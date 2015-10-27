@@ -1,2 +1,2 @@
 # VisiComp
-VisiComp is the offspring of a spreadsheet and a programming environment.
+VisiComp is the bastard child of a spreadsheet and a programming environment.
