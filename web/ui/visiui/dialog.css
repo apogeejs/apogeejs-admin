@@ -1,0 +1,12 @@
+.dialogBody { 
+}
+.dialogLine {
+    margin:10px;
+}
+.dialogTitle {
+    font-weight:bold;
+}
+.dialogButton {
+    margin-left:20px;
+    margin-right:20px;
+}

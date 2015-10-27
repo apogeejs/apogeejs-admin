@@ -1,0 +1,45 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<!--<script src="esprima.js"></script>-->
+		<script src="http://esprima.org/esprima.js"></script>
+		<script>
+			function parse() {
+				var inputElement = document.getElementById("input");
+				var code = inputElement.value;
+				try {
+					var ast = esprima.parse(code, { tolerant: true, loc: true });
+
+					var outputElement = document.getElementById("output");
+					outputElement.value = JSON.stringify(ast);
+				}
+				catch(err) {
+					var outputElement = document.getElementById("output");
+					outputElement.value = JSON.stringify(err);
+					//outputElement.value = err.message;
+				}
+			}
+			
+		</script>
+	</head>
+	<body>
+		<textarea id="input" rows="10" cols="100">
+function doubler(input) {
+	output = input * 2;
+	return output;
+}
+
+var a = 7;
+var b;
+b = doubler(a);
+		</textarea><br>
+		<button onclick="parse()">Parse</button><br>
+		<textarea id="output" rows="10" cols="100"></textarea>
+	</body>
+</html>
