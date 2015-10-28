@@ -404,21 +404,7 @@ visicomp.core.CodeAnalyzer.prototype.processVariableList = function() {
     //process all the variables in the variable list
     for(var key in this.variables) {
         var variableInfo = this.variables[key];
-        
- //debug output
- var temp = key;
- temp += ": ";
- if(variableInfo.table) {
-     temp += "table ";
- }
- if(variableInfo.local) {
-     temp += "local "; 
- }
- if(variableInfo.modified) {
-     temp += "modified ";
- }
- console.log(temp);
- //-------------       
+            
         //check error cases
         {
             var msg;
