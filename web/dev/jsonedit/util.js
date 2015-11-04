@@ -23,19 +23,52 @@ util.createIndentElement = function(indentLevel) {
 	cell.style.width = (PIXELS_PER_INDENT * indentLevel) + "px";
 	return cell;
 }
-util.createKeyElement = function(key,type) {
+util.createKeyElement = function(key,type,isVirtual,parentValue) {
     var className;
     if(type == "key") {
-        className = "keyCell";
+        var overrideCallback = null;
+        
+        if(isVirtual) {
+            className = "virtualKeyCell";
+            overrideCallback = function(editValue) {
+                parentValue.insertElement(editValue,"");
+            }
+        }
+        else {
+            className = "keyCell";
+        }
+        
+        //create an editable key entry
+        return new EditField(key,className,overrideCallback);
     }
-    else if(type == "index") {
-        className = "indexCell";
+    else if(type == "index") { 
+        if(isVirtual) {
+            className = "virtualIndexCell";
+        }
+        else {
+            className = "indexCell";
+        }
+        
+        //create a non editable entry
+        return new FixedField(key,className);   
     }
-	return new EditField(key,className);
+    else {
+        throw "Invalid key type.";
+    }
 }
-util.createValueElement = function(value) {
-	var className = "valueCell";
-    return new EditField(value,className);
+util.createValueElement = function(value,isVirtual,parentValue) {
+	var className;
+    var overrideCallback = null;
+    if(isVirtual) {
+        className = "virtualValueCell";
+        overrideCallback = function(editValue) {
+            parentValue.insertElement("",editValue);
+        }
+    }
+    else {
+        className = "valueCell";
+    }
+    return new EditField(value,className,overrideCallback);
 }
 util.createObjectDelimiter = function(delimiter) {
 	var cell = document.createElement("div");

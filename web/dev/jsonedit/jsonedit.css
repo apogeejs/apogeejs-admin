@@ -18,15 +18,30 @@
     background: white;
     font-style: italic;
 }
-.keyDelimCell {
+.virtualKeyCell {
     display:table-cell;
+    border: lightgray solid 1px;
     padding: 2px;
-    display: none;
-    min-width: 20px;
+    background: white;
+    font-weight:bold;
+}
+.virtualIndexCell {
+    display:table-cell;
+    border: lightgray solid 1px;
+    padding: 2px;
+    background: white;
+    font-style: italic;
 }
 .valueCell {
     display:table-cell;
     border: gray solid 1px;
+    padding: 2px;
+    min-width: 70px;
+    max-width: 500px;
+}
+.virtualValueCell {
+    display:table-cell;
+    border: lightgray solid 1px;
     padding: 2px;
     min-width: 70px;
     max-width: 500px;

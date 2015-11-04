@@ -1,8 +1,12 @@
 
-function ValueEntry(data,indentLevel) {
+function ValueEntry(data,indentLevel,isVirtual,parentValue) {
 	this.data = data;
 	this.type = util.getObjectType(data); //"value", "object", "array"
 	this.indentLevel = indentLevel;
+    
+    //thse are for virtual key entries
+    this.isVirtual = isVirtual;
+    this.parentValue = parentValue;
 	
     
     //for value types ---
@@ -24,7 +28,7 @@ function ValueEntry(data,indentLevel) {
     this.childKeyEntries = [];
     
     //this is the virtual child key
-    this.virtualChildKey
+    this.virtualChildKey = null;
     
     //this is used to control expanding and collapsing
     this.isExpanded = false;
@@ -52,7 +56,7 @@ ValueEntry.prototype.getElementList = function() {
 ValueEntry.prototype.createElements = function() {
     if(this.type == "value") {
         //create a simple element
-        this.valueEditObject = util.createValueElement(this.data);
+        this.valueEditObject = util.createValueElement(this.data,this.isVirtual,this.parentValue);
 		this.elementList.push(this.valueEditObject.getElement());
     }
     else {
@@ -80,7 +84,7 @@ ValueEntry.prototype.createElements = function() {
             }
             
             //add a dummy entry
-            childKeyEntry = new KeyEntry("-","key","-",this.indentLevel + 1);
+            childKeyEntry = new KeyEntry("","key","",this.indentLevel + 1,true,this);
             this.virtualChildKey = childKeyEntry;
             this.listDiv.appendChild(childKeyEntry.getElement());
         }
@@ -96,7 +100,7 @@ ValueEntry.prototype.createElements = function() {
             }
             
             //add a dummy entry
-            childKeyEntry = new KeyEntry(i,"index","-",this.indentLevel + 1);
+            childKeyEntry = new KeyEntry(i,"index","",this.indentLevel + 1,true,this);
             this.virtualChildKey = childKeyEntry;
             this.listDiv.appendChild(childKeyEntry.getElement());
         }
@@ -148,5 +152,44 @@ ValueEntry.prototype.doExpandContract = function() {
 	}
 }
 
+/** This method inserts an element at the given index. If the index is left blank
+ * the entry is inserted at the end of the list. The value of key is ignored if
+ * the entry is an array. */
+ValueEntry.prototype.insertElement = function(key,value,index) {
+
+    var childKeyEntry;
+    
+    //get the insert index
+    if(index === undefined) {
+        index = this.childKeyEntries.length;
+    }
+    
+    //get the element to insert before
+    var insertBefore;
+    if(index >= this.childKeyEntries.length) {
+        insertBefore = this.virtualChildKey.getElement();
+    }
+    else {
+        insertBefore = this.childKeyEntries[index].getElement();
+    }
+    
+    if(this.type == "object") {
+        childKeyEntry = new KeyEntry(key,"key",value,this.indentLevel + 1);     
+    }
+    else if(this.type == "array") {
+        childKeyEntry = new KeyEntry(index,"index",value,this.indentLevel + 1);
+        
+        //we also need to update all the keys larger than this one
+        for(var newIndex = index+1; newIndex < this.childKeyEntries.length; newIndex++) {
+            this.childKeyEntries[newIndex].setKey(newIndex);
+        }
+        this.virtualChildKey.setKey(this.childKeyEntries.length + 1);
+    }
+    
+    this.childKeyEntries.splice(index,0,childKeyEntry);
+    
+    this.listDiv.insertBefore(childKeyEntry.getElement(),insertBefore);
+
+}
 
 
