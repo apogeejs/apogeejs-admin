@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<script src="data.js" type="text/javascript"></script>
+        <script src="keyentry.js" type="text/javascript"></script>
+        <script src="valueentry.js" type="text/javascript"></script>
+        <script src="util.js" type="text/javascript"></script>
+        <script src="editfield.js" type="text/javascript"></script>
+        <link rel="stylesheet" type="text/css" href="jsonedit.css">
+		<script>
+
+			function init() {
+				var mainDiv = document.getElementById("mainDiv");
+				
+				var valueEntry = new ValueEntry(data,0);
+                
+                //we want the base element expanded
+                valueEntry.setExpanded(true);
+                
+                var elementList = valueEntry.getElementList();
+				for(var i = 0; i < elementList.length; i++) {
+                    mainDiv.appendChild(elementList[i]);
+                }
+			}
+		</script>	
+        <style>
+            #mainDiv {
+                border: 1px solid lightgray;
+                position: absolute;
+                top: 0px;
+                bottom: 0px;
+                left: 0px;
+                right: 0px;
+                margin: 5px;
+                overflow: auto;
+            }
+        </style>
+	</head>
+	<body onload="init()">
+		<div id="mainDiv"></div>
+	</body>
+</html>

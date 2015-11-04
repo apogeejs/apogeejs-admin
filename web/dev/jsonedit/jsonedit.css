@@ -1,0 +1,42 @@
+.jsonBody {
+    padding:1px;
+}
+.indentCell {
+    display:table-cell;
+}
+.keyCell {
+    display:table-cell;
+    border: gray solid 1px;
+    padding: 2px;
+    background: lightgray;
+    font-weight:bold;
+}
+.indexCell {
+    display:table-cell;
+    border: gray solid 1px;
+    padding: 2px;
+    background: white;
+    font-style: italic;
+}
+.keyDelimCell {
+    display:table-cell;
+    padding: 2px;
+    display: none;
+    min-width: 20px;
+}
+.valueCell {
+    display:table-cell;
+    border: gray solid 1px;
+    padding: 2px;
+    min-width: 70px;
+    max-width: 500px;
+}
+.objectDelimCell {
+    display:table-cell;
+    padding: 2px;
+}
+.buttonCell {
+    display:table-cell;
+    padding: 2px;
+}
+
