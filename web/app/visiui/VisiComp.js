@@ -8,18 +8,18 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     this.eventManager = new visicomp.core.EventManager();
 
     //create a menu
-    var menuBar = new visicomp.visiui.MenuBar(containerId,this.eventManager);
+    var menuBar = new visicomp.visiui.MenuBar(containerId);
     var menu;
 
     menu = menuBar.addMenu("File");
-    menu.addMenuItem("New","menuFileNew");
-    menu.addMenuItem("Open","menuFileOpen");
-    menu.addMenuItem("Save","menuFileSave");
-    menu.addMenuItem("Close","menuFileClose");
+    menu.addEventMenuItem("New","menuFileNew",null,this.eventManager);
+    menu.addEventMenuItem("Open","menuFileOpen",null,this.eventManager);
+    menu.addEventMenuItem("Save","menuFileSave",null,this.eventManager);
+    menu.addEventMenuItem("Close","menuFileClose",null,this.eventManager);
 
     menu = menuBar.addMenu("Workbook");
-    menu.addMenuItem("Add&nbsp;Worksheet","workbookAddWorksheet");
-    menu.addMenuItem("Add&nbsp;Table","worksheetAddTable");				
+    menu.addEventMenuItem("Add&nbsp;Worksheet","workbookAddWorksheet",null,this.eventManager);
+    menu.addEventMenuItem("Add&nbsp;Table","worksheetAddTable",null,this.eventManager);				
 
     //add some tabs
     this.tabFrame = new visicomp.visiui.TabFrame(containerId);

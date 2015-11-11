@@ -2,49 +2,24 @@
  *
  * @class 
  */
-visicomp.visiui.Menu = function(eventManager) {
+ContextMenu = function() {
 	
-	//initialize menus, if needed
-	if(!visicomp.visiui.Menu.initialized) {
-		visicomp.visiui.Menu.initialize();
-	}
-	
-    //variables
-    this.eventManager = eventManager;
-    this.headingDiv = null;
     this.menuDiv = null;
+//    this.x = x;
+//    this.y = y;
+//    this.container = container;
 	
     this.menuItems = {};
 	
     //construct the menu
-	this.createHeadingElement();
     this.createMenuElement();
 }
 
 //style info
-visicomp.visiui.Menu.MENU_HEADING_BASE_STYLE = {
-    //fixed
-    "display":"inline-block",
-    "position":"relative",
-    "cursor":" default",
-	"overflow":"visible"
-}
-visicomp.visiui.Menu.MENU_HEADING_NORMAL_STYLE = {
-    //configurable
-    "background-color":"",
-    "padding":"2px"
-}
-visicomp.visiui.Menu.MENU_HEADING_HOVER_STYLE = {
-    //configurable
-    "background-color":"lightgray",
-    "padding":"2px"
-}
 visicomp.visiui.Menu.MENU_STYLE = {
     //fixed
     "overflow":"visible",
     "position":"absolute",
-    "top":"100%",
-    "left":"0%",
     "z-index":"100",
     
     //configurable
@@ -66,35 +41,20 @@ visicomp.visiui.Menu.MENU_ITEM_HOVER_STYLE = {
 }
 
 
-visicomp.visiui.Menu.MENU_HEADING_CLASS_NAME = "visiui_menu_heading";
-visicomp.visiui.Menu.MENU_HOVER_HEADING_CLASS_NAME = "visiui_menu_heading_hover";
 visicomp.visiui.Menu.MENU_CLASS_NAME = "visiui_menu";
 visicomp.visiui.Menu.MENU_ITEM_CLASS_NAME = "visiui_menu_item";
 visicomp.visiui.Menu.MENU_ITEM_HOVER_CLASS_NAME = "visiui_menu_item_hover";
-
-/** this returns the dom element for the menu heading. */
-visicomp.visiui.Menu.prototype.getHeadingElement = function() {
-    return this.headingDiv;
-}
 
 /** this returns the dom element for the menu object. */
 visicomp.visiui.Menu.prototype.getMenuElement = function() {
     return this.menuDiv;
 }
 
-/** this returns the dom element for the menu heading. */
-visicomp.visiui.Menu.prototype.setTitle = function(title) {
-    //set the title
-	this.headingDiv.innerHTML = title;
-	//re-add the menu
-    this.headingDiv.appendChild(this.menuDiv);
-}
-
 /** this adds a menu item that dispatchs the given event when clicked. */
-visicomp.visiui.Menu.prototype.addMenuItem = function(title, eventName) {
+visicomp.visiui.Menu.prototype.addMenuItem = function(title, callback) {
     var itemInfo = {};
     itemInfo.title = title;
-    itemInfo.eventName = eventName;
+    itemInfo.callback = callback;
     itemInfo.element = document.createElement("div");
     visicomp.visiui.applyStyle(itemInfo.element,visicomp.visiui.Menu.MENU_ITEM_NORMAL_STYLE);
     itemInfo.element.innerHTML = title;
@@ -108,7 +68,7 @@ visicomp.visiui.Menu.prototype.addMenuItem = function(title, eventName) {
 		//close menu
 		visicomp.visiui.Menu.hideActiveMenu();
 		//dispatch event
-        menu.eventManager.dispatchEvent(eventName);
+        itemInfo.callback();
 		event.stopPropagation();
     }
 	itemInfo.element.onmousemove= function(e) {
@@ -139,29 +99,6 @@ visicomp.visiui.Menu.prototype.removeMenuItem = function(title) {
 // Init
 //================================
 
-/** this adds a menu item that dispatchs the given event when clicked. */
-visicomp.visiui.Menu.prototype.createHeadingElement = function() {
-    this.headingDiv = document.createElement("div");
-    visicomp.visiui.applyStyle(this.headingDiv,visicomp.visiui.Menu.MENU_HEADING_BASE_STYLE);
-    visicomp.visiui.applyStyle(this.headingDiv,visicomp.visiui.Menu.MENU_HEADING_NORMAL_STYLE);
-	
-    var instance = this;
-    this.headingDiv.onmousedown = function(e) {
-        visicomp.visiui.Menu.menuHeaderPressed(instance);
-		e.stopPropagation();
-    }
-    this.headingDiv.onmouseenter = function(e) {
-		visicomp.visiui.applyStyle(instance.headingDiv,visicomp.visiui.Menu.MENU_HEADING_HOVER_STYLE);
-        visicomp.visiui.Menu.menuHeaderEntered(instance);
-    }
-	this.headingDiv.onmouseleave = function(e) {
-        visicomp.visiui.applyStyle(instance.headingDiv,visicomp.visiui.Menu.MENU_HEADING_NORMAL_STYLE);
-    }
-	this.headingDiv.onmousemove = function(e) {
-        e.preventDefault();
-    }
-}
-
 /** this method creates the menu body that is shown below the header. */
 visicomp.visiui.Menu.prototype.createMenuElement = function() {
     this.menuDiv = document.createElement("div");
@@ -179,24 +116,6 @@ visicomp.visiui.Menu.prototype.createMenuElement = function() {
 visicomp.visiui.Menu.initialized = false;
 visicomp.visiui.Menu.activeMenu = null;
 
-visicomp.visiui.Menu.menuHeaderPressed = function(menuObject) {
-	//if there is an active menu, pressing the header closes the active menu otherwise show the menu
-	if(visicomp.visiui.Menu.activeMenu) {
-		//active menu - close the menu
-		visicomp.visiui.Menu.hideActiveMenu();
-	}
-	else {
-		//no active menu, open this menu
-		visicomp.visiui.Menu.show(menuObject);
-	}
-}
-
-visicomp.visiui.Menu.menuHeaderEntered = function(menuObject) {
-	//if a header is entered and there is an active menu, open this menu
-	if(visicomp.visiui.Menu.activeMenu) {
-		visicomp.visiui.Menu.show(menuObject);
-	}
-}
 
 visicomp.visiui.Menu.nonMenuPressed = function() {
 	//if the mouse is pressed outside the menu, close any active menu
@@ -226,14 +145,4 @@ visicomp.visiui.Menu.hideActiveMenu = function() {
 
 visicomp.visiui.Menu.nonMenuMouseHandler = null;
 
-visicomp.visiui.Menu.initialize = function() {
-	window.addEventListener("mousedown",visicomp.visiui.Menu.nonMenuPressed);
-	visicomp.visiui.Menu.initialized = true;
-}
-
-/** This method allows you to undo the initialization actions. I am not sure you would ever need to do it. */
-visicomp.visiui.Menu.deinitialize = function() {
-	window.removeEventListener("mousedown",visicomp.visiui.Menu.nonMenuPressed);
-	visicomp.visiui.Menu.initialized = false;
-}
 	

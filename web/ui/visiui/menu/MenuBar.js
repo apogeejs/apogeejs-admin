@@ -41,8 +41,7 @@ visicomp.visiui.MenuBar.MENU_BAR_STYLE = {
 
 /** This method adds a menu of the given title. It returns the menu javascript object. */
 visicomp.visiui.MenuBar.prototype.addMenu = function(title) {
-	var menu = new visicomp.visiui.Menu(this.eventManager);
-	menu.setTitle(title);
+	var menu = new visicomp.visiui.StaticMenu(title,this.eventManager);
 	
     var menuInfo = {};
     menuInfo.title = title;
