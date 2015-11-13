@@ -22,8 +22,16 @@ KeyEntry.prototype.setKey = function(key) {
     this.keyEditObject.setValue(key);
 }
 
-KeyEntry.prototype.getkey = function() {
+KeyEntry.prototype.getInitialKey = function() {
 	return this.key;
+}
+
+KeyEntry.prototype.getCurrentKey = function() {
+	return this.keyEditObject.getValue();
+}
+
+KeyEntry.prototype.getCurrentValue = function() {
+	return this.valueEntry.getCurrentValue();
 }
 
 KeyEntry.prototype.getElement = function() {
@@ -31,20 +39,26 @@ KeyEntry.prototype.getElement = function() {
 }
 
 KeyEntry.prototype.createBody = function() {
-    
-	//create value entry
-	this.valueEntry = new ValueEntry(this.data,this.indentLevel + 1,this.isVirtual,this.parentValue);
 	
 	//create main row
 	//create row div
 	this.body = document.createElement("div");
 	this.body.className = "jsonBody";
+    
+    //create the key
+    this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual,this.parentValue);
+    
+    //create value entry
+	this.valueEntry = new ValueEntry(this,this.data,this.indentLevel + 1,this.isVirtual,this.parentValue);
 	
+    this.formatBody();
+}
+
+KeyEntry.prototype.formatBody = function() {
 	//add indent
 	this.body.appendChild(util.createIndentElement(this.indentLevel));
 	
 	//add key
-    this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual,this.parentValue);
 	this.body.appendChild(this.keyEditObject.getElement());
 	
 	var valueElementList = this.valueEntry.getElementList();
@@ -52,6 +66,70 @@ KeyEntry.prototype.createBody = function() {
         this.body.appendChild(valueElementList[i]);
     }
     
+    this.loadContextMenu();
+    
+}
+
+KeyEntry.prototype.loadContextMenu = function() {
+
+    var instance = this;
+    var element = this.keyEditObject.getElement();
+    var valueEntry = this.valueEntry;
+    var valueType = valueEntry.getType();
+    element.oncontextmenu = function(event) {
+        var contextMenu = new visicomp.visiui.MenuBody();
+        contextMenu.addCallbackMenuItem("Value",function() {alert(instance.getCurrentValue());});
+        if(valueType == "value") {
+            contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.valueToObject()});
+            contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.valueToArray()});
+        }
+        else if(valueType == "object") {
+            contextMenu.addCallbackMenuItem("Convert To Value",function() {valueEntry.convertToValue()});
+            contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.objectToArray()});
+        }
+        else if(valueType == "array") {
+            contextMenu.addCallbackMenuItem("Convert To Value",function() {valueEntry.convertToValue()});
+            contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.arrayToObject()});
+        }
+        
+        visicomp.visiui.Menu.showContextMenu(contextMenu,event);
+    }
+  
+}
+
+KeyEntry.prototype.convertToKeyType = function(key) {
+    if(this.type == "key") return;
+    
+    this.type = "key";
+    this.key = String(key);
+    
+    //create the key
+    this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual,this.parentValue);
+    
+    //remove and reset all from element
+    this.body.innerHTML = "";
+    this.formatBody();
+}
+
+KeyEntry.prototype.convertToIndexType = function(index) {
+    if(this.type == "index") return;
+    
+    this.type = "index";
+    this.key = index;
+    
+    //create the key
+    this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual,this.parentValue);
+    
+    //remove and reset all from element
+    this.body.innerHTML = "";
+    this.formatBody();
+}
+
+KeyEntry.prototype.updateValueElements = function() {
+    //remove all from element
+    this.body.innerHTML = "";
+    //recreate
+    this.formatBody();
 }
 
 
