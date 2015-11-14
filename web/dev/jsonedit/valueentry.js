@@ -1,11 +1,17 @@
-
-function ValueEntry(parentKey,data,indentLevel,isVirtual,parentValue) {
-	this.parentKey = parentKey;
+/**  This a value entry
+ * 
+ * notes:
+ * - parent is the obgject that holds the dom elements for this value. it will be
+ * either the key for this value or the top level entry. It should have a method
+ * "updateValueElements" that will refresh the elements if they have been updated.
+ */
+function ValueEntry(parent,data,indentLevel,isVirtual,parentValue) {
+	this.parent = parent;
     this.data = data;
 	this.type = util.getObjectType(data); //"value", "object", "array"
 	this.indentLevel = indentLevel;
     
-    //thse are for virtual key entries
+    //thse are for virtual key entries. Parent value is the value that holds the parent key
     this.isVirtual = isVirtual;
     this.parentValue = parentValue;
     
@@ -17,15 +23,15 @@ function ValueEntry(parentKey,data,indentLevel,isVirtual,parentValue) {
     //---------------------
     
     //for list types ----
-    //
+	
+	//these are the child keys
+    this.childKeyEntries = [];
+	
     //this is the singel element for the list entries (if applicable)
 	this.listDiv = null;
     
     //these are all the display elements
     this.elementList = [];
-    
-    //these are the child keys
-    this.childKeyEntries = [];
     
     //this is the virtual child key
     this.virtualChildKey = null;
@@ -83,39 +89,46 @@ ValueEntry.prototype.getElementList = function() {
 }
 
 ValueEntry.prototype.createElements = function(elementsData) {
+	//initialize data elements
+    this.valueEditObject = null;
+    this.childKeyEntries = [];
+	this.virtualChildKey = null;
+	this.elementList = [];
+	
+	//populate data
     if(this.type == "value") {
         //create the value element
         this.createValueElement(elementsData,this.isVirtual,this.parentValue);
+		
+		//clear the list elements
+		this.listDiv = null;
+		this.contractedList = null;
+		this.expandedList = null;
     }
     else {
-        //create a list element
-        this.listDiv = document.createElement("div");
+        //create the child keys for the object or array
         var childKeyEntry;
         if(this.type == "object") { 
             
             for(var key in elementsData) {
                 childKeyEntry = new KeyEntry(key,"key",elementsData[key],this.indentLevel + 1);
                 this.childKeyEntries.push(childKeyEntry);
-                this.listDiv.appendChild(childKeyEntry.getElement());
             }
             
             //add a dummy entry
             childKeyEntry = new KeyEntry("","key","",this.indentLevel + 1,true,this);
             this.virtualChildKey = childKeyEntry;
-            this.listDiv.appendChild(childKeyEntry.getElement());
         }
         else if(this.type == "array") {
             
             for(var i = 0; i < elementsData.length; i++) {
                 childKeyEntry = new KeyEntry(i,"index",elementsData[i],this.indentLevel + 1);
                 this.childKeyEntries.push(childKeyEntry);
-                this.listDiv.appendChild(childKeyEntry.getElement());
             }
             
             //add a dummy entry
             childKeyEntry = new KeyEntry(i,"index","",this.indentLevel + 1,true,this);
             this.virtualChildKey = childKeyEntry;
-            this.listDiv.appendChild(childKeyEntry.getElement());
         }
         
         this.formatList();
@@ -134,18 +147,41 @@ ValueEntry.prototype.createValueElement = function(data,isVirtual,parentValue) {
     this.loadValueElementContextMenu(element); 
 }
 
+ValueEntry.prototype.loadValueElementContextMenu = function(element) {
+
+    var instance = this;    
+    element.oncontextmenu = function(event) {
+        var contextMenu = new visicomp.visiui.MenuBody();
+        contextMenu.addCallbackMenuItem("Convert To Object",function() {instance.valueToObject()});
+        contextMenu.addCallbackMenuItem("Convert To Array",function() {instance.valueToArray()}); 
+        visicomp.visiui.Menu.showContextMenu(contextMenu,event);
+    }
+}
+
 /** This wraps the list elements into the proper format. 
 * @private */
 ValueEntry.prototype.formatList = function() {
-    
-    this.contractedList = [];
+
+    //initialize elements
+	this.listDiv = document.createElement("div");
     this.elementList = [];
+    this.contractedList = [];
     this.expandedList = [];
     
     var startDelimiter;
     var endDelimiter1;
     var endDelimiter2;
     var endIndent = util.createIndentElement(this.indentLevel);
+
+	//list element
+	var childKeyEntry;
+	for(var i = 0; i < this.childKeyEntries.length; i++) {
+		childKeyEntry = this.childKeyEntries[i];
+		this.listDiv.appendChild(childKeyEntry.getElement());
+	}
+	if(this.virtualChildKey) {
+		this.listDiv.appendChild(this.virtualChildKey.getElement());
+	}
 
     //buttons
     var expandButton = util.createExpandButton(this);
@@ -192,18 +228,9 @@ ValueEntry.prototype.formatList = function() {
     this.doExpandContract();
 }
 
-ValueEntry.prototype.loadValueElementContextMenu = function(element) {
-
-    var instance = this;    
-    element.oncontextmenu = function(event) {
-        var contextMenu = new visicomp.visiui.MenuBody();
-        contextMenu.addCallbackMenuItem("Convert To Object",function() {instance.valueToObject()});
-        contextMenu.addCallbackMenuItem("Convert To Array",function() {instance.valueToArray()}); 
-        visicomp.visiui.Menu.showContextMenu(contextMenu,event);
-    }
-}
-
 ValueEntry.prototype.doExpandContract = function() {
+	if((!this.expandedList)||(!this.contractedList)) return;
+	
 	var onList = this.isExpanded ? this.expandedList : this.contractedList;
 	var offList = !this.isExpanded ? this.expandedList : this.contractedList;
 	
@@ -270,26 +297,11 @@ ValueEntry.prototype.valueToArray = function() {
     
     //these are the edit elements
     var newValue = [this.valueEditObject.getValue()];
-    
-    //these are the edit elements
-    this.valueEditObject = null;
-    
-    //for list types ----
-	this.listDiv = null;
-    this.elementList = [];
-    this.childKeyEntries = [];
-    this.virtualChildKey = null;
-    this.isExpanded = false;
-	this.expandedList = [];
-	this.contractedList = [];
-    
-    //-------------------
-	
 	this.createElements(newValue);
     
     //refresh the parent key
-    if(this.parentKey) {
-        this.parentKey.updateValueElements();
+    if(this.parent) {
+        this.parent.updateValueElements();
     }
 }
 
@@ -301,26 +313,11 @@ ValueEntry.prototype.valueToObject = function() {
     
     //these are the edit elements
     var newValue = {"a":this.valueEditObject.getValue()};
-    
-    //these are the edit elements
-    this.valueEditObject = null;
-    
-    //for list types ----
-	this.listDiv = null;
-    this.elementList = [];
-    this.childKeyEntries = [];
-    this.virtualChildKey = null;
-    this.isExpanded = false;
-	this.expandedList = [];
-	this.contractedList = [];
-    
-    //-------------------
-	
 	this.createElements(newValue);
     
     //refresh the parent key
-    if(this.parentKey) {
-        this.parentKey.updateValueElements();
+    if(this.parent) {
+        this.parent.updateValueElements();
     }
 }
 
@@ -330,15 +327,17 @@ ValueEntry.prototype.objectToArray = function() {
     }
     this.type = "array";
     
-    //clear and update the list
-    this.listDiv.innerHTML = "";
+    //reconfigure the existing list (rather than remaking all the objects)
+    var i = 0;
     if(this.childKeyEntries) {
-        for(var i = 0; i < this.childKeyEntries.length; i++) {
+        for(i = 0; i < this.childKeyEntries.length; i++) {
             var childKeyEntry = this.childKeyEntries[i];
             childKeyEntry.convertToIndexType(i);
-            this.listDiv.appendChild(childKeyEntry.getElement());
         }
     }
+	if(this.virtualChildKey) {
+		this.virtualChildKey.convertToIndexType(i);
+	}
     
     //these are the edit elements
     this.valueEditObject = null;
@@ -346,8 +345,8 @@ ValueEntry.prototype.objectToArray = function() {
     this.formatList();
     
     //refresh the parent key
-    if(this.parentKey) {
-        this.parentKey.updateValueElements();
+    if(this.parent) {
+        this.parent.updateValueElements();
     }
 }
 
@@ -357,24 +356,23 @@ ValueEntry.prototype.arrayToObject = function() {
     }
     this.type = "object";
     
-    //clear and update the list
-    this.listDiv.innerHTML = "";
+    //reconfigure the existing list (rather than remaking all the objects)
+	var i = 0;
     if(this.childKeyEntries) {
-        for(var i = 0; i < this.childKeyEntries.length; i++) {
+        for(i = 0; i < this.childKeyEntries.length; i++) {
             var childKeyEntry = this.childKeyEntries[i];
             childKeyEntry.convertToKeyType(String(i));
-            this.listDiv.appendChild(childKeyEntry.getElement());
         }
     }
-    
-    //these are the edit elements
-    this.valueEditObject = null;
-    
+	if(this.virtualChildKey) {
+		this.virtualChildKey.convertToKeyType("");
+	}
+
     this.formatList();
     
     //refresh the parent key
-    if(this.parentKey) {
-        this.parentKey.updateValueElements();
+    if(this.parent) {
+        this.parent.updateValueElements();
     }
 }
 
@@ -382,19 +380,9 @@ ValueEntry.prototype.convertToValue = function() {
     if(this.type == "value") {
         return;
     }
-    
+   
     //update type
     this.type = "value";
-    
-    //clear virtual - make this real if it is virtual
-    this.isVirtual = false;
-//    this.parentValue = this.parentValue; ???
-    
-    //clear some list values
-	this.listDiv = null;
-    this.elementList = [];
-    this.childKeyEntries = [];
-    this.virtualChildKey = null;
     
     var value;
     if((this.childKeyEntries)&&(this.childKeyEntries.length > 0)) {
@@ -406,11 +394,11 @@ ValueEntry.prototype.convertToValue = function() {
     }
     
     //set the element value
-    this.createValueElement(value,this.isVirtual,this.parentValue);
+	this.createElements(value);
     
     //refresh the parent key
-    if(this.parentKey) {
-        this.parentKey.updateValueElements();
+    if(this.parent) {
+        this.parent.updateValueElements();
     }
 }
 

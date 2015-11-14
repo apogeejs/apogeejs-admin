@@ -14,7 +14,7 @@ function KeyEntry(key,keyType,data,indentLevel,isVirtual,parentValue) {
     //this is the edit control for the key
     this.keyEditObject = null;
 	
-	this.createBody();
+	this.createBody(this.data);
 }
 
 KeyEntry.prototype.setKey = function(key) {
@@ -38,7 +38,7 @@ KeyEntry.prototype.getElement = function() {
 	return this.body;
 }
 
-KeyEntry.prototype.createBody = function() {
+KeyEntry.prototype.createBody = function(entryData) {
 	
 	//create main row
 	//create row div
@@ -49,7 +49,7 @@ KeyEntry.prototype.createBody = function() {
     this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual,this.parentValue);
     
     //create value entry
-	this.valueEntry = new ValueEntry(this,this.data,this.indentLevel + 1,this.isVirtual,this.parentValue);
+	this.valueEntry = new ValueEntry(this,entryData,this.indentLevel + 1,this.isVirtual,this.parentValue);
 	
     this.formatBody();
 }

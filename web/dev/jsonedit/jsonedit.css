@@ -22,6 +22,7 @@
     display:table-cell;
     border: lightgray solid 1px;
     padding: 2px;
+	min-width: 10px;
     background: white;
     font-weight:bold;
 }
@@ -40,11 +41,14 @@
     max-width: 500px;
 }
 .virtualValueCell {
-    display:table-cell;
+    display: table-cell;
     border: lightgray solid 1px;
     padding: 2px;
     min-width: 70px;
     max-width: 500px;
+}
+.virtualValueCell:empty {
+	height:15px;
 }
 .objectDelimCell {
     display:table-cell;
