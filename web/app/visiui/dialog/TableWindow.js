@@ -1,5 +1,5 @@
-/** This method shows a create worksheet dialog. The argument onCreateFunction
- * should take the worksheet name as an argument and return an object with the boolean entry
+/** This method shows a create package dialog. The argument onCreateFunction
+ * should take the package name as an argument and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
 visicomp.app.visiui.dialog.tableWindow = function(table) {
 

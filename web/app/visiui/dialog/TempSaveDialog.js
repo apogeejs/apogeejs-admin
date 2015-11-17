@@ -1,14 +1,14 @@
 
-/** This method shows a save worksheet dialog. I simply displays the text of
- * the workbook json for the user to copy and save elsewhere. */
-visicomp.app.visiui.dialog.saveWorkbookDialog = function(workbookUI) {
+/** This method shows a save package dialog. I simply displays the text of
+ * the workspace json for the user to copy and save elsewhere. */
+visicomp.app.visiui.dialog.saveWorkspaceDialog = function(workspaceUI) {
     
-    if((!workbookUI)||(!workbookUI.getWorkbook())) {
-        alert("There is no workbook open.");
+    if((!workspaceUI)||(!workspaceUI.getWorkspace())) {
+        alert("There is no workspace open.");
         return;
     }
     
-    var workbookText = JSON.stringify(workbookUI.getWorkbook().toJson());
+    var workspaceText = JSON.stringify(workspaceUI.getWorkspace().toJson());
 
     var dialog = new visicomp.visiui.Dialog("Dialog",{"resizable":true,"movable":true});
     var content = document.createElement("div");
@@ -17,7 +17,7 @@ visicomp.app.visiui.dialog.saveWorkbookDialog = function(workbookUI) {
   
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Save Workbook"}));
+    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Save Workspace"}));
     content.appendChild(line);
     
     //instructions
@@ -27,7 +27,7 @@ visicomp.app.visiui.dialog.saveWorkbookDialog = function(workbookUI) {
     
     //input
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    var inputElement = visicomp.visiui.createElement("textarea",{"value":workbookText,"rows":"15","cols":"75"});
+    var inputElement = visicomp.visiui.createElement("textarea",{"value":workspaceText,"rows":"15","cols":"75"});
     line.appendChild(inputElement);
     content.appendChild(line);
     

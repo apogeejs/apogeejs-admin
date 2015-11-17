@@ -6,11 +6,10 @@ visicomp.core.updateCode = {};
 
 /** This is a simple entry point to debug user code */
 visicomp.core.runTableFormula = function(table) {
-    var tableName = table.getName();
-    var worksheetName = table.worksheet.getName();
-    var workbookName = table.worksheet.getWorkbook().getName();
+    var tableName = table.getFullName();
+    var workspaceName = table.getWorkspace().getName();
     
-    var updateCommand = visicomp.core.updateCode[workbookName][worksheetName][tableName];
+    var updateCommand = visicomp.core.updateCode[workspaceName][tableName];
     if(updateCommand) {
         //step in here to debug user code for a given table
         updateCommand(table);

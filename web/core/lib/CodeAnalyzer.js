@@ -3,8 +3,8 @@
  *  
  * Formula Rules:
  * - The formula can access any table, using the name of the table if the table is
- * in the same worksheet or [worksheet name].[table name] if the table is in 
- * another worksheet. These tables are held as local variables in the formula function.
+ * in the same package or [package name].[table name] if the table is in 
+ * another package. These tables are held as local variables in the formula function.
  * - The formula should update the value "value" to update the current table. None
  * of the table objects (given by [table name]) should be modified.
  * - The formula should not access any global variables. It should only use local
@@ -12,8 +12,8 @@
  **/ 
 visicomp.core.CodeAnalyzer = function(table) {
     this.table = table
-    this.worksheet = table.getWorksheet();
-    this.workbook = this.worksheet.getWorkbook();
+    this.package = table.getPackage();
+    this.workspace = this.package.getWorkspace();
 	
     this.formula = null;
     this.dependsOn = null;
@@ -163,9 +163,9 @@ visicomp.core.CodeAnalyzer.prototype.analyzeCode = function(formula) {
     this.dependsOn = [];
     this.variables = {};
     
-    //update worksheet and  in case someone is reusing this class and these values changed
-    this.worksheet = this.table.getWorksheet();
-    this.workbook = this.worksheet.getWorkbook();
+    //update package and  in case someone is reusing this class and these values changed
+    this.package = this.table.getPackage();
+    this.workspace = this.package.getWorkspace();
     
     try {
     
@@ -300,59 +300,65 @@ visicomp.core.CodeAnalyzer.prototype.processGenericNode = function(node) {
 visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,isDeclaration) {
     
     //get the variables
-    var variableDesc = this.getVariableDescription(node);
-
-    var varName = variableDesc[0];
-    var variableWorksheet;
-    var variableTable;
-    
-    //look up var name as worksheet, to see if it is a worksheet
-    variableWorksheet = this.workbook.lookupWorksheet(varName);
-    
-    if(variableWorksheet) {
-        //get the table name for the case this is a worksheet
-        var tableName = variableDesc[1];
-        if(!tableName) {
-            //this can happen if the user uses an expression to determine the table name
-            //it is not supported here for now!
-            throw this.createErrorObject("Resolving a table name through an expression is not supported.",node.loc);
-        }
-        
-        //try lookup the table 
-        variableTable = variableWorksheet.lookupTable(tableName);
-        
-        if(!variableTable) {
-             //if worksheet name present, table must be defined
-            throw this.createErrorObject("Table not found for worksheet: " + key,node.loc);         
-        }
-    }
-    else {
-        //try lookup the table in the current worksheet
-        variableTable = this.worksheet.lookupTable(varName);
-        
-        //if we found the table, set the variable worksheet to the current worksheet
-        if(variableTable != null) {
-            variableWorksheet = this.worksheet;
-        }
-    }
-    
+    var namePath = this.getVariableDescription(node);
+	
+	//lookup the object
+	//first determine the name base package on which the name is based
+	//we will base this on whether the first name in the path is in the package,
+	//first checking the local package and then the root package for the workspace
+	
+	var object;
+	var namePackage;
+	var nameIndex = 0;
+	
+	object = this.package.lookupChild(namePath[nameIndex]);
+	if(object != null) {
+		namePackage = this.package;
+	}
+	else {
+		//check the root package
+		var basePackage = this.workspace.getRootPackage();
+		object = basePackage.lookupChild(namePath[nameIndex]);
+		if(object != null) {
+			namePackage = basePackage;
+		}
+		else {
+			object == null;
+			namePackage = null;
+		}
+	}
+	
+	//we have determined the base package for the name, but we might not 
+	//have the actual oject
+	while((nameIndex < namePath.length-1)&&(object != null)&&(object.getType() === "package")) {
+		nameIndex++;
+		object = object.lookupChild(namePath[nameIndex]);
+	}
+	
+	//flag an error if we found a base package but not the proper object
+	if((namePackage != null)&&(object == null)) {
+		//this shouldn't happen. If it does we didn't code the syntax tree right
+        throw this.createErrorObject("Table not found: ",node.loc);
+	}
+	
     //add this variable to the variable list
-    var variableKey;
-    if(variableTable != null) {
-        variableKey = variableTable.getFullName();
+    var objectKey;
+    if(object != null) {
+        objectKey = object.getFullName();
     }
     else {
-        variableKey = varName;
+//I AM NOT SURE WHAT TO USE FOR THE NAME HERE - FULL DOT NAME? LEAD NAME? END NAME?
+        objectKey = namePath[0];
     }
     
     //get or create the var info for this variable
-    var varInfo = this.variables[variableKey];
+    var varInfo = this.variables[objectKey];
     if(!varInfo) {
         varInfo = {};
-        varInfo.worksheet = variableWorksheet;
-        varInfo.table = variableTable;
+        varInfo.package = namePackage;
+        varInfo.table = object;
         varInfo.loc = node.loc; //save the first appearance of this variable
-        this.variables[variableKey] = varInfo;
+        this.variables[objectKey] = varInfo;
     }
     
     //add modifier flags
@@ -384,7 +390,7 @@ visicomp.core.CodeAnalyzer.prototype.getVariableDescription = function(node) {
         }
         else {
             //append the member expression property to it
-            variable.push(node.property);
+            variable.push(node.property.name);
         }
         
         return variable;

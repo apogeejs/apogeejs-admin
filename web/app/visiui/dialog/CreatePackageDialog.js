@@ -1,8 +1,7 @@
-/** This method shows a create worksheet dialog. The argument onCreateFunction
- * should take the worksheet name as an argument and return an object with the boolean entry
+/** This method shows a create package dialog. The argument onCreateFunction
+ * should take the package name as an argument and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.createWorkbookDialog = function(onCreateFunction) {
-
+visicomp.app.visiui.dialog.createPackageDialog = function(onCreateFunction) {
     var dialog = new visicomp.visiui.Dialog("",{"movable":true});
     
     //create body
@@ -12,7 +11,7 @@ visicomp.app.visiui.dialog.createWorkbookDialog = function(onCreateFunction) {
   
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"New Workbook"}));
+    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"New Package"}));
     content.appendChild(line);
     
     //input
@@ -22,7 +21,7 @@ visicomp.app.visiui.dialog.createWorkbookDialog = function(onCreateFunction) {
     line.appendChild(inputElement);
     content.appendChild(line);
     
-    //buttons
+    //buttons and handler
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
         dialog.hide();
@@ -38,12 +37,14 @@ visicomp.app.visiui.dialog.createWorkbookDialog = function(onCreateFunction) {
         var result = onCreateFunction(name);
         
         if(!result.success) {
-            alert("There was an error adding the workbook: " + result.msg);
+            alert("There was an error adding the package: " + result.msg);
             return;
         }
         
+        //if we get here we should close the dialog
         dialog.hide();
     }
+    
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));
     content.appendChild(line);

@@ -1,8 +1,8 @@
 
-/** This method shows a open workbook dialog. The argument onOpenFunction
- * should take the worksheet text as an argument and return an object with the boolean entry
+/** This method shows a open workspace dialog. The argument onOpenFunction
+ * should take the package text as an argument and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.openWorkbookDialog = function(onOpenFunction) {
+visicomp.app.visiui.dialog.openWorkspaceDialog = function(onOpenFunction) {
 
     var dialog = new visicomp.visiui.Dialog("Dialog",{"resizable":true,"movable":true});
     var content = document.createElement("div");
@@ -11,12 +11,12 @@ visicomp.app.visiui.dialog.openWorkbookDialog = function(onOpenFunction) {
   
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Open Workbook"}));
+    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Open Workspace"}));
     content.appendChild(line);
     
     //instructions
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"innerHTML":"Paste saved workbook data in the space below."}));
+    line.appendChild(visicomp.visiui.createElement("div",{"innerHTML":"Paste saved workspace data in the space below."}));
     content.appendChild(line);
     
     //input
@@ -41,7 +41,7 @@ visicomp.app.visiui.dialog.openWorkbookDialog = function(onOpenFunction) {
         var result = onOpenFunction(jsonText);
         
         if(!result.success) {
-            alert("There was an error opening the workbook: " + result.msg);
+            alert("There was an error opening the workspace: " + result.msg);
             return;
         }
         

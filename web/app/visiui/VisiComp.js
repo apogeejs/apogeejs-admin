@@ -17,94 +17,100 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     menu.addEventMenuItem("Save","menuFileSave",null,this.eventManager);
     menu.addEventMenuItem("Close","menuFileClose",null,this.eventManager);
 
-    menu = menuBar.addMenu("Workbook");
-    menu.addEventMenuItem("Add&nbsp;Worksheet","workbookAddWorksheet",null,this.eventManager);
-    menu.addEventMenuItem("Add&nbsp;Table","worksheetAddTable",null,this.eventManager);				
+    menu = menuBar.addMenu("Workspace");
+    menu.addEventMenuItem("Add&nbsp;Package","workspaceAddPackage",null,this.eventManager);
+    menu.addEventMenuItem("Add&nbsp;Table","packageAddTable",null,this.eventManager);				
 
     //add some tabs
     this.tabFrame = new visicomp.visiui.TabFrame(containerId);
-    this.workbookUI = null;
+    this.workspaceUI = null;
     
     //add menu listeners
     var instance = this;
     var newListener = function() {
-        if(instance.workbookOpen()) {
-            alert("You must close the existing workbook before opening another.");
+        if(instance.workspaceOpen()) {
+            alert("You must close the existing workspace before opening another.");
             return;
         }
         
         var onCreate = function(name) {
-            return instance.createWorkbook(name);
+            return instance.createWorkspace(name);
         }
-        visicomp.app.visiui.dialog.createWorkbookDialog(onCreate); 
+        visicomp.app.visiui.dialog.createWorkspaceDialog(onCreate); 
     }
     this.eventManager.addListener("menuFileNew",newListener);
     
     var openListener = function() {
-        if(instance.workbookOpen()) {
-            alert("You must close the existing workbook before opening another.");
+        if(instance.workspaceOpen()) {
+            alert("You must close the existing workspace before opening another.");
             return;
         }
         
-        var onOpen = function(workbookData) {
-            return instance.openWorkbook(workbookData);
+        var onOpen = function(workspaceData) {
+            return instance.openWorkspace(workspaceData);
         }
-        visicomp.app.visiui.dialog.openWorkbookDialog(onOpen); 
+        visicomp.app.visiui.dialog.openWorkspaceDialog(onOpen); 
     }
     this.eventManager.addListener("menuFileOpen",openListener);
     
     var saveListener = function() {
-        visicomp.app.visiui.dialog.saveWorkbookDialog(instance.workbookUI); 
+        visicomp.app.visiui.dialog.saveWorkspaceDialog(instance.workspaceUI); 
     }
     this.eventManager.addListener("menuFileSave",saveListener);
     
     
     var closeListener = function() {
         //add a "are you sure" dialog!!
-        instance.closeWorkbook();
+        instance.closeWorkspace();
     }
     this.eventManager.addListener("menuFileClose",closeListener);
     
     //initialize business logic handlers
 
-    visicomp.core.createworksheet.initHandler(this.eventManager);
+    visicomp.core.createpackage.initHandler(this.eventManager);
     visicomp.core.createtable.initHandler(this.eventManager);
     visicomp.core.updatetable.initHandler(this.eventManager);
 }
 
 /** This method responds to a "new" menu event. */
-visicomp.app.visiui.VisiComp.prototype.createWorkbook = function(name) {
+visicomp.app.visiui.VisiComp.prototype.createWorkspace = function(name) {
     
-    this.workbookUI = new visicomp.app.visiui.WorkbookUI(name,this.eventManager,this.tabFrame);
+	var tab = this.tabFrame.addTab(name);
+    this.workspaceUI = new visicomp.app.visiui.WorkspaceUI(name,this.eventManager,tab);
+	this.workspaceUI.addPackage(name,null);
     
     return {"success":true};
 }
 
 /** This method responds to a "open" menu event. */
-visicomp.app.visiui.VisiComp.prototype.openWorkbook = function(workbookText) {
+visicomp.app.visiui.VisiComp.prototype.openWorkspace = function(workspaceText) {
+	
+alert("Needs to be fixed!");
+if(true) return;
     
-    var workbookData = JSON.parse(workbookText);
+    var workspaceData = JSON.parse(workspaceText);
     
-    //create workbook
-    var workbookName = workbookData.name;
-    this.createWorkbook(workbookName);
-    var workbook = this.workbookUI.getWorkbook();
+    //create workspace
+    var workspaceName = workspaceData.name;
+    this.createWorkspace(workspaceName);
+    var workspace = this.workspaceUI.getWorkspace();
     
     //this will be used to command the table update
     var tableUpdateList = [];
     
-    //create worksheets
-    for(var worksheetName in workbookData.worksheets) {
-        //create and lookup worksheet
-        var worksheetData = workbookData.worksheets[worksheetName];
-        this.workbookUI.addWorksheet(worksheetData.name);
-        var worksheet = workbook.lookupWorksheet(worksheetData.name);
+    //create packages
+    for(var packageName in workspaceData.packages) {
+        //create and lookup package
+        var packageData = workspaceData.packages[packageName];
+//need to add the proper parent
+        this.workspaceUI.addPackage(packageData.name);
+        var package = workspace.lookupPackage(packageData.name);
         
-        //create tables for this worksheet
-        for(var tableName in worksheetData.tables) {
-            var tableData = worksheetData.tables[tableName];
-            this.workbookUI.addTable(worksheet,tableData.name);
-            var table = worksheet.lookupTable(tableData.name);
+        //create tables for this package
+        for(var tableName in packageData.tables) {
+            var tableData = packageData.tables[tableName];
+            this.workspaceUI.addTable(package,tableData.name);
+            var table = package.lookupChild(tableData.name);
             
             //save the data to set the tables' value or formula
             var tableUpdateData = {};
@@ -124,12 +130,12 @@ visicomp.app.visiui.VisiComp.prototype.openWorkbook = function(workbookText) {
 }
 
 /** This method responds to a "open" menu event. */
-visicomp.app.visiui.VisiComp.prototype.closeWorkbook = function() {
+visicomp.app.visiui.VisiComp.prototype.closeWorkspace = function() {
     location.reload();
 }
 
 /** This method responds to a "open" menu event. */
-visicomp.app.visiui.VisiComp.prototype.workbookOpen = function() {
-    return (this.workbookUI != null);
+visicomp.app.visiui.VisiComp.prototype.workspaceOpen = function() {
+    return (this.workspaceUI != null);
 }
 

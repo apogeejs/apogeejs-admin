@@ -7,7 +7,7 @@ visicomp.core.createtable = {};
  * Event object format:  //future add other options
  * { 
  *	name: [string]
- *	worksheet: [worksheet]
+ *	package: [package]
  * }
  */
 visicomp.core.createtable.CREATE_TABLE_HANDLER = "createTable";
@@ -26,15 +26,15 @@ visicomp.core.createtable.TABLE_CREATED_EVENT = "tableCreated";
 visicomp.core.createtable.onCreateTable = function(event) {
     //create table
     var name = event.name;
-    var worksheet = event.worksheet;
+    var package = event.package;
     var table = new visicomp.core.Table(name);
-    worksheet.addTable(table);
+    package.addChild(table);
 	
     //initialize data
     table.setData("");
 	
     //dispatch event
-    var eventManager = worksheet.getWorkbook().getEventManager();
+    var eventManager = package.getWorkspace().getEventManager();
     eventManager.dispatchEvent(visicomp.core.createtable.TABLE_CREATED_EVENT,table);
 	
     //return success

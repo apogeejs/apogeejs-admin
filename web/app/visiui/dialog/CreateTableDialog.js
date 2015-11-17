@@ -1,7 +1,7 @@
 /** This method shows a create table dialog. The argument onCreateFunction
- * should take the worksheet and the table name as arguments and return an object with the boolean entry
+ * should take the package and the table name as arguments and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.createTableDialog = function(worksheets,activeWorksheetName,onCreateFunction) {
+visicomp.app.visiui.dialog.createTableDialog = function(packages,activePackageName,onCreateFunction) {
 
     var dialog = new visicomp.visiui.Dialog("",{"movable":true});
     
@@ -15,14 +15,14 @@ visicomp.app.visiui.dialog.createTableDialog = function(worksheets,activeWorkshe
     line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"New Table"}));
     content.appendChild(line);
     
-    //worksheet selection
+    //package selection
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(document.createTextNode("Worksheet:"));
+    line.appendChild(document.createTextNode("Package:"));
     var select = visicomp.visiui.createElement("select");
     line.appendChild(select);
-    for(var key in worksheets) {
+    for(var key in packages) {
         select.add(visicomp.visiui.createElement("option",{"text":key}));
-        if(key == activeWorksheetName) {
+        if(key == activePackageName) {
             select.value = key;
         }
     }
@@ -42,16 +42,16 @@ visicomp.app.visiui.dialog.createTableDialog = function(worksheets,activeWorkshe
     }
     
     var onCreate = function() {
-        var worksheetName = select.value;
-        var worksheetInfo = worksheets[worksheetName];
-        var worksheet = worksheetInfo.worksheet;
+        var packageName = select.value;
+        var packageInfo = packages[packageName];
+        var package = packageInfo.package;
         var tableName = inputElement.value.trim();
         if(tableName.length == 0) {
             alert("The name is invalid");
             return;
         }
         
-        var result = onCreateFunction(worksheet,tableName);
+        var result = onCreateFunction(package,tableName);
         
         if(result.success) {
             dialog.hide();

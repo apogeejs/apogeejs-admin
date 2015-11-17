@@ -1,9 +1,8 @@
 /** This class encapsulatees a data table */
 visicomp.core.Table = function(name) {
 	
-    this.worksheet = null;
+	this.parent = null;
     this.name = name;
-	this.fullName = name; //update this when a worksheet is set
 	
     //this contains the formula and dependency information
     this.codeInfo = null;
@@ -24,7 +23,45 @@ visicomp.core.Table.prototype.print = function() {
     console.log("name: " + this.data);
 }
 
-/** This is used for saving the workbook. */
+/** This method returns the name for this object. */
+visicomp.core.Table.prototype.getName = function() {
+    return this.name;
+}
+
+/** This method returns the full name in dot notation for this object. */
+visicomp.core.Table.prototype.getFullName = function() {
+	if(this.parent) {
+		if(this.parent.isRootPackage()) {
+			return this.name;
+		}
+		else {
+			return this.parent.getFullName() + "." + this.name;
+		}
+	}
+	else {
+		return this.name;
+	}
+}
+
+/** This identifies the type of object. */
+visicomp.core.Table.prototype.getType = function() {
+	return "table";
+}
+
+/** This returns the parent for this package. For the root package
+ * this value is null. */
+visicomp.core.Table.prototype.getParent = function() {
+	return this.parent;
+}
+
+/** This sets the parent for this package.
+ * @private*/
+visicomp.core.Table.prototype.setParent = function(parent) {
+	this.parent = parent;
+}
+
+
+/** This is used for saving the workspace. */
 visicomp.core.Table.prototype.toJson = function() {
     var json = {};
     json.name = this.name;
@@ -40,16 +77,6 @@ visicomp.core.Table.prototype.toJson = function() {
     return json;
 }
 
-/** This method returns the name for this object. */
-visicomp.core.Table.prototype.getName = function() {
-    return this.name;
-}
-
-/** This method returns the name of the object with the worksheet name prepended.
- * If the worksheet is not set, the plain table name is returned. */
-visicomp.core.Table.prototype.getFullName = function() {
-	return this.fullName;
-}
 /** This method gets the dependency manager. */
 visicomp.core.Table.prototype.hasFormula = function() {
     return (this.codeInfo != null);
@@ -68,24 +95,18 @@ visicomp.core.Table.prototype.setData = function(data) {
 	//make this object immutable
 	visicomp.core.util.deepFreeze(data);
 	
-	//store the new object in the worksheet
-    this.worksheet.updateData(this);
+	//store the new object in the parent
+    this.parent.updateData(this);
 }
 
 /** This method returns the name for this object. */
-visicomp.core.Table.prototype.getWorksheet = function() {
-    return this.worksheet;
+visicomp.core.Table.prototype.getPackage = function() {
+    return this.parent;
 }
 
-/** This method returns the name for this object. */
-visicomp.core.Table.prototype.setWorksheet = function(worksheet) {
-    this.worksheet = worksheet;
-	if(this.worksheet != null) {
-		this.fullName = this.worksheet.getName() + "." + this.name;
-	}
-	else {
-		this.fullName = this.name;
-	}
+/** This gets the workspace for this table. */
+visicomp.core.Table.prototype.getWorkspace = function() {
+	return this.parent.getWorkspace();
 }
 
 /** This method returns the code array. The code array
@@ -148,14 +169,14 @@ visicomp.core.Table.prototype.removeFromImpactsList = function(table) {
 
 /** This calls the update method updates the data objet, setting up the context
  * appropriately. The commands should be set up with the assumption the following
- * variables will be in context: _workbook, _worksheet and _table. */
+ * variables will be in context: _workspace, _package and _table. */
 visicomp.core.Table.prototype.runUpdateCommand = function() {
     var tableName = this.getName();
-    var worksheetName = this.worksheet.getName();
-    var workbookName = this.worksheet.getWorkbook().getName();
+    var packageName = this.parent.getName();
+    var workspaceName = this.parent.getWorkspace().getName();
 	
     //we execute the function here so the user can debug it easily
-    visicomp.core.runTableFormula(tableName,worksheetName,workbookName);
+    visicomp.core.runTableFormula(tableName,packageName,workspaceName);
 }
 
 /** This sets the dependencies based on the code for the object. 
@@ -216,9 +237,9 @@ visicomp.core.Table.prototype.getSupplementalCode = function() {
  * @private */
 visicomp.core.Table.prototype.createUpdateCommand = function() {
     
-    var tableName = this.getName();
-    var worksheetName = this.worksheet.getName();
-    var workbookName = this.worksheet.getWorkbook().getName();
+    var tableFullName = this.getFullName();
+    var packageName = this.parent.getName();
+    var workspaceName = this.parent.getWorkspace().getName();
     
     var accessedVariableString = this.getAccessedVariableCode();
     
@@ -228,9 +249,8 @@ visicomp.core.Table.prototype.createUpdateCommand = function() {
     //create the code body
     var codeBody = visicomp.core.util.formatString(
         visicomp.core.Table.TABLE_UPDATE_FORMAT_TEXT,
-        tableName,
-        worksheetName,
-        workbookName,
+        tableFullName,
+        workspaceName,
         accessedVariableString,
         formula,
         supplementalCode
@@ -259,21 +279,21 @@ visicomp.core.Table.prototype.getAccessedVariableCode = function() {
     //create the text to add an accessed tables to the code
     var accessedVariableString = "";
     
-    //add the local worksheet
+    //add the local parent
     accessedVariableString += visicomp.core.util.formatString(
         visicomp.core.Table.ACCESSED_WORKSHEET_FORMAT_TEXT,
-        this.worksheet.getName()
+        this.parent.getName()
     );
 	
-	//add accessed tables, either as worksheet or table name
-    var includedWorksheetSet = {};
+	//add accessed tables, either as parent or table name
+    var includedPackageSet = {};
 	var dependsOn = this.getDependsOn();
 	for(var i = 0; i < dependsOn.length; i++) {
 		var remoteTable = dependsOn[i];
-		var remoteWorksheet = remoteTable.getWorksheet();
+		var remotePackage = remoteTable.getPackage();
 		
-		//handle tables in the worksheet or other worksheet
-		if(remoteWorksheet == this.worksheet) {
+		//handle tables in the package or other package
+		if(remotePackage == this.parent) {
             
 			//add table to access variables
 			accessedVariableString += visicomp.core.util.formatString(
@@ -282,14 +302,14 @@ visicomp.core.Table.prototype.getAccessedVariableCode = function() {
             );
 		}
 		else {
-			//remote worksheet - add worksheet to context if it has not yet been added
-            var remoteName = remoteWorksheet.getName();
-			if(!includedWorksheetSet[remoteName]) {
+			//remote package - add package to context if it has not yet been added
+            var remoteName = remotePackage.getName();
+			if(!includedPackageSet[remoteName]) {
 				accessedVariableString += visicomp.core.util.formatString(
                     visicomp.core.Table.ACCESSED_WORKSHEET_FORMAT_TEXT,
                     remoteName
                 );
-				includedWorksheetSet[remoteName] = true;
+				includedPackageSet[remoteName] = true;
 			}
 		}
 	}
@@ -302,34 +322,34 @@ visicomp.core.Table.prototype.getAccessedVariableCode = function() {
 /** This is the format string to create the code body for updateing the table
  * Input indices:
  * 0: table name
- * 1: worksheet name
- * 2: workbook name
+ * 1: package name
+ * 2: workspace name
  * 3: access variable code text
  * 4: table formula text
  * 5: supplemental code text
  */
 visicomp.core.Table.TABLE_UPDATE_FORMAT_TEXT = [
 "   //table update code",
-"   visicomp.core.updateCode.{2}.{1}.{0} = function(_table) {",
+"   visicomp.core.updateCode.{1}['{0}'] = function(_table) {",
 "",
-"       var _worksheet = _table.getWorksheet();",
-"       var _workbook = _table.getWorksheet().getWorkbook();",
+"       var _package = _table.getPackage();",
+"       var _workspace = _table.getPackage().getWorkspace();",
 "       var value;",
 "",
 "       //table update function - outside of supplemental code",	
 "       function loadTableValue() {",
 "",
 "//accessed variables",
-"{3}//end accessed variables",
+"{2}//end accessed variables",
 "",
 "//table formula",
-"{4}",
+"{3}",
 "//end formula",
 "",
 "       }",
 "",
 "//supplemental code",
-"{5}",
+"{4}",
 "//end supplemental code",
 "",
 "       //update table value",
@@ -340,10 +360,10 @@ visicomp.core.Table.TABLE_UPDATE_FORMAT_TEXT = [
    ].join("\n");
    
 //this is the code for adding the accessed table to the code
-visicomp.core.Table.ACCESSED_TABLE_FORMAT_TEXT = 'var {0} = _worksheet.lookupTable("{0}").getData();\n';
+visicomp.core.Table.ACCESSED_TABLE_FORMAT_TEXT = 'var {0} = _package.lookupChild("{0}").getData();\n';
 
-//this is the code for adding the accessed worksheet to the code
-visicomp.core.Table.ACCESSED_WORKSHEET_FORMAT_TEXT = 'var {0} = _workbook.lookupWorksheet("{0}").getDataMap();\n';
+//this is the code for adding the accessed package to the code
+visicomp.core.Table.ACCESSED_WORKSHEET_FORMAT_TEXT = 'var {0} = _workspace.lookupPackage("{0}").getData();\n';
     
 
 
