@@ -1,6 +1,6 @@
 /** This is a window frame component. IT is used the table window and the dialog.
  *
- *It can be minimized an maximized and dragged and resized with the mouse.  
+ * It can be minimized an maximized and dragged and resized with the mouse.  
  * 
  * options:
  * minimizable - allow content to be minimized. defaylt value: false
@@ -34,8 +34,12 @@ visicomp.visiui.WindowFrame = function(parentContainer, title, options) {
     this.maximizeButton = null;
     this.closable = null;
     
-    this.windowState = false; //minimize, normal, maximize
-    this.savedParentOverflow = undefined;
+    this.windowState = visicomp.visiui.WindowFrame.NORMAL; //minimize, normal, maximize
+
+	this.coordinateInfo = {}; //requested window size and position
+
+//can we get rid of this?
+this.savedParentOverflow = undefined;
 	
     this.windowDragActive = false;
     this.moveOffsetX = null;
@@ -58,20 +62,8 @@ visicomp.visiui.WindowFrame = function(parentContainer, title, options) {
     
     //event manager
     this.eventManager = new visicomp.core.EventManager();
-    
-    //these styles control the position and size
-    this.coordStyleBody = {
-        "height":""
-    };
-    this.coordStyleFrame = {
-        "left":"",
-        "top":"",
-        "width":"",
-        "height":""
-    };
-    this.requestedWindowSize = null;
 	
-	//these should be set to soemthing more meeaningful, like the minimum widht of the title bar
+	//these should be set to soemthing more meeaningful, like the minimum sensible width of the title bar
 	this.minWidth = 0;
 	this.minHeight = 0;
 	
@@ -119,24 +111,6 @@ visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL = {
 };
 
 visicomp.visiui.WindowFrame.FRAME_STYLE_MAX = {
-    //fixed
-    "position":"absolute",
-    
-    //configurable
-    "background-color":"lightgray",
-    "border":"",
-    "opacity":""
-};
-visicomp.visiui.WindowFrame.COORD_STYLE_FRAME_MAX = {
-    //fixed
-    "left":"0px",
-    "top":"0px",
-    "right":"0px",
-    "bottom":"0px",
-    "width":"",
-    "height":""
-};
-visicomp.visiui.WindowFrame.COORD_STYLE_FRAME_MAX = {
     //fixed
     "position":"absolute",
     
@@ -196,8 +170,8 @@ visicomp.visiui.WindowFrame.prototype.show = function() {
     this.eventManager.dispatchEvent("show",this);
     
     //we will redo this since the size of elements used in calculation may have been wrong
-    if(this.requestedWindowSize !== null) {
-        this.setSize(this.requestedWindowSize[0], this.requestedWindowSize[1]);
+    if(this.coordinateInfo.height !== undefined) {
+        this.updateCoordinates();
     }
 }
 
@@ -209,32 +183,30 @@ visicomp.visiui.WindowFrame.prototype.hide = function() {
 
 /** This method sets the position of the window frame in the parent. */
 visicomp.visiui.WindowFrame.prototype.setPosition = function(x,y) {
-    this.coordStyleFrame.left = x + "px";
-    this.coordStyleFrame.top = y + "px";
-    this.updateCoordinateStyle();
+	this.coordinateInfo.x = x;
+	this.coordinateInfo.y = y;
+	
+    this.updateCoordinates();
 }
 
-/** This method sets the size of the window content, not including the title bar and other decorations. */
+/** This method sets the size of the window frame, including the title bar. To 
+ * size according to content, leave the window frame unsized (or call "clearSize") */
 visicomp.visiui.WindowFrame.prototype.setSize = function(width,height) {
-    this.requestedWindowSize = [width,height];
+    this.coordinateInfo.width = width;
+	this.coordinateInfo.height = height;
     
-    this.coordStyleFrame.width = width + "px";
-    this.coordStyleFrame.height = height + "px";
-    
-    this.updateCoordinateStyle();
+    this.updateCoordinates();
    
     this.frameResized();
 }
 
-/** This method sets the size of the window content, not including the title bar and other decorations. */
+/** This method clears the size set for the window. The window will be sized 
+ * according to the content. */
 visicomp.visiui.WindowFrame.prototype.clearSize = function() {
-    this.requestedWindowSize = null;
-    
-    this.coordStyleFrame.width = "";
-    this.coordStyleFrame.height = "";
-    this.coordStyleBody.height = "";
+    this.coordinateInfo.width = undefined;
+	this.coordinateInfo.height = undefined;
  
-    this.updateCoordinateStyle();
+    this.updateCoordinates();
     
     this.frameResized();
 }
@@ -269,12 +241,12 @@ visicomp.visiui.WindowFrame.prototype.setZIndex = function(zIndex) {
 }
 
 /** This method sets the content for the body. To clear the content, pass null.*/
-visicomp.visiui.WindowFrame.prototype.addElement = function(element) {
+visicomp.visiui.WindowFrame.prototype.addTitleBarElement = function(element) {
     this.titleBarLeftElements.appendChild(element);
 }
 
 /** This method sets the content for the body. To clear the content, pass null.*/
-visicomp.visiui.WindowFrame.prototype.removeElement = function(element) {
+visicomp.visiui.WindowFrame.prototype.removeTitleBarElement = function(element) {
     this.titleBarLeftElements.appendRemove(element);
 }
 
@@ -289,7 +261,7 @@ visicomp.visiui.WindowFrame.prototype.getEventManager= function() {
 /** Mouse down handler for moving the window. */
 visicomp.visiui.WindowFrame.prototype.titleBarMouseDown = function(e) {
     //do not do move in maximized state
-    if(this.windowState == visicomp.visiui.WindowFrame.MAXIMIZED) return;
+    if(this.windowState === visicomp.visiui.WindowFrame.MAXIMIZED) return;
     
     if(this.parentContainer) {
         this.windowDragActive = true;
@@ -306,9 +278,9 @@ visicomp.visiui.WindowFrame.prototype.titleBarMouseDown = function(e) {
 /** Mouse m,ove handler for moving the window. */
 visicomp.visiui.WindowFrame.prototype.titleBarMouseMove = function(e) {
     if(!this.windowDragActive) return;
-    var newX = e.x - this.moveOffsetX;
-    var newY = e.y - this.moveOffsetY;
-    this.setPosition(newX,newY);
+    this.coordinateInfo.x = e.x - this.moveOffsetX;
+    this.coordinateInfo.y = e.y - this.moveOffsetY;
+    this.updateCoordinates();
 }
 
 /** Mouse up handler for moving the window. */
@@ -324,7 +296,7 @@ visicomp.visiui.WindowFrame.prototype.titleBarMouseLeave = function(e) {
 /** Mouse down handler for resizing the window. */
 visicomp.visiui.WindowFrame.prototype.frameMouseDown = function(e) {
     //do not do resize in maximized state
-    if(this.windowState == visicomp.visiui.WindowFrame.MAXIMIZED) return;
+    if(this.windowState === visicomp.visiui.WindowFrame.MAXIMIZED) return;
     
     var flags = this.getResizeType(e);
 	if(flags) {
@@ -406,49 +378,38 @@ visicomp.visiui.WindowFrame.prototype.frameMouseOutCursor = function(e) {
 visicomp.visiui.WindowFrame.prototype.frameMouseMoveResize = function(e) {
     var newHeight;
     var newWidth;
-    var newLeft;
-    var newTop;
+    var newX;
+    var newY;
     
 	if(this.resizeEastActive) {
 		newWidth = e.x - this.resizeOffsetWidth;
 		if(newWidth < this.minWidth) return;
-        this.coordStyleFrame.width = newWidth + "px";
+        this.coordinateInfo.width = newWidth;
 	}
 	else if(this.resizeWestActive) {
 		newWidth = this.resizeOffsetWidth - e.x;
 		if(newWidth < this.minWidth) return;
-		newLeft = e.x - this.moveOffsetX;
-        this.coordStyleFrame.width = newWidth + "px";
-        this.coordStyleFrame.left = newLeft + "px";
+		newX = e.x - this.moveOffsetX;
+        this.coordinateInfo.width = newWidth;
+        this.coordinateInfo.x = newX;
 	}
 	if(this.resizeSouthActive) {
 		newHeight = e.y - this.resizeOffsetHeight;
 		if(newHeight < this.minHeight) return;
-		this.coordStyleFrame.height = newHeight + "px";
+		this.coordinateInfo.height = newHeight;
 	}
 	else if(this.resizeNorthActive) {
 		newHeight = this.resizeOffsetHeight - e.y;
 		if(newHeight < this.minHeight) return;
-		newTop = e.y - this.moveOffsetY;
-		this.coordStyleFrame.height = newHeight + "px";
-		this.coordStyleFrame.top = newTop + "px";
+		newY = e.y - this.moveOffsetY;
+		this.coordinateInfo.height = newHeight;
+		this.coordinateInfo.y = newY;
 	}
-    
-    //we need to create a modified
-    if((newHeight !== undefined)||(newWidth !== undefined)) {
         
-        //we need to set the requested frame size
-        if(this.requestedFrameSize == null) {
-            this.requestedFrameSize = [];
-        }
-        this.requestedFrameSize[0] = (newWidth !== undefined) ? newWidth : this.frame.clientWidth;
-        this.requestedFrameSize[1] = (newHeight !== undefined) ? newHeight : this.frame.clientHeight;
-        
-        //update coordinates
-        this.updateCoordinateStyle();
-        this.frameResized();
-    }
-    
+	//update coordinates
+	this.updateCoordinates();
+	
+	this.frameResized();
     
 }
 
@@ -520,7 +481,7 @@ visicomp.visiui.WindowFrame.prototype.minimizeContent = function() {
     
     //set the window state
     this.windowState = visicomp.visiui.WindowFrame.MINIMIZED;
-    this.updateCoordinateStyle();
+    this.updateCoordinates();
     this.setMinMaxButtons();
     
     //dispatch resize event
@@ -544,7 +505,7 @@ visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
     
     //set the window state
     this.windowState = visicomp.visiui.WindowFrame.NORMAL;
-    this.updateCoordinateStyle();
+    this.updateCoordinates();
     this.setMinMaxButtons();
     
     this.frameResized();
@@ -565,7 +526,7 @@ visicomp.visiui.WindowFrame.prototype.maximizeContent = function() {
     
     //set the window state
     this.windowState = visicomp.visiui.WindowFrame.MAXIMIZED;
-    this.updateCoordinateStyle();
+    this.updateCoordinates();
     this.setMinMaxButtons();
     
     this.frameResized();
@@ -602,34 +563,60 @@ visicomp.visiui.WindowFrame.prototype.setMinMaxButtons = function() {
 }
 
 /** @private */
-visicomp.visiui.WindowFrame.prototype.updateCoordinateStyle = function() {
+visicomp.visiui.WindowFrame.prototype.updateCoordinates = function() {
     var heightSet;
  
-    if(this.windowState == visicomp.visiui.WindowFrame.MAXIMIZED) {
-        //apply the maximized coordinates style
-        visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.COORD_STYLE_FRAME_MAX);
+    if(this.windowState === visicomp.visiui.WindowFrame.MAXIMIZED) {
+        //apply the maximized coordinates size
+        this.frame.style.left = "0px";
+		this.frame.style.top = "0px";
+		this.frame.style.right = "0px";
+		this.frame.style.bottom = "0px";
+		
+		this.frame.style.height = "";
+		this.frame.style.width = "";
         
         heightSet = true;
     }
-    else if(this.windowState == visicomp.visiui.WindowFrame.NORMAL) {
-        //apply the normal coordinate style
-        visicomp.visiui.applyStyle(this.frame,this.coordStyleFrame);
-        
-        heightSet = (this.coordStyleFrame.height !== "");
+    else if(this.windowState === visicomp.visiui.WindowFrame.NORMAL) {
+        //apply the normal size to the window
+		this.frame.style.left = this.coordinateInfo.x + "px";
+        this.frame.style.top = this.coordinateInfo.y + "px";
+		if(this.coordinateInfo.height !== undefined) {
+			this.frame.style.height = this.coordinateInfo.height + "px";
+			heightSet = true;
+		}
+		else {
+			heightSet = false;
+		}
+		if(this.coordinateInfo.width !== undefined) {
+			this.frame.style.width = this.coordinateInfo.width + "px";
+		}
+		
+		this.frame.style.bottom = "";
+		this.frame.style.right = "";
     }
-    else if(this.windowState == visicomp.visiui.WindowFrame.MINIMIZED) {
-        //apply the normal coordinate style
-        visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.COORD_STYLE_FRAME_MIN);
+    else if(this.windowState === visicomp.visiui.WindowFrame.MINIMIZED) {
+        //apply the minimized size to the window
+		this.frame.style.left = this.coordinateInfo.x + "px";
+        this.frame.style.top = this.coordinateInfo.y + "px";
+		
+		this.frame.style.height = "";
+		this.frame.style.width = "";
+		this.frame.style.bottom = "";
+		this.frame.style.right = "";
         
         heightSet = false;
     }
     
+	//determine the body size, if needed
     if(heightSet) {
         var bodyHeight = this.frame.clientHeight - this.titleBar.clientHeight;
-        this.coordStyleBody.height = bodyHeight + "px";
-
-        visicomp.visiui.applyStyle(this.body, this.coordStyleBody);
+        this.body.style.height = bodyHeight + "px";
     }
+	else {
+		this.body.style.height = "";
+	}
 }
 
 /** This method resizes the content to fit the frame if the frame size is set,

@@ -37,7 +37,7 @@ window.setSize(300,300);
     editButton.onclick = function() {
         table.createEditDialog();
     }
-    window.addElement(editButton);
+    window.addTitleBarElement(editButton);
     
     //show the window
     window.show();  
