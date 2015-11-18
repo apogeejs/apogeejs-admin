@@ -222,7 +222,7 @@ visicomp.core.updatetable.sortRecalculateList = function(recalculateList) {
 			var unsortedImpactedDependencies = false;
 			var dependsOn = table.getDependsOn();
 			for(var j = 0; j < dependsOn.length; j++) {
-				var remoteTable = dependsOn[j];
+				var remoteTable = dependsOn[j].table;
 				if(tableIsSortedMap[remoteTable.getFullName()] === false) {
 					//this depends on an unsorted table
 					unsortedImpactedDependencies = true;

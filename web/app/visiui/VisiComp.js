@@ -77,7 +77,7 @@ visicomp.app.visiui.VisiComp.prototype.createWorkspace = function(name) {
     
 	var tab = this.tabFrame.addTab(name);
     this.workspaceUI = new visicomp.app.visiui.WorkspaceUI(name,this.eventManager,tab);
-	this.workspaceUI.addPackage(name,null);
+	this.workspaceUI.addPackage(null,name);
     
     return {"success":true};
 }

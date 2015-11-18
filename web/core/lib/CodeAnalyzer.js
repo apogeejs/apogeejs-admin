@@ -308,23 +308,28 @@ visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,
 	//first checking the local package and then the root package for the workspace
 	
 	var object;
-	var namePackage;
+	var internalReference;
+    var localReference;
 	var nameIndex = 0;
 	
-	object = this.package.lookupChild(namePath[nameIndex]);
+    var baseName = namePath[nameIndex];
+	object = this.package.lookupChild(baseName);
 	if(object != null) {
-		namePackage = this.package;
+		internalReference = true;
+        localReference = true;
 	}
 	else {
 		//check the root package
 		var basePackage = this.workspace.getRootPackage();
-		object = basePackage.lookupChild(namePath[nameIndex]);
+		object = basePackage.lookupChild(baseName);
 		if(object != null) {
-			namePackage = basePackage;
+			internalReference = true;
+            localReference = false;
 		}
 		else {
-			object == null;
-			namePackage = null;
+			object = null;
+			internalReference = false;
+            localReference = false;
 		}
 	}
 	
@@ -336,7 +341,7 @@ visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,
 	}
 	
 	//flag an error if we found a base package but not the proper object
-	if((namePackage != null)&&(object == null)) {
+	if((internalReference)&&(object == null)) {
 		//this shouldn't happen. If it does we didn't code the syntax tree right
         throw this.createErrorObject("Table not found: ",node.loc);
 	}
@@ -347,18 +352,29 @@ visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,
         objectKey = object.getFullName();
     }
     else {
-//I AM NOT SURE WHAT TO USE FOR THE NAME HERE - FULL DOT NAME? LEAD NAME? END NAME?
-        objectKey = namePath[0];
+//I AM NOT SURE WHAT TO USE FOR THE NAME HERE - this will be used for
+//detecting bad global usage, but it is not done now
+        objectKey = baseName;
     }
     
     //get or create the var info for this variable
     var varInfo = this.variables[objectKey];
     if(!varInfo) {
         varInfo = {};
-        varInfo.package = namePackage;
         varInfo.table = object;
         varInfo.loc = node.loc; //save the first appearance of this variable
         this.variables[objectKey] = varInfo;
+    }
+    
+    //store the info on how the variable was accessed - from the "local context" (relative to local package)
+    //or from the "root context" (relative to the root package)    
+    if(internalReference) {
+        if((localReference)&&(!varInfo.localRefBase)) {
+            varInfo.localRefBase = baseName;
+        }
+        else if((!localReference)&&(!varInfo.rootRefBase)) {
+            varInfo.rootRefBase = baseName;
+        }
     }
     
     //add modifier flags
@@ -439,7 +455,7 @@ visicomp.core.CodeAnalyzer.prototype.processVariableList = function() {
         
        //save dependant tables
        if(variableInfo.table) {
-           this.dependsOn.push(variableInfo.table);
+           this.dependsOn.push(variableInfo);
        }
     }
 }

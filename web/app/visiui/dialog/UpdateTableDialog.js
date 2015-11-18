@@ -140,7 +140,6 @@ visicomp.app.visiui.dialog.updateTableDialog = function(table,onSaveFunction) {
     //show the dialog
     dialog.setContent(content);
     dialog.setZIndex(100);
-    dialog.setSize(600,400);
     dialog.show();
     dialog.centerOnPage(); 
     

@@ -90,8 +90,11 @@ visicomp.visiui.TabFrame.TAB_BAR_STYLE = {
     "border-top-width":" 0px"
 }
 visicomp.visiui.TabFrame.TAB_WINDOW_STYLE = {
-    "height":"90%",
-    "position":"relative",
+    "top":"0px",
+    "bottom":"0px",
+    "left":"0px",
+    "right":"0px",
+    "position":"absolute",
     "background-color":"white"
 }
 visicomp.visiui.TabFrame.TAB_BASE_STYLE = {

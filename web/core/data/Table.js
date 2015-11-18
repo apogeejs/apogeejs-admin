@@ -125,7 +125,12 @@ visicomp.core.Table.prototype.setCodeInfo = function(codeInfo) {
     var currentDependsOn = this.getDependsOn();
     this.updateDependencies(currentDependsOn, oldDependsOn);
     
-    this.createUpdateCommand();
+    if(codeInfo != null) {
+        this.createUpdateCommand();
+    }
+    else {
+        this.clearUpdateCommand();
+    }
 }
 
 /** This returns an array of objects this obejct impacts. */
@@ -188,7 +193,7 @@ visicomp.core.Table.prototype.updateDependencies = function(currentDependsOn,old
     var remoteTable;
     var i;
     for(i = 0; i < currentDependsOn.length; i++) {
-        remoteTable = currentDependsOn[i];
+        remoteTable = currentDependsOn[i].table;
 		
 		//update this object
 		remoteTable.addToImpactsList(this);
@@ -199,7 +204,7 @@ visicomp.core.Table.prototype.updateDependencies = function(currentDependsOn,old
 	
     //update for links that have gotten deleted
     for(i = 0; i < oldDependsOn.length; i++) {
-        remoteTable = oldDependsOn[i];
+        remoteTable = oldDependsOn[i].table;
 		
 		var stillDependsOn = newDependencySet[remoteTable.getFullName()];
 		
@@ -238,7 +243,6 @@ visicomp.core.Table.prototype.getSupplementalCode = function() {
 visicomp.core.Table.prototype.createUpdateCommand = function() {
     
     var tableFullName = this.getFullName();
-    var packageName = this.parent.getName();
     var workspaceName = this.parent.getWorkspace().getName();
     
     var accessedVariableString = this.getAccessedVariableCode();
@@ -264,6 +268,14 @@ visicomp.core.Table.prototype.createUpdateCommand = function() {
  * It is separated so there is no context and minimal added closure variables 
  * in the eval statement. 
  * @private */
+visicomp.core.Table.prototype.clearUpdateCommand = function() {
+    delete visicomp.core.updateCode[this.getWorkspace().getName()][this.getFullName()];
+}
+
+/** This methoc evaluates the update command tect to make the update command.
+ * It is separated so there is no context and minimal added closure variables 
+ * in the eval statement. 
+ * @private */
 visicomp.core.Table.makeUpdateCommand = function(_commandText) {
     eval(_commandText);
 }
@@ -278,40 +290,39 @@ visicomp.core.Table.prototype.getAccessedVariableCode = function() {
     
     //create the text to add an accessed tables to the code
     var accessedVariableString = "";
-    
-    //add the local parent
-    accessedVariableString += visicomp.core.util.formatString(
-        visicomp.core.Table.ACCESSED_WORKSHEET_FORMAT_TEXT,
-        this.parent.getName()
-    );
 	
 	//add accessed tables, either as parent or table name
-    var includedPackageSet = {};
+    var includedNameSet = {};
 	var dependsOn = this.getDependsOn();
 	for(var i = 0; i < dependsOn.length; i++) {
-		var remoteTable = dependsOn[i];
-		var remotePackage = remoteTable.getPackage();
+		var varInfo = dependsOn[i];
 		
-		//handle tables in the package or other package
-		if(remotePackage == this.parent) {
-            
+		//include the variable, or the path to it, for local references
+		if((varInfo.localRefBase)&&(!includedNameSet[varInfo.localRefBase])) {
+           
 			//add table to access variables
 			accessedVariableString += visicomp.core.util.formatString(
-                visicomp.core.Table.ACCESSED_TABLE_FORMAT_TEXT,
-                remoteTable.getName()
+                visicomp.core.Table.LOCAL_ACCESSED_OBJECT_FORMAT_TEXT,
+                varInfo.localRefBase
             );
+              
+            //store that we included this name
+            includedNameSet[varInfo.localRefBase] = true;
 		}
-		else {
-			//remote package - add package to context if it has not yet been added
-            var remoteName = remotePackage.getName();
-			if(!includedPackageSet[remoteName]) {
-				accessedVariableString += visicomp.core.util.formatString(
-                    visicomp.core.Table.ACCESSED_WORKSHEET_FORMAT_TEXT,
-                    remoteName
-                );
-				includedPackageSet[remoteName] = true;
-			}
+        
+        //include the variable, or the path to it, for local references
+		if((varInfo.rootRefBase)&&(!includedNameSet[varInfo.rootRefBase])) {
+           
+			//add table to access variables
+			accessedVariableString += visicomp.core.util.formatString(
+                visicomp.core.Table.ROOT_ACCESSED_OBJECT_FORMAT_TEXT,
+                varInfo.rootRefBase
+            );
+              
+            //store that we included this name
+            includedNameSet[varInfo.localRefBase] = true;
 		}
+       
 	}
     
     return accessedVariableString;
@@ -322,48 +333,41 @@ visicomp.core.Table.prototype.getAccessedVariableCode = function() {
 /** This is the format string to create the code body for updateing the table
  * Input indices:
  * 0: table name
- * 1: package name
- * 2: workspace name
- * 3: access variable code text
- * 4: table formula text
- * 5: supplemental code text
+ * 1: workspace name
+ * 2: access variable code text
+ * 3: table formula text
+ * 4: supplemental code text
  */
 visicomp.core.Table.TABLE_UPDATE_FORMAT_TEXT = [
 "   //table update code",
 "   visicomp.core.updateCode.{1}['{0}'] = function(_table) {",
 "",
-"       var _package = _table.getPackage();",
-"       var _workspace = _table.getPackage().getWorkspace();",
+"       var _localPackage = _table.getPackage();",
+"       var _rootPackage = _localPackage.getWorkspace().getRootPackage();",
 "       var value;",
 "",
-"       //table update function - outside of supplemental code",	
-"       function loadTableValue() {",
-"",
 "//accessed variables",
-"{2}//end accessed variables",
-"",
-"//table formula",
-"{3}",
-"//end formula",
-"",
-"       }",
+"{2}",
+"//end accessed variables",
 "",
 "//supplemental code",
 "{4}",
 "//end supplemental code",
 "",
-"       //update table value",
-"       loadTableValue();",
+"//table formula",
+"{3}",
+"//end formula",
+"",
 "       _table.setData(value);",
 "   }",
 ""
    ].join("\n");
    
 //this is the code for adding the accessed table to the code
-visicomp.core.Table.ACCESSED_TABLE_FORMAT_TEXT = 'var {0} = _package.lookupChild("{0}").getData();\n';
+visicomp.core.Table.LOCAL_ACCESSED_OBJECT_FORMAT_TEXT = 'var {0} = _localPackage.lookupChild("{0}").getData();\n';
 
 //this is the code for adding the accessed package to the code
-visicomp.core.Table.ACCESSED_WORKSHEET_FORMAT_TEXT = 'var {0} = _workspace.lookupPackage("{0}").getData();\n';
+visicomp.core.Table.ROOT_ACCESSED_OBJECT_FORMAT_TEXT = 'var {0} = _rootPackage.lookupChild("{0}").getData();\n';
     
 
 

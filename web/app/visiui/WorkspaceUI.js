@@ -15,20 +15,18 @@ visicomp.app.visiui.WorkspaceUI = function(name,eventManager,tab) {
     
     //add menu listeners
     var addPackageListener = function() {
-        var onCreate = function(name) {
-//add all to root
-var parent = instance.workspace.getRootPackage();
-            return instance.addPackage(name,parent);
+        var onCreate = function(parent,packageName) {
+            return instance.addPackage(parent,packageName);
         }
-        visicomp.app.visiui.dialog.createPackageDialog(onCreate);
+        visicomp.app.visiui.dialog.createChildDialog("package",instance.packages,instance.activePackageName,onCreate);
     }
     this.eventManager.addListener("workspaceAddPackage",addPackageListener);
 
     var addTableListener = function() {
-        var onCreate = function(package,tableName) {
-            return instance.addTable(package,tableName);
+        var onCreate = function(parent,tableName) {
+            return instance.addTable(parent,tableName);
         }
-        visicomp.app.visiui.dialog.createTableDialog(instance.packages,instance.activePackageName,onCreate);
+        visicomp.app.visiui.dialog.createChildDialog("table",instance.packages,instance.activePackageName,onCreate);
     }
     this.eventManager.addListener("packageAddTable",addTableListener);
     
@@ -57,7 +55,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
 }
 
 /** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.addPackage = function(name,parent) {
+visicomp.app.visiui.WorkspaceUI.prototype.addPackage = function(parent,name) {
     //create package
     var handlerData = {};
     handlerData.name = name;
@@ -103,11 +101,11 @@ visicomp.app.visiui.WorkspaceUI.prototype.packageAdded = function(package) {
 }
 
 /** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.addTable = function(package, name) {
+visicomp.app.visiui.WorkspaceUI.prototype.addTable = function(parent, name) {
     //create table
     var handlerData = {};
     handlerData.name = name;
-    handlerData.package = package;
+    handlerData.package = parent;
     var result = this.eventManager.callHandler(
         visicomp.core.createtable.CREATE_TABLE_HANDLER,
         handlerData);
