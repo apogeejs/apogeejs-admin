@@ -36,7 +36,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         var onCreate = function(name) {
             return instance.createWorkspace(name);
         }
-        visicomp.app.visiui.dialog.createWorkspaceDialog(onCreate); 
+        visicomp.app.visiui.dialog.showCreateWorkspaceDialog(onCreate); 
     }
     this.eventManager.addListener("menuFileNew",newListener);
     
@@ -49,12 +49,12 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         var onOpen = function(workspaceData) {
             return instance.openWorkspace(workspaceData);
         }
-        visicomp.app.visiui.dialog.openWorkspaceDialog(onOpen); 
+        visicomp.app.visiui.dialog.showOpenWorkspaceDialog(onOpen); 
     }
     this.eventManager.addListener("menuFileOpen",openListener);
     
     var saveListener = function() {
-        visicomp.app.visiui.dialog.saveWorkspaceDialog(instance.workspaceUI); 
+        visicomp.app.visiui.dialog.showSaveWorkspaceDialog(instance.workspaceUI); 
     }
     this.eventManager.addListener("menuFileSave",saveListener);
     
@@ -76,8 +76,11 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 visicomp.app.visiui.VisiComp.prototype.createWorkspace = function(name) {
     
 	var tab = this.tabFrame.addTab(name);
+//we probably want to do this differently
+//create workspace ui, which also creates workspace object
     this.workspaceUI = new visicomp.app.visiui.WorkspaceUI(name,this.eventManager,tab);
-	this.workspaceUI.addPackage(null,name);
+//add the root package here
+	this.workspaceUI.addPackage(this.workspaceUI.workspace,name,true);
     
     return {"success":true};
 }

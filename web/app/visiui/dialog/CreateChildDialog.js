@@ -1,7 +1,7 @@
 /** This method shows a create table dialog. The argument onCreateFunction
  * should take the package and the table name as arguments and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.createChildDialog = function(objectName,packages,activePackageName,onCreateFunction) {
+visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTypeName,objectUIMap,activePackageName,onCreateFunction) {
 
     var dialog = new visicomp.visiui.Dialog("",{"movable":true});
     
@@ -12,7 +12,7 @@ visicomp.app.visiui.dialog.createChildDialog = function(objectName,packages,acti
   
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"New " + objectName}));
+    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"New " + objectTypeName}));
     content.appendChild(line);
     
     //package selection
@@ -20,11 +20,15 @@ visicomp.app.visiui.dialog.createChildDialog = function(objectName,packages,acti
     line.appendChild(document.createTextNode("Package:"));
     var select = visicomp.visiui.createElement("select");
     line.appendChild(select);
-    for(var key in packages) {
-        select.add(visicomp.visiui.createElement("option",{"text":key}));
-        if(key == activePackageName) {
-            select.value = key;
-        }
+    for(var key in objectUIMap) {
+		var object = objectUIMap[key].object;
+		if(object.getType() == "package") { 
+			var packageName = object.getName();
+			select.add(visicomp.visiui.createElement("option",{"text":packageName}));
+			if(packageName == activePackageName) {
+				select.value = packageName;
+			}
+		}
     }
     content.appendChild(line);
     
@@ -42,16 +46,15 @@ visicomp.app.visiui.dialog.createChildDialog = function(objectName,packages,acti
     }
     
     var onCreate = function() {
-        var packageName = select.value;
-        var packageInfo = packages[packageName];
-        var package = packageInfo.package;
-        var tableName = inputElement.value.trim();
-        if(tableName.length == 0) {
+		packageName = select.value;
+        var package = objectUIMap[packageName].object;
+        var objectName = inputElement.value.trim();
+        if(objectName.length == 0) {
             alert("The name is invalid");
             return;
         }
         
-        var result = onCreateFunction(package,tableName);
+        var result = onCreateFunction(package,objectName);
         
         if(result.success) {
             dialog.hide();

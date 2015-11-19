@@ -12,7 +12,7 @@ visicomp.visiui.PackageUI = function(package,parentElement) {
 	this.contentElement = null; //created below
 
     //create the window and editor (for display, not editing)
-    visicomp.app.visiui.dialog.packageWindow(this);
+    visicomp.app.visiui.dialog.showPackageWindow(this);
 }
 
 visicomp.visiui.PackageUI.prototype.getWindow = function() {

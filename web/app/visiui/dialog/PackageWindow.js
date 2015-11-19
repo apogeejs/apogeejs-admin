@@ -1,14 +1,14 @@
 /** This method shows a create package dialog. The argument onCreateFunction
  * should take the package name as an argument and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.packageWindow = function(package) {
+visicomp.app.visiui.dialog.showPackageWindow = function(packageUI) {
 
     //create window
     var options = {"minimizable":true,"maximizable":true,"resizable":true,"movable":true};
-    var window = new visicomp.visiui.StackWindow(package.parentElement,package.name,options);
+    var window = new visicomp.visiui.StackWindow(packageUI.parentElement,packageUI.name,options);
     
-    package.window = window;
-    package.windowEventManager =  window.getEventManager();
+    packageUI.window = window;
+    packageUI.windowEventManager =  window.getEventManager();
     
     //load the content div
     var content = visicomp.visiui.createElement("div",null,
@@ -20,7 +20,7 @@ visicomp.app.visiui.dialog.packageWindow = function(package) {
                 "left":"0px"
             });
             
-	package.contentElement = content;
+	packageUI.contentElement = content;
 
 //dummy size
 window.setSize(500,500);

@@ -1,8 +1,8 @@
 /** This is a package. */
-visicomp.core.Package = function(name, workspace) {
-    this.workspace = workspace;
+visicomp.core.Package = function(name, parent, isRoot) {
     this.name = name;
-	this.parent = null;
+	this.parent = parent;
+	this.isRoot = true;
 
     //this holds the base objects, mapped by name
     this.childMap = {};
@@ -17,7 +17,7 @@ visicomp.core.Package.prototype.getName = function() {
 /** This method returns the full name in dot notation for this object. */
 visicomp.core.Package.prototype.getFullName = function() {
 	if(this.parent) {
-		if(this.parent.isRootPackage()) {
+		if(this.isRoot) {
 			return this.name;
 		}
 		else {
@@ -31,7 +31,7 @@ visicomp.core.Package.prototype.getFullName = function() {
 
 /** this is used to identify if this is the root package. */
 visicomp.core.Package.prototype.isRootPackage = function() {
-    return (this.workspace.getRootPackage() == this);
+    return this.isRoot;
 }
 
 /** This identifies the type of object. */
@@ -63,10 +63,13 @@ visicomp.core.Package.prototype.toJson = function() {
     return json;
 }
 
-
 /** this method gets the workspace. */
 visicomp.core.Package.prototype.getWorkspace = function() {
-    return this.workspace;
+    var ancestor = this;
+	while((ancestor)&&(ancestor.getType() !== "workspace")) {
+		ancestor = ancestor.getParent();
+	} 
+	return ancestor;
 }
 
 /** this method gets the table map. */

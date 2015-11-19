@@ -1,7 +1,7 @@
 
 /** This method shows a save package dialog. I simply displays the text of
  * the workspace json for the user to copy and save elsewhere. */
-visicomp.app.visiui.dialog.saveWorkspaceDialog = function(workspaceUI) {
+visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(workspaceUI) {
     
     if((!workspaceUI)||(!workspaceUI.getWorkspace())) {
         alert("There is no workspace open.");

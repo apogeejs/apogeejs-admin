@@ -2,7 +2,7 @@
 /** This method shows a open workspace dialog. The argument onOpenFunction
  * should take the package text as an argument and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.openWorkspaceDialog = function(onOpenFunction) {
+visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
 
     var dialog = new visicomp.visiui.Dialog("Dialog",{"resizable":true,"movable":true});
     var content = document.createElement("div");

@@ -1,7 +1,7 @@
 /** This method shows a create package dialog. The argument onCreateFunction
  * should take the package name as an argument and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.createWorkspaceDialog = function(onCreateFunction) {
+visicomp.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction) {
 
     var dialog = new visicomp.visiui.Dialog("",{"movable":true});
     

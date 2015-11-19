@@ -13,6 +13,11 @@ visicomp.core.Workspace.prototype.getName = function() {
     return this.name;
 }
 
+/** this method gets the workspace name. */
+visicomp.core.Workspace.prototype.getType = function() {
+    return "workspace";
+}
+
 /** This is used for saving the workspace. */
 visicomp.core.Workspace.prototype.toJson = function() {
     var json = {};

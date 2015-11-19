@@ -12,10 +12,6 @@ visicomp.core.Table = function(name) {
 	
     //data is not yet initialized
     this.data = null;
-	
-    //this is the ui object that displays this table
-    this.displayObject = null;
-
 }
 
 /** Test function. */
@@ -104,9 +100,13 @@ visicomp.core.Table.prototype.getPackage = function() {
     return this.parent;
 }
 
-/** This gets the workspace for this table. */
+/** this method gets the workspace. */
 visicomp.core.Table.prototype.getWorkspace = function() {
-	return this.parent.getWorkspace();
+    var ancestor = this;
+	while((ancestor)&&(ancestor.getType() !== "workspace")) {
+		ancestor = ancestor.getParent();
+	} 
+	return ancestor;
 }
 
 /** This method returns the code array. The code array

@@ -27,14 +27,15 @@ visicomp.core.createpackage.onCreatePackage = function(event) {
     //create package
     var name = event.name;
 	var parent = event.parent;
-    var workspace = event.workspace;
-    var package = new visicomp.core.Package(name,workspace);
+	var workspace = event.workspace;
+    var isRoot = event.isRoot;
+    var package = new visicomp.core.Package(name,parent,isRoot);
 	
-	if(parent) {
-		parent.addChild(package);
+	if(isRoot) {
+		parent.setRootPackage(package);
 	}
 	else {
-		workspace.setRootPackage(package);
+		parent.addChild(package);
 	}
 	
     //dispatch event

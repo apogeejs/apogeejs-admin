@@ -1,6 +1,6 @@
 /** This method shows an update table dialog. The argument onSaveData si the same
  * arguments as the updateTable event handler data. */
-visicomp.app.visiui.dialog.updateTableDialog = function(table,onSaveFunction) {
+visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction) {
     
     var dialog = new visicomp.visiui.Dialog("Dialog",
             {"minimizable":true,"maximizable":true,"movable":true,"resizable":true});

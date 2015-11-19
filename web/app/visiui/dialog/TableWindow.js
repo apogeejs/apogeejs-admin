@@ -1,14 +1,14 @@
 /** This method shows a create package dialog. The argument onCreateFunction
  * should take the package name as an argument and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.tableWindow = function(table) {
+visicomp.app.visiui.dialog.showTableWindow = function(tableUI) {
 
     //create window
     var options = {"minimizable":true,"maximizable":true,"resizable":true,"movable":true};
-    var window = new visicomp.visiui.StackWindow(table.parentElement,table.name,options);
+    var window = new visicomp.visiui.StackWindow(tableUI.parentElement,tableUI.name,options);
     
-    table.window = window;
-    table.windowEventManager =  window.getEventManager();
+    tableUI.window = window;
+    tableUI.windowEventManager =  window.getEventManager();
     
     //load the content div
     var content = visicomp.visiui.createElement("div",null,
@@ -26,7 +26,7 @@ visicomp.app.visiui.dialog.tableWindow = function(table) {
     editor.setReadOnly(true);
     editor.setTheme("ace/theme/eclipse"); //good
     editor.getSession().setMode("ace/mode/json"); 
-    table.editor = editor;
+    tableUI.editor = editor;
 
 //dummy size
 window.setSize(300,300);
@@ -35,7 +35,7 @@ window.setSize(300,300);
     //create the edit button
     var editButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit"});
     editButton.onclick = function() {
-        table.createEditDialog();
+        tableUI.createEditDialog();
     }
     window.addTitleBarElement(editButton);
     
@@ -46,6 +46,6 @@ window.setSize(300,300);
     var resizeCallback = function() {
         editor.resize();
     }
-    table.windowEventManager.addListener("resize", resizeCallback);
+    tableUI.windowEventManager.addListener("resize", resizeCallback);
 }
 

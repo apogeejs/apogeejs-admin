@@ -7,7 +7,6 @@ visicomp.visiui.TableUI = function(table,parentElement) {
     this.table = table;
     this.name = table.getName();
     this.parentElement = parentElement;
-    this.name = table.getName();
     this.dataEventManager = table.getPackage().getWorkspace().getEventManager();
     this.windowEventManager = null;//look this up below
 
@@ -19,7 +18,7 @@ visicomp.visiui.TableUI = function(table,parentElement) {
     this.dataEventManager.addListener(visicomp.core.updatetable.TABLE_UPDATED_EVENT, tableUpdatedCallback);
 
     //create the window and editor (for display, not editing)
-    visicomp.app.visiui.dialog.tableWindow(this);
+    visicomp.app.visiui.dialog.showTableWindow(this);
 }
 
 visicomp.visiui.TableUI.formatString = "\t"
@@ -37,7 +36,7 @@ visicomp.visiui.TableUI.prototype.createEditDialog = function() {
             visicomp.core.updatetable.UPDATE_TABLE_HANDLER,handlerData);
     };
     
-    visicomp.app.visiui.dialog.updateTableDialog(this.table,onSave);
+    visicomp.app.visiui.dialog.showUpdateTableDialog(this.table,onSave);
 }
     
 /** This method updates the table data */    
