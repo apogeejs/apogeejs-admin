@@ -19,6 +19,7 @@ visicomp.core.Package.prototype.constructor = visicomp.core.Package;
 /** This method returns the full name in dot notation for this object. */
 visicomp.core.Package.prototype.getFullName = function() {
 	if(this.isRoot) {
+        //special naming for root object
         return this.getName();
     }   
     else {
