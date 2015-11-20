@@ -34,7 +34,7 @@ visicomp.core.updatetable.UPDATE_TABLES_HANDLER = "updateTables";
 visicomp.core.updatetable.TABLE_UPDATED_EVENT = "tableUpdated";
 
 visicomp.core.updatetable.fireUpdatedEvent = function(table) {
-    var workspace = table.getPackage().getWorkspace();
+    var workspace = table.getWorkspace();
     var eventManager = workspace.getEventManager();
     eventManager.dispatchEvent(visicomp.core.updatetable.TABLE_UPDATED_EVENT,table);
 }

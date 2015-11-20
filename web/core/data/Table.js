@@ -1,61 +1,23 @@
 /** This class encapsulatees a data table */
 visicomp.core.Table = function(name) {
-	
-	this.parent = null;
-    this.name = name;
+    //base init
+    visicomp.core.Child.init.call(this,name,"table");
 	
     //this contains the formula and dependency information
     this.codeInfo = null;
 	
     //these are a list of tables that depend on this table
     this.impactsList = [];
-	
-    //data is not yet initialized
-    this.data = null;
 }
+
+//extend the child object
+visicomp.core.Table.prototype = Object.create(visicomp.core.Child);
+visicomp.core.Table.prototype.constructor = visicomp.core.Table;
 
 /** Test function. */
 visicomp.core.Table.prototype.print = function() {
-    console.log("name: " + this.data);
+    console.log("name: " + this.getData());
 }
-
-/** This method returns the name for this object. */
-visicomp.core.Table.prototype.getName = function() {
-    return this.name;
-}
-
-/** This method returns the full name in dot notation for this object. */
-visicomp.core.Table.prototype.getFullName = function() {
-	if(this.parent) {
-		if(this.parent.isRootPackage()) {
-			return this.name;
-		}
-		else {
-			return this.parent.getFullName() + "." + this.name;
-		}
-	}
-	else {
-		return this.name;
-	}
-}
-
-/** This identifies the type of object. */
-visicomp.core.Table.prototype.getType = function() {
-	return "table";
-}
-
-/** This returns the parent for this package. For the root package
- * this value is null. */
-visicomp.core.Table.prototype.getParent = function() {
-	return this.parent;
-}
-
-/** This sets the parent for this package.
- * @private*/
-visicomp.core.Table.prototype.setParent = function(parent) {
-	this.parent = parent;
-}
-
 
 /** This is used for saving the workspace. */
 visicomp.core.Table.prototype.toJson = function() {
@@ -68,45 +30,25 @@ visicomp.core.Table.prototype.toJson = function() {
         }
     }
     else {
-        json.data = this.data;
+        json.data = this.getData();
     }
     return json;
-}
-
-/** This method gets the dependency manager. */
-visicomp.core.Table.prototype.hasFormula = function() {
-    return (this.codeInfo != null);
-}
-
-/** This method returns the data for this object. */
-visicomp.core.Table.prototype.getData = function() {
-    return this.data;
 }
 
 /** This method sets the data for this object. It also
  * freezes the object so it is immutable. */
 visicomp.core.Table.prototype.setData = function(data) {
-    this.data = data;
-	
+    
 	//make this object immutable
 	visicomp.core.util.deepFreeze(data);
-	
+
 	//store the new object in the parent
-    this.parent.updateData(this);
+    visicomp.core.Child.setData.call(this,data);
 }
 
-/** This method returns the name for this object. */
-visicomp.core.Table.prototype.getPackage = function() {
-    return this.parent;
-}
-
-/** this method gets the workspace. */
-visicomp.core.Table.prototype.getWorkspace = function() {
-    var ancestor = this;
-	while((ancestor)&&(ancestor.getType() !== "workspace")) {
-		ancestor = ancestor.getParent();
-	} 
-	return ancestor;
+/** This method gets the dependency manager. */
+visicomp.core.Table.prototype.hasFormula = function() {
+    return (this.codeInfo != null);
 }
 
 /** This method returns the code array. The code array
@@ -342,7 +284,7 @@ visicomp.core.Table.TABLE_UPDATE_FORMAT_TEXT = [
 "   //table update code",
 "   visicomp.core.updateCode.{1}['{0}'] = function(_table) {",
 "",
-"       var _localPackage = _table.getPackage();",
+"       var _localPackage = _table.getParent();",
 "       var _rootPackage = _localPackage.getWorkspace().getRootPackage();",
 "       var value;",
 "",
@@ -364,10 +306,10 @@ visicomp.core.Table.TABLE_UPDATE_FORMAT_TEXT = [
    ].join("\n");
    
 //this is the code for adding the accessed table to the code
-visicomp.core.Table.LOCAL_ACCESSED_OBJECT_FORMAT_TEXT = 'var {0} = _localPackage.lookupChild("{0}").getData();\n';
+visicomp.core.Table.LOCAL_ACCESSED_OBJECT_FORMAT_TEXT = 'var {0} = _localPackage.lookupChildData("{0}");\n';
 
 //this is the code for adding the accessed package to the code
-visicomp.core.Table.ROOT_ACCESSED_OBJECT_FORMAT_TEXT = 'var {0} = _rootPackage.lookupChild("{0}").getData();\n';
+visicomp.core.Table.ROOT_ACCESSED_OBJECT_FORMAT_TEXT = 'var {0} = _rootPackage.lookupChildData("{0}");\n';
     
 
 

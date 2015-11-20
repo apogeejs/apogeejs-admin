@@ -12,7 +12,7 @@
  **/ 
 visicomp.core.CodeAnalyzer = function(table) {
     this.table = table
-    this.package = table.getPackage();
+    this.package = table.getParent();
     this.workspace = this.package.getWorkspace();
 	
     this.formula = null;
@@ -164,7 +164,7 @@ visicomp.core.CodeAnalyzer.prototype.analyzeCode = function(formula) {
     this.variables = {};
     
     //update package and  in case someone is reusing this class and these values changed
-    this.package = this.table.getPackage();
+    this.package = this.table.getParent();
     this.workspace = this.package.getWorkspace();
     
     try {

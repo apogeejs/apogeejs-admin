@@ -1,7 +1,7 @@
 /** This method shows a create table dialog. The argument onCreateFunction
  * should take the package and the table name as arguments and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTypeName,objectUIMap,activePackageName,onCreateFunction) {
+visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTypeName,objectUIMap,activePackageKey,onCreateFunction) {
 
     var dialog = new visicomp.visiui.Dialog("",{"movable":true});
     
@@ -23,10 +23,9 @@ visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTypeName,objec
     for(var key in objectUIMap) {
 		var object = objectUIMap[key].object;
 		if(object.getType() == "package") { 
-			var packageName = object.getName();
-			select.add(visicomp.visiui.createElement("option",{"text":packageName}));
-			if(packageName == activePackageName) {
-				select.value = packageName;
+			select.add(visicomp.visiui.createElement("option",{"text":key}));
+			if(key == activePackageKey) {
+				select.value = key;
 			}
 		}
     }

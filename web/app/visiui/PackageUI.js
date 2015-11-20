@@ -7,7 +7,7 @@ visicomp.visiui.PackageUI = function(package,parentElement) {
     this.package = package;
     this.name = package.getName();
     this.parentElement = parentElement;
-//    this.dataEventManager = table.getPackage().getWorkspace().getEventManager();
+//    this.dataEventManager = package.getWorkspace().getEventManager();
     this.windowEventManager = null;//look this up below
 	this.contentElement = null; //created below
 

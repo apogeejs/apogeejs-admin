@@ -109,32 +109,6 @@ visicomp.app.visiui.WorkspaceUI.prototype.addTable = function(parent, name) {
 }
 
 /** This method responds to a "new" menu event. */
-//visicomp.app.visiui.WorkspaceUI.prototype.tableAdded = function(table) {
-//
-//    var package = table.getPackage();
-//	
-//	//make sure this is for us
-//    if(package.getWorkspace() != this.workspace) return;
-//	
-//	var packageInfo = this.packages[package.getFullName()];
-//	var container = packageInfo.packageUI.getContentElement();
-//    
-//    //create the table
-//    var tableUI = new visicomp.visiui.TableUI(table,container);
-//    
-//    //store the table info
-//    var tableInfo = {"table":table,"tableUI":tableUI};
-//    packageInfo.tables[table.getName()] = tableInfo;
-//    
-//    //show the table
-//    var window = tableUI.getWindow();
-//    window.setPosition(visicomp.app.visiui.WorkspaceUI.newTableX,visicomp.app.visiui.WorkspaceUI.newTableY);
-//    visicomp.app.visiui.WorkspaceUI.newTableX += visicomp.app.visiui.WorkspaceUI.newTableDeltaX;
-//    visicomp.app.visiui.WorkspaceUI.newTableY += visicomp.app.visiui.WorkspaceUI.newTableDeltaY;
-//    window.show();
-//}
-
-/** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object) {
     //make sure this is for us
     if(object.getWorkspace() !== this.workspace) return;

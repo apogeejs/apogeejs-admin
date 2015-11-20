@@ -7,7 +7,7 @@ visicomp.visiui.TableUI = function(table,parentElement) {
     this.table = table;
     this.name = table.getName();
     this.parentElement = parentElement;
-    this.dataEventManager = table.getPackage().getWorkspace().getEventManager();
+    this.dataEventManager = table.getWorkspace().getEventManager();
     this.windowEventManager = null;//look this up below
 
     //subscribe to update event

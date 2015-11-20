@@ -1,32 +1,29 @@
 /** This is a package. */
-visicomp.core.Package = function(name, parent, isRoot) {
-    this.name = name;
-	this.parent = parent;
-	this.isRoot = true;
+visicomp.core.Package = function(name) {
+    //base init
+    visicomp.core.Child.init.call(this,name,"package");
+	this.isRoot = false;
 
     //this holds the base objects, mapped by name
     this.childMap = {};
     this.dataMap = {};
+    
+    //this only needs to be set once since we do not update it
+    this.setData(this.dataMap);
 }
 
-/** this method gets the name. */
-visicomp.core.Package.prototype.getName = function() {
-    return this.name;
-}
+//extend the child object
+visicomp.core.Package.prototype = Object.create(visicomp.core.Child);
+visicomp.core.Package.prototype.constructor = visicomp.core.Package;
 
 /** This method returns the full name in dot notation for this object. */
 visicomp.core.Package.prototype.getFullName = function() {
-	if(this.parent) {
-		if(this.isRoot) {
-			return this.name;
-		}
-		else {
-			return this.parent.getFullName() + "." + this.name;
-		}
-	}
-	else {
-		return this.name;
-	}
+	if(this.isRoot) {
+        return this.getName();
+    }   
+    else {
+        return visicomp.core.Child.getFullName.call(this);
+    }
 }
 
 /** this is used to identify if this is the root package. */
@@ -34,21 +31,9 @@ visicomp.core.Package.prototype.isRootPackage = function() {
     return this.isRoot;
 }
 
-/** This identifies the type of object. */
-visicomp.core.Package.prototype.getType = function() {
-	return "package";
-}
-
-/** This returns the parent for this package. For the root package
- * this value is null. */
-visicomp.core.Package.prototype.getParent = function() {
-	return this.parent;
-}
-
-/** This sets the parent for this package.
- * @private*/
-visicomp.core.Package.prototype.setParent = function(parent) {
-	this.parent = parent;
+/** this is used to identify if this is the root package. */
+visicomp.core.Package.prototype.setIsRootPackage = function(isRoot) {
+    this.isRoot = isRoot;
 }
 
 /** This is used for saving the workspace. */
@@ -63,23 +48,14 @@ visicomp.core.Package.prototype.toJson = function() {
     return json;
 }
 
-/** this method gets the workspace. */
-visicomp.core.Package.prototype.getWorkspace = function() {
-    var ancestor = this;
-	while((ancestor)&&(ancestor.getType() !== "workspace")) {
-		ancestor = ancestor.getParent();
-	} 
-	return ancestor;
-}
-
 /** this method gets the table map. */
 visicomp.core.Package.prototype.getChildMap = function() {
     return this.childMap;
 }
 
-/** this method gets the data map. */
-visicomp.core.Package.prototype.getData = function() {
-    return this.dataMap;
+/** this method gets the data object for a child from this package. */
+visicomp.core.Package.prototype.lookupChildData = function(name) {
+    return this.dataMap[name];
 }
 
 /** This method looks up a child from this package.  */

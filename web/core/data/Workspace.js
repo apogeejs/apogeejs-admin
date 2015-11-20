@@ -44,4 +44,6 @@ visicomp.core.Workspace.prototype.getRootPackage = function() {
  * @private */
 visicomp.core.Workspace.prototype.setRootPackage = function(package) {
     this.rootPackage = package;
+    package.setParent(this);
+    package.setIsRootPackage(true);
 }
