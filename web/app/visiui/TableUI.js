@@ -15,7 +15,7 @@ visicomp.visiui.TableUI = function(table,parentElement) {
     var tableUpdatedCallback = function(tableData) {
         instance.updateTableData(tableData);
     }
-    this.dataEventManager.addListener(visicomp.core.updateobject.OBJECT_UPDATED_EVENT, tableUpdatedCallback);
+    this.dataEventManager.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, tableUpdatedCallback);
 
     //create the window and editor (for display, not editing)
     visicomp.app.visiui.dialog.showTableWindow(this);
@@ -33,7 +33,7 @@ visicomp.visiui.TableUI.prototype.createEditDialog = function() {
     var instance = this;
     var onSave = function(handlerData) {
         return instance.dataEventManager.callHandler(
-            visicomp.core.updateobject.UPDATE_OBJECT_HANDLER,handlerData);
+            visicomp.core.updatemember.UPDATE_MEMBER_HANDLER,handlerData);
     };
     
     visicomp.app.visiui.dialog.showUpdateTableDialog(this.table,onSave);

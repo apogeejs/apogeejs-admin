@@ -2,7 +2,7 @@
 visicomp.core.Table = function(name) {
     //base init
     visicomp.core.Child.init.call(this,name,"table");
-	visicomp.core.FunctionBase.init.call(this);
+	visicomp.core.Member.init.call(this);
 	
     //this contains the formula and dependency information
     this.codeInfo = null;
@@ -14,7 +14,7 @@ visicomp.core.Table = function(name) {
 //extend the child object
 visicomp.core.Table.prototype = Object.create(visicomp.core.util.mergeObjects(
 		visicomp.core.Child,
-		visicomp.core.FunctionBase));
+		visicomp.core.Member));
 visicomp.core.Table.prototype.constructor = visicomp.core.Table;
 
 /** Test function. */
@@ -50,59 +50,13 @@ visicomp.core.Table.prototype.setData = function(data) {
     visicomp.core.Child.setData.call(this,data);
 }
 
-/** This method gets the dependency manager. */
-visicomp.core.Table.prototype.hasFormula = function() {
-    return (this.getCodeInfo() != null);
-}
+visicomp.core.Table.prototype.functionBodyWrapperFormat = "function() {\nvar value;\n{0}\nreturn value;\n}";
 
-
-/** This calls the update method updates the data objet, setting up the context
- * appropriately. The commands should be set up with the assumption the following
- * variables will be in context: _workspace, _package and _table. */
-visicomp.core.Table.prototype.needsExecuting = function() {
-	return this.hasFormula();
-}
-
-visicomp.core.Table.prototype.execute = function() {	
-    //we execute the function here so the user can debug it easily
-    var data = visicomp.core.runObjectFunction(this);
+visicomp.core.Table.prototype.processObjectFunction = function(objectFunction) {	
+    //tjhe data is the output of the function
+    var data = objectFunction();
 	this.setData(data);
 }
-
-/** This method updates the data for the object. It should be implemented by
- * the object.
- * @protected */
-visicomp.core.Table.prototype.setContent = function(contentData) {
-
-    //read handler data
-    var formula = contentData.formula;
-    var supplementalCode = contentData.supplementalCode;
-    var data = contentData.data;
-	
-    //set forumula or value, not both
-    if(formula) {
-        
-        //create the update function from the formula text
-        var functionText = "function() {\nvar value;\n" + formula + "\nreturn value;\n}";
-        
-        //create code for formula
-        var codeInfo = visicomp.core.updateobject.createCodeInfo(this,functionText,supplementalCode);
-        //we might have error info here!
-		
-        //set code
-        this.setCodeInfo(codeInfo);
-    }
-    else {
-        //clear the formula
-        this.setCodeInfo(null,null);
-
-        //set data
-        this.setData(data);
-		
-		//fire this for the change in value
-		visicomp.core.updateobject.fireUpdatedEvent(this);
-    }
-}	
 
 
 

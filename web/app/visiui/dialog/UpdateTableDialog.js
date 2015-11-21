@@ -80,7 +80,7 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
     
     var onSave = function() {
         var tableData = {};
-        tableData.object = table;
+        tableData.member = table;
         var dataSet = false;
         
         if(formulaEditor) {
@@ -176,8 +176,8 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
             formulaEditor.getSession().setMode("ace/mode/javascript");
             //set the formula
             var codeInfo = table.getCodeInfo();
-            if((codeInfo)&&(codeInfo.formula)) {
-                formulaEditor.getSession().setValue(codeInfo.formula);
+            if((codeInfo)&&(codeInfo.functionBody)) {
+                formulaEditor.getSession().setValue(codeInfo.functionBody);
             }
         }
     }
@@ -203,7 +203,7 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
     }
     
     //initilialize radio buttons
-    if(table.hasFormula()) {
+    if(table.hasCode()) {
         formulaRadio.checked = true;
         showFormulaFunction();
     }

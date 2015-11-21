@@ -5,18 +5,11 @@ visicomp.core = {}
 visicomp.core.functionCode = {};
 
 /** This is a simple entry point to debug user code */
-visicomp.core.runObjectFunction = function(object) {
+visicomp.core.getObjectFunction = function(object) {
     var objectName = object.getFullName();
     var workspaceName = object.getWorkspace().getName();
     
-    var objectFunction = visicomp.core.functionCode[workspaceName][objectName];
-    if(objectFunction) {
-        //step in here to debug user code for a given table
-        return objectFunction();
-    }
-    else {
-        throw "Table update command not found";
-    }
+    return visicomp.core.functionCode[workspaceName][objectName];
 }
 
 

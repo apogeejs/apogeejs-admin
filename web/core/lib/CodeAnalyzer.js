@@ -10,9 +10,9 @@
  * - The formula should not access any global variables. It should only use local
  * variables, the table variables and "value".
  **/ 
-visicomp.core.CodeAnalyzer = function(object) {
-    this.object = object
-    this.package = object.getParent();
+visicomp.core.CodeAnalyzer = function(member) {
+    this.member = member;
+    this.package = member.getParent();
     this.workspace = this.package.getWorkspace();
 	
     this.dependsOn = [];
@@ -154,17 +154,13 @@ visicomp.core.CodeAnalyzer.prototype.getErrors = function() {
  * errors. if true is returned, the dependencies can be retrieved. If false is returned
  * the errors can be retireved.
  **/
-visicomp.core.CodeAnalyzer.prototype.analyzeCode = function(functionText,supplementalCodeText) {
-    
-    //update package and  in case someone is reusing this class and these values changed
-    this.package = this.object.getParent();
-    this.workspace = this.package.getWorkspace();
-    
+visicomp.core.CodeAnalyzer.prototype.analyzeCode = function(functionBody,supplementalCodeText) {
+
     try {
         //pull out variables
         var success;
         
-        success = this.extractVariables("var dummy = " + functionText);
+        success = this.extractVariables(functionBody);
         if(!success) return false;
         
         success = this.extractVariables(supplementalCodeText);
@@ -307,7 +303,7 @@ visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,
     //get the variables
     var namePath = this.getVariableDescription(node);
 	
-	//lookup the object
+	//lookup the member
 	//first determine the name base package on which the name is based
 	//we will base this on whether the first name in the path is in the package,
 	//first checking the local package and then the root package for the workspace
@@ -366,7 +362,7 @@ visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,
     var varInfo = this.variables[objectKey];
     if(!varInfo) {
         varInfo = {};
-        varInfo.object = object;
+        varInfo.member = object;
         varInfo.loc = node.loc; //save the first appearance of this variable
         this.variables[objectKey] = varInfo;
     }
@@ -437,9 +433,9 @@ visicomp.core.CodeAnalyzer.prototype.processVariableList = function(allowDataAcc
             var msg;
             
 //apply only to tables?
-            //object can not be modified
-            if((variableInfo.object)&&(variableInfo.modified)) {
-                if(variableInfo.object == this.object) {
+            //this object can not be modified
+            if((variableInfo.member)&&(variableInfo.modified)) {
+                if(variableInfo.member == this.member) {
                     msg = "To modify the local table use the variable name 'value' rather than the table name.";
                 }
                 else {
@@ -461,8 +457,8 @@ visicomp.core.CodeAnalyzer.prototype.processVariableList = function(allowDataAcc
 //            }
         }
         
-       //save dependant objects
-       if(variableInfo.object) {
+       //save dependant memberss
+       if(variableInfo.member) {
            this.dependsOn.push(variableInfo);
        }
     }
