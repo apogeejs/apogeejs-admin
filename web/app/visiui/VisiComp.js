@@ -69,7 +69,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 
     visicomp.core.createpackage.initHandler(this.eventManager);
     visicomp.core.createtable.initHandler(this.eventManager);
-    visicomp.core.updatetable.initHandler(this.eventManager);
+    visicomp.core.updateobject.initHandler(this.eventManager);
 }
 
 /** This method responds to a "new" menu event. */
@@ -117,7 +117,7 @@ if(true) return;
             
             //save the data to set the tables' value or formula
             var tableUpdateData = {};
-            tableUpdateData.table = table;
+            tableUpdateData.object = table;
             tableUpdateData.formula = tableData.formula;
             tableUpdateData.supplementalCode = tableData.supplementalCode;
             tableUpdateData.data = tableData.data;
@@ -127,7 +127,7 @@ if(true) return;
     
     //update the tables
     var result = this.eventManager.callHandler(
-            visicomp.core.updatetable.UPDATE_TABLES_HANDLER,tableUpdateList);
+            visicomp.core.updateobject.UPDATE_OBJECTS_HANDLER,tableUpdateList);
         
     return result;
 }

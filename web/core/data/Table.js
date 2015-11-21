@@ -2,6 +2,7 @@
 visicomp.core.Table = function(name) {
     //base init
     visicomp.core.Child.init.call(this,name,"table");
+	visicomp.core.FunctionBase.init.call(this);
 	
     //this contains the formula and dependency information
     this.codeInfo = null;
@@ -11,7 +12,9 @@ visicomp.core.Table = function(name) {
 }
 
 //extend the child object
-visicomp.core.Table.prototype = Object.create(visicomp.core.Child);
+visicomp.core.Table.prototype = Object.create(visicomp.core.util.mergeObjects(
+		visicomp.core.Child,
+		visicomp.core.FunctionBase));
 visicomp.core.Table.prototype.constructor = visicomp.core.Table;
 
 /** Test function. */
@@ -19,6 +22,7 @@ visicomp.core.Table.prototype.print = function() {
     console.log("name: " + this.getData());
 }
 
+//FIX THIS UP!!!
 /** This is used for saving the workspace. */
 visicomp.core.Table.prototype.toJson = function() {
     var json = {};
@@ -48,268 +52,53 @@ visicomp.core.Table.prototype.setData = function(data) {
 
 /** This method gets the dependency manager. */
 visicomp.core.Table.prototype.hasFormula = function() {
-    return (this.codeInfo != null);
+    return (this.getCodeInfo() != null);
 }
 
-/** This method returns the code array. The code array
- * includees segments of code,referencing the code pattern. */
-visicomp.core.Table.prototype.getCodeInfo = function() {
-    return this.codeInfo;
-}
-
-/** This method sets the code info.*/
-visicomp.core.Table.prototype.setCodeInfo = function(codeInfo) {
-	
-    var oldDependsOn = this.getDependsOn();
-	
-    this.codeInfo = codeInfo;
-	
-    var currentDependsOn = this.getDependsOn();
-    this.updateDependencies(currentDependsOn, oldDependsOn);
-    
-    if(codeInfo != null) {
-        this.createUpdateCommand();
-    }
-    else {
-        this.clearUpdateCommand();
-    }
-}
-
-/** This returns an array of objects this obejct impacts. */
-visicomp.core.Table.prototype.getImpactsList = function() {
-    return this.impactsList;
-}
-
-/** This returns a map of the objects that this object depends on. */
-visicomp.core.Table.prototype.getDependsOn = function() {
-    if(this.codeInfo) {
-        return this.codeInfo.dependsOn;
-    }
-    else {
-        return [];
-    }
-}
-
-/** this method adds a data object to the imapacts list for this node. */
-visicomp.core.Table.prototype.addToImpactsList = function(table) {
-    //exclude this table
-    if(table == this) return;
-	
-    //make sure it appears only once
-    for(var i = 0; i < this.impactsList.length; i++) {
-        if(this.impactsList[i] == table) return;
-    }
-    //add to the list
-    this.impactsList.push(table);
-}
-
-/** this method removes a data object from the imapacts list for this node. */
-visicomp.core.Table.prototype.removeFromImpactsList = function(table) {
-    //it should appear only once
-    for(var i = 0; i < this.impactsList.length; i++) {
-        if(this.impactsList[i] == table) {
-            this.impactsList.splice(i,1);
-            return;
-        }
-    }
-}
 
 /** This calls the update method updates the data objet, setting up the context
  * appropriately. The commands should be set up with the assumption the following
  * variables will be in context: _workspace, _package and _table. */
-visicomp.core.Table.prototype.runUpdateCommand = function() {
-    var tableName = this.getName();
-    var packageName = this.parent.getName();
-    var workspaceName = this.parent.getWorkspace().getName();
-	
+visicomp.core.Table.prototype.needsExecuting = function() {
+	return this.hasFormula();
+}
+
+visicomp.core.Table.prototype.execute = function() {	
     //we execute the function here so the user can debug it easily
-    visicomp.core.runTableFormula(tableName,packageName,workspaceName);
+    var data = visicomp.core.runObjectFunction(this);
+	this.setData(data);
 }
 
-/** This sets the dependencies based on the code for the object. 
- * @private */
-visicomp.core.Table.prototype.updateDependencies = function(currentDependsOn,oldDependsOn) {
+/** This method updates the data for the object. It should be implemented by
+ * the object.
+ * @protected */
+visicomp.core.Table.prototype.setContent = function(contentData) {
+
+    //read handler data
+    var formulaText = contentData.formula;
+    var supplementalCodeText = contentData.supplementalCode;
+    var data = contentData.data;
 	
-    //update the dependency links among the objects
-	var newDependencySet = {};
-    var remoteTable;
-    var i;
-    for(i = 0; i < currentDependsOn.length; i++) {
-        remoteTable = currentDependsOn[i].table;
+    //set forumula or value, not both
+    if(formulaText) {
+        //create code for formula
+        var codeInfo = visicomp.core.updateobject.createCodeInfo(this,formulaText,supplementalCodeText);
+        //we might have error info here!
 		
-		//update this object
-		remoteTable.addToImpactsList(this);
-
-		//create a set of new tables to use below
-		newDependencySet[remoteTable.getFullName()] = true;
+        //set code
+        this.setCodeInfo(codeInfo);
     }
-	
-    //update for links that have gotten deleted
-    for(i = 0; i < oldDependsOn.length; i++) {
-        remoteTable = oldDependsOn[i].table;
+    else {
+        //clear the formula
+        this.setCodeInfo(null,null);
+
+        //set data
+        this.setData(data);
 		
-		var stillDependsOn = newDependencySet[remoteTable.getFullName()];
-		
-		if(!stillDependsOn) {
-			//remove from imacts list
-			remoteTable.removeFromImpactsList(this);
-		}
+		//fire this for the change in value
+		visicomp.core.updateobject.fireUpdatedEvent(this);
     }
-}
+}	
 
-/** This method returns the formula for this table. 
- * @private */
-visicomp.core.Table.prototype.getFormula = function() {
-    var f;
-    if(this.codeInfo) {
-        f = this.codeInfo.formula;
-    }
-    if(!f) f = "";
-    return f;
-}
-
-/** This method returns the supplemental code for this table. 
- * @private */
-visicomp.core.Table.prototype.getSupplementalCode = function() {
-    var sc;
-    if(this.codeInfo) {
-        sc = this.codeInfo.supplementalCode;
-    }
-    if(!sc) sc = "";
-    return sc;
-}
-
-/** This method creates the table update javascript, which will be added to the
- * html page so the user easily can run it in the debugger if needed. 
- * @private */
-visicomp.core.Table.prototype.createUpdateCommand = function() {
-    
-    var tableFullName = this.getFullName();
-    var workspaceName = this.parent.getWorkspace().getName();
-    
-    var accessedVariableString = this.getAccessedVariableCode();
-    
-    var formula = this.getFormula();
-    var supplementalCode = this.getSupplementalCode();
-    
-    //create the code body
-    var codeBody = visicomp.core.util.formatString(
-        visicomp.core.Table.TABLE_UPDATE_FORMAT_TEXT,
-        tableFullName,
-        workspaceName,
-        accessedVariableString,
-        formula,
-        supplementalCode
-    );
-     
-    //create the code command
-    visicomp.core.Table.makeUpdateCommand(codeBody);
-}
-
-/** This methoc evaluates the update command tect to make the update command.
- * It is separated so there is no context and minimal added closure variables 
- * in the eval statement. 
- * @private */
-visicomp.core.Table.prototype.clearUpdateCommand = function() {
-    delete visicomp.core.updateCode[this.getWorkspace().getName()][this.getFullName()];
-}
-
-/** This methoc evaluates the update command tect to make the update command.
- * It is separated so there is no context and minimal added closure variables 
- * in the eval statement. 
- * @private */
-visicomp.core.Table.makeUpdateCommand = function(_commandText) {
-    eval(_commandText);
-}
-
-/** This method creates the access variable code. It makes short cuts
- * to all the accessed tables. The users should use the shortcuts and not
- * some othermethod off accessing the tables because use of these shortcuts
- * determines the dependencies of the tables, which is need to find the
- * table calculation order. 
- * @private */
-visicomp.core.Table.prototype.getAccessedVariableCode = function() {
-    
-    //create the text to add an accessed tables to the code
-    var accessedVariableString = "";
-	
-	//add accessed tables, either as parent or table name
-    var includedNameSet = {};
-	var dependsOn = this.getDependsOn();
-	for(var i = 0; i < dependsOn.length; i++) {
-		var varInfo = dependsOn[i];
-		
-		//include the variable, or the path to it, for local references
-		if((varInfo.localRefBase)&&(!includedNameSet[varInfo.localRefBase])) {
-           
-			//add table to access variables
-			accessedVariableString += visicomp.core.util.formatString(
-                visicomp.core.Table.LOCAL_ACCESSED_OBJECT_FORMAT_TEXT,
-                varInfo.localRefBase
-            );
-              
-            //store that we included this name
-            includedNameSet[varInfo.localRefBase] = true;
-		}
-        
-        //include the variable, or the path to it, for local references
-		if((varInfo.rootRefBase)&&(!includedNameSet[varInfo.rootRefBase])) {
-           
-			//add table to access variables
-			accessedVariableString += visicomp.core.util.formatString(
-                visicomp.core.Table.ROOT_ACCESSED_OBJECT_FORMAT_TEXT,
-                varInfo.rootRefBase
-            );
-              
-            //store that we included this name
-            includedNameSet[varInfo.localRefBase] = true;
-		}
-       
-	}
-    
-    return accessedVariableString;
-}
-
-
-
-/** This is the format string to create the code body for updateing the table
- * Input indices:
- * 0: table name
- * 1: workspace name
- * 2: access variable code text
- * 3: table formula text
- * 4: supplemental code text
- */
-visicomp.core.Table.TABLE_UPDATE_FORMAT_TEXT = [
-"   //table update code",
-"   visicomp.core.updateCode.{1}['{0}'] = function(_table) {",
-"",
-"       var _localPackage = _table.getParent();",
-"       var _rootPackage = _localPackage.getWorkspace().getRootPackage();",
-"       var value;",
-"",
-"//accessed variables",
-"{2}",
-"//end accessed variables",
-"",
-"//supplemental code",
-"{4}",
-"//end supplemental code",
-"",
-"//table formula",
-"{3}",
-"//end formula",
-"",
-"       _table.setData(value);",
-"   }",
-""
-   ].join("\n");
-   
-//this is the code for adding the accessed table to the code
-visicomp.core.Table.LOCAL_ACCESSED_OBJECT_FORMAT_TEXT = 'var {0} = _localPackage.lookupChildData("{0}");\n';
-
-//this is the code for adding the accessed package to the code
-visicomp.core.Table.ROOT_ACCESSED_OBJECT_FORMAT_TEXT = 'var {0} = _rootPackage.lookupChildData("{0}");\n';
-    
 
 

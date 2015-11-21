@@ -1,6 +1,18 @@
 visicomp.core.util = {};
 
 /** This method creates an integer has value for a string. */
+visicomp.core.util.mergeObjects = function(argListOfObjects) {
+	var returnValue = {};
+	for(var i = 0; i < arguments.length; i++) {
+		var input = arguments[i];
+		for(var key in input) {
+			returnValue[key] = input[key];
+		}
+	}
+	return returnValue;
+}
+
+/** This method creates an integer has value for a string. */
 visicomp.core.util.stringHash = function(string) {
     var HASH_SIZE = 0xffffffff;
     var hash = 0;

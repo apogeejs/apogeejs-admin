@@ -80,7 +80,7 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
     
     var onSave = function() {
         var tableData = {};
-        tableData.table = table;
+        tableData.object = table;
         var dataSet = false;
         
         if(formulaEditor) {

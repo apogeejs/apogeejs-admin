@@ -5,7 +5,7 @@ visicomp.core.Workspace = function(name,eventManager) {
     this.eventManager = eventManager;
     
     //add an entry in the update code structure
-    visicomp.core.updateCode[name] = {};
+    visicomp.core.functionCode[name] = {};
 }
 
 /** this method gets the workspace name. */

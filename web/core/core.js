@@ -2,17 +2,17 @@
 visicomp.core = {}
 
 /** Namespace for table update code, so the user can run it in the debugger. */
-visicomp.core.updateCode = {};
+visicomp.core.functionCode = {};
 
 /** This is a simple entry point to debug user code */
-visicomp.core.runTableFormula = function(table) {
-    var tableName = table.getFullName();
-    var workspaceName = table.getWorkspace().getName();
+visicomp.core.runObjectFunction = function(object) {
+    var objectName = object.getFullName();
+    var workspaceName = object.getWorkspace().getName();
     
-    var updateCommand = visicomp.core.updateCode[workspaceName][tableName];
-    if(updateCommand) {
+    var objectFunction = visicomp.core.functionCode[workspaceName][objectName];
+    if(objectFunction) {
         //step in here to debug user code for a given table
-        updateCommand(table);
+        return objectFunction();
     }
     else {
         throw "Table update command not found";
