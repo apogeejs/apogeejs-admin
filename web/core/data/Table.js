@@ -75,14 +75,18 @@ visicomp.core.Table.prototype.execute = function() {
 visicomp.core.Table.prototype.setContent = function(contentData) {
 
     //read handler data
-    var formulaText = contentData.formula;
-    var supplementalCodeText = contentData.supplementalCode;
+    var formula = contentData.formula;
+    var supplementalCode = contentData.supplementalCode;
     var data = contentData.data;
 	
     //set forumula or value, not both
-    if(formulaText) {
+    if(formula) {
+        
+        //create the update function from the formula text
+        var functionText = "function() {\nvar value;\n" + formula + "\nreturn value;\n}";
+        
         //create code for formula
-        var codeInfo = visicomp.core.updateobject.createCodeInfo(this,formulaText,supplementalCodeText);
+        var codeInfo = visicomp.core.updateobject.createCodeInfo(this,functionText,supplementalCode);
         //we might have error info here!
 		
         //set code

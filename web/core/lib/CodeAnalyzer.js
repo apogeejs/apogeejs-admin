@@ -10,14 +10,13 @@
  * - The formula should not access any global variables. It should only use local
  * variables, the table variables and "value".
  **/ 
-visicomp.core.CodeAnalyzer = function(table) {
-    this.table = table
-    this.package = table.getParent();
+visicomp.core.CodeAnalyzer = function(object) {
+    this.object = object
+    this.package = object.getParent();
     this.workspace = this.package.getWorkspace();
 	
-    this.formula = null;
-    this.dependsOn = null;
-    this.variables = null;
+    this.dependsOn = [];
+    this.variables = {};
     this.errors = null;
 }
 
@@ -129,7 +128,6 @@ visicomp.core.CodeAnalyzer.syntax = {
     
 };
 
-
 /** This method returns the dependancy map for this formula. It is only valid
  * after a successful call to analyzeCode. */
 visicomp.core.CodeAnalyzer.prototype.getDependancies = function() {
@@ -156,32 +154,23 @@ visicomp.core.CodeAnalyzer.prototype.getErrors = function() {
  * errors. if true is returned, the dependencies can be retrieved. If false is returned
  * the errors can be retireved.
  **/
-visicomp.core.CodeAnalyzer.prototype.analyzeCode = function(formula) {
-    
-    //initialize some class variables
-    this.formula = formula;
-    this.dependsOn = [];
-    this.variables = {};
+visicomp.core.CodeAnalyzer.prototype.analyzeCode = function(functionText,supplementalCodeText) {
     
     //update package and  in case someone is reusing this class and these values changed
-    this.package = this.table.getParent();
+    this.package = this.object.getParent();
     this.workspace = this.package.getWorkspace();
     
     try {
-    
-        //parse the code to generate the ast
-        var ast = this.parseCode();
-
-        //check for errors in parsing
-        if((ast.errors)&&(ast.errors.length > 0)) {
-            //failure, save the error
-            this.errors = ast.errors;
-            return false;
-        }
-
-        //analyze the ast
-        this.analyzeAst(ast);
-
+        //pull out variables
+        var success;
+        
+        success = this.extractVariables("var dummy = " + functionText);
+        if(!success) return false;
+        
+        success = this.extractVariables(supplementalCodeText);
+        if(!success) return false;
+//I need to better identify where there were errors above on failure!
+        
         //process the list of variables found in the ast
         this.processVariableList();
         
@@ -202,13 +191,29 @@ visicomp.core.CodeAnalyzer.prototype.analyzeCode = function(formula) {
 /** This method parses the code, returning the abstract syntax tree or 
  * any errors in the code. 
  * @private */
-visicomp.core.CodeAnalyzer.prototype.parseCode = function parse() {
+visicomp.core.CodeAnalyzer.prototype.extractVariables = function(codeText) {
+    //parse the code to generate the ast
+    var ast = this.parseCode(codeText);
+
+    //check for errors in parsing
+    if((ast.errors)&&(ast.errors.length > 0)) {
+        //failure, save the error
+        this.errors = ast.errors;
+        return false;
+    }
+
+    //analyze the ast
+    this.analyzeAst(ast);
     
-    //wrap the code in a function, as will be done when it is executed
-    var functionText = "function _u() {\n" + this.formula + "\n}";
-    
+    return true;
+}
+
+/** This method parses the code, returning the abstract syntax tree or 
+ * any errors in the code. 
+ * @private */
+visicomp.core.CodeAnalyzer.prototype.parseCode = function(codeText) { 
     //parse the code
-    return esprima.parse(functionText, { tolerant: true, loc: true });
+    return esprima.parse(codeText, { tolerant: true, loc: true });
 }
 
 /** This method analyzes the AST to find the variabls accessed from the formula.
@@ -361,7 +366,7 @@ visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,
     var varInfo = this.variables[objectKey];
     if(!varInfo) {
         varInfo = {};
-        varInfo.table = object;
+        varInfo.object = object;
         varInfo.loc = node.loc; //save the first appearance of this variable
         this.variables[objectKey] = varInfo;
     }
@@ -421,7 +426,7 @@ visicomp.core.CodeAnalyzer.prototype.getVariableDescription = function(node) {
 /** This method process the final variables list found in the ast, determining the
  * dependendcies and any errors. 
  * @private */
-visicomp.core.CodeAnalyzer.prototype.processVariableList = function() {
+visicomp.core.CodeAnalyzer.prototype.processVariableList = function(allowDataAccess) {
     
     //process all the variables in the variable list
     for(var key in this.variables) {
@@ -431,9 +436,10 @@ visicomp.core.CodeAnalyzer.prototype.processVariableList = function() {
         {
             var msg;
             
-            //table can not be modified
-            if((variableInfo.table)&&(variableInfo.modified)) {
-                if(variableInfo.table == this.table) {
+//apply only to tables?
+            //object can not be modified
+            if((variableInfo.object)&&(variableInfo.modified)) {
+                if(variableInfo.object == this.object) {
                     msg = "To modify the local table use the variable name 'value' rather than the table name.";
                 }
                 else {
@@ -441,20 +447,22 @@ visicomp.core.CodeAnalyzer.prototype.processVariableList = function() {
                 }
                 throw this.createErrorObject(msg,variableInfo.loc);
             }
+//I should check that the local table is not referenced. It will not have been set yet, at least in theory.
+//Worse, it may be initialized with old data.
             
       
 //oops - we need ot exclued the standard javascript identifiers, like "Math". 
 //IF WE WANT TO DO THIS WE NEED A WHITE LIST (for what is allowed), A BLACK LIST
 //(for what is not allowed) and the rest is considered a global variable.
 //            //global variable can not be accessed
-//            if((!variableInfo.table)&&(!variableInfo.local)) {
+//            if((!variableInfo.object)&&(!variableInfo.local)) {
 //                msg = "Global variables can not be accessed in the formula: " + key;
 //                throw this.createErrorObject(msg,variableInfo.loc);
 //            }
         }
         
-       //save dependant tables
-       if(variableInfo.table) {
+       //save dependant objects
+       if(variableInfo.object) {
            this.dependsOn.push(variableInfo);
        }
     }

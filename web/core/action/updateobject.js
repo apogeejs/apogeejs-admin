@@ -96,18 +96,18 @@ visicomp.core.updateobject.initHandler = function(eventManager) {
 }
 
 /** This method creates the code info from the formula text. */
-visicomp.core.updateobject.createCodeInfo = function(object,formula,supplementalCode) {
+visicomp.core.updateobject.createCodeInfo = function(object,functionText,supplementalCode) {
     
     //instantiate the code analyzer
     var codeAnalyzer = new visicomp.core.CodeAnalyzer(object);
     //check code
-    var success = codeAnalyzer.analyzeCode(formula);
+    var success = codeAnalyzer.analyzeCode(functionText);
     
 //we should check the supplementao code! (it should not depend on any objects!)
 
     //set code
     var codeInfo = {};
-    codeInfo.formula = formula;
+    codeInfo.functionText = functionText;
     codeInfo.supplementalCode = supplementalCode;
     if(success) {
         codeInfo.dependsOn = codeAnalyzer.getDependancies();
@@ -203,7 +203,7 @@ visicomp.core.updateobject.sortRecalculateList = function(recalculateList) {
 			var unsortedImpactedDependencies = false;
 			var dependsOn = object.getDependsOn();
 			for(var j = 0; j < dependsOn.length; j++) {
-				var remoteObject = dependsOn[j].table;
+				var remoteObject = dependsOn[j].object;
 				if(objectIsSortedMap[remoteObject.getFullName()] === false) {
 					//this depends on an unsorted object
 					unsortedImpactedDependencies = true;

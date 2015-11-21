@@ -111,7 +111,7 @@ visicomp.core.FunctionBase.updateDependencies = function(currentDependsOn,oldDep
     var remoteObject;
     var i;
     for(i = 0; i < currentDependsOn.length; i++) {
-        remoteObject = currentDependsOn[i].table;
+        remoteObject = currentDependsOn[i].object;
 		
 		//update this object
 		remoteObject.addToImpactsList(this);
@@ -122,7 +122,7 @@ visicomp.core.FunctionBase.updateDependencies = function(currentDependsOn,oldDep
 	
     //update for links that have gotten deleted
     for(i = 0; i < oldDependsOn.length; i++) {
-        remoteObject = oldDependsOn[i].table;
+        remoteObject = oldDependsOn[i].object;
 		
 		var stillDependsOn = newDependencySet[remoteObject.getFullName()];
 		
@@ -135,10 +135,10 @@ visicomp.core.FunctionBase.updateDependencies = function(currentDependsOn,oldDep
 
 /** This method returns the formula for this object. 
  * @private */
-visicomp.core.FunctionBase.getFormula = function() {
+visicomp.core.FunctionBase.getFunctionText = function() {
     var f;
     if(this.codeInfo) {
-        f = this.codeInfo.formula;
+        f = this.codeInfo.functionText;
     }
     if(!f) f = "";
     return f;
@@ -165,7 +165,7 @@ visicomp.core.FunctionBase.createFunction = function() {
     
     var accessedVariableString = this.getAccessedVariableCode();
     
-    var formula = this.getFormula();
+    var functionText = this.getFunctionText();
     var supplementalCode = this.getSupplementalCode();
 	var functionArgumentList = "";
     
@@ -176,7 +176,7 @@ visicomp.core.FunctionBase.createFunction = function() {
 		objectFullName,
         functionArgumentList,
         accessedVariableString,
-        formula,
+        functionText,
         supplementalCode
     );
      
@@ -279,11 +279,7 @@ visicomp.core.FunctionBase.OBJECT_UPDATE_FORMAT_TEXT = [
 "//end supplemental code",
 "",
 "//object function",
-"visicomp.core.functionCode.{0}['{1}'] = function({2}) {",
-"var value;",
-"{4}",
-"return value;",
-"}",
+"visicomp.core.functionCode.{0}['{1}'] = {4}",
 "//end object function",
 "   }",
 ""
