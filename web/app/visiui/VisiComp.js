@@ -19,7 +19,8 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 
     menu = menuBar.addMenu("Workspace");
     menu.addEventMenuItem("Add&nbsp;Package","workspaceAddPackage",null,this.eventManager);
-    menu.addEventMenuItem("Add&nbsp;Table","packageAddTable",null,this.eventManager);				
+    menu.addEventMenuItem("Add&nbsp;Table","packageAddTable",null,this.eventManager);
+    menu.addEventMenuItem("Add&nbsp;Function","packageAddFunction",null,this.eventManager);
 
     //add some tabs
     this.tabFrame = new visicomp.visiui.TabFrame(containerId);
@@ -69,6 +70,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 
     visicomp.core.createpackage.initHandler(this.eventManager);
     visicomp.core.createtable.initHandler(this.eventManager);
+    visicomp.core.createfunction.initHandler(this.eventManager);
     visicomp.core.updatemember.initHandler(this.eventManager);
 }
 

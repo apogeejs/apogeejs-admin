@@ -154,13 +154,16 @@ visicomp.core.CodeAnalyzer.prototype.getErrors = function() {
  * errors. if true is returned, the dependencies can be retrieved. If false is returned
  * the errors can be retireved.
  **/
-visicomp.core.CodeAnalyzer.prototype.analyzeCode = function(functionBody,supplementalCodeText) {
+visicomp.core.CodeAnalyzer.prototype.analyzeCode = function(functionText,supplementalCodeText) {
 
     try {
         //pull out variables
         var success;
         
-        success = this.extractVariables(functionBody);
+        //the parser needs something added here
+        var modifiedFunctionText = "var __x__ = " + functionText;
+        
+        success = this.extractVariables(modifiedFunctionText);
         if(!success) return false;
         
         success = this.extractVariables(supplementalCodeText);

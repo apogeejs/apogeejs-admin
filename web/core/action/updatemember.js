@@ -99,19 +99,21 @@ visicomp.core.updatemember.setContent = function(contentData) {
 	}
 
     //read handler data
-    var formula = contentData.formula;
+    var functionText = contentData.functionText;
     var supplementalCode = contentData.supplementalCode;
+    var editorInfo = contentData.editorInfo;
     var data = contentData.data;
 	
     //set forumula or value, not both
-    if(formula) {
+    if(functionText) {
         
         //create code for formula
-        var codeInfo = visicomp.core.updatemember.createCodeInfo(member,formula,supplementalCode);
+        var codeInfo = visicomp.core.updatemember.createCodeInfo(member,functionText,supplementalCode);
         //we might have error info here!
 		
         //set code
         member.setCodeInfo(codeInfo);
+        member.setEditorInfo(editorInfo);
     }
     else {
         //clear the formula
@@ -126,18 +128,18 @@ visicomp.core.updatemember.setContent = function(contentData) {
 }	
 
 /** This method creates the code info from the formula text. */
-visicomp.core.updatemember.createCodeInfo = function(member,functionBody,supplementalCode) {
+visicomp.core.updatemember.createCodeInfo = function(member,functionText,supplementalCode) {
     
     //instantiate the code analyzer
     var codeAnalyzer = new visicomp.core.CodeAnalyzer(member);
     //check code
-    var success = codeAnalyzer.analyzeCode(functionBody,supplementalCode);
+    var success = codeAnalyzer.analyzeCode(functionText,supplementalCode);
     
 //we should check the supplementao code! (it should not depend on any members!)
 
     //set code
     var codeInfo = {};
-    codeInfo.functionBody = functionBody;
+    codeInfo.functionText = functionText;
     codeInfo.supplementalCode = supplementalCode;
     if(success) {
         codeInfo.dependsOn = codeAnalyzer.getDependancies();

@@ -3,12 +3,6 @@ visicomp.core.Table = function(name) {
     //base init
     visicomp.core.Child.init.call(this,name,"table");
 	visicomp.core.Member.init.call(this);
-	
-    //this contains the formula and dependency information
-    this.codeInfo = null;
-	
-    //these are a list of tables that depend on this table
-    this.impactsList = [];
 }
 
 //extend the child object
@@ -49,8 +43,6 @@ visicomp.core.Table.prototype.setData = function(data) {
 	//store the new object in the parent
     visicomp.core.Child.setData.call(this,data);
 }
-
-visicomp.core.Table.prototype.functionBodyWrapperFormat = "function() {\nvar value;\n{0}\nreturn value;\n}";
 
 visicomp.core.Table.prototype.processObjectFunction = function(objectFunction) {	
     //tjhe data is the output of the function

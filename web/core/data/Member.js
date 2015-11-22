@@ -71,6 +71,38 @@ visicomp.core.Member.getDependsOn = function() {
     }
 }
 
+/** This method returns info set by the client editor. It allows the 
+ * editor to store a different version than the finished function object.  */
+visicomp.core.Member.getEditorInfo = function() {
+    return this.editorInfo;
+}
+
+/** This method sets info set by the client editor. It allows the 
+ * editor to store a different version than the finished function object.  */
+visicomp.core.Member.setEditorInfo = function(editorInfo) {
+    this.editorInfo = editorInfo;
+}
+
+/** This method returns the formula for this member.  */
+visicomp.core.Member.getFunctionText = function() {
+    var f;
+    if(this.codeInfo) {
+        f = this.codeInfo.functionText;
+    }
+    if(!f) f = "";
+    return f;
+}
+
+/** This method returns the supplemental code for this member.  */
+visicomp.core.Member.getSupplementalCode = function() {
+    var sc;
+    if(this.codeInfo) {
+        sc = this.codeInfo.supplementalCode;
+    }
+    if(!sc) sc = "";
+    return sc;
+}
+
 //===================================
 // Private Functions
 //===================================
@@ -163,28 +195,6 @@ visicomp.core.Member.updateDependencies = function(currentDependsOn,oldDependsOn
     }
 }
 
-/** This method returns the formula for this member. 
- * @private */
-visicomp.core.Member.getFunctionBody = function() {
-    var f;
-    if(this.codeInfo) {
-        f = this.codeInfo.functionBody;
-    }
-    if(!f) f = "";
-    return f;
-}
-
-/** This method returns the supplemental code for this member. 
- * @private */
-visicomp.core.Member.getSupplementalCode = function() {
-    var sc;
-    if(this.codeInfo) {
-        sc = this.codeInfo.supplementalCode;
-    }
-    if(!sc) sc = "";
-    return sc;
-}
-
 /** This method creates the member update javascript, which will be added to the
  * html page so the user easily can run it in the debugger if needed. 
  * @private */
@@ -195,10 +205,7 @@ visicomp.core.Member.createFunction = function() {
     
     var accessedVariableString = this.getAccessedVariableCode();
 
-    var functionBody = this.getFunctionBody();
-    var functionText = visicomp.core.util.formatString(
-        this.functionBodyWrapperFormat,
-        functionBody)
+    var functionText = this.getFunctionText();
     var supplementalCode = this.getSupplementalCode();
 	var functionArgumentList = "";
     

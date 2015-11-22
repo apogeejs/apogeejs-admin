@@ -30,12 +30,21 @@ visicomp.app.visiui.WorkspaceUI = function(name,eventManager,tab) {
     }
     this.eventManager.addListener("packageAddTable",addTableListener);
     
+    var addFunctionListener = function() {
+        var onCreate = function(parent,functionName) {
+            return instance.addFunction(parent,functionName);
+        }
+        visicomp.app.visiui.dialog.showCreateChildDialog("table",instance.objectUIMap,instance.activePackageName,onCreate);
+    }
+    this.eventManager.addListener("packageAddFunction",addFunctionListener);
+    
     //add package created listener
     var objectAddedListener = function(object) {
         instance.objectAdded(object);
     }
     this.eventManager.addListener(visicomp.core.createpackage.WORKSHEET_CREATED_EVENT, objectAddedListener);
     this.eventManager.addListener(visicomp.core.createtable.TABLE_CREATED_EVENT, objectAddedListener);
+    this.eventManager.addListener(visicomp.core.createfunction.FUNCTION_CREATED_EVENT, objectAddedListener);
 }
 
 visicomp.app.visiui.WorkspaceUI.newTableX = 100;
@@ -109,6 +118,18 @@ visicomp.app.visiui.WorkspaceUI.prototype.addTable = function(parent, name) {
 }
 
 /** This method responds to a "new" menu event. */
+visicomp.app.visiui.WorkspaceUI.prototype.addFunction = function(parent, name) {
+    //create table
+    var handlerData = {};
+    handlerData.name = name;
+    handlerData.package = parent;
+    var result = this.eventManager.callHandler(
+        visicomp.core.createfunction.CREATE_FUNCTION_HANDLER,
+        handlerData);
+    return result;
+}
+
+/** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object) {
     //make sure this is for us
     if(object.getWorkspace() !== this.workspace) return;
@@ -133,6 +154,10 @@ visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object) {
 			
 		case "table":
 			objectUI = new visicomp.visiui.TableUI(object,parentContainer);
+			break
+            
+        case "function":
+			objectUI = new visicomp.visiui.FunctionUI(object,parentContainer);
 			break
 			
 		default:

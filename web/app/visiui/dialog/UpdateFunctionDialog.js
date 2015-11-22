@@ -1,6 +1,6 @@
-/** This method shows an update table dialog. The argument onSaveData si the same
- * arguments as the updateTable event handler data. */
-visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction) {
+/** This method shows an update function dialog. The argument onSaveData si the same
+ * arguments as the updateFunction event handler data. */
+visicomp.app.visiui.dialog.showUpdateFunctionDialog = function(functionObject,onSaveFunction) {
     
     var dialog = new visicomp.visiui.Dialog("Dialog",
             {"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
@@ -17,9 +17,6 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
         
     //editor selector
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"}); 
-    var dataRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"dataFormula","value":"data"});
-    line.appendChild(dataRadio);
-    line.appendChild(document.createTextNode("Data"));
     var formulaRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"dataFormula","value":"formula"});
     line.appendChild(formulaRadio);
     line.appendChild(document.createTextNode("Formula"));
@@ -41,16 +38,6 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
     content.appendChild(line);
         
     //create editor containers - will be hiddedn and shown
-    var dataEditorDiv = visicomp.visiui.createElement("div",null,{
-        "position":"absolute",
-        "top":"0px",
-        "bottom":"0px",
-        "right":"0px",
-        "left":"0px"
-    });
-    var dataEditor = null;
-    editorDiv.appendChild(dataEditorDiv);
-    
     var formulaEditorDiv = visicomp.visiui.createElement("div",null,{
         "position":"absolute",
         "top":"0px",
@@ -79,29 +66,32 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
     }
     
     var onSave = function() {
-        var tableData = {};
-        tableData.member = table;
+        var functionData = {};
+        functionData.member = functionObject;
         var dataSet = false;
         
         if(formulaEditor) {
-            var formula = formulaEditor.getSession().getValue().trim();
-            if(formula.length > 0) {
+            var functionBody = formulaEditor.getSession().getValue().trim();
+            if(functionBody.length > 0) {
                 //save the formula
-                tableData.editorInfo = formula;
-                tableData.functionText = visicomp.app.visiui.dialog.wrapTableFormula(formula); 
+                functionData.editorInfo = functionBody;
+                functionData.functionText = visicomp.app.visiui.dialog.wrapFunctionBody(
+                    functionObject.getArgParensString(),
+                    functionBody
+                );
                 
                 if(supplementalEditor) {
                     //load supplemental code from editor
                     var supplementalCode = supplementalEditor.getSession().getValue().trim();
                     if(supplementalCode.length > 0) {
-                        tableData.supplementalCode = supplementalCode;
+                        functionData.supplementalCode = supplementalCode;
                     }
                 }
                 else {
-                    //load supplemental code from table object
-                    var codeInfo = table.getCodeInfo();
+                    //load supplemental code from functionObject object
+                    var codeInfo = functionObject.getCodeInfo();
                     if((codeInfo)&&(codeInfo.supplementalCode)) {
-                        tableData.supplementalCode = codeInfo.supplementalCode;
+                        functionData.supplementalCode = codeInfo.supplementalCode;
                     }
                 }
                 
@@ -111,24 +101,17 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
         
         if(!dataSet) {
             //save the explicit value
-            var text;
-            if(dataEditor) {
-                text = dataEditor.getSession().getValue();
-            }
-            else {
-                text = "";
-            }
-            var json = JSON.parse(text);
-            tableData.data = json;
+alert("data was not set! - this is a debug message");
+return;
         }
         
-        var result = onSaveFunction(tableData);
+        var result = onSaveFunction(functionData);
         
         if(result.success) {
   //          instance.editor.getSession().setValue("-calculating-");
         }
         else {
-            alert("There was an error updating the table: " + result.msg);
+            alert("There was an error updating the function: " + result.msg);
         }
 
         dialog.hide();
@@ -145,27 +128,9 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
     dialog.centerOnPage(); 
     
     //populate data and add handlers for radio buttons
-    //populate dialog
-    var showDataFunction = function() {
-        //hide the formula div and show the data dive
-        formulaEditorDiv.style.display = "none";
-        dataEditorDiv.style.display = "";
-        supplementalEditorDiv.style.display = "none";
-        
-        //create data editor if needed
-        if(!dataEditor) {
-            dataEditor = ace.edit(dataEditorDiv);
-            dataEditor.setTheme("ace/theme/eclipse");
-            dataEditor.getSession().setMode("ace/mode/json");
-            //set the value
-            var data = table.getData();
-            dataEditor.getSession().setValue(JSON.stringify(data,null,visicomp.visiui.TableUI.formatString));
-        }
-    }
-    
+    //populate dialog    
     var showFormulaFunction = function() {
         //hide the data div and show the formula dive
-        dataEditorDiv.style.display = "none";
         formulaEditorDiv.style.display = "";
         supplementalEditorDiv.style.display = "none";
         
@@ -176,16 +141,15 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
             formulaEditor.setTheme("ace/theme/eclipse");
             formulaEditor.getSession().setMode("ace/mode/javascript");
             //set the formula
-            var formula = table.getEditorInfo();
-            if(formula) {
-                formulaEditor.getSession().setValue(formula);
+            var functionBody = functionObject.getEditorInfo();
+            if(functionBody) {
+                formulaEditor.getSession().setValue(functionBody);
             }
         }
     }
     
     var showSupplementalFunction = function() {
         //hide the data div and show the formula dive
-        dataEditorDiv.style.display = "none";
         formulaEditorDiv.style.display = "none";
         supplementalEditorDiv.style.display = "";
         
@@ -196,7 +160,7 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
             supplementalEditor.setTheme("ace/theme/eclipse");
             supplementalEditor.getSession().setMode("ace/mode/javascript");
             //set the formula
-            var codeInfo = table.getCodeInfo();
+            var codeInfo = functionObject.getCodeInfo();
             if((codeInfo)&&(codeInfo.supplementalCode)) {
                 supplementalEditor.getSession().setValue(codeInfo.supplementalCode);
             }
@@ -204,22 +168,13 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
     }
     
     //initilialize radio buttons
-    if(table.hasCode()) {
-        formulaRadio.checked = true;
-        showFormulaFunction();
-    }
-    else {
-        dataRadio.checked = true;
-        showDataFunction();
-    }
+    formulaRadio.checked = true;
+    showFormulaFunction();
     
     //radio change handler
     var onRadioChange = function() {
         if(formulaRadio.checked) {
             showFormulaFunction();
-        }
-        else if(dataRadio.checked) {
-            showDataFunction();
         }
         else if(supplementalRadio.checked) {
             showSupplementalFunction();
@@ -227,7 +182,6 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
     }
     
     formulaRadio.onchange = onRadioChange;
-    dataRadio.onchange = onRadioChange;
     supplementalRadio.onchange = onRadioChange;
     
     //set the resize handler
@@ -244,21 +198,16 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
         editorDiv.style.width = (totalWidth - 5) + "px";
         editorDiv.style.height = (editorDiv.offsetHeight + extraHeight - 5) + "px";
         
-        if(dataEditor) dataEditor.resize();
         if(formulaEditor) formulaEditor.resize();
         if(supplementalEditor) supplementalEditor.resize();
     }
     dialog.getEventManager().addListener("resize", resizeCallback);
 }
 
-visicomp.app.visiui.dialog.wrapTableFormula = function(formula) { 
+visicomp.app.visiui.dialog.wrapFunctionBody = function(argParensString, functionBody) { 
 
-    var functionText = "function() {\n" + 
-        "var value;\n" + 
-        formula + "\n" +
-        "return value;\n\n" +
+    var functionText = "function" + argParensString + " {\n" +
+        functionBody + "\n" +
     "}";
     return functionText;
 }
-
-
