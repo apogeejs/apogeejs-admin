@@ -71,18 +71,6 @@ visicomp.core.Member.getDependsOn = function() {
     }
 }
 
-/** This method returns info set by the client editor. It allows the 
- * editor to store a different version than the finished function object.  */
-visicomp.core.Member.getEditorInfo = function() {
-    return this.editorInfo;
-}
-
-/** This method sets info set by the client editor. It allows the 
- * editor to store a different version than the finished function object.  */
-visicomp.core.Member.setEditorInfo = function(editorInfo) {
-    this.editorInfo = editorInfo;
-}
-
 /** This method returns the formula for this member.  */
 visicomp.core.Member.getFunctionText = function() {
     var f;

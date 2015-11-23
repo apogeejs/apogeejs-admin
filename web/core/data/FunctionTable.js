@@ -16,23 +16,6 @@ visicomp.core.FunctionTable.prototype = Object.create(visicomp.core.util.mergeOb
 		visicomp.core.Member));
 visicomp.core.FunctionTable.prototype.constructor = visicomp.core.Table;
 
-//FIX THIS UP!!!
-/** This is used for saving the workspace. */
-visicomp.core.FunctionTable.prototype.toJson = function() {
-    var json = {};
-    json.name = this.name;
-    if((this.codeInfo)&&(this.codeInfo.formula)) {
-        json.formula = this.codeInfo.formula;
-        if(this.codeInfo.supplementalCode) {
-            json.supplementalCode = this.codeInfo.supplementalCode;
-        }
-    }
-    else {
-        json.data = this.getData(); //needs to be fixed!
-    }
-    return json;
-}
-
 visicomp.core.FunctionTable.prototype.getArgParensString = function() {	
     return this.argParens;
 }

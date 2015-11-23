@@ -16,23 +16,6 @@ visicomp.core.Table.prototype.print = function() {
     console.log("name: " + this.getData());
 }
 
-//FIX THIS UP!!!
-/** This is used for saving the workspace. */
-visicomp.core.Table.prototype.toJson = function() {
-    var json = {};
-    json.name = this.name;
-    if((this.codeInfo)&&(this.codeInfo.formula)) {
-        json.formula = this.codeInfo.formula;
-        if(this.codeInfo.supplementalCode) {
-            json.supplementalCode = this.codeInfo.supplementalCode;
-        }
-    }
-    else {
-        json.data = this.getData();
-    }
-    return json;
-}
-
 /** This method sets the data for this object. It also
  * freezes the object so it is immutable. */
 visicomp.core.Table.prototype.setData = function(data) {

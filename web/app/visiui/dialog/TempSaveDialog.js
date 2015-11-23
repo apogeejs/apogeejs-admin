@@ -8,7 +8,8 @@ visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(workspaceUI) {
         return;
     }
     
-    var workspaceText = JSON.stringify(workspaceUI.getWorkspace().toJson());
+    var workspaceJson = visicomp.visiui.workspaceToJson(workspaceUI.getWorkspace());
+    var workspaceText = JSON.stringify(workspaceJson);
 
     var dialog = new visicomp.visiui.Dialog("Dialog",{"resizable":true,"movable":true});
     var content = document.createElement("div");

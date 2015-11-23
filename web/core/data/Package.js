@@ -37,18 +37,6 @@ visicomp.core.Package.prototype.setIsRootPackage = function(isRoot) {
     this.isRoot = isRoot;
 }
 
-/** This is used for saving the workspace. */
-visicomp.core.Package.prototype.toJson = function() {
-    var json = {};
-    json.name = this.name;
-    json.tables = {};
-    for(var key in this.childMap) {
-        var table = this.childMap[key];
-        json.tables[key] = table.toJson();
-    }
-    return json;
-}
-
 /** this method gets the table map. */
 visicomp.core.Package.prototype.getChildMap = function() {
     return this.childMap;

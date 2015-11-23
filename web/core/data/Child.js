@@ -80,10 +80,18 @@ visicomp.core.Child.getType = function() {
 	return this.type;
 }
 
-///** This is used for saving the workspace. */
-//visicomp.core.Child.prototype.toJson = function() {
-//    //implement this
-//}
+/** This method returns info set by the client editor. It allows the 
+ * editor to store a different version than the finished function object.  */
+visicomp.core.Child.getEditorInfo = function() {
+    return this.editorInfo;
+}
+
+/** This method sets info set by the client editor. It allows the 
+ * editor to store a different version than the finished function object.  */
+visicomp.core.Child.setEditorInfo = function(editorInfo) {
+    this.editorInfo = editorInfo;
+}
+
 
 //========================================
 // "Protected" Methods

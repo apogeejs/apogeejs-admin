@@ -18,18 +18,6 @@ visicomp.core.Workspace.prototype.getType = function() {
     return "workspace";
 }
 
-/** This is used for saving the workspace. */
-visicomp.core.Workspace.prototype.toJson = function() {
-    var json = {};
-    json.name = this.name;
-    json.packages = {};
-    for(var key in this.packageMap) {
-        var package = this.packageMap[key];
-        json.packages[key] = package.toJson();
-    }
-    return json;
-}
-
 /** this method gets the context command. */
 visicomp.core.Workspace.prototype.getEventManager = function() {
     return this.eventManager;
