@@ -1,5 +1,17 @@
 visicomp.core.util = {};
 
+/** This method creates an error object, which has a "message" in the format
+ *of a system error. The type and base error are optional. 
+ * Based on the error type, additional data can be added to the error object
+ * before it is thrown. */
+visicomp.core.util.createError = function(msg,optionalType,optionalBaseError) {
+    var error = {};
+    error.message = msg;
+    error.type = optionalType;
+    error.baseError = optionalBaseError;
+    return error;
+}
+
 /** This method creates an integer has value for a string. */
 visicomp.core.util.mergeObjects = function(argListOfObjects) {
 	var returnValue = {};
@@ -57,6 +69,8 @@ visicomp.core.util.getObjectType = function(object) {
  *array or other value. If it is an object or array it 
  *freezes that object and all of its children, recursively. */
 visicomp.core.util.deepFreeze = function(field) {
+    if((field === null)||(field === undefined)) return;
+    
     var type = visicomp.core.util.getObjectType(field);
 	var i;
 	if(type == "Object") {

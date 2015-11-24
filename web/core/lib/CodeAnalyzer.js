@@ -17,7 +17,6 @@ visicomp.core.CodeAnalyzer = function(member) {
 	
     this.dependsOn = [];
     this.variables = {};
-    this.errors = null;
 }
 
 /** Syntax for AST, names from Esprima.
@@ -134,6 +133,7 @@ visicomp.core.CodeAnalyzer.prototype.getDependancies = function() {
     return this.dependsOn;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 /** This method returns the error list for this formula. It is only valid
  * after a failed call to analyzeCode. 
  *
@@ -146,41 +146,23 @@ visicomp.core.CodeAnalyzer.prototype.getDependancies = function() {
  *      "stack":String, //an error stack
  *  }
  * */
-visicomp.core.CodeAnalyzer.prototype.getErrors = function() {
-    return this.errors;
-}
+////////////////////////////////////////////////////////////////////////////////
 
 /** This method analyzes the code, caluclating the dependancies and checking for
  * errors. if true is returned, the dependencies can be retrieved. If false is returned
  * the errors can be retireved.
  **/
 visicomp.core.CodeAnalyzer.prototype.analyzeCode = function(functionText,supplementalCodeText) {
+        
+    //the parser needs something added here
+    var modifiedFunctionText = "var __x__ = " + functionText;
 
-    try {
-        //pull out variables
-        var success;
-        
-        //the parser needs something added here
-        var modifiedFunctionText = "var __x__ = " + functionText;
-        
-        success = this.extractVariables(modifiedFunctionText);
-        if(!success) return false;
-        
-        success = this.extractVariables(supplementalCodeText);
-        if(!success) return false;
-//I need to better identify where there were errors above on failure!
-        
-        //process the list of variables found in the ast
-        this.processVariableList();
-        
-        //return success
-        return true;
-    }
-    catch(err) {
-        //failure, save the errors
-        this.errors = [err];
-        return false;
-    }
+    //get the code depedencies
+    this.extractVariables(modifiedFunctionText);
+    this.extractVariables(supplementalCodeText);
+
+    //process the list of variables found in the ast
+    this.processVariableList();
 }
 
 //-----------------------------------
@@ -196,15 +178,12 @@ visicomp.core.CodeAnalyzer.prototype.extractVariables = function(codeText) {
 
     //check for errors in parsing
     if((ast.errors)&&(ast.errors.length > 0)) {
-        //failure, save the error
-        this.errors = ast.errors;
-        return false;
+        var error = this.createCompoundParsingError(ast.errors);
+        throw error;
     }
 
     //analyze the ast
     this.analyzeAst(ast);
-    
-    return true;
 }
 
 /** This method parses the code, returning the abstract syntax tree or 
@@ -263,11 +242,11 @@ visicomp.core.CodeAnalyzer.prototype.processGenericNode = function(node) {
     //process this list
     if(nodeInfoList === undefined) {
         //node not found
-        throw this.createErrorObject("Syntax Tree Node not found: " + node.type,node.loc);
+        throw this.createParsingError("Syntax Tree Node not found: " + node.type,node.loc);
     }
     else if(nodeInfoList === null) {
         //node not supported
-        throw this.createErrorObject("Syntax node not supported: " + node.type,node.loc);
+        throw this.createParsingError("Syntax node not supported: " + node.type,node.loc);
     }
     else {
         //this is a good node - process it
@@ -347,7 +326,7 @@ visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,
 	//flag an error if we found a base package but not the proper object
 	if((internalReference)&&(object == null)) {
 		//this shouldn't happen. If it does we didn't code the syntax tree right
-        throw this.createErrorObject("Table not found: ",node.loc);
+        throw this.createParsingError("Table not found: ",node.loc);
 	}
 	
     //add this variable to the variable list
@@ -417,7 +396,7 @@ visicomp.core.CodeAnalyzer.prototype.getVariableDescription = function(node) {
     }
     else {
         //this shouldn't happen. If it does we didn't code the syntax tree right
-        throw this.createErrorObject("Unknown application error: expected a variable identifier node.",node.loc);
+        throw this.createParsingError("Unknown application error: expected a variable identifier node.",node.loc);
     }
 }
 
@@ -444,7 +423,7 @@ visicomp.core.CodeAnalyzer.prototype.processVariableList = function(allowDataAcc
                 else {
                     msg = "Only the local table should be modified in the formula, using the variable name 'value'";
                 }
-                throw this.createErrorObject(msg,variableInfo.loc);
+                throw this.createParsingError(msg,variableInfo.loc);
             }
 //I should check that the local table is not referenced. It will not have been set yet, at least in theory.
 //Worse, it may be initialized with old data.
@@ -456,7 +435,7 @@ visicomp.core.CodeAnalyzer.prototype.processVariableList = function(allowDataAcc
 //            //global variable can not be accessed
 //            if((!variableInfo.object)&&(!variableInfo.local)) {
 //                msg = "Global variables can not be accessed in the formula: " + key;
-//                throw this.createErrorObject(msg,variableInfo.loc);
+//                throw this.createParsingError(msg,variableInfo.loc);
 //            }
         }
         
@@ -475,12 +454,22 @@ visicomp.core.CodeAnalyzer.prototype.processVariableList = function(allowDataAcc
  *     column;[integer column on line number]
  * }
  * @private */
-visicomp.core.CodeAnalyzer.prototype.createErrorObject = function(errorMsg,location) {
-    var error = {};
-    error.description = errorMsg;
+visicomp.core.CodeAnalyzer.prototype.createParsingError = function(errorMsg,location) {
+    var error = visicomp.core.util.createError(errorMsg,"ParsingError");
     if(location) {
         error.lineNumber = location.start.line;
         error.column = location.start.column;
     }
+    return error;
+}
+
+visicomp.core.CodeAnalyzer.prototype.createCompoundParsingError = function(errors) {
+    var errorMsg = "";
+    for(var i = 0; i < errors.length; i++) {
+        errorMsg += errors[i];
+    }
+    
+    var error = visicomp.core.util.createError(errorMsg,"CompoundParsingError");
+    error.errors = errors;
     return error;
 }

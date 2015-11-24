@@ -24,7 +24,9 @@ visicomp.core.createpackage.PACKAGE_CREATED_EVENT = "packageCreated";
 
 /** This is the listener for the create package event. */
 visicomp.core.createpackage.onCreatePackage = function(event) {
-	try {
+	var returnValue;
+    
+    try {
 		//create package
 		var name = event.name;
 		var parent = event.parent;
@@ -44,19 +46,17 @@ visicomp.core.createpackage.onCreatePackage = function(event) {
 		eventManager.dispatchEvent(visicomp.core.createpackage.PACKAGE_CREATED_EVENT,package);
 
 		//return success
-		return {
-			"success":true
-		};
+		returnValue = {"success":true};
 	}
-	catch(error) {
-		//we need to clean up!
-		
-		//return failure
-		return {
-			"success":false,
-			"msg":error.message
-		}
-	}
+	finally {
+        //for now we will not catch errors but let the broswer take care of them
+        //in the future we want the debugger handling for user code errors.
+        if(!returnValue) {
+            alert("There was an error. See the browser debugger.");
+        }
+    }
+    
+    return returnValue;
 }
     
 /** This method subscribes to the create package handler event */

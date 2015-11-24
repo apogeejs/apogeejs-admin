@@ -24,7 +24,9 @@ visicomp.core.createfunction.FUNCTION_CREATED_EVENT = "functionCreated";
 
 /** This is the listener for the create function event. */
 visicomp.core.createfunction.onCreateFunction = function(event) {
-	try {
+	var returnValue;
+    
+    try {
 		//create functionObject
 		var name = event.name;
 		var argParens = event.argParens
@@ -41,19 +43,17 @@ visicomp.core.createfunction.onCreateFunction = function(event) {
 		eventManager.dispatchEvent(visicomp.core.createfunction.FUNCTION_CREATED_EVENT,functionObject);
 
 		//return success
-		return {
-			"success":true
-		};
+		returnValue = {"success":true};
 	}
-	catch(error) {
-		//we need to clean up!
-		
-		//return failure
-		return {
-			"success":false,
-			"msg":error.message
-		}
-	}
+	finally {
+        //for now we will not catch errors but let the broswer take care of them
+        //in the future we want the debugger handling for user code errors.
+        if(!returnValue) {
+            alert("There was an error. See the browser debugger.");
+        }
+    }
+    
+    return returnValue;
 }
 
 /** This method subscribes to the udpate function handler event */

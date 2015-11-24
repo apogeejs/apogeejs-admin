@@ -115,6 +115,13 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
         }
         else {
             alert("There was an error updating the table: " + result.msg);
+            
+            //if this was a code error, rethrow it so the standard browser debug handler can handle it
+            var error = result.error;
+            if((error)&&(error.type == "CalculationError")) {
+                var baseError = error.baseError;
+                if(baseError) throw baseError;
+            }
         }
     }
     

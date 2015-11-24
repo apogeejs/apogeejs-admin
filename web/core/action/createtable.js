@@ -24,7 +24,9 @@ visicomp.core.createtable.TABLE_CREATED_EVENT = "tableCreated";
 
 /** This is the listener for the create table event. */
 visicomp.core.createtable.onCreateTable = function(event) {
-	try {
+	var returnValue;
+    
+    try {
 		//create table
 		var name = event.name;
 		var package = event.package;
@@ -39,19 +41,17 @@ visicomp.core.createtable.onCreateTable = function(event) {
 		eventManager.dispatchEvent(visicomp.core.createtable.TABLE_CREATED_EVENT,table);
 
 		//return success
-		return {
-			"success":true
-		};
+		returnValue = {"success":true};
 	}
-	catch(error) {
-		//we need to clean up!
-		
-		//return failure
-		return {
-			"success":false,
-			"msg":error.message
-		}
-	}
+	finally {
+        //for now we will not catch errors but let the broswer take care of them
+        //in the future we want the debugger handling for user code errors.
+        if(!returnValue) {
+            alert("There was an error. See the browser debugger.");
+        }
+    }
+    
+    return returnValue;
 }
 
 /** This method subscribes to the udpate table handler event */
