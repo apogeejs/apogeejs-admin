@@ -36,3 +36,16 @@ window.setSize(500,500);
 //    table.windowEventManager.addListener("resize", resizeCallback);
 }
 
+visicomp.app.visiui.dialog.showRootPackage = function(packageUI) {
+    
+    packageUI.window = null;
+    packageUI.windowEventManager =  null;
+	packageUI.contentElement = packageUI.parentElement;
+    
+//    //resize the editor on window size change
+//    var resizeCallback = function() {
+//        editor.resize();
+//    }
+//    table.windowEventManager.addListener("resize", resizeCallback);
+}
+

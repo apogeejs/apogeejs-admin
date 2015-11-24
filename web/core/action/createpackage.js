@@ -1,7 +1,7 @@
 /** This namespace contains functions to process an create a package. */
 visicomp.core.createpackage = {};
 
-/** CREATE WORKSHEET HANDLER
+/** CREATE PACKAGE HANDLER
  * This handler should be called to request a package be created.
  * 
  * Event object format:  //future add other options
@@ -10,47 +10,58 @@ visicomp.core.createpackage = {};
  *	workspace: [workspace]
  * }
  */
-visicomp.core.createpackage.CREATE_WORKSHEET_HANDLER = "createPackage";
+visicomp.core.createpackage.CREATE_PACKAGE_HANDLER = "createPackage";
 
-/** WORKSHEET CREATED EVENT
+/** PACKAGE CREATED EVENT
  * This listener event is fired when after a package is created, to be used to respond
  * to a new package such as to update the UI.
  * 
  * Event object Format:
  * [package]
  */
-visicomp.core.createpackage.WORKSHEET_CREATED_EVENT = "packageCreated";
+visicomp.core.createpackage.PACKAGE_CREATED_EVENT = "packageCreated";
 
 
 /** This is the listener for the create package event. */
 visicomp.core.createpackage.onCreatePackage = function(event) {
-    //create package
-    var name = event.name;
-	var parent = event.parent;
-	var workspace = event.workspace;
-    var isRoot = event.isRoot;
-    var package = new visicomp.core.Package(name);
-	
-	if(isRoot) {
-		parent.setRootPackage(package);
+	try {
+		//create package
+		var name = event.name;
+		var parent = event.parent;
+		var workspace = event.workspace;
+		var isRoot = event.isRoot;
+		var package = new visicomp.core.Package(name);
+
+		if(isRoot) {
+			parent.setRootPackage(package);
+		}
+		else {
+			parent.addChild(package);
+		}
+
+		//dispatch event
+		var eventManager = workspace.getEventManager();
+		eventManager.dispatchEvent(visicomp.core.createpackage.PACKAGE_CREATED_EVENT,package);
+
+		//return success
+		return {
+			"success":true
+		};
 	}
-	else {
-		parent.addChild(package);
+	catch(error) {
+		//we need to clean up!
+		
+		//return failure
+		return {
+			"success":false,
+			"msg":error.message
+		}
 	}
-	
-    //dispatch event
-    var eventManager = workspace.getEventManager();
-    eventManager.dispatchEvent(visicomp.core.createpackage.WORKSHEET_CREATED_EVENT,package);
-	
-    //return success
-    return {
-        "success":true
-    };
 }
     
 /** This method subscribes to the create package handler event */
 visicomp.core.createpackage.initHandler = function(eventManager) {
-    eventManager.addHandler(visicomp.core.createpackage.CREATE_WORKSHEET_HANDLER, 
+    eventManager.addHandler(visicomp.core.createpackage.CREATE_PACKAGE_HANDLER, 
             visicomp.core.createpackage.onCreatePackage);
 }
 

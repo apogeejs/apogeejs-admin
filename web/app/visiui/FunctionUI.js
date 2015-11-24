@@ -2,7 +2,7 @@
  *
  * @class 
  */
-visicomp.visiui.FunctionUI = function(functionObject,parentElement) {
+visicomp.app.visiui.FunctionUI = function(functionObject,parentElement) {
 
     this.functionObject = functionObject;
     this.name = functionObject.getName();
@@ -13,7 +13,7 @@ visicomp.visiui.FunctionUI = function(functionObject,parentElement) {
     //subscribe to update event
     var instance = this;
     var functionUpdatedCallback = function(functionObject) {
-        instance.updateFunctionData(functionObject);
+        instance.functionUpdated(functionObject);
     }
     this.dataEventManager.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, functionUpdatedCallback);
 
@@ -21,35 +21,68 @@ visicomp.visiui.FunctionUI = function(functionObject,parentElement) {
     visicomp.app.visiui.dialog.showFunctionWindow(this);
 }
 
-visicomp.visiui.FunctionUI.formatString = "\t"
+visicomp.app.visiui.FunctionUI.formatString = "\t"
 
-visicomp.visiui.FunctionUI.prototype.getWindow = function() {
+visicomp.app.visiui.FunctionUI.prototype.getWindow = function() {
     return this.window;
 }
 
-visicomp.visiui.FunctionUI.prototype.createEditDialog = function() {
+visicomp.app.visiui.FunctionUI.prototype.createEditDialog = function() {
     
     //create save handler
     var instance = this;
-    var onSave = function(handlerData) {
-        return instance.dataEventManager.callHandler(
-            visicomp.core.updatemember.UPDATE_MEMBER_HANDLER,handlerData);
+    var onSave = function(functionBody,supplementalCode) {
+        return instance.updateFunction(functionBody,supplementalCode);
     };
     
     visicomp.app.visiui.dialog.showUpdateFunctionDialog(this.functionObject,onSave);
 }
+
+/** This method responds to a "new" menu event. */
+visicomp.app.visiui.FunctionUI.prototype.updateFunction = function(functionBody,supplementalCode) {
+	
+	var functionData = visicomp.app.visiui.FunctionUI.getUpdateEventData(this.functionObject,functionBody,supplementalCode)
+	
+    var result = this.dataEventManager.callHandler(
+        visicomp.core.updatemember.UPDATE_MEMBER_HANDLER,
+        functionData);
+		
+    return result;
+}
     
 /** This method updates the functionObject data */    
-visicomp.visiui.FunctionUI.prototype.updateFunctionData = function(functionObject) {
-    if(this.functionObject != functionObject) return;
+visicomp.app.visiui.FunctionUI.prototype.functionUpdated = function(functionObject) {
+    if(this.functionObject !== functionObject) return;
     
     var functionText = functionObject.getFunctionText();
     var supplementalCode = functionObject.getSupplementalCode();
-    var code = functionText + 
-        "\n\n/* Supplemental Code */\n\n" +
-        supplementalCode;
+    var code = functionText;
+	if(supplementalCode) {
+		code += "\n\n/* Supplemental Code */\n\n" +
+			supplementalCode;
+	}
     if(this.editor) {
         this.editor.getSession().setValue(code);
     }
+}
+
+/** This method responds to a "new" menu event. */
+visicomp.app.visiui.FunctionUI.getUpdateEventData = function(functionObject,functionBody,supplementalCode) {
+	
+	var functionData = {};
+    functionData.member = functionObject;
+	functionData.editorInfo = functionBody;
+	functionData.functionText = visicomp.app.visiui.FunctionUI.wrapFunctionBody(functionObject.getArgParensString(),functionBody);
+	functionData.supplementalCode = supplementalCode;
+	
+	return functionData;
+}
+
+visicomp.app.visiui.FunctionUI.wrapFunctionBody = function(argParensString, functionBody) { 
+
+    var functionText = "function" + argParensString + " {\n" +
+        functionBody + "\n" +
+    "}";
+    return functionText;
 }
 

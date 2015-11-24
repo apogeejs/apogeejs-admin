@@ -66,55 +66,32 @@ visicomp.app.visiui.dialog.showUpdateFunctionDialog = function(functionObject,on
     }
     
     var onSave = function() {
-        var functionData = {};
-        functionData.member = functionObject;
-        var dataSet = false;
-        
+		var functionBody;
+		var supplementalCode;
+			
         if(formulaEditor) {
-            var functionBody = formulaEditor.getSession().getValue().trim();
-            if(functionBody.length > 0) {
-                //save the formula
-                functionData.editorInfo = functionBody;
-                functionData.functionText = visicomp.app.visiui.dialog.wrapFunctionBody(
-                    functionObject.getArgParensString(),
-                    functionBody
-                );
-                
-                if(supplementalEditor) {
-                    //load supplemental code from editor
-                    var supplementalCode = supplementalEditor.getSession().getValue().trim();
-                    if(supplementalCode.length > 0) {
-                        functionData.supplementalCode = supplementalCode;
-                    }
-                }
-                else {
-                    //load supplemental code from functionObject object
-                    var codeInfo = functionObject.getCodeInfo();
-                    if((codeInfo)&&(codeInfo.supplementalCode)) {
-                        functionData.supplementalCode = codeInfo.supplementalCode;
-                    }
-                }
-                
-                dataSet = true;
-            }
-        }
+            functionBody = formulaEditor.getSession().getValue().trim();
+		}
+		else {
+			functionBody = "";
+		}
+		
+		if(supplementalEditor) {
+            supplementalCode = supplementalEditor.getSession().getValue().trim();
+			if(supplementalCode.length === 0) supplementalCode = null;
+		}
+		else {
+			supplementalCode = null;
+		}
         
-        if(!dataSet) {
-            //save the explicit value
-alert("data was not set! - this is a debug message");
-return;
-        }
-        
-        var result = onSaveFunction(functionData);
+        var result = onSaveFunction(functionBody,supplementalCode);
         
         if(result.success) {
-  //          instance.editor.getSession().setValue("-calculating-");
+			dialog.hide();
         }
         else {
             alert("There was an error updating the function: " + result.msg);
-        }
-
-        dialog.hide();
+		}
     }
     
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
@@ -202,12 +179,4 @@ return;
         if(supplementalEditor) supplementalEditor.resize();
     }
     dialog.getEventManager().addListener("resize", resizeCallback);
-}
-
-visicomp.app.visiui.dialog.wrapFunctionBody = function(argParensString, functionBody) { 
-
-    var functionText = "function" + argParensString + " {\n" +
-        functionBody + "\n" +
-    "}";
-    return functionText;
 }

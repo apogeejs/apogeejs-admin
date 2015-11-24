@@ -2,7 +2,7 @@
  *
  * @class 
  */
-visicomp.visiui.PackageUI = function(package,parentElement) {
+visicomp.app.visiui.PackageUI = function(package,parentElement) {
 
     this.package = package;
     this.name = package.getName();
@@ -11,15 +11,21 @@ visicomp.visiui.PackageUI = function(package,parentElement) {
     this.windowEventManager = null;//look this up below
 	this.contentElement = null; //created below
 
-    //create the window and editor (for display, not editing)
-    visicomp.app.visiui.dialog.showPackageWindow(this);
+	if(package.isRootPackage()) {
+		//show as the root package
+		visicomp.app.visiui.dialog.showRootPackage(this);
+	}
+	else {
+		//create the window and editor (for display, not editing)
+		visicomp.app.visiui.dialog.showPackageWindow(this);
+	}
 }
 
-visicomp.visiui.PackageUI.prototype.getWindow = function() {
+visicomp.app.visiui.PackageUI.prototype.getWindow = function() {
     return this.window;
 }
 
-visicomp.visiui.PackageUI.prototype.getContentElement = function() {
+visicomp.app.visiui.PackageUI.prototype.getContentElement = function() {
     return this.contentElement;
 }
 

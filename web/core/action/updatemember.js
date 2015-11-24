@@ -42,41 +42,61 @@ visicomp.core.updatemember.fireUpdatedEvent = function(member) {
 
 /** This is the listener for the update member event. */
 visicomp.core.updatemember.onUpdateObject = function(updateData) {
-    
-    //update member content
-    visicomp.core.updatemember.setContent(updateData);
-    
-    //recalculate
-    var recalculateList = [];
-    visicomp.core.updatemember.addToRecalculateList(recalculateList,updateData.member);
-    visicomp.core.updatemember.recalculateObjects(recalculateList);
-        
-    //return success
-    return {
-        "success":true
-    };
+    try {
+		//update member content
+		visicomp.core.updatemember.setContent(updateData);
+
+		//recalculate
+		var recalculateList = [];
+		visicomp.core.updatemember.addToRecalculateList(recalculateList,updateData.member);
+		visicomp.core.updatemember.recalculateObjects(recalculateList);
+
+		//return success
+		return {
+			"success":true
+		};
+	}
+	catch(error) {
+		//we need to clean up!
+		
+		//return failure
+		return {
+			"success":false,
+			"msg":error.message
+		}
+	}
 }
 
 
 /** This is the listener for the update members event. */
 visicomp.core.updatemember.onUpdateObjects = function(updateDataList) {
+//	try {
+		var recalculateList = [];
 
-    var recalculateList = [];
-    
-    //update members and add to recalculate list
-    for(var i = 0; i < updateDataList.length; i++) {
-        var data = updateDataList[i];
-		visicomp.core.updatemember.setContent(data);
-        visicomp.core.updatemember.addToRecalculateList(recalculateList,data.member);
-    }
-    
-    //recalculate members
-    visicomp.core.updatemember.recalculateObjects(recalculateList);
-    
-    //return success
-    return {
-        "success":true
-    };
+		//update members and add to recalculate list
+		for(var i = 0; i < updateDataList.length; i++) {
+			var data = updateDataList[i];
+			visicomp.core.updatemember.setContent(data);
+			visicomp.core.updatemember.addToRecalculateList(recalculateList,data.member);
+		}
+
+		//recalculate members
+		visicomp.core.updatemember.recalculateObjects(recalculateList);
+
+		//return success
+		return {
+			"success":true
+		};
+//	}
+//	catch(error) {
+//		//we need to clean up!
+//		
+//		//return failure
+//		return {
+//			"success":false,
+//			"msg":error.message
+//		}
+//	}
 }
     
 /** This method subscribes to the update member handler event */
@@ -109,7 +129,11 @@ visicomp.core.updatemember.setContent = function(contentData) {
         
         //create code for formula
         var codeInfo = visicomp.core.updatemember.createCodeInfo(member,functionText,supplementalCode);
-        //we might have error info here!
+        
+//handle errors!
+		if(codeInfo.errors) {
+			throw codeInfo.errors;
+		}
 		
         //set code
         member.setCodeInfo(codeInfo);
@@ -134,14 +158,13 @@ visicomp.core.updatemember.createCodeInfo = function(member,functionText,supplem
     var codeAnalyzer = new visicomp.core.CodeAnalyzer(member);
     //check code
     var success = codeAnalyzer.analyzeCode(functionText,supplementalCode);
-    
-//we should check the supplementao code! (it should not depend on any members!)
 
     //set code
     var codeInfo = {};
-    codeInfo.functionText = functionText;
-    codeInfo.supplementalCode = supplementalCode;
+    
     if(success) {
+		codeInfo.functionText = functionText;
+		codeInfo.supplementalCode = supplementalCode;
         codeInfo.dependsOn = codeAnalyzer.getDependancies();
     }
     else {
@@ -166,7 +189,7 @@ visicomp.core.updatemember.addToRecalculateList = function(recalculateList,membe
     //add any member that is depends on this one
     var impactsList = member.getImpactsList();
     for(var i = 0; i < impactsList.length; i++) {
-        visicomp.core.updatemember.placeInRecalculateList(recalculateList,impactsList[i]);
+        visicomp.core.updatemember.addToRecalculateList(recalculateList,impactsList[i]);
     }
 }
 

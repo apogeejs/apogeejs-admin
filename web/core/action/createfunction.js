@@ -24,28 +24,36 @@ visicomp.core.createfunction.FUNCTION_CREATED_EVENT = "functionCreated";
 
 /** This is the listener for the create function event. */
 visicomp.core.createfunction.onCreateFunction = function(event) {
-    //create functionObject
-    var declarationName = event.name;
-    var package = event.package;
-    
-    var nameLength = declarationName.indexOf("(");
-    var name = declarationName.substr(0,nameLength);
-    var argParens = declarationName.substr(nameLength);
-    
-    var functionObject = new visicomp.core.FunctionTable(name,argParens);
-    package.addChild(functionObject);
-	
-    //initialize data
-    functionObject.setData("");
-	
-    //dispatch event
-    var eventManager = package.getWorkspace().getEventManager();
-    eventManager.dispatchEvent(visicomp.core.createfunction.FUNCTION_CREATED_EVENT,functionObject);
-	
-    //return success
-    return {
-        "success":true
-    };
+	try {
+		//create functionObject
+		var name = event.name;
+		var argParens = event.argParens
+		var package = event.package;
+
+		var functionObject = new visicomp.core.FunctionTable(name,argParens);
+		package.addChild(functionObject);
+
+		//initialize data
+		functionObject.setData("");
+
+		//dispatch event
+		var eventManager = package.getWorkspace().getEventManager();
+		eventManager.dispatchEvent(visicomp.core.createfunction.FUNCTION_CREATED_EVENT,functionObject);
+
+		//return success
+		return {
+			"success":true
+		};
+	}
+	catch(error) {
+		//we need to clean up!
+		
+		//return failure
+		return {
+			"success":false,
+			"msg":error.message
+		}
+	}
 }
 
 /** This method subscribes to the udpate function handler event */

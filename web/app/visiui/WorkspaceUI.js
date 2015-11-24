@@ -1,15 +1,15 @@
 /* 
  * Constructor
  */
-visicomp.app.visiui.WorkspaceUI = function(name,eventManager,tab) {
+visicomp.app.visiui.WorkspaceUI = function(workspace,tab) {
     //properties
-    this.name = name;
     this.tab = tab;
     this.objectUIMap = {};
     this.activePackageName = null;
-    this.workspace = new visicomp.core.Workspace(name,eventManager);
-    this.eventManager = eventManager;
-    
+    this.workspace = workspace;
+    this.eventManager = workspace.getEventManager();
+    this.name = workspace.getName();
+	
     //listeners
     var instance = this;
     
@@ -34,7 +34,7 @@ visicomp.app.visiui.WorkspaceUI = function(name,eventManager,tab) {
         var onCreate = function(parent,functionName) {
             return instance.addFunction(parent,functionName);
         }
-        visicomp.app.visiui.dialog.showCreateChildDialog("table",instance.objectUIMap,instance.activePackageName,onCreate);
+        visicomp.app.visiui.dialog.showCreateChildDialog("function",instance.objectUIMap,instance.activePackageName,onCreate);
     }
     this.eventManager.addListener("packageAddFunction",addFunctionListener);
     
@@ -42,7 +42,7 @@ visicomp.app.visiui.WorkspaceUI = function(name,eventManager,tab) {
     var objectAddedListener = function(object) {
         instance.objectAdded(object);
     }
-    this.eventManager.addListener(visicomp.core.createpackage.WORKSHEET_CREATED_EVENT, objectAddedListener);
+    this.eventManager.addListener(visicomp.core.createpackage.PACKAGE_CREATED_EVENT, objectAddedListener);
     this.eventManager.addListener(visicomp.core.createtable.TABLE_CREATED_EVENT, objectAddedListener);
     this.eventManager.addListener(visicomp.core.createfunction.FUNCTION_CREATED_EVENT, objectAddedListener);
 }
@@ -59,6 +59,13 @@ visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
 }
 
 /** This method responds to a "new" menu event. */
+visicomp.app.visiui.WorkspaceUI.prototype.getChildUIObject = function(childObject) {
+    var key = this.getObjectKey(childObject);
+	var objectInfo = this.objectUIMap[key][key];
+	return objectInfo.objectUI;
+}
+
+/** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.addPackage = function(parent,name,isRoot) {
     //create package
     var handlerData = {};
@@ -67,43 +74,10 @@ visicomp.app.visiui.WorkspaceUI.prototype.addPackage = function(parent,name,isRo
     handlerData.workspace = this.workspace;
 	handlerData.isRoot = isRoot;
     var result = this.eventManager.callHandler(
-        visicomp.core.createpackage.CREATE_WORKSHEET_HANDLER,
+        visicomp.core.createpackage.CREATE_PACKAGE_HANDLER,
         handlerData);
     return result;
 }
-
-/** This method responds to a "new" menu event. */
-//visicomp.app.visiui.WorkspaceUI.prototype.packageAdded = function(package) {
-//    //make sure this is for us
-//    if(package.getWorkspace() != this.workspace) return;
-//	
-//	var parent = package.getParent();
-//	var parentContainer;
-//	if(parent) {
-//		var packageInfo = this.packages[parent.getFullName()];
-//		parentContainer = packageInfo.packageUI.getContentElement();
-//	}
-//	else {
-//		parentContainer = this.tab;
-//	}
-//	
-//	//create the package
-//	var packageUI = new visicomp.visiui.PackageUI(package,parentContainer);
-//	
-//    var packageInfo = {};
-//	packageInfo.package = package;
-//	packageInfo.packageUI = packageUI;
-//	packageInfo.tables = {};
-//	
-//    this.packages[package.getFullName()] = packageInfo;
-//    
-//    //show the table
-//    var window = packageUI.getWindow();
-//    window.setPosition(visicomp.app.visiui.WorkspaceUI.newTableX,visicomp.app.visiui.WorkspaceUI.newTableY);
-//    visicomp.app.visiui.WorkspaceUI.newTableX += visicomp.app.visiui.WorkspaceUI.newTableDeltaX;
-//    visicomp.app.visiui.WorkspaceUI.newTableY += visicomp.app.visiui.WorkspaceUI.newTableDeltaY;
-//    window.show();
-//}
 
 /** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.addTable = function(parent, name) {
@@ -118,10 +92,22 @@ visicomp.app.visiui.WorkspaceUI.prototype.addTable = function(parent, name) {
 }
 
 /** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.addFunction = function(parent, name) {
+visicomp.app.visiui.WorkspaceUI.prototype.addFunction = function(parent, declarationName) {
+	
+	//seperate name and arglist
+//get a reg ex and chck format
+	var nameLength = declarationName.indexOf("(");
+	if(nameLength < 0) {
+		alert("Include the argument list with the name.");
+		return {"success":false};
+	}
+    var name = declarationName.substr(0,nameLength);
+    var argParens = declarationName.substr(nameLength);
+	
     //create table
     var handlerData = {};
     handlerData.name = name;
+	handlerData.argParens = argParens;
     handlerData.package = parent;
     var result = this.eventManager.callHandler(
         visicomp.core.createfunction.CREATE_FUNCTION_HANDLER,
@@ -149,15 +135,15 @@ visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object) {
 	var objectUI;
 	switch(type) {
 		case "package":
-			objectUI = new visicomp.visiui.PackageUI(object,parentContainer);
+			objectUI = new visicomp.app.visiui.PackageUI(object,parentContainer);
 			break;
 			
 		case "table":
-			objectUI = new visicomp.visiui.TableUI(object,parentContainer);
+			objectUI = new visicomp.app.visiui.TableUI(object,parentContainer);
 			break
             
         case "function":
-			objectUI = new visicomp.visiui.FunctionUI(object,parentContainer);
+			objectUI = new visicomp.app.visiui.FunctionUI(object,parentContainer);
 			break
 			
 		default:
@@ -181,10 +167,12 @@ visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object) {
     
     //show the table
     var window = objectUI.getWindow();
-    window.setPosition(visicomp.app.visiui.WorkspaceUI.newTableX,visicomp.app.visiui.WorkspaceUI.newTableY);
-    visicomp.app.visiui.WorkspaceUI.newTableX += visicomp.app.visiui.WorkspaceUI.newTableDeltaX;
-    visicomp.app.visiui.WorkspaceUI.newTableY += visicomp.app.visiui.WorkspaceUI.newTableDeltaY;
-    window.show();
+	if(window) {
+		window.setPosition(visicomp.app.visiui.WorkspaceUI.newTableX,visicomp.app.visiui.WorkspaceUI.newTableY);
+		visicomp.app.visiui.WorkspaceUI.newTableX += visicomp.app.visiui.WorkspaceUI.newTableDeltaX;
+		visicomp.app.visiui.WorkspaceUI.newTableY += visicomp.app.visiui.WorkspaceUI.newTableDeltaY;
+		window.show();
+	}
 }
 
 visicomp.app.visiui.WorkspaceUI.prototype.getObjectKey = function(object) {

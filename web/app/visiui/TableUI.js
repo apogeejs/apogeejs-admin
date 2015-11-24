@@ -2,7 +2,7 @@
  *
  * @class 
  */
-visicomp.visiui.TableUI = function(table,parentElement) {
+visicomp.app.visiui.TableUI = function(table,parentElement) {
 
     this.table = table;
     this.name = table.getName();
@@ -12,8 +12,8 @@ visicomp.visiui.TableUI = function(table,parentElement) {
 
     //subscribe to update event
     var instance = this;
-    var tableUpdatedCallback = function(tableData) {
-        instance.updateTableData(tableData);
+    var tableUpdatedCallback = function(tableObject) {
+        instance.tableUpdated(tableObject);
     }
     this.dataEventManager.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, tableUpdatedCallback);
 
@@ -21,31 +21,69 @@ visicomp.visiui.TableUI = function(table,parentElement) {
     visicomp.app.visiui.dialog.showTableWindow(this);
 }
 
-visicomp.visiui.TableUI.formatString = "\t"
+visicomp.app.visiui.TableUI.formatString = "\t"
 
-visicomp.visiui.TableUI.prototype.getWindow = function() {
+visicomp.app.visiui.TableUI.prototype.getWindow = function() {
     return this.window;
 }
 
-visicomp.visiui.TableUI.prototype.createEditDialog = function() {
+visicomp.app.visiui.TableUI.prototype.createEditDialog = function() {
     
     //create save handler
     var instance = this;
-    var onSave = function(handlerData) {
-        return instance.dataEventManager.callHandler(
-            visicomp.core.updatemember.UPDATE_MEMBER_HANDLER,handlerData);
+    var onSave = function(data,formula,supplementalCode) {
+        return instance.updateTable(data,formula,supplementalCode);
     };
     
     visicomp.app.visiui.dialog.showUpdateTableDialog(this.table,onSave);
 }
+
+/** This method responds to a "new" menu event. */
+visicomp.app.visiui.TableUI.prototype.updateTable = function(data,formula,supplementalCode) {
+	
+	var updateEventData = visicomp.app.visiui.TableUI.getUpdateEventData(this.table,data,formula,supplementalCode);
+	
+    var result = this.dataEventManager.callHandler(
+        visicomp.core.updatemember.UPDATE_MEMBER_HANDLER,
+        updateEventData);
+		
+    return result;
+}
     
 /** This method updates the table data */    
-visicomp.visiui.TableUI.prototype.updateTableData = function(table) {
+visicomp.app.visiui.TableUI.prototype.tableUpdated = function(table) {
     if(this.table != table) return;
     
-    var textData = JSON.stringify(table.getData(),null,visicomp.visiui.TableUI.formatString);
+    var textData = JSON.stringify(table.getData(),null,visicomp.app.visiui.TableUI.formatString);
     if(this.editor) {
         this.editor.getSession().setValue(textData);
     }
+}
+
+/** This method creates the update event object for this table object. */
+visicomp.app.visiui.TableUI.getUpdateEventData = function(table,data,formula,supplementalCode) {
+	
+	var tableData = {};
+    tableData.member = table;
+	if((formula !== null)&&(formula !== undefined)) {
+		tableData.editorInfo = formula;
+        tableData.functionText = visicomp.app.visiui.TableUI.wrapTableFormula(formula);
+		tableData.supplementalCode = supplementalCode;
+	}
+	else {
+		tableData.data = data;
+	}
+	
+    return tableData;
+}
+
+visicomp.app.visiui.TableUI.wrapTableFormula = function(formula) { 
+
+    var functionText = "function() {\n" + 
+        "var value;\n" + 
+        formula + "\n" +
+        "return value;\n\n" +
+    "}";
+    return functionText;
 }
 

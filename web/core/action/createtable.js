@@ -24,23 +24,34 @@ visicomp.core.createtable.TABLE_CREATED_EVENT = "tableCreated";
 
 /** This is the listener for the create table event. */
 visicomp.core.createtable.onCreateTable = function(event) {
-    //create table
-    var name = event.name;
-    var package = event.package;
-    var table = new visicomp.core.Table(name);
-    package.addChild(table);
-	
-    //initialize data
-    table.setData("");
-	
-    //dispatch event
-    var eventManager = package.getWorkspace().getEventManager();
-    eventManager.dispatchEvent(visicomp.core.createtable.TABLE_CREATED_EVENT,table);
-	
-    //return success
-    return {
-        "success":true
-    };
+	try {
+		//create table
+		var name = event.name;
+		var package = event.package;
+		var table = new visicomp.core.Table(name);
+		package.addChild(table);
+
+		//initialize data
+		table.setData("");
+
+		//dispatch event
+		var eventManager = package.getWorkspace().getEventManager();
+		eventManager.dispatchEvent(visicomp.core.createtable.TABLE_CREATED_EVENT,table);
+
+		//return success
+		return {
+			"success":true
+		};
+	}
+	catch(error) {
+		//we need to clean up!
+		
+		//return failure
+		return {
+			"success":false,
+			"msg":error.message
+		}
+	}
 }
 
 /** This method subscribes to the udpate table handler event */
