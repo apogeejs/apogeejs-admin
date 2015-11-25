@@ -178,7 +178,13 @@ visicomp.core.CodeAnalyzer.prototype.extractVariables = function(codeText) {
 
     //check for errors in parsing
     if((ast.errors)&&(ast.errors.length > 0)) {
-        var error = this.createCompoundParsingError(ast.errors);
+		var error;
+		if(ast.errors.length > 1) {
+			error = this.createCompoundParsingError(ast.errors);
+		}
+		else {
+			error = ast.errors[0];
+		}
         throw error;
     }
 

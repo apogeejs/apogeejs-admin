@@ -78,6 +78,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     visicomp.core.createtable.initHandler(this.eventManager);
     visicomp.core.createfunction.initHandler(this.eventManager);
     visicomp.core.updatemember.initHandler(this.eventManager);
+	visicomp.core.deletechild.initHandler (this.eventManager);
 }
 
 /** This method responds to a "new" menu event. */

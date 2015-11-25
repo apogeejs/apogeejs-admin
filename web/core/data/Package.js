@@ -74,8 +74,9 @@ visicomp.core.Package.prototype.addChild = function(child) {
 /** This method removes a table from the package. It also sets the package
  * on the table object to null.  */
 visicomp.core.Package.prototype.removeChild = function(child) {
-    //only objects placed in the package go here, so they should have no parents
-    if(child.getParent()) return;
+    //make sure this is a child of this object
+	var parent = child.getParent();
+    if((!parent)||(parent !== this)) return;
 	
     //remove from package
     var name = child.getName();

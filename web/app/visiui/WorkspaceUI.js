@@ -45,6 +45,12 @@ visicomp.app.visiui.WorkspaceUI = function(workspace,tab) {
     this.eventManager.addListener(visicomp.core.createpackage.PACKAGE_CREATED_EVENT, objectAddedListener);
     this.eventManager.addListener(visicomp.core.createtable.TABLE_CREATED_EVENT, objectAddedListener);
     this.eventManager.addListener(visicomp.core.createfunction.FUNCTION_CREATED_EVENT, objectAddedListener);
+	
+	//add package created listener
+    var childDeletedListener = function(objectFullName) {
+        instance.childDeleted(objectFullName);
+    }
+    this.eventManager.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
 }
 
 visicomp.app.visiui.WorkspaceUI.newTableX = 100;
@@ -172,6 +178,22 @@ visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object) {
 		visicomp.app.visiui.WorkspaceUI.newTableX += visicomp.app.visiui.WorkspaceUI.newTableDeltaX;
 		visicomp.app.visiui.WorkspaceUI.newTableY += visicomp.app.visiui.WorkspaceUI.newTableDeltaY;
 		window.show();
+	}
+}
+
+/** This method responds to a "new" menu event. */
+visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
+
+//we should verify the workspace!
+	
+	//store the ui object
+	var key = fullName;
+	
+	var objectInfo = this.objectUIMap[key];
+	delete this.objectUIMap[key];
+
+	if((objectInfo)&&(objectInfo.objectUI)) {
+		objectInfo.objectUI.removeFromParent();	
 	}
 }
 

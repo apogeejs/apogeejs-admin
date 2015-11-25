@@ -49,6 +49,18 @@ visicomp.app.visiui.TableUI.prototype.updateTable = function(data,formula,supple
 		
     return result;
 }
+
+/** This method responds to a "new" menu event. */
+visicomp.app.visiui.TableUI.prototype.deleteTable = function() {
+	var eventData = {};
+	eventData.child = this.table;
+	
+    var result = this.dataEventManager.callHandler(
+        visicomp.core.deletechild.DELETE_CHILD_HANDLER,
+        eventData);
+		
+    return result;
+}
     
 /** This method updates the table data */    
 visicomp.app.visiui.TableUI.prototype.tableUpdated = function(table) {
@@ -85,5 +97,13 @@ visicomp.app.visiui.TableUI.wrapTableFormula = function(formula) {
         "return value;\n\n" +
     "}";
     return functionText;
+}
+
+/** This method removes the window element from the parent. */
+visicomp.app.visiui.TableUI.prototype.removeFromParent = function() {
+    if((this.parentElement)&&(this.window)) {
+		var windowElement = this.window.getElement();
+		this.parentElement.removeChild(windowElement);
+	}
 }
 

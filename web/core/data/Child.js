@@ -109,6 +109,15 @@ visicomp.core.Child.setData = function(data) {
     }
 }
 
+/** This method is called when the child is deleted. If necessary the implementation
+ * can extend this function, but it should call this base version of the function
+ * if it does.  */
+visicomp.core.Child.onDelete = function() {
+	if((this.parent != null)&&(this.parent.getType() === "package")) {
+		this.parent.removeChild(this);
+	}
+}
+
 ///** This is a window for a dialog. The title and options are the same as the title
 // * and options for a window frame. 
 // *

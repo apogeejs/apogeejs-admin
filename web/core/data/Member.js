@@ -7,6 +7,9 @@
  * is used for programming controls, since this is a different programming model
  * than the scripts for the data and functions.
  * 
+ * Objects have this member component should also have the child component, as the member
+ * extends the child.
+ * 
  * This is not a class, but it is used for the prototype of the objects that inherit from it.
  */
 visicomp.core.Member = {};
@@ -89,6 +92,15 @@ visicomp.core.Member.getSupplementalCode = function() {
     }
     if(!sc) sc = "";
     return sc;
+}
+
+/** This method returns the supplemental code for this member.  */
+visicomp.core.Member.onDelete = function() {
+	//clear the function
+    this.clearFunction();
+	
+	//call the base function last (since it removes the path)
+	visicomp.core.Child.onDelete.call(this);
 }
 
 //===================================

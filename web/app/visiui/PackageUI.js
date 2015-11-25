@@ -29,3 +29,11 @@ visicomp.app.visiui.PackageUI.prototype.getContentElement = function() {
     return this.contentElement;
 }
 
+/** This method removes the window element from the parent. */
+visicomp.app.visiui.PackageUI.prototype.removeFromParent = function() {
+    if((this.parentElement)&&(this.window)) {
+		var windowElement = this.window.getElement();
+		this.parentElement.removeChild(windowElement);
+	}
+}
+

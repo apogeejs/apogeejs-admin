@@ -38,6 +38,15 @@ window.setSize(300,300);
         tableUI.createEditDialog();
     }
     window.addTitleBarElement(editButton);
+	
+//	//create the edit button
+//    var deleteButton = visicomp.visiui.createElement("button",{"innerHTML":"Delete"});
+//    deleteButton.onclick = function() {
+//        //we should get confirmation
+//
+//		tableUI.deleteTable();
+//    }
+//    window.addTitleBarElement(deleteButton);
     
     //show the window
     window.show();  

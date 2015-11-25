@@ -86,3 +86,11 @@ visicomp.app.visiui.FunctionUI.wrapFunctionBody = function(argParensString, func
     return functionText;
 }
 
+/** This method removes the window element from the parent. */
+visicomp.app.visiui.FunctionUI.prototype.removeFromParent = function() {
+    if((this.parentElement)&&(this.window)) {
+		var windowElement = this.window.getElement();
+		this.parentElement.removeChild(windowElement);
+	}
+}
+
