@@ -108,7 +108,7 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
 			supplementalCode = null;
 		}
         
-        var result = onSaveFunction(data,formula,supplementalCode);
+        var result = onSaveFunction(table,data,formula,supplementalCode);
         
         if(result.success) {
 			dialog.hide();
@@ -239,7 +239,7 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
         if(formulaEditor) formulaEditor.resize();
         if(supplementalEditor) supplementalEditor.resize();
     }
-    dialog.getEventManager().addListener("resize", resizeCallback);
+    dialog.addListener("resize", resizeCallback);
 }
 
 

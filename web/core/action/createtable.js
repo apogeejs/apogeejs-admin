@@ -30,15 +30,16 @@ visicomp.core.createtable.onCreateTable = function(event) {
 		//create table
 		var name = event.name;
 		var package = event.package;
-		var table = new visicomp.core.Table(name);
+        var workspace = package.getWorkspace();
+        
+		var table = new visicomp.core.Table(workspace,name);
 		package.addChild(table);
 
 		//initialize data
 		table.setData("");
 
 		//dispatch event
-		var eventManager = package.getWorkspace().getEventManager();
-		eventManager.dispatchEvent(visicomp.core.createtable.TABLE_CREATED_EVENT,table);
+		workspace.dispatchEvent(visicomp.core.createtable.TABLE_CREATED_EVENT,table);
 
 		//return success
 		returnValue = {"success":true};

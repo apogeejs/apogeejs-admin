@@ -5,8 +5,7 @@ visicomp.core.calculation = {};
 
 visicomp.core.calculation.fireUpdatedEvent = function(member) {
     var workspace = member.getWorkspace();
-    var eventManager = workspace.getEventManager();
-    eventManager.dispatchEvent(visicomp.core.calculation.MEMBER_UPDATED_EVENT,member);
+    workspace.dispatchEvent(visicomp.core.calculation.MEMBER_UPDATED_EVENT,member);
 }
 
 

@@ -31,16 +31,16 @@ visicomp.core.createfunction.onCreateFunction = function(event) {
 		var name = event.name;
 		var argParens = event.argParens
 		var package = event.package;
-
-		var functionObject = new visicomp.core.FunctionTable(name,argParens);
+        var workspace = package.getWorkspace();
+        
+		var functionObject = new visicomp.core.FunctionTable(workspace,name,argParens);
 		package.addChild(functionObject);
 
 		//initialize data
 		functionObject.setData("");
 
 		//dispatch event
-		var eventManager = package.getWorkspace().getEventManager();
-		eventManager.dispatchEvent(visicomp.core.createfunction.FUNCTION_CREATED_EVENT,functionObject);
+		workspace.dispatchEvent(visicomp.core.createfunction.FUNCTION_CREATED_EVENT,functionObject);
 
 		//return success
 		returnValue = {"success":true};

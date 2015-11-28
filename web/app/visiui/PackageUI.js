@@ -1,39 +1,43 @@
-/** This is a editor element for holding an arbitrary JSON object.
- *
- * @class 
- */
-visicomp.app.visiui.PackageUI = function(package,parentElement) {
+visicomp.app.visiui.PackageUI = {};
 
-    this.package = package;
-    this.name = package.getName();
-    this.parentElement = parentElement;
-//    this.dataEventManager = package.getWorkspace().getEventManager();
-    this.windowEventManager = null;//look this up below
-	this.contentElement = null; //created below
+visicomp.app.visiui.PackageUI.populatePackageWindow = function(childUI,package) {
+    
+    //subscribe to table update event
+    var packageUpdatedCallback = function(packageObject) {
+        if(packageObject === package) {
+            visicomp.app.visiui.TableUI.tableUpdated(childUI,package);
+        }
+    }
+    
+    var workspace = package.getWorkspace();
+    
+    workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, packageUpdatedCallback);
+    
+    var window = childUI.getWindow();
+    
+//    //resize the editor on window size change
+//    var resizeCallback = function() {
+//        editor.resize();
+//    }
+//    window.addListener("resize", resizeCallback);
+    
+//    //create the edit button
+//    var editButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit"});
+//    editButton.onclick = function() {
+//        visicomp.app.visiui.PackageUI.createEditDialog(package);
+//    }
+//    window.addTitleBarElement(editButton);
+	
+//	//create the delete button
+//    var deleteButton = visicomp.visiui.createElement("button",{"innerHTML":"Delete"});
+//    deleteButton.onclick = function() {
+//        //we should get confirmation
+//
+//		childUI.deletePackage();
+//    }
+//    window.addTitleBarElement(deleteButton);
 
-	if(package.isRootPackage()) {
-		//show as the root package
-		visicomp.app.visiui.dialog.showRootPackage(this);
-	}
-	else {
-		//create the window and editor (for display, not editing)
-		visicomp.app.visiui.dialog.showPackageWindow(this);
-	}
+    //dummy size
+window.setSize(500,500);
+
 }
-
-visicomp.app.visiui.PackageUI.prototype.getWindow = function() {
-    return this.window;
-}
-
-visicomp.app.visiui.PackageUI.prototype.getContentElement = function() {
-    return this.contentElement;
-}
-
-/** This method removes the window element from the parent. */
-visicomp.app.visiui.PackageUI.prototype.removeFromParent = function() {
-    if((this.parentElement)&&(this.window)) {
-		var windowElement = this.window.getElement();
-		this.parentElement.removeChild(windowElement);
-	}
-}
-

@@ -30,12 +30,12 @@ visicomp.core.deletechild.onDeleteChild = function(event) {
 		//create table
 		var child = event.child;
 		var fullName = child.getFullName();
-		var eventManager = child.getWorkspace().getEventManager();
+		var workspace = child.getWorkspace();
 		
 		child.onDelete();
 
 		//dispatch event
-		eventManager.dispatchEvent(visicomp.core.deletechild.CHILD_DELETED_EVENT,fullName);
+		workspace.dispatchEvent(visicomp.core.deletechild.CHILD_DELETED_EVENT,fullName);
 
 		//return success
 		returnValue = {"success":true};

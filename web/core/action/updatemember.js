@@ -36,8 +36,7 @@ visicomp.core.updatemember.OBJECT_UPDATED_EVENT = "memberUpdated";
 
 visicomp.core.updatemember.fireUpdatedEvent = function(member) {
     var workspace = member.getWorkspace();
-    var eventManager = workspace.getEventManager();
-    eventManager.dispatchEvent(visicomp.core.updatemember.MEMBER_UPDATED_EVENT,member);
+    workspace.dispatchEvent(visicomp.core.updatemember.MEMBER_UPDATED_EVENT,member);
 }
 
 /** This is the listener for the update member event. */

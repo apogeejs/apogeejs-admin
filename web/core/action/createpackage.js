@@ -1,4 +1,4 @@
-/** This namespace contains functions to process an create a package. */
+/** This namespace contains functions to process an create a package.  */
 visicomp.core.createpackage = {};
 
 /** CREATE PACKAGE HANDLER
@@ -31,19 +31,13 @@ visicomp.core.createpackage.onCreatePackage = function(event) {
 		var name = event.name;
 		var parent = event.parent;
 		var workspace = event.workspace;
-		var isRoot = event.isRoot;
-		var package = new visicomp.core.Package(name);
 
-		if(isRoot) {
-			parent.setRootPackage(package);
-		}
-		else {
-			parent.addChild(package);
-		}
-
+		var package = new visicomp.core.Package(workspace,name);
+        if(parent) {
+            parent.addChild(package);
+        }
 		//dispatch event
-		var eventManager = workspace.getEventManager();
-		eventManager.dispatchEvent(visicomp.core.createpackage.PACKAGE_CREATED_EVENT,package);
+		workspace.dispatchEvent(visicomp.core.createpackage.PACKAGE_CREATED_EVENT,package);
 
 		//return success
 		returnValue = {"success":true};

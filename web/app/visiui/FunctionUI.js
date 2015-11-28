@@ -1,58 +1,84 @@
-/** This is a editor element for holding an arbitrary JSON object.
- *
- * @class 
- */
-visicomp.app.visiui.FunctionUI = function(functionObject,parentElement) {
 
-    this.functionObject = functionObject;
-    this.name = functionObject.getName();
-    this.parentElement = parentElement;
-    this.dataEventManager = functionObject.getWorkspace().getEventManager();
-    this.windowEventManager = null;//look this up below
+visicomp.app.visiui.FunctionUI = {};
 
-    //subscribe to update event
-    var instance = this;
-    var functionUpdatedCallback = function(functionObject) {
-        instance.functionUpdated(functionObject);
+visicomp.app.visiui.FunctionUI.populateFunctionWindow = function(childUI,functionObject) {
+    
+    //subscribe to table update event
+    var functionUpdatedCallback = function(functionObjLocal) {
+        if(functionObjLocal === functionObject) {
+            visicomp.app.visiui.FunctionUI.functionUpdated(childUI,functionObject);
+        }
     }
-    this.dataEventManager.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, functionUpdatedCallback);
+    
+    var workspace = functionObject.getWorkspace();
+    workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, functionUpdatedCallback);
+    
+    //editor - only for display, read only
+    var contentDiv = childUI.getContentElement();
+    var editor = ace.edit(contentDiv);
+    editor.renderer.setShowGutter(true);
+    editor.setReadOnly(true);
+    editor.setTheme("ace/theme/eclipse"); //good
+    editor.getSession().setMode("ace/mode/javascript"); 
+    childUI.editor = editor;
+    
+    var window = childUI.getWindow();
+    
+    //resize the editor on window size change
+    var resizeCallback = function() {
+        editor.resize();
+    }
+    window.addListener("resize", resizeCallback);
+    
+    //create the edit button
+    var editButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit"});
+    editButton.onclick = function() {
+        visicomp.app.visiui.FunctionUI.createEditDialog(functionObject);
+    }
+    window.addTitleBarElement(editButton);
+	
+//	//create the delete button
+//    var deleteButton = visicomp.visiui.createElement("button",{"innerHTML":"Delete"});
+//    deleteButton.onclick = function() {
+//        //we should get confirmation
+//
+//		childUI.deleteFunction();
+//    }
+//    window.addTitleBarElement(deleteButton);
 
-    //create the window and editor (for display, not editing)
-    visicomp.app.visiui.dialog.showFunctionWindow(this);
+    //dummy size
+window.setSize(200,200);
+
 }
 
 visicomp.app.visiui.FunctionUI.formatString = "\t"
 
-visicomp.app.visiui.FunctionUI.prototype.getWindow = function() {
-    return this.window;
-}
 
-visicomp.app.visiui.FunctionUI.prototype.createEditDialog = function() {
+visicomp.app.visiui.FunctionUI.createEditDialog = function(functionObject) {
     
     //create save handler
-    var instance = this;
-    var onSave = function(functionBody,supplementalCode) {
-        return instance.updateFunction(functionBody,supplementalCode);
+    var onSave = function(functionObject,functionBody,supplementalCode) {
+        return visicomp.app.visiui.FunctionUI.updateFunction(functionObject,functionBody,supplementalCode);
     };
     
-    visicomp.app.visiui.dialog.showUpdateFunctionDialog(this.functionObject,onSave);
+    visicomp.app.visiui.dialog.showUpdateFunctionDialog(functionObject,onSave);
 }
 
 /** This method responds to a "new" menu event. */
-visicomp.app.visiui.FunctionUI.prototype.updateFunction = function(functionBody,supplementalCode) {
+visicomp.app.visiui.FunctionUI.updateFunction = function(functionObject,functionBody,supplementalCode) {
 	
-	var functionData = visicomp.app.visiui.FunctionUI.getUpdateEventData(this.functionObject,functionBody,supplementalCode)
+	var updateEventData = visicomp.app.visiui.FunctionUI.getUpdateEventData(functionObject,functionBody,supplementalCode)
 	
-    var result = this.dataEventManager.callHandler(
+     var workspace = functionObject.getWorkspace();
+    var result = workspace.callHandler(
         visicomp.core.updatemember.UPDATE_MEMBER_HANDLER,
-        functionData);
+        updateEventData);
 		
     return result;
 }
     
 /** This method updates the functionObject data */    
-visicomp.app.visiui.FunctionUI.prototype.functionUpdated = function(functionObject) {
-    if(this.functionObject !== functionObject) return;
+visicomp.app.visiui.FunctionUI.functionUpdated = function(childUI, functionObject) {
     
     var functionText = functionObject.getFunctionText();
     var supplementalCode = functionObject.getSupplementalCode();
@@ -61,9 +87,7 @@ visicomp.app.visiui.FunctionUI.prototype.functionUpdated = function(functionObje
 		code += "\n\n/* Supplemental Code */\n\n" +
 			supplementalCode;
 	}
-    if(this.editor) {
-        this.editor.getSession().setValue(code);
-    }
+    childUI.editor.getSession().setValue(code);
 }
 
 /** This method responds to a "new" menu event. */
@@ -84,13 +108,5 @@ visicomp.app.visiui.FunctionUI.wrapFunctionBody = function(argParensString, func
         functionBody + "\n" +
     "}";
     return functionText;
-}
-
-/** This method removes the window element from the parent. */
-visicomp.app.visiui.FunctionUI.prototype.removeFromParent = function() {
-    if((this.parentElement)&&(this.window)) {
-		var windowElement = this.window.getElement();
-		this.parentElement.removeChild(windowElement);
-	}
 }
 

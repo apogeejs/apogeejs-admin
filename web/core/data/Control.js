@@ -1,10 +1,9 @@
 /** This is a control. */
-visicomp.core.Control = function(name) {
+visicomp.core.Control = function(workspace,name) {
     //base init
-    visicomp.core.Child.init.call(this,name,"function");
+    visicomp.core.Child.init.call(this,workspace,name,"function");
 }
 
-//extend the child object
-visicomp.core.Control.prototype = Object.create(visicomp.core.Child);
-visicomp.core.Control.prototype.constructor = visicomp.core.Control;
+//add components to this class
+visicomp.core.util.mixin(visicomp.core.Control,visicomp.core.Child);
 

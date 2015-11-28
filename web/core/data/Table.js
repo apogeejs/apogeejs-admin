@@ -1,15 +1,13 @@
 /** This class encapsulatees a data table */
-visicomp.core.Table = function(name) {
+visicomp.core.Table = function(workspace,name) {
     //base init
-    visicomp.core.Child.init.call(this,name,"table");
+    visicomp.core.Child.init.call(this,workspace,name,"table");
 	visicomp.core.Member.init.call(this);
 }
 
-//extend the child object
-visicomp.core.Table.prototype = Object.create(visicomp.core.util.mergeObjects(
-		visicomp.core.Child,
-		visicomp.core.Member));
-visicomp.core.Table.prototype.constructor = visicomp.core.Table;
+//add components to this class
+visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Child);
+visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Member);
 
 /** Test function. */
 visicomp.core.Table.prototype.print = function() {

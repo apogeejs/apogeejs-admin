@@ -29,13 +29,9 @@ visicomp.core.createworkspace.onCreateWorkspace = function(event) {
     try {
 		//create package
 		var name = event.name;
-		var eventManager = event.eventManager;
-		var workspace = new visicomp.core.Workspace(name,eventManager);
-
-		//dispatch event for workspace and root package
-		var eventManager = workspace.getEventManager();
-		eventManager.dispatchEvent(visicomp.core.createworkspace.WORKSPACE_CREATED_EVENT,workspace);
-		eventManager.dispatchEvent(visicomp.core.createpackage.PACKAGE_CREATED_EVENT,workspace.getRootPackage());
+		var workspace = new visicomp.core.Workspace(name);     
+        
+        
 
 		//return success
 		returnValue = {"success":true};

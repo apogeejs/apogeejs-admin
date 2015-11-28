@@ -1,7 +1,7 @@
 /** This is a function. */
-visicomp.core.FunctionTable = function(name,argParens) {
+visicomp.core.FunctionTable = function(workspace,name,argParens) {
     //base init
-    visicomp.core.Child.init.call(this,name,"function");
+    visicomp.core.Child.init.call(this,workspace,name,"function");
 	visicomp.core.Member.init.call(this);
     
     this.argParens = argParens;
@@ -10,11 +10,9 @@ visicomp.core.FunctionTable = function(name,argParens) {
     this.setData(function(){});
 }
 
-//extend the child object
-visicomp.core.FunctionTable.prototype = Object.create(visicomp.core.util.mergeObjects(
-		visicomp.core.Child,
-		visicomp.core.Member));
-visicomp.core.FunctionTable.prototype.constructor = visicomp.core.Table;
+//add components to this class
+visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Child);
+visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Member);
 
 visicomp.core.FunctionTable.prototype.getArgParensString = function() {	
     return this.argParens;

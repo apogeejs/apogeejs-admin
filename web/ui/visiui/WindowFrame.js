@@ -16,6 +16,9 @@ visicomp.visiui.WindowFrame = function(parentContainer, title, options) {
     if(!options) {
         options = {};
     }
+    
+    //base init
+    visicomp.core.EventManager.init.call(this);
 	
     //variables
     this.parentContainer = parentContainer;
@@ -59,9 +62,6 @@ this.savedParentOverflow = undefined;
 	this.resizeOnMouseUp = null;
 	this.resizeOnMouseMove = null;
 	this.resizeOnMouseLeave = null;
-    
-    //event manager
-    this.eventManager = new visicomp.core.EventManager();
 	
 	//these should be set to soemthing more meeaningful, like the minimum sensible width of the title bar
 	this.minWidth = 0;
@@ -72,6 +72,9 @@ this.savedParentOverflow = undefined;
     this.createTitleBar();
     this.createBody();
 }
+
+//add components to this class
+visicomp.core.util.mixin(visicomp.visiui.WindowFrame,visicomp.core.EventManager);
 
 visicomp.visiui.WindowFrame.MINIMIZED = -1;
 visicomp.visiui.WindowFrame.NORMAL = 0;
@@ -167,7 +170,7 @@ visicomp.visiui.WindowFrame.COMMAND_BUTTON_STYLE = {
 /** This method shows the window. */
 visicomp.visiui.WindowFrame.prototype.show = function() {
     this.parentContainer.appendChild(this.getElement());
-    this.eventManager.dispatchEvent("show",this);
+    this.dispatchEvent("show",this);
     
     //we will redo this since the size of elements used in calculation may have been wrong
     if(this.coordinateInfo.height !== undefined) {
@@ -178,7 +181,7 @@ visicomp.visiui.WindowFrame.prototype.show = function() {
 /** This method closes the window. */
 visicomp.visiui.WindowFrame.prototype.hide = function() {
     this.parentContainer.removeChild(this.getElement());
-    this.eventManager.dispatchEvent("hide",this);
+    this.dispatchEvent("hide",this);
 }
 
 /** This method sets the position of the window frame in the parent. */
@@ -248,11 +251,6 @@ visicomp.visiui.WindowFrame.prototype.addTitleBarElement = function(element) {
 /** This method sets the content for the body. To clear the content, pass null.*/
 visicomp.visiui.WindowFrame.prototype.removeTitleBarElement = function(element) {
     this.titleBarLeftElements.appendRemove(element);
-}
-
-/** This method sets the content for the body. To clear the content, pass null.*/
-visicomp.visiui.WindowFrame.prototype.getEventManager= function() {
-    return this.eventManager;
 }
 
 //====================================
@@ -485,7 +483,7 @@ visicomp.visiui.WindowFrame.prototype.minimizeContent = function() {
     this.setMinMaxButtons();
     
     //dispatch resize event
-    this.eventManager.dispatchEvent("minimize",this);
+    this.dispatchEvent("minimize",this);
 }
 
 /** This is the restore function for the window.*/
@@ -625,7 +623,7 @@ visicomp.visiui.WindowFrame.prototype.updateCoordinates = function() {
 visicomp.visiui.WindowFrame.prototype.frameResized = function() {
     
     //dispatch event
-    this.eventManager.dispatchEvent("resize",this);
+    this.dispatchEvent("resize",this);
 }
 
 //====================================

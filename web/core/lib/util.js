@@ -13,15 +13,10 @@ visicomp.core.util.createError = function(msg,optionalType,optionalBaseError) {
 }
 
 /** This method creates an integer has value for a string. */
-visicomp.core.util.mergeObjects = function(argListOfObjects) {
-	var returnValue = {};
-	for(var i = 0; i < arguments.length; i++) {
-		var input = arguments[i];
-		for(var key in input) {
-			returnValue[key] = input[key];
-		}
-	}
-	return returnValue;
+visicomp.core.util.mixin = function(destObject,mixinObject) {
+    for(var key in mixinObject) {
+        destObject.prototype[key] = mixinObject[key];
+    }
 }
 
 /** This method creates an integer has value for a string. */

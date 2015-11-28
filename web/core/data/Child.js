@@ -9,7 +9,8 @@
 visicomp.core.Child = {};
     
 /** This serves as the constructor for the child object, when extending it. */
-visicomp.core.Child.init = function(name,type) {
+visicomp.core.Child.init = function(workspace,name,type) {
+    this.workspace = workspace;
     this.name = name;
     this.type = type;
     this.parent = null;
@@ -46,29 +47,29 @@ visicomp.core.Child.getParent = function() {
  * @private*/
 visicomp.core.Child.setParent = function(parent) {
 	this.parent = parent;
+    if(parent.workspace != this.workspace) {
+        //we might want to write code to change the child workspace, and that of it offspring. Or maybe not.
+        throw visicomp.core.util.createError("The chils and parent must be in the same workspace.");
+    }
 }
 
 /** this method gets the workspace. */
 visicomp.core.Child.getWorkspace = function() {
-    var ancestor = this;
-	while((ancestor)&&(ancestor.getType() !== "workspace")) {
-		ancestor = ancestor.getParent();
-	} 
-	return ancestor;
+   return this.workspace;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//FOR LATER
 /** this method gets the root package/namespace for this object. */
 visicomp.core.Child.getRootPackage = function() {
     var ancestor = this;
 	while(ancestor) {
-        if(ancestor.isRoot) return ancestor;
-		ancestor = ancestor.getParent();
+		var parent = ancestor.getParent();
+        if(parent == null) {
+            return ancestor;
+        }
+        ancestor = parent;
 	} 
-	return null;
+	return null; //this shouldn't happen
 }
-////////////////////////////////////////////////////////////////////////////////
 
 /** this method gets the data map. */
 visicomp.core.Child.getData = function() {

@@ -75,15 +75,16 @@ visicomp.app.visiui.workspaceFromJson = function(app, json) {
     var fileType = json.fileType;
 	if((fileType !== "visicomp workspace")||(!name)) {
 		alert("Error openging file");
-		return;
+		return null;
 	}
 	
 	//create the workspace
-	app.createWorkspace(name);
+    app.createWorkspace(name);
+	var workspace = app.getWorkspace();
+    var workspaceUI = app.getWorkspaceUI();
 	
 	//create children
-	var workspaceUI = app.workspaceUI;
-	var parent = workspaceUI.getWorkspace().getRootPackage();
+	var parent = workspace.getRootPackage();
 	var childMap = json.data;
 	var childUpdateDataList = [];
 	for(var key in childMap) {
@@ -91,14 +92,7 @@ visicomp.app.visiui.workspaceFromJson = function(app, json) {
 		visicomp.app.visiui.childFromJson(workspaceUI, parent, childJson, childUpdateDataList);
 	}
 	
-	//set child data
-	//we need to run the child updates all at once because we don't know the order of execution yet
-	var result = app.getEventManager().callHandler(
-        visicomp.core.updatemember.UPDATE_MEMBERS_HANDLER,
-        childUpdateDataList);
-	
-//handle this differently?
-	return result
+	return {"success":true};
 }
 
 /** This mehtod serializes a child object. 

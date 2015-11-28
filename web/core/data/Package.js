@@ -1,7 +1,7 @@
 /** This is a package. */
-visicomp.core.Package = function(name) {
+visicomp.core.Package = function(workspace,name) {
     //base init
-    visicomp.core.Child.init.call(this,name,"package");
+    visicomp.core.Child.init.call(this,workspace,name,"package");
 	this.isRoot = false;
 
     //this holds the base objects, mapped by name
@@ -12,29 +12,13 @@ visicomp.core.Package = function(name) {
     this.setData(this.dataMap);
 }
 
-//extend the child object
-visicomp.core.Package.prototype = Object.create(visicomp.core.Child);
-visicomp.core.Package.prototype.constructor = visicomp.core.Package;
-
-/** This method returns the full name in dot notation for this object. */
-visicomp.core.Package.prototype.getFullName = function() {
-	if(this.isRoot) {
-        //special naming for root object
-        return this.getName();
-    }   
-    else {
-        return visicomp.core.Child.getFullName.call(this);
-    }
-}
+//add components to this class
+visicomp.core.util.mixin(visicomp.core.Package,visicomp.core.Child);
 
 /** this is used to identify if this is the root package. */
 visicomp.core.Package.prototype.isRootPackage = function() {
-    return this.isRoot;
-}
-
-/** this is used to identify if this is the root package. */
-visicomp.core.Package.prototype.setIsRootPackage = function(isRoot) {
-    this.isRoot = isRoot;
+    //undefined may be OK too. If there is populated object this is no root.
+    return (this.parent == null); 
 }
 
 /** this method gets the table map. */

@@ -7,50 +7,35 @@ visicomp.app.visiui.WorkspaceUI = function(workspace,tab) {
     this.objectUIMap = {};
     this.activePackageName = null;
     this.workspace = workspace;
-    this.eventManager = workspace.getEventManager();
     this.name = workspace.getName();
+    
+    
+/////////////////////////////////////////////
+var rootPackage = workspace.getRootPackage();
+var objectInfo = {};
+	objectInfo.object = rootPackage;
+    //no ui object!!!
+	
+    this.objectUIMap[this.getObjectKey(rootPackage)] = objectInfo;
+
+/////////////////////////////////////////////
 	
     //listeners
     var instance = this;
-    
-    //add menu listeners
-    var addPackageListener = function() {
-        var onCreate = function(parent,packageName) {
-            return instance.addPackage(parent,packageName,false);
-        }
-        visicomp.app.visiui.dialog.showCreateChildDialog("package",instance.objectUIMap,instance.activePackageName,onCreate);
-    }
-    this.eventManager.addListener("workspaceAddPackage",addPackageListener);
-
-    var addTableListener = function() {
-        var onCreate = function(parent,tableName) {
-            return instance.addTable(parent,tableName);
-        }
-        visicomp.app.visiui.dialog.showCreateChildDialog("table",instance.objectUIMap,instance.activePackageName,onCreate);
-    }
-    this.eventManager.addListener("packageAddTable",addTableListener);
-    
-    var addFunctionListener = function() {
-        var onCreate = function(parent,functionName) {
-            return instance.addFunction(parent,functionName);
-        }
-        visicomp.app.visiui.dialog.showCreateChildDialog("function",instance.objectUIMap,instance.activePackageName,onCreate);
-    }
-    this.eventManager.addListener("packageAddFunction",addFunctionListener);
     
     //add package created listener
     var objectAddedListener = function(object) {
         instance.objectAdded(object);
     }
-    this.eventManager.addListener(visicomp.core.createpackage.PACKAGE_CREATED_EVENT, objectAddedListener);
-    this.eventManager.addListener(visicomp.core.createtable.TABLE_CREATED_EVENT, objectAddedListener);
-    this.eventManager.addListener(visicomp.core.createfunction.FUNCTION_CREATED_EVENT, objectAddedListener);
+    this.workspace.addListener(visicomp.core.createpackage.PACKAGE_CREATED_EVENT, objectAddedListener);
+    this.workspace.addListener(visicomp.core.createtable.TABLE_CREATED_EVENT, objectAddedListener);
+    this.workspace.addListener(visicomp.core.createfunction.FUNCTION_CREATED_EVENT, objectAddedListener);
 	
 	//add package created listener
     var childDeletedListener = function(objectFullName) {
         instance.childDeleted(objectFullName);
     }
-    this.eventManager.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
+    this.workspace.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
 }
 
 visicomp.app.visiui.WorkspaceUI.newTableX = 100;
@@ -79,7 +64,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.addPackage = function(parent,name,isRo
 	handlerData.parent = parent;
     handlerData.workspace = this.workspace;
 	handlerData.isRoot = isRoot;
-    var result = this.eventManager.callHandler(
+    var result = this.workspace.callHandler(
         visicomp.core.createpackage.CREATE_PACKAGE_HANDLER,
         handlerData);
     return result;
@@ -91,7 +76,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.addTable = function(parent, name) {
     var handlerData = {};
     handlerData.name = name;
     handlerData.package = parent;
-    var result = this.eventManager.callHandler(
+    var result = this.workspace.callHandler(
         visicomp.core.createtable.CREATE_TABLE_HANDLER,
         handlerData);
     return result;
@@ -115,7 +100,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.addFunction = function(parent, declara
     handlerData.name = name;
 	handlerData.argParens = argParens;
     handlerData.package = parent;
-    var result = this.eventManager.callHandler(
+    var result = this.workspace.callHandler(
         visicomp.core.createfunction.CREATE_FUNCTION_HANDLER,
         handlerData);
     return result;
@@ -127,35 +112,17 @@ visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object) {
     if(object.getWorkspace() !== this.workspace) return;
 	
 	var parent = object.getParent();
+    var objectInfo = this.objectUIMap[this.getObjectKey(parent)];
 	var parentContainer;
-	if(parent.getType() === "workspace") {
-		parentContainer = this.tab;
-	}
-	else {
-		var objectInfo = this.objectUIMap[this.getObjectKey(parent)];
+	if(objectInfo.objectUI) {
 		parentContainer = objectInfo.objectUI.getContentElement();
 	}
-	
-	//create the object
-	var type = object.getType();
-	var objectUI;
-	switch(type) {
-		case "package":
-			objectUI = new visicomp.app.visiui.PackageUI(object,parentContainer);
-			break;
-			
-		case "table":
-			objectUI = new visicomp.app.visiui.TableUI(object,parentContainer);
-			break
-            
-        case "function":
-			objectUI = new visicomp.app.visiui.FunctionUI(object,parentContainer);
-			break
-			
-		default:
-			alert("Unknown object type: " + type);
-			return;
+	else {
+		parentContainer = this.tab;
 	}
+	
+	//create the ui object
+	var objectUI = new visicomp.app.visiui.ChildUI(object,parentContainer);
 	
 	//store the ui object
 	var key = this.getObjectKey(object);

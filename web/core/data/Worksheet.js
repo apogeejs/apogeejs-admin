@@ -1,11 +1,10 @@
 /** This is a function. */
-visicomp.core.Worksheet = function(name) {
+visicomp.core.Worksheet = function(workspace,name) {
     //base init
-    visicomp.core.Child.init.call(this,name,"function");
+    visicomp.core.Child.init.call(this,workspace,name,"function");
 }
 
-//extend the child object
-visicomp.core.Worksheet.prototype = Object.create(visicomp.core.Child);
-visicomp.core.Worksheet.prototype.constructor = visicomp.core.Worksheet;
+//add components to this class
+visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Child);
 
 
