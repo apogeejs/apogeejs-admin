@@ -39,9 +39,6 @@ visicomp.app.visiui.ChildUI = function(child,parentElement) {
 		default:
 			alert("Unsupported object type for a UI object");
 	}
-    
-    //show the window
-    this.window.show();
 }
 
 visicomp.app.visiui.ChildUI.prototype.getWindow = function() {

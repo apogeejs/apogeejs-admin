@@ -1,6 +1,4 @@
-/* 
- * Constructor
- */
+/** This class manages the user interface for a workspace object. */
 visicomp.app.visiui.WorkspaceUI = function(workspace,tab) {
     //properties
     this.tab = tab;
@@ -8,7 +6,6 @@ visicomp.app.visiui.WorkspaceUI = function(workspace,tab) {
     this.activeFolderName = null;
     this.workspace = workspace;
     this.name = workspace.getName();
-    
     
 /////////////////////////////////////////////
 var rootFolder = workspace.getRootFolder();
@@ -138,7 +135,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object) {
 	
     this.objectUIMap[key] = objectInfo;
     
-    //show the table
+    //show the window
     var window = objectUI.getWindow();
 	if(window) {
 		window.setPosition(visicomp.app.visiui.WorkspaceUI.newTableX,visicomp.app.visiui.WorkspaceUI.newTableY);

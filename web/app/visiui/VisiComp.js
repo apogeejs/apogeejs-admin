@@ -2,13 +2,14 @@ if(!visicomp.app) visicomp.app = {};
 if(!visicomp.app.visiui) visicomp.app.visiui = {};
 if(!visicomp.app.visiui.dialog) visicomp.app.visiui.dialog = {};
 
-/** Constructor */
+/** This is the main class of the visicomp application. */
 visicomp.app.visiui.VisiComp = function(containerId) {
     
-//temp - until we figure out what to do with menu and events
-visicomp.core.EventManager.init.call(this);
+    //temp - until we figure out what to do with menu and events
+    //for now we have application events, using the EventManager mixin below.
+    visicomp.core.EventManager.init.call(this);
 
-    //create a menu
+    //create menus
     var menuBar = new visicomp.visiui.MenuBar(containerId);
     var menu;
 
@@ -23,14 +24,18 @@ visicomp.core.EventManager.init.call(this);
     menu.addEventMenuItem("Add&nbsp;Table","folderAddTable",null,this);
     menu.addEventMenuItem("Add&nbsp;Function","folderAddFunction",null,this);
 
-    //add some tabs
+    //create the tab frame - this puts a tab for each workspace, even though
+    //for now you can only make one workspace.
     this.tabFrame = new visicomp.visiui.TabFrame(containerId);
     this.workspaceUI = null;
     
     //add menu listeners
     var instance = this;
+    
+    //create new listener
     var newListener = function() {
-        if(instance.workspaceOpen()) {
+        if(instance.workspaceUI) {
+            //one workspace for now
             alert("You must close the existing workspace before opening another.");
             return;
         }
@@ -42,8 +47,10 @@ visicomp.core.EventManager.init.call(this);
     }
     this.addListener("menuFileNew",newListener);
     
+    //open listener
     var openListener = function() {
-        if(instance.workspaceOpen()) {
+        if(instance.workspaceUI) {
+            //one workspace for now
             alert("You must close the existing workspace before opening another.");
             return;
         }
@@ -55,20 +62,31 @@ visicomp.core.EventManager.init.call(this);
     }
     this.addListener("menuFileOpen",openListener);
     
+    //save listener
     var saveListener = function() {
+        if(!instance.workspaceUI) {
+            alert("There is no open workspace.");
+            return;
+        }
+        
         visicomp.app.visiui.dialog.showSaveWorkspaceDialog(instance.workspaceUI); 
     }
     this.addListener("menuFileSave",saveListener);
     
-    
+    //close listener
     var closeListener = function() {
+        if(!instance.workspaceUI) {
+            alert("There is no open workspace.");
+            return;
+        }
+        
         //add a "are you sure" dialog!!
         instance.closeWorkspace();
     }
     this.addListener("menuFileClose",closeListener);
     
     //workspace menu
-     //add menu listeners
+     //add folder listener
     var addFolderListener = function() {
         if(!instance.workspaceUI) {
             alert("There is no workspace open");
@@ -82,6 +100,7 @@ visicomp.core.EventManager.init.call(this);
     }
     this.addListener("workspaceAddFolder",addFolderListener);
 
+    //add table listener
     var addTableListener = function() {
         if(!instance.workspaceUI) {
             alert("There is no workspace open");
@@ -95,6 +114,7 @@ visicomp.core.EventManager.init.call(this);
     }
     this.addListener("folderAddTable",addTableListener);
     
+    //add function listener
     var addFunctionListener = function() {
         if(!instance.workspaceUI) {
             alert("There is no workspace open");
@@ -129,11 +149,6 @@ visicomp.app.visiui.VisiComp.prototype.openWorkspace = function(workspaceText) {
 /** This method closes a workspace. */
 visicomp.app.visiui.VisiComp.prototype.closeWorkspace = function() {
     location.reload();
-}
-
-/** This method returns true if a workspace is opened. */
-visicomp.app.visiui.VisiComp.prototype.workspaceOpen = function() {
-    return (this.workspaceUI != null);
 }
 
 visicomp.app.visiui.VisiComp.prototype.getWorkspace = function() {
