@@ -1,8 +1,8 @@
-/** This namespace contains functions to process an create a package.  */
-visicomp.core.createpackage = {};
+/** This namespace contains functions to process an create a folder.  */
+visicomp.core.createfolder = {};
 
 /** CREATE PACKAGE HANDLER
- * This handler should be called to request a package be created.
+ * This handler should be called to request a folder be created.
  * 
  * Event object format:  //future add other options
  * { 
@@ -10,34 +10,34 @@ visicomp.core.createpackage = {};
  *	workspace: [workspace]
  * }
  */
-visicomp.core.createpackage.CREATE_PACKAGE_HANDLER = "createPackage";
+visicomp.core.createfolder.CREATE_PACKAGE_HANDLER = "createFolder";
 
 /** PACKAGE CREATED EVENT
- * This listener event is fired when after a package is created, to be used to respond
- * to a new package such as to update the UI.
+ * This listener event is fired when after a folder is created, to be used to respond
+ * to a new folder such as to update the UI.
  * 
  * Event object Format:
- * [package]
+ * [folder]
  */
-visicomp.core.createpackage.PACKAGE_CREATED_EVENT = "packageCreated";
+visicomp.core.createfolder.PACKAGE_CREATED_EVENT = "folderCreated";
 
 
-/** This is the listener for the create package event. */
-visicomp.core.createpackage.onCreatePackage = function(event) {
+/** This is the listener for the create folder event. */
+visicomp.core.createfolder.onCreateFolder = function(event) {
 	var returnValue;
     
     try {
-		//create package
+		//create folder
 		var name = event.name;
 		var parent = event.parent;
 		var workspace = event.workspace;
 
-		var package = new visicomp.core.Package(workspace,name);
+		var folder = new visicomp.core.Folder(workspace,name);
         if(parent) {
-            parent.addChild(package);
+            parent.addChild(folder);
         }
 		//dispatch event
-		workspace.dispatchEvent(visicomp.core.createpackage.PACKAGE_CREATED_EVENT,package);
+		workspace.dispatchEvent(visicomp.core.createfolder.PACKAGE_CREATED_EVENT,folder);
 
 		//return success
 		returnValue = {"success":true};
@@ -53,9 +53,9 @@ visicomp.core.createpackage.onCreatePackage = function(event) {
     return returnValue;
 }
     
-/** This method subscribes to the create package handler event */
-visicomp.core.createpackage.initHandler = function(eventManager) {
-    eventManager.addHandler(visicomp.core.createpackage.CREATE_PACKAGE_HANDLER, 
-            visicomp.core.createpackage.onCreatePackage);
+/** This method subscribes to the create folder handler event */
+visicomp.core.createfolder.initHandler = function(eventManager) {
+    eventManager.addHandler(visicomp.core.createfolder.CREATE_PACKAGE_HANDLER, 
+            visicomp.core.createfolder.onCreateFolder);
 }
 

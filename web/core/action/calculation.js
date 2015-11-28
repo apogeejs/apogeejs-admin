@@ -25,23 +25,23 @@ visicomp.core.calculation.addToRecalculateList = function(recalculateList,member
     }
 }
 
-/** This method recalculates all member objects in the given root package. */
-visicomp.core.calculation.recalculateAll = function(rootPackage) {	
+/** This method recalculates all member objects in the given root folder. */
+visicomp.core.calculation.recalculateAll = function(rootFolder) {	
 	var recalculateList = [];
 	//add all members, recursively
-	visicomp.core.calculation.addAll(rootPackage,recalculateList);
+	visicomp.core.calculation.addAll(rootFolder,recalculateList);
 	//recalculate
 	visicomp.core.calculation.recalculateObjects(recalculateList);
 }
 
-/** This method recursively adds all members from the given package and this children. */
-visicomp.core.calculation.addAll = function(package,recalculateList) {
-	var childMap = package.getChildMap();
+/** This method recursively adds all members from the given folder and this children. */
+visicomp.core.calculation.addAll = function(folder,recalculateList) {
+	var childMap = folder.getChildMap();
 	for(var key in childMap) {
 		var child = childMap[key];
 		switch(child.getType()) {
-			case "package":
-				visicomp.core.calculation.addAll(package,recalculateList);
+			case "folder":
+				visicomp.core.calculation.addAll(folder,recalculateList);
 				break;
 			
 			case "table":

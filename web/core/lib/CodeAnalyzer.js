@@ -3,8 +3,8 @@
  *  
  * Formula Rules:
  * - The formula can access any table, using the name of the table if the table is
- * in the same package or [package name].[table name] if the table is in 
- * another package. These tables are held as local variables in the formula function.
+ * in the same folder or [folder name].[table name] if the table is in 
+ * another folder. These tables are held as local variables in the formula function.
  * - The formula should update the value "value" to update the current table. None
  * of the table objects (given by [table name]) should be modified.
  * - The formula should not access any global variables. It should only use local
@@ -12,8 +12,8 @@
  **/ 
 visicomp.core.CodeAnalyzer = function(member) {
     this.member = member;
-    this.package = member.getParent();
-    this.workspace = this.package.getWorkspace();
+    this.folder = member.getParent();
+    this.workspace = this.folder.getWorkspace();
 	
     this.dependsOn = [];
     this.variables = {};
@@ -292,9 +292,9 @@ visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,
     var namePath = this.getVariableDescription(node);
 	
 	//lookup the member
-	//first determine the name base package on which the name is based
-	//we will base this on whether the first name in the path is in the package,
-	//first checking the local package and then the root package for the workspace
+	//first determine the name base folder on which the name is based
+	//we will base this on whether the first name in the path is in the folder,
+	//first checking the local folder and then the root folder for the workspace
 	
 	var object;
 	var internalReference;
@@ -302,15 +302,15 @@ visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,
 	var nameIndex = 0;
 	
     var baseName = namePath[nameIndex];
-	object = this.package.lookupChild(baseName);
+	object = this.folder.lookupChild(baseName);
 	if(object != null) {
 		internalReference = true;
         localReference = true;
 	}
 	else {
-		//check the root package
-		var basePackage = this.workspace.getRootPackage();
-		object = basePackage.lookupChild(baseName);
+		//check the root folder
+		var baseFolder = this.workspace.getRootFolder();
+		object = baseFolder.lookupChild(baseName);
 		if(object != null) {
 			internalReference = true;
             localReference = false;
@@ -322,14 +322,14 @@ visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,
 		}
 	}
 	
-	//we have determined the base package for the name, but we might not 
+	//we have determined the base folder for the name, but we might not 
 	//have the actual oject
-	while((nameIndex < namePath.length-1)&&(object != null)&&(object.getType() === "package")) {
+	while((nameIndex < namePath.length-1)&&(object != null)&&(object.getType() === "folder")) {
 		nameIndex++;
 		object = object.lookupChild(namePath[nameIndex]);
 	}
 	
-	//flag an error if we found a base package but not the proper object
+	//flag an error if we found a base folder but not the proper object
 	if((internalReference)&&(object == null)) {
 		//this shouldn't happen. If it does we didn't code the syntax tree right
         throw this.createParsingError("Table not found: ",node.loc);
@@ -355,8 +355,8 @@ visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,
         this.variables[objectKey] = varInfo;
     }
     
-    //store the info on how the variable was accessed - from the "local context" (relative to local package)
-    //or from the "root context" (relative to the root package)    
+    //store the info on how the variable was accessed - from the "local context" (relative to local folder)
+    //or from the "root context" (relative to the root folder)    
     if(internalReference) {
         if((localReference)&&(!varInfo.localRefBase)) {
             varInfo.localRefBase = baseName;

@@ -1,17 +1,17 @@
-visicomp.app.visiui.PackageUI = {};
+visicomp.app.visiui.FolderUI = {};
 
-visicomp.app.visiui.PackageUI.populatePackageWindow = function(childUI,package) {
+visicomp.app.visiui.FolderUI.populateFolderWindow = function(childUI,folder) {
     
     //subscribe to table update event
-    var packageUpdatedCallback = function(packageObject) {
-        if(packageObject === package) {
-            visicomp.app.visiui.TableUI.tableUpdated(childUI,package);
+    var folderUpdatedCallback = function(folderObject) {
+        if(folderObject === folder) {
+            visicomp.app.visiui.TableUI.tableUpdated(childUI,folder);
         }
     }
     
-    var workspace = package.getWorkspace();
+    var workspace = folder.getWorkspace();
     
-    workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, packageUpdatedCallback);
+    workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, folderUpdatedCallback);
     
     var window = childUI.getWindow();
     
@@ -24,7 +24,7 @@ visicomp.app.visiui.PackageUI.populatePackageWindow = function(childUI,package) 
 //    //create the edit button
 //    var editButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit"});
 //    editButton.onclick = function() {
-//        visicomp.app.visiui.PackageUI.createEditDialog(package);
+//        visicomp.app.visiui.FolderUI.createEditDialog(folder);
 //    }
 //    window.addTitleBarElement(editButton);
 	
@@ -33,7 +33,7 @@ visicomp.app.visiui.PackageUI.populatePackageWindow = function(childUI,package) 
 //    deleteButton.onclick = function() {
 //        //we should get confirmation
 //
-//		childUI.deletePackage();
+//		childUI.deleteFolder();
 //    }
 //    window.addTitleBarElement(deleteButton);
 

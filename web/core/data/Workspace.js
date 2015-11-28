@@ -6,14 +6,14 @@ visicomp.core.Workspace = function(name) {
     this.name = name;
     
     //initialize business logic handlers
-    visicomp.core.createpackage.initHandler(this);
+    visicomp.core.createfolder.initHandler(this);
     visicomp.core.createtable.initHandler(this);
     visicomp.core.createfunction.initHandler(this);
     visicomp.core.updatemember.initHandler(this);
     visicomp.core.deletechild.initHandler (this);
 
-    //add the root package
-	this.rootPackage = new visicomp.core.Package(this,name);
+    //add the root folder
+	this.rootFolder = new visicomp.core.Folder(this,name);
     
     //add an entry in the update code structure
     visicomp.core.functionCode[name] = {};
@@ -33,6 +33,6 @@ visicomp.core.Workspace.prototype.getType = function() {
 }
 
 /** this method gets the root packaage for the workspace. */
-visicomp.core.Workspace.prototype.getRootPackage = function() {
-    return this.rootPackage;
+visicomp.core.Workspace.prototype.getRootFolder = function() {
+    return this.rootFolder;
 }

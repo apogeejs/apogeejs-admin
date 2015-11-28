@@ -5,33 +5,33 @@ visicomp.app.visiui.WorkspaceUI = function(workspace,tab) {
     //properties
     this.tab = tab;
     this.objectUIMap = {};
-    this.activePackageName = null;
+    this.activeFolderName = null;
     this.workspace = workspace;
     this.name = workspace.getName();
     
     
 /////////////////////////////////////////////
-var rootPackage = workspace.getRootPackage();
+var rootFolder = workspace.getRootFolder();
 var objectInfo = {};
-	objectInfo.object = rootPackage;
+	objectInfo.object = rootFolder;
     //no ui object!!!
 	
-    this.objectUIMap[this.getObjectKey(rootPackage)] = objectInfo;
+    this.objectUIMap[this.getObjectKey(rootFolder)] = objectInfo;
 
 /////////////////////////////////////////////
 	
     //listeners
     var instance = this;
     
-    //add package created listener
+    //add folder created listener
     var objectAddedListener = function(object) {
         instance.objectAdded(object);
     }
-    this.workspace.addListener(visicomp.core.createpackage.PACKAGE_CREATED_EVENT, objectAddedListener);
+    this.workspace.addListener(visicomp.core.createfolder.PACKAGE_CREATED_EVENT, objectAddedListener);
     this.workspace.addListener(visicomp.core.createtable.TABLE_CREATED_EVENT, objectAddedListener);
     this.workspace.addListener(visicomp.core.createfunction.FUNCTION_CREATED_EVENT, objectAddedListener);
 	
-	//add package created listener
+	//add folder created listener
     var childDeletedListener = function(objectFullName) {
         instance.childDeleted(objectFullName);
     }
@@ -57,15 +57,15 @@ visicomp.app.visiui.WorkspaceUI.prototype.getChildUIObject = function(childObjec
 }
 
 /** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.addPackage = function(parent,name,isRoot) {
-    //create package
+visicomp.app.visiui.WorkspaceUI.prototype.addFolder = function(parent,name,isRoot) {
+    //create folder
     var handlerData = {};
     handlerData.name = name;
 	handlerData.parent = parent;
     handlerData.workspace = this.workspace;
 	handlerData.isRoot = isRoot;
     var result = this.workspace.callHandler(
-        visicomp.core.createpackage.CREATE_PACKAGE_HANDLER,
+        visicomp.core.createfolder.CREATE_PACKAGE_HANDLER,
         handlerData);
     return result;
 }
@@ -75,7 +75,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.addTable = function(parent, name) {
     //create table
     var handlerData = {};
     handlerData.name = name;
-    handlerData.package = parent;
+    handlerData.folder = parent;
     var result = this.workspace.callHandler(
         visicomp.core.createtable.CREATE_TABLE_HANDLER,
         handlerData);
@@ -99,7 +99,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.addFunction = function(parent, declara
     var handlerData = {};
     handlerData.name = name;
 	handlerData.argParens = argParens;
-    handlerData.package = parent;
+    handlerData.folder = parent;
     var result = this.workspace.callHandler(
         visicomp.core.createfunction.CREATE_FUNCTION_HANDLER,
         handlerData);

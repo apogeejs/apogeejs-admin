@@ -7,7 +7,7 @@ visicomp.core.deletechild = {};
  * Event object format:  //future add other options
  * { 
  *	name: [string]
- *	package: [package]
+ *	folder: [folder]
  * }
  */
 visicomp.core.deletechild.DELETE_CHILD_HANDLER = "deleteChild";

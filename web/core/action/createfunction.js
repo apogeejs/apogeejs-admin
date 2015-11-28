@@ -7,7 +7,7 @@ visicomp.core.createfunction = {};
  * Event object format:  //future add other options
  * { 
  *	name: [string]
- *	package: [package]
+ *	folder: [folder]
  * }
  */
 visicomp.core.createfunction.CREATE_FUNCTION_HANDLER = "createFunction";
@@ -30,11 +30,11 @@ visicomp.core.createfunction.onCreateFunction = function(event) {
 		//create functionObject
 		var name = event.name;
 		var argParens = event.argParens
-		var package = event.package;
-        var workspace = package.getWorkspace();
+		var folder = event.folder;
+        var workspace = folder.getWorkspace();
         
 		var functionObject = new visicomp.core.FunctionTable(workspace,name,argParens);
-		package.addChild(functionObject);
+		folder.addChild(functionObject);
 
 		//initialize data
 		functionObject.setData("");

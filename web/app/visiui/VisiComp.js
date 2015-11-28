@@ -19,9 +19,9 @@ visicomp.core.EventManager.init.call(this);
     menu.addEventMenuItem("Close","menuFileClose",null,this);
 
     menu = menuBar.addMenu("Workspace");
-    menu.addEventMenuItem("Add&nbsp;Package","workspaceAddPackage",null,this);
-    menu.addEventMenuItem("Add&nbsp;Table","packageAddTable",null,this);
-    menu.addEventMenuItem("Add&nbsp;Function","packageAddFunction",null,this);
+    menu.addEventMenuItem("Add&nbsp;Folder","workspaceAddFolder",null,this);
+    menu.addEventMenuItem("Add&nbsp;Table","folderAddTable",null,this);
+    menu.addEventMenuItem("Add&nbsp;Function","folderAddFunction",null,this);
 
     //add some tabs
     this.tabFrame = new visicomp.visiui.TabFrame(containerId);
@@ -69,18 +69,18 @@ visicomp.core.EventManager.init.call(this);
     
     //workspace menu
      //add menu listeners
-    var addPackageListener = function() {
+    var addFolderListener = function() {
         if(!instance.workspaceUI) {
             alert("There is no workspace open");
             return;
         }
         
-        var onCreate = function(parent,packageName) {
-            return instance.workspaceUI.addPackage(parent,packageName,false);
+        var onCreate = function(parent,folderName) {
+            return instance.workspaceUI.addFolder(parent,folderName,false);
         }
-        visicomp.app.visiui.dialog.showCreateChildDialog("package",instance.workspaceUI.objectUIMap,instance.activePackageName,onCreate);
+        visicomp.app.visiui.dialog.showCreateChildDialog("folder",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
-    this.addListener("workspaceAddPackage",addPackageListener);
+    this.addListener("workspaceAddFolder",addFolderListener);
 
     var addTableListener = function() {
         if(!instance.workspaceUI) {
@@ -91,9 +91,9 @@ visicomp.core.EventManager.init.call(this);
         var onCreate = function(parent,tableName) {
             return instance.workspaceUI.addTable(parent,tableName);
         }
-        visicomp.app.visiui.dialog.showCreateChildDialog("table",instance.workspaceUI.objectUIMap,instance.activePackageName,onCreate);
+        visicomp.app.visiui.dialog.showCreateChildDialog("table",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
-    this.addListener("packageAddTable",addTableListener);
+    this.addListener("folderAddTable",addTableListener);
     
     var addFunctionListener = function() {
         if(!instance.workspaceUI) {
@@ -104,9 +104,9 @@ visicomp.core.EventManager.init.call(this);
         var onCreate = function(parent,functionName) {
             return instance.workspaceUI.addFunction(parent,functionName);
         }
-        visicomp.app.visiui.dialog.showCreateChildDialog("function",instance.workspaceUI.objectUIMap,instance.activePackageName,onCreate);
+        visicomp.app.visiui.dialog.showCreateChildDialog("function",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
-    this.addListener("packageAddFunction",addFunctionListener);
+    this.addListener("folderAddFunction",addFunctionListener);
 }
 
 //add components to this class
@@ -137,7 +137,12 @@ visicomp.app.visiui.VisiComp.prototype.workspaceOpen = function() {
 }
 
 visicomp.app.visiui.VisiComp.prototype.getWorkspace = function() {
-	return this.workspace;
+    if(this.workspaceUI) {
+        return this.workspaceUI.getWorkspace();
+    }
+    else {
+        return null;
+    }
 }
 
 visicomp.app.visiui.VisiComp.prototype.getWorkspaceUI = function() {

@@ -18,7 +18,7 @@ visicomp.app.visiui.workspaceToJson = function(workspace) {
     json.name = workspace.getName();
     json.fileType = "visicomp workspace";
     json.data = {};
-	var childMap = workspace.getRootPackage().getChildMap();
+	var childMap = workspace.getRootFolder().getChildMap();
 	for(var key in childMap) {
 		var child = childMap[key];
 		json.data[key] = visicomp.app.visiui.childToJson(child);
@@ -36,7 +36,7 @@ visicomp.app.visiui.childToJson = function(child) {
     var temp;
     
     switch(json.type) {
-        case "package":
+        case "folder":
             json.children = {};
             var childMap = child.getChildMap();
             for(var key in childMap) {
@@ -84,15 +84,21 @@ visicomp.app.visiui.workspaceFromJson = function(app, json) {
     var workspaceUI = app.getWorkspaceUI();
 	
 	//create children
-	var parent = workspace.getRootPackage();
+	var parent = workspace.getRootFolder();
 	var childMap = json.data;
 	var childUpdateDataList = [];
 	for(var key in childMap) {
 		var childJson = childMap[key];
 		visicomp.app.visiui.childFromJson(workspaceUI, parent, childJson, childUpdateDataList);
 	}
+    
+    //set the data on all the objects
+    var result = workspace.callHandler(
+        visicomp.core.updatemember.UPDATE_MEMBERS_HANDLER,
+        childUpdateDataList);
 	
-	return {"success":true};
+//figure out a better return
+	return result;
 }
 
 /** This mehtod serializes a child object. 
@@ -107,8 +113,16 @@ visicomp.app.visiui.childFromJson = function(workspaceUI,parent,childJson,childU
     
 	//create the object
     switch(type) {
-        case "package":
-            workspaceUI.addPackage(parent,name,false);
+        case "folder":
+            workspaceUI.addFolder(parent,name,false);
+            
+            //add the contents of this folder
+            childObject = parent.lookupChild(name);
+            var grandchildrenJson = childJson.children;
+            for(var key in grandchildrenJson) {
+                var grandchildJson = grandchildrenJson[key];
+                visicomp.app.visiui.childFromJson(workspaceUI, childObject, grandchildJson, childUpdateDataList);
+            }
             break;
             
         case "table":

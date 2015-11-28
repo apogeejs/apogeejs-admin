@@ -1,6 +1,6 @@
 /** This encapsulates the namespace functionality of the objects in the workspace.
- * The namespaces are given by packages and the extending objects represent items
- * in the namespace (including packages, tables, functions, etc.). Each object can
+ * The namespaces are given by folders and the extending objects represent items
+ * in the namespace (including folders, tables, functions, etc.). Each object can
  * have a data object, such as a JSON for a table, which is what the developer will
  * access for the given name.
  * 
@@ -37,13 +37,13 @@ visicomp.core.Child.getFullName = function() {
 	}
 }
 
-/** This returns the parent for this package. For the root package
+/** This returns the parent for this folder. For the root folder
  * this value is null. */
 visicomp.core.Child.getParent = function() {
 	return this.parent;
 }
 
-/** This sets the parent for this package.
+/** This sets the parent for this folder.
  * @private*/
 visicomp.core.Child.setParent = function(parent) {
 	this.parent = parent;
@@ -58,8 +58,8 @@ visicomp.core.Child.getWorkspace = function() {
    return this.workspace;
 }
 
-/** this method gets the root package/namespace for this object. */
-visicomp.core.Child.getRootPackage = function() {
+/** this method gets the root folder/namespace for this object. */
+visicomp.core.Child.getRootFolder = function() {
     var ancestor = this;
 	while(ancestor) {
 		var parent = ancestor.getParent();
@@ -105,7 +105,7 @@ visicomp.core.Child.setData = function(data) {
     this.data = data;
     
     //data the data map in the parent if it is a hierarchy container 
-    if((this.parent)&&(this.parent.getType() == "package")) {
+    if((this.parent)&&(this.parent.getType() == "folder")) {
         this.parent.updateData(this);
     }
 }
@@ -114,7 +114,7 @@ visicomp.core.Child.setData = function(data) {
  * can extend this function, but it should call this base version of the function
  * if it does.  */
 visicomp.core.Child.onDelete = function() {
-	if((this.parent != null)&&(this.parent.getType() === "package")) {
+	if((this.parent != null)&&(this.parent.getType() === "folder")) {
 		this.parent.removeChild(this);
 	}
 }

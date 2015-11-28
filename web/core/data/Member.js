@@ -239,8 +239,8 @@ visicomp.core.Member.clearFunction = function() {
 visicomp.core.Member.makeFunction = function(_functionText) {
 	//var names are obscured because these will appear in the member function closure
 	var _sourceFunction;
-	var _localPackage = this.getParent();
-	var _rootPackage = this.getRootPackage();
+	var _localFolder = this.getParent();
+	var _rootFolder = this.getRootFolder();
 	
 	//execute the code to create the source function
     eval(_functionText);
@@ -328,11 +328,11 @@ visicomp.core.Member.MEMBER_UPDATE_FORMAT_TEXT = [
    
 /** this is the code for adding the accessed member to the code
  * @private */
-visicomp.core.Member.LOCAL_ACCESSED_MEMBER_FORMAT_TEXT = 'var {0} = _localPackage.lookupChildData("{0}");\n';
+visicomp.core.Member.LOCAL_ACCESSED_MEMBER_FORMAT_TEXT = 'var {0} = _localFolder.lookupChildData("{0}");\n';
 
-/** this is the code for adding the accessed package to the code
+/** this is the code for adding the accessed folder to the code
  * @private */
-visicomp.core.Member.ROOT_ACCESSED_MEMBER_FORMAT_TEXT = 'var {0} = _rootPackage.lookupChildData("{0}");\n';
+visicomp.core.Member.ROOT_ACCESSED_MEMBER_FORMAT_TEXT = 'var {0} = _rootFolder.lookupChildData("{0}");\n';
     
 
 

@@ -24,8 +24,8 @@ visicomp.app.visiui.ChildUI = function(child,parentElement) {
     this.window.setContent(contentDiv);
 
 	switch(child.getType()) {
-		case "package":
-            visicomp.app.visiui.PackageUI.populatePackageWindow(this,child);
+		case "folder":
+            visicomp.app.visiui.FolderUI.populateFolderWindow(this,child);
 			break;
 			
 		case "table":

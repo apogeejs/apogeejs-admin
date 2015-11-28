@@ -7,7 +7,7 @@ visicomp.core.createtable = {};
  * Event object format:  //future add other options
  * { 
  *	name: [string]
- *	package: [package]
+ *	folder: [folder]
  * }
  */
 visicomp.core.createtable.CREATE_TABLE_HANDLER = "createTable";
@@ -29,11 +29,11 @@ visicomp.core.createtable.onCreateTable = function(event) {
     try {
 		//create table
 		var name = event.name;
-		var package = event.package;
-        var workspace = package.getWorkspace();
+		var folder = event.folder;
+        var workspace = folder.getWorkspace();
         
 		var table = new visicomp.core.Table(workspace,name);
-		package.addChild(table);
+		folder.addChild(table);
 
 		//initialize data
 		table.setData("");

@@ -22,12 +22,12 @@ visicomp.core.createworkspace.CREATE_WORKSPACE_HANDLER = "createWorkspace";
 visicomp.core.createworkspace.WORKSPACE_CREATED_EVENT = "workspaceCreated";
 
 
-/** This is the listener for the create package event. */
+/** This is the listener for the create folder event. */
 visicomp.core.createworkspace.onCreateWorkspace = function(event) {
 	var returnValue;
     
     try {
-		//create package
+		//create folder
 		var name = event.name;
 		var workspace = new visicomp.core.Workspace(name);     
         
@@ -47,7 +47,7 @@ visicomp.core.createworkspace.onCreateWorkspace = function(event) {
     return returnValue;
 }
     
-/** This method subscribes to the create package handler event */
+/** This method subscribes to the create folder handler event */
 visicomp.core.createworkspace.initHandler = function(eventManager) {
     eventManager.addHandler(visicomp.core.createworkspace.CREATE_WORKSPACE_HANDLER, 
             visicomp.core.createworkspace.onCreateWorkspace);

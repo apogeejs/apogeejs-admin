@@ -69,7 +69,7 @@ visicomp.app.visiui.FunctionUI.updateFunction = function(functionObject,function
 	
 	var updateEventData = visicomp.app.visiui.FunctionUI.getUpdateEventData(functionObject,functionBody,supplementalCode)
 	
-     var workspace = functionObject.getWorkspace();
+    var workspace = functionObject.getWorkspace();
     var result = workspace.callHandler(
         visicomp.core.updatemember.UPDATE_MEMBER_HANDLER,
         updateEventData);

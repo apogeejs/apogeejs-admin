@@ -1,5 +1,5 @@
 
-/** This method shows a save package dialog. I simply displays the text of
+/** This method shows a save folder dialog. I simply displays the text of
  * the workspace json for the user to copy and save elsewhere. */
 visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(workspaceUI) {
     

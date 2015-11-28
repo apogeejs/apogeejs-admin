@@ -1,7 +1,7 @@
 /** This method shows a create table dialog. The argument onCreateFunction
- * should take the package and the table name as arguments and return an object with the boolean entry
+ * should take the folder and the table name as arguments and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTypeName,objectUIMap,activePackageKey,onCreateFunction) {
+visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTypeName,objectUIMap,activeFolderKey,onCreateFunction) {
 
     var dialog = new visicomp.visiui.Dialog("",{"movable":true});
     
@@ -15,16 +15,16 @@ visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTypeName,objec
     line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"New " + objectTypeName}));
     content.appendChild(line);
     
-    //package selection
+    //folder selection
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(document.createTextNode("Package:"));
+    line.appendChild(document.createTextNode("Folder:"));
     var select = visicomp.visiui.createElement("select");
     line.appendChild(select);
     for(var key in objectUIMap) {
 		var object = objectUIMap[key].object;
-		if(object.getType() == "package") { 
+		if(object.getType() == "folder") { 
 			select.add(visicomp.visiui.createElement("option",{"text":key}));
-			if(key == activePackageKey) {
+			if(key == activeFolderKey) {
 				select.value = key;
 			}
 		}
@@ -45,15 +45,15 @@ visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTypeName,objec
     }
     
     var onCreate = function() {
-		packageName = select.value;
-        var package = objectUIMap[packageName].object;
+		folderName = select.value;
+        var folder = objectUIMap[folderName].object;
         var objectName = inputElement.value.trim();
         if(objectName.length == 0) {
             alert("The name is invalid");
             return;
         }
         
-        var result = onCreateFunction(package,objectName);
+        var result = onCreateFunction(folder,objectName);
         
         if(result.success) {
             dialog.hide();
