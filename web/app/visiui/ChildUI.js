@@ -35,6 +35,10 @@ visicomp.app.visiui.ChildUI = function(child,parentElement) {
 		case "function":
             visicomp.app.visiui.FunctionUI.populateFunctionWindow(this,child);
 			break;
+            
+        case "control":
+            visicomp.app.visiui.ControlUI.populateControlWindow(this,child);
+			break;
 			
 		default:
 			alert("Unsupported object type for a UI object");

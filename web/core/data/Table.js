@@ -9,11 +9,6 @@ visicomp.core.Table = function(workspace,name) {
 visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Member);
 
-/** Test function. */
-visicomp.core.Table.prototype.print = function() {
-    console.log("name: " + this.getData());
-}
-
 /** This method sets the data for this object. It also
  * freezes the object so it is immutable. */
 visicomp.core.Table.prototype.setData = function(data) {

@@ -12,7 +12,7 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
     
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Update Folder"}));
+    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Update Table"}));
     content.appendChild(line);
         
     //editor selector

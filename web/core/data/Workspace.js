@@ -9,7 +9,9 @@ visicomp.core.Workspace = function(name) {
     visicomp.core.createfolder.initHandler(this);
     visicomp.core.createtable.initHandler(this);
     visicomp.core.createfunction.initHandler(this);
+    visicomp.core.createcontrol.initHandler(this);
     visicomp.core.updatemember.initHandler(this);
+    visicomp.core.updatecontrol.initHandler(this);
     visicomp.core.deletechild.initHandler (this);
 
     //add the root folder

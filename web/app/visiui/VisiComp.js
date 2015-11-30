@@ -23,6 +23,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     menu.addEventMenuItem("Add&nbsp;Folder","workspaceAddFolder",null,this);
     menu.addEventMenuItem("Add&nbsp;Table","folderAddTable",null,this);
     menu.addEventMenuItem("Add&nbsp;Function","folderAddFunction",null,this);
+    menu.addEventMenuItem("Add&nbsp;Control","folderAddControl",null,this);
 
     //create the tab frame - this puts a tab for each workspace, even though
     //for now you can only make one workspace.
@@ -127,6 +128,20 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         visicomp.app.visiui.dialog.showCreateChildDialog("function",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
     this.addListener("folderAddFunction",addFunctionListener);
+    
+    //add table listener
+    var addControlListener = function() {
+        if(!instance.workspaceUI) {
+            alert("There is no workspace open");
+            return;
+        }
+        
+        var onCreate = function(parent,controlName) {
+            return instance.workspaceUI.addControl(parent,controlName);
+        }
+        visicomp.app.visiui.dialog.showCreateChildDialog("table",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
+    }
+    this.addListener("folderAddControl",addControlListener);
 }
 
 //add components to this class

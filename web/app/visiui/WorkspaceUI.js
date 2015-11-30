@@ -27,6 +27,7 @@ var objectInfo = {};
     this.workspace.addListener(visicomp.core.createfolder.PACKAGE_CREATED_EVENT, objectAddedListener);
     this.workspace.addListener(visicomp.core.createtable.TABLE_CREATED_EVENT, objectAddedListener);
     this.workspace.addListener(visicomp.core.createfunction.FUNCTION_CREATED_EVENT, objectAddedListener);
+    this.workspace.addListener(visicomp.core.createcontrol.CONTROL_CREATED_EVENT, objectAddedListener);
 	
 	//add folder created listener
     var childDeletedListener = function(objectFullName) {
@@ -99,6 +100,18 @@ visicomp.app.visiui.WorkspaceUI.prototype.addFunction = function(parent, declara
     handlerData.folder = parent;
     var result = this.workspace.callHandler(
         visicomp.core.createfunction.CREATE_FUNCTION_HANDLER,
+        handlerData);
+    return result;
+}
+
+/** This method responds to a "new" menu event. */
+visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(parent, name) {
+    //create table
+    var handlerData = {};
+    handlerData.name = name;
+    handlerData.folder = parent;
+    var result = this.workspace.callHandler(
+        visicomp.core.createcontrol.CREATE_CONTROL_HANDLER,
         handlerData);
     return result;
 }
