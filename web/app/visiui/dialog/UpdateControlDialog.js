@@ -115,31 +115,28 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
             controlHtml = htmlEditor.getSession().getValue();
         }
 		else {
-			controlHtml = null;
+			controlHtml = control.getHtml();
 		}
 			
         if(onLoadEditor) {
             controlOnLoad = onLoadEditor.getSession().getValue().trim();
-			if(controlOnLoad.length === 0) controlOnLoad = null;
 		}
 		else {
-			controlOnLoad = null;
+			controlOnLoad = control.getOnLoadBody();
 		}
 		
 		if(supplementalEditor) {
             supplementalCode = supplementalEditor.getSession().getValue().trim();
-			if(supplementalCode.length === 0) supplementalCode = null;
 		}
 		else {
-			supplementalCode = null;
+			supplementalCode = control.getSupplementalCode();
 		}
         
         if(cssEditor) {
             css = cssEditor.getSession().getValue().trim();
-			if(css.length === 0) css = null;
 		}
 		else {
-			css = null;
+			css = control.getCss();
 		}
         
         if(jsLinkEditor) {
@@ -147,7 +144,7 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
 			if(jsLink.length === 0) jsLink = null;
 		}
 		else {
-			jsLink = null;
+			jsLink = control.getJsLink();
 		}
         var result = onSaveFunction(control,controlHtml,controlOnLoad,supplementalCode,css,jsLink);
         

@@ -63,6 +63,14 @@ visicomp.app.visiui.childToJson = function(child) {
             json.supplementalCode = child.getSupplementalCode();
             break;
             
+        case "control":
+            json.html = child.getHtml();
+            json.onLoadBody = child.getOnLoadBody();
+            json.supplementalCode = child.getSupplementalCode();
+            json.css = child.getCss();
+            json.jsLink = child.getJsLink();
+            break;
+            
     }
     
     return json;
@@ -86,16 +94,32 @@ visicomp.app.visiui.workspaceFromJson = function(app, json) {
 	//create children
 	var parent = workspace.getRootFolder();
 	var childMap = json.data;
-	var childUpdateDataList = [];
+	var dataToUpdate = {};
+    dataToUpdate.members = [];
+    dataToUpdate.controls = [];
 	for(var key in childMap) {
 		var childJson = childMap[key];
-		visicomp.app.visiui.childFromJson(workspaceUI, parent, childJson, childUpdateDataList);
+		visicomp.app.visiui.childFromJson(workspaceUI, parent, childJson, dataToUpdate);
 	}
     
     //set the data on all the objects
-    var result = workspace.callHandler(
-        visicomp.core.updatemember.UPDATE_MEMBERS_HANDLER,
-        childUpdateDataList);
+    var result;
+    if(dataToUpdate.members.length > 0) {
+        result = workspace.callHandler(
+            visicomp.core.updatemember.UPDATE_MEMBERS_HANDLER,
+            dataToUpdate.members);
+            
+        if(!result.success) {
+            return result;
+        }
+    }
+    
+    for(var i = 0; i < dataToUpdate.controls.length; i++) {
+        result = workspace.callHandler(
+            visicomp.core.updatecontrol.UPDATE_CONTROL_HANDLER,
+            dataToUpdate.controls[i]);
+    }
+    
 	
 //figure out a better return
 	return result;
@@ -103,7 +127,7 @@ visicomp.app.visiui.workspaceFromJson = function(app, json) {
 
 /** This mehtod serializes a child object. 
  * @private */
-visicomp.app.visiui.childFromJson = function(workspaceUI,parent,childJson,childUpdateDataList) {
+visicomp.app.visiui.childFromJson = function(workspaceUI,parent,childJson,dataToUpdate) {
     var name = childJson.name;
     var type = childJson.type;
 	
@@ -131,7 +155,7 @@ visicomp.app.visiui.childFromJson = function(workspaceUI,parent,childJson,childU
 			//lookup the child and create the update event objecct for it
 			childObject = parent.lookupChild(name);
 			childUpdateData = visicomp.app.visiui.TableUI.getUpdateEventData(childObject,childJson.data,childJson.formula,childJson.supplementalCode);
-			childUpdateDataList.push(childUpdateData);
+			dataToUpdate.members.push(childUpdateData);
             break;
             
         case "function":
@@ -141,7 +165,17 @@ visicomp.app.visiui.childFromJson = function(workspaceUI,parent,childJson,childU
 			//lookup the child and create the update event objecct for it
 			childObject = parent.lookupChild(name);
 			childUpdateData = visicomp.app.visiui.FunctionUI.getUpdateEventData(childObject,childJson.functionBody,childJson.supplementalCode);
-			childUpdateDataList.push(childUpdateData);
+			dataToUpdate.members.push(childUpdateData);
+            break;
+            
+        case "control":
+			workspaceUI.addControl(parent,name);
+			
+			//lookup the child and create the update event objecct for it
+			childObject = parent.lookupChild(name);
+			childUpdateData = visicomp.app.visiui.ControlUI.getUpdateEventData(childObject,childJson.html,
+                childJson.onLoadBody,childJson.supplementalCode,childJson.css,childJson.jsLink);
+			dataToUpdate.controls.push(childUpdateData);
             break;
             
     }

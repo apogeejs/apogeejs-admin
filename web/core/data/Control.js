@@ -74,6 +74,7 @@ visicomp.core.Control.prototype.getJsLink = function() {
     return this.jsLink;
 }
 
+/** @private */
 visicomp.core.Control.prototype.addJsLinks = function(linkText) {
     if(!linkText) {
         this.linkArray = [];
@@ -93,6 +94,7 @@ visicomp.core.Control.prototype.addJsLinks = function(linkText) {
     //for now I don't remove links - add that later? (must be global!)
 }
 
+/** @private */
 visicomp.core.Control.prototype.setLink = function(link) {
     //set the link as the element id
     var element = document.getElementById(link);
