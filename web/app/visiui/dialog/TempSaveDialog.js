@@ -1,14 +1,14 @@
 
 /** This method shows a save folder dialog. I simply displays the text of
  * the workspace json for the user to copy and save elsewhere. */
-visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(workspaceUI) {
+visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
     
     if((!workspaceUI)||(!workspaceUI.getWorkspace())) {
         alert("There is no workspace open.");
         return;
     }
     
-    var workspaceJson = visicomp.app.visiui.workspaceToJson(workspaceUI.getWorkspace());
+    var workspaceJson = visicomp.app.visiui.workspaceToJson(app, workspaceUI.getWorkspace());
     var workspaceText = JSON.stringify(workspaceJson);
 
     var dialog = new visicomp.visiui.Dialog("Dialog",{"resizable":true,"movable":true});

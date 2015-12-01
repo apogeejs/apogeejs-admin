@@ -13,16 +13,30 @@
  * - do a single multi object update event to set all data as needed 
 
 /** This is used for saving the workspace. */
-visicomp.app.visiui.workspaceToJson = function(workspace) {
+visicomp.app.visiui.workspaceToJson = function(app, workspace) {
     var json = {};
     json.name = workspace.getName();
     json.fileType = "visicomp workspace";
+    
+    //links - this is part of app, not workspace, but for now we sav it with workspace!!!
+    var jsLinks = app.getJsLinks();
+    if((jsLinks)&&(jsLinks.length > 0)) {
+        json.jsLinks = jsLinks;
+    }
+    var cssLinks = app.getCssLinks();
+    if((jsLinks)&&(jsLinks.length > 0)) {
+        json.cssLinks = cssLinks;
+    }
+    
+    //children
     json.data = {};
 	var childMap = workspace.getRootFolder().getChildMap();
 	for(var key in childMap) {
 		var child = childMap[key];
 		json.data[key] = visicomp.app.visiui.childToJson(child);
 	}
+    
+    
     return json;
 }
 
@@ -68,7 +82,6 @@ visicomp.app.visiui.childToJson = function(child) {
             json.onLoadBody = child.getOnLoadBody();
             json.supplementalCode = child.getSupplementalCode();
             json.css = child.getCss();
-            json.jsLink = child.getJsLink();
             break;
             
     }
@@ -85,6 +98,15 @@ visicomp.app.visiui.workspaceFromJson = function(app, json) {
 		alert("Error openging file");
 		return null;
 	}
+    
+    //add links
+// we really need to wait for them to load
+    if(json.jsLinks) {
+        app.setJsLinks(json.jsLinks);
+    }
+    if(json.csssLinks) {
+        app.setCssLinks(json.cssLinks);
+    }
 	
 	//create the workspace
     app.createWorkspace(name);
@@ -174,7 +196,7 @@ visicomp.app.visiui.childFromJson = function(workspaceUI,parent,childJson,dataTo
 			//lookup the child and create the update event objecct for it
 			childObject = parent.lookupChild(name);
 			childUpdateData = visicomp.app.visiui.ControlUI.getUpdateEventData(childObject,childJson.html,
-                childJson.onLoadBody,childJson.supplementalCode,childJson.css,childJson.jsLink);
+                childJson.onLoadBody,childJson.supplementalCode,childJson.css);
 			dataToUpdate.controls.push(childUpdateData);
             break;
             

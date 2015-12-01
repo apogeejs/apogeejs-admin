@@ -8,6 +8,12 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     //temp - until we figure out what to do with menu and events
     //for now we have application events, using the EventManager mixin below.
     visicomp.core.EventManager.init.call(this);
+    
+    //external links (empty for now)
+    this.jsLinksText = "";
+    this.jsLinkArray = [];
+    this.cssLinksText = "";
+    this.cssLinkArray = [];
 
     //create menus
     var menuBar = new visicomp.visiui.MenuBar(containerId);
@@ -24,6 +30,9 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     menu.addEventMenuItem("Add&nbsp;Table","folderAddTable",null,this);
     menu.addEventMenuItem("Add&nbsp;Function","folderAddFunction",null,this);
     menu.addEventMenuItem("Add&nbsp;Control","folderAddControl",null,this);
+    
+    menu = menuBar.addMenu("Libraries");
+    menu.addEventMenuItem("Update&nbsp;Links","externalLinks",null,this);
 
     //create the tab frame - this puts a tab for each workspace, even though
     //for now you can only make one workspace.
@@ -70,7 +79,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
             return;
         }
         
-        visicomp.app.visiui.dialog.showSaveWorkspaceDialog(instance.workspaceUI); 
+        visicomp.app.visiui.dialog.showSaveWorkspaceDialog(instance, instance.workspaceUI); 
     }
     this.addListener("menuFileSave",saveListener);
     
@@ -129,7 +138,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     }
     this.addListener("folderAddFunction",addFunctionListener);
     
-    //add table listener
+    //add control listener
     var addControlListener = function() {
         if(!instance.workspaceUI) {
             alert("There is no workspace open");
@@ -142,6 +151,13 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         visicomp.app.visiui.dialog.showCreateChildDialog("table",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
     this.addListener("folderAddControl",addControlListener);
+    
+    //external menu
+    //add links listener
+    var udpateLinksListener = function() {
+        visicomp.app.visiui.dialog.showUpdateLinksDialog(instance);
+    }
+    this.addListener("externalLinks",udpateLinksListener);
 }
 
 //add components to this class
@@ -177,4 +193,94 @@ visicomp.app.visiui.VisiComp.prototype.getWorkspace = function() {
 
 visicomp.app.visiui.VisiComp.prototype.getWorkspaceUI = function() {
 	return this.workspaceUI;
+}
+
+visicomp.app.visiui.VisiComp.prototype.getJsLinks = function() {
+	return this.jsLinks;
+}
+
+visicomp.app.visiui.VisiComp.prototype.setJsLinks = function(jsLinks) {
+	this.jsLinks = jsLinks;
+    
+    //update the page links
+    var newLinkArray = this.createLinkArray(jsLinks);
+    var oldLinkArray = this.jsLinkArray;
+    this.updateLinkArray(newLinkArray,oldLinkArray,visicomp.app.visiui.VisiComp.setJsLink);
+    this.jsLinkArray = newLinkArray;
+}
+
+visicomp.app.visiui.VisiComp.prototype.getCssLinks = function() {
+	return this.cssLinks;
+}
+
+visicomp.app.visiui.VisiComp.prototype.setCssLinks = function(cssLinks) {
+	this.cssLinks = cssLinks;
+    
+    //update the page links
+    var newLinkArray = this.createLinkArray(cssLinks);
+    var oldLinkArray = this.cssLinkArray;
+    this.updateLinkArray(newLinkArray,oldLinkArray,visicomp.app.visiui.VisiComp.setCssLink);
+    this.cssLinkArray = newLinkArray;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+/** @private */
+visicomp.app.visiui.VisiComp.prototype.createLinkArray = function(linkText) {
+    if((!linkText)||(linkText.length === 0)) {
+        return [];
+    }
+    else {
+        return linkText.split(/\s/);
+    }
+}
+
+/** @private */
+visicomp.app.visiui.VisiComp.prototype.updateLinkArray = function(linkArray,oldLinkArray,setLinkFunction) { 
+    
+    var newLinks = {};
+    var i;
+    var link;
+    
+    //add the new links
+    for(i = 0; i < linkArray.length; i++) {
+        //create the link
+        link = linkArray[i];
+        if(link.length > 0) {
+            setLinkFunction(link);
+        }
+        
+        newLinks[link] = true;
+    }
+    
+    //delete unused old links
+    for(i = 0; i < oldLinkArray.length; i++) {
+        link = oldLinkArray[i];
+        if(!newLinks[i]) {
+            //delete this link
+            var element = document.getElementById(link);
+            document.head.removeChild(element);
+        }
+    }
+}
+
+/** @private */
+visicomp.app.visiui.VisiComp.setJsLink = function(link) {
+    //set the link as the element id
+    var element = document.getElementById(link);
+    if(!element) {
+        element = visicomp.visiui.createElement("script",{"id":link,"src":link});
+        document.head.appendChild(element);
+    }
+}
+
+/** @private */
+visicomp.app.visiui.VisiComp.setCssLink = function(link) {
+    //set the link as the element id
+    var element = document.getElementById(link);
+    if(!element) {
+        element = visicomp.visiui.createElement("link",{"id":link,"rel":"stylesheet","type":"text/css","href":link});
+        document.head.appendChild(element);
+    }
 }

@@ -29,9 +29,6 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
     var cssRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"css"});
     line.appendChild(cssRadio);
     line.appendChild(document.createTextNode("CSS"));
-    var jsLinkRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"jsLink"});
-    line.appendChild(jsLinkRadio);
-    line.appendChild(document.createTextNode("JS Links"));
     content.appendChild(line);
     
     //editors
@@ -87,16 +84,6 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
     var cssEditor = null;
     editorDiv.appendChild(cssEditorDiv);
     
-    var jsLinkEditorDiv = visicomp.visiui.createElement("div",null,{
-        "position":"absolute",
-        "top":"0px",
-        "bottom":"0px",
-        "right":"0px",
-        "left":"0px"
-    });
-    var jsLinkEditor = null;
-    editorDiv.appendChild(jsLinkEditorDiv);
-    
     //save and cancel buttons
     //buttons and handler
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
@@ -109,7 +96,6 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
 		var controlOnLoad;
 		var supplementalCode;
         var css;
-        var jsLink;
         
 		if(htmlEditor) {
             controlHtml = htmlEditor.getSession().getValue();
@@ -139,14 +125,7 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
 			css = control.getCss();
 		}
         
-        if(jsLinkEditor) {
-            jsLink = jsLinkEditor.getSession().getValue().trim();
-			if(jsLink.length === 0) jsLink = null;
-		}
-		else {
-			jsLink = control.getJsLink();
-		}
-        var result = onSaveFunction(control,controlHtml,controlOnLoad,supplementalCode,css,jsLink);
+        var result = onSaveFunction(control,controlHtml,controlOnLoad,supplementalCode,css);
         
         if(result.success) {
 			dialog.hide();
@@ -181,7 +160,6 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
         onLoadEditorDiv.style.display = "none";
         supplementalEditorDiv.style.display = "none";
         cssEditorDiv.style.display = "none";
-        jsLinkEditorDiv.style.display = "none";
         
         //create html editor if needed
         if(!htmlEditor) {
@@ -200,7 +178,6 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
         onLoadEditorDiv.style.display = "";
         supplementalEditorDiv.style.display = "none";
         cssEditorDiv.style.display = "none";
-        jsLinkEditorDiv.style.display = "none";
         
         //create onLoad editor if needed
         if(!onLoadEditor) {
@@ -222,7 +199,6 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
         onLoadEditorDiv.style.display = "none";
         supplementalEditorDiv.style.display = "";
         cssEditorDiv.style.display = "none";
-        jsLinkEditorDiv.style.display = "none";
         
         //create onLoad editor if needed
         if(!supplementalEditor) {
@@ -244,7 +220,6 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
         onLoadEditorDiv.style.display = "none";
         supplementalEditorDiv.style.display = "none";
         cssEditorDiv.style.display = "";
-        jsLinkEditorDiv.style.display = "none";
         
         //create html editor if needed
         if(!cssEditor) {
@@ -255,27 +230,6 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
             var css = control.getCss();
             if(css) {
                 cssEditor.getSession().setValue(css);
-            }
-        }
-    }
-    
-    var showJsLinkFunction = function() {
-        //hide the onLoad div and show the html dive
-        htmlEditorDiv.style.display = "none";
-        onLoadEditorDiv.style.display = "none";
-        supplementalEditorDiv.style.display = "none";
-        cssEditorDiv.style.display = "none";
-        jsLinkEditorDiv.style.display = "";
-        
-        //create html editor if needed
-        if(!jsLinkEditor) {
-            jsLinkEditor = ace.edit(jsLinkEditorDiv);
-            jsLinkEditor.setTheme("ace/theme/eclipse");
-            jsLinkEditor.getSession().setMode("ace/mode/text");
-            //set the value
-            var jsLink = control.getJsLink();
-            if(jsLink) {
-                jsLinkEditor.getSession().setValue(jsLink);
             }
         }
     }
@@ -298,16 +252,12 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
         else if(cssRadio.checked) {
             showCssFunction();
         }
-        else if(jsLinkRadio.checked) {
-            showJsLinkFunction();
-        }
     }
     
     onLoadRadio.onchange = onRadioChange;
     htmlRadio.onchange = onRadioChange;
     supplementalRadio.onchange = onRadioChange;
     cssRadio.onchange = onRadioChange;
-    jsLinkRadio.onchange = onRadioChange;
     
     //set the resize handler
     //resize the editor on window size change
@@ -327,7 +277,6 @@ visicomp.app.visiui.dialog.showUpdateControlDialog = function(control,onSaveFunc
         if(onLoadEditor) onLoadEditor.resize();
         if(supplementalEditor) supplementalEditor.resize();
         if(cssEditor) cssEditor.resize();
-        if(jsLinkEditor) jsLinkEditor.resize();
     }
     dialog.addListener("resize", resizeCallback);
 }

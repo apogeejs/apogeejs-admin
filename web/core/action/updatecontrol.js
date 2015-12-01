@@ -71,7 +71,7 @@ visicomp.core.updatecontrol.setContent = function(contentData) {
 	}
 
     //read handler data
-    control.setContent(contentData.html,contentData.onLoadBody,contentData.supplementalCode,contentData.css,contentData.jsLink);
+    control.setContent(contentData.html,contentData.onLoadBody,contentData.supplementalCode,contentData.css);
 		
     //fire this for the change in value
     visicomp.core.updatecontrol.fireUpdatedEvent(control);
