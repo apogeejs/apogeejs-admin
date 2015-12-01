@@ -167,7 +167,7 @@ visicomp.app.visiui.childFromJson = function(workspaceUI,parent,childJson,dataTo
             var grandchildrenJson = childJson.children;
             for(var key in grandchildrenJson) {
                 var grandchildJson = grandchildrenJson[key];
-                visicomp.app.visiui.childFromJson(workspaceUI, childObject, grandchildJson, childUpdateDataList);
+                visicomp.app.visiui.childFromJson(workspaceUI, childObject, grandchildJson, dataToUpdate);
             }
             break;
             

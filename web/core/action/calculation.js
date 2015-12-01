@@ -13,10 +13,12 @@ visicomp.core.calculation.fireUpdatedEvent = function(member) {
  * needs to be recalculated. It then adds all talbes that depend on this one.
  * @private */
 visicomp.core.calculation.addToRecalculateList = function(recalculateList,member) {
+    //if it is in the list, return
+    if(this.inList(recalculateList,member)) return;
      
     //add this member to recalculate list if it needs to be executed
     if(member.needsExecuting()) {
-        visicomp.core.calculation.placeInRecalculateList(recalculateList,member);
+       recalculateList.push(member);
     }
     //add any member that is depends on this one
     var impactsList = member.getImpactsList();
@@ -59,20 +61,14 @@ visicomp.core.calculation.addAll = function(folder,recalculateList) {
 /** This method places the member in the recalculate list, but only if the member is 
  * not already there. 
  *  @private */
-visicomp.core.calculation.placeInRecalculateList = function(recalculateList,member) {
-    //make sure it is not already in there
-    var inList = false;
+visicomp.core.calculation.inList = function(recalculateList,member) {
     for(var j = 0; j < recalculateList.length; j++) {
         var testObject = recalculateList[j];
         if(testObject == member) {
-            inList = true;
-            break;
+            return true;
         }
     }
-    //add to the list, if it is not already there
-    if(!inList) {
-        recalculateList.push(member);
-    }
+    return false;
 }
     
 
