@@ -60,9 +60,9 @@ visicomp.app.visiui.childToJson = function(child) {
             break;
             
         case "table":
-            temp = child.getEditorInfo();
+            temp = child.getFunctionBody();
             if(temp) {
-                json.formula = temp;
+                json.functionBody = temp;
                 json.supplementalCode = child.getSupplementalCode();
             }
             else {
@@ -72,7 +72,7 @@ visicomp.app.visiui.childToJson = function(child) {
             
         case "function":
             json.argParens = child.getArgParensString();
-            json.functionBody = child.getEditorInfo();
+            json.functionBody = child.getFunctionBody();
 			if((json.functionBody === null)||(json.functionBody === undefined)) json.functionBody = "";
             json.supplementalCode = child.getSupplementalCode();
             break;
@@ -176,7 +176,7 @@ visicomp.app.visiui.childFromJson = function(workspaceUI,parent,childJson,dataTo
 
 			//lookup the child and create the update event objecct for it
 			childObject = parent.lookupChild(name);
-			childUpdateData = visicomp.app.visiui.TableUI.getUpdateEventData(childObject,childJson.data,childJson.formula,childJson.supplementalCode);
+			childUpdateData = visicomp.app.visiui.TableUI.getUpdateEventData(childObject,childJson.data,childJson.functionBody,childJson.supplementalCode);
 			dataToUpdate.members.push(childUpdateData);
             break;
             

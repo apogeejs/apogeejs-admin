@@ -81,3 +81,8 @@ visicomp.core.Folder.prototype.updateData = function(child) {
     this.dataMap[name] = data;
 }
 
+visicomp.core.Folder.prototype.createFunctionInContext = function(functionText) {
+//TODO implement
+    alert("NOT IMPLEMNETED!");
+}
+

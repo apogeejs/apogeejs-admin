@@ -95,8 +95,7 @@ visicomp.app.visiui.FunctionUI.getUpdateEventData = function(functionObject,func
 	
 	var functionData = {};
     functionData.member = functionObject;
-	functionData.editorInfo = functionBody;
-	functionData.functionText = visicomp.app.visiui.FunctionUI.wrapFunctionBody(functionObject.getArgParensString(),functionBody);
+	functionData.functionBody = functionBody;
 	functionData.supplementalCode = supplementalCode;
 	
 	return functionData;

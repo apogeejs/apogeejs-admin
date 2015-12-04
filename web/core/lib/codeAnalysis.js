@@ -10,14 +10,6 @@
  * - The formula should not access any global variables. It should only use local
  * variables, the table variables and "value".
  **/ 
-visicomp.core.CodeAnalyzer = function(member) {
-    this.member = member;
-    this.folder = member.getParent();
-    this.workspace = this.folder.getWorkspace();
-	
-    this.dependsOn = [];
-    this.variables = {};
-}
 
 /** Syntax for AST, names from Esprima.
  * Each entry is a list of nodes inside a node of a given type. the list
@@ -28,7 +20,7 @@ visicomp.core.CodeAnalyzer = function(member) {
  *     modified:[boolean indicating if the field correspondes to a modified variable
  *     declaration:[boolean indicating if the field corrsponds to a field declaration]
  * @private */
-visicomp.core.CodeAnalyzer.syntax = {
+visicomp.core.codeAnalysis.syntax = {
     AssignmentExpression: [{name:'left',modified:true},{name:'right'}],
     ArrayExpression: [{name:'elements',list:true}],
     ArrowFunctionExpression: [{name:'params',list:true},{name:'body'},{name:'defaults',list:true}],
@@ -127,12 +119,6 @@ visicomp.core.CodeAnalyzer.syntax = {
     
 };
 
-/** This method returns the dependancy map for this formula. It is only valid
- * after a successful call to analyzeCode. */
-visicomp.core.CodeAnalyzer.prototype.getDependancies = function() {
-    return this.dependsOn;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 /** This method returns the error list for this formula. It is only valid
  * after a failed call to analyzeCode. 
@@ -148,34 +134,30 @@ visicomp.core.CodeAnalyzer.prototype.getDependancies = function() {
  * */
 ////////////////////////////////////////////////////////////////////////////////
 
-/** This method analyzes the code, caluclating the dependancies and checking for
- * errors. if true is returned, the dependencies can be retrieved. If false is returned
- * the errors can be retireved.
+/** This method parses the code and returns a list of variabls accessed. It throws
+ * an exception if there is an error parsing.
  **/
-visicomp.core.CodeAnalyzer.prototype.analyzeCode = function(functionText,supplementalCodeText) {
-        
-    //the parser needs something added here
-    var modifiedFunctionText = "var __x__ = " + functionText;
+visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
 
-    //get the code depedencies
-    this.extractVariables(modifiedFunctionText);
-    this.extractVariables(supplementalCodeText);
+    //parse the code
+    var ast = visicomp.core.codeAnalysis.parseCode(functionText);
 
-    //process the list of variables found in the ast
-    this.processVariableList();
+    //get the variable list
+    var varInfo = visicomp.core.codeAnalysis.getVariableInfo(ast);
+    
+    //return the variable info
+    return varInfo;
 }
 
-//-----------------------------------
-// Test parsing methods
-//-----------------------------------
 
 /** This method parses the code, returning the abstract syntax tree or 
- * any errors in the code. 
+ * any errors in the code. If there is an error parsing the code an exception
+ * is thrown.
  * @private */
-visicomp.core.CodeAnalyzer.prototype.extractVariables = function(codeText) {
-    //parse the code to generate the ast
-    var ast = this.parseCode(codeText);
-
+visicomp.core.codeAnalysis.parseCode = function(codeText) { 
+    //parse the code
+    var ast = esprima.parse(codeText, { tolerant: true, loc: true });
+    
     //check for errors in parsing
     if((ast.errors)&&(ast.errors.length > 0)) {
 		var error;
@@ -187,17 +169,8 @@ visicomp.core.CodeAnalyzer.prototype.extractVariables = function(codeText) {
 		}
         throw error;
     }
-
-    //analyze the ast
-    this.analyzeAst(ast);
-}
-
-/** This method parses the code, returning the abstract syntax tree or 
- * any errors in the code. 
- * @private */
-visicomp.core.CodeAnalyzer.prototype.parseCode = function(codeText) { 
-    //parse the code
-    return esprima.parse(codeText, { tolerant: true, loc: true });
+    
+    return ast;
 }
 
 /** This method analyzes the AST to find the variabls accessed from the formula.
@@ -220,39 +193,100 @@ visicomp.core.CodeAnalyzer.prototype.parseCode = function(codeText) {
  * is modified. (Note this is not exhaustive. Checks that are not doen here will
  * be enforced elsewhere, though it would be preferebly to get them here.
  * @private */
-visicomp.core.CodeAnalyzer.prototype.analyzeAst = function(ast) {
+visicomp.core.codeAnalysis.getVariableInfo = function(ast) {
+    
+    //create the var to hold the parse data
+    var processInfo = {};
+    processInfo.nameTable = {};
+    processInfo.scopeTable = {};
+    
+    //create the base scope
+    var scope = visicomp.core.codeAnalysis.startScope(processInfo);
+
     //traverse the tree, recursively
-    this.processTreeNode(ast,false,false);
+    visicomp.core.codeAnalysis.processTreeNode(processInfo,ast,false,false);
+    
+    //finish the base scope
+    visicomp.core.codeAnalysis.endScope(processInfo,scope);
+    
+    //finish analyzing the accessed variables
+    visicomp.core.codeAnalysis.markLocalVariables(processInfo);
+    
+    //return the variable names accessed
+    return processInfo.nameTable;
+}
+    
+/** This method starts a new loca variable scope, it should be called
+ * when a function starts. 
+ * @private */
+visicomp.core.codeAnalysis.startScope = function(processInfo) {
+    //initailize id gerneator
+    if(processInfo.scopeIdGenerator === undefined) {
+        processInfo.scopeIdGenerator = 0;
+    }
+    
+    //create scope
+    var scope = {};
+    scope.id = String(processInfo.scopeIdGenerator++);
+    scope.parent = processInfo.currentScope;
+    scope.localVariables ={};
+    
+    //save this as the current scope
+    processInfo.scopeTable[scope.id] = scope;
+    processInfo.currentScope = scope;
+}
+
+/** This method ends a local variable scope, reverting to the parent scope.
+ * It should be called when a function exits. 
+ * @private */
+visicomp.core.codeAnalysis.endScope = function(processInfo) {
+    var currentScope = processInfo.currentScope;
+    if(!currentScope) return;
+    
+    //set the scope to the parent scope.
+    processInfo.currentScope = currentScope.parent;
 }
 
 /** This method analyzes the AST (abstract syntax tree). 
  * @private */
-visicomp.core.CodeAnalyzer.prototype.processTreeNode = function(node,isModified,isDeclaration) {
+visicomp.core.codeAnalysis.processTreeNode = function(processInfo,node,isModified,isDeclaration) {
     
     //process the node type
     if((node.type == "Identifier")||(node.type == "MemberExpression")) {
-        this.processVariable(node,isModified,isDeclaration);
+        //process a variable
+        visicomp.core.codeAnalysis.processVariable(processInfo,node,isModified,isDeclaration);
+    } 
+    else if((node.type == "FunctionDeclaration")||(node.type == "FunctionExpression")) {
+        //process the functoin
+        visicomp.core.codeAnalysis.processFunction(processInfo,node);
+        
+    }
+    else if((node.type === NewExpression)&&(callee === "Function")) {
+        //we currently do not support the function constructor
+        //to add it we need to add the local variables and parse the text body
+        throw visicomp.core.codeAnalysis.createParsingError("Function constructor not currently supported!",node.loc); 
     }
     else {
-        this.processGenericNode(node);
+        //process some other node
+        visicomp.core.codeAnalysis.processGenericNode(processInfo,node);
     }
 }
    
 /** This method process nodes that are not variabls identifiers. This traverses 
  * down the syntax tree.
  * @private */
-visicomp.core.CodeAnalyzer.prototype.processGenericNode = function(node) {
+visicomp.core.codeAnalysis.processGenericNode = function(processInfo,node) {
     //load the syntax node info list for this node
-    var nodeInfoList = visicomp.core.CodeAnalyzer.syntax[node.type];
+    var nodeInfoList = visicomp.core.codeAnalysis.syntax[node.type];
     
     //process this list
     if(nodeInfoList === undefined) {
         //node not found
-        throw this.createParsingError("Syntax Tree Node not found: " + node.type,node.loc);
+        throw visicomp.core.codeAnalysis.createParsingError("Syntax Tree Node not found: " + node.type,node.loc);
     }
     else if(nodeInfoList === null) {
         //node not supported
-        throw this.createParsingError("Syntax node not supported: " + node.type,node.loc);
+        throw visicomp.core.codeAnalysis.createParsingError("Syntax node not supported: " + node.type,node.loc);
     }
     else {
         //this is a good node - process it
@@ -271,123 +305,111 @@ visicomp.core.CodeAnalyzer.prototype.processGenericNode = function(node) {
                 if(nodeInfo.list) {
                     //this is a list of child nodes
                     for(var j = 0; j < childField.length; j++) {
-                        this.processTreeNode(childField[j],nodeInfo.modified,nodeInfo.declaration);
+                        visicomp.core.codeAnalysis.processTreeNode(processInfo,childField[j],nodeInfo.modified,nodeInfo.declaration);
                     }
                 }
                 else {
                     //this is a single node
-                    this.processTreeNode(childField,nodeInfo.modified,nodeInfo.declaration);
+                    visicomp.core.codeAnalysis.processTreeNode(processInfo,childField,nodeInfo.modified,nodeInfo.declaration);
                 }
             }
         }
     }
 }
 
+/** This method processes nodes that are function. For functions a new scope is created 
+ * for the body of the function.
+ * @private */
+visicomp.core.codeAnalysis.prototype.processFunction = function(processInfo,node) {
+    var nodeType = node.type;
+    var idNode = node.id;
+    var params = node.params;
+    var body = node.body;
+    
+    //difference here between the declaration and expression
+    // - in declaration the name of the function is a variable in the parent scope
+    // - in expression the name is typically left of. But it can be included, in which case
+    //   it is a variable only in the child (function) scope. This lets the function call
+    //   itself.
+    
+    if((nodeType === "FunctionDeclaration")&&(idNode)) {
+        //parse id node (variable name) in the parent scope
+        visicomp.core.codeAnalysis.prototype.processTreeNode(processInfo,idNode,false,false);
+    }
+    
+    //create a new scope for this function
+    var scope = visicomp.core.codeAnalysis.startScope(processInfo);
+    
+    if((nodeType === "FunctionExpression")&&(idNode)) {
+        //parse id node (variable name) in the parent scope
+        visicomp.core.codeAnalysis.prototype.processTreeNode(processInfo,idNode,false,false);
+    }
+    
+    //process the variable list
+    for(var i = 0; i < params.length; i++) {
+        visicomp.core.codeAnalysis.processTreeNode(processInfo,params[i],false,true);
+    }
+    
+    //process the function body
+    visicomp.core.codeAnalysis.processTreeNode(processInfo,body,false,false);
+    
+    //end the scope for this function
+    visicomp.core.codeAnalysis.endScope(processInfo,scope);
+}
+
 /** This method processes nodes that are variables (identifiers and member expressions), adding
  * them to the list of variables which are used in tehe formula.
  * @private */
-visicomp.core.CodeAnalyzer.prototype.processVariable = function(node,isModified,isDeclaration) {
+visicomp.core.codeAnalysis.prototype.processVariable = function(processInfo,node,isModified,isDeclaration) {
     
-    //get the variables
-    var namePath = this.getVariableDescription(node);
-	
-	//lookup the member
-	//first determine the name base folder on which the name is based
-	//we will base this on whether the first name in the path is in the folder,
-	//first checking the local folder and then the root folder for the workspace
-	
-	var object;
-	var internalReference;
-    var localReference;
-	var nameIndex = 0;
-	
+    //get the variable path and the base name
+    var namePath = this.getVariableDotPath(node);
     var baseName = namePath[nameIndex];
-	object = this.folder.lookupChild(baseName);
-	if(object != null) {
-		internalReference = true;
-        localReference = true;
-	}
-	else {
-		//check the root folder
-		var baseFolder = this.workspace.getRootFolder();
-		object = baseFolder.lookupChild(baseName);
-		if(object != null) {
-			internalReference = true;
-            localReference = false;
-		}
-		else {
-			object = null;
-			internalReference = false;
-            localReference = false;
-		}
-	}
-	
-	//we have determined the base folder for the name, but we might not 
-	//have the actual oject
-	while((nameIndex < namePath.length-1)&&(object != null)&&(object.getType() === "folder")) {
-		nameIndex++;
-		object = object.lookupChild(namePath[nameIndex]);
-	}
-	
-	//flag an error if we found a base folder but not the proper object
-	if((internalReference)&&(object == null)) {
-		//this shouldn't happen. If it does we didn't code the syntax tree right
-        throw this.createParsingError("Table not found: ",node.loc);
-	}
-	
-    //add this variable to the variable list
-    var objectKey;
-    if(object != null) {
-        objectKey = object.getFullName();
-    }
-    else {
-//I AM NOT SURE WHAT TO USE FOR THE NAME HERE - this will be used for
-//detecting bad global usage, but it is not done now
-        objectKey = baseName;
+    
+    //add to the name table
+    var nameEntry = processInfo.nameTable[baseName];
+    if(!nameEntry) {
+        nameEntry = {};
+        nameEntry.name = baseName;
+        nameEntry.uses = [];
+        
+        processInfo.nameTable[baseName] = nameEntry;
     }
     
-    //get or create the var info for this variable
-    var varInfo = this.variables[objectKey];
-    if(!varInfo) {
-        varInfo = {};
-        varInfo.member = object;
-        varInfo.loc = node.loc; //save the first appearance of this variable
-        this.variables[objectKey] = varInfo;
-    }
+    //add a name use entry
+    var nameUse = {};
+    nameUse.path = namePath;
+    nameUse.scope = processInfo.currentScope;
+    nameUse.node = node;
+    nameUse.isModified = isModified;
     
-    //store the info on how the variable was accessed - from the "local context" (relative to local folder)
-    //or from the "root context" (relative to the root folder)    
-    if(internalReference) {
-        if((localReference)&&(!varInfo.localRefBase)) {
-            varInfo.localRefBase = baseName;
-        }
-        else if((!localReference)&&(!varInfo.rootRefBase)) {
-            varInfo.rootRefBase = baseName;
-        }
-    }
+    nameEntry.uses.push(nameUse);
     
-    //add modifier flags
-    if(isModified) {
-        varInfo.modifed = true;
-    }
+    //if this is a declaration store it as a local varaible
     if(isDeclaration) {
-        varInfo.local = true;
+        //store this in the local variables for this scope
+        var scopeLocalVariables = processInfo.currentScope.localVariables;
+        if(!scopeLocalVariables[baseName]) {
+            scopeLocalVariables[baseName] = true;
+        }
+        else {
+            //the variable is being redeclared! that is ok.
+        }
     }
 }
-
 
 /** This method returns the variable and its fields which are given by the node. 
  * In the case the fields are calculated, we do not attempt to return these
  * fields. We do however factor the expressions nodes into the dependencies. 
  * @private */
-visicomp.core.CodeAnalyzer.prototype.getVariableDescription = function(node) {
+visicomp.core.codeAnalysis.prototype.getVariableDotPath = function(node) {
     if(node.type == "Identifier") {
         //read the identifier name
         return [node.name];
     }
     else if(node.type == "MemberExpression") {
         //read the parent identifer
-        var variable = this.getVariableDescription(node.object);
+        var variable = this.getVariableDotPath(node.object);
         
         if(node.computed) {
             //the property name is an expression - process the expression but don't recording the field name
@@ -406,51 +428,32 @@ visicomp.core.CodeAnalyzer.prototype.getVariableDescription = function(node) {
     }
 }
 
-
-/** This method process the final variables list found in the ast, determining the
- * dependendcies and any errors. 
+/** This method annotates the variable usages that are local variables. 
  * @private */
-visicomp.core.CodeAnalyzer.prototype.processVariableList = function(allowDataAccess) {
-    
-    //process all the variables in the variable list
-    for(var key in this.variables) {
-        var variableInfo = this.variables[key];
-            
-        //check error cases
-        {
-            var msg;
-            
-//apply only to tables?
-            //this object can not be modified
-            if((variableInfo.member)&&(variableInfo.modified)) {
-                if(variableInfo.member == this.member) {
-                    msg = "To modify the local table use the variable name 'value' rather than the table name.";
+visicomp.core.codeAnalysis.markLocalVariables = function(processInfo) {
+    for(var key in processInfo.nameTable) {
+        var nameEntry = processInfo.nameTable;
+        var name = nameEntry.name;
+        for(var i = 0; i < nameEntry.uses.length; i++) {
+            var nameUse = nameEntry.uses[i];
+            var scope = nameUse.scope;
+            //check if this name is a local variable in this scope or a parent scope
+            var varScope = null;
+            for(var testScope = scope; testScope; testScope = testScope.parent) {
+                if(testScope.localVariables[name]) {
+                    varScope = testScope;
+                    break;
                 }
-                else {
-                    msg = "Only the local table should be modified in the formula, using the variable name 'value'";
-                }
-                throw this.createParsingError(msg,variableInfo.loc);
             }
-//I should check that the local table is not referenced. It will not have been set yet, at least in theory.
-//Worse, it may be initialized with old data.
-            
-      
-//oops - we need ot exclued the standard javascript identifiers, like "Math". 
-//IF WE WANT TO DO THIS WE NEED A WHITE LIST (for what is allowed), A BLACK LIST
-//(for what is not allowed) and the rest is considered a global variable.
-//            //global variable can not be accessed
-//            if((!variableInfo.object)&&(!variableInfo.local)) {
-//                msg = "Global variables can not be accessed in the formula: " + key;
-//                throw this.createParsingError(msg,variableInfo.loc);
-//            }
+            if(varScope) {
+                //this is a local variable
+                nameUse.isLocal = true;
+                nameUse.scope = varScope;
+            }
         }
-        
-       //save dependant memberss
-       if(variableInfo.member) {
-           this.dependsOn.push(variableInfo);
-       }
     }
 }
+
 
 /** This method creates an error object. 
  * format:
@@ -460,7 +463,7 @@ visicomp.core.CodeAnalyzer.prototype.processVariableList = function(allowDataAcc
  *     column;[integer column on line number]
  * }
  * @private */
-visicomp.core.CodeAnalyzer.prototype.createParsingError = function(errorMsg,location) {
+visicomp.core.codeAnalysis.createParsingError = function(errorMsg,location) {
     var error = visicomp.core.util.createError(errorMsg,"ParsingError");
     if(location) {
         error.lineNumber = location.start.line;
@@ -469,7 +472,7 @@ visicomp.core.CodeAnalyzer.prototype.createParsingError = function(errorMsg,loca
     return error;
 }
 
-visicomp.core.CodeAnalyzer.prototype.createCompoundParsingError = function(errors) {
+visicomp.core.codeAnalysis.createCompoundParsingError = function(errors) {
     var errorMsg = "";
     for(var i = 0; i < errors.length; i++) {
         errorMsg += errors[i];

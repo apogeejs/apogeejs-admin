@@ -80,7 +80,7 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
     
     var onSave = function() {
 		var data;
-		var formula;
+		var functionBody;
 		var supplementalCode;
         
 		if(dataEditor) {
@@ -93,11 +93,17 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
 		}
 			
         if(formulaEditor) {
-            formula = formulaEditor.getSession().getValue().trim();
-			if(formula.length === 0) formula = null;
+            var formula = formulaEditor.getSession().getValue().trim();
+			if(formula.length === 0) {
+                functionBody = null;
+            }
+            else {
+//review how I am doing this!
+                functionBody = visicomp.app.visiui.TableUI.wrapTableFormula(formula);
+            }
 		}
 		else {
-			formula = null;
+			functionBody = null;
 		}
 		
 		if(supplementalEditor) {
@@ -108,7 +114,7 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
 			supplementalCode = null;
 		}
         
-        var result = onSaveFunction(table,data,formula,supplementalCode);
+        var result = onSaveFunction(table,data,functionBody,supplementalCode);
         
         if(result.success) {
 			dialog.hide();
@@ -167,7 +173,9 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
             formulaEditor.setTheme("ace/theme/eclipse");
             formulaEditor.getSession().setMode("ace/mode/javascript");
             //set the formula
-            var formula = table.getEditorInfo();
+            var functionBody = table.getFunctionBody();
+//review how I am doing this!!!
+            var formula = visicomp.app.visiui.TableUI.unwrapTableFormula(functionBody);
             if(formula) {
                 formulaEditor.getSession().setValue(formula);
             }
@@ -241,5 +249,3 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
     }
     dialog.addListener("resize", resizeCallback);
 }
-
-

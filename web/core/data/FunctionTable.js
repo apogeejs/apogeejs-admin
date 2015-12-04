@@ -2,7 +2,7 @@
 visicomp.core.FunctionTable = function(workspace,name,argParens) {
     //base init
     visicomp.core.Child.init.call(this,workspace,name,"function");
-	visicomp.core.Member.init.call(this);
+	visicomp.core.Member.init.call(this,argParens);
     
     this.argParens = argParens;
     
@@ -13,10 +13,6 @@ visicomp.core.FunctionTable = function(workspace,name,argParens) {
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Member);
-
-visicomp.core.FunctionTable.prototype.getArgParensString = function() {	
-    return this.argParens;
-}
 
 visicomp.core.FunctionTable.prototype.processObjectFunction = function(objectFunction) {	
     //tjhe data is the function

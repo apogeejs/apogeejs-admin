@@ -107,20 +107,15 @@ visicomp.core.updatemember.setContent = function(contentData) {
 	}
 
     //read handler data
-    var functionText = contentData.functionText;
+    var functionBody = contentData.functionBody;
     var supplementalCode = contentData.supplementalCode;
-    var editorInfo = contentData.editorInfo;
     var data = contentData.data;
 	
     //set forumula or value, not both
-    if(functionText) {
-        
-        //create code for formula
-        var codeInfo = visicomp.core.updatemember.createCodeInfo(member,functionText,supplementalCode);
+    if(functionBody) {
 		
         //set code
-        member.setCodeInfo(codeInfo);
-        member.setEditorInfo(editorInfo);
+        member.setCode(functionBody,supplementalCode);
     }
     else {
         //clear the formula
@@ -133,24 +128,6 @@ visicomp.core.updatemember.setContent = function(contentData) {
 		visicomp.core.updatemember.fireUpdatedEvent(member);
     }
 }	
-
-/** This method creates the code info from the formula text. */
-visicomp.core.updatemember.createCodeInfo = function(member,functionText,supplementalCode) {
-    
-    //instantiate the code analyzer
-    var codeAnalyzer = new visicomp.core.CodeAnalyzer(member);
-    
-    //check code
-    codeAnalyzer.analyzeCode(functionText,supplementalCode);
-
-    //set code
-    var codeInfo = {};
-    codeInfo.functionText = functionText;
-    codeInfo.supplementalCode = supplementalCode;
-    codeInfo.dependsOn = codeAnalyzer.getDependancies();
-
-    return codeInfo;
-}
 
 
 

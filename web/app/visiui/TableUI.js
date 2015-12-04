@@ -72,9 +72,9 @@ visicomp.app.visiui.TableUI.tableUpdated = function(childUI,table) {
 }
 
 /** This method responds to a "new" menu event. */
-visicomp.app.visiui.TableUI.updateTable = function(table,data,formula,supplementalCode) {
-	
-	var updateEventData = visicomp.app.visiui.TableUI.getUpdateEventData(table,data,formula,supplementalCode);
+visicomp.app.visiui.TableUI.updateTable = function(table,data,functionBody,supplementalCode) {
+    
+	var updateEventData = visicomp.app.visiui.TableUI.getUpdateEventData(table,data,functionBody,supplementalCode);
 	
     var workspace = table.getWorkspace();
     var result = workspace.callHandler(
@@ -85,13 +85,12 @@ visicomp.app.visiui.TableUI.updateTable = function(table,data,formula,supplement
 }
 
 /** This method creates the update event object for this table object. */
-visicomp.app.visiui.TableUI.getUpdateEventData = function(table,data,formula,supplementalCode) {
+visicomp.app.visiui.TableUI.getUpdateEventData = function(table,data,functionBody,supplementalCode) {
 	
 	var tableData = {};
     tableData.member = table;
-	if((formula !== null)&&(formula !== undefined)) {
-		tableData.editorInfo = formula;
-        tableData.functionText = visicomp.app.visiui.TableUI.wrapTableFormula(formula);
+	if((functionBody !== null)&&(functionBody !== undefined)) {
+        tableData.functionBody = functionBody;
 		tableData.supplementalCode = supplementalCode;
 	}
 	else {
@@ -101,14 +100,18 @@ visicomp.app.visiui.TableUI.getUpdateEventData = function(table,data,formula,sup
     return tableData;
 }
 
-visicomp.app.visiui.TableUI.wrapTableFormula = function(formula) { 
+visicomp.app.visiui.TableUI.FUNCTION_PREFIX = "var value;\n";
+visicomp.app.visiui.TableUI.FUNCTION_SUFFIX = "\nreturn value;\n\n";
 
-    var functionText = "function() {\n" + 
-        "var value;\n" + 
-        formula + "\n" +
-        "return value;\n\n" +
-    "}";
-    return functionText;
+visicomp.app.visiui.TableUI.wrapTableFormula = function(formula) { 
+    return visicomp.app.visiui.TableUI.FUNCTION_PREFIX + formula + 
+        visicomp.app.visiui.TableUI.FUNCTION_SUFFIX;
+}
+
+visicomp.app.visiui.TableUI.unwrapTableFormula = function(functionBody) {
+    var formula = functionBody.replace("var value;","");
+    formula = formula.replace("return value;","");
+    return formula.trim();
 }
 
 

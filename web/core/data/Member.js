@@ -15,48 +15,47 @@
 visicomp.core.Member = {};
 
 /** This initializes the component */
-visicomp.core.Member.init = function() {
+visicomp.core.Member.init = function(argParenList) {
+    
+    //arguments of the member function (with parentheses - we probably will change this)
+    this.argParenList = argParenList;
 	
     //this contains the formula and dependency information
-    this.codeInfo = null;
+    this.functionBody = null;
+    this.supplementalCode = null;
 	
     //this is a function that generates the function for this member
+    this.functionGeneratorBody = null;
     this.functionGenerator = null;
+    
+    //this is the list of variables access in the code for this function
+    this.varInfo = null;
+    
+    //this is the list of dependencies
+    this.dependsOnList = [];
     
     //these are a list of members that depend on this member
     this.impactsList = [];
 }
 
-/** This method returns the code array. The code array
- * includees segments of code,referencing the code pattern. */
-visicomp.core.Member.hasCode = function() {
-    return (this.codeInfo !== null);
+/** This method returns the formula for this member.  */
+visicomp.core.Member.getFunctionBody = function() {
+    return this.functionBody;
 }
 
-/** This method returns the code array. The code array
- * includees segments of code,referencing the code pattern. */
-visicomp.core.Member.getCodeInfo = function() {
-    return this.codeInfo;
+/** This method returns the supplemental code for this member.  */
+visicomp.core.Member.getSupplementalCode = function() {
+    return this.supplementalCode;
 }
 
-/** This method sets the code info.*/
-visicomp.core.Member.setCodeInfo = function(codeInfo) {
-	//update dependencies
-    var oldDependsOn = this.getDependsOn();
-	
-    this.codeInfo = codeInfo;
-	
-    var currentDependsOn = this.getDependsOn();
-    this.updateDependencies(currentDependsOn, oldDependsOn);
+/** This method returns the formula for this member.  */
+visicomp.core.Member.setCode = function(functionBody, supplementalCode) {
+    this.functionBody = functionBody;
+    this.supplementalCode = supplementalCode;
     
-    //create the function for this code info
-    this.createFunction();
-}
-
-/** This method clears the code info.*/
-visicomp.core.Member.clearCodeInfo = function() {
-    this.codeInfo = null;
-    this.clearFunction();
+    this.createFunctionGeneratorBody();
+    
+    this.varInfo = visicomp.core.codeAnalysis.analyzeCode(this.functionGeneratorText);
 }
 
 /** This returns an array of members this member impacts. */
@@ -66,32 +65,42 @@ visicomp.core.Member.getImpactsList = function() {
 
 /** This returns a map of the members that this member depends on. */
 visicomp.core.Member.getDependsOn = function() {
-    if(this.codeInfo) {
-        return this.codeInfo.dependsOn;
-    }
-    else {
-        return [];
-    }
+    return this.dependsOnList;
 }
 
-/** This method returns the formula for this member.  */
-visicomp.core.Member.getFunctionText = function() {
-    var f;
-    if(this.codeInfo) {
-        f = this.codeInfo.functionText;
-    }
-    if(!f) f = "";
-    return f;
+visicomp.core.Member.calculateDependencies = function() {
+    //calculate the dependecies
+    var newDependsOnList = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo);
+    this.updateDependencies(newDependsOnList);    
 }
 
-/** This method returns the supplemental code for this member.  */
-visicomp.core.Member.getSupplementalCode = function() {
-    var sc;
-    if(this.codeInfo) {
-        sc = this.codeInfo.supplementalCode;
+/** This method indicates if the member needs to be calculated. 
+ * @private */
+visicomp.core.Member.needsExecuting = function() {
+	return (this.functionGenerator !== null);
+}
+
+
+/** This method calculates the object data from the function.  */
+visicomp.core.Member.execute = function() {
+    if(!this.functionGeneratorBody) return;
+    
+    //create the function in the proper closure
+    this.functionGenerator = this.parent.createFunctionInContext(this.functionGeneratorBody);
+    
+    //create the function using the generator
+    //this stores the function globally so the user can debug it easily
+    this.functionGenerator();
+    
+    var objectFunction = visicomp.core.getObjectFunction(this);
+    
+    if(!objectFunction) {
+        alert("Object function not found!");
+        return;
     }
-    if(!sc) sc = "";
-    return sc;
+    
+    //process the object function as needed (implement for each type)
+    this.processObjectFunction(objectFunction);
 }
 
 /** This method returns the supplemental code for this member.  */
@@ -107,36 +116,46 @@ visicomp.core.Member.onDelete = function() {
 // Private Functions
 //===================================
 
-/** This method indicates if the member needs to be calculated. 
- * @private */
-visicomp.core.Member.needsExecuting = function() {
-	return (this.functionGenerator !== null);
-}
 
-/** This method calculates the object data from the function. 
- * @private */
-visicomp.core.Member.execute = function() {
-    if(!this.functionGenerator) return;
-    
-    //create the function using the generator
-    this.functionGenerator();
-    
-    //we store the function globally so the user can debug it easily
-    var objectFunction = visicomp.core.getObjectFunction(this);
-    
-    if(!objectFunction) {
-        alert("Object function not found!");
-        return;
-    }
-    //process the object function as needed (implement for each type)
-    this.processObjectFunction(objectFunction);
-}
 
 //implementations must implement this function
 //This method takes the object function generated from code and processes it
 //to set the data for the object. (protected)
 //visicomp.core.Member.processObjectFunction 
 
+
+/** This sets the dependencies based on the code for the member. 
+ * @private */
+visicomp.core.Member.updateDependencies = function(newDependsOn) {
+    
+    var oldDependsOn = this.dependsOnList;
+	
+    //update the dependency links among the members
+	var newDependencySet = {};
+    var remoteMember;
+    var i;
+    for(i = 0; i < currentDependsOn.length; i++) {
+        remoteMember = newDependsOn[i].member;
+		
+		//update this member
+		remoteMember.addToImpactsList(this);
+
+		//create a set of new member to use below
+		newDependencySet[remoteMember.getFullName()] = true;
+    }
+	
+    //update for links that have gotten deleted
+    for(i = 0; i < oldDependsOn.length; i++) {
+        remoteMember = oldDependsOn[i].member;
+		
+		var stillDependsOn = newDependencySet[remoteMember.getFullName()];
+		
+		if(!stillDependsOn) {
+			//remove from imacts list
+			remoteMember.removeFromImpactsList(this);
+		}
+    }
+}
 
 /** This method adds a data member to the imapacts list for this node. 
  * @private */
@@ -164,64 +183,23 @@ visicomp.core.Member.removeFromImpactsList = function(member) {
     }
 }
 
-/** This sets the dependencies based on the code for the member. 
- * @private */
-visicomp.core.Member.updateDependencies = function(currentDependsOn,oldDependsOn) {
-	
-    //update the dependency links among the members
-	var newDependencySet = {};
-    var remoteMember;
-    var i;
-    for(i = 0; i < currentDependsOn.length; i++) {
-        remoteMember = currentDependsOn[i].member;
-		
-		//update this member
-		remoteMember.addToImpactsList(this);
-
-		//create a set of new member to use below
-		newDependencySet[remoteMember.getFullName()] = true;
-    }
-	
-    //update for links that have gotten deleted
-    for(i = 0; i < oldDependsOn.length; i++) {
-        remoteMember = oldDependsOn[i].member;
-		
-		var stillDependsOn = newDependencySet[remoteMember.getFullName()];
-		
-		if(!stillDependsOn) {
-			//remove from imacts list
-			remoteMember.removeFromImpactsList(this);
-		}
-    }
-}
-
 /** This method creates the member update javascript, which will be added to the
  * html page so the user easily can run it in the debugger if needed. 
  * @private */
-visicomp.core.Member.createFunction = function() {
+visicomp.core.Member.createFunctionGeneratorBody = function() {
     
     var memberFullName = this.getFullName();
     var workspaceName = this.parent.getWorkspace().getName();
     
-    var accessedVariableString = this.getAccessedVariableCode();
-
-    var functionText = this.getFunctionText();
-    var supplementalCode = this.getSupplementalCode();
-	var functionArgumentList = "";
-    
     //create the code body
-    var codeBody = visicomp.core.util.formatString(
-        visicomp.core.Member.MEMBER_UPDATE_FORMAT_TEXT,
+    this.functionGeneratorBody = visicomp.core.util.formatString(
+        visicomp.core.Member.GENERATOR_FUNCTION_FORMAT_TEXT,
         workspaceName,
 		memberFullName,
-        functionArgumentList,
-        accessedVariableString,
-        functionText,
-        supplementalCode
+        this.argParenList,
+        this.functionBody,
+        this.supplementalCode
     );
-     
-    //create the code command
-    this.makeFunction(codeBody);
 }
 
 /** This methoc evaluates the update command tect to make the update command.
@@ -232,107 +210,39 @@ visicomp.core.Member.clearFunction = function() {
     delete visicomp.core.functionCode[this.getWorkspace().getName()][this.getFullName()];
 }
 
-/** This methoc evaluates the update command tect to make the update command.
- * It is separated so there is no context and minimal added closure variables 
- * in the eval statement. 
- * @private */
-visicomp.core.Member.makeFunction = function(_functionText) {
-	//var names are obscured because these will appear in the member function closure
-	var _sourceFunction;
-	var _localFolder = this.getParent();
-	var _rootFolder = this.getRootFolder();
-	
-	//execute the code to create the source function
-    eval(_functionText);
-	
-	//calling the generator creates the function given by the code info for this member
-	this.functionGenerator = _sourceFunction;
-}
 
-/** This method creates the access variable code. It makes short cuts
- * to all the accessed members. The users should use the shortcuts and not
- * some othermethod off accessing the member because use of these shortcuts
- * determines the dependencies of the member, which is need to find the
- * member calculation order. 
- * @private */
-visicomp.core.Member.getAccessedVariableCode = function() {
-    
-    //create the text to add an accessed member to the code
-    var accessedVariableString = "";
-	
-	//add accessed member, either as parent or member name
-    var includedNameSet = {};
-	var dependsOn = this.getDependsOn();
-	for(var i = 0; i < dependsOn.length; i++) {
-		var varInfo = dependsOn[i];
-		
-		//include the variable, or the path to it, for local references
-		if((varInfo.localRefBase)&&(!includedNameSet[varInfo.localRefBase])) {
-           
-			//add member to access variables
-			accessedVariableString += visicomp.core.util.formatString(
-                visicomp.core.Member.LOCAL_ACCESSED_MEMBER_FORMAT_TEXT,
-                varInfo.localRefBase
-            );
-              
-            //store that we included this name
-            includedNameSet[varInfo.localRefBase] = true;
-		}
-        
-        //include the variable, or the path to it, for local references
-		if((varInfo.rootRefBase)&&(!includedNameSet[varInfo.rootRefBase])) {
-           
-			//add member to access variables
-			accessedVariableString += visicomp.core.util.formatString(
-                visicomp.core.Member.ROOT_ACCESSED_MEMBER_FORMAT_TEXT,
-                varInfo.rootRefBase
-            );
-              
-            //store that we included this name
-            includedNameSet[varInfo.localRefBase] = true;
-		}
-       
-	}
-    
-    return accessedVariableString;
-}
 
 /** This is the format string to create the code body for updateing the member
  * Input indices:
  * 0: workspace name
  * 1: unique member name
- * 2: function argument list
- * 3: access variable code text
- * 4: member formula text
- * 5: supplemental code text
+ * 2: function argument list with parentheses
+ * 3: member formula text
+ * 4: supplemental code text
  * @private
  */
-visicomp.core.Member.MEMBER_UPDATE_FORMAT_TEXT = [
-"   //member update code",
-"   _sourceFunction = function() {",
-"",
-"//accessed variables",
-"{3}",
-"//end accessed variables",
+visicomp.core.Member.GENERATOR_FUNCTION_FORMAT_TEXT = [
+"//{1}",
 "",
 "//supplemental code",
-"{5}",
+"{4}",
 "//end supplemental code",
 "",
 "//member function",
-"visicomp.core.functionCode.{0}['{1}'] = {4}",
+"visicomp.core.functionCode.{0}['{1}'] = function{2} {",
+"{3}",
+"}",
 "//end member function",
-"   }",
 ""
    ].join("\n");
    
-/** this is the code for adding the accessed member to the code
- * @private */
-visicomp.core.Member.LOCAL_ACCESSED_MEMBER_FORMAT_TEXT = 'var {0} = _localFolder.lookupChildData("{0}");\n';
-
-/** this is the code for adding the accessed folder to the code
- * @private */
-visicomp.core.Member.ROOT_ACCESSED_MEMBER_FORMAT_TEXT = 'var {0} = _rootFolder.lookupChildData("{0}");\n';
+///** this is the code for adding the accessed member to the code
+// * @private */
+//visicomp.core.Member.LOCAL_ACCESSED_MEMBER_FORMAT_TEXT = 'var {0} = _localFolder.lookupChildData("{0}");\n';
+//
+///** this is the code for adding the accessed folder to the code
+// * @private */
+//visicomp.core.Member.ROOT_ACCESSED_MEMBER_FORMAT_TEXT = 'var {0} = _rootFolder.lookupChildData("{0}");\n';
     
 
 

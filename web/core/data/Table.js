@@ -2,7 +2,7 @@
 visicomp.core.Table = function(workspace,name) {
     //base init
     visicomp.core.Child.init.call(this,workspace,name,"table");
-	visicomp.core.Member.init.call(this);
+	visicomp.core.Member.init.call(this,"");
 }
 
 //add components to this class
