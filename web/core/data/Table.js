@@ -2,7 +2,7 @@
 visicomp.core.Table = function(workspace,name) {
     //base init
     visicomp.core.Child.init.call(this,workspace,name,"table");
-	visicomp.core.Member.init.call(this,"");
+	visicomp.core.Member.init.call(this,"()");
 }
 
 //add components to this class
@@ -20,6 +20,12 @@ visicomp.core.Table.prototype.setData = function(data) {
     visicomp.core.Child.setData.call(this,data);
 }
 
+/** This method sets the data for this object. It also
+ * freezes the object so it is immutable. */
+visicomp.core.Table.prototype.hasCode = function() {
+	return (this.funtionGeneratorBody != null);
+}
+	
 visicomp.core.Table.prototype.processObjectFunction = function(objectFunction) {	
     //tjhe data is the output of the function
     var data = objectFunction();

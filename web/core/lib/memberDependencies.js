@@ -1,165 +1,126 @@
 
+visicomp.core.memberDependencies = {};
 
-
-/** This method processes nodes that are variables (identifiers and member expressions), adding
- * them to the list of variables which are used in tehe formula.
- * @private */
-visicomp.core.CodeAnalyzer.prototype.processVariable = function(processInfo,node,isModified,isDeclaration) {
-    
-    //get the variables
-    var namePath = this.getVariableDotPath(node);
+/** This method takes the varInfo table from the code analysis and returns
+ * an object with two arrays, an array of workspace objects referenced and
+ * an array of workspace variable names accessed from the user code.
+ */
+visicomp.core.memberDependencies.getDependencyInfo = function(varInfo,localFolder,rootFolder) {
+	var dependencyInfo = {};
+	dependencyInfo.accessedNames = [];
+	dependencyInfo.accessedObjects = [];
+	var objectMap = {};
 	
-	//lookup the member (only if this is not a local variable)
-	//first determine the name base folder on which the name is based
-	//we will base this on whether the first name in the path is in the folder,
-	//first checking the local folder and then the root folder for the workspace
+	//cycle through the variables used
+	for(var baseName in varInfo) {
+		
+		//check if this is an object from the workspace
+		//check local folder
+		var baseObject = localFolder.lookupChild(baseName);
+		var isFromLocalFolder;
+		if(baseObject) {
+			isFromLocalFolder = true;
+		}
+		else {
+			//not from local folder, check root folder
+			isFromLocalFolder = false;
+			baseObject = rootFolder.lookupChild(baseName);
+		}
+		
+		if(baseObject) {
+			//this is a reference to the workspace
+			
+			//we need to make sure these are not local references
+			var isNonLocalReference = false;
+			
+			//for each use of this name that is not local, find the referenced object
+			var nameEntry = varInfo[baseName];
+			for(var i = 0; i < nameEntry.uses.length; i++) {
+				var nameUse = nameEntry.uses[i];
+				if(!nameUse.isLocal) {
+					//this is a referneced object from workspace, not jsut a local reference
+					isNonLocalReference = true
+					
+					//look up the object
+					var namePath = nameUse.path;
+					
+					//lookup this object
+					var folder = isFromLocalFolder ? localFolder : rootFolder;
+					var object = folder.lookupChildFromPath(namePath);
+//need to add this folder loookup!
+					if(object) {
+						//save the object to dependencies
+						var fullName = object.getFullName();
+						if(!objectMap[fullName]) {
+							dependencyInfo.accessedObjects.push(object);
+							objectMap[fullName] = true;
+						}
+					}
+				}
+			}
+			
+			//save this base name if it is used for a non local reference
+			if(isNonLocalReference) {
+				var accessInfo = {};
+				accessInfo.baseName = baseName;
+				accessInfo.isLocalFolder = isFromLocalFolder;
+				dependencyInfo.accessedNames.push(accessInfo);
+			}
+		}
+	}
 	
-	var object;
-	var internalReference;
-    var localReference;
-	var nameIndex = 0;
-    var baseName = namePath[nameIndex];
-	
-    if(!isDeclaration) {
-        object = this.folder.lookupChild(baseName);
-        if(object != null) {
-            internalReference = true;
-            localReference = true;
-        }
-        else {
-            //check the root folder
-            var baseFolder = this.workspace.getRootFolder();
-            object = baseFolder.lookupChild(baseName);
-            if(object != null) {
-                internalReference = true;
-                localReference = false;
-            }
-            else {
-                object = null;
-                internalReference = false;
-                localReference = false;
-            }
-        }
-
-        //we have determined the base folder for the name, but we might not 
-        //have the actual oject
-        while((nameIndex < namePath.length-1)&&(object != null)&&(object.getType() === "folder")) {
-            nameIndex++;
-            object = object.lookupChild(namePath[nameIndex]);
-        }
-
-        //flag an error if we found a base folder but not the proper object
-        if((internalReference)&&(object == null)) {
-            //this shouldn't happen. If it does we didn't code the syntax tree right
-            throw this.createParsingError("Table not found: ",node.loc);
-        }
-    
-    }
-    else {
-        //local variable - no reference to tables
-        internalReference = false;
-        localReference = false; //refers to table refernece from local folder
-        object = null;
-    }
-	
-    //add this variable to the variable list
-    var objectKey;
-    if(object != null) {
-        objectKey = object.getFullName();
-    }
-    else {
-//I AM NOT SURE WHAT TO USE FOR THE NAME HERE - this will be used for
-//detecting bad global usage, but it is not done now
-        objectKey = baseName;
-    }
-    
-    //get or create the var info for this variable
-    var varInfo = this.variables[objectKey];
-    if(!varInfo) {
-        varInfo = {};
-        varInfo.member = object;
-        varInfo.loc = node.loc; //save the first appearance of this variable
-        this.variables[objectKey] = varInfo;
-    }
-    
-    //store the info on how the variable was accessed - from the "local context" (relative to local folder)
-    //or from the "root context" (relative to the root folder) 
-//need to get rid of local variabls references , but only in the proper scope!
-//not done below
-    if(internalReference) {
-        if((localReference)&&(!varInfo.localRefBase)) {
-            varInfo.localRefBase = baseName;
-        }
-        else if((!localReference)&&(!varInfo.rootRefBase)) {
-            varInfo.rootRefBase = baseName;
-        }
-    }
-    
-    //add modifier flags
-    if(isModified) {
-        varInfo.modifed = true;
-    }
-    if(isDeclaration) {
-        varInfo.local = true;
-        
-        //clear anymember reference, if there was one (hoisted local variable)
-        delete varInfo.member;
-        delete varInfo.localRefBase;
-        delete varInfo.localRefBase;
-    }
+	return dependencyInfo;
 }
 
 
-
-
-
-/** This method process the final variables list found in the ast, determining the
- * dependendcies and any errors. 
- * @private */
-visicomp.core.CodeAnalyzer.prototype.processVariableList = function() {
-    
-    //process all the variables in the variable list
-    for(var key in this.variables) {
-        var variableInfo = this.variables[key];
-            
-        //check error cases
-        {
-            var msg;
-            
-//apply only to tables?
-            //this object can not be modified
-            if((variableInfo.member)&&(variableInfo.modified)) {
-                if(variableInfo.member == this.member) {
-                    msg = "To modify the local table use the variable name 'value' rather than the table name.";
-                }
-                else {
-                    msg = "Only the local table should be modified in the formula, using the variable name 'value'";
-                }
-                throw this.createParsingError(msg,variableInfo.loc);
-            }
-//I should check that the local table is not referenced. It will not have been set yet, at least in theory.
-//Worse, it may be initialized with old data.
-            
-      
-//oops - we need ot exclued the standard javascript identifiers, like "Math". 
-//IF WE WANT TO DO THIS WE NEED A WHITE LIST (for what is allowed), A BLACK LIST
-//(for what is not allowed) and the rest is considered a global variable.
-//            //global variable can not be accessed
-//            if((!variableInfo.object)&&(!variableInfo.local)) {
-//                msg = "Global variables can not be accessed in the formula: " + key;
+//
+///** This method process the final variables list found in the ast, determining the
+// * dependendcies and any errors. 
+// * @private */
+//visicomp.core.CodeAnalyzer.prototype.processVariableList = function() {
+//    
+//    //process all the variables in the variable list
+//    for(var key in this.variables) {
+//        var variableInfo = this.variables[key];
+//            
+//        //check error cases
+//        {
+//            var msg;
+//            
+////apply only to tables?
+//            //this object can not be modified
+//            if((variableInfo.member)&&(variableInfo.modified)) {
+//                if(variableInfo.member == this.member) {
+//                    msg = "To modify the local table use the variable name 'value' rather than the table name.";
+//                }
+//                else {
+//                    msg = "Only the local table should be modified in the formula, using the variable name 'value'";
+//                }
 //                throw this.createParsingError(msg,variableInfo.loc);
 //            }
-        }
-        
-       //save dependant memberss
-       if(variableInfo.member) {
-           this.dependsOn.push(variableInfo);
-       }
-    }
-}
-
-
-
+////I should check that the local table is not referenced. It will not have been set yet, at least in theory.
+////Worse, it may be initialized with old data.
+//            
+//      
+////oops - we need ot exclued the standard javascript identifiers, like "Math". 
+////IF WE WANT TO DO THIS WE NEED A WHITE LIST (for what is allowed), A BLACK LIST
+////(for what is not allowed) and the rest is considered a global variable.
+////            //global variable can not be accessed
+////            if((!variableInfo.object)&&(!variableInfo.local)) {
+////                msg = "Global variables can not be accessed in the formula: " + key;
+////                throw this.createParsingError(msg,variableInfo.loc);
+////            }
+//        }
+//        
+//       //save dependant memberss
+//       if(variableInfo.member) {
+//           this.dependsOn.push(variableInfo);
+//       }
+//    }
+//}
+//
+//
+//
 
 
 

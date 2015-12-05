@@ -116,13 +116,16 @@ visicomp.core.updatemember.setContent = function(contentData) {
 		
         //set code
         member.setCode(functionBody,supplementalCode);
+		
+		member.calculateDependencies();
     }
     else {
-        //clear the formula
-        member.clearCodeInfo();
-
+        
         //set data
         member.setData(data);
+		
+		//clear the formula
+        member.clearCode();
 		
 		//fire this for the change in value
 		visicomp.core.updatemember.fireUpdatedEvent(member);

@@ -37,6 +37,18 @@ visicomp.core.Folder.prototype.lookupChild = function(name) {
     return this.childMap[name];
 }
 
+/** This method looks up a child using an arry of names corresponding to the
+ * path from this folder to the object.  Note: the method will return the 
+ * fist non-folder it finds, even if the path is not completed. In this case
+ * it is assumed the path refers to a field inside this object. */
+visicomp.core.Folder.prototype.lookupChildFromPath = function(path) {
+	var object = this;
+	for(var i = 0; ((i < path.length)&&(object.getType() == "folder")); i++) {
+		object = object.lookupChild(path[i]);
+	}
+    return object;
+}
+
 /** This method adds a table to the folder. It also sets the folder for the
  *table object to this folder. It will fail if the name already exists.  */
 visicomp.core.Folder.prototype.addChild = function(child) {
@@ -80,9 +92,3 @@ visicomp.core.Folder.prototype.updateData = function(child) {
     }
     this.dataMap[name] = data;
 }
-
-visicomp.core.Folder.prototype.createFunctionInContext = function(functionText) {
-//TODO implement
-    alert("NOT IMPLEMNETED!");
-}
-

@@ -100,12 +100,3 @@ visicomp.app.visiui.FunctionUI.getUpdateEventData = function(functionObject,func
 	
 	return functionData;
 }
-
-visicomp.app.visiui.FunctionUI.wrapFunctionBody = function(argParensString, functionBody) { 
-
-    var functionText = "function" + argParensString + " {\n" +
-        functionBody + "\n" +
-    "}";
-    return functionText;
-}
-

@@ -78,10 +78,9 @@ visicomp.app.visiui.dialog.showUpdateFunctionDialog = function(functionObject,on
 		
 		if(supplementalEditor) {
             supplementalCode = supplementalEditor.getSession().getValue().trim();
-			if(supplementalCode.length === 0) supplementalCode = null;
 		}
 		else {
-			supplementalCode = null;
+			supplementalCode = "";
 		}
         
         var result = onSaveFunction(functionObject,functionBody,supplementalCode);

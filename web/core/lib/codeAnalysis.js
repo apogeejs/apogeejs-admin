@@ -1,15 +1,18 @@
-/** This class analyzes code, reading the dependencies, checking for errors and 
- * making sure it follows the rules.
- *  
- * Formula Rules:
- * - The formula can access any table, using the name of the table if the table is
- * in the same folder or [folder name].[table name] if the table is in 
- * another folder. These tables are held as local variables in the formula function.
- * - The formula should update the value "value" to update the current table. None
- * of the table objects (given by [table name]) should be modified.
- * - The formula should not access any global variables. It should only use local
- * variables, the table variables and "value".
+/** This function parses the code and returns a table that gives the variable use
+ * in the passed function. The var info table has the following content
+ * - it is a map with an entry for each variable accessed. (This refers just to
+ * a variable and not to field access on that variable.
+ * - the key for an entry is the name of the variable
+ * - for each entry there is an array of usages. Each usage as the following info:
+ * -- nameUse.path: an array of names constructing the field accessed.
+   -- nameUse.scope: a reference to a scope object
+   -- nameUse.node: the AST node that identifies this variable
+   -- nameUse.isModified: true if the variable is modified (not 100% accurate)
+   -- nameUse.isLocal: true if this is a reference to a local variable
+   -- nameUse.decalredScope: for local variables only, gives the scope in which the lcoal variable is declared.
  **/ 
+
+visicomp.core.codeAnalysis = {};
 
 /** Syntax for AST, names from Esprima.
  * Each entry is a list of nodes inside a node of a given type. the list
@@ -261,7 +264,7 @@ visicomp.core.codeAnalysis.processTreeNode = function(processInfo,node,isModifie
         visicomp.core.codeAnalysis.processFunction(processInfo,node);
         
     }
-    else if((node.type === NewExpression)&&(callee === "Function")) {
+    else if((node.type === "NewExpression")&&(callee === "Function")) {
         //we currently do not support the function constructor
         //to add it we need to add the local variables and parse the text body
         throw visicomp.core.codeAnalysis.createParsingError("Function constructor not currently supported!",node.loc); 
@@ -320,7 +323,7 @@ visicomp.core.codeAnalysis.processGenericNode = function(processInfo,node) {
 /** This method processes nodes that are function. For functions a new scope is created 
  * for the body of the function.
  * @private */
-visicomp.core.codeAnalysis.prototype.processFunction = function(processInfo,node) {
+visicomp.core.codeAnalysis.processFunction = function(processInfo,node) {
     var nodeType = node.type;
     var idNode = node.id;
     var params = node.params;
@@ -334,7 +337,7 @@ visicomp.core.codeAnalysis.prototype.processFunction = function(processInfo,node
     
     if((nodeType === "FunctionDeclaration")&&(idNode)) {
         //parse id node (variable name) in the parent scope
-        visicomp.core.codeAnalysis.prototype.processTreeNode(processInfo,idNode,false,false);
+        visicomp.core.codeAnalysis.processTreeNode(processInfo,idNode,false,false);
     }
     
     //create a new scope for this function
@@ -342,7 +345,7 @@ visicomp.core.codeAnalysis.prototype.processFunction = function(processInfo,node
     
     if((nodeType === "FunctionExpression")&&(idNode)) {
         //parse id node (variable name) in the parent scope
-        visicomp.core.codeAnalysis.prototype.processTreeNode(processInfo,idNode,false,false);
+        visicomp.core.codeAnalysis.processTreeNode(processInfo,idNode,false,false);
     }
     
     //process the variable list
@@ -360,11 +363,11 @@ visicomp.core.codeAnalysis.prototype.processFunction = function(processInfo,node
 /** This method processes nodes that are variables (identifiers and member expressions), adding
  * them to the list of variables which are used in tehe formula.
  * @private */
-visicomp.core.codeAnalysis.prototype.processVariable = function(processInfo,node,isModified,isDeclaration) {
+visicomp.core.codeAnalysis.processVariable = function(processInfo,node,isModified,isDeclaration) {
     
     //get the variable path and the base name
-    var namePath = this.getVariableDotPath(node);
-    var baseName = namePath[nameIndex];
+    var namePath = this.getVariableDotPath(processInfo,node);
+    var baseName = namePath[0];
     
     //add to the name table
     var nameEntry = processInfo.nameTable[baseName];
@@ -402,18 +405,18 @@ visicomp.core.codeAnalysis.prototype.processVariable = function(processInfo,node
  * In the case the fields are calculated, we do not attempt to return these
  * fields. We do however factor the expressions nodes into the dependencies. 
  * @private */
-visicomp.core.codeAnalysis.prototype.getVariableDotPath = function(node) {
+visicomp.core.codeAnalysis.getVariableDotPath = function(processInfo,node) {
     if(node.type == "Identifier") {
         //read the identifier name
         return [node.name];
     }
     else if(node.type == "MemberExpression") {
         //read the parent identifer
-        var variable = this.getVariableDotPath(node.object);
+        var variable = this.getVariableDotPath(processInfo,node.object);
         
         if(node.computed) {
             //the property name is an expression - process the expression but don't recording the field name
-            this.processTreeNode(node.property,false,false);
+            this.processTreeNode(processInfo,node.property,false,false);
         }
         else {
             //append the member expression property to it
@@ -432,7 +435,7 @@ visicomp.core.codeAnalysis.prototype.getVariableDotPath = function(node) {
  * @private */
 visicomp.core.codeAnalysis.markLocalVariables = function(processInfo) {
     for(var key in processInfo.nameTable) {
-        var nameEntry = processInfo.nameTable;
+        var nameEntry = processInfo.nameTable[key];
         var name = nameEntry.name;
         for(var i = 0; i < nameEntry.uses.length; i++) {
             var nameUse = nameEntry.uses[i];
@@ -448,7 +451,7 @@ visicomp.core.codeAnalysis.markLocalVariables = function(processInfo) {
             if(varScope) {
                 //this is a local variable
                 nameUse.isLocal = true;
-                nameUse.scope = varScope;
+                nameUse.declarationScope = varScope;
             }
         }
     }

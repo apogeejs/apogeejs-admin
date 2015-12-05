@@ -117,7 +117,7 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList) {
 			var unsortedImpactedDependencies = false;
 			var dependsOn = member.getDependsOn();
 			for(var j = 0; j < dependsOn.length; j++) {
-				var remoteObject = dependsOn[j].member;
+				var remoteObject = dependsOn[j];
 				if(memberIsSortedMap[remoteObject.getFullName()] === false) {
 					//this depends on an unsorted member
 					unsortedImpactedDependencies = true;

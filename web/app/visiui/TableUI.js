@@ -109,6 +109,8 @@ visicomp.app.visiui.TableUI.wrapTableFormula = function(formula) {
 }
 
 visicomp.app.visiui.TableUI.unwrapTableFormula = function(functionBody) {
+	if((functionBody == null)||(functionBody.length = 0)) return "";
+	
     var formula = functionBody.replace("var value;","");
     formula = formula.replace("return value;","");
     return formula.trim();

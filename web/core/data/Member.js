@@ -21,12 +21,13 @@ visicomp.core.Member.init = function(argParenList) {
     this.argParenList = argParenList;
 	
     //this contains the formula and dependency information
-    this.functionBody = null;
-    this.supplementalCode = null;
+    this.functionBody = "";
+    this.supplementalCode = "";
 	
     //this is a function that generates the function for this member
     this.functionGeneratorBody = null;
     this.functionGenerator = null;
+	this.aliasCode = null;
     
     //this is the list of variables access in the code for this function
     this.varInfo = null;
@@ -55,7 +56,20 @@ visicomp.core.Member.setCode = function(functionBody, supplementalCode) {
     
     this.createFunctionGeneratorBody();
     
-    this.varInfo = visicomp.core.codeAnalysis.analyzeCode(this.functionGeneratorText);
+    this.varInfo = visicomp.core.codeAnalysis.analyzeCode(this.functionGeneratorBody);
+}
+
+/** This method returns the formula for this member.  */
+visicomp.core.Member.clearCode = function() {
+	this.functionBody = "";
+    this.supplementalCode = "";
+    this.functionGeneratorBody = null;
+    this.functionGenerator = null;
+	this.aliasCode = null;
+    this.varInfo = null;
+    
+    var newDependsOn = [];
+	this.updateDependencies(newDependsOn);
 }
 
 /** This returns an array of members this member impacts. */
@@ -70,23 +84,34 @@ visicomp.core.Member.getDependsOn = function() {
 
 visicomp.core.Member.calculateDependencies = function() {
     //calculate the dependecies
-    var newDependsOnList = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo);
-    this.updateDependencies(newDependsOnList);    
+	this.dependencyInfo = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo,this.getParent(),this.getRootFolder());
+	
+	//set the table dependencies
+    this.updateDependencies(this.dependencyInfo.accessedObjects);    
+	
+	//create the alias code so the proper variables are present when executing the user code
+	this.createAliasCode(this.dependencyInfo.accessedNames);
 }
 
 /** This method indicates if the member needs to be calculated. 
  * @private */
 visicomp.core.Member.needsExecuting = function() {
-	return (this.functionGenerator !== null);
+	return (this.functionGeneratorBody != null);
 }
 
 
 /** This method calculates the object data from the function.  */
 visicomp.core.Member.execute = function() {
     if(!this.functionGeneratorBody) return;
-    
+	
+	var rootDataMap = this.getRootFolder().getData();
+    var localDataMap = this.getParent().getData();
+	
     //create the function in the proper closure
-    this.functionGenerator = this.parent.createFunctionInContext(this.functionGeneratorBody);
+    this.functionGenerator = visicomp.core.MemberHelper.createFunctionGenerator(rootDataMap,
+		localDataMap,
+		this.functionGeneratorBody,
+		this.aliasCode);
     
     //create the function using the generator
     //this stores the function globally so the user can debug it easily
@@ -127,15 +152,18 @@ visicomp.core.Member.onDelete = function() {
 /** This sets the dependencies based on the code for the member. 
  * @private */
 visicomp.core.Member.updateDependencies = function(newDependsOn) {
-    
+	//retireve the old list
     var oldDependsOn = this.dependsOnList;
+	
+    //create the new dependency list
+	this.dependsOnList = newDependsOn;
 	
     //update the dependency links among the members
 	var newDependencySet = {};
     var remoteMember;
     var i;
-    for(i = 0; i < currentDependsOn.length; i++) {
-        remoteMember = newDependsOn[i].member;
+    for(i = 0; i < newDependsOn.length; i++) {
+        remoteMember = newDependsOn[i];
 		
 		//update this member
 		remoteMember.addToImpactsList(this);
@@ -146,7 +174,7 @@ visicomp.core.Member.updateDependencies = function(newDependsOn) {
 	
     //update for links that have gotten deleted
     for(i = 0; i < oldDependsOn.length; i++) {
-        remoteMember = oldDependsOn[i].member;
+        remoteMember = oldDependsOn[i];
 		
 		var stillDependsOn = newDependencySet[remoteMember.getFullName()];
 		
@@ -202,12 +230,55 @@ visicomp.core.Member.createFunctionGeneratorBody = function() {
     );
 }
 
+/** This method creates the member update javascript, which will be added to the
+ * html page so the user easily can run it in the debugger if needed. 
+ * @private */
+visicomp.core.Member.createAliasCode = function(accessedNameList) {
+	var aliasCode = "";
+	for(var i = 0; i < accessedNameList.length; i++) {
+		var entry = accessedNameList[i];
+		aliasCode = this.addToAliasCode(entry.baseName,entry.isLocalFolder,aliasCode);
+	}
+
+	this.aliasCode = aliasCode;
+}
+
+/** This method appends a variable alias to the alias code string. */
+visicomp.core.Member.addToAliasCode = function(refName,isLocalReference,aliasCode) {
+	if(isLocalReference) {
+		aliasCode += "var " + refName + " = _localDataMap." + refName + ";\n";
+	}
+	else {
+		aliasCode += "var " + refName + " = _rootDataMap." + refName + ";\n";
+	}
+	return aliasCode;
+}
+
 /** This methoc evaluates the update command tect to make the update command.
  * It is separated so there is no context and minimal added closure variables 
  * in the eval statement. 
  * @private */
 visicomp.core.Member.clearFunction = function() {
     delete visicomp.core.functionCode[this.getWorkspace().getName()][this.getFullName()];
+}
+
+visicomp.core.MemberHelper = {};
+/** This function creates the function generator with the proper table varible names
+ * in the closure for the function. */
+visicomp.core.MemberHelper.createFunctionGenerator = function(_rootDataMap,
+		_localDataMap,
+		_functionGeneratorBody,
+		_aliasCode) {
+	
+	//set up the local variables, which accesses the root and local data maps
+	eval(_aliasCode);
+	
+	
+//DOH! Function constructor does not use a closure switch to eval. Clean code below.
+	//create the function generator, with the aliased variables in the closure
+//	return new Function(_functionGeneratorBody);
+	eval("var __x__ = function() {\n" + _functionGeneratorBody + "\n}");
+	return __x__;
 }
 
 
@@ -235,15 +306,6 @@ visicomp.core.Member.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//end member function",
 ""
    ].join("\n");
-   
-///** this is the code for adding the accessed member to the code
-// * @private */
-//visicomp.core.Member.LOCAL_ACCESSED_MEMBER_FORMAT_TEXT = 'var {0} = _localFolder.lookupChildData("{0}");\n';
-//
-///** this is the code for adding the accessed folder to the code
-// * @private */
-//visicomp.core.Member.ROOT_ACCESSED_MEMBER_FORMAT_TEXT = 'var {0} = _rootFolder.lookupChildData("{0}");\n';
-    
 
 
 
