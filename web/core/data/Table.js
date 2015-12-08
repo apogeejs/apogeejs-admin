@@ -2,12 +2,14 @@
 visicomp.core.Table = function(workspace,name) {
     //base init
     visicomp.core.Child.init.call(this,workspace,name,"table");
-	visicomp.core.Member.init.call(this,"()");
+    visicomp.core.Dependant.init.call(this);
+	visicomp.core.Codeable.init.call(this,"()");
 }
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Child);
-visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Member);
+visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Dependant);
+visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Codeable);
 
 /** This method sets the data for this object. It also
  * freezes the object so it is immutable. */

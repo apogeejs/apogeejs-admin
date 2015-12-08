@@ -1,41 +1,42 @@
-/** This namespace contains functions to process an update to an member
+/** This namespace contains functions to process an update to an control
  * which inherits from the FunctionBase component. */
 visicomp.core.updatecontrol = {};
 
 /** UPDATE CONTROL HANDLER
- * This handler should be called to request an update to a member, including the
+ * This handler should be called to request an update to a control, including the
  * value, the formula or the initilializer.
  * 
- * Event member format:
+ * Event object format:
  * { 
- *	member: [member], 
- *	value: [data], //if data is set directly, otherwise use code 
- *	functionBody: [formula text],
+ *	control: [control], \
+ *	html: [html text],
+ *	onLoadBody: [function body text],
  *	supplementalCode: [supplementalCode],
+ *	css: [css text],
  * }
  */
 visicomp.core.updatecontrol.UPDATE_CONTROL_HANDLER = "updateControl";
 
-/** member UPDATED EVENT
- * This listener event is fired when after a member is updated, to be used to respond
- * to the member update such as to update the UI.
+/** control UPDATED EVENT
+ * This listener event is fired when after a control is updated, to be used to respond
+ * to the control update such as to update the UI.
  * 
- * Event member Format:
- * [member]
+ * Event control Format:
+ * [control event object]
  */
 visicomp.core.updatecontrol.CONTROL_UPDATED_EVENT = "controlUpdated";
 
-visicomp.core.updatecontrol.fireUpdatedEvent = function(member) {
-    var workspace = member.getWorkspace();
-    workspace.dispatchEvent(visicomp.core.updatecontrol.CONTROL_UPDATED_EVENT,member);
+visicomp.core.updatecontrol.fireUpdatedEvent = function(control) {
+    var workspace = control.getWorkspace();
+    workspace.dispatchEvent(visicomp.core.updatecontrol.CONTROL_UPDATED_EVENT,control);
 }
 
-/** This is the listener for the update member event. */
+/** This is the listener for the update control event. */
 visicomp.core.updatecontrol.onUpdateObject = function(updateData) {
     var returnValue;
     
     try {
-		//update member content
+		//update control content
 		visicomp.core.updatecontrol.setContent(updateData);
 
 		//return success
@@ -53,15 +54,15 @@ visicomp.core.updatecontrol.onUpdateObject = function(updateData) {
 }
 
     
-/** This method subscribes to the update member handler event */
+/** This method subscribes to the update control handler event */
 visicomp.core.updatecontrol.initHandler = function(eventManager) {
     eventManager.addHandler(visicomp.core.updatecontrol.UPDATE_CONTROL_HANDLER, 
             visicomp.core.updatecontrol.onUpdateObject);
 }
 
 
-/** This method updates the data for the member. It should be implemented by
- * the member.
+/** This method updates the data for the control. It should be implemented by
+ * the control.
  * @protected */
 visicomp.core.updatecontrol.setContent = function(contentData) {
     var control = contentData.control;

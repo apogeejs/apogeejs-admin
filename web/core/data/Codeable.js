@@ -2,7 +2,7 @@
  * and supplemental code. Objects that are codeable should also be childs and
  * dependents.
  * 
- * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
+ * This is a mixin and not a class. It is used in the prototype of the objects that inherit from it.
  */
 visicomp.core.Codeable = {};
 
