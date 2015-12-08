@@ -1,21 +1,13 @@
-/** This encapsulates a member in the workspace refering to a table (data object) or a function.
- * It contains the functionality of setting code to represent the object or in setting the 
- * object directly. For code it manages dependencies to enable proper recalculation.
+/** This mixin encapsulates an object in that can be coded. It contains a function
+ * and supplemental code. Objects that are codeable should also be childs and
+ * dependents.
  * 
- * Alternatively, dependencies can be done using the events
- * fired by the objects and functions indicating they have been updated. This model
- * is used for programming controls, since this is a different programming model
- * than the scripts for the data and functions.
- * 
- * Objects have this member component should also have the child component, as the member
- * extends the child.
- * 
- * This is not a class, but it is used for the prototype of the objects that inherit from it.
+ * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  */
-visicomp.core.Member = {};
+visicomp.core.Codeable = {};
 
 /** This initializes the component */
-visicomp.core.Member.init = function(argParenList) {
+visicomp.core.Codeable.init = function(argParenList) {
     
     //arguments of the member function (with parentheses - we probably will change this)
     this.argParenList = argParenList;
@@ -31,31 +23,25 @@ visicomp.core.Member.init = function(argParenList) {
     
     //this is the list of variables access in the code for this function
     this.varInfo = null;
-    
-    //this is the list of dependencies
-    this.dependsOnList = [];
-    
-    //these are a list of members that depend on this member
-    this.impactsList = [];
 }
 
 /** This method returns the argument list, whith parentheses for this member.  */
-visicomp.core.Member.getArgParensList = function() {
+visicomp.core.Codeable.getArgParensList = function() {
     return this.argParenList;
 }
 
 /** This method returns the formula for this member.  */
-visicomp.core.Member.getFunctionBody = function() {
+visicomp.core.Codeable.getFunctionBody = function() {
     return this.functionBody;
 }
 
 /** This method returns the supplemental code for this member.  */
-visicomp.core.Member.getSupplementalCode = function() {
+visicomp.core.Codeable.getSupplementalCode = function() {
     return this.supplementalCode;
 }
 
 /** This method returns the formula for this member.  */
-visicomp.core.Member.setCode = function(functionBody, supplementalCode) {
+visicomp.core.Codeable.setCode = function(functionBody, supplementalCode) {
     this.functionBody = functionBody;
     this.supplementalCode = supplementalCode;
     
@@ -65,7 +51,7 @@ visicomp.core.Member.setCode = function(functionBody, supplementalCode) {
 }
 
 /** This method returns the formula for this member.  */
-visicomp.core.Member.clearCode = function() {
+visicomp.core.Codeable.clearCode = function() {
 	this.functionBody = "";
     this.supplementalCode = "";
     this.functionGeneratorBody = null;
@@ -77,17 +63,7 @@ visicomp.core.Member.clearCode = function() {
 	this.updateDependencies(newDependsOn);
 }
 
-/** This returns an array of members this member impacts. */
-visicomp.core.Member.getImpactsList = function() {
-    return this.impactsList;
-}
-
-/** This returns a map of the members that this member depends on. */
-visicomp.core.Member.getDependsOn = function() {
-    return this.dependsOnList;
-}
-
-visicomp.core.Member.calculateDependencies = function() {
+visicomp.core.Codeable.calculateDependencies = function() {
     //calculate the dependecies
 	this.dependencyInfo = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo,this.getParent(),this.getRootFolder());
 	
@@ -98,22 +74,22 @@ visicomp.core.Member.calculateDependencies = function() {
 	this.createAliasCode(this.dependencyInfo.accessedNames);
 }
 
-/** This method indicates if the member needs to be calculated. 
+/** This implements the "needsExecuting" method of Dependant. 
  * @private */
-visicomp.core.Member.needsExecuting = function() {
+visicomp.core.Codeable.needsExecuting = function() {
 	return (this.functionGeneratorBody != null);
 }
 
 
-/** This method calculates the object data from the function.  */
-visicomp.core.Member.execute = function() {
+/** This implements the "execute" method of Dependant.  */
+visicomp.core.Codeable.execute = function() {
     if(!this.functionGeneratorBody) return;
 	
 	var rootDataMap = this.getRootFolder().getData();
     var localDataMap = this.getParent().getData();
 	
     //create the function in the proper closure
-    this.functionGenerator = visicomp.core.MemberHelper.createFunctionGenerator(rootDataMap,
+    this.functionGenerator = visicomp.core.CodeableHelper.createFunctionGenerator(rootDataMap,
 		localDataMap,
 		this.functionGeneratorBody,
 		this.aliasCode);
@@ -133,8 +109,8 @@ visicomp.core.Member.execute = function() {
     this.processObjectFunction(objectFunction);
 }
 
-/** This method returns the supplemental code for this member.  */
-visicomp.core.Member.onDelete = function() {
+/** This method method modifies the delete call to the child object.  */
+visicomp.core.Codeable.onDelete = function() {
 	//clear the function
     this.clearFunction();
 	
@@ -151,82 +127,20 @@ visicomp.core.Member.onDelete = function() {
 //implementations must implement this function
 //This method takes the object function generated from code and processes it
 //to set the data for the object. (protected)
-//visicomp.core.Member.processObjectFunction 
+//visicomp.core.Codeable.processObjectFunction 
 
-
-/** This sets the dependencies based on the code for the member. 
- * @private */
-visicomp.core.Member.updateDependencies = function(newDependsOn) {
-	//retireve the old list
-    var oldDependsOn = this.dependsOnList;
-	
-    //create the new dependency list
-	this.dependsOnList = newDependsOn;
-	
-    //update the dependency links among the members
-	var newDependencySet = {};
-    var remoteMember;
-    var i;
-    for(i = 0; i < newDependsOn.length; i++) {
-        remoteMember = newDependsOn[i];
-		
-		//update this member
-		remoteMember.addToImpactsList(this);
-
-		//create a set of new member to use below
-		newDependencySet[remoteMember.getFullName()] = true;
-    }
-	
-    //update for links that have gotten deleted
-    for(i = 0; i < oldDependsOn.length; i++) {
-        remoteMember = oldDependsOn[i];
-		
-		var stillDependsOn = newDependencySet[remoteMember.getFullName()];
-		
-		if(!stillDependsOn) {
-			//remove from imacts list
-			remoteMember.removeFromImpactsList(this);
-		}
-    }
-}
-
-/** This method adds a data member to the imapacts list for this node. 
- * @private */
-visicomp.core.Member.addToImpactsList = function(member) {
-    //exclude this member
-    if(member == this) return;
-	
-    //make sure it appears only once
-    for(var i = 0; i < this.impactsList.length; i++) {
-        if(this.impactsList[i] == member) return;
-    }
-    //add to the list
-    this.impactsList.push(member);
-}
-
-/** This method removes a data member from the imapacts list for this node. 
- * @private */
-visicomp.core.Member.removeFromImpactsList = function(member) {
-    //it should appear only once
-    for(var i = 0; i < this.impactsList.length; i++) {
-        if(this.impactsList[i] == member) {
-            this.impactsList.splice(i,1);
-            return;
-        }
-    }
-}
 
 /** This method creates the member update javascript, which will be added to the
  * html page so the user easily can run it in the debugger if needed. 
  * @private */
-visicomp.core.Member.createFunctionGeneratorBody = function() {
+visicomp.core.Codeable.createFunctionGeneratorBody = function() {
     
     var memberFullName = this.getFullName();
     var workspaceName = this.parent.getWorkspace().getName();
     
     //create the code body
     this.functionGeneratorBody = visicomp.core.util.formatString(
-        visicomp.core.Member.GENERATOR_FUNCTION_FORMAT_TEXT,
+        visicomp.core.Codeable.GENERATOR_FUNCTION_FORMAT_TEXT,
         workspaceName,
 		memberFullName,
         this.argParenList,
@@ -238,7 +152,7 @@ visicomp.core.Member.createFunctionGeneratorBody = function() {
 /** This method creates the member update javascript, which will be added to the
  * html page so the user easily can run it in the debugger if needed. 
  * @private */
-visicomp.core.Member.createAliasCode = function(accessedNameList) {
+visicomp.core.Codeable.createAliasCode = function(accessedNameList) {
 	var aliasCode = "";
 	for(var i = 0; i < accessedNameList.length; i++) {
 		var entry = accessedNameList[i];
@@ -249,7 +163,7 @@ visicomp.core.Member.createAliasCode = function(accessedNameList) {
 }
 
 /** This method appends a variable alias to the alias code string. */
-visicomp.core.Member.addToAliasCode = function(refName,isLocalReference,aliasCode) {
+visicomp.core.Codeable.addToAliasCode = function(refName,isLocalReference,aliasCode) {
 	if(isLocalReference) {
 		aliasCode += "var " + refName + " = _localDataMap." + refName + ";\n";
 	}
@@ -263,14 +177,14 @@ visicomp.core.Member.addToAliasCode = function(refName,isLocalReference,aliasCod
  * It is separated so there is no context and minimal added closure variables 
  * in the eval statement. 
  * @private */
-visicomp.core.Member.clearFunction = function() {
+visicomp.core.Codeable.clearFunction = function() {
     delete visicomp.core.functionCode[this.getWorkspace().getName()][this.getFullName()];
 }
 
-visicomp.core.MemberHelper = {};
+visicomp.core.CodeableHelper = {};
 /** This function creates the function generator with the proper table varible names
  * in the closure for the function. */
-visicomp.core.MemberHelper.createFunctionGenerator = function(_rootDataMap,
+visicomp.core.CodeableHelper.createFunctionGenerator = function(_rootDataMap,
 		_localDataMap,
 		_functionGeneratorBody,
 		_aliasCode) {
@@ -297,7 +211,7 @@ visicomp.core.MemberHelper.createFunctionGenerator = function(_rootDataMap,
  * 4: supplemental code text
  * @private
  */
-visicomp.core.Member.GENERATOR_FUNCTION_FORMAT_TEXT = [
+visicomp.core.Codeable.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//{1}",
 "",
 "//supplemental code",

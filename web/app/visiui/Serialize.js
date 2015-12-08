@@ -71,7 +71,7 @@ visicomp.app.visiui.childToJson = function(child) {
             break;
             
         case "function":
-            json.argParens = child.getArgParensString();
+            json.argParens = child.getArgParensList();
             json.functionBody = child.getFunctionBody();
 			if((json.functionBody === null)||(json.functionBody === undefined)) json.functionBody = "";
             json.supplementalCode = child.getSupplementalCode();

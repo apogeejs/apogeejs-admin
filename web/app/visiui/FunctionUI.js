@@ -80,11 +80,12 @@ visicomp.app.visiui.FunctionUI.updateFunction = function(functionObject,function
 /** This method updates the functionObject data */    
 visicomp.app.visiui.FunctionUI.functionUpdated = function(childUI, functionObject) {
     
-    var functionText = functionObject.getFunctionText();
+    var argParens = functionObject.getArgParensList();
+    var functionBody = functionObject.getFunctionBody();
     var supplementalCode = functionObject.getSupplementalCode();
-    var code = functionText;
+    var code = "function" + argParens + " {\n" + functionBody + "\n}\n";
 	if(supplementalCode) {
-		code += "\n\n/* Supplemental Code */\n\n" +
+		code += "\n/* Supplemental Code */\n\n" +
 			supplementalCode;
 	}
     childUI.editor.getSession().setValue(code);

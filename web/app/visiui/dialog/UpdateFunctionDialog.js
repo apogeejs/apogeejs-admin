@@ -117,7 +117,7 @@ visicomp.app.visiui.dialog.showUpdateFunctionDialog = function(functionObject,on
             formulaEditor.setTheme("ace/theme/eclipse");
             formulaEditor.getSession().setMode("ace/mode/javascript");
             //set the formula
-            var functionBody = functionObject.getEditorInfo();
+            var functionBody = functionObject.getFunctionBody();
             if(functionBody) {
                 formulaEditor.getSession().setValue(functionBody);
             }
@@ -136,9 +136,9 @@ visicomp.app.visiui.dialog.showUpdateFunctionDialog = function(functionObject,on
             supplementalEditor.setTheme("ace/theme/eclipse");
             supplementalEditor.getSession().setMode("ace/mode/javascript");
             //set the formula
-            var codeInfo = functionObject.getCodeInfo();
-            if((codeInfo)&&(codeInfo.supplementalCode)) {
-                supplementalEditor.getSession().setValue(codeInfo.supplementalCode);
+            var supplementalCode = functionObject.getSupplementalCode();
+            if(supplementalCode) {
+                supplementalEditor.getSession().setValue(supplementalCode);
             }
         }
     }
