@@ -73,14 +73,14 @@ visicomp.app.visiui.dialog.showUpdateFunctionDialog = function(functionObject,on
             functionBody = formulaEditor.getSession().getValue().trim();
 		}
 		else {
-			functionBody = "";
+			functionBody = functionObject.getFunctionBody();
 		}
 		
 		if(supplementalEditor) {
             supplementalCode = supplementalEditor.getSession().getValue().trim();
 		}
 		else {
-			supplementalCode = "";
+			supplementalCode = functionObject.getSupplementalCode();
 		}
         
         var result = onSaveFunction(functionObject,functionBody,supplementalCode);

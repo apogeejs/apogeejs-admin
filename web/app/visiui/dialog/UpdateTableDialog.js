@@ -89,13 +89,13 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
 			else data = null;
         }
 		else {
-			data = null;
+			data = table.getData();
 		}
 			
         if(formulaEditor) {
             var formula = formulaEditor.getSession().getValue().trim();
 			if(formula.length === 0) {
-                functionBody = null;
+                functionBody = "";
             }
             else {
 //review how I am doing this!
@@ -103,14 +103,14 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
             }
 		}
 		else {
-			functionBody = null;
+			functionBody = table.getFunctionBody();
 		}
 		
 		if(supplementalEditor) {
             supplementalCode = supplementalEditor.getSession().getValue().trim();
 		}
 		else {
-			supplementalCode = "";
+			supplementalCode = table.getSupplementalCode();
 		}
         
         var result = onSaveFunction(table,data,functionBody,supplementalCode);
@@ -194,15 +194,16 @@ visicomp.app.visiui.dialog.showUpdateTableDialog = function(table,onSaveFunction
             supplementalEditor.setTheme("ace/theme/eclipse");
             supplementalEditor.getSession().setMode("ace/mode/javascript");
             //set the formula
-            var codeInfo = table.getCodeInfo();
-            if((codeInfo)&&(codeInfo.supplementalCode)) {
-                supplementalEditor.getSession().setValue(codeInfo.supplementalCode);
+            var supplementalCode = table.getSupplementalCode();
+            if(supplementalCode) {
+                supplementalEditor.getSession().setValue(supplementalCode);
             }
         }
     }
     
     //initilialize radio buttons
-    if(table.hasCode()) {
+    var fb = table.getFunctionBody();
+    if((fb)&&(fb.length > 0)) {
         formulaRadio.checked = true;
         showFormulaFunction();
     }

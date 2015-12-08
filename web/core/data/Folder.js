@@ -2,6 +2,7 @@
 visicomp.core.Folder = function(workspace,name) {
     //base init
     visicomp.core.Child.init.call(this,workspace,name,"folder");
+    visicomp.core.Dependant.init.call(this);
 	this.isRoot = false;
 
     //this holds the base objects, mapped by name
@@ -14,6 +15,7 @@ visicomp.core.Folder = function(workspace,name) {
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Child);
+visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Dependant);
 
 /** this is used to identify if this is the root folder. */
 visicomp.core.Folder.prototype.isRootFolder = function() {
@@ -65,6 +67,9 @@ visicomp.core.Folder.prototype.addChild = function(child) {
     this.dataMap[name] = child.getData();
 	
     child.setParent(this);
+    
+    //set all children as dependents
+    this.calculateDependents();
 }
 
 /** This method removes a table from the folder. It also sets the folder
@@ -80,6 +85,9 @@ visicomp.core.Folder.prototype.removeChild = function(child) {
     delete(this.dataMap[name]);
 	
     child.setParent(null);
+    
+    //set all children as dependents
+    this.calculateDependents();
 }
 
 /** This method updates the table data object in the folder data map. */
@@ -91,4 +99,29 @@ visicomp.core.Folder.prototype.updateData = function(child) {
         return;
     }
     this.dataMap[name] = data;
+}
+
+/** This is the implementation of the dependant method. */
+visicomp.core.Folder.prototype.needsExecuting = function() {
+    //there is no update for the folder object
+    return false;
+}
+
+/** This is the implementation of the dependant method.  */
+visicomp.core.Folder.prototype.execute = function() {
+    //there is no update for the folder object
+}
+
+//============================
+// Private methods
+//============================
+
+/** This method updates the table data object in the folder data map. 
+ * @private */
+visicomp.core.Folder.prototype.calculateDependents = function() {
+    var newDependsOn = [];
+    for(var name in this.childMap) {
+        newDependsOn.push(this.childMap[name]);
+    }
+    this.updateDependencies(newDependsOn);
 }
