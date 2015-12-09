@@ -55,15 +55,7 @@ visicomp.app.visiui.ChildUI.prototype.getContentElement = function() {
 
 /** This method responds to a "new" menu event. */
 visicomp.app.visiui.ChildUI.prototype.deleteObject = function() {
-	var eventData = {};
-	eventData.child = this.object;
-	var workspace = this.object.getWorkspace();
-    
-    var result = this.workspace.callHandler(
-        visicomp.core.deletechild.DELETE_CHILD_HANDLER,
-        eventData);
-		
-    return result;
+    return visicomp.core.deletechild.deleteChild(this.object);
 }
 
 /** This method removes the window element from the parent. */

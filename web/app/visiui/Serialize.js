@@ -127,9 +127,7 @@ visicomp.app.visiui.workspaceFromJson = function(app, json) {
     //set the data on all the objects
     var result;
     if(dataToUpdate.members.length > 0) {
-        result = workspace.callHandler(
-            visicomp.core.updatemember.UPDATE_MEMBERS_HANDLER,
-            dataToUpdate.members);
+        result = visicomp.core.updatemember.updateObjects(dataToUpdate.members);
             
         if(!result.success) {
             return result;
@@ -137,12 +135,18 @@ visicomp.app.visiui.workspaceFromJson = function(app, json) {
     }
     
     for(var i = 0; i < dataToUpdate.controls.length; i++) {
-        result = workspace.callHandler(
-            visicomp.core.updatecontrol.UPDATE_CONTROL_HANDLER,
-            dataToUpdate.controls[i]);
+        var controlData = dataToUpdate.controls[i];
+        result = visicomp.core.updatecontrol.updateObject(controlData.control,
+            controlData.html,
+            controlData.onLoadBody,
+            controlData.supplementalCode,
+            controlData.css);
+            
+        if(!result.success) {
+            return result;
+        }
     }
     
-	
 //figure out a better return
 	return result;
 }
@@ -154,50 +158,73 @@ visicomp.app.visiui.childFromJson = function(workspaceUI,parent,childJson,dataTo
     var type = childJson.type;
 	
 	var childObject;
-	var childUIObject;
 	var childUpdateData;
+    var result;
     
 	//create the object
     switch(type) {
         case "folder":
-            workspaceUI.addFolder(parent,name,false);
+            result = visicomp.core.createfolder.createFolder(parent,name);
             
             //add the contents of this folder
-            childObject = parent.lookupChild(name);
-            var grandchildrenJson = childJson.children;
-            for(var key in grandchildrenJson) {
-                var grandchildJson = grandchildrenJson[key];
-                visicomp.app.visiui.childFromJson(workspaceUI, childObject, grandchildJson, dataToUpdate);
+            if(result.success) {
+                childObject = result.folder;
+                var grandchildrenJson = childJson.children;
+                for(var key in grandchildrenJson) {
+                    var grandchildJson = grandchildrenJson[key];
+                    visicomp.app.visiui.childFromJson(workspaceUI, childObject, grandchildJson, dataToUpdate);
+                }
+            }
+            else {
+                throw visicomp.core.util.createError("Error creating folder " + name); 
             }
             break;
             
         case "table":
-			workspaceUI.addTable(parent,name);
+			result = visicomp.core.createtable.createTable(parent,name);
 
-			//lookup the child and create the update event objecct for it
-			childObject = parent.lookupChild(name);
-			childUpdateData = visicomp.app.visiui.TableUI.getUpdateEventData(childObject,childJson.data,childJson.functionBody,childJson.supplementalCode);
-			dataToUpdate.members.push(childUpdateData);
+            if(result.success) {
+                //lookup the child and create the update event objecct for it
+                childObject = result.table;
+                childUpdateData = visicomp.core.updatemember
+            }
+            else {
+                throw visicomp.core.util.createError("Error creating table " + name); 
+            }
             break;
             
         case "function":
 			var argParens = childJson.argParens;
-			workspaceUI.addFunction(parent,name + argParens);
+            result = visicomp.core.createfunction.createFunction(parent,name,argParens);
 			
-			//lookup the child and create the update event objecct for it
-			childObject = parent.lookupChild(name);
-			childUpdateData = visicomp.app.visiui.FunctionUI.getUpdateEventData(childObject,childJson.functionBody,childJson.supplementalCode);
-			dataToUpdate.members.push(childUpdateData);
+            if(result.success) {
+                //lookup the child and create the update event objecct for it
+                childObject = result.functionObject;
+                childUpdateData = visicomp.core.updatemember.getUpdateDataWrapper(childObject,undefined,childJson.functionBody,childJson.supplementalCode);
+                dataToUpdate.members.push(childUpdateData);
+            }
+            else {
+                throw visicomp.core.util.createError("Error creating function " + name); 
+            }
             break;
             
         case "control":
-			workspaceUI.addControl(parent,name);
+			result = visicomp.core.createcontrol.createControl(parent,name);
 			
-			//lookup the child and create the update event objecct for it
-			childObject = parent.lookupChild(name);
-			childUpdateData = visicomp.app.visiui.ControlUI.getUpdateEventData(childObject,childJson.html,
-                childJson.onLoadBody,childJson.supplementalCode,childJson.css);
-			dataToUpdate.controls.push(childUpdateData);
+            if(result.success) {
+                //lookup the child and create the update event objecct for it
+                childObject = result.control;
+                childUpdateData = {};
+                childUpdateData.control = childObject;
+                childUpdateData.html = childJson.html;
+                childUpdateData.onLoadBody = childJson.onLoadBody;
+                childUpdateData.supplementalCode = childJson.supplementalCode;
+                childUpdateData.css = childJson.css;
+                dataToUpdate.controls.push(childUpdateData);
+            }
+            else {
+                throw visicomp.core.util.createError("Error creating control " + name); 
+            }
             break;
             
     }

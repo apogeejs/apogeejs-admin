@@ -55,68 +55,6 @@ visicomp.app.visiui.WorkspaceUI.prototype.getChildUIObject = function(childObjec
 }
 
 /** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.addFolder = function(parent,name,isRoot) {
-    //create folder
-    var handlerData = {};
-    handlerData.name = name;
-	handlerData.parent = parent;
-    handlerData.workspace = this.workspace;
-	handlerData.isRoot = isRoot;
-    var result = this.workspace.callHandler(
-        visicomp.core.createfolder.CREATE_PACKAGE_HANDLER,
-        handlerData);
-    return result;
-}
-
-/** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.addTable = function(parent, name) {
-    //create table
-    var handlerData = {};
-    handlerData.name = name;
-    handlerData.folder = parent;
-    var result = this.workspace.callHandler(
-        visicomp.core.createtable.CREATE_TABLE_HANDLER,
-        handlerData);
-    return result;
-}
-
-/** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.addFunction = function(parent, declarationName) {
-	
-	//seperate name and arglist
-//get a reg ex and chck format
-	var nameLength = declarationName.indexOf("(");
-	if(nameLength < 0) {
-		alert("Include the argument list with the name.");
-		return {"success":false};
-	}
-    var name = declarationName.substr(0,nameLength);
-    var argParens = declarationName.substr(nameLength);
-	
-    //create table
-    var handlerData = {};
-    handlerData.name = name;
-	handlerData.argParens = argParens;
-    handlerData.folder = parent;
-    var result = this.workspace.callHandler(
-        visicomp.core.createfunction.CREATE_FUNCTION_HANDLER,
-        handlerData);
-    return result;
-}
-
-/** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(parent, name) {
-    //create table
-    var handlerData = {};
-    handlerData.name = name;
-    handlerData.folder = parent;
-    var result = this.workspace.callHandler(
-        visicomp.core.createcontrol.CREATE_CONTROL_HANDLER,
-        handlerData);
-    return result;
-}
-
-/** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object) {
     //make sure this is for us
     if(object.getWorkspace() !== this.workspace) return;

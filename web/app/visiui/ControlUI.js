@@ -47,7 +47,7 @@ visicomp.app.visiui.ControlUI.createEditDialog = function(control) {
     
     //create save handler
     var onSave = function(control,html,onLoadBody,supplementalCode,css) {
-        return visicomp.app.visiui.ControlUI.updateControl(control,html,onLoadBody,supplementalCode,css);
+        return visicomp.core.updatecontrol.updateObject(control,html,onLoadBody,supplementalCode,css);
     };
     
     visicomp.app.visiui.dialog.showUpdateControlDialog(control,onSave);
@@ -63,32 +63,6 @@ visicomp.app.visiui.ControlUI.controlUpdated = function(childUI,control) {
     if(onLoad) {
         onLoad();
     }
-}
-
-/** This method responds to a "new" menu event. */
-visicomp.app.visiui.ControlUI.updateControl = function(control,html,onLoadBody,supplementalCode,css) {
-	
-	var updateEventData = visicomp.app.visiui.ControlUI.getUpdateEventData(control,html,onLoadBody,supplementalCode,css);
-	
-    var workspace = control.getWorkspace();
-    var result = workspace.callHandler(
-        visicomp.core.updatecontrol.UPDATE_CONTROL_HANDLER,
-        updateEventData);
-		
-    return result;
-}
-
-/** This method creates the update event object for this control object. */
-visicomp.app.visiui.ControlUI.getUpdateEventData = function(control,html,onLoadBody,supplementalCode,css) {
-	
-	var controlData = {};
-    controlData.control = control;
-    controlData.html = html;
-    controlData.onLoadBody = onLoadBody;
-    controlData.supplementalCode = supplementalCode;
-    controlData.css = css;
-	
-    return controlData;
 }
 
 

@@ -1,17 +1,6 @@
 /** This namespace contains functions to process an create a table. */
 visicomp.core.createtable = {};
 
-/** CREATE TABLE HANDLER
- * This handler should be called to request a table be created.
- * 
- * Event object format:  //future add other options
- * { 
- *	name: [string]
- *	folder: [folder]
- * }
- */
-visicomp.core.createtable.CREATE_TABLE_HANDLER = "createTable";
-
 /** TABLE CREATED EVENT
  * This listener event is fired when after a table is created, to be used to respond
  * to a new table such as to update the UI.
@@ -23,13 +12,11 @@ visicomp.core.createtable.TABLE_CREATED_EVENT = "tableCreated";
 
 
 /** This is the listener for the create table event. */
-visicomp.core.createtable.onCreateTable = function(event) {
+visicomp.core.createtable.createTable = function(folder,name) {
 	var returnValue;
     
     try {
 		//create table
-		var name = event.name;
-		var folder = event.folder;
         var workspace = folder.getWorkspace();
         
 		var table = new visicomp.core.Table(workspace,name);
@@ -42,22 +29,17 @@ visicomp.core.createtable.onCreateTable = function(event) {
 		workspace.dispatchEvent(visicomp.core.createtable.TABLE_CREATED_EVENT,table);
 
 		//return success
-		returnValue = {"success":true};
+		returnValue = {"success":true, "table":table};
 	}
 	finally {
         //for now we will not catch errors but let the broswer take care of them
         //in the future we want the debugger handling for user code errors.
         if(!returnValue) {
             alert("There was an error. See the browser debugger.");
+            returnValue = {"success":false};
         }
     }
     
     return returnValue;
-}
-
-/** This method subscribes to the udpate table handler event */
-visicomp.core.createtable.initHandler = function(eventManager) {
-    eventManager.addHandler(visicomp.core.createtable.CREATE_TABLE_HANDLER, 
-            visicomp.core.createtable.onCreateTable);
 }
 

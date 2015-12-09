@@ -8,9 +8,7 @@ visicomp.app.visiui.TableUI.populateTableWindow = function(childUI,table) {
             visicomp.app.visiui.TableUI.tableUpdated(childUI,table);
         }
     }
-    
     var workspace = table.getWorkspace();
-    
     workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, tableUpdatedCallback);
     
     //editor - only for display, read only
@@ -57,7 +55,7 @@ visicomp.app.visiui.TableUI.createEditDialog = function(table) {
     
     //create save handler
     var onSave = function(table,data,formula,supplementalCode) {
-        return visicomp.app.visiui.TableUI.updateTable(table,data,formula,supplementalCode);
+        return visicomp.core.updatemember.updateObject(table,data,formula,supplementalCode);
     };
     
     visicomp.app.visiui.dialog.showUpdateTableDialog(table,onSave);
@@ -69,35 +67,6 @@ visicomp.app.visiui.TableUI.tableUpdated = function(childUI,table) {
     if(childUI.editor) {
         childUI.editor.getSession().setValue(textData);
     }
-}
-
-/** This method responds to a "new" menu event. */
-visicomp.app.visiui.TableUI.updateTable = function(table,data,functionBody,supplementalCode) {
-    
-	var updateEventData = visicomp.app.visiui.TableUI.getUpdateEventData(table,data,functionBody,supplementalCode);
-	
-    var workspace = table.getWorkspace();
-    var result = workspace.callHandler(
-        visicomp.core.updatemember.UPDATE_MEMBER_HANDLER,
-        updateEventData);
-		
-    return result;
-}
-
-/** This method creates the update event object for this table object. */
-visicomp.app.visiui.TableUI.getUpdateEventData = function(table,data,functionBody,supplementalCode) {
-	
-	var tableData = {};
-    tableData.member = table;
-	if((functionBody !== null)&&(functionBody !== undefined)) {
-        tableData.functionBody = functionBody;
-		tableData.supplementalCode = supplementalCode;
-	}
-	else {
-		tableData.data = data;
-	}
-	
-    return tableData;
 }
 
 visicomp.app.visiui.TableUI.FUNCTION_PREFIX = "var value;\n";

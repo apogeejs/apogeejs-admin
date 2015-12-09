@@ -15,6 +15,11 @@ visicomp.core.Dependant.init = function() {
     this.impactsList = [];
 }
 
+/** This method should be called to check if an object takes part in the
+ * dependencies for a workspace. This method should not be implemented on 
+ * non-dependants. */
+visicomp.core.Dependant.isDependant = true
+
 
 /** This returns an array of members this member impacts. */
 visicomp.core.Dependant.getImpactsList = function() {
@@ -55,6 +60,11 @@ visicomp.core.Dependant.updateDependencies = function(newDependsOn) {
     var i;
     for(i = 0; i < newDependsOn.length; i++) {
         remoteMember = newDependsOn[i];
+        
+        //make sure this is a dependant
+        if(!remoteMember.isDependant) {
+            visicomp.core.util.createError("The object " + remoteMember.getFullName() + " cannot be referenced as a dependant.");
+        }
 		
 		//update this member
 		remoteMember.addToImpactsList(this);

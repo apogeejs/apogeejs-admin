@@ -121,7 +121,10 @@ visicomp.core.Folder.prototype.execute = function() {
 visicomp.core.Folder.prototype.calculateDependents = function() {
     var newDependsOn = [];
     for(var name in this.childMap) {
-        newDependsOn.push(this.childMap[name]);
+        var object = this.childMap[name];
+        if(object.isDependent) {
+            newDependsOn.push(object);
+        }
     }
     this.updateDependencies(newDependsOn);
 }

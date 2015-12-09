@@ -2,29 +2,6 @@
  * which inherits from the FunctionBase component. */
 visicomp.core.updatemember = {};
 
-/** UPDATE MEMBER HANDLER
- * This handler should be called to request an update to a member, including the
- * value, the formula or the initilializer.
- * 
- * Event member format:
- * { 
- *	member: [member], 
- *	value: [data], //if data is set directly, otherwise use code 
- *	functionBody: [formula text],
- *	supplementalCode: [supplementalCode],
- * }
- */
-visicomp.core.updatemember.UPDATE_MEMBER_HANDLER = "updateMember";
-
-/** UPDATE MEMBERS HANDLER
- * This handler should be called to request an update to a member, including the
- * value, the formula or the initilializer.
- * 
- * Event member format:
- * An array of member update members
- */
-visicomp.core.updatemember.UPDATE_MEMEBERS_HANDLER = "updateMemebers";
-
 /** member UPDATED EVENT
  * This listener event is fired when after a member is updated, to be used to respond
  * to the member update such as to update the UI.
@@ -40,16 +17,16 @@ visicomp.core.updatemember.fireUpdatedEvent = function(member) {
 }
 
 /** This is the listener for the update member event. */
-visicomp.core.updatemember.onUpdateObject = function(updateData) {
+visicomp.core.updatemember.updateObject = function(member,data,functionBody,supplementalCode) {
     var returnValue;
     
     try {
 		//update member content
-		visicomp.core.updatemember.setContent(updateData);
+		visicomp.core.updatemember.setContent(member,data,functionBody,supplementalCode);
 
 		//recalculate
 		var recalculateList = [];
-		visicomp.core.calculation.addToRecalculateList(recalculateList,updateData.member);
+		visicomp.core.calculation.addToRecalculateList(recalculateList,member);
 		visicomp.core.calculation.recalculateObjects(recalculateList);
 
 		//return success
@@ -60,6 +37,7 @@ visicomp.core.updatemember.onUpdateObject = function(updateData) {
         //in the future we want the debugger handling for user code errors.
         if(!returnValue) {
             alert("There was an error. See the browser debugger.");
+            returnValue = {"success":false};
         }
     }
     
@@ -68,14 +46,18 @@ visicomp.core.updatemember.onUpdateObject = function(updateData) {
 
 
 /** This is the listener for the update members event. */
-visicomp.core.updatemember.onUpdateObjects = function(updateDataList) {
+visicomp.core.updatemember.updateObjects = function(updateDataList) {
     var recalculateList = [];
 
     //update members and add to recalculate list
     for(var i = 0; i < updateDataList.length; i++) {
-        var data = updateDataList[i];
-        visicomp.core.updatemember.setContent(data);
-        visicomp.core.calculation.addToRecalculateList(recalculateList,data.member);
+        var argData = updateDataList[i];
+        var member = argData.member;
+        var data = argData.data;
+        var functionBody = argData.functionBody;
+        var supplementalCode = argData.supplementalCode;
+        visicomp.core.updatemember.setContent(member,data,functionBody,supplementalCode);
+        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
     }
 
     //recalculate members
@@ -86,30 +68,26 @@ visicomp.core.updatemember.onUpdateObjects = function(updateDataList) {
         "success":true
     };
 }
-    
-/** This method subscribes to the update member handler event */
-visicomp.core.updatemember.initHandler = function(eventManager) {
-    eventManager.addHandler(visicomp.core.updatemember.UPDATE_MEMBER_HANDLER, 
-            visicomp.core.updatemember.onUpdateObject);
-    eventManager.addHandler(visicomp.core.updatemember.UPDATE_MEMBERS_HANDLER, 
-            visicomp.core.updatemember.onUpdateObjects);
+
+/** This method responds to a "new" menu event. */
+visicomp.core.updatemember.getUpdateDataWrapper = function(member,data,functionBody,supplementalCode) {
+	
+	var updateDataWraapper = {};
+    updateDataWraapper.member = member;
+    if((data !== undefined)||(data !== null)) {
+        updateDataWraapper.data = data;
+    }
+	updateDataWraapper.functionBody = functionBody;
+	updateDataWraapper.supplementalCode = supplementalCode;
+	
+	return updateDataWraapper;
 }
 
 
 /** This method updates the data for the member. It should be implemented by
  * the member.
  * @protected */
-visicomp.core.updatemember.setContent = function(contentData) {
-    var member = contentData.member;
-	if(!member) {
-		alert("Error: missing member");
-		return;
-	}
-
-    //read handler data
-    var functionBody = contentData.functionBody;
-    var supplementalCode = contentData.supplementalCode;
-    var data = contentData.data;
+visicomp.core.updatemember.setContent = function(member,data,functionBody,supplementalCode) {
 	
     //set forumula or value, not both
     if(functionBody) {

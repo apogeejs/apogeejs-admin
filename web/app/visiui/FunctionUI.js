@@ -58,23 +58,10 @@ visicomp.app.visiui.FunctionUI.createEditDialog = function(functionObject) {
     
     //create save handler
     var onSave = function(functionObject,functionBody,supplementalCode) {
-        return visicomp.app.visiui.FunctionUI.updateFunction(functionObject,functionBody,supplementalCode);
+        return visicomp.core.updatemember.updateObject(functionObject,null,functionBody,supplementalCode);
     };
     
     visicomp.app.visiui.dialog.showUpdateFunctionDialog(functionObject,onSave);
-}
-
-/** This method responds to a "new" menu event. */
-visicomp.app.visiui.FunctionUI.updateFunction = function(functionObject,functionBody,supplementalCode) {
-	
-	var updateEventData = visicomp.app.visiui.FunctionUI.getUpdateEventData(functionObject,functionBody,supplementalCode)
-	
-    var workspace = functionObject.getWorkspace();
-    var result = workspace.callHandler(
-        visicomp.core.updatemember.UPDATE_MEMBER_HANDLER,
-        updateEventData);
-		
-    return result;
 }
     
 /** This method updates the functionObject data */    
@@ -89,15 +76,4 @@ visicomp.app.visiui.FunctionUI.functionUpdated = function(childUI, functionObjec
 			supplementalCode;
 	}
     childUI.editor.getSession().setValue(code);
-}
-
-/** This method responds to a "new" menu event. */
-visicomp.app.visiui.FunctionUI.getUpdateEventData = function(functionObject,functionBody,supplementalCode) {
-	
-	var functionData = {};
-    functionData.member = functionObject;
-	functionData.functionBody = functionBody;
-	functionData.supplementalCode = supplementalCode;
-	
-	return functionData;
 }

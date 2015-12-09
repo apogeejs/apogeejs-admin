@@ -2,17 +2,6 @@ visicomp.app.visiui.FolderUI = {};
 
 visicomp.app.visiui.FolderUI.populateFolderWindow = function(childUI,folder) {
     
-    //subscribe to table update event
-    var folderUpdatedCallback = function(folderObject) {
-        if(folderObject === folder) {
-            visicomp.app.visiui.TableUI.tableUpdated(childUI,folder);
-        }
-    }
-    
-    var workspace = folder.getWorkspace();
-    
-    workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, folderUpdatedCallback);
-    
     var window = childUI.getWindow();
     
 //    //resize the editor on window size change

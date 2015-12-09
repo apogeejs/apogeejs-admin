@@ -104,7 +104,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         }
         
         var onCreate = function(parent,folderName) {
-            return instance.workspaceUI.addFolder(parent,folderName,false);
+            return visicomp.core.createfolder.createFolder(parent,folderName);
         }
         visicomp.app.visiui.dialog.showCreateChildDialog("folder",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
@@ -118,7 +118,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         }
         
         var onCreate = function(parent,tableName) {
-            return instance.workspaceUI.addTable(parent,tableName);
+            return visicomp.core.createtable.createTable(parent,tableName);
         }
         visicomp.app.visiui.dialog.showCreateChildDialog("table",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
@@ -131,8 +131,21 @@ visicomp.app.visiui.VisiComp = function(containerId) {
             return;
         }
         
-        var onCreate = function(parent,functionName) {
-            return instance.workspaceUI.addFunction(parent,functionName);
+        var onCreate = function(parent,declarationName) {
+            //seperate name and arglist 
+//this is kind of a cludge the way this is done
+//we should make a separate edit dialog for this
+//we also should change the data taht is stored = so it is not the string and args together
+            //get a reg ex and chck format
+            var nameLength = declarationName.indexOf("(");
+            if(nameLength < 0) {
+                alert("Include the argument list with the name.");
+                return {"success":false};
+            }
+            var functionName = declarationName.substr(0,nameLength);
+            var argParens = declarationName.substr(nameLength);
+    
+            return visicomp.core.createfunction.createFunction(parent,functionName,argParens);
         }
         visicomp.app.visiui.dialog.showCreateChildDialog("function",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
@@ -146,7 +159,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         }
         
         var onCreate = function(parent,controlName) {
-            return instance.workspaceUI.addControl(parent,controlName);
+            return visicomp.core.createcontrol.createControl(parent,controlName);
         }
         visicomp.app.visiui.dialog.showCreateChildDialog("table",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
