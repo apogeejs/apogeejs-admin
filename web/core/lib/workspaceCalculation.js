@@ -17,13 +17,17 @@ visicomp.core.calculation.addToRecalculateList = function(recalculateList,member
     if(this.inList(recalculateList,member)) return;
      
     //add this member to recalculate list if it needs to be executed
-    if(member.needsExecuting()) {
-       recalculateList.push(member);
+    if(member.isRecalculable) {
+        if(member.needsExecuting()) {
+           recalculateList.push(member);
+        }
     }
     //add any member that is depends on this one
-    var impactsList = member.getImpactsList();
-    for(var i = 0; i < impactsList.length; i++) {
-        visicomp.core.calculation.addToRecalculateList(recalculateList,impactsList[i]);
+    if(member.isImpactor) {
+        var impactsList = member.getImpactsList();
+        for(var i = 0; i < impactsList.length; i++) {
+            visicomp.core.calculation.addToRecalculateList(recalculateList,impactsList[i]);
+        }
     }
 }
 

@@ -186,7 +186,8 @@ visicomp.app.visiui.childFromJson = function(workspaceUI,parent,childJson,dataTo
             if(result.success) {
                 //lookup the child and create the update event objecct for it
                 childObject = result.table;
-                childUpdateData = visicomp.core.updatemember
+                childUpdateData = visicomp.core.updatemember.getUpdateDataWrapper(childObject,childJson.data,childJson.functionBody,childJson.supplementalCode);
+                dataToUpdate.members.push(childUpdateData);
             }
             else {
                 throw visicomp.core.util.createError("Error creating table " + name); 

@@ -71,44 +71,14 @@ visicomp.core.Child.getRootFolder = function() {
 	return null; //this shouldn't happen
 }
 
-/** this method gets the data map. */
-visicomp.core.Child.getData = function() {
-    return this.data;
-}
-
 /** This identifies the type of object. */
 visicomp.core.Child.getType = function() {
 	return this.type;
 }
 
-/** This method returns info set by the client editor. It allows the 
- * editor to store a different version than the finished function object.  */
-visicomp.core.Child.getEditorInfo = function() {
-    return this.editorInfo;
-}
-
-/** This method sets info set by the client editor. It allows the 
- * editor to store a different version than the finished function object.  */
-visicomp.core.Child.setEditorInfo = function(editorInfo) {
-    this.editorInfo = editorInfo;
-}
-
-
 //========================================
 // "Protected" Methods
 //========================================
-
-/** This method sets the data for this object. This is the object used by the 
- * code which is identified by this name, for example the JSON object associated
- * with a table. Besides hold the data object, this updates the parent data map. */
-visicomp.core.Child.setData = function(data) {
-    this.data = data;
-    
-    //data the data map in the parent if it is a hierarchy container 
-    if((this.parent)&&(this.parent.getType() == "folder")) {
-        this.parent.updateData(this);
-    }
-}
 
 /** This method is called when the child is deleted. If necessary the implementation
  * can extend this function, but it should call this base version of the function
@@ -118,34 +88,4 @@ visicomp.core.Child.onDelete = function() {
 		this.parent.removeChild(this);
 	}
 }
-
-///** This is a window for a dialog. The title and options are the same as the title
-// * and options for a window frame. 
-// *
-// * @class 
-// */
-//visicomp.visiui.Dialog = function(title, options) {
-//    
-//    //use page body and the parent
-//    var parentContainer = document.body;
-//    
-//    //call the parent constructor
-//    visicomp.visiui.WindowFrame.call(this,parentContainer,title,options);
-//    
-//    this.setZIndex(visicomp.visiui.DIALOG_ZINDEX);
-//}
-//
-//visicomp.visiui.Dialog.prototype = Object.create(visicomp.visiui.WindowFrame.prototype);
-//visicomp.visiui.Dialog.prototype.constructor = visicomp.visiui.Dialog;
-//
-///** This method centers the dialog on the page. It must be called after the conten
-// * is set, and possibly after it is rendered, so the size of it is calculated. */
-//visicomp.visiui.Dialog.prototype.centerOnPage = function() {
-//    var element = this.getElement();
-//    var x = (document.body.clientWidth - element.clientWidth)/2;
-//    var y = (document.body.clientHeight - element.clientHeight)/2;
-//    this.setPosition(x,y);
-//}
-
-
 

@@ -10,9 +10,6 @@ visicomp.core.Dependant.init = function() {
     
     //this is the list of dependencies
     this.dependsOnList = [];
-    
-    //these are a list of members that depend on this member
-    this.impactsList = [];
 }
 
 /** This method should be called to check if an object takes part in the
@@ -20,26 +17,10 @@ visicomp.core.Dependant.init = function() {
  * non-dependants. */
 visicomp.core.Dependant.isDependant = true
 
-
-/** This returns an array of members this member impacts. */
-visicomp.core.Dependant.getImpactsList = function() {
-    return this.impactsList;
-}
-
 /** This returns a map of the members that this member depends on. */
 visicomp.core.Dependant.getDependsOn = function() {
     return this.dependsOnList;
 }
-
-/** This method indicates if the member needs to be calculated.
- * It should be implemented in inheriting objects. 
- * */
-//visicomp.core.Dependant.needsExecuting = function() {}
-
-
-/** This method updates an object after its dependencies have been updated.
- * It should be implemented by inheriting objects.  */
-//visicomp.core.Dependant.execute = function() {}
 
 //===================================
 // Private Functions
@@ -62,7 +43,7 @@ visicomp.core.Dependant.updateDependencies = function(newDependsOn) {
         remoteMember = newDependsOn[i];
         
         //make sure this is a dependant
-        if(!remoteMember.isDependant) {
+        if(!remoteMember.isImpactor) {
             visicomp.core.util.createError("The object " + remoteMember.getFullName() + " cannot be referenced as a dependant.");
         }
 		
@@ -83,31 +64,5 @@ visicomp.core.Dependant.updateDependencies = function(newDependsOn) {
 			//remove from imacts list
 			remoteMember.removeFromImpactsList(this);
 		}
-    }
-}
-
-/** This method adds a data member to the imapacts list for this node. 
- * @private */
-visicomp.core.Dependant.addToImpactsList = function(member) {
-    //exclude this member
-    if(member == this) return;
-	
-    //make sure it appears only once
-    for(var i = 0; i < this.impactsList.length; i++) {
-        if(this.impactsList[i] == member) return;
-    }
-    //add to the list
-    this.impactsList.push(member);
-}
-
-/** This method removes a data member from the imapacts list for this node. 
- * @private */
-visicomp.core.Dependant.removeFromImpactsList = function(member) {
-    //it should appear only once
-    for(var i = 0; i < this.impactsList.length; i++) {
-        if(this.impactsList[i] == member) {
-            this.impactsList.splice(i,1);
-            return;
-        }
     }
 }

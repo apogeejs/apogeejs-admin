@@ -22,9 +22,6 @@ visicomp.core.createcontrol.createControl = function(folder,name) {
 		var control = new visicomp.core.Control(workspace,name);
 		folder.addChild(control);
 
-		//initialize data
-		control.setData("");
-
 		//dispatch event
 		workspace.dispatchEvent(visicomp.core.createcontrol.CONTROL_CREATED_EVENT,control);
 

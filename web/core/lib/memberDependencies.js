@@ -47,8 +47,12 @@ visicomp.core.memberDependencies.getDependencyInfo = function(varInfo,localFolde
 					//lookup this object
 					var folder = isFromLocalFolder ? localFolder : rootFolder;
 					var object = folder.lookupChildFromPath(namePath);
-//need to add this folder loookup!
 					if(object) {
+                        
+                        if(!object.isImpactor) {
+                            throw visicomp.core.util.createError("An object may not depend on the object " + object.getName());
+                        }
+                        
 						//save the object to dependencies
 						var fullName = object.getFullName();
 						if(!objectMap[fullName]) {

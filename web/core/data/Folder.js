@@ -2,7 +2,9 @@
 visicomp.core.Folder = function(workspace,name) {
     //base init
     visicomp.core.Child.init.call(this,workspace,name,"folder");
+    visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
+    visicomp.core.Impactor.init.call(this);
 	this.isRoot = false;
 
     //this holds the base objects, mapped by name
@@ -15,7 +17,9 @@ visicomp.core.Folder = function(workspace,name) {
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Child);
+visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.DataHolder);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Dependant);
+visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Impactor);
 
 /** this is used to identify if this is the root folder. */
 visicomp.core.Folder.prototype.isRootFolder = function() {
@@ -64,7 +68,9 @@ visicomp.core.Folder.prototype.addChild = function(child) {
     }
     //add object
     this.childMap[name] = child;
-    this.dataMap[name] = child.getData();
+    if(child.isDataHolder) {
+        this.dataMap[name] = child.getData();
+    }
 	
     child.setParent(this);
     
@@ -101,17 +107,6 @@ visicomp.core.Folder.prototype.updateData = function(child) {
     this.dataMap[name] = data;
 }
 
-/** This is the implementation of the dependant method. */
-visicomp.core.Folder.prototype.needsExecuting = function() {
-    //there is no update for the folder object
-    return false;
-}
-
-/** This is the implementation of the dependant method.  */
-visicomp.core.Folder.prototype.execute = function() {
-    //there is no update for the folder object
-}
-
 //============================
 // Private methods
 //============================
@@ -122,7 +117,7 @@ visicomp.core.Folder.prototype.calculateDependents = function() {
     var newDependsOn = [];
     for(var name in this.childMap) {
         var object = this.childMap[name];
-        if(object.isDependent) {
+        if(object.isDataHolder) {
             newDependsOn.push(object);
         }
     }

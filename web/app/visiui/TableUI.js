@@ -54,8 +54,13 @@ visicomp.app.visiui.TableUI.formatString = "\t";
 visicomp.app.visiui.TableUI.createEditDialog = function(table) {
     
     //create save handler
-    var onSave = function(table,data,formula,supplementalCode) {
-        return visicomp.core.updatemember.updateObject(table,data,formula,supplementalCode);
+    var onSave = function(table,data,functionBody,supplementalCode) {
+        if((functionBody)&&(functionBody.length > 0)) {
+            return visicomp.core.updatemember.updateCode(table,functionBody,supplementalCode);
+        }
+        else {
+            return visicomp.core.updatemember.updateData(table,data);
+        }
     };
     
     visicomp.app.visiui.dialog.showUpdateTableDialog(table,onSave);

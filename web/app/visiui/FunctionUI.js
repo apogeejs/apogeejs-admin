@@ -58,7 +58,7 @@ visicomp.app.visiui.FunctionUI.createEditDialog = function(functionObject) {
     
     //create save handler
     var onSave = function(functionObject,functionBody,supplementalCode) {
-        return visicomp.core.updatemember.updateObject(functionObject,null,functionBody,supplementalCode);
+        return visicomp.core.updatemember.updateCode(functionObject,functionBody,supplementalCode);
     };
     
     visicomp.app.visiui.dialog.showUpdateFunctionDialog(functionObject,onSave);
