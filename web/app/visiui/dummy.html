@@ -52,6 +52,7 @@
         <script type="text/javascript" src="dialog/UpdateFunctionDialog.js"></script>
         <script type="text/javascript" src="dialog/UpdateControlDialog.js"></script>
         <script type="text/javascript" src="dialog/CreateChildDialog.js"></script>
+        <script type="text/javascript" src="dialog/CreateControlDialog.js"></script>
         <script type="text/javascript" src="dialog/CreateWorkspaceDialog.js"></script>
         <script type="text/javascript" src="dialog/TempOpenDialog.js"></script>
         <script type="text/javascript" src="dialog/TempSaveDialog.js"></script>
@@ -82,6 +83,10 @@
             var app = null;
 			function init() {
                 app = new visicomp.app.visiui.VisiComp("appContainer");
+            }
+            
+            function registerControl(controlBundle) {
+                app.registerControl(controlBundle);
             }
 		</script>
 	</head>

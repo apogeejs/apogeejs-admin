@@ -14,6 +14,9 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     this.jsLinkArray = [];
     this.cssLinksText = "";
     this.cssLinkArray = [];
+    
+    //controls
+    this.controlMap = {};
 
     //create menus
     var menuBar = new visicomp.visiui.MenuBar(containerId);
@@ -158,10 +161,11 @@ visicomp.app.visiui.VisiComp = function(containerId) {
             return;
         }
         
-        var onCreate = function(parent,controlName) {
-            return visicomp.core.createcontrol.createControl(parent,controlName);
+        var onCreate = function(parent,controlName,controlBundle) {
+            var controlEngine = controlBundle.createInstance();
+            return visicomp.core.createcontrol.createControl(parent,controlName,controlEngine);
         }
-        visicomp.app.visiui.dialog.showCreateChildDialog("table",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
+        visicomp.app.visiui.dialog.showCreateControlDialog(instance.controlMap,instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
     this.addListener("folderAddControl",addControlListener);
     
@@ -234,6 +238,13 @@ visicomp.app.visiui.VisiComp.prototype.setCssLinks = function(cssLinks) {
     var oldLinkArray = this.cssLinkArray;
     this.updateLinkArray(newLinkArray,oldLinkArray,visicomp.app.visiui.VisiComp.setCssLink);
     this.cssLinkArray = newLinkArray;
+}
+
+/** This method registers a control. */
+visicomp.app.visiui.VisiComp.prototype.registerControl = function(controlBundle) {
+
+//we should maybe warn if another control bundle is being overwritten 
+    this.controlMap[controlBundle.name] = controlBundle;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

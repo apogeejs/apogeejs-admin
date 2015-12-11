@@ -12,14 +12,14 @@ visicomp.core.createcontrol.CONTROL_CREATED_EVENT = "controlCreated";
 
 
 /** This is the listener for the create control event. */
-visicomp.core.createcontrol.createControl = function(folder,name) {
+visicomp.core.createcontrol.createControl = function(folder,name,controlEngine) {
 	var returnValue;
     
     try {
 		//create control
         var workspace = folder.getWorkspace();
         
-		var control = new visicomp.core.Control(workspace,name);
+		var control = new visicomp.core.Control(workspace,name,controlEngine);
 		folder.addChild(control);
 
 		//dispatch event
