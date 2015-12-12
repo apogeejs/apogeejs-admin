@@ -108,7 +108,16 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         }
         
         var onCreate = function(parent,folderName) {
-            return visicomp.core.createfolder.createFolder(parent,folderName);
+            var returnValue = visicomp.core.createfolder.createFolder(parent,folderName);
+            if(returnValue.success) {
+                var folder = returnValue.folder;
+                var folderUiInit = visicomp.app.visiui.FolderUI.populateFolderWindow;
+                instance.workspaceUI.objectAdded(folder,folderUiInit);
+            }
+            else {
+                //no action for now
+            }
+            return returnValue;
         }
         visicomp.app.visiui.dialog.showCreateChildDialog("Folder",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
@@ -122,7 +131,16 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         }
         
         var onCreate = function(parent,tableName) {
-            return visicomp.core.createtable.createTable(parent,tableName);
+            var returnValue = visicomp.core.createtable.createTable(parent,tableName);
+            if(returnValue.success) {
+                var table = returnValue.table;
+                var tableUiInit = visicomp.app.visiui.TableUI.populateTableWindow;
+                instance.workspaceUI.objectAdded(table,tableUiInit);
+            }
+            else {
+                //no action for now
+            }
+            return returnValue;
         }
         visicomp.app.visiui.dialog.showCreateChildDialog("Table",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
@@ -149,7 +167,16 @@ visicomp.app.visiui.VisiComp = function(containerId) {
             var functionName = declarationName.substr(0,nameLength);
             var argParens = declarationName.substr(nameLength);
     
-            return visicomp.core.createfunction.createFunction(parent,functionName,argParens);
+            var returnValue = visicomp.core.createfunction.createFunction(parent,functionName,argParens);
+            if(returnValue.success) {
+                var functionObject = returnValue.functionObject;
+                var functionUiInit = visicomp.app.visiui.FunctionUI.populateFunctionWindow;
+                instance.workspaceUI.objectAdded(functionObject,functionUiInit);
+            }
+            else {
+                //no action for now
+            }
+            return returnValue;
         }
         visicomp.app.visiui.dialog.showCreateChildDialog("Function",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
@@ -164,7 +191,16 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         
         var onCreate = function(parent,controlName,controlBundle) {
             var controlEngine = controlBundle.createInstance();
-            return visicomp.core.createcontrol.createControl(parent,controlName,controlEngine);
+            var returnValue = visicomp.core.createcontrol.createControl(parent,controlName,controlEngine);
+            if(returnValue.success) {
+                var control = returnValue.control;
+                var controlUiInit = visicomp.app.visiui.ControlUI.populateControlWindow;
+                instance.workspaceUI.objectAdded(control,controlUiInit);
+            }
+            else {
+                //no action for now
+            }
+            return returnValue;
         }
         visicomp.app.visiui.dialog.showCreateControlDialog(instance.controlMap,instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
@@ -179,7 +215,16 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 		
 		var onCreate = function(parent,controlName) {
 			var controlEngine = new visicomp.app.visiui.control.CustomControl();
-            return visicomp.core.createcontrol.createControl(parent,controlName,controlEngine);
+            var returnValue = visicomp.core.createcontrol.createControl(parent,controlName,controlEngine);
+            if(returnValue.success) {
+                var control = returnValue.control;
+                var controlUiInit = visicomp.app.visiui.CustomControlUI.populateControlWindow;
+                instance.workspaceUI.objectAdded(control,controlUiInit);
+            }
+            else {
+                //no action for now
+            }
+            return returnValue;
         }
         visicomp.app.visiui.dialog.showCreateChildDialog("Custom Control",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }

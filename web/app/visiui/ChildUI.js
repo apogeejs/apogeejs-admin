@@ -2,7 +2,7 @@
  *
  * @class 
  */
-visicomp.app.visiui.ChildUI = function(child,parentElement) {
+visicomp.app.visiui.ChildUI = function(child,parentElement,uiInit) {
 
     this.object = child;
     this.name = child.getName();
@@ -22,34 +22,37 @@ visicomp.app.visiui.ChildUI = function(child,parentElement) {
                 "left":"0px"
             });
     this.window.setContent(contentDiv);
+    
+    //initialize the UI
+    uiInit(this,child);
 
-	switch(child.getType()) {
-		case "folder":
-            visicomp.app.visiui.FolderUI.populateFolderWindow(this,child);
-			break;
-			
-		case "table":
-            visicomp.app.visiui.TableUI.populateTableWindow(this,child);
-			break;
-			
-		case "function":
-            visicomp.app.visiui.FunctionUI.populateFunctionWindow(this,child);
-			break;
-            
-        case "control":
-			var controlEngine = child.getControlEngine();
-			//create a special window for custom controls
-			if(controlEngine.isCustomControl) {
-				visicomp.app.visiui.CustomControlUI.populateControlWindow(this,child);
-			}
-			else {
-				visicomp.app.visiui.ControlUI.populateControlWindow(this,child);
-			}
-			break;
-			
-		default:
-			alert("Unsupported object type for a UI object");
-	}
+//	switch(child.getType()) {
+//		case "folder":
+//            visicomp.app.visiui.FolderUI.populateFolderWindow(this,child);
+//			break;
+//			
+//		case "table":
+//            visicomp.app.visiui.TableUI.populateTableWindow(this,child);
+//			break;
+//			
+//		case "function":
+//            visicomp.app.visiui.FunctionUI.populateFunctionWindow(this,child);
+//			break;
+//            
+//        case "control":
+//			var controlEngine = child.getControlEngine();
+//			//create a special window for custom controls
+//			if(controlEngine.isCustomControl) {
+//				visicomp.app.visiui.CustomControlUI.populateControlWindow(this,child);
+//			}
+//			else {
+//				visicomp.app.visiui.ControlUI.populateControlWindow(this,child);
+//			}
+//			break;
+//			
+//		default:
+//			alert("Unsupported object type for a UI object");
+//	}
 }
 
 visicomp.app.visiui.ChildUI.prototype.getWindow = function() {

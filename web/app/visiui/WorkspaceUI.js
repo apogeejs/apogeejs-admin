@@ -21,13 +21,13 @@ var objectInfo = {};
     var instance = this;
     
     //add folder created listener
-    var objectAddedListener = function(object) {
-        instance.objectAdded(object);
-    }
-    this.workspace.addListener(visicomp.core.createfolder.PACKAGE_CREATED_EVENT, objectAddedListener);
-    this.workspace.addListener(visicomp.core.createtable.TABLE_CREATED_EVENT, objectAddedListener);
-    this.workspace.addListener(visicomp.core.createfunction.FUNCTION_CREATED_EVENT, objectAddedListener);
-    this.workspace.addListener(visicomp.core.createcontrol.CONTROL_CREATED_EVENT, objectAddedListener);
+//    var objectAddedListener = function(object) {
+//        instance.objectAdded(object);
+//    }
+//    this.workspace.addListener(visicomp.core.createfolder.PACKAGE_CREATED_EVENT, objectAddedListener);
+//    this.workspace.addListener(visicomp.core.createtable.TABLE_CREATED_EVENT, objectAddedListener);
+//    this.workspace.addListener(visicomp.core.createfunction.FUNCTION_CREATED_EVENT, objectAddedListener);
+//    this.workspace.addListener(visicomp.core.createcontrol.CONTROL_CREATED_EVENT, objectAddedListener);
 	
 	//add folder created listener
     var childDeletedListener = function(objectFullName) {
@@ -55,7 +55,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.getChildUIObject = function(childObjec
 }
 
 /** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object) {
+visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object,uiInit) {
     //make sure this is for us
     if(object.getWorkspace() !== this.workspace) return;
 	
@@ -70,7 +70,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object) {
 	}
 	
 	//create the ui object
-	var objectUI = new visicomp.app.visiui.ChildUI(object,parentContainer);
+	var objectUI = new visicomp.app.visiui.ChildUI(object,parentContainer,uiInit);
 	
 	//store the ui object
 	var key = this.getObjectKey(object);
