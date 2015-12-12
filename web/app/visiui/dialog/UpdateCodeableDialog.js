@@ -1,6 +1,10 @@
-/** This method shows an update function dialog. The argument onSaveData si the same
- * arguments as the updateFunction event handler data. */
-visicomp.app.visiui.dialog.showUpdateFunctionDialog = function(functionObject,onSaveFunction) {
+/** This method shows an update dialog for the code in a codeable object.
+ * The argument editorCodeWrapper is optional and can be left off. It allows the
+ * function body code to be wrapped and unwraped so the code the user enters does
+ * not include the complete function body. This is used on Table so the user can 
+ * set the value to a variable names "value" rather then writing a function with 
+ * a return statement. This was just a UI choice. */
+visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,onSaveFunction,title,editorCodeWrapper) {
     
     var dialog = new visicomp.visiui.Dialog("Dialog",
             {"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
@@ -12,14 +16,24 @@ visicomp.app.visiui.dialog.showUpdateFunctionDialog = function(functionObject,on
     
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Update Function"}));
+    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":title}));
     content.appendChild(line);
         
     //editor selector
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"}); 
     var formulaRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"dataFormula","value":"formula"});
     line.appendChild(formulaRadio);
-    line.appendChild(document.createTextNode("Formula"));
+	//-------------------------------
+	//this code added to allow customization of name and content for the main code - used by table
+	var formulaName;
+	if(editorCodeWrapper) {
+		formulaName = editorCodeWrapper.displayName;
+	}
+	else {
+		formulaName = "Function Body"
+	}
+	//--------------------------------
+    line.appendChild(document.createTextNode(formulaName));
     var supplementalRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"dataFormula","value":"supplemental"});
     line.appendChild(supplementalRadio);
     line.appendChild(document.createTextNode("Supplemental Code"));
@@ -66,24 +80,30 @@ visicomp.app.visiui.dialog.showUpdateFunctionDialog = function(functionObject,on
     }
     
     var onSave = function() {
-		var functionBody;
+		var mainCode;
 		var supplementalCode;
 			
         if(formulaEditor) {
-            functionBody = formulaEditor.getSession().getValue().trim();
+            mainCode = formulaEditor.getSession().getValue().trim();
+			//--------------------------
+			//this code added to allow customization of name and content for the main code - used by table
+			if(editorCodeWrapper) {
+				mainCode = editorCodeWrapper.wrapCode(mainCode);
+			}
+			//--------------------------
 		}
 		else {
-			functionBody = functionObject.getFunctionBody();
+			mainCode = codeableObject.getFunctionBody();
 		}
 		
 		if(supplementalEditor) {
             supplementalCode = supplementalEditor.getSession().getValue().trim();
 		}
 		else {
-			supplementalCode = functionObject.getSupplementalCode();
+			supplementalCode = codeableObject.getSupplementalCode();
 		}
         
-        var result = onSaveFunction(functionObject,functionBody,supplementalCode);
+        var result = onSaveFunction(codeableObject,mainCode,supplementalCode);
         
         if(result.success) {
 			dialog.hide();
@@ -117,9 +137,16 @@ visicomp.app.visiui.dialog.showUpdateFunctionDialog = function(functionObject,on
             formulaEditor.setTheme("ace/theme/eclipse");
             formulaEditor.getSession().setMode("ace/mode/javascript");
             //set the formula
-            var functionBody = functionObject.getFunctionBody();
-            if(functionBody) {
-                formulaEditor.getSession().setValue(functionBody);
+            var mainCode = codeableObject.getFunctionBody();
+            if(mainCode) {
+			
+				//--------------------------
+				//this code added to allow customization of name and content for the main code - used by table
+				if(editorCodeWrapper) {
+					mainCode = editorCodeWrapper.unwrapCode(mainCode);
+				}
+				//--------------------------
+                formulaEditor.getSession().setValue(mainCode);
             }
         }
     }
@@ -136,7 +163,7 @@ visicomp.app.visiui.dialog.showUpdateFunctionDialog = function(functionObject,on
             supplementalEditor.setTheme("ace/theme/eclipse");
             supplementalEditor.getSession().setMode("ace/mode/javascript");
             //set the formula
-            var supplementalCode = functionObject.getSupplementalCode();
+            var supplementalCode = codeableObject.getSupplementalCode();
             if(supplementalCode) {
                 supplementalEditor.getSession().setValue(supplementalCode);
             }

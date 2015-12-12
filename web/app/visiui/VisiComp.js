@@ -33,6 +33,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     menu.addEventMenuItem("Add&nbsp;Table","folderAddTable",null,this);
     menu.addEventMenuItem("Add&nbsp;Function","folderAddFunction",null,this);
     menu.addEventMenuItem("Add&nbsp;Control","folderAddControl",null,this);
+	menu.addEventMenuItem("Add&nbsp;Custom&nbsp;Control","folderAddCustomControl",null,this);
     
     menu = menuBar.addMenu("Libraries");
     menu.addEventMenuItem("Update&nbsp;Links","externalLinks",null,this);
@@ -109,7 +110,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         var onCreate = function(parent,folderName) {
             return visicomp.core.createfolder.createFolder(parent,folderName);
         }
-        visicomp.app.visiui.dialog.showCreateChildDialog("folder",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
+        visicomp.app.visiui.dialog.showCreateChildDialog("Folder",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
     this.addListener("workspaceAddFolder",addFolderListener);
 
@@ -123,7 +124,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         var onCreate = function(parent,tableName) {
             return visicomp.core.createtable.createTable(parent,tableName);
         }
-        visicomp.app.visiui.dialog.showCreateChildDialog("table",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
+        visicomp.app.visiui.dialog.showCreateChildDialog("Table",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
     this.addListener("folderAddTable",addTableListener);
     
@@ -150,7 +151,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     
             return visicomp.core.createfunction.createFunction(parent,functionName,argParens);
         }
-        visicomp.app.visiui.dialog.showCreateChildDialog("function",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
+        visicomp.app.visiui.dialog.showCreateChildDialog("Function",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
     this.addListener("folderAddFunction",addFunctionListener);
     
@@ -168,6 +169,21 @@ visicomp.app.visiui.VisiComp = function(containerId) {
         visicomp.app.visiui.dialog.showCreateControlDialog(instance.controlMap,instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
     }
     this.addListener("folderAddControl",addControlListener);
+	
+	//add custom control listener
+    var addCustomControlListener = function() {
+        if(!instance.workspaceUI) {
+            alert("There is no workspace open");
+            return;
+        }
+		
+		var onCreate = function(parent,controlName) {
+			var controlEngine = new visicomp.app.visiui.control.CustomControl();
+            return visicomp.core.createcontrol.createControl(parent,controlName,controlEngine);
+        }
+        visicomp.app.visiui.dialog.showCreateChildDialog("Custom Control",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
+    }
+    this.addListener("folderAddCustomControl",addCustomControlListener);
     
     //external menu
     //add links listener

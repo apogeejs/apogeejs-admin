@@ -1,6 +1,6 @@
-visicomp.app.visiui.ControlUI = {};
+visicomp.app.visiui.CustomControlUI = {};
 
-visicomp.app.visiui.ControlUI.populateControlWindow = function(childUI,control) {
+visicomp.app.visiui.CustomControlUI.populateControlWindow = function(childUI,control) {
     
 //    //subscribe to control update event
 //    var controlUpdatedCallback = function(controlObject) {
@@ -25,12 +25,17 @@ visicomp.app.visiui.ControlUI.populateControlWindow = function(childUI,control) 
 //    }
 //    window.addListener("resize", resizeCallback);
     
-    //create the edit button
-    var editButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit"});
-    editButton.onclick = function() {
-        visicomp.app.visiui.ControlUI.createEditDialog(control);
+    //create the edit buttons
+    var editUserCodeButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit Formula"});
+    editUserCodeButton.onclick = function() {
+        visicomp.app.visiui.CustomControlUI.createFormulaEditDialog(control);
     }
-    window.addTitleBarElement(editButton);
+    window.addTitleBarElement(editUserCodeButton);
+	var editControlCodeButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit Control"});
+    editControlCodeButton.onclick = function() {
+        visicomp.app.visiui.CustomControlUI.createControlEditDialog(control);
+    }
+    window.addTitleBarElement(editControlCodeButton);
 	
 //	//create the delete button
 //    var deleteButton = visicomp.visiui.createElement("button",{"innerHTML":"Delete"});
@@ -44,9 +49,9 @@ visicomp.app.visiui.ControlUI.populateControlWindow = function(childUI,control) 
     window.clearSize();
 }
 
-visicomp.app.visiui.ControlUI.formatString = "\t";
+visicomp.app.visiui.CustomControlUI.formatString = "\t";
 
-visicomp.app.visiui.ControlUI.createEditDialog = function(control) {
+visicomp.app.visiui.CustomControlUI.createFormulaEditDialog = function(control) {
     
     //create save handler
     var onSave = function(controlObject,functionBody,supplementalCode) {
@@ -54,6 +59,19 @@ visicomp.app.visiui.ControlUI.createEditDialog = function(control) {
     };
     
     visicomp.app.visiui.dialog.showUpdateCodeableDialog(control,onSave,"Update Control");
+}
+
+visicomp.app.visiui.CustomControlUI.createControlEditDialog = function(control) {
+    
+    //create save handler
+    var onSave = function(controlObject,controlHtml,controlOnLoad,supplementalCode,css) {
+		var customControlEngine = controlObject.getControlEngine();
+		customControlEngine.update(controlHtml,controlOnLoad,supplementalCode,css);
+//figure out what to do with return here
+		return {"success":true};
+    };
+    
+    visicomp.app.visiui.dialog.showUpdateCustomControlDialog(control,onSave);
 }
 
 ///** This method updates the control data */    

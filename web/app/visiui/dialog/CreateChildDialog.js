@@ -1,7 +1,7 @@
 /** This method shows a create table dialog. The argument onCreateFunction
  * should take the folder and the table name as arguments and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTypeName,objectUIMap,activeFolderKey,onCreateFunction) {
+visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTitle,objectUIMap,activeFolderKey,onCreateFunction) {
 
     var dialog = new visicomp.visiui.Dialog("",{"movable":true});
     
@@ -12,7 +12,7 @@ visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTypeName,objec
   
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"New " + objectTypeName}));
+    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"New " + objectTitle}));
     content.appendChild(line);
     
     //folder selection

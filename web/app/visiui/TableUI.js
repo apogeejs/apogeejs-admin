@@ -29,11 +29,16 @@ visicomp.app.visiui.TableUI.populateTableWindow = function(childUI,table) {
     window.addListener("resize", resizeCallback);
     
     //create the edit button
-    var editButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit"});
-    editButton.onclick = function() {
-        visicomp.app.visiui.TableUI.createEditDialog(table);
+    var editDataButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit Data"});
+    editDataButton.onclick = function() {
+        visicomp.app.visiui.TableUI.createEditDataDialog(table);
     }
-    window.addTitleBarElement(editButton);
+    window.addTitleBarElement(editDataButton);
+	var editCodeButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit Code"});
+    editCodeButton.onclick = function() {
+        visicomp.app.visiui.TableUI.createEditCodeDialog(table);
+    }
+    window.addTitleBarElement(editCodeButton);
 	
 //	//create the delete button
 //    var deleteButton = visicomp.visiui.createElement("button",{"innerHTML":"Delete"});
@@ -51,19 +56,24 @@ window.setSize(200,200);
 
 visicomp.app.visiui.TableUI.formatString = "\t";
 
-visicomp.app.visiui.TableUI.createEditDialog = function(table) {
+visicomp.app.visiui.TableUI.createEditDataDialog = function(table) {
     
     //create save handler
-    var onSave = function(table,data,functionBody,supplementalCode) {
-        if((functionBody)&&(functionBody.length > 0)) {
-            return visicomp.core.updatemember.updateCode(table,functionBody,supplementalCode);
-        }
-        else {
-            return visicomp.core.updatemember.updateData(table,data);
-        }
+    var onSave = function(table,data) {
+        return visicomp.core.updatemember.updateData(table,data);
     };
     
-    visicomp.app.visiui.dialog.showUpdateTableDialog(table,onSave);
+    visicomp.app.visiui.dialog.showUpdateTableDataDialog(table,onSave);
+}
+
+visicomp.app.visiui.TableUI.createEditCodeDialog = function(table) {
+    
+    //create save handler
+    var onSave = function(table,functionBody,supplementalCode) {
+        return visicomp.core.updatemember.updateCode(table,functionBody,supplementalCode);
+    };
+    
+    visicomp.app.visiui.dialog.showUpdateCodeableDialog(table,onSave,"UpdateTable",visicomp.app.visiui.TableUI.editorCodeWrapper);
 }
 
 /** This method updates the table data */    
@@ -74,15 +84,23 @@ visicomp.app.visiui.TableUI.tableUpdated = function(childUI,table) {
     }
 }
 
-visicomp.app.visiui.TableUI.FUNCTION_PREFIX = "var value;\n";
-visicomp.app.visiui.TableUI.FUNCTION_SUFFIX = "\nreturn value;\n\n";
+//======================================
+// This is a code wrapper so the user works with the formula rather than the function body
+//======================================
 
-visicomp.app.visiui.TableUI.wrapTableFormula = function(formula) { 
-    return visicomp.app.visiui.TableUI.FUNCTION_PREFIX + formula + 
-        visicomp.app.visiui.TableUI.FUNCTION_SUFFIX;
+visicomp.app.visiui.TableUI.editorCodeWrapper = {};
+
+visicomp.app.visiui.TableUI.editorCodeWrapper.FUNCTION_PREFIX = "var value;\n";
+visicomp.app.visiui.TableUI.editorCodeWrapper.FUNCTION_SUFFIX = "\nreturn value;\n\n";
+
+visicomp.app.visiui.TableUI.editorCodeWrapper.displayName = "Formula";
+
+visicomp.app.visiui.TableUI.editorCodeWrapper.wrapCode = function(formula) { 
+    return visicomp.app.visiui.TableUI.editorCodeWrapper.FUNCTION_PREFIX + formula + 
+        visicomp.app.visiui.TableUI.editorCodeWrapper.FUNCTION_SUFFIX;
 }
 
-visicomp.app.visiui.TableUI.unwrapTableFormula = function(functionBody) {
+visicomp.app.visiui.TableUI.editorCodeWrapper.unwrapCode = function(functionBody) {
 	if((functionBody == null)||(functionBody.length = 0)) return "";
 	
     var formula = functionBody.replace("var value;","");

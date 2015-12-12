@@ -37,7 +37,14 @@ visicomp.app.visiui.ChildUI = function(child,parentElement) {
 			break;
             
         case "control":
-            visicomp.app.visiui.ControlUI.populateControlWindow(this,child);
+			var controlEngine = child.getControlEngine();
+			//create a special window for custom controls
+			if(controlEngine.isCustomControl) {
+				visicomp.app.visiui.CustomControlUI.populateControlWindow(this,child);
+			}
+			else {
+				visicomp.app.visiui.ControlUI.populateControlWindow(this,child);
+			}
 			break;
 			
 		default:

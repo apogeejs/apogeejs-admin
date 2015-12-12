@@ -61,7 +61,7 @@ visicomp.app.visiui.FunctionUI.createEditDialog = function(functionObject) {
         return visicomp.core.updatemember.updateCode(functionObject,functionBody,supplementalCode);
     };
     
-    visicomp.app.visiui.dialog.showUpdateFunctionDialog(functionObject,onSave);
+    visicomp.app.visiui.dialog.showUpdateCodeableDialog(functionObject,onSave,"Update Function");
 }
     
 /** This method updates the functionObject data */    
