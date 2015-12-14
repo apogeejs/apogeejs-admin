@@ -91,4 +91,26 @@ visicomp.app.visiui.CustomControlUI.createControlEditDialog = function(control) 
 
 
 
-
+	//add custom control listener
+    var addCustomControlListener = function() {
+        if(!instance.workspaceUI) {
+            alert("There is no workspace open");
+            return;
+        }
+		
+		var onCreate = function(parent,controlName) {
+			var controlEngine = new visicomp.app.visiui.control.CustomControl();
+            var returnValue = visicomp.core.createcontrol.createControl(parent,controlName,controlEngine);
+            if(returnValue.success) {
+                var control = returnValue.control;
+                var controlUiInit = visicomp.app.visiui.CustomControlUI.populateControlWindow;
+                instance.workspaceUI.objectAdded(control,controlUiInit);
+            }
+            else {
+                //no action for now
+            }
+            return returnValue;
+        }
+        visicomp.app.visiui.dialog.showCreateChildDialog("Custom Control",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
+    }
+    this.addListener("folderAddCustomControl",addCustomControlListener);

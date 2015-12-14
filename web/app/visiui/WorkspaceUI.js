@@ -2,32 +2,22 @@
 visicomp.app.visiui.WorkspaceUI = function(workspace,tab) {
     //properties
     this.tab = tab;
-    this.objectUIMap = {};
+    this.controlMap = {};
     this.activeFolderName = null;
     this.workspace = workspace;
-    this.name = workspace.getName();
     
 /////////////////////////////////////////////
 var rootFolder = workspace.getRootFolder();
-var objectInfo = {};
-	objectInfo.object = rootFolder;
+var controlInfo = {};
+	controlInfo.control = rootFolder;
     //no ui object!!!
 	
-    this.objectUIMap[this.getObjectKey(rootFolder)] = objectInfo;
+    this.controlMap[this.getObjectKey(rootFolder)] = controlInfo;
 
 /////////////////////////////////////////////
 	
     //listeners
     var instance = this;
-    
-    //add folder created listener
-//    var objectAddedListener = function(object) {
-//        instance.objectAdded(object);
-//    }
-//    this.workspace.addListener(visicomp.core.createfolder.PACKAGE_CREATED_EVENT, objectAddedListener);
-//    this.workspace.addListener(visicomp.core.createtable.TABLE_CREATED_EVENT, objectAddedListener);
-//    this.workspace.addListener(visicomp.core.createfunction.FUNCTION_CREATED_EVENT, objectAddedListener);
-//    this.workspace.addListener(visicomp.core.createcontrol.CONTROL_CREATED_EVENT, objectAddedListener);
 	
 	//add folder created listener
     var childDeletedListener = function(objectFullName) {
@@ -50,44 +40,49 @@ visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
 /** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.getChildUIObject = function(childObject) {
     var key = this.getObjectKey(childObject);
-	var objectInfo = this.objectUIMap[key][key];
+	var objectInfo = this.controlMap[key][key];
 	return objectInfo.objectUI;
 }
 
 /** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.objectAdded = function(object,uiInit) {
+visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(control) {
     //make sure this is for us
-    if(object.getWorkspace() !== this.workspace) return;
+    if(control.getWorkspace() !== this.workspace) return;
 	
+    var object = control.getObject();
 	var parent = object.getParent();
-    var objectInfo = this.objectUIMap[this.getObjectKey(parent)];
+    var controlInfo = this.controlMap[this.getObjectKey(parent)];
 	var parentContainer;
-	if(objectInfo.objectUI) {
-		parentContainer = objectInfo.objectUI.getContentElement();
+	if(controlInfo.control) {
+        //the parent control should have a content element (and should be a folder)
+        //maybe we need to enforce this its the right tyep and/or add a parent component instead)
+		parentContainer = controlInfo.control.getContentElement();
 	}
 	else {
+        //we will assume if there is no control is is the root
 		parentContainer = this.tab;
 	}
 	
 	//create the ui object
-	var objectUI = new visicomp.app.visiui.ChildUI(object,parentContainer,uiInit);
+	var controlFrame = new visicomp.app.visiui.ChildUI(control,parentContainer,object.getName());
+    control.setFrame(controlFrame);
 	
 	//store the ui object
 	var key = this.getObjectKey(object);
 	
-	if(this.objectUIMap[key]) {
+	if(this.controlMap[key]) {
 		alert("Unknown error - there is already an object with this object key: " + key);
 		return;
 	}
 	
-    var objectInfo = {};
-	objectInfo.object = object;
-	objectInfo.objectUI = objectUI;
+    controlInfo = {};
+    controlInfo.object = object;
+	controlInfo.control = control;
 	
-    this.objectUIMap[key] = objectInfo;
+    this.controlMap[key] = controlInfo;
     
     //show the window
-    var window = objectUI.getWindow();
+    var window = control.getWindow();
 	if(window) {
 		window.setPosition(visicomp.app.visiui.WorkspaceUI.newTableX,visicomp.app.visiui.WorkspaceUI.newTableY);
 		visicomp.app.visiui.WorkspaceUI.newTableX += visicomp.app.visiui.WorkspaceUI.newTableDeltaX;
@@ -104,16 +99,97 @@ visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
 	//store the ui object
 	var key = fullName;
 	
-	var objectInfo = this.objectUIMap[key];
-	delete this.objectUIMap[key];
+	var controlInfo = this.controlMap[key];
+	delete this.controlMap[key];
 
-	if((objectInfo)&&(objectInfo.objectUI)) {
-		objectInfo.objectUI.removeFromParent();	
+	if((controlInfo)&&(controlInfo.control)) {
+		controlInfo.control.removeFromParent();	
 	}
 }
 
 visicomp.app.visiui.WorkspaceUI.prototype.getObjectKey = function(object) {
 //needs to be changed when we add worksheets
 	return object.getFullName();
+}
+
+visicomp.app.visiui.WorkspaceUI.prototype.toJson = function() {
+    var json = {};
+    json.name = this.workspace.getName();
+    json.fileType = "visicomp workspace";
+    
+//links - this is part of app, not workspace, but for now we sav it with workspace!!!
+    var jsLinks = app.getJsLinks();
+    if((jsLinks)&&(jsLinks.length > 0)) {
+        json.jsLinks = jsLinks;
+    }
+    var cssLinks = app.getCssLinks();
+    if((jsLinks)&&(jsLinks.length > 0)) {
+        json.cssLinks = cssLinks;
+    }
+    
+    //children
+    json.data = {};
+	for(var key in this.controlMap) {
+		var controlInfo = this.controlMap[key];
+        var control = controlInfo.control;
+        if(control) {
+            json.data[key] = control.toJson();
+        }
+	}
+    
+    return json;
+}
+
+
+/** This is used for saving the workspace. */
+visicomp.app.visiui.WorkspaceUI.workspaceFromJson = function(app, json) {
+    var name = json.name;
+    var fileType = json.fileType;
+	if((fileType !== "visicomp workspace")||(!name)) {
+		alert("Error openging file");
+		return null;
+	}
+    
+    //add links
+// we really need to wait for them to load
+    if(json.jsLinks) {
+        app.setJsLinks(json.jsLinks);
+    }
+    if(json.cssLinks) {
+        app.setCssLinks(json.cssLinks);
+    }
+	
+//we need to wait for all links to load!!!
+    
+	//create the workspace
+    app.createWorkspace(name);
+	var workspace = app.getWorkspace();
+	
+	//create children
+	var parent = workspace.getRootFolder();
+	var childMap = json.data;
+	var updateDataList = [];
+	for(var key in childMap) {
+		var childJson = childMap[key];
+        var type = childJson.type;
+        var controlGenerator = app.getControlGenerator(type);
+        if(!controlGenerator) {
+            throw visicomp.core.util.createError("Control definition not found: " + type);
+        }
+        controlGenerator.createFromJson(app,parent,childJson,updateDataList)
+	}
+    
+    //set the data on all the objects
+    var result;
+    if(updateDataList.length > 0) {
+        result = visicomp.core.updatemember.updateObjects(updateDataList);
+            
+        if(!result.success) {
+            return result;
+        }
+    }
+    
+//figure out a better return
+	return result;
 }
 

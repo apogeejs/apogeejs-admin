@@ -9,31 +9,39 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     //for now we have application events, using the EventManager mixin below.
     visicomp.core.EventManager.init.call(this);
     
+    //workspaces
+    this.workspaceUIs = {};
+//I am limiting to one for now. later I will udpate to allow more
+this.workspaceLoaded = false;
+    
     //external links (empty for now)
     this.jsLinksText = "";
     this.jsLinkArray = [];
     this.cssLinksText = "";
     this.cssLinkArray = [];
     
-    //controls
-    this.controlMap = {};
+    //control generators
+    this.controlGenerators = {};
+    //these are a list of names of controls that go in the "added control" list
+    this.additionalControls = [];
 
     //create menus
     var menuBar = new visicomp.visiui.MenuBar(containerId);
     var menu;
 
     menu = menuBar.addMenu("File");
-    menu.addEventMenuItem("New","menuFileNew",null,this);
-    menu.addEventMenuItem("Open","menuFileOpen",null,this);
-    menu.addEventMenuItem("Save","menuFileSave",null,this);
-    menu.addEventMenuItem("Close","menuFileClose",null,this);
+    menu.addCallbackMenuItem("New","menuFileNew",null,this);
+    menu.addCallbackMenuItem("Open","menuFileOpen",null,this);
+    menu.addCallbackMenuItem("Save","menuFileSave",null,this);
+    menu.addCallbackMenuItem("Close","menuFileClose",null,this);
 
     menu = menuBar.addMenu("Workspace");
-    menu.addEventMenuItem("Add&nbsp;Folder","workspaceAddFolder",null,this);
-    menu.addEventMenuItem("Add&nbsp;Table","folderAddTable",null,this);
-    menu.addEventMenuItem("Add&nbsp;Function","folderAddFunction",null,this);
-    menu.addEventMenuItem("Add&nbsp;Control","folderAddControl",null,this);
-	menu.addEventMenuItem("Add&nbsp;Custom&nbsp;Control","folderAddCustomControl",null,this);
+    menu.addCallbackMenuItem("Add&nbsp;Folder",this.controlGenerators.Folder.showCreateDialog);
+    menu.addCallbackMenuItem("Add&nbsp;Table",this.controlGenerators.Table.showCreateDialog);
+    menu.addCallbackMenuItem("Add&nbsp;Function",this.controlGenerators.Function.showCreateDialog);
+//these will change
+    menu.addCallbackMenuItem("Add&nbsp;Control",this.controlGenerators.Control.showCreateDialog);
+	menu.addCallbackMenuItem("Add&nbsp;Custom&nbsp;Control",this.controlGenerators.CustomControl.showCreateDialog);
     
     menu = menuBar.addMenu("Libraries");
     menu.addEventMenuItem("Update&nbsp;Links","externalLinks",null,this);
@@ -48,14 +56,16 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     
     //create new listener
     var newListener = function() {
-        if(instance.workspaceUI) {
+        if(instance.workspaceLoaded) {
             //one workspace for now
             alert("You must close the existing workspace before opening another.");
             return;
         }
         
         var onCreate = function(name) {
-            return instance.createWorkspace(name);
+            var returnValue = instance.createWorkspace(name);
+if(returnValue.success) instance.workspaceLoaded = true;
+            return returnValue;
         }
         visicomp.app.visiui.dialog.showCreateWorkspaceDialog(onCreate); 
     }
@@ -63,14 +73,16 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     
     //open listener
     var openListener = function() {
-        if(instance.workspaceUI) {
+        if(instance.workspaceLoaded) {
             //one workspace for now
             alert("You must close the existing workspace before opening another.");
             return;
         }
         
         var onOpen = function(workspaceData) {
-            return instance.openWorkspace(workspaceData);
+            var returnValue = instance.openWorkspace(workspaceData);
+if(returnValue.success) instance.workspaceLoaded = true;
+            return returnValue;
         }
         visicomp.app.visiui.dialog.showOpenWorkspaceDialog(onOpen); 
     }
@@ -78,7 +90,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     
     //save listener
     var saveListener = function() {
-        if(!instance.workspaceUI) {
+        if(!instance.workspaceLoaded) {
             alert("There is no open workspace.");
             return;
         }
@@ -89,146 +101,16 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     
     //close listener
     var closeListener = function() {
-        if(!instance.workspaceUI) {
+        if(!instance.workspaceLoaded) {
             alert("There is no open workspace.");
             return;
         }
         
-        //add a "are you sure" dialog!!
+        //for now this reloads - when we fix this make sure it does everything it needs
+        //to to get rid of the workspace
         instance.closeWorkspace();
     }
     this.addListener("menuFileClose",closeListener);
-    
-    //workspace menu
-     //add folder listener
-    var addFolderListener = function() {
-        if(!instance.workspaceUI) {
-            alert("There is no workspace open");
-            return;
-        }
-        
-        var onCreate = function(parent,folderName) {
-            var returnValue = visicomp.core.createfolder.createFolder(parent,folderName);
-            if(returnValue.success) {
-                var folder = returnValue.folder;
-                var folderUiInit = visicomp.app.visiui.FolderUI.populateFolderWindow;
-                instance.workspaceUI.objectAdded(folder,folderUiInit);
-            }
-            else {
-                //no action for now
-            }
-            return returnValue;
-        }
-        visicomp.app.visiui.dialog.showCreateChildDialog("Folder",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
-    }
-    this.addListener("workspaceAddFolder",addFolderListener);
-
-    //add table listener
-    var addTableListener = function() {
-        if(!instance.workspaceUI) {
-            alert("There is no workspace open");
-            return;
-        }
-        
-        var onCreate = function(parent,tableName) {
-            var returnValue = visicomp.core.createtable.createTable(parent,tableName);
-            if(returnValue.success) {
-                var table = returnValue.table;
-                var tableUiInit = visicomp.app.visiui.TableUI.populateTableWindow;
-                instance.workspaceUI.objectAdded(table,tableUiInit);
-            }
-            else {
-                //no action for now
-            }
-            return returnValue;
-        }
-        visicomp.app.visiui.dialog.showCreateChildDialog("Table",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
-    }
-    this.addListener("folderAddTable",addTableListener);
-    
-    //add function listener
-    var addFunctionListener = function() {
-        if(!instance.workspaceUI) {
-            alert("There is no workspace open");
-            return;
-        }
-        
-        var onCreate = function(parent,declarationName) {
-            //seperate name and arglist 
-//this is kind of a cludge the way this is done
-//we should make a separate edit dialog for this
-//we also should change the data taht is stored = so it is not the string and args together
-            //get a reg ex and chck format
-            var nameLength = declarationName.indexOf("(");
-            if(nameLength < 0) {
-                alert("Include the argument list with the name.");
-                return {"success":false};
-            }
-            var functionName = declarationName.substr(0,nameLength);
-            var argParens = declarationName.substr(nameLength);
-    
-            var returnValue = visicomp.core.createfunction.createFunction(parent,functionName,argParens);
-            if(returnValue.success) {
-                var functionObject = returnValue.functionObject;
-                var functionUiInit = visicomp.app.visiui.FunctionUI.populateFunctionWindow;
-                instance.workspaceUI.objectAdded(functionObject,functionUiInit);
-            }
-            else {
-                //no action for now
-            }
-            return returnValue;
-        }
-        visicomp.app.visiui.dialog.showCreateChildDialog("Function",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
-    }
-    this.addListener("folderAddFunction",addFunctionListener);
-    
-    //add control listener
-    var addControlListener = function() {
-        if(!instance.workspaceUI) {
-            alert("There is no workspace open");
-            return;
-        }
-        
-        var onCreate = function(parent,controlName,controlBundle) {
-            var controlEngine = controlBundle.createInstance();
-            var returnValue = visicomp.core.createcontrol.createControl(parent,controlName,controlEngine);
-            if(returnValue.success) {
-                var control = returnValue.control;
-                var controlUiInit = visicomp.app.visiui.ControlUI.populateControlWindow;
-                instance.workspaceUI.objectAdded(control,controlUiInit);
-            }
-            else {
-                //no action for now
-            }
-            return returnValue;
-        }
-        visicomp.app.visiui.dialog.showCreateControlDialog(instance.controlMap,instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
-    }
-    this.addListener("folderAddControl",addControlListener);
-	
-	//add custom control listener
-    var addCustomControlListener = function() {
-        if(!instance.workspaceUI) {
-            alert("There is no workspace open");
-            return;
-        }
-		
-		var onCreate = function(parent,controlName) {
-			var controlEngine = new visicomp.app.visiui.control.CustomControl();
-            var returnValue = visicomp.core.createcontrol.createControl(parent,controlName,controlEngine);
-            if(returnValue.success) {
-                var control = returnValue.control;
-                var controlUiInit = visicomp.app.visiui.CustomControlUI.populateControlWindow;
-                instance.workspaceUI.objectAdded(control,controlUiInit);
-            }
-            else {
-                //no action for now
-            }
-            return returnValue;
-        }
-        visicomp.app.visiui.dialog.showCreateChildDialog("Custom Control",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
-    }
-    this.addListener("folderAddCustomControl",addCustomControlListener);
     
     //external menu
     //add links listener
@@ -243,35 +125,53 @@ visicomp.core.util.mixin(visicomp.app.visiui.VisiComp,visicomp.core.EventManager
 
 /** This method creates a new workspace. */
 visicomp.app.visiui.VisiComp.prototype.createWorkspace = function(name) {
+    
+//we can only have one workspace of a given name!    
+    
     var workspace = new visicomp.core.Workspace(name);
     var tab = this.tabFrame.addTab(workspace.getName());
-    this.workspaceUI = new visicomp.app.visiui.WorkspaceUI(workspace,tab);
+    var workspaceUI = new visicomp.app.visiui.WorkspaceUI(workspace,tab);
+    this.workspaceUIs[name] = workspaceUI;
     return {"success":true};
 }
 
 /** This method opens an workspace, from the text file. */
 visicomp.app.visiui.VisiComp.prototype.openWorkspace = function(workspaceText) {
 	var workspaceJson = JSON.parse(workspaceText);
-	return visicomp.app.visiui.workspaceFromJson(this,workspaceJson);
+	return visicomp.app.visiui.Workspace.workspaceFromJson(this,workspaceJson);
 }
 
 /** This method closes a workspace. */
 visicomp.app.visiui.VisiComp.prototype.closeWorkspace = function() {
+    
+//this closes all! Fix
+    
     location.reload();
 }
 
-visicomp.app.visiui.VisiComp.prototype.getWorkspace = function() {
-    if(this.workspaceUI) {
-        return this.workspaceUI.getWorkspace();
+visicomp.app.visiui.VisiComp.prototype.addControl = function(control) {
+    var workspace = control.getWorkspace();
+    var workspaceUI = this.workspaceUIs[workspace.getName()];
+    if(workspaceUI) {
+        return workspaceUI.addControl(control);
     }
     else {
-        return null;
+        throw visicomp.core.util.createError("Workspace not found: " + workspace.getName()); 
     }
 }
 
-visicomp.app.visiui.VisiComp.prototype.getWorkspaceUI = function() {
-	return this.workspaceUI;
-}
+//visicomp.app.visiui.VisiComp.prototype.getWorkspace = function() {
+//    if(this.workspaceUI) {
+//        return this.workspaceUI.getWorkspace();
+//    }
+//    else {
+//        return null;
+//    }
+//}
+//
+//visicomp.app.visiui.VisiComp.prototype.getWorkspaceUI = function() {
+//	return this.workspaceUI;
+//}
 
 visicomp.app.visiui.VisiComp.prototype.getJsLinks = function() {
 	return this.jsLinks;
@@ -302,10 +202,17 @@ visicomp.app.visiui.VisiComp.prototype.setCssLinks = function(cssLinks) {
 }
 
 /** This method registers a control. */
-visicomp.app.visiui.VisiComp.prototype.registerControl = function(controlBundle) {
+visicomp.app.visiui.VisiComp.prototype.registerControl = function(controlGenerator) {
+    var name = controlGenerator.name;
+    if(this.controlGenerators[name]) {
+//in the future we can maybe do something other than punt
+        alert("There is already a registered control with this name. Either the control has already been added of the name is not unique.");
+        return;
+    }
 
 //we should maybe warn if another control bundle is being overwritten 
-    this.controlMap[controlBundle.name] = controlBundle;
+    this.controlGenerators[name] = controlGenerator;
+    this.addedControls.push(name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

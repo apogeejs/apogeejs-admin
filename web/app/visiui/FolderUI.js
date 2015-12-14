@@ -30,3 +30,31 @@ visicomp.app.visiui.FolderUI.populateFolderWindow = function(childUI,folder) {
 window.setSize(500,500);
 
 }
+
+
+
+
+
+    //workspace menu
+     //add folder listener
+    var addFolderListener = function() {
+        if(!instance.workspaceUI) {
+            alert("There is no workspace open");
+            return;
+        }
+        
+        var onCreate = function(parent,folderName) {
+            var returnValue = visicomp.core.createfolder.createFolder(parent,folderName);
+            if(returnValue.success) {
+                var folder = returnValue.folder;
+                var folderUiInit = visicomp.app.visiui.FolderUI.populateFolderWindow;
+                instance.workspaceUI.objectAdded(folder,folderUiInit);
+            }
+            else {
+                //no action for now
+            }
+            return returnValue;
+        }
+        visicomp.app.visiui.dialog.showCreateChildDialog("Folder",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
+    }
+    this.addListener("workspaceAddFolder",addFolderListener);

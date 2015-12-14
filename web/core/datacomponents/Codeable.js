@@ -59,8 +59,15 @@ visicomp.core.Codeable.clearCode = function() {
 	this.aliasCode = null;
     this.varInfo = null;
     
+    this.clearFunction();
+    
     var newDependsOn = [];
 	this.updateDependencies(newDependsOn);
+}
+
+/** This method returns the formula for this member.  */
+visicomp.core.Codeable.hasCode = function() {
+    return (this.functionGeneratorBody === null);
 }
 
 visicomp.core.Codeable.calculateDependencies = function() {

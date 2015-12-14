@@ -77,3 +77,43 @@ visicomp.app.visiui.FunctionUI.functionUpdated = function(childUI, functionObjec
 	}
     childUI.editor.getSession().setValue(code);
 }
+
+
+
+
+    //add function listener
+    var addFunctionListener = function() {
+        if(!instance.workspaceUI) {
+            alert("There is no workspace open");
+            return;
+        }
+        
+        var onCreate = function(parent,declarationName) {
+            //seperate name and arglist 
+//this is kind of a cludge the way this is done
+//we should make a separate edit dialog for this
+//we also should change the data taht is stored = so it is not the string and args together
+            //get a reg ex and chck format
+            var nameLength = declarationName.indexOf("(");
+            if(nameLength < 0) {
+                alert("Include the argument list with the name.");
+                return {"success":false};
+            }
+            var functionName = declarationName.substr(0,nameLength);
+            var argParens = declarationName.substr(nameLength);
+    
+            var returnValue = visicomp.core.createfunction.createFunction(parent,functionName,argParens);
+            if(returnValue.success) {
+                var functionObject = returnValue.functionObject;
+                var functionUiInit = visicomp.app.visiui.FunctionUI.populateFunctionWindow;
+                instance.workspaceUI.objectAdded(functionObject,functionUiInit);
+            }
+            else {
+                //no action for now
+            }
+            return returnValue;
+        }
+        visicomp.app.visiui.dialog.showCreateChildDialog("Function",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
+    }
+    this.addListener("folderAddFunction",addFunctionListener);
+    

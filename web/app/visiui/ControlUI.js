@@ -74,3 +74,28 @@ visicomp.app.visiui.ControlUI.createEditDialog = function(control) {
 
 
 
+    //add control listener
+    var addControlListener = function() {
+        if(!instance.workspaceUI) {
+            alert("There is no workspace open");
+            return;
+        }
+        
+        var onCreate = function(parent,controlName,controlBundle) {
+            var controlEngine = controlBundle.createInstance();
+            var returnValue = visicomp.core.createcontrol.createControl(parent,controlName,controlEngine);
+            if(returnValue.success) {
+                var control = returnValue.control;
+                var controlUiInit = visicomp.app.visiui.ControlUI.populateControlWindow;
+                instance.workspaceUI.objectAdded(control,controlUiInit);
+            }
+            else {
+                //no action for now
+            }
+            return returnValue;
+        }
+        visicomp.app.visiui.dialog.showCreateControlDialog(instance.controlMap,instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
+    }
+    this.addListener("folderAddControl",addControlListener);
+	
+

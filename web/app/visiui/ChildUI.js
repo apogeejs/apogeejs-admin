@@ -2,15 +2,13 @@
  *
  * @class 
  */
-visicomp.app.visiui.ChildUI = function(child,parentElement,uiInit) {
+visicomp.app.visiui.ChildUI = function(parentElement,name) {
 
-    this.object = child;
-    this.name = child.getName();
     this.parentElement = parentElement;
 
     //create window
     var options = {"minimizable":true,"maximizable":true,"resizable":true,"movable":true};
-    this.window = new visicomp.visiui.StackWindow(this.parentElement,this.name,options);
+    this.window = new visicomp.visiui.StackWindow(this.parentElement,name,options);
     
     //load the content div
     var contentDiv = visicomp.visiui.createElement("div",null,
@@ -22,9 +20,6 @@ visicomp.app.visiui.ChildUI = function(child,parentElement,uiInit) {
                 "left":"0px"
             });
     this.window.setContent(contentDiv);
-    
-    //initialize the UI
-    uiInit(this,child);
 
 //	switch(child.getType()) {
 //		case "folder":
@@ -63,17 +58,17 @@ visicomp.app.visiui.ChildUI.prototype.getContentElement = function() {
     return this.window.getContent();
 }
 
-/** This method responds to a "new" menu event. */
-visicomp.app.visiui.ChildUI.prototype.deleteObject = function() {
-    return visicomp.core.deletechild.deleteChild(this.object);
-}
-
-/** This method removes the window element from the parent. */
-visicomp.app.visiui.ChildUI.prototype.deleteUIElement = function() {
-    if((this.parentElement)&&(this.window)) {
-		var windowElement = this.window.getElement();
-		this.parentElement.removeChild(windowElement);
-	}
-}
+///** This method responds to a "new" menu event. */
+//visicomp.app.visiui.ChildUI.prototype.deleteObject = function() {
+//    return visicomp.core.deletechild.deleteChild(this.object);
+//}
+//
+///** This method removes the window element from the parent. */
+//visicomp.app.visiui.ChildUI.prototype.deleteUIElement = function() {
+//    if((this.parentElement)&&(this.window)) {
+//		var windowElement = this.window.getElement();
+//		this.parentElement.removeChild(windowElement);
+//	}
+//}
 
 
