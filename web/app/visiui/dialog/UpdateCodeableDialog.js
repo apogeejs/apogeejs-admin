@@ -103,7 +103,7 @@ visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,on
 			supplementalCode = codeableObject.getSupplementalCode();
 		}
         
-        var result = onSaveFunction(codeableObject,mainCode,supplementalCode);
+        var result = onSaveFunction(mainCode,supplementalCode);
         
         if(result.success) {
 			dialog.hide();

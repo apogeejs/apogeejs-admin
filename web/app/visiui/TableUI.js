@@ -84,11 +84,11 @@ visicomp.app.visiui.TableControl.prototype.toJson = function() {
     json.type = visicomp.app.visiui.TableControl.generator.name;
     
     if(this.table.hasCode()) {
-        json.functionBody = this.getFunctionBody();
-        json.supplementalCode = this.getSupplementalCode();
+        json.functionBody = this.table.getFunctionBody();
+        json.supplementalCode = this.table.getSupplementalCode();
     }
     else {
-        json.data = this.getData();
+        json.data = this.table.getData();
     }
     return json;
 }
@@ -113,10 +113,11 @@ visicomp.app.visiui.TableControl.prototype.tableUpdated = function() {
 /** This method displays the edit data dialog for this control. 
  * @private */
 visicomp.app.visiui.TableControl.prototype.createEditDataDialog = function() {
-    
+    var instance = this;
+	
     //create save handler
     var onSave = function(data) {
-        return visicomp.core.updatemember.updateData(this.table,data);
+        return visicomp.core.updatemember.updateData(instance.table,data);
     };
     
     visicomp.app.visiui.dialog.showUpdateTableDataDialog(this.table,onSave);
@@ -125,13 +126,14 @@ visicomp.app.visiui.TableControl.prototype.createEditDataDialog = function() {
 /** This method displays the edit code dialog
  *  @private */
 visicomp.app.visiui.TableControl.prototype.createEditCodeDialog = function() {
+	var instance = this;
     
     //create save handler
     var onSave = function(functionBody,supplementalCode) {
-        return visicomp.core.updatemember.updateCode(this.table,functionBody,supplementalCode);
+        return visicomp.core.updatemember.updateCode(instance.table,functionBody,supplementalCode);
     };
     
-    visicomp.app.visiui.dialog.showUpdateCodeableDialog(this.table,onSave,"UpdateTable",visicomp.app.visiui.TableControl.editorCodeWrapper);
+    visicomp.app.visiui.dialog.showUpdateCodeableDialog(this.table,onSave,"Update Table",visicomp.app.visiui.TableControl.editorCodeWrapper);
 }
 
 //======================================

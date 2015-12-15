@@ -1,6 +1,6 @@
 /** This method shows an update control dialog. The argument onSaveData si the same
  * arguments as the updateControl event handler html. */
-visicomp.app.visiui.dialog.showUpdateLinksDialog = function(app) {
+visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspace) {
     
     var dialog = new visicomp.visiui.Dialog("Dialog",
             {"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
@@ -71,12 +71,14 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(app) {
 
         if(jsLinksEditor) {
             var jsLinks = jsLinksEditor.getSession().getValue().trim();
-            app.setJsLinks(jsLinks);
+			var linkArray = visicomp.app.visiui.dialog.createLinkArray(jsLinks);
+            workspace.setJsLinks(jsLinks);
 		}
         
         if(cssLinksEditor) {
             var cssLinks = cssLinksEditor.getSession().getValue().trim();
-            app.setCssLinks(cssLinks);
+            var linkArray = visicomp.app.visiui.dialog.createLinkArray(csssLinks);
+            workspace.setCssLinks(linkArray);
 		}
         
 //figrue out error handling here
@@ -166,5 +168,19 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(app) {
     dialog.addListener("resize", resizeCallback);
 }
 
+/** @private */
+visicomp.app.visiui.dialog.createLinkText = function(linkArray) {
+    return linkArray.join("\n");
+}
+
+/** @private */
+visicomp.app.visiui.dialog.createLinkArray = function(linkText) {
+    if((!linkText)||(linkText.length === 0)) {
+        return [];
+    }
+    else {
+        return linkText.split(/\s/);
+    }
+}
 
 

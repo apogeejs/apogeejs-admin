@@ -1,13 +1,16 @@
 if(visicomp.app.visiui.control === undefined) visicomp.app.visiui.control = {};
 
 visicomp.app.visiui.control.CustomControl = function() {
-    
+    this.contentLoaded = false;
 }
 
 visicomp.app.visiui.control.CustomControl.prototype.isCustomControl = true;
 
 visicomp.app.visiui.control.CustomControl.prototype.setWindow = function(window) {
     this.window = window;
+	if(this.contentLoaded) {
+		this.setContent();
+	}
 }
 
 visicomp.app.visiui.control.CustomControl.prototype.getHtml = function() {
@@ -31,9 +34,19 @@ visicomp.app.visiui.control.CustomControl.prototype.update = function(html,onLoa
 	this.onLoadbody = onLoadBody;
 	this.supplementalCode = supplementalCode;
 	this.css = css;
+	this.contentLoaded = true;
 	
 	//dummy update
-	var contentElement = this.window.getContent();
-    contentElement.innerHTML = html;
+	if(this.window) {
+		this.setContent();
+	}
+}
+
+visicomp.app.visiui.control.CustomControl.prototype.setContent = function() {
+	//TEMP
+	if(this.window) {
+		var element = this.window.getContent();
+		element.innerHTML = this.html;
+	}
 }
 

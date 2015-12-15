@@ -1,11 +1,11 @@
 visicomp.app.visiui.ControlUI = {};
 
-visicomp.app.visiui.ControlUI.populateControlWindow = function(childUI,control) {
+visicomp.app.visiui.ControlUI.populateControlWindow = function(controlFrame,control) {
     
 //    //subscribe to control update event
 //    var controlUpdatedCallback = function(controlObject) {
 //        if(controlObject === control) {
-//            visicomp.app.visiui.ControlUI.controlUpdated(childUI,control);
+//            visicomp.app.visiui.ControlUI.controlUpdated(controlFrame,control);
 //        }
 //    }
 //    
@@ -14,7 +14,7 @@ visicomp.app.visiui.ControlUI.populateControlWindow = function(childUI,control) 
 //    workspace.addListener(visicomp.core.updatecontrol.CONTROL_UPDATED_EVENT, controlUpdatedCallback);
     
     
-    var window = childUI.getWindow();
+    var window = controlFrame.getWindow();
     
     //set the child UI object onto the control engine
     control.getControlEngine().setWindow(window);
@@ -37,7 +37,7 @@ visicomp.app.visiui.ControlUI.populateControlWindow = function(childUI,control) 
 //    deleteButton.onclick = function() {
 //        //we should get confirmation
 //
-//		childUI.deleteControl();
+//		controlFrame.deleteControl();
 //    }
 //    window.addTitleBarElement(deleteButton);
 
@@ -57,8 +57,8 @@ visicomp.app.visiui.ControlUI.createEditDialog = function(control) {
 }
 
 ///** This method updates the control data */    
-//visicomp.app.visiui.ControlUI.controlUpdated = function(childUI,control) {
-//    var window = childUI.getWindow();
+//visicomp.app.visiui.ControlUI.controlUpdated = function(controlFrame,control) {
+//    var window = controlFrame.getWindow();
 //    var contentElement = window.getContent();
 //    contentElement.innerHTML = control.getHtml();
 //    
@@ -68,34 +68,4 @@ visicomp.app.visiui.ControlUI.createEditDialog = function(control) {
 //    }
 //}
 
-
-
-
-
-
-
-    //add control listener
-    var addControlListener = function() {
-        if(!instance.workspaceUI) {
-            alert("There is no workspace open");
-            return;
-        }
-        
-        var onCreate = function(parent,controlName,controlBundle) {
-            var controlEngine = controlBundle.createInstance();
-            var returnValue = visicomp.core.createcontrol.createControl(parent,controlName,controlEngine);
-            if(returnValue.success) {
-                var control = returnValue.control;
-                var controlUiInit = visicomp.app.visiui.ControlUI.populateControlWindow;
-                instance.workspaceUI.objectAdded(control,controlUiInit);
-            }
-            else {
-                //no action for now
-            }
-            return returnValue;
-        }
-        visicomp.app.visiui.dialog.showCreateControlDialog(instance.controlMap,instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
-    }
-    this.addListener("folderAddControl",addControlListener);
-	
 

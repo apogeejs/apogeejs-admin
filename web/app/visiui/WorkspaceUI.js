@@ -1,15 +1,19 @@
 /** This class manages the user interface for a workspace object. */
-visicomp.app.visiui.WorkspaceUI = function(workspace,tab) {
+visicomp.app.visiui.WorkspaceUI = function(app,workspace,tab) {
     //properties
+	this.app = app;
     this.tab = tab;
     this.controlMap = {};
     this.activeFolderName = null;
     this.workspace = workspace;
+	
+    this.jsLinkArray = [];
+    this.cssLinkArray = [];
     
 /////////////////////////////////////////////
 var rootFolder = workspace.getRootFolder();
 var controlInfo = {};
-	controlInfo.control = rootFolder;
+	controlInfo.object = rootFolder;
     //no ui object!!!
 	
     this.controlMap[this.getObjectKey(rootFolder)] = controlInfo;
@@ -38,12 +42,22 @@ visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
 }
 
 /** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.getChildUIObject = function(childObject) {
+visicomp.app.visiui.WorkspaceUI.prototype.getChildControl = function(childObject) {
     var key = this.getObjectKey(childObject);
-	var objectInfo = this.controlMap[key][key];
-	return objectInfo.objectUI;
+	var controlInfo = this.controlMap[key];
+	if(controlInfo) {
+		return controlInfo.control;
+	}
+	else {
+		return null;
+	}
 }
 
+/** This returns the map of control objects. */
+visicomp.app.visiui.WorkspaceUI.prototype.getControlMap = function() {
+	return this.controlMap;
+}
+	
 /** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(control) {
     //make sure this is for us
@@ -64,8 +78,8 @@ visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(control) {
 	}
 	
 	//create the ui object
-	var controlFrame = new visicomp.app.visiui.ChildUI(control,parentContainer,object.getName());
-    control.setFrame(controlFrame);
+	var controlFrame = new visicomp.app.visiui.ControlFrame(parentContainer,object.getName());
+	control.setFrame(controlFrame);
 	
 	//store the ui object
 	var key = this.getObjectKey(object);
@@ -82,7 +96,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(control) {
     this.controlMap[key] = controlInfo;
     
     //show the window
-    var window = control.getWindow();
+	var window = controlFrame.getWindow();
 	if(window) {
 		window.setPosition(visicomp.app.visiui.WorkspaceUI.newTableX,visicomp.app.visiui.WorkspaceUI.newTableY);
 		visicomp.app.visiui.WorkspaceUI.newTableX += visicomp.app.visiui.WorkspaceUI.newTableDeltaX;
@@ -117,32 +131,21 @@ visicomp.app.visiui.WorkspaceUI.prototype.toJson = function() {
     json.name = this.workspace.getName();
     json.fileType = "visicomp workspace";
     
-//links - this is part of app, not workspace, but for now we sav it with workspace!!!
-    var jsLinks = app.getJsLinks();
-    if((jsLinks)&&(jsLinks.length > 0)) {
-        json.jsLinks = jsLinks;
-    }
-    var cssLinks = app.getCssLinks();
-    if((jsLinks)&&(jsLinks.length > 0)) {
-        json.cssLinks = cssLinks;
-    }
+    json.jsLinks = this.jsLinkArray;
+    json.cssLinks = this.cssLinkArray;
+	
+//we need to wait for these to load!
     
-    //children
+    //controls
     json.data = {};
-	for(var key in this.controlMap) {
-		var controlInfo = this.controlMap[key];
-        var control = controlInfo.control;
-        if(control) {
-            json.data[key] = control.toJson();
-        }
-	}
+	this.workspace.getRootFolder().addChildrenToJson(this,json.data);
     
     return json;
 }
 
 
 /** This is used for saving the workspace. */
-visicomp.app.visiui.WorkspaceUI.workspaceFromJson = function(app, json) {
+visicomp.app.visiui.WorkspaceUI.fromJson = function(app, json) {
     var name = json.name;
     var fileType = json.fileType;
 	if((fileType !== "visicomp workspace")||(!name)) {
@@ -166,18 +169,11 @@ visicomp.app.visiui.WorkspaceUI.workspaceFromJson = function(app, json) {
 	var workspace = app.getWorkspace();
 	
 	//create children
-	var parent = workspace.getRootFolder();
-	var childMap = json.data;
+	var rootFolder = workspace.getRootFolder();
+	var childrenJson = json.data;
 	var updateDataList = [];
-	for(var key in childMap) {
-		var childJson = childMap[key];
-        var type = childJson.type;
-        var controlGenerator = app.getControlGenerator(type);
-        if(!controlGenerator) {
-            throw visicomp.core.util.createError("Control definition not found: " + type);
-        }
-        controlGenerator.createFromJson(app,parent,childJson,updateDataList)
-	}
+	
+	rootFolder.createChildrenFromJson(app,childrenJson,updateDataList)
     
     //set the data on all the objects
     var result;
@@ -191,5 +187,72 @@ visicomp.app.visiui.WorkspaceUI.workspaceFromJson = function(app, json) {
     
 //figure out a better return
 	return result;
+}
+
+//========================================
+// Links
+//========================================
+
+visicomp.app.visiui.VisiComp.prototype.getJsLinks = function() {
+	return this.jsLinkArray;
+}
+
+visicomp.app.visiui.VisiComp.prototype.setJsLinks = function(newLinkArray) {
+    //update the page links
+    var oldLinkArray = this.jsLinkArray;
+	var addList = [];
+	var removeList = [];
+    this.createLinkAddRemoveList(newLinkArray,oldLinkArray,addList,removeList);
+    this.jsLinkArray = newLinkArray;
+	this.app.updateWorkspaceLinks(this.workspace.getName(),addList,removeList,"js");;
+}
+
+visicomp.app.visiui.VisiComp.prototype.getCssLinks = function() {
+	return this.cssLinkArray;
+}
+
+visicomp.app.visiui.VisiComp.prototype.setCssLinks = function(newLinkArray) {
+    //update the page links
+    var oldLinkArray = this.cssLinkArray;
+	var addList = [];
+	var removeList = [];
+    this.createLinkAddRemoveList(newLinkArray,oldLinkArray,addList,removeList);
+    this.cssLinkArray = newLinkArray;
+	this.app.updateWorkspaceLinks(this.workspace.getName(),addList,removeList,"css");
+}
+
+/** This method determins which links are new, which are old and which are removed.  
+ * @private */
+visicomp.app.visiui.VisiComp.prototype.createLinkAddRemoveList = function(linkArray,oldLinkArray,addList,removeList) { 
+    
+    var newLinks = {};
+    var i;
+    var link;
+    
+    //add the new links
+    for(i = 0; i < linkArray.length; i++) {
+        link = linkArray[i];
+        newLinks[link] = true;
+    }
+    
+    //fiure out which are new and which are outdated
+    for(i = 0; i < oldLinkArray.length; i++) {
+        link = oldLinkArray[i];
+        if(!newLinks[link]) {
+			//this link has been removed
+            removeList.push(link);
+        }
+		else {
+			//flag that this does not need to be added
+			newLinks[link] = false;
+		}
+    }
+	
+	//put the new links to the add list
+	for(link in newLinks) {
+		if(newLinks[link]) {
+			addList.push(link);
+		}
+	}
 }
 

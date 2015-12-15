@@ -40,7 +40,7 @@ visicomp.app.visiui.dialog.showUpdateTableDataDialog = function(table,onSaveFunc
 	dataEditor.getSession().setMode("ace/mode/json");
 	//set the value
 	var data = table.getData();
-	dataEditor.getSession().setValue(JSON.stringify(data,null,visicomp.app.visiui.TableUI.formatString));
+	dataEditor.getSession().setValue(JSON.stringify(data,null,visicomp.app.visiui.TableControl.formatString));
 	
 	
     editorDiv.appendChild(dataEditorDiv);
@@ -59,7 +59,7 @@ visicomp.app.visiui.dialog.showUpdateTableDataDialog = function(table,onSaveFunc
 		if(dataText.length > 0) data = JSON.parse(dataText);
 		else data = "";
 			
-        var result = onSaveFunction(table,data);
+        var result = onSaveFunction(data);
         
         if(result.success) {
 			dialog.hide();

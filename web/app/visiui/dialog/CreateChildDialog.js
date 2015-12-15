@@ -1,7 +1,16 @@
 /** This method shows a create table dialog. The argument onCreateFunction
  * should take the folder and the table name as arguments and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTitle,objectUIMap,activeFolderKey,onCreateFunction) {
+visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTitle,app,onCreateFunction) {
+	
+//for now, load the single workspace
+//later we should allow for multiple
+var workspaceUI = app.getWorkspaceUI();
+if(!workspaceUI) {
+	alert("No workspace is loaded!");
+	return;
+}
+	var controlMap = workspaceUI.getControlMap();
 
     var dialog = new visicomp.visiui.Dialog("",{"movable":true});
     
@@ -20,13 +29,13 @@ visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTitle,objectUI
     line.appendChild(document.createTextNode("Folder:"));
     var select = visicomp.visiui.createElement("select");
     line.appendChild(select);
-    for(var key in objectUIMap) {
-		var object = objectUIMap[key].object;
+    for(var key in controlMap) {
+		var object = controlMap[key].object;
 		if(object.getType() == "folder") { 
 			select.add(visicomp.visiui.createElement("option",{"text":key}));
-			if(key == activeFolderKey) {
-				select.value = key;
-			}
+//			if(key == activeFolderKey) {
+//				select.value = key;
+//			}
 		}
     }
     content.appendChild(line);
@@ -45,15 +54,15 @@ visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTitle,objectUI
     }
     
     var onCreate = function() {
-		var folderName = select.value;
-        var folder = objectUIMap[folderName].object;
+		var folderKey = select.value;
+        var folder = controlMap[folderKey].object;
         var objectName = inputElement.value.trim();
         if(objectName.length == 0) {
             alert("The name is invalid");
             return;
         }
         
-        var result = onCreateFunction(folder,objectName);
+        var result = onCreateFunction(app,folder,objectName);
         
         if(result.success) {
             dialog.hide();
