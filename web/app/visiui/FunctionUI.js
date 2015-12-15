@@ -46,7 +46,7 @@ visicomp.app.visiui.FunctionControl.prototype.setFrame = function(controlFrame) 
     editor.renderer.setShowGutter(true);
     editor.setReadOnly(true);
     editor.setTheme("ace/theme/eclipse"); //good
-    editor.getSession().setMode("ace/mode/json"); 
+    editor.getSession().setMode("ace/mode/javascript"); 
     this.editor = editor;
     
     var window = controlFrame.getWindow();

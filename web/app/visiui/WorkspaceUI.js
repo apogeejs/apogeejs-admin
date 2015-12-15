@@ -70,7 +70,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(control) {
 	if(controlInfo.control) {
         //the parent control should have a content element (and should be a folder)
         //maybe we need to enforce this its the right tyep and/or add a parent component instead)
-		parentContainer = controlInfo.control.getContentElement();
+		parentContainer = controlInfo.control.getFrame().getContentElement();
 	}
 	else {
         //we will assume if there is no control is is the root
