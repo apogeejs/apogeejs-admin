@@ -1,45 +1,15 @@
 /** This control represents a table object. */
 visicomp.app.visiui.FolderControl = function(folder) {
-    this.folder = folder;
-    this.frame = null;
+    //base init
+    visicomp.app.visiui.Control.init.call(this,folder,"Folder");
 };
+
+//add components to this class
+visicomp.core.util.mixin(visicomp.app.visiui.FolderControl,visicomp.app.visiui.Control);
 
 //==============================
 // Public Instance Methods
 //==============================
-
-/** This method returns the table for this table control. */
-visicomp.app.visiui.FolderControl.prototype.getObject = function() {
-    return this.folder;
-}
-
-/** This method returns the table for this table control. */
-visicomp.app.visiui.FolderControl.prototype.getWorkspace = function() {
-    return this.folder.getWorkspace();
-}
-
-/** This method populates the frame for this control. */
-visicomp.app.visiui.FolderControl.prototype.getFrame = function() {
-     return this.frame;
-}
-
-/** This method populates the frame for this control. */
-visicomp.app.visiui.FolderControl.prototype.setFrame = function(controlFrame) {
-    
-    this.frame = controlFrame;
-    
-    var window = controlFrame.getWindow();
-    
-//    //resize the editor on window size change
-//    var resizeCallback = function() {
-//        editor.resize();
-//    }
-//    window.addListener("resize", resizeCallback);
-
-    //dummy size
-window.setSize(500,500);
-
-}
 
 /** This serializes the table control. */
 visicomp.app.visiui.FolderControl.prototype.toJson = function(workspaceUI) {
@@ -48,7 +18,7 @@ visicomp.app.visiui.FolderControl.prototype.toJson = function(workspaceUI) {
 	
     var json = {};
     json.name = this.table.getName();
-    json.type = visicomp.app.visiui.FolderControl.generator.name;
+    json.type = visicomp.app.visiui.FolderControl.generator.uniqueName;
 	json.children = {};
 	this.addChildrenToJson(workspaceUI,json.children);
     return json;
@@ -71,20 +41,39 @@ visicomp.app.visiui.FolderControl.prototype.addChildrenToJson = function(workspa
 }
 
 //==============================
-// Private Instance Methods
+// Protected and Private Instance Methods
 //==============================
 
+
+/** This method populates the frame for this control. 
+ * @protected */
+visicomp.app.visiui.FolderControl.prototype.populateFrame = function(controlFrame) {
+    
+    var window = controlFrame.getWindow();
+    
+//    //resize the editor on window size change
+//    var resizeCallback = function() {
+//        editor.resize();
+//    }
+//    window.addListener("resize", resizeCallback);
+
+    //dummy size
+window.setSize(500,500);
+
+}
 
 //======================================
 // Static methods
 //======================================
 
 //add table listener
-visicomp.app.visiui.FolderControl.showCreateDialog = function(app) {
-     visicomp.app.visiui.dialog.showCreateChildDialog("Folder",
-        app,
-        visicomp.app.visiui.FolderControl.createFolderControl
-    );
+visicomp.app.visiui.FolderControl.getShowCreateDialogCallback = function(app) {
+    return function() {
+       visicomp.app.visiui.dialog.showCreateChildDialog("Folder",
+           app,
+           visicomp.app.visiui.FolderControl.createFolderControl
+       );
+    }
 }
 
 //add table listener
@@ -131,7 +120,8 @@ visicomp.app.visiui.FolderControl.prototype.createChildrenFromJson = function(ap
 //======================================
 
 visicomp.app.visiui.FolderControl.generator = {};
-visicomp.app.visiui.FolderControl.generator.name = "Folder";
-visicomp.app.visiui.FolderControl.generator.showCreateDialog = visicomp.app.visiui.FolderControl.showCreateDialog;
+visicomp.app.visiui.FolderControl.generator.displayName = "Folder";
+visicomp.app.visiui.FolderControl.generator.uniqueName = "visicomp.app.visiui.FolderControl";
+visicomp.app.visiui.FolderControl.generator.getShowCreateDialogCallback = visicomp.app.visiui.FolderControl.getShowCreateDialogCallback;
 visicomp.app.visiui.FolderControl.generator.createFromJson = visicomp.app.visiui.FolderControl.createfromJson;
 

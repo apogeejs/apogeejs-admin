@@ -18,8 +18,8 @@ visicomp.visiui.MenuBody = function() {
     //construct the menu
     this.createMenuElement();
     
-    //this will be set later
-    this.isContext = false;
+    //this will be set if it is a static menu
+    this.menuHeader = null;
 }
 
 //style info
@@ -62,18 +62,23 @@ visicomp.visiui.MenuBody.prototype.getParentElement = function() {
 }
 
 /** This returns the parent element for the menu.  */
+visicomp.visiui.MenuBody.prototype.getMenuHeader = function() {
+    return this.menuHeader;
+}
+
+/** This returns the parent element for the menu.  */
 visicomp.visiui.MenuBody.prototype.getIsContext = function() {
-    return this.isContext;
+    return (this.menuHeader == null);
 }
 
 /** This method is used to attach the menu to the menu head, in a static menu. */
-visicomp.visiui.MenuBody.prototype.attachToMenuHead = function(staticMenu) {
+visicomp.visiui.MenuBody.prototype.attachToMenuHeader = function(menuHeader) {
     //attach menu to heading
-    this.parentElement = staticMenu.getHeadingElement();
+    this.parentElement = menuHeader.getElement();
     this.menuDiv.style.left = "0%";
     this.menuDiv.style.top = "100%";
     
-    this.isContext = false;
+    this.menuHeader = menuHeader;
 }
 
 /** This method is used to set the position for a context menu. The x and y coordinates
@@ -81,7 +86,6 @@ visicomp.visiui.MenuBody.prototype.attachToMenuHead = function(staticMenu) {
  * document body. */
 visicomp.visiui.MenuBody.prototype.setPosition = function(x, y, parentElement) {
     this.parentElement = parentElement;
-    this.isContext = true;
    
 //we need to calculate the size, so I add and remove it - there is probably another way
 parentElement.appendChild(this.menuDiv);
@@ -149,6 +153,7 @@ visicomp.visiui.MenuBody.prototype.addMenuItem = function(itemInfo) {
             itemInfo.callback();
         }
         event.stopPropagation();
+        visicomp.visiui.applyStyle(itemInfo.element,visicomp.visiui.MenuBody.MENU_ITEM_NORMAL_STYLE);
     }
 	itemInfo.element.onmousemove= function(e) {
         e.preventDefault();
@@ -163,13 +168,12 @@ visicomp.visiui.MenuBody.prototype.addMenuItem = function(itemInfo) {
 	
     this.menuDiv.appendChild(itemInfo.element);
     this.menuItems[itemInfo.title] = itemInfo;
-    delete this.menuItems[itemInfo.title];
 }
 
 /** this adds a menu item that dispatchs the given event when clicked. */
 visicomp.visiui.MenuBody.prototype.setMenuItems = function(itemInfos) {
     for(var i = 0; i < itemInfos.length; i++) {
-        this.setMenuItem(itemInfos[i]);
+        this.addMenuItem(itemInfos[i]);
     }
 }
 
@@ -178,6 +182,7 @@ visicomp.visiui.MenuBody.prototype.removeMenuItem = function(title) {
     var itemInfo = this.menuItems[title];
     if(itemInfo) {
         this.menuDiv.removeChild(itemInfo.element);
+        delete this.menuItems[title];
     }
 }
 

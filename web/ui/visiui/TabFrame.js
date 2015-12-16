@@ -5,7 +5,7 @@
  * 
  * @class 
  */
-visicomp.visiui.TabFrame = function(containerId, options) {
+visicomp.visiui.TabFrame = function(options) {
 	
     if(!options) {
         options = {};
@@ -48,16 +48,6 @@ this.tabFrame.oncontextmenu = function(event) {
     window.addEventListener("resize", function() {
         instance.resizeElement();
     });
-    
-    //place in container
-    var container = document.getElementById(containerId);
-    if(container) {
-        container.appendChild(this.tabFrameControl);
-    } 
-    else {
-        alert("menu bar container no found");
-        return
-    }
     
     //calculate the size
     this.resizeElement();
@@ -127,6 +117,11 @@ visicomp.visiui.TabFrame.TAB_ACTIVE_STYLE = {
     "border":" 1px solid black",
     "border-top-color":"white",
     "padding":"2px"
+}
+
+/** This method returns the dom element for the control. */
+visicomp.visiui.TabFrame.prototype.getElement = function() {
+    return this.tabFrameControl;
 }
 
 /** This method returns the main dom element for the window frame. */

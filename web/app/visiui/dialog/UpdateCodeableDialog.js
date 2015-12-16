@@ -6,8 +6,7 @@
  * a return statement. This was just a UI choice. */
 visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,onSaveFunction,title,editorCodeWrapper) {
     
-    var dialog = new visicomp.visiui.Dialog("Dialog",
-            {"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
+    var dialog = new visicomp.visiui.Dialog({"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
             
     //create body
     var content = visicomp.visiui.createElement("div",{"className":"dialogBody"}); 

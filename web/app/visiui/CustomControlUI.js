@@ -1,108 +1,55 @@
 /** This control represents a table object. */
 visicomp.app.visiui.CustomResourceControl = function(resource) {
-    this.resource = resource;
-    this.frame = null;
-	
-	this.resourceProcessor = resource.getResourceProcessor();
+    //base init
+    visicomp.app.visiui.Control.init.call(this,resource,"Custom Control");
+    visicomp.app.visiui.BasicResourceControl.init.call(this);
 };
+
+//add components to this class
+visicomp.core.util.mixin(visicomp.app.visiui.CustomResourceControl,visicomp.app.visiui.Control);
+visicomp.core.util.mixin(visicomp.app.visiui.CustomResourceControl,visicomp.app.visiui.BasicResourceControl);
+
 
 //==============================
 // Public Instance Methods
 //==============================
 
-/** This method returns the table for this table control. */
-visicomp.app.visiui.CustomResourceControl.prototype.getObject = function() {
-    return this.resource;
-}
-
-/** This method returns the table for this table control. */
-visicomp.app.visiui.CustomResourceControl.prototype.getWorkspace = function() {
-    return this.resource.getWorkspace();
-}
-
-/** This method populates the frame for this control. */
-visicomp.app.visiui.CustomResourceControl.prototype.getFrame = function() {
-     return this.frame;
-}
-
-/** This method populates the frame for this control. */
-visicomp.app.visiui.CustomResourceControl.prototype.setFrame = function(controlFrame) {
-    
-    this.frame = controlFrame;
-    
-    var window = controlFrame.getWindow();
-	
-	//set the child UI object onto the control engine
-    this.resource.getResourceProcessor().setWindow(window);
-	
-	//menus
-	var instance = this;
-	
-	//create the edit buttons
-    var editUserCodeButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit Formula"});
-    editUserCodeButton.onclick = function() {
-        instance.createFormulaEditDialog();
-    }
-    window.addTitleBarElement(editUserCodeButton);
-	
-	var editControlCodeButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit Resource"});
-    editControlCodeButton.onclick = function() {
-         instance.createResourceEditDialog();
-    }
-    window.addTitleBarElement(editControlCodeButton);
-
-    //dummy size
-window.setSize(200,200);
-
-}
-
-/** This serializes the table control. */
-visicomp.app.visiui.CustomResourceControl.prototype.toJson = function() {
-    var json = {};
-    json.name = this.reosource.getName();
-    json.type = visicomp.app.visiui.TableControl.generator.name;
-    
-	var resourceProcessor = this.resource.getResourceProcessor();
-	resourceProcessor.update(json.html,json.onLoadBody,json.supplementalCode,json.css);
-	
-	json.html = resourceProcessor.getHtml();
-	json.onLoadBody = resourceProcessor.getOnLoadBody();
-	json.supplementalCode = resourceProcessor.getSupplementalCode();
-	json.css = resourceProcessor.getCsss();
-		
-	json.functionBody = this.resource.getFunctionBody();
-	json.supplementalCode = this.resource.getSupplementalCode();
-
-    return json;
-}
 
 //==============================
-// Private Instance Methods
+// Protected and Private Instance Methods
 //==============================
 
-visicomp.app.visiui.CustomResourceControl.prototype.createFormulaEditDialog = function() {
-	var instance = this;
+
+/** This method populates the frame for this control. */
+visicomp.app.visiui.CustomResourceControl.prototype.addToFrame = function(controlFrame) {
+	
+    //create the menu
+    var menuItemInfoList = this.getMenuItemInfoList();
+
+    var itemInfo = {};
+    itemInfo.title = "Edit&nbsp;Resource$nbsp;Code";
+    itemInfo.callback = this.createEditResourceDialogCallback();
     
-    //create save handler
-    var onSave = function(functionBody,supplementalCode) {
-        return visicomp.core.updatemember.updateCode(instance.resource,functionBody,supplementalCode);
-    };
-    
-    visicomp.app.visiui.dialog.showUpdateCodeableDialog(instance.resource,onSave,"Update Formula");
+    //add these at the start of the menu
+    menuItemInfoList.splice(1,0,itemInfo);
+
 }
 
-visicomp.app.visiui.CustomResourceControl.prototype.createResourceEditDialog = function() {
-	var instance = this;
+visicomp.app.visiui.CustomResourceControl.prototype.createEditResourceDialogCallback = function() {
+    
+    var resource = this.getObject();
     
     //create save handler
     var onSave = function(controlHtml,controlOnLoad,supplementalCode,css) {
-		var customResourceProcessor = instance.resource.getResourceProcessor();
+		var customResourceProcessor = resource.getResourceProcessor();
 		customResourceProcessor.update(controlHtml,controlOnLoad,supplementalCode,css);
 //figure out what to do with return here
 		return {"success":true};
     };
     
-    visicomp.app.visiui.dialog.showUpdateCustomControlDialog(control,onSave);
+    return function() {
+        visicomp.app.visiui.dialog.showUpdateCustomControlDialog(resource,onSave);
+    }
 }
 
 //======================================
@@ -110,11 +57,13 @@ visicomp.app.visiui.CustomResourceControl.prototype.createResourceEditDialog = f
 //======================================
 
 //add table listener
-visicomp.app.visiui.CustomResourceControl.showCreateDialog = function(app) {
-     visicomp.app.visiui.dialog.showCreateChildDialog("Custom Control",
-        app,
-        visicomp.app.visiui.CustomResourceControl.createControl
-    );
+visicomp.app.visiui.CustomResourceControl.getShowCreateDialogCallback = function(app) {
+    return function() {
+        visicomp.app.visiui.dialog.showCreateChildDialog("Custom Control",
+            app,
+            visicomp.app.visiui.CustomResourceControl.createControl
+        );
+    }
 }
 
 //add table listener
@@ -140,14 +89,7 @@ visicomp.app.visiui.CustomResourceControl.createfromJson = function(app,parent,j
     
     if(resultValue.success) {
 		var resource = resultValue.resource;
-		var resourceProcessor = resource.getResourceProcessor();
-		resourceProcessor.update(json.html,json.onLoadBody,json.supplementalCode,json.css);
-		
-        var updateData = {};
-        updateData.member = resultValue.resource;
-		updateData.functionBody = json.functionBody;
-		updateData.supplementalCode = json.supplementalCode;
-        updateDataList.push(updateData);
+        resource.updateFromJson(json,updateDataList);
     }
 }
 
@@ -156,8 +98,9 @@ visicomp.app.visiui.CustomResourceControl.createfromJson = function(app,parent,j
 //======================================
 
 visicomp.app.visiui.CustomResourceControl.generator = {};
-visicomp.app.visiui.CustomResourceControl.generator.name = "CustomResource";
-visicomp.app.visiui.CustomResourceControl.generator.showCreateDialog = visicomp.app.visiui.CustomResourceControl.showCreateDialog;
+visicomp.app.visiui.CustomResourceControl.generator.displayName = "Custom Control";
+visicomp.app.visiui.CustomResourceControl.generator.uniqueName = "visicomp.app.visiui.CustomResourceControl";
+visicomp.app.visiui.CustomResourceControl.generator.getShowCreateDialogCallback = visicomp.app.visiui.CustomResourceControl.getShowCreateDialogCallback;
 visicomp.app.visiui.CustomResourceControl.generator.createFromJson = visicomp.app.visiui.CustomResourceControl.createfromJson;
 
 

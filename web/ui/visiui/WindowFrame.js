@@ -11,7 +11,7 @@
  *
  * @class 
  */
-visicomp.visiui.WindowFrame = function(parentContainer, title, options) {
+visicomp.visiui.WindowFrame = function(parentContainer, options) {
 	
     if(!options) {
         options = {};
@@ -22,7 +22,6 @@ visicomp.visiui.WindowFrame = function(parentContainer, title, options) {
 	
     //variables
     this.parentContainer = parentContainer;
-    this.title = title;
     this.options = options;
 	
     this.frame = null;
@@ -84,6 +83,7 @@ visicomp.visiui.WindowFrame.MINIMIZE_CMD_IMAGE = visicomp.RESOURCE_DIR + "/minim
 visicomp.visiui.WindowFrame.RESTORE_CMD_IMAGE = visicomp.RESOURCE_DIR + "/restore.png";
 visicomp.visiui.WindowFrame.MAXIMIZE_CMD_IMAGE = visicomp.RESOURCE_DIR + "/maximize.png";
 visicomp.visiui.WindowFrame.CLOSE_CMD_IMAGE = visicomp.RESOURCE_DIR + "/close.png";
+visicomp.visiui.WindowFrame.MENU_IMAGE = visicomp.RESOURCE_DIR + "/hamburger.png";
 
 visicomp.visiui.WindowFrame.RESIZE_LOCATION_SIZE = 10;
 
@@ -151,8 +151,8 @@ visicomp.visiui.WindowFrame.TITLE_BAR_RIGHT_STYLE = {
 
 visicomp.visiui.WindowFrame.TITLE_STYLE = {
     //fixed
-    "display":"inline",
-    "cursor":"default"  
+    "display":"inline-block",
+    "cursor":"default"
 };
 
 visicomp.visiui.WindowFrame.COMMAND_BUTTON_STYLE = { 
@@ -166,6 +166,30 @@ visicomp.visiui.WindowFrame.COMMAND_BUTTON_STYLE = {
 //====================================
 // Public Methods
 //====================================
+
+/** This method sets the title on the window frame.
+ * This will be added to the title bar in the order it was called. The standard
+ * location for the menu is immediately after the menu, if the menu is present. */
+visicomp.visiui.WindowFrame.prototype.setTitle = function(title) {
+    //title
+    this.titleElement = document.createElement("div");
+    visicomp.visiui.applyStyle(this.titleElement,visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE);
+    this.titleElement.innerHTML = title;
+    this.titleBarLeftElements.appendChild(this.titleElement);
+}
+
+/** This gets the menu for the window frame. If this is called, a menu will be added
+ * to the window frame, empty or otherwise. If it is not called, there will be no menu. 
+ * This will be added to the title bar in the order it was called. The standard
+ * location for the menu is first. */
+visicomp.visiui.WindowFrame.prototype.getMenu = function() {
+    if(!this.menu) {
+        this.menu = visicomp.visiui.Menu.createMenuFromImage(visicomp.visiui.WindowFrame.MENU_IMAGE);
+        this.titleBarLeftElements.appendChild(this.menu.getElement());
+    }
+    return this.menu;
+}
+
 
 /** This method shows the window. */
 visicomp.visiui.WindowFrame.prototype.show = function() {
@@ -683,12 +707,6 @@ visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
     this.titleBarRightElements = document.createElement("div");
     visicomp.visiui.applyStyle(this.titleBarRightElements,visicomp.visiui.WindowFrame.TITLE_BAR_RIGHT_STYLE);
     this.titleBar.appendChild(this.titleBarRightElements);
-    
-    //title
-    this.titleElement = document.createElement("div");
-    visicomp.visiui.applyStyle(this.titleElement,visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE);
-    this.titleElement.innerHTML = this.title;
-    this.titleBarLeftElements.appendChild(this.titleElement);
 
     //for handlers below
     var instance = this;

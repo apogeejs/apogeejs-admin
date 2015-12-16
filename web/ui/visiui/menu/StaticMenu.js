@@ -1,8 +1,8 @@
-/** This is a menu component
+/** This is a menu component, attached to the given dom element
  *
  * @class 
  */
-visicomp.visiui.StaticMenu = function(title,eventManager) {
+visicomp.visiui.MenuHeader = function(domElement) {
 	
 	//initialize menus, if needed
 	if(!visicomp.visiui.Menu.initialized) {
@@ -10,64 +10,63 @@ visicomp.visiui.StaticMenu = function(title,eventManager) {
 	}
 	
     //variables
-    this.eventManager = eventManager;
-    this.title = title;
-    this.headingDiv = null;
-    this.menuBody = new visicomp.visiui.MenuBody(eventManager);
+    this.domElement = domElement;
+    this.menuBody = new visicomp.visiui.MenuBody();
 	
     //construct the menu
-	this.createHeadingElement();
+	this.initHeadingElement();
     
     //attach menu to heading
-    this.menuBody.attachToMenuHead(this);
+    this.menuBody.attachToMenuHeader(this);
 }
 
 //style info
-visicomp.visiui.StaticMenu.MENU_HEADING_BASE_STYLE = {
+visicomp.visiui.MenuHeader.MENU_HEADING_BASE_STYLE = {
     //fixed
     "display":"inline-block",
     "position":"relative",
     "cursor":" default",
 	"overflow":"visible"
 }
-visicomp.visiui.StaticMenu.MENU_HEADING_NORMAL_STYLE = {
+visicomp.visiui.MenuHeader.MENU_HEADING_NORMAL_STYLE = {
     //configurable
+    "border":"",
     "background-color":"",
     "padding":"2px"
 }
-visicomp.visiui.StaticMenu.MENU_HEADING_HOVER_STYLE = {
+visicomp.visiui.MenuHeader.MENU_HEADING_HOVER_STYLE = {
     //configurable
     "background-color":"lightgray",
     "padding":"2px"
 }
 
 /** this returns the dom element for the menu heading. */
-visicomp.visiui.StaticMenu.prototype.getHeadingElement = function() {
-    return this.headingDiv;
+visicomp.visiui.MenuHeader.prototype.getElement = function() {
+    return this.domElement;
 }
 
 /** this returns the dom element for the menu object. */
-visicomp.visiui.StaticMenu.prototype.getMenuBody = function() {
+visicomp.visiui.MenuHeader.prototype.getMenuBody = function() {
     return this.menuBody;
 }
 
 /** this adds a menu item that dispatchs the given event when clicked. */
-visicomp.visiui.StaticMenu.prototype.addEventMenuItem = function(title, eventName, eventData, eventManager) {
+visicomp.visiui.MenuHeader.prototype.addEventMenuItem = function(title, eventName, eventData, eventManager) {
     this.menuBody.addEventMenuItem(title,eventName, eventData, eventManager);
 }
 
 /** this adds a menu item that dispatchs the given event when clicked. */
-visicomp.visiui.StaticMenu.prototype.addCallbackMenuItem = function(title, callback) {
+visicomp.visiui.MenuHeader.prototype.addCallbackMenuItem = function(title, callback) {
     this.menuBody.addCallbackMenuItem(title,callback);
 }
 
 /** this adds a menu item that dispatchs the given event when clicked. */
-visicomp.visiui.StaticMenu.prototype.addMenuItem = function(itemInfo) {
+visicomp.visiui.MenuHeader.prototype.addMenuItem = function(itemInfo) {
     this.menuBody.addMenuItem(itemInfo);
 }
 
 /** this adds a menu item that dispatchs the given event when clicked. */
-visicomp.visiui.StaticMenu.prototype.setMenuItems = function(itemInfos) {
+visicomp.visiui.MenuHeader.prototype.setMenuItems = function(itemInfos) {
     this.menuBody.setMenuItems(itemInfos);
 }
 
@@ -76,25 +75,28 @@ visicomp.visiui.StaticMenu.prototype.setMenuItems = function(itemInfos) {
 //================================
 
 /** this adds a menu item that dispatchs the given event when clicked. */
-visicomp.visiui.StaticMenu.prototype.createHeadingElement = function() {
-    this.headingDiv = document.createElement("div");
-    visicomp.visiui.applyStyle(this.headingDiv,visicomp.visiui.StaticMenu.MENU_HEADING_BASE_STYLE);
-    visicomp.visiui.applyStyle(this.headingDiv,visicomp.visiui.StaticMenu.MENU_HEADING_NORMAL_STYLE);
-    this.headingDiv.innerHTML = this.title;
+visicomp.visiui.MenuHeader.prototype.initHeadingElement = function() {
+    visicomp.visiui.applyStyle(this.domElement,visicomp.visiui.MenuHeader.MENU_HEADING_BASE_STYLE);
+    visicomp.visiui.applyStyle(this.domElement,visicomp.visiui.MenuHeader.MENU_HEADING_NORMAL_STYLE);
 	
     var instance = this;
-    this.headingDiv.onmousedown = function(e) {
+    this.domElement.onmousedown = function(e) {
         visicomp.visiui.Menu.menuHeaderPressed(instance);
 		e.stopPropagation();
     }
-    this.headingDiv.onmouseenter = function(e) {
-		visicomp.visiui.applyStyle(instance.headingDiv,visicomp.visiui.StaticMenu.MENU_HEADING_HOVER_STYLE);
+    this.domElement.onmouseenter = function(e) {
+		visicomp.visiui.applyStyle(instance.domElement,visicomp.visiui.MenuHeader.MENU_HEADING_HOVER_STYLE);
         visicomp.visiui.Menu.menuHeaderEntered(instance);
     }
-	this.headingDiv.onmouseleave = function(e) {
-        visicomp.visiui.applyStyle(instance.headingDiv,visicomp.visiui.StaticMenu.MENU_HEADING_NORMAL_STYLE);
+	this.domElement.onmouseleave = function(e) {
+        visicomp.visiui.applyStyle(instance.domElement,visicomp.visiui.MenuHeader.MENU_HEADING_NORMAL_STYLE);
     }
-	this.headingDiv.onmousemove = function(e) {
+	this.domElement.onmousemove = function(e) {
         e.preventDefault();
     }
+}
+
+/** this adds a menu item that dispatchs the given event when clicked. */
+visicomp.visiui.MenuHeader.prototype.restoreNormalAppearance = function() {
+    visicomp.visiui.applyStyle(this.domElement,visicomp.visiui.MenuHeader.MENU_HEADING_NORMAL_STYLE);
 }

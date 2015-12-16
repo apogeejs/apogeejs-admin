@@ -7,6 +7,22 @@ visicomp.visiui.Menu = {};
 visicomp.visiui.Menu.initialized = false;
 visicomp.visiui.Menu.activeMenu = null;
 
+/** This method creates a static menu with the given text. */
+visicomp.visiui.Menu.createMenu = function(text) {
+    var element = document.createElement("div");
+    element.innerHTML = text;
+    return new visicomp.visiui.MenuHeader(element);
+}
+
+/** This method creates a static menu from the given img url. */
+visicomp.visiui.Menu.createMenuFromImage = function(imageUrl) {
+    var imageElement = document.createElement("img");
+    imageElement.src = imageUrl;
+    var element = document.createElement("div");
+    element.appendChild(imageElement);
+    return new visicomp.visiui.MenuHeader(element);
+}
+
 visicomp.visiui.Menu.showContextMenu = function(menuBody,contextEvent) {
     //create menu and attach to document body
     menuBody.setPosition(contextEvent.clientX, contextEvent.clientY, document.body);
@@ -29,7 +45,7 @@ visicomp.visiui.Menu.menuHeaderPressed = function(menuHeader) {
 }
 
 visicomp.visiui.Menu.menuHeaderEntered = function(menuHeader) {
-	//if a header is entered and there is an active menu, open this menu
+	//if a header is entered and there is an active, non-context menu, open this menu
 	if((visicomp.visiui.Menu.activeMenu)&&(!visicomp.visiui.Menu.activeMenu.getIsContext())) {
 		visicomp.visiui.Menu.show(menuHeader.getMenuBody());
 	}
@@ -62,10 +78,14 @@ visicomp.visiui.Menu.hideActiveMenu = function() {
 	if(visicomp.visiui.Menu.activeMenu) {
         var parentElement = visicomp.visiui.Menu.activeMenu.getParentElement();
         var menuElement = visicomp.visiui.Menu.activeMenu.getMenuElement();
+        var menuHeader = visicomp.visiui.Menu.activeMenu.getMenuHeader();
         if((parentElement)&&(menuElement)) {
             parentElement.removeChild(menuElement);
             visicomp.visiui.Menu.activeMenu = null;
         }	
+        if(menuHeader) {
+            menuHeader.restoreNormalAppearance();
+        }
 	}
 }
 

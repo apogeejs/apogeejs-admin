@@ -12,7 +12,7 @@ if(!workspaceUI) {
 }
 	var controlMap = workspaceUI.getControlMap();
 
-    var dialog = new visicomp.visiui.Dialog("",{"movable":true});
+    var dialog = new visicomp.visiui.Dialog({"movable":true});
     
     //create body
     var content = visicomp.visiui.createElement("div",{"className":"dialogBody"}); 

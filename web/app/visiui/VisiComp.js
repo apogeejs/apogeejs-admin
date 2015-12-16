@@ -16,6 +16,7 @@ this.singleLoadedWorkspace = null;
     
     //control generators
     this.controlGenerators = {};
+    this.standardControls = [];
     //these are a list of names of controls that go in the "added control" list
     this.additionalControls = [];
 	
@@ -237,7 +238,7 @@ visicomp.app.visiui.VisiComp.removeLink = function(link) {
 
 /** This method registers a control. */
 visicomp.app.visiui.VisiComp.prototype.registerControl = function(controlGenerator) {
-    var name = controlGenerator.name;
+    var name = controlGenerator.uniqueName;
     if(this.controlGenerators[name]) {
 //in the future we can maybe do something other than punt
         alert("There is already a registered control with this name. Either the control has already been added of the name is not unique.");
@@ -260,42 +261,79 @@ visicomp.app.visiui.VisiComp.prototype.getControlGenerator = function(name) {
 /** This method adds the standard controls to the app. 
  * @private */
 visicomp.app.visiui.VisiComp.prototype.loadStandardControlGenerators = function() {
-	this.controlGenerators[visicomp.app.visiui.FolderControl.generator.name] = visicomp.app.visiui.FolderControl.generator;
-	this.controlGenerators[visicomp.app.visiui.TableControl.generator.name] = visicomp.app.visiui.TableControl.generator;
-	this.controlGenerators[visicomp.app.visiui.FunctionControl.generator.name] = visicomp.app.visiui.FunctionControl.generator;
-	this.controlGenerators[visicomp.app.visiui.CustomResourceControl.generator.name] = visicomp.app.visiui.CustomResourceControl.generator;
+	this.registerStandardControl(visicomp.app.visiui.FolderControl.generator);
+	this.registerStandardControl(visicomp.app.visiui.TableControl.generator);
+	this.registerStandardControl(visicomp.app.visiui.FunctionControl.generator);
+	this.registerStandardControl(visicomp.app.visiui.CustomResourceControl.generator);
+}
+
+/** This method registers a control. 
+ * @private */
+visicomp.app.visiui.VisiComp.prototype.registerStandardControl = function(controlGenerator) {
+    var name = controlGenerator.uniqueName;
+    if(this.controlGenerators[name]) {
+//in the future we can maybe do something other than punt
+        alert("There is already a registered control with this name. Either the control has already been added of the name is not unique.");
+        return;
+    }
+
+//we should maybe warn if another control bundle is being overwritten 
+    this.controlGenerators[name] = controlGenerator;
+    this.standardControls.push(name);
 }
 
 /** This method creates the app ui. 
  * @private */
 visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
+    
+    var container = document.getElementById(containerId);
+    if(!container) {
+        throw visicomp.core.util.createError("Container ID not found: " + containerID);
+    }
 
-    //create menus
-    var menuBar = new visicomp.visiui.MenuBar(containerId);
+    //create menus---------------------------------
+//mnove this somewhere else... maybe into html    
+    var menuBar = document.createElement("div");
+    var menuBarStyle = {
+        "background-color":"rgb(217,229,250)",
+        "padding":"2px"
+    }
+    visicomp.visiui.applyStyle(menuBar,menuBarStyle);
+    container.appendChild(menuBar);
+    //----------------------------------------------
+    
     var menu;
 
-    menu = menuBar.addMenu("File");
+    menu = visicomp.visiui.Menu.createMenu("File");
+    menuBar.appendChild(menu.getElement());
+    
     menu.addEventMenuItem("New","menuFileNew",null,this);
     menu.addEventMenuItem("Open","menuFileOpen",null,this);
     menu.addEventMenuItem("Save","menuFileSave",null,this);
-    menu.addEventMenuItem("Close","menuFileClose",null,this);
-
-	var app = this;
+    menu.addEventMenuItem("Close","menuFileClose",null,this);	
 	
-    menu = menuBar.addMenu("Workspace");
-    menu.addCallbackMenuItem("Add&nbsp;Folder",function() {app.controlGenerators.Folder.showCreateDialog(app)});
-    menu.addCallbackMenuItem("Add&nbsp;Table",function() {
-		app.controlGenerators.Table.showCreateDialog(app)
-	});
-    menu.addCallbackMenuItem("Add&nbsp;Function",function() {app.controlGenerators.Function.showCreateDialog(app)});
-	menu.addCallbackMenuItem("Add&nbsp;Custom&nbsp;Control",function() {app.controlGenerators.CustomResource.showCreateDialog(app)});
+    menu = visicomp.visiui.Menu.createMenu("Workspace");
+    menuBar.appendChild(menu.getElement());
     
-    menu = menuBar.addMenu("Libraries");
+    var app = this;
+    for(var i = 0; i < this.standardControls.length; i++) {
+        var key = this.standardControls[i];
+        var generator = this.controlGenerators[key];
+        var title = "Add&nbsp;" + generator.displayName;
+        menu.addCallbackMenuItem(title,generator.getShowCreateDialogCallback(app));
+    }
+    
+    menu = visicomp.visiui.Menu.createMenu("Libraries");
+    menuBar.appendChild(menu.getElement());
+    
     menu.addEventMenuItem("Update&nbsp;Links","externalLinks",null,this);
 
     //create the tab frame - this puts a tab for each workspace, even though
     //for now you can only make one workspace.
     this.tabFrame = new visicomp.visiui.TabFrame(containerId);
+    container.appendChild(this.tabFrame.getElement());
+    this.tabFrame.resizeElement();
+    
     this.workspaceUI = null;
     
     //add menu listeners

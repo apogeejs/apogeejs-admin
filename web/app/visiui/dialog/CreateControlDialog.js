@@ -3,7 +3,7 @@
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
 visicomp.app.visiui.dialog.showCreateControlDialog = function(controlTypeMap,objectUIMap,activeFolderKey,onCreateFunction) {
 
-    var dialog = new visicomp.visiui.Dialog("",{"movable":true});
+    var dialog = new visicomp.visiui.Dialog({"movable":true});
     
     //create body
     var content = visicomp.visiui.createElement("div",{"className":"dialogBody"}); 

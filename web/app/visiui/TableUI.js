@@ -1,43 +1,68 @@
 /** This control represents a table object. */
 visicomp.app.visiui.TableControl = function(table) {
-    this.table = table;
+    //base init
+    visicomp.app.visiui.Control.init.call(this,table,"Table");
     this.editor = null; //is read only, not really an editor
-    this.frame = null;
     
     //subscribe to table update event
     var instance = this;
     var workspace = table.getWorkspace();
     var tableUpdatedCallback = function(tableObject) {
-        if(tableObject === instance.table) {
+        if(tableObject === table) {
             instance.tableUpdated();
         }
     }
     workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, tableUpdatedCallback);
 };
 
+//add components to this class
+visicomp.core.util.mixin(visicomp.app.visiui.TableControl,visicomp.app.visiui.Control);
+
 //==============================
 // Public Instance Methods
 //==============================
 
-/** This method returns the table for this table control. */
-visicomp.app.visiui.TableControl.prototype.getObject = function() {
-    return this.table;
-}
-
-/** This method returns the table for this table control. */
-visicomp.app.visiui.TableControl.prototype.getWorkspace = function() {
-    return this.table.getWorkspace();
-}
-
-/** This method populates the frame for this control. */
-visicomp.app.visiui.TableControl.prototype.getFrame = function() {
-     return this.frame;
-}
-
-/** This method populates the frame for this control. */
-visicomp.app.visiui.TableControl.prototype.setFrame = function(controlFrame) {
+/** This serializes the table control. */
+visicomp.app.visiui.TableControl.prototype.toJson = function(workspaceUI) {
+    var json = {};
+    var table = this.getObject();
+    json.name = table.getName();
+    json.type = visicomp.app.visiui.TableControl.generator.uniqueName;
     
-    this.frame = controlFrame;
+    if(this.table.hasCode()) {
+        json.functionBody = table.getFunctionBody();
+        json.supplementalCode = table.getSupplementalCode();
+    }
+    else {
+        json.data = table.getData();
+    }
+    return json;
+}
+
+//==============================
+// Protected and Private Instance Methods
+//==============================
+
+
+/** This method populates the frame for this control. 
+ * @protected */
+visicomp.app.visiui.TableControl.prototype.populateFrame = function(controlFrame) {
+    
+    var window = controlFrame.getWindow();
+    
+    //create the menu
+    var menuItemInfoList = this.getMenuItemInfoList();
+  
+    var itemInfo1 = {};
+    itemInfo1.title = "Edit&nbsp;Data";
+    itemInfo1.callback = this.createEditDataDialog();
+    
+    var itemInfo2 = {};
+    itemInfo2.title = "Edit&nbsp;Formula";
+    itemInfo2.callback = this.createEditCodeableDialogCallback(itemInfo2.title,visicomp.app.visiui.TableControl.editorCodeWrapper);
+    
+    //add these at the start of the menu
+    menuItemInfoList.splice(0,0,itemInfo1,itemInfo2);
     
     //editor - only for display, read only
     var contentDiv = controlFrame.getContentElement();
@@ -48,54 +73,16 @@ visicomp.app.visiui.TableControl.prototype.setFrame = function(controlFrame) {
     editor.getSession().setMode("ace/mode/json"); 
     this.editor = editor;
     
-    var window = controlFrame.getWindow();
-    
     //resize the editor on window size change
     var resizeCallback = function() {
         editor.resize();
     }
     window.addListener("resize", resizeCallback);
-    
-    //menus
-    var instance = this;
-    
-    //create the edit button
-    var editDataButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit Data"});
-    editDataButton.onclick = function() {
-        instance.createEditDataDialog();
-    }
-    window.addTitleBarElement(editDataButton);
-    
-	var editCodeButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit Code"});
-    editCodeButton.onclick = function() {
-        instance.createEditCodeDialog();
-    }
-    window.addTitleBarElement(editCodeButton);
 
     //dummy size
 window.setSize(200,200);
 
 }
-
-/** This serializes the table control. */
-visicomp.app.visiui.TableControl.prototype.toJson = function() {
-    var json = {};
-    json.name = this.table.getName();
-    json.type = visicomp.app.visiui.TableControl.generator.name;
-    
-    if(this.table.hasCode()) {
-        json.functionBody = this.table.getFunctionBody();
-        json.supplementalCode = this.table.getSupplementalCode();
-    }
-    else {
-        json.data = this.table.getData();
-    }
-    return json;
-}
-
-//==============================
-// Private Instance Methods
-//==============================
 
 /** This is the format character use to display tabs in the display editor. 
  * @private*/
@@ -104,7 +91,8 @@ visicomp.app.visiui.TableControl.formatString = "\t";
 /** This method updates the table data 
  * @private */    
 visicomp.app.visiui.TableControl.prototype.tableUpdated = function() {
-    var textData = JSON.stringify(this.table.getData(),null,visicomp.app.visiui.TableControl.formatString);
+    var data = this.getObject().getData();
+    var textData = JSON.stringify(data,null,visicomp.app.visiui.TableControl.formatString);
     if(this.editor) {
         this.editor.getSession().setValue(textData);
     }
@@ -117,23 +105,12 @@ visicomp.app.visiui.TableControl.prototype.createEditDataDialog = function() {
 	
     //create save handler
     var onSave = function(data) {
-        return visicomp.core.updatemember.updateData(instance.table,data);
+        return visicomp.core.updatemember.updateData(instance.getObject(),data);
     };
     
-    visicomp.app.visiui.dialog.showUpdateTableDataDialog(this.table,onSave);
-}
-
-/** This method displays the edit code dialog
- *  @private */
-visicomp.app.visiui.TableControl.prototype.createEditCodeDialog = function() {
-	var instance = this;
-    
-    //create save handler
-    var onSave = function(functionBody,supplementalCode) {
-        return visicomp.core.updatemember.updateCode(instance.table,functionBody,supplementalCode);
-    };
-    
-    visicomp.app.visiui.dialog.showUpdateCodeableDialog(this.table,onSave,"Update Table",visicomp.app.visiui.TableControl.editorCodeWrapper);
+    return function() {
+        visicomp.app.visiui.dialog.showUpdateTableDataDialog(instance.getObject(),onSave);
+    }
 }
 
 //======================================
@@ -141,16 +118,18 @@ visicomp.app.visiui.TableControl.prototype.createEditCodeDialog = function() {
 //======================================
 
 //add table listener
-visicomp.app.visiui.TableControl.showCreateDialog = function(app) {
-     visicomp.app.visiui.dialog.showCreateChildDialog("Table",
-        app,
-        visicomp.app.visiui.TableControl.createTableControl
-    );
+visicomp.app.visiui.TableControl.getShowCreateDialogCallback = function(app) {
+    return function() {
+        visicomp.app.visiui.dialog.showCreateChildDialog("Table",
+            app,
+            visicomp.app.visiui.TableControl.createControl
+        );
+    }
 }
 
 //add table listener
-visicomp.app.visiui.TableControl.createTableControl = function(app,parent,tableName) {
-    var returnValue = visicomp.core.createtable.createTable(parent,tableName);
+visicomp.app.visiui.TableControl.createControl = function(app,parent,name) {
+    var returnValue = visicomp.core.createtable.createTable(parent,name);
     if(returnValue.success) {
         var table = returnValue.table;
         var tableControl = new visicomp.app.visiui.TableControl(table);
@@ -187,8 +166,9 @@ visicomp.app.visiui.TableControl.createfromJson = function(app,parent,json,updat
 //======================================
 
 visicomp.app.visiui.TableControl.generator = {};
-visicomp.app.visiui.TableControl.generator.name = "Table";
-visicomp.app.visiui.TableControl.generator.showCreateDialog = visicomp.app.visiui.TableControl.showCreateDialog;
+visicomp.app.visiui.TableControl.generator.displayName = "Table";
+visicomp.app.visiui.TableControl.generator.uniqueName = "visicomp.app.visiui.TableControl";
+visicomp.app.visiui.TableControl.generator.getShowCreateDialogCallback = visicomp.app.visiui.TableControl.getShowCreateDialogCallback;
 visicomp.app.visiui.TableControl.generator.createFromJson = visicomp.app.visiui.TableControl.createfromJson;
 
 //======================================
@@ -215,32 +195,3 @@ visicomp.app.visiui.TableControl.editorCodeWrapper.unwrapCode = function(functio
     return formula.trim();
 }
 
-
-
-
-
-//
-//
-//    //add table listener
-//    var addTableListener = function() {
-//        if(!instance.workspaceUI) {
-//            alert("There is no workspace open");
-//            return;
-//        }
-//        
-//        var onCreate = function(parent,tableName) {
-//            var returnValue = visicomp.core.createtable.createTable(parent,tableName);
-//            if(returnValue.success) {
-//                var table = returnValue.table;
-//                var tableUiInit = visicomp.app.visiui.TableUI.populateTableWindow;
-//                instance.workspaceUI.objectAdded(table,tableUiInit);
-//            }
-//            else {
-//                //no action for now
-//            }
-//            return returnValue;
-//        }
-//        visicomp.app.visiui.dialog.showCreateChildDialog("Table",instance.workspaceUI.objectUIMap,instance.activeFolderName,onCreate);
-//    }
-//    this.addListener("folderAddTable",addTableListener);
-//    

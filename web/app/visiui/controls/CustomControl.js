@@ -50,3 +50,19 @@ visicomp.app.visiui.control.CustomControl.prototype.setContent = function() {
 	}
 }
 
+visicomp.app.visiui.control.CustomControl.prototype.updateToJson = function() {
+    var json = {};
+    json.html = this.html;
+	json.onLoadBody = this.onLoadBody;
+	json.supplementalCode = this.supplementalCode;
+	json.css = this.css;
+    return json;
+}
+
+visicomp.app.visiui.control.CustomControl.prototype.updateFromJson = function(json) {
+    this.html = json.html;
+	this.onLoadBody = json.onLoadBody;
+	this.supplementalCode = json.supplementalCode;
+	this.css = json.css;
+}
+

@@ -5,7 +5,7 @@
  * 
  * @class 
  */
-visicomp.visiui.MenuBar = function(containerId,eventManager,options) {
+visicomp.visiui.MenuBar = function(eventManager,options) {
 	
     if(!options) {
         options = {};
@@ -18,16 +18,6 @@ visicomp.visiui.MenuBar = function(containerId,eventManager,options) {
 	
     this.div = document.createElement("div");
     visicomp.visiui.applyStyle(this.div,visicomp.visiui.MenuBar.MENU_BAR_STYLE);
-    
-    //place in container
-    var container = document.getElementById(containerId);
-    if(container) {
-        container.appendChild(this.div);
-    } 
-    else {
-        alert("menu bar container no found");
-        return
-    }
 }
 
 //style info
@@ -37,6 +27,11 @@ visicomp.visiui.MenuBar.MENU_BAR_STYLE = {
     //configurable
     "background-color":"rgb(217,229,250)",
     "padding":"2px"
+}
+
+/** This method returns the dom element for the control. */
+visicomp.visiui.MenuBar.prototype.getElement = function() {
+    return this.div;
 }
 
 /** This method adds a menu of the given title. It returns the menu javascript object. */

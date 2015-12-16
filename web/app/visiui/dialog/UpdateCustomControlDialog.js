@@ -1,11 +1,10 @@
 /** This method shows an update control dialog. The argument onSaveData si the same
  * arguments as the updateFunction event handler data. */
-visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(control,onSaveFunction) {
+visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onSaveFunction) {
 	
-	var customControlEngine = control.getControlEngine();
+	var customResourceProcessor = resource.getResourceProcessor();
     
-    var dialog = new visicomp.visiui.Dialog("Dialog",
-            {"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
+    var dialog = new visicomp.visiui.Dialog({"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
             
     //create body
     var content = visicomp.visiui.createElement("div",{"className":"dialogBody"}); 
@@ -103,37 +102,37 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(control,onSa
             controlHtml = htmlEditor.getSession().getValue();
         }
 		else {
-			controlHtml = customControlEngine.getHtml();
+			controlHtml = customResourceProcessor.getHtml();
 		}
 			
         if(onLoadEditor) {
             controlOnLoad = onLoadEditor.getSession().getValue().trim();
 		}
 		else {
-			controlOnLoad = customControlEngine.getOnLoadBody();
+			controlOnLoad = customResourceProcessor.getOnLoadBody();
 		}
 		
 		if(supplementalEditor) {
             supplementalCode = supplementalEditor.getSession().getValue().trim();
 		}
 		else {
-			supplementalCode = control.getSupplementalCode();
+			supplementalCode = customResourceProcessor.getSupplementalCode();
 		}
         
         if(cssEditor) {
             css = cssEditor.getSession().getValue().trim();
 		}
 		else {
-			css = customControlEngine.getCss();
+			css = customResourceProcessor.getCss();
 		}
         
-        var result = onSaveFunction(control,controlHtml,controlOnLoad,supplementalCode,css);
+        var result = onSaveFunction(controlHtml,controlOnLoad,supplementalCode,css);
         
         if(result.success) {
 			dialog.hide();
         }
         else {
-            alert("There was an error updating the control: " + result.msg);
+            alert("There was an error updating the resource: " + result.msg);
             
             //if this was a code error, rethrow it so the standard browser debug handler can handle it
             var error = result.error;
@@ -169,8 +168,10 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(control,onSa
             htmlEditor.setTheme("ace/theme/eclipse");
             htmlEditor.getSession().setMode("ace/mode/html");
             //set the value
-            var html = customControlEngine.getHtml();
-            htmlEditor.getSession().setValue(html);
+            var html = customResourceProcessor.getHtml();
+            if(html) {
+                htmlEditor.getSession().setValue(html);
+            }
         }
     }
     
@@ -188,7 +189,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(control,onSa
             onLoadEditor.setTheme("ace/theme/eclipse");
             onLoadEditor.getSession().setMode("ace/mode/javascript");
             //set the onLoad
-            var onLoadBody = customControlEngine.getOnLoadBody();
+            var onLoadBody = customResourceProcessor.getOnLoadBody();
             if(onLoadBody) {
                 onLoadEditor.getSession().setValue(onLoadBody);
             }
@@ -209,7 +210,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(control,onSa
             supplementalEditor.setTheme("ace/theme/eclipse");
             supplementalEditor.getSession().setMode("ace/mode/javascript");
             //set the onLoad
-            var supplementalCode = customControlEngine.getSupplementalCode();
+            var supplementalCode = customResourceProcessor.getSupplementalCode();
             if(supplementalCode) {
                 supplementalEditor.getSession().setValue(supplementalCode);
             }
@@ -229,7 +230,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(control,onSa
             cssEditor.setTheme("ace/theme/eclipse");
             cssEditor.getSession().setMode("ace/mode/css");
             //set the value
-            var css = customControlEngine.getCss();
+            var css = customResourceProcessor.getCss();
             if(css) {
                 cssEditor.getSession().setValue(css);
             }

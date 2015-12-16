@@ -8,7 +8,7 @@ visicomp.app.visiui.ControlFrame = function(parentElement,name) {
 
     //create window
     var options = {"minimizable":true,"maximizable":true,"resizable":true,"movable":true};
-    this.window = new visicomp.visiui.StackWindow(this.parentElement,name,options);
+    this.window = new visicomp.visiui.StackWindow(this.parentElement,options);
     
     //load the content div
     var contentDiv = visicomp.visiui.createElement("div",null,

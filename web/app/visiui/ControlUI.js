@@ -1,71 +1,81 @@
-visicomp.app.visiui.ControlUI = {};
+/** This is a mixin that encapsulates the base functionality of an abstract resource control
+ * 
+ * This is not a class, but it is used for the prototype of the objects that inherit from it.
+ */
+visicomp.app.visiui.BasicResourceControl = {};
 
-visicomp.app.visiui.ControlUI.populateControlWindow = function(controlFrame,control) {
+/** This is the initializer for the component. The object passed is the core object
+ * associated with this control. */
+visicomp.app.visiui.BasicResourceControl.init = function() {}
+
+//==============================
+// Public Instance Methods
+//==============================
+
+/** This serializes the table control. */
+visicomp.app.visiui.BasicResourceControl.toJson = function() {
+    var json = {};
+    json.name = this.reosource.getName();
+    json.type = visicomp.app.visiui.TableControl.generator.uniqueName;
     
-//    //subscribe to control update event
-//    var controlUpdatedCallback = function(controlObject) {
-//        if(controlObject === control) {
-//            visicomp.app.visiui.ControlUI.controlUpdated(controlFrame,control);
-//        }
-//    }
-//    
-//    var workspace = control.getWorkspace();
-//    
-//    workspace.addListener(visicomp.core.updatecontrol.CONTROL_UPDATED_EVENT, controlUpdatedCallback);
-    
+    //store the processor info
+	var resourceProcessor = this.getObject().getResourceProcessor();
+    json.processor = resourceProcessor.updateToJson();
+		
+    //store the codeable info
+	json.functionBody = this.resource.getFunctionBody();
+	json.supplementalCode = this.resource.getSupplementalCode();
+
+    return json;
+}
+
+//==============================
+// Private Instance Methods
+//==============================
+
+
+/** This method populates the frame for this control. */
+visicomp.app.visiui.BasicResourceControl.populateFrame = function(controlFrame) {
     
     var window = controlFrame.getWindow();
-    
-    //set the child UI object onto the control engine
-    control.getControlEngine().setWindow(window);
-    
-    //resize the editor on window size change
-//    var resizeCallback = function() {
-//        editor.resize();
-//    }
-//    window.addListener("resize", resizeCallback);
-    
-    //create the edit button
-    var editButton = visicomp.visiui.createElement("button",{"innerHTML":"Edit"});
-    editButton.onclick = function() {
-        visicomp.app.visiui.ControlUI.createEditDialog(control);
-    }
-    window.addTitleBarElement(editButton);
 	
-//	//create the delete button
-//    var deleteButton = visicomp.visiui.createElement("button",{"innerHTML":"Delete"});
-//    deleteButton.onclick = function() {
-//        //we should get confirmation
-//
-//		controlFrame.deleteControl();
-//    }
-//    window.addTitleBarElement(deleteButton);
+	//set the child UI object onto the control engine
+    var resource = this.getObject();
+    resource.getResourceProcessor().setWindow(window);
+	
+    //create the menu
+    var menuItemInfoList = this.getMenuItemInfoList();
+  
+    var itemInfo = {};
+    itemInfo.title = "Edit&nbsp;Initializer&nbsp;Code";
+    itemInfo.callback = this.createEditCodeableDialogCallback(itemInfo.title);
+    
+    //add these at the start of the menu
+    menuItemInfoList.splice(0,0,itemInfo);
 
-    window.clearSize();
+    //dummy size
+window.setSize(200,200);
+
+    //check if the implementation wants to do anything
+    if(this.addToFrame) {
+        this.addToFrame(controlFrame);
+    }
+
 }
 
-visicomp.app.visiui.ControlUI.formatString = "\t";
+//======================================
+// Static methods
+//======================================
 
-visicomp.app.visiui.ControlUI.createEditDialog = function(control) {
-    
-    //create save handler
-    var onSave = function(controlObject,functionBody,supplementalCode) {
-        return visicomp.core.updatemember.updateCode(controlObject,functionBody,supplementalCode);
-    };
-    
-    visicomp.app.visiui.dialog.showUpdateCodeableDialog(control,onSave,"Update Control");
+/** This method can be called to complete serialization of a basic control. */
+visicomp.app.visiui.BasicResourceControl.updatefromJson = function(json,updateDataList) {
+		var resourceProcessor = resource.getResourceProcessor();
+		resourceProcessor.updateFromJson(json.processor);
+		
+        var updateData = {};
+        updateData.member = resource;
+		updateData.functionBody = json.functionBody;
+		updateData.supplementalCode = json.supplementalCode;
+        updateDataList.push(updateData);
 }
-
-///** This method updates the control data */    
-//visicomp.app.visiui.ControlUI.controlUpdated = function(controlFrame,control) {
-//    var window = controlFrame.getWindow();
-//    var contentElement = window.getContent();
-//    contentElement.innerHTML = control.getHtml();
-//    
-//    var onLoad = control.getOnLoad();
-//    if(onLoad) {
-//        onLoad();
-//    }
-//}
-
 

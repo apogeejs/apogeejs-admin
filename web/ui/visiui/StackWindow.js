@@ -4,10 +4,10 @@
  *
  * @class 
  */
-visicomp.visiui.StackWindow = function(parentContainer, title, options) {
+visicomp.visiui.StackWindow = function(parentContainer, options) {
     
     //call the parent constructor
-    visicomp.visiui.WindowFrame.call(this,parentContainer,title,options);
+    visicomp.visiui.WindowFrame.call(this,parentContainer, options);
     
     //lookup the window manager, assoicated by parent container
     //if someone tries to change the parent container, they should update the window manager
