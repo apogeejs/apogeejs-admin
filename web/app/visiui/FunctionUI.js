@@ -7,8 +7,8 @@ visicomp.app.visiui.FunctionControl = function(functionObject) {
     //subscribe to table update event
     var instance = this;
     var workspace = functionObject.getWorkspace();
-    var functionUpdatedCallback = function(functionObject) {
-        if(functionObject === functionObject) {
+    var functionUpdatedCallback = function(updatedObject) {
+        if(updatedObject === functionObject) {
             instance.functionUpdated();
         }
     }
@@ -80,10 +80,11 @@ visicomp.app.visiui.FunctionControl.formatString = "\t";
 /** This method updates the table data 
  * @private */    
 visicomp.app.visiui.FunctionControl.prototype.functionUpdated = function() {
-	var name = this.functionObject.getName();
-    var argParens = this.functionObject.getArgParensList();
-    var functionBody = this.functionObject.getFunctionBody();
-    var supplementalCode = this.functionObject.getSupplementalCode();
+    var functionObject = this.getObject();
+	var name = functionObject.getName();
+    var argParens = functionObject.getArgParensList();
+    var functionBody = functionObject.getFunctionBody();
+    var supplementalCode = functionObject.getSupplementalCode();
     var code = "function " + name + argParens + " {\n" + functionBody + "\n}\n";
 	if(supplementalCode) {
 		code += "\n/* Supplemental Code */\n\n" +

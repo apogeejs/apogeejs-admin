@@ -8,7 +8,7 @@ visicomp.core.createresource = {};
  * Event object Format:
  * [resource]
  */
-visicomp.core.createresource.RESOURCE_CREATED_EVENT = "controlCreated";
+visicomp.core.createresource.RESOURCE_CREATED_EVENT = "resourceCreated";
 
 
 /** This is the listener for the create resource event. */
