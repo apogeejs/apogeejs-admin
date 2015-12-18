@@ -67,13 +67,13 @@ visicomp.app.visiui.CustomResourceControl.getShowCreateDialogCallback = function
 }
 
 //add table listener
-visicomp.app.visiui.CustomResourceControl.createControl = function(app,parent,name) {
+visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,parent,name) {
 	var processor = new visicomp.app.visiui.control.CustomControl();
     var returnValue = visicomp.core.createresource.createResource(parent,name,processor);
     if(returnValue.success) {
         var resource = returnValue.resource;
         var customResourceControl = new visicomp.app.visiui.CustomResourceControl(resource);
-        app.addControl(customResourceControl);
+        workspaceUI.addControl(customResourceControl);
     }
     else {
         //no action for now
@@ -82,10 +82,10 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(app,parent,na
 }
 
 /** This serializes the table control. */
-visicomp.app.visiui.CustomResourceControl.createfromJson = function(app,parent,json,updateDataList) {
+visicomp.app.visiui.CustomResourceControl.createfromJson = function(workspaceUI,parent,json,updateDataList) {
 
     var name = json.name;
-    var resultValue = visicomp.app.visiui.CustomResourceControl.createControl(app,parent,name);
+    var resultValue = visicomp.app.visiui.CustomResourceControl.createControl(workspaceUI,parent,name);
     
     if(resultValue.success) {
 		var resource = resultValue.resource;

@@ -14,30 +14,15 @@ visicomp.core.util.mixin(visicomp.app.visiui.FolderControl,visicomp.app.visiui.C
 /** This serializes the table control. */
 visicomp.app.visiui.FolderControl.prototype.toJson = function(workspaceUI) {
 	
-//NEEDS TO BE FIXED!!!!	
-	
     var json = {};
-    json.name = this.table.getName();
+    var folder = this.getObject();
+    json.name = folder.getName();
     json.type = visicomp.app.visiui.FolderControl.generator.uniqueName;
 	json.children = {};
-	this.addChildrenToJson(workspaceUI,json.children);
+    
+	workspaceUI.addChildrenToJson(folder,json.children);
+    
     return json;
-}
-
-/** This serializes the child controls for this fodler. */
-visicomp.app.visiui.FolderControl.prototype.addChildrenToJson = function(workspaceUI,json) {
-	
-	var childMap = this.folder.getChildMap();
-	for(var key in childMap) {
-		var child = json[key];
-        
-		//get the object map for the workspace
-		var childControl = workspaceUI.lookupChildControl(child);
-		
-		//get the control for this child
-		var name = child.getName();
-		json[name] = childControl.toJson(workspaceUI);
-	}
 }
 
 //==============================
@@ -71,18 +56,18 @@ visicomp.app.visiui.FolderControl.getShowCreateDialogCallback = function(app) {
     return function() {
        visicomp.app.visiui.dialog.showCreateChildDialog("Folder",
            app,
-           visicomp.app.visiui.FolderControl.createFolderControl
+           visicomp.app.visiui.FolderControl.createControl
        );
     }
 }
 
 //add table listener
-visicomp.app.visiui.FolderControl.createFolderControl = function(app,parent,folderName) {
-    var returnValue = visicomp.core.createfolder.createFolder(parent,folderName);
+visicomp.app.visiui.FolderControl.createControl = function(workspaceUI,parent,name) {
+    var returnValue = visicomp.core.createfolder.createFolder(parent,name);
     if(returnValue.success) {
         var folder = returnValue.folder;
         var folderControl = new visicomp.app.visiui.FolderControl(folder);
-        app.addControl(folderControl);
+        workspaceUI.addControl(folderControl);
     }
     else {
         //no action for now
@@ -91,27 +76,14 @@ visicomp.app.visiui.FolderControl.createFolderControl = function(app,parent,fold
 }
 
 /** This serializes the table control. */
-visicomp.app.visiui.FolderControl.createfromJson = function(app,parent,json,updateDataList) {
+visicomp.app.visiui.FolderControl.createfromJson = function(workspaceUI,parent,json,updateDataList) {
     var name = json.name;
-    var resultValue = visicomp.app.visiui.FolderControl.createFolderControl(app,parent,name);
+    var resultValue = visicomp.app.visiui.FolderControl.createControl(workspaceUI,parent,name);
 	if(resultValue.success) {
 		if(json.children) {
 			var folder = resultValue.folder;
-			folder.createChildrenFromJson(json.children);
+			workspaceUI.createChildrenFromJson(folder,json.children,updateDataList);
 		}
-	}
-}
-
-/** This serializes the child controls for this fodler. */
-visicomp.app.visiui.FolderControl.prototype.createChildrenFromJson = function(app,json,updateDataList) {
-	for(var key in json) {
-		var childJson = json[key];
-        var type = childJson.type;
-        var controlGenerator = app.getControlGenerator(type);
-        if(!controlGenerator) {
-            throw visicomp.core.util.createError("Control definition not found: " + type);
-        }
-        controlGenerator.createFromJson(app,this,childJson,updateDataList)
 	}
 }
 

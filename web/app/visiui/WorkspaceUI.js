@@ -138,7 +138,8 @@ visicomp.app.visiui.WorkspaceUI.prototype.toJson = function() {
     
     //controls
     json.data = {};
-	this.workspace.getRootFolder().addChildrenToJson(this,json.data);
+    var rootFolder = this.workspace.getRootFolder();
+	this.addChildrenToJson(rootFolder,json.data);
     
     return json;
 }
@@ -149,31 +150,40 @@ visicomp.app.visiui.WorkspaceUI.fromJson = function(app, json) {
     var name = json.name;
     var fileType = json.fileType;
 	if((fileType !== "visicomp workspace")||(!name)) {
-		alert("Error openging file");
-		return null;
+		return {"success":false,"msg":"Bad file format."};
 	}
     
-    //add links
-// we really need to wait for them to load
-    if(json.jsLinks) {
-        app.setJsLinks(json.jsLinks);
+    //create the workspace
+    var returnValue = app.createWorkspace(name);
+    if(!returnValue.success) {
+        return returnValue;
     }
-    if(json.cssLinks) {
+    
+    var workspaceUI = returnValue.workspaceUI;
+	var workspace = returnValue.workspace;
+    
+    //add links
+    var linksAdded = false;
+    if((json.jsLinks)&&(json.jsLinks.length > 0)) {
+        app.setJsLinks(json.jsLinks);
+        linksAdded = true;
+    }
+    if((json.cssLinks)&&(json.cssLinks.length > 0)) {
         app.setCssLinks(json.cssLinks);
+        linksAdded = true;
     }
 	
-//we need to wait for all links to load!!!
-    
-	//create the workspace
-    app.createWorkspace(name);
-	var workspace = app.getWorkspace();
+//this is how we will wait to load links if there are any for now
+if(linksAdded) {
+    alert("This is the temporary mechanism to wait for any included links to load. Press enter to continue.");
+}
 	
 	//create children
 	var rootFolder = workspace.getRootFolder();
 	var childrenJson = json.data;
 	var updateDataList = [];
 	
-	rootFolder.createChildrenFromJson(app,childrenJson,updateDataList)
+	workspaceUI.createChildrenFromJson(rootFolder,childrenJson,updateDataList)
     
     //set the data on all the objects
     var result;
@@ -187,6 +197,35 @@ visicomp.app.visiui.WorkspaceUI.fromJson = function(app, json) {
     
 //figure out a better return
 	return result;
+}
+
+/** This serializes the child controls for this fodler. */
+visicomp.app.visiui.WorkspaceUI.prototype.createChildrenFromJson = function(parentFolder,json,updateDataList) {
+	for(var key in json) {
+		var childJson = json[key];
+        var type = childJson.type;
+        var controlGenerator = this.app.getControlGenerator(type);
+        if(!controlGenerator) {
+            throw visicomp.core.util.createError("Control definition not found: " + type);
+        }
+        controlGenerator.createFromJson(this,parentFolder,childJson,updateDataList);
+	}
+}
+
+/** This serializes the child controls for this fodler. */
+visicomp.app.visiui.WorkspaceUI.prototype.addChildrenToJson = function(folder,json) {
+	
+	var childMap = folder.getChildMap();
+	for(var key in childMap) {
+		var child = childMap[key];
+        
+		//get the object map for the workspace
+		var childControl = this.getChildControl(child);
+		
+		//get the control for this child
+		var name = child.getName();
+		json[name] = childControl.toJson(this);
+	}
 }
 
 //========================================

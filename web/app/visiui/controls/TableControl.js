@@ -29,7 +29,7 @@ visicomp.app.visiui.TableControl.prototype.toJson = function(workspaceUI) {
     json.name = table.getName();
     json.type = visicomp.app.visiui.TableControl.generator.uniqueName;
     
-    if(this.table.hasCode()) {
+    if(table.hasCode()) {
         json.functionBody = table.getFunctionBody();
         json.supplementalCode = table.getSupplementalCode();
     }
@@ -128,12 +128,12 @@ visicomp.app.visiui.TableControl.getShowCreateDialogCallback = function(app) {
 }
 
 //add table listener
-visicomp.app.visiui.TableControl.createControl = function(app,parent,name) {
+visicomp.app.visiui.TableControl.createControl = function(workspaceUI,parent,name) {
     var returnValue = visicomp.core.createtable.createTable(parent,name);
     if(returnValue.success) {
         var table = returnValue.table;
         var tableControl = new visicomp.app.visiui.TableControl(table);
-        app.addControl(tableControl);
+        workspaceUI.addControl(tableControl);
     }
     else {
         //no action for now
@@ -142,10 +142,10 @@ visicomp.app.visiui.TableControl.createControl = function(app,parent,name) {
 }
 
 /** This serializes the table control. */
-visicomp.app.visiui.TableControl.createfromJson = function(app,parent,json,updateDataList) {
+visicomp.app.visiui.TableControl.createfromJson = function(workspaceUI,parent,json,updateDataList) {
 
     var name = json.name;
-    var resultValue = visicomp.app.visiui.TableControl.createTableControl(app,parent,name);
+    var resultValue = visicomp.app.visiui.TableControl.createControl(workspaceUI,parent,name);
     
     if(resultValue.success) {
         var updateData = {};

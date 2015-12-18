@@ -23,12 +23,15 @@ visicomp.core.util.mixin(visicomp.app.visiui.FunctionControl,visicomp.app.visiui
 //==============================
 
 /** This serializes the table control. */
-visicomp.app.visiui.TableControl.prototype.toJson = function(workspaceUI) {
+visicomp.app.visiui.FunctionControl.prototype.toJson = function(workspaceUI) {
     var json = {};
-    json.name = this.table.getName();
+    var functionObject = this.getObject();
+    json.name =functionObject.getName();
     json.type = visicomp.app.visiui.FunctionControl.generator.uniqueName;
-	json.functionBody = this.functionObject.getFunctionBody();
-	json.supplementalCode = this.functionObject.getSupplementalCode();
+    
+    json.argParens = functionObject.getArgParensList();
+	json.functionBody = functionObject.getFunctionBody();
+	json.supplementalCode = functionObject.getSupplementalCode();
     return json;
 }
 
@@ -108,7 +111,7 @@ visicomp.app.visiui.FunctionControl.getShowCreateDialogCallback = function(app) 
 }
 
 //add table listener
-visicomp.app.visiui.FunctionControl.createControl = function(app,parent,declarationName) {
+visicomp.app.visiui.FunctionControl.createControl = function(workspaceUI,parent,declarationName) {
 	
 	//clean up extraction of name and arg list---------------
 	var nameLength = declarationName.indexOf("(");
@@ -124,7 +127,7 @@ visicomp.app.visiui.FunctionControl.createControl = function(app,parent,declarat
     if(returnValue.success) {
         var functionObject = returnValue.functionObject;
         var functionControl = new visicomp.app.visiui.FunctionControl(functionObject);
-        app.addControl(functionControl);
+        workspaceUI.addControl(functionControl);
     }
     else {
         //no action for now
@@ -133,10 +136,11 @@ visicomp.app.visiui.FunctionControl.createControl = function(app,parent,declarat
 }
 
 /** This serializes the table control. */
-visicomp.app.visiui.FunctionControl.createfromJson = function(app,parent,json,updateDataList) {
+visicomp.app.visiui.FunctionControl.createfromJson = function(workspaceUI,parent,json,updateDataList) {
 
     var name = json.name;
-    var resultValue = visicomp.app.visiui.FunctionControl.createFunctionControl(app,parent,name);
+    var argParens = json.argParens;
+    var resultValue = visicomp.app.visiui.FunctionControl.createControl(workspaceUI,parent,name + argParens);
     
     if(resultValue.success) {
         var updateData = {};

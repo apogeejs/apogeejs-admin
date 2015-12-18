@@ -2,14 +2,17 @@
  * should take the folder and the table name as arguments and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
 visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTitle,app,onCreateFunction) {
-	
-//for now, load the single workspace
+
+////////////////////////////////////////////////////////
+//for now, load only the active
 //later we should allow for multiple
-var workspaceUI = app.getWorkspaceUI();
+var workspaceUI = app.getActiveWorkspaceUI();
 if(!workspaceUI) {
 	alert("No workspace is loaded!");
 	return;
 }
+////////////////////////////////////////////////////////
+
 	var controlMap = workspaceUI.getControlMap();
 
     var dialog = new visicomp.visiui.Dialog({"movable":true});
@@ -62,7 +65,7 @@ if(!workspaceUI) {
             return;
         }
         
-        var result = onCreateFunction(app,folder,objectName);
+        var result = onCreateFunction(workspaceUI,folder,objectName);
         
         if(result.success) {
             dialog.hide();

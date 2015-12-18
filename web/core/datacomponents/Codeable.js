@@ -67,7 +67,7 @@ visicomp.core.Codeable.clearCode = function() {
 
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.hasCode = function() {
-    return (this.functionGeneratorBody === null);
+    return (this.functionGeneratorBody !== null);
 }
 
 visicomp.core.Codeable.calculateDependencies = function() {

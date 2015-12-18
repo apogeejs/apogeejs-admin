@@ -11,8 +11,6 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     
     //workspaces
     this.workspaceUIs = {};
-//I am limiting to one for now. later I will udpate to allow more
-this.singleLoadedWorkspace = null;
     
     //control generators
     this.controlGenerators = {};
@@ -32,7 +30,7 @@ this.singleLoadedWorkspace = null;
 	this.createUI(containerId);
 	
 	//create a default workspace
-//	this.createWorkspace(visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME);
+	this.createWorkspace(visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME);
 	
 }
 	
@@ -42,11 +40,8 @@ visicomp.core.util.mixin(visicomp.app.visiui.VisiComp,visicomp.core.EventManager
 
 visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME = "workspace";
 
-//------------------------------------------------------------------------------
-//WE NEED TO MANAGE THESE DIFFERENTLY WHEN WE ALLOW MUTLIPLE WORKSPACES
-
-visicomp.app.visiui.VisiComp.prototype.getWorkspace = function() {
-    var workspaceUI = this.getWorkspaceUI();
+visicomp.app.visiui.VisiComp.prototype.getWorkspace = function(name) {
+    var workspaceUI = this.getWorkspaceUI(name);
 	if(workspaceUI) {
 		return workspaceUI.getWorkspace();
 	}
@@ -55,40 +50,76 @@ visicomp.app.visiui.VisiComp.prototype.getWorkspace = function() {
 	}
 }
 
-visicomp.app.visiui.VisiComp.prototype.getWorkspaceUI = function() {
-	if(this.singleLoadedWorkspace !== null) {
-		return this.workspaceUIs[this.singleLoadedWorkspace];
+visicomp.app.visiui.VisiComp.prototype.getWorkspaceUI = function(name) {
+	return this.workspaceUIs[name];
+}
+
+visicomp.app.visiui.VisiComp.prototype.getActiveWorkspaceUI = function() {
+    var name = this.tabFrame.getActiveTabTitle();
+    if(name) {
+        return this.workspaceUIs[name];
+    }
+    else {
+        return null;
+    }
+}
+
+visicomp.app.visiui.VisiComp.prototype.getActiveWorkspace = function() {
+    var workspaceUI = this.getActiveWorkspaceUI();
+	if(workspaceUI) {
+		return workspaceUI.getWorkspace();
 	}
 	else {
 		return null;
 	}
 }
-//------------------------------------------------------------------------------
 
 /** This method creates a new workspace. */
 visicomp.app.visiui.VisiComp.prototype.createWorkspace = function(name) {
     
-//we can only have one workspace of a given name!    
+//we can only have one workspace of a given name!
+if(this.workspaceUIs[name]) {
+    return {"success":false,"msg":"There is already an open workspce with the name " + name};
+}
     
     var workspace = new visicomp.core.Workspace(name);
-    var tab = this.tabFrame.addTab(workspace.getName());
+    var tab = this.tabFrame.addTab(name);
+    this.tabFrame.setActiveTab(name);
     var workspaceUI = new visicomp.app.visiui.WorkspaceUI(this,workspace,tab);
     this.workspaceUIs[name] = workspaceUI;
-    return {"success":true};
+    
+    var returnValue = {};
+    returnValue.success = true;
+    returnValue.workspaceUI = workspaceUI;
+    returnValue.workspace = workspace;
+    return returnValue;
 }
 
 /** This method opens an workspace, from the text file. */
 visicomp.app.visiui.VisiComp.prototype.openWorkspace = function(workspaceText) {
 	var workspaceJson = JSON.parse(workspaceText);
-	return visicomp.app.visiui.Workspace.fromJson(this,workspaceJson);
+	return visicomp.app.visiui.WorkspaceUI.fromJson(this,workspaceJson);
 }
 
-/** This method closes a workspace. */
+/** This method closes the active workspace. */
 visicomp.app.visiui.VisiComp.prototype.closeWorkspace = function() {
     
-//this closes all! Fix
+    //add some kind of warnging!!
     
-    location.reload();
+    var activeWorkspaceUI = this.getActiveWorkspaceUI();
+    if(activeWorkspaceUI === null) {
+        alert("There is no open workspace.");
+        return;
+    }
+    
+    var workspace = activeWorkspaceUI.getWorkspace();
+    
+    var name = workspace.getName();
+    
+    //remove the workspace from the app
+    delete this.workspaceUIs[name];
+    this.tabFrame.removeTab(name);
+    workspace.close();
 }
 
 visicomp.app.visiui.VisiComp.prototype.addControl = function(control) {
@@ -340,34 +371,18 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     var instance = this;
     
     //create new listener
-    var newListener = function() {
-        if(instance.singleLoadedWorkspace !== null) {
-            //one workspace for now
-            alert("You must close the existing workspace before opening another.");
-            return;
-        }
-        
+    var newListener = function() {      
         var onCreate = function(name) {
-            var returnValue = instance.createWorkspace(name);
-if(returnValue.success) instance.singleLoadedWorkspace = name;
-            return returnValue;
+            return instance.createWorkspace(name);
         }
         visicomp.app.visiui.dialog.showCreateWorkspaceDialog(onCreate); 
     }
     this.addListener("menuFileNew",newListener);
     
     //open listener
-    var openListener = function() {
-        if(instance.singleLoadedWorkspace !== null) {
-            //one workspace for now
-            alert("You must close the existing workspace before opening another.");
-            return;
-        }
-        
+    var openListener = function() {       
         var onOpen = function(workspaceData) {
-            var returnValue = instance.openWorkspace(workspaceData);
-if(returnValue.success) instance.singleLoadedWorkspace = workspaceData.name;
-            return returnValue;
+            return instance.openWorkspace(workspaceData);
         }
         visicomp.app.visiui.dialog.showOpenWorkspaceDialog(onOpen); 
     }
@@ -375,21 +390,18 @@ if(returnValue.success) instance.singleLoadedWorkspace = workspaceData.name;
     
     //save listener
     var saveListener = function() {
-        if(instance.singleLoadedWorkspace === null) {
+        var activeWorkspaceUI = instance.getActiveWorkspaceUI();
+        if(activeWorkspaceUI === null) {
             alert("There is no open workspace.");
             return;
         }
         
-        visicomp.app.visiui.dialog.showSaveWorkspaceDialog(instance, instance.workspaceUI); 
+        visicomp.app.visiui.dialog.showSaveWorkspaceDialog(instance, activeWorkspaceUI); 
     }
     this.addListener("menuFileSave",saveListener);
     
     //close listener
     var closeListener = function() {
-        if(instance.workspaceLoaded === null) {
-            alert("There is no open workspace.");
-            return;
-        }
         
         //for now this reloads - when we fix this make sure it does everything it needs
         //to to get rid of the workspace

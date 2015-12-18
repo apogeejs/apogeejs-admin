@@ -188,15 +188,15 @@ visicomp.visiui.TabFrame.prototype.addTab = function(title) {
 visicomp.visiui.TabFrame.prototype.removeTab = function(title) {
     var tabData = this.tabTable[title];
     if(tabData) {
-        this.mainFrame.remove(tabData.displayFrame);
-        this.tabBar.remove(tabData.tabElement);
+        this.tabFrame.removeChild(tabData.displayFrame);
+        this.tabBar.removeChild(tabData.tabElement);
         delete this.tabTable[title];
 		
         if(this.activeTab == title) {
             this.activeTab = null;
             //choose a random tab
             for(var title in this.tabTable) {
-                this.setActiveTab = title;
+                this.activeTab = title;
                 break;
             }
         }
@@ -208,6 +208,11 @@ visicomp.visiui.TabFrame.prototype.removeTab = function(title) {
 visicomp.visiui.TabFrame.prototype.setActiveTab = function(title) {
     this.activeTab = title;
     this.updateTabDisplay();
+}
+
+/** This mesets the active tab, by tab title. */
+visicomp.visiui.TabFrame.prototype.getActiveTabTitle = function() {
+    return this.activeTab;
 }
 
 /** This updates the tabs. */
