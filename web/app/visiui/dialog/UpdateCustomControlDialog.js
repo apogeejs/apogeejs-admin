@@ -1,8 +1,8 @@
 /** This method shows an update control dialog. The argument onSaveData si the same
  * arguments as the updateFunction event handler data. */
-visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onSaveFunction) {
+visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResourceControl,onSaveFunction) {
 	
-	var customResourceProcessor = resource.getResourceProcessor();
+	var customResourceProcessor = customResourceControl.getResourceProcessor();
     
     var dialog = new visicomp.visiui.Dialog({"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
             
@@ -94,7 +94,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
     
     var onSave = function() {
 		var controlHtml;
-		var customizeScriptBody;
+		var customize;
 		var supplementalCode;
         var css;
         
@@ -106,10 +106,10 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
 		}
 			
         if(customizeEditor) {
-            customizeScriptBody = processorEditor.getSession().getValue().trim();
+            customize = customizeEditor.getSession().getValue().trim();
 		}
 		else {
-			customizeScriptBody = customResourceProcessor.getCustomizeScript();
+			customize = customResourceProcessor.getCustomizeScript();
 		}
 		
 		if(supplementalEditor) {
@@ -126,7 +126,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
 			css = customResourceProcessor.getCss();
 		}
         
-        var result = onSaveFunction(controlHtml,customizeScriptBody,supplementalCode,css);
+        var result = onSaveFunction(controlHtml,customize,supplementalCode,css);
         
         if(result.success) {
 			dialog.hide();
@@ -189,9 +189,9 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
             customizeEditor.setTheme("ace/theme/eclipse");
             customizeEditor.getSession().setMode("ace/mode/javascript");
             //set the customize
-            var customizeBody = customResourceProcessor.getCustomizeScript();
-            if(customizeBody) {
-                customizeEditor.getSession().setValue(customizeBody);
+            var customize = customResourceProcessor.getCustomizeScript();
+            if(customize) {
+                customizeEditor.getSession().setValue(customize);
             }
         }
     }
@@ -203,13 +203,13 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
         supplementalEditorDiv.style.display = "";
         cssEditorDiv.style.display = "none";
         
-        //create customize editor if needed
+        //create supplemental editor if needed
         if(!supplementalEditor) {
             //initialize editor
             supplementalEditor = ace.edit(supplementalEditorDiv);
             supplementalEditor.setTheme("ace/theme/eclipse");
             supplementalEditor.getSession().setMode("ace/mode/javascript");
-            //set the customize
+            //set the supplemental
             var supplementalCode = customResourceProcessor.getSupplementalCode();
             if(supplementalCode) {
                 supplementalEditor.getSession().setValue(supplementalCode);
@@ -238,8 +238,8 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
     }
     
     //show html first
-    htmlRadio.checked = true;
-    showHtmlFunction();
+    customizeRadio.checked = true;
+    showCustomizeFunction();
     
     //radio change handler
     var onRadioChange = function() {

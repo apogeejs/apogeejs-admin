@@ -14,6 +14,24 @@ visicomp.core.util.mixin(visicomp.app.visiui.CustomResourceControl,visicomp.app.
 // Public Instance Methods
 //==============================
 
+visicomp.app.visiui.CustomResourceControl.prototype.getResourceProcessor = function() {
+	return this.getObject().getResourceProcessor();
+}
+
+visicomp.app.visiui.CustomResourceControl.prototype.update = function(html,processorGeneratorBody,supplementalCode,css) {
+	
+	//create a new resource processor
+	var newProcessor = new visicomp.app.visiui.CustomResourceProcessor();
+	newProcessor.setFrame(this.frame);
+	
+	//update it
+	newProcessor.update(html,processorGeneratorBody,supplementalCode,css);
+	
+	//update the resource
+	var resource = this.getObject();
+	resource.updateResourceProcessor(newProcessor);
+}
+
 
 //==============================
 // Protected and Private Instance Methods
@@ -37,18 +55,17 @@ visicomp.app.visiui.CustomResourceControl.prototype.addToFrame = function(contro
 
 visicomp.app.visiui.CustomResourceControl.prototype.createEditResourceDialogCallback = function() {
     
-    var resource = this.getObject();
+    var instance = this;
     
     //create save handler
     var onSave = function(controlHtml,controlOnLoad,supplementalCode,css) {
-		var customResourceProcessor = resource.getResourceProcessor();
-		customResourceProcessor.update(controlHtml,controlOnLoad,supplementalCode,css);
+		instance.update(controlHtml,controlOnLoad,supplementalCode,css);
 //figure out what to do with return here
 		return {"success":true};
     };
     
     return function() {
-        visicomp.app.visiui.dialog.showUpdateCustomControlDialog(resource,onSave);
+        visicomp.app.visiui.dialog.showUpdateCustomControlDialog(instance,onSave);
     }
 }
 
@@ -73,8 +90,9 @@ visicomp.app.visiui.CustomResourceControl.getShowCreateDialogCallback = function
 
 //add table listener
 visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,parent,name) {
-	var processor = new visicomp.app.visiui.control.CustomResourceProcessor();
-    var returnValue = visicomp.core.createresource.createResource(parent,name,processor);
+	//create a resource with a base custom processor
+	var resourceProcessor = new visicomp.app.visiui.CustomResourceProcessor();
+    var returnValue = visicomp.core.createresource.createResource(parent,name,resourceProcessor);
     if(returnValue.success) {
         var resource = returnValue.resource;
         var customResourceControl = new visicomp.app.visiui.CustomResourceControl(resource);

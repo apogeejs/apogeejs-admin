@@ -5,7 +5,7 @@ visicomp.core.Resource = function(workspace,name,resourceProcessor) {
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
     visicomp.core.Impactor.init.call(this);
-	visicomp.core.Codeable.init.call(this,"(resource)");
+	visicomp.core.Codeable.init.call(this,"(resourceProcessor)");
     
     this.resourceProcessor = resourceProcessor;
 }
@@ -19,11 +19,25 @@ visicomp.core.util.mixin(visicomp.core.Resource,visicomp.core.Recalculable);
 visicomp.core.Resource.prototype.getResourceProcessor = function() {	
     return this.resourceProcessor;
 }    
-    
+
+/** This method updates the resource processor for this resource. */
+visicomp.core.Resource.prototype.updateResourceProcessor = function(resourceProcessor) {	
+    this.resourceProcessor = resourceProcessor;
+	
+	//if we have code, rerun it with the new processor
+	var objectFunction = visicomp.core.getObjectFunction(this);
+	if(objectFunction) {
+		//process the object function as needed
+		this.processObjectFunction(objectFunction);
+	}
+} 
+
 visicomp.core.Resource.prototype.processObjectFunction = function(objectFunction) {	
     //texectue the object function passing the resource object.
     objectFunction(this.resourceProcessor);
 }
+
+
 
 
 

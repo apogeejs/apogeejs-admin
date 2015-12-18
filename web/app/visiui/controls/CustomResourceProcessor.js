@@ -1,54 +1,51 @@
-if(visicomp.app.visiui.control === undefined) visicomp.app.visiui.control = {};
-
-visicomp.app.visiui.control.CustomResourceProcessor = function() {
-    this.contentLoaded = false;
+visicomp.app.visiui.CustomResourceProcessor = function() {
+	this.controlFrame = null;
+	
+	this.html = "";
+	this.customizeScript = "";
+	this.supplementalCode = "";
+	this.css = "";
 }
 
-visicomp.app.visiui.control.CustomResourceProcessor.prototype.setWindow = function(window) {
-    this.window = window;
-	if(this.contentLoaded) {
-		this.setContent();
-	}
+visicomp.app.visiui.CustomResourceProcessor.prototype.setFrame = function(controlFrame) {
+    this.controlFrame = controlFrame;
 }
 
-visicomp.app.visiui.control.CustomResourceProcessor.prototype.getHtml = function() {
+visicomp.app.visiui.CustomResourceProcessor.prototype.getFrame = function() {
+    return this.controlFrame;
+}
+
+visicomp.app.visiui.CustomResourceProcessor.prototype.getContentElement = function() {
+    return this.controlFrame.getWindow().getContent();
+}
+
+visicomp.app.visiui.CustomResourceProcessor.prototype.getHtml = function() {
     return this.html;
 }
 
-visicomp.app.visiui.control.CustomResourceProcessor.prototype.getCustomizeScript = function() {
+visicomp.app.visiui.CustomResourceProcessor.prototype.getCustomizeScript = function() {
     return this.customizeScript;
 }
 
-visicomp.app.visiui.control.CustomResourceProcessor.prototype.getSupplementalCode = function(msg) {
+visicomp.app.visiui.CustomResourceProcessor.prototype.getSupplementalCode = function() {
     return this.supplementalCode;
 }
 
-visicomp.app.visiui.control.CustomResourceProcessor.prototype.getCss = function(msg) {
+visicomp.app.visiui.CustomResourceProcessor.prototype.getCss = function(msg) {
     return this.css;
 }
 
-visicomp.app.visiui.control.CustomResourceProcessor.prototype.update = function(html,customizeScript,supplementalCode,css) {
+visicomp.app.visiui.CustomResourceProcessor.prototype.update = function(html,customizeScript,supplementalCode,css) {
     this.html = html;
 	this.customizeScript = customizeScript;
 	this.supplementalCode = supplementalCode;
 	this.css = css;
-	this.contentLoaded = true;
 	
-	//dummy update
-	if(this.window) {
-		this.setContent();
-	}
+	//update the processor with the given data
+	this.updateProcessor();
 }
 
-visicomp.app.visiui.control.CustomResourceProcessor.prototype.setContent = function() {
-	//TEMP
-	if(this.window) {
-		var element = this.window.getContent();
-		element.innerHTML = this.html;
-	}
-}
-
-visicomp.app.visiui.control.CustomResourceProcessor.prototype.updateToJson = function() {
+visicomp.app.visiui.CustomResourceProcessor.prototype.updateToJson = function() {
     var json = {};
     json.html = this.html;
 	json.customizeScript = this.customizeScript;
@@ -57,10 +54,55 @@ visicomp.app.visiui.control.CustomResourceProcessor.prototype.updateToJson = fun
     return json;
 }
 
-visicomp.app.visiui.control.CustomResourceProcessor.prototype.updateFromJson = function(json) {
-    this.html = json.html;
-	this.customizeScript = json.customizeScript;
-	this.supplementalCode = json.supplementalCode;
-	this.css = json.css;
+visicomp.app.visiui.CustomResourceProcessor.prototype.updateFromJson = function(json) {
+	this.update(json.html,json.customizeScript,json.supplementalCode,json.css);
 }
+
+//======================================
+// Processor methods
+//======================================
+
+/** This method creates the member update javascript, which will be added to the
+ * html page so the user easily can run it in the debugger if needed. 
+ * @private */
+visicomp.app.visiui.CustomResourceProcessor.prototype.updateProcessor = function() {
+    
+	
+    
+    //create the resource generator wrapped with its closure
+    var generatorFunctionBody = visicomp.core.util.formatString(
+        visicomp.app.visiui.CustomResourceProcessor.GENERATOR_FUNCTION_FORMAT_TEXT,
+		this.customizeScript,
+        this.supplementalCode
+    );
+	
+	//create the function generator, with the aliased variables in the closure
+	var generatorFunction = new Function(generatorFunctionBody);
+	var updateFunction = generatorFunction();
+	this.resourceProcessor = updateFunction(this);
+}
+
+
+
+/** This is the format string to create the code body for updateing the member
+ * Input indices:
+ * 0: customize script
+ * 1: supplemental code text
+ * @private
+ */
+visicomp.app.visiui.CustomResourceProcessor.GENERATOR_FUNCTION_FORMAT_TEXT = [
+"",
+"//supplemental code",
+"{1}",
+"//end supplemental code",
+"",
+"//member function",
+"var generator = function(resourceProcessor) {",
+"{0}",
+"}",
+"//end member function",
+"return generator;",
+""
+   ].join("\n");
+
 
