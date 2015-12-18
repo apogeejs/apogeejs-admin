@@ -27,7 +27,7 @@ visicomp.app.visiui.CustomResourceControl.prototype.addToFrame = function(contro
     var menuItemInfoList = this.getMenuItemInfoList();
 
     var itemInfo = {};
-    itemInfo.title = "Edit&nbsp;Resource$nbsp;Code";
+    itemInfo.title = "Edit&nbsp;Resource&nbsp;Code";
     itemInfo.callback = this.createEditResourceDialogCallback();
     
     //add these at the start of the menu
@@ -73,7 +73,7 @@ visicomp.app.visiui.CustomResourceControl.getShowCreateDialogCallback = function
 
 //add table listener
 visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,parent,name) {
-	var processor = new visicomp.app.visiui.control.CustomControl();
+	var processor = new visicomp.app.visiui.control.CustomResourceProcessor();
     var returnValue = visicomp.core.createresource.createResource(parent,name,processor);
     if(returnValue.success) {
         var resource = returnValue.resource;

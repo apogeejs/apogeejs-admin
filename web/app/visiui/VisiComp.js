@@ -350,7 +350,8 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     for(var i = 0; i < this.standardControls.length; i++) {
         var key = this.standardControls[i];
         var generator = this.controlGenerators[key];
-        var title = "Add&nbsp;" + generator.displayName;
+        var fixedDisplayName = this.convertSpacesForHtml(generator.displayName); 
+        var title = "Add&nbsp;" + fixedDisplayName;
         menu.addCallbackMenuItem(title,generator.getShowCreateDialogCallback(app));
     }
     
@@ -415,4 +416,10 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
         visicomp.app.visiui.dialog.showUpdateLinksDialog(instance);
     }
     this.addListener("externalLinks",udpateLinksListener);
+}
+
+/** This method replaces on spaces with &nbsp; spaces. It is intedned to prevent
+ * wrapping in html. */
+visicomp.app.visiui.VisiComp.prototype.convertSpacesForHtml = function(text) {
+    return text.replace(" ","&nbsp;");
 }
