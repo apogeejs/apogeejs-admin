@@ -15,16 +15,17 @@ visicomp.app.visiui.BasicResourceControl.init = function() {}
 /** This serializes the table control. */
 visicomp.app.visiui.BasicResourceControl.toJson = function() {
     var json = {};
-    json.name = this.reosource.getName();
-    json.type = visicomp.app.visiui.TableControl.generator.uniqueName;
+    var resource = this.getObject();
+    json.name = resource.getName();
+    json.type = this.getUniqueTypeName();
     
     //store the processor info
-	var resourceProcessor = this.getObject().getResourceProcessor();
+	var resourceProcessor = resource.getResourceProcessor();
     json.processor = resourceProcessor.updateToJson();
 		
     //store the codeable info
-	json.functionBody = this.resource.getFunctionBody();
-	json.supplementalCode = this.resource.getSupplementalCode();
+	json.functionBody = resource.getFunctionBody();
+	json.supplementalCode = resource.getSupplementalCode();
 
     return json;
 }
@@ -32,6 +33,9 @@ visicomp.app.visiui.BasicResourceControl.toJson = function() {
 //==============================
 // Private Instance Methods
 //==============================
+
+//** This instance method must be implemented by the extending class. */
+//visicomp.app.visiui.BasicResourceControl.getUniqueTypeName();
 
 
 /** This method populates the frame for this control. */
@@ -68,7 +72,7 @@ window.setSize(200,200);
 //======================================
 
 /** This method can be called to complete serialization of a basic control. */
-visicomp.app.visiui.BasicResourceControl.updatefromJson = function(json,updateDataList) {
+visicomp.app.visiui.BasicResourceControl.updateFromJson = function(resource,json,updateDataList) {
 		var resourceProcessor = resource.getResourceProcessor();
 		resourceProcessor.updateFromJson(json.processor);
 		

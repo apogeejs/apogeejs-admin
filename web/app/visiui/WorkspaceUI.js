@@ -196,7 +196,7 @@ if(linksAdded) {
     }
     
 //figure out a better return
-	return result;
+	return {"success":true};
 }
 
 /** This serializes the child controls for this fodler. */

@@ -21,9 +21,9 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
     var htmlRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"html"});
     line.appendChild(htmlRadio);
     line.appendChild(document.createTextNode("HTML"));
-    var onLoadRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"onLoad"});
-    line.appendChild(onLoadRadio);
-    line.appendChild(document.createTextNode("OnLoad"));
+    var customizeRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"customize"});
+    line.appendChild(customizeRadio);
+    line.appendChild(document.createTextNode("Customize Script"));
     var supplementalRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"supplemental"});
     line.appendChild(supplementalRadio);
     line.appendChild(document.createTextNode("Supplemental Code"));
@@ -55,15 +55,15 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
     var htmlEditor = null;
     editorDiv.appendChild(htmlEditorDiv);
     
-    var onLoadEditorDiv = visicomp.visiui.createElement("div",null,{
+    var customizeEditorDiv = visicomp.visiui.createElement("div",null,{
         "position":"absolute",
         "top":"0px",
         "bottom":"0px",
         "right":"0px",
         "left":"0px"
     });
-    var onLoadEditor = null;
-    editorDiv.appendChild(onLoadEditorDiv);
+    var customizeEditor = null;
+    editorDiv.appendChild(customizeEditorDiv);
     
     var supplementalEditorDiv = visicomp.visiui.createElement("div",null,{
         "position":"absolute",
@@ -94,7 +94,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
     
     var onSave = function() {
 		var controlHtml;
-		var controlOnLoad;
+		var customizeScriptBody;
 		var supplementalCode;
         var css;
         
@@ -105,11 +105,11 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
 			controlHtml = customResourceProcessor.getHtml();
 		}
 			
-        if(onLoadEditor) {
-            controlOnLoad = onLoadEditor.getSession().getValue().trim();
+        if(customizeEditor) {
+            customizeScriptBody = processorEditor.getSession().getValue().trim();
 		}
 		else {
-			controlOnLoad = customResourceProcessor.getOnLoadBody();
+			customizeScriptBody = customResourceProcessor.getCustomizeScript();
 		}
 		
 		if(supplementalEditor) {
@@ -126,7 +126,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
 			css = customResourceProcessor.getCss();
 		}
         
-        var result = onSaveFunction(controlHtml,controlOnLoad,supplementalCode,css);
+        var result = onSaveFunction(controlHtml,customizeScriptBody,supplementalCode,css);
         
         if(result.success) {
 			dialog.hide();
@@ -156,9 +156,9 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
     //populate html and add handlers for radio buttons
     //populate dialog
     var showHtmlFunction = function() {
-        //hide the onLoad div and show the html dive
+        //hide the customize div and show the html dive
         htmlEditorDiv.style.display = "";
-        onLoadEditorDiv.style.display = "none";
+        customizeEditorDiv.style.display = "none";
         supplementalEditorDiv.style.display = "none";
         cssEditorDiv.style.display = "none";
         
@@ -175,41 +175,41 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
         }
     }
     
-    var showOnLoadFunction = function() {
-        //hide the html div and show the onLoad dive
+    var showCustomizeFunction = function() {
+        //hide the html div and show the customize dive
         htmlEditorDiv.style.display = "none";
-        onLoadEditorDiv.style.display = "";
+        customizeEditorDiv.style.display = "";
         supplementalEditorDiv.style.display = "none";
         cssEditorDiv.style.display = "none";
         
-        //create onLoad editor if needed
-        if(!onLoadEditor) {
+        //create customize editor if needed
+        if(!customizeEditor) {
             //initialize editor
-            onLoadEditor = ace.edit(onLoadEditorDiv);
-            onLoadEditor.setTheme("ace/theme/eclipse");
-            onLoadEditor.getSession().setMode("ace/mode/javascript");
-            //set the onLoad
-            var onLoadBody = customResourceProcessor.getOnLoadBody();
-            if(onLoadBody) {
-                onLoadEditor.getSession().setValue(onLoadBody);
+            customizeEditor = ace.edit(customizeEditorDiv);
+            customizeEditor.setTheme("ace/theme/eclipse");
+            customizeEditor.getSession().setMode("ace/mode/javascript");
+            //set the customize
+            var customizeBody = customResourceProcessor.getCustomizeScript();
+            if(customizeBody) {
+                customizeEditor.getSession().setValue(customizeBody);
             }
         }
     }
     
     var showSupplementalFunction = function() {
-        //hide the html div and show the onLoad dive
+        //hide the html div and show the customize dive
         htmlEditorDiv.style.display = "none";
-        onLoadEditorDiv.style.display = "none";
+        customizeEditorDiv.style.display = "none";
         supplementalEditorDiv.style.display = "";
         cssEditorDiv.style.display = "none";
         
-        //create onLoad editor if needed
+        //create customize editor if needed
         if(!supplementalEditor) {
             //initialize editor
             supplementalEditor = ace.edit(supplementalEditorDiv);
             supplementalEditor.setTheme("ace/theme/eclipse");
             supplementalEditor.getSession().setMode("ace/mode/javascript");
-            //set the onLoad
+            //set the customize
             var supplementalCode = customResourceProcessor.getSupplementalCode();
             if(supplementalCode) {
                 supplementalEditor.getSession().setValue(supplementalCode);
@@ -218,9 +218,9 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
     }
     
     var showCssFunction = function() {
-        //hide the onLoad div and show the html dive
+        //hide the customize div and show the html dive
         htmlEditorDiv.style.display = "none";
-        onLoadEditorDiv.style.display = "none";
+        customizeEditorDiv.style.display = "none";
         supplementalEditorDiv.style.display = "none";
         cssEditorDiv.style.display = "";
         
@@ -243,8 +243,8 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
     
     //radio change handler
     var onRadioChange = function() {
-        if(onLoadRadio.checked) {
-            showOnLoadFunction();
+        if(customizeRadio.checked) {
+            showCustomizeFunction();
         }
         else if(htmlRadio.checked) {
             showHtmlFunction();
@@ -257,7 +257,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
         }
     }
     
-    onLoadRadio.onchange = onRadioChange;
+    customizeRadio.onchange = onRadioChange;
     htmlRadio.onchange = onRadioChange;
     supplementalRadio.onchange = onRadioChange;
     cssRadio.onchange = onRadioChange;
@@ -277,7 +277,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(resource,onS
         editorDiv.style.height = (editorDiv.offsetHeight + extraHeight - 5) + "px";
         
         if(htmlEditor) htmlEditor.resize();
-        if(onLoadEditor) onLoadEditor.resize();
+        if(customizeEditor) customizeEditor.resize();
         if(supplementalEditor) supplementalEditor.resize();
         if(cssEditor) cssEditor.resize();
     }

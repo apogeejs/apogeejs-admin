@@ -4,8 +4,6 @@ visicomp.app.visiui.control.CustomControl = function() {
     this.contentLoaded = false;
 }
 
-visicomp.app.visiui.control.CustomControl.prototype.isCustomControl = true;
-
 visicomp.app.visiui.control.CustomControl.prototype.setWindow = function(window) {
     this.window = window;
 	if(this.contentLoaded) {
@@ -17,8 +15,8 @@ visicomp.app.visiui.control.CustomControl.prototype.getHtml = function() {
     return this.html;
 }
 
-visicomp.app.visiui.control.CustomControl.prototype.getOnLoadBody = function() {
-    return this.onLoadBody;
+visicomp.app.visiui.control.CustomControl.prototype.getCustomizeScript = function() {
+    return this.customizeScript;
 }
 
 visicomp.app.visiui.control.CustomControl.prototype.getSupplementalCode = function(msg) {
@@ -29,9 +27,9 @@ visicomp.app.visiui.control.CustomControl.prototype.getCss = function(msg) {
     return this.css;
 }
 
-visicomp.app.visiui.control.CustomControl.prototype.update = function(html,onLoadBody,supplementalCode,css) {
+visicomp.app.visiui.control.CustomControl.prototype.update = function(html,customizeScript,supplementalCode,css) {
     this.html = html;
-	this.onLoadbody = onLoadBody;
+	this.customizeScript = customizeScript;
 	this.supplementalCode = supplementalCode;
 	this.css = css;
 	this.contentLoaded = true;
@@ -53,7 +51,7 @@ visicomp.app.visiui.control.CustomControl.prototype.setContent = function() {
 visicomp.app.visiui.control.CustomControl.prototype.updateToJson = function() {
     var json = {};
     json.html = this.html;
-	json.onLoadBody = this.onLoadBody;
+	json.customizeScript = this.customizeScript;
 	json.supplementalCode = this.supplementalCode;
 	json.css = this.css;
     return json;
@@ -61,7 +59,7 @@ visicomp.app.visiui.control.CustomControl.prototype.updateToJson = function() {
 
 visicomp.app.visiui.control.CustomControl.prototype.updateFromJson = function(json) {
     this.html = json.html;
-	this.onLoadBody = json.onLoadBody;
+	this.customizeScript = json.customizeScript;
 	this.supplementalCode = json.supplementalCode;
 	this.css = json.css;
 }

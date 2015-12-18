@@ -20,34 +20,6 @@ visicomp.app.visiui.ControlFrame = function(parentElement,name) {
                 "left":"0px"
             });
     this.window.setContent(contentDiv);
-
-//	switch(child.getType()) {
-//		case "folder":
-//            visicomp.app.visiui.FolderUI.populateFolderWindow(this,child);
-//			break;
-//			
-//		case "table":
-//            visicomp.app.visiui.TableUI.populateTableWindow(this,child);
-//			break;
-//			
-//		case "function":
-//            visicomp.app.visiui.FunctionUI.populateFunctionWindow(this,child);
-//			break;
-//            
-//        case "control":
-//			var controlEngine = child.getControlEngine();
-//			//create a special window for custom controls
-//			if(controlEngine.isCustomControl) {
-//				visicomp.app.visiui.CustomControlUI.populateControlWindow(this,child);
-//			}
-//			else {
-//				visicomp.app.visiui.ControlUI.populateControlWindow(this,child);
-//			}
-//			break;
-//			
-//		default:
-//			alert("Unsupported object type for a UI object");
-//	}
 }
 
 visicomp.app.visiui.ControlFrame.prototype.getWindow = function() {

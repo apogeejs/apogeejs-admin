@@ -52,6 +52,11 @@ visicomp.app.visiui.CustomResourceControl.prototype.createEditResourceDialogCall
     }
 }
 
+/** This method is implemented to allow serialization. */
+visicomp.app.visiui.CustomResourceControl.prototype.getUniqueTypeName = function() {
+    return visicomp.app.visiui.CustomResourceControl.generator.uniqueName;
+}
+
 //======================================
 // Static methods
 //======================================
@@ -88,8 +93,8 @@ visicomp.app.visiui.CustomResourceControl.createfromJson = function(workspaceUI,
     var resultValue = visicomp.app.visiui.CustomResourceControl.createControl(workspaceUI,parent,name);
     
     if(resultValue.success) {
-		var resource = resultValue.resource;
-        resource.updateFromJson(json,updateDataList);
+        var resource = resultValue.resource;
+        visicomp.app.visiui.BasicResourceControl.updateFromJson(resource,json,updateDataList);
     }
 }
 
