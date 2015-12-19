@@ -214,10 +214,10 @@ visicomp.app.visiui.VisiComp.prototype.updateWorkspaceLinks = function(workspace
 
 visicomp.app.visiui.VisiComp.prototype.addLinkToPage = function(link,type) {
 	if(type === "js") {
-		this.addJsLink(link)
+		visicomp.app.visiui.VisiComp.addJsLink(link)
 	}
 	else if(type === "css") {
-		this.addCssLink(link);
+		visicomp.app.visiui.VisiComp.addCssLink(link);
 	}
 }
 
@@ -226,7 +226,7 @@ visicomp.app.visiui.VisiComp.prototype.removeLinkFromPage = function(link,type) 
 	//we can not unexectue the js script
 	//css does get removed
 	if(type === "css") {
-		this.removeLink(link);
+		visicomp.app.visiui.VisiComp.removeLink(link);
 		return true;
 	}
 	else {
@@ -366,8 +366,6 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     container.appendChild(this.tabFrame.getElement());
     this.tabFrame.resizeElement();
     
-    this.workspaceUI = null;
-    
     //add menu listeners
     var instance = this;
     
@@ -413,7 +411,8 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     //external menu
     //add links listener
     var udpateLinksListener = function() {
-        visicomp.app.visiui.dialog.showUpdateLinksDialog(instance);
+        var activeWorkspaceUI = instance.getActiveWorkspaceUI();
+        visicomp.app.visiui.dialog.showUpdateLinksDialog(activeWorkspaceUI);
     }
     this.addListener("externalLinks",udpateLinksListener);
 }

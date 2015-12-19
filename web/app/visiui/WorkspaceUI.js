@@ -165,18 +165,31 @@ visicomp.app.visiui.WorkspaceUI.fromJson = function(app, json) {
     //add links
     var linksAdded = false;
     if((json.jsLinks)&&(json.jsLinks.length > 0)) {
-        app.setJsLinks(json.jsLinks);
+        workspaceUI.setJsLinks(json.jsLinks);
         linksAdded = true;
     }
     if((json.cssLinks)&&(json.cssLinks.length > 0)) {
-        app.setCssLinks(json.cssLinks);
+        workspaceUI.setCssLinks(json.cssLinks);
         linksAdded = true;
     }
 	
 //this is how we will wait to load links if there are any for now
 if(linksAdded) {
-    alert("This is the temporary mechanism to wait for any included links to load. Press enter to continue.");
+    var timerFunction = function() {
+        visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson(workspaceUI,workspace,json);
+    }
+    setTimeout(timerFunction,3000);
+    alert("There is a temporary fixed delay while external libraries are loading.");
+    return {"success":true};
 }
+else {
+    return visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson(workspaceUI,workspace,json);
+}
+    
+}
+
+/** This is used for saving the workspace. */
+visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson = function(workspaceUI,workspace,json) {
 	
 	//create children
 	var rootFolder = workspace.getRootFolder();
@@ -232,11 +245,11 @@ visicomp.app.visiui.WorkspaceUI.prototype.addChildrenToJson = function(folder,js
 // Links
 //========================================
 
-visicomp.app.visiui.VisiComp.prototype.getJsLinks = function() {
+visicomp.app.visiui.WorkspaceUI.prototype.getJsLinks = function() {
 	return this.jsLinkArray;
 }
 
-visicomp.app.visiui.VisiComp.prototype.setJsLinks = function(newLinkArray) {
+visicomp.app.visiui.WorkspaceUI.prototype.setJsLinks = function(newLinkArray) {
     //update the page links
     var oldLinkArray = this.jsLinkArray;
 	var addList = [];
@@ -246,11 +259,11 @@ visicomp.app.visiui.VisiComp.prototype.setJsLinks = function(newLinkArray) {
 	this.app.updateWorkspaceLinks(this.workspace.getName(),addList,removeList,"js");;
 }
 
-visicomp.app.visiui.VisiComp.prototype.getCssLinks = function() {
+visicomp.app.visiui.WorkspaceUI.prototype.getCssLinks = function() {
 	return this.cssLinkArray;
 }
 
-visicomp.app.visiui.VisiComp.prototype.setCssLinks = function(newLinkArray) {
+visicomp.app.visiui.WorkspaceUI.prototype.setCssLinks = function(newLinkArray) {
     //update the page links
     var oldLinkArray = this.cssLinkArray;
 	var addList = [];
@@ -262,7 +275,7 @@ visicomp.app.visiui.VisiComp.prototype.setCssLinks = function(newLinkArray) {
 
 /** This method determins which links are new, which are old and which are removed.  
  * @private */
-visicomp.app.visiui.VisiComp.prototype.createLinkAddRemoveList = function(linkArray,oldLinkArray,addList,removeList) { 
+visicomp.app.visiui.WorkspaceUI.prototype.createLinkAddRemoveList = function(linkArray,oldLinkArray,addList,removeList) { 
     
     var newLinks = {};
     var i;

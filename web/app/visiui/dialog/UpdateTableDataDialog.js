@@ -100,8 +100,6 @@ visicomp.app.visiui.dialog.showUpdateTableDataDialog = function(table,onSaveFunc
         editorDiv.style.height = (editorDiv.offsetHeight + extraHeight - 5) + "px";
         
         if(dataEditor) dataEditor.resize();
-        if(formulaEditor) formulaEditor.resize();
-        if(supplementalEditor) supplementalEditor.resize();
     }
     dialog.addListener("resize", resizeCallback);
 }

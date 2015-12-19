@@ -1,6 +1,6 @@
 /** This method shows an update control dialog. The argument onSaveData si the same
  * arguments as the updateControl event handler html. */
-visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspace) {
+visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     
     var dialog = new visicomp.visiui.Dialog({"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
             
@@ -71,13 +71,13 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspace) {
         if(jsLinksEditor) {
             var jsLinks = jsLinksEditor.getSession().getValue().trim();
 			var linkArray = visicomp.app.visiui.dialog.createLinkArray(jsLinks);
-            workspace.setJsLinks(jsLinks);
+            workspaceUI.setJsLinks(linkArray);
 		}
         
         if(cssLinksEditor) {
             var cssLinks = cssLinksEditor.getSession().getValue().trim();
-            var linkArray = visicomp.app.visiui.dialog.createLinkArray(csssLinks);
-            workspace.setCssLinks(linkArray);
+            var linkArray = visicomp.app.visiui.dialog.createLinkArray(cssLinks);
+            workspaceUI.setCssLinks(linkArray);
 		}
         
 //figrue out error handling here
@@ -105,7 +105,7 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspace) {
             jsLinksEditor.setTheme("ace/theme/eclipse");
             jsLinksEditor.getSession().setMode("ace/mode/text");
             //set the value
-            var jsLinks = app.getJsLinks();
+            var jsLinks = workspaceUI.getJsLinks();
             if(jsLinks) {
                 jsLinksEditor.getSession().setValue(jsLinks);
             }
@@ -123,7 +123,7 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspace) {
             cssLinksEditor.setTheme("ace/theme/eclipse");
             cssLinksEditor.getSession().setMode("ace/mode/text");
             //set the value
-            var cssLinks = app.getCssLinks();
+            var cssLinks = workspaceUI.getCssLinks();
             if(cssLinks) {
                 cssLinksEditor.getSession().setValue(cssLinks);
             }
