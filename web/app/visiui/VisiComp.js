@@ -24,7 +24,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 	this.linkMapByType.css = {};
 	
 	//load the standard control generators
-	this.loadStandardControlGenerators();
+	this.loadControlGenerators();
 	
 	//create the UI
 	this.createUI(containerId);
@@ -34,7 +34,6 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 	
 }
 	
-
 //add components to this class
 visicomp.core.util.mixin(visicomp.app.visiui.VisiComp,visicomp.core.EventManager);
 
@@ -72,6 +71,39 @@ visicomp.app.visiui.VisiComp.prototype.getActiveWorkspace = function() {
 	else {
 		return null;
 	}
+}
+
+//==================================
+// Workspace Management
+//==================================
+
+/** This method initiatees the open workspace procedure. */
+visicomp.app.visiui.VisiComp.prototype.newWorkspaceRequested = function() {
+    var instance = this;
+    var onCreate = function(name) {
+        return instance.createWorkspace(name);
+    }
+    visicomp.app.visiui.dialog.showCreateWorkspaceDialog(onCreate); 
+}
+
+/** This method initiatees the open workspace procedure. */
+visicomp.app.visiui.VisiComp.prototype.openWorkspaceRequested = function() {
+    var instance = this;
+    var onOpen = function(workspaceData) {
+        return instance.openWorkspace(workspaceData);
+    }
+    visicomp.app.visiui.dialog.showOpenWorkspaceDialog(onOpen);
+}
+
+/** This method initiatees the save workspace procedure. */
+visicomp.app.visiui.VisiComp.prototype.saveWorkspaceRequested = function() {
+    var activeWorkspaceUI = this.getActiveWorkspaceUI();
+    if(activeWorkspaceUI === null) {
+        alert("There is no open workspace.");
+        return;
+    }
+
+    visicomp.app.visiui.dialog.showSaveWorkspaceDialog(this, activeWorkspaceUI);
 }
 
 /** This method creates a new workspace. */
@@ -122,20 +154,42 @@ visicomp.app.visiui.VisiComp.prototype.closeWorkspace = function() {
     workspace.close();
 }
 
-visicomp.app.visiui.VisiComp.prototype.addControl = function(control) {
-    var workspace = control.getWorkspace();
-    var workspaceUI = this.workspaceUIs[workspace.getName()];
-    if(workspaceUI) {
-        return workspaceUI.addControl(control);
+//==================================
+// Additional Control
+//==================================
+
+/** This method lets the user add an additional control from a list of types. */
+visicomp.app.visiui.VisiComp.prototype.addAdditionalControl = function() {
+    var instance = this;
+    
+    var onSelect = function(controlType) {
+        var generator = instance.controlGenerators[controlType];
+        if(generator) {
+            var showDialog = generator.getShowCreateDialogCallback(instance);
+            showDialog();
+        }
+        else {
+            alert("Unknown control type: " + controlType);
+        }
     }
-    else {
-        throw visicomp.core.util.createError("Workspace not found: " + workspace.getName()); 
-    }
+    //open select control dialog
+    visicomp.app.visiui.dialog.showSelectControlDialog(this.additionalControls,onSelect);
+    
 }
 
 //==================================
 // Link Management
 //==================================
+
+/** This method initiates the process of updaing the external links. */
+visicomp.app.visiui.VisiComp.prototype.updateLinksRequested = function() {
+    var activeWorkspaceUI = this.getActiveWorkspaceUI();
+    if(!activeWorkspaceUI) {
+        alert("There is no open workspace.");
+        return;
+    }
+    visicomp.app.visiui.dialog.showUpdateLinksDialog(activeWorkspaceUI);
+}
 
 /** This method adds links as registered by a given workspace. Links can be added and
  * removed. Removing links may or may not remove them from the page (currently
@@ -278,7 +332,7 @@ visicomp.app.visiui.VisiComp.prototype.registerControl = function(controlGenerat
 
 //we should maybe warn if another control bundle is being overwritten 
     this.controlGenerators[name] = controlGenerator;
-    this.addedControls.push(name);
+    this.additionalControls.push(name);
 }
 
 /** This method registers a control. */
@@ -291,11 +345,14 @@ visicomp.app.visiui.VisiComp.prototype.getControlGenerator = function(name) {
 
 /** This method adds the standard controls to the app. 
  * @private */
-visicomp.app.visiui.VisiComp.prototype.loadStandardControlGenerators = function() {
+visicomp.app.visiui.VisiComp.prototype.loadControlGenerators = function() {
+    //standard controls
 	this.registerStandardControl(visicomp.app.visiui.FolderControl.generator);
 	this.registerStandardControl(visicomp.app.visiui.TableControl.generator);
 	this.registerStandardControl(visicomp.app.visiui.FunctionControl.generator);
-	this.registerStandardControl(visicomp.app.visiui.CustomResourceControl.generator);
+	
+    //additional controls
+    this.registerControl(visicomp.app.visiui.CustomResourceControl.generator);
 }
 
 /** This method registers a control. 
@@ -317,6 +374,7 @@ visicomp.app.visiui.VisiComp.prototype.registerStandardControl = function(contro
  * @private */
 visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     
+    //load the UI into tthe given container
     var container = document.getElementById(containerId);
     if(!container) {
         throw visicomp.core.util.createError("Container ID not found: " + containerID);
@@ -333,17 +391,28 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     container.appendChild(menuBar);
     //----------------------------------------------
     
+    //create the menus
     var menu;
+    var instance = this;
 
-    menu = visicomp.visiui.Menu.createMenu("File");
+    //Workspace menu
+    menu = visicomp.visiui.Menu.createMenu("Workspace");
     menuBar.appendChild(menu.getElement());
     
-    menu.addEventMenuItem("New","menuFileNew",null,this);
-    menu.addEventMenuItem("Open","menuFileOpen",null,this);
-    menu.addEventMenuItem("Save","menuFileSave",null,this);
-    menu.addEventMenuItem("Close","menuFileClose",null,this);	
+    var newCallback = function() {instance.newWorkspaceRequested()};
+    menu.addCallbackMenuItem("New",newCallback);
+    
+    var openCallback = function() {instance.openWorkspaceRequested()};
+    menu.addCallbackMenuItem("Open",openCallback);
+    
+    var saveCallback = function() {instance.saveWorkspaceRequested()};
+    menu.addCallbackMenuItem("Save",saveCallback);
+    
+    var closeCallback = function() {instance.closeWorkspace()};
+    menu.addCallbackMenuItem("Close",closeCallback);	
 	
-    menu = visicomp.visiui.Menu.createMenu("Workspace");
+    //Controls Menu
+    menu = visicomp.visiui.Menu.createMenu("Controls");
     menuBar.appendChild(menu.getElement());
     
     var app = this;
@@ -355,67 +424,28 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
         menu.addCallbackMenuItem(title,generator.getShowCreateDialogCallback(app));
     }
     
+    //add the additional control item
+    var controlCallback = function(){instance.addAdditionalControl()};
+    menu.addCallbackMenuItem("Other&nbsp;Controls...",controlCallback);
+    
+    //libraries menu
     menu = visicomp.visiui.Menu.createMenu("Libraries");
     menuBar.appendChild(menu.getElement());
     
-    menu.addEventMenuItem("Update&nbsp;Links","externalLinks",null,this);
+    var linksCallback = function() {instance.updateLinksRequested()};
+    menu.addCallbackMenuItem("Update&nbsp;Links",linksCallback);
 
     //create the tab frame - this puts a tab for each workspace, even though
     //for now you can only make one workspace.
     this.tabFrame = new visicomp.visiui.TabFrame(containerId);
     container.appendChild(this.tabFrame.getElement());
     this.tabFrame.resizeElement();
-    
-    //add menu listeners
-    var instance = this;
-    
-    //create new listener
-    var newListener = function() {      
-        var onCreate = function(name) {
-            return instance.createWorkspace(name);
-        }
-        visicomp.app.visiui.dialog.showCreateWorkspaceDialog(onCreate); 
-    }
-    this.addListener("menuFileNew",newListener);
-    
-    //open listener
-    var openListener = function() {       
-        var onOpen = function(workspaceData) {
-            return instance.openWorkspace(workspaceData);
-        }
-        visicomp.app.visiui.dialog.showOpenWorkspaceDialog(onOpen); 
-    }
-    this.addListener("menuFileOpen",openListener);
-    
-    //save listener
-    var saveListener = function() {
-        var activeWorkspaceUI = instance.getActiveWorkspaceUI();
-        if(activeWorkspaceUI === null) {
-            alert("There is no open workspace.");
-            return;
-        }
-        
-        visicomp.app.visiui.dialog.showSaveWorkspaceDialog(instance, activeWorkspaceUI); 
-    }
-    this.addListener("menuFileSave",saveListener);
-    
-    //close listener
-    var closeListener = function() {
-        
-        //for now this reloads - when we fix this make sure it does everything it needs
-        //to to get rid of the workspace
-        instance.closeWorkspace();
-    }
-    this.addListener("menuFileClose",closeListener);
-    
-    //external menu
-    //add links listener
-    var udpateLinksListener = function() {
-        var activeWorkspaceUI = instance.getActiveWorkspaceUI();
-        visicomp.app.visiui.dialog.showUpdateLinksDialog(activeWorkspaceUI);
-    }
-    this.addListener("externalLinks",udpateLinksListener);
+ 
 }
+
+//=================================
+// Utility Functions
+//=================================
 
 /** This method replaces on spaces with &nbsp; spaces. It is intedned to prevent
  * wrapping in html. */

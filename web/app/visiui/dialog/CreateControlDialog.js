@@ -85,8 +85,8 @@ visicomp.app.visiui.dialog.showCreateControlDialog = function(controlTypeMap,obj
             alert("There was an error adding the table: " + result.msg);
         }
     }
-    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));
+    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
     //show dialog

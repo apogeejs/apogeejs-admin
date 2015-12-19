@@ -84,8 +84,8 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
 		dialog.hide();
     }
     
-    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Save","onclick":onSave}));
+    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
     //show the dialog
@@ -107,7 +107,8 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
             //set the value
             var jsLinks = workspaceUI.getJsLinks();
             if(jsLinks) {
-                jsLinksEditor.getSession().setValue(jsLinks);
+                var linkText = jsLinks.join("\n");
+                jsLinksEditor.getSession().setValue(linkText);
             }
         }
     }
@@ -125,7 +126,8 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
             //set the value
             var cssLinks = workspaceUI.getCssLinks();
             if(cssLinks) {
-                cssLinksEditor.getSession().setValue(cssLinks);
+                var linkText = cssLinks.join("\n");
+                cssLinksEditor.getSession().setValue(linkText);
             }
         }
     }

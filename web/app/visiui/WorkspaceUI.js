@@ -178,8 +178,7 @@ if(linksAdded) {
     var timerFunction = function() {
         visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson(workspaceUI,workspace,json);
     }
-    setTimeout(timerFunction,3000);
-    alert("There is a temporary fixed delay while external libraries are loading.");
+    setTimeout(timerFunction,2000);
     return {"success":true};
 }
 else {

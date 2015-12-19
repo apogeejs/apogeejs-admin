@@ -226,7 +226,7 @@ visicomp.core.Codeable.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//end supplemental code",
 "",
 "//member function",
-"visicomp.core.functionCode.{0}['{1}'] = function{2} {",
+"visicomp.core.functionCode['{0}']['{1}'] = function{2} {",
 "{3}",
 "}",
 "//end member function",

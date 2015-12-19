@@ -1,7 +1,7 @@
-/** This method shows a create folder dialog. The argument onCreateFunction
- * should take the folder name as an argument and return an object with the boolean entry
+/** This method shows a create table dialog. The argument onCreateFunction
+ * should take the folder and the table name as arguments and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction) {
+visicomp.app.visiui.dialog.showSelectControlDialog = function(controlList,onSelectFunction) {
 
     var dialog = new visicomp.visiui.Dialog({"movable":true});
     
@@ -12,14 +12,18 @@ visicomp.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction
   
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"New Workspace"}));
+    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Select Control Type"}));
     content.appendChild(line);
     
-    //input
+    //folder selection
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(document.createTextNode("Name:"));
-    var inputElement = visicomp.visiui.createElement("input",{"type":"text"});
-    line.appendChild(inputElement);
+    line.appendChild(document.createTextNode("Control:"));
+    var select = visicomp.visiui.createElement("select");
+    line.appendChild(select);
+    for(var i = 0; i < controlList.length; i++) {
+		var name = controlList[i];
+		select.add(visicomp.visiui.createElement("option",{"text":name}));
+    }
     content.appendChild(line);
     
     //buttons
@@ -29,20 +33,9 @@ visicomp.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction
     }
     
     var onCreate = function() {
-        var name = inputElement.value.trim();
-        if(name.length == 0) {
-            alert("The name is invalid");
-            return;
-        }
-        
-        var result = onCreateFunction(name);
-        
-        if(result.success) {
-			dialog.hide();
-		}
-		else {
-            alert("There was an error adding the workspace: " + result.msg);
-        }      
+		var controlType = select.value;
+        onSelectFunction(controlType);
+        dialog.hide();
     }
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
@@ -53,5 +46,6 @@ visicomp.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction
     dialog.show();
     dialog.centerOnPage();
 }
+
 
 

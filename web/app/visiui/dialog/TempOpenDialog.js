@@ -49,8 +49,8 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
         dialog.hide();
     }
     
-    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Open","onclick":onOpen}));
+    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
     //show dialog
