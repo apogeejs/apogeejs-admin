@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+	<head>
+		<title>Leaflet 2 Test</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+		
+		<script>
+		
+		function init() {
+			
+            var mapDiv = document.getElementById("mapElement");
+            var map = L.map(mapDiv);
+
+            map.setView([41.3565797,2.1343725], 16);
+
+            L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg', {
+                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+                maxZoom: 18
+            }).addTo(map);
+        }
+
+	</script>
+	<style type="text/css">
+		html, body { height: 100%; width: 100%; margin: 0; overflow:hidden;}
+		#mapElement {height: 100%; width: 100%; }
+	</style>
+	</head>
+	<body onload="init();">
+		<div id="mapElement"></div>
+	</body>
+</html>
