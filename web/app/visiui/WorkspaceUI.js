@@ -220,7 +220,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.createChildrenFromJson = function(pare
         if(!controlGenerator) {
             throw visicomp.core.util.createError("Control definition not found: " + type);
         }
-        controlGenerator.createFromJson(this,parentFolder,childJson,updateDataList);
+        visicomp.app.visiui.Control.createfromJson(this,parentFolder,controlGenerator,childJson,updateDataList);
 	}
 }
 

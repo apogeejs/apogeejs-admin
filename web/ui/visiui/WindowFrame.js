@@ -238,6 +238,44 @@ visicomp.visiui.WindowFrame.prototype.clearSize = function() {
     this.frameResized();
 }
 
+/** This method gets the location and size info for the window. */
+visicomp.visiui.WindowFrame.prototype.getCoordinateInfo= function() {
+    return this.coordinateInfo;
+}
+
+/** This method sets the location and size info for the window. */
+visicomp.visiui.WindowFrame.prototype.setCoordinateInfo= function(coordinateInfo) {
+    this.coordinateInfo = coordinateInfo;
+    this.updateCoordinates();
+    this.frameResized();
+}
+
+/** This method gets the location and size info for the window. */
+visicomp.visiui.WindowFrame.prototype.getWindowState = function() {
+    return this.windowState;
+}
+
+/** This method sets the location and size info for the window. */
+visicomp.visiui.WindowFrame.prototype.setWindowState = function(windowState) {
+    switch(windowState) {
+        case visicomp.visiui.WindowFrame.NORMAL:
+            this.restoreContent();
+            break;
+            
+        case visicomp.visiui.WindowFrame.MINIMIZED:
+            this.minimizeContent();
+            break;
+            
+        case visicomp.visiui.WindowFrame.MAXIMIZED:
+            this.maximizeContent();
+            break;
+            
+        default:
+            alert("Unknown window state: " + windowState);
+            break;
+    }
+}
+
 /** This method returns the main dom element for the window frame. */
 visicomp.visiui.WindowFrame.prototype.getElement = function() {
     return this.frame;

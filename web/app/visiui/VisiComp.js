@@ -415,13 +415,12 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     menu = visicomp.visiui.Menu.createMenu("Controls");
     menuBar.appendChild(menu.getElement());
     
-    var app = this;
     for(var i = 0; i < this.standardControls.length; i++) {
         var key = this.standardControls[i];
         var generator = this.controlGenerators[key];
-        var fixedDisplayName = this.convertSpacesForHtml(generator.displayName); 
-        var title = "Add&nbsp;" + fixedDisplayName;
-        menu.addCallbackMenuItem(title,generator.getShowCreateDialogCallback(app));
+        var title = visicomp.app.visiui.VisiComp.convertSpacesForHtml("Add " + generator.displayName);
+        var callback = this.getOnCreateRequestedCallback(generator);
+        menu.addCallbackMenuItem(title,callback);
     }
     
     //add the additional control item
@@ -442,6 +441,16 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     this.tabFrame.resizeElement();
  
 }
+/** This shows the create control dialog. */
+visicomp.app.visiui.VisiComp.prototype.getOnCreateRequestedCallback = function(generator) {
+    var instance = this;
+    return function() {
+        visicomp.app.visiui.dialog.showCreateChildDialog(generator.displayName,
+            instance,
+            generator.createControl
+        );
+    }
+}
 
 //=================================
 // Utility Functions
@@ -449,6 +458,6 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
 
 /** This method replaces on spaces with &nbsp; spaces. It is intedned to prevent
  * wrapping in html. */
-visicomp.app.visiui.VisiComp.prototype.convertSpacesForHtml = function(text) {
+visicomp.app.visiui.VisiComp.convertSpacesForHtml = function(text) {
     return text.replace(" ","&nbsp;");
 }

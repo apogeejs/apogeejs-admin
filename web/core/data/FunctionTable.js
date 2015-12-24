@@ -1,11 +1,11 @@
 /** This is a function. */
-visicomp.core.FunctionTable = function(workspace,name,argParens) {
+visicomp.core.FunctionTable = function(workspace,name,argList) {
     //base init
     visicomp.core.Child.init.call(this,workspace,name,"function");
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
     visicomp.core.Impactor.init.call(this);
-	visicomp.core.Codeable.init.call(this,argParens);
+	visicomp.core.Codeable.init.call(this,argList);
     visicomp.core.Recalculable.init.call(this);
     
     //set to an empty function

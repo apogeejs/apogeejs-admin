@@ -1,7 +1,7 @@
 /** This control represents a table object. */
 visicomp.app.visiui.TableControl = function(table) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,table,"Table");
+    visicomp.app.visiui.Control.init.call(this,table,visicomp.app.visiui.TableControl.generator);
     this.editor = null; //is read only, not really an editor
     
     //subscribe to table update event
@@ -19,16 +19,12 @@ visicomp.app.visiui.TableControl = function(table) {
 visicomp.core.util.mixin(visicomp.app.visiui.TableControl,visicomp.app.visiui.Control);
 
 //==============================
-// Public Instance Methods
+// Protected and Private Instance Methods
 //==============================
 
 /** This serializes the table control. */
-visicomp.app.visiui.TableControl.prototype.toJson = function(workspaceUI) {
-    var json = {};
+visicomp.app.visiui.TableControl.prototype.writeToJson = function(workspaceUI, json) {
     var table = this.getObject();
-    json.name = table.getName();
-    json.type = visicomp.app.visiui.TableControl.generator.uniqueName;
-    
     if(table.hasCode()) {
         json.functionBody = table.getFunctionBody();
         json.supplementalCode = table.getSupplementalCode();
@@ -36,13 +32,27 @@ visicomp.app.visiui.TableControl.prototype.toJson = function(workspaceUI) {
     else {
         json.data = table.getData();
     }
-    return json;
 }
 
-//==============================
-// Protected and Private Instance Methods
-//==============================
-
+/** This method deseriliazes any data needed after the control is instantiated.
+ * objects that extend Control should override this for any data that is
+ * needed, however they should call this base function first. */
+visicomp.app.visiui.TableControl.prototype.updateFromJson = function(workspaceUI,json,updateDataList) {
+    //call the base update function
+    visicomp.app.visiui.Control.updateFromJson.call(this,workspaceUI,json,updateDataList);
+    
+    //load the type specific data
+    var updateData = {};
+    updateData.member = this.getObject();
+    if(json.functionBody) {
+        updateData.functionBody = json.functionBody;
+        updateData.supplementalCode = json.supplementalCode;
+    }
+    else {
+        updateData.data = json.data;
+    }
+    updateDataList.push(updateData);
+}
 
 /** This method populates the frame for this control. 
  * @protected */
@@ -118,47 +128,18 @@ visicomp.app.visiui.TableControl.prototype.createEditDataDialog = function() {
 //======================================
 
 //add table listener
-visicomp.app.visiui.TableControl.getShowCreateDialogCallback = function(app) {
-    return function() {
-        visicomp.app.visiui.dialog.showCreateChildDialog("Table",
-            app,
-            visicomp.app.visiui.TableControl.createControl
-        );
-    }
-}
-
-//add table listener
 visicomp.app.visiui.TableControl.createControl = function(workspaceUI,parent,name) {
     var returnValue = visicomp.core.createtable.createTable(parent,name);
     if(returnValue.success) {
         var table = returnValue.table;
         var tableControl = new visicomp.app.visiui.TableControl(table);
         workspaceUI.addControl(tableControl);
+        returnValue.control = tableControl;
     }
     else {
         //no action for now
     }
     return returnValue;
-}
-
-/** This serializes the table control. */
-visicomp.app.visiui.TableControl.createfromJson = function(workspaceUI,parent,json,updateDataList) {
-
-    var name = json.name;
-    var resultValue = visicomp.app.visiui.TableControl.createControl(workspaceUI,parent,name);
-    
-    if(resultValue.success) {
-        var updateData = {};
-        updateData.member = resultValue.table;
-        if(json.functionBody) {
-            updateData.functionBody = json.functionBody;
-            updateData.supplementalCode = json.supplementalCode;
-        }
-        else {
-            updateData.data = json.data;
-        }
-        updateDataList.push(updateData);
-    }
 }
 
 //======================================
@@ -168,8 +149,7 @@ visicomp.app.visiui.TableControl.createfromJson = function(workspaceUI,parent,js
 visicomp.app.visiui.TableControl.generator = {};
 visicomp.app.visiui.TableControl.generator.displayName = "Table";
 visicomp.app.visiui.TableControl.generator.uniqueName = "visicomp.app.visiui.TableControl";
-visicomp.app.visiui.TableControl.generator.getShowCreateDialogCallback = visicomp.app.visiui.TableControl.getShowCreateDialogCallback;
-visicomp.app.visiui.TableControl.generator.createFromJson = visicomp.app.visiui.TableControl.createfromJson;
+visicomp.app.visiui.TableControl.generator.createControl = visicomp.app.visiui.TableControl.createControl;
 
 //======================================
 // This is a code wrapper so the user works with the formula rather than the function body

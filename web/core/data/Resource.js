@@ -5,7 +5,7 @@ visicomp.core.Resource = function(workspace,name,resourceProcessor) {
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
     visicomp.core.Impactor.init.call(this);
-	visicomp.core.Codeable.init.call(this,"(resourceProcessor)");
+	visicomp.core.Codeable.init.call(this,["resourceProcessor"]);
     
     this.resourceProcessor = resourceProcessor;
 }

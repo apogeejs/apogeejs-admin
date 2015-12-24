@@ -7,10 +7,10 @@
 visicomp.core.Codeable = {};
 
 /** This initializes the component */
-visicomp.core.Codeable.init = function(argParenList) {
+visicomp.core.Codeable.init = function(argList) {
     
     //arguments of the member function (with parentheses - we probably will change this)
-    this.argParenList = argParenList;
+    this.argList = argList;
 	
     //this contains the formula and dependency information
     this.functionBody = "";
@@ -25,9 +25,18 @@ visicomp.core.Codeable.init = function(argParenList) {
     this.varInfo = null;
 }
 
-/** This method returns the argument list, whith parentheses for this member.  */
-visicomp.core.Codeable.getArgParensList = function() {
-    return this.argParenList;
+/** This method returns the argument list.  */
+visicomp.core.Codeable.getArgList = function() {
+    return this.argList;
+}
+
+/** This method sets the argument list, which should be an array of strings.  */
+visicomp.core.Codeable.setArgList = function(argList) {
+    this.argList = argList;
+    
+    this.createFunctionGeneratorBody();
+    
+    this.varInfo = visicomp.core.codeAnalysis.analyzeCode(this.functionGeneratorBody);
 }
 
 /** This method returns the formula for this member.  */
@@ -145,12 +154,14 @@ visicomp.core.Codeable.createFunctionGeneratorBody = function() {
     var memberFullName = this.getFullName();
     var workspaceName = this.parent.getWorkspace().getName();
     
+    var argListString = this.argList.join(","); 
+    
     //create the code body
     this.functionGeneratorBody = visicomp.core.util.formatString(
         visicomp.core.Codeable.GENERATOR_FUNCTION_FORMAT_TEXT,
         workspaceName,
 		memberFullName,
-        this.argParenList,
+        argListString,
         this.functionBody,
         this.supplementalCode
     );
@@ -226,7 +237,7 @@ visicomp.core.Codeable.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//end supplemental code",
 "",
 "//member function",
-"visicomp.core.functionCode['{0}']['{1}'] = function{2} {",
+"visicomp.core.functionCode['{0}']['{1}'] = function({2}) {",
 "{3}",
 "}",
 "//end member function",

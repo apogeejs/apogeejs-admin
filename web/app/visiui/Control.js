@@ -6,16 +6,16 @@ visicomp.app.visiui.Control = {};
     
 /** This is the initializer for the component. The object passed is the core object
  * associated with this control. */
-visicomp.app.visiui.Control.init = function(object,controlType) {
+visicomp.app.visiui.Control.init = function(object,generator) {
     this.object = object;
-    this.controlType = controlType;
+    this.generator = generator;
     this.frame = null;
     
     this.menuItemInfoList = [];
     
     //add the standard entries
     var itemInfo = {};
-    itemInfo.title = "Delete&nbsp;" + this.controlType;
+    itemInfo.title = visicomp.app.visiui.VisiComp.convertSpacesForHtml("Delete " + this.generator.displayName);
     itemInfo.callback = this.createDeleteCallback(itemInfo.title);
     this.menuItemInfoList.push(itemInfo);
 }
@@ -59,10 +59,20 @@ visicomp.app.visiui.Control.setFrame = function(controlFrame) {
     
 }
 
-//This method should be populated by an extending object. It should return a json object.
-//** This serializes the table control. */
-//visicomp.app.visiui.TableControl.prototype.toJson = function(workspaceUI);
-
+/** This serializes the table control. */
+visicomp.app.visiui.Control.toJson = function(workspaceUI) {
+    var json = {};
+    json.name = this.getObject().getName();
+    json.type = this.generator.uniqueName;
+    
+    var window = this.frame.getWindow();
+    json.windowCoords = window.getCoordinateInfo();
+    json.windowState = window.getWindowState();
+    
+    this.writeToJson(workspaceUI,json);
+    
+    return json;
+}
 
 //==============================
 // Protected Instance Methods
@@ -72,6 +82,23 @@ visicomp.app.visiui.Control.setFrame = function(controlFrame) {
 visicomp.app.visiui.Control.getMenuItemInfoList = function() {
     return this.menuItemInfoList;
 }
+
+/** This method deseriliazes any data needed after the control is instantiated.
+ * objects that extend Control should override this for any data that is
+ * needed, however they should call this base function first. */
+visicomp.app.visiui.Control.updateFromJson = function(workspaceUI,json,updateDataList) {
+    var window = this.frame.getWindow();
+    if(json.windowCoords) {
+        window.setCoordinateInfo(json.windowCoords);
+    }
+    if(json.windowState) {
+        window.setWindowState(json.windowState);
+    }
+}
+
+//This method should be populated by an extending object. It should return a json object.
+//** This serializes the table control. */
+//visicomp.app.visiui.TableControl.prototype.writeToJson = function(workspaceUI, json);
 
 //This method should be populated by an extending object.
 //** This method populates the frame for this control. */
@@ -103,6 +130,20 @@ visicomp.app.visiui.Control.createDeleteCallback = function(title) {
         alert("Not implemented!");
     }
 }
+
+/** This deserializez the control from a json. It is a static function, but because
+ * this is a mixin it will also appear as a member function on extending objects. */
+visicomp.app.visiui.Control.createfromJson = function(workspaceUI,parent,generator,json,updateDataList) {
+    var name = json.name;
+    var resultValue = generator.createControl(workspaceUI,parent,name);
+    
+    if(resultValue.success) {
+        //load the general control data
+        var control = resultValue.control;
+        control.updateFromJson(workspaceUI,json,updateDataList);
+    }
+}
+
 
 //======================================
 // Each control should have a generator in the following format

@@ -73,6 +73,35 @@ visicomp.core.updatemember.updateData = function(member,data) {
     return returnValue;
 }
 
+/** This is the listener for the update member event. */
+visicomp.core.updatemember.updateArgList = function(member,argList) {
+    var returnValue;
+    
+    try {
+
+		//set data
+        visicomp.core.updatemember.setArgList(member,argList);
+
+		//recalculate
+		var recalculateList = [];
+		visicomp.core.calculation.addToRecalculateList(recalculateList,member);
+		visicomp.core.calculation.recalculateObjects(recalculateList);
+
+		//return success
+		returnValue = {"success":true};
+	}
+	finally {
+        //for now we will not catch errors but let the broswer take care of them
+        //in the future we want the debugger handling for user code errors.
+        if(!returnValue) {
+            alert("There was an error. See the browser debugger.");
+            returnValue = {"success":false};
+        }
+    }
+    
+    return returnValue;
+}
+
 
 /** This is the listener for the update members event. */
 visicomp.core.updatemember.updateObjects = function(updateDataList) {
@@ -132,6 +161,13 @@ visicomp.core.updatemember.setData = function(member,data) {
     //clear the formula
     member.clearCode();
 
+    //fire this for the change in value
+    visicomp.core.updatemember.fireUpdatedEvent(member);
+}
+
+visicomp.core.updatemember.setArgList = function(member,argList) {
+    member.setArgList(argList);
+    
     //fire this for the change in value
     visicomp.core.updatemember.fireUpdatedEvent(member);
 }

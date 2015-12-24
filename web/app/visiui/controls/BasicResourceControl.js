@@ -9,30 +9,38 @@ visicomp.app.visiui.BasicResourceControl = {};
 visicomp.app.visiui.BasicResourceControl.init = function() {}
 
 //==============================
-// Public Instance Methods
+// Protected and Private Instance Methods
 //==============================
 
 /** This serializes the table control. */
-visicomp.app.visiui.BasicResourceControl.toJson = function() {
-    var json = {};
+visicomp.app.visiui.BasicResourceControl.writeToJson = function(workspaceUI, json) {
     var resource = this.getObject();
-    json.name = resource.getName();
-    json.type = this.getUniqueTypeName();
     
     //store the processor info
 	var resourceProcessor = resource.getResourceProcessor();
-    json.processor = resourceProcessor.updateToJson();
-		
+    if(resourceProcessor.toJson) {
+        json.processor = resourceProcessor.toJson();
+    }
+    
     //store the codeable info
 	json.functionBody = resource.getFunctionBody();
 	json.supplementalCode = resource.getSupplementalCode();
-
-    return json;
 }
 
-//==============================
-// Private Instance Methods
-//==============================
+/** This method deseriliazes any data needed after the control is instantiated.
+ * objects that extend Control should override this for any data that is
+ * needed, however they should call this base function first. */
+visicomp.app.visiui.BasicResourceControl.updateFromJson = function(json,updateDataList) {
+    //call the base update function
+    visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
+    
+    //load the type specific data
+    var updateData = {};
+    updateData.member = resource;
+    updateData.functionBody = json.functionBody;
+    updateData.supplementalCode = json.supplementalCode;
+    updateDataList.push(updateData);
+}
 
 //** This instance method must be implemented by the extending class. */
 //visicomp.app.visiui.BasicResourceControl.getUniqueTypeName();
@@ -75,14 +83,20 @@ window.setSize(200,200);
 //======================================
 
 /** This method can be called to complete serialization of a basic control. */
-visicomp.app.visiui.BasicResourceControl.updateFromJson = function(resource,json,updateDataList) {
-		var resourceProcessor = resource.getResourceProcessor();
-		resourceProcessor.updateFromJson(json.processor);
+visicomp.app.visiui.BasicResourceControl.updateFromJson = function(workspaceUI,json,updateDataList) {
+    //call the base update function
+    visicomp.app.visiui.Control.updateFromJson.call(this,workspaceUI,json,updateDataList);
 		
-        var updateData = {};
-        updateData.member = resource;
-		updateData.functionBody = json.functionBody;
-		updateData.supplementalCode = json.supplementalCode;
-        updateDataList.push(updateData);
+    var resource = this.getObject();
+    if(json.processor) {
+        var resourceProcessor = resource.getResourceProcessor();
+        resourceProcessor.updateFromJson(json.processor);
+    }
+
+    var updateData = {};
+    updateData.member = resource;
+    updateData.functionBody = json.functionBody;
+    updateData.supplementalCode = json.supplementalCode;
+    updateDataList.push(updateData);
 }
 

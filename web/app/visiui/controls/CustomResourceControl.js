@@ -1,7 +1,7 @@
 /** This control represents a table object. */
 visicomp.app.visiui.CustomResourceControl = function(resource) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,resource,"Custom Control");
+    visicomp.app.visiui.Control.init.call(this,resource,visicomp.app.visiui.CustomResourceControl.generator);
     visicomp.app.visiui.BasicResourceControl.init.call(this);
 };
 
@@ -9,9 +9,8 @@ visicomp.app.visiui.CustomResourceControl = function(resource) {
 visicomp.core.util.mixin(visicomp.app.visiui.CustomResourceControl,visicomp.app.visiui.Control);
 visicomp.core.util.mixin(visicomp.app.visiui.CustomResourceControl,visicomp.app.visiui.BasicResourceControl);
 
-
 //==============================
-// Public Instance Methods
+// Protected and Private Instance Methods
 //==============================
 
 visicomp.app.visiui.CustomResourceControl.prototype.getResourceProcessor = function() {
@@ -31,12 +30,6 @@ visicomp.app.visiui.CustomResourceControl.prototype.update = function(html,proce
 	var resource = this.getObject();
 	resource.updateResourceProcessor(newProcessor);
 }
-
-
-//==============================
-// Protected and Private Instance Methods
-//==============================
-
 
 /** This method populates the frame for this control. */
 visicomp.app.visiui.CustomResourceControl.prototype.addToFrame = function(controlFrame) {
@@ -79,16 +72,6 @@ visicomp.app.visiui.CustomResourceControl.prototype.getUniqueTypeName = function
 //======================================
 
 //add table listener
-visicomp.app.visiui.CustomResourceControl.getShowCreateDialogCallback = function(app) {
-    return function() {
-        visicomp.app.visiui.dialog.showCreateChildDialog("Custom Control",
-            app,
-            visicomp.app.visiui.CustomResourceControl.createControl
-        );
-    }
-}
-
-//add table listener
 visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,parent,name) {
 	//create a resource with a base custom processor
 	var resourceProcessor = new visicomp.app.visiui.CustomResourceProcessor();
@@ -97,23 +80,12 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,p
         var resource = returnValue.resource;
         var customResourceControl = new visicomp.app.visiui.CustomResourceControl(resource);
         workspaceUI.addControl(customResourceControl);
+        returnValue.control = customResourceControl;
     }
     else {
         //no action for now
     }
     return returnValue;
-}
-
-/** This serializes the table control. */
-visicomp.app.visiui.CustomResourceControl.createfromJson = function(workspaceUI,parent,json,updateDataList) {
-
-    var name = json.name;
-    var resultValue = visicomp.app.visiui.CustomResourceControl.createControl(workspaceUI,parent,name);
-    
-    if(resultValue.success) {
-        var resource = resultValue.resource;
-        visicomp.app.visiui.BasicResourceControl.updateFromJson(resource,json,updateDataList);
-    }
 }
 
 //======================================
@@ -123,7 +95,6 @@ visicomp.app.visiui.CustomResourceControl.createfromJson = function(workspaceUI,
 visicomp.app.visiui.CustomResourceControl.generator = {};
 visicomp.app.visiui.CustomResourceControl.generator.displayName = "Custom Control";
 visicomp.app.visiui.CustomResourceControl.generator.uniqueName = "visicomp.app.visiui.CustomResourceControl";
-visicomp.app.visiui.CustomResourceControl.generator.getShowCreateDialogCallback = visicomp.app.visiui.CustomResourceControl.getShowCreateDialogCallback;
-visicomp.app.visiui.CustomResourceControl.generator.createFromJson = visicomp.app.visiui.CustomResourceControl.createfromJson;
+visicomp.app.visiui.CustomResourceControl.generator.createControl = visicomp.app.visiui.CustomResourceControl.createControl;
 
 
