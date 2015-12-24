@@ -42,10 +42,6 @@ visicomp.app.visiui.BasicResourceControl.updateFromJson = function(json,updateDa
     updateDataList.push(updateData);
 }
 
-//** This instance method must be implemented by the extending class. */
-//visicomp.app.visiui.BasicResourceControl.getUniqueTypeName();
-
-
 /** This method populates the frame for this control. */
 visicomp.app.visiui.BasicResourceControl.populateFrame = function(controlFrame) {
     

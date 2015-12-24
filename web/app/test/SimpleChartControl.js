@@ -48,14 +48,6 @@ SimpleChartResourceProcessor.LINE_STYLE =  {
     "pointHighlightStroke": "rgba(220,220,220,1)"
 };
 
-/** updateToJson - required method for resource processor used in Basic Resource Control. 
- * no data to serialize here. */
-SimpleChartResourceProcessor.prototype.updateToJson = function() {}
-
-/** updateToJson - required method for resource processor used in Basic Resource Control. 
- * no data to deserialize here. */
-SimpleChartResourceProcessor.prototype.updateFromJson = function(json) {}
-
 /** This is the method users will call to initialize the chart. */
 SimpleChartResourceProcessor.prototype.setData = function(valueArray,options) {
     if(!options) options = {};
@@ -121,25 +113,9 @@ SimpleChartControl = function(resource) {
 visicomp.core.util.mixin(SimpleChartControl,visicomp.app.visiui.Control);
 visicomp.core.util.mixin(SimpleChartControl,visicomp.app.visiui.BasicResourceControl);
 
-
-/** This method is implemented to allow serialization. */
-SimpleChartControl.prototype.getUniqueTypeName = function() {
-    return SimpleChartControl.generator.uniqueName;
-}
-
 //======================================
 // Static methods
 //======================================
-
-/** This method creates a callback to show a "create control" dialog. */
-SimpleChartControl.getShowCreateDialogCallback = function(app) {
-    return function() {
-        visicomp.app.visiui.dialog.showCreateChildDialog("Simple Chart Control",
-            app,
-            SimpleChartControl.createControl
-        );
-    }
-}
 
 /** This method creates the control. */
 SimpleChartControl.createControl = function(workspaceUI,parent,name) {
@@ -150,23 +126,12 @@ SimpleChartControl.createControl = function(workspaceUI,parent,name) {
         var resource = returnValue.resource;
         var simpleChartControl = new SimpleChartControl(resource);
         workspaceUI.addControl(simpleChartControl);
+        returnValue.control = simpleChartControl;
     }
     else {
         //no action for now
     }
     return returnValue;
-}
-
-/** This static deserializes the control. */
-SimpleChartControl.createfromJson = function(workspaceUI,parent,json,updateDataList) {
-
-    var name = json.name;
-    var resultValue = SimpleChartControl.createControl(workspaceUI,parent,name);
-    
-    if(resultValue.success) {
-        var resource = resultValue.resource;
-        visicomp.app.visiui.BasicResourceControl.updateFromJson(resource,json,updateDataList);
-    }
 }
 
 //======================================
@@ -176,8 +141,7 @@ SimpleChartControl.createfromJson = function(workspaceUI,parent,json,updateDataL
 SimpleChartControl.generator = {};
 SimpleChartControl.generator.displayName = "Simple Chart Control";
 SimpleChartControl.generator.uniqueName = "visicomp.example.SimpleChartControl";
-SimpleChartControl.generator.getShowCreateDialogCallback = SimpleChartControl.getShowCreateDialogCallback;
-SimpleChartControl.generator.createFromJson = SimpleChartControl.createfromJson;
+SimpleChartControl.generator.createControl = SimpleChartControl.createControl;
 
 
 //auto registration

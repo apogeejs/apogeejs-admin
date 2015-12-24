@@ -80,25 +80,9 @@ SimpleGeojsonControl = function(resource) {
 visicomp.core.util.mixin(SimpleGeojsonControl,visicomp.app.visiui.Control);
 visicomp.core.util.mixin(SimpleGeojsonControl,visicomp.app.visiui.BasicResourceControl);
 
-
-/** This method is implemented to allow serialization. */
-SimpleGeojsonControl.prototype.getUniqueTypeName = function() {
-    return SimpleGeojsonControl.generator.uniqueName;
-}
-
 //======================================
 // Static methods
 //======================================
-
-/** This method creates a callback to show a "create control" dialog. */
-SimpleGeojsonControl.getShowCreateDialogCallback = function(app) {
-    return function() {
-        visicomp.app.visiui.dialog.showCreateChildDialog("Simple GeoJSON Control",
-            app,
-            SimpleGeojsonControl.createControl
-        );
-    }
-}
 
 /** This method creates the control. */
 SimpleGeojsonControl.createControl = function(workspaceUI,parent,name) {
@@ -109,23 +93,12 @@ SimpleGeojsonControl.createControl = function(workspaceUI,parent,name) {
         var resource = returnValue.resource;
         var simpleGeojsonControl = new SimpleGeojsonControl(resource);
         workspaceUI.addControl(simpleGeojsonControl);
+        returnValue.control = simpleGeojsonControl;
     }
     else {
         //no action for now
     }
     return returnValue;
-}
-
-/** This static deserializes the control. */
-SimpleGeojsonControl.createfromJson = function(workspaceUI,parent,json,updateDataList) {
-
-    var name = json.name;
-    var resultValue = SimpleGeojsonControl.createControl(workspaceUI,parent,name);
-    
-    if(resultValue.success) {
-        var resource = resultValue.resource;
-        visicomp.app.visiui.BasicResourceControl.updateFromJson(resource,json,updateDataList);
-    }
 }
 
 //======================================
@@ -135,8 +108,7 @@ SimpleGeojsonControl.createfromJson = function(workspaceUI,parent,json,updateDat
 SimpleGeojsonControl.generator = {};
 SimpleGeojsonControl.generator.displayName = "Simple GeoJSON Control";
 SimpleGeojsonControl.generator.uniqueName = "visicomp.example.SimpleGeojsonControl";
-SimpleGeojsonControl.generator.getShowCreateDialogCallback = SimpleGeojsonControl.getShowCreateDialogCallback;
-SimpleGeojsonControl.generator.createFromJson = SimpleGeojsonControl.createfromJson;
+SimpleGeojsonControl.generator.createControl = SimpleGeojsonControl.createControl;
 
 
 //auto registration

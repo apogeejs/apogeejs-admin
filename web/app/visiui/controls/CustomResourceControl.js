@@ -62,11 +62,6 @@ visicomp.app.visiui.CustomResourceControl.prototype.createEditResourceDialogCall
     }
 }
 
-/** This method is implemented to allow serialization. */
-visicomp.app.visiui.CustomResourceControl.prototype.getUniqueTypeName = function() {
-    return visicomp.app.visiui.CustomResourceControl.generator.uniqueName;
-}
-
 //======================================
 // Static methods
 //======================================
