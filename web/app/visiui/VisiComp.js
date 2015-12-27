@@ -165,7 +165,7 @@ visicomp.app.visiui.VisiComp.prototype.addAdditionalControl = function() {
     var onSelect = function(controlType) {
         var generator = instance.controlGenerators[controlType];
         if(generator) {
-            var showDialog = generator.getShowCreateDialogCallback(instance);
+            var showDialog = instance.getOnCreateRequestedCallback(generator);
             showDialog();
         }
         else {
