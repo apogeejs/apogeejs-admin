@@ -30,12 +30,6 @@ var controlInfo = {};
     this.workspace.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
 }
 
-visicomp.app.visiui.WorkspaceUI.newTableX = 100;
-visicomp.app.visiui.WorkspaceUI.newTableY = 50;
-
-visicomp.app.visiui.WorkspaceUI.newTableDeltaX = 50;
-visicomp.app.visiui.WorkspaceUI.newTableDeltaY = 50;
-
 /** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
     return this.workspace;
@@ -65,12 +59,12 @@ visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(control) {
 	
     var object = control.getObject();
 	var parent = object.getParent();
-    var controlInfo = this.controlMap[this.getObjectKey(parent)];
+    var parentControlInfo = this.controlMap[this.getObjectKey(parent)];
 	var parentContainer;
-	if(controlInfo.control) {
+	if(parentControlInfo.control) {
         //the parent control should have a content element (and should be a folder)
         //maybe we need to enforce this its the right tyep and/or add a parent component instead)
-		parentContainer = controlInfo.control.getFrame().getContentElement();
+		parentContainer = parentControlInfo.control.getFrame().getContentElement();
 	}
 	else {
         //we will assume if there is no control is is the root
@@ -89,21 +83,58 @@ visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(control) {
 		return;
 	}
 	
-    controlInfo = {};
+    var controlInfo = {};
     controlInfo.object = object;
 	controlInfo.control = control;
 	
     this.controlMap[key] = controlInfo;
     
     //show the window
+//FIGURE OUT THE RIGHT WAY TO DO THIS
 	var window = controlFrame.getWindow();
 	if(window) {
-		window.setPosition(visicomp.app.visiui.WorkspaceUI.newTableX,visicomp.app.visiui.WorkspaceUI.newTableY);
-		visicomp.app.visiui.WorkspaceUI.newTableX += visicomp.app.visiui.WorkspaceUI.newTableDeltaX;
-		visicomp.app.visiui.WorkspaceUI.newTableY += visicomp.app.visiui.WorkspaceUI.newTableDeltaY;
+        var pos = this.getNextWindowPosition(parentControlInfo,parentContainer);
+		window.setPosition(pos[0],pos[1]);
 		window.show();
 	}
 }
+
+///////////////////////////////////////////////////
+//we need a better way to initialize position
+//maybe we should define a parent mixin that does it.
+//for now I will place it here
+    
+visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_X = 75;
+visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_Y = 75;
+visicomp.app.visiui.WorkspaceUI.MIN_WRAP_WIDTH = 20; 
+visicomp.app.visiui.WorkspaceUI.MIN_WRAP_HEIGHT = 200;
+
+/** this is used to identify if this is the root folder. */
+visicomp.app.visiui.WorkspaceUI.prototype.getNextWindowPosition = function(parentControlInfo,parentContainer) {
+    //initialize if needed
+    if(parentControlInfo.prevNewChildX === undefined) {
+        parentControlInfo.prevNewChildX = 0;
+        parentControlInfo.prevNewChildY = 0;
+        parentControlInfo.wrapCount = 0;
+    }
+    
+    var x = parentControlInfo.prevNewChildX + visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_X;
+    var y = parentControlInfo.prevNewChildY + visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_Y;
+    
+    if( ((x > parentContainer.offsetWidth)&&(x > visicomp.app.visiui.WorkspaceUI.MIN_WRAP_WIDTH)) && 
+        ((y > parentContainer.offsetHeight)&&(y > visicomp.app.visiui.WorkspaceUI.MIN_WRAP_HEIGHT)) ) {
+        parentControlInfo.wrapCount++;
+        x = visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_X * (parentControlInfo.wrapCount + 1);
+        y = visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_Y;
+    }
+    
+    parentControlInfo.prevNewChildX = x;
+    parentControlInfo.prevNewChildY = y;
+    
+    return [x,y];
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
 
 /** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
