@@ -2,6 +2,25 @@
  * must be loaded separately for this control. */
 
 (function() {
+    
+//=================================
+// Statics to load google code (can only call load once)
+//=================================
+//
+//we need to make sure we try to load only once
+var googleLoadCalled = false;
+
+var instances = [];
+function addInstance(instance) {
+    instances.push(instance);
+}
+
+function onLibLoad() {
+    for(var i = 0; i < instances.length; i++) {
+        var instance = instances[i];
+        instance.createChartObject();
+    }
+}
 
 //=================================
 // Simple Chart Reousrce Processor
@@ -25,23 +44,23 @@ GoogleChartResourceProcessor = function() {
 GoogleChartResourceProcessor.prototype.setWindow = function(window) {
     this.window = window;
     
-    //load the control, now that we have the window
-    var instance = this;
-    var onLoadCallback = function() {
-        instance.onLibLoad();
-    }
-    
-    // Load the Visualization API and the piechart package.
+    // Load the Visualization API - we can only load once
     if(!google.visualization) {
-        google.charts.load('current', {packages: ['corechart']});
-        google.charts.setOnLoadCallback(onLoadCallback);
+        //register this instance
+        addInstance(this);
+    
+        if(!googleLoadCalled) {
+            googleLoadCalled = true;
+            google.charts.load('current', {packages: ['corechart']});
+            google.charts.setOnLoadCallback(onLibLoad);
+        }
     }
     else {
-        onLoadCallback();
+        this.createChartObject();
     }
 }
 
-GoogleChartResourceProcessor.prototype.onLibLoad = function() {
+GoogleChartResourceProcessor.prototype.createChartObject = function() {
     this.libLoaded = true;
     
     this.chart = new google.visualization.LineChart(this.window.getContent());
