@@ -36,11 +36,6 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
         });
     this.window.setContent(contentDiv);
     
-    //show the window
-	var pos = this.parentContainerObject.getNextWindowPosition();
-    this.window.setPosition(pos[0],pos[1]);
-    this.window.show();
-    
     //------------------
     // Add window content
     //------------------
@@ -61,8 +56,18 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
     var menu = this.window.getMenu();
     menu.setMenuItems(this.menuItemInfoList);
     
+    //------------------
     //set the title
+    //------------------
+//we might want to show this before the control content is added. I had a problem
+//with the window content size not being calculated correctly. That can probably be
+//fixed
     this.window.setTitle(this.getObject().getName());
+    
+    //show the window
+	var pos = this.parentContainerObject.getNextWindowPosition();
+    this.window.setPosition(pos[0],pos[1]);
+    this.window.show();
 }
 
 //==============================
