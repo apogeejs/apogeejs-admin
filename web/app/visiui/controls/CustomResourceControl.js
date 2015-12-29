@@ -1,7 +1,7 @@
 /** This control represents a table object. */
-visicomp.app.visiui.CustomResourceControl = function(resource) {
+visicomp.app.visiui.CustomResourceControl = function(workspaceUI,resource) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,resource,visicomp.app.visiui.CustomResourceControl.generator);
+    visicomp.app.visiui.Control.init.call(this,workspaceUI,resource,visicomp.app.visiui.CustomResourceControl.generator);
     visicomp.app.visiui.BasicResourceControl.init.call(this);
 };
 
@@ -73,7 +73,7 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,p
     var returnValue = visicomp.core.createresource.createResource(parent,name,resourceProcessor);
     if(returnValue.success) {
         var resource = returnValue.resource;
-        var customResourceControl = new visicomp.app.visiui.CustomResourceControl(resource);
+        var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,resource);
         workspaceUI.addControl(customResourceControl);
         returnValue.control = customResourceControl;
     }

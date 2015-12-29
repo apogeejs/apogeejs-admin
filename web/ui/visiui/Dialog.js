@@ -4,12 +4,12 @@
  * @class 
  */
 visicomp.visiui.Dialog = function(options) {
-    
+    //call the parent constructor
+    visicomp.visiui.WindowFrame.call(this,options);
+   
     //use page body and the parent
     var parentContainer = document.body;
-    
-    //call the parent constructor
-    visicomp.visiui.WindowFrame.call(this,parentContainer,options);
+    this.setParentContainer(parentContainer);
     
     this.setZIndex(visicomp.visiui.DIALOG_ZINDEX);
 }

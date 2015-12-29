@@ -107,6 +107,28 @@ visicomp.core.Folder.prototype.updateData = function(child) {
     this.dataMap[name] = data;
 }
 
+/** This method updates the dependencies of any children
+ * based on an object being added. */
+visicomp.core.Folder.prototype.updateForAddedVariable = function(object) {
+    for(var key in this.childMap) {
+        var child = this.childMap[key];
+        if(child.updateForAddedVariable) {
+            child.updateForAddedVariable(object);
+        }
+    }
+}
+
+/** This method updates the dependencies of any children
+ * based on an object being deleted. */
+visicomp.core.Folder.prototype.updateForDeletedVariable = function(object) {
+    for(var key in this.childMap) {
+        var child = this.childMap[key];
+        if(child.updateForDeletedVariable) {
+            child.updateForDeletedVariable(object);
+        }
+    }
+}
+
 //============================
 // Private methods
 //============================

@@ -1,5 +1,7 @@
 /** This class manages the user interface for a workspace object. */
 visicomp.app.visiui.WorkspaceUI = function(app,workspace,tab) {
+    visicomp.app.visiui.ParentContainer.init.call(this,this.getContainerElement());
+    
     //properties
 	this.app = app;
     this.tab = tab;
@@ -14,7 +16,7 @@ visicomp.app.visiui.WorkspaceUI = function(app,workspace,tab) {
 var rootFolder = workspace.getRootFolder();
 var controlInfo = {};
 	controlInfo.object = rootFolder;
-    //no ui object!!!
+    controlInfo.control = null; //no control object for the root
 	
     this.controlMap[this.getObjectKey(rootFolder)] = controlInfo;
 
@@ -22,13 +24,22 @@ var controlInfo = {};
 	
     //listeners
     var instance = this;
+    
+    //add a member updated listener
+    var memberUpdatedCallback = function(memberObject) {
+        instance.memberUpdated(memberObject);
+    }
+    workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, memberUpdatedCallback);
 	
-	//add folder created listener
-    var childDeletedListener = function(objectFullName) {
-        instance.childDeleted(objectFullName);
+	//add child deleted listener
+    var childDeletedListener = function(fullName) {
+        instance.childDeleted(fullName);
     }
     this.workspace.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
 }
+
+//add components to this class
+visicomp.core.util.mixin(visicomp.app.visiui.WorkspaceUI,visicomp.app.visiui.ParentContainer);
 
 /** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
@@ -58,22 +69,13 @@ visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(control) {
     if(control.getWorkspace() !== this.workspace) return;
 	
     var object = control.getObject();
-	var parent = object.getParent();
-    var parentControlInfo = this.controlMap[this.getObjectKey(parent)];
-	var parentContainer;
-	if(parentControlInfo.control) {
-        //the parent control should have a content element (and should be a folder)
-        //maybe we need to enforce this its the right tyep and/or add a parent component instead)
-		parentContainer = parentControlInfo.control.getFrame().getContentElement();
-	}
-	else {
-        //we will assume if there is no control is is the root
-		parentContainer = this.tab;
-	}
-	
-	//create the ui object
-	var controlFrame = new visicomp.app.visiui.ControlFrame(parentContainer,object.getName());
-	control.setFrame(controlFrame);
+    var parent = object.getParent();
+    
+    //get parent control info
+    var parentKey = this.getObjectKey(parent);
+    var parentControlInfo = this.controlMap[parentKey];
+    var parentContainerObject = this.getContainerObject(parentControlInfo);
+    control.setParentContainerObject(parentContainerObject);
 	
 	//store the ui object
 	var key = this.getObjectKey(object);
@@ -89,57 +91,28 @@ visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(control) {
 	
     this.controlMap[key] = controlInfo;
     
-    //show the window
-//FIGURE OUT THE RIGHT WAY TO DO THIS
+    //show the window------------------
+//Clean this up!
 	var window = controlFrame.getWindow();
-	if(window) {
-        var pos = this.getNextWindowPosition(parentControlInfo,parentContainer);
-		window.setPosition(pos[0],pos[1]);
-		window.show();
-	}
+	var pos = parentContainerObject.getNextWindowPosition();
+    window.setPosition(pos[0],pos[1]);
+    window.show;
+//-----------------------------------
 }
 
-///////////////////////////////////////////////////
-//we need a better way to initialize position
-//maybe we should define a parent mixin that does it.
-//for now I will place it here
-    
-visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_X = 75;
-visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_Y = 75;
-visicomp.app.visiui.WorkspaceUI.MIN_WRAP_WIDTH = 20; 
-visicomp.app.visiui.WorkspaceUI.MIN_WRAP_HEIGHT = 200;
-
-/** this is used to identify if this is the root folder. */
-visicomp.app.visiui.WorkspaceUI.prototype.getNextWindowPosition = function(parentControlInfo,parentContainer) {
-    //initialize if needed
-    if(parentControlInfo.prevNewChildX === undefined) {
-        parentControlInfo.prevNewChildX = 0;
-        parentControlInfo.prevNewChildY = 0;
-        parentControlInfo.wrapCount = 0;
+/** This method responds to a member updated. */
+visicomp.app.visiui.WorkspaceUI.prototype.memberUpdated = function(memberObject) {
+    //store the ui object
+	var key = memberObject.getFullName();
+	
+	var controlInfo = this.controlMap[key];
+	if((controlInfo)&&(controlInfo.control)) {
+        controlInfo.control.memberUpdated();
     }
-    
-    var x = parentControlInfo.prevNewChildX + visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_X;
-    var y = parentControlInfo.prevNewChildY + visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_Y;
-    
-    if( ((x > parentContainer.offsetWidth)&&(x > visicomp.app.visiui.WorkspaceUI.MIN_WRAP_WIDTH)) && 
-        ((y > parentContainer.offsetHeight)&&(y > visicomp.app.visiui.WorkspaceUI.MIN_WRAP_HEIGHT)) ) {
-        parentControlInfo.wrapCount++;
-        x = visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_X * (parentControlInfo.wrapCount + 1);
-        y = visicomp.app.visiui.WorkspaceUI.DELTA_CHILD_Y;
-    }
-    
-    parentControlInfo.prevNewChildX = x;
-    parentControlInfo.prevNewChildY = y;
-    
-    return [x,y];
 }
-
-///////////////////////////////////////////////////////////////////////////////////////
 
 /** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
-
-//we should verify the workspace!
 	
 	//store the ui object
 	var key = fullName;
@@ -148,7 +121,25 @@ visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
 	delete this.controlMap[key];
 
 	if((controlInfo)&&(controlInfo.control)) {
-		controlInfo.control.removeFromParent();	
+        //remove the UI element
+        var controlWindow = controlInfo.control.getFrame().getWindow();
+        controlWindow.remove();
+        
+        //do any needed cleanup
+        controlInfo.control.onDelete();
+	}
+}
+
+/** This method looks up the parent container element for a given object key. */
+visicomp.app.visiui.WorkspaceUI.prototype.getContainerObject = function(controlInfo) {
+	if(controlInfo.control) {
+        //the parent control should have a content element (and should be a folder)
+        //maybe we need to enforce this its the right tyep and/or add a parent component instead)
+		return controlInfo.control;
+	}
+	else {
+        //if there is no control we will assume this is the root
+		return this;
 	}
 }
 

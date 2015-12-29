@@ -150,8 +150,7 @@ visicomp.core.updatemember.getUpdateDataWrapper = function(member,data,functionB
 
 visicomp.core.updatemember.setCode = function(member,functionBody,supplementalCode) {
      //set code
-        member.setCode(functionBody,supplementalCode);
-		member.calculateDependencies();
+     member.setCode(functionBody,supplementalCode);
 }
 
 visicomp.core.updatemember.setData = function(member,data) {

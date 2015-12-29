@@ -11,7 +11,7 @@
  *
  * @class 
  */
-visicomp.visiui.WindowFrame = function(parentContainer, options) {
+visicomp.visiui.WindowFrame = function(options) {
 	
     if(!options) {
         options = {};
@@ -21,7 +21,6 @@ visicomp.visiui.WindowFrame = function(parentContainer, options) {
     visicomp.core.EventManager.init.call(this);
 	
     //variables
-    this.parentContainer = parentContainer;
     this.options = options;
 	
     this.frame = null;
@@ -167,6 +166,11 @@ visicomp.visiui.WindowFrame.COMMAND_BUTTON_STYLE = {
 // Public Methods
 //====================================
 
+/** This method sets the parent container. */
+visicomp.visiui.WindowFrame.prototype.setParentContainer = function(parentContainer) {
+    this.parentContainer = parentContainer;
+}
+
 /** This method sets the title on the window frame.
  * This will be added to the title bar in the order it was called. The standard
  * location for the menu is immediately after the menu, if the menu is present. */
@@ -206,6 +210,11 @@ visicomp.visiui.WindowFrame.prototype.show = function() {
 visicomp.visiui.WindowFrame.prototype.hide = function() {
     this.parentContainer.removeChild(this.getElement());
     this.dispatchEvent("hide",this);
+}
+
+/** This method closes the window. */
+visicomp.visiui.WindowFrame.prototype.remove = function() {
+    this.parentContainer.removeChild(this.getElement());
 }
 
 /** This method sets the position of the window frame in the parent. */

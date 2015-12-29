@@ -24,16 +24,14 @@ visicomp.core.Resource.prototype.getResourceProcessor = function() {
 visicomp.core.Resource.prototype.updateResourceProcessor = function(resourceProcessor) {	
     this.resourceProcessor = resourceProcessor;
 	
-	//if we have code, rerun it with the new processor
-	var objectFunction = visicomp.core.getObjectFunction(this);
-	if(objectFunction) {
-		//process the object function as needed
-		this.processObjectFunction(objectFunction);
-	}
+    //re-execute, if needed
+	if(this.needsExecuting()) {
+        this.execute();
+    }
 } 
 
 visicomp.core.Resource.prototype.processObjectFunction = function(objectFunction) {	
-    //texectue the object function passing the resource object.
+    //exectue the object function passing the resource object.
     objectFunction(this.resourceProcessor);
 }
 

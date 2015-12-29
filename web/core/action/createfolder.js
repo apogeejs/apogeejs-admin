@@ -23,6 +23,10 @@ visicomp.core.createfolder.createFolder = function(parent,name) {
         if(parent) {
             parent.addChild(folder);
         }
+        
+        //do any updates to other objects because of the added obejct
+        workspace.updateForAddedVariable(folder);
+        
 		//dispatch event
 		workspace.dispatchEvent(visicomp.core.createfolder.PACKAGE_CREATED_EVENT,folder);
 

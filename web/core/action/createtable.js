@@ -24,6 +24,9 @@ visicomp.core.createtable.createTable = function(folder,name) {
 
 		//initialize data
 		table.setData("");
+        
+        //do any updates to other objects because of the added obejct
+        workspace.updateForAddedVariable(table);
 
 		//dispatch event
 		workspace.dispatchEvent(visicomp.core.createtable.TABLE_CREATED_EVENT,table);

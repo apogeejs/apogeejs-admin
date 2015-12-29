@@ -47,7 +47,7 @@ visicomp.core.Child.getParent = function() {
  * @private*/
 visicomp.core.Child.setParent = function(parent) {
 	this.parent = parent;
-    if(parent.workspace != this.workspace) {
+    if((parent != null)&&(parent.workspace != this.workspace)) {
         //we might want to write code to change the child workspace, and that of it offspring. Or maybe not.
         throw visicomp.core.util.createError("The chils and parent must be in the same workspace.");
     }

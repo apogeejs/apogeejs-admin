@@ -21,8 +21,12 @@ visicomp.core.deletechild.deleteChild = function(child) {
 		var workspace = child.getWorkspace();
 		
 		child.onDelete();
+        
+        //do any updates to other objects because of the deleted table
+        workspace.updateForDeletedVariable(child);
 
 		//dispatch event
+        var data = {};
 		workspace.dispatchEvent(visicomp.core.deletechild.CHILD_DELETED_EVENT,fullName);
 
 		//return success

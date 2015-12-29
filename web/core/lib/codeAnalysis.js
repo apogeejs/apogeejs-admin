@@ -10,6 +10,8 @@
    -- nameUse.isModified: true if the variable is modified (not 100% accurate)
    -- nameUse.isLocal: true if this is a reference to a local variable
    -- nameUse.decalredScope: for local variables only, gives the scope in which the lcoal variable is declared.
+ * - additionally, there is a flag indicating if all uses of a name are local variables
+ * -- isLocal: true if all uses of a varaible entry are local variables
  **/ 
 
 visicomp.core.codeAnalysis = {};
@@ -49,11 +51,13 @@ visicomp.core.codeAnalysis.syntax = {
     ForOfStatement: [{name:'left'},{name:'right'},{name:'body'}],
     ForInStatement: [{name:'left'},{name:'right'},{name:'body'}],
     FunctionDeclaration: [
+        {name:'id',declaration:true},
         {name:'params',list:true,declaration:true},
         {name:'body'}
         //no supporting default functions values
     ],
     FunctionExpression: [
+        {name:'id',declaration:true},
         {name:'params',list:true,declaration:true},
         {name:'body'}
         //no supporting default functions values
@@ -151,7 +155,6 @@ visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
     //return the variable info
     return varInfo;
 }
-
 
 /** This method parses the code, returning the abstract syntax tree or 
  * any errors in the code. If there is an error parsing the code an exception
@@ -337,7 +340,7 @@ visicomp.core.codeAnalysis.processFunction = function(processInfo,node) {
     
     if((nodeType === "FunctionDeclaration")&&(idNode)) {
         //parse id node (variable name) in the parent scope
-        visicomp.core.codeAnalysis.processTreeNode(processInfo,idNode,false,false);
+        visicomp.core.codeAnalysis.processTreeNode(processInfo,idNode,false,true);
     }
     
     //create a new scope for this function
@@ -345,7 +348,7 @@ visicomp.core.codeAnalysis.processFunction = function(processInfo,node) {
     
     if((nodeType === "FunctionExpression")&&(idNode)) {
         //parse id node (variable name) in the parent scope
-        visicomp.core.codeAnalysis.processTreeNode(processInfo,idNode,false,false);
+        visicomp.core.codeAnalysis.processTreeNode(processInfo,idNode,false,true);
     }
     
     //process the variable list
@@ -437,6 +440,7 @@ visicomp.core.codeAnalysis.markLocalVariables = function(processInfo) {
     for(var key in processInfo.nameTable) {
         var nameEntry = processInfo.nameTable[key];
         var name = nameEntry.name;
+        var existNonLocal = false;
         for(var i = 0; i < nameEntry.uses.length; i++) {
             var nameUse = nameEntry.uses[i];
             var scope = nameUse.scope;
@@ -453,6 +457,13 @@ visicomp.core.codeAnalysis.markLocalVariables = function(processInfo) {
                 nameUse.isLocal = true;
                 nameUse.declarationScope = varScope;
             }
+            else {
+                existNonLocal = true;
+            }
+        }
+        //add a flag to the name enry if all uses are local
+        if(!existNonLocal) {
+            nameEntry.isLocal = true;
         }
     }
 }

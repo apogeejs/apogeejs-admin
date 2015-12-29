@@ -6,7 +6,8 @@ visicomp.app.visiui.Control = {};
     
 /** This is the initializer for the component. The object passed is the core object
  * associated with this control. */
-visicomp.app.visiui.Control.init = function(object,generator) {
+visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
+    this.workspaceUI = workspaceUI;
     this.object = object;
     this.generator = generator;
     this.frame = null;
@@ -18,6 +19,31 @@ visicomp.app.visiui.Control.init = function(object,generator) {
     itemInfo.title = visicomp.app.visiui.VisiComp.convertSpacesForHtml("Delete " + this.generator.displayName);
     itemInfo.callback = this.createDeleteCallback(itemInfo.title);
     this.menuItemInfoList.push(itemInfo);
+    
+    //create window
+    var options = {"minimizable":true,"maximizable":true,"resizable":true,"movable":true};
+    this.window = new visicomp.visiui.StackWindow(options);
+    
+    //load the content div
+    var contentDiv = visicomp.visiui.createElement("div",null,
+            {
+                "position":"absolute",
+                "top":"0px",
+                "bottom":"0px",
+                "right":"0px",
+                "left":"0px"
+            });
+    this.window.setContent(contentDiv);
+    
+     //let the extending object populate the frame
+    this.populateFrame();
+    
+    //set the menu
+    var menu = this.window.getMenu();
+    menu.setMenuItems(this.menuItemInfoList);
+    
+    //set the title
+    this.window.setTitle(this.getObject().getName());
 }
 
 //==============================
@@ -29,9 +55,14 @@ visicomp.app.visiui.Control.getObject = function() {
     return this.object;
 }
 
-/** This method returns the table for this table control. */
+/** This method returns the workspace for this table control. */
 visicomp.app.visiui.Control.getWorkspace = function() {
     return this.object.getWorkspace();
+}
+
+/** This method returns the workspaceUI for this table control. */
+visicomp.app.visiui.Control.getWorkspaceUI = function() {
+    return this.workspaceUI;
 }
 
 /** This method populates the frame for this control. */
@@ -40,27 +71,13 @@ visicomp.app.visiui.Control.getFrame = function() {
 }
 
 /** This method populates the frame for this control. */
-visicomp.app.visiui.Control.setFrame = function(controlFrame) {
-    
-    this.frame = controlFrame;
-    
-    //let the extending object populate the frame
-    this.populateFrame(controlFrame);
-    
-    //add the window title bar elements
-    var window = controlFrame.getWindow();
-    
-    //set the menu
-    var menu = window.getMenu();
-    menu.setMenuItems(this.menuItemInfoList);
-    
-    //set the title
-    window.setTitle(this.getObject().getName());
-    
+visicomp.app.visiui.Control.setParentContainerObject = function(parentContainerObject) {
+    var parentContainer = parentContainerObject.getContainerObject();
+    this.window.setParentContainer(parentContainer);
 }
 
 /** This serializes the table control. */
-visicomp.app.visiui.Control.toJson = function(workspaceUI) {
+visicomp.app.visiui.Control.toJson = function() {
     var json = {};
     json.name = this.getObject().getName();
     json.type = this.generator.uniqueName;
@@ -69,7 +86,7 @@ visicomp.app.visiui.Control.toJson = function(workspaceUI) {
     json.windowCoords = window.getCoordinateInfo();
     json.windowState = window.getWindowState();
     
-    this.writeToJson(workspaceUI,json);
+    this.writeToJson(json);
     
     return json;
 }
@@ -86,7 +103,7 @@ visicomp.app.visiui.Control.getMenuItemInfoList = function() {
 /** This method deseriliazes any data needed after the control is instantiated.
  * objects that extend Control should override this for any data that is
  * needed, however they should call this base function first. */
-visicomp.app.visiui.Control.updateFromJson = function(workspaceUI,json,updateDataList) {
+visicomp.app.visiui.Control.updateFromJson = function(json,updateDataList) {
     var window = this.frame.getWindow();
     if(json.windowCoords) {
         window.setCoordinateInfo(json.windowCoords);
@@ -126,9 +143,17 @@ visicomp.app.visiui.Control.createEditCodeableDialogCallback = function(title, o
 /** This method creates a callback for deleting the control. 
  *  @private */
 visicomp.app.visiui.Control.createDeleteCallback = function(title) {
+    var object = this.getObject();
     return function() {
-        alert("Not implemented!");
+        //we should do a warning!!!
+        
+        //delete the object - the control we be deleted after the delete event received
+        visicomp.core.deletechild.deleteChild(object);
     }
+}
+
+/** This method should include an needed functionality to clean up after a delete. */
+visicomp.app.visiui.Control.onDelete = function() {
 }
 
 /** This deserializez the control from a json. It is a static function, but because
@@ -140,18 +165,15 @@ visicomp.app.visiui.Control.createfromJson = function(workspaceUI,parent,generat
     if(resultValue.success) {
         //load the general control data
         var control = resultValue.control;
-        control.updateFromJson(workspaceUI,json,updateDataList);
+        control.updateFromJson(json,updateDataList);
     }
 }
 
-
 //======================================
-// Each control should have a generator in the following format
+// All controls should have a control generator to register the control, as below
 //======================================
-
+//
 //visicomp.app.visiui.TableControl.generator = {};
-//visicomp.app.visiui.TableControl.generator.name = "visicomp.app.visiui.TableControl";
-////visicomp.app.visiui.TableControl.generator.displayName = "Table";
-//visicomp.app.visiui.TableControl.generator.showCreateDialog = visicomp.app.visiui.TableControl.showCreateDialog;
-//visicomp.app.visiui.TableControl.generator.createFromJson = visicomp.app.visiui.TableControl.createfromJson;
-
+//visicomp.app.visiui.TableControl.generator.displayName = "Table";
+//visicomp.app.visiui.TableControl.generator.uniqueName = "visicomp.app.visiui.TableControl";
+//visicomp.app.visiui.TableControl.generator.createControl = visicomp.app.visiui.TableControl.createControl;

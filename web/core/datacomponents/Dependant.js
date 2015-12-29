@@ -12,11 +12,6 @@ visicomp.core.Dependant.init = function() {
     this.dependsOnList = [];
 }
 
-/** This method should be called to check if an object takes part in the
- * dependencies for a workspace. This method should not be implemented on 
- * non-dependants. */
-visicomp.core.Dependant.isDependant = true
-
 /** This returns a map of the members that this member depends on. */
 visicomp.core.Dependant.getDependsOn = function() {
     return this.dependsOnList;

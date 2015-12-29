@@ -24,6 +24,9 @@ visicomp.core.createfunction.createFunction = function(folder,name,argParens) {
 
 		//initialize data
 		functionObject.setData("");
+        
+        //do any updates to other objects because of the added obejct
+        workspace.updateForAddedVariable(functionObject);
 
 		//dispatch event
 		workspace.dispatchEvent(visicomp.core.createfunction.FUNCTION_CREATED_EVENT,functionObject);

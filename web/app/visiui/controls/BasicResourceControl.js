@@ -13,7 +13,7 @@ visicomp.app.visiui.BasicResourceControl.init = function() {}
 //==============================
 
 /** This serializes the table control. */
-visicomp.app.visiui.BasicResourceControl.writeToJson = function(workspaceUI, json) {
+visicomp.app.visiui.BasicResourceControl.writeToJson = function(json) {
     var resource = this.getObject();
     
     //store the processor info
@@ -35,6 +35,8 @@ visicomp.app.visiui.BasicResourceControl.updateFromJson = function(json,updateDa
     visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
     
     //load the type specific data
+    var resource = this.getObject();
+    
     var updateData = {};
     updateData.member = resource;
     updateData.functionBody = json.functionBody;
@@ -74,14 +76,20 @@ window.setSize(200,200);
 
 }
 
+/** This is called when the data is updated. There is no action here since it is
+ * done by the resource processor. 
+ * @private */    
+visicomp.app.visiui.BasicResourceControl.memberUpdated = function() {    
+}
+
 //======================================
 // Static methods
 //======================================
 
 /** This method can be called to complete serialization of a basic control. */
-visicomp.app.visiui.BasicResourceControl.updateFromJson = function(workspaceUI,json,updateDataList) {
+visicomp.app.visiui.BasicResourceControl.updateFromJson = function(json,updateDataList) {
     //call the base update function
-    visicomp.app.visiui.Control.updateFromJson.call(this,workspaceUI,json,updateDataList);
+    visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
 		
     var resource = this.getObject();
     if(json.processor) {

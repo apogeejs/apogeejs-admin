@@ -7,12 +7,6 @@ visicomp.core.Workspace = function(name) {
 
     //add the root folder
 	this.rootFolder = new visicomp.core.Folder(this,name);
-    
-    //add an entry in the update code structure
-    //this is placed here to make debugging easier.
-    //This means we need to go and delete it if we clse the workspace.
-    //Alternatively it could be stored somewhere in the workspace.
-    visicomp.core.functionCode[name] = {};
 }
 
 //add components to this class
@@ -33,8 +27,18 @@ visicomp.core.Workspace.prototype.getRootFolder = function() {
     return this.rootFolder;
 }
 
+/** This method updates the dependencies of any children in the workspace
+ * based on an object being added. */
+visicomp.core.Workspace.prototype.updateForAddedVariable = function(object) {
+    this.rootFolder.updateForAddedVariable(object);
+}
+
+/** This method updates the dependencies of any children in the workspace
+ * based on an object being deleted. */
+visicomp.core.Workspace.prototype.updateForDeletedVariable = function(object) {
+    this.rootFolder.updateForAddedVariable(object);
+}
+
 /** This method removes any data from this workspace. */
 visicomp.core.Workspace.prototype.close = function() {
-    //add an entry in the update code structure
-    delete visicomp.core.functionCode[this.name];
 }

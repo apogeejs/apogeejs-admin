@@ -21,6 +21,8 @@ visicomp.core.createresource.createResource = function(folder,name,resourceProce
         
 		var resource = new visicomp.core.Resource(workspace,name,resourceProcessor);
 		folder.addChild(resource);
+        
+        //no need to update other tables for added resource - it does not impact other objects
 
 		//dispatch event
 		workspace.dispatchEvent(visicomp.core.createresource.RESOURCE_CREATED_EVENT,resource);

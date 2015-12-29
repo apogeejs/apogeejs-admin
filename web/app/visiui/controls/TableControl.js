@@ -1,18 +1,8 @@
 /** This control represents a table object. */
-visicomp.app.visiui.TableControl = function(table) {
+visicomp.app.visiui.TableControl = function(workspaceUI,table) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,table,visicomp.app.visiui.TableControl.generator);
+    visicomp.app.visiui.Control.init.call(this,workspaceUI,table,visicomp.app.visiui.TableControl.generator);
     this.editor = null; //is read only, not really an editor
-    
-    //subscribe to table update event
-    var instance = this;
-    var workspace = table.getWorkspace();
-    var tableUpdatedCallback = function(tableObject) {
-        if(tableObject === table) {
-            instance.tableUpdated();
-        }
-    }
-    workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, tableUpdatedCallback);
 };
 
 //add components to this class
@@ -23,7 +13,7 @@ visicomp.core.util.mixin(visicomp.app.visiui.TableControl,visicomp.app.visiui.Co
 //==============================
 
 /** This serializes the table control. */
-visicomp.app.visiui.TableControl.prototype.writeToJson = function(workspaceUI, json) {
+visicomp.app.visiui.TableControl.prototype.writeToJson = function(json) {
     var table = this.getObject();
     if(table.hasCode()) {
         json.functionBody = table.getFunctionBody();
@@ -37,9 +27,9 @@ visicomp.app.visiui.TableControl.prototype.writeToJson = function(workspaceUI, j
 /** This method deseriliazes any data needed after the control is instantiated.
  * objects that extend Control should override this for any data that is
  * needed, however they should call this base function first. */
-visicomp.app.visiui.TableControl.prototype.updateFromJson = function(workspaceUI,json,updateDataList) {
+visicomp.app.visiui.TableControl.prototype.updateFromJson = function(json,updateDataList) {
     //call the base update function
-    visicomp.app.visiui.Control.updateFromJson.call(this,workspaceUI,json,updateDataList);
+    visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
     
     //load the type specific data
     var updateData = {};
@@ -100,7 +90,7 @@ visicomp.app.visiui.TableControl.formatString = "\t";
 
 /** This method updates the table data 
  * @private */    
-visicomp.app.visiui.TableControl.prototype.tableUpdated = function() {
+visicomp.app.visiui.TableControl.prototype.memberUpdated = function() {
     var data = this.getObject().getData();
     var textData = JSON.stringify(data,null,visicomp.app.visiui.TableControl.formatString);
     if(this.editor) {
@@ -132,7 +122,7 @@ visicomp.app.visiui.TableControl.createControl = function(workspaceUI,parent,nam
     var returnValue = visicomp.core.createtable.createTable(parent,name);
     if(returnValue.success) {
         var table = returnValue.table;
-        var tableControl = new visicomp.app.visiui.TableControl(table);
+        var tableControl = new visicomp.app.visiui.TableControl(workspaceUI,table);
         workspaceUI.addControl(tableControl);
         returnValue.control = tableControl;
     }
