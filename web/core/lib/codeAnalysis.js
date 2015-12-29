@@ -267,7 +267,7 @@ visicomp.core.codeAnalysis.processTreeNode = function(processInfo,node,isModifie
         visicomp.core.codeAnalysis.processFunction(processInfo,node);
         
     }
-    else if((node.type === "NewExpression")&&(callee === "Function")) {
+    else if((node.type === "NewExpression")&&(node.callee.type === "Function")) {
         //we currently do not support the function constructor
         //to add it we need to add the local variables and parse the text body
         throw visicomp.core.codeAnalysis.createParsingError("Function constructor not currently supported!",node.loc); 
