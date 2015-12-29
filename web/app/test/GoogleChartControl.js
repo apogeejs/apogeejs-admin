@@ -19,7 +19,7 @@ GoogleChartResourceProcessor = function() {
     this.dataWaiting = false;
 }
 
-//requires ""
+//requires "https://www.gstatic.com/charts/loader.js"
 
 /** setFrame - required method for resource processor used in Basic Resource Control. */
 GoogleChartResourceProcessor.prototype.setWindow = function(window) {
