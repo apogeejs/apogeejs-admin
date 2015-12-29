@@ -17,12 +17,12 @@ SimpleGeojsonResourceProcessor = function() {
 //http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css
 
 /** setFrame - required method for resource processor used in Basic Resource Control. */
-SimpleGeojsonResourceProcessor.prototype.setFrame = function(controlFrame) {
-    this.controlFrame = controlFrame;
+SimpleGeojsonResourceProcessor.prototype.setWindow = function(window) {
+    this.window = window;
     this.mapDiv = document.createElement("div");
     this.mapDiv.style.height = "100%";
     this.mapDiv.style.width = "100%"; 
-    var contentElement = this.controlFrame.getWindow().getContent();
+    var contentElement = this.window.getContent();
     contentElement.appendChild(this.mapDiv);
     
     //map init note - we can not init the map until the dom is ready.
@@ -70,9 +70,9 @@ SimpleGeojsonResourceProcessor.prototype.setData = function(data,options) {
 
 /** This is the control for the chart. It inherits from the component
  * BasicResourceControl to represent a resource object. */
-SimpleGeojsonControl = function(resource) {
+SimpleGeojsonControl = function(workspaceUI,resource) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,resource,"Simple GeoJSON Control");
+    visicomp.app.visiui.Control.init.call(this,workspaceUI,resource,"Simple GeoJSON Control");
     visicomp.app.visiui.BasicResourceControl.init.call(this);
 };
 
@@ -91,8 +91,7 @@ SimpleGeojsonControl.createControl = function(workspaceUI,parent,name) {
     var returnValue = visicomp.core.createresource.createResource(parent,name,resourceProcessor);
     if(returnValue.success) {
         var resource = returnValue.resource;
-        var simpleGeojsonControl = new SimpleGeojsonControl(resource);
-        workspaceUI.addControl(simpleGeojsonControl);
+        var simpleGeojsonControl = new SimpleGeojsonControl(workspaceUI,resource);
         returnValue.control = simpleGeojsonControl;
     }
     else {

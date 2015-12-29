@@ -1,5 +1,5 @@
 visicomp.app.visiui.CustomResourceProcessor = function() {
-	this.controlFrame = null;
+	this.window = null;
 	
 	this.html = "";
 	this.customizeScript = "";
@@ -7,16 +7,16 @@ visicomp.app.visiui.CustomResourceProcessor = function() {
 	this.css = "";
 }
 
-visicomp.app.visiui.CustomResourceProcessor.prototype.setFrame = function(controlFrame) {
-    this.controlFrame = controlFrame;
+visicomp.app.visiui.CustomResourceProcessor.prototype.setWindow = function(window) {
+    this.window = window;
 }
 
-visicomp.app.visiui.CustomResourceProcessor.prototype.getFrame = function() {
-    return this.controlFrame;
+visicomp.app.visiui.CustomResourceProcessor.prototype.getWindow = function() {
+    return this.window;
 }
 
 visicomp.app.visiui.CustomResourceProcessor.prototype.getContentElement = function() {
-    return this.controlFrame.getWindow().getContent();
+    return this.window.getContent();
 }
 
 visicomp.app.visiui.CustomResourceProcessor.prototype.getHtml = function() {
@@ -66,8 +66,6 @@ visicomp.app.visiui.CustomResourceProcessor.prototype.updateFromJson = function(
  * html page so the user easily can run it in the debugger if needed. 
  * @private */
 visicomp.app.visiui.CustomResourceProcessor.prototype.updateProcessor = function() {
-    
-	
     
     //create the resource generator wrapped with its closure
     var generatorFunctionBody = visicomp.core.util.formatString(

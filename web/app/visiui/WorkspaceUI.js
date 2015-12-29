@@ -1,6 +1,6 @@
 /** This class manages the user interface for a workspace object. */
 visicomp.app.visiui.WorkspaceUI = function(app,workspace,tab) {
-    visicomp.app.visiui.ParentContainer.init.call(this,this.getContainerElement());
+    visicomp.app.visiui.ParentContainer.init.call(this,tab);
     
     //properties
 	this.app = app;
@@ -46,9 +46,9 @@ visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
     return this.workspace;
 }
 
-/** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.getChildControl = function(childObject) {
-    var key = this.getObjectKey(childObject);
+/** This method gets the control associated with a member object. */
+visicomp.app.visiui.WorkspaceUI.prototype.getControl = function(object) {
+    var key = this.getObjectKey(object);
 	var controlInfo = this.controlMap[key];
 	if(controlInfo) {
 		return controlInfo.control;
@@ -62,22 +62,34 @@ visicomp.app.visiui.WorkspaceUI.prototype.getChildControl = function(childObject
 visicomp.app.visiui.WorkspaceUI.prototype.getControlMap = function() {
 	return this.controlMap;
 }
-	
-/** This method responds to a "new" menu event. */
-visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(control) {
-    //make sure this is for us
-    if(control.getWorkspace() !== this.workspace) return;
-	
-    var object = control.getObject();
+
+visicomp.app.visiui.WorkspaceUI.prototype.getParentContainerObject = function(object) {
     var parent = object.getParent();
     
     //get parent control info
     var parentKey = this.getObjectKey(parent);
     var parentControlInfo = this.controlMap[parentKey];
-    var parentContainerObject = this.getContainerObject(parentControlInfo);
-    control.setParentContainerObject(parentContainerObject);
-	
-	//store the ui object
+	if(parentControlInfo.control) {
+        //the parent control should have a content element (and should be a folder)
+        //maybe we need to enforce this its the right tyep and/or add a parent component instead)
+		return parentControlInfo.control;
+	}
+	else {
+        //if there is no control we will assume this is the root
+		return this;
+	}
+}
+
+visicomp.app.visiui.WorkspaceUI.prototype.registerControl = function(control) {
+    
+    var object = control.getObject();
+    
+    //make sure this is for us
+    if(object.getWorkspace() !== this.workspace) {
+        throw visicomp.core.util.createError("Control registered in wrong workspace: " + object.getFullName());
+    }
+    
+    //store the ui object
 	var key = this.getObjectKey(object);
 	
 	if(this.controlMap[key]) {
@@ -91,14 +103,8 @@ visicomp.app.visiui.WorkspaceUI.prototype.addControl = function(control) {
 	
     this.controlMap[key] = controlInfo;
     
-    //show the window------------------
-//Clean this up!
-	var window = controlFrame.getWindow();
-	var pos = parentContainerObject.getNextWindowPosition();
-    window.setPosition(pos[0],pos[1]);
-    window.show;
-//-----------------------------------
 }
+	
 
 /** This method responds to a member updated. */
 visicomp.app.visiui.WorkspaceUI.prototype.memberUpdated = function(memberObject) {
@@ -122,24 +128,11 @@ visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
 
 	if((controlInfo)&&(controlInfo.control)) {
         //remove the UI element
-        var controlWindow = controlInfo.control.getFrame().getWindow();
+        var controlWindow = controlInfo.control.getWindow();
         controlWindow.remove();
         
         //do any needed cleanup
         controlInfo.control.onDelete();
-	}
-}
-
-/** This method looks up the parent container element for a given object key. */
-visicomp.app.visiui.WorkspaceUI.prototype.getContainerObject = function(controlInfo) {
-	if(controlInfo.control) {
-        //the parent control should have a content element (and should be a folder)
-        //maybe we need to enforce this its the right tyep and/or add a parent component instead)
-		return controlInfo.control;
-	}
-	else {
-        //if there is no control we will assume this is the root
-		return this;
 	}
 }
 
@@ -254,7 +247,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.addChildrenToJson = function(folder,js
 		var child = childMap[key];
         
 		//get the object map for the workspace
-		var childControl = this.getChildControl(child);
+		var childControl = this.getControl(child);
 		
 		//get the control for this child
 		var name = child.getName();

@@ -2,7 +2,6 @@
 visicomp.app.visiui.FunctionControl = function(workspaceUI, functionObject) {
     //base init
     visicomp.app.visiui.Control.init.call(this,workspaceUI,functionObject,visicomp.app.visiui.FunctionControl.generator);
-    this.editor = null; //is read only, not really an editor
 };
 
 //add components to this class
@@ -40,9 +39,9 @@ visicomp.app.visiui.FunctionControl.prototype.updateFromJson = function(json,upd
 
 /** This method populates the frame for this control. 
  * @protected */
-visicomp.app.visiui.FunctionControl.prototype.populateFrame = function(controlFrame) {
+visicomp.app.visiui.FunctionControl.prototype.populateFrame = function() {
     
-    var window = controlFrame.getWindow();
+    var window = this.getWindow();
     
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
@@ -59,7 +58,7 @@ visicomp.app.visiui.FunctionControl.prototype.populateFrame = function(controlFr
     menuItemInfoList.splice(0,0,itemInfo1,itemInfo2);
     
     //editor - only for display, read only
-    var contentDiv = controlFrame.getContentElement();
+    var contentDiv = this.getContentElement();
     var editor = ace.edit(contentDiv);
     editor.renderer.setShowGutter(true);
     editor.setReadOnly(true);
@@ -125,7 +124,6 @@ visicomp.app.visiui.FunctionControl.createControl = function(workspaceUI,parent,
     if(returnValue.success) {
         var functionObject = returnValue.functionObject;
         var functionControl = new visicomp.app.visiui.FunctionControl(workspaceUI,functionObject);
-        workspaceUI.addControl(functionControl);
         returnValue.control = functionControl;
     }
     else {

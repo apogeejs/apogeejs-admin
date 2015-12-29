@@ -32,7 +32,7 @@ visicomp.app.visiui.CustomResourceControl.prototype.update = function(html,proce
 }
 
 /** This method populates the frame for this control. */
-visicomp.app.visiui.CustomResourceControl.prototype.addToFrame = function(controlFrame) {
+visicomp.app.visiui.CustomResourceControl.prototype.addToFrame = function() {
 	
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
@@ -74,7 +74,6 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,p
     if(returnValue.success) {
         var resource = returnValue.resource;
         var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,resource);
-        workspaceUI.addControl(customResourceControl);
         returnValue.control = customResourceControl;
     }
     else {

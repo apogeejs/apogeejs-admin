@@ -45,15 +45,15 @@ visicomp.app.visiui.BasicResourceControl.updateFromJson = function(json,updateDa
 }
 
 /** This method populates the frame for this control. */
-visicomp.app.visiui.BasicResourceControl.populateFrame = function(controlFrame) {
+visicomp.app.visiui.BasicResourceControl.populateFrame = function() {
     
-    var window = controlFrame.getWindow();
+    var window = this.getWindow();
 	
 	//set the child UI object onto the control engine
     var resource = this.getObject();
 	var resourceProcessor = resource.getResourceProcessor();
 	if(resourceProcessor) {
-		resourceProcessor.setFrame(controlFrame);
+		resourceProcessor.setWindow(window);
 	}
 	
     //create the menu
@@ -71,7 +71,7 @@ window.setSize(200,200);
 
     //check if the implementation wants to do anything
     if(this.addToFrame) {
-        this.addToFrame(controlFrame);
+        this.addToFrame();
     }
 
 }

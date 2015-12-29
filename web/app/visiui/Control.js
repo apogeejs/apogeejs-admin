@@ -10,8 +10,42 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
     this.workspaceUI = workspaceUI;
     this.object = object;
     this.generator = generator;
-    this.frame = null;
     
+    this.parentContainerObject = this.workspaceUI.getParentContainerObject(object);
+    if(!this.parentContainerObject) {
+        throw visicomp.core.util.createError("Parent object not found: " + object.getFullName());
+    }
+    
+    this.workspaceUI.registerControl(this);
+    
+    //--------------
+    //create window
+    //--------------
+    var options = {"minimizable":true,"maximizable":true,"resizable":true,"movable":true};
+    var parentContainer = this.parentContainerObject.getContainerElement();
+    this.window = new visicomp.visiui.StackWindow(parentContainer,options);
+    
+    //load the content div
+    var contentDiv = visicomp.visiui.createElement("div",null,
+        {
+            "position":"absolute",
+            "top":"0px",
+            "bottom":"0px",
+            "right":"0px",
+            "left":"0px"
+        });
+    this.window.setContent(contentDiv);
+    
+    //show the window
+	var pos = this.parentContainerObject.getNextWindowPosition();
+    this.window.setPosition(pos[0],pos[1]);
+    this.window.show();
+    
+    //------------------
+    // Add window content
+    //------------------
+    
+    //create menus
     this.menuItemInfoList = [];
     
     //add the standard entries
@@ -19,21 +53,6 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
     itemInfo.title = visicomp.app.visiui.VisiComp.convertSpacesForHtml("Delete " + this.generator.displayName);
     itemInfo.callback = this.createDeleteCallback(itemInfo.title);
     this.menuItemInfoList.push(itemInfo);
-    
-    //create window
-    var options = {"minimizable":true,"maximizable":true,"resizable":true,"movable":true};
-    this.window = new visicomp.visiui.StackWindow(options);
-    
-    //load the content div
-    var contentDiv = visicomp.visiui.createElement("div",null,
-            {
-                "position":"absolute",
-                "top":"0px",
-                "bottom":"0px",
-                "right":"0px",
-                "left":"0px"
-            });
-    this.window.setContent(contentDiv);
     
      //let the extending object populate the frame
     this.populateFrame();
@@ -66,14 +85,13 @@ visicomp.app.visiui.Control.getWorkspaceUI = function() {
 }
 
 /** This method populates the frame for this control. */
-visicomp.app.visiui.Control.getFrame = function() {
-     return this.frame;
+visicomp.app.visiui.Control.getWindow = function() {
+     return this.window;
 }
 
 /** This method populates the frame for this control. */
-visicomp.app.visiui.Control.setParentContainerObject = function(parentContainerObject) {
-    var parentContainer = parentContainerObject.getContainerObject();
-    this.window.setParentContainer(parentContainer);
+visicomp.app.visiui.Control.getContentElement = function() {
+     return this.window.getContent();
 }
 
 /** This serializes the table control. */
@@ -82,9 +100,8 @@ visicomp.app.visiui.Control.toJson = function() {
     json.name = this.getObject().getName();
     json.type = this.generator.uniqueName;
     
-    var window = this.frame.getWindow();
-    json.windowCoords = window.getCoordinateInfo();
-    json.windowState = window.getWindowState();
+    json.windowCoords = this.window.getCoordinateInfo();
+    json.windowState = this.window.getWindowState();
     
     this.writeToJson(json);
     
@@ -104,22 +121,21 @@ visicomp.app.visiui.Control.getMenuItemInfoList = function() {
  * objects that extend Control should override this for any data that is
  * needed, however they should call this base function first. */
 visicomp.app.visiui.Control.updateFromJson = function(json,updateDataList) {
-    var window = this.frame.getWindow();
     if(json.windowCoords) {
-        window.setCoordinateInfo(json.windowCoords);
+        this.window.setCoordinateInfo(json.windowCoords);
     }
     if(json.windowState) {
-        window.setWindowState(json.windowState);
+        this.window.setWindowState(json.windowState);
     }
 }
 
 //This method should be populated by an extending object. It should return a json object.
 //** This serializes the table control. */
-//visicomp.app.visiui.TableControl.prototype.writeToJson = function(workspaceUI, json);
+//visicomp.app.visiui.TableControl.prototype.writeToJson = function(json);
 
 //This method should be populated by an extending object.
 //** This method populates the frame for this control. */
-//visicomp.app.visiui.Control.populateFrame = function(controlFrame);
+//visicomp.app.visiui.Control.populateFrame = function();
 
 //==============================
 // Private Instance Methods

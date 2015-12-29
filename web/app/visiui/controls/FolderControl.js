@@ -2,7 +2,7 @@
 visicomp.app.visiui.FolderControl = function(workspaceUI,folder) {
     //base init
     visicomp.app.visiui.Control.init.call(this,workspaceUI,folder,visicomp.app.visiui.FolderControl.generator);
-    visicomp.app.visiui.ParentContainer.init.call(this,this.getContainerElement());
+    visicomp.app.visiui.ParentContainer.init.call(this,this.getContentElement());
 };
 
 //add components to this class
@@ -42,9 +42,9 @@ visicomp.app.visiui.FolderControl.prototype.updateFromJson = function(json,updat
 
 /** This method populates the frame for this control. 
  * @protected */
-visicomp.app.visiui.FolderControl.prototype.populateFrame = function(controlFrame) {
+visicomp.app.visiui.FolderControl.prototype.populateFrame = function() {
     
-    var window = controlFrame.getWindow();
+    var window = this.getWindow();
     
 //    //resize the editor on window size change
 //    var resizeCallback = function() {
@@ -67,7 +67,6 @@ visicomp.app.visiui.FolderControl.createControl = function(workspaceUI,parent,na
     if(returnValue.success) {
         var folder = returnValue.folder;
         var folderControl = new visicomp.app.visiui.FolderControl(workspaceUI,folder);
-        workspaceUI.addControl(folderControl);
         returnValue.control = folderControl;
     }
     else {

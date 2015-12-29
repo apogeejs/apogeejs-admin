@@ -2,7 +2,6 @@
 visicomp.app.visiui.TableControl = function(workspaceUI,table) {
     //base init
     visicomp.app.visiui.Control.init.call(this,workspaceUI,table,visicomp.app.visiui.TableControl.generator);
-    this.editor = null; //is read only, not really an editor
 };
 
 //add components to this class
@@ -46,9 +45,9 @@ visicomp.app.visiui.TableControl.prototype.updateFromJson = function(json,update
 
 /** This method populates the frame for this control. 
  * @protected */
-visicomp.app.visiui.TableControl.prototype.populateFrame = function(controlFrame) {
+visicomp.app.visiui.TableControl.prototype.populateFrame = function() {
     
-    var window = controlFrame.getWindow();
+    var window = this.getWindow();
     
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
@@ -65,7 +64,7 @@ visicomp.app.visiui.TableControl.prototype.populateFrame = function(controlFrame
     menuItemInfoList.splice(0,0,itemInfo1,itemInfo2);
     
     //editor - only for display, read only
-    var contentDiv = controlFrame.getContentElement();
+    var contentDiv = this.getContentElement();
     var editor = ace.edit(contentDiv);
     editor.renderer.setShowGutter(true);
     editor.setReadOnly(true);
@@ -123,7 +122,6 @@ visicomp.app.visiui.TableControl.createControl = function(workspaceUI,parent,nam
     if(returnValue.success) {
         var table = returnValue.table;
         var tableControl = new visicomp.app.visiui.TableControl(workspaceUI,table);
-        workspaceUI.addControl(tableControl);
         returnValue.control = tableControl;
     }
     else {

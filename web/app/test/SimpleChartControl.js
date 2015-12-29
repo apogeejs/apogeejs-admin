@@ -9,7 +9,7 @@
 
 /** Constructor */
 SimpleChartResourceProcessor = function() {
-	this.controlFrame = null;
+	this.window = null;
     this.canvas = null;
     this.chart = null;
     
@@ -20,8 +20,8 @@ SimpleChartResourceProcessor = function() {
 
 
 /** setFrame - required method for resource processor used in Basic Resource Control. */
-SimpleChartResourceProcessor.prototype.setFrame = function(controlFrame) {
-    this.controlFrame = controlFrame;
+SimpleChartResourceProcessor.prototype.setWindow = function(window) {
+    this.window = window;
 }
 
 /** setFrame - required method for resource processor used in Basic Resource Control. */
@@ -34,7 +34,7 @@ SimpleChartResourceProcessor.prototype.setChartSize = function(width,height) {
 SimpleChartResourceProcessor.prototype.setData = function(data,chartOptions) {
     
     //set up the display element
-    var contentElement = this.controlFrame.getWindow().getContent();
+    var contentElement = this.window.getContent();
     contentElement.innerHTML = "";
     this.canvas = document.createElement("canvas");
     if(this.height) {
@@ -57,9 +57,9 @@ SimpleChartResourceProcessor.prototype.setData = function(data,chartOptions) {
 
 /** This is the control for the chart. It inherits from the component
  * BasicResourceControl to represent a resource object. */
-SimpleChartControl = function(resource) {
+SimpleChartControl = function(workspaceUI,resource) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,resource,SimpleChartControl.generator);
+    visicomp.app.visiui.Control.init.call(this,workspaceUI,resource,SimpleChartControl.generator);
     visicomp.app.visiui.BasicResourceControl.init.call(this);
 };
 
@@ -78,8 +78,7 @@ SimpleChartControl.createControl = function(workspaceUI,parent,name) {
     var returnValue = visicomp.core.createresource.createResource(parent,name,resourceProcessor);
     if(returnValue.success) {
         var resource = returnValue.resource;
-        var simpleChartControl = new SimpleChartControl(resource);
-        workspaceUI.addControl(simpleChartControl);
+        var simpleChartControl = new SimpleChartControl(workspaceUI,resource);
         returnValue.control = simpleChartControl;
     }
     else {
