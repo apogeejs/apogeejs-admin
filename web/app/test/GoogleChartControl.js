@@ -47,9 +47,9 @@ GoogleChartResourceProcessor.prototype.onLibLoad = function() {
     this.chart = new google.visualization.LineChart(this.window.getContent());
     
     if(this.dataWaiting) {
-        this.setData(this.cachedDataGenerator,this.cachedOptions);
+        this.setData(this.cachedData,this.cachedOptions);
         
-        delete this.cachedDataGenerator;
+        delete this.cachedData;
         delete this.cachedOptions;        
         this.dataWaiting = false;
     }
@@ -62,19 +62,30 @@ GoogleChartResourceProcessor.prototype.setChartSize = function(width,height) {
 }
 
 /** This is the method users will call to initialize the chart. */
-GoogleChartResourceProcessor.prototype.setData = function(dataGeneratorFunction,chartOptions) {
+GoogleChartResourceProcessor.prototype.setData = function(data,chartOptions) {
     
     if(this.libLoaded) {
-        var data = dataGeneratorFunction();
-        this.chart.draw(data, chartOptions);
+        var dataTable = this.createDataTable(data);
+        this.chart.draw(dataTable, chartOptions);
     }
     else {
         this.dataWaiting = true;
-        this.cachedDataGenerator = dataGeneratorFunction;
+        this.cachedData = data;
         this.cachedOptions = chartOptions;
     }
 }
 
+/** This is constructs the data table from the given data. */
+GoogleChartResourceProcessor.prototype.createDataTable = function(data) {
+    var dataTable = new google.visualization.DataTable();
+    for(var i = 0; i < data.columns.length; i++) {
+        var columnInfo = data.columns[i];
+        dataTable.addColumn(columnInfo.type,columnInfo.name);
+    }
+    dataTable.addRows(data.rows);
+    
+    return dataTable;
+}
 
 //=================================
 // Simple Chart Control
