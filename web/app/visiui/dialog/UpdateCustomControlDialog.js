@@ -89,7 +89,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
     //buttons and handler
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
-        dialog.hide();
+        closeDialog();
     }
     
     var onSave = function() {
@@ -97,49 +97,65 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
 		var customize;
 		var supplementalCode;
         var css;
-        
-		if(htmlEditor) {
+
+        if(htmlEditor) {
             controlHtml = htmlEditor.getSession().getValue();
         }
-		else {
-			controlHtml = customResourceProcessor.getHtml();
-		}
-			
+        else {
+            controlHtml = customResourceProcessor.getHtml();
+        }
+
         if(customizeEditor) {
             customize = customizeEditor.getSession().getValue().trim();
-		}
-		else {
-			customize = customResourceProcessor.getCustomizeScript();
-		}
-		
-		if(supplementalEditor) {
+        }
+        else {
+            customize = customResourceProcessor.getCustomizeScript();
+        }
+
+        if(supplementalEditor) {
             supplementalCode = supplementalEditor.getSession().getValue().trim();
-		}
-		else {
-			supplementalCode = customResourceProcessor.getSupplementalCode();
-		}
-        
+        }
+        else {
+            supplementalCode = customResourceProcessor.getSupplementalCode();
+        }
+
         if(cssEditor) {
             css = cssEditor.getSession().getValue().trim();
-		}
-		else {
-			css = customResourceProcessor.getCss();
-		}
-        
+        }
+        else {
+            css = customResourceProcessor.getCss();
+        }
+
         var result = onSaveFunction(controlHtml,customize,supplementalCode,css);
-        
+
         if(result.success) {
-			dialog.hide();
+            closeDialog();
         }
         else {
             alert("There was an error updating the resource: " + result.msg);
-            
-            //if this was a code error, rethrow it so the standard browser debug handler can handle it
-            var error = result.error;
-            if((error)&&(error.type == "CalculationError")) {
-                var baseError = error.baseError;
-                if(baseError) throw baseError;
-            }
+        }
+    }
+
+    
+    var closeDialog = function() {
+        dialog.hide();
+        
+        //clean up the editor
+        if(htmlEditor) { 
+            htmlEditor.destroy();
+            htmlEditor = null;
+        }
+        if(customizeEditor) { 
+            customizeEditor.destroy();
+            customizeEditor = null;
+        }
+        if(supplementalEditor) { 
+            supplementalEditor.destroy();
+            supplementalEditor = null;
+        }
+        if(cssEditor) { 
+            cssEditor.destroy();
+            cssEditor = null;
         }
     }
     

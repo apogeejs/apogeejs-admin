@@ -61,27 +61,44 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     //buttons and handler
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
-        dialog.hide();
+        closeDialog();
     }
     
     var onSave = function() {
-        var jsResult;
-        var cssResult;
+        
+        try {
 
-        if(jsLinksEditor) {
-            var jsLinks = jsLinksEditor.getSession().getValue().trim();
-			var linkArray = visicomp.app.visiui.dialog.createLinkArray(jsLinks);
-            workspaceUI.setJsLinks(linkArray);
-		}
+            if(jsLinksEditor) {
+                var jsLinks = jsLinksEditor.getSession().getValue().trim();
+                var linkArray = visicomp.app.visiui.dialog.createLinkArray(jsLinks);
+                workspaceUI.setJsLinks(linkArray);
+
+            }
+
+            if(cssLinksEditor) {
+                var cssLinks = cssLinksEditor.getSession().getValue().trim();
+                var linkArray = visicomp.app.visiui.dialog.createLinkArray(cssLinks);
+                workspaceUI.setCssLinks(linkArray);
+            }
+ 
+        }
+        finally {
+            closeDialog();
+        }
+    }
+    
+    var closeDialog = function() {
+        dialog.hide();
         
-        if(cssLinksEditor) {
-            var cssLinks = cssLinksEditor.getSession().getValue().trim();
-            var linkArray = visicomp.app.visiui.dialog.createLinkArray(cssLinks);
-            workspaceUI.setCssLinks(linkArray);
-		}
-        
-//figrue out error handling here
-		dialog.hide();
+        //clean up the editor
+        if(jsLinksEditor) { 
+            jsLinksEditor.destroy();
+            jsLinksEditor = null;
+        }
+        if(cssLinksEditor) { 
+            cssLinksEditor.destroy();
+            cssLinksEditor = null;
+        }  
     }
     
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Save","onclick":onSave}));

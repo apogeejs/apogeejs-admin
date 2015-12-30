@@ -75,7 +75,7 @@ visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,on
     //buttons and handler
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
-        dialog.hide();
+        closeDialog();
     }
     
     var onSave = function() {
@@ -107,7 +107,7 @@ visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,on
             editComplete = onSaveFunction(mainCode,supplementalCode);
 
             if(editComplete) {
-                dialog.hide();
+                closeDialog();
             }
         }
         finally {
@@ -115,8 +115,22 @@ visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,on
                 //this catches exceptions thrown in update. This should be user
                 //code errors that we want to capture in the debugger for now
                 alert("There was an error calculating the result. It will be captured in the debugger.");
-                dialog.hide();
+                closeDialog();
             }
+        }
+    }
+    
+    var closeDialog = function() {
+        dialog.hide();
+        
+        //clean up the editor
+        if(formulaEditor) { 
+            formulaEditor.destroy();
+            formulaEditor = null;
+        }
+        if(supplementalEditor) { 
+            supplementalEditor.destroy();
+            supplementalEditor = null;
         }
     }
     

@@ -77,6 +77,14 @@ window.setSize(200,200);
 
 }
 
+/** This method should include an needed functionality to clean up after a delete. */
+visicomp.app.visiui.FunctionControl.prototype.onDelete = function() {
+    if(this.editor) {
+        this.editor.destroy();
+        this.editor = null;
+    }
+}
+
 /** This is the format character use to display tabs in the display editor. 
  * @private*/
 visicomp.app.visiui.FunctionControl.formatString = "\t";

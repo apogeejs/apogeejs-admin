@@ -48,7 +48,7 @@ visicomp.app.visiui.dialog.showUpdateTableDataDialog = function(table,onSaveFunc
     //buttons and handler
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
-        dialog.hide();
+        closeDialog();
     }
     
     var onSave = function() {
@@ -74,7 +74,7 @@ visicomp.app.visiui.dialog.showUpdateTableDataDialog = function(table,onSaveFunc
             editComplete = onSaveFunction(data);
 
             if(editComplete) {
-                dialog.hide();
+                closeDialog();
             }
         }
         finally {
@@ -82,8 +82,17 @@ visicomp.app.visiui.dialog.showUpdateTableDataDialog = function(table,onSaveFunc
                 //this catches exceptions thrown in update. This should be user
                 //code errors that we want to capture in the debugger for now
                 alert("There was an error calculating the result. It will be captured in the debugger.");
-                dialog.hide();
+                closeDialog();
             }
+
+        }
+    }
+    
+    var closeDialog = function() {
+        dialog.hide();
+        if(dataEditor) { 
+            dataEditor.destroy();
+            dataEditor = null;
         }
     }
     

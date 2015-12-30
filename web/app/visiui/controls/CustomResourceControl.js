@@ -21,7 +21,7 @@ visicomp.app.visiui.CustomResourceControl.prototype.update = function(html,proce
 	
 	//create a new resource processor
 	var newProcessor = new visicomp.app.visiui.CustomResourceProcessor();
-	newProcessor.setFrame(this.frame);
+	newProcessor.setWindow(this.getWindow());
 	
 	//update it
 	newProcessor.update(html,processorGeneratorBody,supplementalCode,css);
