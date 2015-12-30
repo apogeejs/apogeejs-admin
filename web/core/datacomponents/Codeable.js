@@ -323,12 +323,6 @@ visicomp.core.Codeable.recalculateDependencies = function() {
     //reexecute, if needed
     if(this.needsExecuting()) {
         this.execute();
-        
-//this really should go somewhere else
-var workspace = this.getWorkspace();
-workspace.dispatchEvent(visicomp.core.updatemember.MEMBER_UPDATED_EVENT,this); 
-//-------------------------------------
-        
     }
 }
 
