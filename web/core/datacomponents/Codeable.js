@@ -23,21 +23,51 @@ visicomp.core.Codeable.getArgList = function() {
 
 /** This method sets the argument list, which should be an array of strings.  */
 visicomp.core.Codeable.setArgList = function(argList) {
+    var editStatus = visicomp.core.util.createEditStatus();
     
     //process the user code
     var processedCodeData = {};
-    this.processCode(argList,this.functionBody,this.supplementalCode,processedCodeData);
+    try {
+        this.processCode(argList,this.functionBody,this.supplementalCode,processedCodeData,editStatus);
+        
+        if(!editStatus.success) {
+            return editStatus;
+        }
+    }
+    catch(unknownError) {
+        editStatus.success = false;
+        editStatus.msg = unknownError.message;
+        editStatus.errorType = "Unknown";
+        return editStatus;
+    }
     
     //set data
-    this.argList = argList;
+    try {
+        editStatus.saveStarted = true;
+        
+        this.argList = argList;
+
+        this.varInfo = processedCodeData.varInfo;
+
+        this.contextSetter = processedCodeData.contextSetter;
+        this.objectFunction = processedCodeData.objectFunction;
+
+        //update dependencies
+        this.updateDependencies(processedCodeData.dependencyList);
+        
+        editStatus.saveCompleted = true;
+    }
+    catch(unknownError) {
+        editStatus.success = false;
+        editStatus.msg = unknownError.message;
+        editStatus.errorType = "Unknown";
+        return editStatus;
+    }
     
-    this.varInfo = processedCodeData.varInfo;
+    //fire an update event
+    visicomp.core.updatemember.fireUpdatedEvent(this);
     
-    this.contextSetter = processedCodeData.contextSetter;
-    this.objectFunction = processedCodeData.objectFunction;
-    
-    //update dependencies
-    this.updateDependencies(processedCodeData.dependencyList);
+    return editStatus;
 }
 
 /** This method returns the formula for this member.  */
@@ -52,22 +82,49 @@ visicomp.core.Codeable.getSupplementalCode = function() {
 
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.setCode = function(functionBody, supplementalCode) {
+    var editStatus = visicomp.core.util.createEditStatus();
     
     //process the user code
     var processedCodeData = {};
-    this.processCode(this.argList,functionBody,supplementalCode,processedCodeData);
+    try {
+        this.processCode(this.argList,functionBody,supplementalCode,processedCodeData,editStatus);
+        
+        if(!editStatus.success) {
+            return editStatus;
+        }
+    }
+    catch(unknownError) {
+        editStatus.success = false;
+        editStatus.msg = unknownError.message;
+        editStatus.errorType = "Unknown";
+        return editStatus;
+    }
     
     //set data
-    this.functionBody = functionBody;
-    this.supplementalCode = supplementalCode;
+    try {
+        editStatus.saveStarted = true;
+        
+        this.functionBody = functionBody;
+        this.supplementalCode = supplementalCode;
+
+        this.varInfo = processedCodeData.varInfo;
+
+        this.contextSetter = processedCodeData.contextSetter;
+        this.objectFunction = processedCodeData.objectFunction;
+
+        //update dependencies
+        this.updateDependencies(processedCodeData.dependencyList);
+        
+        editStatus.saveCompleted = true;
+    }
+    catch(unknownError) {
+        editStatus.success = false;
+        editStatus.msg = unknownError.message;
+        editStatus.errorType = "Unknown";
+        return editStatus;
+    }
     
-    this.varInfo = processedCodeData.varInfo;
-    
-    this.contextSetter = processedCodeData.contextSetter;
-    this.objectFunction = processedCodeData.objectFunction;
-    
-    //update dependencies
-    this.updateDependencies(processedCodeData.dependencyList); 
+    return editStatus;
 }
 
 /** This method udpates the dependencies if needed because
@@ -149,11 +206,20 @@ visicomp.core.Codeable.execute = function() {
 /** This method analyzes the code and creates the object function and dependencies. 
  * The results are loaded into the passed object processedCodeData.
  * @private */
-visicomp.core.Codeable.processCode = function(argList,functionBody,supplementalCode,processedCodeData) {
+visicomp.core.Codeable.processCode = function(argList,functionBody,supplementalCode,processedCodeData,editStatus) {
+    
     //analyze the code
     var combinedFunctionBody = this.createCombinedFunctionBody(argList, functionBody, supplementalCode);
-    var varInfo = visicomp.core.codeAnalysis.analyzeCode(combinedFunctionBody);
-    
+    var varInfo;
+    try {
+        varInfo = visicomp.core.codeAnalysis.analyzeCode(combinedFunctionBody);
+    }
+    catch(parsingError) {
+        editStatus.success = false;
+        editStatus.msg = parsingError.message;
+        editStatus.errorType = "Parsing";
+        return editStatus;
+    }
     //create the object function and context setter
     this.createObjectFunction(varInfo, combinedFunctionBody, processedCodeData);
     
@@ -162,6 +228,10 @@ visicomp.core.Codeable.processCode = function(argList,functionBody,supplementalC
     
     processedCodeData.varInfo = varInfo;
     processedCodeData.dependencyList = dependencyList;
+    
+    editStatus.success = true;
+    return editStatus;
+    
 }
 
 

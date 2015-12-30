@@ -55,22 +55,34 @@ visicomp.app.visiui.dialog.showUpdateTableDataDialog = function(table,onSaveFunc
 		var data;
 
 		var dataText = dataEditor.getSession().getValue();
-		if(dataText.length > 0) data = JSON.parse(dataText);
-		else data = "";
-			
-        var result = onSaveFunction(data);
-        
-        if(result.success) {
-			dialog.hide();
+		if(dataText.length > 0) {
+            try {
+                data = JSON.parse(dataText);
+            }
+            catch(error) {
+                //parsing error
+                alert("There was an error parsing the JSON input: " +  error.message);
+                return;
+            }
         }
-        else {
-            alert("There was an error updating the table: " + result.msg);
-            
-            //if this was a code error, rethrow it so the standard browser debug handler can handle it
-            var error = result.error;
-            if((error)&&(error.type == "CalculationError")) {
-                var baseError = error.baseError;
-                if(baseError) throw baseError;
+		else {
+            data = "";
+        }
+		
+        var editComplete = undefined;
+        try {
+            editComplete = onSaveFunction(data);
+
+            if(editComplete) {
+                dialog.hide();
+            }
+        }
+        finally {
+            if(editComplete === undefined) {
+                //this catches exceptions thrown in update. This should be user
+                //code errors that we want to capture in the debugger for now
+                alert("There was an error calculating the result. It will be captured in the debugger.");
+                dialog.hide();
             }
         }
     }

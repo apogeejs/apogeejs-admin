@@ -102,14 +102,22 @@ visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,on
 			supplementalCode = codeableObject.getSupplementalCode();
 		}
         
-        var result = onSaveFunction(mainCode,supplementalCode);
-        
-        if(result.success) {
-			dialog.hide();
+        var editComplete = undefined;
+        try {
+            editComplete = onSaveFunction(mainCode,supplementalCode);
+
+            if(editComplete) {
+                dialog.hide();
+            }
         }
-        else {
-            alert("There was an error updating the function: " + result.msg);
-		}
+        finally {
+            if(editComplete === undefined) {
+                //this catches exceptions thrown in update. This should be user
+                //code errors that we want to capture in the debugger for now
+                alert("There was an error calculating the result. It will be captured in the debugger.");
+                dialog.hide();
+            }
+        }
     }
     
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Save","onclick":onSave}));

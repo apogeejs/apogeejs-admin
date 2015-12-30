@@ -79,13 +79,23 @@ visicomp.core.calculation.inList = function(recalculateList,member) {
 /** This method sorts the recalcultae list into the proper order and then
  * recalculates all the members in it. */
 visicomp.core.calculation.recalculateObjects = function(recalculateList) {
-	
+	var returnValue;
+    
     //sort the list so we can update once each
     var success = visicomp.core.calculation.sortRecalculateList(recalculateList);
-    if(!success) return;
+    if(!success) {
+        returnValue = {};
+        returnValue.success = false;
+        returnValue.msg = "Failure in update cascade - Is there a curcular reference?";
+        return returnValue;
+    }
 	
     //update each of the items in this list
     visicomp.core.calculation.callRecalculateList(recalculateList);
+    
+    returnValue = {};
+    returnValue.success = true;
+    return returnValue;
 }
 
 /** This method updates the recalculate list order so no member appears in the list
@@ -144,7 +154,6 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList) {
 		
 		//if we added no members to sorted this iteration, there must be a circular reference
 		if(!membersAddedToSorted) {
-			alert("failure in update cascade - Is there a curcular reference?");
             return false;
 		}
 		

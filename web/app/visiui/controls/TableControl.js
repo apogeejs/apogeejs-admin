@@ -90,11 +90,28 @@ visicomp.app.visiui.TableControl.formatString = "\t";
 /** This method updates the table data 
  * @private */    
 visicomp.app.visiui.TableControl.prototype.memberUpdated = function() {
-    var data = this.getObject().getData();
-    var textData = JSON.stringify(data,null,visicomp.app.visiui.TableControl.formatString);
-    if(this.editor) {
-        this.editor.getSession().setValue(textData);
+    var object = this.getObject();
+    if(object.hasError()) {
+        this.showError(object.getErrorMsg());
     }
+    else {
+        var data = this.getObject().getData();
+        var textData = JSON.stringify(data,null,visicomp.app.visiui.TableControl.formatString);
+        this.showData(textData);
+    }
+}
+
+visicomp.app.visiui.TableControl.prototype.showError = function(msg) {
+    //this.editor.style.display = "none";
+    //this.errorDiv.style.display = "";
+    //this.errorDiv.innerHTML = msg;
+    this.editor.getSession().setValue("ERROR: " + msg);
+}
+
+visicomp.app.visiui.TableControl.prototype.showData = function(dataText) {
+    //this.editor.style.display = "";
+    //this.errorDiv.style.display = "none";
+    this.editor.getSession().setValue(dataText);
 }
 
 /** This method displays the edit data dialog for this control. 
@@ -104,7 +121,9 @@ visicomp.app.visiui.TableControl.prototype.createEditDataDialog = function() {
 	
     //create save handler
     var onSave = function(data) {
-        return visicomp.core.updatemember.updateData(instance.getObject(),data);
+        var editStatus = visicomp.core.updatemember.updateData(instance.getObject(),data);
+        var editComplete = instance.processEditResult(editStatus);
+        return editComplete;
     };
     
     return function() {

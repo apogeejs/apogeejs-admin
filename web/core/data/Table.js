@@ -25,7 +25,7 @@ visicomp.core.Table.prototype.setData = function(data) {
 	visicomp.core.util.deepFreeze(data);
 
 	//store the new object in the parent
-    visicomp.core.DataHolder.setData.call(this,data);
+    return visicomp.core.DataHolder.setData.call(this,data);
 }
 	
 visicomp.core.Table.prototype.processObjectFunction = function(objectFunction) {	

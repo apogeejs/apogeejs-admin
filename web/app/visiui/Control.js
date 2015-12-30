@@ -153,7 +153,9 @@ visicomp.app.visiui.Control.createEditCodeableDialogCallback = function(title, o
     
     //create save handler
     var onSave = function(functionBody,supplementalCode) {
-        return visicomp.core.updatemember.updateCode(instance.object,functionBody,supplementalCode);
+        var editStatus =  visicomp.core.updatemember.updateCode(instance.object,functionBody,supplementalCode);
+        var editComplete = instance.processEditResult(editStatus);
+        return editComplete;
     };
     
     return function() {
@@ -171,6 +173,25 @@ visicomp.app.visiui.Control.createDeleteCallback = function(title) {
         //delete the object - the control we be deleted after the delete event received
         visicomp.core.deletechild.deleteChild(object);
     }
+}
+
+/** This method gives a standard response for a edit result. */
+visicomp.app.visiui.Control.processEditResult = function(editStatus) {
+    if(!editStatus.success) {
+        var msg = "";
+        if(editStatus.errorType === "Unknown") {
+            msg += "Unknown Error: The application is in an indeterminant state. It is recommended it be closed: "
+        }
+        else if(editStatus.errorType) {
+            msg += editStatus.errorType + " Error: "
+        }
+        msg += editStatus.msg;
+        alert(msg);
+    }
+    
+    //end the edit if we finished the save, whether of not we completed the update
+    var editComplete = (editStatus.saveCompleted) ? true : false;
+    return editComplete;
 }
 
 /** This method should include an needed functionality to clean up after a delete. */
