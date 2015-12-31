@@ -1,6 +1,8 @@
 /** This class manages the user interface for a workspace object. */
 visicomp.app.visiui.WorkspaceUI = function(app,workspace,tab) {
-    visicomp.app.visiui.ParentContainer.init.call(this,tab);
+//note - this is not the correct event manager
+var wrongEventManager = app;
+    visicomp.app.visiui.ParentContainer.init.call(this,tab,wrongEventManager);
     
     //properties
 	this.app = app;

@@ -6,8 +6,9 @@ visicomp.app.visiui.ParentContainer = {};
     
 /** This is the initializer for the component. The object passed is the core object
  * associated with this control. */
-visicomp.app.visiui.ParentContainer.init = function(containerElement) {
+visicomp.app.visiui.ParentContainer.init = function(containerElement, eventManager) {
     this.containerElement = containerElement;
+    this.eventManager = eventManager;
     
     this.prevNewChildX = 0;
     this.prevNewChildY = 0;
@@ -29,6 +30,13 @@ visicomp.app.visiui.ParentContainer.MIN_WRAP_HEIGHT = 200;
  * @protected */
 visicomp.app.visiui.ParentContainer.getContainerElement = function() {
     return this.containerElement;
+}
+
+/** This is the initializer for the component. The object passed is the core object
+ * associated with this control. 
+ * @protected */
+visicomp.app.visiui.ParentContainer.getEventManager = function() {
+    return this.eventManager;
 }
 
 /** this is used to identify if this is the root folder. */

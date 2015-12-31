@@ -68,6 +68,16 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
 	var pos = this.parentContainerObject.getNextWindowPosition();
     this.window.setPosition(pos[0],pos[1]);
     this.window.show();
+    
+    
+    //TEMPORARY CODE - this is to fix a bug where child windows do not display properly
+    //if they are deserialized in a minimized parent.
+    var window = this.window;
+    var onShow = function() {
+        window.show();
+    }
+    var parentEventManager = this.parentContainerObject.getEventManager();
+    parentEventManager.addListener("show", onShow);
 }
 
 //==============================

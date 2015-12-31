@@ -23,16 +23,16 @@ visicomp.visiui.TabFrame = function(options) {
     visicomp.visiui.applyStyle(this.tabFrame,visicomp.visiui.TabFrame.DISPLAY_FRAME_STYLE);
 	this.tabFrameControl.appendChild(this.tabFrame);
   
-//CONTEXT MENU EXAMPLE  
-var instance = this;    
-this.tabFrame.oncontextmenu = function(event) {
-    var contextMenu = new visicomp.visiui.MenuBody();
-    contextMenu.addCallbackMenuItem("First",function() {alert("first");});
-    contextMenu.addCallbackMenuItem("Second",function() {alert("second");});
-    contextMenu.addCallbackMenuItem("Third",function() {alert("third");});
-    contextMenu.addCallbackMenuItem("Fourth",function() {alert("fourth");});
-    visicomp.visiui.Menu.showContextMenu(contextMenu,event);
-}    
+////CONTEXT MENU EXAMPLE  
+//var instance = this;    
+//this.tabFrame.oncontextmenu = function(event) {
+//    var contextMenu = new visicomp.visiui.MenuBody();
+//    contextMenu.addCallbackMenuItem("First",function() {alert("first");});
+//    contextMenu.addCallbackMenuItem("Second",function() {alert("second");});
+//    contextMenu.addCallbackMenuItem("Third",function() {alert("third");});
+//    contextMenu.addCallbackMenuItem("Fourth",function() {alert("fourth");});
+//    visicomp.visiui.Menu.showContextMenu(contextMenu,event);
+//}    
     
     
     this.tabBar = document.createElement("div");

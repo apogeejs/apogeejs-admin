@@ -2,7 +2,7 @@
 visicomp.app.visiui.FolderControl = function(workspaceUI,folder) {
     //base init
     visicomp.app.visiui.Control.init.call(this,workspaceUI,folder,visicomp.app.visiui.FolderControl.generator);
-    visicomp.app.visiui.ParentContainer.init.call(this,this.getContentElement());
+    visicomp.app.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
 };
 
 //add components to this class

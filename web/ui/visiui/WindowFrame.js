@@ -544,13 +544,15 @@ visicomp.visiui.WindowFrame.prototype.minimizeContent = function() {
     //apply the normal style for the frame
     visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL);
     
+    var wasMinimized = (this.windowState === visicomp.visiui.WindowFrame.MINIMIZED);   
+ 
     //set the window state
     this.windowState = visicomp.visiui.WindowFrame.MINIMIZED;
     this.updateCoordinates();
     this.setMinMaxButtons();
     
     //dispatch resize event
-    this.dispatchEvent("minimize",this);
+    if(!wasMinimized) this.frameShown();
 }
 
 /** This is the restore function for the window.*/
@@ -568,11 +570,14 @@ visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
     //apply the normal style for the frame
     visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL);
     
+    var wasMinimized = (this.windowState === visicomp.visiui.WindowFrame.MINIMIZED);
+    
     //set the window state
     this.windowState = visicomp.visiui.WindowFrame.NORMAL;
     this.updateCoordinates();
     this.setMinMaxButtons();
     
+    if(wasMinimized) this.frameShown();
     this.frameResized();
 }
 
@@ -589,11 +594,14 @@ visicomp.visiui.WindowFrame.prototype.maximizeContent = function() {
     //apply the maximized style to the frame
     visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.FRAME_STYLE_MAX);
     
+    var wasMinimized = (this.windowState === visicomp.visiui.WindowFrame.MINIMIZED);
+    
     //set the window state
     this.windowState = visicomp.visiui.WindowFrame.MAXIMIZED;
     this.updateCoordinates();
     this.setMinMaxButtons();
     
+    if(wasMinimized) this.frameShown();
     this.frameResized();
 }
 
@@ -682,6 +690,24 @@ visicomp.visiui.WindowFrame.prototype.updateCoordinates = function() {
 	else {
 		this.body.style.height = "";
 	}
+}
+
+/** This method resizes the content to fit the frame if the frame size is set,
+ * and it fires a resize event for the window.
+ * @private */
+visicomp.visiui.WindowFrame.prototype.frameShown = function() {
+    
+    //dispatch event
+    this.dispatchEvent("show",this);
+}
+
+/** This method resizes the content to fit the frame if the frame size is set,
+ * and it fires a resize event for the window.
+ * @private */
+visicomp.visiui.WindowFrame.prototype.frameHidden = function() {
+    
+    //dispatch event
+    this.dispatchEvent("hide",this);
 }
 
 /** This method resizes the content to fit the frame if the frame size is set,
