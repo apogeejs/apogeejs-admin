@@ -5,7 +5,6 @@ visicomp.core.Folder = function(workspace,name) {
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
     visicomp.core.Impactor.init.call(this);
-	this.isRoot = false;
 
     //this holds the base objects, mapped by name
     this.childMap = {};

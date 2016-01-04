@@ -16,11 +16,13 @@ var wrongEventManager = app;
     
 /////////////////////////////////////////////
 var rootFolder = workspace.getRootFolder();
-var controlInfo = {};
-	controlInfo.object = rootFolder;
-    controlInfo.control = null; //no control object for the root
-	
-    this.controlMap[this.getObjectKey(rootFolder)] = controlInfo;
+//var controlInfo = {};
+//	controlInfo.object = rootFolder;
+//    controlInfo.control = null; //no control object for the root
+//	
+//    this.controlMap[this.getObjectKey(rootFolder)] = controlInfo;
+this.registerControl(rootFolder,null);
+this.addControlContainer(rootFolder,this)
 
 /////////////////////////////////////////////
 	
@@ -71,20 +73,15 @@ visicomp.app.visiui.WorkspaceUI.prototype.getParentContainerObject = function(ob
     //get parent control info
     var parentKey = this.getObjectKey(parent);
     var parentControlInfo = this.controlMap[parentKey];
-	if(parentControlInfo.control) {
-        //the parent control should have a content element (and should be a folder)
-        //maybe we need to enforce this its the right tyep and/or add a parent component instead)
-		return parentControlInfo.control;
-	}
-	else {
-        //if there is no control we will assume this is the root
-		return this;
-	}
+    if(!parentControlInfo.parentContainer) {
+        throw visicomp.core.util.createError("Parent container not found!");
+    }
+    return parentControlInfo.parentContainer;
 }
 
-visicomp.app.visiui.WorkspaceUI.prototype.registerControl = function(control) {
-    
-    var object = control.getObject();
+/** This method registers a control. The parameter "parentContainer" is optional
+ * and is only needed if the object is a parent container. */
+visicomp.app.visiui.WorkspaceUI.prototype.registerControl = function(object,control) {
     
     //make sure this is for us
     if(object.getWorkspace() !== this.workspace) {
@@ -105,6 +102,21 @@ visicomp.app.visiui.WorkspaceUI.prototype.registerControl = function(control) {
 	
     this.controlMap[key] = controlInfo;
     
+}
+
+/** This method registers a control. The parameter "parentContainer" is optional
+ * and is only needed if the object is a parent container. */
+visicomp.app.visiui.WorkspaceUI.prototype.addControlContainer = function(object,parentContainer) {
+    
+    //store the ui object
+	var key = this.getObjectKey(object);
+	
+    var controlInfo = this.controlMap[key];
+    if(!controlInfo) {
+		alert("Unknown error - control info not found: " + key);
+		return;
+	}
+	controlInfo.parentContainer = parentContainer;
 }
 	
 

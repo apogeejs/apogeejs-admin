@@ -16,7 +16,7 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
         throw visicomp.core.util.createError("Parent object not found: " + object.getFullName());
     }
     
-    this.workspaceUI.registerControl(this);
+    this.workspaceUI.registerControl(this.object,this);
     
     //--------------
     //create window
@@ -170,6 +170,23 @@ visicomp.app.visiui.Control.createEditCodeableDialogCallback = function(title, o
     
     return function() {
         visicomp.app.visiui.dialog.showUpdateCodeableDialog(instance.object,onSave,title,optionalEditorWrapper);
+    }
+}
+
+/** This method creates a callback for editing a standard codeable object
+ *  @private */
+visicomp.app.visiui.Control.prototype.createEditArgListDialogCallback = function() {
+	var instance = this;
+    
+    //create save handler
+    var onSave = function(argList) {
+        var editStatus = visicomp.core.updatemember.updateArgList(instance.object,argList);
+        var editComplete = instance.processEditResult(editStatus);
+        return editComplete;  
+    };
+    
+    return function() {
+        visicomp.app.visiui.dialog.showUpdateArgListDialog(instance.object,onSave);
     }
 }
 

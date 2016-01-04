@@ -25,15 +25,19 @@ visicomp.core.Child.getName = function() {
 /** This method returns the full name in dot notation for this object. */
 visicomp.core.Child.getFullName = function() {
 	if(this.parent) {
-		if(this.parent.isRoot) {
-			return this.name;
+		var name = this.parent.getFullName();
+
+		if(this.parent.isRootFolder()) {
+			//name += ":"; //no connector - included in root name
 		}
 		else {
-			return this.parent.getFullName() + "." + this.name;
+			name += ".";
 		}
+		name += this.name;
+		return name;
 	}
 	else {
-		return this.name;
+		return this.name + ":";
 	}
 }
 

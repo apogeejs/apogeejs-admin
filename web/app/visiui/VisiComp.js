@@ -350,6 +350,7 @@ visicomp.app.visiui.VisiComp.prototype.loadControlGenerators = function() {
 	this.registerStandardControl(visicomp.app.visiui.FolderControl.generator);
 	this.registerStandardControl(visicomp.app.visiui.TableControl.generator);
 	this.registerStandardControl(visicomp.app.visiui.FunctionControl.generator);
+    this.registerStandardControl(visicomp.app.visiui.WorksheetControl.generator);
 	
     //additional controls
     this.registerControl(visicomp.app.visiui.CustomResourceControl.generator);

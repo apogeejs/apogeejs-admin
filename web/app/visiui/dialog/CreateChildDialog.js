@@ -33,8 +33,8 @@ if(!workspaceUI) {
     var select = visicomp.visiui.createElement("select");
     line.appendChild(select);
     for(var key in controlMap) {
-		var object = controlMap[key].object;
-		if(object.getType() == "folder") { 
+		var controlInfo = controlMap[key];
+		if(controlInfo.parentContainer) { 
 			select.add(visicomp.visiui.createElement("option",{"text":key}));
 //			if(key == activeFolderKey) {
 //				select.value = key;
@@ -58,14 +58,14 @@ if(!workspaceUI) {
     
     var onCreate = function() {
 		var folderKey = select.value;
-        var folder = controlMap[folderKey].object;
+        var parentObject = controlMap[folderKey].object;
         var objectName = inputElement.value.trim();
         if(objectName.length == 0) {
             alert("The name is invalid");
             return;
         }
         
-        var result = onCreateFunction(workspaceUI,folder,objectName);
+        var result = onCreateFunction(workspaceUI,parentObject,objectName);
         
         if(result.success) {
             dialog.hide();
