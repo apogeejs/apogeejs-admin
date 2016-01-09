@@ -173,23 +173,6 @@ visicomp.app.visiui.Control.createEditCodeableDialogCallback = function(title, o
     }
 }
 
-/** This method creates a callback for editing a standard codeable object
- *  @private */
-visicomp.app.visiui.Control.prototype.createEditArgListDialogCallback = function() {
-	var instance = this;
-    
-    //create save handler
-    var onSave = function(argList) {
-        var editStatus = visicomp.core.updatemember.updateArgList(instance.object,argList);
-        var editComplete = instance.processEditResult(editStatus);
-        return editComplete;  
-    };
-    
-    return function() {
-        visicomp.app.visiui.dialog.showUpdateArgListDialog(instance.object,onSave);
-    }
-}
-
 /** This method creates a callback for deleting the control. 
  *  @private */
 visicomp.app.visiui.Control.createDeleteCallback = function(title) {

@@ -22,7 +22,7 @@ visicomp.core.createworksheet.createWorksheet = function(parent,name) {
 		var worksheet = new visicomp.core.Worksheet(workspace,name,parent);
         
         //do any updates to other objects because of the added obejct
-        workspace.updateForAddedVariable(worksheet.getExternalFolder());
+        workspace.updateForAddedVariable(worksheet);
         
 		//dispatch event
 		workspace.dispatchEvent(visicomp.core.createworksheet.WORKSHEET_CREATED_EVENT,worksheet);

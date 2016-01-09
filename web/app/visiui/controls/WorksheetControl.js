@@ -4,7 +4,7 @@ visicomp.app.visiui.WorksheetControl = function(workspaceUI,worksheet) {
     visicomp.app.visiui.Control.init.call(this,workspaceUI,worksheet,visicomp.app.visiui.WorksheetControl.generator);
     visicomp.app.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
     
-        //register this object as a parent container
+    //register this object as a parent container
     var internalFolder = worksheet.getInternalFolder();
     workspaceUI.registerControl(internalFolder,null);
     workspaceUI.addControlContainer(internalFolder,this);
@@ -26,13 +26,12 @@ visicomp.app.visiui.WorksheetControl.prototype.writeToJson = function(json) {
     
     var workspaceUI = this.getWorkspaceUI();
     
-	json.internalFolder = {};
+	json.argList = worksheet.getArgList();
+    json.returnValue = worksheet.getReturnValueString();
+
+    json.internalFolder = {};
     var internalFolder = worksheet.getInternalFolder();
 	workspaceUI.addChildrenToJson(internalFolder,json.internalFolder);
-
-    json.externalFolder = {};
-    var externalFolder = worksheet.getExternalFolder();
-	workspaceUI.addChildrenToJson(externalFolder,json.externalFolder);
 
 }
 
@@ -47,15 +46,15 @@ visicomp.app.visiui.WorksheetControl.prototype.updateFromJson = function(json,up
     
     //internal data
     var worksheet = this.getObject();
+    
+    worksheet.setArgList(json.argList);
+    worksheet.setReturnValueString(json.returnValueString);
+    
     if(json.internalFolder) {
         var internalFolder = worksheet.getInternalFolder();
         workspaceUI.createChildrenFromJson(internalFolder,json.internalFolder,updateDataList);
     }
     
-    if(json.externalFolder) {
-        var externalFolder = worksheet.getExternalFolder();
-        workspaceUI.createChildrenFromJson(externalFolder,json.externalFolder,updateDataList);
-    }
 }
 
 /** This method populates the frame for this control. 
@@ -66,8 +65,16 @@ visicomp.app.visiui.WorksheetControl.prototype.populateFrame = function() {
     
     var menuItemInfoList = this.getMenuItemInfoList();
     
-    //there should be one item - the delete item. Remove it because delete is not currently correct
-    menuItemInfoList.pop();
+    var itemInfo1 = {};
+    itemInfo1.title = "Edit&nbsp;Arg&nbsp;List";
+    itemInfo1.callback = this.createEditArgListDialogCallback();
+  
+    var itemInfo2 = {};
+    itemInfo2.title = "Edit&nbsp;Return&nbspValue";
+    itemInfo2.callback = this.createEditReturnValueDialogCallback();
+    
+    //add these at the start of the menu
+    menuItemInfoList.splice(0,0,itemInfo1,itemInfo2);
     
 //    //resize the editor on window size change
 //    var resizeCallback = function() {
@@ -78,6 +85,48 @@ visicomp.app.visiui.WorksheetControl.prototype.populateFrame = function() {
     //dummy size
 window.setSize(500,500);
 
+}
+
+/** This method creates a callback for editing a standard codeable object
+ *  @private */
+visicomp.app.visiui.WorksheetControl.prototype.createEditArgListDialogCallback = function() {
+    var worksheet = this.getObject();
+    
+    //create save handler
+    var onSave = function(argList) {
+        worksheet.setArgList(argList);
+        
+        var editComplete = true;
+        return editComplete;  
+    };
+    
+    return function() {
+        visicomp.app.visiui.dialog.showUpdateArgListDialog(worksheet,onSave);
+    }
+}
+
+/** This method creates a callback for editing a standard codeable object
+ *  @private */
+visicomp.app.visiui.WorksheetControl.prototype.createEditReturnValueDialogCallback = function() {
+    var worksheet = this.getObject();
+    
+    //create save handler
+    var onSave = function(returnValueString) {
+        
+        worksheet.setReturnValueString(returnValueString);
+        
+        var editComplete = true;       
+        return editComplete;  
+    };
+    
+    return function() {
+        visicomp.app.visiui.dialog.showUpdateWorksheetReturnDialog(worksheet,onSave);
+    }
+}
+
+/** This method updates the table data 
+ * @private */    
+visicomp.app.visiui.WorksheetControl.prototype.memberUpdated = function() {
 }
 
 //======================================
