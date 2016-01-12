@@ -16,7 +16,7 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
         throw visicomp.core.util.createError("Parent object not found: " + object.getFullName());
     }
     
-    this.workspaceUI.registerControl(this.object,this);
+    this.workspaceUI.registerMember(this.object,this);
     
     //--------------
     //create window

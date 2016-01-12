@@ -21,7 +21,7 @@ var rootFolder = workspace.getRootFolder();
 //    controlInfo.control = null; //no control object for the root
 //	
 //    this.controlMap[this.getObjectKey(rootFolder)] = controlInfo;
-this.registerControl(rootFolder,null);
+this.registerMember(rootFolder,null);
 this.addControlContainer(rootFolder,this)
 
 /////////////////////////////////////////////
@@ -79,9 +79,10 @@ visicomp.app.visiui.WorkspaceUI.prototype.getParentContainerObject = function(ob
     return parentControlInfo.parentContainer;
 }
 
-/** This method registers a control. The parameter "parentContainer" is optional
- * and is only needed if the object is a parent container. */
-visicomp.app.visiui.WorkspaceUI.prototype.registerControl = function(object,control) {
+/** This method registers a member data object and its optional control object.
+ * for each folder, and only folders at this point, the mehod addControlContainer
+ * should also be called to set the container for the children of this folder. */
+visicomp.app.visiui.WorkspaceUI.prototype.registerMember = function(object,control) {
     
     //make sure this is for us
     if(object.getWorkspace() !== this.workspace) {

@@ -6,7 +6,7 @@ visicomp.app.visiui.WorksheetControl = function(workspaceUI,worksheet) {
     
     //register this object as a parent container
     var internalFolder = worksheet.getInternalFolder();
-    workspaceUI.registerControl(internalFolder,null);
+    workspaceUI.registerMember(internalFolder,null);
     workspaceUI.addControlContainer(internalFolder,this);
 };
 
