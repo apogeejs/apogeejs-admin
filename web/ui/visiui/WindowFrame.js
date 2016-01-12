@@ -330,8 +330,8 @@ visicomp.visiui.WindowFrame.prototype.titleBarMouseDown = function(e) {
     
     if(this.parentContainer) {
         this.windowDragActive = true;
-        this.moveOffsetX = e.x - this.frame.offsetLeft;
-        this.moveOffsetY = e.y - this.frame.offsetTop;
+        this.moveOffsetX = e.clientX - this.frame.offsetLeft;
+        this.moveOffsetY = e.clientY - this.frame.offsetTop;
 		
         //add move events to the parent, since the mouse can leave this element during a move
         this.parentContainer.addEventListener("mousemove",this.moveOnMouseMove);
@@ -343,8 +343,8 @@ visicomp.visiui.WindowFrame.prototype.titleBarMouseDown = function(e) {
 /** Mouse m,ove handler for moving the window. */
 visicomp.visiui.WindowFrame.prototype.titleBarMouseMove = function(e) {
     if(!this.windowDragActive) return;
-    this.coordinateInfo.x = e.x - this.moveOffsetX;
-    this.coordinateInfo.y = e.y - this.moveOffsetY;
+    this.coordinateInfo.x = e.clientX - this.moveOffsetX;
+    this.coordinateInfo.y = e.clientY - this.moveOffsetY;
     this.updateCoordinates();
 }
 
@@ -367,21 +367,21 @@ visicomp.visiui.WindowFrame.prototype.frameMouseDown = function(e) {
 	if(flags) {
 		if(flags & visicomp.visiui.WindowFrame.RESIZE_EAST) {
 			this.resizeEastActive = true;
-			this.resizeOffsetWidth = e.x - this.frame.clientWidth;
+			this.resizeOffsetWidth = e.clientX - this.frame.clientWidth;
 		}
 		else if(flags & visicomp.visiui.WindowFrame.RESIZE_WEST) {
 			this.resizeWestActive = true;
-			this.resizeOffsetWidth = e.x + this.frame.clientWidth;
-			this.moveOffsetX = e.x - this.frame.offsetLeft;
+			this.resizeOffsetWidth = e.clientX + this.frame.clientWidth;
+			this.moveOffsetX = e.clientX - this.frame.offsetLeft;
 		}
 		if(flags & visicomp.visiui.WindowFrame.RESIZE_SOUTH) {
 			this.resizeSouthActive = true;
-			this.resizeOffsetHeight = e.y - this.frame.clientHeight;
+			this.resizeOffsetHeight = e.clientY - this.frame.clientHeight;
 		}
 		else if(flags & visicomp.visiui.WindowFrame.RESIZE_NORTH) {
 			this.resizeNorthActive = true;
-			this.resizeOffsetHeight = e.y + this.frame.clientHeight;
-			this.moveOffsetY = e.y - this.frame.offsetTop;
+			this.resizeOffsetHeight = e.clientY + this.frame.clientHeight;
+			this.moveOffsetY = e.clientY - this.frame.offsetTop;
 		}
 
         //add resize events to the parent, since the mouse can leave this element during a move
@@ -447,26 +447,26 @@ visicomp.visiui.WindowFrame.prototype.frameMouseMoveResize = function(e) {
     var newY;
     
 	if(this.resizeEastActive) {
-		newWidth = e.x - this.resizeOffsetWidth;
+		newWidth = e.clientX - this.resizeOffsetWidth;
 		if(newWidth < this.minWidth) return;
         this.coordinateInfo.width = newWidth;
 	}
 	else if(this.resizeWestActive) {
-		newWidth = this.resizeOffsetWidth - e.x;
+		newWidth = this.resizeOffsetWidth - e.clientX;
 		if(newWidth < this.minWidth) return;
-		newX = e.x - this.moveOffsetX;
+		newX = e.clientX - this.moveOffsetX;
         this.coordinateInfo.width = newWidth;
         this.coordinateInfo.x = newX;
 	}
 	if(this.resizeSouthActive) {
-		newHeight = e.y - this.resizeOffsetHeight;
+		newHeight = e.clientY - this.resizeOffsetHeight;
 		if(newHeight < this.minHeight) return;
 		this.coordinateInfo.height = newHeight;
 	}
 	else if(this.resizeNorthActive) {
-		newHeight = this.resizeOffsetHeight - e.y;
+		newHeight = this.resizeOffsetHeight - e.clientY;
 		if(newHeight < this.minHeight) return;
-		newY = e.y - this.moveOffsetY;
+		newY = e.clientY - this.moveOffsetY;
 		this.coordinateInfo.height = newHeight;
 		this.coordinateInfo.y = newY;
 	}
