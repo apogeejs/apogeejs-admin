@@ -38,9 +38,6 @@ visicomp.app.visiui.WorksheetControl.prototype.updateFromJson = function(json,up
     //internal data
     var worksheet = this.getObject();
     
-    worksheet.setArgList(json.argList);
-    worksheet.setReturnValueString(json.returnValueString);
-    
     if(json.internalFolder) {
         var internalFolder = worksheet.getInternalFolder();
         workspaceUI.createChildrenFromJson(internalFolder,json.internalFolder,updateDataList);
@@ -143,6 +140,18 @@ visicomp.app.visiui.WorksheetControl.createControl = function(workspaceUI,parent
     return returnValue;
 }
 
+visicomp.app.visiui.WorksheetControl.createControlFromJson = function(workspaceUI,member,controlData) {
+    var worksheetControl = new visicomp.app.visiui.WorksheetControl(workspaceUI,member);
+    if(controlData) {
+        worksheetControl.updateFromJson(controlData);
+        worksheetControl.memberUpdated();
+        if(controlData.children) {
+            var folder = member.getInternalFolder();
+            workspaceUI.loadFolderControlContentFromJson(folder,controlData.children);
+        }
+    }
+    return worksheetControl;
+}
 
 //======================================
 // This is the control generator, to register the control
@@ -152,4 +161,5 @@ visicomp.app.visiui.WorksheetControl.generator = {};
 visicomp.app.visiui.WorksheetControl.generator.displayName = "Worksheet";
 visicomp.app.visiui.WorksheetControl.generator.uniqueName = "visicomp.app.visiui.WorksheetControl";
 visicomp.app.visiui.WorksheetControl.generator.createControl = visicomp.app.visiui.WorksheetControl.createControl;
+visicomp.app.visiui.WorksheetControl.generator.createControlFromJson = visicomp.app.visiui.WorksheetControl.createControlFromJson;
 

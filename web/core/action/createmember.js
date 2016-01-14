@@ -25,8 +25,7 @@ visicomp.core.createmember.createMember = function(folder,json) {
         var workspace = folder.getWorkspace();
         var updateDataList = [];
         
-        var member = generator.createMember(workspace,json,updateDataList);
-		folder.addChild(member);
+        var member = generator.createMember(folder,json,updateDataList);
        
         //do data updates if needed
         if(updateDataList.length > 0) {

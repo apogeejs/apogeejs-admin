@@ -17,6 +17,10 @@ visicomp.core.Dependant.getDependsOn = function() {
     return this.dependsOnList;
 }
 
+/** This property tells if this object is a dependant.
+ * This property should not be implemented on non-dependants. */
+visicomp.core.Dependant.isDependant = true
+
 //===================================
 // Private Functions
 //===================================

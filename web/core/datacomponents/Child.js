@@ -6,13 +6,38 @@
  */
 visicomp.core.Child = {};
     
-/** This serves as the constructor for the child object, when extending it. */
-visicomp.core.Child.init = function(workspace,name,generator) {
-    this.workspace = workspace;
+/** This serves as the constructor for the child object, when extending it. 
+ * The parent should be the folder that holds this child. If this is a root folder,
+ * then the parent should instead be the object in which the object is the root folder
+ * whcih can be the workspace or an other child (such as a worksheet). */
+visicomp.core.Child.init = function(parent,name,generator) {
     this.name = name;
     this.generator = generator;
-    this.parent = null;
+    
+    //set the parent folder and the workspace
+    if(parent.isFolder) {
+        this.workspace = parent.getWorkspace();
+        this.parent = parent;
+        parent.addChild(this);
+    }
+    else if(parent.isChild) {
+        this.workspace = parent.getWorkspace();
+        this.parent = null;
+        this.baseName = parent.getFullName();
+    }
+    else if(parent.isWorkspace) {
+        this.workspace = parent;
+        this.parent = null;
+        this.baseName = parent.getName();
+    }
+    else {
+        throw visicomp.core.util.createError("Illegal parent: " + parent);
+    }
 }
+
+/** This property tells if this object is a child.
+ * This property should not be implemented on non-children. */
+visicomp.core.Child.isChild = true
 
 /** this method gets the name. */
 visicomp.core.Child.getName = function() {
@@ -31,7 +56,7 @@ visicomp.core.Child.getFullName = function() {
 		return name;
 	}
 	else {
-		return this.getBaseName() + ":";
+		return this.baseName + ":";
 	}
 }
 
@@ -39,16 +64,6 @@ visicomp.core.Child.getFullName = function() {
  * this value is null. */
 visicomp.core.Child.getParent = function() {
 	return this.parent;
-}
-
-/** This sets the parent for this folder.
- * @private*/
-visicomp.core.Child.setParent = function(parent) {
-	this.parent = parent;
-    if((parent != null)&&(parent.workspace != this.workspace)) {
-        //we might want to write code to change the child workspace, and that of it offspring. Or maybe not.
-        throw visicomp.core.util.createError("The chils and parent must be in the same workspace.");
-    }
 }
 
 /** this method gets the workspace. */

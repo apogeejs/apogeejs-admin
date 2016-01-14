@@ -1,10 +1,10 @@
 /** This is a function. */
-visicomp.core.FunctionTable = function(workspace,name,argList) {
+visicomp.core.FunctionTable = function(parent,name,argList) {
     //base init
-    visicomp.core.Child.init.call(this,workspace,name,visicomp.core.FunctionTable.generator);
+    visicomp.core.Impactor.init.call(this);
+    visicomp.core.Child.init.call(this,parent,name,visicomp.core.FunctionTable.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
-    visicomp.core.Impactor.init.call(this);
 	visicomp.core.Codeable.init.call(this,argList);
     visicomp.core.Recalculable.init.call(this);
     
@@ -27,9 +27,9 @@ visicomp.core.FunctionTable.prototype.processObjectFunction = function(objectFun
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.FunctionTable.fromJson = function(workspace,json,updateDataList) {
+visicomp.core.FunctionTable.fromJson = function(parent,json,updateDataList) {
     var initialArgList = [];
-    var functionTable = new visicomp.core.FunctionTable(workspace,json.name,initialArgList);
+    var functionTable = new visicomp.core.FunctionTable(parent,json.name,initialArgList);
     if(json.updateData) {
         json.updateData.member = functionTable;
         updateDataList.push(json.updateData);

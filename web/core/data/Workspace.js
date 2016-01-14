@@ -7,11 +7,14 @@ visicomp.core.Workspace = function(name) {
 
     //add the root folder
 	this.rootFolder = new visicomp.core.Folder(this,name);
-    this.rootFolder.setBaseName(name);
 }
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Workspace,visicomp.core.EventManager);
+
+/** This property tells if this object is a child.
+ * This property should not be implemented on non-children. \*/
+visicomp.core.Workspace.prototype.isWorkspace = true;
 
 /** this method gets the workspace name. */
 visicomp.core.Workspace.prototype.getName = function() {
@@ -84,7 +87,6 @@ visicomp.core.Workspace.fromJson = function(json) {
 	//recreate the root folder
 	var updateDataList = [];
     workspace.rootFolder = visicomp.core.Folder.fromJson(workspace,json.data,updateDataList);
-    workspace.rootFolder.setBaseName(workspace.getName());
     
     //set the data on all the objects
     var result;

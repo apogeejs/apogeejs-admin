@@ -16,6 +16,10 @@ visicomp.core.Codeable.init = function(argList) {
     this.clearCode();
 }
 
+/** This property tells if this object is a codeable.
+ * This property should not be implemented on non-codeables. */
+visicomp.core.Codeable.isCodeable = true
+
 /** This method returns the argument list.  */
 visicomp.core.Codeable.getArgList = function() {
     return this.argList;

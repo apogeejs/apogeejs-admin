@@ -1,10 +1,10 @@
 /** This class encapsulatees a data table */
-visicomp.core.Resource = function(workspace,name,resourceProcessor) {
+visicomp.core.Resource = function(parent,name,resourceProcessor) {
     //base init
-    visicomp.core.Child.init.call(this,workspace,name,visicomp.core.Resource.generator);
+    visicomp.core.Impactor.init.call(this);
+    visicomp.core.Child.init.call(this,parent,name,visicomp.core.Resource.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
-    visicomp.core.Impactor.init.call(this);
 	visicomp.core.Codeable.init.call(this,["resourceProcessor"]);
     
     this.resourceProcessor = resourceProcessor;
@@ -37,12 +37,12 @@ visicomp.core.Resource.prototype.processObjectFunction = function(objectFunction
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.Resource.fromJson = function(workspace,json,updateDataList) {
+visicomp.core.Resource.fromJson = function(parent,json,updateDataList) {
     
     throw new visicomp.core.util.createError("From JSON not implemented for resource processer");
     var resourceProcesros = null;
     
-    var resource = visicomp.core.Resource(workspace,json.name,resourceProcessor);
+    var resource = visicomp.core.Resource(parent,json.name,resourceProcessor);
     return resource;
 
 }
