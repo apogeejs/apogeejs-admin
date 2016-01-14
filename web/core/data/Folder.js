@@ -95,8 +95,6 @@ visicomp.core.Folder.prototype.removeChild = function(child) {
     var name = child.getName();
     delete(this.childMap[name]);
     delete(this.dataMap[name]);
-	
-    child.setParent(null);
     
     //set all children as dependents
     this.calculateDependents();
