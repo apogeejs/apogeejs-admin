@@ -225,7 +225,7 @@ visicomp.core.Worksheet.prototype.loadInputElements = function(rootFolder) {
     var argMembers = [];
     for(var i = 0; i < this.argList.length; i++) {
         var argName = this.argList[i];
-        var argMember = rootFolder.lookupChildFromPath(argName);
+        var argMember = rootFolder.lookupChild(argName);
         argMembers.push(argMember);
     }
     return argMembers;
@@ -234,7 +234,7 @@ visicomp.core.Worksheet.prototype.loadInputElements = function(rootFolder) {
 /** This method gets the output member from the virtual workspace.  */
 visicomp.core.Worksheet.prototype.loadOutputElement = function(rootFolder) {
     if((this.returnValueString != null)&&(this.returnValueString.length > 0)) {
-        var member = rootFolder.lookupChildFromPath(this.returnValueString);
+        var member = rootFolder.lookupChild(this.returnValueString);
         return member.getData();
     }
     else {
