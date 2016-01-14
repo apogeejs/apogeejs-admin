@@ -1,5 +1,7 @@
-/** This class manages the user interface for a workspace object. */
-visicomp.app.visiui.WorkspaceUI = function(app,workspace,tab) {
+/** This class manages the user interface for a workspace object. The argument
+ * uiInitData is optional and should be included if the workspace is not empty. It
+ * contains the information of how to create controls for the workspace data. */
+visicomp.app.visiui.WorkspaceUI = function(app,tab) {
 //note - this is not the correct event manager
 var wrongEventManager = app;
     visicomp.app.visiui.ParentContainer.init.call(this,tab,wrongEventManager);
@@ -9,41 +11,29 @@ var wrongEventManager = app;
     this.tab = tab;
     this.controlMap = {};
     this.activeFolderName = null;
-    this.workspace = workspace;
-	
+   
     this.jsLinkArray = [];
     this.cssLinkArray = [];
-    
-/////////////////////////////////////////////
-var rootFolder = workspace.getRootFolder();
-//var controlInfo = {};
-//	controlInfo.object = rootFolder;
-//    controlInfo.control = null; //no control object for the root
-//	
-//    this.controlMap[this.getObjectKey(rootFolder)] = controlInfo;
-this.registerMember(rootFolder,null);
-this.addControlContainer(rootFolder,this)
-
-/////////////////////////////////////////////
-	
-    //listeners
-    var instance = this;
-    
-    //add a member updated listener
-    var memberUpdatedCallback = function(memberObject) {
-        instance.memberUpdated(memberObject);
-    }
-    workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, memberUpdatedCallback);
-	
-	//add child deleted listener
-    var childDeletedListener = function(fullName) {
-        instance.childDeleted(fullName);
-    }
-    this.workspace.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
 }
+    
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.app.visiui.WorkspaceUI,visicomp.app.visiui.ParentContainer);
+
+visicomp.app.visiui.WorkspaceUI.prototype.loadWorkspace = function(workspaceJson) {
+    var workspaceDataJson = workspaceJson.workspace;
+    var workspaceControlsJson = workspaceJson.controls;
+    
+    var workspace = visicomp.core.Workspace.fromJson(workspaceDataJson);
+    
+    this.setWorkspace(workspace,workspaceControlsJson);
+}
+
+visicomp.app.visiui.WorkspaceUI.prototype.loadNewWorkspace = function(name) {
+    var workspace = new visicomp.core.Workspace(name);
+    
+    this.setWorkspace(workspace);
+}
 
 /** This method responds to a "new" menu event. */
 visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
@@ -156,6 +146,10 @@ visicomp.app.visiui.WorkspaceUI.prototype.getObjectKey = function(object) {
 	return object.getFullName();
 }
 
+//====================================
+// open and save methods
+//====================================
+
 visicomp.app.visiui.WorkspaceUI.prototype.toJson = function() {
     var json = {};
     json.name = this.workspace.getName();
@@ -163,101 +157,18 @@ visicomp.app.visiui.WorkspaceUI.prototype.toJson = function() {
     
     json.jsLinks = this.jsLinkArray;
     json.cssLinks = this.cssLinkArray;
-	
-//we need to wait for these to load!
     
-    //controls
-    json.data = {};
+    json.workspace = this.workspace.toJson();
+    
     var rootFolder = this.workspace.getRootFolder();
-	this.addChildrenToJson(rootFolder,json.data);
+    json.controls = this.getFolderControlContentJson(rootFolder);
     
     return json;
 }
 
-
-/** This is used for saving the workspace. */
-visicomp.app.visiui.WorkspaceUI.fromJson = function(app, json) {
-    var name = json.name;
-    var fileType = json.fileType;
-	if((fileType !== "visicomp workspace")||(!name)) {
-		return {"success":false,"msg":"Bad file format."};
-	}
-    
-    //create the workspace
-    var returnValue = app.createWorkspace(name);
-    if(!returnValue.success) {
-        return returnValue;
-    }
-    
-    var workspaceUI = returnValue.workspaceUI;
-	var workspace = returnValue.workspace;
-    
-    //add links
-    var linksAdded = false;
-    if((json.jsLinks)&&(json.jsLinks.length > 0)) {
-        workspaceUI.setJsLinks(json.jsLinks);
-        linksAdded = true;
-    }
-    if((json.cssLinks)&&(json.cssLinks.length > 0)) {
-        workspaceUI.setCssLinks(json.cssLinks);
-        linksAdded = true;
-    }
-	
-//this is how we will wait to load links if there are any for now
-if(linksAdded) {
-    var timerFunction = function() {
-        visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson(workspaceUI,workspace,json);
-    }
-    setTimeout(timerFunction,2000);
-    return {"success":true};
-}
-else {
-    return visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson(workspaceUI,workspace,json);
-}
-    
-}
-
-/** This is used for saving the workspace. */
-visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson = function(workspaceUI,workspace,json) {
-	
-	//create children
-	var rootFolder = workspace.getRootFolder();
-	var childrenJson = json.data;
-	var updateDataList = [];
-	
-	workspaceUI.createChildrenFromJson(rootFolder,childrenJson,updateDataList)
-    
-    //set the data on all the objects
-    var result;
-    if(updateDataList.length > 0) {
-        result = visicomp.core.updatemember.updateObjects(updateDataList);
-            
-        if(!result.success) {
-            return result;
-        }
-    }
-    
-//figure out a better return
-	return {"success":true};
-}
-
-/** This serializes the child controls for this fodler. */
-visicomp.app.visiui.WorkspaceUI.prototype.createChildrenFromJson = function(parentFolder,json,updateDataList) {
-	for(var key in json) {
-		var childJson = json[key];
-        var type = childJson.type;
-        var controlGenerator = this.app.getControlGenerator(type);
-        if(!controlGenerator) {
-            throw visicomp.core.util.createError("Control definition not found: " + type);
-        }
-        visicomp.app.visiui.Control.createfromJson(this,parentFolder,controlGenerator,childJson,updateDataList);
-	}
-}
-
-/** This serializes the child controls for this fodler. */
-visicomp.app.visiui.WorkspaceUI.prototype.addChildrenToJson = function(folder,json) {
-	
-	var childMap = folder.getChildMap();
+visicomp.app.visiui.WorkspaceUI.prototype.getFolderControlContentJson = function(folder) {
+    var json = {};
+    var childMap = folder.getChildMap();
 	for(var key in childMap) {
 		var child = childMap[key];
         
@@ -266,9 +177,159 @@ visicomp.app.visiui.WorkspaceUI.prototype.addChildrenToJson = function(folder,js
 		
 		//get the control for this child
 		var name = child.getName();
-		json[name] = childControl.toJson(this);
+		json[name] = childControl.toJson();
+	}
+    return json;
+}
+
+
+///** This is used for saving the workspace. */
+//visicomp.app.visiui.WorkspaceUI.fromJson = function(app, json) {
+//    //check file
+//    var name = json.name;
+//    var fileType = json.fileType;
+//	if((fileType !== "visicomp workspace")||(!name)) {
+//		return {"success":false,"msg":"Bad file format."};
+//	}
+//    
+//    //create the workspace
+//    var returnValue = app.createWorkspace(name);
+//    if(!returnValue.success) {
+//        return returnValue;
+//    }
+//    
+//    var workspaceUI = returnValue.workspaceUI;
+//	var workspace = returnValue.workspace;
+//    
+//}
+
+///** This is used for saving the workspace. */
+//visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson = function(workspaceUI,workspace,json) {
+//
+//    var workspace = visicomp.core.Workspace.fromJson(json);
+//
+////what am I doing? ;
+//
+//    var controlInfoMap = json.ui;
+//    
+//    //construc the ui elements as the workspace members are created
+//    var onMemberCreated = function(member) {
+//        var control = null;
+//        
+//        var controlInfo = controlInfoMap[member.getFullName()];
+//        if(controlInfo) {
+//            control = visicomp.app.visiui.WorkspaceUI.createControl(workspaceUI,member,controlInfo);
+//        }
+//        
+//        workspaceUI.registerMember(member,control);
+//    }
+//    workspace.addListener(visicomp.core.createmember.MEMBER_CREATED_EVENT,onMemberCreated);
+//    workspace.loadFromJson(json.workspace);
+//    
+//	
+//	//create children
+//	var rootFolder = workspace.getRootFolder();
+//	var childrenJson = json.data;
+//	var updateDataList = [];
+//	
+//	workspaceUI.createChildrenFromJson(rootFolder,childrenJson,updateDataList)
+//    
+//    //set the data on all the objects
+//    var result;
+//    if(updateDataList.length > 0) {
+//        result = visicomp.core.updatemember.updateObjects(updateDataList);
+//            
+//        if(!result.success) {
+//            return result;
+//        }
+//    }
+//    
+////figure out a better return
+//	return {"success":true};
+//}
+
+///** This serializes the child controls for this fodler. */
+//visicomp.app.visiui.WorkspaceUI.prototype.createChildrenFromJson = function(parentFolder,json,updateDataList) {
+//	for(var key in json) {
+//		var childJson = json[key];
+//        var type = childJson.type;
+//        var controlGenerator = this.app.getControlGenerator(type);
+//        if(!controlGenerator) {
+//            throw visicomp.core.util.createError("Control definition not found: " + type);
+//        }
+//        visicomp.app.visiui.Control.createfromJson(this,parentFolder,controlGenerator,childJson,updateDataList);
+//	}
+//}
+//
+///** This serializes the child controls for this fodler. */
+//visicomp.app.visiui.WorkspaceUI.prototype.addChildrenToJson = function(folder,json) {
+//	
+//	var childMap = folder.getChildMap();
+//	for(var key in childMap) {
+//		var child = childMap[key];
+//        
+//		//get the object map for the workspace
+//		var childControl = this.getControl(child);
+//		
+//		//get the control for this child
+//		var name = child.getName();
+//		json[name] = childControl.toJson(this);
+//	}
+//}
+
+
+ /** This method responds to a "new" menu event. 
+  * @private */
+visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace,workspaceControlsJson) {   
+    
+    this.workspace = workspace;
+	
+    //listeners
+    var instance = this;
+    
+    //add a member updated listener
+    var memberUpdatedCallback = function(memberObject) {
+        instance.memberUpdated(memberObject);
+    }
+    workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, memberUpdatedCallback);
+	
+	//add child deleted listener
+    var childDeletedListener = function(fullName) {
+        instance.childDeleted(fullName);
+    }
+    this.workspace.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
+    
+    //set up root folder
+    var rootFolder = workspace.getRootFolder();
+    this.registerMember(rootFolder,null);
+    this.addControlContainer(rootFolder,this)
+    
+    //oad contrtols from json if present
+    if(workspaceControlsJson) {
+        this.loadFolderControlContentFromJson(rootFolder,workspaceControlsJson);
+    }
+    
+}
+
+visicomp.app.visiui.WorkspaceUI.prototype.loadFolderControlContentFromJson = function(folder,json) {
+	for(var key in json) {
+		var childJson = json[key];
+		var childMember = folder.lookupChild(key);	
+		this.loadControlFromJson(childMember,childJson);
 	}
 }
+
+visicomp.app.visiui.WorkspaceUI.prototype.loadControlFromJson = function(member,json) {
+    var controlType = json.type;
+    var generator = this.app.getControlGenerator(controlType);
+	if(generator) {
+        generator.createControlFromJson(this,member,json);
+    }
+    else {
+        throw visicomp.core.util.createError("Control type not found: " + controlType);
+    }
+}
+
 
 //========================================
 // Links
@@ -336,4 +397,4 @@ visicomp.app.visiui.WorkspaceUI.prototype.createLinkAddRemoveList = function(lin
 		}
 	}
 }
-
+    

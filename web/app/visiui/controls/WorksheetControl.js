@@ -21,18 +21,9 @@ visicomp.core.util.mixin(visicomp.app.visiui.WorksheetControl,visicomp.app.visiu
 /** This serializes the worksheet control. */
 visicomp.app.visiui.WorksheetControl.prototype.writeToJson = function(json) {
     var worksheet = this.getObject();
-    json.name = worksheet.getName();
-    json.type = visicomp.app.visiui.WorksheetControl.generator.uniqueName;
-    
-    var workspaceUI = this.getWorkspaceUI();
-    
-	json.argList = worksheet.getArgList();
-    json.returnValue = worksheet.getReturnValueString();
-
-    json.internalFolder = {};
     var internalFolder = worksheet.getInternalFolder();
-	workspaceUI.addChildrenToJson(internalFolder,json.internalFolder);
-
+    var workspaceUI = this.getWorkspaceUI();
+    json.children = workspaceUI.getFolderControlContentJson(internalFolder);
 }
 
 /** This method deseriliazes any data needed after the control is instantiated.
@@ -135,9 +126,14 @@ visicomp.app.visiui.WorksheetControl.prototype.memberUpdated = function() {
 
 //add table listener
 visicomp.app.visiui.WorksheetControl.createControl = function(workspaceUI,parent,name) {
-    var returnValue = visicomp.core.createworksheet.createWorksheet(parent,name);
+    
+    var json = {};
+    json.name = name;
+    json.type = visicomp.core.Worksheet.generator.type;
+    var returnValue = visicomp.core.createmember.createMember(parent,json);
+    
     if(returnValue.success) {
-        var worksheet = returnValue.worksheet;
+        var worksheet = returnValue.member;
         var worksheetControl = new visicomp.app.visiui.WorksheetControl(workspaceUI,worksheet);
         returnValue.control = worksheetControl;
     }

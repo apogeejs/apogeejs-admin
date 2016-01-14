@@ -1,7 +1,5 @@
-/** This mixin encapsulates an object that holds data. The data is held in the 
- * folder data hierarchy that mirrors the folder object hierarchy. Objects
- * that are dependats my only depend on objects that are data holders (so that 
- * there is something to depend on.) 
+/** This component encapsulates an object that holds data. The data is the object
+ * that is accessed when the user calls the child name from the code.
  * 
  * The DataHolder must be a child.
  * 
@@ -33,35 +31,28 @@ visicomp.core.Child.getData = function() {
  * code which is identified by this name, for example the JSON object associated
  * with a table. Besides hold the data object, this updates the parent data map. */
 visicomp.core.DataHolder.setData = function(data) {
-    return this.internalSetData(data,false,null);
+    this.internalSetData(data,false,null);
 }
 
 /** This method sets the error flag for this data holder, and it sets an error
  * message. The error is cleared by setting valid data. */
 visicomp.core.DataHolder.setError = function(msg) {
-    return this.internalSetData(null,true,msg);
+    this.internalSetData(null,true,msg);
 }
 
 visicomp.core.DataHolder.internalSetData = function(data,hasError,errorMsg) {
-    var editStatus = visicomp.core.util.createEditStatus();
-    editStatus.saveStarted = true;
     
     this.data = data;
     this.error = hasError;
     this.errorMsg = errorMsg;
     
     //data the data map in the parent if it is a hierarchy container 
-    if((this.parent)&&(this.parent.getType() == "folder")) {
+    if((this.parent)&&(this.parent.getType() == visicomp.core.Folder.generator.type)) {
         this.parent.updateData(this);
     }
     
-    editStatus.saveCompleted = true;
-    editStatus.success = true;
-    
     //fire an update event
     visicomp.core.updatemember.fireUpdatedEvent(this);
-    
-    return editStatus;
 }
 
 /** This method returns true if there is an error for this table, 

@@ -1,7 +1,7 @@
 /** This is a function. */
 visicomp.core.FunctionTable = function(workspace,name,argList) {
     //base init
-    visicomp.core.Child.init.call(this,workspace,name,"function");
+    visicomp.core.Child.init.call(this,workspace,name,visicomp.core.FunctionTable.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
     visicomp.core.Impactor.init.call(this);
@@ -9,7 +9,7 @@ visicomp.core.FunctionTable = function(workspace,name,argList) {
     visicomp.core.Recalculable.init.call(this);
     
     //set to an empty function
-    this.setData(function(){});
+    //this.setData(function(){});
 }
 
 //add components to this class
@@ -24,3 +24,27 @@ visicomp.core.FunctionTable.prototype.processObjectFunction = function(objectFun
     //tjhe data is the function
 	this.setData(objectFunction);
 }
+
+/** This method creates a child from a json. It should be implemented as a static
+ * method in a non-abstract class. */ 
+visicomp.core.FunctionTable.fromJson = function(workspace,json,updateDataList) {
+    var initialArgList = [];
+    var functionTable = new visicomp.core.FunctionTable(workspace,json.name,initialArgList);
+    if(json.updateData) {
+        json.updateData.member = functionTable;
+        updateDataList.push(json.updateData);
+    }
+    return functionTable;
+}
+
+//============================
+// Static methods
+//============================
+
+visicomp.core.FunctionTable.generator = {};
+visicomp.core.FunctionTable.generator.displayName = "Function";
+visicomp.core.FunctionTable.generator.type = "visicomp.core.FunctionTable";
+visicomp.core.FunctionTable.generator.createMember = visicomp.core.FunctionTable.fromJson;
+
+//register this member
+visicomp.core.Workspace.addMemberGenerator(visicomp.core.FunctionTable.generator);

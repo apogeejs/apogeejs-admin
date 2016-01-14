@@ -1,7 +1,7 @@
 /** This is a folder. */
 visicomp.core.Folder = function(workspace,name) {
     //base init
-    visicomp.core.Child.init.call(this,workspace,name,"folder");
+    visicomp.core.Child.init.call(this,workspace,name,visicomp.core.Folder.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
     visicomp.core.Impactor.init.call(this);
@@ -9,6 +9,8 @@ visicomp.core.Folder = function(workspace,name) {
     //this holds the base objects, mapped by name
     this.childMap = {};
     this.dataMap = {};
+    
+    this.baseName = null;
     
     //this only needs to be set once since we do not update it
     this.setData(this.dataMap);
@@ -24,6 +26,16 @@ visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Impactor);
 visicomp.core.Folder.prototype.isRootFolder = function() {
     //undefined may be OK too. If there is populated object this is no root.
     return (this.parent == null); 
+}
+
+/** The base name should be set only for root folders. */
+visicomp.core.Folder.prototype.setBaseName = function(baseName) {
+    this.baseName = baseName;
+}
+
+/** The base name should be set only for root folders. */
+visicomp.core.Folder.prototype.getBaseName = function() {
+    return this.baseName;
 }
 
 /** this method gets the table map. */
@@ -48,7 +60,7 @@ visicomp.core.Folder.prototype.lookupChild = function(name) {
  * it is assumed the path refers to a field inside this object. */
 visicomp.core.Folder.prototype.lookupChildFromPath = function(path) {
 	var object = this;
-	for(var i = 0; ((i < path.length)&&(object.getType() == "folder")); i++) {
+	for(var i = 0; ((i < path.length)&&(object.getType() == visicomp.core.Folder.generator.type)); i++) {
 		object = object.lookupChild(path[i]);
 	}
     return object;
@@ -128,6 +140,42 @@ visicomp.core.Folder.prototype.updateForDeletedVariable = function(object) {
     }
 }
 
+/** This method creates a child from a json. It should be implemented as a static
+ * method in a non-abstract class. */ 
+visicomp.core.Folder.fromJson = function(workspace,json,updateDataList) {
+    var folder = new visicomp.core.Folder(workspace,json.name);
+    
+    for(var key in json.children) {
+        var childJson = json.children[key];
+        var childGenerator = visicomp.core.Workspace.getMemberGenerator(childJson.type);
+        if(childGenerator) {
+            var child = childGenerator.createMember(workspace,childJson,updateDataList);
+            folder.addChild(child);
+        }
+        else {
+            throw visicomp.core.util.createError("Member type not found: " + childJson.type);
+        }
+        
+    }
+    
+    return folder;
+}
+
+//===================================
+// Protected Functions
+//===================================
+
+/** This method adds any additional data to the json saved for this child. 
+ * @protected */
+visicomp.core.Folder.prototype.addToJson = function(json) {
+	json.children = {};
+    
+    for(var key in this.childMap) {
+        var child = this.childMap[key];
+        json.children[key] = child.toJson();
+    }
+}
+
 //============================
 // Private methods
 //============================
@@ -144,3 +192,15 @@ visicomp.core.Folder.prototype.calculateDependents = function() {
     }
     this.updateDependencies(newDependsOn);
 }
+
+//============================
+// Static methods
+//============================
+
+visicomp.core.Folder.generator = {};
+visicomp.core.Folder.generator.displayName = "Folder";
+visicomp.core.Folder.generator.type = "visicomp.core.Folder";
+visicomp.core.Folder.generator.createMember = visicomp.core.Folder.fromJson;
+
+//register this member
+visicomp.core.Workspace.addMemberGenerator(visicomp.core.Folder.generator);

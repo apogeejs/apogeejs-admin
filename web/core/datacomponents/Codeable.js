@@ -21,55 +21,6 @@ visicomp.core.Codeable.getArgList = function() {
     return this.argList;
 }
 
-/** This method sets the argument list, which should be an array of strings.  */
-visicomp.core.Codeable.setArgList = function(argList) {
-    var editStatus = visicomp.core.util.createEditStatus();
-    
-    //process the user code
-    var processedCodeData = {};
-    try {
-        this.processCode(argList,this.functionBody,this.supplementalCode,processedCodeData,editStatus);
-        
-        if(!editStatus.success) {
-            return editStatus;
-        }
-    }
-    catch(unknownError) {
-        editStatus.success = false;
-        editStatus.msg = unknownError.message;
-        editStatus.errorType = "Unknown";
-        return editStatus;
-    }
-    
-    //set data
-    try {
-        editStatus.saveStarted = true;
-        
-        this.argList = argList;
-
-        this.varInfo = processedCodeData.varInfo;
-
-        this.contextSetter = processedCodeData.contextSetter;
-        this.objectFunction = processedCodeData.objectFunction;
-
-        //update dependencies
-        this.updateDependencies(processedCodeData.dependencyList);
-        
-        editStatus.saveCompleted = true;
-    }
-    catch(unknownError) {
-        editStatus.success = false;
-        editStatus.msg = unknownError.message;
-        editStatus.errorType = "Unknown";
-        return editStatus;
-    }
-    
-    //fire an update event
-    visicomp.core.updatemember.fireUpdatedEvent(this);
-    
-    return editStatus;
-}
-
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.getFunctionBody = function() {
     return this.functionBody;
@@ -81,50 +32,22 @@ visicomp.core.Codeable.getSupplementalCode = function() {
 }
 
 /** This method returns the formula for this member.  */
-visicomp.core.Codeable.setCode = function(functionBody, supplementalCode) {
-    var editStatus = visicomp.core.util.createEditStatus();
-    
-    //process the user code
-    var processedCodeData = {};
-    try {
-        this.processCode(this.argList,functionBody,supplementalCode,processedCodeData,editStatus);
-        
-        if(!editStatus.success) {
-            return editStatus;
-        }
-    }
-    catch(unknownError) {
-        editStatus.success = false;
-        editStatus.msg = unknownError.message;
-        editStatus.errorType = "Unknown";
-        return editStatus;
-    }
-    
-    //set data
-    try {
-        editStatus.saveStarted = true;
-        
-        this.functionBody = functionBody;
-        this.supplementalCode = supplementalCode;
+visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
 
-        this.varInfo = processedCodeData.varInfo;
+        //set the base data
+        this.argList = codeInfo.argList;
+        this.functionBody = codeInfo.functionBody;
+        this.supplementalCode = codeInfo.supplementalCode;
 
-        this.contextSetter = processedCodeData.contextSetter;
-        this.objectFunction = processedCodeData.objectFunction;
+        //save the variables accessed
+        this.varInfo = codeInfo.varInfo;
+
+        //save the object functions
+        this.contextSetter = codeInfo.contextSetter;
+        this.objectFunction = codeInfo.objectFunction;
 
         //update dependencies
-        this.updateDependencies(processedCodeData.dependencyList);
-        
-        editStatus.saveCompleted = true;
-    }
-    catch(unknownError) {
-        editStatus.success = false;
-        editStatus.msg = unknownError.message;
-        editStatus.errorType = "Unknown";
-        return editStatus;
-    }
-    
-    return editStatus;
+        this.updateDependencies(codeInfo.dependencyList);
 }
 
 /** This method udpates the dependencies if needed because
@@ -195,6 +118,25 @@ visicomp.core.Codeable.execute = function() {
 }
 
 //===================================
+// Protected Functions
+//===================================
+
+/** This gets an update structure to upsate a newly instantiated child
+/* to match the current object. */
+visicomp.core.Codeable.getUpdateData = function() {
+    var updateData = {};
+    if(this.hasCode()) {
+        updateData.argList = this.getArgList();
+        updateData.functionBody = this.getFunctionBody();
+        updateData.supplementalCode = this.getSupplementalCode();
+    }
+    else {
+        updateData.data = this.getData();
+    }
+    return updateData;
+}
+
+//===================================
 // Private Functions
 //===================================
 
@@ -202,96 +144,6 @@ visicomp.core.Codeable.execute = function() {
 //This method takes the object function generated from code and processes it
 //to set the data for the object. (protected)
 //visicomp.core.Codeable.processObjectFunction 
-
-/** This method analyzes the code and creates the object function and dependencies. 
- * The results are loaded into the passed object processedCodeData.
- * @private */
-visicomp.core.Codeable.processCode = function(argList,functionBody,supplementalCode,processedCodeData,editStatus) {
-    
-    //analyze the code
-    var combinedFunctionBody = this.createCombinedFunctionBody(argList, functionBody, supplementalCode);
-    var varInfo;
-    try {
-        varInfo = visicomp.core.codeAnalysis.analyzeCode(combinedFunctionBody);
-    }
-    catch(parsingError) {
-        editStatus.success = false;
-        editStatus.msg = parsingError.message;
-        editStatus.errorType = "Parsing";
-        return editStatus;
-    }
-    //create the object function and context setter
-    this.createObjectFunction(varInfo, combinedFunctionBody, processedCodeData);
-    
-    //calculate dependencies
-	var dependencyList = visicomp.core.memberDependencies.getDependencyInfo(varInfo,this.getParent(),this.getRootFolder());
-    
-    processedCodeData.varInfo = varInfo;
-    processedCodeData.dependencyList = dependencyList;
-    
-    editStatus.success = true;
-    return editStatus;
-    
-}
-
-
-/** This method creates the user code object function body. 
- * @private */
-visicomp.core.Codeable.createCombinedFunctionBody = function(argList, functionBody, supplementalCode) {
-    
-    var memberFullName = this.getFullName();
-    var argListString = argList.join(","); 
-    
-    //create the code body
-    var combinedFunctionBody = visicomp.core.util.formatString(
-        visicomp.core.Codeable.OBJECT_FUNCTION_FORMAT_TEXT,
-		memberFullName,
-        argListString,
-        functionBody,
-        supplementalCode
-    );
-        
-    return combinedFunctionBody;
-}
-
-/** This method creates the wrapped user code object function, including the context variables. 
- * @private */
-visicomp.core.Codeable.createObjectFunction = function(varInfo, combinedFunctionBody, processedCodeData) {
-    
-    var contextDeclarationText = "";
-    var contextSetterBody = "";
-    
-    //set the context - here we only defined the variables that are actually used.
-	for(var baseName in varInfo) {
-        
-        var baseNameInfo = varInfo[baseName];
-        
-        //do not add context variable for local or "returnValue", which is explicitly defined
-        if((baseName === "returnValue")||(baseNameInfo.isLocal)) continue;
-        
-        //add a declaration
-        contextDeclarationText += "var " + baseName + ";\n";
-        
-        //add to the context setter
-        contextSetterBody += baseName + ' = visicomp.core.Codeable.loadFromContext(listOfContexts,"' + baseName + '");\n';
-    }
-    
-    //create the generator for the object function
-    var generatorBody = visicomp.core.util.formatString(
-        visicomp.core.Codeable.GENERATOR_FUNCTION_FORMAT_TEXT,
-		contextDeclarationText,
-        contextSetterBody,
-        combinedFunctionBody
-    );
-    var generatorFunction = new Function(generatorBody);
-    
-    //return the output of the generator - the object function and the context setter
-    var generatorOutput = generatorFunction();
-
-    //save the output to the processed data struct
-    processedCodeData.contextSetter = generatorOutput.contextSetter;
-    processedCodeData.objectFunction = generatorOutput.objectFunction;
-}
 
 /** This method returns a value by name from a list of contexts. 
  * @private */
@@ -325,50 +177,3 @@ visicomp.core.Codeable.recalculateDependencies = function() {
         this.execute();
     }
 }
-
-/** This is the format string to create the code body for the object function
- * Input indices:
- * 0: unique member name
- * 1: function argument list with parentheses
- * 2: member formula text
- * 3: supplemental code text
- * @private
- */
-visicomp.core.Codeable.OBJECT_FUNCTION_FORMAT_TEXT = [
-"//{0}",
-"",
-"//supplemental code",
-"{3}",
-"//end supplemental code",
-"",
-"//member function",
-"returnValue.objectFunction = function({1}) {",
-"{2}",
-"}",
-"//end member function",
-""
-   ].join("\n");
-   
-/** This is the format string to create the code body for the object function
- * Input indices:
- * 0: context declaration text
- * 1: context setter body
- * 2: object function body
- * @private
- */
-visicomp.core.Codeable.GENERATOR_FUNCTION_FORMAT_TEXT = [
-"//declare context variables",
-"{0}",
-"",
-"var returnValue = {};",
-"//context setter",
-"returnValue.contextSetter = function(listOfContexts) {",
-"{1}",
-"};",
-"",
-"//user code",
-"{2}",
-"",
-"return returnValue;"
-   ].join("\n");
-

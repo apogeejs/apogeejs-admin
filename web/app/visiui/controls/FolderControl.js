@@ -19,29 +19,25 @@ visicomp.core.util.mixin(visicomp.app.visiui.FolderControl,visicomp.app.visiui.P
 /** This serializes the table control. */
 visicomp.app.visiui.FolderControl.prototype.writeToJson = function(json) {
     var folder = this.getObject();
-    json.name = folder.getName();
-    json.type = visicomp.app.visiui.FolderControl.generator.uniqueName;
-	json.children = {};
-    
     var workspaceUI = this.getWorkspaceUI();
-	workspaceUI.addChildrenToJson(folder,json.children);
+    json.children = workspaceUI.getFolderControlContentJson(folder);
 }
 
-/** This method deseriliazes any data needed after the control is instantiated.
- * objects that extend Control should override this for any data that is
- * needed, however they should call this base function first. */
-visicomp.app.visiui.FolderControl.prototype.updateFromJson = function(json,updateDataList) {
-    var workspaceUI = this.getWorkspaceUI();
-    
-    //call the base update function
-    visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
-    
-    //load the type specific data
-    if(json.children) {
-        var folder = this.getObject();
-        workspaceUI.createChildrenFromJson(folder,json.children,updateDataList);
-    }
-}
+///** This method deseriliazes any data needed after the control is instantiated.
+// * objects that extend Control should override this for any data that is
+// * needed, however they should call this base function first. */
+//visicomp.app.visiui.FolderControl.prototype.updateFromJson = function(json) {
+//    var workspaceUI = this.getWorkspaceUI();
+//    
+//    //call the base update function
+//    visicomp.app.visiui.Control.updateFromJson.call(this,json);
+//    
+//    //load the type specific data
+//    if(json.children) {
+//        var folder = this.getObject();
+//        workspaceUI.loadFolderControlContentFromJson(folder,json.children);
+//    }
+//}
 
 /** This method populates the frame for this control. 
  * @protected */
@@ -66,9 +62,14 @@ window.setSize(500,500);
 
 //add table listener
 visicomp.app.visiui.FolderControl.createControl = function(workspaceUI,parent,name) {
-    var returnValue = visicomp.core.createfolder.createFolder(parent,name);
+    
+    var json = {};
+    json.name = name;
+    json.type = visicomp.core.Folder.generator.type;
+    var returnValue = visicomp.core.createmember.createMember(parent,json);
+    
     if(returnValue.success) {
-        var folder = returnValue.folder;
+        var folder = returnValue.member;
         var folderControl = new visicomp.app.visiui.FolderControl(workspaceUI,folder);
         returnValue.control = folderControl;
     }
@@ -76,6 +77,18 @@ visicomp.app.visiui.FolderControl.createControl = function(workspaceUI,parent,na
         //no action for now
     }
     return returnValue;
+}
+
+visicomp.app.visiui.FolderControl.createControlFromJson = function(workspaceUI,member,controlData) {
+    var folderControl = new visicomp.app.visiui.FolderControl(workspaceUI,member);
+    if(controlData) {
+        folderControl.updateFromJson(controlData);
+        if(controlData.children) {
+            workspaceUI.loadFolderControlContentFromJson(member,controlData.children);
+        }
+    }
+    
+    return folderControl;
 }
 
 
@@ -87,4 +100,4 @@ visicomp.app.visiui.FolderControl.generator = {};
 visicomp.app.visiui.FolderControl.generator.displayName = "Folder";
 visicomp.app.visiui.FolderControl.generator.uniqueName = "visicomp.app.visiui.FolderControl";
 visicomp.app.visiui.FolderControl.generator.createControl = visicomp.app.visiui.FolderControl.createControl;
-
+visicomp.app.visiui.FolderControl.generator.createControlFromJson = visicomp.app.visiui.FolderControl.createControlFromJson;

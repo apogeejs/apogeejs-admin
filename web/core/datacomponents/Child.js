@@ -1,20 +1,17 @@
-/** This encapsulates the namespace functionality of the objects in the workspace.
- * The namespaces are given by folders and the extending objects represent items
- * in the namespace (including folders, tables, functions, etc.). Each object can
- * have a data object, such as a JSON for a table, which is what the developer will
- * access for the given name.
+/** This component encapsulates the child functionality for members in the workspace.
+ * There is one object, Folder which his a parent. The other objects and also the
+ * Folder is a child.
  * 
  * This is not a class, but it is used for the prototype of the objects that inherit from it.
  */
 visicomp.core.Child = {};
     
 /** This serves as the constructor for the child object, when extending it. */
-visicomp.core.Child.init = function(workspace,name,type) {
+visicomp.core.Child.init = function(workspace,name,generator) {
     this.workspace = workspace;
     this.name = name;
-    this.type = type;
+    this.generator = generator;
     this.parent = null;
-    this.data = null;
 }
 
 /** this method gets the name. */
@@ -27,17 +24,14 @@ visicomp.core.Child.getFullName = function() {
 	if(this.parent) {
 		var name = this.parent.getFullName();
 
-		if(this.parent.isRootFolder()) {
-			//name += ":"; //no connector - included in root name
-		}
-		else {
+		if(!this.parent.isRootFolder()) {
 			name += ".";
 		}
 		name += this.name;
 		return name;
 	}
 	else {
-		return this.name + ":";
+		return this.getBaseName() + ":";
 	}
 }
 
@@ -77,8 +71,29 @@ visicomp.core.Child.getRootFolder = function() {
 
 /** This identifies the type of object. */
 visicomp.core.Child.getType = function() {
-	return this.type;
+	return this.generator.type;
 }
+
+/** This method writes the child to a json. */
+visicomp.core.Child.toJson = function() {
+	var json = {};
+    json.name = this.name;
+    json.type = this.generator.type;
+    if(this.addToJson) {
+        this.addToJson(json);
+    }
+    
+    if(this.getUpdateData) {
+        var updateData = this.getUpdateData();
+        json.updateData = updateData;
+    }
+    return json;
+}
+
+///** This method creates a child from a json. IT should be implemented as a static
+// * function in extending objects. */ 
+//visicomp.core.Child.fromJson = function(workspace,json,updateDataList) {
+//}
 
 //========================================
 // "Protected" Methods
@@ -86,10 +101,24 @@ visicomp.core.Child.getType = function() {
 
 /** This method is called when the child is deleted. If necessary the implementation
  * can extend this function, but it should call this base version of the function
- * if it does.  */
+ * if it does.  
+ * @protected */
 visicomp.core.Child.onDelete = function() {
-	if((this.parent != null)&&(this.parent.getType() === "folder")) {
+	if((this.parent != null)&&(this.parent.getType() === visicomp.core.Folder.generator.type)) {
 		this.parent.removeChild(this);
 	}
 }
+
+//Implement this method if there is data to add to this child.
+///** This method adds any additional data to the json saved for this child. 
+// * @protected */
+//visicomp.core.Child.addToJson = function(json) {
+//}
+
+//Implement this method if there is update data for this json
+///** This gets an update structure to upsate a newly instantiated child
+//* to match the current object. 
+//* @protected */
+//visicomp.core.Child.getUpdateData = function() {
+//}
 

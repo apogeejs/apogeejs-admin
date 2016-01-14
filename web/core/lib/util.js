@@ -1,15 +1,5 @@
 visicomp.core.util = {};
 
-visicomp.core.util.createEditStatus = function() {
-    var editStatus = {};
-    editStatus.success = false;
-    editStatus.errorType = null;
-    editStatus.saveStarted = false;
-    editStatus.saveCompleted = false;
-    editStatus.msg = null;
-    return editStatus;
-}
-
 /** This method creates an error object, which has a "message" in the format
  *of a system error. The type and base error are optional. 
  * Based on the error type, additional data can be added to the error object

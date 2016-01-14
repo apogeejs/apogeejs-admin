@@ -17,61 +17,42 @@ visicomp.core.updatemember.fireUpdatedEvent = function(member) {
 }
 
 /** This is the listener for the update member event. */
-visicomp.core.updatemember.updateCode = function(member,functionBody,supplementalCode) {
-    var editStatus;
-
-    //set code
-    editStatus = visicomp.core.updatemember.setCode(member,functionBody,supplementalCode);
-
-    if(editStatus.success) {
-        //recalculate
-        var recalculateList = [];
-        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
-        visicomp.core.calculation.recalculateObjects(recalculateList,editStatus);
+visicomp.core.updatemember.updateCode = function(member,argList,functionBody,supplementalCode) {
+    var recalculateList = [];
+    
+    var editStatus = visicomp.core.updatemember.updateObjectFunction(member,
+        argList,
+        functionBody,
+        supplementalCode,
+        recalculateList);
+        
+    if(!editStatus.success) {
+        return editStatus;
     }
+    
+    editStatus = visicomp.core.updatemember.doRecalculate(recalculateList,editStatus);
     
     return editStatus;
 }
 
 /** This is the listener for the update member event. */
 visicomp.core.updatemember.updateData = function(member,data) {
-    var editStatus;
-
-    //set data
-    editStatus = visicomp.core.updatemember.setData(member,data);
-
-    if(editStatus.success) {
-        //recalculate
-        var recalculateList = [];
-        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
-        visicomp.core.calculation.recalculateObjects(recalculateList,editStatus);
+    var recalculateList = [];
+    var editStatus = visicomp.core.updatemember.updateObjectData(member,data,recalculateList);
+    
+    if(!editStatus.success) {
+        return editStatus;
     }
+    
+    editStatus = visicomp.core.updatemember.doRecalculate(recalculateList,editStatus);
     
     return editStatus;
 }
 
-/** This is the listener for the update member event. */
-visicomp.core.updatemember.updateArgList = function(member,argList) {
-    var editStatus;
-
-    //set data
-    editStatus = visicomp.core.updatemember.setArgList(member,argList);
-
-    if(editStatus.success) {
-        //recalculate
-        var recalculateList = [];
-        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
-        visicomp.core.calculation.recalculateObjects(recalculateList,editStatus);
-    }
-
-    return editStatus;
-}
-
-
 /** This is the listener for the update members event. */
 visicomp.core.updatemember.updateObjects = function(updateDataList) {
-    var mainEditStatus = visicomp.core.util.createEditStatus();
-    var singleEditStatus
+    var mainEditStatus = {};
+    var singleEditStatus;
     var recalculateList = [];
 
     //flag start of save (almost)
@@ -82,73 +63,163 @@ visicomp.core.updatemember.updateObjects = function(updateDataList) {
         var argData = updateDataList[i];
         var member = argData.member;
         var data = argData.data;
+        var argList = argData.argList; 
         var functionBody = argData.functionBody;
         var supplementalCode = argData.supplementalCode;
         
         if(functionBody) {
-            singleEditStatus = visicomp.core.updatemember.setCode(member,functionBody,supplementalCode);
+            singleEditStatus = visicomp.core.updatemember.updateObjectFunction(member,
+                argList,
+                functionBody,
+                supplementalCode,
+                recalculateList);
         }
         else if(data) {
-            singleEditStatus = visicomp.core.updatemember.setData(member,data);
+            singleEditStatus = visicomp.core.updatemember.updateObjectData(member,data,recalculateList);
         }
         
         //stop processing on an error
         if(!singleEditStatus.success) {
             mainEditStatus.success = false;
             mainEditStatus.msg = singleEditStatus.msg;
+            mainEditStatus.success = false;
             return mainEditStatus;
         }
-        
-        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
     }
     
     //flag end of save
     mainEditStatus.saveCompleted = true;
 
-    //recalculate members
-    visicomp.core.calculation.recalculateObjects(recalculateList,mainEditStatus);
-
     //return status
+    mainEditStatus = visicomp.core.updatemember.doRecalculate(recalculateList,mainEditStatus);
+    
     return mainEditStatus;
 }
 
-/** This method responds to a "new" menu event. */
-visicomp.core.updatemember.getUpdateDataWrapper = function(member,data,functionBody,supplementalCode) {
-	
-	var updateDataWraapper = {};
-    updateDataWraapper.member = member;
-    if((data !== undefined)||(data !== null)) {
-        updateDataWraapper.data = data;
+//=====================================
+// Private Functions
+//=====================================
+
+visicomp.core.updatemember.processCode = function(member,argList,functionBody,supplementalCode) {
+    
+    //load some needed variables
+    var localFolder = member.getParent();
+    var rootFolder = member.getRootFolder();
+    var codeLabel = member.getFullName();
+    
+    var codeInfo = visicomp.core.codeCompiler.processCode(argList,
+        functionBody,
+        supplementalCode,
+        localFolder,
+        rootFolder,
+        codeLabel);
+        
+    return codeInfo;
+}
+
+/** This is the listener for the update member event. */
+visicomp.core.updatemember.updateObjectFunction = function(member,
+        argList,
+        functionBody,
+        supplementalCode,
+        recalculateList) {
+    
+    var editStatus = {};
+    
+    //process the code
+    var codeInfo;
+   
+    try {
+        codeInfo = visicomp.core.updatemember.processCode(member,argList,functionBody,supplementalCode);
     }
-	updateDataWraapper.functionBody = functionBody;
-	updateDataWraapper.supplementalCode = supplementalCode;
-	
-	return updateDataWraapper;
+    catch(error) {
+        editStatus.msg = error.msg;
+        editStatus.error = error;
+        editStatus.succcess = false;
+        return editStatus;
+    }
+    
+    editStatus.saveStarted = true;
+         
+    //save the code
+    try {
+        member.setCodeInfo(codeInfo);
+    }
+    catch(error) {
+        editStatus.msg = error.msg;
+        editStatus.error = error;
+        editStatus.succcess = false;
+        return editStatus;
+    }
+    
+    editStatus.saveEnded = true;
+    
+    try {
+        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
+    }
+    catch(error) {
+        editStatus.msg = error.msg;
+        editStatus.error = error;
+        editStatus.succcess = false;
+        return editStatus;
+    }
+    
+    editStatus.success = true;
+    return editStatus;
 }
 
-visicomp.core.updatemember.setCode = function(member,functionBody,supplementalCode) {
-     //set code
-     var editStatus = member.setCode(functionBody,supplementalCode);
-     
-     return editStatus;
-}
 
-visicomp.core.updatemember.setData = function(member,data) {
+/** This is the listener for the update member event. */
+visicomp.core.updatemember.updateObjectData = function(member,data,recalculateList) {
+    var editStatus = {};
+    editStatus.saveStarted = true;
+
     //set data
-    var editStatus = member.setData(data);
-
-    //clear the formula
-    member.clearCode();
+    try {
+        member.setData(data);
+        member.clearCode();
+    }
+    catch(error) {
+        editStatus.msg = error.msg;
+        editStatus.error = error;
+        editStatus.succcess = false;
+        return editStatus;
+    }
     
+    editStatus.saveEnded = true;
+    
+    try {
+        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
+    }
+    catch(error) {
+        editStatus.msg = error.msg;
+        editStatus.error = error;
+        editStatus.succcess = false;
+        return editStatus;
+    }
+    
+    editStatus.success = true;
     return editStatus;
 }
 
-visicomp.core.updatemember.setArgList = function(member,argList) {
-    var editStatus = member.setArgList(argList);
+/** This is the listener for the update member event. */
+visicomp.core.updatemember.doRecalculate = function(recalculateList,editStatus) {
+    //sort list
+    try {
+        visicomp.core.calculation.sortRecalculateList(recalculateList);
+    }
+    catch(error) {
+        editStatus.msg = error.msg;
+        editStatus.error = error;
+        editStatus.succcess = false;
+        return editStatus;
+    }
     
+    //recalculate - let an error from here go, to be processed in debugger for now
+    visicomp.core.calculation.callRecalculateList(recalculateList);
+    
+    editStatus.success = true;
     return editStatus;
 }
-
-
 
 

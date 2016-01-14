@@ -112,13 +112,15 @@ visicomp.app.visiui.Control.getContentElement = function() {
 /** This serializes the table control. */
 visicomp.app.visiui.Control.toJson = function() {
     var json = {};
-    json.name = this.getObject().getName();
+    json.key = this.getObject().getFullName();
     json.type = this.generator.uniqueName;
     
     json.windowCoords = this.window.getCoordinateInfo();
     json.windowState = this.window.getWindowState();
     
-    this.writeToJson(json);
+    if(this.writeToJson) {
+        this.writeToJson(json);
+    }
     
     return json;
 }
@@ -127,7 +129,7 @@ visicomp.app.visiui.Control.toJson = function() {
 // Protected Instance Methods
 //==============================
 
-/** This method returns the table for this table control. */
+/** This method returns the menu entries for this control. */
 visicomp.app.visiui.Control.getMenuItemInfoList = function() {
     return this.menuItemInfoList;
 }
@@ -135,7 +137,7 @@ visicomp.app.visiui.Control.getMenuItemInfoList = function() {
 /** This method deseriliazes any data needed after the control is instantiated.
  * objects that extend Control should override this for any data that is
  * needed, however they should call this base function first. */
-visicomp.app.visiui.Control.updateFromJson = function(json,updateDataList) {
+visicomp.app.visiui.Control.updateFromJson = function(json) {
     if(json.windowCoords) {
         this.window.setCoordinateInfo(json.windowCoords);
     }
@@ -160,10 +162,12 @@ visicomp.app.visiui.Control.updateFromJson = function(json,updateDataList) {
  *  @private */
 visicomp.app.visiui.Control.createEditCodeableDialogCallback = function(title, optionalEditorWrapper) {
 	var instance = this;
+    var member = instance.getObject();
     
     //create save handler
     var onSave = function(functionBody,supplementalCode) {
-        var editStatus =  visicomp.core.updatemember.updateCode(instance.object,functionBody,supplementalCode);
+        var argList = member.getArgList();
+        var editStatus =  visicomp.core.updatemember.updateCode(member,argList,functionBody,supplementalCode);
         var editComplete = instance.processEditResult(editStatus);
         return editComplete;
     };
@@ -189,18 +193,15 @@ visicomp.app.visiui.Control.createDeleteCallback = function(title) {
 visicomp.app.visiui.Control.processEditResult = function(editStatus) {
     if(!editStatus.success) {
         var msg = "";
-        if(editStatus.errorType === "Unknown") {
+        if(editStatus.saveStarted && !editStatus.saveEnded) {
             msg += "Unknown Error: The application is in an indeterminant state. It is recommended it be closed: "
-        }
-        else if(editStatus.errorType) {
-            msg += editStatus.errorType + " Error: "
         }
         msg += editStatus.msg;
         alert(msg);
     }
     
     //end the edit if we finished the save, whether of not we completed the update
-    var editComplete = (editStatus.saveCompleted) ? true : false;
+    var editComplete = (editStatus.saveEnded) ? true : false;
     return editComplete;
 }
 

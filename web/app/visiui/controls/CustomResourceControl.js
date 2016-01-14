@@ -70,9 +70,14 @@ visicomp.app.visiui.CustomResourceControl.prototype.createEditResourceDialogCall
 visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,parent,name) {
 	//create a resource with a base custom processor
 	var resourceProcessor = new visicomp.app.visiui.CustomResourceProcessor();
-    var returnValue = visicomp.core.createresource.createResource(parent,name,resourceProcessor);
+    var json = {};
+    json.name = name;
+    json.type = visicomp.core.Resource.generator.type;
+    var returnValue = visicomp.core.createmember.createMember(parent,json);
+    
     if(returnValue.success) {
-        var resource = returnValue.resource;
+        var resource = returnValue.member;
+        resource.updateResourceProcessor(resourceProcessor);
         var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,resource);
         returnValue.control = customResourceControl;
     }

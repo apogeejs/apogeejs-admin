@@ -1,9 +1,4 @@
-/** This mixin encapsulates an object that holds data. The data is held in the 
- * folder data hierarchy that mirrors the folder object hierarchy. Objects
- * that are dependats my only depend on objects that are data holders (so that 
- * there is something to depend on.) 
- * 
- * The DataHolder must be a child.
+/** This component encapsulates an object that another member can depend on.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  */

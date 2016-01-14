@@ -31,37 +31,6 @@ visicomp.core.calculation.addToRecalculateList = function(recalculateList,member
     }
 }
 
-/** This method recalculates all member objects in the given root folder. */
-visicomp.core.calculation.recalculateAll = function(rootFolder) {	
-	var recalculateList = [];
-	//add all members, recursively
-	visicomp.core.calculation.addAll(rootFolder,recalculateList);
-	//recalculate
-	visicomp.core.calculation.recalculateObjects(recalculateList);
-}
-
-/** This method recursively adds all members from the given folder and this children. */
-visicomp.core.calculation.addAll = function(folder,recalculateList) {
-	var childMap = folder.getChildMap();
-	for(var key in childMap) {
-		var child = childMap[key];
-		switch(child.getType()) {
-			case "folder":
-				visicomp.core.calculation.addAll(folder,recalculateList);
-				break;
-			
-			case "table":
-			case "function":
-				recalculateList.push(child);
-//I think we need to recalculate code! (because of the dependencies)
-				break;
-				
-			default:
-				break;
-		}
-	}
-}
-
 /** This method places the member in the recalculate list, but only if the member is 
  * not already there. 
  *  @private */
@@ -76,25 +45,25 @@ visicomp.core.calculation.inList = function(recalculateList,member) {
 }
     
 
-/** This method sorts the recalcultae list into the proper order and then
- * recalculates all the members in it. */
-visicomp.core.calculation.recalculateObjects = function(recalculateList,editStatus) {
-    
-    //sort the list so we can update once each
-    var success = visicomp.core.calculation.sortRecalculateList(recalculateList);
-    if(!success) {
-        editStatus.success = false;
-        returnValue.msg = "Failure in update cascade - Is there a curcular reference?";
-        return returnValue;
-    }
-	
-    //update each of the items in this list
-    visicomp.core.calculation.callRecalculateList(recalculateList);
-    
-    editStatus.success = true;
-    
-    return editStatus;
-}
+///** This method sorts the recalcultae list into the proper order and then
+// * recalculates all the members in it. */
+//visicomp.core.calculation.recalculateObjects = function(recalculateList,editStatus) {
+//    
+//    //sort the list so we can update once each
+//    var success = visicomp.core.calculation.sortRecalculateList(recalculateList);
+//    if(!success) {
+//        editStatus.success = false;
+//        returnValue.msg = "Failure in update cascade - Is there a curcular reference?";
+//        return returnValue;
+//    }
+//	
+//    //update each of the items in this list
+//    visicomp.core.calculation.callRecalculateList(recalculateList);
+//    
+//    editStatus.success = true;
+//    
+//    return editStatus;
+//}
 
 /** This method updates the recalculate list order so no member appears in the list
  *before a member it depends on. This will return false if it fails. 
