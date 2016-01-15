@@ -17,7 +17,7 @@ visicomp.core.calculation.addToRecalculateList = function(recalculateList,member
     if(this.inList(recalculateList,member)) return;
      
     //add this member to recalculate list if it needs to be executed
-    if(member.isRecalculable) {
+    if(member.isCodeable) {
         if(member.needsExecuting()) {
            recalculateList.push(member);
         }

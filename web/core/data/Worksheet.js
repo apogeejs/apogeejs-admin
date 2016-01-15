@@ -1,12 +1,11 @@
 /** This is a worksheet, which is basically a function
  * that is expanded into data objects. */
-visicomp.core.Worksheet = function(parent,name) {
+visicomp.core.Worksheet = function(owner,name) {
     //base init
     visicomp.core.Impactor.init.call(this);
-    visicomp.core.Child.init.call(this,parent,name,visicomp.core.Worksheet.generator);
+    visicomp.core.Child.init.call(this,owner,name,visicomp.core.Worksheet.generator);
     visicomp.core.DataHolder.init.call(this);
-    visicomp.core.Dependant.init.call(this);
-    visicomp.core.Recalculable.init.call(this);
+    visicomp.core.Owner.init.call(this);
     
     //create the internal folder as a root folder (no parent). But give it
     //the full path name
@@ -35,20 +34,14 @@ visicomp.core.Worksheet = function(parent,name) {
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Child);
-
-//add components to this class
-visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.DataHolder);
-visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Dependant);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Impactor);
-visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Recalculable);
+visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Owner);
 
 /** */
 visicomp.core.Worksheet.prototype.getInternalFolder = function() {
     return this.internalFolder;
 }
-
-// SET REUTRN VALUE NEEDS TO HAVE THE FULL UPDATE LOGIC!!!!
 
 /** */
 visicomp.core.Worksheet.prototype.setReturnValueString = function(returnValueString) {
@@ -81,6 +74,10 @@ visicomp.core.Worksheet.prototype.getArgList = function() {
     return this.argList;
 }
 
+//------------------------------
+// Child Methods
+//------------------------------
+
 /** This method is called when the child is deleted. If necessary the implementation
  * can extend this function, but it should call this base version of the function
  * if it does.  */
@@ -101,8 +98,8 @@ visicomp.core.Worksheet.prototype.onDelete = function() {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.Worksheet.fromJson = function(parent,json,updateDataList) {
-    var worksheet = new visicomp.core.Worksheet(parent,json.name);
+visicomp.core.Worksheet.fromJson = function(owner,json,updateDataList) {
+    var worksheet = new visicomp.core.Worksheet(owner,json.name);
     if(json.argList !== undefined) {
         worksheet.setArgList(json.argList);
     }
@@ -119,10 +116,6 @@ visicomp.core.Worksheet.fromJson = function(parent,json,updateDataList) {
 
 }
 
-//===================================
-// Protected Functions
-//===================================
-
 /** This method adds any additional data to the json saved for this child. 
  * @protected */
 visicomp.core.Worksheet.prototype.addToJson = function(json) {
@@ -131,16 +124,14 @@ visicomp.core.Worksheet.prototype.addToJson = function(json) {
     json.internalFolder = this.internalFolder.toJson();
 }
 
-/** This method indicates if the member needs to be calculated.
- * It should be implemented in inheriting objects. 
- * */
-visicomp.core.Worksheet.prototype.needsExecuting = function() {return false;}
+//------------------------------
+// Owner Methods
+//------------------------------
 
-
-/** This method updates an object after its dependencies have been updated.
- * It should be implemented by inheriting objects.  */
-visicomp.core.Worksheet.prototype.execute = function() {}
-    
+/** this method s implemented for the Owner component/mixin. */
+visicomp.core.Worksheet.prototype.getBaseName = function() {
+    return this.getFullName();
+}
     
 //==============================
 // Private Methods

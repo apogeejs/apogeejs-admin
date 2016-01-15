@@ -1,8 +1,13 @@
-/** This component encapsulates the child functionality for members in the workspace.
- * There is one object, Folder which his a parent. The other objects and also the
- * Folder is a child.
+/** This component encapsulates the child functionality for members in the workspace,
+ * allowing them to sit in a organizational hierarchy.
  * 
  * This is not a class, but it is used for the prototype of the objects that inherit from it.
+ *  
+ * COMPONENT DEPENDENCIES:
+ * - For children that are DataHolders and consequentially Impactors, the Imapctor
+ * component must be installed before the child component. As the child is added it
+ * impacts its parent. 
+ * 
  */
 visicomp.core.Child = {};
     
@@ -10,28 +15,19 @@ visicomp.core.Child = {};
  * The parent should be the folder that holds this child. If this is a root folder,
  * then the parent should instead be the object in which the object is the root folder
  * whcih can be the workspace or an other child (such as a worksheet). */
-visicomp.core.Child.init = function(parent,name,generator) {
+visicomp.core.Child.init = function(owner,name,generator) {
     this.name = name;
     this.generator = generator;
     
-    //set the parent folder and the workspace
-    if(parent.isFolder) {
-        this.workspace = parent.getWorkspace();
-        this.parent = parent;
-        parent.addChild(this);
-    }
-    else if(parent.isChild) {
-        this.workspace = parent.getWorkspace();
-        this.parent = null;
-        this.baseName = parent.getFullName();
-    }
-    else if(parent.isWorkspace) {
-        this.workspace = parent;
-        this.parent = null;
-        this.baseName = parent.getName();
+    this.workspace = owner.getWorkspace();
+    
+    if(owner.isParent) {
+        this.parent = owner;
+        this.parent.addChild(this);
     }
     else {
-        throw visicomp.core.util.createError("Illegal parent: " + parent);
+        this.parent = null;
+        this.baseName = owner.getBaseName();
     }
 }
 
@@ -49,7 +45,7 @@ visicomp.core.Child.getFullName = function() {
 	if(this.parent) {
 		var name = this.parent.getFullName();
 
-		if(!this.parent.isRootFolder()) {
+		if(!this.parent.isRoot()) {
 			name += ".";
 		}
 		name += this.name;
@@ -119,20 +115,23 @@ visicomp.core.Child.toJson = function() {
  * if it does.  
  * @protected */
 visicomp.core.Child.onDelete = function() {
-	if((this.parent != null)&&(this.parent.getType() === visicomp.core.Folder.generator.type)) {
+	if(this.parent) {
 		this.parent.removeChild(this);
 	}
 }
 
-//Implement this method if there is data to add to this child.
+//Implement this method if there is data to add to this child. Otherwise it may
+//be omitted
 ///** This method adds any additional data to the json saved for this child. 
 // * @protected */
 //visicomp.core.Child.addToJson = function(json) {
 //}
 
-//Implement this method if there is update data for this json
+//Implement this method if there is update data for this json. otherwise it may
+//be omitted
 ///** This gets an update structure to upsate a newly instantiated child
-//* to match the current object. 
+//* to match the current object. It may return "undefined" if there is no update
+//* data needed. 
 //* @protected */
 //visicomp.core.Child.getUpdateData = function() {
 //}

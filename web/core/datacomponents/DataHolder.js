@@ -1,9 +1,13 @@
 /** This component encapsulates an object that holds data. The data is the object
  * that is accessed when the user calls the child name from the code.
  * 
- * The DataHolder must be a child.
- * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
+ * 
+ * COMPONENT DEPENDENCIES:
+ * - A DataHolder must be a Child. The Child component must be installed before the
+ * DataHolder component.
+ * - A DataHolder must be an Impactor, as the data can be used by another object. The
+ * Impactor component must be installed before the DataHolder component.
  */
 visicomp.core.DataHolder = {};
 
@@ -47,7 +51,7 @@ visicomp.core.DataHolder.internalSetData = function(data,hasError,errorMsg) {
     this.errorMsg = errorMsg;
     
     //data the data map in the parent if it is a hierarchy container 
-    if((this.parent)&&(this.parent.getType() == visicomp.core.Folder.generator.type)) {
+    if(this.parent) {
         this.parent.updateData(this);
     }
     

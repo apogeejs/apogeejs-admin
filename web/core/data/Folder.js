@@ -1,10 +1,12 @@
 /** This is a folder. */
-visicomp.core.Folder = function(parent,name) {
+visicomp.core.Folder = function(owner,name) {
     //base init
     visicomp.core.Impactor.init.call(this);
-    visicomp.core.Child.init.call(this,parent,name,visicomp.core.Folder.generator);
+    visicomp.core.Child.init.call(this,owner,name,visicomp.core.Folder.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
+    visicomp.core.Owner.init.call(this);
+    visicomp.core.Parent.init.call(this);
 
     //this holds the base objects, mapped by name
     this.childMap = {};
@@ -19,48 +21,22 @@ visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.DataHolder);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Dependant);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Impactor);
+visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Owner);
+visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Parent);
 
-/** This property tells if this object is a folder.
- * This property should not be implemented on non-folders. 
- * NOTE: This self-identifier is applied on all the components/mixins. However,
- * The folder object is special (1/14/16) since it is the only data object that 
- * can have children. It takes a "parent" role, but it is not a mixin because
- * it is the only one. So it does have an identifier whereas other data objects
- * do not. */
-visicomp.core.Folder.prototype.isFolder = true;
-
-/** this is used to identify if this is the root folder. */
-visicomp.core.Folder.prototype.isRootFolder = function() {
-    //undefined may be OK too. If there is populated object this is no root.
-    return (this.parent == null); 
-}
+//------------------------------
+// Parent Methods
+//------------------------------
 
 /** this method gets the table map. */
 visicomp.core.Folder.prototype.getChildMap = function() {
     return this.childMap;
 }
 
-/** this method gets the data object for a child from this folder. */
-visicomp.core.Folder.prototype.lookupChildData = function(name) {
-    return this.dataMap[name];
-}
-
 /** This method looks up a child from this folder.  */
 visicomp.core.Folder.prototype.lookupChild = function(name) {
     //check look for object in this folder
     return this.childMap[name];
-}
-
-/** This method looks up a child using an arry of names corresponding to the
- * path from this folder to the object.  Note: the method will return the 
- * fist non-folder it finds, even if the path is not completed. In this case
- * it is assumed the path refers to a field inside this object. */
-visicomp.core.Folder.prototype.lookupChildFromPath = function(path) {
-	var object = this;
-	for(var i = 0; ((i < path.length)&&(object.getType() == visicomp.core.Folder.generator.type)); i++) {
-		object = object.lookupChild(path[i]);
-	}
-    return object;
 }
 
 /** This method adds a table to the folder. It also sets the folder for the
@@ -111,12 +87,16 @@ visicomp.core.Folder.prototype.updateData = function(child) {
     this.dataMap[name] = data;
 }
 
+//------------------------------
+// Dependent Methods
+//------------------------------
+
 /** This method updates the dependencies of any children
  * based on an object being added. */
 visicomp.core.Folder.prototype.updateForAddedVariable = function(object) {
     for(var key in this.childMap) {
         var child = this.childMap[key];
-        if(child.updateForAddedVariable) {
+        if(child.isDependent) {
             child.updateForAddedVariable(object);
         }
     }
@@ -127,16 +107,30 @@ visicomp.core.Folder.prototype.updateForAddedVariable = function(object) {
 visicomp.core.Folder.prototype.updateForDeletedVariable = function(object) {
     for(var key in this.childMap) {
         var child = this.childMap[key];
-        if(child.updateForDeletedVariable) {
+        if(child.isDependent) {
             child.updateForDeletedVariable(object);
         }
     }
 }
 
+//------------------------------
+// Owner Methods
+//------------------------------
+
+/** this method s implemented for the Owner component/mixin. It will not be used
+ * since this is also a parent, meaning it will not hold a root folder. */
+visicomp.core.Folder.prototype.getBaseName = function() {
+    return this.name;
+}
+
+//------------------------------
+// Child Methods
+//------------------------------
+
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.Folder.fromJson = function(parent,json,updateDataList) {
-    var folder = new visicomp.core.Folder(parent,json.name);
+visicomp.core.Folder.fromJson = function(owner,json,updateDataList) {
+    var folder = new visicomp.core.Folder(owner,json.name);
     
     for(var key in json.children) {
         var childJson = json.children[key];
@@ -153,11 +147,7 @@ visicomp.core.Folder.fromJson = function(parent,json,updateDataList) {
     return folder;
 }
 
-//===================================
-// Protected Functions
-//===================================
-
-/** This method adds any additional data to the json saved for this child. 
+/** This method adds any additional data to the json to save for this child. 
  * @protected */
 visicomp.core.Folder.prototype.addToJson = function(json) {
 	json.children = {};

@@ -1,8 +1,14 @@
 /** This mixin encapsulates an object in that can be coded. It contains a function
  * and supplemental code. Object that are codeable should also be a child,
- * dependant, recalculable and dataholder.
+ * dependant and dataholder.
  * 
  * This is a mixin and not a class. It is used in the prototype of the objects that inherit from it.
+ * 
+ * COMPONENT DEPENDENCIES:
+ * - A Codeable must be a Child. The Child component must be installed before the
+ * Codeable component.
+ * - A Codeable is a Dependent. Dependent calculates dependencies arising from 
+ * anobjects code. The Dependent component must be installed before the Codeable component. 
  */
 visicomp.core.Codeable = {};
 
@@ -121,9 +127,9 @@ visicomp.core.Codeable.execute = function() {
     this.processObjectFunction(this.objectFunction);
 }
 
-//===================================
-// Protected Functions
-//===================================
+//------------------------------
+// Child Methods
+//------------------------------
 
 /** This gets an update structure to upsate a newly instantiated child
 /* to match the current object. */

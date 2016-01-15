@@ -1,6 +1,14 @@
-/** This component encapsulates an object that another member can depend on.
+/** This component encapsulates an object that another member can depend on. This
+ * dependency arises because the object has data that can be accessed by the user.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
+ * 
+ * COMPONENT DEPENDENCIES:
+ * - An Impactor must be a Child, however the Impactor component must be installed
+ * before the Child component, as the child component will use the Impactor functionality
+ * when it is being initialized.
+ * - An Impactor must be a DataHolder, however it must be installed before
+ * the DataHolder. An object can not be one without the other.
  */
 visicomp.core.Impactor = {};
 

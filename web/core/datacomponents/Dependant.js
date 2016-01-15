@@ -1,7 +1,14 @@
-/** This mixin encapsulates an object in the workspace that depends on another object or
- * id depended on.
+/** This mixin encapsulates an object in the workspace that depends on another
+ * object by virtue of code (from being a Codeable) in the object. Other dependenciees are possible
+ * but they are not captured buy this component.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
+ * 
+ * COMPONENT DEPENDENCIES:
+ * - A Dependant must be a Child. The Child component must be installed before the
+ * Dependant component.
+ * - A Dependent is a Codeable, however it must be installed before Codeable. An object
+ * can not be one without the other.
  */
 visicomp.core.Dependant = {};
 
@@ -12,14 +19,24 @@ visicomp.core.Dependant.init = function() {
     this.dependsOnList = [];
 }
 
+/** This property tells if this object is a dependant.
+ * This property should not be implemented on non-dependants. */
+visicomp.core.Dependant.isDependant = true;
+
 /** This returns a map of the members that this member depends on. */
 visicomp.core.Dependant.getDependsOn = function() {
     return this.dependsOnList;
 }
 
-/** This property tells if this object is a dependant.
- * This property should not be implemented on non-dependants. */
-visicomp.core.Dependant.isDependant = true
+//Must be implemented in extending object
+///** This method udpates the dependencies if needed because
+// *the passed variable was added.  */
+//visicomp.core.Codeable.updateForAddedVariable = function(object);
+
+//Must be implemented in extending object
+///** This method udpates the dependencies if needed because
+// *the passed variable was deleted.  */
+//visicomp.core.Codeable.updateForDeletedVariable = function(object);
 
 //===================================
 // Private Functions

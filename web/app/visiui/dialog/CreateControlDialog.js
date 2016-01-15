@@ -41,7 +41,7 @@ visicomp.app.visiui.dialog.showCreateControlDialog = function(controlTypeMap,obj
     line.appendChild(select);
     for(var key in objectUIMap) {
 		var object = objectUIMap[key].object;
-		if(object.getType() == visicomp.core.Folder.generator.type) { 
+		if(object.isParent) { 
 			select.add(visicomp.visiui.createElement("option",{"text":key}));
 			if(key == activeFolderKey) {
 				select.value = key;

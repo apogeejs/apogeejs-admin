@@ -2,6 +2,7 @@
 visicomp.core.Workspace = function(name) {
     //base init
     visicomp.core.EventManager.init.call(this);
+    visicomp.core.Owner.init.call(this);
     
     this.name = name;
 
@@ -11,10 +12,7 @@ visicomp.core.Workspace = function(name) {
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Workspace,visicomp.core.EventManager);
-
-/** This property tells if this object is a child.
- * This property should not be implemented on non-children. \*/
-visicomp.core.Workspace.prototype.isWorkspace = true;
+visicomp.core.util.mixin(visicomp.core.Workspace,visicomp.core.Owner);
 
 /** this method gets the workspace name. */
 visicomp.core.Workspace.prototype.getName = function() {
@@ -47,6 +45,20 @@ visicomp.core.Workspace.prototype.updateForDeletedVariable = function(object) {
 visicomp.core.Workspace.prototype.close = function() {
 }
 
+/** this method s implemented for the Owner component/mixin. */
+visicomp.core.Workspace.prototype.getWorkspace = function() {
+   return this;
+}
+
+//------------------------------
+// Owner Methods
+//------------------------------
+
+/** this method s implemented for the Owner component/mixin. */
+visicomp.core.Workspace.prototype.getBaseName = function() {
+    return this.name;
+}
+
 //============================
 // Save Functions
 //============================
@@ -68,7 +80,6 @@ visicomp.core.Workspace.prototype.toJson = function() {
     
     return json;
 }
-
 
 /** This is used for saving the workspace. */
 visicomp.core.Workspace.fromJson = function(json) {

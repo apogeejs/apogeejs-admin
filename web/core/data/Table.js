@@ -1,8 +1,8 @@
 /** This class encapsulatees a data table */
-visicomp.core.Table = function(parent,name) {
+visicomp.core.Table = function(owner,name) {
     //base init
     visicomp.core.Impactor.init.call(this);
-    visicomp.core.Child.init.call(this,parent,name,visicomp.core.Table.generator);
+    visicomp.core.Child.init.call(this,owner,name,visicomp.core.Table.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
 	visicomp.core.Codeable.init.call(this,[]);
@@ -14,9 +14,12 @@ visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.DataHolder);
 visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Dependant);
 visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Impactor);
 visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Codeable);
-visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Recalculable);
 
-/** This method extends set data from Child. It also
+//------------------------------
+// DataHolder Methods
+//------------------------------
+
+/** This method extends set data from DataHOlder. It also
  * freezes the object so it is immutable. (in the future we may
  * consider copying instead, or allowing a choice)*/
 visicomp.core.Table.prototype.setData = function(data) {
@@ -27,6 +30,10 @@ visicomp.core.Table.prototype.setData = function(data) {
 	//store the new object in the parent
     return visicomp.core.DataHolder.setData.call(this,data);
 }
+
+//------------------------------
+// Codeable Methods
+//------------------------------
 	
 visicomp.core.Table.prototype.processObjectFunction = function(objectFunction) {	
     //tjhe data is the output of the function
@@ -34,11 +41,14 @@ visicomp.core.Table.prototype.processObjectFunction = function(objectFunction) {
 	this.setData(data);
 }
 
+//------------------------------
+// Child Methods
+//------------------------------
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.Table.fromJson = function(parent,json,updateDataList) {
-    var table = new visicomp.core.Table(parent,json.name);
+visicomp.core.Table.fromJson = function(owner,json,updateDataList) {
+    var table = new visicomp.core.Table(owner,json.name);
     if(json.updateData) {
         json.updateData.member = table;
         updateDataList.push(json.updateData);
