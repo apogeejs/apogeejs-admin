@@ -45,19 +45,6 @@ visicomp.app.visiui.CustomResourceProcessor.prototype.update = function(html,cus
 	this.updateProcessor();
 }
 
-visicomp.app.visiui.CustomResourceProcessor.prototype.toJson = function() {
-    var json = {};
-    json.html = this.html;
-	json.customizeScript = this.customizeScript;
-	json.supplementalCode = this.supplementalCode;
-	json.css = this.css;
-    return json;
-}
-
-visicomp.app.visiui.CustomResourceProcessor.prototype.updateFromJson = function(json) {
-	this.update(json.html,json.customizeScript,json.supplementalCode,json.css);
-}
-
 //======================================
 // Processor methods
 //======================================

@@ -27,6 +27,10 @@ visicomp.app.visiui.CustomResourceControl.prototype.update = function(html,proce
 	resource.updateResourceProcessor(newProcessor);
 }
 
+visicomp.app.visiui.CustomResourceControl.prototype.initEmptyProcessor = function() {
+	this.update("","","","");
+}
+
 /** This method populates the frame for this control. */
 visicomp.app.visiui.CustomResourceControl.prototype.addToFrame = function() {
 	
@@ -58,16 +62,37 @@ visicomp.app.visiui.CustomResourceControl.prototype.createEditResourceDialogCall
     }
 }
 
-
 /** This serializes the table control. */
 visicomp.app.visiui.CustomResourceControl.prototype.writeToJson = function(json) {
-    var resource = this.getObject();
-    
     //store the processor info
+    var resource = this.getObject();
 	var resourceProcessor = resource.getResourceProcessor();
     if(resourceProcessor) {
-        json.processor = resourceProcessor.toJson();
+        json.processor = {};
+        json.processor.html = resourceProcessor.getHtml();
+        json.processor.customizeScript = resourceProcessor.getCustomizeScript();
+        json.processor.supplementalCode = resourceProcessor.getSupplementalCode();
+        json.processor.css = resourceProcessor.getCss();
     }
+}
+
+/** This method deseriliazes any data needed after the control is instantiated.
+ * objects that extend Control should override this for any data that is
+ * needed, however they should call this base function first. */
+visicomp.app.visiui.CustomResourceControl.prototype.updateFromJson = function(json,updateDataList) {
+    visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
+    
+    //internal data
+    if(json.processor) {
+        this.update(json.processor.html,
+            json.processor.customizeScript,
+            json.processor.supplementalCode,
+            json.processor.css);
+    }
+    else {
+        this.initEmptyProcessor();
+    }
+    
 }
 
 //======================================
@@ -88,10 +113,14 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,p
         var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,resource);
         returnValue.control = customResourceControl;
         
-        //set the resource processor
-        var resourceProcessor = new visicomp.app.visiui.CustomResourceProcessor();
-        resourceProcessor.setWindow(customResourceControl.getWindow());
-        resource.updateResourceProcessor(resourceProcessor);
+        //if we do not load from a json, we must manually set the resource processor
+        //this is because here we store processor data in the JSON. If we try creating
+        //an empty one it might not be compatible with the existing initializer code int
+        //the resource. 
+        //In cases where the resourceProcessor does not save data in the json, which
+        //is the typical scenario, then this is not an issue.
+        customResourceControl.initEmptyProcessor();
+        
     }
     else {
         //no action for now
@@ -107,13 +136,9 @@ visicomp.app.visiui.CustomResourceControl.createControlFromJson = function(works
         customResourceControl.updateFromJson(controlData);
         customResourceControl.memberUpdated();
     }
-    
-    var resourceProcessor = new visicomp.app.visiui.CustomResourceProcessor();
-    resourceProcessor.setWindow(customResourceControl.getWindow());    
-    if((controlData)&&(controlData.processor)) {
-        resourceProcessor.updateFromJson(controlData.processor);
+    else {
+        customResourceControl.initEmptyProcessor();
     }
-    member.updateResourceProcessor(resourceProcessor);
     
     return customResourceControl;
 }

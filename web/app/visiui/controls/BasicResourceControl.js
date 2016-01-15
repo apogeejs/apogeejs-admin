@@ -17,13 +17,6 @@ visicomp.app.visiui.BasicResourceControl.populateFrame = function() {
     
     var window = this.getWindow();
 	
-	//set the child UI object onto the control engine
-    var resource = this.getObject();
-	var resourceProcessor = resource.getResourceProcessor();
-	if(resourceProcessor) {
-		resourceProcessor.setWindow(window);
-	}
-	
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
   

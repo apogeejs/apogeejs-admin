@@ -29,9 +29,7 @@ visicomp.app.visiui.WorksheetControl.prototype.writeToJson = function(json) {
 /** This method deseriliazes any data needed after the control is instantiated.
  * objects that extend Control should override this for any data that is
  * needed, however they should call this base function first. */
-visicomp.app.visiui.WorksheetControl.prototype.updateFromJson = function(json,updateDataList) {
-    var workspaceUI = this.getWorkspaceUI();
-    
+visicomp.app.visiui.WorksheetControl.prototype.updateFromJson = function(json,updateDataList) {    
     //call the base update function
     visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
     
@@ -39,6 +37,7 @@ visicomp.app.visiui.WorksheetControl.prototype.updateFromJson = function(json,up
     var worksheet = this.getObject();
     
     if(json.internalFolder) {
+        var workspaceUI = this.getWorkspaceUI();
         var internalFolder = worksheet.getInternalFolder();
         workspaceUI.createChildrenFromJson(internalFolder,json.internalFolder,updateDataList);
     }

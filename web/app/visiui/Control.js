@@ -148,7 +148,7 @@ visicomp.app.visiui.Control.updateFromJson = function(json) {
 
 //This method should be populated by an extending object. It should return a json object.
 //** This serializes the table control. */
-//visicomp.app.visiui.TableControl.prototype.writeToJson = function(json);
+//visicomp.app.visiui.Control.prototype.writeToJson = function(json);
 
 //This method should be populated by an extending object.
 //** This method populates the frame for this control. */
