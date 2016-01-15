@@ -79,7 +79,7 @@ visicomp.core.updatemember.updateObjects = function(updateDataList) {
         }
         
         //stop processing on an error
-        if(!singleEditStatus.success) {
+        if((singleEditStatus)&&(!singleEditStatus.success)) {
             mainEditStatus.success = false;
             mainEditStatus.msg = singleEditStatus.msg;
             mainEditStatus.success = false;

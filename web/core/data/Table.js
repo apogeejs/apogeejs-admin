@@ -4,14 +4,16 @@ visicomp.core.Table = function(owner,name) {
     visicomp.core.Impactor.init.call(this);
     visicomp.core.Child.init.call(this,owner,name,visicomp.core.Table.generator);
     visicomp.core.DataHolder.init.call(this);
-    visicomp.core.Dependant.init.call(this);
+    visicomp.core.Dependent.init.call(this);
 	visicomp.core.Codeable.init.call(this,[]);
+    
+    this.setData("");
 }
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.DataHolder);
-visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Dependant);
+visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Dependent);
 visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Impactor);
 visicomp.core.util.mixin(visicomp.core.Table,visicomp.core.Codeable);
 

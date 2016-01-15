@@ -1,6 +1,6 @@
 /** This mixin encapsulates an object in that can be coded. It contains a function
  * and supplemental code. Object that are codeable should also be a child,
- * dependant and dataholder.
+ * dependent and dataholder.
  * 
  * This is a mixin and not a class. It is used in the prototype of the objects that inherit from it.
  * 
@@ -102,14 +102,14 @@ visicomp.core.Codeable.hasCode = function() {
     return (this.objectFunction !== null);
 }
 
-/** This implements the "needsExecuting" method of Dependant. 
+/** This implements the "needsExecuting" method of Dependent. 
  * @private */
 visicomp.core.Codeable.needsExecuting = function() {
 	return (this.objectFunction != null);
 }
 
 
-/** This implements the "execute" method of Dependant.  */
+/** This implements the "execute" method of Dependent.  */
 visicomp.core.Codeable.execute = function() {
     if(!this.objectFunction) return;
     

@@ -5,26 +5,26 @@
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
  * COMPONENT DEPENDENCIES:
- * - A Dependant must be a Child. The Child component must be installed before the
- * Dependant component.
+ * - A Dependent must be a Child. The Child component must be installed before the
+ * Dependent component.
  * - A Dependent is a Codeable, however it must be installed before Codeable. An object
  * can not be one without the other.
  */
-visicomp.core.Dependant = {};
+visicomp.core.Dependent = {};
 
 /** This initializes the component */
-visicomp.core.Dependant.init = function() {
+visicomp.core.Dependent.init = function() {
     
     //this is the list of dependencies
     this.dependsOnList = [];
 }
 
-/** This property tells if this object is a dependant.
- * This property should not be implemented on non-dependants. */
-visicomp.core.Dependant.isDependant = true;
+/** This property tells if this object is a dependent.
+ * This property should not be implemented on non-dependents. */
+visicomp.core.Dependent.isDependent = true;
 
 /** This returns a map of the members that this member depends on. */
-visicomp.core.Dependant.getDependsOn = function() {
+visicomp.core.Dependent.getDependsOn = function() {
     return this.dependsOnList;
 }
 
@@ -44,7 +44,7 @@ visicomp.core.Dependant.getDependsOn = function() {
 
 /** This sets the dependencies based on the code for the member. 
  * @private */
-visicomp.core.Dependant.updateDependencies = function(newDependsOn) {
+visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
 	//retireve the old list
     var oldDependsOn = this.dependsOnList;
 	
@@ -58,9 +58,9 @@ visicomp.core.Dependant.updateDependencies = function(newDependsOn) {
     for(i = 0; i < newDependsOn.length; i++) {
         remoteMember = newDependsOn[i];
         
-        //make sure this is a dependant
+        //make sure this is a dependent
         if(!remoteMember.isImpactor) {
-            visicomp.core.util.createError("The object " + remoteMember.getFullName() + " cannot be referenced as a dependant.");
+            visicomp.core.util.createError("The object " + remoteMember.getFullName() + " cannot be referenced as a dependent.");
         }
 		
 		//update this member

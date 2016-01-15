@@ -108,90 +108,113 @@ visicomp.app.visiui.VisiComp.prototype.saveWorkspaceRequested = function() {
 
 /** This method creates a new workspace. */
 visicomp.app.visiui.VisiComp.prototype.createWorkspace = function(name) {
-    
-    //make the workspace ui
-    var workspaceUI = this.makeWorkspaceUI(name);
-    
-    //load a new workspace
-    workspaceUI.loadNewWorkspace(name);
-    
     var returnValue = {};
-    returnValue.success = true;
-    returnValue.workspaceUI = workspaceUI;
-    returnValue.workspace = workspaceUI.getWorkspace();
     
-    return returnValue;
+    try {
+        //make the workspace ui
+        var workspaceUI = this.makeWorkspaceUI(name);
+
+        //load a new workspace
+        workspaceUI.loadNewWorkspace(name);
     
+        returnValue.success = true;
+        returnValue.workspaceUI = workspaceUI;
+        returnValue.workspace = workspaceUI.getWorkspace();
+    }
+    catch(error) {
+        returnValue.success = false;
+        returnValue.msg = error.message;
+    }
+    
+    return returnValue; 
 }
 
 /** This method opens an workspace, from the text file. */
 visicomp.app.visiui.VisiComp.prototype.openWorkspace = function(workspaceText) {
-	var workspaceJson = JSON.parse(workspaceText);
- 
- //I should verify the file type and format!    
-    
-    var name = workspaceJson.workspace.name;
-    var workspaceUI =  this.makeWorkspaceUI(name);
- 
-    //load links if they are present
-    var links = workspaceJson.links;
-
-//this code was in workspace. I should probably put it back there.
-//
-//    //add links
-//    var linksAdded = false;
-//    if((json.jsLinks)&&(json.jsLinks.length > 0)) {
-//        workspaceUI.setJsLinks(json.jsLinks);
-//        linksAdded = true;
-//    }
-//    if((json.cssLinks)&&(json.cssLinks.length > 0)) {
-//        workspaceUI.setCssLinks(json.cssLinks);
-//        linksAdded = true;
-//    }
-//	
-////this is how we will wait to load links if there are any for now
-//if(linksAdded) {
-//    var timerFunction = function() {
-//        visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson(workspaceUI,workspace,json);
-//    }
-//    setTimeout(timerFunction,2000);
-//    return {"success":true};
-//}
-//else {
-//    return visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson(workspaceUI,workspace,json);
-//}
-//    
-    
-    //load the workspace data
-    workspaceUI.loadWorkspace(workspaceJson);
-    
     var returnValue = {};
-    returnValue.success = true;
-    returnValue.workspaceUI = workspaceUI;
-    returnValue.workspace = workspaceUI.getWorkspace();
+    
+    try {
+        var workspaceJson = JSON.parse(workspaceText);
+
+     //I should verify the file type and format!    
+
+        var name = workspaceJson.workspace.name;
+        var workspaceUI =  this.makeWorkspaceUI(name);
+
+        //load links if they are present
+        var links = workspaceJson.links;
+
+    //this code was in workspace. I should probably put it back there.
+    //
+    //    //add links
+    //    var linksAdded = false;
+    //    if((json.jsLinks)&&(json.jsLinks.length > 0)) {
+    //        workspaceUI.setJsLinks(json.jsLinks);
+    //        linksAdded = true;
+    //    }
+    //    if((json.cssLinks)&&(json.cssLinks.length > 0)) {
+    //        workspaceUI.setCssLinks(json.cssLinks);
+    //        linksAdded = true;
+    //    }
+    //	
+    ////this is how we will wait to load links if there are any for now
+    //if(linksAdded) {
+    //    var timerFunction = function() {
+    //        visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson(workspaceUI,workspace,json);
+    //    }
+    //    setTimeout(timerFunction,2000);
+    //    return {"success":true};
+    //}
+    //else {
+    //    return visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson(workspaceUI,workspace,json);
+    //}
+    //    
+
+        //load the workspace data
+        workspaceUI.loadWorkspace(workspaceJson);
+
+        returnValue.success = true;
+        returnValue.workspaceUI = workspaceUI;
+        returnValue.workspace = workspaceUI.getWorkspace();
+    }
+    catch(error) {
+        returnValue.success = false;
+        returnValue.msg = error.message;
+    }
     
     return returnValue;
 }
 
 /** This method closes the active workspace. */
 visicomp.app.visiui.VisiComp.prototype.closeWorkspace = function() {
+    var returnValue = {};
     
     //add some kind of warnging!!
-    
-    var activeWorkspaceUI = this.getActiveWorkspaceUI();
-    if(activeWorkspaceUI === null) {
-        alert("There is no open workspace.");
-        return;
+    try {
+        var activeWorkspaceUI = this.getActiveWorkspaceUI();
+        if(activeWorkspaceUI === null) {
+            returnValue.success = false;
+            returnValue.msg = "There is no open workspace.";
+            return returnValue;
+        }
+
+        var workspace = activeWorkspaceUI.getWorkspace();
+
+        var name = workspace.getName();
+
+        //remove the workspace from the app
+        delete this.workspaceUIs[name];
+        this.tabFrame.removeTab(name);
+        workspace.close();
+        
+        returnValue.success = true;
+    }
+    catch(error) {
+        returnValue.success = false;
+        returnValue.msg = error.message;
     }
     
-    var workspace = activeWorkspaceUI.getWorkspace();
-    
-    var name = workspace.getName();
-    
-    //remove the workspace from the app
-    delete this.workspaceUIs[name];
-    this.tabFrame.removeTab(name);
-    workspace.close();
+    return returnValue;
 }
 
 /** This method makes the app workspace, from a workspace data object and the UI init info. 
@@ -199,9 +222,9 @@ visicomp.app.visiui.VisiComp.prototype.closeWorkspace = function() {
 visicomp.app.visiui.VisiComp.prototype.makeWorkspaceUI = function(name) {
     
     //we can only have one workspace of a given name!
-if(this.workspaceUIs[name]) {
-    return {"success":false,"msg":"There is already an open workspce with the name " + name};
-}
+    if(this.workspaceUIs[name]) {
+        throw visicomp.core.util.createError("There is already an open workspace with the name " + name);
+    }
     
 	var tab = this.tabFrame.addTab(name);
     this.tabFrame.setActiveTab(name);

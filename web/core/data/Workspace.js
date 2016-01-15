@@ -86,10 +86,10 @@ visicomp.core.Workspace.fromJson = function(json) {
     var name = json.name;
     var fileType = json.fileType;
 	if((fileType !== visicomp.core.Workspace.SAVE_FILE_TYPE)||(!name)) {
-		return {"success":false,"msg":"Bad file format."};
+		throw visicomp.core.util.createError("Bad file format.");
 	}
     if(json.version != visicomp.core.Workspace.SAVE_FILE_VERSION) {
-        return {"success":false,"msg":"Incorrect file version."};
+        throw visicomp.core.util.createError("Incorrect file version.");
     }
     
     //create the workspace

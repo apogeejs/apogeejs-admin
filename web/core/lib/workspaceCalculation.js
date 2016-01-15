@@ -43,27 +43,6 @@ visicomp.core.calculation.inList = function(recalculateList,member) {
     }
     return false;
 }
-    
-
-///** This method sorts the recalcultae list into the proper order and then
-// * recalculates all the members in it. */
-//visicomp.core.calculation.recalculateObjects = function(recalculateList,editStatus) {
-//    
-//    //sort the list so we can update once each
-//    var success = visicomp.core.calculation.sortRecalculateList(recalculateList);
-//    if(!success) {
-//        editStatus.success = false;
-//        returnValue.msg = "Failure in update cascade - Is there a curcular reference?";
-//        return returnValue;
-//    }
-//	
-//    //update each of the items in this list
-//    visicomp.core.calculation.callRecalculateList(recalculateList);
-//    
-//    editStatus.success = true;
-//    
-//    return editStatus;
-//}
 
 /** This method updates the recalculate list order so no member appears in the list
  *before a member it depends on. This will return false if it fails. 

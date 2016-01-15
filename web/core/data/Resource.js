@@ -4,7 +4,7 @@ visicomp.core.Resource = function(owner,name) {
     visicomp.core.Impactor.init.call(this);
     visicomp.core.Child.init.call(this,owner,name,visicomp.core.Resource.generator);
     visicomp.core.DataHolder.init.call(this);
-    visicomp.core.Dependant.init.call(this);
+    visicomp.core.Dependent.init.call(this);
 	visicomp.core.Codeable.init.call(this,["resource"]);
     
     this.resourceProcessor = null;
@@ -12,7 +12,7 @@ visicomp.core.Resource = function(owner,name) {
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Resource,visicomp.core.Child);
-visicomp.core.util.mixin(visicomp.core.Resource,visicomp.core.Dependant);
+visicomp.core.util.mixin(visicomp.core.Resource,visicomp.core.Dependent);
 visicomp.core.util.mixin(visicomp.core.Resource,visicomp.core.Codeable);
 	
 visicomp.core.Resource.prototype.getResourceProcessor = function() {	
