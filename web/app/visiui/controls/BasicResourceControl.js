@@ -12,38 +12,6 @@ visicomp.app.visiui.BasicResourceControl.init = function() {}
 // Protected and Private Instance Methods
 //==============================
 
-/** This serializes the table control. */
-visicomp.app.visiui.BasicResourceControl.writeToJson = function(json) {
-    var resource = this.getObject();
-    
-    //store the processor info
-	var resourceProcessor = resource.getResourceProcessor();
-    if(resourceProcessor.toJson) {
-        json.processor = resourceProcessor.toJson();
-    }
-    
-    //store the codeable info
-	json.functionBody = resource.getFunctionBody();
-	json.supplementalCode = resource.getSupplementalCode();
-}
-
-/** This method deseriliazes any data needed after the control is instantiated.
- * objects that extend Control should override this for any data that is
- * needed, however they should call this base function first. */
-visicomp.app.visiui.BasicResourceControl.updateFromJson = function(json,updateDataList) {
-    //call the base update function
-    visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
-    
-    //load the type specific data
-    var resource = this.getObject();
-    
-    var updateData = {};
-    updateData.member = resource;
-    updateData.functionBody = json.functionBody;
-    updateData.supplementalCode = json.supplementalCode;
-    updateDataList.push(updateData);
-}
-
 /** This method populates the frame for this control. */
 visicomp.app.visiui.BasicResourceControl.populateFrame = function() {
     
@@ -86,21 +54,4 @@ visicomp.app.visiui.BasicResourceControl.memberUpdated = function() {
 // Static methods
 //======================================
 
-/** This method can be called to complete serialization of a basic control. */
-visicomp.app.visiui.BasicResourceControl.updateFromJson = function(json,updateDataList) {
-    //call the base update function
-    visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
-		
-    var resource = this.getObject();
-    if(json.processor) {
-        var resourceProcessor = resource.getResourceProcessor();
-        resourceProcessor.updateFromJson(json.processor);
-    }
-
-    var updateData = {};
-    updateData.member = resource;
-    updateData.functionBody = json.functionBody;
-    updateData.supplementalCode = json.supplementalCode;
-    updateDataList.push(updateData);
-}
 

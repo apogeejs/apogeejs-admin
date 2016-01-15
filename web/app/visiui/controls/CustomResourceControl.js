@@ -13,10 +13,6 @@ visicomp.core.util.mixin(visicomp.app.visiui.CustomResourceControl,visicomp.app.
 // Protected and Private Instance Methods
 //==============================
 
-visicomp.app.visiui.CustomResourceControl.prototype.getResourceProcessor = function() {
-	return this.getObject().getResourceProcessor();
-}
-
 visicomp.app.visiui.CustomResourceControl.prototype.update = function(html,processorGeneratorBody,supplementalCode,css) {
 	
 	//create a new resource processor
@@ -62,14 +58,24 @@ visicomp.app.visiui.CustomResourceControl.prototype.createEditResourceDialogCall
     }
 }
 
+
+/** This serializes the table control. */
+visicomp.app.visiui.CustomResourceControl.prototype.writeToJson = function(json) {
+    var resource = this.getObject();
+    
+    //store the processor info
+	var resourceProcessor = resource.getResourceProcessor();
+    if(resourceProcessor) {
+        json.processor = resourceProcessor.toJson();
+    }
+}
+
 //======================================
 // Static methods
 //======================================
 
 //add table listener
 visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,parent,name) {
-	//create a resource with a base custom processor
-	var resourceProcessor = new visicomp.app.visiui.CustomResourceProcessor();
     var json = {};
     json.name = name;
     json.type = visicomp.core.Resource.generator.type;
@@ -77,14 +83,39 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,p
     
     if(returnValue.success) {
         var resource = returnValue.member;
-        resource.updateResourceProcessor(resourceProcessor);
+        
+        //create the control
         var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,resource);
         returnValue.control = customResourceControl;
+        
+        //set the resource processor
+        var resourceProcessor = new visicomp.app.visiui.CustomResourceProcessor();
+        resourceProcessor.setWindow(customResourceControl.getWindow());
+        resource.updateResourceProcessor(resourceProcessor);
     }
     else {
         //no action for now
     }
     return returnValue;
+}
+
+
+visicomp.app.visiui.CustomResourceControl.createControlFromJson = function(workspaceUI,member,controlData) {
+    
+    var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,member);
+    if(controlData) {
+        customResourceControl.updateFromJson(controlData);
+        customResourceControl.memberUpdated();
+    }
+    
+    var resourceProcessor = new visicomp.app.visiui.CustomResourceProcessor();
+    resourceProcessor.setWindow(customResourceControl.getWindow());    
+    if((controlData)&&(controlData.processor)) {
+        resourceProcessor.updateFromJson(controlData.processor);
+    }
+    member.updateResourceProcessor(resourceProcessor);
+    
+    return customResourceControl;
 }
 
 //======================================
@@ -95,5 +126,6 @@ visicomp.app.visiui.CustomResourceControl.generator = {};
 visicomp.app.visiui.CustomResourceControl.generator.displayName = "Custom Control";
 visicomp.app.visiui.CustomResourceControl.generator.uniqueName = "visicomp.app.visiui.CustomResourceControl";
 visicomp.app.visiui.CustomResourceControl.generator.createControl = visicomp.app.visiui.CustomResourceControl.createControl;
+visicomp.app.visiui.CustomResourceControl.generator.createControlFromJson = visicomp.app.visiui.CustomResourceControl.createControlFromJson;
 
 

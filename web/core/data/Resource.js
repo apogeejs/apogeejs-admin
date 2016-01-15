@@ -1,13 +1,13 @@
 /** This class encapsulatees a data table */
-visicomp.core.Resource = function(parent,name,resourceProcessor) {
+visicomp.core.Resource = function(parent,name) {
     //base init
     visicomp.core.Impactor.init.call(this);
     visicomp.core.Child.init.call(this,parent,name,visicomp.core.Resource.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependant.init.call(this);
-	visicomp.core.Codeable.init.call(this,["resourceProcessor"]);
+	visicomp.core.Codeable.init.call(this,["resource"]);
     
-    this.resourceProcessor = resourceProcessor;
+    this.resourceProcessor = null;
 }
 
 //add components to this class
@@ -32,36 +32,26 @@ visicomp.core.Resource.prototype.updateResourceProcessor = function(resourceProc
 
 visicomp.core.Resource.prototype.processObjectFunction = function(objectFunction) {	
     //exectue the object function passing the resource object.
-    objectFunction(this.resourceProcessor);
+    if(this.resourceProcessor) {
+        objectFunction(this.resourceProcessor);
+    }
 }
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 visicomp.core.Resource.fromJson = function(parent,json,updateDataList) {
     
-    throw new visicomp.core.util.createError("From JSON not implemented for resource processer");
-    var resourceProcesros = null;
-    
-    var resource = visicomp.core.Resource(parent,json.name,resourceProcessor);
+    var resource = new visicomp.core.Resource(parent,json.name);
+    if(json.updateData) {
+        json.updateData.member = resource;
+        updateDataList.push(json.updateData);
+    }
     return resource;
-
 }
 
 //===================================
 // Protected Functions
 //===================================
-
-/** This method adds any additional data to the json saved for this child. 
- * @protected */
-visicomp.core.Resource.prototype.addToJson = function(json) {
-    //call the method from codeable
-    visicomp.core.Codeable.addToJson.call(this,json);
-    
-	//store the processor info
-    if(this.resourceProcessor) {
-        json.processor = this.resourceProcessor.toJson();
-    }
-}
 
 //============================
 // Static methods

@@ -2,7 +2,7 @@
  * arguments as the updateFunction event handler data. */
 visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResourceControl,onSaveFunction) {
 	
-	var customResourceProcessor = customResourceControl.getResourceProcessor();
+	var customResourceProcessor = customResourceControl.getObject().getResourceProcessor();
     
     var dialog = new visicomp.visiui.Dialog({"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
             

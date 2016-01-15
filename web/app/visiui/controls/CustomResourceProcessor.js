@@ -95,7 +95,7 @@ visicomp.app.visiui.CustomResourceProcessor.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//end supplemental code",
 "",
 "//member function",
-"var generator = function(resourceProcessor) {",
+"var generator = function(resource) {",
 "{0}",
 "}",
 "//end member function",
