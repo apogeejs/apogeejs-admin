@@ -77,6 +77,9 @@ KeyEntry.prototype.loadContextMenu = function() {
     var valueEntry = this.valueEntry;
     var valueType = valueEntry.getType();
     element.oncontextmenu = function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
         var contextMenu = new visicomp.visiui.MenuBody();
         contextMenu.addCallbackMenuItem("Value",function() {alert(instance.getCurrentValue());});
         if(valueType == "value") {

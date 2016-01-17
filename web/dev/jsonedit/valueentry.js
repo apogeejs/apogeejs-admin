@@ -151,6 +151,10 @@ ValueEntry.prototype.loadValueElementContextMenu = function(element) {
 
     var instance = this;    
     element.oncontextmenu = function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        
         var contextMenu = new visicomp.visiui.MenuBody();
         contextMenu.addCallbackMenuItem("Convert To Object",function() {instance.valueToObject()});
         contextMenu.addCallbackMenuItem("Convert To Array",function() {instance.valueToArray()}); 
