@@ -1,19 +1,21 @@
 /**  This a value entry
  * 
  * notes:
- * - parent is the obgject that holds the dom elements for this value. it will be
+ * - parent is the object that holds the dom elements for this value. it will be
  * either the key for this value or the top level entry. It should have a method
  * "updateValueElements" that will refresh the elements if they have been updated.
  */
-function ValueEntry(parent,data,indentLevel,isVirtual,parentValue) {
+function ValueEntry(parent,data,isVirtual) {
 	this.parent = parent;
     this.data = data;
 	this.type = util.getObjectType(data); //"value", "object", "array"
-	this.indentLevel = indentLevel;
+	this.indentLevel = parent.getIndentLevel() + 1;
+    
+    //these are all the display elements
+    this.elementList = [];
     
     //thse are for virtual key entries. Parent value is the value that holds the parent key
     this.isVirtual = isVirtual;
-    this.parentValue = parentValue;
     
     //for value types ---
     
@@ -29,9 +31,6 @@ function ValueEntry(parent,data,indentLevel,isVirtual,parentValue) {
 	
     //this is the singel element for the list entries (if applicable)
 	this.listDiv = null;
-    
-    //these are all the display elements
-    this.elementList = [];
     
     //this is the virtual child key
     this.virtualChildKey = null;
@@ -88,6 +87,14 @@ ValueEntry.prototype.getElementList = function() {
 	return this.elementList;
 }
 
+ValueEntry.prototype.getValueEditObject = function() {
+	return this.valueEditObject;
+}
+
+ValueEntry.prototype.getIndentLevel = function() {
+	return this.indentLevel;
+}
+
 ValueEntry.prototype.createElements = function(elementsData) {
 	//initialize data elements
     this.valueEditObject = null;
@@ -98,7 +105,7 @@ ValueEntry.prototype.createElements = function(elementsData) {
 	//populate data
     if(this.type == "value") {
         //create the value element
-        this.createValueElement(elementsData,this.isVirtual,this.parentValue);
+        this.createValueElement(elementsData);
 		
 		//clear the list elements
 		this.listDiv = null;
@@ -109,27 +116,28 @@ ValueEntry.prototype.createElements = function(elementsData) {
         //create the child keys for the object or array
         var childKeyEntry;
         if(this.type == "object") { 
-            
             for(var key in elementsData) {
-                childKeyEntry = new KeyEntry(key,"key",elementsData[key],this.indentLevel + 1);
+                childKeyEntry = new KeyEntry(this,key,"key",elementsData[key],false);
                 this.childKeyEntries.push(childKeyEntry);
             }
             
             //add a dummy entry
-            childKeyEntry = new KeyEntry("","key","",this.indentLevel + 1,true,this);
+            childKeyEntry = new KeyEntry(this,"","key","",this,true,false);
             this.virtualChildKey = childKeyEntry;
         }
         else if(this.type == "array") {
-            
-            for(var i = 0; i < elementsData.length; i++) {
-                childKeyEntry = new KeyEntry(i,"index",elementsData[i],this.indentLevel + 1);
+            for(var keyIndex = 0; keyIndex < elementsData.length; keyIndex++) {
+                childKeyEntry = new KeyEntry(this,keyIndex,"index",elementsData[keyIndex],false);
                 this.childKeyEntries.push(childKeyEntry);
             }
             
             //add a dummy entry
-            childKeyEntry = new KeyEntry(i,"index","",this.indentLevel + 1,true,this);
+            childKeyEntry = new KeyEntry(this,keyIndex,"index","",true);
             this.virtualChildKey = childKeyEntry;
         }
+        
+        //update keys  as needed (applies context menu, for one
+        this.updateChildKeys();
         
         this.formatList();
     }
@@ -137,29 +145,27 @@ ValueEntry.prototype.createElements = function(elementsData) {
 
 /** This wraps the list elements into the proper format. 
 * @private */
-ValueEntry.prototype.createValueElement = function(data,isVirtual,parentValue) {
+ValueEntry.prototype.createValueElement = function(data) {
 
     //create a simple element
-    this.valueEditObject = util.createValueElement(data,isVirtual,parentValue);
+    this.valueEditObject = util.createValueElement(data,this.isVirtual);
+    
+    var parentValueObject = this.parent.getParentValueObject();
+    
+    //make the edit field editable if it is a key
+    if((parentValueObject)&&(this.isVirtual)) {
+        var instance = this;
+        var onCompleteCallback = function(editValue) {
+            //create a new element with this key
+            parentValueObject.insertElement("",editValue);
+            //clear the data from the virtual entry
+            instance.valueEditObject.setValue("");
+        }
+        this.valueEditObject.setOnCompleteCallback(onCompleteCallback);
+    }    
+    
     var element = this.valueEditObject.getElement();
     this.elementList.push(element);
-    
-    this.loadValueElementContextMenu(element); 
-}
-
-ValueEntry.prototype.loadValueElementContextMenu = function(element) {
-
-    var instance = this;    
-    element.oncontextmenu = function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        
-        var contextMenu = new visicomp.visiui.MenuBody();
-        contextMenu.addCallbackMenuItem("Convert To Object",function() {instance.valueToObject()});
-        contextMenu.addCallbackMenuItem("Convert To Array",function() {instance.valueToArray()}); 
-        visicomp.visiui.Menu.showContextMenu(contextMenu,event);
-    }
 }
 
 /** This wraps the list elements into the proper format. 
@@ -250,6 +256,10 @@ ValueEntry.prototype.doExpandContract = function() {
 	}
 }
 
+//--------------------------
+// Edit Operations
+//--------------------------
+
 /** This method inserts an element at the given index. If the index is left blank
  * the entry is inserted at the end of the list. The value of key is ignored if
  * the entry is an array. */
@@ -272,10 +282,10 @@ ValueEntry.prototype.insertElement = function(key,value,index) {
     }
     
     if(this.type == "object") {
-        childKeyEntry = new KeyEntry(key,"key",value,this.indentLevel + 1);     
+        childKeyEntry = new KeyEntry(this,key,"key",value,false);     
     }
     else if(this.type == "array") {
-        childKeyEntry = new KeyEntry(index,"index",value,this.indentLevel + 1);
+        childKeyEntry = new KeyEntry(this,index,"index",value,false);
         
         //we also need to update all the keys larger than this one
         for(var newIndex = index+1; newIndex < this.childKeyEntries.length; newIndex++) {
@@ -287,11 +297,111 @@ ValueEntry.prototype.insertElement = function(key,value,index) {
     this.childKeyEntries.splice(index,0,childKeyEntry);
     
     this.listDiv.insertBefore(childKeyEntry.getElement(),insertBefore);
+    
+    //update keys as needed
+    this.updateChildKeys();
+}
 
+/** this method moves the key from the current index to the next index. */
+ValueEntry.prototype.moveChildKeyToNextIndex = function(index) {
+    if((index < 0)||(index >= this.childKeyEntries.length -1)) {
+        //illegal index
+        alert("Can not make the specified key move");
+        return;
+    }
+    
+    var oldFirstKey = this.childKeyEntries[index];
+    var oldSecondKey = this.childKeyEntries[index+1];
+    
+    this.childKeyEntries[index] = oldSecondKey;
+    this.childKeyEntries[index+1] = oldFirstKey;
+    
+    this.listDiv.insertBefore(oldSecondKey.getElement(),oldFirstKey.getElement());
+    
+    //update keys as needed
+    this.updateChildKeys();
+}
+
+/** This method inserts an element at the given index. If the index is left blank
+ * the entry is inserted at the end of the list. The value of key is ignored if
+ * the entry is an array. */
+ValueEntry.prototype.deleteChildElement = function(keyEntry) {
+    
+    var index = this.childKeyEntries.indexOf(keyEntry);
+    if(index == -1) {
+        alert("Element not found!");
+        return;
+    }
+    
+    //get the element to delete
+    this.childKeyEntries.splice(index,1);
+    
+    this.listDiv.removeChild(keyEntry.getElement());
+    
+    //update keys as needed
+    this.updateChildKeys();
+
+}
+
+/** This method inserts an element at the given index. If the index is left blank
+ * the entry is inserted at the end of the list. The value of key is ignored if
+ * the entry is an array. 
+ * @private */
+ValueEntry.prototype.updateChildKeys = function() {
+    var numberKeys;
+    var keyIndex;
+    
+    if(this.type == "object") {
+        var key;
+        
+        //count keys
+        numberKeys = 0;
+        for(key in this.childKeyEntries) {
+            numberKeys++;
+        }
+
+        keyIndex = 0;
+        for(key in this.childKeyEntries) {
+            var childKeyEntry = this.childKeyEntries[key];
+            
+            //set the context menu
+            childKeyEntry.loadContextMenu(numberKeys,keyIndex);
+            keyIndex++;
+        }
+        
+    }
+    else if(this.type == "array") {
+        numberKeys = this.childKeyEntries.length;
+        
+        //set context menu and make sure index is correct
+        for(keyIndex = 0; keyIndex < numberKeys; keyIndex++) {
+            childKeyEntry = this.childKeyEntries[keyIndex];
+            
+            //make sure the index is correct
+            if(childKeyEntry.getCurrentKey() != keyIndex) {
+                childKeyEntry.setKey(keyIndex);
+            }
+            
+            //set the context menu
+            childKeyEntry.loadContextMenu(numberKeys,keyIndex);
+        }
+        
+        if(this.virtualChildKey) {
+            if(this.virtualChildKey.getCurrentKey() != numberKeys) {
+                this.virtualChildKey.setKey(numberKeys);
+            }
+            
+            this.virtualChildKey.loadContextMenu(numberKeys,numberKeys);
+        }
+    }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
+
+//------------------------------
+// Conversions
+//------------------------------
 
 ValueEntry.prototype.valueToArray = function() {
     if(!this.type == "value") {
@@ -305,6 +415,11 @@ ValueEntry.prototype.valueToArray = function() {
     
     //refresh the parent key
     if(this.parent) {
+        var parentValueObject = this.parent.getParentValueObject();
+        if(parentValueObject) {
+            parentValueObject.updateChildKeys();
+        }
+        
         this.parent.updateValueElements();
     }
 }
@@ -318,9 +433,14 @@ ValueEntry.prototype.valueToObject = function() {
     //these are the edit elements
     var newValue = {"a":this.valueEditObject.getValue()};
 	this.createElements(newValue);
-    
+   
     //refresh the parent key
     if(this.parent) {
+        var parentValueObject = this.parent.getParentValueObject();
+        if(parentValueObject) {
+            parentValueObject.updateChildKeys();
+        }
+        
         this.parent.updateValueElements();
     }
 }
@@ -350,6 +470,11 @@ ValueEntry.prototype.objectToArray = function() {
     
     //refresh the parent key
     if(this.parent) {
+        var parentValueObject = this.parent.getParentValueObject();
+        if(parentValueObject) {
+            parentValueObject.updateChildKeys();
+        }
+        
         this.parent.updateValueElements();
     }
 }
@@ -376,6 +501,11 @@ ValueEntry.prototype.arrayToObject = function() {
     
     //refresh the parent key
     if(this.parent) {
+        var parentValueObject = this.parent.getParentValueObject();
+        if(parentValueObject) {
+            parentValueObject.updateChildKeys();
+        }
+        
         this.parent.updateValueElements();
     }
 }
@@ -402,6 +532,11 @@ ValueEntry.prototype.convertToValue = function() {
     
     //refresh the parent key
     if(this.parent) {
+        var parentValueObject = this.parent.getParentValueObject();
+        if(parentValueObject) {
+            parentValueObject.updateChildKeys();
+        }
+        
         this.parent.updateValueElements();
     }
 }

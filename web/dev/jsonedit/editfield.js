@@ -3,13 +3,13 @@
  * be returned to the previous value. Otherwise, the value of the field
  * fill be updated to match the edit.
  */
-function EditField(value,className,overrideChangeCallback) {
+function EditField(value,className) {
     this.value = value;
     this.element = document.createElement("div");
     this.element.className = className;
     this.element.innerHTML = value;
     
-    this.overrideChangeCallback = overrideChangeCallback;
+    this.onCompleteCallback = null;
     
     //this will be set while the element is being edited
     this.editField = null;
@@ -19,6 +19,10 @@ function EditField(value,className,overrideChangeCallback) {
     this.element.onclick = function() {
 		instance.onClick();
 	};
+}
+
+EditField.prototype.setOnCompleteCallback= function(onCompleteCallback) {
+    return this.onCompleteCallback = onCompleteCallback;
 }
 
 EditField.prototype.getValue= function() {
@@ -68,20 +72,13 @@ EditField.prototype.startEdit = function() {
 
 EditField.prototype.endEdit = function() {
     if(this.editField) {
-        
-        if(this.overrideChangeCallback) {
-            //callback the change handler to create a new entry
-            //don't treat this like an edit if the field did not change
-            if(this.editField.value != this.value) {
-                this.overrideChangeCallback(this.editField.value);
-            }
-        }
-        else {
-            //store the new value
-            this.value = this.editField.value;     
-        }
+        this.value = this.editField.value;     
         this.editField = null;
         this.element.innerHTML = this.value;
+        
+        if(this.onCompleteCallback) {
+            this.onCompleteCallback(this.value);
+        }
     }
 }
 

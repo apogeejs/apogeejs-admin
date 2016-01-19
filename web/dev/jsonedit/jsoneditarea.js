@@ -2,14 +2,10 @@
 function JsonEditArea(divElement,initialValue) {
     this.body = divElement;
     
-	this.valueEntry = new ValueEntry(this,initialValue,0);
+	this.valueEntry = new ValueEntry(this,initialValue);
     this.valueEntry.setExpanded(true);
  
 	this.formatBody();
-}
-
-JsonEditArea.prototype.getInitialKey = function() {
-	return this.key;
 }
 
 JsonEditArea.prototype.getCurrentValue = function() {
@@ -18,6 +14,14 @@ JsonEditArea.prototype.getCurrentValue = function() {
 
 JsonEditArea.prototype.getElement = function() {
 	return this.body;
+}
+
+JsonEditArea.prototype.getParentValueObject = function() {
+	return undefined;
+}
+
+JsonEditArea.prototype.getIndentLevel = function() {
+	return 0;
 }
 
 JsonEditArea.prototype.formatBody = function() {
@@ -41,6 +45,9 @@ JsonEditArea.prototype.loadContextMenu = function() {
         event.stopPropagation();
         
         var contextMenu = new visicomp.visiui.MenuBody();
+        
+        contextMenu.addCallbackMenuItem("Get Value",function() {alert(JSON.stringify(valueEntry.getCurrentValue()));});
+        
         if(valueType == "value") {
             contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.valueToObject()});
             contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.valueToArray()});

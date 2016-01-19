@@ -1,14 +1,13 @@
 
-function KeyEntry(key,keyType,data,indentLevel,isVirtual,parentValue) {
+function KeyEntry(parentValue,key,keyType,data,isVirtual) {
 	this.key = key;
 	this.type = keyType; //"key" or "index"
 	this.data = data;
-	this.indentLevel = indentLevel;
+	this.indentLevel = parentValue.getIndentLevel() + 1;
+    this.parentValue = parentValue;
     
     //thse are for virtual key entries
     this.isVirtual = isVirtual;
-    this.parentValue = parentValue;
-	
 	this.body = null;
     
     //this is the edit control for the key
@@ -38,6 +37,14 @@ KeyEntry.prototype.getElement = function() {
 	return this.body;
 }
 
+KeyEntry.prototype.getParentValueObject = function() {
+	return this.parentValue;
+}
+
+KeyEntry.prototype.getIndentLevel = function() {
+	return this.indentLevel;
+}
+
 KeyEntry.prototype.createBody = function(entryData) {
 	
 	//create main row
@@ -46,12 +53,31 @@ KeyEntry.prototype.createBody = function(entryData) {
 	this.body.className = "jsonBody";
     
     //create the key
-    this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual,this.parentValue);
+    this.createKeyElement();
     
     //create value entry
-	this.valueEntry = new ValueEntry(this,entryData,this.indentLevel + 1,this.isVirtual,this.parentValue);
+	this.valueEntry = new ValueEntry(this,entryData,this.isVirtual);
 	
     this.formatBody();
+}
+
+/** This wraps the list elements into the proper format. 
+* @private */
+KeyEntry.prototype.createKeyElement = function() {
+    
+    this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual);
+    
+    //make the edit field editable if it is a key
+    if((this.type == "key")&&(this.isVirtual)) {
+        var instance = this;
+        var onCompleteCallback = function(editValue) {
+            //create a new element with this key
+            instance.parentValue.insertElement(editValue,"");
+            //clear the data from the virtual entry
+            instance.keyEditObject.setValue("");
+        }
+        this.keyEditObject.setOnCompleteCallback(onCompleteCallback);
+    }
 }
 
 KeyEntry.prototype.formatBody = function() {
@@ -65,23 +91,41 @@ KeyEntry.prototype.formatBody = function() {
     for(var i = 0; i < valueElementList.length; i++) {
         this.body.appendChild(valueElementList[i]);
     }
-    
-    this.loadContextMenu();
-    
 }
 
-KeyEntry.prototype.loadContextMenu = function() {
+/** This loads the context menu for the key. It should be update if
+ *the key index changes. */
+KeyEntry.prototype.loadContextMenu = function(parentKeyCount,keyIndex) {
 
     var instance = this;
+    var parentValue = this.parentValue; 
     var element = this.keyEditObject.getElement();
     var valueEntry = this.valueEntry;
     var valueType = valueEntry.getType();
+    
     element.oncontextmenu = function(event) {
         event.preventDefault();
         event.stopPropagation();
         
         var contextMenu = new visicomp.visiui.MenuBody();
-        contextMenu.addCallbackMenuItem("Value",function() {alert(instance.getCurrentValue());});
+        
+        //insert elements
+        contextMenu.addCallbackMenuItem("Insert Above",function() {parentValue.insertElement("","",keyIndex);});
+        contextMenu.addCallbackMenuItem("Insert Below",function() {parentValue.insertElement("","",keyIndex+1);});
+
+        if(keyIndex > 0) {
+            contextMenu.addCallbackMenuItem("Move Up",function() {parentValue.moveChildKeyToNextIndex(keyIndex-1);});
+        }
+        if(keyIndex < parentKeyCount - 1) {
+            contextMenu.addCallbackMenuItem("Move Down",function() {parentValue.moveChildKeyToNextIndex(keyIndex);});
+        }
+        
+        //delete elements
+        if(!instance.isVirtual) {
+            contextMenu.addCallbackMenuItem("Delete Entry",function() {parentValue.deleteChildElement(instance);});
+        }
+        
+        //conversions
         if(valueType == "value") {
             contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.valueToObject()});
             contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.valueToArray()});
@@ -97,6 +141,12 @@ KeyEntry.prototype.loadContextMenu = function() {
         
         visicomp.visiui.Menu.showContextMenu(contextMenu,event);
     }
+    
+    //if this is a value entry, set the same context menu on the value element
+    if(valueType == "value") {
+        var valueEditObject = this.valueEntry.getValueEditObject();
+        valueEditObject.getElement().oncontextmenu = element.oncontextmenu;
+    }
   
 }
 
@@ -107,7 +157,7 @@ KeyEntry.prototype.convertToKeyType = function(key) {
     this.key = String(key);
     
     //create the key
-    this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual,this.parentValue);
+    this.createKeyElement();
     
     //remove and reset all from element
     this.body.innerHTML = "";
@@ -121,7 +171,7 @@ KeyEntry.prototype.convertToIndexType = function(index) {
     this.key = index;
     
     //create the key
-    this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual,this.parentValue);
+    this.createKeyElement();
     
     //remove and reset all from element
     this.body.innerHTML = "";
