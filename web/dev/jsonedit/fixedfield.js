@@ -16,6 +16,10 @@ FixedField.prototype.setValue = function(value) {
     this.element.innerHTML = value;
 }
 
+FixedField.prototype.setClassName = function(className) {
+    this.element.className = className;
+}
+
 FixedField.prototype.getElement = function() {
     return this.element;
 }

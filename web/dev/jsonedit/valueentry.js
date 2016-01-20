@@ -14,7 +14,7 @@ function ValueEntry(parent,data,isVirtual) {
     //these are all the display elements
     this.elementList = [];
     
-    //thse are for virtual key entries. Parent value is the value that holds the parent key
+    //thse are for virtual key entries
     this.isVirtual = isVirtual;
     
     //for value types ---
@@ -28,12 +28,12 @@ function ValueEntry(parent,data,isVirtual) {
 	
 	//these are the child keys
     this.childKeyEntries = [];
-	
-    //this is the singel element for the list entries (if applicable)
-	this.listDiv = null;
     
     //this is the virtual child key
     this.virtualChildKey = null;
+	
+    //this is the singel element for the list entries (if applicable)
+	this.listDiv = null;
     
     //this is used to control expanding and collapsing
     this.isExpanded = false;
@@ -41,9 +41,34 @@ function ValueEntry(parent,data,isVirtual) {
 	this.contractedList = [];
     
     //-------------------
-	
-	this.createElements(this.data);
+    
+    if(this.type == "value") {
+        //-----------------------------
+        //update the data for a simple value entry
+        //-----------------------------
+        this.createValueEntry(this.data);
+    }
+    else {
+        //-----------------------------
+        //update the child key entries
+        //-----------------------------
+        this.createChildKeyEntries(this.data);
+
+        //------------------------
+        //update keys as needed
+        //------------------------
+        this.updateChildKeys();
+
+        //----------------------------
+        //update the dom element list
+        //----------------------------
+        this.createElementList();
+    }
 }
+
+//============================
+// Accessors
+//============================
 
 ValueEntry.prototype.getInitialValue = function() {
     return this.data;
@@ -95,82 +120,452 @@ ValueEntry.prototype.getIndentLevel = function() {
 	return this.indentLevel;
 }
 
-ValueEntry.prototype.createElements = function(elementsData) {
-	//initialize data elements
+ValueEntry.prototype.setIsVirtual = function(isVirtual) {
+	this.isVirtual = isVirtual;
+    if(this.valueEditObject) {
+        if(isVirtual) {
+            this.valueEditObject.setClassName("valueCell");
+        }
+        else {
+            this.valueEditObject.setClassName("virtualValueCell");
+        }
+    }
+}
+
+
+
+//----------------------------
+// Navigation between cells
+//----------------------------
+
+ValueEntry.prototype.navigateCells = function(direction) {
+    var parentValue = this.parent.getParentValueObject();
+    if(parentValue) {
+        parentValue.navigateChildren(this.parent,false,direction);
+    }
+}
+
+ValueEntry.prototype.navigateChildren = function(keyEntry,originIsKey,direction) {
+    
+    var destKeyEntry = null;
+    var destFieldIsKey = false;
+    if(direction == EditField.DIRECTION_DOWN) {
+        var index = this.childKeyEntries.indexOf(keyEntry);
+        if(index >= 0) {
+            index += 1;
+            if(index < this.childKeyEntries.length) {
+                destKeyEntry = this.childKeyEntries[index];
+            }
+            else {
+                destKeyEntry = this.virtualChildKey;
+            }
+            destFieldIsKey = originIsKey;
+        }
+    }
+    if(direction == EditField.DIRECTION_UP) {
+        var index = this.childKeyEntries.indexOf(keyEntry);
+        index -= 1;
+        if(index >= 0) {
+            destKeyEntry = this.childKeyEntries[index];
+            destFieldIsKey = originIsKey;
+        }
+    }
+    else if(direction == EditField.DIRECTION_RIGHT) {
+        if(originIsKey) {
+            destKeyEntry = originIsKey;
+            destFieldIsKey = false;
+        }
+    }
+    else if(direction == EditField.DIRECTION_LEFT) {
+        if(!originIsKey) {
+            destKeyEntry = originIsKey;
+            destFieldIsKey = true;
+        }
+    }
+
+    //navigate
+    if(destKeyEntry) {
+        if(destFieldIsKey) {
+            destKeyEntry.keyEditObject.startEdit();
+        }
+        else {
+            //make sure this is a value
+            if(destKeyEntry.valueEntry.valueEditObject) {
+                destKeyEntry.valueEntry.valueEditObject.startEdit();
+            }
+        }
+    }
+    
+}
+
+//--------------------------
+// Edit Operations
+//--------------------------
+
+/** This method inserts an element at the given index. If the index is left blank
+ * the entry is inserted at the end of the list. The value of key is ignored if
+ * the entry is an array. */
+ValueEntry.prototype.insertElement = function(key,value,index) {
+
+    var childKeyEntry;
+    
+    //get the insert index
+    if(index === undefined) {
+        index = this.childKeyEntries.length;
+    }
+    
+    //-----------------------------
+    //update the child key entries
+    //-----------------------------
+    var insertBefore;
+    if(index >= this.childKeyEntries.length) {
+        insertBefore = this.virtualChildKey.getElement();
+    }
+    else {
+        insertBefore = this.childKeyEntries[index].getElement();
+    }
+    
+    if(this.type == "object") {
+        childKeyEntry = new KeyEntry(this,key,"key",value,false);     
+    }
+    else if(this.type == "array") {
+        childKeyEntry = new KeyEntry(this,index,"index",value,false);
+        
+        //we also need to update all the keys larger than this one
+        for(var newIndex = index+1; newIndex < this.childKeyEntries.length; newIndex++) {
+            this.childKeyEntries[newIndex].setKey(newIndex);
+        }
+        this.virtualChildKey.setKey(this.childKeyEntries.length + 1);
+    }
+    
+    this.childKeyEntries.splice(index,0,childKeyEntry);
+    
+    //------------------------
+    //update keys as needed
+    //------------------------
+    this.updateChildKeys();
+    
+    //----------------------------
+    //update the dom element list
+    //----------------------------
+    this.listDiv.insertBefore(childKeyEntry.getElement(),insertBefore);
+}
+
+/** this method swaps the given key with the next key in the list. */
+ValueEntry.prototype.moveChildKeyToNextIndex = function(index) {
+    if((index < 0)||(index >= this.childKeyEntries.length -1)) {
+        //illegal index
+        alert("Can not make the specified key move");
+        return;
+    }
+    
+    //-----------------------------
+    //update the child key entries
+    //-----------------------------
+    var oldFirstKey = this.childKeyEntries[index];
+    var oldSecondKey = this.childKeyEntries[index+1];
+    
+    this.childKeyEntries[index] = oldSecondKey;
+    this.childKeyEntries[index+1] = oldFirstKey;
+    
+    //------------------------
+    //update keys as needed
+    //------------------------
+    this.updateChildKeys();
+    
+    //----------------------------
+    //update the dom element list
+    //----------------------------
+    this.listDiv.insertBefore(oldSecondKey.getElement(),oldFirstKey.getElement());
+    
+}
+
+/** This method inserts an element at the given index. If the index is left blank
+ * the entry is inserted at the end of the list. The value of key is ignored if
+ * the entry is an array. */
+ValueEntry.prototype.deleteChildElement = function(keyEntry) {
+    
+    var index = this.childKeyEntries.indexOf(keyEntry);
+    if(index == -1) {
+        alert("Element not found!");
+        return;
+    }
+    
+    //-----------------------------
+    //update the child key entries
+    //-----------------------------
+    this.childKeyEntries.splice(index,1);
+    
+    //------------------------
+    //update keys as needed
+    //------------------------
+    this.updateChildKeys();
+    
+    //----------------------------
+    //update the dom element list
+    //----------------------------
+    this.listDiv.removeChild(keyEntry.getElement());
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+//------------------------------
+// Conversions
+//------------------------------
+
+ValueEntry.prototype.valueToArray = function() {
+    if(!this.type == "value") {
+        throw "Type value expected. Found " + this.type;
+    }
+    this.type = "array";
+    
+    //these are the edit elements
+    var newValue = [this.valueEditObject.getValue()];
+    
+    //-----------------------------
+    //update the child key entries
+    //-----------------------------
+	this.createChildKeyEntries(newValue);
+    
+    //------------------------
+    //update keys as needed
+    //------------------------
+    this.updateChildKeys();
+
+    //----------------------------
+    //update the dom element list
+    //----------------------------
+    this.createElementList();
+    
+    //refresh the parent key
+    if(this.parent) {
+        var parentValueObject = this.parent.getParentValueObject();
+        if(parentValueObject) {
+            parentValueObject.updateChildKeys();
+        }
+        
+        this.parent.updateValueElements();
+    }
+}
+
+ValueEntry.prototype.valueToObject = function() {
+    if(!this.type == "value") {
+        throw "Type value expected. Found " + this.type;
+    }
+    this.type = "object";
+    
+    //these are the edit elements
+    var newValue = {"a":this.valueEditObject.getValue()};
+    
+    //-----------------------------
+    //update the child key entries
+    //-----------------------------
+	this.createChildKeyEntries(newValue);
+    
+    //------------------------
+    //update keys as needed
+    //------------------------
+    this.updateChildKeys();
+
+    //----------------------------
+    //update the dom element list
+    //----------------------------
+    this.createElementList();
+   
+    //refresh the parent key
+    if(this.parent) {
+        var parentValueObject = this.parent.getParentValueObject();
+        if(parentValueObject) {
+            parentValueObject.updateChildKeys();
+        }
+        
+        this.parent.updateValueElements();
+    }
+}
+
+ValueEntry.prototype.objectToArray = function() {
+    if(!this.type == "object") {
+        throw "Type object expected. Found " + this.type;
+    }
+    this.type = "array";
+    
+    //-----------------------------
+    //update the child key entries
+    //-----------------------------
+    //reconfigure the existing list (rather than remaking all the objects)
+    var i = 0;
+    if(this.childKeyEntries) {
+        for(i = 0; i < this.childKeyEntries.length; i++) {
+            var childKeyEntry = this.childKeyEntries[i];
+            childKeyEntry.convertToIndexType(i);
+        }
+    }
+	if(this.virtualChildKey) {
+		this.virtualChildKey.convertToIndexType(i);
+	}
+    
+    //these are the edit elements
+    this.valueEditObject = null;
+    
+    //------------------------
+    //update keys as needed
+    //------------------------
+    this.updateChildKeys();
+    
+    //----------------------------
+    //update the dom element list
+    //----------------------------
+    this.createElementList();
+    
+    //refresh the parent key
+    if(this.parent) {
+        var parentValueObject = this.parent.getParentValueObject();
+        if(parentValueObject) {
+            parentValueObject.updateChildKeys();
+        }
+        
+        this.parent.updateValueElements();
+    }
+}
+
+ValueEntry.prototype.arrayToObject = function() {
+    if(!this.type == "array") {
+        throw "Type array expected. Found " + this.type;
+    }
+    this.type = "object";
+    
+    //-----------------------------
+    //update the child key entries
+    //-----------------------------
+    //reconfigure the existing list (rather than remaking all the objects)
+	var i = 0;
+    if(this.childKeyEntries) {
+        for(i = 0; i < this.childKeyEntries.length; i++) {
+            var childKeyEntry = this.childKeyEntries[i];
+            childKeyEntry.convertToKeyType(String(i));
+        }
+    }
+	if(this.virtualChildKey) {
+		this.virtualChildKey.convertToKeyType("");
+	}
+    
+    //------------------------
+    //update keys as needed
+    //------------------------
+    this.updateChildKeys();
+
+    //----------------------------
+    //update the dom element list
+    //----------------------------
+    this.createElementList();
+    
+    //refresh the parent key
+    if(this.parent) {
+        var parentValueObject = this.parent.getParentValueObject();
+        if(parentValueObject) {
+            parentValueObject.updateChildKeys();
+        }
+        
+        this.parent.updateValueElements();
+    }
+}
+
+ValueEntry.prototype.convertToValue = function() {
+    if(this.type == "value") {
+        return;
+    }
+   
+    //update type
+    this.type = "value";
+    
+    var value;
+    if((this.childKeyEntries)&&(this.childKeyEntries.length > 0)) {
+        var firstChildKey = this.childKeyEntries[0];
+        value = firstChildKey.getCurrentValue();
+    }
+    else {
+        value = "";
+    }
+    
+    //-----------------------------
+    //update the data for a simple value entry
+    //-----------------------------
+    this.createValueEntry(value);
+    
+    //refresh the parent key
+    if(this.parent) {
+        var parentValueObject = this.parent.getParentValueObject();
+        if(parentValueObject) {
+            parentValueObject.updateChildKeys();
+        }
+        
+        this.parent.updateValueElements();
+    }
+}
+
+//==============================
+// Construction Methods
+//==============================
+
+/** This method constructs the contents for a value entry
+ * @private */
+ValueEntry.prototype.createValueEntry = function(elementsData) {
+    if(this.type != "value") return;
+    
     this.valueEditObject = null;
     this.childKeyEntries = [];
 	this.virtualChildKey = null;
 	this.elementList = [];
 	
-	//populate data
-    if(this.type == "value") {
-        //create the value element
-        this.createValueElement(elementsData);
-		
-		//clear the list elements
-		this.listDiv = null;
-		this.contractedList = null;
-		this.expandedList = null;
-    }
-    else {
-        //create the child keys for the object or array
-        var childKeyEntry;
-        if(this.type == "object") { 
-            for(var key in elementsData) {
-                childKeyEntry = new KeyEntry(this,key,"key",elementsData[key],false);
-                this.childKeyEntries.push(childKeyEntry);
-            }
-            
-            //add a dummy entry
-            childKeyEntry = new KeyEntry(this,"","key","",this,true,false);
-            this.virtualChildKey = childKeyEntry;
-        }
-        else if(this.type == "array") {
-            for(var keyIndex = 0; keyIndex < elementsData.length; keyIndex++) {
-                childKeyEntry = new KeyEntry(this,keyIndex,"index",elementsData[keyIndex],false);
-                this.childKeyEntries.push(childKeyEntry);
-            }
-            
-            //add a dummy entry
-            childKeyEntry = new KeyEntry(this,keyIndex,"index","",true);
-            this.virtualChildKey = childKeyEntry;
-        }
-        
-        //update keys  as needed (applies context menu, for one
-        this.updateChildKeys();
-        
-        this.formatList();
-    }
+    //create the value element
+    this.createValueElement(elementsData);
+
+    //clear the list elements
+    this.listDiv = null;
+    this.contractedList = null;
+    this.expandedList = null;
 }
 
-/** This wraps the list elements into the proper format. 
-* @private */
-ValueEntry.prototype.createValueElement = function(data) {
+/** This method constructs the contents for an array or object
+ * @private */
+ValueEntry.prototype.createChildKeyEntries = function(elementsData) {
+    if(this.type == "value") return;
+    
+	//initialize data elements
+    this.valueEditObject = null;
+    this.childKeyEntries = [];
+	this.virtualChildKey = null;
+	this.elementList = [];
 
-    //create a simple element
-    this.valueEditObject = util.createValueElement(data,this.isVirtual);
-    
-    var parentValueObject = this.parent.getParentValueObject();
-    
-    //make the edit field editable if it is a key
-    if((parentValueObject)&&(this.isVirtual)) {
-        var instance = this;
-        var onCompleteCallback = function(editValue) {
-            //create a new element with this key
-            parentValueObject.insertElement("",editValue);
-            //clear the data from the virtual entry
-            instance.valueEditObject.setValue("");
+    //create the child keys for the object or array
+    var childKeyEntry;
+    if(this.type == "object") { 
+        for(var key in elementsData) {
+            childKeyEntry = new KeyEntry(this,key,"key",elementsData[key],false);
+            this.childKeyEntries.push(childKeyEntry);
         }
-        this.valueEditObject.setOnCompleteCallback(onCompleteCallback);
-    }    
-    
-    var element = this.valueEditObject.getElement();
-    this.elementList.push(element);
+
+        //add a dummy entry
+        childKeyEntry = new KeyEntry(this,"","key","",this,true,false);
+        this.virtualChildKey = childKeyEntry;
+    }
+    else if(this.type == "array") {
+        for(var keyIndex = 0; keyIndex < elementsData.length; keyIndex++) {
+            childKeyEntry = new KeyEntry(this,keyIndex,"index",elementsData[keyIndex],false);
+            this.childKeyEntries.push(childKeyEntry);
+        }
+
+        //add a dummy entry
+        childKeyEntry = new KeyEntry(this,keyIndex,"index","",true);
+        this.virtualChildKey = childKeyEntry;
+    }
+
 }
 
-/** This wraps the list elements into the proper format. 
+/** This create the dom element list for the child key entries 
 * @private */
-ValueEntry.prototype.formatList = function() {
+ValueEntry.prototype.createElementList = function() {
 
     //initialize elements
 	this.listDiv = document.createElement("div");
@@ -238,114 +633,9 @@ ValueEntry.prototype.formatList = function() {
     this.doExpandContract();
 }
 
-ValueEntry.prototype.doExpandContract = function() {
-	if((!this.expandedList)||(!this.contractedList)) return;
-	
-	var onList = this.isExpanded ? this.expandedList : this.contractedList;
-	var offList = !this.isExpanded ? this.expandedList : this.contractedList;
-	
-	var i;
-	var element;
-	for(i = 0; i < onList.length; i++) {
-		element = onList[i];
-		element.style.display = "";
-	}
-	for(i = 0; i < offList.length; i++) {
-		element = offList[i];
-		element.style.display = "none";
-	}
-}
 
-//--------------------------
-// Edit Operations
-//--------------------------
-
-/** This method inserts an element at the given index. If the index is left blank
- * the entry is inserted at the end of the list. The value of key is ignored if
- * the entry is an array. */
-ValueEntry.prototype.insertElement = function(key,value,index) {
-
-    var childKeyEntry;
-    
-    //get the insert index
-    if(index === undefined) {
-        index = this.childKeyEntries.length;
-    }
-    
-    //get the element to insert before
-    var insertBefore;
-    if(index >= this.childKeyEntries.length) {
-        insertBefore = this.virtualChildKey.getElement();
-    }
-    else {
-        insertBefore = this.childKeyEntries[index].getElement();
-    }
-    
-    if(this.type == "object") {
-        childKeyEntry = new KeyEntry(this,key,"key",value,false);     
-    }
-    else if(this.type == "array") {
-        childKeyEntry = new KeyEntry(this,index,"index",value,false);
-        
-        //we also need to update all the keys larger than this one
-        for(var newIndex = index+1; newIndex < this.childKeyEntries.length; newIndex++) {
-            this.childKeyEntries[newIndex].setKey(newIndex);
-        }
-        this.virtualChildKey.setKey(this.childKeyEntries.length + 1);
-    }
-    
-    this.childKeyEntries.splice(index,0,childKeyEntry);
-    
-    this.listDiv.insertBefore(childKeyEntry.getElement(),insertBefore);
-    
-    //update keys as needed
-    this.updateChildKeys();
-}
-
-/** this method moves the key from the current index to the next index. */
-ValueEntry.prototype.moveChildKeyToNextIndex = function(index) {
-    if((index < 0)||(index >= this.childKeyEntries.length -1)) {
-        //illegal index
-        alert("Can not make the specified key move");
-        return;
-    }
-    
-    var oldFirstKey = this.childKeyEntries[index];
-    var oldSecondKey = this.childKeyEntries[index+1];
-    
-    this.childKeyEntries[index] = oldSecondKey;
-    this.childKeyEntries[index+1] = oldFirstKey;
-    
-    this.listDiv.insertBefore(oldSecondKey.getElement(),oldFirstKey.getElement());
-    
-    //update keys as needed
-    this.updateChildKeys();
-}
-
-/** This method inserts an element at the given index. If the index is left blank
- * the entry is inserted at the end of the list. The value of key is ignored if
- * the entry is an array. */
-ValueEntry.prototype.deleteChildElement = function(keyEntry) {
-    
-    var index = this.childKeyEntries.indexOf(keyEntry);
-    if(index == -1) {
-        alert("Element not found!");
-        return;
-    }
-    
-    //get the element to delete
-    this.childKeyEntries.splice(index,1);
-    
-    this.listDiv.removeChild(keyEntry.getElement());
-    
-    //update keys as needed
-    this.updateChildKeys();
-
-}
-
-/** This method inserts an element at the given index. If the index is left blank
- * the entry is inserted at the end of the list. The value of key is ignored if
- * the entry is an array. 
+/** This method updates the keys with the context menu and makes
+ * sure the keys are corect for array entries. 
  * @private */
 ValueEntry.prototype.updateChildKeys = function() {
     var numberKeys;
@@ -369,6 +659,9 @@ ValueEntry.prototype.updateChildKeys = function() {
             keyIndex++;
         }
         
+        //context menu
+        this.virtualChildKey.loadContextMenu(numberKeys,numberKeys);
+        
     }
     else if(this.type == "array") {
         numberKeys = this.childKeyEntries.length;
@@ -391,154 +684,89 @@ ValueEntry.prototype.updateChildKeys = function() {
                 this.virtualChildKey.setKey(numberKeys);
             }
             
+            //context menu
             this.virtualChildKey.loadContextMenu(numberKeys,numberKeys);
         }
     }
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-
-//------------------------------
-// Conversions
-//------------------------------
-
-ValueEntry.prototype.valueToArray = function() {
-    if(!this.type == "value") {
-        throw "Type value expected. Found " + this.type;
-    }
-    this.type = "array";
-    
-    //these are the edit elements
-    var newValue = [this.valueEditObject.getValue()];
-	this.createElements(newValue);
-    
-    //refresh the parent key
-    if(this.parent) {
-        var parentValueObject = this.parent.getParentValueObject();
-        if(parentValueObject) {
-            parentValueObject.updateChildKeys();
-        }
-        
-        this.parent.updateValueElements();
-    }
-}
-
-ValueEntry.prototype.valueToObject = function() {
-    if(!this.type == "value") {
-        throw "Type value expected. Found " + this.type;
-    }
-    this.type = "object";
-    
-    //these are the edit elements
-    var newValue = {"a":this.valueEditObject.getValue()};
-	this.createElements(newValue);
-   
-    //refresh the parent key
-    if(this.parent) {
-        var parentValueObject = this.parent.getParentValueObject();
-        if(parentValueObject) {
-            parentValueObject.updateChildKeys();
-        }
-        
-        this.parent.updateValueElements();
-    }
-}
-
-ValueEntry.prototype.objectToArray = function() {
-    if(!this.type == "object") {
-        throw "Type object expected. Found " + this.type;
-    }
-    this.type = "array";
-    
-    //reconfigure the existing list (rather than remaking all the objects)
-    var i = 0;
-    if(this.childKeyEntries) {
-        for(i = 0; i < this.childKeyEntries.length; i++) {
-            var childKeyEntry = this.childKeyEntries[i];
-            childKeyEntry.convertToIndexType(i);
-        }
-    }
-	if(this.virtualChildKey) {
-		this.virtualChildKey.convertToIndexType(i);
+ValueEntry.prototype.doExpandContract = function() {
+	if((!this.expandedList)||(!this.contractedList)) return;
+	
+	var onList = this.isExpanded ? this.expandedList : this.contractedList;
+	var offList = !this.isExpanded ? this.expandedList : this.contractedList;
+	
+	var i;
+	var element;
+	for(i = 0; i < onList.length; i++) {
+		element = onList[i];
+		element.style.display = "";
 	}
-    
-    //these are the edit elements
-    this.valueEditObject = null;
-    
-    this.formatList();
-    
-    //refresh the parent key
-    if(this.parent) {
-        var parentValueObject = this.parent.getParentValueObject();
-        if(parentValueObject) {
-            parentValueObject.updateChildKeys();
-        }
-        
-        this.parent.updateValueElements();
-    }
-}
-
-ValueEntry.prototype.arrayToObject = function() {
-    if(!this.type == "array") {
-        throw "Type array expected. Found " + this.type;
-    }
-    this.type = "object";
-    
-    //reconfigure the existing list (rather than remaking all the objects)
-	var i = 0;
-    if(this.childKeyEntries) {
-        for(i = 0; i < this.childKeyEntries.length; i++) {
-            var childKeyEntry = this.childKeyEntries[i];
-            childKeyEntry.convertToKeyType(String(i));
-        }
-    }
-	if(this.virtualChildKey) {
-		this.virtualChildKey.convertToKeyType("");
+	for(i = 0; i < offList.length; i++) {
+		element = offList[i];
+		element.style.display = "none";
 	}
-
-    this.formatList();
-    
-    //refresh the parent key
-    if(this.parent) {
-        var parentValueObject = this.parent.getParentValueObject();
-        if(parentValueObject) {
-            parentValueObject.updateChildKeys();
-        }
-        
-        this.parent.updateValueElements();
-    }
 }
 
-ValueEntry.prototype.convertToValue = function() {
-    if(this.type == "value") {
-        return;
-    }
-   
-    //update type
-    this.type = "value";
+
+/** This creates the edit element for the entry. Only needed on type "value" 
+* @private */
+ValueEntry.prototype.createValueElement = function(data) {
+
+    //create a simple element
+    this.valueEditObject = util.createValueElement(data,this.isVirtual);
+    var instance = this;
     
-    var value;
-    if((this.childKeyEntries)&&(this.childKeyEntries.length > 0)) {
-        var firstChildKey = this.childKeyEntries[0];
-        value = firstChildKey.getCurrentValue();
-    }
-    else {
-        value = "";
-    }
-    
-    //set the element value
-	this.createElements(value);
-    
-    //refresh the parent key
-    if(this.parent) {
-        var parentValueObject = this.parent.getParentValueObject();
-        if(parentValueObject) {
-            parentValueObject.updateChildKeys();
+    //make the edit field editable if it is a key
+    var onEdit = function(editValue) {
+        if(instance.isVirtual) {
+            var parentValueObject = instance.parent.getParentValueObject();
+            if(parentValueObject) {
+                parentValueObject.makeVirtualEntryReal();
+            }
         }
-        
-        this.parent.updateValueElements();
     }
+    this.valueEditObject.setOnEditCallback(onEdit);
+
+    
+    //set the navgation callback
+    var navCallback = function(direction) {
+        instance.navigateCells(direction);
+    }
+    this.valueEditObject.setNavCallback(navCallback);
+    
+    var element = this.valueEditObject.getElement();
+    this.elementList.push(element);
 }
+
+
+
+/** This wraps the list elements into the proper format. */
+ValueEntry.prototype.makeVirtualEntryReal = function(data) {
+    var newRealEntry = this.virtualChildKey
+    newRealEntry.setIsVirtual(false);
+    this.childKeyEntries.push(newRealEntry);
+    
+    var childKeyEntry;
+    if(this.type == "object") { 
+        //add a dummy entry
+        childKeyEntry = new KeyEntry(this,"","key","",this,true);
+        this.virtualChildKey = childKeyEntry;
+    }
+    else if(this.type == "array") {
+        //add a dummy entry
+        childKeyEntry = new KeyEntry(this,this.childKeyEntries.length,"index","",true);
+        this.virtualChildKey = childKeyEntry;
+    }
+    
+    this.updateChildKeys();
+    
+    this.createElementList();
+    
+    this.parent.updateValueElements();
+    
+}
+
 
 

@@ -8,6 +8,7 @@
     display:table-cell;
     border: gray solid 1px;
     padding: 2px;
+    min-width: 10px;
     background: lightgray;
     font-weight:bold;
 }
@@ -46,6 +47,9 @@
     padding: 2px;
     min-width: 70px;
     max-width: 500px;
+}
+.valueCell:empty {
+	height:15px;
 }
 .virtualValueCell:empty {
 	height:15px;

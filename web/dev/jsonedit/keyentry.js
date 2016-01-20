@@ -1,4 +1,4 @@
-
+/** Constructor */
 function KeyEntry(parentValue,key,keyType,data,isVirtual) {
 	this.key = key;
 	this.type = keyType; //"key" or "index"
@@ -12,9 +12,15 @@ function KeyEntry(parentValue,key,keyType,data,isVirtual) {
     
     //this is the edit control for the key
     this.keyEditObject = null;
+    
+    this.valueEntry = null;
 	
 	this.createBody(this.data);
 }
+
+//=======================
+// Accessors
+//=======================
 
 KeyEntry.prototype.setKey = function(key) {
 	this.key = key;
@@ -45,6 +51,40 @@ KeyEntry.prototype.getIndentLevel = function() {
 	return this.indentLevel;
 }
 
+KeyEntry.prototype.setIsVirtual = function(isVirtual) {
+	this.isVirtual = isVirtual;
+    if(isVirtual) {
+        if(this.type == "key") {
+            this.keyEditObject.setClassName("virtualKeyCell");
+        }
+        else {
+            this.keyEditObject.setClassName("virtualIndexCell");
+        }
+    }
+    else {
+        if(this.type == "key") {
+            this.keyEditObject.setClassName("keyCell");
+        }
+        else {
+            this.keyEditObject.setClassName("indexCell");
+        }
+    }
+    this.valueEntry.setIsVirtual(isVirtual);
+}
+
+KeyEntry.prototype.updateValueElements = function() {
+    //remove all from element
+    this.body.innerHTML = "";
+    //recreate
+    this.formatBody();
+}
+
+//=================================
+// Others Methods
+//=================================
+
+/** This method created the key entry, clearing the old one if applicable.
+ * @private */
 KeyEntry.prototype.createBody = function(entryData) {
 	
 	//create main row
@@ -61,25 +101,7 @@ KeyEntry.prototype.createBody = function(entryData) {
     this.formatBody();
 }
 
-/** This wraps the list elements into the proper format. 
-* @private */
-KeyEntry.prototype.createKeyElement = function() {
-    
-    this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual);
-    
-    //make the edit field editable if it is a key
-    if((this.type == "key")&&(this.isVirtual)) {
-        var instance = this;
-        var onCompleteCallback = function(editValue) {
-            //create a new element with this key
-            instance.parentValue.insertElement(editValue,"");
-            //clear the data from the virtual entry
-            instance.keyEditObject.setValue("");
-        }
-        this.keyEditObject.setOnCompleteCallback(onCompleteCallback);
-    }
-}
-
+/** @private */
 KeyEntry.prototype.formatBody = function() {
 	//add indent
 	this.body.appendChild(util.createIndentElement(this.indentLevel));
@@ -87,9 +109,41 @@ KeyEntry.prototype.formatBody = function() {
 	//add key
 	this.body.appendChild(this.keyEditObject.getElement());
 	
+    //add the value elements
 	var valueElementList = this.valueEntry.getElementList();
     for(var i = 0; i < valueElementList.length; i++) {
         this.body.appendChild(valueElementList[i]);
+    }
+}
+
+/** This wraps the list elements into the proper format. 
+* @private */
+KeyEntry.prototype.createKeyElement = function() {
+    
+    this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual);
+    
+    //make the edit field editable if it is a key
+    if(this.type == "key") {
+        var instance = this;
+        var onEdit = function(editValue) {
+            if(instance.isVirtual) {
+                instance.parentValue.makeVirtualEntryReal();
+            }
+        }
+        this.keyEditObject.setOnEditCallback(onEdit);
+        
+        //set the navgation callback
+        var navCallback = function(direction) {
+            instance.navigateCells(direction);
+        }
+        this.keyEditObject.setNavCallback(navCallback);
+    }
+}
+
+//navigation rules
+KeyEntry.prototype.navigateCells = function(direction) {
+    if(this.parentValue) {
+        this.parentValue.navigateChildren(this,true,direction);
     }
 }
 
@@ -102,6 +156,7 @@ KeyEntry.prototype.loadContextMenu = function(parentKeyCount,keyIndex) {
     var element = this.keyEditObject.getElement();
     var valueEntry = this.valueEntry;
     var valueType = valueEntry.getType();
+    var isVirtual = this.isVirtual;
     
     element.oncontextmenu = function(event) {
         event.preventDefault();
@@ -109,20 +164,22 @@ KeyEntry.prototype.loadContextMenu = function(parentKeyCount,keyIndex) {
         
         var contextMenu = new visicomp.visiui.MenuBody();
         
-        //insert elements
-        contextMenu.addCallbackMenuItem("Insert Above",function() {parentValue.insertElement("","",keyIndex);});
-        contextMenu.addCallbackMenuItem("Insert Below",function() {parentValue.insertElement("","",keyIndex+1);});
+        if(!isVirtual) {
+            //insert elements
+            contextMenu.addCallbackMenuItem("Insert Above",function() {parentValue.insertElement("","",keyIndex);});
+            contextMenu.addCallbackMenuItem("Insert Below",function() {parentValue.insertElement("","",keyIndex+1);});
 
-        if(keyIndex > 0) {
-            contextMenu.addCallbackMenuItem("Move Up",function() {parentValue.moveChildKeyToNextIndex(keyIndex-1);});
-        }
-        if(keyIndex < parentKeyCount - 1) {
-            contextMenu.addCallbackMenuItem("Move Down",function() {parentValue.moveChildKeyToNextIndex(keyIndex);});
-        }
-        
-        //delete elements
-        if(!instance.isVirtual) {
-            contextMenu.addCallbackMenuItem("Delete Entry",function() {parentValue.deleteChildElement(instance);});
+            if(keyIndex > 0) {
+                contextMenu.addCallbackMenuItem("Move Up",function() {parentValue.moveChildKeyToNextIndex(keyIndex-1);});
+            }
+            if(keyIndex < parentKeyCount - 1) {
+                contextMenu.addCallbackMenuItem("Move Down",function() {parentValue.moveChildKeyToNextIndex(keyIndex);});
+            }
+
+            //delete elements
+            if(!instance.isVirtual) {
+                contextMenu.addCallbackMenuItem("Delete Entry",function() {parentValue.deleteChildElement(instance);});
+            }
         }
         
         //conversions
@@ -150,6 +207,10 @@ KeyEntry.prototype.loadContextMenu = function(parentKeyCount,keyIndex) {
   
 }
 
+//======================================
+// Actions
+//======================================
+
 KeyEntry.prototype.convertToKeyType = function(key) {
     if(this.type == "key") return;
     
@@ -175,13 +236,6 @@ KeyEntry.prototype.convertToIndexType = function(index) {
     
     //remove and reset all from element
     this.body.innerHTML = "";
-    this.formatBody();
-}
-
-KeyEntry.prototype.updateValueElements = function() {
-    //remove all from element
-    this.body.innerHTML = "";
-    //recreate
     this.formatBody();
 }
 
