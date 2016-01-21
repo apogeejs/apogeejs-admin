@@ -138,6 +138,8 @@ ValueEntry.prototype.setIsVirtual = function(isVirtual) {
 // Navigation between cells
 //----------------------------
 
+/** This navigates to a next cell on completion of editing. 
+ * @private */
 ValueEntry.prototype.navigateCells = function(direction) {
     var parentValue = this.parent.getParentValueObject();
     if(parentValue) {
@@ -145,57 +147,121 @@ ValueEntry.prototype.navigateCells = function(direction) {
     }
 }
 
+/** This method determines the place to navigation to, and starts editing there
+ * if the re is a valid location. 
+ * @private */
 ValueEntry.prototype.navigateChildren = function(keyEntry,originIsKey,direction) {
     
-    var destKeyEntry = null;
-    var destFieldIsKey = false;
-    if(direction == EditField.DIRECTION_DOWN) {
-        var index = this.childKeyEntries.indexOf(keyEntry);
-        if(index >= 0) {
-            index += 1;
-            if(index < this.childKeyEntries.length) {
-                destKeyEntry = this.childKeyEntries[index];
+    //gerate the nav fruls
+    var destIsKey = false;
+    var deltaIndex = 0;
+    var doMove;
+    
+    if(this.type == "array") {
+        if((direction == EditField.DIRECTION_NEXT)||(direction == EditField.DIRECTION_DOWN)) {
+            doMove = !originIsKey;
+            if(doMove) {
+                destIsKey = false;
+                deltaIndex = 1;
             }
-            else {
-                destKeyEntry = this.virtualChildKey;
+        }
+        else if((direction == EditField.DIRECTION_PREV)||(direction == EditField.DIRECTION_UP)) {
+            doMove = !originIsKey;
+            if(doMove) {
+                destIsKey = false;
+                deltaIndex = -1;
             }
-            destFieldIsKey = originIsKey;
+        }
+        else if((direction == EditField.DIRECTION_RIGHT)||(direction == EditField.DIRECTION_LEFT)) {
+            doMove = false;
         }
     }
-    if(direction == EditField.DIRECTION_UP) {
-        var index = this.childKeyEntries.indexOf(keyEntry);
-        index -= 1;
-        if(index >= 0) {
-            destKeyEntry = this.childKeyEntries[index];
-            destFieldIsKey = originIsKey;
+    else if(this.type == "object") {
+        if(direction == EditField.DIRECTION_NEXT) {
+            doMove = true;
+            destIsKey = !originIsKey;
+            deltaIndex = originIsKey ? 0 : 1;  
         }
-    }
-    else if(direction == EditField.DIRECTION_RIGHT) {
-        if(originIsKey) {
-            destKeyEntry = originIsKey;
-            destFieldIsKey = false;
+        else if(direction == EditField.DIRECTION_PREV) {
+            doMove = true;
+            destIsKey = !originIsKey;
+            deltaIndex = originIsKey ? -1 : 0; 
         }
-    }
-    else if(direction == EditField.DIRECTION_LEFT) {
-        if(!originIsKey) {
-            destKeyEntry = originIsKey;
-            destFieldIsKey = true;
-        }
-    }
-
-    //navigate
-    if(destKeyEntry) {
-        if(destFieldIsKey) {
-            destKeyEntry.keyEditObject.startEdit();
-        }
-        else {
-            //make sure this is a value
-            if(destKeyEntry.valueEntry.valueEditObject) {
-                destKeyEntry.valueEntry.valueEditObject.startEdit();
+        else if(direction == EditField.DIRECTION_RIGHT) {
+            doMove = originIsKey;
+            if(doMove) {
+                destIsKey = false;
+                deltaIndex = 0; 
             }
+        }
+        else if(direction == EditField.DIRECTION_LEFT) {
+            doMove = !originIsKey;
+            if(doMove) {
+                destIsKey = true;
+                deltaIndex = 0; 
+            }
+        }
+        else if(direction == EditField.DIRECTION_UP) {
+            doMove = true;
+            destIsKey = originIsKey;
+            deltaIndex = -1; 
+        }
+        else if(direction == EditField.DIRECTION_DOWN) {
+            doMove = true;
+            destIsKey = originIsKey;
+            deltaIndex = 1; 
         }
     }
     
+    if(doMove) {
+    	var oldIndex;
+        var newIndex = -1;
+        var newKeyEntry = null;
+        var editObject;
+
+		//get the old index
+		if(keyEntry == this.virtualChildKey) {
+        	oldIndex = this.childKeyEntries.length;
+        }
+        else {
+        	oldIndex = this.childKeyEntries.indexOf(keyEntry);
+        }
+
+        //get the new key
+        if(oldIndex >= 0) {
+            newIndex = oldIndex + deltaIndex;
+            if((newIndex >= 0)&&(newIndex < this.childKeyEntries.length)) {
+                //get key entry - the normal ones
+                newKeyEntry = this.childKeyEntries[newIndex];
+            }
+            else if(newIndex == this.childKeyEntries.length) {
+                //this is the index of the virtual key
+                newKeyEntry = this.virtualChildKey;
+            }
+        }
+            
+        //get the edit field
+		if(newKeyEntry) {
+			
+			if(destIsKey) {
+				//get key entry - presumably this is not an array
+				editObject = newKeyEntry.keyEditObject;
+			}
+			else {
+				var valueEntry = newKeyEntry.valueEntry;
+				//only navigation if the dest cell is a value. 
+				//if it is an array or object do not navigate
+				if(valueEntry.getType() == "value") {
+					editObject = valueEntry.valueEditObject;
+				}
+			}
+		}
+
+		//if we found a valid edit object, start editing
+		if(editObject) {
+			editObject.startEdit();
+		}
+    }
 }
 
 //--------------------------
