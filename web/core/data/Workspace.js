@@ -45,14 +45,14 @@ visicomp.core.Workspace.prototype.updateForDeletedVariable = function(object) {
 visicomp.core.Workspace.prototype.close = function() {
 }
 
+//------------------------------
+// Owner Methods
+//------------------------------
+
 /** this method s implemented for the Owner component/mixin. */
 visicomp.core.Workspace.prototype.getWorkspace = function() {
    return this;
 }
-
-//------------------------------
-// Owner Methods
-//------------------------------
 
 /** this method s implemented for the Owner component/mixin. */
 visicomp.core.Workspace.prototype.getBaseName = function() {
