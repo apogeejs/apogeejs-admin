@@ -67,20 +67,29 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     var onSave = function() {
         
         try {
+			var jsLinkArray;
+			var cssLinkArray;
 
+			//get js links
             if(jsLinksEditor) {
                 var jsLinks = jsLinksEditor.getSession().getValue().trim();
-                var linkArray = visicomp.app.visiui.dialog.createLinkArray(jsLinks);
-                workspaceUI.setJsLinks(linkArray);
-
+                jsLinkArray = visicomp.app.visiui.dialog.createLinkArray(jsLinks);
             }
+			else {
+				jsLinkArray = [];
+			}
 
+			//get css links
             if(cssLinksEditor) {
                 var cssLinks = cssLinksEditor.getSession().getValue().trim();
-                var linkArray = visicomp.app.visiui.dialog.createLinkArray(cssLinks);
-                workspaceUI.setCssLinks(linkArray);
+                cssLinkArray = visicomp.app.visiui.dialog.createLinkArray(cssLinks);
             }
- 
+			else {
+				cssLinkArray = [];
+			}
+			
+			//load links if we have any
+			workspaceUI.setLinks(jsLinkArray,cssLinkArray);
         }
         finally {
             closeDialog();

@@ -18,10 +18,12 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     //these are a list of names of controls that go in the "added control" list
     this.additionalControls = [];
 	
-	//external links infrastructure
-	this.linkMapByType = {};
-	this.linkMapByType.js = {};
-	this.linkMapByType.css = {};
+	this.linkManager = new visicomp.app.visiui.LinkManager();
+	
+//	//external links infrastructure
+//	this.linkMapByType = {};
+//	this.linkMapByType.js = {};
+//	this.linkMapByType.css = {};
 	
 	//load the standard control generators
 	this.loadControlGenerators();
@@ -113,9 +115,6 @@ visicomp.app.visiui.VisiComp.prototype.createWorkspace = function(name) {
     try {
         //make the workspace ui
         var workspaceUI = this.makeWorkspaceUI(name);
-
-        //load a new workspace
-        workspaceUI.loadNewWorkspace(name);
     
         returnValue.success = true;
         returnValue.workspaceUI = workspaceUI;
@@ -136,48 +135,53 @@ visicomp.app.visiui.VisiComp.prototype.openWorkspace = function(workspaceText) {
     try {
         var workspaceJson = JSON.parse(workspaceText);
 
-     //I should verify the file type and format!    
+//I should verify the file type and format!    
 
+		//make a blank workspace
+		//we might need to load the links before we can deserialize the json
         var name = workspaceJson.workspace.name;
         var workspaceUI =  this.makeWorkspaceUI(name);
-
-        //load links if they are present
-        var links = workspaceJson.links;
-
-    //this code was in workspace. I should probably put it back there.
-    //
-    //    //add links
-    //    var linksAdded = false;
-    //    if((json.jsLinks)&&(json.jsLinks.length > 0)) {
-    //        workspaceUI.setJsLinks(json.jsLinks);
-    //        linksAdded = true;
-    //    }
-    //    if((json.cssLinks)&&(json.cssLinks.length > 0)) {
-    //        workspaceUI.setCssLinks(json.cssLinks);
-    //        linksAdded = true;
-    //    }
-    //	
-    ////this is how we will wait to load links if there are any for now
-    //if(linksAdded) {
-    //    var timerFunction = function() {
-    //        visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson(workspaceUI,workspace,json);
-    //    }
-    //    setTimeout(timerFunction,2000);
-    //    return {"success":true};
-    //}
-    //else {
-    //    return visicomp.app.visiui.WorkspaceUI.setWorkspaceDataFromJson(workspaceUI,workspace,json);
-    //}
-    //    
-
+    
+        //add links
+		var jsLinks;
+		var cssLinks;
+        var linksAdded = false;
+        if((workspaceJson.jsLinks)&&(workspaceJson.jsLinks.length > 0)) {
+            jsLinks = workspaceJson.jsLinks;
+            linksAdded = true;
+        }
+		else {
+			jsLinks = [];
+		}
+        if((workspaceJson.cssLinks)&&(workspaceJson.cssLinks.length > 0)) {
+			cssLinks = workspaceJson.cssLinks;
+            linksAdded = true;
+        }
+		else {
+			cssLinks = [];
+		}
+    	
+		//if we have to load links wait for them to load
+		if(linksAdded) {
+			//deserialize workspace after the links load
+			var onLinksLoaded = function() {
+				workspaceUI.loadFromJson(workspaceJson);
+			}
+			workspaceUI.setLinks(jsLinks,cssLinks,onLinksLoaded,name);
+			return {"success":true};
+		}
+		else {
+			//no need to wait to load workspace
+			workspaceUI.loadFromJson(workspaceJson);
+		}
+        
         //load the workspace data
-        workspaceUI.loadWorkspace(workspaceJson);
-
         returnValue.success = true;
         returnValue.workspaceUI = workspaceUI;
         returnValue.workspace = workspaceUI.getWorkspace();
     }
     catch(error) {
+		console.error(error.stack);
         returnValue.success = false;
         returnValue.msg = error.message;
     }
@@ -228,7 +232,7 @@ visicomp.app.visiui.VisiComp.prototype.makeWorkspaceUI = function(name) {
     
 	var tab = this.tabFrame.addTab(name);
     this.tabFrame.setActiveTab(name);
-    var workspaceUI = new visicomp.app.visiui.WorkspaceUI(this,tab);
+    var workspaceUI = new visicomp.app.visiui.WorkspaceUI(this,tab,name);
     this.workspaceUIs[name] = workspaceUI;
     
     return workspaceUI;
@@ -277,125 +281,127 @@ visicomp.app.visiui.VisiComp.prototype.updateLinksRequested = function() {
  * workspase. The linksLoadedCallback is optional. It is called when all links have
  * been loaded on the page. CALLBACK NOT CURRENTLY IMPLEMENTED!!!
  */
-visicomp.app.visiui.VisiComp.prototype.updateWorkspaceLinks = function(workspaceName,addList,removeList,type,linksLoadedCallback) {
-	
-	var i;
-	var cnt;
-	var index;
-	var link;
-	var linkWorkspaces;
-	
-	//retrieve link workspaces base on type
-	var linkMap = this.linkMapByType[type];
-	if(!linkMap) {
-		alert("Unrecognized link type: " + type);
-		return;
-	}
-	
-	//remove the workspace for this link
-	cnt = removeList.length;
-	for(i = 0; i < cnt; i++) {
-		link = removeList[i];
-		linkWorkspaces = linkMap[link];
-		if(linkWorkspaces) {
-			index = linkWorkspaces.indexOf(link);
-			if(index !== -1) {
-				//remove the workspace from this link
-				linkWorkspaces.splice(i,1);
-				if(linkWorkspaces.length === 0) {
-					//nobody references this link
-					//try to remove it (it might not be removeable
-					var linkRemoved = this.removeLinkFromPage(link,type);
-					if(linkRemoved) {
-						delete linkMap[link];
-					}
-				}
-			}
-			else {
-				//workspace already removed - no action
-			}
-		}
-		else {
-			//link does not exist - no action
-		}
-	}
-	
-	//remove the workspace for this link
-	cnt = addList.length;
-	for(i = 0; i < cnt; i++) {
-		link = addList[i];
-		linkWorkspaces = linkMap[link];
-		if(linkWorkspaces) {
-			//link already present on page
-			index = linkWorkspaces.indexOf(link);
-			if(index != -1) {
-				//workspace already has link - no action
-			}
-			else {
-				//add workspace to link
-				linkWorkspaces.push(workspaceName);
-			}
-		}
-		else {
-			//link must be added, and workspace added to link
-			linkWorkspaces = [];
-			linkWorkspaces.push(workspaceName);
-			linkMap[link] = linkWorkspaces;
-			this.addLinkToPage(link,type);
-		}
-	}
+visicomp.app.visiui.VisiComp.prototype.updateWorkspaceLinks = function(workspaceName,addList,removeList,linksLoadedCallback) {
+	this.linkManager.updateWorkspaceLinks(workspaceName,addList,removeList,linksLoadedCallback);
 }
-
-visicomp.app.visiui.VisiComp.prototype.addLinkToPage = function(link,type) {
-	if(type === "js") {
-		visicomp.app.visiui.VisiComp.addJsLink(link)
-	}
-	else if(type === "css") {
-		visicomp.app.visiui.VisiComp.addCssLink(link);
-	}
-}
-
-visicomp.app.visiui.VisiComp.prototype.removeLinkFromPage = function(link,type) {
-	//for now do not remove js link, only css
-	//we can not unexectue the js script
-	//css does get removed
-	if(type === "css") {
-		visicomp.app.visiui.VisiComp.removeLink(link);
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
-/** @private */
-visicomp.app.visiui.VisiComp.addJsLink = function(link) {
-    //set the link as the element id
-    var element = document.getElementById(link);
-    if(!element) {
-        element = visicomp.visiui.createElement("script",{"id":link,"src":link});
-        document.head.appendChild(element);
-    }
-}
-
-/** @private */
-visicomp.app.visiui.VisiComp.addCssLink = function(link) {
-    //set the link as the element id
-    var element = document.getElementById(link);
-    if(!element) {
-        element = visicomp.visiui.createElement("link",{"id":link,"rel":"stylesheet","type":"text/css","href":link});
-        document.head.appendChild(element);
-    }
-}
-
-/** @private */
-visicomp.app.visiui.VisiComp.removeLink = function(link) {
-    //set the link as the element id
-    var element = document.getElementById(link);
-    if(element) {
-        document.head.removeChild(element);
-    }
-}
+//	
+//	var i;
+//	var cnt;
+//	var index;
+//	var link;
+//	var linkWorkspaces;
+//	
+//	//retrieve link workspaces base on type
+//	var linkMap = this.linkMapByType[type];
+//	if(!linkMap) {
+//		alert("Unrecognized link type: " + type);
+//		return;
+//	}
+//	
+//	//remove the workspace for this link
+//	cnt = removeList.length;
+//	for(i = 0; i < cnt; i++) {
+//		link = removeList[i];
+//		linkWorkspaces = linkMap[link];
+//		if(linkWorkspaces) {
+//			index = linkWorkspaces.indexOf(link);
+//			if(index !== -1) {
+//				//remove the workspace from this link
+//				linkWorkspaces.splice(i,1);
+//				if(linkWorkspaces.length === 0) {
+//					//nobody references this link
+//					//try to remove it (it might not be removeable
+//					var linkRemoved = this.removeLinkFromPage(link,type);
+//					if(linkRemoved) {
+//						delete linkMap[link];
+//					}
+//				}
+//			}
+//			else {
+//				//workspace already removed - no action
+//			}
+//		}
+//		else {
+//			//link does not exist - no action
+//		}
+//	}
+//	
+//	//remove the workspace for this link
+//	cnt = addList.length;
+//	for(i = 0; i < cnt; i++) {
+//		link = addList[i];
+//		linkWorkspaces = linkMap[link];
+//		if(linkWorkspaces) {
+//			//link already present on page
+//			index = linkWorkspaces.indexOf(link);
+//			if(index != -1) {
+//				//workspace already has link - no action
+//			}
+//			else {
+//				//add workspace to link
+//				linkWorkspaces.push(workspaceName);
+//			}
+//		}
+//		else {
+//			//link must be added, and workspace added to link
+//			linkWorkspaces = [];
+//			linkWorkspaces.push(workspaceName);
+//			linkMap[link] = linkWorkspaces;
+//			this.addLinkToPage(link,type);
+//		}
+//	}
+//}
+//
+//visicomp.app.visiui.VisiComp.prototype.addLinkToPage = function(link,type) {
+//	if(type === "js") {
+//		visicomp.app.visiui.VisiComp.addJsLink(link)
+//	}
+//	else if(type === "css") {
+//		visicomp.app.visiui.VisiComp.addCssLink(link);
+//	}
+//}
+//
+//visicomp.app.visiui.VisiComp.prototype.removeLinkFromPage = function(link,type) {
+//	//for now do not remove js link, only css
+//	//we can not unexectue the js script
+//	//css does get removed
+//	if(type === "css") {
+//		visicomp.app.visiui.VisiComp.removeLink(link);
+//		return true;
+//	}
+//	else {
+//		return false;
+//	}
+//}
+//
+///** @private */
+//visicomp.app.visiui.VisiComp.addJsLink = function(link) {
+//    //set the link as the element id
+//    var element = document.getElementById(link);
+//    if(!element) {
+//        element = visicomp.visiui.createElement("script",{"id":link,"src":link});
+//        document.head.appendChild(element);
+//    }
+//}
+//
+///** @private */
+//visicomp.app.visiui.VisiComp.addCssLink = function(link) {
+//    //set the link as the element id
+//    var element = document.getElementById(link);
+//    if(!element) {
+//        element = visicomp.visiui.createElement("link",{"id":link,"rel":"stylesheet","type":"text/css","href":link});
+//        document.head.appendChild(element);
+//    }
+//}
+//
+///** @private */
+//visicomp.app.visiui.VisiComp.removeLink = function(link) {
+//    //set the link as the element id
+//    var element = document.getElementById(link);
+//    if(element) {
+//        document.head.removeChild(element);
+//    }
+//}
 
 //=================================
 // Control Management

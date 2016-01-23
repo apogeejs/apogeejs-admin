@@ -215,6 +215,9 @@ visicomp.visiui.WindowFrame.prototype.remove = function() {
 
 /** This method sets the position of the window frame in the parent. */
 visicomp.visiui.WindowFrame.prototype.setPosition = function(x,y) {
+	//don't let window be placed at a negative coord. We can lose it.
+	if(x < 0) x = 0;
+	if(y < 0) y = 0;
 	this.coordinateInfo.x = x;
 	this.coordinateInfo.y = y;
 	
@@ -343,8 +346,12 @@ visicomp.visiui.WindowFrame.prototype.titleBarMouseDown = function(e) {
 /** Mouse m,ove handler for moving the window. */
 visicomp.visiui.WindowFrame.prototype.titleBarMouseMove = function(e) {
     if(!this.windowDragActive) return;
-    this.coordinateInfo.x = e.clientX - this.moveOffsetX;
-    this.coordinateInfo.y = e.clientY - this.moveOffsetY;
+	var newX = e.clientX - this.moveOffsetX;
+	if(newX < 0) newX = 0;
+	var newY = e.clientY - this.moveOffsetY;
+	if(newY < 0) newY = 0;
+    this.coordinateInfo.x = newX;
+    this.coordinateInfo.y = newY;
     this.updateCoordinates();
 }
 
@@ -455,6 +462,7 @@ visicomp.visiui.WindowFrame.prototype.frameMouseMoveResize = function(e) {
 		newWidth = this.resizeOffsetWidth - e.clientX;
 		if(newWidth < this.minWidth) return;
 		newX = e.clientX - this.moveOffsetX;
+		if(newX < 0) newX = 0;
         this.coordinateInfo.width = newWidth;
         this.coordinateInfo.x = newX;
 	}
@@ -467,6 +475,7 @@ visicomp.visiui.WindowFrame.prototype.frameMouseMoveResize = function(e) {
 		newHeight = this.resizeOffsetHeight - e.clientY;
 		if(newHeight < this.minHeight) return;
 		newY = e.clientY - this.moveOffsetY;
+		if(newY < 0) newY = 0;
 		this.coordinateInfo.height = newHeight;
 		this.coordinateInfo.y = newY;
 	}

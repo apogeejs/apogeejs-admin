@@ -1,11 +1,13 @@
 /** This class manages the user interface for a workspace object. The argument
  * uiInitData is optional and should be included if the workspace is not empty. It
  * contains the information of how to create controls for the workspace data. */
-visicomp.app.visiui.WorkspaceUI = function(app,tab) {
+visicomp.app.visiui.WorkspaceUI = function(app,tab,name) {
 //note - this is not the correct event manager
 var wrongEventManager = app;
     visicomp.app.visiui.ParentContainer.init.call(this,tab,wrongEventManager);
     
+	this.workspace = new visicomp.core.Workspace(name);
+	
     //properties
 	this.app = app;
     this.tab = tab;
@@ -14,25 +16,53 @@ var wrongEventManager = app;
    
     this.jsLinkArray = [];
     this.cssLinkArray = [];
+	
+	//listeners
+    var instance = this;
+    
+    //add a member updated listener
+    var memberUpdatedCallback = function(memberObject) {
+        instance.memberUpdated(memberObject);
+    }
+    this.workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, memberUpdatedCallback);
+	
+	//add child deleted listener
+    var childDeletedListener = function(fullName) {
+        instance.childDeleted(fullName);
+    }
+    this.workspace.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
+	
+	//set up the root folder
+    var rootFolder = this.workspace.getRootFolder();
+    this.registerMember(rootFolder,null);
+    this.addControlContainer(rootFolder,this);
 }
     
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.app.visiui.WorkspaceUI,visicomp.app.visiui.ParentContainer);
 
-visicomp.app.visiui.WorkspaceUI.prototype.loadWorkspace = function(workspaceJson) {
+/** This method loads the data form this json into the workspace. */
+visicomp.app.visiui.WorkspaceUI.prototype.loadFromJson = function(workspaceJson) {
     var workspaceDataJson = workspaceJson.workspace;
     var workspaceControlsJson = workspaceJson.controls;
+	
+	//I don't really like the way I do this, deleting the old folder, to allow for the new one
+	var oldRootFolder = this.workspace.getRootFolder().getFullName();
+	this.childDeleted(oldRootFolder);
+	
+	//load the workspace
+    this.workspace.loadFromJson(workspaceDataJson);
     
-    var workspace = visicomp.core.Workspace.fromJson(workspaceDataJson);
+	//reinitialize the root folder
+    var rootFolder = this.workspace.getRootFolder();
+    this.registerMember(rootFolder,null);
+    this.addControlContainer(rootFolder,this)
     
-    this.setWorkspace(workspace,workspaceControlsJson);
-}
-
-visicomp.app.visiui.WorkspaceUI.prototype.loadNewWorkspace = function(name) {
-    var workspace = new visicomp.core.Workspace(name);
-    
-    this.setWorkspace(workspace);
+    //oad contrtols from json if present
+    if(workspaceControlsJson) {
+        this.loadFolderControlContentFromJson(rootFolder,workspaceControlsJson);
+    }
 }
 
 /** This method responds to a "new" menu event. */
@@ -188,30 +218,9 @@ visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace,work
     
     this.workspace = workspace;
 	
-    //listeners
-    var instance = this;
     
-    //add a member updated listener
-    var memberUpdatedCallback = function(memberObject) {
-        instance.memberUpdated(memberObject);
-    }
-    workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, memberUpdatedCallback);
-	
-	//add child deleted listener
-    var childDeletedListener = function(fullName) {
-        instance.childDeleted(fullName);
-    }
-    this.workspace.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
     
-    //set up root folder
-    var rootFolder = workspace.getRootFolder();
-    this.registerMember(rootFolder,null);
-    this.addControlContainer(rootFolder,this)
     
-    //oad contrtols from json if present
-    if(workspaceControlsJson) {
-        this.loadFolderControlContentFromJson(rootFolder,workspaceControlsJson);
-    }
     
 }
 
@@ -242,34 +251,29 @@ visicomp.app.visiui.WorkspaceUI.prototype.loadControlFromJson = function(member,
 visicomp.app.visiui.WorkspaceUI.prototype.getJsLinks = function() {
 	return this.jsLinkArray;
 }
-
-visicomp.app.visiui.WorkspaceUI.prototype.setJsLinks = function(newLinkArray) {
+//GET RUID OF NAME ARG!!!
+visicomp.app.visiui.WorkspaceUI.prototype.setLinks = function(newJsLinkArray,newCssLinkArray,onLinksLoaded,name) {
     //update the page links
-    var oldLinkArray = this.jsLinkArray;
+    var oldJsLinkArray = this.jsLinkArray;
+	var oldCssLinkArray = this.cssLinkArray;
 	var addList = [];
 	var removeList = [];
-    this.createLinkAddRemoveList(newLinkArray,oldLinkArray,addList,removeList);
-    this.jsLinkArray = newLinkArray;
-	this.app.updateWorkspaceLinks(this.workspace.getName(),addList,removeList,"js");;
+	
+    this.createLinkAddRemoveList(newJsLinkArray,oldJsLinkArray,"js",addList,removeList);
+	this.createLinkAddRemoveList(newCssLinkArray,oldCssLinkArray,"css",addList,removeList);
+	
+    this.jsLinkArray = newJsLinkArray;
+	this.cssLinkArray = newCssLinkArray;
+	this.app.updateWorkspaceLinks(/*this.workspace.getName()*/name,addList,removeList,onLinksLoaded);;
 }
 
 visicomp.app.visiui.WorkspaceUI.prototype.getCssLinks = function() {
 	return this.cssLinkArray;
 }
 
-visicomp.app.visiui.WorkspaceUI.prototype.setCssLinks = function(newLinkArray) {
-    //update the page links
-    var oldLinkArray = this.cssLinkArray;
-	var addList = [];
-	var removeList = [];
-    this.createLinkAddRemoveList(newLinkArray,oldLinkArray,addList,removeList);
-    this.cssLinkArray = newLinkArray;
-	this.app.updateWorkspaceLinks(this.workspace.getName(),addList,removeList,"css");
-}
-
 /** This method determins which links are new, which are old and which are removed.  
  * @private */
-visicomp.app.visiui.WorkspaceUI.prototype.createLinkAddRemoveList = function(linkArray,oldLinkArray,addList,removeList) { 
+visicomp.app.visiui.WorkspaceUI.prototype.createLinkAddRemoveList = function(linkArray,oldLinkArray,type,addList,removeList) { 
     
     var newLinks = {};
     var i;
@@ -286,7 +290,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.createLinkAddRemoveList = function(lin
         link = oldLinkArray[i];
         if(!newLinks[link]) {
 			//this link has been removed
-            removeList.push(link);
+            removeList.push({"link":link,"type":type});
         }
 		else {
 			//flag that this does not need to be added
@@ -297,7 +301,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.createLinkAddRemoveList = function(lin
 	//put the new links to the add list
 	for(link in newLinks) {
 		if(newLinks[link]) {
-			addList.push(link);
+			addList.push({"link":link,"type":type});
 		}
 	}
 }

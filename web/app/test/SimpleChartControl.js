@@ -35,7 +35,7 @@ SimpleChartResourceProcessor.prototype.setData = function(data,chartOptions) {
     
     //set up the display element
     var contentElement = this.window.getContent();
-    contentElement.innerHTML = "";
+	visicomp.core.util.removeAllChildren(this.body);
     this.canvas = document.createElement("canvas");
     if(this.height) {
         this.canvas.style.height = this.height + "px";

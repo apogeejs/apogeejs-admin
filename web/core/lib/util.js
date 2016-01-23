@@ -91,3 +91,10 @@ visicomp.core.util.formatString = function(format,stringArgs) {
         return formatParams[index]; 
     });
 };
+
+/** This method removes all the content from a DOM element. */
+visicomp.core.util.removeAllChildren = function(element) {
+	while(element.lastChild) {
+		element.removeChild(element.lastChild);
+	}
+}

@@ -45,14 +45,14 @@ visicomp.core.Workspace.prototype.updateForDeletedVariable = function(object) {
 visicomp.core.Workspace.prototype.close = function() {
 }
 
+//------------------------------
+// Owner Methods
+//------------------------------
+
 /** this method s implemented for the Owner component/mixin. */
 visicomp.core.Workspace.prototype.getWorkspace = function() {
    return this;
 }
-
-//------------------------------
-// Owner Methods
-//------------------------------
 
 /** this method s implemented for the Owner component/mixin. */
 visicomp.core.Workspace.prototype.getBaseName = function() {
@@ -81,23 +81,19 @@ visicomp.core.Workspace.prototype.toJson = function() {
     return json;
 }
 
-/** This is used for saving the workspace. */
-visicomp.core.Workspace.fromJson = function(json) {
-    var name = json.name;
+/** This is loads data from the given json into this workspace. */
+visicomp.core.Workspace.prototype.loadFromJson = function(json) {
     var fileType = json.fileType;
-	if((fileType !== visicomp.core.Workspace.SAVE_FILE_TYPE)||(!name)) {
+	if(fileType !== visicomp.core.Workspace.SAVE_FILE_TYPE) {
 		throw visicomp.core.util.createError("Bad file format.");
 	}
-    if(json.version != visicomp.core.Workspace.SAVE_FILE_VERSION) {
+    if(json.version !== visicomp.core.Workspace.SAVE_FILE_VERSION) {
         throw visicomp.core.util.createError("Incorrect file version.");
     }
-    
-    //create the workspace
-	var workspace = new visicomp.core.Workspace(name);
 	
 	//recreate the root folder
 	var updateDataList = [];
-    workspace.rootFolder = visicomp.core.Folder.fromJson(workspace,json.data,updateDataList);
+    this.rootFolder = visicomp.core.Folder.fromJson(this,json.data,updateDataList);
     
     //set the data on all the objects
     var result;
@@ -108,9 +104,6 @@ visicomp.core.Workspace.fromJson = function(json) {
             return result;
         }
     }
-    
-//figure out a better return
-	return workspace;
 }
 
 //================================
