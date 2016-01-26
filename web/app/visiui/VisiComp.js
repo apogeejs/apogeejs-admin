@@ -20,11 +20,6 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 	
 	this.linkManager = new visicomp.app.visiui.LinkManager();
 	
-//	//external links infrastructure
-//	this.linkMapByType = {};
-//	this.linkMapByType.js = {};
-//	this.linkMapByType.css = {};
-	
 	//load the standard control generators
 	this.loadControlGenerators();
 	
@@ -284,124 +279,6 @@ visicomp.app.visiui.VisiComp.prototype.updateLinksRequested = function() {
 visicomp.app.visiui.VisiComp.prototype.updateWorkspaceLinks = function(workspaceName,addList,removeList,linksLoadedCallback) {
 	this.linkManager.updateWorkspaceLinks(workspaceName,addList,removeList,linksLoadedCallback);
 }
-//	
-//	var i;
-//	var cnt;
-//	var index;
-//	var link;
-//	var linkWorkspaces;
-//	
-//	//retrieve link workspaces base on type
-//	var linkMap = this.linkMapByType[type];
-//	if(!linkMap) {
-//		alert("Unrecognized link type: " + type);
-//		return;
-//	}
-//	
-//	//remove the workspace for this link
-//	cnt = removeList.length;
-//	for(i = 0; i < cnt; i++) {
-//		link = removeList[i];
-//		linkWorkspaces = linkMap[link];
-//		if(linkWorkspaces) {
-//			index = linkWorkspaces.indexOf(link);
-//			if(index !== -1) {
-//				//remove the workspace from this link
-//				linkWorkspaces.splice(i,1);
-//				if(linkWorkspaces.length === 0) {
-//					//nobody references this link
-//					//try to remove it (it might not be removeable
-//					var linkRemoved = this.removeLinkFromPage(link,type);
-//					if(linkRemoved) {
-//						delete linkMap[link];
-//					}
-//				}
-//			}
-//			else {
-//				//workspace already removed - no action
-//			}
-//		}
-//		else {
-//			//link does not exist - no action
-//		}
-//	}
-//	
-//	//remove the workspace for this link
-//	cnt = addList.length;
-//	for(i = 0; i < cnt; i++) {
-//		link = addList[i];
-//		linkWorkspaces = linkMap[link];
-//		if(linkWorkspaces) {
-//			//link already present on page
-//			index = linkWorkspaces.indexOf(link);
-//			if(index != -1) {
-//				//workspace already has link - no action
-//			}
-//			else {
-//				//add workspace to link
-//				linkWorkspaces.push(workspaceName);
-//			}
-//		}
-//		else {
-//			//link must be added, and workspace added to link
-//			linkWorkspaces = [];
-//			linkWorkspaces.push(workspaceName);
-//			linkMap[link] = linkWorkspaces;
-//			this.addLinkToPage(link,type);
-//		}
-//	}
-//}
-//
-//visicomp.app.visiui.VisiComp.prototype.addLinkToPage = function(link,type) {
-//	if(type === "js") {
-//		visicomp.app.visiui.VisiComp.addJsLink(link)
-//	}
-//	else if(type === "css") {
-//		visicomp.app.visiui.VisiComp.addCssLink(link);
-//	}
-//}
-//
-//visicomp.app.visiui.VisiComp.prototype.removeLinkFromPage = function(link,type) {
-//	//for now do not remove js link, only css
-//	//we can not unexectue the js script
-//	//css does get removed
-//	if(type === "css") {
-//		visicomp.app.visiui.VisiComp.removeLink(link);
-//		return true;
-//	}
-//	else {
-//		return false;
-//	}
-//}
-//
-///** @private */
-//visicomp.app.visiui.VisiComp.addJsLink = function(link) {
-//    //set the link as the element id
-//    var element = document.getElementById(link);
-//    if(!element) {
-//        element = visicomp.visiui.createElement("script",{"id":link,"src":link});
-//        document.head.appendChild(element);
-//    }
-//}
-//
-///** @private */
-//visicomp.app.visiui.VisiComp.addCssLink = function(link) {
-//    //set the link as the element id
-//    var element = document.getElementById(link);
-//    if(!element) {
-//        element = visicomp.visiui.createElement("link",{"id":link,"rel":"stylesheet","type":"text/css","href":link});
-//        document.head.appendChild(element);
-//    }
-//}
-//
-///** @private */
-//visicomp.app.visiui.VisiComp.removeLink = function(link) {
-//    //set the link as the element id
-//    var element = document.getElementById(link);
-//    if(element) {
-//        document.head.removeChild(element);
-//    }
-//}
 
 //=================================
 // Control Management

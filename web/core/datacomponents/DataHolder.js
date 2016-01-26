@@ -54,9 +54,6 @@ visicomp.core.DataHolder.internalSetData = function(data,hasError,errorMsg) {
     if(this.parent) {
         this.parent.updateData(this);
     }
-    
-    //fire an update event
-    visicomp.core.updatemember.fireUpdatedEvent(this);
 }
 
 /** This method returns true if there is an error for this table, 

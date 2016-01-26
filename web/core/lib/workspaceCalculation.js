@@ -3,12 +3,6 @@
 visicomp.core.calculation = {};
 
 
-visicomp.core.calculation.fireUpdatedEvent = function(member) {
-    var workspace = member.getWorkspace();
-    workspace.dispatchEvent(visicomp.core.calculation.MEMBER_UPDATED_EVENT,member);
-}
-
-
 /** This addes the member to the recalculate list, if it has a formula and hence
  * needs to be recalculated. It then adds all talbes that depend on this one.
  * @private */
@@ -123,9 +117,6 @@ visicomp.core.calculation.callRecalculateList = function(recalculateList) {
 
         //update the member
         member.execute();
-
-        //fire this for the change in value
-        visicomp.core.calculation.fireUpdatedEvent(member);
     }
 }
 

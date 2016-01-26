@@ -16,6 +16,12 @@ visicomp.core.updatemember.fireUpdatedEvent = function(member) {
     workspace.dispatchEvent(visicomp.core.updatemember.MEMBER_UPDATED_EVENT,member);
 }
 
+visicomp.core.updatemember.fireUpdatedEventList = function(memberList) {
+    for(var i = 0; i < memberList.length; i++) {
+        visicomp.core.updatemember.fireUpdatedEvent(memberList[i]);
+    }
+}
+
 /** This is the listener for the update member event. */
 visicomp.core.updatemember.updateCode = function(member,argList,functionBody,supplementalCode) {
     var recalculateList = [];
@@ -32,6 +38,9 @@ visicomp.core.updatemember.updateCode = function(member,argList,functionBody,sup
     
     editStatus = visicomp.core.updatemember.doRecalculate(recalculateList,editStatus);
     
+    //fire updated events
+    visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
+    
     return editStatus;
 }
 
@@ -46,6 +55,10 @@ visicomp.core.updatemember.updateData = function(member,data) {
     
     editStatus = visicomp.core.updatemember.doRecalculate(recalculateList,editStatus);
     
+    //fire updated events
+    visicomp.core.updatemember.fireUpdatedEvent(member);
+    visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
+    
     return editStatus;
 }
 
@@ -54,6 +67,7 @@ visicomp.core.updatemember.updateObjects = function(updateDataList) {
     var mainEditStatus = {};
     var singleEditStatus;
     var recalculateList = [];
+    var setDataList = [];
 
     //flag start of save (almost)
     mainEditStatus.saveStarted = true;
@@ -76,6 +90,8 @@ visicomp.core.updatemember.updateObjects = function(updateDataList) {
         }
         else if(data) {
             singleEditStatus = visicomp.core.updatemember.updateObjectData(member,data,recalculateList);
+            
+            setDataList.push(member);
         }
         
         //stop processing on an error
@@ -92,6 +108,10 @@ visicomp.core.updatemember.updateObjects = function(updateDataList) {
 
     //return status
     mainEditStatus = visicomp.core.updatemember.doRecalculate(recalculateList,mainEditStatus);
+    
+    //fire updated events
+    visicomp.core.updatemember.fireUpdatedEventList(setDataList);
+    visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
     
     return mainEditStatus;
 }
