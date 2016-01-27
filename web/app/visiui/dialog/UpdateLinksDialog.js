@@ -128,6 +128,8 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
         //create html editor if needed
         if(!jsLinksEditor) {
             jsLinksEditor = ace.edit(jsLinksEditorDiv);
+//this stops an error message
+jsLinksEditor.$blockScrolling = Infinity;
             jsLinksEditor.setTheme("ace/theme/eclipse");
             jsLinksEditor.getSession().setMode("ace/mode/text");
             //set the value
@@ -147,6 +149,8 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
         //create html editor if needed
         if(!cssLinksEditor) {
             cssLinksEditor = ace.edit(cssLinksEditorDiv);
+//this stops an error message
+cssLinksEditor.$blockScrolling = Infinity;
             cssLinksEditor.setTheme("ace/theme/eclipse");
             cssLinksEditor.getSession().setMode("ace/mode/text");
             //set the value

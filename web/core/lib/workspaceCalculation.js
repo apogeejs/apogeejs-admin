@@ -108,15 +108,42 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList) {
 	
 }
 
-/** This calls the update method for each member in the impacted list.
+/** This calls execute for each member in the recalculate list. It modifies the 
+ * passed in edit status with success or failure, and in the case of failure, sets
+ * the error message.
  * @private */
-visicomp.core.calculation.callRecalculateList = function(recalculateList) {
+visicomp.core.calculation.callRecalculateList = function(recalculateList,editStatus) {
     var member;
-    for(var i = 0; i < recalculateList.length; i++) {
+    var i;
+    var failureList = null;
+    for(i = 0; i < recalculateList.length; i++) {
         member = recalculateList[i];
 
         //update the member
-        member.execute();
+        var success = member.execute();
+        if(!success) {
+            if(failureList == null) {
+                failureList = [];
+            }
+            failureList.push(member);
+        }
+    }
+    
+    //check for failure
+    if(failureList != null) {
+        var message = "Failed values: ";
+        for(i = 0; i < failureList.length; i++) {
+            //dependency error found
+            if(i > 0) message += ", ";
+            message += failureList[i].getFullName();
+        } 
+        
+        //return error
+        editStatus.success = false;
+        editStatus.msg = message;
+    }
+    else {
+        editStatus = true;
     }
 }
 

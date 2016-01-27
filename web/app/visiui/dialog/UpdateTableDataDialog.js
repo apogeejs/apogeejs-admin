@@ -35,6 +35,8 @@ visicomp.app.visiui.dialog.showUpdateTableDataDialog = function(table,onSaveFunc
         "left":"0px"
     });
     var dataEditor = ace.edit(dataEditorDiv);
+//this stops an error message
+dataEditor.$blockScrolling = Infinity;
 	dataEditor.setTheme("ace/theme/eclipse");
 	dataEditor.getSession().setMode("ace/mode/json");
 	//set the value

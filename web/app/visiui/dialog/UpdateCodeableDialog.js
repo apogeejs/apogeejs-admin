@@ -155,6 +155,8 @@ visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,on
         if(!formulaEditor) {
             //initialize editor
             formulaEditor = ace.edit(formulaEditorDiv);
+//this stops an error message
+formulaEditor.$blockScrolling = Infinity;
             formulaEditor.setTheme("ace/theme/eclipse");
             formulaEditor.getSession().setMode("ace/mode/javascript");
             //set the formula
@@ -181,6 +183,8 @@ visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,on
         if(!supplementalEditor) {
             //initialize editor
             supplementalEditor = ace.edit(supplementalEditorDiv);
+//this stops an error message
+supplementalEditor.$blockScrolling = Infinity;
             supplementalEditor.setTheme("ace/theme/eclipse");
             supplementalEditor.getSession().setMode("ace/mode/javascript");
             //set the formula

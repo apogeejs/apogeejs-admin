@@ -23,7 +23,7 @@ visicomp.core.Dependent.init = function() {
  * This property should not be implemented on non-dependents. */
 visicomp.core.Dependent.isDependent = true;
 
-/** This returns a map of the members that this member depends on. */
+/** This returns a list of the members that this member depends on. */
 visicomp.core.Dependent.getDependsOn = function() {
     return this.dependsOnList;
 }

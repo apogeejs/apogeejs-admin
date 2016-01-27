@@ -34,6 +34,8 @@ visicomp.app.visiui.TableControl.prototype.populateFrame = function() {
     //editor - only for display, read only
     var contentDiv = this.getContentElement();
     var editor = ace.edit(contentDiv);
+//this stops an error message
+editor.$blockScrolling = Infinity;
     editor.renderer.setShowGutter(true);
     editor.setReadOnly(true);
     editor.setTheme("ace/theme/eclipse"); //good

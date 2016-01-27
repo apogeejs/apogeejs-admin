@@ -236,9 +236,7 @@ visicomp.core.updatemember.doRecalculate = function(recalculateList,editStatus) 
     }
     
     //recalculate - let an error from here go, to be processed in debugger for now
-    visicomp.core.calculation.callRecalculateList(recalculateList);
-    
-    editStatus.success = true;
+    visicomp.core.calculation.callRecalculateList(recalculateList,editStatus);
     return editStatus;
 }
 

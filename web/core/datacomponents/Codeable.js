@@ -102,29 +102,43 @@ visicomp.core.Codeable.hasCode = function() {
     return (this.objectFunction !== null);
 }
 
-/** This implements the "needsExecuting" method of Dependent. 
+/** If this is true the member must be executed. 
  * @private */
 visicomp.core.Codeable.needsExecuting = function() {
 	return (this.objectFunction != null);
 }
 
 
-/** This implements the "execute" method of Dependent.  */
+/** This updates the member data based on the function. It returns
+ * true for success and false if there is an error.  */
 visicomp.core.Codeable.execute = function() {
-    if(!this.objectFunction) return;
+    if(!this.objectFunction) return false;
     
-    //set the context
-    var rootDataMap = this.getRootFolder().getData();
-    var localDataMap = this.getParent().getData();
-    var listOfContexts = [
-        localDataMap,
-        rootDataMap,
-        window
-    ]
-    this.contextSetter(listOfContexts);
-    
-    //process the object function as needed (implement for each type)
-    this.processObjectFunction(this.objectFunction);
+    try {
+        //check if any values this depends on have an error
+        var errorFound = this.checkDependencyError();
+        if(errorFound) return false;
+        
+        //set the context
+        var rootDataMap = this.getRootFolder().getData();
+        var localDataMap = this.getParent().getData();
+        var listOfContexts = [
+            localDataMap,
+            rootDataMap,
+            window
+        ]
+        this.contextSetter(listOfContexts);
+
+        //process the object function as needed (implement for each type)
+        this.processObjectFunction(this.objectFunction);
+        
+        return true;
+    }
+    catch(error) {
+        console.error(error.stack);
+        this.setError(error.message);
+        return false;
+    }
 }
 
 //------------------------------
@@ -168,6 +182,40 @@ visicomp.core.Codeable.loadFromContext = function(listOfContexts,name) {
     }
     //not found
     return undefined;
+}
+
+/** This method checks if any variable this depends on ha an error. If so it 
+ * reports an error for this member and returns true.  Otherwise it returns false.
+ * @private */
+visicomp.core.Codeable.checkDependencyError = function() {
+    //get variables this depends on has an error
+    var dependsOn = this.getDependsOn();
+    var errorDependencies = null;
+    var i = 0;
+    for(var i = 0; i < dependsOn.length; i++) {
+        var member = dependsOn[i];
+        if(member.hasError()) {
+            if(errorDependencies == null) {
+                errorDependencies = [];
+            }
+            errorDependencies.push(member);
+        }
+    }
+    
+    if(errorDependencies != null) {
+        //dependency error found
+        var message = "Error in dependency: ";
+        for(i = 0; i < errorDependencies.length; i++) {
+            if(i > 0) message += ", ";
+            message += errorDependencies[i].getFullName();
+        }
+        this.setError(message);
+        return true;
+    }
+    else {
+        //no dependency error
+        return false;
+    }
 }
 
 /** This method recalculates the dependencies for this object, given a change

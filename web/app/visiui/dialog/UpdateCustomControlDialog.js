@@ -181,6 +181,8 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
         //create html editor if needed
         if(!htmlEditor) {
             htmlEditor = ace.edit(htmlEditorDiv);
+//this stops an error message
+htmlEditor.$blockScrolling = Infinity;
             htmlEditor.setTheme("ace/theme/eclipse");
             htmlEditor.getSession().setMode("ace/mode/html");
             //set the value
@@ -202,6 +204,8 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
         if(!customizeEditor) {
             //initialize editor
             customizeEditor = ace.edit(customizeEditorDiv);
+//this stops an error message
+customizeEditor.$blockScrolling = Infinity;
             customizeEditor.setTheme("ace/theme/eclipse");
             customizeEditor.getSession().setMode("ace/mode/javascript");
             //set the customize
@@ -223,6 +227,8 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
         if(!supplementalEditor) {
             //initialize editor
             supplementalEditor = ace.edit(supplementalEditorDiv);
+//this stops an error message
+supplementalEditor.$blockScrolling = Infinity;
             supplementalEditor.setTheme("ace/theme/eclipse");
             supplementalEditor.getSession().setMode("ace/mode/javascript");
             //set the supplemental
@@ -243,6 +249,8 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
         //create html editor if needed
         if(!cssEditor) {
             cssEditor = ace.edit(cssEditorDiv);
+//this stops an error message
+cssEditor.$blockScrolling = Infinity;
             cssEditor.setTheme("ace/theme/eclipse");
             cssEditor.getSession().setMode("ace/mode/css");
             //set the value
