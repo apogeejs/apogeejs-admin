@@ -1,4 +1,7 @@
-/** This control represents a table object. */
+/** This is a custom resource control. 
+ * To implement it, the resource script must have the methods "run()" which will
+ * be called when the control is updated. It also must have any methods that are
+ * confugred with initialization data from the model. */
 visicomp.app.visiui.CustomResourceControl = function(workspaceUI,resource) {
     //base init
     visicomp.app.visiui.Control.init.call(this,workspaceUI,resource,visicomp.app.visiui.CustomResourceControl.generator);
@@ -25,6 +28,8 @@ visicomp.app.visiui.CustomResourceControl.prototype.update = function(html,proce
 	//update the resource
 	var resource = this.getObject();
 	resource.updateResourceProcessor(newProcessor);
+    
+    this.memberUpdated();
 }
 
 visicomp.app.visiui.CustomResourceControl.prototype.initEmptyProcessor = function() {

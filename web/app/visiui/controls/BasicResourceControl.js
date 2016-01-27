@@ -12,6 +12,9 @@ visicomp.app.visiui.BasicResourceControl.init = function() {}
 // Protected and Private Instance Methods
 //==============================
 
+///** This method should be implemented to add any data to the control at initialization time. */
+//visicomp.app.visiui.CustomResourceControl.prototype.addToFrame = function();
+
 /** This method populates the frame for this control. */
 visicomp.app.visiui.BasicResourceControl.populateFrame = function() {
     
@@ -37,10 +40,16 @@ window.setSize(200,200);
 
 }
 
-/** This is called when the data is updated. There is no action here since it is
- * done by the resource processor. 
+/** This is called when the data is updated. This calls the "run" method of
+ * the resource processor. 
  * @private */    
-visicomp.app.visiui.BasicResourceControl.memberUpdated = function() {    
+visicomp.app.visiui.BasicResourceControl.memberUpdated = function() {
+    //execute the resource processor on an update
+    var resource = this.getObject();
+    var resourceProcessor = resource.getResourceProcessor();
+    if(resourceProcessor) {
+        resourceProcessor.run();
+    }    
 }
 
 //======================================
