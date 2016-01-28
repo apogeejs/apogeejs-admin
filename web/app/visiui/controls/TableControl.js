@@ -74,7 +74,16 @@ visicomp.app.visiui.TableControl.prototype.memberUpdated = function() {
     }
     else {
         var data = this.getObject().getData();
-        var textData = JSON.stringify(data,null,visicomp.app.visiui.TableControl.formatString);
+        var textData;
+        if(data === null) {
+            textData = "null";
+        }
+        else if(data === undefined) {
+            textData = "undefined";
+        }
+        else {
+            textData = JSON.stringify(data,null,visicomp.app.visiui.TableControl.formatString);
+        }
         this.showData(textData);
     }
 }
