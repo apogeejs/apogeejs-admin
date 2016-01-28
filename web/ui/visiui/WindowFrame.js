@@ -524,10 +524,10 @@ visicomp.visiui.WindowFrame.prototype.endResize = function() {
 visicomp.visiui.WindowFrame.prototype.getResizeType = function(e) {
 	var flags = 0;
 	if(e.target === this.frame) {
-		if(this.frame.offsetWidth - e.offsetX < visicomp.visiui.WindowFrame.RESIZE_TOLERANCE) flags |= visicomp.visiui.WindowFrame.RESIZE_EAST;
+		if(this.frame.clientWidth - e.offsetX < visicomp.visiui.WindowFrame.RESIZE_TOLERANCE) flags |= visicomp.visiui.WindowFrame.RESIZE_EAST;
 		else if(e.offsetX < visicomp.visiui.WindowFrame.RESIZE_TOLERANCE) flags |= visicomp.visiui.WindowFrame.RESIZE_WEST;
 		
-		if(this.frame.offsetHeight - e.offsetY < visicomp.visiui.WindowFrame.RESIZE_TOLERANCE) flags |= visicomp.visiui.WindowFrame.RESIZE_SOUTH;
+		if(this.frame.clientHeight - e.offsetY < visicomp.visiui.WindowFrame.RESIZE_TOLERANCE) flags |= visicomp.visiui.WindowFrame.RESIZE_SOUTH;
 		else if(e.offsetY < visicomp.visiui.WindowFrame.RESIZE_TOLERANCE) flags |= visicomp.visiui.WindowFrame.RESIZE_NORTH;
 	}
 	return flags;
