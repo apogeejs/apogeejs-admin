@@ -22,8 +22,7 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
     //create window
     //--------------
     var options = {"minimizable":true,"maximizable":true,"resizable":true,"movable":true};
-    var parentContainer = this.parentContainerObject.getContainerElement();
-    this.window = new visicomp.visiui.StackWindow(parentContainer,options);
+    this.window = new visicomp.visiui.WindowFrame(this.parentContainerObject,options);
     
     //load the content div
     var contentDiv = visicomp.visiui.createElement("div",null,

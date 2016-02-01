@@ -2,7 +2,7 @@
 visicomp.app.visiui.FolderControl = function(workspaceUI,folder) {
     //base init
     visicomp.app.visiui.Control.init.call(this,workspaceUI,folder,visicomp.app.visiui.FolderControl.generator);
-    visicomp.app.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
+    visicomp.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
     
     //register this folder as a parent container
     workspaceUI.addControlContainer(folder,this);
@@ -10,7 +10,7 @@ visicomp.app.visiui.FolderControl = function(workspaceUI,folder) {
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.app.visiui.FolderControl,visicomp.app.visiui.Control);
-visicomp.core.util.mixin(visicomp.app.visiui.FolderControl,visicomp.app.visiui.ParentContainer);
+visicomp.core.util.mixin(visicomp.app.visiui.FolderControl,visicomp.visiui.ParentContainer);
 
 //==============================
 // Protected and Private Instance Methods

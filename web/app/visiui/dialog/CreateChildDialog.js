@@ -15,7 +15,8 @@ if(!workspaceUI) {
 
 	var controlMap = workspaceUI.getControlMap();
 
-    var dialog = new visicomp.visiui.Dialog({"movable":true});
+    var dialogParent = visicomp.app.visiui.VisiComp.getDialogParent();
+    var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"movable":true});
     
     //create body
     var content = visicomp.visiui.createElement("div",{"className":"dialogBody"}); 
@@ -81,6 +82,7 @@ if(!workspaceUI) {
     //show dialog
     dialog.setContent(content);
     dialog.show();
-    dialog.centerOnPage();
+    var coords = dialogParent.getCenterOnPagePosition(dialog);
+    dialog.setPosition(coords[0],coords[1]);
 }
 

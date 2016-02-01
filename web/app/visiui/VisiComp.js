@@ -226,8 +226,9 @@ visicomp.app.visiui.VisiComp.prototype.makeWorkspaceUI = function(name) {
     }
     
 	var tab = this.tabFrame.addTab(name);
+    var tabContainerObject = this.tabFrame.getTabContainerObject(name);
     this.tabFrame.setActiveTab(name);
-    var workspaceUI = new visicomp.app.visiui.WorkspaceUI(this,tab,name);
+    var workspaceUI = new visicomp.app.visiui.WorkspaceUI(this,tab,tabContainerObject,name);
     this.workspaceUIs[name] = workspaceUI;
     
     return workspaceUI;
@@ -344,8 +345,21 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
         throw visicomp.core.util.createError("Container ID not found: " + containerID);
     }
 
-    //create menus---------------------------------
-//mnove this somewhere else... maybe into html    
+    //----------------------------
+    // Create dialog parent
+    //----------------------------
+//I should probably do this on a per-app basis. review this...
+    visicomp.app.visiui.VisiComp.dialogParent = new visicomp.visiui.SimpleParentContainer(container);
+    
+    //handler to resize on window resize
+    window.addEventListener("resize", function() {  
+        //fire event for this object
+        visicomp.app.visiui.VisiComp.dialogParent.resized();
+    });
+
+    //-------------------
+    //create menus
+    //-----------------------
     var menuBar = document.createElement("div");
     var menuBarStyle = {
         "background-color":"rgb(217,229,250)",
@@ -353,7 +367,6 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     }
     visicomp.visiui.applyStyle(menuBar,menuBarStyle);
     container.appendChild(menuBar);
-    //----------------------------------------------
     
     //create the menus
     var menu;
@@ -398,12 +411,13 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     var linksCallback = function() {instance.updateLinksRequested()};
     menu.addCallbackMenuItem("Update&nbsp;Links",linksCallback);
 
-    //create the tab frame - this puts a tab for each workspace, even though
-    //for now you can only make one workspace.
+    //----------------------
+    //create the tab frame - there is a tab for each workspace
+    //--------------------------
     this.tabFrame = new visicomp.visiui.TabFrame(containerId);
     container.appendChild(this.tabFrame.getElement());
     this.tabFrame.resizeElement();
- 
+    
 }
 /** This shows the create control dialog. */
 visicomp.app.visiui.VisiComp.prototype.getOnCreateRequestedCallback = function(generator) {
@@ -417,9 +431,15 @@ visicomp.app.visiui.VisiComp.prototype.getOnCreateRequestedCallback = function(g
 }
 
 //=================================
-// Utility Functions
+// Static Functions
 //=================================
 
+visicomp.app.visiui.VisiComp.dialogParent = null;
+
+
+visicomp.app.visiui.VisiComp.getDialogParent = function() {
+    return visicomp.app.visiui.VisiComp.dialogParent;
+}
 /** This method replaces on spaces with &nbsp; spaces. It is intedned to prevent
  * wrapping in html. */
 visicomp.app.visiui.VisiComp.convertSpacesForHtml = function(text) {

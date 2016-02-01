@@ -2,7 +2,7 @@
 visicomp.app.visiui.WorksheetControl = function(workspaceUI,worksheet) {
     //base init
     visicomp.app.visiui.Control.init.call(this,workspaceUI,worksheet,visicomp.app.visiui.WorksheetControl.generator);
-    visicomp.app.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
+    visicomp.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
     
     //register this object as a parent container
     var internalFolder = worksheet.getInternalFolder();
@@ -12,7 +12,7 @@ visicomp.app.visiui.WorksheetControl = function(workspaceUI,worksheet) {
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.app.visiui.WorksheetControl,visicomp.app.visiui.Control);
-visicomp.core.util.mixin(visicomp.app.visiui.WorksheetControl,visicomp.app.visiui.ParentContainer);
+visicomp.core.util.mixin(visicomp.app.visiui.WorksheetControl,visicomp.visiui.ParentContainer);
 
 //==============================
 // Protected and Private Instance Methods

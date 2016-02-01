@@ -22,6 +22,7 @@ visicomp.visiui.WindowFrame = function(parentContainer, options) {
 	
     //variables
     this.parentContainer = parentContainer;
+    this.parentElement = parentContainer.getContainerElement();
     this.options = options;
 	
     this.frame = null;
@@ -70,6 +71,17 @@ this.savedParentOverflow = undefined;
     this.initDiv();
     this.createTitleBar();
     this.createBody();
+    
+    //add window to the parent
+    this.parentContainer.addWindow(this);
+	
+    //add the handler to move the active window to the front
+    var instance = this;
+	var frontHandler = function(e) {
+        instance.parentContainer.bringToFront(instance);
+    };
+    var element = this.getElement();
+	element.addEventListener("mousedown",frontHandler);
 }
 
 //add components to this class
@@ -193,7 +205,7 @@ visicomp.visiui.WindowFrame.prototype.getMenu = function() {
 
 /** This method shows the window. */
 visicomp.visiui.WindowFrame.prototype.show = function() {
-    this.parentContainer.appendChild(this.getElement());
+    this.parentElement.appendChild(this.getElement());
     this.dispatchEvent("show",this);
     
     //we will redo this since the size of elements used in calculation may have been wrong
@@ -204,13 +216,13 @@ visicomp.visiui.WindowFrame.prototype.show = function() {
 
 /** This method closes the window. */
 visicomp.visiui.WindowFrame.prototype.hide = function() {
-    this.parentContainer.removeChild(this.getElement());
+    this.parentElement.removeChild(this.getElement());
     this.dispatchEvent("hide",this);
 }
 
 /** This method closes the window. */
 visicomp.visiui.WindowFrame.prototype.remove = function() {
-    this.parentContainer.removeChild(this.getElement());
+    this.parentElement.removeChild(this.getElement());
 }
 
 /** This method sets the position of the window frame in the parent. */
@@ -331,15 +343,15 @@ visicomp.visiui.WindowFrame.prototype.titleBarMouseDown = function(e) {
     //do not do move in maximized state
     if(this.windowState === visicomp.visiui.WindowFrame.MAXIMIZED) return;
     
-    if(this.parentContainer) {
+    if(this.parentElement) {
         this.windowDragActive = true;
         this.moveOffsetX = e.clientX - this.frame.offsetLeft;
         this.moveOffsetY = e.clientY - this.frame.offsetTop;
 		
         //add move events to the parent, since the mouse can leave this element during a move
-        this.parentContainer.addEventListener("mousemove",this.moveOnMouseMove);
-        this.parentContainer.addEventListener("mouseleave",this.moveOnMouseLeave);
-        this.parentContainer.addEventListener("mouseup",this.moveOnMouseUp);
+        this.parentElement.addEventListener("mousemove",this.moveOnMouseMove);
+        this.parentElement.addEventListener("mouseleave",this.moveOnMouseLeave);
+        this.parentElement.addEventListener("mouseup",this.moveOnMouseUp);
     }
 }
 
@@ -392,9 +404,9 @@ visicomp.visiui.WindowFrame.prototype.frameMouseDown = function(e) {
 		}
 
         //add resize events to the parent, since the mouse can leave this element during a move
-		this.parentContainer.addEventListener("mouseup",this.resizeOnMouseUp);
-		this.parentContainer.addEventListener("mousemove",this.resizeOnMouseMove);
-		this.parentContainer.addEventListener("mouseleave",this.resizeOnMouseLeave);
+		this.parentElement.addEventListener("mouseup",this.resizeOnMouseUp);
+		this.parentElement.addEventListener("mousemove",this.resizeOnMouseMove);
+		this.parentElement.addEventListener("mouseleave",this.resizeOnMouseLeave);
 	}
 }
 
@@ -502,9 +514,9 @@ visicomp.visiui.WindowFrame.prototype.frameMouseLeave = function(e) {
  * @private */
 visicomp.visiui.WindowFrame.prototype.endMove = function(e) {
     this.windowDragActive = false;
-    this.parentContainer.removeEventListener("mousemove",this.moveOnMouseMove);
-    this.parentContainer.removeEventListener("mouseleave",this.moveOnMouseLeave);
-    this.parentContainer.removeEventListener("mouseup",this.moveOnMouseUp);
+    this.parentElement.removeEventListener("mousemove",this.moveOnMouseMove);
+    this.parentElement.removeEventListener("mouseleave",this.moveOnMouseLeave);
+    this.parentElement.removeEventListener("mouseup",this.moveOnMouseUp);
 }
 
 /** this method ends a resize action.
@@ -514,9 +526,9 @@ visicomp.visiui.WindowFrame.prototype.endResize = function() {
 	this.resizeWestActive = false;
 	this.resizeSouthActive = false;
 	this.resizeNorthActive = false;
-	this.parentContainer.removeEventListener("mouseup",this.resizeOnMouseUp);
-	this.parentContainer.removeEventListener("mousemove",this.resizeOnMouseMove);
-	this.parentContainer.removeEventListener("mouseleave",this.resizeOnMouseLeave);
+	this.parentElement.removeEventListener("mouseup",this.resizeOnMouseUp);
+	this.parentElement.removeEventListener("mousemove",this.resizeOnMouseMove);
+	this.parentElement.removeEventListener("mouseleave",this.resizeOnMouseLeave);
 }
 
 /** This methods determines if a mouse location shoudl allow for a resize action.
@@ -546,14 +558,21 @@ visicomp.visiui.WindowFrame.prototype.minimizeContent = function() {
     
     //restore parent overflow, if needed
     if(this.savedParentOverflow !== undefined) {
-        this.parentContainer.style.overflow = this.savedParentOverflow;
+        this.parentElement.style.overflow = this.savedParentOverflow;
         this.savedParentOverflow = undefined;
     }
     
     //apply the normal style for the frame
     visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL);
     
-    var wasMinimized = (this.windowState === visicomp.visiui.WindowFrame.MINIMIZED);   
+    var wasMinimized = (this.windowState === visicomp.visiui.WindowFrame.MINIMIZED);
+    var wasMaximized = (this.windowState === visicomp.visiui.WindowFrame.MAXIMIZED);
+    
+    //unsbscribe from parent resize
+    if((wasMaximized)&&(this.maximizedResizeHandler)) {
+        this.parentContainer.getEventManager().removeListener("resize",this.maximizedResizeHandler);
+        this.parentResizeSubscribed = false;
+    }
  
     //set the window state
     this.windowState = visicomp.visiui.WindowFrame.MINIMIZED;
@@ -572,7 +591,7 @@ visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
     
     //restore parent overflow, if needed
     if(this.savedParentOverflow !== undefined) {
-        this.parentContainer.style.overflow = this.savedParentOverflow;
+        this.parentElement.style.overflow = this.savedParentOverflow;
         this.savedParentOverflow = undefined;
     }
     
@@ -580,6 +599,13 @@ visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
     visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL);
     
     var wasMinimized = (this.windowState === visicomp.visiui.WindowFrame.MINIMIZED);
+    var wasMaximized = (this.windowState === visicomp.visiui.WindowFrame.MAXIMIZED);
+    
+    //unsbscribe from parent resize
+    if((wasMaximized)&&(this.maximizedResizeHandler)) {
+        this.parentContainer.getEventManager().removeListener("resize",this.maximizedResizeHandler);
+        this.parentResizeSubscribed = false;
+    }
     
     //set the window state
     this.windowState = visicomp.visiui.WindowFrame.NORMAL;
@@ -597,8 +623,8 @@ visicomp.visiui.WindowFrame.prototype.maximizeContent = function() {
     this.body.style.display = "";
 
     //make sure the parent does not have scroll; store the old value
-    this.savedParentOverflow = this.parentContainer.style.overflow;
-    this.parentContainer.style.overflow = "hidden";
+    this.savedParentOverflow = this.parentElement.style.overflow;
+    this.parentElement.style.overflow = "hidden";
 
     //apply the maximized style to the frame
     visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.FRAME_STYLE_MAX);
@@ -612,6 +638,12 @@ visicomp.visiui.WindowFrame.prototype.maximizeContent = function() {
     
     if(wasMinimized) this.frameShown();
     this.frameResized();
+    
+    //subscribe to receive the parent resize event and pass it on
+    if(this.maximizedResizeHandler) {
+        this.parentContainer.getEventManager().addListener("resize",this.maximizedResizeHandler);
+        this.parentResizeSubscribed = true;
+    }
 }
 
 
@@ -746,11 +778,11 @@ visicomp.visiui.WindowFrame.prototype.initDiv = function() {
         }
 
         this.frame.onmousemove = function(event) {
-            instance.frameMouseMoveCursor(event)
+            instance.frameMouseMoveCursor(event);
         };
 
         this.frame.onmouseout = function(event) {
-            instance.frameMouseOutCursor(event)
+            instance.frameMouseOutCursor(event);
         };
 
         //mouse window resize events we will place on the parent container - since the mouse drag 
@@ -812,7 +844,7 @@ visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
         this.titleBarRightElements.appendChild(this.restoreButton);
     }
     
-    //maximize button
+    //maximize button and logic
     if(this.options.maximizable) {
         this.maximizeButton = document.createElement("img");
         visicomp.visiui.applyStyle(this.maximizeButton,visicomp.visiui.WindowFrame.COMMAND_BUTTON_STYLE);
@@ -821,6 +853,14 @@ visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
             instance.maximizeContent();
         }
         this.titleBarRightElements.appendChild(this.maximizeButton);
+        
+        //save this - it should be present if we allow maximize 
+        this.parentResizeSubscribed = false;
+        //we must pass the resize event from parent to child when maximized
+        this.maximizedResizeHandler = function() {
+            instance.updateCoordinates();
+            instance.frameResized();
+        }
     }
     
     //layout the window buttons

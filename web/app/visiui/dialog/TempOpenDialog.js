@@ -4,7 +4,8 @@
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
 visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
 
-    var dialog = new visicomp.visiui.Dialog({"resizable":true,"movable":true});
+    var dialogParent = visicomp.app.visiui.VisiComp.getDialogParent();
+    var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"resizable":true,"movable":true});
     var content = document.createElement("div");
     
     var line;

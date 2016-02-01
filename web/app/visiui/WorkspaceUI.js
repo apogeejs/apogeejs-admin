@@ -1,16 +1,14 @@
 /** This class manages the user interface for a workspace object. The argument
  * uiInitData is optional and should be included if the workspace is not empty. It
  * contains the information of how to create controls for the workspace data. */
-visicomp.app.visiui.WorkspaceUI = function(app,tab,name) {
-//note - this is not the correct event manager
-var wrongEventManager = app;
-    visicomp.app.visiui.ParentContainer.init.call(this,tab,wrongEventManager);
+visicomp.app.visiui.WorkspaceUI = function(app,tab,tabContainerObject,name) {
     
 	this.workspace = new visicomp.core.Workspace(name);
 	
     //properties
 	this.app = app;
     this.tab = tab;
+    this.tabContainerObject = tabContainerObject;
     this.controlMap = {};
     this.activeFolderName = null;
    
@@ -35,12 +33,8 @@ var wrongEventManager = app;
 	//set up the root folder
     var rootFolder = this.workspace.getRootFolder();
     this.registerMember(rootFolder,null);
-    this.addControlContainer(rootFolder,this);
+    this.addControlContainer(rootFolder,this.tabContainerObject);
 }
-    
-
-//add components to this class
-visicomp.core.util.mixin(visicomp.app.visiui.WorkspaceUI,visicomp.app.visiui.ParentContainer);
 
 /** This method loads the data form this json into the workspace. */
 visicomp.app.visiui.WorkspaceUI.prototype.loadFromJson = function(workspaceJson) {
@@ -57,7 +51,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.loadFromJson = function(workspaceJson)
 	//reinitialize the root folder
     var rootFolder = this.workspace.getRootFolder();
     this.registerMember(rootFolder,null);
-    this.addControlContainer(rootFolder,this)
+    this.addControlContainer(rootFolder,this.tabContainerObject);
     
     //oad contrtols from json if present
     if(workspaceControlsJson) {

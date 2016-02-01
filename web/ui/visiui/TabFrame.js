@@ -1,6 +1,10 @@
 /** This is a tab frame. The constructor takes an id for the container and
  * an options object. The tab frame wil lbe appended to the given container.
  * 
+ * This is not really a general window element. It is made to fit this use case.
+ * It resizes to occupy all space in the parent, starting form its existing location,
+ * which in this case should be right after the menu.
+ * 
  * options: none
  * 
  * @class 
@@ -10,6 +14,10 @@ visicomp.visiui.TabFrame = function(options) {
     if(!options) {
         options = {};
     }
+    
+    //base init
+    visicomp.core.EventManager.init.call(this);
+    //initialize parent container after conatiner div created
 	
     //variables
     this.options = options;
@@ -21,8 +29,15 @@ visicomp.visiui.TabFrame = function(options) {
 	
     this.tabFrame = document.createElement("div");
     visicomp.visiui.applyStyle(this.tabFrame,visicomp.visiui.TabFrame.DISPLAY_FRAME_STYLE);
-	this.tabFrameControl.appendChild(this.tabFrame);
-  
+	this.tabFrameControl.appendChild(this.tabFrame);  
+    
+    this.tabBar = document.createElement("div");
+    visicomp.visiui.applyStyle(this.tabBar,visicomp.visiui.TabFrame.TAB_BAR_STYLE);
+    this.tabFrameControl.appendChild(this.tabBar);
+    
+    //base init for parent continer mixin
+    visicomp.visiui.ParentContainer.init.call(this,this.tabFrame,this);
+	
 ////CONTEXT MENU EXAMPLE  
 //var instance = this;    
 //this.tabFrame.oncontextmenu = function(event) {
@@ -32,13 +47,8 @@ visicomp.visiui.TabFrame = function(options) {
 //    contextMenu.addCallbackMenuItem("Third",function() {alert("third");});
 //    contextMenu.addCallbackMenuItem("Fourth",function() {alert("fourth");});
 //    visicomp.visiui.Menu.showContextMenu(contextMenu,event);
-//}    
+//}      
     
-    
-    this.tabBar = document.createElement("div");
-    visicomp.visiui.applyStyle(this.tabBar,visicomp.visiui.TabFrame.TAB_BAR_STYLE);
-    this.tabFrameControl.appendChild(this.tabBar);
-	
 	//prevent default drag action
 	var moveHandler = function(e) {e.preventDefault();};
     this.tabFrameControl.addEventListener("mousemove",moveHandler);
@@ -47,11 +57,18 @@ visicomp.visiui.TabFrame = function(options) {
     var instance = this;
     window.addEventListener("resize", function() {
         instance.resizeElement();
+        
+        //fire event for this object
+        instance.dispatchEvent("resize",this);
     });
     
     //calculate the size
     this.resizeElement();
 }
+
+//add components to this class
+visicomp.core.util.mixin(visicomp.visiui.TabFrame,visicomp.core.EventManager);
+visicomp.core.util.mixin(visicomp.visiui.TabFrame,visicomp.visiui.ParentContainer);
 
 visicomp.visiui.TabFrame.CONTAINER_FRAME_MARGIN_PX = 5;
 
@@ -135,6 +152,17 @@ visicomp.visiui.TabFrame.prototype.getTabElement = function(title) {
     }
 }
 
+/** This method returns the main dom element for the window frame. */
+visicomp.visiui.TabFrame.prototype.getTabContainerObject = function(title) {
+    var tabData = this.tabTable[title];
+    if(tabData) {
+        return tabData.tabContainerObject;
+    }
+    else {
+        return null;
+    }
+}
+
 /** This method adds a tab to the tab frame. */
 visicomp.visiui.TabFrame.prototype.addTab = function(title) {
     //make sure there is no tab with this name
@@ -153,13 +181,23 @@ visicomp.visiui.TabFrame.prototype.addTab = function(title) {
 	
     //add the element
     this.tabFrame.appendChild(element);
+    
+    //create the parent container for the tab contents
+    var tabContainerObject = new visicomp.visiui.SimpleParentContainer(element);
 
     //create tab
     var tabElement = document.createElement("div");
     visicomp.visiui.applyStyle(tabElement,visicomp.visiui.TabFrame.TAB_BASE_STYLE);
     tabElement.innerHTML = title;
     this.tabBar.appendChild(tabElement);
-    tabData.tabElement = tabElement;
+    tabData.tabElement = tabElement;   
+    
+    //handler to resize on window resize
+    window.addEventListener("resize", function() {  
+        //fire event for this object
+        tabContainerObject.resized();
+    });
+    tabData.tabContainerObject = tabContainerObject;
 	
     //add the click handler
     var instance = this;

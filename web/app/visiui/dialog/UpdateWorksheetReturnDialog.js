@@ -1,7 +1,8 @@
 /** This method shows the doalog to set the arg list for a function. */
 visicomp.app.visiui.dialog.showUpdateWorksheetReturnDialog = function(worksheet,onSaveFunction) {
 
-    var dialog = new visicomp.visiui.Dialog({"movable":true});
+    var dialogParent = visicomp.app.visiui.VisiComp.getDialogParent();
+    var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"movable":true});
     
     //create body
     var content = visicomp.visiui.createElement("div",{"className":"dialogBody"}); 

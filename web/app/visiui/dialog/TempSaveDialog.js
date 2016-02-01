@@ -11,7 +11,8 @@ visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
     var workspaceJson = workspaceUI.toJson();
     var workspaceText = JSON.stringify(workspaceJson);
 
-    var dialog = new visicomp.visiui.Dialog({"resizable":true,"movable":true});
+    var dialogParent = visicomp.app.visiui.VisiComp.getDialogParent();
+    var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"resizable":true,"movable":true});
     var content = document.createElement("div");
     
     var line;
