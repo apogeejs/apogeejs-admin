@@ -26,7 +26,8 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 	//create the UI
 	this.createUI(containerId);
 	
-	//create a default workspace
+	//create a default workspace 
+//I don't handle a failed return here!
 	this.createWorkspace(visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME);
 	
 }
@@ -110,10 +111,11 @@ visicomp.app.visiui.VisiComp.prototype.createWorkspace = function(name) {
     try {
         //make the workspace ui
         var workspaceUI = this.makeWorkspaceUI(name);
+        var workspace = new visicomp.core.Workspace(name);
+        workspaceUI.setWorkspace(workspace);
     
         returnValue.success = true;
         returnValue.workspaceUI = workspaceUI;
-        returnValue.workspace = workspaceUI.getWorkspace();
     }
     catch(error) {
         returnValue.success = false;
@@ -159,15 +161,16 @@ visicomp.app.visiui.VisiComp.prototype.openWorkspace = function(workspaceText) {
 		//if we have to load links wait for them to load
 		if(linksAdded) {
 			//deserialize workspace after the links load
+            var instance = this;
 			var onLinksLoaded = function() {
-				workspaceUI.loadFromJson(workspaceJson);
+				instance.loadWorkspace(workspaceUI,workspaceJson);
 			}
 			workspaceUI.setLinks(jsLinks,cssLinks,onLinksLoaded,name);
 			return {"success":true};
 		}
 		else {
 			//no need to wait to load workspace
-			workspaceUI.loadFromJson(workspaceJson);
+			this.loadWorkspace(workspaceUI,workspaceJson);
 		}
         
         //load the workspace data
@@ -216,7 +219,7 @@ visicomp.app.visiui.VisiComp.prototype.closeWorkspace = function() {
     return returnValue;
 }
 
-/** This method makes the app workspace, from a workspace data object and the UI init info. 
+/** This method makes an empty workspace ui object. 
  * @private */
 visicomp.app.visiui.VisiComp.prototype.makeWorkspaceUI = function(name) {
     
@@ -228,10 +231,20 @@ visicomp.app.visiui.VisiComp.prototype.makeWorkspaceUI = function(name) {
 	var tab = this.tabFrame.addTab(name);
     var tabContainerObject = this.tabFrame.getTabContainerObject(name);
     this.tabFrame.setActiveTab(name);
-    var workspaceUI = new visicomp.app.visiui.WorkspaceUI(this,tab,tabContainerObject,name);
+    var workspaceUI = new visicomp.app.visiui.WorkspaceUI(this,tab,tabContainerObject);
     this.workspaceUIs[name] = workspaceUI;
     
     return workspaceUI;
+}
+
+/** This method loads an existing workspace into an empty workspace UI. */
+visicomp.app.visiui.VisiComp.prototype.loadWorkspace = function(workspaceUI,workspaceJson) {
+    var workspaceDataJson = workspaceJson.workspace;
+    var workspaceControlsJson = workspaceJson.controls;
+
+    var workspace = new visicomp.core.Workspace(workspaceDataJson);
+    
+    workspaceUI.setWorkspace(workspace,workspaceControlsJson);
 }
 
 //==================================

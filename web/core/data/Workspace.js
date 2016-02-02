@@ -1,13 +1,18 @@
 /** This is the workspace. */
-visicomp.core.Workspace = function(name) {
+visicomp.core.Workspace = function(nameOrJson) {
     //base init
     visicomp.core.EventManager.init.call(this);
     visicomp.core.Owner.init.call(this);
     
-    this.name = name;
-
-    //add the root folder
-	this.rootFolder = new visicomp.core.Folder(this,name);
+    var inputArgType = visicomp.core.util.getObjectType(nameOrJson);
+    
+    if(inputArgType === "String") {
+        this.name = nameOrJson;
+        this.rootFolder = new visicomp.core.Folder(this,nameOrJson);
+    }
+    else {
+        this.loadFromJson(nameOrJson);
+    }
 }
 
 //add components to this class
@@ -81,7 +86,9 @@ visicomp.core.Workspace.prototype.toJson = function() {
     return json;
 }
 
-/** This is loads data from the given json into this workspace. */
+
+/** This is loads data from the given json into this workspace. 
+ * @private */
 visicomp.core.Workspace.prototype.loadFromJson = function(json) {
     var fileType = json.fileType;
 	if(fileType !== visicomp.core.Workspace.SAVE_FILE_TYPE) {
@@ -90,6 +97,8 @@ visicomp.core.Workspace.prototype.loadFromJson = function(json) {
     if(json.version !== visicomp.core.Workspace.SAVE_FILE_VERSION) {
         throw visicomp.core.util.createError("Incorrect file version.");
     }
+    
+    this.name = json.name;
 	
 	//recreate the root folder
 	var updateDataList = [];

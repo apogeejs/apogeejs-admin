@@ -1,9 +1,9 @@
 /** This class manages the user interface for a workspace object. The argument
  * uiInitData is optional and should be included if the workspace is not empty. It
  * contains the information of how to create controls for the workspace data. */
-visicomp.app.visiui.WorkspaceUI = function(app,tab,tabContainerObject,name) {
-    
-	this.workspace = new visicomp.core.Workspace(name);
+visicomp.app.visiui.WorkspaceUI = function(app,tab,tabContainerObject) {
+
+    this.workspace = null;
 	
     //properties
 	this.app = app;
@@ -14,8 +14,27 @@ visicomp.app.visiui.WorkspaceUI = function(app,tab,tabContainerObject,name) {
    
     this.jsLinkArray = [];
     this.cssLinkArray = [];
-	
-	//listeners
+}
+
+ /** This method sets the workspace. The argument controlsJson should be included
+  * if the workspace is not empty, such as when opening a existing workspace. It
+  * contains the data for the control associated with each workspace member. For 
+  * a new empty workspace the controlsJson should be omitted.
+  * @private */
+visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace, controlsJson) {   
+    this.workspace = workspace; 
+    
+    //set up the root folder
+    var rootFolder = this.workspace.getRootFolder();
+    this.registerMember(rootFolder,null);
+    this.addControlContainer(rootFolder,this.tabContainerObject);
+  
+    //load controls from json if present
+    if(controlsJson) {
+        this.loadFolderControlContentFromJson(rootFolder,controlsJson);
+    }
+    
+    //listeners
     var instance = this;
     
     //add a member updated listener
@@ -29,37 +48,33 @@ visicomp.app.visiui.WorkspaceUI = function(app,tab,tabContainerObject,name) {
         instance.childDeleted(fullName);
     }
     this.workspace.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
-	
-	//set up the root folder
-    var rootFolder = this.workspace.getRootFolder();
-    this.registerMember(rootFolder,null);
-    this.addControlContainer(rootFolder,this.tabContainerObject);
+    
 }
 
-/** This method loads the data form this json into the workspace. */
-visicomp.app.visiui.WorkspaceUI.prototype.loadFromJson = function(workspaceJson) {
-    var workspaceDataJson = workspaceJson.workspace;
-    var workspaceControlsJson = workspaceJson.controls;
-	
-	//I don't really like the way I do this, deleting the old folder, to allow for the new one
-	var oldRootFolder = this.workspace.getRootFolder().getFullName();
-	this.childDeleted(oldRootFolder);
-	
-	//load the workspace
-    this.workspace.loadFromJson(workspaceDataJson);
-    
-	//reinitialize the root folder
-    var rootFolder = this.workspace.getRootFolder();
-    this.registerMember(rootFolder,null);
-    this.addControlContainer(rootFolder,this.tabContainerObject);
-    
-    //oad contrtols from json if present
-    if(workspaceControlsJson) {
-        this.loadFolderControlContentFromJson(rootFolder,workspaceControlsJson);
-    }
-}
+///** This method loads the data form this json into the workspace. */
+//visicomp.app.visiui.WorkspaceUI.prototype.loadFromJson = function(workspaceJson) {
+//    var workspaceDataJson = workspaceJson.workspace;
+//    var workspaceControlsJson = workspaceJson.controls;
+//	
+//	//I don't really like the way I do this, deleting the old folder, to allow for the new one
+//	var oldRootFolder = this.workspace.getRootFolder().getFullName();
+//	this.childDeleted(oldRootFolder);
+//	
+//	//load the workspace
+//    this.workspace.loadFromJson(workspaceDataJson);
+//    
+//	//reinitialize the root folder
+//    var rootFolder = this.workspace.getRootFolder();
+//    this.registerMember(rootFolder,null);
+//    this.addControlContainer(rootFolder,this.tabContainerObject);
+//    
+//    //oad contrtols from json if present
+//    if(workspaceControlsJson) {
+//        this.loadFolderControlContentFromJson(rootFolder,workspaceControlsJson);
+//    }
+//}
 
-/** This method responds to a "new" menu event. */
+/** This method gets the workspace object. */
 visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
     return this.workspace;
 }
@@ -204,18 +219,6 @@ visicomp.app.visiui.WorkspaceUI.prototype.getFolderControlContentJson = function
 		json[name] = childControl.toJson();
 	}
     return json;
-}
-
- /** This method responds to a "new" menu event. 
-  * @private */
-visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace,workspaceControlsJson) {   
-    
-    this.workspace = workspace;
-	
-    
-    
-    
-    
 }
 
 visicomp.app.visiui.WorkspaceUI.prototype.loadFolderControlContentFromJson = function(folder,json) {
