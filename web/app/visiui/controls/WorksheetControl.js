@@ -1,13 +1,15 @@
 /** This control represents a table object. */
-visicomp.app.visiui.WorksheetControl = function(workspaceUI,worksheet) {
+visicomp.app.visiui.WorksheetControl = function(workspaceUI,worksheet,controlJson) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,workspaceUI,worksheet,visicomp.app.visiui.WorksheetControl.generator);
+    visicomp.app.visiui.Control.init.call(this,workspaceUI,worksheet,visicomp.app.visiui.WorksheetControl.generator,controlJson);
     visicomp.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
     
     //register this object as a parent container
     var internalFolder = worksheet.getInternalFolder();
     workspaceUI.registerMember(internalFolder,null);
     workspaceUI.addControlContainer(internalFolder,this);
+    
+    this.memberUpdated();
 };
 
 //add components to this class
@@ -26,29 +28,9 @@ visicomp.app.visiui.WorksheetControl.prototype.writeToJson = function(json) {
     json.children = workspaceUI.getFolderControlContentJson(internalFolder);
 }
 
-/** This method deseriliazes any data needed after the control is instantiated.
- * objects that extend Control should override this for any data that is
- * needed, however they should call this base function first. */
-visicomp.app.visiui.WorksheetControl.prototype.updateFromJson = function(json,updateDataList) {    
-    //call the base update function
-    visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
-    
-    //internal data
-    var worksheet = this.getObject();
-    
-    if(json.internalFolder) {
-        var workspaceUI = this.getWorkspaceUI();
-        var internalFolder = worksheet.getInternalFolder();
-        workspaceUI.createChildrenFromJson(internalFolder,json.internalFolder,updateDataList);
-    }
-    
-}
-
 /** This method populates the frame for this control. 
  * @protected */
 visicomp.app.visiui.WorksheetControl.prototype.populateFrame = function() {
-    
-    var window = this.getWindow();
     
     var menuItemInfoList = this.getMenuItemInfoList();
     
@@ -62,16 +44,6 @@ visicomp.app.visiui.WorksheetControl.prototype.populateFrame = function() {
     
     //add these at the start of the menu
     menuItemInfoList.splice(0,0,itemInfo1,itemInfo2);
-    
-//    //resize the editor on window size change
-//    var resizeCallback = function() {
-//        editor.resize();
-//    }
-//    window.addListener("resize", resizeCallback);
-
-    //dummy size
-window.setSize(500,500);
-
 }
 
 /** This method creates a callback for editing a standard codeable object
@@ -139,15 +111,11 @@ visicomp.app.visiui.WorksheetControl.createControl = function(workspaceUI,parent
     return returnValue;
 }
 
-visicomp.app.visiui.WorksheetControl.createControlFromJson = function(workspaceUI,member,controlData) {
-    var worksheetControl = new visicomp.app.visiui.WorksheetControl(workspaceUI,member);
-    if(controlData) {
-        worksheetControl.updateFromJson(controlData);
-        worksheetControl.memberUpdated();
-        if(controlData.children) {
-            var folder = member.getInternalFolder();
-            workspaceUI.loadFolderControlContentFromJson(folder,controlData.children);
-        }
+visicomp.app.visiui.WorksheetControl.createControlFromJson = function(workspaceUI,member,controlJson) {
+    var worksheetControl = new visicomp.app.visiui.WorksheetControl(workspaceUI,member,controlJson);
+    if((controlData)&&(controlData.children)) {
+        var folder = member.getInternalFolder();
+        workspaceUI.loadFolderControlContentFromJson(folder,controlData.children);
     }
     return worksheetControl;
 }
@@ -161,4 +129,5 @@ visicomp.app.visiui.WorksheetControl.generator.displayName = "Worksheet";
 visicomp.app.visiui.WorksheetControl.generator.uniqueName = "visicomp.app.visiui.WorksheetControl";
 visicomp.app.visiui.WorksheetControl.generator.createControl = visicomp.app.visiui.WorksheetControl.createControl;
 visicomp.app.visiui.WorksheetControl.generator.createControlFromJson = visicomp.app.visiui.WorksheetControl.createControlFromJson;
-
+visicomp.app.visiui.WorksheetControl.generator.DEFAULT_WIDTH = 500;
+visicomp.app.visiui.WorksheetControl.generator.DEFAULT_HEIGHT = 500;

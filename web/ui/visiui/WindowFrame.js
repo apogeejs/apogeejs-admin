@@ -24,6 +24,9 @@ visicomp.visiui.WindowFrame = function(parentContainer, options) {
     this.parentContainer = parentContainer;
     this.parentElement = parentContainer.getContainerElement();
     this.options = options;
+    
+    this.windowState = visicomp.visiui.WindowFrame.NORMAL; //minimize, normal, maximize
+    this.coordinateInfo = {};
 	
     this.frame = null;
     this.body = null;
@@ -37,10 +40,6 @@ visicomp.visiui.WindowFrame = function(parentContainer, options) {
     this.maximizeButton = null;
     this.closable = null;
     
-    this.windowState = visicomp.visiui.WindowFrame.NORMAL; //minimize, normal, maximize
-
-	this.coordinateInfo = {}; //requested window size and position
-
 //can we get rid of this?
 this.savedParentOverflow = undefined;
 	

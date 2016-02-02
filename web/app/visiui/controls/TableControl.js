@@ -1,7 +1,9 @@
 /** This control represents a table object. */
-visicomp.app.visiui.TableControl = function(workspaceUI,table) {
+visicomp.app.visiui.TableControl = function(workspaceUI,table,controlJson) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,workspaceUI,table,visicomp.app.visiui.TableControl.generator);
+    visicomp.app.visiui.Control.init.call(this,workspaceUI,table,visicomp.app.visiui.TableControl.generator,controlJson);
+    
+    this.memberUpdated();
 };
 
 //add components to this class
@@ -47,10 +49,6 @@ editor.$blockScrolling = Infinity;
         editor.resize();
     }
     window.addListener("resize", resizeCallback);
-
-    //dummy size
-window.setSize(200,200);
-
 }
 
 /** This method should include an needed functionality to clean up after a delete. */
@@ -142,12 +140,8 @@ visicomp.app.visiui.TableControl.createControl = function(workspaceUI,parent,nam
 }
 
 
-visicomp.app.visiui.TableControl.createControlFromJson = function(workspaceUI,member,controlData) {
-    var tableControl = new visicomp.app.visiui.TableControl(workspaceUI,member);
-    if(controlData) {
-        tableControl.updateFromJson(controlData);
-        tableControl.memberUpdated();
-    }
+visicomp.app.visiui.TableControl.createControlFromJson = function(workspaceUI,member,controlJson) {
+    var tableControl = new visicomp.app.visiui.TableControl(workspaceUI,member,controlJson);
     return tableControl;
 }
 
@@ -160,6 +154,8 @@ visicomp.app.visiui.TableControl.generator.displayName = "Table";
 visicomp.app.visiui.TableControl.generator.uniqueName = "visicomp.app.visiui.TableControl";
 visicomp.app.visiui.TableControl.generator.createControl = visicomp.app.visiui.TableControl.createControl;
 visicomp.app.visiui.TableControl.generator.createControlFromJson = visicomp.app.visiui.TableControl.createControlFromJson;
+visicomp.app.visiui.TableControl.generator.DEFAULT_WIDTH = 200;
+visicomp.app.visiui.TableControl.generator.DEFAULT_HEIGHT = 200;
 
 //======================================
 // This is a code wrapper so the user works with the formula rather than the function body

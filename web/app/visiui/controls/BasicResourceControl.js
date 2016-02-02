@@ -17,8 +17,6 @@ visicomp.app.visiui.BasicResourceControl.init = function() {}
 
 /** This method populates the frame for this control. */
 visicomp.app.visiui.BasicResourceControl.populateFrame = function() {
-    
-    var window = this.getWindow();
 	
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
@@ -29,9 +27,6 @@ visicomp.app.visiui.BasicResourceControl.populateFrame = function() {
     
     //add these at the start of the menu
     menuItemInfoList.splice(0,0,itemInfo);
-
-    //dummy size
-window.setSize(200,200);
 
     //check if the implementation wants to do anything
     if(this.addToFrame) {
@@ -47,7 +42,7 @@ visicomp.app.visiui.BasicResourceControl.memberUpdated = function() {
     //execute the resource processor on an update
     var resource = this.getObject();
     var resourceProcessor = resource.getResourceProcessor();
-    if(resourceProcessor) {
+    if((resourceProcessor)&&(resourceProcessor.run)) {
         resourceProcessor.run();
     }    
 }

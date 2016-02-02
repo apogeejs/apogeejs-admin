@@ -1,7 +1,7 @@
 /** This control represents a table object. */
-visicomp.app.visiui.FolderControl = function(workspaceUI,folder) {
+visicomp.app.visiui.FolderControl = function(workspaceUI,folder,controlJson) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,workspaceUI,folder,visicomp.app.visiui.FolderControl.generator);
+    visicomp.app.visiui.Control.init.call(this,workspaceUI,folder,visicomp.app.visiui.FolderControl.generator,controlJson);
     visicomp.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
     
     //register this folder as a parent container
@@ -23,37 +23,9 @@ visicomp.app.visiui.FolderControl.prototype.writeToJson = function(json) {
     json.children = workspaceUI.getFolderControlContentJson(folder);
 }
 
-///** This method deseriliazes any data needed after the control is instantiated.
-// * objects that extend Control should override this for any data that is
-// * needed, however they should call this base function first. */
-//visicomp.app.visiui.FolderControl.prototype.updateFromJson = function(json) {
-//    var workspaceUI = this.getWorkspaceUI();
-//    
-//    //call the base update function
-//    visicomp.app.visiui.Control.updateFromJson.call(this,json);
-//    
-//    //load the type specific data
-//    if(json.children) {
-//        var folder = this.getObject();
-//        workspaceUI.loadFolderControlContentFromJson(folder,json.children);
-//    }
-//}
-
 /** This method populates the frame for this control. 
  * @protected */
 visicomp.app.visiui.FolderControl.prototype.populateFrame = function() {
-    
-    var window = this.getWindow();
-    
-//    //resize the editor on window size change
-//    var resizeCallback = function() {
-//        editor.resize();
-//    }
-//    window.addListener("resize", resizeCallback);
-
-    //dummy size
-window.setSize(500,500);
-
 }
 
 //======================================
@@ -81,11 +53,8 @@ visicomp.app.visiui.FolderControl.createControl = function(workspaceUI,parent,na
 
 visicomp.app.visiui.FolderControl.createControlFromJson = function(workspaceUI,member,controlData) {
     var folderControl = new visicomp.app.visiui.FolderControl(workspaceUI,member);
-    if(controlData) {
-        folderControl.updateFromJson(controlData);
-        if(controlData.children) {
-            workspaceUI.loadFolderControlContentFromJson(member,controlData.children);
-        }
+    if((controlData)&&(controlData.children)) {
+        workspaceUI.loadFolderControlContentFromJson(member,controlData.children);
     }
     
     return folderControl;
@@ -101,3 +70,5 @@ visicomp.app.visiui.FolderControl.generator.displayName = "Folder";
 visicomp.app.visiui.FolderControl.generator.uniqueName = "visicomp.app.visiui.FolderControl";
 visicomp.app.visiui.FolderControl.generator.createControl = visicomp.app.visiui.FolderControl.createControl;
 visicomp.app.visiui.FolderControl.generator.createControlFromJson = visicomp.app.visiui.FolderControl.createControlFromJson;
+visicomp.app.visiui.FolderControl.generator.DEFAULT_WIDTH = 500;
+visicomp.app.visiui.FolderControl.generator.DEFAULT_HEIGHT = 500;

@@ -2,9 +2,9 @@
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the control is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-visicomp.app.visiui.CustomResourceControl = function(workspaceUI,resource) {
+visicomp.app.visiui.CustomResourceControl = function(workspaceUI,resource,controlJson) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,workspaceUI,resource,visicomp.app.visiui.CustomResourceControl.generator);
+    visicomp.app.visiui.Control.init.call(this,workspaceUI,resource,visicomp.app.visiui.CustomResourceControl.generator,controlJson);
     visicomp.app.visiui.BasicResourceControl.init.call(this);
 };
 
@@ -81,12 +81,8 @@ visicomp.app.visiui.CustomResourceControl.prototype.writeToJson = function(json)
     }
 }
 
-/** This method deseriliazes any data needed after the control is instantiated.
- * objects that extend Control should override this for any data that is
- * needed, however they should call this base function first. */
-visicomp.app.visiui.CustomResourceControl.prototype.updateFromJson = function(json,updateDataList) {
-    visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
-    
+/** This method deseriliazes data for the custom resource control. */
+visicomp.app.visiui.CustomResourceControl.prototype.updateFromJson = function(json) {   
     //internal data
     if(json.processor) {
         this.update(json.processor.html,
@@ -136,10 +132,9 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,p
 
 visicomp.app.visiui.CustomResourceControl.createControlFromJson = function(workspaceUI,member,controlData) {
     
-    var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,member);
+    var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,member,controlData);
     if(controlData) {
         customResourceControl.updateFromJson(controlData);
-        customResourceControl.memberUpdated();
     }
     else {
         customResourceControl.initEmptyProcessor();
@@ -157,5 +152,6 @@ visicomp.app.visiui.CustomResourceControl.generator.displayName = "Custom Contro
 visicomp.app.visiui.CustomResourceControl.generator.uniqueName = "visicomp.app.visiui.CustomResourceControl";
 visicomp.app.visiui.CustomResourceControl.generator.createControl = visicomp.app.visiui.CustomResourceControl.createControl;
 visicomp.app.visiui.CustomResourceControl.generator.createControlFromJson = visicomp.app.visiui.CustomResourceControl.createControlFromJson;
-
+visicomp.app.visiui.CustomResourceControl.generator.DEFAULT_WIDTH = 500;
+visicomp.app.visiui.CustomResourceControl.generator.DEFAULT_HEIGHT = 300;
 

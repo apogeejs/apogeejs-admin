@@ -1,7 +1,9 @@
 /** This control represents a table object. */
-visicomp.app.visiui.FunctionControl = function(workspaceUI, functionObject) {
+visicomp.app.visiui.FunctionControl = function(workspaceUI, functionObject, controlJson) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,workspaceUI,functionObject,visicomp.app.visiui.FunctionControl.generator);
+    visicomp.app.visiui.Control.init.call(this,workspaceUI,functionObject,visicomp.app.visiui.FunctionControl.generator,controlJson);
+
+    this.memberUpdated();
 };
 
 //add components to this class
@@ -10,32 +12,6 @@ visicomp.core.util.mixin(visicomp.app.visiui.FunctionControl,visicomp.app.visiui
 //==============================
 // Protected and Private Instance Methods
 //==============================
-
-///** This serializes the table control. */
-//visicomp.app.visiui.FunctionControl.prototype.writeToJson = function(json) {
-//    var functionObject = this.getObject();
-//    json.argList = functionObject.getArgList();
-//	json.functionBody = functionObject.getFunctionBody();
-//	json.supplementalCode = functionObject.getSupplementalCode();
-//}
-
-///** This method deseriliazes any data needed after the control is instantiated.
-// * objects that extend Control should override this for any data that is
-// * needed, however they should call this base function first. */
-//visicomp.app.visiui.FunctionControl.prototype.updateFromJson = function(json,updateDataList) {
-//    //call the base update function
-//    visicomp.app.visiui.Control.updateFromJson.call(this,json,updateDataList);
-//    
-//    //load the type specific data
-//    var functionObject = this.getObject();
-//    functionObject.setArgList(json.argList);
-//    
-//    var updateData = {};
-//    updateData.member = functionObject;
-//    updateData.functionBody = json.functionBody;
-//    updateData.supplementalCode = json.supplementalCode;
-//    updateDataList.push(updateData);
-//}
 
 /** This method populates the frame for this control. 
  * @protected */
@@ -73,10 +49,6 @@ editor.$blockScrolling = Infinity;
         editor.resize();
     }
     window.addListener("resize", resizeCallback);
-
-    //dummy size
-window.setSize(200,200);
-
 }
 
 /** This method should include an needed functionality to clean up after a delete. */
@@ -150,12 +122,8 @@ visicomp.app.visiui.FunctionControl.createControl = function(workspaceUI,parent,
     return returnValue;
 }
 
-visicomp.app.visiui.FunctionControl.createControlFromJson = function(workspaceUI,member,controlData) {
-    var functionControl = new visicomp.app.visiui.FunctionControl(workspaceUI,member);
-    if(controlData) {
-        functionControl.updateFromJson(controlData);
-        functionControl.memberUpdated();
-    }
+visicomp.app.visiui.FunctionControl.createControlFromJson = function(workspaceUI,member,controlJson) {
+    var functionControl = new visicomp.app.visiui.FunctionControl(workspaceUI,member,controlJson);
     return functionControl;
 }
 
@@ -168,5 +136,6 @@ visicomp.app.visiui.FunctionControl.generator.displayName = "Function";
 visicomp.app.visiui.FunctionControl.generator.uniqueName = "visicomp.app.visiui.FunctionControl";
 visicomp.app.visiui.FunctionControl.generator.createControl = visicomp.app.visiui.FunctionControl.createControl;
 visicomp.app.visiui.FunctionControl.generator.createControlFromJson = visicomp.app.visiui.FunctionControl.createControlFromJson;
-
+visicomp.app.visiui.FunctionControl.generator.DEFAULT_WIDTH = 200;
+visicomp.app.visiui.FunctionControl.generator.DEFAULT_HEIGHT = 200;
  

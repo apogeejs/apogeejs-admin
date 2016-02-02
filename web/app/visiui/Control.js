@@ -6,7 +6,12 @@ visicomp.app.visiui.Control = {};
     
 /** This is the initializer for the component. The object passed is the core object
  * associated with this control. */
-visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
+visicomp.app.visiui.Control.init = function(workspaceUI,object,generator,options) {
+    
+    if(!options) {
+        options = {};
+    }
+    
     this.workspaceUI = workspaceUI;
     this.object = object;
     this.generator = generator;
@@ -21,8 +26,12 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
     //--------------
     //create window
     //--------------
-    var options = {"minimizable":true,"maximizable":true,"resizable":true,"movable":true};
-    this.window = new visicomp.visiui.WindowFrame(this.parentContainerObject,options);
+    var windowOptions = {};
+    windowOptions.minimizable = true;
+    windowOptions.maximizable = true;
+    windowOptions.resizable = true;
+    windowOptions.movable = true;
+    this.window = new visicomp.visiui.WindowFrame(this.parentContainerObject,windowOptions);
     
     //load the content div
     var contentDiv = visicomp.visiui.createElement("div",null,
@@ -64,8 +73,20 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator) {
     this.window.setTitle(this.getObject().getName());
     
     //show the window
-	var pos = this.parentContainerObject.getNextWindowPosition();
-    this.window.setPosition(pos[0],pos[1]);
+    if(options.coordInfo) {
+        this.window.setCoordinateInfo(options.coordInfo);
+    }
+    else {
+        //set position 
+        var pos = this.parentContainerObject.getNextWindowPosition();
+        this.window.setPosition(pos[0],pos[1]);
+        
+        //set default size
+        this.window.setSize(generator.DEFAULT_WIDTH,generator.DEFAULT_HEIGHT);
+    }
+    if(options.windowState) {
+        this.window.setWindowState(options.windowState);
+    }
     this.window.show();
     
     
@@ -114,7 +135,7 @@ visicomp.app.visiui.Control.toJson = function() {
     json.key = this.getObject().getFullName();
     json.type = this.generator.uniqueName;
     
-    json.windowCoords = this.window.getCoordinateInfo();
+    json.coordInfo = this.window.getCoordinateInfo();
     json.windowState = this.window.getWindowState();
     
     if(this.writeToJson) {
@@ -131,18 +152,6 @@ visicomp.app.visiui.Control.toJson = function() {
 /** This method returns the menu entries for this control. */
 visicomp.app.visiui.Control.getMenuItemInfoList = function() {
     return this.menuItemInfoList;
-}
-
-/** This method deseriliazes any data needed after the control is instantiated.
- * objects that extend Control should override this for any data that is
- * needed, however they should call this base function first. */
-visicomp.app.visiui.Control.updateFromJson = function(json) {
-    if(json.windowCoords) {
-        this.window.setCoordinateInfo(json.windowCoords);
-    }
-    if(json.windowState) {
-        this.window.setWindowState(json.windowState);
-    }
 }
 
 //This method should be populated by an extending object. It should return a json object.
@@ -206,19 +215,6 @@ visicomp.app.visiui.Control.processEditResult = function(editStatus) {
 
 /** This method should include an needed functionality to clean up after a delete. */
 visicomp.app.visiui.Control.onDelete = function() {
-}
-
-/** This deserializez the control from a json. It is a static function, but because
- * this is a mixin it will also appear as a member function on extending objects. */
-visicomp.app.visiui.Control.createfromJson = function(workspaceUI,parent,generator,json,updateDataList) {
-    var name = json.name;
-    var resultValue = generator.createControl(workspaceUI,parent,name);
-    
-    if(resultValue.success) {
-        //load the general control data
-        var control = resultValue.control;
-        control.updateFromJson(json,updateDataList);
-    }
 }
 
 //======================================
