@@ -1,7 +1,7 @@
 /** This method shows the doalog to set the arg list for a function. */
 visicomp.app.visiui.dialog.showUpdateArgListDialog = function(object,onSaveFunction) {
 
-    var dialogParent = visicomp.app.visiui.VisiComp.getDialogParent();
+    var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"movable":true});
     
     //create body

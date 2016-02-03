@@ -15,7 +15,7 @@ if(!workspaceUI) {
 
 	var controlMap = workspaceUI.getControlMap();
 
-    var dialogParent = visicomp.app.visiui.VisiComp.getDialogParent();
+    var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"movable":true});
     
     //create body

@@ -351,24 +351,9 @@ visicomp.app.visiui.VisiComp.prototype.registerStandardControl = function(contro
  * @private */
 visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     
-    //load the UI into tthe given container
-    var container = document.getElementById(containerId);
-    if(!container) {
-        throw visicomp.core.util.createError("Container ID not found: " + containerID);
-    }
-
-    //----------------------------
-    // Create dialog parent
-    //----------------------------
-//I should probably do this on a per-app basis. review this...
-    visicomp.app.visiui.VisiComp.dialogParent = new visicomp.visiui.SimpleParentContainer(container);
+    var windowElements = visicomp.visiui.initWindows(containerId);
+    var container = windowElements.baseElement;
     
-    //handler to resize on window resize
-    window.addEventListener(visicomp.visiui.WindowFrame.RESIZED, function() {  
-        //fire event for this object
-        visicomp.app.visiui.VisiComp.dialogParent.resized();
-    });
-
     //-------------------
     //create menus
     //-----------------------
@@ -446,12 +431,6 @@ visicomp.app.visiui.VisiComp.prototype.getOnCreateRequestedCallback = function(g
 // Static Functions
 //=================================
 
-visicomp.app.visiui.VisiComp.dialogParent = null;
-
-
-visicomp.app.visiui.VisiComp.getDialogParent = function() {
-    return visicomp.app.visiui.VisiComp.dialogParent;
-}
 /** This method replaces on spaces with &nbsp; spaces. It is intedned to prevent
  * wrapping in html. */
 visicomp.app.visiui.VisiComp.convertSpacesForHtml = function(text) {

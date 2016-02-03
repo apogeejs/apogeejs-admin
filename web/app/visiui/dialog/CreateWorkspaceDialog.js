@@ -3,7 +3,7 @@
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
 visicomp.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction) {
 
-    var dialogParent = visicomp.app.visiui.VisiComp.getDialogParent();
+    var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"movable":true});
     
     //create body

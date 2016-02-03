@@ -4,7 +4,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
 	
 	var customResourceProcessor = customResourceControl.getObject().getResourceProcessor();
     
-    var dialogParent = visicomp.app.visiui.VisiComp.getDialogParent();
+    var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
             
     //create body

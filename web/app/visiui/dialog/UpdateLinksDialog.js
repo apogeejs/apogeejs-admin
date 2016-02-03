@@ -2,7 +2,7 @@
  * arguments as the updateControl event handler html. */
 visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     
-    var dialogParent = visicomp.app.visiui.VisiComp.getDialogParent();
+    var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
             
     //create body

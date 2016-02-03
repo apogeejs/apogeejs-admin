@@ -133,6 +133,8 @@ visicomp.visiui.WindowFrame.RESIZED = "resized";
 visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL = {
     //fixed
     "position":"absolute",
+    "pointerEvents": "auto", //we need this since we remove pointer evetns from the dialog layer container
+    
     
     //configurable
     "background-color":"lightgray",
@@ -143,6 +145,7 @@ visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL = {
 visicomp.visiui.WindowFrame.FRAME_STYLE_MAX = {
     //fixed
     "position":"absolute",
+    "pointerEvents": "auto",
     
     //configurable
     "background-color":"lightgray",

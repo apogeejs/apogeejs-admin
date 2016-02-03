@@ -3,13 +3,13 @@
  * 
  * @class 
  */
-visicomp.visiui.SimpleParentContainer = function(div) {
+visicomp.visiui.SimpleParentContainer = function(div,initialIsShowing) {
     
     //base init
     visicomp.core.EventManager.init.call(this);
     visicomp.visiui.ParentContainer.init.call(this,div,this);
     
-    this.isShowing = false;
+    this.isShowing = initialIsShowing;
 }
 
 //add components to this class
