@@ -48,7 +48,7 @@ editor.$blockScrolling = Infinity;
     var resizeCallback = function() {
         editor.resize();
     }
-    window.addListener("resize", resizeCallback);
+    window.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
 }
 
 /** This method should include an needed functionality to clean up after a delete. */

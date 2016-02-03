@@ -55,11 +55,8 @@ visicomp.visiui.TabFrame = function(options) {
     
     //handler to resize on window resize
     var instance = this;
-    window.addEventListener("resize", function() {
+    window.addEventListener(visicomp.visiui.WindowFrame.RESIZED, function() {
         instance.resizeElement();
-        
-        //fire event for this object
-        instance.dispatchEvent("resize",this);
     });
     
     //calculate the size
@@ -69,6 +66,10 @@ visicomp.visiui.TabFrame = function(options) {
 //add components to this class
 visicomp.core.util.mixin(visicomp.visiui.TabFrame,visicomp.core.EventManager);
 visicomp.core.util.mixin(visicomp.visiui.TabFrame,visicomp.visiui.ParentContainer);
+
+//events
+visicomp.visiui.TabFrame.TAB_SHOWN = "tabShown";
+visicomp.visiui.TabFrame.TABS_RESIZED = "tabsResized";
 
 visicomp.visiui.TabFrame.CONTAINER_FRAME_MARGIN_PX = 5;
 
@@ -95,14 +96,6 @@ visicomp.visiui.TabFrame.TAB_BAR_STYLE = {
     "margin":"0px",
     "border":" 1px solid gray",
     "border-top-width":" 0px"
-}
-visicomp.visiui.TabFrame.TAB_WINDOW_STYLE = {
-    "top":"0px",
-    "bottom":"0px",
-    "left":"0px",
-    "right":"0px",
-    "position":"absolute",
-    "background-color":"white"
 }
 visicomp.visiui.TabFrame.TAB_BASE_STYLE = {
     //fixed
@@ -142,21 +135,10 @@ visicomp.visiui.TabFrame.prototype.getElement = function() {
 }
 
 /** This method returns the main dom element for the window frame. */
-visicomp.visiui.TabFrame.prototype.getTabElement = function(title) {
-    var tabData = this.tabTable[title];
+visicomp.visiui.TabFrame.prototype.getTab = function(name) {
+    var tabData = this.tabTable[name];
     if(tabData) {
-        return tabData.displayFrame;
-    }
-    else {
-        return null;
-    }
-}
-
-/** This method returns the main dom element for the window frame. */
-visicomp.visiui.TabFrame.prototype.getTabContainerObject = function(title) {
-    var tabData = this.tabTable[title];
-    if(tabData) {
-        return tabData.tabContainerObject;
+        return tabData.tabDisplay;
     }
     else {
         return null;
@@ -164,73 +146,59 @@ visicomp.visiui.TabFrame.prototype.getTabContainerObject = function(title) {
 }
 
 /** This method adds a tab to the tab frame. */
-visicomp.visiui.TabFrame.prototype.addTab = function(title) {
+visicomp.visiui.TabFrame.prototype.addTab = function(name) {
     //make sure there is no tab with this name
-    if(this.tabTable[title]) {
+    if(this.tabTable[name]) {
         alert("There is already a tab with this name!");
         return null;
     }
     
-    //create the tab element
-    var element = document.createElement("div");
-    visicomp.visiui.applyStyle(element,visicomp.visiui.TabFrame.TAB_WINDOW_STYLE);
-	
-    var tabData = {};
-    tabData.title = title;
-    tabData.displayFrame = element;
-	
-    //add the element
-    this.tabFrame.appendChild(element);
+    //create the tab object
+    var tab = new visicomp.visiui.Tab(name, this);
+    this.tabFrame.appendChild(tab.getContainerElement());
     
-    //create the parent container for the tab contents
-    var tabContainerObject = new visicomp.visiui.SimpleParentContainer(element);
-
-    //create tab
-    var tabElement = document.createElement("div");
-    visicomp.visiui.applyStyle(tabElement,visicomp.visiui.TabFrame.TAB_BASE_STYLE);
-    tabElement.innerHTML = title;
-    this.tabBar.appendChild(tabElement);
-    tabData.tabElement = tabElement;   
-    
-    //handler to resize on window resize
-    window.addEventListener("resize", function() {  
-        //fire event for this object
-        tabContainerObject.resized();
-    });
-    tabData.tabContainerObject = tabContainerObject;
+    //create tab label
+    var tabLabelElement = document.createElement("div");
+    visicomp.visiui.applyStyle(tabLabelElement,visicomp.visiui.TabFrame.TAB_BASE_STYLE);
+    tabLabelElement.innerHTML = name;
+    this.tabBar.appendChild(tabLabelElement);
 	
     //add the click handler
     var instance = this;
-    tabElement.onclick = function() {
-        instance.setActiveTab(title);
+    tabLabelElement.onclick = function() {
+        instance.setActiveTab(name);
     }
-    tabElement.onmousedown = function(e) {
+    tabLabelElement.onmousedown = function(e) {
         //this prevents text selection
         e.preventDefault();
     }
 	
-    //check if this tab is active
-    this.tabTable[title] = tabData;
+    //add to tabs
+    var tabData = {};
+    tabData.tabDisplay = tab;
+    tabData.tabLabel = tabLabelElement;
+    
+    this.tabTable[name] = tabData;
     if(this.activeTab == null) {
-        this.activeTab = title;
+        this.activeTab = name;
     }
     this.updateTabDisplay();
     
     //resize the main control element
     this.resizeElement();
     
-    return element;
+    return tab;
 }
 
 /** This method adds a tab to the tab frame. */
-visicomp.visiui.TabFrame.prototype.removeTab = function(title) {
-    var tabData = this.tabTable[title];
+visicomp.visiui.TabFrame.prototype.removeTab = function(name) {
+    var tabData = this.tabTable[name];
     if(tabData) {
-        this.tabFrame.removeChild(tabData.displayFrame);
-        this.tabBar.removeChild(tabData.tabElement);
-        delete this.tabTable[title];
+        this.tabFrame.removeChild(tabData.tabDisplay.getContainerElement());
+        this.tabBar.removeChild(tabData.tabLabel);
+        delete this.tabTable[name];
 		
-        if(this.activeTab == title) {
+        if(this.activeTab == name) {
             this.activeTab = null;
             //choose a random tab
             for(var title in this.tabTable) {
@@ -256,16 +224,16 @@ visicomp.visiui.TabFrame.prototype.getActiveTabTitle = function() {
 /** This updates the tabs. */
 visicomp.visiui.TabFrame.prototype.updateTabDisplay = function() {
     var title;
-    var tabInfo;
     for(title in this.tabTable) {
-        tabInfo = this.tabTable[title];
+        var tabData = this.tabTable[title];
         if(title == this.activeTab) {
-            tabInfo.displayFrame.style.display = "";
-            visicomp.visiui.applyStyle(tabInfo.tabElement,visicomp.visiui.TabFrame.TAB_ACTIVE_STYLE);
+            tabData.tabDisplay.getContainerElement().style.display = "";
+            visicomp.visiui.applyStyle(tabData.tabLabel,visicomp.visiui.TabFrame.TAB_ACTIVE_STYLE);
+            this.dispatchEvent(visicomp.visiui.TabFrame.TAB_SHOWN,this.activeTab);
         }
         else {
-            tabInfo.displayFrame.style.display = "none";
-            visicomp.visiui.applyStyle(tabInfo.tabElement,visicomp.visiui.TabFrame.TAB_INACTIVE_STYLE);
+            tabData.tabDisplay.getContainerElement().style.display = "none";
+            visicomp.visiui.applyStyle(tabData.tabLabel,visicomp.visiui.TabFrame.TAB_INACTIVE_STYLE);
         }
     }
 }
@@ -285,4 +253,6 @@ visicomp.visiui.TabFrame.prototype.resizeElement = function() {
     var controlHeight = parent.clientHeight - this.tabFrameControl.offsetTop;
     this.tabFrame.style.height = (controlHeight - this.tabBar.offsetHeight - 
             2 * visicomp.visiui.TabFrame.CONTAINER_FRAME_MARGIN_PX) + "px";
+        
+    this.dispatchEvent(visicomp.visiui.TabFrame.TABS_RESIZED,this);
 }

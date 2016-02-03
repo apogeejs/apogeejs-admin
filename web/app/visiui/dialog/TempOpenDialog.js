@@ -57,6 +57,7 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
     //show dialog
     dialog.setContent(content);
     dialog.show();
-    dialog.centerOnPage();
+    var coords = dialogParent.getCenterOnPagePosition(dialog);
+    dialog.setPosition(coords[0],coords[1]);
 }
 

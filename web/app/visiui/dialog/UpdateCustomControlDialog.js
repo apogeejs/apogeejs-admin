@@ -166,9 +166,9 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
     
     //show the dialog
     dialog.setContent(content);
-    dialog.setZIndex(100);
     dialog.show();
-    dialog.centerOnPage(); 
+    var coords = dialogParent.getCenterOnPagePosition(dialog);
+    dialog.setPosition(coords[0],coords[1]); 
     
     //populate html and add handlers for radio buttons
     //populate dialog
@@ -306,7 +306,7 @@ cssEditor.$blockScrolling = Infinity;
         if(supplementalEditor) supplementalEditor.resize();
         if(cssEditor) cssEditor.resize();
     }
-    dialog.addListener("resize", resizeCallback);
+    dialog.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
 }
 
 

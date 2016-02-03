@@ -1,14 +1,13 @@
 /** This class manages the user interface for a workspace object. The argument
  * uiInitData is optional and should be included if the workspace is not empty. It
  * contains the information of how to create controls for the workspace data. */
-visicomp.app.visiui.WorkspaceUI = function(app,tab,tabContainerObject) {
+visicomp.app.visiui.WorkspaceUI = function(app,tab) {
 
     this.workspace = null;
 	
     //properties
 	this.app = app;
     this.tab = tab;
-    this.tabContainerObject = tabContainerObject;
     this.controlMap = {};
     this.activeFolderName = null;
    
@@ -27,7 +26,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace, con
     //set up the root folder
     var rootFolder = this.workspace.getRootFolder();
     this.registerMember(rootFolder,null);
-    this.addControlContainer(rootFolder,this.tabContainerObject);
+    this.addControlContainer(rootFolder,this.tab);
   
     //load controls from json if present
     if(controlsJson) {
@@ -50,29 +49,6 @@ visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace, con
     this.workspace.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
     
 }
-
-///** This method loads the data form this json into the workspace. */
-//visicomp.app.visiui.WorkspaceUI.prototype.loadFromJson = function(workspaceJson) {
-//    var workspaceDataJson = workspaceJson.workspace;
-//    var workspaceControlsJson = workspaceJson.controls;
-//	
-//	//I don't really like the way I do this, deleting the old folder, to allow for the new one
-//	var oldRootFolder = this.workspace.getRootFolder().getFullName();
-//	this.childDeleted(oldRootFolder);
-//	
-//	//load the workspace
-//    this.workspace.loadFromJson(workspaceDataJson);
-//    
-//	//reinitialize the root folder
-//    var rootFolder = this.workspace.getRootFolder();
-//    this.registerMember(rootFolder,null);
-//    this.addControlContainer(rootFolder,this.tabContainerObject);
-//    
-//    //oad contrtols from json if present
-//    if(workspaceControlsJson) {
-//        this.loadFolderControlContentFromJson(rootFolder,workspaceControlsJson);
-//    }
-//}
 
 /** This method gets the workspace object. */
 visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
@@ -173,7 +149,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
 	if((controlInfo)&&(controlInfo.control)) {
         //remove the UI element
         var controlWindow = controlInfo.control.getWindow();
-        controlWindow.remove();
+        controlWindow.hide();
         
         //do any needed cleanup
         controlInfo.control.onDelete();

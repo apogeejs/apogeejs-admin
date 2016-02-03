@@ -229,9 +229,8 @@ visicomp.app.visiui.VisiComp.prototype.makeWorkspaceUI = function(name) {
     }
     
 	var tab = this.tabFrame.addTab(name);
-    var tabContainerObject = this.tabFrame.getTabContainerObject(name);
-    this.tabFrame.setActiveTab(name);
-    var workspaceUI = new visicomp.app.visiui.WorkspaceUI(this,tab,tabContainerObject);
+//    this.tabFrame.setActiveTab(name);
+    var workspaceUI = new visicomp.app.visiui.WorkspaceUI(this,tab);
     this.workspaceUIs[name] = workspaceUI;
     
     return workspaceUI;
@@ -365,7 +364,7 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     visicomp.app.visiui.VisiComp.dialogParent = new visicomp.visiui.SimpleParentContainer(container);
     
     //handler to resize on window resize
-    window.addEventListener("resize", function() {  
+    window.addEventListener(visicomp.visiui.WindowFrame.RESIZED, function() {  
         //fire event for this object
         visicomp.app.visiui.VisiComp.dialogParent.resized();
     });

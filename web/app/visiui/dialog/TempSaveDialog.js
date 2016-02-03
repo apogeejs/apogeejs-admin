@@ -45,6 +45,7 @@ visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
     //show dialog
     dialog.setContent(content);
     dialog.show();
-    dialog.centerOnPage();
+    var coords = dialogParent.getCenterOnPagePosition(dialog);
+    dialog.setPosition(coords[0],coords[1]);
 }
 

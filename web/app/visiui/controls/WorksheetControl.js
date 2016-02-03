@@ -16,6 +16,15 @@ visicomp.app.visiui.WorksheetControl = function(workspaceUI,worksheet,controlJso
 visicomp.core.util.mixin(visicomp.app.visiui.WorksheetControl,visicomp.app.visiui.Control);
 visicomp.core.util.mixin(visicomp.app.visiui.WorksheetControl,visicomp.visiui.ParentContainer);
 
+//----------------------
+// ParentContainer Methods
+//----------------------
+
+/** This method must be implemented in inheriting objects. */
+visicomp.app.visiui.WorksheetControl.prototype.getContentIsShowing = function() {
+    return this.getWindow().getContentIsShowing();
+}
+
 //==============================
 // Protected and Private Instance Methods
 //==============================
@@ -113,7 +122,7 @@ visicomp.app.visiui.WorksheetControl.createControl = function(workspaceUI,parent
 
 visicomp.app.visiui.WorksheetControl.createControlFromJson = function(workspaceUI,member,controlJson) {
     var worksheetControl = new visicomp.app.visiui.WorksheetControl(workspaceUI,member,controlJson);
-    if((controlData)&&(controlData.children)) {
+    if((controlJson)&&(controlJson.children)) {
         var folder = member.getInternalFolder();
         workspaceUI.loadFolderControlContentFromJson(folder,controlData.children);
     }

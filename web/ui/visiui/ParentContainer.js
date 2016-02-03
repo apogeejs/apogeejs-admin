@@ -1,4 +1,5 @@
 /** This is a mixin that encapsulates the base functionality of a parent container for a control
+ * The parent container must provide events for when is is shown, hidden and resized.
  * 
  * This is not a class, but it is used for the prototype of the objects that inherit from it.
  */
@@ -26,9 +27,16 @@ visicomp.visiui.ParentContainer.DELTA_CHILD_Y = 75;
 visicomp.visiui.ParentContainer.MIN_WRAP_WIDTH = 20; 
 visicomp.visiui.ParentContainer.MIN_WRAP_HEIGHT = 200;
 
+//events
+visicomp.visiui.ParentContainer.CONTENT_SHOWN = "content shown";
+visicomp.visiui.ParentContainer.CONTENT_HIDDEN = "content hidden";
+//visicomp.visiui.WindowFrame.RESIZED;
 //==============================
 // Public Instance Methods
 //==============================
+
+///** This method must be implemented in inheriting objects. */
+//visicomp.visiui.ParentContainer.getContentIsShowing = function();
 
 /** This returns the dom element taht contains the child. */
 visicomp.visiui.ParentContainer.getContainerElement = function() {
@@ -43,12 +51,14 @@ visicomp.visiui.ParentContainer.getEventManager = function() {
 
 /** This method adds a windows to the parent. It does not show the window. Show must be done. */
 visicomp.visiui.ParentContainer.addWindow = function(windowFrame) {
+    this.containerElement.appendChild(windowFrame.getElement());
     this.windowFrameStack.push(windowFrame);
     this.updateOrder();
 }
 
 /** This method removes the window from the parent container. */
 visicomp.visiui.ParentContainer.removeWindow = function(windowFrame) {
+    this.containerElement.removeChild(windowFrame.getElement());
     var index = this.windowFrameStack.indexOf(windowFrame);
     this.windowFrameStack.splice(index,1);
     this.updateOrder();

@@ -27,6 +27,7 @@ visicomp.visiui.WindowFrame = function(parentContainer, options) {
     
     this.windowState = visicomp.visiui.WindowFrame.NORMAL; //minimize, normal, maximize
     this.coordinateInfo = {};
+    this.isShowing = false;
 	
     this.frame = null;
     this.body = null;
@@ -70,9 +71,6 @@ this.savedParentOverflow = undefined;
     this.initDiv();
     this.createTitleBar();
     this.createBody();
-    
-    //add window to the parent
-    this.parentContainer.addWindow(this);
 	
     //add the handler to move the active window to the front
     var instance = this;
@@ -81,6 +79,19 @@ this.savedParentOverflow = undefined;
     };
     var element = this.getElement();
 	element.addEventListener("mousedown",frontHandler);
+    
+    //this makes sure to update the window when the parent becomes visible
+    var onShow = function() {
+        //refresh the element
+        instance.show();
+    }
+    var onHide = function() {
+        //don't remove element, but mark it as hidden
+        instance.isShowing = false;
+    }
+    var parentEventManager = this.parentContainer.getEventManager();
+    parentEventManager.addListener(visicomp.visiui.ParentContainer.CONTENT_SHOWN, onShow);
+    parentEventManager.addListener(visicomp.visiui.ParentContainer.CONTENT_HIDDEN, onHide);
 }
 
 //add components to this class
@@ -108,6 +119,11 @@ visicomp.visiui.WindowFrame.RESIZE_NE = visicomp.visiui.WindowFrame.RESIZE_NORTH
 visicomp.visiui.WindowFrame.RESIZE_NW = visicomp.visiui.WindowFrame.RESIZE_NORTH + visicomp.visiui.WindowFrame.RESIZE_WEST;
 visicomp.visiui.WindowFrame.RESIZE_SE = visicomp.visiui.WindowFrame.RESIZE_SOUTH + visicomp.visiui.WindowFrame.RESIZE_EAST;
 visicomp.visiui.WindowFrame.RESIZE_SW = visicomp.visiui.WindowFrame.RESIZE_SOUTH + visicomp.visiui.WindowFrame.RESIZE_WEST;
+
+//events
+visicomp.visiui.WindowFrame.SHOWN = "shown";
+visicomp.visiui.WindowFrame.HIDDEN = "hidden";
+visicomp.visiui.WindowFrame.RESIZED = "resized";
 
 //======================================
 // CSS STYLES
@@ -204,24 +220,39 @@ visicomp.visiui.WindowFrame.prototype.getMenu = function() {
 
 /** This method shows the window. */
 visicomp.visiui.WindowFrame.prototype.show = function() {
-    this.parentElement.appendChild(this.getElement());
-    this.dispatchEvent("show",this);
+    if(this.isShowing) return;
     
-    //we will redo this since the size of elements used in calculation may have been wrong
-    if(this.coordinateInfo.height !== undefined) {
-        this.updateCoordinates();
+    //add window to the parent
+    this.parentContainer.addWindow(this);
+
+    if(this.parentContainer.getContentIsShowing()) {
+        this.isShowing = true;
+        this.frameShown();
+
+        //we will redo this since the size of elements used in calculation may have been wrong
+        if(this.coordinateInfo.height !== undefined) {
+            this.updateCoordinates();
+        }
     }
 }
 
 /** This method closes the window. */
 visicomp.visiui.WindowFrame.prototype.hide = function() {
-    this.parentElement.removeChild(this.getElement());
-    this.dispatchEvent("hide",this);
+    this.parentContainer.removeWindow(this);
+    if(this.isShowing) {
+        this.isShowing = false;
+        this.frameHidden();
+    }
 }
 
-/** This method closes the window. */
-visicomp.visiui.WindowFrame.prototype.remove = function() {
-    this.parentElement.removeChild(this.getElement());
+/** This method returns true if the window is showing. */
+visicomp.visiui.WindowFrame.prototype.getIsShowing = function() {
+    return this.isShowing;
+}
+
+/** This method returns true if the window is showing. */
+visicomp.visiui.WindowFrame.prototype.getContentIsShowing = function() {
+    return (this.isShowing)&&(this.windowState != visicomp.visiui.WindowFrame.MINIMIZED);
 }
 
 /** This method sets the position of the window frame in the parent. */
@@ -569,7 +600,7 @@ visicomp.visiui.WindowFrame.prototype.minimizeContent = function() {
     
     //unsbscribe from parent resize
     if((wasMaximized)&&(this.maximizedResizeHandler)) {
-        this.parentContainer.getEventManager().removeListener("resize",this.maximizedResizeHandler);
+        this.parentContainer.getEventManager().removeListener(visicomp.visiui.WindowFrame.RESIZED,this.maximizedResizeHandler);
         this.parentResizeSubscribed = false;
     }
  
@@ -579,7 +610,7 @@ visicomp.visiui.WindowFrame.prototype.minimizeContent = function() {
     this.setMinMaxButtons();
     
     //dispatch resize event
-    if(!wasMinimized) this.frameShown();
+    if(!wasMinimized) this.contentOnlyHidden();
 }
 
 /** This is the restore function for the window.*/
@@ -602,7 +633,7 @@ visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
     
     //unsbscribe from parent resize
     if((wasMaximized)&&(this.maximizedResizeHandler)) {
-        this.parentContainer.getEventManager().removeListener("resize",this.maximizedResizeHandler);
+        this.parentContainer.getEventManager().removeListener(visicomp.visiui.WindowFrame.RESIZED,this.maximizedResizeHandler);
         this.parentResizeSubscribed = false;
     }
     
@@ -611,7 +642,7 @@ visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
     this.updateCoordinates();
     this.setMinMaxButtons();
     
-    if(wasMinimized) this.frameShown();
+    if(wasMinimized) this.contentOnlyShown();
     this.frameResized();
 }
 
@@ -635,12 +666,12 @@ visicomp.visiui.WindowFrame.prototype.maximizeContent = function() {
     this.updateCoordinates();
     this.setMinMaxButtons();
     
-    if(wasMinimized) this.frameShown();
+    if(wasMinimized) this.contentOnlyShown();
     this.frameResized();
     
     //subscribe to receive the parent resize event and pass it on
     if(this.maximizedResizeHandler) {
-        this.parentContainer.getEventManager().addListener("resize",this.maximizedResizeHandler);
+        this.parentContainer.getEventManager().addListener(visicomp.visiui.WindowFrame.RESIZED,this.maximizedResizeHandler);
         this.parentResizeSubscribed = true;
     }
 }
@@ -732,31 +763,46 @@ visicomp.visiui.WindowFrame.prototype.updateCoordinates = function() {
 	}
 }
 
-/** This method resizes the content to fit the frame if the frame size is set,
- * and it fires a resize event for the window.
+/** This method should be called when the entire window is shown.
  * @private */
 visicomp.visiui.WindowFrame.prototype.frameShown = function() {
     
     //dispatch event
-    this.dispatchEvent("show",this);
+    this.dispatchEvent(visicomp.visiui.WindowFrame.SHOWN,this);
+    this.dispatchEvent(visicomp.visiui.ParentContainer.CONTENT_SHOWN,this);
 }
 
-/** This method resizes the content to fit the frame if the frame size is set,
- * and it fires a resize event for the window.
+/** This method should be called when the entire window is hidden.
  * @private */
 visicomp.visiui.WindowFrame.prototype.frameHidden = function() {
     
     //dispatch event
-    this.dispatchEvent("hide",this);
+    this.dispatchEvent(visicomp.visiui.WindowFrame.HIDDEN,this);
+    this.dispatchEvent(visicomp.visiui.ParentContainer.CONTENT_HIDDEN,this);
 }
 
-/** This method resizes the content to fit the frame if the frame size is set,
- * and it fires a resize event for the window.
+/** This method should be called when the entire window is hidden
+ * @private */
+visicomp.visiui.WindowFrame.prototype.contentOnlyShown = function() {
+    
+    //dispatch event
+    this.dispatchEvent(visicomp.visiui.ParentContainer.CONTENT_SHOWN,this);
+}
+
+/** This method shoudl be called when the window contents are show
+ * @private */
+visicomp.visiui.WindowFrame.prototype.contentOnlyHidden = function() {
+    
+    //dispatch event
+    this.dispatchEvent(visicomp.visiui.ParentContainer.CONTENT_HIDDEN,this);
+}
+
+/** This method shold be called when the content is hidden but the window is not..
  * @private */
 visicomp.visiui.WindowFrame.prototype.frameResized = function() {
     
     //dispatch event
-    this.dispatchEvent("resize",this);
+    this.dispatchEvent(visicomp.visiui.WindowFrame.RESIZED,this);
 }
 
 //====================================

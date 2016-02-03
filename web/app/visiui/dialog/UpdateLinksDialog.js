@@ -117,9 +117,9 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     
     //show the dialog
     dialog.setContent(content);
-    dialog.setZIndex(100);
     dialog.show();
-    dialog.centerOnPage(); 
+    var coords = dialogParent.getCenterOnPagePosition(dialog);
+    dialog.setPosition(coords[0],coords[1]);
     
     var showJsLinksFunction = function() {
         //hide the onLoad div and show the html dive
@@ -197,7 +197,7 @@ cssLinksEditor.$blockScrolling = Infinity;
         if(cssLinksEditor) cssLinksEditor.resize();
         if(jsLinksEditor) jsLinksEditor.resize();
     }
-    dialog.addListener("resize", resizeCallback);
+    dialog.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
 }
 
 /** @private */

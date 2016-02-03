@@ -130,11 +130,11 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,p
 }
 
 
-visicomp.app.visiui.CustomResourceControl.createControlFromJson = function(workspaceUI,member,controlData) {
+visicomp.app.visiui.CustomResourceControl.createControlFromJson = function(workspaceUI,member,controlJson) {
     
-    var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,member,controlData);
-    if(controlData) {
-        customResourceControl.updateFromJson(controlData);
+    var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,member,controlJson);
+    if(controlJson) {
+        customResourceControl.updateFromJson(controlJson);
     }
     else {
         customResourceControl.initEmptyProcessor();

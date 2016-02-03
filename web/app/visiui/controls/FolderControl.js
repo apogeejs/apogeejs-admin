@@ -12,6 +12,15 @@ visicomp.app.visiui.FolderControl = function(workspaceUI,folder,controlJson) {
 visicomp.core.util.mixin(visicomp.app.visiui.FolderControl,visicomp.app.visiui.Control);
 visicomp.core.util.mixin(visicomp.app.visiui.FolderControl,visicomp.visiui.ParentContainer);
 
+//----------------------
+// ParentContainer Methods
+//----------------------
+
+/** This method must be implemented in inheriting objects. */
+visicomp.app.visiui.FolderControl.prototype.getContentIsShowing = function() {
+    return this.getWindow().getContentIsShowing();
+}
+
 //==============================
 // Protected and Private Instance Methods
 //==============================
@@ -51,10 +60,10 @@ visicomp.app.visiui.FolderControl.createControl = function(workspaceUI,parent,na
     return returnValue;
 }
 
-visicomp.app.visiui.FolderControl.createControlFromJson = function(workspaceUI,member,controlData) {
-    var folderControl = new visicomp.app.visiui.FolderControl(workspaceUI,member);
-    if((controlData)&&(controlData.children)) {
-        workspaceUI.loadFolderControlContentFromJson(member,controlData.children);
+visicomp.app.visiui.FolderControl.createControlFromJson = function(workspaceUI,member,controlJson) {
+    var folderControl = new visicomp.app.visiui.FolderControl(workspaceUI,member,controlJson);
+    if((controlJson)&&(controlJson.children)) {
+        workspaceUI.loadFolderControlContentFromJson(member,controlJson.children);
     }
     
     return folderControl;

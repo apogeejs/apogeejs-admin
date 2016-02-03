@@ -105,9 +105,9 @@ dataEditor.$blockScrolling = Infinity;
     
     //show the dialog
     dialog.setContent(content);
-    dialog.setZIndex(100);
     dialog.show();
-    dialog.centerOnPage(); 
+    var coords = dialogParent.getCenterOnPagePosition(dialog);
+    dialog.setPosition(coords[0],coords[1]); 
     
     //set the resize handler
     //resize the editor on window size change
@@ -125,5 +125,5 @@ dataEditor.$blockScrolling = Infinity;
         
         if(dataEditor) dataEditor.resize();
     }
-    dialog.addListener("resize", resizeCallback);
+    dialog.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
 }

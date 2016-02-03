@@ -16,8 +16,8 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator,options
     this.object = object;
     this.generator = generator;
     
-    this.parentContainerObject = this.workspaceUI.getParentContainerObject(object);
-    if(!this.parentContainerObject) {
+    this.parentContainer = this.workspaceUI.getParentContainerObject(object);
+    if(!this.parentContainer) {
         throw visicomp.core.util.createError("Parent object not found: " + object.getFullName());
     }
     
@@ -31,7 +31,7 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator,options
     windowOptions.maximizable = true;
     windowOptions.resizable = true;
     windowOptions.movable = true;
-    this.window = new visicomp.visiui.WindowFrame(this.parentContainerObject,windowOptions);
+    this.window = new visicomp.visiui.WindowFrame(this.parentContainer,windowOptions);
     
     //load the content div
     var contentDiv = visicomp.visiui.createElement("div",null,
@@ -78,7 +78,7 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator,options
     }
     else {
         //set position 
-        var pos = this.parentContainerObject.getNextWindowPosition();
+        var pos = this.parentContainer.getNextWindowPosition();
         this.window.setPosition(pos[0],pos[1]);
         
         //set default size
@@ -88,16 +88,6 @@ visicomp.app.visiui.Control.init = function(workspaceUI,object,generator,options
         this.window.setWindowState(options.windowState);
     }
     this.window.show();
-    
-    
-    //TEMPORARY CODE - this is to fix a bug where child windows do not display properly
-    //if they are deserialized in a minimized parent.
-    var window = this.window;
-    var onShow = function() {
-        window.show();
-    }
-    var parentEventManager = this.parentContainerObject.getEventManager();
-    parentEventManager.addListener("show", onShow);
 }
 
 //==============================

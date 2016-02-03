@@ -141,9 +141,9 @@ visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,on
     
     //show the dialog
     dialog.setContent(content);
-    dialog.setZIndex(100);
     dialog.show();
-    dialog.centerOnPage(); 
+    var coords = dialogParent.getCenterOnPagePosition(dialog);
+    dialog.setPosition(coords[0],coords[1]);
     
     //populate data and add handlers for radio buttons
     //populate dialog    
@@ -230,5 +230,5 @@ supplementalEditor.$blockScrolling = Infinity;
         if(formulaEditor) formulaEditor.resize();
         if(supplementalEditor) supplementalEditor.resize();
     }
-    dialog.addListener("resize", resizeCallback);
+    dialog.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
 }
