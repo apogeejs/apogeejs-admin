@@ -54,7 +54,11 @@ visicomp.core.Folder.prototype.addChild = function(child) {
     //add object
     this.childMap[name] = child;
     if(child.isDataHolder) {
-		this.spliceDataMap(name,child.getData());
+		var data = child.getData();
+		//object may first appear with no data
+		if(data !== undefined) {
+			this.spliceDataMap(name,data);
+		}
     }
     
     //set all children as dependents
