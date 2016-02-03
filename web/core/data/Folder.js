@@ -11,8 +11,9 @@ visicomp.core.Folder = function(owner,name) {
     //this holds the base objects, mapped by name
     this.childMap = {};
     this.dataMap = {};
-    
-    //this only needs to be set once since we do not update it
+	
+	//make sure the data map is frozen
+	Object.freeze(this.dataMap);
     this.setData(this.dataMap);
 }
 
@@ -53,7 +54,7 @@ visicomp.core.Folder.prototype.addChild = function(child) {
     //add object
     this.childMap[name] = child;
     if(child.isDataHolder) {
-        this.dataMap[name] = child.getData();
+		this.spliceDataMap(name,child.getData());
     }
     
     //set all children as dependents
@@ -70,7 +71,9 @@ visicomp.core.Folder.prototype.removeChild = function(child) {
     //remove from folder
     var name = child.getName();
     delete(this.childMap[name]);
-    delete(this.dataMap[name]);
+	if(child.isDataHolder) {
+		this.spliceDataMap(name);
+	}
     
     //set all children as dependents
     this.calculateDependents();
@@ -78,13 +81,15 @@ visicomp.core.Folder.prototype.removeChild = function(child) {
 
 /** This method updates the table data object in the folder data map. */
 visicomp.core.Folder.prototype.updateData = function(child) {
+	if(!child.isDataHolder) return;
+	
     var name = child.getName();
     var data = child.getData();
     if(this.childMap[name] === undefined) {
         alert("Error - this table " + name + " has not yet been added to the folder.");
         return;
     }
-    this.dataMap[name] = data;
+	this.spliceDataMap(name,data);
 }
 
 //------------------------------
@@ -173,6 +178,29 @@ visicomp.core.Folder.prototype.calculateDependents = function() {
         }
     }
     this.updateDependencies(newDependsOn);
+}
+
+/** This method creates a new immutable data map, either adding a give name and data or
+ * removing a name. To remove a name from the map, leave "addData" as undefined. 
+ * @private */
+visicomp.core.Folder.prototype.spliceDataMap = function(addOrRemoveName,addData) {
+	var newDataMap = {};
+	
+	//copy old data
+	for(var key in this.dataMap) {
+		if(key !== addOrRemoveName) {
+			newDataMap[key] = this.dataMap[key];
+		}
+	}
+	//add or update thiis child data
+	if(addData !== undefined) {
+		newDataMap[addOrRemoveName] = addData;
+	}
+	
+	//make this immutable and set it as data for this folder
+	Object.freeze(newDataMap);
+	this.dataMap = newDataMap;
+	this.setData(this.dataMap);
 }
 
 //============================
