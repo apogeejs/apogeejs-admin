@@ -18,8 +18,7 @@ visicomp.app.visiui.WorkspaceUI = function(app,tab) {
  /** This method sets the workspace. The argument controlsJson should be included
   * if the workspace is not empty, such as when opening a existing workspace. It
   * contains the data for the control associated with each workspace member. For 
-  * a new empty workspace the controlsJson should be omitted.
-  * @private */
+  * a new empty workspace the controlsJson should be omitted. */
 visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace, controlsJson) {   
     this.workspace = workspace; 
     

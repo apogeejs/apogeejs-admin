@@ -5,8 +5,7 @@ visicomp.core.util = {};
  * Based on the error type, additional data can be added to the error object
  * before it is thrown. */
 visicomp.core.util.createError = function(msg,optionalType,optionalBaseError) {
-    var error = {};
-    error.message = msg;
+    var error = new Error(msg);
     error.type = optionalType;
     error.baseError = optionalBaseError;
     return error;

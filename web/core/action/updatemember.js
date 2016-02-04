@@ -69,9 +69,6 @@ visicomp.core.updatemember.updateObjects = function(updateDataList) {
     var recalculateList = [];
     var setDataList = [];
 
-    //flag start of save (almost)
-    mainEditStatus.saveStarted = true;
-
     //update members and add to recalculate list
     for(var i = 0; i < updateDataList.length; i++) {
         var argData = updateDataList[i];
@@ -102,9 +99,6 @@ visicomp.core.updatemember.updateObjects = function(updateDataList) {
             return mainEditStatus;
         }
     }
-    
-    //flag end of save
-    mainEditStatus.saveCompleted = true;
 
     //return status
     mainEditStatus = visicomp.core.updatemember.doRecalculate(recalculateList,mainEditStatus);
@@ -148,36 +142,40 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
     
     //process the code
     var codeInfo;
+	var codeInfoValid = false;
    
     try {
         codeInfo = visicomp.core.updatemember.processCode(member,argList,functionBody,supplementalCode);
+		codeInfoValid = true;
     }
     catch(error) {
-        editStatus.msg = error.msg;
-        editStatus.error = error;
-        editStatus.succcess = false;
-        return editStatus;
+		//this is an error in the code
+        if(error.stack) {
+			console.error(error.stack);
+		}
+		member.setCodeError(error.msg);
     }
-    
-    editStatus.saveStarted = true;
          
     //save the code
-    try {
-        member.setCodeInfo(codeInfo);
-    }
-    catch(error) {
-        editStatus.msg = error.msg;
-        editStatus.error = error;
-        editStatus.succcess = false;
-        return editStatus;
-    }
+    if(codeInfoValid) {
+		try {
+			member.setCodeInfo(codeInfo);
+		}
+		catch(error) {
+			//this is an error in the code
+			if(error.stack) {
+				console.error(error.stack);
+			}
+			member.setCodeError(error.msg);
+		}
+	}
     
-    editStatus.saveEnded = true;
-    
+	//update recalculate list
     try {
         visicomp.core.calculation.addToRecalculateList(recalculateList,member);
     }
     catch(error) {
+		//this is an unknown program error
         editStatus.msg = error.msg;
         editStatus.error = error;
         editStatus.succcess = false;
@@ -200,10 +198,11 @@ visicomp.core.updatemember.updateObjectData = function(member,data,recalculateLi
         member.clearCode();
     }
     catch(error) {
-        editStatus.msg = error.msg;
-        editStatus.error = error;
-        editStatus.succcess = false;
-        return editStatus;
+		//this is a data error
+		if(error.stack) {
+			console.error(error.stack);
+		}
+		member.setDataError(error.msg);
     }
     
     editStatus.saveEnded = true;
@@ -212,6 +211,7 @@ visicomp.core.updatemember.updateObjectData = function(member,data,recalculateLi
         visicomp.core.calculation.addToRecalculateList(recalculateList,member);
     }
     catch(error) {
+        //this is an unknown program error
         editStatus.msg = error.msg;
         editStatus.error = error;
         editStatus.succcess = false;
@@ -229,6 +229,7 @@ visicomp.core.updatemember.doRecalculate = function(recalculateList,editStatus) 
         visicomp.core.calculation.sortRecalculateList(recalculateList);
     }
     catch(error) {
+		//this is an unknown program error
         editStatus.msg = error.msg;
         editStatus.error = error;
         editStatus.succcess = false;

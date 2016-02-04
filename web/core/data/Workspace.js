@@ -108,10 +108,10 @@ visicomp.core.Workspace.prototype.loadFromJson = function(json) {
     var result;
     if(updateDataList.length > 0) {
         result = visicomp.core.updatemember.updateObjects(updateDataList);
-            
-        if(!result.success) {
-            return result;
-        }
+//            
+//        if(!result.success) {
+//            throw visicomp.core.util.createError(result.msg);
+//        }
     }
 }
 

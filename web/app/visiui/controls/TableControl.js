@@ -67,8 +67,8 @@ visicomp.app.visiui.TableControl.formatString = "\t";
  * @private */    
 visicomp.app.visiui.TableControl.prototype.memberUpdated = function() {
     var object = this.getObject();
-    if(object.hasError()) {
-        this.showError(object.getErrorMsg());
+    if(object.hasDataError()) {
+        this.showError(object.getDataErrorMsg());
     }
     else {
         var data = this.getObject().getData();

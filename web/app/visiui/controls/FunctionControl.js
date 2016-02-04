@@ -67,16 +67,28 @@ visicomp.app.visiui.FunctionControl.formatString = "\t";
  * @private */    
 visicomp.app.visiui.FunctionControl.prototype.memberUpdated = function() {
     var functionObject = this.getObject();
-	var name = functionObject.getName();
-    var argListString = functionObject.getArgList().join(",");
-    var functionBody = functionObject.getFunctionBody();
-    var supplementalCode = functionObject.getSupplementalCode();
-    var code = "function " + name + "(" + argListString + ") {\n" + functionBody + "\n}\n";
-	if(supplementalCode) {
-		code += "\n/* Supplemental Code */\n\n" +
-			supplementalCode;
+	if(functionObject.hasDataError()) {
+        this.showError(functionObject.getDataErrorMsg());
+    }
+    else {
+		var name = functionObject.getName();
+		var argListString = functionObject.getArgList().join(",");
+		var functionBody = functionObject.getFunctionBody();
+		var supplementalCode = functionObject.getSupplementalCode();
+		var code = "function " + name + "(" + argListString + ") {\n" + functionBody + "\n}\n";
+		if(supplementalCode) {
+			code += "\n/* Supplemental Code */\n\n" +
+				supplementalCode;
+		}
+		this.editor.getSession().setValue(code);
 	}
-    this.editor.getSession().setValue(code);
+}
+
+visicomp.app.visiui.FunctionControl.prototype.showError = function(msg) {
+    //this.editor.style.display = "none";
+    //this.errorDiv.style.display = "";
+    //this.errorDiv.innerHTML = msg;
+    this.editor.getSession().setValue("ERROR: " + msg);
 }
 
 /** This method creates a callback for editing a standard codeable object

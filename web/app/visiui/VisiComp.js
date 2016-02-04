@@ -87,8 +87,8 @@ visicomp.app.visiui.VisiComp.prototype.newWorkspaceRequested = function() {
 /** This method initiatees the open workspace procedure. */
 visicomp.app.visiui.VisiComp.prototype.openWorkspaceRequested = function() {
     var instance = this;
-    var onOpen = function(workspaceData) {
-        return instance.openWorkspace(workspaceData);
+    var onOpen = function(workspaceData,resultCallback) {
+        instance.openWorkspace(workspaceData,resultCallback);
     }
     visicomp.app.visiui.dialog.showOpenWorkspaceDialog(onOpen);
 }
@@ -125,8 +125,10 @@ visicomp.app.visiui.VisiComp.prototype.createWorkspace = function(name) {
     return returnValue; 
 }
 
-/** This method opens an workspace, from the text file. */
-visicomp.app.visiui.VisiComp.prototype.openWorkspace = function(workspaceText) {
+/** This method opens an workspace, from the text file. 
+ * The result is returnd through the callback function rather than a return value,
+ * since the function runs (or may run) asynchronously. */
+visicomp.app.visiui.VisiComp.prototype.openWorkspace = function(workspaceText,resultCallback) {
     var returnValue = {};
     
     try {
@@ -163,28 +165,23 @@ visicomp.app.visiui.VisiComp.prototype.openWorkspace = function(workspaceText) {
 			//deserialize workspace after the links load
             var instance = this;
 			var onLinksLoaded = function() {
-				instance.loadWorkspace(workspaceUI,workspaceJson);
+				var returnValue = instance.loadWorkspace(workspaceUI,workspaceJson);
+				resultCallback(returnValue);
 			}
 			workspaceUI.setLinks(jsLinks,cssLinks,onLinksLoaded,name);
-			return {"success":true};
 		}
 		else {
 			//no need to wait to load workspace
-			this.loadWorkspace(workspaceUI,workspaceJson);
+			var returnValue = this.loadWorkspace(workspaceUI,workspaceJson);
+			resultCallback(returnValue);
 		}
-        
-        //load the workspace data
-        returnValue.success = true;
-        returnValue.workspaceUI = workspaceUI;
-        returnValue.workspace = workspaceUI.getWorkspace();
     }
     catch(error) {
 		console.error(error.stack);
         returnValue.success = false;
         returnValue.msg = error.message;
+		resultCallback(returnValue);
     }
-    
-    return returnValue;
 }
 
 /** This method closes the active workspace. */
@@ -244,6 +241,8 @@ visicomp.app.visiui.VisiComp.prototype.loadWorkspace = function(workspaceUI,work
     var workspace = new visicomp.core.Workspace(workspaceDataJson);
     
     workspaceUI.setWorkspace(workspace,workspaceControlsJson);
+	
+	return {"success":true};
 }
 
 //==================================

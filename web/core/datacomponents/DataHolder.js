@@ -15,8 +15,8 @@ visicomp.core.DataHolder = {};
 visicomp.core.DataHolder.init = function() {
     
     this.data = null;
-    this.error = false;
-    this.errorMsg = null;
+    this.dataError = false;
+    this.dataErrorMsg = null;
     
     //these are a list of members that depend on this member
     this.impactsList = [];
@@ -40,15 +40,15 @@ visicomp.core.DataHolder.setData = function(data) {
 
 /** This method sets the error flag for this data holder, and it sets an error
  * message. The error is cleared by setting valid data. */
-visicomp.core.DataHolder.setError = function(msg) {
+visicomp.core.DataHolder.setDataError = function(msg) {
     this.internalSetData(null,true,msg);
 }
 
 visicomp.core.DataHolder.internalSetData = function(data,hasError,errorMsg) {
     
     this.data = data;
-    this.error = hasError;
-    this.errorMsg = errorMsg;
+    this.dataError = hasError;
+    this.dataErrorMsg = errorMsg;
     
     //data the data map in the parent if it is a hierarchy container 
     if(this.parent) {
@@ -56,16 +56,16 @@ visicomp.core.DataHolder.internalSetData = function(data,hasError,errorMsg) {
     }
 }
 
-/** This method returns true if there is an error for this table, 
+/** This method returns true if there is an dataError for this table, 
  * making the data invalid. */
-visicomp.core.DataHolder.hasError = function() {
-    return this.error;
+visicomp.core.DataHolder.hasDataError = function() {
+    return this.dataError;
 }
 
 /** This returns the error messag. It should only be called
  * is hasError returns true. */
-visicomp.core.DataHolder.getErrorMsg = function() {
-    return this.errorMsg;
+visicomp.core.DataHolder.getDataErrorMsg = function() {
+    return this.dataErrorMsg;
 }
 
 /** This returns an array of members this member impacts. */

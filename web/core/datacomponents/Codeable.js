@@ -17,6 +17,10 @@ visicomp.core.Codeable.init = function(argList) {
     
     //arguments of the member function (with parentheses - we probably will change this)
     this.argList = argList;
+	
+	//error data
+	this.codeError = false;
+	this.codeErrorMsg = null;
     
     //initialze the code as empty
     this.clearCode();
@@ -41,6 +45,25 @@ visicomp.core.Codeable.getSupplementalCode = function() {
     return this.supplementalCode;
 }
 
+/** This method sets the code error flag for this codeable, and it sets an error
+ * message. The error is cleared by setting valid code. */
+visicomp.core.DataHolder.setCodeError = function(msg) {
+    this.codeError = true;
+	this.codeErrorMsg = msg;
+}
+
+/** This method returns true if there is an code error for this member, 
+ * making the code invalid. */
+visicomp.core.DataHolder.hasCodeError = function() {
+    return this.codeError;
+}
+
+/** This returns the code error messag. It should only be called
+ * is hasCodeError returns true. */
+visicomp.core.DataHolder.getCodeErrorMsg = function() {
+    return this.codeErrorMsg;
+}
+
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
 
@@ -55,6 +78,10 @@ visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
         //save the object functions
         this.contextSetter = codeInfo.contextSetter;
         this.objectFunction = codeInfo.objectFunction;
+		
+		//clear any error
+		this.codeError = false;
+		this.codeErrorMsg = null;
 
         //update dependencies
         this.updateDependencies(codeInfo.dependencyList);
@@ -113,6 +140,13 @@ visicomp.core.Codeable.needsExecuting = function() {
  * true for success and false if there is an error.  */
 visicomp.core.Codeable.execute = function() {
     if(!this.objectFunction) return false;
+	
+	//don't calculate if this has an error.
+	//do pass the error on to be a data error.
+	if(this.hasCodeError()) {
+		this.setDataError(this.getCodeErrorMsg());
+		return false;
+	}
     
     try {
         //check if any values this depends on have an error
@@ -136,7 +170,7 @@ visicomp.core.Codeable.execute = function() {
     }
     catch(error) {
         console.error(error.stack);
-        this.setError(error.message);
+        this.setDataError(error.message);
         return false;
     }
 }
@@ -194,7 +228,8 @@ visicomp.core.Codeable.checkDependencyError = function() {
     var i = 0;
     for(var i = 0; i < dependsOn.length; i++) {
         var member = dependsOn[i];
-        if(member.hasError()) {
+        if(member.hasDataError()) {
+			//this depends on a table with an error.
             if(errorDependencies == null) {
                 errorDependencies = [];
             }
@@ -209,7 +244,7 @@ visicomp.core.Codeable.checkDependencyError = function() {
             if(i > 0) message += ", ";
             message += errorDependencies[i].getFullName();
         }
-        this.setError(message);
+        this.setDataError(message);
         return true;
     }
     else {

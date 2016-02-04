@@ -31,16 +31,10 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
     var onCancel = function() {
         dialog.hide();
     }
-    
-    var onOpen = function() {
-        var jsonText = inputElement.value;
-        if(jsonText.length == 0) {
-            alert("Please paste the file into the input field");
-            return;
-        }
-        
-        var result = onOpenFunction(jsonText);
-        
+	
+	//this callback processes the return value from onOpen, since that function
+	//runs (or may run) asynchronously
+	var onOpenResult = function(result) {
         if(!result.success) {
             alert("There was an error opening the workspace: " + result.msg);
             return;
@@ -49,6 +43,16 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
         //if we get here we should close the dialog
         dialog.hide();
     }
+    
+    var onOpen = function() {
+        var jsonText = inputElement.value;
+        if(jsonText.length == 0) {
+            alert("Please paste the file into the input field");
+            return;
+        }
+        
+        onOpenFunction(jsonText,onOpenResult);
+	}
     
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Open","onclick":onOpen}));
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));

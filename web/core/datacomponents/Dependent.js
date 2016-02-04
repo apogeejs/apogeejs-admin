@@ -31,12 +31,12 @@ visicomp.core.Dependent.getDependsOn = function() {
 //Must be implemented in extending object
 ///** This method udpates the dependencies if needed because
 // *the passed variable was added.  */
-//visicomp.core.Codeable.updateForAddedVariable = function(object);
+//visicomp.core.Dependent.updateForAddedVariable = function(object);
 
 //Must be implemented in extending object
 ///** This method udpates the dependencies if needed because
 // *the passed variable was deleted.  */
-//visicomp.core.Codeable.updateForDeletedVariable = function(object);
+//visicomp.core.Dependent.updateForDeletedVariable = function(object);
 
 //===================================
 // Private Functions
@@ -49,7 +49,7 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
     var oldDependsOn = this.dependsOnList;
 	
     //create the new dependency list
-	this.dependsOnList = newDependsOn;
+	this.dependsOnList = [];
 	
     //update the dependency links among the members
 	var newDependencySet = {};
@@ -63,11 +63,22 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
             visicomp.core.util.createError("The object " + remoteMember.getFullName() + " cannot be referenced as a dependent.");
         }
 		
-		//update this member
-		remoteMember.addToImpactsList(this);
+		if(remoteMember === this) {
+			//it is an error to depend on itself (it doesn't exist yet)
+			//ok to reference through a local varible - this is how recursive functions are handled.
+			var message = "A data formula should not reference its own name.";
+			this.setCodeError(message);
+		}
+		else {	
+			
+			this.dependsOnList.push(remoteMember);
+			
+			//update this member
+			remoteMember.addToImpactsList(this);
 
-		//create a set of new member to use below
-		newDependencySet[remoteMember.getFullName()] = true;
+			//create a set of new member to use below
+			newDependencySet[remoteMember.getFullName()] = true;
+		}
     }
 	
     //update for links that have gotten deleted
