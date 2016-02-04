@@ -39,7 +39,8 @@ visicomp.core.DataHolder.setData = function(data) {
 }
 
 /** This method sets the error flag for this data holder, and it sets an error
- * message. The error is cleared by setting valid data. */
+ * message. The error is cleared by setting valid data, either through the 
+ * set data method or in a calculation. */
 visicomp.core.DataHolder.setDataError = function(msg) {
     this.internalSetData(null,true,msg);
 }

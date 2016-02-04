@@ -106,9 +106,9 @@ visicomp.app.visiui.TableControl.prototype.createEditDataDialog = function() {
 	
     //create save handler
     var onSave = function(data) {
-        var editStatus = visicomp.core.updatemember.updateData(instance.getObject(),data);
-        var editComplete = instance.processEditResult(editStatus);
-        return editComplete;
+        var actionResponse = visicomp.core.updatemember.updateData(instance.getObject(),data);
+        var closeDialog = instance.processActionReponse(actionResponse);
+        return closeDialog;  
     };
     
     return function() {

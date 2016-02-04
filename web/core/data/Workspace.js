@@ -105,9 +105,9 @@ visicomp.core.Workspace.prototype.loadFromJson = function(json) {
     this.rootFolder = visicomp.core.Folder.fromJson(this,json.data,updateDataList);
     
     //set the data on all the objects
-    var result;
+    var actionResponse;
     if(updateDataList.length > 0) {
-        result = visicomp.core.updatemember.updateObjects(updateDataList);
+        actionResponse = visicomp.core.updatemember.updateObjects(updateDataList);
 //            
 //        if(!result.success) {
 //            throw visicomp.core.util.createError(result.msg);

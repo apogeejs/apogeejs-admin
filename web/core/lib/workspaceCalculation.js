@@ -39,20 +39,24 @@ visicomp.core.calculation.inList = function(recalculateList,member) {
 }
 
 /** This method updates the recalculate list order so no member appears in the list
- *before a member it depends on. This will return false if it fails. 
+ *before a member it depends on. This will return false if there is a circular reference.
  * @private */
-visicomp.core.calculation.sortRecalculateList = function(recalculateList) {
+visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionErrorList) {
 	
 	//working variables
 	var sortedRecalculateList = [];
 	var member;
 	var i;
+    var success = true;
 	
 	//keep track of which members have been copied to the sorted list
+    //clear all circular reference errors before sorting (they will be reset if needed)
 	var memberIsSortedMap = {};
 	for(i = 0; i < recalculateList.length; i++) {
 		member = recalculateList[i];
 		memberIsSortedMap[member.getFullName()] = false;
+        
+        member.setCircRefError(false);
 	}
 	
 	//sort the list
@@ -72,6 +76,10 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList) {
 			var dependsOn = member.getDependsOn();
 			for(var j = 0; j < dependsOn.length; j++) {
 				var remoteObject = dependsOn[j];
+                
+                //don't withhold an object that depends on itself
+                if(remoteObject === member) continue;
+                
 				if(memberIsSortedMap[remoteObject.getFullName()] === false) {
 					//this depends on an unsorted member
 					unsortedImpactedDependencies = true;
@@ -93,8 +101,19 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList) {
 		}
 		
 		//if we added no members to sorted this iteration, there must be a circular reference
+        //give each an error and transfer to sorted list
 		if(!membersAddedToSorted) {
-            return false;
+            var actionError;
+            var msg = "Circular reference error";
+            for(var ie = 0; ie < recalculateList.length; ie++) {
+                member = recalculateList[ie];
+                member.setCircRefError(true);
+                actionError = visicomp.core.util.createActionError(msg,visicomp.core.util.ACTION_ERROR_MODEL);
+                actionErrorList.push(actionError);
+                sortedRecalculateList.push(member);
+            }
+            recalculateList.splice(0,recalculateList.length);
+            success = false;
 		}
 		
 	}
@@ -103,48 +122,30 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList) {
 	for(i = 0; i < sortedRecalculateList.length; i++) {
 		recalculateList.push(sortedRecalculateList[i]);
 	}
-	
-	return true;
-	
+    
+    return success;
 }
 
-/** This calls execute for each member in the recalculate list. It modifies the 
- * passed in edit status with success or failure, and in the case of failure, sets
- * the error message.
+/** This calls execute for each member in the recalculate list. The return value
+ * is false if there are any errors.
  * @private */
-visicomp.core.calculation.callRecalculateList = function(recalculateList,editStatus) {
+visicomp.core.calculation.callRecalculateList = function(recalculateList,actionErrorList) {
     var member;
     var i;
-    var failureList = null;
+    var overallSuccess = true;
     for(i = 0; i < recalculateList.length; i++) {
         member = recalculateList[i];
 
         //update the member
         var success = member.execute();
         if(!success) {
-            if(failureList == null) {
-                failureList = [];
-            }
-            failureList.push(member);
+            var actionError = visicomp.core.util.createActionError(member.getDataErrorMsg(),visicomp.core.util.ACTION_ERROR_MODEL);
+            actionErrorList.push(actionError);
+            overallSuccess = false;
         }
     }
     
-    //check for failure
-    if(failureList != null) {
-        var message = "Failed values: ";
-        for(i = 0; i < failureList.length; i++) {
-            //dependency error found
-            if(i > 0) message += ", ";
-            message += failureList[i].getFullName();
-        } 
-        
-        //return error
-        editStatus.success = false;
-        editStatus.msg = message;
-    }
-    else {
-        editStatus = true;
-    }
+    return overallSuccess;
 }
 
 

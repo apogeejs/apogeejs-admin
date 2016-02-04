@@ -22,50 +22,72 @@ visicomp.core.updatemember.fireUpdatedEventList = function(memberList) {
     }
 }
 
-/** This is the listener for the update member event. */
+/** This method updates the object function for a given member. The return value
+ * is an Action Response object.*/
 visicomp.core.updatemember.updateCode = function(member,argList,functionBody,supplementalCode) {
+    var actionResponse = visicomp.core.util.createActionResponse();
+    var actionErrorList = actionResponse.errorList;
     var recalculateList = [];
     
-    var editStatus = visicomp.core.updatemember.updateObjectFunction(member,
+    var dataSet = visicomp.core.updatemember.updateObjectFunction(member,
         argList,
         functionBody,
         supplementalCode,
-        recalculateList);
+        recalculateList,
+        actionErrorList);
         
-    if(!editStatus.success) {
-        return editStatus;
+    if(!dataSet) {
+        //table not updated
+        actionResponse.success = false;
+        actionResponse.actionDone = dataSet;
+        return actionResponse;
     }
     
-    editStatus = visicomp.core.updatemember.doRecalculate(recalculateList,editStatus);
+    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionErrorList);
+    actionResponse.success = calcSuccess;
+    actionResponse.actionDone = true;
     
     //fire updated events
     visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
     
-    return editStatus;
+    return actionResponse;
 }
 
-/** This is the listener for the update member event. */
+/** This method updates the data for a given member. The return value
+ * is an Action Response object.*/
 visicomp.core.updatemember.updateData = function(member,data) {
+    var actionResponse = visicomp.core.util.createActionResponse();
+    var actionErrorList = actionResponse.errorList;
     var recalculateList = [];
-    var editStatus = visicomp.core.updatemember.updateObjectData(member,data,recalculateList);
+
+    var dataSet = visicomp.core.updatemember.updateObjectData(member,
+        data,
+        recalculateList,
+        actionErrorList);
     
-    if(!editStatus.success) {
-        return editStatus;
+    if(!dataSet) {
+        actionResponse.success = false;
+        actionResponse.actionDone = false;
+        return actionResponse;
     }
     
-    editStatus = visicomp.core.updatemember.doRecalculate(recalculateList,editStatus);
+    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionErrorList);
+    actionResponse.success = calcSuccess;
+    actionResponse.actionDone = true;
     
     //fire updated events
     visicomp.core.updatemember.fireUpdatedEvent(member);
     visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
     
-    return editStatus;
+    return actionResponse;
 }
 
-/** This is the listener for the update members event. */
+/** This method updates the object function or the data for a list of members. The return value
+ * is an Action Response object. This method does not keep track of the action response value
+ * actionDone, since there are multiple object acted upon. */
 visicomp.core.updatemember.updateObjects = function(updateDataList) {
-    var mainEditStatus = {};
-    var singleEditStatus;
+    var actionResponse = visicomp.core.util.createActionResponse();
+    var actionErrorList = actionResponse.errorList;
     var recalculateList = [];
     var setDataList = [];
 
@@ -79,40 +101,174 @@ visicomp.core.updatemember.updateObjects = function(updateDataList) {
         var supplementalCode = argData.supplementalCode;
         
         if(functionBody) {
-            singleEditStatus = visicomp.core.updatemember.updateObjectFunction(member,
+            var uofDataSet = visicomp.core.updatemember.updateObjectFunction(member,
                 argList,
                 functionBody,
                 supplementalCode,
-                recalculateList);
+                recalculateList,
+                actionErrorList);
         }
         else if(data) {
-            singleEditStatus = visicomp.core.updatemember.updateObjectData(member,data,recalculateList);
+            var uodDataSet = visicomp.core.updatemember.updateObjectData(member,
+                data,
+                recalculateList,
+                actionErrorList);
             
             setDataList.push(member);
         }
-        
-        //stop processing on an error
-        if((singleEditStatus)&&(!singleEditStatus.success)) {
-            mainEditStatus.success = false;
-            mainEditStatus.msg = singleEditStatus.msg;
-            mainEditStatus.success = false;
-            return mainEditStatus;
-        }
     }
 
-    //return status
-    mainEditStatus = visicomp.core.updatemember.doRecalculate(recalculateList,mainEditStatus);
+    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionErrorList);
+    actionResponse.success = calcSuccess;
+    actionResponse.actionDone = true;
     
     //fire updated events
     visicomp.core.updatemember.fireUpdatedEventList(setDataList);
     visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
     
-    return mainEditStatus;
+    return actionResponse;
 }
 
 //=====================================
 // Private Functions
 //=====================================
+
+/** This method updates the code and object function in a member based on the
+ * passed code. It returns true if the data was set and false if there was an
+ * error before the data was set. */
+visicomp.core.updatemember.updateObjectFunction = function(member,
+        argList,
+        functionBody,
+        supplementalCode,
+        recalculateList,
+        actionErrorList) {
+    
+    //process the code
+    var codeInfo;
+	var codeInfoValid = false;
+    var actionError;
+    var errorMsg;
+   
+    try {
+        codeInfo = visicomp.core.updatemember.processCode(member,argList,functionBody,supplementalCode);
+		codeInfoValid = true;
+    }
+    catch(error) {
+		//this is an error in the code
+        if(error.stack) {
+			console.error(error.stack);
+		}
+        var errorMsg = error.message ? error.message : "An unknown error ocurred";
+        member.setCodeError(errorMsg);
+        actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_MODEL);
+        actionErrorList.push(actionError);
+    }
+         
+    //save the code
+    if(codeInfoValid) {
+		try {
+			member.setCodeInfo(codeInfo);
+		}
+		catch(error) {
+			//this is an error in the code
+			if(error.stack) {
+				console.error(error.stack);
+			}
+            errorMsg = error.message ? error.message : "An unknown error ocurred";
+            member.setCodeError(errorMsg);
+            actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_MODEL);
+            actionErrorList.push(actionError);
+		}
+	}
+    
+	//update recalculate list
+    try {
+        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
+    }
+    catch(error) {
+		//this is an unknown program error
+        if(error.stack) {
+            console.error(error.stack);
+        }
+        errorMsg = error.message ? error.message : "An unknown error ocurred";
+        member.setCodeError(errorMsg);
+        actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_APP);
+        actionErrorList.push(actionError);
+    }
+    
+    return codeInfoValid;
+}
+
+
+/** This method sets the data for a member. The return value indicates if the
+ * save was done (or at least attempted). */
+visicomp.core.updatemember.updateObjectData = function(member,
+        data,
+        recalculateList,
+        actionErrorList) {
+            
+    var actionError;
+    var errorMsg;
+
+    //set data
+    try {
+        member.setData(data);
+        member.clearCode();
+    }
+    catch(error) {
+		//this is a data error
+		if(error.stack) {
+			console.error(error.stack);
+		}
+        errorMsg = error.message ? error.message : "An unknown error ocurred";
+        member.setDataError(errorMsg);
+        actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_MODEL);
+        actionErrorList.push(actionError);
+    }
+    
+    try {
+        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
+    }
+    catch(error) {
+        //this is an unknown program error
+        if(error.stack) {
+            console.error(error.stack);
+        }
+        errorMsg = error.message ? error.message : "An unknown error ocurred";
+        actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_APP);
+        actionErrorList.push(actionError);
+        
+    }
+
+    //in this method data set is always attempted
+    return true;
+}
+
+/** This is the listener for the update member event. */
+visicomp.core.updatemember.doRecalculate = function(recalculateList,actionErrorList) {
+     
+    try {
+        //sort list
+        var listSorted = visicomp.core.calculation.sortRecalculateList(recalculateList,actionErrorList);
+    
+        //recalculate list
+        //if there is a sort error (ciruclar reference) this will also cause an error here
+        var listCalculated = visicomp.core.calculation.callRecalculateList(recalculateList,actionErrorList);
+
+        return listCalculated;
+    }
+    catch(error) {
+		//this is an unknown program error
+        if(error.stack) {
+            console.error(error.stack);
+        }
+        var errorMsg = error.message ? error.message : "An unknown error ocurred";
+        actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_APP);
+        actionErrorList.push(actionError);
+        
+        return false;
+    }
+}
 
 visicomp.core.updatemember.processCode = function(member,argList,functionBody,supplementalCode) {
     
@@ -129,116 +285,6 @@ visicomp.core.updatemember.processCode = function(member,argList,functionBody,su
         codeLabel);
         
     return codeInfo;
-}
-
-/** This is the listener for the update member event. */
-visicomp.core.updatemember.updateObjectFunction = function(member,
-        argList,
-        functionBody,
-        supplementalCode,
-        recalculateList) {
-    
-    var editStatus = {};
-    
-    //process the code
-    var codeInfo;
-	var codeInfoValid = false;
-   
-    try {
-        codeInfo = visicomp.core.updatemember.processCode(member,argList,functionBody,supplementalCode);
-		codeInfoValid = true;
-    }
-    catch(error) {
-		//this is an error in the code
-        if(error.stack) {
-			console.error(error.stack);
-		}
-		member.setCodeError(error.msg);
-    }
-         
-    //save the code
-    if(codeInfoValid) {
-		try {
-			member.setCodeInfo(codeInfo);
-		}
-		catch(error) {
-			//this is an error in the code
-			if(error.stack) {
-				console.error(error.stack);
-			}
-			member.setCodeError(error.msg);
-		}
-	}
-    
-	//update recalculate list
-    try {
-        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
-    }
-    catch(error) {
-		//this is an unknown program error
-        editStatus.msg = error.msg;
-        editStatus.error = error;
-        editStatus.succcess = false;
-        return editStatus;
-    }
-    
-    editStatus.success = true;
-    return editStatus;
-}
-
-
-/** This is the listener for the update member event. */
-visicomp.core.updatemember.updateObjectData = function(member,data,recalculateList) {
-    var editStatus = {};
-    editStatus.saveStarted = true;
-
-    //set data
-    try {
-        member.setData(data);
-        member.clearCode();
-    }
-    catch(error) {
-		//this is a data error
-		if(error.stack) {
-			console.error(error.stack);
-		}
-		member.setDataError(error.msg);
-    }
-    
-    editStatus.saveEnded = true;
-    
-    try {
-        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
-    }
-    catch(error) {
-        //this is an unknown program error
-        editStatus.msg = error.msg;
-        editStatus.error = error;
-        editStatus.succcess = false;
-        return editStatus;
-    }
-    
-    editStatus.success = true;
-    return editStatus;
-}
-
-/** This is the listener for the update member event. */
-visicomp.core.updatemember.doRecalculate = function(recalculateList,editStatus) {
-    //sort list
-    try {
-        visicomp.core.calculation.sortRecalculateList(recalculateList);
-    }
-    catch(error) {
-		//this is an unknown program error
-        editStatus.msg = error.msg;
-        editStatus.error = error;
-        editStatus.succcess = false;
-        return editStatus;
-    }
-    
-    //recalculate - let an error from here go, to be processed in debugger for now
-    visicomp.core.calculation.callRecalculateList(recalculateList,editStatus);
-    return editStatus;
 }
 
 

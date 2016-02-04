@@ -165,9 +165,9 @@ visicomp.app.visiui.Control.createEditCodeableDialogCallback = function(title, o
     //create save handler
     var onSave = function(functionBody,supplementalCode) {
         var argList = member.getArgList();
-        var editStatus =  visicomp.core.updatemember.updateCode(member,argList,functionBody,supplementalCode);
-        var editComplete = instance.processEditResult(editStatus);
-        return editComplete;
+        var actionResponse =  visicomp.core.updatemember.updateCode(member,argList,functionBody,supplementalCode);
+        var closeDialog = instance.processActionReponse(actionResponse);
+        return closeDialog;  
     };
     
     return function() {
@@ -187,20 +187,24 @@ visicomp.app.visiui.Control.createDeleteCallback = function(title) {
     }
 }
 
-/** This method gives a standard response for a edit result. */
-visicomp.app.visiui.Control.processEditResult = function(editStatus) {
-    if(!editStatus.success) {
+/** This method gives the response for an action response. The return
+ * value tells if the dialog used for the user to do the action should be closed
+ * of left open, if applicable. */
+visicomp.app.visiui.Control.processActionReponse = function(actionResponse) {
+    if(!actionResponse.success) {
         var msg = "";
-        if(editStatus.saveStarted && !editStatus.saveEnded) {
-            msg += "Unknown Error: The application is in an indeterminant state. It is recommended it be closed: "
+        if(actionResponse.fatal) {
+            msg += "Unknown Error: The application is in an indeterminant state. It is recommended it be closed.\n";
         }
-        msg += editStatus.msg;
+        for(var i = 0; i < actionResponse.errorList.length; i++) {
+            msg += actionResponse.errorList[i].msg + "\n";
+        }
         alert(msg);
     }
     
-    //end the edit if we finished the save, whether of not we completed the update
-    var editComplete = (editStatus.saveEnded) ? true : false;
-    return editComplete;
+    //close dialog if the action was done, otherwise keep it open
+    var closeDialog = actionResponse.actionDone;
+    return closeDialog;
 }
 
 /** This method should include an needed functionality to clean up after a delete. */

@@ -101,9 +101,9 @@ visicomp.app.visiui.FunctionControl.prototype.createEditArgListDialogCallback = 
     var onSave = function(argList) {
         var functionBody = member.getFunctionBody();
         var supplementalCode = member.getSupplementalCode();
-        var editStatus = visicomp.core.updatemember.updateCode(member,argList,functionBody,supplementalCode);
-        var editComplete = instance.processEditResult(editStatus);
-        return editComplete;  
+        var actionResponse = visicomp.core.updatemember.updateCode(member,argList,functionBody,supplementalCode);
+        var closeDialog = instance.processActionReponse(actionResponse);
+        return closeDialog;  
     };
     
     return function() {

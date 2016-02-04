@@ -11,6 +11,28 @@ visicomp.core.util.createError = function(msg,optionalType,optionalBaseError) {
     return error;
 }
 
+/** This method creates an action response object, to be used in an action return value. */
+visicomp.core.util.createActionResponse = function() {
+    var obj = {};
+    obj.success = false;
+    obj.errorList = [];
+    obj.fatal = false;
+    obj.actionDone = false;
+    return obj;
+}
+
+/** This method creates an action error object, to be used in an action return value. */
+visicomp.core.util.createActionError = function(msg,type) {
+    var err = {};
+    err.msg = msg;
+    err.type = type;
+    return err;
+}
+
+visicomp.core.util.ACTION_ERROR_MODEL = "model";
+visicomp.core.util.ACTION_ERROR_APP = "app";
+visicomp.core.util.ACTION_ERROR_USER_APP = "user app";
+
 /** This method creates an integer has value for a string. */
 visicomp.core.util.mixin = function(destObject,mixinObject) {
     for(var key in mixinObject) {

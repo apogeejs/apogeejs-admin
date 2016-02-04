@@ -178,21 +178,17 @@ visicomp.core.Worksheet.prototype.getWorksheetFunction = function() {
         }
         
         //do the update
-        var returnStatus = visicomp.core.updatemember.updateObjects(updateDataList);
-        
-        if(returnStatus.success) {
+        var actionResponse = visicomp.core.updatemember.updateObjects(updateDataList);        
+        if(actionResponse.success) {
             //retrieve the result
             return instance.loadOutputElement(rootFolder);
         }
         else {
-            //error!
-            throw visicomp.core.util.createError(returnStatus.msg);
+            instance.setError("Error!");
         }
     }
     
-    return worksheetFunction;
-    
-    
+    return worksheetFunction;    
 }
 
 /** This method creates the worksheet function.  */
@@ -203,7 +199,10 @@ visicomp.core.Worksheet.prototype.getVirtualWorkspace = function() {
         var updateDataList = [];
         var tempRootFolder = visicomp.core.Folder.fromJson(tempWorkspace,json,updateDataList);
         tempWorkspace.rootFolder = tempRootFolder;
-        visicomp.core.updatemember.updateObjects(updateDataList);
+        var actionResponse = visicomp.core.updatemember.updateObjects(updateDataList);
+        if(!actionResponse.success) {
+            this.setError("Error!");
+        }
         
         this.virtualWorkspace = tempWorkspace;
     }
