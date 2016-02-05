@@ -68,7 +68,7 @@ visicomp.app.visiui.TableControl.formatString = "\t";
 visicomp.app.visiui.TableControl.prototype.memberUpdated = function() {
     var object = this.getObject();
     if(object.hasDataError()) {
-        this.showError(object.getDataErrorMsg());
+        this.showError(object.getDataError());
     }
     else {
         var data = this.getObject().getData();
@@ -86,11 +86,11 @@ visicomp.app.visiui.TableControl.prototype.memberUpdated = function() {
     }
 }
 
-visicomp.app.visiui.TableControl.prototype.showError = function(msg) {
+visicomp.app.visiui.TableControl.prototype.showError = function(actionError) {
     //this.editor.style.display = "none";
     //this.errorDiv.style.display = "";
     //this.errorDiv.innerHTML = msg;
-    this.editor.getSession().setValue("ERROR: " + msg);
+    this.editor.getSession().setValue("ERROR: " + actionError.msg);
 }
 
 visicomp.app.visiui.TableControl.prototype.showData = function(dataText) {

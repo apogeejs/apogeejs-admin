@@ -15,8 +15,7 @@ visicomp.core.DataHolder = {};
 visicomp.core.DataHolder.init = function() {
     
     this.data = null;
-    this.dataError = false;
-    this.dataErrorMsg = null;
+    this.dataError = null;
     
     //these are a list of members that depend on this member
     this.impactsList = [];
@@ -35,21 +34,20 @@ visicomp.core.Child.getData = function() {
  * code which is identified by this name, for example the JSON object associated
  * with a table. Besides hold the data object, this updates the parent data map. */
 visicomp.core.DataHolder.setData = function(data) {
-    this.internalSetData(data,false,null);
+    this.internalSetData(data,null);
 }
 
 /** This method sets the error flag for this data holder, and it sets an error
  * message. The error is cleared by setting valid data, either through the 
  * set data method or in a calculation. */
-visicomp.core.DataHolder.setDataError = function(msg) {
-    this.internalSetData(null,true,msg);
+visicomp.core.DataHolder.setDataError = function(actionError) {
+    this.internalSetData(null,actionError);
 }
 
-visicomp.core.DataHolder.internalSetData = function(data,hasError,errorMsg) {
+visicomp.core.DataHolder.internalSetData = function(data,actionError) {
     
     this.data = data;
-    this.dataError = hasError;
-    this.dataErrorMsg = errorMsg;
+    this.dataError = actionError;
     
     //data the data map in the parent if it is a hierarchy container 
     if(this.parent) {
@@ -60,13 +58,13 @@ visicomp.core.DataHolder.internalSetData = function(data,hasError,errorMsg) {
 /** This method returns true if there is an dataError for this table, 
  * making the data invalid. */
 visicomp.core.DataHolder.hasDataError = function() {
-    return this.dataError;
+    return (this.dataError != null);
 }
 
 /** This returns the error messag. It should only be called
  * is hasError returns true. */
-visicomp.core.DataHolder.getDataErrorMsg = function() {
-    return this.dataErrorMsg;
+visicomp.core.DataHolder.getDataError = function() {
+    return this.dataError;
 }
 
 /** This returns an array of members this member impacts. */

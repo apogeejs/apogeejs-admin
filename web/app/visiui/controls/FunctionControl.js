@@ -68,7 +68,7 @@ visicomp.app.visiui.FunctionControl.formatString = "\t";
 visicomp.app.visiui.FunctionControl.prototype.memberUpdated = function() {
     var functionObject = this.getObject();
 	if(functionObject.hasDataError()) {
-        this.showError(functionObject.getDataErrorMsg());
+        this.showError(functionObject.getDataError());
     }
     else {
 		var name = functionObject.getName();
@@ -84,11 +84,11 @@ visicomp.app.visiui.FunctionControl.prototype.memberUpdated = function() {
 	}
 }
 
-visicomp.app.visiui.FunctionControl.prototype.showError = function(msg) {
+visicomp.app.visiui.FunctionControl.prototype.showError = function(actionError) {
     //this.editor.style.display = "none";
     //this.errorDiv.style.display = "";
     //this.errorDiv.innerHTML = msg;
-    this.editor.getSession().setValue("ERROR: " + msg);
+    this.editor.getSession().setValue("ERROR: " + actionError.msg);
 }
 
 /** This method creates a callback for editing a standard codeable object

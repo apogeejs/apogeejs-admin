@@ -25,8 +25,7 @@ visicomp.core.updatemember.fireUpdatedEventList = function(memberList) {
 /** This method updates the object function for a given member. The return value
  * is an Action Response object.*/
 visicomp.core.updatemember.updateCode = function(member,argList,functionBody,supplementalCode) {
-    var actionResponse = visicomp.core.util.createActionResponse();
-    var actionErrorList = actionResponse.errorList;
+    var actionResponse = visicomp.core.action.createActionResponse();
     var recalculateList = [];
     
     var dataSet = visicomp.core.updatemember.updateObjectFunction(member,
@@ -34,7 +33,7 @@ visicomp.core.updatemember.updateCode = function(member,argList,functionBody,sup
         functionBody,
         supplementalCode,
         recalculateList,
-        actionErrorList);
+        actionResponse.errors);
         
     if(!dataSet) {
         //table not updated
@@ -43,7 +42,7 @@ visicomp.core.updatemember.updateCode = function(member,argList,functionBody,sup
         return actionResponse;
     }
     
-    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionErrorList);
+    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse.errors);
     actionResponse.success = calcSuccess;
     actionResponse.actionDone = true;
     
@@ -56,14 +55,13 @@ visicomp.core.updatemember.updateCode = function(member,argList,functionBody,sup
 /** This method updates the data for a given member. The return value
  * is an Action Response object.*/
 visicomp.core.updatemember.updateData = function(member,data) {
-    var actionResponse = visicomp.core.util.createActionResponse();
-    var actionErrorList = actionResponse.errorList;
+    var actionResponse = visicomp.core.action.createActionResponse();
     var recalculateList = [];
 
     var dataSet = visicomp.core.updatemember.updateObjectData(member,
         data,
         recalculateList,
-        actionErrorList);
+        actionResponse.errors);
     
     if(!dataSet) {
         actionResponse.success = false;
@@ -71,7 +69,7 @@ visicomp.core.updatemember.updateData = function(member,data) {
         return actionResponse;
     }
     
-    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionErrorList);
+    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse.errors);
     actionResponse.success = calcSuccess;
     actionResponse.actionDone = true;
     
@@ -86,8 +84,7 @@ visicomp.core.updatemember.updateData = function(member,data) {
  * is an Action Response object. This method does not keep track of the action response value
  * actionDone, since there are multiple object acted upon. */
 visicomp.core.updatemember.updateObjects = function(updateDataList) {
-    var actionResponse = visicomp.core.util.createActionResponse();
-    var actionErrorList = actionResponse.errorList;
+    var actionResponse = visicomp.core.action.createActionResponse();
     var recalculateList = [];
     var setDataList = [];
 
@@ -106,19 +103,19 @@ visicomp.core.updatemember.updateObjects = function(updateDataList) {
                 functionBody,
                 supplementalCode,
                 recalculateList,
-                actionErrorList);
+                actionResponse.errors);
         }
         else if(data) {
             var uodDataSet = visicomp.core.updatemember.updateObjectData(member,
                 data,
                 recalculateList,
-                actionErrorList);
+                actionResponse.errors);
             
             setDataList.push(member);
         }
     }
 
-    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionErrorList);
+    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse.errors);
     actionResponse.success = calcSuccess;
     actionResponse.actionDone = true;
     
@@ -141,7 +138,7 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
         functionBody,
         supplementalCode,
         recalculateList,
-        actionErrorList) {
+        errors) {
     
     //process the code
     var codeInfo;
@@ -158,10 +155,11 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
         if(error.stack) {
 			console.error(error.stack);
 		}
-        var errorMsg = error.message ? error.message : "An unknown error ocurred";
-        member.setCodeError(errorMsg);
-        actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_MODEL);
-        actionErrorList.push(actionError);
+        errorMsg = error.message ? error.message : null;
+        actionError = new visicomp.core.ActionError(errorMsg,member);
+        actionError.setParentException(error);
+        member.setCodeError(actionError);
+        errors.add(actionError);
     }
          
     //save the code
@@ -174,10 +172,11 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
 			if(error.stack) {
 				console.error(error.stack);
 			}
-            errorMsg = error.message ? error.message : "An unknown error ocurred";
-            member.setCodeError(errorMsg);
-            actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_MODEL);
-            actionErrorList.push(actionError);
+            errorMsg = error.message ? error.message : null;
+            actionError = new visicomp.core.ActionError(errorMsg,member);
+            actionError.setParentException(error);
+            member.setCodeError(actionError);
+            errors.add(actionError);
 		}
 	}
     
@@ -190,10 +189,10 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
         if(error.stack) {
             console.error(error.stack);
         }
-        errorMsg = error.message ? error.message : "An unknown error ocurred";
-        member.setCodeError(errorMsg);
-        actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_APP);
-        actionErrorList.push(actionError);
+        errorMsg = "Error adding member to recalculate list: " + ((error.message) ? error.message : null);
+        actionError = new visicomp.core.ActionError(errorMsg,member,visicomp.core.util.ACTION_ERROR_APP);
+        actionError.setParentException(error);
+        errors.add(actionError);
     }
     
     return codeInfoValid;
@@ -205,7 +204,7 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
 visicomp.core.updatemember.updateObjectData = function(member,
         data,
         recalculateList,
-        actionErrorList) {
+        errors) {
             
     var actionError;
     var errorMsg;
@@ -220,10 +219,11 @@ visicomp.core.updatemember.updateObjectData = function(member,
 		if(error.stack) {
 			console.error(error.stack);
 		}
-        errorMsg = error.message ? error.message : "An unknown error ocurred";
-        member.setDataError(errorMsg);
-        actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_MODEL);
-        actionErrorList.push(actionError);
+        errorMsg = error.message ? error.message : null;
+        actionError = new visicomp.core.ActionError(errorMsg,member);
+        actionError.setParentException(error);
+        member.setDataError(actionError);
+        errors.add(actionError);
     }
     
     try {
@@ -234,9 +234,10 @@ visicomp.core.updatemember.updateObjectData = function(member,
         if(error.stack) {
             console.error(error.stack);
         }
-        errorMsg = error.message ? error.message : "An unknown error ocurred";
-        actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_APP);
-        actionErrorList.push(actionError);
+        errorMsg = "Error adding member to recalculate list: " + ((error.message) ? error.message : null);
+        actionError = new visicomp.core.ActionError(errorMsg,member,visicomp.core.util.ACTION_ERROR_APP);
+        actionError.setParentException(error);
+        errors.add(actionError);
         
     }
 
@@ -245,15 +246,15 @@ visicomp.core.updatemember.updateObjectData = function(member,
 }
 
 /** This is the listener for the update member event. */
-visicomp.core.updatemember.doRecalculate = function(recalculateList,actionErrorList) {
+visicomp.core.updatemember.doRecalculate = function(recalculateList,errors) {
      
     try {
         //sort list
-        var listSorted = visicomp.core.calculation.sortRecalculateList(recalculateList,actionErrorList);
+        var listSorted = visicomp.core.calculation.sortRecalculateList(recalculateList,errors);
     
         //recalculate list
         //if there is a sort error (ciruclar reference) this will also cause an error here
-        var listCalculated = visicomp.core.calculation.callRecalculateList(recalculateList,actionErrorList);
+        var listCalculated = visicomp.core.calculation.callRecalculateList(recalculateList,errors);
 
         return listCalculated;
     }
@@ -262,9 +263,10 @@ visicomp.core.updatemember.doRecalculate = function(recalculateList,actionErrorL
         if(error.stack) {
             console.error(error.stack);
         }
-        var errorMsg = error.message ? error.message : "An unknown error ocurred";
-        actionError = visicomp.core.util.createActionError(errorMsg,visicomp.core.util.ACTION_ERROR_APP);
-        actionErrorList.push(actionError);
+        var errorMsg = "Error recalculate model: " + ((error.message) ? error.message : null);
+        var actionError = new visicomp.core.ActionError(errorMsg,null,visicomp.core.util.ACTION_ERROR_APP);
+        actionError.setParentException(error);
+        errors.add(actionError);
         
         return false;
     }

@@ -192,13 +192,21 @@ visicomp.app.visiui.Control.createDeleteCallback = function(title) {
  * of left open, if applicable. */
 visicomp.app.visiui.Control.processActionReponse = function(actionResponse) {
     if(!actionResponse.success) {
+        var errorList = actionResponse.errors.getErrorList();
         var msg = "";
         if(actionResponse.fatal) {
             msg += "Unknown Error: The application is in an indeterminant state. It is recommended it be closed.\n";
         }
-        for(var i = 0; i < actionResponse.errorList.length; i++) {
-            msg += actionResponse.errorList[i].msg + "\n";
+        for(var i = 0; i < errorList.length; i++) {
+            var actionError = errorList[i];
+            var line = "";
+            if(actionError.member) {
+                line += actionError.member.getName() + ": ";
+            }
+            line += actionError.msg;
+            msg += line + "\n";
         }
+        
         alert(msg);
     }
     

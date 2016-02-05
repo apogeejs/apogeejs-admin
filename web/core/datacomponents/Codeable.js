@@ -19,9 +19,8 @@ visicomp.core.Codeable.init = function(argList) {
     this.argList = argList;
 	
 	//error data
-	this.codeError = false;
-	this.codeErrorMsg = null;
-    this.circRefError = false;
+	this.codeError = null;
+    this.circRefError = null;
     
     //initialze the code as empty
     this.clearCode();
@@ -49,33 +48,40 @@ visicomp.core.Codeable.getSupplementalCode = function() {
 /** This method sets the code error flag for this codeable, and it sets an error
  * message. The error is cleared by setting valid code. If an object has a code error
  * this will be passed on to be a data error when the member is executed.*/
-visicomp.core.DataHolder.setCodeError = function(msg) {
-    this.codeError = true;
-	this.codeErrorMsg = msg;
+visicomp.core.Codeable.setCodeError = function(actionError) {
+    this.codeError = actionError;
 }
 
 /** This method returns true if there is an code error for this member, 
  * making the code invalid. */
-visicomp.core.DataHolder.hasCodeError = function() {
+visicomp.core.Codeable.hasCodeError = function() {
+    return (this.codeError != null);
+}
+
+/** This returns the code error. */
+visicomp.core.Codeable.getCodeError = function() {
     return this.codeError;
 }
 
-/** This returns the code error messag. It should only be called
- * is hasCodeError returns true. */
-visicomp.core.DataHolder.getCodeErrorMsg = function() {
-    return this.codeErrorMsg;
-}
-
-/** This method sets the circular reference error flag for this codeable. The error 
- * should be cleared by calling this function when a recalculation is done.
+/** This method sets the circular reference error for this codeable.
  * If an object has a ciruclar refernec error
  * this will be passed on to be a data error when the member is executed.*/
-visicomp.core.DataHolder.setCircRefError = function(circRefError) {
+visicomp.core.Codeable.setCircRefError = function(circRefError) {
     this.circRefError = circRefError;
 }
 
+/** This method clears the circular reference error for this codeable.*/
+visicomp.core.Codeable.clearCircRefError = function() {
+    this.circRefError = null;
+}
+
 /** This returns true if there is a ciruclar reference error. */
-visicomp.core.DataHolder.hasCircRefError = function() {
+visicomp.core.Codeable.hasCircRefError = function() {
+    return (this.circRefError != null);
+}
+
+/** This returns the cirular reference error. */
+visicomp.core.Codeable.getCircRefError = function() {
     return this.circRefError;
 }
 
@@ -94,9 +100,8 @@ visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
         this.contextSetter = codeInfo.contextSetter;
         this.objectFunction = codeInfo.objectFunction;
 		
-		//clear any error
-		this.codeError = false;
-		this.codeErrorMsg = null;
+		//clear any code error
+		this.codeError = null;
 
         //update dependencies
         this.updateDependencies(codeInfo.dependencyList);
@@ -159,11 +164,11 @@ visicomp.core.Codeable.execute = function() {
 	//don't calculate if this has an error.
 	//do pass the error on to be a data error.
 	if(this.hasCodeError()) {
-		this.setDataError(this.getCodeErrorMsg());
+		this.setDataError(this.getCodeError());
 		return false;
 	}
     else if(this.hasCircRefError()) {
-        this.setDataError("Circular reference Error");
+        this.setDataError(this.getCircRefError());
         return false;
     }
     
@@ -188,8 +193,14 @@ visicomp.core.Codeable.execute = function() {
         return true;
     }
     catch(error) {
-        console.error(error.stack);
-        this.setDataError(error.message);
+        //this is an error in the code
+        if(error.stack) {
+            console.error(error.stack);
+        }
+        var errorMsg = "Error Recalculating Member: " + ((error.message) ? error.message : null);
+        var actionError = new visicomp.core.ActionError(errorMsg,this);
+        actionError.setParentException(error);
+        this.setDataError(actionError);
         return false;
     }
 }
@@ -263,7 +274,10 @@ visicomp.core.Codeable.checkDependencyError = function() {
             if(i > 0) message += ", ";
             message += errorDependencies[i].getFullName();
         }
-        this.setDataError(message);
+        var actionError = new visicomp.core.ActionError(message,this);
+        actionError.setDependencyError(true);
+        this.setDataError(actionError);   
+        
         return true;
     }
     else {
