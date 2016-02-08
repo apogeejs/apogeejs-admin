@@ -126,17 +126,19 @@ visicomp.app.visiui.TableControl.createControl = function(workspaceUI,parent,nam
     var json = {};
     json.name = name;
     json.type = visicomp.core.Table.generator.type;
-    var returnValue = visicomp.core.createmember.createMember(parent,json);
+    var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
-    if(returnValue.success) {
-        var table = returnValue.member;
+    if(actionResponse.success) {
+        var table = actionResponse.member;
         var tableControl = new visicomp.app.visiui.TableControl(workspaceUI,table);
-        returnValue.control = tableControl;
+        actionResponse.control = tableControl;
     }
     else {
-        //no action for now
+        //show an error message, howver we will close dialog whether object was
+		//created or not.
+		visicomp.app.visiui.Control.processActionReponse(actionResponse);
     }
-    return returnValue;
+    return actionResponse;
 }
 
 

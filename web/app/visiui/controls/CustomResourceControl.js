@@ -105,14 +105,14 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,p
     var json = {};
     json.name = name;
     json.type = visicomp.core.Resource.generator.type;
-    var returnValue = visicomp.core.createmember.createMember(parent,json);
+    var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
-    if(returnValue.success) {
-        var resource = returnValue.member;
+    if(actionResponse.success) {
+        var resource = actionResponse.member;
         
         //create the control
         var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,resource);
-        returnValue.control = customResourceControl;
+        actionResponse.control = customResourceControl;
         
         //if we do not load from a json, we must manually set the resource processor
         //this is because here we store processor data in the JSON. If we try creating
@@ -124,9 +124,11 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,p
         
     }
     else {
-        //no action for now
+        //show an error message, howver we will close dialog whether object was
+		//created or not.
+		visicomp.app.visiui.Control.processActionReponse(actionResponse);
     }
-    return returnValue;
+    return actionResponse;
 }
 
 

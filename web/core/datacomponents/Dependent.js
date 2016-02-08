@@ -60,14 +60,15 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
         
         //make sure this is a dependent
         if(!remoteMember.isImpactor) {
-            visicomp.core.util.createError("The object " + remoteMember.getFullName() + " cannot be referenced as a dependent.");
+            throw visicomp.core.util.createError("The object " + remoteMember.getFullName() + " cannot be referenced as a dependent.");
         }
 		
 		if(remoteMember === this) {
 			//it is an error to depend on itself (it doesn't exist yet)
 			//ok to reference through a local varible - this is how recursive functions are handled.
 			var message = "A data formula should not reference its own name.";
-			this.setCodeError(message);
+			var actionError = new visicomp.core.ActionError(message,this);
+			this.setCodeError(actionError);
 		}
 		else {	
 			

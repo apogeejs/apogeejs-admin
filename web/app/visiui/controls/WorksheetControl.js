@@ -107,17 +107,19 @@ visicomp.app.visiui.WorksheetControl.createControl = function(workspaceUI,parent
     var json = {};
     json.name = name;
     json.type = visicomp.core.Worksheet.generator.type;
-    var returnValue = visicomp.core.createmember.createMember(parent,json);
+    var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
-    if(returnValue.success) {
-        var worksheet = returnValue.member;
+    if(actionResponse.success) {
+        var worksheet = actionResponse.member;
         var worksheetControl = new visicomp.app.visiui.WorksheetControl(workspaceUI,worksheet);
-        returnValue.control = worksheetControl;
+        actionResponse.control = worksheetControl;
     }
     else {
-        //no action for now
+        //show an error message, howver we will close dialog whether object was
+		//created or not.
+		visicomp.app.visiui.Control.processActionReponse(actionResponse);
     }
-    return returnValue;
+    return actionResponse;
 }
 
 visicomp.app.visiui.WorksheetControl.createControlFromJson = function(workspaceUI,member,controlJson) {

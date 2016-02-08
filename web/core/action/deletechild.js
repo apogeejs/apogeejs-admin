@@ -13,7 +13,13 @@ visicomp.core.deletechild.CHILD_DELETED_EVENT = "childDeleted";
 
 /** This is the listener for the create table event. */
 visicomp.core.deletechild.deleteChild = function(child) {
-	var returnValue;
+	var actionResponse = visicomp.core.action.createActionResponse();
+	var errors = actionResponse.errors;
+	var errorMsg;
+	var actionError;
+	
+	//clear success on error
+	actionResponse.success = true;
     
     try {
 		//create table
@@ -23,25 +29,43 @@ visicomp.core.deletechild.deleteChild = function(child) {
 		child.onDelete();
         
         //do any updates to other objects because of the deleted table
-        workspace.updateForDeletedVariable(child);
-
+		try {
+			workspace.updateForDeletedVariable(child);
+		}
+		catch(error) {
+			//failure to create object
+			if(error.stack) {
+				console.error(error.stack);
+			}
+//DONT DO THIS WITH AN EXCEPTION - PAS IN ERRORS OR ACTION RESPONSE
+//ERROS SEEMS OK LIKE BEFORE EXCEPT IT WOULD BE NICE TO MARK FAILURE WHEN AN ERROR IS ADDED.
+//MAYBE I SHOULD CHANGE THAT EVERYWHERE?
+            errorMsg = error.message ? error.message : null;
+            actionError = new visicomp.core.ActionError(errorMsg,member);
+            actionError.setParentException(error);
+            member.setCodeError(actionError);
+            errors.add(actionError);
+			
+			actionResponse.success = false;
+		}
+		
 		//dispatch event
-        var data = {};
 		workspace.dispatchEvent(visicomp.core.deletechild.CHILD_DELETED_EVENT,fullName);
 
 		//return success
-		returnValue = {"success":true};
+		return actionResponse;
 	}
 	finally {
-        //for now we will not catch errors but let the broswer take care of them
-        //in the future we want the debugger handling for user code errors.
-        if(!returnValue) {
-            alert("There was an error. See the browser debugger.");
-            returnValue = {"success":false};
-        }
+        //we shouldn't reach here. if we do it is an app error
+		//maybe I should mark this fatal. It is not certain if the app is in a valid state.
+		errorMsg = "Unknown application error";
+		actionError = new visicomp.core.ActionError(errorMsg,null,visicomp.core.action.ACTION_ERROR_APP);
+		errors.add(actionError);
+
+		actionResponse.success = false;
+		actionResponse.actionDone = false;
+		return actionResponse;
     }
-    
-    return returnValue;
 }
 
 

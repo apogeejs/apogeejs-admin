@@ -121,17 +121,19 @@ visicomp.app.visiui.FunctionControl.createControl = function(workspaceUI,parent,
     var json = {};
     json.name = name;
     json.type = visicomp.core.FunctionTable.generator.type;
-    var returnValue = visicomp.core.createmember.createMember(parent,json);
+    var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
-    if(returnValue.success) {
-        var functionObject = returnValue.member;
+    if(actionResponse.success) {
+        var functionObject = actionResponse.member;
         var functionControl = new visicomp.app.visiui.FunctionControl(workspaceUI,functionObject);
-        returnValue.control = functionControl;
+        actionResponse.control = functionControl;
     }
     else {
-        //no action for now
+        //show an error message, howver we will close dialog whether object was
+		//created or not.
+		visicomp.app.visiui.Control.processActionReponse(actionResponse);
     }
-    return returnValue;
+    return actionResponse;
 }
 
 visicomp.app.visiui.FunctionControl.createControlFromJson = function(workspaceUI,member,controlJson) {
