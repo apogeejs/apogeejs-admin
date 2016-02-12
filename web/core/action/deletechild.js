@@ -11,61 +11,50 @@ visicomp.core.deletechild = {};
 visicomp.core.deletechild.CHILD_DELETED_EVENT = "childDeleted";
 
 
-/** This is the listener for the create table event. */
-visicomp.core.deletechild.deleteChild = function(child) {
-	var actionResponse = visicomp.core.action.createActionResponse();
-	var errors = actionResponse.errors;
-	var errorMsg;
-	var actionError;
-	
-	//clear success on error
-	actionResponse.success = true;
+/** This is the listener for the create table event.
+ * The return value is an ActionResponse object. Optionally, an existing action response
+ * may be passed in or otherwise one will be created here. */
+visicomp.core.deletechild.deleteChild = function(child,optionalActionResponse) {
+	var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
     
     try {
-		//create table
+        
+        var updateDataList = [];
+        var recalculateList = [];
+        var setDataList = [];
+        
+        //delete child
+        child.onDelete();
+        
 		var fullName = child.getFullName();
 		var workspace = child.getWorkspace();
-		
-		child.onDelete();
-        
-        //do any updates to other objects because of the deleted table
-		try {
-			workspace.updateForDeletedVariable(child);
-		}
-		catch(error) {
-			//failure to create object
-			if(error.stack) {
-				console.error(error.stack);
-			}
-//DONT DO THIS WITH AN EXCEPTION - PAS IN ERRORS OR ACTION RESPONSE
-//ERROS SEEMS OK LIKE BEFORE EXCEPT IT WOULD BE NICE TO MARK FAILURE WHEN AN ERROR IS ADDED.
-//MAYBE I SHOULD CHANGE THAT EVERYWHERE?
-            errorMsg = error.message ? error.message : null;
-            actionError = new visicomp.core.ActionError(errorMsg,member);
-            actionError.setParentException(error);
-            member.setCodeError(actionError);
-            errors.add(actionError);
-			
-			actionResponse.success = false;
-		}
-		
-		//dispatch event
-		workspace.dispatchEvent(visicomp.core.deletechild.CHILD_DELETED_EVENT,fullName);
 
-		//return success
-		return actionResponse;
+        workspace.updateForDeletedVariable(child,recalculateList,actionResponse);
+
+        //do data updates if needed
+        if(updateDataList.length > 0) {
+            visicomp.core.updatemember.updateObjectFunctionOrData(updateDataList,
+                recalculateList,
+                setDataList,
+                actionResponse);
+        } 
+
+        var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
+
+        //dispatch events
+        workspace.dispatchEvent(visicomp.core.deletechild.CHILD_DELETED_EVENT,fullName);
+        visicomp.core.updatemember.fireUpdatedEventList(setDataList);
+        visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
 	}
-	finally {
-        //we shouldn't reach here. if we do it is an app error
-		//maybe I should mark this fatal. It is not certain if the app is in a valid state.
-		errorMsg = "Unknown application error";
-		actionError = new visicomp.core.ActionError(errorMsg,null,visicomp.core.action.ACTION_ERROR_APP);
-		errors.add(actionError);
-
-		actionResponse.success = false;
-		actionResponse.actionDone = false;
-		return actionResponse;
+	catch(error) {
+        //unknown application error
+        var actionError = visicomp.core.ActionError.processFatalAppException(error);
+        actionResponse.addError(actionError);
     }
+    
+    //return response
+    return actionResponse;
+        
 }
 
 

@@ -103,21 +103,9 @@ visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,on
 			supplementalCode = codeableObject.getSupplementalCode();
 		}
         
-        var editComplete = undefined;
-        try {
-            editComplete = onSaveFunction(mainCode,supplementalCode);
-
-            if(editComplete) {
-                closeDialog();
-            }
-        }
-        finally {
-            if(editComplete === undefined) {
-                //this catches exceptions thrown in update. This should be user
-                //code errors that we want to capture in the debugger for now
-                alert("There was an error calculating the result. It will be captured in the debugger.");
-                closeDialog();
-            }
+        var complete = onSaveFunction(mainCode,supplementalCode);
+        if(complete) {
+            closeDialog();
         }
     }
     

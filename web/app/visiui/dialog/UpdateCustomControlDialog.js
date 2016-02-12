@@ -127,13 +127,10 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
             css = customResourceProcessor.getCss();
         }
 
-        var result = onSaveFunction(controlHtml,customize,supplementalCode,css);
+        var complete = onSaveFunction(controlHtml,customize,supplementalCode,css);
 
-        if(result.success) {
+        if(complete) {
             closeDialog();
-        }
-        else {
-            alert("There was an error updating the resource: " + result.msg);
         }
     }
 

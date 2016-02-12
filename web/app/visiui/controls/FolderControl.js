@@ -49,15 +49,10 @@ visicomp.app.visiui.FolderControl.createControl = function(workspaceUI,parent,na
     json.type = visicomp.core.Folder.generator.type;
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
-    if(actionResponse.success) {
-        var folder = actionResponse.member;
+    var folder = actionResponse.member;
+    if(folder) {       
         var folderControl = new visicomp.app.visiui.FolderControl(workspaceUI,folder);
         actionResponse.control = folderControl;
-    }
-    else {
-        //show an error message, howver we will close dialog whether object was
-		//created or not.
-		visicomp.app.visiui.Control.processActionReponse(actionResponse);
     }
     return actionResponse;
 }

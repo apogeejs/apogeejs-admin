@@ -46,7 +46,7 @@ visicomp.core.Resource.prototype.processObjectFunction = function(objectFunction
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.Resource.fromJson = function(owner,json,updateDataList) {
+visicomp.core.Resource.fromJson = function(owner,json,updateDataList,actionResponse) {
     
     var resource = new visicomp.core.Resource(owner,json.name);
     if(json.updateData) {

@@ -36,14 +36,10 @@ visicomp.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction
             return;
         }
         
-        var result = onCreateFunction(name);
-        
-        if(result.success) {
+        var closeDialog = onCreateFunction(name);
+        if(closeDialog) {
 			dialog.hide();
-		}
-		else {
-            alert("There was an error adding the workspace: " + result.msg);
-        }      
+		}    
     }
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));

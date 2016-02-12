@@ -9,7 +9,7 @@ visicomp.core.updatemember = {};
  * Event member Format:
  * [member]
  */
-visicomp.core.updatemember.OBJECT_UPDATED_EVENT = "memberUpdated";
+visicomp.core.updatemember.MEMBER_UPDATED_EVENT = "memberUpdated";
 
 visicomp.core.updatemember.fireUpdatedEvent = function(member) {
     var workspace = member.getWorkspace();
@@ -22,73 +22,97 @@ visicomp.core.updatemember.fireUpdatedEventList = function(memberList) {
     }
 }
 
-/** This method updates the object function for a given member. The return value
- * is an Action Response object.*/
-visicomp.core.updatemember.updateCode = function(member,argList,functionBody,supplementalCode) {
-    var actionResponse = visicomp.core.action.createActionResponse();
-    var recalculateList = [];
+/** This method updates the object function for a given member. 
+ * The return value is an ActionResponse object. Optionally, an existing action response
+ * may be passed in or otherwise one will be created here. */
+visicomp.core.updatemember.updateCode = function(member,argList,functionBody,supplementalCode,optionalActionResponse) {
+	var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
     
-    var dataSet = visicomp.core.updatemember.updateObjectFunction(member,
-        argList,
-        functionBody,
-        supplementalCode,
-        recalculateList,
-        actionResponse.errors);
+    try {
+        var recalculateList = [];
+
+        var dataSet = visicomp.core.updatemember.updateObjectFunction(member,
+            argList,
+            functionBody,
+            supplementalCode,
+            recalculateList);
+
+        var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
         
-    if(!dataSet) {
-        //table not updated
-        actionResponse.success = false;
-        actionResponse.actionDone = dataSet;
-        return actionResponse;
+        //fire updated events
+        visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
     }
-    
-    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse.errors);
-    actionResponse.success = calcSuccess;
-    actionResponse.actionDone = true;
-    
-    //fire updated events
-    visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
+    catch(error) {
+        var actionError = visicomp.core.ActionError.processFatalAppException(error);
+        actionResponse.addError(actionError);
+    }
     
     return actionResponse;
 }
 
-/** This method updates the data for a given member. The return value
- * is an Action Response object.*/
-visicomp.core.updatemember.updateData = function(member,data) {
-    var actionResponse = visicomp.core.action.createActionResponse();
-    var recalculateList = [];
+/** This method updates the data for a given member. 
+ * The return value is an ActionResponse object. Optionally, an existing action response
+ * may be passed in or otherwise one will be created here. */
+visicomp.core.updatemember.updateData = function(member,data,optionalActionResponse) {
+	var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
+    
+    try {
+        var recalculateList = [];
 
-    var dataSet = visicomp.core.updatemember.updateObjectData(member,
-        data,
+        var dataSet = visicomp.core.updatemember.updateObjectData(member,
+            data,
+            recalculateList);
+
+        var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
+
+        //fire updated events
+        visicomp.core.updatemember.fireUpdatedEvent(member);
+        visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
+    }
+    catch(error) {
+        var actionError = visicomp.core.ActionError.processFatalAppException(error);
+        actionResponse.addError(actionError);
+    }
+    
+    return actionResponse;
+}
+
+/** This method updates the object function or the data for a list of members. 
+ * The return value is an ActionResponse object. Optionally, an existing action response
+ * may be passed in or otherwise one will be created here. */
+visicomp.core.updatemember.updateObjects = function(updateDataList,optionalActionResponse) {
+	var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
+    
+    try {
+        var recalculateList = [];
+        var setDataList = [];
+
+        visicomp.core.updatemember.updateObjectFunctionOrData(updateDataList,
+            recalculateList,
+            setDataList); 
+
+        var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
+
+        //fire updated events
+        visicomp.core.updatemember.fireUpdatedEventList(setDataList);
+        visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
+    }
+    catch(error) {
+        var actionError = visicomp.core.ActionError.processFatalAppException(error);
+        actionResponse.add(actionError);
+    }
+    
+    return actionResponse;
+}
+
+//=====================================
+// Private Functions
+//=====================================
+
+visicomp.core.updatemember.updateObjectFunctionOrData = function(updateDataList,
         recalculateList,
-        actionResponse.errors);
-    
-    if(!dataSet) {
-        actionResponse.success = false;
-        actionResponse.actionDone = false;
-        return actionResponse;
-    }
-    
-    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse.errors);
-    actionResponse.success = calcSuccess;
-    actionResponse.actionDone = true;
-    
-    //fire updated events
-    visicomp.core.updatemember.fireUpdatedEvent(member);
-    visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
-    
-    return actionResponse;
-}
-
-/** This method updates the object function or the data for a list of members. The return value
- * is an Action Response object. This method does not keep track of the action response value
- * actionDone, since there are multiple object acted upon. */
-visicomp.core.updatemember.updateObjects = function(updateDataList) {
-    var actionResponse = visicomp.core.action.createActionResponse();
-    var recalculateList = [];
-    var setDataList = [];
-
-    //update members and add to recalculate list
+        setDataList) {  
+     
     for(var i = 0; i < updateDataList.length; i++) {
         var argData = updateDataList[i];
         var member = argData.member;
@@ -102,33 +126,17 @@ visicomp.core.updatemember.updateObjects = function(updateDataList) {
                 argList,
                 functionBody,
                 supplementalCode,
-                recalculateList,
-                actionResponse.errors);
+                recalculateList);
         }
         else if(data) {
             var uodDataSet = visicomp.core.updatemember.updateObjectData(member,
                 data,
-                recalculateList,
-                actionResponse.errors);
+                recalculateList);
             
             setDataList.push(member);
         }
     }
-
-    var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse.errors);
-    actionResponse.success = calcSuccess;
-    actionResponse.actionDone = true;
-    
-    //fire updated events
-    visicomp.core.updatemember.fireUpdatedEventList(setDataList);
-    visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
-    
-    return actionResponse;
 }
-
-//=====================================
-// Private Functions
-//=====================================
 
 /** This method updates the code and object function in a member based on the
  * passed code. It returns true if the data was set and false if there was an
@@ -137,65 +145,41 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
         argList,
         functionBody,
         supplementalCode,
-        recalculateList,
-        errors) {
+        recalculateList) {
     
     //process the code
-    var codeInfo;
-	var codeInfoValid = false;
+    var codeInfo ={};
+    codeInfo.argList = argList;
+    codeInfo.functionBody = functionBody;
+    codeInfo.supplementalCode = supplementalCode;
+        
     var actionError;
-    var errorMsg;
    
-    try {
-        codeInfo = visicomp.core.updatemember.processCode(member,argList,functionBody,supplementalCode);
-		codeInfoValid = true;
+    try {        
+        //load some needed context variables
+        var localFolder = member.getParent();
+        var rootFolder = member.getRootFolder();
+        var codeLabel = member.getFullName();
+    
+        //process the code text into javascript code
+        visicomp.core.codeCompiler.processCode(codeInfo,
+            localFolder,
+            rootFolder,
+            codeLabel);
     }
     catch(error) {
-		//this is an error in the code
-        if(error.stack) {
-			console.error(error.stack);
-		}
-        errorMsg = error.message ? error.message : null;
-        actionError = new visicomp.core.ActionError(errorMsg,member);
-        actionError.setParentException(error);
+        //process the error
+        actionError = visicomp.core.ActionError.processMemberModelException(error,member);
         member.setCodeError(actionError);
-        errors.add(actionError);
     }
          
     //save the code
-    if(codeInfoValid) {
-		try {
-			member.setCodeInfo(codeInfo);
-		}
-		catch(error) {
-			//this is an error in the code
-			if(error.stack) {
-				console.error(error.stack);
-			}
-            errorMsg = error.message ? error.message : null;
-            actionError = new visicomp.core.ActionError(errorMsg,member);
-            actionError.setParentException(error);
-            member.setCodeError(actionError);
-            errors.add(actionError);
-		}
-	}
+    member.setCodeInfo(codeInfo);
     
 	//update recalculate list
-    try {
-        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
-    }
-    catch(error) {
-		//this is an unknown program error
-        if(error.stack) {
-            console.error(error.stack);
-        }
-        errorMsg = "Error adding member to recalculate list: " + ((error.message) ? error.message : null);
-        actionError = new visicomp.core.ActionError(errorMsg,member,visicomp.core.util.ACTION_ERROR_APP);
-        actionError.setParentException(error);
-        errors.add(actionError);
-    }
+    visicomp.core.calculation.addToRecalculateList(recalculateList,member);
     
-    return codeInfoValid;
+    return true;
 }
 
 
@@ -203,90 +187,28 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
  * save was done (or at least attempted). */
 visicomp.core.updatemember.updateObjectData = function(member,
         data,
-        recalculateList,
-        errors) {
-            
-    var actionError;
-    var errorMsg;
+        recalculateList) {
 
-    //set data
-    try {
-        member.setData(data);
-        member.clearCode();
-    }
-    catch(error) {
-		//this is a data error
-		if(error.stack) {
-			console.error(error.stack);
-		}
-        errorMsg = error.message ? error.message : null;
-        actionError = new visicomp.core.ActionError(errorMsg,member);
-        actionError.setParentException(error);
-        member.setDataError(actionError);
-        errors.add(actionError);
-    }
+    member.setData(data);
+    member.clearCode();
     
-    try {
-        visicomp.core.calculation.addToRecalculateList(recalculateList,member);
-    }
-    catch(error) {
-        //this is an unknown program error
-        if(error.stack) {
-            console.error(error.stack);
-        }
-        errorMsg = "Error adding member to recalculate list: " + ((error.message) ? error.message : null);
-        actionError = new visicomp.core.ActionError(errorMsg,member,visicomp.core.util.ACTION_ERROR_APP);
-        actionError.setParentException(error);
-        errors.add(actionError);
-        
-    }
+    visicomp.core.calculation.addToRecalculateList(recalculateList,member);
 
     //in this method data set is always attempted
     return true;
 }
 
 /** This is the listener for the update member event. */
-visicomp.core.updatemember.doRecalculate = function(recalculateList,errors) {
+visicomp.core.updatemember.doRecalculate = function(recalculateList,actionResponse) {
      
-    try {
-        //sort list
-        var listSorted = visicomp.core.calculation.sortRecalculateList(recalculateList,errors);
-    
-        //recalculate list
-        //if there is a sort error (ciruclar reference) this will also cause an error here
-        var listCalculated = visicomp.core.calculation.callRecalculateList(recalculateList,errors);
+    //sort list
+    var listSorted = visicomp.core.calculation.sortRecalculateList(recalculateList,actionResponse);
 
-        return listCalculated;
-    }
-    catch(error) {
-		//this is an unknown program error
-        if(error.stack) {
-            console.error(error.stack);
-        }
-        var errorMsg = "Error recalculate model: " + ((error.message) ? error.message : null);
-        var actionError = new visicomp.core.ActionError(errorMsg,null,visicomp.core.util.ACTION_ERROR_APP);
-        actionError.setParentException(error);
-        errors.add(actionError);
-        
-        return false;
-    }
-}
+    //recalculate list
+    //if there is a sort error (ciruclar reference) this will also cause an error here
+    var listCalculated = visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
 
-visicomp.core.updatemember.processCode = function(member,argList,functionBody,supplementalCode) {
-    
-    //load some needed variables
-    var localFolder = member.getParent();
-    var rootFolder = member.getRootFolder();
-    var codeLabel = member.getFullName();
-    
-    var codeInfo = visicomp.core.codeCompiler.processCode(argList,
-        functionBody,
-        supplementalCode,
-        localFolder,
-        rootFolder,
-        codeLabel);
-        
-    return codeInfo;
+    return listCalculated;
 }
 
 

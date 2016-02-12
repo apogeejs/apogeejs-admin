@@ -152,9 +152,13 @@ visicomp.app.visiui.Control.getMenuItemInfoList = function() {
 //** This method populates the frame for this control. */
 //visicomp.app.visiui.Control.populateFrame = function();
 
-//==============================
-// Private Instance Methods
-//==============================
+/** This method should include an needed functionality to clean up after a delete. */
+visicomp.app.visiui.Control.onDelete = function() {
+}
+
+//=============================
+// Action UI Entry Points
+//=============================
 
 /** This method creates a callback for editing a standard codeable object
  *  @private */
@@ -166,8 +170,14 @@ visicomp.app.visiui.Control.createEditCodeableDialogCallback = function(title, o
     var onSave = function(functionBody,supplementalCode) {
         var argList = member.getArgList();
         var actionResponse =  visicomp.core.updatemember.updateCode(member,argList,functionBody,supplementalCode);
-        var closeDialog = instance.processActionReponse(actionResponse);
-        return closeDialog;  
+        if(!actionResponse.getSuccess()) {
+            //show an error message
+            var msg = actionResponse.getErrorMsg();
+            alert(msg);
+        }
+        
+        //return true to close the dialog
+        return true;  
     };
     
     return function() {
@@ -183,40 +193,13 @@ visicomp.app.visiui.Control.createDeleteCallback = function(title) {
         //we should do a warning!!!
         
         //delete the object - the control we be deleted after the delete event received
-        visicomp.core.deletechild.deleteChild(object);
-    }
-}
-
-/** This method gives the response for an action response. The return
- * value tells if the dialog used for the user to do the action should be closed
- * of left open, if applicable. */
-visicomp.app.visiui.Control.processActionReponse = function(actionResponse) {
-    if(!actionResponse.success) {
-        var errorList = actionResponse.errors.getErrorList();
-        var msg = "";
-        if(actionResponse.fatal) {
-            msg += "Unknown Error: The application is in an indeterminant state. It is recommended it be closed.\n";
+        var actionResponse = visicomp.core.deletechild.deleteChild(object);
+        if(!actionResponse.getSuccess()) {
+            //show an error message
+            var msg = actionResponse.getErrorMsg();
+            alert(msg);
         }
-        for(var i = 0; i < errorList.length; i++) {
-            var actionError = errorList[i];
-            var line = "";
-            if(actionError.member) {
-                line += actionError.member.getName() + ": ";
-            }
-            line += actionError.msg;
-            msg += line + "\n";
-        }
-        
-        alert(msg);
     }
-    
-    //close dialog if the action was done, otherwise keep it open
-    var closeDialog = actionResponse.actionDone;
-    return closeDialog;
-}
-
-/** This method should include an needed functionality to clean up after a delete. */
-visicomp.app.visiui.Control.onDelete = function() {
 }
 
 //======================================

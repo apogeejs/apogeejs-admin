@@ -41,7 +41,7 @@ visicomp.core.calculation.inList = function(recalculateList,member) {
 /** This method updates the recalculate list order so no member appears in the list
  *before a member it depends on. This will return false if there is a circular reference.
  * @private */
-visicomp.core.calculation.sortRecalculateList = function(recalculateList,errors) {
+visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionResponse) {
 	
 	//working variables
 	var sortedRecalculateList = [];
@@ -104,8 +104,8 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,errors)
         //give each an error and transfer to sorted list
 		if(!membersAddedToSorted) {
             var errorMsg = "Circular Reference";
-            var actionError = new visicomp.core.ActionError(errorMsg,null,visicomp.core.action.ACTION_ERROR_MODEL);
-            errors.add(actionError);
+            var actionError = new visicomp.core.ActionError(errorMsg,null,visicomp.core.ActionError.ACTION_ERROR_MODEL);
+            actionResponse.addError(actionError);
             for(var ie = 0; ie < recalculateList.length; ie++) {
                 member = recalculateList[ie];
                 member.setCircRefError(actionError);
@@ -128,7 +128,7 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,errors)
 /** This calls execute for each member in the recalculate list. The return value
  * is false if there are any errors.
  * @private */
-visicomp.core.calculation.callRecalculateList = function(recalculateList,errors) {
+visicomp.core.calculation.callRecalculateList = function(recalculateList,actionResponse) {
     var member;
     var i;
     var overallSuccess = true;
@@ -139,7 +139,9 @@ visicomp.core.calculation.callRecalculateList = function(recalculateList,errors)
         var success = member.execute();
         if(!success) {
             var actionError = member.getDataError();
-            errors.add(actionError);
+            if(actionError) {
+                actionResponse.addError(actionError);
+            }
             overallSuccess = false;
         }
     }

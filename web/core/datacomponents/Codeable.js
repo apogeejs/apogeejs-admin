@@ -15,7 +15,7 @@ visicomp.core.Codeable = {};
 /** This initializes the component */
 visicomp.core.Codeable.init = function(argList) {
     
-    //arguments of the member function (with parentheses - we probably will change this)
+    //arguments of the member function
     this.argList = argList;
 	
 	//error data
@@ -88,10 +88,16 @@ visicomp.core.Codeable.getCircRefError = function() {
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
 
-        //set the base data
-        this.argList = codeInfo.argList;
-        this.functionBody = codeInfo.functionBody;
-        this.supplementalCode = codeInfo.supplementalCode;
+    //set the base data
+    this.argList = codeInfo.argList;
+    this.functionBody = codeInfo.functionBody;
+    this.supplementalCode = codeInfo.supplementalCode;
+    this.codeSet = true;
+
+    if(codeInfo.actionError) {
+        this.setCodeError(codeInfo.actionError);
+    }
+    else {
 
         //save the variables accessed
         this.varInfo = codeInfo.varInfo;
@@ -99,40 +105,82 @@ visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
         //save the object functions
         this.contextSetter = codeInfo.contextSetter;
         this.objectFunction = codeInfo.objectFunction;
-		
-		//clear any code error
-		this.codeError = null;
 
-        //update dependencies
-        this.updateDependencies(codeInfo.dependencyList);
+        //clear any code error
+        this.codeError = null;
+    }
+
+    //update dependencies
+    this.updateDependencies(codeInfo.dependencyList);
 }
 
 /** This method udpates the dependencies if needed because
  *the passed variable was added.  */
-visicomp.core.Codeable.updateForAddedVariable = function(object) {
-    if(this.hasCode()) {
-        //we need a function that calculates the dependencies
-        //for now I will just always recalculate, if there is 
-        var possibleDependency = true;
-        if(possibleDependency) {
-            this.recalculateDependencies();
+visicomp.core.Codeable.updateForAddedVariable = function(addedMember,recalculateList) {
+    if((this.hasCode())&&(this.varInfo)) {
+            
+        var newDependencyList;
+        try {
+            
+            //calculate new dependencies
+            newDependencyList = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo,
+               this.getParent(),
+               this.getRootFolder());
         }
+        catch(error) {
+            //error for this member
+            var actionError = visicomp.core.ActionError.processMemberModelException(error,this);
+            this.setCodeError(actionError);
+            
+            //set a dummy dependency list
+            newDependencyList = [];
+        }
+            
+        //update this object if the new table is in the list
+        if(newDependencyList.indexOf(addedMember) >= 0) {
+            //update dependencies
+            this.updateDependencies(newDependencyList);
+
+            //add to update list
+            visicomp.core.calculation.addToRecalculateList(recalculateList,this);
+        }
+        
     }
 }
 
 /** This method udpates the dependencies if needed because
  *the passed variable was deleted.  */
-visicomp.core.Codeable.updateForDeletedVariable = function(object) {
+visicomp.core.Codeable.updateForDeletedVariable = function(deletedMember,recalculateList) {
     if(this.hasCode()) {
         var dependsOnList = this.getDependsOn();
-        if(dependsOnList.indexOf(object) >= 0) {
-            this.recalculateDependencies();
+        if(dependsOnList.indexOf(deletedMember) >= 0) {
+            
+            if(!this.varInfo) return;
+    
+            try {
+                //calculate dependencies
+               var dependencyList = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo,
+                   this.getParent(),
+                   this.getRootFolder());
+            }
+            catch(error) {
+                //unknown application error
+                var actionError = visicomp.core.ActionError.processMemberModelException(error,this);
+                this.setCodeError(actionError);
+            }
+
+            //update dependencies
+            this.updateDependencies(dependencyList); 
+
+            //add to update list
+            visicomp.core.calculation.addToRecalculateList(recalculateList,this);
         }
     }
 }
 
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.clearCode = function() {
+    this.codeSet = false;
     this.functionBody = "";
     this.supplementalCode = "";
     this.varInfo = null;
@@ -146,20 +194,19 @@ visicomp.core.Codeable.clearCode = function() {
 
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.hasCode = function() {
-    return (this.objectFunction !== null);
+    return this.codeSet;
 }
 
 /** If this is true the member must be executed. 
  * @private */
 visicomp.core.Codeable.needsExecuting = function() {
-	return (this.objectFunction != null);
+	return this.codeSet;
 }
 
 
 /** This updates the member data based on the function. It returns
  * true for success and false if there is an error.  */
 visicomp.core.Codeable.execute = function() {
-    if(!this.objectFunction) return false;
 	
 	//don't calculate if this has an error.
 	//do pass the error on to be a data error.
@@ -169,6 +216,12 @@ visicomp.core.Codeable.execute = function() {
 	}
     else if(this.hasCircRefError()) {
         this.setDataError(this.getCircRefError());
+        return false;
+    }
+    
+    if((!this.objectFunction)||(!this.contextSetter)) {
+        var actionError = new visicomp.core.ActionError("Function not found for member: " + this.getName(),this);
+        this.setDataError(actionError);
         return false;
     }
     
@@ -275,7 +328,6 @@ visicomp.core.Codeable.checkDependencyError = function() {
             message += errorDependencies[i].getFullName();
         }
         var actionError = new visicomp.core.ActionError(message,this);
-        actionError.setDependencyError(true);
         this.setDataError(actionError);   
         
         return true;
@@ -283,23 +335,5 @@ visicomp.core.Codeable.checkDependencyError = function() {
     else {
         //no dependency error
         return false;
-    }
-}
-
-/** This method recalculates the dependencies for this object, given a change
- * in variables in the workspace. 
- * @private */
-visicomp.core.Codeable.recalculateDependencies = function() {
-     //calculate dependencies
-	var dependencyList = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo,
-        this.getParent(),
-        this.getRootFolder());
-    
-    //update dependencies
-    this.updateDependencies(dependencyList); 
-    
-    //reexecute, if needed
-    if(this.needsExecuting()) {
-        this.execute();
     }
 }

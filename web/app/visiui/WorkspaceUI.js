@@ -1,18 +1,24 @@
 /** This class manages the user interface for a workspace object. The argument
  * uiInitData is optional and should be included if the workspace is not empty. It
  * contains the information of how to create controls for the workspace data. */
-visicomp.app.visiui.WorkspaceUI = function(app,tab) {
+visicomp.app.visiui.WorkspaceUI = function() {
 
     this.workspace = null;
 	
     //properties
-	this.app = app;
-    this.tab = tab;
+	this.app = null;
+    this.tab = null;
     this.controlMap = {};
     this.activeFolderName = null;
    
     this.jsLinkArray = [];
     this.cssLinkArray = [];
+}
+
+/** This sets the application. It must be done before the workspace is set. */
+visicomp.app.visiui.WorkspaceUI.prototype.setApp = function(app,tab) {
+    this.app = app;
+    this.tab = tab;
 }
 
  /** This method sets the workspace. The argument controlsJson should be included
@@ -39,7 +45,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace, con
     var memberUpdatedCallback = function(memberObject) {
         instance.memberUpdated(memberObject);
     }
-    this.workspace.addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, memberUpdatedCallback);
+    this.workspace.addListener(visicomp.core.updatemember.MEMBER_UPDATED_EVENT, memberUpdatedCallback);
 	
 	//add child deleted listener
     var childDeletedListener = function(fullName) {
@@ -223,6 +229,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.loadControlFromJson = function(member,
 visicomp.app.visiui.WorkspaceUI.prototype.getJsLinks = function() {
 	return this.jsLinkArray;
 }
+
 //GET RUID OF NAME ARG!!!
 visicomp.app.visiui.WorkspaceUI.prototype.setLinks = function(newJsLinkArray,newCssLinkArray,onLinksLoaded,name) {
     //update the page links
@@ -236,7 +243,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.setLinks = function(newJsLinkArray,new
 	
     this.jsLinkArray = newJsLinkArray;
 	this.cssLinkArray = newCssLinkArray;
-	this.app.updateWorkspaceLinks(/*this.workspace.getName()*/name,addList,removeList,onLinksLoaded);;
+	this.app.updateWorkspaceLinks(name,addList,removeList,onLinksLoaded);;
 }
 
 visicomp.app.visiui.WorkspaceUI.prototype.getCssLinks = function() {

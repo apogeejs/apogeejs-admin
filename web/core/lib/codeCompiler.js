@@ -4,24 +4,16 @@ visicomp.core.codeCompiler = {};
 /** This method analyzes the code and creates the object function and dependencies. 
  * The results are loaded into the passed object processedCodeData.
  * @private */
-visicomp.core.codeCompiler.processCode = function(argList,
-        functionBody,
-        supplementalCode,
+visicomp.core.codeCompiler.processCode = function(codeInfo,
         localFolder,
         rootFolder,
         codeLabel) {
     
-    //create the code info struct to carry the data
-    var codeInfo ={};
-    codeInfo.argList = argList;
-    codeInfo.functionBody = functionBody;
-    codeInfo.supplementalCode = supplementalCode;
-    
     //analyze the code
     var combinedFunctionBody = visicomp.core.codeCompiler.createCombinedFunctionBody(
-        argList, 
-        functionBody, 
-        supplementalCode, 
+        codeInfo.argList, 
+        codeInfo.functionBody, 
+        codeInfo.supplementalCode, 
         codeLabel);
         
     //get the accessed variables

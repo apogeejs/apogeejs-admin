@@ -55,6 +55,15 @@ visicomp.app.visiui.WorksheetControl.prototype.populateFrame = function() {
     menuItemInfoList.splice(0,0,itemInfo1,itemInfo2);
 }
 
+/** This method updates the table data 
+ * @private */    
+visicomp.app.visiui.WorksheetControl.prototype.memberUpdated = function() {
+}
+
+//=============================
+// Action UI Entry Points
+//=============================
+
 /** This method creates a callback for editing a standard codeable object
  *  @private */
 visicomp.app.visiui.WorksheetControl.prototype.createEditArgListDialogCallback = function() {
@@ -92,11 +101,6 @@ visicomp.app.visiui.WorksheetControl.prototype.createEditReturnValueDialogCallba
     }
 }
 
-/** This method updates the table data 
- * @private */    
-visicomp.app.visiui.WorksheetControl.prototype.memberUpdated = function() {
-}
-
 //======================================
 // Static methods
 //======================================
@@ -109,15 +113,10 @@ visicomp.app.visiui.WorksheetControl.createControl = function(workspaceUI,parent
     json.type = visicomp.core.Worksheet.generator.type;
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
-    if(actionResponse.success) {
-        var worksheet = actionResponse.member;
+    var worksheet = actionResponse.member;
+    if(actionResponse.getSuccess()) {
         var worksheetControl = new visicomp.app.visiui.WorksheetControl(workspaceUI,worksheet);
         actionResponse.control = worksheetControl;
-    }
-    else {
-        //show an error message, howver we will close dialog whether object was
-		//created or not.
-		visicomp.app.visiui.Control.processActionReponse(actionResponse);
     }
     return actionResponse;
 }

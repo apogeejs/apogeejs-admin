@@ -72,22 +72,9 @@ dataEditor.$blockScrolling = Infinity;
             data = "";
         }
 		
-        var editComplete = undefined;
-        try {
-            editComplete = onSaveFunction(data);
-
-            if(editComplete) {
-                closeDialog();
-            }
-        }
-        finally {
-            if(editComplete === undefined) {
-                //this catches exceptions thrown in update. This should be user
-                //code errors that we want to capture in the debugger for now
-                alert("There was an error calculating the result. It will be captured in the debugger.");
-                closeDialog();
-            }
-
+        var complete = onSaveFunction(data);
+        if(complete) {
+            closeDialog();
         }
     }
     

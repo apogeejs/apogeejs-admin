@@ -1,5 +1,5 @@
 /** This is the workspace. */
-visicomp.core.Workspace = function(nameOrJson) {
+visicomp.core.Workspace = function(nameOrJson,actionResponseForJson) {
     //base init
     visicomp.core.EventManager.init.call(this);
     visicomp.core.Owner.init.call(this);
@@ -11,7 +11,7 @@ visicomp.core.Workspace = function(nameOrJson) {
         this.rootFolder = new visicomp.core.Folder(this,nameOrJson);
     }
     else {
-        this.loadFromJson(nameOrJson);
+        this.loadFromJson(nameOrJson,actionResponseForJson);
     }
 }
 
@@ -36,14 +36,14 @@ visicomp.core.Workspace.prototype.getRootFolder = function() {
 
 /** This method updates the dependencies of any children in the workspace
  * based on an object being added. */
-visicomp.core.Workspace.prototype.updateForAddedVariable = function(object) {
-    this.rootFolder.updateForAddedVariable(object);
+visicomp.core.Workspace.prototype.updateForAddedVariable = function(object,recalculateList) {
+    this.rootFolder.updateForAddedVariable(object,recalculateList);
 }
 
 /** This method updates the dependencies of any children in the workspace
  * based on an object being deleted. */
-visicomp.core.Workspace.prototype.updateForDeletedVariable = function(object) {
-    this.rootFolder.updateForAddedVariable(object);
+visicomp.core.Workspace.prototype.updateForDeletedVariable = function(object,recalculateList) {
+    this.rootFolder.updateForDeletedVariable(object,recalculateList);
 }
 
 /** This method removes any data from this workspace. */
@@ -89,7 +89,7 @@ visicomp.core.Workspace.prototype.toJson = function() {
 
 /** This is loads data from the given json into this workspace. 
  * @private */
-visicomp.core.Workspace.prototype.loadFromJson = function(json) {
+visicomp.core.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     var fileType = json.fileType;
 	if(fileType !== visicomp.core.Workspace.SAVE_FILE_TYPE) {
 		throw visicomp.core.util.createError("Bad file format.");
@@ -105,13 +105,8 @@ visicomp.core.Workspace.prototype.loadFromJson = function(json) {
     this.rootFolder = visicomp.core.Folder.fromJson(this,json.data,updateDataList);
     
     //set the data on all the objects
-    var actionResponse;
     if(updateDataList.length > 0) {
-        actionResponse = visicomp.core.updatemember.updateObjects(updateDataList);
-//            
-//        if(!result.success) {
-//            throw visicomp.core.util.createError(result.msg);
-//        }
+        actionResponse = visicomp.core.updatemember.updateObjects(updateDataList,actionResponse);
     }
 }
 

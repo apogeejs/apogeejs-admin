@@ -102,22 +102,22 @@ visicomp.core.Folder.prototype.updateData = function(child) {
 
 /** This method updates the dependencies of any children
  * based on an object being added. */
-visicomp.core.Folder.prototype.updateForAddedVariable = function(object) {
+visicomp.core.Folder.prototype.updateForAddedVariable = function(object,recalculateList) {
     for(var key in this.childMap) {
         var child = this.childMap[key];
         if(child.isDependent) {
-            child.updateForAddedVariable(object);
+            child.updateForAddedVariable(object,recalculateList);
         }
     }
 }
 
 /** This method updates the dependencies of any children
  * based on an object being deleted. */
-visicomp.core.Folder.prototype.updateForDeletedVariable = function(object) {
+visicomp.core.Folder.prototype.updateForDeletedVariable = function(object,recalculateList) {
     for(var key in this.childMap) {
         var child = this.childMap[key];
         if(child.isDependent) {
-            child.updateForDeletedVariable(object);
+            child.updateForDeletedVariable(object,recalculateList);
         }
     }
 }
@@ -138,19 +138,12 @@ visicomp.core.Folder.prototype.getBaseName = function() {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.Folder.fromJson = function(owner,json,updateDataList) {
+visicomp.core.Folder.fromJson = function(owner,json,updateDataList,actionResponse) {
     var folder = new visicomp.core.Folder(owner,json.name);
     
     for(var key in json.children) {
         var childJson = json.children[key];
-        var childGenerator = visicomp.core.Workspace.getMemberGenerator(childJson.type);
-        if(childGenerator) {
-            var child = childGenerator.createMember(folder,childJson,updateDataList);
-        }
-        else {
-            throw visicomp.core.util.createError("Member type not found: " + childJson.type);
-        }
-        
+        var child = visicomp.core.createmember.instantiateMember(folder,json,updateDataList,actionResponse);
     }
     
     return folder;

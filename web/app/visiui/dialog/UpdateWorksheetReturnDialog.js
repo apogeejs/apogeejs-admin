@@ -33,22 +33,11 @@ visicomp.app.visiui.dialog.showUpdateWorksheetReturnDialog = function(worksheet,
         //parse the arg list into an array
         var returnValue = inputElement.value.trim();
         
-        var editComplete = undefined;
-        try {
-            editComplete = onSaveFunction(returnValue);
-            
-            if(editComplete) {
-                dialog.hide();
-            }
+        var complete = onSaveFunction(returnValue);   
+        if(complete) {
+            dialog.hide();
         }
-        finally {
-            if(editComplete === undefined) {
-                //this catches exceptions thrown in update. This should be user
-                //code errors that we want to capture in the debugger for now
-                alert("There was an error calculating the result. It will be captured in the debugger.");
-                dialog.hide();
-            }
-        }
+
     }
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onSave}));
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));

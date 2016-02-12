@@ -31,18 +31,6 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
     var onCancel = function() {
         dialog.hide();
     }
-	
-	//this callback processes the return value from onOpen, since that function
-	//runs (or may run) asynchronously
-	var onOpenResult = function(result) {
-        if(!result.success) {
-            alert("There was an error opening the workspace: " + result.msg);
-            return;
-        }
-        
-        //if we get here we should close the dialog
-        dialog.hide();
-    }
     
     var onOpen = function() {
         var jsonText = inputElement.value;
@@ -51,7 +39,10 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
             return;
         }
         
-        onOpenFunction(jsonText,onOpenResult);
+        var closeDialog = onOpenFunction(jsonText);
+        if(closeDialog) {
+            dialog.hide();
+        }
 	}
     
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Open","onclick":onOpen}));

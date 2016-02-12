@@ -29,7 +29,7 @@ visicomp.core.Worksheet = function(owner,name) {
             this.virtualWorkspace = null;
         }    
     }
-    this.getWorkspace().addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, memberUpdatedCallback);
+    this.getWorkspace().addListener(visicomp.core.updatemember.MEMBER_UPDATED_EVENT, memberUpdatedCallback);
 }
 
 //add components to this class
@@ -86,7 +86,12 @@ visicomp.core.Worksheet.prototype.onDelete = function() {
     var returnValue;
     
     if(this.internalFolder) {
-        returnValue = visicomp.core.deletechild.deleteChild(this.internalFolder);
+        var actionResponse = visicomp.core.deletechild.deleteChild(this.internalFolder);
+        if(!actionResponse.getSuccess()) {
+            //show an error message
+            var msg = actionResponse.getErrorMsg();
+            alert(msg);
+        }
     }
     
 //I don't know what to do if this fails. Figure that out.
@@ -98,7 +103,7 @@ visicomp.core.Worksheet.prototype.onDelete = function() {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.Worksheet.fromJson = function(owner,json,updateDataList) {
+visicomp.core.Worksheet.fromJson = function(owner,json,updateDataList,actionResponse) {
     var worksheet = new visicomp.core.Worksheet(owner,json.name);
     if(json.argList !== undefined) {
         worksheet.setArgList(json.argList);
@@ -109,7 +114,7 @@ visicomp.core.Worksheet.fromJson = function(owner,json,updateDataList) {
     
     //recreate the root folder if info is specified
     if(json.internalFolder) {
-        worksheet.internalFolder = visicomp.core.Folder.fromJson(worksheet,json.internalFolder,updateDataList);
+        worksheet.internalFolder = visicomp.core.Folder.fromJson(worksheet,json.internalFolder,updateDataList,actionResponse);
     }
     
     return worksheet;
@@ -179,12 +184,14 @@ visicomp.core.Worksheet.prototype.getWorksheetFunction = function() {
         
         //do the update
         var actionResponse = visicomp.core.updatemember.updateObjects(updateDataList);        
-        if(actionResponse.success) {
+        if(actionResponse.getSuccess()) {
             //retrieve the result
             return instance.loadOutputElement(rootFolder);
         }
         else {
-            instance.setError("Error!");
+            //show an error message
+            var msg = actionResponse.getErrorMsg();
+            alert(msg);
         }
     }
     
@@ -200,8 +207,10 @@ visicomp.core.Worksheet.prototype.getVirtualWorkspace = function() {
         var tempRootFolder = visicomp.core.Folder.fromJson(tempWorkspace,json,updateDataList);
         tempWorkspace.rootFolder = tempRootFolder;
         var actionResponse = visicomp.core.updatemember.updateObjects(updateDataList);
-        if(!actionResponse.success) {
-            this.setError("Error!");
+        if(!actionResponse.getSuccess()) {
+            //show an error message
+            var msg = actionResponse.getErrorMsg();
+            alert(msg);
         }
         
         this.virtualWorkspace = tempWorkspace;

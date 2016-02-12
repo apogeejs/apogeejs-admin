@@ -16,22 +16,6 @@ visicomp.core.util.mixin(visicomp.app.visiui.CustomResourceControl,visicomp.app.
 // Protected and Private Instance Methods
 //==============================
 
-visicomp.app.visiui.CustomResourceControl.prototype.update = function(html,processorGeneratorBody,supplementalCode,css) {
-	
-	//create a new resource processor
-	var newProcessor = new visicomp.app.visiui.CustomResourceProcessor();
-	newProcessor.setWindow(this.getWindow());
-	
-	//update it
-	newProcessor.update(html,processorGeneratorBody,supplementalCode,css);
-	
-	//update the resource
-	var resource = this.getObject();
-	resource.updateResourceProcessor(newProcessor);
-    
-    this.memberUpdated();
-}
-
 visicomp.app.visiui.CustomResourceControl.prototype.initEmptyProcessor = function() {
 	this.update("","","","");
 }
@@ -49,22 +33,6 @@ visicomp.app.visiui.CustomResourceControl.prototype.addToFrame = function() {
     //add these at the start of the menu
     menuItemInfoList.splice(1,0,itemInfo);
 
-}
-
-visicomp.app.visiui.CustomResourceControl.prototype.createEditResourceDialogCallback = function() {
-    
-    var instance = this;
-    
-    //create save handler
-    var onSave = function(controlHtml,controlOnLoad,supplementalCode,css) {
-		instance.update(controlHtml,controlOnLoad,supplementalCode,css);
-//figure out what to do with return here
-		return {"success":true};
-    };
-    
-    return function() {
-        visicomp.app.visiui.dialog.showUpdateCustomControlDialog(instance,onSave);
-    }
 }
 
 /** This serializes the table control. */
@@ -96,6 +64,65 @@ visicomp.app.visiui.CustomResourceControl.prototype.updateFromJson = function(js
     
 }
 
+//=============================
+// Action UI Entry Points
+//=============================
+
+visicomp.app.visiui.CustomResourceControl.prototype.createEditResourceDialogCallback = function() {
+    
+    var instance = this;
+    
+    //create save handler
+    var onSave = function(controlHtml,controlOnLoad,supplementalCode,css) {
+		var actionResponse = instance.update(controlHtml,controlOnLoad,supplementalCode,css);
+        if(!actionResponse.getSuccess()) {
+            alert(actionResponse.getErrorMsg());
+        }
+		return true
+    };
+    
+    return function() {
+        visicomp.app.visiui.dialog.showUpdateCustomControlDialog(instance,onSave);
+    }
+}
+
+//=============================
+// Action
+//=============================
+
+visicomp.app.visiui.CustomResourceControl.prototype.update = function(html,processorGeneratorBody,supplementalCode,css) {
+	var actionResponse = new visicomp.core.ActionResponse();
+    var resource = this.getObject();
+    
+    try { 
+        //create a new resource processor
+        var newProcessor = new visicomp.app.visiui.CustomResourceProcessor();
+        newProcessor.setWindow(this.getWindow());
+
+        //update it
+        newProcessor.update(html,processorGeneratorBody,supplementalCode,css);
+
+        //update the resource
+        resource.updateResourceProcessor(newProcessor);
+
+        this.memberUpdated();
+    }
+    catch(error) {
+        //user application error
+        if(error.stack) {
+            console.error(error.stack);
+        }
+        var errorMsg = error.message ? error.message : visicomp.core.ActionError.UNKNOWN_ERROR_MESSAGE;
+        var actionError = new visicomp.core.ActionError(errorMsg,resource,visicomp.core.util.ACTION_ERROR_USER_APP);
+        actionError.setParentException(error);
+        
+        actionResponse.addError(actionError);
+    }
+    
+    return actionResponse; 
+}
+
+
 //======================================
 // Static methods
 //======================================
@@ -107,9 +134,8 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,p
     json.type = visicomp.core.Resource.generator.type;
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
-    if(actionResponse.success) {
-        var resource = actionResponse.member;
-        
+    var resource = actionResponse.member;
+    if(resource) {
         //create the control
         var customResourceControl = new visicomp.app.visiui.CustomResourceControl(workspaceUI,resource);
         actionResponse.control = customResourceControl;
@@ -120,13 +146,7 @@ visicomp.app.visiui.CustomResourceControl.createControl = function(workspaceUI,p
         //the resource. 
         //In cases where the resourceProcessor does not save data in the json, which
         //is the typical scenario, then this is not an issue.
-        customResourceControl.initEmptyProcessor();
-        
-    }
-    else {
-        //show an error message, howver we will close dialog whether object was
-		//created or not.
-		visicomp.app.visiui.Control.processActionReponse(actionResponse);
+        customResourceControl.initEmptyProcessor(); 
     }
     return actionResponse;
 }

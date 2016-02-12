@@ -45,6 +45,11 @@ visicomp.core.Dependent.getDependsOn = function() {
 /** This sets the dependencies based on the code for the member. 
  * @private */
 visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
+    
+    if(!newDependsOn) {
+        newDependsOn = [];
+    }
+    
 	//retireve the old list
     var oldDependsOn = this.dependsOnList;
 	
@@ -58,7 +63,7 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
     for(i = 0; i < newDependsOn.length; i++) {
         remoteMember = newDependsOn[i];
         
-        //make sure this is a dependent
+        //make sure this is a dependent - this is an application error if this happens
         if(!remoteMember.isImpactor) {
             throw visicomp.core.util.createError("The object " + remoteMember.getFullName() + " cannot be referenced as a dependent.");
         }

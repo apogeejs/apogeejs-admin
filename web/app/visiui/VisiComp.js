@@ -27,8 +27,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 	this.createUI(containerId);
 	
 	//create a default workspace 
-//I don't handle a failed return here!
-	this.createWorkspace(visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME);
+    visicomp.app.visiui.createworkspace.createWorkspace(this,visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME);
 	
 }
 	
@@ -75,150 +74,9 @@ visicomp.app.visiui.VisiComp.prototype.getActiveWorkspace = function() {
 // Workspace Management
 //==================================
 
-/** This method initiatees the open workspace procedure. */
-visicomp.app.visiui.VisiComp.prototype.newWorkspaceRequested = function() {
-    var instance = this;
-    var onCreate = function(name) {
-        return instance.createWorkspace(name);
-    }
-    visicomp.app.visiui.dialog.showCreateWorkspaceDialog(onCreate); 
-}
-
-/** This method initiatees the open workspace procedure. */
-visicomp.app.visiui.VisiComp.prototype.openWorkspaceRequested = function() {
-    var instance = this;
-    var onOpen = function(workspaceData,resultCallback) {
-        instance.openWorkspace(workspaceData,resultCallback);
-    }
-    visicomp.app.visiui.dialog.showOpenWorkspaceDialog(onOpen);
-}
-
-/** This method initiatees the save workspace procedure. */
-visicomp.app.visiui.VisiComp.prototype.saveWorkspaceRequested = function() {
-    var activeWorkspaceUI = this.getActiveWorkspaceUI();
-    if(activeWorkspaceUI === null) {
-        alert("There is no open workspace.");
-        return;
-    }
-
-    visicomp.app.visiui.dialog.showSaveWorkspaceDialog(this, activeWorkspaceUI);
-}
-
-/** This method creates a new workspace. */
-visicomp.app.visiui.VisiComp.prototype.createWorkspace = function(name) {
-    var returnValue = {};
-    
-    try {
-        //make the workspace ui
-        var workspaceUI = this.makeWorkspaceUI(name);
-        var workspace = new visicomp.core.Workspace(name);
-        workspaceUI.setWorkspace(workspace);
-    
-        returnValue.success = true;
-        returnValue.workspaceUI = workspaceUI;
-    }
-    catch(error) {
-        returnValue.success = false;
-        returnValue.msg = error.message;
-    }
-    
-    return returnValue; 
-}
-
-/** This method opens an workspace, from the text file. 
- * The result is returnd through the callback function rather than a return value,
- * since the function runs (or may run) asynchronously. */
-visicomp.app.visiui.VisiComp.prototype.openWorkspace = function(workspaceText,resultCallback) {
-    var returnValue = {};
-    
-    try {
-        var workspaceJson = JSON.parse(workspaceText);
-
-//I should verify the file type and format!    
-
-		//make a blank workspace
-		//we might need to load the links before we can deserialize the json
-        var name = workspaceJson.workspace.name;
-        var workspaceUI =  this.makeWorkspaceUI(name);
-    
-        //add links
-		var jsLinks;
-		var cssLinks;
-        var linksAdded = false;
-        if((workspaceJson.jsLinks)&&(workspaceJson.jsLinks.length > 0)) {
-            jsLinks = workspaceJson.jsLinks;
-            linksAdded = true;
-        }
-		else {
-			jsLinks = [];
-		}
-        if((workspaceJson.cssLinks)&&(workspaceJson.cssLinks.length > 0)) {
-			cssLinks = workspaceJson.cssLinks;
-            linksAdded = true;
-        }
-		else {
-			cssLinks = [];
-		}
-    	
-		//if we have to load links wait for them to load
-		if(linksAdded) {
-			//deserialize workspace after the links load
-            var instance = this;
-			var onLinksLoaded = function() {
-				var returnValue = instance.loadWorkspace(workspaceUI,workspaceJson);
-				resultCallback(returnValue);
-			}
-			workspaceUI.setLinks(jsLinks,cssLinks,onLinksLoaded,name);
-		}
-		else {
-			//no need to wait to load workspace
-			var returnValue = this.loadWorkspace(workspaceUI,workspaceJson);
-			resultCallback(returnValue);
-		}
-    }
-    catch(error) {
-		console.error(error.stack);
-        returnValue.success = false;
-        returnValue.msg = error.message;
-		resultCallback(returnValue);
-    }
-}
-
-/** This method closes the active workspace. */
-visicomp.app.visiui.VisiComp.prototype.closeWorkspace = function() {
-    var returnValue = {};
-    
-    //add some kind of warnging!!
-    try {
-        var activeWorkspaceUI = this.getActiveWorkspaceUI();
-        if(activeWorkspaceUI === null) {
-            returnValue.success = false;
-            returnValue.msg = "There is no open workspace.";
-            return returnValue;
-        }
-
-        var workspace = activeWorkspaceUI.getWorkspace();
-
-        var name = workspace.getName();
-
-        //remove the workspace from the app
-        delete this.workspaceUIs[name];
-        this.tabFrame.removeTab(name);
-        workspace.close();
-        
-        returnValue.success = true;
-    }
-    catch(error) {
-        returnValue.success = false;
-        returnValue.msg = error.message;
-    }
-    
-    return returnValue;
-}
-
 /** This method makes an empty workspace ui object. 
  * @private */
-visicomp.app.visiui.VisiComp.prototype.makeWorkspaceUI = function(name) {
+visicomp.app.visiui.VisiComp.prototype.addWorkspaceUI = function(workspaceUI,name) {
     
     //we can only have one workspace of a given name!
     if(this.workspaceUIs[name]) {
@@ -226,61 +84,25 @@ visicomp.app.visiui.VisiComp.prototype.makeWorkspaceUI = function(name) {
     }
     
 	var tab = this.tabFrame.addTab(name);
-//    this.tabFrame.setActiveTab(name);
-    var workspaceUI = new visicomp.app.visiui.WorkspaceUI(this,tab);
+    workspaceUI.setApp(this,tab);
     this.workspaceUIs[name] = workspaceUI;
-    
-    return workspaceUI;
 }
 
-/** This method loads an existing workspace into an empty workspace UI. */
-visicomp.app.visiui.VisiComp.prototype.loadWorkspace = function(workspaceUI,workspaceJson) {
-    var workspaceDataJson = workspaceJson.workspace;
-    var workspaceControlsJson = workspaceJson.controls;
+/** This method closes the active workspace. */
+visicomp.app.visiui.VisiComp.prototype.removeWorkspaceUI = function(workspaceUI) {
 
-    var workspace = new visicomp.core.Workspace(workspaceDataJson);
-    
-    workspaceUI.setWorkspace(workspace,workspaceControlsJson);
-	
-	return {"success":true};
-}
+    var workspace = workspaceUI.getWorkspace();
 
-//==================================
-// Additional Control
-//==================================
+    var name = workspace.getName();
 
-/** This method lets the user add an additional control from a list of types. */
-visicomp.app.visiui.VisiComp.prototype.addAdditionalControl = function() {
-    var instance = this;
-    
-    var onSelect = function(controlType) {
-        var generator = instance.controlGenerators[controlType];
-        if(generator) {
-            var showDialog = instance.getOnCreateRequestedCallback(generator);
-            showDialog();
-        }
-        else {
-            alert("Unknown control type: " + controlType);
-        }
-    }
-    //open select control dialog
-    visicomp.app.visiui.dialog.showSelectControlDialog(this.additionalControls,onSelect);
-    
+    //remove the workspace from the app
+    delete this.workspaceUIs[name];
+    this.tabFrame.removeTab(name);
 }
 
 //==================================
 // Link Management
 //==================================
-
-/** This method initiates the process of updaing the external links. */
-visicomp.app.visiui.VisiComp.prototype.updateLinksRequested = function() {
-    var activeWorkspaceUI = this.getActiveWorkspaceUI();
-    if(!activeWorkspaceUI) {
-        alert("There is no open workspace.");
-        return;
-    }
-    visicomp.app.visiui.dialog.showUpdateLinksDialog(activeWorkspaceUI);
-}
 
 /** This method adds links as registered by a given workspace. Links can be added and
  * removed. Removing links may or may not remove them from the page (currently
@@ -366,22 +188,21 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     
     //create the menus
     var menu;
-    var instance = this;
 
     //Workspace menu
     menu = visicomp.visiui.Menu.createMenu("Workspace");
     menuBar.appendChild(menu.getElement());
     
-    var newCallback = function() {instance.newWorkspaceRequested()};
+    var newCallback = visicomp.app.visiui.createworkspace.getCreateCallback(this);
     menu.addCallbackMenuItem("New",newCallback);
     
-    var openCallback = function() {instance.openWorkspaceRequested()};
+    var openCallback = visicomp.app.visiui.openworkspace.getOpenCallback(this);
     menu.addCallbackMenuItem("Open",openCallback);
     
-    var saveCallback = function() {instance.saveWorkspaceRequested()};
+    var saveCallback = visicomp.app.visiui.saveworkspace.getSaveCallback(this);
     menu.addCallbackMenuItem("Save",saveCallback);
     
-    var closeCallback = function() {instance.closeWorkspace()};
+    var closeCallback = visicomp.app.visiui.closeworkspace.getCloseCallback(this);
     menu.addCallbackMenuItem("Close",closeCallback);	
 	
     //Controls Menu
@@ -392,19 +213,19 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
         var key = this.standardControls[i];
         var generator = this.controlGenerators[key];
         var title = visicomp.app.visiui.VisiComp.convertSpacesForHtml("Add " + generator.displayName);
-        var callback = this.getOnCreateRequestedCallback(generator);
+        var callback = visicomp.app.visiui.addcontrol.getAddControlCallback(this,generator);
         menu.addCallbackMenuItem(title,callback);
     }
     
     //add the additional control item
-    var controlCallback = function(){instance.addAdditionalControl()};
+    var controlCallback = visicomp.app.visiui.addadditionalcontrol.getAddAdditionalControlCallback(this,generator);
     menu.addCallbackMenuItem("Other&nbsp;Controls...",controlCallback);
     
     //libraries menu
     menu = visicomp.visiui.Menu.createMenu("Libraries");
     menuBar.appendChild(menu.getElement());
     
-    var linksCallback = function() {instance.updateLinksRequested()};
+    var linksCallback = visicomp.app.visiui.updatelinks.getUpdateLinksCallback(this);
     menu.addCallbackMenuItem("Update&nbsp;Links",linksCallback);
 
     //----------------------
@@ -414,16 +235,6 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     container.appendChild(this.tabFrame.getElement());
     this.tabFrame.resizeElement();
     
-}
-/** This shows the create control dialog. */
-visicomp.app.visiui.VisiComp.prototype.getOnCreateRequestedCallback = function(generator) {
-    var instance = this;
-    return function() {
-        visicomp.app.visiui.dialog.showCreateChildDialog(generator.displayName,
-            instance,
-            generator.createControl
-        );
-    }
 }
 
 //=================================

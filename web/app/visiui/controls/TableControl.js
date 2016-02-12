@@ -99,6 +99,10 @@ visicomp.app.visiui.TableControl.prototype.showData = function(dataText) {
     this.editor.getSession().setValue(dataText);
 }
 
+//=============================
+// Action UI Entry Points
+//=============================
+
 /** This method displays the edit data dialog for this control. 
  * @private */
 visicomp.app.visiui.TableControl.prototype.createEditDataDialog = function() {
@@ -107,8 +111,14 @@ visicomp.app.visiui.TableControl.prototype.createEditDataDialog = function() {
     //create save handler
     var onSave = function(data) {
         var actionResponse = visicomp.core.updatemember.updateData(instance.getObject(),data);
-        var closeDialog = instance.processActionReponse(actionResponse);
-        return closeDialog;  
+        if(!actionResponse.getSuccess()) {
+            //show an error message
+            var msg = actionResponse.getErrorMsg();
+            alert(msg);
+        }
+        
+        //return true to close the dialog
+        return true;  
     };
     
     return function() {
@@ -128,15 +138,10 @@ visicomp.app.visiui.TableControl.createControl = function(workspaceUI,parent,nam
     json.type = visicomp.core.Table.generator.type;
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
-    if(actionResponse.success) {
-        var table = actionResponse.member;
+    var table = actionResponse.member;
+    if(table) {
         var tableControl = new visicomp.app.visiui.TableControl(workspaceUI,table);
         actionResponse.control = tableControl;
-    }
-    else {
-        //show an error message, howver we will close dialog whether object was
-		//created or not.
-		visicomp.app.visiui.Control.processActionReponse(actionResponse);
     }
     return actionResponse;
 }

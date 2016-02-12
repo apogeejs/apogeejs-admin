@@ -37,21 +37,9 @@ visicomp.app.visiui.dialog.showUpdateArgListDialog = function(object,onSaveFunct
             argList[i] = argList[i].trim();
         }
         
-        var editComplete = undefined;
-        try {
-            editComplete = onSaveFunction(argList);
-            
-            if(editComplete) {
-                dialog.hide();
-            }
-        }
-        finally {
-            if(editComplete === undefined) {
-                //this catches exceptions thrown in update. This should be user
-                //code errors that we want to capture in the debugger for now
-                alert("There was an error calculating the result. It will be captured in the debugger.");
-                dialog.hide();
-            }
+        var complete = onSaveFunction(argList);  
+        if(complete) {
+            dialog.hide();
         }
     }
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onSave}));

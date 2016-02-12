@@ -91,6 +91,10 @@ visicomp.app.visiui.FunctionControl.prototype.showError = function(actionError) 
     this.editor.getSession().setValue("ERROR: " + actionError.msg);
 }
 
+//=============================
+// Action UI Entry Points
+//=============================
+
 /** This method creates a callback for editing a standard codeable object
  *  @private */
 visicomp.app.visiui.FunctionControl.prototype.createEditArgListDialogCallback = function() {
@@ -102,8 +106,14 @@ visicomp.app.visiui.FunctionControl.prototype.createEditArgListDialogCallback = 
         var functionBody = member.getFunctionBody();
         var supplementalCode = member.getSupplementalCode();
         var actionResponse = visicomp.core.updatemember.updateCode(member,argList,functionBody,supplementalCode);
-        var closeDialog = instance.processActionReponse(actionResponse);
-        return closeDialog;  
+        if(!actionResponse.getSuccess()) {
+            //show an error message
+            var msg = actionResponse.getErrorMsg();
+            alert(msg);
+        }
+        
+        //return true to close the dialog
+        return true;  
     };
     
     return function() {
@@ -123,15 +133,10 @@ visicomp.app.visiui.FunctionControl.createControl = function(workspaceUI,parent,
     json.type = visicomp.core.FunctionTable.generator.type;
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
-    if(actionResponse.success) {
-        var functionObject = actionResponse.member;
+    var functionObject = actionResponse.member;
+    if(functionObject) {
         var functionControl = new visicomp.app.visiui.FunctionControl(workspaceUI,functionObject);
         actionResponse.control = functionControl;
-    }
-    else {
-        //show an error message, howver we will close dialog whether object was
-		//created or not.
-		visicomp.app.visiui.Control.processActionReponse(actionResponse);
     }
     return actionResponse;
 }

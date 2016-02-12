@@ -66,13 +66,9 @@ if(!workspaceUI) {
             return;
         }
         
-        var result = onCreateFunction(workspaceUI,parentObject,objectName);
-        
-        if(result.success) {
+        var closeDialog = onCreateFunction(workspaceUI,parentObject,objectName);
+        if(closeDialog) {
             dialog.hide();
-        }
-        else {
-            alert("There was an error adding the table: " + result.msg);
         }
     }
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));

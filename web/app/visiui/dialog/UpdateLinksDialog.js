@@ -67,34 +67,31 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     
     var onSave = function() {
         
-        try {
-			var jsLinkArray;
-			var cssLinkArray;
+        var jsLinkArray;
+        var cssLinkArray;
 
-			//get js links
-            if(jsLinksEditor) {
-                var jsLinks = jsLinksEditor.getSession().getValue().trim();
-                jsLinkArray = visicomp.app.visiui.dialog.createLinkArray(jsLinks);
-            }
-			else {
-				jsLinkArray = [];
-			}
+        //get js links
+        if(jsLinksEditor) {
+            var jsLinks = jsLinksEditor.getSession().getValue().trim();
+            jsLinkArray = visicomp.app.visiui.dialog.createLinkArray(jsLinks);
+        }
+        else {
+            jsLinkArray = [];
+        }
 
-			//get css links
-            if(cssLinksEditor) {
-                var cssLinks = cssLinksEditor.getSession().getValue().trim();
-                cssLinkArray = visicomp.app.visiui.dialog.createLinkArray(cssLinks);
-            }
-			else {
-				cssLinkArray = [];
-			}
-			
-			//load links if we have any
-			workspaceUI.setLinks(jsLinkArray,cssLinkArray);
+        //get css links
+        if(cssLinksEditor) {
+            var cssLinks = cssLinksEditor.getSession().getValue().trim();
+            cssLinkArray = visicomp.app.visiui.dialog.createLinkArray(cssLinks);
         }
-        finally {
-            closeDialog();
+        else {
+            cssLinkArray = [];
         }
+
+        //load links if we have any
+        workspaceUI.setLinks(jsLinkArray,cssLinkArray);
+
+        closeDialog();
     }
     
     var closeDialog = function() {
