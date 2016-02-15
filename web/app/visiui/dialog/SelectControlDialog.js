@@ -1,5 +1,5 @@
-/** This method shows a dialog to select from additional controls. */
-visicomp.app.visiui.dialog.showSelectControlDialog = function(controlList,onSelectFunction) {
+/** This method shows a dialog to select from additional components. */
+visicomp.app.visiui.dialog.showSelectComponentDialog = function(componentList,onSelectFunction) {
 
     var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"movable":true});
@@ -11,16 +11,16 @@ visicomp.app.visiui.dialog.showSelectControlDialog = function(controlList,onSele
   
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Select Control Type"}));
+    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Select Component Type"}));
     content.appendChild(line);
     
     //folder selection
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(document.createTextNode("Control:"));
+    line.appendChild(document.createTextNode("Component:"));
     var select = visicomp.visiui.createElement("select");
     line.appendChild(select);
-    for(var i = 0; i < controlList.length; i++) {
-		var name = controlList[i];
+    for(var i = 0; i < componentList.length; i++) {
+		var name = componentList[i];
 		select.add(visicomp.visiui.createElement("option",{"text":name}));
     }
     content.appendChild(line);
@@ -32,8 +32,8 @@ visicomp.app.visiui.dialog.showSelectControlDialog = function(controlList,onSele
     }
     
     var onCreate = function() {
-		var controlType = select.value;
-        onSelectFunction(controlType);
+		var componentType = select.value;
+        onSelectFunction(componentType);
         dialog.hide();
     }
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));

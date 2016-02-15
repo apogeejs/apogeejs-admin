@@ -142,7 +142,7 @@ visicomp.core.Folder.fromJson = function(owner,json,updateDataList,actionRespons
     
     for(var key in json.children) {
         var childJson = json.children[key];
-        var child = visicomp.core.createmember.instantiateMember(folder,json,updateDataList,actionResponse);
+        var child = visicomp.core.createmember.instantiateMember(folder,childJson,updateDataList,actionResponse);
     }
     
     return folder;

@@ -1,5 +1,4 @@
-/** This method shows an update control dialog. The argument onSaveData si the same
- * arguments as the updateControl event handler html. */
+/** This method shows a dialog to update the workspace links. */
 visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     
     var dialogParent = visicomp.visiui.getDialogParent();
@@ -17,11 +16,11 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
         
     //editor selector
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"}); 
-    var jsLinksRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"jsLinks"});
+    var jsLinksRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"componentContent","value":"jsLinks"});
     line.appendChild(jsLinksRadio);
     line.appendChild(document.createTextNode("JS Links"));
     content.appendChild(line);
-    var cssLinksRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"cssLinks"});
+    var cssLinksRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"componentContent","value":"cssLinks"});
     line.appendChild(cssLinksRadio);
     line.appendChild(document.createTextNode("CSS Links"));
     

@@ -1,21 +1,21 @@
-/** This control represents a table object. */
-visicomp.app.visiui.FunctionControl = function(workspaceUI, functionObject, controlJson) {
+/** This component represents a table object. */
+visicomp.app.visiui.FunctionComponent = function(workspaceUI, functionObject, componentJson) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,workspaceUI,functionObject,visicomp.app.visiui.FunctionControl.generator,controlJson);
+    visicomp.app.visiui.Component.init.call(this,workspaceUI,functionObject,visicomp.app.visiui.FunctionComponent.generator,componentJson);
 
     this.memberUpdated();
 };
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.app.visiui.FunctionControl,visicomp.app.visiui.Control);
+visicomp.core.util.mixin(visicomp.app.visiui.FunctionComponent,visicomp.app.visiui.Component);
 
 //==============================
 // Protected and Private Instance Methods
 //==============================
 
-/** This method populates the frame for this control. 
+/** This method populates the frame for this component. 
  * @protected */
-visicomp.app.visiui.FunctionControl.prototype.populateFrame = function() {
+visicomp.app.visiui.FunctionComponent.prototype.populateFrame = function() {
     
     var window = this.getWindow();
     
@@ -52,7 +52,7 @@ editor.$blockScrolling = Infinity;
 }
 
 /** This method should include an needed functionality to clean up after a delete. */
-visicomp.app.visiui.FunctionControl.prototype.onDelete = function() {
+visicomp.app.visiui.FunctionComponent.prototype.onDelete = function() {
     if(this.editor) {
         this.editor.destroy();
         this.editor = null;
@@ -61,11 +61,11 @@ visicomp.app.visiui.FunctionControl.prototype.onDelete = function() {
 
 /** This is the format character use to display tabs in the display editor. 
  * @private*/
-visicomp.app.visiui.FunctionControl.formatString = "\t";
+visicomp.app.visiui.FunctionComponent.formatString = "\t";
 
 /** This method updates the table data 
  * @private */    
-visicomp.app.visiui.FunctionControl.prototype.memberUpdated = function() {
+visicomp.app.visiui.FunctionComponent.prototype.memberUpdated = function() {
     var functionObject = this.getObject();
 	if(functionObject.hasDataError()) {
         this.showError(functionObject.getDataError());
@@ -84,7 +84,7 @@ visicomp.app.visiui.FunctionControl.prototype.memberUpdated = function() {
 	}
 }
 
-visicomp.app.visiui.FunctionControl.prototype.showError = function(actionError) {
+visicomp.app.visiui.FunctionComponent.prototype.showError = function(actionError) {
     //this.editor.style.display = "none";
     //this.errorDiv.style.display = "";
     //this.errorDiv.innerHTML = msg;
@@ -97,7 +97,7 @@ visicomp.app.visiui.FunctionControl.prototype.showError = function(actionError) 
 
 /** This method creates a callback for editing a standard codeable object
  *  @private */
-visicomp.app.visiui.FunctionControl.prototype.createEditArgListDialogCallback = function() {
+visicomp.app.visiui.FunctionComponent.prototype.createEditArgListDialogCallback = function() {
 	var instance = this;
     var member = instance.getObject();
     
@@ -126,7 +126,7 @@ visicomp.app.visiui.FunctionControl.prototype.createEditArgListDialogCallback = 
 //======================================
 
 //add table listener
-visicomp.app.visiui.FunctionControl.createControl = function(workspaceUI,parent,name) {
+visicomp.app.visiui.FunctionComponent.createComponent = function(workspaceUI,parent,name) {
     
     var json = {};
     json.name = name;
@@ -135,26 +135,26 @@ visicomp.app.visiui.FunctionControl.createControl = function(workspaceUI,parent,
     
     var functionObject = actionResponse.member;
     if(functionObject) {
-        var functionControl = new visicomp.app.visiui.FunctionControl(workspaceUI,functionObject);
-        actionResponse.control = functionControl;
+        var functionComponent = new visicomp.app.visiui.FunctionComponent(workspaceUI,functionObject);
+        actionResponse.component = functionComponent;
     }
     return actionResponse;
 }
 
-visicomp.app.visiui.FunctionControl.createControlFromJson = function(workspaceUI,member,controlJson) {
-    var functionControl = new visicomp.app.visiui.FunctionControl(workspaceUI,member,controlJson);
-    return functionControl;
+visicomp.app.visiui.FunctionComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
+    var functionComponent = new visicomp.app.visiui.FunctionComponent(workspaceUI,member,componentJson);
+    return functionComponent;
 }
 
 //======================================
-// This is the control generator, to register the control
+// This is the component generator, to register the component
 //======================================
 
-visicomp.app.visiui.FunctionControl.generator = {};
-visicomp.app.visiui.FunctionControl.generator.displayName = "Function";
-visicomp.app.visiui.FunctionControl.generator.uniqueName = "visicomp.app.visiui.FunctionControl";
-visicomp.app.visiui.FunctionControl.generator.createControl = visicomp.app.visiui.FunctionControl.createControl;
-visicomp.app.visiui.FunctionControl.generator.createControlFromJson = visicomp.app.visiui.FunctionControl.createControlFromJson;
-visicomp.app.visiui.FunctionControl.generator.DEFAULT_WIDTH = 200;
-visicomp.app.visiui.FunctionControl.generator.DEFAULT_HEIGHT = 200;
+visicomp.app.visiui.FunctionComponent.generator = {};
+visicomp.app.visiui.FunctionComponent.generator.displayName = "Function";
+visicomp.app.visiui.FunctionComponent.generator.uniqueName = "visicomp.app.visiui.FunctionComponent";
+visicomp.app.visiui.FunctionComponent.generator.createComponent = visicomp.app.visiui.FunctionComponent.createComponent;
+visicomp.app.visiui.FunctionComponent.generator.createComponentFromJson = visicomp.app.visiui.FunctionComponent.createComponentFromJson;
+visicomp.app.visiui.FunctionComponent.generator.DEFAULT_WIDTH = 200;
+visicomp.app.visiui.FunctionComponent.generator.DEFAULT_HEIGHT = 200;
  

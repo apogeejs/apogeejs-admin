@@ -1,6 +1,4 @@
-/** This class manages the user interface for a workspace object. The argument
- * uiInitData is optional and should be included if the workspace is not empty. It
- * contains the information of how to create controls for the workspace data. */
+/** This class manages the user interface for a workspace object. */
 visicomp.app.visiui.WorkspaceUI = function() {
 
     this.workspace = null;
@@ -8,7 +6,7 @@ visicomp.app.visiui.WorkspaceUI = function() {
     //properties
 	this.app = null;
     this.tab = null;
-    this.controlMap = {};
+    this.componentMap = {};
     this.activeFolderName = null;
    
     this.jsLinkArray = [];
@@ -21,21 +19,21 @@ visicomp.app.visiui.WorkspaceUI.prototype.setApp = function(app,tab) {
     this.tab = tab;
 }
 
- /** This method sets the workspace. The argument controlsJson should be included
+ /** This method sets the workspace. The argument componentsJson should be included
   * if the workspace is not empty, such as when opening a existing workspace. It
-  * contains the data for the control associated with each workspace member. For 
-  * a new empty workspace the controlsJson should be omitted. */
-visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace, controlsJson) {   
+  * contains the data for the component associated with each workspace member. For 
+  * a new empty workspace the componentsJson should be omitted. */
+visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace, componentsJson) {   
     this.workspace = workspace; 
     
     //set up the root folder
     var rootFolder = this.workspace.getRootFolder();
     this.registerMember(rootFolder,null);
-    this.addControlContainer(rootFolder,this.tab);
+    this.addComponentContainer(rootFolder,this.tab);
   
-    //load controls from json if present
-    if(controlsJson) {
-        this.loadFolderControlContentFromJson(rootFolder,controlsJson);
+    //load components from json if present
+    if(componentsJson) {
+        this.loadFolderComponentContentFromJson(rootFolder,componentsJson);
     }
     
     //listeners
@@ -60,74 +58,74 @@ visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
     return this.workspace;
 }
 
-/** This method gets the control associated with a member object. */
-visicomp.app.visiui.WorkspaceUI.prototype.getControl = function(object) {
+/** This method gets the component associated with a member object. */
+visicomp.app.visiui.WorkspaceUI.prototype.getComponent = function(object) {
     var key = this.getObjectKey(object);
-	var controlInfo = this.controlMap[key];
-	if(controlInfo) {
-		return controlInfo.control;
+	var componentInfo = this.componentMap[key];
+	if(componentInfo) {
+		return componentInfo.component;
 	}
 	else {
 		return null;
 	}
 }
 
-/** This returns the map of control objects. */
-visicomp.app.visiui.WorkspaceUI.prototype.getControlMap = function() {
-	return this.controlMap;
+/** This returns the map of component objects. */
+visicomp.app.visiui.WorkspaceUI.prototype.getComponentMap = function() {
+	return this.componentMap;
 }
 
 visicomp.app.visiui.WorkspaceUI.prototype.getParentContainerObject = function(object) {
     var parent = object.getParent();
     
-    //get parent control info
+    //get parent component info
     var parentKey = this.getObjectKey(parent);
-    var parentControlInfo = this.controlMap[parentKey];
-    if(!parentControlInfo.parentContainer) {
+    var parentComponentInfo = this.componentMap[parentKey];
+    if(!parentComponentInfo.parentContainer) {
         throw visicomp.core.util.createError("Parent container not found!");
     }
-    return parentControlInfo.parentContainer;
+    return parentComponentInfo.parentContainer;
 }
 
-/** This method registers a member data object and its optional control object.
- * for each folder, and only folders at this point, the mehod addControlContainer
+/** This method registers a member data object and its optional component object.
+ * for each folder, and only folders at this point, the mehod addComponentContainer
  * should also be called to set the container for the children of this folder. */
-visicomp.app.visiui.WorkspaceUI.prototype.registerMember = function(object,control) {
+visicomp.app.visiui.WorkspaceUI.prototype.registerMember = function(object,component) {
     
     //make sure this is for us
     if(object.getWorkspace() !== this.workspace) {
-        throw visicomp.core.util.createError("Control registered in wrong workspace: " + object.getFullName());
+        throw visicomp.core.util.createError("Component registered in wrong workspace: " + object.getFullName());
     }
     
     //store the ui object
 	var key = this.getObjectKey(object);
 	
-	if(this.controlMap[key]) {
+	if(this.componentMap[key]) {
 		alert("Unknown error - there is already an object with this object key: " + key);
 		return;
 	}
 	
-    var controlInfo = {};
-    controlInfo.object = object;
-	controlInfo.control = control;
+    var componentInfo = {};
+    componentInfo.object = object;
+	componentInfo.component = component;
 	
-    this.controlMap[key] = controlInfo;
+    this.componentMap[key] = componentInfo;
     
 }
 
-/** This method registers a control. The parameter "parentContainer" is optional
+/** This method registers a component. The parameter "parentContainer" is optional
  * and is only needed if the object is a parent container. */
-visicomp.app.visiui.WorkspaceUI.prototype.addControlContainer = function(object,parentContainer) {
+visicomp.app.visiui.WorkspaceUI.prototype.addComponentContainer = function(object,parentContainer) {
     
     //store the ui object
 	var key = this.getObjectKey(object);
 	
-    var controlInfo = this.controlMap[key];
-    if(!controlInfo) {
-		alert("Unknown error - control info not found: " + key);
+    var componentInfo = this.componentMap[key];
+    if(!componentInfo) {
+		alert("Unknown error - component info not found: " + key);
 		return;
 	}
-	controlInfo.parentContainer = parentContainer;
+	componentInfo.parentContainer = parentContainer;
 }
 	
 
@@ -136,9 +134,9 @@ visicomp.app.visiui.WorkspaceUI.prototype.memberUpdated = function(memberObject)
     //store the ui object
 	var key = memberObject.getFullName();
 	
-	var controlInfo = this.controlMap[key];
-	if((controlInfo)&&(controlInfo.control)) {
-        controlInfo.control.memberUpdated();
+	var componentInfo = this.componentMap[key];
+	if((componentInfo)&&(componentInfo.component)) {
+        componentInfo.component.memberUpdated();
     }
 }
 
@@ -148,16 +146,16 @@ visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
 	//store the ui object
 	var key = fullName;
 	
-	var controlInfo = this.controlMap[key];
-	delete this.controlMap[key];
+	var componentInfo = this.componentMap[key];
+	delete this.componentMap[key];
 
-	if((controlInfo)&&(controlInfo.control)) {
+	if((componentInfo)&&(componentInfo.component)) {
         //remove the UI element
-        var controlWindow = controlInfo.control.getWindow();
-        controlWindow.hide();
+        var componentWindow = componentInfo.component.getWindow();
+        componentWindow.hide();
         
         //do any needed cleanup
-        controlInfo.control.onDelete();
+        componentInfo.component.onDelete();
 	}
 }
 
@@ -181,43 +179,43 @@ visicomp.app.visiui.WorkspaceUI.prototype.toJson = function() {
     json.workspace = this.workspace.toJson();
     
     var rootFolder = this.workspace.getRootFolder();
-    json.controls = this.getFolderControlContentJson(rootFolder);
+    json.components = this.getFolderComponentContentJson(rootFolder);
     
     return json;
 }
 
-visicomp.app.visiui.WorkspaceUI.prototype.getFolderControlContentJson = function(folder) {
+visicomp.app.visiui.WorkspaceUI.prototype.getFolderComponentContentJson = function(folder) {
     var json = {};
     var childMap = folder.getChildMap();
 	for(var key in childMap) {
 		var child = childMap[key];
         
 		//get the object map for the workspace
-		var childControl = this.getControl(child);
+		var childComponent = this.getComponent(child);
 		
-		//get the control for this child
+		//get the component for this child
 		var name = child.getName();
-		json[name] = childControl.toJson();
+		json[name] = childComponent.toJson();
 	}
     return json;
 }
 
-visicomp.app.visiui.WorkspaceUI.prototype.loadFolderControlContentFromJson = function(folder,json) {
+visicomp.app.visiui.WorkspaceUI.prototype.loadFolderComponentContentFromJson = function(folder,json) {
 	for(var key in json) {
 		var childJson = json[key];
 		var childMember = folder.lookupChild(key);	
-		this.loadControlFromJson(childMember,childJson);
+		this.loadComponentFromJson(childMember,childJson);
 	}
 }
 
-visicomp.app.visiui.WorkspaceUI.prototype.loadControlFromJson = function(member,json) {
-    var controlType = json.type;
-    var generator = this.app.getControlGenerator(controlType);
+visicomp.app.visiui.WorkspaceUI.prototype.loadComponentFromJson = function(member,json) {
+    var componentType = json.type;
+    var generator = this.app.getComponentGenerator(componentType);
 	if(generator) {
-        generator.createControlFromJson(this,member,json);
+        generator.createComponentFromJson(this,member,json);
     }
     else {
-        throw visicomp.core.util.createError("Control type not found: " + controlType);
+        throw visicomp.core.util.createError("Component type not found: " + componentType);
     }
 }
 

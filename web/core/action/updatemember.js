@@ -190,7 +190,11 @@ visicomp.core.updatemember.updateObjectData = function(member,
         recalculateList) {
 
     member.setData(data);
-    member.clearCode();
+    
+    //clear the code if this is a codeable object
+    if(member.isCodeable) {
+        member.clearCode();
+    }
     
     visicomp.core.calculation.addToRecalculateList(recalculateList,member);
 

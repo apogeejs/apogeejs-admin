@@ -59,12 +59,12 @@ SimpleChartResourceProcessor.prototype.setData = function(data,chartOptions) {
  * BasicResourceControl to represent a resource object. */
 SimpleChartControl = function(workspaceUI,resource) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,workspaceUI,resource,SimpleChartControl.generator);
+    visicomp.app.visiui.Component.init.call(this,workspaceUI,resource,SimpleChartControl.generator);
     visicomp.app.visiui.BasicResourceControl.init.call(this);
 };
 
 //add components to this class
-visicomp.core.util.mixin(SimpleChartControl,visicomp.app.visiui.Control);
+visicomp.core.util.mixin(SimpleChartControl,visicomp.app.visiui.Component);
 visicomp.core.util.mixin(SimpleChartControl,visicomp.app.visiui.BasicResourceControl);
 
 //======================================

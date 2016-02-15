@@ -1,15 +1,15 @@
 
 
-visicomp.app.visiui.addcontrol = {};
+visicomp.app.visiui.addcomponent = {};
 
 //=====================================
 // UI Entry Point
 //=====================================
 
-visicomp.app.visiui.addcontrol.getAddControlCallback = function(app,generator) {
+visicomp.app.visiui.addcomponent.getAddComponentCallback = function(app,generator) {
     
     var createCallback = function(workspaceUI,parent,name) {
-        var actionResponse =  generator.createControl(workspaceUI,parent,name);   
+        var actionResponse =  generator.createComponent(workspaceUI,parent,name);   
         if(!actionResponse.getSuccess()) {
             alert(actionResponse.getErrorMsg())
         }
@@ -29,7 +29,7 @@ visicomp.app.visiui.addcontrol.getAddControlCallback = function(app,generator) {
 // Action
 //=====================================
 
-//action is in the control generator
+//action is in the component generator
 
 
 

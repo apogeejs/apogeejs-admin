@@ -96,9 +96,9 @@ visicomp.app.visiui.openworkspace.openWorkspace = function(app,workspaceText,act
 /** This method loads an existing workspace into an empty workspace UI. */
 visicomp.app.visiui.openworkspace.loadWorkspace = function(workspaceUI,workspaceJson,actionResponse) {
     var workspaceDataJson = workspaceJson.workspace;
-    var workspaceControlsJson = workspaceJson.controls;
+    var workspaceComponentsJson = workspaceJson.components;
 
     var workspace = new visicomp.core.Workspace(workspaceDataJson,actionResponse);
     
-    workspaceUI.setWorkspace(workspace,workspaceControlsJson);
+    workspaceUI.setWorkspace(workspace,workspaceComponentsJson);
 }

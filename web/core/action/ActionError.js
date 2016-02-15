@@ -26,7 +26,7 @@ visicomp.core.ActionError.UNKNOWN_ERROR_MESSAGE = "Unknown Error";
 visicomp.core.ActionError.ACTION_ERROR_MODEL = "model";
 /** This is an error in the application code. */
 visicomp.core.ActionError.ACTION_ERROR_APP = "app";
-/** This is an error in the user appliation level code, such as added controls. */
+/** This is an error in the user appliation level code, such as custom components. */
 visicomp.core.ActionError.ACTION_ERROR_USER_APP = "user app";
 /** This is an operator error. */
 visicomp.core.ActionError.ACTION_ERROR_USER = "user";

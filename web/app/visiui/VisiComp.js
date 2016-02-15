@@ -12,16 +12,16 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     //workspaces
     this.workspaceUIs = {};
     
-    //control generators
-    this.controlGenerators = {};
-    this.standardControls = [];
-    //these are a list of names of controls that go in the "added control" list
-    this.additionalControls = [];
+    //component generators
+    this.componentGenerators = {};
+    this.standardComponents = [];
+    //these are a list of names of components that go in the "added component" list
+    this.additionalComponents = [];
 	
 	this.linkManager = new visicomp.app.visiui.LinkManager();
 	
-	//load the standard control generators
-	this.loadControlGenerators();
+	//load the standard component generators
+	this.loadComponentGenerators();
 	
 	//create the UI
 	this.createUI(containerId);
@@ -115,57 +115,57 @@ visicomp.app.visiui.VisiComp.prototype.updateWorkspaceLinks = function(workspace
 }
 
 //=================================
-// Control Management
+// Component Management
 //=================================
 
-/** This method registers a control. */
-visicomp.app.visiui.VisiComp.prototype.registerControl = function(controlGenerator) {
-    var name = controlGenerator.uniqueName;
-    if(this.controlGenerators[name]) {
+/** This method registers a component. */
+visicomp.app.visiui.VisiComp.prototype.registerComponent = function(componentGenerator) {
+    var name = componentGenerator.uniqueName;
+    if(this.componentGenerators[name]) {
 //in the future we can maybe do something other than punt
-        alert("There is already a registered control with this name. Either the control has already been added of the name is not unique.");
+        alert("There is already a registered component with this name. Either the component has already been added of the name is not unique.");
         return;
     }
 
-//we should maybe warn if another control bundle is being overwritten 
-    this.controlGenerators[name] = controlGenerator;
-    this.additionalControls.push(name);
+//we should maybe warn if another component bundle is being overwritten 
+    this.componentGenerators[name] = componentGenerator;
+    this.additionalComponents.push(name);
 }
 
-/** This method registers a control. */
-visicomp.app.visiui.VisiComp.prototype.getControlGenerator = function(name) {
-	return this.controlGenerators[name];
+/** This method registers a component. */
+visicomp.app.visiui.VisiComp.prototype.getComponentGenerator = function(name) {
+	return this.componentGenerators[name];
 }
 //==========================
 // App Initialization
 //==========================
 
-/** This method adds the standard controls to the app. 
+/** This method adds the standard components to the app. 
  * @private */
-visicomp.app.visiui.VisiComp.prototype.loadControlGenerators = function() {
-    //standard controls
-	this.registerStandardControl(visicomp.app.visiui.FolderControl.generator);
-	this.registerStandardControl(visicomp.app.visiui.JsonTableControl.generator);
-	this.registerStandardControl(visicomp.app.visiui.FunctionControl.generator);
-    this.registerStandardControl(visicomp.app.visiui.WorksheetControl.generator);
+visicomp.app.visiui.VisiComp.prototype.loadComponentGenerators = function() {
+    //standard components
+	this.registerStandardComponent(visicomp.app.visiui.FolderComponent.generator);
+	this.registerStandardComponent(visicomp.app.visiui.JsonTableComponent.generator);
+	this.registerStandardComponent(visicomp.app.visiui.FunctionComponent.generator);
+    this.registerStandardComponent(visicomp.app.visiui.WorksheetComponent.generator);
 	
-    //additional controls
-    this.registerControl(visicomp.app.visiui.CustomResourceControl.generator);
+    //additional components
+    this.registerComponent(visicomp.app.visiui.CustomResourceComponent.generator);
 }
 
-/** This method registers a control. 
+/** This method registers a component. 
  * @private */
-visicomp.app.visiui.VisiComp.prototype.registerStandardControl = function(controlGenerator) {
-    var name = controlGenerator.uniqueName;
-    if(this.controlGenerators[name]) {
+visicomp.app.visiui.VisiComp.prototype.registerStandardComponent = function(componentGenerator) {
+    var name = componentGenerator.uniqueName;
+    if(this.componentGenerators[name]) {
 //in the future we can maybe do something other than punt
-        alert("There is already a registered control with this name. Either the control has already been added of the name is not unique.");
+        alert("There is already a registered component with this name. Either the component has already been added of the name is not unique.");
         return;
     }
 
-//we should maybe warn if another control bundle is being overwritten 
-    this.controlGenerators[name] = controlGenerator;
-    this.standardControls.push(name);
+//we should maybe warn if another component bundle is being overwritten 
+    this.componentGenerators[name] = componentGenerator;
+    this.standardComponents.push(name);
 }
 
 /** This method creates the app ui. 
@@ -205,21 +205,21 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     var closeCallback = visicomp.app.visiui.closeworkspace.getCloseCallback(this);
     menu.addCallbackMenuItem("Close",closeCallback);	
 	
-    //Controls Menu
-    menu = visicomp.visiui.Menu.createMenu("Controls");
+    //Components Menu
+    menu = visicomp.visiui.Menu.createMenu("Components");
     menuBar.appendChild(menu.getElement());
     
-    for(var i = 0; i < this.standardControls.length; i++) {
-        var key = this.standardControls[i];
-        var generator = this.controlGenerators[key];
+    for(var i = 0; i < this.standardComponents.length; i++) {
+        var key = this.standardComponents[i];
+        var generator = this.componentGenerators[key];
         var title = visicomp.app.visiui.VisiComp.convertSpacesForHtml("Add " + generator.displayName);
-        var callback = visicomp.app.visiui.addcontrol.getAddControlCallback(this,generator);
+        var callback = visicomp.app.visiui.addcomponent.getAddComponentCallback(this,generator);
         menu.addCallbackMenuItem(title,callback);
     }
     
-    //add the additional control item
-    var controlCallback = visicomp.app.visiui.addadditionalcontrol.getAddAdditionalControlCallback(this,generator);
-    menu.addCallbackMenuItem("Other&nbsp;Controls...",controlCallback);
+    //add the additional component item
+    var componentCallback = visicomp.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback(this,generator);
+    menu.addCallbackMenuItem("Other&nbsp;Components...",componentCallback);
     
     //libraries menu
     menu = visicomp.visiui.Menu.createMenu("Libraries");

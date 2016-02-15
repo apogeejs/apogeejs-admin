@@ -1,8 +1,8 @@
-/** This method shows an update control dialog. The argument onSaveData si the same
+/** This method shows an update component dialog. The argument onSaveData si the same
  * arguments as the updateFunction event handler data. */
-visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResourceControl,onSaveFunction) {
+visicomp.app.visiui.dialog.showUpdateCustomComponentDialog = function(customResourceComponent,onSaveFunction) {
 	
-	var customResourceProcessor = customResourceControl.getObject().getResourceProcessor();
+	var customResourceProcessor = customResourceComponent.getObject().getResourceProcessor();
     
     var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
@@ -14,21 +14,21 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
     
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Update Control"}));
+    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Update Component"}));
     content.appendChild(line);
         
     //editor selector
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"}); 
-    var htmlRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"html"});
+    var htmlRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"componentContent","value":"html"});
     line.appendChild(htmlRadio);
     line.appendChild(document.createTextNode("HTML"));
-    var customizeRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"customize"});
+    var customizeRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"componentContent","value":"customize"});
     line.appendChild(customizeRadio);
     line.appendChild(document.createTextNode("Customize Script"));
-    var supplementalRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"supplemental"});
+    var supplementalRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"componentContent","value":"supplemental"});
     line.appendChild(supplementalRadio);
     line.appendChild(document.createTextNode("Supplemental Code"));
-    var cssRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"controlContent","value":"css"});
+    var cssRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"componentContent","value":"css"});
     line.appendChild(cssRadio);
     line.appendChild(document.createTextNode("CSS"));
     content.appendChild(line);
@@ -94,16 +94,16 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
     }
     
     var onSave = function() {
-		var controlHtml;
+		var componentHtml;
 		var customize;
 		var supplementalCode;
         var css;
 
         if(htmlEditor) {
-            controlHtml = htmlEditor.getSession().getValue();
+            componentHtml = htmlEditor.getSession().getValue();
         }
         else {
-            controlHtml = customResourceProcessor.getHtml();
+            componentHtml = customResourceProcessor.getHtml();
         }
 
         if(customizeEditor) {
@@ -127,7 +127,7 @@ visicomp.app.visiui.dialog.showUpdateCustomControlDialog = function(customResour
             css = customResourceProcessor.getCss();
         }
 
-        var complete = onSaveFunction(controlHtml,customize,supplementalCode,css);
+        var complete = onSaveFunction(componentHtml,customize,supplementalCode,css);
 
         if(complete) {
             closeDialog();

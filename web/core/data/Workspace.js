@@ -80,7 +80,7 @@ visicomp.core.Workspace.prototype.toJson = function() {
     json.fileType = visicomp.core.Workspace.SAVE_FILE_TYPE;
     json.version = visicomp.core.Workspace.SAVE_FILE_VERSION;
     
-    //controls
+    //components
     json.data = this.rootFolder.toJson();
     
     return json;

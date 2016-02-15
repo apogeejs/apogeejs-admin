@@ -11,7 +11,7 @@ if(!workspaceUI) {
 }
 ////////////////////////////////////////////////////////
 
-	var controlMap = workspaceUI.getControlMap();
+	var componentMap = workspaceUI.getComponentMap();
 
     var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"movable":true});
@@ -31,9 +31,9 @@ if(!workspaceUI) {
     line.appendChild(document.createTextNode("Folder:"));
     var select = visicomp.visiui.createElement("select");
     line.appendChild(select);
-    for(var key in controlMap) {
-		var controlInfo = controlMap[key];
-		if(controlInfo.parentContainer) { 
+    for(var key in componentMap) {
+		var componentInfo = componentMap[key];
+		if(componentInfo.parentContainer) { 
 			select.add(visicomp.visiui.createElement("option",{"text":key}));
 //			if(key == activeFolderKey) {
 //				select.value = key;
@@ -57,7 +57,7 @@ if(!workspaceUI) {
     
     var onCreate = function() {
 		var folderKey = select.value;
-        var parentObject = controlMap[folderKey].object;
+        var parentObject = componentMap[folderKey].object;
         var objectName = inputElement.value.trim();
         if(objectName.length == 0) {
             alert("The name is invalid");

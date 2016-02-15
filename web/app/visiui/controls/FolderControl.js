@@ -1,23 +1,23 @@
-/** This control represents a table object. */
-visicomp.app.visiui.FolderControl = function(workspaceUI,folder,controlJson) {
+/** This component represents a table object. */
+visicomp.app.visiui.FolderComponent = function(workspaceUI,folder,componentJson) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,workspaceUI,folder,visicomp.app.visiui.FolderControl.generator,controlJson);
+    visicomp.app.visiui.Component.init.call(this,workspaceUI,folder,visicomp.app.visiui.FolderComponent.generator,componentJson);
     visicomp.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
     
     //register this folder as a parent container
-    workspaceUI.addControlContainer(folder,this);
+    workspaceUI.addComponentContainer(folder,this);
 };
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.app.visiui.FolderControl,visicomp.app.visiui.Control);
-visicomp.core.util.mixin(visicomp.app.visiui.FolderControl,visicomp.visiui.ParentContainer);
+visicomp.core.util.mixin(visicomp.app.visiui.FolderComponent,visicomp.app.visiui.Component);
+visicomp.core.util.mixin(visicomp.app.visiui.FolderComponent,visicomp.visiui.ParentContainer);
 
 //----------------------
 // ParentContainer Methods
 //----------------------
 
 /** This method must be implemented in inheriting objects. */
-visicomp.app.visiui.FolderControl.prototype.getContentIsShowing = function() {
+visicomp.app.visiui.FolderComponent.prototype.getContentIsShowing = function() {
     return this.getWindow().getContentIsShowing();
 }
 
@@ -25,16 +25,16 @@ visicomp.app.visiui.FolderControl.prototype.getContentIsShowing = function() {
 // Protected and Private Instance Methods
 //==============================
 
-/** This serializes the table control. */
-visicomp.app.visiui.FolderControl.prototype.writeToJson = function(json) {
+/** This serializes the table component. */
+visicomp.app.visiui.FolderComponent.prototype.writeToJson = function(json) {
     var folder = this.getObject();
     var workspaceUI = this.getWorkspaceUI();
-    json.children = workspaceUI.getFolderControlContentJson(folder);
+    json.children = workspaceUI.getFolderComponentContentJson(folder);
 }
 
-/** This method populates the frame for this control. 
+/** This method populates the frame for this component. 
  * @protected */
-visicomp.app.visiui.FolderControl.prototype.populateFrame = function() {
+visicomp.app.visiui.FolderComponent.prototype.populateFrame = function() {
 }
 
 //======================================
@@ -42,7 +42,7 @@ visicomp.app.visiui.FolderControl.prototype.populateFrame = function() {
 //======================================
 
 //add table listener
-visicomp.app.visiui.FolderControl.createControl = function(workspaceUI,parent,name) {
+visicomp.app.visiui.FolderComponent.createComponent = function(workspaceUI,parent,name) {
     
     var json = {};
     json.name = name;
@@ -51,30 +51,30 @@ visicomp.app.visiui.FolderControl.createControl = function(workspaceUI,parent,na
     
     var folder = actionResponse.member;
     if(folder) {       
-        var folderControl = new visicomp.app.visiui.FolderControl(workspaceUI,folder);
-        actionResponse.control = folderControl;
+        var folderComponent = new visicomp.app.visiui.FolderComponent(workspaceUI,folder);
+        actionResponse.component = folderComponent;
     }
     return actionResponse;
 }
 
-visicomp.app.visiui.FolderControl.createControlFromJson = function(workspaceUI,member,controlJson) {
-    var folderControl = new visicomp.app.visiui.FolderControl(workspaceUI,member,controlJson);
-    if((controlJson)&&(controlJson.children)) {
-        workspaceUI.loadFolderControlContentFromJson(member,controlJson.children);
+visicomp.app.visiui.FolderComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
+    var folderComponent = new visicomp.app.visiui.FolderComponent(workspaceUI,member,componentJson);
+    if((componentJson)&&(componentJson.children)) {
+        workspaceUI.loadFolderComponentContentFromJson(member,componentJson.children);
     }
     
-    return folderControl;
+    return folderComponent;
 }
 
 
 //======================================
-// This is the control generator, to register the control
+// This is the component generator, to register the component
 //======================================
 
-visicomp.app.visiui.FolderControl.generator = {};
-visicomp.app.visiui.FolderControl.generator.displayName = "Folder";
-visicomp.app.visiui.FolderControl.generator.uniqueName = "visicomp.app.visiui.FolderControl";
-visicomp.app.visiui.FolderControl.generator.createControl = visicomp.app.visiui.FolderControl.createControl;
-visicomp.app.visiui.FolderControl.generator.createControlFromJson = visicomp.app.visiui.FolderControl.createControlFromJson;
-visicomp.app.visiui.FolderControl.generator.DEFAULT_WIDTH = 500;
-visicomp.app.visiui.FolderControl.generator.DEFAULT_HEIGHT = 500;
+visicomp.app.visiui.FolderComponent.generator = {};
+visicomp.app.visiui.FolderComponent.generator.displayName = "Folder";
+visicomp.app.visiui.FolderComponent.generator.uniqueName = "visicomp.app.visiui.FolderComponent";
+visicomp.app.visiui.FolderComponent.generator.createComponent = visicomp.app.visiui.FolderComponent.createComponent;
+visicomp.app.visiui.FolderComponent.generator.createComponentFromJson = visicomp.app.visiui.FolderComponent.createComponentFromJson;
+visicomp.app.visiui.FolderComponent.generator.DEFAULT_WIDTH = 500;
+visicomp.app.visiui.FolderComponent.generator.DEFAULT_HEIGHT = 500;

@@ -114,12 +114,12 @@ GoogleChartResourceProcessor.prototype.createDataTable = function(data) {
  * BasicResourceControl to represent a resource object. */
 GoogleChartControl = function(workspaceUI,resource) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,workspaceUI,resource,GoogleChartControl.generator);
+    visicomp.app.visiui.Component.init.call(this,workspaceUI,resource,GoogleChartControl.generator);
     visicomp.app.visiui.BasicResourceControl.init.call(this);
 };
 
 //add components to this class
-visicomp.core.util.mixin(GoogleChartControl,visicomp.app.visiui.Control);
+visicomp.core.util.mixin(GoogleChartControl,visicomp.app.visiui.Component);
 visicomp.core.util.mixin(GoogleChartControl,visicomp.app.visiui.BasicResourceControl);
 
 //======================================
