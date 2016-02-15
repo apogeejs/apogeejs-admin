@@ -1,7 +1,7 @@
 /** This method shows an update dialog for the code in a codeable object.
  * The argument editorCodeWrapper is optional and can be left off. It allows the
  * function body code to be wrapped and unwraped so the code the user enters does
- * not include the complete function body. This is used on Table so the user can 
+ * not include the complete function body. This is used on JsonTable, for example, so the user can 
  * set the value to a variable names "value" rather then writing a function with 
  * a return statement. This was just a UI choice. */
 visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,onSaveFunction,title,editorCodeWrapper) {
@@ -24,7 +24,7 @@ visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,on
     var formulaRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"dataFormula","value":"formula"});
     line.appendChild(formulaRadio);
 	//-------------------------------
-	//this code added to allow customization of name and content for the main code - used by table
+	//this code added to allow customization of name and content for the main code - used by json table, for example
 	var formulaName;
 	if(editorCodeWrapper) {
 		formulaName = editorCodeWrapper.displayName;
@@ -86,7 +86,7 @@ visicomp.app.visiui.dialog.showUpdateCodeableDialog = function(codeableObject,on
         if(formulaEditor) {
             mainCode = formulaEditor.getSession().getValue().trim();
 			//--------------------------
-			//this code added to allow customization of name and content for the main code - used by table
+			//this code added to allow customization of name and content for the main code - used by JSON table
 			if(editorCodeWrapper) {
 				mainCode = editorCodeWrapper.wrapCode(mainCode);
 			}
@@ -153,7 +153,7 @@ formulaEditor.$blockScrolling = Infinity;
             if(mainCode) {
 			
 				//--------------------------
-				//this code added to allow customization of name and content for the main code - used by table
+				//this code added to allow customization of name and content for the main code - used by JSON table
 				if(editorCodeWrapper) {
 					mainCode = editorCodeWrapper.unwrapCode(mainCode);
 				}

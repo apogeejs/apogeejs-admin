@@ -65,8 +65,7 @@ visicomp.core.Folder.prototype.addChild = function(child) {
     this.calculateDependents();
 }
 
-/** This method removes a table from the folder. It also sets the folder
- * on the table object to null.  */
+/** This method removes a table from the folder. */
 visicomp.core.Folder.prototype.removeChild = function(child) {
     //make sure this is a child of this object
 	var parent = child.getParent();

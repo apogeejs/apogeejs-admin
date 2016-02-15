@@ -1,19 +1,19 @@
-/** This namespace contains functions to process an create a table. */
+/** This namespace contains the action to delete a child. */
 visicomp.core.deletechild = {};
 
-/** TABLE CREATED EVENT
- * This listener event is fired when after a table is created, to be used to respond
- * to a new table such as to update the UI.
+/** CHILD DELETED EVENT
+ * This listener event is fired when after a child is deleted, to be used to respond
+ * such as to update the UI.
  * 
  * Event object Format:
- * [table]
+ * [child]
  */
 visicomp.core.deletechild.CHILD_DELETED_EVENT = "childDeleted";
 
 
-/** This is the listener for the create table event.
- * The return value is an ActionResponse object. Optionally, an existing action response
- * may be passed in or otherwise one will be created here. */
+/** This method should be called to delete a child. The return value is an ActionResponse.
+ * It will by default create its own action response object, however optionally an
+ * existing action response may be passed in. */
 visicomp.core.deletechild.deleteChild = function(child,optionalActionResponse) {
 	var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
     

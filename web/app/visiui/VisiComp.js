@@ -145,7 +145,7 @@ visicomp.app.visiui.VisiComp.prototype.getControlGenerator = function(name) {
 visicomp.app.visiui.VisiComp.prototype.loadControlGenerators = function() {
     //standard controls
 	this.registerStandardControl(visicomp.app.visiui.FolderControl.generator);
-	this.registerStandardControl(visicomp.app.visiui.TableControl.generator);
+	this.registerStandardControl(visicomp.app.visiui.JsonTableControl.generator);
 	this.registerStandardControl(visicomp.app.visiui.FunctionControl.generator);
     this.registerStandardControl(visicomp.app.visiui.WorksheetControl.generator);
 	

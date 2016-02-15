@@ -1,9 +1,7 @@
-/** This class encapsulatees a data table */
+/** This class encapsulatees a member used to IO. t does not hold data in the model. */
 visicomp.core.Resource = function(owner,name) {
     //base init
-    visicomp.core.Impactor.init.call(this);
     visicomp.core.Child.init.call(this,owner,name,visicomp.core.Resource.generator);
-    visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
 	visicomp.core.Codeable.init.call(this,["resource"]);
     

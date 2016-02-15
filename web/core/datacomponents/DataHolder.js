@@ -32,7 +32,7 @@ visicomp.core.Child.getData = function() {
 
 /** This method sets the data for this object. This is the object used by the 
  * code which is identified by this name, for example the JSON object associated
- * with a table. Besides hold the data object, this updates the parent data map. */
+ * with a JSON table. Besides hold the data object, this updates the parent data map. */
 visicomp.core.DataHolder.setData = function(data) {
     this.internalSetData(data,null);
 }

@@ -1,4 +1,4 @@
-/** Namespace for the core logic for manipulating tables. */
+/** Namespace for the business logic for the visicomp model. */
 visicomp.core = {}
 
 ///** This is a simple entry point to debug user code */

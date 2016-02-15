@@ -1,5 +1,5 @@
-/** This method shows an update table dialog. The argument onSaveData si the same
- * arguments as the updateTable event handler data. */
+/** This method shows an update table dialog. The argument onSaveData is the
+ * data to be saved. */
 visicomp.app.visiui.dialog.showUpdateTableDataDialog = function(table,onSaveFunction) {
     
     var dialogParent = visicomp.visiui.getDialogParent();
@@ -42,7 +42,7 @@ dataEditor.$blockScrolling = Infinity;
 	dataEditor.getSession().setMode("ace/mode/json");
 	//set the value
 	var data = table.getData();
-	dataEditor.getSession().setValue(JSON.stringify(data,null,visicomp.app.visiui.TableControl.formatString));
+	dataEditor.getSession().setValue(JSON.stringify(data,null,visicomp.app.visiui.JsonTableControl.formatString));
 	
 	
     editorDiv.appendChild(dataEditorDiv);

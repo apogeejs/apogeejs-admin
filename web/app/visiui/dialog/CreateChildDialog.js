@@ -1,6 +1,4 @@
-/** This method shows a create table dialog. The argument onCreateFunction
- * should take the folder and the table name as arguments and return an object with the boolean entry
- * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
+/** This method shows a create child dialog. */
 visicomp.app.visiui.dialog.showCreateChildDialog = function(objectTitle,app,onCreateFunction) {
 
 ////////////////////////////////////////////////////////

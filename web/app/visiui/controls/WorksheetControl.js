@@ -1,4 +1,5 @@
-/** This control represents a table object. */
+/** This control represents a worksheet, which is a function that is programmed using
+ *visicomp tables rather than writing code. */
 visicomp.app.visiui.WorksheetControl = function(workspaceUI,worksheet,controlJson) {
     //base init
     visicomp.app.visiui.Control.init.call(this,workspaceUI,worksheet,visicomp.app.visiui.WorksheetControl.generator,controlJson);
@@ -55,7 +56,7 @@ visicomp.app.visiui.WorksheetControl.prototype.populateFrame = function() {
     menuItemInfoList.splice(0,0,itemInfo1,itemInfo2);
 }
 
-/** This method updates the table data 
+/** This method updates the component when the data changes. 
  * @private */    
 visicomp.app.visiui.WorksheetControl.prototype.memberUpdated = function() {
 }
@@ -105,7 +106,7 @@ visicomp.app.visiui.WorksheetControl.prototype.createEditReturnValueDialogCallba
 // Static methods
 //======================================
 
-//add table listener
+/** This method creates the control. */
 visicomp.app.visiui.WorksheetControl.createControl = function(workspaceUI,parent,name) {
     
     var json = {};
