@@ -1,4 +1,4 @@
-visicomp.app.visiui.CustomResourceProcessor = function() {
+visicomp.app.visiui.CustomResource = function() {
 	this.window = null;
 	
 	this.html = "";
@@ -7,56 +7,56 @@ visicomp.app.visiui.CustomResourceProcessor = function() {
 	this.css = "";
 }
 
-visicomp.app.visiui.CustomResourceProcessor.prototype.setWindow = function(window) {
+visicomp.app.visiui.CustomResource.prototype.setWindow = function(window) {
     this.window = window;
 }
 
-visicomp.app.visiui.CustomResourceProcessor.prototype.getWindow = function() {
+visicomp.app.visiui.CustomResource.prototype.getWindow = function() {
     return this.window;
 }
 
-visicomp.app.visiui.CustomResourceProcessor.prototype.getContentElement = function() {
+visicomp.app.visiui.CustomResource.prototype.getContentElement = function() {
     return this.window.getContent();
 }
 
-visicomp.app.visiui.CustomResourceProcessor.prototype.getHtml = function() {
+visicomp.app.visiui.CustomResource.prototype.getHtml = function() {
     return this.html;
 }
 
-visicomp.app.visiui.CustomResourceProcessor.prototype.getCustomizeScript = function() {
+visicomp.app.visiui.CustomResource.prototype.getCustomizeScript = function() {
     return this.customizeScript;
 }
 
-visicomp.app.visiui.CustomResourceProcessor.prototype.getSupplementalCode = function() {
+visicomp.app.visiui.CustomResource.prototype.getSupplementalCode = function() {
     return this.supplementalCode;
 }
 
-visicomp.app.visiui.CustomResourceProcessor.prototype.getCss = function(msg) {
+visicomp.app.visiui.CustomResource.prototype.getCss = function(msg) {
     return this.css;
 }
 
-visicomp.app.visiui.CustomResourceProcessor.prototype.update = function(html,customizeScript,supplementalCode,css) {
+visicomp.app.visiui.CustomResource.prototype.update = function(html,customizeScript,supplementalCode,css) {
     this.html = html;
 	this.customizeScript = customizeScript;
 	this.supplementalCode = supplementalCode;
 	this.css = css;
 	
-	//update the processor with the given data
-	this.updateProcessor();
+	//update the resource with the given data
+	this.updateResource();
 }
 
 //======================================
-// Processor methods
+// Resource methods
 //======================================
 
 /** This method creates the member update javascript, which will be added to the
  * html page so the user easily can run it in the debugger if needed. 
  * @private */
-visicomp.app.visiui.CustomResourceProcessor.prototype.updateProcessor = function() {
+visicomp.app.visiui.CustomResource.prototype.updateResource = function() {
     
     //create the resource generator wrapped with its closure
     var generatorFunctionBody = visicomp.core.util.formatString(
-        visicomp.app.visiui.CustomResourceProcessor.GENERATOR_FUNCTION_FORMAT_TEXT,
+        visicomp.app.visiui.CustomResource.GENERATOR_FUNCTION_FORMAT_TEXT,
 		this.customizeScript,
         this.supplementalCode
     );
@@ -64,7 +64,7 @@ visicomp.app.visiui.CustomResourceProcessor.prototype.updateProcessor = function
 	//create the function generator, with the aliased variables in the closure
 	var generatorFunction = new Function(generatorFunctionBody);
 	var updateFunction = generatorFunction();
-	this.resourceProcessor = updateFunction(this);
+	this.resource = updateFunction(this);
 }
 
 
@@ -75,7 +75,7 @@ visicomp.app.visiui.CustomResourceProcessor.prototype.updateProcessor = function
  * 1: supplemental code text
  * @private
  */
-visicomp.app.visiui.CustomResourceProcessor.GENERATOR_FUNCTION_FORMAT_TEXT = [
+visicomp.app.visiui.CustomResource.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "",
 "//supplemental code",
 "{1}",

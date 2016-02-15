@@ -1,8 +1,8 @@
 /** This method shows an update component dialog. The argument onSaveData si the same
  * arguments as the updateFunction event handler data. */
-visicomp.app.visiui.dialog.showUpdateCustomComponentDialog = function(customResourceComponent,onSaveFunction) {
+visicomp.app.visiui.dialog.showUpdateCustomComponentDialog = function(customControlComponent,onSaveFunction) {
 	
-	var customResourceProcessor = customResourceComponent.getObject().getResourceProcessor();
+	var customResource = customControlComponent.getObject().getResource();
     
     var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
@@ -103,28 +103,28 @@ visicomp.app.visiui.dialog.showUpdateCustomComponentDialog = function(customReso
             componentHtml = htmlEditor.getSession().getValue();
         }
         else {
-            componentHtml = customResourceProcessor.getHtml();
+            componentHtml = customResource.getHtml();
         }
 
         if(customizeEditor) {
             customize = customizeEditor.getSession().getValue().trim();
         }
         else {
-            customize = customResourceProcessor.getCustomizeScript();
+            customize = customResource.getCustomizeScript();
         }
 
         if(supplementalEditor) {
             supplementalCode = supplementalEditor.getSession().getValue().trim();
         }
         else {
-            supplementalCode = customResourceProcessor.getSupplementalCode();
+            supplementalCode = customResource.getSupplementalCode();
         }
 
         if(cssEditor) {
             css = cssEditor.getSession().getValue().trim();
         }
         else {
-            css = customResourceProcessor.getCss();
+            css = customResource.getCss();
         }
 
         var complete = onSaveFunction(componentHtml,customize,supplementalCode,css);
@@ -184,7 +184,7 @@ htmlEditor.$blockScrolling = Infinity;
             htmlEditor.setTheme("ace/theme/eclipse");
             htmlEditor.getSession().setMode("ace/mode/html");
             //set the value
-            var html = customResourceProcessor.getHtml();
+            var html = customResource.getHtml();
             if(html) {
                 htmlEditor.getSession().setValue(html);
             }
@@ -207,7 +207,7 @@ customizeEditor.$blockScrolling = Infinity;
             customizeEditor.setTheme("ace/theme/eclipse");
             customizeEditor.getSession().setMode("ace/mode/javascript");
             //set the customize
-            var customize = customResourceProcessor.getCustomizeScript();
+            var customize = customResource.getCustomizeScript();
             if(customize) {
                 customizeEditor.getSession().setValue(customize);
             }
@@ -230,7 +230,7 @@ supplementalEditor.$blockScrolling = Infinity;
             supplementalEditor.setTheme("ace/theme/eclipse");
             supplementalEditor.getSession().setMode("ace/mode/javascript");
             //set the supplemental
-            var supplementalCode = customResourceProcessor.getSupplementalCode();
+            var supplementalCode = customResource.getSupplementalCode();
             if(supplementalCode) {
                 supplementalEditor.getSession().setValue(supplementalCode);
             }
@@ -252,7 +252,7 @@ cssEditor.$blockScrolling = Infinity;
             cssEditor.setTheme("ace/theme/eclipse");
             cssEditor.getSession().setMode("ace/mode/css");
             //set the value
-            var css = customResourceProcessor.getCss();
+            var css = customResource.getCss();
             if(css) {
                 cssEditor.getSession().setValue(css);
             }

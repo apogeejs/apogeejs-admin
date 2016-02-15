@@ -150,7 +150,7 @@ visicomp.app.visiui.VisiComp.prototype.loadComponentGenerators = function() {
     this.registerStandardComponent(visicomp.app.visiui.WorksheetComponent.generator);
 	
     //additional components
-    this.registerComponent(visicomp.app.visiui.CustomResourceComponent.generator);
+    this.registerComponent(visicomp.app.visiui.CustomControlComponent.generator);
 }
 
 /** This method registers a component. 

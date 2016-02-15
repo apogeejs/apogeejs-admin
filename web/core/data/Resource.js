@@ -17,7 +17,7 @@ visicomp.core.Control.prototype.getResource = function() {
     return this.resource;
 }    
 
-/** This method updates the resource processor for this resource. */
+/** This method updates the resource for this resource. */
 visicomp.core.Control.prototype.updateResource = function(resource) {	
     this.resource = resource;
 	

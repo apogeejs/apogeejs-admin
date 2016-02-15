@@ -2,21 +2,21 @@
  * 
  * This is not a class, but it is used for the prototype of the objects that inherit from it.
  */
-visicomp.app.visiui.BasicResourceComponent = {};
+visicomp.app.visiui.BasicControlComponent = {};
 
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-visicomp.app.visiui.BasicResourceComponent.init = function() {}
+visicomp.app.visiui.BasicControlComponent.init = function() {}
 
 //==============================
 // Protected and Private Instance Methods
 //==============================
 
 ///** This method should be implemented to add any data to the component at initialization time. */
-//visicomp.app.visiui.CustomResourceComponent.prototype.addToFrame = function();
+//visicomp.app.visiui.BasicControlComponent.prototype.addToFrame = function();
 
 /** This method populates the frame for this component. */
-visicomp.app.visiui.BasicResourceComponent.populateFrame = function() {
+visicomp.app.visiui.BasicControlComponent.populateFrame = function() {
 	
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
@@ -36,14 +36,14 @@ visicomp.app.visiui.BasicResourceComponent.populateFrame = function() {
 }
 
 /** This is called when the data is updated. This calls the "run" method of
- * the resource processor. 
+ * the resource. 
  * @private */    
-visicomp.app.visiui.BasicResourceComponent.memberUpdated = function() {
-    //execute the resource processor on an update
-    var resource = this.getObject();
-    var resourceProcessor = resource.getResourceProcessor();
-    if((resourceProcessor)&&(resourceProcessor.run)) {
-        resourceProcessor.run();
+visicomp.app.visiui.BasicControlComponent.memberUpdated = function() {
+    //execute the resource on an update
+    var control = this.getObject();
+    var resource = control.getResource();
+    if((resource)&&(resource.run)) {
+        resource.run();
     }    
 }
 
