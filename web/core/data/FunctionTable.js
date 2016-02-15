@@ -33,7 +33,7 @@ visicomp.core.FunctionTable.prototype.processObjectFunction = function(objectFun
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.FunctionTable.fromJson = function(owner,json,updateDataList) {
+visicomp.core.FunctionTable.fromJson = function(owner,json,updateDataList,actionResponse) {
     var initialArgList = [];
     var functionTable = new visicomp.core.FunctionTable(owner,json.name,initialArgList);
     if(json.updateData) {

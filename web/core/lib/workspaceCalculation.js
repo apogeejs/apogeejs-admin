@@ -3,12 +3,6 @@
 visicomp.core.calculation = {};
 
 
-visicomp.core.calculation.fireUpdatedEvent = function(member) {
-    var workspace = member.getWorkspace();
-    workspace.dispatchEvent(visicomp.core.calculation.MEMBER_UPDATED_EVENT,member);
-}
-
-
 /** This addes the member to the recalculate list, if it has a formula and hence
  * needs to be recalculated. It then adds all talbes that depend on this one.
  * @private */
@@ -45,20 +39,24 @@ visicomp.core.calculation.inList = function(recalculateList,member) {
 }
 
 /** This method updates the recalculate list order so no member appears in the list
- *before a member it depends on. This will return false if it fails. 
+ *before a member it depends on. This will return false if there is a circular reference.
  * @private */
-visicomp.core.calculation.sortRecalculateList = function(recalculateList) {
+visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionResponse) {
 	
 	//working variables
 	var sortedRecalculateList = [];
 	var member;
 	var i;
+    var success = true;
 	
 	//keep track of which members have been copied to the sorted list
+    //clear all circular reference errors before sorting (they will be reset if needed)
 	var memberIsSortedMap = {};
 	for(i = 0; i < recalculateList.length; i++) {
 		member = recalculateList[i];
 		memberIsSortedMap[member.getFullName()] = false;
+        
+        member.clearCircRefError();
 	}
 	
 	//sort the list
@@ -78,6 +76,10 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList) {
 			var dependsOn = member.getDependsOn();
 			for(var j = 0; j < dependsOn.length; j++) {
 				var remoteObject = dependsOn[j];
+                
+                //don't withhold an object that depends on itself
+                if(remoteObject === member) continue;
+                
 				if(memberIsSortedMap[remoteObject.getFullName()] === false) {
 					//this depends on an unsorted member
 					unsortedImpactedDependencies = true;
@@ -99,8 +101,18 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList) {
 		}
 		
 		//if we added no members to sorted this iteration, there must be a circular reference
+        //give each an error and transfer to sorted list
 		if(!membersAddedToSorted) {
-            return false;
+            var errorMsg = "Circular Reference";
+            var actionError = new visicomp.core.ActionError(errorMsg,null,visicomp.core.ActionError.ACTION_ERROR_MODEL);
+            actionResponse.addError(actionError);
+            for(var ie = 0; ie < recalculateList.length; ie++) {
+                member = recalculateList[ie];
+                member.setCircRefError(actionError);
+                sortedRecalculateList.push(member);
+            }
+            recalculateList.splice(0,recalculateList.length);
+            success = false;
 		}
 		
 	}
@@ -109,24 +121,32 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList) {
 	for(i = 0; i < sortedRecalculateList.length; i++) {
 		recalculateList.push(sortedRecalculateList[i]);
 	}
-	
-	return true;
-	
+    
+    return success;
 }
 
-/** This calls the update method for each member in the impacted list.
+/** This calls execute for each member in the recalculate list. The return value
+ * is false if there are any errors.
  * @private */
-visicomp.core.calculation.callRecalculateList = function(recalculateList) {
+visicomp.core.calculation.callRecalculateList = function(recalculateList,actionResponse) {
     var member;
-    for(var i = 0; i < recalculateList.length; i++) {
+    var i;
+    var overallSuccess = true;
+    for(i = 0; i < recalculateList.length; i++) {
         member = recalculateList[i];
 
         //update the member
-        member.execute();
-
-        //fire this for the change in value
-        visicomp.core.calculation.fireUpdatedEvent(member);
+        var success = member.execute();
+        if(!success) {
+            var actionError = member.getDataError();
+            if(actionError) {
+                actionResponse.addError(actionError);
+            }
+            overallSuccess = false;
+        }
     }
+    
+    return overallSuccess;
 }
 
 

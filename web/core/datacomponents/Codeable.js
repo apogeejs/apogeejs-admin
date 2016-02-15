@@ -15,8 +15,12 @@ visicomp.core.Codeable = {};
 /** This initializes the component */
 visicomp.core.Codeable.init = function(argList) {
     
-    //arguments of the member function (with parentheses - we probably will change this)
+    //arguments of the member function
     this.argList = argList;
+	
+	//error data
+	this.codeError = null;
+    this.circRefError = null;
     
     //initialze the code as empty
     this.clearCode();
@@ -41,13 +45,59 @@ visicomp.core.Codeable.getSupplementalCode = function() {
     return this.supplementalCode;
 }
 
+/** This method sets the code error flag for this codeable, and it sets an error
+ * message. The error is cleared by setting valid code. If an object has a code error
+ * this will be passed on to be a data error when the member is executed.*/
+visicomp.core.Codeable.setCodeError = function(actionError) {
+    this.codeError = actionError;
+}
+
+/** This method returns true if there is an code error for this member, 
+ * making the code invalid. */
+visicomp.core.Codeable.hasCodeError = function() {
+    return (this.codeError != null);
+}
+
+/** This returns the code error. */
+visicomp.core.Codeable.getCodeError = function() {
+    return this.codeError;
+}
+
+/** This method sets the circular reference error for this codeable.
+ * If an object has a ciruclar refernec error
+ * this will be passed on to be a data error when the member is executed.*/
+visicomp.core.Codeable.setCircRefError = function(circRefError) {
+    this.circRefError = circRefError;
+}
+
+/** This method clears the circular reference error for this codeable.*/
+visicomp.core.Codeable.clearCircRefError = function() {
+    this.circRefError = null;
+}
+
+/** This returns true if there is a ciruclar reference error. */
+visicomp.core.Codeable.hasCircRefError = function() {
+    return (this.circRefError != null);
+}
+
+/** This returns the cirular reference error. */
+visicomp.core.Codeable.getCircRefError = function() {
+    return this.circRefError;
+}
+
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
 
-        //set the base data
-        this.argList = codeInfo.argList;
-        this.functionBody = codeInfo.functionBody;
-        this.supplementalCode = codeInfo.supplementalCode;
+    //set the base data
+    this.argList = codeInfo.argList;
+    this.functionBody = codeInfo.functionBody;
+    this.supplementalCode = codeInfo.supplementalCode;
+    this.codeSet = true;
+
+    if(codeInfo.actionError) {
+        this.setCodeError(codeInfo.actionError);
+    }
+    else {
 
         //save the variables accessed
         this.varInfo = codeInfo.varInfo;
@@ -56,36 +106,81 @@ visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
         this.contextSetter = codeInfo.contextSetter;
         this.objectFunction = codeInfo.objectFunction;
 
-        //update dependencies
-        this.updateDependencies(codeInfo.dependencyList);
+        //clear any code error
+        this.codeError = null;
+    }
+
+    //update dependencies
+    this.updateDependencies(codeInfo.dependencyList);
 }
 
 /** This method udpates the dependencies if needed because
  *the passed variable was added.  */
-visicomp.core.Codeable.updateForAddedVariable = function(object) {
-    if(this.hasCode()) {
-        //we need a function that calculates the dependencies
-        //for now I will just always recalculate, if there is 
-        var possibleDependency = true;
-        if(possibleDependency) {
-            this.recalculateDependencies();
+visicomp.core.Codeable.updateForAddedVariable = function(addedMember,recalculateList) {
+    if((this.hasCode())&&(this.varInfo)) {
+            
+        var newDependencyList;
+        try {
+            
+            //calculate new dependencies
+            newDependencyList = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo,
+               this.getParent(),
+               this.getRootFolder());
         }
+        catch(error) {
+            //error for this member
+            var actionError = visicomp.core.ActionError.processMemberModelException(error,this);
+            this.setCodeError(actionError);
+            
+            //set a dummy dependency list
+            newDependencyList = [];
+        }
+            
+        //update this object if the new table is in the list
+        if(newDependencyList.indexOf(addedMember) >= 0) {
+            //update dependencies
+            this.updateDependencies(newDependencyList);
+
+            //add to update list
+            visicomp.core.calculation.addToRecalculateList(recalculateList,this);
+        }
+        
     }
 }
 
 /** This method udpates the dependencies if needed because
  *the passed variable was deleted.  */
-visicomp.core.Codeable.updateForDeletedVariable = function(object) {
+visicomp.core.Codeable.updateForDeletedVariable = function(deletedMember,recalculateList) {
     if(this.hasCode()) {
         var dependsOnList = this.getDependsOn();
-        if(dependsOnList.indexOf(object) >= 0) {
-            this.recalculateDependencies();
+        if(dependsOnList.indexOf(deletedMember) >= 0) {
+            
+            if(!this.varInfo) return;
+    
+            try {
+                //calculate dependencies
+               var dependencyList = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo,
+                   this.getParent(),
+                   this.getRootFolder());
+            }
+            catch(error) {
+                //unknown application error
+                var actionError = visicomp.core.ActionError.processMemberModelException(error,this);
+                this.setCodeError(actionError);
+            }
+
+            //update dependencies
+            this.updateDependencies(dependencyList); 
+
+            //add to update list
+            visicomp.core.calculation.addToRecalculateList(recalculateList,this);
         }
     }
 }
 
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.clearCode = function() {
+    this.codeSet = false;
     this.functionBody = "";
     this.supplementalCode = "";
     this.varInfo = null;
@@ -99,32 +194,68 @@ visicomp.core.Codeable.clearCode = function() {
 
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.hasCode = function() {
-    return (this.objectFunction !== null);
+    return this.codeSet;
 }
 
-/** This implements the "needsExecuting" method of Dependent. 
+/** If this is true the member must be executed. 
  * @private */
 visicomp.core.Codeable.needsExecuting = function() {
-	return (this.objectFunction != null);
+	return this.codeSet;
 }
 
 
-/** This implements the "execute" method of Dependent.  */
+/** This updates the member data based on the function. It returns
+ * true for success and false if there is an error.  */
 visicomp.core.Codeable.execute = function() {
-    if(!this.objectFunction) return;
+	
+	//don't calculate if this has an error.
+	//do pass the error on to be a data error.
+	if(this.hasCodeError()) {
+		this.setDataError(this.getCodeError());
+		return false;
+	}
+    else if(this.hasCircRefError()) {
+        this.setDataError(this.getCircRefError());
+        return false;
+    }
     
-    //set the context
-    var rootDataMap = this.getRootFolder().getData();
-    var localDataMap = this.getParent().getData();
-    var listOfContexts = [
-        localDataMap,
-        rootDataMap,
-        window
-    ]
-    this.contextSetter(listOfContexts);
+    if((!this.objectFunction)||(!this.contextSetter)) {
+        var actionError = new visicomp.core.ActionError("Function not found for member: " + this.getName(),this);
+        this.setDataError(actionError);
+        return false;
+    }
     
-    //process the object function as needed (implement for each type)
-    this.processObjectFunction(this.objectFunction);
+    try {
+        //check if any values this depends on have an error
+        var errorFound = this.checkDependencyError();
+        if(errorFound) return false;
+        
+        //set the context
+        var rootDataMap = this.getRootFolder().getData();
+        var localDataMap = this.getParent().getData();
+        var listOfContexts = [
+            localDataMap,
+            rootDataMap,
+            window
+        ]
+        this.contextSetter(listOfContexts);
+
+        //process the object function as needed (implement for each type)
+        this.processObjectFunction(this.objectFunction);
+        
+        return true;
+    }
+    catch(error) {
+        //this is an error in the code
+        if(error.stack) {
+            console.error(error.stack);
+        }
+        var errorMsg = "Error Recalculating Member: " + ((error.message) ? error.message : null);
+        var actionError = new visicomp.core.ActionError(errorMsg,this);
+        actionError.setParentException(error);
+        this.setDataError(actionError);
+        return false;
+    }
 }
 
 //------------------------------
@@ -170,20 +301,39 @@ visicomp.core.Codeable.loadFromContext = function(listOfContexts,name) {
     return undefined;
 }
 
-/** This method recalculates the dependencies for this object, given a change
- * in variables in the workspace. 
+/** This method checks if any variable this depends on ha an error. If so it 
+ * reports an error for this member and returns true.  Otherwise it returns false.
  * @private */
-visicomp.core.Codeable.recalculateDependencies = function() {
-     //calculate dependencies
-	var dependencyList = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo,
-        this.getParent(),
-        this.getRootFolder());
+visicomp.core.Codeable.checkDependencyError = function() {
+    //get variables this depends on has an error
+    var dependsOn = this.getDependsOn();
+    var errorDependencies = null;
+    var i = 0;
+    for(var i = 0; i < dependsOn.length; i++) {
+        var member = dependsOn[i];
+        if(member.hasDataError()) {
+			//this depends on a table with an error.
+            if(errorDependencies == null) {
+                errorDependencies = [];
+            }
+            errorDependencies.push(member);
+        }
+    }
     
-    //update dependencies
-    this.updateDependencies(dependencyList); 
-    
-    //reexecute, if needed
-    if(this.needsExecuting()) {
-        this.execute();
+    if(errorDependencies != null) {
+        //dependency error found
+        var message = "Error in dependency: ";
+        for(i = 0; i < errorDependencies.length; i++) {
+            if(i > 0) message += ", ";
+            message += errorDependencies[i].getFullName();
+        }
+        var actionError = new visicomp.core.ActionError(message,this);
+        this.setDataError(actionError);   
+        
+        return true;
+    }
+    else {
+        //no dependency error
+        return false;
     }
 }

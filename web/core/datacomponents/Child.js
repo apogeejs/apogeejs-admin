@@ -1,7 +1,7 @@
 /** This component encapsulates the child functionality for members in the workspace,
  * allowing them to sit in a organizational hierarchy.
  * 
- * This is not a class, but it is used for the prototype of the objects that inherit from it.
+ * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  *  
  * COMPONENT DEPENDENCIES:
  * - For children that are DataHolders and consequentially Impactors, the Imapctor
@@ -103,7 +103,7 @@ visicomp.core.Child.toJson = function() {
 
 ///** This method creates a child from a json. IT should be implemented as a static
 // * function in extending objects. */ 
-//visicomp.core.Child.fromJson = function(workspace,json,updateDataList) {
+//visicomp.core.Child.fromJson = function(workspace,json,updateDataList,actionResponse) {
 //}
 
 //========================================

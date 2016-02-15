@@ -15,8 +15,7 @@ visicomp.core.DataHolder = {};
 visicomp.core.DataHolder.init = function() {
     
     this.data = null;
-    this.error = false;
-    this.errorMsg = null;
+    this.dataError = null;
     
     //these are a list of members that depend on this member
     this.impactsList = [];
@@ -33,42 +32,39 @@ visicomp.core.Child.getData = function() {
 
 /** This method sets the data for this object. This is the object used by the 
  * code which is identified by this name, for example the JSON object associated
- * with a table. Besides hold the data object, this updates the parent data map. */
+ * with a JSON table. Besides hold the data object, this updates the parent data map. */
 visicomp.core.DataHolder.setData = function(data) {
-    this.internalSetData(data,false,null);
+    this.internalSetData(data,null);
 }
 
 /** This method sets the error flag for this data holder, and it sets an error
- * message. The error is cleared by setting valid data. */
-visicomp.core.DataHolder.setError = function(msg) {
-    this.internalSetData(null,true,msg);
+ * message. The error is cleared by setting valid data, either through the 
+ * set data method or in a calculation. */
+visicomp.core.DataHolder.setDataError = function(actionError) {
+    this.internalSetData(null,actionError);
 }
 
-visicomp.core.DataHolder.internalSetData = function(data,hasError,errorMsg) {
+visicomp.core.DataHolder.internalSetData = function(data,actionError) {
     
     this.data = data;
-    this.error = hasError;
-    this.errorMsg = errorMsg;
+    this.dataError = actionError;
     
     //data the data map in the parent if it is a hierarchy container 
     if(this.parent) {
         this.parent.updateData(this);
     }
-    
-    //fire an update event
-    visicomp.core.updatemember.fireUpdatedEvent(this);
 }
 
-/** This method returns true if there is an error for this table, 
+/** This method returns true if there is an dataError for this table, 
  * making the data invalid. */
-visicomp.core.DataHolder.hasError = function() {
-    return this.error;
+visicomp.core.DataHolder.hasDataError = function() {
+    return (this.dataError != null);
 }
 
 /** This returns the error messag. It should only be called
  * is hasError returns true. */
-visicomp.core.DataHolder.getErrorMsg = function() {
-    return this.errorMsg;
+visicomp.core.DataHolder.getDataError = function() {
+    return this.dataError;
 }
 
 /** This returns an array of members this member impacts. */

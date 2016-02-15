@@ -65,7 +65,7 @@ EditField.prototype.startEdit = function() {
 			this.editField.value = this.value;
 		}
 		
-        this.element.innerHTML = "";
+		visicomp.core.util.removeAllChildren(this.element);
         this.element.appendChild(this.editField);
         
         //select the entry

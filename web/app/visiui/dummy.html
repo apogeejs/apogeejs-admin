@@ -13,26 +13,28 @@
         <script type="text/javascript" src="../../core/lib/util.js"></script>
         <script type="text/javascript" src="../../core/datacomponents/Child.js"></script>
         <script type="text/javascript" src="../../core/datacomponents/DataHolder.js"></script>
-        <script type="text/javascript" src="../../core/datacomponents/Dependant.js"></script>
+        <script type="text/javascript" src="../../core/datacomponents/Dependent.js"></script>
 		<script type="text/javascript" src="../../core/datacomponents/Impactor.js"></script>
         <script type="text/javascript" src="../../core/datacomponents/Codeable.js"></script>
         <script type="text/javascript" src="../../core/datacomponents/Owner.js"></script>
         <script type="text/javascript" src="../../core/datacomponents/Parent.js"></script>
         <script type="text/javascript" src="../../core/data/Workspace.js"></script>
-        <script type="text/javascript" src="../../core/data/Table.js"></script>
+        <script type="text/javascript" src="../../core/data/JsonTable.js"></script>
         <script type="text/javascript" src="../../core/data/FunctionTable.js"></script>
-        <script type="text/javascript" src="../../core/data/Resource.js"></script>
+        <script type="text/javascript" src="../../core/data/Control.js"></script>
         <script type="text/javascript" src="../../core/data/Folder.js"></script>
         <script type="text/javascript" src="../../core/data/Worksheet.js"></script>
-        <script type="text/javascript" src="../../core/action/createmember.js"></script>
-        <script type="text/javascript" src="../../core/action/updatemember.js"></script>
-		<script type="text/javascript" src="../../core/action/deletechild.js"></script>
+        <script type="text/javascript" src="../../core/actions/ActionResponse.js"></script>
+        <script type="text/javascript" src="../../core/actions/ActionError.js"></script>
+        <script type="text/javascript" src="../../core/actions/createmember.js"></script>
+        <script type="text/javascript" src="../../core/actions/updatemember.js"></script>
+		<script type="text/javascript" src="../../core/actions/deletechild.js"></script>
 		<script type="text/javascript" src="../../ui/visiui/visiui.js"></script>
+        <script type="text/javascript" src="../../ui/visiui/ParentContainer.js"></script>
 		<script type="text/javascript" src="../../ui/visiui/WindowFrame.js"></script>
-        <script type="text/javascript" src="../../ui/visiui/WindowGroupManager.js"></script>
-        <script type="text/javascript" src="../../ui/visiui/StackWindow.js"></script>
-        <script type="text/javascript" src="../../ui/visiui/Dialog.js"></script>
+        <script type="text/javascript" src="../../ui/visiui/SimpleParentContainer.js"></script>
 		<script type="text/javascript" src="../../ui/visiui/TabFrame.js"></script>
+        <script type="text/javascript" src="../../ui/visiui/Tab.js"></script>
 		<script type="text/javascript" src="../../ui/visiui/menu/MenuBar.js"></script>
 		<script type="text/javascript" src="../../ui/visiui/menu/Menu.js"></script>
         <script type="text/javascript" src="../../ui/visiui/menu/StaticMenu.js"></script>
@@ -40,28 +42,34 @@
         <script type="text/javascript" src="../../lib/ace/src-min/ace.js" charset="utf-8"></script>
         <script type="text/javascript" src="../../lib/parsing/esprima.js"></script>
         <script type="text/javascript" src="VisiComp.js"></script>
-        <script type="text/javascript" src="Control.js"></script>
-        <script type="text/javascript" src="ParentContainer.js"></script>
+		<script type="text/javascript" src="LinkManager.js"></script>
+        <script type="text/javascript" src="Component.js"></script>
         <script type="text/javascript" src="WorkspaceUI.js"></script>
-		<script type="text/javascript" src="controls/FolderControl.js"></script>
-        <script type="text/javascript" src="controls/TableControl.js"></script>
-        <script type="text/javascript" src="controls/FunctionControl.js"></script>
-        <script type="text/javascript" src="controls/WorksheetControl.js"></script>
-        <script type="text/javascript" src="controls/BasicResourceControl.js"></script>
-		<script type="text/javascript" src="controls/CustomResourceControl.js"></script>
-        <script type="text/javascript" src="controls/CustomResourceProcessor.js"></script>
-        <script type="text/javascript" src="dialog/UpdateTableDataDialog.js"></script>
-        <script type="text/javascript" src="dialog/UpdateArgListDialog.js"></script>
-		<script type="text/javascript" src="dialog/UpdateCodeableDialog.js"></script>
-		<script type="text/javascript" src="dialog/UpdateCustomControlDialog.js"></script>
-        <script type="text/javascript" src="dialog/CreateChildDialog.js"></script>
-        <script type="text/javascript" src="dialog/CreateControlDialog.js"></script>
-        <script type="text/javascript" src="dialog/CreateWorkspaceDialog.js"></script>
-        <script type="text/javascript" src="dialog/UpdateWorksheetReturnDialog.js"></script>
-        <script type="text/javascript" src="dialog/TempOpenDialog.js"></script>
-        <script type="text/javascript" src="dialog/TempSaveDialog.js"></script>
-        <script type="text/javascript" src="dialog/UpdateLinksDialog.js"></script>
-        <script type="text/javascript" src="dialog/SelectControlDialog.js"></script>
+		<script type="text/javascript" src="components/FolderComponent.js"></script>
+        <script type="text/javascript" src="components/JsonTableComponent.js"></script>
+        <script type="text/javascript" src="components/FunctionComponent.js"></script>
+        <script type="text/javascript" src="components/WorksheetComponent.js"></script>
+        <script type="text/javascript" src="components/BasicControlComponent.js"></script>
+		<script type="text/javascript" src="components/CustomControlComponent.js"></script>
+        <script type="text/javascript" src="components/CustomResource.js"></script>
+        <script type="text/javascript" src="actions/openworkspace.js"></script>
+        <script type="text/javascript" src="actions/createworkspace.js"></script>
+        <script type="text/javascript" src="actions/closeworkspace.js"></script>
+        <script type="text/javascript" src="actions/saveworkspace.js"></script>
+        <script type="text/javascript" src="actions/addcomponent.js"></script>
+        <script type="text/javascript" src="actions/addadditionalcomponent.js"></script>
+        <script type="text/javascript" src="actions/updatelinks.js"></script>
+        <script type="text/javascript" src="dialogs/UpdateTableDataDialog.js"></script>
+        <script type="text/javascript" src="dialogs/UpdateArgListDialog.js"></script>
+		<script type="text/javascript" src="dialogs/UpdateCodeableDialog.js"></script>
+		<script type="text/javascript" src="dialogs/UpdateCustomControlDialog.js"></script>
+        <script type="text/javascript" src="dialogs/CreateChildDialog.js"></script>
+        <script type="text/javascript" src="dialogs/CreateWorkspaceDialog.js"></script>
+        <script type="text/javascript" src="dialogs/UpdateWorksheetReturnDialog.js"></script>
+        <script type="text/javascript" src="dialogs/TempOpenDialog.js"></script>
+        <script type="text/javascript" src="dialogs/TempSaveDialog.js"></script>
+        <script type="text/javascript" src="dialogs/UpdateLinksDialog.js"></script>
+        <script type="text/javascript" src="dialogs/SelectControlDialog.js"></script>
         <link rel="stylesheet" type="text/css" href="../../ui/visiui/dialog.css">
 		<style>
 			body {

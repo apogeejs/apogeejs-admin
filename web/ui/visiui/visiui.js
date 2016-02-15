@@ -57,3 +57,53 @@ visicomp.visiui.createElement = function(type,properties,styleProperties) {
     }
     return element;
 }
+
+//=========================================
+// window and dialog methods
+//=========================================
+
+visicomp.visiui.dialogParent = null;
+
+visicomp.visiui.BASE_ELEMENT_STYLE = {
+    "position":"absolute",
+    "left":"0px",
+    "right":"0px",
+    "top":"0px",
+    "bottom":"0px",
+    "z-index":1
+}
+
+visicomp.visiui.DIALOG_LAYER_STYLE = {
+    "position":"absolute",
+    "left":"0px",
+    "right":"0px",
+    "top":"0px",
+    "bottom":"0px",
+    "z-index": 2,
+    "pointer-events": "none"
+}
+    
+visicomp.visiui.initWindows = function(appElementId) {
+    //create the ui elements from the app element
+    var appContainer = document.getElementById(appElementId);
+    if(!appContainer) {
+        throw visicomp.core.util.createError("Container ID not found: " + appElementId);
+    }
+    
+    var elements = {};
+    elements.baseElement = visicomp.visiui.createElement("div",null,visicomp.visiui.BASE_ELEMENT_STYLE); 
+    elements.dialogLayer = visicomp.visiui.createElement("div",null,visicomp.visiui.DIALOG_LAYER_STYLE);
+    
+    appContainer.appendChild(elements.baseElement);
+    appContainer.appendChild(elements.dialogLayer);
+    
+//I should implement the events on here!
+    visicomp.visiui.dialogParent = new visicomp.visiui.SimpleParentContainer(elements.dialogLayer,true);
+    
+    return elements;
+}
+
+/** This returns the parent container for dialogs. */
+visicomp.visiui.getDialogParent = function() {
+    return visicomp.visiui.dialogParent;
+}

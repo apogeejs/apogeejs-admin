@@ -5,12 +5,12 @@ visicomp.core.util = {};
  * Based on the error type, additional data can be added to the error object
  * before it is thrown. */
 visicomp.core.util.createError = function(msg,optionalType,optionalBaseError) {
-    var error = {};
-    error.message = msg;
+    var error = new Error(msg);
     error.type = optionalType;
     error.baseError = optionalBaseError;
     return error;
 }
+
 
 /** This method creates an integer has value for a string. */
 visicomp.core.util.mixin = function(destObject,mixinObject) {
@@ -91,3 +91,10 @@ visicomp.core.util.formatString = function(format,stringArgs) {
         return formatParams[index]; 
     });
 };
+
+/** This method removes all the content from a DOM element. */
+visicomp.core.util.removeAllChildren = function(element) {
+	while(element.lastChild) {
+		element.removeChild(element.lastChild);
+	}
+}

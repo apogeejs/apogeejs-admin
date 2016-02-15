@@ -68,7 +68,7 @@ JsonEditArea.prototype.loadContextMenu = function() {
 
 JsonEditArea.prototype.updateValueElements = function() {
     //remove all from element
-    this.body.innerHTML = "";
+	visicomp.core.util.removeAllChildren(this.body);
     //recreate
     this.formatBody();
 }

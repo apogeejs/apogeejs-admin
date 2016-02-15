@@ -17,19 +17,21 @@ visicomp.core.Worksheet = function(owner,name) {
     //this is the internal workspace in which function evaluations are done.
     this.virtualWorkspace = null;
     
-    //dummy, until we figure out how to do this
+    //set initial worksheet function
     var worksheetFunction = this.getWorksheetFunction();
     this.setData(worksheetFunction);
     
     //subscribe to the update event for this table
-    //add a member updated listener
-    instance = this;
+    //whenever the output object is updated we will update the worksheet function
+    var instance = this;
     var memberUpdatedCallback = function(member) {
         if(instance.isBaseReturnObject(member)) {
-            this.virtualWorkspace = null;
+            //we recalculate this unnecessarily sometimes - as in when the input argument value
+            //in the workshet changes. That's ok though.
+            instance.updateWorksheetFunction();
         }    
     }
-    this.getWorkspace().addListener(visicomp.core.updatemember.MEMEBER_UPDATED_EVENT, memberUpdatedCallback);
+    this.getWorkspace().addListener(visicomp.core.updatemember.MEMBER_UPDATED_EVENT, memberUpdatedCallback);
 }
 
 //add components to this class
@@ -51,7 +53,7 @@ visicomp.core.Worksheet.prototype.setReturnValueString = function(returnValueStr
     //clear the virtual workspace
     this.virtualWorkspace = null;
     
-    this.triggerRecalc();
+    this.updateWorksheetFunction();
 }
 
 /** */
@@ -66,7 +68,7 @@ visicomp.core.Worksheet.prototype.setArgList = function(argList) {
     //clear the virtual workspace
     this.virtualWorkspace = null;
     
-    this.triggerRecalc();
+    this.updateWorksheetFunction();
 }
 
 /** */
@@ -86,7 +88,12 @@ visicomp.core.Worksheet.prototype.onDelete = function() {
     var returnValue;
     
     if(this.internalFolder) {
-        returnValue = visicomp.core.deletechild.deleteChild(this.internalFolder);
+        var actionResponse = visicomp.core.deletechild.deleteChild(this.internalFolder);
+        if(!actionResponse.getSuccess()) {
+            //show an error message
+            var msg = actionResponse.getErrorMsg();
+            alert(msg);
+        }
     }
     
 //I don't know what to do if this fails. Figure that out.
@@ -98,7 +105,7 @@ visicomp.core.Worksheet.prototype.onDelete = function() {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.Worksheet.fromJson = function(owner,json,updateDataList) {
+visicomp.core.Worksheet.fromJson = function(owner,json,updateDataList,actionResponse) {
     var worksheet = new visicomp.core.Worksheet(owner,json.name);
     if(json.argList !== undefined) {
         worksheet.setArgList(json.argList);
@@ -109,7 +116,7 @@ visicomp.core.Worksheet.fromJson = function(owner,json,updateDataList) {
     
     //recreate the root folder if info is specified
     if(json.internalFolder) {
-        worksheet.internalFolder = visicomp.core.Folder.fromJson(worksheet,json.internalFolder,updateDataList);
+        worksheet.internalFolder = visicomp.core.Folder.fromJson(worksheet,json.internalFolder,updateDataList,actionResponse);
     }
     
     return worksheet;
@@ -138,15 +145,15 @@ visicomp.core.Worksheet.prototype.getBaseName = function() {
 //==============================
 
 /** This method creates the worksheet function.  */
-visicomp.core.Worksheet.prototype.triggerRecalc = function() {
-    var recalculateList = [];
-    visicomp.core.calculation.addToRecalculateList(recalculateList,this);
+visicomp.core.Worksheet.prototype.updateWorksheetFunction = function() {
+    var worksheetFunction = this.getWorksheetFunction();
     
-    var dummyEditStatus = {};
-    visicomp.core.updatemember.doRecalculate(recalculateList,dummyEditStatus);
-    //handle edit status differently----------------
-    if(!dummyEditStatus.success) {
-        alert("Error in recal from worksheet.");
+    //set the worksheet function directly as data
+    var actionResponse = visicomp.core.updatemember.updateData(this,worksheetFunction);
+    
+    //handle this differently?----------------
+    if(!actionResponse.success) {
+        alert("Error in recal from worksheet: " + actionResponse.getErrorMsg());
     }
     //---------------------------------------
 }
@@ -159,8 +166,10 @@ visicomp.core.Worksheet.prototype.getWorksheetFunction = function() {
     
     var worksheetFunction = function(args) {
         
+//this is really inefficient. it needs to be improved.
+        
         //if the virtual workspace does not exist, create it
-        var virtualWorkspace = instance.getVirtualWorkspace();
+        var virtualWorkspace = instance.createVirtualWorkspace();
         
         //lookup elements from virtual workspace
         var rootFolder = virtualWorkspace.getRootFolder();
@@ -178,37 +187,36 @@ visicomp.core.Worksheet.prototype.getWorksheetFunction = function() {
         }
         
         //do the update
-        var returnStatus = visicomp.core.updatemember.updateObjects(updateDataList);
-        
-        if(returnStatus.success) {
+        var actionResponse = visicomp.core.updatemember.updateObjects(updateDataList);        
+        if(actionResponse.getSuccess()) {
             //retrieve the result
             return instance.loadOutputElement(rootFolder);
         }
         else {
-            //error!
-            throw visicomp.core.util.createError(returnStatus.msg);
+            //show an error message
+            var msg = actionResponse.getErrorMsg();
+            alert(msg);
         }
     }
     
-    return worksheetFunction;
-    
-    
+    return worksheetFunction;    
 }
 
-/** This method creates the worksheet function.  */
-visicomp.core.Worksheet.prototype.getVirtualWorkspace = function() {
-    if(!this.virtualWorkspace) {
-        var json = this.internalFolder.toJson();
-        var tempWorkspace = new visicomp.core.Workspace("temp");
-        var updateDataList = [];
-        var tempRootFolder = visicomp.core.Folder.fromJson(tempWorkspace,json,updateDataList);
-        tempWorkspace.rootFolder = tempRootFolder;
-        visicomp.core.updatemember.updateObjects(updateDataList);
-        
-        this.virtualWorkspace = tempWorkspace;
+/** This method creates a copy of the workspace to be used for the function evvaluation.  */
+visicomp.core.Worksheet.prototype.createVirtualWorkspace = function() {
+    var json = this.internalFolder.toJson();
+    var virtualWorkspace = new visicomp.core.Workspace("temp");
+    var updateDataList = [];
+    var virtualRootFolder = visicomp.core.Folder.fromJson(virtualWorkspace,json,updateDataList);
+    virtualWorkspace.rootFolder = virtualRootFolder;
+    var actionResponse = visicomp.core.updatemember.updateObjects(updateDataList);
+    if(!actionResponse.getSuccess()) {
+        //show an error message
+        var msg = actionResponse.getErrorMsg();
+        alert(msg);
     }
-    
-    return this.virtualWorkspace;
+
+    return virtualWorkspace;
 }
 
 /** This method loads the input argument members from the virtual workspace.  */
@@ -235,12 +243,8 @@ visicomp.core.Worksheet.prototype.loadOutputElement = function(rootFolder) {
 
 /** This method gets the output member from the virtual workspace.  */
 visicomp.core.Worksheet.prototype.isBaseReturnObject = function(member) {
-    if(member.getRootFolder() == this.internalFolder) {
-        //for now just clear the virtual workspace if anything in the worksheet changes.
-        //we should be able to make this more efficient
-       this.virtualWorkspace = null;
-       this.triggerRecalc();
-    }
+    return ((member.getRootFolder() == this.internalFolder)&&
+            (member.getName() == this.returnValueString));
 }
 
 //============================

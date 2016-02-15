@@ -72,12 +72,12 @@ SimpleGeojsonResourceProcessor.prototype.setData = function(data,options) {
  * BasicResourceControl to represent a resource object. */
 SimpleGeojsonControl = function(workspaceUI,resource) {
     //base init
-    visicomp.app.visiui.Control.init.call(this,workspaceUI,resource,"Simple GeoJSON Control");
+    visicomp.app.visiui.Component.init.call(this,workspaceUI,resource,"Simple GeoJSON Control");
     visicomp.app.visiui.BasicResourceControl.init.call(this);
 };
 
 //add components to this class
-visicomp.core.util.mixin(SimpleGeojsonControl,visicomp.app.visiui.Control);
+visicomp.core.util.mixin(SimpleGeojsonControl,visicomp.app.visiui.Component);
 visicomp.core.util.mixin(SimpleGeojsonControl,visicomp.app.visiui.BasicResourceControl);
 
 //======================================

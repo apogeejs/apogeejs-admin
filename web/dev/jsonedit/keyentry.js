@@ -74,7 +74,7 @@ KeyEntry.prototype.setIsVirtual = function(isVirtual) {
 
 KeyEntry.prototype.updateValueElements = function() {
     //remove all from element
-    this.body.innerHTML = "";
+	visicomp.core.util.removeAllChildren(this.body);
     //recreate
     this.formatBody();
 }
@@ -221,7 +221,7 @@ KeyEntry.prototype.convertToKeyType = function(key) {
     this.createKeyElement();
     
     //remove and reset all from element
-    this.body.innerHTML = "";
+	visicomp.core.util.removeAllChildren(this.body);
     this.formatBody();
 }
 
@@ -235,7 +235,7 @@ KeyEntry.prototype.convertToIndexType = function(index) {
     this.createKeyElement();
     
     //remove and reset all from element
-    this.body.innerHTML = "";
+    visicomp.core.util.removeAllChildren(this.body);
     this.formatBody();
 }
 

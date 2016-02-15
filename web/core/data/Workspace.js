@@ -1,13 +1,18 @@
 /** This is the workspace. */
-visicomp.core.Workspace = function(name) {
+visicomp.core.Workspace = function(nameOrJson,actionResponseForJson) {
     //base init
     visicomp.core.EventManager.init.call(this);
     visicomp.core.Owner.init.call(this);
     
-    this.name = name;
-
-    //add the root folder
-	this.rootFolder = new visicomp.core.Folder(this,name);
+    var inputArgType = visicomp.core.util.getObjectType(nameOrJson);
+    
+    if(inputArgType === "String") {
+        this.name = nameOrJson;
+        this.rootFolder = new visicomp.core.Folder(this,nameOrJson);
+    }
+    else {
+        this.loadFromJson(nameOrJson,actionResponseForJson);
+    }
 }
 
 //add components to this class
@@ -31,14 +36,14 @@ visicomp.core.Workspace.prototype.getRootFolder = function() {
 
 /** This method updates the dependencies of any children in the workspace
  * based on an object being added. */
-visicomp.core.Workspace.prototype.updateForAddedVariable = function(object) {
-    this.rootFolder.updateForAddedVariable(object);
+visicomp.core.Workspace.prototype.updateForAddedVariable = function(object,recalculateList) {
+    this.rootFolder.updateForAddedVariable(object,recalculateList);
 }
 
 /** This method updates the dependencies of any children in the workspace
  * based on an object being deleted. */
-visicomp.core.Workspace.prototype.updateForDeletedVariable = function(object) {
-    this.rootFolder.updateForAddedVariable(object);
+visicomp.core.Workspace.prototype.updateForDeletedVariable = function(object,recalculateList) {
+    this.rootFolder.updateForDeletedVariable(object,recalculateList);
 }
 
 /** This method removes any data from this workspace. */
@@ -75,42 +80,34 @@ visicomp.core.Workspace.prototype.toJson = function() {
     json.fileType = visicomp.core.Workspace.SAVE_FILE_TYPE;
     json.version = visicomp.core.Workspace.SAVE_FILE_VERSION;
     
-    //controls
+    //components
     json.data = this.rootFolder.toJson();
     
     return json;
 }
 
-/** This is used for saving the workspace. */
-visicomp.core.Workspace.fromJson = function(json) {
-    var name = json.name;
+
+/** This is loads data from the given json into this workspace. 
+ * @private */
+visicomp.core.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     var fileType = json.fileType;
-	if((fileType !== visicomp.core.Workspace.SAVE_FILE_TYPE)||(!name)) {
+	if(fileType !== visicomp.core.Workspace.SAVE_FILE_TYPE) {
 		throw visicomp.core.util.createError("Bad file format.");
 	}
-    if(json.version != visicomp.core.Workspace.SAVE_FILE_VERSION) {
+    if(json.version !== visicomp.core.Workspace.SAVE_FILE_VERSION) {
         throw visicomp.core.util.createError("Incorrect file version.");
     }
     
-    //create the workspace
-	var workspace = new visicomp.core.Workspace(name);
+    this.name = json.name;
 	
 	//recreate the root folder
 	var updateDataList = [];
-    workspace.rootFolder = visicomp.core.Folder.fromJson(workspace,json.data,updateDataList);
+    this.rootFolder = visicomp.core.Folder.fromJson(this,json.data,updateDataList);
     
     //set the data on all the objects
-    var result;
     if(updateDataList.length > 0) {
-        result = visicomp.core.updatemember.updateObjects(updateDataList);
-            
-        if(!result.success) {
-            return result;
-        }
+        actionResponse = visicomp.core.updatemember.updateObjects(updateDataList,actionResponse);
     }
-    
-//figure out a better return
-	return workspace;
 }
 
 //================================
