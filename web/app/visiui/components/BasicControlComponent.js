@@ -12,7 +12,8 @@ visicomp.app.visiui.BasicControlComponent.init = function() {}
 // Protected and Private Instance Methods
 //==============================
 
-///** This method should be implemented to add any data to the component at initialization time. */
+///** This method should be implemented to create the UI at initialization time. 
+//* It is called when the UI is ready to be constructed. */
 //visicomp.app.visiui.BasicControlComponent.prototype.addToFrame = function();
 
 /** This method populates the frame for this component. */
