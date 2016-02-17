@@ -7,14 +7,16 @@ visicomp.core.codeCompiler = {};
 visicomp.core.codeCompiler.processCode = function(codeInfo,
         localFolder,
         rootFolder,
-        codeLabel) {
+        codeLabel,
+        objectFunctionName) {
     
     //analyze the code
     var combinedFunctionBody = visicomp.core.codeCompiler.createCombinedFunctionBody(
         codeInfo.argList, 
         codeInfo.functionBody, 
         codeInfo.supplementalCode, 
-        codeLabel);
+        codeLabel,
+        objectFunctionName);
         
     //get the accessed variables
     codeInfo.varInfo = visicomp.core.codeAnalysis.analyzeCode(combinedFunctionBody);
@@ -39,14 +41,20 @@ visicomp.core.codeCompiler.processCode = function(codeInfo,
 visicomp.core.codeCompiler.createCombinedFunctionBody = function(argList,
         functionBody, 
         supplementalCode,
-        codeLabel) {
+        codeLabel,
+        functionName) {
     
-    var argListString = argList.join(","); 
+    var argListString = argList.join(",");
+    
+    if((functionName === undefined)||(functionName === null)) {    
+        functionName = "";
+    }
     
     //create the code body
     var combinedFunctionBody = visicomp.core.util.formatString(
         visicomp.core.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT,
 		codeLabel,
+        functionName,
         argListString,
         functionBody,
         supplementalCode
@@ -96,21 +104,23 @@ visicomp.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunc
 /** This is the format string to create the code body for the object function
  * Input indices:
  * 0: unique member name
- * 1: function argument list with parentheses
- * 2: member formula text
- * 3: supplemental code text
+ * 1: functionName
+ * 2: function argument list with parentheses
+ * 3: member formula text
+ * 4: supplemental code text
+ * 
  * @private
  */
 visicomp.core.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT = [
 "//{0}",
 "",
 "//supplemental code",
-"{3}",
+"{4}",
 "//end supplemental code",
 "",
 "//member function",
-"returnValue.objectFunction = function({1}) {",
-"{2}",
+"returnValue.objectFunction = function {1}({2}) {",
+"{3}",
 "}",
 "//end member function",
 ""

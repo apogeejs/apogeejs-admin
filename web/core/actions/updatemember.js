@@ -160,12 +160,14 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
         var localFolder = member.getParent();
         var rootFolder = member.getRootFolder();
         var codeLabel = member.getFullName();
+        var functionName = member.getAllowRecursive() ? member.getName() : "";
     
         //process the code text into javascript code
         visicomp.core.codeCompiler.processCode(codeInfo,
             localFolder,
             rootFolder,
-            codeLabel);
+            codeLabel,
+            functionName);
     }
     catch(error) {
         //process the error

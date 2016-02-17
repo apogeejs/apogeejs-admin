@@ -3,7 +3,7 @@ visicomp.core.Control = function(owner,name) {
     //base init
     visicomp.core.Child.init.call(this,owner,name,visicomp.core.Control.generator);
     visicomp.core.Dependent.init.call(this);
-	visicomp.core.Codeable.init.call(this,["resource"]);
+	visicomp.core.Codeable.init.call(this,["resource"],false);
     
     this.resource = null;
 }

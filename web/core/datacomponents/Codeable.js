@@ -13,10 +13,13 @@
 visicomp.core.Codeable = {};
 
 /** This initializes the component */
-visicomp.core.Codeable.init = function(argList) {
+visicomp.core.Codeable.init = function(argList,allowRecursive) {
     
     //arguments of the member function
     this.argList = argList;
+    
+    //the allows the object function for this member to call itself
+    this.allowRecursive = allowRecursive;
 	
 	//error data
 	this.codeError = null;
@@ -36,6 +39,11 @@ visicomp.core.Codeable.getArgList = function() {
 }
 
 /** This method returns the formula for this member.  */
+visicomp.core.Codeable.getAllowRecursive = function() {
+    return this.allowRecursive;
+}
+
+/** This method returns the fucntion body for this member.  */
 visicomp.core.Codeable.getFunctionBody = function() {
     return this.functionBody;
 }

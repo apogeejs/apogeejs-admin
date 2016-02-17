@@ -5,7 +5,7 @@ visicomp.core.JsonTable = function(owner,name) {
     visicomp.core.Child.init.call(this,owner,name,visicomp.core.JsonTable.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
-	visicomp.core.Codeable.init.call(this,[]);
+	visicomp.core.Codeable.init.call(this,[],false);
     
     this.setData("");
 }

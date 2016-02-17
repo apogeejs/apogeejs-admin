@@ -5,7 +5,7 @@ visicomp.core.FunctionTable = function(owner,name,argList) {
     visicomp.core.Child.init.call(this,owner,name,visicomp.core.FunctionTable.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
-	visicomp.core.Codeable.init.call(this,argList);
+	visicomp.core.Codeable.init.call(this,argList,true);
     
     //set to an empty function
     //this.setData(function(){});
