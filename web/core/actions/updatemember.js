@@ -99,7 +99,7 @@ visicomp.core.updatemember.updateObjects = function(updateDataList,optionalActio
     }
     catch(error) {
         var actionError = visicomp.core.ActionError.processFatalAppException(error);
-        actionResponse.add(actionError);
+        actionResponse.addError(actionError);
     }
     
     return actionResponse;

@@ -144,8 +144,8 @@ visicomp.app.visiui.VisiComp.prototype.getComponentGenerator = function(name) {
  * @private */
 visicomp.app.visiui.VisiComp.prototype.loadComponentGenerators = function() {
     //standard components
+    this.registerStandardComponent(visicomp.app.visiui.JsonTableComponent.generator);
 	this.registerStandardComponent(visicomp.app.visiui.FolderComponent.generator);
-	this.registerStandardComponent(visicomp.app.visiui.JsonTableComponent.generator);
 	this.registerStandardComponent(visicomp.app.visiui.FunctionComponent.generator);
     this.registerStandardComponent(visicomp.app.visiui.WorksheetComponent.generator);
 	

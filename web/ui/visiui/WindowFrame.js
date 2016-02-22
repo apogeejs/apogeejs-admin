@@ -197,13 +197,20 @@ visicomp.visiui.WindowFrame.COMMAND_BUTTON_STYLE = {
 // Public Methods
 //====================================
 
+visicomp.visiui.WindowFrame.prototype.getTitle = function(title) {
+    return this.title;
+}
+
 /** This method sets the title on the window frame.
  * This will be added to the title bar in the order it was called. The standard
  * location for the menu is immediately after the menu, if the menu is present. */
 visicomp.visiui.WindowFrame.prototype.setTitle = function(title) {
     //title
-    this.titleElement = document.createElement("div");
-    visicomp.visiui.applyStyle(this.titleElement,visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE);
+    this.title = title;
+    if(!this.titleElement) {
+        this.titleElement = document.createElement("div");
+        visicomp.visiui.applyStyle(this.titleElement,visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE);
+    }
     this.titleElement.innerHTML = title;
     this.titleBarLeftElements.appendChild(this.titleElement);
 }

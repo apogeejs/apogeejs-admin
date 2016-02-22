@@ -42,7 +42,7 @@ visicomp.app.visiui.dialog.showUpdateArgListDialog = function(object,onSaveFunct
             dialog.hide();
         }
     }
-    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onSave}));
+    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"OK","onclick":onSave}));
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     

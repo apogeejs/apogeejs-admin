@@ -7,8 +7,6 @@
  * COMPONENT DEPENDENCIES:
  * - A Dependent must be a Child. The Child component must be installed before the
  * Dependent component.
- * - A Dependent is a Codeable, however it must be installed before Codeable. An object
- * can not be one without the other.
  */
 visicomp.core.Dependent = {};
 
@@ -37,6 +35,16 @@ visicomp.core.Dependent.getDependsOn = function() {
 ///** This method udpates the dependencies if needed because
 // *the passed variable was deleted.  */
 //visicomp.core.Dependent.updateForDeletedVariable = function(object);
+
+
+///** This is a check to see if the object should be checked for dependencies 
+// * for recalculation.  
+// * @private */
+//visicomp.core.Dependent.needsExecuting = function();
+
+
+///** This updates the member based on a change in a dependency.  */
+//visicomp.core.Dependent.execute = function();
 
 //===================================
 // Private Functions

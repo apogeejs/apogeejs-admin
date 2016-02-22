@@ -67,15 +67,25 @@ visicomp.app.visiui.FunctionComponent.formatString = "\t";
  * @private */    
 visicomp.app.visiui.FunctionComponent.prototype.memberUpdated = function() {
     var functionObject = this.getObject();
+    var displayName = functionObject.getDisplayName();
+    
+    //make sure the title is up to data
+    var window = this.getWindow();
+    if(window) {
+        var windowTitle = window.getTitle();
+        if(windowTitle != displayName) {
+            window.setTitle(displayName);
+        }
+    }
+    
+    //print body
 	if(functionObject.hasDataError()) {
         this.showError(functionObject.getDataError());
     }
     else {
-		var name = functionObject.getName();
-		var argListString = functionObject.getArgList().join(",");
 		var functionBody = functionObject.getFunctionBody();
 		var supplementalCode = functionObject.getSupplementalCode();
-		var code = "function " + name + "(" + argListString + ") {\n" + functionBody + "\n}\n";
+		var code = "function " + displayName + " {\n" + functionBody + "\n}\n";
 		if(supplementalCode) {
 			code += "\n/* Supplemental Code */\n\n" +
 				supplementalCode;

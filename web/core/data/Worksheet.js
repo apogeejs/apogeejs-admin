@@ -17,9 +17,12 @@ visicomp.core.Worksheet = function(owner,name) {
     //this is the internal workspace in which function evaluations are done.
     this.virtualWorkspace = null;
     
+//-----------------------------------------------
+//we need to do this a better way!
     //set initial worksheet function
     var worksheetFunction = this.getWorksheetFunction();
     this.setData(worksheetFunction);
+//---------------------------------------------------
     
     //subscribe to the update event for this table
     //whenever the output object is updated we will update the worksheet function
@@ -28,7 +31,13 @@ visicomp.core.Worksheet = function(owner,name) {
         if(instance.isBaseReturnObject(member)) {
             //we recalculate this unnecessarily sometimes - as in when the input argument value
             //in the workshet changes. That's ok though.
-            instance.updateWorksheetFunction();
+            var actionResponse = visicomp.core.updateworksheet.recalculateFunction(instance);
+//----------------------------------------------
+//we need a proper way to show this!
+if(!actionResponse.success) {
+    alert(actionResponse.msg);
+}
+//---------------------------------------
         }    
     }
     this.getWorkspace().addListener(visicomp.core.updatemember.MEMBER_UPDATED_EVENT, memberUpdatedCallback);
@@ -46,29 +55,8 @@ visicomp.core.Worksheet.prototype.getInternalFolder = function() {
 }
 
 /** */
-visicomp.core.Worksheet.prototype.setReturnValueString = function(returnValueString) {
-    
-    this.returnValueString = returnValueString;
-    
-    //clear the virtual workspace
-    this.virtualWorkspace = null;
-    
-    this.updateWorksheetFunction();
-}
-
-/** */
 visicomp.core.Worksheet.prototype.getReturnValueString = function() {
     return this.returnValueString;
-}
-
-/** */
-visicomp.core.Worksheet.prototype.setArgList = function(argList) {
-    this.argList = argList;
-    
-    //clear the virtual workspace
-    this.virtualWorkspace = null;
-    
-    this.updateWorksheetFunction();
 }
 
 /** */
@@ -79,6 +67,20 @@ visicomp.core.Worksheet.prototype.getArgList = function() {
 //------------------------------
 // Child Methods
 //------------------------------
+
+/** This overrides the get title method of child to return the function declaration. */
+visicomp.core.Worksheet.prototype.getDisplayName = function() {
+    var name = this.getName();
+    var argList = this.getArgList();
+    var argListString = argList.join(",");
+    
+    var displayName = name + "(" + argListString + ")";
+    if((this.returnValueString != null)&&(this.returnValueString.length > 1)) {
+        displayName += " = " + this.returnValueString;
+    }
+    
+    return displayName;
+}
 
 /** This method is called when the child is deleted. If necessary the implementation
  * can extend this function, but it should call this base version of the function
@@ -144,23 +146,18 @@ visicomp.core.Worksheet.prototype.getBaseName = function() {
 // Private Methods
 //==============================
 
-/** This method creates the worksheet function.  */
-visicomp.core.Worksheet.prototype.updateWorksheetFunction = function() {
-    var worksheetFunction = this.getWorksheetFunction();
-    
-    //set the worksheet function directly as data
-    var actionResponse = visicomp.core.updatemember.updateData(this,worksheetFunction);
-    
-    //handle this differently?----------------
-    if(!actionResponse.success) {
-        alert("Error in recal from worksheet: " + actionResponse.getErrorMsg());
-    }
-    //---------------------------------------
+/** This is called from the update action. It should not be called externally. */
+visicomp.core.Worksheet.prototype.setReturnValueString = function(returnValueString) {
+    this.returnValueString = returnValueString;
 }
 
+/** This is called from the update action. It should not be called externally. */
+visicomp.core.Worksheet.prototype.setArgList = function(argList) {
+    this.argList = argList;
+}
 
-
-/** This method creates the worksheet function.  */
+/** This method creates the worksheet function. It is called from the update action 
+ * and should not be called externally.  */
 visicomp.core.Worksheet.prototype.getWorksheetFunction = function() {
     var instance = this;
     
@@ -193,9 +190,10 @@ visicomp.core.Worksheet.prototype.getWorksheetFunction = function() {
             return instance.loadOutputElement(rootFolder);
         }
         else {
-            //show an error message
-            var msg = actionResponse.getErrorMsg();
-            alert(msg);
+///////////////////////////////////
+//set an error for the worksheet
+///////////////////////////////////
+            return null;
         }
     }
     
@@ -225,6 +223,13 @@ visicomp.core.Worksheet.prototype.loadInputElements = function(rootFolder) {
     for(var i = 0; i < this.argList.length; i++) {
         var argName = this.argList[i];
         var argMember = rootFolder.lookupChild(argName);
+        if(!argMember) {
+///////////////////////////////////
+//set an error for the worksheet
+///////////////////////////////////
+            var actionError = visicomp.core.ActionError("Input element not found in worksheet: " + argName,this);
+            this.worksheetError = actionError;
+        }
         argMembers.push(argMember);
     }
     return argMembers;
@@ -234,7 +239,15 @@ visicomp.core.Worksheet.prototype.loadInputElements = function(rootFolder) {
 visicomp.core.Worksheet.prototype.loadOutputElement = function(rootFolder) {
     if((this.returnValueString != null)&&(this.returnValueString.length > 0)) {
         var member = rootFolder.lookupChild(this.returnValueString);
-        return member.getData();
+        if(member != null) {
+            return member.getData();
+        }
+        else {
+///////////////////////////////////
+//set an error for the worksheet
+///////////////////////////////////
+            return undefined;
+        }
     }
     else {
         return undefined;

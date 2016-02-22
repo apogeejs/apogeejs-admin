@@ -67,10 +67,7 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     //------------------
     //set the title
     //------------------
-//we might want to show this before the component content is added. I had a problem
-//with the window content size not being calculated correctly. That can probably be
-//fixed
-    this.window.setTitle(this.getObject().getName());
+    this.window.setTitle(this.getObject().getDisplayName());
     
     //show the window
     if(options.coordInfo) {

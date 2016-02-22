@@ -157,7 +157,7 @@ visicomp.app.visiui.JsonTableComponent.createComponentFromJson = function(worksp
 //======================================
 
 visicomp.app.visiui.JsonTableComponent.generator = {};
-visicomp.app.visiui.JsonTableComponent.generator.displayName = "JSON Table";
+visicomp.app.visiui.JsonTableComponent.generator.displayName = "Data Table";
 visicomp.app.visiui.JsonTableComponent.generator.uniqueName = "visicomp.app.visiui.JsonTableComponent";
 visicomp.app.visiui.JsonTableComponent.generator.createComponent = visicomp.app.visiui.JsonTableComponent.createComponent;
 visicomp.app.visiui.JsonTableComponent.generator.createComponentFromJson = visicomp.app.visiui.JsonTableComponent.createComponentFromJson;

@@ -59,6 +59,16 @@ visicomp.app.visiui.WorksheetComponent.prototype.populateFrame = function() {
 /** This method updates the component when the data changes. 
  * @private */    
 visicomp.app.visiui.WorksheetComponent.prototype.memberUpdated = function() {
+    //make sure the title is up to data
+    var window = this.getWindow();
+    if(window) {
+        var functionObject = this.getObject();
+        var displayName = functionObject.getDisplayName();
+        var windowTitle = window.getTitle();
+        if(windowTitle != displayName) {
+            window.setTitle(displayName);
+        }
+    }
 }
 
 //=============================
@@ -72,10 +82,16 @@ visicomp.app.visiui.WorksheetComponent.prototype.createEditArgListDialogCallback
     
     //create save handler
     var onSave = function(argList) {
-        worksheet.setArgList(argList);
+        var actionResponse = visicomp.core.updateworksheet.updateArgList(worksheet,argList);
         
-        var editComplete = true;
-        return editComplete;  
+        if(!actionResponse.getSuccess()) {
+            //show an error message
+            var msg = actionResponse.getErrorMsg();
+            alert(msg);
+        }
+        
+        //return true to close the dialog
+        return true; 
     };
     
     return function() {
@@ -90,11 +106,16 @@ visicomp.app.visiui.WorksheetComponent.prototype.createEditReturnValueDialogCall
     
     //create save handler
     var onSave = function(returnValueString) {
+        var actionResponse = visicomp.core.updateworksheet.updateReturnValue(worksheet,returnValueString);
         
-        worksheet.setReturnValueString(returnValueString);
+        if(!actionResponse.getSuccess()) {
+            //show an error message
+            var msg = actionResponse.getErrorMsg();
+            alert(msg);
+        }
         
-        var editComplete = true;       
-        return editComplete;  
+        //return true to close the dialog
+        return true; 
     };
     
     return function() {

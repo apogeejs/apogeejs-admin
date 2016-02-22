@@ -31,6 +31,14 @@ visicomp.core.FunctionTable.prototype.processObjectFunction = function(objectFun
 // Child Methods
 //------------------------------
 
+/** This overrides the get title method of child to return the function declaration. */
+visicomp.core.FunctionTable.prototype.getDisplayName = function() {
+    var name = this.getName();
+    var argList = this.getArgList();
+    var argListString = argList.join(",");
+    return name + "(" + argListString + ")";
+}
+
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 visicomp.core.FunctionTable.fromJson = function(owner,json,updateDataList,actionResponse) {

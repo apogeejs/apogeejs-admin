@@ -56,6 +56,12 @@ visicomp.core.Child.getFullName = function() {
 	}
 }
 
+/** This method returns a display name for the child object. By default it returns
+/* the object name but can by overriden by the child implementation. */
+visicomp.core.Child.getDisplayName = function() {
+    return this.name;
+}
+
 /** This returns the parent for this folder. For the root folder
  * this value is null. */
 visicomp.core.Child.getParent = function() {
