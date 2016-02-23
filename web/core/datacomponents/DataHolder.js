@@ -16,9 +16,6 @@ visicomp.core.DataHolder.init = function() {
     
     this.data = null;
     this.dataError = null;
-    
-    //these are a list of members that depend on this member
-    this.impactsList = [];
 }
 
 /** This property tells if this object is a data holder.

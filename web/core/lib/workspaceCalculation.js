@@ -11,7 +11,7 @@ visicomp.core.calculation.addToRecalculateList = function(recalculateList,member
     if(this.inList(recalculateList,member)) return;
      
     //add this member to recalculate list if it needs to be executed
-    if(member.isCodeable) {
+    if(member.isDependent) {
         if(member.needsExecuting()) {
            recalculateList.push(member);
         }
@@ -56,7 +56,9 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
 		member = recalculateList[i];
 		memberIsSortedMap[member.getFullName()] = false;
         
-        member.clearCircRefError();
+        if(member.isCodeable) {
+        	member.clearCircRefError();
+        }
 	}
 	
 	//sort the list

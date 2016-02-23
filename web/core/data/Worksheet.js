@@ -5,49 +5,29 @@ visicomp.core.Worksheet = function(owner,name) {
     visicomp.core.Impactor.init.call(this);
     visicomp.core.Child.init.call(this,owner,name,visicomp.core.Worksheet.generator);
     visicomp.core.DataHolder.init.call(this);
+    visicomp.core.Dependent.init.call(this);
     visicomp.core.Owner.init.call(this);
-    
-    //create the internal folder as a root folder (no parent). But give it
-    //the full path name
-    this.internalFolder = new visicomp.core.Folder(this,this.getFullName());
     
     this.returnValueString = "";
     this.argList = [];
     
-    //this is the internal workspace in which function evaluations are done.
-    this.virtualWorkspace = null;
+    //create the internal folder as a root folder (no parent). But give it
+    //the full path name
+    var folder = new visicomp.core.Folder(this,this.getFullName());
+    this.setInternalFolder(folder);
     
-//-----------------------------------------------
-//we need to do this a better way!
-    //set initial worksheet function
-    var worksheetFunction = this.getWorksheetFunction();
-    this.setData(worksheetFunction);
-//---------------------------------------------------
-    
-    //subscribe to the update event for this table
-    //whenever the output object is updated we will update the worksheet function
-    var instance = this;
-    var memberUpdatedCallback = function(member) {
-        if(instance.isBaseReturnObject(member)) {
-            //we recalculate this unnecessarily sometimes - as in when the input argument value
-            //in the workshet changes. That's ok though.
-            var actionResponse = visicomp.core.updateworksheet.recalculateFunction(instance);
-//----------------------------------------------
-//we need a proper way to show this!
-if(!actionResponse.success) {
-    alert(actionResponse.msg);
-}
-//---------------------------------------
-        }    
-    }
-    this.getWorkspace().addListener(visicomp.core.updatemember.MEMBER_UPDATED_EVENT, memberUpdatedCallback);
+    //set to an empty function
+    this.setData(function(){});
 }
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.DataHolder);
+visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Dependent);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Impactor);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Owner);
+
+visicomp.core.Worksheet.RETURN_VALUE_TABLE_NAME = "_worksheet_return_value_";
 
 /** */
 visicomp.core.Worksheet.prototype.getInternalFolder = function() {
@@ -118,7 +98,8 @@ visicomp.core.Worksheet.fromJson = function(owner,json,updateDataList,actionResp
     
     //recreate the root folder if info is specified
     if(json.internalFolder) {
-        worksheet.internalFolder = visicomp.core.Folder.fromJson(worksheet,json.internalFolder,updateDataList,actionResponse);
+        var internalFolder = visicomp.core.Folder.fromJson(worksheet,json.internalFolder,updateDataList,actionResponse);
+        worksheet.setInternalFolder(internalFolder);
     }
     
     return worksheet;
@@ -141,10 +122,55 @@ visicomp.core.Worksheet.prototype.addToJson = function(json) {
 visicomp.core.Worksheet.prototype.getBaseName = function() {
     return this.getFullName();
 }
+
+//-------------------------------
+// Dependent Methods
+//-------------------------------
     
+
+/** If this is true the member must be executed. */
+visicomp.core.Worksheet.prototype.needsExecuting = function() {
+	return true;
+}
+
+/** This updates the member data based on the function. It returns
+ * true for success and false if there is an error.  */
+visicomp.core.Worksheet.prototype.execute = function() {
+    
+    var worksheetErrors = [];
+    
+	//check for code errors, if so set a data error
+    var worksheetFunction = this.getWorksheetFunction(worksheetErrors);
+    
+    if(worksheetErrors.length == 0) {
+        this.setData(worksheetFunction);
+    }
+    else {
+        //for now I can only set a single error. I will set the first.
+        //I should get way to set multiple
+        this.setDataError(worksheetErrors[0]);
+    }
+}
+
+/** This method updates the dependencies of any children
+ * based on an object being added. */
+visicomp.core.Worksheet.prototype.updateForAddedVariable = function(object,recalculateList) {
+}
+
+/** This method updates the dependencies of any children
+ * based on an object being deleted. */
+visicomp.core.Worksheet.prototype.updateForDeletedVariable = function(object,recalculateList) {
+}
+
 //==============================
 // Private Methods
 //==============================
+
+/** This is called from the update action. It should not be called externally. */
+visicomp.core.Worksheet.prototype.setInternalFolder = function(folder) {
+    this.internalFolder = folder;
+    this.updateDependencies([folder]);
+}
 
 /** This is called from the update action. It should not be called externally. */
 visicomp.core.Worksheet.prototype.setReturnValueString = function(returnValueString) {
@@ -158,23 +184,18 @@ visicomp.core.Worksheet.prototype.setArgList = function(argList) {
 
 /** This method creates the worksheet function. It is called from the update action 
  * and should not be called externally.  */
-visicomp.core.Worksheet.prototype.getWorksheetFunction = function() {
-    var instance = this;
+visicomp.core.Worksheet.prototype.getWorksheetFunction = function(worksheetErrors) {
+
+    //create a copy of the workspace to do the function calculation - don't update the UI display version
+    var virtualWorkspace = this.createVirtualWorkspace();
+
+    //lookup elements from virtual workspace
+    var rootFolder = virtualWorkspace.getRootFolder();
+    var inputElementArray = this.loadInputElements(rootFolder,worksheetErrors);
+    var returnValueTable = this.loadOutputElement(rootFolder,worksheetErrors); 
     
     var worksheetFunction = function(args) {
-        
-//this is really inefficient. it needs to be improved.
-        
-        //if the virtual workspace does not exist, create it
-        var virtualWorkspace = instance.createVirtualWorkspace();
-        
-        //lookup elements from virtual workspace
-        var rootFolder = virtualWorkspace.getRootFolder();
-        
-        //get the input elements
-        var inputElementArray = instance.loadInputElements(rootFolder);
-        
-        //create update array
+        //create an update array to set the table values to the elements
         var updateDataList = [];
         for(var i = 0; i < inputElementArray.length; i++) {
             var entry = {};
@@ -182,18 +203,22 @@ visicomp.core.Worksheet.prototype.getWorksheetFunction = function() {
             entry.data = arguments[i];
             updateDataList.push(entry);
         }
-        
-        //do the update
+
+        //apply the update
         var actionResponse = visicomp.core.updatemember.updateObjects(updateDataList);        
         if(actionResponse.getSuccess()) {
             //retrieve the result
-            return instance.loadOutputElement(rootFolder);
+            if(returnValueTable) {
+                return returnValueTable.getData();
+            }
+            else {
+                //no return value found
+                return undefined;
+            }
         }
         else {
-///////////////////////////////////
-//set an error for the worksheet
-///////////////////////////////////
-            return null;
+            //error exectuing worksheet function - thro wan exception
+            throw visicomp.core.util.createError("Error executing worksheet: " + actionResponse.getErrorMsg());
         }
     }
     
@@ -218,48 +243,33 @@ visicomp.core.Worksheet.prototype.createVirtualWorkspace = function() {
 }
 
 /** This method loads the input argument members from the virtual workspace.  */
-visicomp.core.Worksheet.prototype.loadInputElements = function(rootFolder) {
+visicomp.core.Worksheet.prototype.loadInputElements = function(rootFolder,worksheetErrors) {
     var argMembers = [];
     for(var i = 0; i < this.argList.length; i++) {
         var argName = this.argList[i];
         var argMember = rootFolder.lookupChild(argName);
         if(!argMember) {
-///////////////////////////////////
-//set an error for the worksheet
-///////////////////////////////////
-            var actionError = visicomp.core.ActionError("Input element not found in worksheet: " + argName,this);
-            this.worksheetError = actionError;
+            //missing input element
+            var actionError = new visicomp.core.ActionError("Input element not found in worksheet: " + argName,this);
+            worksheetErrors.push(actionError);
         }
         argMembers.push(argMember);
     }
     return argMembers;
 }
 
-/** This method gets the output member from the virtual workspace.  */
-visicomp.core.Worksheet.prototype.loadOutputElement = function(rootFolder) {
-    if((this.returnValueString != null)&&(this.returnValueString.length > 0)) {
-        var member = rootFolder.lookupChild(this.returnValueString);
-        if(member != null) {
-            return member.getData();
-        }
-        else {
-///////////////////////////////////
-//set an error for the worksheet
-///////////////////////////////////
-            return undefined;
-        }
+/** This method loads the output member from the virtual workspace.  */
+visicomp.core.Worksheet.prototype.loadOutputElement = function(rootFolder,worksheetErrors) {
+    var returnValueMember = rootFolder.lookupChild(this.returnValueString);
+    if(!returnValueMember) {
+        //missing input element
+        var actionError = new visicomp.core.ActionError("Return element not found in worksheet: " + this.returnValueString,this);
+        worksheetErrors.push(actionError);
     }
-    else {
-        return undefined;
-    }
+    return returnValueMember;
 }
 
-/** This method gets the output member from the virtual workspace.  */
-visicomp.core.Worksheet.prototype.isBaseReturnObject = function(member) {
-    return ((member.getRootFolder() == this.internalFolder)&&
-            (member.getName() == this.returnValueString));
-}
-
+        
 //============================
 // Static methods
 //============================

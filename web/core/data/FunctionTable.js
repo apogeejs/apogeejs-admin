@@ -8,7 +8,7 @@ visicomp.core.FunctionTable = function(owner,name,argList) {
 	visicomp.core.Codeable.init.call(this,argList,true);
     
     //set to an empty function
-    //this.setData(function(){});
+    this.setData(function(){});
 }
 
 //add components to this class

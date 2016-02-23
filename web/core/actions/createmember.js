@@ -59,7 +59,7 @@ visicomp.core.createmember.createMember = function(folder,json,optionalActionRes
 	catch(error) {
         //unknown application error
         var actionError = visicomp.core.ActionError.processFatalAppException(error);
-        errors.add(actionError);
+        actionResponse.addError(actionError);
     }
     
     //return response
