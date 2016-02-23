@@ -12,7 +12,10 @@
  */
 visicomp.core.Codeable = {};
 
-/** This initializes the component */
+/** This initializes the component. argList is the arguments for the object function.
+ * allowRecursive assigns the name of the variable to the function so it can call itself
+ * as a local variable. We want to allow functions to call themselves but we do not
+ * want the formula for a data object to call the previous value of itself. */
 visicomp.core.Codeable.init = function(argList,allowRecursive) {
     
     //arguments of the member function
