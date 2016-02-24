@@ -1,10 +1,10 @@
 
-visicomp.core.memberDependencies = {};
+visicomp.core.codeDependencies = {};
 
 /** This method takes the varInfo table from the code analysis and returns
  * a lsit of member objects which this member depends on.
  */
-visicomp.core.memberDependencies.getDependencyInfo = function(varInfo,localFolder,rootFolder) {
+visicomp.core.codeDependencies.getDependencyInfo = function(varInfo,localFolder,rootFolder) {
     var dependencyList = [];
 	var objectMap = {};
 	

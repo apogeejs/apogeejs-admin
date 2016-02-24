@@ -36,7 +36,7 @@ visicomp.core.codeCompiler.processCode = function(codeInfo,
     }
     
     //calculate dependencies
-	codeInfo.dependencyList = visicomp.core.memberDependencies.getDependencyInfo(
+	codeInfo.dependencyList = visicomp.core.codeDependencies.getDependencyInfo(
             codeInfo.varInfo,
             localFolder,
             rootFolder);

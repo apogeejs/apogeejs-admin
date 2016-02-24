@@ -112,7 +112,7 @@ visicomp.core.Codeable.updateForAddedVariable = function(addedMember,recalculate
         try {
             
             //calculate new dependencies
-            newDependencyList = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo,
+            newDependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
                this.getParent(),
                this.getRootFolder());
         }
@@ -148,7 +148,7 @@ visicomp.core.Codeable.updateForDeletedVariable = function(deletedMember,recalcu
     
             try {
                 //calculate dependencies
-               var dependencyList = visicomp.core.memberDependencies.getDependencyInfo(this.varInfo,
+               var dependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
                    this.getParent(),
                    this.getRootFolder());
             }

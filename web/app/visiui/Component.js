@@ -190,7 +190,7 @@ visicomp.app.visiui.Component.createDeleteCallback = function(title) {
         //we should do a warning!!!
         
         //delete the object - the component we be deleted after the delete event received
-        var actionResponse = visicomp.core.deletechild.deleteChild(object);
+        var actionResponse = visicomp.core.deletemember.deleteMember(object);
         if(!actionResponse.getSuccess()) {
             //show an error message
             var msg = actionResponse.getErrorMsg();

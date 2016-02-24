@@ -49,7 +49,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace, com
     var childDeletedListener = function(fullName) {
         instance.childDeleted(fullName);
     }
-    this.workspace.addListener(visicomp.core.deletechild.CHILD_DELETED_EVENT, childDeletedListener);
+    this.workspace.addListener(visicomp.core.deletemember.MEMBER_DELETED_EVENT, childDeletedListener);
     
 }
 
