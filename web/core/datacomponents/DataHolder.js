@@ -64,40 +64,5 @@ visicomp.core.DataHolder.getDataError = function() {
     return this.dataError;
 }
 
-/** This returns an array of members this member impacts. */
-visicomp.core.DataHolder.getImpactsList = function() {
-    return this.impactsList;
-}
-
-//===================================
-// Private or Internal Functions
-//===================================
-
-/** This method adds a data member to the imapacts list for this node. 
- * @private */
-visicomp.core.DataHolder.addToImpactsList = function(member) {
-    //exclude this member
-    if(member == this) return;
-	
-    //make sure it appears only once
-    for(var i = 0; i < this.impactsList.length; i++) {
-        if(this.impactsList[i] == member) return;
-    }
-    //add to the list
-    this.impactsList.push(member);
-}
-
-/** This method removes a data member from the imapacts list for this node. 
- * @private */
-visicomp.core.DataHolder.removeFromImpactsList = function(member) {
-    //it should appear only once
-    for(var i = 0; i < this.impactsList.length; i++) {
-        if(this.impactsList[i] == member) {
-            this.impactsList.splice(i,1);
-            return;
-        }
-    }
-}
-
 
 

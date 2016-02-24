@@ -132,9 +132,28 @@ visicomp.core.calculation.callRecalculateList = function(recalculateList,actionR
     var overallSuccess = true;
     for(i = 0; i < recalculateList.length; i++) {
         member = recalculateList[i];
-
-        //update the member
-        var success = member.execute();
+        
+        //check for errors related to dependency
+        var success;
+        if(member.hasSelfRefError()) {
+            member.setDataError(member.getSelfRefError());
+            success = false;
+        }
+        else if(member.hasCircRefError()) {
+            member.setDataError(member.getCircRefError());
+            success = false;
+        }
+        else {
+            //check if any values this depends on have an error
+            var errorFound = this.checkDependencyError(member);
+            success = !errorFound;
+            
+            if(success) {
+                //update the member
+                success = member.execute();
+            }
+        }
+        
         if(!success) {
             var actionError = member.getDataError();
             if(actionError) {
@@ -146,6 +165,45 @@ visicomp.core.calculation.callRecalculateList = function(recalculateList,actionR
     
     return overallSuccess;
 }
+
+
+/** This method checks if any variable the given member depends on has an error. If so it 
+ * reports an error for this member and returns true.  Otherwise it returns false.
+ * @private */
+visicomp.core.calculation.checkDependencyError = function(member) {
+    //get variables this depends on has an error
+    var dependsOn = member.getDependsOn();
+    var errorDependencies = null;
+    var i = 0;
+    for(var i = 0; i < dependsOn.length; i++) {
+        var impactor = dependsOn[i];
+        if(impactor.hasDataError()) {
+			//this depends on a table with an error.
+            if(errorDependencies == null) {
+                errorDependencies = [];
+            }
+            errorDependencies.push(member);
+        }
+    }
+    
+    if(errorDependencies != null) {
+        //dependency error found
+        var message = "Error in dependency: ";
+        for(i = 0; i < errorDependencies.length; i++) {
+            if(i > 0) message += ", ";
+            message += errorDependencies[i].getFullName();
+        }
+        var actionError = new visicomp.core.ActionError(message,member);
+        this.setDataError(actionError);   
+        
+        return true;
+    }
+    else {
+        //no dependency error
+        return false;
+    }
+}
+
 
 
 

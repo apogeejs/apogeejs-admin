@@ -1,6 +1,5 @@
 /** This mixin encapsulates an object in the workspace that depends on another
- * object by virtue of code (from being a Codeable) in the object. Other dependenciees are possible
- * but they are not captured buy this component.
+ * object, and is recalculated based partilaly on that object.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
@@ -15,6 +14,9 @@ visicomp.core.Dependent.init = function() {
     
     //this is the list of dependencies
     this.dependsOnList = [];
+    
+    this.circRefError = null;
+    this.selfRefError = null;
 }
 
 /** This property tells if this object is a dependent.
@@ -27,23 +29,23 @@ visicomp.core.Dependent.getDependsOn = function() {
 }
 
 /** This method sets the circular reference error for this dependent.*/
-visicomp.core.Dependent.setCircRefError = function(circRef) {
-    this.circRef = circRef;
+visicomp.core.Dependent.setCircRefError = function(circRefError) {
+    this.circRefError = circRefError;
 }
 
 /** This method clears the circular reference error for this codeable.*/
 visicomp.core.Dependent.clearCircRefError = function() {
-    this.circRef = null;
+    this.circRefError = null;
 }
 
 /** This returns true if there is a circular reference error. */
 visicomp.core.Dependent.hasCircRefError = function() {
-    return (this.circRef != null);
+    return (this.circRefError != null);
 }
 
 /** This returns the circular reference error. */
 visicomp.core.Dependent.getCircRefError = function() {
-    return this.circRef;
+    return this.circRefError;
 }
 
 /** This method sets the self reference error for this dependent. An object
