@@ -319,7 +319,7 @@
 		"generalInfo": {
 			"key": "Home Costs:generalInfo",
 			"type": "visicomp.app.visiui.JsonTableComponent",
-			"coordIndo": {
+			"coordInfo": {
 				"width": 252,
 				"height": 148,
 				"x": 25,
@@ -330,7 +330,7 @@
 		"CALCULATION_DURATION_YEARS": {
 			"key": "Home Costs:CALCULATION_DURATION_YEARS",
 			"type": "visicomp.app.visiui.JsonTableComponent",
-			"coordIndo": {
+			"coordInfo": {
 				"width": 259,
 				"height": 58,
 				"x": 298,
@@ -341,7 +341,7 @@
 		"homeScenario": {
 			"key": "Home Costs:homeScenario",
 			"type": "visicomp.app.visiui.JsonTableComponent",
-			"coordIndo": {
+			"coordInfo": {
 				"width": 358,
 				"height": 213,
 				"x": 24,
@@ -352,7 +352,7 @@
 		"rentalScenario": {
 			"key": "Home Costs:rentalScenario",
 			"type": "visicomp.app.visiui.JsonTableComponent",
-			"coordIndo": {
+			"coordInfo": {
 				"width": 357,
 				"height": 111,
 				"x": 19,
@@ -363,7 +363,7 @@
 		"calculations": {
 			"key": "Home Costs:calculations",
 			"type": "visicomp.app.visiui.FolderComponent",
-			"coordIndo": {
+			"coordInfo": {
 				"width": 1222,
 				"height": 940,
 				"x": 618,
@@ -374,7 +374,7 @@
 				"own": {
 					"key": "Home Costs:calculations.own",
 					"type": "visicomp.app.visiui.FolderComponent",
-					"coordIndo": {
+					"coordInfo": {
 						"width": 858,
 						"height": 1073,
 						"x": 62,
@@ -385,7 +385,7 @@
 						"mortagePayment": {
 							"key": "Home Costs:calculations.own.mortagePayment",
 							"type": "visicomp.app.visiui.FunctionComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 200,
 								"height": 200,
 								"x": 539,
@@ -396,7 +396,7 @@
 						"payment": {
 							"key": "Home Costs:calculations.own.payment",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 190,
 								"height": 60,
 								"x": 409,
@@ -407,7 +407,7 @@
 						"loanAmount": {
 							"key": "Home Costs:calculations.own.loanAmount",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 132,
 								"height": 59,
 								"x": 229,
@@ -418,7 +418,7 @@
 						"downpayment": {
 							"key": "Home Costs:calculations.own.downpayment",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 144,
 								"height": 68,
 								"x": 35,
@@ -429,7 +429,7 @@
 						"loanInfo": {
 							"key": "Home Costs:calculations.own.loanInfo",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 387,
 								"height": 171,
 								"x": 10,
@@ -440,7 +440,7 @@
 						"homeValueInfo": {
 							"key": "Home Costs:calculations.own.homeValueInfo",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 383,
 								"height": 167,
 								"x": -25,
@@ -451,7 +451,7 @@
 						"savingsInfo": {
 							"key": "Home Costs:calculations.own.savingsInfo",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 343,
 								"height": 174,
 								"x": 25,
@@ -462,7 +462,7 @@
 						"homeCostsInfo": {
 							"key": "Home Costs:calculations.own.homeCostsInfo",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 333,
 								"height": 182,
 								"x": 461,
@@ -473,7 +473,7 @@
 						"totalAssets": {
 							"key": "Home Costs:calculations.own.totalAssets",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 329,
 								"height": 154,
 								"x": 476,
@@ -486,7 +486,7 @@
 				"rent": {
 					"key": "Home Costs:calculations.rent",
 					"type": "visicomp.app.visiui.FolderComponent",
-					"coordIndo": {
+					"coordInfo": {
 						"width": 809,
 						"height": 597,
 						"x": 62,
@@ -497,7 +497,7 @@
 						"savingsInfo": {
 							"key": "Home Costs:calculations.rent.savingsInfo",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 285,
 								"height": 223,
 								"x": 41,
@@ -508,7 +508,7 @@
 						"rentInfo": {
 							"key": "Home Costs:calculations.rent.rentInfo",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 298,
 								"height": 137,
 								"x": 41,
@@ -521,7 +521,7 @@
 				"MONTHS_PER_YEAR": {
 					"key": "Home Costs:calculations.MONTHS_PER_YEAR",
 					"type": "visicomp.app.visiui.JsonTableComponent",
-					"coordIndo": {
+					"coordInfo": {
 						"width": 205,
 						"height": 62,
 						"x": 704,
@@ -532,7 +532,7 @@
 				"NUMBER_MONTHS": {
 					"key": "Home Costs:calculations.NUMBER_MONTHS",
 					"type": "visicomp.app.visiui.JsonTableComponent",
-					"coordIndo": {
+					"coordInfo": {
 						"width": 192,
 						"height": 60,
 						"x": 704,
@@ -543,7 +543,7 @@
 				"allowanceInfo": {
 					"key": "Home Costs:calculations.allowanceInfo",
 					"type": "visicomp.app.visiui.JsonTableComponent",
-					"coordIndo": {
+					"coordInfo": {
 						"width": 265,
 						"height": 148,
 						"x": 307,
@@ -554,7 +554,7 @@
 				"chartInfo": {
 					"key": "Home Costs:calculations.chartInfo",
 					"type": "visicomp.app.visiui.FolderComponent",
-					"coordIndo": {
+					"coordInfo": {
 						"width": 819,
 						"height": 593,
 						"x": 50,
@@ -565,7 +565,7 @@
 						"assetsData": {
 							"key": "Home Costs:calculations.chartInfo.assetsData",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 327,
 								"height": 229,
 								"x": 408,
@@ -576,7 +576,7 @@
 						"assetsOptions": {
 							"key": "Home Costs:calculations.chartInfo.assetsOptions",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 324,
 								"height": 229,
 								"x": 409,
@@ -587,7 +587,7 @@
 						"costsOptions": {
 							"key": "Home Costs:calculations.chartInfo.costsOptions",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 324,
 								"height": 233,
 								"x": 56,
@@ -598,7 +598,7 @@
 						"costsData": {
 							"key": "Home Costs:calculations.chartInfo.costsData",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 326,
 								"height": 231,
 								"x": 55,
@@ -611,7 +611,7 @@
 				"homeless": {
 					"key": "Home Costs:calculations.homeless",
 					"type": "visicomp.app.visiui.FolderComponent",
-					"coordIndo": {
+					"coordInfo": {
 						"width": 690,
 						"height": 378,
 						"x": 58,
@@ -622,7 +622,7 @@
 						"costs": {
 							"key": "Home Costs:calculations.homeless.costs",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 200,
 								"height": 200,
 								"x": 38,
@@ -633,7 +633,7 @@
 						"savings": {
 							"key": "Home Costs:calculations.homeless.savings",
 							"type": "visicomp.app.visiui.JsonTableComponent",
-							"coordIndo": {
+							"coordInfo": {
 								"width": 200,
 								"height": 200,
 								"x": 267,
@@ -648,7 +648,7 @@
 		"assets": {
 			"key": "Home Costs:assets",
 			"type": "visicomp.example.GoogleChartComponent",
-			"coordIndo": {
+			"coordInfo": {
 				"width": 886,
 				"height": 555,
 				"x": 428,
@@ -659,7 +659,7 @@
 		"costs": {
 			"key": "Home Costs:costs",
 			"type": "visicomp.example.GoogleChartComponent",
-			"coordIndo": {
+			"coordInfo": {
 				"width": 933,
 				"height": 525,
 				"x": 568,
