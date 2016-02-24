@@ -54,11 +54,8 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
 	var memberIsSortedMap = {};
 	for(i = 0; i < recalculateList.length; i++) {
 		member = recalculateList[i];
-		memberIsSortedMap[member.getFullName()] = false;
-        
-        if(member.isCodeable) {
-        	member.clearCircRefError();
-        }
+		memberIsSortedMap[member.getFullName()] = false;       
+        member.clearCircRefError();
 	}
 	
 	//sort the list
@@ -116,7 +113,6 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
             recalculateList.splice(0,recalculateList.length);
             success = false;
 		}
-		
 	}
 	
 	//copy working sorted list back to input list member

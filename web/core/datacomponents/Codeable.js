@@ -74,28 +74,6 @@ visicomp.core.Codeable.getCodeError = function() {
     return this.codeError;
 }
 
-/** This method sets the circular reference error for this codeable.
- * If an object has a ciruclar refernec error
- * this will be passed on to be a data error when the member is executed.*/
-visicomp.core.Codeable.setCircRefError = function(circRefError) {
-    this.circRefError = circRefError;
-}
-
-/** This method clears the circular reference error for this codeable.*/
-visicomp.core.Codeable.clearCircRefError = function() {
-    this.circRefError = null;
-}
-
-/** This returns true if there is a ciruclar reference error. */
-visicomp.core.Codeable.hasCircRefError = function() {
-    return (this.circRefError != null);
-}
-
-/** This returns the cirular reference error. */
-visicomp.core.Codeable.getCircRefError = function() {
-    return this.circRefError;
-}
-
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
 
@@ -225,6 +203,10 @@ visicomp.core.Codeable.execute = function() {
 		this.setDataError(this.getCodeError());
 		return false;
 	}
+    else if(this.hasSelfRefError()) {
+        this.setDataError(this.getSelfRefError());
+        return false;
+    }
     else if(this.hasCircRefError()) {
         this.setDataError(this.getCircRefError());
         return false;

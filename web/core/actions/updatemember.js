@@ -153,28 +153,19 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
     codeInfo.functionBody = functionBody;
     codeInfo.supplementalCode = supplementalCode;
         
-    var actionError;
-   
-    try {        
-        //load some needed context variables
-        var localFolder = member.getParent();
-        var rootFolder = member.getRootFolder();
-        var codeLabel = member.getFullName();
-        var functionName = member.getAllowRecursive() ? member.getName() : "";
-    
-        //process the code text into javascript code
-        visicomp.core.codeCompiler.processCode(codeInfo,
-            localFolder,
-            rootFolder,
-            codeLabel,
-            functionName);
-    }
-    catch(error) {
-        //process the error
-        actionError = visicomp.core.ActionError.processMemberModelException(error,member);
-        member.setCodeError(actionError);
-    }
-         
+    //load some needed context variables
+    var localFolder = member.getParent();
+    var rootFolder = member.getRootFolder();
+    var codeLabel = member.getFullName();
+    var functionName = member.getAllowRecursive() ? member.getName() : "";
+
+    //process the code text into javascript code
+    visicomp.core.codeCompiler.processCode(codeInfo,
+        localFolder,
+        rootFolder,
+        codeLabel,
+        functionName);
+
     //save the code
     member.setCodeInfo(codeInfo);
     

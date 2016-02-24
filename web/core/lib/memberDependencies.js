@@ -42,6 +42,7 @@ visicomp.core.memberDependencies.getDependencyInfo = function(varInfo,localFolde
 					if(object) {
                         
                         if(!object.isImpactor) {
+                            //this shouldn't happen
                             throw visicomp.core.util.createError("An object may not depend on the object " + object.getName());
                         }
                         

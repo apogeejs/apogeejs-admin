@@ -26,6 +26,47 @@ visicomp.core.Dependent.getDependsOn = function() {
     return this.dependsOnList;
 }
 
+/** This method sets the circular reference error for this dependent.*/
+visicomp.core.Dependent.setCircRefError = function(circRef) {
+    this.circRef = circRef;
+}
+
+/** This method clears the circular reference error for this codeable.*/
+visicomp.core.Dependent.clearCircRefError = function() {
+    this.circRef = null;
+}
+
+/** This returns true if there is a circular reference error. */
+visicomp.core.Dependent.hasCircRefError = function() {
+    return (this.circRef != null);
+}
+
+/** This returns the circular reference error. */
+visicomp.core.Dependent.getCircRefError = function() {
+    return this.circRef;
+}
+
+/** This method sets the self reference error for this dependent. An object
+ * should not reference itself since an object should not be aware of its previous value. */
+visicomp.core.Dependent.setSelfRefError = function(selfRefError) {
+    this.selfRefError = selfRefError;
+}
+
+/** This method clears the self reference error for this codeable.*/
+visicomp.core.Dependent.clearSelfRefError = function() {
+    this.selfRefError = null;
+}
+
+/** This returns true if there is a self reference error. */
+visicomp.core.Dependent.hasSelfRefError = function() {
+    return (this.selfRefError != null);
+}
+
+/** This returns the self reference error. */
+visicomp.core.Dependent.getSelfRefError = function() {
+    return this.selfRefError;
+}
+
 //Must be implemented in extending object
 ///** This method udpates the dependencies if needed because
 // *the passed variable was added.  */
@@ -63,6 +104,7 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
 	
     //create the new dependency list
 	this.dependsOnList = [];
+    this.clearSelfRefError();
 	
     //update the dependency links among the members
 	var newDependencySet = {};
@@ -81,7 +123,7 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
 			//ok to reference through a local varible - this is how recursive functions are handled.
 			var message = "A data formula should not reference its own name.";
 			var actionError = new visicomp.core.ActionError(message,this);
-			this.setCodeError(actionError);
+			this.setSelfRefError(actionError);
 		}
 		else {	
 			

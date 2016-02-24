@@ -147,22 +147,7 @@ visicomp.core.codeAnalysis.syntax = {
 visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
 
     //parse the code
-    var ast = visicomp.core.codeAnalysis.parseCode(functionText);
-
-    //get the variable list
-    var varInfo = visicomp.core.codeAnalysis.getVariableInfo(ast);
-    
-    //return the variable info
-    return varInfo;
-}
-
-/** This method parses the code, returning the abstract syntax tree or 
- * any errors in the code. If there is an error parsing the code an exception
- * is thrown.
- * @private */
-visicomp.core.codeAnalysis.parseCode = function(codeText) { 
-    //parse the code
-    var ast = esprima.parse(codeText, { tolerant: true, loc: true });
+    var ast = esprima.parse(functionText, { tolerant: true, loc: true });
     
     //check for errors in parsing
     if((ast.errors)&&(ast.errors.length > 0)) {
@@ -175,8 +160,12 @@ visicomp.core.codeAnalysis.parseCode = function(codeText) {
 		}
         throw error;
     }
+
+    //get the variable list
+    var varInfo = visicomp.core.codeAnalysis.getVariableInfo(ast);
     
-    return ast;
+    //return the variable info
+    return varInfo;
 }
 
 /** This method analyzes the AST to find the variabls accessed from the formula.

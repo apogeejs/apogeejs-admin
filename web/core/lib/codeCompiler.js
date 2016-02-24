@@ -19,12 +19,21 @@ visicomp.core.codeCompiler.processCode = function(codeInfo,
         objectFunctionName);
         
     //get the accessed variables
-    codeInfo.varInfo = visicomp.core.codeAnalysis.analyzeCode(combinedFunctionBody);
+    try {
+        //parse the code and get variabls dependencies
+        codeInfo.varInfo = visicomp.core.codeAnalysis.analyzeCode(combinedFunctionBody);
     
-    //create the object function and context setter
-    var generatorOutput = visicomp.core.codeCompiler.createObjectFunction(codeInfo.varInfo, combinedFunctionBody);
-    codeInfo.contextSetter = generatorOutput.contextSetter;
-    codeInfo.objectFunction = generatorOutput.objectFunction;
+        //create the object function and context setter from the code text
+        var generatorOutput = visicomp.core.codeCompiler.createObjectFunction(codeInfo.varInfo, combinedFunctionBody);
+        codeInfo.contextSetter = generatorOutput.contextSetter;
+        codeInfo.objectFunction = generatorOutput.objectFunction;
+    
+    }
+    catch(error) {
+        var actionError = visicomp.core.ActionError.processMemberModelException(error,null);
+        codeInfo.actionError = actionError;
+        return codeInfo;
+    }
     
     //calculate dependencies
 	codeInfo.dependencyList = visicomp.core.memberDependencies.getDependencyInfo(
