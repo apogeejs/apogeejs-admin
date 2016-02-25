@@ -93,8 +93,7 @@ visicomp.core.Dependent.getSelfRefError = function() {
 // Private Functions
 //===================================
 
-/** This sets the dependencies based on the code for the member. 
- * @private */
+/** This sets the dependencies based on the code for the member. */
 visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
     
     if(!newDependsOn) {

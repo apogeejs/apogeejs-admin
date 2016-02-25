@@ -29,7 +29,7 @@ visicomp.core.JsonTable.prototype.setData = function(data) {
 	//make this object immutable
 	visicomp.core.util.deepFreeze(data);
 
-	//store the new object in the parent
+	//store the new object
     return visicomp.core.DataHolder.setData.call(this,data);
 }
 

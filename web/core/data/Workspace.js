@@ -24,12 +24,12 @@ visicomp.core.Workspace.prototype.getName = function() {
     return this.name;
 }
 
-/** this method gets the workspace name. */
+/** this method gets the object type. */
 visicomp.core.Workspace.prototype.getType = function() {
     return "workspace";
 }
 
-/** this method gets the root packaage for the workspace. */
+/** this method gets the root package for the workspace. */
 visicomp.core.Workspace.prototype.getRootFolder = function() {
     return this.rootFolder;
 }
@@ -46,7 +46,7 @@ visicomp.core.Workspace.prototype.updateForDeletedVariable = function(object,rec
     this.rootFolder.updateForDeletedVariable(object,recalculateList);
 }
 
-/** This method removes any data from this workspace. */
+/** This method removes any data from this workspace on closing. */
 visicomp.core.Workspace.prototype.close = function() {
 }
 
@@ -54,12 +54,12 @@ visicomp.core.Workspace.prototype.close = function() {
 // Owner Methods
 //------------------------------
 
-/** this method s implemented for the Owner component/mixin. */
+/** this method is implemented for the Owner component/mixin. */
 visicomp.core.Workspace.prototype.getWorkspace = function() {
    return this;
 }
 
-/** this method s implemented for the Owner component/mixin. */
+/** this method is implemented for the Owner component/mixin. */
 visicomp.core.Workspace.prototype.getBaseName = function() {
     return this.name;
 }

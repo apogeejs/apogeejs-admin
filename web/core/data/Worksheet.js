@@ -21,25 +21,23 @@ visicomp.core.Worksheet = function(owner,name) {
 }
 
 //add components to this class
+visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Impactor);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.DataHolder);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Dependent);
-visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Impactor);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Owner);
 
-visicomp.core.Worksheet.RETURN_VALUE_TABLE_NAME = "_worksheet_return_value_";
-
-/** */
+/** This gets the internal forlder for the worksheet. */
 visicomp.core.Worksheet.prototype.getInternalFolder = function() {
     return this.internalFolder;
 }
 
-/** */
+/** This gets the name of the return object for the worksheet function. */
 visicomp.core.Worksheet.prototype.getReturnValueString = function() {
     return this.returnValueString;
 }
 
-/** */
+/** This gets the arg list of the worksheet function. */
 visicomp.core.Worksheet.prototype.getArgList = function() {
     return this.argList;
 }
@@ -48,7 +46,7 @@ visicomp.core.Worksheet.prototype.getArgList = function() {
 // Child Methods
 //------------------------------
 
-/** This overrides the get title method of child to return the function declaration. */
+/** This overrides the get displaymethod of child to return the function declaration. */
 visicomp.core.Worksheet.prototype.getDisplayName = function() {
     var name = this.getName();
     var argList = this.getArgList();
@@ -166,7 +164,8 @@ visicomp.core.Worksheet.prototype.updateForDeletedVariable = function(object,rec
 // Private Methods
 //==============================
 
-/** This is called from the update action. It should not be called externally. */
+/** This is called from the update action. It should not be called externally. 
+ * @private */
 visicomp.core.Worksheet.prototype.setInternalFolder = function(folder) {
     this.internalFolder = folder;
     this.updateDependencies([folder]);
@@ -183,7 +182,8 @@ visicomp.core.Worksheet.prototype.setArgList = function(argList) {
 }
 
 /** This method creates the worksheet function. It is called from the update action 
- * and should not be called externally.  */
+ * and should not be called externally. 
+ * @private */
 visicomp.core.Worksheet.prototype.getWorksheetFunction = function(worksheetErrors) {
 
     //create a copy of the workspace to do the function calculation - don't update the UI display version
@@ -225,7 +225,8 @@ visicomp.core.Worksheet.prototype.getWorksheetFunction = function(worksheetError
     return worksheetFunction;    
 }
 
-/** This method creates a copy of the workspace to be used for the function evvaluation.  */
+/** This method creates a copy of the workspace to be used for the function evvaluation. 
+ * @private */
 visicomp.core.Worksheet.prototype.createVirtualWorkspace = function() {
     var json = this.internalFolder.toJson();
     var virtualWorkspace = new visicomp.core.Workspace("temp");
@@ -242,7 +243,8 @@ visicomp.core.Worksheet.prototype.createVirtualWorkspace = function() {
     return virtualWorkspace;
 }
 
-/** This method loads the input argument members from the virtual workspace.  */
+/** This method loads the input argument members from the virtual workspace. 
+ * @private */
 visicomp.core.Worksheet.prototype.loadInputElements = function(rootFolder,worksheetErrors) {
     var argMembers = [];
     for(var i = 0; i < this.argList.length; i++) {
@@ -258,7 +260,8 @@ visicomp.core.Worksheet.prototype.loadInputElements = function(rootFolder,worksh
     return argMembers;
 }
 
-/** This method loads the output member from the virtual workspace.  */
+/** This method loads the output member from the virtual workspace. 
+ * @private  */
 visicomp.core.Worksheet.prototype.loadOutputElement = function(rootFolder,worksheetErrors) {
     var returnValueMember = rootFolder.lookupChild(this.returnValueString);
     if(!returnValueMember) {
