@@ -18,6 +18,7 @@ visicomp.core.Child = {};
 visicomp.core.Child.init = function(owner,name,generator) {
     this.name = name;
     this.generator = generator;
+    this.errors = [];
     
     this.workspace = owner.getWorkspace();
     
@@ -89,6 +90,41 @@ visicomp.core.Child.getRootFolder = function() {
 /** This identifies the type of object. */
 visicomp.core.Child.getType = function() {
 	return this.generator.type;
+}
+
+
+/** This method sets the pre calc error for this dependent. */
+visicomp.core.Child.addError = function(error) {
+    this.errors.push(error);
+}
+
+/** This method sets the pre calc error for this dependent. */
+visicomp.core.Child.addErrors = function(errorList) {
+    this.errors = this.errors.concat(errorList);
+}
+
+/** This method clears the error list. */
+visicomp.core.Child.clearErrors = function(type) {
+    var newList = [];
+    if(type != null) {    
+        for(var i = 0; i < this.errors.length; i++) {
+            var entry = this.errors[i];
+            if(entry.type != type) {
+                newList.push(entry);
+            }
+        }
+    }
+    this.errors = newList;
+}
+
+/** This returns true if there is a pre calc error. */
+visicomp.core.Child.hasError = function() {
+    return (this.errors.length > 0);
+}
+
+/** This returns the pre calc error. */
+visicomp.core.Child.getErrors = function() {
+    return this.errors;
 }
 
 /** This method writes the child to a json. */

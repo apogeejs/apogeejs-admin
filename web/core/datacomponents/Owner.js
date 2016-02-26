@@ -8,8 +8,6 @@
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
  * COMPONENT DEPENDENCIES:
- * - A Owner must be a Child. The Child component must be installed before the
- * Codeable component.
  */
 visicomp.core.Owner = {};
 

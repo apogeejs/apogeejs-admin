@@ -3,20 +3,19 @@
 visicomp.core.calculation = {};
 
 
-/** This addes the member to the recalculate list, if it has a formula and hence
- * needs to be recalculated. It then adds all talbes that depend on this one.
+/** This moethod should be called on an Impactor or Dependent object that changes.
+ * This will allow for any Dependents to be recaculated.
  * @private */
 visicomp.core.calculation.addToRecalculateList = function(recalculateList,member) {
     //if it is in the list, return
     if(this.inList(recalculateList,member)) return;
      
     //add this member to recalculate list if it needs to be executed
-    if(member.isDependent) {
-        if(member.needsExecuting()) {
-           recalculateList.push(member);
-        }
+    if((member.isCalculable)&&(member.needsCalculating())) {
+        recalculateList.push(member);
     }
-    //add any member that is depends on this one
+    
+    //add any member that depends on this one
     if(member.isImpactor) {
         var impactsList = member.getImpactsList();
         for(var i = 0; i < impactsList.length; i++) {
@@ -55,7 +54,7 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
 	for(i = 0; i < recalculateList.length; i++) {
 		member = recalculateList[i];
 		memberIsSortedMap[member.getFullName()] = false;       
-        member.clearCircRefError();
+        member.clearPreCalcErrors("Calculation - Circ Ref");
 	}
 	
 	//sort the list
@@ -103,11 +102,11 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
         //give each an error and transfer to sorted list
 		if(!membersAddedToSorted) {
             var errorMsg = "Circular Reference";
-            var actionError = new visicomp.core.ActionError(errorMsg,null,visicomp.core.ActionError.ACTION_ERROR_MODEL);
+            var actionError = new visicomp.core.ActionError(errorMsg,"Calculation - Circ Ref",null);
             actionResponse.addError(actionError);
             for(var ie = 0; ie < recalculateList.length; ie++) {
                 member = recalculateList[ie];
-                member.setCircRefError(actionError);
+                member.addPreCalcError(actionError);
                 sortedRecalculateList.push(member);
             }
             recalculateList.splice(0,recalculateList.length);
@@ -150,7 +149,7 @@ visicomp.core.calculation.callRecalculateList = function(recalculateList,actionR
             
             if(success) {
                 //update the member
-                success = member.execute();
+                success = member.calculate();
             }
         }
         
@@ -171,6 +170,9 @@ visicomp.core.calculation.callRecalculateList = function(recalculateList,actionR
  * reports an error for this member and returns true.  Otherwise it returns false.
  * @private */
 visicomp.core.calculation.checkDependencyError = function(member) {
+    
+    member.clearErrors("Calculation - Dependency");
+    
     //get variables this depends on has an error
     var dependsOn = member.getDependsOn();
     var errorDependencies = null;
@@ -193,8 +195,8 @@ visicomp.core.calculation.checkDependencyError = function(member) {
             if(i > 0) message += ", ";
             message += errorDependencies[i].getFullName();
         }
-        var actionError = new visicomp.core.ActionError(message,member);
-        this.setDataError(actionError);   
+        var actionError = new visicomp.core.ActionError(message,"Calculation - Dependency",member);
+        member.addError(actionError);   
         
         return true;
     }

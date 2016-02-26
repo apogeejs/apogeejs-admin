@@ -107,23 +107,11 @@ visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
  *the passed variable was added.  */
 visicomp.core.Codeable.updateForAddedVariable = function(addedMember,recalculateList) {
     if((this.hasCode())&&(this.varInfo)) {
-            
-        var newDependencyList;
-        try {
-            
-            //calculate new dependencies
-            newDependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
+                  
+        //calculate new dependencies
+        var newDependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
                this.getParent(),
                this.getRootFolder());
-        }
-        catch(error) {
-            //error for this member
-            var actionError = visicomp.core.ActionError.processMemberModelException(error,this);
-            this.setCodeError(actionError);
-            
-            //set a dummy dependency list
-            newDependencyList = [];
-        }
             
         //update this object if the new table is in the list
         if(newDependencyList.indexOf(addedMember) >= 0) {
@@ -146,17 +134,9 @@ visicomp.core.Codeable.updateForDeletedVariable = function(deletedMember,recalcu
             
             if(!this.varInfo) return;
     
-            try {
-                //calculate dependencies
-               var dependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
+            var dependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
                    this.getParent(),
                    this.getRootFolder());
-            }
-            catch(error) {
-                //unknown application error
-                var actionError = visicomp.core.ActionError.processMemberModelException(error,this);
-                this.setCodeError(actionError);
-            }
 
             //update dependencies
             this.updateDependencies(dependencyList); 
@@ -195,18 +175,15 @@ visicomp.core.Codeable.needsExecuting = function() {
 
 /** This updates the member data based on the function. It returns
  * true for success and false if there is an error.  */
-visicomp.core.Codeable.execute = function() {
-	
-	//don't calculate if this has an error.
-	//do pass the error on to be a data error.
-	if(this.hasCodeError()) {
-		this.setDataError(this.getCodeError());
-		return false;
-	}
+visicomp.core.Codeable.calculate = function() {
+    
+    //clear these errors here. they will be reset below
+    this.clearErrors("Codeable - Calculate");
     
     if((!this.objectFunction)||(!this.contextSetter)) {
-        var actionError = new visicomp.core.ActionError("Function not found for member: " + this.getName(),this);
-        this.setDataError(actionError);
+        var msg = "Function not found for member: " + this.getName();
+        var actionError = new visicomp.core.ActionError(msg,"Codeable - Calculate",this);
+        this.addError(actionError);
         return false;
     }
     
@@ -232,9 +209,9 @@ visicomp.core.Codeable.execute = function() {
             console.error(error.stack);
         }
         var errorMsg = "Error Recalculating Member: " + ((error.message) ? error.message : null);
-        var actionError = new visicomp.core.ActionError(errorMsg,this);
+        var actionError = new visicomp.core.ActionError(errorMsg,"Codeable - Calculate",this);
         actionError.setParentException(error);
-        this.setDataError(actionError);
+        this.addError(actionError);
         return false;
     }
 }

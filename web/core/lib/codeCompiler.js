@@ -19,21 +19,27 @@ visicomp.core.codeCompiler.processCode = function(codeInfo,
         objectFunctionName);
         
     //get the accessed variables
-    try {
-        //parse the code and get variabls dependencies
-        codeInfo.varInfo = visicomp.core.codeAnalysis.analyzeCode(combinedFunctionBody);
+    //
+    //parse the code and get variabls dependencies
+    var analyzeOutput = visicomp.core.codeAnalysis.analyzeCode(combinedFunctionBody);
     
-        //create the object function and context setter from the code text
-        var generatorOutput = visicomp.core.codeCompiler.createObjectFunction(codeInfo.varInfo, combinedFunctionBody);
+    if(analyzeOutput.success) {
+        codeInfo.varInfo = analyzeOutput.varInfo;
+    }
+    else {
+        codeInfo.errors = analyzeOutput.errors;
+    }
+
+    //create the object function and context setter from the code text
+    var generatorOutput = visicomp.core.codeCompiler.createObjectFunction(codeInfo.varInfo, combinedFunctionBody);
+    if(generatorOutput.success) {
         codeInfo.contextSetter = generatorOutput.contextSetter;
         codeInfo.objectFunction = generatorOutput.objectFunction;
+    }
+    else {
+        codeInfo.errors = generatorOutput.errors;
+    }
     
-    }
-    catch(error) {
-        var actionError = visicomp.core.ActionError.processMemberModelException(error,null);
-        codeInfo.actionError = actionError;
-        return codeInfo;
-    }
     
     //calculate dependencies
 	codeInfo.dependencyList = visicomp.core.codeDependencies.getDependencyInfo(
@@ -101,10 +107,20 @@ visicomp.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunc
         contextSetterBody,
         combinedFunctionBody
     );
-    var generatorFunction = new Function(generatorBody);
+        
+    var generatorOutput;
+    try {
+        var generatorFunction = new Function(generatorBody);
     
-    //return the output of the generator - the object function and the context setter
-    var generatorOutput = generatorFunction();
+        //return the output of the generator - the object function and the context setter
+        generatorOutput = generatorFunction();
+        generatorOutput.usccess = true;
+    }
+    catch(exception) {
+        generatorOutput = {};
+        generatorOutput.success = false;
+        generatorOutput.error = processMemberModelException(exception,"Compile - Code");
+    }
     
     return generatorOutput;
 }

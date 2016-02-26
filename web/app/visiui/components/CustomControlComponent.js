@@ -16,7 +16,7 @@ visicomp.core.util.mixin(visicomp.app.visiui.CustomControlComponent,visicomp.app
 // Protected and Private Instance Methods
 //==============================
 
-visicomp.app.visiui.CustomControlComponent.prototype.initEmptyReso = function() {
+visicomp.app.visiui.CustomControlComponent.prototype.initEmptyResource = function() {
 	this.update("","","","");
 }
 
@@ -93,6 +93,7 @@ visicomp.app.visiui.CustomControlComponent.prototype.createEditResourceDialogCal
 visicomp.app.visiui.CustomControlComponent.prototype.update = function(html,resourceGeneratorBody,supplementalCode,css) {
 	var actionResponse = new visicomp.core.ActionResponse();
     var control = this.getObject();
+    control.clearErrors("Custom Control - Update");
     
     try { 
         //create a new resource
@@ -113,9 +114,10 @@ visicomp.app.visiui.CustomControlComponent.prototype.update = function(html,reso
             console.error(error.stack);
         }
         var errorMsg = error.message ? error.message : visicomp.core.ActionError.UNKNOWN_ERROR_MESSAGE;
-        var actionError = new visicomp.core.ActionError(errorMsg,control,visicomp.core.util.ACTION_ERROR_USER_APP);
+        var actionError = new visicomp.core.ActionError(errorMsg,"Custom Control - Update",control);
         actionError.setParentException(error);
         
+        control.addError(actionError);
         actionResponse.addError(actionError);
     }
     

@@ -74,7 +74,7 @@ visicomp.core.createmember.instantiateMember = function(folder,json,updateDataLi
     if(!generator) {
        //type not found
        var errorMsg = "Member type not found: " + json.type;
-       var actionError = new visicomp.core.ActionError(errorMsg,null,visicomp.core.ActionError.ACTION_ERROR_MODEL);
+       var actionError = new visicomp.core.ActionError(errorMsg,"Model",null);
        
        actionResponse.addError(actionError);
        

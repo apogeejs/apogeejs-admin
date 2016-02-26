@@ -1,35 +1,35 @@
 
 
 /** This method class is an action error object, to be used in an action return value. 
- * If this is an error is associated with a member the member should be passed in. Otherwise
- * null or any false value may be passed in. The error type can be omitted if the type is
- * visicomp.core.ActionError.ACTION_ERROR_MODEL and a member is passed in, which is the
- * standard case for an error. */
-visicomp.core.ActionError = function(msg,optionalMember,optionalErrorType) {
+ * The error type is a classification string. If the error is associated with a member
+ * the member can be set here. */
+visicomp.core.ActionError = function(msg,errorType,optionalMember) {
     this.msg = (msg != null) ? msg : visicomp.core.ActionError.UNKNOWN_ERROR_MESSAGE;
-    if(optionalMember) {
-        this.member = optionalMember;
-        this.errorType = visicomp.core.ActionError.ACTION_ERROR_MODEL;
-    }
-    if(optionalErrorType) {
-        this.errorType = optionalErrorType;
-    }
+    this.errorType = errorType;
+    this.member = optionalMember;
     
     this.isFatal = false;
     this.parentException = null;
-    
 }
 
 visicomp.core.ActionError.UNKNOWN_ERROR_MESSAGE = "Unknown Error";
 
-/** This is an error in the user model code. */
-visicomp.core.ActionError.ACTION_ERROR_MODEL = "model";
-/** This is an error in the application code. */
-visicomp.core.ActionError.ACTION_ERROR_APP = "app";
-/** This is an error in the user appliation level code, such as custom components. */
-visicomp.core.ActionError.ACTION_ERROR_USER_APP = "user app";
-/** This is an operator error. */
-visicomp.core.ActionError.ACTION_ERROR_USER = "user";
+//"User App" - This is an error in the users application code
+//"Custom Control - Update" - in "update" of custom control (cleared and set)
+//"Worksheet - Code" - error in setting the worksheet function
+//"User" - This is an operator error
+//"Model" - This is an error in the data model, like a missing generator
+//"Code" - error in use model code (I used on worksheet and in code. Maybe I should split these.)
+//"Calculate" - error when the object function is set as data (includes execution if necessary)
+//
+///** This is an error in the user model code. */
+//visicomp.core.ActionError.ACTION_ERROR_MODEL = "model";
+///** This is an error in the application code. */
+//visicomp.core.ActionError.ACTION_ERROR_APP = "app";
+///** This is an error in the user appliation level code, such as custom components. */
+//visicomp.core.ActionError.ACTION_ERROR_USER_APP = "user app";
+///** This is an operator error. */
+//visicomp.core.ActionError.ACTION_ERROR_USER = "user";
 
 /** This sets the exception that triggered this error. */
 visicomp.core.ActionError.prototype.setParentException = function(exception) {
@@ -41,24 +41,29 @@ visicomp.core.ActionError.prototype.setIsFatal= function(isFatal) {
     this.isFatal = isFatal;
 }
 
-/** This sets the exception that triggered this error. */
+/** This returns true if this is a fatal error. */
 visicomp.core.ActionError.prototype.getIsFatal= function() {
     return this.isFatal;
+}
+
+/** This gets the type of error. */
+visicomp.core.ActionError.prototype.getType= function() {
+    return this.errorType;
 }
 
 /** This method processes an exception from a model error, returning an ActionError object.
  * IT is OK if the member is passed as null. The resulting error message is the message from the
  * exception. An optional prefix may be added using the argument optionalErrorMsgPrefix.
  * This method also prints the stack trace for the exception. */
-visicomp.core.ActionError.processMemberModelException = function(error,optionalMember,optionalErrorMsgPrefix) {
-    if(error.stack) {
-        console.error(error.stack);
+visicomp.core.ActionError.processMemberModelException = function(exception,type,optionalMember,optionalErrorMsgPrefix) {
+    if(exception.stack) {
+        console.error(exception.stack);
     }
     var errorMsg = optionalErrorMsgPrefix ? optionalErrorMsgPrefix : "";
-    if(error.message) errorMsg += error.message;
+    if(exception.message) errorMsg += exception.message;
     if(errorMsg.length == 0) errorMsg = "Unknown error";
-    var actionError = new visicomp.core.ActionError(errorMsg,optionalMember,visicomp.core.util.ACTION_ERROR_MODEL);
-    actionError.setParentException(error);
+    var actionError = new visicomp.core.ActionError(errorMsg,type,optionalMember);
+    actionError.setParentException(exception);
     return actionError;
 }
 
@@ -67,15 +72,15 @@ visicomp.core.ActionError.processMemberModelException = function(error,optionalM
  * The resulting error message is the message from the
  * exception. An optional prefix may be added using the argument optionalErrorMsgPrefix.
  * This method also prints the stack trace for the exception. */
-visicomp.core.ActionError.processFatalAppException = function(error,optionalErrorMsgPrefix) {  
-    if(error.stack) {
-        console.error(error.stack);
+visicomp.core.ActionError.processFatalAppException = function(exception,optionalErrorMsgPrefix) {  
+    if(exception.stack) {
+        console.error(exception.stack);
     }
     var errorMsg = optionalErrorMsgPrefix ? optionalErrorMsgPrefix : "";
-    if(error.message) errorMsg += error.message;
+    if(exception.message) errorMsg += exception.message;
     if(errorMsg.length == 0) errorMsg = "Unknown error";
-    var actionError = new visicomp.core.ActionError(errorMsg,null,visicomp.core.util.ACTION_ERROR_APP);
-    actionError.setParentException(error);
+    var actionError = new visicomp.core.ActionError(errorMsg,"App",null);
+    actionError.setParentException(exception);
     actionError.setIsFatal(true);
     return actionError;
 }

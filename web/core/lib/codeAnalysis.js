@@ -146,25 +146,42 @@ visicomp.core.codeAnalysis.syntax = {
  **/
 visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
 
+    var returnValue = {};
+
     //parse the code
-    var ast = esprima.parse(functionText, { tolerant: true, loc: true });
+    var ast;
     
-    //check for errors in parsing
-    if((ast.errors)&&(ast.errors.length > 0)) {
-		var error;
-		if(ast.errors.length > 1) {
-			error = this.createCompoundParsingError(ast.errors);
-		}
-		else {
-			error = ast.errors[0];
-		}
-        throw error;
+    try {
+        ast = esprima.parse(functionText, { tolerant: true, loc: true });
+    
+        //check for errors in parsing
+        if((ast.errors)&&(ast.errors.length > 0)) {
+            returnValue.success = false;
+            returnValue.errors = [];
+            for(var i = 0; i < ast.errors.length; i++) {
+                var astError = ast.errors[i];
+                var actionError = new visicomp.core.ActionError(astError.description,"Analyze - Code");
+                actionError.setParentException(astError);
+                returnValue.errors.push(actionError);
+            }
+            
+            return returnValue;
+        }
+    }
+    catch(exception) {
+        var actionError = processMemberModelException(exception,"Analyze - Code");
+        returnValue.success = false;
+        returnValue.errors = [];
+        returnValue.errors.push(actionError);
+        return returnValue;
     }
 
     //get the variable list
     var varInfo = visicomp.core.codeAnalysis.getVariableInfo(ast);
     
     //return the variable info
+    returnValue.success = true;
+    returnValue.varInfo = varInfo;
     return varInfo;
 }
 
@@ -472,16 +489,5 @@ visicomp.core.codeAnalysis.createParsingError = function(errorMsg,location) {
         error.lineNumber = location.start.line;
         error.column = location.start.column;
     }
-    return error;
-}
-
-visicomp.core.codeAnalysis.createCompoundParsingError = function(errors) {
-    var errorMsg = "";
-    for(var i = 0; i < errors.length; i++) {
-        errorMsg += errors[i];
-    }
-    
-    var error = visicomp.core.util.createError(errorMsg,"CompoundParsingError");
-    error.errors = errors;
     return error;
 }

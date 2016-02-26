@@ -99,15 +99,6 @@ visicomp.core.Folder.prototype.updateData = function(child) {
 // Dependent Methods
 //------------------------------
 
-/** If this is true the member must be executed. */
-visicomp.core.Folder.prototype.needsExecuting = function() {
-	return false;
-}
-
-/** This updates the member data based on the function. It returns
- * true for success and false if there is an error.  */
-visicomp.core.Folder.prototype.execute = function() {}
-
 /** This method updates the dependencies of any children
  * based on an object being added. */
 visicomp.core.Folder.prototype.updateForAddedVariable = function(object,recalculateList) {

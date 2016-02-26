@@ -41,17 +41,12 @@ visicomp.core.codeDependencies.getDependencyInfo = function(varInfo,localFolder,
 					var object = folder.lookupChildFromPath(namePath);
 					if(object) {
                         
-                        if(!object.isImpactor) {
-                            //this shouldn't happen
-                            throw visicomp.core.util.createError("An object may not depend on the object " + object.getName());
+                        //add as dependent (note this may not be a data object - check later!)
+                        var fullName = object.getFullName();
+                        if(!objectMap[fullName]) {
+                            dependencyList.push(object);
+                            objectMap[fullName] = true;
                         }
-                        
-						//save the object to dependencies
-						var fullName = object.getFullName();
-						if(!objectMap[fullName]) {
-							dependencyList.push(object);
-							objectMap[fullName] = true;
-						}
 					}
 				}
 			}

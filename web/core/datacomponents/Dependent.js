@@ -1,5 +1,5 @@
 /** This mixin encapsulates an object in the workspace that depends on another
- * object, and is recalculated based partilaly on that object.
+ * object, and is recalculated based partialy on that object.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
@@ -28,47 +28,6 @@ visicomp.core.Dependent.getDependsOn = function() {
     return this.dependsOnList;
 }
 
-/** This method sets the circular reference error for this dependent.*/
-visicomp.core.Dependent.setCircRefError = function(circRefError) {
-    this.circRefError = circRefError;
-}
-
-/** This method clears the circular reference error for this codeable.*/
-visicomp.core.Dependent.clearCircRefError = function() {
-    this.circRefError = null;
-}
-
-/** This returns true if there is a circular reference error. */
-visicomp.core.Dependent.hasCircRefError = function() {
-    return (this.circRefError != null);
-}
-
-/** This returns the circular reference error. */
-visicomp.core.Dependent.getCircRefError = function() {
-    return this.circRefError;
-}
-
-/** This method sets the self reference error for this dependent. An object
- * should not reference itself since an object should not be aware of its previous value. */
-visicomp.core.Dependent.setSelfRefError = function(selfRefError) {
-    this.selfRefError = selfRefError;
-}
-
-/** This method clears the self reference error for this codeable.*/
-visicomp.core.Dependent.clearSelfRefError = function() {
-    this.selfRefError = null;
-}
-
-/** This returns true if there is a self reference error. */
-visicomp.core.Dependent.hasSelfRefError = function() {
-    return (this.selfRefError != null);
-}
-
-/** This returns the self reference error. */
-visicomp.core.Dependent.getSelfRefError = function() {
-    return this.selfRefError;
-}
-
 //Must be implemented in extending object
 ///** This method udpates the dependencies if needed because
 // *the passed variable was added.  */
@@ -78,16 +37,6 @@ visicomp.core.Dependent.getSelfRefError = function() {
 ///** This method udpates the dependencies if needed because
 // *the passed variable was deleted.  */
 //visicomp.core.Dependent.updateForDeletedVariable = function(object);
-
-
-///** This is a check to see if the object should be checked for dependencies 
-// * for recalculation.  
-// * @private */
-//visicomp.core.Dependent.needsExecuting = function();
-
-
-///** This updates the member based on a change in a dependency.  */
-//visicomp.core.Dependent.execute = function();
 
 //===================================
 // Private Functions
@@ -105,7 +54,8 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
 	
     //create the new dependency list
 	this.dependsOnList = [];
-    this.clearSelfRefError();
+//NEED TO FIX THIS - ONLY APPLIES TO CALCULABLE!!!
+//    this.clearPreCalcErrors("Dependent - Self Ref");
 	
     //update the dependency links among the members
 	var newDependencySet = {};
@@ -113,19 +63,22 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
     var i;
     for(i = 0; i < newDependsOn.length; i++) {
         remoteMember = newDependsOn[i];
-        
-        //make sure this is a dependent - this is an application error if this happens
-        if(!remoteMember.isImpactor) {
-            throw visicomp.core.util.createError("The object " + remoteMember.getFullName() + " cannot be referenced as a dependent.");
-        }
 		
 		if(remoteMember === this) {
+            
+//this is totally wrong!!!
+//I need a reference to the object I am comparing too
+//NOT _THIS_
+
 			//it is an error to depend on itself (it doesn't exist yet)
 			//ok to reference through a local varible - this is how recursive functions are handled.
 			var message = "A data formula should not reference its own name.";
-			var actionError = new visicomp.core.ActionError(message,this);
-			this.setSelfRefError(actionError);
+			var actionError = new visicomp.core.ActionError(message,"Dependent - Self Ref",this);
+			this.addPreCaclError(actionError);
 		}
+        else if((!remoteMember.isImpactor)||(!remoteMember.isDependent)) {
+            //PLACE A WARNING HERE!!!
+        }
 		else {	
 			
 			this.dependsOnList.push(remoteMember);

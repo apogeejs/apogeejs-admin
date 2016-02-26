@@ -6,6 +6,7 @@ visicomp.core.Worksheet = function(owner,name) {
     visicomp.core.Child.init.call(this,owner,name,visicomp.core.Worksheet.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
+    visicomp.core.Calculable.init.call(this);
     visicomp.core.Owner.init.call(this);
     
     this.returnValueString = "";
@@ -25,6 +26,7 @@ visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Impactor);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.DataHolder);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Dependent);
+visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Calculable);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Owner);
 
 /** This gets the internal forlder for the worksheet. */
@@ -127,13 +129,13 @@ visicomp.core.Worksheet.prototype.getBaseName = function() {
     
 
 /** If this is true the member must be executed. */
-visicomp.core.Worksheet.prototype.needsExecuting = function() {
+visicomp.core.Worksheet.prototype.needsCalculating = function() {
 	return true;
 }
 
 /** This updates the member data based on the function. It returns
  * true for success and false if there is an error.  */
-visicomp.core.Worksheet.prototype.execute = function() {
+visicomp.core.Worksheet.prototype.calculate = function() {
     
     var worksheetErrors = [];
     
@@ -146,7 +148,7 @@ visicomp.core.Worksheet.prototype.execute = function() {
     else {
         //for now I can only set a single error. I will set the first.
         //I should get way to set multiple
-        this.setDataError(worksheetErrors[0]);
+        this.addErrors(worksheetErrors);
     }
 }
 
@@ -252,7 +254,8 @@ visicomp.core.Worksheet.prototype.loadInputElements = function(rootFolder,worksh
         var argMember = rootFolder.lookupChild(argName);
         if(!argMember) {
             //missing input element
-            var actionError = new visicomp.core.ActionError("Input element not found in worksheet: " + argName,this);
+            var msg = "Input element not found in worksheet: " + argName;
+            var actionError = new visicomp.core.ActionError(msg,"Worksheet - Code",this);
             worksheetErrors.push(actionError);
         }
         argMembers.push(argMember);
@@ -266,7 +269,8 @@ visicomp.core.Worksheet.prototype.loadOutputElement = function(rootFolder,worksh
     var returnValueMember = rootFolder.lookupChild(this.returnValueString);
     if(!returnValueMember) {
         //missing input element
-        var actionError = new visicomp.core.ActionError("Return element not found in worksheet: " + this.returnValueString,this);
+        var msg = "Return element not found in worksheet: " + this.returnValueString;
+        var actionError = new visicomp.core.ActionError(msg,"Worksheet - Code",this);
         worksheetErrors.push(actionError);
     }
     return returnValueMember;

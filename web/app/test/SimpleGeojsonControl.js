@@ -8,8 +8,14 @@
 //=================================
 
 /** Constructor */
-SimpleGeojsonResourceProcessor = function() {
-	this.controlFrame = null;
+SimpleGeojsonResource = function() {
+
+    this.contentElement = null;
+    this.mapDiv = null;
+    
+    this.lat = 37;
+    this.lon = -120;
+    this.zoom = 14;
 }
 
 //required links for leaflet
@@ -17,13 +23,13 @@ SimpleGeojsonResourceProcessor = function() {
 //http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css
 
 /** setFrame - required method for resource processor used in Basic Resource Control. */
-SimpleGeojsonResourceProcessor.prototype.setWindow = function(window) {
-    this.window = window;
+SimpleGeojsonResource.prototype.setContentElement = function(contentElement) {
+    this.contentElement = contentElement;
+    
     this.mapDiv = document.createElement("div");
     this.mapDiv.style.height = "100%";
     this.mapDiv.style.width = "100%"; 
-    var contentElement = this.window.getContent();
-    contentElement.appendChild(this.mapDiv);
+    this.contentElement.appendChild(this.mapDiv);
     
     //map init note - we can not init the map until the dom is ready.
     //Isn't ready yet. Maybe we need some sort of event that it is?
@@ -38,31 +44,27 @@ function createId() {
     return "map_div_" + counter++;
 }
 
-/** updateToJson - required method for resource processor used in Basic Resource Control. 
- * no data to serialize here. */
-SimpleGeojsonResourceProcessor.prototype.updateToJson = function() {}
-
-/** updateToJson - required method for resource processor used in Basic Resource Control. 
- * no data to deserialize here. */
-SimpleGeojsonResourceProcessor.prototype.updateFromJson = function(json) {}
+/** This is the method users will call to initialize the chart. */
+SimpleGeojsonResource.prototype.setData = function(lat,lon,zoom) {
+    this.lat = lat;
+    this.lon = lon;
+    this.zoom = zoom;
+}
 
 /** This is the method users will call to initialize the chart. */
-SimpleGeojsonResourceProcessor.prototype.setData = function(data,options) {
-    if(!options) options = {};
-    
+SimpleGeojsonResource.prototype.run = function() {  
     if(!this.map) {
         this.map = L.map(this.mapDiv);
-
-        this.map.setView([41.3565797,2.1343725], 16);
-
+        
         //microsoft osm
         L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg', {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
             maxZoom: 18
         }).addTo(this.map);
     }
-}
 
+    this.map.setView([this.lat,this.lon], this.zoom);
+}
 
 //=================================
 // Simple Chart Control
@@ -70,49 +72,69 @@ SimpleGeojsonResourceProcessor.prototype.setData = function(data,options) {
 
 /** This is the control for the chart. It inherits from the component
  * BasicResourceControl to represent a resource object. */
-SimpleGeojsonControl = function(workspaceUI,resource) {
+SimpleGeojsonComponent = function(workspaceUI,control,componentJson) {
+    //add the resource for the control
+    var resource = new SimpleGeojsonResource();
+    control.updateResource(resource);
+    
     //base init
-    visicomp.app.visiui.Component.init.call(this,workspaceUI,resource,"Simple GeoJSON Control");
-    visicomp.app.visiui.BasicResourceControl.init.call(this);
+    visicomp.app.visiui.Component.init.call(this,workspaceUI,control,SimpleGeojsonComponent.generator,componentJson);
+    visicomp.app.visiui.BasicControlComponent.init.call(this);
 };
 
 //add components to this class
-visicomp.core.util.mixin(SimpleGeojsonControl,visicomp.app.visiui.Component);
-visicomp.core.util.mixin(SimpleGeojsonControl,visicomp.app.visiui.BasicResourceControl);
+visicomp.core.util.mixin(SimpleGeojsonComponent,visicomp.app.visiui.Component);
+visicomp.core.util.mixin(SimpleGeojsonComponent,visicomp.app.visiui.BasicControlComponent);
+
+/** Store the content element for the resource. */
+SimpleGeojsonComponent.prototype.addToFrame = function() {
+    var control = this.getObject();
+    var resource = control.getResource();
+    resource.setContentElement(this.getContentElement());
+}
 
 //======================================
 // Static methods
 //======================================
 
 /** This method creates the control. */
-SimpleGeojsonControl.createControl = function(workspaceUI,parent,name) {
-	//create a resource a simple chart resource processor
-	var resourceProcessor = new SimpleGeojsonResourceProcessor();
-    var returnValue = visicomp.core.createresource.createResource(parent,name,resourceProcessor);
-    if(returnValue.success) {
-        var resource = returnValue.resource;
-        var simpleGeojsonControl = new SimpleGeojsonControl(workspaceUI,resource);
-        returnValue.control = simpleGeojsonControl;
+SimpleGeojsonComponent.createComponent = function(workspaceUI,parent,name) {
+    //create a resource a simple chart resource processor
+    var json = {};
+    json.name = name;
+    json.type = visicomp.core.Control.generator.type;
+    var actionResponse = visicomp.core.createmember.createMember(parent,json);
+    
+    var control = actionResponse.member;
+    if(control) {
+        var simpleGeojsonComponent = new SimpleGeojsonComponent(workspaceUI,control);
+        actionResponse.component = simpleGeojsonComponent;
     }
     else {
         //no action for now
     }
-    return returnValue;
+    return actionResponse;
+}
+
+SimpleGeojsonComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
+    return new SimpleGeojsonComponent(workspaceUI,member,componentJson);
 }
 
 //======================================
 // This is the control generator, to register the control
 //======================================
 
-SimpleGeojsonControl.generator = {};
-SimpleGeojsonControl.generator.displayName = "Simple GeoJSON Control";
-SimpleGeojsonControl.generator.uniqueName = "visicomp.example.SimpleGeojsonControl";
-SimpleGeojsonControl.generator.createControl = SimpleGeojsonControl.createControl;
-
+SimpleGeojsonComponent.generator = {};
+SimpleGeojsonComponent.generator.displayName = "Simple GeoJSON Control";
+SimpleGeojsonComponent.generator.uniqueName = "visicomp.example.SimpleGeojsonComponent";
+SimpleGeojsonComponent.generator.createComponent = SimpleGeojsonComponent.createComponent;
+SimpleGeojsonComponent.generator.createComponentFromJson = SimpleGeojsonComponent.createComponentFromJson;
+SimpleGeojsonComponent.generator.DEFAULT_WIDTH = 500;
+SimpleGeojsonComponent.generator.DEFAULT_HEIGHT = 500;
 
 //auto registration
-if(registerControl) {
-    registerControl(SimpleGeojsonControl.generator);
+if(registerComponent) {
+    registerComponent(SimpleGeojsonComponent.generator);
 }
 
 }

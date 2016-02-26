@@ -113,14 +113,13 @@ GoogleChartResource.prototype.createDataTable = function(data) {
 /** This is the control for the chart. It inherits from the component
  * BasicResourceControl to represent a resource object. */
 GoogleChartComponent = function(workspaceUI,control,componentJson) {
+    //base init
+    visicomp.app.visiui.Component.init.call(this,workspaceUI,control,GoogleChartComponent.generator,componentJson);
+    visicomp.app.visiui.BasicControlComponent.init.call(this);
     
     //add the resource for the control
     var resource = new GoogleChartResource();
     control.updateResource(resource);
-    
-    //base init
-    visicomp.app.visiui.Component.init.call(this,workspaceUI,control,GoogleChartComponent.generator,componentJson);
-    visicomp.app.visiui.BasicControlComponent.init.call(this);
 };
 
 //add components to this class

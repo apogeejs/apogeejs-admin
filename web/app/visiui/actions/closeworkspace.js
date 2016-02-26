@@ -30,7 +30,7 @@ visicomp.app.visiui.closeworkspace.closeWorkspace = function(app) {
         var activeWorkspaceUI = app.getActiveWorkspaceUI();
         if(activeWorkspaceUI === null) {
             var errorMsg = "There is no workspace open.";
-            var actionError = new visicomp.core.ActionError(errorMsg,null,visicomp.core.ActionError.ACTION_ERROR_USER);
+            var actionError = new visicomp.core.ActionError(errorMsg,"User",null);
             actionResponse.addError(actionError);
             return actionResponse;
         }
