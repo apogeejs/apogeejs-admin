@@ -3,7 +3,7 @@
 	"fileType": "visicomp workspace",
 	"jsLinks": [
 		"https://www.gstatic.com/charts/loader.js",
-		"../../app/test/GoogleChartComponent.js"
+		"../test/GoogleChartComponent.js"
 	],
 	"cssLinks": [],
 	"workspace": {

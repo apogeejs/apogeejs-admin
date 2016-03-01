@@ -24,13 +24,13 @@ visicomp.core.calculation.addToRecalculateList = function(recalculateList,member
     }
 }
 
-/** This method places the member in the recalculate list, but only if the member is 
+/** This method places the calculable member in the recalculate list, but only if the member is 
  * not already there. 
  *  @private */
-visicomp.core.calculation.inList = function(recalculateList,member) {
+visicomp.core.calculation.inList = function(recalculateList,calculable) {
     for(var j = 0; j < recalculateList.length; j++) {
         var testObject = recalculateList[j];
-        if(testObject == member) {
+        if(testObject == calculable) {
             return true;
         }
     }
@@ -44,7 +44,7 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
 	
 	//working variables
 	var sortedRecalculateList = [];
-	var member;
+	var calculable;
 	var i;
     var success = true;
 	
@@ -52,9 +52,9 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
     //clear all circular reference errors before sorting (they will be reset if needed)
 	var memberIsSortedMap = {};
 	for(i = 0; i < recalculateList.length; i++) {
-		member = recalculateList[i];
-		memberIsSortedMap[member.getFullName()] = false;       
-        member.clearPreCalcErrors("Calculation - Circ Ref");
+		calculable = recalculateList[i];
+		memberIsSortedMap[calculable.getFullName()] = false;       
+        calculable.clearPreCalcErrors("Calculation - Circ Ref");
 	}
 	
 	//sort the list
@@ -67,16 +67,16 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
 		//other words, it has no depedencies that have not been updated yet.
 		for(i = 0; i < recalculateList.length; i++) {
 			//cyucle through members
-			member = recalculateList[i];
+			calculable = recalculateList[i];
 			
 			//check if there are any unsorted dependencies
 			var unsortedImpactedDependencies = false;
-			var dependsOn = member.getDependsOn();
+			var dependsOn = calculable.getDependsOn();
 			for(var j = 0; j < dependsOn.length; j++) {
 				var remoteObject = dependsOn[j];
                 
                 //don't withhold an object that depends on itself
-                if(remoteObject === member) continue;
+                if(remoteObject === calculable) continue;
                 
 				if(memberIsSortedMap[remoteObject.getFullName()] === false) {
 					//this depends on an unsorted member
@@ -88,9 +88,9 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
 			//save member to sorted if there are no unsorted impacted dependencies
 			if(!unsortedImpactedDependencies) {
 				//add to the end of the sorted list
-				sortedRecalculateList.push(member);
+				sortedRecalculateList.push(calculable);
 				//record that is has been sorted
-				memberIsSortedMap[member.getFullName()] = true;
+				memberIsSortedMap[calculable.getFullName()] = true;
 				//remove it from unsorted list
 				recalculateList.splice(i,1);
 				//flag that we moved a member this iteration of while loop
@@ -105,9 +105,9 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
             var actionError = new visicomp.core.ActionError(errorMsg,"Calculation - Circ Ref",null);
             actionResponse.addError(actionError);
             for(var ie = 0; ie < recalculateList.length; ie++) {
-                member = recalculateList[ie];
-                member.addPreCalcError(actionError);
-                sortedRecalculateList.push(member);
+                calculable = recalculateList[ie];
+                calculable.addPreCalcError(actionError);
+                sortedRecalculateList.push(calculable);
             }
             recalculateList.splice(0,recalculateList.length);
             success = false;
@@ -126,35 +126,31 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
  * is false if there are any errors.
  * @private */
 visicomp.core.calculation.callRecalculateList = function(recalculateList,actionResponse) {
-    var member;
+    var calculable;
     var i;
     var overallSuccess = true;
     for(i = 0; i < recalculateList.length; i++) {
-        member = recalculateList[i];
+        calculable = recalculateList[i];
         
         //check for errors related to dependency
         var success;
-        if(member.hasSelfRefError()) {
-            member.setDataError(member.getSelfRefError());
-            success = false;
-        }
-        else if(member.hasCircRefError()) {
-            member.setDataError(member.getCircRefError());
+        if(calculable.hasPreCalcError()) {
+            calculable.setDataError(calculable.getPreRefError());
             success = false;
         }
         else {
             //check if any values this depends on have an error
-            var errorFound = this.checkDependencyError(member);
+            var errorFound = visicomp.core.calculation.checkDependencyError(calculable);
             success = !errorFound;
             
             if(success) {
                 //update the member
-                success = member.calculate();
+                success = calculable.calculate();
             }
         }
         
         if(!success) {
-            var actionError = member.getDataError();
+            var actionError = calculable.getDataError();
             if(actionError) {
                 actionResponse.addError(actionError);
             }
@@ -169,12 +165,12 @@ visicomp.core.calculation.callRecalculateList = function(recalculateList,actionR
 /** This method checks if any variable the given member depends on has an error. If so it 
  * reports an error for this member and returns true.  Otherwise it returns false.
  * @private */
-visicomp.core.calculation.checkDependencyError = function(member) {
+visicomp.core.calculation.checkDependencyError = function(calculable) {
     
-    member.clearErrors("Calculation - Dependency");
+    calculable.clearErrors("Calculation - Dependency");
     
     //get variables this depends on has an error
-    var dependsOn = member.getDependsOn();
+    var dependsOn = calculable.getDependsOn();
     var errorDependencies = null;
     var i = 0;
     for(var i = 0; i < dependsOn.length; i++) {
@@ -184,7 +180,7 @@ visicomp.core.calculation.checkDependencyError = function(member) {
             if(errorDependencies == null) {
                 errorDependencies = [];
             }
-            errorDependencies.push(member);
+            errorDependencies.push(calculable);
         }
     }
     
@@ -195,8 +191,8 @@ visicomp.core.calculation.checkDependencyError = function(member) {
             if(i > 0) message += ", ";
             message += errorDependencies[i].getFullName();
         }
-        var actionError = new visicomp.core.ActionError(message,"Calculation - Dependency",member);
-        member.addError(actionError);   
+        var actionError = new visicomp.core.ActionError(message,"Calculation - Dependency",calculable);
+        calculable.addError(actionError);   
         
         return true;
     }

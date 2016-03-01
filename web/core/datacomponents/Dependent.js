@@ -65,11 +65,6 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
         remoteMember = newDependsOn[i];
 		
 		if(remoteMember === this) {
-            
-//this is totally wrong!!!
-//I need a reference to the object I am comparing too
-//NOT _THIS_
-
 			//it is an error to depend on itself (it doesn't exist yet)
 			//ok to reference through a local varible - this is how recursive functions are handled.
 			var message = "A data formula should not reference its own name.";

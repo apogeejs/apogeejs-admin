@@ -114,7 +114,7 @@ visicomp.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunc
     
         //return the output of the generator - the object function and the context setter
         generatorOutput = generatorFunction();
-        generatorOutput.usccess = true;
+        generatorOutput.success = true;
     }
     catch(exception) {
         generatorOutput = {};

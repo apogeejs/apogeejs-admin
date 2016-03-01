@@ -168,7 +168,7 @@ visicomp.core.Codeable.hasCode = function() {
 
 /** If this is true the member must be executed. 
  * @private */
-visicomp.core.Codeable.needsExecuting = function() {
+visicomp.core.Codeable.needsCalculating = function() {
 	return this.codeSet;
 }
 

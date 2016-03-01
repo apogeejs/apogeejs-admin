@@ -84,6 +84,7 @@ visicomp.app.visiui.VisiComp.prototype.addWorkspaceUI = function(workspaceUI,nam
     }
     
 	var tab = this.tabFrame.addTab(name);
+    this.tabFrame.setActiveTab(name);
     workspaceUI.setApp(this,tab);
     this.workspaceUIs[name] = workspaceUI;
 }

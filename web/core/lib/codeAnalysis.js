@@ -164,8 +164,6 @@ visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
                 actionError.setParentException(astError);
                 returnValue.errors.push(actionError);
             }
-            
-            return returnValue;
         }
     }
     catch(exception) {
@@ -182,7 +180,7 @@ visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
     //return the variable info
     returnValue.success = true;
     returnValue.varInfo = varInfo;
-    return varInfo;
+    return returnValue;
 }
 
 /** This method analyzes the AST to find the variabls accessed from the formula.
