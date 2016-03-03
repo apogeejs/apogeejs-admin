@@ -6,6 +6,7 @@
  * COMPONENT DEPENDENCIES:
  * - A Dependent must be a Child. The Child component must be installed before the
  * Dependent component.
+ * 
  */
 visicomp.core.Dependent = {};
 
@@ -54,8 +55,15 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
 	
     //create the new dependency list
 	this.dependsOnList = [];
-//NEED TO FIX THIS - ONLY APPLIES TO CALCULABLE!!!
-//    this.clearPreCalcErrors("Dependent - Self Ref");
+
+//-----------------------
+//ARGH - this is ugly. Figure out how to put errors on all dependents
+//A dependent non-calculable is one that has forwards dependencies, but doesn't depend on them
+//itself, like a folder
+    if(this.isCalculable) {
+        this.clearPreCalcErrors("Dependent - Self Ref");
+    }
+//------------------------
 	
     //update the dependency links among the members
 	var newDependencySet = {};
@@ -64,12 +72,15 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
     for(i = 0; i < newDependsOn.length; i++) {
         remoteMember = newDependsOn[i];
 		
-		if(remoteMember === this) {
+		if((remoteMember === this)&&(this.isCalculable)) {
+//-----------------------
+//ARGH - this is ugly. Figure out how to put errors on all dependents
 			//it is an error to depend on itself (it doesn't exist yet)
 			//ok to reference through a local varible - this is how recursive functions are handled.
 			var message = "A data formula should not reference its own name.";
 			var actionError = new visicomp.core.ActionError(message,"Dependent - Self Ref",this);
 			this.addPreCaclError(actionError);
+//------------------------
 		}
         else if((!remoteMember.isImpactor)||(!remoteMember.isDependent)) {
             //PLACE A WARNING HERE!!!

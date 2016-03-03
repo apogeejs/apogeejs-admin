@@ -16,6 +16,14 @@ visicomp.core.Parent = {};
 
 /** This initializes the component */
 visicomp.core.Parent.init = function() {
+    
+    //set the context manager
+    this.contextManager = new visicomp.core.ContextManager(this);
+    //add an entry for this folder. Make it local unless this si a root folder
+    var myEntry = {};
+    myEntry.isLocal = !this.isRoot();
+    myEntry.parent = this;
+    this.contextManager.addToContextList(myEntry);
 }
 
 visicomp.core.Parent.isParent = true;
@@ -25,6 +33,11 @@ visicomp.core.Parent.isParent = true;
 visicomp.core.Parent.isRoot = function() {
     //undefined may be OK too. If there is populated object this is not root.
     return (this.getParent() == null); 
+}
+
+/** This method returns the contextManager for this parent.  */
+visicomp.core.Parent.getContextManager = function() {
+    return this.contextManager;
 }
 
 ///** this method gets a map of child names to children. This may not be the structure
@@ -41,7 +54,7 @@ visicomp.core.Parent.isRoot = function() {
  * it is assumed the path refers to a field inside this object. */
 visicomp.core.Parent.lookupChildFromPath = function(path) {
 	var object = this;
-	for(var i = 0; ((i < path.length)&&(object.isParent)); i++) {
+	for(var i = 0; ((object)&&(i < path.length)&&(object.isParent)); i++) {
 		object = object.lookupChild(path[i]);
 	}
     return object;

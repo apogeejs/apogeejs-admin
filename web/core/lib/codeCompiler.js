@@ -5,8 +5,7 @@ visicomp.core.codeCompiler = {};
  * The results are loaded into the passed object processedCodeData.
  * @private */
 visicomp.core.codeCompiler.processCode = function(codeInfo,
-        localFolder,
-        rootFolder,
+        contextManager,
         codeLabel,
         objectFunctionName) {
     
@@ -44,8 +43,7 @@ visicomp.core.codeCompiler.processCode = function(codeInfo,
     //calculate dependencies
 	codeInfo.dependencyList = visicomp.core.codeDependencies.getDependencyInfo(
             codeInfo.varInfo,
-            localFolder,
-            rootFolder);
+            contextManager);
     
     return codeInfo;   
 }
@@ -97,7 +95,7 @@ visicomp.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunc
         contextDeclarationText += "var " + baseName + ";\n";
         
         //add to the context setter
-        contextSetterBody += baseName + ' = visicomp.core.Codeable.loadFromContext(listOfContexts,"' + baseName + '");\n';
+        contextSetterBody += baseName + ' = contextManager.getBaseData("' + baseName + '");\n';
     }
     
     //create the generator for the object function
@@ -164,7 +162,7 @@ visicomp.core.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "",
 "var returnValue = {};",
 "//context setter",
-"returnValue.contextSetter = function(listOfContexts) {",
+"returnValue.contextSetter = function(contextManager) {",
 "{1}",
 "};",
 "",

@@ -6,8 +6,6 @@
  * - A Calculable must be a Child. The Child component must be installed before the
  * Calculable component.
  * 
- * - A Calculable is typically a dependent, with the calculation depending on the other objects.
- * 
  * - A Calculable is typically a codeable, with the calculation being defined by he code.
  */
 visicomp.core.Calculable = {};

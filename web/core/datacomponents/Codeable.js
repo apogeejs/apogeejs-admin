@@ -9,6 +9,7 @@
  * Codeable component.
  * - A Codeable is a Dependent. Dependent calculates dependencies arising from 
  * anobjects code. The Dependent component must be installed before the Codeable component. 
+ * - A Codeable is a Calculable.
  */
 visicomp.core.Codeable = {};
 
@@ -20,6 +21,8 @@ visicomp.core.Codeable.init = function(argList,allowRecursive) {
     
     //arguments of the member function
     this.argList = argList;
+    
+    this.contextManager = new visicomp.core.ContextManager(this);
     
     //the allows the object function for this member to call itself
     this.allowRecursive = allowRecursive;
@@ -54,6 +57,11 @@ visicomp.core.Codeable.getFunctionBody = function() {
 /** This method returns the supplemental code for this member.  */
 visicomp.core.Codeable.getSupplementalCode = function() {
     return this.supplementalCode;
+}
+
+/** This method returns the contextManager for this codeable.  */
+visicomp.core.Codeable.getContextManager = function() {
+    return this.contextManager;
 }
 
 /** This method sets the code error flag for this codeable, and it sets an error
@@ -110,8 +118,7 @@ visicomp.core.Codeable.updateForAddedVariable = function(addedMember,recalculate
                   
         //calculate new dependencies
         var newDependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
-               this.getParent(),
-               this.getRootFolder());
+               this.contextManager);
             
         //update this object if the new table is in the list
         if(newDependencyList.indexOf(addedMember) >= 0) {
@@ -135,8 +142,7 @@ visicomp.core.Codeable.updateForDeletedVariable = function(deletedMember,recalcu
             if(!this.varInfo) return;
     
             var dependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
-                   this.getParent(),
-                   this.getRootFolder());
+                   this.contextManager);
 
             //update dependencies
             this.updateDependencies(dependencyList); 
@@ -189,14 +195,7 @@ visicomp.core.Codeable.calculate = function() {
     
     try {
         //set the context
-        var rootDataMap = this.getRootFolder().getData();
-        var localDataMap = this.getParent().getData();
-        var listOfContexts = [
-            localDataMap,
-            rootDataMap,
-            window
-        ]
-        this.contextSetter(listOfContexts);
+        this.contextSetter(this.contextManager);
 
         //process the object function as needed (implement for each type)
         this.processObjectFunction(this.objectFunction);

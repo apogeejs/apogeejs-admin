@@ -4,6 +4,14 @@ visicomp.core.Workspace = function(nameOrJson,actionResponseForJson) {
     visicomp.core.EventManager.init.call(this);
     visicomp.core.Owner.init.call(this);
     
+    //set the context manager
+    this.contextManager = new visicomp.core.ContextManager(null);
+    //global variables from window object
+    var globalVarEntry = {};
+    globalVarEntry.isLocal = false;
+    globalVarEntry.data = window;
+    this.contextManager.addToContextList(globalVarEntry);
+    
     var inputArgType = visicomp.core.util.getObjectType(nameOrJson);
     
     if(inputArgType === "String") {
@@ -32,6 +40,11 @@ visicomp.core.Workspace.prototype.getFullName = function() {
 /** this method gets the root package for the workspace. */
 visicomp.core.Workspace.prototype.getRootFolder = function() {
     return this.rootFolder;
+}
+
+/** This method returns the contextManager for this parent.  */
+visicomp.core.Workspace.prototype.getContextManager = function() {
+    return this.contextManager;
 }
 
 /** This method updates the dependencies of any children in the workspace

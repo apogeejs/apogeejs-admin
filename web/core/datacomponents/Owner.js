@@ -26,4 +26,8 @@ visicomp.core.Owner.isOwner = true;
 // * by this object. */
 //visicomp.core.Owner.getFullName = function();
 
+//must be implented by extending object
+///** This method retrieves the context manager for this owner. */
+//visicomp.core.Owner.getContextManager = function();
+
 

@@ -141,15 +141,13 @@ visicomp.core.updatemember.updateObjectFunctionOrData = function(updateDataList,
 /** This method updates the code and object function in a member based on the
  * passed code. It returns true if the data was set and false if there was an
  * error before the data was set. */
-visicomp.core.updatemember.updateObjectFunction = function(member,
+visicomp.core.updatemember.updateObjectFunction = function(codeable,
         argList,
         functionBody,
         supplementalCode,
         recalculateList) {
             
-    if(member.isCalculable) {
-        member.clearPreCalcErrors();
-    }
+    codeable.clearPreCalcErrors();
     
     //process the code
     var codeInfo ={};
@@ -158,23 +156,21 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
     codeInfo.supplementalCode = supplementalCode;
         
     //load some needed context variables
-    var localFolder = member.getParent();
-    var rootFolder = member.getRootFolder();
-    var codeLabel = member.getFullName();
-    var functionName = member.getAllowRecursive() ? member.getName() : "";
+    var contextManager = codeable.getContextManager();
+    var codeLabel = codeable.getFullName();
+    var functionName = codeable.getAllowRecursive() ? codeable.getName() : "";
 
     //process the code text into javascript code
     visicomp.core.codeCompiler.processCode(codeInfo,
-        localFolder,
-        rootFolder,
+        contextManager,
         codeLabel,
         functionName);
 
     //save the code
-    member.setCodeInfo(codeInfo);
+    codeable.setCodeInfo(codeInfo);
     
 	//update recalculate list
-    visicomp.core.calculation.addToRecalculateList(recalculateList,member);
+    visicomp.core.calculation.addToRecalculateList(recalculateList,codeable);
     
     return true;
 }
@@ -182,22 +178,22 @@ visicomp.core.updatemember.updateObjectFunction = function(member,
 
 /** This method sets the data for a member. The return value indicates if the
  * save was done (or at least attempted). */
-visicomp.core.updatemember.updateObjectData = function(member,
+visicomp.core.updatemember.updateObjectData = function(dataHolder,
         data,
         recalculateList) {
             
-    if(member.isCalculable) {
-        member.clearPreCalcErrors();
+    if(dataHolder.isCalculable) {
+        dataHolder.clearPreCalcErrors();
     } 
 
-    member.setData(data);
+    dataHolder.setData(data);
     
     //clear the code if this is a codeable object
-    if(member.isCodeable) {
-        member.clearCode();
+    if(dataHolder.isCodeable) {
+        dataHolder.clearCode();
     }
     
-    visicomp.core.calculation.addToRecalculateList(recalculateList,member);
+    visicomp.core.calculation.addToRecalculateList(recalculateList,dataHolder);
 
     //in this method data set is always attempted
     return true;
