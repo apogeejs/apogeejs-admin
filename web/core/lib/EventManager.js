@@ -36,13 +36,9 @@ visicomp.core.EventManager.addListener = function(eventName, callback) {
 visicomp.core.EventManager.removeListener = function(eventName, callback) {
     var callbackList = this.listenerTable[eventName];
     if(callbackList) {
-        for(var i = 0; i < callbackList.length; i++) {
-            var l = callbackList[i];
-            if(l == callback) {
-                //it only appears once
-                callbackList.splice(2,1);
-                return;
-            }
+        var index = callbackList.indexOf(callback);
+        if(index >= 0) {
+            callbackList.splice(index,1);
         }
     }
 }

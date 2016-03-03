@@ -12,9 +12,9 @@
 visicomp.core.Child = {};
     
 /** This serves as the constructor for the child object, when extending it. 
- * The parent should be the folder that holds this child. If this is a root folder,
- * then the parent should instead be the object in which the object is the root folder
- * whcih can be the workspace or an other child (such as a worksheet). */
+ * The owner should be the parent that holds this child or the object that holds
+ * the hierarchy (maybe the workspace). If the owner is not a parent, this is typically
+ * a folder and it is called the root folder. */
 visicomp.core.Child.init = function(owner,name,generator) {
     this.name = name;
     this.generator = generator;
@@ -22,13 +22,9 @@ visicomp.core.Child.init = function(owner,name,generator) {
     
     this.workspace = owner.getWorkspace();
     
+    this.owner = owner;
     if(owner.isParent) {
-        this.parent = owner;
-        this.parent.addChild(this);
-    }
-    else {
-        this.parent = null;
-        this.baseName = owner.getBaseName();
+        this.owner.addChild(this);
     }
 }
 
@@ -43,18 +39,21 @@ visicomp.core.Child.getName = function() {
 
 /** This method returns the full name in dot notation for this object. */
 visicomp.core.Child.getFullName = function() {
-	if(this.parent) {
-		var name = this.parent.getFullName();
+    var name = this.owner.getFullName();
 
-		if(!this.parent.isRoot()) {
-			name += ".";
-		}
-		name += this.name;
-		return name;
-	}
-	else {
-		return this.baseName + ":";
-	}
+    if(this.owner.isParent) {
+        //is child of a parnt
+        if(!this.owner.isRoot()) {
+            name += ".";
+        }
+        name += this.name;
+    }
+    else {
+        //this is a root fodler
+        name += ":";
+    }
+
+    return name;
 }
 
 /** This method returns a display name for the child object. By default it returns
@@ -63,10 +62,20 @@ visicomp.core.Child.getDisplayName = function() {
     return this.name;
 }
 
-/** This returns the parent for this folder. For the root folder
+/** This returns the owner for this child. */
+visicomp.core.Child.getOwner = function() {
+    return this.owner;
+}
+
+/** This returns the parent for this child. For the root folder
  * this value is null. */
 visicomp.core.Child.getParent = function() {
-	return this.parent;
+    if(this.owner.isParent) {
+        return this.owner;
+    }
+    else {
+        return null;
+    }
 }
 
 /** this method gets the workspace. */
@@ -78,20 +87,14 @@ visicomp.core.Child.getWorkspace = function() {
 visicomp.core.Child.getRootFolder = function() {
     var ancestor = this;
 	while(ancestor) {
-		var parent = ancestor.getParent();
-        if(parent == null) {
+		var owner = ancestor.getOwner();
+        if(!owner.isParent) {
             return ancestor;
         }
-        ancestor = parent;
+        ancestor = owner;
 	} 
 	return null; //this shouldn't happen
 }
-
-/** This identifies the type of object. */
-visicomp.core.Child.getType = function() {
-	return this.generator.type;
-}
-
 
 /** This method sets the pre calc error for this dependent. */
 visicomp.core.Child.addError = function(error) {
@@ -157,8 +160,8 @@ visicomp.core.Child.toJson = function() {
  * if it does.  
  * @protected */
 visicomp.core.Child.onDelete = function() {
-	if(this.parent) {
-		this.parent.removeChild(this);
+	if(this.owner.isParent) {
+		this.owner.removeChild(this);
 	}
 }
 

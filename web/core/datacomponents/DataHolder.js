@@ -47,8 +47,9 @@ visicomp.core.DataHolder.internalSetData = function(data,actionError) {
     this.dataError = actionError;
     
     //data the data map in the parent if it is a hierarchy container 
-    if(this.parent) {
-        this.parent.updateData(this);
+    var parent = this.getParent();
+    if(parent) {
+        parent.updateData(this);
     }
 }
 

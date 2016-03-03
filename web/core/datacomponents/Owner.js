@@ -22,8 +22,8 @@ visicomp.core.Owner.isOwner = true;
 //visicomp.core.Owner.getWorkspace = function();
 
 //must be implemented in extending object
-///** This method retrieves the base name whichis relevent for a root folder owned
+///** This method retrieves the full name whichis relevent for a root folder owned
 // * by this object. */
-//visicomp.core.Owner.getBaseName = function();
+//visicomp.core.Owner.getFullName = function();
 
 

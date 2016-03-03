@@ -24,9 +24,9 @@ visicomp.core.Workspace.prototype.getName = function() {
     return this.name;
 }
 
-/** this method gets the object type. */
-visicomp.core.Workspace.prototype.getType = function() {
-    return "workspace";
+/** this method gets the workspace name. */
+visicomp.core.Workspace.prototype.getFullName = function() {
+    return this.name;
 }
 
 /** this method gets the root package for the workspace. */
