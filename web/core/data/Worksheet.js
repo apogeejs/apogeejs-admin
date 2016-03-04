@@ -12,7 +12,7 @@ visicomp.core.Worksheet = function(owner,name) {
     this.returnValueString = "";
     this.argList = [];
     
-    this.contextManager = new visicomp.core.ContextManager(this);
+    this.contextManager = new visicomp.core.ContextManager(this.owner);
     
     //create the internal folder as a root folder (no parent). But give it
     //the full path name
@@ -121,15 +121,6 @@ visicomp.core.Worksheet.prototype.addToJson = function(json) {
     json.internalFolder = this.internalFolder.toJson();
 }
 
-//------------------------------
-// Owner Methods
-//------------------------------
-
-/** this method s implemented for the Owner component/mixin. */
-visicomp.core.Worksheet.prototype.getBaseName = function() {
-    return this.getFullName();
-}
-
 //-------------------------------
 // Dependent Methods
 //-------------------------------
@@ -195,8 +186,12 @@ visicomp.core.Worksheet.prototype.setArgList = function(argList) {
  * @private */
 visicomp.core.Worksheet.prototype.getWorksheetFunction = function(worksheetErrors) {
 
-    //create a copy of the workspace to do the function calculation - don't update the UI display version
-    var virtualWorkspace = this.createVirtualWorkspace();
+    //create a copy of the workspace to do the function calculation - we don't update the UI display version
+    var virtualWorkspace = this.createVirtualWorkspace(worksheetErrors);
+	
+	if(!virtualWorkspace) {
+		return null;
+	}
 
     //lookup elements from virtual workspace
     var rootFolder = virtualWorkspace.getRootFolder();
@@ -236,20 +231,15 @@ visicomp.core.Worksheet.prototype.getWorksheetFunction = function(worksheetError
 
 /** This method creates a copy of the workspace to be used for the function evvaluation. 
  * @private */
-visicomp.core.Worksheet.prototype.createVirtualWorkspace = function() {
-    var json = this.internalFolder.toJson();
-    var virtualWorkspace = new visicomp.core.Workspace("temp");
-    var updateDataList = [];
-    var virtualRootFolder = visicomp.core.Folder.fromJson(virtualWorkspace,json,updateDataList);
-    virtualWorkspace.rootFolder = virtualRootFolder;
-    var actionResponse = visicomp.core.updatemember.updateObjects(updateDataList);
-    if(!actionResponse.getSuccess()) {
-        //show an error message
-        var msg = actionResponse.getErrorMsg();
-        alert(msg);
-    }
-
-    return virtualWorkspace;
+visicomp.core.Worksheet.prototype.createVirtualWorkspace = function(worksheetErrors) {
+    try {
+		return visicomp.core.Workspace.createVirtualWorkpaceFromFolder("temp",this.internalFolder,this.getContextManager());
+	}
+	catch(error) {
+        var actionError = processMemberModelException(exception,"Worksheet - Code");
+		worksheetErrors.push(actionError);
+		return null;
+	}
 }
 
 /** This method loads the input argument members from the virtual workspace. 

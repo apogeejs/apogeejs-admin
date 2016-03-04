@@ -18,7 +18,7 @@ visicomp.core.Parent = {};
 visicomp.core.Parent.init = function() {
     
     //set the context manager
-    this.contextManager = new visicomp.core.ContextManager(this);
+    this.contextManager = new visicomp.core.ContextManager(this.getOwner());
     //add an entry for this folder. Make it local unless this si a root folder
     var myEntry = {};
     myEntry.isLocal = !this.isRoot();

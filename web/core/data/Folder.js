@@ -122,16 +122,6 @@ visicomp.core.Folder.prototype.updateForDeletedVariable = function(object,recalc
 }
 
 //------------------------------
-// Owner Methods
-//------------------------------
-
-/** this method s implemented for the Owner component/mixin. It will not be used
- * since this is also a parent, meaning it will not hold a root folder. */
-visicomp.core.Folder.prototype.getBaseName = function() {
-    return this.name;
-}
-
-//------------------------------
 // Child Methods
 //------------------------------
 

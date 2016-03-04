@@ -47,6 +47,12 @@ visicomp.core.Workspace.prototype.getContextManager = function() {
     return this.contextManager;
 }
 
+/** This method is used to completely replace the context manager. It is only used
+ * in special cases.  */
+visicomp.core.Workspace.prototype.replaceContextManager = function(contextManager) {
+    this.contextManager = contextManager;
+}
+
 /** This method updates the dependencies of any children in the workspace
  * based on an object being added. */
 visicomp.core.Workspace.prototype.updateForAddedVariable = function(object,recalculateList) {
@@ -72,9 +78,25 @@ visicomp.core.Workspace.prototype.getWorkspace = function() {
    return this;
 }
 
-/** this method is implemented for the Owner component/mixin. */
-visicomp.core.Workspace.prototype.getBaseName = function() {
-    return this.name;
+//==========================
+//virtual workspace methods
+//==========================
+
+/** This method makes a virtual workspace that contains a copy of the give folder
+ * as the root folder. Optionally the context manager may be set. */
+visicomp.core.Workspace.createVirtualWorkpaceFromFolder = function(name,origRootFolder,optionalContextManager) {
+	//create a workspace json from the root folder json
+	var workspaceJson = {};
+    workspaceJson.name = name;
+    workspaceJson.fileType = visicomp.core.Workspace.SAVE_FILE_TYPE;
+    workspaceJson.version = visicomp.core.Workspace.SAVE_FILE_VERSION;
+    workspaceJson.data = origRootFolder.toJson();
+	
+	if(optionalContextManager !== undefined) {
+		workspaceJson.contextManager = optionalContextManager;
+	}
+	
+    return new visicomp.core.Workspace(workspaceJson);
 }
 
 //============================
@@ -112,6 +134,14 @@ visicomp.core.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     }
     
     this.name = json.name;
+	
+	//load context links
+	if(json.contextManager) {
+		//for now just include this one. Later we need to have some options
+		//for saving and opening
+		//THIS IS ONLY FOR THE WORKSHEET IMPLEMENTATION FOR NOW!
+		this.contextManager = json.contextManager;
+	}
 	
 	//recreate the root folder
 	var updateDataList = [];

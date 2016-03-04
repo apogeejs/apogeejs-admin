@@ -22,7 +22,7 @@ visicomp.core.Codeable.init = function(argList,allowRecursive) {
     //arguments of the member function
     this.argList = argList;
     
-    this.contextManager = new visicomp.core.ContextManager(this);
+    this.contextManager = new visicomp.core.ContextManager(this.getOwner());
     
     //the allows the object function for this member to call itself
     this.allowRecursive = allowRecursive;

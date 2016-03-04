@@ -1,8 +1,8 @@
 
     
 /** This class manages context for the user code. */
-visicomp.core.ContextManager = function(child) {
-    this.child = child;
+visicomp.core.ContextManager = function(contextParent) {
+    this.parentOwner = contextParent;
     this.contextList = [];
 }
 
@@ -42,12 +42,9 @@ visicomp.core.ContextManager.prototype.hierarchicalLookup = function(lookupFunct
     if(result !== undefined) {
         return result;
     }
-    else if(this.child) {
-        var owner = this.child.getOwner();
-        if(owner) {
-            var ownerContextManager = owner.getContextManager();
-            return ownerContextManager.hierarchicalLookup(lookupFunctionName,lookupKey,generation + 1);
-        }
+    else if(this.parentOwner) {
+		var ownerContextManager = this.parentOwner.getContextManager();
+		return ownerContextManager.hierarchicalLookup(lookupFunctionName,lookupKey,generation + 1);
     }
     
     return undefined;
