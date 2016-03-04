@@ -12,6 +12,8 @@ visicomp.core.Worksheet = function(owner,name) {
     this.returnValueString = "";
     this.argList = [];
     
+    this.contextManager = new visicomp.core.ContextManager(this);
+    
     //create the internal folder as a root folder (no parent). But give it
     //the full path name
     var folder = new visicomp.core.Folder(this,this.getFullName());
@@ -32,6 +34,11 @@ visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Owner);
 /** This gets the internal forlder for the worksheet. */
 visicomp.core.Worksheet.prototype.getInternalFolder = function() {
     return this.internalFolder;
+}
+
+/** This method returns the contextManager for this codeable.  */
+visicomp.core.Worksheet.prototype.getContextManager = function() {
+    return this.contextManager;
 }
 
 /** This gets the name of the return object for the worksheet function. */
