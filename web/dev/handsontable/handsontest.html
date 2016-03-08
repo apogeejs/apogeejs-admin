@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+	<head>
+		<title>TODO supply a title</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script src="https://handsontable.com/bower_components/handsontable/dist/handsontable.full.js"></script>
+		<link rel="stylesheet" media="screen" href="https://handsontable.com/bower_components/handsontable/dist/handsontable.full.css">
+		
+		<script>
+			var hot;
+			var data;
+			
+			function init() {
+				data = [
+					["", "Ford", "Volvo", "Toyota", "Honda"],
+					["2016", 10, 11, 12, [1,2,3]],
+					["2017", 20, 11, 14, {a:3}],
+					["2018", 30],
+					{a: 4, b: 5}
+				];
+
+				var container = document.getElementById("xxxxx");
+				hot = new Handsontable(container, {
+					readOnly: true,
+					data: data,
+					rowHeaders: true,
+					colHeaders: true
+				});
+			}
+			
+			function displayClicked() {
+				alert(JSON.stringify(data));
+			}
+		</script>
+	</head>
+	<body onload="init()">
+		<div id="xxxxx"></div>
+		<input type="button" value="display" onclick="displayClicked()">
+	</body>
+</html>
