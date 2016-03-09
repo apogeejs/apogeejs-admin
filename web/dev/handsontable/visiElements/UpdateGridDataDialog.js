@@ -26,7 +26,7 @@ visicomp.dev.handsontable.showUpdateGridDataDialog = function(table,onSaveFuncti
             "width":"500px",
             "height":"300px",
             "border":"1px solid darkgray",
-			"overflow":"hidden",
+			"overflow":"hidden"
         });
     line.appendChild(editorDiv);
     content.appendChild(line);
@@ -45,7 +45,8 @@ visicomp.dev.handsontable.showUpdateGridDataDialog = function(table,onSaveFuncti
 	var gridEditor = new Handsontable(dataEditorDiv, {
 		data: workingData,
 		rowHeaders: true,
-		colHeaders: true
+		colHeaders: true,
+        contextMenu: true
 	});
 	
     editorDiv.appendChild(dataEditorDiv);

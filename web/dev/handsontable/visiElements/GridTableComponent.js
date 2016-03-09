@@ -38,26 +38,23 @@ visicomp.dev.handsontable.GridTableComponent.prototype.populateFrame = function(
     
     //editor - only for display, read only
     var contentDiv = this.getContentElement();
-	var gridDiv = visicomp.visiui.createElement("div",null,{
-		"position":"relative",
-		"width":"500px",
-		"height":"300px",
-		"border":"1px solid darkgray",
+    
+	this.gridDiv = visicomp.visiui.createElement("div",null,{
+//		"position":"absolute",
+        "width":"500px",
+        "height":"500px",
+        //"border":"1px solid darkgray",
 		"overflow":"hidden",
-		"zIndex":0
+        "zIndex":0
 	});
-	contentDiv.appendChild(gridDiv);
-	var gridControl = new Handsontable(gridDiv, {
-		readOnly: true,
-		data: [[""]], //empty data
-		rowHeaders: true,
-		colHeaders: true
-	});
-    this.gridControl = gridControl;
+	contentDiv.appendChild(this.gridDiv);
     
     //resize the editor on window size change
-    var resizeCallback = function() {
-        gridControl.render();
+    var instance = this;
+    var resizeCallback = function() {  
+        if(instance.gridControl) {
+            instance.gridControl.render();
+        }
     }
     window.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
 }
@@ -91,11 +88,23 @@ visicomp.dev.handsontable.GridTableComponent.prototype.memberUpdated = function(
 
 visicomp.dev.handsontable.GridTableComponent.prototype.showError = function(actionError) {
 //temporarly error handling
-    this.gridControl.loadData([["ERROR: ",actionError.msg]]);
+    if(this.gridControl) {
+        this.gridControl.loadData([["ERROR: ",actionError.msg]]);
+    }
 }
 
 visicomp.dev.handsontable.GridTableComponent.prototype.showData = function(data) {
-    this.gridControl.loadData(data);
+    if(this.gridControl) {
+        this.gridControl.loadData(data);
+    }
+    else {       
+        this.gridControl = new Handsontable(this.gridDiv, {
+            readOnly: true,
+            data: data,
+            rowHeaders: true,
+            colHeaders: true
+        });
+    }
 }
 
 //=============================
@@ -162,8 +171,8 @@ visicomp.dev.handsontable.GridTableComponent.generator.displayName = "Grid Table
 visicomp.dev.handsontable.GridTableComponent.generator.uniqueName = "visicomp.dev.handsontable.GridTableComponent";
 visicomp.dev.handsontable.GridTableComponent.generator.createComponent = visicomp.dev.handsontable.GridTableComponent.createComponent;
 visicomp.dev.handsontable.GridTableComponent.generator.createComponentFromJson = visicomp.dev.handsontable.GridTableComponent.createComponentFromJson;
-visicomp.dev.handsontable.GridTableComponent.generator.DEFAULT_WIDTH = 200;
-visicomp.dev.handsontable.GridTableComponent.generator.DEFAULT_HEIGHT = 200;
+visicomp.dev.handsontable.GridTableComponent.generator.DEFAULT_WIDTH = 600;
+visicomp.dev.handsontable.GridTableComponent.generator.DEFAULT_HEIGHT = 600;
 
 //======================================
 // This is a code wrapper so the user works with the formula rather than the function body
