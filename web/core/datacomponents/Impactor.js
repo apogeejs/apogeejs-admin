@@ -7,8 +7,7 @@
  * - An Impactor must be a Child, however the Impactor component must be installed
  * before the Child component, as the child component will use the Impactor functionality
  * when it is being initialized.
- * - An Impactor must be a DataHolder, however it must be initialized before
- * the DataHolder. An object can not be one without the other.
+ * - An Impactor must be a DataHolder.
  */
 visicomp.core.Impactor = {};
 

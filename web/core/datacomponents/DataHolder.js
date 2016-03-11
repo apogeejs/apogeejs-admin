@@ -4,10 +4,8 @@
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
  * COMPONENT DEPENDENCIES:
- * - A DataHolder must be a Child. The Child component must be installed before the
- * DataHolder component.
- * - A DataHolder must be an Impactor, as the data can be used by another object. The
- * Impactor component must be installed before the DataHolder component.
+ * - A DataHolder must be a Child.
+ * - A DataHolder must be an Impactor.
  */
 visicomp.core.DataHolder = {};
 

@@ -5,10 +5,8 @@
  * This is a mixin and not a class. It is used in the prototype of the objects that inherit from it.
  * 
  * COMPONENT DEPENDENCIES:
- * - A Codeable must be a Child. The Child component must be installed before the
- * Codeable component.
- * - A Codeable is a Dependent. Dependent calculates dependencies arising from 
- * anobjects code. The Dependent component must be installed before the Codeable component. 
+ * - A Codeable must be a Child.
+ * - A Codeable is a Dependent. 
  * - A Codeable is a Calculable.
  */
 visicomp.core.Codeable = {};
@@ -28,7 +26,13 @@ visicomp.core.Codeable.init = function(argList,allowRecursive) {
     this.allowRecursive = allowRecursive;
     
     //initialze the code as empty
-    this.clearCode();
+    this.codeSet = false;
+    this.functionBody = "";
+    this.supplementalCode = "";
+    this.varInfo = null;
+    this.dependencyInfo = null;
+    this.contextSetter = null;
+    this.objectFunction = null;
 }
 
 /** This property tells if this object is a codeable.

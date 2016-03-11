@@ -3,8 +3,7 @@
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
  * COMPONENT DEPENDENCIES:
- * - A Calculable must be a Child. The Child component must be installed before the
- * Calculable component.
+ * - A Calculable must be a Child.
  * 
  * - A Calculable is typically a codeable, with the calculation being defined by he code.
  */

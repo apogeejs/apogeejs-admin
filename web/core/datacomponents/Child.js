@@ -5,7 +5,7 @@
  *  
  * COMPONENT DEPENDENCIES:
  * - For children that are DataHolders and consequentially Impactors, the Imapctor
- * component must be installed before the child component. As the child is added it
+ * component must be installed before the child component, as the child is added it
  * impacts its parent. 
  * 
  */

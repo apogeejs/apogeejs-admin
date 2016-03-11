@@ -7,10 +7,8 @@
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
  * COMPONENT DEPENDENCIES:
- * - A Parent must be a Child. The Child component must be installed before the
- * Codeable component.
- * - A Parent must be an Owner. The Owner component must be installed before the 
- * Parent component.
+ * - A Parent must be a Child.
+ * - A Parent must be an Owner.
  */
 visicomp.core.Parent = {};
 

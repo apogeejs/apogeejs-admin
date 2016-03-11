@@ -4,8 +4,7 @@
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
  * COMPONENT DEPENDENCIES:
- * - A Dependent must be a Child. The Child component must be installed before the
- * Dependent component.
+ * - A Dependent must be a Child.
  * 
  */
 visicomp.core.Dependent = {};
