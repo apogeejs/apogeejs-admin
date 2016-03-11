@@ -135,7 +135,7 @@ visicomp.core.calculation.callRecalculateList = function(recalculateList,actionR
         //check for errors related to dependency
         var success;
         if(calculable.hasPreCalcError()) {
-            calculable.setDataError(calculable.getPreRefError());
+            calculable.addErrors(calculable.getPreCalcErrors());
             success = false;
         }
         else {
@@ -150,9 +150,11 @@ visicomp.core.calculation.callRecalculateList = function(recalculateList,actionR
         }
         
         if(!success) {
-            var actionError = calculable.getDataError();
-            if(actionError) {
-                actionResponse.addError(actionError);
+            var actionErrors = calculable.getErrors();
+            if(actionErrors) {
+                for(var j = 0; j < actionErrors.length; j++) {
+                    actionResponse.addError(actionErrors[j]);
+                }
             }
             overallSuccess = false;
         }
@@ -175,7 +177,7 @@ visicomp.core.calculation.checkDependencyError = function(calculable) {
     var i = 0;
     for(var i = 0; i < dependsOn.length; i++) {
         var impactor = dependsOn[i];
-        if(impactor.hasDataError()) {
+        if(impactor.hasError()) {
 			//this depends on a table with an error.
             if(errorDependencies == null) {
                 errorDependencies = [];

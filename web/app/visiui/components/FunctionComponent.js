@@ -79,8 +79,8 @@ visicomp.app.visiui.FunctionComponent.prototype.memberUpdated = function() {
     }
     
     //print body
-	if(functionObject.hasDataError()) {
-        this.showError(functionObject.getDataError());
+	if(functionObject.hasError()) {
+        this.showErrors(functionObject.getErrors());
     }
     else {
 		var functionBody = functionObject.getFunctionBody();
@@ -94,11 +94,12 @@ visicomp.app.visiui.FunctionComponent.prototype.memberUpdated = function() {
 	}
 }
 
-visicomp.app.visiui.FunctionComponent.prototype.showError = function(actionError) {
-    //this.editor.style.display = "none";
-    //this.errorDiv.style.display = "";
-    //this.errorDiv.innerHTML = msg;
-    this.editor.getSession().setValue("ERROR: " + actionError.msg);
+visicomp.app.visiui.FunctionComponent.prototype.showErrors = function(actionErrors) {
+    var errorMsg = "Error: \n";
+    for(var i = 0; i < actionErrors.length; i++) {
+        errorMsg += actionErrors[i].msg + "\n";
+    }
+    this.editor.getSession().setValue(errorMsg);
 }
 
 //=============================

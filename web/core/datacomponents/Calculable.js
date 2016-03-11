@@ -21,9 +21,9 @@ visicomp.core.Calculable.init = function() {
 visicomp.core.Calculable.isCalculable = true;
 
 /** This method sets the pre calc error for this dependent. */
-visicomp.core.Calculable.addPreCalcError = function(type,preCalcError) {
+visicomp.core.Calculable.addPreCalcError = function(preCalcError) {
     var entry = {};
-    entry.type = type;
+    entry.type = preCalcError.getType();
     entry.error = preCalcError;
     this.preCalcErrors.push(entry);
 }
@@ -49,7 +49,7 @@ visicomp.core.Calculable.hasPreCalcError = function() {
 }
 
 /** This returns the pre calc error. */
-visicomp.core.Calculable.getPreCalcError = function() {
+visicomp.core.Calculable.getPreCalcErrors = function() {
     return this.preCalcErrors;
 }
 

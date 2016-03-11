@@ -71,8 +71,8 @@ visicomp.dev.handsontable.GridTableComponent.prototype.onDelete = function() {
  * @private */    
 visicomp.dev.handsontable.GridTableComponent.prototype.memberUpdated = function() {
     var object = this.getObject();
-    if(object.hasDataError()) {
-        this.showError(object.getDataError());
+    if(object.hasError()) {
+        this.showErrors(object.getErrors());
     }
     else {
         var data = this.getObject().getData();
@@ -86,10 +86,15 @@ visicomp.dev.handsontable.GridTableComponent.prototype.memberUpdated = function(
     }
 }
 
-visicomp.dev.handsontable.GridTableComponent.prototype.showError = function(actionError) {
+visicomp.dev.handsontable.GridTableComponent.prototype.showErrors = function(actionErrors) {
 //temporarly error handling
     if(this.gridControl) {
-        this.gridControl.loadData([["ERROR: ",actionError.msg]]);
+        var errorData = [["Error:"]];
+        for(var i = 0; i < actionErrors.length; i++) {
+            var errorEntry = [actionErrors[i].msg];
+            errorData.push(errorEntry);
+        }
+        this.gridControl.loadData(errorData);
     }
 }
 

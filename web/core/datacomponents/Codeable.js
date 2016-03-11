@@ -26,10 +26,6 @@ visicomp.core.Codeable.init = function(argList,allowRecursive) {
     
     //the allows the object function for this member to call itself
     this.allowRecursive = allowRecursive;
-	
-	//error data
-	this.codeError = null;
-    this.circRefError = null;
     
     //initialze the code as empty
     this.clearCode();
@@ -64,24 +60,6 @@ visicomp.core.Codeable.getContextManager = function() {
     return this.contextManager;
 }
 
-/** This method sets the code error flag for this codeable, and it sets an error
- * message. The error is cleared by setting valid code. If an object has a code error
- * this will be passed on to be a data error when the member is executed.*/
-visicomp.core.Codeable.setCodeError = function(actionError) {
-    this.codeError = actionError;
-}
-
-/** This method returns true if there is an code error for this member, 
- * making the code invalid. */
-visicomp.core.Codeable.hasCodeError = function() {
-    return (this.codeError != null);
-}
-
-/** This returns the code error. */
-visicomp.core.Codeable.getCodeError = function() {
-    return this.codeError;
-}
-
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
 
@@ -92,7 +70,7 @@ visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
     this.codeSet = true;
 
     if(codeInfo.actionError) {
-        this.setCodeError(codeInfo.actionError);
+        this.addPreCalcError(codeInfo.actionError);
     }
     else {
 
@@ -243,17 +221,3 @@ visicomp.core.Codeable.getUpdateData = function() {
 //to set the data for the object. (protected)
 //visicomp.core.Codeable.processObjectFunction 
 
-/** This method returns a value by name from a list of contexts. 
- * @private */
-visicomp.core.Codeable.loadFromContext = function(listOfContexts,name) {
-    var cnt = listOfContexts.length;
-    for(var i = 0; i < cnt; i++) {
-        var map = listOfContexts[i];
-        var value= map[name];
-        if(value !== undefined) {
-            return value;
-        }
-    }
-    //not found
-    return undefined;
-}

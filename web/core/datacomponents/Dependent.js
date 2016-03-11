@@ -15,9 +15,6 @@ visicomp.core.Dependent.init = function() {
     
     //this is the list of dependencies
     this.dependsOnList = [];
-    
-    this.circRefError = null;
-    this.selfRefError = null;
 }
 
 /** This property tells if this object is a dependent.
@@ -82,7 +79,7 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
 			this.addPreCaclError(actionError);
 //------------------------
 		}
-        else if((!remoteMember.isImpactor)||(!remoteMember.isDependent)) {
+        else if(!remoteMember.isImpactor) {
             //PLACE A WARNING HERE!!!
         }
 		else {	

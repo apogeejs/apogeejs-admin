@@ -141,6 +141,7 @@ visicomp.core.Worksheet.prototype.calculate = function() {
     var worksheetFunction = this.getWorksheetFunction(worksheetErrors);
     
     if(worksheetErrors.length == 0) {
+        this.clearErrors();
         this.setData(worksheetFunction);
     }
     else {

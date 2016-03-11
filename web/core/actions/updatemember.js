@@ -148,6 +148,7 @@ visicomp.core.updatemember.updateObjectFunction = function(codeable,
         recalculateList) {
             
     codeable.clearPreCalcErrors();
+    codeable.clearErrors();
     
     //process the code
     var codeInfo ={};
@@ -185,6 +186,8 @@ visicomp.core.updatemember.updateObjectData = function(dataHolder,
     if(dataHolder.isCalculable) {
         dataHolder.clearPreCalcErrors();
     } 
+    
+    dataHolder.clearErrors();
 
     dataHolder.setData(data);
     
