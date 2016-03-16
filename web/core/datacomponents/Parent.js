@@ -14,14 +14,6 @@ visicomp.core.Parent = {};
 
 /** This initializes the component */
 visicomp.core.Parent.init = function() {
-    
-    //set the context manager
-    this.contextManager = new visicomp.core.ContextManager(this.getOwner());
-    //add an entry for this folder. Make it local unless this si a root folder
-    var myEntry = {};
-    myEntry.isLocal = !this.isRoot();
-    myEntry.parent = this;
-    this.contextManager.addToContextList(myEntry);
 }
 
 visicomp.core.Parent.isParent = true;
@@ -31,11 +23,6 @@ visicomp.core.Parent.isParent = true;
 visicomp.core.Parent.isRoot = function() {
     //undefined may be OK too. If there is populated object this is not root.
     return (this.getParent() == null); 
-}
-
-/** This method returns the contextManager for this parent.  */
-visicomp.core.Parent.getContextManager = function() {
-    return this.contextManager;
 }
 
 ///** this method gets a map of child names to children. This may not be the structure
@@ -70,4 +57,21 @@ visicomp.core.Parent.lookupChildFromPath = function(path) {
 // Must be implemented in extending object
 ///** This method updates the data object for this child. */
 //visicomp.core.Folder.updateData = function(child);
+
+//------------------------------
+//ContextHolder methods
+//------------------------------
+
+/** This method retrieve creates the loaded context manager. */
+visicomp.core.Parent.createContextManager = function() {
+    //set the context manager
+    var contextManager = new visicomp.core.ContextManager(this.getOwner());
+    //add an entry for this folder. Make it local unless this si a root folder
+    var myEntry = {};
+    myEntry.isLocal = !this.isRoot();
+    myEntry.parent = this;
+    contextManager.addToContextList(myEntry);
+    
+    return contextManager;
+}
 

@@ -8,6 +8,7 @@
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
  * COMPONENT DEPENDENCIES:
+ * An Owner must be a Context Holder
  */
 visicomp.core.Owner = {};
 

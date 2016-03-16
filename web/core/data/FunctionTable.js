@@ -6,6 +6,7 @@ visicomp.core.FunctionTable = function(owner,name,argList) {
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
     visicomp.core.Calculable.init.call(this);
+    visicomp.core.ContextHolder.init.call(this);
 	visicomp.core.Codeable.init.call(this,argList,true);
     
     //set to an empty function
@@ -18,6 +19,7 @@ visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.DataHolder);
 visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Dependent);
 visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Calculable);
 visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Impactor);
+visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.ContextHolder);
 visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Codeable);
 
 //------------------------------

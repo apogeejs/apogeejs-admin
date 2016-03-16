@@ -6,8 +6,9 @@
  * 
  * COMPONENT DEPENDENCIES:
  * - A Codeable must be a Child.
- * - A Codeable is a Dependent. 
- * - A Codeable is a Calculable.
+ * - A Codeable must be Dependent. 
+ * - A Codeable must be Calculable.
+ * - A Codeable must be ContextHolder
  */
 visicomp.core.Codeable = {};
 
@@ -19,8 +20,6 @@ visicomp.core.Codeable.init = function(argList,allowRecursive) {
     
     //arguments of the member function
     this.argList = argList;
-    
-    this.contextManager = new visicomp.core.ContextManager(this.getOwner());
     
     //the allows the object function for this member to call itself
     this.allowRecursive = allowRecursive;
@@ -59,11 +58,6 @@ visicomp.core.Codeable.getSupplementalCode = function() {
     return this.supplementalCode;
 }
 
-/** This method returns the contextManager for this codeable.  */
-visicomp.core.Codeable.getContextManager = function() {
-    return this.contextManager;
-}
-
 /** This method returns the formula for this member.  */
 visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
 
@@ -100,7 +94,7 @@ visicomp.core.Codeable.updateForAddedVariable = function(addedMember,recalculate
                   
         //calculate new dependencies
         var newDependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
-               this.contextManager);
+               this.getContextManager());
             
         //update this object if the new table is in the list
         if(newDependencyList.indexOf(addedMember) >= 0) {
@@ -124,7 +118,7 @@ visicomp.core.Codeable.updateForDeletedVariable = function(deletedMember,recalcu
             if(!this.varInfo) return;
     
             var dependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
-                   this.contextManager);
+                   this.getContextManager());
 
             //update dependencies
             this.updateDependencies(dependencyList); 
@@ -177,7 +171,7 @@ visicomp.core.Codeable.calculate = function() {
     
     try {
         //set the context
-        this.contextSetter(this.contextManager);
+        this.contextSetter(this.getContextManager());
 
         //process the object function as needed (implement for each type)
         this.processObjectFunction(this.objectFunction);
@@ -215,6 +209,17 @@ visicomp.core.Codeable.getUpdateData = function() {
     }
     return updateData;
 }
+
+//------------------------------
+//ContextHolder methods
+//------------------------------
+
+/** This method retrieve creates the loaded context manager. */
+visicomp.core.Codeable.createContextManager = function() {
+    return new visicomp.core.ContextManager(this.getOwner());
+}
+
+
 
 //===================================
 // Private Functions

@@ -2,15 +2,8 @@
 visicomp.core.Workspace = function(nameOrJson,actionResponseForJson) {
     //base init
     visicomp.core.EventManager.init.call(this);
+    visicomp.core.ContextHolder.init.call(this);
     visicomp.core.Owner.init.call(this);
-    
-    //set the context manager
-    this.contextManager = new visicomp.core.ContextManager(null);
-    //global variables from window object
-    var globalVarEntry = {};
-    globalVarEntry.isLocal = false;
-    globalVarEntry.data = window;
-    this.contextManager.addToContextList(globalVarEntry);
     
     var inputArgType = visicomp.core.util.getObjectType(nameOrJson);
     
@@ -25,6 +18,7 @@ visicomp.core.Workspace = function(nameOrJson,actionResponseForJson) {
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Workspace,visicomp.core.EventManager);
+visicomp.core.util.mixin(visicomp.core.Workspace,visicomp.core.ContextHolder);
 visicomp.core.util.mixin(visicomp.core.Workspace,visicomp.core.Owner);
 
 /** this method gets the workspace name. */
@@ -40,17 +34,6 @@ visicomp.core.Workspace.prototype.getFullName = function() {
 /** this method gets the root package for the workspace. */
 visicomp.core.Workspace.prototype.getRootFolder = function() {
     return this.rootFolder;
-}
-
-/** This method returns the contextManager for this parent.  */
-visicomp.core.Workspace.prototype.getContextManager = function() {
-    return this.contextManager;
-}
-
-/** This method is used to completely replace the context manager. It is only used
- * in special cases.  */
-visicomp.core.Workspace.prototype.replaceContextManager = function(contextManager) {
-    this.contextManager = contextManager;
 }
 
 /** This method updates the dependencies of any children in the workspace
@@ -77,6 +60,25 @@ visicomp.core.Workspace.prototype.close = function() {
 visicomp.core.Workspace.prototype.getWorkspace = function() {
    return this;
 }
+
+
+//------------------------------
+//ContextHolder methods
+//------------------------------
+
+/** This method retrieve creates the loaded context manager. */
+visicomp.core.Workspace.prototype.createContextManager = function() {
+    //set the context manager
+    var contextManager = new visicomp.core.ContextManager(null);
+    //global variables from window object
+    var globalVarEntry = {};
+    globalVarEntry.isLocal = false;
+    globalVarEntry.data = window;
+    contextManager.addToContextList(globalVarEntry);
+    
+    return contextManager;
+}
+
 
 //==========================
 //virtual workspace methods
@@ -140,7 +142,7 @@ visicomp.core.Workspace.prototype.loadFromJson = function(json,actionResponse) {
 		//for now just include this one. Later we need to have some options
 		//for saving and opening
 		//THIS IS ONLY FOR THE WORKSHEET IMPLEMENTATION FOR NOW!
-		this.contextManager = json.contextManager;
+		this.setContextManager(json.contextManager);
 	}
 	
 	//recreate the root folder

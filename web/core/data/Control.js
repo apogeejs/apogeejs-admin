@@ -4,6 +4,7 @@ visicomp.core.Control = function(owner,name) {
     visicomp.core.Child.init.call(this,owner,name,visicomp.core.Control.generator);
     visicomp.core.Dependent.init.call(this);
     visicomp.core.Calculable.init.call(this);
+    visicomp.core.ContextHolder.init.call(this);
 	visicomp.core.Codeable.init.call(this,["resource"],false);
     
     this.resource = null;
@@ -13,6 +14,7 @@ visicomp.core.Control = function(owner,name) {
 visicomp.core.util.mixin(visicomp.core.Control,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Control,visicomp.core.Dependent);
 visicomp.core.util.mixin(visicomp.core.Control,visicomp.core.Calculable);
+visicomp.core.util.mixin(visicomp.core.Control,visicomp.core.ContextHolder);
 visicomp.core.util.mixin(visicomp.core.Control,visicomp.core.Codeable);
 	
 visicomp.core.Control.prototype.getResource = function() {	

@@ -5,6 +5,7 @@ visicomp.core.Folder = function(owner,name) {
     visicomp.core.Child.init.call(this,owner,name,visicomp.core.Folder.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
+    visicomp.core.ContextHolder.init.call(this);
     visicomp.core.Owner.init.call(this);
     visicomp.core.Parent.init.call(this);
 
@@ -22,6 +23,7 @@ visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.DataHolder);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Dependent);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Impactor);
+visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.ContextHolder);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Owner);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Parent);
 

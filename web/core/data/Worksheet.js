@@ -7,12 +7,11 @@ visicomp.core.Worksheet = function(owner,name) {
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
     visicomp.core.Calculable.init.call(this);
+    visicomp.core.ContextHolder.init.call(this);
     visicomp.core.Owner.init.call(this);
     
     this.returnValueString = "";
     this.argList = [];
-    
-    this.contextManager = new visicomp.core.ContextManager(this.owner);
     
     //create the internal folder as a root folder (no parent). But give it
     //the full path name
@@ -29,16 +28,12 @@ visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.DataHolder);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Dependent);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Calculable);
+visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.ContextHolder);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Owner);
 
 /** This gets the internal forlder for the worksheet. */
 visicomp.core.Worksheet.prototype.getInternalFolder = function() {
     return this.internalFolder;
-}
-
-/** This method returns the contextManager for this codeable.  */
-visicomp.core.Worksheet.prototype.getContextManager = function() {
-    return this.contextManager;
 }
 
 /** This gets the name of the return object for the worksheet function. */
@@ -160,6 +155,16 @@ visicomp.core.Worksheet.prototype.updateForAddedVariable = function(object,recal
  * based on an object being deleted. */
 visicomp.core.Worksheet.prototype.updateForDeletedVariable = function(object,recalculateList) {
 }
+
+//------------------------------
+//ContextHolder methods
+//------------------------------
+
+/** This method retrieve creates the loaded context manager. */
+visicomp.core.Worksheet.prototype.createContextManager = function() {
+    return new visicomp.core.ContextManager(this.getOwner());
+}
+
 
 //==============================
 // Private Methods
