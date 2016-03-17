@@ -1,8 +1,8 @@
 /** This is a function. */
-visicomp.core.FunctionTable = function(owner,name,argList) {
+visicomp.core.FunctionTable = function(name,argList) {
     //base init
     visicomp.core.Impactor.init.call(this);
-    visicomp.core.Child.init.call(this,owner,name,visicomp.core.FunctionTable.generator);
+    visicomp.core.Child.init.call(this,name,visicomp.core.FunctionTable.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
     visicomp.core.Calculable.init.call(this);
@@ -47,7 +47,8 @@ visicomp.core.FunctionTable.prototype.getDisplayName = function() {
  * method in a non-abstract class. */ 
 visicomp.core.FunctionTable.fromJson = function(owner,json,updateDataList,actionResponse) {
     var initialArgList = [];
-    var functionTable = new visicomp.core.FunctionTable(owner,json.name,initialArgList);
+    var functionTable = new visicomp.core.FunctionTable(json.name,initialArgList);
+    functionTable.setOwner(owner);
     if(json.updateData) {
         json.updateData.member = functionTable;
         updateDataList.push(json.updateData);

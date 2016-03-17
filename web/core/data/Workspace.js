@@ -9,7 +9,8 @@ visicomp.core.Workspace = function(nameOrJson,actionResponseForJson) {
     
     if(inputArgType === "String") {
         this.name = nameOrJson;
-        this.rootFolder = new visicomp.core.Folder(this,nameOrJson);
+        this.rootFolder = new visicomp.core.Folder(nameOrJson);
+        this.rootFolder.setOwner(this);
     }
     else {
         this.loadFromJson(nameOrJson,actionResponseForJson);

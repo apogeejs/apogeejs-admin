@@ -15,17 +15,13 @@ visicomp.core.Child = {};
  * The owner should be the parent that holds this child or the object that holds
  * the hierarchy (maybe the workspace). If the owner is not a parent, this is typically
  * a folder and it is called the root folder. */
-visicomp.core.Child.init = function(owner,name,generator) {
+visicomp.core.Child.init = function(name,generator) {
     this.name = name;
     this.generator = generator;
     this.errors = [];
     
-    this.workspace = owner.getWorkspace();
-    
-    this.owner = owner;
-    if(owner.isParent) {
-        this.owner.addChild(this);
-    }
+    this.workspace = null;
+    this.owner = null;
 }
 
 /** This property tells if this object is a child.
@@ -63,6 +59,21 @@ visicomp.core.Child.getDisplayName = function() {
 }
 
 /** This returns the owner for this child. */
+visicomp.core.Child.setOwner = function(owner) {
+    //only set it once for now
+    if(this.owner) {
+        throw visicomp.core.util.createError("Currently the owner can only be set once.");
+    }
+    
+    this.workspace = owner.getWorkspace();
+    
+    this.owner = owner;
+    if(owner.isParent) {
+        this.owner.addChild(this);
+    }
+}
+
+/** This returns the owner for this child. */
 visicomp.core.Child.getOwner = function() {
     return this.owner;
 }
@@ -70,7 +81,7 @@ visicomp.core.Child.getOwner = function() {
 /** This returns the parent for this child. For the root folder
  * this value is null. */
 visicomp.core.Child.getParent = function() {
-    if(this.owner.isParent) {
+    if((this.owner)&&(this.owner.isParent)) {
         return this.owner;
     }
     else {

@@ -1,8 +1,8 @@
 /** This class encapsulatees a data table for a JSON object */
-visicomp.core.JsonTable = function(owner,name) {
+visicomp.core.JsonTable = function(name) {
     //base init
     visicomp.core.Impactor.init.call(this);
-    visicomp.core.Child.init.call(this,owner,name,visicomp.core.JsonTable.generator);
+    visicomp.core.Child.init.call(this,name,visicomp.core.JsonTable.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
     visicomp.core.Calculable.init.call(this);
@@ -54,7 +54,8 @@ visicomp.core.JsonTable.prototype.processObjectFunction = function(objectFunctio
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 visicomp.core.JsonTable.fromJson = function(owner,json,updateDataList,actionResponse) {
-    var table = new visicomp.core.JsonTable(owner,json.name);
+    var table = new visicomp.core.JsonTable(json.name);
+    table.setOwner(owner);
     if(json.updateData) {
         json.updateData.member = table;
         updateDataList.push(json.updateData);

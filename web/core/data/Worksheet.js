@@ -1,9 +1,9 @@
 /** This is a worksheet, which is basically a function
  * that is expanded into data objects. */
-visicomp.core.Worksheet = function(owner,name) {
+visicomp.core.Worksheet = function(name) {
     //base init
     visicomp.core.Impactor.init.call(this);
-    visicomp.core.Child.init.call(this,owner,name,visicomp.core.Worksheet.generator);
+    visicomp.core.Child.init.call(this,name,visicomp.core.Worksheet.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
     visicomp.core.Calculable.init.call(this);
@@ -15,7 +15,8 @@ visicomp.core.Worksheet = function(owner,name) {
     
     //create the internal folder as a root folder (no parent). But give it
     //the full path name
-    var folder = new visicomp.core.Folder(this,this.getFullName());
+    var folder = new visicomp.core.Folder(this.getFullName());
+    folder.setOwner(this);
     this.setInternalFolder(folder);
     
     //set to an empty function
@@ -90,7 +91,8 @@ visicomp.core.Worksheet.prototype.onDelete = function() {
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 visicomp.core.Worksheet.fromJson = function(owner,json,updateDataList,actionResponse) {
-    var worksheet = new visicomp.core.Worksheet(owner,json.name);
+    var worksheet = new visicomp.core.Worksheet(json.name);
+    worksheet.setOwner(owner);
     if(json.argList !== undefined) {
         worksheet.setArgList(json.argList);
     }

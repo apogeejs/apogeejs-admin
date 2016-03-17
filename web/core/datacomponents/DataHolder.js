@@ -29,8 +29,9 @@ visicomp.core.Child.getData = function() {
 visicomp.core.DataHolder.setData = function(data) {
     this.data = data;
     
-    if(this.parent) {
-        this.parent.updateData(this);
+    var parent = this.getParent();
+    if(parent) {
+        parent.updateData(this);
     }
 }
 
