@@ -24,6 +24,7 @@ visicomp.app.visiui.closeworkspace.getCloseCallback = function(app) {
 
 visicomp.app.visiui.closeworkspace.closeWorkspace = function(app) {
     var actionResponse = new visicomp.core.ActionResponse();
+    var workspaceUIRemoved = false;
     
     try {
     
@@ -35,13 +36,16 @@ visicomp.app.visiui.closeworkspace.closeWorkspace = function(app) {
             return actionResponse;
         }
 
-        app.removeWorkspaceUI(activeWorkspaceUI);
-
         var workspace = activeWorkspaceUI.getWorkspace();
+        
+        var name = workspace.getName();
+        workspaceUIRemoved = app.removeWorkspaceUI(name);
+
         workspace.close();
     }
     catch(error) {
-        var actionError = visicomp.core.ActionError.processFatalAppException(error);
+        var isFatal = !workspaceUIRemoved;
+        var actionError = visicomp.core.ActionError.processAppException(error,isFatal);
         actionResponse.addError(actionError);
     }
     

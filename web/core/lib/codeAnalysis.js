@@ -482,7 +482,7 @@ visicomp.core.codeAnalysis.markLocalVariables = function(processInfo) {
  * }
  * @private */
 visicomp.core.codeAnalysis.createParsingError = function(errorMsg,location) {
-    var error = visicomp.core.util.createError(errorMsg,"ParsingError");
+    var error = visicomp.core.util.createError(errorMsg);
     if(location) {
         error.lineNumber = location.start.line;
         error.column = location.start.column;

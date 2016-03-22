@@ -74,8 +74,9 @@ visicomp.app.visiui.VisiComp.prototype.getActiveWorkspace = function() {
 // Workspace Management
 //==================================
 
-/** This method makes an empty workspace ui object. 
- * @private */
+/** This method makes an empty workspace ui object. This throws an exception if
+ * the workspace can not be opened.
+ */
 visicomp.app.visiui.VisiComp.prototype.addWorkspaceUI = function(workspaceUI,name) {
     
     //we can only have one workspace of a given name!
@@ -87,18 +88,15 @@ visicomp.app.visiui.VisiComp.prototype.addWorkspaceUI = function(workspaceUI,nam
     this.tabFrame.setActiveTab(name);
     workspaceUI.setApp(this,tab);
     this.workspaceUIs[name] = workspaceUI;
+    return true;
 }
 
 /** This method closes the active workspace. */
-visicomp.app.visiui.VisiComp.prototype.removeWorkspaceUI = function(workspaceUI) {
-
-    var workspace = workspaceUI.getWorkspace();
-
-    var name = workspace.getName();
-
+visicomp.app.visiui.VisiComp.prototype.removeWorkspaceUI = function(name) {
     //remove the workspace from the app
     delete this.workspaceUIs[name];
     this.tabFrame.removeTab(name);
+    return true;
 }
 
 //==================================

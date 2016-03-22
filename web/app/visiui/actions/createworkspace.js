@@ -28,11 +28,12 @@ visicomp.app.visiui.createworkspace.getCreateCallback = function(app) {
 /** This method creates a new workspace. */
 visicomp.app.visiui.createworkspace.createWorkspace = function(app,name) {
     var actionResponse = new visicomp.core.ActionResponse();
+    var workspaceUIAdded;
     
     try {
         //make the workspace ui
         var workspaceUI = new visicomp.app.visiui.WorkspaceUI();
-        app.addWorkspaceUI(workspaceUI,name);
+        workspaceUIAdded = app.addWorkspaceUI(workspaceUI,name);
         
         //create and edd an empty workspace
         var workspace = new visicomp.core.Workspace(name);
@@ -40,8 +41,12 @@ visicomp.app.visiui.createworkspace.createWorkspace = function(app,name) {
     
         actionResponse.workspaceUI = workspaceUI;
     }
-    catch(error) {
-        var actionError = visicomp.core.ActionError.processFatalAppException(error);
+    catch(error) { 
+        if(workspaceUIAdded) {
+            app.removeWorkspaceUI(name);
+        }
+        
+        var actionError = visicomp.core.ActionError.processAppException(error,false);
         actionResponse.addError(actionError);
     }
     

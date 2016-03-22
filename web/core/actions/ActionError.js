@@ -72,7 +72,7 @@ visicomp.core.ActionError.processMemberModelException = function(exception,type,
  * The resulting error message is the message from the
  * exception. An optional prefix may be added using the argument optionalErrorMsgPrefix.
  * This method also prints the stack trace for the exception. */
-visicomp.core.ActionError.processFatalAppException = function(exception,optionalErrorMsgPrefix) {  
+visicomp.core.ActionError.processAppException = function(exception,isFatal,optionalErrorMsgPrefix) {  
     if(exception.stack) {
         console.error(exception.stack);
     }
@@ -81,7 +81,7 @@ visicomp.core.ActionError.processFatalAppException = function(exception,optional
     if(errorMsg.length == 0) errorMsg = "Unknown error";
     var actionError = new visicomp.core.ActionError(errorMsg,"App",null);
     actionError.setParentException(exception);
-    actionError.setIsFatal(true);
+    actionError.setIsFatal(isFatal);
     return actionError;
 }
 

@@ -39,6 +39,8 @@ visicomp.app.visiui.openworkspace.getOpenCallback = function(app) {
  * since the function runs (or may run) asynchronously. */
 visicomp.app.visiui.openworkspace.openWorkspace = function(app,workspaceText,actionCompletedCallback) {
     var actionResponse = new visicomp.core.ActionResponse();
+    var name;
+    var workspaceUIAdded;
     
     try {
         //parse the workspace json
@@ -47,10 +49,10 @@ visicomp.app.visiui.openworkspace.openWorkspace = function(app,workspaceText,act
 //I should verify the file type and format!    
 
 		//make a blank workspace
-        var name = workspaceJson.workspace.name;
+        name = workspaceJson.workspace.name;
         
         var workspaceUI = new visicomp.app.visiui.WorkspaceUI();
-        app.addWorkspaceUI(workspaceUI,name);
+        workspaceUIAdded = app.addWorkspaceUI(workspaceUI,name);
     
         //add links, if applicable
 		var jsLinks;
@@ -87,7 +89,10 @@ visicomp.app.visiui.openworkspace.openWorkspace = function(app,workspaceText,act
 		}
     }
     catch(error) {
-        var actionError = visicomp.core.ActionError.processFatalAppException(error);
+        if(workspaceUIAdded) {
+            app.removeWorkspaceUI(name);
+        }
+        var actionError = visicomp.core.ActionError.processAppException(error,false);
         actionResponse.addError(actionError);
         actionCompletedCallback(actionResponse);
     }

@@ -15,7 +15,7 @@ visicomp.core.updateworksheet.updateArgList = function(worksheet,argList,optiona
         visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
     }
     catch(error) {
-        var actionError = visicomp.core.ActionError.processFatalAppException(error);
+        var actionError = visicomp.core.ActionError.processAppException(error,true);
         actionResponse.addError(actionError);
     }
     
@@ -35,7 +35,7 @@ visicomp.core.updateworksheet.updateReturnValue = function(worksheet,returnValue
         visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
     }
     catch(error) {
-        var actionError = visicomp.core.ActionError.processFatalAppException(error);
+        var actionError = visicomp.core.ActionError.processAppException(error,true);
         actionResponse.addError(actionError);
     }
     
