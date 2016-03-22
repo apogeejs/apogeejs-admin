@@ -167,7 +167,7 @@ visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
         }
     }
     catch(exception) {
-        var actionError = processMemberModelException(exception,"Analyze - Code");
+        var actionError = visicomp.core.ActionError.processMemberModelException(exception,"Analyze - Code");
         returnValue.success = false;
         returnValue.errors = [];
         returnValue.errors.push(actionError);

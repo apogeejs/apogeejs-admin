@@ -131,6 +131,7 @@ visicomp.core.calculation.callRecalculateList = function(recalculateList,actionR
     var overallSuccess = true;
     for(i = 0; i < recalculateList.length; i++) {
         dependent = recalculateList[i];
+        dependent.clearErrors();
         
         //check for errors related to dependency
         var success;
@@ -182,7 +183,7 @@ visicomp.core.calculation.checkDependencyError = function(dependent) {
             if(errorDependencies == null) {
                 errorDependencies = [];
             }
-            errorDependencies.push(dependent);
+            errorDependencies.push(impactor);
         }
     }
     

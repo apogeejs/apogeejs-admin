@@ -249,7 +249,7 @@ visicomp.core.Worksheet.prototype.createVirtualWorkspace = function(worksheetErr
 		return visicomp.core.Workspace.createVirtualWorkpaceFromFolder("temp",this.internalFolder,this.getContextManager());
 	}
 	catch(error) {
-        var actionError = processMemberModelException(exception,"Worksheet - Code");
+        var actionError = visicomp.core.ActionError.processMemberModelException(exception,"Worksheet - Code");
 		worksheetErrors.push(actionError);
 		return null;
 	}
