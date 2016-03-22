@@ -124,6 +124,8 @@ visicomp.visiui.WindowFrame.RESIZE_SW = visicomp.visiui.WindowFrame.RESIZE_SOUTH
 visicomp.visiui.WindowFrame.SHOWN = "shown";
 visicomp.visiui.WindowFrame.HIDDEN = "hidden";
 visicomp.visiui.WindowFrame.RESIZED = "resized";
+visicomp.visiui.WindowFrame.RESIZE_STARTED = "resize started";
+visicomp.visiui.WindowFrame.RESIZE_ENDED = "resize ended";
 
 //======================================
 // CSS STYLES
@@ -225,6 +227,11 @@ visicomp.visiui.WindowFrame.prototype.getMenu = function() {
         this.titleBarLeftElements.appendChild(this.menu.getElement());
     }
     return this.menu;
+}
+
+/** This metod sets the scroll policy for the window content div. The default is auto. */
+visicomp.visiui.WindowFrame.prototype.setContentDivOverflowPolicy = function(overflow) {
+    this.content.style.overflow = overflow;
 }
 
 
@@ -392,6 +399,8 @@ visicomp.visiui.WindowFrame.prototype.titleBarMouseDown = function(e) {
         this.parentElement.addEventListener("mousemove",this.moveOnMouseMove);
         this.parentElement.addEventListener("mouseleave",this.moveOnMouseLeave);
         this.parentElement.addEventListener("mouseup",this.moveOnMouseUp);
+        
+        //move start event would go here
     }
 }
 
@@ -447,6 +456,8 @@ visicomp.visiui.WindowFrame.prototype.frameMouseDown = function(e) {
 		this.parentElement.addEventListener("mouseup",this.resizeOnMouseUp);
 		this.parentElement.addEventListener("mousemove",this.resizeOnMouseMove);
 		this.parentElement.addEventListener("mouseleave",this.resizeOnMouseLeave);
+        
+        this.dispatchEvent(visicomp.visiui.WindowFrame.RESIZE_STARTED,this);
 	}
 }
 
@@ -569,6 +580,8 @@ visicomp.visiui.WindowFrame.prototype.endResize = function() {
 	this.parentElement.removeEventListener("mouseup",this.resizeOnMouseUp);
 	this.parentElement.removeEventListener("mousemove",this.resizeOnMouseMove);
 	this.parentElement.removeEventListener("mouseleave",this.resizeOnMouseLeave);
+    
+    this.dispatchEvent(visicomp.visiui.WindowFrame.RESIZE_ENDED,this);
 }
 
 /** This methods determines if a mouse location shoudl allow for a resize action.

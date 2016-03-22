@@ -22,6 +22,9 @@ visicomp.dev.handsontable.GridTableComponent.prototype.populateFrame = function(
     
     var window = this.getWindow();
     
+    //remove scrollbars from window content div
+    window.setContentDivOverflowPolicy("hidden");
+    
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
   
@@ -41,9 +44,8 @@ visicomp.dev.handsontable.GridTableComponent.prototype.populateFrame = function(
     
 	this.gridDiv = visicomp.visiui.createElement("div",null,{
 //		"position":"absolute",
-        "width":"500px",
-        "height":"500px",
-        //"border":"1px solid darkgray",
+        "width":contentDiv.clientWidth + "px",
+        "height":contentDiv.clientHeight + "px",
 		"overflow":"hidden",
         "zIndex":0
 	});
@@ -51,12 +53,14 @@ visicomp.dev.handsontable.GridTableComponent.prototype.populateFrame = function(
     
     //resize the editor on window size change
     var instance = this;
-    var resizeCallback = function() {  
+    var resizeEndedCallback = function() {
+        instance.gridDiv.style.width = contentDiv.clientWidth + "px";
+        instance.gridDiv.style.height = contentDiv.clientHeight + "px";
         if(instance.gridControl) {
             instance.gridControl.render();
         }
     }
-    window.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
+    window.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeEndedCallback);
 }
 
 /** This method should include an needed functionality to clean up after a delete. */
