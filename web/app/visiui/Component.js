@@ -43,26 +43,13 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
             "left":"0px"
         });
     this.window.setContent(contentDiv);
-    
+
+
     //------------------
-    // Add window content
+    // Add menu (we will add the items later. This populates it.)
     //------------------
-    
-    //create menus
-    this.menuItemInfoList = [];
-    
-    //add the standard entries
-    var itemInfo = {};
-    itemInfo.title = visicomp.app.visiui.VisiComp.convertSpacesForHtml("Delete " + this.generator.displayName);
-    itemInfo.callback = this.createDeleteCallback(itemInfo.title);
-    this.menuItemInfoList.push(itemInfo);
-    
-     //let the extending object populate the frame
-    this.populateFrame();
-    
-    //set the menu
+
     var menu = this.window.getMenu();
-    menu.setMenuItems(this.menuItemInfoList);
     
     //------------------
     //set the title
@@ -85,6 +72,26 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
         this.window.setWindowState(options.windowState);
     }
     this.window.show();
+    
+    
+    //------------------
+    // Add window content
+    //------------------
+    
+    //menu items
+    this.menuItemInfoList = [];
+    
+    //add the standard entries
+    var itemInfo = {};
+    itemInfo.title = visicomp.app.visiui.VisiComp.convertSpacesForHtml("Delete " + this.generator.displayName);
+    itemInfo.callback = this.createDeleteCallback(itemInfo.title);
+    this.menuItemInfoList.push(itemInfo);
+    
+     //let the extending object populate the frame and the menu items
+    this.populateFrame();
+    
+    //set the menu items
+    menu.setMenuItems(this.menuItemInfoList);
 }
 
 //==============================
