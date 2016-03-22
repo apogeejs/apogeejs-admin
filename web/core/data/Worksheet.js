@@ -2,11 +2,9 @@
  * that is expanded into data objects. */
 visicomp.core.Worksheet = function(name) {
     //base init
-    visicomp.core.Impactor.init.call(this);
     visicomp.core.Child.init.call(this,name,visicomp.core.Worksheet.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
-    visicomp.core.Calculable.init.call(this);
     visicomp.core.ContextHolder.init.call(this);
     visicomp.core.Owner.init.call(this);
     
@@ -24,11 +22,9 @@ visicomp.core.Worksheet = function(name) {
 }
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Impactor);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.DataHolder);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Dependent);
-visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Calculable);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.ContextHolder);
 visicomp.core.util.mixin(visicomp.core.Worksheet,visicomp.core.Owner);
 

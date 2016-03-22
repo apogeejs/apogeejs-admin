@@ -183,7 +183,7 @@ visicomp.core.updatemember.updateObjectData = function(dataHolder,
         data,
         recalculateList) {
             
-    if(dataHolder.isCalculable) {
+    if(dataHolder.isDependent) {
         dataHolder.clearPreCalcErrors();
     } 
     

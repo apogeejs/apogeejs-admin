@@ -3,7 +3,6 @@ visicomp.core.Control = function(name) {
     //base init
     visicomp.core.Child.init.call(this,name,visicomp.core.Control.generator);
     visicomp.core.Dependent.init.call(this);
-    visicomp.core.Calculable.init.call(this);
     visicomp.core.ContextHolder.init.call(this);
 	visicomp.core.Codeable.init.call(this,["resource"],false);
     
@@ -13,7 +12,6 @@ visicomp.core.Control = function(name) {
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Control,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Control,visicomp.core.Dependent);
-visicomp.core.util.mixin(visicomp.core.Control,visicomp.core.Calculable);
 visicomp.core.util.mixin(visicomp.core.Control,visicomp.core.ContextHolder);
 visicomp.core.util.mixin(visicomp.core.Control,visicomp.core.Codeable);
 	

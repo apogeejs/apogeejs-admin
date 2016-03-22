@@ -1,7 +1,6 @@
 /** This is a folder. */
 visicomp.core.Folder = function(name) {
     //base init
-    visicomp.core.Impactor.init.call(this);
     visicomp.core.Child.init.call(this,name,visicomp.core.Folder.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
@@ -21,8 +20,7 @@ visicomp.core.Folder = function(name) {
 //add components to this class
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.DataHolder);
-visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Dependent);
-visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Impactor);
+visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Dependent);                      
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.ContextHolder);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Owner);
 visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Parent);
@@ -95,6 +93,17 @@ visicomp.core.Folder.prototype.updateData = function(child) {
         return;
     }
 	this.spliceDataMap(name,data);
+}
+
+/** There is no calculation for the folder base on dependents. 
+ * @private */
+visicomp.core.Folder.prototype.needsCalculating = function() {
+    return false;
+}
+
+/** There is no calculation in the folder.  */
+visicomp.core.Folder.prototype.calculate = function() {
+    
 }
 
 //------------------------------

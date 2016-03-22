@@ -4,9 +4,6 @@
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  *  
  * COMPONENT DEPENDENCIES:
- * - For children that are DataHolders and consequentially Impactors, the Imapctor
- * component must be installed before the child component, as the child is added it
- * impacts its parent. 
  * 
  */
 visicomp.core.Child = {};

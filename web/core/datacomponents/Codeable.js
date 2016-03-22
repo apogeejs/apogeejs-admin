@@ -7,7 +7,6 @@
  * COMPONENT DEPENDENCIES:
  * - A Codeable must be a Child.
  * - A Codeable must be Dependent. 
- * - A Codeable must be Calculable.
  * - A Codeable must be ContextHolder
  */
 visicomp.core.Codeable = {};

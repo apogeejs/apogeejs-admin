@@ -1,11 +1,9 @@
 /** This is a function. */
 visicomp.core.FunctionTable = function(name,argList) {
     //base init
-    visicomp.core.Impactor.init.call(this);
     visicomp.core.Child.init.call(this,name,visicomp.core.FunctionTable.generator);
     visicomp.core.DataHolder.init.call(this);
     visicomp.core.Dependent.init.call(this);
-    visicomp.core.Calculable.init.call(this);
     visicomp.core.ContextHolder.init.call(this);
 	visicomp.core.Codeable.init.call(this,argList,true);
     
@@ -17,8 +15,6 @@ visicomp.core.FunctionTable = function(name,argList) {
 visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Child);
 visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.DataHolder);
 visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Dependent);
-visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Calculable);
-visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Impactor);
 visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.ContextHolder);
 visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Codeable);
 

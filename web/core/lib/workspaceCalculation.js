@@ -3,7 +3,7 @@
 visicomp.core.calculation = {};
 
 
-/** This moethod should be called on an Impactor or Dependent object that changes.
+/** This moethod should be called on an Impactor (DataHolder) or Dependent object that changes.
  * This will allow for any Dependents to be recaculated.
  * @private */
 visicomp.core.calculation.addToRecalculateList = function(recalculateList,member) {
@@ -11,12 +11,12 @@ visicomp.core.calculation.addToRecalculateList = function(recalculateList,member
     if(this.inList(recalculateList,member)) return;
      
     //add this member to recalculate list if it needs to be executed
-    if((member.isCalculable)&&(member.needsCalculating())) {
+    if((member.isDependent)&&(member.needsCalculating())) {
         recalculateList.push(member);
     }
     
     //add any member that depends on this one
-    if(member.isImpactor) {
+    if(member.isDataHolder) {
         var impactsList = member.getImpactsList();
         for(var i = 0; i < impactsList.length; i++) {
             visicomp.core.calculation.addToRecalculateList(recalculateList,impactsList[i]);
@@ -24,13 +24,13 @@ visicomp.core.calculation.addToRecalculateList = function(recalculateList,member
     }
 }
 
-/** This method places the calculable member in the recalculate list, but only if the member is 
+/** This method places the dependent member in the recalculate list, but only if the member is 
  * not already there. 
  *  @private */
-visicomp.core.calculation.inList = function(recalculateList,calculable) {
+visicomp.core.calculation.inList = function(recalculateList,dependent) {
     for(var j = 0; j < recalculateList.length; j++) {
         var testObject = recalculateList[j];
-        if(testObject == calculable) {
+        if(testObject == dependent) {
             return true;
         }
     }
@@ -44,7 +44,7 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
 	
 	//working variables
 	var sortedRecalculateList = [];
-	var calculable;
+	var dependent;
 	var i;
     var success = true;
 	
@@ -52,9 +52,9 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
     //clear all circular reference errors before sorting (they will be reset if needed)
 	var memberIsSortedMap = {};
 	for(i = 0; i < recalculateList.length; i++) {
-		calculable = recalculateList[i];
-		memberIsSortedMap[calculable.getFullName()] = false;       
-        calculable.clearPreCalcErrors("Calculation - Circ Ref");
+		dependent = recalculateList[i];
+		memberIsSortedMap[dependent.getFullName()] = false;       
+        dependent.clearPreCalcErrors("Calculation - Circ Ref");
 	}
 	
 	//sort the list
@@ -67,16 +67,16 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
 		//other words, it has no depedencies that have not been updated yet.
 		for(i = 0; i < recalculateList.length; i++) {
 			//cyucle through members
-			calculable = recalculateList[i];
+			dependent = recalculateList[i];
 			
 			//check if there are any unsorted dependencies
 			var unsortedImpactedDependencies = false;
-			var dependsOn = calculable.getDependsOn();
+			var dependsOn = dependent.getDependsOn();
 			for(var j = 0; j < dependsOn.length; j++) {
 				var remoteObject = dependsOn[j];
                 
                 //don't withhold an object that depends on itself
-                if(remoteObject === calculable) continue;
+                if(remoteObject === dependent) continue;
                 
 				if(memberIsSortedMap[remoteObject.getFullName()] === false) {
 					//this depends on an unsorted member
@@ -88,9 +88,9 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
 			//save member to sorted if there are no unsorted impacted dependencies
 			if(!unsortedImpactedDependencies) {
 				//add to the end of the sorted list
-				sortedRecalculateList.push(calculable);
+				sortedRecalculateList.push(dependent);
 				//record that is has been sorted
-				memberIsSortedMap[calculable.getFullName()] = true;
+				memberIsSortedMap[dependent.getFullName()] = true;
 				//remove it from unsorted list
 				recalculateList.splice(i,1);
 				//flag that we moved a member this iteration of while loop
@@ -105,9 +105,9 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
             var actionError = new visicomp.core.ActionError(errorMsg,"Calculation - Circ Ref",null);
             actionResponse.addError(actionError);
             for(var ie = 0; ie < recalculateList.length; ie++) {
-                calculable = recalculateList[ie];
-                calculable.addPreCalcError(actionError);
-                sortedRecalculateList.push(calculable);
+                dependent = recalculateList[ie];
+                dependent.addPreCalcError(actionError);
+                sortedRecalculateList.push(dependent);
             }
             recalculateList.splice(0,recalculateList.length);
             success = false;
@@ -126,31 +126,31 @@ visicomp.core.calculation.sortRecalculateList = function(recalculateList,actionR
  * is false if there are any errors.
  * @private */
 visicomp.core.calculation.callRecalculateList = function(recalculateList,actionResponse) {
-    var calculable;
+    var dependent;
     var i;
     var overallSuccess = true;
     for(i = 0; i < recalculateList.length; i++) {
-        calculable = recalculateList[i];
+        dependent = recalculateList[i];
         
         //check for errors related to dependency
         var success;
-        if(calculable.hasPreCalcError()) {
-            calculable.addErrors(calculable.getPreCalcErrors());
+        if(dependent.hasPreCalcError()) {
+            dependent.addErrors(dependent.getPreCalcErrors());
             success = false;
         }
         else {
             //check if any values this depends on have an error
-            var errorFound = visicomp.core.calculation.checkDependencyError(calculable);
+            var errorFound = visicomp.core.calculation.checkDependencyError(dependent);
             success = !errorFound;
             
             if(success) {
                 //update the member
-                success = calculable.calculate();
+                success = dependent.calculate();
             }
         }
         
         if(!success) {
-            var actionErrors = calculable.getErrors();
+            var actionErrors = dependent.getErrors();
             if(actionErrors) {
                 for(var j = 0; j < actionErrors.length; j++) {
                     actionResponse.addError(actionErrors[j]);
@@ -167,12 +167,12 @@ visicomp.core.calculation.callRecalculateList = function(recalculateList,actionR
 /** This method checks if any variable the given member depends on has an error. If so it 
  * reports an error for this member and returns true.  Otherwise it returns false.
  * @private */
-visicomp.core.calculation.checkDependencyError = function(calculable) {
+visicomp.core.calculation.checkDependencyError = function(dependent) {
     
-    calculable.clearErrors("Calculation - Dependency");
+    dependent.clearErrors("Calculation - Dependency");
     
     //get variables this depends on has an error
-    var dependsOn = calculable.getDependsOn();
+    var dependsOn = dependent.getDependsOn();
     var errorDependencies = null;
     var i = 0;
     for(var i = 0; i < dependsOn.length; i++) {
@@ -182,7 +182,7 @@ visicomp.core.calculation.checkDependencyError = function(calculable) {
             if(errorDependencies == null) {
                 errorDependencies = [];
             }
-            errorDependencies.push(calculable);
+            errorDependencies.push(dependent);
         }
     }
     
@@ -193,8 +193,8 @@ visicomp.core.calculation.checkDependencyError = function(calculable) {
             if(i > 0) message += ", ";
             message += errorDependencies[i].getFullName();
         }
-        var actionError = new visicomp.core.ActionError(message,"Calculation - Dependency",calculable);
-        calculable.addError(actionError);   
+        var actionError = new visicomp.core.ActionError(message,"Calculation - Dependency",dependent);
+        dependent.addError(actionError);   
         
         return true;
     }
