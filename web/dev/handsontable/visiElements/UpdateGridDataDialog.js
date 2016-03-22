@@ -22,7 +22,6 @@ visicomp.dev.handsontable.showUpdateGridDataDialog = function(table,onSaveFuncti
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
     var editorDiv = visicomp.visiui.createElement("div",null,
         {
-            "position":"relative",
             "width":"500px",
             "height":"300px",
             "border":"1px solid darkgray",
@@ -30,26 +29,6 @@ visicomp.dev.handsontable.showUpdateGridDataDialog = function(table,onSaveFuncti
         });
     line.appendChild(editorDiv);
     content.appendChild(line);
-        
-    //create editor container
-    var dataEditorDiv = visicomp.visiui.createElement("div",null,{
-        "position":"absolute",
-        "top":"0px",
-        "bottom":"0px",
-        "right":"0px",
-        "left":"0px"
-    });
-	
-	var workingData = JSON.parse(JSON.stringify(table.getData()));
-	
-	var gridEditor = new Handsontable(dataEditorDiv, {
-		data: workingData,
-		rowHeaders: true,
-		colHeaders: true,
-        contextMenu: true
-	});
-	
-    editorDiv.appendChild(dataEditorDiv);
     
     //save and cancel buttons
     //buttons and handler
@@ -82,8 +61,18 @@ visicomp.dev.handsontable.showUpdateGridDataDialog = function(table,onSaveFuncti
     dialog.show();
     var coords = dialogParent.getCenterOnPagePosition(dialog);
     dialog.setPosition(coords[0],coords[1]); 
+    
+    //add the content
+    var workingData = JSON.parse(JSON.stringify(table.getData()));
 	
-gridEditor.render();
+	var gridEditor = new Handsontable(editorDiv, {
+		data: workingData,
+		rowHeaders: true,
+		colHeaders: true,
+        contextMenu: true
+	});
+	
+    //gridEditor.render();
     
     //set the resize handler
     //resize the editor on window size change
@@ -101,5 +90,5 @@ gridEditor.render();
         
         if(gridEditor) gridEditor.render();
     }
-    dialog.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
+    dialog.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeCallback);
 }
