@@ -25,7 +25,7 @@ visicomp.core.Owner.isOwner = true;
 //must be implemented in extending object
 ///** This method retrieves the full name whichis relevent for a root folder owned
 // * by this object. */
-//visicomp.core.Owner.getFullName = function();
+//visicomp.core.Owner.getPossesionNameBase = function();
 
 //must be implented by extending object
 ///** This method retrieves the context manager for this owner. */

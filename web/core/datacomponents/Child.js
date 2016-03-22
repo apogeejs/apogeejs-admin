@@ -20,7 +20,6 @@ visicomp.core.Child.init = function(name,generator) {
     this.generator = generator;
     this.errors = [];
     
-    this.workspace = null;
     this.owner = null;
 }
 
@@ -35,21 +34,12 @@ visicomp.core.Child.getName = function() {
 
 /** This method returns the full name in dot notation for this object. */
 visicomp.core.Child.getFullName = function() {
-    var name = this.owner.getFullName();
-
-    if(this.owner.isParent) {
-        //is child of a parnt
-        if(!this.owner.isRoot()) {
-            name += ".";
-        }
-        name += this.name;
+    if(this.owner) {
+        return this.owner.getPossesionNameBase() + this.name;
     }
     else {
-        //this is a root fodler
-        name += ":";
+        return this.name;
     }
-
-    return name;
 }
 
 /** This method returns a display name for the child object. By default it returns
@@ -64,8 +54,6 @@ visicomp.core.Child.setOwner = function(owner) {
     if(this.owner) {
         throw visicomp.core.util.createError("Currently the owner can only be set once.");
     }
-    
-    this.workspace = owner.getWorkspace();
     
     this.owner = owner;
     if(owner.isParent) {
@@ -91,7 +79,12 @@ visicomp.core.Child.getParent = function() {
 
 /** this method gets the workspace. */
 visicomp.core.Child.getWorkspace = function() {
-   return this.workspace;
+   if(this.owner) {
+       return this.owner.getWorkspace();
+   }
+   else {
+       return null;
+   }
 }
 
 /** this method gets the root folder/namespace for this object. */
@@ -99,7 +92,10 @@ visicomp.core.Child.getRootFolder = function() {
     var ancestor = this;
 	while(ancestor) {
 		var owner = ancestor.getOwner();
-        if(!owner.isParent) {
+        if(!owner) {
+            return null;
+        }
+        else if(!owner.isParent) {
             return ancestor;
         }
         ancestor = owner;

@@ -75,3 +75,28 @@ visicomp.core.Parent.createContextManager = function() {
     return contextManager;
 }
 
+//------------------------------
+//Owner methods
+//------------------------------
+
+/** this method gets the hame the children inherit for the full name. */
+visicomp.core.Parent.getPossesionNameBase = function() {
+    if(this.isRoot()) {
+        return this.owner.getPossesionNameBase();
+    }
+    else {
+        return this.getFullName() + ".";
+    }
+}
+
+/** This method returns the full name in dot notation for this object. */
+visicomp.core.Parent.getFullName = function() {
+    if(this.isRoot()) {
+//change this!
+        return this.owner.getPossesionNameBase();
+    }
+    else {
+        return visicomp.core.Child.getFullName.call(this);
+    }
+}
+

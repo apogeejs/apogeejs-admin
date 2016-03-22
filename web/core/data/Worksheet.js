@@ -15,7 +15,7 @@ visicomp.core.Worksheet = function(name) {
     
     //create the internal folder as a root folder (no parent). But give it
     //the full path name
-    var folder = new visicomp.core.Folder(this.getFullName());
+    var folder = new visicomp.core.Folder(name);
     folder.setOwner(this);
     this.setInternalFolder(folder);
     
@@ -165,6 +165,15 @@ visicomp.core.Worksheet.prototype.updateForDeletedVariable = function(object,rec
 /** This method retrieve creates the loaded context manager. */
 visicomp.core.Worksheet.prototype.createContextManager = function() {
     return new visicomp.core.ContextManager(this.getOwner());
+}
+
+//------------------------------
+//Owner methods
+//------------------------------
+
+/** this method gets the hame the children inherit for the full name. */
+visicomp.core.Worksheet.prototype.getPossesionNameBase = function() {
+    return this.getFullName() + ":";
 }
 
 

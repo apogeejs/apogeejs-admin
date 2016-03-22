@@ -27,11 +27,6 @@ visicomp.core.Workspace.prototype.getName = function() {
     return this.name;
 }
 
-/** this method gets the workspace name. */
-visicomp.core.Workspace.prototype.getFullName = function() {
-    return this.name;
-}
-
 /** this method gets the root package for the workspace. */
 visicomp.core.Workspace.prototype.getRootFolder = function() {
     return this.rootFolder;
@@ -62,6 +57,10 @@ visicomp.core.Workspace.prototype.getWorkspace = function() {
    return this;
 }
 
+/** this method gets the hame the children inherit for the full name. */
+visicomp.core.Workspace.prototype.getPossesionNameBase = function() {
+    return this.name + ":";
+}
 
 //------------------------------
 //ContextHolder methods
