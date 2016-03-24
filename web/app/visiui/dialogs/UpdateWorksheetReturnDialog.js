@@ -1,5 +1,5 @@
 /** This method shows the doalog to set the arg list for a function. */
-visicomp.app.visiui.dialog.showUpdateWorksheetReturnDialog = function(worksheet,onSaveFunction) {
+visicomp.app.visiui.dialog.showUpdateFolderFunctionReturnDialog = function(folderFunction,onSaveFunction) {
 
     var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"movable":true});
@@ -11,7 +11,7 @@ visicomp.app.visiui.dialog.showUpdateWorksheetReturnDialog = function(worksheet,
   
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Update Worksheet Return"}));
+    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Update FolderFunction Return"}));
     content.appendChild(line);
     
     //input
@@ -21,7 +21,7 @@ visicomp.app.visiui.dialog.showUpdateWorksheetReturnDialog = function(worksheet,
     line.appendChild(inputElement);
     content.appendChild(line);
     
-    inputElement.value = worksheet.getReturnValueString();
+    inputElement.value = folderFunction.getReturnValueString();
     
     //buttons
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});

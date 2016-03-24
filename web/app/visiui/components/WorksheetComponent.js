@@ -1,12 +1,12 @@
-/** This component represents a worksheet, which is a function that is programmed using
+/** This component represents a folderFunction, which is a function that is programmed using
  *visicomp tables rather than writing code. */
-visicomp.app.visiui.WorksheetComponent = function(workspaceUI,worksheet,componentJson) {
+visicomp.app.visiui.FolderFunctionComponent = function(workspaceUI,folderFunction,componentJson) {
     //base init
-    visicomp.app.visiui.Component.init.call(this,workspaceUI,worksheet,visicomp.app.visiui.WorksheetComponent.generator,componentJson);
+    visicomp.app.visiui.Component.init.call(this,workspaceUI,folderFunction,visicomp.app.visiui.FolderFunctionComponent.generator,componentJson);
     visicomp.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
     
     //register this object as a parent container
-    var internalFolder = worksheet.getInternalFolder();
+    var internalFolder = folderFunction.getInternalFolder();
     workspaceUI.registerMember(internalFolder,null);
     workspaceUI.addComponentContainer(internalFolder,this);
     
@@ -14,15 +14,15 @@ visicomp.app.visiui.WorksheetComponent = function(workspaceUI,worksheet,componen
 };
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.app.visiui.WorksheetComponent,visicomp.app.visiui.Component);
-visicomp.core.util.mixin(visicomp.app.visiui.WorksheetComponent,visicomp.visiui.ParentContainer);
+visicomp.core.util.mixin(visicomp.app.visiui.FolderFunctionComponent,visicomp.app.visiui.Component);
+visicomp.core.util.mixin(visicomp.app.visiui.FolderFunctionComponent,visicomp.visiui.ParentContainer);
 
 //----------------------
 // ParentContainer Methods
 //----------------------
 
 /** This method must be implemented in inheriting objects. */
-visicomp.app.visiui.WorksheetComponent.prototype.getContentIsShowing = function() {
+visicomp.app.visiui.FolderFunctionComponent.prototype.getContentIsShowing = function() {
     return this.getWindow().getContentIsShowing();
 }
 
@@ -30,17 +30,17 @@ visicomp.app.visiui.WorksheetComponent.prototype.getContentIsShowing = function(
 // Protected and Private Instance Methods
 //==============================
 
-/** This serializes the worksheet component. */
-visicomp.app.visiui.WorksheetComponent.prototype.writeToJson = function(json) {
-    var worksheet = this.getObject();
-    var internalFolder = worksheet.getInternalFolder();
+/** This serializes the folderFunction component. */
+visicomp.app.visiui.FolderFunctionComponent.prototype.writeToJson = function(json) {
+    var folderFunction = this.getObject();
+    var internalFolder = folderFunction.getInternalFolder();
     var workspaceUI = this.getWorkspaceUI();
     json.children = workspaceUI.getFolderComponentContentJson(internalFolder);
 }
 
 /** This method populates the frame for this component. 
  * @protected */
-visicomp.app.visiui.WorksheetComponent.prototype.populateFrame = function() {
+visicomp.app.visiui.FolderFunctionComponent.prototype.populateFrame = function() {
     
     var menuItemInfoList = this.getMenuItemInfoList();
     
@@ -58,7 +58,7 @@ visicomp.app.visiui.WorksheetComponent.prototype.populateFrame = function() {
 
 /** This method updates the component when the data changes. 
  * @private */    
-visicomp.app.visiui.WorksheetComponent.prototype.memberUpdated = function() {
+visicomp.app.visiui.FolderFunctionComponent.prototype.memberUpdated = function() {
     //make sure the title is up to data
     var window = this.getWindow();
     if(window) {
@@ -77,12 +77,12 @@ visicomp.app.visiui.WorksheetComponent.prototype.memberUpdated = function() {
 
 /** This method creates a callback for editing a standard codeable object
  *  @private */
-visicomp.app.visiui.WorksheetComponent.prototype.createEditArgListDialogCallback = function() {
-    var worksheet = this.getObject();
+visicomp.app.visiui.FolderFunctionComponent.prototype.createEditArgListDialogCallback = function() {
+    var folderFunction = this.getObject();
     
     //create save handler
     var onSave = function(argList) {
-        var actionResponse = visicomp.core.updateworksheet.updateArgList(worksheet,argList);
+        var actionResponse = visicomp.core.updatefolderFunction.updateArgList(folderFunction,argList);
         
         if(!actionResponse.getSuccess()) {
             //show an error message
@@ -95,18 +95,18 @@ visicomp.app.visiui.WorksheetComponent.prototype.createEditArgListDialogCallback
     };
     
     return function() {
-        visicomp.app.visiui.dialog.showUpdateArgListDialog(worksheet,onSave);
+        visicomp.app.visiui.dialog.showUpdateArgListDialog(folderFunction,onSave);
     }
 }
 
 /** This method creates a callback for editing a standard codeable object
  *  @private */
-visicomp.app.visiui.WorksheetComponent.prototype.createEditReturnValueDialogCallback = function() {
-    var worksheet = this.getObject();
+visicomp.app.visiui.FolderFunctionComponent.prototype.createEditReturnValueDialogCallback = function() {
+    var folderFunction = this.getObject();
     
     //create save handler
     var onSave = function(returnValueString) {
-        var actionResponse = visicomp.core.updateworksheet.updateReturnValue(worksheet,returnValueString);
+        var actionResponse = visicomp.core.updatefolderFunction.updateReturnValue(folderFunction,returnValueString);
         
         if(!actionResponse.getSuccess()) {
             //show an error message
@@ -119,7 +119,7 @@ visicomp.app.visiui.WorksheetComponent.prototype.createEditReturnValueDialogCall
     };
     
     return function() {
-        visicomp.app.visiui.dialog.showUpdateWorksheetReturnDialog(worksheet,onSave);
+        visicomp.app.visiui.dialog.showUpdateFolderFunctionReturnDialog(folderFunction,onSave);
     }
 }
 
@@ -128,38 +128,38 @@ visicomp.app.visiui.WorksheetComponent.prototype.createEditReturnValueDialogCall
 //======================================
 
 /** This method creates the component. */
-visicomp.app.visiui.WorksheetComponent.createComponent = function(workspaceUI,parent,name) {
+visicomp.app.visiui.FolderFunctionComponent.createComponent = function(workspaceUI,parent,name) {
     
     var json = {};
     json.name = name;
-    json.type = visicomp.core.Worksheet.generator.type;
+    json.type = visicomp.core.FolderFunction.generator.type;
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
-    var worksheet = actionResponse.member;
+    var folderFunction = actionResponse.member;
     if(actionResponse.getSuccess()) {
-        var worksheetComponent = new visicomp.app.visiui.WorksheetComponent(workspaceUI,worksheet);
-        actionResponse.component = worksheetComponent;
+        var folderFunctionComponent = new visicomp.app.visiui.FolderFunctionComponent(workspaceUI,folderFunction);
+        actionResponse.component = folderFunctionComponent;
     }
     return actionResponse;
 }
 
-visicomp.app.visiui.WorksheetComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
-    var worksheetComponent = new visicomp.app.visiui.WorksheetComponent(workspaceUI,member,componentJson);
+visicomp.app.visiui.FolderFunctionComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
+    var folderFunctionComponent = new visicomp.app.visiui.FolderFunctionComponent(workspaceUI,member,componentJson);
     if((componentJson)&&(componentJson.children)) {
         var folder = member.getInternalFolder();
         workspaceUI.loadFolderComponentContentFromJson(folder,componentJson.children);
     }
-    return worksheetComponent;
+    return folderFunctionComponent;
 }
 
 //======================================
 // This is the component generator, to register the component
 //======================================
 
-visicomp.app.visiui.WorksheetComponent.generator = {};
-visicomp.app.visiui.WorksheetComponent.generator.displayName = "Worksheet";
-visicomp.app.visiui.WorksheetComponent.generator.uniqueName = "visicomp.app.visiui.WorksheetComponent";
-visicomp.app.visiui.WorksheetComponent.generator.createComponent = visicomp.app.visiui.WorksheetComponent.createComponent;
-visicomp.app.visiui.WorksheetComponent.generator.createComponentFromJson = visicomp.app.visiui.WorksheetComponent.createComponentFromJson;
-visicomp.app.visiui.WorksheetComponent.generator.DEFAULT_WIDTH = 500;
-visicomp.app.visiui.WorksheetComponent.generator.DEFAULT_HEIGHT = 500;
+visicomp.app.visiui.FolderFunctionComponent.generator = {};
+visicomp.app.visiui.FolderFunctionComponent.generator.displayName = "Folder Function";
+visicomp.app.visiui.FolderFunctionComponent.generator.uniqueName = "visicomp.app.visiui.FolderFunctionComponent";
+visicomp.app.visiui.FolderFunctionComponent.generator.createComponent = visicomp.app.visiui.FolderFunctionComponent.createComponent;
+visicomp.app.visiui.FolderFunctionComponent.generator.createComponentFromJson = visicomp.app.visiui.FolderFunctionComponent.createComponentFromJson;
+visicomp.app.visiui.FolderFunctionComponent.generator.DEFAULT_WIDTH = 500;
+visicomp.app.visiui.FolderFunctionComponent.generator.DEFAULT_HEIGHT = 500;

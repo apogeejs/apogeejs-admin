@@ -160,7 +160,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
 }
 
 visicomp.app.visiui.WorkspaceUI.prototype.getObjectKey = function(object) {
-//needs to be changed when we add worksheets
+//needs to be changed when we add folderFunctions
 	return object.getFullName();
 }
 

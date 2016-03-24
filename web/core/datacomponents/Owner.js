@@ -2,7 +2,7 @@
  * Parent in that Parent has a child within a data hierarchy. Parents are a subset of owners.
  * An object that owns a root folder if an owner but not a parent.
  * Examples of Owners that are not parent are the Workspace, which holds the workspace root folder
- * and the Worksheet, which is a data object which has its own root folder containing its children,
+ * and the FolderFunction, which is a data object which has its own root folder containing its children,
  * which are inaccessible from the rest of the workspace.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.

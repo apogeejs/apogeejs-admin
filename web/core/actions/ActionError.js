@@ -16,10 +16,10 @@ visicomp.core.ActionError.UNKNOWN_ERROR_MESSAGE = "Unknown Error";
 
 //"User App" - This is an error in the users application code
 //"Custom Control - Update" - in "update" of custom control (cleared and set)
-//"Worksheet - Code" - error in setting the worksheet function
+//"FolderFunction - Code" - error in setting the folderFunction function
 //"User" - This is an operator error
 //"Model" - This is an error in the data model, like a missing generator
-//"Code" - error in use model code (I used on worksheet and in code. Maybe I should split these.)
+//"Code" - error in use model code (I used on folderFunction and in code. Maybe I should split these.)
 //"Calculate" - error when the object function is set as data (includes execution if necessary)
 //
 ///** This is an error in the user model code. */

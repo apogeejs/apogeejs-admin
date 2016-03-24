@@ -1,14 +1,14 @@
 /** This namespace contains functions to process an update the object function
- *for a worksheet. */
-visicomp.core.updateworksheet = {};
+ *for a folderFunction. */
+visicomp.core.updatefolderFunction = {};
 
-visicomp.core.updateworksheet.updateArgList = function(worksheet,argList,optionalActionResponse) {
+visicomp.core.updatefolderFunction.updateArgList = function(folderFunction,argList,optionalActionResponse) {
     var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
     try {
-        worksheet.setArgList(argList);
+        folderFunction.setArgList(argList);
 
         var recalculateList = [];
-        visicomp.core.calculation.addToRecalculateList(recalculateList,worksheet);
+        visicomp.core.calculation.addToRecalculateList(recalculateList,folderFunction);
         var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
         
         //fire updated events
@@ -22,13 +22,13 @@ visicomp.core.updateworksheet.updateArgList = function(worksheet,argList,optiona
     return actionResponse;
 }
     
-visicomp.core.updateworksheet.updateReturnValue = function(worksheet,returnValueString,optionalActionResponse) {
+visicomp.core.updatefolderFunction.updateReturnValue = function(folderFunction,returnValueString,optionalActionResponse) {
      var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
     try {
-        worksheet.setReturnValueString(returnValueString);
+        folderFunction.setReturnValueString(returnValueString);
 
         var recalculateList = [];
-        visicomp.core.calculation.addToRecalculateList(recalculateList,worksheet);
+        visicomp.core.calculation.addToRecalculateList(recalculateList,folderFunction);
         var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
         
         //fire updated events
