@@ -1,16 +1,14 @@
-if(!visicomp.dev) visicomp.dev = {};
-if(!visicomp.dev.handsontable) visicomp.dev.handsontable = {};
 
 /** This component represents a json table object. */
-visicomp.dev.handsontable.GridTableComponent = function(workspaceUI,table,componentJson) {
+visicomp.app.visiui.GridTableComponent = function(workspaceUI,table,componentJson) {
     //base init
-    visicomp.app.visiui.Component.init.call(this,workspaceUI,table,visicomp.dev.handsontable.GridTableComponent.generator,componentJson);
+    visicomp.app.visiui.Component.init.call(this,workspaceUI,table,visicomp.app.visiui.GridTableComponent.generator,componentJson);
     
     this.memberUpdated();
 };
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.dev.handsontable.GridTableComponent,visicomp.app.visiui.Component);
+visicomp.core.util.mixin(visicomp.app.visiui.GridTableComponent,visicomp.app.visiui.Component);
 
 //==============================
 // Protected and Private Instance Methods
@@ -18,7 +16,7 @@ visicomp.core.util.mixin(visicomp.dev.handsontable.GridTableComponent,visicomp.a
 
 /** This method populates the frame for this component. 
  * @protected */
-visicomp.dev.handsontable.GridTableComponent.prototype.populateFrame = function() {
+visicomp.app.visiui.GridTableComponent.prototype.populateFrame = function() {
     
     var window = this.getWindow();
     
@@ -34,7 +32,7 @@ visicomp.dev.handsontable.GridTableComponent.prototype.populateFrame = function(
     
     var itemInfo2 = {};
     itemInfo2.title = "Edit&nbsp;Formula";
-    itemInfo2.callback = this.createEditCodeableDialogCallback(itemInfo2.title,visicomp.dev.handsontable.GridTableComponent.editorCodeWrapper);
+    itemInfo2.callback = this.createEditCodeableDialogCallback(itemInfo2.title,visicomp.app.visiui.GridTableComponent.editorCodeWrapper);
     
     //add these at the start of the menu
     menuItemInfoList.splice(0,0,itemInfo1,itemInfo2);
@@ -64,7 +62,7 @@ visicomp.dev.handsontable.GridTableComponent.prototype.populateFrame = function(
 }
 
 /** This method should include an needed functionality to clean up after a delete. */
-visicomp.dev.handsontable.GridTableComponent.prototype.onDelete = function() {
+visicomp.app.visiui.GridTableComponent.prototype.onDelete = function() {
     if(this.gridControl) {
         this.gridControl.destroy();
         this.gridControl = null;
@@ -73,7 +71,7 @@ visicomp.dev.handsontable.GridTableComponent.prototype.onDelete = function() {
 
 /** This method updates the table data 
  * @private */    
-visicomp.dev.handsontable.GridTableComponent.prototype.memberUpdated = function() {
+visicomp.app.visiui.GridTableComponent.prototype.memberUpdated = function() {
     var object = this.getObject();
     if(object.hasError()) {
         this.showErrors(object.getErrors());
@@ -90,7 +88,7 @@ visicomp.dev.handsontable.GridTableComponent.prototype.memberUpdated = function(
     }
 }
 
-visicomp.dev.handsontable.GridTableComponent.prototype.showErrors = function(actionErrors) {
+visicomp.app.visiui.GridTableComponent.prototype.showErrors = function(actionErrors) {
 //temporarly error handling
     if(this.gridControl) {
         var errorData = [["Error:"]];
@@ -102,7 +100,7 @@ visicomp.dev.handsontable.GridTableComponent.prototype.showErrors = function(act
     }
 }
 
-visicomp.dev.handsontable.GridTableComponent.prototype.showData = function(data) {
+visicomp.app.visiui.GridTableComponent.prototype.showData = function(data) {
     if(this.gridControl) {
         this.gridControl.loadData(data);
     }
@@ -122,7 +120,7 @@ visicomp.dev.handsontable.GridTableComponent.prototype.showData = function(data)
 
 /** This method displays the edit data dialog for this component. 
  * @private */
-visicomp.dev.handsontable.GridTableComponent.prototype.createEditDataDialog = function() {
+visicomp.app.visiui.GridTableComponent.prototype.createEditDataDialog = function() {
     var instance = this;
 	
     //create save handler
@@ -139,7 +137,7 @@ visicomp.dev.handsontable.GridTableComponent.prototype.createEditDataDialog = fu
     };
     
     return function() {
-        visicomp.dev.handsontable.showUpdateGridDataDialog(instance.getObject(),onSave);
+        visicomp.app.visiui.dialog.showUpdateGridDataDialog(instance.getObject(),onSave);
     }
 }
 
@@ -148,7 +146,7 @@ visicomp.dev.handsontable.GridTableComponent.prototype.createEditDataDialog = fu
 //======================================
 
 
-visicomp.dev.handsontable.GridTableComponent.createComponent = function(workspaceUI,parent,name) {
+visicomp.app.visiui.GridTableComponent.createComponent = function(workspaceUI,parent,name) {
     
     var json = {};
     json.name = name;
@@ -159,15 +157,15 @@ visicomp.dev.handsontable.GridTableComponent.createComponent = function(workspac
     
     var table = actionResponse.member;
     if(table) {
-        var tableComponent = new visicomp.dev.handsontable.GridTableComponent(workspaceUI,table);
+        var tableComponent = new visicomp.app.visiui.GridTableComponent(workspaceUI,table);
         actionResponse.component = tableComponent;
     }
     return actionResponse;
 }
 
 
-visicomp.dev.handsontable.GridTableComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
-    var tableComponent = new visicomp.dev.handsontable.GridTableComponent(workspaceUI,member,componentJson);
+visicomp.app.visiui.GridTableComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
+    var tableComponent = new visicomp.app.visiui.GridTableComponent(workspaceUI,member,componentJson);
     return tableComponent;
 }
 
@@ -175,31 +173,31 @@ visicomp.dev.handsontable.GridTableComponent.createComponentFromJson = function(
 // This is the component generator, to register the component
 //======================================
 
-visicomp.dev.handsontable.GridTableComponent.generator = {};
-visicomp.dev.handsontable.GridTableComponent.generator.displayName = "Grid Table";
-visicomp.dev.handsontable.GridTableComponent.generator.uniqueName = "visicomp.dev.handsontable.GridTableComponent";
-visicomp.dev.handsontable.GridTableComponent.generator.createComponent = visicomp.dev.handsontable.GridTableComponent.createComponent;
-visicomp.dev.handsontable.GridTableComponent.generator.createComponentFromJson = visicomp.dev.handsontable.GridTableComponent.createComponentFromJson;
-visicomp.dev.handsontable.GridTableComponent.generator.DEFAULT_WIDTH = 600;
-visicomp.dev.handsontable.GridTableComponent.generator.DEFAULT_HEIGHT = 600;
+visicomp.app.visiui.GridTableComponent.generator = {};
+visicomp.app.visiui.GridTableComponent.generator.displayName = "Grid Table";
+visicomp.app.visiui.GridTableComponent.generator.uniqueName = "visicomp.app.visiui.GridTableComponent";
+visicomp.app.visiui.GridTableComponent.generator.createComponent = visicomp.app.visiui.GridTableComponent.createComponent;
+visicomp.app.visiui.GridTableComponent.generator.createComponentFromJson = visicomp.app.visiui.GridTableComponent.createComponentFromJson;
+visicomp.app.visiui.GridTableComponent.generator.DEFAULT_WIDTH = 600;
+visicomp.app.visiui.GridTableComponent.generator.DEFAULT_HEIGHT = 600;
 
 //======================================
 // This is a code wrapper so the user works with the formula rather than the function body
 //======================================
 
-visicomp.dev.handsontable.GridTableComponent.editorCodeWrapper = {};
+visicomp.app.visiui.GridTableComponent.editorCodeWrapper = {};
 
-visicomp.dev.handsontable.GridTableComponent.editorCodeWrapper.FUNCTION_PREFIX = "var value;\n";
-visicomp.dev.handsontable.GridTableComponent.editorCodeWrapper.FUNCTION_SUFFIX = "\nreturn value;\n\n";
+visicomp.app.visiui.GridTableComponent.editorCodeWrapper.FUNCTION_PREFIX = "var value;\n";
+visicomp.app.visiui.GridTableComponent.editorCodeWrapper.FUNCTION_SUFFIX = "\nreturn value;\n\n";
 
-visicomp.dev.handsontable.GridTableComponent.editorCodeWrapper.displayName = "Formula";
+visicomp.app.visiui.GridTableComponent.editorCodeWrapper.displayName = "Formula";
 
-visicomp.dev.handsontable.GridTableComponent.editorCodeWrapper.wrapCode = function(formula) { 
-    return visicomp.dev.handsontable.GridTableComponent.editorCodeWrapper.FUNCTION_PREFIX + formula + 
-        visicomp.dev.handsontable.GridTableComponent.editorCodeWrapper.FUNCTION_SUFFIX;
+visicomp.app.visiui.GridTableComponent.editorCodeWrapper.wrapCode = function(formula) { 
+    return visicomp.app.visiui.GridTableComponent.editorCodeWrapper.FUNCTION_PREFIX + formula + 
+        visicomp.app.visiui.GridTableComponent.editorCodeWrapper.FUNCTION_SUFFIX;
 }
 
-visicomp.dev.handsontable.GridTableComponent.editorCodeWrapper.unwrapCode = function(functionBody) {
+visicomp.app.visiui.GridTableComponent.editorCodeWrapper.unwrapCode = function(functionBody) {
 	if((functionBody == null)||(functionBody.length = 0)) return "";
 	
     var formula = functionBody.replace("var value;","");
@@ -210,7 +208,7 @@ visicomp.dev.handsontable.GridTableComponent.editorCodeWrapper.unwrapCode = func
 
 //auto registration
 if(registerComponent) {
-    registerComponent(visicomp.dev.handsontable.GridTableComponent.generator);
+    registerComponent(visicomp.app.visiui.GridTableComponent.generator);
 }
 
 //external links

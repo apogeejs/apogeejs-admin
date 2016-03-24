@@ -1,9 +1,7 @@
-if(!visicomp.dev) visicomp.dev = {};
-if(!visicomp.dev.handsontable) visicomp.dev.handsontable = {};
 
 /** This method shows an update table dialog. The argument onSaveData is the
  * data to be saved. */
-visicomp.dev.handsontable.showUpdateGridDataDialog = function(table,onSaveFunction) {
+visicomp.app.visiui.dialog.showUpdateGridDataDialog = function(table,onSaveFunction) {
     
     var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"minimizable":true,"maximizable":true,"movable":true,"resizable":true});

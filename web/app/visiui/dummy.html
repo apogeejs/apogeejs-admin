@@ -24,12 +24,12 @@
         <script type="text/javascript" src="../../core/data/FunctionTable.js"></script>
         <script type="text/javascript" src="../../core/data/Control.js"></script>
         <script type="text/javascript" src="../../core/data/Folder.js"></script>
-        <script type="text/javascript" src="../../core/data/Worksheet.js"></script>
+        <script type="text/javascript" src="../../core/data/FolderFunction.js"></script>
         <script type="text/javascript" src="../../core/actions/ActionResponse.js"></script>
         <script type="text/javascript" src="../../core/actions/ActionError.js"></script>
         <script type="text/javascript" src="../../core/actions/createmember.js"></script>
         <script type="text/javascript" src="../../core/actions/updatemember.js"></script>
-        <script type="text/javascript" src="../../core/actions/updateworksheet.js"></script>
+        <script type="text/javascript" src="../../core/actions/updatefolderfunction.js"></script>
 		<script type="text/javascript" src="../../core/actions/deletemember.js"></script>
 		<script type="text/javascript" src="../../ui/visiui/visiui.js"></script>
         <script type="text/javascript" src="../../ui/visiui/ParentContainer.js"></script>
@@ -43,14 +43,16 @@
         <script type="text/javascript" src="../../ui/visiui/menu/MenuBody.js"></script>
         <script type="text/javascript" src="../../lib/ace/src-min/ace.js" charset="utf-8"></script>
         <script type="text/javascript" src="../../lib/parsing/esprima.js"></script>
+        <script type="text/javascript" src="https://handsontable.com/bower_components/handsontable/dist/handsontable.full.js"></script>
         <script type="text/javascript" src="VisiComp.js"></script>
 		<script type="text/javascript" src="LinkManager.js"></script>
         <script type="text/javascript" src="Component.js"></script>
         <script type="text/javascript" src="WorkspaceUI.js"></script>
 		<script type="text/javascript" src="components/FolderComponent.js"></script>
         <script type="text/javascript" src="components/JsonTableComponent.js"></script>
+        <script type="text/javascript" src="components/GridTableComponent.js"></script>
         <script type="text/javascript" src="components/FunctionComponent.js"></script>
-        <script type="text/javascript" src="components/WorksheetComponent.js"></script>
+        <script type="text/javascript" src="components/FolderFunctionComponent.js"></script>
         <script type="text/javascript" src="components/BasicControlComponent.js"></script>
 		<script type="text/javascript" src="components/CustomControlComponent.js"></script>
         <script type="text/javascript" src="components/CustomResource.js"></script>
@@ -62,6 +64,7 @@
         <script type="text/javascript" src="actions/addadditionalcomponent.js"></script>
         <script type="text/javascript" src="actions/updatelinks.js"></script>
         <script type="text/javascript" src="dialogs/UpdateTableDataDialog.js"></script>
+        <script type="text/javascript" src="dialogs/UpdateGridDataDialog.js"></script>
         <script type="text/javascript" src="dialogs/UpdateArgListDialog.js"></script>
 		<script type="text/javascript" src="dialogs/UpdateCodeableDialog.js"></script>
 		<script type="text/javascript" src="dialogs/UpdateCustomControlDialog.js"></script>
@@ -73,6 +76,7 @@
         <script type="text/javascript" src="dialogs/UpdateLinksDialog.js"></script>
         <script type="text/javascript" src="dialogs/SelectControlDialog.js"></script>
         <link rel="stylesheet" type="text/css" href="../../ui/visiui/dialog.css">
+        <link rel="stylesheet" type="text/css" href="https://handsontable.com/bower_components/handsontable/dist/handsontable.full.css">
 		<style>
 			body {
                 overflow:hidden;

@@ -144,6 +144,7 @@ visicomp.app.visiui.VisiComp.prototype.getComponentGenerator = function(name) {
 visicomp.app.visiui.VisiComp.prototype.loadComponentGenerators = function() {
     //standard components
     this.registerStandardComponent(visicomp.app.visiui.JsonTableComponent.generator);
+    this.registerStandardComponent(visicomp.app.visiui.GridTableComponent.generator);
 	this.registerStandardComponent(visicomp.app.visiui.FolderComponent.generator);
 	this.registerStandardComponent(visicomp.app.visiui.FunctionComponent.generator);
     this.registerStandardComponent(visicomp.app.visiui.FolderFunctionComponent.generator);
