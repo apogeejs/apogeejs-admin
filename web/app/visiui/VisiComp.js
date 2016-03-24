@@ -243,5 +243,5 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
 /** This method replaces on spaces with &nbsp; spaces. It is intedned to prevent
  * wrapping in html. */
 visicomp.app.visiui.VisiComp.convertSpacesForHtml = function(text) {
-    return text.replace(" ","&nbsp;");
+    return text.replace(/ /g,"&nbsp;");
 }

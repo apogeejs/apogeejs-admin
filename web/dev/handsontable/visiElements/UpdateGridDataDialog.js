@@ -38,6 +38,11 @@ visicomp.dev.handsontable.showUpdateGridDataDialog = function(table,onSaveFuncti
     }
     
     var onSave = function() {
+        if(table.hasCode()) {
+            var saveData = confirm("Saving will overwrite the formula for this table. Continue saving?");
+            if(!saveData) return;
+        }
+        
         var complete = onSaveFunction(workingData);
         if(complete) {
             closeDialog();

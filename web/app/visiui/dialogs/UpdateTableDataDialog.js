@@ -41,9 +41,10 @@ dataEditor.$blockScrolling = Infinity;
 	dataEditor.setTheme("ace/theme/eclipse");
 	dataEditor.getSession().setMode("ace/mode/json");
 	//set the value
-	var data = table.getData();
-	dataEditor.getSession().setValue(JSON.stringify(data,null,visicomp.app.visiui.JsonTableComponent.formatString));
-	
+    if(!table.hasCode()) {
+        var data = table.getData();
+        dataEditor.getSession().setValue(JSON.stringify(data,null,visicomp.app.visiui.JsonTableComponent.formatString));
+    }
 	
     editorDiv.appendChild(dataEditorDiv);
     
@@ -55,6 +56,12 @@ dataEditor.$blockScrolling = Infinity;
     }
     
     var onSave = function() {
+        
+        if(table.hasCode()) {
+            var saveData = confirm("Saving will overwrite the formula for this table. Continue saving?");
+            if(!saveData) return;
+        }
+        
 		var data;
 
 		var dataText = dataEditor.getSession().getValue();
