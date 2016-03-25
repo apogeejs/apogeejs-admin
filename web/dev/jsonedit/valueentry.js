@@ -9,6 +9,7 @@ function ValueEntry(parent,data,isVirtual) {
 	this.parent = parent;
     this.data = data;
 	this.type = util.getObjectType(data); //"value", "object", "array"
+
 	this.indentLevel = parent.getIndentLevel() + 1;
     
     //these are all the display elements

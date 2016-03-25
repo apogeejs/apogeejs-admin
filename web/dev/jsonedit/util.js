@@ -2,6 +2,11 @@ util = {};
 
 var OBJECT_CONSTRUCTOR = {}.constructor;
 var ARRAY_CONSTRUCTOR = [].constructor;
+var STRING_CONSTRUCTOR = "".constructor;
+var NUMBER_CONSTRUCTOR = (0).constructor;
+var BOOLEAN_CONSTRUCTOR = (true).constructor;
+
+//inputs to this should be "object", "array" or "value". Other type objects will not be processed properly
 util.getObjectType = function(data) {
 	if(data == null) return "value";
 	
@@ -13,6 +18,45 @@ util.getObjectType = function(data) {
 	}
 	else {
 		return "value";
+	}
+}
+
+//this tells a type value: "string", "number", "boolean", "other", "null"
+util.getValueType = function(value) {
+	if(data == null) return "null";
+	
+	if(data.constructor == STRING_CONSTRUCTOR) {
+		return "string";
+	}
+	else if(data.constructor == NUMBER_CONSTRUCTOR) {
+		return "number";
+	}
+	else if(data.constructor == BOOLEAN_CONSTRUCTOR) {
+		return "boolean";
+	}
+	else {
+		return "other";
+	}
+}
+
+//This method retuns true if the stringToNonString method will successfully convet the object.
+util.canBeConvertedToNonString = function(stringValue) {
+	return(isFinite(stringValue) || stringValue === "false" || stringValue === "true");
+}
+
+//This method coverts a string value to non-string value (currently a number or boolean). 
+//If the conversion fails, it returns the string value.
+//before the method is called it should be checked that it is a valid
+//number or boolean.
+util.stringToNonString = function(stringValue) {
+	var stringToValueCode = "value = " + data;
+	var value;
+	try {
+	  eval(stringToValueCode);
+	  return value;
+	}
+	catch(error) {
+	  return stringValue;
 	}
 }
 
