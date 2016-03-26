@@ -125,10 +125,10 @@ ValueEntry.prototype.setIsVirtual = function(isVirtual) {
 	this.isVirtual = isVirtual;
     if(this.valueEditObject) {
         if(isVirtual) {
-            this.valueEditObject.setClassName("valueCell");
+            this.valueEditObject.setClassName("virtualValueCell");
         }
         else {
-            this.valueEditObject.setClassName("virtualValueCell");
+            this.valueEditObject.setClassName("valueCellString","valueCellNonString");
         }
     }
 }
@@ -380,6 +380,54 @@ ValueEntry.prototype.deleteChildElement = function(keyEntry) {
 //------------------------------
 // Conversions
 //------------------------------
+
+
+ValueEntry.prototype.convertibleToNumber = function() {
+    if(this.type === "value") {
+        var currentValue = this.getCurrentValue();
+        var valueType = util.getValueType(currentValue);
+        if(valueType === "string") {
+            return isFinite(currentValue);
+        }
+    }
+    return false;
+}
+
+ValueEntry.prototype.convertibleToBool = function() {
+    if(this.type === "value") {
+        var currentValue = this.getCurrentValue();
+        var valueType = util.getValueType(currentValue);
+        if(valueType === "string") {
+            return util.isBoolString(currentValue);
+        }
+    }
+    return false;
+}
+
+//this converts a string to a number or boolean
+ValueEntry.prototype.valueToNonString = function() {
+    var currentValue = this.getCurrentValue();
+    //change the data in this object
+    var newData = util.stringToNonString(currentValue);
+    this.valueEditObject.setValue(newData);
+}
+
+ValueEntry.prototype.convertibleToString = function() {
+    if(this.type === "value") {
+        var currentValue = this.getCurrentValue();
+        var valueType = util.getValueType(currentValue);
+        return (valueType !== "string");
+    }
+    return false;
+}
+
+ValueEntry.prototype.valueToString = function() {
+    var currentValue = this.getCurrentValue();
+    //change the data in this object
+    var newData = String(currentValue);
+    this.valueEditObject.setValue(newData);
+}
+
 
 ValueEntry.prototype.valueToArray = function() {
     if(!this.type == "value") {

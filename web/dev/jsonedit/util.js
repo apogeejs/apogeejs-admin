@@ -23,15 +23,15 @@ util.getObjectType = function(data) {
 
 //this tells a type value: "string", "number", "boolean", "other", "null"
 util.getValueType = function(value) {
-	if(data == null) return "null";
+	if(value == null) return "null";
 	
-	if(data.constructor == STRING_CONSTRUCTOR) {
+	if(value.constructor == STRING_CONSTRUCTOR) {
 		return "string";
 	}
-	else if(data.constructor == NUMBER_CONSTRUCTOR) {
+	else if(value.constructor == NUMBER_CONSTRUCTOR) {
 		return "number";
 	}
-	else if(data.constructor == BOOLEAN_CONSTRUCTOR) {
+	else if(value.constructor == BOOLEAN_CONSTRUCTOR) {
 		return "boolean";
 	}
 	else {
@@ -39,9 +39,13 @@ util.getValueType = function(value) {
 	}
 }
 
+util.isBoolString = function(stringValue) {
+    return (stringValue === "false" || stringValue === "true");
+}
+
 //This method retuns true if the stringToNonString method will successfully convet the object.
 util.canBeConvertedToNonString = function(stringValue) {
-	return(isFinite(stringValue) || stringValue === "false" || stringValue === "true");
+	return(isFinite(stringValue) || util.isBoolString(stringValue));
 }
 
 //This method coverts a string value to non-string value (currently a number or boolean). 
@@ -49,7 +53,7 @@ util.canBeConvertedToNonString = function(stringValue) {
 //before the method is called it should be checked that it is a valid
 //number or boolean.
 util.stringToNonString = function(stringValue) {
-	var stringToValueCode = "value = " + data;
+	var stringToValueCode = "value = " + stringValue;
 	var value;
 	try {
 	  eval(stringToValueCode);
@@ -78,7 +82,7 @@ util.createKeyElement = function(key,type,isVirtual) {
         }
         
         //create an editable key entry
-        return new EditField(key,className);
+        return new EditField(key,className,className);
     }
     else if(type == "index") { 
         if(isVirtual) {
@@ -96,14 +100,17 @@ util.createKeyElement = function(key,type,isVirtual) {
     }
 }
 util.createValueElement = function(value,isVirtual) {
-	var className;
+	var stringClassName;
+    var nonStringClassName;
     if(isVirtual) {
-        className = "virtualValueCell";
+        stringClassName = "virtualValueCell";
+        nonStringClassName = "virtualValueCell";
     }
     else {
-        className = "valueCell";
+        stringClassName = "valueCellString";
+        nonStringClassName = "valueCellNonString";
     }
-    return new EditField(value,className);
+    return new EditField(value,stringClassName,nonStringClassName);
 }
 util.createObjectDelimiter = function(delimiter) {
 	var cell = document.createElement("div");

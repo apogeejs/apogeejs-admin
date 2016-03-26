@@ -16,7 +16,7 @@ FixedField.prototype.setValue = function(value) {
     this.element.innerHTML = value;
 }
 
-FixedField.prototype.setClassName = function(className) {
+FixedField.prototype.setClassName = function(className,extraName) {
     this.element.className = className;
 }
 

@@ -186,6 +186,18 @@ KeyEntry.prototype.loadContextMenu = function(parentKeyCount,keyIndex) {
         if(valueType == "value") {
             contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.valueToObject()});
             contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.valueToArray()});
+            
+            if(valueEntry.convertibleToNumber()) {
+                contextMenu.addCallbackMenuItem("Convert To Number",function() {valueEntry.valueToNonString()});
+            }
+            
+            if(valueEntry.convertibleToBool()) {
+                contextMenu.addCallbackMenuItem("Convert To Boolean",function() {valueEntry.valueToNonString()});
+            }
+            
+            if(valueEntry.convertibleToString()) {
+                contextMenu.addCallbackMenuItem("Convert To String",function() {valueEntry.valueToString()});
+            }
         }
         else if(valueType == "object") {
             contextMenu.addCallbackMenuItem("Convert To Value",function() {valueEntry.convertToValue()});

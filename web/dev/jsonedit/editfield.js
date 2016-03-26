@@ -3,12 +3,12 @@
  * be returned to the previous value. Otherwise, the value of the field
  * fill be updated to match the edit.
  */
-function EditField(value,className) {
+function EditField(value,stringCssClass,nonStringCssClass) {
     this.value = value;
     this.element = document.createElement("div");
-    this.element.className = className;
+    this.element.className = stringCssClass;
     this.element.innerHTML = value;
-    
+       
     this.onEdit = null;
     this.onNavigate = null;
     
@@ -20,6 +20,9 @@ function EditField(value,className) {
     this.element.onclick = function() {
 		instance.onClick();
 	};
+    
+    this.setValue(value);
+    this.setClassName(stringCssClass,nonStringCssClass);
 }
 
 EditField.prototype.setOnEditCallback= function(onEdit) {
@@ -30,20 +33,40 @@ EditField.prototype.setNavCallback = function(onNavigate) {
     this.onNavigate = onNavigate;
 }
 
+/** This method sets the flag indicating the data should be read from the edit
+ * field as a string or a non-string. This will take effect only when data is read
+ * from the edit field. */
+EditField.prototype.setValueTypeIsString = function(isString) {
+    this.isString = isString;
+}
+
 EditField.prototype.getValue= function() {
     return this.value;
 }
 
 EditField.prototype.setValue = function(value) {
     this.value = value;
-    if(this.editField) {
-        this.editField.value = value;
+    this.isString = (util.getValueType(value) === "string");
+    if(this.isString) {
+        this.element.className = this.stringCssClass;
     }
+    else {
+        this.element.className = this.nonStringCssClass;
+    }
+
     this.element.innerHTML = value;
 }
 
-EditField.prototype.setClassName = function(className) {
-    this.element.className = className;
+EditField.prototype.setClassName = function(stringClassName,nonStringClassName) {
+    this.stringCssClass = stringClassName;
+    this.nonStringCssClass = nonStringClassName ? nonStringClassName : stringClassName;
+    
+    if(this.isString) {
+        this.element.className = this.stringCssClass;
+    }
+    else {
+        this.element.className = this.nonStringCssClass;
+    }
 }
 
 EditField.prototype.getElement = function() {
@@ -90,9 +113,24 @@ EditField.prototype.endEdit = function() {
     if(this.editField) {
         var newValue = this.editField.value;
         if(newValue != this.value) {
-            this.value = this.editField.value;     
+            //read the value, in the appropriate format
+            var editStringValue = this.editField.value;
+            var editValue;
+            if(!this.isString) {
+                if(util.canBeConvertedToNonString(editStringValue)) {
+                    editValue = util.stringToNonString(editStringValue);
+                }
+                else {
+                    editValue = editStringValue;
+                }
+            }
+            else {
+                editValue = editStringValue;
+            }
+            
             this.editField = null;
-            this.element.innerHTML = this.value;
+            this.setValue(editValue);
+            
             if(this.onEdit) {
                 this.onEdit(this.value);
             }

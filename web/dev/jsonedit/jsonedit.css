@@ -34,12 +34,23 @@
     background: white;
     font-style: italic;
 }
-.valueCell {
+.valueCellString {
     display:table-cell;
     border: gray solid 1px;
     padding: 2px;
     min-width: 70px;
     max-width: 500px;
+    font-family: sans-serif;
+    color: black;
+}
+.valueCellNonString {
+    display:table-cell;
+    border: gray solid 1px;
+    padding: 2px;
+    min-width: 70px;
+    max-width: 500px;
+    font-family: monospace;
+    color: blue;
 }
 .virtualValueCell {
     display: table-cell;
