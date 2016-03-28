@@ -5,9 +5,10 @@
  * either the key for this value or the top level entry. It should have a method
  * "updateValueElements" that will refresh the elements if they have been updated.
  */
-function ValueEntry(parent,data,isVirtual) {
+function ValueEntry(parent,data,isEditable,isVirtual) {
 	this.parent = parent;
     this.data = data;
+	this.isEditable = isEditable;
 	this.type = util.getObjectType(data); //"value", "object", "array"
 
 	this.indentLevel = parent.getIndentLevel() + 1;
@@ -286,10 +287,10 @@ ValueEntry.prototype.insertElement = function(key,value,index) {
     }
     
     if(this.type == "object") {
-        childKeyEntry = new KeyEntry(this,key,"key",value,false);     
+        childKeyEntry = new KeyEntry(this,key,"key",value,this.isEditable,false);     
     }
     else if(this.type == "array") {
-        childKeyEntry = new KeyEntry(this,index,"index",value,false);
+        childKeyEntry = new KeyEntry(this,index,"index",value,this.isEditable,false);
         
         //we also need to update all the keys larger than this one
         for(var newIndex = index+1; newIndex < this.childKeyEntries.length; newIndex++) {
@@ -661,23 +662,27 @@ ValueEntry.prototype.createChildKeyEntries = function(elementsData) {
     var childKeyEntry;
     if(this.type == "object") { 
         for(var key in elementsData) {
-            childKeyEntry = new KeyEntry(this,key,"key",elementsData[key],false);
+            childKeyEntry = new KeyEntry(this,key,"key",elementsData[key],this.isEditable,false);
             this.childKeyEntries.push(childKeyEntry);
         }
 
-        //add a dummy entry
-        childKeyEntry = new KeyEntry(this,"","key","",this,true,false);
-        this.virtualChildKey = childKeyEntry;
+        //add a dummy entry if this is editable
+		if(this.isEditable) {
+			childKeyEntry = new KeyEntry(this,"","key","",this.isEditable,true);
+			this.virtualChildKey = childKeyEntry;
+		}
     }
     else if(this.type == "array") {
         for(var keyIndex = 0; keyIndex < elementsData.length; keyIndex++) {
-            childKeyEntry = new KeyEntry(this,keyIndex,"index",elementsData[keyIndex],false);
+            childKeyEntry = new KeyEntry(this,keyIndex,"index",elementsData[keyIndex],this.isEditable,false);
             this.childKeyEntries.push(childKeyEntry);
         }
 
-        //add a dummy entry
-        childKeyEntry = new KeyEntry(this,keyIndex,"index","",true);
-        this.virtualChildKey = childKeyEntry;
+		//add a dummy entry if this is editable
+		if(this.isEditable) {
+			childKeyEntry = new KeyEntry(this,keyIndex,"index","",this.isEditable,true);
+			this.virtualChildKey = childKeyEntry;
+		}
     }
 
 }
@@ -834,7 +839,7 @@ ValueEntry.prototype.doExpandContract = function() {
 ValueEntry.prototype.createValueElement = function(data) {
 
     //create a simple element
-    this.valueEditObject = new EditField(data,EditField.FIELD_TYPE_VALUE,true,this.isVirtual);
+    this.valueEditObject = new EditField(data,EditField.FIELD_TYPE_VALUE,this.isEditable,this.isVirtual);
     var instance = this;
     
     //make the edit field editable if it is a key
@@ -870,12 +875,12 @@ ValueEntry.prototype.makeVirtualEntryReal = function(data) {
     var childKeyEntry;
     if(this.type == "object") { 
         //add a dummy entry
-        childKeyEntry = new KeyEntry(this,"","key","",this,true);
+        childKeyEntry = new KeyEntry(this,"","key","",this.isEditable,true);
         this.virtualChildKey = childKeyEntry;
     }
     else if(this.type == "array") {
         //add a dummy entry
-        childKeyEntry = new KeyEntry(this,this.childKeyEntries.length,"index","",true);
+        childKeyEntry = new KeyEntry(this,this.childKeyEntries.length,"index","",this.isEditable,true);
         this.virtualChildKey = childKeyEntry;
     }
     

@@ -1,8 +1,9 @@
 
-function JsonEditArea(divElement,initialValue) {
+function JsonEditArea(divElement,initialValue,isEditable) {
     this.body = divElement;
+	this.isEditable = isEditable;
     
-	this.valueEntry = new ValueEntry(this,initialValue);
+	this.valueEntry = new ValueEntry(this,initialValue,this.isEditable);
     this.valueEntry.setExpanded(true);
  
 	this.formatBody();
@@ -48,18 +49,20 @@ JsonEditArea.prototype.loadContextMenu = function() {
         
         contextMenu.addCallbackMenuItem("Get Value",function() {alert(JSON.stringify(valueEntry.getCurrentValue()));});
         
-        if(valueType == "value") {
-            contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.valueToObject()});
-            contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.valueToArray()});
-        }
-        else if(valueType == "object") {
-            contextMenu.addCallbackMenuItem("Convert To Value",function() {valueEntry.convertToValue()});
-            contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.objectToArray()});
-        }
-        else if(valueType == "array") {
-            contextMenu.addCallbackMenuItem("Convert To Value",function() {valueEntry.convertToValue()});
-            contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.arrayToObject()});
-        }
+		if(this.isEditable) {
+			if(valueType == "value") {
+				contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.valueToObject()});
+				contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.valueToArray()});
+			}
+			else if(valueType == "object") {
+				contextMenu.addCallbackMenuItem("Convert To Value",function() {valueEntry.convertToValue()});
+				contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.objectToArray()});
+			}
+			else if(valueType == "array") {
+				contextMenu.addCallbackMenuItem("Convert To Value",function() {valueEntry.convertToValue()});
+				contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.arrayToObject()});
+			}
+		}
         
         visicomp.visiui.Menu.showContextMenu(contextMenu,event);
     }

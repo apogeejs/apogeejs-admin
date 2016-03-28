@@ -1,8 +1,9 @@
 /** Constructor */
-function KeyEntry(parentValue,key,keyType,data,isVirtual) {
+function KeyEntry(parentValue,key,keyType,data,isEditable,isVirtual) {
 	this.key = key;
 	this.type = keyType; //EditField.FIELD_TYPE_KEY ro EditField.FIELD_TYPE_INDEX
 	this.data = data;
+	this.isEditable = isEditable;
 	this.indentLevel = parentValue.getIndentLevel() + 1;
     this.parentValue = parentValue;
     
@@ -82,7 +83,7 @@ KeyEntry.prototype.createBody = function(entryData) {
     this.createKeyElement();
     
     //create value entry
-	this.valueEntry = new ValueEntry(this,entryData,this.isVirtual);
+	this.valueEntry = new ValueEntry(this,entryData,this.isEditable,this.isVirtual);
 	
     this.formatBody();
 }
@@ -106,7 +107,7 @@ KeyEntry.prototype.formatBody = function() {
 * @private */
 KeyEntry.prototype.createKeyElement = function() {
     
-	var isEditable = (this.type === EditField.FIELD_TYPE_KEY);
+	var isEditable = (this.type === EditField.FIELD_TYPE_KEY) ? this.isEditable : false;
 	
     this.keyEditObject = new EditField(this.key,this.type,isEditable,this.isVirtual);
     
@@ -149,6 +150,9 @@ KeyEntry.prototype.loadContextMenu = function(parentKeyCount,keyIndex) {
     element.oncontextmenu = function(event) {
         event.preventDefault();
         event.stopPropagation();
+		
+		//for now no context menu if nto editable
+		if(!instance.isEditable) return;
         
         var contextMenu = new visicomp.visiui.MenuBody();
         
