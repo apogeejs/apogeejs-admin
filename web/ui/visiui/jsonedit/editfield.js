@@ -3,7 +3,7 @@
  * be returned to the previous value. Otherwise, the value of the field
  * fill be updated to match the edit.
  */
-function EditField(value,fieldType,isEditable,isVirtual) {
+visicomp.jsonedit.EditField = function (value,fieldType,isEditable,isVirtual) {
     this.value = value;
 	this.fieldType = fieldType;
 	this.isEditable = isEditable;
@@ -26,30 +26,30 @@ function EditField(value,fieldType,isEditable,isVirtual) {
     this.setValue(value);
 }
 
-EditField.FIELD_TYPE_VALUE = "value";
-EditField.FIELD_TYPE_KEY = "key";
-EditField.FIELD_TYPE_INDEX = "index";
+visicomp.jsonedit.EditField.FIELD_TYPE_VALUE = "value";
+visicomp.jsonedit.EditField.FIELD_TYPE_KEY = "key";
+visicomp.jsonedit.EditField.FIELD_TYPE_INDEX = "index";
 
-EditField.prototype.setOnEditCallback= function(onEdit) {
+visicomp.jsonedit.EditField.prototype.setOnEditCallback= function(onEdit) {
     return this.onEdit = onEdit;
 }
 
-EditField.prototype.setNavCallback = function(onNavigate) {
+visicomp.jsonedit.EditField.prototype.setNavCallback = function(onNavigate) {
     this.onNavigate = onNavigate;
 }
 
-EditField.prototype.setIsVirtual = function(isVirtual) {
+visicomp.jsonedit.EditField.prototype.setIsVirtual = function(isVirtual) {
     this.isVirtual = isVirtual;
 	this.setCssClass();
 }
 
-EditField.prototype.getValue= function() {
+visicomp.jsonedit.EditField.prototype.getValue= function() {
     return this.value;
 }
 
-EditField.prototype.setValue = function(value) {
+visicomp.jsonedit.EditField.prototype.setValue = function(value) {
     this.value = value;
-    this.isString = (util.getValueType(value) === "string");
+    this.isString = (visicomp.jsonedit.getValueType(value) === "string");
 	this.setCssClass();
 
 	//display value (with one exception - show "null" for null value
@@ -62,7 +62,7 @@ EditField.prototype.setValue = function(value) {
 }
 
 /** @private */
-EditField.prototype.setCssClass = function() {
+visicomp.jsonedit.EditField.prototype.setCssClass = function() {
 	var cssName = "cell_" + this.fieldType;
 	if(this.isVirtual) {
 		cssName += "_virtual";
@@ -79,18 +79,18 @@ EditField.prototype.setCssClass = function() {
 	this.element.className = cssName;
 }
 
-EditField.prototype.getElement = function() {
+visicomp.jsonedit.EditField.prototype.getElement = function() {
     return this.element;
 }
 
-EditField.prototype.onClick = function() {
+visicomp.jsonedit.EditField.prototype.onClick = function() {
     if((this.isEditable)&&(!this.editField)) {
         this.startEdit();
     }
  
 }
 
-EditField.prototype.startEdit = function() {
+visicomp.jsonedit.EditField.prototype.startEdit = function() {
     if(!this.editField) {
         this.editField = document.createElement("input");
 		this.editField.type = "text";
@@ -119,7 +119,7 @@ EditField.prototype.startEdit = function() {
 //console.log("--------------------");
 //console.log(this.editField.selectionStart + " " + this.editField.selectionEnd);
 
-EditField.prototype.endEdit = function() {
+visicomp.jsonedit.EditField.prototype.endEdit = function() {
     if(this.editField) {
         var newValue = this.editField.value;
         if(newValue != this.value) {
@@ -127,8 +127,8 @@ EditField.prototype.endEdit = function() {
             var editStringValue = this.editField.value;
             var editValue;
             if((this.isVirtual)||(!this.isString)) {
-                if(util.canBeConvertedToNonString(editStringValue)) {
-                    editValue = util.stringToNonString(editStringValue);
+                if(visicomp.jsonedit.canBeConvertedToNonString(editStringValue)) {
+                    editValue = visicomp.jsonedit.stringToNonString(editStringValue);
                 }
                 else {
                     editValue = editStringValue;
@@ -152,20 +152,20 @@ EditField.prototype.endEdit = function() {
     }
 }
 
-EditField.DIRECTION_NONE = 0;
-EditField.DIRECTION_UP = 1;
-EditField.DIRECTION_DOWN = 2;
-EditField.DIRECTION_RIGHT = 3;
-EditField.DIRECTION_LEFT = 4;
-EditField.DIRECTION_NEXT = 5;
-EditField.DIRECTION_PREV = 6;
+visicomp.jsonedit.EditField.DIRECTION_NONE = 0;
+visicomp.jsonedit.EditField.DIRECTION_UP = 1;
+visicomp.jsonedit.EditField.DIRECTION_DOWN = 2;
+visicomp.jsonedit.EditField.DIRECTION_RIGHT = 3;
+visicomp.jsonedit.EditField.DIRECTION_LEFT = 4;
+visicomp.jsonedit.EditField.DIRECTION_NEXT = 5;
+visicomp.jsonedit.EditField.DIRECTION_PREV = 6;
 
-EditField.ENTER_KEY = 13;
-EditField.TAB_KEY = 9;
-EditField.UP_KEY = 38;
-EditField.DOWN_KEY = 40;
-EditField.RIGHT_KEY = 39;
-EditField.LEFT_KEY = 37;
+visicomp.jsonedit.EditField.ENTER_KEY = 13;
+visicomp.jsonedit.EditField.TAB_KEY = 9;
+visicomp.jsonedit.EditField.UP_KEY = 38;
+visicomp.jsonedit.EditField.DOWN_KEY = 40;
+visicomp.jsonedit.EditField.RIGHT_KEY = 39;
+visicomp.jsonedit.EditField.LEFT_KEY = 37;
 
 //navigation rules:
 //- tab/enter and shift tab/enter go to the next and previous active field
@@ -182,43 +182,43 @@ EditField.LEFT_KEY = 37;
 
 
 
-EditField.prototype.onKeyDown = function(event) {
+visicomp.jsonedit.EditField.prototype.onKeyDown = function(event) {
     var doExit = false;
-    var direction = EditField.DIRECTION_NONE;
+    var direction = visicomp.jsonedit.EditField.DIRECTION_NONE;
     var cancelDefault = false;
-    if(event.keyCode == EditField.ENTER_KEY) {
+    if(event.keyCode == visicomp.jsonedit.EditField.ENTER_KEY) {
         //next or prev, based on shift key
         doExit = true;
-        direction = event.shiftKey ? EditField.DIRECTION_PREV : EditField.DIRECTION_NEXT;
+        direction = event.shiftKey ? visicomp.jsonedit.EditField.DIRECTION_PREV : visicomp.jsonedit.EditField.DIRECTION_NEXT;
         cancelDefault = true;
 	}
-    else if(event.keyCode == EditField.TAB_KEY) {
+    else if(event.keyCode == visicomp.jsonedit.EditField.TAB_KEY) {
         //next or prev, based on shift key
         doExit = true;
-        direction = event.shiftKey ? EditField.DIRECTION_PREV : EditField.DIRECTION_NEXT;
+        direction = event.shiftKey ? visicomp.jsonedit.EditField.DIRECTION_PREV : visicomp.jsonedit.EditField.DIRECTION_NEXT;
         cancelDefault = true;
     }
-    else if(event.keyCode == EditField.UP_KEY) {
+    else if(event.keyCode == visicomp.jsonedit.EditField.UP_KEY) {
         doExit = true;
-        direction = EditField.DIRECTION_UP;
+        direction = visicomp.jsonedit.EditField.DIRECTION_UP;
         cancelDefault = true;
     }
-    else if(event.keyCode == EditField.DOWN_KEY) {
+    else if(event.keyCode == visicomp.jsonedit.EditField.DOWN_KEY) {
         doExit = true;
-        direction = EditField.DIRECTION_DOWN;
+        direction = visicomp.jsonedit.EditField.DIRECTION_DOWN;
         cancelDefault = true;
     }
-    else if(event.keyCode == EditField.RIGHT_KEY) {
-        if(this.cursorAtEndOfEditField()) {
+    else if(event.keyCode == visicomp.jsonedit.EditField.RIGHT_KEY) {
+        if(this.cursorAtEndOfvisicomp.jsonedit.EditField()) {
             doExit = true;
-            direction = EditField.DIRECTION_RIGHT;
+            direction = visicomp.jsonedit.EditField.DIRECTION_RIGHT;
             cancelDefault = true;
         }
     }
-    else if(event.keyCode == EditField.LEFT_KEY) {
-        if(this.cursorAtStartOfEditField()) {
+    else if(event.keyCode == visicomp.jsonedit.EditField.LEFT_KEY) {
+        if(this.cursorAtStartOfvisicomp.jsonedit.EditField()) {
             doExit = true;
-            direction = EditField.DIRECTION_LEFT;
+            direction = visicomp.jsonedit.EditField.DIRECTION_LEFT;
             cancelDefault = true;
         }
     }
@@ -230,17 +230,17 @@ EditField.prototype.onKeyDown = function(event) {
     
     if(doExit) {
         this.endEdit();
-        if((direction != EditField.DIRECTION_NONE)&&(this.onNavigate)) {
+        if((direction != visicomp.jsonedit.EditField.DIRECTION_NONE)&&(this.onNavigate)) {
             this.onNavigate(direction);
         }
     }
 }
 
-EditField.prototype.cursorAtStartOfEditField = function() {
+visicomp.jsonedit.EditField.prototype.cursorAtStartOfvisicomp.jsonedit.EditField = function() {
     return ((this.editField.selectionStart == 0)&&(this.editField.selectionEnd == 0));
 }
 
-EditField.prototype.cursorAtEndOfEditField = function() {
+visicomp.jsonedit.EditField.prototype.cursorAtEndOfvisicomp.jsonedit.EditField = function() {
     var length = String(this.editField.value).length;
     return ((this.editField.selectionStart == length)&&(this.editField.selectionEnd == length));
 }

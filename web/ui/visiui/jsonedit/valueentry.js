@@ -5,11 +5,11 @@
  * either the key for this value or the top level entry. It should have a method
  * "updateValueElements" that will refresh the elements if they have been updated.
  */
-function ValueEntry(parent,data,isEditable,isVirtual) {
+visicomp.jsonedit.ValueEntry = function(parent,data,isEditable,isVirtual) {
 	this.parent = parent;
     this.data = data;
 	this.isEditable = isEditable;
-	this.type = util.getObjectType(data); //"value", "object", "array"
+	this.type = visicomp.jsonedit.getObjectType(data); //"value", "object", "array"
 
 	this.indentLevel = parent.getIndentLevel() + 1;
     
@@ -72,11 +72,11 @@ function ValueEntry(parent,data,isEditable,isVirtual) {
 // Accessors
 //============================
 
-ValueEntry.prototype.getInitialValue = function() {
+visicomp.jsonedit.ValueEntry.prototype.getInitialValue = function() {
     return this.data;
 }
 
-ValueEntry.prototype.getCurrentValue = function() {
+visicomp.jsonedit.ValueEntry.prototype.getCurrentValue = function() {
 	var value;
     var i;
     var keyEntry;
@@ -101,28 +101,28 @@ ValueEntry.prototype.getCurrentValue = function() {
     return value;
 }
 
-ValueEntry.prototype.getType = function() {
+visicomp.jsonedit.ValueEntry.prototype.getType = function() {
 	return this.type;
 }
 
-ValueEntry.prototype.setExpanded = function(isExpanded) {
+visicomp.jsonedit.ValueEntry.prototype.setExpanded = function(isExpanded) {
 	this.isExpanded = isExpanded;
     this.doExpandContract();
 }
 
-ValueEntry.prototype.getElementList = function() {
+visicomp.jsonedit.ValueEntry.prototype.getElementList = function() {
 	return this.elementList;
 }
 
-ValueEntry.prototype.getValueEditObject = function() {
+visicomp.jsonedit.ValueEntry.prototype.getValueEditObject = function() {
 	return this.valueEditObject;
 }
 
-ValueEntry.prototype.getIndentLevel = function() {
+visicomp.jsonedit.ValueEntry.prototype.getIndentLevel = function() {
 	return this.indentLevel;
 }
 
-ValueEntry.prototype.setIsVirtual = function(isVirtual) {
+visicomp.jsonedit.ValueEntry.prototype.setIsVirtual = function(isVirtual) {
 	this.isVirtual = isVirtual;
 	this.valueEditObject.setIsVirtual(isVirtual);
 }
@@ -135,7 +135,7 @@ ValueEntry.prototype.setIsVirtual = function(isVirtual) {
 
 /** This navigates to a next cell on completion of editing. 
  * @private */
-ValueEntry.prototype.navigateCells = function(direction) {
+visicomp.jsonedit.ValueEntry.prototype.navigateCells = function(direction) {
     var parentValue = this.parent.getParentValueObject();
     if(parentValue) {
         parentValue.navigateChildren(this.parent,false,direction);
@@ -145,7 +145,7 @@ ValueEntry.prototype.navigateCells = function(direction) {
 /** This method determines the place to navigation to, and starts editing there
  * if the re is a valid location. 
  * @private */
-ValueEntry.prototype.navigateChildren = function(keyEntry,originIsKey,direction) {
+visicomp.jsonedit.ValueEntry.prototype.navigateChildren = function(keyEntry,originIsKey,direction) {
     
     //gerate the nav fruls
     var destIsKey = false;
@@ -153,55 +153,55 @@ ValueEntry.prototype.navigateChildren = function(keyEntry,originIsKey,direction)
     var doMove;
     
     if(this.type == "array") {
-        if((direction == EditField.DIRECTION_NEXT)||(direction == EditField.DIRECTION_DOWN)) {
+        if((direction == visicomp.jsonedit.EditField.DIRECTION_NEXT)||(direction == visicomp.jsonedit.EditField.DIRECTION_DOWN)) {
             doMove = !originIsKey;
             if(doMove) {
                 destIsKey = false;
                 deltaIndex = 1;
             }
         }
-        else if((direction == EditField.DIRECTION_PREV)||(direction == EditField.DIRECTION_UP)) {
+        else if((direction == visicomp.jsonedit.EditField.DIRECTION_PREV)||(direction == visicomp.jsonedit.EditField.DIRECTION_UP)) {
             doMove = !originIsKey;
             if(doMove) {
                 destIsKey = false;
                 deltaIndex = -1;
             }
         }
-        else if((direction == EditField.DIRECTION_RIGHT)||(direction == EditField.DIRECTION_LEFT)) {
+        else if((direction == visicomp.jsonedit.EditField.DIRECTION_RIGHT)||(direction == visicomp.jsonedit.EditField.DIRECTION_LEFT)) {
             doMove = false;
         }
     }
     else if(this.type == "object") {
-        if(direction == EditField.DIRECTION_NEXT) {
+        if(direction == visicomp.jsonedit.EditField.DIRECTION_NEXT) {
             doMove = true;
             destIsKey = !originIsKey;
             deltaIndex = originIsKey ? 0 : 1;  
         }
-        else if(direction == EditField.DIRECTION_PREV) {
+        else if(direction == visicomp.jsonedit.EditField.DIRECTION_PREV) {
             doMove = true;
             destIsKey = !originIsKey;
             deltaIndex = originIsKey ? -1 : 0; 
         }
-        else if(direction == EditField.DIRECTION_RIGHT) {
+        else if(direction == visicomp.jsonedit.EditField.DIRECTION_RIGHT) {
             doMove = originIsKey;
             if(doMove) {
                 destIsKey = false;
                 deltaIndex = 0; 
             }
         }
-        else if(direction == EditField.DIRECTION_LEFT) {
+        else if(direction == visicomp.jsonedit.EditField.DIRECTION_LEFT) {
             doMove = !originIsKey;
             if(doMove) {
                 destIsKey = true;
                 deltaIndex = 0; 
             }
         }
-        else if(direction == EditField.DIRECTION_UP) {
+        else if(direction == visicomp.jsonedit.EditField.DIRECTION_UP) {
             doMove = true;
             destIsKey = originIsKey;
             deltaIndex = -1; 
         }
-        else if(direction == EditField.DIRECTION_DOWN) {
+        else if(direction == visicomp.jsonedit.EditField.DIRECTION_DOWN) {
             doMove = true;
             destIsKey = originIsKey;
             deltaIndex = 1; 
@@ -266,7 +266,7 @@ ValueEntry.prototype.navigateChildren = function(keyEntry,originIsKey,direction)
 /** This method inserts an element at the given index. If the index is left blank
  * the entry is inserted at the end of the list. The value of key is ignored if
  * the entry is an array. */
-ValueEntry.prototype.insertElement = function(key,value,index) {
+visicomp.jsonedit.ValueEntry.prototype.insertElement = function(key,value,index) {
 
     var childKeyEntry;
     
@@ -287,10 +287,10 @@ ValueEntry.prototype.insertElement = function(key,value,index) {
     }
     
     if(this.type == "object") {
-        childKeyEntry = new KeyEntry(this,key,"key",value,this.isEditable,false);     
+        childKeyEntry = new visicomp.jsonedit.KeyEntry(this,key,"key",value,this.isEditable,false);     
     }
     else if(this.type == "array") {
-        childKeyEntry = new KeyEntry(this,index,"index",value,this.isEditable,false);
+        childKeyEntry = new visicomp.jsonedit.KeyEntry(this,index,"index",value,this.isEditable,false);
         
         //we also need to update all the keys larger than this one
         for(var newIndex = index+1; newIndex < this.childKeyEntries.length; newIndex++) {
@@ -313,7 +313,7 @@ ValueEntry.prototype.insertElement = function(key,value,index) {
 }
 
 /** this method swaps the given key with the next key in the list. */
-ValueEntry.prototype.moveChildKeyToNextIndex = function(index) {
+visicomp.jsonedit.ValueEntry.prototype.moveChildKeyToNextIndex = function(index) {
     if((index < 0)||(index >= this.childKeyEntries.length -1)) {
         //illegal index
         alert("Can not make the specified key move");
@@ -344,7 +344,7 @@ ValueEntry.prototype.moveChildKeyToNextIndex = function(index) {
 /** This method inserts an element at the given index. If the index is left blank
  * the entry is inserted at the end of the list. The value of key is ignored if
  * the entry is an array. */
-ValueEntry.prototype.deleteChildElement = function(keyEntry) {
+visicomp.jsonedit.ValueEntry.prototype.deleteChildElement = function(keyEntry) {
     
     var index = this.childKeyEntries.indexOf(keyEntry);
     if(index == -1) {
@@ -376,10 +376,10 @@ ValueEntry.prototype.deleteChildElement = function(keyEntry) {
 //------------------------------
 
 
-ValueEntry.prototype.convertibleToNumber = function() {
+visicomp.jsonedit.ValueEntry.prototype.convertibleToNumber = function() {
     if(this.type === "value") {
         var currentValue = this.getCurrentValue();
-        var valueType = util.getValueType(currentValue);
+        var valueType = visicomp.jsonedit.getValueType(currentValue);
         if(valueType === "string") {
             return isFinite(currentValue);
         }
@@ -387,46 +387,46 @@ ValueEntry.prototype.convertibleToNumber = function() {
     return false;
 }
 
-ValueEntry.prototype.convertibleToBool = function() {
+visicomp.jsonedit.ValueEntry.prototype.convertibleToBool = function() {
     if(this.type === "value") {
         var currentValue = this.getCurrentValue();
-        var valueType = util.getValueType(currentValue);
+        var valueType = visicomp.jsonedit.getValueType(currentValue);
         if(valueType === "string") {
-            return util.isBoolString(currentValue);
+            return visicomp.jsonedit.isBoolString(currentValue);
         }
     }
     return false;
 }
 
-ValueEntry.prototype.convertibleToNull = function() {
+visicomp.jsonedit.ValueEntry.prototype.convertibleToNull = function() {
     if(this.type === "value") {
         var currentValue = this.getCurrentValue();
-        var valueType = util.getValueType(currentValue);
+        var valueType = visicomp.jsonedit.getValueType(currentValue);
         if(valueType === "string") {
-            return util.isNullString(currentValue);
+            return visicomp.jsonedit.isNullString(currentValue);
         }
     }
     return false;
 }
 
 //this converts a string to a number or boolean
-ValueEntry.prototype.valueToNonString = function() {
+visicomp.jsonedit.ValueEntry.prototype.valueToNonString = function() {
     var currentValue = this.getCurrentValue();
     //change the data in this object
-    var newData = util.stringToNonString(currentValue);
+    var newData = visicomp.jsonedit.stringToNonString(currentValue);
     this.valueEditObject.setValue(newData);
 }
 
-ValueEntry.prototype.convertibleToString = function() {
+visicomp.jsonedit.ValueEntry.prototype.convertibleToString = function() {
     if(this.type === "value") {
         var currentValue = this.getCurrentValue();
-        var valueType = util.getValueType(currentValue);
+        var valueType = visicomp.jsonedit.getValueType(currentValue);
         return (valueType !== "string");
     }
     return false;
 }
 
-ValueEntry.prototype.valueToString = function() {
+visicomp.jsonedit.ValueEntry.prototype.valueToString = function() {
     var currentValue = this.getCurrentValue();
     //change the data in this object
     var newData = String(currentValue);
@@ -434,7 +434,7 @@ ValueEntry.prototype.valueToString = function() {
 }
 
 
-ValueEntry.prototype.valueToArray = function() {
+visicomp.jsonedit.ValueEntry.prototype.valueToArray = function() {
     if(!this.type == "value") {
         throw "Type value expected. Found " + this.type;
     }
@@ -469,7 +469,7 @@ ValueEntry.prototype.valueToArray = function() {
     }
 }
 
-ValueEntry.prototype.valueToObject = function() {
+visicomp.jsonedit.ValueEntry.prototype.valueToObject = function() {
     if(!this.type == "value") {
         throw "Type value expected. Found " + this.type;
     }
@@ -504,7 +504,7 @@ ValueEntry.prototype.valueToObject = function() {
     }
 }
 
-ValueEntry.prototype.objectToArray = function() {
+visicomp.jsonedit.ValueEntry.prototype.objectToArray = function() {
     if(!this.type == "object") {
         throw "Type object expected. Found " + this.type;
     }
@@ -549,7 +549,7 @@ ValueEntry.prototype.objectToArray = function() {
     }
 }
 
-ValueEntry.prototype.arrayToObject = function() {
+visicomp.jsonedit.ValueEntry.prototype.arrayToObject = function() {
     if(!this.type == "array") {
         throw "Type array expected. Found " + this.type;
     }
@@ -591,7 +591,7 @@ ValueEntry.prototype.arrayToObject = function() {
     }
 }
 
-ValueEntry.prototype.convertToValue = function() {
+visicomp.jsonedit.ValueEntry.prototype.convertToValue = function() {
     if(this.type == "value") {
         return;
     }
@@ -630,7 +630,7 @@ ValueEntry.prototype.convertToValue = function() {
 
 /** This method constructs the contents for a value entry
  * @private */
-ValueEntry.prototype.createValueEntry = function(elementsData) {
+visicomp.jsonedit.ValueEntry.prototype.createValueEntry = function(elementsData) {
     if(this.type != "value") return;
     
     this.valueEditObject = null;
@@ -649,7 +649,7 @@ ValueEntry.prototype.createValueEntry = function(elementsData) {
 
 /** This method constructs the contents for an array or object
  * @private */
-ValueEntry.prototype.createChildKeyEntries = function(elementsData) {
+visicomp.jsonedit.ValueEntry.prototype.createChildKeyEntries = function(elementsData) {
     if(this.type == "value") return;
     
 	//initialize data elements
@@ -662,25 +662,25 @@ ValueEntry.prototype.createChildKeyEntries = function(elementsData) {
     var childKeyEntry;
     if(this.type == "object") { 
         for(var key in elementsData) {
-            childKeyEntry = new KeyEntry(this,key,"key",elementsData[key],this.isEditable,false);
+            childKeyEntry = new visicomp.jsonedit.KeyEntry(this,key,"key",elementsData[key],this.isEditable,false);
             this.childKeyEntries.push(childKeyEntry);
         }
 
         //add a dummy entry if this is editable
 		if(this.isEditable) {
-			childKeyEntry = new KeyEntry(this,"","key","",this.isEditable,true);
+			childKeyEntry = new visicomp.jsonedit.KeyEntry(this,"","key","",this.isEditable,true);
 			this.virtualChildKey = childKeyEntry;
 		}
     }
     else if(this.type == "array") {
         for(var keyIndex = 0; keyIndex < elementsData.length; keyIndex++) {
-            childKeyEntry = new KeyEntry(this,keyIndex,"index",elementsData[keyIndex],this.isEditable,false);
+            childKeyEntry = new visicomp.jsonedit.KeyEntry(this,keyIndex,"index",elementsData[keyIndex],this.isEditable,false);
             this.childKeyEntries.push(childKeyEntry);
         }
 
 		//add a dummy entry if this is editable
 		if(this.isEditable) {
-			childKeyEntry = new KeyEntry(this,keyIndex,"index","",this.isEditable,true);
+			childKeyEntry = new visicomp.jsonedit.KeyEntry(this,keyIndex,"index","",this.isEditable,true);
 			this.virtualChildKey = childKeyEntry;
 		}
     }
@@ -689,7 +689,7 @@ ValueEntry.prototype.createChildKeyEntries = function(elementsData) {
 
 /** This create the dom element list for the child key entries 
 * @private */
-ValueEntry.prototype.createElementList = function() {
+visicomp.jsonedit.ValueEntry.prototype.createElementList = function() {
 
     //initialize elements
 	this.listDiv = document.createElement("div");
@@ -700,7 +700,7 @@ ValueEntry.prototype.createElementList = function() {
     var startDelimiter;
     var endDelimiter1;
     var endDelimiter2;
-    var endIndent = util.createIndentElement(this.indentLevel);
+    var endIndent = visicomp.jsonedit.createIndentElement(this.indentLevel);
 
 	//list element
 	var childKeyEntry;
@@ -713,18 +713,18 @@ ValueEntry.prototype.createElementList = function() {
 	}
 
     //buttons
-    var expandButton = util.createExpandButton(this);
-    var contractButton = util.createContractButton(this);
+    var expandButton = visicomp.jsonedit.createExpandButton(this);
+    var contractButton = visicomp.jsonedit.createContractButton(this);
 
     if(this.type == "object") { 
-        startDelimiter = util.createObjectDelimiter("{");
-        endDelimiter1 = util.createObjectDelimiter("}");
-        endDelimiter2 = util.createObjectDelimiter("}");
+        startDelimiter = visicomp.jsonedit.createObjectDelimiter("{");
+        endDelimiter1 = visicomp.jsonedit.createObjectDelimiter("}");
+        endDelimiter2 = visicomp.jsonedit.createObjectDelimiter("}");
     }
     else if(this.type == "array") {
-        startDelimiter = util.createObjectDelimiter("[");
-        endDelimiter1 = util.createObjectDelimiter("]");
-        endDelimiter2 = util.createObjectDelimiter("]");
+        startDelimiter = visicomp.jsonedit.createObjectDelimiter("[");
+        endDelimiter1 = visicomp.jsonedit.createObjectDelimiter("]");
+        endDelimiter2 = visicomp.jsonedit.createObjectDelimiter("]");
     }
 
     //save the elements
@@ -761,7 +761,7 @@ ValueEntry.prototype.createElementList = function() {
 /** This method updates the keys with the context menu and makes
  * sure the keys are corect for array entries. 
  * @private */
-ValueEntry.prototype.updateChildKeys = function() {
+visicomp.jsonedit.ValueEntry.prototype.updateChildKeys = function() {
     var numberKeys;
     var keyIndex;
     
@@ -815,7 +815,7 @@ ValueEntry.prototype.updateChildKeys = function() {
 }
 
 
-ValueEntry.prototype.doExpandContract = function() {
+visicomp.jsonedit.ValueEntry.prototype.doExpandContract = function() {
 	if((!this.expandedList)||(!this.contractedList)) return;
 	
 	var onList = this.isExpanded ? this.expandedList : this.contractedList;
@@ -836,10 +836,10 @@ ValueEntry.prototype.doExpandContract = function() {
 
 /** This creates the edit element for the entry. Only needed on type "value" 
 * @private */
-ValueEntry.prototype.createValueElement = function(data) {
+visicomp.jsonedit.ValueEntry.prototype.createValueElement = function(data) {
 
     //create a simple element
-    this.valueEditObject = new EditField(data,EditField.FIELD_TYPE_VALUE,this.isEditable,this.isVirtual);
+    this.valueEditObject = new visicomp.jsonedit.EditField(data,visicomp.jsonedit.EditField.FIELD_TYPE_VALUE,this.isEditable,this.isVirtual);
     var instance = this;
     
     //make the edit field editable if it is a key
@@ -867,7 +867,7 @@ ValueEntry.prototype.createValueElement = function(data) {
 
 
 /** This wraps the list elements into the proper format. */
-ValueEntry.prototype.makeVirtualEntryReal = function(data) {
+visicomp.jsonedit.ValueEntry.prototype.makeVirtualEntryReal = function(data) {
     var newRealEntry = this.virtualChildKey
     newRealEntry.setIsVirtual(false);
     this.childKeyEntries.push(newRealEntry);
@@ -875,12 +875,12 @@ ValueEntry.prototype.makeVirtualEntryReal = function(data) {
     var childKeyEntry;
     if(this.type == "object") { 
         //add a dummy entry
-        childKeyEntry = new KeyEntry(this,"","key","",this.isEditable,true);
+        childKeyEntry = new visicomp.jsonedit.KeyEntry(this,"","key","",this.isEditable,true);
         this.virtualChildKey = childKeyEntry;
     }
     else if(this.type == "array") {
         //add a dummy entry
-        childKeyEntry = new KeyEntry(this,this.childKeyEntries.length,"index","",this.isEditable,true);
+        childKeyEntry = new visicomp.jsonedit.KeyEntry(this,this.childKeyEntries.length,"index","",this.isEditable,true);
         this.virtualChildKey = childKeyEntry;
     }
     

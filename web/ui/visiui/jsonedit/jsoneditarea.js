@@ -1,31 +1,31 @@
 
-function JsonEditArea(divElement,initialValue,isEditable) {
+visicomp.jsonedit.JsonEditArea = function(divElement,initialValue,isEditable) {
     this.body = divElement;
 	this.isEditable = isEditable;
     
-	this.valueEntry = new ValueEntry(this,initialValue,this.isEditable);
+	this.valueEntry = new visicomp.jsonedit.ValueEntry(this,initialValue,this.isEditable);
     this.valueEntry.setExpanded(true);
  
 	this.formatBody();
 }
 
-JsonEditArea.prototype.getCurrentValue = function() {
+visicomp.jsonedit.JsonEditArea.prototype.getCurrentValue = function() {
 	return this.valueEntry.getCurrentValue();
 }
 
-JsonEditArea.prototype.getElement = function() {
+visicomp.jsonedit.JsonEditArea.prototype.getElement = function() {
 	return this.body;
 }
 
-JsonEditArea.prototype.getParentValueObject = function() {
+visicomp.jsonedit.JsonEditArea.prototype.getParentValueObject = function() {
 	return undefined;
 }
 
-JsonEditArea.prototype.getIndentLevel = function() {
+visicomp.jsonedit.JsonEditArea.prototype.getIndentLevel = function() {
 	return 0;
 }
 
-JsonEditArea.prototype.formatBody = function() {
+visicomp.jsonedit.JsonEditArea.prototype.formatBody = function() {
     var elementList = this.valueEntry.getElementList();
     for(var i = 0; i < elementList.length; i++) {
         this.body.appendChild(elementList[i]);
@@ -35,7 +35,7 @@ JsonEditArea.prototype.formatBody = function() {
 }
 
 
-JsonEditArea.prototype.loadContextMenu = function() {
+visicomp.jsonedit.JsonEditArea.prototype.loadContextMenu = function() {
 
     var instance = this;
     var element = this.body;
@@ -69,7 +69,7 @@ JsonEditArea.prototype.loadContextMenu = function() {
   
 }
 
-JsonEditArea.prototype.updateValueElements = function() {
+visicomp.jsonedit.JsonEditArea.prototype.updateValueElements = function() {
     //remove all from element
 	visicomp.core.util.removeAllChildren(this.body);
     //recreate

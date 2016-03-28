@@ -1,7 +1,7 @@
 /** Constructor */
-function KeyEntry(parentValue,key,keyType,data,isEditable,isVirtual) {
+visicomp.jsonedit.KeyEntry = function(parentValue,key,keyType,data,isEditable,isVirtual) {
 	this.key = key;
-	this.type = keyType; //EditField.FIELD_TYPE_KEY ro EditField.FIELD_TYPE_INDEX
+	this.type = keyType; //visicomp.jsonedit.EditField.FIELD_TYPE_KEY ro visicomp.jsonedit.EditField.FIELD_TYPE_INDEX
 	this.data = data;
 	this.isEditable = isEditable;
 	this.indentLevel = parentValue.getIndentLevel() + 1;
@@ -23,43 +23,43 @@ function KeyEntry(parentValue,key,keyType,data,isEditable,isVirtual) {
 // Accessors
 //=======================
 
-KeyEntry.prototype.setKey = function(key) {
+visicomp.jsonedit.KeyEntry.prototype.setKey = function(key) {
 	this.key = key;
     this.keyEditObject.setValue(key);
 }
 
-KeyEntry.prototype.getInitialKey = function() {
+visicomp.jsonedit.KeyEntry.prototype.getInitialKey = function() {
 	return this.key;
 }
 
-KeyEntry.prototype.getCurrentKey = function() {
+visicomp.jsonedit.KeyEntry.prototype.getCurrentKey = function() {
 	return this.keyEditObject.getValue();
 }
 
-KeyEntry.prototype.getCurrentValue = function() {
+visicomp.jsonedit.KeyEntry.prototype.getCurrentValue = function() {
 	return this.valueEntry.getCurrentValue();
 }
 
-KeyEntry.prototype.getElement = function() {
+visicomp.jsonedit.KeyEntry.prototype.getElement = function() {
 	return this.body;
 }
 
-KeyEntry.prototype.getParentValueObject = function() {
+visicomp.jsonedit.KeyEntry.prototype.getParentValueObject = function() {
 	return this.parentValue;
 }
 
-KeyEntry.prototype.getIndentLevel = function() {
+visicomp.jsonedit.KeyEntry.prototype.getIndentLevel = function() {
 	return this.indentLevel;
 }
 
-KeyEntry.prototype.setIsVirtual = function(isVirtual) {
+visicomp.jsonedit.KeyEntry.prototype.setIsVirtual = function(isVirtual) {
 	this.isVirtual = isVirtual;
 	this.keyEditObject.setIsVirtual(isVirtual);
 
     this.valueEntry.setIsVirtual(isVirtual);
 }
 
-KeyEntry.prototype.updateValueElements = function() {
+visicomp.jsonedit.KeyEntry.prototype.updateValueElements = function() {
     //remove all from element
 	visicomp.core.util.removeAllChildren(this.body);
     //recreate
@@ -72,7 +72,7 @@ KeyEntry.prototype.updateValueElements = function() {
 
 /** This method created the key entry, clearing the old one if applicable.
  * @private */
-KeyEntry.prototype.createBody = function(entryData) {
+visicomp.jsonedit.KeyEntry.prototype.createBody = function(entryData) {
 	
 	//create main row
 	//create row div
@@ -83,15 +83,15 @@ KeyEntry.prototype.createBody = function(entryData) {
     this.createKeyElement();
     
     //create value entry
-	this.valueEntry = new ValueEntry(this,entryData,this.isEditable,this.isVirtual);
+	this.valueEntry = new visicomp.jsonedit.ValueEntry(this,entryData,this.isEditable,this.isVirtual);
 	
     this.formatBody();
 }
 
 /** @private */
-KeyEntry.prototype.formatBody = function() {
+visicomp.jsonedit.KeyEntry.prototype.formatBody = function() {
 	//add indent
-	this.body.appendChild(util.createIndentElement(this.indentLevel));
+	this.body.appendChild(visicomp.jsonedit.createIndentElement(this.indentLevel));
 	
 	//add key
 	this.body.appendChild(this.keyEditObject.getElement());
@@ -105,11 +105,11 @@ KeyEntry.prototype.formatBody = function() {
 
 /** This wraps the list elements into the proper format. 
 * @private */
-KeyEntry.prototype.createKeyElement = function() {
+visicomp.jsonedit.KeyEntry.prototype.createKeyElement = function() {
     
-	var isEditable = (this.type === EditField.FIELD_TYPE_KEY) ? this.isEditable : false;
+	var isEditable = (this.type === visicomp.jsonedit.EditField.FIELD_TYPE_KEY) ? this.isEditable : false;
 	
-    this.keyEditObject = new EditField(this.key,this.type,isEditable,this.isVirtual);
+    this.keyEditObject = new visicomp.jsonedit.EditField(this.key,this.type,isEditable,this.isVirtual);
     
     //make the edit field editable if it is a key
     if(isEditable) {
@@ -130,7 +130,7 @@ KeyEntry.prototype.createKeyElement = function() {
 }
 
 //navigation rules
-KeyEntry.prototype.navigateCells = function(direction) {
+visicomp.jsonedit.KeyEntry.prototype.navigateCells = function(direction) {
     if(this.parentValue) {
         this.parentValue.navigateChildren(this,true,direction);
     }
@@ -138,7 +138,7 @@ KeyEntry.prototype.navigateCells = function(direction) {
 
 /** This loads the context menu for the key. It should be update if
  *the key index changes. */
-KeyEntry.prototype.loadContextMenu = function(parentKeyCount,keyIndex) {
+visicomp.jsonedit.KeyEntry.prototype.loadContextMenu = function(parentKeyCount,keyIndex) {
 
     var instance = this;
     var parentValue = this.parentValue; 
@@ -219,10 +219,10 @@ KeyEntry.prototype.loadContextMenu = function(parentKeyCount,keyIndex) {
 // Actions
 //======================================
 
-KeyEntry.prototype.convertToKeyType = function(key) {
-    if(this.type == EditField.FIELD_TYPE_KEY) return;
+visicomp.jsonedit.KeyEntry.prototype.convertToKeyType = function(key) {
+    if(this.type == visicomp.jsonedit.EditField.FIELD_TYPE_KEY) return;
     
-    this.type = EditField.FIELD_TYPE_KEY;
+    this.type = visicomp.jsonedit.EditField.FIELD_TYPE_KEY;
     this.key = String(key);
     
     //create the key
@@ -233,10 +233,10 @@ KeyEntry.prototype.convertToKeyType = function(key) {
     this.formatBody();
 }
 
-KeyEntry.prototype.convertToIndexType = function(index) {
-    if(this.type == EditField.FIELD_TYPE_INDEX) return;
+visicomp.jsonedit.KeyEntry.prototype.convertToIndexType = function(index) {
+    if(this.type == visicomp.jsonedit.EditField.FIELD_TYPE_INDEX) return;
     
-    this.type = EditField.FIELD_TYPE_INDEX;
+    this.type = visicomp.jsonedit.EditField.FIELD_TYPE_INDEX;
     this.key = index;
     
     //create the key
