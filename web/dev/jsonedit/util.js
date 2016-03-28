@@ -43,9 +43,13 @@ util.isBoolString = function(stringValue) {
     return (stringValue === "false" || stringValue === "true");
 }
 
+util.isNullString = function(stringValue) {
+    return (stringValue === "null");
+}
+
 //This method retuns true if the stringToNonString method will successfully convet the object.
 util.canBeConvertedToNonString = function(stringValue) {
-	return(isFinite(stringValue) || util.isBoolString(stringValue));
+	return(isFinite(stringValue) || util.isBoolString(stringValue) || util.isNullString(stringValue) );
 }
 
 //This method coverts a string value to non-string value (currently a number or boolean). 
@@ -71,47 +75,7 @@ util.createIndentElement = function(indentLevel) {
 	cell.style.width = (PIXELS_PER_INDENT * indentLevel) + "px";
 	return cell;
 }
-util.createKeyElement = function(key,type,isVirtual) {
-    var className;
-    if(type == "key") {  
-        if(isVirtual) {
-            className = "virtualKeyCell";
-        }
-        else {
-            className = "keyCell";
-        }
-        
-        //create an editable key entry
-        return new EditField(key,className,className);
-    }
-    else if(type == "index") { 
-        if(isVirtual) {
-            className = "virtualIndexCell";
-        }
-        else {
-            className = "indexCell";
-        }
-        
-        //create a non editable entry
-        return new FixedField(key,className);   
-    }
-    else {
-        throw "Invalid key type.";
-    }
-}
-util.createValueElement = function(value,isVirtual) {
-	var stringClassName;
-    var nonStringClassName;
-    if(isVirtual) {
-        stringClassName = "virtualValueCell";
-        nonStringClassName = "virtualValueCell";
-    }
-    else {
-        stringClassName = "valueCellString";
-        nonStringClassName = "valueCellNonString";
-    }
-    return new EditField(value,stringClassName,nonStringClassName);
-}
+
 util.createObjectDelimiter = function(delimiter) {
 	var cell = document.createElement("div");
 	cell.className = "objectDelimCell";

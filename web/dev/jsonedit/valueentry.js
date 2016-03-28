@@ -123,14 +123,7 @@ ValueEntry.prototype.getIndentLevel = function() {
 
 ValueEntry.prototype.setIsVirtual = function(isVirtual) {
 	this.isVirtual = isVirtual;
-    if(this.valueEditObject) {
-        if(isVirtual) {
-            this.valueEditObject.setClassName("virtualValueCell");
-        }
-        else {
-            this.valueEditObject.setClassName("valueCellString","valueCellNonString");
-        }
-    }
+	this.valueEditObject.setIsVirtual(isVirtual);
 }
 
 
@@ -399,6 +392,17 @@ ValueEntry.prototype.convertibleToBool = function() {
         var valueType = util.getValueType(currentValue);
         if(valueType === "string") {
             return util.isBoolString(currentValue);
+        }
+    }
+    return false;
+}
+
+ValueEntry.prototype.convertibleToNull = function() {
+    if(this.type === "value") {
+        var currentValue = this.getCurrentValue();
+        var valueType = util.getValueType(currentValue);
+        if(valueType === "string") {
+            return util.isNullString(currentValue);
         }
     }
     return false;
@@ -830,7 +834,7 @@ ValueEntry.prototype.doExpandContract = function() {
 ValueEntry.prototype.createValueElement = function(data) {
 
     //create a simple element
-    this.valueEditObject = util.createValueElement(data,this.isVirtual);
+    this.valueEditObject = new EditField(data,EditField.FIELD_TYPE_VALUE,true,this.isVirtual);
     var instance = this;
     
     //make the edit field editable if it is a key

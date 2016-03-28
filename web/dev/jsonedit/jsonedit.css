@@ -4,7 +4,7 @@
 .indentCell {
     display:table-cell;
 }
-.keyCell {
+.cell_key {
     display:table-cell;
     border: gray solid 1px;
     padding: 2px;
@@ -12,14 +12,14 @@
     background: lightgray;
     font-weight:bold;
 }
-.indexCell {
+.cell_index {
     display:table-cell;
     border: gray solid 1px;
     padding: 2px;
     background: white;
     font-style: italic;
 }
-.virtualKeyCell {
+.cell_key_virtual {
     display:table-cell;
     border: lightgray solid 1px;
     padding: 2px;
@@ -27,14 +27,14 @@
     background: white;
     font-weight:bold;
 }
-.virtualIndexCell {
+.cell_index_virtual {
     display:table-cell;
     border: lightgray solid 1px;
     padding: 2px;
     background: white;
     font-style: italic;
 }
-.valueCellString {
+.cell_value_string {
     display:table-cell;
     border: gray solid 1px;
     padding: 2px;
@@ -43,7 +43,7 @@
     font-family: sans-serif;
     color: black;
 }
-.valueCellNonString {
+.cell_value_nonstring {
     display:table-cell;
     border: gray solid 1px;
     padding: 2px;
@@ -52,7 +52,7 @@
     font-family: monospace;
     color: blue;
 }
-.virtualValueCell {
+.cell_value_virtual {
     display: table-cell;
     border: lightgray solid 1px;
     padding: 2px;

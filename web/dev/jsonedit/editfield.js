@@ -3,11 +3,13 @@
  * be returned to the previous value. Otherwise, the value of the field
  * fill be updated to match the edit.
  */
-function EditField(value,stringCssClass,nonStringCssClass) {
+function EditField(value,fieldType,isEditable,isVirtual) {
     this.value = value;
+	this.fieldType = fieldType;
+	this.isEditable = isEditable;
+	this.isVirtual = isVirtual;
+	
     this.element = document.createElement("div");
-    this.element.className = stringCssClass;
-    this.element.innerHTML = value;
        
     this.onEdit = null;
     this.onNavigate = null;
@@ -20,10 +22,13 @@ function EditField(value,stringCssClass,nonStringCssClass) {
     this.element.onclick = function() {
 		instance.onClick();
 	};
-    
+   
     this.setValue(value);
-    this.setClassName(stringCssClass,nonStringCssClass);
 }
+
+EditField.FIELD_TYPE_VALUE = "value";
+EditField.FIELD_TYPE_KEY = "key";
+EditField.FIELD_TYPE_INDEX = "index";
 
 EditField.prototype.setOnEditCallback= function(onEdit) {
     return this.onEdit = onEdit;
@@ -33,11 +38,9 @@ EditField.prototype.setNavCallback = function(onNavigate) {
     this.onNavigate = onNavigate;
 }
 
-/** This method sets the flag indicating the data should be read from the edit
- * field as a string or a non-string. This will take effect only when data is read
- * from the edit field. */
-EditField.prototype.setValueTypeIsString = function(isString) {
-    this.isString = isString;
+EditField.prototype.setIsVirtual = function(isVirtual) {
+    this.isVirtual = isVirtual;
+	this.setCssClass();
 }
 
 EditField.prototype.getValue= function() {
@@ -47,26 +50,33 @@ EditField.prototype.getValue= function() {
 EditField.prototype.setValue = function(value) {
     this.value = value;
     this.isString = (util.getValueType(value) === "string");
-    if(this.isString) {
-        this.element.className = this.stringCssClass;
-    }
-    else {
-        this.element.className = this.nonStringCssClass;
-    }
+	this.setCssClass();
 
-    this.element.innerHTML = value;
+	//display value (with one exception - show "null" for null value
+	if(value === null) {
+		this.element.innerHTML = "null"
+	}
+	else {
+		this.element.innerHTML = value;
+	}
 }
 
-EditField.prototype.setClassName = function(stringClassName,nonStringClassName) {
-    this.stringCssClass = stringClassName;
-    this.nonStringCssClass = nonStringClassName ? nonStringClassName : stringClassName;
-    
-    if(this.isString) {
-        this.element.className = this.stringCssClass;
-    }
-    else {
-        this.element.className = this.nonStringCssClass;
-    }
+/** @private */
+EditField.prototype.setCssClass = function() {
+	var cssName = "cell_" + this.fieldType;
+	if(this.isVirtual) {
+		cssName += "_virtual";
+	}
+	else if(this.fieldType === "value") {
+		if(this.isString) {
+			cssName += "_string";
+		}
+		else {
+			cssName += "_nonstring";
+		}
+	}
+	
+	this.element.className = cssName;
 }
 
 EditField.prototype.getElement = function() {
@@ -74,7 +84,7 @@ EditField.prototype.getElement = function() {
 }
 
 EditField.prototype.onClick = function() {
-    if(!this.editField) {
+    if((this.isEditable)&&(!this.editField)) {
         this.startEdit();
     }
  
@@ -116,7 +126,7 @@ EditField.prototype.endEdit = function() {
             //read the value, in the appropriate format
             var editStringValue = this.editField.value;
             var editValue;
-            if(!this.isString) {
+            if((this.isVirtual)||(!this.isString)) {
                 if(util.canBeConvertedToNonString(editStringValue)) {
                     editValue = util.stringToNonString(editStringValue);
                 }

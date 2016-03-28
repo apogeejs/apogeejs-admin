@@ -1,7 +1,7 @@
 /** Constructor */
 function KeyEntry(parentValue,key,keyType,data,isVirtual) {
 	this.key = key;
-	this.type = keyType; //"key" or "index"
+	this.type = keyType; //EditField.FIELD_TYPE_KEY ro EditField.FIELD_TYPE_INDEX
 	this.data = data;
 	this.indentLevel = parentValue.getIndentLevel() + 1;
     this.parentValue = parentValue;
@@ -53,22 +53,8 @@ KeyEntry.prototype.getIndentLevel = function() {
 
 KeyEntry.prototype.setIsVirtual = function(isVirtual) {
 	this.isVirtual = isVirtual;
-    if(isVirtual) {
-        if(this.type == "key") {
-            this.keyEditObject.setClassName("virtualKeyCell");
-        }
-        else {
-            this.keyEditObject.setClassName("virtualIndexCell");
-        }
-    }
-    else {
-        if(this.type == "key") {
-            this.keyEditObject.setClassName("keyCell");
-        }
-        else {
-            this.keyEditObject.setClassName("indexCell");
-        }
-    }
+	this.keyEditObject.setIsVirtual(isVirtual);
+
     this.valueEntry.setIsVirtual(isVirtual);
 }
 
@@ -120,10 +106,12 @@ KeyEntry.prototype.formatBody = function() {
 * @private */
 KeyEntry.prototype.createKeyElement = function() {
     
-    this.keyEditObject = util.createKeyElement(this.key,this.type,this.isVirtual);
+	var isEditable = (this.type === EditField.FIELD_TYPE_KEY);
+	
+    this.keyEditObject = new EditField(this.key,this.type,isEditable,this.isVirtual);
     
     //make the edit field editable if it is a key
-    if(this.type == "key") {
+    if(isEditable) {
         var instance = this;
         var onEdit = function(editValue) {
             if(instance.isVirtual) {
@@ -194,6 +182,10 @@ KeyEntry.prototype.loadContextMenu = function(parentKeyCount,keyIndex) {
             if(valueEntry.convertibleToBool()) {
                 contextMenu.addCallbackMenuItem("Convert To Boolean",function() {valueEntry.valueToNonString()});
             }
+			
+			if(valueEntry.convertibleToNull()) {
+                contextMenu.addCallbackMenuItem("Convert To Null",function() {valueEntry.valueToNonString()});
+            }
             
             if(valueEntry.convertibleToString()) {
                 contextMenu.addCallbackMenuItem("Convert To String",function() {valueEntry.valueToString()});
@@ -224,9 +216,9 @@ KeyEntry.prototype.loadContextMenu = function(parentKeyCount,keyIndex) {
 //======================================
 
 KeyEntry.prototype.convertToKeyType = function(key) {
-    if(this.type == "key") return;
+    if(this.type == EditField.FIELD_TYPE_KEY) return;
     
-    this.type = "key";
+    this.type = EditField.FIELD_TYPE_KEY;
     this.key = String(key);
     
     //create the key
@@ -238,9 +230,9 @@ KeyEntry.prototype.convertToKeyType = function(key) {
 }
 
 KeyEntry.prototype.convertToIndexType = function(index) {
-    if(this.type == "index") return;
+    if(this.type == EditField.FIELD_TYPE_INDEX) return;
     
-    this.type = "index";
+    this.type = EditField.FIELD_TYPE_INDEX;
     this.key = index;
     
     //create the key
