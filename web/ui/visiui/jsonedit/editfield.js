@@ -236,11 +236,11 @@ visicomp.jsonedit.EditField.prototype.onKeyDown = function(event) {
     }
 }
 
-visicomp.jsonedit.EditField.prototype.cursorAtStartOfvisicomp.jsonedit.EditField = function() {
+visicomp.jsonedit.EditField.prototype.cursorAtStartOfEditField = function() {
     return ((this.editField.selectionStart == 0)&&(this.editField.selectionEnd == 0));
 }
 
-visicomp.jsonedit.EditField.prototype.cursorAtEndOfvisicomp.jsonedit.EditField = function() {
+visicomp.jsonedit.EditField.prototype.cursorAtEndOfEditField = function() {
     var length = String(this.editField.value).length;
     return ((this.editField.selectionStart == length)&&(this.editField.selectionEnd == length));
 }

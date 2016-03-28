@@ -784,8 +784,9 @@ visicomp.jsonedit.ValueEntry.prototype.updateChildKeys = function() {
         }
         
         //context menu
-        this.virtualChildKey.loadContextMenu(numberKeys,numberKeys);
-        
+		if(this.virtualChildKey) {
+			this.virtualChildKey.loadContextMenu(numberKeys,numberKeys);
+		}
     }
     else if(this.type == "array") {
         numberKeys = this.childKeyEntries.length;
