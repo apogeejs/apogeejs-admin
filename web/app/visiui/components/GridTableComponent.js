@@ -205,12 +205,6 @@ visicomp.app.visiui.GridTableComponent.editorCodeWrapper.unwrapCode = function(f
     return formula.trim();
 }
 
-
-//auto registration
-if(registerComponent) {
-    registerComponent(visicomp.app.visiui.GridTableComponent.generator);
-}
-
 //external links
 //https://handsontable.com/bower_components/handsontable/dist/handsontable.full.js
 //https://handsontable.com/bower_components/handsontable/dist/handsontable.full.css
