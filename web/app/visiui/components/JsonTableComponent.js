@@ -9,9 +9,9 @@ visicomp.app.visiui.JsonTableComponent = function(workspaceUI,table,componentJso
 //add components to this class
 visicomp.core.util.mixin(visicomp.app.visiui.JsonTableComponent,visicomp.app.visiui.Component);
 
-visicomp.app.visiui.JsonTableComponent.VIEW_TEXT = "text";
-visicomp.app.visiui.JsonTableComponent.VIEW_FORM = "form";
-visicomp.app.visiui.JsonTableComponent.VIEW_CODE = "code";
+visicomp.app.visiui.JsonTableComponent.VIEW_TEXT = "Text";
+visicomp.app.visiui.JsonTableComponent.VIEW_FORM = "Form";
+visicomp.app.visiui.JsonTableComponent.VIEW_CODE = "Code";
 
 visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW = visicomp.app.visiui.JsonTableComponent.VIEW_TEXT;
 
@@ -31,10 +31,12 @@ visicomp.app.visiui.JsonTableComponent.prototype.setViewType = function(viewType
 	switch(viewType) {
 		case visicomp.app.visiui.JsonTableComponent.VIEW_TEXT:
 			this.viewElement = new visicomp.app.visiui.JsonTableComponent.TextView(this);
+            this.viewType = visicomp.app.visiui.JsonTableComponent.VIEW_TEXT;
 			break;
 			
 		case visicomp.app.visiui.JsonTableComponent.VIEW_FORM:
 			this.viewElement = new visicomp.app.visiui.JsonTableComponent.FormView(this);
+            this.viewType = visicomp.app.visiui.JsonTableComponent.VIEW_FORM;
 			break;
 			
 		default:
@@ -64,7 +66,7 @@ visicomp.app.visiui.JsonTableComponent.prototype.populateFrame = function() {
     itemInfo2.callback = this.createEditCodeableDialogCallback(itemInfo2.title,visicomp.app.visiui.JsonTableComponent.editorCodeWrapper);
 	
 	var itemInfo3 = {};
-    itemInfo3.title = "View...";
+    itemInfo3.title = "Set&nbsp;View";
     itemInfo3.callback = this.createViewDialogCallback();
     
     //add these at the start of the menu
@@ -154,8 +156,51 @@ visicomp.app.visiui.JsonTableComponent.prototype.createEditDataDialog = function
 }
 
 visicomp.app.visiui.JsonTableComponent.prototype.createViewDialogCallback = function() {
-	return function() {
-		alert("Not implemented!");
+	//create dialog layout
+    var layout = {};
+    layout.lines = [];
+    var line;
+    
+    line = {};
+    line.type = "title";
+    line.title = "Select View";
+    layout.lines.push(line);
+    
+    var ddLine = {};
+    ddLine.type = "dropdown";
+    ddLine.heading = "View: "
+    ddLine.entries = [
+        visicomp.app.visiui.JsonTableComponent.VIEW_FORM,
+        visicomp.app.visiui.JsonTableComponent.VIEW_TEXT
+    ];
+    ddLine.resultKey = "view";
+    layout.lines.push(ddLine);
+    
+    line = {};
+    line.type = "submit";
+    line.submit = "OK";
+    line.cancel = "Cancel";
+    layout.lines.push(line);
+    
+    //create on submit function
+    var instance = this;
+    var onSubmit = function(result) {
+        instance.setViewType(result.view);
+        instance.memberUpdated();
+        return true;
+    }
+    
+    return function() {
+        //set the current view type
+        if(instance.viewType) {
+            ddLine.initial = ddLine.entries.indexOf(instance.viewType);
+        }
+        else {
+            ddLine.initial = ddLine.entries.indexOf(visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW);
+        }
+    
+        //open dialog
+		visicomp.app.visiui.dialog.showConfigurableDialog(layout,onSubmit);
 	}
 }
 
@@ -171,7 +216,7 @@ visicomp.app.visiui.JsonTableComponent.TextView = function(jsonTableComponent) {
         "left":"0px",
 		"bottom":"0px",
         "right":"0px",
-		"overflow":"auto",
+		"overflow":"auto"
 	});
 	
 	var editor = ace.edit(this.editorDiv);
@@ -228,7 +273,7 @@ visicomp.app.visiui.JsonTableComponent.FormView = function(jsonTableComponent) {
         "left":"0px",
 		"bottom":"0px",
         "right":"0px",
-		"overflow":"auto",
+		"overflow":"auto"
 	});
 	
 	var data = jsonTableComponent.getObject().getData();
