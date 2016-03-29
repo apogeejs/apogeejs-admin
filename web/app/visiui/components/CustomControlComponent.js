@@ -27,7 +27,7 @@ visicomp.app.visiui.CustomControlComponent.prototype.addToFrame = function() {
     var menuItemInfoList = this.getMenuItemInfoList();
 
     var itemInfo = {};
-    itemInfo.title = "Edit&nbsp;Resource&nbsp;Code";
+    itemInfo.title = "Edit Resource Code";
     itemInfo.callback = this.createEditResourceDialogCallback();
     
     //add these at the start of the menu

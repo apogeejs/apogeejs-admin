@@ -27,11 +27,11 @@ visicomp.app.visiui.GridTableComponent.prototype.populateFrame = function() {
     var menuItemInfoList = this.getMenuItemInfoList();
   
     var itemInfo1 = {};
-    itemInfo1.title = "Edit&nbsp;Data";
+    itemInfo1.title = "Edit Data";
     itemInfo1.callback = this.createEditDataDialog();
     
     var itemInfo2 = {};
-    itemInfo2.title = "Edit&nbsp;Formula";
+    itemInfo2.title = "Edit Formula";
     itemInfo2.callback = this.createEditCodeableDialogCallback(itemInfo2.title,visicomp.app.visiui.GridTableComponent.editorCodeWrapper);
     
     //add these at the start of the menu
@@ -41,13 +41,12 @@ visicomp.app.visiui.GridTableComponent.prototype.populateFrame = function() {
     var contentDiv = this.getContentElement();
     
 	this.gridDiv = visicomp.visiui.createElement("div",null,{
-//		"position":"absolute",
         "width":contentDiv.clientWidth + "px",
         "height":contentDiv.clientHeight + "px",
 		"overflow":"hidden",
         "zIndex":0
 	});
-	contentDiv.appendChild(this.gridDiv);
+	contentDiv.appendChild(this.gridDiv);    
     
     //resize the editor on window size change
     var instance = this;
@@ -59,8 +58,60 @@ visicomp.app.visiui.GridTableComponent.prototype.populateFrame = function() {
         }
     }
     window.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeEndedCallback);
+    
+    //create the inline edit handler
+    this.gridEdited = function() {
+        console.log(JSON.stringify(arguments));
+        //no action for this case
+        if(arguments[1] == "loadData") return;
+
+        //update working data before calling update
+        instance.workingData = visicomp.core.util.deepCopy(instance.gridControl.getData());
+        visicomp.core.updatemember.updateData(instance.getObject(),instance.workingData);
+    }
+
+    //create the grid
+    this.createNewGrid();
 }
 
+/** This method creates a new grid. 
+ * @private */
+visicomp.app.visiui.GridTableComponent.prototype.createNewGrid = function() {
+    if(this.gridControl) {
+        this.gridControl.destroy();
+        this.gridControl = null;
+    }
+    
+    //grid is NOT editable if it has a formula
+    var object = this.getObject();
+    var editable = !object.hasCode();
+    
+    var gridOptions; 
+    if(editable) {
+        gridOptions = {
+            rowHeaders: true,
+            colHeaders: true,
+            contextMenu: true,
+            //edit callbacks
+            afterChange:this.gridEdited,
+            afterCreateCol:this.gridEdited,
+            afterCreateRow:this.gridEdited,
+            afterRemoveCol:this.gridEdited,
+            afterRemoveRow:this.gridEdited
+        }
+        this.gridEditable = true;
+    }
+    else {
+        gridOptions = {
+            readOnly: true,
+            rowHeaders: true,
+            colHeaders: true
+        }
+        this.gridEditable = false;
+    }
+        
+    this.gridControl = new Handsontable(this.gridDiv,gridOptions); 
+}
 /** This method should include an needed functionality to clean up after a delete. */
 visicomp.app.visiui.GridTableComponent.prototype.onDelete = function() {
     if(this.gridControl) {
@@ -77,14 +128,30 @@ visicomp.app.visiui.GridTableComponent.prototype.memberUpdated = function() {
         this.showErrors(object.getErrors());
     }
     else {
-        var data = this.getObject().getData();
+        var data = object.getData();
+        
+        //grid editable should NOT EQUAL object.hasCode
+        if(this.gridEditable == object.hasCode()) {
+            this.createNewGrid();
+        }
+        else if(data === this.workingData) {
+            //no need for an update
+            return;
+        }
+        
+        //update data for display
         if(data === null) {
             data = [["null"]];
         }
         else if(data === undefined) {
             data = [["undefined"]];
         }
-        this.showData(data);
+        
+        //make a working copy of the data that we can edit
+        this.workingData = visicomp.core.util.deepCopy(data);
+        
+        //load the grid
+        this.gridControl.loadData(this.workingData);
     }
 }
 
@@ -97,20 +164,6 @@ visicomp.app.visiui.GridTableComponent.prototype.showErrors = function(actionErr
             errorData.push(errorEntry);
         }
         this.gridControl.loadData(errorData);
-    }
-}
-
-visicomp.app.visiui.GridTableComponent.prototype.showData = function(data) {
-    if(this.gridControl) {
-        this.gridControl.loadData(data);
-    }
-    else {       
-        this.gridControl = new Handsontable(this.gridDiv, {
-            readOnly: true,
-            data: data,
-            rowHeaders: true,
-            colHeaders: true
-        });
     }
 }
 
@@ -178,8 +231,8 @@ visicomp.app.visiui.GridTableComponent.generator.displayName = "Grid Table";
 visicomp.app.visiui.GridTableComponent.generator.uniqueName = "visicomp.app.visiui.GridTableComponent";
 visicomp.app.visiui.GridTableComponent.generator.createComponent = visicomp.app.visiui.GridTableComponent.createComponent;
 visicomp.app.visiui.GridTableComponent.generator.createComponentFromJson = visicomp.app.visiui.GridTableComponent.createComponentFromJson;
-visicomp.app.visiui.GridTableComponent.generator.DEFAULT_WIDTH = 600;
-visicomp.app.visiui.GridTableComponent.generator.DEFAULT_HEIGHT = 600;
+visicomp.app.visiui.GridTableComponent.generator.DEFAULT_WIDTH = 200;
+visicomp.app.visiui.GridTableComponent.generator.DEFAULT_HEIGHT = 200;
 
 //======================================
 // This is a code wrapper so the user works with the formula rather than the function body

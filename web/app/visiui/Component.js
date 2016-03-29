@@ -83,7 +83,7 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     
     //add the standard entries
     var itemInfo = {};
-    itemInfo.title = visicomp.app.visiui.VisiComp.convertSpacesForHtml("Delete " + this.generator.displayName);
+    itemInfo.title = "Delete " + this.generator.displayName;
     itemInfo.callback = this.createDeleteCallback(itemInfo.title);
     this.menuItemInfoList.push(itemInfo);
     

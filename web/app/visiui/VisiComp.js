@@ -212,21 +212,21 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     for(var i = 0; i < this.standardComponents.length; i++) {
         var key = this.standardComponents[i];
         var generator = this.componentGenerators[key];
-        var title = visicomp.app.visiui.VisiComp.convertSpacesForHtml("Add " + generator.displayName);
+        var title = "Add " + generator.displayName;
         var callback = visicomp.app.visiui.addcomponent.getAddComponentCallback(this,generator);
         menu.addCallbackMenuItem(title,callback);
     }
     
     //add the additional component item
     var componentCallback = visicomp.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback(this,generator);
-    menu.addCallbackMenuItem("Other&nbsp;Components...",componentCallback);
+    menu.addCallbackMenuItem("Other Components...",componentCallback);
     
     //libraries menu
     menu = visicomp.visiui.Menu.createMenu("Libraries");
     menuBar.appendChild(menu.getElement());
     
     var linksCallback = visicomp.app.visiui.updatelinks.getUpdateLinksCallback(this);
-    menu.addCallbackMenuItem("Update&nbsp;Links",linksCallback);
+    menu.addCallbackMenuItem("Update Links",linksCallback);
 
     //----------------------
     //create the tab frame - there is a tab for each workspace
@@ -241,8 +241,3 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
 // Static Functions
 //=================================
 
-/** This method replaces on spaces with &nbsp; spaces. It is intedned to prevent
- * wrapping in html. */
-visicomp.app.visiui.VisiComp.convertSpacesForHtml = function(text) {
-    return text.replace(/ /g,"&nbsp;");
-}

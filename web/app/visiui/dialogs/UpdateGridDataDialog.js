@@ -66,7 +66,7 @@ visicomp.app.visiui.dialog.showUpdateGridDataDialog = function(table,onSaveFunct
     dialog.setPosition(coords[0],coords[1]); 
     
     //add the content
-    var workingData = JSON.parse(JSON.stringify(table.getData()));
+    var workingData = visicomp.core.util.deepCopy(table.getData());
 	
 	var gridEditor = new Handsontable(editorDiv, {
 		data: workingData,

@@ -60,6 +60,11 @@ visicomp.core.util.getObjectType = function(object) {
     return "Unknown";
 }
 
+/** This method creates a deep copy of an object, array or value. */
+visicomp.core.util.deepCopy = function(data) {
+    return JSON.parse(JSON.stringify(data));
+}
+
 /** This method takes a field which can be an object, 
  *array or other value. If it is an object or array it 
  *freezes that object and all of its children, recursively. */

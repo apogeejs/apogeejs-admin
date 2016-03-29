@@ -23,7 +23,7 @@ visicomp.app.visiui.BasicControlComponent.populateFrame = function() {
     var menuItemInfoList = this.getMenuItemInfoList();
   
     var itemInfo = {};
-    itemInfo.title = "Edit&nbsp;Initializer&nbsp;Code";
+    itemInfo.title = "Edit Initializer Code";
     itemInfo.callback = this.createEditCodeableDialogCallback(itemInfo.title);
     
     //add these at the start of the menu

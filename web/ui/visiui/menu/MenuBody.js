@@ -51,6 +51,13 @@ visicomp.visiui.MenuBody.MENU_ITEM_HOVER_STYLE = {
     "padding":"2px"
 }
 
+/** This method replaces on spaces with &nbsp; spaces. It is intedned to prevent
+ * wrapping in html. */
+visicomp.visiui.MenuBody.convertSpacesForHtml = function(text) {
+    return text.replace(/ /g,"&nbsp;");
+}
+
+
 /** this returns the dom element for the menu object. */
 visicomp.visiui.MenuBody.prototype.getMenuElement = function() {
     return this.menuDiv;
@@ -132,9 +139,9 @@ visicomp.visiui.MenuBody.prototype.addCallbackMenuItem = function(title, callbac
 visicomp.visiui.MenuBody.prototype.addMenuItem = function(itemInfo) {
     itemInfo.element = document.createElement("div");
     visicomp.visiui.applyStyle(itemInfo.element,visicomp.visiui.MenuBody.MENU_ITEM_NORMAL_STYLE);
-    itemInfo.element.innerHTML = itemInfo.title;
     
-    var menu = this;
+    var title = visicomp.visiui.MenuBody.convertSpacesForHtml(itemInfo.title);
+    itemInfo.element.innerHTML = title;
 	
     itemInfo.element.onmousedown = function(event) {
 		event.stopPropagation();

@@ -58,15 +58,15 @@ visicomp.app.visiui.JsonTableComponent.prototype.populateFrame = function() {
     var menuItemInfoList = this.getMenuItemInfoList();
   
     var itemInfo1 = {};
-    itemInfo1.title = "Edit&nbsp;Data";
+    itemInfo1.title = "Edit Data";
     itemInfo1.callback = this.createEditDataDialog();
     
     var itemInfo2 = {};
-    itemInfo2.title = "Edit&nbsp;Formula";
+    itemInfo2.title = "Edit Formula";
     itemInfo2.callback = this.createEditCodeableDialogCallback(itemInfo2.title,visicomp.app.visiui.JsonTableComponent.editorCodeWrapper);
 	
 	var itemInfo3 = {};
-    itemInfo3.title = "Set&nbsp;View";
+    itemInfo3.title = "Set View";
     itemInfo3.callback = this.createViewDialogCallback();
     
     //add these at the start of the menu

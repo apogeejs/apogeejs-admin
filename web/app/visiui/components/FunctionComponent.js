@@ -23,11 +23,11 @@ visicomp.app.visiui.FunctionComponent.prototype.populateFrame = function() {
     var menuItemInfoList = this.getMenuItemInfoList();
     
     var itemInfo1 = {};
-    itemInfo1.title = "Edit&nbsp;Arg&nbsp;List";
+    itemInfo1.title = "Edit Arg List";
     itemInfo1.callback = this.createEditArgListDialogCallback();
   
     var itemInfo2 = {};
-    itemInfo2.title = "Edit&nbsp;Function";
+    itemInfo2.title = "Edit Function";
     itemInfo2.callback = this.createEditCodeableDialogCallback("Update Function");
     
     //add these at the start of the menu
