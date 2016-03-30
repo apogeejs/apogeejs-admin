@@ -124,15 +124,7 @@ visicomp.jsonedit.ValueEntry.prototype.getIndentLevel = function() {
 }
 
 visicomp.jsonedit.ValueEntry.prototype.setIsVirtual = function(isVirtual) {
-//    
-//    if((this.isVirtual)&&(!isVirtual)&&(this.data == "")) {
-//        this.data = null;
-//        this.valueEditObject.setValue(this.data);
-//    }
-    
-	this.isVirtual = isVirtual;
-    
-    
+	this.isVirtual = isVirtual;  
     
 	this.valueEditObject.setIsVirtual(isVirtual);
 }

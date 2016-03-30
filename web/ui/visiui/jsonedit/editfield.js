@@ -4,7 +4,6 @@
  * fill be updated to match the edit.
  */
 visicomp.jsonedit.EditField = function (value,fieldType,isEditable,isVirtual) {
-    this.value = value;
 	this.fieldType = fieldType;
 	this.isEditable = isEditable;
 	this.isVirtual = isVirtual;
@@ -48,6 +47,12 @@ visicomp.jsonedit.EditField.prototype.getValue= function() {
 }
 
 visicomp.jsonedit.EditField.prototype.setValue = function(value) {
+	
+	if(value === undefined) {
+		value = null;
+		console.log("The value undefined is not valid for a JSON. It has been converted to null.");
+	}
+	
     this.value = value;
     this.isString = (visicomp.jsonedit.getValueType(value) === "string");
 	this.setCssClass();
@@ -116,8 +121,9 @@ visicomp.jsonedit.EditField.prototype.startEdit = function() {
     }
 }
 
-//console.log("--------------------");
-//console.log(this.editField.selectionStart + " " + this.editField.selectionEnd);
+//value output conversion rules
+// - if the initial value was a non-string or an empty string, try to convert the contents of the edit cell to a non-string
+// - otherwise keep the value as a string when it is loaded from the edit field
 
 visicomp.jsonedit.EditField.prototype.endEdit = function() {
     if(this.editField) {
@@ -126,7 +132,8 @@ visicomp.jsonedit.EditField.prototype.endEdit = function() {
             //read the value, in the appropriate format
             var editStringValue = this.editField.value;
             var editValue;
-            if((this.isVirtual)||(!this.isString)) {
+            if((!this.isString)||(this.value === "")) {
+				//try to convert to a number if the original value was a number if it was an empty string
                 if(visicomp.jsonedit.canBeConvertedToNonString(editStringValue)) {
                     editValue = visicomp.jsonedit.stringToNonString(editStringValue);
                 }
@@ -180,8 +187,6 @@ visicomp.jsonedit.EditField.LEFT_KEY = 37;
 //- when we enter a field through navigation or click, it should select the entire field.
 
 
-
-
 visicomp.jsonedit.EditField.prototype.onKeyDown = function(event) {
     var doExit = false;
     var direction = visicomp.jsonedit.EditField.DIRECTION_NONE;
@@ -209,14 +214,14 @@ visicomp.jsonedit.EditField.prototype.onKeyDown = function(event) {
         cancelDefault = true;
     }
     else if(event.keyCode == visicomp.jsonedit.EditField.RIGHT_KEY) {
-        if(this.cursorAtEndOfvisicomp.jsonedit.EditField()) {
+        if(this.cursorAtEndOfEditField()) {
             doExit = true;
             direction = visicomp.jsonedit.EditField.DIRECTION_RIGHT;
             cancelDefault = true;
         }
     }
     else if(event.keyCode == visicomp.jsonedit.EditField.LEFT_KEY) {
-        if(this.cursorAtStartOfvisicomp.jsonedit.EditField()) {
+        if(this.cursorAtStartOfEditField()) {
             doExit = true;
             direction = visicomp.jsonedit.EditField.DIRECTION_LEFT;
             cancelDefault = true;
