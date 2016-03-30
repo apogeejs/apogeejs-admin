@@ -59,9 +59,8 @@ visicomp.app.visiui.GridTableComponent.prototype.populateFrame = function() {
     }
     window.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeEndedCallback);
     
-    //create the inline edit handler
+    //internal grid edited function
     this.gridEdited = function() {
-        console.log(JSON.stringify(arguments));
         //no action for this case
         if(arguments[1] == "loadData") return;
 
@@ -72,6 +71,12 @@ visicomp.app.visiui.GridTableComponent.prototype.populateFrame = function() {
 
     //create the grid
     this.createNewGrid();
+}
+
+/** This method should be called if the grid is edited inline.
+ * @private */
+visicomp.app.visiui.GridTableComponent.prototype.gridEdited = function() {
+    
 }
 
 /** This method creates a new grid. 

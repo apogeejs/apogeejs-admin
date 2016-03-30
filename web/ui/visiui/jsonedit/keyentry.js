@@ -1,5 +1,6 @@
 /** Constructor */
-visicomp.jsonedit.KeyEntry = function(parentValue,key,keyType,data,isEditable,isVirtual) {
+visicomp.jsonedit.KeyEntry = function(editArea,parentValue,key,keyType,data,isEditable,isVirtual) {
+    this.editArea = editArea;
 	this.key = key;
 	this.type = keyType; //visicomp.jsonedit.EditField.FIELD_TYPE_KEY ro visicomp.jsonedit.EditField.FIELD_TYPE_INDEX
 	this.data = data;
@@ -83,7 +84,7 @@ visicomp.jsonedit.KeyEntry.prototype.createBody = function(entryData) {
     this.createKeyElement();
     
     //create value entry
-	this.valueEntry = new visicomp.jsonedit.ValueEntry(this,entryData,this.isEditable,this.isVirtual);
+	this.valueEntry = new visicomp.jsonedit.ValueEntry(this.editArea,this,entryData,this.isEditable,this.isVirtual);
 	
     this.formatBody();
 }
@@ -118,6 +119,9 @@ visicomp.jsonedit.KeyEntry.prototype.createKeyElement = function() {
             if(instance.isVirtual) {
                 instance.parentValue.makeVirtualEntryReal();
             }
+            
+            //notify of edit
+            instance.editArea.valueEdited();
         }
         this.keyEditObject.setOnEditCallback(onEdit);
         
@@ -172,36 +176,36 @@ visicomp.jsonedit.KeyEntry.prototype.loadContextMenu = function(parentKeyCount,k
             if(!instance.isVirtual) {
                 contextMenu.addCallbackMenuItem("Delete Entry",function() {parentValue.deleteChildElement(instance);});
             }
-        }
-        
-        //conversions
-        if(valueType == "value") {
-            contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.valueToObject()});
-            contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.valueToArray()});
-            
-            if(valueEntry.convertibleToNumber()) {
-                contextMenu.addCallbackMenuItem("Convert To Number",function() {valueEntry.valueToNonString()});
+
+            //conversions
+            if(valueType == "value") {
+                contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.valueToObject()});
+                contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.valueToArray()});
+
+                if(valueEntry.convertibleToNumber()) {
+                    contextMenu.addCallbackMenuItem("Convert To Number",function() {valueEntry.valueToNonString()});
+                }
+
+                if(valueEntry.convertibleToBool()) {
+                    contextMenu.addCallbackMenuItem("Convert To Boolean",function() {valueEntry.valueToNonString()});
+                }
+
+                if(valueEntry.convertibleToNull()) {
+                    contextMenu.addCallbackMenuItem("Convert To Null",function() {valueEntry.valueToNonString()});
+                }
+
+                if(valueEntry.convertibleToString()) {
+                    contextMenu.addCallbackMenuItem("Convert To String",function() {valueEntry.valueToString()});
+                }
             }
-            
-            if(valueEntry.convertibleToBool()) {
-                contextMenu.addCallbackMenuItem("Convert To Boolean",function() {valueEntry.valueToNonString()});
+            else if(valueType == "object") {
+                contextMenu.addCallbackMenuItem("Convert To Value",function() {valueEntry.convertToValue()});
+                contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.objectToArray()});
             }
-			
-			if(valueEntry.convertibleToNull()) {
-                contextMenu.addCallbackMenuItem("Convert To Null",function() {valueEntry.valueToNonString()});
+            else if(valueType == "array") {
+                contextMenu.addCallbackMenuItem("Convert To Value",function() {valueEntry.convertToValue()});
+                contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.arrayToObject()});
             }
-            
-            if(valueEntry.convertibleToString()) {
-                contextMenu.addCallbackMenuItem("Convert To String",function() {valueEntry.valueToString()});
-            }
-        }
-        else if(valueType == "object") {
-            contextMenu.addCallbackMenuItem("Convert To Value",function() {valueEntry.convertToValue()});
-            contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.objectToArray()});
-        }
-        else if(valueType == "array") {
-            contextMenu.addCallbackMenuItem("Convert To Value",function() {valueEntry.convertToValue()});
-            contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.arrayToObject()});
         }
         
         visicomp.visiui.Menu.showContextMenu(contextMenu,event);

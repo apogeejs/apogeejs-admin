@@ -3,10 +3,14 @@ visicomp.jsonedit.JsonEditArea = function(divElement,initialValue,isEditable) {
     this.body = divElement;
 	this.isEditable = isEditable;
     
-	this.valueEntry = new visicomp.jsonedit.ValueEntry(this,initialValue,this.isEditable);
+	this.valueEntry = new visicomp.jsonedit.ValueEntry(this,this,initialValue,this.isEditable);
     this.valueEntry.setExpanded(true);
  
 	this.formatBody();
+}
+
+visicomp.jsonedit.JsonEditArea.prototype.setEditCallback = function(editCallback) {
+	this.editCallback = editCallback;
 }
 
 visicomp.jsonedit.JsonEditArea.prototype.getCurrentValue = function() {
@@ -49,7 +53,7 @@ visicomp.jsonedit.JsonEditArea.prototype.loadContextMenu = function() {
         
         contextMenu.addCallbackMenuItem("Get Value",function() {alert(JSON.stringify(valueEntry.getCurrentValue()));});
         
-		if(this.isEditable) {
+		if(instance.isEditable) {
 			if(valueType == "value") {
 				contextMenu.addCallbackMenuItem("Convert To Object",function() {valueEntry.valueToObject()});
 				contextMenu.addCallbackMenuItem("Convert To Array",function() {valueEntry.valueToArray()});
@@ -74,6 +78,14 @@ visicomp.jsonedit.JsonEditArea.prototype.updateValueElements = function() {
 	visicomp.core.util.removeAllChildren(this.body);
     //recreate
     this.formatBody();
+}
+
+/** This methd is called internally when an edit takes place in the edit are. 
+ * @private */
+visicomp.jsonedit.JsonEditArea.prototype.valueEdited = function() {
+    if(this.editCallback) {
+        this.editCallback();
+    }
 }
 
 

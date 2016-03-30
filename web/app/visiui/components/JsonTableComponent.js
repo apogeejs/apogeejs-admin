@@ -13,7 +13,7 @@ visicomp.app.visiui.JsonTableComponent.VIEW_TEXT = "Text";
 visicomp.app.visiui.JsonTableComponent.VIEW_FORM = "Form";
 visicomp.app.visiui.JsonTableComponent.VIEW_CODE = "Code";
 
-visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW = visicomp.app.visiui.JsonTableComponent.VIEW_TEXT;
+visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW = visicomp.app.visiui.JsonTableComponent.VIEW_FORM;
 
 /** This method populates the frame for this component. 
  * @protected */
@@ -108,14 +108,16 @@ visicomp.app.visiui.JsonTableComponent.prototype.memberUpdated = function() {
 		if(this.viewElementShowing !== this.viewElement) {
 			this.showElement(this.viewElement);
 		}
+        
+        var editable = !object.hasCode();
 		
-		this.viewElement.showData(object.getData());
+		this.viewElement.showData(object.getData(),editable);
 	}
 }
 
 /** @private */
 visicomp.app.visiui.JsonTableComponent.prototype.showElement = function(viewElement) {
-	
+    
 	var contentDiv = this.getContentElement();
 	visicomp.core.util.removeAllChildren(contentDiv);
 	
@@ -239,6 +241,10 @@ editor.$blockScrolling = Infinity;
     window.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeCallback);
 }
 
+/** This flag indicates the object does not edit data - because in text we can not enforce value json 
+ * during each edit step. */
+visicomp.app.visiui.JsonTableComponent.TextView.prototype.canEdit = false;
+
 visicomp.app.visiui.JsonTableComponent.TextView.prototype.getElement = function() {
 	return this.editorDiv;
 }
@@ -265,7 +271,7 @@ visicomp.app.visiui.JsonTableComponent.TextView.prototype.destroy = function() {
     }
 }
 
-visicomp.app.visiui.JsonTableComponent.FormView = function(jsonTableComponent) {
+visicomp.app.visiui.JsonTableComponent.FormView = function(jsonTableComponent,editOk) {
 	
 	this.editorDiv = visicomp.visiui.createElement("div",null,{
 		"position":"absolute",
@@ -275,18 +281,38 @@ visicomp.app.visiui.JsonTableComponent.FormView = function(jsonTableComponent) {
         "right":"0px",
 		"overflow":"auto"
 	});
-	
-	var data = jsonTableComponent.getObject().getData();
-	this.editor = new visicomp.jsonedit.JsonEditArea(this.editorDiv,data,false); 
+    
+    this.workingData = null;
+    
+    var instance = this;
+    var table = jsonTableComponent.getObject();
+    this.editCallback = function() {
+        var currentData = instance.editor.getCurrentValue();
+        instance.workingData = currentData;
+        visicomp.core.updatemember.updateData(table,currentData);
+    }
 }
+
+/** This flag indicates the element can or cannot edit data. */
+visicomp.app.visiui.JsonTableComponent.FormView.prototype.canEdit = true;
 
 visicomp.app.visiui.JsonTableComponent.FormView.prototype.getElement = function() {
 	return this.editorDiv;
 }
 
-visicomp.app.visiui.JsonTableComponent.FormView.prototype.showData = function(data) {
+visicomp.app.visiui.JsonTableComponent.FormView.prototype.showData = function(data,editOk) {
+    if((data == this.workingData)&&(this.editOk == editOk)) {
+        //no need to update
+        return;
+    }
+    
+    this.workingData = visicomp.core.util.deepCopy(data);
+    this.editOk = editOk;
+    
 	visicomp.core.util.removeAllChildren(this.editorDiv);
-	this.editor = new visicomp.jsonedit.JsonEditArea(this.editorDiv,data,false);
+	this.editor = new visicomp.jsonedit.JsonEditArea(this.editorDiv,data,editOk);
+    
+    this.editor.setEditCallback(this.editCallback);
 }
 
 visicomp.app.visiui.JsonTableComponent.FormView.prototype.destroy = function() {
@@ -303,6 +329,9 @@ visicomp.app.visiui.JsonTableComponent.ErrorView = function(jsonTableComponent) 
 		"color":"red"
 	});
 }
+
+/** This flag indicates the object does not edit data. */
+visicomp.app.visiui.JsonTableComponent.ErrorView.prototype.canEdit = false;
 
 visicomp.app.visiui.JsonTableComponent.ErrorView.prototype.getElement = function() {
 	return this.displayDiv;
