@@ -92,7 +92,7 @@ visicomp.visiui.TabFrame.TAB_BAR_STYLE = {
     //fixed
     
     //configurable
-    "background-color":"rgb(122,165,226)",
+    "background-color":visicomp.visiui.colors.tabFrameColor,
     "margin":"0px",
     "border":" 1px solid gray",
     "border-top-width":" 0px"
@@ -112,7 +112,7 @@ visicomp.visiui.TabFrame.TAB_INACTIVE_STYLE = {
     "cursor":" default",
     
     //configurable
-    "background-color":"rgb(122,165,226)",
+    "background-color":visicomp.visiui.colors.tabFrameColor,
     "border":" 1px solid black",
     "border-top-color":"",
     "padding":"2px"

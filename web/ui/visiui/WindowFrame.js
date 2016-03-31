@@ -24,7 +24,7 @@ visicomp.visiui.WindowFrame = function(parentContainer, options) {
     this.parentContainer = parentContainer;
     this.parentElement = parentContainer.getContainerElement();
     this.options = options;
-    
+
     this.windowState = visicomp.visiui.WindowFrame.NORMAL; //minimize, normal, maximize
     this.coordinateInfo = {};
     this.isShowing = false;
@@ -140,7 +140,7 @@ visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL = {
     
     //configurable
     "background-color":"lightgray",
-    "border":"4px solid rgb(122,165,226)",
+    "border":"4px solid " + visicomp.visiui.colors.windowColor,
     "opacity":".95"
 };
 
@@ -159,7 +159,7 @@ visicomp.visiui.WindowFrame.TITLE_BAR_STYLE = {
     "position":"relative",
     
     //configurable
-    "background-color":"rgb(122,165,226)",
+    "background-color":visicomp.visiui.colors.windowColor,
     "padding":"3px"
 };
 visicomp.visiui.WindowFrame.BODY_STYLE = {

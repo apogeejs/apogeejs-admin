@@ -180,7 +180,7 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     //-----------------------
     var menuBar = document.createElement("div");
     var menuBarStyle = {
-        "background-color":"rgb(217,229,250)",
+        "background-color":visicomp.visiui.colors.menuBarColor,
         "padding":"2px"
     }
     visicomp.visiui.applyStyle(menuBar,menuBarStyle);
