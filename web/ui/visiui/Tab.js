@@ -7,6 +7,7 @@ visicomp.visiui.Tab = function(name, tabFrame) {
     //base init
     visicomp.core.EventManager.init.call(this);
     visicomp.visiui.ParentContainer.init.call(this,element,this);
+	visicomp.visiui.ParentHighlighter.init.call(this,element);
     
     this.name = name;
     this.isShowing = false;
@@ -36,6 +37,7 @@ visicomp.visiui.Tab = function(name, tabFrame) {
 //add components to this class
 visicomp.core.util.mixin(visicomp.visiui.Tab,visicomp.core.EventManager);
 visicomp.core.util.mixin(visicomp.visiui.Tab,visicomp.visiui.ParentContainer);
+visicomp.core.util.mixin(visicomp.visiui.Tab,visicomp.visiui.ParentHighlighter);
 
 visicomp.visiui.Tab.TAB_WINDOW_STYLE = {
     "top":"0px",

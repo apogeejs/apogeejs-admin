@@ -4,6 +4,7 @@ visicomp.app.visiui.FolderFunctionComponent = function(workspaceUI,folderFunctio
     //base init
     visicomp.app.visiui.Component.init.call(this,workspaceUI,folderFunction,visicomp.app.visiui.FolderFunctionComponent.generator,componentJson);
     visicomp.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
+	visicomp.visiui.ParentHighlighter.init.call(this,this.getContentElement());
     
     //register this object as a parent container
     var internalFolder = folderFunction.getInternalFolder();
@@ -16,6 +17,7 @@ visicomp.app.visiui.FolderFunctionComponent = function(workspaceUI,folderFunctio
 //add components to this class
 visicomp.core.util.mixin(visicomp.app.visiui.FolderFunctionComponent,visicomp.app.visiui.Component);
 visicomp.core.util.mixin(visicomp.app.visiui.FolderFunctionComponent,visicomp.visiui.ParentContainer);
+visicomp.core.util.mixin(visicomp.app.visiui.FolderFunctionComponent,visicomp.visiui.ParentHighlighter);
 
 //----------------------
 // ParentContainer Methods
