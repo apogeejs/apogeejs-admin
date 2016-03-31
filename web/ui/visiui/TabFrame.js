@@ -36,19 +36,8 @@ visicomp.visiui.TabFrame = function(options) {
     this.tabFrameControl.appendChild(this.tabBar);
     
     //base init for parent continer mixin
-    visicomp.visiui.ParentContainer.init.call(this,this.tabFrame,this);
-	
-////CONTEXT MENU EXAMPLE  
-//var instance = this;    
-//this.tabFrame.oncontextmenu = function(event) {
-//    var contextMenu = new visicomp.visiui.MenuBody();
-//    contextMenu.addCallbackMenuItem("First",function() {alert("first");});
-//    contextMenu.addCallbackMenuItem("Second",function() {alert("second");});
-//    contextMenu.addCallbackMenuItem("Third",function() {alert("third");});
-//    contextMenu.addCallbackMenuItem("Fourth",function() {alert("fourth");});
-//    visicomp.visiui.Menu.showContextMenu(contextMenu,event);
-//}      
-    
+    visicomp.visiui.ParentContainer.init.call(this,this.tabFrame,this);	
+
 	//prevent default drag action
 	var moveHandler = function(e) {e.preventDefault();};
     this.tabFrameControl.addEventListener("mousemove",moveHandler);
@@ -85,7 +74,7 @@ visicomp.visiui.TabFrame.DISPLAY_FRAME_STYLE = {
     
     //configurable
     "background-color":"white",
-    "border":" 1px solid gray",
+    //"border":" 1px solid gray",
     "border-bottom-width":" 0px"
 }
 visicomp.visiui.TabFrame.TAB_BAR_STYLE = {
