@@ -44,7 +44,7 @@ visicomp.visiui.TabFrame = function(options) {
     
     //handler to resize on window resize
     var instance = this;
-    window.addEventListener(visicomp.visiui.WindowFrame.RESIZED, function() {
+    window.addEventListener("resize", function() {
         instance.resizeElement();
     });
     
