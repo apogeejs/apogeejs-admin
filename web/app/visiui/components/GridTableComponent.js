@@ -50,14 +50,15 @@ visicomp.app.visiui.GridTableComponent.prototype.populateFrame = function() {
     
     //resize the editor on window size change
     var instance = this;
-    var resizeEndedCallback = function() {
+    var resizeCallback = function() {
         instance.gridDiv.style.width = contentDiv.clientWidth + "px";
         instance.gridDiv.style.height = contentDiv.clientHeight + "px";
         if(instance.gridControl) {
             instance.gridControl.render();
         }
     }
-    window.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeEndedCallback);
+//    window.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeCallback);
+    addResizeListener(contentDiv, resizeCallback);
     
     //internal grid edited function
     this.gridEdited = function() {

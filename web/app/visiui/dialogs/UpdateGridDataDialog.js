@@ -74,11 +74,9 @@ visicomp.app.visiui.dialog.showUpdateGridDataDialog = function(table,onSaveFunct
 		colHeaders: true,
         contextMenu: true
 	});
-	
-    //gridEditor.render();
     
     //set the resize handler
-    //resize the editor on window size change
+    //resize the editor on element change
     var resizeCallback = function() {
         //this needs to be fixed
         var container = content.parentElement;
@@ -93,5 +91,7 @@ visicomp.app.visiui.dialog.showUpdateGridDataDialog = function(table,onSaveFunct
         
         if(gridEditor) gridEditor.render();
     }
-    dialog.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeCallback);
+    //dialog.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeCallback);
+    var container = content.parentElement;
+    addResizeListener(container, resizeCallback);
 }

@@ -119,5 +119,7 @@ dataEditor.$blockScrolling = Infinity;
         
         if(dataEditor) dataEditor.resize();
     }
-    dialog.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
+//    dialog.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
+    var container = content.parentElement;
+    addResizeListener(container, resizeCallback);
 }

@@ -303,7 +303,9 @@ cssEditor.$blockScrolling = Infinity;
         if(supplementalEditor) supplementalEditor.resize();
         if(cssEditor) cssEditor.resize();
     }
-    dialog.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
+//    dialog.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
+    var container = content.parentElement;
+    addResizeListener(container, resizeCallback);
 }
 
 

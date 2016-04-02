@@ -218,5 +218,7 @@ supplementalEditor.$blockScrolling = Infinity;
         if(formulaEditor) formulaEditor.resize();
         if(supplementalEditor) supplementalEditor.resize();
     }
-    dialog.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
+//    dialog.addListener(visicomp.visiui.WindowFrame.RESIZED, resizeCallback);
+    var container = content.parentElement;
+    addResizeListener(container, resizeCallback);
 }

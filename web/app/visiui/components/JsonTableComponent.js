@@ -237,8 +237,9 @@ editor.$blockScrolling = Infinity;
         editor.resize();
     }
 	
-	var window = jsonTableComponent.getWindow();
-    window.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeCallback);
+    addResizeListener(this.editorDiv, resizeCallback);
+//	var window = jsonTableComponent.getWindow();
+//    window.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeCallback);
 }
 
 /** This flag indicates the object does not edit data - because in text we can not enforce value json 
