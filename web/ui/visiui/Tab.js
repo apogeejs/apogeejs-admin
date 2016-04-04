@@ -42,8 +42,7 @@ visicomp.core.util.mixin(visicomp.visiui.Tab,visicomp.visiui.ParentHighlighter);
 visicomp.visiui.Tab.TAB_WINDOW_STYLE = {
     "top":"0px",
     "left":"0px",
-    "height":"100%",
-    "width":"100%",
+	"height":"100%",
     "position":"relative",
     "background-color":"white",
     "overflow":"auto"

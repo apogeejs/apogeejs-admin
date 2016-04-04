@@ -11,7 +11,6 @@ visicomp.visiui.ParentHighlighter.init = function(containerElement) {
 
 this.borderOutlineStyle = "solid 3px " + visicomp.visiui.ParentHighlighter.getColor();
 containerElement.style.border = this.borderOutlineStyle;
-
 }
 
 /** This method adds a windows to the parent. It does not show the window. Show must be done. */
