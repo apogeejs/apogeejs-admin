@@ -27,7 +27,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 	this.createUI(containerId);
 	
 	//create a default workspace 
-    visicomp.app.visiui.createworkspace.createWorkspace(this,visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME);
+//    visicomp.app.visiui.createworkspace.createWorkspace(this,visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME);
 	
 }
 	
@@ -173,16 +173,31 @@ visicomp.app.visiui.VisiComp.prototype.registerStandardComponent = function(comp
 visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     
     var windowElements = visicomp.visiui.initWindows(containerId);
-    var container = windowElements.baseElement;
+    var topContainer = windowElements.baseElement;
+    
+    var container = document.createElement("div");
+    var containerStyle = {
+        "position":"relative",
+        "display":"table",
+        "width":"100%",
+        "height":"100%"
+    };
+    visicomp.visiui.applyStyle(container,containerStyle);
+    topContainer.appendChild(container);
+    
+    
     
     //-------------------
     //create menus
     //-----------------------
     var menuBar = document.createElement("div");
     var menuBarStyle = {
+        "position":"relative",
         "background-color":visicomp.visiui.colors.menuBarColor,
-        "padding":"2px"
-    }
+        "padding":"2px",
+        "display":"table-row",
+        "width":"100%"
+    };
     visicomp.visiui.applyStyle(menuBar,menuBarStyle);
     container.appendChild(menuBar);
     
@@ -231,9 +246,19 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     //----------------------
     //create the tab frame - there is a tab for each workspace
     //--------------------------
-    this.tabFrame = new visicomp.visiui.TabFrame(containerId);
-    container.appendChild(this.tabFrame.getElement());
-    this.tabFrame.resizeElement();
+    
+    var tabFrameDiv = document.createElement("div");
+    var tabFrameDivStyle = {
+        "position":"relative",
+        "background-color":"white",
+        "display":"table-row",
+        "width":"100%",
+        "height":"100%"
+    }
+    visicomp.visiui.applyStyle(tabFrameDiv,tabFrameDivStyle);
+    container.appendChild(tabFrameDiv);
+    
+    this.tabFrame = new visicomp.visiui.TabFrame(tabFrameDiv);
     
 }
 

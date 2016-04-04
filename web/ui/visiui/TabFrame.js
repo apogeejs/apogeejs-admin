@@ -9,7 +9,7 @@
  * 
  * @class 
  */
-visicomp.visiui.TabFrame = function(options) {
+visicomp.visiui.TabFrame = function(parentDiv,options) {
 	
     if(!options) {
         options = {};
@@ -25,7 +25,8 @@ visicomp.visiui.TabFrame = function(options) {
     this.activeTab = null;
     
     this.tabFrameControl = document.createElement("div");
-    visicomp.visiui.applyStyle(this.tabFrameControl,visicomp.visiui.TabFrame.CONTAINER_FRAME_STYLE);
+    visicomp.visiui.applyStyle(this.tabFrameControl,visicomp.visiui.TabFrame.CONTAINER_STYLE);
+    parentDiv.appendChild(this.tabFrameControl);
 	
     this.tabFrame = document.createElement("div");
     visicomp.visiui.applyStyle(this.tabFrame,visicomp.visiui.TabFrame.DISPLAY_FRAME_STYLE);
@@ -41,15 +42,6 @@ visicomp.visiui.TabFrame = function(options) {
 	//prevent default drag action
 	var moveHandler = function(e) {e.preventDefault();};
     this.tabFrameControl.addEventListener("mousemove",moveHandler);
-    
-    //handler to resize on window resize
-    var instance = this;
-    window.addEventListener("resize", function() {
-        instance.resizeElement();
-    });
-    
-    //calculate the size
-    this.resizeElement();
 }
 
 //add components to this class
@@ -62,15 +54,22 @@ visicomp.visiui.TabFrame.TABS_RESIZED = "tabsResized";
 
 visicomp.visiui.TabFrame.CONTAINER_FRAME_MARGIN_PX = 5;
 
-visicomp.visiui.TabFrame.CONTAINER_FRAME_STYLE = {
-    "position":"absolute",
-    "margin":visicomp.visiui.TabFrame.CONTAINER_FRAME_MARGIN_PX + "px",
-    "padding":"0px"
-}
+visicomp.visiui.TabFrame.CONTAINER_STYLE = {
+    "position":"relative",
+    "display":"table",
+    "width":"100%",
+    "height":"100%",
+    "top":"0px",
+    "left":"0px"
+};
 visicomp.visiui.TabFrame.DISPLAY_FRAME_STYLE = {
     //fixed
     "position":"relative",
-    "overflow":"auto",
+    "display":"table-row",
+    "width":"100%",
+    "height":"100%",
+    "top":"0px",
+    "left":"0px",
     
     //configurable
     "background-color":"white",
@@ -79,6 +78,9 @@ visicomp.visiui.TabFrame.DISPLAY_FRAME_STYLE = {
 }
 visicomp.visiui.TabFrame.TAB_BAR_STYLE = {
     //fixed
+    "position":"relative",
+    "display":"table-row",
+    "width":"100%",
     
     //configurable
     "background-color":visicomp.visiui.colors.tabFrameColor,
@@ -173,8 +175,8 @@ visicomp.visiui.TabFrame.prototype.addTab = function(name) {
     }
     this.updateTabDisplay();
     
-    //resize the main control element
-    this.resizeElement();
+//    //resize the main control element
+//    this.resizeElement();
     
     return tab;
 }
@@ -225,23 +227,4 @@ visicomp.visiui.TabFrame.prototype.updateTabDisplay = function() {
             visicomp.visiui.applyStyle(tabData.tabLabel,visicomp.visiui.TabFrame.TAB_INACTIVE_STYLE);
         }
     }
-}
-
-/** This method resizes the cotnrol. Resize is done automatically when the control
- * tabs are added or when the window resizes. On other events that cause the available
- * area for this control to change this function should be called. */
-visicomp.visiui.TabFrame.prototype.resizeElement = function() {
-    //set the width
-    var parent = this.tabFrameControl.offsetParent;
-    if(!parent) return;
-    var controlWidth = parent.clientWidth - this.tabFrameControl.offsetLeft;
-    this.tabFrame.style.width = (controlWidth - 2 * visicomp.visiui.TabFrame.CONTAINER_FRAME_MARGIN_PX) + "px";
-    this.tabBar.style.width = (controlWidth - 2 * visicomp.visiui.TabFrame.CONTAINER_FRAME_MARGIN_PX) + "px";
-    
-    //set the height
-    var controlHeight = parent.clientHeight - this.tabFrameControl.offsetTop;
-    this.tabFrame.style.height = (controlHeight - this.tabBar.offsetHeight - 
-            2 * visicomp.visiui.TabFrame.CONTAINER_FRAME_MARGIN_PX) + "px";
-        
-    this.dispatchEvent(visicomp.visiui.TabFrame.TABS_RESIZED,this);
 }

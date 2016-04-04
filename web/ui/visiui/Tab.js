@@ -41,11 +41,12 @@ visicomp.core.util.mixin(visicomp.visiui.Tab,visicomp.visiui.ParentHighlighter);
 
 visicomp.visiui.Tab.TAB_WINDOW_STYLE = {
     "top":"0px",
-    "bottom":"0px",
     "left":"0px",
-    "right":"0px",
-    "position":"absolute",
-    "background-color":"white"
+    "height":"100%",
+    "width":"100%",
+    "position":"relative",
+    "background-color":"white",
+    "overflow":"auto"
 }
 
 /** This method must be implemented in inheriting objects. */
