@@ -64,7 +64,6 @@ bufferDiv.appendChild(this.gridDiv);
             instance.gridControl.render();
         }
     }
-//    window.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeCallback);
     addResizeListener(contentDiv, resizeCallback);
     
     //internal grid edited function

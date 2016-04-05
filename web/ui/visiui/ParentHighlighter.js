@@ -1,5 +1,5 @@
-/** This is a mixin that encapsulates the base functionality of a parent container for a control
- * The parent container must provide events for when is is shown, hidden and resized.
+/** This is a mixin is used by parents to highlight children, to display to which
+ * parent a child belons.
  * 
  * This is not a class, but it is used for the prototype of the objects that inherit from it.
  */

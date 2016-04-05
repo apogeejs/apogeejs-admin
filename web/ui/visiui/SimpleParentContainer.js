@@ -21,18 +21,13 @@ visicomp.visiui.SimpleParentContainer.prototype.getContentIsShowing = function()
     return this.isShowing;
 }
 
-/** This should be called when the element is resized. */
-visicomp.visiui.SimpleParentContainer.prototype.resized = function() {
-    this.dispatchEvent(visicomp.visiui.WindowFrame.RESIZED,this);
-}
-
-/** This should be called when the element is resized. */
+/** This should be called when the element is shown. */
 visicomp.visiui.SimpleParentContainer.prototype.isShown = function() {
     this.isShowing = true;
     this.dispatchEvent(visicomp.visiui.ParentContainer.CONTENT_SHOWN,this);
 }
 
-/** This should be called when the element is resized. */
+/** This should be called when the element is hidden. */
 visicomp.visiui.SimpleParentContainer.prototype.isHidden = function() {
     this.isShowing = false;
     this.dispatchEvent(visicomp.visiui.ParentContainer.CONTENT_HIDDEN,this);

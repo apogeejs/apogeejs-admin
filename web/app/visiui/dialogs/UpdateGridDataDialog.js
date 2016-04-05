@@ -91,7 +91,6 @@ visicomp.app.visiui.dialog.showUpdateGridDataDialog = function(table,onSaveFunct
         
         if(gridEditor) gridEditor.render();
     }
-    //dialog.addListener(visicomp.visiui.WindowFrame.RESIZE_ENDED, resizeCallback);
     var container = content.parentElement;
     addResizeListener(container, resizeCallback);
 }

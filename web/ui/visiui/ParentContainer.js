@@ -1,5 +1,5 @@
 /** This is a mixin that encapsulates the base functionality of a parent container for a control
- * The parent container must provide events for when is is shown, hidden and resized.
+ * The parent container must provide events for when is is shown, hidden.
  * 
  * This is not a class, but it is used for the prototype of the objects that inherit from it.
  */
@@ -30,7 +30,7 @@ visicomp.visiui.ParentContainer.MIN_WRAP_HEIGHT = 200;
 //events
 visicomp.visiui.ParentContainer.CONTENT_SHOWN = "content shown";
 visicomp.visiui.ParentContainer.CONTENT_HIDDEN = "content hidden";
-//visicomp.visiui.WindowFrame.RESIZED;
+
 //==============================
 // Public Instance Methods
 //==============================
