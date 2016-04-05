@@ -18,11 +18,6 @@ visicomp.core.util.mixin(visicomp.app.visiui.GridTableComponent,visicomp.app.vis
  * @protected */
 visicomp.app.visiui.GridTableComponent.prototype.populateFrame = function() {
     
-    var window = this.getWindow();
-    
-    //remove scrollbars from window content div
-    window.setContentDivOverflowPolicy("hidden");
-    
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
   
@@ -40,13 +35,25 @@ visicomp.app.visiui.GridTableComponent.prototype.populateFrame = function() {
     //editor - only for display, read only
     var contentDiv = this.getContentElement();
     
+var bufferDiv = visicomp.visiui.createElement("div",null,{
+        "display":"block",
+        "top":"0px",
+        "left":"0px",
+        "bottom":"0px",
+        "right":"0px",
+        "position":"absolute",
+        "overflow":"hidden"   
+	});
+	contentDiv.appendChild(bufferDiv); 
+    
 	this.gridDiv = visicomp.visiui.createElement("div",null,{
         "width":contentDiv.clientWidth + "px",
         "height":contentDiv.clientHeight + "px",
 		"overflow":"hidden",
         "zIndex":0
 	});
-	contentDiv.appendChild(this.gridDiv);    
+//	contentDiv.appendChild(this.gridDiv);
+bufferDiv.appendChild(this.gridDiv);    
     
     //resize the editor on window size change
     var instance = this;

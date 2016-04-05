@@ -183,13 +183,14 @@ visicomp.visiui.WindowFrame.BODY_STYLE = {
 };
 visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE = {
     //fixed
-    "display":"inline-block"
+    "display":"inline",
+    "width":"100%"
 };
 
 visicomp.visiui.WindowFrame.TITLE_BAR_RIGHT_STYLE = {
     //fixed
-    "display":"inline-block",
-    "float":"right"
+    "float":"right",
+    "display":"inline"
 };
 
 visicomp.visiui.WindowFrame.TITLE_STYLE = {
@@ -241,8 +242,8 @@ visicomp.visiui.WindowFrame.prototype.getMenu = function() {
 }
 
 /** This metod sets the scroll policy for the window content div. The default is auto. */
-visicomp.visiui.WindowFrame.prototype.setContentDivOverflowPolicy = function(overflow) {
-    this.content.style.overflow = overflow;
+visicomp.visiui.WindowFrame.prototype.setContentDivStyle = function(contentDivStyle) {
+    visicomp.visiui.applyStyle(this.content,contentDivStyle);
 }
 
 
@@ -862,29 +863,16 @@ visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
     this.titleBar = document.createElement("div");
     visicomp.visiui.applyStyle(this.titleBar,visicomp.visiui.WindowFrame.TITLE_BAR_STYLE);
     this.frame.appendChild(this.titleBar);
-	
-	
-var mouseCatcher =  document.createElement("div");
-var mcs = {
-	"position":"relative",
-	"top":"0px",
-	"left":"0px",
-	"width":"100%",
-	"height":"100%"
-}
-visicomp.visiui.applyStyle(mouseCatcher,mcs);
-this.titleBar.appendChild(mouseCatcher);
-	
-	
+    
     //add elements
     this.titleBarLeftElements = document.createElement("div");
     visicomp.visiui.applyStyle(this.titleBarLeftElements,visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE);
     this.titleBar.appendChild(this.titleBarLeftElements);
-mouseCatcher.appendChild(this.titleBarLeftElements);
+
+
     this.titleBarRightElements = document.createElement("div");
     visicomp.visiui.applyStyle(this.titleBarRightElements,visicomp.visiui.WindowFrame.TITLE_BAR_RIGHT_STYLE);
     this.titleBar.appendChild(this.titleBarRightElements);
-mouseCatcher.appendChild(this.titleBarLeftElements);
 
     //for handlers below
     var instance = this;

@@ -39,7 +39,8 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
 			"display":"block",
             "position":"relative",
             "top":"0px",
-            "height":"100%"
+            "height":"100%",
+            "overflow": "auto"
         });
     this.window.setContent(contentDiv);
 
