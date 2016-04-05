@@ -136,6 +136,8 @@ visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL = {
     //fixed
     "position":"absolute",
     "pointerEvents": "auto", //we need this since we remove pointer evetns from the dialog layer container
+	
+	"display":"table",
     
     
     //configurable
@@ -148,6 +150,8 @@ visicomp.visiui.WindowFrame.FRAME_STYLE_MAX = {
     //fixed
     "position":"absolute",
     "pointerEvents": "auto",
+	
+	"display":"table",
     
     //configurable
     "background-color":"lightgray",
@@ -156,7 +160,11 @@ visicomp.visiui.WindowFrame.FRAME_STYLE_MAX = {
 };
 visicomp.visiui.WindowFrame.TITLE_BAR_STYLE = {
     //fixed
-    "position":"relative",
+    "position":"relative",	
+	"display":"table-row",
+	"width":"100%",
+	
+"pointer-events":"all",
     
     //configurable
     "background-color":visicomp.visiui.colors.windowColor,
@@ -164,8 +172,11 @@ visicomp.visiui.WindowFrame.TITLE_BAR_STYLE = {
 };
 visicomp.visiui.WindowFrame.BODY_STYLE = {
     //fixed
-    "overflow":"auto",
     "position":"relative",
+	"display":"table-row",
+	"width":"100%",
+	"height":"100%",
+	"overflow":"auto",
     
     //configurable
     "background-color":"white"  
@@ -640,7 +651,7 @@ visicomp.visiui.WindowFrame.prototype.minimizeContent = function() {
 visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
     
     //set body as visible
-    this.body.style.display = "";
+    this.body.style.display = "table-row";
     
     //restore parent overflow, if needed
     if(this.savedParentOverflow !== undefined) {
@@ -673,7 +684,7 @@ visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
 visicomp.visiui.WindowFrame.prototype.maximizeContent = function() {
     
     //set body as visible
-    this.body.style.display = "";
+    this.body.style.display = "table-row";
 
     //make sure the parent does not have scroll; store the old value
     this.savedParentOverflow = this.parentElement.style.overflow;
@@ -731,19 +742,13 @@ visicomp.visiui.WindowFrame.prototype.setMinMaxButtons = function() {
 
 /** @private */
 visicomp.visiui.WindowFrame.prototype.updateCoordinates = function() {
-    var heightSet;
- 
+	
     if(this.windowState === visicomp.visiui.WindowFrame.MAXIMIZED) {
         //apply the maximized coordinates size
         this.frame.style.left = "0px";
 		this.frame.style.top = "0px";
-		this.frame.style.right = "0px";
-		this.frame.style.bottom = "0px";
-		
-		this.frame.style.height = "";
-		this.frame.style.width = "";
-        
-        heightSet = true;
+		this.frame.style.height = "100%";
+		this.frame.style.width = "100%";
     }
     else if(this.windowState === visicomp.visiui.WindowFrame.NORMAL) {
         //apply the normal size to the window
@@ -751,39 +756,19 @@ visicomp.visiui.WindowFrame.prototype.updateCoordinates = function() {
         this.frame.style.top = this.coordinateInfo.y + "px";
 		if(this.coordinateInfo.height !== undefined) {
 			this.frame.style.height = this.coordinateInfo.height + "px";
-			heightSet = true;
-		}
-		else {
-			heightSet = false;
 		}
 		if(this.coordinateInfo.width !== undefined) {
 			this.frame.style.width = this.coordinateInfo.width + "px";
 		}
-		
-		this.frame.style.bottom = "";
-		this.frame.style.right = "";
     }
     else if(this.windowState === visicomp.visiui.WindowFrame.MINIMIZED) {
         //apply the minimized size to the window
 		this.frame.style.left = this.coordinateInfo.x + "px";
         this.frame.style.top = this.coordinateInfo.y + "px";
 		
-		this.frame.style.height = "";
-		this.frame.style.width = "";
-		this.frame.style.bottom = "";
-		this.frame.style.right = "";
-        
-        heightSet = false;
+		this.frame.style.height = "0px";
+		this.frame.style.width = "0px";
     }
-    
-	//determine the body size, if needed
-    if(heightSet) {
-        var bodyHeight = this.frame.clientHeight - this.titleBar.clientHeight;
-        this.body.style.height = bodyHeight + "px";
-    }
-	else {
-		this.body.style.height = "";
-	}
 }
 
 /** This method should be called when the entire window is shown.
@@ -878,13 +863,28 @@ visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
     visicomp.visiui.applyStyle(this.titleBar,visicomp.visiui.WindowFrame.TITLE_BAR_STYLE);
     this.frame.appendChild(this.titleBar);
 	
+	
+var mouseCatcher =  document.createElement("div");
+var mcs = {
+	"position":"relative",
+	"top":"0px",
+	"left":"0px",
+	"width":"100%",
+	"height":"100%"
+}
+visicomp.visiui.applyStyle(mouseCatcher,mcs);
+this.titleBar.appendChild(mouseCatcher);
+	
+	
     //add elements
     this.titleBarLeftElements = document.createElement("div");
     visicomp.visiui.applyStyle(this.titleBarLeftElements,visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE);
     this.titleBar.appendChild(this.titleBarLeftElements);
+mouseCatcher.appendChild(this.titleBarLeftElements);
     this.titleBarRightElements = document.createElement("div");
     visicomp.visiui.applyStyle(this.titleBarRightElements,visicomp.visiui.WindowFrame.TITLE_BAR_RIGHT_STYLE);
     this.titleBar.appendChild(this.titleBarRightElements);
+mouseCatcher.appendChild(this.titleBarLeftElements);
 
     //for handlers below
     var instance = this;

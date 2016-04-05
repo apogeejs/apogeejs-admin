@@ -36,11 +36,10 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     //load the content div
     var contentDiv = visicomp.visiui.createElement("div",null,
         {
-            "position":"absolute",
+			"display":"block",
+            "position":"relative",
             "top":"0px",
-            "bottom":"0px",
-            "right":"0px",
-            "left":"0px"
+            "height":"100%"
         });
     this.window.setContent(contentDiv);
 

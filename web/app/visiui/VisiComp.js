@@ -193,10 +193,10 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     var menuBar = document.createElement("div");
     var menuBarStyle = {
         "position":"relative",
-        "background-color":visicomp.visiui.colors.menuBarColor,
-        "padding":"2px",
         "display":"table-row",
-        "width":"100%"
+        "width":"100%",
+		"background-color":visicomp.visiui.colors.menuBarColor,
+        "padding":"2px"
     };
     visicomp.visiui.applyStyle(menuBar,menuBarStyle);
     container.appendChild(menuBar);
