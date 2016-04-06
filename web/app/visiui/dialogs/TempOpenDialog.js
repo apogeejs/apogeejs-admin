@@ -6,9 +6,26 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
 
     var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"resizable":true,"movable":true});
-    var content = document.createElement("div");
+    dialog.setTitle("&nbsp;");
+
+//add a scroll container
+    var contentContainer = visicomp.visiui.createElement("div",null,
+        {
+			"display":"block",
+            "position":"relative",
+            "top":"0px",
+            "height":"100%",
+            "overflow": "auto"
+        });
     
     var line;
+    
+var content = visicomp.visiui.createElement("div",null,
+        {
+			"display":"table",
+            "overflow":"hidden"
+        });
+contentContainer.appendChild(content);
   
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
@@ -50,8 +67,18 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
     content.appendChild(line);
     
     //show dialog
-    dialog.setContent(content);
+//dialog.setContent(contentContainer);
+	//set to a dummy size, we will resize to fit
+    dialog.setSize(500,500);
     dialog.show();
+    
+    //size the dialog to the content
+    var insideWidth = content.offsetWidth;
+    var insideHeight = content.offsetHeight;
+    var outsideWidth = contentContainer.offsetWidth;
+    var outsideHeight = contentContainer.offsetHeight;
+    dialog.setSize(500 + insideWidth - outsideWidth + 20,500 + insideHeight - outsideHeight + 20);
+    
     var coords = dialogParent.getCenterOnPagePosition(dialog);
     dialog.setPosition(coords[0],coords[1]);
 }

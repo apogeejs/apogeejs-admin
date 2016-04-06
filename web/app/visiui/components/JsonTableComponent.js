@@ -94,25 +94,25 @@ visicomp.app.visiui.JsonTableComponent.formatString = "\t";
 visicomp.app.visiui.JsonTableComponent.prototype.memberUpdated = function() {
     var object = this.getObject();
     if(object.hasError()) {
-		if(!this.errorElement) {
-			this.errorElement = new visicomp.app.visiui.JsonTableComponent.ErrorView(this);
-		}
-		
-		if(this.viewElementShowing !== this.errorElement) {
-			this.showElement(this.errorElement);
-		}
-		
-		this.errorElement.showData(object.getErrors());
-    }
-    else {
-		if(this.viewElementShowing !== this.viewElement) {
-			this.showElement(this.viewElement);
-		}
+        var errorMsg = "Error: \n";
+        var actionErrors = object.getErrors();
+        for(var i = 0; i < actionErrors.length; i++) {
+            errorMsg += actionErrors[i].msg + "\n";
+        }
         
-        var editable = !object.hasCode();
-		
-		this.viewElement.showData(object.getData(),editable);
-	}
+        this.showErrorBar(errorMsg);
+    }
+    else {   
+        this.hideErrorBar();
+    }
+        
+    if(this.viewElementShowing !== this.viewElement) {
+        this.showElement(this.viewElement);
+    }
+
+    var editable = !object.hasCode();
+
+    this.viewElement.showData(object.getData(),editable);
 }
 
 /** @private */

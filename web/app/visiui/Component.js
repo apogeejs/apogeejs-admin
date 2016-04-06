@@ -94,6 +94,37 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     menu.setMenuItems(this.menuItemInfoList);
 }
 
+//=======================
+// dev
+//=======================
+
+/** This method returns the base member for this component. */
+visicomp.app.visiui.Component.showErrorBar = function(text) {
+    if(!this.errorDiv) {
+        this.errorDiv = visicomp.visiui.createElement("div",null,
+            {
+                "display":"block",
+                "position":"relative",
+                "top":"0px",
+                "width":"100%",
+                "background-color":"red",
+                "color":"white"
+            });
+    }
+    this.errorDiv.innerHTML = text;
+    var window = this.getWindow();
+    window.loadHeaders([this.errorDiv]);
+}
+
+/** This method returns the base member for this component. */
+visicomp.app.visiui.Component.hideErrorBar = function() {
+    if(this.errorDiv) {
+        var window = this.getWindow();
+        window.frame.removeChild(this.errorDiv);
+        this.errorDiv = null;
+    }
+}
+
 //==============================
 // Public Instance Methods
 //==============================

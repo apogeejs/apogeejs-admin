@@ -30,7 +30,9 @@ visicomp.visiui.WindowFrame = function(parentContainer, options) {
     this.isShowing = false;
 	
     this.frame = null;
+    this.bodyRow = null;
     this.body = null;
+    this.titleBarRow = null;
     this.titleBar = null;
     this.titleBarLeftElements = null;
     this.titleBarRightElements = null;
@@ -124,6 +126,13 @@ visicomp.visiui.WindowFrame.RESIZE_SW = visicomp.visiui.WindowFrame.RESIZE_SOUTH
 // CSS STYLES
 //======================================
 
+//visicomp.visiui.WindowFrame.HEADER_ROW_STYLE
+//visicomp.visiui.WindowFrame.BODY_ROW_STYLE
+//visicomp.visiui.WindowFrame.ROW_FILL_ELEMENT_BASE_STYLE
+//visicomp.visiui.WindowFrame.TITLE_BAR_SUPPLEMENT_STYLE
+//visicomp.visiui.WindowFrame.BODY_SUPPLEMENT_STYLE
+
+
 /* window frame */
 visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL = {
     //fixed
@@ -151,28 +160,54 @@ visicomp.visiui.WindowFrame.FRAME_STYLE_MAX = {
     "border":"",
     "opacity":""
 };
-visicomp.visiui.WindowFrame.TITLE_BAR_STYLE = {
+visicomp.visiui.WindowFrame.HEADER_ROW_STYLE = {
     //fixed
     "position":"relative",	
 	"display":"table-row",
 	"width":"100%",
-	
-"pointer-events":"all",
-    
+    "top":"0px",
+    "left":"0px"
+};
+visicomp.visiui.WindowFrame.HEADER_ELEMENT_BASE_STYLE = {
+    "display":"block",
+    "top":"0px",
+    "left":"0px",
+    "position":"relative",
+    "overflow":"visible"
+};
+visicomp.visiui.WindowFrame.BODY_ROW_STYLE = {
+    //fixed
+    "position":"relative",	
+	"display":"table-row",
+	"width":"100%",
+    "height":"100%",
+    "top":"0px",
+    "left":"0px"
+};
+visicomp.visiui.WindowFrame.BODY_BUFFER_STYLE = {
+    "display":"block",
+    "position":"relative",
+    "top":"0px",
+    "height":"100%",
+    "overflow": "auto"
+};
+visicomp.visiui.WindowFrame.BODY_ELEMENT_BASE_STYLE = {
+    "display":"block",
+    "top":"0px",
+    "left":"0px",
+    "bottom":"0px",
+    "right":"0px",
+    "position":"absolute",
+    "overflow":"hidden"   
+};
+visicomp.visiui.WindowFrame.BODY_SUPPLEMENT_STYLE = {
+    //configurable
+    "background-color":"white"  
+};
+visicomp.visiui.WindowFrame.TITLE_BAR_SUPPLEMENT_STYLE = {
     //configurable
     "background-color":visicomp.visiui.colors.windowColor,
     "padding":"3px"
-};
-visicomp.visiui.WindowFrame.BODY_STYLE = {
-    //fixed
-    "position":"relative",
-	"display":"table-row",
-	"width":"100%",
-	"height":"100%",
-	"overflow":"auto",
-    
-    //configurable
-    "background-color":"white"  
 };
 visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE = {
     //fixed
@@ -594,7 +629,7 @@ visicomp.visiui.WindowFrame.prototype.getResizeType = function(e) {
 visicomp.visiui.WindowFrame.prototype.minimizeContent = function() {
     
     //set body as hidden
-    this.body.style.display = "none";
+    this.bodyRow.style.display = "none";
     
     //restore parent overflow, if needed
     if(this.savedParentOverflow !== undefined) {
@@ -621,7 +656,7 @@ visicomp.visiui.WindowFrame.prototype.minimizeContent = function() {
 visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
     
     //set body as visible
-    this.body.style.display = "table-row";
+    this.bodyRow.style.display = "table-row";
     
     //restore parent overflow, if needed
     if(this.savedParentOverflow !== undefined) {
@@ -647,7 +682,7 @@ visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
 visicomp.visiui.WindowFrame.prototype.maximizeContent = function() {
     
     //set body as visible
-    this.body.style.display = "table-row";
+    this.bodyRow.style.display = "table-row";
 
     //make sure the parent does not have scroll; store the old value
     this.savedParentOverflow = this.parentElement.style.overflow;
@@ -804,11 +839,17 @@ visicomp.visiui.WindowFrame.prototype.initDiv = function() {
 
 /** @private */
 visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
-    //create title bar
-    this.titleBar = document.createElement("div");
-    visicomp.visiui.applyStyle(this.titleBar,visicomp.visiui.WindowFrame.TITLE_BAR_STYLE);
-    this.frame.appendChild(this.titleBar);
     
+    //create title bar
+    this.titleBarRow = document.createElement("div");
+    visicomp.visiui.applyStyle(this.titleBarRow,visicomp.visiui.WindowFrame.HEADER_ROW_STYLE);
+    this.frame.appendChild(this.titleBarRow);
+    
+    this.titleBar = document.createElement("div");
+    visicomp.visiui.applyStyle(this.titleBar,visicomp.visiui.WindowFrame.HEADER_ELEMENT_BASE_STYLE);
+    visicomp.visiui.applyStyle(this.titleBar,visicomp.visiui.WindowFrame.TITLE_BAR_SUPPLEMENT_STYLE);
+    this.titleBarRow.appendChild(this.titleBar);
+
     //add elements
     this.titleBarLeftElements = document.createElement("div");
     visicomp.visiui.applyStyle(this.titleBarLeftElements,visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE);
@@ -902,12 +943,52 @@ visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
 	var defaultDragHandler = function(e) {e.preventDefault();};
     this.titleBar.addEventListener("mousemove",defaultDragHandler);
 }
+
+/** @private */
+visicomp.visiui.WindowFrame.prototype.createHeaderContainer = function() {
+    
+    //create header element
+    this.headerRow = document.createElement("div");
+    visicomp.visiui.applyStyle(this.headerRow,visicomp.visiui.WindowFrame.HEADER_ROW_STYLE);
+    this.frame.appendChild(this.headerRow);
+    
+    this.headerElement = document.createElement("div");
+    visicomp.visiui.applyStyle(this.headerElement,visicomp.visiui.WindowFrame.HEADER_ELEMENT_BASE_STYLE);
+    visicomp.visiui.applyStyle(this.headerElement,visicomp.visiui.WindowFrame.TITLE_BAR_SUPPLEMENT_STYLE);
+    this.headerRow.appendChild(this.headerElement);
+ 
+    //load empty headers
+    this.loadHeaders([]);
+}
+
+visicomp.visiui.WindowFrame.prototype.loadHeaders = function(headerElements) {
+    visicomp.core.util.removeAllChildren(this.headerElement);
+    if(headerElements.length > 0) {
+        this.headerRow.style.display = "table-row";
+        for(var i = 0; i < headerElements.length; i++) {}
+        this.headerElement.appendChild(headerElements[i]);
+    }
+    else {
+        this.headerRow.style.display = "none";
+    }
+}
 	
 /** @private */
 visicomp.visiui.WindowFrame.prototype.createBody = function() {
+    
+    //create body
+    this.bodyRow = document.createElement("div");
+    visicomp.visiui.applyStyle(this.bodyRow,visicomp.visiui.WindowFrame.BODY_ROW_STYLE);
+    this.frame.appendChild(this.bodyRow);
+    
+    this.bodyRowBuffer = document.createElement("div");
+    visicomp.visiui.applyStyle(this.bodyRowBuffer,visicomp.visiui.WindowFrame.BODY_BUFFER_STYLE);
+    this.bodyRow.appendChild(this.bodyRowBuffer);
+    
     this.body = document.createElement("div");
-    visicomp.visiui.applyStyle(this.body,visicomp.visiui.WindowFrame.BODY_STYLE);
-    this.frame.appendChild(this.body);
+    visicomp.visiui.applyStyle(this.body,visicomp.visiui.WindowFrame.BODY_ELEMENT_BASE_STYLE);
+    visicomp.visiui.applyStyle(this.body,visicomp.visiui.WindowFrame.BODY_SUPPLEMENT_STYLE);
+    this.bodyRowBuffer.appendChild(this.body);
 	
 	//prevent default drag action
 	var defaultDragHandler = function(e) {e.preventDefault();};

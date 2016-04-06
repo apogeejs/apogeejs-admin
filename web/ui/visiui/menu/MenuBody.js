@@ -29,7 +29,7 @@ visicomp.visiui.MenuBody.MENU_STYLE = {
     "position":"absolute",
     "top":"100%",
     "left":"0%",
-    "z-index":"100",
+    "zIndex":"100",
     
     //configurable
     "border":"1px solid lightgray",
