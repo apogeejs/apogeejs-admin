@@ -79,6 +79,7 @@ this.savedParentOverflow = undefined;
     //initialize
     this.initDiv();
     this.createTitleBar();
+	this.createHeaderContainer();
     this.createBody();
 	
     //add the handler to move the active window to the front
@@ -298,8 +299,9 @@ visicomp.visiui.WindowFrame.prototype.loadHeaders = function(headerElements) {
     visicomp.core.util.removeAllChildren(this.headerElement);
     if(headerElements.length > 0) {
         this.headerRow.style.display = "table-row";
-        for(var i = 0; i < headerElements.length; i++) {}
-        this.headerElement.appendChild(headerElements[i]);
+        for(var i = 0; i < headerElements.length; i++) {
+			this.headerElement.appendChild(headerElements[i]);
+		}
     }
     else {
         this.headerRow.style.display = "none";
