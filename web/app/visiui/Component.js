@@ -94,23 +94,75 @@ visicomp.app.visiui.Component.showErrorBar = function(text) {
                 "display":"block",
                 "position":"relative",
                 "top":"0px",
-                "width":"100%",
                 "background-color":"red",
                 "color":"white"
             });
     }
     this.errorDiv.innerHTML = text;
-    var window = this.getWindow();
-    window.loadHeaders([this.errorDiv]);
+    this.errorBarActive = true;
+	
+	this.showActiveHeaders();
 }
 
 /** This method returns the base member for this component. */
 visicomp.app.visiui.Component.hideErrorBar = function() {
-    if(this.errorDiv) {
-        var window = this.getWindow();
-        window.frame.removeChild(this.errorDiv);
-        this.errorDiv = null;
+	this.errorBarActive = false;
+	this.showActiveHeaders();
+}
+
+/** This method returns the base member for this component. */
+visicomp.app.visiui.Component.showSaveBar = function(onSave,onCancel) {
+    if(!this.saveDiv) {
+        this.saveDiv = visicomp.visiui.createElement("div",null,
+            {
+                "display":"block",
+                "position":"relative",
+                "top":"0px",
+                "background-color":"white",
+				"border":"solid 1px gray",
+				"padding":"3px"
+            });
+			
+		this.saveDiv.appendChild(document.createTextNode("Edit: "));
+		
+		this.saveBarSaveButton = document.createElement("button");
+		this.saveBarSaveButton.innerHTML = "Save";
+		this.saveDiv.appendChild(this.saveBarSaveButton);
+		
+		this.saveDiv.appendChild(document.createTextNode(" "));
+
+		this.saveBarCancelButton = document.createElement("button");
+		this.saveBarCancelButton.innerHTML = "Cancel";
+		this.saveDiv.appendChild(this.saveBarCancelButton);
     }
+	
+	this.saveBarSaveButton.onclick = onSave;
+	this.saveBarCancelButton.onclick = onCancel;
+	this.saveBarActive = true;
+	
+	this.showActiveHeaders();
+}
+
+/** This method returns the base member for this component. */
+visicomp.app.visiui.Component.hideSaveBar = function() {
+    this.saveBarActive = false;	
+	this.showActiveHeaders();
+}
+
+/** This method shows the active headers. 
+ * @private */
+visicomp.app.visiui.Component.showActiveHeaders = function() {
+	var window = this.getWindow();
+	
+	var headers = [];
+	if((this.errorBarActive)&&(this.errorDiv)) {
+		headers.push(this.errorDiv);
+	}
+	if((this.saveBarActive)&&(this.saveDiv)) {
+		headers.push(this.saveDiv);
+	}
+	
+    window.loadHeaders(headers);
 }
 
 //==============================

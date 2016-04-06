@@ -222,6 +222,11 @@ visicomp.visiui.WindowFrame.TITLE_BAR_SUPPLEMENT_STYLE = {
     "background-color":visicomp.visiui.colors.windowColor,
     "padding":"3px"
 };
+/** provides styleing for the header container. */
+visicomp.visiui.WindowFrame.HEADER_SUPPLEMENT_STYLE = {
+    //configurable
+};
+
 visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE = {
     //fixed
     "display":"inline",
@@ -1015,7 +1020,7 @@ visicomp.visiui.WindowFrame.prototype.createHeaderContainer = function() {
     
     this.headerElement = document.createElement("div");
     visicomp.visiui.applyStyle(this.headerElement,visicomp.visiui.WindowFrame.HEADER_ELEMENT_BASE_STYLE);
-    visicomp.visiui.applyStyle(this.headerElement,visicomp.visiui.WindowFrame.TITLE_BAR_SUPPLEMENT_STYLE);
+    visicomp.visiui.applyStyle(this.headerElement,visicomp.visiui.WindowFrame.HEADER_SUPPLEMENT_STYLE);
     this.headerRow.appendChild(this.headerElement);
  
     //load empty headers

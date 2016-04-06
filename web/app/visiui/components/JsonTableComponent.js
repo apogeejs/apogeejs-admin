@@ -30,12 +30,12 @@ visicomp.app.visiui.JsonTableComponent.prototype.setViewType = function(viewType
 	//create the new view element;
 	switch(viewType) {
 		case visicomp.app.visiui.JsonTableComponent.VIEW_TEXT:
-			this.viewElement = new visicomp.app.visiui.JsonTableComponent.TextView(this);
+			this.viewElement = new visicomp.app.visiui.JsonTableComponent.TextView(this,true);
             this.viewType = visicomp.app.visiui.JsonTableComponent.VIEW_TEXT;
 			break;
 			
 		case visicomp.app.visiui.JsonTableComponent.VIEW_FORM:
-			this.viewElement = new visicomp.app.visiui.JsonTableComponent.FormView(this);
+			this.viewElement = new visicomp.app.visiui.JsonTableComponent.FormView(this,true);
             this.viewType = visicomp.app.visiui.JsonTableComponent.VIEW_FORM;
 			break;
 			
@@ -223,6 +223,11 @@ visicomp.app.visiui.JsonTableComponent.TextView = function(jsonTableComponent) {
 		"overflow":"auto"
 	});
 	
+	this.component = jsonTableComponent;
+	this.table = jsonTableComponent.getObject();
+	this.workingData = null;
+	this.editOk = false;
+	
 	var editor = ace.edit(this.editorDiv);
 	
 //this stops an error message
@@ -240,6 +245,70 @@ editor.$blockScrolling = Infinity;
     }
 	
     addResizeListener(this.editorDiv, resizeCallback);
+	
+	this.editMode = false;
+	
+	var instance = this;
+	var onMouseClick = function() {
+		instance.onMouseClick();
+	}
+	this.editorDiv.addEventListener("click",onMouseClick);
+}
+
+visicomp.app.visiui.JsonTableComponent.TextView.prototype.onMouseClick = function() {
+	if((this.editOk)&&(!this.editMode)) {
+		
+		var instance = this;
+		var onSave = function() {
+			instance.save();
+		}
+		var onCancel = function() {
+			instance.cancel();
+		}
+		
+		this.component.showSaveBar(onSave,onCancel);
+		
+		this.editor.setReadOnly(false);
+		this.editMode = true;
+	}
+}
+
+visicomp.app.visiui.JsonTableComponent.TextView.prototype.save = function() {
+	
+	var dataText = this.editor.getSession().getValue();
+	var data;
+	if(dataText.length > 0) {
+		try {
+			data = JSON.parse(dataText);
+		}
+		catch(error) {
+			//parsing error
+			alert("There was an error parsing the JSON input: " +  error.message);
+			return;
+		}
+	}
+	else {
+		data = "";
+	}
+	
+	visicomp.core.updatemember.updateData(this.table,data);
+	
+	//exit edit mode
+	this.editMode = false;
+	this.editor.setReadOnly(true);
+
+	this.component.hideSaveBar();
+}
+
+visicomp.app.visiui.JsonTableComponent.TextView.prototype.cancel = function() {
+	//reset the original data
+	this.showData(this.workingData,this.editOk);
+	
+	//exit edit mode
+	this.editMode = false;
+	this.editor.setReadOnly(true);
+
+	this.component.hideSaveBar();
 }
 
 /** This flag indicates the object does not edit data - because in text we can not enforce value json 
@@ -250,7 +319,10 @@ visicomp.app.visiui.JsonTableComponent.TextView.prototype.getElement = function(
 	return this.editorDiv;
 }
 	
-visicomp.app.visiui.JsonTableComponent.TextView.prototype.showData = function(data) {
+visicomp.app.visiui.JsonTableComponent.TextView.prototype.showData = function(data,editOk) {
+	
+	this.workingData = data;
+	
 	var textData;
 	if(data === null) {
 		textData = "null";
@@ -262,6 +334,7 @@ visicomp.app.visiui.JsonTableComponent.TextView.prototype.showData = function(da
 		textData = JSON.stringify(data,null,visicomp.app.visiui.JsonTableComponent.formatString);
 	}
 	
+	this.editOk = editOk;
 	this.editor.getSession().setValue(textData);
 }
 
@@ -272,7 +345,7 @@ visicomp.app.visiui.JsonTableComponent.TextView.prototype.destroy = function() {
     }
 }
 
-visicomp.app.visiui.JsonTableComponent.FormView = function(jsonTableComponent,editOk) {
+visicomp.app.visiui.JsonTableComponent.FormView = function(jsonTableComponent) {
 	
 	this.editorDiv = visicomp.visiui.createElement("div",null,{
 		"position":"absolute",
