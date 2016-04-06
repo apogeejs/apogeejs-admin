@@ -53,6 +53,8 @@ visicomp.app.visiui.JsonTableComponent.prototype.setViewType = function(viewType
 /** This method populates the frame for this component. 
  * @protected */
 visicomp.app.visiui.JsonTableComponent.prototype.populateFrame = function() {
+	
+	this.setFixedContentElement();
     
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();

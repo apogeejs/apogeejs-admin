@@ -37,6 +37,7 @@ visicomp.app.visiui.FolderComponent.prototype.writeToJson = function(json) {
 /** This method populates the frame for this component. 
  * @protected */
 visicomp.app.visiui.FolderComponent.prototype.populateFrame = function() {
+	this.setScrollingContentElement();
 }
 
 //======================================

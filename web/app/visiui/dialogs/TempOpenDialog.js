@@ -17,15 +17,16 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
             "height":"100%",
             "overflow": "auto"
         });
+	dialog.setContent(contentContainer);
     
     var line;
     
-var content = visicomp.visiui.createElement("div",null,
-        {
-			"display":"table",
-            "overflow":"hidden"
-        });
-contentContainer.appendChild(content);
+	var content = visicomp.visiui.createElement("div",null,
+			{
+				"display":"table",
+				"overflow":"hidden"
+			});
+	contentContainer.appendChild(content);
   
     //title
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
@@ -67,17 +68,10 @@ contentContainer.appendChild(content);
     content.appendChild(line);
     
     //show dialog
-//dialog.setContent(contentContainer);
-	//set to a dummy size, we will resize to fit
-    dialog.setSize(500,500);
     dialog.show();
     
     //size the dialog to the content
-    var insideWidth = content.offsetWidth;
-    var insideHeight = content.offsetHeight;
-    var outsideWidth = contentContainer.offsetWidth;
-    var outsideHeight = contentContainer.offsetHeight;
-    dialog.setSize(500 + insideWidth - outsideWidth + 20,500 + insideHeight - outsideHeight + 20);
+    dialog.fitToContent(content);
     
     var coords = dialogParent.getCenterOnPagePosition(dialog);
     dialog.setPosition(coords[0],coords[1]);

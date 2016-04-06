@@ -43,6 +43,8 @@ visicomp.app.visiui.FolderFunctionComponent.prototype.writeToJson = function(jso
 /** This method populates the frame for this component. 
  * @protected */
 visicomp.app.visiui.FolderFunctionComponent.prototype.populateFrame = function() {
+	
+	this.setScrollingContentElement();
     
     var menuItemInfoList = this.getMenuItemInfoList();
     

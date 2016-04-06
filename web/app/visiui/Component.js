@@ -32,18 +32,6 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     windowOptions.resizable = true;
     windowOptions.movable = true;
     this.window = new visicomp.visiui.WindowFrame(this.parentContainer,windowOptions);
-    
-    //load the content div
-    var contentDiv = visicomp.visiui.createElement("div",null,
-        {
-			"display":"block",
-            "position":"relative",
-            "top":"0px",
-            "height":"100%",
-            "overflow": "auto"
-        });
-    this.window.setContent(contentDiv);
-
 
     //------------------
     // Add menu (we will add the items later. This populates it.)
@@ -149,9 +137,29 @@ visicomp.app.visiui.Component.getWindow = function() {
      return this.window;
 }
 
+/** This method sets the content element as a scrolling element. */
+visicomp.app.visiui.Component.setScrollingContentElement = function() {
+    //load the content div
+    this.contentDiv = visicomp.visiui.createElement("div",null,
+        {
+			"display":"block",
+            "position":"relative",
+            "top":"0px",
+            "height":"100%",
+            "overflow": "auto"
+        });
+    this.window.setContent(this.contentDiv);
+}
+
+/** This method sets the content element as a fixed element. */
+visicomp.app.visiui.Component.setFixedContentElement = function() {
+    //load the content div
+    this.contentDiv = this.window.getBody();
+}
+
 /** This method returns the content element for the windowframe for this component. */
 visicomp.app.visiui.Component.getContentElement = function() {
-     return this.window.getContent();
+     return this.contentDiv;
 }
 
 /** This serializes the component. */

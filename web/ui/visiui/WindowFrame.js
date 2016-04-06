@@ -26,7 +26,14 @@ visicomp.visiui.WindowFrame = function(parentContainer, options) {
     this.options = options;
 
     this.windowState = visicomp.visiui.WindowFrame.NORMAL; //minimize, normal, maximize
-    this.coordinateInfo = {};
+    
+	//set default size values
+	this.coordinateInfo = {};
+	this.coordinateInfo.x = 0;
+	this.coordinateInfo.y = 0;
+	this.coordinateInfo.width = visicomp.visiui.WindowFrame.DEFAULT_WINDOW_WIDTH;
+	this.coordinateInfo.height = visicomp.visiui.WindowFrame.DEFAULT_WINDOW_HEIGHT;
+	
     this.isShowing = false;
 	
     this.frame = null;
@@ -122,18 +129,14 @@ visicomp.visiui.WindowFrame.RESIZE_NW = visicomp.visiui.WindowFrame.RESIZE_NORTH
 visicomp.visiui.WindowFrame.RESIZE_SE = visicomp.visiui.WindowFrame.RESIZE_SOUTH + visicomp.visiui.WindowFrame.RESIZE_EAST;
 visicomp.visiui.WindowFrame.RESIZE_SW = visicomp.visiui.WindowFrame.RESIZE_SOUTH + visicomp.visiui.WindowFrame.RESIZE_WEST;
 
+/** size must be speicifed for the window. If not these values are used. */
+visicomp.visiui.WindowFrame.DEFAULT_WINDOW_HEIGHT = 300;
+visicomp.visiui.WindowFrame.DEFAULT_WINDOW_WIDTH = 300;
 //======================================
 // CSS STYLES
 //======================================
 
-//visicomp.visiui.WindowFrame.HEADER_ROW_STYLE
-//visicomp.visiui.WindowFrame.BODY_ROW_STYLE
-//visicomp.visiui.WindowFrame.ROW_FILL_ELEMENT_BASE_STYLE
-//visicomp.visiui.WindowFrame.TITLE_BAR_SUPPLEMENT_STYLE
-//visicomp.visiui.WindowFrame.BODY_SUPPLEMENT_STYLE
-
-
-/* window frame */
+/** window frame style for normal mode */
 visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL = {
     //fixed
     "position":"absolute",
@@ -148,6 +151,7 @@ visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL = {
     "opacity":".95"
 };
 
+/** Window frame stle for maximized mode */
 visicomp.visiui.WindowFrame.FRAME_STYLE_MAX = {
     //fixed
     "position":"absolute",
@@ -160,6 +164,7 @@ visicomp.visiui.WindowFrame.FRAME_STYLE_MAX = {
     "border":"",
     "opacity":""
 };
+/** Style for header table row components inside the frame. */
 visicomp.visiui.WindowFrame.HEADER_ROW_STYLE = {
     //fixed
     "position":"relative",	
@@ -168,6 +173,7 @@ visicomp.visiui.WindowFrame.HEADER_ROW_STYLE = {
     "top":"0px",
     "left":"0px"
 };
+/** Style for the header element inside the header row element. */
 visicomp.visiui.WindowFrame.HEADER_ELEMENT_BASE_STYLE = {
     "display":"block",
     "top":"0px",
@@ -175,6 +181,7 @@ visicomp.visiui.WindowFrame.HEADER_ELEMENT_BASE_STYLE = {
     "position":"relative",
     "overflow":"visible"
 };
+/** Style for the body table row - fills all area not needed for fixed size headers. */
 visicomp.visiui.WindowFrame.BODY_ROW_STYLE = {
     //fixed
     "position":"relative",	
@@ -184,6 +191,7 @@ visicomp.visiui.WindowFrame.BODY_ROW_STYLE = {
     "top":"0px",
     "left":"0px"
 };
+/** This isolates the window table elements from sizing of the body element. */ 
 visicomp.visiui.WindowFrame.BODY_BUFFER_STYLE = {
     "display":"block",
     "position":"relative",
@@ -191,6 +199,8 @@ visicomp.visiui.WindowFrame.BODY_BUFFER_STYLE = {
     "height":"100%",
     "overflow": "auto"
 };
+/** This is the style for the body element. If scrolling is desired a
+ * overflow:auto component should be added inside the window body. */
 visicomp.visiui.WindowFrame.BODY_ELEMENT_BASE_STYLE = {
     "display":"block",
     "top":"0px",
@@ -200,10 +210,12 @@ visicomp.visiui.WindowFrame.BODY_ELEMENT_BASE_STYLE = {
     "position":"absolute",
     "overflow":"hidden"   
 };
+/** provides styling for the body */
 visicomp.visiui.WindowFrame.BODY_SUPPLEMENT_STYLE = {
     //configurable
     "background-color":"white"  
 };
+/** provides styleing for the title bar. */
 visicomp.visiui.WindowFrame.TITLE_BAR_SUPPLEMENT_STYLE = {
     //configurable
     "background-color":visicomp.visiui.colors.windowColor,
@@ -247,6 +259,9 @@ visicomp.visiui.WindowFrame.prototype.getTitle = function(title) {
  * This will be added to the title bar in the order it was called. The standard
  * location for the menu is immediately after the menu, if the menu is present. */
 visicomp.visiui.WindowFrame.prototype.setTitle = function(title) {
+	if((title === null)||(title === undefined)||(title.length === 0)) {
+		title = "&nbsp;";
+	}
     //title
     this.title = title;
     if(!this.titleElement) {
@@ -264,10 +279,33 @@ visicomp.visiui.WindowFrame.prototype.setTitle = function(title) {
 visicomp.visiui.WindowFrame.prototype.getMenu = function() {
     if(!this.menu) {
         this.menu = visicomp.visiui.Menu.createMenuFromImage(visicomp.visiui.WindowFrame.MENU_IMAGE);
-        this.titleBarLeftElements.appendChild(this.menu.getElement());
+		var firstLeftElementChild = this.titleBarLeftElements.firstChild;
+		if(firstLeftElementChild) {
+			this.titleBarLeftElements.insertBefore(this.menu.getElement(),firstLeftElementChild);
+		}
+		else {
+			this.titleBarLeftElements.appendChild(this.menu.getElement());
+		}
     }
     return this.menu;
 }
+
+/** This method sets the headers for the window. They appreare between the title
+ * bar and the body. The elements should typicaly be "block" type components, such
+ * as a div.
+ */
+visicomp.visiui.WindowFrame.prototype.loadHeaders = function(headerElements) {
+    visicomp.core.util.removeAllChildren(this.headerElement);
+    if(headerElements.length > 0) {
+        this.headerRow.style.display = "table-row";
+        for(var i = 0; i < headerElements.length; i++) {}
+        this.headerElement.appendChild(headerElements[i]);
+    }
+    else {
+        this.headerRow.style.display = "none";
+    }
+}
+
 
 /** This method shows the window. */
 visicomp.visiui.WindowFrame.prototype.show = function() {
@@ -317,8 +355,7 @@ visicomp.visiui.WindowFrame.prototype.setPosition = function(x,y) {
     this.updateCoordinates();
 }
 
-/** This method sets the size of the window frame, including the title bar. To 
- * size according to content, leave the window frame unsized (or call "clearSize") */
+/** This method sets the size of the window frame, including the title bar. */
 visicomp.visiui.WindowFrame.prototype.setSize = function(width,height) {
     this.coordinateInfo.width = width;
 	this.coordinateInfo.height = height;
@@ -326,15 +363,27 @@ visicomp.visiui.WindowFrame.prototype.setSize = function(width,height) {
     this.updateCoordinates();
 }
 
-/** This method clears the size set for the window. The window will be sized 
- * according to the content. */
-visicomp.visiui.WindowFrame.prototype.clearSize = function() {
-    this.coordinateInfo.width = undefined;
-	this.coordinateInfo.height = undefined;
- 
-    this.updateCoordinates();
+/** This method sets the size of the window to fit the content. It should only be 
+ * called after the window has been shown. The argument passed should be the element
+ * that holds the content and is sized to it. */
+visicomp.visiui.WindowFrame.prototype.fitToContent = function(contentContainer) {
+	//figure out how big to make the frame to fit the content
+    var viewWidth = this.body.offsetWidth;
+    var viewHeight = this.body.offsetHeight;
+    var contentWidth = contentContainer.offsetWidth;
+    var contentHeight = contentContainer.offsetHeight;
+	
+	var targetWidth = this.coordinateInfo.width + contentWidth - viewWidth + visicomp.visiui.WindowFrame.FIT_WIDTH_BUFFER;
+	var targetHeight = this.coordinateInfo.height + contentHeight - viewHeight + visicomp.visiui.WindowFrame.FIT_HEIGHT_BUFFER;
+	
+    this.setSize(targetWidth,targetHeight);
 }
 
+/** @private */
+visicomp.visiui.WindowFrame.FIT_HEIGHT_BUFFER = 20;
+/** @private */
+visicomp.visiui.WindowFrame.FIT_WIDTH_BUFFER = 20;
+	
 /** This method gets the location and size info for the window. */
 visicomp.visiui.WindowFrame.prototype.getCoordinateInfo= function() {
     return this.coordinateInfo;
@@ -377,7 +426,13 @@ visicomp.visiui.WindowFrame.prototype.getElement = function() {
     return this.frame;
 }
 
-/** This method sets the content for the body. To clear the content, pass null.*/
+/** This method returns the window body.*/
+visicomp.visiui.WindowFrame.prototype.getBody = function() {
+    return this.body;
+}
+
+/** This method sets a content element in the body. Alternatively the body can 
+ * be retrieved and loaded as desired. */
 visicomp.visiui.WindowFrame.prototype.setContent = function(element) {
     //remove the old content
     while(this.body.firstChild) {
@@ -389,11 +444,6 @@ visicomp.visiui.WindowFrame.prototype.setContent = function(element) {
     if(this.content) {
         this.body.appendChild(this.content);
     }
-}
-
-/** This method sets the content for the body. To clear the content, pass null.*/
-visicomp.visiui.WindowFrame.prototype.getContent = function() {
-    return this.content;
 }
 
 /** This method sets the size of the window, including the title bar and other decorations. */
@@ -748,8 +798,14 @@ visicomp.visiui.WindowFrame.prototype.updateCoordinates = function() {
 		if(this.coordinateInfo.height !== undefined) {
 			this.frame.style.height = this.coordinateInfo.height + "px";
 		}
+		else {
+			this.frame.style.height = visicomp.visiui.WindowFrame.DEFAULT_WINDOW_HEIGHT + "px";
+		}
 		if(this.coordinateInfo.width !== undefined) {
 			this.frame.style.width = this.coordinateInfo.width + "px";
+		}
+		else {
+			this.frame.style.width = visicomp.visiui.WindowFrame.DEFAULT_WINDOW_WIDTH + "px";
 		}
     }
     else if(this.windowState === visicomp.visiui.WindowFrame.MINIMIZED) {
@@ -918,6 +974,9 @@ visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
         }
         this.titleBarRightElements.appendChild(this.closeButton);
     }
+	
+	//add am empty title
+	this.setTitle("");
     
     //mouse move and resize
     if(this.options.movable) {
@@ -959,18 +1018,6 @@ visicomp.visiui.WindowFrame.prototype.createHeaderContainer = function() {
  
     //load empty headers
     this.loadHeaders([]);
-}
-
-visicomp.visiui.WindowFrame.prototype.loadHeaders = function(headerElements) {
-    visicomp.core.util.removeAllChildren(this.headerElement);
-    if(headerElements.length > 0) {
-        this.headerRow.style.display = "table-row";
-        for(var i = 0; i < headerElements.length; i++) {}
-        this.headerElement.appendChild(headerElements[i]);
-    }
-    else {
-        this.headerRow.style.display = "none";
-    }
 }
 	
 /** @private */

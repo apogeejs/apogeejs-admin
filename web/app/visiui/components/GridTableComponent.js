@@ -17,6 +17,8 @@ visicomp.core.util.mixin(visicomp.app.visiui.GridTableComponent,visicomp.app.vis
 /** This method populates the frame for this component. 
  * @protected */
 visicomp.app.visiui.GridTableComponent.prototype.populateFrame = function() {
+	
+	this.setFixedContentElement();
     
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
@@ -35,16 +37,16 @@ visicomp.app.visiui.GridTableComponent.prototype.populateFrame = function() {
     //editor - only for display, read only
     var contentDiv = this.getContentElement();
     
-var bufferDiv = visicomp.visiui.createElement("div",null,{
-        "display":"block",
-        "top":"0px",
-        "left":"0px",
-        "bottom":"0px",
-        "right":"0px",
-        "position":"absolute",
-        "overflow":"hidden"   
-	});
-	contentDiv.appendChild(bufferDiv); 
+//var bufferDiv = visicomp.visiui.createElement("div",null,{
+//        "display":"block",
+//        "top":"0px",
+//        "left":"0px",
+//        "bottom":"0px",
+//        "right":"0px",
+//        "position":"absolute",
+//        "overflow":"hidden"   
+//	});
+//	contentDiv.appendChild(bufferDiv); 
     
 	this.gridDiv = visicomp.visiui.createElement("div",null,{
         "width":contentDiv.clientWidth + "px",
@@ -52,8 +54,8 @@ var bufferDiv = visicomp.visiui.createElement("div",null,{
 		"overflow":"hidden",
         "zIndex":0
 	});
-//	contentDiv.appendChild(this.gridDiv);
-bufferDiv.appendChild(this.gridDiv);    
+	contentDiv.appendChild(this.gridDiv);
+//bufferDiv.appendChild(this.gridDiv);    
     
     //resize the editor on window size change
     var instance = this;

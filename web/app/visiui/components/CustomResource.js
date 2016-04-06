@@ -16,7 +16,8 @@ visicomp.app.visiui.CustomResource.prototype.getWindow = function() {
 }
 
 visicomp.app.visiui.CustomResource.prototype.getContentElement = function() {
-    return this.window.getContent();
+    //return this.window.getContent();
+	alert("implement get content element for custom resource!");
 }
 
 visicomp.app.visiui.CustomResource.prototype.getHtml = function() {

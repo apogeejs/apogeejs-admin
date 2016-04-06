@@ -16,8 +16,8 @@ visicomp.core.util.mixin(visicomp.app.visiui.FunctionComponent,visicomp.app.visi
 /** This method populates the frame for this component. 
  * @protected */
 visicomp.app.visiui.FunctionComponent.prototype.populateFrame = function() {
-    
-    var window = this.getWindow();
+	
+	this.setFixedContentElement();
     
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
