@@ -11,6 +11,9 @@ visicomp.app.visiui.FormDataMode = function(component) {
 	
 }
 
+/** This indicates if this element displays data or something else (code) */
+visicomp.app.visiui.FormDataMode.prototype.isData = true;
+
 visicomp.app.visiui.FormDataMode.prototype.getElement = function() {
 	return this.editor.getElement();
 }

@@ -12,6 +12,7 @@ visicomp.core.util.mixin(visicomp.app.visiui.JsonTableComponent,visicomp.app.vis
 visicomp.app.visiui.JsonTableComponent.VIEW_TEXT = "Text";
 visicomp.app.visiui.JsonTableComponent.VIEW_FORM = "Form";
 visicomp.app.visiui.JsonTableComponent.VIEW_CODE = "Code";
+visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE = "Supplemental Code";
 
 visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW = visicomp.app.visiui.JsonTableComponent.VIEW_FORM;
 
@@ -36,6 +37,16 @@ visicomp.app.visiui.JsonTableComponent.prototype.setViewType = function(viewType
 		case visicomp.app.visiui.JsonTableComponent.VIEW_FORM:
 			this.viewElement = new visicomp.app.visiui.FormDataMode(this);
             this.viewType = visicomp.app.visiui.JsonTableComponent.VIEW_FORM;
+			break;
+			
+		case visicomp.app.visiui.JsonTableComponent.VIEW_CODE:
+			this.viewElement = new visicomp.app.visiui.AceCodeMode(this);
+            this.viewType = visicomp.app.visiui.JsonTableComponent.VIEW_CODE;
+			break;
+			
+		case visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
+			this.viewElement = new visicomp.app.visiui.AceSupplementalMode(this);
+            this.viewType = visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE;
 			break;
 			
 		default:
@@ -111,7 +122,7 @@ visicomp.app.visiui.JsonTableComponent.prototype.memberUpdated = function() {
         this.showElement(this.viewElement);
     }
 
-    var editable = !object.hasCode();
+    var editable = ((this.viewElement.isData === false)||(!object.hasCode()));
 
     this.viewElement.showData(editable);
 }
@@ -176,8 +187,10 @@ visicomp.app.visiui.JsonTableComponent.prototype.createViewDialogCallback = func
     ddLine.type = "dropdown";
     ddLine.heading = "View: "
     ddLine.entries = [
-        visicomp.app.visiui.JsonTableComponent.VIEW_FORM,
-        visicomp.app.visiui.JsonTableComponent.VIEW_TEXT
+		visicomp.app.visiui.JsonTableComponent.VIEW_FORM,
+		visicomp.app.visiui.JsonTableComponent.VIEW_TEXT,
+		visicomp.app.visiui.JsonTableComponent.VIEW_CODE,
+		visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE
     ];
     ddLine.resultKey = "view";
     layout.lines.push(ddLine);

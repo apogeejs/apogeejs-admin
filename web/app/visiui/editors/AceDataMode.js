@@ -16,6 +16,9 @@ visicomp.app.visiui.AceDataMode = function(component) {
 	
 }
 
+/** This indicates if this element displays data or something else (code) */
+visicomp.app.visiui.AceDataMode.prototype.isData = true;
+
 visicomp.app.visiui.AceDataMode.prototype.getElement = function() {
 	return this.editor.getElement();
 }
