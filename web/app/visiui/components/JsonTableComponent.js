@@ -23,19 +23,18 @@ visicomp.app.visiui.JsonTableComponent.prototype.setViewType = function(viewType
 	
 	//if there is an old view, remove it
 	if(this.viewElement) {
-		this.viewElement.destroy();
 		this.showElement(null);
 	}
 	
 	//create the new view element;
 	switch(viewType) {
 		case visicomp.app.visiui.JsonTableComponent.VIEW_TEXT:
-			this.viewElement = new visicomp.app.visiui.JsonTableComponent.TextView(this,true);
+			this.viewElement = new visicomp.app.visiui.AceDataMode(this);
             this.viewType = visicomp.app.visiui.JsonTableComponent.VIEW_TEXT;
 			break;
 			
 		case visicomp.app.visiui.JsonTableComponent.VIEW_FORM:
-			this.viewElement = new visicomp.app.visiui.JsonTableComponent.FormView(this,true);
+			this.viewElement = new visicomp.app.visiui.FormDataMode(this);
             this.viewType = visicomp.app.visiui.JsonTableComponent.VIEW_FORM;
 			break;
 			
@@ -114,7 +113,7 @@ visicomp.app.visiui.JsonTableComponent.prototype.memberUpdated = function() {
 
     var editable = !object.hasCode();
 
-    this.viewElement.showData(object.getData(),editable);
+    this.viewElement.showData(editable);
 }
 
 /** @private */
@@ -128,6 +127,9 @@ visicomp.app.visiui.JsonTableComponent.prototype.showElement = function(viewElem
 		contentDiv.appendChild(viewDiv);
 	}
 	
+	if(this.viewElementShowing) {
+		this.viewElementShowing.destroy();
+	}
 	this.viewElementShowing = viewElement;
 }
 
@@ -206,222 +208,6 @@ visicomp.app.visiui.JsonTableComponent.prototype.createViewDialogCallback = func
         //open dialog
 		visicomp.app.visiui.dialog.showConfigurableDialog(layout,onSubmit);
 	}
-}
-
-//======================================
-// View Objects
-//======================================
-
-visicomp.app.visiui.JsonTableComponent.TextView = function(jsonTableComponent) {
-   
-	this.editorDiv = visicomp.visiui.createElement("div",null,{
-		"position":"absolute",
-        "top":"0px",
-        "left":"0px",
-		"bottom":"0px",
-        "right":"0px",
-		"overflow":"auto"
-	});
-	
-	this.component = jsonTableComponent;
-	this.table = jsonTableComponent.getObject();
-	this.workingData = null;
-	this.editOk = false;
-	
-	var editor = ace.edit(this.editorDiv);
-	
-//this stops an error message
-editor.$blockScrolling = Infinity;
-
-    editor.renderer.setShowGutter(true);
-    editor.setReadOnly(true);
-    editor.setTheme("ace/theme/eclipse"); //good
-    editor.getSession().setMode("ace/mode/json"); 
-    this.editor = editor;
-	
-	//resize the editor on window size change
-    var resizeCallback = function() {
-        editor.resize();
-    }
-	
-    addResizeListener(this.editorDiv, resizeCallback);
-	
-	this.editMode = false;
-	
-	var instance = this;
-	var onMouseClick = function() {
-		instance.onMouseClick();
-	}
-	this.editorDiv.addEventListener("click",onMouseClick);
-}
-
-visicomp.app.visiui.JsonTableComponent.TextView.prototype.onMouseClick = function() {
-	if((this.editOk)&&(!this.editMode)) {
-		
-		var instance = this;
-		var onSave = function() {
-			instance.save();
-		}
-		var onCancel = function() {
-			instance.cancel();
-		}
-		
-		this.component.showSaveBar(onSave,onCancel);
-		
-		this.editor.setReadOnly(false);
-		this.editMode = true;
-	}
-}
-
-visicomp.app.visiui.JsonTableComponent.TextView.prototype.save = function() {
-	
-	var dataText = this.editor.getSession().getValue();
-	var data;
-	if(dataText.length > 0) {
-		try {
-			data = JSON.parse(dataText);
-		}
-		catch(error) {
-			//parsing error
-			alert("There was an error parsing the JSON input: " +  error.message);
-			return;
-		}
-	}
-	else {
-		data = "";
-	}
-	
-	visicomp.core.updatemember.updateData(this.table,data);
-	
-	//exit edit mode
-	this.editMode = false;
-	this.editor.setReadOnly(true);
-
-	this.component.hideSaveBar();
-}
-
-visicomp.app.visiui.JsonTableComponent.TextView.prototype.cancel = function() {
-	//reset the original data
-	this.showData(this.workingData,this.editOk);
-	
-	//exit edit mode
-	this.editMode = false;
-	this.editor.setReadOnly(true);
-
-	this.component.hideSaveBar();
-}
-
-/** This flag indicates the object does not edit data - because in text we can not enforce value json 
- * during each edit step. */
-visicomp.app.visiui.JsonTableComponent.TextView.prototype.canEdit = false;
-
-visicomp.app.visiui.JsonTableComponent.TextView.prototype.getElement = function() {
-	return this.editorDiv;
-}
-	
-visicomp.app.visiui.JsonTableComponent.TextView.prototype.showData = function(data,editOk) {
-	
-	this.workingData = data;
-	
-	var textData;
-	if(data === null) {
-		textData = "null";
-	}
-	else if(data === undefined) {
-		textData = "undefined";
-	}
-	else {
-		textData = JSON.stringify(data,null,visicomp.app.visiui.JsonTableComponent.formatString);
-	}
-	
-	this.editOk = editOk;
-	this.editor.getSession().setValue(textData);
-}
-
-visicomp.app.visiui.JsonTableComponent.TextView.prototype.destroy = function() {
-	if(this.editor) {
-        this.editor.destroy();
-        this.editor = null;
-    }
-}
-
-visicomp.app.visiui.JsonTableComponent.FormView = function(jsonTableComponent) {
-	
-	this.editorDiv = visicomp.visiui.createElement("div",null,{
-		"position":"absolute",
-        "top":"0px",
-        "left":"0px",
-		"bottom":"0px",
-        "right":"0px",
-		"overflow":"auto"
-	});
-    
-    this.workingData = null;
-    
-    var instance = this;
-    var table = jsonTableComponent.getObject();
-    this.editCallback = function() {
-        var currentData = instance.editor.getCurrentValue();
-        instance.workingData = currentData;
-        visicomp.core.updatemember.updateData(table,currentData);
-    }
-}
-
-/** This flag indicates the element can or cannot edit data. */
-visicomp.app.visiui.JsonTableComponent.FormView.prototype.canEdit = true;
-
-visicomp.app.visiui.JsonTableComponent.FormView.prototype.getElement = function() {
-	return this.editorDiv;
-}
-
-visicomp.app.visiui.JsonTableComponent.FormView.prototype.showData = function(data,editOk) {
-    if((data == this.workingData)&&(this.editOk == editOk)) {
-        //no need to update
-        return;
-    }
-    
-    this.workingData = visicomp.core.util.deepCopy(data);
-    this.editOk = editOk;
-    
-	visicomp.core.util.removeAllChildren(this.editorDiv);
-	this.editor = new visicomp.jsonedit.JsonEditArea(this.editorDiv,data,editOk);
-    
-    this.editor.setEditCallback(this.editCallback);
-}
-
-visicomp.app.visiui.JsonTableComponent.FormView.prototype.destroy = function() {
-}
-
-visicomp.app.visiui.JsonTableComponent.ErrorView = function(jsonTableComponent) {
-	this.displayDiv = visicomp.visiui.createElement("div",null,{
-		"position":"absolute",
-        "top":"0px",
-        "left":"0px",
-		"bottom":"0px",
-        "right":"0px",
-		"overflow":"auto",
-		"color":"red"
-	});
-}
-
-/** This flag indicates the object does not edit data. */
-visicomp.app.visiui.JsonTableComponent.ErrorView.prototype.canEdit = false;
-
-visicomp.app.visiui.JsonTableComponent.ErrorView.prototype.getElement = function() {
-	return this.displayDiv;
-}
-
-visicomp.app.visiui.JsonTableComponent.ErrorView.prototype.showData = function(actionErrors) {
-	var errorMsg = "Error: \n";
-    for(var i = 0; i < actionErrors.length; i++) {
-        errorMsg += actionErrors[i].msg + "\n";
-    }
-	
-	this.displayDiv.innerHTML = errorMsg;
-}
-
-visicomp.app.visiui.JsonTableComponent.ErrorView.prototype.destroy = function() {
-	
 }
 
 
