@@ -1,4 +1,7 @@
-
+/** Editor that uses json edit area
+ * 
+ * @param {type} onSave - should take a json object that should be saved.
+ */
 visicomp.app.visiui.JsonFormEditor = function(onSave) {
 	
 	this.editorDiv = visicomp.visiui.createElement("div",null,{

@@ -1,4 +1,10 @@
-
+/** Editor that uses the Ace text editor.
+ * 
+ * @param {type} component - the visicomp component
+ * @param {type} aceMode - the display format, such as "ace/mode/json"
+ * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
+ * @param {type} onCancel - returns true if the edit should end
+ */
 visicomp.app.visiui.AceTextEditor = function(component,aceMode,onSave,onCancel) {
    
 	this.editorDiv = visicomp.visiui.createElement("div",null,{
