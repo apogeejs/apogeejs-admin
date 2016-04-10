@@ -40,7 +40,7 @@ visicomp.app.visiui.JsonTableComponent.prototype.setViewType = function(viewType
 			break;
 			
 		case visicomp.app.visiui.JsonTableComponent.VIEW_CODE:
-			this.viewElement = new visicomp.app.visiui.AceCodeMode(this);
+			this.viewElement = new visicomp.app.visiui.AceCodeMode(this,visicomp.app.visiui.JsonTableComponent.editorCodeWrapper);
             this.viewType = visicomp.app.visiui.JsonTableComponent.VIEW_CODE;
 			break;
 			
