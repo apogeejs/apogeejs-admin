@@ -19,10 +19,12 @@ visicomp.app.visiui.JsonTableComponent.VIEW_TEXT = "Text";
 visicomp.app.visiui.JsonTableComponent.VIEW_FORM = "Form";
 visicomp.app.visiui.JsonTableComponent.VIEW_CODE = "Code";
 visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+visicomp.app.visiui.JsonTableComponent.VIEW_GRID = "GRID";
 
 visicomp.app.visiui.JsonTableComponent.VIEW_MODES = [
     visicomp.app.visiui.JsonTableComponent.VIEW_FORM,
     visicomp.app.visiui.JsonTableComponent.VIEW_TEXT,
+	visicomp.app.visiui.JsonTableComponent.VIEW_GRID,
     visicomp.app.visiui.JsonTableComponent.VIEW_CODE,
     visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE
 ];
@@ -46,6 +48,9 @@ visicomp.app.visiui.JsonTableComponent.prototype.getViewModeElement = function(v
 			
 		case visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new visicomp.app.visiui.AceSupplementalMode(this);
+			
+		case visicomp.app.visiui.JsonTableComponent.VIEW_GRID:
+			return new visicomp.app.visiui.HandsonGridMode(this);
 			
 		default:
 //temporary error handling...
