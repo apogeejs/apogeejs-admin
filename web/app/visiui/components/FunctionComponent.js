@@ -2,16 +2,48 @@
 visicomp.app.visiui.FunctionComponent = function(workspaceUI, functionObject, componentJson) {
     //base init
     visicomp.app.visiui.Component.init.call(this,workspaceUI,functionObject,visicomp.app.visiui.FunctionComponent.generator,componentJson);
-
+    visicomp.app.visiui.TableEditComponent.init.call(this);
+    
     this.memberUpdated();
 };
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.app.visiui.FunctionComponent,visicomp.app.visiui.Component);
+visicomp.core.util.mixin(visicomp.app.visiui.FunctionComponent,visicomp.app.visiui.TableEditComponent);
 
 //==============================
 // Protected and Private Instance Methods
 //==============================
+
+visicomp.app.visiui.FunctionComponent.VIEW_CODE = "Code";
+visicomp.app.visiui.FunctionComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+
+visicomp.app.visiui.FunctionComponent.VIEW_MODES = [
+    visicomp.app.visiui.FunctionComponent.VIEW_CODE,
+    visicomp.app.visiui.FunctionComponent.VIEW_SUPPLEMENTAL_CODE
+];
+
+visicomp.app.visiui.FunctionComponent.DEFAULT_VIEW = visicomp.app.visiui.FunctionComponent.VIEW_CODE;
+
+/** This method should be implemented to retrieve a view mode of the give type. 
+ * @protected. */
+visicomp.app.visiui.FunctionComponent.prototype.getViewModeElement = function(viewType) {
+	
+	//create the new view element;
+	switch(viewType) {
+			
+		case visicomp.app.visiui.FunctionComponent.VIEW_CODE:
+			return new visicomp.app.visiui.AceCodeMode(this);
+			
+		case visicomp.app.visiui.FunctionComponent.VIEW_SUPPLEMENTAL_CODE:
+			return new visicomp.app.visiui.AceSupplementalMode(this);
+			
+		default:
+//temporary error handling...
+			alert("unrecognized view element!");
+			return null;
+	}
+}
 
 /** This method populates the frame for this component. 
  * @protected */
@@ -25,30 +57,13 @@ visicomp.app.visiui.FunctionComponent.prototype.populateFrame = function() {
     var itemInfo1 = {};
     itemInfo1.title = "Edit Arg List";
     itemInfo1.callback = this.createEditArgListDialogCallback();
-  
-    var itemInfo2 = {};
-    itemInfo2.title = "Edit Function";
-    itemInfo2.callback = this.createEditCodeableDialogCallback("Update Function");
     
     //add these at the start of the menu
-    menuItemInfoList.splice(0,0,itemInfo1,itemInfo2);
+    menuItemInfoList.splice(0,0,itemInfo1);
     
-    //editor - only for display, read only
-    var contentDiv = this.getContentElement();
-    var editor = ace.edit(contentDiv);
-//this stops an error message
-editor.$blockScrolling = Infinity;
-    editor.renderer.setShowGutter(true);
-    editor.setReadOnly(true);
-    editor.setTheme("ace/theme/eclipse"); //good
-    editor.getSession().setMode("ace/mode/javascript"); 
-    this.editor = editor;
-    
-    //resize the editor on window size change
-    var resizeCallback = function() {
-        editor.resize();
-    }
-    addResizeListener(contentDiv, resizeCallback);
+    //show the view
+	this.setViewTypes(visicomp.app.visiui.FunctionComponent.VIEW_MODES,
+        visicomp.app.visiui.FunctionComponent.DEFAULT_VIEW);
 }
 
 /** This method should include an needed functionality to clean up after a delete. */
@@ -57,49 +72,6 @@ visicomp.app.visiui.FunctionComponent.prototype.onDelete = function() {
         this.editor.destroy();
         this.editor = null;
     }
-}
-
-/** This is the format character use to display tabs in the display editor. 
- * @private*/
-visicomp.app.visiui.FunctionComponent.formatString = "\t";
-
-/** This method updates the table data 
- * @private */    
-visicomp.app.visiui.FunctionComponent.prototype.memberUpdated = function() {
-    var functionObject = this.getObject();
-    var displayName = functionObject.getDisplayName();
-    
-    //make sure the title is up to data
-    var window = this.getWindow();
-    if(window) {
-        var windowTitle = window.getTitle();
-        if(windowTitle != displayName) {
-            window.setTitle(displayName);
-        }
-    }
-    
-    //print body
-	if(functionObject.hasError()) {
-        this.showErrors(functionObject.getErrors());
-    }
-    else {
-		var functionBody = functionObject.getFunctionBody();
-		var supplementalCode = functionObject.getSupplementalCode();
-		var code = "function " + displayName + " {\n" + functionBody + "\n}\n";
-		if(supplementalCode) {
-			code += "\n/* Supplemental Code */\n\n" +
-				supplementalCode;
-		}
-		this.editor.getSession().setValue(code);
-	}
-}
-
-visicomp.app.visiui.FunctionComponent.prototype.showErrors = function(actionErrors) {
-    var errorMsg = "Error: \n";
-    for(var i = 0; i < actionErrors.length; i++) {
-        errorMsg += actionErrors[i].msg + "\n";
-    }
-    this.editor.getSession().setValue(errorMsg);
 }
 
 //=============================

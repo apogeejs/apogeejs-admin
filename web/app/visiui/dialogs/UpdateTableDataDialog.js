@@ -43,7 +43,7 @@ dataEditor.$blockScrolling = Infinity;
 	//set the value
     if(!table.hasCode()) {
         var data = table.getData();
-        dataEditor.getSession().setValue(JSON.stringify(data,null,visicomp.app.visiui.JsonTableComponent.formatString));
+        dataEditor.getSession().setValue(JSON.stringify(data,null,visicomp.app.visiui.AceDataMode.formatString));
     }
 	
     editorDiv.appendChild(dataEditorDiv);

@@ -16,6 +16,10 @@ visicomp.app.visiui.AceDataMode = function(component) {
 	
 }
 
+/** This is the format character use to display tabs in the display editor. 
+ * @private*/
+visicomp.app.visiui.AceDataMode.formatString = "\t";
+
 /** This indicates if this element displays data or something else (code) */
 visicomp.app.visiui.AceDataMode.prototype.isData = true;
 
@@ -38,7 +42,7 @@ visicomp.app.visiui.AceDataMode.prototype.showData = function(editOk) {
 		textData = "undefined";
 	}
 	else {
-		textData = JSON.stringify(json,null,visicomp.app.visiui.JsonTableComponent.formatString);
+		textData = JSON.stringify(json,null,visicomp.app.visiui.AceDataMode.formatString);
 	}
 	
 	this.editor.showData(textData,editOk);

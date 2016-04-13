@@ -468,6 +468,21 @@ visicomp.visiui.WindowFrame.prototype.removeTitleBarElement = function(element) 
     this.titleBarLeftElements.appendRemove(element);
 }
 
+/** This method sets the content for the body. To clear the content, pass null.*/
+visicomp.visiui.WindowFrame.prototype.addRightTitleBarElement = function(element) {
+    if(this.titleBarRightElements.firstChild) {
+		this.titleBarRightElements.insertBefore(element,this.titleBarRightElements.firstChild);
+	}
+    else {
+        this.titleBarRightElements.appendChild(element);
+    }
+}
+
+/** This method sets the content for the body. To clear the content, pass null.*/
+visicomp.visiui.WindowFrame.prototype.removeRightTitleBarElement = function(element) {
+    this.titleBarRightElements.appendRemove(element);
+}
+
 //====================================
 // Motion/Reseize Event Handlers and functions
 //====================================
