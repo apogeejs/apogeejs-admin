@@ -23,6 +23,8 @@ visicomp.app.visiui.CustomControlComponent.prototype.initEmptyResource = functio
 /** This method populates the frame for this component. */
 visicomp.app.visiui.CustomControlComponent.prototype.addToFrame = function() {
 	
+this.setFixedContentElement();
+	
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
 
@@ -98,7 +100,7 @@ visicomp.app.visiui.CustomControlComponent.prototype.update = function(html,reso
     try { 
         //create a new resource
         var newResource = new visicomp.app.visiui.CustomResource();
-        newResource.setWindow(this.getWindow());
+        newResource.setComponent(this);
 
         //update it
         newResource.update(html,resourceGeneratorBody,supplementalCode,css);

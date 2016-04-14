@@ -1,5 +1,5 @@
 visicomp.app.visiui.CustomResource = function() {
-	this.window = null;
+	this.contentElement = null;
 	
 	this.html = "";
 	this.customizeScript = "";
@@ -7,17 +7,16 @@ visicomp.app.visiui.CustomResource = function() {
 	this.css = "";
 }
 
-visicomp.app.visiui.CustomResource.prototype.setWindow = function(window) {
-    this.window = window;
-}
-
-visicomp.app.visiui.CustomResource.prototype.getWindow = function() {
-    return this.window;
+visicomp.app.visiui.CustomResource.prototype.setComponent = function(component) {
+    this.component = component;
 }
 
 visicomp.app.visiui.CustomResource.prototype.getContentElement = function() {
-    //return this.window.getContent();
-	alert("implement get content element for custom resource!");
+    return this.component.getContentElement();
+}
+
+visicomp.app.visiui.CustomResource.prototype.getComponent = function() {
+    return this.component;
 }
 
 visicomp.app.visiui.CustomResource.prototype.getHtml = function() {
