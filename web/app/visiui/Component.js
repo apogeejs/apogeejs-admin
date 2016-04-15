@@ -75,8 +75,10 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     itemInfo.callback = this.createDeleteCallback(itemInfo.title);
     this.menuItemInfoList.push(itemInfo);
     
-     //let the extending object populate the frame and the menu items
-    this.populateFrame();
+    //let the extending object populate the frame and the menu items
+	if(this.populateFrame) {
+		this.populateFrame();
+	}
     
     //set the menu items
     menu.setMenuItems(this.menuItemInfoList);

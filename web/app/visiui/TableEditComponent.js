@@ -7,7 +7,13 @@ visicomp.app.visiui.TableEditComponent = {};
 
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-visicomp.app.visiui.TableEditComponent.init = function() {
+visicomp.app.visiui.TableEditComponent.init = function(viewTypes,defaultView) {
+	
+	this.viewTypes = viewTypes;
+	this.defaultView = defaultView;
+	
+	this.initUI();
+	
     //this.viewModeElement
     //this.viewType
     //this.viewModeElementShowing
@@ -32,37 +38,6 @@ visicomp.app.visiui.TableEditComponent.setViewType = function(viewType) {
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
 //visicomp.app.visiui.TableEditComponent.getViewModeElement = function(viewType);
-
-/** This method creates the view tuype selector UI. 
- * @protected */
-visicomp.app.visiui.TableEditComponent.setViewTypes = function(viewTypes,defaultView) {
-    this.select = visicomp.visiui.createElement("select",null,{
-        "margin-right":"3px",
-        "background-color":"transparent"
-    });
-    this.defaultView = defaultView;
-    
-    for(var i = 0; i < viewTypes.length; i++) {
-        var entry = viewTypes[i];
-        this.select.add(visicomp.visiui.createElement("option",{"text":entry}));
-    }
-    
-    //create on functions
-    var instance = this;
-    var onViewSet = function(event) {
-        instance.setViewType(instance.select.value);
-        instance.memberUpdated();
-        return true;
-    }
-    
-    this.select.onchange = onViewSet;
-   
-    //add the view select to the title bar
-    this.window.addRightTitleBarElement(this.select);
-    
-    this.setViewType(this.defaultView);
-    this.updateViewDropdown();
-}
 
 //this function will update the view shown in the dropdown
 visicomp.app.visiui.TableEditComponent.updateViewDropdown = function(viewType) {
@@ -96,6 +71,40 @@ visicomp.app.visiui.TableEditComponent.memberUpdated = function() {
     var editable = ((this.viewModeElement.isData === false)||(!object.hasCode()));
 
     this.viewModeElement.showData(editable);
+}
+
+/** This method populates the frame for this component. 
+ * @protected */
+visicomp.app.visiui.TableEditComponent.initUI = function() {
+	
+	this.setFixedContentElement();
+	
+	//create the view selection ui
+	this.select = visicomp.visiui.createElement("select",null,{
+        "margin-right":"3px",
+        "background-color":"transparent"
+    });
+    
+    for(var i = 0; i < this.viewTypes.length; i++) {
+        var entry = this.viewTypes[i];
+        this.select.add(visicomp.visiui.createElement("option",{"text":entry}));
+    }
+    
+    //create on functions
+    var instance = this;
+    var onViewSet = function(event) {
+        instance.setViewType(instance.select.value);
+        instance.memberUpdated();
+        return true;
+    }
+    
+    this.select.onchange = onViewSet;
+   
+    //add the view select to the title bar
+    this.window.addRightTitleBarElement(this.select);
+    
+    this.setViewType(this.defaultView);
+    this.updateViewDropdown();
 }
 
 /** @private */

@@ -2,7 +2,9 @@
 visicomp.app.visiui.FunctionComponent = function(workspaceUI, functionObject, componentJson) {
     //base init
     visicomp.app.visiui.Component.init.call(this,workspaceUI,functionObject,visicomp.app.visiui.FunctionComponent.generator,componentJson);
-    visicomp.app.visiui.TableEditComponent.init.call(this);
+    visicomp.app.visiui.TableEditComponent.init.call(this,
+		visicomp.app.visiui.FunctionComponent.VIEW_MODES,
+        visicomp.app.visiui.FunctionComponent.DEFAULT_VIEW);
     
     this.memberUpdated();
 };
@@ -48,8 +50,6 @@ visicomp.app.visiui.FunctionComponent.prototype.getViewModeElement = function(vi
 /** This method populates the frame for this component. 
  * @protected */
 visicomp.app.visiui.FunctionComponent.prototype.populateFrame = function() {
-	
-	this.setFixedContentElement();
     
     //create the menu
     var menuItemInfoList = this.getMenuItemInfoList();
@@ -60,10 +60,6 @@ visicomp.app.visiui.FunctionComponent.prototype.populateFrame = function() {
     
     //add these at the start of the menu
     menuItemInfoList.splice(0,0,itemInfo1);
-    
-    //show the view
-	this.setViewTypes(visicomp.app.visiui.FunctionComponent.VIEW_MODES,
-        visicomp.app.visiui.FunctionComponent.DEFAULT_VIEW);
 }
 
 /** This method should include an needed functionality to clean up after a delete. */

@@ -1,28 +1,13 @@
 
 visicomp.app.visiui.AceCodeMode = function(component,optionalEditorCodeWrapper) {
-	this.component = component;
+	//base constructor
+	visicomp.app.visiui.AceCodeModeBase.call(this,component,"ace/mode/javascript");
+	
 	this.editorCodeWrapper = optionalEditorCodeWrapper;
-	
-	this.editOk = false;
-	
-	var instance = this;
-	var onSave = function(text) {
-		return instance.onSave(text);
-	}
-	var onCancel = function() {
-		return instance.onCancel();
-	}
-	
-	this.editor = new visicomp.app.visiui.AceTextEditor(component,"ace/mode/javascript",onSave,onCancel);
-	
 }
 
-/** This indicates if this element displays data or something else (code) */
-visicomp.app.visiui.AceCodeMode.prototype.isData = false;
-
-visicomp.app.visiui.AceCodeMode.prototype.getElement = function() {
-	return this.editor.getElement();
-}
+visicomp.app.visiui.AceCodeMode.prototype = Object.create(visicomp.app.visiui.AceCodeModeBase.prototype);
+visicomp.app.visiui.AceCodeMode.prototype.constructor = visicomp.app.visiui.AceCodeMode;
 	
 visicomp.app.visiui.AceCodeMode.prototype.showData = function(editOk) {
 		
@@ -39,14 +24,6 @@ visicomp.app.visiui.AceCodeMode.prototype.showData = function(editOk) {
 	
 	this.editor.showData(codeText,editOk);
 }
-
-visicomp.app.visiui.AceCodeMode.prototype.destroy = function() {
-	this.editor.destroy();
-}
-
-//==============================
-// internal
-//==============================
 
 visicomp.app.visiui.AceCodeMode.prototype.onSave = function(text) {	
 	
@@ -70,10 +47,4 @@ visicomp.app.visiui.AceCodeMode.prototype.onSave = function(text) {
 	}
         
 	return true;  
-}
-visicomp.app.visiui.AceCodeMode.prototype.onCancel = function() {
-	//reload old data
-	this.showData(this.editOk);
-	
-	return true;
 }

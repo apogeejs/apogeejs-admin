@@ -76,6 +76,11 @@ visicomp.app.visiui.HandsonGridEditor = function(component,onSave,onCancel) {
 	//do a resize on load too
 	this.dummyFrameElement.onload = onLoadCallback;
 	
+	//grid edited function
+	this.gridEdited = function(args) {
+		instance.save(arguments);
+	}
+	
 }
 
 visicomp.app.visiui.HandsonGridEditor.prototype.save = function(argArray) {

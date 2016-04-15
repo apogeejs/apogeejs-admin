@@ -2,7 +2,9 @@
 visicomp.app.visiui.JsonTableComponent = function(workspaceUI,table,componentJson) {
     //base init
     visicomp.app.visiui.Component.init.call(this,workspaceUI,table,visicomp.app.visiui.JsonTableComponent.generator,componentJson);
-    visicomp.app.visiui.TableEditComponent.init.call(this);
+    visicomp.app.visiui.TableEditComponent.init.call(this,
+		visicomp.app.visiui.JsonTableComponent.VIEW_MODES,
+        visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW);
     
     this.memberUpdated();
 };
@@ -24,7 +26,6 @@ visicomp.app.visiui.JsonTableComponent.VIEW_GRID = "GRID";
 visicomp.app.visiui.JsonTableComponent.VIEW_MODES = [
     visicomp.app.visiui.JsonTableComponent.VIEW_FORM,
     visicomp.app.visiui.JsonTableComponent.VIEW_TEXT,
-	visicomp.app.visiui.JsonTableComponent.VIEW_GRID,
     visicomp.app.visiui.JsonTableComponent.VIEW_CODE,
     visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE
 ];
@@ -49,25 +50,11 @@ visicomp.app.visiui.JsonTableComponent.prototype.getViewModeElement = function(v
 		case visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new visicomp.app.visiui.AceSupplementalMode(this);
 			
-		case visicomp.app.visiui.JsonTableComponent.VIEW_GRID:
-			return new visicomp.app.visiui.HandsonGridMode(this);
-			
 		default:
 //temporary error handling...
 			alert("unrecognized view element!");
 			return null;
 	}
-}
-
-/** This method populates the frame for this component. 
- * @protected */
-visicomp.app.visiui.JsonTableComponent.prototype.populateFrame = function() {
-	
-	this.setFixedContentElement();
-
-	//show the view
-	this.setViewTypes(visicomp.app.visiui.JsonTableComponent.VIEW_MODES,
-        visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW);
 }
 
 /** This method should include an needed functionality to clean up after a delete. */

@@ -12,7 +12,7 @@ visicomp.app.visiui.CustomResource.prototype.setComponent = function(component) 
 }
 
 visicomp.app.visiui.CustomResource.prototype.getContentElement = function() {
-    return this.component.getContentElement();
+    return this.component.getOutputElement();
 }
 
 visicomp.app.visiui.CustomResource.prototype.getComponent = function() {

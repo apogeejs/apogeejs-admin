@@ -2,15 +2,18 @@
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-visicomp.app.visiui.CustomControlComponent = function(workspaceUI,resource,componentJson) {
+visicomp.app.visiui.CustomControlComponent = function(workspaceUI,control,componentJson) {
     //base init
-    visicomp.app.visiui.Component.init.call(this,workspaceUI,resource,visicomp.app.visiui.CustomControlComponent.generator,componentJson);
-    visicomp.app.visiui.BasicControlComponent.init.call(this);
+    visicomp.app.visiui.Component.init.call(this,workspaceUI,control,visicomp.app.visiui.CustomControlComponent.generator,componentJson);
+	visicomp.app.visiui.TableEditComponent.init.call(this,
+		visicomp.app.visiui.CustomControlComponent.VIEW_MODES,
+		visicomp.app.visiui.CustomControlComponent.DEFAULT_VIEW
+	);
 };
 
 //add components to this class
 visicomp.core.util.mixin(visicomp.app.visiui.CustomControlComponent,visicomp.app.visiui.Component);
-visicomp.core.util.mixin(visicomp.app.visiui.CustomControlComponent,visicomp.app.visiui.BasicControlComponent);
+visicomp.core.util.mixin(visicomp.app.visiui.CustomControlComponent,visicomp.app.visiui.TableEditComponent);
 
 //==============================
 // Protected and Private Instance Methods
@@ -20,21 +23,56 @@ visicomp.app.visiui.CustomControlComponent.prototype.initEmptyResource = functio
 	this.update("","","","");
 }
 
-/** This method populates the frame for this component. */
-visicomp.app.visiui.CustomControlComponent.prototype.addToFrame = function() {
-	
-this.setFixedContentElement();
-	
-    //create the menu
-    var menuItemInfoList = this.getMenuItemInfoList();
+visicomp.app.visiui.CustomControlComponent.prototype.getOutputElement = function() {
+	return this.outputMode.getElement();
+}
 
-    var itemInfo = {};
-    itemInfo.title = "Edit Resource Code";
-    itemInfo.callback = this.createEditResourceDialogCallback();
-    
-    //add these at the start of the menu
-    menuItemInfoList.splice(1,0,itemInfo);
+visicomp.app.visiui.CustomControlComponent.VIEW_OUTPUT = "Output";
+visicomp.app.visiui.CustomControlComponent.VIEW_CODE = "Model Code";
+visicomp.app.visiui.CustomControlComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+visicomp.app.visiui.CustomControlComponent.VIEW_CUSTOM_CODE = "Base Code";
+visicomp.app.visiui.CustomControlComponent.VIEW_CUSTOM_SUPPLEMENTAL_CODE = "Base Private";
 
+visicomp.app.visiui.CustomControlComponent.VIEW_MODES = [
+	visicomp.app.visiui.CustomControlComponent.VIEW_OUTPUT,
+	visicomp.app.visiui.CustomControlComponent.VIEW_CODE,
+    visicomp.app.visiui.CustomControlComponent.VIEW_SUPPLEMENTAL_CODE,
+    visicomp.app.visiui.CustomControlComponent.VIEW_CUSTOM_CODE,
+    visicomp.app.visiui.CustomControlComponent.VIEW_CUSTOM_SUPPLEMENTAL_CODE
+];
+
+visicomp.app.visiui.CustomControlComponent.DEFAULT_VIEW = visicomp.app.visiui.CustomControlComponent.VIEW_OUTPUT;
+
+/** This method should be implemented to retrieve a view mode of the give type. 
+ * @protected. */
+visicomp.app.visiui.CustomControlComponent.prototype.getViewModeElement = function(viewType) {
+	
+	//create the new view element;
+	switch(viewType) {
+		
+		case visicomp.app.visiui.CustomControlComponent.VIEW_OUTPUT:
+			if(!this.outputMode) {
+				this.outputMode = new visicomp.app.visiui.ResourceOutputMode(this);
+			}
+			return this.outputMode;
+			
+		case visicomp.app.visiui.CustomControlComponent.VIEW_CODE:
+			return new visicomp.app.visiui.AceCodeMode(this);
+			
+		case visicomp.app.visiui.CustomControlComponent.VIEW_SUPPLEMENTAL_CODE:
+			return new visicomp.app.visiui.AceSupplementalMode(this);
+			
+		case visicomp.app.visiui.CustomControlComponent.VIEW_CUSTOM_CODE:
+			return new visicomp.app.visiui.AceCustomCodeMode(this);
+			
+		case visicomp.app.visiui.CustomControlComponent.VIEW_CUSTOM_SUPPLEMENTAL_CODE:
+			return new visicomp.app.visiui.AceCustomSupplementalMode(this);
+			
+		default:
+//temporary error handling...
+			alert("unrecognized view element!");
+			return null;
+	}
 }
 
 /** This serializes the table component. */
