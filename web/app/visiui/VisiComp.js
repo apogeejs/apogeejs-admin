@@ -93,6 +93,7 @@ visicomp.app.visiui.VisiComp.prototype.addWorkspaceUI = function(workspaceUI,nam
 
 /** This method closes the active workspace. */
 visicomp.app.visiui.VisiComp.prototype.removeWorkspaceUI = function(name) {
+    
     //remove the workspace from the app
     delete this.workspaceUIs[name];
     this.tabFrame.removeTab(name);
@@ -107,7 +108,7 @@ visicomp.app.visiui.VisiComp.prototype.removeWorkspaceUI = function(name) {
  * removed. Removing links may or may not remove them from the page (currently
  * js links are not removed and css links are, once they are not used by any 
  * workspase. The linksLoadedCallback is optional. It is called when all links have
- * been loaded on the page. CALLBACK NOT CURRENTLY IMPLEMENTED!!!
+ * been loaded on the page.
  */
 visicomp.app.visiui.VisiComp.prototype.updateWorkspaceLinks = function(workspaceName,addList,removeList,linksLoadedCallback) {
 	this.linkManager.updateWorkspaceLinks(workspaceName,addList,removeList,linksLoadedCallback);

@@ -39,6 +39,12 @@ visicomp.app.visiui.closeworkspace.closeWorkspace = function(app) {
         var workspace = activeWorkspaceUI.getWorkspace();
         
         var name = workspace.getName();
+        
+        var doRemove = confirm("Are you sure you want to close the workspace " + name + "?");
+        if(!doRemove) {
+            return actionResponse;
+        }
+        
         workspaceUIRemoved = app.removeWorkspaceUI(name);
 
         workspace.close();

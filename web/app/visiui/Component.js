@@ -287,7 +287,10 @@ visicomp.app.visiui.Component.createEditCodeableDialogCallback = function(title,
 visicomp.app.visiui.Component.createDeleteCallback = function(title) {
     var object = this.getObject();
     return function() {
-        //we should do a warning!!!
+        var doDelete = confirm("Are you sure you want to delete this object?");
+        if(!doDelete) {
+            return;
+        }
         
         //delete the object - the component we be deleted after the delete event received
         var actionResponse = visicomp.core.deletemember.deleteMember(object);

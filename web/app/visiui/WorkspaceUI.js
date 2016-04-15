@@ -71,8 +71,15 @@ visicomp.app.visiui.WorkspaceUI.prototype.getComponent = function(object) {
 }
 
 /** This returns the map of component objects. */
-visicomp.app.visiui.WorkspaceUI.prototype.getComponentMap = function() {
-	return this.componentMap;
+visicomp.app.visiui.WorkspaceUI.prototype.getFolderList = function() {
+	var folderList = []; 
+    for(var key in this.componentMap) {
+		var componentInfo = this.componentMap[key];
+		if(componentInfo.parentContainer) { 
+			folderList.push(key);
+		}
+    }
+    return folderList;
 }
 
 visicomp.app.visiui.WorkspaceUI.prototype.getParentContainerObject = function(object) {
@@ -113,8 +120,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.registerMember = function(object,compo
     
 }
 
-/** This method registers a component. The parameter "parentContainer" is optional
- * and is only needed if the object is a parent container. */
+/** This method sets the parent for the given component. */
 visicomp.app.visiui.WorkspaceUI.prototype.addComponentContainer = function(object,parentContainer) {
     
     //store the ui object
@@ -160,8 +166,27 @@ visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
 }
 
 visicomp.app.visiui.WorkspaceUI.prototype.getObjectKey = function(object) {
-//needs to be changed when we add folderFunctions
 	return object.getFullName();
+}
+
+visicomp.app.visiui.WorkspaceUI.prototype.getObjectByKey = function(key) {
+    var componentInfo = this.componentMap[key];
+    if(componentInfo) {
+        return componentInfo.object;
+    }
+    else {
+        return null;
+    }
+}
+
+visicomp.app.visiui.WorkspaceUI.prototype.getComponentByKey = function(key) {
+    var componentInfo = this.componentMap[key];
+    if(componentInfo) {
+        return componentInfo.component;
+    }
+    else {
+        return null;
+    }
 }
 
 //====================================

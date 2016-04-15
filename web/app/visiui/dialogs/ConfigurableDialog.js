@@ -135,7 +135,7 @@ visicomp.app.visiui.dialog.showConfigurableDialog.lineFunctions = {
         lineObject.element = line;
         //get result
         lineObject.addToResult = function(formData) {
-            var result = inputElement.value.trim;
+            var result = inputElement.value.trim();
             formData[lineDef.resultKey] = result;
         }
         //no on Close
