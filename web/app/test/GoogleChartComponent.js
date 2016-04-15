@@ -55,9 +55,9 @@ GoogleChartResource = function() {
 }
 
 /** setFrame - required method for resource processor used in Basic Resource Control. */
-GoogleChartResource.prototype.setContentElement = function(contentElement) {
-    this.contentElement = contentElement;
-    this.run();
+GoogleChartResource.prototype.setComponent = function(component) {
+    this.component = component;
+    this.component.memberUpdated();
 }
 
 /** setFrame - required method for resource processor used in Basic Resource Control. */
@@ -76,15 +76,15 @@ GoogleChartResource.prototype.setData = function(data,chartOptions) {
 /** This is the method users will call to initialize the chart. */
 GoogleChartResource.prototype.onLibLoaded = function() {
     this.libLoaded = true;
-    this.run();
+    this.component.memberUpdated();
 }
 
 /** This is the method users will call to initialize the chart. */
 GoogleChartResource.prototype.run = function() {
-    if((this.libLoaded)&&(this.contentElement)) {
+    if((this.libLoaded)&&(this.component)) {
         //create chart if needed
         if(!this.chart) {
-            this.chart = new google.visualization.LineChart(this.contentElement);
+            this.chart = new google.visualization.LineChart(this.component.getOutputElement());
         }
         
         //plot the data
@@ -107,60 +107,22 @@ GoogleChartResource.prototype.createDataTable = function(data) {
     return dataTable;
 }
 
-//=================================
-// Google Chart Control
-//=================================
-
-/** This is the control for the chart. It inherits from the component
- * BasicResourceControl to represent a resource object. */
-GoogleChartComponent = function(workspaceUI,control,componentJson) {
-    
-    //add the resource for the control
-    var resource = new GoogleChartResource();
-    control.updateResource(resource);
-    
-    //base init
-    visicomp.app.visiui.Component.init.call(this,workspaceUI,control,GoogleChartComponent.generator,componentJson);
-    visicomp.app.visiui.BasicControlComponent.init.call(this);
-};
-
-//add components to this class
-visicomp.core.util.mixin(GoogleChartComponent,visicomp.app.visiui.Component);
-visicomp.core.util.mixin(GoogleChartComponent,visicomp.app.visiui.BasicControlComponent);
-
-/** Ordinarily we would populate the UI here. But we might have to wait for the
- * google library to load so we just set the element so it can be loaded later. */
-GoogleChartComponent.prototype.addToFrame = function() {
-    var control = this.getObject();
-    var resource = control.getResource();
-    resource.setContentElement(this.getContentElement());
-}
-
 //======================================
 // Static methods
 //======================================
 
+var GoogleChartComponent = {};
+
 /** This method creates the control. */
 GoogleChartComponent.createComponent = function(workspaceUI,parent,name) {
-	//create a resource a simple chart resource processor
-    var json = {};
-    json.name = name;
-    json.type = visicomp.core.Control.generator.type;
-    var actionResponse = visicomp.core.createmember.createMember(parent,json);
-    
-    var control = actionResponse.member;
-    if(control) {
-        var googleChartComponent = new GoogleChartComponent(workspaceUI,control);
-        actionResponse.component = googleChartComponent;
-    }
-    else {
-        //no action for now
-    }
-    return actionResponse;
+	var resource = new GoogleChartResource();
+	return visicomp.app.visiui.BasicControlComponent.createBaseComponent(workspaceUI,parent,name,resource,GoogleChartComponent.generator);
 }
 
 GoogleChartComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
-    return new GoogleChartComponent(workspaceUI,member,componentJson);
+	var resource = new GoogleChartResource();
+	member.updateResource(resource);
+    return visicomp.app.visiui.BasicControlComponent.createBaseComponentFromJson(workspaceUI,member,GoogleChartComponent.generator,componentJson);
 }
 
 //======================================

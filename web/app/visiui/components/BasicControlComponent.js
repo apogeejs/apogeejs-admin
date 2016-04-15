@@ -1,55 +1,98 @@
-/** This is a mixin that encapsulates the base functionality of an abstract resource component
- * 
- * This is not a class, but it is used for the prototype of the objects that inherit from it.
- */
-visicomp.app.visiui.BasicControlComponent = {};
+/** This is a custom resource component. 
+ * To implement it, the resource script must have the methods "run()" which will
+ * be called when the component is updated. It also must have any methods that are
+ * confugred with initialization data from the model. */
+visicomp.app.visiui.BasicControlComponent = function(workspaceUI,control,generator,componentJson) {
+    //base init
+    visicomp.app.visiui.Component.init.call(this,workspaceUI,control,generator,componentJson);
+	visicomp.app.visiui.TableEditComponent.init.call(this,
+		visicomp.app.visiui.BasicControlComponent.VIEW_MODES,
+		visicomp.app.visiui.BasicControlComponent.DEFAULT_VIEW
+	);
+	
+	var resource = control.getResource();
+	resource.setComponent(this);
+};
 
-/** This is the initializer for the component. The object passed is the core object
- * associated with this component. */
-visicomp.app.visiui.BasicControlComponent.init = function() {}
+//add components to this class
+visicomp.core.util.mixin(visicomp.app.visiui.BasicControlComponent,visicomp.app.visiui.Component);
+visicomp.core.util.mixin(visicomp.app.visiui.BasicControlComponent,visicomp.app.visiui.TableEditComponent);
 
 //==============================
 // Protected and Private Instance Methods
 //==============================
 
-///** This method should be implemented to create the UI at initialization time. 
-//* It is called when the UI is ready to be constructed. */
-//visicomp.app.visiui.BasicControlComponent.prototype.addToFrame = function();
-
-/** This method populates the frame for this component. */
-visicomp.app.visiui.BasicControlComponent.populateFrame = function() {
-	
-    //create the menu
-    var menuItemInfoList = this.getMenuItemInfoList();
-  
-    var itemInfo = {};
-    itemInfo.title = "Edit Initializer Code";
-    itemInfo.callback = this.createEditCodeableDialogCallback(itemInfo.title);
-    
-    //add these at the start of the menu
-    menuItemInfoList.splice(0,0,itemInfo);
-
-    //check if the implementation wants to do anything
-    if(this.addToFrame) {
-        this.addToFrame();
-    }
-
+visicomp.app.visiui.BasicControlComponent.prototype.initEmptyResource = function() {
+	this.update("","","","");
 }
 
-/** This is called when the data is updated. This calls the "run" method of
- * the resource. 
- * @private */    
-visicomp.app.visiui.BasicControlComponent.memberUpdated = function() {
-    //execute the resource on an update
-    var control = this.getObject();
-    var resource = control.getResource();
-    if((resource)&&(resource.run)) {
-        resource.run();
-    }    
+visicomp.app.visiui.BasicControlComponent.prototype.getOutputElement = function() {
+	return this.outputMode.getElement();
+}
+
+visicomp.app.visiui.BasicControlComponent.VIEW_OUTPUT = "Output";
+visicomp.app.visiui.BasicControlComponent.VIEW_CODE = "Code";
+visicomp.app.visiui.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+
+visicomp.app.visiui.BasicControlComponent.VIEW_MODES = [
+	visicomp.app.visiui.BasicControlComponent.VIEW_OUTPUT,
+	visicomp.app.visiui.BasicControlComponent.VIEW_CODE,
+    visicomp.app.visiui.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE
+];
+
+visicomp.app.visiui.BasicControlComponent.DEFAULT_VIEW = visicomp.app.visiui.BasicControlComponent.VIEW_OUTPUT;
+
+/** This method should be implemented to retrieve a view mode of the give type. 
+ * @protected. */
+visicomp.app.visiui.BasicControlComponent.prototype.getViewModeElement = function(viewType) {
+	
+	//create the new view element;
+	switch(viewType) {
+		
+		case visicomp.app.visiui.BasicControlComponent.VIEW_OUTPUT:
+			if(!this.outputMode) {
+				this.outputMode = new visicomp.app.visiui.ResourceOutputMode(this);
+			}
+			return this.outputMode;
+			
+		case visicomp.app.visiui.BasicControlComponent.VIEW_CODE:
+			return new visicomp.app.visiui.AceCodeMode(this);
+			
+		case visicomp.app.visiui.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
+			return new visicomp.app.visiui.AceSupplementalMode(this);
+			
+		default:
+//temporary error handling...
+			alert("unrecognized view element!");
+			return null;
+	}
 }
 
 //======================================
 // Static methods
 //======================================
 
+visicomp.app.visiui.BasicControlComponent.createBaseComponent = function(workspaceUI,parent,name,resource,generator) {
+    var json = {};
+    json.name = name;
+    json.type = visicomp.core.Control.generator.type;
+    var actionResponse = visicomp.core.createmember.createMember(parent,json);
+    
+    var control = actionResponse.member;
+    if(control) {
+		//set the resource
+		control.updateResource(resource);
+		
+        //create the component
+        var basicControlComponent = new visicomp.app.visiui.BasicControlComponent(workspaceUI,control,generator);
+        actionResponse.component = basicControlComponent;
+    }
+    return actionResponse;
+}
+
+
+visicomp.app.visiui.BasicControlComponent.createBaseComponentFromJson = function(workspaceUI,member,generator,componentJson) {
+    var customControlComponent = new visicomp.app.visiui.BasicControlComponent(workspaceUI,member,generator,componentJson);
+    return customControlComponent;
+}
 

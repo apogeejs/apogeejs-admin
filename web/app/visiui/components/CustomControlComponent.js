@@ -105,28 +105,6 @@ visicomp.app.visiui.CustomControlComponent.prototype.updateFromJson = function(j
 }
 
 //=============================
-// Action UI Entry Points
-//=============================
-
-visicomp.app.visiui.CustomControlComponent.prototype.createEditResourceDialogCallback = function() {
-    
-    var instance = this;
-    
-    //create save handler
-    var onSave = function(componentHtml,componentOnLoad,supplementalCode,css) {
-		var actionResponse = instance.update(componentHtml,componentOnLoad,supplementalCode,css);
-        if(!actionResponse.getSuccess()) {
-            alert(actionResponse.getErrorMsg());
-        }
-		return true
-    };
-    
-    return function() {
-        visicomp.app.visiui.dialog.showUpdateCustomComponentDialog(instance,onSave);
-    }
-}
-
-//=============================
 // Action
 //=============================
 
