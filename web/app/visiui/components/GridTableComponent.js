@@ -59,10 +59,13 @@ visicomp.app.visiui.GridTableComponent.prototype.getViewModeElement = function(v
 //======================================
 
 
-visicomp.app.visiui.GridTableComponent.createComponent = function(workspaceUI,parent,name) {
+visicomp.app.visiui.GridTableComponent.createComponent = function(workspaceUI,data) {
+    
+    var parent = workspaceUI.getObjectByKey(data.parentKey);
+    //should throw an exception if parent is invalid!
     
     var json = {};
-    json.name = name;
+    json.name = data.name;
     json.type = visicomp.core.JsonTable.generator.type;
 	json.updateData = {};
 	json.updateData.data = [[""]]; //empty single cell

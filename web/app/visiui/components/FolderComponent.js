@@ -45,10 +45,13 @@ visicomp.app.visiui.FolderComponent.prototype.populateFrame = function() {
 //======================================
 
 //add table listener
-visicomp.app.visiui.FolderComponent.createComponent = function(workspaceUI,parent,name) {
+visicomp.app.visiui.FolderComponent.createComponent = function(workspaceUI,data) {
+    
+    var parent = workspaceUI.getObjectByKey(data.parentKey);
+    //should throw an exception if parent is invalid!
     
     var json = {};
-    json.name = name;
+    json.name = data.name;
     json.type = visicomp.core.Folder.generator.type;
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     

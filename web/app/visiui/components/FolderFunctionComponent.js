@@ -42,22 +42,8 @@ visicomp.app.visiui.FolderFunctionComponent.prototype.writeToJson = function(jso
 
 /** This method populates the frame for this component. 
  * @protected */
-visicomp.app.visiui.FolderFunctionComponent.prototype.populateFrame = function() {
-	
+visicomp.app.visiui.FolderFunctionComponent.prototype.populateFrame = function() {	
 	this.setScrollingContentElement();
-    
-    var menuItemInfoList = this.getMenuItemInfoList();
-    
-    var itemInfo1 = {};
-    itemInfo1.title = "Edit Arg List";
-    itemInfo1.callback = this.createEditArgListDialogCallback();
-  
-    var itemInfo2 = {};
-    itemInfo2.title = "Edit Return Value";
-    itemInfo2.callback = this.createEditReturnValueDialogCallback();
-    
-    //add these at the start of the menu
-    menuItemInfoList.splice(0,0,itemInfo1,itemInfo2);
 }
 
 /** This method updates the component when the data changes. 
@@ -75,56 +61,25 @@ visicomp.app.visiui.FolderFunctionComponent.prototype.memberUpdated = function()
     }
 }
 
-//=============================
-// Action UI Entry Points
-//=============================
+/** This method extends the base method to get the property values
+ * for the property edit dialog. */
+visicomp.app.visiui.FolderFunctionComponent.prototype.getPropertyValues = function() {
+    var values = visicomp.app.visiui.Component.getPropertyValues.call(this);
 
-/** This method creates a callback for editing a standard codeable object
- *  @private */
-visicomp.app.visiui.FolderFunctionComponent.prototype.createEditArgListDialogCallback = function() {
-    var folderFunction = this.getObject();
-    
-    //create save handler
-    var onSave = function(argList) {
-        var actionResponse = visicomp.core.updatefolderFunction.updateArgList(folderFunction,argList);
-        
-        if(!actionResponse.getSuccess()) {
-            //show an error message
-            var msg = actionResponse.getErrorMsg();
-            alert(msg);
-        }
-        
-        //return true to close the dialog
-        return true; 
-    };
-    
-    return function() {
-        visicomp.app.visiui.dialog.showUpdateArgListDialog(folderFunction,onSave);
-    }
+    var argList = this.object.getArgList();
+    var argListString = argList.toString();
+    values.argListString = argListString;
+    values.returnValueString = this.object.getReturnValueString();
+    return values;
 }
 
-/** This method creates a callback for editing a standard codeable object
- *  @private */
-visicomp.app.visiui.FolderFunctionComponent.prototype.createEditReturnValueDialogCallback = function() {
-    var folderFunction = this.getObject();
+/** This method extends the base method to update property values. */
+visicomp.app.visiui.FolderFunctionComponent.prototype.updatePropertyValues = function(newValues) {
+    var argListString = newValues.argListString;
+    var argList = visicomp.app.visiui.FunctionComponent.parseStringArray(argListString);
+    var returnValueString = newValues.returnValueString;
     
-    //create save handler
-    var onSave = function(returnValueString) {
-        var actionResponse = visicomp.core.updatefolderFunction.updateReturnValue(folderFunction,returnValueString);
-        
-        if(!actionResponse.getSuccess()) {
-            //show an error message
-            var msg = actionResponse.getErrorMsg();
-            alert(msg);
-        }
-        
-        //return true to close the dialog
-        return true; 
-    };
-    
-    return function() {
-        visicomp.app.visiui.dialog.showUpdateFolderFunctionReturnDialog(folderFunction,onSave);
-    }
+    return visicomp.core.updatefolderFunction.updatePropertyValues(this.object,argList,returnValueString);
 }
 
 //======================================
@@ -132,11 +87,22 @@ visicomp.app.visiui.FolderFunctionComponent.prototype.createEditReturnValueDialo
 //======================================
 
 /** This method creates the component. */
-visicomp.app.visiui.FolderFunctionComponent.createComponent = function(workspaceUI,parent,name) {
+visicomp.app.visiui.FolderFunctionComponent.createComponent = function(workspaceUI,data) {
     
+    var parent = workspaceUI.getObjectByKey(data.parentKey);
+    //should throw an exception if parent is invalid!
+
     var json = {};
-    json.name = name;
+    json.name = data.name; 
+    if(data.argListString) {
+        var argList = visicomp.app.visiui.FunctionComponent.parseStringArray(data.argListString);
+        json.argList = argList;
+    }
+    if(data.returnValueString) {
+        json.returnValue = data.returnValueString;
+    }
     json.type = visicomp.core.FolderFunction.generator.type;
+    
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
     var folderFunction = actionResponse.member;
@@ -167,3 +133,17 @@ visicomp.app.visiui.FolderFunctionComponent.generator.createComponent = visicomp
 visicomp.app.visiui.FolderFunctionComponent.generator.createComponentFromJson = visicomp.app.visiui.FolderFunctionComponent.createComponentFromJson;
 visicomp.app.visiui.FolderFunctionComponent.generator.DEFAULT_WIDTH = 500;
 visicomp.app.visiui.FolderFunctionComponent.generator.DEFAULT_HEIGHT = 500;
+
+visicomp.app.visiui.FolderFunctionComponent.generator.propertyDialogLines = [
+    {
+        "type":"inputElement",
+        "heading":"Arg List: ",
+        "resultKey":"argListString"
+    },
+    {
+        "type":"inputElement",
+        "heading":"Return Val: ",
+        "resultKey":"returnValueString"
+    }
+];
+

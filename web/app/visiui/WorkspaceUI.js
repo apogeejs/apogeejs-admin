@@ -60,7 +60,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.getWorkspace = function() {
 
 /** This method gets the component associated with a member object. */
 visicomp.app.visiui.WorkspaceUI.prototype.getComponent = function(object) {
-    var key = this.getObjectKey(object);
+    var key = visicomp.app.visiui.WorkspaceUI.getObjectKey(object);
 	var componentInfo = this.componentMap[key];
 	if(componentInfo) {
 		return componentInfo.component;
@@ -86,7 +86,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.getParentContainerObject = function(ob
     var parent = object.getParent();
     
     //get parent component info
-    var parentKey = this.getObjectKey(parent);
+    var parentKey = visicomp.app.visiui.WorkspaceUI.getObjectKey(parent);
     var parentComponentInfo = this.componentMap[parentKey];
     if(!parentComponentInfo.parentContainer) {
         throw visicomp.core.util.createError("Parent container not found!");
@@ -105,7 +105,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.registerMember = function(object,compo
     }
     
     //store the ui object
-	var key = this.getObjectKey(object);
+	var key = visicomp.app.visiui.WorkspaceUI.getObjectKey(object);
 	
 	if(this.componentMap[key]) {
 		alert("Unknown error - there is already an object with this object key: " + key);
@@ -124,7 +124,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.registerMember = function(object,compo
 visicomp.app.visiui.WorkspaceUI.prototype.addComponentContainer = function(object,parentContainer) {
     
     //store the ui object
-	var key = this.getObjectKey(object);
+	var key = visicomp.app.visiui.WorkspaceUI.getObjectKey(object);
 	
     var componentInfo = this.componentMap[key];
     if(!componentInfo) {
@@ -165,7 +165,7 @@ visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
 	}
 }
 
-visicomp.app.visiui.WorkspaceUI.prototype.getObjectKey = function(object) {
+visicomp.app.visiui.WorkspaceUI.getObjectKey = function(object) {
 	return object.getFullName();
 }
 

@@ -71,10 +71,13 @@ visicomp.app.visiui.JsonTableComponent.prototype.onDelete = function() {
 //======================================
 
 
-visicomp.app.visiui.JsonTableComponent.createComponent = function(workspaceUI,parent,name) {
+visicomp.app.visiui.JsonTableComponent.createComponent = function(workspaceUI,data) {
+    
+    var parent = workspaceUI.getObjectByKey(data.parentKey);
+    //should throw an exception if parent is invalid!
     
     var json = {};
-    json.name = name;
+    json.name = data.name;
     json.type = visicomp.core.JsonTable.generator.type;
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     

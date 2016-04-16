@@ -71,7 +71,13 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     
     //add the standard entries
     var itemInfo = {};
-    itemInfo.title = "Delete " + this.generator.displayName;
+    itemInfo.title = "Edit Properties";
+    itemInfo.callback = visicomp.app.visiui.addcomponent.getUpdateComponentCallback(this,this.generator);
+    
+    this.menuItemInfoList.push(itemInfo);
+    
+    var itemInfo = {};
+    itemInfo.title = "Delete";
     itemInfo.callback = this.createDeleteCallback(itemInfo.title);
     this.menuItemInfoList.push(itemInfo);
     
@@ -245,7 +251,8 @@ visicomp.app.visiui.Component.getMenuItemInfoList = function() {
 //** This serializes the table component. */
 //visicomp.app.visiui.Component.prototype.writeToJson = function(json);
 
-//This method should be populated by an extending object.
+//This method should be populated by an extending object iof it needs to add any UI elements
+// to the frame.
 //** This method populates the frame for this component. */
 //visicomp.app.visiui.Component.populateFrame = function();
 
@@ -253,38 +260,30 @@ visicomp.app.visiui.Component.getMenuItemInfoList = function() {
 visicomp.app.visiui.Component.onDelete = function() {
 }
 
+/** This method is used for setting initial values in the property dialog. 
+ * If there are additional property lines, in the generator, this method should
+ * be extended to give the values of those properties too. */
+visicomp.app.visiui.Component.getPropertyValues = function() {
+    var values = {};
+    values.name = this.object.getName();
+    values.parentKey = visicomp.app.visiui.WorkspaceUI.getObjectKey(this.object.getParent());
+    return values;
+}
+
+/** This method is used for updating property values from the property dialog. 
+ * If there are additional property lines, in the generator, this method should
+ * be extended to edit the values of those properties too. */
+visicomp.app.visiui.Component.updatePropertyValues = function(newValues) {
+    
+}
+
 //=============================
 // Action UI Entry Points
 //=============================
 
-/** This method creates a callback for editing a standard codeable object
- *  @private */
-visicomp.app.visiui.Component.createEditCodeableDialogCallback = function(title, optionalEditorWrapper) {
-	var instance = this;
-    var member = instance.getObject();
-    
-    //create save handler
-    var onSave = function(functionBody,supplementalCode) {
-        var argList = member.getArgList();
-        var actionResponse =  visicomp.core.updatemember.updateCode(member,argList,functionBody,supplementalCode);
-        if(!actionResponse.getSuccess()) {
-            //show an error message
-            var msg = actionResponse.getErrorMsg();
-            alert(msg);
-        }
-        
-        //return true to close the dialog
-        return true;  
-    };
-    
-    return function() {
-        visicomp.app.visiui.dialog.showUpdateCodeableDialog(instance.object,onSave,title,optionalEditorWrapper);
-    }
-}
-
 /** This method creates a callback for deleting the component. 
  *  @private */
-visicomp.app.visiui.Component.createDeleteCallback = function(title) {
+visicomp.app.visiui.Component.createDeleteCallback = function() {
     var object = this.getObject();
     return function() {
         var doDelete = confirm("Are you sure you want to delete this object?");

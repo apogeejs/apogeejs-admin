@@ -55,6 +55,10 @@ visicomp.app.visiui.dialog.showConfigurableDialog = function(layout,onSubmitFunc
     //show dialog
     dialog.setContent(content);
     dialog.show();
+    
+    //size the dialog to the content
+    dialog.fitToContent(content);
+    
     var coords = dialogParent.getCenterOnPagePosition(dialog);
     dialog.setPosition(coords[0],coords[1]);
 }
@@ -101,14 +105,17 @@ visicomp.app.visiui.dialog.showConfigurableDialog.lineFunctions = {
             line.appendChild(document.createTextNode(lineDef.heading));
         }
         var select = visicomp.visiui.createElement("select");
-        line.appendChild(select);
         for(var i = 0; i < lineDef.entries.length; i++) {
             var entry = lineDef.entries[i];
             select.add(visicomp.visiui.createElement("option",{"text":entry}));
-            if(lineDef.initial === i) {
-                select.value = entry;
-            }
         }
+        if(lineDef.initial) {
+            select.value = lineDef.initial;
+        }
+        if(lineDef.disabled) {
+            select.disabled = true;
+        }
+        line.appendChild(select);
         lineObject.element = line;
         //get result
         lineObject.addToResult = function(formData) {
@@ -131,6 +138,12 @@ visicomp.app.visiui.dialog.showConfigurableDialog.lineFunctions = {
             line.appendChild(document.createTextNode(lineDef.heading));
         }
         var inputElement = visicomp.visiui.createElement("input",{"type":"text"});
+        if(lineDef.initial) {
+            inputElement.value = lineDef.initial;
+        }
+        if(lineDef.disabled) {
+            inputElement.disabled = true;
+        }
         line.appendChild(inputElement);
         lineObject.element = line;
         //get result

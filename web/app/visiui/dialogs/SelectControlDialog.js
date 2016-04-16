@@ -4,8 +4,25 @@ visicomp.app.visiui.dialog.showSelectComponentDialog = function(componentList,on
     var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"movable":true});
     
-    //create body
-    var content = visicomp.visiui.createElement("div",{"className":"dialogBody"}); 
+    //add a scroll container
+    var contentContainer = visicomp.visiui.createElement("div",null,
+        {
+			"display":"block",
+            "position":"relative",
+            "top":"0px",
+            "height":"100%",
+            "overflow": "auto"
+        });
+	dialog.setContent(contentContainer);
+    
+    var line;
+    
+	var content = visicomp.visiui.createElement("div",null,
+			{
+				"display":"table",
+				"overflow":"hidden"
+			});
+	contentContainer.appendChild(content);
     
     var line;
   
@@ -40,9 +57,14 @@ visicomp.app.visiui.dialog.showSelectComponentDialog = function(componentList,on
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
+    dialog.setContent(content);  
+    
     //show dialog
-    dialog.setContent(content);
     dialog.show();
+    
+    //size the dialog to the content
+    dialog.fitToContent(content);
+    
     var coords = dialogParent.getCenterOnPagePosition(dialog);
     dialog.setPosition(coords[0],coords[1]);
 }

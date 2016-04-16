@@ -54,7 +54,7 @@ visicomp.core.FolderFunction.prototype.getDisplayName = function() {
     var argListString = argList.join(",");
     
     var displayName = name + "(" + argListString + ")";
-    if((this.returnValueString != null)&&(this.returnValueString.length > 1)) {
+    if((this.returnValueString != null)&&(this.returnValueString.length > 0)) {
         displayName += " = " + this.returnValueString;
     }
     

@@ -13,7 +13,27 @@ visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
 
     var dialogParent = visicomp.visiui.getDialogParent();
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"resizable":true,"movable":true});
-    var content = document.createElement("div");
+    dialog.setTitle("&nbsp;");
+    
+    //add a scroll container
+    var contentContainer = visicomp.visiui.createElement("div",null,
+        {
+			"display":"block",
+            "position":"relative",
+            "top":"0px",
+            "height":"100%",
+            "overflow": "auto"
+        });
+	dialog.setContent(contentContainer);
+    
+    var line;
+    
+	var content = visicomp.visiui.createElement("div",null,
+			{
+				"display":"table",
+				"overflow":"hidden"
+			});
+	contentContainer.appendChild(content);
     
     var line;
   
@@ -41,10 +61,15 @@ visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
     
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"OK","onclick":onOk}));
     content.appendChild(line);
+
+    dialog.setContent(content);
     
     //show dialog
-    dialog.setContent(content);
     dialog.show();
+    
+    //size the dialog to the content
+    dialog.fitToContent(content);
+    
     var coords = dialogParent.getCenterOnPagePosition(dialog);
     dialog.setPosition(coords[0],coords[1]);
 }

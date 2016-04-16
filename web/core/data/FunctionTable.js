@@ -42,7 +42,18 @@ visicomp.core.FunctionTable.prototype.getDisplayName = function() {
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 visicomp.core.FunctionTable.fromJson = function(owner,json,updateDataList,actionResponse) {
-    var initialArgList = [];
+    var initialArgList;
+    //------------------------
+    // There are two ways to set the arg list. Here, json.argList, is used in creating 
+    // the function table. Otherwise use json.updateData.argList.
+    if(json.argList) {
+        initialArgList = json.argList;
+    }
+    else {
+        initialArgList = [];
+    }
+    //-------------------
+    
     var functionTable = new visicomp.core.FunctionTable(json.name,initialArgList);
     functionTable.setOwner(owner);
     if(json.updateData) {

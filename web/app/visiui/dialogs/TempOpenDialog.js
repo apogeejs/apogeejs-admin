@@ -8,7 +8,7 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
     var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"resizable":true,"movable":true});
     dialog.setTitle("&nbsp;");
 
-//add a scroll container
+    //add a scroll container
     var contentContainer = visicomp.visiui.createElement("div",null,
         {
 			"display":"block",

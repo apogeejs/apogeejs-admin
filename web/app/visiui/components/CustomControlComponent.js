@@ -148,9 +148,13 @@ visicomp.app.visiui.CustomControlComponent.prototype.update = function(html,reso
 //======================================
 
 //add table listener
-visicomp.app.visiui.CustomControlComponent.createComponent = function(workspaceUI,parent,name) {
+visicomp.app.visiui.CustomControlComponent.createComponent = function(workspaceUI,data) {
+    
+    var parent = workspaceUI.getObjectByKey(data.parentKey);
+    //should throw an exception if parent is invalid!
+    
     var json = {};
-    json.name = name;
+    json.name = data.name;
     json.type = visicomp.core.Control.generator.type;
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
