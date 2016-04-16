@@ -1,12 +1,12 @@
 
 
-visicomp.app.visiui.addcomponent = {};
+visicomp.app.visiui.updatecomponent = {};
 
 //=====================================
 // UI Entry Point
 //=====================================
 
-visicomp.app.visiui.addcomponent.getAddComponentCallback = function(app,generator,optionalInitialValues) {
+visicomp.app.visiui.updatecomponent.getAddComponentCallback = function(app,generator,optionalInitialValues) {
     
     var createCallback = function() {
         //get the active workspace
@@ -19,7 +19,7 @@ visicomp.app.visiui.addcomponent.getAddComponentCallback = function(app,generato
         var additionalLines = generator.propertyDialogLines;
         
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = visicomp.app.visiui.addcomponent.getDialogLayout(workspaceUI,generator,true,additionalLines,optionalInitialValues);
+        var dialogLayout = visicomp.app.visiui.updatecomponent.getDialogLayout(workspaceUI,generator,true,additionalLines,optionalInitialValues);
         
         //create on submit callback
         var onSubmitFunction = function(result) {
@@ -42,7 +42,7 @@ visicomp.app.visiui.addcomponent.getAddComponentCallback = function(app,generato
     
 }
 
-visicomp.app.visiui.addcomponent.getUpdateComponentCallback = function(component,generator) {
+visicomp.app.visiui.updatecomponent.getUpdateComponentCallback = function(component,generator) {
     
     var createCallback = function() {
     
@@ -52,7 +52,7 @@ visicomp.app.visiui.addcomponent.getUpdateComponentCallback = function(component
         var initialValues = component.getPropertyValues();
         
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = visicomp.app.visiui.addcomponent.getDialogLayout(workspaceUI,generator,false,additionalLines,initialValues);
+        var dialogLayout = visicomp.app.visiui.updatecomponent.getDialogLayout(workspaceUI,generator,false,additionalLines,initialValues);
         
         //create on submit callback
         var onSubmitFunction = function(newValues) {
@@ -98,7 +98,7 @@ visicomp.app.visiui.addcomponent.getUpdateComponentCallback = function(component
 }
 
 //this is for a create or update dialog
-visicomp.app.visiui.addcomponent.getDialogLayout = function(workspaceUI,generator,doCreate,additionalLines,initialValues) {
+visicomp.app.visiui.updatecomponent.getDialogLayout = function(workspaceUI,generator,doCreate,additionalLines,initialValues) {
     
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};

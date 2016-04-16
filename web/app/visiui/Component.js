@@ -72,7 +72,7 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     //add the standard entries
     var itemInfo = {};
     itemInfo.title = "Edit Properties";
-    itemInfo.callback = visicomp.app.visiui.addcomponent.getUpdateComponentCallback(this,this.generator);
+    itemInfo.callback = visicomp.app.visiui.updatecomponent.getUpdateComponentCallback(this,this.generator);
     
     this.menuItemInfoList.push(itemInfo);
     

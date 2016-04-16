@@ -12,7 +12,7 @@ visicomp.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback = f
         var onSelect = function(componentType) {
             var generator = app.getComponentGenerator(componentType);
             if(generator) {
-                var doAddComponent = visicomp.app.visiui.addcomponent.getAddComponentCallback(app,generator);
+                var doAddComponent = visicomp.app.visiui.updatecomponent.getAddComponentCallback(app,generator);
                 doAddComponent();
             }
             else {

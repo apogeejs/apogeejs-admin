@@ -229,7 +229,7 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
         var key = this.standardComponents[i];
         var generator = this.componentGenerators[key];
         var title = "Add " + generator.displayName;
-        var callback = visicomp.app.visiui.addcomponent.getAddComponentCallback(this,generator);
+        var callback = visicomp.app.visiui.updatecomponent.getAddComponentCallback(this,generator);
         menu.addCallbackMenuItem(title,callback);
     }
     
