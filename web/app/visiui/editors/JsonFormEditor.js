@@ -35,8 +35,12 @@ visicomp.app.visiui.JsonFormEditor.prototype.showData = function(data,editOk) {
         //no need to update
         return;
     }
+	
+	//the value undefined will break things. It is not a valid json value.
+	//I should verify I handle this consistently through app.
+	if(data === undefined) data = null;
     
-    this.workingData = visicomp.core.util.deepCopy(data);
+    this.workingData = visicomp.core.util.deepJsonCopy(data);
     this.editOk = editOk;
     
 	visicomp.core.util.removeAllChildren(this.editorDiv);

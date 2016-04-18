@@ -46,7 +46,7 @@ visicomp.app.visiui.createworkspace.createWorkspace = function(app,name) {
             app.removeWorkspaceUI(name);
         }
         
-        var actionError = visicomp.core.ActionError.processAppException(error,false);
+        var actionError = visicomp.core.ActionError.processException(error,"AppException",false);
         actionResponse.addError(actionError);
     }
     

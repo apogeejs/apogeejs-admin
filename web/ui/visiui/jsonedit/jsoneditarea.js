@@ -2,6 +2,11 @@
 visicomp.jsonedit.JsonEditArea = function(divElement,initialValue,isEditable) {
     this.body = divElement;
 	this.isEditable = isEditable;
+	
+	//undefined is not a valid json value and will screw things up
+	if(initialValue === undefined) {
+		initialValue = "";
+	}
     
 	this.valueEntry = new visicomp.jsonedit.ValueEntry(this,this,initialValue,this.isEditable);
     this.valueEntry.setExpanded(true);

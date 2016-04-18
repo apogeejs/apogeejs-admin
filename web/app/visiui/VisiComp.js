@@ -81,7 +81,7 @@ visicomp.app.visiui.VisiComp.prototype.addWorkspaceUI = function(workspaceUI,nam
     
     //we can only have one workspace of a given name!
     if(this.workspaceUIs[name]) {
-        throw visicomp.core.util.createError("There is already an open workspace with the name " + name);
+        throw visicomp.core.util.createError("There is already an open workspace with the name " + name,false);
     }
     
 	var tab = this.tabFrame.addTab(name);

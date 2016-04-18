@@ -108,8 +108,8 @@ visicomp.app.visiui.WorkspaceUI.prototype.registerMember = function(object,compo
 	var key = visicomp.app.visiui.WorkspaceUI.getObjectKey(object);
 	
 	if(this.componentMap[key]) {
-		alert("Unknown error - there is already an object with this object key: " + key);
-		return;
+		//already exists! (we need to catch this earlier if we want it to not be fatal. But we should catch it here too.)
+        throw visicomp.core.util.createError("There is already a component with the given name.",true);
 	}
 	
     var componentInfo = {};

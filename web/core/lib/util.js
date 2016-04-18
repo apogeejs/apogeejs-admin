@@ -1,13 +1,16 @@
 visicomp.core.util = {};
 
 /** This method creates an error object, which has a "message" in the format
- *of a system error. The type and base error are optional. 
- * Based on the error type, additional data can be added to the error object
- * before it is thrown. */
-visicomp.core.util.createError = function(msg,optionalType,optionalBaseError) {
+ *of a system error. The isFatal flag can be set to specify if this is a fatal or nonfatal
+ *error. It may also be omitted. A base error may also be set. */
+visicomp.core.util.createError = function(msg,optionalIsFatal,optionalBaseError) {
     var error = new Error(msg);
-    error.type = optionalType;
-    error.baseError = optionalBaseError;
+	if(optionalIsFatal !== undefined) {
+		error.isFatal = optionalIsFatal;
+	}
+	if(optionalBaseError !== undefined) {
+		error.baseError = optionalBaseError;
+	}
     return error;
 }
 
@@ -60,8 +63,9 @@ visicomp.core.util.getObjectType = function(object) {
     return "Unknown";
 }
 
-/** This method creates a deep copy of an object, array or value. */
-visicomp.core.util.deepCopy = function(data) {
+/** This method creates a deep copy of an object, array or value. Note that
+ * undefined is not a valid value in JSON. */
+visicomp.core.util.deepJsonCopy = function(data) {
     return JSON.parse(JSON.stringify(data));
 }
 

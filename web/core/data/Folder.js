@@ -47,9 +47,8 @@ visicomp.core.Folder.prototype.addChild = function(child) {
     //check if it exists first
     var name = child.getName();
     if(this.childMap[name]) {
-        //already exists!
-        alert('Error - name already exists!');
-        return;
+        //already exists! not fatal since it is not added to the model yet,
+        throw visicomp.core.util.createError("There is already an object with the given name.",false);
     }
     //add object
     this.childMap[name] = child;

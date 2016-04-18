@@ -107,7 +107,7 @@ visicomp.app.visiui.FunctionComponent.createComponent = function(workspaceUI,dat
     
     var json = {};
     json.name = data.name;
-    if(data.argList) {
+    if(data.argListString) {
         var argList = visicomp.app.visiui.FunctionComponent.parseStringArray(data.argListString);
         json.argList = argList;
     }

@@ -117,7 +117,7 @@ visicomp.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunc
     catch(exception) {
         generatorOutput = {};
         generatorOutput.success = false;
-        generatorOutput.error = visicomp.core.ActionError.processMemberModelException(exception,"Compile - Code");
+        generatorOutput.error = visicomp.core.ActionError.processException(exception,"Compile - Code",false);
     }
     
     return generatorOutput;

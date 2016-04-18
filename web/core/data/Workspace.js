@@ -129,10 +129,10 @@ visicomp.core.Workspace.prototype.toJson = function() {
 visicomp.core.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     var fileType = json.fileType;
 	if(fileType !== visicomp.core.Workspace.SAVE_FILE_TYPE) {
-		throw visicomp.core.util.createError("Bad file format.");
+		throw visicomp.core.util.createError("Bad file format.",false);
 	}
     if(json.version !== visicomp.core.Workspace.SAVE_FILE_VERSION) {
-        throw visicomp.core.util.createError("Incorrect file version.");
+        throw visicomp.core.util.createError("Incorrect file version.",false);
     }
     
     this.name = json.name;

@@ -249,7 +249,7 @@ visicomp.core.FolderFunction.prototype.createVirtualWorkspace = function(folderF
 		return visicomp.core.Workspace.createVirtualWorkpaceFromFolder("temp",this.internalFolder,this.getContextManager());
 	}
 	catch(error) {
-        var actionError = visicomp.core.ActionError.processMemberModelException(exception,"FolderFunction - Code");
+        var actionError = visicomp.core.ActionError.processException(exception,"FolderFunction - Code",false);
 		folderFunctionErrors.push(actionError);
 		return null;
 	}

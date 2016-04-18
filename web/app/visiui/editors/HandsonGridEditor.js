@@ -88,7 +88,7 @@ visicomp.app.visiui.HandsonGridEditor.prototype.save = function(argArray) {
 	if(argArray[1] == "loadData") return;
 
 	//update "input" data before calling update
-	this.inputData = visicomp.core.util.deepCopy(this.gridControl.getData());
+	this.inputData = visicomp.core.util.deepJsonCopy(this.gridControl.getData());
 
 	this.parentSave(this.inputData);
 }
@@ -112,7 +112,7 @@ visicomp.app.visiui.HandsonGridEditor.prototype.showData = function(json,editOk)
 	var oldEditOk = this.editOk;
 	this.editOk = editOk;
 	this.inputData = json;
-	var editData = visicomp.core.util.deepCopy(json);
+	var editData = visicomp.core.util.deepJsonCopy(json);
 	
 	if((!this.gridControl)||(oldEditOk !== editOk)) {
 		this.createNewGrid();

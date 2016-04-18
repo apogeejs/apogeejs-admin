@@ -48,7 +48,7 @@ visicomp.core.deletemember.deleteMember = function(member,optionalActionResponse
 	}
 	catch(error) {
         //unknown application error
-        var actionError = visicomp.core.ActionError.processAppException(error,true);
+        var actionError = visicomp.core.ActionError.processException(error,"AppException",true);
         actionResponse.addError(actionError);
     }
     

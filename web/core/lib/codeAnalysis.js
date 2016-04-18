@@ -167,7 +167,7 @@ visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
         }
     }
     catch(exception) {
-        var actionError = visicomp.core.ActionError.processMemberModelException(exception,"Analyze - Code");
+        var actionError = visicomp.core.ActionError.processException(exception,"Analyze - Code",false);
         returnValue.success = false;
         returnValue.errors = [];
         returnValue.errors.push(actionError);
@@ -482,7 +482,7 @@ visicomp.core.codeAnalysis.markLocalVariables = function(processInfo) {
  * }
  * @private */
 visicomp.core.codeAnalysis.createParsingError = function(errorMsg,location) {
-    var error = visicomp.core.util.createError(errorMsg);
+    var error = visicomp.core.util.createError(errorMsg,false);
     if(location) {
         error.lineNumber = location.start.line;
         error.column = location.start.column;

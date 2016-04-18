@@ -92,7 +92,7 @@ visicomp.app.visiui.openworkspace.openWorkspace = function(app,workspaceText,act
         if(workspaceUIAdded) {
             app.removeWorkspaceUI(name);
         }
-        var actionError = visicomp.core.ActionError.processAppException(error,false);
+        var actionError = visicomp.core.ActionError.processException(error,"AppException",false);
         actionResponse.addError(actionError);
         actionCompletedCallback(actionResponse);
     }

@@ -43,7 +43,7 @@ visicomp.core.updatemember.updateCode = function(member,argList,functionBody,sup
         visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
     }
     catch(error) {
-        var actionError = visicomp.core.ActionError.processAppException(error,true);
+        var actionError = visicomp.core.ActionError.processException(error,"AppException",true);
         actionResponse.addError(actionError);
     }
     
@@ -70,7 +70,7 @@ visicomp.core.updatemember.updateData = function(member,data,optionalActionRespo
         visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
     }
     catch(error) {
-        var actionError = visicomp.core.ActionError.processAppException(error,true);
+        var actionError = visicomp.core.ActionError.processException(error,"AppException",true);
         actionResponse.addError(actionError);
     }
     
@@ -98,7 +98,7 @@ visicomp.core.updatemember.updateObjects = function(updateDataList,optionalActio
         visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
     }
     catch(error) {
-        var actionError = visicomp.core.ActionError.processAppException(error,true);
+        var actionError = visicomp.core.ActionError.processException(error,"AppException",true);
         actionResponse.addError(actionError);
     }
     

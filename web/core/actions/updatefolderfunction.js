@@ -16,7 +16,7 @@ visicomp.core.updatefolderFunction.updatePropertyValues = function(folderFunctio
         visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
     }
     catch(error) {
-        var actionError = visicomp.core.ActionError.processAppException(error,true);
+        var actionError = visicomp.core.ActionError.processException(error,"AppException",true);
         actionResponse.addError(actionError);
     }
     
