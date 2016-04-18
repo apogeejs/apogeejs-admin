@@ -32,10 +32,7 @@ visicomp.core.Dependent.getDependsOn = function() {
 
 /** This method sets the pre calc error for this dependent. */
 visicomp.core.Dependent.addPreCalcError = function(preCalcError) {
-    var entry = {};
-    entry.type = preCalcError.getType();
-    entry.error = preCalcError;
-    this.preCalcErrors.push(entry);
+    this.preCalcErrors.push(preCalcError);
 }
 
 /** This method clears the pre calc error of a given type. It no type is set
@@ -44,9 +41,9 @@ visicomp.core.Dependent.clearPreCalcErrors = function(type) {
     var newList = [];
     if(type != null) {    
         for(var i = 0; i < this.preCalcErrors.length; i++) {
-            var entry = this.preCalcErrors[i];
-            if(entry.type != type) {
-                newList.push(entry);
+            var error = this.preCalcErrors[i];
+            if(error.getType() != type) {
+                newList.push(error);
             }
         }
     }

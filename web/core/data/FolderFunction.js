@@ -69,7 +69,7 @@ visicomp.core.FolderFunction.prototype.onDelete = function() {
     var returnValue;
     
     if(this.internalFolder) {
-        var actionResponse = visicomp.core.deletechild.deleteChild(this.internalFolder);
+        var actionResponse = visicomp.core.deletemember.deleteMember(this.internalFolder);
         if(!actionResponse.getSuccess()) {
             //show an error message
             var msg = actionResponse.getErrorMsg();
@@ -262,13 +262,15 @@ visicomp.core.FolderFunction.prototype.loadInputElements = function(rootFolder,f
     for(var i = 0; i < this.argList.length; i++) {
         var argName = this.argList[i];
         var argMember = rootFolder.lookupChild(argName);
-        if(!argMember) {
-            //missing input element
-            var msg = "Input element not found in folderFunction: " + argName;
-            var actionError = new visicomp.core.ActionError(msg,"FolderFunction - Code",this);
-            folderFunctionErrors.push(actionError);
-        }
-        argMembers.push(argMember);
+        if(argMember) {
+			argMembers.push(argMember);
+		}
+//		else {
+//            //missing input element
+//            var msg = "Input element not found in folderFunction: " + argName;
+//            var actionError = new visicomp.core.ActionError(msg,"FolderFunction - Code",this);
+//            folderFunctionErrors.push(actionError);
+//        }       
     }
     return argMembers;
 }
@@ -277,12 +279,12 @@ visicomp.core.FolderFunction.prototype.loadInputElements = function(rootFolder,f
  * @private  */
 visicomp.core.FolderFunction.prototype.loadOutputElement = function(rootFolder,folderFunctionErrors) {
     var returnValueMember = rootFolder.lookupChild(this.returnValueString);
-    if(!returnValueMember) {
-        //missing input element
-        var msg = "Return element not found in folderFunction: " + this.returnValueString;
-        var actionError = new visicomp.core.ActionError(msg,"FolderFunction - Code",this);
-        folderFunctionErrors.push(actionError);
-    }
+//    if(!returnValueMember) {
+//        //missing input element
+//        var msg = "Return element not found in folderFunction: " + this.returnValueString;
+//        var actionError = new visicomp.core.ActionError(msg,"FolderFunction - Code",this);
+//        folderFunctionErrors.push(actionError);
+//    }
     return returnValueMember;
 }
 
