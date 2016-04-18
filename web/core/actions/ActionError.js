@@ -51,49 +51,6 @@ visicomp.core.ActionError.prototype.getType= function() {
     return this.errorType;
 }
 
-/** This method processes an exception from a model error, returning an ActionError object.
- * IT is OK if the member is passed as null. The resulting error message is the message from the
- * exception. An optional prefix may be added using the argument optionalErrorMsgPrefix.
- * This method also prints the stack trace for the exception. */
-visicomp.core.ActionError.processMemberModelException = function(exception,type,optionalMember,optionalErrorMsgPrefix) {
-    if(exception.stack) {
-        console.error(exception.stack);
-    }
-    var errorMsg = optionalErrorMsgPrefix ? optionalErrorMsgPrefix : "";
-    if(exception.message) errorMsg += exception.message;
-    if(errorMsg.length == 0) errorMsg = "Unknown error";
-    var actionError = new visicomp.core.ActionError(errorMsg,type,optionalMember);
-    actionError.setParentException(exception);
-    return actionError;
-}
-
-/** This method processes a fatal application exception, returning an ActionError object
- * marked as fatal. This should be use when the app lication is left in an unknown state. 
- * The resulting error message is the message from the
- * exception. An optional prefix may be added using the argument optionalErrorMsgPrefix.
- * This method also prints the stack trace for the exception. */
-visicomp.core.ActionError.processAppException = function(exception,defaultIsFatal,optionalErrorMsgPrefix) {  
-    if(exception.stack) {
-        console.error(exception.stack);
-    }
-    var errorMsg = optionalErrorMsgPrefix ? optionalErrorMsgPrefix : "";
-    if(exception.message) errorMsg += exception.message;
-    if(errorMsg.length == 0) errorMsg = "Unknown error";
-    var actionError = new visicomp.core.ActionError(errorMsg,"App",null);
-    actionError.setParentException(exception);
-	
-	var isFatal;
-	if(exception.isFatal !== undefined) {
-		isFatal = exception.isFatal;
-	}
-	else {
-		isFatal = defaultIsFatal;
-	}
-    actionError.setIsFatal(isFatal);
-	
-    return actionError;
-}
-
 /** This method processes a fatal application exception, returning an ActionError object
  * marked as fatal. This should be use when the app lication is left in an unknown state. 
  * The resulting error message is the message from the

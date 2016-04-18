@@ -51,7 +51,7 @@ visicomp.app.visiui.closeworkspace.closeWorkspace = function(app) {
     }
     catch(error) {
         var isFatal = !workspaceUIRemoved;
-        var actionError = visicomp.core.ActionError.processAppException(error,isFatal);
+        var actionError = visicomp.core.ActionError.processException(error,"AppException",isFatal);
         actionResponse.addError(actionError);
     }
     
