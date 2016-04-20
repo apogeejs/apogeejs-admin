@@ -13,7 +13,7 @@ visicomp.app.visiui.JsonFormEditor = function(onSave) {
 		"overflow":"auto"
 	});
     
-    this.workingData = null;
+    this.workingData = {"d":"c"}; //we need to set it to someting that ntohing can ===
 	this.editOk = false;
 	
 	this.editor = null;

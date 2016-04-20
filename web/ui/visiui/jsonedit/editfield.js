@@ -57,9 +57,14 @@ visicomp.jsonedit.EditField.prototype.setValue = function(value) {
     this.isString = (visicomp.jsonedit.getValueType(value) === "string");
 	this.setCssClass();
 
-	//display value (with one exception - show "null" for null value
+	//display value (with some exceptions)
 	if(value === null) {
+		//show null for null value
 		this.element.innerHTML = "null"
+	}
+	else if(value === "") {
+		//this keeps the height from shrinking
+		this.element.innerHTML = "&nbsp;"
 	}
 	else {
 		this.element.innerHTML = value;
