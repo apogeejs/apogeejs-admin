@@ -70,6 +70,11 @@ visicomp.visiui.MenuHeader.prototype.setMenuItems = function(itemInfos) {
     this.menuBody.setMenuItems(itemInfos);
 }
 
+/** this adds a menu item that dispatchs the given event when clicked. */
+visicomp.visiui.MenuHeader.prototype.removeMenuItem = function(title) {
+	this.menuBody.removeMenuItem(title);
+}
+
 //================================
 // Init
 //================================

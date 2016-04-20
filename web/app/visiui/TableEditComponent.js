@@ -7,17 +7,21 @@ visicomp.app.visiui.TableEditComponent = {};
 
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-visicomp.app.visiui.TableEditComponent.init = function(viewTypes,defaultView) {
+visicomp.app.visiui.TableEditComponent.init = function(viewTypes,defaultView,optionalClearFunctionOnBlankInfo) {
 	
 	this.viewTypes = viewTypes;
 	this.defaultView = defaultView;
 	
 	this.initUI();
 	
-    //this.viewModeElement
+	//this.viewModeElement
     //this.viewType
     //this.viewModeElementShowing
     //this.select
+	
+	this.clearFunctionOnBlankInfo = optionalClearFunctionOnBlankInfo;
+	this.clearFunctionActive = false;
+	this.clearFunctionCallback = null;
 }
 
 /** This method populates the frame for this component. 
@@ -71,6 +75,41 @@ visicomp.app.visiui.TableEditComponent.memberUpdated = function() {
     var editable = ((this.viewModeElement.isData === false)||(!object.hasCode()));
 
     this.viewModeElement.showData(editable);
+	
+	//add the clear function menu item if needed
+	if(this.clearFunctionOnBlankInfo) {
+	
+		if(object.hasCode()) {
+			if(!this.clearFunctionActive) {
+				var menu = this.getWindow().getMenu();
+				
+				if(!this.clearFunctionCallback) {
+					this.clearFunctionCallback = this.getClearFunctionCallback();
+				}
+				
+				menu.addCallbackMenuItem(this.clearFunctionOnBlankInfo.menuLabel,this.clearFunctionCallback);
+				this.clearFunctionActive = true;
+			}
+		}
+		else {
+			if(this.clearFunctionActive) {
+				var menu = this.getWindow().getMenu();
+				menu.removeMenuItem(this.clearFunctionOnBlankInfo.menuLabel);
+				this.clearFunctionActive = false;
+			}
+		}
+	}
+}
+
+visicomp.app.visiui.TableEditComponent.getClearFunctionCallback = function() {
+	var table = this.getObject();
+	var blankDataValue = this.clearFunctionOnBlankInfo.dataValue;
+    return function() {
+        var actionResponse = visicomp.core.updatemember.updateData(table,blankDataValue); 
+        if(!actionResponse.getSuccess()) {
+            alert(actionResponse.getErrorMsg());
+        }
+    }
 }
 
 /** This method populates the frame for this component. 

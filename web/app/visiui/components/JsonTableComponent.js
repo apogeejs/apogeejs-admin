@@ -4,8 +4,9 @@ visicomp.app.visiui.JsonTableComponent = function(workspaceUI,table,componentJso
     visicomp.app.visiui.Component.init.call(this,workspaceUI,table,visicomp.app.visiui.JsonTableComponent.generator,componentJson);
     visicomp.app.visiui.TableEditComponent.init.call(this,
 		visicomp.app.visiui.JsonTableComponent.VIEW_MODES,
-        visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW);
-    
+        visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW,
+		visicomp.app.visiui.JsonTableComponent.BLANK_DATA_VALUE_INFO);
+	
     this.memberUpdated();
 };
 
@@ -19,9 +20,8 @@ visicomp.core.util.mixin(visicomp.app.visiui.JsonTableComponent,visicomp.app.vis
 
 visicomp.app.visiui.JsonTableComponent.VIEW_TEXT = "Text";
 visicomp.app.visiui.JsonTableComponent.VIEW_FORM = "Form";
-visicomp.app.visiui.JsonTableComponent.VIEW_CODE = "Code";
+visicomp.app.visiui.JsonTableComponent.VIEW_CODE = "Formula";
 visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
-visicomp.app.visiui.JsonTableComponent.VIEW_GRID = "GRID";
 
 visicomp.app.visiui.JsonTableComponent.VIEW_MODES = [
     visicomp.app.visiui.JsonTableComponent.VIEW_FORM,
@@ -31,6 +31,11 @@ visicomp.app.visiui.JsonTableComponent.VIEW_MODES = [
 ];
 
 visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW = visicomp.app.visiui.JsonTableComponent.VIEW_FORM;
+
+visicomp.app.visiui.JsonTableComponent.BLANK_DATA_VALUE_INFO = {
+	"dataValue":"",
+	"menuLabel":"Clear Formula"
+};
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
@@ -45,7 +50,7 @@ visicomp.app.visiui.JsonTableComponent.prototype.getViewModeElement = function(v
 			return new visicomp.app.visiui.FormDataMode(this);
 			
 		case visicomp.app.visiui.JsonTableComponent.VIEW_CODE:
-			return new visicomp.app.visiui.AceCodeMode(this,visicomp.app.visiui.JsonTableComponent.editorCodeWrapper);
+			return new visicomp.app.visiui.AceCodeMode(this,visicomp.app.visiui.JsonTableComponent.BLANK_DATA_VALUE_INFO,visicomp.app.visiui.JsonTableComponent.editorCodeWrapper);
 			
 		case visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new visicomp.app.visiui.AceSupplementalMode(this);

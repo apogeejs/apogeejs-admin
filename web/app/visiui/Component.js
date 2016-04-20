@@ -242,11 +242,6 @@ visicomp.app.visiui.Component.toJson = function() {
 // Protected Instance Methods
 //==============================
 
-/** This method returns the menu entries for this component. */
-visicomp.app.visiui.Component.getMenuItemInfoList = function() {
-    return this.menuItemInfoList;
-}
-
 //This method should be populated by an extending object. It should return a json object.
 //** This serializes the table component. */
 //visicomp.app.visiui.Component.prototype.writeToJson = function(json);

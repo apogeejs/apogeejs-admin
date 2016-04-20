@@ -8,9 +8,7 @@ visicomp.app.visiui.closeworkspace = {};
 
 visicomp.app.visiui.closeworkspace.getCloseCallback = function(app) {
     return function() {
-        
-        //we should have a warning! And better yet, check for a dirty flag
-        
+
         var actionResponse = visicomp.app.visiui.closeworkspace.closeWorkspace(app); 
         if(!actionResponse.getSuccess()) {
             alert(actionResponse.getErrorMsg());

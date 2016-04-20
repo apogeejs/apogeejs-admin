@@ -5,7 +5,8 @@ visicomp.app.visiui.GridTableComponent = function(workspaceUI,table,componentJso
     visicomp.app.visiui.Component.init.call(this,workspaceUI,table,visicomp.app.visiui.GridTableComponent.generator,componentJson);
 	visicomp.app.visiui.TableEditComponent.init.call(this,
 		visicomp.app.visiui.GridTableComponent.VIEW_MODES,
-		visicomp.app.visiui.GridTableComponent.DEFAULT_VIEW
+		visicomp.app.visiui.GridTableComponent.DEFAULT_VIEW,
+		visicomp.app.visiui.GridTableComponent.BLANK_DATA_VALUE_INFO
 	);
     
     this.memberUpdated();
@@ -20,7 +21,7 @@ visicomp.core.util.mixin(visicomp.app.visiui.GridTableComponent,visicomp.app.vis
 //==============================
 
 visicomp.app.visiui.GridTableComponent.VIEW_GRID = "Grid";
-visicomp.app.visiui.GridTableComponent.VIEW_CODE = "Code";
+visicomp.app.visiui.GridTableComponent.VIEW_CODE = "Formula";
 visicomp.app.visiui.GridTableComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 visicomp.app.visiui.GridTableComponent.VIEW_MODES = [
@@ -28,6 +29,11 @@ visicomp.app.visiui.GridTableComponent.VIEW_MODES = [
     visicomp.app.visiui.GridTableComponent.VIEW_CODE,
     visicomp.app.visiui.GridTableComponent.VIEW_SUPPLEMENTAL_CODE
 ];
+
+visicomp.app.visiui.GridTableComponent.BLANK_DATA_VALUE_INFO = {
+	"dataValue":[[null]],
+	"menuLabel":"Clear Formula"
+};
 
 visicomp.app.visiui.GridTableComponent.DEFAULT_VIEW = visicomp.app.visiui.GridTableComponent.VIEW_GRID;
 
@@ -39,7 +45,7 @@ visicomp.app.visiui.GridTableComponent.prototype.getViewModeElement = function(v
 	switch(viewType) {
 			
 		case visicomp.app.visiui.GridTableComponent.VIEW_CODE:
-			return new visicomp.app.visiui.AceCodeMode(this,visicomp.app.visiui.JsonTableComponent.editorCodeWrapper);
+			return new visicomp.app.visiui.AceCodeMode(this,visicomp.app.visiui.GridTableComponent.BLANK_DATA_VALUE_INFO,visicomp.app.visiui.JsonTableComponent.editorCodeWrapper);
 			
 		case visicomp.app.visiui.GridTableComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new visicomp.app.visiui.AceSupplementalMode(this);

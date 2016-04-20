@@ -57,7 +57,7 @@ visicomp.app.visiui.CustomControlComponent.prototype.getViewModeElement = functi
 			return this.outputMode;
 			
 		case visicomp.app.visiui.CustomControlComponent.VIEW_CODE:
-			return new visicomp.app.visiui.AceCodeMode(this);
+			return new visicomp.app.visiui.AceCodeMode(this,false);
 			
 		case visicomp.app.visiui.CustomControlComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new visicomp.app.visiui.AceSupplementalMode(this);

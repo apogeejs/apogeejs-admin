@@ -35,7 +35,7 @@ visicomp.app.visiui.FunctionComponent.prototype.getViewModeElement = function(vi
 	switch(viewType) {
 			
 		case visicomp.app.visiui.FunctionComponent.VIEW_CODE:
-			return new visicomp.app.visiui.AceCodeMode(this);
+			return new visicomp.app.visiui.AceCodeMode(this,false);
 			
 		case visicomp.app.visiui.FunctionComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new visicomp.app.visiui.AceSupplementalMode(this);
