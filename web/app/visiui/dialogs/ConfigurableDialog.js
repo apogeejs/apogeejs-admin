@@ -4,8 +4,7 @@
  * return true or false, indicating whether of not to close the dialog. */
 visicomp.app.visiui.dialog.showConfigurableDialog = function(layout,onSubmitFunction) {
 
-    var dialogParent = visicomp.visiui.getDialogParent();
-    var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"movable":true});
+    var dialog = visicomp.visiui.createDialog({"movable":true});
     var lineObjects = [];
     
     //this is the action for the form
@@ -18,7 +17,7 @@ visicomp.app.visiui.dialog.showConfigurableDialog = function(layout,onSubmitFunc
                 lineObject.onClose();
             }
         }
-        dialog.hide();
+        visicomp.visiui.closeDialog(dialog);
     }
     //cancel
     formActions.onCancel = function() {
@@ -58,9 +57,7 @@ visicomp.app.visiui.dialog.showConfigurableDialog = function(layout,onSubmitFunc
     
     //size the dialog to the content
     dialog.fitToContent(content);
-    
-    var coords = dialogParent.getCenterOnPagePosition(dialog);
-    dialog.setPosition(coords[0],coords[1]);
+    dialog.centerInParent();
 }
     
     

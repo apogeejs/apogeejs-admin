@@ -1,8 +1,7 @@
 /** This method shows a dialog to update the workspace links. */
 visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     
-    var dialogParent = visicomp.visiui.getDialogParent();
-    var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
+    var dialog = visicomp.visiui.createDialog({"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
             
 //    //create body
 //    var content = visicomp.visiui.createElement("div",{"className":"dialogBody"}); 
@@ -114,7 +113,7 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     }
     
     var closeDialog = function() {
-        dialog.hide();
+        visicomp.visiui.closeDialog(dialog);
         
         //clean up the editor
         if(jsLinksEditor) { 
@@ -138,9 +137,7 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     
     //size the dialog to the content
     dialog.fitToContent(content);
-    
-    var coords = dialogParent.getCenterOnPagePosition(dialog);
-    dialog.setPosition(coords[0],coords[1]);
+    dialog.centerInParent();
     
     var showJsLinksFunction = function() {
         //hide the onLoad div and show the html dive

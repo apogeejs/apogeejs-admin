@@ -386,6 +386,13 @@ visicomp.visiui.WindowFrame.prototype.fitToContent = function(contentContainer) 
     this.setSize(targetWidth,targetHeight);
 }
 
+/** This method centers the window in its parent. it should only be called
+ *after the window is shown. */
+visicomp.visiui.WindowFrame.prototype.centerInParent = function() {
+    var coords = this.parentContainer.getCenterOnPagePosition(this);
+    this.setPosition(coords[0],coords[1]);
+}
+
 /** @private */
 visicomp.visiui.WindowFrame.FIT_HEIGHT_BUFFER = 20;
 /** @private */
@@ -436,6 +443,11 @@ visicomp.visiui.WindowFrame.prototype.getElement = function() {
 /** This method returns the window body.*/
 visicomp.visiui.WindowFrame.prototype.getBody = function() {
     return this.body;
+}
+
+/** This method returns the window body.*/
+visicomp.visiui.WindowFrame.prototype.getParent = function() {
+    return this.parentContainer;
 }
 
 /** This method sets a content element in the body. Alternatively the body can 
