@@ -120,8 +120,8 @@ visicomp.app.visiui.TableEditComponent.initUI = function() {
 	
 	//create the view selection ui
 	this.select = visicomp.visiui.createElement("select",null,{
-        "margin-right":"3px",
-        "background-color":"transparent"
+        "marginRight":"3px",
+        "backgroundColor":"transparent"
     });
     
     for(var i = 0; i < this.viewTypes.length; i++) {

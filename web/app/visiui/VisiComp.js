@@ -28,7 +28,8 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 	
 	//create a default workspace 
 //    visicomp.app.visiui.createworkspace.createWorkspace(this,visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME);
-	
+var cb = visicomp.app.visiui.openworkspace.getOpenCallback(this);	
+cb();
 }
 	
 //add components to this class
@@ -196,7 +197,7 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
         "position":"relative",
         "display":"table-row",
         "width":"100%",
-		"background-color":visicomp.visiui.colors.menuBarColor,
+		"backgroundColor":visicomp.visiui.colors.menuBarColor,
         "padding":"2px"
     };
     visicomp.visiui.applyStyle(menuBar,menuBarStyle);
@@ -251,7 +252,7 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     var tabFrameDiv = document.createElement("div");
     var tabFrameDivStyle = {
         "position":"relative",
-        "background-color":"white",
+        "backgroundColor":"white",
         "display":"table-row",
         "width":"100%",
         "height":"100%"

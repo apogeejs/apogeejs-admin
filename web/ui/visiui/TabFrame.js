@@ -72,9 +72,9 @@ visicomp.visiui.TabFrame.DISPLAY_FRAME_STYLE = {
     "left":"0px",
     
     //configurable
-    "background-color":"white",
+    "backgroundColor":"white",
     //"border":" 1px solid gray",
-    "border-bottom-width":" 0px"
+    "borderBottomWidth":" 0px"
 }
 visicomp.visiui.TabFrame.TAB_BAR_STYLE = {
     //fixed
@@ -83,10 +83,10 @@ visicomp.visiui.TabFrame.TAB_BAR_STYLE = {
     "width":"100%",
     
     //configurable
-    "background-color":visicomp.visiui.colors.tabFrameColor,
+    "backgroundColor":visicomp.visiui.colors.tabFrameColor,
     "margin":"0px",
     "border":" 1px solid gray",
-    "border-top-width":" 0px"
+    "borderTopWidth":" 0px"
 }
 visicomp.visiui.TabFrame.TAB_BASE_STYLE = {
     //fixed
@@ -103,9 +103,9 @@ visicomp.visiui.TabFrame.TAB_INACTIVE_STYLE = {
     "cursor":" default",
     
     //configurable
-    "background-color":visicomp.visiui.colors.tabFrameColor,
+    "backgroundColor":visicomp.visiui.colors.tabFrameColor,
     "border":" 1px solid black",
-    "border-top-color":"",
+    "borderTopColor":"",
     "padding":"2px"
 }
 visicomp.visiui.TabFrame.TAB_ACTIVE_STYLE = {
@@ -114,9 +114,9 @@ visicomp.visiui.TabFrame.TAB_ACTIVE_STYLE = {
     "cursor":" default",
     
     //configurable
-    "background-color":"white",
+    "backgroundColor":"white",
     "border":" 1px solid black",
-    "border-top-color":"white",
+    "borderTopColor":"white",
     "padding":"2px"
 }
 

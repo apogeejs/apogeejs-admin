@@ -147,7 +147,7 @@ visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL = {
     
     
     //configurable
-    "background-color":"lightgray",
+    "backgroundColor":"lightgray",
     "border":"4px solid " + visicomp.visiui.colors.windowColor,
     "opacity":".95"
 };
@@ -161,7 +161,7 @@ visicomp.visiui.WindowFrame.FRAME_STYLE_MAX = {
 	"display":"table",
     
     //configurable
-    "background-color":"lightgray",
+    "backgroundColor":"lightgray",
     "border":"",
     "opacity":""
 };
@@ -214,12 +214,12 @@ visicomp.visiui.WindowFrame.BODY_ELEMENT_BASE_STYLE = {
 /** provides styling for the body */
 visicomp.visiui.WindowFrame.BODY_SUPPLEMENT_STYLE = {
     //configurable
-    "background-color":"white"  
+    "backgroundColor":"white"  
 };
 /** provides styleing for the title bar. */
 visicomp.visiui.WindowFrame.TITLE_BAR_SUPPLEMENT_STYLE = {
     //configurable
-    "background-color":visicomp.visiui.colors.windowColor,
+    "backgroundColor":visicomp.visiui.colors.windowColor,
     "padding":"3px"
 };
 /** provides styleing for the header container. */
@@ -250,7 +250,7 @@ visicomp.visiui.WindowFrame.COMMAND_BUTTON_STYLE = {
     "display":"inline-block",
 
     //configurable
-    "margin-right":"3px"
+    "marginRight":"3px"
 };
 
 //====================================

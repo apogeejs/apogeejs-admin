@@ -44,7 +44,7 @@ visicomp.visiui.Tab.TAB_WINDOW_STYLE = {
     "left":"0px",
 	"height":"100%",
     "position":"relative",
-    "background-color":"white",
+    "backgroundColor":"white",
     "overflow":"auto"
 }
 

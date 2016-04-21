@@ -31,12 +31,12 @@ visicomp.visiui.MenuHeader.MENU_HEADING_BASE_STYLE = {
 visicomp.visiui.MenuHeader.MENU_HEADING_NORMAL_STYLE = {
     //configurable
     "border":"",
-    "background-color":"",
+    "backgroundColor":"",
     "padding":"2px"
 }
 visicomp.visiui.MenuHeader.MENU_HEADING_HOVER_STYLE = {
     //configurable
-    "background-color":"lightgray",
+    "backgroundColor":"lightgray",
     "padding":"2px"
 }
 
@@ -88,7 +88,8 @@ visicomp.visiui.MenuHeader.prototype.initHeadingElement = function() {
     this.domElement.onmousedown = function(e) {
         visicomp.visiui.Menu.menuHeaderPressed(instance);
 		e.stopPropagation();
-    }
+    }	
+	
     this.domElement.onmouseenter = function(e) {
 		visicomp.visiui.applyStyle(instance.domElement,visicomp.visiui.MenuHeader.MENU_HEADING_HOVER_STYLE);
         visicomp.visiui.Menu.menuHeaderEntered(instance);

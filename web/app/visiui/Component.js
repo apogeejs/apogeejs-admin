@@ -102,7 +102,7 @@ visicomp.app.visiui.Component.showErrorBar = function(text) {
                 "display":"block",
                 "position":"relative",
                 "top":"0px",
-                "background-color":"red",
+                "backgroundColor":"red",
                 "color":"white"
             });
     }
@@ -126,7 +126,7 @@ visicomp.app.visiui.Component.showSaveBar = function(onSave,onCancel) {
                 "display":"block",
                 "position":"relative",
                 "top":"0px",
-                "background-color":"white",
+                "backgroundColor":"white",
 				"border":"solid 1px gray",
 				"padding":"3px"
             });

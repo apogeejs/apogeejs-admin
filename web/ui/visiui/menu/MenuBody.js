@@ -33,7 +33,7 @@ visicomp.visiui.MenuBody.MENU_STYLE = {
     
     //configurable
     "border":"1px solid lightgray",
-    "background-color":"white"
+    "backgroundColor":"white"
 }
 visicomp.visiui.MenuBody.MENU_ITEM_BASE_STYLE = {
     //fixed
@@ -42,12 +42,12 @@ visicomp.visiui.MenuBody.MENU_ITEM_BASE_STYLE = {
 }
 visicomp.visiui.MenuBody.MENU_ITEM_NORMAL_STYLE = {
     //configurable
-    "background-color":"",
+    "backgroundColor":"",
     "padding":"2px"
 }
 visicomp.visiui.MenuBody.MENU_ITEM_HOVER_STYLE = {
     //configurable
-    "background-color":"lightgray",
+    "backgroundColor":"lightgray",
     "padding":"2px"
 }
 

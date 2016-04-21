@@ -70,7 +70,7 @@ visicomp.visiui.BASE_ELEMENT_STYLE = {
     "right":"0px",
     "top":"0px",
     "bottom":"0px",
-    "z-index":1
+    "zIndex":1
 }
 
 visicomp.visiui.DIALOG_LAYER_STYLE = {
@@ -79,8 +79,8 @@ visicomp.visiui.DIALOG_LAYER_STYLE = {
     "right":"0px",
     "top":"0px",
     "bottom":"0px",
-    "z-index": 2,
-    "pointer-events": "none"
+    "zIndex": 2,
+    "pointerEvents": "none"
 }
     
 visicomp.visiui.initWindows = function(appElementId) {
