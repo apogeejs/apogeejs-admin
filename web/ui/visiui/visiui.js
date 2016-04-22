@@ -62,7 +62,7 @@ visicomp.visiui.createElement = function(type,properties,styleProperties) {
 // window and dialog methods
 //=========================================
 
-visicomp.visiui.dialogParent = null;
+visicomp.visiui.dialogLayer = null;
 
 visicomp.visiui.BASE_ELEMENT_STYLE = {
     "position":"absolute",
@@ -82,6 +82,15 @@ visicomp.visiui.DIALOG_LAYER_STYLE = {
     "zIndex": 2,
     "pointerEvents": "none"
 }
+
+visicomp.visiui.DIALOG_SHIELD_STYLE = {
+    "position":"absolute",
+    "left":"0px",
+    "right":"0px",
+    "top":"0px",
+    "bottom":"0px",
+    "pointerEvents": "auto"
+}
     
 visicomp.visiui.initWindows = function(appElementId) {
     //create the ui elements from the app element
@@ -97,13 +106,33 @@ visicomp.visiui.initWindows = function(appElementId) {
     appContainer.appendChild(elements.baseElement);
     appContainer.appendChild(elements.dialogLayer);
     
-//I should implement the events on here!
-    visicomp.visiui.dialogParent = new visicomp.visiui.SimpleParentContainer(elements.dialogLayer,true);
+    visicomp.visiui.dialogLayer = elements.dialogLayer;
     
     return elements;
 }
 
-/** This returns the parent container for dialogs. */
-visicomp.visiui.getDialogParent = function() {
-    return visicomp.visiui.dialogParent;
+/** This method creates a normal window which is situated above a shiled layer blocking
+ *out events to the app, making the dialog like a modal dialog. If this function is used
+ *to create a dialog, it must be closed with the visicomp.visiui.closeDialog function to
+ *remove the modal layer, whether or not the dialog was shown. The options passed are the 
+ *normal options for a window frame. (Note - if there are other events with whihc to act with
+ *the app they may need to be shileded too.) */
+visicomp.visiui.createDialog = function(options) {
+    var shieldElement = visicomp.visiui.createElement("div",null,visicomp.visiui.DIALOG_SHIELD_STYLE);
+    var dialogParent = new visicomp.visiui.SimpleParentContainer(shieldElement,true);
+    visicomp.visiui.dialogLayer.appendChild(shieldElement);
+    return new visicomp.visiui.WindowFrame(dialogParent,options);
 }
+
+/** This method closes a dialog created with visicomp.visiui.createDialog. It
+ *hides the window and removes the modal shiled. */
+visicomp.visiui.closeDialog = function(dialog) {
+    var parent = dialog.getParent();
+    dialog.hide();
+    visicomp.visiui.dialogLayer.removeChild(parent.getContainerElement());
+}
+
+
+
+
+

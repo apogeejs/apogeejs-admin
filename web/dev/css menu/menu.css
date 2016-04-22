@@ -1,0 +1,115 @@
+div.menu-bar {
+	position: relative;
+	margin: 0;
+	padding: 0;
+	/* menu header width and height */
+	height: 30px;
+	width: 90%;
+}
+ 
+/* horizontal menu */
+
+div.menu-bar ul {
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	list-style-type: none;
+	background-color: #fffabf;
+	overflow: visible;
+}
+
+div.menu-bar ul li {
+	display: block;
+	float: left;
+	height: auto;
+	/* menu header's items width */
+	width: 120px;
+}
+
+div.menu-bar li > span, div.menu-bar li > a, div.menu-bar li > a:link,
+div.menu-bar li > a:visited, div.menu-bar li > a:active {
+	display: block;
+	padding: 0 0 0 10px;
+	height: 100%;
+	width: 109px;
+	border-right: 1px #5d5636 solid;
+	line-height: 30px;
+	font-family: times, serif;
+	font-size: 17px;
+	font-style: italic;
+	text-decoration: none;
+	background-color: #fffabf;
+	color: #5d5636;
+	cursor: pointer;
+}
+
+div.menu-bar li:hover > span, div.menu-bar li:hover > a {
+	color: #220000;
+	background-color: #eeeabe;
+}
+
+/* vertical sub-menus */
+
+div.menu-bar ul ul {
+	margin-top: 2px;
+	display: none;
+	position: static;
+	height: auto;
+	/* vertical-menus width */
+	width: 160px;
+	border: 1px #666666 solid;
+	background-color: #dddddd;
+}
+
+div.menu-bar li:hover > ul {
+	display: block;
+}
+
+div.menu-bar ul ul li {
+	position: relative;
+	float: none;
+	display: block;
+	height: 28px;
+	width: 100%;
+	border: none;
+}
+
+div.menu-bar ul ul li > span, div.menu-bar ul ul li > a,
+div.menu-bar ul ul li > a:link, div.menu-bar ul ul li > a:visited,
+div.menu-bar ul ul li > a:active {
+	height: 100%;
+	width: 96%;
+	padding: 0 0 0 4%;
+	line-height: 28px;
+	background-color: transparent;
+	border: none;
+	color: #000000;
+	font-family: georgia, serif;
+	font-size: 11px;
+	font-style: normal;
+}
+
+div.menu-bar ul ul li:hover > span, div.menu-bar ul ul li:hover > a {
+	background-color: #cccccc;
+	color: #ff0000;
+}
+
+/* vertical sub-sub-menus */
+
+div.menu-bar ul ul ul {
+	/* sub-sub-menu position is relative to its parent */
+	position: absolute;
+	top: 4px;
+	left: 155px;
+	margin: 0;
+}
+
+/* an arrow on the right side of menu's folders */
+
+span.menu-nav:after, a.menu-nav:after {
+	content: "\00BB";
+	float: right;
+	margin-right: 8px;
+}

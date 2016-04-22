@@ -1,8 +1,7 @@
 /** This method shows a dialog to select from additional components. */
 visicomp.app.visiui.dialog.showSelectComponentDialog = function(componentList,onSelectFunction) {
 
-    var dialogParent = visicomp.visiui.getDialogParent();
-    var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"movable":true});
+    var dialog = visicomp.visiui.createDialog({"movable":true});
     
     //add a scroll container
     var contentContainer = visicomp.visiui.createElement("div",null,
@@ -45,13 +44,13 @@ visicomp.app.visiui.dialog.showSelectComponentDialog = function(componentList,on
     //buttons
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
-        dialog.hide();
+        visicomp.visiui.closeDialog(dialog);
     }
     
     var onCreate = function() {
 		var componentType = select.value;
         onSelectFunction(componentType);
-        dialog.hide();
+        visicomp.visiui.closeDialog(dialog);
     }
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
@@ -64,9 +63,7 @@ visicomp.app.visiui.dialog.showSelectComponentDialog = function(componentList,on
     
     //size the dialog to the content
     dialog.fitToContent(content);
-    
-    var coords = dialogParent.getCenterOnPagePosition(dialog);
-    dialog.setPosition(coords[0],coords[1]);
+    dialog.centerInParent();
 }
 
 

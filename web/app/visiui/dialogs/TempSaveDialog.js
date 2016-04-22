@@ -11,8 +11,7 @@ visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
     var workspaceJson = workspaceUI.toJson();
     var workspaceText = JSON.stringify(workspaceJson);
 
-    var dialogParent = visicomp.visiui.getDialogParent();
-    var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"resizable":true,"movable":true});
+    var dialog = visicomp.visiui.createDialog({"resizable":true,"movable":true});
     dialog.setTitle("&nbsp;");
     
     //add a scroll container
@@ -56,7 +55,7 @@ visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
     //buttons and handler
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
     var onOk = function() {
-        dialog.hide();
+        visicomp.visiui.closeDialog(dialog);
     }
     
     line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"OK","onclick":onOk}));
@@ -69,8 +68,6 @@ visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
     
     //size the dialog to the content
     dialog.fitToContent(content);
-    
-    var coords = dialogParent.getCenterOnPagePosition(dialog);
-    dialog.setPosition(coords[0],coords[1]);
+    dialog.centerInParent();
 }
 

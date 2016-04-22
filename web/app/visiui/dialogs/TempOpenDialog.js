@@ -4,8 +4,7 @@
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
 visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
 
-    var dialogParent = visicomp.visiui.getDialogParent();
-    var dialog = new visicomp.visiui.WindowFrame(dialogParent,{"resizable":true,"movable":true});
+    var dialog = visicomp.visiui.createDialog({"resizable":true,"movable":true});
     dialog.setTitle("&nbsp;");
 
     //add a scroll container
@@ -47,7 +46,7 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
     //buttons and handler
     line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
-        dialog.hide();
+        visicomp.visiui.closeDialog(dialog);
     }
     
     var onOpen = function() {
@@ -59,7 +58,7 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
         
         var closeDialog = onOpenFunction(jsonText);
         if(closeDialog) {
-            dialog.hide();
+            visicomp.visiui.closeDialog(dialog);
         }
 	}
     
@@ -72,8 +71,6 @@ visicomp.app.visiui.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
     
     //size the dialog to the content
     dialog.fitToContent(content);
-    
-    var coords = dialogParent.getCenterOnPagePosition(dialog);
-    dialog.setPosition(coords[0],coords[1]);
+    dialog.centerInParent();
 }
 
