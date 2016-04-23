@@ -37,12 +37,17 @@ visicomp.visiui.WindowFrame = function(parentContainer, options) {
     this.isShowing = false;
 	
     this.frame = null;
-    this.bodyRow = null;
-    this.body = null;
-    this.titleBarRow = null;
+    this.titleCell = null;
+    this.bodyCell = null;
+    this.headerCell = null;
+    
     this.titleBar = null;
     this.titleBarLeftElements = null;
     this.titleBarRightElements = null;
+    
+    this.header = null;
+    
+    this.body = null;
     this.content = null;
     
     this.minimizeButton = null;
@@ -50,9 +55,6 @@ visicomp.visiui.WindowFrame = function(parentContainer, options) {
     this.maximizeButton = null;
     this.closable = null;
     
-//can we get rid of this?
-this.savedParentOverflow = undefined;
-	
     this.windowDragActive = false;
     this.moveOffsetX = null;
     this.moveOffsetX = null;
@@ -77,10 +79,7 @@ this.savedParentOverflow = undefined;
 	this.minHeight = 0;
 	
     //initialize
-    this.initDiv();
-    this.createTitleBar();
-	this.createHeaderContainer();
-    this.createBody();
+    this.initUI();
 	
     //add the handler to move the active window to the front
     var instance = this;
@@ -136,96 +135,6 @@ visicomp.visiui.WindowFrame.DEFAULT_WINDOW_WIDTH = 300;
 //======================================
 // CSS STYLES
 //======================================
-
-/** window frame style for normal mode */
-visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL = {
-    //fixed
-    "position":"absolute",
-    "pointerEvents": "auto", //we need this since we remove pointer evetns from the dialog layer container
-	
-	"display":"table",
-    
-    
-    //configurable
-    "backgroundColor":"lightgray",
-    "border":"4px solid " + visicomp.visiui.colors.windowColor,
-    "opacity":".95"
-};
-
-/** Window frame stle for maximized mode */
-visicomp.visiui.WindowFrame.FRAME_STYLE_MAX = {
-    //fixed
-    "position":"absolute",
-    "pointerEvents": "auto",
-	
-	"display":"table",
-    
-    //configurable
-    "backgroundColor":"lightgray",
-    "border":"",
-    "opacity":""
-};
-/** Style for header table row components inside the frame. */
-visicomp.visiui.WindowFrame.HEADER_ROW_STYLE = {
-    //fixed
-    "position":"relative",	
-	"display":"table-row",
-	"width":"100%",
-    "top":"0px",
-    "left":"0px"
-};
-/** Style for the header element inside the header row element. */
-visicomp.visiui.WindowFrame.HEADER_ELEMENT_BASE_STYLE = {
-    "display":"block",
-    "top":"0px",
-    "left":"0px",
-    "position":"relative",
-    "overflow":"visible"
-};
-/** Style for the body table row - fills all area not needed for fixed size headers. */
-visicomp.visiui.WindowFrame.BODY_ROW_STYLE = {
-    //fixed
-    "position":"relative",	
-	"display":"table-row",
-	"width":"100%",
-    "height":"100%",
-    "top":"0px",
-    "left":"0px"
-};
-/** This isolates the window table elements from sizing of the body element. */ 
-visicomp.visiui.WindowFrame.BODY_BUFFER_STYLE = {
-    "display":"block",
-    "position":"relative",
-    "top":"0px",
-    "height":"100%",
-    "overflow": "auto"
-};
-/** This is the style for the body element. If scrolling is desired a
- * overflow:auto component should be added inside the window body. */
-visicomp.visiui.WindowFrame.BODY_ELEMENT_BASE_STYLE = {
-    "display":"block",
-    "top":"0px",
-    "left":"0px",
-    "bottom":"0px",
-    "right":"0px",
-    "position":"absolute",
-    "overflow":"hidden"   
-};
-/** provides styling for the body */
-visicomp.visiui.WindowFrame.BODY_SUPPLEMENT_STYLE = {
-    //configurable
-    "backgroundColor":"white"  
-};
-/** provides styleing for the title bar. */
-visicomp.visiui.WindowFrame.TITLE_BAR_SUPPLEMENT_STYLE = {
-    //configurable
-    "backgroundColor":visicomp.visiui.colors.windowColor,
-    "padding":"3px"
-};
-/** provides styleing for the header container. */
-visicomp.visiui.WindowFrame.HEADER_SUPPLEMENT_STYLE = {
-    //configurable
-};
 
 visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE = {
     //fixed
@@ -303,13 +212,9 @@ visicomp.visiui.WindowFrame.prototype.getMenu = function() {
 visicomp.visiui.WindowFrame.prototype.loadHeaders = function(headerElements) {
     visicomp.core.util.removeAllChildren(this.headerElement);
     if(headerElements.length > 0) {
-        this.headerRow.style.display = "table-row";
         for(var i = 0; i < headerElements.length; i++) {
 			this.headerElement.appendChild(headerElements[i]);
 		}
-    }
-    else {
-        this.headerRow.style.display = "none";
     }
 }
 
@@ -498,8 +403,9 @@ visicomp.visiui.WindowFrame.prototype.removeRightTitleBarElement = function(elem
 //====================================
 // Motion/Reseize Event Handlers and functions
 //====================================
+
 /** Mouse down handler for moving the window. */
-visicomp.visiui.WindowFrame.prototype.titleBarMouseDown = function(e) {
+visicomp.visiui.WindowFrame.prototype.moveMouseDown = function(e) {
     //do not do move in maximized state
     if(this.windowState === visicomp.visiui.WindowFrame.MAXIMIZED) return;
     
@@ -518,7 +424,7 @@ visicomp.visiui.WindowFrame.prototype.titleBarMouseDown = function(e) {
 }
 
 /** Mouse m,ove handler for moving the window. */
-visicomp.visiui.WindowFrame.prototype.titleBarMouseMove = function(e) {
+visicomp.visiui.WindowFrame.prototype.moveMouseMove = function(e) {
     if(!this.windowDragActive) return;
 	var newX = e.clientX - this.moveOffsetX;
 	if(newX < 0) newX = 0;
@@ -530,36 +436,35 @@ visicomp.visiui.WindowFrame.prototype.titleBarMouseMove = function(e) {
 }
 
 /** Mouse up handler for moving the window. */
-visicomp.visiui.WindowFrame.prototype.titleBarMouseUp = function(e) {
+visicomp.visiui.WindowFrame.prototype.moveMouseUp = function(e) {
     this.endMove();
 }
 
 /** Mouse leave handler for moving the window. */
-visicomp.visiui.WindowFrame.prototype.titleBarMouseLeave = function(e) {
+visicomp.visiui.WindowFrame.prototype.moveMouseLeave = function(e) {
     this.endMove();
 }
 
 /** Mouse down handler for resizing the window. */
-visicomp.visiui.WindowFrame.prototype.frameMouseDown = function(e) {
+visicomp.visiui.WindowFrame.prototype.resizeMouseDown = function(e,resizeFlags) {
     //do not do resize in maximized state
     if(this.windowState === visicomp.visiui.WindowFrame.MAXIMIZED) return;
-    
-    var flags = this.getResizeType(e);
-	if(flags) {
-		if(flags & visicomp.visiui.WindowFrame.RESIZE_EAST) {
+
+	if(resizeFlags) {
+		if(resizeFlags & visicomp.visiui.WindowFrame.RESIZE_EAST) {
 			this.resizeEastActive = true;
 			this.resizeOffsetWidth = e.clientX - this.frame.clientWidth;
 		}
-		else if(flags & visicomp.visiui.WindowFrame.RESIZE_WEST) {
+		else if(resizeFlags & visicomp.visiui.WindowFrame.RESIZE_WEST) {
 			this.resizeWestActive = true;
 			this.resizeOffsetWidth = e.clientX + this.frame.clientWidth;
 			this.moveOffsetX = e.clientX - this.frame.offsetLeft;
 		}
-		if(flags & visicomp.visiui.WindowFrame.RESIZE_SOUTH) {
+		if(resizeFlags & visicomp.visiui.WindowFrame.RESIZE_SOUTH) {
 			this.resizeSouthActive = true;
 			this.resizeOffsetHeight = e.clientY - this.frame.clientHeight;
 		}
-		else if(flags & visicomp.visiui.WindowFrame.RESIZE_NORTH) {
+		else if(resizeFlags & visicomp.visiui.WindowFrame.RESIZE_NORTH) {
 			this.resizeNorthActive = true;
 			this.resizeOffsetHeight = e.clientY + this.frame.clientHeight;
 			this.moveOffsetY = e.clientY - this.frame.offsetTop;
@@ -568,69 +473,23 @@ visicomp.visiui.WindowFrame.prototype.frameMouseDown = function(e) {
         //add resize events to the parent, since the mouse can leave this element during a move
 		this.parentElement.addEventListener("mouseup",this.resizeOnMouseUp);
 		this.parentElement.addEventListener("mousemove",this.resizeOnMouseMove);
-		this.parentElement.addEventListener("mouseleave",this.resizeOnMouseLeave);
+        this.parentElement.addEventListener("mouseleave",this.resizeOnMouseLeave);
 	}
-}
-
-/** Mouse move handler for resizing the window - setting the cursor. */
-visicomp.visiui.WindowFrame.prototype.frameMouseMoveCursor = function(e) {
-    var flags = this.getResizeType(e);
-	if(flags) {
-		switch(flags) {
-			case visicomp.visiui.WindowFrame.RESIZE_SE:
-				this.frame.style.cursor = "se-resize";
-				break;
-
-			case visicomp.visiui.WindowFrame.RESIZE_SW:
-				this.frame.style.cursor = "sw-resize";
-				break;
-
-			case visicomp.visiui.WindowFrame.RESIZE_NE:
-				this.frame.style.cursor = "ne-resize";
-				break;
-
-			case visicomp.visiui.WindowFrame.RESIZE_NW:
-				this.frame.style.cursor = "nw-resize";
-				break;
-
-			case visicomp.visiui.WindowFrame.RESIZE_EAST:
-				this.frame.style.cursor = "e-resize";
-				break;
-
-			case visicomp.visiui.WindowFrame.RESIZE_WEST:
-				this.frame.style.cursor = "w-resize";
-				break;
-
-			case visicomp.visiui.WindowFrame.RESIZE_SOUTH:
-				this.frame.style.cursor = "s-resize";
-				break;
-
-			case visicomp.visiui.WindowFrame.RESIZE_NORTH:
-				this.frame.style.cursor = "n-resize";
-				break;
-
-			default:
-				this.frame.style.cursor = "default";
-		}	
-	}
-}
-
-/** Mouse out handler for resizing the window. */
-visicomp.visiui.WindowFrame.prototype.frameMouseOutCursor = function(e) {
-	this.frame.style.cursor = "default";
 }
 
 /** Mouse move handler for resizing the window. */
-visicomp.visiui.WindowFrame.prototype.frameMouseMoveResize = function(e) {
+visicomp.visiui.WindowFrame.prototype.resizeMouseMove = function(e) {
     var newHeight;
     var newWidth;
     var newX;
     var newY;
+    var changeMade = false;
     
 	if(this.resizeEastActive) {
 		newWidth = e.clientX - this.resizeOffsetWidth;
 		if(newWidth < this.minWidth) return;
         this.coordinateInfo.width = newWidth;
+        changeMade = true;
 	}
 	else if(this.resizeWestActive) {
 		newWidth = this.resizeOffsetWidth - e.clientX;
@@ -639,11 +498,13 @@ visicomp.visiui.WindowFrame.prototype.frameMouseMoveResize = function(e) {
 		if(newX < 0) newX = 0;
         this.coordinateInfo.width = newWidth;
         this.coordinateInfo.x = newX;
+        changeMade = true;
 	}
 	if(this.resizeSouthActive) {
 		newHeight = e.clientY - this.resizeOffsetHeight;
 		if(newHeight < this.minHeight) return;
 		this.coordinateInfo.height = newHeight;
+        changeMade = true;
 	}
 	else if(this.resizeNorthActive) {
 		newHeight = this.resizeOffsetHeight - e.clientY;
@@ -652,19 +513,22 @@ visicomp.visiui.WindowFrame.prototype.frameMouseMoveResize = function(e) {
 		if(newY < 0) newY = 0;
 		this.coordinateInfo.height = newHeight;
 		this.coordinateInfo.y = newY;
+        changeMade = true;
 	}
         
-	//update coordinates
-	this.updateCoordinates();
+    if(changeMade) {
+        //update coordinates
+        this.updateCoordinates();
+    }
 }
 
 /** Mouse up handler for resizing the window. */
-visicomp.visiui.WindowFrame.prototype.frameMouseUp = function(e) {
+visicomp.visiui.WindowFrame.prototype.resizeMouseUp = function(e) {
     this.endResize();
 }
 
-/** Mouse leave handler for resizing the window. */
-visicomp.visiui.WindowFrame.prototype.frameMouseLeave = function(e) {
+/** Mouse up handler for resizing the window. */
+visicomp.visiui.WindowFrame.prototype.resizeMouseLeave = function(e) {
     this.endResize();
 }
 
@@ -674,7 +538,6 @@ visicomp.visiui.WindowFrame.prototype.frameMouseLeave = function(e) {
 visicomp.visiui.WindowFrame.prototype.endMove = function(e) {
     this.windowDragActive = false;
     this.parentElement.removeEventListener("mousemove",this.moveOnMouseMove);
-    this.parentElement.removeEventListener("mouseleave",this.moveOnMouseLeave);
     this.parentElement.removeEventListener("mouseup",this.moveOnMouseUp);
 }
 
@@ -687,23 +550,7 @@ visicomp.visiui.WindowFrame.prototype.endResize = function() {
 	this.resizeNorthActive = false;
 	this.parentElement.removeEventListener("mouseup",this.resizeOnMouseUp);
 	this.parentElement.removeEventListener("mousemove",this.resizeOnMouseMove);
-	this.parentElement.removeEventListener("mouseleave",this.resizeOnMouseLeave);
 }
-
-/** This methods determines if a mouse location shoudl allow for a resize action.
- * @private */
-visicomp.visiui.WindowFrame.prototype.getResizeType = function(e) {
-	var flags = 0;
-	if(e.target === this.frame) {
-		if(this.frame.clientWidth - e.offsetX < visicomp.visiui.WindowFrame.RESIZE_TOLERANCE) flags |= visicomp.visiui.WindowFrame.RESIZE_EAST;
-		else if(e.offsetX < visicomp.visiui.WindowFrame.RESIZE_TOLERANCE) flags |= visicomp.visiui.WindowFrame.RESIZE_WEST;
-		
-		if(this.frame.clientHeight - e.offsetY < visicomp.visiui.WindowFrame.RESIZE_TOLERANCE) flags |= visicomp.visiui.WindowFrame.RESIZE_SOUTH;
-		else if(e.offsetY < visicomp.visiui.WindowFrame.RESIZE_TOLERANCE) flags |= visicomp.visiui.WindowFrame.RESIZE_NORTH;
-	}
-	return flags;
-}
-
 
 //====================================
 //  Min/max Methods
@@ -713,16 +560,7 @@ visicomp.visiui.WindowFrame.prototype.getResizeType = function(e) {
 visicomp.visiui.WindowFrame.prototype.minimizeContent = function() {
     
     //set body as hidden
-    this.bodyRow.style.display = "none";
-    
-    //restore parent overflow, if needed
-    if(this.savedParentOverflow !== undefined) {
-        this.parentElement.style.overflow = this.savedParentOverflow;
-        this.savedParentOverflow = undefined;
-    }
-    
-    //apply the normal style for the frame
-    visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL);
+    this.body.style.display = "none";
     
     var wasMinimized = (this.windowState === visicomp.visiui.WindowFrame.MINIMIZED);
     var wasMaximized = (this.windowState === visicomp.visiui.WindowFrame.MAXIMIZED);
@@ -739,17 +577,8 @@ visicomp.visiui.WindowFrame.prototype.minimizeContent = function() {
 /** This is the restore function for the window.*/
 visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
     
-    //set body as visible
-    this.bodyRow.style.display = "table-row";
-    
-    //restore parent overflow, if needed
-    if(this.savedParentOverflow !== undefined) {
-        this.parentElement.style.overflow = this.savedParentOverflow;
-        this.savedParentOverflow = undefined;
-    }
-    
-    //apply the normal style for the frame
-    visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL);
+    //set body as not hidden
+    this.body.style.display = "";
     
     var wasMinimized = (this.windowState === visicomp.visiui.WindowFrame.MINIMIZED);
     var wasMaximized = (this.windowState === visicomp.visiui.WindowFrame.MAXIMIZED);
@@ -765,15 +594,8 @@ visicomp.visiui.WindowFrame.prototype.restoreContent = function() {
 /** This is the minimize function for the window.*/
 visicomp.visiui.WindowFrame.prototype.maximizeContent = function() {
     
-    //set body as visible
-    this.bodyRow.style.display = "table-row";
-
-    //make sure the parent does not have scroll; store the old value
-    this.savedParentOverflow = this.parentElement.style.overflow;
-    this.parentElement.style.overflow = "hidden";
-
-    //apply the maximized style to the frame
-    visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.FRAME_STYLE_MAX);
+    //set body as not hidden
+    this.body.style.display = "";
     
     var wasMinimized = (this.windowState === visicomp.visiui.WindowFrame.MINIMIZED);
     
@@ -889,56 +711,122 @@ visicomp.visiui.WindowFrame.prototype.contentOnlyHidden = function() {
 //====================================
 
 /** @private */
-visicomp.visiui.WindowFrame.prototype.initDiv = function() {
-    this.frame = document.createElement("div");
-    visicomp.visiui.applyStyle(this.frame,visicomp.visiui.WindowFrame.FRAME_STYLE_NORMAL);
+visicomp.visiui.WindowFrame.prototype.initUI = function() {
     
-    if(this.options.resizable) {
-        var instance = this;
-
-        //events on main frame for mouse resizing 
-        this.frame.onmousedown = function(event) {
-            instance.frameMouseDown(event);
-        }
-
-        this.frame.onmousemove = function(event) {
-            instance.frameMouseMoveCursor(event);
-        };
-
-        this.frame.onmouseout = function(event) {
-            instance.frameMouseOutCursor(event);
-        };
-
-        //mouse window resize events we will place on the parent container - since the mouse drag 
-        //may leave the window frame during the resize
-        this.resizeOnMouseMove = function(event) {
-            instance.frameMouseMoveResize(event);
-        };
-        this.resizeOnMouseLeave = function(event) {
-            instance.frameMouseLeave(event);
-        };
-        this.resizeOnMouseUp = function(event) {
-            instance.frameMouseUp(event);
-        };
-    }
-	
-	//prevent default drag action
+    var table;
+    var row;
+    var cell;
+    
+    table = document.createElement("table");
+    table.className = "visiui_win_main";
+    this.frame = table; 
+    
+    //top border
+    row = document.createElement("tr");
+    table.appendChild(row);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_frameElement visiui_win_topLeft";
+    this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_WEST | visicomp.visiui.WindowFrame.RESIZE_NORTH);
+    row.appendChild(cell);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_frameElement visiui_win_top";
+    this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_NORTH);  
+    row.appendChild(cell);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_frameElement visiui_win_topRight";
+    this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_EAST | visicomp.visiui.WindowFrame.RESIZE_NORTH);  
+    row.appendChild(cell);
+    
+    //title bar
+    row = document.createElement("tr");
+    table.appendChild(row);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_frameElement visiui_win_left";
+    this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_WEST); 
+    cell.rowSpan = 3;
+    row.appendChild(cell);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_titleBarCell";
+    this.titleBarCell = cell;
+    row.appendChild(cell);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_frameElement visiui_win_right";
+    this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_EAST); 
+    cell.rowSpan = 3;
+    row.appendChild(cell);
+    
+    //header row
+    row = document.createElement("tr");
+    table.appendChild(row);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_headerCell";
+    this.headerCell = cell;
+    row.appendChild(cell);
+    
+    //body
+    row = document.createElement("tr");
+    row.className = "visiui_win_bodyRow";
+    table.appendChild(row);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_bodyCell";
+    this.bodyCell = cell;
+    row.appendChild(cell);
+    
+    //bottom border
+    row = document.createElement("tr");
+    table.appendChild(row);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_frameElement visiui_win_bottomLeft";
+    this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_WEST | visicomp.visiui.WindowFrame.RESIZE_SOUTH); 
+    row.appendChild(cell);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_frameElement visiui_win_bottom";
+    this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_SOUTH);  
+    row.appendChild(cell);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_frameElement visiui_win_bottomRight";
+    this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_EAST | visicomp.visiui.WindowFrame.RESIZE_SOUTH);
+    row.appendChild(cell);
+    
+    //prevent default drag action
     var defaultDragHandler = function(e) {e.preventDefault();};
     this.frame.addEventListener("mousemove",defaultDragHandler);
+    
+    this.createTitleBar();
+    this.createHeaderContainer();
+    this.createBody();
+}
+
+/** @private */
+visicomp.visiui.WindowFrame.prototype.addResizeHandlers = function(cell,flags) {
+    //add handlers if the window is resizable
+    if(this.options.resizable) {
+        var instance = this;
+        cell.onmousedown = function(event) {
+            instance.resizeMouseDown(event,flags);
+        }
+        
+        //these are not cel specific. they are used on all cells and on the parent container
+        //during a move.
+        if(!this.resizeOnMouseMove) {
+            this.resizeOnMouseMove = function(event) {
+                instance.resizeMouseMove(event);
+            };
+            this.resizeOnMouseUp = function(event) {
+                instance.resizeMouseUp(event);
+            };
+            this.resizeOnMouseLeave = function(event) {
+                instance.resizeMouseLeave(event);
+            };
+        }
+    }
 }
 
 /** @private */
 visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
     
-    //create title bar
-    this.titleBarRow = document.createElement("div");
-    visicomp.visiui.applyStyle(this.titleBarRow,visicomp.visiui.WindowFrame.HEADER_ROW_STYLE);
-    this.frame.appendChild(this.titleBarRow);
-    
     this.titleBar = document.createElement("div");
-    visicomp.visiui.applyStyle(this.titleBar,visicomp.visiui.WindowFrame.HEADER_ELEMENT_BASE_STYLE);
-    visicomp.visiui.applyStyle(this.titleBar,visicomp.visiui.WindowFrame.TITLE_BAR_SUPPLEMENT_STYLE);
-    this.titleBarRow.appendChild(this.titleBar);
+    this.titleBar.className = "visiui_win_titleBar";
 
     //add elements
     this.titleBarLeftElements = document.createElement("div");
@@ -985,13 +873,6 @@ visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
             instance.maximizeContent();
         }
         this.titleBarRightElements.appendChild(this.maximizeButton);
-        
-        //save this - it should be present if we allow maximize 
-        this.parentResizeSubscribed = false;
-        //we must pass the resize event from parent to child when maximized
-        this.maximizedResizeHandler = function() {
-            instance.updateCoordinates();
-        }
     }
     
     //layout the window buttons
@@ -1016,39 +897,37 @@ visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
     if(this.options.movable) {
         //add mouse handlers for moving the window 
         this.titleBar.onmousedown = function(event) {
-            instance.titleBarMouseDown(event);
+            instance.moveMouseDown(event);
         }
 
         //mouse window drag events we will place on the parent container - since the mouse drag 
         //may leave the window frame during the move
         this.moveOnMouseMove = function(event) {
-            instance.titleBarMouseMove(event);
+            instance.moveMouseMove(event);
         };
-        this.moveOnMouseLeave = function(event) {
-            instance.titleBarMouseLeave(event);
-        }
         this.moveOnMouseUp = function(event) {
-            instance.titleBarMouseUp(event);
+            instance.moveMouseUp(event);
+        }
+        this.moveOnMouseLeave = function(event) {
+            instance.moveMouseLeave(event);
         }
     }
 	
 	//prevent default drag action
 	var defaultDragHandler = function(e) {e.preventDefault();};
     this.titleBar.addEventListener("mousemove",defaultDragHandler);
+    
+    //add to window
+    this.titleBarCell.appendChild(this.titleBar);
 }
 
 /** @private */
 visicomp.visiui.WindowFrame.prototype.createHeaderContainer = function() {
     
-    //create header element
-    this.headerRow = document.createElement("div");
-    visicomp.visiui.applyStyle(this.headerRow,visicomp.visiui.WindowFrame.HEADER_ROW_STYLE);
-    this.frame.appendChild(this.headerRow);
-    
     this.headerElement = document.createElement("div");
-    visicomp.visiui.applyStyle(this.headerElement,visicomp.visiui.WindowFrame.HEADER_ELEMENT_BASE_STYLE);
-    visicomp.visiui.applyStyle(this.headerElement,visicomp.visiui.WindowFrame.HEADER_SUPPLEMENT_STYLE);
-    this.headerRow.appendChild(this.headerElement);
+    this.headerElement.className = "visiui_win_header";
+    
+    this.headerCell.appendChild(this.headerElement);
  
     //load empty headers
     this.loadHeaders([]);
@@ -1057,22 +936,13 @@ visicomp.visiui.WindowFrame.prototype.createHeaderContainer = function() {
 /** @private */
 visicomp.visiui.WindowFrame.prototype.createBody = function() {
     
-    //create body
-    this.bodyRow = document.createElement("div");
-    visicomp.visiui.applyStyle(this.bodyRow,visicomp.visiui.WindowFrame.BODY_ROW_STYLE);
-    this.frame.appendChild(this.bodyRow);
-    
-    this.bodyRowBuffer = document.createElement("div");
-    visicomp.visiui.applyStyle(this.bodyRowBuffer,visicomp.visiui.WindowFrame.BODY_BUFFER_STYLE);
-    this.bodyRow.appendChild(this.bodyRowBuffer);
-    
     this.body = document.createElement("div");
-    visicomp.visiui.applyStyle(this.body,visicomp.visiui.WindowFrame.BODY_ELEMENT_BASE_STYLE);
-    visicomp.visiui.applyStyle(this.body,visicomp.visiui.WindowFrame.BODY_SUPPLEMENT_STYLE);
-    this.bodyRowBuffer.appendChild(this.body);
+    this.body.className = "visiui_win_body";
 	
 	//prevent default drag action
 	var defaultDragHandler = function(e) {e.preventDefault();};
     this.body.addEventListener("mousemove",defaultDragHandler);
+    
+    this.bodyCell.appendChild(this.body);
 }
 
