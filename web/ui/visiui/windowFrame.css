@@ -1,12 +1,16 @@
-.visiui_win_titleBarCell {
-  background-color: green;
-}
-.visiui_win_titleBar {
-	background-color: rgb(185,185,220);
+/* These are default window colors. User can set alternate colors. */
+/* The default values are ugly for now to make sure people set them for the app. */
+.visiui_win_titleBarClass {
+	background-color: purple/*rgb(185,185,220)*/;
     padding:3px;
 }
+.visiui_win_windowColorClass {
+  background-color: green/*rgb(185,185,220)*/;
+}
+
+/* These elements should not be overridden */ 
 .visiui_win_bodyCell {
-  background-color: lightGray;
+  background-color: rgb(240,240,240);
   /*display set in javascript*/
   /* - normal, max - emtpy string */
   /* - min - "none" */
@@ -26,9 +30,7 @@
 }
 .visiui_win_header {
 }
-.visiui_win_frameElement {
-  background-color: rgb(185,185,220);
-}
+
 
 .visiui_win_main {
   border-collapse: collapse;
@@ -37,7 +39,7 @@
   /* - normal - all values set */
   /* - min - height and width set to empty string */
   /* - max - height and width set to 100% */
-  background-color: cyan;
+  background-color: rgb(240,240,240);
 }
 .visiui_win_main td {
   position: relative;

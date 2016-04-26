@@ -121,6 +121,9 @@ visicomp.visiui.createDialog = function(options) {
     var shieldElement = visicomp.visiui.createElement("div",null,visicomp.visiui.DIALOG_SHIELD_STYLE);
     var dialogParent = new visicomp.visiui.SimpleParentContainer(shieldElement,true);
     visicomp.visiui.dialogLayer.appendChild(shieldElement);
+    
+    if(!options.frameColorClass) options.frameColorClass = "visicomp_windowColor";
+    if(!options.titleBarClass) options.titleBarClass = "visicomp_titleBarClass";
     return new visicomp.visiui.WindowFrame(dialogParent,options);
 }
 

@@ -5,6 +5,8 @@
  * It resizes to occupy all space in the parent, starting form its existing location,
  * which in this case should be right after the menu.
  * 
+ * note - document external color classes set in options
+ * 
  * options: none
  * 
  * @class 
@@ -14,6 +16,12 @@ visicomp.visiui.TabFrame = function(parentDiv,options) {
     if(!options) {
         options = {};
     }
+    
+    //make sure these are passed in with valid colors!
+    if((!options.tabBarColorClass)||(!options.activeTabColorClass)) {
+        alert("The tabBarColorClass and  activeTabColorClass must be set in the options for tab frame!");
+    } options.titleBarClass = "";
+  
     
     //base init
     visicomp.core.EventManager.init.call(this);
@@ -34,6 +42,7 @@ visicomp.visiui.TabFrame = function(parentDiv,options) {
     
     this.tabBar = document.createElement("div");
     visicomp.visiui.applyStyle(this.tabBar,visicomp.visiui.TabFrame.TAB_BAR_STYLE);
+    this.tabBar.className = this.options.tabBarColorClass;
     this.tabFrameControl.appendChild(this.tabBar);
     
     //base init for parent continer mixin
@@ -82,8 +91,7 @@ visicomp.visiui.TabFrame.TAB_BAR_STYLE = {
     "display":"table-row",
     "width":"100%",
     
-    //configurable
-    "backgroundColor":visicomp.visiui.colors.tabFrameColor,
+    /* set background color with an external style */
     "margin":"0px",
     "border":" 1px solid gray",
     "borderTopWidth":" 0px"
@@ -102,8 +110,7 @@ visicomp.visiui.TabFrame.TAB_INACTIVE_STYLE = {
     "display":"inline-block",
     "cursor":" default",
     
-    //configurable
-    "backgroundColor":visicomp.visiui.colors.tabFrameColor,
+    /* set color with external class */
     "border":" 1px solid black",
     "borderTopColor":"",
     "padding":"2px"
@@ -220,11 +227,13 @@ visicomp.visiui.TabFrame.prototype.updateTabDisplay = function() {
         if(title == this.activeTab) {
             tabData.tabDisplay.getContainerElement().style.display = "";
             visicomp.visiui.applyStyle(tabData.tabLabel,visicomp.visiui.TabFrame.TAB_ACTIVE_STYLE);
+            tabData.tabLabel.className = this.options.activeTabColorClass;
             this.dispatchEvent(visicomp.visiui.TabFrame.TAB_SHOWN,this.activeTab);
         }
         else {
             tabData.tabDisplay.getContainerElement().style.display = "none";
             visicomp.visiui.applyStyle(tabData.tabLabel,visicomp.visiui.TabFrame.TAB_INACTIVE_STYLE);
+            tabData.tabLabel.className = this.options.tabBarColorClass;
         }
     }
 }

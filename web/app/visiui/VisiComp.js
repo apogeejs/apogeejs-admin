@@ -197,10 +197,10 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
         "position":"relative",
         "display":"table-row",
         "width":"100%",
-		"backgroundColor":visicomp.visiui.colors.menuBarColor,
         "padding":"2px"
     };
     visicomp.visiui.applyStyle(menuBar,menuBarStyle);
+    menuBar.className = "visicomp_menuBarStyle";
     container.appendChild(menuBar);
     
     //create the menus
@@ -260,7 +260,10 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     visicomp.visiui.applyStyle(tabFrameDiv,tabFrameDivStyle);
     container.appendChild(tabFrameDiv);
     
-    this.tabFrame = new visicomp.visiui.TabFrame(tabFrameDiv);
+    var options = {};
+    options.tabBarColorClass = "visicomp_tabFrameColor";
+    options.activeTabColorClass = "visicomp_tabFrameActiveColor";
+    this.tabFrame = new visicomp.visiui.TabFrame(tabFrameDiv,options);
     
 }
 

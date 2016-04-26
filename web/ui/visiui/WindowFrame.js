@@ -13,9 +13,13 @@
  */
 visicomp.visiui.WindowFrame = function(parentContainer, options) {
 	
+    //set the options
     if(!options) {
         options = {};
     }
+    
+    if(!options.frameColorClass) options.frameColorClass = visicomp.visiui.WindowFrame.DEFAULT_FRAME_COLOR_CLASS;
+    if(!options.titleBarClass) options.titleBarClass = visicomp.visiui.WindowFrame.DEFAULT_TITLE_BAR_CLASS;
     
     //base init
     visicomp.core.EventManager.init.call(this);
@@ -132,6 +136,10 @@ visicomp.visiui.WindowFrame.RESIZE_SW = visicomp.visiui.WindowFrame.RESIZE_SOUTH
 /** size must be speicifed for the window. If not these values are used. */
 visicomp.visiui.WindowFrame.DEFAULT_WINDOW_HEIGHT = 300;
 visicomp.visiui.WindowFrame.DEFAULT_WINDOW_WIDTH = 300;
+
+visicomp.visiui.WindowFrame.DEFAULT_TITLE_BAR_CLASS = "visiui_win_titleBarClass";
+visicomp.visiui.WindowFrame.DEFAULT_FRAME_COLOR_CLASS = "visiui_win_windowColorClass";
+
 //======================================
 // CSS STYLES
 //======================================
@@ -725,15 +733,15 @@ visicomp.visiui.WindowFrame.prototype.initUI = function() {
     row = document.createElement("tr");
     table.appendChild(row);
     cell = document.createElement("td");
-    cell.className = "visiui_win_frameElement visiui_win_topLeft";
+    cell.className = this.options.frameColorClass + " visiui_win_topLeft";
     this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_WEST | visicomp.visiui.WindowFrame.RESIZE_NORTH);
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = "visiui_win_frameElement visiui_win_top";
+    cell.className = this.options.frameColorClass + " visiui_win_top";
     this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_NORTH);  
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = "visiui_win_frameElement visiui_win_topRight";
+    cell.className = this.options.frameColorClass + " visiui_win_topRight";
     this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_EAST | visicomp.visiui.WindowFrame.RESIZE_NORTH);  
     row.appendChild(cell);
     
@@ -741,16 +749,16 @@ visicomp.visiui.WindowFrame.prototype.initUI = function() {
     row = document.createElement("tr");
     table.appendChild(row);
     cell = document.createElement("td");
-    cell.className = "visiui_win_frameElement visiui_win_left";
+    cell.className = this.options.frameColorClass + " visiui_win_left";
     this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_WEST); 
     cell.rowSpan = 3;
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = "visiui_win_titleBarCell";
+    cell.className = this.options.frameColorClass;
     this.titleBarCell = cell;
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = "visiui_win_frameElement visiui_win_right";
+    cell.className = this.options.frameColorClass + " visiui_win_right";
     this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_EAST); 
     cell.rowSpan = 3;
     row.appendChild(cell);
@@ -776,15 +784,15 @@ visicomp.visiui.WindowFrame.prototype.initUI = function() {
     row = document.createElement("tr");
     table.appendChild(row);
     cell = document.createElement("td");
-    cell.className = "visiui_win_frameElement visiui_win_bottomLeft";
+    cell.className = this.options.frameColorClass + " visiui_win_bottomLeft";
     this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_WEST | visicomp.visiui.WindowFrame.RESIZE_SOUTH); 
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = "visiui_win_frameElement visiui_win_bottom";
+    cell.className = this.options.frameColorClass + " visiui_win_bottom";
     this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_SOUTH);  
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = "visiui_win_frameElement visiui_win_bottomRight";
+    cell.className = this.options.frameColorClass + " visiui_win_bottomRight";
     this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_EAST | visicomp.visiui.WindowFrame.RESIZE_SOUTH);
     row.appendChild(cell);
     
@@ -826,7 +834,7 @@ visicomp.visiui.WindowFrame.prototype.addResizeHandlers = function(cell,flags) {
 visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
     
     this.titleBar = document.createElement("div");
-    this.titleBar.className = "visiui_win_titleBar";
+    this.titleBar.className = this.options.titleBarClass;
 
     //add elements
     this.titleBarLeftElements = document.createElement("div");

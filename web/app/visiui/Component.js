@@ -31,6 +31,8 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     windowOptions.maximizable = true;
     windowOptions.resizable = true;
     windowOptions.movable = true;
+    windowOptions.frameColorClass = "visicomp_windowColor";
+    windowOptions.titleBarClass = "visicomp_titleBarClass";
     this.window = new visicomp.visiui.WindowFrame(this.parentContainer,windowOptions);
 
     //------------------
