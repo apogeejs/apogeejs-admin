@@ -120,8 +120,7 @@ visicomp.visiui.TabFrame.TAB_ACTIVE_STYLE = {
     "display":"inline-block",
     "cursor":" default",
     
-    //configurable
-    "backgroundColor":"white",
+    /* set background color with an external style */
     "border":" 1px solid black",
     "borderTopColor":"white",
     "padding":"2px"
