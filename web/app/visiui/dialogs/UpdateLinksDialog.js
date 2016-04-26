@@ -216,7 +216,7 @@ cssLinksEditor.$blockScrolling = Infinity;
         if(jsLinksEditor) jsLinksEditor.resize();
     }
     var container = content.parentElement;
-    addResizeListener(container, resizeCallback);
+    visicomp.visiui.setResizeListener(container, resizeCallback);
 }
 
 /** @private */

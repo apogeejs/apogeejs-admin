@@ -6,6 +6,15 @@
  * @param {type} onCancel - returns true if the edit should end
  */
 visicomp.app.visiui.AceTextEditor = function(component,aceMode,onSave,onCancel) {
+    
+    this.outsideDiv = visicomp.visiui.createElement("div",null,{
+		"position":"absolute",
+        "top":"0px",
+        "left":"0px",
+		"bottom":"0px",
+        "right":"0px",
+		"overflow":"hidden"
+	});
    
 	this.editorDiv = visicomp.visiui.createElement("div",null,{
 		"position":"absolute",
@@ -15,6 +24,7 @@ visicomp.app.visiui.AceTextEditor = function(component,aceMode,onSave,onCancel) 
         "right":"0px",
 		"overflow":"auto"
 	});
+    this.outsideDiv.appendChild(this.editorDiv);
 	
 	this.component = component;
 	this.table = component.getObject();
@@ -38,7 +48,7 @@ visicomp.app.visiui.AceTextEditor = function(component,aceMode,onSave,onCancel) 
         editor.resize();
     }
 	
-    addResizeListener(this.editorDiv, resizeCallback);
+    visicomp.visiui.setResizeListener(this.outsideDiv, resizeCallback);
 	
 	//add click handle to enter edit mode
 	var instance = this;
@@ -73,7 +83,7 @@ visicomp.app.visiui.AceTextEditor.prototype.cancel = function() {
 //=============================
 
 visicomp.app.visiui.AceTextEditor.prototype.getElement = function() {
-	return this.editorDiv;
+	return this.outsideDiv;
 }
 	
 visicomp.app.visiui.AceTextEditor.prototype.showData = function(text,editOk) {

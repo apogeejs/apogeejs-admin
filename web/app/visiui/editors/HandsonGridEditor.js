@@ -1,7 +1,6 @@
 /** Editor that uses the Ace text editor.
  * 
  * @param {type} component - the visicomp component
- * @param {type} aceMode - the display format, such as "ace/mode/json"
  * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
  * @param {type} onCancel - returns true if the edit should end
  */
@@ -29,23 +28,6 @@ visicomp.app.visiui.HandsonGridEditor = function(component,onSave,onCancel) {
 	});
 	this.outsideDiv.appendChild(this.gridDiv);
 	
-//----------------------------------------------------
-//CLEAN THIS UP!
-	
-	var styleJson = {
-		"position":"absolute",
-        "top":"0px",
-        "left":"0px",
-		"height":"100%",
-        "width":"100%",
-		"overflow":"hidden",
-		"zIndex":-1
-	};
-	this.dummyFrameElement = visicomp.visiui.createElement("iframe",null,styleJson);
-	this.outsideDiv.appendChild(this.dummyFrameElement);
-	
-//-----------------------------------------------------	
-	
 	this.component = component;
 	this.table = component.getObject();
 	this.inputData = null;
@@ -63,18 +45,7 @@ visicomp.app.visiui.HandsonGridEditor = function(component,onSave,onCancel) {
             instance.gridControl.render();
         }
     }
-//    addResizeListener(this.outsideDiv, resizeCallback);
-
-	var onLoadCallback = function() {
-		
-		instance.dummyFrameBody = instance.dummyFrameElement.contentDocument.body;
-		instance.dummyFrameBody.onresize = resizeCallback;
-		
-		resizeCallback();
-	}
-	
-	//do a resize on load too
-	this.dummyFrameElement.onload = onLoadCallback;
+   visicomp.visiui.setResizeListener(this.outsideDiv, resizeCallback);
 	
 	//grid edited function
 	this.gridEdited = function(args) {
