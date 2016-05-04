@@ -81,23 +81,37 @@
 			}
 
 		</script>
+		<style>
+			.stepDiv {
+				background-color: lightgray;
+				outline: solid 1px gray;
+				padding: 10px;
+				margin: 10px;
+				display: table;
+			}
+		</style>
+	
 	</head>
 	<body>
-		<p>Insert the workspace json and define the input and output fields to set up a web service endpoint</p>
-        Workspace JSON:<br>
-		<textarea id="workspaceData" rows="5" cols="75"></textarea><br>
-		<br>
-		Input Field:<input id="inputTable" type="text"> &nbsp;&nbsp;&nbsp;&nbsp; Output Field: <input  id="outputTable" type="text"><br>
-		<br>
-		<p>Set the input body, which corresponds to the body of the request.</p>
-		Input Body:<br>
-		<textarea id="inputData" rows="5" cols="75"></textarea><br>
-		<br>
+		<h1>Web Server/Headless Mode</h1>
+		<div class="stepDiv">
+			<p>Insert the workspace json and define the input and output fields for the endpoint.</p>
+			Workspace JSON:<br>
+			<textarea id="workspaceData" rows="5" cols="75"></textarea><br>
+			<br>
+			Input Field:<input id="inputTable" type="text"> &nbsp;&nbsp;&nbsp;&nbsp; Output Field: <input  id="outputTable" type="text"><br>
+		</div>
+		<div class="stepDiv">
+			<p>This is the body of the request.</p>
+			Input Body:<br>
+			<textarea id="inputData" rows="5" cols="75"></textarea><br>
+		</div>
 		<button onclick="processInput()">Submit</button><br>
-		<br>
-		<p>This is the response.</p>
-		Output Body:<br>
-		<textarea id="outputData" rows="15" cols="75"></textarea><br>
+		<div class="stepDiv">
+			<p>This is the body of the response.</p>
+			Output Body:<br>
+			<textarea id="outputData" rows="15" cols="75"></textarea><br>
+		</div>
 		
 	</body>
 </html>
