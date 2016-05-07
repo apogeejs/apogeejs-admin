@@ -114,9 +114,9 @@ GoogleChartResource.prototype.createDataTable = function(data) {
 var GoogleChartComponent = {};
 
 /** This method creates the control. */
-GoogleChartComponent.createComponent = function(workspaceUI,parent,name) {
+GoogleChartComponent.createComponent = function(workspaceUI,data) {
 	var resource = new GoogleChartResource();
-	return visicomp.app.visiui.BasicControlComponent.createBaseComponent(workspaceUI,parent,name,resource,GoogleChartComponent.generator);
+	return visicomp.app.visiui.BasicControlComponent.createBaseComponent(workspaceUI,data,resource,GoogleChartComponent.generator);
 }
 
 GoogleChartComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {

@@ -72,9 +72,13 @@ visicomp.app.visiui.BasicControlComponent.prototype.getViewModeElement = functio
 // Static methods
 //======================================
 
-visicomp.app.visiui.BasicControlComponent.createBaseComponent = function(workspaceUI,parent,name,resource,generator) {
+visicomp.app.visiui.BasicControlComponent.createBaseComponent = function(workspaceUI,data,resource,generator) {
+    
+    var parent = workspaceUI.getObjectByKey(data.parentKey);
+    //should throw an exception if parent is invalid!
+    
     var json = {};
-    json.name = name;
+    json.name = data.name;
     json.type = visicomp.core.Control.generator.type;
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
