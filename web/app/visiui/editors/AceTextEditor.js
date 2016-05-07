@@ -89,6 +89,15 @@ visicomp.app.visiui.AceTextEditor.prototype.getElement = function() {
 visicomp.app.visiui.AceTextEditor.prototype.showData = function(text,editOk) {
 	this.editOk = editOk;
 	this.editor.getSession().setValue(text);
+    
+    //set the background color
+    if(this.editOk) {
+        this.editorDiv.style.backgroundColor = "";
+    }
+    else {
+        this.editorDiv.style.backgroundColor = visicomp.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
+    }
+    
 }
 
 visicomp.app.visiui.AceTextEditor.prototype.destroy = function() {

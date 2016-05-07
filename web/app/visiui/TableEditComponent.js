@@ -24,6 +24,9 @@ visicomp.app.visiui.TableEditComponent.init = function(viewTypes,defaultView,opt
 	this.clearFunctionCallback = null;
 }
 
+/** This value is used as the background color when an editor is read only. */
+visicomp.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
+
 /** This method populates the frame for this component. 
  * @protected */
 visicomp.app.visiui.TableEditComponent.setViewType = function(viewType) {

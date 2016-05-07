@@ -90,6 +90,14 @@ visicomp.app.visiui.HandsonGridEditor.prototype.showData = function(json,editOk)
 	}
 	
 	this.gridControl.loadData(editData);
+    
+    //set the background color
+    if(this.editOk) {
+        this.gridDiv.style.backgroundColor = "";
+    }
+    else {
+        this.gridDiv.style.backgroundColor = visicomp.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
+    }
 }
 
 visicomp.app.visiui.HandsonGridEditor.prototype.destroy = function() {

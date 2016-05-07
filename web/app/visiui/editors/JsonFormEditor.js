@@ -47,5 +47,13 @@ visicomp.app.visiui.JsonFormEditor.prototype.showData = function(data,editOk) {
 	this.editor = new visicomp.jsonedit.JsonEditArea(this.editorDiv,data,editOk);
     
     this.editor.setEditCallback(this.editCallback);
+    
+    //set the background color
+    if(this.editOk) {
+        this.editorDiv.style.backgroundColor = "";
+    }
+    else {
+        this.editorDiv.style.backgroundColor = visicomp.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
+    }
 }
 

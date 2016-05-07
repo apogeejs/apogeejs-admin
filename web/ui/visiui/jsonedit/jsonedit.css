@@ -9,7 +9,7 @@
     border: gray solid 1px;
     padding: 2px;
     min-width: 10px;
-    background: lightgray;
+    background: rgb(220,220,240);
     font-weight:bold;
 }
 .cell_index {

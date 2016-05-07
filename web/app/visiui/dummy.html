@@ -129,6 +129,14 @@
             .visicomp_tabFrameActiveColor {
                 background-color: white;
             }
+            
+            /* overrides for the handsontable coloring */
+            .handsontable th {
+                background-color: rgb(220,220,240);
+            }
+            .handsontable td {
+                background-color: rgba(255,255,255,0);
+              }
 		</style>
 		<script>
             var app = null;
@@ -139,6 +147,7 @@
             function registerComponent(controlBundle) {
                 app.registerComponent(controlBundle);
             }
+            
 		</script>
 	</head>
 	<body onload="init()" onbeforeunload="return '[add a dirty flaag check]'">
