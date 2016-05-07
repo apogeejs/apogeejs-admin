@@ -59,6 +59,7 @@
 }
 .visiui_win_top {
   height: 5px;
+  min-height: 5px;
   cursor: ns-resize;
 }
 .visiui_win_topRight {
@@ -66,10 +67,12 @@
 }
 .visiui_win_left {
   width: 5px;
+  min-width: 5px;
   cursor: ew-resize;
 }
 .visiui_win_right {
   width: 5px;
+  min-width: 5px;
   cursor: ew-resize;
 }
 .visiui_win_bottomLeft {
@@ -77,6 +80,7 @@
 }
 .visiui_win_bottom {
   height: 5px;
+  min-height: 5px;
   cursor: ns-resize;
 }
 .visiui_win_bottomRight {

@@ -159,7 +159,10 @@ visicomp.visiui.WindowFrame.TITLE_BAR_RIGHT_STYLE = {
 visicomp.visiui.WindowFrame.TITLE_STYLE = {
     //fixed
     "display":"inline-block",
-    "cursor":"default"
+    "cursor":"default",
+    "font-weight":"bold",
+    "color":"darkblue"
+    
 };
 
 visicomp.visiui.WindowFrame.COMMAND_BUTTON_STYLE = { 
@@ -189,7 +192,7 @@ visicomp.visiui.WindowFrame.prototype.setTitle = function(title) {
     this.title = title;
     if(!this.titleElement) {
         this.titleElement = document.createElement("div");
-        visicomp.visiui.applyStyle(this.titleElement,visicomp.visiui.WindowFrame.TITLE_BAR_LEFT_STYLE);
+        visicomp.visiui.applyStyle(this.titleElement,visicomp.visiui.WindowFrame.TITLE_STYLE);
     }
     this.titleElement.innerHTML = title;
     this.titleBarLeftElements.appendChild(this.titleElement);
