@@ -31,6 +31,7 @@ visicomp.app.visiui.JsonTableComponent.VIEW_MODES = [
 ];
 
 visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW = visicomp.app.visiui.JsonTableComponent.VIEW_FORM;
+//visicomp.app.visiui.JsonTableComponent.DEFAULT_VIEW = visicomp.app.visiui.JsonTableComponent.VIEW_TEXT;
 
 visicomp.app.visiui.JsonTableComponent.BLANK_DATA_VALUE_INFO = {
 	"dataValue":"",
