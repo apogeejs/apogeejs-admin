@@ -65,7 +65,7 @@ visicomp.app.visiui.GridTableComponent.prototype.getViewModeElement = function(v
 //======================================
 
 
-visicomp.app.visiui.GridTableComponent.createComponent = function(workspaceUI,data) {
+visicomp.app.visiui.GridTableComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
     var parent = workspaceUI.getObjectByKey(data.parentKey);
     //should throw an exception if parent is invalid!
@@ -79,7 +79,7 @@ visicomp.app.visiui.GridTableComponent.createComponent = function(workspaceUI,da
     
     var table = actionResponse.member;
     if(table) {
-        var tableComponent = new visicomp.app.visiui.GridTableComponent(workspaceUI,table);
+        var tableComponent = new visicomp.app.visiui.GridTableComponent(workspaceUI,table,componentOptions);
         actionResponse.component = tableComponent;
     }
     return actionResponse;

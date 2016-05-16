@@ -72,7 +72,7 @@ visicomp.app.visiui.BasicControlComponent.prototype.getViewModeElement = functio
 // Static methods
 //======================================
 
-visicomp.app.visiui.BasicControlComponent.createBaseComponent = function(workspaceUI,data,resource,generator) {
+visicomp.app.visiui.BasicControlComponent.createBaseComponent = function(workspaceUI,data,resource,generator,componentOptions) {
     
     var parent = workspaceUI.getObjectByKey(data.parentKey);
     //should throw an exception if parent is invalid!
@@ -88,7 +88,7 @@ visicomp.app.visiui.BasicControlComponent.createBaseComponent = function(workspa
 		control.updateResource(resource);
 		
         //create the component
-        var basicControlComponent = new visicomp.app.visiui.BasicControlComponent(workspaceUI,control,generator);
+        var basicControlComponent = new visicomp.app.visiui.BasicControlComponent(workspaceUI,control,generator,componentOptions);
         actionResponse.component = basicControlComponent;
     }
     return actionResponse;

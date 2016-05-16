@@ -6,7 +6,7 @@ visicomp.app.visiui.updatecomponent = {};
 // UI Entry Point
 //=====================================
 
-visicomp.app.visiui.updatecomponent.getAddComponentCallback = function(app,generator,optionalInitialValues) {
+visicomp.app.visiui.updatecomponent.getAddComponentCallback = function(app,generator,optionalInitialValues,optionalComponentOptions) {
     
     var createCallback = function() {
         //get the active workspace
@@ -26,7 +26,7 @@ visicomp.app.visiui.updatecomponent.getAddComponentCallback = function(app,gener
             
             //need to test if fields are valid!
 
-            var actionResponse =  generator.createComponent(workspaceUI,result);   
+            var actionResponse =  generator.createComponent(workspaceUI,result,optionalComponentOptions);   
             if(!actionResponse.getSuccess()) {
                 alert(actionResponse.getErrorMsg())
             }

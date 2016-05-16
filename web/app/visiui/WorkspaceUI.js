@@ -19,6 +19,11 @@ visicomp.app.visiui.WorkspaceUI.prototype.setApp = function(app,tab) {
     this.tab = tab;
 }
 
+/** This gets the application instance. */
+visicomp.app.visiui.WorkspaceUI.prototype.getApp = function() {
+    return this.app;
+}
+
  /** This method sets the workspace. The argument componentsJson should be included
   * if the workspace is not empty, such as when opening a existing workspace. It
   * contains the data for the component associated with each workspace member. For 
@@ -50,6 +55,11 @@ visicomp.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace, com
         instance.childDeleted(fullName);
     }
     this.workspace.addListener(visicomp.core.deletemember.MEMBER_DELETED_EVENT, childDeletedListener);
+    
+    //add context menu to create childrent
+    var contentElement = this.tab.getContainerElement();
+    var app = this.getApp();
+    app.setFolderContextMenu(contentElement,rootFolder);
     
 }
 

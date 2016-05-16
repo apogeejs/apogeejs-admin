@@ -6,13 +6,13 @@ visicomp.app.visiui.addadditionalcomponent = {};
 // UI Entry Point
 //=====================================
 
-visicomp.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback = function(app,generator) {
+visicomp.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback = function(app,optionalInitialValues,optionalComponentOptions) {
     return function() {
     
         var onSelect = function(componentType) {
             var generator = app.getComponentGenerator(componentType);
             if(generator) {
-                var doAddComponent = visicomp.app.visiui.updatecomponent.getAddComponentCallback(app,generator);
+                var doAddComponent = visicomp.app.visiui.updatecomponent.getAddComponentCallback(app,generator,optionalInitialValues,optionalComponentOptions);
                 doAddComponent();
             }
             else {

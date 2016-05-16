@@ -100,7 +100,7 @@ visicomp.app.visiui.FunctionComponent.prototype.memberUpdated = function() {
 //======================================
 
 //create component call. data includes name and potentially other info
-visicomp.app.visiui.FunctionComponent.createComponent = function(workspaceUI,data) {
+visicomp.app.visiui.FunctionComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
     var parent = workspaceUI.getObjectByKey(data.parentKey);
     //should throw an exception if parent is invalid!
@@ -116,7 +116,7 @@ visicomp.app.visiui.FunctionComponent.createComponent = function(workspaceUI,dat
     
     var functionObject = actionResponse.member;
     if(functionObject) {
-        var functionComponent = new visicomp.app.visiui.FunctionComponent(workspaceUI,functionObject);
+        var functionComponent = new visicomp.app.visiui.FunctionComponent(workspaceUI,functionObject,componentOptions);
         actionResponse.component = functionComponent;
     }
     return actionResponse;

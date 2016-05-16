@@ -148,7 +148,7 @@ visicomp.app.visiui.CustomControlComponent.prototype.update = function(html,reso
 //======================================
 
 //add table listener
-visicomp.app.visiui.CustomControlComponent.createComponent = function(workspaceUI,data) {
+visicomp.app.visiui.CustomControlComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
     var parent = workspaceUI.getObjectByKey(data.parentKey);
     //should throw an exception if parent is invalid!
@@ -161,7 +161,7 @@ visicomp.app.visiui.CustomControlComponent.createComponent = function(workspaceU
     var control = actionResponse.member;
     if(control) {
         //create the component
-        var customControlComponent = new visicomp.app.visiui.CustomControlComponent(workspaceUI,control);
+        var customControlComponent = new visicomp.app.visiui.CustomControlComponent(workspaceUI,control,componentOptions);
         actionResponse.component = customControlComponent;
         
         //if we do not load from a json, we must manually set the resource

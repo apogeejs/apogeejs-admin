@@ -38,14 +38,22 @@ visicomp.app.visiui.FolderComponent.prototype.writeToJson = function(json) {
  * @protected */
 visicomp.app.visiui.FolderComponent.prototype.populateFrame = function() {
 	this.setScrollingContentElement();
+    
+    //add context menu to create childrent
+    var contentElement = this.getContentElement();
+    var folder = this.getObject();
+    var app = this.getWorkspaceUI().getApp();
+    app.setFolderContextMenu(contentElement,folder);
+    
 }
+
 
 //======================================
 // Static methods
 //======================================
 
 //add table listener
-visicomp.app.visiui.FolderComponent.createComponent = function(workspaceUI,data) {
+visicomp.app.visiui.FolderComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
     var parent = workspaceUI.getObjectByKey(data.parentKey);
     //should throw an exception if parent is invalid!
@@ -57,7 +65,7 @@ visicomp.app.visiui.FolderComponent.createComponent = function(workspaceUI,data)
     
     var folder = actionResponse.member;
     if(folder) {       
-        var folderComponent = new visicomp.app.visiui.FolderComponent(workspaceUI,folder);
+        var folderComponent = new visicomp.app.visiui.FolderComponent(workspaceUI,folder,componentOptions);
         actionResponse.component = folderComponent;
     }
     return actionResponse;

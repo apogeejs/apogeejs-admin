@@ -98,16 +98,20 @@ SimpleGeojsonComponent.prototype.addToFrame = function() {
 //======================================
 
 /** This method creates the control. */
-SimpleGeojsonComponent.createComponent = function(workspaceUI,parent,name) {
+SimpleGeojsonComponent.createComponent = function(workspaceUI,data,componentOptions) {
+    
+    var parent = workspaceUI.getObjectByKey(data.parentKey);
+    //should throw an exception if parent is invalid!
+    //
     //create a resource a simple chart resource processor
     var json = {};
-    json.name = name;
+    json.name = data.name;
     json.type = visicomp.core.Control.generator.type;
     var actionResponse = visicomp.core.createmember.createMember(parent,json);
     
     var control = actionResponse.member;
     if(control) {
-        var simpleGeojsonComponent = new SimpleGeojsonComponent(workspaceUI,control);
+        var simpleGeojsonComponent = new SimpleGeojsonComponent(workspaceUI,control,componentOptions);
         actionResponse.component = simpleGeojsonComponent;
     }
     else {

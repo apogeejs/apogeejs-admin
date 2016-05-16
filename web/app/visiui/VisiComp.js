@@ -226,17 +226,8 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     menu = visicomp.visiui.Menu.createMenu("Components");
     menuBar.appendChild(menu.getElement());
     
-    for(var i = 0; i < this.standardComponents.length; i++) {
-        var key = this.standardComponents[i];
-        var generator = this.componentGenerators[key];
-        var title = "Add " + generator.displayName;
-        var callback = visicomp.app.visiui.updatecomponent.getAddComponentCallback(this,generator);
-        menu.addCallbackMenuItem(title,callback);
-    }
-    
-    //add the additional component item
-    var componentCallback = visicomp.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback(this,generator);
-    menu.addCallbackMenuItem("Other Components...",componentCallback);
+    //add create child elements
+    this.populateAddChildMenu(menu);
     
     //libraries menu
     menu = visicomp.visiui.Menu.createMenu("Libraries");
@@ -268,6 +259,50 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
 }
 
 //=================================
-// Static Functions
+// Menu Functions
 //=================================
+
+visicomp.app.visiui.VisiComp.prototype.populateAddChildMenu = function(menu,optionalInitialValues,optionalComponentOptions) {
+    
+    for(var i = 0; i < this.standardComponents.length; i++) {
+        var key = this.standardComponents[i];
+        var generator = this.componentGenerators[key];
+        var title = "Add " + generator.displayName;
+        var callback = visicomp.app.visiui.updatecomponent.getAddComponentCallback(this,generator,optionalInitialValues,optionalComponentOptions);
+        menu.addCallbackMenuItem(title,callback);
+    }
+
+    //add the additional component item
+    var componentCallback = visicomp.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback(this,optionalInitialValues,optionalComponentOptions);
+    menu.addCallbackMenuItem("Other Components...",componentCallback);
+}
+
+/** This loads the context menu for the key. It should be update if
+ *the key index changes. */
+visicomp.app.visiui.VisiComp.prototype.setFolderContextMenu = function(contentElement,folder) {
+    
+    var app = this;
+
+    var initialValues = {};
+    initialValues.parentKey = visicomp.app.visiui.WorkspaceUI.getObjectKey(folder);
+    
+    contentElement.oncontextmenu = function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        //position the window if we can
+        if(event.offsetX) {
+            var componentOptions = {};
+            var coordInfo = {};
+            coordInfo.x = event.offsetX;
+            coordInfo.y = event.offsetY;
+            componentOptions.coordInfo = coordInfo;
+        }
+        
+        var contextMenu = new visicomp.visiui.MenuBody();
+        app.populateAddChildMenu(contextMenu,initialValues,componentOptions);
+        
+        visicomp.visiui.Menu.showContextMenu(contextMenu,event);
+    }
+}
 

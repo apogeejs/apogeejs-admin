@@ -48,7 +48,9 @@ visicomp.app.visiui.dialog.showConfigurableDialog = function(layout,onSubmitFunc
         //create line
         var lineObject = visicomp.app.visiui.dialog.showConfigurableDialog.createLine(lineDef,formActions);
         lineObjects.push(lineObject);
-        content.appendChild(lineObject.element);
+        if(lineObject.element) { //no element for "invisible" entry, which is used to pass values along
+            content.appendChild(lineObject.element);
+        }
     }
     
     //show dialog
@@ -186,7 +188,25 @@ visicomp.app.visiui.dialog.showConfigurableDialog.lineFunctions = {
     //lineDef.createLineObject(formActions) - returns lineObject
     "custom": function(lineDef,formActions) {
         return lineDef.createLineObject(formActions);
+    },
+    
+    //lineDef.type = "invisible"
+    //lineDef.intial = value for this element (optional)
+    //lineDef.resultKey = name of result in result data
+    "invisible": function(lineDef,formActions) {
+        var lineObject = {};
+        //create the empty element
+        lineObject.element = null;
+        //get result
+        lineObject.addToResult = function(formData) {
+            
+            formData[lineDef.resultKey] = lineDef.initial;
+        }
+        //no on Close
+        
+        return lineObject;
     }
+    
     
 }
     
