@@ -157,6 +157,7 @@ visicomp.core.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT = [
  * @private
  */
 visicomp.core.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT = [
+"'use strict'",
 "//declare context variables",
 "{0}",
 "",

@@ -110,7 +110,7 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
 			//ok to reference through a local varible - this is how recursive functions are handled.
 			var message = "A data formula should not reference its own name.";
 			var actionError = new visicomp.core.ActionError(message,"Dependent - Self Ref",this);
-			this.addPreCaclError(actionError);
+			this.addPreCalcError(actionError);
 		}
         else if(!remoteMember.isDataHolder) {
             //PLACE A WARNING HERE!!!

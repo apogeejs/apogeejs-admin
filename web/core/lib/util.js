@@ -66,6 +66,8 @@ visicomp.core.util.getObjectType = function(object) {
 /** This method creates a deep copy of an object, array or value. Note that
  * undefined is not a valid value in JSON. */
 visicomp.core.util.deepJsonCopy = function(data) {
+    if(data === null) return null;
+    if(data === undefined) return undefined;
     return JSON.parse(JSON.stringify(data));
 }
 

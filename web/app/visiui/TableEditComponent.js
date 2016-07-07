@@ -31,7 +31,13 @@ visicomp.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
  * @protected */
 visicomp.app.visiui.TableEditComponent.setViewType = function(viewType) {
 	//return if there is no change
-	if(this.viewType === viewType) return;
+	if(this.viewType === viewType) return false;
+    
+    //check if we are editing
+    if(this.editActive()) {
+        alert("You must save or cancel the edit session to change the view mode.");
+        return false;
+    }
 	
 	//if there is an old view, remove it
 	if(this.viewModeElement) {
@@ -40,6 +46,8 @@ visicomp.app.visiui.TableEditComponent.setViewType = function(viewType) {
     
     this.viewModeElement = this.getViewModeElement(viewType);
     this.viewType = viewType;
+    
+    return true;
 }
 
 /** This method should be implemented to retrieve a view mode of the give type. 
@@ -135,9 +143,15 @@ visicomp.app.visiui.TableEditComponent.initUI = function() {
     //create on functions
     var instance = this;
     var onViewSet = function(event) {
-        instance.setViewType(instance.select.value);
-        instance.memberUpdated();
-        return true;
+        var success = instance.setViewType(instance.select.value);
+        if(success) {
+            instance.memberUpdated();
+        }
+        else {
+            //make sure correct view type is displayed
+            instance.updateViewDropdown(this.viewType);
+        }
+        return success;
     }
     
     this.select.onchange = onViewSet;

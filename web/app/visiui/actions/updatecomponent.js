@@ -16,7 +16,7 @@ visicomp.app.visiui.updatecomponent.getAddComponentCallback = function(app,gener
             return;
         }
         
-        var additionalLines = generator.propertyDialogLines;
+        var additionalLines = visicomp.core.util.deepJsonCopy(generator.propertyDialogLines);       
         
         //create the dialog layout - do on the fly because folder list changes
         var dialogLayout = visicomp.app.visiui.updatecomponent.getDialogLayout(workspaceUI,generator,true,additionalLines,optionalInitialValues);

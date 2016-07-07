@@ -153,6 +153,11 @@ visicomp.app.visiui.Component.showSaveBar = function(onSave,onCancel) {
 	this.showActiveHeaders();
 }
 
+/** This returns true if the user is editing, as signified by the edit bar showing. */
+visicomp.app.visiui.Component.editActive = function() {
+    return this.saveBarActive;
+}
+
 /** This method returns the base member for this component. */
 visicomp.app.visiui.Component.hideSaveBar = function() {
     this.saveBarActive = false;	
