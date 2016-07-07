@@ -27,9 +27,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 	this.createUI(containerId);
 	
 	//create a default workspace 
-//    visicomp.app.visiui.createworkspace.createWorkspace(this,visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME);
-var cb = visicomp.app.visiui.openworkspace.getOpenCallback(this);	
-cb();
+    visicomp.app.visiui.createworkspace.createWorkspace(this,visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME);
 }
 	
 //add components to this class
