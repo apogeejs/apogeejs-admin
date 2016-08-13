@@ -15,9 +15,6 @@ visicomp.core.Dependent.init = function() {
     
     //this is the list of dependencies
     this.dependsOnList = [];
-    
-    //errors before calculation is attempted
-    this.preCalcErrors = [];
 }
 
 /** This property tells if this object is a dependent.
@@ -27,37 +24,6 @@ visicomp.core.Dependent.isDependent = true;
 /** This returns a list of the members that this member depends on. */
 visicomp.core.Dependent.getDependsOn = function() {
     return this.dependsOnList;
-}
-
-
-/** This method sets the pre calc error for this dependent. */
-visicomp.core.Dependent.addPreCalcError = function(preCalcError) {
-    this.preCalcErrors.push(preCalcError);
-}
-
-/** This method clears the pre calc error of a given type. It no type is set
- * all errors are cleared.*/
-visicomp.core.Dependent.clearPreCalcErrors = function(type) {
-    var newList = [];
-    if(type != null) {    
-        for(var i = 0; i < this.preCalcErrors.length; i++) {
-            var error = this.preCalcErrors[i];
-            if(error.getType() != type) {
-                newList.push(error);
-            }
-        }
-    }
-    this.preCalcErrors = newList;
-}
-
-/** This returns true if there is a pre calc error. */
-visicomp.core.Dependent.hasPreCalcError = function() {
-    return (this.preCalcErrors.length > 0);
-}
-
-/** This returns the pre calc error. */
-visicomp.core.Dependent.getPreCalcErrors = function() {
-    return this.preCalcErrors;
 }
 
 //Must be implemented in extending object
@@ -77,8 +43,34 @@ visicomp.core.Dependent.getPreCalcErrors = function() {
 //visicomp.core.Dependent.needsCalculating = function();
 
 ///** This updates the member based on a change in a dependency.  */
+//visicomp.core.Dependent.prepareForCalculate = function();
+
+///** This updates the member based on a change in a dependency.  */
 //visicomp.core.Dependent.calculate = function();
 
+///** This method initializes the data for this function.  */
+//visicomp.core.Dependent.initFunction = function();
+
+/** This method makes sure any impactors are set. It sets a dependency 
+ * error if one or more of the dependencies has a error. */
+visicomp.core.Dependent.initializeImpactors = function() {
+    var errorDependencies = [];
+    
+    //make sure dependencies are up to date
+    for(var i = 0; i < this.dependsOnList.length; i++) {
+        var impactor = this.dependsOnList[i];
+        if((impactor.needsCalculating())&&(!impactor.getDataSet())) {
+            impactor.calculate();
+        }
+        if(impactor.hasError()) {
+            errorDependencies.push(impactor);
+        }                   
+    }
+
+    if(errorDependencies.length > 0) {
+        createDependencyError(errorDependencies);
+    }
+}
 //===================================
 // Private Functions
 //===================================
@@ -95,8 +87,6 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
 	
     //create the new dependency list
 	this.dependsOnList = [];
-        
-    this.clearPreCalcErrors("Dependent - Self Ref");
 	
     //update the dependency links among the members
 	var newDependencySet = {};
@@ -105,14 +95,7 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
     for(i = 0; i < newDependsOn.length; i++) {
         remoteMember = newDependsOn[i];
 		
-		if(remoteMember === this) {
-			//it is an error to depend on itself (it doesn't exist yet)
-			//ok to reference through a local varible - this is how recursive functions are handled.
-			var message = "A data formula should not reference its own name.";
-			var actionError = new visicomp.core.ActionError(message,"Dependent - Self Ref",this);
-			this.addPreCalcError(actionError);
-		}
-        else if(!remoteMember.isDataHolder) {
+		if(!remoteMember.isDataHolder) {
             //PLACE A WARNING HERE!!!
         }
 		else {	
@@ -138,4 +121,18 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
 			remoteMember.removeFromImpactsList(this);
 		}
     }
+}
+
+/** This method creates an dependency error, given a list of impactors that have an error. 
+ * @private */
+visicomp.core.Dependent.createDependencyError = function(errorDependencies) {
+        //dependency error found
+        var message = "Error in dependency: ";
+        for(i = 0; i < errorDependencies.length; i++) {
+            if(i > 0) message += ", ";
+            message += errorDependencies[i].getFullName();
+        }
+        var actionError = new visicomp.core.ActionError(message,"Calculation - Dependency",dependent);
+        this.addError(actionError);   
+
 }

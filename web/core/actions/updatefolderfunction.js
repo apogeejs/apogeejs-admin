@@ -10,7 +10,7 @@ visicomp.core.updatefolderFunction.updatePropertyValues = function(folderFunctio
 
         var recalculateList = [];
         visicomp.core.calculation.addToRecalculateList(recalculateList,folderFunction);
-        var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
+        visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
         
         //fire updated events
         visicomp.core.updatemember.fireUpdatedEventList(recalculateList);

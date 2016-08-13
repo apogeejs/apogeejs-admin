@@ -1,6 +1,7 @@
 
     
-/** This class manages context for the user code. */
+/** This class manages context for the user code. This is used to provide the object 
+ * associated with a given name in the code, following the relevent namespace hierarchy.*/
 visicomp.core.ContextManager = function(contextParent) {
     this.parentOwner = contextParent;
     this.contextList = [];

@@ -124,6 +124,15 @@ visicomp.core.FolderFunction.prototype.needsCalculating = function() {
 	return true;
 }
 
+/** This updates the member based on a change in a dependency.  */
+visicomp.core.FolderFunction.prepareForCalculate = function() {
+    this.clearDataSet();
+    this.clearErrors();
+}
+
+//add these fields to object
+//this.impactorDataSet = true;
+
 /** This updates the member data based on the function. It returns
  * true for success and false if there is an error.  */
 visicomp.core.FolderFunction.prototype.calculate = function() {
@@ -134,7 +143,6 @@ visicomp.core.FolderFunction.prototype.calculate = function() {
     var folderFunctionFunction = this.getFolderFunctionFunction(folderFunctionErrors);
     
     if(folderFunctionErrors.length == 0) {
-        this.clearErrors();
         this.setData(folderFunctionFunction);
     }
     else {
@@ -142,6 +150,9 @@ visicomp.core.FolderFunction.prototype.calculate = function() {
         //I should get way to set multiple
         this.addErrors(folderFunctionErrors);
     }
+    
+    //make sure the data is set in each impactor
+    this.initializeImpactors();
 }
 
 /** This method updates the dependencies of any children
@@ -200,18 +211,31 @@ visicomp.core.FolderFunction.prototype.setArgList = function(argList) {
 visicomp.core.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErrors) {
 
     //create a copy of the workspace to do the function calculation - we don't update the UI display version
-    var virtualWorkspace = this.createVirtualWorkspace(folderFunctionErrors);
-	
-	if(!virtualWorkspace) {
-		return null;
-	}
-
-    //lookup elements from virtual workspace
-    var rootFolder = virtualWorkspace.getRootFolder();
-    var inputElementArray = this.loadInputElements(rootFolder,folderFunctionErrors);
-    var returnValueTable = this.loadOutputElement(rootFolder,folderFunctionErrors); 
+    var virtualWorkspace;
+    var rootFolder;
+    var inputElementArray;
+    var returnValueTable; 
+    
+    var initialized = false;
+    var instance = this;
     
     var folderFunctionFunction = function(args) {
+        
+        if(!initialized) {
+            //create a copy of the workspace to do the function calculation - we don't update the UI display version
+            virtualWorkspace = instance.createVirtualWorkspace(folderFunctionErrors);
+	
+    //HANDLE THIS ERROR CASE DIFFERENTLY!!!
+            if(!virtualWorkspace) {
+                return null;
+            }
+
+            //lookup elements from virtual workspace
+            rootFolder = virtualWorkspace.getRootFolder();
+            inputElementArray = instance.loadInputElements(rootFolder,folderFunctionErrors);
+            returnValueTable = instance.loadOutputElement(rootFolder,folderFunctionErrors);     
+        }
+        
         //create an update array to set the table values to the elements
         var updateDataList = [];
         for(var i = 0; i < inputElementArray.length; i++) {

@@ -6,16 +6,14 @@ visicomp.core.codeCompiler = {};
  * @private */
 visicomp.core.codeCompiler.processCode = function(codeInfo,
         contextManager,
-        codeLabel,
-        objectFunctionName) {
+        codeLabel) {
     
     //analyze the code
     var combinedFunctionBody = visicomp.core.codeCompiler.createCombinedFunctionBody(
         codeInfo.argList, 
         codeInfo.functionBody, 
         codeInfo.supplementalCode, 
-        codeLabel,
-        objectFunctionName);
+        codeLabel);
         
     //get the accessed variables
     //
@@ -30,15 +28,8 @@ visicomp.core.codeCompiler.processCode = function(codeInfo,
     }
 
     //create the object function and context setter from the code text
-    var generatorOutput = visicomp.core.codeCompiler.createObjectFunction(codeInfo.varInfo, combinedFunctionBody);
-    if(generatorOutput.success) {
-        codeInfo.contextSetter = generatorOutput.contextSetter;
-        codeInfo.objectFunction = generatorOutput.objectFunction;
-    }
-    else {
-        codeInfo.errors = generatorOutput.errors;
-    }
-    
+    var generatorFunction = visicomp.core.codeCompiler.createObjectFunction(codeInfo.varInfo, combinedFunctionBody);
+    codeInfo.generatorFunction = generatorFunction;
     
     //calculate dependencies
 	codeInfo.dependencyList = visicomp.core.codeDependencies.getDependencyInfo(
@@ -54,20 +45,14 @@ visicomp.core.codeCompiler.processCode = function(codeInfo,
 visicomp.core.codeCompiler.createCombinedFunctionBody = function(argList,
         functionBody, 
         supplementalCode,
-        codeLabel,
-        functionName) {
+        codeLabel) {
     
     var argListString = argList.join(",");
-    
-    if((functionName === undefined)||(functionName === null)) {    
-        functionName = "";
-    }
     
     //create the code body
     var combinedFunctionBody = visicomp.core.util.formatString(
         visicomp.core.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT,
 		codeLabel,
-        functionName,
         argListString,
         functionBody,
         supplementalCode
@@ -85,6 +70,8 @@ visicomp.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunc
     
     //set the context - here we only defined the variables that are actually used.
 	for(var baseName in varInfo) {
+        //ignore this variable
+        if(baseName == "__dh__") continue;
         
         var baseNameInfo = varInfo[baseName];
         
@@ -106,21 +93,22 @@ visicomp.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunc
         combinedFunctionBody
     );
         
-    var generatorOutput;
-    try {
-        var generatorFunction = new Function(generatorBody);
+    var generatorFunction = new Function("__dh__",generatorBody);
+    return generatorFunction;
+        
+//    var generatorOutput;
+//    try {
+//        
+//    
+//        //return the output of the generator - the object function and the context setter
+//        generatorFunction();
+//    }
+//    catch(exception) {
+//        generatorOutput = {};
+//        generatorOutput.success = false;
+//        generatorOutput.error = visicomp.core.ActionError.processException(exception,"Compile - Code",false);
+//    }
     
-        //return the output of the generator - the object function and the context setter
-        generatorOutput = generatorFunction();
-        generatorOutput.success = true;
-    }
-    catch(exception) {
-        generatorOutput = {};
-        generatorOutput.success = false;
-        generatorOutput.error = visicomp.core.ActionError.processException(exception,"Compile - Code",false);
-    }
-    
-    return generatorOutput;
 }
 
 
@@ -138,13 +126,17 @@ visicomp.core.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT = [
 "//{0}",
 "",
 "//supplemental code",
-"{4}",
+"{3}",
 "//end supplemental code",
 "",
 "//member function",
-"returnValue.objectFunction = function {1}({2}) {",
-"{3}",
-"}",
+"__dh__.setObjectFunction(function({1}) {",
+"//overhead code",
+"__dh__.initFunction();",
+"",
+"//user code",
+"{2}",
+"});",
 "//end member function",
 ""
    ].join("\n");
@@ -161,16 +153,13 @@ visicomp.core.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//declare context variables",
 "{0}",
 "",
-"var returnValue = {};",
 "//context setter",
-"returnValue.contextSetter = function(contextManager) {",
+"__dh__.setContextSetter(function(contextManager) {",
 "{1}",
-"};",
+"});",
 "",
 "//user code",
-"{2}",
-"",
-"return returnValue;"
+"{2}"
    ].join("\n");
 
 

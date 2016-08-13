@@ -15,11 +15,23 @@ visicomp.core.DataHolder.init = function() {
     
     //these are a list of members that depend on this member
     this.impactsList = [];
+    
+    this.dataSet = false;
 }
 
 /** This property tells if this object is a data holder.
  * This property should not be implemented on non-data holders. */
-visicomp.core.DataHolder.isDataHolder = true
+visicomp.core.DataHolder.isDataHolder = true;
+
+/** This sets the value of dataSet to false. It is automatically set to true in set data. */
+visicomp.core.DataHolder.clearDataSet = function() {
+    this.dataSet = false;
+}
+
+/** This returns true if the data has been set.  This value must be managed externally. */
+visicomp.core.DataHolder.getDataSet = function() {
+    return this.dataSet;
+}
 
 /** this method gets the data map. */
 visicomp.core.Child.getData = function() {
@@ -36,6 +48,7 @@ visicomp.core.DataHolder.getImpactsList = function() {
  * with a JSON table. Besides hold the data object, this updates the parent data map. */
 visicomp.core.DataHolder.setData = function(data) {
     this.data = data;
+    this.dataSet = true;
     
     var parent = this.getParent();
     if(parent) {

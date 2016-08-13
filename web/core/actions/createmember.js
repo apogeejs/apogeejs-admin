@@ -46,7 +46,7 @@ visicomp.core.createmember.createMember = function(folder,json,optionalActionRes
                     actionResponse);
             } 
             
-            var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
+            visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
 
             //dispatch events
             workspace.dispatchEvent(visicomp.core.createmember.MEMBER_CREATED_EVENT,member);

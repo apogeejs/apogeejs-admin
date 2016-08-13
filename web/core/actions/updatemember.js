@@ -31,13 +31,13 @@ visicomp.core.updatemember.updateCode = function(member,argList,functionBody,sup
     try {
         var recalculateList = [];
 
-        var dataSet = visicomp.core.updatemember.updateObjectFunction(member,
+        visicomp.core.updatemember.updateObjectFunction(member,
             argList,
             functionBody,
             supplementalCode,
             recalculateList);
 
-        var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
+        visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
         
         //fire updated events
         visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
@@ -59,11 +59,9 @@ visicomp.core.updatemember.updateData = function(member,data,optionalActionRespo
     try {
         var recalculateList = [];
 
-        var dataSet = visicomp.core.updatemember.updateObjectData(member,
-            data,
-            recalculateList);
+        visicomp.core.updatemember.updateObjectData(member,data,recalculateList);
 
-        var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
+        visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
 
         //fire updated events
         visicomp.core.updatemember.fireUpdatedEvent(member);
@@ -91,7 +89,7 @@ visicomp.core.updatemember.updateObjects = function(updateDataList,optionalActio
             recalculateList,
             setDataList); 
 
-        var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
+        visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
 
         //fire updated events
         visicomp.core.updatemember.fireUpdatedEventList(setDataList);
@@ -122,14 +120,14 @@ visicomp.core.updatemember.updateObjectFunctionOrData = function(updateDataList,
         var supplementalCode = argData.supplementalCode;
         
         if(functionBody) {
-            var uofDataSet = visicomp.core.updatemember.updateObjectFunction(member,
+            visicomp.core.updatemember.updateObjectFunction(member,
                 argList,
                 functionBody,
                 supplementalCode,
                 recalculateList);
         }
         else if(data) {
-            var uodDataSet = visicomp.core.updatemember.updateObjectData(member,
+            visicomp.core.updatemember.updateObjectData(member,
                 data,
                 recalculateList);
             
@@ -139,16 +137,12 @@ visicomp.core.updatemember.updateObjectFunctionOrData = function(updateDataList,
 }
 
 /** This method updates the code and object function in a member based on the
- * passed code. It returns true if the data was set and false if there was an
- * error before the data was set. */
+ * passed code.*/
 visicomp.core.updatemember.updateObjectFunction = function(codeable,
         argList,
         functionBody,
         supplementalCode,
         recalculateList) {
-            
-    codeable.clearPreCalcErrors();
-    codeable.clearErrors();
     
     //process the code
     var codeInfo ={};
@@ -159,60 +153,35 @@ visicomp.core.updatemember.updateObjectFunction = function(codeable,
     //load some needed context variables
     var contextManager = codeable.getContextManager();
     var codeLabel = codeable.getFullName();
-    var functionName = codeable.getAllowRecursive() ? codeable.getName() : "";
 
     //process the code text into javascript code
     visicomp.core.codeCompiler.processCode(codeInfo,
         contextManager,
-        codeLabel,
-        functionName);
+        codeLabel);
 
     //save the code
     codeable.setCodeInfo(codeInfo);
     
 	//update recalculate list
     visicomp.core.calculation.addToRecalculateList(recalculateList,codeable);
-    
-    return true;
 }
 
 
-/** This method sets the data for a member. The return value indicates if the
- * save was done (or at least attempted). */
+/** This method sets the data for a member. */
 visicomp.core.updatemember.updateObjectData = function(dataHolder,
         data,
         recalculateList) {
-            
-    if(dataHolder.isDependent) {
-        dataHolder.clearPreCalcErrors();
-    } 
     
     dataHolder.clearErrors();
-
-    dataHolder.setData(data);
-    
     //clear the code if this is a codeable object
     if(dataHolder.isCodeable) {
         dataHolder.clearCode();
     }
     
+    dataHolder.setData(data);
+    
     visicomp.core.calculation.addToRecalculateList(recalculateList,dataHolder);
-
-    //in this method data set is always attempted
-    return true;
 }
 
-/** This is the listener for the update member event. */
-visicomp.core.updatemember.doRecalculate = function(recalculateList,actionResponse) {
-     
-    //sort list
-    var listSorted = visicomp.core.calculation.sortRecalculateList(recalculateList,actionResponse);
-
-    //recalculate list
-    //if there is a sort error (ciruclar reference) this will also cause an error here
-    var listCalculated = visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
-
-    return listCalculated;
-}
 
 

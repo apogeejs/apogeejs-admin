@@ -12,16 +12,12 @@
 visicomp.core.Codeable = {};
 
 /** This initializes the component. argList is the arguments for the object function.
- * allowRecursive assigns the name of the variable to the function so it can call itself
- * as a local variable. We want to allow functions to call themselves but we do not
- * want the formula for a data object to call the previous value of itself. */
-visicomp.core.Codeable.init = function(argList,allowRecursive) {
+ * dataEvaluatesObjectFunction is used to determine if the object function for this
+ * codeable can be set before the context and impactors are initialized. */
+visicomp.core.Codeable.init = function(argList,dataEvaluatesObjectFunction) {
     
     //arguments of the member function
     this.argList = argList;
-    
-    //the allows the object function for this member to call itself
-    this.allowRecursive = allowRecursive;
     
     //initialze the code as empty
     this.codeSet = false;
@@ -31,6 +27,12 @@ visicomp.core.Codeable.init = function(argList,allowRecursive) {
     this.dependencyInfo = null;
     this.contextSetter = null;
     this.objectFunction = null;
+    this.codeError = null;
+    
+    //fields used in calculation
+    this.calcInProgress = false;
+    this.dataSet = false;
+    this.functionInitialized = false;
 }
 
 /** This property tells if this object is a codeable.
@@ -40,11 +42,6 @@ visicomp.core.Codeable.isCodeable = true
 /** This method returns the argument list.  */
 visicomp.core.Codeable.getArgList = function() {
     return this.argList;
-}
-
-/** This method returns the formula for this member.  */
-visicomp.core.Codeable.getAllowRecursive = function() {
-    return this.allowRecursive;
 }
 
 /** This method returns the fucntion body for this member.  */
@@ -64,23 +61,26 @@ visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
     this.argList = codeInfo.argList;
     this.functionBody = codeInfo.functionBody;
     this.supplementalCode = codeInfo.supplementalCode;
-    this.codeSet = true;
+
+    //save the variables accessed
+    this.varInfo = codeInfo.varInfo;
 
     if(codeInfo.actionError) {
-        this.addPreCalcError(codeInfo.actionError);
+        //code not valie
+        this.codeError = codeInfo.actionError;
     }
     else {
-
-        //save the variables accessed
-        this.varInfo = codeInfo.varInfo;
-
-        //save the object functions
-        this.contextSetter = codeInfo.contextSetter;
-        this.objectFunction = codeInfo.objectFunction;
-
-        //clear any code error
-        this.codeError = null;
+        //set the code  by exectuing generator
+        try {
+            codeInfo.generatorFunction(this);
+            this.codeError = null;
+        }
+        catch(ex) {
+            this.codeError = visicomp.core.ActionError.processException(ex,"Codeable - Set Code",false);
+        }
     }
+    
+    this.codeSet = true;
 
     //update dependencies
     this.updateDependencies(codeInfo.dependencyList);
@@ -137,6 +137,7 @@ visicomp.core.Codeable.clearCode = function() {
     this.dependencyInfo = null;
     this.contextSetter = null;
     this.objectFunction = null;
+    this.codeError = null;
     
     var newDependsOn = [];
 	this.updateDependencies(newDependsOn);
@@ -153,29 +154,32 @@ visicomp.core.Codeable.needsCalculating = function() {
 	return this.codeSet;
 }
 
+/** This updates the member based on a change in a dependency.  */
+visicomp.core.Codeable.prepareForCalculate = function() {
+    this.clearDataSet();
+    this.functionInitialized = false;
+    this.clearErrors(); 
+}
 
-/** This updates the member data based on the function. It returns
- * true for success and false if there is an error.  */
+/** This method sets the data object for the member.  */
 visicomp.core.Codeable.calculate = function() {
     
-    //clear these errors here. they will be reset below
-    this.clearErrors("Codeable - Calculate");
+    if(this.getDataSet()) return;
     
     if((!this.objectFunction)||(!this.contextSetter)) {
         var msg = "Function not found for member: " + this.getName();
         var actionError = new visicomp.core.ActionError(msg,"Codeable - Calculate",this);
         this.addError(actionError);
-        return false;
+        return;
+    }
+    
+    if(this.codeError != null) {
+        this.addError(this.codeError);
+        return;
     }
     
     try {
-        //set the context
-        this.contextSetter(this.getContextManager());
-
-        //process the object function as needed (implement for each type)
         this.processObjectFunction(this.objectFunction);
-        
-        return true;
     }
     catch(error) {
         //this is an error in the code
@@ -186,8 +190,48 @@ visicomp.core.Codeable.calculate = function() {
         var actionError = new visicomp.core.ActionError(errorMsg,"Codeable - Calculate",this);
         actionError.setParentException(error);
         this.addError(actionError);
-        return false;
     }
+}
+
+/** This makes sure user code of object function is ready to execute.  */
+visicomp.core.Codeable.initFunction = function() {
+    
+    if(this.functionInitialized) return;
+    
+    //make sure this in only called once
+    if(this.calcInProgress) {
+        var errorMsg = "Error Recalculating Member: " + ((error.message) ? error.message : null);
+        var actionError = new visicomp.core.ActionError(errorMsg,"Codeable - Calculate",this);
+        actionError.setParentException(error);
+        this.addError(actionError);
+        return;
+    }
+    this.calcInProgress = true;
+    
+    try {
+        
+        //make sure the data is set in each impactor
+        this.initializeImpactors();
+        if(this.hasError()) {
+            return;
+        }
+        
+        //set the context
+        this.contextSetter(this.getContextManager());
+    }
+    catch(error) {
+        //this is an error in the code
+        if(error.stack) {
+            console.error(error.stack);
+        }
+        var errorMsg = "Error Recalculating Member: " + ((error.message) ? error.message : null);
+        var actionError = new visicomp.core.ActionError(errorMsg,"Codeable - Calculate",this);
+        actionError.setParentException(error);
+        this.addError(actionError);
+    }
+    
+    this.calcInProgress = false;
+    this.functionInitialized = true;
 }
 
 //------------------------------
@@ -228,4 +272,14 @@ visicomp.core.Codeable.createContextManager = function() {
 //This method takes the object function generated from code and processes it
 //to set the data for the object. (protected)
 //visicomp.core.Codeable.processObjectFunction 
+
+/** This method sets the object function. */
+visicomp.core.Codeable.setObjectFunction = function(objectFunction) {
+    this.objectFunction = objectFunction;
+}
+
+/** This method sets the object function. */
+visicomp.core.Codeable.setContextSetter = function(contextSetter) {
+    this.contextSetter = contextSetter;
+}
 

@@ -4,7 +4,7 @@ visicomp.core.Control = function(name) {
     visicomp.core.Child.init.call(this,name,visicomp.core.Control.generator);
     visicomp.core.Dependent.init.call(this);
     visicomp.core.ContextHolder.init.call(this);
-	visicomp.core.Codeable.init.call(this,["resource"],false);
+	visicomp.core.Codeable.init.call(this,["resource"],true);
     
     this.resource = null;
 }

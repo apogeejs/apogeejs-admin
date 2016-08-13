@@ -39,7 +39,7 @@ visicomp.core.deletemember.deleteMember = function(member,optionalActionResponse
                 actionResponse);
         } 
 
-        var calcSuccess = visicomp.core.updatemember.doRecalculate(recalculateList,actionResponse);
+        visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
 
         //dispatch events
         workspace.dispatchEvent(visicomp.core.deletemember.MEMBER_DELETED_EVENT,fullName);
