@@ -125,7 +125,7 @@ visicomp.core.FolderFunction.prototype.needsCalculating = function() {
 }
 
 /** This updates the member based on a change in a dependency.  */
-visicomp.core.FolderFunction.prepareForCalculate = function() {
+visicomp.core.FolderFunction.prototype.prepareForCalculate = function() {
     this.clearDataSet();
     this.clearErrors();
 }
@@ -158,11 +158,13 @@ visicomp.core.FolderFunction.prototype.calculate = function() {
 /** This method updates the dependencies of any children
  * based on an object being added. */
 visicomp.core.FolderFunction.prototype.updateForAddedVariable = function(object,recalculateList) {
+    this.internalFolder.updateForAddedVariable(object,recalculateList);
 }
 
 /** This method updates the dependencies of any children
  * based on an object being deleted. */
 visicomp.core.FolderFunction.prototype.updateForDeletedVariable = function(object,recalculateList) {
+     this.internalFolder.updateForDeletedVariable(object,recalculateList);
 }
 
 //------------------------------

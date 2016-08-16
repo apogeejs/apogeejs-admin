@@ -94,21 +94,7 @@ visicomp.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunc
     );
         
     var generatorFunction = new Function("__dh__",generatorBody);
-    return generatorFunction;
-        
-//    var generatorOutput;
-//    try {
-//        
-//    
-//        //return the output of the generator - the object function and the context setter
-//        generatorFunction();
-//    }
-//    catch(exception) {
-//        generatorOutput = {};
-//        generatorOutput.success = false;
-//        generatorOutput.error = visicomp.core.ActionError.processException(exception,"Compile - Code",false);
-//    }
-    
+    return generatorFunction;    
 }
 
 

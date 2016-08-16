@@ -65,25 +65,32 @@ visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
     //save the variables accessed
     this.varInfo = codeInfo.varInfo;
 
-    if(codeInfo.actionError) {
-        //code not valie
-        this.codeError = codeInfo.actionError;
-    }
-    else {
+    if(codeInfo.actionError == null) {
         //set the code  by exectuing generator
         try {
             codeInfo.generatorFunction(this);
             this.codeError = null;
+            
+            //update dependencies
+            this.updateDependencies(codeInfo.dependencyList);
         }
         catch(ex) {
             this.codeError = visicomp.core.ActionError.processException(ex,"Codeable - Set Code",false);
         }
     }
+    else {
+        this.codeError = codeInfo.actionError;
+    }
     
-    this.codeSet = true;
-
-    //update dependencies
-    this.updateDependencies(codeInfo.dependencyList);
+    if(codeInfo.actionError) {
+        //code not valid
+        this.objectFunction = null;
+        this.contextSetter = null;
+        //will not be calculated - hasnot dependencies
+        this.updateDependecies([]);
+    }
+    
+    this.codeSet = true; 
 }
 
 /** This method udpates the dependencies if needed because
@@ -261,8 +268,6 @@ visicomp.core.Codeable.getUpdateData = function() {
 visicomp.core.Codeable.createContextManager = function() {
     return new visicomp.core.ContextManager(this.getOwner());
 }
-
-
 
 //===================================
 // Private Functions
