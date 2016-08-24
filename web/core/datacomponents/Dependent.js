@@ -54,7 +54,7 @@ visicomp.core.Dependent.getDependsOn = function() {
 /** This method makes sure any impactors are set. It sets a dependency 
  * error if one or more of the dependencies has a error. */
 visicomp.core.Dependent.initializeImpactors = function() {
-    var errorDependencies = [];
+    var errorDependencies = [];    
     
     //make sure dependencies are up to date
     for(var i = 0; i < this.dependsOnList.length; i++) {
@@ -68,7 +68,7 @@ visicomp.core.Dependent.initializeImpactors = function() {
     }
 
     if(errorDependencies.length > 0) {
-        createDependencyError(errorDependencies);
+        this.createDependencyError(errorDependencies);
     }
 }
 //===================================
@@ -128,11 +128,11 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
 visicomp.core.Dependent.createDependencyError = function(errorDependencies) {
         //dependency error found
         var message = "Error in dependency: ";
-        for(i = 0; i < errorDependencies.length; i++) {
+        for(var i = 0; i < errorDependencies.length; i++) {
             if(i > 0) message += ", ";
             message += errorDependencies[i].getFullName();
         }
-        var actionError = new visicomp.core.ActionError(message,"Calculation - Dependency",dependent);
+        var actionError = new visicomp.core.ActionError(message,"Calculation - Dependency",this);
         this.addError(actionError);   
 
 }

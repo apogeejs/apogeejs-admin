@@ -127,7 +127,6 @@ visicomp.core.FolderFunction.prototype.needsCalculating = function() {
 /** This updates the member based on a change in a dependency.  */
 visicomp.core.FolderFunction.prototype.prepareForCalculate = function() {
     this.clearDataSet();
-    this.clearErrors();
 }
 
 //add these fields to object
@@ -261,7 +260,7 @@ visicomp.core.FolderFunction.prototype.getFolderFunctionFunction = function(fold
         }
         else {
             //error exectuing folderFunction function - thro wan exception
-            throw visicomp.core.util.createError("Error executing folderFunction: " + actionResponse.getErrorMsg());
+            throw visicomp.core.util.createError(actionResponse.getErrorMsg());
         }
     }
     

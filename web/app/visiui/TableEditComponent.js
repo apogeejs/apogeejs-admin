@@ -67,7 +67,7 @@ visicomp.app.visiui.TableEditComponent.updateViewDropdown = function(viewType) {
 visicomp.app.visiui.TableEditComponent.memberUpdated = function() {
     var object = this.getObject();
     if(object.hasError()) {
-        var errorMsg = "Error: \n";
+        var errorMsg = "";
         var actionErrors = object.getErrors();
         for(var i = 0; i < actionErrors.length; i++) {
             errorMsg += actionErrors[i].msg + "\n";

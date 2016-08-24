@@ -165,13 +165,12 @@ visicomp.core.Codeable.needsCalculating = function() {
 visicomp.core.Codeable.prepareForCalculate = function() {
     this.clearDataSet();
     this.functionInitialized = false;
-    this.clearErrors(); 
 }
 
 /** This method sets the data object for the member.  */
 visicomp.core.Codeable.calculate = function() {
     
-    if(this.getDataSet()) return;
+    if((this.getDataSet())||(this.hasError())) return;
     
     if((!this.objectFunction)||(!this.contextSetter)) {
         var msg = "Function not found for member: " + this.getName();
@@ -193,7 +192,8 @@ visicomp.core.Codeable.calculate = function() {
         if(error.stack) {
             console.error(error.stack);
         }
-        var errorMsg = "Error Recalculating Member: " + ((error.message) ? error.message : null);
+
+        var errorMsg = (error.message) ? error.message : "Unknown error";
         var actionError = new visicomp.core.ActionError(errorMsg,"Codeable - Calculate",this);
         actionError.setParentException(error);
         this.addError(actionError);
@@ -207,9 +207,8 @@ visicomp.core.Codeable.initFunction = function() {
     
     //make sure this in only called once
     if(this.calcInProgress) {
-        var errorMsg = "Error Recalculating Member: " + ((error.message) ? error.message : null);
+        var errorMsg = "Circular reference error";
         var actionError = new visicomp.core.ActionError(errorMsg,"Codeable - Calculate",this);
-        actionError.setParentException(error);
         this.addError(actionError);
         return;
     }
@@ -231,7 +230,7 @@ visicomp.core.Codeable.initFunction = function() {
         if(error.stack) {
             console.error(error.stack);
         }
-        var errorMsg = "Error Recalculating Member: " + ((error.message) ? error.message : null);
+        var errorMsg = (error.message) ? error.message : "Unknown error";
         var actionError = new visicomp.core.ActionError(errorMsg,"Codeable - Calculate",this);
         actionError.setParentException(error);
         this.addError(actionError);

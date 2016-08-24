@@ -153,6 +153,8 @@ visicomp.core.updatemember.updateObjectFunction = function(codeable,
     //load some needed context variables
     var contextManager = codeable.getContextManager();
     var codeLabel = codeable.getFullName();
+    
+    codeable.clearErrors();
 
     //process the code text into javascript code
     visicomp.core.codeCompiler.processCode(codeInfo,
