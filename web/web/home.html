@@ -1,0 +1,156 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style>
+            .introP {
+            }
+            .compareTable {
+                border-color: lightgray;
+                margin: 20px;
+                outline: lightgray 4px solid
+            }
+            .titleCell {
+                font-size: x-large;
+                font-weight: bold;
+                text-align: center;
+                padding: 10px;
+                outline: lightgray 1px solid
+            }
+            .strengthCell {
+                font-style: italic;
+                text-align: center;
+                padding: 10px;
+                outline: lightgray 1px solid
+            }
+            .imageCell {
+                text-align: center;
+                padding: 10px;
+                outline: lightgray 1px solid
+            }
+            .bulletCell {
+                padding: 5px;
+                outline: lightgray 1px solid
+            }
+        </style>
+    </head>
+    <body>
+        <img src="logo75.png">
+        <p class="introP">
+            Hax is a <b>Programmatic Data Editor</b> inspired by the Spreadsheet.
+        </p>
+        <p class="introP">
+            It can be used as a calculation tool like a spreadsheet or for the 
+            creation and manipulation of data.
+        </p>
+        <p class="introP">
+            Hax does not replace the spreadsheet, it is more of a <b>power user version</b> of the spreadsheet. See the comparison below:
+        </p>        
+        <table class="compareTable">
+            <tr>
+                <td class="titleCell">
+                    Spreadsheet
+                </td>
+                <td class="titleCell">
+                    Hax
+                </td>
+            </tr>
+            <tr>
+                <td class="strengthCell">
+                    <em>Best for working with simple models and doing data presentation.</em>
+                </td>
+                <td class="strengthCell">
+                    <em>Best for working with complex models and doing data manipulation.</em>
+                </td>
+            </tr>
+            <tr>
+                <td class="imageCell">
+                    <img src="simpleSpreadsheet_small.png">
+                </td>
+                <td class="imageCell">
+                    <img src="simpleModelNFormula_small.png">
+                </td>
+            </tr>
+            <tr>
+                <td class="bulletCell">
+                    <ul>
+                        <li>A <b>grid of cells</b>, each cell is named according to its <b>location in the grid</b>.</li>
+                    </ul>
+                </td>
+                <td class="bulletCell">
+                    <ul>
+                        <li>Hax replaces cells with <b>individual tables</b>. Tables are given <b>descriptive names</b> such as "revenue".</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td class="bulletCell">
+                    <ul>
+                        <li>Each cell has a static value or a formula to calculate this value.</li>
+                    </ul>
+                </td>
+                <td class="bulletCell">
+                    <ul>
+                        <li>Each table has a static value or a formula to calculate the value.</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td class="bulletCell">
+                    <ul>
+                        <li>A cell value is a <b>simple value</b> like a number or a string.</li>
+                    </ul>
+                </td>
+                <td class="bulletCell">
+                    <ul>
+                        <li>A table value is a <b>data structure</b> such as an array, or something more complex.</li>
+                    </ul>
+                </td>
+            </tr>
+        </table>
+        <h2>Motivation for Hax</h2>
+        <p>
+            The motivation behind Hax was to make it easier to write real code in a spreadsheet-like tool.
+        </p>
+        <ul>
+            <li>The variables names from a spreadsheet, such as <b><em>B$5</em></b>, are replaced with descriptive names such as 
+                <b><em>revenue</em></b> to make the code more understandable.</li>
+            <li>The formulas are applied to entire data structures, so <b>loops or recursive functions</b> can be used, rather than
+                        <b>copying and pasting</b> formulas over a range of cells.</li>
+        </ul>
+        <p>
+            These new features make the tool more of a coding environment. Admittedly there is
+            extra overhead in writing this code. For simple models, the spreadsheet is easier.
+            However, once the model gets more complex, it is much easier to organize, debug and 
+            maintain in Hax.
+        </p>
+        
+        <h2>Implementation</h2>
+        <p>Hax runs completely in the browser and is written in javascript. The user scripting language
+            is also javascript.
+        </p>
+        <p>Because Hax is uses javascript, the data format for data structures is JSON. This is a convenient
+            because JSON is one of the most prevelent data formats, such as for metadata files and data transfer
+            in web services.    
+        </p>
+        
+        <p>ADD COMPATIBILITY!!! - browsers and javascript versions</p>
+        
+        <h2>Examples</h2>
+        (make links to example pages here)
+       
+        <br>
+        ALSO TO DO:<br>
+        - links at top of page, including to the actual App!<br>
+        - prettier header, standardized over example pages.<br>
+        - quick start?<br>
+        - documentation?<br>
+        
+        
+    </body>
+</html>
