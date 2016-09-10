@@ -164,6 +164,7 @@ visicomp.core.Codeable.needsCalculating = function() {
 /** This updates the member based on a change in a dependency.  */
 visicomp.core.Codeable.prepareForCalculate = function() {
     this.clearDataSet();
+    this.clearErrors();
     this.functionInitialized = false;
 }
 
@@ -210,6 +211,8 @@ visicomp.core.Codeable.initFunction = function() {
         var errorMsg = "Circular reference error";
         var actionError = new visicomp.core.ActionError(errorMsg,"Codeable - Calculate",this);
         this.addError(actionError);
+        //clear calc in progress flag
+        this.calcInProgress = false;
         return;
     }
     this.calcInProgress = true;
@@ -219,6 +222,7 @@ visicomp.core.Codeable.initFunction = function() {
         //make sure the data is set in each impactor
         this.initializeImpactors();
         if(this.hasError()) {
+            this.calcInProgress = false;
             return;
         }
         
