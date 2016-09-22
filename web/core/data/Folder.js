@@ -1,5 +1,5 @@
 /** This is a folder. */
-visicomp.core.Folder = function(name) {
+visicomp.core.Folder = function(name,owner) {
     //base init
     visicomp.core.Child.init.call(this,name,visicomp.core.Folder.generator);
     visicomp.core.DataHolder.init.call(this);
@@ -7,6 +7,8 @@ visicomp.core.Folder = function(name) {
     visicomp.core.ContextHolder.init.call(this);
     visicomp.core.Owner.init.call(this);
     visicomp.core.Parent.init.call(this);
+    
+    this.initOwner(owner);
 
     //this holds the base objects, mapped by name
     this.childMap = {};
@@ -138,8 +140,7 @@ visicomp.core.Folder.prototype.updateForDeletedVariable = function(object,recalc
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 visicomp.core.Folder.fromJson = function(owner,json,updateDataList,actionResponse) {
-    var folder = new visicomp.core.Folder(json.name);
-    folder.setOwner(owner);
+    var folder = new visicomp.core.Folder(json.name,owner);
     
     for(var key in json.children) {
         var childJson = json.children[key];

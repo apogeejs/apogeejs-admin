@@ -163,7 +163,7 @@ visicomp.core.Codeable.needsCalculating = function() {
 
 /** This updates the member based on a change in a dependency.  */
 visicomp.core.Codeable.prepareForCalculate = function() {
-    this.clearDataSet();
+    if(this.isDataHolder) this.clearDataSet();
     this.clearErrors();
     this.functionInitialized = false;
 }
@@ -171,7 +171,7 @@ visicomp.core.Codeable.prepareForCalculate = function() {
 /** This method sets the data object for the member.  */
 visicomp.core.Codeable.calculate = function() {
     
-    if((this.getDataSet())||(this.hasError())) return;
+    if(((this.isDataHolder)&&(this.getDataSet()))||(this.hasError())) return;
     
     if((!this.objectFunction)||(!this.contextSetter)) {
         var msg = "Function not found for member: " + this.getName();

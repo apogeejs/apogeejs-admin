@@ -15,9 +15,14 @@ visicomp.core.Child = {};
 visicomp.core.Child.init = function(name,generator) {
     this.name = name;
     this.generator = generator;
-    this.errors = [];
-    
-    this.owner = null;
+    this.errors = [];  
+}
+
+visicomp.core.Child.initOwner = function(owner) {
+    this.owner = owner;
+    if(owner.isParent) {
+        this.owner.addChild(this);
+    }
 }
 
 /** This property tells if this object is a child.
@@ -43,19 +48,6 @@ visicomp.core.Child.getFullName = function() {
 /* the object name but can by overriden by the child implementation. */
 visicomp.core.Child.getDisplayName = function() {
     return this.name;
-}
-
-/** This returns the owner for this child. */
-visicomp.core.Child.setOwner = function(owner) {
-    //only set it once for now
-    if(this.owner) {
-        throw visicomp.core.util.createError("Currently the owner can only be set once.");
-    }
-    
-    this.owner = owner;
-    if(owner.isParent) {
-        this.owner.addChild(this);
-    }
 }
 
 /** This returns the owner for this child. */

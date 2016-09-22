@@ -1,6 +1,6 @@
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
-visicomp.core.FolderFunction = function(name) {
+visicomp.core.FolderFunction = function(name,owner) {
     //base init
     visicomp.core.Child.init.call(this,name,visicomp.core.FolderFunction.generator);
     visicomp.core.DataHolder.init.call(this);
@@ -11,10 +11,11 @@ visicomp.core.FolderFunction = function(name) {
     this.returnValueString = "";
     this.argList = [];
     
+    this.initOwner(owner);
+    
     //create the internal folder as a root folder (no parent). But give it
     //the full path name
-    var folder = new visicomp.core.Folder(name);
-    folder.setOwner(this);
+    var folder = new visicomp.core.Folder(name,this);
     this.setInternalFolder(folder);
     
     //set to an empty function
@@ -87,8 +88,7 @@ visicomp.core.FolderFunction.prototype.onDelete = function() {
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 visicomp.core.FolderFunction.fromJson = function(owner,json,updateDataList,actionResponse) {
-    var folderFunction = new visicomp.core.FolderFunction(json.name);
-    folderFunction.setOwner(owner);
+    var folderFunction = new visicomp.core.FolderFunction(json.name,owner);
     if(json.argList !== undefined) {
         folderFunction.setArgList(json.argList);
     }

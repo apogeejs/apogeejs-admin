@@ -9,8 +9,7 @@ visicomp.core.Workspace = function(nameOrJson,actionResponseForJson) {
     
     if(inputArgType === "String") {
         this.name = nameOrJson;
-        this.rootFolder = new visicomp.core.Folder(nameOrJson);
-        this.rootFolder.setOwner(this);
+        this.rootFolder = new visicomp.core.Folder(nameOrJson,this);
     }
     else {
         this.loadFromJson(nameOrJson,actionResponseForJson);
@@ -41,6 +40,13 @@ visicomp.core.Workspace.prototype.updateForAddedVariable = function(object,recal
 /** This method updates the dependencies of any children in the workspace
  * based on an object being deleted. */
 visicomp.core.Workspace.prototype.updateForDeletedVariable = function(object,recalculateList) {
+    this.rootFolder.updateForDeletedVariable(object,recalculateList);
+}
+
+/** This method updates the dependencies of any children in the workspace
+ * based on an object being moved. */
+visicomp.core.Workspace.prototype.updateForMovetedVariable = function(object,recalculateList) {
+    this.rootFolder.updateForAddedVariable(object,recalculateList);
     this.rootFolder.updateForDeletedVariable(object,recalculateList);
 }
 
