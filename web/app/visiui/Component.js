@@ -260,6 +260,9 @@ visicomp.app.visiui.Component.toJson = function() {
 
 /** This method should include an needed functionality to clean up after a delete. */
 visicomp.app.visiui.Component.onDelete = function() {
+    //remove the UI element
+    var componentWindow = this.getWindow();
+    componentWindow.deleteWindow();
 }
 
 /** This method is used for setting initial values in the property dialog. 

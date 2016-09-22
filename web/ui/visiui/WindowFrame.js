@@ -94,17 +94,17 @@ visicomp.visiui.WindowFrame = function(parentContainer, options) {
 	element.addEventListener("mousedown",frontHandler);
     
     //this makes sure to update the window when the parent becomes visible
-    var onShow = function() {
+    this.onShow = function() {
         //refresh the element
         instance.show();
     }
-    var onHide = function() {
+    this.onHide = function() {
         //don't remove element, but mark it as hidden
         instance.isShowing = false;
     }
     var parentEventManager = this.parentContainer.getEventManager();
-    parentEventManager.addListener(visicomp.visiui.ParentContainer.CONTENT_SHOWN, onShow);
-    parentEventManager.addListener(visicomp.visiui.ParentContainer.CONTENT_HIDDEN, onHide);
+    parentEventManager.addListener(visicomp.visiui.ParentContainer.CONTENT_SHOWN, this.onShow);
+    parentEventManager.addListener(visicomp.visiui.ParentContainer.CONTENT_HIDDEN, this.onHide);
 }
 
 //add components to this class
@@ -248,13 +248,21 @@ visicomp.visiui.WindowFrame.prototype.show = function() {
     }
 }
 
-/** This method closes the window. */
+/** This method hides the window. */
 visicomp.visiui.WindowFrame.prototype.hide = function() {
     this.parentContainer.removeWindow(this);
     if(this.isShowing) {
         this.isShowing = false;
         this.frameHidden();
     }
+}
+
+/** This method closes the window. */
+visicomp.visiui.WindowFrame.prototype.deleteWindow = function() {
+    var parentEventManager = this.parentContainer.getEventManager();
+    parentEventManager.removeListener(visicomp.visiui.ParentContainer.CONTENT_SHOWN, this.onShow);
+    parentEventManager.removeListener(visicomp.visiui.ParentContainer.CONTENT_HIDDEN, this.onHide);
+    this.hide();
 }
 
 /** This method returns true if the window is showing. */

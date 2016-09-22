@@ -166,10 +166,6 @@ visicomp.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
 	delete this.componentMap[key];
 
 	if((componentInfo)&&(componentInfo.component)) {
-        //remove the UI element
-        var componentWindow = componentInfo.component.getWindow();
-        componentWindow.hide();
-        
         //do any needed cleanup
         componentInfo.component.onDelete();
 	}

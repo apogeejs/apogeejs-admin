@@ -65,6 +65,9 @@ visicomp.app.visiui.JsonTableComponent.prototype.getViewModeElement = function(v
 
 /** This method should include an needed functionality to clean up after a delete. */
 visicomp.app.visiui.JsonTableComponent.prototype.onDelete = function() {
+    //call the base on delete
+    visicomp.app.visiui.Component.onDelete.call(this);
+    
     if(this.viewElement) {
 		this.viewElement.destroy();
 		this.viewElement = null;

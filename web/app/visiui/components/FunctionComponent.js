@@ -49,6 +49,9 @@ visicomp.app.visiui.FunctionComponent.prototype.getViewModeElement = function(vi
 
 /** This method should include an needed functionality to clean up after a delete. */
 visicomp.app.visiui.FunctionComponent.prototype.onDelete = function() {
+    //call the base on delete
+    visicomp.app.visiui.Component.onDelete.call(this);
+    
     if(this.editor) {
         this.editor.destroy();
         this.editor = null;
