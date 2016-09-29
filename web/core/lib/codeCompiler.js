@@ -25,6 +25,7 @@ visicomp.core.codeCompiler.processCode = function(codeInfo,
     }
     else {
         codeInfo.errors = analyzeOutput.errors;
+        return codeInfo;
     }
 
     //create the object function and context setter from the code text
