@@ -807,10 +807,6 @@ visicomp.visiui.WindowFrame.prototype.initUI = function() {
     this.addResizeHandlers(cell,visicomp.visiui.WindowFrame.RESIZE_EAST | visicomp.visiui.WindowFrame.RESIZE_SOUTH);
     row.appendChild(cell);
     
-    //prevent default drag action
-    //var defaultDragHandler = function(e) {e.preventDefault();};
-    //this.frame.addEventListener("mousemove",defaultDragHandler);
-    
     this.createTitleBar();
     this.createHeaderContainer();
     this.createBody();
@@ -931,10 +927,6 @@ visicomp.visiui.WindowFrame.prototype.createTitleBar = function() {
             instance.moveMouseLeave(event);
         }
     }
-	
-	//prevent default drag action
-	var defaultDragHandler = function(e) {e.preventDefault();};
-    this.titleBar.addEventListener("mousemove",defaultDragHandler);
     
     //add to window
     this.titleBarCell.appendChild(this.titleBar);
@@ -957,10 +949,6 @@ visicomp.visiui.WindowFrame.prototype.createBody = function() {
     
     this.body = document.createElement("div");
     this.body.className = "visiui_win_body";
-	
-	//prevent default drag action
-	//var defaultDragHandler = function(e) {e.preventDefault();};
-    //this.body.addEventListener("mousemove",defaultDragHandler);
     
     this.bodyCell.appendChild(this.body);
 }

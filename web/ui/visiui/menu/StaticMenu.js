@@ -97,9 +97,6 @@ visicomp.visiui.MenuHeader.prototype.initHeadingElement = function() {
 	this.domElement.onmouseleave = function(e) {
         visicomp.visiui.applyStyle(instance.domElement,visicomp.visiui.MenuHeader.MENU_HEADING_NORMAL_STYLE);
     }
-	this.domElement.onmousemove = function(e) {
-        e.preventDefault();
-    }
 }
 
 /** this adds a menu item that dispatchs the given event when clicked. */

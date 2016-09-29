@@ -47,10 +47,6 @@ visicomp.visiui.TabFrame = function(parentDiv,options) {
     
     //base init for parent continer mixin
     visicomp.visiui.ParentContainer.init.call(this,this.tabFrame,this);	
-
-	//prevent default drag action
-	//var moveHandler = function(e) {e.preventDefault();};
-    //this.tabFrameControl.addEventListener("mousemove",moveHandler);
 }
 
 //add components to this class
@@ -69,7 +65,7 @@ visicomp.visiui.TabFrame.CONTAINER_STYLE = {
     "width":"100%",
     "height":"100%",
     "top":"0px",
-    "left":"0px"
+    "left":"0px",
 };
 visicomp.visiui.TabFrame.DISPLAY_FRAME_STYLE = {
     //fixed

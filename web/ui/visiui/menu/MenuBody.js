@@ -162,9 +162,6 @@ visicomp.visiui.MenuBody.prototype.addMenuItem = function(itemInfo) {
         event.stopPropagation();
         visicomp.visiui.applyStyle(itemInfo.element,visicomp.visiui.MenuBody.MENU_ITEM_NORMAL_STYLE);
     }
-	itemInfo.element.onmousemove= function(e) {
-        e.preventDefault();
-    }
 	//css hover did not work with drag
 	itemInfo.element.onmouseenter= function(e) {
         visicomp.visiui.applyStyle(itemInfo.element,visicomp.visiui.MenuBody.MENU_ITEM_HOVER_STYLE);

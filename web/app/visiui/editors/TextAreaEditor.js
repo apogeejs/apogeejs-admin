@@ -16,16 +16,32 @@ visicomp.app.visiui.TextAreaEditor = function(component,onSave,onCancel) {
 		"overflow":"hidden"
 	});
    
-	this.textArea = visicomp.visiui.createElement("TEXTAREA",null,{
+	var textArea = visicomp.visiui.createElement("TEXTAREA",null,{
 		"position":"absolute",
         "top":"0px",
         "left":"0px",
         "width":"100%",
         "height":"100%",
-		"overflow":"auto"
+		"overflow":"auto",
+        
+        "webkitUserSelect":"none",
+        "khtmlUserSelect":"none",
+        "mozUserSelect":"none",
+        "msUserSelect":"none",
+        "userSelect":"none"
 	});
+    this.textArea = textArea;
     this.textArea.readOnly = true;
     this.outsideDiv.appendChild(this.textArea);
+    
+    var onFocus = function () {
+        visicomp.visiui.applyStyle(textArea,visicomp.app.visiui.TextAreaEditor.selectStyle);
+    }
+    this.textArea.addEventListener("focus",onFocus);
+    var onBlur = function () {
+        visicomp.visiui.applyStyle(textArea,visicomp.app.visiui.TextAreaEditor.noSelectStyle);
+    }
+    this.textArea.addEventListener("blur",onBlur);
     
 	
 	this.component = component;
@@ -51,6 +67,21 @@ visicomp.app.visiui.TextAreaEditor = function(component,onSave,onCancel) {
 	}
 	this.textArea.addEventListener("click",onMouseClick);
 }
+
+visicomp.app.visiui.TextAreaEditor.noSelectStyle = {
+    "webkitUserSelect":"none",
+    "khtmlUserSelect":"none",
+    "mozUserSelect":"none",
+    "msUserSelect":"none",
+    "userSelect":"none"
+};
+visicomp.app.visiui.TextAreaEditor.selectStyle = {
+    "webkitUserSelect":"text",
+    "khtmlUserSelect":"text",
+    "mozUserSelect":"text",
+    "msUserSelect":"text",
+    "userSelect":"text"
+};
 
 visicomp.app.visiui.TextAreaEditor.prototype.save = function() {
 	
