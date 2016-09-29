@@ -23,6 +23,9 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     
     this.workspaceUI.registerMember(this.object,this);
     
+    //inheriting objects can pass functions here to be called on cleanup
+    this.cleanupActions = [];
+    
     //--------------
     //create window
     //--------------
@@ -90,6 +93,11 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     
     //set the menu items
     menu.setMenuItems(this.menuItemInfoList);
+}
+
+/** This method should be called if any cleanup actions are needed on delete. */
+visicomp.app.visiui.Component.addCleanupAction = function(cleanupFunction) {
+    this.cleanupActions.push(cleanupFunction);
 }
 
 //=======================
@@ -263,6 +271,11 @@ visicomp.app.visiui.Component.onDelete = function() {
     //remove the UI element
     var componentWindow = this.getWindow();
     componentWindow.deleteWindow();
+    
+    //execute cleanup actions
+    for(var i = 0; i < this.cleanupActions.length; i++) {
+        this.cleanupActions[i]();
+    }
 }
 
 /** This method is used for setting initial values in the property dialog. 

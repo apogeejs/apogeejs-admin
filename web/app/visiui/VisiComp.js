@@ -92,7 +92,6 @@ visicomp.app.visiui.VisiComp.prototype.addWorkspaceUI = function(workspaceUI,nam
 
 /** This method closes the active workspace. */
 visicomp.app.visiui.VisiComp.prototype.removeWorkspaceUI = function(name) {
-    
     //remove the workspace from the app
     delete this.workspaceUIs[name];
     this.tabFrame.removeTab(name);

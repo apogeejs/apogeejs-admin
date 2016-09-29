@@ -195,6 +195,17 @@ visicomp.app.visiui.WorkspaceUI.prototype.getComponentByKey = function(key) {
     }
 }
 
+/** This method gets the workspace object. */
+visicomp.app.visiui.WorkspaceUI.prototype.close = function() {
+    //delete all the components - to make sure the are cleaned up
+    for(var key in this.componentMap) {
+        var componentInfo = this.componentMap[key];
+        if((componentInfo)&&(componentInfo.component)) {
+            componentInfo.component.onDelete();
+        }
+    }
+}
+
 //====================================
 // open and save methods
 //====================================

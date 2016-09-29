@@ -22,6 +22,14 @@ visicomp.app.visiui.TableEditComponent.init = function(viewTypes,defaultView,opt
 	this.clearFunctionOnBlankInfo = optionalClearFunctionOnBlankInfo;
 	this.clearFunctionActive = false;
 	this.clearFunctionCallback = null;
+    
+    //add a cleanup action to the base component - component must already be initialized
+    var instance = this;
+    var cleanupAction = function() {
+        instance.destroy();
+    }
+    this.addCleanupAction(cleanupAction);
+
 }
 
 /** This value is used as the background color when an editor is read only. */
@@ -177,5 +185,12 @@ visicomp.app.visiui.TableEditComponent.showModeElement = function(viewModeElemen
 	if(this.viewModeElementShowing) {
 		this.viewModeElementShowing.destroy();
 	}
-	this.viewElementShowing = viewModeElement;
+	this.viewModeElementShowing = viewModeElement;
+}
+
+/** @protected */
+visicomp.app.visiui.TableEditComponent.destroy = function() {
+    if(this.viewModeElement) {
+        this.viewModeElement.destroy();
+    }
 }

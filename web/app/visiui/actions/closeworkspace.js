@@ -44,7 +44,8 @@ visicomp.app.visiui.closeworkspace.closeWorkspace = function(app) {
         }
         
         workspaceUIRemoved = app.removeWorkspaceUI(name);
-
+        
+        activeWorkspaceUI.close();
         workspace.close();
     }
     catch(error) {
