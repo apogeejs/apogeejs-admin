@@ -49,8 +49,8 @@ visicomp.visiui.TabFrame = function(parentDiv,options) {
     visicomp.visiui.ParentContainer.init.call(this,this.tabFrame,this);	
 
 	//prevent default drag action
-	var moveHandler = function(e) {e.preventDefault();};
-    this.tabFrameControl.addEventListener("mousemove",moveHandler);
+	//var moveHandler = function(e) {e.preventDefault();};
+    //this.tabFrameControl.addEventListener("mousemove",moveHandler);
 }
 
 //add components to this class

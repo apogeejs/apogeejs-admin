@@ -808,8 +808,8 @@ visicomp.visiui.WindowFrame.prototype.initUI = function() {
     row.appendChild(cell);
     
     //prevent default drag action
-    var defaultDragHandler = function(e) {e.preventDefault();};
-    this.frame.addEventListener("mousemove",defaultDragHandler);
+    //var defaultDragHandler = function(e) {e.preventDefault();};
+    //this.frame.addEventListener("mousemove",defaultDragHandler);
     
     this.createTitleBar();
     this.createHeaderContainer();
@@ -959,9 +959,8 @@ visicomp.visiui.WindowFrame.prototype.createBody = function() {
     this.body.className = "visiui_win_body";
 	
 	//prevent default drag action
-	var defaultDragHandler = function(e) {e.preventDefault();};
-    this.body.addEventListener("mousemove",defaultDragHandler);
+	//var defaultDragHandler = function(e) {e.preventDefault();};
+    //this.body.addEventListener("mousemove",defaultDragHandler);
     
     this.bodyCell.appendChild(this.body);
 }
-

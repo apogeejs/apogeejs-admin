@@ -24,7 +24,9 @@ visicomp.app.visiui.TextAreaEditor = function(component,onSave,onCancel) {
         "height":"100%",
 		"overflow":"auto"
 	});
+    this.textArea.readOnly = true;
     this.outsideDiv.appendChild(this.textArea);
+    
 	
 	this.component = component;
 	this.table = component.getObject();
@@ -80,6 +82,7 @@ visicomp.app.visiui.TextAreaEditor.prototype.getElement = function() {
 	
 visicomp.app.visiui.TextAreaEditor.prototype.showData = function(text,editOk) {
 	this.editOk = editOk;
+    this.textArea.readOnly = !editOk;
 	this.textArea.value = text;
     
     //set the background color
