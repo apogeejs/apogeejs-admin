@@ -1,5 +1,5 @@
 
-visicomp.app.visiui.AceDataMode = function(component) {
+visicomp.app.visiui.AceDataMode = function(component,doJsonFormatting) {
 	this.component = component;
 	
 	this.editOk = false;
@@ -12,7 +12,8 @@ visicomp.app.visiui.AceDataMode = function(component) {
 		return instance.onCancel();
 	}
 	
-	this.editor = new visicomp.app.visiui.AceTextEditor(component,"ace/mode/json",onSave,onCancel);
+    var mode = doJsonFormatting ? "ace/mode/json" : "ace/mode/text";
+	this.editor = new visicomp.app.visiui.AceTextEditor(component,mode,onSave,onCancel);
 	
 }
 

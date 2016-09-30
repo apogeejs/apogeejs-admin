@@ -18,16 +18,16 @@ visicomp.core.util.mixin(visicomp.app.visiui.JsonTableComponent,visicomp.app.vis
 // Protected and Private Instance Methods
 //==============================
 
-visicomp.app.visiui.JsonTableComponent.VIEW_PLAIN_TEXT = "Plain Text";
-visicomp.app.visiui.JsonTableComponent.VIEW_TEXT = "Text";
+visicomp.app.visiui.JsonTableComponent.VIEW_PLAIN_TEXT = "Text";
+visicomp.app.visiui.JsonTableComponent.VIEW_JSON_TEXT = "JSON";
 visicomp.app.visiui.JsonTableComponent.VIEW_FORM = "Form";
 visicomp.app.visiui.JsonTableComponent.VIEW_CODE = "Formula";
 visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 visicomp.app.visiui.JsonTableComponent.VIEW_MODES = [
     visicomp.app.visiui.JsonTableComponent.VIEW_PLAIN_TEXT,
+    visicomp.app.visiui.JsonTableComponent.VIEW_JSON_TEXT,
     visicomp.app.visiui.JsonTableComponent.VIEW_FORM,
-    visicomp.app.visiui.JsonTableComponent.VIEW_TEXT,
     visicomp.app.visiui.JsonTableComponent.VIEW_CODE,
     visicomp.app.visiui.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE
 ];
@@ -46,13 +46,11 @@ visicomp.app.visiui.JsonTableComponent.prototype.getViewModeElement = function(v
 	
 	//create the new view element;
 	switch(viewType) {
-//--------------------------------------------------------------
         case visicomp.app.visiui.JsonTableComponent.VIEW_PLAIN_TEXT:
-			return new visicomp.app.visiui.TextAreaMode(this);
-//--------------------------------------------------------------
+            return new visicomp.app.visiui.AceDataMode(this,false);
             
-		case visicomp.app.visiui.JsonTableComponent.VIEW_TEXT:
-			return new visicomp.app.visiui.AceDataMode(this);
+		case visicomp.app.visiui.JsonTableComponent.VIEW_JSON_TEXT:
+			return new visicomp.app.visiui.AceDataMode(this,true);
 			
 		case visicomp.app.visiui.JsonTableComponent.VIEW_FORM:
 			return new visicomp.app.visiui.FormDataMode(this);

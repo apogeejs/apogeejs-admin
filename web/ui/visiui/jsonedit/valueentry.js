@@ -39,7 +39,7 @@ visicomp.jsonedit.ValueEntry = function(editArea,parent,data,isEditable,isVirtua
 	this.listDiv = null;
     
     //this is used to control expanding and collapsing
-    this.isExpanded = false;
+    this.isExpanded = true;
 	this.expandedList = [];
 	this.contractedList = [];
     
