@@ -51,7 +51,24 @@ visicomp.app.visiui.HandsonGridEditor = function(component,onSave,onCancel) {
 	this.gridEdited = function(args) {
 		instance.save(arguments);
 	}
+    
+    //on a paste, the event is fired for each row created. We delay it here to haev fewer updates of the rest of the sheet
+    this.timerInProcess = false;
+    var REFRESH_DELAY = 50;
+    
+    this.delayGridEdited = function(args) {
+        //if there is no timer waiting, start a timer
+        if(!instance.timerInProcess) {
+            instance.timerInProcess = true;
+            var callEditEvent = function(args) {
+                instance.timerInProcess = false;
+                instance.gridEdited(arguments);
+            }
+            setTimeout(callEditEvent,REFRESH_DELAY);
+        }
+    }
 	
+    
 }
 
 visicomp.app.visiui.HandsonGridEditor.prototype.save = function(argArray) {
@@ -127,8 +144,8 @@ visicomp.app.visiui.HandsonGridEditor.prototype.createNewGrid = function() {
             contextMenu: true,
             //edit callbacks
             afterChange:this.gridEdited,
-            afterCreateCol:this.gridEdited,
-            afterCreateRow:this.gridEdited,
+            afterCreateCol:this.delayGridEdited,
+            afterCreateRow:this.delayGridEdited,
             afterRemoveCol:this.gridEdited,
             afterRemoveRow:this.gridEdited
         }
