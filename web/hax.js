@@ -1,5 +1,6 @@
 /** Main project name space */
 hax = {};
 
-hax.RESOURCE_DIR = "/Hax/resources";
+hax.ROOT_DIRECTORY = "/Hax";
+hax.RESOURCE_DIR = hax.ROOT_DIRECTORY + "/resources";
 
