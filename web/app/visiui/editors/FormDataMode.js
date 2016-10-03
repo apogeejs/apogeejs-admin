@@ -1,5 +1,5 @@
 
-visicomp.app.visiui.FormDataMode = function(component) {
+hax.app.visiui.FormDataMode = function(component) {
 	this.component = component;
 
 	var instance = this;
@@ -7,18 +7,18 @@ visicomp.app.visiui.FormDataMode = function(component) {
 		instance.onSave(data);
 	}
 	
-	this.editor = new visicomp.app.visiui.JsonFormEditor(onSave);
+	this.editor = new hax.app.visiui.JsonFormEditor(onSave);
 	
 }
 
 /** This indicates if this element displays data or something else (code) */
-visicomp.app.visiui.FormDataMode.prototype.isData = true;
+hax.app.visiui.FormDataMode.prototype.isData = true;
 
-visicomp.app.visiui.FormDataMode.prototype.getElement = function() {
+hax.app.visiui.FormDataMode.prototype.getElement = function() {
 	return this.editor.getElement();
 }
 	
-visicomp.app.visiui.FormDataMode.prototype.showData = function(editOk) {
+hax.app.visiui.FormDataMode.prototype.showData = function(editOk) {
 		
 	var table = this.component.getObject();
 	var json = table.getData();	
@@ -26,17 +26,17 @@ visicomp.app.visiui.FormDataMode.prototype.showData = function(editOk) {
 	this.editor.showData(json,editOk);
 }
 
-visicomp.app.visiui.FormDataMode.prototype.destroy = function() {
+hax.app.visiui.FormDataMode.prototype.destroy = function() {
 }
 
 //==============================
 // internal
 //==============================
 
-visicomp.app.visiui.FormDataMode.prototype.onSave = function(data) {
+hax.app.visiui.FormDataMode.prototype.onSave = function(data) {
 
 	var table = this.component.getObject();
-	visicomp.core.updatemember.updateData(table,data);
+	hax.core.updatemember.updateData(table,data);
 //the response should depend on this result in some way? check the error dialogs
 	
 	return true;

@@ -1,12 +1,12 @@
 /** This namespace contains functions to process an update to an member
  * which inherits from the FunctionBase component. */
-visicomp.core.calculation = {};
+hax.core.calculation = {};
 
 
 /** This moethod should be called on an Impactor (DataHolder) or Dependent object that changes.
  * This will allow for any Dependents to be recaculated.
  * @private */
-visicomp.core.calculation.addToRecalculateList = function(recalculateList,member) {
+hax.core.calculation.addToRecalculateList = function(recalculateList,member) {
     //if it is in the list, return
     if(recalculateList.indexOf(member) >= 0) return;
      
@@ -20,7 +20,7 @@ visicomp.core.calculation.addToRecalculateList = function(recalculateList,member
     if(member.isDataHolder) {
         var impactsList = member.getImpactsList();
         for(var i = 0; i < impactsList.length; i++) {
-            visicomp.core.calculation.addToRecalculateList(recalculateList,impactsList[i]);
+            hax.core.calculation.addToRecalculateList(recalculateList,impactsList[i]);
         }
     }
 }
@@ -28,7 +28,7 @@ visicomp.core.calculation.addToRecalculateList = function(recalculateList,member
 /** This calls execute for each member in the recalculate list. The return value
  * is false if there are any errors.
  * @private */
-visicomp.core.calculation.callRecalculateList = function(recalculateList,actionResponse) {
+hax.core.calculation.callRecalculateList = function(recalculateList,actionResponse) {
     var dependent;
     var i;
     var success = true;

@@ -2,9 +2,9 @@
  * 
  * @param {type} onSave - should take a json object that should be saved.
  */
-visicomp.app.visiui.JsonFormEditor = function(onSave) {
+hax.app.visiui.JsonFormEditor = function(onSave) {
 	
-	this.editorDiv = visicomp.visiui.createElement("div",null,{
+	this.editorDiv = hax.visiui.createElement("div",null,{
 		"position":"absolute",
         "top":"0px",
         "left":"0px",
@@ -26,11 +26,11 @@ visicomp.app.visiui.JsonFormEditor = function(onSave) {
     }
 }
 
-visicomp.app.visiui.JsonFormEditor.prototype.getElement = function() {
+hax.app.visiui.JsonFormEditor.prototype.getElement = function() {
 	return this.editorDiv;
 }
 
-visicomp.app.visiui.JsonFormEditor.prototype.showData = function(data,editOk) {
+hax.app.visiui.JsonFormEditor.prototype.showData = function(data,editOk) {
     if((data === this.workingData)&&(this.editOk === editOk)) {
         //no need to update
         return;
@@ -40,11 +40,11 @@ visicomp.app.visiui.JsonFormEditor.prototype.showData = function(data,editOk) {
 	//I should verify I handle this consistently through app.
 	if(data === undefined) data = null;
     
-    this.workingData = visicomp.core.util.deepJsonCopy(data);
+    this.workingData = hax.core.util.deepJsonCopy(data);
     this.editOk = editOk;
     
-	visicomp.core.util.removeAllChildren(this.editorDiv);
-	this.editor = new visicomp.jsonedit.JsonEditArea(this.editorDiv,data,editOk);
+	hax.core.util.removeAllChildren(this.editorDiv);
+	this.editor = new hax.jsonedit.JsonEditArea(this.editorDiv,data,editOk);
     
     this.editor.setEditCallback(this.editCallback);
     
@@ -53,7 +53,7 @@ visicomp.app.visiui.JsonFormEditor.prototype.showData = function(data,editOk) {
         this.editorDiv.style.backgroundColor = "";
     }
     else {
-        this.editorDiv.style.backgroundColor = visicomp.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
+        this.editorDiv.style.backgroundColor = hax.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
     }
 }
 

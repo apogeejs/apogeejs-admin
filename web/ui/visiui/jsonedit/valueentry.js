@@ -5,12 +5,12 @@
  * either the key for this value or the top level entry. It should have a method
  * "updateValueElements" that will refresh the elements if they have been updated.
  */
-visicomp.jsonedit.ValueEntry = function(editArea,parent,data,isEditable,isVirtual) {
+hax.jsonedit.ValueEntry = function(editArea,parent,data,isEditable,isVirtual) {
     this.editArea = editArea;
 	this.parent = parent;
     this.data = data;
 	this.isEditable = isEditable;
-	this.type = visicomp.jsonedit.getObjectType(data); //"value", "object", "array"
+	this.type = hax.jsonedit.getObjectType(data); //"value", "object", "array"
 
 	this.indentLevel = parent.getIndentLevel() + 1;
     
@@ -73,11 +73,11 @@ visicomp.jsonedit.ValueEntry = function(editArea,parent,data,isEditable,isVirtua
 // Accessors
 //============================
 
-visicomp.jsonedit.ValueEntry.prototype.getInitialValue = function() {
+hax.jsonedit.ValueEntry.prototype.getInitialValue = function() {
     return this.data;
 }
 
-visicomp.jsonedit.ValueEntry.prototype.getCurrentValue = function() {
+hax.jsonedit.ValueEntry.prototype.getCurrentValue = function() {
 	var value;
     var i;
     var keyEntry;
@@ -102,28 +102,28 @@ visicomp.jsonedit.ValueEntry.prototype.getCurrentValue = function() {
     return value;
 }
 
-visicomp.jsonedit.ValueEntry.prototype.getType = function() {
+hax.jsonedit.ValueEntry.prototype.getType = function() {
 	return this.type;
 }
 
-visicomp.jsonedit.ValueEntry.prototype.setExpanded = function(isExpanded) {
+hax.jsonedit.ValueEntry.prototype.setExpanded = function(isExpanded) {
 	this.isExpanded = isExpanded;
     this.doExpandContract();
 }
 
-visicomp.jsonedit.ValueEntry.prototype.getElementList = function() {
+hax.jsonedit.ValueEntry.prototype.getElementList = function() {
 	return this.elementList;
 }
 
-visicomp.jsonedit.ValueEntry.prototype.getValueEditObject = function() {
+hax.jsonedit.ValueEntry.prototype.getValueEditObject = function() {
 	return this.valueEditObject;
 }
 
-visicomp.jsonedit.ValueEntry.prototype.getIndentLevel = function() {
+hax.jsonedit.ValueEntry.prototype.getIndentLevel = function() {
 	return this.indentLevel;
 }
 
-visicomp.jsonedit.ValueEntry.prototype.setIsVirtual = function(isVirtual) {
+hax.jsonedit.ValueEntry.prototype.setIsVirtual = function(isVirtual) {
 	this.isVirtual = isVirtual;  
     
 	this.valueEditObject.setIsVirtual(isVirtual);
@@ -137,7 +137,7 @@ visicomp.jsonedit.ValueEntry.prototype.setIsVirtual = function(isVirtual) {
 
 /** This navigates to a next cell on completion of editing. 
  * @private */
-visicomp.jsonedit.ValueEntry.prototype.navigateCells = function(direction) {
+hax.jsonedit.ValueEntry.prototype.navigateCells = function(direction) {
     var parentValue = this.parent.getParentValueObject();
     if(parentValue) {
         parentValue.navigateChildren(this.parent,false,direction);
@@ -147,7 +147,7 @@ visicomp.jsonedit.ValueEntry.prototype.navigateCells = function(direction) {
 /** This method determines the place to navigation to, and starts editing there
  * if the re is a valid location. 
  * @private */
-visicomp.jsonedit.ValueEntry.prototype.navigateChildren = function(keyEntry,originIsKey,direction) {
+hax.jsonedit.ValueEntry.prototype.navigateChildren = function(keyEntry,originIsKey,direction) {
     
     //gerate the nav fruls
     var destIsKey = false;
@@ -155,55 +155,55 @@ visicomp.jsonedit.ValueEntry.prototype.navigateChildren = function(keyEntry,orig
     var doMove;
     
     if(this.type == "array") {
-        if((direction == visicomp.jsonedit.EditField.DIRECTION_NEXT)||(direction == visicomp.jsonedit.EditField.DIRECTION_DOWN)) {
+        if((direction == hax.jsonedit.EditField.DIRECTION_NEXT)||(direction == hax.jsonedit.EditField.DIRECTION_DOWN)) {
             doMove = !originIsKey;
             if(doMove) {
                 destIsKey = false;
                 deltaIndex = 1;
             }
         }
-        else if((direction == visicomp.jsonedit.EditField.DIRECTION_PREV)||(direction == visicomp.jsonedit.EditField.DIRECTION_UP)) {
+        else if((direction == hax.jsonedit.EditField.DIRECTION_PREV)||(direction == hax.jsonedit.EditField.DIRECTION_UP)) {
             doMove = !originIsKey;
             if(doMove) {
                 destIsKey = false;
                 deltaIndex = -1;
             }
         }
-        else if((direction == visicomp.jsonedit.EditField.DIRECTION_RIGHT)||(direction == visicomp.jsonedit.EditField.DIRECTION_LEFT)) {
+        else if((direction == hax.jsonedit.EditField.DIRECTION_RIGHT)||(direction == hax.jsonedit.EditField.DIRECTION_LEFT)) {
             doMove = false;
         }
     }
     else if(this.type == "object") {
-        if(direction == visicomp.jsonedit.EditField.DIRECTION_NEXT) {
+        if(direction == hax.jsonedit.EditField.DIRECTION_NEXT) {
             doMove = true;
             destIsKey = !originIsKey;
             deltaIndex = originIsKey ? 0 : 1;  
         }
-        else if(direction == visicomp.jsonedit.EditField.DIRECTION_PREV) {
+        else if(direction == hax.jsonedit.EditField.DIRECTION_PREV) {
             doMove = true;
             destIsKey = !originIsKey;
             deltaIndex = originIsKey ? -1 : 0; 
         }
-        else if(direction == visicomp.jsonedit.EditField.DIRECTION_RIGHT) {
+        else if(direction == hax.jsonedit.EditField.DIRECTION_RIGHT) {
             doMove = originIsKey;
             if(doMove) {
                 destIsKey = false;
                 deltaIndex = 0; 
             }
         }
-        else if(direction == visicomp.jsonedit.EditField.DIRECTION_LEFT) {
+        else if(direction == hax.jsonedit.EditField.DIRECTION_LEFT) {
             doMove = !originIsKey;
             if(doMove) {
                 destIsKey = true;
                 deltaIndex = 0; 
             }
         }
-        else if(direction == visicomp.jsonedit.EditField.DIRECTION_UP) {
+        else if(direction == hax.jsonedit.EditField.DIRECTION_UP) {
             doMove = true;
             destIsKey = originIsKey;
             deltaIndex = -1; 
         }
-        else if(direction == visicomp.jsonedit.EditField.DIRECTION_DOWN) {
+        else if(direction == hax.jsonedit.EditField.DIRECTION_DOWN) {
             doMove = true;
             destIsKey = originIsKey;
             deltaIndex = 1; 
@@ -268,7 +268,7 @@ visicomp.jsonedit.ValueEntry.prototype.navigateChildren = function(keyEntry,orig
 /** This method inserts an element at the given index. If the index is left blank
  * the entry is inserted at the end of the list. The value of key is ignored if
  * the entry is an array. */
-visicomp.jsonedit.ValueEntry.prototype.insertElement = function(key,value,index) {
+hax.jsonedit.ValueEntry.prototype.insertElement = function(key,value,index) {
 
     var childKeyEntry;
     
@@ -289,10 +289,10 @@ visicomp.jsonedit.ValueEntry.prototype.insertElement = function(key,value,index)
     }
     
     if(this.type == "object") {
-        childKeyEntry = new visicomp.jsonedit.KeyEntry(this.editArea,this,key,"key",value,this.isEditable,false);     
+        childKeyEntry = new hax.jsonedit.KeyEntry(this.editArea,this,key,"key",value,this.isEditable,false);     
     }
     else if(this.type == "array") {
-        childKeyEntry = new visicomp.jsonedit.KeyEntry(this.editArea,this,index,"index",value,this.isEditable,false);
+        childKeyEntry = new hax.jsonedit.KeyEntry(this.editArea,this,index,"index",value,this.isEditable,false);
         
         //we also need to update all the keys larger than this one
         for(var newIndex = index+1; newIndex < this.childKeyEntries.length; newIndex++) {
@@ -315,7 +315,7 @@ visicomp.jsonedit.ValueEntry.prototype.insertElement = function(key,value,index)
 }
 
 /** this method swaps the given key with the next key in the list. */
-visicomp.jsonedit.ValueEntry.prototype.moveChildKeyToNextIndex = function(index) {
+hax.jsonedit.ValueEntry.prototype.moveChildKeyToNextIndex = function(index) {
     if((index < 0)||(index >= this.childKeyEntries.length -1)) {
         //illegal index
         alert("Can not make the specified key move");
@@ -346,7 +346,7 @@ visicomp.jsonedit.ValueEntry.prototype.moveChildKeyToNextIndex = function(index)
 /** This method inserts an element at the given index. If the index is left blank
  * the entry is inserted at the end of the list. The value of key is ignored if
  * the entry is an array. */
-visicomp.jsonedit.ValueEntry.prototype.deleteChildElement = function(keyEntry) {
+hax.jsonedit.ValueEntry.prototype.deleteChildElement = function(keyEntry) {
     
     var index = this.childKeyEntries.indexOf(keyEntry);
     if(index == -1) {
@@ -378,10 +378,10 @@ visicomp.jsonedit.ValueEntry.prototype.deleteChildElement = function(keyEntry) {
 //------------------------------
 
 
-visicomp.jsonedit.ValueEntry.prototype.convertibleToNumber = function() {
+hax.jsonedit.ValueEntry.prototype.convertibleToNumber = function() {
     if(this.type === "value") {
         var currentValue = this.getCurrentValue();
-        var valueType = visicomp.jsonedit.getValueType(currentValue);
+        var valueType = hax.jsonedit.getValueType(currentValue);
         if(valueType === "string") {
             return isFinite(currentValue);
         }
@@ -389,49 +389,49 @@ visicomp.jsonedit.ValueEntry.prototype.convertibleToNumber = function() {
     return false;
 }
 
-visicomp.jsonedit.ValueEntry.prototype.convertibleToBool = function() {
+hax.jsonedit.ValueEntry.prototype.convertibleToBool = function() {
     if(this.type === "value") {
         var currentValue = this.getCurrentValue();
-        var valueType = visicomp.jsonedit.getValueType(currentValue);
+        var valueType = hax.jsonedit.getValueType(currentValue);
         if(valueType === "string") {
-            return visicomp.jsonedit.isBoolString(currentValue);
+            return hax.jsonedit.isBoolString(currentValue);
         }
     }
     return false;
 }
 
-visicomp.jsonedit.ValueEntry.prototype.convertibleToNull = function() {
+hax.jsonedit.ValueEntry.prototype.convertibleToNull = function() {
     if(this.type === "value") {
         var currentValue = this.getCurrentValue();
-        var valueType = visicomp.jsonedit.getValueType(currentValue);
+        var valueType = hax.jsonedit.getValueType(currentValue);
         if(valueType === "string") {
-            return visicomp.jsonedit.isNullString(currentValue);
+            return hax.jsonedit.isNullString(currentValue);
         }
     }
     return false;
 }
 
 //this converts a string to a number or boolean
-visicomp.jsonedit.ValueEntry.prototype.valueToNonString = function() {
+hax.jsonedit.ValueEntry.prototype.valueToNonString = function() {
     var currentValue = this.getCurrentValue();
     //change the data in this object
-    var newData = visicomp.jsonedit.stringToNonString(currentValue);
+    var newData = hax.jsonedit.stringToNonString(currentValue);
     this.valueEditObject.setValue(newData);
     
     //notify of edit
     this.editArea.valueEdited();
 }
 
-visicomp.jsonedit.ValueEntry.prototype.convertibleToString = function() {
+hax.jsonedit.ValueEntry.prototype.convertibleToString = function() {
     if(this.type === "value") {
         var currentValue = this.getCurrentValue();
-        var valueType = visicomp.jsonedit.getValueType(currentValue);
+        var valueType = hax.jsonedit.getValueType(currentValue);
         return (valueType !== "string");
     }
     return false;
 }
 
-visicomp.jsonedit.ValueEntry.prototype.valueToString = function() {
+hax.jsonedit.ValueEntry.prototype.valueToString = function() {
     var currentValue = this.getCurrentValue();
     //change the data in this object
     var newData = String(currentValue);
@@ -442,7 +442,7 @@ visicomp.jsonedit.ValueEntry.prototype.valueToString = function() {
 }
 
 
-visicomp.jsonedit.ValueEntry.prototype.valueToArray = function() {
+hax.jsonedit.ValueEntry.prototype.valueToArray = function() {
     if(!this.type == "value") {
         throw "Type value expected. Found " + this.type;
     }
@@ -480,7 +480,7 @@ visicomp.jsonedit.ValueEntry.prototype.valueToArray = function() {
     this.editArea.valueEdited();
 }
 
-visicomp.jsonedit.ValueEntry.prototype.valueToObject = function() {
+hax.jsonedit.ValueEntry.prototype.valueToObject = function() {
     if(!this.type == "value") {
         throw "Type value expected. Found " + this.type;
     }
@@ -518,7 +518,7 @@ visicomp.jsonedit.ValueEntry.prototype.valueToObject = function() {
     this.editArea.valueEdited();
 }
 
-visicomp.jsonedit.ValueEntry.prototype.objectToArray = function() {
+hax.jsonedit.ValueEntry.prototype.objectToArray = function() {
     if(!this.type == "object") {
         throw "Type object expected. Found " + this.type;
     }
@@ -566,7 +566,7 @@ visicomp.jsonedit.ValueEntry.prototype.objectToArray = function() {
     this.editArea.valueEdited();
 }
 
-visicomp.jsonedit.ValueEntry.prototype.arrayToObject = function() {
+hax.jsonedit.ValueEntry.prototype.arrayToObject = function() {
     if(!this.type == "array") {
         throw "Type array expected. Found " + this.type;
     }
@@ -611,7 +611,7 @@ visicomp.jsonedit.ValueEntry.prototype.arrayToObject = function() {
     this.editArea.valueEdited();
 }
 
-visicomp.jsonedit.ValueEntry.prototype.convertToValue = function() {
+hax.jsonedit.ValueEntry.prototype.convertToValue = function() {
     if(this.type == "value") {
         return;
     }
@@ -653,7 +653,7 @@ visicomp.jsonedit.ValueEntry.prototype.convertToValue = function() {
 
 /** This method constructs the contents for a value entry
  * @private */
-visicomp.jsonedit.ValueEntry.prototype.createValueEntry = function(elementsData) {
+hax.jsonedit.ValueEntry.prototype.createValueEntry = function(elementsData) {
     if(this.type != "value") return;
     
     this.valueEditObject = null;
@@ -672,7 +672,7 @@ visicomp.jsonedit.ValueEntry.prototype.createValueEntry = function(elementsData)
 
 /** This method constructs the contents for an array or object
  * @private */
-visicomp.jsonedit.ValueEntry.prototype.createChildKeyEntries = function(elementsData) {
+hax.jsonedit.ValueEntry.prototype.createChildKeyEntries = function(elementsData) {
     if(this.type == "value") return;
     
 	//initialize data elements
@@ -685,25 +685,25 @@ visicomp.jsonedit.ValueEntry.prototype.createChildKeyEntries = function(elements
     var childKeyEntry;
     if(this.type == "object") { 
         for(var key in elementsData) {
-            childKeyEntry = new visicomp.jsonedit.KeyEntry(this.editArea,this,key,"key",elementsData[key],this.isEditable,false);
+            childKeyEntry = new hax.jsonedit.KeyEntry(this.editArea,this,key,"key",elementsData[key],this.isEditable,false);
             this.childKeyEntries.push(childKeyEntry);
         }
 
         //add a dummy entry if this is editable
 		if(this.isEditable) {
-			childKeyEntry = new visicomp.jsonedit.KeyEntry(this.editArea,this,"","key","",this.isEditable,true);
+			childKeyEntry = new hax.jsonedit.KeyEntry(this.editArea,this,"","key","",this.isEditable,true);
 			this.virtualChildKey = childKeyEntry;
 		}
     }
     else if(this.type == "array") {
         for(var keyIndex = 0; keyIndex < elementsData.length; keyIndex++) {
-            childKeyEntry = new visicomp.jsonedit.KeyEntry(this.editArea,this,keyIndex,"index",elementsData[keyIndex],this.isEditable,false);
+            childKeyEntry = new hax.jsonedit.KeyEntry(this.editArea,this,keyIndex,"index",elementsData[keyIndex],this.isEditable,false);
             this.childKeyEntries.push(childKeyEntry);
         }
 
 		//add a dummy entry if this is editable
 		if(this.isEditable) {
-			childKeyEntry = new visicomp.jsonedit.KeyEntry(this.editArea,this,keyIndex,"index","",this.isEditable,true);
+			childKeyEntry = new hax.jsonedit.KeyEntry(this.editArea,this,keyIndex,"index","",this.isEditable,true);
 			this.virtualChildKey = childKeyEntry;
 		}
     }
@@ -712,7 +712,7 @@ visicomp.jsonedit.ValueEntry.prototype.createChildKeyEntries = function(elements
 
 /** This create the dom element list for the child key entries 
 * @private */
-visicomp.jsonedit.ValueEntry.prototype.createElementList = function() {
+hax.jsonedit.ValueEntry.prototype.createElementList = function() {
 
     //initialize elements
 	this.listDiv = document.createElement("div");
@@ -723,7 +723,7 @@ visicomp.jsonedit.ValueEntry.prototype.createElementList = function() {
     var startDelimiter;
     var endDelimiter1;
     var endDelimiter2;
-    var endIndent = visicomp.jsonedit.createIndentElement(this.indentLevel);
+    var endIndent = hax.jsonedit.createIndentElement(this.indentLevel);
 
 	//list element
 	var childKeyEntry;
@@ -736,18 +736,18 @@ visicomp.jsonedit.ValueEntry.prototype.createElementList = function() {
 	}
 
     //buttons
-    var expandButton = visicomp.jsonedit.createExpandButton(this);
-    var contractButton = visicomp.jsonedit.createContractButton(this);
+    var expandButton = hax.jsonedit.createExpandButton(this);
+    var contractButton = hax.jsonedit.createContractButton(this);
 
     if(this.type == "object") { 
-        startDelimiter = visicomp.jsonedit.createObjectDelimiter("{");
-        endDelimiter1 = visicomp.jsonedit.createObjectDelimiter("}");
-        endDelimiter2 = visicomp.jsonedit.createObjectDelimiter("}");
+        startDelimiter = hax.jsonedit.createObjectDelimiter("{");
+        endDelimiter1 = hax.jsonedit.createObjectDelimiter("}");
+        endDelimiter2 = hax.jsonedit.createObjectDelimiter("}");
     }
     else if(this.type == "array") {
-        startDelimiter = visicomp.jsonedit.createObjectDelimiter("[");
-        endDelimiter1 = visicomp.jsonedit.createObjectDelimiter("]");
-        endDelimiter2 = visicomp.jsonedit.createObjectDelimiter("]");
+        startDelimiter = hax.jsonedit.createObjectDelimiter("[");
+        endDelimiter1 = hax.jsonedit.createObjectDelimiter("]");
+        endDelimiter2 = hax.jsonedit.createObjectDelimiter("]");
     }
 
     //save the elements
@@ -784,7 +784,7 @@ visicomp.jsonedit.ValueEntry.prototype.createElementList = function() {
 /** This method updates the keys with the context menu and makes
  * sure the keys are corect for array entries. 
  * @private */
-visicomp.jsonedit.ValueEntry.prototype.updateChildKeys = function() {
+hax.jsonedit.ValueEntry.prototype.updateChildKeys = function() {
     var numberKeys;
     var keyIndex;
     
@@ -839,7 +839,7 @@ visicomp.jsonedit.ValueEntry.prototype.updateChildKeys = function() {
 }
 
 
-visicomp.jsonedit.ValueEntry.prototype.doExpandContract = function() {
+hax.jsonedit.ValueEntry.prototype.doExpandContract = function() {
 	if((!this.expandedList)||(!this.contractedList)) return;
 	
 	var onList = this.isExpanded ? this.expandedList : this.contractedList;
@@ -860,10 +860,10 @@ visicomp.jsonedit.ValueEntry.prototype.doExpandContract = function() {
 
 /** This creates the edit element for the entry. Only needed on type "value" 
 * @private */
-visicomp.jsonedit.ValueEntry.prototype.createValueElement = function(data) {
+hax.jsonedit.ValueEntry.prototype.createValueElement = function(data) {
 
     //create a simple element
-    this.valueEditObject = new visicomp.jsonedit.EditField(data,visicomp.jsonedit.EditField.FIELD_TYPE_VALUE,this.isEditable,this.isVirtual);
+    this.valueEditObject = new hax.jsonedit.EditField(data,hax.jsonedit.EditField.FIELD_TYPE_VALUE,this.isEditable,this.isVirtual);
     var instance = this;
     
     //make the edit field editable if it is a key
@@ -894,7 +894,7 @@ visicomp.jsonedit.ValueEntry.prototype.createValueElement = function(data) {
 
 
 /** This wraps the list elements into the proper format. */
-visicomp.jsonedit.ValueEntry.prototype.makeVirtualEntryReal = function(data) {
+hax.jsonedit.ValueEntry.prototype.makeVirtualEntryReal = function(data) {
     var newRealEntry = this.virtualChildKey
     newRealEntry.setIsVirtual(false);
     this.childKeyEntries.push(newRealEntry);
@@ -902,12 +902,12 @@ visicomp.jsonedit.ValueEntry.prototype.makeVirtualEntryReal = function(data) {
     var childKeyEntry;
     if(this.type == "object") { 
         //add a dummy entry
-        childKeyEntry = new visicomp.jsonedit.KeyEntry(this.editArea,this,"","key","",this.isEditable,true);
+        childKeyEntry = new hax.jsonedit.KeyEntry(this.editArea,this,"","key","",this.isEditable,true);
         this.virtualChildKey = childKeyEntry;
     }
     else if(this.type == "array") {
         //add a dummy entry
-        childKeyEntry = new visicomp.jsonedit.KeyEntry(this.editArea,this,this.childKeyEntries.length,"index","",this.isEditable,true);
+        childKeyEntry = new hax.jsonedit.KeyEntry(this.editArea,this,this.childKeyEntries.length,"index","",this.isEditable,true);
         this.virtualChildKey = childKeyEntry;
     }
     

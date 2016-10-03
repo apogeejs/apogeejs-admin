@@ -1,5 +1,5 @@
 
-visicomp.app.visiui.HandsonGridMode = function(component) {
+hax.app.visiui.HandsonGridMode = function(component) {
 	this.component = component;
 	
 	this.editOk = false;
@@ -12,18 +12,18 @@ visicomp.app.visiui.HandsonGridMode = function(component) {
 		return instance.onCancel();
 	}
 	
-	this.editor = new visicomp.app.visiui.HandsonGridEditor(component,onSave,onCancel);
+	this.editor = new hax.app.visiui.HandsonGridEditor(component,onSave,onCancel);
 	
 }
 
 /** This indicates if this element displays data or something else (code) */
-visicomp.app.visiui.HandsonGridMode.prototype.isData = true;
+hax.app.visiui.HandsonGridMode.prototype.isData = true;
 
-visicomp.app.visiui.HandsonGridMode.prototype.getElement = function() {
+hax.app.visiui.HandsonGridMode.prototype.getElement = function() {
 	return this.editor.getElement();
 }
 	
-visicomp.app.visiui.HandsonGridMode.prototype.showData = function(editOk) {
+hax.app.visiui.HandsonGridMode.prototype.showData = function(editOk) {
 		
 	var table = this.component.getObject();
 	var json = table.getData();	
@@ -32,7 +32,7 @@ visicomp.app.visiui.HandsonGridMode.prototype.showData = function(editOk) {
 	this.editor.showData(json,editOk);
 }
 
-visicomp.app.visiui.HandsonGridMode.prototype.destroy = function() {
+hax.app.visiui.HandsonGridMode.prototype.destroy = function() {
 	this.editor.destroy();
 }
 
@@ -40,14 +40,14 @@ visicomp.app.visiui.HandsonGridMode.prototype.destroy = function() {
 // internal
 //==============================
 
-visicomp.app.visiui.HandsonGridMode.prototype.onSave = function(data) {
+hax.app.visiui.HandsonGridMode.prototype.onSave = function(data) {
 	var table = this.component.getObject();
-	visicomp.core.updatemember.updateData(table,data);
+	hax.core.updatemember.updateData(table,data);
 //the response should depend on this result in some way? check the error dialogs
 	
 	return true;
 }
-visicomp.app.visiui.HandsonGridMode.prototype.onCancel = function() {
+hax.app.visiui.HandsonGridMode.prototype.onCancel = function() {
 	//reload old data
 	this.showData(this.editOk);
 	

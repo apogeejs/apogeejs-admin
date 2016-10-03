@@ -7,10 +7,10 @@
  * COMPONENT DEPENDENCIES:
  * - A DataHolder must be a Child.
  */
-visicomp.core.DataHolder = {};
+hax.core.DataHolder = {};
 
 /** This initializes the component */
-visicomp.core.DataHolder.init = function() {
+hax.core.DataHolder.init = function() {
     this.data = null;
     
     //these are a list of members that depend on this member
@@ -21,32 +21,32 @@ visicomp.core.DataHolder.init = function() {
 
 /** This property tells if this object is a data holder.
  * This property should not be implemented on non-data holders. */
-visicomp.core.DataHolder.isDataHolder = true;
+hax.core.DataHolder.isDataHolder = true;
 
 /** This sets the value of dataSet to false. It is automatically set to true in set data. */
-visicomp.core.DataHolder.clearDataSet = function() {
+hax.core.DataHolder.clearDataSet = function() {
     this.dataSet = false;
 }
 
 /** This returns true if the data has been set.  This value must be managed externally. */
-visicomp.core.DataHolder.getDataSet = function() {
+hax.core.DataHolder.getDataSet = function() {
     return this.dataSet;
 }
 
 /** this method gets the data map. */
-visicomp.core.Child.getData = function() {
+hax.core.Child.getData = function() {
     return this.data;
 }
 
 /** This returns an array of members this member impacts. */
-visicomp.core.DataHolder.getImpactsList = function() {
+hax.core.DataHolder.getImpactsList = function() {
     return this.impactsList;
 }
 
 /** This method sets the data for this object. This is the object used by the 
  * code which is identified by this name, for example the JSON object associated
  * with a JSON table. Besides hold the data object, this updates the parent data map. */
-visicomp.core.DataHolder.setData = function(data) {
+hax.core.DataHolder.setData = function(data) {
     this.data = data;
     this.dataSet = true;
     
@@ -62,7 +62,7 @@ visicomp.core.DataHolder.setData = function(data) {
 
 /** This method adds a data member to the imapacts list for this node. 
  * @private */
-visicomp.core.DataHolder.addToImpactsList = function(member) {
+hax.core.DataHolder.addToImpactsList = function(member) {
     //exclude this member
     if(member == this) return;
 	
@@ -76,7 +76,7 @@ visicomp.core.DataHolder.addToImpactsList = function(member) {
 
 /** This method removes a data member from the imapacts list for this node. 
  * @private */
-visicomp.core.DataHolder.removeFromImpactsList = function(member) {
+hax.core.DataHolder.removeFromImpactsList = function(member) {
     //it should appear only once
     for(var i = 0; i < this.impactsList.length; i++) {
         if(this.impactsList[i] == member) {

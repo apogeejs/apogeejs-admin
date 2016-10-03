@@ -1,10 +1,10 @@
 
-visicomp.core.codeDependencies = {};
+hax.core.codeDependencies = {};
 
 /** This method takes the varInfo table from the code analysis and returns
  * a lsit of member objects which this member depends on.
  */
-visicomp.core.codeDependencies.getDependencyInfo = function(varInfo,contextManager) {
+hax.core.codeDependencies.getDependencyInfo = function(varInfo,contextManager) {
     var dependencyList = [];
 	var objectMap = {};
 	

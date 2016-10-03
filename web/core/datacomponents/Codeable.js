@@ -9,12 +9,12 @@
  * - A Codeable must be Dependent. 
  * - A Codeable must be ContextHolder
  */
-visicomp.core.Codeable = {};
+hax.core.Codeable = {};
 
 /** This initializes the component. argList is the arguments for the object function.
  * dataEvaluatesObjectFunction is used to determine if the object function for this
  * codeable can be set before the context and impactors are initialized. */
-visicomp.core.Codeable.init = function(argList,dataEvaluatesObjectFunction) {
+hax.core.Codeable.init = function(argList,dataEvaluatesObjectFunction) {
     
     //arguments of the member function
     this.argList = argList;
@@ -37,25 +37,25 @@ visicomp.core.Codeable.init = function(argList,dataEvaluatesObjectFunction) {
 
 /** This property tells if this object is a codeable.
  * This property should not be implemented on non-codeables. */
-visicomp.core.Codeable.isCodeable = true
+hax.core.Codeable.isCodeable = true
 
 /** This method returns the argument list.  */
-visicomp.core.Codeable.getArgList = function() {
+hax.core.Codeable.getArgList = function() {
     return this.argList;
 }
 
 /** This method returns the fucntion body for this member.  */
-visicomp.core.Codeable.getFunctionBody = function() {
+hax.core.Codeable.getFunctionBody = function() {
     return this.functionBody;
 }
 
 /** This method returns the supplemental code for this member.  */
-visicomp.core.Codeable.getSupplementalCode = function() {
+hax.core.Codeable.getSupplementalCode = function() {
     return this.supplementalCode;
 }
 
 /** This method returns the formula for this member.  */
-visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
+hax.core.Codeable.setCodeInfo = function(codeInfo) {
 
     //set the base data
     this.argList = codeInfo.argList;
@@ -75,7 +75,7 @@ visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
             this.updateDependencies(codeInfo.dependencyList);
         }
         catch(ex) {
-            this.codeError = visicomp.core.ActionError.processException(ex,"Codeable - Set Code",false);
+            this.codeError = hax.core.ActionError.processException(ex,"Codeable - Set Code",false);
         }
     }
     else {
@@ -95,11 +95,11 @@ visicomp.core.Codeable.setCodeInfo = function(codeInfo) {
 
 /** This method udpates the dependencies if needed because
  *the passed variable was added.  */
-visicomp.core.Codeable.updateForAddedVariable = function(addedMember,recalculateList) {
+hax.core.Codeable.updateForAddedVariable = function(addedMember,recalculateList) {
     if((this.hasCode())&&(this.varInfo)) {
                   
         //calculate new dependencies
-        var newDependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
+        var newDependencyList = hax.core.codeDependencies.getDependencyInfo(this.varInfo,
                this.getContextManager());
             
         //update this object if the new table is in the list
@@ -108,7 +108,7 @@ visicomp.core.Codeable.updateForAddedVariable = function(addedMember,recalculate
             this.updateDependencies(newDependencyList);
 
             //add to update list
-            visicomp.core.calculation.addToRecalculateList(recalculateList,this);
+            hax.core.calculation.addToRecalculateList(recalculateList,this);
         }
         
     }
@@ -116,27 +116,27 @@ visicomp.core.Codeable.updateForAddedVariable = function(addedMember,recalculate
 
 /** This method udpates the dependencies if needed because
  *the passed variable was deleted.  */
-visicomp.core.Codeable.updateForDeletedVariable = function(deletedMember,recalculateList) {
+hax.core.Codeable.updateForDeletedVariable = function(deletedMember,recalculateList) {
     if(this.hasCode()) {
         var dependsOnList = this.getDependsOn();
         if(dependsOnList.indexOf(deletedMember) >= 0) {
             
             if(!this.varInfo) return;
     
-            var dependencyList = visicomp.core.codeDependencies.getDependencyInfo(this.varInfo,
+            var dependencyList = hax.core.codeDependencies.getDependencyInfo(this.varInfo,
                    this.getContextManager());
 
             //update dependencies
             this.updateDependencies(dependencyList); 
 
             //add to update list
-            visicomp.core.calculation.addToRecalculateList(recalculateList,this);
+            hax.core.calculation.addToRecalculateList(recalculateList,this);
         }
     }
 }
 
 /** This method returns the formula for this member.  */
-visicomp.core.Codeable.clearCode = function() {
+hax.core.Codeable.clearCode = function() {
     this.codeSet = false;
     this.functionBody = "";
     this.supplementalCode = "";
@@ -151,31 +151,31 @@ visicomp.core.Codeable.clearCode = function() {
 }
 
 /** This method returns the formula for this member.  */
-visicomp.core.Codeable.hasCode = function() {
+hax.core.Codeable.hasCode = function() {
     return this.codeSet;
 }
 
 /** If this is true the member must be executed. 
  * @private */
-visicomp.core.Codeable.needsCalculating = function() {
+hax.core.Codeable.needsCalculating = function() {
 	return this.codeSet;
 }
 
 /** This updates the member based on a change in a dependency.  */
-visicomp.core.Codeable.prepareForCalculate = function() {
+hax.core.Codeable.prepareForCalculate = function() {
     if(this.isDataHolder) this.clearDataSet();
     this.clearErrors();
     this.functionInitialized = false;
 }
 
 /** This method sets the data object for the member.  */
-visicomp.core.Codeable.calculate = function() {
+hax.core.Codeable.calculate = function() {
     
     if(((this.isDataHolder)&&(this.getDataSet()))||(this.hasError())) return;
     
     if((!this.objectFunction)||(!this.contextSetter)) {
         var msg = "Function not found for member: " + this.getName();
-        var actionError = new visicomp.core.ActionError(msg,"Codeable - Calculate",this);
+        var actionError = new hax.core.ActionError(msg,"Codeable - Calculate",this);
         this.addError(actionError);
         return;
     }
@@ -195,21 +195,21 @@ visicomp.core.Codeable.calculate = function() {
         }
 
         var errorMsg = (error.message) ? error.message : "Unknown error";
-        var actionError = new visicomp.core.ActionError(errorMsg,"Codeable - Calculate",this);
+        var actionError = new hax.core.ActionError(errorMsg,"Codeable - Calculate",this);
         actionError.setParentException(error);
         this.addError(actionError);
     }
 }
 
 /** This makes sure user code of object function is ready to execute.  */
-visicomp.core.Codeable.initFunction = function() {
+hax.core.Codeable.initFunction = function() {
     
     if(this.functionInitialized) return;
     
     //make sure this in only called once
     if(this.calcInProgress) {
         var errorMsg = "Circular reference error";
-        var actionError = new visicomp.core.ActionError(errorMsg,"Codeable - Calculate",this);
+        var actionError = new hax.core.ActionError(errorMsg,"Codeable - Calculate",this);
         this.addError(actionError);
         //clear calc in progress flag
         this.calcInProgress = false;
@@ -235,7 +235,7 @@ visicomp.core.Codeable.initFunction = function() {
             console.error(error.stack);
         }
         var errorMsg = (error.message) ? error.message : "Unknown error";
-        var actionError = new visicomp.core.ActionError(errorMsg,"Codeable - Calculate",this);
+        var actionError = new hax.core.ActionError(errorMsg,"Codeable - Calculate",this);
         actionError.setParentException(error);
         this.addError(actionError);
     }
@@ -250,7 +250,7 @@ visicomp.core.Codeable.initFunction = function() {
 
 /** This gets an update structure to upsate a newly instantiated child
 /* to match the current object. */
-visicomp.core.Codeable.getUpdateData = function() {
+hax.core.Codeable.getUpdateData = function() {
     var updateData = {};
     if(this.hasCode()) {
         updateData.argList = this.getArgList();
@@ -268,8 +268,8 @@ visicomp.core.Codeable.getUpdateData = function() {
 //------------------------------
 
 /** This method retrieve creates the loaded context manager. */
-visicomp.core.Codeable.createContextManager = function() {
-    return new visicomp.core.ContextManager(this.getOwner());
+hax.core.Codeable.createContextManager = function() {
+    return new hax.core.ContextManager(this.getOwner());
 }
 
 //===================================
@@ -279,15 +279,15 @@ visicomp.core.Codeable.createContextManager = function() {
 //implementations must implement this function
 //This method takes the object function generated from code and processes it
 //to set the data for the object. (protected)
-//visicomp.core.Codeable.processObjectFunction 
+//hax.core.Codeable.processObjectFunction 
 
 /** This method sets the object function. */
-visicomp.core.Codeable.setObjectFunction = function(objectFunction) {
+hax.core.Codeable.setObjectFunction = function(objectFunction) {
     this.objectFunction = objectFunction;
 }
 
 /** This method sets the object function. */
-visicomp.core.Codeable.setContextSetter = function(contextSetter) {
+hax.core.Codeable.setContextSetter = function(contextSetter) {
     this.contextSetter = contextSetter;
 }
 

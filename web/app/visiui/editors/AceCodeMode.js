@@ -6,18 +6,18 @@
  * code is set to the empty string. If no action is desired, false or any value that evaluates to
  * false can be sent in.
  */
-visicomp.app.visiui.AceCodeMode = function(component,optionalOnBlankData,optionalEditorCodeWrapper) {
+hax.app.visiui.AceCodeMode = function(component,optionalOnBlankData,optionalEditorCodeWrapper) {
 	//base constructor
-	visicomp.app.visiui.AceCodeModeBase.call(this,component,"ace/mode/javascript");
+	hax.app.visiui.AceCodeModeBase.call(this,component,"ace/mode/javascript");
 	
 	this.onBlankData = optionalOnBlankData;
 	this.editorCodeWrapper = optionalEditorCodeWrapper;
 }
 
-visicomp.app.visiui.AceCodeMode.prototype = Object.create(visicomp.app.visiui.AceCodeModeBase.prototype);
-visicomp.app.visiui.AceCodeMode.prototype.constructor = visicomp.app.visiui.AceCodeMode;
+hax.app.visiui.AceCodeMode.prototype = Object.create(hax.app.visiui.AceCodeModeBase.prototype);
+hax.app.visiui.AceCodeMode.prototype.constructor = hax.app.visiui.AceCodeMode;
 	
-visicomp.app.visiui.AceCodeMode.prototype.showData = function(editOk) {
+hax.app.visiui.AceCodeMode.prototype.showData = function(editOk) {
 		
 	var table = this.component.getObject();
 	var functionBody = table.getFunctionBody();
@@ -33,14 +33,14 @@ visicomp.app.visiui.AceCodeMode.prototype.showData = function(editOk) {
 	this.editor.showData(codeText,editOk);
 }
 
-visicomp.app.visiui.AceCodeMode.prototype.onSave = function(text) {	
+hax.app.visiui.AceCodeMode.prototype.onSave = function(text) {	
 	
 	var table = this.component.getObject();
 	
 	if((this.onBlankData)&&(text === "")) {
 		//special case - clear code
 		var data = this.onBlankData.dataValue; 
-		visicomp.core.updatemember.updateData(table,data);
+		hax.core.updatemember.updateData(table,data);
 	}
 	else {
 		//standard case - edit code
@@ -55,7 +55,7 @@ visicomp.app.visiui.AceCodeMode.prototype.onSave = function(text) {
 
 		var supplementalCode = table.getSupplementalCode();
 		var argList = table.getArgList();
-		var actionResponse =  visicomp.core.updatemember.updateCode(table,argList,functionBody,supplementalCode);
+		var actionResponse =  hax.core.updatemember.updateCode(table,argList,functionBody,supplementalCode);
 		if(!actionResponse.getSuccess()) {
 			//show an error message
 			var msg = actionResponse.getErrorMsg();

@@ -3,11 +3,11 @@
  * 
  * This is not a class, but it is used for the prototype of the objects that inherit from it.
  */
-visicomp.app.visiui.TableEditComponent = {};
+hax.app.visiui.TableEditComponent = {};
 
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-visicomp.app.visiui.TableEditComponent.init = function(viewTypes,defaultView,optionalClearFunctionOnBlankInfo) {
+hax.app.visiui.TableEditComponent.init = function(viewTypes,defaultView,optionalClearFunctionOnBlankInfo) {
 	
 	this.viewTypes = viewTypes;
 	this.defaultView = defaultView;
@@ -33,11 +33,11 @@ visicomp.app.visiui.TableEditComponent.init = function(viewTypes,defaultView,opt
 }
 
 /** This value is used as the background color when an editor is read only. */
-visicomp.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
+hax.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
 /** This method populates the frame for this component. 
  * @protected */
-visicomp.app.visiui.TableEditComponent.setViewType = function(viewType) {
+hax.app.visiui.TableEditComponent.setViewType = function(viewType) {
 	//return if there is no change
 	if(this.viewType === viewType) return false;
     
@@ -60,10 +60,10 @@ visicomp.app.visiui.TableEditComponent.setViewType = function(viewType) {
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-//visicomp.app.visiui.TableEditComponent.getViewModeElement = function(viewType);
+//hax.app.visiui.TableEditComponent.getViewModeElement = function(viewType);
 
 //this function will update the view shown in the dropdown
-visicomp.app.visiui.TableEditComponent.updateViewDropdown = function(viewType) {
+hax.app.visiui.TableEditComponent.updateViewDropdown = function(viewType) {
     if(!viewType) {
         viewType = this.defaultView;
     }
@@ -72,7 +72,7 @@ visicomp.app.visiui.TableEditComponent.updateViewDropdown = function(viewType) {
 
 /** This method updates the table data 
  * @private */    
-visicomp.app.visiui.TableEditComponent.memberUpdated = function() {
+hax.app.visiui.TableEditComponent.memberUpdated = function() {
     var object = this.getObject();
     if(object.hasError()) {
         var errorMsg = "";
@@ -120,11 +120,11 @@ visicomp.app.visiui.TableEditComponent.memberUpdated = function() {
 	}
 }
 
-visicomp.app.visiui.TableEditComponent.getClearFunctionCallback = function() {
+hax.app.visiui.TableEditComponent.getClearFunctionCallback = function() {
 	var table = this.getObject();
 	var blankDataValue = this.clearFunctionOnBlankInfo.dataValue;
     return function() {
-        var actionResponse = visicomp.core.updatemember.updateData(table,blankDataValue); 
+        var actionResponse = hax.core.updatemember.updateData(table,blankDataValue); 
         if(!actionResponse.getSuccess()) {
             alert(actionResponse.getErrorMsg());
         }
@@ -133,19 +133,19 @@ visicomp.app.visiui.TableEditComponent.getClearFunctionCallback = function() {
 
 /** This method populates the frame for this component. 
  * @protected */
-visicomp.app.visiui.TableEditComponent.initUI = function() {
+hax.app.visiui.TableEditComponent.initUI = function() {
 	
 	this.setFixedContentElement();
 	
 	//create the view selection ui
-	this.select = visicomp.visiui.createElement("select",null,{
+	this.select = hax.visiui.createElement("select",null,{
         "marginRight":"3px",
         "backgroundColor":"transparent"
     });
     
     for(var i = 0; i < this.viewTypes.length; i++) {
         var entry = this.viewTypes[i];
-        this.select.add(visicomp.visiui.createElement("option",{"text":entry}));
+        this.select.add(hax.visiui.createElement("option",{"text":entry}));
     }
     
     //create on functions
@@ -172,10 +172,10 @@ visicomp.app.visiui.TableEditComponent.initUI = function() {
 }
 
 /** @private */
-visicomp.app.visiui.TableEditComponent.showModeElement = function(viewModeElement) {
+hax.app.visiui.TableEditComponent.showModeElement = function(viewModeElement) {
     
 	var contentDiv = this.getContentElement();
-	visicomp.core.util.removeAllChildren(contentDiv);
+	hax.core.util.removeAllChildren(contentDiv);
 	
     if(viewModeElement) {
 		var viewDiv = viewModeElement.getElement();
@@ -189,7 +189,7 @@ visicomp.app.visiui.TableEditComponent.showModeElement = function(viewModeElemen
 }
 
 /** @protected */
-visicomp.app.visiui.TableEditComponent.destroy = function() {
+hax.app.visiui.TableEditComponent.destroy = function() {
     if(this.viewModeElement) {
         this.viewModeElement.destroy();
     }

@@ -1,5 +1,5 @@
 /** This namespace contains the action to delete a member. */
-visicomp.core.deletemember = {};
+hax.core.deletemember = {};
 
 /** MEMBER DELETED EVENT
  * This listener event is fired when after a member is deleted, to be used to respond
@@ -8,14 +8,14 @@ visicomp.core.deletemember = {};
  * Event object Format:
  * [child]
  */
-visicomp.core.deletemember.MEMBER_DELETED_EVENT = "memberDeleted";
+hax.core.deletemember.MEMBER_DELETED_EVENT = "memberDeleted";
 
 
 /** This method should be called to delete a child. The return value is an ActionResponse.
  * It will by default create its own action response object, however optionally an
  * existing action response may be passed in. */
-visicomp.core.deletemember.deleteMember = function(member,optionalActionResponse) {
-	var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
+hax.core.deletemember.deleteMember = function(member,optionalActionResponse) {
+	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.core.ActionResponse();
     
     try {
         
@@ -33,22 +33,22 @@ visicomp.core.deletemember.deleteMember = function(member,optionalActionResponse
 
         //do data updates if needed
         if(updateDataList.length > 0) {
-            visicomp.core.updatemember.updateObjectFunctionOrData(updateDataList,
+            hax.core.updatemember.updateObjectFunctionOrData(updateDataList,
                 recalculateList,
                 setDataList,
                 actionResponse);
         } 
 
-        visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
+        hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
 
         //dispatch events
-        workspace.dispatchEvent(visicomp.core.deletemember.MEMBER_DELETED_EVENT,fullName);
-        visicomp.core.updatemember.fireUpdatedEventList(setDataList);
-        visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
+        workspace.dispatchEvent(hax.core.deletemember.MEMBER_DELETED_EVENT,fullName);
+        hax.core.updatemember.fireUpdatedEventList(setDataList);
+        hax.core.updatemember.fireUpdatedEventList(recalculateList);
 	}
 	catch(error) {
         //unknown application error
-        var actionError = visicomp.core.ActionError.processException(error,"AppException",true);
+        var actionError = hax.core.ActionError.processException(error,"AppException",true);
         actionResponse.addError(actionError);
     }
     

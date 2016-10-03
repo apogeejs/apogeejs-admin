@@ -1,33 +1,33 @@
 
-visicomp.visiui.Tab = function(name, tabFrame) {
+hax.visiui.Tab = function(name, tabFrame) {
     
     //create the tab element
     var element = document.createElement("div");
 
     //base init
-    visicomp.core.EventManager.init.call(this);
-    visicomp.visiui.ParentContainer.init.call(this,element,this);
-	visicomp.visiui.ParentHighlighter.init.call(this,element);
+    hax.core.EventManager.init.call(this);
+    hax.visiui.ParentContainer.init.call(this,element,this);
+	hax.visiui.ParentHighlighter.init.call(this,element);
     
     this.name = name;
     this.isShowing = false;
     
-    visicomp.visiui.applyStyle(element,visicomp.visiui.Tab.TAB_WINDOW_STYLE);
+    hax.visiui.applyStyle(element,hax.visiui.Tab.TAB_WINDOW_STYLE);
 	this.displayFrame = element;
     
     //add handlers for resize and show
     var instance = this;
-    tabFrame.addListener(visicomp.visiui.TabFrame.TABS_RESIZED, function() {  
-        instance.dispatchEvent(visicomp.visiui.WindowFrame.RESIZED,this);
+    tabFrame.addListener(hax.visiui.TabFrame.TABS_RESIZED, function() {  
+        instance.dispatchEvent(hax.visiui.WindowFrame.RESIZED,this);
     });
-    tabFrame.addListener(visicomp.visiui.TabFrame.TAB_SHOWN, function(activeTabName) {
+    tabFrame.addListener(hax.visiui.TabFrame.TAB_SHOWN, function(activeTabName) {
         if(activeTabName == instance.name) {
             instance.isShowing = true;
-            instance.dispatchEvent(visicomp.visiui.ParentContainer.CONTENT_SHOWN,instance);
+            instance.dispatchEvent(hax.visiui.ParentContainer.CONTENT_SHOWN,instance);
         }
         else {
             instance.isShowing = false;
-            instance.dispatchEvent(visicomp.visiui.ParentContainer.CONTENT_HIDDEN,instance);
+            instance.dispatchEvent(hax.visiui.ParentContainer.CONTENT_HIDDEN,instance);
         }
     });
     
@@ -35,11 +35,11 @@ visicomp.visiui.Tab = function(name, tabFrame) {
 }
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.visiui.Tab,visicomp.core.EventManager);
-visicomp.core.util.mixin(visicomp.visiui.Tab,visicomp.visiui.ParentContainer);
-visicomp.core.util.mixin(visicomp.visiui.Tab,visicomp.visiui.ParentHighlighter);
+hax.core.util.mixin(hax.visiui.Tab,hax.core.EventManager);
+hax.core.util.mixin(hax.visiui.Tab,hax.visiui.ParentContainer);
+hax.core.util.mixin(hax.visiui.Tab,hax.visiui.ParentHighlighter);
 
-visicomp.visiui.Tab.TAB_WINDOW_STYLE = {
+hax.visiui.Tab.TAB_WINDOW_STYLE = {
     "top":"0px",
     "left":"0px",
 	"height":"100%",
@@ -49,6 +49,6 @@ visicomp.visiui.Tab.TAB_WINDOW_STYLE = {
 }
 
 /** This method must be implemented in inheriting objects. */
-visicomp.visiui.Tab.prototype.getContentIsShowing = function() {
+hax.visiui.Tab.prototype.getContentIsShowing = function() {
     return this.isShowing;
 }

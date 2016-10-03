@@ -2,12 +2,12 @@
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-visicomp.app.visiui.BasicControlComponent = function(workspaceUI,control,generator,componentJson) {
+hax.app.visiui.BasicControlComponent = function(workspaceUI,control,generator,componentJson) {
     //base init
-    visicomp.app.visiui.Component.init.call(this,workspaceUI,control,generator,componentJson);
-	visicomp.app.visiui.TableEditComponent.init.call(this,
-		visicomp.app.visiui.BasicControlComponent.VIEW_MODES,
-		visicomp.app.visiui.BasicControlComponent.DEFAULT_VIEW
+    hax.app.visiui.Component.init.call(this,workspaceUI,control,generator,componentJson);
+	hax.app.visiui.TableEditComponent.init.call(this,
+		hax.app.visiui.BasicControlComponent.VIEW_MODES,
+		hax.app.visiui.BasicControlComponent.DEFAULT_VIEW
 	);
 	
 	var resource = control.getResource();
@@ -15,51 +15,51 @@ visicomp.app.visiui.BasicControlComponent = function(workspaceUI,control,generat
 };
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.app.visiui.BasicControlComponent,visicomp.app.visiui.Component);
-visicomp.core.util.mixin(visicomp.app.visiui.BasicControlComponent,visicomp.app.visiui.TableEditComponent);
+hax.core.util.mixin(hax.app.visiui.BasicControlComponent,hax.app.visiui.Component);
+hax.core.util.mixin(hax.app.visiui.BasicControlComponent,hax.app.visiui.TableEditComponent);
 
 //==============================
 // Protected and Private Instance Methods
 //==============================
 
-visicomp.app.visiui.BasicControlComponent.prototype.initEmptyResource = function() {
+hax.app.visiui.BasicControlComponent.prototype.initEmptyResource = function() {
 	this.update("","","","");
 }
 
-visicomp.app.visiui.BasicControlComponent.prototype.getOutputElement = function() {
+hax.app.visiui.BasicControlComponent.prototype.getOutputElement = function() {
 	return this.outputMode.getElement();
 }
 
-visicomp.app.visiui.BasicControlComponent.VIEW_OUTPUT = "Output";
-visicomp.app.visiui.BasicControlComponent.VIEW_CODE = "Code";
-visicomp.app.visiui.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+hax.app.visiui.BasicControlComponent.VIEW_OUTPUT = "Output";
+hax.app.visiui.BasicControlComponent.VIEW_CODE = "Code";
+hax.app.visiui.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
 
-visicomp.app.visiui.BasicControlComponent.VIEW_MODES = [
-	visicomp.app.visiui.BasicControlComponent.VIEW_OUTPUT,
-	visicomp.app.visiui.BasicControlComponent.VIEW_CODE,
-    visicomp.app.visiui.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE
+hax.app.visiui.BasicControlComponent.VIEW_MODES = [
+	hax.app.visiui.BasicControlComponent.VIEW_OUTPUT,
+	hax.app.visiui.BasicControlComponent.VIEW_CODE,
+    hax.app.visiui.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE
 ];
 
-visicomp.app.visiui.BasicControlComponent.DEFAULT_VIEW = visicomp.app.visiui.BasicControlComponent.VIEW_OUTPUT;
+hax.app.visiui.BasicControlComponent.DEFAULT_VIEW = hax.app.visiui.BasicControlComponent.VIEW_OUTPUT;
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-visicomp.app.visiui.BasicControlComponent.prototype.getViewModeElement = function(viewType) {
+hax.app.visiui.BasicControlComponent.prototype.getViewModeElement = function(viewType) {
 	
 	//create the new view element;
 	switch(viewType) {
 		
-		case visicomp.app.visiui.BasicControlComponent.VIEW_OUTPUT:
+		case hax.app.visiui.BasicControlComponent.VIEW_OUTPUT:
 			if(!this.outputMode) {
-				this.outputMode = new visicomp.app.visiui.ResourceOutputMode(this);
+				this.outputMode = new hax.app.visiui.ResourceOutputMode(this);
 			}
 			return this.outputMode;
 			
-		case visicomp.app.visiui.BasicControlComponent.VIEW_CODE:
-			return new visicomp.app.visiui.AceCodeMode(this,false);
+		case hax.app.visiui.BasicControlComponent.VIEW_CODE:
+			return new hax.app.visiui.AceCodeMode(this,false);
 			
-		case visicomp.app.visiui.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new visicomp.app.visiui.AceSupplementalMode(this);
+		case hax.app.visiui.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
+			return new hax.app.visiui.AceSupplementalMode(this);
 			
 		default:
 //temporary error handling...
@@ -72,15 +72,15 @@ visicomp.app.visiui.BasicControlComponent.prototype.getViewModeElement = functio
 // Static methods
 //======================================
 
-visicomp.app.visiui.BasicControlComponent.createBaseComponent = function(workspaceUI,data,resource,generator,componentOptions) {
+hax.app.visiui.BasicControlComponent.createBaseComponent = function(workspaceUI,data,resource,generator,componentOptions) {
     
     var parent = workspaceUI.getObjectByKey(data.parentKey);
     //should throw an exception if parent is invalid!
     
     var json = {};
     json.name = data.name;
-    json.type = visicomp.core.Control.generator.type;
-    var actionResponse = visicomp.core.createmember.createMember(parent,json);
+    json.type = hax.core.Control.generator.type;
+    var actionResponse = hax.core.createmember.createMember(parent,json);
     
     var control = actionResponse.member;
     if(control) {
@@ -88,15 +88,15 @@ visicomp.app.visiui.BasicControlComponent.createBaseComponent = function(workspa
 		control.updateResource(resource);
 		
         //create the component
-        var basicControlComponent = new visicomp.app.visiui.BasicControlComponent(workspaceUI,control,generator,componentOptions);
+        var basicControlComponent = new hax.app.visiui.BasicControlComponent(workspaceUI,control,generator,componentOptions);
         actionResponse.component = basicControlComponent;
     }
     return actionResponse;
 }
 
 
-visicomp.app.visiui.BasicControlComponent.createBaseComponentFromJson = function(workspaceUI,member,generator,componentJson) {
-    var customControlComponent = new visicomp.app.visiui.BasicControlComponent(workspaceUI,member,generator,componentJson);
+hax.app.visiui.BasicControlComponent.createBaseComponentFromJson = function(workspaceUI,member,generator,componentJson) {
+    var customControlComponent = new hax.app.visiui.BasicControlComponent(workspaceUI,member,generator,componentJson);
     return customControlComponent;
 }
 

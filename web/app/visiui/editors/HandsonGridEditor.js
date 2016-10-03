@@ -1,12 +1,12 @@
 /** Editor that uses the Ace text editor.
  * 
- * @param {type} component - the visicomp component
+ * @param {type} component - the hax component
  * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
  * @param {type} onCancel - returns true if the edit should end
  */
-visicomp.app.visiui.HandsonGridEditor = function(component,onSave,onCancel) {
+hax.app.visiui.HandsonGridEditor = function(component,onSave,onCancel) {
    
-	this.outsideDiv = visicomp.visiui.createElement("div",null,{
+	this.outsideDiv = hax.visiui.createElement("div",null,{
 		"position":"absolute",
         "top":"0px",
         "left":"0px",
@@ -17,7 +17,7 @@ visicomp.app.visiui.HandsonGridEditor = function(component,onSave,onCancel) {
 	
 //TBR initial sizing. now I just set it to a dummy number	
 	
-	this.gridDiv = visicomp.visiui.createElement("div",null,{
+	this.gridDiv = hax.visiui.createElement("div",null,{
 		"position":"absolute",
         "top":"0px",
         "left":"0px",
@@ -45,7 +45,7 @@ visicomp.app.visiui.HandsonGridEditor = function(component,onSave,onCancel) {
             instance.gridControl.render();
         }
     }
-   visicomp.visiui.setResizeListener(this.outsideDiv, resizeCallback);
+   hax.visiui.setResizeListener(this.outsideDiv, resizeCallback);
 	
 	//grid edited function
 	this.gridEdited = function(args) {
@@ -71,17 +71,17 @@ visicomp.app.visiui.HandsonGridEditor = function(component,onSave,onCancel) {
     
 }
 
-visicomp.app.visiui.HandsonGridEditor.prototype.save = function(argArray) {
+hax.app.visiui.HandsonGridEditor.prototype.save = function(argArray) {
 	//no action for this case
 	if(argArray[1] == "loadData") return;
 
 	//update "input" data before calling update
-	this.inputData = visicomp.core.util.deepJsonCopy(this.gridControl.getData());
+	this.inputData = hax.core.util.deepJsonCopy(this.gridControl.getData());
 
 	this.parentSave(this.inputData);
 }
 
-visicomp.app.visiui.HandsonGridEditor.prototype.cancel = function() {
+hax.app.visiui.HandsonGridEditor.prototype.cancel = function() {
 	//reset the original data
 	this.parentCancel();
 }
@@ -90,17 +90,17 @@ visicomp.app.visiui.HandsonGridEditor.prototype.cancel = function() {
 // "Package" Methods
 //=============================
 
-visicomp.app.visiui.HandsonGridEditor.prototype.getElement = function() {
+hax.app.visiui.HandsonGridEditor.prototype.getElement = function() {
 	return this.outsideDiv;
 }
 	
-visicomp.app.visiui.HandsonGridEditor.prototype.showData = function(json,editOk) {
+hax.app.visiui.HandsonGridEditor.prototype.showData = function(json,editOk) {
 	if((this.inputData === json)&&(editOk)) return;
 	
 	var oldEditOk = this.editOk;
 	this.editOk = editOk;
 	this.inputData = json;
-	var editData = visicomp.core.util.deepJsonCopy(json);
+	var editData = hax.core.util.deepJsonCopy(json);
 	
 	if((!this.gridControl)||(oldEditOk !== editOk)) {
 		this.createNewGrid();
@@ -113,11 +113,11 @@ visicomp.app.visiui.HandsonGridEditor.prototype.showData = function(json,editOk)
         this.gridDiv.style.backgroundColor = "";
     }
     else {
-        this.gridDiv.style.backgroundColor = visicomp.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
+        this.gridDiv.style.backgroundColor = hax.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
     }
 }
 
-visicomp.app.visiui.HandsonGridEditor.prototype.destroy = function() {
+hax.app.visiui.HandsonGridEditor.prototype.destroy = function() {
 	if(this.gridControl) {
         this.gridControl.destroy();
         this.gridControl = null;
@@ -130,7 +130,7 @@ visicomp.app.visiui.HandsonGridEditor.prototype.destroy = function() {
 
 /** This method creates a new grid. 
  * @private */
-visicomp.app.visiui.HandsonGridEditor.prototype.createNewGrid = function() {
+hax.app.visiui.HandsonGridEditor.prototype.createNewGrid = function() {
     if(this.gridControl) {
         this.gridControl.destroy();
         this.gridControl = null;

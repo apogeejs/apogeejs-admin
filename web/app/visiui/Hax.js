@@ -1,13 +1,13 @@
-if(!visicomp.app) visicomp.app = {};
-if(!visicomp.app.visiui) visicomp.app.visiui = {};
-if(!visicomp.app.visiui.dialog) visicomp.app.visiui.dialog = {};
+if(!hax.app) hax.app = {};
+if(!hax.app.visiui) hax.app.visiui = {};
+if(!hax.app.visiui.dialog) hax.app.visiui.dialog = {};
 
-/** This is the main class of the visicomp application. */
-visicomp.app.visiui.VisiComp = function(containerId) {
+/** This is the main class of the hax application. */
+hax.app.visiui.Hax = function(containerId) {
     
     //temp - until we figure out what to do with menu and events
     //for now we have application events, using the EventManager mixin below.
-    visicomp.core.EventManager.init.call(this);
+    hax.core.EventManager.init.call(this);
     
     //workspaces
     this.workspaceUIs = {};
@@ -18,7 +18,7 @@ visicomp.app.visiui.VisiComp = function(containerId) {
     //these are a list of names of components that go in the "added component" list
     this.additionalComponents = [];
 	
-	this.linkManager = new visicomp.app.visiui.LinkManager();
+	this.linkManager = new hax.app.visiui.LinkManager();
 	
 	//load the standard component generators
 	this.loadComponentGenerators();
@@ -27,15 +27,15 @@ visicomp.app.visiui.VisiComp = function(containerId) {
 	this.createUI(containerId);
 	
 	//create a default workspace 
-    visicomp.app.visiui.createworkspace.createWorkspace(this,visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME);
+    hax.app.visiui.createworkspace.createWorkspace(this,hax.app.visiui.Hax.DEFAULT_WORKSPACE_NAME);
 }
 	
 //add components to this class
-visicomp.core.util.mixin(visicomp.app.visiui.VisiComp,visicomp.core.EventManager);
+hax.core.util.mixin(hax.app.visiui.Hax,hax.core.EventManager);
 
-visicomp.app.visiui.VisiComp.DEFAULT_WORKSPACE_NAME = "workspace";
+hax.app.visiui.Hax.DEFAULT_WORKSPACE_NAME = "workspace";
 
-visicomp.app.visiui.VisiComp.prototype.getWorkspace = function(name) {
+hax.app.visiui.Hax.prototype.getWorkspace = function(name) {
     var workspaceUI = this.getWorkspaceUI(name);
 	if(workspaceUI) {
 		return workspaceUI.getWorkspace();
@@ -45,11 +45,11 @@ visicomp.app.visiui.VisiComp.prototype.getWorkspace = function(name) {
 	}
 }
 
-visicomp.app.visiui.VisiComp.prototype.getWorkspaceUI = function(name) {
+hax.app.visiui.Hax.prototype.getWorkspaceUI = function(name) {
 	return this.workspaceUIs[name];
 }
 
-visicomp.app.visiui.VisiComp.prototype.getActiveWorkspaceUI = function() {
+hax.app.visiui.Hax.prototype.getActiveWorkspaceUI = function() {
     var name = this.tabFrame.getActiveTabTitle();
     if(name) {
         return this.workspaceUIs[name];
@@ -59,7 +59,7 @@ visicomp.app.visiui.VisiComp.prototype.getActiveWorkspaceUI = function() {
     }
 }
 
-visicomp.app.visiui.VisiComp.prototype.getActiveWorkspace = function() {
+hax.app.visiui.Hax.prototype.getActiveWorkspace = function() {
     var workspaceUI = this.getActiveWorkspaceUI();
 	if(workspaceUI) {
 		return workspaceUI.getWorkspace();
@@ -76,11 +76,11 @@ visicomp.app.visiui.VisiComp.prototype.getActiveWorkspace = function() {
 /** This method makes an empty workspace ui object. This throws an exception if
  * the workspace can not be opened.
  */
-visicomp.app.visiui.VisiComp.prototype.addWorkspaceUI = function(workspaceUI,name) {
+hax.app.visiui.Hax.prototype.addWorkspaceUI = function(workspaceUI,name) {
     
     //we can only have one workspace of a given name!
     if(this.workspaceUIs[name]) {
-        throw visicomp.core.util.createError("There is already an open workspace with the name " + name,false);
+        throw hax.core.util.createError("There is already an open workspace with the name " + name,false);
     }
     
 	var tab = this.tabFrame.addTab(name);
@@ -91,7 +91,7 @@ visicomp.app.visiui.VisiComp.prototype.addWorkspaceUI = function(workspaceUI,nam
 }
 
 /** This method closes the active workspace. */
-visicomp.app.visiui.VisiComp.prototype.removeWorkspaceUI = function(name) {
+hax.app.visiui.Hax.prototype.removeWorkspaceUI = function(name) {
     //remove the workspace from the app
     delete this.workspaceUIs[name];
     this.tabFrame.removeTab(name);
@@ -108,7 +108,7 @@ visicomp.app.visiui.VisiComp.prototype.removeWorkspaceUI = function(name) {
  * workspase. The linksLoadedCallback is optional. It is called when all links have
  * been loaded on the page.
  */
-visicomp.app.visiui.VisiComp.prototype.updateWorkspaceLinks = function(workspaceName,addList,removeList,linksLoadedCallback) {
+hax.app.visiui.Hax.prototype.updateWorkspaceLinks = function(workspaceName,addList,removeList,linksLoadedCallback) {
 	this.linkManager.updateWorkspaceLinks(workspaceName,addList,removeList,linksLoadedCallback);
 }
 
@@ -117,7 +117,7 @@ visicomp.app.visiui.VisiComp.prototype.updateWorkspaceLinks = function(workspace
 //=================================
 
 /** This method registers a component. */
-visicomp.app.visiui.VisiComp.prototype.registerComponent = function(componentGenerator) {
+hax.app.visiui.Hax.prototype.registerComponent = function(componentGenerator) {
     var name = componentGenerator.uniqueName;
     if(this.componentGenerators[name]) {
 //in the future we can maybe do something other than punt
@@ -131,7 +131,7 @@ visicomp.app.visiui.VisiComp.prototype.registerComponent = function(componentGen
 }
 
 /** This method registers a component. */
-visicomp.app.visiui.VisiComp.prototype.getComponentGenerator = function(name) {
+hax.app.visiui.Hax.prototype.getComponentGenerator = function(name) {
 	return this.componentGenerators[name];
 }
 //==========================
@@ -140,21 +140,21 @@ visicomp.app.visiui.VisiComp.prototype.getComponentGenerator = function(name) {
 
 /** This method adds the standard components to the app. 
  * @private */
-visicomp.app.visiui.VisiComp.prototype.loadComponentGenerators = function() {
+hax.app.visiui.Hax.prototype.loadComponentGenerators = function() {
     //standard components
-    this.registerStandardComponent(visicomp.app.visiui.JsonTableComponent.generator);
-    this.registerStandardComponent(visicomp.app.visiui.GridTableComponent.generator);
-	this.registerStandardComponent(visicomp.app.visiui.FolderComponent.generator);
-	this.registerStandardComponent(visicomp.app.visiui.FunctionComponent.generator);
-    this.registerStandardComponent(visicomp.app.visiui.FolderFunctionComponent.generator);
+    this.registerStandardComponent(hax.app.visiui.JsonTableComponent.generator);
+    this.registerStandardComponent(hax.app.visiui.GridTableComponent.generator);
+	this.registerStandardComponent(hax.app.visiui.FolderComponent.generator);
+	this.registerStandardComponent(hax.app.visiui.FunctionComponent.generator);
+    this.registerStandardComponent(hax.app.visiui.FolderFunctionComponent.generator);
 	
     //additional components
-    this.registerComponent(visicomp.app.visiui.CustomControlComponent.generator);
+    this.registerComponent(hax.app.visiui.CustomControlComponent.generator);
 }
 
 /** This method registers a component. 
  * @private */
-visicomp.app.visiui.VisiComp.prototype.registerStandardComponent = function(componentGenerator) {
+hax.app.visiui.Hax.prototype.registerStandardComponent = function(componentGenerator) {
     var name = componentGenerator.uniqueName;
     if(this.componentGenerators[name]) {
 //in the future we can maybe do something other than punt
@@ -169,9 +169,9 @@ visicomp.app.visiui.VisiComp.prototype.registerStandardComponent = function(comp
 
 /** This method creates the app ui. 
  * @private */
-visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
+hax.app.visiui.Hax.prototype.createUI = function(containerId) {
     
-    var windowElements = visicomp.visiui.initWindows(containerId);
+    var windowElements = hax.visiui.initWindows(containerId);
     var topContainer = windowElements.baseElement;
     
     var container = document.createElement("div");
@@ -181,7 +181,7 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
         "width":"100%",
         "height":"100%"
     };
-    visicomp.visiui.applyStyle(container,containerStyle);
+    hax.visiui.applyStyle(container,containerStyle);
     topContainer.appendChild(container);
     
     
@@ -196,7 +196,7 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
         "width":"100%",
         "padding":"2px"
     };
-    visicomp.visiui.applyStyle(menuBar,menuBarStyle);
+    hax.visiui.applyStyle(menuBar,menuBarStyle);
     menuBar.className = "visicomp_menuBarStyle";
     container.appendChild(menuBar);
     
@@ -204,33 +204,33 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
     var menu;
 
     //Workspace menu
-    menu = visicomp.visiui.Menu.createMenu("Workspace");
+    menu = hax.visiui.Menu.createMenu("Workspace");
     menuBar.appendChild(menu.getElement());
     
-    var newCallback = visicomp.app.visiui.createworkspace.getCreateCallback(this);
+    var newCallback = hax.app.visiui.createworkspace.getCreateCallback(this);
     menu.addCallbackMenuItem("New",newCallback);
     
-    var openCallback = visicomp.app.visiui.openworkspace.getOpenCallback(this);
+    var openCallback = hax.app.visiui.openworkspace.getOpenCallback(this);
     menu.addCallbackMenuItem("Open",openCallback);
     
-    var saveCallback = visicomp.app.visiui.saveworkspace.getSaveCallback(this);
+    var saveCallback = hax.app.visiui.saveworkspace.getSaveCallback(this);
     menu.addCallbackMenuItem("Save",saveCallback);
     
-    var closeCallback = visicomp.app.visiui.closeworkspace.getCloseCallback(this);
+    var closeCallback = hax.app.visiui.closeworkspace.getCloseCallback(this);
     menu.addCallbackMenuItem("Close",closeCallback);	
 	
     //Components Menu
-    menu = visicomp.visiui.Menu.createMenu("Components");
+    menu = hax.visiui.Menu.createMenu("Components");
     menuBar.appendChild(menu.getElement());
     
     //add create child elements
     this.populateAddChildMenu(menu);
     
     //libraries menu
-    menu = visicomp.visiui.Menu.createMenu("Libraries");
+    menu = hax.visiui.Menu.createMenu("Libraries");
     menuBar.appendChild(menu.getElement());
     
-    var linksCallback = visicomp.app.visiui.updatelinks.getUpdateLinksCallback(this);
+    var linksCallback = hax.app.visiui.updatelinks.getUpdateLinksCallback(this);
     menu.addCallbackMenuItem("Update Links",linksCallback);
 
     //----------------------
@@ -245,13 +245,13 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
         "width":"100%",
         "height":"100%"
     }
-    visicomp.visiui.applyStyle(tabFrameDiv,tabFrameDivStyle);
+    hax.visiui.applyStyle(tabFrameDiv,tabFrameDivStyle);
     container.appendChild(tabFrameDiv);
     
     var options = {};
     options.tabBarColorClass = "visicomp_tabFrameColor";
     options.activeTabColorClass = "visicomp_tabFrameActiveColor";
-    this.tabFrame = new visicomp.visiui.TabFrame(tabFrameDiv,options);
+    this.tabFrame = new hax.visiui.TabFrame(tabFrameDiv,options);
     
 }
 
@@ -259,29 +259,29 @@ visicomp.app.visiui.VisiComp.prototype.createUI = function(containerId) {
 // Menu Functions
 //=================================
 
-visicomp.app.visiui.VisiComp.prototype.populateAddChildMenu = function(menu,optionalInitialValues,optionalComponentOptions) {
+hax.app.visiui.Hax.prototype.populateAddChildMenu = function(menu,optionalInitialValues,optionalComponentOptions) {
     
     for(var i = 0; i < this.standardComponents.length; i++) {
         var key = this.standardComponents[i];
         var generator = this.componentGenerators[key];
         var title = "Add " + generator.displayName;
-        var callback = visicomp.app.visiui.updatecomponent.getAddComponentCallback(this,generator,optionalInitialValues,optionalComponentOptions);
+        var callback = hax.app.visiui.updatecomponent.getAddComponentCallback(this,generator,optionalInitialValues,optionalComponentOptions);
         menu.addCallbackMenuItem(title,callback);
     }
 
     //add the additional component item
-    var componentCallback = visicomp.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback(this,optionalInitialValues,optionalComponentOptions);
+    var componentCallback = hax.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback(this,optionalInitialValues,optionalComponentOptions);
     menu.addCallbackMenuItem("Other Components...",componentCallback);
 }
 
 /** This loads the context menu for the key. It should be update if
  *the key index changes. */
-visicomp.app.visiui.VisiComp.prototype.setFolderContextMenu = function(contentElement,folder) {
+hax.app.visiui.Hax.prototype.setFolderContextMenu = function(contentElement,folder) {
     
     var app = this;
 
     var initialValues = {};
-    initialValues.parentKey = visicomp.app.visiui.WorkspaceUI.getObjectKey(folder);
+    initialValues.parentKey = hax.app.visiui.WorkspaceUI.getObjectKey(folder);
     
     contentElement.oncontextmenu = function(event) {
         event.preventDefault();
@@ -296,10 +296,10 @@ visicomp.app.visiui.VisiComp.prototype.setFolderContextMenu = function(contentEl
             componentOptions.coordInfo = coordInfo;
         }
         
-        var contextMenu = new visicomp.visiui.MenuBody();
+        var contextMenu = new hax.visiui.MenuBody();
         app.populateAddChildMenu(contextMenu,initialValues,componentOptions);
         
-        visicomp.visiui.Menu.showContextMenu(contextMenu,event);
+        hax.visiui.Menu.showContextMenu(contextMenu,event);
     }
 }
 

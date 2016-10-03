@@ -1,15 +1,15 @@
   
-visicomp.core.codeCompiler = {};
+hax.core.codeCompiler = {};
 
 /** This method analyzes the code and creates the object function and dependencies. 
  * The results are loaded into the passed object processedCodeData.
  * @private */
-visicomp.core.codeCompiler.processCode = function(codeInfo,
+hax.core.codeCompiler.processCode = function(codeInfo,
         contextManager,
         codeLabel) {
     
     //analyze the code
-    var combinedFunctionBody = visicomp.core.codeCompiler.createCombinedFunctionBody(
+    var combinedFunctionBody = hax.core.codeCompiler.createCombinedFunctionBody(
         codeInfo.argList, 
         codeInfo.functionBody, 
         codeInfo.supplementalCode, 
@@ -18,7 +18,7 @@ visicomp.core.codeCompiler.processCode = function(codeInfo,
     //get the accessed variables
     //
     //parse the code and get variabls dependencies
-    var analyzeOutput = visicomp.core.codeAnalysis.analyzeCode(combinedFunctionBody);
+    var analyzeOutput = hax.core.codeAnalysis.analyzeCode(combinedFunctionBody);
     
     if(analyzeOutput.success) {
         codeInfo.varInfo = analyzeOutput.varInfo;
@@ -29,11 +29,11 @@ visicomp.core.codeCompiler.processCode = function(codeInfo,
     }
 
     //create the object function and context setter from the code text
-    var generatorFunction = visicomp.core.codeCompiler.createObjectFunction(codeInfo.varInfo, combinedFunctionBody);
+    var generatorFunction = hax.core.codeCompiler.createObjectFunction(codeInfo.varInfo, combinedFunctionBody);
     codeInfo.generatorFunction = generatorFunction;
     
     //calculate dependencies
-	codeInfo.dependencyList = visicomp.core.codeDependencies.getDependencyInfo(
+	codeInfo.dependencyList = hax.core.codeDependencies.getDependencyInfo(
             codeInfo.varInfo,
             contextManager);
     
@@ -43,7 +43,7 @@ visicomp.core.codeCompiler.processCode = function(codeInfo,
 
 /** This method creates the user code object function body. 
  * @private */
-visicomp.core.codeCompiler.createCombinedFunctionBody = function(argList,
+hax.core.codeCompiler.createCombinedFunctionBody = function(argList,
         functionBody, 
         supplementalCode,
         codeLabel) {
@@ -51,8 +51,8 @@ visicomp.core.codeCompiler.createCombinedFunctionBody = function(argList,
     var argListString = argList.join(",");
     
     //create the code body
-    var combinedFunctionBody = visicomp.core.util.formatString(
-        visicomp.core.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT,
+    var combinedFunctionBody = hax.core.util.formatString(
+        hax.core.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT,
 		codeLabel,
         argListString,
         functionBody,
@@ -64,7 +64,7 @@ visicomp.core.codeCompiler.createCombinedFunctionBody = function(argList,
 
 /** This method creates the wrapped user code object function, including the context variables. 
  * @private */
-visicomp.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunctionBody) {
+hax.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunctionBody) {
     
     var contextDeclarationText = "";
     var contextSetterBody = "";
@@ -87,8 +87,8 @@ visicomp.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunc
     }
     
     //create the generator for the object function
-    var generatorBody = visicomp.core.util.formatString(
-        visicomp.core.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT,
+    var generatorBody = hax.core.util.formatString(
+        hax.core.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT,
 		contextDeclarationText,
         contextSetterBody,
         combinedFunctionBody
@@ -109,7 +109,7 @@ visicomp.core.codeCompiler.createObjectFunction = function(varInfo, combinedFunc
  * 
  * @private
  */
-visicomp.core.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT = [
+hax.core.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT = [
 "//{0}",
 "",
 "//supplemental code",
@@ -135,7 +135,7 @@ visicomp.core.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT = [
  * 2: object function body
  * @private
  */
-visicomp.core.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT = [
+hax.core.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "'use strict'",
 "//declare context variables",
 "{0}",

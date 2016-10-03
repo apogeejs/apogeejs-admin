@@ -1,4 +1,4 @@
-visicomp.core.action = {};
+hax.core.action = {};
 
 /** This class encapsulates a response to an action. It include a success flag,
  * a list of ActionErrors, and a fatal flag. Success is set to true unless there
@@ -6,7 +6,7 @@ visicomp.core.action = {};
  * When processing an action, only model data errors should be set. A code error 
  * will be translated to a data error when recalculate is called. Application 
  * errors can also be set. */
-visicomp.core.ActionResponse = function() {
+hax.core.ActionResponse = function() {
     this.success = true;
     this.errors = [];
     this.fatal = false;
@@ -14,7 +14,7 @@ visicomp.core.ActionResponse = function() {
 
 /** This method adds an error to the error list for this action. It also sets 
  * success to false. */
-visicomp.core.ActionResponse.prototype.addError = function(actionError) {
+hax.core.ActionResponse.prototype.addError = function(actionError) {
     this.success = false;
     if(actionError.getIsFatal()) {
         this.fatal = true;
@@ -26,12 +26,12 @@ visicomp.core.ActionResponse.prototype.addError = function(actionError) {
 }
 
 /** This method returns false if there were any errors during this action. */
-visicomp.core.ActionResponse.prototype.getSuccess = function() {
+hax.core.ActionResponse.prototype.getSuccess = function() {
     return this.success;
 }
 
 /** This method returns the error message for this action. It is only valid if success = false. */
-visicomp.core.ActionResponse.prototype.getErrorMsg = function() {
+hax.core.ActionResponse.prototype.getErrorMsg = function() {
     var msg = "";
     if(this.fatal) {
         msg += "Unknown Error: The application is in an indeterminant state. It is recommended it be closed.\n";

@@ -5,7 +5,7 @@
  * iframe document body.
  */
 
-visicomp.visiui.setResizeListener = function(element, resizeCallback){
+hax.visiui.setResizeListener = function(element, resizeCallback){
 
     var styleJson = {
         "position":"absolute",
@@ -29,12 +29,12 @@ visicomp.visiui.setResizeListener = function(element, resizeCallback){
     }
 
     //create and attach element
-    var dummyFrameElement = visicomp.visiui.createElement("iframe",null,styleJson);
+    var dummyFrameElement = hax.visiui.createElement("iframe",null,styleJson);
     dummyFrameElement.onload = onLoadCallback;
     element.appendChild(dummyFrameElement);
 }
 
-visicomp.visiui.removeResizeListener = function(element, resizeCallback){
+hax.visiui.removeResizeListener = function(element, resizeCallback){
     alert("implement this!");
 }
 

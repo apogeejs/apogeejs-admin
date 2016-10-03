@@ -4,18 +4,18 @@
  * 
  * COMPONENT DEPENDENCIES:
  */
-visicomp.core.ContextHolder = {};
+hax.core.ContextHolder = {};
 
 /** This initializes the component */
-visicomp.core.ContextHolder.init = function() {
+hax.core.ContextHolder.init = function() {
     //will be set on demand
     this.contextManager = null;
 }
 
-visicomp.core.ContextHolder.isContextHolder = true;
+hax.core.ContextHolder.isContextHolder = true;
 
 /** This method retrieves the context manager. */
-visicomp.core.ContextHolder.getContextManager = function() {
+hax.core.ContextHolder.getContextManager = function() {
     if(!this.contextManager) {
         //set the context manager
         this.contextManager = this.createContextManager();
@@ -26,10 +26,10 @@ visicomp.core.ContextHolder.getContextManager = function() {
 
 //this method must be implemneted in extending classes
 ///** This method retrieve creates the loaded context manager. */
-//visicomp.core.ContextHolder.createContextManager = function();
+//hax.core.ContextHolder.createContextManager = function();
 
 /** This is used only if the context manager should be replaced with an existing one.. */
-visicomp.core.ContextHolder.setContextManager = function(contextManager) {
+hax.core.ContextHolder.setContextManager = function(contextManager) {
     this.contextManager = contextManager;
 }
 

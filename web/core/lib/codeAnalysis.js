@@ -14,7 +14,7 @@
  * -- isLocal: true if all uses of a varaible entry are local variables
  **/ 
 
-visicomp.core.codeAnalysis = {};
+hax.core.codeAnalysis = {};
 
 /** Syntax for AST, names from Esprima.
  * Each entry is a list of nodes inside a node of a given type. the list
@@ -25,7 +25,7 @@ visicomp.core.codeAnalysis = {};
  *     modified:[boolean indicating if the field correspondes to a modified variable
  *     declaration:[boolean indicating if the field corrsponds to a field declaration]
  * @private */
-visicomp.core.codeAnalysis.syntax = {
+hax.core.codeAnalysis.syntax = {
     AssignmentExpression: [{name:'left',modified:true},{name:'right'}],
     ArrayExpression: [{name:'elements',list:true}],
     ArrowFunctionExpression: [{name:'params',list:true},{name:'body'},{name:'defaults',list:true}],
@@ -144,7 +144,7 @@ visicomp.core.codeAnalysis.syntax = {
 /** This method parses the code and returns a list of variabls accessed. It throws
  * an exception if there is an error parsing.
  **/
-visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
+hax.core.codeAnalysis.analyzeCode = function(functionText) {
 
     var returnValue = {};
 
@@ -160,14 +160,14 @@ visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
             returnValue.errors = [];
             for(var i = 0; i < ast.errors.length; i++) {
                 var astError = ast.errors[i];
-                var actionError = new visicomp.core.ActionError(astError.description,"Analyze - Code");
+                var actionError = new hax.core.ActionError(astError.description,"Analyze - Code");
                 actionError.setParentException(astError);
                 returnValue.errors.push(actionError);
             }
         }
     }
     catch(exception) {
-        var actionError = visicomp.core.ActionError.processException(exception,"Analyze - Code",false);
+        var actionError = hax.core.ActionError.processException(exception,"Analyze - Code",false);
         returnValue.success = false;
         returnValue.errors = [];
         returnValue.errors.push(actionError);
@@ -175,7 +175,7 @@ visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
     }
 
     //get the variable list
-    var varInfo = visicomp.core.codeAnalysis.getVariableInfo(ast);
+    var varInfo = hax.core.codeAnalysis.getVariableInfo(ast);
     
     //return the variable info
     returnValue.success = true;
@@ -203,7 +203,7 @@ visicomp.core.codeAnalysis.analyzeCode = function(functionText) {
  * is modified. (Note this is not exhaustive. Checks that are not doen here will
  * be enforced elsewhere, though it would be preferebly to get them here.
  * @private */
-visicomp.core.codeAnalysis.getVariableInfo = function(ast) {
+hax.core.codeAnalysis.getVariableInfo = function(ast) {
     
     //create the var to hold the parse data
     var processInfo = {};
@@ -211,16 +211,16 @@ visicomp.core.codeAnalysis.getVariableInfo = function(ast) {
     processInfo.scopeTable = {};
     
     //create the base scope
-    var scope = visicomp.core.codeAnalysis.startScope(processInfo);
+    var scope = hax.core.codeAnalysis.startScope(processInfo);
 
     //traverse the tree, recursively
-    visicomp.core.codeAnalysis.processTreeNode(processInfo,ast,false,false);
+    hax.core.codeAnalysis.processTreeNode(processInfo,ast,false,false);
     
     //finish the base scope
-    visicomp.core.codeAnalysis.endScope(processInfo,scope);
+    hax.core.codeAnalysis.endScope(processInfo,scope);
     
     //finish analyzing the accessed variables
-    visicomp.core.codeAnalysis.markLocalVariables(processInfo);
+    hax.core.codeAnalysis.markLocalVariables(processInfo);
     
     //return the variable names accessed
     return processInfo.nameTable;
@@ -229,7 +229,7 @@ visicomp.core.codeAnalysis.getVariableInfo = function(ast) {
 /** This method starts a new loca variable scope, it should be called
  * when a function starts. 
  * @private */
-visicomp.core.codeAnalysis.startScope = function(processInfo) {
+hax.core.codeAnalysis.startScope = function(processInfo) {
     //initailize id gerneator
     if(processInfo.scopeIdGenerator === undefined) {
         processInfo.scopeIdGenerator = 0;
@@ -249,7 +249,7 @@ visicomp.core.codeAnalysis.startScope = function(processInfo) {
 /** This method ends a local variable scope, reverting to the parent scope.
  * It should be called when a function exits. 
  * @private */
-visicomp.core.codeAnalysis.endScope = function(processInfo) {
+hax.core.codeAnalysis.endScope = function(processInfo) {
     var currentScope = processInfo.currentScope;
     if(!currentScope) return;
     
@@ -259,44 +259,44 @@ visicomp.core.codeAnalysis.endScope = function(processInfo) {
 
 /** This method analyzes the AST (abstract syntax tree). 
  * @private */
-visicomp.core.codeAnalysis.processTreeNode = function(processInfo,node,isModified,isDeclaration) {
+hax.core.codeAnalysis.processTreeNode = function(processInfo,node,isModified,isDeclaration) {
     
     //process the node type
     if((node.type == "Identifier")||(node.type == "MemberExpression")) {
         //process a variable
-        visicomp.core.codeAnalysis.processVariable(processInfo,node,isModified,isDeclaration);
+        hax.core.codeAnalysis.processVariable(processInfo,node,isModified,isDeclaration);
     } 
     else if((node.type == "FunctionDeclaration")||(node.type == "FunctionExpression")) {
         //process the functoin
-        visicomp.core.codeAnalysis.processFunction(processInfo,node);
+        hax.core.codeAnalysis.processFunction(processInfo,node);
         
     }
     else if((node.type === "NewExpression")&&(node.callee.type === "Function")) {
         //we currently do not support the function constructor
         //to add it we need to add the local variables and parse the text body
-        throw visicomp.core.codeAnalysis.createParsingError("Function constructor not currently supported!",node.loc); 
+        throw hax.core.codeAnalysis.createParsingError("Function constructor not currently supported!",node.loc); 
     }
     else {
         //process some other node
-        visicomp.core.codeAnalysis.processGenericNode(processInfo,node);
+        hax.core.codeAnalysis.processGenericNode(processInfo,node);
     }
 }
    
 /** This method process nodes that are not variabls identifiers. This traverses 
  * down the syntax tree.
  * @private */
-visicomp.core.codeAnalysis.processGenericNode = function(processInfo,node) {
+hax.core.codeAnalysis.processGenericNode = function(processInfo,node) {
     //load the syntax node info list for this node
-    var nodeInfoList = visicomp.core.codeAnalysis.syntax[node.type];
+    var nodeInfoList = hax.core.codeAnalysis.syntax[node.type];
     
     //process this list
     if(nodeInfoList === undefined) {
         //node not found
-        throw visicomp.core.codeAnalysis.createParsingError("Syntax Tree Node not found: " + node.type,node.loc);
+        throw hax.core.codeAnalysis.createParsingError("Syntax Tree Node not found: " + node.type,node.loc);
     }
     else if(nodeInfoList === null) {
         //node not supported
-        throw visicomp.core.codeAnalysis.createParsingError("Syntax node not supported: " + node.type,node.loc);
+        throw hax.core.codeAnalysis.createParsingError("Syntax node not supported: " + node.type,node.loc);
     }
     else {
         //this is a good node - process it
@@ -315,12 +315,12 @@ visicomp.core.codeAnalysis.processGenericNode = function(processInfo,node) {
                 if(nodeInfo.list) {
                     //this is a list of child nodes
                     for(var j = 0; j < childField.length; j++) {
-                        visicomp.core.codeAnalysis.processTreeNode(processInfo,childField[j],nodeInfo.modified,nodeInfo.declaration);
+                        hax.core.codeAnalysis.processTreeNode(processInfo,childField[j],nodeInfo.modified,nodeInfo.declaration);
                     }
                 }
                 else {
                     //this is a single node
-                    visicomp.core.codeAnalysis.processTreeNode(processInfo,childField,nodeInfo.modified,nodeInfo.declaration);
+                    hax.core.codeAnalysis.processTreeNode(processInfo,childField,nodeInfo.modified,nodeInfo.declaration);
                 }
             }
         }
@@ -330,7 +330,7 @@ visicomp.core.codeAnalysis.processGenericNode = function(processInfo,node) {
 /** This method processes nodes that are function. For functions a new scope is created 
  * for the body of the function.
  * @private */
-visicomp.core.codeAnalysis.processFunction = function(processInfo,node) {
+hax.core.codeAnalysis.processFunction = function(processInfo,node) {
     var nodeType = node.type;
     var idNode = node.id;
     var params = node.params;
@@ -344,33 +344,33 @@ visicomp.core.codeAnalysis.processFunction = function(processInfo,node) {
     
     if((nodeType === "FunctionDeclaration")&&(idNode)) {
         //parse id node (variable name) in the parent scope
-        visicomp.core.codeAnalysis.processTreeNode(processInfo,idNode,false,true);
+        hax.core.codeAnalysis.processTreeNode(processInfo,idNode,false,true);
     }
     
     //create a new scope for this function
-    var scope = visicomp.core.codeAnalysis.startScope(processInfo);
+    var scope = hax.core.codeAnalysis.startScope(processInfo);
     
     if((nodeType === "FunctionExpression")&&(idNode)) {
         //parse id node (variable name) in the parent scope
-        visicomp.core.codeAnalysis.processTreeNode(processInfo,idNode,false,true);
+        hax.core.codeAnalysis.processTreeNode(processInfo,idNode,false,true);
     }
     
     //process the variable list
     for(var i = 0; i < params.length; i++) {
-        visicomp.core.codeAnalysis.processTreeNode(processInfo,params[i],false,true);
+        hax.core.codeAnalysis.processTreeNode(processInfo,params[i],false,true);
     }
     
     //process the function body
-    visicomp.core.codeAnalysis.processTreeNode(processInfo,body,false,false);
+    hax.core.codeAnalysis.processTreeNode(processInfo,body,false,false);
     
     //end the scope for this function
-    visicomp.core.codeAnalysis.endScope(processInfo,scope);
+    hax.core.codeAnalysis.endScope(processInfo,scope);
 }
 
 /** This method processes nodes that are variables (identifiers and member expressions), adding
  * them to the list of variables which are used in tehe formula.
  * @private */
-visicomp.core.codeAnalysis.processVariable = function(processInfo,node,isModified,isDeclaration) {
+hax.core.codeAnalysis.processVariable = function(processInfo,node,isModified,isDeclaration) {
     
     //get the variable path and the base name
     var namePath = this.getVariableDotPath(processInfo,node);
@@ -412,7 +412,7 @@ visicomp.core.codeAnalysis.processVariable = function(processInfo,node,isModifie
  * In the case the fields are calculated, we do not attempt to return these
  * fields. We do however factor the expressions nodes into the dependencies. 
  * @private */
-visicomp.core.codeAnalysis.getVariableDotPath = function(processInfo,node) {
+hax.core.codeAnalysis.getVariableDotPath = function(processInfo,node) {
     if(node.type == "Identifier") {
         //read the identifier name
         return [node.name];
@@ -440,7 +440,7 @@ visicomp.core.codeAnalysis.getVariableDotPath = function(processInfo,node) {
 
 /** This method annotates the variable usages that are local variables. 
  * @private */
-visicomp.core.codeAnalysis.markLocalVariables = function(processInfo) {
+hax.core.codeAnalysis.markLocalVariables = function(processInfo) {
     for(var key in processInfo.nameTable) {
         var nameEntry = processInfo.nameTable[key];
         var name = nameEntry.name;
@@ -481,8 +481,8 @@ visicomp.core.codeAnalysis.markLocalVariables = function(processInfo) {
  *     column;[integer column on line number]
  * }
  * @private */
-visicomp.core.codeAnalysis.createParsingError = function(errorMsg,location) {
-    var error = visicomp.core.util.createError(errorMsg,false);
+hax.core.codeAnalysis.createParsingError = function(errorMsg,location) {
+    var error = hax.core.util.createError(errorMsg,false);
     if(location) {
         error.lineNumber = location.start.line;
         error.column = location.start.column;

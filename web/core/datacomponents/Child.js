@@ -6,19 +6,19 @@
  * COMPONENT DEPENDENCIES:
  * 
  */
-visicomp.core.Child = {};
+hax.core.Child = {};
     
 /** This serves as the constructor for the child object, when extending it. 
  * The owner should be the parent that holds this child or the object that holds
  * the hierarchy (maybe the workspace). If the owner is not a parent, this is typically
  * a folder and it is called the root folder. */
-visicomp.core.Child.init = function(name,generator) {
+hax.core.Child.init = function(name,generator) {
     this.name = name;
     this.generator = generator;
     this.errors = [];  
 }
 
-visicomp.core.Child.initOwner = function(owner) {
+hax.core.Child.initOwner = function(owner) {
     this.owner = owner;
     if(owner.isParent) {
         this.owner.addChild(this);
@@ -27,15 +27,15 @@ visicomp.core.Child.initOwner = function(owner) {
 
 /** This property tells if this object is a child.
  * This property should not be implemented on non-children. */
-visicomp.core.Child.isChild = true
+hax.core.Child.isChild = true
 
 /** this method gets the name. */
-visicomp.core.Child.getName = function() {
+hax.core.Child.getName = function() {
     return this.name;
 }
 
 /** This method returns the full name in dot notation for this object. */
-visicomp.core.Child.getFullName = function() {
+hax.core.Child.getFullName = function() {
     if(this.owner) {
         return this.owner.getPossesionNameBase() + this.name;
     }
@@ -46,18 +46,18 @@ visicomp.core.Child.getFullName = function() {
 
 /** This method returns a display name for the child object. By default it returns
 /* the object name but can by overriden by the child implementation. */
-visicomp.core.Child.getDisplayName = function() {
+hax.core.Child.getDisplayName = function() {
     return this.name;
 }
 
 /** This returns the owner for this child. */
-visicomp.core.Child.getOwner = function() {
+hax.core.Child.getOwner = function() {
     return this.owner;
 }
 
 /** This returns the parent for this child. For the root folder
  * this value is null. */
-visicomp.core.Child.getParent = function() {
+hax.core.Child.getParent = function() {
     if((this.owner)&&(this.owner.isParent)) {
         return this.owner;
     }
@@ -67,7 +67,7 @@ visicomp.core.Child.getParent = function() {
 }
 
 /** this method gets the workspace. */
-visicomp.core.Child.getWorkspace = function() {
+hax.core.Child.getWorkspace = function() {
    if(this.owner) {
        return this.owner.getWorkspace();
    }
@@ -77,7 +77,7 @@ visicomp.core.Child.getWorkspace = function() {
 }
 
 /** this method gets the root folder/namespace for this object. */
-visicomp.core.Child.getRootFolder = function() {
+hax.core.Child.getRootFolder = function() {
     var ancestor = this;
 	while(ancestor) {
 		var owner = ancestor.getOwner();
@@ -93,17 +93,17 @@ visicomp.core.Child.getRootFolder = function() {
 }
 
 /** This method sets the pre calc error for this dependent. */
-visicomp.core.Child.addError = function(error) {
+hax.core.Child.addError = function(error) {
     this.errors.push(error);
 }
 
 /** This method sets the pre calc error for this dependent. */
-visicomp.core.Child.addErrors = function(errorList) {
+hax.core.Child.addErrors = function(errorList) {
     this.errors = this.errors.concat(errorList);
 }
 
 /** This method clears the error list. */
-visicomp.core.Child.clearErrors = function(type) {
+hax.core.Child.clearErrors = function(type) {
     var newList = [];
     if(type != null) {    
         for(var i = 0; i < this.errors.length; i++) {
@@ -117,17 +117,17 @@ visicomp.core.Child.clearErrors = function(type) {
 }
 
 /** This returns true if there is a pre calc error. */
-visicomp.core.Child.hasError = function() {
+hax.core.Child.hasError = function() {
     return (this.errors.length > 0);
 }
 
 /** This returns the pre calc error. */
-visicomp.core.Child.getErrors = function() {
+hax.core.Child.getErrors = function() {
     return this.errors;
 }
 
 /** This method writes the child to a json. */
-visicomp.core.Child.toJson = function() {
+hax.core.Child.toJson = function() {
 	var json = {};
     json.name = this.name;
     json.type = this.generator.type;
@@ -144,7 +144,7 @@ visicomp.core.Child.toJson = function() {
 
 ///** This method creates a child from a json. IT should be implemented as a static
 // * function in extending objects. */ 
-//visicomp.core.Child.fromJson = function(workspace,json,updateDataList,actionResponse) {
+//hax.core.Child.fromJson = function(workspace,json,updateDataList,actionResponse) {
 //}
 
 //========================================
@@ -155,7 +155,7 @@ visicomp.core.Child.toJson = function() {
  * can extend this function, but it should call this base version of the function
  * if it does.  
  * @protected */
-visicomp.core.Child.onDelete = function() {
+hax.core.Child.onDelete = function() {
 	if(this.owner.isParent) {
 		this.owner.removeChild(this);
 	}
@@ -165,7 +165,7 @@ visicomp.core.Child.onDelete = function() {
 //be omitted
 ///** This method adds any additional data to the json saved for this child. 
 // * @protected */
-//visicomp.core.Child.addToJson = function(json) {
+//hax.core.Child.addToJson = function(json) {
 //}
 
 //Implement this method if there is update data for this json. otherwise it may
@@ -174,6 +174,6 @@ visicomp.core.Child.onDelete = function() {
 //* to match the current object. It may return "undefined" if there is no update
 //* data needed. 
 //* @protected */
-//visicomp.core.Child.getUpdateData = function() {
+//hax.core.Child.getUpdateData = function() {
 //}
 

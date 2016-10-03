@@ -1,13 +1,13 @@
 /** This method shows a create folder dialog. The argument onCreateFunction
  * should take the folder name as an argument and return an object with the boolean entry
  * "success" and, if false, a msg in the field "msg". On success the dialog will close. */
-visicomp.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction) {
+hax.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction) {
 
-    var dialog = visicomp.visiui.createDialog({"movable":true});
+    var dialog = hax.visiui.createDialog({"movable":true});
     dialog.setTitle("&nbsp;");
     
     //add a scroll container
-    var contentContainer = visicomp.visiui.createElement("div",null,
+    var contentContainer = hax.visiui.createElement("div",null,
         {
 			"display":"block",
             "position":"relative",
@@ -19,7 +19,7 @@ visicomp.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction
     
     var line;
     
-	var content = visicomp.visiui.createElement("div",null,
+	var content = hax.visiui.createElement("div",null,
 			{
 				"display":"table",
 				"overflow":"hidden"
@@ -29,21 +29,21 @@ visicomp.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction
     var line;
   
     //title
-    line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"New Workspace"}));
+    line = hax.visiui.createElement("div",{"className":"dialogLine"});
+    line.appendChild(hax.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"New Workspace"}));
     content.appendChild(line);
     
     //input
-    line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
+    line = hax.visiui.createElement("div",{"className":"dialogLine"});
     line.appendChild(document.createTextNode("Name:"));
-    var inputElement = visicomp.visiui.createElement("input",{"type":"text"});
+    var inputElement = hax.visiui.createElement("input",{"type":"text"});
     line.appendChild(inputElement);
     content.appendChild(line);
     
     //buttons
-    line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
+    line = hax.visiui.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
-        visicomp.visiui.closeDialog(dialog);
+        hax.visiui.closeDialog(dialog);
     }
     
     var onCreate = function() {
@@ -55,11 +55,11 @@ visicomp.app.visiui.dialog.showCreateWorkspaceDialog = function(onCreateFunction
         
         var closeDialog = onCreateFunction(name);
         if(closeDialog) {
-			visicomp.visiui.closeDialog(dialog);
+			hax.visiui.closeDialog(dialog);
 		}    
     }
-    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));
-    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
+    line.appendChild(hax.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));
+    line.appendChild(hax.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
     dialog.setContent(content);

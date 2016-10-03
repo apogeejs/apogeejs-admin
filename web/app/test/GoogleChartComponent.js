@@ -116,13 +116,13 @@ var GoogleChartComponent = {};
 /** This method creates the control. */
 GoogleChartComponent.createComponent = function(workspaceUI,data,componentOptions) {
 	var resource = new GoogleChartResource();
-	return visicomp.app.visiui.BasicControlComponent.createBaseComponent(workspaceUI,data,resource,GoogleChartComponent.generator,componentOptions);
+	return hax.app.visiui.BasicControlComponent.createBaseComponent(workspaceUI,data,resource,GoogleChartComponent.generator,componentOptions);
 }
 
 GoogleChartComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
 	var resource = new GoogleChartResource();
 	member.updateResource(resource);
-    return visicomp.app.visiui.BasicControlComponent.createBaseComponentFromJson(workspaceUI,member,GoogleChartComponent.generator,componentJson);
+    return hax.app.visiui.BasicControlComponent.createBaseComponentFromJson(workspaceUI,member,GoogleChartComponent.generator,componentJson);
 }
 
 //======================================
@@ -131,7 +131,7 @@ GoogleChartComponent.createComponentFromJson = function(workspaceUI,member,compo
 
 GoogleChartComponent.generator = {};
 GoogleChartComponent.generator.displayName = "Google Chart Control";
-GoogleChartComponent.generator.uniqueName = "visicomp.example.GoogleChartComponent";
+GoogleChartComponent.generator.uniqueName = "hax.example.GoogleChartComponent";
 GoogleChartComponent.generator.createComponent = GoogleChartComponent.createComponent;
 GoogleChartComponent.generator.createComponentFromJson = GoogleChartComponent.createComponentFromJson;
 GoogleChartComponent.generator.DEFAULT_WIDTH = 500;

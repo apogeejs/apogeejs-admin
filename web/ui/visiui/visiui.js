@@ -1,5 +1,5 @@
 /** This is the main visiui file */
-visicomp.visiui = {};
+hax.visiui = {};
 
 
 //I put some utilities in here. I shoudl figure out a better place to put this.
@@ -7,20 +7,20 @@ visicomp.visiui = {};
 //=====================================
 // ZIndex Constants
 //=====================================
-visicomp.visiui.MENU_ZINDEX = 100;
-visicomp.visiui.WINDOW_FRAME_ZINIDEX = 10;
-visicomp.visiui.DIALOG_ZINDEX = 200;
+hax.visiui.MENU_ZINDEX = 100;
+hax.visiui.WINDOW_FRAME_ZINIDEX = 10;
+hax.visiui.DIALOG_ZINDEX = 200;
 
 //======================================
 // ID Generator
 //======================================
 
-visicomp.visiui.idIndex = 0;
-visicomp.visiui.idBase = "_visiui_id_";
+hax.visiui.idIndex = 0;
+hax.visiui.idBase = "_visiui_id_";
 
 /** This method generates a generic id for dom elements. */
-visicomp.visiui.createId = function() {
-    return visicomp.visiui.idBase + visicomp.visiui.idIndex++;
+hax.visiui.createId = function() {
+    return hax.visiui.idBase + hax.visiui.idIndex++;
 }
 
 //=========================================
@@ -28,7 +28,7 @@ visicomp.visiui.createId = function() {
 //=========================================
 
 /** This method applies the style json to the dom element. */
-visicomp.visiui.applyStyle = function(element,style) {
+hax.visiui.applyStyle = function(element,style) {
     for(var key in style) {
         element.style[key] = style[key];
     }
@@ -45,7 +45,7 @@ visicomp.visiui.applyStyle = function(element,style) {
  * properties are javascript properties, 
  * styleProperties are the style properties
  * */
-visicomp.visiui.createElement = function(type,properties,styleProperties) {
+hax.visiui.createElement = function(type,properties,styleProperties) {
     var element = document.createElement(type);
     if(properties) {
         for(var key in properties) {
@@ -53,7 +53,7 @@ visicomp.visiui.createElement = function(type,properties,styleProperties) {
         }
     }
     if(styleProperties) {
-        visicomp.visiui.applyStyle(element,styleProperties);
+        hax.visiui.applyStyle(element,styleProperties);
     }
     return element;
 }
@@ -62,9 +62,9 @@ visicomp.visiui.createElement = function(type,properties,styleProperties) {
 // window and dialog methods
 //=========================================
 
-visicomp.visiui.dialogLayer = null;
+hax.visiui.dialogLayer = null;
 
-visicomp.visiui.BASE_ELEMENT_STYLE = {
+hax.visiui.BASE_ELEMENT_STYLE = {
     "position":"absolute",
     "left":"0px",
     "right":"0px",
@@ -73,7 +73,7 @@ visicomp.visiui.BASE_ELEMENT_STYLE = {
     "zIndex":1
 }
 
-visicomp.visiui.DIALOG_LAYER_STYLE = {
+hax.visiui.DIALOG_LAYER_STYLE = {
     "position":"absolute",
     "left":"0px",
     "right":"0px",
@@ -83,7 +83,7 @@ visicomp.visiui.DIALOG_LAYER_STYLE = {
     "pointerEvents": "none"
 }
 
-visicomp.visiui.DIALOG_SHIELD_STYLE = {
+hax.visiui.DIALOG_SHIELD_STYLE = {
     "position":"absolute",
     "left":"0px",
     "right":"0px",
@@ -92,47 +92,47 @@ visicomp.visiui.DIALOG_SHIELD_STYLE = {
     "pointerEvents": "auto"
 }
     
-visicomp.visiui.initWindows = function(appElementId) {
+hax.visiui.initWindows = function(appElementId) {
     //create the ui elements from the app element
     var appContainer = document.getElementById(appElementId);
     if(!appContainer) {
-        throw visicomp.core.util.createError("Container ID not found: " + appElementId);
+        throw hax.core.util.createError("Container ID not found: " + appElementId);
     }
     
     var elements = {};
-    elements.baseElement = visicomp.visiui.createElement("div",null,visicomp.visiui.BASE_ELEMENT_STYLE); 
-    elements.dialogLayer = visicomp.visiui.createElement("div",null,visicomp.visiui.DIALOG_LAYER_STYLE);
+    elements.baseElement = hax.visiui.createElement("div",null,hax.visiui.BASE_ELEMENT_STYLE); 
+    elements.dialogLayer = hax.visiui.createElement("div",null,hax.visiui.DIALOG_LAYER_STYLE);
     
     appContainer.appendChild(elements.baseElement);
     appContainer.appendChild(elements.dialogLayer);
     
-    visicomp.visiui.dialogLayer = elements.dialogLayer;
+    hax.visiui.dialogLayer = elements.dialogLayer;
     
     return elements;
 }
 
 /** This method creates a normal window which is situated above a shiled layer blocking
  *out events to the app, making the dialog like a modal dialog. If this function is used
- *to create a dialog, it must be closed with the visicomp.visiui.closeDialog function to
+ *to create a dialog, it must be closed with the hax.visiui.closeDialog function to
  *remove the modal layer, whether or not the dialog was shown. The options passed are the 
  *normal options for a window frame. (Note - if there are other events with whihc to act with
  *the app they may need to be shileded too.) */
-visicomp.visiui.createDialog = function(options) {
-    var shieldElement = visicomp.visiui.createElement("div",null,visicomp.visiui.DIALOG_SHIELD_STYLE);
-    var dialogParent = new visicomp.visiui.SimpleParentContainer(shieldElement,true);
-    visicomp.visiui.dialogLayer.appendChild(shieldElement);
+hax.visiui.createDialog = function(options) {
+    var shieldElement = hax.visiui.createElement("div",null,hax.visiui.DIALOG_SHIELD_STYLE);
+    var dialogParent = new hax.visiui.SimpleParentContainer(shieldElement,true);
+    hax.visiui.dialogLayer.appendChild(shieldElement);
     
     if(!options.frameColorClass) options.frameColorClass = "visicomp_windowColor";
     if(!options.titleBarClass) options.titleBarClass = "visicomp_titleBarClass";
-    return new visicomp.visiui.WindowFrame(dialogParent,options);
+    return new hax.visiui.WindowFrame(dialogParent,options);
 }
 
-/** This method closes a dialog created with visicomp.visiui.createDialog. It
+/** This method closes a dialog created with hax.visiui.createDialog. It
  *hides the window and removes the modal shiled. */
-visicomp.visiui.closeDialog = function(dialog) {
+hax.visiui.closeDialog = function(dialog) {
     var parent = dialog.getParent();
     dialog.hide();
-    visicomp.visiui.dialogLayer.removeChild(parent.getContainerElement());
+    hax.visiui.dialogLayer.removeChild(parent.getContainerElement());
 }
 
 

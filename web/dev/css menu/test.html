@@ -4,7 +4,7 @@
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         
-        <script type="text/javascript" src="../../visicomp.js"></script>
+        <script type="text/javascript" src="../../hax.js"></script>
         <script type="text/javascript" src="../../ui/visiui/visiui.js"></script>
         <script type="text/javascript" src="MenuBar.js"></script>	
         <script type="text/javascript" src="Menu.js"></script>	
@@ -15,36 +15,36 @@
         <script>
             function init() {
                 var menuBarContainer = document.getElementById("menu_bar_container");
-                var menuBar = new visicomp.visiui.MenuBar();
+                var menuBar = new hax.visiui.MenuBar();
                 menuBarContainer.appendChild(menuBar.getElement());
 
                 var menu;
                 var menuItem;
 
-                menu = new visicomp.visiui.Menu("first");
+                menu = new hax.visiui.Menu("first");
                 menuBar.addMenu(menu);
-                menuItem = new visicomp.visiui.MenuItem("a",function() {alert("a pressed");});
+                menuItem = new hax.visiui.MenuItem("a",function() {alert("a pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new visicomp.visiui.MenuItem("b",function() {alert("b pressed");});
+                menuItem = new hax.visiui.MenuItem("b",function() {alert("b pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new visicomp.visiui.MenuItem("c",function() {alert("c pressed");});
+                menuItem = new hax.visiui.MenuItem("c",function() {alert("c pressed");});
                 menu.addMenuItem(menuItem);
 
 
-                menu = new visicomp.visiui.Menu("second");
+                menu = new hax.visiui.Menu("second");
                 menuBar.addMenu(menu);
                 
-                menuItem = new visicomp.visiui.MenuItem("1",function() {alert("1 pressed");});
+                menuItem = new hax.visiui.MenuItem("1",function() {alert("1 pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new visicomp.visiui.MenuItem("2",function() {alert("2 pressed");});
+                menuItem = new hax.visiui.MenuItem("2",function() {alert("2 pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new visicomp.visiui.MenuItem("3",function() {alert("3 pressed");});
+                menuItem = new hax.visiui.MenuItem("3",function() {alert("3 pressed");});
                 menu.addMenuItem(menuItem);
 
-                menu = new visicomp.visiui.Menu("third");
+                menu = new hax.visiui.Menu("third");
                 menuBar.addMenu(menu);
 
-                menu = new visicomp.visiui.Menu("fourth");
+                menu = new hax.visiui.Menu("fourth");
                 menuBar.addMenu(menu);
             }
         </script>	

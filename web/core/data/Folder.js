@@ -1,12 +1,12 @@
 /** This is a folder. */
-visicomp.core.Folder = function(name,owner) {
+hax.core.Folder = function(name,owner) {
     //base init
-    visicomp.core.Child.init.call(this,name,visicomp.core.Folder.generator);
-    visicomp.core.DataHolder.init.call(this);
-    visicomp.core.Dependent.init.call(this);
-    visicomp.core.ContextHolder.init.call(this);
-    visicomp.core.Owner.init.call(this);
-    visicomp.core.Parent.init.call(this);
+    hax.core.Child.init.call(this,name,hax.core.Folder.generator);
+    hax.core.DataHolder.init.call(this);
+    hax.core.Dependent.init.call(this);
+    hax.core.ContextHolder.init.call(this);
+    hax.core.Owner.init.call(this);
+    hax.core.Parent.init.call(this);
     
     this.initOwner(owner);
 
@@ -20,37 +20,37 @@ visicomp.core.Folder = function(name,owner) {
 }
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Child);
-visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.DataHolder);
-visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Dependent);                      
-visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.ContextHolder);
-visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Owner);
-visicomp.core.util.mixin(visicomp.core.Folder,visicomp.core.Parent);
+hax.core.util.mixin(hax.core.Folder,hax.core.Child);
+hax.core.util.mixin(hax.core.Folder,hax.core.DataHolder);
+hax.core.util.mixin(hax.core.Folder,hax.core.Dependent);                      
+hax.core.util.mixin(hax.core.Folder,hax.core.ContextHolder);
+hax.core.util.mixin(hax.core.Folder,hax.core.Owner);
+hax.core.util.mixin(hax.core.Folder,hax.core.Parent);
 
 //------------------------------
 // Parent Methods
 //------------------------------
 
 /** this method gets the table map. */
-visicomp.core.Folder.prototype.getChildMap = function() {
+hax.core.Folder.prototype.getChildMap = function() {
     return this.childMap;
 }
 
 /** This method looks up a child from this folder.  */
-visicomp.core.Folder.prototype.lookupChild = function(name) {
+hax.core.Folder.prototype.lookupChild = function(name) {
     //check look for object in this folder
     return this.childMap[name];
 }
 
 /** This method adds a table to the folder. It also sets the folder for the
  *table object to this folder. It will fail if the name already exists.  */
-visicomp.core.Folder.prototype.addChild = function(child) {
+hax.core.Folder.prototype.addChild = function(child) {
 	
     //check if it exists first
     var name = child.getName();
     if(this.childMap[name]) {
         //already exists! not fatal since it is not added to the model yet,
-        throw visicomp.core.util.createError("There is already an object with the given name.",false);
+        throw hax.core.util.createError("There is already an object with the given name.",false);
     }
     //add object
     this.childMap[name] = child;
@@ -67,7 +67,7 @@ visicomp.core.Folder.prototype.addChild = function(child) {
 }
 
 /** This method removes a table from the folder. */
-visicomp.core.Folder.prototype.removeChild = function(child) {
+hax.core.Folder.prototype.removeChild = function(child) {
     //make sure this is a child of this object
 	var parent = child.getParent();
     if((!parent)||(parent !== this)) return;
@@ -84,7 +84,7 @@ visicomp.core.Folder.prototype.removeChild = function(child) {
 }
 
 /** This method updates the table data object in the folder data map. */
-visicomp.core.Folder.prototype.updateData = function(child) {
+hax.core.Folder.prototype.updateData = function(child) {
 	if(!child.isDataHolder) return;
 	
     var name = child.getName();
@@ -98,12 +98,12 @@ visicomp.core.Folder.prototype.updateData = function(child) {
 
 /** There is no calculation for the folder base on dependents. 
  * @private */
-visicomp.core.Folder.prototype.needsCalculating = function() {
+hax.core.Folder.prototype.needsCalculating = function() {
     return false;
 }
 
 /** There is no calculation in the folder.  */
-visicomp.core.Folder.prototype.calculate = function() {
+hax.core.Folder.prototype.calculate = function() {
     
 }
 
@@ -113,7 +113,7 @@ visicomp.core.Folder.prototype.calculate = function() {
 
 /** This method updates the dependencies of any children
  * based on an object being added. */
-visicomp.core.Folder.prototype.updateForAddedVariable = function(object,recalculateList) {
+hax.core.Folder.prototype.updateForAddedVariable = function(object,recalculateList) {
     for(var key in this.childMap) {
         var child = this.childMap[key];
         if(child.isDependent) {
@@ -124,7 +124,7 @@ visicomp.core.Folder.prototype.updateForAddedVariable = function(object,recalcul
 
 /** This method updates the dependencies of any children
  * based on an object being deleted. */
-visicomp.core.Folder.prototype.updateForDeletedVariable = function(object,recalculateList) {
+hax.core.Folder.prototype.updateForDeletedVariable = function(object,recalculateList) {
     for(var key in this.childMap) {
         var child = this.childMap[key];
         if(child.isDependent) {
@@ -139,12 +139,12 @@ visicomp.core.Folder.prototype.updateForDeletedVariable = function(object,recalc
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.Folder.fromJson = function(owner,json,updateDataList,actionResponse) {
-    var folder = new visicomp.core.Folder(json.name,owner);
+hax.core.Folder.fromJson = function(owner,json,updateDataList,actionResponse) {
+    var folder = new hax.core.Folder(json.name,owner);
     
     for(var key in json.children) {
         var childJson = json.children[key];
-        var child = visicomp.core.createmember.instantiateMember(folder,childJson,updateDataList,actionResponse);
+        var child = hax.core.createmember.instantiateMember(folder,childJson,updateDataList,actionResponse);
     }
     
     return folder;
@@ -152,7 +152,7 @@ visicomp.core.Folder.fromJson = function(owner,json,updateDataList,actionRespons
 
 /** This method adds any additional data to the json to save for this child. 
  * @protected */
-visicomp.core.Folder.prototype.addToJson = function(json) {
+hax.core.Folder.prototype.addToJson = function(json) {
 	json.children = {};
     
     for(var key in this.childMap) {
@@ -167,7 +167,7 @@ visicomp.core.Folder.prototype.addToJson = function(json) {
 
 /** This method updates the table data object in the folder data map. 
  * @private */
-visicomp.core.Folder.prototype.calculateDependents = function() {
+hax.core.Folder.prototype.calculateDependents = function() {
     var newDependsOn = [];
     for(var name in this.childMap) {
         var object = this.childMap[name];
@@ -181,7 +181,7 @@ visicomp.core.Folder.prototype.calculateDependents = function() {
 /** This method creates a new immutable data map, either adding a give name and data or
  * removing a name. To remove a name from the map, leave "addData" as undefined. 
  * @private */
-visicomp.core.Folder.prototype.spliceDataMap = function(addOrRemoveName,addData) {
+hax.core.Folder.prototype.spliceDataMap = function(addOrRemoveName,addData) {
 	var newDataMap = {};
 	
 	//copy old data
@@ -205,10 +205,10 @@ visicomp.core.Folder.prototype.spliceDataMap = function(addOrRemoveName,addData)
 // Static methods
 //============================
 
-visicomp.core.Folder.generator = {};
-visicomp.core.Folder.generator.displayName = "Folder";
-visicomp.core.Folder.generator.type = "visicomp.core.Folder";
-visicomp.core.Folder.generator.createMember = visicomp.core.Folder.fromJson;
+hax.core.Folder.generator = {};
+hax.core.Folder.generator.displayName = "Folder";
+hax.core.Folder.generator.type = "hax.core.Folder";
+hax.core.Folder.generator.createMember = hax.core.Folder.fromJson;
 
 //register this member
-visicomp.core.Workspace.addMemberGenerator(visicomp.core.Folder.generator);
+hax.core.Workspace.addMemberGenerator(hax.core.Folder.generator);

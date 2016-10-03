@@ -2,31 +2,31 @@
     
 /** This class manages context for the user code. This is used to provide the object 
  * associated with a given name in the code, following the relevent namespace hierarchy.*/
-visicomp.core.ContextManager = function(contextParent) {
+hax.core.ContextManager = function(contextParent) {
     this.parentOwner = contextParent;
     this.contextList = [];
 }
 
-visicomp.core.ContextManager.prototype.addToContextList = function(entry) {
+hax.core.ContextManager.prototype.addToContextList = function(entry) {
     this.contextList.push(entry);
 }
 
-visicomp.core.ContextManager.prototype.removeFromContextList = function(entry) {
+hax.core.ContextManager.prototype.removeFromContextList = function(entry) {
     var index = this.contextList.indexOf(entry);
     if(index >= 0) {
         this.contextList.splice(index,1);
     }
 }
 
-visicomp.core.ContextManager.prototype.clearContextList = function() {
+hax.core.ContextManager.prototype.clearContextList = function() {
     this.contextList = [];
 }
 
-visicomp.core.ContextManager.prototype.getBaseData = function(baseName,generation) {
+hax.core.ContextManager.prototype.getBaseData = function(baseName,generation) {
     return this.hierarchicalLookup("lookupData",baseName,generation);
 }
 
-visicomp.core.ContextManager.prototype.getImpactor = function(path,generation) {
+hax.core.ContextManager.prototype.getImpactor = function(path,generation) {
     return this.hierarchicalLookup("lookupImpactor",path,generation);
 }
 
@@ -34,7 +34,7 @@ visicomp.core.ContextManager.prototype.getImpactor = function(path,generation) {
 // Private Methods
 //==================================
 
-visicomp.core.ContextManager.prototype.hierarchicalLookup = function(lookupFunctionName,lookupKey,generation) {
+hax.core.ContextManager.prototype.hierarchicalLookup = function(lookupFunctionName,lookupKey,generation) {
     if(generation === undefined) generation = 0;
 
     //lookup base name in the context list
@@ -51,7 +51,7 @@ visicomp.core.ContextManager.prototype.hierarchicalLookup = function(lookupFunct
     return undefined;
 }
 
-visicomp.core.ContextManager.prototype.lookup = function(lookupFunctionName,lookupKey,generation) {
+hax.core.ContextManager.prototype.lookup = function(lookupFunctionName,lookupKey,generation) {
 	//cycle through the variables used
 	for(var i = 0; i < this.contextList.length; i++) {
         var entry = this.contextList[i];
@@ -66,7 +66,7 @@ visicomp.core.ContextManager.prototype.lookup = function(lookupFunctionName,look
     return undefined;
 }
 
-visicomp.core.ContextManager.prototype.lookupData = function(entry,baseName) {   
+hax.core.ContextManager.prototype.lookupData = function(entry,baseName) {   
     if(entry.parent) {
         var child = entry.parent.lookupChild(baseName);
         if(child) {
@@ -81,7 +81,7 @@ visicomp.core.ContextManager.prototype.lookupData = function(entry,baseName) {
     }
 }
 
-visicomp.core.ContextManager.prototype.lookupImpactor = function(entry,path) {
+hax.core.ContextManager.prototype.lookupImpactor = function(entry,path) {
     if(entry.parent) {
         return entry.parent.lookupChildFromPath(path);
     }

@@ -1,12 +1,12 @@
 
 
-visicomp.app.visiui.saveworkspace = {};
+hax.app.visiui.saveworkspace = {};
 
 //=====================================
 // UI Entry Point
 //=====================================
 
-visicomp.app.visiui.saveworkspace.getSaveCallback = function(app) {
+hax.app.visiui.saveworkspace.getSaveCallback = function(app) {
     return function() {
         
         var activeWorkspaceUI = app.getActiveWorkspaceUI();
@@ -15,7 +15,7 @@ visicomp.app.visiui.saveworkspace.getSaveCallback = function(app) {
             return
         }
         
-        visicomp.app.visiui.dialog.showSaveWorkspaceDialog(app, activeWorkspaceUI);
+        hax.app.visiui.dialog.showSaveWorkspaceDialog(app, activeWorkspaceUI);
     }
 }
 

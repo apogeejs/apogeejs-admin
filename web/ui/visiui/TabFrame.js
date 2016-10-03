@@ -11,7 +11,7 @@
  * 
  * @class 
  */
-visicomp.visiui.TabFrame = function(parentDiv,options) {
+hax.visiui.TabFrame = function(parentDiv,options) {
 	
     if(!options) {
         options = {};
@@ -24,7 +24,7 @@ visicomp.visiui.TabFrame = function(parentDiv,options) {
   
     
     //base init
-    visicomp.core.EventManager.init.call(this);
+    hax.core.EventManager.init.call(this);
     //initialize parent container after conatiner div created
 	
     //variables
@@ -33,33 +33,33 @@ visicomp.visiui.TabFrame = function(parentDiv,options) {
     this.activeTab = null;
     
     this.tabFrameControl = document.createElement("div");
-    visicomp.visiui.applyStyle(this.tabFrameControl,visicomp.visiui.TabFrame.CONTAINER_STYLE);
+    hax.visiui.applyStyle(this.tabFrameControl,hax.visiui.TabFrame.CONTAINER_STYLE);
     parentDiv.appendChild(this.tabFrameControl);
 	
     this.tabFrame = document.createElement("div");
-    visicomp.visiui.applyStyle(this.tabFrame,visicomp.visiui.TabFrame.DISPLAY_FRAME_STYLE);
+    hax.visiui.applyStyle(this.tabFrame,hax.visiui.TabFrame.DISPLAY_FRAME_STYLE);
 	this.tabFrameControl.appendChild(this.tabFrame);  
     
     this.tabBar = document.createElement("div");
-    visicomp.visiui.applyStyle(this.tabBar,visicomp.visiui.TabFrame.TAB_BAR_STYLE);
+    hax.visiui.applyStyle(this.tabBar,hax.visiui.TabFrame.TAB_BAR_STYLE);
     this.tabBar.className = this.options.tabBarColorClass;
     this.tabFrameControl.appendChild(this.tabBar);
     
     //base init for parent continer mixin
-    visicomp.visiui.ParentContainer.init.call(this,this.tabFrame,this);	
+    hax.visiui.ParentContainer.init.call(this,this.tabFrame,this);	
 }
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.visiui.TabFrame,visicomp.core.EventManager);
-visicomp.core.util.mixin(visicomp.visiui.TabFrame,visicomp.visiui.ParentContainer);
+hax.core.util.mixin(hax.visiui.TabFrame,hax.core.EventManager);
+hax.core.util.mixin(hax.visiui.TabFrame,hax.visiui.ParentContainer);
 
 //events
-visicomp.visiui.TabFrame.TAB_SHOWN = "tabShown";
-visicomp.visiui.TabFrame.TABS_RESIZED = "tabsResized";
+hax.visiui.TabFrame.TAB_SHOWN = "tabShown";
+hax.visiui.TabFrame.TABS_RESIZED = "tabsResized";
 
-visicomp.visiui.TabFrame.CONTAINER_FRAME_MARGIN_PX = 5;
+hax.visiui.TabFrame.CONTAINER_FRAME_MARGIN_PX = 5;
 
-visicomp.visiui.TabFrame.CONTAINER_STYLE = {
+hax.visiui.TabFrame.CONTAINER_STYLE = {
     "position":"relative",
     "display":"table",
     "width":"100%",
@@ -67,7 +67,7 @@ visicomp.visiui.TabFrame.CONTAINER_STYLE = {
     "top":"0px",
     "left":"0px",
 };
-visicomp.visiui.TabFrame.DISPLAY_FRAME_STYLE = {
+hax.visiui.TabFrame.DISPLAY_FRAME_STYLE = {
     //fixed
     "position":"relative",
     "display":"table-row",
@@ -81,7 +81,7 @@ visicomp.visiui.TabFrame.DISPLAY_FRAME_STYLE = {
     //"border":" 1px solid gray",
     "borderBottomWidth":" 0px"
 }
-visicomp.visiui.TabFrame.TAB_BAR_STYLE = {
+hax.visiui.TabFrame.TAB_BAR_STYLE = {
     //fixed
     "position":"relative",
     "display":"table-row",
@@ -92,7 +92,7 @@ visicomp.visiui.TabFrame.TAB_BAR_STYLE = {
     "border":" 1px solid gray",
     "borderTopWidth":" 0px"
 }
-visicomp.visiui.TabFrame.TAB_BASE_STYLE = {
+hax.visiui.TabFrame.TAB_BASE_STYLE = {
     //fixed
     "display":"inline-block",
     "cursor":" default",
@@ -101,7 +101,7 @@ visicomp.visiui.TabFrame.TAB_BASE_STYLE = {
     "border":" 1px solid black",
     "padding":"2px"
 }
-visicomp.visiui.TabFrame.TAB_INACTIVE_STYLE = {
+hax.visiui.TabFrame.TAB_INACTIVE_STYLE = {
     //fixed
     "display":"inline-block",
     "cursor":" default",
@@ -111,7 +111,7 @@ visicomp.visiui.TabFrame.TAB_INACTIVE_STYLE = {
     "borderTopColor":"",
     "padding":"2px"
 }
-visicomp.visiui.TabFrame.TAB_ACTIVE_STYLE = {
+hax.visiui.TabFrame.TAB_ACTIVE_STYLE = {
     //fixed
     "display":"inline-block",
     "cursor":" default",
@@ -123,12 +123,12 @@ visicomp.visiui.TabFrame.TAB_ACTIVE_STYLE = {
 }
 
 /** This method returns the dom element for the control. */
-visicomp.visiui.TabFrame.prototype.getElement = function() {
+hax.visiui.TabFrame.prototype.getElement = function() {
     return this.tabFrameControl;
 }
 
 /** This method returns the main dom element for the window frame. */
-visicomp.visiui.TabFrame.prototype.getTab = function(name) {
+hax.visiui.TabFrame.prototype.getTab = function(name) {
     var tabData = this.tabTable[name];
     if(tabData) {
         return tabData.tabDisplay;
@@ -139,7 +139,7 @@ visicomp.visiui.TabFrame.prototype.getTab = function(name) {
 }
 
 /** This method adds a tab to the tab frame. */
-visicomp.visiui.TabFrame.prototype.addTab = function(name) {
+hax.visiui.TabFrame.prototype.addTab = function(name) {
     //make sure there is no tab with this name
     if(this.tabTable[name]) {
         alert("There is already a tab with this name!");
@@ -147,12 +147,12 @@ visicomp.visiui.TabFrame.prototype.addTab = function(name) {
     }
     
     //create the tab object
-    var tab = new visicomp.visiui.Tab(name, this);
+    var tab = new hax.visiui.Tab(name, this);
     this.tabFrame.appendChild(tab.getContainerElement());
     
     //create tab label
     var tabLabelElement = document.createElement("div");
-    visicomp.visiui.applyStyle(tabLabelElement,visicomp.visiui.TabFrame.TAB_BASE_STYLE);
+    hax.visiui.applyStyle(tabLabelElement,hax.visiui.TabFrame.TAB_BASE_STYLE);
     tabLabelElement.innerHTML = name;
     this.tabBar.appendChild(tabLabelElement);
 	
@@ -184,7 +184,7 @@ visicomp.visiui.TabFrame.prototype.addTab = function(name) {
 }
 
 /** This method adds a tab to the tab frame. */
-visicomp.visiui.TabFrame.prototype.removeTab = function(name) {
+hax.visiui.TabFrame.prototype.removeTab = function(name) {
     var tabData = this.tabTable[name];
     if(tabData) {
         this.tabFrame.removeChild(tabData.tabDisplay.getContainerElement());
@@ -204,30 +204,30 @@ visicomp.visiui.TabFrame.prototype.removeTab = function(name) {
 }
 
 /** This mesets the active tab, by tab title. */
-visicomp.visiui.TabFrame.prototype.setActiveTab = function(title) {
+hax.visiui.TabFrame.prototype.setActiveTab = function(title) {
     this.activeTab = title;
     this.updateTabDisplay();
 }
 
 /** This mesets the active tab, by tab title. */
-visicomp.visiui.TabFrame.prototype.getActiveTabTitle = function() {
+hax.visiui.TabFrame.prototype.getActiveTabTitle = function() {
     return this.activeTab;
 }
 
 /** This updates the tabs. */
-visicomp.visiui.TabFrame.prototype.updateTabDisplay = function() {
+hax.visiui.TabFrame.prototype.updateTabDisplay = function() {
     var title;
     for(title in this.tabTable) {
         var tabData = this.tabTable[title];
         if(title == this.activeTab) {
             tabData.tabDisplay.getContainerElement().style.display = "";
-            visicomp.visiui.applyStyle(tabData.tabLabel,visicomp.visiui.TabFrame.TAB_ACTIVE_STYLE);
+            hax.visiui.applyStyle(tabData.tabLabel,hax.visiui.TabFrame.TAB_ACTIVE_STYLE);
             tabData.tabLabel.className = this.options.activeTabColorClass;
-            this.dispatchEvent(visicomp.visiui.TabFrame.TAB_SHOWN,this.activeTab);
+            this.dispatchEvent(hax.visiui.TabFrame.TAB_SHOWN,this.activeTab);
         }
         else {
             tabData.tabDisplay.getContainerElement().style.display = "none";
-            visicomp.visiui.applyStyle(tabData.tabLabel,visicomp.visiui.TabFrame.TAB_INACTIVE_STYLE);
+            hax.visiui.applyStyle(tabData.tabLabel,hax.visiui.TabFrame.TAB_INACTIVE_STYLE);
             tabData.tabLabel.className = this.options.tabBarColorClass;
         }
     }

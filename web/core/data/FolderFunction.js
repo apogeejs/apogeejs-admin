@@ -1,12 +1,12 @@
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
-visicomp.core.FolderFunction = function(name,owner) {
+hax.core.FolderFunction = function(name,owner) {
     //base init
-    visicomp.core.Child.init.call(this,name,visicomp.core.FolderFunction.generator);
-    visicomp.core.DataHolder.init.call(this);
-    visicomp.core.Dependent.init.call(this);
-    visicomp.core.ContextHolder.init.call(this);
-    visicomp.core.Owner.init.call(this);
+    hax.core.Child.init.call(this,name,hax.core.FolderFunction.generator);
+    hax.core.DataHolder.init.call(this);
+    hax.core.Dependent.init.call(this);
+    hax.core.ContextHolder.init.call(this);
+    hax.core.Owner.init.call(this);
     
     this.returnValueString = "";
     this.argList = [];
@@ -15,7 +15,7 @@ visicomp.core.FolderFunction = function(name,owner) {
     
     //create the internal folder as a root folder (no parent). But give it
     //the full path name
-    var folder = new visicomp.core.Folder(name,this);
+    var folder = new hax.core.Folder(name,this);
     this.setInternalFolder(folder);
     
     //set to an empty function
@@ -23,24 +23,24 @@ visicomp.core.FolderFunction = function(name,owner) {
 }
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.core.FolderFunction,visicomp.core.Child);
-visicomp.core.util.mixin(visicomp.core.FolderFunction,visicomp.core.DataHolder);
-visicomp.core.util.mixin(visicomp.core.FolderFunction,visicomp.core.Dependent);
-visicomp.core.util.mixin(visicomp.core.FolderFunction,visicomp.core.ContextHolder);
-visicomp.core.util.mixin(visicomp.core.FolderFunction,visicomp.core.Owner);
+hax.core.util.mixin(hax.core.FolderFunction,hax.core.Child);
+hax.core.util.mixin(hax.core.FolderFunction,hax.core.DataHolder);
+hax.core.util.mixin(hax.core.FolderFunction,hax.core.Dependent);
+hax.core.util.mixin(hax.core.FolderFunction,hax.core.ContextHolder);
+hax.core.util.mixin(hax.core.FolderFunction,hax.core.Owner);
 
 /** This gets the internal forlder for the folderFunction. */
-visicomp.core.FolderFunction.prototype.getInternalFolder = function() {
+hax.core.FolderFunction.prototype.getInternalFolder = function() {
     return this.internalFolder;
 }
 
 /** This gets the name of the return object for the folderFunction function. */
-visicomp.core.FolderFunction.prototype.getReturnValueString = function() {
+hax.core.FolderFunction.prototype.getReturnValueString = function() {
     return this.returnValueString;
 }
 
 /** This gets the arg list of the folderFunction function. */
-visicomp.core.FolderFunction.prototype.getArgList = function() {
+hax.core.FolderFunction.prototype.getArgList = function() {
     return this.argList;
 }
 
@@ -49,7 +49,7 @@ visicomp.core.FolderFunction.prototype.getArgList = function() {
 //------------------------------
 
 /** This overrides the get displaymethod of child to return the function declaration. */
-visicomp.core.FolderFunction.prototype.getDisplayName = function() {
+hax.core.FolderFunction.prototype.getDisplayName = function() {
     var name = this.getName();
     var argList = this.getArgList();
     var argListString = argList.join(",");
@@ -65,12 +65,12 @@ visicomp.core.FolderFunction.prototype.getDisplayName = function() {
 /** This method is called when the child is deleted. If necessary the implementation
  * can extend this function, but it should call this base version of the function
  * if it does.  */
-visicomp.core.FolderFunction.prototype.onDelete = function() {
+hax.core.FolderFunction.prototype.onDelete = function() {
     
     var returnValue;
     
     if(this.internalFolder) {
-        var actionResponse = visicomp.core.deletemember.deleteMember(this.internalFolder);
+        var actionResponse = hax.core.deletemember.deleteMember(this.internalFolder);
         if(!actionResponse.getSuccess()) {
             //show an error message
             var msg = actionResponse.getErrorMsg();
@@ -81,14 +81,14 @@ visicomp.core.FolderFunction.prototype.onDelete = function() {
 //I don't know what to do if this fails. Figure that out.
     
     //call the base delete
-    returnValue = visicomp.core.Child.onDelete.call(this);
+    returnValue = hax.core.Child.onDelete.call(this);
 	return returnValue;
 }
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.FolderFunction.fromJson = function(owner,json,updateDataList,actionResponse) {
-    var folderFunction = new visicomp.core.FolderFunction(json.name,owner);
+hax.core.FolderFunction.fromJson = function(owner,json,updateDataList,actionResponse) {
+    var folderFunction = new hax.core.FolderFunction(json.name,owner);
     if(json.argList !== undefined) {
         folderFunction.setArgList(json.argList);
     }
@@ -98,7 +98,7 @@ visicomp.core.FolderFunction.fromJson = function(owner,json,updateDataList,actio
     
     //recreate the root folder if info is specified
     if(json.internalFolder) {
-        var internalFolder = visicomp.core.Folder.fromJson(folderFunction,json.internalFolder,updateDataList,actionResponse);
+        var internalFolder = hax.core.Folder.fromJson(folderFunction,json.internalFolder,updateDataList,actionResponse);
         folderFunction.setInternalFolder(internalFolder);
     }
     
@@ -108,7 +108,7 @@ visicomp.core.FolderFunction.fromJson = function(owner,json,updateDataList,actio
 
 /** This method adds any additional data to the json saved for this child. 
  * @protected */
-visicomp.core.FolderFunction.prototype.addToJson = function(json) {
+hax.core.FolderFunction.prototype.addToJson = function(json) {
     json.argList = this.argList;
     json.returnValue = this.returnValueString;
     json.internalFolder = this.internalFolder.toJson();
@@ -120,12 +120,12 @@ visicomp.core.FolderFunction.prototype.addToJson = function(json) {
     
 
 /** If this is true the member must be executed. */
-visicomp.core.FolderFunction.prototype.needsCalculating = function() {
+hax.core.FolderFunction.prototype.needsCalculating = function() {
 	return true;
 }
 
 /** This updates the member based on a change in a dependency.  */
-visicomp.core.FolderFunction.prototype.prepareForCalculate = function() {
+hax.core.FolderFunction.prototype.prepareForCalculate = function() {
     this.clearDataSet();
 }
 
@@ -134,7 +134,7 @@ visicomp.core.FolderFunction.prototype.prepareForCalculate = function() {
 
 /** This updates the member data based on the function. It returns
  * true for success and false if there is an error.  */
-visicomp.core.FolderFunction.prototype.calculate = function() {
+hax.core.FolderFunction.prototype.calculate = function() {
     
     var folderFunctionErrors = [];
     
@@ -156,13 +156,13 @@ visicomp.core.FolderFunction.prototype.calculate = function() {
 
 /** This method updates the dependencies of any children
  * based on an object being added. */
-visicomp.core.FolderFunction.prototype.updateForAddedVariable = function(object,recalculateList) {
+hax.core.FolderFunction.prototype.updateForAddedVariable = function(object,recalculateList) {
     this.internalFolder.updateForAddedVariable(object,recalculateList);
 }
 
 /** This method updates the dependencies of any children
  * based on an object being deleted. */
-visicomp.core.FolderFunction.prototype.updateForDeletedVariable = function(object,recalculateList) {
+hax.core.FolderFunction.prototype.updateForDeletedVariable = function(object,recalculateList) {
      this.internalFolder.updateForDeletedVariable(object,recalculateList);
 }
 
@@ -171,8 +171,8 @@ visicomp.core.FolderFunction.prototype.updateForDeletedVariable = function(objec
 //------------------------------
 
 /** This method retrieve creates the loaded context manager. */
-visicomp.core.FolderFunction.prototype.createContextManager = function() {
-    return new visicomp.core.ContextManager(this.getOwner());
+hax.core.FolderFunction.prototype.createContextManager = function() {
+    return new hax.core.ContextManager(this.getOwner());
 }
 
 //------------------------------
@@ -180,7 +180,7 @@ visicomp.core.FolderFunction.prototype.createContextManager = function() {
 //------------------------------
 
 /** this method gets the hame the children inherit for the full name. */
-visicomp.core.FolderFunction.prototype.getPossesionNameBase = function() {
+hax.core.FolderFunction.prototype.getPossesionNameBase = function() {
     return this.getFullName() + ":";
 }
 
@@ -191,25 +191,25 @@ visicomp.core.FolderFunction.prototype.getPossesionNameBase = function() {
 
 /** This is called from the update action. It should not be called externally. 
  * @private */
-visicomp.core.FolderFunction.prototype.setInternalFolder = function(folder) {
+hax.core.FolderFunction.prototype.setInternalFolder = function(folder) {
     this.internalFolder = folder;
     this.updateDependencies([folder]);
 }
 
 /** This is called from the update action. It should not be called externally. */
-visicomp.core.FolderFunction.prototype.setReturnValueString = function(returnValueString) {
+hax.core.FolderFunction.prototype.setReturnValueString = function(returnValueString) {
     this.returnValueString = returnValueString;
 }
 
 /** This is called from the update action. It should not be called externally. */
-visicomp.core.FolderFunction.prototype.setArgList = function(argList) {
+hax.core.FolderFunction.prototype.setArgList = function(argList) {
     this.argList = argList;
 }
 
 /** This method creates the folderFunction function. It is called from the update action 
  * and should not be called externally. 
  * @private */
-visicomp.core.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErrors) {
+hax.core.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErrors) {
 
     //create a copy of the workspace to do the function calculation - we don't update the UI display version
     var virtualWorkspace;
@@ -247,7 +247,7 @@ visicomp.core.FolderFunction.prototype.getFolderFunctionFunction = function(fold
         }
 
         //apply the update
-        var actionResponse = visicomp.core.updatemember.updateObjects(updateDataList);        
+        var actionResponse = hax.core.updatemember.updateObjects(updateDataList);        
         if(actionResponse.getSuccess()) {
             //retrieve the result
             if(returnValueTable) {
@@ -260,7 +260,7 @@ visicomp.core.FolderFunction.prototype.getFolderFunctionFunction = function(fold
         }
         else {
             //error exectuing folderFunction function - thro wan exception
-            throw visicomp.core.util.createError(actionResponse.getErrorMsg());
+            throw hax.core.util.createError(actionResponse.getErrorMsg());
         }
     }
     
@@ -269,12 +269,12 @@ visicomp.core.FolderFunction.prototype.getFolderFunctionFunction = function(fold
 
 /** This method creates a copy of the workspace to be used for the function evvaluation. 
  * @private */
-visicomp.core.FolderFunction.prototype.createVirtualWorkspace = function(folderFunctionErrors) {
+hax.core.FolderFunction.prototype.createVirtualWorkspace = function(folderFunctionErrors) {
     try {
-		return visicomp.core.Workspace.createVirtualWorkpaceFromFolder("temp",this.internalFolder,this.getContextManager());
+		return hax.core.Workspace.createVirtualWorkpaceFromFolder("temp",this.internalFolder,this.getContextManager());
 	}
 	catch(error) {
-        var actionError = visicomp.core.ActionError.processException(exception,"FolderFunction - Code",false);
+        var actionError = hax.core.ActionError.processException(exception,"FolderFunction - Code",false);
 		folderFunctionErrors.push(actionError);
 		return null;
 	}
@@ -282,7 +282,7 @@ visicomp.core.FolderFunction.prototype.createVirtualWorkspace = function(folderF
 
 /** This method loads the input argument members from the virtual workspace. 
  * @private */
-visicomp.core.FolderFunction.prototype.loadInputElements = function(rootFolder,folderFunctionErrors) {
+hax.core.FolderFunction.prototype.loadInputElements = function(rootFolder,folderFunctionErrors) {
     var argMembers = [];
     for(var i = 0; i < this.argList.length; i++) {
         var argName = this.argList[i];
@@ -293,7 +293,7 @@ visicomp.core.FolderFunction.prototype.loadInputElements = function(rootFolder,f
 //		else {
 //            //missing input element
 //            var msg = "Input element not found in folderFunction: " + argName;
-//            var actionError = new visicomp.core.ActionError(msg,"FolderFunction - Code",this);
+//            var actionError = new hax.core.ActionError(msg,"FolderFunction - Code",this);
 //            folderFunctionErrors.push(actionError);
 //        }       
     }
@@ -302,12 +302,12 @@ visicomp.core.FolderFunction.prototype.loadInputElements = function(rootFolder,f
 
 /** This method loads the output member from the virtual workspace. 
  * @private  */
-visicomp.core.FolderFunction.prototype.loadOutputElement = function(rootFolder,folderFunctionErrors) {
+hax.core.FolderFunction.prototype.loadOutputElement = function(rootFolder,folderFunctionErrors) {
     var returnValueMember = rootFolder.lookupChild(this.returnValueString);
 //    if(!returnValueMember) {
 //        //missing input element
 //        var msg = "Return element not found in folderFunction: " + this.returnValueString;
-//        var actionError = new visicomp.core.ActionError(msg,"FolderFunction - Code",this);
+//        var actionError = new hax.core.ActionError(msg,"FolderFunction - Code",this);
 //        folderFunctionErrors.push(actionError);
 //    }
     return returnValueMember;
@@ -318,10 +318,10 @@ visicomp.core.FolderFunction.prototype.loadOutputElement = function(rootFolder,f
 // Static methods
 //============================
 
-visicomp.core.FolderFunction.generator = {};
-visicomp.core.FolderFunction.generator.displayName = "Folder Function";
-visicomp.core.FolderFunction.generator.type = "visicomp.core.FolderFunction";
-visicomp.core.FolderFunction.generator.createMember = visicomp.core.FolderFunction.fromJson;
+hax.core.FolderFunction.generator = {};
+hax.core.FolderFunction.generator.displayName = "Folder Function";
+hax.core.FolderFunction.generator.type = "hax.core.FolderFunction";
+hax.core.FolderFunction.generator.createMember = hax.core.FolderFunction.fromJson;
 
 //register this member
-visicomp.core.Workspace.addMemberGenerator(visicomp.core.FolderFunction.generator);
+hax.core.Workspace.addMemberGenerator(hax.core.FolderFunction.generator);

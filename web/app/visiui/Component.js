@@ -2,11 +2,11 @@
  * 
  * This is not a class, but it is used for the prototype of the objects that inherit from it.
  */
-visicomp.app.visiui.Component = {};
+hax.app.visiui.Component = {};
     
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,options) {
+hax.app.visiui.Component.init = function(workspaceUI,object,generator,options) {
     
     if(!options) {
         options = {};
@@ -18,7 +18,7 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     
     this.parentContainer = this.workspaceUI.getParentContainerObject(object);
     if(!this.parentContainer) {
-        throw visicomp.core.util.createError("Parent object not found: " + object.getFullName());
+        throw hax.core.util.createError("Parent object not found: " + object.getFullName());
     }
     
     this.workspaceUI.registerMember(this.object,this);
@@ -36,7 +36,7 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     windowOptions.movable = true;
     windowOptions.frameColorClass = "visicomp_windowColor";
     windowOptions.titleBarClass = "visicomp_titleBarClass";
-    this.window = new visicomp.visiui.WindowFrame(this.parentContainer,windowOptions);
+    this.window = new hax.visiui.WindowFrame(this.parentContainer,windowOptions);
 
     //------------------
     // Add menu (we will add the items later. This populates it.)
@@ -77,7 +77,7 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
     //add the standard entries
     var itemInfo = {};
     itemInfo.title = "Edit Properties";
-    itemInfo.callback = visicomp.app.visiui.updatecomponent.getUpdateComponentCallback(this,this.generator);
+    itemInfo.callback = hax.app.visiui.updatecomponent.getUpdateComponentCallback(this,this.generator);
     
     this.menuItemInfoList.push(itemInfo);
     
@@ -96,7 +96,7 @@ visicomp.app.visiui.Component.init = function(workspaceUI,object,generator,optio
 }
 
 /** This method should be called if any cleanup actions are needed on delete. */
-visicomp.app.visiui.Component.addCleanupAction = function(cleanupFunction) {
+hax.app.visiui.Component.addCleanupAction = function(cleanupFunction) {
     this.cleanupActions.push(cleanupFunction);
 }
 
@@ -105,9 +105,9 @@ visicomp.app.visiui.Component.addCleanupAction = function(cleanupFunction) {
 //=======================
 
 /** This method returns the base member for this component. */
-visicomp.app.visiui.Component.showErrorBar = function(text) {
+hax.app.visiui.Component.showErrorBar = function(text) {
     if(!this.errorDiv) {
-        this.errorDiv = visicomp.visiui.createElement("div",null,
+        this.errorDiv = hax.visiui.createElement("div",null,
             {
                 "display":"block",
                 "position":"relative",
@@ -123,15 +123,15 @@ visicomp.app.visiui.Component.showErrorBar = function(text) {
 }
 
 /** This method returns the base member for this component. */
-visicomp.app.visiui.Component.hideErrorBar = function() {
+hax.app.visiui.Component.hideErrorBar = function() {
 	this.errorBarActive = false;
 	this.showActiveHeaders();
 }
 
 /** This method returns the base member for this component. */
-visicomp.app.visiui.Component.showSaveBar = function(onSave,onCancel) {
+hax.app.visiui.Component.showSaveBar = function(onSave,onCancel) {
     if(!this.saveDiv) {
-        this.saveDiv = visicomp.visiui.createElement("div",null,
+        this.saveDiv = hax.visiui.createElement("div",null,
             {
                 "display":"block",
                 "position":"relative",
@@ -162,19 +162,19 @@ visicomp.app.visiui.Component.showSaveBar = function(onSave,onCancel) {
 }
 
 /** This returns true if the user is editing, as signified by the edit bar showing. */
-visicomp.app.visiui.Component.editActive = function() {
+hax.app.visiui.Component.editActive = function() {
     return this.saveBarActive;
 }
 
 /** This method returns the base member for this component. */
-visicomp.app.visiui.Component.hideSaveBar = function() {
+hax.app.visiui.Component.hideSaveBar = function() {
     this.saveBarActive = false;	
 	this.showActiveHeaders();
 }
 
 /** This method shows the active headers. 
  * @private */
-visicomp.app.visiui.Component.showActiveHeaders = function() {
+hax.app.visiui.Component.showActiveHeaders = function() {
 	var window = this.getWindow();
 	
 	var headers = [];
@@ -193,29 +193,29 @@ visicomp.app.visiui.Component.showActiveHeaders = function() {
 //==============================
 
 /** This method returns the base member for this component. */
-visicomp.app.visiui.Component.getObject = function() {
+hax.app.visiui.Component.getObject = function() {
     return this.object;
 }
 
 /** This method returns the workspace for this component. */
-visicomp.app.visiui.Component.getWorkspace = function() {
+hax.app.visiui.Component.getWorkspace = function() {
     return this.object.getWorkspace();
 }
 
 /** This method returns the workspaceUI for this component. */
-visicomp.app.visiui.Component.getWorkspaceUI = function() {
+hax.app.visiui.Component.getWorkspaceUI = function() {
     return this.workspaceUI;
 }
 
 /** This method populates the frame for this component. */
-visicomp.app.visiui.Component.getWindow = function() {
+hax.app.visiui.Component.getWindow = function() {
      return this.window;
 }
 
 /** This method sets the content element as a scrolling element. */
-visicomp.app.visiui.Component.setScrollingContentElement = function() {
+hax.app.visiui.Component.setScrollingContentElement = function() {
     //load the content div
-    this.contentDiv = visicomp.visiui.createElement("div",null,
+    this.contentDiv = hax.visiui.createElement("div",null,
         {
 			"display":"block",
             "position":"relative",
@@ -227,18 +227,18 @@ visicomp.app.visiui.Component.setScrollingContentElement = function() {
 }
 
 /** This method sets the content element as a fixed element. */
-visicomp.app.visiui.Component.setFixedContentElement = function() {
+hax.app.visiui.Component.setFixedContentElement = function() {
     //load the content div
     this.contentDiv = this.window.getBody();
 }
 
 /** This method returns the content element for the windowframe for this component. */
-visicomp.app.visiui.Component.getContentElement = function() {
+hax.app.visiui.Component.getContentElement = function() {
      return this.contentDiv;
 }
 
 /** This serializes the component. */
-visicomp.app.visiui.Component.toJson = function() {
+hax.app.visiui.Component.toJson = function() {
     var json = {};
     json.key = this.getObject().getFullName();
     json.type = this.generator.uniqueName;
@@ -259,15 +259,15 @@ visicomp.app.visiui.Component.toJson = function() {
 
 //This method should be populated by an extending object. It should return a json object.
 //** This serializes the table component. */
-//visicomp.app.visiui.Component.prototype.writeToJson = function(json);
+//hax.app.visiui.Component.prototype.writeToJson = function(json);
 
 //This method should be populated by an extending object iof it needs to add any UI elements
 // to the frame.
 //** This method populates the frame for this component. */
-//visicomp.app.visiui.Component.populateFrame = function();
+//hax.app.visiui.Component.populateFrame = function();
 
 /** This method should include an needed functionality to clean up after a delete. */
-visicomp.app.visiui.Component.onDelete = function() {
+hax.app.visiui.Component.onDelete = function() {
     //remove the UI element
     var componentWindow = this.getWindow();
     componentWindow.deleteWindow();
@@ -281,17 +281,17 @@ visicomp.app.visiui.Component.onDelete = function() {
 /** This method is used for setting initial values in the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to give the values of those properties too. */
-visicomp.app.visiui.Component.getPropertyValues = function() {
+hax.app.visiui.Component.getPropertyValues = function() {
     var values = {};
     values.name = this.object.getName();
-    values.parentKey = visicomp.app.visiui.WorkspaceUI.getObjectKey(this.object.getParent());
+    values.parentKey = hax.app.visiui.WorkspaceUI.getObjectKey(this.object.getParent());
     return values;
 }
 
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-visicomp.app.visiui.Component.updatePropertyValues = function(newValues) {
+hax.app.visiui.Component.updatePropertyValues = function(newValues) {
     
 }
 
@@ -301,7 +301,7 @@ visicomp.app.visiui.Component.updatePropertyValues = function(newValues) {
 
 /** This method creates a callback for deleting the component. 
  *  @private */
-visicomp.app.visiui.Component.createDeleteCallback = function() {
+hax.app.visiui.Component.createDeleteCallback = function() {
     var object = this.getObject();
     return function() {
         var doDelete = confirm("Are you sure you want to delete this object?");
@@ -310,7 +310,7 @@ visicomp.app.visiui.Component.createDeleteCallback = function() {
         }
         
         //delete the object - the component we be deleted after the delete event received
-        var actionResponse = visicomp.core.deletemember.deleteMember(object);
+        var actionResponse = hax.core.deletemember.deleteMember(object);
         if(!actionResponse.getSuccess()) {
             //show an error message
             var msg = actionResponse.getErrorMsg();
@@ -323,10 +323,10 @@ visicomp.app.visiui.Component.createDeleteCallback = function() {
 // All components should have a generator to register the component, as below
 //======================================
 //
-//visicomp.app.visiui.JsonTableComponent.generator = {};
-//visicomp.app.visiui.JsonTableComponent.generator.displayName = "JSON Table";
-//visicomp.app.visiui.JsonTableComponent.generator.uniqueName = "visicomp.app.visiui.JsonTableComponent";
-//visicomp.app.visiui.JsonTableComponent.generator.createComponent = visicomp.app.visiui.JsonTableComponent.createComponent;
-//visicomp.app.visiui.JsonTableComponent.generator.createComponentFromJson = visicomp.app.visiui.JsonTableComponent.createComponentFromJson;
-//visicomp.app.visiui.JsonTableComponent.generator.DEFAULT_WIDTH = 200;
-//visicomp.app.visiui.JsonTableComponent.generator.DEFAULT_HEIGHT = 200;
+//hax.app.visiui.JsonTableComponent.generator = {};
+//hax.app.visiui.JsonTableComponent.generator.displayName = "JSON Table";
+//hax.app.visiui.JsonTableComponent.generator.uniqueName = "hax.app.visiui.JsonTableComponent";
+//hax.app.visiui.JsonTableComponent.generator.createComponent = hax.app.visiui.JsonTableComponent.createComponent;
+//hax.app.visiui.JsonTableComponent.generator.createComponentFromJson = hax.app.visiui.JsonTableComponent.createComponentFromJson;
+//hax.app.visiui.JsonTableComponent.generator.DEFAULT_WIDTH = 200;
+//hax.app.visiui.JsonTableComponent.generator.DEFAULT_HEIGHT = 200;

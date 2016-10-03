@@ -3,7 +3,7 @@
  * be returned to the previous value. Otherwise, the value of the field
  * fill be updated to match the edit.
  */
-visicomp.jsonedit.EditField = function (value,fieldType,isEditable,isVirtual) {
+hax.jsonedit.EditField = function (value,fieldType,isEditable,isVirtual) {
 	this.fieldType = fieldType;
 	this.isEditable = isEditable;
 	this.isVirtual = isVirtual;
@@ -25,28 +25,28 @@ visicomp.jsonedit.EditField = function (value,fieldType,isEditable,isVirtual) {
     this.setValue(value);
 }
 
-visicomp.jsonedit.EditField.FIELD_TYPE_VALUE = "value";
-visicomp.jsonedit.EditField.FIELD_TYPE_KEY = "key";
-visicomp.jsonedit.EditField.FIELD_TYPE_INDEX = "index";
+hax.jsonedit.EditField.FIELD_TYPE_VALUE = "value";
+hax.jsonedit.EditField.FIELD_TYPE_KEY = "key";
+hax.jsonedit.EditField.FIELD_TYPE_INDEX = "index";
 
-visicomp.jsonedit.EditField.prototype.setOnEditCallback= function(onEdit) {
+hax.jsonedit.EditField.prototype.setOnEditCallback= function(onEdit) {
     return this.onEdit = onEdit;
 }
 
-visicomp.jsonedit.EditField.prototype.setNavCallback = function(onNavigate) {
+hax.jsonedit.EditField.prototype.setNavCallback = function(onNavigate) {
     this.onNavigate = onNavigate;
 }
 
-visicomp.jsonedit.EditField.prototype.setIsVirtual = function(isVirtual) {
+hax.jsonedit.EditField.prototype.setIsVirtual = function(isVirtual) {
     this.isVirtual = isVirtual;
 	this.setCssClass();
 }
 
-visicomp.jsonedit.EditField.prototype.getValue= function() {
+hax.jsonedit.EditField.prototype.getValue= function() {
     return this.value;
 }
 
-visicomp.jsonedit.EditField.prototype.setValue = function(value) {
+hax.jsonedit.EditField.prototype.setValue = function(value) {
 	
 	if(value === undefined) {
 		value = null;
@@ -54,7 +54,7 @@ visicomp.jsonedit.EditField.prototype.setValue = function(value) {
 	}
 	
     this.value = value;
-    this.isString = (visicomp.jsonedit.getValueType(value) === "string");
+    this.isString = (hax.jsonedit.getValueType(value) === "string");
 	this.setCssClass();
 
 	//display value (with some exceptions)
@@ -72,7 +72,7 @@ visicomp.jsonedit.EditField.prototype.setValue = function(value) {
 }
 
 /** @private */
-visicomp.jsonedit.EditField.prototype.setCssClass = function() {
+hax.jsonedit.EditField.prototype.setCssClass = function() {
 	var cssName = "cell_" + this.fieldType;
 	if(this.isVirtual) {
 		cssName += "_virtual";
@@ -89,18 +89,18 @@ visicomp.jsonedit.EditField.prototype.setCssClass = function() {
 	this.element.className = cssName;
 }
 
-visicomp.jsonedit.EditField.prototype.getElement = function() {
+hax.jsonedit.EditField.prototype.getElement = function() {
     return this.element;
 }
 
-visicomp.jsonedit.EditField.prototype.onClick = function() {
+hax.jsonedit.EditField.prototype.onClick = function() {
     if((this.isEditable)&&(!this.editField)) {
         this.startEdit();
     }
  
 }
 
-visicomp.jsonedit.EditField.prototype.startEdit = function() {
+hax.jsonedit.EditField.prototype.startEdit = function() {
     if(!this.editField) {
         this.editField = document.createElement("input");
 		this.editField.type = "text";
@@ -108,7 +108,7 @@ visicomp.jsonedit.EditField.prototype.startEdit = function() {
 			this.editField.value = this.value;
 		}
 		
-		visicomp.core.util.removeAllChildren(this.element);
+		hax.core.util.removeAllChildren(this.element);
         this.element.appendChild(this.editField);
         
         //select the entry
@@ -130,7 +130,7 @@ visicomp.jsonedit.EditField.prototype.startEdit = function() {
 // - if the initial value was a non-string or an empty string, try to convert the contents of the edit cell to a non-string
 // - otherwise keep the value as a string when it is loaded from the edit field
 
-visicomp.jsonedit.EditField.prototype.endEdit = function() {
+hax.jsonedit.EditField.prototype.endEdit = function() {
     if(this.editField) {
         var newValue = this.editField.value;
         if(newValue != this.value) {
@@ -139,8 +139,8 @@ visicomp.jsonedit.EditField.prototype.endEdit = function() {
             var editValue;
             if((!this.isString)||(this.value === "")) {
 				//try to convert to a number if the original value was a number if it was an empty string
-                if(visicomp.jsonedit.canBeConvertedToNonString(editStringValue)) {
-                    editValue = visicomp.jsonedit.stringToNonString(editStringValue);
+                if(hax.jsonedit.canBeConvertedToNonString(editStringValue)) {
+                    editValue = hax.jsonedit.stringToNonString(editStringValue);
                 }
                 else {
                     editValue = editStringValue;
@@ -164,20 +164,20 @@ visicomp.jsonedit.EditField.prototype.endEdit = function() {
     }
 }
 
-visicomp.jsonedit.EditField.DIRECTION_NONE = 0;
-visicomp.jsonedit.EditField.DIRECTION_UP = 1;
-visicomp.jsonedit.EditField.DIRECTION_DOWN = 2;
-visicomp.jsonedit.EditField.DIRECTION_RIGHT = 3;
-visicomp.jsonedit.EditField.DIRECTION_LEFT = 4;
-visicomp.jsonedit.EditField.DIRECTION_NEXT = 5;
-visicomp.jsonedit.EditField.DIRECTION_PREV = 6;
+hax.jsonedit.EditField.DIRECTION_NONE = 0;
+hax.jsonedit.EditField.DIRECTION_UP = 1;
+hax.jsonedit.EditField.DIRECTION_DOWN = 2;
+hax.jsonedit.EditField.DIRECTION_RIGHT = 3;
+hax.jsonedit.EditField.DIRECTION_LEFT = 4;
+hax.jsonedit.EditField.DIRECTION_NEXT = 5;
+hax.jsonedit.EditField.DIRECTION_PREV = 6;
 
-visicomp.jsonedit.EditField.ENTER_KEY = 13;
-visicomp.jsonedit.EditField.TAB_KEY = 9;
-visicomp.jsonedit.EditField.UP_KEY = 38;
-visicomp.jsonedit.EditField.DOWN_KEY = 40;
-visicomp.jsonedit.EditField.RIGHT_KEY = 39;
-visicomp.jsonedit.EditField.LEFT_KEY = 37;
+hax.jsonedit.EditField.ENTER_KEY = 13;
+hax.jsonedit.EditField.TAB_KEY = 9;
+hax.jsonedit.EditField.UP_KEY = 38;
+hax.jsonedit.EditField.DOWN_KEY = 40;
+hax.jsonedit.EditField.RIGHT_KEY = 39;
+hax.jsonedit.EditField.LEFT_KEY = 37;
 
 //navigation rules:
 //- tab/enter and shift tab/enter go to the next and previous active field
@@ -192,43 +192,43 @@ visicomp.jsonedit.EditField.LEFT_KEY = 37;
 //- when we enter a field through navigation or click, it should select the entire field.
 
 
-visicomp.jsonedit.EditField.prototype.onKeyDown = function(event) {
+hax.jsonedit.EditField.prototype.onKeyDown = function(event) {
     var doExit = false;
-    var direction = visicomp.jsonedit.EditField.DIRECTION_NONE;
+    var direction = hax.jsonedit.EditField.DIRECTION_NONE;
     var cancelDefault = false;
-    if(event.keyCode == visicomp.jsonedit.EditField.ENTER_KEY) {
+    if(event.keyCode == hax.jsonedit.EditField.ENTER_KEY) {
         //next or prev, based on shift key
         doExit = true;
-        direction = event.shiftKey ? visicomp.jsonedit.EditField.DIRECTION_PREV : visicomp.jsonedit.EditField.DIRECTION_NEXT;
+        direction = event.shiftKey ? hax.jsonedit.EditField.DIRECTION_PREV : hax.jsonedit.EditField.DIRECTION_NEXT;
         cancelDefault = true;
 	}
-    else if(event.keyCode == visicomp.jsonedit.EditField.TAB_KEY) {
+    else if(event.keyCode == hax.jsonedit.EditField.TAB_KEY) {
         //next or prev, based on shift key
         doExit = true;
-        direction = event.shiftKey ? visicomp.jsonedit.EditField.DIRECTION_PREV : visicomp.jsonedit.EditField.DIRECTION_NEXT;
+        direction = event.shiftKey ? hax.jsonedit.EditField.DIRECTION_PREV : hax.jsonedit.EditField.DIRECTION_NEXT;
         cancelDefault = true;
     }
-    else if(event.keyCode == visicomp.jsonedit.EditField.UP_KEY) {
+    else if(event.keyCode == hax.jsonedit.EditField.UP_KEY) {
         doExit = true;
-        direction = visicomp.jsonedit.EditField.DIRECTION_UP;
+        direction = hax.jsonedit.EditField.DIRECTION_UP;
         cancelDefault = true;
     }
-    else if(event.keyCode == visicomp.jsonedit.EditField.DOWN_KEY) {
+    else if(event.keyCode == hax.jsonedit.EditField.DOWN_KEY) {
         doExit = true;
-        direction = visicomp.jsonedit.EditField.DIRECTION_DOWN;
+        direction = hax.jsonedit.EditField.DIRECTION_DOWN;
         cancelDefault = true;
     }
-    else if(event.keyCode == visicomp.jsonedit.EditField.RIGHT_KEY) {
+    else if(event.keyCode == hax.jsonedit.EditField.RIGHT_KEY) {
         if(this.cursorAtEndOfEditField()) {
             doExit = true;
-            direction = visicomp.jsonedit.EditField.DIRECTION_RIGHT;
+            direction = hax.jsonedit.EditField.DIRECTION_RIGHT;
             cancelDefault = true;
         }
     }
-    else if(event.keyCode == visicomp.jsonedit.EditField.LEFT_KEY) {
+    else if(event.keyCode == hax.jsonedit.EditField.LEFT_KEY) {
         if(this.cursorAtStartOfEditField()) {
             doExit = true;
-            direction = visicomp.jsonedit.EditField.DIRECTION_LEFT;
+            direction = hax.jsonedit.EditField.DIRECTION_LEFT;
             cancelDefault = true;
         }
     }
@@ -240,17 +240,17 @@ visicomp.jsonedit.EditField.prototype.onKeyDown = function(event) {
     
     if(doExit) {
         this.endEdit();
-        if((direction != visicomp.jsonedit.EditField.DIRECTION_NONE)&&(this.onNavigate)) {
+        if((direction != hax.jsonedit.EditField.DIRECTION_NONE)&&(this.onNavigate)) {
             this.onNavigate(direction);
         }
     }
 }
 
-visicomp.jsonedit.EditField.prototype.cursorAtStartOfEditField = function() {
+hax.jsonedit.EditField.prototype.cursorAtStartOfEditField = function() {
     return ((this.editField.selectionStart == 0)&&(this.editField.selectionEnd == 0));
 }
 
-visicomp.jsonedit.EditField.prototype.cursorAtEndOfEditField = function() {
+hax.jsonedit.EditField.prototype.cursorAtEndOfEditField = function() {
     var length = String(this.editField.value).length;
     return ((this.editField.selectionStart == length)&&(this.editField.selectionEnd == length));
 }

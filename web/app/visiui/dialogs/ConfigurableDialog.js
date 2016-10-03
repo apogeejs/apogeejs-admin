@@ -2,9 +2,9 @@
  * defines the form content for the dialog. The on submit
  * function is called when submit is pressed. The on submit function should
  * return true or false, indicating whether of not to close the dialog. */
-visicomp.app.visiui.dialog.showConfigurableDialog = function(layout,onSubmitFunction) {
+hax.app.visiui.dialog.showConfigurableDialog = function(layout,onSubmitFunction) {
 
-    var dialog = visicomp.visiui.createDialog({"movable":true});
+    var dialog = hax.visiui.createDialog({"movable":true});
     var lineObjects = [];
     
     //this is the action for the form
@@ -17,7 +17,7 @@ visicomp.app.visiui.dialog.showConfigurableDialog = function(layout,onSubmitFunc
                 lineObject.onClose();
             }
         }
-        visicomp.visiui.closeDialog(dialog);
+        hax.visiui.closeDialog(dialog);
     }
     //cancel
     formActions.onCancel = function() {
@@ -41,12 +41,12 @@ visicomp.app.visiui.dialog.showConfigurableDialog = function(layout,onSubmitFunc
         }
     }
     
-    var content = visicomp.visiui.createElement("div",{"className":"dialogBody"});
+    var content = hax.visiui.createElement("div",{"className":"dialogBody"});
     for(var i = 0; i < layout.lines.length; i++) {
         var lineDef = layout.lines[i];
         
         //create line
-        var lineObject = visicomp.app.visiui.dialog.showConfigurableDialog.createLine(lineDef,formActions);
+        var lineObject = hax.app.visiui.dialog.showConfigurableDialog.createLine(lineDef,formActions);
         lineObjects.push(lineObject);
         if(lineObject.element) { //no element for "invisible" entry, which is used to pass values along
             content.appendChild(lineObject.element);
@@ -64,8 +64,8 @@ visicomp.app.visiui.dialog.showConfigurableDialog = function(layout,onSubmitFunc
     
     
     
-visicomp.app.visiui.dialog.showConfigurableDialog.createLine = function(lineDef,formActions) {
-    var lineFunction = visicomp.app.visiui.dialog.showConfigurableDialog.lineFunctions[lineDef.type];
+hax.app.visiui.dialog.showConfigurableDialog.createLine = function(lineDef,formActions) {
+    var lineFunction = hax.app.visiui.dialog.showConfigurableDialog.lineFunctions[lineDef.type];
     if(lineFunction) {
         return lineFunction(lineDef,formActions);
     }
@@ -76,14 +76,14 @@ visicomp.app.visiui.dialog.showConfigurableDialog.createLine = function(lineDef,
     }
 }
 
-visicomp.app.visiui.dialog.showConfigurableDialog.lineFunctions = {
+hax.app.visiui.dialog.showConfigurableDialog.lineFunctions = {
     //linedef.type = "title"
     //linedef.title = title
     "title": function(lineDef,formActions) {
         var lineObject = {};
         //create the element
-        var line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-        line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":lineDef.title}));
+        var line = hax.visiui.createElement("div",{"className":"dialogLine"});
+        line.appendChild(hax.visiui.createElement("div",{"className":"dialogTitle","innerHTML":lineDef.title}));
         lineObject.element = line;
         
         //no addToResult or onClose
@@ -99,14 +99,14 @@ visicomp.app.visiui.dialog.showConfigurableDialog.lineFunctions = {
     "dropdown": function(lineDef,formActions) {
         var lineObject = {};
         //create the element
-        var line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
+        var line = hax.visiui.createElement("div",{"className":"dialogLine"});
         if(lineDef.heading) {
             line.appendChild(document.createTextNode(lineDef.heading));
         }
-        var select = visicomp.visiui.createElement("select");
+        var select = hax.visiui.createElement("select");
         for(var i = 0; i < lineDef.entries.length; i++) {
             var entry = lineDef.entries[i];
-            select.add(visicomp.visiui.createElement("option",{"text":entry}));
+            select.add(hax.visiui.createElement("option",{"text":entry}));
         }
         if(lineDef.initial) {
             select.value = lineDef.initial;
@@ -132,11 +132,11 @@ visicomp.app.visiui.dialog.showConfigurableDialog.lineFunctions = {
     "inputElement": function(lineDef,formActions) {
         var lineObject = {};
         //create the element
-        var line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
+        var line = hax.visiui.createElement("div",{"className":"dialogLine"});
         if(lineDef.heading) {
             line.appendChild(document.createTextNode(lineDef.heading));
         }
-        var inputElement = visicomp.visiui.createElement("input",{"type":"text"});
+        var inputElement = hax.visiui.createElement("input",{"type":"text"});
         if(lineDef.initial) {
             inputElement.value = lineDef.initial;
         }
@@ -169,13 +169,13 @@ visicomp.app.visiui.dialog.showConfigurableDialog.lineFunctions = {
     "submit": function(lineDef,formActions) {
         var lineObject = {};
         //create the element
-        var line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
+        var line = hax.visiui.createElement("div",{"className":"dialogLine"});
         if(lineDef.submit) {  
-            line.appendChild(visicomp.visiui.createElement("button",
+            line.appendChild(hax.visiui.createElement("button",
             {"className":"dialogButton","innerHTML":lineDef.submit,"onclick":formActions.onSubmit}));
         }
         if(lineDef.cancel) {
-            line.appendChild(visicomp.visiui.createElement("button",
+            line.appendChild(hax.visiui.createElement("button",
             {"className":"dialogButton","innerHTML":lineDef.cancel,"onclick":formActions.onCancel}));
         }
         lineObject.element = line;

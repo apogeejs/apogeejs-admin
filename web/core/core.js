@@ -1,12 +1,12 @@
-/** Namespace for the business logic for the visicomp model. */
-visicomp.core = {}
+/** Namespace for the business logic for the hax model. */
+hax.core = {}
 
 ///** This is a simple entry point to debug user code */
-//visicomp.core.getObjectFunction = function(object) {
+//hax.core.getObjectFunction = function(object) {
 //    var objectName = object.getFullName();
 //    var workspaceName = object.getWorkspace().getName();
 //    
-//    return visicomp.core.functionCode[workspaceName][objectName];
+//    return hax.core.functionCode[workspaceName][objectName];
 //}
 
 

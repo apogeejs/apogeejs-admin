@@ -1,8 +1,8 @@
 
-visicomp.app.visiui.ResourceOutputMode = function(component) {
+hax.app.visiui.ResourceOutputMode = function(component) {
 	this.component = component;
 	
-	this.outputElement = visicomp.visiui.createElement("div",null,{
+	this.outputElement = hax.visiui.createElement("div",null,{
 		"position":"absolute",
         "top":"0px",
         "left":"0px",
@@ -13,13 +13,13 @@ visicomp.app.visiui.ResourceOutputMode = function(component) {
 }
 
 /** This indicates if this element displays data or something else (code) */
-visicomp.app.visiui.ResourceOutputMode.prototype.isData = true;
+hax.app.visiui.ResourceOutputMode.prototype.isData = true;
 
-visicomp.app.visiui.ResourceOutputMode.prototype.getElement = function() {
+hax.app.visiui.ResourceOutputMode.prototype.getElement = function() {
 	return this.outputElement;
 }
 	
-visicomp.app.visiui.ResourceOutputMode.prototype.showData = function(editOk) {
+hax.app.visiui.ResourceOutputMode.prototype.showData = function(editOk) {
 	//edit ok ignored - no edit of the control data object - there is none
 	
 	var control = this.component.getObject();
@@ -29,14 +29,14 @@ visicomp.app.visiui.ResourceOutputMode.prototype.showData = function(editOk) {
     }   
 }
 
-visicomp.app.visiui.ResourceOutputMode.prototype.destroy = function() {
+hax.app.visiui.ResourceOutputMode.prototype.destroy = function() {
 }
 
 //==============================
 // internal
 //==============================
 
-visicomp.app.visiui.ResourceOutputMode.prototype.onSave = function(data) {
+hax.app.visiui.ResourceOutputMode.prototype.onSave = function(data) {
 	//no saving action
 }
 

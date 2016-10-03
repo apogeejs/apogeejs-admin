@@ -1,4 +1,4 @@
-visicomp.app.visiui.CustomResource = function() {
+hax.app.visiui.CustomResource = function() {
 	this.contentElement = null;
 	
 	this.html = "";
@@ -7,35 +7,35 @@ visicomp.app.visiui.CustomResource = function() {
 	this.css = "";
 }
 
-visicomp.app.visiui.CustomResource.prototype.setComponent = function(component) {
+hax.app.visiui.CustomResource.prototype.setComponent = function(component) {
     this.component = component;
 }
 
-visicomp.app.visiui.CustomResource.prototype.getContentElement = function() {
+hax.app.visiui.CustomResource.prototype.getContentElement = function() {
     return this.component.getOutputElement();
 }
 
-visicomp.app.visiui.CustomResource.prototype.getComponent = function() {
+hax.app.visiui.CustomResource.prototype.getComponent = function() {
     return this.component;
 }
 
-visicomp.app.visiui.CustomResource.prototype.getHtml = function() {
+hax.app.visiui.CustomResource.prototype.getHtml = function() {
     return this.html;
 }
 
-visicomp.app.visiui.CustomResource.prototype.getCustomizeScript = function() {
+hax.app.visiui.CustomResource.prototype.getCustomizeScript = function() {
     return this.customizeScript;
 }
 
-visicomp.app.visiui.CustomResource.prototype.getSupplementalCode = function() {
+hax.app.visiui.CustomResource.prototype.getSupplementalCode = function() {
     return this.supplementalCode;
 }
 
-visicomp.app.visiui.CustomResource.prototype.getCss = function(msg) {
+hax.app.visiui.CustomResource.prototype.getCss = function(msg) {
     return this.css;
 }
 
-visicomp.app.visiui.CustomResource.prototype.update = function(html,customizeScript,supplementalCode,css) {
+hax.app.visiui.CustomResource.prototype.update = function(html,customizeScript,supplementalCode,css) {
     this.html = html;
 	this.customizeScript = customizeScript;
 	this.supplementalCode = supplementalCode;
@@ -52,11 +52,11 @@ visicomp.app.visiui.CustomResource.prototype.update = function(html,customizeScr
 /** This method creates the member update javascript, which will be added to the
  * html page so the user easily can run it in the debugger if needed. 
  * @private */
-visicomp.app.visiui.CustomResource.prototype.updateResource = function() {
+hax.app.visiui.CustomResource.prototype.updateResource = function() {
     
     //create the resource generator wrapped with its closure
-    var generatorFunctionBody = visicomp.core.util.formatString(
-        visicomp.app.visiui.CustomResource.GENERATOR_FUNCTION_FORMAT_TEXT,
+    var generatorFunctionBody = hax.core.util.formatString(
+        hax.app.visiui.CustomResource.GENERATOR_FUNCTION_FORMAT_TEXT,
 		this.customizeScript,
         this.supplementalCode
     );
@@ -75,7 +75,7 @@ visicomp.app.visiui.CustomResource.prototype.updateResource = function() {
  * 1: supplemental code text
  * @private
  */
-visicomp.app.visiui.CustomResource.GENERATOR_FUNCTION_FORMAT_TEXT = [
+hax.app.visiui.CustomResource.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "",
 "//supplemental code",
 "{1}",

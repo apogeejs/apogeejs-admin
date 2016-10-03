@@ -10,34 +10,34 @@
  * - A Parent must be a Child.
  * - A Parent must be an Owner.
  */
-visicomp.core.Parent = {};
+hax.core.Parent = {};
 
 /** This initializes the component */
-visicomp.core.Parent.init = function() {
+hax.core.Parent.init = function() {
 }
 
-visicomp.core.Parent.isParent = true;
+hax.core.Parent.isParent = true;
 
 
 /** this is used to identify if this is the root folder. */
-visicomp.core.Parent.isRoot = function() {
+hax.core.Parent.isRoot = function() {
     //undefined may be OK too. If there is populated object this is not root.
     return (this.getParent() == null); 
 }
 
 ///** this method gets a map of child names to children. This may not be the structure
 // * of the data in the parent, but it is the prefered common representation. */
-//visicomp.core.Parent.getChildMap = function();
+//hax.core.Parent.getChildMap = function();
 
 // Must be implemented in extending object
 ///** This method looks up a child from this folder.  */
-//visicomp.core.Folder.lookupChild = function(name);
+//hax.core.Folder.lookupChild = function(name);
 
 /** This method looks up a child using an arry of names corresponding to the
  * path from this folder to the object.  Note: the method will return the 
  * fist non-folder it finds, even if the path is not completed. In this case
  * it is assumed the path refers to a field inside this object. */
-visicomp.core.Parent.lookupChildFromPath = function(path) {
+hax.core.Parent.lookupChildFromPath = function(path) {
 	var object = this;
 	for(var i = 0; ((object)&&(i < path.length)&&(object.isParent)); i++) {
 		object = object.lookupChild(path[i]);
@@ -48,24 +48,24 @@ visicomp.core.Parent.lookupChildFromPath = function(path) {
 // Must be implemented in extending object
 ///** This method adds the child to this parent. 
 // * It will fail if the name already exists.  */
-//visicomp.core.Parent.addChild = function(child);
+//hax.core.Parent.addChild = function(child);
 
 // Must be implemented in extending object
 ///** This method removes this child from this parent.  */
-//visicomp.core.Folder.removeChild = function(child);
+//hax.core.Folder.removeChild = function(child);
 
 // Must be implemented in extending object
 ///** This method updates the data object for this child. */
-//visicomp.core.Folder.updateData = function(child);
+//hax.core.Folder.updateData = function(child);
 
 //------------------------------
 //ContextHolder methods
 //------------------------------
 
 /** This method retrieve creates the loaded context manager. */
-visicomp.core.Parent.createContextManager = function() {
+hax.core.Parent.createContextManager = function() {
     //set the context manager
-    var contextManager = new visicomp.core.ContextManager(this.getOwner());
+    var contextManager = new hax.core.ContextManager(this.getOwner());
     //add an entry for this folder. Make it local unless this si a root folder
     var myEntry = {};
     myEntry.isLocal = !this.isRoot();
@@ -80,7 +80,7 @@ visicomp.core.Parent.createContextManager = function() {
 //------------------------------
 
 /** this method gets the hame the children inherit for the full name. */
-visicomp.core.Parent.getPossesionNameBase = function() {
+hax.core.Parent.getPossesionNameBase = function() {
     if(this.isRoot()) {
         return this.owner.getPossesionNameBase();
     }
@@ -90,13 +90,13 @@ visicomp.core.Parent.getPossesionNameBase = function() {
 }
 
 /** This method returns the full name in dot notation for this object. */
-visicomp.core.Parent.getFullName = function() {
+hax.core.Parent.getFullName = function() {
     if(this.isRoot()) {
 //change this!
         return this.owner.getPossesionNameBase();
     }
     else {
-        return visicomp.core.Child.getFullName.call(this);
+        return hax.core.Child.getFullName.call(this);
     }
 }
 

@@ -1,5 +1,5 @@
 
-visicomp.jsonedit.JsonEditArea = function(divElement,initialValue,isEditable) {
+hax.jsonedit.JsonEditArea = function(divElement,initialValue,isEditable) {
     this.body = divElement;
 	this.isEditable = isEditable;
 	
@@ -8,33 +8,33 @@ visicomp.jsonedit.JsonEditArea = function(divElement,initialValue,isEditable) {
 		initialValue = "";
 	}
     
-	this.valueEntry = new visicomp.jsonedit.ValueEntry(this,this,initialValue,this.isEditable);
+	this.valueEntry = new hax.jsonedit.ValueEntry(this,this,initialValue,this.isEditable);
     this.valueEntry.setExpanded(true);
  
 	this.formatBody();
 }
 
-visicomp.jsonedit.JsonEditArea.prototype.setEditCallback = function(editCallback) {
+hax.jsonedit.JsonEditArea.prototype.setEditCallback = function(editCallback) {
 	this.editCallback = editCallback;
 }
 
-visicomp.jsonedit.JsonEditArea.prototype.getCurrentValue = function() {
+hax.jsonedit.JsonEditArea.prototype.getCurrentValue = function() {
 	return this.valueEntry.getCurrentValue();
 }
 
-visicomp.jsonedit.JsonEditArea.prototype.getElement = function() {
+hax.jsonedit.JsonEditArea.prototype.getElement = function() {
 	return this.body;
 }
 
-visicomp.jsonedit.JsonEditArea.prototype.getParentValueObject = function() {
+hax.jsonedit.JsonEditArea.prototype.getParentValueObject = function() {
 	return undefined;
 }
 
-visicomp.jsonedit.JsonEditArea.prototype.getIndentLevel = function() {
+hax.jsonedit.JsonEditArea.prototype.getIndentLevel = function() {
 	return 0;
 }
 
-visicomp.jsonedit.JsonEditArea.prototype.formatBody = function() {
+hax.jsonedit.JsonEditArea.prototype.formatBody = function() {
     var elementList = this.valueEntry.getElementList();
     for(var i = 0; i < elementList.length; i++) {
         this.body.appendChild(elementList[i]);
@@ -44,7 +44,7 @@ visicomp.jsonedit.JsonEditArea.prototype.formatBody = function() {
 }
 
 
-visicomp.jsonedit.JsonEditArea.prototype.loadContextMenu = function() {
+hax.jsonedit.JsonEditArea.prototype.loadContextMenu = function() {
 
     var instance = this;
     var element = this.body;
@@ -54,7 +54,7 @@ visicomp.jsonedit.JsonEditArea.prototype.loadContextMenu = function() {
         event.preventDefault();
         event.stopPropagation();
         
-        var contextMenu = new visicomp.visiui.MenuBody();
+        var contextMenu = new hax.visiui.MenuBody();
         
         contextMenu.addCallbackMenuItem("Get Value",function() {alert(JSON.stringify(valueEntry.getCurrentValue()));});
         
@@ -89,21 +89,21 @@ visicomp.jsonedit.JsonEditArea.prototype.loadContextMenu = function() {
 			}
 		}
         
-        visicomp.visiui.Menu.showContextMenu(contextMenu,event);
+        hax.visiui.Menu.showContextMenu(contextMenu,event);
     }
   
 }
 
-visicomp.jsonedit.JsonEditArea.prototype.updateValueElements = function() {
+hax.jsonedit.JsonEditArea.prototype.updateValueElements = function() {
     //remove all from element
-	visicomp.core.util.removeAllChildren(this.body);
+	hax.core.util.removeAllChildren(this.body);
     //recreate
     this.formatBody();
 }
 
 /** This methd is called internally when an edit takes place in the edit are. 
  * @private */
-visicomp.jsonedit.JsonEditArea.prototype.valueEdited = function() {
+hax.jsonedit.JsonEditArea.prototype.valueEdited = function() {
     if(this.editCallback) {
         this.editCallback();
     }

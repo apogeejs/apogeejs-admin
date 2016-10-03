@@ -1,4 +1,4 @@
-visicomp.jsonedit = {};
+hax.jsonedit = {};
 
 var OBJECT_CONSTRUCTOR = {}.constructor;
 var ARRAY_CONSTRUCTOR = [].constructor;
@@ -7,7 +7,7 @@ var NUMBER_CONSTRUCTOR = (0).constructor;
 var BOOLEAN_CONSTRUCTOR = (true).constructor;
 
 //inputs to this should be "object", "array" or "value". Other type objects will not be processed properly
-visicomp.jsonedit.getObjectType = function(data) {
+hax.jsonedit.getObjectType = function(data) {
 	if(data == null) return "value";
 	
 	if(data.constructor == OBJECT_CONSTRUCTOR) {
@@ -22,7 +22,7 @@ visicomp.jsonedit.getObjectType = function(data) {
 }
 
 //this tells a type value: "string", "number", "boolean", "other", "null"
-visicomp.jsonedit.getValueType = function(value) {
+hax.jsonedit.getValueType = function(value) {
 	if(value == null) return "null";
 	
 	if(value.constructor == STRING_CONSTRUCTOR) {
@@ -39,24 +39,24 @@ visicomp.jsonedit.getValueType = function(value) {
 	}
 }
 
-visicomp.jsonedit.isBoolString = function(stringValue) {
+hax.jsonedit.isBoolString = function(stringValue) {
     return (stringValue === "false" || stringValue === "true");
 }
 
-visicomp.jsonedit.isNullString = function(stringValue) {
+hax.jsonedit.isNullString = function(stringValue) {
     return (stringValue === "null");
 }
 
 //This method retuns true if the stringToNonString method will successfully convet the object.
-visicomp.jsonedit.canBeConvertedToNonString = function(stringValue) {
-	return(isFinite(stringValue) || visicomp.jsonedit.isBoolString(stringValue) || visicomp.jsonedit.isNullString(stringValue) );
+hax.jsonedit.canBeConvertedToNonString = function(stringValue) {
+	return(isFinite(stringValue) || hax.jsonedit.isBoolString(stringValue) || hax.jsonedit.isNullString(stringValue) );
 }
 
 //This method coverts a string value to non-string value (currently a number or boolean). 
 //If the conversion fails, it returns the string value.
 //before the method is called it should be checked that it is a valid
 //number or boolean.
-visicomp.jsonedit.stringToNonString = function(stringValue) {
+hax.jsonedit.stringToNonString = function(stringValue) {
 	var stringToValueCode = "value = " + stringValue;
 	var value;
 	try {
@@ -69,20 +69,20 @@ visicomp.jsonedit.stringToNonString = function(stringValue) {
 }
 
 var PIXELS_PER_INDENT = 10;
-visicomp.jsonedit.createIndentElement = function(indentLevel) {
+hax.jsonedit.createIndentElement = function(indentLevel) {
 	var cell = document.createElement("div");
 	cell.className = "indentCell";
 	cell.style.width = (PIXELS_PER_INDENT * indentLevel) + "px";
 	return cell;
 }
 
-visicomp.jsonedit.createObjectDelimiter = function(delimiter) {
+hax.jsonedit.createObjectDelimiter = function(delimiter) {
 	var cell = document.createElement("div");
 	cell.className = "objectDelimCell";
 	cell.innerHTML = delimiter;
 	return cell;
 }
-visicomp.jsonedit.createExpandButton = function(valueEntry) {
+hax.jsonedit.createExpandButton = function(valueEntry) {
 	var cell = document.createElement("div");
 	cell.className = "buttonCell";
 	cell.innerHTML = "+";
@@ -91,7 +91,7 @@ visicomp.jsonedit.createExpandButton = function(valueEntry) {
 	}
 	return cell;
 }
-visicomp.jsonedit.createContractButton = function(valueEntry) {
+hax.jsonedit.createContractButton = function(valueEntry) {
 	var cell = document.createElement("div");
 	cell.className = "buttonCell";
 	cell.innerHTML = "-";

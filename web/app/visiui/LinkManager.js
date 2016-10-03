@@ -1,6 +1,6 @@
 
-/** This is the main class of the visicomp application. */
-visicomp.app.visiui.LinkManager = function() {
+/** This is the main class of the hax application. */
+hax.app.visiui.LinkManager = function() {
 	//external links infrastructure
 	this.linkMap = {};
 }
@@ -12,7 +12,7 @@ visicomp.app.visiui.LinkManager = function() {
  * been loaded on the page.
  * The arguments "addList" and"removeList" are arrays with the entries {"link":(url),"type":("js" or "css")}
  */
-visicomp.app.visiui.LinkManager.prototype.updateWorkspaceLinks = function(workspaceName,addList,removeList,linksLoadedCallback) {
+hax.app.visiui.LinkManager.prototype.updateWorkspaceLinks = function(workspaceName,addList,removeList,linksLoadedCallback) {
 	
 	var i;
 	var cnt;
@@ -92,22 +92,22 @@ visicomp.app.visiui.LinkManager.prototype.updateWorkspaceLinks = function(worksp
 	}
 }
 
-visicomp.app.visiui.LinkManager.prototype.addLinkToPage = function(link,type,responseProcessor) {
+hax.app.visiui.LinkManager.prototype.addLinkToPage = function(link,type,responseProcessor) {
 	
 	if(type === "js") {
-		visicomp.app.visiui.LinkManager.addJsLink(link,responseProcessor)
+		hax.app.visiui.LinkManager.addJsLink(link,responseProcessor)
 	}
 	else if(type === "css") {
-		visicomp.app.visiui.LinkManager.addCssLink(link,responseProcessor);
+		hax.app.visiui.LinkManager.addCssLink(link,responseProcessor);
 	}
 }
 
-visicomp.app.visiui.LinkManager.prototype.removeLinkFromPage = function(link,type) {
+hax.app.visiui.LinkManager.prototype.removeLinkFromPage = function(link,type) {
 	//for now do not remove js link, only css
 	//we can not unexectue the js script
 	//css does get removed
 	if(type === "css") {
-		visicomp.app.visiui.LinkManager.removeLink(link);
+		hax.app.visiui.LinkManager.removeLink(link);
 		return true;
 	}
 	else {
@@ -116,7 +116,7 @@ visicomp.app.visiui.LinkManager.prototype.removeLinkFromPage = function(link,typ
 }
 
 /** @private */
-visicomp.app.visiui.LinkManager.addJsLink = function(link,responseProcessor) {
+hax.app.visiui.LinkManager.addJsLink = function(link,responseProcessor) {
 
     //set the link as the element id
     var element = document.getElementById(link);
@@ -129,7 +129,7 @@ visicomp.app.visiui.LinkManager.addJsLink = function(link,responseProcessor) {
 			linkProps.onload = responseProcessor.getOnLoad(link);
 			linkProps.onerror = responseProcessor.getOnError(link);
 		}
-        element = visicomp.visiui.createElement("script",linkProps);
+        element = hax.visiui.createElement("script",linkProps);
         document.head.appendChild(element);
     }
 	else {
@@ -138,7 +138,7 @@ visicomp.app.visiui.LinkManager.addJsLink = function(link,responseProcessor) {
 }
 
 /** @private */
-visicomp.app.visiui.LinkManager.addCssLink = function(link,onResponseProcessor) {
+hax.app.visiui.LinkManager.addCssLink = function(link,onResponseProcessor) {
     //set the link as the element id
     var element = document.getElementById(link);
     if(!element) {
@@ -152,7 +152,7 @@ visicomp.app.visiui.LinkManager.addCssLink = function(link,onResponseProcessor) 
 			linkProps.onload = onResponseProcessor.getOnLoad(link);
 			linkProps.onerror = onResponseProcessor.getOnError(link);
 		}
-        element = visicomp.visiui.createElement("link",linkProps);
+        element = hax.visiui.createElement("link",linkProps);
         document.head.appendChild(element);
     }
 	else {
@@ -161,7 +161,7 @@ visicomp.app.visiui.LinkManager.addCssLink = function(link,onResponseProcessor) 
 }
 
 /** @private */
-visicomp.app.visiui.LinkManager.removeLink = function(link) {
+hax.app.visiui.LinkManager.removeLink = function(link) {
     //set the link as the element id
     var element = document.getElementById(link);
     if(element) {
@@ -172,7 +172,7 @@ visicomp.app.visiui.LinkManager.removeLink = function(link) {
 /** This returns an object that manages calling the given callback when all requested links
  * are loaded.
  * @private */
-visicomp.app.visiui.LinkManager.prototype.getResponseProcessor = function(addList,linksLoadedCallback) {
+hax.app.visiui.LinkManager.prototype.getResponseProcessor = function(addList,linksLoadedCallback) {
 	var links = [];
 	for(var i = 0; i < addList.length; i++) {
 		links[i] = addList[i].link;

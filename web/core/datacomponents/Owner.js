@@ -10,25 +10,25 @@
  * COMPONENT DEPENDENCIES:
  * An Owner must be a Context Holder
  */
-visicomp.core.Owner = {};
+hax.core.Owner = {};
 
 /** This initializes the component */
-visicomp.core.Owner.init = function() {
+hax.core.Owner.init = function() {
 }
 
-visicomp.core.Owner.isOwner = true;
+hax.core.Owner.isOwner = true;
 
 //must be implemented in extending object
 ///** This method retrieves the workspace for the child of this owner. */
-//visicomp.core.Owner.getWorkspace = function();
+//hax.core.Owner.getWorkspace = function();
 
 //must be implemented in extending object
 ///** This method retrieves the full name whichis relevent for a root folder owned
 // * by this object. */
-//visicomp.core.Owner.getPossesionNameBase = function();
+//hax.core.Owner.getPossesionNameBase = function();
 
 //must be implented by extending object
 ///** This method retrieves the context manager for this owner. */
-//visicomp.core.Owner.getContextManager = function();
+//hax.core.Owner.getContextManager = function();
 
 

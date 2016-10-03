@@ -1,10 +1,10 @@
 /* 
  * This is a mixin to give event functionality.
  */
-visicomp.core.EventManager = {};
+hax.core.EventManager = {};
     
 /** This serves as the constructor for the child object, when extending it. */
-visicomp.core.EventManager.init = function() {
+hax.core.EventManager.init = function() {
      /** This field holds the event listeners
     * @private */
     this.listenerTable = {};
@@ -15,7 +15,7 @@ visicomp.core.EventManager.init = function() {
 }
 
 /** This method adds a listener for the given event. */
-visicomp.core.EventManager.addListener = function(eventName, callback) {
+hax.core.EventManager.addListener = function(eventName, callback) {
     var callbackList = this.listenerTable[eventName];
     if(!callbackList) {
         callbackList = [];
@@ -33,7 +33,7 @@ visicomp.core.EventManager.addListener = function(eventName, callback) {
 }
 
 /** This method removes a listener for the event. */
-visicomp.core.EventManager.removeListener = function(eventName, callback) {
+hax.core.EventManager.removeListener = function(eventName, callback) {
     var callbackList = this.listenerTable[eventName];
     if(callbackList) {
         var index = callbackList.indexOf(callback);
@@ -44,7 +44,7 @@ visicomp.core.EventManager.removeListener = function(eventName, callback) {
 }
 
 /** THis method dispatches an event. */
-visicomp.core.EventManager.dispatchEvent = function(eventName, eventData) {
+hax.core.EventManager.dispatchEvent = function(eventName, eventData) {
     var callbackList = this.listenerTable[eventName];
     if(callbackList) {
         for(var i = 0; i < callbackList.length; i++) {
@@ -56,18 +56,18 @@ visicomp.core.EventManager.dispatchEvent = function(eventName, eventData) {
 
 
 /** This method adds a handler. */
-visicomp.core.EventManager.addHandler = function(handlerName, callback) {
+hax.core.EventManager.addHandler = function(handlerName, callback) {
     this.handlerTable[handlerName] = callback;
 }
 
 /** This method clears a handler. */
-visicomp.core.EventManager.removeHandler = function(handlerName) {
+hax.core.EventManager.removeHandler = function(handlerName) {
     delete this.handlerTable[handlerName];
 }
 
 /** This method calls a handler by name and returns the result. If no 
  * handler is found an error is thrown. */
-visicomp.core.EventManager.callHandler = function(handlerName, handlerData) {
+hax.core.EventManager.callHandler = function(handlerName, handlerData) {
     var callback = this.handlerTable[handlerName];
     if(callback) {
         return callback(handlerData)

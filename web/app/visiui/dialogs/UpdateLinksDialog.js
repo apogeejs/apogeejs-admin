@@ -1,13 +1,13 @@
 /** This method shows a dialog to update the workspace links. */
-visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
+hax.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     
-    var dialog = visicomp.visiui.createDialog({"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
+    var dialog = hax.visiui.createDialog({"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
             
 //    //create body
-//    var content = visicomp.visiui.createElement("div",{"className":"dialogBody"}); 
+//    var content = hax.visiui.createElement("div",{"className":"dialogBody"}); 
     
     //add a scroll container
-    var contentContainer = visicomp.visiui.createElement("div",null,
+    var contentContainer = hax.visiui.createElement("div",null,
         {
 			"display":"block",
             "position":"relative",
@@ -19,7 +19,7 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     
     var line;
     
-	var content = visicomp.visiui.createElement("div",null,
+	var content = hax.visiui.createElement("div",null,
 			{
 				"display":"table",
 				"overflow":"hidden"
@@ -29,23 +29,23 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     var line;
     
     //title
-    line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Update Links"}));
+    line = hax.visiui.createElement("div",{"className":"dialogLine"});
+    line.appendChild(hax.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Update Links"}));
     content.appendChild(line);
         
     //editor selector
-    line = visicomp.visiui.createElement("div",{"className":"dialogLine"}); 
-    var jsLinksRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"componentContent","value":"jsLinks"});
+    line = hax.visiui.createElement("div",{"className":"dialogLine"}); 
+    var jsLinksRadio = hax.visiui.createElement("input",{"type":"radio","name":"componentContent","value":"jsLinks"});
     line.appendChild(jsLinksRadio);
     line.appendChild(document.createTextNode("JS Links"));
     content.appendChild(line);
-    var cssLinksRadio = visicomp.visiui.createElement("input",{"type":"radio","name":"componentContent","value":"cssLinks"});
+    var cssLinksRadio = hax.visiui.createElement("input",{"type":"radio","name":"componentContent","value":"cssLinks"});
     line.appendChild(cssLinksRadio);
     line.appendChild(document.createTextNode("CSS Links"));
     
     //editors
-    line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    var editorDiv = visicomp.visiui.createElement("div",null,
+    line = hax.visiui.createElement("div",{"className":"dialogLine"});
+    var editorDiv = hax.visiui.createElement("div",null,
         {
             "position":"relative",
             "width":"500px",
@@ -56,7 +56,7 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     content.appendChild(line);
         
     //create editor containers - will be hiddedn and shown
-    var jsLinksEditorDiv = visicomp.visiui.createElement("div",null,{
+    var jsLinksEditorDiv = hax.visiui.createElement("div",null,{
         "position":"absolute",
         "top":"0px",
         "bottom":"0px",
@@ -66,7 +66,7 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     var jsLinksEditor = null;
     editorDiv.appendChild(jsLinksEditorDiv);
     
-    var cssLinksEditorDiv = visicomp.visiui.createElement("div",null,{
+    var cssLinksEditorDiv = hax.visiui.createElement("div",null,{
         "position":"absolute",
         "top":"0px",
         "bottom":"0px",
@@ -78,7 +78,7 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     
     //save and cancel buttons
     //buttons and handler
-    line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
+    line = hax.visiui.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
         closeDialog();
     }
@@ -91,7 +91,7 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
         //get js links
         if(jsLinksEditor) {
             var jsLinks = jsLinksEditor.getSession().getValue().trim();
-            jsLinkArray = visicomp.app.visiui.dialog.createLinkArray(jsLinks);
+            jsLinkArray = hax.app.visiui.dialog.createLinkArray(jsLinks);
         }
         else {
             jsLinkArray = [];
@@ -100,7 +100,7 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
         //get css links
         if(cssLinksEditor) {
             var cssLinks = cssLinksEditor.getSession().getValue().trim();
-            cssLinkArray = visicomp.app.visiui.dialog.createLinkArray(cssLinks);
+            cssLinkArray = hax.app.visiui.dialog.createLinkArray(cssLinks);
         }
         else {
             cssLinkArray = [];
@@ -113,7 +113,7 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
     }
     
     var closeDialog = function() {
-        visicomp.visiui.closeDialog(dialog);
+        hax.visiui.closeDialog(dialog);
         
         //clean up the editor
         if(jsLinksEditor) { 
@@ -126,8 +126,8 @@ visicomp.app.visiui.dialog.showUpdateLinksDialog = function(workspaceUI) {
         }  
     }
     
-    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Save","onclick":onSave}));
-    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
+    line.appendChild(hax.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Save","onclick":onSave}));
+    line.appendChild(hax.visiui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
     dialog.setContent(content);
@@ -216,16 +216,16 @@ cssLinksEditor.$blockScrolling = Infinity;
         if(jsLinksEditor) jsLinksEditor.resize();
     }
     var container = content.parentElement;
-    visicomp.visiui.setResizeListener(container, resizeCallback);
+    hax.visiui.setResizeListener(container, resizeCallback);
 }
 
 /** @private */
-visicomp.app.visiui.dialog.createLinkText = function(linkArray) {
+hax.app.visiui.dialog.createLinkText = function(linkArray) {
     return linkArray.join("\n");
 }
 
 /** @private */
-visicomp.app.visiui.dialog.createLinkArray = function(linkText) {
+hax.app.visiui.dialog.createLinkArray = function(linkText) {
     if((!linkText)||(linkText.length === 0)) {
         return [];
     }

@@ -8,10 +8,10 @@
  * - A Dependent must be a Child.
  * 
  */
-visicomp.core.Dependent = {};
+hax.core.Dependent = {};
 
 /** This initializes the component */
-visicomp.core.Dependent.init = function() {
+hax.core.Dependent.init = function() {
     
     //this is the list of dependencies
     this.dependsOnList = [];
@@ -19,41 +19,41 @@ visicomp.core.Dependent.init = function() {
 
 /** This property tells if this object is a dependent.
  * This property should not be implemented on non-dependents. */
-visicomp.core.Dependent.isDependent = true;
+hax.core.Dependent.isDependent = true;
 
 /** This returns a list of the members that this member depends on. */
-visicomp.core.Dependent.getDependsOn = function() {
+hax.core.Dependent.getDependsOn = function() {
     return this.dependsOnList;
 }
 
 //Must be implemented in extending object
 ///** This method udpates the dependencies if needed because
 // *the passed variable was added.  */
-//visicomp.core.Dependent.updateForAddedVariable = function(object);
+//hax.core.Dependent.updateForAddedVariable = function(object);
 
 //Must be implemented in extending object
 ///** This method udpates the dependencies if needed because
 // *the passed variable was deleted.  */
-//visicomp.core.Dependent.updateForDeletedVariable = function(object);
+//hax.core.Dependent.updateForDeletedVariable = function(object);
 
 ///** This is a check to see if the object should be checked for dependencies 
 // * for recalculation. It is safe for this method to always return false and
 // allow the calculation to happen. 
 // * @private */
-//visicomp.core.Dependent.needsCalculating = function();
+//hax.core.Dependent.needsCalculating = function();
 
 ///** This updates the member based on a change in a dependency.  */
-//visicomp.core.Dependent.prepareForCalculate = function();
+//hax.core.Dependent.prepareForCalculate = function();
 
 ///** This updates the member based on a change in a dependency.  */
-//visicomp.core.Dependent.calculate = function();
+//hax.core.Dependent.calculate = function();
 
 ///** This method initializes the data for this function.  */
-//visicomp.core.Dependent.initFunction = function();
+//hax.core.Dependent.initFunction = function();
 
 /** This method makes sure any impactors are set. It sets a dependency 
  * error if one or more of the dependencies has a error. */
-visicomp.core.Dependent.initializeImpactors = function() {
+hax.core.Dependent.initializeImpactors = function() {
     var errorDependencies = [];    
     
     //make sure dependencies are up to date
@@ -76,7 +76,7 @@ visicomp.core.Dependent.initializeImpactors = function() {
 //===================================
 
 /** This sets the dependencies based on the code for the member. */
-visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
+hax.core.Dependent.updateDependencies = function(newDependsOn) {
     
     if(!newDependsOn) {
         newDependsOn = [];
@@ -125,14 +125,14 @@ visicomp.core.Dependent.updateDependencies = function(newDependsOn) {
 
 /** This method creates an dependency error, given a list of impactors that have an error. 
  * @private */
-visicomp.core.Dependent.createDependencyError = function(errorDependencies) {
+hax.core.Dependent.createDependencyError = function(errorDependencies) {
         //dependency error found
         var message = "Error in dependency: ";
         for(var i = 0; i < errorDependencies.length; i++) {
             if(i > 0) message += ", ";
             message += errorDependencies[i].getFullName();
         }
-        var actionError = new visicomp.core.ActionError(message,"Calculation - Dependency",this);
+        var actionError = new hax.core.ActionError(message,"Calculation - Dependency",this);
         this.addError(actionError);   
 
 }

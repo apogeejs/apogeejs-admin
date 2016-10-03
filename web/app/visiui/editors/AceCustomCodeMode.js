@@ -1,13 +1,13 @@
 
-visicomp.app.visiui.AceCustomCodeMode = function(component) {
+hax.app.visiui.AceCustomCodeMode = function(component) {
 	//base constructor
-	visicomp.app.visiui.AceCodeModeBase.call(this,component,"ace/mode/javascript");
+	hax.app.visiui.AceCodeModeBase.call(this,component,"ace/mode/javascript");
 }
 
-visicomp.app.visiui.AceCustomCodeMode.prototype = Object.create(visicomp.app.visiui.AceCodeModeBase.prototype);
-visicomp.app.visiui.AceCustomCodeMode.prototype.constructor = visicomp.app.visiui.AceCustomCodeMode;
+hax.app.visiui.AceCustomCodeMode.prototype = Object.create(hax.app.visiui.AceCodeModeBase.prototype);
+hax.app.visiui.AceCustomCodeMode.prototype.constructor = hax.app.visiui.AceCustomCodeMode;
 	
-visicomp.app.visiui.AceCustomCodeMode.prototype.showData = function(editOk) {
+hax.app.visiui.AceCustomCodeMode.prototype.showData = function(editOk) {
 		
 	var control = this.component.getObject();
 	var resource = control.getResource();
@@ -16,7 +16,7 @@ visicomp.app.visiui.AceCustomCodeMode.prototype.showData = function(editOk) {
 	this.editor.showData(codeText,editOk);
 }
 
-visicomp.app.visiui.AceCustomCodeMode.prototype.onSave = function(text) {	
+hax.app.visiui.AceCustomCodeMode.prototype.onSave = function(text) {	
 	
 	var control = this.component.getObject();
 	var resource = control.getResource();

@@ -1,11 +1,11 @@
 /** This is a function. */
-visicomp.core.FunctionTable = function(name,owner,argList) {
+hax.core.FunctionTable = function(name,owner,argList) {
     //base init
-    visicomp.core.Child.init.call(this,name,visicomp.core.FunctionTable.generator);
-    visicomp.core.DataHolder.init.call(this);
-    visicomp.core.Dependent.init.call(this);
-    visicomp.core.ContextHolder.init.call(this);
-	visicomp.core.Codeable.init.call(this,argList,false);
+    hax.core.Child.init.call(this,name,hax.core.FunctionTable.generator);
+    hax.core.DataHolder.init.call(this);
+    hax.core.Dependent.init.call(this);
+    hax.core.ContextHolder.init.call(this);
+	hax.core.Codeable.init.call(this,argList,false);
     
     this.initOwner(owner);
     
@@ -14,17 +14,17 @@ visicomp.core.FunctionTable = function(name,owner,argList) {
 }
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Child);
-visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.DataHolder);
-visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Dependent);
-visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.ContextHolder);
-visicomp.core.util.mixin(visicomp.core.FunctionTable,visicomp.core.Codeable);
+hax.core.util.mixin(hax.core.FunctionTable,hax.core.Child);
+hax.core.util.mixin(hax.core.FunctionTable,hax.core.DataHolder);
+hax.core.util.mixin(hax.core.FunctionTable,hax.core.Dependent);
+hax.core.util.mixin(hax.core.FunctionTable,hax.core.ContextHolder);
+hax.core.util.mixin(hax.core.FunctionTable,hax.core.Codeable);
 
 //------------------------------
 // Codeable Methods
 //------------------------------
 
-visicomp.core.FunctionTable.prototype.processObjectFunction = function(objectFunction) {	
+hax.core.FunctionTable.prototype.processObjectFunction = function(objectFunction) {	
     //tjhe data is the function
 	this.setData(objectFunction);
 }
@@ -34,7 +34,7 @@ visicomp.core.FunctionTable.prototype.processObjectFunction = function(objectFun
 //------------------------------
 
 /** This overrides the get title method of child to return the function declaration. */
-visicomp.core.FunctionTable.prototype.getDisplayName = function() {
+hax.core.FunctionTable.prototype.getDisplayName = function() {
     var name = this.getName();
     var argList = this.getArgList();
     var argListString = argList.join(",");
@@ -43,7 +43,7 @@ visicomp.core.FunctionTable.prototype.getDisplayName = function() {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-visicomp.core.FunctionTable.fromJson = function(owner,json,updateDataList,actionResponse) {
+hax.core.FunctionTable.fromJson = function(owner,json,updateDataList,actionResponse) {
     var initialArgList;
     //------------------------
     // There are two ways to set the arg list. Here, json.argList, is used in creating 
@@ -56,7 +56,7 @@ visicomp.core.FunctionTable.fromJson = function(owner,json,updateDataList,action
     }
     //-------------------
     
-    var functionTable = new visicomp.core.FunctionTable(json.name,owner,initialArgList);
+    var functionTable = new hax.core.FunctionTable(json.name,owner,initialArgList);
     if(json.updateData) {
         json.updateData.member = functionTable;
         updateDataList.push(json.updateData);
@@ -68,10 +68,10 @@ visicomp.core.FunctionTable.fromJson = function(owner,json,updateDataList,action
 // Static methods
 //============================
 
-visicomp.core.FunctionTable.generator = {};
-visicomp.core.FunctionTable.generator.displayName = "Function";
-visicomp.core.FunctionTable.generator.type = "visicomp.core.FunctionTable";
-visicomp.core.FunctionTable.generator.createMember = visicomp.core.FunctionTable.fromJson;
+hax.core.FunctionTable.generator = {};
+hax.core.FunctionTable.generator.displayName = "Function";
+hax.core.FunctionTable.generator.type = "hax.core.FunctionTable";
+hax.core.FunctionTable.generator.createMember = hax.core.FunctionTable.fromJson;
 
 //register this member
-visicomp.core.Workspace.addMemberGenerator(visicomp.core.FunctionTable.generator);
+hax.core.Workspace.addMemberGenerator(hax.core.FunctionTable.generator);

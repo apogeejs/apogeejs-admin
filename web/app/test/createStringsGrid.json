@@ -1,19 +1,19 @@
 {
 	"name": "createStringsGrid",
-	"fileType": "visicomp workspace",
+	"fileType": "hax workspace",
 	"jsLinks": [],
 	"cssLinks": [],
 	"workspace": {
 		"name": "createStringsGrid",
-		"fileType": "visicomp workspace",
+		"fileType": "hax workspace",
 		"version": 0.1,
 		"data": {
 			"name": "createStringsGrid",
-			"type": "visicomp.core.Folder",
+			"type": "hax.core.Folder",
 			"children": {
 				"stringsFile": {
 					"name": "stringsFile",
-					"type": "visicomp.core.JsonTable",
+					"type": "hax.core.JsonTable",
 					"updateData": {
 						"data": {
 							"translations": {
@@ -1783,7 +1783,7 @@
 				},
 				"stringsGrid": {
 					"name": "stringsGrid",
-					"type": "visicomp.core.JsonTable",
+					"type": "hax.core.JsonTable",
 					"updateData": {
 						"argList": [],
 						"functionBody": "var value;\nvalue = gridMatrix;\nreturn value;\n\n",
@@ -1792,7 +1792,7 @@
 				},
 				"gridMatrix": {
 					"name": "gridMatrix",
-					"type": "visicomp.core.JsonTable",
+					"type": "hax.core.JsonTable",
 					"updateData": {
 						"argList": [],
 						"functionBody": "var value;\nvalue = [];\n\n//create the header, with \"Key\" as the leading entry\nvar header = [\"Key\"];\nvalue.push(header);\n//create a map from key to column\nvar langToIndex = {};\n\n//process each entry in the strings file\nfor(var key in stringsFile.translations) {\n    //read an entry\n    var entry = stringsFile.translations[key];\n    //create row, same length as header\n    var row = new Array(header.length);\n    ///add key as first entry\n    row[0] = key;\n    for(var lang in entry) {\n        //lookup tgyhe index for this string\n        var index = langToIndex[lang];\n        //if index doesn't exist, add it to the header\n        if(index === undefined) {\n            index = header.length;\n            header.push(lang);\n            langToIndex[lang] = index;\n        }\n        //add to row\n        row[index] = entry[lang];\n    }\n    \n    //add to the matrix\n    value.push(row);\n}\nreturn value;\n\n",
@@ -1805,7 +1805,7 @@
 	"components": {
 		"stringsFile": {
 			"key": "createStringsGrid:stringsFile",
-			"type": "visicomp.app.visiui.JsonTableComponent",
+			"type": "hax.app.visiui.JsonTableComponent",
 			"coordInfo": {
 				"x": 120,
 				"y": 3,
@@ -1816,7 +1816,7 @@
 		},
 		"stringsGrid": {
 			"key": "createStringsGrid:stringsGrid",
-			"type": "visicomp.app.visiui.GridTableComponent",
+			"type": "hax.app.visiui.GridTableComponent",
 			"coordInfo": {
 				"x": 280,
 				"y": 50,
@@ -1827,7 +1827,7 @@
 		},
 		"gridMatrix": {
 			"key": "createStringsGrid:gridMatrix",
-			"type": "visicomp.app.visiui.JsonTableComponent",
+			"type": "hax.app.visiui.JsonTableComponent",
 			"coordInfo": {
 				"x": 789,
 				"y": 25,

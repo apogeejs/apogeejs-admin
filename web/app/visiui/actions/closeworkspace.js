@@ -1,15 +1,15 @@
 
 
-visicomp.app.visiui.closeworkspace = {};
+hax.app.visiui.closeworkspace = {};
 
 //=====================================
 // UI Entry Point
 //=====================================
 
-visicomp.app.visiui.closeworkspace.getCloseCallback = function(app) {
+hax.app.visiui.closeworkspace.getCloseCallback = function(app) {
     return function() {
 
-        var actionResponse = visicomp.app.visiui.closeworkspace.closeWorkspace(app); 
+        var actionResponse = hax.app.visiui.closeworkspace.closeWorkspace(app); 
         if(!actionResponse.getSuccess()) {
             alert(actionResponse.getErrorMsg());
         }
@@ -20,8 +20,8 @@ visicomp.app.visiui.closeworkspace.getCloseCallback = function(app) {
 // Action
 //=====================================
 
-visicomp.app.visiui.closeworkspace.closeWorkspace = function(app) {
-    var actionResponse = new visicomp.core.ActionResponse();
+hax.app.visiui.closeworkspace.closeWorkspace = function(app) {
+    var actionResponse = new hax.core.ActionResponse();
     var workspaceUIRemoved = false;
     
     try {
@@ -29,7 +29,7 @@ visicomp.app.visiui.closeworkspace.closeWorkspace = function(app) {
         var activeWorkspaceUI = app.getActiveWorkspaceUI();
         if(activeWorkspaceUI === null) {
             var errorMsg = "There is no workspace open.";
-            var actionError = new visicomp.core.ActionError(errorMsg,"User",null);
+            var actionError = new hax.core.ActionError(errorMsg,"User",null);
             actionResponse.addError(actionError);
             return actionResponse;
         }
@@ -50,7 +50,7 @@ visicomp.app.visiui.closeworkspace.closeWorkspace = function(app) {
     }
     catch(error) {
         var isFatal = !workspaceUIRemoved;
-        var actionError = visicomp.core.ActionError.processException(error,"AppException",isFatal);
+        var actionError = hax.core.ActionError.processException(error,"AppException",isFatal);
         actionResponse.addError(actionError);
     }
     

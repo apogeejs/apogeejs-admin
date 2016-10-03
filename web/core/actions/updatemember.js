@@ -1,6 +1,6 @@
 /** This namespace contains functions to process an update to an member
  * which inherits from the FunctionBase component. */
-visicomp.core.updatemember = {};
+hax.core.updatemember = {};
 
 /** member UPDATED EVENT
  * This listener event is fired when after a member is updated, to be used to respond
@@ -9,41 +9,41 @@ visicomp.core.updatemember = {};
  * Event member Format:
  * [member]
  */
-visicomp.core.updatemember.MEMBER_UPDATED_EVENT = "memberUpdated";
+hax.core.updatemember.MEMBER_UPDATED_EVENT = "memberUpdated";
 
-visicomp.core.updatemember.fireUpdatedEvent = function(member) {
+hax.core.updatemember.fireUpdatedEvent = function(member) {
     var workspace = member.getWorkspace();
-    workspace.dispatchEvent(visicomp.core.updatemember.MEMBER_UPDATED_EVENT,member);
+    workspace.dispatchEvent(hax.core.updatemember.MEMBER_UPDATED_EVENT,member);
 }
 
-visicomp.core.updatemember.fireUpdatedEventList = function(memberList) {
+hax.core.updatemember.fireUpdatedEventList = function(memberList) {
     for(var i = 0; i < memberList.length; i++) {
-        visicomp.core.updatemember.fireUpdatedEvent(memberList[i]);
+        hax.core.updatemember.fireUpdatedEvent(memberList[i]);
     }
 }
 
 /** This method updates the object function for a given member. 
  * The return value is an ActionResponse object. Optionally, an existing action response
  * may be passed in or otherwise one will be created here. */
-visicomp.core.updatemember.updateCode = function(member,argList,functionBody,supplementalCode,optionalActionResponse) {
-	var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
+hax.core.updatemember.updateCode = function(member,argList,functionBody,supplementalCode,optionalActionResponse) {
+	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.core.ActionResponse();
     
     try {
         var recalculateList = [];
 
-        visicomp.core.updatemember.updateObjectFunction(member,
+        hax.core.updatemember.updateObjectFunction(member,
             argList,
             functionBody,
             supplementalCode,
             recalculateList);
 
-        visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
+        hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
         
         //fire updated events
-        visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
+        hax.core.updatemember.fireUpdatedEventList(recalculateList);
     }
     catch(error) {
-        var actionError = visicomp.core.ActionError.processException(error,"AppException",true);
+        var actionError = hax.core.ActionError.processException(error,"AppException",true);
         actionResponse.addError(actionError);
     }
     
@@ -53,22 +53,22 @@ visicomp.core.updatemember.updateCode = function(member,argList,functionBody,sup
 /** This method updates the data for a given member. 
  * The return value is an ActionResponse object. Optionally, an existing action response
  * may be passed in or otherwise one will be created here. */
-visicomp.core.updatemember.updateData = function(member,data,optionalActionResponse) {
-	var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
+hax.core.updatemember.updateData = function(member,data,optionalActionResponse) {
+	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.core.ActionResponse();
     
     try {
         var recalculateList = [];
 
-        visicomp.core.updatemember.updateObjectData(member,data,recalculateList);
+        hax.core.updatemember.updateObjectData(member,data,recalculateList);
 
-        visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
+        hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
 
         //fire updated events
-        visicomp.core.updatemember.fireUpdatedEvent(member);
-        visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
+        hax.core.updatemember.fireUpdatedEvent(member);
+        hax.core.updatemember.fireUpdatedEventList(recalculateList);
     }
     catch(error) {
-        var actionError = visicomp.core.ActionError.processException(error,"AppException",true);
+        var actionError = hax.core.ActionError.processException(error,"AppException",true);
         actionResponse.addError(actionError);
     }
     
@@ -78,25 +78,25 @@ visicomp.core.updatemember.updateData = function(member,data,optionalActionRespo
 /** This method updates the object function or the data for a list of members. 
  * The return value is an ActionResponse object. Optionally, an existing action response
  * may be passed in or otherwise one will be created here. */
-visicomp.core.updatemember.updateObjects = function(updateDataList,optionalActionResponse) {
-	var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
+hax.core.updatemember.updateObjects = function(updateDataList,optionalActionResponse) {
+	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.core.ActionResponse();
     
     try {
         var recalculateList = [];
         var setDataList = [];
 
-        visicomp.core.updatemember.updateObjectFunctionOrData(updateDataList,
+        hax.core.updatemember.updateObjectFunctionOrData(updateDataList,
             recalculateList,
             setDataList); 
 
-        visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
+        hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
 
         //fire updated events
-        visicomp.core.updatemember.fireUpdatedEventList(setDataList);
-        visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
+        hax.core.updatemember.fireUpdatedEventList(setDataList);
+        hax.core.updatemember.fireUpdatedEventList(recalculateList);
     }
     catch(error) {
-        var actionError = visicomp.core.ActionError.processException(error,"AppException",true);
+        var actionError = hax.core.ActionError.processException(error,"AppException",true);
         actionResponse.addError(actionError);
     }
     
@@ -107,7 +107,7 @@ visicomp.core.updatemember.updateObjects = function(updateDataList,optionalActio
 // Private Functions
 //=====================================
 
-visicomp.core.updatemember.updateObjectFunctionOrData = function(updateDataList,
+hax.core.updatemember.updateObjectFunctionOrData = function(updateDataList,
         recalculateList,
         setDataList) {  
      
@@ -120,14 +120,14 @@ visicomp.core.updatemember.updateObjectFunctionOrData = function(updateDataList,
         var supplementalCode = argData.supplementalCode;
         
         if(functionBody) {
-            visicomp.core.updatemember.updateObjectFunction(member,
+            hax.core.updatemember.updateObjectFunction(member,
                 argList,
                 functionBody,
                 supplementalCode,
                 recalculateList);
         }
         else if(data) {
-            visicomp.core.updatemember.updateObjectData(member,
+            hax.core.updatemember.updateObjectData(member,
                 data,
                 recalculateList);
             
@@ -138,7 +138,7 @@ visicomp.core.updatemember.updateObjectFunctionOrData = function(updateDataList,
 
 /** This method updates the code and object function in a member based on the
  * passed code.*/
-visicomp.core.updatemember.updateObjectFunction = function(codeable,
+hax.core.updatemember.updateObjectFunction = function(codeable,
         argList,
         functionBody,
         supplementalCode,
@@ -155,7 +155,7 @@ visicomp.core.updatemember.updateObjectFunction = function(codeable,
     var codeLabel = codeable.getFullName();
 
     //process the code text into javascript code
-    visicomp.core.codeCompiler.processCode(codeInfo,
+    hax.core.codeCompiler.processCode(codeInfo,
         contextManager,
         codeLabel);
 
@@ -163,12 +163,12 @@ visicomp.core.updatemember.updateObjectFunction = function(codeable,
     codeable.setCodeInfo(codeInfo);
     
 	//update recalculate list
-    visicomp.core.calculation.addToRecalculateList(recalculateList,codeable);
+    hax.core.calculation.addToRecalculateList(recalculateList,codeable);
 }
 
 
 /** This method sets the data for a member. */
-visicomp.core.updatemember.updateObjectData = function(dataHolder,
+hax.core.updatemember.updateObjectData = function(dataHolder,
         data,
         recalculateList) {
     
@@ -180,7 +180,7 @@ visicomp.core.updatemember.updateObjectData = function(dataHolder,
     
     dataHolder.setData(data);
     
-    visicomp.core.calculation.addToRecalculateList(recalculateList,dataHolder);
+    hax.core.calculation.addToRecalculateList(recalculateList,dataHolder);
 }
 
 

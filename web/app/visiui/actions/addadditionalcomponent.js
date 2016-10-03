@@ -1,18 +1,18 @@
 
 
-visicomp.app.visiui.addadditionalcomponent = {};
+hax.app.visiui.addadditionalcomponent = {};
 
 //=====================================
 // UI Entry Point
 //=====================================
 
-visicomp.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback = function(app,optionalInitialValues,optionalComponentOptions) {
+hax.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback = function(app,optionalInitialValues,optionalComponentOptions) {
     return function() {
     
         var onSelect = function(componentType) {
             var generator = app.getComponentGenerator(componentType);
             if(generator) {
-                var doAddComponent = visicomp.app.visiui.updatecomponent.getAddComponentCallback(app,generator,optionalInitialValues,optionalComponentOptions);
+                var doAddComponent = hax.app.visiui.updatecomponent.getAddComponentCallback(app,generator,optionalInitialValues,optionalComponentOptions);
                 doAddComponent();
             }
             else {
@@ -20,7 +20,7 @@ visicomp.app.visiui.addadditionalcomponent.getAddAdditionalComponentCallback = f
             }
         }
         //open select component dialog
-        visicomp.app.visiui.dialog.showSelectComponentDialog(app.additionalComponents,onSelect);
+        hax.app.visiui.dialog.showSelectComponentDialog(app.additionalComponents,onSelect);
     }
 }
 

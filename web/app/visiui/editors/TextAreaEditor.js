@@ -1,13 +1,13 @@
 /** Editor that uses the Ace text editor.
  * 
- * @param {type} component - the visicomp component
+ * @param {type} component - the hax component
  * @param {type} aceMode - the display format, such as "ace/mode/json"
  * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
  * @param {type} onCancel - returns true if the edit should end
  */
-visicomp.app.visiui.TextAreaEditor = function(component,onSave,onCancel) {
+hax.app.visiui.TextAreaEditor = function(component,onSave,onCancel) {
     
-    this.outsideDiv = visicomp.visiui.createElement("div",null,{
+    this.outsideDiv = hax.visiui.createElement("div",null,{
 		"position":"absolute",
         "top":"0px",
         "left":"0px",
@@ -16,7 +16,7 @@ visicomp.app.visiui.TextAreaEditor = function(component,onSave,onCancel) {
 		"overflow":"hidden"
 	});
    
-	var textArea = visicomp.visiui.createElement("TEXTAREA",null,{
+	var textArea = hax.visiui.createElement("TEXTAREA",null,{
 		"position":"absolute",
         "top":"0px",
         "left":"0px",
@@ -35,11 +35,11 @@ visicomp.app.visiui.TextAreaEditor = function(component,onSave,onCancel) {
     this.outsideDiv.appendChild(this.textArea);
     
     var onFocus = function () {
-        visicomp.visiui.applyStyle(textArea,visicomp.app.visiui.TextAreaEditor.selectStyle);
+        hax.visiui.applyStyle(textArea,hax.app.visiui.TextAreaEditor.selectStyle);
     }
     this.textArea.addEventListener("focus",onFocus);
     var onBlur = function () {
-        visicomp.visiui.applyStyle(textArea,visicomp.app.visiui.TextAreaEditor.noSelectStyle);
+        hax.visiui.applyStyle(textArea,hax.app.visiui.TextAreaEditor.noSelectStyle);
     }
     this.textArea.addEventListener("blur",onBlur);
     
@@ -58,7 +58,7 @@ visicomp.app.visiui.TextAreaEditor = function(component,onSave,onCancel) {
 //        editor.resize();
 //    }
 	
-//    visicomp.visiui.setResizeListener(this.outsideDiv, resizeCallback);
+//    hax.visiui.setResizeListener(this.outsideDiv, resizeCallback);
 	
 	//add click handle to enter edit mode
 	var instance = this;
@@ -68,14 +68,14 @@ visicomp.app.visiui.TextAreaEditor = function(component,onSave,onCancel) {
 	this.textArea.addEventListener("click",onMouseClick);
 }
 
-visicomp.app.visiui.TextAreaEditor.noSelectStyle = {
+hax.app.visiui.TextAreaEditor.noSelectStyle = {
     "webkitUserSelect":"none",
     "khtmlUserSelect":"none",
     "mozUserSelect":"none",
     "msUserSelect":"none",
     "userSelect":"none"
 };
-visicomp.app.visiui.TextAreaEditor.selectStyle = {
+hax.app.visiui.TextAreaEditor.selectStyle = {
     "webkitUserSelect":"text",
     "khtmlUserSelect":"text",
     "mozUserSelect":"text",
@@ -83,7 +83,7 @@ visicomp.app.visiui.TextAreaEditor.selectStyle = {
     "userSelect":"text"
 };
 
-visicomp.app.visiui.TextAreaEditor.prototype.save = function() {
+hax.app.visiui.TextAreaEditor.prototype.save = function() {
 	
 	var text = this.textArea.value;
 	
@@ -94,7 +94,7 @@ visicomp.app.visiui.TextAreaEditor.prototype.save = function() {
 	}
 }
 
-visicomp.app.visiui.TextAreaEditor.prototype.cancel = function() {
+hax.app.visiui.TextAreaEditor.prototype.cancel = function() {
 	//reset the original data
 	var cancelComplete = this.parentCancel();
 	
@@ -107,11 +107,11 @@ visicomp.app.visiui.TextAreaEditor.prototype.cancel = function() {
 // "Package" Methods
 //=============================
 
-visicomp.app.visiui.TextAreaEditor.prototype.getElement = function() {
+hax.app.visiui.TextAreaEditor.prototype.getElement = function() {
 	return this.outsideDiv;
 }
 	
-visicomp.app.visiui.TextAreaEditor.prototype.showData = function(text,editOk) {
+hax.app.visiui.TextAreaEditor.prototype.showData = function(text,editOk) {
 	this.editOk = editOk;
     this.textArea.readOnly = !editOk;
 	this.textArea.value = text;
@@ -121,12 +121,12 @@ visicomp.app.visiui.TextAreaEditor.prototype.showData = function(text,editOk) {
         this.textArea.style.backgroundColor = "";
     }
     else {
-        this.textArea.style.backgroundColor = visicomp.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
+        this.textArea.style.backgroundColor = hax.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
     }
     
 }
 
-visicomp.app.visiui.TextAreaEditor.prototype.destroy = function() {
+hax.app.visiui.TextAreaEditor.prototype.destroy = function() {
 }
 
 //==============================
@@ -134,14 +134,14 @@ visicomp.app.visiui.TextAreaEditor.prototype.destroy = function() {
 //==============================
 
 /** @private */
-visicomp.app.visiui.TextAreaEditor.prototype.endEditMode = function() {
+hax.app.visiui.TextAreaEditor.prototype.endEditMode = function() {
 	this.editMode = false;
 	this.textArea.readOnly = true;
 	this.component.hideSaveBar();
 }
 
 /** @private */
-visicomp.app.visiui.TextAreaEditor.prototype.onMouseClick = function() {
+hax.app.visiui.TextAreaEditor.prototype.onMouseClick = function() {
 	if((this.editOk)&&(!this.editMode)) {
 		
 		var instance = this;

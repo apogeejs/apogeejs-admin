@@ -1,13 +1,13 @@
 
-visicomp.app.visiui.AceSupplementalMode = function(component) {
+hax.app.visiui.AceSupplementalMode = function(component) {
 	//base constructor
-	visicomp.app.visiui.AceCodeModeBase.call(this,component,"ace/mode/javascript");
+	hax.app.visiui.AceCodeModeBase.call(this,component,"ace/mode/javascript");
 }
 
-visicomp.app.visiui.AceSupplementalMode.prototype = Object.create(visicomp.app.visiui.AceCodeModeBase.prototype);
-visicomp.app.visiui.AceSupplementalMode.prototype.constructor = visicomp.app.visiui.AceSupplementalMode;
+hax.app.visiui.AceSupplementalMode.prototype = Object.create(hax.app.visiui.AceCodeModeBase.prototype);
+hax.app.visiui.AceSupplementalMode.prototype.constructor = hax.app.visiui.AceSupplementalMode;
 
-visicomp.app.visiui.AceSupplementalMode.prototype.showData = function(editOk) {
+hax.app.visiui.AceSupplementalMode.prototype.showData = function(editOk) {
 		
 	var table = this.component.getObject();
 	var codeText = table.getSupplementalCode();	
@@ -15,12 +15,12 @@ visicomp.app.visiui.AceSupplementalMode.prototype.showData = function(editOk) {
 	this.editor.showData(codeText,editOk);
 }
 
-visicomp.app.visiui.AceSupplementalMode.prototype.onSave = function(text) {	
+hax.app.visiui.AceSupplementalMode.prototype.onSave = function(text) {	
 	var table = this.component.getObject();
 	var functionBody = table.getFunctionBody();
 	var supplementalCode = text;
 	var argList = table.getArgList();
-	var actionResponse =  visicomp.core.updatemember.updateCode(table,argList,functionBody,supplementalCode);
+	var actionResponse =  hax.core.updatemember.updateCode(table,argList,functionBody,supplementalCode);
 	if(!actionResponse.getSuccess()) {
 		//show an error message
 		var msg = actionResponse.getErrorMsg();

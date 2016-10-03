@@ -78,13 +78,13 @@ SimpleGeojsonComponent = function(workspaceUI,control,componentJson) {
     control.updateResource(resource);
     
     //base init
-    visicomp.app.visiui.Component.init.call(this,workspaceUI,control,SimpleGeojsonComponent.generator,componentJson);
-    visicomp.app.visiui.BasicControlComponent.init.call(this);
+    hax.app.visiui.Component.init.call(this,workspaceUI,control,SimpleGeojsonComponent.generator,componentJson);
+    hax.app.visiui.BasicControlComponent.init.call(this);
 };
 
 //add components to this class
-visicomp.core.util.mixin(SimpleGeojsonComponent,visicomp.app.visiui.Component);
-visicomp.core.util.mixin(SimpleGeojsonComponent,visicomp.app.visiui.BasicControlComponent);
+hax.core.util.mixin(SimpleGeojsonComponent,hax.app.visiui.Component);
+hax.core.util.mixin(SimpleGeojsonComponent,hax.app.visiui.BasicControlComponent);
 
 /** Store the content element for the resource. */
 SimpleGeojsonComponent.prototype.addToFrame = function() {
@@ -106,8 +106,8 @@ SimpleGeojsonComponent.createComponent = function(workspaceUI,data,componentOpti
     //create a resource a simple chart resource processor
     var json = {};
     json.name = data.name;
-    json.type = visicomp.core.Control.generator.type;
-    var actionResponse = visicomp.core.createmember.createMember(parent,json);
+    json.type = hax.core.Control.generator.type;
+    var actionResponse = hax.core.createmember.createMember(parent,json);
     
     var control = actionResponse.member;
     if(control) {
@@ -130,7 +130,7 @@ SimpleGeojsonComponent.createComponentFromJson = function(workspaceUI,member,com
 
 SimpleGeojsonComponent.generator = {};
 SimpleGeojsonComponent.generator.displayName = "Simple GeoJSON Control";
-SimpleGeojsonComponent.generator.uniqueName = "visicomp.example.SimpleGeojsonComponent";
+SimpleGeojsonComponent.generator.uniqueName = "hax.example.SimpleGeojsonComponent";
 SimpleGeojsonComponent.generator.createComponent = SimpleGeojsonComponent.createComponent;
 SimpleGeojsonComponent.generator.createComponentFromJson = SimpleGeojsonComponent.createComponentFromJson;
 SimpleGeojsonComponent.generator.DEFAULT_WIDTH = 500;

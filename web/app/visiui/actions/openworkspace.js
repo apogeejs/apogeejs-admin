@@ -1,11 +1,11 @@
 
-visicomp.app.visiui.openworkspace = {};
+hax.app.visiui.openworkspace = {};
 
 //=====================================
 // UI Entry Point
 //=====================================
 
-visicomp.app.visiui.openworkspace.getOpenCallback = function(app) {
+hax.app.visiui.openworkspace.getOpenCallback = function(app) {
     return function() {
     
         var onOpen = function(workspaceData) {
@@ -18,14 +18,14 @@ visicomp.app.visiui.openworkspace.getOpenCallback = function(app) {
             }
 
             //open workspace
-            visicomp.app.visiui.openworkspace.openWorkspace(app,workspaceData,actionCompletedCallback);
+            hax.app.visiui.openworkspace.openWorkspace(app,workspaceData,actionCompletedCallback);
 
             //we should show some sort of loading message or symbol
 
             return true;
         }
         
-        visicomp.app.visiui.dialog.showOpenWorkspaceDialog(onOpen);
+        hax.app.visiui.dialog.showOpenWorkspaceDialog(onOpen);
     }
 }
 
@@ -37,8 +37,8 @@ visicomp.app.visiui.openworkspace.getOpenCallback = function(app) {
 /** This method opens an workspace, from the text file. 
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
-visicomp.app.visiui.openworkspace.openWorkspace = function(app,workspaceText,actionCompletedCallback) {
-    var actionResponse = new visicomp.core.ActionResponse();
+hax.app.visiui.openworkspace.openWorkspace = function(app,workspaceText,actionCompletedCallback) {
+    var actionResponse = new hax.core.ActionResponse();
     var name;
     var workspaceUIAdded;
     
@@ -51,7 +51,7 @@ visicomp.app.visiui.openworkspace.openWorkspace = function(app,workspaceText,act
 		//make a blank workspace
         name = workspaceJson.workspace.name;
         
-        var workspaceUI = new visicomp.app.visiui.WorkspaceUI();
+        var workspaceUI = new hax.app.visiui.WorkspaceUI();
         workspaceUIAdded = app.addWorkspaceUI(workspaceUI,name);
     
         //add links, if applicable
@@ -75,7 +75,7 @@ visicomp.app.visiui.openworkspace.openWorkspace = function(app,workspaceText,act
     	
 		//if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {
-            visicomp.app.visiui.openworkspace.loadWorkspace(workspaceUI,workspaceJson);
+            hax.app.visiui.openworkspace.loadWorkspace(workspaceUI,workspaceJson);
             actionCompletedCallback(actionResponse);
         }
         
@@ -92,18 +92,18 @@ visicomp.app.visiui.openworkspace.openWorkspace = function(app,workspaceText,act
         if(workspaceUIAdded) {
             app.removeWorkspaceUI(name);
         }
-        var actionError = visicomp.core.ActionError.processException(error,"AppException",false);
+        var actionError = hax.core.ActionError.processException(error,"AppException",false);
         actionResponse.addError(actionError);
         actionCompletedCallback(actionResponse);
     }
 }
 
 /** This method loads an existing workspace into an empty workspace UI. */
-visicomp.app.visiui.openworkspace.loadWorkspace = function(workspaceUI,workspaceJson,actionResponse) {
+hax.app.visiui.openworkspace.loadWorkspace = function(workspaceUI,workspaceJson,actionResponse) {
     var workspaceDataJson = workspaceJson.workspace;
     var workspaceComponentsJson = workspaceJson.components;
 
-    var workspace = new visicomp.core.Workspace(workspaceDataJson,actionResponse);
+    var workspace = new hax.core.Workspace(workspaceDataJson,actionResponse);
     
     workspaceUI.setWorkspace(workspace,workspaceComponentsJson);
 }

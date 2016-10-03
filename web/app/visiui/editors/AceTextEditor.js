@@ -1,13 +1,13 @@
 /** Editor that uses the Ace text editor.
  * 
- * @param {type} component - the visicomp component
+ * @param {type} component - the hax component
  * @param {type} aceMode - the display format, such as "ace/mode/json"
  * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
  * @param {type} onCancel - returns true if the edit should end
  */
-visicomp.app.visiui.AceTextEditor = function(component,aceMode,onSave,onCancel) {
+hax.app.visiui.AceTextEditor = function(component,aceMode,onSave,onCancel) {
     
-    this.outsideDiv = visicomp.visiui.createElement("div",null,{
+    this.outsideDiv = hax.visiui.createElement("div",null,{
 		"position":"absolute",
         "top":"0px",
         "left":"0px",
@@ -16,7 +16,7 @@ visicomp.app.visiui.AceTextEditor = function(component,aceMode,onSave,onCancel) 
 		"overflow":"hidden"
 	});
    
-	this.editorDiv = visicomp.visiui.createElement("div",null,{
+	this.editorDiv = hax.visiui.createElement("div",null,{
 		"position":"absolute",
         "top":"0px",
         "left":"0px",
@@ -48,7 +48,7 @@ visicomp.app.visiui.AceTextEditor = function(component,aceMode,onSave,onCancel) 
         editor.resize();
     }
 	
-    visicomp.visiui.setResizeListener(this.outsideDiv, resizeCallback);
+    hax.visiui.setResizeListener(this.outsideDiv, resizeCallback);
 	
 	//add click handle to enter edit mode
 	var instance = this;
@@ -58,7 +58,7 @@ visicomp.app.visiui.AceTextEditor = function(component,aceMode,onSave,onCancel) 
 	this.editorDiv.addEventListener("click",onMouseClick);
 }
 
-visicomp.app.visiui.AceTextEditor.prototype.save = function() {
+hax.app.visiui.AceTextEditor.prototype.save = function() {
 	
 	var text = this.editor.getSession().getValue();
 	
@@ -69,7 +69,7 @@ visicomp.app.visiui.AceTextEditor.prototype.save = function() {
 	}
 }
 
-visicomp.app.visiui.AceTextEditor.prototype.cancel = function() {
+hax.app.visiui.AceTextEditor.prototype.cancel = function() {
 	//reset the original data
 	var cancelComplete = this.parentCancel();
 	
@@ -82,11 +82,11 @@ visicomp.app.visiui.AceTextEditor.prototype.cancel = function() {
 // "Package" Methods
 //=============================
 
-visicomp.app.visiui.AceTextEditor.prototype.getElement = function() {
+hax.app.visiui.AceTextEditor.prototype.getElement = function() {
 	return this.outsideDiv;
 }
 	
-visicomp.app.visiui.AceTextEditor.prototype.showData = function(text,editOk) {
+hax.app.visiui.AceTextEditor.prototype.showData = function(text,editOk) {
 	this.editOk = editOk;
 	this.editor.getSession().setValue(text);
     
@@ -95,12 +95,12 @@ visicomp.app.visiui.AceTextEditor.prototype.showData = function(text,editOk) {
         this.editorDiv.style.backgroundColor = "";
     }
     else {
-        this.editorDiv.style.backgroundColor = visicomp.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
+        this.editorDiv.style.backgroundColor = hax.app.visiui.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
     }
     
 }
 
-visicomp.app.visiui.AceTextEditor.prototype.destroy = function() {
+hax.app.visiui.AceTextEditor.prototype.destroy = function() {
 	if(this.editor) {
         this.editor.destroy();
         this.editor = null;
@@ -112,14 +112,14 @@ visicomp.app.visiui.AceTextEditor.prototype.destroy = function() {
 //==============================
 
 /** @private */
-visicomp.app.visiui.AceTextEditor.prototype.endEditMode = function() {
+hax.app.visiui.AceTextEditor.prototype.endEditMode = function() {
 	this.editMode = false;
 	this.editor.setReadOnly(true);
 	this.component.hideSaveBar();
 }
 
 /** @private */
-visicomp.app.visiui.AceTextEditor.prototype.onMouseClick = function() {
+hax.app.visiui.AceTextEditor.prototype.onMouseClick = function() {
 	if((this.editOk)&&(!this.editMode)) {
 		
 		var instance = this;

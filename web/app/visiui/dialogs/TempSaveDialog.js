@@ -1,7 +1,7 @@
 
 /** This method shows a save folder dialog. I simply displays the text of
  * the workspace json for the user to copy and save elsewhere. */
-visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
+hax.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
     
     if((!workspaceUI)||(!workspaceUI.getWorkspace())) {
         alert("There is no workspace open.");
@@ -11,11 +11,11 @@ visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
     var workspaceJson = workspaceUI.toJson();
     var workspaceText = JSON.stringify(workspaceJson);
 
-    var dialog = visicomp.visiui.createDialog({"resizable":true,"movable":true});
+    var dialog = hax.visiui.createDialog({"resizable":true,"movable":true});
     dialog.setTitle("&nbsp;");
     
     //add a scroll container
-    var contentContainer = visicomp.visiui.createElement("div",null,
+    var contentContainer = hax.visiui.createElement("div",null,
         {
 			"display":"block",
             "position":"relative",
@@ -27,7 +27,7 @@ visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
     
     var line;
     
-	var content = visicomp.visiui.createElement("div",null,
+	var content = hax.visiui.createElement("div",null,
 			{
 				"display":"table",
 				"overflow":"hidden"
@@ -37,28 +37,28 @@ visicomp.app.visiui.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
     var line;
   
     //title
-    line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Save Workspace"}));
+    line = hax.visiui.createElement("div",{"className":"dialogLine"});
+    line.appendChild(hax.visiui.createElement("div",{"className":"dialogTitle","innerHTML":"Save Workspace"}));
     content.appendChild(line);
     
     //instructions
-    line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(visicomp.visiui.createElement("div",{"innerHTML":"Copy the data below and save it in a file to open later."}));
+    line = hax.visiui.createElement("div",{"className":"dialogLine"});
+    line.appendChild(hax.visiui.createElement("div",{"innerHTML":"Copy the data below and save it in a file to open later."}));
     content.appendChild(line);
     
     //input
-    line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
-    var inputElement = visicomp.visiui.createElement("textarea",{"value":workspaceText,"rows":"15","cols":"75"});
+    line = hax.visiui.createElement("div",{"className":"dialogLine"});
+    var inputElement = hax.visiui.createElement("textarea",{"value":workspaceText,"rows":"15","cols":"75"});
     line.appendChild(inputElement);
     content.appendChild(line);
     
     //buttons and handler
-    line = visicomp.visiui.createElement("div",{"className":"dialogLine"});
+    line = hax.visiui.createElement("div",{"className":"dialogLine"});
     var onOk = function() {
-        visicomp.visiui.closeDialog(dialog);
+        hax.visiui.closeDialog(dialog);
     }
     
-    line.appendChild(visicomp.visiui.createElement("button",{"className":"dialogButton","innerHTML":"OK","onclick":onOk}));
+    line.appendChild(hax.visiui.createElement("button",{"className":"dialogButton","innerHTML":"OK","onclick":onOk}));
     content.appendChild(line);
 
     dialog.setContent(content);

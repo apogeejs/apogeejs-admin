@@ -1,12 +1,12 @@
 
 
-visicomp.app.visiui.updatecomponent = {};
+hax.app.visiui.updatecomponent = {};
 
 //=====================================
 // UI Entry Point
 //=====================================
 
-visicomp.app.visiui.updatecomponent.getAddComponentCallback = function(app,generator,optionalInitialValues,optionalComponentOptions) {
+hax.app.visiui.updatecomponent.getAddComponentCallback = function(app,generator,optionalInitialValues,optionalComponentOptions) {
     
     var createCallback = function() {
         //get the active workspace
@@ -16,10 +16,10 @@ visicomp.app.visiui.updatecomponent.getAddComponentCallback = function(app,gener
             return;
         }
         
-        var additionalLines = visicomp.core.util.deepJsonCopy(generator.propertyDialogLines);       
+        var additionalLines = hax.core.util.deepJsonCopy(generator.propertyDialogLines);       
         
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = visicomp.app.visiui.updatecomponent.getDialogLayout(workspaceUI,generator,true,additionalLines,optionalInitialValues);
+        var dialogLayout = hax.app.visiui.updatecomponent.getDialogLayout(workspaceUI,generator,true,additionalLines,optionalInitialValues);
         
         //create on submit callback
         var onSubmitFunction = function(result) {
@@ -35,14 +35,14 @@ visicomp.app.visiui.updatecomponent.getAddComponentCallback = function(app,gener
         }
         
         //show dialog
-        visicomp.app.visiui.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
+        hax.app.visiui.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
     }
     
     return createCallback;
     
 }
 
-visicomp.app.visiui.updatecomponent.getUpdateComponentCallback = function(component,generator) {
+hax.app.visiui.updatecomponent.getUpdateComponentCallback = function(component,generator) {
     
     var createCallback = function() {
     
@@ -52,7 +52,7 @@ visicomp.app.visiui.updatecomponent.getUpdateComponentCallback = function(compon
         var initialValues = component.getPropertyValues();
         
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = visicomp.app.visiui.updatecomponent.getDialogLayout(workspaceUI,generator,false,additionalLines,initialValues);
+        var dialogLayout = hax.app.visiui.updatecomponent.getDialogLayout(workspaceUI,generator,false,additionalLines,initialValues);
         
         //create on submit callback
         var onSubmitFunction = function(newValues) {
@@ -90,7 +90,7 @@ visicomp.app.visiui.updatecomponent.getUpdateComponentCallback = function(compon
         }
         
         //show dialog
-        visicomp.app.visiui.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
+        hax.app.visiui.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
     }
     
     return createCallback;
@@ -98,7 +98,7 @@ visicomp.app.visiui.updatecomponent.getUpdateComponentCallback = function(compon
 }
 
 //this is for a create or update dialog
-visicomp.app.visiui.updatecomponent.getDialogLayout = function(workspaceUI,generator,doCreate,additionalLines,initialValues) {
+hax.app.visiui.updatecomponent.getDialogLayout = function(workspaceUI,generator,doCreate,additionalLines,initialValues) {
     
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};

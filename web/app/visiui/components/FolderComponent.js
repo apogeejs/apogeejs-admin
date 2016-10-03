@@ -1,25 +1,25 @@
 /** This component represents a table object. */
-visicomp.app.visiui.FolderComponent = function(workspaceUI,folder,componentJson) {
+hax.app.visiui.FolderComponent = function(workspaceUI,folder,componentJson) {
     //base init
-    visicomp.app.visiui.Component.init.call(this,workspaceUI,folder,visicomp.app.visiui.FolderComponent.generator,componentJson);
-    visicomp.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
-	visicomp.visiui.ParentHighlighter.init.call(this,this.getContentElement());
+    hax.app.visiui.Component.init.call(this,workspaceUI,folder,hax.app.visiui.FolderComponent.generator,componentJson);
+    hax.visiui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
+	hax.visiui.ParentHighlighter.init.call(this,this.getContentElement());
     
     //register this folder as a parent container
     workspaceUI.addComponentContainer(folder,this);
 };
 
 //add components to this class
-visicomp.core.util.mixin(visicomp.app.visiui.FolderComponent,visicomp.app.visiui.Component);
-visicomp.core.util.mixin(visicomp.app.visiui.FolderComponent,visicomp.visiui.ParentContainer);
-visicomp.core.util.mixin(visicomp.app.visiui.FolderComponent,visicomp.visiui.ParentHighlighter);
+hax.core.util.mixin(hax.app.visiui.FolderComponent,hax.app.visiui.Component);
+hax.core.util.mixin(hax.app.visiui.FolderComponent,hax.visiui.ParentContainer);
+hax.core.util.mixin(hax.app.visiui.FolderComponent,hax.visiui.ParentHighlighter);
 
 //----------------------
 // ParentContainer Methods
 //----------------------
 
 /** This method must be implemented in inheriting objects. */
-visicomp.app.visiui.FolderComponent.prototype.getContentIsShowing = function() {
+hax.app.visiui.FolderComponent.prototype.getContentIsShowing = function() {
     return this.getWindow().getContentIsShowing();
 }
 
@@ -28,7 +28,7 @@ visicomp.app.visiui.FolderComponent.prototype.getContentIsShowing = function() {
 //==============================
 
 /** This serializes the table component. */
-visicomp.app.visiui.FolderComponent.prototype.writeToJson = function(json) {
+hax.app.visiui.FolderComponent.prototype.writeToJson = function(json) {
     var folder = this.getObject();
     var workspaceUI = this.getWorkspaceUI();
     json.children = workspaceUI.getFolderComponentContentJson(folder);
@@ -36,7 +36,7 @@ visicomp.app.visiui.FolderComponent.prototype.writeToJson = function(json) {
 
 /** This method populates the frame for this component. 
  * @protected */
-visicomp.app.visiui.FolderComponent.prototype.populateFrame = function() {
+hax.app.visiui.FolderComponent.prototype.populateFrame = function() {
 	this.setScrollingContentElement();
     
     //add context menu to create childrent
@@ -53,26 +53,26 @@ visicomp.app.visiui.FolderComponent.prototype.populateFrame = function() {
 //======================================
 
 //add table listener
-visicomp.app.visiui.FolderComponent.createComponent = function(workspaceUI,data,componentOptions) {
+hax.app.visiui.FolderComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
     var parent = workspaceUI.getObjectByKey(data.parentKey);
     //should throw an exception if parent is invalid!
     
     var json = {};
     json.name = data.name;
-    json.type = visicomp.core.Folder.generator.type;
-    var actionResponse = visicomp.core.createmember.createMember(parent,json);
+    json.type = hax.core.Folder.generator.type;
+    var actionResponse = hax.core.createmember.createMember(parent,json);
     
     var folder = actionResponse.member;
     if(folder) {       
-        var folderComponent = new visicomp.app.visiui.FolderComponent(workspaceUI,folder,componentOptions);
+        var folderComponent = new hax.app.visiui.FolderComponent(workspaceUI,folder,componentOptions);
         actionResponse.component = folderComponent;
     }
     return actionResponse;
 }
 
-visicomp.app.visiui.FolderComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
-    var folderComponent = new visicomp.app.visiui.FolderComponent(workspaceUI,member,componentJson);
+hax.app.visiui.FolderComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
+    var folderComponent = new hax.app.visiui.FolderComponent(workspaceUI,member,componentJson);
     if((componentJson)&&(componentJson.children)) {
         workspaceUI.loadFolderComponentContentFromJson(member,componentJson.children);
     }
@@ -85,10 +85,10 @@ visicomp.app.visiui.FolderComponent.createComponentFromJson = function(workspace
 // This is the component generator, to register the component
 //======================================
 
-visicomp.app.visiui.FolderComponent.generator = {};
-visicomp.app.visiui.FolderComponent.generator.displayName = "Folder";
-visicomp.app.visiui.FolderComponent.generator.uniqueName = "visicomp.app.visiui.FolderComponent";
-visicomp.app.visiui.FolderComponent.generator.createComponent = visicomp.app.visiui.FolderComponent.createComponent;
-visicomp.app.visiui.FolderComponent.generator.createComponentFromJson = visicomp.app.visiui.FolderComponent.createComponentFromJson;
-visicomp.app.visiui.FolderComponent.generator.DEFAULT_WIDTH = 500;
-visicomp.app.visiui.FolderComponent.generator.DEFAULT_HEIGHT = 500;
+hax.app.visiui.FolderComponent.generator = {};
+hax.app.visiui.FolderComponent.generator.displayName = "Folder";
+hax.app.visiui.FolderComponent.generator.uniqueName = "hax.app.visiui.FolderComponent";
+hax.app.visiui.FolderComponent.generator.createComponent = hax.app.visiui.FolderComponent.createComponent;
+hax.app.visiui.FolderComponent.generator.createComponentFromJson = hax.app.visiui.FolderComponent.createComponentFromJson;
+hax.app.visiui.FolderComponent.generator.DEFAULT_WIDTH = 500;
+hax.app.visiui.FolderComponent.generator.DEFAULT_HEIGHT = 500;

@@ -1,5 +1,5 @@
 /** This namespace contains functions to process a create of a member */
-visicomp.core.createmember = {};
+hax.core.createmember = {};
 
 /** member CREATED EVENT
  * This listener event is fired when after a member is created, to be used to respond
@@ -8,18 +8,18 @@ visicomp.core.createmember = {};
  * Event member Format:
  * [member]
  */
-visicomp.core.createmember.MEMBER_CREATED_EVENT = "memberCreated";
+hax.core.createmember.MEMBER_CREATED_EVENT = "memberCreated";
 
-visicomp.core.createmember.fireCreatedEvent = function(member) {
+hax.core.createmember.fireCreatedEvent = function(member) {
     var workspace = member.getWorkspace();
-    workspace.dispatchEvent(visicomp.core.createmember.MEMBER_CREATED_EVENT,member);
+    workspace.dispatchEvent(hax.core.createmember.MEMBER_CREATED_EVENT,member);
 }
 
 /** This method creates member according the input json, in the given folder.
  * The return value is an ActionResponse object. Optionally, an existing action response
  * may be passed in or otherwise one will be created here. */
-visicomp.core.createmember.createMember = function(folder,json,optionalActionResponse) {
-	var actionResponse = optionalActionResponse ? optionalActionResponse : new visicomp.core.ActionResponse();
+hax.core.createmember.createMember = function(folder,json,optionalActionResponse) {
+	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.core.ActionResponse();
     
     try {
         
@@ -27,7 +27,7 @@ visicomp.core.createmember.createMember = function(folder,json,optionalActionRes
         var recalculateList = [];
         var setDataList = [];
         
-        var member = visicomp.core.createmember.instantiateMember(folder,json,updateDataList,actionResponse);
+        var member = hax.core.createmember.instantiateMember(folder,json,updateDataList,actionResponse);
         
         //add the member to the action response
         actionResponse.member = member;
@@ -40,25 +40,25 @@ visicomp.core.createmember.createMember = function(folder,json,optionalActionRes
 
             //do data updates if needed
             if(updateDataList.length > 0) {
-                visicomp.core.updatemember.updateObjectFunctionOrData(updateDataList,
+                hax.core.updatemember.updateObjectFunctionOrData(updateDataList,
                     recalculateList,
                     setDataList,
                     actionResponse);
             } 
             
-            visicomp.core.calculation.callRecalculateList(recalculateList,actionResponse);
+            hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
 
             //dispatch events
-            workspace.dispatchEvent(visicomp.core.createmember.MEMBER_CREATED_EVENT,member);
-            visicomp.core.updatemember.fireUpdatedEventList(setDataList);
-            visicomp.core.updatemember.fireUpdatedEventList(recalculateList);
+            workspace.dispatchEvent(hax.core.createmember.MEMBER_CREATED_EVENT,member);
+            hax.core.updatemember.fireUpdatedEventList(setDataList);
+            hax.core.updatemember.fireUpdatedEventList(recalculateList);
         }
 
 		
 	}
 	catch(error) {
         //unknown application error
-        var actionError = visicomp.core.ActionError.processException(error,"AppException",true);
+        var actionError = hax.core.ActionError.processException(error,"AppException",true);
         actionResponse.addError(actionError);
     }
     
@@ -67,14 +67,14 @@ visicomp.core.createmember.createMember = function(folder,json,optionalActionRes
 }
 
 /** This method instantiates a member, without setting the update data. */
-visicomp.core.createmember.instantiateMember = function(folder,json,updateDataList,actionResponse) {
+hax.core.createmember.instantiateMember = function(folder,json,updateDataList,actionResponse) {
     //create member
-    var generator = visicomp.core.Workspace.getMemberGenerator(json.type);
+    var generator = hax.core.Workspace.getMemberGenerator(json.type);
 
     if(!generator) {
        //type not found
        var errorMsg = "Member type not found: " + json.type;
-       var actionError = new visicomp.core.ActionError(errorMsg,"Model",null);
+       var actionError = new hax.core.ActionError(errorMsg,"Model",null);
        
        actionResponse.addError(actionError);
        

@@ -3,7 +3,7 @@
 	<head>
 		<title></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<script type="text/javascript" src="../../visicomp.js"></script>
+		<script type="text/javascript" src="../../hax.js"></script>
         <script type="text/javascript" src="../../core/core.js"></script>
 		<script type="text/javascript" src="../../core/lib/EventManager.js"></script>
         <script type="text/javascript" src="../../core/lib/ContextManager.js"></script>
@@ -42,12 +42,12 @@
 				
 				//open the model
 				var headlessWorkspaceJson = inputObject.workspaceJson.workspace;
-                var workspace = new visicomp.core.Workspace(headlessWorkspaceJson);
+                var workspace = new hax.core.Workspace(headlessWorkspaceJson);
 				var rootFolder = workspace.getRootFolder();
 				
 				//set the input
 				var inputTable = rootFolder.lookupChild(inputObject.inputTable);
-				visicomp.core.updatemember.updateData(inputTable,inputObject.inputJson);
+				hax.core.updatemember.updateData(inputTable,inputObject.inputJson);
 				
 				//get the output
 				var outputTable = rootFolder.lookupChild(inputObject.outputTable);
