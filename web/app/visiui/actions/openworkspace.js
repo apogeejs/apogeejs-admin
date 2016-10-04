@@ -9,19 +9,17 @@ hax.app.visiui.openworkspace.getOpenCallback = function(app) {
     return function() {
     
         var onOpen = function(workspaceData) {
-
-            //this will show the asynchronous result
+                
             var actionCompletedCallback = function(actionResponse) {
                 if(!actionResponse.getSuccess()) {
                     alert(actionResponse.getErrorMsg());
                 }
-            }
-
+            };
+            
             //open workspace
             hax.app.visiui.openworkspace.openWorkspace(app,workspaceData,actionCompletedCallback);
 
             //we should show some sort of loading message or symbol
-
             return true;
         }
         
@@ -106,4 +104,56 @@ hax.app.visiui.openworkspace.loadWorkspace = function(workspaceUI,workspaceJson,
     var workspace = new hax.core.Workspace(workspaceDataJson,actionResponse);
     
     workspaceUI.setWorkspace(workspace,workspaceComponentsJson);
+}
+
+
+//------------------------
+// open from url
+//------------------------
+
+/** This method opens an workspace by getting the workspace file from the url. */
+hax.app.visiui.openworkspace.openWorkspaceFromUrl = function(app,url) {
+    var actionCompletedCallback = function(actionResponse) {
+        if(!actionResponse.getSuccess()) {
+            alert(actionResponse.getErrorMsg());
+        }
+    };
+    
+    hax.app.visiui.openworkspace.openWorkspaceFromUrlImpl(app,url,actionCompletedCallback);
+}
+
+/** This method opens an workspace by getting the workspace file from the url. */
+hax.app.visiui.openworkspace.openWorkspaceFromUrlImpl = function(app,url,actionCompletedCallback) {
+    var onDownload = function(workspaceText) {
+        hax.app.visiui.openworkspace.openWorkspace(app,workspaceText,actionCompletedCallback);
+    }
+    
+    var onFailure = function(msg) {
+        var actionError = new hax.core.ActionError(msg,"AppException",null);
+        var actionResponse = new hax.core.ActionResponse();
+        actionResponse.addError(actionError);
+        actionCompletedCallback(actionResponse);
+    }   
+    hax.app.visiui.openworkspace.doRequest(url,onDownload,onFailure);   
+}
+
+/**
+ * This is an http request for the worksheet data
+ */
+hax.app.visiui.openworkspace.doRequest= function(url,onDownload,onFailure) {
+	var xmlhttp=new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange=function() {
+        var msg;
+        if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+            onDownload(xmlhttp.responseText);
+        }
+        else if(xmlhttp.readyState==4  && xmlhttp.status >= 400)  {
+            msg = "Error in http request. Status: " + xmlhttp.status;
+            onFailure(msg);
+        }
+    }
+	
+	xmlhttp.open("GET",url,true);
+    xmlhttp.send();
 }

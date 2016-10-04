@@ -25,9 +25,16 @@ hax.app.visiui.Hax = function(containerId) {
 	
 	//create the UI
 	this.createUI(containerId);
-	
-	//create a default workspace 
-    hax.app.visiui.createworkspace.createWorkspace(this,hax.app.visiui.Hax.DEFAULT_WORKSPACE_NAME);
+    
+    //open a workspace - from url or default
+    var workspaceUrl = hax.core.util.readQueryField("url",document.URL);
+    if(workspaceUrl) {
+        hax.app.visiui.openworkspace.openWorkspaceFromUrl(this,workspaceUrl);
+    }
+    else {
+        //create a default workspace 
+        hax.app.visiui.createworkspace.createWorkspace(this,hax.app.visiui.Hax.DEFAULT_WORKSPACE_NAME);
+    }
 }
 	
 //add components to this class

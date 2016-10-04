@@ -109,3 +109,11 @@ hax.core.util.removeAllChildren = function(element) {
 		element.removeChild(element.lastChild);
 	}
 }
+
+/** This method reads the query string from a url */
+hax.core.util.readQueryField = function(field,url) {
+    var href = url ? url : window.location.href;
+    var reg = new RegExp( '[?&]' + field + '=([^&#]*)', 'i' );
+    var string = reg.exec(href);
+    return string ? string[1] : null;
+}
