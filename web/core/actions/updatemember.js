@@ -119,14 +119,14 @@ hax.core.updatemember.updateObjectFunctionOrData = function(updateDataList,
         var functionBody = argData.functionBody;
         var supplementalCode = argData.supplementalCode;
         
-        if(functionBody) {
+        if(functionBody !== undefined) {
             hax.core.updatemember.updateObjectFunction(member,
                 argList,
                 functionBody,
                 supplementalCode,
                 recalculateList);
         }
-        else if(data) {
+        else if(data !== undefined) {
             hax.core.updatemember.updateObjectData(member,
                 data,
                 recalculateList);
