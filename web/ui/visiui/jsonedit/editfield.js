@@ -73,7 +73,7 @@ hax.jsonedit.EditField.prototype.setValue = function(value) {
 
 /** @private */
 hax.jsonedit.EditField.prototype.setCssClass = function() {
-	var cssName = "cell_" + this.fieldType;
+	var cssName = "cell_base cell_" + this.fieldType;
 	if(this.isVirtual) {
 		cssName += "_virtual";
 	}
@@ -102,6 +102,26 @@ hax.jsonedit.EditField.prototype.onClick = function() {
 
 hax.jsonedit.EditField.prototype.startEdit = function() {
     if(!this.editField) {
+    
+        //get the selection
+        var selection = getSelection();
+        var selectInfo;
+        if(selection.anchorNode.parentNode == this.element) {
+            selectInfo = {};
+            if(selection.anchorOffset <= selection.focusOffset) {
+                selectInfo.start = selection.anchorOffset;
+                selectInfo.end = selection.focusOffset;
+            }
+            else {
+                selectInfo.start = selection.focusOffset;
+                selectInfo.end = selection.anchorOffset;
+            }
+        }
+        else {
+            selectInfo = null;
+        }    
+        
+        //create the edit field
         this.editField = document.createElement("input");
 		this.editField.type = "text";
 		if(this.value !== undefined) {
@@ -112,7 +132,12 @@ hax.jsonedit.EditField.prototype.startEdit = function() {
         this.element.appendChild(this.editField);
         
         //select the entry
-        this.editField.setSelectionRange(0,String(this.value).length);
+        if(selectInfo) {
+            this.editField.setSelectionRange(selectInfo.start,selectInfo.end);
+        }
+        else {
+            this.editField.select();
+        }
         this.editField.focus();
         
         //event handlers to end edit

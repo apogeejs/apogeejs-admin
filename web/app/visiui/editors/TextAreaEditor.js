@@ -22,27 +22,11 @@ hax.app.visiui.TextAreaEditor = function(component,onSave,onCancel) {
         "left":"0px",
         "width":"100%",
         "height":"100%",
-		"overflow":"auto",
-        
-        "webkitUserSelect":"none",
-        "khtmlUserSelect":"none",
-        "mozUserSelect":"none",
-        "msUserSelect":"none",
-        "userSelect":"none"
+		"overflow":"auto"
 	});
     this.textArea = textArea;
     this.textArea.readOnly = true;
-    this.outsideDiv.appendChild(this.textArea);
-    
-    var onFocus = function () {
-        hax.visiui.applyStyle(textArea,hax.app.visiui.TextAreaEditor.selectStyle);
-    }
-    this.textArea.addEventListener("focus",onFocus);
-    var onBlur = function () {
-        hax.visiui.applyStyle(textArea,hax.app.visiui.TextAreaEditor.noSelectStyle);
-    }
-    this.textArea.addEventListener("blur",onBlur);
-    
+    this.outsideDiv.appendChild(this.textArea);  
 	
 	this.component = component;
 	this.table = component.getObject();
@@ -67,21 +51,6 @@ hax.app.visiui.TextAreaEditor = function(component,onSave,onCancel) {
 	}
 	this.textArea.addEventListener("click",onMouseClick);
 }
-
-hax.app.visiui.TextAreaEditor.noSelectStyle = {
-    "webkitUserSelect":"none",
-    "khtmlUserSelect":"none",
-    "mozUserSelect":"none",
-    "msUserSelect":"none",
-    "userSelect":"none"
-};
-hax.app.visiui.TextAreaEditor.selectStyle = {
-    "webkitUserSelect":"text",
-    "khtmlUserSelect":"text",
-    "mozUserSelect":"text",
-    "msUserSelect":"text",
-    "userSelect":"text"
-};
 
 hax.app.visiui.TextAreaEditor.prototype.save = function() {
 	
