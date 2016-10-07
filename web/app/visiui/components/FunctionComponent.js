@@ -60,6 +60,9 @@ hax.app.visiui.FunctionComponent.prototype.getPropertyValues = function() {
 
 /** This method extends the base method to update property values. */
 hax.app.visiui.FunctionComponent.prototype.updatePropertyValues = function(newValues) {
+    
+    hax.app.visiui.Component.call(this,newValues);
+    
     var argListString = newValues.argListString;
     var argList = hax.app.visiui.FunctionComponent.parseStringArray(argListString);
     

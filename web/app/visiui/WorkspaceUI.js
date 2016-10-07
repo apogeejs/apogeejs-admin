@@ -55,6 +55,10 @@ hax.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace, componen
         instance.childDeleted(fullName);
     }
     this.workspace.addListener(hax.core.deletemember.MEMBER_DELETED_EVENT, childDeletedListener);
+    var childMovedListener = function(moveInfo) {
+        instance.childMoved(moveInfo);
+    }
+    this.workspace.addListener(hax.core.movemember.MEMBER_MOVED_EVENT, childMovedListener);
     
     //add context menu to create childrent
     var contentElement = this.tab.getContainerElement();
@@ -169,6 +173,23 @@ hax.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
         //do any needed cleanup
         componentInfo.component.onDelete();
 	}
+}
+
+/** This method responds to a "new" menu event. */
+hax.app.visiui.WorkspaceUI.prototype.childMoved = function(moveInfo) {
+	
+    var oldKey = moveInfo.oldFullName;
+    var newKey = moveInfo.newFullName;
+    
+	var componentInfo = this.componentMap[oldKey];
+	delete this.componentMap[oldKey]
+    
+    this.componentMap[newKey] = componentInfo;
+    
+    //move the window to the proper parent container
+    var parentContainer = this.getParentContainerObject(componentInfo.object);
+    var window = componentInfo.component.getWindow();
+    window.changeParent(parentContainer);
 }
 
 hax.app.visiui.WorkspaceUI.getObjectKey = function(object) {

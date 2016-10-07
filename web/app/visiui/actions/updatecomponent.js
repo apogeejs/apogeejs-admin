@@ -70,15 +70,15 @@ hax.app.visiui.updatecomponent.getUpdateComponentCallback = function(component,g
 
             //update
             var actionResponse;
-            if((newValues.name !== initialValues.name)||(newValues.parentKey != initialValues.parentKey)) {
-                //handle refactor, with property change
-                alert("This shouldn't happen - how did the name or fodler change?");
-                return true;
-            }
-            else {
+//            if((newValues.name !== initialValues.name)||(newValues.parentKey != initialValues.parentKey)) {
+//                //handle refactor, with property change
+//                alert("This shouldn't happen - how did the name or fodler change?");
+//                return true;
+//            }
+//            else {
                 //only property change
                 actionResponse = component.updatePropertyValues(newValues);
-            }
+//            }
               
             //print an error message if there was an error
             if(!actionResponse.getSuccess()) {
@@ -120,10 +120,10 @@ hax.app.visiui.updatecomponent.getDialogLayout = function(workspaceUI,generator,
     parentLine.heading = "Folder: ";
     parentLine.entries = workspaceUI.getFolderList();
     parentLine.resultKey = "parentKey"; 
-    if(!doCreate) {
-        //do not allow editing after create, for now
-        parentLine.disabled = true;
-    }
+//    if(!doCreate) {
+//        //do not allow editing after create, for now
+//        parentLine.disabled = true;
+//    }
     lines.push(parentLine);
 
     var nameLine = {};

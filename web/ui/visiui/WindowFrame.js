@@ -229,6 +229,22 @@ hax.visiui.WindowFrame.prototype.loadHeaders = function(headerElements) {
     }
 }
 
+/** This method shows the window. */
+hax.visiui.WindowFrame.prototype.changeParent = function(newParentContainer) {
+    this.hide();
+    var oldParentContainer = this.parentContainer;
+    var oldParentEventManager = oldParentContainer.getEventManager();
+    oldParentEventManager.removeListener(hax.visiui.ParentContainer.CONTENT_SHOWN, this.onShow);
+    oldParentEventManager.removeListener(hax.visiui.ParentContainer.CONTENT_HIDDEN, this.onHide);
+    
+    this.parentContainer = newParentContainer;
+    this.parentElement = newParentContainer.getContainerElement();
+    
+    var newParentEventManager = newParentContainer.getEventManager();
+    newParentEventManager.addListener(hax.visiui.ParentContainer.CONTENT_SHOWN, this.onShow);
+    newParentEventManager.addListener(hax.visiui.ParentContainer.CONTENT_HIDDEN, this.onHide);
+    this.show();
+}
 
 /** This method shows the window. */
 hax.visiui.WindowFrame.prototype.show = function() {

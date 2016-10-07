@@ -25,6 +25,13 @@ hax.core.Child.initOwner = function(owner) {
     }
 }
 
+hax.core.Child.changeOwner = function(owner) {
+    if((this.owner)&&(this.owner.isParent)) {
+        this.owner.removeChild(this);
+    }
+    this.initOwner(owner);
+}
+
 /** This property tells if this object is a child.
  * This property should not be implemented on non-children. */
 hax.core.Child.isChild = true

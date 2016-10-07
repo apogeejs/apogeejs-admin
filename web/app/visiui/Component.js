@@ -78,7 +78,6 @@ hax.app.visiui.Component.init = function(workspaceUI,object,generator,options) {
     var itemInfo = {};
     itemInfo.title = "Edit Properties";
     itemInfo.callback = hax.app.visiui.updatecomponent.getUpdateComponentCallback(this,this.generator);
-    
     this.menuItemInfoList.push(itemInfo);
     
     var itemInfo = {};
@@ -292,7 +291,8 @@ hax.app.visiui.Component.getPropertyValues = function() {
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
 hax.app.visiui.Component.updatePropertyValues = function(newValues) {
-    
+    var parent = this.workspaceUI.getObjectByKey(newValues.parentKey);
+    return hax.core.movemember.moveMember(this.object,newValues.name,parent);
 }
 
 //=============================
