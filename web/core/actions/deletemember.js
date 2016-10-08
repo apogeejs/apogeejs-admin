@@ -19,9 +19,7 @@ hax.core.deletemember.deleteMember = function(member,optionalActionResponse) {
     
     try {
         
-        var updateDataList = [];
         var recalculateList = [];
-        var setDataList = [];
         
         //delete child
         member.onDelete();
@@ -29,21 +27,12 @@ hax.core.deletemember.deleteMember = function(member,optionalActionResponse) {
 		var fullName = member.getFullName();
 		var workspace = member.getWorkspace();
 
-        workspace.updateForDeletedVariable(member,recalculateList,actionResponse);
-
-        //do data updates if needed
-        if(updateDataList.length > 0) {
-            hax.core.updatemember.updateObjectFunctionOrData(updateDataList,
-                recalculateList,
-                setDataList,
-                actionResponse);
-        } 
+        workspace.updateForDeletedVariable(member,recalculateList);
 
         hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
 
         //dispatch events
         workspace.dispatchEvent(hax.core.deletemember.MEMBER_DELETED_EVENT,fullName);
-        hax.core.updatemember.fireUpdatedEventList(setDataList);
         hax.core.updatemember.fireUpdatedEventList(recalculateList);
 	}
 	catch(error) {

@@ -277,22 +277,82 @@ hax.app.visiui.Component.onDelete = function() {
     }
 }
 
+/** This method should include an needed functionality to clean up after a delete. */
+hax.app.visiui.Component.memberMoved = function(newParentContainer) {
+        //move the window to the proper parent container
+    this.parenContainer = newParentContainer;
+    this.window.changeParent(newParentContainer);
+    this.updateTitle();
+}
+
+/** This method extends the member udpated function from the base.
+ * @protected */    
+hax.app.visiui.Component.memberUpdated = function() {
+    this.updateTitle();
+}
+
+/** This method makes sure the window title is up to date.
+ * @private */    
+hax.app.visiui.Component.updateTitle = function() {
+    //make sure the title is up to data
+    var window = this.getWindow();
+    if(window) {
+        var member = this.getObject();
+        var displayName = member.getDisplayName();
+        var windowTitle = window.getTitle();
+        if(windowTitle !== displayName) {
+            window.setTitle(displayName);
+        }
+    }
+}
+
 /** This method is used for setting initial values in the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to give the values of those properties too. */
 hax.app.visiui.Component.getPropertyValues = function() {
+    
+    var member = this.object;
+    
     var values = {};
-    values.name = this.object.getName();
-    values.parentKey = hax.app.visiui.WorkspaceUI.getObjectKey(this.object.getParent());
+    values.name = member.getName();
+    values.parentKey = hax.app.visiui.WorkspaceUI.getObjectKey(member.getParent());
+    
+    if(this.generator.addPropFunction) {
+        this.generator.addPropFunction(member,values);
+    }
     return values;
 }
 
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-hax.app.visiui.Component.updatePropertyValues = function(newValues) {
-    var parent = this.workspaceUI.getObjectByKey(newValues.parentKey);
-    return hax.core.movemember.moveMember(this.object,newValues.name,parent);
+hax.app.visiui.Component.updatePropertyValues = function(oldValues,newValues) {
+    var actionResponse = new hax.core.ActionResponse();
+    var recalculateList = [];
+    var member = this.object;
+    
+    try {
+        if((oldValues.name !== newValues.name)||(oldValues.parentKey !== newValues.parentKey)) {
+            var parent = this.workspaceUI.getObjectByKey(newValues.parentKey);
+            hax.core.movemember.moveMember(member,newValues.name,parent,recalculateList);
+        }
+
+        if(this.generator.updatePropHandler) {
+            this.generator.updatePropHandler(member,oldValues,newValues,recalculateList);
+        }
+        
+        //recalculate
+        hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
+        
+        hax.core.updatemember.fireUpdatedEventList(recalculateList);
+    }
+    catch(error) {
+        //unknown application error
+        var actionError = hax.core.ActionError.processException(error,"AppException",true);
+        actionResponse.addError(actionError);
+    }
+    
+    return actionResponse;
 }
 
 //=============================

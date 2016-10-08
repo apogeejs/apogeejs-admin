@@ -177,19 +177,23 @@ hax.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
 
 /** This method responds to a "new" menu event. */
 hax.app.visiui.WorkspaceUI.prototype.childMoved = function(moveInfo) {
-	
-    var oldKey = moveInfo.oldFullName;
-    var newKey = moveInfo.newFullName;
     
-	var componentInfo = this.componentMap[oldKey];
-	delete this.componentMap[oldKey]
+    //just redo the whole map, to make sure we get any children too
+    var newComponentMap = {};
+    for(var oldKey in this.componentMap) {
+        var componentInfo = this.componentMap[oldKey];
+        var member = componentInfo.object;
+        var activeKey = member.getFullName();
+        newComponentMap[activeKey] = componentInfo;
+    }
+    this.componentMap = newComponentMap;
     
-    this.componentMap[newKey] = componentInfo;
-    
-    //move the window to the proper parent container
-    var parentContainer = this.getParentContainerObject(componentInfo.object);
-    var window = componentInfo.component.getWindow();
-    window.changeParent(parentContainer);
+    //update the component
+    var movedComponentInfo = this.componentMap[moveInfo.newFullName];
+	if((movedComponentInfo)&&(movedComponentInfo.component)) {
+        var parentContainer = this.getParentContainerObject(movedComponentInfo.object);
+        movedComponentInfo.component.memberMoved(parentContainer);
+    }
 }
 
 hax.app.visiui.WorkspaceUI.getObjectKey = function(object) {

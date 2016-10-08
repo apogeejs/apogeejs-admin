@@ -21,40 +21,37 @@ hax.core.createmember.fireCreatedEvent = function(member) {
 hax.core.createmember.createMember = function(folder,json,optionalActionResponse) {
 	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.core.ActionResponse();
     
-    try {
+    try {      
+        var recalculateList = [];
         
         var updateDataList = [];
-        var recalculateList = [];
         var setDataList = [];
         
         var member = hax.core.createmember.instantiateMember(folder,json,updateDataList,actionResponse);
         
         //add the member to the action response
         actionResponse.member = member;
+
         
-        if(member != null) {
-        
-            var workspace = member.getWorkspace();
-            
-            workspace.updateForAddedVariable(member,recalculateList);
+        var workspace = member.getWorkspace();
 
-            //do data updates if needed
-            if(updateDataList.length > 0) {
-                hax.core.updatemember.updateObjectFunctionOrData(updateDataList,
-                    recalculateList,
-                    setDataList,
-                    actionResponse);
-            } 
-            
-            hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
+        workspace.updateForAddedVariable(member,recalculateList);
 
-            //dispatch events
-            workspace.dispatchEvent(hax.core.createmember.MEMBER_CREATED_EVENT,member);
-            hax.core.updatemember.fireUpdatedEventList(setDataList);
-            hax.core.updatemember.fireUpdatedEventList(recalculateList);
-        }
+        //do data updates if needed
+        if(updateDataList.length > 0) {
+            hax.core.updatemember.updateObjectFunctionOrData(updateDataList,
+                recalculateList,
+                setDataList,
+                actionResponse);
+        } 
 
-		
+        hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
+
+        //dispatch events
+        workspace.dispatchEvent(hax.core.createmember.MEMBER_CREATED_EVENT,member);
+        hax.core.updatemember.fireUpdatedEventList(setDataList);
+        hax.core.updatemember.fireUpdatedEventList(recalculateList);
+
 	}
 	catch(error) {
         //unknown application error

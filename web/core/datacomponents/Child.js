@@ -25,11 +25,16 @@ hax.core.Child.initOwner = function(owner) {
     }
 }
 
-hax.core.Child.changeOwner = function(owner) {
+hax.core.Child.move = function(newName,newOwner) {
+    //remove from old owner
     if((this.owner)&&(this.owner.isParent)) {
         this.owner.removeChild(this);
     }
-    this.initOwner(owner);
+    //change name
+    this.name = newName;
+    
+    //place in the new owner
+    this.initOwner(newOwner);
 }
 
 /** This property tells if this object is a child.

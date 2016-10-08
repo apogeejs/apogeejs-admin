@@ -53,42 +53,6 @@ hax.app.visiui.FolderFunctionComponent.prototype.populateFrame = function() {
     app.setFolderContextMenu(contentElement,internalFolder);
 }
 
-/** This method updates the component when the data changes. 
- * @private */    
-hax.app.visiui.FolderFunctionComponent.prototype.memberUpdated = function() {
-    //make sure the title is up to data
-    var window = this.getWindow();
-    if(window) {
-        var functionObject = this.getObject();
-        var displayName = functionObject.getDisplayName();
-        var windowTitle = window.getTitle();
-        if(windowTitle != displayName) {
-            window.setTitle(displayName);
-        }
-    }
-}
-
-/** This method extends the base method to get the property values
- * for the property edit dialog. */
-hax.app.visiui.FolderFunctionComponent.prototype.getPropertyValues = function() {
-    var values = hax.app.visiui.Component.getPropertyValues.call(this);
-
-    var argList = this.object.getArgList();
-    var argListString = argList.toString();
-    values.argListString = argListString;
-    values.returnValueString = this.object.getReturnValueString();
-    return values;
-}
-
-/** This method extends the base method to update property values. */
-hax.app.visiui.FolderFunctionComponent.prototype.updatePropertyValues = function(newValues) {
-    var argListString = newValues.argListString;
-    var argList = hax.app.visiui.FunctionComponent.parseStringArray(argListString);
-    var returnValueString = newValues.returnValueString;
-    
-    return hax.core.updatefolderFunction.updatePropertyValues(this.object,argList,returnValueString);
-}
-
 //======================================
 // Static methods
 //======================================
@@ -129,6 +93,24 @@ hax.app.visiui.FolderFunctionComponent.createComponentFromJson = function(worksp
     return folderFunctionComponent;
 }
 
+
+/** This method extends the base method to get the property values
+ * for the property edit dialog. */
+hax.app.visiui.FolderFunctionComponent.addPropValues = function(member,values) {
+    var argList = member.getArgList();
+    var argListString = argList.toString();
+    values.argListString = argListString;
+    values.returnValueString = member.getReturnValueString();
+    return values;
+}
+
+hax.app.visiui.FolderFunctionComponent.propUpdateHandler = function(member,oldValues,newValues,recalculateList) {
+    if((oldValues.argListString !== newValues.argListString)||(oldValues.returnValueString !== newValues.returnValueString)) {
+        var newArgList = hax.app.visiui.FunctionComponent.parseStringArray(newValues.argListString);
+        hax.core.updatefolderFunction.updatePropertyValues(member,newArgList,newValues.returnValueString,recalculateList);
+    }    
+}
+
 //======================================
 // This is the component generator, to register the component
 //======================================
@@ -153,4 +135,5 @@ hax.app.visiui.FolderFunctionComponent.generator.propertyDialogLines = [
         "resultKey":"returnValueString"
     }
 ];
-
+hax.app.visiui.FolderFunctionComponent.generator.addPropFunction = hax.app.visiui.FolderFunctionComponent.addPropValues;
+hax.app.visiui.FolderFunctionComponent.generator.updatePropHandler = hax.app.visiui.FolderFunctionComponent.propUpdateHandler;

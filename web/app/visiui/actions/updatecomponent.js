@@ -45,14 +45,12 @@ hax.app.visiui.updatecomponent.getAddComponentCallback = function(app,generator,
 hax.app.visiui.updatecomponent.getUpdateComponentCallback = function(component,generator) {
     
     var createCallback = function() {
-    
-        var additionalLines = generator.propertyDialogLines;
         
         var workspaceUI = component.getWorkspaceUI();       
         var initialValues = component.getPropertyValues();
         
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = hax.app.visiui.updatecomponent.getDialogLayout(workspaceUI,generator,false,additionalLines,initialValues);
+        var dialogLayout = hax.app.visiui.updatecomponent.getDialogLayout(workspaceUI,generator,false,initialValues);
         
         //create on submit callback
         var onSubmitFunction = function(newValues) {
@@ -69,16 +67,7 @@ hax.app.visiui.updatecomponent.getUpdateComponentCallback = function(component,g
             //need to test if fields are valid!
 
             //update
-            var actionResponse;
-//            if((newValues.name !== initialValues.name)||(newValues.parentKey != initialValues.parentKey)) {
-//                //handle refactor, with property change
-//                alert("This shouldn't happen - how did the name or fodler change?");
-//                return true;
-//            }
-//            else {
-                //only property change
-                actionResponse = component.updatePropertyValues(newValues);
-//            }
+            var actionResponse = component.updatePropertyValues(initialValues,newValues);
               
             //print an error message if there was an error
             if(!actionResponse.getSuccess()) {
@@ -98,7 +87,9 @@ hax.app.visiui.updatecomponent.getUpdateComponentCallback = function(component,g
 }
 
 //this is for a create or update dialog
-hax.app.visiui.updatecomponent.getDialogLayout = function(workspaceUI,generator,doCreate,additionalLines,initialValues) {
+hax.app.visiui.updatecomponent.getDialogLayout = function(workspaceUI,generator,doCreate,initialValues) {
+    
+    var additionalLines = generator.propertyDialogLines;
     
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};
@@ -120,20 +111,12 @@ hax.app.visiui.updatecomponent.getDialogLayout = function(workspaceUI,generator,
     parentLine.heading = "Folder: ";
     parentLine.entries = workspaceUI.getFolderList();
     parentLine.resultKey = "parentKey"; 
-//    if(!doCreate) {
-//        //do not allow editing after create, for now
-//        parentLine.disabled = true;
-//    }
     lines.push(parentLine);
 
     var nameLine = {};
     nameLine.type = "inputElement";
     nameLine.heading = "Name: ";
     nameLine.resultKey = "name";
-    if(!doCreate) {
-        //do not allow editing after create, for now
-        nameLine.disabled = true;
-    }
     lines.push(nameLine);
     
     //add additioanl lines, if applicable

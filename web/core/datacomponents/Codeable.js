@@ -103,13 +103,13 @@ hax.core.Codeable.updateForAddedVariable = function(addedMember,recalculateList)
                this.getContextManager());
             
         //update this object if the new table is in the list
-        if(newDependencyList.indexOf(addedMember) >= 0) {
+//        if(newDependencyList.indexOf(addedMember) >= 0) {
             //update dependencies
             this.updateDependencies(newDependencyList);
 
             //add to update list
             hax.core.calculation.addToRecalculateList(recalculateList,this);
-        }
+//        }
         
     }
 }
@@ -118,8 +118,8 @@ hax.core.Codeable.updateForAddedVariable = function(addedMember,recalculateList)
  *the passed variable was deleted.  */
 hax.core.Codeable.updateForDeletedVariable = function(deletedMember,recalculateList) {
     if(this.hasCode()) {
-        var dependsOnList = this.getDependsOn();
-        if(dependsOnList.indexOf(deletedMember) >= 0) {
+//        var dependsOnList = this.getDependsOn();
+//        if(dependsOnList.indexOf(deletedMember) >= 0) {
             
             if(!this.varInfo) return;
     
@@ -131,7 +131,7 @@ hax.core.Codeable.updateForDeletedVariable = function(deletedMember,recalculateL
 
             //add to update list
             hax.core.calculation.addToRecalculateList(recalculateList,this);
-        }
+//        }
     }
 }
 

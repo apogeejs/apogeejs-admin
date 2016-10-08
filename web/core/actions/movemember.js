@@ -19,56 +19,21 @@ hax.core.movemember.fireCreatedEvent = function(member) {
 /** This method creates member according the input json, in the given folder.
  * The return value is an ActionResponse object. Optionally, an existing action response
  * may be passed in or otherwise one will be created here. */
-hax.core.movemember.moveMember = function(member,name,folder,optionalActionResponse) {
-	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.core.ActionResponse();
-    
-    try {
+hax.core.movemember.moveMember = function(member,name,folder,recalculateList) {
         
-        var updateDataList = [];
-        var recalculateList = [];
-        var setDataList = [];
-        
-        var moveInfo = {};
-        
-        moveInfo.oldFullName = member.getFullName();
-        member.changeOwner(folder);
-        moveInfo.newFullName = member.getFullName();
-        
-        //add the member to the action response
-        actionResponse.member = member;
-        
-        if(member != null) {
-        
-            var workspace = member.getWorkspace();
-            
-            workspace.updateForDeletedVariable(member,recalculateList,actionResponse);
-            workspace.updateForAddedVariable(member,recalculateList);
+    var moveInfo = {};
 
-            //do data updates if needed
-            if(updateDataList.length > 0) {
-                hax.core.updatemember.updateObjectFunctionOrData(updateDataList,
-                    recalculateList,
-                    setDataList,
-                    actionResponse);
-            } 
-            
-            hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
+    moveInfo.oldFullName = member.getFullName();
+    member.move(name,folder);
+    moveInfo.newFullName = member.getFullName();
 
-            //dispatch events
-            workspace.dispatchEvent(hax.core.movemember.MEMBER_MOVED_EVENT,moveInfo);
-            hax.core.updatemember.fireUpdatedEventList(setDataList);
-            hax.core.updatemember.fireUpdatedEventList(recalculateList);
-        }
+    var workspace = member.getWorkspace();
 
-		
-	}
-	catch(error) {
-        //unknown application error
-        var actionError = hax.core.ActionError.processException(error,"AppException",true);
-        actionResponse.addError(actionError);
-    }
-    
-    //return response
-	return actionResponse;
+    workspace.updateForDeletedVariable(member,recalculateList);
+    workspace.updateForAddedVariable(member,recalculateList);
+
+    //dispatch events
+    workspace.dispatchEvent(hax.core.movemember.MEMBER_MOVED_EVENT,moveInfo);
+	
 }
 

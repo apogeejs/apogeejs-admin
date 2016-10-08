@@ -73,6 +73,9 @@ hax.app.visiui.TableEditComponent.updateViewDropdown = function(viewType) {
 /** This method updates the table data 
  * @private */    
 hax.app.visiui.TableEditComponent.memberUpdated = function() {
+    //call the base function
+    hax.app.visiui.Component.memberUpdated.call(this);
+    
     var object = this.getObject();
     if(object.hasError()) {
         var errorMsg = "";

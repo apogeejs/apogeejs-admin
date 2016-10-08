@@ -47,49 +47,6 @@ hax.app.visiui.FunctionComponent.prototype.getViewModeElement = function(viewTyp
 	}
 }
 
-/** This method extends the base method to get the property values
- * for the property edit dialog. */
-hax.app.visiui.FunctionComponent.prototype.getPropertyValues = function() {
-    var values = hax.app.visiui.Component.getPropertyValues.call(this);
-
-    var argList = this.object.getArgList();
-    var argListString = argList.toString();
-    values.argListString = argListString;
-    return values;
-}
-
-/** This method extends the base method to update property values. */
-hax.app.visiui.FunctionComponent.prototype.updatePropertyValues = function(newValues) {
-    
-    hax.app.visiui.Component.call(this,newValues);
-    
-    var argListString = newValues.argListString;
-    var argList = hax.app.visiui.FunctionComponent.parseStringArray(argListString);
-    
-    var functionBody = this.object.getFunctionBody();
-    var supplementalCode = this.object.getSupplementalCode();
-    
-    return hax.core.updatemember.updateCode(this.object,argList,functionBody,supplementalCode);
-}
-
-/** This method extends the member udpated function from the base.
- * @private */    
-hax.app.visiui.FunctionComponent.prototype.memberUpdated = function() {
-    //call the base function
-    hax.app.visiui.TableEditComponent.memberUpdated.call(this);
-    
-    //make sure the title is up to data
-    var window = this.getWindow();
-    if(window) {
-        var functionObject = this.getObject();
-        var displayName = functionObject.getDisplayName();
-        var windowTitle = window.getTitle();
-        if(windowTitle != displayName) {
-            window.setTitle(displayName);
-        }
-    }
-}
-
 //======================================
 // Static methods
 //======================================
@@ -122,6 +79,29 @@ hax.app.visiui.FunctionComponent.createComponentFromJson = function(workspaceUI,
     return functionComponent;
 }
 
+/** This method extends the base method to get the property values
+ * for the property edit dialog. */
+hax.app.visiui.FunctionComponent.addPropValues = function(member,values) {
+    var argList = member.getArgList();
+    var argListString = argList.toString();
+    values.argListString = argListString;
+    return values;
+}
+
+hax.app.visiui.FunctionComponent.propUpdateHandler = function(member,oldValues,newValues,recalculateList) {
+    if(oldValues.argListString !== newValues.argListString) {
+        var newArgList = hax.app.visiui.FunctionComponent.parseStringArray(newValues.argListString);
+        var functionBody = member.getFunctionBody();
+        var supplementalCode = member.getSupplementalCode();
+
+        hax.core.updatemember.updateObjectFunction(member,
+            newArgList,
+            functionBody,
+            supplementalCode,
+            recalculateList);
+    }
+}
+
 hax.app.visiui.FunctionComponent.parseStringArray = function(argListString) {
     var argList = argListString.split(",");
     for(var i = 0; i < argList.length; i++) {
@@ -149,4 +129,6 @@ hax.app.visiui.FunctionComponent.generator.propertyDialogLines = [
         "resultKey":"argListString"
     }
 ];
+hax.app.visiui.FunctionComponent.generator.addPropFunction = hax.app.visiui.FunctionComponent.addPropValues;
+hax.app.visiui.FunctionComponent.generator.updatePropHandler = hax.app.visiui.FunctionComponent.propUpdateHandler;
  
