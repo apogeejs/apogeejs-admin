@@ -21,8 +21,11 @@ hax.core.deletemember.deleteMember = function(member,optionalActionResponse) {
         
         var recalculateList = [];
         
-        //delete child
-        member.onDelete();
+        //call delete handlers
+        member.onDeleteChild();
+        if(member.isDependent) {
+            member.onDeleteDependent();
+        }
         
 		var fullName = member.getFullName();
 		var workspace = member.getWorkspace();

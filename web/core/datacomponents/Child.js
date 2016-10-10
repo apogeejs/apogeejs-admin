@@ -167,7 +167,7 @@ hax.core.Child.toJson = function() {
  * can extend this function, but it should call this base version of the function
  * if it does.  
  * @protected */
-hax.core.Child.onDelete = function() {
+hax.core.Child.onDeleteChild = function() {
 	if(this.owner.isParent) {
 		this.owner.removeChild(this);
 	}

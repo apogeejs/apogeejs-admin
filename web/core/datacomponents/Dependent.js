@@ -71,6 +71,16 @@ hax.core.Dependent.initializeImpactors = function() {
         this.createDependencyError(errorDependencies);
     }
 }
+
+/** This method does any needed cleanup when the dependent is depeted.. */
+hax.core.Dependent.onDeleteDependent = function() {
+    //remove this dependent from the impactor
+    for(var i = 0; i < this.dependsOnList.length; i++) {
+        var remoteMember = this.dependsOnList[i];
+        //remove from imacts list
+        remoteMember.removeFromImpactsList(this);
+    }
+}
 //===================================
 // Private Functions
 //===================================
