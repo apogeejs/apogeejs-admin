@@ -172,7 +172,7 @@ hax.core.FolderFunction.prototype.updateForDeletedVariable = function(object,rec
 
 /** This method retrieve creates the loaded context manager. */
 hax.core.FolderFunction.prototype.createContextManager = function() {
-    return new hax.core.ContextManager(this.getOwner());
+    return new hax.core.ContextManager(this);
 }
 
 //------------------------------
@@ -271,7 +271,7 @@ hax.core.FolderFunction.prototype.getFolderFunctionFunction = function(folderFun
  * @private */
 hax.core.FolderFunction.prototype.createVirtualWorkspace = function(folderFunctionErrors) {
     try {
-		return hax.core.Workspace.createVirtualWorkpaceFromFolder("temp",this.internalFolder,this.getContextManager());
+		return hax.core.Workspace.createVirtualWorkpaceFromFolder("temp",this.internalFolder,this.getOwner());
 	}
 	catch(error) {
         var actionError = hax.core.ActionError.processException(exception,"FolderFunction - Code",false);

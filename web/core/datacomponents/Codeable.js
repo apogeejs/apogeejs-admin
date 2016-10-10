@@ -269,7 +269,7 @@ hax.core.Codeable.getUpdateData = function() {
 
 /** This method retrieve creates the loaded context manager. */
 hax.core.Codeable.createContextManager = function() {
-    return new hax.core.ContextManager(this.getOwner());
+    return new hax.core.ContextManager(this);
 }
 
 //===================================

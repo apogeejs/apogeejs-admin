@@ -65,7 +65,7 @@ hax.core.Parent.lookupChildFromPath = function(path) {
 /** This method retrieve creates the loaded context manager. */
 hax.core.Parent.createContextManager = function() {
     //set the context manager
-    var contextManager = new hax.core.ContextManager(this.getOwner());
+    var contextManager = new hax.core.ContextManager(this);
     //add an entry for this folder. Make it local unless this si a root folder
     var myEntry = {};
     myEntry.isLocal = !this.isRoot();

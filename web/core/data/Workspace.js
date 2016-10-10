@@ -1,9 +1,12 @@
-/** This is the workspace. */
-hax.core.Workspace = function(nameOrJson,actionResponseForJson) {
+/** This is the workspace. Typically owner should be null. */
+hax.core.Workspace = function(nameOrJson,actionResponseForJson,owner) {
     //base init
     hax.core.EventManager.init.call(this);
     hax.core.ContextHolder.init.call(this);
     hax.core.Owner.init.call(this);
+    
+    if(owner === undefined) owner = null;
+    this.owner = owner;
     
     var inputArgType = hax.core.util.getObjectType(nameOrJson);
     
@@ -29,6 +32,12 @@ hax.core.Workspace.prototype.getName = function() {
 /** this method gets the root package for the workspace. */
 hax.core.Workspace.prototype.getRootFolder = function() {
     return this.rootFolder;
+}
+
+/** This allows for a workspace to have a parent. For a normal workspace this should be null. 
+ * This is used for finding variables in scope. */
+hax.core.Workspace.prototype.getOwner = function() {
+    return this.owner;
 }
 
 /** This method updates the dependencies of any children in the workspace
@@ -75,7 +84,7 @@ hax.core.Workspace.prototype.getPossesionNameBase = function() {
 /** This method retrieve creates the loaded context manager. */
 hax.core.Workspace.prototype.createContextManager = function() {
     //set the context manager
-    var contextManager = new hax.core.ContextManager(null);
+    var contextManager = new hax.core.ContextManager(this);
     //global variables from window object
     var globalVarEntry = {};
     globalVarEntry.isLocal = false;
@@ -92,7 +101,7 @@ hax.core.Workspace.prototype.createContextManager = function() {
 
 /** This method makes a virtual workspace that contains a copy of the give folder
  * as the root folder. Optionally the context manager may be set. */
-hax.core.Workspace.createVirtualWorkpaceFromFolder = function(name,origRootFolder,optionalContextManager) {
+hax.core.Workspace.createVirtualWorkpaceFromFolder = function(name,origRootFolder,ownerInWorkspace) {
 	//create a workspace json from the root folder json
 	var workspaceJson = {};
     workspaceJson.name = name;
@@ -100,11 +109,7 @@ hax.core.Workspace.createVirtualWorkpaceFromFolder = function(name,origRootFolde
     workspaceJson.version = hax.core.Workspace.SAVE_FILE_VERSION;
     workspaceJson.data = origRootFolder.toJson();
 	
-	if(optionalContextManager !== undefined) {
-		workspaceJson.contextManager = optionalContextManager;
-	}
-	
-    return new hax.core.Workspace(workspaceJson);
+    return new hax.core.Workspace(workspaceJson,null,ownerInWorkspace);
 }
 
 //============================

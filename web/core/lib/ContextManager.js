@@ -1,9 +1,10 @@
 
     
-/** This class manages context for the user code. This is used to provide the object 
- * associated with a given name in the code, following the relevent namespace hierarchy.*/
-hax.core.ContextManager = function(contextParent) {
-    this.parentOwner = contextParent;
+/** This class manages context for the user code. This is used to associate names
+ *from the user code with objects from the workspace. The argument passed here is
+ *the object assoicatd with the context manager. */
+hax.core.ContextManager = function(member) {
+    this.member = member;
     this.contextList = [];
 }
 
@@ -43,9 +44,12 @@ hax.core.ContextManager.prototype.hierarchicalLookup = function(lookupFunctionNa
     if(result !== undefined) {
         return result;
     }
-    else if(this.parentOwner) {
-		var ownerContextManager = this.parentOwner.getContextManager();
-		return ownerContextManager.hierarchicalLookup(lookupFunctionName,lookupKey,generation + 1);
+    else if((this.member)&&(this.member.getOwner)) {
+        var owner = this.member.getOwner();
+        if(owner) {
+            var ownerContextManager = owner.getContextManager();
+            return ownerContextManager.hierarchicalLookup(lookupFunctionName,lookupKey,generation + 1);
+        }
     }
     
     return undefined;
