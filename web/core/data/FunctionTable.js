@@ -1,5 +1,5 @@
 /** This is a function. */
-hax.core.FunctionTable = function(name,owner,argList) {
+hax.core.FunctionTable = function(name,owner,initialData) {
     //base init
     hax.core.Child.init.call(this,name,hax.core.FunctionTable.generator);
     hax.core.DataHolder.init.call(this);
@@ -10,7 +10,8 @@ hax.core.FunctionTable = function(name,owner,argList) {
     this.initOwner(owner);
     
     //set to an empty function
-    this.setData(function(){});
+    //this.setData(function(){});
+    setCodeOrData(initialData);
 }
 
 //add components to this class
@@ -43,25 +44,8 @@ hax.core.FunctionTable.prototype.getDisplayName = function() {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-hax.core.FunctionTable.fromJson = function(owner,json,updateDataList,actionResponse) {
-    var initialArgList;
-    //------------------------
-    // There are two ways to set the arg list. Here, json.argList, is used in creating 
-    // the function table. Otherwise use json.updateData.argList.
-    if(json.argList) {
-        initialArgList = json.argList;
-    }
-    else {
-        initialArgList = [];
-    }
-    //-------------------
-    
-    var functionTable = new hax.core.FunctionTable(json.name,owner,initialArgList);
-    if(json.updateData) {
-        json.updateData.member = functionTable;
-        updateDataList.push(json.updateData);
-    }
-    return functionTable;
+hax.core.FunctionTable.fromJson = function(owner,json,actionResponse) {
+    return new hax.core.FunctionTable(json.name,owner,json.updateData);
 }
 
 //============================

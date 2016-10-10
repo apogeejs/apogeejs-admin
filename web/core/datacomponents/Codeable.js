@@ -70,9 +70,6 @@ hax.core.Codeable.setCodeInfo = function(codeInfo) {
         try {
             codeInfo.generatorFunction(this);
             this.codeError = null;
-            
-            //update dependencies
-            this.updateDependencies(codeInfo.dependencyList);
         }
         catch(ex) {
             this.codeError = hax.core.ActionError.processException(ex,"Codeable - Set Code",false);
@@ -86,13 +83,31 @@ hax.core.Codeable.setCodeInfo = function(codeInfo) {
         //code not valid
         this.objectFunction = null;
         this.contextSetter = null;
-        //will not be calculated - hasnot dependencies
-        this.updateDependecies([]);
     }
-    
     this.codeSet = true; 
 }
 
+/** This method returns the formula for this member.  */
+hax.core.Codeable.initializeDependencies = function() {
+    
+    if((this.hasCode())&&(this.varInfo)&&(!this.codeError)) {
+        try {
+            var newDependencyList = hax.core.codeDependencies.getDependencyInfo(this.varInfo,
+                   this.getContextManager());
+
+            //update dependencies
+            this.updateDependencies(newDependencyList);
+        }
+        catch(ex) {
+            this.codeError = hax.core.ActionError.processException(ex,"Codeable - Set Dependencies",false);
+        }
+    }
+    else {
+        //will not be calculated - has no dependencies
+        this.updateDependecies([]);
+    }
+}
+    
 /** This method udpates the dependencies if needed because
  *the passed variable was added.  */
 hax.core.Codeable.updateForAddedVariable = function(addedMember,recalculateList) {

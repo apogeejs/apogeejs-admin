@@ -1,5 +1,5 @@
 /** This class encapsulatees a data table for a JSON object */
-hax.core.JsonTable = function(name,owner) {
+hax.core.JsonTable = function(name,owner,initialData) {
     //base init
     hax.core.Child.init.call(this,name,hax.core.JsonTable.generator);
     hax.core.DataHolder.init.call(this);
@@ -9,7 +9,8 @@ hax.core.JsonTable = function(name,owner) {
     
     this.initOwner(owner);
     
-    this.setData("");
+    //this.setData("");
+    setCodeOrData(initialData);
 }
 
 //add components to this class
@@ -51,13 +52,8 @@ hax.core.JsonTable.prototype.processObjectFunction = function(objectFunction) {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-hax.core.JsonTable.fromJson = function(owner,json,updateDataList,actionResponse) {
-    var table = new hax.core.JsonTable(json.name,owner);
-    if(json.updateData) {
-        json.updateData.member = table;
-        updateDataList.push(json.updateData);
-    }
-    return table;
+hax.core.JsonTable.fromJson = function(owner,json,actionResponse) {
+    return new hax.core.JsonTable(json.name,owner,json.updateData);
 }
 
 //============================

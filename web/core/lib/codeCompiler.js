@@ -4,9 +4,7 @@ hax.core.codeCompiler = {};
 /** This method analyzes the code and creates the object function and dependencies. 
  * The results are loaded into the passed object processedCodeData.
  * @private */
-hax.core.codeCompiler.processCode = function(codeInfo,
-        contextManager,
-        codeLabel) {
+hax.core.codeCompiler.processCode = function(codeInfo,codeLabel) {
     
     //analyze the code
     var combinedFunctionBody = hax.core.codeCompiler.createCombinedFunctionBody(
@@ -31,11 +29,6 @@ hax.core.codeCompiler.processCode = function(codeInfo,
     //create the object function and context setter from the code text
     var generatorFunction = hax.core.codeCompiler.createObjectFunction(codeInfo.varInfo, combinedFunctionBody);
     codeInfo.generatorFunction = generatorFunction;
-    
-    //calculate dependencies
-	codeInfo.dependencyList = hax.core.codeDependencies.getDependencyInfo(
-            codeInfo.varInfo,
-            contextManager);
     
     return codeInfo;   
 }

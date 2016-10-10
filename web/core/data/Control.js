@@ -1,5 +1,5 @@
 /** This class encapsulatees a member used to IO. t does not hold data in the model. */
-hax.core.Control = function(name,owner) {
+hax.core.Control = function(name,owner,initialData) {
     //base init
     hax.core.Child.init.call(this,name,hax.core.Control.generator);
     hax.core.Dependent.init.call(this);
@@ -9,6 +9,7 @@ hax.core.Control = function(name,owner) {
     this.initOwner(owner);
     
     this.resource = null;
+    setCodeOrData(initialData);
 }
 
 //add components to this class
@@ -48,14 +49,8 @@ hax.core.Control.prototype.processObjectFunction = function(objectFunction) {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-hax.core.Control.fromJson = function(owner,json,updateDataList,actionResponse) {
-    
-    var control = new hax.core.Control(json.name,owner);
-    if(json.updateData) {
-        json.updateData.member = control;
-        updateDataList.push(json.updateData);
-    }
-    return control;
+hax.core.Control.fromJson = function(owner,json,actionResponse) {   
+    return hax.core.Control(json.name,owner);
 }
 
 //============================

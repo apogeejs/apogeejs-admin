@@ -149,23 +149,31 @@ hax.core.updatemember.updateObjectFunction = function(codeable,
     codeInfo.argList = argList;
     codeInfo.functionBody = functionBody;
     codeInfo.supplementalCode = supplementalCode;
-        
-    //load some needed context variables
-    var contextManager = codeable.getContextManager();
-    var codeLabel = codeable.getFullName();
 
-    //process the code text into javascript code
-    hax.core.codeCompiler.processCode(codeInfo,
-        contextManager,
-        codeLabel);
-
-    //save the code
-    codeable.setCodeInfo(codeInfo);
+    //set the code on the codeable
+    hax.core.updatemember.processCodeInfo(codeable,codeInfo);
+    
+    //set dependencies
+    codeable.initializeDependencies();
     
 	//update recalculate list
     hax.core.calculation.addToRecalculateList(recalculateList,codeable);
 }
 
+/** This method updates the code and object function in a member based on the
+ * passed code.*/
+hax.core.updatemember.processCodeInfo = function(codeable,codeInfo) {
+    
+    //load some needed context variables
+    var codeLabel = codeable.getFullName();
+    
+    //process the code text into javascript code
+    hax.core.codeCompiler.processCode(codeInfo,
+        codeLabel);
+
+    //save the code
+    codeable.setCodeInfo(codeInfo);
+}
 
 /** This method sets the data for a member. */
 hax.core.updatemember.updateObjectData = function(dataHolder,
