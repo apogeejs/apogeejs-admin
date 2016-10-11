@@ -29,7 +29,7 @@ hax.core.util.mixin(hax.core.FolderFunction,hax.core.DataHolder);
 hax.core.util.mixin(hax.core.FolderFunction,hax.core.Dependent);
 hax.core.util.mixin(hax.core.FolderFunction,hax.core.ContextHolder);
 hax.core.util.mixin(hax.core.FolderFunction,hax.core.Owner);
-hax.core.util.mixin(hax.core.Workspace,hax.core.RootHolder);
+hax.core.util.mixin(hax.core.FolderFunction,hax.core.RootHolder);
 
 /** This gets the internal forlder for the folderFunction. */
 hax.core.FolderFunction.prototype.getInternalFolder = function() {
@@ -105,8 +105,8 @@ hax.core.FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
     initialData.returnValue = json.returnValue;
     
     var createEmptyInternalFolder;
-    if(initialData.internalFolder) {
-        childrenJsonOutputList.push(initialData.internalFolder);
+    if(json.internalFolder) {
+        childrenJsonOutputList.push(json.internalFolder);
         createEmptyInternalFolder = false;
     }
     else {
@@ -168,7 +168,9 @@ hax.core.FolderFunction.prototype.calculate = function() {
 /** This method updates the dependencies of any children
  * based on an object being added. */
 hax.core.FolderFunction.prototype.updateDependeciesForModelChange = function(recalculateList) {
-    this.internalFolder.updateDependeciesForModelChange(recalculateList);
+    if(this.internalFolder) {
+        this.internalFolder.updateDependeciesForModelChange(recalculateList);
+    }
 }
 
 //------------------------------

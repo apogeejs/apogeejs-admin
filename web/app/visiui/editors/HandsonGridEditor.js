@@ -106,6 +106,9 @@ hax.app.visiui.HandsonGridEditor.prototype.showData = function(json,editOk) {
 		this.createNewGrid();
 	}
 	
+    if(!editData) {
+        editData = [[]];
+    }
 	this.gridControl.loadData(editData);
     
     //set the background color

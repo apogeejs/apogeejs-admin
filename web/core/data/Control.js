@@ -9,10 +9,12 @@ hax.core.Control = function(name,owner,initialData) {
     this.initOwner(owner);
     
     this.resource = null;
-   if(!initialData) initialData = {};
-    if(initialData.argList === undefined) initialData.argList = "";
-    if(initialData.functionBody === undefined) initialData.functionBody = "";  
-    hax.core.updatemember.applyCode(this,initialData);
+    
+    if(!initialData) initialData = {};
+    var argList = initialData.argList ? initialData.argList : [];
+    var functionBody = initialData.functionBody ? initialData.functionBody : "";
+    var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
+    hax.core.updatemember.applyCode(this,argList,functionBody,supplementalCode);
 }
 
 //add components to this class
@@ -53,7 +55,7 @@ hax.core.Control.prototype.processObjectFunction = function(objectFunction) {
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 hax.core.Control.fromJson = function(owner,json,actionResponse) {   
-    return hax.core.Control(json.name,owner);
+    return new hax.core.Control(json.name,owner,json.updateData);
 }
 
 //============================

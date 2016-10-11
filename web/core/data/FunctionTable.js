@@ -10,10 +10,10 @@ hax.core.FunctionTable = function(name,owner,initialData) {
     this.initOwner(owner);
     
     //set initial data
-    if(!initialData) initialData = {};
-    if(initialData.argList === undefined) initialData.argList = "";
-    if(initialData.functionBody === undefined) initialData.functionBody = "";  
-    hax.core.updatemember.applyCode(this,initialData);
+    var argList = initialData.argList ? initialData.argList : [];
+    var functionBody = initialData.functionBody ? initialData.functionBody : "";
+    var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
+    hax.core.updatemember.applyCode(this,argList,functionBody,supplementalCode);
 }
 
 //add components to this class
