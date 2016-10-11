@@ -4,6 +4,7 @@ hax.core.Workspace = function(nameOrJson,actionResponseForJson,owner) {
     hax.core.EventManager.init.call(this);
     hax.core.ContextHolder.init.call(this);
     hax.core.Owner.init.call(this);
+    hax.core.RootHolder.init.call(this);
     
     if(owner === undefined) owner = null;
     this.owner = owner;
@@ -23,6 +24,7 @@ hax.core.Workspace = function(nameOrJson,actionResponseForJson,owner) {
 hax.core.util.mixin(hax.core.Workspace,hax.core.EventManager);
 hax.core.util.mixin(hax.core.Workspace,hax.core.ContextHolder);
 hax.core.util.mixin(hax.core.Workspace,hax.core.Owner);
+hax.core.util.mixin(hax.core.Workspace,hax.core.RootHolder);
 
 /** this method gets the workspace name. */
 hax.core.Workspace.prototype.getName = function() {
@@ -32,6 +34,11 @@ hax.core.Workspace.prototype.getName = function() {
 /** this method gets the root package for the workspace. */
 hax.core.Workspace.prototype.getRootFolder = function() {
     return this.rootFolder;
+}
+
+/** This method sets the root object - implemented from RootHolder.  */
+hax.core.Workspace.prototype.setRoot = function(child) {
+    this.rootFolder = child;
 }
 
 /** This allows for a workspace to have a parent. For a normal workspace this should be null. 
@@ -166,31 +173,10 @@ hax.core.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     //for now I will jsut copy everything in create member
     
     if(!actionResponse) actionResponse = new hax.core.ActionResponse();
+
+    hax.core.createmember.createMember(this,json.data,actionResponse);
     
-    try {      
-        var recalculateList = [];
-        var creationList = [];
-        
-        var member = hax.core.createmember.instantiateMember(this,json.data,creationList,actionResponse);
-        this.rootFolder = member;
-        
-        //add the member to the action response
-        actionResponse.member = member;
-
-        var workspace = member.getWorkspace();
-        workspace.updateForAddedVariable(member,recalculateList);
-
-        hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
-
-        //dispatch events
-        hax.core.createmember.fireCreatedEventList(creationList);
-        hax.core.updatemember.fireUpdatedEventList(recalculateList);
-	}
-	catch(error) {
-        //unknown application error
-        var actionError = hax.core.ActionError.processException(error,"AppException",true);
-        actionResponse.addError(actionError);
-    }
+    return actionResponse;
 }
 
 //================================

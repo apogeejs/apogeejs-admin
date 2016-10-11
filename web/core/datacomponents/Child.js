@@ -23,12 +23,21 @@ hax.core.Child.initOwner = function(owner) {
     if(owner.isParent) {
         this.owner.addChild(this);
     }
+    else if(owner.isRootHolder) {
+        this.owner.setRoot(this);
+    }
 }
 
 hax.core.Child.move = function(newName,newOwner) {
     //remove from old owner
-    if((this.owner)&&(this.owner.isParent)) {
-        this.owner.removeChild(this);
+    if(this.owner) {
+        if(this.owner.isParent) {
+            this.owner.removeChild(this);
+        }
+        else {
+            //don't allow moving a root for now!
+            //or renaiming either!
+        }
     }
     //change name
     this.name = newName;
