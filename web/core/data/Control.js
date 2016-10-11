@@ -9,7 +9,10 @@ hax.core.Control = function(name,owner,initialData) {
     this.initOwner(owner);
     
     this.resource = null;
-    setCodeOrData(initialData);
+   if(!initialData) initialData = {};
+    if(initialData.argList === undefined) initialData.argList = "";
+    if(initialData.functionBody === undefined) initialData.functionBody = "";  
+    hax.core.updatemember.applyCode(this,initialData);
 }
 
 //add components to this class

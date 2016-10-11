@@ -139,12 +139,12 @@ hax.core.Folder.prototype.updateForDeletedVariable = function(object,recalculate
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-hax.core.Folder.fromJson = function(owner,json,updateDataList,actionResponse) {
+hax.core.Folder.fromJson = function(owner,json,childrenJsonOutputList) {
     var folder = new hax.core.Folder(json.name,owner);
     
     for(var key in json.children) {
         var childJson = json.children[key];
-        var child = hax.core.createmember.instantiateMember(folder,childJson,updateDataList,actionResponse);
+        childrenJsonOutputList.push(childJson);
     }
     
     return folder;

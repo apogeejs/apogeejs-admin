@@ -43,7 +43,9 @@ hax.core.Workspace.prototype.getOwner = function() {
 /** This method updates the dependencies of any children in the workspace
  * based on an object being added. */
 hax.core.Workspace.prototype.updateForAddedVariable = function(object,recalculateList) {
-    this.rootFolder.updateForAddedVariable(object,recalculateList);
+    if(this.rootFolder) {
+        this.rootFolder.updateForAddedVariable(object,recalculateList);
+    }
 }
 
 /** This method updates the dependencies of any children in the workspace
@@ -156,13 +158,38 @@ hax.core.Workspace.prototype.loadFromJson = function(json,actionResponse) {
 		this.setContextManager(json.contextManager);
 	}
 	
-	//recreate the root folder
-	var updateDataList = [];
-    this.rootFolder = hax.core.Folder.fromJson(this,json.data,updateDataList);
+	//recreate the root folder and its children
+    //this.rootFolder = hax.core.createmember.createMember(this,json.data,actionResponse);
+    //DOH! This currently doesn't because create member assumes the root folder is set. 
+    //maybe we should update so setting the owner on the root folder sets the root folder,
+    //such as if the alternative to a parent is a "rootholder" or something like that.
+    //for now I will jsut copy everything in create member
     
-    //set the data on all the objects
-    if(updateDataList.length > 0) {
-        actionResponse = hax.core.updatemember.updateObjects(updateDataList,actionResponse);
+    if(!actionResponse) actionResponse = new hax.core.ActionResponse();
+    
+    try {      
+        var recalculateList = [];
+        var creationList = [];
+        
+        var member = hax.core.createmember.instantiateMember(this,json.data,creationList,actionResponse);
+        this.rootFolder = member;
+        
+        //add the member to the action response
+        actionResponse.member = member;
+
+        var workspace = member.getWorkspace();
+        workspace.updateForAddedVariable(member,recalculateList);
+
+        hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
+
+        //dispatch events
+        hax.core.createmember.fireCreatedEventList(creationList);
+        hax.core.updatemember.fireUpdatedEventList(recalculateList);
+	}
+	catch(error) {
+        //unknown application error
+        var actionError = hax.core.ActionError.processException(error,"AppException",true);
+        actionResponse.addError(actionError);
     }
 }
 

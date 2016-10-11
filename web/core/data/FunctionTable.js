@@ -9,9 +9,11 @@ hax.core.FunctionTable = function(name,owner,initialData) {
     
     this.initOwner(owner);
     
-    //set to an empty function
-    //this.setData(function(){});
-    setCodeOrData(initialData);
+    //set initial data
+    if(!initialData) initialData = {};
+    if(initialData.argList === undefined) initialData.argList = "";
+    if(initialData.functionBody === undefined) initialData.functionBody = "";  
+    hax.core.updatemember.applyCode(this,initialData);
 }
 
 //add components to this class

@@ -1,6 +1,6 @@
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
-hax.core.FolderFunction = function(name,owner,initialData) {
+hax.core.FolderFunction = function(name,owner,initialData,internalFolder) {
     //base init
     hax.core.Child.init.call(this,name,hax.core.FolderFunction.generator);
     hax.core.DataHolder.init.call(this);
@@ -10,23 +10,17 @@ hax.core.FolderFunction = function(name,owner,initialData) {
     
     this.initOwner(owner);
     
+    //set initial data
     this.argList = initialData.argList !== undefined ? initialData.argList : "";
     this.returnValueString = initialData.returnValue !== undefined ? initialData.returnValue : [];
-    
-        
-    //recreate the root folder if info is specified
-    var internalFolder;
-    if(initialData.internalFolder) {
-        internalFolder = hax.core.Folder.fromJson(folderFunction,json.internalFolder,actionResponse);
-        this.setInternalFolder(internalFolder);
-    }
-    else {
-        var folder = new hax.core.Folder(name,this);
-    }
-    this.setInternalFolder(folder);
-    
     //set to an empty function
     this.setData(function(){});
+    
+    //recreate the root folder if info is specified
+    if(!internalFolder) {
+        internalFolder = new hax.core.Folder(name,this);
+    }
+    this.internalFolder = internalFolder;
 }
 
 //add components to this class
@@ -94,12 +88,20 @@ hax.core.FolderFunction.prototype.onDelete = function() {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-hax.core.FolderFunction.fromJson = function(owner,json,actionResponse) {
+hax.core.FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
     var initialData = {};
     initialData.argList = json.argList;
     initialData.returnValue = json.returnValue;
-    initialData.internalFolder = json.internalFolder;
-    return new hax.core.FolderFunction(json.name,owner,initialData);
+    
+    var internalFolder;
+    if(initialData.internalFolder) {
+        internalFolder = hax.core.Folder.fromJson(this,initialData.internalFolder,childrenJsonOutputList);
+    }
+    else {
+        internalFolder = undefined;
+    }
+    
+    return new hax.core.FolderFunction(json.name,owner,initialData,internalFolder);
 }
 
 /** This method adds any additional data to the json saved for this child. 
@@ -184,13 +186,6 @@ hax.core.FolderFunction.prototype.getPossesionNameBase = function() {
 //==============================
 // Private Methods
 //==============================
-
-/** This is called from the update action. It should not be called externally. 
- * @private */
-hax.core.FolderFunction.prototype.setInternalFolder = function(folder) {
-    this.internalFolder = folder;
-    this.updateDependencies([folder]);
-}
 
 /** This is called from the update action. It should not be called externally. */
 hax.core.FolderFunction.prototype.setReturnValueString = function(returnValueString) {

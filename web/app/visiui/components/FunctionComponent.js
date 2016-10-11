@@ -94,7 +94,7 @@ hax.app.visiui.FunctionComponent.propUpdateHandler = function(member,oldValues,n
         var functionBody = member.getFunctionBody();
         var supplementalCode = member.getSupplementalCode();
 
-        hax.core.updatemember.updateObjectFunction(member,
+        hax.core.updatemember.updateCode(member,
             newArgList,
             functionBody,
             supplementalCode,

@@ -9,8 +9,13 @@ hax.core.JsonTable = function(name,owner,initialData) {
     
     this.initOwner(owner);
     
-    //this.setData("");
-    setCodeOrData(initialData);
+    //set initial data
+    if(!initialData) {
+        //default initail value
+        initialData = {};
+        initialData.data = "";
+    }  
+    hax.core.updatemember.applyCodeOrData(this,initialData);
 }
 
 //add components to this class
