@@ -19,7 +19,8 @@ hax.core.FolderFunction = function(name,owner,initialData,createEmptyInternalFol
     
     //recreate the root folder if info is specified
     if(createEmptyInternalFolder) {
-        this.internalFolder = new hax.core.Folder(name,this);
+        var internalFolder = new hax.core.Folder(name,this);
+        this.setRoot(internalFolder);
     }
 }
 
@@ -44,6 +45,8 @@ hax.core.FolderFunction.prototype.getRoot = function() {
 /** This method sets the root object - implemented from RootHolder.  */
 hax.core.FolderFunction.prototype.setRoot = function(child) {
     this.internalFolder = child;
+    var newDependsOn = [child];
+    this.updateDependencies(newDependsOn);
 }
 
 /** This gets the name of the return object for the folderFunction function. */
