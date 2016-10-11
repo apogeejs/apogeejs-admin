@@ -36,6 +36,11 @@ hax.core.FolderFunction.prototype.getInternalFolder = function() {
     return this.internalFolder;
 }
 
+/** Implemnetation of get root for folder function. */
+hax.core.FolderFunction.prototype.getRoot = function() {
+    return this.getInternalFolder();
+}
+
 /** This method sets the root object - implemented from RootHolder.  */
 hax.core.FolderFunction.prototype.setRoot = function(child) {
     this.internalFolder = child;
@@ -162,14 +167,8 @@ hax.core.FolderFunction.prototype.calculate = function() {
 
 /** This method updates the dependencies of any children
  * based on an object being added. */
-hax.core.FolderFunction.prototype.updateForAddedVariable = function(object,recalculateList) {
-    this.internalFolder.updateForAddedVariable(object,recalculateList);
-}
-
-/** This method updates the dependencies of any children
- * based on an object being deleted. */
-hax.core.FolderFunction.prototype.updateForDeletedVariable = function(object,recalculateList) {
-     this.internalFolder.updateForDeletedVariable(object,recalculateList);
+hax.core.FolderFunction.prototype.updateDependeciesForModelChange = function(recalculateList) {
+    this.internalFolder.updateDependeciesForModelChange(recalculateList);
 }
 
 //------------------------------
@@ -231,7 +230,7 @@ hax.core.FolderFunction.prototype.getFolderFunctionFunction = function(folderFun
             }
 
             //lookup elements from virtual workspace
-            rootFolder = virtualWorkspace.getRootFolder();
+            rootFolder = virtualWorkspace.getRoot();
             inputElementArray = instance.loadInputElements(rootFolder,folderFunctionErrors);
             returnValueTable = instance.loadOutputElement(rootFolder,folderFunctionErrors);     
         }

@@ -43,7 +43,7 @@
 				//open the model
 				var headlessWorkspaceJson = inputObject.workspaceJson.workspace;
                 var workspace = new hax.core.Workspace(headlessWorkspaceJson);
-				var rootFolder = workspace.getRootFolder();
+				var rootFolder = workspace.getRoot();
 				
 				//set the input
 				var inputTable = rootFolder.lookupChild(inputObject.inputTable);

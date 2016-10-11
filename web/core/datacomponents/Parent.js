@@ -82,7 +82,12 @@ hax.core.Parent.createContextManager = function() {
 /** this method gets the hame the children inherit for the full name. */
 hax.core.Parent.getPossesionNameBase = function() {
     if(this.isRoot()) {
-        return this.owner.getPossesionNameBase();
+        if(this.owner) {
+            return this.owner.getPossesionNameBase();
+        }
+        else {
+            return this.getName() + ":";
+        }
     }
     else {
         return this.getFullName() + ".";
@@ -92,8 +97,12 @@ hax.core.Parent.getPossesionNameBase = function() {
 /** This method returns the full name in dot notation for this object. */
 hax.core.Parent.getFullName = function() {
     if(this.isRoot()) {
-//change this!
-        return this.owner.getPossesionNameBase();
+        if(this.owner) {
+            return this.owner.getPossesionNameBase();
+        }
+        else {
+            return this.getName() + ":";
+        }
     }
     else {
         return hax.core.Child.getFullName.call(this);

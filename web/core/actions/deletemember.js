@@ -10,6 +10,14 @@ hax.core.deletemember = {};
  */
 hax.core.deletemember.MEMBER_DELETED_EVENT = "memberDeleted";
 
+hax.core.deletemember.fireDeletedEventList = function(deleteInfoList) {
+    for(var i = 0; i < deleteInfoList.length; i++) {
+        var deleteInfo = deleteInfoList[i];
+        var workspace = deleteInfo.workspace;
+        workspace.dispatchEvent(hax.core.deletemember.MEMBER_DELETED_EVENT,deleteInfo);
+    }
+}
+
 
 /** This method should be called to delete a child. The return value is an ActionResponse.
  * It will by default create its own action response object, however optionally an
@@ -20,22 +28,27 @@ hax.core.deletemember.deleteMember = function(member,optionalActionResponse) {
     try {
         
         var recalculateList = [];
+        var deleteInfoList = [];
         
-        //call delete handlers
-        member.onDeleteChild();
-        if(member.isDependent) {
-            member.onDeleteDependent();
+        var workspace = member.getWorkspace();
+        
+        hax.core.deletemember.fillDeleteInfoList(member,deleteInfoList);
+        for(var i = 0; i < deleteInfoList.length; i++) {
+            //call delete handlers
+            var deleteInfo = deleteInfoList[i];
+            var member = deleteInfo.member;
+            member.onDeleteChild();
+            if(member.isDependent) {
+                member.onDeleteDependent();
+            }
+            
         }
-        
-		var fullName = member.getFullName();
-		var workspace = member.getWorkspace();
-
-        workspace.updateForDeletedVariable(member,recalculateList);
+        workspace.updateDependeciesForModelChange(recalculateList);
 
         hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
 
         //dispatch events
-        workspace.dispatchEvent(hax.core.deletemember.MEMBER_DELETED_EVENT,fullName);
+        hax.core.deletemember.fireDeletedEventList(deleteInfoList);
         hax.core.updatemember.fireUpdatedEventList(recalculateList);
 	}
 	catch(error) {
@@ -49,6 +62,25 @@ hax.core.deletemember.deleteMember = function(member,optionalActionResponse) {
         
 }
 
+
+hax.core.deletemember.fillDeleteInfoList =  function(member,deleteInfoList) {
+    var deleteInfo = {};
+    deleteInfo.member = member;
+    deleteInfo.workspace = member.getWorkspace();
+    deleteInfo.fullName = member.getFullName();
+    deleteInfoList.push(deleteInfo);
+    if(member.isParent) {
+        var childMap = member.getChildMap();
+        for(var key in childMap) {
+            var child = childMap[key];
+            hax.core.deletemember.fillDeleteInfoList(child,deleteInfoList);
+        }
+    }
+    else if(member.isRootHolder) {
+        var root = member.getRoot();
+        hax.core.deletemember.fillDeleteInfoList(root,deleteInfoList);
+    }
+}
 
 
 

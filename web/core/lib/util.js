@@ -110,6 +110,18 @@ hax.core.util.removeAllChildren = function(element) {
 	}
 }
 
+/** This creates a new array with elements from the first that are not in the second. */
+hax.core.util.getListInFirstButNotSecond = function(firstList,secondList) {
+    var newList = [];
+    for(var i = 0; i < firstList.length; i++) {
+        var entry = firstList[i];
+        if(secondList.indexOf(entry) < 0) {
+            newList.push(entry);
+        }
+    }
+    return newList;
+}
+
 /** This method reads the query string from a url */
 hax.core.util.readQueryField = function(field,url) {
     var href = url ? url : window.location.href;

@@ -107,49 +107,25 @@ hax.core.Codeable.initializeDependencies = function() {
         this.updateDependecies([]);
     }
 }
-    
+
 /** This method udpates the dependencies if needed because
  *the passed variable was added.  */
-hax.core.Codeable.updateForAddedVariable = function(addedMember,recalculateList) {
+hax.core.Codeable.updateDependeciesForModelChange = function(recalculateList) {
     if((this.hasCode())&&(this.varInfo)) {
                   
         //calculate new dependencies
         var newDependencyList = hax.core.codeDependencies.getDependencyInfo(this.varInfo,
                this.getContextManager());
-            
-        //update this object if the new table is in the list
-//        if(newDependencyList.indexOf(addedMember) >= 0) {
-            //update dependencies
-            this.updateDependencies(newDependencyList);
-
+          
+        //update the dependency list
+        var dependenciesChanged = this.updateDependencies(newDependencyList);
+        if(dependenciesChanged) {
             //add to update list
             hax.core.calculation.addToRecalculateList(recalculateList,this);
-//        }
-        
+        }  
     }
 }
-
-/** This method udpates the dependencies if needed because
- *the passed variable was deleted.  */
-hax.core.Codeable.updateForDeletedVariable = function(deletedMember,recalculateList) {
-    if(this.hasCode()) {
-//        var dependsOnList = this.getDependsOn();
-//        if(dependsOnList.indexOf(deletedMember) >= 0) {
-            
-            if(!this.varInfo) return;
     
-            var dependencyList = hax.core.codeDependencies.getDependencyInfo(this.varInfo,
-                   this.getContextManager());
-
-            //update dependencies
-            this.updateDependencies(dependencyList); 
-
-            //add to update list
-            hax.core.calculation.addToRecalculateList(recalculateList,this);
-//        }
-    }
-}
-
 /** This method returns the formula for this member.  */
 hax.core.Codeable.clearCode = function() {
     this.codeSet = false;

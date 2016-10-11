@@ -28,13 +28,8 @@ hax.core.Dependent.getDependsOn = function() {
 
 //Must be implemented in extending object
 ///** This method udpates the dependencies if needed because
-// *the passed variable was added.  */
-//hax.core.Dependent.updateForAddedVariable = function(object);
-
-//Must be implemented in extending object
-///** This method udpates the dependencies if needed because
-// *the passed variable was deleted.  */
-//hax.core.Dependent.updateForDeletedVariable = function(object);
+// *a variable was added or removed from the workspace.  */
+//hax.core.Dependent.updateDependeciesForModelChange = function(object);
 
 ///** This is a check to see if the object should be checked for dependencies 
 // * for recalculation. It is safe for this method to always return false and
@@ -88,6 +83,8 @@ hax.core.Dependent.onDeleteDependent = function() {
 /** This sets the dependencies based on the code for the member. */
 hax.core.Dependent.updateDependencies = function(newDependsOn) {
     
+    var dependenciesUpdated = false;
+    
     if(!newDependsOn) {
         newDependsOn = [];
     }
@@ -113,7 +110,10 @@ hax.core.Dependent.updateDependencies = function(newDependsOn) {
 			this.dependsOnList.push(remoteMember);
 			
 			//update this member
-			remoteMember.addToImpactsList(this);
+			var isNewAddition = remoteMember.addToImpactsList(this);
+            if(isNewAddition) {
+                dependenciesUpdated = true;
+            }
 
 			//create a set of new member to use below
 			newDependencySet[remoteMember.getFullName()] = true;
@@ -129,8 +129,11 @@ hax.core.Dependent.updateDependencies = function(newDependsOn) {
 		if(!stillDependsOn) {
 			//remove from imacts list
 			remoteMember.removeFromImpactsList(this);
+            dependenciesUpdated = true;
 		}
     }
+    
+    return dependenciesUpdated;
 }
 
 /** This method creates an dependency error, given a list of impactors that have an error. 

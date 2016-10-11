@@ -113,22 +113,11 @@ hax.core.Folder.prototype.calculate = function() {
 
 /** This method updates the dependencies of any children
  * based on an object being added. */
-hax.core.Folder.prototype.updateForAddedVariable = function(object,recalculateList) {
+hax.core.Folder.prototype.updateDependeciesForModelChange = function(recalculateList) {
     for(var key in this.childMap) {
         var child = this.childMap[key];
         if(child.isDependent) {
-            child.updateForAddedVariable(object,recalculateList);
-        }
-    }
-}
-
-/** This method updates the dependencies of any children
- * based on an object being deleted. */
-hax.core.Folder.prototype.updateForDeletedVariable = function(object,recalculateList) {
-    for(var key in this.childMap) {
-        var child = this.childMap[key];
-        if(child.isDependent) {
-            child.updateForDeletedVariable(object,recalculateList);
+            child.updateDependeciesForModelChange(recalculateList);
         }
     }
 }

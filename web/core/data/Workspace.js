@@ -32,7 +32,7 @@ hax.core.Workspace.prototype.getName = function() {
 }
 
 /** this method gets the root package for the workspace. */
-hax.core.Workspace.prototype.getRootFolder = function() {
+hax.core.Workspace.prototype.getRoot = function() {
     return this.rootFolder;
 }
 
@@ -47,25 +47,11 @@ hax.core.Workspace.prototype.getOwner = function() {
     return this.owner;
 }
 
-/** This method updates the dependencies of any children in the workspace
- * based on an object being added. */
-hax.core.Workspace.prototype.updateForAddedVariable = function(object,recalculateList) {
+/** This method updates the dependencies of any children in the workspace. */
+hax.core.Workspace.prototype.updateDependeciesForModelChange = function(recalculateList) {
     if(this.rootFolder) {
-        this.rootFolder.updateForAddedVariable(object,recalculateList);
+        this.rootFolder.updateDependeciesForModelChange(recalculateList);
     }
-}
-
-/** This method updates the dependencies of any children in the workspace
- * based on an object being deleted. */
-hax.core.Workspace.prototype.updateForDeletedVariable = function(object,recalculateList) {
-    this.rootFolder.updateForDeletedVariable(object,recalculateList);
-}
-
-/** This method updates the dependencies of any children in the workspace
- * based on an object being moved. */
-hax.core.Workspace.prototype.updateForMovetedVariable = function(object,recalculateList) {
-    this.rootFolder.updateForAddedVariable(object,recalculateList);
-    this.rootFolder.updateForDeletedVariable(object,recalculateList);
 }
 
 /** This method removes any data from this workspace on closing. */

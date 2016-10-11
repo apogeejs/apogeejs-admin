@@ -98,7 +98,7 @@ hax.core.Child.getWorkspace = function() {
 }
 
 /** this method gets the root folder/namespace for this object. */
-hax.core.Child.getRootFolder = function() {
+hax.core.Child.getRoot = function() {
     var ancestor = this;
 	while(ancestor) {
 		var owner = ancestor.getOwner();
@@ -177,9 +177,15 @@ hax.core.Child.toJson = function() {
  * if it does.  
  * @protected */
 hax.core.Child.onDeleteChild = function() {
+    if(!(this.owner)) return;
+    
 	if(this.owner.isParent) {
 		this.owner.removeChild(this);
 	}
+    else if(this.owner.isRootHolder) {
+        this.owner.setRoot(null);
+    }
+    this.owner = null;
 }
 
 //Implement this method if there is data to add to this child. Otherwise it may

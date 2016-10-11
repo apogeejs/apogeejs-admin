@@ -60,18 +60,21 @@ hax.core.DataHolder.setData = function(data) {
 // Private or Internal Functions
 //===================================
 
-/** This method adds a data member to the imapacts list for this node. 
+/** This method adds a data member to the imapacts list for this node.
+ * The return value is true if the member was added and false if it was already there. 
  * @private */
 hax.core.DataHolder.addToImpactsList = function(member) {
     //exclude this member
-    if(member == this) return;
-	
-    //make sure it appears only once
-    for(var i = 0; i < this.impactsList.length; i++) {
-        if(this.impactsList[i] == member) return;
+    if(member === this) return;
+    
+    //add to the list iff it is not already there
+    if(this.impactsList.indexOf(member) === -1) {
+        this.impactsList.push(member);
+        return true;
     }
-    //add to the list
-    this.impactsList.push(member);
+    else {
+        return false;
+    }
 }
 
 /** This method removes a data member from the imapacts list for this node. 

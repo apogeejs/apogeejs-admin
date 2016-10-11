@@ -32,7 +32,7 @@ hax.app.visiui.WorkspaceUI.prototype.setWorkspace = function(workspace, componen
     this.workspace = workspace; 
     
     //set up the root folder
-    var rootFolder = this.workspace.getRootFolder();
+    var rootFolder = this.workspace.getRoot();
     this.registerMember(rootFolder,null);
     this.addComponentContainer(rootFolder,this.tab);
   
@@ -161,10 +161,10 @@ hax.app.visiui.WorkspaceUI.prototype.memberUpdated = function(memberObject) {
 }
 
 /** This method responds to a "new" menu event. */
-hax.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
+hax.app.visiui.WorkspaceUI.prototype.childDeleted = function(deleteInfo) {
 	
 	//store the ui object
-	var key = fullName;
+	var key = deleteInfo.fullName;
 	
 	var componentInfo = this.componentMap[key];
 	delete this.componentMap[key];
@@ -178,21 +178,14 @@ hax.app.visiui.WorkspaceUI.prototype.childDeleted = function(fullName) {
 /** This method responds to a "new" menu event. */
 hax.app.visiui.WorkspaceUI.prototype.childMoved = function(moveInfo) {
     
-    //just redo the whole map, to make sure we get any children too
-    var newComponentMap = {};
-    for(var oldKey in this.componentMap) {
-        var componentInfo = this.componentMap[oldKey];
-        var member = componentInfo.object;
-        var activeKey = member.getFullName();
-        newComponentMap[activeKey] = componentInfo;
-    }
-    this.componentMap = newComponentMap;
+    var componentInfo = this.componentMap[moveInfo.oldFullName];
+    delete this.componentMap[moveInfo.oldFullName];
+    this.componentMap[moveInfo.newFullName] = componentInfo;
     
     //update the component
-    var movedComponentInfo = this.componentMap[moveInfo.newFullName];
-	if((movedComponentInfo)&&(movedComponentInfo.component)) {
-        var parentContainer = this.getParentContainerObject(movedComponentInfo.object);
-        movedComponentInfo.component.memberMoved(parentContainer);
+	if((componentInfo)&&(componentInfo.component)) {
+        var parentContainer = this.getParentContainerObject(componentInfo.object);
+        componentInfo.component.memberMoved(parentContainer);
     }
 }
 
@@ -245,7 +238,7 @@ hax.app.visiui.WorkspaceUI.prototype.toJson = function() {
     
     json.workspace = this.workspace.toJson();
     
-    var rootFolder = this.workspace.getRootFolder();
+    var rootFolder = this.workspace.getRoot();
     json.components = this.getFolderComponentContentJson(rootFolder);
     
     return json;

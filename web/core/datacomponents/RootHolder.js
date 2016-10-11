@@ -18,3 +18,7 @@ hax.core.RootHolder.isRootHolder = true;
 ///** This method sets the root object.  */
 //hax.core.RootHolder.setRoot = function(child);
 
+// Must be implemented in extending object
+///** This method returns the root object.  */
+//hax.core.RootHolder.getRoot = function();
+

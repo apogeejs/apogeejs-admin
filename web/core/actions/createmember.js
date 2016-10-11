@@ -37,13 +37,15 @@ hax.core.createmember.createMember = function(owner,json,optionalActionResponse)
         actionResponse.member = member;
 
         var workspace = member.getWorkspace();
-        workspace.updateForAddedVariable(member,recalculateList);
+        workspace.updateDependeciesForModelChange(recalculateList);
 
         hax.core.calculation.callRecalculateList(recalculateList,actionResponse);
+        
+        var updatedButNotCreated = hax.core.util.getListInFirstButNotSecond(recalculateList,creationList);
 
         //dispatch events
         hax.core.createmember.fireCreatedEventList(creationList);
-        hax.core.updatemember.fireUpdatedEventList(recalculateList);
+        hax.core.updatemember.fireUpdatedEventList(updatedButNotCreated);
 	}
 	catch(error) {
         //unknown application error
