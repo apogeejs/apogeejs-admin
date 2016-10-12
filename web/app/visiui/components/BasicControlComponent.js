@@ -12,6 +12,14 @@ hax.app.visiui.BasicControlComponent = function(workspaceUI,control,generator,co
 	
 	var resource = control.getResource();
 	resource.setComponent(this);
+    
+    //add a cleanup action to call resource when delete is happening
+    var cleanupAction = function() {
+        if(resource.delete) {
+            resource.delete();
+        }
+    }
+    this.addCleanupAction(cleanupAction);
 };
 
 //add components to this class

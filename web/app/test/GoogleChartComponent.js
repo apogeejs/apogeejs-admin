@@ -80,7 +80,7 @@ GoogleChartResource.prototype.onLibLoaded = function() {
 }
 
 /** This is the method users will call to initialize the chart. */
-GoogleChartResource.prototype.run = function() {
+GoogleChartResource.prototype.show = function() {
     if((this.libLoaded)&&(this.component)) {
         //create chart if needed
         if(!this.chart) {

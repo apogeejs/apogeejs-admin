@@ -10,38 +10,48 @@
 /** Constructor */
 SimpleGeojsonResource = function() {
 
+    this.map = null;
     this.contentElement = null;
     this.mapDiv = null;
     
+    //dummy initial view
     this.lat = 37;
     this.lon = -120;
     this.zoom = 14;
 }
 
 //required links for leaflet
-//http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js
-//http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css
+//https://unpkg.com/leaflet@1.0.1/dist/leaflet.js
+//https://unpkg.com/leaflet@1.0.1/dist/leaflet.css
+
 
 /** setFrame - required method for resource processor used in Basic Resource Control. */
-SimpleGeojsonResource.prototype.setContentElement = function(contentElement) {
-    this.contentElement = contentElement;
+SimpleGeojsonResource.prototype.setComponent = function(component) {
+    this.component = component;
     
+    //initialize UI - to be ready for code to be set ---------------------------
     this.mapDiv = document.createElement("div");
     this.mapDiv.style.height = "100%";
     this.mapDiv.style.width = "100%"; 
-    this.contentElement.appendChild(this.mapDiv);
+    var contentElement = this.component.getOutputElement();
+    contentElement.appendChild(this.mapDiv);
+   
+    //set map later - since we need it to be showing before we initialize leaflet
     
-    //map init note - we can not init the map until the dom is ready.
-    //Isn't ready yet. Maybe we need some sort of event that it is?
-    //or maybe just init when the user calls it.
+    //resize the editor on window size change
+    var instance = this;
+    var resizeCallback = function() {
+        if(instance.map) {
+            instance.map.invalidateSize();
+        }
+    }
+    hax.visiui.setResizeListener(this.mapDiv, resizeCallback);
     
-    //resize note - this resizes the map
-    //map.invalidateSize(); 
-}
-
-var counter = 0;
-function createId() {
-    return "map_div_" + counter++;
+    
+    //end initailize UI --------------------------------------------------------
+    
+    //call component updated - though we usually don't need to
+    this.component.memberUpdated();
 }
 
 /** This is the method users will call to initialize the chart. */
@@ -49,79 +59,56 @@ SimpleGeojsonResource.prototype.setData = function(lat,lon,zoom) {
     this.lat = lat;
     this.lon = lon;
     this.zoom = zoom;
+    
+    //center map if it has been created
+    if(this.map) {
+        this.map.setView([this.lat,this.lon], this.zoom);
+    }
 }
 
 /** This is the method users will call to initialize the chart. */
-SimpleGeojsonResource.prototype.run = function() {  
+SimpleGeojsonResource.prototype.show = function() {  
     if(!this.map) {
+        
         this.map = L.map(this.mapDiv);
         
-        //microsoft osm
-        L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg', {
+        //osm tiles
+        L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
             maxZoom: 18
         }).addTo(this.map);
-    }
-
-    this.map.setView([this.lat,this.lon], this.zoom);
+        
+        //center map if data has been set
+        if(this.lat) {
+            this.map.setView([this.lat,this.lon], this.zoom);
+        }
+    }  
 }
 
-//=================================
-// Simple Chart Control
-//=================================
+SimpleGeojsonResource.prototype.hide = function() {  
+    //no action
+}
 
-/** This is the control for the chart. It inherits from the component
- * BasicResourceControl to represent a resource object. */
-SimpleGeojsonComponent = function(workspaceUI,control,componentJson) {
-    //add the resource for the control
-    var resource = new SimpleGeojsonResource();
-    control.updateResource(resource);
-    
-    //base init
-    hax.app.visiui.Component.init.call(this,workspaceUI,control,SimpleGeojsonComponent.generator,componentJson);
-    hax.app.visiui.BasicControlComponent.init.call(this);
-};
-
-//add components to this class
-hax.core.util.mixin(SimpleGeojsonComponent,hax.app.visiui.Component);
-hax.core.util.mixin(SimpleGeojsonComponent,hax.app.visiui.BasicControlComponent);
-
-/** Store the content element for the resource. */
-SimpleGeojsonComponent.prototype.addToFrame = function() {
-    var control = this.getObject();
-    var resource = control.getResource();
-    resource.setContentElement(this.getContentElement());
+SimpleGeojsonResource.prototype.delete = function() {  
+    //no action
 }
 
 //======================================
 // Static methods
 //======================================
 
+var SimpleGeojsonComponent = {};
+
 /** This method creates the control. */
 SimpleGeojsonComponent.createComponent = function(workspaceUI,data,componentOptions) {
-    
-    var parent = workspaceUI.getObjectByKey(data.parentKey);
-    //should throw an exception if parent is invalid!
-    //
-    //create a resource a simple chart resource processor
-    var json = {};
-    json.name = data.name;
-    json.type = hax.core.Control.generator.type;
-    var actionResponse = hax.core.createmember.createMember(parent,json);
-    
-    var control = actionResponse.member;
-    if(control) {
-        var simpleGeojsonComponent = new SimpleGeojsonComponent(workspaceUI,control,componentOptions);
-        actionResponse.component = simpleGeojsonComponent;
-    }
-    else {
-        //no action for now
-    }
-    return actionResponse;
+    var resource = new SimpleGeojsonResource();
+	return hax.app.visiui.BasicControlComponent.createBaseComponent(workspaceUI,data,resource,SimpleGeojsonComponent.generator,componentOptions);
 }
 
 SimpleGeojsonComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
-    return new SimpleGeojsonComponent(workspaceUI,member,componentJson);
+    var resource = new SimpleGeojsonResource();
+	member.updateResource(resource);
+    return hax.app.visiui.BasicControlComponent.createBaseComponentFromJson(workspaceUI,member,SimpleGeojsonComponent.generator,componentJson);
 }
 
 //======================================

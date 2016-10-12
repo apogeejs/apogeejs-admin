@@ -84,7 +84,10 @@ hax.core.Codeable.setCodeInfo = function(codeInfo) {
         this.objectFunction = null;
         this.contextSetter = null;
     }
-    this.codeSet = true; 
+    this.codeSet = true;
+    if(this.isDependent) {
+        this.setDependenciesSetFlag(false);
+    }
 }
 
 /** This method returns the formula for this member.  */
@@ -146,10 +149,10 @@ hax.core.Codeable.hasCode = function() {
     return this.codeSet;
 }
 
-/** If this is true the member must be executed. 
+/** If this is true the member is ready to be executed. 
  * @private */
 hax.core.Codeable.needsCalculating = function() {
-	return this.codeSet;
+	return (this.codeSet)&&(this.getDependenciesSetFlag());
 }
 
 /** This updates the member based on a change in a dependency.  */

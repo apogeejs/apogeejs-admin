@@ -11,7 +11,7 @@ hax.core.Control = function(name,owner,initialData) {
     this.resource = null;
     
     if(!initialData) initialData = {};
-    var argList = initialData.argList ? initialData.argList : [];
+    var argList = initialData.argList ? initialData.argList : ["resource"];
     var functionBody = initialData.functionBody ? initialData.functionBody : "";
     var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
     hax.core.updatemember.applyCode(this,argList,functionBody,supplementalCode);

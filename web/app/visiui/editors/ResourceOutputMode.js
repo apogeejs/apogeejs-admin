@@ -24,12 +24,17 @@ hax.app.visiui.ResourceOutputMode.prototype.showData = function(editOk) {
 	
 	var control = this.component.getObject();
     var resource = control.getResource();
-    if((resource)&&(resource.run)) {
-        resource.run();
+    if((resource)&&(resource.show)) {
+        resource.show();
     }   
 }
 
 hax.app.visiui.ResourceOutputMode.prototype.destroy = function() {
+    var control = this.component.getObject();
+    var resource = control.getResource();
+    if((resource)&&(resource.hide)) {
+        resource.hide();
+    }
 }
 
 //==============================

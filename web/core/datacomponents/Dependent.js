@@ -15,6 +15,7 @@ hax.core.Dependent.init = function() {
     
     //this is the list of dependencies
     this.dependsOnList = [];
+    this.dependenciesSet = true;
 }
 
 /** This property tells if this object is a dependent.
@@ -24,6 +25,16 @@ hax.core.Dependent.isDependent = true;
 /** This returns a list of the members that this member depends on. */
 hax.core.Dependent.getDependsOn = function() {
     return this.dependsOnList;
+}
+
+/** This returns false if the dependencies are (known to be) not up to date. */
+hax.core.Dependent.getDependenciesSetFlag = function() {
+    return this.dependenciesSet;
+}
+
+/** This sets the dependencies set flag. It is used mainly to set the flag to false when something changes extenally. */
+hax.core.Dependent.setDependenciesSetFlag = function(dependenciesSet) {
+    this.dependenciesSet = dependenciesSet;
 }
 
 //Must be implemented in extending object
@@ -132,6 +143,7 @@ hax.core.Dependent.updateDependencies = function(newDependsOn) {
             dependenciesUpdated = true;
 		}
     }
+    this.dependenciesSet = true;
     
     return dependenciesUpdated;
 }
