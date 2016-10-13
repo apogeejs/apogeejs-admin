@@ -11,6 +11,8 @@
 SimpleGeojsonResource = function() {
 
     this.map = null;
+    this.geoJsonLayer = null;
+    
     this.contentElement = null;
     this.mapDiv = null;
     
@@ -35,8 +37,17 @@ SimpleGeojsonResource.prototype.setComponent = function(component) {
     this.mapDiv.style.width = "100%"; 
     var contentElement = this.component.getOutputElement();
     contentElement.appendChild(this.mapDiv);
-   
-    //set map later - since we need it to be showing before we initialize leaflet
+    
+    this.map = L.map(this.mapDiv);
+        
+    //osm tiles
+    L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+        maxZoom: 18
+    }).addTo(this.map);
+
+    //set view
+    this.map.setView([this.lat,this.lon], this.zoom);
     
     //resize the editor on window size change
     var instance = this;
@@ -55,34 +66,28 @@ SimpleGeojsonResource.prototype.setComponent = function(component) {
 }
 
 /** This is the method users will call to initialize the chart. */
-SimpleGeojsonResource.prototype.setData = function(lat,lon,zoom) {
+SimpleGeojsonResource.prototype.setView = function(lat,lon,zoom) {
     this.lat = lat;
     this.lon = lon;
     this.zoom = zoom;
-    
-    //center map if it has been created
     if(this.map) {
         this.map.setView([this.lat,this.lon], this.zoom);
     }
 }
 
+SimpleGeojsonResource.prototype.setGeojson = function(features,theme) {
+    if(this.geoJsonLayer !== null) {
+        this.geoJsonLayer.remove();
+        this.geoJsonLayer = null;
+    }
+    if(this.map) {
+        this.geoJsonLayer = L.geoJSON(features,theme).addTo(this.map);
+    }
+}
+
 /** This is the method users will call to initialize the chart. */
 SimpleGeojsonResource.prototype.show = function() {  
-    if(!this.map) {
-        
-        this.map = L.map(this.mapDiv);
-        
-        //osm tiles
-        L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-            maxZoom: 18
-        }).addTo(this.map);
-        
-        //center map if data has been set
-        if(this.lat) {
-            this.map.setView([this.lat,this.lon], this.zoom);
-        }
-    }  
+  
 }
 
 SimpleGeojsonResource.prototype.hide = function() {  

@@ -29,7 +29,7 @@ hax.visiui.MenuBody.MENU_STYLE = {
     "position":"absolute",
     "top":"100%",
     "left":"0%",
-    "zIndex":"100",
+    "zIndex":"2000",
     
     //configurable
     "border":"1px solid lightgray",

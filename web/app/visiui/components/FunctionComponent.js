@@ -61,7 +61,8 @@ hax.app.visiui.FunctionComponent.createComponent = function(workspaceUI,data,com
     json.name = data.name;
     if(data.argListString) {
         var argList = hax.app.visiui.FunctionComponent.parseStringArray(data.argListString);
-        json.argList = argList;
+        json.updateData = {};
+        json.updateData.argList = argList;
     }
     json.type = hax.core.FunctionTable.generator.type;
     var actionResponse = hax.core.createmember.createMember(parent,json);
