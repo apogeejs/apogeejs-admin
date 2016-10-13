@@ -32,10 +32,6 @@ hax.core.util.mixin(hax.app.visiui.BasicControlComponent,hax.app.visiui.TableEdi
 // Protected and Private Instance Methods
 //==============================
 
-hax.app.visiui.BasicControlComponent.prototype.initEmptyResource = function() {
-	this.update("","","","");
-}
-
 hax.app.visiui.BasicControlComponent.prototype.getOutputElement = function() {
 	return this.outputMode.getElement();
 }

@@ -64,7 +64,10 @@ hax.app.visiui.CustomResource.prototype.updateResource = function() {
 	//create the function generator, with the aliased variables in the closure
 	var generatorFunction = new Function(generatorFunctionBody);
 	var updateFunction = generatorFunction();
-	this.resource = updateFunction(this);
+	
+    var resource = updateFunction(this);
+    var control = this.getObject();
+    control.updateResource(resource);
 }
 
 
@@ -82,7 +85,7 @@ hax.app.visiui.CustomResource.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//end supplemental code",
 "",
 "//member function",
-"var generator = function(resource) {",
+"var generator = function(component) {",
 "{0}",
 "}",
 "//end member function",

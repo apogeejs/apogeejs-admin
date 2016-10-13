@@ -9,6 +9,22 @@ hax.app.visiui.CustomControlComponent = function(workspaceUI,control,componentJs
 		hax.app.visiui.CustomControlComponent.VIEW_MODES,
 		hax.app.visiui.CustomControlComponent.DEFAULT_VIEW
 	);
+	
+	//create a resource based on the json (or lack of a json)
+    if((componentJson)&&(componentJson.resource)) {
+        this.loadResourceFromJson(componentJson.resource);
+    }
+    else {
+        this.loadEmptyResource();
+    }
+    
+    //add a cleanup action to call resource when delete is happening
+    var cleanupAction = function() {
+        if(resource.delete) {
+            resource.delete();
+        }
+    }
+    this.addCleanupAction(cleanupAction);
 };
 
 //add components to this class
@@ -16,12 +32,28 @@ hax.core.util.mixin(hax.app.visiui.CustomControlComponent,hax.app.visiui.Compone
 hax.core.util.mixin(hax.app.visiui.CustomControlComponent,hax.app.visiui.TableEditComponent);
 
 //==============================
-// Protected and Private Instance Methods
+//Resource Accessors
 //==============================
 
-hax.app.visiui.CustomControlComponent.prototype.initEmptyResource = function() {
-	this.update("","","","");
+hax.app.visiui.CustomControlComponent.prototype.getHtml = function() {
+    return this.html;
 }
+
+hax.app.visiui.CustomControlComponent.prototype.getCustomizeScript = function() {
+    return this.customizeScript;
+}
+
+hax.app.visiui.CustomControlComponent.prototype.getSupplementalCode = function() {
+    return this.supplementalCode;
+}
+
+hax.app.visiui.CustomControlComponent.prototype.getCss = function(msg) {
+    return this.css;
+}
+
+//==============================
+// Protected and Private Instance Methods
+//==============================
 
 hax.app.visiui.CustomControlComponent.prototype.getOutputElement = function() {
 	return this.outputMode.getElement();
@@ -82,49 +114,68 @@ hax.app.visiui.CustomControlComponent.prototype.writeToJson = function(json) {
 	var resource = control.getResource();
     if(resource) {
         json.resource = {};
-        json.resource.html = resource.getHtml();
-        json.resource.customizeScript = resource.getCustomizeScript();
-        json.resource.supplementalCode = resource.getSupplementalCode();
-        json.resource.css = resource.getCss();
+        json.resource.html = this.html;
+        json.resource.customizeScript = this.customizeScript;
+        json.resource.supplementalCode = this.supplementalCode;
+        json.resource.css = this.css;
     }
 }
 
 /** This method deseriliazes data for the custom resource component. */
-hax.app.visiui.CustomControlComponent.prototype.updateFromJson = function(json) {   
-    //internal data
+hax.app.visiui.CustomControlComponent.prototype.updateFromJson = function(json) {  
+    //load resource
     if(json.resource) {
-        this.update(json.resource.html,
-            json.resource.customizeScript,
-            json.resource.supplementalCode,
-            json.resource.css);
+        this.loadResourceFromJson(json.resource);
     }
     else {
-        this.initEmptyResource();
+        this.loadEmptyResource();
     }
-    
+}
+
+hax.app.visiui.CustomControlComponent.prototype.loadEmptyResource = function() {
+	this.update("","return {};","","");
+}
+
+/** This method deseriliazes data for the custom resource component. */
+hax.app.visiui.CustomControlComponent.prototype.loadResourceFromJson = function(json) {   
+	if(!json) json = {};
+	var html = (json.html !== undefined) ? json.html : "";
+	var customizeScript = (json.customizeScript !== undefined) ? json.customizeScript : "";
+	var supplementalCode = (json.supplementalCode !== undefined) ? json.supplementalCode : "";
+	var css = (json.css === undefined) ? json.css : "";
+	
+    this.update(html,customizeScript,supplementalCode,css);    
 }
 
 //=============================
 // Action
 //=============================
 
-hax.app.visiui.CustomControlComponent.prototype.update = function(html,resourceGeneratorBody,supplementalCode,css) {
+hax.app.visiui.CustomControlComponent.prototype.update = function(html,customizeScript,supplementalCode,css) {
+    this.html = html;
+	this.customizeScript = customizeScript;
+	this.supplementalCode = supplementalCode;
+	this.css = css;
+    
 	var actionResponse = new hax.core.ActionResponse();
     var control = this.getObject();
-    control.clearErrors("Custom Control - Update");
+    control.clearErrors();
     
     try { 
         //create a new resource
-        var newResource = new hax.app.visiui.CustomResource();
-        newResource.setComponent(this);
-
-        //update it
-        newResource.update(html,resourceGeneratorBody,supplementalCode,css);
+        var resource = this.createResource();
+        if(!resource) {
+            throw new Error("resource.setComponent(component) is not defined");
+        }
 
         //update the resource
-        control.updateResource(newResource);
-
-        this.memberUpdated();
+        control.updateResource(resource);
+        
+        if(resource.setComponent) {
+            resource.setComponent(this);
+        }
+        
+        control.calculate();
     }
     catch(error) {
         //user application error
@@ -144,53 +195,89 @@ hax.app.visiui.CustomControlComponent.prototype.update = function(html,resourceG
 
 
 //======================================
+// Resource methods
+//======================================
+
+/** This method creates the member update javascript, which will be added to the
+ * html page so the user easily can run it in the debugger if needed. 
+ * @private */
+hax.app.visiui.CustomControlComponent.prototype.createResource = function() {
+    
+    //create the resource generator wrapped with its closure
+    var generatorFunctionBody = hax.core.util.formatString(
+        hax.app.visiui.CustomControlComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
+		this.customizeScript,
+        this.supplementalCode
+    );
+	
+	//create the function generator, with the aliased variables in the closure
+	var generatorFunction = new Function(generatorFunctionBody);
+	var updateFunction = generatorFunction();
+	
+    var resource = updateFunction(this);
+    return resource;
+}
+
+
+
+/** This is the format string to create the code body for updateing the member
+ * Input indices:
+ * 0: customize script
+ * 1: supplemental code text
+ * @private
+ */
+hax.app.visiui.CustomControlComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
+"",
+"//supplemental code",
+"{1}",
+"//end supplemental code",
+"",
+"//member function",
+"var generator = function(component) {",
+"{0}",
+"}",
+"//end member function",
+"return generator;",
+""
+   ].join("\n");
+
+
+
+
+
+//======================================
 // Static methods
 //======================================
 
-//add table listener
+
+/** This method creates the control. */
 hax.app.visiui.CustomControlComponent.createComponent = function(workspaceUI,data,componentOptions) {
-    
-    var parent = workspaceUI.getObjectByKey(data.parentKey);
+	var parent = workspaceUI.getObjectByKey(data.parentKey);
     //should throw an exception if parent is invalid!
     
+	//create a generic component of this given name
     var json = {};
     json.name = data.name;
     json.type = hax.core.Control.generator.type;
     var actionResponse = hax.core.createmember.createMember(parent,json);
-    
     var control = actionResponse.member;
+	
     if(control) {
         //create the component
-        var customControlComponent = new hax.app.visiui.CustomControlComponent(workspaceUI,control,componentOptions);
+        var customControlComponent = new hax.app.visiui.CustomControlComponent.createComponentFromJson(workspaceUI,control,componentOptions);
         actionResponse.component = customControlComponent;
-        
-        //if we do not load from a json, we must manually set the resource
-        //this is because here we store resource data in the JSON. If we try creating
-        //an empty one it might not be compatible with the existing initializer code int
-        //the resource. 
-        //In cases where the resource does not save data in the json, which
-        //is the typical scenario, then this is not an issue.
-        customControlComponent.initEmptyResource(); 
     }
     return actionResponse;
 }
 
-
-hax.app.visiui.CustomControlComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
-    
-    var customControlComponent = new hax.app.visiui.CustomControlComponent(workspaceUI,member,componentJson);
-    if(componentJson) {
-        customControlComponent.updateFromJson(componentJson);
-    }
-    else {
-        customControlComponent.initEmptyResource();
-    }
-    
+hax.app.visiui.CustomControlComponent.createComponentFromJson = function(workspaceUI,control,componentJson) {
+    var customControlComponent = new hax.app.visiui.CustomControlComponent(workspaceUI,control,componentJson);
     return customControlComponent;
 }
 
+
 //======================================
-// This is the component generator, to register the component
+// This is the control generator, to register the control
 //======================================
 
 hax.app.visiui.CustomControlComponent.generator = {};
@@ -199,5 +286,5 @@ hax.app.visiui.CustomControlComponent.generator.uniqueName = "hax.app.visiui.Cus
 hax.app.visiui.CustomControlComponent.generator.createComponent = hax.app.visiui.CustomControlComponent.createComponent;
 hax.app.visiui.CustomControlComponent.generator.createComponentFromJson = hax.app.visiui.CustomControlComponent.createComponentFromJson;
 hax.app.visiui.CustomControlComponent.generator.DEFAULT_WIDTH = 500;
-hax.app.visiui.CustomControlComponent.generator.DEFAULT_HEIGHT = 300;
+hax.app.visiui.CustomControlComponent.generator.DEFAULT_HEIGHT = 500;
 
