@@ -176,6 +176,7 @@ hax.app.visiui.CustomControlComponent.prototype.update = function(html,customize
         }
         
         control.calculate();
+        this.memberUpdated();
     }
     catch(error) {
         //user application error
