@@ -1,20 +1,3 @@
-//to do
-//- add other google sheets calls to allow download and upload data
-//-- I will use the bulk update method of spreadsheet to add and manipulate sheets to a spreadsheet
-//- create an external button control to do actions, like download or upload
-//- create a test system
-
-
-//intransix
-var CLIENT_ID = '933018598900-o6ejkguvna42eu66epreehm5nuirocua.apps.googleusercontent.com'; //intransix
-//spreadsheetId = '1VlcMRBzYsalrRw4E9W2D5c6-cowftX5QY6w4gbjFUWE';
-//range = 'Sheet1!A1:G';
-
-
-//micello
-//var CLIENT_ID = '105795106133-2s6hcm7d2hoombjmkjgo4a86bi2gsnj9.apps.googleusercontent.com'; //micello
-//spreadsheetId = '1xM9hFvTs69baR6v9jI3eMa2SLuDBTFkNRIEdUJh58xY',
-//range = 'Sheet1!A1:G'
 
 var SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 
@@ -24,8 +7,8 @@ function initiateAction(clientAction, clientId) {
         handleAuthResult(authResult,clientAction);
     };
     var payload = {};
-    payload.clientId = clientId;
-    payload.scope = SCOPES.joins(' ');
+    payload.client_id = clientId;
+    payload.scope = SCOPES.join(' ');
     payload.immediate = false;
     gapi.auth.authorize(payload,nextStep);
 }
@@ -68,13 +51,6 @@ function getRange(spreadsheetId,range,onResult) {
     }
 }
 
-//EXAMPLE of how to use get range - use this returned client action
-function getGetRangeClientAction(spreadsheetId,range,onResult) {
-    return function() {
-        getRange(spreadsheetId,range,onResult);
-    }
-}
-
 function doUpload(spreadsheetId,range,values,onResult) {
     var uploadData = {};
     uploadData.spreadsheetId = spreadsheetId;
@@ -95,44 +71,28 @@ function doClear(spreadsheetId,range,onResult) {
 
 function doCopy(fromSpreadsheetId,toSpreadsheetId,sheetId,onResult) {
     var uploadData = {};
-    uploadData.spreadsheetId = spreadsheetId;
-    uploadData.destinationSpreadsheetId = spreadsheetId;
+    uploadData.spreadsheetId = fromSpreadsheetId;
+    uploadData.destinationSpreadsheetId = toSpreadsheetId;
     uploadData.sheetId = sheetId;
     var loadData = gapi.client.sheets.spreadsheets.values.clear(uploadData);
     loadData.then(onResult,errorResult);
 }
 
-///////////////////////////////////////////////////////
-
-function downloadResult(response) {
-    var range = response.result;
-    if (range.values.length > 0) {
-        setTableData(range.values);
-    } else {
-        alert('No data found.');
-    }
-}
-
-function uploadResult(response) {
-    alert(JSON.stringify(response));
-}
-
-
-
-function setTableData(data) {
-    var workspace = app.getWorkspace("CloudTest");
-    var rootFolder = workspace.getRoot();
-    var gridTable = rootFolder.lookupChildFromPath(["grid"]);
-    if(gridTable) {
-        var actionResponse = hax.core.updatemember.updateData(gridTable,data);
-        if(actionResponse.getSuccess()) {
-            //alert("Data loaded!");
-        }
-        else {
-            alert(actionResponse.getErrorMsg());
-        }
-    }
+function addNewSheet(spreadsheetId,sheetName,onResult) {
+    var newSheetData = {};
+    var newSheetProperties = {};
+    newSheetProperties.title = sheetName;
+    newSheetProperties.index = 0;
+    newSheetData.properties = newSheetProperties;
+    var newSheetRequest = {};
+    newSheetRequest.addSheet = newSheetData;
     
+    var updateData = {};
+    updateData.spreadsheetId = spreadsheetId;
+    updateData.requests = [];
+    updateData.requests.push(newSheetRequest);
+    
+    var loadData = gapi.client.sheets.spreadsheets.batchUpdate(updateData);
+    loadData.then(onResult,errorResult);
 }
-
 
