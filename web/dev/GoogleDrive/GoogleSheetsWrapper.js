@@ -1,5 +1,6 @@
 //to do
 //- add other google sheets calls to allow download and upload data
+//-- I will use the bulk update method of spreadsheet to add and manipulate sheets to a spreadsheet
 //- create an external button control to do actions, like download or upload
 //- create a test system
 
