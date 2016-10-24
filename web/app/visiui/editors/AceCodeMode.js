@@ -30,6 +30,7 @@ hax.app.visiui.AceCodeMode.prototype.showData = function(editOk) {
 		codeText = functionBody;
 	}
 	
+    this.editOk = editOk;
 	this.editor.showData(codeText,editOk);
 }
 

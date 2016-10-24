@@ -115,7 +115,7 @@ hax.app.visiui.AceTextEditor.prototype.destroy = function() {
 hax.app.visiui.AceTextEditor.prototype.endEditMode = function() {
 	this.editMode = false;
 	this.editor.setReadOnly(true);
-	this.component.hideSaveBar();
+	this.component.endEditUI();
 }
 
 /** @private */
@@ -130,7 +130,7 @@ hax.app.visiui.AceTextEditor.prototype.onMouseClick = function() {
 			instance.cancel();
 		}
 		
-		this.component.showSaveBar(onSave,onCancel);
+		this.component.startEditUI(onSave,onCancel);
 		
 		this.editor.setReadOnly(false);
 		this.editMode = true;

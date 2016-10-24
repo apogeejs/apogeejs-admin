@@ -106,7 +106,7 @@ hax.app.visiui.TextAreaEditor.prototype.destroy = function() {
 hax.app.visiui.TextAreaEditor.prototype.endEditMode = function() {
 	this.editMode = false;
 	this.textArea.readOnly = true;
-	this.component.hideSaveBar();
+	this.component.endEditUI();
 }
 
 /** @private */
@@ -121,7 +121,7 @@ hax.app.visiui.TextAreaEditor.prototype.onMouseClick = function() {
 			instance.cancel();
 		}
 		
-		this.component.showSaveBar(onSave,onCancel);
+		this.component.startEditUI(onSave,onCancel);
 		
 		this.textArea.readOnly = false;
 		this.editMode = true;

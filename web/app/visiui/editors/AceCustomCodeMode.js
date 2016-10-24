@@ -11,6 +11,7 @@ hax.app.visiui.AceCustomCodeMode.prototype.showData = function(editOk) {
 		
 	var codeText = this.component.getCustomizeScript();
 	
+    this.editOk = editOk;
 	this.editor.showData(codeText,editOk);
 }
 

@@ -134,6 +134,19 @@ hax.app.visiui.TableEditComponent.getClearFunctionCallback = function() {
     }
 }
 
+/** This method should be called to set up the component ui for edit mode. 
+ * @protected */
+hax.app.visiui.TableEditComponent.startEditUI = function(onSave,onCancel) {
+    this.select.disabled = true;
+    this.showSaveBar(onSave,onCancel);
+}
+
+/** This method populates the frame for this component. 
+ * @protected */
+hax.app.visiui.TableEditComponent.endEditUI = function() {
+    this.hideSaveBar();
+    this.select.disabled = false;
+}
 /** This method populates the frame for this component. 
  * @protected */
 hax.app.visiui.TableEditComponent.initUI = function() {
