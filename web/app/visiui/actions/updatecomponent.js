@@ -14,12 +14,10 @@ hax.app.visiui.updatecomponent.getAddComponentCallback = function(app,generator,
         if(!workspaceUI) {
             alert("There is no open workspace.");
             return;
-        }
-        
-        var additionalLines = hax.core.util.deepJsonCopy(generator.propertyDialogLines);       
+        }     
         
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = hax.app.visiui.updatecomponent.getDialogLayout(workspaceUI,generator,true,additionalLines,optionalInitialValues);
+        var dialogLayout = hax.app.visiui.updatecomponent.getDialogLayout(workspaceUI,generator,true,optionalInitialValues);
         
         //create on submit callback
         var onSubmitFunction = function(result) {
@@ -89,7 +87,7 @@ hax.app.visiui.updatecomponent.getUpdateComponentCallback = function(component,g
 //this is for a create or update dialog
 hax.app.visiui.updatecomponent.getDialogLayout = function(workspaceUI,generator,doCreate,initialValues) {
     
-    var additionalLines = generator.propertyDialogLines;
+    var additionalLines = hax.core.util.deepJsonCopy(generator.propertyDialogLines);  
     
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};
