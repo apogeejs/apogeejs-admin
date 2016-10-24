@@ -27,7 +27,7 @@ hax.core.Codeable.init = function(argList,dataEvaluatesObjectFunction) {
     this.dependencyInfo = null;
     this.contextSetter = null;
     this.objectFunction = null;
-    this.codeError = null;
+    this.codeErrors = [];
     
     //fields used in calculation
     this.calcInProgress = false;
@@ -65,21 +65,22 @@ hax.core.Codeable.setCodeInfo = function(codeInfo) {
     //save the variables accessed
     this.varInfo = codeInfo.varInfo;
 
-    if(codeInfo.actionError == null) {
+    if((!codeInfo.errors)||(codeInfo.errors.length === 0)) {
         //set the code  by exectuing generator
         try {
             codeInfo.generatorFunction(this);
-            this.codeError = null;
+            this.codeErrors = [];
         }
         catch(ex) {
-            this.codeError = hax.core.ActionError.processException(ex,"Codeable - Set Code",false);
+            this.codeErrors.push(hax.core.ActionError.processException(ex,"Codeable - Set Code",false));
         }
     }
     else {
-        this.codeError = codeInfo.actionError;
+//doh - i am throwing away errors - handle this differently!
+        this.codeErrors = codeInfo.errors;
     }
     
-    if(codeInfo.actionError) {
+    if(this.codeErrors.length > 0) {
         //code not valid
         this.objectFunction = null;
         this.contextSetter = null;
@@ -93,7 +94,7 @@ hax.core.Codeable.setCodeInfo = function(codeInfo) {
 /** This method returns the formula for this member.  */
 hax.core.Codeable.initializeDependencies = function() {
     
-    if((this.hasCode())&&(this.varInfo)&&(!this.codeError)) {
+    if((this.hasCode())&&(this.varInfo)&&(this.codeErrors.length === 0)) {
         try {
             var newDependencyList = hax.core.codeDependencies.getDependencyInfo(this.varInfo,
                    this.getContextManager());
@@ -102,12 +103,12 @@ hax.core.Codeable.initializeDependencies = function() {
             this.updateDependencies(newDependencyList);
         }
         catch(ex) {
-            this.codeError = hax.core.ActionError.processException(ex,"Codeable - Set Dependencies",false);
+            this.codeErrors.push(hax.core.ActionError.processException(ex,"Codeable - Set Dependencies",false));
         }
     }
     else {
         //will not be calculated - has no dependencies
-        this.updateDependecies([]);
+        this.updateDependencies([]);
     }
 }
 
@@ -138,7 +139,7 @@ hax.core.Codeable.clearCode = function() {
     this.dependencyInfo = null;
     this.contextSetter = null;
     this.objectFunction = null;
-    this.codeError = null;
+    this.codeErrors = [];
     
     var newDependsOn = [];
 	this.updateDependencies(newDependsOn);
@@ -167,17 +168,17 @@ hax.core.Codeable.calculate = function() {
     
     if(((this.isDataHolder)&&(this.getDataSet()))||(this.hasError())) return;
     
+    if(this.codeErrors.length > 0) {
+        this.addErrors(this.codeErrors);
+        return;
+    }
+    
     if((!this.objectFunction)||(!this.contextSetter)) {
         var msg = "Function not found for member: " + this.getName();
         var actionError = new hax.core.ActionError(msg,"Codeable - Calculate",this);
         this.addError(actionError);
         return;
-    }
-    
-    if(this.codeError != null) {
-        this.addError(this.codeError);
-        return;
-    }
+    } 
     
     try {
         this.processObjectFunction(this.objectFunction);
