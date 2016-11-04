@@ -1,6 +1,15 @@
 /** This is the main visiui file */
 hax.visiui = {};
 
+/** This should be called to initializethe resource path. */
+hax.visiui.initResourcePath = function(resourceDirectory) {
+    hax.visiui.RESOURCE_DIR = resourceDirectory;
+}
+
+/** This retreives the resoruce path for a resource. */
+hax.visiui.getResourcePath = function(relativePath) {
+    return hax.visiui.RESOURCE_DIR + relativePath;
+}
 
 //I put some utilities in here. I shoudl figure out a better place to put this.
 

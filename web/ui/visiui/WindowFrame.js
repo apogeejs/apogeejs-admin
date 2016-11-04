@@ -114,11 +114,11 @@ hax.visiui.WindowFrame.MINIMIZED = -1;
 hax.visiui.WindowFrame.NORMAL = 0;
 hax.visiui.WindowFrame.MAXIMIZED = 1;
 
-hax.visiui.WindowFrame.MINIMIZE_CMD_IMAGE = hax.RESOURCE_DIR + "/minimize.png";
-hax.visiui.WindowFrame.RESTORE_CMD_IMAGE = hax.RESOURCE_DIR + "/restore.png";
-hax.visiui.WindowFrame.MAXIMIZE_CMD_IMAGE = hax.RESOURCE_DIR + "/maximize.png";
-hax.visiui.WindowFrame.CLOSE_CMD_IMAGE = hax.RESOURCE_DIR + "/close.png";
-hax.visiui.WindowFrame.MENU_IMAGE = hax.RESOURCE_DIR + "/hamburger.png";
+hax.visiui.WindowFrame.MINIMIZE_CMD_IMAGE = "/minimize.png";
+hax.visiui.WindowFrame.RESTORE_CMD_IMAGE = "/restore.png";
+hax.visiui.WindowFrame.MAXIMIZE_CMD_IMAGE = "/maximize.png";
+hax.visiui.WindowFrame.CLOSE_CMD_IMAGE = "/close.png";
+hax.visiui.WindowFrame.MENU_IMAGE = "/hamburger.png";
 
 hax.visiui.WindowFrame.RESIZE_LOCATION_SIZE = 10;
 
@@ -204,7 +204,7 @@ hax.visiui.WindowFrame.prototype.setTitle = function(title) {
  * location for the menu is first. */
 hax.visiui.WindowFrame.prototype.getMenu = function() {
     if(!this.menu) {
-        this.menu = hax.visiui.Menu.createMenuFromImage(hax.visiui.WindowFrame.MENU_IMAGE);
+        this.menu = hax.visiui.Menu.createMenuFromImage(hax.visiui.getResourcePath(hax.visiui.WindowFrame.MENU_IMAGE));
 		var firstLeftElementChild = this.titleBarLeftElements.firstChild;
 		if(firstLeftElementChild) {
 			this.titleBarLeftElements.insertBefore(this.menu.getElement(),firstLeftElementChild);
@@ -877,7 +877,7 @@ hax.visiui.WindowFrame.prototype.createTitleBar = function() {
     if(this.options.minimizable) {
         this.minimizeButton = document.createElement("img");
         hax.visiui.applyStyle(this.minimizeButton,hax.visiui.WindowFrame.COMMAND_BUTTON_STYLE);
-        this.minimizeButton.src = hax.visiui.WindowFrame.MINIMIZE_CMD_IMAGE;
+        this.minimizeButton.src = hax.visiui.getResourcePath(hax.visiui.WindowFrame.MINIMIZE_CMD_IMAGE);
         this.minimizeButton.onclick = function() {
             instance.minimizeContent();
         }
@@ -888,7 +888,7 @@ hax.visiui.WindowFrame.prototype.createTitleBar = function() {
     if(this.options.minimizable || this.options.maximizable) {	
         this.restoreButton = document.createElement("img");
         hax.visiui.applyStyle(this.restoreButton,hax.visiui.WindowFrame.COMMAND_BUTTON_STYLE);
-        this.restoreButton.src = hax.visiui.WindowFrame.RESTORE_CMD_IMAGE;
+        this.restoreButton.src = hax.visiui.getResourcePath(hax.visiui.WindowFrame.RESTORE_CMD_IMAGE);
         this.restoreButton.onclick = function() {
             instance.restoreContent();
         }
@@ -899,7 +899,7 @@ hax.visiui.WindowFrame.prototype.createTitleBar = function() {
     if(this.options.maximizable) {
         this.maximizeButton = document.createElement("img");
         hax.visiui.applyStyle(this.maximizeButton,hax.visiui.WindowFrame.COMMAND_BUTTON_STYLE);
-        this.maximizeButton.src = hax.visiui.WindowFrame.MAXIMIZE_CMD_IMAGE;
+        this.maximizeButton.src = hax.visiui.getResourcePath(hax.visiui.WindowFrame.MAXIMIZE_CMD_IMAGE);
         this.maximizeButton.onclick = function() {
             instance.maximizeContent();
         }
@@ -914,7 +914,7 @@ hax.visiui.WindowFrame.prototype.createTitleBar = function() {
     if(this.options.closable) {
         this.closeButton = document.createElement("img");
         hax.visiui.applyStyle(this.closeButton,hax.visiui.WindowFrame.COMMAND_BUTTON_STYLE);
-        this.closeButton.src = hax.visiui.WindowFrame.CLOSE_CMD_IMAGE;
+        this.closeButton.src = hax.visiui.getResourcePath(hax.visiui.WindowFrame.CLOSE_CMD_IMAGE);
         this.closeButton.onclick = function() {
             instance.hide();
         }

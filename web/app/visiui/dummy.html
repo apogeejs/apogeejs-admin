@@ -66,13 +66,16 @@
         <script type="text/javascript" src="components/BasicControlComponent.js"></script>
 		<script type="text/javascript" src="components/CustomControlComponent.js"></script>
         <script type="text/javascript" src="components/CustomResource.js"></script>
-        <script type="text/javascript" src="actions/openworkspace.js"></script>
         <script type="text/javascript" src="actions/createworkspace.js"></script>
-        <script type="text/javascript" src="actions/closeworkspace.js"></script>
-        <script type="text/javascript" src="actions/saveworkspace.js"></script>
+        <script type="text/javascript" src="actions/closeworkspace.js"></script>       
         <script type="text/javascript" src="actions/updatecomponent.js"></script>
         <script type="text/javascript" src="actions/addadditionalcomponent.js"></script>
         <script type="text/javascript" src="actions/updatelinks.js"></script>
+        <script type="text/javascript" src="webCode/appmenus.js"></script>
+        <script type="text/javascript" src="webCode/openworkspace.js"></script>
+        <script type="text/javascript" src="webCode/saveworkspace.js"></script>
+        <script type="text/javascript" src="webCode/TempOpenDialog.js"></script>
+        <script type="text/javascript" src="webCode/TempSaveDialog.js"></script>
         <script type="text/javascript" src="editors/TextAreaEditor.js"></script>
         <script type="text/javascript" src="editors/TextAreaMode.js"></script>
 		<script type="text/javascript" src="editors/AceTextEditor.js"></script>
@@ -89,8 +92,6 @@
 		<script type="text/javascript" src="editors/ResourceOutputMode.js"></script>
         <script type="text/javascript" src="dialogs/ConfigurableDialog.js"></script>
         <script type="text/javascript" src="dialogs/CreateWorkspaceDialog.js"></script>
-        <script type="text/javascript" src="dialogs/TempOpenDialog.js"></script>
-        <script type="text/javascript" src="dialogs/TempSaveDialog.js"></script>
         <script type="text/javascript" src="dialogs/UpdateLinksDialog.js"></script>
         <script type="text/javascript" src="dialogs/SelectControlDialog.js"></script>
         
@@ -169,6 +170,7 @@
             'use strict'
             var app = null;
 			function init() {
+                hax.visiui.initResourcePath("../../resources");
                 app = new hax.app.visiui.Hax("appContainer");
             }
             
