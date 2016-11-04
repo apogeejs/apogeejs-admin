@@ -75,6 +75,8 @@ module.exports = function(grunt) {
 			"app/visiui/webCode/appmenus.js",
 			"app/visiui/webCode/openworkspace.js",
 			"app/visiui/webCode/saveworkspace.js",
+			"app/visiui/webCode/TempOpenDialog.js",
+			"app/visiui/webCode/TempSaveDialog.js",
 			"app/visiui/editors/TextAreaEditor.js",
 			"app/visiui/editors/TextAreaMode.js",
 			"app/visiui/editors/AceTextEditor.js",
@@ -91,8 +93,6 @@ module.exports = function(grunt) {
 			"app/visiui/editors/ResourceOutputMode.js",
 			"app/visiui/dialogs/ConfigurableDialog.js",
 			"app/visiui/dialogs/CreateWorkspaceDialog.js",
-			"app/visiui/dialogs/TempOpenDialog.js",
-			"app/visiui/dialogs/TempSaveDialog.js",
 			"app/visiui/dialogs/UpdateLinksDialog.js",
 			"app/visiui/dialogs/SelectControlDialog.js"
           ],
