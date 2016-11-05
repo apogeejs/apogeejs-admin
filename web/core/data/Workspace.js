@@ -83,7 +83,7 @@ hax.core.Workspace.prototype.createContextManager = function() {
     //global variables from window object
     var globalVarEntry = {};
     globalVarEntry.isLocal = false;
-    globalVarEntry.data = window;
+    globalVarEntry.data = __globals__;
     contextManager.addToContextList(globalVarEntry);
     
     return contextManager;

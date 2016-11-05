@@ -6,8 +6,9 @@ module.exports = function(grunt) {
       options: {
         separator: ';\n'
       },
-      dist: {
+      dist_web: {
         src: [
+            "customize/webHeader.js",
 			"hax.js",
 			"core/core.js",
 			"core/lib/EventManager.js",
@@ -96,10 +97,11 @@ module.exports = function(grunt) {
 			"app/visiui/dialogs/UpdateLinksDialog.js",
 			"app/visiui/dialogs/SelectControlDialog.js"
           ],
-        dest: '../../dist/<%= pkg.name %>.js'
+        dest: '../../dist/<%= pkg.name %>-web.js'
       },
       dist_electron: {
         src: [
+            "customize/webHeader.js",
 			"hax.js",
 			"core/core.js",
 			"core/lib/EventManager.js",
@@ -187,6 +189,43 @@ module.exports = function(grunt) {
 			"app/visiui/dialogs/SelectControlDialog.js"
           ],
         dest: '../../dist/<%= pkg.name %>-electron.js'
+      },
+      dist_node: {
+        src: [
+            "customize/coreNpmHeader.js",
+			"hax.js",
+			"core/core.js",
+			"core/lib/EventManager.js",
+			"core/lib/ContextManager.js",
+			"core/lib/codeCompiler.js",
+			"core/lib/codeAnalysis.js",
+			"core/lib/codeDependencies.js",
+			"core/lib/workspaceCalculation.js",
+			"core/lib/util.js",
+			"core/datacomponents/Child.js",
+			"core/datacomponents/ContextHolder.js",
+			"core/datacomponents/DataHolder.js",
+			"core/datacomponents/Dependent.js",
+			"core/datacomponents/Codeable.js",
+			"core/datacomponents/Owner.js",
+			"core/datacomponents/Parent.js",
+			"core/datacomponents/RootHolder.js",
+			"core/data/Workspace.js",
+			"core/data/JsonTable.js",
+			"core/data/FunctionTable.js",
+			"core/data/Control.js",
+			"core/data/Folder.js",
+			"core/data/FolderFunction.js",
+			"core/actions/ActionResponse.js",
+			"core/actions/ActionError.js",
+			"core/actions/createmember.js",
+			"core/actions/updatemember.js",
+			"core/actions/updatefolderfunction.js",
+			"core/actions/movemember.js",
+			"core/actions/deletemember.js",
+            "customize/npmFooter.js"
+          ],
+        dest: '../../dist/<%= pkg.name %>-node.js'
       }
     },
     uglify: {
@@ -195,12 +234,17 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          '../../dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+          '../../dist/<%= pkg.name %>-web.min.js': ['<%= concat.dist_web.dest %>']
         }
       },
 	  dist_electron: {
         files: {
           '../../dist/<%= pkg.name %>-electron.min.js': ['<%= concat.dist_electron.dest %>']
+        }
+      },
+	  dist_mode: {
+        files: {
+          '../../dist/<%= pkg.name %>-node.min.js': ['<%= concat.dist_node.dest %>']
         }
       }
     },
