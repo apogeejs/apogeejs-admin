@@ -97,7 +97,7 @@ module.exports = function(grunt) {
 			"app/visiui/dialogs/UpdateLinksDialog.js",
 			"app/visiui/dialogs/SelectControlDialog.js"
           ],
-        dest: '../../dist/<%= pkg.name %>-web.js'
+        dest: '../../dist/<%= pkg.name %>-lib-web.js'
       },
       dist_electron: {
         src: [
@@ -186,9 +186,10 @@ module.exports = function(grunt) {
 			"app/visiui/dialogs/ConfigurableDialog.js",
 			"app/visiui/dialogs/CreateWorkspaceDialog.js",
 			"app/visiui/dialogs/UpdateLinksDialog.js",
-			"app/visiui/dialogs/SelectControlDialog.js"
+			"app/visiui/dialogs/SelectControlDialog.js",
+            "customize/npmFooter.js"
           ],
-        dest: '../../dist/<%= pkg.name %>-electron.js'
+        dest: '../../dist/<%= pkg.name %>-lib-electron.js'
       },
       dist_node: {
         src: [
@@ -225,26 +226,26 @@ module.exports = function(grunt) {
 			"core/actions/deletemember.js",
             "customize/npmFooter.js"
           ],
-        dest: '../../dist/<%= pkg.name %>-node.js'
+        dest: '../../dist/<%= pkg.name %>-lib-node.js'
       }
     },
     uglify: {
       options: {
-        banner: '/*! <%= pkg.name %>-electron <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+        banner: '/*! <%= pkg.name %>-lib-electron <%= grunt.template.today("dd-mm-yyyy") %> */\n'
       },
       dist: {
         files: {
-          '../../dist/<%= pkg.name %>-web.min.js': ['<%= concat.dist_web.dest %>']
+          '../../dist/<%= pkg.name %>-lib-web.min.js': ['<%= concat.dist_web.dest %>']
         }
       },
 	  dist_electron: {
         files: {
-          '../../dist/<%= pkg.name %>-electron.min.js': ['<%= concat.dist_electron.dest %>']
+          '../../dist/<%= pkg.name %>-lib-electron.min.js': ['<%= concat.dist_electron.dest %>']
         }
       },
 	  dist_mode: {
         files: {
-          '../../dist/<%= pkg.name %>-node.min.js': ['<%= concat.dist_node.dest %>']
+          '../../dist/<%= pkg.name %>-lib-node.min.js': ['<%= concat.dist_node.dest %>']
         }
       }
     },
@@ -258,7 +259,7 @@ module.exports = function(grunt) {
 			"ui/visiui/windowFrame.css",
 			"ui/visiui/dialog.css"
           ],
-          dest: "../../dist/hax-cat.css"
+          dest: "../../dist/hax-lib.css"
         },
       },
     copy: {

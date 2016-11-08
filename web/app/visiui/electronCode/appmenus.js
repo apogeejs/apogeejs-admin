@@ -33,6 +33,9 @@ hax.app.visiui.Hax.prototype.createMenuBar = function() {
     
     var closeCallback = hax.app.visiui.closeworkspace.getCloseCallback(this);
     menu.addCallbackMenuItem("Close",closeCallback);	
+    
+    var exitCallback = hax.app.visiui.Hax.getExitCallback();
+    menu.addCallbackMenuItem("Exit",exitCallback);
 	
     //Components Menu
     menu = hax.visiui.Menu.createMenu("Components");
@@ -52,4 +55,10 @@ hax.app.visiui.Hax.prototype.createMenuBar = function() {
     
 }
 
-
+hax.app.visiui.Hax.getExitCallback = function() {
+    return function() {
+        var remote = require('electron').remote;
+        var window = remote.getCurrentWindow();
+        window.close();
+    }
+}
