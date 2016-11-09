@@ -99,6 +99,42 @@ module.exports = function(grunt) {
           ],
         dest: '../../dist/<%= pkg.name %>-lib-web.js'
       },
+      dist_web_core: {
+        src: [
+            "customize/webHeader.js",
+			"hax.js",
+			"core/core.js",
+			"core/lib/EventManager.js",
+			"core/lib/ContextManager.js",
+			"core/lib/codeCompiler.js",
+			"core/lib/codeAnalysis.js",
+			"core/lib/codeDependencies.js",
+			"core/lib/workspaceCalculation.js",
+			"core/lib/util.js",
+			"core/datacomponents/Child.js",
+			"core/datacomponents/ContextHolder.js",
+			"core/datacomponents/DataHolder.js",
+			"core/datacomponents/Dependent.js",
+			"core/datacomponents/Codeable.js",
+			"core/datacomponents/Owner.js",
+			"core/datacomponents/Parent.js",
+			"core/datacomponents/RootHolder.js",
+			"core/data/Workspace.js",
+			"core/data/JsonTable.js",
+			"core/data/FunctionTable.js",
+			"core/data/Control.js",
+			"core/data/Folder.js",
+			"core/data/FolderFunction.js",
+			"core/actions/ActionResponse.js",
+			"core/actions/ActionError.js",
+			"core/actions/createmember.js",
+			"core/actions/updatemember.js",
+			"core/actions/updatefolderfunction.js",
+			"core/actions/movemember.js",
+			"core/actions/deletemember.js"
+          ],
+        dest: '../../dist/<%= pkg.name %>-core-lib-web.js'
+      },
       dist_electron: {
         src: [
             "customize/webHeader.js",
@@ -236,6 +272,11 @@ module.exports = function(grunt) {
       dist: {
         files: {
           '../../dist/<%= pkg.name %>-lib-web.min.js': ['<%= concat.dist_web.dest %>']
+        }
+      },
+      dist: {
+        files: {
+          '../../dist/<%= pkg.name %>-core-lib-web.min.js': ['<%= concat.dist_web.dest %>']
         }
       },
 	  dist_electron: {
