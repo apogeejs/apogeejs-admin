@@ -1,0 +1,76 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <div>
+            <ul>
+                <li>Open the Hax web application at <a href="http://haxapp.com/hax.html">http://haxapp.com/hax.html</a></li>
+                <li>Create a new Data Table called "settings"
+                    <ul>
+                        <li>Right click in the main window.</li>
+                        <li>Select "Add Data Table" from the context menu.</li>
+                        <li>Enter the name "settings" and press the "create" button.</li>
+                    </ul>                      
+                </li>
+                <li>Set a value for this table.
+                    <ul>
+                        <li>Option 1: Enter the JSON value as text: 
+                            <ul>
+                                <li>Select "JSON" from the dropdown on the table "settings".</li>
+                                <li>Click in the table body to enter edit mode.</li>
+                                <li>Paste in the following JSON data:
+                                    <pre>
+{
+	"initialYear": 2015,
+	"initialRevenue": 1000000,
+	"growthRate": 3,
+	"projectionCount": 10
+}
+                                    </pre>
+                                </li>
+                                <li>Press save to save the data.</li>
+                            </ul>
+                        </li>
+                        <li>Option 2: Enter the data using the Form mode: 
+                            <ul>
+                                <li>Select "Form" from the dropdown on the table "settings".</li>
+                                <li>Right click in the table body to get a context menu. Select "Convert to Object"</li>
+                                <li>Type in the key and value data from the JSON above.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>Create a new Data Table called "revenueList".</li>
+                <li>Add a formula for the new table.
+                    <ul>
+                        <li>From the dropdown on the table select "Formula".</li>
+                        <li>Click the window body to enter edit mode.</li>
+                        <li>Paste in the following code. You can drag the table edge to make the table bigger.
+                            <pre>
+value = [];
+value[0] = settings.initialRevenue;
+for(var i = 1; i < settings.projectionCount; i++) {
+    value[i] = value[i-1] * (1 + settings.growthRate/100);
+}
+                            </pre>
+                        </li>
+                        <li>Press "save".</li>
+                        <li>From the dropdown, select "Text". A JSON array should be displayed.</li>
+                    </ul>
+                </li>
+                
+                    
+            </ul>
+            
+                
+            
+        </div>
+    </body>
+</html>
