@@ -1,0 +1,124 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style>
+            body {
+                font-family: sans-serif;
+            }
+            ol {
+                list-style-position: inside;
+            }
+            ol.numericList {
+                list-style-type: decimal;
+            }
+            ol.upperAlphaList {
+                list-style-type: upper-alpha;
+            }
+            ol.lowerAlphaList {
+                list-style-type: lower-alpha;
+            }
+            ol.upperRomanList {
+                list-style-type: upper-roman;
+            }
+            ol.lowerRomanList {
+                list-style-type: lower-roman;
+            }
+            li {
+                margin: 10px;
+            }
+            textarea.codeText {
+                outline: black 1px solid;
+                font-family: monospace;
+                width: 600px;
+                margin: 10px;
+            }
+            .sideNote {
+                font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <ol class="numericList">
+                <li>Open the Hax web application at <a href="http://haxapp.com/hax.html">http://haxapp.com/hax.html</a></li>
+                <li>Create a new Data Table called "settings":
+                    <ol class="upperAlphaList">
+                        <li>Right click in the main window and select "Add Data Table" from the context menu.
+                            <div><img src="createTable.png"/></div>
+                        </li>
+                        <li>Enter the name "settings" and press the "Create" button.
+                            <div><img src="nameTable.png"/></div>
+                        </li>
+                    </ol>                      
+                </li>
+                <li>Set a value for this table:
+                    <ol class="upperAlphaList">
+                        <li>Option 1: Enter the JSON value as text: 
+                            <ol class="lowerAlphaList">
+                                <li>Select "JSON" from the dropdown on the table "settings".</li>
+                                <li>Click in the table body to enter edit mode.</li>
+                                <li>Paste in the following JSON data:
+                                    <div><textarea class="codeText" readonly rows="7">
+{
+	"initialYear": 2015,
+	"initialRevenue": 1000000,
+	"growthRate": 3,
+	"projectionCount": 10
+}
+                                    </textarea></div>
+                                    <div><img src="pasteJson.png"/></div>
+                                </li>
+                                <li>Press "Save" to save the data.</li>
+                            </ol>
+                        </li>
+                        <li>Option 2: Enter the data using the "Form" mode: 
+                            <ol class="lowerAlphaList">
+                                <li>Select "Form" from the dropdown on the table "settings".</li>
+                                <li>Right click in the table body to get a context menu. Select "Convert to Object".
+                                    <p class="sideNote">Individual value entries in the form can also be right clicked, to get a context menu for them.</p>
+                                    <div><img src="convertToObject.png"/></div>
+                                </li>
+                                <li>Type in the key and value data from the JSON above.
+                                    <div><img src="fillForm.png"/></div>
+                                </li>
+                            </ol>
+                        </li>
+                    </ol>
+                </li>
+                <li>Create a new Data Table called "revenueList".
+                    <div><img src="revenueListTable.png"/></div>
+                </li>
+                <li>Add a formula for the new table:
+                    <ol class="upperAlphaList">
+                        <li>From the dropdown on the table select "Formula".</li>
+                        <li>Click the window body to enter edit mode.</li>
+                        <li>Paste in the following code. You can drag the table edge to make the table bigger.
+                            <p class="sideNote">The code should be javascript code the populates the predefined variable "value".
+                            The values in other tables can be accessed using the given table's name.</p>
+                            <div><textarea class="codeText" readonly rows="6">
+value = [];
+value[0] = settings.initialRevenue;
+for(var i = 1; i < settings.projectionCount; i++) {
+    value[i] = value[i-1] * (1 + settings.growthRate/100);
+}
+                            </textarea></div>
+                            <div>
+                                <img src="revenueCode.png"/>
+                            </div>
+                        </li>
+                        <li>Press "save".</li>
+                        <li>From the dropdown, select "Text". A JSON array should be displayed.
+                            <div><img src="revenueList.png" class="smallImage"/></div>
+                        </li>
+                    </ol>
+                </li>             
+            </ol>
+        </div>
+    </body>
+</html>

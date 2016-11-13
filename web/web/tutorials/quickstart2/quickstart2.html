@@ -1,0 +1,118 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style>
+            body {
+                font-family: sans-serif;
+            }
+            ol {
+                list-style-position: inside;
+            }
+            ol.numericList {
+                list-style-type: decimal;
+            }
+            ol.upperAlphaList {
+                list-style-type: upper-alpha;
+            }
+            ol.lowerAlphaList {
+                list-style-type: lower-alpha;
+            }
+            ol.upperRomanList {
+                list-style-type: upper-roman;
+            }
+            ol.lowerRomanList {
+                list-style-type: lower-roman;
+            }
+            li {
+                margin: 10px;
+            }
+            textarea.codeText {
+                outline: black 1px solid;
+                font-family: monospace;
+                width: 600px;
+                margin: 10px;
+            }
+            .sideNote {
+                font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <ol class="numericList">
+                <li>Go to the "Formula" for the table "revenueList" and update the code as follows:
+                    <div><textarea class="codeText" readonly rows="6">
+value = [];
+value[0] = getEntry(settings.initialYear,settings.initialRevenue);
+for(var i = 1; i < settings.projectionCount; i++) {
+    value[i] = getNextEntry(value[i-1]);
+}
+                          </textarea>
+                    </div>
+                    <div><img src="newCode.png"/></div>
+                </li>
+                <li>Press save. There is an error because we have not defined the function "getEntry".
+                    <div><img src="newCodeError.png"/></div>                      
+                </li>
+                <li>From the dropdown select "Private". Add the following code there.
+                    <p class="sideNote">The code in the private section is accessible to the formula, and nowhere else.</p>
+                    <div><textarea class="codeText" readonly rows="13">
+function getEntry(year,revenue) {
+    var entry = {};
+    entry.year = year;
+    entry.revenue = revenue;
+    return entry;
+}
+
+function getNextEntry(previousEntry) {
+    var newYear = previousEntry.year + 1;
+    var newRevenue = previousEntry.revenue * (1 + settings.growthRate/100);
+    return getEntry(newYear,newRevenue);
+}
+                          </textarea>
+                    </div>
+                    <div><img src="privateCode.png"/></div>
+                </li>
+                <li>Save the private code and return to the "Text" view. Now we have an array of compound entries.
+                    <div><img src="newRevenueList.png"/></div>
+                </li>
+                
+                
+                
+                
+                
+                
+                <li>Add a formula for the new table:
+                    <ol class="upperAlphaList">
+                        <li>From the dropdown on the table select "Formula".</li>
+                        <li>Click the window body to enter edit mode.</li>
+                        <li>Paste in the following code. You can drag the table edge to make the table bigger.
+                            <p class="sideNote">The code should be javascript code the populates the predefined variable "value".
+                            The values in other tables can be accessed using the given table's name.</p>
+                            <div><textarea class="codeText" readonly rows="6">
+value = [];
+value[0] = settings.initialRevenue;
+for(var i = 1; i < settings.projectionCount; i++) {
+    value[i] = value[i-1] * (1 + settings.growthRate/100);
+}
+                            </textarea></div>
+                            <div>
+                                <img src="revenueCode.png"/>
+                            </div>
+                        </li>
+                        <li>Press "save".</li>
+                        <li>From the dropdown, select "Text". A JSON array should be displayed.
+                            <div><img src="revenueList.png" class="smallImage"/></div>
+                        </li>
+                    </ol>
+                </li>             
+            </ol>
+        </div>
+    </body>
+</html>
