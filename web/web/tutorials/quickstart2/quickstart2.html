@@ -82,36 +82,73 @@ function getNextEntry(previousEntry) {
                 <li>Save the private code and return to the "Text" view. Now we have an array of compound entries.
                     <div><img src="newRevenueList.png"/></div>
                 </li>
-                
-                
-                
-                
-                
-                
-                <li>Add a formula for the new table:
-                    <ol class="upperAlphaList">
-                        <li>From the dropdown on the table select "Formula".</li>
-                        <li>Click the window body to enter edit mode.</li>
-                        <li>Paste in the following code. You can drag the table edge to make the table bigger.
-                            <p class="sideNote">The code should be javascript code the populates the predefined variable "value".
-                            The values in other tables can be accessed using the given table's name.</p>
-                            <div><textarea class="codeText" readonly rows="6">
+                <li>Create a Grid Table, called "revenueGrid". 
+                    <div><img src="addGridTable.png"/></div>               
+                </li>                
+                <li>Set the formula for the grid to be the following code.
+                    <div><textarea class="codeText" readonly rows="7">
 value = [];
-value[0] = settings.initialRevenue;
-for(var i = 1; i < settings.projectionCount; i++) {
-    value[i] = value[i-1] * (1 + settings.growthRate/100);
+value.push(getRow("Year","Revenue"));
+for(var i = 0; i < revenueList.length; i++) {
+    var entry = revenueList[i];
+    value.push(getRow(entry.year,entry.revenue));
 }
-                            </textarea></div>
-                            <div>
-                                <img src="revenueCode.png"/>
-                            </div>
-                        </li>
-                        <li>Press "save".</li>
-                        <li>From the dropdown, select "Text". A JSON array should be displayed.
-                            <div><img src="revenueList.png" class="smallImage"/></div>
-                        </li>
-                    </ol>
-                </li>             
+                    </textarea></div>
+                    <div>
+                        <img src="revenueGridFormula.png"/>
+                    </div>
+                </li>
+                <li>Set the private code for the grid to be the following code.
+                    <div><textarea class="codeText" readonly rows="4">
+function getRow(first,second) {
+    return [first,second];
+}
+                    </textarea></div>
+                    <p class="sideNote">The error below is the error we get before we save the private code defining the function "getRow".</p>
+                    <div>
+                        <img src="revenueGridPrivate.png"/>
+                    </div>
+                </li> 
+                <li>Saving and returning to the "Text" view should give the following result.
+                    <div><img src="revenueGridResult.png"/></div>                      
+                </li>
+                <li>Add another Data Table, with the name "revenueGridAsJSON". Set the following formula:
+                    <p class="sideNote">Here we are assigning the value of revenueGridAsJSON table to be the value of the revenueGrid.</p>
+                    <div><textarea class="codeText" readonly rows="2">
+value = revenueGrid;
+                    </textarea></div>
+                    <div><img src="gridToJsonFormula.png"/></div>                      
+                </li>
+                <li>Returning to the "Text" view gives the following result. 
+                    <p class="sideNote">The Grid Table has a JSON object for data, just like the Data Table.
+                    The Grid Table JSON is an array rows, with each row being an array of values.</p>
+                    <div><img src="gridToJsonResult.png"/></div>                      
+                </li>
+                <li>Now try modifying the revenueGridAsJSON formula as follows:
+                    <p class="sideNote">We are assigning the revenueGrid value to revenueGridAsJSON and then modifying it.</p>
+                    <div><textarea class="codeText" readonly rows="3">
+value = revenueGrid;
+value[0].push("title for another column");
+                    </textarea></div>
+                    <div><img src="gridToJsonWithEdit.png"/></div>                      
+                </li>
+                <li>When we save, we get an error. You can't modify a table copied like this.
+                    <p class="sideNote">We set revenueGridAsJSON to be the <b>same object</b> as revenueGrid. By modifying
+                    revenueGridAsJSON we are also modifying revenueGrid. This is illegal. You can not modify the value
+                    of one table from another table's formula. The value read from a table is <b>immutable</b>.</p>
+                    <div><img src="gridToJsonEditError.png"/></div>                      
+                </li>
+                <li>Now modify the revenueGridAsJSON formula as follows:
+                    <p class="sideNote">Here we are making a copy of the revenueGrid value. We can edit this copy.</p>
+                    <div><textarea class="codeText" readonly rows="3">
+value = Hax.core.util.deepJSONCopy(revenueGrid);
+value[0].push("title for another column");
+                    </textarea></div>
+                    <div><img src="gridToJsonEditNoError.png"/></div>                      
+                </li>
+                <li>The result in the "Text" view shows the edited data.
+                    <div><img src="gridToJsonEditResult.png"/></div>                      
+                </li>
             </ol>
         </div>
     </body>
