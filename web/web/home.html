@@ -1,55 +1,57 @@
-<!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
--->
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
+        <title>Hax Home</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <style>
+        <link rel="stylesheet" href="/web/base.css">
+        <style>           
             .introP {
             }
             .compareTable {
-                border-color: lightgray;
-                margin: 20px;
-                outline: lightgray 4px solid
+                margin-left: 20px;
+                margin-left: 20px;
+                margin-top: 40px;
+                margin-bottom: 40px;
+                /*border-collapse: collapse;*/
+                border: #1f297d 1px solid;
             }
             .titleCell {
                 font-size: x-large;
                 font-weight: bold;
                 text-align: center;
                 padding: 10px;
-                outline: lightgray 1px solid
             }
             .strengthCell {
                 font-style: italic;
                 text-align: center;
                 padding: 10px;
-                outline: lightgray 1px solid
             }
             .imageCell {
                 text-align: center;
                 padding: 10px;
-                outline: lightgray 1px solid
             }
             .bulletCell {
                 padding: 5px;
-                outline: lightgray 1px solid
             }
         </style>
     </head>
     <body>
-        <img src="logo75.png">
+        <!-- header -->
+        <a class="headerLink" href="/web/home.html"><img class="headerLogo" src="/web/logo51.png"></a>
+        <a class="headerLink" href="/web/home.html">Home</a>
+        <a class="headerLink" href="/hax.html">Application</a>
+        <a class="headerLink" href="/web/tutorials/tutorials.html">Tutorials</a>
+        <a class="headerLink" href="/web/reference/reference.html">Reference</a>
+        <a class="headerLink" href="/web/downloads/downloads.html">Downloads</a>
+        <a class="headerLink" href="/web/about.html">About</a>
+        <hr class="headerBreak">
+        <!-- end header -->
         <p class="introP">
-            Hax is a <b>Programmatic Data Editor</b> inspired by the Spreadsheet.
+            Hax is a <b>programming tool</b> inspired by the Spreadsheet.
         </p>
         <p class="introP">
-            It can be used as a calculation tool like a spreadsheet or for the 
-            creation and manipulation of data.
-        </p>
-        <p class="introP">
-            Hax does not replace the spreadsheet, it is more of a <b>power user version</b> of the spreadsheet. See the comparison below:
+            Hax does not replace the spreadsheet, it is more of a <b>power user version of the spreadsheet</b> 
+            or a <b>quick and easy programming environment</b>. See the comparison below:
         </p>        
         <table class="compareTable">
             <tr>
@@ -62,10 +64,10 @@ and open the template in the editor.
             </tr>
             <tr>
                 <td class="strengthCell">
-                    <em>Best for working with simple models and doing data presentation.</em>
+                    <em>Best for: simple models, data entry, data presentation.</em>
                 </td>
                 <td class="strengthCell">
-                    <em>Best for working with complex models and doing data manipulation.</em>
+                    <em>Best for: complex models, data manipulation, JSON data.</em>
                 </td>
             </tr>
             <tr>
@@ -131,7 +133,7 @@ and open the template in the editor.
         </p>
         
         <h2>Implementation</h2>
-        <p>Hax runs completely in the browser and is written in javascript. The user scripting language
+        <p>The Hax web application runs completely in the browser and is written in javascript. The user scripting language
             is also javascript.
         </p>
         <p>Because Hax is uses javascript, the data format for data structures is JSON. This is a convenient
@@ -139,18 +141,13 @@ and open the template in the editor.
             in web services.    
         </p>
         
-        <p>ADD COMPATIBILITY!!! - browsers and javascript versions</p>
-        
-        <h2>Examples</h2>
-        (make links to example pages here)
-       
-        <br>
-        ALSO TO DO:<br>
-        - links at top of page, including to the actual App!<br>
-        - prettier header, standardized over example pages.<br>
-        - quick start?<br>
-        - documentation?<br>
-        
+        <h2>Compatibility</h2>
+        <ul>
+            <li>Desktop Chrome, Firefox browsers tested. Safari also supported.</li>
+            <li>Edge support coming soon</li>
+            <li>Internet Explorer not supported</li>
+            <li>Desktop support only. Touch not supported.</li>
+        </ul>
         
     </body>
 </html>
