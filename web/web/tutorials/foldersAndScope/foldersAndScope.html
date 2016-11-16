@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hax Tutorial - Folders and Scope</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="/web/base.css">
+        <link rel="stylesheet" href="/web/tutorials/tutorial.css">
+    </head>
+    <body>
+        <!-- header -->
+        <a class="headerLink" href="/web/home.html"><img class="headerLogo" src="/web/logo51.png"></a>
+        <a class="headerLink" href="/web/home.html">Home</a>
+        <a class="headerLink" href="/hax.html">Application</a>
+        <a class="headerLink" href="/web/tutorials/tutorials.html">Tutorials</a>
+        <a class="headerLink" href="/web/reference/reference.html">Reference</a>
+        <a class="headerLink" href="/web/downloads/downloads.html">Downloads</a>
+        <a class="headerLink" href="/web/about.html">About</a>
+        <hr class="headerBreak">
+        <!-- end header -->
+        <h2>Tutorial - Folders and Scope</h2>
+        <p>This tutorial introduces folders and discusses scope for accessing tables from formulas.</p> 
+        <p>Folders are a way of organizing the tables to clean up the workspace.</p>
+        <div>
+            <ol class="numericList">
+                <li>Start with a new project. Open a new window with the url <a href="http://haxapp.com/hax.html">http://haxapp.com/hax.html</a></li>
+                <li>Close the default workspace and create a new workspace called "FolderTest"</li>
+                <li>Create a data table called "a". Set the value to the string "in root folder".
+                    <div><img src="addTableA.png"/></div>
+                </li>
+                <li>Create a folder called "folder1". This is done by selecting the "Add Folder" when right clicking the main window.
+                    <div><img src="addFolder1.png"/></div>
+                </li>
+                <li>Create a data table called "b". Do this by right clicking inside the window for folder "folder1". The dialog
+                    box to create table "b" should show the folder as "FolderTest:folder1".                   
+                    <div><img src="addingTableB.png"/></div>
+                    <p class="sideNote">Notice the color of the border of the folder1 inner window. This should match
+                    the color of the outer border of table "b", and of all objects that it contains.</p>
+                    <div><img src="addTableB.png"/></div>
+                </li>
+                <li>Create a data table in the root folder called "test1". Set the formula as follows:
+                    <div><textarea class="codeText" readonly rows="5">
+value = {};
+value.a = a; //access table a in same folder
+value.b = b; //b does not exist! undefined
+value.f1b = folder1.b; //access table b in folder 1
+                          </textarea>
+                    </div>
+                    <div><img src="addTest1.png"/></div>
+                    <p class="sideNote">The results are below. Note that the value "b" without the prefix "folder1"
+                        is not shown. This value of b from that folder is undefined.</p>
+                    <div><img src="test1Result.png"/></div>
+                </li>
+                <li>Create a data table in the folder1 called "test2" with the following formula. This is the same
+                    formula as table "test1", but the comments are different.
+                    <div><textarea class="codeText" readonly rows="5">
+value = {};
+value.a = a; //access table a in same folder
+value.b = b; //this works here
+value.f1b = folder1.b; //this works too
+                          </textarea>
+                    </div>
+                    <div><img src="addTest2.png"/></div>
+                    <p class="sideNote">The results are below. We see we can access table "b" either with the
+                        local name or with the complete path to it.</p>
+                    <div><img src="test2Result.png"/></div>
+                </li>
+                <li>Now add a table called "a" to "folder1". Set the value to "also in folder 1".
+                    <p class="sideNote">The result in table "test2" changed. It takes the value of 
+                    local table "a" with precedence over the table that has the full path "a", relative to the root folder.</p>
+                    <div><img src="addTableA2.png"/></div>
+                </li>
+                <li>Now add a table called "c" to the root folder with the formula:
+                    <div><textarea class="codeText" readonly rows="2">
+value = folder1;
+                    </textarea></div>
+                    <p class="sideNote">We are setting table "c" to the value of the folder "folder1".</p>
+                    <div><img src="addTableC.png"/></div>
+                    <p class="sideNote">A folder also has data associated with it. It is a map of the tables it contains.</p>
+                    <div><img src="tableCResult.png"/></div>
+                </li>
+            </ol>
+        </div>
+    </body>
+</html>

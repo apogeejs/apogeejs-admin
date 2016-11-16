@@ -1,51 +1,34 @@
-<!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
--->
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
+        <title>Hax Quickstart Part 2</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <style>
-            body {
-                font-family: sans-serif;
-            }
-            ol {
-                list-style-position: inside;
-            }
-            ol.numericList {
-                list-style-type: decimal;
-            }
-            ol.upperAlphaList {
-                list-style-type: upper-alpha;
-            }
-            ol.lowerAlphaList {
-                list-style-type: lower-alpha;
-            }
-            ol.upperRomanList {
-                list-style-type: upper-roman;
-            }
-            ol.lowerRomanList {
-                list-style-type: lower-roman;
-            }
-            li {
-                margin: 10px;
-            }
-            textarea.codeText {
-                outline: black 1px solid;
-                font-family: monospace;
-                width: 600px;
-                margin: 10px;
-            }
-            .sideNote {
-                font-style: italic;
-            }
-        </style>
+        <link rel="stylesheet" href="/web/base.css">
+        <link rel="stylesheet" href="/web/tutorials/tutorial.css">
     </head>
     <body>
+        <!-- header -->
+        <a class="headerLink" href="/web/home.html"><img class="headerLogo" src="/web/logo51.png"></a>
+        <a class="headerLink" href="/web/home.html">Home</a>
+        <a class="headerLink" href="/hax.html">Application</a>
+        <a class="headerLink" href="/web/tutorials/tutorials.html">Tutorials</a>
+        <a class="headerLink" href="/web/reference/reference.html">Reference</a>
+        <a class="headerLink" href="/web/downloads/downloads.html">Downloads</a>
+        <a class="headerLink" href="/web/about.html">About</a>
+        <hr class="headerBreak">
+        <!-- end header -->
+        <h2>Quickstart Part 2</h2>
+        <p>This is a continuation of the Quickstart. It adds some more detail about data tables and introduces the grid table.</p> 
         <div>
             <ol class="numericList">
+                <li>We start with the project you just finished in the Quickstart part 1. Alternatively you can
+                    close you workspace and open the following one. To do this, select "Open" from the "Workspace" 
+                    menu and paste in the following data:
+                    <div><textarea class="codeText" readonly rows="6">
+{"name":"workspace","fileType":"hax workspace","jsLinks":[],"cssLinks":[],"workspace":{"name":"workspace","fileType":"hax workspace","version":0.1,"data":{"name":"workspace","type":"hax.core.Folder","children":{"settings":{"name":"settings","type":"hax.core.JsonTable","updateData":{"data":{"initialYear":2015,"initialRevenue":1000000,"growthRate":3,"projectionCount":10}}},"revenueList":{"name":"revenueList","type":"hax.core.JsonTable","updateData":{"argList":[],"functionBody":"var value;\nvalue = [];\r\nvalue[0] = settings.initialRevenue;\r\nfor(var i = 1; i < settings.projectionCount; i++) {\r\n    value[i] = value[i-1] * (1 + settings.growthRate/100);\r\n}\r\n       \nreturn value;\n\n","supplementalCode":""}}}}},"components":{"settings":{"key":"workspace:settings","type":"hax.app.visiui.JsonTableComponent","coordInfo":{"x":15,"y":19},"windowState":0},"revenueList":{"key":"workspace:revenueList","type":"hax.app.visiui.JsonTableComponent","coordInfo":{"x":386,"y":72},"windowState":0}}}
+                          </textarea>
+                    </div>            
+                </li>
                 <li>Go to the "Formula" for the table "revenueList" and update the code as follows:
                     <div><textarea class="codeText" readonly rows="6">
 value = [];
