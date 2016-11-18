@@ -239,7 +239,6 @@ hax.app.visiui.Component.getContentElement = function() {
 /** This serializes the component. */
 hax.app.visiui.Component.toJson = function() {
     var json = {};
-    json.key = this.getObject().getFullName();
     json.type = this.generator.uniqueName;
     
     json.coordInfo = this.window.getCoordinateInfo();
