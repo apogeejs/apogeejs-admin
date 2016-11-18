@@ -142,21 +142,6 @@ hax.core.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     }
     
     this.name = json.name;
-	
-	//load context links
-	if(json.contextManager) {
-		//for now just include this one. Later we need to have some options
-		//for saving and opening
-		//THIS IS ONLY FOR THE WORKSHEET IMPLEMENTATION FOR NOW!
-		this.setContextManager(json.contextManager);
-	}
-	
-	//recreate the root folder and its children
-    //this.rootFolder = hax.core.createmember.createMember(this,json.data,actionResponse);
-    //DOH! This currently doesn't because create member assumes the root folder is set. 
-    //maybe we should update so setting the owner on the root folder sets the root folder,
-    //such as if the alternative to a parent is a "rootholder" or something like that.
-    //for now I will jsut copy everything in create member
     
     if(!actionResponse) actionResponse = new hax.core.ActionResponse();
 
