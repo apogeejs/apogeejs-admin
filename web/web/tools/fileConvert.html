@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hax File Version Converter</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="/web/base.css">
+        <style>
+            textarea.workspaceText {
+                outline: black 1px solid;
+                font-family: monospace;
+                width: 600px;
+                margin: 10px;
+            }
+        </style>
+        <script>
+            function convertFile() {
+                var inputTextArea = document.getElementById("inputText");
+                var inputString = inputTextArea.value;
+                
+                var temp = inputString.replace(/hax.core/g,"hax");
+                temp = temp.replace(/hax.app.visiui/g,"haxapp.app");
+                temp = temp.replace(/hax.visiui/g,"haxapp.ui");
+                var outputString = temp.replace(/"version":0.1/g,'"version":0.2');
+                
+                var outputTextArea = document.getElementById("outputText");
+                outputTextArea.value = outputString;
+            }
+        </script>
+    </head>
+    <body>
+        <!-- header -->
+        <a class="headerLink" href="/web/home.html"><img class="headerLogo" src="/web/logo51.png"></a>
+        <a class="headerLink" href="/web/home.html">Home</a>
+        <a class="headerLink" href="/hax.html">Application</a>
+        <a class="headerLink" href="/web/tutorials/tutorials.html">Tutorials</a>
+        <a class="headerLink" href="/web/reference/reference.html">Reference</a>
+        <a class="headerLink" href="/web/downloads/downloads.html">Downloads</a>
+        <a class="headerLink" href="/web/tools/fileConvert.html">Tools</a>
+        <a class="headerLink" href="/web/about.html">About</a>
+        <hr class="headerBreak">
+        <!-- end header -->
+        <h1>Workspace File Version Converter</h1>
+        <p>This page will convert the file format for a Hax workspace file.</p> 
+        <div>
+            <h2>Input file: Workspace Format Version 0.1</h2>
+            <textarea class="workspaceText" id="inputText" rows="15"></textarea>
+            <br>
+            <input type="Submit" onclick="convertFile()">
+            <h2>Output file: Workspace Format Version 0.2</h2>
+            <textarea class="workspaceText" id="outputText" rows="15"></textarea>
+        </div>
+    </body>
+</html>
