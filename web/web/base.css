@@ -1,0 +1,25 @@
+body {
+    font-family: sans-serif;
+    color: #1f297d;
+}
+.headerLogo {
+    padding-right: 100px;
+}
+.headerLink {
+    dislay: inline;
+    text-decoration: none;
+    font-size: large;
+    font-weight: bold;
+    padding-right: 20px;
+    color: #1f297d;
+}
+.headerLink:hover {
+    color: #3f4fcf;
+}
+.headerBreak {
+    border-width: 2px;
+    border-color: #1f297d;
+    border-style: solid;
+    color: #1f297d;
+}
+
