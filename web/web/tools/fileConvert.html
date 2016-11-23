@@ -13,7 +13,7 @@
             }
         </style>
         <script>
-            function convertFile() {
+            function convertTo_0p2_File() {
                 var inputTextArea = document.getElementById("inputText");
                 var inputString = inputTextArea.value;
                 
@@ -40,14 +40,18 @@
         <hr class="headerBreak">
         <!-- end header -->
         <h1>Workspace File Version Converter</h1>
-        <p>This page will convert the file format for a Hax workspace file.</p> 
+        <p>This page will convert the file format for a Hax workspace file. Scroll down to the
+        appropriate version and enter the workspace text. The submit button for that entry will
+        convert to the next file version. Repeat until you reach the desired file version.</p> 
         <div>
-            <h2>Input file: Workspace Format Version 0.1</h2>
-            <textarea class="workspaceText" id="inputText" rows="15"></textarea>
-            <br>
-            <input type="Submit" onclick="convertFile()">
-            <h2>Output file: Workspace Format Version 0.2</h2>
+            
+            <h2>Workspace Format Version 0.2</h2>
+            <p>Used in Hax version 0.3.0 and above (current)</p>
             <textarea class="workspaceText" id="outputText" rows="15"></textarea>
+            <h2>Workspace Format Version 0.1</h2>
+            <p>Used in Hax version 0.0.1 to 0.2.0</p>
+            <input type="Submit" value="Convert 0.1 to 0.2" onclick="convertTo_0p2_File()"><br>
+            <textarea class="workspaceText" id="inputText" rows="15"></textarea>
         </div>
     </body>
 </html>

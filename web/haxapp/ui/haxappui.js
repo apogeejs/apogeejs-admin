@@ -44,8 +44,16 @@ haxapp.ui.applyStyle = function(element,style) {
 }
 
 //=========================================
-// screate dom methods
+// dom methods
 //=========================================
+
+
+/** This method removes all the content from a DOM element. */
+haxapp.ui.removeAllChildren = function(element) {
+	while(element.lastChild) {
+		element.removeChild(element.lastChild);
+	}
+}
 
 /** This method applies the style json to the dom element. All arguments
  * besides type are optional.
@@ -105,7 +113,7 @@ haxapp.ui.initWindows = function(appElementId) {
     //create the ui elements from the app element
     var appContainer = document.getElementById(appElementId);
     if(!appContainer) {
-        throw hax.util.createError("Container ID not found: " + appElementId);
+        throw hax.base.createError("Container ID not found: " + appElementId);
     }
     
     var elements = {};

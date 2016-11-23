@@ -25,12 +25,12 @@ hax.FolderFunction = function(name,owner,initialData,createEmptyInternalFolder) 
 }
 
 //add components to this class
-hax.util.mixin(hax.FolderFunction,hax.Child);
-hax.util.mixin(hax.FolderFunction,hax.DataHolder);
-hax.util.mixin(hax.FolderFunction,hax.Dependent);
-hax.util.mixin(hax.FolderFunction,hax.ContextHolder);
-hax.util.mixin(hax.FolderFunction,hax.Owner);
-hax.util.mixin(hax.FolderFunction,hax.RootHolder);
+hax.base.mixin(hax.FolderFunction,hax.Child);
+hax.base.mixin(hax.FolderFunction,hax.DataHolder);
+hax.base.mixin(hax.FolderFunction,hax.Dependent);
+hax.base.mixin(hax.FolderFunction,hax.ContextHolder);
+hax.base.mixin(hax.FolderFunction,hax.Owner);
+hax.base.mixin(hax.FolderFunction,hax.RootHolder);
 
 /** This gets the internal forlder for the folderFunction. */
 hax.FolderFunction.prototype.getInternalFolder = function() {
@@ -263,7 +263,7 @@ hax.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunction
         }
         else {
             //error exectuing folderFunction function - thro wan exception
-            throw hax.util.createError(actionResponse.getErrorMsg());
+            throw hax.base.createError(actionResponse.getErrorMsg());
         }
     }
     

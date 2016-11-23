@@ -18,10 +18,10 @@ hax.Control = function(name,owner,initialData) {
 }
 
 //add components to this class
-hax.util.mixin(hax.Control,hax.Child);
-hax.util.mixin(hax.Control,hax.Dependent);
-hax.util.mixin(hax.Control,hax.ContextHolder);
-hax.util.mixin(hax.Control,hax.Codeable);
+hax.base.mixin(hax.Control,hax.Child);
+hax.base.mixin(hax.Control,hax.Dependent);
+hax.base.mixin(hax.Control,hax.ContextHolder);
+hax.base.mixin(hax.Control,hax.Codeable);
 	
 hax.Control.prototype.getResource = function() {	
     return this.resource;

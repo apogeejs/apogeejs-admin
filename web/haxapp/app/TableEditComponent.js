@@ -191,7 +191,7 @@ haxapp.app.TableEditComponent.initUI = function() {
 haxapp.app.TableEditComponent.showModeElement = function(viewModeElement) {
     
 	var contentDiv = this.getContentElement();
-	hax.util.removeAllChildren(contentDiv);
+	haxapp.ui.removeAllChildren(contentDiv);
 	
     if(viewModeElement) {
 		var viewDiv = viewModeElement.getElement();

@@ -37,7 +37,7 @@ haxapp.app.Hax = function(containerId) {
 }
 	
 //add components to this class
-hax.util.mixin(haxapp.app.Hax,hax.EventManager);
+hax.base.mixin(haxapp.app.Hax,hax.EventManager);
 
 haxapp.app.Hax.DEFAULT_WORKSPACE_NAME = "workspace";
 
@@ -86,7 +86,7 @@ haxapp.app.Hax.prototype.addWorkspaceUI = function(workspaceUI,name) {
     
     //we can only have one workspace of a given name!
     if(this.workspaceUIs[name]) {
-        throw hax.util.createError("There is already an open workspace with the name " + name,false);
+        throw hax.base.createError("There is already an open workspace with the name " + name,false);
     }
     
 	var tab = this.tabFrame.addTab(name);

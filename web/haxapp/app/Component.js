@@ -18,7 +18,7 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     
     this.parentContainer = this.workspaceUI.getParentContainerObject(object);
     if(!this.parentContainer) {
-        throw hax.util.createError("Parent object not found: " + object.getFullName());
+        throw hax.base.createError("Parent object not found: " + object.getFullName());
     }
     
     this.workspaceUI.registerMember(this.object,this);

@@ -11,8 +11,8 @@ haxapp.app.JsonTableComponent = function(workspaceUI,table,componentJson) {
 };
 
 //add components to this class
-hax.util.mixin(haxapp.app.JsonTableComponent,haxapp.app.Component);
-hax.util.mixin(haxapp.app.JsonTableComponent,haxapp.app.TableEditComponent);
+hax.base.mixin(haxapp.app.JsonTableComponent,haxapp.app.Component);
+hax.base.mixin(haxapp.app.JsonTableComponent,haxapp.app.TableEditComponent);
 
 //==============================
 // Protected and Private Instance Methods

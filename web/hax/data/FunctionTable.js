@@ -17,11 +17,11 @@ hax.FunctionTable = function(name,owner,initialData) {
 }
 
 //add components to this class
-hax.util.mixin(hax.FunctionTable,hax.Child);
-hax.util.mixin(hax.FunctionTable,hax.DataHolder);
-hax.util.mixin(hax.FunctionTable,hax.Dependent);
-hax.util.mixin(hax.FunctionTable,hax.ContextHolder);
-hax.util.mixin(hax.FunctionTable,hax.Codeable);
+hax.base.mixin(hax.FunctionTable,hax.Child);
+hax.base.mixin(hax.FunctionTable,hax.DataHolder);
+hax.base.mixin(hax.FunctionTable,hax.Dependent);
+hax.base.mixin(hax.FunctionTable,hax.ContextHolder);
+hax.base.mixin(hax.FunctionTable,hax.Codeable);
 
 //------------------------------
 // Codeable Methods

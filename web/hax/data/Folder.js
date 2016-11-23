@@ -20,12 +20,12 @@ hax.Folder = function(name,owner) {
 }
 
 //add components to this class
-hax.util.mixin(hax.Folder,hax.Child);
-hax.util.mixin(hax.Folder,hax.DataHolder);
-hax.util.mixin(hax.Folder,hax.Dependent);                      
-hax.util.mixin(hax.Folder,hax.ContextHolder);
-hax.util.mixin(hax.Folder,hax.Owner);
-hax.util.mixin(hax.Folder,hax.Parent);
+hax.base.mixin(hax.Folder,hax.Child);
+hax.base.mixin(hax.Folder,hax.DataHolder);
+hax.base.mixin(hax.Folder,hax.Dependent);                      
+hax.base.mixin(hax.Folder,hax.ContextHolder);
+hax.base.mixin(hax.Folder,hax.Owner);
+hax.base.mixin(hax.Folder,hax.Parent);
 
 //------------------------------
 // Parent Methods
@@ -50,7 +50,7 @@ hax.Folder.prototype.addChild = function(child) {
     var name = child.getName();
     if(this.childMap[name]) {
         //already exists! not fatal since it is not added to the model yet,
-        throw hax.util.createError("There is already an object with the given name.",false);
+        throw hax.base.createError("There is already an object with the given name.",false);
     }
     //add object
     this.childMap[name] = child;

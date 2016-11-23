@@ -103,7 +103,7 @@ haxapp.app.WorkspaceUI.prototype.getParentContainerObject = function(object) {
     var parentKey = haxapp.app.WorkspaceUI.getObjectKey(parent);
     var parentComponentInfo = this.componentMap[parentKey];
     if(!parentComponentInfo.parentContainer) {
-        throw hax.util.createError("Parent container not found!");
+        throw hax.base.createError("Parent container not found!");
     }
     return parentComponentInfo.parentContainer;
 }
@@ -115,7 +115,7 @@ haxapp.app.WorkspaceUI.prototype.registerMember = function(object,component) {
     
     //make sure this is for us
     if(object.getWorkspace() !== this.workspace) {
-        throw hax.util.createError("Component registered in wrong workspace: " + object.getFullName());
+        throw hax.base.createError("Component registered in wrong workspace: " + object.getFullName());
     }
     
     //store the ui object
@@ -123,7 +123,7 @@ haxapp.app.WorkspaceUI.prototype.registerMember = function(object,component) {
 	
 	if(this.componentMap[key]) {
 		//already exists! (we need to catch this earlier if we want it to not be fatal. But we should catch it here too.)
-        throw hax.util.createError("There is already a component with the given name.",true);
+        throw hax.base.createError("There is already a component with the given name.",true);
 	}
 	
     var componentInfo = {};
@@ -275,7 +275,7 @@ haxapp.app.WorkspaceUI.prototype.loadComponentFromJson = function(member,json) {
         generator.createComponentFromJson(this,member,json);
     }
     else {
-        throw hax.util.createError("Component type not found: " + componentType);
+        throw hax.base.createError("Component type not found: " + componentType);
     }
 }
 

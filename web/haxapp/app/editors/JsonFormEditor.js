@@ -43,7 +43,7 @@ haxapp.app.JsonFormEditor.prototype.showData = function(data,editOk) {
     this.workingData = hax.util.deepJsonCopy(data);
     this.editOk = editOk;
     
-	hax.util.removeAllChildren(this.editorDiv);
+	haxapp.ui.removeAllChildren(this.editorDiv);
 	this.editor = new haxapp.jsonedit.JsonEditArea(this.editorDiv,data,editOk);
     
     this.editor.setEditCallback(this.editCallback);

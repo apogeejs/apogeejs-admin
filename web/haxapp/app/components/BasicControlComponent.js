@@ -25,8 +25,8 @@ haxapp.app.BasicControlComponent = function(workspaceUI,control,generator,compon
 };
 
 //add components to this class
-hax.util.mixin(haxapp.app.BasicControlComponent,haxapp.app.Component);
-hax.util.mixin(haxapp.app.BasicControlComponent,haxapp.app.TableEditComponent);
+hax.base.mixin(haxapp.app.BasicControlComponent,haxapp.app.Component);
+hax.base.mixin(haxapp.app.BasicControlComponent,haxapp.app.TableEditComponent);
 
 //==============================
 // Protected and Private Instance Methods

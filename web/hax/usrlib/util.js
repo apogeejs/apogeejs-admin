@@ -1,26 +1,6 @@
+/** This namespace includes some utility function available to the user. They 
+ * are also used in the applictaion. */
 hax.util = {};
-
-/** This method creates an error object, which has a "message" in the format
- *of a system error. The isFatal flag can be set to specify if this is a fatal or nonfatal
- *error. It may also be omitted. A base error may also be set. */
-hax.util.createError = function(msg,optionalIsFatal,optionalBaseError) {
-    var error = new Error(msg);
-	if(optionalIsFatal !== undefined) {
-		error.isFatal = optionalIsFatal;
-	}
-	if(optionalBaseError !== undefined) {
-		error.baseError = optionalBaseError;
-	}
-    return error;
-}
-
-
-/** This method creates an integer has value for a string. */
-hax.util.mixin = function(destObject,mixinObject) {
-    for(var key in mixinObject) {
-        destObject.prototype[key] = mixinObject[key];
-    }
-}
 
 /** This method creates an integer has value for a string. */
 hax.util.stringHash = function(string) {
@@ -71,28 +51,6 @@ hax.util.deepJsonCopy = function(data) {
     return JSON.parse(JSON.stringify(data));
 }
 
-/** This method takes a field which can be an object, 
- *array or other value. If it is an object or array it 
- *freezes that object and all of its children, recursively. */
-hax.util.deepFreeze = function(field) {
-    if((field === null)||(field === undefined)) return;
-    
-    var type = hax.util.getObjectType(field);
-	var i;
-	if(type == "Object") {
-		Object.freeze(field);
-		for(i in field) {
-			hax.util.deepFreeze(field[i]);
-		}
-	}
-	else if(type == "Array") {
-		Object.freeze(field);
-		for(i = 0; i < field.length; i++) {
-			hax.util.deepFreeze(field[i]);
-		}
-	}
-}
-
 /** This method does format string functionality. Text should include
  * {i} to insert the ith string argument passed. */
 hax.util.formatString = function(format,stringArgs) {
@@ -102,25 +60,6 @@ hax.util.formatString = function(format,stringArgs) {
         return formatParams[index]; 
     });
 };
-
-/** This method removes all the content from a DOM element. */
-hax.util.removeAllChildren = function(element) {
-	while(element.lastChild) {
-		element.removeChild(element.lastChild);
-	}
-}
-
-/** This creates a new array with elements from the first that are not in the second. */
-hax.util.getListInFirstButNotSecond = function(firstList,secondList) {
-    var newList = [];
-    for(var i = 0; i < firstList.length; i++) {
-        var entry = firstList[i];
-        if(secondList.indexOf(entry) < 0) {
-            newList.push(entry);
-        }
-    }
-    return newList;
-}
 
 /** This method reads the query string from a url */
 hax.util.readQueryField = function(field,url) {

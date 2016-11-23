@@ -108,7 +108,7 @@ haxapp.ui.WindowFrame = function(parentContainer, options) {
 }
 
 //add components to this class
-hax.util.mixin(haxapp.ui.WindowFrame,hax.EventManager);
+hax.base.mixin(haxapp.ui.WindowFrame,hax.EventManager);
 
 haxapp.ui.WindowFrame.MINIMIZED = -1;
 haxapp.ui.WindowFrame.NORMAL = 0;
@@ -221,7 +221,7 @@ haxapp.ui.WindowFrame.prototype.getMenu = function() {
  * as a div.
  */
 haxapp.ui.WindowFrame.prototype.loadHeaders = function(headerElements) {
-    hax.util.removeAllChildren(this.headerElement);
+    haxapp.ui.removeAllChildren(this.headerElement);
     if(headerElements.length > 0) {
         for(var i = 0; i < headerElements.length; i++) {
 			this.headerElement.appendChild(headerElements[i]);

@@ -28,8 +28,8 @@ haxapp.app.CustomControlComponent = function(workspaceUI,control,componentJson) 
 };
 
 //add components to this class
-hax.util.mixin(haxapp.app.CustomControlComponent,haxapp.app.Component);
-hax.util.mixin(haxapp.app.CustomControlComponent,haxapp.app.TableEditComponent);
+hax.base.mixin(haxapp.app.CustomControlComponent,haxapp.app.Component);
+hax.base.mixin(haxapp.app.CustomControlComponent,haxapp.app.TableEditComponent);
 
 //==============================
 //Resource Accessors

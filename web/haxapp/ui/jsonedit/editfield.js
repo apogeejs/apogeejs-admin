@@ -128,7 +128,7 @@ haxapp.jsonedit.EditField.prototype.startEdit = function() {
 			this.editField.value = this.value;
 		}
 		
-		hax.util.removeAllChildren(this.element);
+		haxapp.ui.removeAllChildren(this.element);
         this.element.appendChild(this.editField);
         
         //select the entry

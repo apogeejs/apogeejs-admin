@@ -50,8 +50,8 @@ haxapp.ui.TabFrame = function(parentDiv,options) {
 }
 
 //add components to this class
-hax.util.mixin(haxapp.ui.TabFrame,hax.EventManager);
-hax.util.mixin(haxapp.ui.TabFrame,haxapp.ui.ParentContainer);
+hax.base.mixin(haxapp.ui.TabFrame,hax.EventManager);
+hax.base.mixin(haxapp.ui.TabFrame,haxapp.ui.ParentContainer);
 
 //events
 haxapp.ui.TabFrame.TAB_SHOWN = "tabShown";

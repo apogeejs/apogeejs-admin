@@ -96,7 +96,7 @@ haxapp.jsonedit.JsonEditArea.prototype.loadContextMenu = function() {
 
 haxapp.jsonedit.JsonEditArea.prototype.updateValueElements = function() {
     //remove all from element
-	hax.util.removeAllChildren(this.body);
+	haxapp.ui.removeAllChildren(this.body);
     //recreate
     this.formatBody();
 }

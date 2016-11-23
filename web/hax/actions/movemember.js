@@ -39,7 +39,7 @@ hax.movemember.moveMember = function(member,name,folder,recalculateList) {
 
     workspace.updateDependeciesForModelChange(recalculateList);
     
-    var updatedButNotMoved = hax.util.getListInFirstButNotSecond(recalculateList,movedMemberList);
+    var updatedButNotMoved = hax.base.getListInFirstButNotSecond(recalculateList,movedMemberList);
 
     //dispatch events
     hax.movemember.fireMovedEventList(movedMemberList,movedOldNameList,movedNewNameList);

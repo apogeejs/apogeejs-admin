@@ -13,8 +13,8 @@ haxapp.ui.SimpleParentContainer = function(div,initialIsShowing) {
 }
 
 //add components to this class
-hax.util.mixin(haxapp.ui.SimpleParentContainer,hax.EventManager);
-hax.util.mixin(haxapp.ui.SimpleParentContainer,haxapp.ui.ParentContainer);
+hax.base.mixin(haxapp.ui.SimpleParentContainer,hax.EventManager);
+hax.base.mixin(haxapp.ui.SimpleParentContainer,haxapp.ui.ParentContainer);
 
 /** This method must be implemented in inheriting objects. */
 haxapp.ui.SimpleParentContainer.prototype.getContentIsShowing = function() {

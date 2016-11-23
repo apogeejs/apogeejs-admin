@@ -19,11 +19,11 @@ hax.JsonTable = function(name,owner,initialData) {
 }
 
 //add components to this class
-hax.util.mixin(hax.JsonTable,hax.Child);
-hax.util.mixin(hax.JsonTable,hax.DataHolder);
-hax.util.mixin(hax.JsonTable,hax.Dependent);
-hax.util.mixin(hax.JsonTable,hax.ContextHolder);
-hax.util.mixin(hax.JsonTable,hax.Codeable);
+hax.base.mixin(hax.JsonTable,hax.Child);
+hax.base.mixin(hax.JsonTable,hax.DataHolder);
+hax.base.mixin(hax.JsonTable,hax.Dependent);
+hax.base.mixin(hax.JsonTable,hax.ContextHolder);
+hax.base.mixin(hax.JsonTable,hax.Codeable);
 
 //------------------------------
 // DataHolder Methods
@@ -35,7 +35,7 @@ hax.util.mixin(hax.JsonTable,hax.Codeable);
 hax.JsonTable.prototype.setData = function(data) {
     
 	//make this object immutable
-	hax.util.deepFreeze(data);
+	hax.base.deepFreeze(data);
 
 	//store the new object
     return hax.DataHolder.setData.call(this,data);

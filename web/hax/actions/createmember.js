@@ -41,7 +41,7 @@ hax.createmember.createMember = function(owner,json,optionalActionResponse) {
 
         hax.calculation.callRecalculateList(recalculateList,actionResponse);
         
-        var updatedButNotCreated = hax.util.getListInFirstButNotSecond(recalculateList,creationList);
+        var updatedButNotCreated = hax.base.getListInFirstButNotSecond(recalculateList,creationList);
 
         //dispatch events
         hax.createmember.fireCreatedEventList(creationList);

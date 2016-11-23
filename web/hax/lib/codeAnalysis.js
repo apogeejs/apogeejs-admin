@@ -482,7 +482,7 @@ hax.codeAnalysis.markLocalVariables = function(processInfo) {
  * }
  * @private */
 hax.codeAnalysis.createParsingError = function(errorMsg,location) {
-    var error = hax.util.createError(errorMsg,false);
+    var error = hax.base.createError(errorMsg,false);
     if(location) {
         error.lineNumber = location.start.line;
         error.column = location.start.column;

@@ -10,9 +10,9 @@ haxapp.app.FolderComponent = function(workspaceUI,folder,componentJson) {
 };
 
 //add components to this class
-hax.util.mixin(haxapp.app.FolderComponent,haxapp.app.Component);
-hax.util.mixin(haxapp.app.FolderComponent,haxapp.ui.ParentContainer);
-hax.util.mixin(haxapp.app.FolderComponent,haxapp.ui.ParentHighlighter);
+hax.base.mixin(haxapp.app.FolderComponent,haxapp.app.Component);
+hax.base.mixin(haxapp.app.FolderComponent,haxapp.ui.ParentContainer);
+hax.base.mixin(haxapp.app.FolderComponent,haxapp.ui.ParentHighlighter);
 
 //----------------------
 // ParentContainer Methods

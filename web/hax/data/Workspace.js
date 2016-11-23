@@ -21,10 +21,10 @@ hax.Workspace = function(nameOrJson,actionResponseForJson,owner) {
 }
 
 //add components to this class
-hax.util.mixin(hax.Workspace,hax.EventManager);
-hax.util.mixin(hax.Workspace,hax.ContextHolder);
-hax.util.mixin(hax.Workspace,hax.Owner);
-hax.util.mixin(hax.Workspace,hax.RootHolder);
+hax.base.mixin(hax.Workspace,hax.EventManager);
+hax.base.mixin(hax.Workspace,hax.ContextHolder);
+hax.base.mixin(hax.Workspace,hax.Owner);
+hax.base.mixin(hax.Workspace,hax.RootHolder);
 
 /** this method gets the workspace name. */
 hax.Workspace.prototype.getName = function() {
@@ -135,10 +135,10 @@ hax.Workspace.prototype.toJson = function() {
 hax.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     var fileType = json.fileType;
 	if(fileType !== hax.Workspace.SAVE_FILE_TYPE) {
-		throw hax.util.createError("Bad file format.",false);
+		throw hax.base.createError("Bad file format.",false);
 	}
     if(json.version !== hax.Workspace.SAVE_FILE_VERSION) {
-        throw hax.util.createError("Incorrect file version. CHECK HAXAPP.COM FOR VERSION CONVERTER.",false);
+        throw hax.base.createError("Incorrect file version. CHECK HAXAPP.COM FOR VERSION CONVERTER.",false);
     }
     
     this.name = json.name;

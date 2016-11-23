@@ -35,9 +35,9 @@ haxapp.ui.Tab = function(name, tabFrame) {
 }
 
 //add components to this class
-hax.util.mixin(haxapp.ui.Tab,hax.EventManager);
-hax.util.mixin(haxapp.ui.Tab,haxapp.ui.ParentContainer);
-hax.util.mixin(haxapp.ui.Tab,haxapp.ui.ParentHighlighter);
+hax.base.mixin(haxapp.ui.Tab,hax.EventManager);
+hax.base.mixin(haxapp.ui.Tab,haxapp.ui.ParentContainer);
+hax.base.mixin(haxapp.ui.Tab,haxapp.ui.ParentHighlighter);
 
 haxapp.ui.Tab.TAB_WINDOW_STYLE = {
     "top":"0px",

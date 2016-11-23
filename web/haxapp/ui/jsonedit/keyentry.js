@@ -62,7 +62,7 @@ haxapp.jsonedit.KeyEntry.prototype.setIsVirtual = function(isVirtual) {
 
 haxapp.jsonedit.KeyEntry.prototype.updateValueElements = function() {
     //remove all from element
-	hax.util.removeAllChildren(this.body);
+	haxapp.ui.removeAllChildren(this.body);
     //recreate
     this.formatBody();
 }
@@ -233,7 +233,7 @@ haxapp.jsonedit.KeyEntry.prototype.convertToKeyType = function(key) {
     this.createKeyElement();
     
     //remove and reset all from element
-	hax.util.removeAllChildren(this.body);
+	haxapp.ui.removeAllChildren(this.body);
     this.formatBody();
 }
 
@@ -247,7 +247,7 @@ haxapp.jsonedit.KeyEntry.prototype.convertToIndexType = function(index) {
     this.createKeyElement();
     
     //remove and reset all from element
-    hax.util.removeAllChildren(this.body);
+    haxapp.ui.removeAllChildren(this.body);
     this.formatBody();
 }
 
