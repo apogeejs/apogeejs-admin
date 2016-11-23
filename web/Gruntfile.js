@@ -3,304 +3,184 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
-      options: {
-        separator: ';\n'
-      },
-      dist_web: {
-        src: [
-            "customize/webHeader.js",
-			"hax.js",
-			"core/core.js",
-			"core/lib/EventManager.js",
-			"core/lib/ContextManager.js",
-			"core/lib/codeCompiler.js",
-			"core/lib/codeAnalysis.js",
-			"core/lib/codeDependencies.js",
-			"core/lib/workspaceCalculation.js",
-			"core/lib/util.js",
-			"core/datacomponents/Child.js",
-			"core/datacomponents/ContextHolder.js",
-			"core/datacomponents/DataHolder.js",
-			"core/datacomponents/Dependent.js",
-			"core/datacomponents/Codeable.js",
-			"core/datacomponents/Owner.js",
-			"core/datacomponents/Parent.js",
-			"core/datacomponents/RootHolder.js",
-			"core/data/Workspace.js",
-			"core/data/JsonTable.js",
-			"core/data/FunctionTable.js",
-			"core/data/Control.js",
-			"core/data/Folder.js",
-			"core/data/FolderFunction.js",
-			"core/actions/ActionResponse.js",
-			"core/actions/ActionError.js",
-			"core/actions/createmember.js",
-			"core/actions/updatemember.js",
-			"core/actions/updatefolderfunction.js",
-			"core/actions/movemember.js",
-			"core/actions/deletemember.js",
-			"ui/visiui/visiui.js",
-			"ui/visiui/ParentContainer.js",
-			"ui/visiui/ParentHighlighter.js",
-			"ui/visiui/WindowFrame.js",
-			"ui/visiui/SimpleParentContainer.js",
-			"ui/visiui/TabFrame.js",
-			"ui/visiui/Tab.js",
-			"ui/visiui/menu/Menu.js",
-			"ui/visiui/menu/StaticMenu.js",
-			"ui/visiui/menu/MenuBody.js",
-			"ui/visiui/jsonedit/jsonedit.js",
-			"ui/visiui/jsonedit/keyentry.js",
-			"ui/visiui/jsonedit/valueentry.js",
-			"ui/visiui/jsonedit/editfield.js",
-			"ui/visiui/jsonedit/jsoneditarea.js",
-			"ui/visiui/resize/resize.js",
-			"app/visiui/Hax.js",
-			"app/visiui/LinkManager.js",
-			"app/visiui/Component.js",
-			"app/visiui/TableEditComponent.js",
-			"app/visiui/WorkspaceUI.js",
-			"app/visiui/components/FolderComponent.js",
-			"app/visiui/components/JsonTableComponent.js",
-			"app/visiui/components/GridTableComponent.js",
-			"app/visiui/components/FunctionComponent.js",
-			"app/visiui/components/FolderFunctionComponent.js",
-			"app/visiui/components/BasicControlComponent.js",
-			"app/visiui/components/CustomControlComponent.js",
-			"app/visiui/components/CustomResource.js",
-			"app/visiui/actions/createworkspace.js",
-			"app/visiui/actions/closeworkspace.js",
-			"app/visiui/actions/updatecomponent.js",
-			"app/visiui/actions/addadditionalcomponent.js",
-			"app/visiui/actions/updatelinks.js",
-			"app/visiui/webCode/appmenus.js",
-			"app/visiui/webCode/openworkspace.js",
-			"app/visiui/webCode/saveworkspace.js",
-			"app/visiui/webCode/TempOpenDialog.js",
-			"app/visiui/webCode/TempSaveDialog.js",
-			"app/visiui/editors/TextAreaEditor.js",
-			"app/visiui/editors/TextAreaMode.js",
-			"app/visiui/editors/AceTextEditor.js",
-			"app/visiui/editors/AceCodeModeBase.js",
-			"app/visiui/editors/AceCodeMode.js",
-			"app/visiui/editors/AceDataMode.js",
-			"app/visiui/editors/AceSupplementalMode.js",
-			"app/visiui/editors/AceCustomCodeMode.js",
-			"app/visiui/editors/AceCustomSupplementalMode.js",
-			"app/visiui/editors/JsonFormEditor.js",
-			"app/visiui/editors/FormDataMode.js",
-			"app/visiui/editors/HandsonGridEditor.js",
-			"app/visiui/editors/HandsonGridMode.js",
-			"app/visiui/editors/ResourceOutputMode.js",
-			"app/visiui/dialogs/ConfigurableDialog.js",
-			"app/visiui/dialogs/CreateWorkspaceDialog.js",
-			"app/visiui/dialogs/UpdateLinksDialog.js",
-			"app/visiui/dialogs/SelectControlDialog.js"
-          ],
-        dest: '../../dist/<%= pkg.name %>-lib-web.js'
-      },
-      dist_web_core: {
-        src: [
-            "customize/webHeader.js",
-			"hax.js",
-			"core/core.js",
-			"core/lib/EventManager.js",
-			"core/lib/ContextManager.js",
-			"core/lib/codeCompiler.js",
-			"core/lib/codeAnalysis.js",
-			"core/lib/codeDependencies.js",
-			"core/lib/workspaceCalculation.js",
-			"core/lib/util.js",
-			"core/datacomponents/Child.js",
-			"core/datacomponents/ContextHolder.js",
-			"core/datacomponents/DataHolder.js",
-			"core/datacomponents/Dependent.js",
-			"core/datacomponents/Codeable.js",
-			"core/datacomponents/Owner.js",
-			"core/datacomponents/Parent.js",
-			"core/datacomponents/RootHolder.js",
-			"core/data/Workspace.js",
-			"core/data/JsonTable.js",
-			"core/data/FunctionTable.js",
-			"core/data/Control.js",
-			"core/data/Folder.js",
-			"core/data/FolderFunction.js",
-			"core/actions/ActionResponse.js",
-			"core/actions/ActionError.js",
-			"core/actions/createmember.js",
-			"core/actions/updatemember.js",
-			"core/actions/updatefolderfunction.js",
-			"core/actions/movemember.js",
-			"core/actions/deletemember.js"
-          ],
-        dest: '../../dist/<%= pkg.name %>-core-lib-web.js'
-      },
-      dist_electron: {
-        src: [
-            "customize/webHeader.js",
-			"hax.js",
-			"core/core.js",
-			"core/lib/EventManager.js",
-			"core/lib/ContextManager.js",
-			"core/lib/codeCompiler.js",
-			"core/lib/codeAnalysis.js",
-			"core/lib/codeDependencies.js",
-			"core/lib/workspaceCalculation.js",
-			"core/lib/util.js",
-			"core/datacomponents/Child.js",
-			"core/datacomponents/ContextHolder.js",
-			"core/datacomponents/DataHolder.js",
-			"core/datacomponents/Dependent.js",
-			"core/datacomponents/Codeable.js",
-			"core/datacomponents/Owner.js",
-			"core/datacomponents/Parent.js",
-			"core/datacomponents/RootHolder.js",
-			"core/data/Workspace.js",
-			"core/data/JsonTable.js",
-			"core/data/FunctionTable.js",
-			"core/data/Control.js",
-			"core/data/Folder.js",
-			"core/data/FolderFunction.js",
-			"core/actions/ActionResponse.js",
-			"core/actions/ActionError.js",
-			"core/actions/createmember.js",
-			"core/actions/updatemember.js",
-			"core/actions/updatefolderfunction.js",
-			"core/actions/movemember.js",
-			"core/actions/deletemember.js",
-			"ui/visiui/visiui.js",
-			"ui/visiui/ParentContainer.js",
-			"ui/visiui/ParentHighlighter.js",
-			"ui/visiui/WindowFrame.js",
-			"ui/visiui/SimpleParentContainer.js",
-			"ui/visiui/TabFrame.js",
-			"ui/visiui/Tab.js",
-			"ui/visiui/menu/Menu.js",
-			"ui/visiui/menu/StaticMenu.js",
-			"ui/visiui/menu/MenuBody.js",
-			"ui/visiui/jsonedit/jsonedit.js",
-			"ui/visiui/jsonedit/keyentry.js",
-			"ui/visiui/jsonedit/valueentry.js",
-			"ui/visiui/jsonedit/editfield.js",
-			"ui/visiui/jsonedit/jsoneditarea.js",
-			"ui/visiui/resize/resize.js",
-			"app/visiui/Hax.js",
-			"app/visiui/LinkManager.js",
-			"app/visiui/Component.js",
-			"app/visiui/TableEditComponent.js",
-			"app/visiui/WorkspaceUI.js",
-			"app/visiui/components/FolderComponent.js",
-			"app/visiui/components/JsonTableComponent.js",
-			"app/visiui/components/GridTableComponent.js",
-			"app/visiui/components/FunctionComponent.js",
-			"app/visiui/components/FolderFunctionComponent.js",
-			"app/visiui/components/BasicControlComponent.js",
-			"app/visiui/components/CustomControlComponent.js",
-			"app/visiui/components/CustomResource.js",			
-			"app/visiui/actions/createworkspace.js",
-			"app/visiui/actions/closeworkspace.js",			
-			"app/visiui/actions/updatecomponent.js",
-			"app/visiui/electronCode/appmenus.js",
-			"app/visiui/electronCode/openworkspace.js",
-			"app/visiui/electronCode/saveworkspace.js",
-			"app/visiui/actions/addadditionalcomponent.js",
-			"app/visiui/actions/updatelinks.js",
-			"app/visiui/editors/TextAreaEditor.js",
-			"app/visiui/editors/TextAreaMode.js",
-			"app/visiui/editors/AceTextEditor.js",
-			"app/visiui/editors/AceCodeModeBase.js",
-			"app/visiui/editors/AceCodeMode.js",
-			"app/visiui/editors/AceDataMode.js",
-			"app/visiui/editors/AceSupplementalMode.js",
-			"app/visiui/editors/AceCustomCodeMode.js",
-			"app/visiui/editors/AceCustomSupplementalMode.js",
-			"app/visiui/editors/JsonFormEditor.js",
-			"app/visiui/editors/FormDataMode.js",
-			"app/visiui/editors/HandsonGridEditor.js",
-			"app/visiui/editors/HandsonGridMode.js",
-			"app/visiui/editors/ResourceOutputMode.js",
-			"app/visiui/dialogs/ConfigurableDialog.js",
-			"app/visiui/dialogs/CreateWorkspaceDialog.js",
-			"app/visiui/dialogs/UpdateLinksDialog.js",
-			"app/visiui/dialogs/SelectControlDialog.js",
-            "customize/npmFooter.js"
-          ],
-        dest: '../../dist/<%= pkg.name %>-lib-electron.js'
-      },
-      dist_node: {
-        src: [
-            "customize/coreNpmHeader.js",
-			"hax.js",
-			"core/core.js",
-			"core/lib/EventManager.js",
-			"core/lib/ContextManager.js",
-			"core/lib/codeCompiler.js",
-			"core/lib/codeAnalysis.js",
-			"core/lib/codeDependencies.js",
-			"core/lib/workspaceCalculation.js",
-			"core/lib/util.js",
-			"core/datacomponents/Child.js",
-			"core/datacomponents/ContextHolder.js",
-			"core/datacomponents/DataHolder.js",
-			"core/datacomponents/Dependent.js",
-			"core/datacomponents/Codeable.js",
-			"core/datacomponents/Owner.js",
-			"core/datacomponents/Parent.js",
-			"core/datacomponents/RootHolder.js",
-			"core/data/Workspace.js",
-			"core/data/JsonTable.js",
-			"core/data/FunctionTable.js",
-			"core/data/Control.js",
-			"core/data/Folder.js",
-			"core/data/FolderFunction.js",
-			"core/actions/ActionResponse.js",
-			"core/actions/ActionError.js",
-			"core/actions/createmember.js",
-			"core/actions/updatemember.js",
-			"core/actions/updatefolderfunction.js",
-			"core/actions/movemember.js",
-			"core/actions/deletemember.js",
-            "customize/npmFooter.js"
-          ],
-        dest: '../../dist/<%= pkg.name %>-lib-node.js'
-      }
+        "options": {
+            "separator": ";\n"
+        },
+        "base_lib": {
+            "src": [
+                "hax/hax.js",
+                "hax/lib/EventManager.js",
+                "hax/lib/ContextManager.js",
+                "hax/lib/codeCompiler.js",
+                "hax/lib/codeAnalysis.js",
+                "hax/lib/codeDependencies.js",
+                "hax/lib/workspaceCalculation.js",
+                "hax/lib/util.js",
+                "hax/datacomponents/Child.js",
+                "hax/datacomponents/ContextHolder.js",
+                "hax/datacomponents/DataHolder.js",
+                "hax/datacomponents/Dependent.js",
+                "hax/datacomponents/Codeable.js",
+                "hax/datacomponents/Owner.js",
+                "hax/datacomponents/Parent.js",
+                "hax/datacomponents/RootHolder.js",
+                "hax/data/Workspace.js",
+                "hax/data/JsonTable.js",
+                "hax/data/FunctionTable.js",
+                "hax/data/Control.js",
+                "hax/data/Folder.js",
+                "hax/data/FolderFunction.js",
+                "hax/actions/ActionResponse.js",
+                "hax/actions/ActionError.js",
+                "hax/actions/createmember.js",
+                "hax/actions/updatemember.js",
+                "hax/actions/updatefolderfunction.js",
+                "hax/actions/movemember.js",
+                "hax/actions/deletemember.js"
+            ],
+            "dest": "../../dist/hax-base-lib.js"
+        },
+        "base_app": {
+            "src": [
+                "haxapp/haxapp.js",
+                "haxapp/ui/haxappui.js",
+                "haxapp/ui/ParentContainer.js",
+                "haxapp/ui/ParentHighlighter.js",
+                "haxapp/ui/WindowFrame.js",
+                "haxapp/ui/SimpleParentContainer.js",
+                "haxapp/ui/TabFrame.js",
+                "haxapp/ui/Tab.js",
+                "haxapp/ui/menu/Menu.js",
+                "haxapp/ui/menu/StaticMenu.js",
+                "haxapp/ui/menu/MenuBody.js",
+                "haxapp/ui/jsonedit/jsonedit.js",
+                "haxapp/ui/jsonedit/keyentry.js",
+                "haxapp/ui/jsonedit/valueentry.js",
+                "haxapp/ui/jsonedit/editfield.js",
+                "haxapp/ui/jsonedit/jsoneditarea.js",
+                "haxapp/ui/resize/resize.js",
+                "haxapp/app/Hax.js",
+                "haxapp/app/Hax.js",
+                "haxapp/app/LinkManager.js",
+                "haxapp/app/Component.js",
+                "haxapp/app/TableEditComponent.js",
+                "haxapp/app/WorkspaceUI.js",
+                "haxapp/app/components/FolderComponent.js",
+                "haxapp/app/components/JsonTableComponent.js",
+                "haxapp/app/components/GridTableComponent.js",
+                "haxapp/app/components/FunctionComponent.js",
+                "haxapp/app/components/FolderFunctionComponent.js",
+                "haxapp/app/components/BasicControlComponent.js",
+                "haxapp/app/components/CustomControlComponent.js",
+                "haxapp/app/components/CustomResource.js",
+                "haxapp/app/actions/createworkspace.js",
+                "haxapp/app/actions/closeworkspace.js",
+                "haxapp/app/actions/updatecomponent.js",
+                "haxapp/app/actions/addadditionalcomponent.js",
+                "haxapp/app/actions/updatelinks.js",
+                "haxapp/app/webCode/appmenus.js",
+                "haxapp/app/webCode/openworkspace.js",
+                "haxapp/app/webCode/saveworkspace.js",
+                "haxapp/app/webCode/TempOpenDialog.js",
+                "haxapp/app/webCode/TempSaveDialog.js",
+                "haxapp/app/editors/TextAreaEditor.js",
+                "haxapp/app/editors/TextAreaMode.js",
+                "haxapp/app/editors/AceTextEditor.js",
+                "haxapp/app/editors/AceCodeModeBase.js",
+                "haxapp/app/editors/AceCodeMode.js",
+                "haxapp/app/editors/AceDataMode.js",
+                "haxapp/app/editors/AceSupplementalMode.js",
+                "haxapp/app/editors/AceCustomCodeMode.js",
+                "haxapp/app/editors/AceCustomSupplementalMode.js",
+                "haxapp/app/editors/JsonFormEditor.js",
+                "haxapp/app/editors/FormDataMode.js",
+                "haxapp/app/editors/HandsonGridEditor.js",
+                "haxapp/app/editors/HandsonGridMode.js",
+                "haxapp/app/editors/ResourceOutputMode.js",
+                "haxapp/app/dialogs/ConfigurableDialog.js",
+                "haxapp/app/dialogs/CreateWorkspaceDialog.js",
+                "haxapp/app/dialogs/UpdateLinksDialog.js",
+                "haxapp/app/dialogs/SelectControlDialog.js"
+            ],
+            "dest": "../../dist/hax-base-app.js"
+        },
+        "dist_web_lib": {
+            "options":{
+                "banner":"/* Hax Web Lib Version <%= pkg.version %> */\n"
+            },
+            "src": [
+                "customize/webLibHeader.js",
+                "../../dist/hax-base-lib.js"
+            ],
+            "dest": "../../dist/hax-web-lib.js"
+        },
+        "dist_web_app": {
+            "options":{
+                "banner":"/* Hax Web App Version <%= pkg.version %> */\n"
+            },
+            "src": [
+                "../../dist/hax-base-app.js"
+            ],
+            "dest": "../../dist/hax-web-app.js"
+        },
+        "dist_npm_lib": {
+            "options":{
+                "banner":"/* Hax NPM Lib Version <%= pkg.version %> */\n"
+            },
+            "src": [
+                "customize/npmLibHeader.js",
+                "../../dist/hax-base-lib.js",
+                "customize/npmLibFooter.js"
+            ],
+            "dest": "../../dist/hax-npm-lib.js"
+        },
+        "dist_npm_app": {
+            "options":{
+                "banner":"/* Hax NPM App Version <%= pkg.version %> */\n"
+            },
+            "src": [
+                "../../dist/hax-base-app.js",
+                "customize/npmAppFooter.js"
+            ],
+            "dest": "../../dist/hax-npm-app.js"
+        }
     },
     uglify: {
       options: {
-        banner: '/*! <%= pkg.name %>-lib-electron <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+        banner: '/*! hax <%= pkg.version %> */\n'
       },
-      dist: {
+      dist_web_lib: {
         files: {
-          '../../dist/<%= pkg.name %>-lib-web.min.js': ['<%= concat.dist_web.dest %>']
+          '../../dist/hax-web-lib.min.js': ['<%= concat.dist_web_lib.dest %>']
         }
       },
-      dist: {
+      dist_web_app: {
         files: {
-          '../../dist/<%= pkg.name %>-core-lib-web.min.js': ['<%= concat.dist_web.dest %>']
+          '../../dist/hax-web-app.min.js': ['<%= concat.dist_web_app.dest %>']
         }
       },
-	  dist_electron: {
+	  dist_npm_lib: {
         files: {
-          '../../dist/<%= pkg.name %>-lib-electron.min.js': ['<%= concat.dist_electron.dest %>']
+          '../../dist/hax-npm-lib.min.js': ['<%= concat.dist_npm_lib.dest %>']
         }
       },
-	  dist_mode: {
+	  dist_npm_app: {
         files: {
-          '../../dist/<%= pkg.name %>-lib-node.min.js': ['<%= concat.dist_node.dest %>']
+          '../../dist/hax-npm-app.min.js': ['<%= concat.dist_npm_app.dest %>']
         }
       }
     },
     concat_css: {
         options: {
-          // Task-specific options go here. 
+          banner: '/*! hax <%= pkg.version %> */\n' 
         },
         all: {
           src: [
-			"ui/visiui/jsonedit/jsonedit.css",
-			"ui/visiui/windowFrame.css",
-			"ui/visiui/dialog.css"
+			"haxapp/ui/jsonedit/jsonedit.css",
+			"haxapp/ui/windowFrame.css",
+			"haxapp/ui/dialog.css"
           ],
-          dest: "../../dist/hax-lib.css"
+          dest: "../../dist/haxapp.css"
         },
       },
     copy: {

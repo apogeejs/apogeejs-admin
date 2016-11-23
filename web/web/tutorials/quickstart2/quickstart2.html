@@ -141,7 +141,7 @@ value[0].push("title for another column");
                 <li>Now modify the revenueGridAsJSON formula as follows:
                     <p class="sideNote">Here we are making a copy of the revenueGrid value. We can edit this copy.</p>
                     <div><textarea class="codeText" readonly rows="3">
-value = Hax.core.util.deepJSONCopy(revenueGrid);
+value = hax.util.deepJSONCopy(revenueGrid);
 value[0].push("title for another column");
                     </textarea></div>
                     <div><img src="gridToJsonEditNoError.png"/></div>                      

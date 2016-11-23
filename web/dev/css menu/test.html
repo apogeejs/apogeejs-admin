@@ -15,36 +15,36 @@
         <script>
             function init() {
                 var menuBarContainer = document.getElementById("menu_bar_container");
-                var menuBar = new hax.visiui.MenuBar();
+                var menuBar = new haxapp.ui.MenuBar();
                 menuBarContainer.appendChild(menuBar.getElement());
 
                 var menu;
                 var menuItem;
 
-                menu = new hax.visiui.Menu("first");
+                menu = new haxapp.ui.Menu("first");
                 menuBar.addMenu(menu);
-                menuItem = new hax.visiui.MenuItem("a",function() {alert("a pressed");});
+                menuItem = new haxapp.ui.MenuItem("a",function() {alert("a pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new hax.visiui.MenuItem("b",function() {alert("b pressed");});
+                menuItem = new haxapp.ui.MenuItem("b",function() {alert("b pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new hax.visiui.MenuItem("c",function() {alert("c pressed");});
+                menuItem = new haxapp.ui.MenuItem("c",function() {alert("c pressed");});
                 menu.addMenuItem(menuItem);
 
 
-                menu = new hax.visiui.Menu("second");
+                menu = new haxapp.ui.Menu("second");
                 menuBar.addMenu(menu);
                 
-                menuItem = new hax.visiui.MenuItem("1",function() {alert("1 pressed");});
+                menuItem = new haxapp.ui.MenuItem("1",function() {alert("1 pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new hax.visiui.MenuItem("2",function() {alert("2 pressed");});
+                menuItem = new haxapp.ui.MenuItem("2",function() {alert("2 pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new hax.visiui.MenuItem("3",function() {alert("3 pressed");});
+                menuItem = new haxapp.ui.MenuItem("3",function() {alert("3 pressed");});
                 menu.addMenuItem(menuItem);
 
-                menu = new hax.visiui.Menu("third");
+                menu = new haxapp.ui.Menu("third");
                 menuBar.addMenu(menu);
 
-                menu = new hax.visiui.Menu("fourth");
+                menu = new haxapp.ui.Menu("fourth");
                 menuBar.addMenu(menu);
             }
         </script>	
