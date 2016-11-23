@@ -3,7 +3,7 @@
 	"fileType": "hax workspace",
 	"jsLinks": [
 		"https://www.gstatic.com/charts/loader.js",
-		"../test/GoogleChartComponent.js"
+		"http://www.haxapp.com/examples/GoogleChartComponent.js"
 	],
 	"cssLinks": [],
 	"workspace": {
