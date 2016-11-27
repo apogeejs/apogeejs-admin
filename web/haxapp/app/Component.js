@@ -288,6 +288,20 @@ haxapp.app.Component.memberMoved = function(newParentContainer) {
  * @protected */    
 haxapp.app.Component.memberUpdated = function() {
     this.updateTitle();
+    
+    var object = this.getObject();
+    if(object.hasError()) {
+        var errorMsg = "";
+        var actionErrors = object.getErrors();
+        for(var i = 0; i < actionErrors.length; i++) {
+            errorMsg += actionErrors[i].msg + "\n";
+        }
+        
+        this.showErrorBar(errorMsg);
+    }
+    else {   
+        this.hideErrorBar();
+    }
 }
 
 /** This method makes sure the window title is up to date.

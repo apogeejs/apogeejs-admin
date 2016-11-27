@@ -77,18 +77,18 @@ haxapp.app.TableEditComponent.memberUpdated = function() {
     haxapp.app.Component.memberUpdated.call(this);
     
     var object = this.getObject();
-    if(object.hasError()) {
-        var errorMsg = "";
-        var actionErrors = object.getErrors();
-        for(var i = 0; i < actionErrors.length; i++) {
-            errorMsg += actionErrors[i].msg + "\n";
-        }
-        
-        this.showErrorBar(errorMsg);
-    }
-    else {   
-        this.hideErrorBar();
-    }
+//    if(object.hasError()) {
+//        var errorMsg = "";
+//        var actionErrors = object.getErrors();
+//        for(var i = 0; i < actionErrors.length; i++) {
+//            errorMsg += actionErrors[i].msg + "\n";
+//        }
+//        
+//        this.showErrorBar(errorMsg);
+//    }
+//    else {   
+//        this.hideErrorBar();
+//    }
         
     if(this.viewModeElementShowing !== this.viewModeElement) {
         this.showModeElement(this.viewModeElement);

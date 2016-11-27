@@ -49,7 +49,7 @@ hax.DataHolder.getImpactsList = function() {
 hax.DataHolder.setData = function(data) {
     this.data = data;
     this.dataSet = true;
-    
+  
     var parent = this.getParent();
     if(parent) {
         parent.updateData(this);

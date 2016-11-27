@@ -141,6 +141,7 @@ hax.FolderFunction.prototype.needsCalculating = function() {
 /** This updates the member based on a change in a dependency.  */
 hax.FolderFunction.prototype.prepareForCalculate = function() {
     this.clearDataSet();
+    this.clearErrors(); 
 }
 
 //add these fields to object
@@ -149,6 +150,9 @@ hax.FolderFunction.prototype.prepareForCalculate = function() {
 /** This updates the member data based on the function. It returns
  * true for success and false if there is an error.  */
 hax.FolderFunction.prototype.calculate = function() {
+    
+    //make sure the data is set in each impactor
+    this.initializeImpactors();
     
     var folderFunctionErrors = [];
     
@@ -163,9 +167,6 @@ hax.FolderFunction.prototype.calculate = function() {
         //I should get way to set multiple
         this.addErrors(folderFunctionErrors);
     }
-    
-    //make sure the data is set in each impactor
-    this.initializeImpactors();
 }
 
 /** This method updates the dependencies of any children

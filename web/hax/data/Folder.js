@@ -99,12 +99,20 @@ hax.Folder.prototype.updateData = function(child) {
 /** There is no calculation for the folder base on dependents. 
  * @private */
 hax.Folder.prototype.needsCalculating = function() {
-    return false;
+    return true;
 }
 
-/** There is no calculation in the folder.  */
+/** This updates the member based on a change in a dependency.  */
+hax.Folder.prototype.prepareForCalculate = function() {
+    this.clearDataSet();
+    this.clearErrors();
+}
+
+/** Calculate the data.  */
 hax.Folder.prototype.calculate = function() {
-    
+    //we don't need to calculate since the calculate is done on the fly
+    //we just need to make sure the impactors are set
+    this.initializeImpactors();
 }
 
 //------------------------------

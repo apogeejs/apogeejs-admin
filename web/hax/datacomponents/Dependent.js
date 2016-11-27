@@ -54,9 +54,6 @@ hax.Dependent.setDependenciesSetFlag = function(dependenciesSet) {
 ///** This updates the member based on a change in a dependency.  */
 //hax.Dependent.calculate = function();
 
-///** This method initializes the data for this function.  */
-//hax.Dependent.initFunction = function();
-
 /** This method makes sure any impactors are set. It sets a dependency 
  * error if one or more of the dependencies has a error. */
 hax.Dependent.initializeImpactors = function() {
