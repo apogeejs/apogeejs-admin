@@ -15,7 +15,7 @@ hax.codeCompiler.processCode = function(codeInfo,codeLabel) {
         
     //get the accessed variables
     //
-    //parse the code and get variabls dependencies
+    //parse the code and get variable dependencies
     var analyzeOutput = hax.codeAnalysis.analyzeCode(combinedFunctionBody);
     
     if(analyzeOutput.success) {
@@ -95,10 +95,9 @@ hax.codeCompiler.createObjectFunction = function(varInfo, combinedFunctionBody) 
 /** This is the format string to create the code body for the object function
  * Input indices:
  * 0: unique member name
- * 1: functionName
- * 2: function argument list with parentheses
- * 3: member formula text
- * 4: supplemental code text
+ * 1: function argument list with parentheses
+ * 2: member formula text
+ * 3: supplemental code text
  * 
  * @private
  */

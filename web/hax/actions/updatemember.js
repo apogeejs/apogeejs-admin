@@ -67,7 +67,7 @@ hax.updatemember.updateData = function(member,data,optionalActionResponse) {
     try {
         var recalculateList = [];
 
-        hax.updatemember.applyData(member,data,recalculateList);
+        hax.updatemember.applyData(member,data);
         
         hax.calculation.addToRecalculateList(recalculateList,member);
 

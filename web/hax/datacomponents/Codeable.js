@@ -11,10 +11,8 @@
  */
 hax.Codeable = {};
 
-/** This initializes the component. argList is the arguments for the object function.
- * dataEvaluatesObjectFunction is used to determine if the object function for this
- * codeable can be set before the context and impactors are initialized. */
-hax.Codeable.init = function(argList,dataEvaluatesObjectFunction) {
+/** This initializes the component. argList is the arguments for the object function. */
+hax.Codeable.init = function(argList) {
     
     //arguments of the member function
     this.argList = argList;

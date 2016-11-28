@@ -28,11 +28,6 @@ hax.ContextHolder.getContextManager = function() {
 ///** This method retrieve creates the loaded context manager. */
 //hax.ContextHolder.createContextManager = function();
 
-/** This is used only if the context manager should be replaced with an existing one.. */
-hax.ContextHolder.setContextManager = function(contextManager) {
-    this.contextManager = contextManager;
-}
-
 
 
 
