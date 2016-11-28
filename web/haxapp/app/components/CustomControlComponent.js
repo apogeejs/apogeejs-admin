@@ -20,6 +20,7 @@ haxapp.app.CustomControlComponent = function(workspaceUI,control,componentJson) 
     
     //add a cleanup action to call resource when delete is happening
     var cleanupAction = function() {
+        var resource = control.getResource();
         if(resource.delete) {
             resource.delete();
         }
@@ -214,9 +215,9 @@ haxapp.app.CustomControlComponent.prototype.createResource = function() {
 	
 	//create the function generator, with the aliased variables in the closure
 	var generatorFunction = new Function(generatorFunctionBody);
-	var updateFunction = generatorFunction();
+	var resourceFunction = generatorFunction();
 	
-    var resource = updateFunction(this);
+    var resource = resourceFunction(this);
     return resource;
 }
 
@@ -235,11 +236,13 @@ haxapp.app.CustomControlComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//end supplemental code",
 "",
 "//member function",
-"var generator = function(component) {",
+"var resourceFunction = function(component) {",
+"var resource = {};",
 "{0}",
+"return resource;",
 "}",
 "//end member function",
-"return generator;",
+"return resourceFunction;",
 ""
    ].join("\n");
 
