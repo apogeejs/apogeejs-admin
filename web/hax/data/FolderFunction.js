@@ -138,15 +138,6 @@ hax.FolderFunction.prototype.needsCalculating = function() {
 	return true;
 }
 
-/** This updates the member based on a change in a dependency.  */
-hax.FolderFunction.prototype.prepareForCalculate = function() {
-    this.clearDataSet();
-    this.clearErrors(); 
-}
-
-//add these fields to object
-//this.impactorDataSet = true;
-
 /** This updates the member data based on the function. It returns
  * true for success and false if there is an error.  */
 hax.FolderFunction.prototype.calculate = function() {
@@ -167,6 +158,8 @@ hax.FolderFunction.prototype.calculate = function() {
         //I should get way to set multiple
         this.addErrors(folderFunctionErrors);
     }
+    
+    this.clearCalcPending();
 }
 
 /** This method updates the dependencies of any children

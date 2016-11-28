@@ -33,6 +33,7 @@ hax.Control.prototype.updateResource = function(resource) {
 	
     //re-execute, if needed
 	if(this.needsCalculating()) {
+        this.prepareForCalculate();
         this.calculate();
     }
 } 

@@ -175,6 +175,7 @@ haxapp.app.CustomControlComponent.prototype.update = function(html,customizeScri
             resource.setComponent(this);
         }
         
+        control.prepareForCalculate();
         control.calculate();
         this.memberUpdated();
     }

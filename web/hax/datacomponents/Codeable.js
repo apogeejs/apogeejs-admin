@@ -29,7 +29,6 @@ hax.Codeable.init = function(argList) {
     
     //fields used in calculation
     this.calcInProgress = false;
-    this.dataSet = false;
     this.functionInitialized = false;
 }
 
@@ -84,9 +83,6 @@ hax.Codeable.setCodeInfo = function(codeInfo) {
         this.contextSetter = null;
     }
     this.codeSet = true;
-    if(this.isDependent) {
-        this.setDependenciesSetFlag(false);
-    }
 }
 
 /** This method returns the formula for this member.  */
@@ -139,6 +135,8 @@ hax.Codeable.clearCode = function() {
     this.objectFunction = null;
     this.codeErrors = [];
     
+    this.clearCalcPending();
+    
     var newDependsOn = [];
 	this.updateDependencies(newDependsOn);
 }
@@ -151,23 +149,23 @@ hax.Codeable.hasCode = function() {
 /** If this is true the member is ready to be executed. 
  * @private */
 hax.Codeable.needsCalculating = function() {
-	return (this.codeSet)&&(this.getDependenciesSetFlag());
+	return this.codeSet;
 }
 
-/** This updates the member based on a change in a dependency.  */
+/** This does any init needed for calculation.  */
 hax.Codeable.prepareForCalculate = function() {
-    if(this.isDataHolder) this.clearDataSet();
-    this.clearErrors();
+    //call the base function
+    hax.Dependent.prepareForCalculate.call(this);
+    
     this.functionInitialized = false;
 }
 
 /** This method sets the data object for the member.  */
 hax.Codeable.calculate = function() {
     
-    if(((this.isDataHolder)&&(this.getDataSet()))||(this.hasError())) return;
-    
     if(this.codeErrors.length > 0) {
         this.addErrors(this.codeErrors);
+        this.clearCalcPending();
         return;
     }
     
@@ -175,6 +173,7 @@ hax.Codeable.calculate = function() {
         var msg = "Function not found for member: " + this.getName();
         var actionError = new hax.ActionError(msg,"Codeable - Calculate",this);
         this.addError(actionError);
+        this.clearCalcPending();
         return;
     } 
     
@@ -192,6 +191,8 @@ hax.Codeable.calculate = function() {
         actionError.setParentException(error);
         this.addError(actionError);
     }
+    
+    this.clearCalcPending();
 }
 
 /** This makes sure user code of object function is ready to execute.  */

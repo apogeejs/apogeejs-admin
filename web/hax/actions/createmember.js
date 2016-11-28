@@ -33,6 +33,11 @@ hax.createmember.createMember = function(owner,json,optionalActionResponse) {
         
         var member = hax.createmember.instantiateMember(owner,json,creationList,actionResponse);
         
+        //put all created objects into recalculate list
+        for(var i = 0; i < creationList.length; i++) {
+            hax.calculation.addToRecalculateList(recalculateList,creationList[i]);
+        }
+        
         //add the member to the action response
         actionResponse.member = member;
 

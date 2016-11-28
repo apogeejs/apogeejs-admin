@@ -15,7 +15,7 @@ hax.Dependent.init = function() {
     
     //this is the list of dependencies
     this.dependsOnList = [];
-    this.dependenciesSet = true;
+    this.calcPending = false;
 }
 
 /** This property tells if this object is a dependent.
@@ -27,14 +27,15 @@ hax.Dependent.getDependsOn = function() {
     return this.dependsOnList;
 }
 
-/** This returns false if the dependencies are (known to be) not up to date. */
-hax.Dependent.getDependenciesSetFlag = function() {
-    return this.dependenciesSet;
+/** This returns the calc pending flag.  */
+hax.Dependent.getCalcPending = function() {
+    return this.calcPending;
 }
 
-/** This sets the dependencies set flag. It is used mainly to set the flag to false when something changes extenally. */
-hax.Dependent.setDependenciesSetFlag = function(dependenciesSet) {
-    this.dependenciesSet = dependenciesSet;
+/** This sets the calc pending flag to false. It should be called when the 
+ * calcultion is no longer needed.  */
+hax.Dependent.clearCalcPending = function() {
+    this.calcPending = false;
 }
 
 //Must be implemented in extending object
@@ -48,8 +49,11 @@ hax.Dependent.setDependenciesSetFlag = function(dependenciesSet) {
 // * @private */
 //hax.Dependent.needsCalculating = function();
 
-///** This updates the member based on a change in a dependency.  */
-//hax.Dependent.prepareForCalculate = function();
+/** This does any init needed for calculation.  */
+hax.Dependent.prepareForCalculate = function() {
+    this.clearErrors();
+    this.calcPending = true;
+}
 
 ///** This updates the member based on a change in a dependency.  */
 //hax.Dependent.calculate = function();
@@ -62,7 +66,7 @@ hax.Dependent.initializeImpactors = function() {
     //make sure dependencies are up to date
     for(var i = 0; i < this.dependsOnList.length; i++) {
         var impactor = this.dependsOnList[i];
-        if((impactor.needsCalculating())&&(!impactor.getDataSet())) {
+        if(impactor.getCalcPending()) {
             impactor.calculate();
         }
         if(impactor.hasError()) {
@@ -140,7 +144,7 @@ hax.Dependent.updateDependencies = function(newDependsOn) {
             dependenciesUpdated = true;
 		}
     }
-    this.dependenciesSet = true;
+//    this.dependenciesSet = true;
     
     return dependenciesUpdated;
 }

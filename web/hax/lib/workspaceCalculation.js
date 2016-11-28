@@ -33,16 +33,18 @@ hax.calculation.callRecalculateList = function(recalculateList,actionResponse) {
     var i;
     var success = true;
     for(i = 0; i < recalculateList.length; i++) {
-        dependent = recalculateList[i];   
-        dependent.calculate();   
-        if(dependent.hasError()) {
-            var actionErrors = dependent.getErrors();
-            if(actionErrors) {
-                for(var j = 0; j < actionErrors.length; j++) {
-                    actionResponse.addError(actionErrors[j]);
+        dependent = recalculateList[i];
+        if(dependent.getCalcPending()) {
+            dependent.calculate();   
+            if(dependent.hasError()) {
+                var actionErrors = dependent.getErrors();
+                if(actionErrors) {
+                    for(var j = 0; j < actionErrors.length; j++) {
+                        actionResponse.addError(actionErrors[j]);
+                    }
                 }
+                success = false;
             }
-            success = false;
         }
     }
     

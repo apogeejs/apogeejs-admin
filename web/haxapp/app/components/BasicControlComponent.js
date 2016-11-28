@@ -13,6 +13,7 @@ haxapp.app.BasicControlComponent = function(workspaceUI,control,generator,compon
 	var resource = control.getResource();
 	resource.setComponent(this);
     //redo calculate in contrl now the UI is set up
+    control.prepareForCalculate();
     control.calculate();
     
     //add a cleanup action to call resource when delete is happening
