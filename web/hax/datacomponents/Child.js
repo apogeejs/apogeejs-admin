@@ -15,7 +15,8 @@ hax.Child = {};
 hax.Child.init = function(name,generator) {
     this.name = name;
     this.generator = generator;
-    this.errors = [];  
+    this.errors = []; 
+    this.resultPending = false;
 }
 
 hax.Child.initOwner = function(owner) {
@@ -145,6 +146,17 @@ hax.Child.hasError = function() {
 /** This returns the pre calc error. */
 hax.Child.getErrors = function() {
     return this.errors;
+}
+
+/** This returns true if the member is not up to date, typically
+ * do to waiting on an asynchronous operation. */
+hax.Child.getResultPending = function() {
+    return this.resultPending;
+}
+
+/** This sets the result pending flag. */
+hax.Child.setResultPending = function(isPending) {
+    this.resultPending = isPending;
 }
 
 /** This method writes the child to a json. */

@@ -103,27 +103,64 @@ haxapp.app.Component.addCleanupAction = function(cleanupFunction) {
 // dev
 //=======================
 
+//constants for the window banner bar
+haxapp.app.Component.BANNER_TYPE_ERROR = "error";
+haxapp.app.Component.BANNER_BGCOLOR_ERROR = "red";
+haxapp.app.Component.BANNER_FGCOLOR_ERROR = "white";
+
+haxapp.app.Component.BANNER_TYPE_PENDING = "pending";
+haxapp.app.Component.BANNER_BGCOLOR_PENDING = "yellow";
+haxapp.app.Component.BANNER_FGCOLOR_PENDING = "black";
+
+haxapp.app.Component.BANNER_BGCOLOR_UNKNOWN = "yellow";
+haxapp.app.Component.BANNER_FGCOLOR_UNKNOWN = "black";
+
+haxapp.app.Component.PENDING_MESSAGE = "Calculation pending...";
+
 /** This method returns the base member for this component. */
-haxapp.app.Component.showErrorBar = function(text) {
-    if(!this.errorDiv) {
-        this.errorDiv = haxapp.ui.createElement("div",null,
+haxapp.app.Component.showBannerBar = function(text,type) {
+    
+    if(!this.bannerDiv) {
+        this.bannerDiv = haxapp.ui.createElement("div",null,
             {
                 "display":"block",
                 "position":"relative",
                 "top":"0px",
-                "backgroundColor":"red",
-                "color":"white"
+                "backgroundColor":bgColor,
+                "color":fgColor
             });
     }
-    this.errorDiv.innerHTML = text;
-    this.errorBarActive = true;
+    
+    //get banner color
+    var bgColor;
+    var fgColor;
+    if(type == haxapp.app.Component.BANNER_TYPE_ERROR) {
+        bgColor = haxapp.app.Component.BANNER_BGCOLOR_ERROR;
+        fgColor = haxapp.app.Component.BANNER_FGCOLOR_ERROR;
+    }
+    else if(type == haxapp.app.Component.BANNER_TYPE_PENDING) {
+        bgColor = haxapp.app.Component.BANNER_BGCOLOR_PENDING;
+        fgColor = haxapp.app.Component.BANNER_FGCOLOR_PENDING;
+    }
+    else {
+        bgColor = haxapp.app.Component.BANNER_BGCOLOR_UNKNOWN;
+        fgColor = haxapp.app.Component.BANNER_FGCOLOR_UNKNOWN;
+   }
+   var colorStyle = {};
+   colorStyle.backgroundColor = bgColor;
+   colorStyle.color = fgColor;
+   haxapp.ui.applyStyle(this.bannerDiv,colorStyle);
+       
+    //set message
+    this.bannerDiv.innerHTML = text;
+    this.bannerBarActive = true;
 	
 	this.showActiveHeaders();
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.Component.hideErrorBar = function() {
-	this.errorBarActive = false;
+haxapp.app.Component.hideBannerBar = function() {
+	this.bannerBarActive = false;
 	this.showActiveHeaders();
 }
 
@@ -177,8 +214,8 @@ haxapp.app.Component.showActiveHeaders = function() {
 	var window = this.getWindow();
 	
 	var headers = [];
-	if((this.errorBarActive)&&(this.errorDiv)) {
-		headers.push(this.errorDiv);
+	if((this.bannerBarActive)&&(this.bannerDiv)) {
+		headers.push(this.bannerDiv);
 	}
 	if((this.saveBarActive)&&(this.saveDiv)) {
 		headers.push(this.saveDiv);
@@ -297,10 +334,13 @@ haxapp.app.Component.memberUpdated = function() {
             errorMsg += actionErrors[i].msg + "\n";
         }
         
-        this.showErrorBar(errorMsg);
+        this.showBannerBar(errorMsg,haxapp.app.Component.BANNER_TYPE_ERROR);
+    }
+    else if(object.getResultPending()) {
+        this.showBannerBar(haxapp.app.Component.PENDING_MESSAGE,haxapp.app.Component.BANNER_TYPE_PENDING);
     }
     else {   
-        this.hideErrorBar();
+        this.hideBannerBar();
     }
 }
 

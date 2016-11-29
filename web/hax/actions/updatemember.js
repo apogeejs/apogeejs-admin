@@ -85,6 +85,40 @@ hax.updatemember.updateData = function(member,data,optionalActionResponse) {
     return actionResponse;
 }
 
+/** This method is used to update the value of a member on the return of an asynchrronous
+ * formula. */
+hax.updatemember.asynchFunctionUpdateData = function(member,data) {
+	var actionResponse = new hax.ActionResponse();
+    
+    try {
+        var recalculateList = [];
+
+        //apply data without clearing formula
+        hax.updatemember.asynchFunctionApplyData(member,data);
+        member.setResultPending(false);
+        
+        //add all dependents to list without adding this object
+        if(member.isDataHolder) {
+            var impactsList = member.getImpactsList();
+            for(var i = 0; i < impactsList.length; i++) {
+                hax.calculation.addToRecalculateList(recalculateList,impactsList[i]);
+            }
+        }
+
+        hax.calculation.callRecalculateList(recalculateList,actionResponse);
+
+        //fire updated events
+        hax.updatemember.fireUpdatedEvent(member);
+        hax.updatemember.fireUpdatedEventList(recalculateList);
+    }
+    catch(error) {
+        var actionError = hax.ActionError.processException(error,"AppException",true);
+        actionResponse.addError(actionError);
+    }
+    
+    return actionResponse;
+}
+
 /** This method updates the object function or the data for a list of members. 
  * The return value is an ActionResponse object. Optionally, an existing action response
  * may be passed in or otherwise one will be created here. */
@@ -182,6 +216,13 @@ hax.updatemember.applyData = function(dataHolder,data) {
         dataHolder.clearCode();
     }
     
+    dataHolder.setData(data);
+}
+
+/* This method sets the data on the return os an asynchronous formula. It 
+ * is the same as apply data except it does not clear the code. */
+hax.updatemember.asynchFunctionApplyData = function(dataHolder,data) {
+    dataHolder.clearErrors();
     dataHolder.setData(data);
 }
 

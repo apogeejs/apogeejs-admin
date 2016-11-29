@@ -52,6 +52,7 @@ hax.Dependent.clearCalcPending = function() {
 /** This does any init needed for calculation.  */
 hax.Dependent.prepareForCalculate = function() {
     this.clearErrors();
+    this.setResultPending(false);
     this.calcPending = true;
 }
 
@@ -61,7 +62,8 @@ hax.Dependent.prepareForCalculate = function() {
 /** This method makes sure any impactors are set. It sets a dependency 
  * error if one or more of the dependencies has a error. */
 hax.Dependent.initializeImpactors = function() {
-    var errorDependencies = [];    
+    var errorDependencies = [];
+    var resultPending = false;
     
     //make sure dependencies are up to date
     for(var i = 0; i < this.dependsOnList.length; i++) {
@@ -71,11 +73,17 @@ hax.Dependent.initializeImpactors = function() {
         }
         if(impactor.hasError()) {
             errorDependencies.push(impactor);
-        }                   
+        } 
+        else if(impactor.getResultPending()) {
+            resultPending = true;
+        }
     }
 
     if(errorDependencies.length > 0) {
         this.createDependencyError(errorDependencies);
+    }
+    else if(resultPending) {
+        this.setResultPending(true);
     }
 }
 

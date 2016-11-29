@@ -27,6 +27,9 @@ hax.Codeable.init = function(argList) {
     this.objectFunction = null;
     this.codeErrors = [];
     
+    this.clearCalcPending();
+    this.setResultPending(false);
+    
     //fields used in calculation
     this.calcInProgress = false;
     this.functionInitialized = false;
@@ -136,6 +139,7 @@ hax.Codeable.clearCode = function() {
     this.codeErrors = [];
     
     this.clearCalcPending();
+    this.setResultPending(false);
     
     var newDependsOn = [];
 	this.updateDependencies(newDependsOn);

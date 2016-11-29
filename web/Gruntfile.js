@@ -73,7 +73,6 @@ module.exports = function(grunt) {
                 "haxapp/app/components/FolderFunctionComponent.js",
                 "haxapp/app/components/BasicControlComponent.js",
                 "haxapp/app/components/CustomControlComponent.js",
-                "haxapp/app/components/CustomResource.js",
                 "haxapp/app/actions/createworkspace.js",
                 "haxapp/app/actions/closeworkspace.js",
                 "haxapp/app/actions/updatecomponent.js",
