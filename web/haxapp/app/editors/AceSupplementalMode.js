@@ -23,8 +23,9 @@ haxapp.app.AceSupplementalMode.prototype.onSave = function(text) {
 	var actionResponse =  hax.updatemember.updateCode(table,argList,functionBody,supplementalCode);
 	if(!actionResponse.getSuccess()) {
 		//show an error message
-		var msg = actionResponse.getErrorMsg();
-		alert(msg);
+//no alert here - error display is adequate
+//			var msg = actionResponse.getErrorMsg();
+//			alert(msg);
 	}
         
 	return true;  
