@@ -64,7 +64,10 @@ hax.JsonTable.prototype.processObjectFunction = function(objectFunction) {
         var member = this;
         memberInfo.asynchCallback = function(memberValue) {
             //set the data for the table, along with triggering updates on dependent tables.
-            hax.updatemember.asynchFunctionUpdateData(member,memberValue)
+            hax.updatemember.asynchFunctionUpdateData(member,memberValue);
+        }
+        memberInfo.asynchErrorCallback = function(errorMsg) {
+            hax.updatemember.asynchFunctionUpdateError(member,errorMsg);
         }
         this.setResultPending(true);
     }

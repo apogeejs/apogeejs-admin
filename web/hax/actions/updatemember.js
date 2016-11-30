@@ -119,6 +119,41 @@ hax.updatemember.asynchFunctionUpdateData = function(member,data) {
     return actionResponse;
 }
 
+hax.updatemember.asynchFunctionUpdateError = function(member,errorMsg) {
+    var actionResponse = new hax.ActionResponse();
+    var actionError;
+    
+    try {
+        var recalculateList = [];
+
+        //apply data without clearing formula
+        actionError = new hax.ActionError(errorMsg,"Codeable - Calculate",member);
+        member.addError(actionError);
+        actionResponse.addError(actionError);
+        member.setResultPending(false);
+        
+        //add all dependents to list without adding this object
+        if(member.isDataHolder) {
+            var impactsList = member.getImpactsList();
+            for(var i = 0; i < impactsList.length; i++) {
+                hax.calculation.addToRecalculateList(recalculateList,impactsList[i]);
+            }
+        }
+
+        hax.calculation.callRecalculateList(recalculateList,actionResponse);
+
+        //fire updated events
+        hax.updatemember.fireUpdatedEvent(member);
+        hax.updatemember.fireUpdatedEventList(recalculateList);
+    }
+    catch(error) {
+        actionError = hax.ActionError.processException(error,"AppException",true);
+        actionResponse.addError(actionError);
+    }
+    
+    return actionResponse;
+}
+
 /** This method updates the object function or the data for a list of members. 
  * The return value is an ActionResponse object. Optionally, an existing action response
  * may be passed in or otherwise one will be created here. */
