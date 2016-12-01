@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
+        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.28.4/handsontable.full.min.js"></script>
+        
+        <script type="text/javascript" src="../../customize/webLibHeader.js"></script>
+		<script type="text/javascript" src="../../hax/hax.js"></script>
+        <script type="text/javascript" src="../../hax/lib/base.js"></script>
+        <script type="text/javascript" src="../../hax/usrlib/util.js"></script>
+		<script type="text/javascript" src="../../hax/lib/EventManager.js"></script>
+        <script type="text/javascript" src="../../hax/lib/ContextManager.js"></script>
+        <script type="text/javascript" src="../../hax/lib/codeCompiler.js"></script>
+        <script type="text/javascript" src="../../hax/lib/codeAnalysis.js"></script>
+		<script type="text/javascript" src="../../hax/lib/codeDependencies.js"></script>
+		<script type="text/javascript" src="../../hax/lib/workspaceCalculation.js"></script>
+        <script type="text/javascript" src="../../hax/lib/ActionResponse.js"></script>
+        <script type="text/javascript" src="../../hax/lib/ActionError.js"></script>
+        <script type="text/javascript" src="../../hax/datacomponents/Child.js"></script>
+        <script type="text/javascript" src="../../hax/datacomponents/ContextHolder.js"></script>
+        <script type="text/javascript" src="../../hax/datacomponents/DataHolder.js"></script>
+        <script type="text/javascript" src="../../hax/datacomponents/Dependent.js"></script>
+        <script type="text/javascript" src="../../hax/datacomponents/Codeable.js"></script>
+        <script type="text/javascript" src="../../hax/datacomponents/Owner.js"></script>
+        <script type="text/javascript" src="../../hax/datacomponents/Parent.js"></script>
+        <script type="text/javascript" src="../../hax/datacomponents/RootHolder.js"></script>
+        <script type="text/javascript" src="../../hax/data/Workspace.js"></script>
+        <script type="text/javascript" src="../../hax/data/JsonTable.js"></script>
+        <script type="text/javascript" src="../../hax/data/FunctionTable.js"></script>
+        <script type="text/javascript" src="../../hax/data/Control.js"></script>
+        <script type="text/javascript" src="../../hax/data/Folder.js"></script>
+        <script type="text/javascript" src="../../hax/data/FolderFunction.js"></script>
+        <script type="text/javascript" src="../../hax/actions/createmember.js"></script>
+        <script type="text/javascript" src="../../hax/actions/updatemember.js"></script>
+        <script type="text/javascript" src="../../hax/actions/updatefolderfunction.js"></script>
+		<script type="text/javascript" src="../../hax/actions/movemember.js"></script>
+        <script type="text/javascript" src="../../hax/actions/deletemember.js"></script>
+        
+        <script type="text/javascript" src="../haxapp.js"></script>
+		<script type="text/javascript" src="../ui/haxappui.js"></script>
+        <script type="text/javascript" src="../ui/ParentContainer.js"></script>
+		<script type="text/javascript" src="../ui/ParentHighlighter.js"></script>
+		<script type="text/javascript" src="../ui/WindowFrame.js"></script>
+        <script type="text/javascript" src="../ui/SimpleParentContainer.js"></script>
+		<script type="text/javascript" src="../ui/TabFrame.js"></script>
+        <script type="text/javascript" src="../ui/Tab.js"></script>
+		<script type="text/javascript" src="../ui/menu/Menu.js"></script>
+        <script type="text/javascript" src="../ui/menu/StaticMenu.js"></script>
+        <script type="text/javascript" src="../ui/menu/MenuBody.js"></script>
+		<script type="text/javascript" src="../ui/jsonedit/jsonedit.js"></script>
+        <script type="text/javascript" src="../ui/jsonedit/keyentry.js"></script>
+        <script type="text/javascript" src="../ui/jsonedit/valueentry.js"></script>
+        <script type="text/javascript" src="../ui/jsonedit/editfield.js"></script>
+        <script type="text/javascript" src="../ui/jsonedit/jsoneditarea.js"></script>
+        <script type="text/javascript" src="../ui/resize/resize.js"></script>
+        <script type="text/javascript" src="../app/Hax.js"></script>
+		<script type="text/javascript" src="../app/LinkManager.js"></script>
+        <script type="text/javascript" src="../app/Component.js"></script>
+        <script type="text/javascript" src="../app/TableEditComponent.js"></script>
+        <script type="text/javascript" src="../app/WorkspaceUI.js"></script>
+		<script type="text/javascript" src="../app/components/FolderComponent.js"></script>
+        <script type="text/javascript" src="../app/components/JsonTableComponent.js"></script>
+        <script type="text/javascript" src="../app/components/GridTableComponent.js"></script>
+        <script type="text/javascript" src="../app/components/FunctionComponent.js"></script>
+        <script type="text/javascript" src="../app/components/FolderFunctionComponent.js"></script>
+        <script type="text/javascript" src="../app/components/BasicControlComponent.js"></script>
+		<script type="text/javascript" src="../app/components/CustomControlComponent.js"></script>
+        <script type="text/javascript" src="../app/actions/createworkspace.js"></script>
+        <script type="text/javascript" src="../app/actions/openworkspace.js"></script>
+        <script type="text/javascript" src="../app/actions/saveworkspace.js"></script>
+        <script type="text/javascript" src="../app/actions/closeworkspace.js"></script>       
+        <script type="text/javascript" src="../app/actions/updatecomponent.js"></script>
+        <script type="text/javascript" src="../app/actions/addadditionalcomponent.js"></script>
+        <script type="text/javascript" src="../app/actions/updatelinks.js"></script>
+        <script type="text/javascript" src="../app/editors/TextAreaEditor.js"></script>
+        <script type="text/javascript" src="../app/editors/TextAreaMode.js"></script>
+		<script type="text/javascript" src="../app/editors/AceTextEditor.js"></script>
+		<script type="text/javascript" src="../app/editors/AceCodeModeBase.js"></script>
+		<script type="text/javascript" src="../app/editors/AceCodeMode.js"></script>
+		<script type="text/javascript" src="../app/editors/AceDataMode.js"></script>
+		<script type="text/javascript" src="../app/editors/AceSupplementalMode.js"></script>
+		<script type="text/javascript" src="../app/editors/AceCustomCodeMode.js"></script>
+		<script type="text/javascript" src="../app/editors/AceCustomSupplementalMode.js"></script>
+		<script type="text/javascript" src="../app/editors/JsonFormEditor.js"></script>
+		<script type="text/javascript" src="../app/editors/FormDataMode.js"></script>
+		<script type="text/javascript" src="../app/editors/HandsonGridEditor.js"></script>
+		<script type="text/javascript" src="../app/editors/HandsonGridMode.js"></script>
+		<script type="text/javascript" src="../app/editors/ResourceOutputMode.js"></script>
+        <script type="text/javascript" src="../app/dialogs/ConfigurableDialog.js"></script>
+        <script type="text/javascript" src="../app/dialogs/CreateWorkspaceDialog.js"></script>
+        <script type="text/javascript" src="../app/dialogs/UpdateLinksDialog.js"></script>
+        <script type="text/javascript" src="../app/dialogs/SelectControlDialog.js"></script>
+        
+        <script type="text/javascript" src="../../customize/electronCode/file_impl_electron.js"></script>
+        <script type="text/javascript" src="../../customize/electronCode/custom_menus_electron.js"></script>
+        <!-- <script type="text/javascript" src="../../customize/cutNPasteCode/file_impl_cutnpaste.js"></script>
+        <script type="text/javascript" src="../../customize/cutNPasteCode/PasteOpenDialog.js"></script>
+        <script type="text/javascript" src="../../customize/cutNPasteCode/CutSaveDialog.js"></script> -->
+        
+		<link rel="stylesheet" type="text/css" href="../ui/jsonedit/jsonedit.css">
+        <link rel="stylesheet" type="text/css" href="../ui/windowFrame.css">
+        <link rel="stylesheet" type="text/css" href="../ui/dialog.css">
+        
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.28.4/handsontable.full.min.css">
+		<style id="styles_for_doc">
+			body {
+                overflow:hidden;
+                position:absolute;
+                left:0;
+                right:0;
+                top:0;
+				bottom:0;
+				padding:0px;
+				margin:0px;
+				font-family: sans-serif;
+				font-size: small;
+                
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+			}
+           textarea focus {
+                -webkit-user-select: text;
+                -khtml-user-select: text;
+                -moz-user-select: text;
+                -ms-user-select: text;
+                user-select: text;
+            }
+            input[type=text] focus {
+                -webkit-user-select: text;
+                -khtml-user-select: text;
+                -moz-user-select: text;
+                -ms-user-select: text;
+                user-select: text;
+            }
+            #appContainer {
+                position:absolute;
+                left:0;
+                right:0;
+                top:0;
+				bottom:0;
+            }
+            /* color/style classes */
+            .visicomp_windowColor {
+                background-color: rgb(185,185,220);
+            }
+            .visicomp_titleBarClass {
+                background-color: rgb(185,185,220);
+                padding:3px;
+            }
+            .visicomp_menuBarStyle {
+                background-color: rgb(220,220,240);
+            }
+            .visicomp_tabFrameColor {
+                background-color: rgb(185,185,220);
+            }
+            .visicomp_tabFrameActiveColor {
+                background-color: white;
+            }
+            
+            /* overrides for the handsontable coloring */
+            .handsontable th {
+                background-color: rgb(220,220,240);
+            }
+            .handsontable td {
+                background-color: rgba(255,255,255,0);
+              }
+		</style>
+		<script>
+            'use strict'
+            var app = null;
+			function init() {
+                haxapp.ui.initResourcePath("../../resources");
+                app = new haxapp.app.Hax("appContainer");
+            }
+            
+            function registerComponent(controlBundle) {
+                app.registerComponent(controlBundle);
+            }
+            
+		</script>
+	</head>
+	<body onload="init()">
+        <div id="appContainer"></div>
+	</body>
+</html>

@@ -1,6 +1,6 @@
 {
   "name": "hax",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Hax programming tool",
   "main": "hax.js",
   "devDependencies": {

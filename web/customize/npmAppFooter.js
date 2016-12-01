@@ -1,4 +1,4 @@
 
-module.exports = hax;
+module.exports = haxapp;
 
 

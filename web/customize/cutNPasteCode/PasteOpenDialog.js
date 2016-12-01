@@ -1,19 +1,11 @@
 
-/** This method shows a save folder dialog. I simply displays the text of
- * the workspace json for the user to copy and save elsewhere. */
-haxapp.app.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
-    
-    if((!workspaceUI)||(!workspaceUI.getWorkspace())) {
-        alert("There is no workspace open.");
-        return;
-    }
-    
-    var workspaceJson = workspaceUI.toJson();
-    var workspaceText = JSON.stringify(workspaceJson);
+/** This method shows a open workspace dialog. The argument onOpenFunction
+ * takes single argment, the workspace text. It does not need a return value. */
+haxapp.app.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
 
     var dialog = haxapp.ui.createDialog({"resizable":true,"movable":true});
     dialog.setTitle("&nbsp;");
-    
+
     //add a scroll container
     var contentContainer = haxapp.ui.createElement("div",null,
         {
@@ -33,35 +25,44 @@ haxapp.app.dialog.showSaveWorkspaceDialog = function(app,workspaceUI) {
 				"overflow":"hidden"
 			});
 	contentContainer.appendChild(content);
-    
-    var line;
   
     //title
     line = haxapp.ui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(haxapp.ui.createElement("div",{"className":"dialogTitle","innerHTML":"Save Workspace"}));
+    line.appendChild(haxapp.ui.createElement("div",{"className":"dialogTitle","innerHTML":"Open Workspace"}));
     content.appendChild(line);
     
     //instructions
     line = haxapp.ui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(haxapp.ui.createElement("div",{"innerHTML":"Copy the data below and save it in a file to open later."}));
+    line.appendChild(haxapp.ui.createElement("div",{"innerHTML":"Paste saved workspace data in the space below."}));
     content.appendChild(line);
     
     //input
     line = haxapp.ui.createElement("div",{"className":"dialogLine"});
-    var inputElement = haxapp.ui.createElement("textarea",{"value":workspaceText,"rows":"15","cols":"75"});
+    var inputElement = haxapp.ui.createElement("textarea",{"rows":"15","cols":"75"});
     line.appendChild(inputElement);
     content.appendChild(line);
     
     //buttons and handler
     line = haxapp.ui.createElement("div",{"className":"dialogLine"});
-    var onOk = function() {
+    var onCancel = function() {
         haxapp.ui.closeDialog(dialog);
     }
     
-    line.appendChild(haxapp.ui.createElement("button",{"className":"dialogButton","innerHTML":"OK","onclick":onOk}));
+    var onOpen = function() {
+        var jsonText = inputElement.value;
+        if(jsonText.length == 0) {
+            alert("Please paste the file into the input field");
+            return;
+        }
+        
+        onOpenFunction(jsonText);
+        
+        haxapp.ui.closeDialog(dialog);
+	}
+    
+    line.appendChild(haxapp.ui.createElement("button",{"className":"dialogButton","innerHTML":"Open","onclick":onOpen}));
+    line.appendChild(haxapp.ui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
-
-    dialog.setContent(content);
     
     //show dialog
     dialog.show();

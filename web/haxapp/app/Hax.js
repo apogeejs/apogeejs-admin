@@ -222,6 +222,77 @@ haxapp.app.Hax.prototype.createUI = function(containerId) {
 // Menu Functions
 //=================================
 
+/** This method creates the creates the menu bar, with the attached functionality. 
+ * @private */
+haxapp.app.Hax.prototype.createMenuBar = function() {
+    
+    //-------------------
+    //create menus
+    //-----------------------
+    var menuBar = document.createElement("div");
+    var menuBarStyle = {
+        "position":"relative",
+        "display":"table-row",
+        "width":"100%",
+        "padding":"2px"
+    };
+    haxapp.ui.applyStyle(menuBar,menuBarStyle);
+    menuBar.className = "visicomp_menuBarStyle";
+    
+    //create the menus
+    var menu;
+    var name;
+    var menus = {};
+
+    //Workspace menu
+    name = "Workspace";
+    menu = haxapp.ui.Menu.createMenu(name);
+    menuBar.appendChild(menu.getElement());
+    menus[name] = menu;
+    
+    var newCallback = haxapp.app.createworkspace.getCreateCallback(this);
+    menu.addCallbackMenuItem("New",newCallback);
+    
+    var openCallback = haxapp.app.openworkspace.getOpenCallback(this);
+    menu.addCallbackMenuItem("Open",openCallback);
+    
+    var saveCallback = haxapp.app.saveworkspace.getSaveCallback(this);
+    menu.addCallbackMenuItem("Save",saveCallback);
+    
+    var closeCallback = haxapp.app.closeworkspace.getCloseCallback(this);
+    menu.addCallbackMenuItem("Close",closeCallback);	
+	
+    //Components Menu
+    name = "Components";
+    menu = haxapp.ui.Menu.createMenu(name);
+    menuBar.appendChild(menu.getElement());
+    menus[name] = menu;
+    
+    //add create child elements
+    this.populateAddChildMenu(menu);
+    
+    //libraries menu
+    name = "Libraries";
+    menu = haxapp.ui.Menu.createMenu(name);
+    menuBar.appendChild(menu.getElement());
+    menus[name] = menu;
+    
+    var linksCallback = haxapp.app.updatelinks.getUpdateLinksCallback(this);
+    menu.addCallbackMenuItem("Update Links",linksCallback);
+    
+    //allow the implementation to add more menus or menu items
+    if(this.addToMenuBar) {
+        this.addToMenuBar(menuBar,menus);
+    }
+    
+    return menuBar;
+    
+}
+
+///** This method should be implemented if custom menus or menu items are desired. */
+//haxapp.app.Hax.prototype.addToMenuBar(menuBar,menus);
+
+
 haxapp.app.Hax.prototype.populateAddChildMenu = function(menu,optionalInitialValues,optionalComponentOptions) {
     
     for(var i = 0; i < this.standardComponents.length; i++) {

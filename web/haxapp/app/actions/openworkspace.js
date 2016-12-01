@@ -1,6 +1,4 @@
 
-
-
 haxapp.app.openworkspace = {};
 
 //=====================================
@@ -10,12 +8,10 @@ haxapp.app.openworkspace = {};
 haxapp.app.openworkspace.getOpenCallback = function(app) {
     return function() {
     
-        var onOpen = function(err,workspaceData) {
+        var onOpen = function(err,workspaceData,workspaceHandle) {
             
             if(err) {
-                
                 alert("Error: " + err.message);
-                return false;
             }
             else {
                 var actionCompletedCallback = function(actionResponse) {
@@ -25,28 +21,16 @@ haxapp.app.openworkspace.getOpenCallback = function(app) {
                 };
 
                 //open workspace
-                haxapp.app.openworkspace.openWorkspace(app,workspaceData,actionCompletedCallback);
-
-                //we should show some sort of loading message or symbol
-                return true;
+                haxapp.app.openworkspace.openWorkspace(app,workspaceData,workspaceHandle,actionCompletedCallback);
             }
         }
         
-        //show file open dialog
-        var electron = require('electron').remote;
-        var dialog = electron.dialog;
-        
-		var fileList = dialog.showOpenDialog({properties: ['openFile']});
-			
-        if((fileList)&&(fileList.length > 0)) {
-            var name = fileList[0];
-            var fs = require('fs');
-            fs.readFile(name,onOpen);
-        }
+        haxapp.app.openworkspace.openFile(onOpen);
     }
 }
 
-
+//THIS FUNCTION MUST BE IMPLEMENTED!
+//haxapp.app.openworkspace.openFile(onOpen);
 
 //=====================================
 // Action
@@ -56,7 +40,7 @@ haxapp.app.openworkspace.getOpenCallback = function(app) {
 /** This method opens an workspace, from the text file. 
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
-haxapp.app.openworkspace.openWorkspace = function(app,workspaceText,actionCompletedCallback) {
+haxapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspaceHandle,actionCompletedCallback) {
     var actionResponse = new hax.ActionResponse();
     var name;
     var workspaceUIAdded;
@@ -127,11 +111,54 @@ haxapp.app.openworkspace.loadWorkspace = function(workspaceUI,workspaceJson,acti
     workspaceUI.setWorkspace(workspace,workspaceComponentsJson);
 }
 
+
 //------------------------
 // open from url
 //------------------------
 
 /** This method opens an workspace by getting the workspace file from the url. */
 haxapp.app.openworkspace.openWorkspaceFromUrl = function(app,url) {
-    alert("Open workspace from URL not supported in electron");
+    var actionCompletedCallback = function(actionResponse) {
+        if(!actionResponse.getSuccess()) {
+            alert(actionResponse.getErrorMsg());
+        }
+    };
+    
+    haxapp.app.openworkspace.openWorkspaceFromUrlImpl(app,url,actionCompletedCallback);
+}
+
+/** This method opens an workspace by getting the workspace file from the url. */
+haxapp.app.openworkspace.openWorkspaceFromUrlImpl = function(app,url,actionCompletedCallback) {
+    var onDownload = function(workspaceText) {
+        haxapp.app.openworkspace.openWorkspace(app,workspaceText,actionCompletedCallback);
+    }
+    
+    var onFailure = function(msg) {
+        var actionError = new hax.ActionError(msg,"AppException",null);
+        var actionResponse = new hax.ActionResponse();
+        actionResponse.addError(actionError);
+        actionCompletedCallback(actionResponse);
+    }   
+    haxapp.app.openworkspace.doRequest(url,onDownload,onFailure);   
+}
+
+/**
+ * This is an http request for the worksheet data
+ */
+haxapp.app.openworkspace.doRequest= function(url,onDownload,onFailure) {
+	var xmlhttp=new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange=function() {
+        var msg;
+        if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+            onDownload(xmlhttp.responseText);
+        }
+        else if(xmlhttp.readyState==4  && xmlhttp.status >= 400)  {
+            msg = "Error in http request. Status: " + xmlhttp.status;
+            onFailure(msg);
+        }
+    }
+	
+	xmlhttp.open("GET",url,true);
+    xmlhttp.send();
 }

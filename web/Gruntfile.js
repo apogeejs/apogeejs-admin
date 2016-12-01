@@ -123,6 +123,17 @@ module.exports = function(grunt) {
             ],
             "dest": "../../dist/hax-web-app.js"
         },
+        "dist_web_cutnpaste": {
+            "options":{
+                "banner":"/* Hax Web Customization Version <%= pkg.version %> - Cut-n-Paste file open/close */\n"
+            },
+            "src": [
+                "haxapp/customize/cutNPasteCode/CutSaveDialog.js",
+                "haxapp/customize/cutNPasteCode/PasteOpenDialog.js",
+                "haxapp/customize/cutNPasteCode/file_impl_cutnpaste.js"
+            ],
+            "dest": "../../dist/hax-web-cutnpaste.js"
+        },
         "dist_npm_lib": {
             "options":{
                 "banner":"/* Hax NPM Lib Version <%= pkg.version %> */\n"
@@ -140,6 +151,8 @@ module.exports = function(grunt) {
             },
             "src": [
                 "../../dist/hax-base-app.js",
+                "haxapp/customize/electronCode/custom_menus_electron.js",
+                "haxapp/customize/electronCode/file_impl_electron.js",
                 "customize/npmAppFooter.js"
             ],
             "dest": "../../dist/hax-npm-app.js"
@@ -157,6 +170,11 @@ module.exports = function(grunt) {
       dist_web_app: {
         files: {
           '../../dist/hax-web-app.min.js': ['<%= concat.dist_web_app.dest %>']
+        }
+      },
+      dist_web_cutnpaste: {
+        files: {
+          '../../dist/hax-web-cutnpaste.min.js': ['<%= concat.dist_web_cutnpaste.dest %>']
         }
       },
 	  dist_npm_lib: {

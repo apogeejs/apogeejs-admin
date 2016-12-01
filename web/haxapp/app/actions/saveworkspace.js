@@ -45,33 +45,13 @@ haxapp.app.saveworkspace.getWorkspaceText = function() {
         return undefined;
     }
 }
-    
-haxapp.app.saveworkspace.showSaveDialog = function(data) {
-    var electron = require('electron').remote;
-    var dialog = electron.dialog;
-    var filename = dialog.showSaveDialog();
-    if(filename) {
-        haxapp.app.saveworkspace.saveFile(filename,data);
-    }
-    else {
-        return false;
-    }
-}
+  
+//THIS METHOD MUST BE IMPLEMTED!  
+//haxapp.app.saveworkspace.showSaveDialog = function(data);
 
 //=====================================
 // Action
 //=====================================
 
-haxapp.app.saveworkspace.saveFile = function(filename,data) {
-    var onComplete = function(err,data) {
-        if(err) {
-            alert("Error: " + err.message);
-        }
-        else {
-            alert("Saved!");
-        }
-    }
-
-    var fs = require('fs');
-    fs.writeFile(filename,data,onComplete);
-}
+//THIS METHOD MUST BE IMPLEMTED!
+//haxapp.app.saveworkspace.saveFile = function(filename,data);
