@@ -166,7 +166,6 @@ hax.Codeable.prepareForCalculate = function() {
 
 /** This method sets the data object for the member.  */
 hax.Codeable.calculate = function() {
-    
     if(this.codeErrors.length > 0) {
         this.addErrors(this.codeErrors);
         this.clearCalcPending();

@@ -140,8 +140,7 @@ hax.FolderFunction.prototype.needsCalculating = function() {
 
 /** This updates the member data based on the function. It returns
  * true for success and false if there is an error.  */
-hax.FolderFunction.prototype.calculate = function() {
-    
+hax.FolderFunction.prototype.calculate = function() {  
     //make sure the data is set in each impactor
     this.initializeImpactors();
     

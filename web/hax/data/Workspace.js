@@ -104,9 +104,61 @@ hax.Workspace.createVirtualWorkpaceFromFolder = function(name,origRootFolder,own
     workspaceJson.version = hax.Workspace.SAVE_FILE_VERSION;
     workspaceJson.data = origRootFolder.toJson();
 	
-    return new hax.Workspace(workspaceJson,null,ownerInWorkspace);
+    var virtualWorkspace = new hax.Workspace(workspaceJson,null);
+    
+    //add the parent variables to the context manager - but add them as static
+    //data, not dynamic objects
+    var contextManager = virtualWorkspace.getContextManager();
+    //DANGER - what I really want to do is not have the global entry. I have other 
+    //entries that might be before it and they will include a global entry.
+    contextManager.clearContextList();
+    //kind of a cludge
+    hax.Workspace.flattenParentIntoContextManager(contextManager,ownerInWorkspace);
+    
+    return virtualWorkspace;
 }
 
+//this is a cludge. look into fixing it.
+hax.Workspace.flattenParentIntoContextManager = function(contextManager,virtualWorkspaceParent) {
+    for(var owner = virtualWorkspaceParent; owner != null; owner = owner.getOwner()) {
+        var ownerContextManager = owner.getContextManager();
+        var contextList = ownerContextManager.contextList; //IF WE USE THIS WE NEED TO MAKE IT ACCESSIBLE!
+        for(var i = 0; i < contextList.length; i++) {
+            var contextEntry = contextList[i];
+            //only take non-local entries
+            if(contextEntry.isLocal) continue;
+//=============================================================
+//for now - this is what we would do if we took the folder functino parent. Currently the regular code does not do this.
+//            //only take local entries if this is owner is the local owner 
+//            if((contextEntry.isLocal)&&(owner != virtualWorkspaceParent)) {
+//                continue;
+//            }
+//==============================================================
+            
+            if(contextEntry.parent) {
+                //add this entry after converting it to a data entry, 
+                contextManager.addToContextList(hax.Workspace.convertToDataContextEntry(contextEntry));
+            }
+            else if(contextEntry.data) {
+                //already a data entry - add it directly
+                contextManager.addToContextList(contextEntry);
+            }
+            else {
+                //unknown case - ignore
+            }
+        }
+    }
+}
+
+hax.Workspace.convertToDataContextEntry = function(contextEntry) {
+    var contextDataEntry = {};
+    contextDataEntry.isLocal = false;
+    if(contextEntry.parent.isDataHolder) {
+        contextDataEntry.data = contextEntry.parent.getData();
+    }
+    return contextDataEntry;
+}
+    
 //============================
 // Save Functions
 //============================
