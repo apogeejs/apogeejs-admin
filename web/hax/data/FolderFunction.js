@@ -45,7 +45,8 @@ hax.FolderFunction.prototype.getRoot = function() {
 /** This method sets the root object - implemented from RootHolder.  */
 hax.FolderFunction.prototype.setRoot = function(child) {
     this.internalFolder = child;
-    var newDependsOn = [child];
+    var newDependsOn = [];
+    if(child) newDependsOn.push(child);
     this.updateDependencies(newDependsOn);
 }
 
