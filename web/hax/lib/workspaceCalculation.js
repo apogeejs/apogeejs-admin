@@ -16,14 +16,20 @@ hax.calculation.addToRecalculateList = function(recalculateList,member) {
         member.prepareForCalculate();
     }
     
-    //add any member that depends on this one
     if(member.isDataHolder) {
-        var impactsList = member.getImpactsList();
-        for(var i = 0; i < impactsList.length; i++) {
-            hax.calculation.addToRecalculateList(recalculateList,impactsList[i]);
-        }
+        hax.calculation.addDependsOnToRecalculateList(recalculateList,member);
     }
 }
+
+hax.calculation.addDependsOnToRecalculateList = function(recalculateList,member) {
+    //add any member that depends on this one    
+    var impactsList = member.getImpactsList();
+    for(var i = 0; i < impactsList.length; i++) {
+        hax.calculation.addToRecalculateList(recalculateList,impactsList[i]);
+    }
+}
+
+
 
 /** This calls execute for each member in the recalculate list. The return value
  * is false if there are any errors.

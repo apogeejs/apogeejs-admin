@@ -376,38 +376,6 @@ haxapp.app.Component.getPropertyValues = function() {
     return values;
 }
 
-/** This method is used for updating property values from the property dialog. 
- * If there are additional property lines, in the generator, this method should
- * be extended to edit the values of those properties too. */
-haxapp.app.Component.updatePropertyValues = function(oldValues,newValues) {
-    var actionResponse = new hax.ActionResponse();
-    var recalculateList = [];
-    var member = this.object;
-    
-    try {
-        if((oldValues.name !== newValues.name)||(oldValues.parentKey !== newValues.parentKey)) {
-            var parent = this.workspaceUI.getObjectByKey(newValues.parentKey);
-            hax.movemember.moveMember(member,newValues.name,parent,recalculateList);
-        }
-
-        if(this.generator.updatePropHandler) {
-            this.generator.updatePropHandler(member,oldValues,newValues,recalculateList);
-        }
-        
-        //recalculate
-        hax.calculation.callRecalculateList(recalculateList,actionResponse);
-        
-        hax.updatemember.fireUpdatedEventList(recalculateList);
-    }
-    catch(error) {
-        //unknown application error
-        var actionError = hax.ActionError.processException(error,"AppException",true);
-        actionResponse.addError(actionError);
-    }
-    
-    return actionResponse;
-}
-
 //=============================
 // Action UI Entry Points
 //=============================

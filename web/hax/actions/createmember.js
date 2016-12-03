@@ -28,29 +28,11 @@ hax.createmember.createMember = function(owner,json,optionalActionResponse) {
 	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.ActionResponse();
     
     try {      
-        var recalculateList = [];
-        var creationList = [];
-        
-        var member = hax.createmember.instantiateMember(owner,json,creationList,actionResponse);
-        
-        //put all created objects into recalculate list
-        for(var i = 0; i < creationList.length; i++) {
-            hax.calculation.addToRecalculateList(recalculateList,creationList[i]);
-        }
-        
-        //add the member to the action response
-        actionResponse.member = member;
-
+        var completedActions = hax.action.createCompletedActionsObject();
+        var member = hax.createmember.instantiateMember(owner,json,completedActions,actionResponse);
         var workspace = member.getWorkspace();
-        workspace.updateDependeciesForModelChange(recalculateList);
-
-        hax.calculation.callRecalculateList(recalculateList,actionResponse);
         
-        var updatedButNotCreated = hax.base.getListInFirstButNotSecond(recalculateList,creationList);
-
-        //dispatch events
-        hax.createmember.fireCreatedEventList(creationList);
-        hax.updatemember.fireUpdatedEventList(updatedButNotCreated);
+        hax.action.finalizeAction(workspace,completedActions,actionResponse);
 	}
 	catch(error) {
         //unknown application error
@@ -62,8 +44,9 @@ hax.createmember.createMember = function(owner,json,optionalActionResponse) {
 	return actionResponse;
 }
 
-/** This method instantiates a member, without setting the update data. */
-hax.createmember.instantiateMember = function(owner,json,creationList,actionResponse) {
+/** This method instantiates a member, without setting the update data. 
+ *@private */
+hax.createmember.instantiateMember = function(owner,json,completedActions,actionResponse) {
     //create member
     var generator = hax.Workspace.getMemberGenerator(json.type);
 
@@ -79,12 +62,12 @@ hax.createmember.instantiateMember = function(owner,json,creationList,actionResp
 
     var childJsonOutputList = [];
     var member = generator.createMember(owner,json,childJsonOutputList);
-    creationList.push(member);
+    hax.action.addAction(completedActions,member,"create");
     
     //instantiate children if there are any
     for(var i = 0; i < childJsonOutputList.length; i++) {
         var childJson = childJsonOutputList[i];
-        hax.createmember.instantiateMember(member,childJson,creationList,actionResponse);
+        hax.createmember.instantiateMember(member,childJson,completedActions,actionResponse);
     }
     
     return member;

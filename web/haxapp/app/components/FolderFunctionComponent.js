@@ -104,10 +104,15 @@ haxapp.app.FolderFunctionComponent.addPropValues = function(member,values) {
     return values;
 }
 
-haxapp.app.FolderFunctionComponent.propUpdateHandler = function(member,oldValues,newValues,recalculateList) {
+haxapp.app.FolderFunctionComponent.propUpdateHandler = function(folderFunction,oldValues,newValues,completedActions) {
     if((oldValues.argListString !== newValues.argListString)||(oldValues.returnValueString !== newValues.returnValueString)) {
         var newArgList = haxapp.app.FunctionComponent.parseStringArray(newValues.argListString);
-        hax.updatefolderFunction.updatePropertyValues(member,newArgList,newValues.returnValueString,recalculateList);
+        
+        folderFunction.setArgList(newArgList);
+        folderFunction.setReturnValueString(newValues.returnValueString);
+        
+        //we use update code because this needs to be calculated
+        hax.action.addAction(completedActions,folderFunction,"updateCode");
     }    
 }
 

@@ -299,12 +299,12 @@ haxapp.app.Hax.prototype.populateAddChildMenu = function(menu,optionalInitialVal
         var key = this.standardComponents[i];
         var generator = this.componentGenerators[key];
         var title = "Add " + generator.displayName;
-        var callback = haxapp.app.updatecomponent.getAddComponentCallback(this,generator,optionalInitialValues,optionalComponentOptions);
+        var callback = haxapp.app.addcomponent.getAddComponentCallback(this,generator,optionalInitialValues,optionalComponentOptions);
         menu.addCallbackMenuItem(title,callback);
     }
 
     //add the additional component item
-    var componentCallback = haxapp.app.addadditionalcomponent.getAddAdditionalComponentCallback(this,optionalInitialValues,optionalComponentOptions);
+    var componentCallback = haxapp.app.addcomponent.getAddAdditionalComponentCallback(this,optionalInitialValues,optionalComponentOptions);
     menu.addCallbackMenuItem("Other Components...",componentCallback);
 }
 

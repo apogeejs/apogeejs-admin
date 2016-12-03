@@ -11,9 +11,6 @@ hax.updatemember = {};
  */
 hax.updatemember.MEMBER_UPDATED_EVENT = "memberUpdated";
 
-hax.updatemember.CODE_APPLIED = 0;
-hax.updatemember.DATA_APPLIED = 1;
-
 hax.updatemember.fireUpdatedEvent = function(member) {
     var workspace = member.getWorkspace();
     workspace.dispatchEvent(hax.updatemember.MEMBER_UPDATED_EVENT,member);
@@ -32,23 +29,17 @@ hax.updatemember.updateCode = function(member,argList,functionBody,supplementalC
 	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.ActionResponse();
     
     try {
-        var recalculateList = [];
-
+        var completedActions = hax.action.createCompletedActionsObject();
+        
         hax.updatemember.applyCode(member,
             argList,
             functionBody,
-            supplementalCode,
-            recalculateList);
+            supplementalCode);
             
-        //set dependencies
-        member.initializeDependencies();
+        hax.action.addAction(completedActions,member,"updateCode");
             
-        hax.calculation.addToRecalculateList(recalculateList,member);
-
-        hax.calculation.callRecalculateList(recalculateList,actionResponse);
-        
-        //fire updated events
-        hax.updatemember.fireUpdatedEventList(recalculateList);
+        var workspace = member.getWorkspace();
+        hax.action.finalizeAction(workspace,completedActions,actionResponse);
     }
     catch(error) {
         var actionError = hax.ActionError.processException(error,"AppException",true);
@@ -65,17 +56,19 @@ hax.updatemember.updateData = function(member,data,optionalActionResponse) {
 	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.ActionResponse();
     
     try {
-        var recalculateList = [];
-
+        var completedActions = hax.action.createCompletedActionsObject();
+        
         hax.updatemember.applyData(member,data);
         
-        hax.calculation.addToRecalculateList(recalculateList,member);
-
-        hax.calculation.callRecalculateList(recalculateList,actionResponse);
-
-        //fire updated events
-        hax.updatemember.fireUpdatedEvent(member);
-        hax.updatemember.fireUpdatedEventList(recalculateList);
+        //clear the code - so the data is used
+        if(member.isCodeable) {
+            member.clearCode();
+        }
+        
+        hax.action.addAction(completedActions,member,"updateData");
+        
+        var workspace = member.getWorkspace();
+        hax.action.finalizeAction(workspace,completedActions,actionResponse);
     }
     catch(error) {
         var actionError = hax.ActionError.processException(error,"AppException",true);
@@ -91,25 +84,16 @@ hax.updatemember.asynchFunctionUpdateData = function(member,data) {
 	var actionResponse = new hax.ActionResponse();
     
     try {
-        var recalculateList = [];
-
+        var completedActions = hax.action.createCompletedActionsObject();
+        
         //apply data without clearing formula
         hax.updatemember.asynchFunctionApplyData(member,data);
         member.setResultPending(false);
         
-        //add all dependents to list without adding this object
-        if(member.isDataHolder) {
-            var impactsList = member.getImpactsList();
-            for(var i = 0; i < impactsList.length; i++) {
-                hax.calculation.addToRecalculateList(recalculateList,impactsList[i]);
-            }
-        }
-
-        hax.calculation.callRecalculateList(recalculateList,actionResponse);
-
-        //fire updated events
-        hax.updatemember.fireUpdatedEvent(member);
-        hax.updatemember.fireUpdatedEventList(recalculateList);
+        hax.action.addAction(completedActions,member,"asynchUpdateCode");
+        
+        var workspace = member.getWorkspace();
+        hax.action.finalizeAction(workspace,completedActions,actionResponse);
     }
     catch(error) {
         var actionError = hax.ActionError.processException(error,"AppException",true);
@@ -124,27 +108,18 @@ hax.updatemember.asynchFunctionUpdateError = function(member,errorMsg) {
     var actionError;
     
     try {
-        var recalculateList = [];
-
+        var completedActions = hax.action.createCompletedActionsObject();
+        
         //apply data without clearing formula
         actionError = new hax.ActionError(errorMsg,"Codeable - Calculate",member);
         member.addError(actionError);
         actionResponse.addError(actionError);
         member.setResultPending(false);
         
-        //add all dependents to list without adding this object
-        if(member.isDataHolder) {
-            var impactsList = member.getImpactsList();
-            for(var i = 0; i < impactsList.length; i++) {
-                hax.calculation.addToRecalculateList(recalculateList,impactsList[i]);
-            }
-        }
-
-        hax.calculation.callRecalculateList(recalculateList,actionResponse);
-
-        //fire updated events
-        hax.updatemember.fireUpdatedEvent(member);
-        hax.updatemember.fireUpdatedEventList(recalculateList);
+        hax.action.addAction(completedActions,member,"asynchUpdateError");
+        
+        var workspace = member.getWorkspace();
+        hax.action.finalizeAction(workspace,completedActions,actionResponse);
     }
     catch(error) {
         actionError = hax.ActionError.processException(error,"AppException",true);
@@ -161,8 +136,7 @@ hax.updatemember.updateObjects = function(updateDataList,optionalActionResponse)
 	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.ActionResponse();
     
     try {
-        var recalculateList = [];   
-        var setDataList = [];
+        var completedActions = hax.action.createCompletedActionsObject();
              
         //process each member in the list
         for(var i = 0; i < updateDataList.length; i++) {
@@ -170,26 +144,11 @@ hax.updatemember.updateObjects = function(updateDataList,optionalActionResponse)
             var member = argData.member;
             
             var codeOrData = hax.updatemember.applyCodeOrData(member,argData);
-            
-            //if this is code we need to initialize
-            //set dependencies
-            if(codeOrData === hax.updatemember.CODE_APPLIED) {
-                member.initializeDependencies();
-            }
-            else {
-                setDataList.push(member);
-            }
-            
-            //update recalculate list
-            hax.calculation.addToRecalculateList(recalculateList,member);
+            hax.action.addAction(completedActions,member,codeOrData);
         }
 
-        //recalculate after all have been added
-        hax.calculation.callRecalculateList(recalculateList,actionResponse);
-
-        //fire updated events
-        hax.updatemember.fireUpdatedEventList(setDataList);
-        hax.updatemember.fireUpdatedEventList(recalculateList);
+        var workspace = member.getWorkspace();
+        hax.action.finalizeAction(workspace,completedActions,actionResponse);
     }
     catch(error) {
         var actionError = hax.ActionError.processException(error,"AppException",true);
@@ -200,7 +159,7 @@ hax.updatemember.updateObjects = function(updateDataList,optionalActionResponse)
 }
 
 //=====================================
-// Private Functions
+// Private and Internal Functions
 //=====================================
 
 hax.updatemember.applyCodeOrData = function(member,updateData) {
@@ -214,12 +173,12 @@ hax.updatemember.applyCodeOrData = function(member,updateData) {
             argList,
             functionBody,
             supplementalCode);
-        return hax.updatemember.CODE_APPLIED;
+        return "updateCode";
     }
     else if(data !== undefined) {
         hax.updatemember.applyData(member,
             data);
-        return hax.updatemember.DATA_APPLIED;
+        return "updateData";
     }
 }
 /** This method updates the code and object function in a member based on the
@@ -242,21 +201,9 @@ hax.updatemember.applyCode = function(codeable,argList,functionBody,supplemental
     codeable.setCodeInfo(codeInfo);
 }
 
-/** This method sets the data for a member. */
+/** This method sets the data for a member. 
+ * @private */
 hax.updatemember.applyData = function(dataHolder,data) {
-    
-    dataHolder.clearErrors();
-    //clear the code if this is a codeable object
-    if(dataHolder.isCodeable) {
-        dataHolder.clearCode();
-    }
-    
-    dataHolder.setData(data);
-}
-
-/* This method sets the data on the return os an asynchronous formula. It 
- * is the same as apply data except it does not clear the code. */
-hax.updatemember.asynchFunctionApplyData = function(dataHolder,data) {
     dataHolder.clearErrors();
     dataHolder.setData(data);
 }

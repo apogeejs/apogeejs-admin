@@ -10,11 +10,14 @@ hax.deletemember = {};
  */
 hax.deletemember.MEMBER_DELETED_EVENT = "memberDeleted";
 
+hax.createmember.fireDeletedEvent = function(deleteInfo) {
+    var workspace = deleteInfo.workspace;
+    workspace.dispatchEvent(hax.deletemember.MEMBER_DELETED_EVENT,deleteInfo);
+}
+
 hax.deletemember.fireDeletedEventList = function(deleteInfoList) {
     for(var i = 0; i < deleteInfoList.length; i++) {
-        var deleteInfo = deleteInfoList[i];
-        var workspace = deleteInfo.workspace;
-        workspace.dispatchEvent(hax.deletemember.MEMBER_DELETED_EVENT,deleteInfo);
+        hax.createmember.fireDeletedEvent(deleteInfoList[i]);
     }
 }
 
@@ -26,9 +29,8 @@ hax.deletemember.deleteMember = function(member,optionalActionResponse) {
 	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.ActionResponse();
     
     try {
-        
-        var recalculateList = [];
         var deleteInfoList = [];
+        var completedActions = hax.action.createCompletedActionsObject();
         
         var workspace = member.getWorkspace();
         
@@ -40,16 +42,11 @@ hax.deletemember.deleteMember = function(member,optionalActionResponse) {
             member.onDeleteChild();
             if(member.isDependent) {
                 member.onDeleteDependent();
-            }
-            
+            }   
+            hax.action.addActionInfo(completedActions,deleteInfo);
         }
-        workspace.updateDependeciesForModelChange(recalculateList);
-
-        hax.calculation.callRecalculateList(recalculateList,actionResponse);
-
-        //dispatch events
-        hax.deletemember.fireDeletedEventList(deleteInfoList);
-        hax.updatemember.fireUpdatedEventList(recalculateList);
+        
+        hax.action.finalizeAction(workspace,completedActions,actionResponse);
 	}
 	catch(error) {
         //unknown application error
@@ -62,10 +59,11 @@ hax.deletemember.deleteMember = function(member,optionalActionResponse) {
         
 }
 
-
+/** @private */
 hax.deletemember.fillDeleteInfoList =  function(member,deleteInfoList) {
     var deleteInfo = {};
     deleteInfo.member = member;
+    deleteInfo.action = "delete"
     deleteInfo.workspace = member.getWorkspace();
     deleteInfo.fullName = member.getFullName();
     deleteInfoList.push(deleteInfo);

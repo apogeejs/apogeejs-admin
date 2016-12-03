@@ -11,42 +11,43 @@ hax.movemember = {};
  */
 hax.movemember.MEMBER_MOVED_EVENT = "memberMoved";
 
+hax.movemember.fireMovedEvent = function(moveInfo) {
+    var workspace = moveInfo.member.getWorkspace();
+    workspace.dispatchEvent(hax.movemember.MEMBER_MOVED_EVENT,moveInfo);
+}
 
-hax.movemember.fireMovedEventList = function(movedMemberList,movedOldNameList,movedNewNameList) {
-    for(var i = 0; i < movedMemberList.length; i++) {
-        var member = movedMemberList[i];
-        var workspace = member.getWorkspace();
-        var memberInfo = {};
-        memberInfo.member = member;
-        memberInfo.oldFullName = movedOldNameList[i];
-        memberInfo.newFullName = movedNewNameList[i];
-        workspace.dispatchEvent(hax.movemember.MEMBER_MOVED_EVENT,memberInfo);
+hax.movemember.fireMovedEventList = function(moveInfoList) {
+    for(var i = 0; i < moveInfoList.length; i++) {
+        hax.movemember.fireMovedEvent(moveInfoList[i]);
     }
 }
 
 /** This method creates member according the input json, in the given folder.
  * The return value is an ActionResponse object. Optionally, an existing action response
  * may be passed in or otherwise one will be created here. */
-hax.movemember.moveMember = function(member,name,folder,recalculateList) {
+hax.movemember.moveMember = function(member,name,folder,completedActions) {
         
     var movedMemberList = [];
     hax.movemember.loadMovedList(member,movedMemberList);
     var movedOldNameList = hax.movemember.getNameList(movedMemberList);
     member.move(name,folder);
     var movedNewNameList = hax.movemember.getNameList(movedMemberList);
-
-    var workspace = member.getWorkspace();
-
-    workspace.updateDependeciesForModelChange(recalculateList);
     
-    var updatedButNotMoved = hax.base.getListInFirstButNotSecond(recalculateList,movedMemberList);
+    //add the individual moves
+    for(var i = 0; i < movedMemberList.length; i++) {
+        var moveMember = movedMemberList[i];
+        var memberInfo = {};
+        memberInfo.member = moveMember;
+        memberInfo.oldFullName = movedOldNameList[i];
+        memberInfo.newFullName = movedNewNameList[i];
+        memberInfo.action = "move";
+        hax.action.addActionInfo(completedActions,memberInfo);
+    }
 
-    //dispatch events
-    hax.movemember.fireMovedEventList(movedMemberList,movedOldNameList,movedNewNameList);
-    hax.updatemember.fireUpdatedEventList(updatedButNotMoved);
 }
 
-//this creates the moved info list, including the member and the old name, but not the new name
+/** this creates the moved info list, including the member and the old name, but not the new name
+ * @private */
 hax.movemember.loadMovedList = function(member,movedMemberList) {
     movedMemberList.push(member);
     
@@ -63,7 +64,8 @@ hax.movemember.loadMovedList = function(member,movedMemberList) {
     }
 }
 
-//this adds the new name to the moved list
+/** this adds the new name to the moved list
+ * @private */
 hax.movemember.getNameList = function(movedMemberList) {
     var nameList = [];
     for(var i = 0; i < movedMemberList.length; i++) {

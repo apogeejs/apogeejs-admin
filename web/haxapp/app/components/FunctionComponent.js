@@ -89,17 +89,16 @@ haxapp.app.FunctionComponent.addPropValues = function(member,values) {
     return values;
 }
 
-haxapp.app.FunctionComponent.propUpdateHandler = function(member,oldValues,newValues,recalculateList) {
+haxapp.app.FunctionComponent.propUpdateHandler = function(member,oldValues,newValues,completedActions) {
     if(oldValues.argListString !== newValues.argListString) {
         var newArgList = haxapp.app.FunctionComponent.parseStringArray(newValues.argListString);
         var functionBody = member.getFunctionBody();
         var supplementalCode = member.getSupplementalCode();
-
-        hax.updatemember.updateCode(member,
-            newArgList,
-            functionBody,
-            supplementalCode,
-            recalculateList);
+        
+        //apply the code update
+        hax.updatemember.applyCode(member,newArgList,functionBody,supplementalCode);
+        
+        hax.action.addAction(completedActions,member,"updateCode");
     }
 }
 
