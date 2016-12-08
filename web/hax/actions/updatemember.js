@@ -90,7 +90,7 @@ hax.updatemember.asynchFunctionUpdateData = function(member,data) {
         hax.updatemember.asynchFunctionApplyData(member,data);
         member.setResultPending(false);
         
-        hax.action.addAction(completedActions,member,"asynchUpdateCode");
+        hax.action.addAction(completedActions,member,"asynchUpdateData");
         
         var workspace = member.getWorkspace();
         hax.action.finalizeAction(workspace,completedActions,actionResponse);
