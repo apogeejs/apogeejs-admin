@@ -197,7 +197,10 @@ hax.Workspace.prototype.loadFromJson = function(json,actionResponse) {
 	
     if(!actionResponse) actionResponse = new hax.ActionResponse();
 
-    hax.createmember.createMember(this,json.data,actionResponse);
+    var actionData = json.data;
+    actionData.action = "createMember";
+    actionData.owner = this;
+    hax.action.doAction(this,actionData,actionResponse);
     
     return actionResponse;
 }

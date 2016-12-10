@@ -1,73 +1,52 @@
 /** This namespace contains functions to process a create of a member */
 hax.createmember = {};
 
+/** Create member action */
+hax.createmember.ACTION_NAME = "createMember";
+
 /** member CREATED EVENT
- * This listener event is fired when after a member is created, to be used to respond
- * to the member update such as to update the UI.
- * 
  * Event member Format:
  * [member]
  */
 hax.createmember.MEMBER_CREATED_EVENT = "memberCreated";
 
-hax.createmember.fireCreatedEvent = function(member) {
-    var workspace = member.getWorkspace();
-    workspace.dispatchEvent(hax.createmember.MEMBER_CREATED_EVENT,member);
+hax.createmember.ACTION_INFO = {
+    "actionFunction": hax.createmember.createMember,
+    "checkUpdateAll": true,
+    "updateDependencies": true,
+    "addToRecalc": true,
+    "event": hax.createmember.MEMBER_CREATED_EVENT
 }
 
-hax.createmember.fireCreatedEventList = function(memberList) {
-    for(var i = 0; i < memberList.length; i++) {
-        hax.createmember.fireCreatedEvent(memberList[i]);
-    }
-}
-
-/** This method creates member according the input json, in the given folder.
- * The return value is an ActionResponse object. Optionally, an existing action response
- * may be passed in or otherwise one will be created here. */
-hax.createmember.createMember = function(owner,json,optionalActionResponse) {
-	var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.ActionResponse();
-    
-    try {      
-        var completedActions = hax.action.createCompletedActionsObject();
-        var member = hax.createmember.instantiateMember(owner,json,completedActions,actionResponse);
-        var workspace = member.getWorkspace();
-        
-        hax.action.finalizeAction(workspace,completedActions,actionResponse);
-	}
-	catch(error) {
-        //unknown application error
-        var actionError = hax.ActionError.processException(error,"AppException",true);
-        actionResponse.addError(actionError);
-    }
-    
-    //return response
-	return actionResponse;
-}
+hax.action.addEventInfo(hax.createmember.ACTION_NAME,hax.createmember.ACTION_INFO);
 
 /** This method instantiates a member, without setting the update data. 
  *@private */
-hax.createmember.instantiateMember = function(owner,json,completedActions,actionResponse) {
+hax.createmember.createMember = function(actionData,processedActions) {
+    
     //create member
-    var generator = hax.Workspace.getMemberGenerator(json.type);
+    var generator = hax.Workspace.getMemberGenerator(actionData.type);
 
     if(!generator) {
        //type not found
-       var errorMsg = "Member type not found: " + json.type;
-       var actionError = new hax.ActionError(errorMsg,"Model",null);
-       
-       actionResponse.addError(actionError);
-       
+       actionData.error = new hax.ActionError("Member type not found: " + actionData.type,"AppException",null);
        return null;
     }
 
     var childJsonOutputList = [];
-    var member = generator.createMember(owner,json,childJsonOutputList);
-    hax.action.addAction(completedActions,member,"create");
+    var member = generator.createMember(actionData.owner,actionData,childJsonOutputList);
+    
+    //store the created object
+    actionData.member = member;
+    
+    //we are potentially adding multiple creates here, including children
+    processedActions.push(actionData);
     
     //instantiate children if there are any
     for(var i = 0; i < childJsonOutputList.length; i++) {
         var childJson = childJsonOutputList[i];
-        hax.createmember.instantiateMember(member,childJson,completedActions,actionResponse);
+        childJson.owner = member;
+        hax.createmember.createMember(childJson);
     }
     
     return member;

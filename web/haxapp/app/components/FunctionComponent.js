@@ -54,20 +54,23 @@ haxapp.app.FunctionComponent.prototype.getViewModeElement = function(viewType) {
 //create component call. data includes name and potentially other info
 haxapp.app.FunctionComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
+    var workspace = workspaceUI.getWorkspace();
     var parent = workspaceUI.getObjectByKey(data.parentKey);
     //should throw an exception if parent is invalid!
     
     var json = {};
+    json.action = "createMember";
+    json.owner = parent;
     json.name = data.name;
     if(data.argListString) {
-        var argList = haxapp.app.FunctionComponent.parseStringArray(data.argListString);
+        var argList = hax.FunctionTable.parseStringArray(data.argListString);
         json.updateData = {};
         json.updateData.argList = argList;
     }
     json.type = hax.FunctionTable.generator.type;
-    var actionResponse = hax.createmember.createMember(parent,json);
+    var actionResponse = hax.action.doAction(workspace,json);
     
-    var functionObject = actionResponse.member;
+    var functionObject = json.member;
     if(functionObject) {
         var functionComponent = new haxapp.app.FunctionComponent(workspaceUI,functionObject,componentOptions);
         actionResponse.component = functionComponent;
@@ -78,36 +81,6 @@ haxapp.app.FunctionComponent.createComponent = function(workspaceUI,data,compone
 haxapp.app.FunctionComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
     var functionComponent = new haxapp.app.FunctionComponent(workspaceUI,member,componentJson);
     return functionComponent;
-}
-
-/** This method extends the base method to get the property values
- * for the property edit dialog. */
-haxapp.app.FunctionComponent.addPropValues = function(member,values) {
-    var argList = member.getArgList();
-    var argListString = argList.toString();
-    values.argListString = argListString;
-    return values;
-}
-
-haxapp.app.FunctionComponent.propUpdateHandler = function(member,oldValues,newValues,completedActions) {
-    if(oldValues.argListString !== newValues.argListString) {
-        var newArgList = haxapp.app.FunctionComponent.parseStringArray(newValues.argListString);
-        var functionBody = member.getFunctionBody();
-        var supplementalCode = member.getSupplementalCode();
-        
-        //apply the code update
-        hax.updatemember.applyCode(member,newArgList,functionBody,supplementalCode);
-        
-        hax.action.addAction(completedActions,member,"updateCode");
-    }
-}
-
-haxapp.app.FunctionComponent.parseStringArray = function(argListString) {
-    var argList = argListString.split(",");
-    for(var i = 0; i < argList.length; i++) {
-        argList[i] = argList[i].trim();
-    }
-    return argList;
 }
 
 //======================================
@@ -129,6 +102,5 @@ haxapp.app.FunctionComponent.generator.propertyDialogLines = [
         "resultKey":"argListString"
     }
 ];
-haxapp.app.FunctionComponent.generator.addPropFunction = haxapp.app.FunctionComponent.addPropValues;
-haxapp.app.FunctionComponent.generator.updatePropHandler = haxapp.app.FunctionComponent.propUpdateHandler;
+
  

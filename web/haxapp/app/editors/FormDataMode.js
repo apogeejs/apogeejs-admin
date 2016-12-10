@@ -36,8 +36,12 @@ haxapp.app.FormDataMode.prototype.destroy = function() {
 haxapp.app.FormDataMode.prototype.onSave = function(data) {
 
 	var table = this.component.getObject();
-	hax.updatemember.updateData(table,data);
-//the response should depend on this result in some way? check the error dialogs
+    
+    var actionData = {};
+    actionData.action = "updateData";
+    actionData.member = table;
+    actionData.data = data;
+	var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
 	
 	return true;
 }

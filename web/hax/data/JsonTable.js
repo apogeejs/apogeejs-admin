@@ -15,7 +15,19 @@ hax.JsonTable = function(name,owner,initialData) {
         initialData = {};
         initialData.data = "";
     }  
-    hax.updatemember.applyCodeOrData(this,initialData);
+
+    if(initialData.functionBody !== undefined) {
+        hax.updatemember.applyCode(this,
+            initialData.argList,
+            initialData.functionBody,
+            initialData.supplementalCode);
+    }
+    else {
+        if(initialData.data === undefined) initialData.data = "";
+        
+        hax.updatemember.applyData(this,
+            initialData.data);
+    }
 }
 
 //add components to this class
@@ -64,10 +76,18 @@ hax.JsonTable.prototype.processObjectFunction = function(objectFunction) {
         var member = this;
         memberInfo.asynchCallback = function(memberValue) {
             //set the data for the table, along with triggering updates on dependent tables.
-            hax.updatemember.asynchFunctionUpdateData(member,memberValue);
+            var actionData = {};
+            actionData.action = "asynchUpdateData";
+            actionData.member = member;
+            actionData.data = memberValue;
+            var actionResponse =  hax.action.doAction(member.getWorkspace(),actionData);
         }
         memberInfo.asynchErrorCallback = function(errorMsg) {
-            hax.updatemember.asynchFunctionUpdateError(member,errorMsg);
+            var actionData = {};
+            actionData.action = "asynchUpdateError";
+            actionData.member = member;
+            actionData.errorMsg = errorMsg;
+            var actionResponse =  hax.action.doAction(member.getWorkspace(),actionData);
         }
         this.setResultPending(true);
     }

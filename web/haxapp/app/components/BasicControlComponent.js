@@ -85,11 +85,14 @@ haxapp.app.BasicControlComponent.createBaseComponent = function(workspaceUI,data
     //should throw an exception if parent is invalid!
     
     var json = {};
+    json.action = "createMember";
+    json.owner = parent;
     json.name = data.name;
     json.type = hax.Control.generator.type;
-    var actionResponse = hax.createmember.createMember(parent,json);
+    var actionResponse = hax.action.doAction(this.getWorkspace(),json);
     
-    var control = actionResponse.member;
+    var control = json.member;
+    
     if(control) {
 		//set the resource
 		control.updateResource(resource);

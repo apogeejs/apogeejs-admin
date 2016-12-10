@@ -32,7 +32,7 @@ haxapp.app.updatecomponent.getUpdateComponentCallback = function(component,gener
             //need to test if fields are valid!
 
             //update
-            var actionResponse = haxapp.app.updatecomponent.updatePropertyValues(component,generator,initialValues,newValues);
+            var actionResponse = haxapp.app.updatecomponent.updatePropertyValues(component,initialValues,newValues);
               
             //print an error message if there was an error
             if(!actionResponse.getSuccess()) {
@@ -59,32 +59,43 @@ haxapp.app.updatecomponent.getUpdateComponentCallback = function(component,gener
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-haxapp.app.updatecomponent.updatePropertyValues = function(component,generator,oldValues,newValues) {
-    var actionResponse = new hax.ActionResponse();
-    
-    try {
-        var completedActions = hax.action.createCompletedActionsObject();
-        var member = component.getObject();
-        var workspaceUI = component.getWorkspaceUI();
-        
-        if((oldValues.name !== newValues.name)||(oldValues.parentKey !== newValues.parentKey)) {
-            var parent = workspaceUI.getObjectByKey(newValues.parentKey);
-            hax.movemember.moveMember(member,newValues.name,parent,completedActions);
-        }
+haxapp.app.updatecomponent.updatePropertyValues = function(component,oldValues,newValues) {
 
-        if(generator.updatePropHandler) {
-            generator.updatePropHandler(member,oldValues,newValues,completedActions);
+    var actionResponse = new hax.ActionResponse();
+
+    var member = component.getObject();
+    var workspaceUI = component.getWorkspaceUI();
+    var actionList = [];
+    var actionData;
+
+    //check if a move action is needed
+    if((oldValues.name !== newValues.name)||(oldValues.parentKey !== newValues.parentKey)) {
+        var newFolder = workspaceUI.getObjectByKey(newValues.parentKey);
+        actionData = {};
+        actionData.action = "moveMember";
+        actionData.member = member;
+        actionData.name = newValues.name;
+        actionData.folder = newFolder;
+        actionList.push(actionData);
+    }
+
+    //check if additional properties are needed
+    var memberGenerator = member.generator;
+    if(memberGenerator.getPropertyUpdateAction) {
+        actionData = memberGenerator.getPropertyUpdateAction(member,oldValues,newValues);
+        if(actionData) {
+           actionList.push(actionData); 
         }
+    }
+
+    if(actionList.length > 0) {
+        actionData = {};
+        actionData.action = "compoundAction";
+        actionData.actions = actionList;
+
+        actionResponse = hax.action.doAction(member.getWorkspace(),actionData,actionResponse);
+    }
         
-        var workspace = member.getWorkspace();
-        hax.action.finalizeAction(workspace,completedActions,actionResponse);
-    }
-    catch(error) {
-        //unknown application error
-        var actionError = hax.ActionError.processException(error,"AppException",true);
-        actionResponse.addError(actionError);
-    }
-    
     return actionResponse;
 }
 

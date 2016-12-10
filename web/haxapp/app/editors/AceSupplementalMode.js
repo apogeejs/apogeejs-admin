@@ -17,10 +17,16 @@ haxapp.app.AceSupplementalMode.prototype.showData = function(editOk) {
 
 haxapp.app.AceSupplementalMode.prototype.onSave = function(text) {	
 	var table = this.component.getObject();
-	var functionBody = table.getFunctionBody();
-	var supplementalCode = text;
-	var argList = table.getArgList();
-	var actionResponse =  hax.updatemember.updateCode(table,argList,functionBody,supplementalCode);
+    
+	var actionData = {};
+        actionData.action = "updateCode";
+        actionData.member = table;
+        actionData.argList = table.getArgList();
+        actionData.functionBody = table.getFunctionBody();
+        actionData.supplementalCode = text;  
+        
+		var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
+        
 	if(!actionResponse.getSuccess()) {
 		//show an error message
 //no alert here - error display is adequate

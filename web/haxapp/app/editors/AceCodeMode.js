@@ -37,33 +37,32 @@ haxapp.app.AceCodeMode.prototype.showData = function(editOk) {
 haxapp.app.AceCodeMode.prototype.onSave = function(text) {	
 	
 	var table = this.component.getObject();
+    var actionData = {};
 	
 	if((this.onBlankData)&&(text === "")) {
 		//special case - clear code
-		var data = this.onBlankData.dataValue; 
-		hax.updatemember.updateData(table,data);
+        actionData.action = "updateData";
+        actionData.member = table;
+        actionData.data = this.onBlankData.dataValue;
+		
 	}
 	else {
 		//standard case - edit code
-	
-		var functionBody;
+        actionData.action = "updateCode";
+        actionData.member = table;
+        actionData.argList = table.getArgList();
+
 		if(this.editorCodeWrapper) {
-			functionBody = this.editorCodeWrapper.wrapCode(text);
+			actionData.functionBody = this.editorCodeWrapper.wrapCode(text);
 		}
 		else {
-			functionBody = text;
+			actionData.functionBody = text;
 		}
 
-		var supplementalCode = table.getSupplementalCode();
-		var argList = table.getArgList();
-		var actionResponse =  hax.updatemember.updateCode(table,argList,functionBody,supplementalCode);
-		if(!actionResponse.getSuccess()) {
-			//show an error message
-//no alert here - error display is adequate
-//			var msg = actionResponse.getErrorMsg();
-//			alert(msg);
-		}
+        actionData.supplementalCode = table.getSupplementalCode();  
 	}
+    
+    var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
         
 	return true;  
 }

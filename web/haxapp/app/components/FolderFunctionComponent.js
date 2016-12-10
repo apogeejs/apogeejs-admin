@@ -60,11 +60,14 @@ haxapp.app.FolderFunctionComponent.prototype.populateFrame = function() {
 /** This method creates the component. */
 haxapp.app.FolderFunctionComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
+    var workspace = workspaceUI.getWorkspace();
     var parent = workspaceUI.getObjectByKey(data.parentKey);
     //should throw an exception if parent is invalid!
-
+    
     var json = {};
-    json.name = data.name; 
+    json.action = "createMember";
+    json.owner = parent;
+    json.name = data.name;
     if(data.argListString) {
         var argList = haxapp.app.FunctionComponent.parseStringArray(data.argListString);
         json.argList = argList;
@@ -73,10 +76,9 @@ haxapp.app.FolderFunctionComponent.createComponent = function(workspaceUI,data,c
         json.returnValue = data.returnValueString;
     }
     json.type = hax.FolderFunction.generator.type;
+    var actionResponse = hax.action.doAction(workspace,json);
     
-    var actionResponse = hax.createmember.createMember(parent,json);
-    
-    var folderFunction = actionResponse.member;
+    var folderFunction = json.member;
     if(actionResponse.getSuccess()) {
         var folderFunctionComponent = new haxapp.app.FolderFunctionComponent(workspaceUI,folderFunction,componentOptions);
         actionResponse.component = folderFunctionComponent;
@@ -91,29 +93,6 @@ haxapp.app.FolderFunctionComponent.createComponentFromJson = function(workspaceU
         workspaceUI.loadFolderComponentContentFromJson(folder,componentJson.children);
     }
     return folderFunctionComponent;
-}
-
-
-/** This method extends the base method to get the property values
- * for the property edit dialog. */
-haxapp.app.FolderFunctionComponent.addPropValues = function(member,values) {
-    var argList = member.getArgList();
-    var argListString = argList.toString();
-    values.argListString = argListString;
-    values.returnValueString = member.getReturnValueString();
-    return values;
-}
-
-haxapp.app.FolderFunctionComponent.propUpdateHandler = function(folderFunction,oldValues,newValues,completedActions) {
-    if((oldValues.argListString !== newValues.argListString)||(oldValues.returnValueString !== newValues.returnValueString)) {
-        var newArgList = haxapp.app.FunctionComponent.parseStringArray(newValues.argListString);
-        
-        folderFunction.setArgList(newArgList);
-        folderFunction.setReturnValueString(newValues.returnValueString);
-        
-        //we use update code because this needs to be calculated
-        hax.action.addAction(completedActions,folderFunction,"updateCode");
-    }    
 }
 
 //======================================
@@ -140,5 +119,3 @@ haxapp.app.FolderFunctionComponent.generator.propertyDialogLines = [
         "resultKey":"returnValueString"
     }
 ];
-haxapp.app.FolderFunctionComponent.generator.addPropFunction = haxapp.app.FolderFunctionComponent.addPropValues;
-haxapp.app.FolderFunctionComponent.generator.updatePropHandler = haxapp.app.FolderFunctionComponent.propUpdateHandler;

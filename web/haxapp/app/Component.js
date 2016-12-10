@@ -365,13 +365,14 @@ haxapp.app.Component.updateTitle = function() {
 haxapp.app.Component.getPropertyValues = function() {
     
     var member = this.object;
+    var generator = member.generator;
     
     var values = {};
     values.name = member.getName();
     values.parentKey = haxapp.app.WorkspaceUI.getObjectKey(member.getParent());
     
-    if(this.generator.addPropFunction) {
-        this.generator.addPropFunction(member,values);
+    if(generator.addPropFunction) {
+        generator.addPropFunction(member,values);
     }
     return values;
 }
@@ -391,7 +392,11 @@ haxapp.app.Component.createDeleteCallback = function() {
         }
         
         //delete the object - the component we be deleted after the delete event received
-        var actionResponse = hax.deletemember.deleteMember(object);
+        var json = {};
+        json.action = "deleteMember";
+        json.member = object;
+        var actionResponse = hax.action.doAction(object.getWorkspace(),json);
+
         if(!actionResponse.getSuccess()) {
             //show an error message
             var msg = actionResponse.getErrorMsg();

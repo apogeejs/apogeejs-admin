@@ -1,47 +1,62 @@
 /** This namespace contains functions to process a create of a member */
 hax.movemember = {};
 
+/** Move member action */
+hax.movemember.ACTION_NAME = "moveMember";
+
 /** member MOVE EVENT
- * This listener event is fired when after a member is moveded, meaning either
- * the name or folder is updated. It is to be used to respond
- * to the member update such as to update the UI.
- * 
  * Event member Format:
  * [member]
+ * [oldFullName]
  */
 hax.movemember.MEMBER_MOVED_EVENT = "memberMoved";
 
-hax.movemember.fireMovedEvent = function(moveInfo) {
-    var workspace = moveInfo.member.getWorkspace();
-    workspace.dispatchEvent(hax.movemember.MEMBER_MOVED_EVENT,moveInfo);
-}
+hax.movemember.ACTION_INFO= {
+    "actionFunction": hax.movemember.moveMember,
+    "checkUpdateAll": true,
+    "updateDependencies": true,
+    "addToRecalc": true,
+    "event": hax.movemember.MEMBER_MOVED_EVENT
+};
 
-hax.movemember.fireMovedEventList = function(moveInfoList) {
-    for(var i = 0; i < moveInfoList.length; i++) {
-        hax.movemember.fireMovedEvent(moveInfoList[i]);
-    }
-}
+hax.action.addEventInfo(hax.movemember.ACTION_NAME,hax.movemember.ACTION_INFO);
 
 /** This method creates member according the input json, in the given folder.
  * The return value is an ActionResponse object. Optionally, an existing action response
  * may be passed in or otherwise one will be created here. */
-hax.movemember.moveMember = function(member,name,folder,completedActions) {
+hax.movemember.moveMember = function(actionData,processedActions) {
+        
+    var member = actionData.member;
         
     var movedMemberList = [];
     hax.movemember.loadMovedList(member,movedMemberList);
     var movedOldNameList = hax.movemember.getNameList(movedMemberList);
-    member.move(name,folder);
-    var movedNewNameList = hax.movemember.getNameList(movedMemberList);
+    member.move(actionData.name,actionData.folder);
     
     //add the individual moves
     for(var i = 0; i < movedMemberList.length; i++) {
         var moveMember = movedMemberList[i];
-        var memberInfo = {};
-        memberInfo.member = moveMember;
-        memberInfo.oldFullName = movedOldNameList[i];
-        memberInfo.newFullName = movedNewNameList[i];
-        memberInfo.action = "move";
-        hax.action.addActionInfo(completedActions,memberInfo);
+        
+        //we are adding multiple delete events here
+        var actionDataEntry;
+        if(moveMember === member) {
+            actionDataEntry = actionData;
+        }
+        else {
+            actionDataEntry = {};
+            actionDataEntry.action = "moveMember";
+            actionDataEntry.member = member;
+            actionDataEntry.name = member.getName();
+            actionDataEntry.folder = member.getParent();
+            actionDataEntry.actionInfo = actionData.actionInfo;
+        }
+        //add additional info
+        var eventInfo = {};
+        eventInfo.member = member;
+        eventInfo.oldFullName = movedOldNameList[i];
+        actionDataEntry.eventInfo = eventInfo;
+        
+        processedActions.push(actionDataEntry);
     }
 
 }

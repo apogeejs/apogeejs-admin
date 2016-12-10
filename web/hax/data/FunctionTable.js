@@ -50,6 +50,43 @@ hax.FunctionTable.fromJson = function(owner,json,actionResponse) {
     return new hax.FunctionTable(json.name,owner,json.updateData);
 }
 
+/** This method extends the base method to get the property values
+ * for the property editting. */
+hax.FunctionTable.addPropValues = function(member,values) {
+    var argList = member.getArgList();
+    var argListString = argList.toString();
+    values.argListString = argListString;
+    return values;
+}
+
+/** This method executes a property update. */
+hax.FunctionTable.getPropertyUpdateAction = function(member,oldValues,newValues) {
+    if(oldValues.argListString !== newValues.argListString) {
+        var newArgList = hax.FunctionTable.parseStringArray(newValues.argListString);
+  
+        var actionData = {};
+        actionData.action = "updateCode";
+        actionData.member = member;
+        actionData.argList = newArgList;
+        actionData.functionBody = member.getFunctionBody();
+        actionData.supplementalCode = member.getSupplementalCode();
+        return actionData;
+    }
+    else {
+        return null;
+    }
+}
+
+/** This methdo parses an arg list string to make an arg list array. It is
+ * also used outisde this class. */
+hax.FunctionTable.parseStringArray = function(argListString) {
+    var argList = argListString.split(",");
+    for(var i = 0; i < argList.length; i++) {
+        argList[i] = argList[i].trim();
+    }
+    return argList;
+}
+
 //============================
 // Static methods
 //============================
@@ -58,6 +95,10 @@ hax.FunctionTable.generator = {};
 hax.FunctionTable.generator.displayName = "Function";
 hax.FunctionTable.generator.type = "hax.FunctionTable";
 hax.FunctionTable.generator.createMember = hax.FunctionTable.fromJson;
+hax.FunctionTable.generator.addPropFunction = hax.FunctionTable.addPropValues;
+hax.FunctionTable.generator.getPropertyUpdateAction = hax.FunctionTable.getPropertyUpdateAction;
 
 //register this member
 hax.Workspace.addMemberGenerator(hax.FunctionTable.generator);
+
+

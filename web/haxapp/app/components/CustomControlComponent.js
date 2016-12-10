@@ -257,16 +257,20 @@ haxapp.app.CustomControlComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 
 /** This method creates the control. */
 haxapp.app.CustomControlComponent.createComponent = function(workspaceUI,data,componentOptions) {
-	var parent = workspaceUI.getObjectByKey(data.parentKey);
+	
+    var workspace = workspaceUI.getWorkspace();
+    var parent = workspaceUI.getObjectByKey(data.parentKey);
     //should throw an exception if parent is invalid!
     
-	//create a generic component of this given name
     var json = {};
+    json.action = "createMember";
+    json.owner = parent;
     json.name = data.name;
     json.type = hax.Control.generator.type;
-    var actionResponse = hax.createmember.createMember(parent,json);
-    var control = actionResponse.member;
-	
+    var actionResponse = hax.action.doAction(workspace,json);
+    
+    var control = json.member;
+    
     if(control) {
         //create the component
         var customControlComponent = new haxapp.app.CustomControlComponent.createComponentFromJson(workspaceUI,control,componentOptions);

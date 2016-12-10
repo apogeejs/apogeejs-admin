@@ -178,9 +178,11 @@ haxapp.app.WorkspaceUI.prototype.childDeleted = function(deleteInfo) {
 /** This method responds to a "new" menu event. */
 haxapp.app.WorkspaceUI.prototype.childMoved = function(moveInfo) {
     
+    var newFullName = moveInfo.member.getFullName();
+    
     var componentInfo = this.componentMap[moveInfo.oldFullName];
     delete this.componentMap[moveInfo.oldFullName];
-    this.componentMap[moveInfo.newFullName] = componentInfo;
+    this.componentMap[newFullName] = componentInfo;
     
     //update the component
 	if((componentInfo)&&(componentInfo.component)) {

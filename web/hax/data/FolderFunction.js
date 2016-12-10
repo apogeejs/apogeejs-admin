@@ -86,7 +86,10 @@ hax.FolderFunction.prototype.onDelete = function() {
     var returnValue;
     
     if(this.internalFolder) {
-        var actionResponse = hax.deletemember.deleteMember(this.internalFolder);
+        var json = {};
+        json.action = "deleteMember";
+        json.member = this.internalFolder;
+        var actionResponse = hax.action.doAction(this.getWorkspace(),json);
         if(!actionResponse.getSuccess()) {
             //show an error message
             var msg = actionResponse.getErrorMsg();
@@ -127,6 +130,36 @@ hax.FolderFunction.prototype.addToJson = function(json) {
     json.argList = this.argList;
     json.returnValue = this.returnValueString;
     json.internalFolder = this.internalFolder.toJson();
+}
+
+/** This method extends the base method to get the property values
+ * for the property editting. */
+hax.FolderFunction.addPropValues = function(member,values) {
+    var argList = member.getArgList();
+    var argListString = argList.toString();
+    values.argListString = argListString;
+    values.returnValueString = member.getReturnValueString();
+    return values;
+}
+
+/** This method executes a property update. */
+hax.FolderFunction.getPropertyUpdateAction = function(folderFunction,oldValues,newValues) {
+    if((oldValues.argListString !== newValues.argListString)||(oldValues.returnValueString !== newValues.returnValueString)) {
+        var newArgList = haxapp.app.FunctionComponent.parseStringArray(newValues.argListString);
+        
+        folderFunction.setArgList(newArgList);
+        folderFunction.setReturnValueString(newValues.returnValueString);
+        
+        var actionData = {};
+        actionData.action = "updateFolderFunction";
+        actionData.member = folderFunction;
+        actionData.argList = newArgList;
+        actionData.returnString = newValues.returnValueString;
+        return actionData;
+    }    
+    else {
+        return null;
+    }
 }
 
 //-------------------------------
@@ -234,17 +267,22 @@ hax.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunction
             returnValueTable = instance.loadOutputElement(rootFolder,folderFunctionErrors);     
         }
         
-        //create an update array to set the table values to the elements
-        var updateDataList = [];
+        //create an update array to set the table values to the elements  
+        var updateActionList = [];
         for(var i = 0; i < inputElementArray.length; i++) {
             var entry = {};
+            entry.action = "updateData";
             entry.member = inputElementArray[i];
             entry.data = arguments[i];
-            updateDataList.push(entry);
+            updateActionList.push(entry);
         }
+        
+        var actionData = {};
+        actionData.action = "compoundAction";
+        actionData.actions = updateActionList;
 
         //apply the update
-        var actionResponse = hax.updatemember.updateObjects(updateDataList);        
+        var actionResponse = hax.action.doAction(virtualWorkspace,actionData);        
         if(actionResponse.getSuccess()) {
             //retrieve the result
             if(returnValueTable) {
@@ -319,6 +357,10 @@ hax.FolderFunction.generator = {};
 hax.FolderFunction.generator.displayName = "Folder Function";
 hax.FolderFunction.generator.type = "hax.FolderFunction";
 hax.FolderFunction.generator.createMember = hax.FolderFunction.fromJson;
+hax.FolderFunction.generator.addPropFunction = hax.FolderFunction.addPropValues;
+hax.FolderFunction.generator.getPropertyUpdateAction = hax.FolderFunction.getPropertyUpdateAction;
 
 //register this member
 hax.Workspace.addMemberGenerator(hax.FolderFunction.generator);
+
+

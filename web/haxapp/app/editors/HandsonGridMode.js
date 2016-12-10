@@ -42,8 +42,12 @@ haxapp.app.HandsonGridMode.prototype.destroy = function() {
 
 haxapp.app.HandsonGridMode.prototype.onSave = function(data) {
 	var table = this.component.getObject();
-	hax.updatemember.updateData(table,data);
-//the response should depend on this result in some way? check the error dialogs
+    
+	var actionData = {};
+    actionData.action = "updateData";
+    actionData.member = table;
+    actionData.data = data;
+	var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
 	
 	return true;
 }
