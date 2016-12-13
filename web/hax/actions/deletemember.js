@@ -1,26 +1,27 @@
-/** This namespace contains the action to delete a member. */
+/** This namespace contains the delete member action */
 hax.deletemember = {};
 
-/** Create member action */
+/** Delete member action name 
+ * Action Data format:
+ * {
+ *  "action": hax.deletemember.ACTION_NAME,
+ *  "member": (member to delete),
+ *  
+ *  "eventInfo": (OUTPUT - event info for the associated delete event)
+ * }
+ */
 hax.deletemember.ACTION_NAME = "deleteMember";
 
 /** MEMBER DELETED EVENT
  * Event object Format:
- * [member]
- * [fullName]
+ * {
+ *  "member": (member),
+ *  "fullName": (the full name for the member, which is no longer accessible from the member itself)
+ *  }
  */
 hax.deletemember.MEMBER_DELETED_EVENT = "memberDeleted";
 
-hax.deletemember.ACTION_INFO = {
-		"actionFunction": hax.deletemember.deleteMember,
-		"checkUpdateAll": true,
-		"updateDependencies": false,
-		"addToRecalc": false,
-		"event": hax.deletemember.MEMBER_DELETED_EVENT
-	}
-
-hax.action.addEventInfo(hax.deletemember.ACTION_NAME,hax.deletemember.ACTION_INFO);
-
+/** Delete member action function */
 hax.deletemember.deleteMember = function(actionData,processedActions) {
 
     var deleteList = [];
@@ -73,3 +74,15 @@ hax.deletemember.getDeleteList =  function(member,deleteList) {
 
 
 
+/** Action info */
+hax.deletemember.ACTION_INFO = {
+    "actionFunction": hax.deletemember.deleteMember,
+    "checkUpdateAll": true,
+    "updateDependencies": false,
+    "addToRecalc": false,
+    "event": hax.deletemember.MEMBER_DELETED_EVENT
+}
+
+
+//This line of code registers the action 
+hax.action.addActionInfo(hax.deletemember.ACTION_NAME,hax.deletemember.ACTION_INFO);

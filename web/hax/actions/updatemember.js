@@ -1,60 +1,57 @@
-/** This namespace contains functions to process an update to an member
- * which inherits from the FunctionBase component. */
+/** This namespace contains the update member actions */
 hax.updatemember = {};
 
-/** Create member action */
+/** Update data action name 
+ * Action Data format:
+ * {
+ *  "action": hax.updatemember.UPDATE_DATA_ACTION_NAME,
+ *  "member": (member to update),
+ *  "data": (new value for the table)
+ * }
+ */
 hax.updatemember.UPDATE_DATA_ACTION_NAME = "updateData";
+
+/** Update code action name 
+ * Action Data format:
+ * {
+ *  "action": hax.updatemember.UPDATE_CODE_ACTION_NAME,
+ *  "member": (member to update),
+ *  "argList": (arg list for the table)
+ *  "functionBody": (function body for the table)
+ *  "supplementalCode": (supplemental code for the table)
+ * }
+ */
 hax.updatemember.UPDATE_CODE_ACTION_NAME = "updateCode";
+
+/** Update asynch data action name - used for updating data after an asynchronous formula
+ * Action Data format:
+ * {
+ *  "action": hax.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME,
+ *  "member": (member to update),
+ *  "data": (new value for the table)
+ * }
+ */
 hax.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME = "asynchUpdateData";
+
+/** Update asynch error action name - used for publishing an error after an asynchronous formula
+ * Action Data format:
+ * {
+ *  "action": hax.updatemember.UPDATE_DATA_ACTION_NAME,
+ *  "member": (member to update),
+ *  "errorMsg": (new value for the table)
+ * }
+ */
 hax.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME = "asynchUpdateError";
 
 /** member UPDATED EVENT
- * Event member Format:
- * [member]
+ * Event member format:
+ * {
+ *  "member": (member)
+ * }
  */
 hax.updatemember.MEMBER_UPDATED_EVENT = "memberUpdated";
 
-hax.updatemember.UPDATE_DATA_ACTION_INFO = {
-    "actionFunction": hax.updatemember.updateData,
-    "checkUpdateAll": false,
-    "updateDependencies": true,
-    "addToRecalc": false,
-    "addDependenceiesToRecalc": true,
-    "event": hax.updatemember.MEMBER_UPDATED_EVENT
-};
-hax.updatemember.UPDATE_CODE_ACTION_INFO = {
-    "actionFunction": hax.updatemember.updateCode,
-    "checkUpdateAll": false,
-    "updateDependencies": true,
-    "addToRecalc": true,
-    "event": hax.updatemember.MEMBER_UPDATED_EVENT
-};
-hax.updatemember.UPDATE_ASYNCH_DATA_ACTION_INFO = {
-    "actionFunction": hax.updatemember.asynchFunctionUpdateData,
-    "checkUpdateAll": false,
-    "updateDependencies": false,
-    "addToRecalc": false,
-    "addDependenceiesToRecalc": true,
-    "event": hax.updatemember.MEMBER_UPDATED_EVENT
-};
-hax.updatemember.UPDATE_ASYNCH_ERROR_ACTION_INFO = {
-    "actionFunction": hax.updatemember.asynchFunctionUpdateError,
-    "checkUpdateAll": false,
-    "updateDependencies": false,
-    "addToRecalc": false,
-    "addDependenceiesToRecalc": true,
-    "event": hax.updatemember.MEMBER_UPDATED_EVENT
-};
-
-hax.action.addEventInfo(hax.updatemember.UPDATE_DATA_ACTION_NAME,hax.updatemember.UPDATE_DATA_ACTION_INFO);
-hax.action.addEventInfo(hax.updatemember.UPDATE_CODE_ACTION_NAME,hax.updatemember.UPDATE_CODE_ACTION_INFO);
-hax.action.addEventInfo(hax.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME,hax.updatemember.UPDATE_ASYNCH_DATA_ACTION_INFO);
-hax.action.addEventInfo(hax.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME,hax.updatemember.UPDATE_ASYNCH_ERROR_ACTION_INFO);
-
-
-/** This method updates the object function for a given member. 
- * The return value is an ActionResponse object. Optionally, an existing action response
- * may be passed in or otherwise one will be created here. */
+/** Update code action function. */
 hax.updatemember.updateCode = function(actionData,processedActions) { 
           
     hax.updatemember.applyCode(actionData.member,
@@ -65,9 +62,7 @@ hax.updatemember.updateCode = function(actionData,processedActions) {
     processedActions.push(actionData);
 }
 
-/** This method updates the data for a given member. 
- * The return value is an ActionResponse object. Optionally, an existing action response
- * may be passed in or otherwise one will be created here. */
+/** Update data action function */
 hax.updatemember.updateData = function(actionData,processedActions) {
         
     var member = actionData.member;
@@ -82,8 +77,7 @@ hax.updatemember.updateData = function(actionData,processedActions) {
     processedActions.push(actionData);
 }
 
-/** This method is used to update the value of a member on the return of an asynchrronous
- * formula. */
+/** Update asynch data action function */
 hax.updatemember.asynchFunctionUpdateData = function(actionData,processedActions) {
 	
     var member = actionData.member;
@@ -95,6 +89,7 @@ hax.updatemember.asynchFunctionUpdateData = function(actionData,processedActions
     processedActions.push(actionData);
 }
 
+/** Update asynch error action function. */
 hax.updatemember.asynchFunctionUpdateError = function(actionData,processedActions) {
 
     var member = actionData.member;
@@ -108,10 +103,6 @@ hax.updatemember.asynchFunctionUpdateError = function(actionData,processedAction
         
 }
 
-
-//=====================================
-// Private and Internal Functions
-//=====================================
 
 /** This method updates the code and object function in a member based on the
  * passed code.*/
@@ -133,12 +124,52 @@ hax.updatemember.applyCode = function(codeable,argList,functionBody,supplemental
     codeable.setCodeInfo(codeInfo);
 }
 
-/** This method sets the data for a member. 
- * @private */
+/** This method sets the data for a member. */
 hax.updatemember.applyData = function(dataHolder,data) {
     dataHolder.clearErrors();
     dataHolder.setData(data);
 }
 
 
+/** Update data action info */
+hax.updatemember.UPDATE_DATA_ACTION_INFO = {
+    "actionFunction": hax.updatemember.updateData,
+    "checkUpdateAll": false,
+    "updateDependencies": true,
+    "addToRecalc": false,
+    "addDependenceiesToRecalc": true,
+    "event": hax.updatemember.MEMBER_UPDATED_EVENT
+};
+/** Update code action info */
+hax.updatemember.UPDATE_CODE_ACTION_INFO = {
+    "actionFunction": hax.updatemember.updateCode,
+    "checkUpdateAll": false,
+    "updateDependencies": true,
+    "addToRecalc": true,
+    "event": hax.updatemember.MEMBER_UPDATED_EVENT
+};
+/** Update asynch data action info */
+hax.updatemember.UPDATE_ASYNCH_DATA_ACTION_INFO = {
+    "actionFunction": hax.updatemember.asynchFunctionUpdateData,
+    "checkUpdateAll": false,
+    "updateDependencies": false,
+    "addToRecalc": false,
+    "addDependenceiesToRecalc": true,
+    "event": hax.updatemember.MEMBER_UPDATED_EVENT
+};
+/** Update asynch error action info */
+hax.updatemember.UPDATE_ASYNCH_ERROR_ACTION_INFO = {
+    "actionFunction": hax.updatemember.asynchFunctionUpdateError,
+    "checkUpdateAll": false,
+    "updateDependencies": false,
+    "addToRecalc": false,
+    "addDependenceiesToRecalc": true,
+    "event": hax.updatemember.MEMBER_UPDATED_EVENT
+};
 
+
+//The following code registers the actions
+hax.action.addActionInfo(hax.updatemember.UPDATE_DATA_ACTION_NAME,hax.updatemember.UPDATE_DATA_ACTION_INFO);
+hax.action.addActionInfo(hax.updatemember.UPDATE_CODE_ACTION_NAME,hax.updatemember.UPDATE_CODE_ACTION_INFO);
+hax.action.addActionInfo(hax.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME,hax.updatemember.UPDATE_ASYNCH_DATA_ACTION_INFO);
+hax.action.addActionInfo(hax.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME,hax.updatemember.UPDATE_ASYNCH_ERROR_ACTION_INFO);

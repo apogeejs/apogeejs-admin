@@ -1,24 +1,27 @@
-/** This namespace contains functions to process a create of a member */
+/** This namespace contains the create member action */
 hax.createmember = {};
 
-/** Create member action */
+/** Create member action name 
+ * Action Data format:
+ * {
+ *  "action": hax.createmember.ACTION_NAME,
+ *  "owner": (parent/owner for new member),
+ *  "name": (name of the new member),
+ *  "updateData": (an initial data for the table, table dependent)
+ *  
+ *  "member": (OUTPUT - the created member),
+ *  "error": (OUTPUT - an error created in the action function)
+ * }
+ */
 hax.createmember.ACTION_NAME = "createMember";
 
 /** member CREATED EVENT
- * Event member Format:
- * [member]
+ * Event member format:
+ * {
+ *  "member": (member)
+ * }
  */
 hax.createmember.MEMBER_CREATED_EVENT = "memberCreated";
-
-hax.createmember.ACTION_INFO = {
-    "actionFunction": hax.createmember.createMember,
-    "checkUpdateAll": true,
-    "updateDependencies": true,
-    "addToRecalc": true,
-    "event": hax.createmember.MEMBER_CREATED_EVENT
-}
-
-hax.action.addEventInfo(hax.createmember.ACTION_NAME,hax.createmember.ACTION_INFO);
 
 /** This method instantiates a member, without setting the update data. 
  *@private */
@@ -45,9 +48,23 @@ hax.createmember.createMember = function(actionData,processedActions) {
     //instantiate children if there are any
     for(var i = 0; i < childJsonOutputList.length; i++) {
         var childJson = childJsonOutputList[i];
+        childJson.action = "createMember";
+        childJson.actionInfo = actionData.actionInfo; //assume parent action is alsl createMember!
         childJson.owner = member;
-        hax.createmember.createMember(childJson);
+        hax.createmember.createMember(childJson,processedActions);
     }
     
     return member;
 }
+
+/** Action info */
+hax.createmember.ACTION_INFO = {
+    "actionFunction": hax.createmember.createMember,
+    "checkUpdateAll": true,
+    "updateDependencies": true,
+    "addToRecalc": true,
+    "event": hax.createmember.MEMBER_CREATED_EVENT
+}
+
+//This line of code registers the action 
+hax.action.addActionInfo(hax.createmember.ACTION_NAME,hax.createmember.ACTION_INFO);

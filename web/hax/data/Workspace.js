@@ -1,4 +1,5 @@
-/** This is the workspace. Typically owner should be null. */
+/** This is the workspace. Typically owner should be null. It
+ * is used for creating virtual workspaces. */
 hax.Workspace = function(nameOrJson,actionResponseForJson,owner) {
     //base init
     hax.EventManager.init.call(this);
@@ -80,11 +81,19 @@ hax.Workspace.prototype.getPossesionNameBase = function() {
 hax.Workspace.prototype.createContextManager = function() {
     //set the context manager
     var contextManager = new hax.ContextManager(this);
-    //global variables from window object
-    var globalVarEntry = {};
-    globalVarEntry.isLocal = false;
-    globalVarEntry.data = __globals__;
-    contextManager.addToContextList(globalVarEntry);
+    
+    if(this.owner) {
+        //get the context of the owner, but flattened so we don't reference
+        //the owner's tables
+        hax.Workspace.flattenParentIntoContextManager(contextManager,this.owner);
+    }
+    else {
+        //global variables from window object
+        var globalVarEntry = {};
+        globalVarEntry.isLocal = false;
+        globalVarEntry.data = __globals__;
+        contextManager.addToContextList(globalVarEntry);
+    }
     
     return contextManager;
 }
@@ -104,16 +113,7 @@ hax.Workspace.createVirtualWorkpaceFromFolder = function(name,origRootFolder,own
     workspaceJson.version = hax.Workspace.SAVE_FILE_VERSION;
     workspaceJson.data = origRootFolder.toJson();
 	
-    var virtualWorkspace = new hax.Workspace(workspaceJson,null);
-    
-    //add the parent variables to the context manager - but add them as static
-    //data, not dynamic objects
-    var contextManager = virtualWorkspace.getContextManager();
-    //DANGER - what I really want to do is not have the global entry. I have other 
-    //entries that might be before it and they will include a global entry.
-    contextManager.clearContextList();
-    //kind of a cludge
-    hax.Workspace.flattenParentIntoContextManager(contextManager,ownerInWorkspace);
+    var virtualWorkspace = new hax.Workspace(workspaceJson,null,ownerInWorkspace);
     
     return virtualWorkspace;
 }

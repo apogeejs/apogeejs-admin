@@ -1,29 +1,27 @@
-/** This namespace contains functions to process a create of a member */
+/** This namespace contains the move member action */
 hax.movemember = {};
 
-/** Move member action */
+/** Move member action name 
+ * Action Data format:
+ * {
+ *  "action": hax.movemember.ACTION_NAME,
+ *  "member": (member to move),
+ *  
+ *  "eventInfo": (OUTPUT - event info for the associated delete event)
+ * }
+ */
 hax.movemember.ACTION_NAME = "moveMember";
 
-/** member MOVE EVENT
- * Event member Format:
- * [member]
- * [oldFullName]
+/** MEMBER MOVED EVENT
+ * Event object Format:
+ * {
+ *  "member": (member),
+ *  "oldFullName": (the full name for the member, which is not accessible from the member itself)
+ *  }
  */
 hax.movemember.MEMBER_MOVED_EVENT = "memberMoved";
 
-hax.movemember.ACTION_INFO= {
-    "actionFunction": hax.movemember.moveMember,
-    "checkUpdateAll": true,
-    "updateDependencies": true,
-    "addToRecalc": true,
-    "event": hax.movemember.MEMBER_MOVED_EVENT
-};
-
-hax.action.addEventInfo(hax.movemember.ACTION_NAME,hax.movemember.ACTION_INFO);
-
-/** This method creates member according the input json, in the given folder.
- * The return value is an ActionResponse object. Optionally, an existing action response
- * may be passed in or otherwise one will be created here. */
+/** Move member action function */
 hax.movemember.moveMember = function(actionData,processedActions) {
         
     var member = actionData.member;
@@ -88,3 +86,17 @@ hax.movemember.getNameList = function(movedMemberList) {
     }
     return nameList;
 }
+
+
+/** Action info */
+hax.movemember.ACTION_INFO= {
+    "actionFunction": hax.movemember.moveMember,
+    "checkUpdateAll": true,
+    "updateDependencies": true,
+    "addToRecalc": true,
+    "event": hax.movemember.MEMBER_MOVED_EVENT
+};
+
+
+//This line of code registers the action 
+hax.action.addActionInfo(hax.movemember.ACTION_NAME,hax.movemember.ACTION_INFO);
