@@ -14,6 +14,7 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     
     this.workspaceUI = workspaceUI;
     this.object = object;
+    this.activeParent = object.getParent();
     this.generator = generator;
     
     this.parentContainer = this.workspaceUI.getParentContainerObject(object);
@@ -313,19 +314,20 @@ haxapp.app.Component.onDelete = function() {
     }
 }
 
-/** This method should include an needed functionality to clean up after a delete. */
-haxapp.app.Component.memberMoved = function(newParentContainer) {
-        //move the window to the proper parent container
-    this.parenContainer = newParentContainer;
-    this.window.changeParent(newParentContainer);
-    this.updateTitle();
-}
-
 /** This method extends the member udpated function from the base.
  * @protected */    
 haxapp.app.Component.memberUpdated = function() {
+    //check for change of parent
+    if(this.object.getParent() !== this.activeParent) {
+        this.activeParent = this.object.getParent();
+        this.parenContainer = this.getWorkspaceUI().getParentContainerObject(this.object);
+        this.window.changeParent(this.parenContainer);
+    }
+    
+    //update title
     this.updateTitle();
     
+    //update data
     var object = this.getObject();
     if(object.hasError()) {
         var errorMsg = "";
@@ -369,7 +371,7 @@ haxapp.app.Component.getPropertyValues = function() {
     
     var values = {};
     values.name = member.getName();
-    values.parentKey = haxapp.app.WorkspaceUI.getObjectKey(member.getParent());
+    values.parentKey = member.getParent().getFullName();
     
     if(generator.addPropFunction) {
         generator.addPropFunction(member,values);

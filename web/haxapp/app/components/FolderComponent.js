@@ -56,7 +56,7 @@ haxapp.app.FolderComponent.prototype.populateFrame = function() {
 haxapp.app.FolderComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
     var workspace = workspaceUI.getWorkspace();
-    var parent = workspaceUI.getObjectByKey(data.parentKey);
+    var parent = workspace.getMemberByFullName(data.parentKey);
     //should throw an exception if parent is invalid!
     
     var json = {};

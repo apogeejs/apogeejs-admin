@@ -13,6 +13,7 @@ hax.Child = {};
  * the hierarchy (maybe the workspace). If the owner is not a parent, this is typically
  * a folder and it is called the root folder. */
 hax.Child.init = function(name,generator) {
+    this.id = hax.Child._createId();
     this.name = name;
     this.generator = generator;
     this.errors = []; 
@@ -51,6 +52,12 @@ hax.Child.move = function(newName,newOwner) {
  * This property should not be implemented on non-children. */
 hax.Child.isChild = true
 
+/** this method gets the ID. It is not persistent and is valid only for this 
+ * instance the workspace is opened. */
+hax.Child.getId = function() {
+    return this.id;
+}
+
 /** this method gets the name. */
 hax.Child.getName = function() {
     return this.name;
@@ -62,6 +69,7 @@ hax.Child.getFullName = function() {
         return this.owner.getPossesionNameBase() + this.name;
     }
     else {
+        //this shouldn't happen
         return this.name;
     }
 }
@@ -215,4 +223,16 @@ hax.Child.onDeleteChild = function() {
 //* @protected */
 //hax.Child.getUpdateData = function() {
 //}
+
+/** This is used for Id generation.
+ * @private */
+hax.Child.nextId = 1;
+
+/** This method generates a member ID for the child. It is only valid
+ * for the duration the workspace is opened. It is not persisted.
+ * @private
+ */
+hax.Child._createId = function() {
+    return hax.Child.nextId++;
+}
 

@@ -76,7 +76,7 @@ haxapp.app.JsonTableComponent.prototype.getViewModeElement = function(viewType) 
 haxapp.app.JsonTableComponent.createComponent = function(workspaceUI,data,componentOptions) {
    
     var workspace = workspaceUI.getWorkspace();
-    var parent = workspaceUI.getObjectByKey(data.parentKey);
+    var parent = workspace.getMemberByFullName(data.parentKey);
     //should throw an exception if parent is invalid!
     
     var json = {};

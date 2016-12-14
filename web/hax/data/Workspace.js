@@ -14,7 +14,7 @@ hax.Workspace = function(nameOrJson,actionResponseForJson,owner) {
     
     if(inputArgType === "String") {
         this.name = nameOrJson;
-        this.rootFolder = new hax.Folder(nameOrJson,this);
+        this.rootFolder = new hax.Folder(hax.Parent.ROOT_NAME,this);
     }
     else {
         this.loadFromJson(nameOrJson,actionResponseForJson);
@@ -70,7 +70,19 @@ hax.Workspace.prototype.getWorkspace = function() {
 
 /** this method gets the hame the children inherit for the full name. */
 hax.Workspace.prototype.getPossesionNameBase = function() {
-    return this.name + ":";
+    if(this.owner) {
+        return this.owner.getPossesionNameBase() + this.name + ".";
+    }
+    else {
+        return "";
+    }
+}
+
+/** This method looks up a member by its full name. */
+hax.Workspace.prototype.getMemberByPathArray = function(path,startElement) {
+    if(startElement === undefined) startElement = 0;
+    if(path[startElement] === hax.Parent.ROOT_NAME) return this.rootFolder;
+    return this.rootFolder.lookupChildFromPathArray(path,startElement);
 }
 
 //------------------------------

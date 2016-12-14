@@ -87,7 +87,7 @@ hax.ContextManager.prototype.lookupData = function(entry,baseName) {
 
 hax.ContextManager.prototype.lookupImpactor = function(entry,path) {
     if(entry.parent) {
-        return entry.parent.lookupChildFromPath(path);
+        return entry.parent.lookupChildFromPathArray(path);
     }
     else {
         return undefined;

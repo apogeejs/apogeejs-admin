@@ -61,7 +61,7 @@ haxapp.app.FolderFunctionComponent.prototype.populateFrame = function() {
 haxapp.app.FolderFunctionComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
     var workspace = workspaceUI.getWorkspace();
-    var parent = workspaceUI.getObjectByKey(data.parentKey);
+    var parent = workspace.getMemberByFullName(data.parentKey);
     //should throw an exception if parent is invalid!
     
     var json = {};
@@ -69,7 +69,7 @@ haxapp.app.FolderFunctionComponent.createComponent = function(workspaceUI,data,c
     json.owner = parent;
     json.name = data.name;
     if(data.argListString) {
-        var argList = haxapp.app.FunctionComponent.parseStringArray(data.argListString);
+        var argList = hax.FunctionTable.parseStringArray(data.argListString);
         json.argList = argList;
     }
     if(data.returnValueString) {

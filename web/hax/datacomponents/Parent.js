@@ -12,6 +12,9 @@
  */
 hax.Parent = {};
 
+/** This is the name for the root. */
+hax.Parent.ROOT_NAME = "root";
+
 /** This initializes the component */
 hax.Parent.init = function() {
 }
@@ -34,15 +37,28 @@ hax.Parent.isRoot = function() {
 //hax.Folder.lookupChild = function(name);
 
 /** This method looks up a child using an arry of names corresponding to the
- * path from this folder to the object.  Note: the method will return the 
- * fist non-folder it finds, even if the path is not completed. In this case
- * it is assumed the path refers to a field inside this object. */
-hax.Parent.lookupChildFromPath = function(path) {
-	var object = this;
-	for(var i = 0; ((object)&&(i < path.length)&&(object.isParent)); i++) {
-		object = object.lookupChild(path[i]);
-	}
-    return object;
+ * path from this folder to the object.  The argument startElement is an optional
+ * index into the path array for fodler below the root folder. */
+hax.Parent.lookupChildFromPathArray = function(path,startElement) {
+    if(startElement === undefined) startElement = 0;
+    
+    var member = this.lookupChild(path[startElement]);
+    if(!member) return null;
+    
+    if(startElement < path.length-1) {
+        if(member.isParent) {
+            return member.lookupChildFromPathArray(path,startElement+1);
+        }
+        else if(member.isOwner) {
+            return member.getMemberByPathArray(path,startElement+1);
+        }
+        else {
+            return member;
+        }
+    }
+    else {
+        return member;
+    }
 }
 
 // Must be implemented in extending object
@@ -82,30 +98,17 @@ hax.Parent.createContextManager = function() {
 /** this method gets the hame the children inherit for the full name. */
 hax.Parent.getPossesionNameBase = function() {
     if(this.isRoot()) {
+        //we don't want to include the root name in the object full name
         if(this.owner) {
             return this.owner.getPossesionNameBase();
         }
         else {
+            //this shouldn't happen
             return this.getName() + ":";
         }
     }
     else {
         return this.getFullName() + ".";
-    }
-}
-
-/** This method returns the full name in dot notation for this object. */
-hax.Parent.getFullName = function() {
-    if(this.isRoot()) {
-        if(this.owner) {
-            return this.owner.getPossesionNameBase();
-        }
-        else {
-            return this.getName() + ":";
-        }
-    }
-    else {
-        return hax.Child.getFullName.call(this);
     }
 }
 

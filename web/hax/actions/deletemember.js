@@ -16,7 +16,6 @@ hax.deletemember.ACTION_NAME = "deleteMember";
  * Event object Format:
  * {
  *  "member": (member),
- *  "fullName": (the full name for the member, which is no longer accessible from the member itself)
  *  }
  */
 hax.deletemember.MEMBER_DELETED_EVENT = "memberDeleted";
@@ -46,11 +45,6 @@ hax.deletemember.deleteMember = function(actionData,processedActions) {
             actionDataEntry.member = member;
             actionDataEntry.actionInfo = actionData.actionInfo;
         }
-        //add additional info
-        var eventInfo = {};
-        eventInfo.member = member;
-        eventInfo.fullName = member.getFullName();
-        actionDataEntry.eventInfo = eventInfo;
         
         processedActions.push(actionDataEntry);
     }

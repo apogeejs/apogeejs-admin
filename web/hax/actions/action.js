@@ -34,7 +34,6 @@
  *   "member": (The data object that is acted upon , if applicable),
  *   (other, multiple): (Specific data for the action),
  *   "error": (output only - An action error giving an error in action specific code execution)
- *   "eventInfo": (output only - Used as the object passed in an event. If this is not present, "member" is used.
  *   "actionInfo": (This is the action info for the action. It is added within doAction and should not be added the user.)
  * }
  * 
@@ -85,6 +84,11 @@ hax.action.doAction = function(workspace,actionData,optionalActionResponse) {
 	return actionResponse;
 }
 
+/** This function is used to register an action. */
+hax.action.addActionInfo = function(actionName,actionInfo) {
+    hax.action.actionInfo[actionName] = actionInfo;
+}
+
 /** This function looks up the proper function for an action and executes it. */
 hax.action.callActionFunction = function(actionData,processedActions) {
 
@@ -97,11 +101,6 @@ hax.action.callActionFunction = function(actionData,processedActions) {
     else {
         actionData.error = new hax.ActionError("Unknown action: " + actionData.action,"AppException",null);
     }  
-}
-
-/** This function is used to register an action. */
-hax.action.addActionInfo = function(actionName,actionInfo) {
-    hax.action.actionInfo[actionName] = actionInfo;
 }
 
 //=======================================
@@ -145,7 +144,6 @@ hax.action.fireEvents = function(workspace,processedActions,recalculateList) {
     
     //TEMPORARY EVENT PROCESSING - NEEDS TO BE IMPROVED
     var eventSet = {};
-    var eventObject;
     var member;
     
     for(var i = 0; i < processedActions.length; i++) {
@@ -156,23 +154,12 @@ hax.action.fireEvents = function(workspace,processedActions,recalculateList) {
             if(!eventName) continue;
             
             var member = actionData.member;
-            
-            //get the event object
-            if(actionData.eventInfo) {
-                eventObject = actionData.eventInfo;
-            }
-            else if(member) {
-                eventObject = member;
-            }
-            
-            //fire event if we have one
-            if(eventObject) {  
-                hax.action.fireEvent(workspace,eventName,eventObject);
-                
-                //temporary processing!
-                if(member) {
-                    eventSet[actionData.member.getFullName()] = true;
-                }
+      
+            hax.action.fireEvent(workspace,eventName,member);
+
+            //temporary processing!
+            if(member) {
+                eventSet[actionData.member.getId()] = true;
             }
         }
     }
@@ -180,8 +167,7 @@ hax.action.fireEvents = function(workspace,processedActions,recalculateList) {
     //Doh! WE NEED TO DO THIS DIFFERENTLY FOR LOTS OF REASONS
     for(i = 0; i < recalculateList.length; i++) {
         var member = recalculateList[i];
-        var fullName = member.getFullName();
-        if(!eventSet[fullName]) {
+        if(!eventSet[member.getId()]) {
             hax.action.fireEvent(workspace,hax.updatemember.MEMBER_UPDATED_EVENT,member);
         }
     } 

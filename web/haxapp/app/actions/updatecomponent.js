@@ -64,13 +64,13 @@ haxapp.app.updatecomponent.updatePropertyValues = function(component,oldValues,n
     var actionResponse = new hax.ActionResponse();
 
     var member = component.getObject();
-    var workspaceUI = component.getWorkspaceUI();
+    var workspace = component.getWorkspace();
     var actionList = [];
     var actionData;
 
     //check if a move action is needed
     if((oldValues.name !== newValues.name)||(oldValues.parentKey !== newValues.parentKey)) {
-        var newFolder = workspaceUI.getObjectByKey(newValues.parentKey);
+        var newFolder = workspace.getMemberByFullName(newValues.parentKey);
         actionData = {};
         actionData.action = "moveMember";
         actionData.member = member;
@@ -93,7 +93,7 @@ haxapp.app.updatecomponent.updatePropertyValues = function(component,oldValues,n
         actionData.action = "compoundAction";
         actionData.actions = actionList;
 
-        actionResponse = hax.action.doAction(member.getWorkspace(),actionData,actionResponse);
+        actionResponse = hax.action.doAction(workspace,actionData,actionResponse);
     }
         
     return actionResponse;

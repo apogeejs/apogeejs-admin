@@ -12,15 +12,6 @@ hax.movemember = {};
  */
 hax.movemember.ACTION_NAME = "moveMember";
 
-/** MEMBER MOVED EVENT
- * Event object Format:
- * {
- *  "member": (member),
- *  "oldFullName": (the full name for the member, which is not accessible from the member itself)
- *  }
- */
-hax.movemember.MEMBER_MOVED_EVENT = "memberMoved";
-
 /** Move member action function */
 hax.movemember.moveMember = function(actionData,processedActions) {
         
@@ -28,7 +19,6 @@ hax.movemember.moveMember = function(actionData,processedActions) {
         
     var movedMemberList = [];
     hax.movemember.loadMovedList(member,movedMemberList);
-    var movedOldNameList = hax.movemember.getNameList(movedMemberList);
     member.move(actionData.name,actionData.folder);
     
     //add the individual moves
@@ -48,11 +38,6 @@ hax.movemember.moveMember = function(actionData,processedActions) {
             actionDataEntry.folder = member.getParent();
             actionDataEntry.actionInfo = actionData.actionInfo;
         }
-        //add additional info
-        var eventInfo = {};
-        eventInfo.member = member;
-        eventInfo.oldFullName = movedOldNameList[i];
-        actionDataEntry.eventInfo = eventInfo;
         
         processedActions.push(actionDataEntry);
     }
@@ -77,24 +62,13 @@ hax.movemember.loadMovedList = function(member,movedMemberList) {
     }
 }
 
-/** this adds the new name to the moved list
- * @private */
-hax.movemember.getNameList = function(movedMemberList) {
-    var nameList = [];
-    for(var i = 0; i < movedMemberList.length; i++) {
-        nameList[i] = movedMemberList[i].getFullName();
-    }
-    return nameList;
-}
-
-
 /** Action info */
 hax.movemember.ACTION_INFO= {
     "actionFunction": hax.movemember.moveMember,
     "checkUpdateAll": true,
     "updateDependencies": true,
     "addToRecalc": true,
-    "event": hax.movemember.MEMBER_MOVED_EVENT
+    "event": hax.updatemember.MEMBER_UPDATED_EVENT
 };
 
 

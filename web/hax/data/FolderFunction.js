@@ -19,7 +19,7 @@ hax.FolderFunction = function(name,owner,initialData,createEmptyInternalFolder) 
     
     //recreate the root folder if info is specified
     if(createEmptyInternalFolder) {
-        var internalFolder = new hax.Folder(name,this);
+        var internalFolder = new hax.Folder(hax.Parent.ROOT_NAME,this);
         this.setRoot(internalFolder);
     }
 }
@@ -145,7 +145,7 @@ hax.FolderFunction.addPropValues = function(member,values) {
 /** This method executes a property update. */
 hax.FolderFunction.getPropertyUpdateAction = function(folderFunction,oldValues,newValues) {
     if((oldValues.argListString !== newValues.argListString)||(oldValues.returnValueString !== newValues.returnValueString)) {
-        var newArgList = haxapp.app.FunctionComponent.parseStringArray(newValues.argListString);
+        var newArgList = hax.FunctionTable.parseStringArray(newValues.argListString);
         
         folderFunction.setArgList(newArgList);
         folderFunction.setReturnValueString(newValues.returnValueString);
@@ -218,7 +218,14 @@ hax.FolderFunction.prototype.createContextManager = function() {
 
 /** this method gets the hame the children inherit for the full name. */
 hax.FolderFunction.prototype.getPossesionNameBase = function() {
-    return this.getFullName() + ":";
+    return this.getFullName() + ".";
+}
+
+/** This method looks up a member by its full name. */
+hax.FolderFunction.prototype.getMemberByPathArray = function(path,startElement) {
+    if(startElement === undefined) startElement = 0;
+    if(path[startElement] === hax.Parent.ROOT_NAME) return this.internalFolder;
+    return this.internalFolder.lookupChildFromPathArray(path,startElement);
 }
 
 
@@ -306,7 +313,7 @@ hax.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunction
  * @private */
 hax.FolderFunction.prototype.createVirtualWorkspace = function(folderFunctionErrors) {
     try {
-		return hax.Workspace.createVirtualWorkpaceFromFolder("temp",this.internalFolder,this.getOwner());
+		return hax.Workspace.createVirtualWorkpaceFromFolder(this.getName(),this.internalFolder,this.getOwner());
 	}
 	catch(error) {
         var actionError = hax.ActionError.processException(exception,"FolderFunction - Code",false);

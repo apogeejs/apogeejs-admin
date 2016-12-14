@@ -45,20 +45,16 @@ haxapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, componentsJs
     var instance = this;
     
     //add a member updated listener
-    var memberUpdatedCallback = function(memberObject) {
-        instance.memberUpdated(memberObject);
+    var memberUpdatedCallback = function(member) {
+        instance.memberUpdated(member);
     }
     this.workspace.addListener(hax.updatemember.MEMBER_UPDATED_EVENT, memberUpdatedCallback);
 	
 	//add child deleted listener
-    var childDeletedListener = function(fullName) {
-        instance.childDeleted(fullName);
+    var childDeletedListener = function(member) {
+        instance.childDeleted(member);
     }
     this.workspace.addListener(hax.deletemember.MEMBER_DELETED_EVENT, childDeletedListener);
-    var childMovedListener = function(moveInfo) {
-        instance.childMoved(moveInfo);
-    }
-    this.workspace.addListener(hax.movemember.MEMBER_MOVED_EVENT, childMovedListener);
     
     //add context menu to create childrent
     var contentElement = this.tab.getContainerElement();
@@ -74,8 +70,7 @@ haxapp.app.WorkspaceUI.prototype.getWorkspace = function() {
 
 /** This method gets the component associated with a member object. */
 haxapp.app.WorkspaceUI.prototype.getComponent = function(object) {
-    var key = haxapp.app.WorkspaceUI.getObjectKey(object);
-	var componentInfo = this.componentMap[key];
+	var componentInfo = this.componentMap[object.getId()];
 	if(componentInfo) {
 		return componentInfo.component;
 	}
@@ -89,8 +84,9 @@ haxapp.app.WorkspaceUI.prototype.getFolderList = function() {
 	var folderList = []; 
     for(var key in this.componentMap) {
 		var componentInfo = this.componentMap[key];
-		if(componentInfo.parentContainer) { 
-			folderList.push(key);
+        var member = componentInfo.object;
+		if(member.isParent) { 
+			folderList.push(member.getFullName());
 		}
     }
     return folderList;
@@ -100,8 +96,7 @@ haxapp.app.WorkspaceUI.prototype.getParentContainerObject = function(object) {
     var parent = object.getParent();
     
     //get parent component info
-    var parentKey = haxapp.app.WorkspaceUI.getObjectKey(parent);
-    var parentComponentInfo = this.componentMap[parentKey];
+    var parentComponentInfo = this.componentMap[parent.getId()];
     if(!parentComponentInfo.parentContainer) {
         throw hax.base.createError("Parent container not found!");
     }
@@ -119,9 +114,9 @@ haxapp.app.WorkspaceUI.prototype.registerMember = function(object,component) {
     }
     
     //store the ui object
-	var key = haxapp.app.WorkspaceUI.getObjectKey(object);
+	var memberId = object.getId();
 	
-	if(this.componentMap[key]) {
+	if(this.componentMap[memberId]) {
 		//already exists! (we need to catch this earlier if we want it to not be fatal. But we should catch it here too.)
         throw hax.base.createError("There is already a component with the given name.",true);
 	}
@@ -130,7 +125,7 @@ haxapp.app.WorkspaceUI.prototype.registerMember = function(object,component) {
     componentInfo.object = object;
 	componentInfo.component = component;
 	
-    this.componentMap[key] = componentInfo;
+    this.componentMap[memberId] = componentInfo;
     
 }
 
@@ -138,9 +133,8 @@ haxapp.app.WorkspaceUI.prototype.registerMember = function(object,component) {
 haxapp.app.WorkspaceUI.prototype.addComponentContainer = function(object,parentContainer) {
     
     //store the ui object
-	var key = haxapp.app.WorkspaceUI.getObjectKey(object);
 	
-    var componentInfo = this.componentMap[key];
+    var componentInfo = this.componentMap[object.getId()];
     if(!componentInfo) {
 		alert("Unknown error - component info not found: " + key);
 		return;
@@ -152,7 +146,9 @@ haxapp.app.WorkspaceUI.prototype.addComponentContainer = function(object,parentC
 /** This method responds to a member updated. */
 haxapp.app.WorkspaceUI.prototype.memberUpdated = function(memberObject) {
     //store the ui object
-	var key = memberObject.getFullName();
+	var key = memberObject.getId();
+    
+console.log("updated: " + memberObject.getFullName());
 	
 	var componentInfo = this.componentMap[key];
 	if((componentInfo)&&(componentInfo.component)) {
@@ -161,38 +157,18 @@ haxapp.app.WorkspaceUI.prototype.memberUpdated = function(memberObject) {
 }
 
 /** This method responds to a "new" menu event. */
-haxapp.app.WorkspaceUI.prototype.childDeleted = function(deleteInfo) {
+haxapp.app.WorkspaceUI.prototype.childDeleted = function(memberObject) {
 	
 	//store the ui object
-	var key = deleteInfo.fullName;
+	var memberId = memberObject.getId();
 	
-	var componentInfo = this.componentMap[key];
-	delete this.componentMap[key];
+	var componentInfo = this.componentMap[memberId];
+	delete this.componentMap[memberId];
 
 	if((componentInfo)&&(componentInfo.component)) {
         //do any needed cleanup
         componentInfo.component.onDelete();
 	}
-}
-
-/** This method responds to a "new" menu event. */
-haxapp.app.WorkspaceUI.prototype.childMoved = function(moveInfo) {
-    
-    var newFullName = moveInfo.member.getFullName();
-    
-    var componentInfo = this.componentMap[moveInfo.oldFullName];
-    delete this.componentMap[moveInfo.oldFullName];
-    this.componentMap[newFullName] = componentInfo;
-    
-    //update the component
-	if((componentInfo)&&(componentInfo.component)) {
-        var parentContainer = this.getParentContainerObject(componentInfo.object);
-        componentInfo.component.memberMoved(parentContainer);
-    }
-}
-
-haxapp.app.WorkspaceUI.getObjectKey = function(object) {
-	return object.getFullName();
 }
 
 haxapp.app.WorkspaceUI.prototype.getObjectByKey = function(key) {

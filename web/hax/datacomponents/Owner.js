@@ -31,4 +31,13 @@ hax.Owner.isOwner = true;
 ///** This method retrieves the context manager for this owner. */
 //hax.Owner.getContextManager = function();
 
+/** This method looks up a member by its full name. */
+hax.Owner.getMemberByFullName = function(fullName) {
+    var path = fullName.split(".");
+    return this.getMemberByPathArray(path);
+}
+
+///** This method looks up a member by an array path. The start element is
+// * the index of the array at which to start. */
+//hax.Owner.getMemberByPathArray = function(path,startElement);
 

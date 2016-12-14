@@ -136,7 +136,7 @@ hax.Dependent.updateDependencies = function(newDependsOn) {
             }
 
 			//create a set of new member to use below
-			newDependencySet[remoteMember.getFullName()] = true;
+			newDependencySet[remoteMember.getId()] = true;
 		}
     }
 	
@@ -144,7 +144,7 @@ hax.Dependent.updateDependencies = function(newDependsOn) {
     for(i = 0; i < oldDependsOn.length; i++) {
         remoteMember = oldDependsOn[i];
 		
-		var stillDependsOn = newDependencySet[remoteMember.getFullName()];
+		var stillDependsOn = newDependencySet[remoteMember.getId()];
 		
 		if(!stillDependsOn) {
 			//remove from imacts list

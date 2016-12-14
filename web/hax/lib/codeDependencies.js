@@ -24,10 +24,10 @@ hax.codeDependencies.getDependencyInfo = function(varInfo,contextManager) {
                 if(impactor) {
 
                     //add as dependent (note this may not be a data object - check later!)
-                    var fullName = impactor.getFullName();
-                    if(!objectMap[fullName]) {
+                    var memberId = impactor.getId();
+                    if(!objectMap[memberId]) {
                         dependencyList.push(impactor);
-                        objectMap[fullName] = true;
+                        objectMap[memberId] = true;
                     }
                 }
             }

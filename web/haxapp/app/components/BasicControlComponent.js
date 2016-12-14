@@ -81,7 +81,8 @@ haxapp.app.BasicControlComponent.prototype.getViewModeElement = function(viewTyp
 
 haxapp.app.BasicControlComponent.createBaseComponent = function(workspaceUI,data,resource,generator,componentOptions) {
     
-    var parent = workspaceUI.getObjectByKey(data.parentKey);
+    var workspace = workspaceUI.getWorkspace();
+    var parent = workspace.getMemberByFullName(data.parentKey);
     //should throw an exception if parent is invalid!
     
     var json = {};
@@ -89,7 +90,7 @@ haxapp.app.BasicControlComponent.createBaseComponent = function(workspaceUI,data
     json.owner = parent;
     json.name = data.name;
     json.type = hax.Control.generator.type;
-    var actionResponse = hax.action.doAction(this.getWorkspace(),json);
+    var actionResponse = hax.action.doAction(workspace,json);
     
     var control = json.member;
     
