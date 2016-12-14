@@ -55,7 +55,7 @@ hax.Control.prototype.processObjectFunction = function(objectFunction) {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-hax.Control.fromJson = function(owner,json,actionResponse) {   
+hax.Control.fromJson = function(owner,json) {   
     return new hax.Control(json.name,owner,json.updateData);
 }
 

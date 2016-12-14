@@ -46,7 +46,7 @@ hax.FunctionTable.prototype.getDisplayName = function() {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-hax.FunctionTable.fromJson = function(owner,json,actionResponse) {
+hax.FunctionTable.fromJson = function(owner,json) {
     return new hax.FunctionTable(json.name,owner,json.updateData);
 }
 

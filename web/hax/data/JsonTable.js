@@ -103,7 +103,7 @@ hax.JsonTable.prototype.processObjectFunction = function(objectFunction) {
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-hax.JsonTable.fromJson = function(owner,json,actionResponse) {
+hax.JsonTable.fromJson = function(owner,json) {
     return new hax.JsonTable(json.name,owner,json.updateData);
 }
 

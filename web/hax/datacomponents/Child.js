@@ -185,7 +185,7 @@ hax.Child.toJson = function() {
 
 ///** This method creates a child from a json. IT should be implemented as a static
 // * function in extending objects. */ 
-//hax.Child.fromJson = function(workspace,json,updateDataList,actionResponse) {
+//hax.Child.fromJson = function(owner,json,childrenJsonOutputList) {
 //}
 
 //========================================
