@@ -67,18 +67,14 @@ haxapp.app.GridTableComponent.prototype.getViewModeElement = function(viewType) 
 
 haxapp.app.GridTableComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
-    var workspace = workspaceUI.getWorkspace();
-    var parent = workspace.getMemberByFullName(data.parentKey);
-    //should throw an exception if parent is invalid!
-    
     var json = {};
     json.action = "createMember";
-    json.owner = parent;
+    json.owner = data.parent;
     json.name = data.name;
     json.type = hax.JsonTable.generator.type;
 	json.updateData = {};
 	json.updateData.data = [[""]]; //empty single cell
-    var actionResponse = hax.action.doAction(workspace,json);
+    var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
     
     var table = json.member;
     if(table) {

@@ -54,13 +54,9 @@ haxapp.app.FunctionComponent.prototype.getViewModeElement = function(viewType) {
 //create component call. data includes name and potentially other info
 haxapp.app.FunctionComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
-    var workspace = workspaceUI.getWorkspace();
-    var parent = workspace.getMemberByFullName(data.parentKey);
-    //should throw an exception if parent is invalid!
-    
     var json = {};
     json.action = "createMember";
-    json.owner = parent;
+    json.owner = data.parent;
     json.name = data.name;
     if(data.argListString) {
         var argList = hax.FunctionTable.parseStringArray(data.argListString);
@@ -68,7 +64,7 @@ haxapp.app.FunctionComponent.createComponent = function(workspaceUI,data,compone
         json.updateData.argList = argList;
     }
     json.type = hax.FunctionTable.generator.type;
-    var actionResponse = hax.action.doAction(workspace,json);
+    var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
     
     var functionObject = json.member;
     if(functionObject) {

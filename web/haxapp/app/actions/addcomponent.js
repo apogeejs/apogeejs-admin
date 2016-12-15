@@ -17,13 +17,22 @@ haxapp.app.addcomponent.getAddComponentCallback = function(app,generator,optiona
             return;
         }     
         
+        //get the folder list
+        var folderMap = workspaceUI.getFolders();
+        var folderList = [];
+        for(var folderName in folderMap) {
+            folderList.push(folderName);
+        }
+        
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = haxapp.app.propdialog.getDialogLayout(workspaceUI,generator,true,optionalInitialValues);
+        var dialogLayout = haxapp.app.propdialog.getDialogLayout(folderList,generator,true,optionalInitialValues);
         
         //create on submit callback
         var onSubmitFunction = function(result) {
             
             //need to test if fields are valid!
+            
+            result.parent = folderMap[result.parentName];
 
             var actionResponse =  generator.createComponent(workspaceUI,result,optionalComponentOptions);   
             if(!actionResponse.getSuccess()) {

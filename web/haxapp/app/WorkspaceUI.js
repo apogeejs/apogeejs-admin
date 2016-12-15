@@ -80,16 +80,16 @@ haxapp.app.WorkspaceUI.prototype.getComponent = function(object) {
 }
 
 /** This returns the map of component objects. */
-haxapp.app.WorkspaceUI.prototype.getFolderList = function() {
-	var folderList = []; 
+haxapp.app.WorkspaceUI.prototype.getFolders = function() {
+    var folders = {}
     for(var key in this.componentMap) {
 		var componentInfo = this.componentMap[key];
         var member = componentInfo.object;
-		if(member.isParent) { 
-			folderList.push(member.getFullName());
-		}
+        if(member.isParent) { 
+            folders[member.getFullName()] = member;
+        }
     }
-    return folderList;
+    return folders;
 }
 
 haxapp.app.WorkspaceUI.prototype.getParentContainerObject = function(object) {
@@ -171,25 +171,25 @@ haxapp.app.WorkspaceUI.prototype.childDeleted = function(memberObject) {
 	}
 }
 
-haxapp.app.WorkspaceUI.prototype.getObjectByKey = function(key) {
-    var componentInfo = this.componentMap[key];
-    if(componentInfo) {
-        return componentInfo.object;
-    }
-    else {
-        return null;
-    }
-}
-
-haxapp.app.WorkspaceUI.prototype.getComponentByKey = function(key) {
-    var componentInfo = this.componentMap[key];
-    if(componentInfo) {
-        return componentInfo.component;
-    }
-    else {
-        return null;
-    }
-}
+//haxapp.app.WorkspaceUI.prototype.getObjectById = function(memeberId) {
+//    var componentInfo = this.componentMap[key];
+//    if(componentInfo) {
+//        return componentInfo.object;
+//    }
+//    else {
+//        return null;
+//    }
+//}
+//
+//haxapp.app.WorkspaceUI.prototype.getComponentById = function(memberId) {
+//    var componentInfo = this.componentMap[key];
+//    if(componentInfo) {
+//        return componentInfo.component;
+//    }
+//    else {
+//        return null;
+//    }
+//}
 
 /** This method gets the workspace object. */
 haxapp.app.WorkspaceUI.prototype.close = function() {

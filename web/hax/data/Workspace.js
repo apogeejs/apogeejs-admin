@@ -71,7 +71,7 @@ hax.Workspace.prototype.getWorkspace = function() {
 /** this method gets the hame the children inherit for the full name. */
 hax.Workspace.prototype.getPossesionNameBase = function() {
     if(this.owner) {
-        return this.owner.getPossesionNameBase() + this.name + ".";
+        return this.owner.getPossesionNameBase() + hax.Parent.ROOT_NAME + ".";
     }
     else {
         return "";

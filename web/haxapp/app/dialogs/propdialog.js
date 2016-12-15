@@ -2,7 +2,7 @@ haxapp.app.propdialog = {};
 
 
 //this is for a create or update dialog
-haxapp.app.propdialog.getDialogLayout = function(workspaceUI,generator,doCreate,initialValues) {
+haxapp.app.propdialog.getDialogLayout = function(folderNames,generator,doCreate,initialValues) {
     
     var additionalLines = hax.util.deepJsonCopy(generator.propertyDialogLines);  
     
@@ -24,8 +24,8 @@ haxapp.app.propdialog.getDialogLayout = function(workspaceUI,generator,doCreate,
     var parentLine = {};
     parentLine.type = "dropdown";
     parentLine.heading = "Folder: ";
-    parentLine.entries = workspaceUI.getFolderList();
-    parentLine.resultKey = "parentKey"; 
+    parentLine.entries = folderNames;
+    parentLine.resultKey = "parentName"; 
     lines.push(parentLine);
 
     var nameLine = {};

@@ -43,7 +43,7 @@ hax.Parent.lookupChildFromPathArray = function(path,startElement) {
     if(startElement === undefined) startElement = 0;
     
     var member = this.lookupChild(path[startElement]);
-    if(!member) return null;
+    if(!member) return undefined;
     
     if(startElement < path.length-1) {
         if(member.isParent) {
@@ -95,6 +95,17 @@ hax.Parent.createContextManager = function() {
 //Owner methods
 //------------------------------
 
+/** This method returns the full name in dot notation for this object. */
+hax.Parent.getFullName = function() {
+    if(this.isRoot()) {
+        return this.owner.getPossesionNameBase() + hax.Parent.ROOT_NAME;
+    }
+    else {
+        //this shouldn't happen
+        return hax.Child.getFullName.call(this);
+    }
+}
+
 /** this method gets the hame the children inherit for the full name. */
 hax.Parent.getPossesionNameBase = function() {
     if(this.isRoot()) {
@@ -104,7 +115,7 @@ hax.Parent.getPossesionNameBase = function() {
         }
         else {
             //this shouldn't happen
-            return this.getName() + ":";
+            return this.getName() + ".";
         }
     }
     else {

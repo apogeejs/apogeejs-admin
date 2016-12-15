@@ -371,7 +371,7 @@ haxapp.app.Component.getPropertyValues = function() {
     
     var values = {};
     values.name = member.getName();
-    values.parentKey = member.getParent().getFullName();
+    values.parentName = member.getParent().getFullName();
     
     if(generator.addPropFunction) {
         generator.addPropFunction(member,values);

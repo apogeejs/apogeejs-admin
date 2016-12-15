@@ -14,8 +14,15 @@ haxapp.app.updatecomponent.getUpdateComponentCallback = function(component,gener
         var workspaceUI = component.getWorkspaceUI();       
         var initialValues = component.getPropertyValues();
         
+        //get the folder list
+        var folderMap = workspaceUI.getFolders();
+        var folderList = [];
+        for(var folderName in folderMap) {
+            folderList.push(folderName);
+        }
+        
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = haxapp.app.propdialog.getDialogLayout(workspaceUI,generator,false,initialValues);
+        var dialogLayout = haxapp.app.propdialog.getDialogLayout(folderList,generator,false,initialValues);
         
         //create on submit callback
         var onSubmitFunction = function(newValues) {
@@ -28,6 +35,9 @@ haxapp.app.updatecomponent.getUpdateComponentCallback = function(component,gener
             if(!change) {
                 return true;
             }
+            
+            //get the parent value
+            newValues.parent = foldermap[newValues.parentName];
             
             //need to test if fields are valid!
 
@@ -69,13 +79,12 @@ haxapp.app.updatecomponent.updatePropertyValues = function(component,oldValues,n
     var actionData;
 
     //check if a move action is needed
-    if((oldValues.name !== newValues.name)||(oldValues.parentKey !== newValues.parentKey)) {
-        var newFolder = workspace.getMemberByFullName(newValues.parentKey);
+    if((oldValues.name !== newValues.name)||(oldValues.parentName !== newValues.parentName)) {
         actionData = {};
         actionData.action = "moveMember";
         actionData.member = member;
         actionData.name = newValues.name;
-        actionData.folder = newFolder;
+        actionData.folder = newValues.parent;
         actionList.push(actionData);
     }
 

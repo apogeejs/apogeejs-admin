@@ -315,7 +315,7 @@ haxapp.app.Hax.prototype.setFolderContextMenu = function(contentElement,folder) 
     var app = this;
 
     var initialValues = {};
-    initialValues.parentKey = folder.getFullName();
+    initialValues.parentName = folder.getFullName();
     
     contentElement.oncontextmenu = function(event) {
         event.preventDefault();

@@ -55,16 +55,12 @@ haxapp.app.FolderComponent.prototype.populateFrame = function() {
 //add table listener
 haxapp.app.FolderComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
-    var workspace = workspaceUI.getWorkspace();
-    var parent = workspace.getMemberByFullName(data.parentKey);
-    //should throw an exception if parent is invalid!
-    
     var json = {};
     json.action = "createMember";
-    json.owner = parent;
+    json.owner = data.parent;
     json.name = data.name;
     json.type = hax.Folder.generator.type;
-    var actionResponse = hax.action.doAction(workspace,json);
+    var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
     
     var folder = json.member;
 

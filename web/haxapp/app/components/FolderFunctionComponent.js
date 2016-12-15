@@ -60,13 +60,9 @@ haxapp.app.FolderFunctionComponent.prototype.populateFrame = function() {
 /** This method creates the component. */
 haxapp.app.FolderFunctionComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
-    var workspace = workspaceUI.getWorkspace();
-    var parent = workspace.getMemberByFullName(data.parentKey);
-    //should throw an exception if parent is invalid!
-    
     var json = {};
     json.action = "createMember";
-    json.owner = parent;
+    json.owner = data.parent;
     json.name = data.name;
     if(data.argListString) {
         var argList = hax.FunctionTable.parseStringArray(data.argListString);
@@ -76,7 +72,7 @@ haxapp.app.FolderFunctionComponent.createComponent = function(workspaceUI,data,c
         json.returnValue = data.returnValueString;
     }
     json.type = hax.FolderFunction.generator.type;
-    var actionResponse = hax.action.doAction(workspace,json);
+    var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
     
     var folderFunction = json.member;
     if(actionResponse.getSuccess()) {
