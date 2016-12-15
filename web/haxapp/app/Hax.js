@@ -150,6 +150,7 @@ haxapp.app.Hax.prototype.loadComponentGenerators = function() {
     //standard components
     this.registerStandardComponent(haxapp.app.JsonTableComponent.generator);
     this.registerStandardComponent(haxapp.app.GridTableComponent.generator);
+    this.registerStandardComponent(haxapp.app.TextComponent.generator);
 	this.registerStandardComponent(haxapp.app.FolderComponent.generator);
 	this.registerStandardComponent(haxapp.app.FunctionComponent.generator);
     this.registerStandardComponent(haxapp.app.FolderFunctionComponent.generator);

@@ -1,0 +1,107 @@
+
+/** This component represents a json table object. */
+haxapp.app.TextComponent = function(workspaceUI,table,componentJson) {
+    //base init
+    haxapp.app.Component.init.call(this,workspaceUI,table,haxapp.app.TextComponent.generator,componentJson);
+	haxapp.app.TableEditComponent.init.call(this,
+		haxapp.app.TextComponent.VIEW_MODES,
+		haxapp.app.TextComponent.DEFAULT_VIEW,
+		haxapp.app.TextComponent.BLANK_DATA_VALUE_INFO
+	);
+    
+    this.memberUpdated();
+};
+
+//add components to this class
+hax.base.mixin(haxapp.app.TextComponent,haxapp.app.Component);
+hax.base.mixin(haxapp.app.TextComponent,haxapp.app.TableEditComponent);
+
+//==============================
+// Protected and Private Instance Methods
+//==============================
+
+haxapp.app.TextComponent.VIEW_TEXT = "Text";
+haxapp.app.TextComponent.VIEW_CODE = "Formula";
+haxapp.app.TextComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+
+haxapp.app.TextComponent.VIEW_MODES = [
+	haxapp.app.TextComponent.VIEW_TEXT,
+    haxapp.app.TextComponent.VIEW_CODE,
+    haxapp.app.TextComponent.VIEW_SUPPLEMENTAL_CODE
+];
+
+haxapp.app.TextComponent.BLANK_DATA_VALUE_INFO = {
+	"dataValue":"",
+	"menuLabel":"Clear Formula"
+};
+
+haxapp.app.TextComponent.DEFAULT_VIEW = haxapp.app.TextComponent.VIEW_TEXT;
+
+/** This method should be implemented to retrieve a view mode of the give type. 
+ * @protected. */
+haxapp.app.TextComponent.prototype.getViewModeElement = function(viewType) {
+	
+	//create the new view element;
+	switch(viewType) {
+			
+		case haxapp.app.TextComponent.VIEW_CODE:
+			return new haxapp.app.AceCodeMode(this,haxapp.app.TextComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
+			
+		case haxapp.app.TextComponent.VIEW_SUPPLEMENTAL_CODE:
+			return new haxapp.app.AceSupplementalMode(this);
+			
+		case haxapp.app.TextComponent.VIEW_TEXT:
+			return new haxapp.app.AceTextMode(this);
+			
+		default:
+//temporary error handling...
+			alert("unrecognized view element!");
+			return null;
+	}
+}
+
+//======================================
+// Static methods
+//======================================
+
+
+haxapp.app.TextComponent.createComponent = function(workspaceUI,data,componentOptions) {
+    
+    var json = {};
+    json.action = "createMember";
+    json.owner = data.parent;
+    json.name = data.name;
+    json.type = hax.JsonTable.generator.type;
+	json.updateData = {};
+	json.updateData.data = "";
+    var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
+    
+    var table = json.member;
+    if(table) {
+        var tableComponent = new haxapp.app.TextComponent(workspaceUI,table,componentOptions);
+        actionResponse.component = tableComponent;
+    }
+    return actionResponse;
+}
+
+
+haxapp.app.TextComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
+    var tableComponent = new haxapp.app.TextComponent(workspaceUI,member,componentJson);
+    return tableComponent;
+}
+
+//======================================
+// This is the component generator, to register the component
+//======================================
+
+haxapp.app.TextComponent.generator = {};
+haxapp.app.TextComponent.generator.displayName = "Text Table";
+haxapp.app.TextComponent.generator.uniqueName = "haxapp.app.TextComponent";
+haxapp.app.TextComponent.generator.createComponent = haxapp.app.TextComponent.createComponent;
+haxapp.app.TextComponent.generator.createComponentFromJson = haxapp.app.TextComponent.createComponentFromJson;
+haxapp.app.TextComponent.generator.DEFAULT_WIDTH = 200;
+haxapp.app.TextComponent.generator.DEFAULT_HEIGHT = 200;
+
+
+
+
