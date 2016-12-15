@@ -145,14 +145,10 @@ hax.codeAnalysis.syntax = {
  * an exception if there is an error parsing.
  **/
 hax.codeAnalysis.analyzeCode = function(functionText) {
-
-    var returnValue = {};
-
-    //parse the code
-    var ast;
     
     try {
-        ast = esprima.parse(functionText, { tolerant: true, loc: true });
+        var returnValue = {};
+        var ast = esprima.parse(functionText, { tolerant: true, loc: true });
     
         //check for errors in parsing
         if((ast.errors)&&(ast.errors.length > 0)) {
@@ -165,6 +161,14 @@ hax.codeAnalysis.analyzeCode = function(functionText) {
                 returnValue.errors.push(actionError);
             }
         }
+        
+        //get the variable list
+        var varInfo = hax.codeAnalysis.getVariableInfo(ast);
+
+        //return the variable info
+        returnValue.success = true;
+        returnValue.varInfo = varInfo;
+        return returnValue;
     }
     catch(exception) {
         var actionError = hax.ActionError.processException(exception,"Analyze - Code",false);
@@ -173,14 +177,6 @@ hax.codeAnalysis.analyzeCode = function(functionText) {
         returnValue.errors.push(actionError);
         return returnValue;
     }
-
-    //get the variable list
-    var varInfo = hax.codeAnalysis.getVariableInfo(ast);
-    
-    //return the variable info
-    returnValue.success = true;
-    returnValue.varInfo = varInfo;
-    return returnValue;
 }
 
 /** This method analyzes the AST to find the variabls accessed from the formula.
