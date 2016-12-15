@@ -370,6 +370,8 @@ hax.codeAnalysis.processVariable = function(processInfo,node,isModified,isDeclar
     
     //get the variable path and the base name
     var namePath = this.getVariableDotPath(processInfo,node);
+    if(!namePath) return;
+    
     var baseName = namePath[0];
     
     //add to the name table
@@ -404,9 +406,11 @@ hax.codeAnalysis.processVariable = function(processInfo,node,isModified,isDeclar
     }
 }
 
-/** This method returns the variable and its fields which are given by the node. 
- * In the case the fields are calculated, we do not attempt to return these
- * fields. We do however factor the expressions nodes into the dependencies. 
+/** This method returns the variable and its fields which are given by the node.
+ * It may return null, meaning there is no variable to add to the dependency.  
+ * See notes embedded in the code. It is possible to fool this into making a
+ * dependecne on a parent (and all children) when all that is required is a 
+ * single child. 
  * @private */
 hax.codeAnalysis.getVariableDotPath = function(processInfo,node) {
     if(node.type == "Identifier") {
@@ -414,19 +418,35 @@ hax.codeAnalysis.getVariableDotPath = function(processInfo,node) {
         return [node.name];
     }
     else if(node.type == "MemberExpression") {
-        //read the parent identifer
-        var variable = this.getVariableDotPath(processInfo,node.object);
-        
-        if(node.computed) {
-            //the property name is an expression - process the expression but don't recording the field name
-            this.processTreeNode(processInfo,node.property,false,false);
+        if(node.object.type == "CallExpression") {
+            //CALL EXPRESSION
+            //ignore the variable path after the call. We will set a dependence
+            //on the parent which should work but is too strong. For example
+            //we may be including dependence on a while folder when really we depend
+            //on a single child in the folder.
+            this.processTreeNode(processInfo,node.object,false,false);
+            
+            return null;
         }
         else {
-            //append the member expression property to it
-            variable.push(node.property.name);
+            //MEMBER EXPRESSION OR IDENTIFIER hopefully. We should throw an exception if not.
+            var variable = this.getVariableDotPath(processInfo,node.object);
+
+            if(node.computed) {
+                //COMPUTED CASE
+                //We will not try to figure out what the child is. We will only make a dependence on 
+                //the parent. This should work but it is too strong. For example
+                //we may be including dependence on a while folder when really we depend
+                //on a single child in the folder.
+                this.processTreeNode(processInfo,node.property,false,false);
+            }
+            else {
+                //append the member expression property to it
+                variable.push(node.property.name);
+            }
+
+            return variable;
         }
-        
-        return variable;
     }
     else {
         //this shouldn't happen. If it does we didn't code the syntax tree right
