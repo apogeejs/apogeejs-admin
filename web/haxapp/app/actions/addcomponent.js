@@ -30,7 +30,12 @@ haxapp.app.addcomponent.getAddComponentCallback = function(app,generator,optiona
         //create on submit callback
         var onSubmitFunction = function(result) {
             
-            //need to test if fields are valid!
+            //validate name
+            var nameResult = hax.codeCompiler.validateTableName(result.name);
+            if(!nameResult.valid) {
+                alert(nameResult.errorMessage);
+                return false;
+            }
             
             result.parent = folderMap[result.parentName];
 

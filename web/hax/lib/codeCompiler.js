@@ -1,9 +1,44 @@
   
 hax.codeCompiler = {};
 
+/** @private */
+hax.codeCompiler.HAX_FORBIDDEN_NAMES = {
+    "root": true
+}
+
+/** @private */
+hax.codeCompiler.NAME_PATTERN = /[a-zA-Z_$][0-9a-zA-Z_$]*/;
+
+/** This function validates a table name. It returns 
+ * [valid,errorMsg]. */
+hax.codeCompiler.validateTableName = function(name) {
+    var nameResult = {};
+
+    //check if it is a keyword
+    if(hax.codeAnalysis.KEYWORDS[name]) {
+        nameResult.errorMessage = "Illegal name: " + name + " - Javascript reserved keyword";
+        nameResult.valid = false;
+    }    
+    else if(hax.codeCompiler.HAX_FORBIDDEN_NAMES[name]) {
+        nameResult.errorMessage = "Illegal name: " + name + " - Hax reserved keyword";
+        nameResult.valid = false;
+    }
+    else {
+        //check the pattern
+        var nameResult = hax.codeCompiler.NAME_PATTERN.exec(name);
+        if((!nameResult)||(nameResult[0] !== name)) {
+            nameResult.errorMessage = "Illegal name format: " + name;
+            nameResult.valid = false;
+        }
+        else {
+            nameResult.valid = true;
+        }
+    }
+    return nameResult;
+}
+
 /** This method analyzes the code and creates the object function and dependencies. 
- * The results are loaded into the passed object processedCodeData.
- * @private */
+ * The results are loaded into the passed object processedCodeData. */
 hax.codeCompiler.processCode = function(codeInfo,codeLabel) {
     
     //analyze the code
