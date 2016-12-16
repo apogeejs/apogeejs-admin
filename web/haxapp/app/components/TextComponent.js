@@ -23,11 +23,13 @@ hax.base.mixin(haxapp.app.TextComponent,haxapp.app.TableEditComponent);
 haxapp.app.TextComponent.VIEW_TEXT = "Text";
 haxapp.app.TextComponent.VIEW_CODE = "Formula";
 haxapp.app.TextComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+haxapp.app.TextComponent.VIEW_DESCRIPTION = "Notes";
 
 haxapp.app.TextComponent.VIEW_MODES = [
 	haxapp.app.TextComponent.VIEW_TEXT,
     haxapp.app.TextComponent.VIEW_CODE,
-    haxapp.app.TextComponent.VIEW_SUPPLEMENTAL_CODE
+    haxapp.app.TextComponent.VIEW_SUPPLEMENTAL_CODE,
+    haxapp.app.TextComponent.VIEW_DESCRIPTION
 ];
 
 haxapp.app.TextComponent.BLANK_DATA_VALUE_INFO = {
@@ -52,6 +54,9 @@ haxapp.app.TextComponent.prototype.getViewModeElement = function(viewType) {
 			
 		case haxapp.app.TextComponent.VIEW_TEXT:
 			return new haxapp.app.AceTextMode(this);
+            
+        case haxapp.app.TextComponent.VIEW_DESCRIPTION:
+			return new haxapp.app.AceDescriptionMode(this);
 			
 		default:
 //temporary error handling...

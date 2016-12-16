@@ -23,11 +23,13 @@ hax.base.mixin(haxapp.app.GridTableComponent,haxapp.app.TableEditComponent);
 haxapp.app.GridTableComponent.VIEW_GRID = "Grid";
 haxapp.app.GridTableComponent.VIEW_CODE = "Formula";
 haxapp.app.GridTableComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+haxapp.app.GridTableComponent.VIEW_DESCRIPTION = "Notes";
 
 haxapp.app.GridTableComponent.VIEW_MODES = [
 	haxapp.app.GridTableComponent.VIEW_GRID,
     haxapp.app.GridTableComponent.VIEW_CODE,
-    haxapp.app.GridTableComponent.VIEW_SUPPLEMENTAL_CODE
+    haxapp.app.GridTableComponent.VIEW_SUPPLEMENTAL_CODE,
+    haxapp.app.GridTableComponent.VIEW_DESCRIPTION
 ];
 
 haxapp.app.GridTableComponent.BLANK_DATA_VALUE_INFO = {
@@ -52,6 +54,9 @@ haxapp.app.GridTableComponent.prototype.getViewModeElement = function(viewType) 
 			
 		case haxapp.app.GridTableComponent.VIEW_GRID:
 			return new haxapp.app.HandsonGridMode(this);
+            
+        case haxapp.app.GridTableComponent.VIEW_DESCRIPTION:
+			return new haxapp.app.AceDescriptionMode(this);
 			
 		default:
 //temporary error handling...

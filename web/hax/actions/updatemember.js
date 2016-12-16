@@ -43,6 +43,16 @@ hax.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME = "asynchUpdateData";
  */
 hax.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME = "asynchUpdateError";
 
+/** Update description action name - used for publishing an error after an asynchronous formula
+ * Action Data format:
+ * {
+ *  "action": hax.updatemember.UPDATE_DESCRIPTION_ACTION_NAME,
+ *  "member": (member to update),
+ *  "description": (description)
+ * }
+ */
+hax.updatemember.UPDATE_DESCRIPTION_ACTION_NAME = "updateDescription";
+
 /** member UPDATED EVENT
  * Event member format:
  * {
@@ -101,6 +111,16 @@ hax.updatemember.asynchFunctionUpdateError = function(actionData,processedAction
     
     processedActions.push(actionData);
         
+}
+
+/** Update description */
+hax.updatemember.updateDescription = function(actionData,processedActions) {
+        
+    var member = actionData.member;
+
+    member.setDescription(actionData.description);
+    
+    processedActions.push(actionData);
 }
 
 
@@ -166,6 +186,15 @@ hax.updatemember.UPDATE_ASYNCH_ERROR_ACTION_INFO = {
     "addDependenceiesToRecalc": true,
     "event": hax.updatemember.MEMBER_UPDATED_EVENT
 };
+/** Update data action info */
+hax.updatemember.UPDATE_DESCRIPTION_ACTION_INFO = {
+    "actionFunction": hax.updatemember.updateDescription,
+    "checkUpdateAll": false,
+    "updateDependencies": false,
+    "addToRecalc": false,
+    "addDependenceiesToRecalc": false,
+    "event": hax.updatemember.MEMBER_UPDATED_EVENT
+};
 
 
 //The following code registers the actions
@@ -173,3 +202,4 @@ hax.action.addActionInfo(hax.updatemember.UPDATE_DATA_ACTION_NAME,hax.updatememb
 hax.action.addActionInfo(hax.updatemember.UPDATE_CODE_ACTION_NAME,hax.updatemember.UPDATE_CODE_ACTION_INFO);
 hax.action.addActionInfo(hax.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME,hax.updatemember.UPDATE_ASYNCH_DATA_ACTION_INFO);
 hax.action.addActionInfo(hax.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME,hax.updatemember.UPDATE_ASYNCH_ERROR_ACTION_INFO);
+hax.action.addActionInfo(hax.updatemember.UPDATE_DESCRIPTION_ACTION_NAME,hax.updatemember.UPDATE_DESCRIPTION_ACTION_INFO);

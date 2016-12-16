@@ -40,11 +40,13 @@ haxapp.app.BasicControlComponent.prototype.getOutputElement = function() {
 haxapp.app.BasicControlComponent.VIEW_OUTPUT = "Output";
 haxapp.app.BasicControlComponent.VIEW_CODE = "Code";
 haxapp.app.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+haxapp.app.BasicControlComponent.VIEW_DESCRIPTION = "Notes";
 
 haxapp.app.BasicControlComponent.VIEW_MODES = [
 	haxapp.app.BasicControlComponent.VIEW_OUTPUT,
 	haxapp.app.BasicControlComponent.VIEW_CODE,
-    haxapp.app.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE
+    haxapp.app.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE,
+    haxapp.app.BasicControlComponent.VIEW_DESCRIPTION
 ];
 
 haxapp.app.BasicControlComponent.DEFAULT_VIEW = haxapp.app.BasicControlComponent.VIEW_OUTPUT;
@@ -67,6 +69,9 @@ haxapp.app.BasicControlComponent.prototype.getViewModeElement = function(viewTyp
 			
 		case haxapp.app.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new haxapp.app.AceSupplementalMode(this);
+            
+        case haxapp.app.BasicControlComponent.VIEW_DESCRIPTION:
+			return new haxapp.app.AceDescriptionMode(this);
 			
 		default:
 //temporary error handling...

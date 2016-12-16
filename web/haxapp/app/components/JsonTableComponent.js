@@ -23,13 +23,15 @@ haxapp.app.JsonTableComponent.VIEW_JSON_TEXT = "JSON";
 haxapp.app.JsonTableComponent.VIEW_FORM = "Form";
 haxapp.app.JsonTableComponent.VIEW_CODE = "Formula";
 haxapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+haxapp.app.JsonTableComponent.VIEW_DESCRIPTION = "Notes";
 
 haxapp.app.JsonTableComponent.VIEW_MODES = [
     haxapp.app.JsonTableComponent.VIEW_PLAIN_TEXT,
     haxapp.app.JsonTableComponent.VIEW_JSON_TEXT,
     haxapp.app.JsonTableComponent.VIEW_FORM,
     haxapp.app.JsonTableComponent.VIEW_CODE,
-    haxapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE
+    haxapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE,
+    haxapp.app.JsonTableComponent.VIEW_DESCRIPTION
 ];
 
 //haxapp.app.JsonTableComponent.DEFAULT_VIEW = haxapp.app.JsonTableComponent.VIEW_FORM;
@@ -60,6 +62,9 @@ haxapp.app.JsonTableComponent.prototype.getViewModeElement = function(viewType) 
 			
 		case haxapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new haxapp.app.AceSupplementalMode(this);
+            
+        case haxapp.app.JsonTableComponent.VIEW_DESCRIPTION:
+			return new haxapp.app.AceDescriptionMode(this);
 			
 		default:
 //temporary error handling...

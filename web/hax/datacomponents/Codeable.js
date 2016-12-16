@@ -21,6 +21,7 @@ hax.Codeable.init = function(argList) {
     this.codeSet = false;
     this.functionBody = "";
     this.supplementalCode = "";
+    this.description = "";
     this.varInfo = null;
     this.dependencyInfo = null;
     this.contextSetter = null;
@@ -52,6 +53,16 @@ hax.Codeable.getFunctionBody = function() {
 /** This method returns the supplemental code for this member.  */
 hax.Codeable.getSupplementalCode = function() {
     return this.supplementalCode;
+}
+
+/** This method returns the supplemental code for this member.  */
+hax.Codeable.getDescription = function() {
+    return this.description;
+}
+
+/** This method returns the supplemental code for this member.  */
+hax.Codeable.setDescription = function(description) {
+    this.description = description;
 }
 
 /** This method returns the formula for this member.  */
@@ -257,6 +268,7 @@ hax.Codeable.getUpdateData = function() {
     else {
         updateData.data = this.getData();
     }
+    updateData.description = this.getDescription();
     return updateData;
 }
 

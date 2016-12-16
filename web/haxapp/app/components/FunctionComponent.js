@@ -19,10 +19,12 @@ hax.base.mixin(haxapp.app.FunctionComponent,haxapp.app.TableEditComponent);
 
 haxapp.app.FunctionComponent.VIEW_CODE = "Code";
 haxapp.app.FunctionComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+haxapp.app.FunctionComponent.VIEW_DESCRIPTION = "Notes";
 
 haxapp.app.FunctionComponent.VIEW_MODES = [
     haxapp.app.FunctionComponent.VIEW_CODE,
-    haxapp.app.FunctionComponent.VIEW_SUPPLEMENTAL_CODE
+    haxapp.app.FunctionComponent.VIEW_SUPPLEMENTAL_CODE,
+    haxapp.app.FunctionComponent.VIEW_DESCRIPTION
 ];
 
 haxapp.app.FunctionComponent.DEFAULT_VIEW = haxapp.app.FunctionComponent.VIEW_CODE;
@@ -39,6 +41,9 @@ haxapp.app.FunctionComponent.prototype.getViewModeElement = function(viewType) {
 			
 		case haxapp.app.FunctionComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new haxapp.app.AceSupplementalMode(this);
+            
+        case haxapp.app.FunctionComponent.VIEW_DESCRIPTION:
+			return new haxapp.app.AceDescriptionMode(this);
 			
 		default:
 //temporary error handling...

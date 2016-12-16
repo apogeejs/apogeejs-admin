@@ -65,13 +65,15 @@ haxapp.app.CustomControlComponent.VIEW_CODE = "Model Code";
 haxapp.app.CustomControlComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
 haxapp.app.CustomControlComponent.VIEW_CUSTOM_CODE = "Base Code";
 haxapp.app.CustomControlComponent.VIEW_CUSTOM_SUPPLEMENTAL_CODE = "Base Private";
+haxapp.app.CustomControlComponent.VIEW_DESCRIPTION = "Notes";
 
 haxapp.app.CustomControlComponent.VIEW_MODES = [
 	haxapp.app.CustomControlComponent.VIEW_OUTPUT,
 	haxapp.app.CustomControlComponent.VIEW_CODE,
     haxapp.app.CustomControlComponent.VIEW_SUPPLEMENTAL_CODE,
     haxapp.app.CustomControlComponent.VIEW_CUSTOM_CODE,
-    haxapp.app.CustomControlComponent.VIEW_CUSTOM_SUPPLEMENTAL_CODE
+    haxapp.app.CustomControlComponent.VIEW_CUSTOM_SUPPLEMENTAL_CODE,
+    haxapp.app.CustomControlComponent.VIEW_DESCRIPTION
 ];
 
 haxapp.app.CustomControlComponent.DEFAULT_VIEW = haxapp.app.CustomControlComponent.VIEW_OUTPUT;
@@ -100,6 +102,9 @@ haxapp.app.CustomControlComponent.prototype.getViewModeElement = function(viewTy
 			
 		case haxapp.app.CustomControlComponent.VIEW_CUSTOM_SUPPLEMENTAL_CODE:
 			return new haxapp.app.AceCustomSupplementalMode(this);
+            
+        case haxapp.app.CustomControlComponent.VIEW_DESCRIPTION:
+			return new haxapp.app.AceDescriptionMode(this);
 			
 		default:
 //temporary error handling...

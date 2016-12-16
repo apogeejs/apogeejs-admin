@@ -15,6 +15,9 @@ hax.Control = function(name,owner,initialData) {
     var functionBody = initialData.functionBody ? initialData.functionBody : "";
     var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
     hax.updatemember.applyCode(this,argList,functionBody,supplementalCode);
+    if(initialData.description !== undefined) {
+        this.setDescription(initialData.description);
+    }
 }
 
 //add components to this class

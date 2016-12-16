@@ -28,6 +28,9 @@ hax.JsonTable = function(name,owner,initialData) {
         hax.updatemember.applyData(this,
             initialData.data);
     }
+    if(initialData.description !== undefined) {
+        this.setDescription(initialData.description);
+    }
 }
 
 //add components to this class
