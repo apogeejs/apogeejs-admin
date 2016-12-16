@@ -5,10 +5,7 @@
 haxapp.app.CustomControlComponent = function(workspaceUI,control,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,control,haxapp.app.CustomControlComponent.generator,componentJson);
-	haxapp.app.TableEditComponent.init.call(this,
-		haxapp.app.CustomControlComponent.VIEW_MODES,
-		haxapp.app.CustomControlComponent.DEFAULT_VIEW
-	);
+	haxapp.app.TableEditComponent.init.call(this,haxapp.app.CustomControlComponent.TABLE_EDIT_SETTINGS,componentJson);
 	
 	//create a resource based on the json (or lack of a json)
     if((componentJson)&&(componentJson.resource)) {
@@ -18,15 +15,11 @@ haxapp.app.CustomControlComponent = function(workspaceUI,control,componentJson) 
         this.loadEmptyResource();
     }
     
-    //add a cleanup action to call resource when delete is happening
-    var cleanupAction = function() {
-        var resource = control.getResource();
-        if(resource.delete) {
-            resource.delete();
-        }
-    }
-    this.addCleanupAction(cleanupAction);
+    //add a cleanup and save actions
+    this.addSaveAction(haxapp.app.CustomControlComponent.writeToJson);
+    this.addCleanupAction(haxapp.app.CustomControlComponent.cleanupAction);
 };
+
 
 //add components to this class
 hax.base.mixin(haxapp.app.CustomControlComponent,haxapp.app.Component);
@@ -76,7 +69,10 @@ haxapp.app.CustomControlComponent.VIEW_MODES = [
     haxapp.app.CustomControlComponent.VIEW_DESCRIPTION
 ];
 
-haxapp.app.CustomControlComponent.DEFAULT_VIEW = haxapp.app.CustomControlComponent.VIEW_OUTPUT;
+haxapp.app.CustomControlComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": haxapp.app.CustomControlComponent.VIEW_MODES,
+    "defaultView": haxapp.app.CustomControlComponent.VIEW_OUTPUT,
+}
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
@@ -111,20 +107,6 @@ haxapp.app.CustomControlComponent.prototype.getViewModeElement = function(viewTy
 			alert("unrecognized view element!");
 			return null;
 	}
-}
-
-/** This serializes the table component. */
-haxapp.app.CustomControlComponent.prototype.writeToJson = function(json) {
-    //store the resource info
-    var control = this.getObject();
-	var resource = control.getResource();
-    if(resource) {
-        json.resource = {};
-        json.resource.html = this.html;
-        json.resource.customizeScript = this.customizeScript;
-        json.resource.supplementalCode = this.supplementalCode;
-        json.resource.css = this.css;
-    }
 }
 
 /** This method deseriliazes data for the custom resource component. */
@@ -199,6 +181,34 @@ haxapp.app.CustomControlComponent.prototype.update = function(html,customizeScri
     }
     
     return actionResponse; 
+}
+
+//======================================
+// Callbacks
+// These are defined as static but are called in the objects context
+//======================================
+
+
+haxapp.app.CustomControlComponent.cleanupAction = function() {
+    var resource = this.control.getResource();
+    if(resource.delete) {
+        resource.delete();
+    }
+}
+
+
+/** This serializes the table component. */
+haxapp.app.CustomControlComponent.writeToJson = function(json) {
+    //store the resource info
+    var control = this.getObject();
+	var resource = control.getResource();
+    if(resource) {
+        json.resource = {};
+        json.resource.html = this.html;
+        json.resource.customizeScript = this.customizeScript;
+        json.resource.supplementalCode = this.supplementalCode;
+        json.resource.css = this.css;
+    }
 }
 
 

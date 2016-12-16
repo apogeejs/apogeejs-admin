@@ -7,6 +7,9 @@ haxapp.app.FolderComponent = function(workspaceUI,folder,componentJson) {
     
     //register this folder as a parent container
     workspaceUI.addComponentContainer(folder,this);
+    
+    //add a cleanup and save actions
+    this.addSaveAction(haxapp.app.FolderComponent.writeToJson);
 };
 
 //add components to this class
@@ -27,12 +30,6 @@ haxapp.app.FolderComponent.prototype.getContentIsShowing = function() {
 // Protected and Private Instance Methods
 //==============================
 
-/** This serializes the table component. */
-haxapp.app.FolderComponent.prototype.writeToJson = function(json) {
-    var folder = this.getObject();
-    var workspaceUI = this.getWorkspaceUI();
-    json.children = workspaceUI.getFolderComponentContentJson(folder);
-}
 
 /** This method populates the frame for this component. 
  * @protected */
@@ -46,6 +43,19 @@ haxapp.app.FolderComponent.prototype.populateFrame = function() {
     app.setFolderContextMenu(contentElement,folder);
     
 }
+
+//======================================
+// Callbacks
+// These are defined as static but are called in the objects context
+//======================================
+
+/** This serializes the table component. */
+haxapp.app.FolderComponent.writeToJson = function(json) {
+    var folder = this.getObject();
+    var workspaceUI = this.getWorkspaceUI();
+    json.children = workspaceUI.getFolderComponentContentJson(folder);
+}
+
 
 
 //======================================

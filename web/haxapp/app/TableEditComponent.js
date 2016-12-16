@@ -7,28 +7,28 @@ haxapp.app.TableEditComponent = {};
 
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-haxapp.app.TableEditComponent.init = function(viewTypes,defaultView,optionalClearFunctionOnBlankInfo) {
+haxapp.app.TableEditComponent.init = function(settings,options) {
 	
-	this.viewTypes = viewTypes;
-	this.defaultView = defaultView;
+	this.viewTypes = settings.viewModes;
+    this.defaultViewType = settings.defaultView;
+    var initialViewType = ((options)&&(options.viewType)) ? options.viewType : settings.defaultView;
+    
+	this.initUI(initialViewType);
 	
-	this.initUI();
-	
-	//this.viewModeElement
     //this.viewType
+	//this.viewModeElement
     //this.viewModeElementShowing
     //this.select
 	
-	this.clearFunctionOnBlankInfo = optionalClearFunctionOnBlankInfo;
+    this.doClearFunction = (settings.clearFunctionMenyText !== undefined);
+	this.clearFunctionMenuText = settings.clearFunctionMenuText;
+    this.clearFunctionDataValue = settings.emptyDataValue;
 	this.clearFunctionActive = false;
 	this.clearFunctionCallback = null;
     
     //add a cleanup action to the base component - component must already be initialized
-    var instance = this;
-    var cleanupAction = function() {
-        instance.destroy();
-    }
-    this.addCleanupAction(cleanupAction);
+    this.addSaveAction(haxapp.app.TableEditComponent.writeToJson);
+    this.addCleanupAction(haxapp.app.TableEditComponent.destroy);
 
 }
 
@@ -65,7 +65,7 @@ haxapp.app.TableEditComponent.setViewType = function(viewType) {
 //this function will update the view shown in the dropdown
 haxapp.app.TableEditComponent.updateViewDropdown = function(viewType) {
     if(!viewType) {
-        viewType = this.defaultView;
+        viewType = this.defaultViewType;
     }
     this.select.value = viewType;
 }
@@ -87,8 +87,8 @@ haxapp.app.TableEditComponent.memberUpdated = function() {
     this.viewModeElement.showData(editable);
 	
 	//add the clear function menu item if needed
-	if(this.clearFunctionOnBlankInfo) {
-	
+	if(this.doClearFunction) {
+    
 		if(object.hasCode()) {
 			if(!this.clearFunctionActive) {
 				var menu = this.getWindow().getMenu();
@@ -97,14 +97,14 @@ haxapp.app.TableEditComponent.memberUpdated = function() {
 					this.clearFunctionCallback = this.getClearFunctionCallback();
 				}
 				
-				menu.addCallbackMenuItem(this.clearFunctionOnBlankInfo.menuLabel,this.clearFunctionCallback);
+				menu.addCallbackMenuItem(this.clearFunctionMenuText,this.clearFunctionCallback);
 				this.clearFunctionActive = true;
 			}
 		}
 		else {
 			if(this.clearFunctionActive) {
 				var menu = this.getWindow().getMenu();
-				menu.removeMenuItem(this.clearFunctionOnBlankInfo.menuLabel);
+				menu.removeMenuItem(this.clearFunctionMenuText);
 				this.clearFunctionActive = false;
 			}
 		}
@@ -113,7 +113,7 @@ haxapp.app.TableEditComponent.memberUpdated = function() {
 
 haxapp.app.TableEditComponent.getClearFunctionCallback = function() {
 	var table = this.getObject();
-	var blankDataValue = this.clearFunctionOnBlankInfo.dataValue;
+	var blankDataValue = this.clearFunctionDataValue;
     return function() {
         var actionResponse = hax.updatemember.updateData(table,blankDataValue); 
         if(!actionResponse.getSuccess()) {
@@ -137,7 +137,13 @@ haxapp.app.TableEditComponent.endEditUI = function() {
 }
 /** This method populates the frame for this component. 
  * @protected */
-haxapp.app.TableEditComponent.initUI = function() {
+haxapp.app.TableEditComponent.initUI = function(initialViewType) {
+    
+    //make sure we have a valid initial view type
+    if(this.viewTypes.indexOf(initialViewType) < 0) {
+        initialViewType = this.defaultViewType;
+    }
+        
 	
 	this.setFixedContentElement();
 	
@@ -171,8 +177,8 @@ haxapp.app.TableEditComponent.initUI = function() {
     //add the view select to the title bar
     this.window.addRightTitleBarElement(this.select);
     
-    this.setViewType(this.defaultView);
-    this.updateViewDropdown();
+    this.setViewType(initialViewType);
+    this.updateViewDropdown(this.viewType);
 }
 
 /** @private */
@@ -192,9 +198,19 @@ haxapp.app.TableEditComponent.showModeElement = function(viewModeElement) {
 	this.viewModeElementShowing = viewModeElement;
 }
 
+//======================================
+// Callbacks
+// These are defined as static but are called in the objects context
+//======================================
+
 /** @protected */
 haxapp.app.TableEditComponent.destroy = function() {
     if(this.viewModeElement) {
         this.viewModeElement.destroy();
     }
+}
+
+/** This serializes the table component. */
+haxapp.app.TableEditComponent.writeToJson = function(json) {
+    json.viewType = this.viewType;
 }

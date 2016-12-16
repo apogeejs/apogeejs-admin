@@ -24,7 +24,8 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     
     this.workspaceUI.registerMember(this.object,this);
     
-    //inheriting objects can pass functions here to be called on cleanup
+    //inheriting objects can pass functions here to be called on cleanup, save, etc
+    this.saveActions = [];
     this.cleanupActions = [];
     
     //--------------
@@ -95,7 +96,14 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     menu.setMenuItems(this.menuItemInfoList);
 }
 
-/** This method should be called if any cleanup actions are needed on delete. */
+/** If an extending object has any save actions, a callback should be passed here.
+ * The callback will be executed in the context of the current object. */
+haxapp.app.Component.addSaveAction = function(saveFunction) {
+    this.saveActions.push(saveFunction);
+}
+
+/** If an extending object has any cleanup actions, a callback should be passed here.
+ * The callback will be executed in the context of the current object. */
 haxapp.app.Component.addCleanupAction = function(cleanupFunction) {
     this.cleanupActions.push(cleanupFunction);
 }
@@ -282,8 +290,8 @@ haxapp.app.Component.toJson = function() {
     json.coordInfo = this.window.getCoordinateInfo();
     json.windowState = this.window.getWindowState();
     
-    if(this.writeToJson) {
-        this.writeToJson(json);
+    for(var i = 0; i < this.saveActions.length; i++) {
+        this.saveActions[i].call(this,json);
     }
     
     return json;
@@ -293,7 +301,7 @@ haxapp.app.Component.toJson = function() {
 // Protected Instance Methods
 //==============================
 
-//This method should be populated by an extending object. It should return a json object.
+//This method should be populated by an extending object.
 //** This serializes the table component. */
 //haxapp.app.Component.prototype.writeToJson = function(json);
 
@@ -302,7 +310,8 @@ haxapp.app.Component.toJson = function() {
 //** This method populates the frame for this component. */
 //haxapp.app.Component.populateFrame = function();
 
-/** This method should include an needed functionality to clean up after a delete. */
+/** This method cleans up after a delete. Any extending object that has delete
+ * actions should pass a callback function to the method "addClenaupAction" */
 haxapp.app.Component.onDelete = function() {
     //remove the UI element
     var componentWindow = this.getWindow();
@@ -310,7 +319,7 @@ haxapp.app.Component.onDelete = function() {
     
     //execute cleanup actions
     for(var i = 0; i < this.cleanupActions.length; i++) {
-        this.cleanupActions[i]();
+        this.cleanupActions[i].call(this);
     }
 }
 

@@ -12,6 +12,9 @@ haxapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,compone
     workspaceUI.addComponentContainer(internalFolder,this);
     
     this.memberUpdated();
+    
+    //add a cleanup and save actions
+    this.addSaveAction(haxapp.app.FolderFunctionComponent.writeToJson);
 };
 
 //add components to this class
@@ -32,14 +35,6 @@ haxapp.app.FolderFunctionComponent.prototype.getContentIsShowing = function() {
 // Protected and Private Instance Methods
 //==============================
 
-/** This serializes the folderFunction component. */
-haxapp.app.FolderFunctionComponent.prototype.writeToJson = function(json) {
-    var folderFunction = this.getObject();
-    var internalFolder = folderFunction.getInternalFolder();
-    var workspaceUI = this.getWorkspaceUI();
-    json.children = workspaceUI.getFolderComponentContentJson(internalFolder);
-}
-
 /** This method populates the frame for this component. 
  * @protected */
 haxapp.app.FolderFunctionComponent.prototype.populateFrame = function() {	
@@ -51,6 +46,19 @@ haxapp.app.FolderFunctionComponent.prototype.populateFrame = function() {
     var internalFolder = folderFunction.getInternalFolder();
     var app = this.getWorkspaceUI().getApp();
     app.setFolderContextMenu(contentElement,internalFolder);
+}
+
+//======================================
+// Callbacks
+// These are defined as static but are called in the objects context
+//======================================
+
+/** This serializes the folderFunction component. */
+haxapp.app.FolderFunctionComponent.writeToJson = function(json) {
+    var folderFunction = this.getObject();
+    var internalFolder = folderFunction.getInternalFolder();
+    var workspaceUI = this.getWorkspaceUI();
+    json.children = workspaceUI.getFolderComponentContentJson(internalFolder);
 }
 
 //======================================

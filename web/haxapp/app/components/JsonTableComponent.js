@@ -3,9 +3,8 @@ haxapp.app.JsonTableComponent = function(workspaceUI,table,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,table,haxapp.app.JsonTableComponent.generator,componentJson);
     haxapp.app.TableEditComponent.init.call(this,
-		haxapp.app.JsonTableComponent.VIEW_MODES,
-        haxapp.app.JsonTableComponent.DEFAULT_VIEW,
-		haxapp.app.JsonTableComponent.BLANK_DATA_VALUE_INFO);
+		haxapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS,
+        componentJson);
 	
     this.memberUpdated();
 };
@@ -34,13 +33,12 @@ haxapp.app.JsonTableComponent.VIEW_MODES = [
     haxapp.app.JsonTableComponent.VIEW_DESCRIPTION
 ];
 
-//haxapp.app.JsonTableComponent.DEFAULT_VIEW = haxapp.app.JsonTableComponent.VIEW_FORM;
-haxapp.app.JsonTableComponent.DEFAULT_VIEW = haxapp.app.JsonTableComponent.VIEW_PLAIN_TEXT;
-
-haxapp.app.JsonTableComponent.BLANK_DATA_VALUE_INFO = {
-	"dataValue":"",
-	"menuLabel":"Clear Formula"
-};
+haxapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": haxapp.app.JsonTableComponent.VIEW_MODES,
+    "defaultView": haxapp.app.JsonTableComponent.VIEW_PLAIN_TEXT,
+    "clearFunctionMenuText": "Clear Formula",
+    "emptyDataValue": ""
+}
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */

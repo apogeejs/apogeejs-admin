@@ -2,9 +2,7 @@
 haxapp.app.FunctionComponent = function(workspaceUI, functionObject, componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,functionObject,haxapp.app.FunctionComponent.generator,componentJson);
-    haxapp.app.TableEditComponent.init.call(this,
-		haxapp.app.FunctionComponent.VIEW_MODES,
-        haxapp.app.FunctionComponent.DEFAULT_VIEW);
+    haxapp.app.TableEditComponent.init.call(this,haxapp.app.FunctionComponent.TABLE_EDIT_SETTINGS,componentJson);
     
     this.memberUpdated();
 };
@@ -27,7 +25,10 @@ haxapp.app.FunctionComponent.VIEW_MODES = [
     haxapp.app.FunctionComponent.VIEW_DESCRIPTION
 ];
 
-haxapp.app.FunctionComponent.DEFAULT_VIEW = haxapp.app.FunctionComponent.VIEW_CODE;
+haxapp.app.FunctionComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": haxapp.app.FunctionComponent.VIEW_MODES,
+    "defaultView": haxapp.app.FunctionComponent.VIEW_CODE
+}
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */

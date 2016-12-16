@@ -3,11 +3,7 @@
 haxapp.app.GridTableComponent = function(workspaceUI,table,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,table,haxapp.app.GridTableComponent.generator,componentJson);
-	haxapp.app.TableEditComponent.init.call(this,
-		haxapp.app.GridTableComponent.VIEW_MODES,
-		haxapp.app.GridTableComponent.DEFAULT_VIEW,
-		haxapp.app.GridTableComponent.BLANK_DATA_VALUE_INFO
-	);
+	haxapp.app.TableEditComponent.init.call(this,haxapp.app.GridTableComponent.TABLE_EDIT_SETTINGS,componentJson);
     
     this.memberUpdated();
 };
@@ -32,10 +28,12 @@ haxapp.app.GridTableComponent.VIEW_MODES = [
     haxapp.app.GridTableComponent.VIEW_DESCRIPTION
 ];
 
-haxapp.app.GridTableComponent.BLANK_DATA_VALUE_INFO = {
-	"dataValue":[[null]],
-	"menuLabel":"Clear Formula"
-};
+haxapp.app.GridTableComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": haxapp.app.GridTableComponent.VIEW_MODES,
+    "defaultView": haxapp.app.GridTableComponent.VIEW_GRID,
+    "clearFunctionMenuText": "Clear Formula",
+    "emptyDataValue": [[null]]
+}
 
 haxapp.app.GridTableComponent.DEFAULT_VIEW = haxapp.app.GridTableComponent.VIEW_GRID;
 

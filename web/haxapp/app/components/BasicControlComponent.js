@@ -5,10 +5,7 @@
 haxapp.app.BasicControlComponent = function(workspaceUI,control,generator,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,control,generator,componentJson);
-	haxapp.app.TableEditComponent.init.call(this,
-		haxapp.app.BasicControlComponent.VIEW_MODES,
-		haxapp.app.BasicControlComponent.DEFAULT_VIEW
-	);
+	haxapp.app.TableEditComponent.init.call(this,haxapp.app.BasicControlComponent.TABLE_EDIT_SETTINGS,componentJson);
 	
 	var resource = control.getResource();
 	resource.setComponent(this);
@@ -16,13 +13,7 @@ haxapp.app.BasicControlComponent = function(workspaceUI,control,generator,compon
     control.prepareForCalculate();
     control.calculate();
     
-    //add a cleanup action to call resource when delete is happening
-    var cleanupAction = function() {
-        if(resource.delete) {
-            resource.delete();
-        }
-    }
-    this.addCleanupAction(cleanupAction);
+    this.addCleanupAction(haxapp.app.BasicControlComponent.cleanupAction);
 };
 
 //add components to this class
@@ -49,7 +40,10 @@ haxapp.app.BasicControlComponent.VIEW_MODES = [
     haxapp.app.BasicControlComponent.VIEW_DESCRIPTION
 ];
 
-haxapp.app.BasicControlComponent.DEFAULT_VIEW = haxapp.app.BasicControlComponent.VIEW_OUTPUT;
+haxapp.app.BasicControlComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": haxapp.app.BasicControlComponent.VIEW_MODES,
+    "defaultView": haxapp.app.BasicControlComponent.VIEW_OUTPUT,
+}
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
@@ -78,6 +72,19 @@ haxapp.app.BasicControlComponent.prototype.getViewModeElement = function(viewTyp
 			alert("unrecognized view element!");
 			return null;
 	}
+}
+
+//======================================
+// Callbacks
+// These are defined as static but are called in the objects context
+//======================================
+
+
+haxapp.app.BasicControlComponent.cleanupAction = function() {
+    var resource = this.control.getResource();
+    if(resource.delete) {
+        resource.delete();
+    }
 }
 
 //======================================

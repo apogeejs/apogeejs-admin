@@ -3,11 +3,7 @@
 haxapp.app.TextComponent = function(workspaceUI,table,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,table,haxapp.app.TextComponent.generator,componentJson);
-	haxapp.app.TableEditComponent.init.call(this,
-		haxapp.app.TextComponent.VIEW_MODES,
-		haxapp.app.TextComponent.DEFAULT_VIEW,
-		haxapp.app.TextComponent.BLANK_DATA_VALUE_INFO
-	);
+	haxapp.app.TableEditComponent.init.call(this,haxapp.app.TextComponent.TABLE_EDIT_SETTINGS,componentJson);
     
     this.memberUpdated();
 };
@@ -32,12 +28,12 @@ haxapp.app.TextComponent.VIEW_MODES = [
     haxapp.app.TextComponent.VIEW_DESCRIPTION
 ];
 
-haxapp.app.TextComponent.BLANK_DATA_VALUE_INFO = {
-	"dataValue":"",
-	"menuLabel":"Clear Formula"
-};
-
-haxapp.app.TextComponent.DEFAULT_VIEW = haxapp.app.TextComponent.VIEW_TEXT;
+haxapp.app.TextComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": haxapp.app.TextComponent.VIEW_MODES,
+    "defaultView": haxapp.app.TextComponent.VIEW_TEXT,
+    "clearFunctionMenuText": "Clear Formula",
+    "emptyDataValue": ""
+}
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
