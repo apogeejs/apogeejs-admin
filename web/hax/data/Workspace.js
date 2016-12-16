@@ -102,7 +102,6 @@ hax.Workspace.prototype.createContextManager = function() {
     else {
         //global variables from window object
         var globalVarEntry = {};
-        globalVarEntry.isLocal = false;
         globalVarEntry.data = __globals__;
         contextManager.addToContextList(globalVarEntry);
     }
@@ -138,15 +137,6 @@ hax.Workspace.flattenParentIntoContextManager = function(contextManager,virtualW
         for(var i = 0; i < contextList.length; i++) {
             var contextEntry = contextList[i];
             //only take non-local entries
-            if(contextEntry.isLocal) continue;
-//=============================================================
-//for now - this is what we would do if we took the folder functino parent. Currently the regular code does not do this.
-//            //only take local entries if this is owner is the local owner 
-//            if((contextEntry.isLocal)&&(owner != virtualWorkspaceParent)) {
-//                continue;
-//            }
-//==============================================================
-            
             if(contextEntry.parent) {
                 //add this entry after converting it to a data entry, 
                 contextManager.addToContextList(hax.Workspace.convertToDataContextEntry(contextEntry));
@@ -164,7 +154,6 @@ hax.Workspace.flattenParentIntoContextManager = function(contextManager,virtualW
 
 hax.Workspace.convertToDataContextEntry = function(contextEntry) {
     var contextDataEntry = {};
-    contextDataEntry.isLocal = false;
     if(contextEntry.parent.isDataHolder) {
         contextDataEntry.data = contextEntry.parent.getData();
     }

@@ -84,7 +84,6 @@ hax.Parent.createContextManager = function() {
     var contextManager = new hax.ContextManager(this);
     //add an entry for this folder. Make it local unless this si a root folder
     var myEntry = {};
-    myEntry.isLocal = !this.isRoot();
     myEntry.parent = this;
     contextManager.addToContextList(myEntry);
     

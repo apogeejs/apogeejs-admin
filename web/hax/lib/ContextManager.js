@@ -35,11 +35,10 @@ hax.ContextManager.prototype.getImpactor = function(path,generation) {
 // Private Methods
 //==================================
 
-hax.ContextManager.prototype.hierarchicalLookup = function(lookupFunctionName,lookupKey,generation) {
-    if(generation === undefined) generation = 0;
+hax.ContextManager.prototype.hierarchicalLookup = function(lookupFunctionName,lookupKey) {
 
     //lookup base name in the context list
-    var result = this.lookup(lookupFunctionName,lookupKey,generation);
+    var result = this.lookup(lookupFunctionName,lookupKey);
     
     if(result !== undefined) {
         return result;
@@ -48,22 +47,20 @@ hax.ContextManager.prototype.hierarchicalLookup = function(lookupFunctionName,lo
         var owner = this.member.getOwner();
         if(owner) {
             var ownerContextManager = owner.getContextManager();
-            return ownerContextManager.hierarchicalLookup(lookupFunctionName,lookupKey,generation + 1);
+            return ownerContextManager.hierarchicalLookup(lookupFunctionName,lookupKey);
         }
     }
     
     return undefined;
 }
 
-hax.ContextManager.prototype.lookup = function(lookupFunctionName,lookupKey,generation) {
+hax.ContextManager.prototype.lookup = function(lookupFunctionName,lookupKey) {
 	//cycle through the variables used
 	for(var i = 0; i < this.contextList.length; i++) {
         var entry = this.contextList[i];
-        if(!((entry.isLocal)&&(generation > 1))) {
-            var result = this[lookupFunctionName](entry,lookupKey); 
-            if(result !== undefined) {
-                return result;
-            }
+        var result = this[lookupFunctionName](entry,lookupKey); 
+        if(result !== undefined) {
+            return result;
         }
     }
     //not found
