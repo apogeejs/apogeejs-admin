@@ -25,7 +25,7 @@ hax.Codeable.init = function(argList) {
     this.varInfo = null;
     this.dependencyInfo = null;
     this.contextSetter = null;
-    this.objectFunction = null;
+    this.memberFunction = null;
     this.codeErrors = [];
     
     this.clearCalcPending();
@@ -79,7 +79,12 @@ hax.Codeable.setCodeInfo = function(codeInfo) {
     if((!codeInfo.errors)||(codeInfo.errors.length === 0)) {
         //set the code  by exectuing generator
         try {
-            codeInfo.generatorFunction(this);
+            //here we generate the init function we need, which also serves as a debug hook
+            var initFunction = hax.memberDebugHook(this);
+            
+            var generatedFunctions = codeInfo.generatorFunction(initFunction);
+            this.memberFunction = generatedFunctions.memberFunction;
+            this.contextSetter = generatedFunctions.contextSetter;            
             this.codeErrors = [];
         }
         catch(ex) {
@@ -93,7 +98,7 @@ hax.Codeable.setCodeInfo = function(codeInfo) {
     
     if(this.codeErrors.length > 0) {
         //code not valid
-        this.objectFunction = null;
+        this.memberFunction = null;
         this.contextSetter = null;
     }
     this.codeSet = true;
@@ -146,7 +151,7 @@ hax.Codeable.clearCode = function() {
     this.varInfo = null;
     this.dependencyInfo = null;
     this.contextSetter = null;
-    this.objectFunction = null;
+    this.memberFunction = null;
     this.codeErrors = [];
     
     this.clearCalcPending();
@@ -183,7 +188,7 @@ hax.Codeable.calculate = function() {
         return;
     }
     
-    if((!this.objectFunction)||(!this.contextSetter)) {
+    if((!this.memberFunction)||(!this.contextSetter)) {
         var msg = "Function not found for member: " + this.getName();
         var actionError = new hax.ActionError(msg,"Codeable - Calculate",this);
         this.addError(actionError);
@@ -192,7 +197,7 @@ hax.Codeable.calculate = function() {
     } 
     
     try {
-        this.processObjectFunction(this.objectFunction);
+        this.processMemberFunction(this.memberFunction);
     }
     catch(error) {
         //this is an error in the code
@@ -288,15 +293,5 @@ hax.Codeable.createContextManager = function() {
 //implementations must implement this function
 //This method takes the object function generated from code and processes it
 //to set the data for the object. (protected)
-//hax.Codeable.processObjectFunction 
-
-/** This method sets the object function. */
-hax.Codeable.setObjectFunction = function(objectFunction) {
-    this.objectFunction = objectFunction;
-}
-
-/** This method sets the object function. */
-hax.Codeable.setContextSetter = function(contextSetter) {
-    this.contextSetter = contextSetter;
-}
+//hax.Codeable.processMemberFunction 
 

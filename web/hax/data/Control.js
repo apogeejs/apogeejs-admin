@@ -45,10 +45,10 @@ hax.Control.prototype.updateResource = function(resource) {
 // Codeable Methods
 //------------------------------
 
-hax.Control.prototype.processObjectFunction = function(objectFunction) {	
+hax.Control.prototype.processMemberFunction = function(memberFunction) {	
     //exectue the object function passing the resource object.
     if(this.resource) {
-        objectFunction(this.resource);
+        memberFunction(this.resource);
     }
 }
 
@@ -60,6 +60,15 @@ hax.Control.prototype.processObjectFunction = function(objectFunction) {
  * method in a non-abstract class. */ 
 hax.Control.fromJson = function(owner,json) {   
     return new hax.Control(json.name,owner,json.updateData);
+}
+
+hax.Control.prototype.onDeleteChild = function () {
+    if((this.resource)&&(this.resource.onDelete)) {
+        this.resource.onDelete();
+    }
+    
+    //call the base implementation
+    hax.Child.onDeleteChild.call(this);
 }
 
 //============================

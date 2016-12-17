@@ -51,7 +51,8 @@ hax.codeCompiler.processCode = function(codeInfo,codeLabel) {
     //get the accessed variables
     //
     //parse the code and get variable dependencies
-    var analyzeOutput = hax.codeAnalysis.analyzeCode(combinedFunctionBody);
+    var effectiveCombinedFunctionBody = hax.codeCompiler.MEMBER_LOCALS_TEXT + combinedFunctionBody;
+    var analyzeOutput = hax.codeAnalysis.analyzeCode(effectiveCombinedFunctionBody);
     
     if(analyzeOutput.success) {
         codeInfo.varInfo = analyzeOutput.varInfo;
@@ -62,7 +63,7 @@ hax.codeCompiler.processCode = function(codeInfo,codeLabel) {
     }
 
     //create the object function and context setter from the code text
-    var generatorFunction = hax.codeCompiler.createObjectFunction(codeInfo.varInfo, combinedFunctionBody);
+    var generatorFunction = hax.codeCompiler.createGeneratorFunction(codeInfo.varInfo, combinedFunctionBody);
     codeInfo.generatorFunction = generatorFunction;
     
     return codeInfo;   
@@ -80,7 +81,7 @@ hax.codeCompiler.createCombinedFunctionBody = function(argList,
     
     //create the code body
     var combinedFunctionBody = hax.util.formatString(
-        hax.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT,
+        hax.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT,
 		codeLabel,
         argListString,
         functionBody,
@@ -92,16 +93,13 @@ hax.codeCompiler.createCombinedFunctionBody = function(argList,
 
 /** This method creates the wrapped user code object function, including the context variables. 
  * @private */
-hax.codeCompiler.createObjectFunction = function(varInfo, combinedFunctionBody) {
+hax.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunctionBody) {
     
     var contextDeclarationText = "";
     var contextSetterBody = "";
     
     //set the context - here we only defined the variables that are actually used.
-	for(var baseName in varInfo) {
-        //ignore this variable
-        if(baseName == "__dh__") continue;
-        
+	for(var baseName in varInfo) {        
         var baseNameInfo = varInfo[baseName];
         
         //do not add context variable for local or "returnValue", which is explicitly defined
@@ -122,7 +120,7 @@ hax.codeCompiler.createObjectFunction = function(varInfo, combinedFunctionBody) 
         combinedFunctionBody
     );
         
-    var generatorFunction = new Function("__dh__",generatorBody);
+    var generatorFunction = new Function("__initFunction",generatorBody);
     return generatorFunction;    
 }
 
@@ -136,24 +134,28 @@ hax.codeCompiler.createObjectFunction = function(varInfo, combinedFunctionBody) 
  * 
  * @private
  */
-hax.codeCompiler.OBJECT_FUNCTION_FORMAT_TEXT = [
+hax.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT = [
 "//{0}",
 "",
-"//supplemental code",
+"//supplemental code--------------",
 "{3}",
-"//end supplemental code",
+"//end supplemental code----------",
 "",
-"//member function",
-"__dh__.setObjectFunction(function({1}) {",
+"//member function----------------",
+"function __memberFunction({1}) {",
 "//overhead code",
-"__dh__.initFunction();",
+"__initFunction();",
 "",
 "//user code",
 "{2}",
-"});",
-"//end member function",
-""
+"};",
+"//end member function------------",
    ].join("\n");
+   
+/** This line is added when getting the dependencies to account for some local 
+ * variables in the member function.
+ * @private */
+hax.codeCompiler.MEMBER_LOCALS_TEXT = "var __initFunction, __memberFunction; " 
    
 /** This is the format string to create the code body for the object function
  * Input indices:
@@ -166,14 +168,16 @@ hax.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "'use strict'",
 "//declare context variables",
 "{0}",
-"",
 "//context setter",
-"__dh__.setContextSetter(function(contextManager) {",
-"{1}",
-"});",
+"function __setContext(contextManager) {",
+"{1}};",
 "",
 "//user code",
-"{2}"
+"{2}",
+"return {",
+"'memberFunction': __memberFunction,",
+"'contextSetter': __setContext",
+"};"
    ].join("\n");
 
 

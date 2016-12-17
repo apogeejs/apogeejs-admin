@@ -39,7 +39,7 @@ haxapp.app.updatecomponent.getUpdateComponentCallback = function(component,gener
             //validate the name, if it changed
             if(newValues.name !== initialValues.name) {
                 //validate name
-                var nameResult = hax.codeCompiler.validateTableName(result.name);
+                var nameResult = hax.codeCompiler.validateTableName(newValues.name);
                 if(!nameResult.valid) {
                     alert(nameResult.errorMessage);
                     return false;

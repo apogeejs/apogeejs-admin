@@ -94,7 +94,7 @@ SimpleGeojsonResource.prototype.hide = function() {
     //no action
 }
 
-SimpleGeojsonResource.prototype.delete = function() {  
+SimpleGeojsonResource.prototype.onDelete = function() {  
     //no action
 }
 

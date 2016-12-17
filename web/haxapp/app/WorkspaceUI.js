@@ -148,8 +148,6 @@ haxapp.app.WorkspaceUI.prototype.memberUpdated = function(memberObject) {
     //store the ui object
 	var key = memberObject.getId();
     
-console.log("updated: " + memberObject.getFullName());
-	
 	var componentInfo = this.componentMap[key];
 	if((componentInfo)&&(componentInfo.component)) {
         componentInfo.component.memberUpdated();

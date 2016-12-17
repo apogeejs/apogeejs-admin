@@ -30,9 +30,9 @@ hax.base.mixin(hax.FunctionTable,hax.Codeable);
 // Codeable Methods
 //------------------------------
 
-hax.FunctionTable.prototype.processObjectFunction = function(objectFunction) {	
+hax.FunctionTable.prototype.processMemberFunction = function(memberFunction) {	
     //tjhe data is the function
-	this.setData(objectFunction);
+	this.setData(memberFunction);
 }
 
 //------------------------------

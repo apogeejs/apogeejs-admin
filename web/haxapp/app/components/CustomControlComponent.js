@@ -17,7 +17,6 @@ haxapp.app.CustomControlComponent = function(workspaceUI,control,componentJson) 
     
     //add a cleanup and save actions
     this.addSaveAction(haxapp.app.CustomControlComponent.writeToJson);
-    this.addCleanupAction(haxapp.app.CustomControlComponent.cleanupAction);
 };
 
 
@@ -71,7 +70,7 @@ haxapp.app.CustomControlComponent.VIEW_MODES = [
 
 haxapp.app.CustomControlComponent.TABLE_EDIT_SETTINGS = {
     "viewModes": haxapp.app.CustomControlComponent.VIEW_MODES,
-    "defaultView": haxapp.app.CustomControlComponent.VIEW_OUTPUT,
+    "defaultView": haxapp.app.CustomControlComponent.VIEW_OUTPUT
 }
 
 /** This method should be implemented to retrieve a view mode of the give type. 
@@ -187,15 +186,6 @@ haxapp.app.CustomControlComponent.prototype.update = function(html,customizeScri
 // Callbacks
 // These are defined as static but are called in the objects context
 //======================================
-
-
-haxapp.app.CustomControlComponent.cleanupAction = function() {
-    var resource = this.control.getResource();
-    if(resource.delete) {
-        resource.delete();
-    }
-}
-
 
 /** This serializes the table component. */
 haxapp.app.CustomControlComponent.writeToJson = function(json) {

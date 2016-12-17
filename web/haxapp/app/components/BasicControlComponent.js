@@ -12,8 +12,6 @@ haxapp.app.BasicControlComponent = function(workspaceUI,control,generator,compon
     //redo calculate in contrl now the UI is set up
     control.prepareForCalculate();
     control.calculate();
-    
-    this.addCleanupAction(haxapp.app.BasicControlComponent.cleanupAction);
 };
 
 //add components to this class
@@ -42,7 +40,7 @@ haxapp.app.BasicControlComponent.VIEW_MODES = [
 
 haxapp.app.BasicControlComponent.TABLE_EDIT_SETTINGS = {
     "viewModes": haxapp.app.BasicControlComponent.VIEW_MODES,
-    "defaultView": haxapp.app.BasicControlComponent.VIEW_OUTPUT,
+    "defaultView": haxapp.app.BasicControlComponent.VIEW_OUTPUT
 }
 
 /** This method should be implemented to retrieve a view mode of the give type. 
@@ -79,13 +77,6 @@ haxapp.app.BasicControlComponent.prototype.getViewModeElement = function(viewTyp
 // These are defined as static but are called in the objects context
 //======================================
 
-
-haxapp.app.BasicControlComponent.cleanupAction = function() {
-    var resource = this.control.getResource();
-    if(resource.delete) {
-        resource.delete();
-    }
-}
 
 //======================================
 // Static methods

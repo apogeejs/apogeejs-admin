@@ -67,12 +67,12 @@ hax.JsonTable.prototype.getArgList = function() {
     return ["memberInfo"];
 }
 	
-hax.JsonTable.prototype.processObjectFunction = function(objectFunction) {	
+hax.JsonTable.prototype.processMemberFunction = function(memberFunction) {	
     //used for asynch result
     var memberInfo = {};
     
     //the data is the output of the function
-    var data = objectFunction(memberInfo);
+    var data = memberFunction(memberInfo);
     
     if(memberInfo.pending) {
         //result is asynchronous - provide a funtion to pass the result
