@@ -8,6 +8,11 @@ hax.base.mixin = function(destObject,mixinObject) {
     }
 }
 
+/** This method creates an integer has value for a string. */
+hax.base.isPromise = function(object) {
+    return (typeof object === "object")&&(object.constructor === Promise);
+}
+
 /** This method takes a field which can be an object, 
  *array or other value. If it is an object or array it 
  *freezes that object and all of its children, recursively. */

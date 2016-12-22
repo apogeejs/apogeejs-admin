@@ -14,7 +14,7 @@ hax.memberDebugHook = function(member) {
         //
         //for conditional breakpoints, use the function member.getName()
         //to get the member name.        
-        member.initFunction();
+        return member.testFunction();
     };
 }
 

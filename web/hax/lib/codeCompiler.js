@@ -120,7 +120,7 @@ hax.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunctionBod
         combinedFunctionBody
     );
         
-    var generatorFunction = new Function("__initFunction",generatorBody);
+    var generatorFunction = new Function("__testFunction",generatorBody);
     return generatorFunction;    
 }
 
@@ -144,7 +144,7 @@ hax.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT = [
 "//member function----------------",
 "function __memberFunction({1}) {",
 "//overhead code",
-"__initFunction();",
+"if(!__testFunction()) return undefined;",
 "",
 "//user code",
 "{2}",
@@ -155,7 +155,7 @@ hax.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT = [
 /** This line is added when getting the dependencies to account for some local 
  * variables in the member function.
  * @private */
-hax.codeCompiler.MEMBER_LOCALS_TEXT = "var __initFunction, __memberFunction; " 
+hax.codeCompiler.MEMBER_LOCALS_TEXT = "var __testFunction, __memberFunction; " 
    
 /** This is the format string to create the code body for the object function
  * Input indices:

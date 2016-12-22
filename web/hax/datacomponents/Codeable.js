@@ -34,6 +34,7 @@ hax.Codeable.init = function(argList) {
     //fields used in calculation
     this.calcInProgress = false;
     this.functionInitialized = false;
+    this.initReturnValue = false;
 }
 
 /** This property tells if this object is a codeable.
@@ -80,9 +81,9 @@ hax.Codeable.setCodeInfo = function(codeInfo) {
         //set the code  by exectuing generator
         try {
             //here we generate the init function we need, which also serves as a debug hook
-            var initFunction = hax.memberDebugHook(this);
+            var testFunction = hax.memberDebugHook(this);
             
-            var generatedFunctions = codeInfo.generatorFunction(initFunction);
+            var generatedFunctions = codeInfo.generatorFunction(testFunction);
             this.memberFunction = generatedFunctions.memberFunction;
             this.contextSetter = generatedFunctions.contextSetter;            
             this.codeErrors = [];
@@ -178,6 +179,7 @@ hax.Codeable.prepareForCalculate = function() {
     hax.Dependent.prepareForCalculate.call(this);
     
     this.functionInitialized = false;
+    this.initReturnValue = false;
 }
 
 /** This method sets the data object for the member.  */
@@ -215,9 +217,9 @@ hax.Codeable.calculate = function() {
 }
 
 /** This makes sure user code of object function is ready to execute.  */
-hax.Codeable.initFunction = function() {
+hax.Codeable.testFunction = function() {
     
-    if(this.functionInitialized) return;
+    if(this.functionInitialized) return this.initReturnValue;
     
     //make sure this in only called once
     if(this.calcInProgress) {
@@ -226,7 +228,9 @@ hax.Codeable.initFunction = function() {
         this.addError(actionError);
         //clear calc in progress flag
         this.calcInProgress = false;
-        return;
+        this.functionInitialized = true;
+        this.initReturnValue = false;
+        return this.initReturnValue;
     }
     this.calcInProgress = true;
     
@@ -234,13 +238,17 @@ hax.Codeable.initFunction = function() {
         
         //make sure the data is set in each impactor
         this.initializeImpactors();
-        if(this.hasError()) {
+        if((this.hasError())||(this.getResultPending())) {
             this.calcInProgress = false;
-            return;
+            this.functionInitialized = true;
+            this.initReturnValue = false;
+            return this.initReturnValue;
         }
         
         //set the context
         this.contextSetter(this.getContextManager());
+        
+        this.initReturnValue = true;
     }
     catch(error) {
         //this is an error in the code
@@ -251,10 +259,12 @@ hax.Codeable.initFunction = function() {
         var actionError = new hax.ActionError(errorMsg,"Codeable - Calculate",this);
         actionError.setParentException(error);
         this.addError(actionError);
+        this.initReturnValue = false;
     }
     
     this.calcInProgress = false;
     this.functionInitialized = true;
+    return this.initReturnValue;
 }
 
 //------------------------------

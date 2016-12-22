@@ -5,7 +5,7 @@ hax.JsonTable = function(name,owner,initialData) {
     hax.DataHolder.init.call(this);
     hax.Dependent.init.call(this);
     hax.ContextHolder.init.call(this);
-	hax.Codeable.init.call(this,["memberInfo"],true);
+	hax.Codeable.init.call(this,[],true);
     
     this.initOwner(owner);
     
@@ -64,20 +64,19 @@ hax.JsonTable.prototype.setData = function(data) {
  * for JsonTable it gets cleared when data is set. However, whenever code
  * is used we want the argument list to be this value. */
 hax.JsonTable.prototype.getArgList = function() {
-    return ["memberInfo"];
+    return [];
 }
 	
 hax.JsonTable.prototype.processMemberFunction = function(memberFunction) {	
-    //used for asynch result
-    var memberInfo = {};
     
     //the data is the output of the function
-    var data = memberFunction(memberInfo);
+    var data = memberFunction();
     
-    if(memberInfo.pending) {
+    //if the return value is a Promise, the data is asynch
+    if(hax.base.isPromise(data)) {
         //result is asynchronous - provide a funtion to pass the result
         var member = this;
-        memberInfo.asynchCallback = function(memberValue) {
+        var asynchCallback = function(memberValue) {
             //set the data for the table, along with triggering updates on dependent tables.
             var actionData = {};
             actionData.action = "asynchUpdateData";
@@ -85,7 +84,7 @@ hax.JsonTable.prototype.processMemberFunction = function(memberFunction) {
             actionData.data = memberValue;
             var actionResponse =  hax.action.doAction(member.getWorkspace(),actionData);
         }
-        memberInfo.asynchErrorCallback = function(errorMsg) {
+        var asynchErrorCallback = function(errorMsg) {
             var actionData = {};
             actionData.action = "asynchUpdateError";
             actionData.member = member;
@@ -93,6 +92,8 @@ hax.JsonTable.prototype.processMemberFunction = function(memberFunction) {
             var actionResponse =  hax.action.doAction(member.getWorkspace(),actionData);
         }
         this.setResultPending(true);
+        
+        data.then(asynchCallback).catch(asynchErrorCallback);    
     }
     else {
         //result is synchronous
