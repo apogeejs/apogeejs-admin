@@ -46,7 +46,7 @@ haxapp.app.closeworkspace.closeWorkspace = function(app) {
         workspaceUIRemoved = app.removeWorkspaceUI(name);
         
         activeWorkspaceUI.close();
-        workspace.close();
+        workspace.onClose();
     }
     catch(error) {
         var isFatal = !workspaceUIRemoved;

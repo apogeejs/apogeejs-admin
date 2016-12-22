@@ -78,6 +78,11 @@ hax.FolderFunction.prototype.getDisplayName = function() {
     return displayName;
 }
 
+/** This method removes any data from this workspace on closing. */
+hax.FolderFunction.prototype.close = function() {
+    this.internalFolder.onClose();
+}
+
 /** This method is called when the child is deleted. If necessary the implementation
  * can extend this function, but it should call this base version of the function
  * if it does.  */

@@ -68,11 +68,15 @@ hax.Parent.lookupChildFromPathArray = function(path,startElement) {
 
 // Must be implemented in extending object
 ///** This method removes this child from this parent.  */
-//hax.Folder.removeChild = function(child);
+//hax.Parent.removeChild = function(child);
 
 // Must be implemented in extending object
 ///** This method updates the data object for this child. */
-//hax.Folder.updateData = function(child);
+//hax.Parent.updateData = function(child);
+
+///** This method is called when the workspace is closed. 
+//* It should do any needed cleanup for the object. */
+//hax.Parent.onClose = function();
 
 //------------------------------
 //ContextHolder methods

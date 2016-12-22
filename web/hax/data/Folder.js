@@ -154,6 +154,13 @@ hax.Folder.prototype.addToJson = function(json) {
     }
 }
 
+hax.Folder.prototype.onClose = function () {
+    for(var key in this.childMap) {
+        var child = this.childMap[key];
+        if(child.onClose) child.onClose();
+    }
+}
+
 //============================
 // Private methods
 //============================

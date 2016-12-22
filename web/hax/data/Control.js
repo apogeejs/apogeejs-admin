@@ -62,13 +62,16 @@ hax.Control.fromJson = function(owner,json) {
     return new hax.Control(json.name,owner,json.updateData);
 }
 
-hax.Control.prototype.onDeleteChild = function () {
+hax.Control.prototype.onDelete = function () {
+    this.onClose();
+
+    hax.child.onDeleteChild.call(this);
+}
+
+hax.Control.prototype.onClose = function () {
     if((this.resource)&&(this.resource.onDelete)) {
         this.resource.onDelete();
     }
-    
-    //call the base implementation
-    hax.Child.onDeleteChild.call(this);
 }
 
 //============================

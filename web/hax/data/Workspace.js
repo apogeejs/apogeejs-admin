@@ -56,7 +56,8 @@ hax.Workspace.prototype.updateDependeciesForModelChange = function(recalculateLi
 }
 
 /** This method removes any data from this workspace on closing. */
-hax.Workspace.prototype.close = function() {
+hax.Workspace.prototype.onClose = function() {
+    this.rootFolder.onClose();
 }
 
 //------------------------------

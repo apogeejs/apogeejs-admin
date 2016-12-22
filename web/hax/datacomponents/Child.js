@@ -208,6 +208,11 @@ hax.Child.onDeleteChild = function() {
     this.owner = null;
 }
 
+///** This method is called when the workspace is closed and also when an object
+// * is deleted. It should do any needed cleanup for the object.  
+// * @protected */
+//hax.Child.onClose = function();
+
 //Implement this method if there is data to add to this child. Otherwise it may
 //be omitted
 ///** This method adds any additional data to the json saved for this child. 

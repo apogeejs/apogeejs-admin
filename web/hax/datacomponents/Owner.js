@@ -41,3 +41,7 @@ hax.Owner.getMemberByFullName = function(fullName) {
 // * the index of the array at which to start. */
 //hax.Owner.getMemberByPathArray = function(path,startElement);
 
+///** This method is called when the workspace is closed.
+// It should do any needed cleanup for the object. */
+//hax.Owner.onClose = function();
+
