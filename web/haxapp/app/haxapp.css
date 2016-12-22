@@ -1,0 +1,64 @@
+body {
+        overflow:hidden;
+        position:absolute;
+        left:0;
+        right:0;
+        top:0;
+        bottom:0;
+        padding:0px;
+        margin:0px;
+        font-family: sans-serif;
+        font-size: small;
+
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+   textarea focus {
+        -webkit-user-select: text;
+        -khtml-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+    }
+    input[type=text] focus {
+        -webkit-user-select: text;
+        -khtml-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+    }
+    #appContainer {
+        position:absolute;
+        left:0;
+        right:0;
+        top:0;
+        bottom:0;
+    }
+    /* color/style classes */
+    .visicomp_windowColor {
+        background-color: rgb(185,185,220);
+    }
+    .visicomp_titleBarClass {
+        background-color: rgb(185,185,220);
+        padding:3px;
+    }
+    .visicomp_menuBarStyle {
+        background-color: rgb(220,220,240);
+    }
+    .visicomp_tabFrameColor {
+        background-color: rgb(185,185,220);
+    }
+    .visicomp_tabFrameActiveColor {
+        background-color: white;
+    }
+
+    /* overrides for the handsontable coloring */
+    .handsontable th {
+        background-color: rgb(220,220,240);
+    }
+    .handsontable td {
+        background-color: rgba(255,255,255,0);
+      }
