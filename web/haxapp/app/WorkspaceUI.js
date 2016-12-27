@@ -13,6 +13,8 @@ haxapp.app.WorkspaceUI = function() {
     this.cssLinkArray = [];
 }
 
+haxapp.app.WorkspaceUI.MAIN_WORKSPACE_NAME = "main workspace";
+
 /** This sets the application. It must be done before the workspace is set. */
 haxapp.app.WorkspaceUI.prototype.setApp = function(app,tab) {
     this.app = app;
@@ -198,6 +200,9 @@ haxapp.app.WorkspaceUI.prototype.close = function() {
             componentInfo.component.onDelete();
         }
     }
+    
+    //remove links
+    this.setLinks([],[]);
 }
 
 //====================================
@@ -263,8 +268,7 @@ haxapp.app.WorkspaceUI.prototype.getJsLinks = function() {
 	return this.jsLinkArray;
 }
 
-//GET RUID OF NAME ARG!!!
-haxapp.app.WorkspaceUI.prototype.setLinks = function(newJsLinkArray,newCssLinkArray,onLinksLoaded,name) {
+haxapp.app.WorkspaceUI.prototype.setLinks = function(newJsLinkArray,newCssLinkArray,onLinksLoaded) {
     //update the page links
     var oldJsLinkArray = this.jsLinkArray;
 	var oldCssLinkArray = this.cssLinkArray;
@@ -276,7 +280,7 @@ haxapp.app.WorkspaceUI.prototype.setLinks = function(newJsLinkArray,newCssLinkAr
 	
     this.jsLinkArray = newJsLinkArray;
 	this.cssLinkArray = newCssLinkArray;
-	this.app.updateWorkspaceLinks(name,addList,removeList,onLinksLoaded);;
+	this.app.updateWorkspaceLinks(haxapp.app.WorkspaceUI.MAIN_WORKSPACE_NAME,addList,removeList,onLinksLoaded);
 }
 
 haxapp.app.WorkspaceUI.prototype.getCssLinks = function() {

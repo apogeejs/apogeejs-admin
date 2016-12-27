@@ -91,10 +91,7 @@ haxapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspaceHan
         }
         
         if(linksAdded) {
-			//set links and set the callback to complete loading the workspace
-            //make a blank workspace
-            name = workspaceJson.workspace.name;
-			workspaceUI.setLinks(jsLinks,cssLinks,doWorkspaceLoad,name);
+			workspaceUI.setLinks(jsLinks,cssLinks,doWorkspaceLoad);
 		}
 		else {
 			//immediately load the workspace - no links to wait for

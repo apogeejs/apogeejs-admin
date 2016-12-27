@@ -32,7 +32,7 @@ haxapp.app.Hax = function(containerId) {
     }
     else {
         //create a default workspace 
-        haxapp.app.createworkspace.createWorkspace(this,haxapp.app.Hax.DEFAULT_WORKSPACE_NAME);
+        haxapp.app.createworkspace.createWorkspace(this);
     }
 }
 	
@@ -40,15 +40,6 @@ haxapp.app.Hax = function(containerId) {
 hax.base.mixin(haxapp.app.Hax,hax.EventManager);
 
 haxapp.app.Hax.DEFAULT_WORKSPACE_NAME = "workspace";
-
-haxapp.app.Hax.prototype.getWorkspace = function() {
-	if(this.workspaceUI) {
-		return this.workspaceUI.getWorkspace();
-	}
-	else {
-		return null;
-	}
-}
 
 haxapp.app.Hax.prototype.getWorkspaceUI = function() {
 	return this.workspaceUI;
@@ -102,8 +93,8 @@ haxapp.app.Hax.prototype.clearWorkspaceUI = function() {
  * workspase. The linksLoadedCallback is optional. It is called when all links have
  * been loaded on the page.
  */
-haxapp.app.Hax.prototype.updateWorkspaceLinks = function(workspaceName,addList,removeList,linksLoadedCallback) {
-	this.linkManager.updateWorkspaceLinks(workspaceName,addList,removeList,linksLoadedCallback);
+haxapp.app.Hax.prototype.updateWorkspaceLinks = function(ownerName,addList,removeList,linksLoadedCallback) {
+	this.linkManager.updateWorkspaceLinks(ownerName,addList,removeList,linksLoadedCallback);
 }
 
 //=================================
@@ -280,7 +271,6 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
 
 ///** This method should be implemented if custom menus or menu items are desired. */
 //haxapp.app.Hax.prototype.addToMenuBar(menuBar,menus);
-
 
 haxapp.app.Hax.prototype.populateAddChildMenu = function(menu,optionalInitialValues,optionalComponentOptions) {
     

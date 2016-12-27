@@ -1,18 +1,23 @@
 
-/** This is the main class of the hax application. */
+/** This class manages links for CSS and JS for the page. When links are added
+ * they should be associated with an owner identified with a name. A given link
+ * will be removed when all owners of that link on longer use it.
+ * (This implementation was used when we had multiple workspaces allowed in the
+ * application.
+ * . */
 haxapp.app.LinkManager = function() {
 	//external links infrastructure
 	this.linkMap = {};
 }
 
-/** This method adds links as registered by a given workspace. Links can be added and
- * removed. Removing links may or may not remove them from the page (currently
+/** This method adds links as registered by a given owner, as identified by name.
+ * Links can be added and removed. Removing links may or may not remove them from the page (currently
  * js links are not removed and css links are, once they are not used by any 
- * workspase. The linksLoadedCallback is optional. It is called when all links have
+ * owner. The linksLoadedCallback is optional. It is called when all links have
  * been loaded on the page.
  * The arguments "addList" and"removeList" are arrays with the entries {"link":(url),"type":("js" or "css")}
  */
-haxapp.app.LinkManager.prototype.updateWorkspaceLinks = function(workspaceName,addList,removeList,linksLoadedCallback) {
+haxapp.app.LinkManager.prototype.updateWorkspaceLinks = function(ownerName,addList,removeList,linksLoadedCallback) {
 	
 	var i;
 	var cnt;
@@ -73,7 +78,7 @@ haxapp.app.LinkManager.prototype.updateWorkspaceLinks = function(workspaceName,a
 			}
 			else {
 				//add workspace to link
-				linkWorkspaces.push(workspaceName);
+				linkWorkspaces.push(ownerName);
 			}
 	
 //SLOPPY!
@@ -85,7 +90,7 @@ haxapp.app.LinkManager.prototype.updateWorkspaceLinks = function(workspaceName,a
 		else {
 			//link must be added, and workspace added to link
 			linkWorkspaces = [];
-			linkWorkspaces.push(workspaceName);
+			linkWorkspaces.push(ownerName);
 			this.linkMap[link] = linkWorkspaces;
 			this.addLinkToPage(link,type,responseProcessor);
 		}

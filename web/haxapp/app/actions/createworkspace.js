@@ -12,18 +12,12 @@ haxapp.app.createworkspace.getCreateCallback = function(app) {
         //make sure there is not an open workspace
         if(app.getWorkspaceUI()) {
             alert("There is already an open workspace. You must close the workspace first.");
-            return;
+        }      
+
+        var actionResponse = haxapp.app.createworkspace.createWorkspace(app);
+        if(!actionResponse.getSuccess()) {
+            alert(actionResponse.getErrorMsg());
         }
-        
-        var onCreate = function(name) {
-            var actionResponse = haxapp.app.createworkspace.createWorkspace(app,name);
-            if(!actionResponse.getSuccess()) {
-                alert(actionResponse.getErrorMsg());
-            }
-            return true;
-        }
-        
-        haxapp.app.dialog.showCreateWorkspaceDialog(onCreate); 
     }
 }
 
@@ -32,7 +26,7 @@ haxapp.app.createworkspace.getCreateCallback = function(app) {
 //=====================================
 
 /** This method creates a new workspace. */
-haxapp.app.createworkspace.createWorkspace = function(app,name) {
+haxapp.app.createworkspace.createWorkspace = function(app) {
     var actionResponse = new hax.ActionResponse();
     var workspaceUIAdded;
     
@@ -47,7 +41,7 @@ haxapp.app.createworkspace.createWorkspace = function(app,name) {
         workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
         
         //create and edd an empty workspace
-        var workspace = new hax.Workspace(name);
+        var workspace = new hax.Workspace();
         workspaceUI.setWorkspace(workspace);
     
         actionResponse.workspaceUI = workspaceUI;
