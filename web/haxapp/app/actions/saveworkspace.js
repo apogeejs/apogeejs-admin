@@ -36,7 +36,7 @@ haxapp.app.saveworkspace.getSaveAsCallback = function(app) {
 }
 
 haxapp.app.saveworkspace.getWorkspaceText = function() {
-    var activeWorkspaceUI = app.getActiveWorkspaceUI();
+    var activeWorkspaceUI = app.getWorkspaceUI();
     if(activeWorkspaceUI) {
         var workspaceJson = activeWorkspaceUI.toJson();
         return JSON.stringify(workspaceJson);

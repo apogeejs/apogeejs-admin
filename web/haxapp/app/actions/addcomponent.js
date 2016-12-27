@@ -11,7 +11,7 @@ haxapp.app.addcomponent.getAddComponentCallback = function(app,generator,optiona
     
     var createCallback = function() {
         //get the active workspace
-        var workspaceUI = app.getActiveWorkspaceUI();
+        var workspaceUI = app.getWorkspaceUI();
         if(!workspaceUI) {
             alert("There is no open workspace.");
             return;

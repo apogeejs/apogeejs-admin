@@ -8,6 +8,12 @@ haxapp.app.openworkspace = {};
 haxapp.app.openworkspace.getOpenCallback = function(app) {
     return function() {
     
+        //make sure there is not an open workspace
+        if(app.getWorkspaceUI()) {
+            alert("There is already an open workspace. You must close the workspace first.");
+            return;
+        }
+    
         var onOpen = function(err,workspaceData,workspaceHandle) {
             
             if(err) {
@@ -23,7 +29,7 @@ haxapp.app.openworkspace.getOpenCallback = function(app) {
                 //open workspace
                 haxapp.app.openworkspace.openWorkspace(app,workspaceData,workspaceHandle,actionCompletedCallback);
             }
-        }
+        }    
         
         haxapp.app.openworkspace.openFile(onOpen);
     }
@@ -46,16 +52,18 @@ haxapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspaceHan
     var workspaceUIAdded;
     
     try {
+        //make sure there is not an open workspace
+        if(app.getWorkspaceUI()) {
+            throw new Error("There is already an open workspace");
+        }
+        
         //parse the workspace json
         var workspaceJson = JSON.parse(workspaceText);
 
 //I should verify the file type and format!    
-
-		//make a blank workspace
-        name = workspaceJson.workspace.name;
         
         var workspaceUI = new haxapp.app.WorkspaceUI();
-        workspaceUIAdded = app.addWorkspaceUI(workspaceUI,name);
+        workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
     
         //add links, if applicable
 		var jsLinks;
@@ -84,6 +92,8 @@ haxapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspaceHan
         
         if(linksAdded) {
 			//set links and set the callback to complete loading the workspace
+            //make a blank workspace
+            name = workspaceJson.workspace.name;
 			workspaceUI.setLinks(jsLinks,cssLinks,doWorkspaceLoad,name);
 		}
 		else {
@@ -93,7 +103,7 @@ haxapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspaceHan
     }
     catch(error) {
         if(workspaceUIAdded) {
-            app.removeWorkspaceUI(name);
+            app.clearWorkspaceUI();
         }
         var actionError = hax.ActionError.processException(error,"AppException",false);
         actionResponse.addError(actionError);
@@ -130,7 +140,7 @@ haxapp.app.openworkspace.openWorkspaceFromUrl = function(app,url) {
 /** This method opens an workspace by getting the workspace file from the url. */
 haxapp.app.openworkspace.openWorkspaceFromUrlImpl = function(app,url,actionCompletedCallback) {
     var onDownload = function(workspaceText) {
-        haxapp.app.openworkspace.openWorkspace(app,workspaceText,actionCompletedCallback);
+        haxapp.app.openworkspace.openWorkspace(app,workspaceText,url,actionCompletedCallback);
     }
     
     var onFailure = function(msg) {

@@ -9,7 +9,7 @@ haxapp.app.Hax = function(containerId) {
     hax.EventManager.init.call(this);
     
     //workspaces
-    this.workspaceUIs = {};
+    this.workspaceUI = null;
     
     //component generators
     this.componentGenerators = {};
@@ -41,34 +41,22 @@ hax.base.mixin(haxapp.app.Hax,hax.EventManager);
 
 haxapp.app.Hax.DEFAULT_WORKSPACE_NAME = "workspace";
 
-haxapp.app.Hax.prototype.getWorkspace = function(name) {
-    var workspaceUI = this.getWorkspaceUI(name);
-	if(workspaceUI) {
-		return workspaceUI.getWorkspace();
+haxapp.app.Hax.prototype.getWorkspace = function() {
+	if(this.workspaceUI) {
+		return this.workspaceUI.getWorkspace();
 	}
 	else {
 		return null;
 	}
 }
 
-haxapp.app.Hax.prototype.getWorkspaceUI = function(name) {
-	return this.workspaceUIs[name];
+haxapp.app.Hax.prototype.getWorkspaceUI = function() {
+	return this.workspaceUI;
 }
 
-haxapp.app.Hax.prototype.getActiveWorkspaceUI = function() {
-    var name = this.tabFrame.getActiveTabTitle();
-    if(name) {
-        return this.workspaceUIs[name];
-    }
-    else {
-        return null;
-    }
-}
-
-haxapp.app.Hax.prototype.getActiveWorkspace = function() {
-    var workspaceUI = this.getActiveWorkspaceUI();
-	if(workspaceUI) {
-		return workspaceUI.getWorkspace();
+haxapp.app.Hax.prototype.getWorkspace = function() {
+	if(this.workspaceUI) {
+		return this.workspaceUI.getWorkspace();
 	}
 	else {
 		return null;
@@ -82,25 +70,25 @@ haxapp.app.Hax.prototype.getActiveWorkspace = function() {
 /** This method makes an empty workspace ui object. This throws an exception if
  * the workspace can not be opened.
  */
-haxapp.app.Hax.prototype.addWorkspaceUI = function(workspaceUI,name) {
+haxapp.app.Hax.prototype.setWorkspaceUI = function(workspaceUI) {
     
     //we can only have one workspace of a given name!
-    if(this.workspaceUIs[name]) {
-        throw hax.base.createError("There is already an open workspace with the name " + name,false);
+    if(this.workspaceUI) {
+        throw hax.base.createError("There is already an open workspace",false);
     }
     
-	var tab = this.tabFrame.addTab(name);
-    this.tabFrame.setActiveTab(name);
+	var tab = this.tabFrame.addTab("DUMMY NAME");
+    this.tabFrame.setActiveTab("DUMMY NAME");
     workspaceUI.setApp(this,tab);
-    this.workspaceUIs[name] = workspaceUI;
+    this.workspaceUI = workspaceUI;
     return true;
 }
 
 /** This method closes the active workspace. */
-haxapp.app.Hax.prototype.removeWorkspaceUI = function(name) {
+haxapp.app.Hax.prototype.clearWorkspaceUI = function() {
     //remove the workspace from the app
-    delete this.workspaceUIs[name];
-    this.tabFrame.removeTab(name);
+    this.workspaceUI = null;
+    this.tabFrame.removeTab("DUMMY NAME");
     return true;
 }
 

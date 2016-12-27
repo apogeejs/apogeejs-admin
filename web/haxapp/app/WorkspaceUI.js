@@ -206,7 +206,6 @@ haxapp.app.WorkspaceUI.prototype.close = function() {
 
 haxapp.app.WorkspaceUI.prototype.toJson = function() {
     var json = {};
-    json.name = this.workspace.getName();
     json.fileType = "hax workspace";
     
     json.jsLinks = this.jsLinkArray;
