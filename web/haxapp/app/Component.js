@@ -51,6 +51,12 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     //------------------
     this.window.setTitle(this.getObject().getDisplayName());
     
+    //headers
+    this.toolbarDiv = null;
+    this.toolbarActive = false;
+    this.bannerDiv = null;
+    this.bannerBarActive = false;
+    
     //show the window
     if(options.coordInfo) {
         this.window.setCoordinateInfo(options.coordInfo);
@@ -109,7 +115,7 @@ haxapp.app.Component.addCleanupAction = function(cleanupFunction) {
 }
 
 //=======================
-// dev
+// Headers
 //=======================
 
 //constants for the window banner bar
@@ -174,46 +180,16 @@ haxapp.app.Component.hideBannerBar = function() {
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.Component.showSaveBar = function(onSave,onCancel) {
-    if(!this.saveDiv) {
-        this.saveDiv = haxapp.ui.createElement("div",null,
-            {
-                "display":"block",
-                "position":"relative",
-                "top":"0px",
-                "backgroundColor":"white",
-				"border":"solid 1px gray",
-				"padding":"3px"
-            });
-			
-		this.saveDiv.appendChild(document.createTextNode("Edit: "));
-		
-		this.saveBarSaveButton = document.createElement("button");
-		this.saveBarSaveButton.innerHTML = "Save";
-		this.saveDiv.appendChild(this.saveBarSaveButton);
-		
-		this.saveDiv.appendChild(document.createTextNode(" "));
-
-		this.saveBarCancelButton = document.createElement("button");
-		this.saveBarCancelButton.innerHTML = "Cancel";
-		this.saveDiv.appendChild(this.saveBarCancelButton);
-    }
-	
-	this.saveBarSaveButton.onclick = onSave;
-	this.saveBarCancelButton.onclick = onCancel;
-	this.saveBarActive = true;
-	
+haxapp.app.Component.showToolbar = function(toolbarDiv) {
+    this.toolbarActive = true;
+    this.toolbarDiv = toolbarDiv;
 	this.showActiveHeaders();
 }
 
-/** This returns true if the user is editing, as signified by the edit bar showing. */
-haxapp.app.Component.editActive = function() {
-    return this.saveBarActive;
-}
-
 /** This method returns the base member for this component. */
-haxapp.app.Component.hideSaveBar = function() {
-    this.saveBarActive = false;	
+haxapp.app.Component.hideToolbar = function() {
+    this.toolbarActive = false;
+    this.toolbarDiv = null;	
 	this.showActiveHeaders();
 }
 
@@ -223,12 +199,16 @@ haxapp.app.Component.showActiveHeaders = function() {
 	var window = this.getWindow();
 	
 	var headers = [];
+    if((this.toolbarActive)&&(this.toolbarDiv)) {
+		headers.push(this.toolbarDiv);
+	}
+    if((this.saveBarActive)&&(this.saveDiv)) {
+		headers.push(this.saveDiv);
+	}
 	if((this.bannerBarActive)&&(this.bannerDiv)) {
 		headers.push(this.bannerDiv);
 	}
-	if((this.saveBarActive)&&(this.saveDiv)) {
-		headers.push(this.saveDiv);
-	}
+	
 	
     window.loadHeaders(headers);
 }

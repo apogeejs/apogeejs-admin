@@ -42,7 +42,7 @@ haxapp.app.TableEditComponent.setViewType = function(viewType) {
 	if(this.viewType === viewType) return false;
     
     //check if we are editing
-    if(this.editActive()) {
+    if(this.saveBarActive) {
         alert("You must save or cancel the edit session to change the view mode.");
         return false;
     }
@@ -173,12 +173,66 @@ haxapp.app.TableEditComponent.initUI = function(initialViewType) {
     }
     
     this.select.onchange = onViewSet;
-   
-    //add the view select to the title bar
-    this.window.addRightTitleBarElement(this.select);
+    
+    //add the toolbar
+    this.normalToolbarDiv = haxapp.ui.createElement("div",null,
+        {
+            "display":"block",
+            "position":"relative",
+            "top":"0px",
+            "backgroundColor":"white",
+            "border":"solid 1px gray",
+            "padding":"3px"
+        });
+
+    this.normalToolbarDiv.appendChild(document.createTextNode("View: "));
+    this.normalToolbarDiv.appendChild(this.select);
+    this.showToolbar(this.normalToolbarDiv);
     
     this.setViewType(initialViewType);
     this.updateViewDropdown(this.viewType);
+}
+
+
+/** This method returns the base member for this component. */
+haxapp.app.TableEditComponent.showSaveBar = function(onSave,onCancel) {
+    if(!this.saveDiv) {
+        this.saveDiv = haxapp.ui.createElement("div",null,
+            {
+                "display":"block",
+                "position":"relative",
+                "top":"0px",
+                "backgroundColor":"white",
+				"border":"solid 1px gray",
+				"padding":"3px"
+            });
+			
+		this.saveDiv.appendChild(document.createTextNode("Edit: "));
+		
+		this.saveBarSaveButton = document.createElement("button");
+		this.saveBarSaveButton.innerHTML = "Save";
+		this.saveDiv.appendChild(this.saveBarSaveButton);
+		
+		this.saveDiv.appendChild(document.createTextNode(" "));
+
+		this.saveBarCancelButton = document.createElement("button");
+		this.saveBarCancelButton.innerHTML = "Cancel";
+		this.saveDiv.appendChild(this.saveBarCancelButton);
+    }
+	
+	this.saveBarSaveButton.onclick = onSave;
+	this.saveBarCancelButton.onclick = onCancel;
+	this.saveBarActive = true;
+    
+    //show the save toolbar
+    this.showToolbar(this.saveDiv);
+}
+
+
+/** This method returns the base member for this component. */
+haxapp.app.TableEditComponent.hideSaveBar = function() {
+    this.saveBarActive = false;	
+	this.showToolbar(this.normalToolbarDiv);
 }
 
 /** @private */
