@@ -1,0 +1,32 @@
+ /* display and header */
+.visiui-dnh-container {
+    position:relative;
+    display:table;
+    width:100%;
+    height:100%;
+}
+.visiui-dnh-header {
+    position:relative;
+    display:table-row;
+    width:100%;
+}
+.visiui-dnh-body {
+    position:relative;
+    display:table-row;
+    width:100%;
+    height:100%;                 
+}
+.visiui-dnh-fixed {
+    left:0px;
+    top:0px;
+    height:100%;
+    position:relative;
+    overflow:hidden;
+}
+.visiui-dnh-scrolling {
+    left:0px;
+    top:0px;
+    height:100%;
+    position:relative;
+    overflow:auto;
+}

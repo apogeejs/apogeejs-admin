@@ -75,6 +75,15 @@ haxapp.ui.createElement = function(type,properties,styleProperties) {
     return element;
 }
 
+/** This method creates a DOM element of the given type, sets the class name
+ * and, if present, adds it to the given parent. */
+haxapp.ui.createElementWithClass = function(elementType,className,parent) {
+    var element = document.createElement(elementType);
+    element.className = className;
+    if(parent) parent.appendChild(element);
+    return element;
+}
+
 //=========================================
 // window and dialog methods
 //=========================================
