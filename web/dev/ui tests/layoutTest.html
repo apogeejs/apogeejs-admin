@@ -10,21 +10,68 @@ and open the template in the editor.
         <style>
             /* note - with the commented out borders, we need to change the right adn bottom of the split pane 
             * by 2x this number.   */
-            html {
-                position: absolute;
-                top: 0px;
-                left: 0px;
-                right: 0px;
-                bottom: 0px;
-                margin: 0px;
-                padding: 0px;
+            body {
+                overflow:hidden;
+                position:absolute;
+                left:0px;
+                right:0px;
+                top:0px;
+                bottom:0px;
+                padding:0px;
+                margin:0px;
             }
-            .container {
-                /*position: relative;
+            .appContainer {
+                position:absolute;
+                left:0px;
+                right:0px;
+                top:0px;
+                bottom:0px; 
+            }
+            
+            /* headered display */
+            .displayContainer {
+                position:relative;
+                display:table;
+                width:100%;
+                height:100%;
+            }
+            .headerSection {
+                position:relative;
+                display:table-row;
+                width:100%;
+            }
+            .mainSection {
+                position:relative;
+                display:table-row;
+                width:100%;
+                height:100%;                 
+            }
+            .fixedContentSection {
+                left:0px;
+                top:0px;
+                height:100%;
+                position:relative;
+                overflow:hidden;
+            }
+            .scrollingContentSection {
+                left:0px;
+                top:0px;
+                height:100%;
+                position:relative;
+                overflow:auto;
+            }
+            
+            /* Split Pane */
+            .splitPaneContainer {
+                position: relative;
                 top:0px;
                 left:0px;
                 width:100%;
-                height:500px;*/
+                height:100%;
+                background-color: yellow;
+            }
+            .splitPaneContainer2 {
+                
                 background-color: yellow;
                 outline: 5px solid blue;
                 
@@ -33,12 +80,12 @@ and open the template in the editor.
                 left:5px;
                 right:5px;
                 bottom:5px;
-            }       
+            }  
             .splitPaneTable {
                 border-collapse: collapse;
                 position: relative;
                 width:100%;
-                height:100%;    
+                height:100%;
             }
             .splitPaneRow {
                 position: relative;
@@ -60,10 +107,6 @@ and open the template in the editor.
                 overflow: hidden;
                 background-color: lighblue;
             }
-            
-            
-            
-            
             .scrollingPaneContent {
                 position: absolute;
                 top: 0px;
@@ -78,9 +121,44 @@ and open the template in the editor.
                 overflow: hidden;
             }
             .fixedPaneContent {
-                position:relative;
-                height: 100%;
+                position: absolute;
+                top: 0px;
+                left:0px;
+                right:0px;
+                bottom:0px;
                 overflow: hidden;
+            }
+            
+            /* coloring */
+            .menuBarColoring {
+                background-color: yellow;
+            }
+            .tabBarColoring {
+                background-color: cyan;
+            }
+            .tabDisplayColoring {
+                background-color: orange;
+            }
+            .treeColoring {
+                background-color: lightgray;
+            }
+            .windowColoring {
+                background-color: lightblue;
+            }
+            
+            .WINDOW_STYLE {
+                top:100px;
+                left:50px;
+                height:200px;
+                width:300px;
+                position:absolute;
+            }
+            .WINDOW_STYLE2 {
+                top:800px;
+                left:700px;
+                height:500px;
+                width:600px;
+                position:absolute;
             }
         </style>
         <script>
@@ -157,12 +235,26 @@ var endResize = function() {
         </script>
     </head>
     <body onload="init()">
-        <div class="container">
-            <table id="table" class="splitPaneTable">
-                <tr class="splitPaneRow">
-                    <td id="lPanel" class="leftPane">
-                        <div class="basePaneContent"><div class="scrollingPaneContent">
-                                                dfasdfasdfsdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsd<br>
+        <div class="appContainer">
+            
+            <!-- menu and the rest --> 
+            <div class="displayContainer">
+                <div class="headerSection menuBarColoring">
+                    This is menu bar content
+                </div>
+                <div class="mainSection">
+                    
+                    <!-- Split Pane -->
+                    <div class="splitPaneContainer"><div class="splitPaneContainer2">
+                        <table id="table" class="splitPaneTable">
+                            <tr class="splitPaneRow">
+                                <td id="lPanel" class="leftPane">
+                                    <div class="basePaneContent">
+                                        <div class="scrollingPaneContent treeColoring">
+                                            
+                                            <!-- the tree -->
+                                            
+                                            this is the left panel<br>
                     dfasdfasdfsdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsd<br>
                     dfasdfasdfsdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsd<br>
                     dfasdfasdfsdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsd<br>
@@ -233,18 +325,54 @@ var endResize = function() {
                     dfasdfasdfsdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsd<br>
                     dfasdfasdfsdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsd<br>
                     dfasdfasdfsdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsd<br>
-                    dfasdfasdfsdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsd<br> 
-                        </div></div>
-                    </td>
-                    <td id="mPanel" class="divider"></td>
-                    <td id="rPanel" class="rightPane">
-                        <div class="fixedPaneContent">
-                            kljhlkjh
-                        </div>
-                    </td>
-                </tr>
-            </table>
+                    dfasdfasdfsdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsd<br>
+                    dfasdfasdfsdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsd<br>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td id="mPanel" class="divider"></td>
+                                <td id="rPanel" class="rightPane">
+                                    <div class="basePaneContent">
+                                        <div class="fixedPaneContent">
+                                        
+                                        <!-- the tabs -->
+                                        
+                                        <div class="displayContainer">
+                                            <div class="headerSection tabBarColoring">
+                                                This is tab bar content<br>
+                                                (taking up two lines)
+                                            </div>
+                                            <div class="mainSection">
+                                                <div class="scrollingContentSection tabDisplayColoring">
+                                                    <table class="WINDOW_STYLE windowColoring">
+                                                        <tr><td>asdfas</td><tr>
+                                                    </table>
+                                                    <table class="WINDOW_STYLE2 windowColoring">
+                                                        <tr><td>asdfas</td><tr>
+                                                    </table>
+                                                </div>
+                                            </div>   
+                                        </div>
+                                            
+                                            
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                        
+                        
+                        
+                        
+                        
+                        
+                </div></div>
+            </div>  
         </div>
+
+        
+        
         
         
         <!--

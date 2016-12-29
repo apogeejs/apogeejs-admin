@@ -1,0 +1,118 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style>
+            body {
+                overflow:hidden;
+                position:absolute;
+                left:0px;
+                right:0px;
+                top:0px;
+                bottom:0px;
+                padding:0px;
+                margin:0px;
+            }
+            .appContainer {
+                position:absolute;
+                left:0;
+                right:0;
+                top:0;
+                bottom:0; 
+            }
+            
+            .container {
+                position:relative;
+                display:table;
+                width:100%;
+                height:100%;
+            }
+            .headerSection {
+                position:relative;
+                display:table-row;
+                width:100%;
+            }
+            .mainSection {
+                position:relative;
+                display:table-row;
+                width:100%;
+                height:100%;                 
+            }
+            .fixedContentSection {
+                left:0px;
+                top:0px;
+                height:100%;
+                position:relative;
+                overflow:hidden;
+            }
+            .scrollingContentSection {
+                left:0px;
+                top:0px;
+                height:100%;
+                position:relative;
+                overflow:auto;
+            }
+            
+            
+            .menuBarColoring {
+                background-color: yellow;
+            }
+            .tabBarColoring {
+                background-color: cyan;
+            }
+            .tabDisplayColoring {
+                background-color: orange;
+            }
+
+.WINDOW_STYLE {
+    top:100px;
+    left:50px;
+	height:200px;
+    width:300px;
+    position:absolute;
+    background-color:lightblue;
+}
+.WINDOW_STYLE2 {
+    top:800px;
+    left:700px;
+	height:500px;
+    width:600px;
+    position:absolute;
+    background-color:lightblue;
+}
+
+        </style>
+    </head>
+    <body>
+        <div class="appContainer">
+            <div class="container">
+                <div class="headerSection menuBarColoring">
+                    This is menu bar content
+                </div>
+                <div class="mainSection">
+                    <div class="container">
+                        <div class="headerSection tabBarColoring">
+                           This is tab bar content
+                        </div>
+                        <div class="mainSection">
+                            <div class="scrollingContentSection tabDisplayColoring">
+                                <table class="WINDOW_STYLE">
+                                    <tr><td>asdfas</td><tr>
+                                </table>
+                                <table class="WINDOW_STYLE2">
+                                    <tr><td>asdfas</td><tr>
+                                </table>
+                            </div>
+                        </div>   
+
+                    </div>
+                </div>
+            </div>  
+        </div>
+    </body>
+</html>
