@@ -48,12 +48,6 @@ body {
     .visicomp_menuBarStyle {
         background-color: rgb(220,220,240);
     }
-    .visicomp_tabFrameColor {
-        background-color: rgb(185,185,220);
-    }
-    .visicomp_tabFrameActiveColor {
-        background-color: white;
-    }
 
     /* overrides for the handsontable coloring */
     .handsontable th {

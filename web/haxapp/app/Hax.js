@@ -191,10 +191,8 @@ haxapp.app.Hax.prototype.createUI = function(containerId) {
     haxapp.ui.applyStyle(tabFrameDiv,tabFrameDivStyle);
     container.appendChild(tabFrameDiv);
     
-    var options = {};
-    options.tabBarColorClass = "visicomp_tabFrameColor";
-    options.activeTabColorClass = "visicomp_tabFrameActiveColor";
-    this.tabFrame = new haxapp.ui.TabFrame(tabFrameDiv,options);
+    this.tabFrame = new haxapp.ui.TabFrame();
+    tabFrameDiv.appendChild(this.tabFrame.getElement());
     
 }
 
