@@ -52,7 +52,7 @@ module.exports = function(grunt) {
                 "haxapp/ui/TabFrame.js",
                 "haxapp/ui/Tab.js",
                 "haxapp/ui/menu/Menu.js",
-                "haxapp/ui/menu/StaticMenu.js",
+                "haxapp/ui/menu/MenuHeader.js",
                 "haxapp/ui/menu/MenuBody.js",
                 "haxapp/ui/jsonedit/jsonedit.js",
                 "haxapp/ui/jsonedit/keyentry.js",
