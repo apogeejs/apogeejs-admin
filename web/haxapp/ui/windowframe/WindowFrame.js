@@ -632,7 +632,7 @@ haxapp.ui.WindowFrame.prototype.initUI = function() {
     cell = document.createElement("td");
     cell.className = "visiui_win_windowColorClass visiui_win_left";
     this.addResizeHandlers(cell,haxapp.ui.WindowFrame.RESIZE_WEST); 
-    cell.rowSpan = 3;
+    cell.rowSpan = 2;
     row.appendChild(cell);
     cell = document.createElement("td");
     cell.className = "visiui_win_windowColorClass";
@@ -641,7 +641,7 @@ haxapp.ui.WindowFrame.prototype.initUI = function() {
     cell = document.createElement("td");
     cell.className = "visiui_win_windowColorClass visiui_win_right";
     this.addResizeHandlers(cell,haxapp.ui.WindowFrame.RESIZE_EAST); 
-    cell.rowSpan = 3;
+    cell.rowSpan = 2;
     row.appendChild(cell);
     
     //body

@@ -8,8 +8,7 @@ haxapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,compone
     
     //register this object as a parent container
     var internalFolder = folderFunction.getInternalFolder();
-    workspaceUI.registerMember(internalFolder,null);
-    workspaceUI.addComponentContainer(internalFolder,this);
+    workspaceUI.registerMember(internalFolder,this,folderFunction);
     
     this.memberUpdated();
     

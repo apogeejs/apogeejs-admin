@@ -35,10 +35,7 @@ haxapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, componentsJs
     
     //set up the root folder
     var rootFolder = this.workspace.getRoot();
-    this.registerMember(rootFolder,null);
-    this.addComponentContainer(rootFolder,this.tab);
-  
-    //load components from json if present
+    var rootFolderComponent = new haxapp.app.FolderComponent(this,rootFolder);
     if(componentsJson) {
         this.loadFolderComponentContentFromJson(rootFolder,componentsJson);
     }
@@ -57,12 +54,6 @@ haxapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, componentsJs
         instance.childDeleted(member);
     }
     this.workspace.addListener(hax.deletemember.MEMBER_DELETED_EVENT, childDeletedListener);
-    
-    //add context menu to create childrent
-    var contentElement = this.tab.getContainerElement();
-    var app = this.getApp();
-    app.setFolderContextMenu(contentElement,rootFolder);
-    
 }
 
 /** This method gets the workspace object. */
@@ -96,36 +87,43 @@ haxapp.app.WorkspaceUI.prototype.getFolders = function() {
 
 haxapp.app.WorkspaceUI.prototype.getParentContainerObject = function(object) {
     var parent = object.getParent();
-    
-    //get parent component info
-    var parentComponentInfo = this.componentMap[parent.getId()];
-    if(!parentComponentInfo.parentContainer) {
-        throw hax.base.createError("Parent container not found!");
+    if(parent) {
+        var parentComponent = this.getComponent(parent);
+        //I SHOULD DO A BETTER CHECK TO MAKE SURE THIS IS A PARENT COMPONENT
+        if(!parentComponent.getContainerElement) {
+            throw hax.base.createError("Parent container not found!");
+        }
+        return parentComponent;
     }
-    return parentComponentInfo.parentContainer;
+    else {
+        //root of workspace! - TEMPORARY
+        return this.tab;
+    }
 }
 
-/** This method registers a member data object and its optional component object.
- * for each folder, and only folders at this point, the mehod addComponentContainer
- * should also be called to set the container for the children of this folder. */
-haxapp.app.WorkspaceUI.prototype.registerMember = function(object,component) {
+/** This method registers a member data object and its associated component object.
+ * If the member is not the main member assoicated with component but instead an included
+ * member, the main componentMember should be passed in also. Otherwise it should be left 
+ * undefined. */
+haxapp.app.WorkspaceUI.prototype.registerMember = function(member,component,mainComponentMember) {
     
     //make sure this is for us
-    if(object.getWorkspace() !== this.workspace) {
-        throw hax.base.createError("Component registered in wrong workspace: " + object.getFullName());
+    if(member.getWorkspace() !== this.workspace) {
+        throw hax.base.createError("Component registered in wrong workspace: " + member.getFullName());
     }
     
     //store the ui object
-	var memberId = object.getId();
+	var memberId = member.getId();
 	
 	if(this.componentMap[memberId]) {
 		//already exists! (we need to catch this earlier if we want it to not be fatal. But we should catch it here too.)
-        throw hax.base.createError("There is already a component with the given name.",true);
+        throw hax.base.createError("There is already a member with the given ID.",true);
 	}
 	
     var componentInfo = {};
-    componentInfo.object = object;
+    componentInfo.object = member;
 	componentInfo.component = component;
+    if(mainComponentMember) componentInfo.componentMember = mainComponentMember;
 	
     this.componentMap[memberId] = componentInfo;
     

@@ -5,9 +5,6 @@ haxapp.app.FolderComponent = function(workspaceUI,folder,componentJson) {
     haxapp.ui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
 	haxapp.ui.ParentHighlighter.init.call(this,this.getContentElement());
     
-    //register this folder as a parent container
-    workspaceUI.addComponentContainer(folder,this);
-    
     //add a cleanup and save actions
     this.addSaveAction(haxapp.app.FolderComponent.writeToJson);
 };
