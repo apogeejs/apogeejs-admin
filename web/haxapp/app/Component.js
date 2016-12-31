@@ -36,9 +36,12 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     windowOptions.maximizable = true;
     windowOptions.resizable = true;
     windowOptions.movable = true;
-    windowOptions.frameColorClass = "visicomp_windowColor";
-    windowOptions.titleBarClass = "visicomp_titleBarClass";
-    this.window = new haxapp.ui.WindowFrame(this.parentContainer,windowOptions);
+    
+    this.window = new haxapp.ui.WindowFrame(this.parentContainer,windowOptions); 
+    //set fixed pane for header container - will customize later
+    this.windowInsideContainer = new haxapp.ui.HeaderContainer(haxapp.ui.DisplayAndHeader.FIXED_PANE);
+    
+    this.window.setContent(this.windowInsideContainer.getOuterElement());
 
     //------------------
     // Add menu (we will add the items later. This populates it.)
@@ -196,8 +199,6 @@ haxapp.app.Component.hideToolbar = function() {
 /** This method shows the active headers. 
  * @private */
 haxapp.app.Component.showActiveHeaders = function() {
-	var window = this.getWindow();
-	
 	var headers = [];
     if((this.toolbarActive)&&(this.toolbarDiv)) {
 		headers.push(this.toolbarDiv);
@@ -209,8 +210,7 @@ haxapp.app.Component.showActiveHeaders = function() {
 		headers.push(this.bannerDiv);
 	}
 	
-	
-    window.loadHeaders(headers);
+    this.windowInsideContainer.loadHeaders(headers);
 }
 
 //==============================
@@ -239,27 +239,18 @@ haxapp.app.Component.getWindow = function() {
 
 /** This method sets the content element as a scrolling element. */
 haxapp.app.Component.setScrollingContentElement = function() {
-    //load the content div
-    this.contentDiv = haxapp.ui.createElement("div",null,
-        {
-			"display":"block",
-            "position":"relative",
-            "top":"0px",
-            "height":"100%",
-            "overflow": "auto"
-        });
-    this.window.setContent(this.contentDiv);
+    this.windowInsideContainer.setBodyType(haxapp.ui.DisplayAndHeader.SCROLLING_PANE);
 }
 
 /** This method sets the content element as a fixed element. */
 haxapp.app.Component.setFixedContentElement = function() {
     //load the content div
-    this.contentDiv = this.window.getBody();
+    this.windowInsideContainer.setBodyType(haxapp.ui.DisplayAndHeader.FIXED_PANE);
 }
 
 /** This method returns the content element for the windowframe for this component. */
 haxapp.app.Component.getContentElement = function() {
-     return this.contentDiv;
+     return this.windowInsideContainer.getBodyElement();
 }
 
 /** This serializes the component. */

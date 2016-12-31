@@ -1,5 +1,8 @@
-
 /* menu style */
+.visiui-menu-bar {
+    background-color: rgb(220,220,240);
+    padding:2px;
+}
 .visiui-menu-body {
     /* fixed */
     overflow:visible;

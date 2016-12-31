@@ -14,13 +14,16 @@ haxapp.ui.DisplayAndHeader = function(headerType,headerStyleClass,bodyType,bodyS
     var header = haxapp.ui.createElementWithClass("div","visiui-dnh-header",this.container);
     var body = haxapp.ui.createElementWithClass("div","visiui-dnh-body",this.container);
     
-    var headerClass = headerType;
-    if(headerStyleClass) headerClass += " " + headerStyleClass;
-    this.headerContent = haxapp.ui.createElementWithClass("div",headerClass,header);
+    this.headerStyleClass = headerStyleClass;
+    this.bodyStyleClass = bodyStyleClass;
     
-    var bodyClass = bodyType;
-    if(bodyStyleClass) bodyClass += " " + bodyStyleClass;
-    this.bodyContent = haxapp.ui.createElementWithClass("div",bodyClass,body);
+    this.headerContent = document.createElement("div");
+    header.appendChild(this.headerContent);
+    this.bodyContent = document.createElement("div");
+    body.appendChild(this.bodyContent);
+    
+    this.setHeaderType(headerType);
+    this.setBodyType(bodyType);
 }
 
 /** This is the pane type for a pane that scrolls in both X and Y, iv needed. */
@@ -28,6 +31,20 @@ haxapp.ui.DisplayAndHeader.FIXED_PANE = "visiui-dnh-fixed";
 
 /** This is the pane type for a pane that does not scrolling, hiding any overflow. */
 haxapp.ui.DisplayAndHeader.SCROLLING_PANE = "visiui-dnh-scrolling";
+
+/** this method sets the header type. */
+haxapp.ui.DisplayAndHeader.prototype.setHeaderType = function(headerType) {
+	var headerClass = headerType;
+    if(this.headerStyleClass) headerClass += " " + this.headerStyleClass;
+    this.headerContent.className = headerClass;
+}
+
+/** this method sets the body type. */
+haxapp.ui.DisplayAndHeader.prototype.setBodyType = function(bodyType) {
+	var bodyClass = bodyType;
+    if(this.bodyStyleClass) bodyClass += " " + this.bodyStyleClass;
+    this.bodyContent.className = bodyClass;
+}
 
 /** this method returns the DOM element for ths combined layout. */
 haxapp.ui.DisplayAndHeader.prototype.getOuterElement = function() {

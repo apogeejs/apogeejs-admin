@@ -148,8 +148,6 @@ haxapp.ui.createDialog = function(options) {
     var dialogParent = new haxapp.ui.SimpleParentContainer(shieldElement,true);
     haxapp.ui.dialogLayer.appendChild(shieldElement);
     
-    if(!options.frameColorClass) options.frameColorClass = "visicomp_windowColor";
-    if(!options.titleBarClass) options.titleBarClass = "visicomp_titleBarClass";
     return new haxapp.ui.WindowFrame(dialogParent,options);
 }
 
@@ -160,6 +158,14 @@ haxapp.ui.closeDialog = function(dialog) {
     dialog.hide();
     haxapp.ui.dialogLayer.removeChild(parent.getContainerElement());
 }
+
+haxapp.ui.WINDOW_STATE_MINIMIZED = -1;
+haxapp.ui.WINDOW_STATE_NORMAL = 0;
+haxapp.ui.WINDOW_STATE_MAXIMIZED = 1;
+
+haxapp.ui.MINIMIZABLE = 0x01;
+haxapp.ui.MAXIMIZABLE = 0x02;
+haxapp.ui.CLOSEABLE = 0x04;
 
 
 

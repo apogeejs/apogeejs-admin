@@ -207,20 +207,13 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
     //-------------------
     //create menus
     //-----------------------
-    var menuBar = document.createElement("div");
-    var menuBarStyle = {
-        "position":"relative",
-        "display":"table-row",
-        "width":"100%",
-        "padding":"2px"
-    };
-    haxapp.ui.applyStyle(menuBar,menuBarStyle);
-    menuBar.className = "visicomp_menuBarStyle";
     
     //create the menus
     var menu;
     var name;
     var menus = {};
+    
+    var menuBar = haxapp.ui.Menu.createMenuBarElement();
 
     //Workspace menu
     name = "Workspace";

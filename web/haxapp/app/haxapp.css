@@ -37,18 +37,6 @@ body {
         top:0;
         bottom:0;
     }
-    /* color/style classes */
-    .visicomp_windowColor {
-        background-color: rgb(185,185,220);
-    }
-    .visicomp_titleBarClass {
-        background-color: rgb(185,185,220);
-        padding:3px;
-    }
-    .visicomp_menuBarStyle {
-        background-color: rgb(220,220,240);
-    }
-
     /* overrides for the handsontable coloring */
     .handsontable th {
         background-color: rgb(220,220,240);

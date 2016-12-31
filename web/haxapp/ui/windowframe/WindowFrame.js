@@ -18,9 +18,6 @@ haxapp.ui.WindowFrame = function(parentContainer, options) {
         options = {};
     }
     
-    if(!options.frameColorClass) options.frameColorClass = haxapp.ui.WindowFrame.DEFAULT_FRAME_COLOR_CLASS;
-    if(!options.titleBarClass) options.titleBarClass = haxapp.ui.WindowFrame.DEFAULT_TITLE_BAR_CLASS;
-    
     //base init
     hax.EventManager.init.call(this);
 	
@@ -29,7 +26,7 @@ haxapp.ui.WindowFrame = function(parentContainer, options) {
     this.parentElement = parentContainer.getContainerElement();
     this.options = options;
 
-    this.windowState = haxapp.ui.WindowFrame.NORMAL; //minimize, normal, maximize
+    this.windowState = haxapp.ui.WINDOW_STATE_NORMAL; //minimize, normal, maximize
     
 	//set default size values
 	this.coordinateInfo = {};
@@ -43,21 +40,10 @@ haxapp.ui.WindowFrame = function(parentContainer, options) {
     this.frame = null;
     this.titleCell = null;
     this.bodyCell = null;
-    this.headerCell = null;
     
     this.titleBar = null;
-    this.titleBarLeftElements = null;
-    this.titleBarRightElements = null;
-    
-    this.header = null;
-    
     this.body = null;
     this.content = null;
-    
-    this.minimizeButton = null;
-    this.restoreButton = null;
-    this.maximizeButton = null;
-    this.closable = null;
     
     this.windowDragActive = false;
     this.moveOffsetX = null;
@@ -104,21 +90,11 @@ haxapp.ui.WindowFrame = function(parentContainer, options) {
     }
     var parentEventManager = this.parentContainer.getEventManager();
     parentEventManager.addListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
-    parentEventManager.addListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);
+    parentEventManager.addListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);    
 }
 
 //add components to this class
 hax.base.mixin(haxapp.ui.WindowFrame,hax.EventManager);
-
-haxapp.ui.WindowFrame.MINIMIZED = -1;
-haxapp.ui.WindowFrame.NORMAL = 0;
-haxapp.ui.WindowFrame.MAXIMIZED = 1;
-
-haxapp.ui.WindowFrame.MINIMIZE_CMD_IMAGE = "/minimize.png";
-haxapp.ui.WindowFrame.RESTORE_CMD_IMAGE = "/restore.png";
-haxapp.ui.WindowFrame.MAXIMIZE_CMD_IMAGE = "/maximize.png";
-haxapp.ui.WindowFrame.CLOSE_CMD_IMAGE = "/close.png";
-haxapp.ui.WindowFrame.MENU_IMAGE = "/hamburger.png";
 
 haxapp.ui.WindowFrame.RESIZE_LOCATION_SIZE = 10;
 
@@ -137,96 +113,29 @@ haxapp.ui.WindowFrame.RESIZE_SW = haxapp.ui.WindowFrame.RESIZE_SOUTH + haxapp.ui
 haxapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT = 300;
 haxapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH = 300;
 
-haxapp.ui.WindowFrame.DEFAULT_TITLE_BAR_CLASS = "visiui_win_titleBarClass";
-haxapp.ui.WindowFrame.DEFAULT_FRAME_COLOR_CLASS = "visiui_win_windowColorClass";
-
 //======================================
 // CSS STYLES
 //======================================
 
-haxapp.ui.WindowFrame.TITLE_BAR_LEFT_STYLE = {
-    //fixed
-    "display":"inline",
-    "width":"100%"
-};
 
-haxapp.ui.WindowFrame.TITLE_BAR_RIGHT_STYLE = {
-    //fixed
-    "float":"right",
-    "display":"inline"
-};
-
-haxapp.ui.WindowFrame.TITLE_STYLE = {
-    //fixed
-    "display":"inline-block",
-    "cursor":"default",
-    "font-weight":"bold",
-    "color":"darkblue"
-    
-};
-
-haxapp.ui.WindowFrame.COMMAND_BUTTON_STYLE = { 
-    //fixed
-    "display":"inline-block",
-
-    //configurable
-    "marginRight":"3px"
-};
 
 //====================================
 // Public Methods
 //====================================
 
-haxapp.ui.WindowFrame.prototype.getTitle = function(title) {
-    return this.title;
+/** This method shows the window. */
+haxapp.ui.WindowFrame.prototype.getTitle = function() {
+    return this.titleBar.getTitle();
 }
 
-/** This method sets the title on the window frame.
- * This will be added to the title bar in the order it was called. The standard
- * location for the menu is immediately after the menu, if the menu is present. */
+/** This method shows the window. */
 haxapp.ui.WindowFrame.prototype.setTitle = function(title) {
-	if((title === null)||(title === undefined)||(title.length === 0)) {
-		title = "&nbsp;";
-	}
-    //title
-    this.title = title;
-    if(!this.titleElement) {
-        this.titleElement = document.createElement("div");
-        haxapp.ui.applyStyle(this.titleElement,haxapp.ui.WindowFrame.TITLE_STYLE);
-    }
-    this.titleElement.innerHTML = title;
-    this.titleBarLeftElements.appendChild(this.titleElement);
+    return this.titleBar.setTitle(title);
 }
 
-/** This gets the menu for the window frame. If this is called, a menu will be added
- * to the window frame, empty or otherwise. If it is not called, there will be no menu. 
- * This will be added to the title bar in the order it was called. The standard
- * location for the menu is first. */
+/** This method shows the window. */
 haxapp.ui.WindowFrame.prototype.getMenu = function() {
-    if(!this.menu) {
-        this.menu = haxapp.ui.Menu.createMenuFromImage(haxapp.ui.getResourcePath(haxapp.ui.WindowFrame.MENU_IMAGE));
-		var firstLeftElementChild = this.titleBarLeftElements.firstChild;
-		if(firstLeftElementChild) {
-			this.titleBarLeftElements.insertBefore(this.menu.getElement(),firstLeftElementChild);
-		}
-		else {
-			this.titleBarLeftElements.appendChild(this.menu.getElement());
-		}
-    }
-    return this.menu;
-}
-
-/** This method sets the headers for the window. They appreare between the title
- * bar and the body. The elements should typicaly be "block" type components, such
- * as a div.
- */
-haxapp.ui.WindowFrame.prototype.loadHeaders = function(headerElements) {
-    haxapp.ui.removeAllChildren(this.headerElement);
-    if(headerElements.length > 0) {
-        for(var i = 0; i < headerElements.length; i++) {
-			this.headerElement.appendChild(headerElements[i]);
-		}
-    }
+    return this.titleBar.getMenu();
 }
 
 /** This method shows the window. */
@@ -288,7 +197,7 @@ haxapp.ui.WindowFrame.prototype.getIsShowing = function() {
 
 /** This method returns true if the window is showing. */
 haxapp.ui.WindowFrame.prototype.getContentIsShowing = function() {
-    return (this.isShowing)&&(this.windowState != haxapp.ui.WindowFrame.MINIMIZED);
+    return (this.isShowing)&&(this.windowState != haxapp.ui.WINDOW_STATE_MINIMIZED);
 }
 
 /** This method sets the position of the window frame in the parent. */
@@ -357,15 +266,15 @@ haxapp.ui.WindowFrame.prototype.getWindowState = function() {
 /** This method sets the location and size info for the window. */
 haxapp.ui.WindowFrame.prototype.setWindowState = function(windowState) {
     switch(windowState) {
-        case haxapp.ui.WindowFrame.NORMAL:
+        case haxapp.ui.WINDOW_STATE_NORMAL:
             this.restoreContent();
             break;
             
-        case haxapp.ui.WindowFrame.MINIMIZED:
+        case haxapp.ui.WINDOW_STATE_MINIMIZED:
             this.minimizeContent();
             break;
             
-        case haxapp.ui.WindowFrame.MAXIMIZED:
+        case haxapp.ui.WINDOW_STATE_MAXIMIZED:
             this.maximizeContent();
             break;
             
@@ -417,7 +326,7 @@ haxapp.ui.WindowFrame.prototype.setZIndex = function(zIndex) {
 /** Mouse down handler for moving the window. */
 haxapp.ui.WindowFrame.prototype.moveMouseDown = function(e) {
     //do not do move in maximized state
-    if(this.windowState === haxapp.ui.WindowFrame.MAXIMIZED) return;
+    if(this.windowState === haxapp.ui.WINDOW_STATE_MAXIMIZED) return;
     
     if(this.parentElement) {
         this.windowDragActive = true;
@@ -458,7 +367,7 @@ haxapp.ui.WindowFrame.prototype.moveMouseLeave = function(e) {
 /** Mouse down handler for resizing the window. */
 haxapp.ui.WindowFrame.prototype.resizeMouseDown = function(e,resizeFlags) {
     //do not do resize in maximized state
-    if(this.windowState === haxapp.ui.WindowFrame.MAXIMIZED) return;
+    if(this.windowState === haxapp.ui.WINDOW_STATE_MAXIMIZED) return;
 
 	if(resizeFlags) {
 		if(resizeFlags & haxapp.ui.WindowFrame.RESIZE_EAST) {
@@ -572,13 +481,13 @@ haxapp.ui.WindowFrame.prototype.minimizeContent = function() {
     //set body as hidden
     this.body.style.display = "none";
     
-    var wasMinimized = (this.windowState === haxapp.ui.WindowFrame.MINIMIZED);
-    var wasMaximized = (this.windowState === haxapp.ui.WindowFrame.MAXIMIZED);
+    var wasMinimized = (this.windowState === haxapp.ui.WINDOW_STATE_MINIMIZED);
+    var wasMaximized = (this.windowState === haxapp.ui.WINDOW_STATE_MAXIMIZED);
  
     //set the window state
-    this.windowState = haxapp.ui.WindowFrame.MINIMIZED;
+    this.windowState = haxapp.ui.WINDOW_STATE_MINIMIZED;
     this.updateCoordinates();
-    this.setMinMaxButtons();
+    this.titleBar.setMinMaxButtons(this.windowState);
     
     //dispatch resize event
     if(!wasMinimized) this.contentOnlyHidden();
@@ -590,13 +499,13 @@ haxapp.ui.WindowFrame.prototype.restoreContent = function() {
     //set body as not hidden
     this.body.style.display = "";
     
-    var wasMinimized = (this.windowState === haxapp.ui.WindowFrame.MINIMIZED);
-    var wasMaximized = (this.windowState === haxapp.ui.WindowFrame.MAXIMIZED);
+    var wasMinimized = (this.windowState === haxapp.ui.WINDOW_STATE_MINIMIZED);
+    var wasMaximized = (this.windowState === haxapp.ui.WINDOW_STATE_MAXIMIZED);
     
     //set the window state
-    this.windowState = haxapp.ui.WindowFrame.NORMAL;
+    this.windowState = haxapp.ui.WINDOW_STATE_NORMAL;
     this.updateCoordinates();
-    this.setMinMaxButtons();
+    this.titleBar.setMinMaxButtons(this.windowState);
     
     if(wasMinimized) this.contentOnlyShown();
 }
@@ -607,57 +516,27 @@ haxapp.ui.WindowFrame.prototype.maximizeContent = function() {
     //set body as not hidden
     this.body.style.display = "";
     
-    var wasMinimized = (this.windowState === haxapp.ui.WindowFrame.MINIMIZED);
+    var wasMinimized = (this.windowState === haxapp.ui.WINDOW_STATE_MINIMIZED);
     
     //set the window state
-    this.windowState = haxapp.ui.WindowFrame.MAXIMIZED;
+    this.windowState = haxapp.ui.WINDOW_STATE_MAXIMIZED;
     this.updateCoordinates();
-    this.setMinMaxButtons();
+    this.titleBar.setMinMaxButtons(this.windowState);
     
     if(wasMinimized) this.contentOnlyShown();
-}
-
-
-/** This method ends a move action. 
- * @private */
-haxapp.ui.WindowFrame.prototype.setMinMaxButtons = function() {
-    if(this.minimizeButton) {
-        if(this.windowState == haxapp.ui.WindowFrame.MINIMIZED) {
-            this.minimizeButton.style.display = "none";
-        }
-        else {
-            this.minimizeButton.style.display = "";
-        }
-    }
-    if(this.restoreButton) {
-        if(this.windowState == haxapp.ui.WindowFrame.NORMAL) {
-            this.restoreButton.style.display = "none";
-        }
-        else {
-            this.restoreButton.style.display = "";
-        }
-    }
-    if(this.maximizeButton) {
-        if(this.windowState == haxapp.ui.WindowFrame.MAXIMIZED) {
-            this.maximizeButton.style.display = "none";
-        }
-        else {
-            this.maximizeButton.style.display = "";
-        }
-    }
 }
 
 /** @private */
 haxapp.ui.WindowFrame.prototype.updateCoordinates = function() {
 	
-    if(this.windowState === haxapp.ui.WindowFrame.MAXIMIZED) {
+    if(this.windowState === haxapp.ui.WINDOW_STATE_MAXIMIZED) {
         //apply the maximized coordinates size
         this.frame.style.left = "0px";
 		this.frame.style.top = "0px";
 		this.frame.style.height = "100%";
 		this.frame.style.width = "100%";
     }
-    else if(this.windowState === haxapp.ui.WindowFrame.NORMAL) {
+    else if(this.windowState === haxapp.ui.WINDOW_STATE_NORMAL) {
         //apply the normal size to the window
 		this.frame.style.left = this.coordinateInfo.x + "px";
         this.frame.style.top = this.coordinateInfo.y + "px";
@@ -674,7 +553,7 @@ haxapp.ui.WindowFrame.prototype.updateCoordinates = function() {
 			this.frame.style.width = haxapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH + "px";
 		}
     }
-    else if(this.windowState === haxapp.ui.WindowFrame.MINIMIZED) {
+    else if(this.windowState === haxapp.ui.WINDOW_STATE_MINIMIZED) {
         //apply the minimized size to the window
 		this.frame.style.left = this.coordinateInfo.x + "px";
         this.frame.style.top = this.coordinateInfo.y + "px";
@@ -735,15 +614,15 @@ haxapp.ui.WindowFrame.prototype.initUI = function() {
     row = document.createElement("tr");
     table.appendChild(row);
     cell = document.createElement("td");
-    cell.className = this.options.frameColorClass + " visiui_win_topLeft";
+    cell.className = "visiui_win_windowColorClass visiui_win_topLeft";
     this.addResizeHandlers(cell,haxapp.ui.WindowFrame.RESIZE_WEST | haxapp.ui.WindowFrame.RESIZE_NORTH);
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = this.options.frameColorClass + " visiui_win_top";
+    cell.className = "visiui_win_windowColorClass visiui_win_top";
     this.addResizeHandlers(cell,haxapp.ui.WindowFrame.RESIZE_NORTH);  
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = this.options.frameColorClass + " visiui_win_topRight";
+    cell.className = "visiui_win_windowColorClass visiui_win_topRight";
     this.addResizeHandlers(cell,haxapp.ui.WindowFrame.RESIZE_EAST | haxapp.ui.WindowFrame.RESIZE_NORTH);  
     row.appendChild(cell);
     
@@ -751,26 +630,18 @@ haxapp.ui.WindowFrame.prototype.initUI = function() {
     row = document.createElement("tr");
     table.appendChild(row);
     cell = document.createElement("td");
-    cell.className = this.options.frameColorClass + " visiui_win_left";
+    cell.className = "visiui_win_windowColorClass visiui_win_left";
     this.addResizeHandlers(cell,haxapp.ui.WindowFrame.RESIZE_WEST); 
     cell.rowSpan = 3;
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = this.options.frameColorClass;
+    cell.className = "visiui_win_windowColorClass";
     this.titleBarCell = cell;
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = this.options.frameColorClass + " visiui_win_right";
+    cell.className = "visiui_win_windowColorClass visiui_win_right";
     this.addResizeHandlers(cell,haxapp.ui.WindowFrame.RESIZE_EAST); 
     cell.rowSpan = 3;
-    row.appendChild(cell);
-    
-    //header row
-    row = document.createElement("tr");
-    table.appendChild(row);
-    cell = document.createElement("td");
-    cell.className = "visiui_win_headerCell";
-    this.headerCell = cell;
     row.appendChild(cell);
     
     //body
@@ -786,20 +657,22 @@ haxapp.ui.WindowFrame.prototype.initUI = function() {
     row = document.createElement("tr");
     table.appendChild(row);
     cell = document.createElement("td");
-    cell.className = this.options.frameColorClass + " visiui_win_bottomLeft";
+    cell.className = "visiui_win_windowColorClass visiui_win_bottomLeft";
     this.addResizeHandlers(cell,haxapp.ui.WindowFrame.RESIZE_WEST | haxapp.ui.WindowFrame.RESIZE_SOUTH); 
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = this.options.frameColorClass + " visiui_win_bottom";
+    cell.className = "visiui_win_windowColorClass visiui_win_bottom";
     this.addResizeHandlers(cell,haxapp.ui.WindowFrame.RESIZE_SOUTH);  
     row.appendChild(cell);
     cell = document.createElement("td");
-    cell.className = this.options.frameColorClass + " visiui_win_bottomRight";
+    cell.className = "visiui_win_windowColorClass visiui_win_bottomRight";
     this.addResizeHandlers(cell,haxapp.ui.WindowFrame.RESIZE_EAST | haxapp.ui.WindowFrame.RESIZE_SOUTH);
     row.appendChild(cell);
-    
+ 
+    //create the title bar
     this.createTitleBar();
-    this.createHeaderContainer();
+    
+    //create body
     this.createBody();
 }
 
@@ -830,79 +703,22 @@ haxapp.ui.WindowFrame.prototype.addResizeHandlers = function(cell,flags) {
 
 /** @private */
 haxapp.ui.WindowFrame.prototype.createTitleBar = function() {
+    //creat title bar
+    var cmdFlags = 0;
+    if(this.options.minimizable) cmdFlags |= haxapp.ui.MINIMIZABLE;
+    if(this.options.maximizable) cmdFlags |= haxapp.ui.MAXIMIZABLE;
+    if(this.options.closeable) cmdFlags |= haxapp.ui.CLOSEABLE;
     
-    this.titleBar = document.createElement("div");
-    this.titleBar.className = this.options.titleBarClass;
-
-    //add elements
-    this.titleBarLeftElements = document.createElement("div");
-    haxapp.ui.applyStyle(this.titleBarLeftElements,haxapp.ui.WindowFrame.TITLE_BAR_LEFT_STYLE);
-    this.titleBar.appendChild(this.titleBarLeftElements);
-
-
-    this.titleBarRightElements = document.createElement("div");
-    haxapp.ui.applyStyle(this.titleBarRightElements,haxapp.ui.WindowFrame.TITLE_BAR_RIGHT_STYLE);
-    this.titleBar.appendChild(this.titleBarRightElements);
-
-    //for handlers below
-    var instance = this;
+    this.titleBar = new haxapp.ui.TitleBar(this,cmdFlags);
+    var titleBarElement = this.titleBar.getOuterElement();
+    this.titleBarCell.appendChild(titleBarElement);
     
-    //add window commands ( we will hide the bottons that are not needed)
-    //minimize button
-    if(this.options.minimizable) {
-        this.minimizeButton = document.createElement("img");
-        haxapp.ui.applyStyle(this.minimizeButton,haxapp.ui.WindowFrame.COMMAND_BUTTON_STYLE);
-        this.minimizeButton.src = haxapp.ui.getResourcePath(haxapp.ui.WindowFrame.MINIMIZE_CMD_IMAGE);
-        this.minimizeButton.onclick = function() {
-            instance.minimizeContent();
-        }
-        this.titleBarRightElements.appendChild(this.minimizeButton);
-    }
-	
-    //restore button - only if we cn minimize or maximize
-    if(this.options.minimizable || this.options.maximizable) {	
-        this.restoreButton = document.createElement("img");
-        haxapp.ui.applyStyle(this.restoreButton,haxapp.ui.WindowFrame.COMMAND_BUTTON_STYLE);
-        this.restoreButton.src = haxapp.ui.getResourcePath(haxapp.ui.WindowFrame.RESTORE_CMD_IMAGE);
-        this.restoreButton.onclick = function() {
-            instance.restoreContent();
-        }
-        this.titleBarRightElements.appendChild(this.restoreButton);
-    }
-    
-    //maximize button and logic
-    if(this.options.maximizable) {
-        this.maximizeButton = document.createElement("img");
-        haxapp.ui.applyStyle(this.maximizeButton,haxapp.ui.WindowFrame.COMMAND_BUTTON_STYLE);
-        this.maximizeButton.src = haxapp.ui.getResourcePath(haxapp.ui.WindowFrame.MAXIMIZE_CMD_IMAGE);
-        this.maximizeButton.onclick = function() {
-            instance.maximizeContent();
-        }
-        this.titleBarRightElements.appendChild(this.maximizeButton);
-    }
-    
-    //layout the window buttons
-    this.windowState = haxapp.ui.WindowFrame.NORMAL;
-    this.setMinMaxButtons();
-    
-    //close button
-    if(this.options.closable) {
-        this.closeButton = document.createElement("img");
-        haxapp.ui.applyStyle(this.closeButton,haxapp.ui.WindowFrame.COMMAND_BUTTON_STYLE);
-        this.closeButton.src = haxapp.ui.getResourcePath(haxapp.ui.WindowFrame.CLOSE_CMD_IMAGE);
-        this.closeButton.onclick = function() {
-            instance.hide();
-        }
-        this.titleBarRightElements.appendChild(this.closeButton);
-    }
-	
-	//add am empty title
-	this.setTitle("");
-    
+      //add mouse move control
     //mouse move and resize
+    var instance = this;
     if(this.options.movable) {
         //add mouse handlers for moving the window 
-        this.titleBar.onmousedown = function(event) {
+        titleBarElement.onmousedown = function(event) {
             instance.moveMouseDown(event);
         }
 
@@ -919,20 +735,16 @@ haxapp.ui.WindowFrame.prototype.createTitleBar = function() {
         }
     }
     
-    //add to window
-    this.titleBarCell.appendChild(this.titleBar);
-}
-
-/** @private */
-haxapp.ui.WindowFrame.prototype.createHeaderContainer = function() {
-    
-    this.headerElement = document.createElement("div");
-    this.headerElement.className = "visiui_win_header";
-    
-    this.headerCell.appendChild(this.headerElement);
- 
-    //load empty headers
-    this.loadHeaders([]);
+    //listen for cmd events from title bar
+    this.addListener("minimize_request",function() {
+        instance.minimizeContent();
+    });
+    this.addListener("maximize_request",function() {
+        instance.maximizeContent();
+    });
+    this.addListener("restore_request",function() {
+        instance.restoreContent();
+    });
 }
 	
 /** @private */
