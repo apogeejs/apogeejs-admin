@@ -8,13 +8,13 @@
 }
 /* pane outline color and width must be set here and in the divider */
 .visiui-sp-parent2 {
-    outline: 5px solid blue;
+    outline: 5px solid rgb(220,220,240);;
 
     position: absolute;
-    top:5px;
-    left:5px;
-    right:5px;
-    bottom:5px;
+    top:4px;
+    left:4px;
+    right:4px;
+    bottom:4px;
 }  
 .visiui-sp-table {
     border-collapse: collapse;
@@ -34,7 +34,7 @@
 .visiui-sp-divider {
     width:5px;
     height:100%;
-    background-color: blue;
+    background-color: rgb(220,220,240);
 }
 .visiui-sp-right {
     height:100%;

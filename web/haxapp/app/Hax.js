@@ -70,7 +70,7 @@ haxapp.app.Hax.prototype.setWorkspaceUI = function(workspaceUI) {
     
 	var tab = this.tabFrame.addTab("DUMMY NAME");
     this.tabFrame.setActiveTab("DUMMY NAME");
-    workspaceUI.setApp(this,tab);
+    workspaceUI.setApp(this,tab,this.treePane);
     this.workspaceUI = workspaceUI;
     return true;
 }
@@ -160,40 +160,39 @@ haxapp.app.Hax.prototype.createUI = function(containerId) {
     var windowElements = haxapp.ui.initWindows(containerId);
     var topContainer = windowElements.baseElement;
     
-    var container = document.createElement("div");
-    var containerStyle = {
-        "position":"relative",
-        "display":"table",
-        "width":"100%",
-        "height":"100%"
-    };
-    haxapp.ui.applyStyle(container,containerStyle);
-    topContainer.appendChild(container);
+    var mainContainer = new haxapp.ui.DisplayAndHeader(haxapp.ui.DisplayAndHeader.FIXED_PANE,
+            null,
+            haxapp.ui.DisplayAndHeader.FIXED_PANE,
+            null
+        );
+    topContainer.appendChild(mainContainer.getOuterElement());
     
     //-------------------
-    //create menus - note this functino is defined differently for web and electron, in a remote file
+    //create menus
     //-------------------
     var menuBar = this.createMenuBar();
-    container.appendChild(menuBar);
-
+    mainContainer.getHeader().appendChild(menuBar);
+    
     //----------------------
-    //create the tab frame - there is a tab for each workspace
-    //--------------------------
+    //create the split pane
+    //----------------------
+    var splitPane = new haxapp.ui.SplitPane(
+            haxapp.ui.SplitPane.SCROLLING_PANE,
+            haxapp.ui.SplitPane.FIXED_PANE
+        );
+    mainContainer.getBody().appendChild(splitPane.getOuterElement());
+
+    //---------------------
+    //load the tree pane
+    //---------------------
+    this.treePane = splitPane.getLeftPaneContainer();
     
-    var tabFrameDiv = document.createElement("div");
-    var tabFrameDivStyle = {
-        "position":"relative",
-        "backgroundColor":"white",
-        "display":"table-row",
-        "width":"100%",
-        "height":"100%"
-    }
-    haxapp.ui.applyStyle(tabFrameDiv,tabFrameDivStyle);
-    container.appendChild(tabFrameDiv);
-    
+    //----------------------
+    //create the tab frame
+    //----------------------
     this.tabFrame = new haxapp.ui.TabFrame();
-    tabFrameDiv.appendChild(this.tabFrame.getElement());
-    
+    splitPane.getRightPaneContainer().appendChild(this.tabFrame.getElement());
+   
 }
 
 //=================================

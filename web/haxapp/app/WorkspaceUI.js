@@ -16,9 +16,12 @@ haxapp.app.WorkspaceUI = function() {
 haxapp.app.WorkspaceUI.MAIN_WORKSPACE_NAME = "main workspace";
 
 /** This sets the application. It must be done before the workspace is set. */
-haxapp.app.WorkspaceUI.prototype.setApp = function(app,tab) {
+haxapp.app.WorkspaceUI.prototype.setApp = function(app,tab,treePane) {
     this.app = app;
     this.tab = tab;
+    this.treePane = treePane;
+    //just to put something in...
+    this.treePane.innerHTML = "<ul><li>one</li><li>two</li><li>three</li></ul>";
 }
 
 /** This gets the application instance. */
