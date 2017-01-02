@@ -28,6 +28,17 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     this.saveActions = [];
     this.cleanupActions = [];
     
+    //-------------
+    //create tree entry
+    //-------------
+    this.treeEntry = this.createTreeEntry();
+    //TREE_ENTRY - add the tree entry to the parent
+    if(this.activeParent) {
+        var parentComponent = this.workspaceUI.getComponent(this.activeParent);
+        var parentTreeEntry = parentComponent.getTreeEntry();
+        parentTreeEntry.addChild(this.getObject().getId(),this.treeEntry);
+    }
+    
     //--------------
     //create window
     //--------------
@@ -134,6 +145,10 @@ haxapp.app.Component.BANNER_BGCOLOR_UNKNOWN = "yellow";
 haxapp.app.Component.BANNER_FGCOLOR_UNKNOWN = "black";
 
 haxapp.app.Component.PENDING_MESSAGE = "Calculation pending...";
+
+haxapp.app.Component.getTreeEntry = function() {
+    return this.treeEntry;
+}
 
 /** This method returns the base member for this component. */
 haxapp.app.Component.showBannerBar = function(text,type) {
@@ -272,6 +287,37 @@ haxapp.app.Component.toJson = function() {
 // Protected Instance Methods
 //==============================
 
+/** This creates the tree entry. */
+haxapp.app.Component.createTreeEntry = function() {
+    
+    //TREE_ENTRY
+    //FIX THIS CODE!!!
+    //open doesn't work and the context menu is duplicated code (that shouldn't be)
+    
+    var instance = this;
+    
+    var openCallback = function() {
+        alert("Open pressed!");
+    } 
+    
+    var contextMenuCallback = function(event) {
+        var contextMenu = new haxapp.ui.MenuBody();
+        
+        var callback;
+        
+        callback = haxapp.app.updatecomponent.getUpdateComponentCallback(instance,instance.generator);
+        contextMenu.addCallbackMenuItem("Edit Properties",callback);
+        
+        callback = instance.createDeleteCallback("Delete");
+        contextMenu.addCallbackMenuItem("Delete",callback);
+        
+        haxapp.ui.Menu.showContextMenu(contextMenu,event);
+    }
+    
+    var labelText = this.getObject().getName();
+    return new haxapp.ui.treecontrol.TreeEntry(labelText, openCallback, contextMenuCallback);
+}
+
 //This method should be populated by an extending object.
 //** This serializes the table component. */
 //haxapp.app.Component.prototype.writeToJson = function(json);
@@ -288,6 +334,15 @@ haxapp.app.Component.onDelete = function() {
     var componentWindow = this.getWindow();
     componentWindow.deleteWindow();
     
+    //TREE_ENTRY - remove tree entry from the parent
+    if(this.activeParent) {
+        var parentComponent = this.workspaceUI.getComponent(this.activeParent);
+        if(parentComponent) {
+            var parentTreeEntry = parentComponent.getTreeEntry();
+            parentTreeEntry.removeChild(this.getObject().getId());
+        }
+    }
+    
     //execute cleanup actions
     for(var i = 0; i < this.cleanupActions.length; i++) {
         this.cleanupActions[i].call(this);
@@ -299,9 +354,24 @@ haxapp.app.Component.onDelete = function() {
 haxapp.app.Component.memberUpdated = function() {
     //check for change of parent
     if(this.object.getParent() !== this.activeParent) {
+        var oldParent = this.activeParent;
+        
         this.activeParent = this.object.getParent();
         this.parenContainer = this.getWorkspaceUI().getParentContainerObject(this.object);
         this.window.changeParent(this.parenContainer);
+        
+        //TREE_ENTRY - remove tree entry from old parent
+        if(oldParent) {
+            var parentComponent = this.workspaceUI.getComponent(oldParent);
+            var parentTreeEntry = parentComponent.getTreeEntry();
+            parentTreeEntry.removeChild(this.getObject().getId());
+        }
+        //TREE_ENTRY - add it to the new parent
+        if(this.activeParent) {
+            var parentComponent = this.workspaceUI.getComponent(this.activeParent);
+            var parentTreeEntry = parentComponent.getTreeEntry();
+            parentTreeEntry.removeChild(this.getObject().getId());
+        }
     }
     
     //update title
@@ -329,16 +399,22 @@ haxapp.app.Component.memberUpdated = function() {
 /** This method makes sure the window title is up to date.
  * @private */    
 haxapp.app.Component.updateTitle = function() {
-    //make sure the title is up to data
+    //make sure the title is up to date
+    var member = this.getObject();
+    
     var window = this.getWindow();
     if(window) {
-        var member = this.getObject();
+        
         var displayName = member.getDisplayName();
         var windowTitle = window.getTitle();
         if(windowTitle !== displayName) {
             window.setTitle(displayName);
         }
     }
+    
+    //TREE_ENTRY - set the title on the tree entry
+    this.treeEntry.setLabel(member.getName());
+    
 }
 
 /** This method is used for setting initial values in the property dialog. 

@@ -19,9 +19,8 @@ haxapp.app.WorkspaceUI.MAIN_WORKSPACE_NAME = "main workspace";
 haxapp.app.WorkspaceUI.prototype.setApp = function(app,tab,treePane) {
     this.app = app;
     this.tab = tab;
-    this.treePane = treePane;
-    //just to put something in...
-    this.treePane.innerHTML = "<ul><li>one</li><li>two</li><li>three</li></ul>";
+    this.tree = new haxapp.ui.treecontrol.TreeControl();
+    treePane.appendChild(this.tree.getElement());
 }
 
 /** This gets the application instance. */
@@ -42,6 +41,9 @@ haxapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, componentsJs
     if(componentsJson) {
         this.loadFolderComponentContentFromJson(rootFolder,componentsJson);
     }
+    
+    //TREE_ENTRY - add the root tree entyr to the panel
+    this.tree.setRootEntry(rootFolderComponent.getTreeEntry().getElement());
     
     //listeners
     var instance = this;
@@ -172,35 +174,18 @@ haxapp.app.WorkspaceUI.prototype.childDeleted = function(memberObject) {
 	}
 }
 
-//haxapp.app.WorkspaceUI.prototype.getObjectById = function(memeberId) {
-//    var componentInfo = this.componentMap[key];
-//    if(componentInfo) {
-//        return componentInfo.object;
-//    }
-//    else {
-//        return null;
-//    }
-//}
-//
-//haxapp.app.WorkspaceUI.prototype.getComponentById = function(memberId) {
-//    var componentInfo = this.componentMap[key];
-//    if(componentInfo) {
-//        return componentInfo.component;
-//    }
-//    else {
-//        return null;
-//    }
-//}
-
 /** This method gets the workspace object. */
 haxapp.app.WorkspaceUI.prototype.close = function() {
     //delete all the components - to make sure the are cleaned up
     for(var key in this.componentMap) {
         var componentInfo = this.componentMap[key];
-        if((componentInfo)&&(componentInfo.component)) {
+        if((componentInfo)&&(componentInfo.component)&&(!componentInfo.componentMember)) {
             componentInfo.component.onDelete();
         }
     }
+    
+    //TREE_ENTRY - remove tree entry
+    this.tree.clearRootEntry();
     
     //remove links
     this.setLinks([],[]);
