@@ -42,38 +42,15 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     //--------------
     //create window
     //--------------
-    var windowOptions = {};
-    windowOptions.minimizable = true;
-    windowOptions.maximizable = true;
-    windowOptions.resizable = true;
-    windowOptions.movable = true;
     
-    this.window = new haxapp.ui.WindowFrame(this.parentContainer,windowOptions); 
-    //set fixed pane for header container - will customize later
-    this.windowInsideContainer = new haxapp.ui.HeaderContainer(haxapp.ui.DisplayAndHeader.FIXED_PANE);
+    this.window = this.createDisplayFrame();
+    this.componentDisplay = new haxapp.app.ComponentDisplay(this.window, this, this.generator, this.options);
+    this.populateFrame(this.componentDisplay);
     
-    this.window.setContent(this.windowInsideContainer.getOuterElement());
-
-    //------------------
-    // Add menu (we will add the items later. This populates it.)
-    //------------------
-
-    var menu = this.window.getMenu();
-    
-    //------------------
-    //set the title
-    //------------------
-    this.window.setTitle(this.getObject().getDisplayName());
-    
-    //headers
-    this.toolbarDiv = null;
-    this.toolbarActive = false;
-    this.bannerDiv = null;
-    this.bannerBarActive = false;
-    
+    //THESE OPTIONS - SHOULD THEY DEPEND ON THE PARTICULAR CONTAINER TAB?
     //show the window
-    if(options.coordInfo) {
-        this.window.setCoordinateInfo(options.coordInfo);
+    if(this.options.coordInfo) {
+        this.window.setCoordinateInfo(this.options.coordInfo);
     }
     else {
         //set position 
@@ -81,39 +58,14 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
         this.window.setPosition(pos[0],pos[1]);
         
         //set default size
-        this.window.setSize(generator.DEFAULT_WIDTH,generator.DEFAULT_HEIGHT);
+        this.window.setSize(this.generator.DEFAULT_WIDTH,this.generator.DEFAULT_HEIGHT);
     }
-    if(options.windowState) {
-        this.window.setWindowState(options.windowState);
+    if(this.options.windowState) {
+        this.window.setWindowState(this.options.windowState);
     }
+    
     this.window.show();
-    
-    
-    //------------------
-    // Add window content
-    //------------------
-    
-    //menu items
-    this.menuItemInfoList = [];
-    
-    //add the standard entries
-    var itemInfo = {};
-    itemInfo.title = "Edit Properties";
-    itemInfo.callback = haxapp.app.updatecomponent.getUpdateComponentCallback(this,this.generator);
-    this.menuItemInfoList.push(itemInfo);
-    
-    var itemInfo = {};
-    itemInfo.title = "Delete";
-    itemInfo.callback = this.createDeleteCallback(itemInfo.title);
-    this.menuItemInfoList.push(itemInfo);
-    
-    //let the extending object populate the frame and the menu items
-	if(this.populateFrame) {
-		this.populateFrame();
-	}
-    
-    //set the menu items
-    menu.setMenuItems(this.menuItemInfoList);
+   
 }
 
 /** If an extending object has any save actions, a callback should be passed here.
@@ -128,105 +80,31 @@ haxapp.app.Component.addCleanupAction = function(cleanupFunction) {
     this.cleanupActions.push(cleanupFunction);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+haxapp.app.Component.createDisplayFrame = function() {
+    var windowOptions = {};
+    windowOptions.minimizable = true;
+    windowOptions.maximizable = true;
+    windowOptions.resizable = true;
+    windowOptions.movable = true;
+    
+    var window = new haxapp.ui.WindowFrame(this.parentContainer,windowOptions); 
+    return window;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
 //=======================
 // Headers
 //=======================
 
-//constants for the window banner bar
-haxapp.app.Component.BANNER_TYPE_ERROR = "error";
-haxapp.app.Component.BANNER_BGCOLOR_ERROR = "red";
-haxapp.app.Component.BANNER_FGCOLOR_ERROR = "white";
-
-haxapp.app.Component.BANNER_TYPE_PENDING = "pending";
-haxapp.app.Component.BANNER_BGCOLOR_PENDING = "yellow";
-haxapp.app.Component.BANNER_FGCOLOR_PENDING = "black";
-
-haxapp.app.Component.BANNER_BGCOLOR_UNKNOWN = "yellow";
-haxapp.app.Component.BANNER_FGCOLOR_UNKNOWN = "black";
-
-haxapp.app.Component.PENDING_MESSAGE = "Calculation pending...";
 
 haxapp.app.Component.getTreeEntry = function() {
     return this.treeEntry;
 }
 
-/** This method returns the base member for this component. */
-haxapp.app.Component.showBannerBar = function(text,type) {
-    
-    if(!this.bannerDiv) {
-        this.bannerDiv = haxapp.ui.createElement("div",null,
-            {
-                "display":"block",
-                "position":"relative",
-                "top":"0px",
-                "backgroundColor":bgColor,
-                "color":fgColor
-            });
-    }
-    
-    //get banner color
-    var bgColor;
-    var fgColor;
-    if(type == haxapp.app.Component.BANNER_TYPE_ERROR) {
-        bgColor = haxapp.app.Component.BANNER_BGCOLOR_ERROR;
-        fgColor = haxapp.app.Component.BANNER_FGCOLOR_ERROR;
-    }
-    else if(type == haxapp.app.Component.BANNER_TYPE_PENDING) {
-        bgColor = haxapp.app.Component.BANNER_BGCOLOR_PENDING;
-        fgColor = haxapp.app.Component.BANNER_FGCOLOR_PENDING;
-    }
-    else {
-        bgColor = haxapp.app.Component.BANNER_BGCOLOR_UNKNOWN;
-        fgColor = haxapp.app.Component.BANNER_FGCOLOR_UNKNOWN;
-   }
-   var colorStyle = {};
-   colorStyle.backgroundColor = bgColor;
-   colorStyle.color = fgColor;
-   haxapp.ui.applyStyle(this.bannerDiv,colorStyle);
-       
-    //set message
-    this.bannerDiv.innerHTML = text;
-    this.bannerBarActive = true;
-	
-	this.showActiveHeaders();
-}
-
-/** This method returns the base member for this component. */
-haxapp.app.Component.hideBannerBar = function() {
-	this.bannerBarActive = false;
-	this.showActiveHeaders();
-}
-
-/** This method returns the base member for this component. */
-haxapp.app.Component.showToolbar = function(toolbarDiv) {
-    this.toolbarActive = true;
-    this.toolbarDiv = toolbarDiv;
-	this.showActiveHeaders();
-}
-
-/** This method returns the base member for this component. */
-haxapp.app.Component.hideToolbar = function() {
-    this.toolbarActive = false;
-    this.toolbarDiv = null;	
-	this.showActiveHeaders();
-}
-
-/** This method shows the active headers. 
- * @private */
-haxapp.app.Component.showActiveHeaders = function() {
-	var headers = [];
-    if((this.toolbarActive)&&(this.toolbarDiv)) {
-		headers.push(this.toolbarDiv);
-	}
-    if((this.saveBarActive)&&(this.saveDiv)) {
-		headers.push(this.saveDiv);
-	}
-	if((this.bannerBarActive)&&(this.bannerDiv)) {
-		headers.push(this.bannerDiv);
-	}
-	
-    this.windowInsideContainer.loadHeaders(headers);
-}
 
 //==============================
 // Public Instance Methods
@@ -252,16 +130,6 @@ haxapp.app.Component.getWindow = function() {
      return this.window;
 }
 
-/** This method sets the content element as a scrolling element. */
-haxapp.app.Component.setScrollingContentElement = function() {
-    this.windowInsideContainer.setBodyType(haxapp.ui.DisplayAndHeader.SCROLLING_PANE);
-}
-
-/** This method sets the content element as a fixed element. */
-haxapp.app.Component.setFixedContentElement = function() {
-    //load the content div
-    this.windowInsideContainer.setBodyType(haxapp.ui.DisplayAndHeader.FIXED_PANE);
-}
 
 /** This method returns the content element for the windowframe for this component. */
 haxapp.app.Component.getContentElement = function() {
@@ -357,8 +225,6 @@ haxapp.app.Component.memberUpdated = function() {
         var oldParent = this.activeParent;
         
         this.activeParent = this.object.getParent();
-        this.parenContainer = this.getWorkspaceUI().getParentContainerObject(this.object);
-        this.window.changeParent(this.parenContainer);
         
         //TREE_ENTRY - remove tree entry from old parent
         if(oldParent) {
@@ -374,8 +240,8 @@ haxapp.app.Component.memberUpdated = function() {
         }
     }
     
-    //update title
-    this.updateTitle();
+    //TREE_ENTRY - set the title on the tree entry
+    this.treeEntry.setLabel(this.object.getName());
     
     //update data
     var object = this.getObject();
@@ -394,27 +260,6 @@ haxapp.app.Component.memberUpdated = function() {
     else {   
         this.hideBannerBar();
     }
-}
-
-/** This method makes sure the window title is up to date.
- * @private */    
-haxapp.app.Component.updateTitle = function() {
-    //make sure the title is up to date
-    var member = this.getObject();
-    
-    var window = this.getWindow();
-    if(window) {
-        
-        var displayName = member.getDisplayName();
-        var windowTitle = window.getTitle();
-        if(windowTitle !== displayName) {
-            window.setTitle(displayName);
-        }
-    }
-    
-    //TREE_ENTRY - set the title on the tree entry
-    this.treeEntry.setLabel(member.getName());
-    
 }
 
 /** This method is used for setting initial values in the property dialog. 
