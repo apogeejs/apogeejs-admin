@@ -68,9 +68,7 @@ haxapp.app.Hax.prototype.setWorkspaceUI = function(workspaceUI) {
         throw hax.base.createError("There is already an open workspace",false);
     }
     
-	var tab = this.tabFrame.addTab("DUMMY NAME");
-    this.tabFrame.setActiveTab("DUMMY NAME");
-    workspaceUI.setApp(this,tab,this.treePane);
+    workspaceUI.setApp(this,this.tabFrame,this.treePane);
     this.workspaceUI = workspaceUI;
     return true;
 }
@@ -79,7 +77,7 @@ haxapp.app.Hax.prototype.setWorkspaceUI = function(workspaceUI) {
 haxapp.app.Hax.prototype.clearWorkspaceUI = function() {
     //remove the workspace from the app
     this.workspaceUI = null;
-    this.tabFrame.removeTab("DUMMY NAME");
+//    this.tabFrame.removeTab("DUMMY NAME");
     return true;
 }
 

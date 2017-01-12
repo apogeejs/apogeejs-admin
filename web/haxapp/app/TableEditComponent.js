@@ -2,22 +2,22 @@
  *that edits a table. This mixin requires the object be a component.
  * 
  * This is not a class, but it is used for the prototype of the objects that inherit from it.
+ * 
+ * NOW IT IS A CLASS, FOR NOW AT LEAST
  */
-haxapp.app.TableEditComponent = {};
+
 
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-haxapp.app.TableEditComponent.init = function(component,settings,options) {
-    
-    this.options = options;
+haxapp.app.TableEditComponent = function(component,settings,options) {
     
     this.component = component;
+    this.options = options;
 	
 	this.viewTypes = settings.viewModes;
     this.defaultViewType = settings.defaultView;
     
-    this.window = null;
-    this.container = null;
+    this.containerElement = null;
 	
     this.viewType = null;
 	this.viewModeElement = null;
@@ -31,8 +31,8 @@ haxapp.app.TableEditComponent.init = function(component,settings,options) {
 	this.clearFunctionCallback = null;
     
     //add a cleanup action to the base component - component must already be initialized
-    this.addSaveAction(haxapp.app.TableEditComponent.writeToJson);
-    this.addCleanupAction(haxapp.app.TableEditComponent.destroy);
+//    this.addSaveAction(haxapp.app.TableEditComponent.writeToJson);
+//    this.addCleanupAction(haxapp.app.TableEditComponent.destroy);
 
 }
 
@@ -41,7 +41,7 @@ haxapp.app.TableEditComponent.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
 /** This method populates the frame for this component. 
  * @protected */
-haxapp.app.TableEditComponent.setViewType = function(viewType) {
+haxapp.app.TableEditComponent.prototype.setViewType = function(viewType) {
 	//return if there is no change
 	if(this.viewType === viewType) return false;
     
@@ -56,7 +56,7 @@ haxapp.app.TableEditComponent.setViewType = function(viewType) {
 		this.showModeElement(null);
 	}
     
-    this.viewModeElement = this.getViewModeElement(viewType);
+    this.viewModeElement = this.component.getViewModeElement(viewType);
     this.viewType = viewType;
     
     return true;
@@ -64,10 +64,10 @@ haxapp.app.TableEditComponent.setViewType = function(viewType) {
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-//haxapp.app.TableEditComponent.getViewModeElement = function(viewType);
+//haxapp.app.TableEditComponent.prototype.getViewModeElement = function(viewType);
 
 //this function will update the view shown in the dropdown
-haxapp.app.TableEditComponent.updateViewDropdown = function(viewType) {
+haxapp.app.TableEditComponent.prototype.updateViewDropdown = function(viewType) {
     if(!viewType) {
         viewType = this.defaultViewType;
     }
@@ -76,9 +76,9 @@ haxapp.app.TableEditComponent.updateViewDropdown = function(viewType) {
 
 /** This method updates the table data 
  * @private */    
-haxapp.app.TableEditComponent.memberUpdated = function() {
+haxapp.app.TableEditComponent.prototype.memberUpdated = function() {
     
-    var object = this.getObject();
+    var object = this.component.getObject();
         
     if(this.viewModeElementShowing !== this.viewModeElement) {
         this.showModeElement(this.viewModeElement);
@@ -113,7 +113,7 @@ haxapp.app.TableEditComponent.memberUpdated = function() {
 	}
 }
 
-haxapp.app.TableEditComponent.getClearFunctionCallback = function() {
+haxapp.app.TableEditComponent.prototype.getClearFunctionCallback = function() {
 	var table = this.getObject();
 	var blankDataValue = this.clearFunctionDataValue;
     return function() {
@@ -126,36 +126,35 @@ haxapp.app.TableEditComponent.getClearFunctionCallback = function() {
 
 /** This method should be called to set up the component ui for edit mode. 
  * @protected */
-haxapp.app.TableEditComponent.startEditUI = function(onSave,onCancel) {
+haxapp.app.TableEditComponent.prototype.startEditUI = function(onSave,onCancel) {
     this.select.disabled = true;
     this.showSaveBar(onSave,onCancel);
 }
 
 /** This method populates the frame for this component. 
  * @protected */
-haxapp.app.TableEditComponent.endEditUI = function() {
+haxapp.app.TableEditComponent.prototype.endEditUI = function() {
     this.hideSaveBar();
     this.select.disabled = false;
 }
 /** This method populates the frame for this component. 
  * @protected */
-haxapp.app.TableEditComponent.initUI = function(window,componentDisplay) {
+haxapp.app.TableEditComponent.prototype.initUI = function(componentDisplay) {
     
-    this.window = window;
     this.componentDisplay = componentDisplay;
-    this.container = componentDisplay.getContentElement();
+    this.containerElement = componentDisplay.getContentElement();
     
     //set initial view type
     var initialViewType;
-        if( (this.options) &&
-            (this.options.viewType) &&
-            (this.viewTypes.indexOf(initialViewType) < 0) ) {
-            
-            this.options.viewType;
-        }
-        else {
-            this.defaultViewType;
-        }    
+    if( (this.options) &&
+        (this.options.viewType) &&
+        (this.viewTypes.indexOf(initialViewType) < 0) ) {
+
+        initialViewType = this.options.viewType;
+    }
+    else {
+        initialViewType = this.defaultViewType;
+    }    
 	
 	this.componentDisplay.setFixedContentElement();
     
@@ -200,7 +199,7 @@ haxapp.app.TableEditComponent.initUI = function(window,componentDisplay) {
 
     this.normalToolbarDiv.appendChild(document.createTextNode("View: "));
     this.normalToolbarDiv.appendChild(this.select);
-    this.showToolbar(this.normalToolbarDiv);
+    this.componentDisplay.showToolbar(this.normalToolbarDiv);
     
     this.setViewType(initialViewType);
     this.updateViewDropdown(this.viewType);
@@ -208,7 +207,7 @@ haxapp.app.TableEditComponent.initUI = function(window,componentDisplay) {
 
 
 /** This method returns the base member for this component. */
-haxapp.app.TableEditComponent.showSaveBar = function(onSave,onCancel) {
+haxapp.app.TableEditComponent.prototype.showSaveBar = function(onSave,onCancel) {
     if(!this.saveDiv) {
         this.saveDiv = haxapp.ui.createElement("div",null,
             {
@@ -242,19 +241,19 @@ haxapp.app.TableEditComponent.showSaveBar = function(onSave,onCancel) {
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.TableEditComponent.hideSaveBar = function() {
+haxapp.app.TableEditComponent.prototype.hideSaveBar = function() {
     this.saveBarActive = false;	
 	this.componentDisplay.showToolbar(this.normalToolbarDiv);
 }
 
 /** @private */
-haxapp.app.TableEditComponent.showModeElement = function(viewModeElement) {
+haxapp.app.TableEditComponent.prototype.showModeElement = function(viewModeElement) {
     
-	haxapp.ui.removeAllChildren(this.container);
+	haxapp.ui.removeAllChildren(this.containerElement);
 	
     if(viewModeElement) {
 		var viewDiv = viewModeElement.getElement();
-		this.container.appendChild(viewDiv);
+		this.containerElement.appendChild(viewDiv);
 	}
 	
 	if(this.viewModeElementShowing) {
@@ -269,13 +268,13 @@ haxapp.app.TableEditComponent.showModeElement = function(viewModeElement) {
 //======================================
 
 /** @protected */
-haxapp.app.TableEditComponent.destroy = function() {
+haxapp.app.TableEditComponent.prototype.destroy = function() {
     if(this.viewModeElement) {
         this.viewModeElement.destroy();
     }
 }
 
 /** This serializes the table component. */
-haxapp.app.TableEditComponent.writeToJson = function(json) {
+haxapp.app.TableEditComponent.prototype.writeToJson = function(json) {
     json.viewType = this.viewType;
 }

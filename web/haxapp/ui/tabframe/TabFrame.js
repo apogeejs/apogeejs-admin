@@ -55,7 +55,7 @@ haxapp.ui.TabFrame.prototype.addTab = function(name) {
     
     //create the tab object
     var tab = new haxapp.ui.Tab(name, this);
-    this.tabFrame.appendChild(tab.getContainerElement());
+    this.tabFrame.appendChild(tab.getOuterElement());
     
     //create tab label
     var tabLabelElement = haxapp.ui.createElementWithClass("div","visiui-tf-tab-base visiui-tf-tab-inactive",this.tabBar);
@@ -125,11 +125,11 @@ haxapp.ui.TabFrame.prototype.updateTabDisplay = function() {
     for(title in this.tabTable) {
         var tabData = this.tabTable[title];
         if(title == this.activeTab) {
-            tabData.tabDisplay.getContainerElement().style.display = "";
+            tabData.tabDisplay.getOuterElement().style.display = "";
             tabData.tabLabel.className = "visiui-tf-tab-base visiui-tf-tab-active";
         }
         else {
-            tabData.tabDisplay.getContainerElement().style.display = "none";
+            tabData.tabDisplay.getOuterElement().style.display = "none";
             tabData.tabLabel.className = "visiui-tf-tab-base visiui-tf-tab-inactive";
         }
     }

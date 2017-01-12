@@ -2,8 +2,6 @@
 haxapp.app.FolderComponent = function(workspaceUI,folder,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,folder,haxapp.app.FolderComponent.generator,componentJson);
-    haxapp.ui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
-	haxapp.ui.ParentHighlighter.init.call(this,this.getContentElement());
     
     //add a cleanup and save actions
     this.addSaveAction(haxapp.app.FolderComponent.writeToJson);
@@ -11,8 +9,6 @@ haxapp.app.FolderComponent = function(workspaceUI,folder,componentJson) {
 
 //add components to this class
 hax.base.mixin(haxapp.app.FolderComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.FolderComponent,haxapp.ui.ParentContainer);
-hax.base.mixin(haxapp.app.FolderComponent,haxapp.ui.ParentHighlighter);
 
 //----------------------
 // ParentContainer Methods

@@ -17,10 +17,10 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     this.activeParent = object.getParent();
     this.generator = generator;
     
-    this.parentContainer = this.workspaceUI.getParentContainerObject(this.object);
-    if(!this.parentContainer) {
-        throw hax.base.createError("Parent object not found: " + object.getFullName());
-    }
+//    this.parentContainer = this.workspaceUI.getParentContainerObject(this.object);
+//    if(!this.parentContainer) {
+//        throw hax.base.createError("Parent object not found: " + object.getFullName());
+//    }
     
     this.workspaceUI.registerMember(this.object,this);
     
@@ -43,28 +43,28 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     //create window
     //--------------
     
-    this.window = this.createDisplayFrame();
-    this.componentDisplay = new haxapp.app.ComponentDisplay(this.window, this, this.generator, this.options);
-    this.populateFrame(this.componentDisplay);
-    
-    //THESE OPTIONS - SHOULD THEY DEPEND ON THE PARTICULAR CONTAINER TAB?
-    //show the window
-    if(this.options.coordInfo) {
-        this.window.setCoordinateInfo(this.options.coordInfo);
-    }
-    else {
-        //set position 
-        var pos = this.parentContainer.getNextWindowPosition();
-        this.window.setPosition(pos[0],pos[1]);
-        
-        //set default size
-        this.window.setSize(this.generator.DEFAULT_WIDTH,this.generator.DEFAULT_HEIGHT);
-    }
-    if(this.options.windowState) {
-        this.window.setWindowState(this.options.windowState);
-    }
-    
-    this.window.show();
+//    this.window = this.createDisplayFrame();
+//    this.componentDisplay = new haxapp.app.ComponentDisplay(this.window, this, this.generator, this.options);
+//    this.populateFrame(this.componentDisplay);
+//    
+//    //THESE OPTIONS - SHOULD THEY DEPEND ON THE PARTICULAR CONTAINER TAB?
+//    //show the window
+//    if(this.options.coordInfo) {
+//        this.window.setCoordinateInfo(this.options.coordInfo);
+//    }
+//    else {
+//        //set position 
+//        var pos = this.parentContainer.getNextWindowPosition();
+//        this.window.setPosition(pos[0],pos[1]);
+//        
+//        //set default size
+//        this.window.setSize(this.generator.DEFAULT_WIDTH,this.generator.DEFAULT_HEIGHT);
+//    }
+//    if(this.options.windowState) {
+//        this.window.setWindowState(this.options.windowState);
+//    }
+//    
+//    this.window.show();
    
 }
 
@@ -133,6 +133,7 @@ haxapp.app.Component.getWindow = function() {
 
 /** This method returns the content element for the windowframe for this component. */
 haxapp.app.Component.getContentElement = function() {
+    alert("This shouldn't be called!");
      return this.windowInsideContainer.getBodyElement();
 }
 
@@ -165,7 +166,7 @@ haxapp.app.Component.createTreeEntry = function() {
     var instance = this;
     
     var openCallback = function() {
-        alert("Open pressed!");
+        instance.openWindow();
     } 
     
     var contextMenuCallback = function(event) {
@@ -199,8 +200,8 @@ haxapp.app.Component.createTreeEntry = function() {
  * actions should pass a callback function to the method "addClenaupAction" */
 haxapp.app.Component.onDelete = function() {
     //remove the UI element
-    var componentWindow = this.getWindow();
-    componentWindow.deleteWindow();
+//    var componentWindow = this.getWindow();
+//    componentWindow.deleteWindow();
     
     //TREE_ENTRY - remove tree entry from the parent
     if(this.activeParent) {
@@ -252,13 +253,13 @@ haxapp.app.Component.memberUpdated = function() {
             errorMsg += actionErrors[i].msg + "\n";
         }
         
-        this.showBannerBar(errorMsg,haxapp.app.Component.BANNER_TYPE_ERROR);
+//        this.showBannerBar(errorMsg,haxapp.app.Component.BANNER_TYPE_ERROR);
     }
     else if(object.getResultPending()) {
-        this.showBannerBar(haxapp.app.Component.PENDING_MESSAGE,haxapp.app.Component.BANNER_TYPE_PENDING);
+//        this.showBannerBar(haxapp.app.Component.PENDING_MESSAGE,haxapp.app.Component.BANNER_TYPE_PENDING);
     }
     else {   
-        this.hideBannerBar();
+//        this.hideBannerBar();
     }
 }
 
@@ -278,6 +279,18 @@ haxapp.app.Component.getPropertyValues = function() {
         generator.addPropFunction(member,values);
     }
     return values;
+}
+
+haxapp.app.Component.openWindow = function() {
+    if(this.tab) {
+        //we already have an opened window - make it active
+        this.workspaceUI.setTabActive(this.tab);
+    }
+    else {
+        this.tab = this.workspaceUI.requestTab(this.object.getFullName());
+        this.componentDisplay = new haxapp.app.ComponentDisplay(this.tab,this);
+        this.populateDisplay(this.componentDisplay);
+    }
 }
 
 //=============================

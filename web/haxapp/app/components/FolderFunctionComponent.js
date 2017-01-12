@@ -3,8 +3,6 @@
 haxapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,folderFunction,haxapp.app.FolderFunctionComponent.generator,componentJson);
-    haxapp.ui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
-	haxapp.ui.ParentHighlighter.init.call(this,this.getContentElement());
     
     //register this object as a parent container
     var internalFolder = folderFunction.getInternalFolder();
@@ -18,8 +16,6 @@ haxapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,compone
 
 //add components to this class
 hax.base.mixin(haxapp.app.FolderFunctionComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.FolderFunctionComponent,haxapp.ui.ParentContainer);
-hax.base.mixin(haxapp.app.FolderFunctionComponent,haxapp.ui.ParentHighlighter);
 
 //----------------------
 // ParentContainer Methods

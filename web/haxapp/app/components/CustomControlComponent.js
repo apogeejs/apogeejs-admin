@@ -5,7 +5,6 @@
 haxapp.app.CustomControlComponent = function(workspaceUI,control,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,control,haxapp.app.CustomControlComponent.generator,componentJson);
-	haxapp.app.TableEditComponent.init.call(this,haxapp.app.CustomControlComponent.TABLE_EDIT_SETTINGS,componentJson);
 	
 	//create a resource based on the json (or lack of a json)
     if((componentJson)&&(componentJson.resource)) {
@@ -22,7 +21,6 @@ haxapp.app.CustomControlComponent = function(workspaceUI,control,componentJson) 
 
 //add components to this class
 hax.base.mixin(haxapp.app.CustomControlComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.CustomControlComponent,haxapp.app.TableEditComponent);
 
 //==============================
 //Resource Accessors

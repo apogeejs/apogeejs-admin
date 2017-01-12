@@ -5,7 +5,6 @@
 haxapp.app.BasicControlComponent = function(workspaceUI,control,generator,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,control,generator,componentJson);
-	haxapp.app.TableEditComponent.init.call(this,haxapp.app.BasicControlComponent.TABLE_EDIT_SETTINGS,componentJson);
 	
 	var resource = control.getResource();
 	resource.setComponent(this);
@@ -16,7 +15,6 @@ haxapp.app.BasicControlComponent = function(workspaceUI,control,generator,compon
 
 //add components to this class
 hax.base.mixin(haxapp.app.BasicControlComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.BasicControlComponent,haxapp.app.TableEditComponent);
 
 //==============================
 // Protected and Private Instance Methods

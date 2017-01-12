@@ -3,14 +3,12 @@
 haxapp.app.TextComponent = function(workspaceUI,table,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,table,haxapp.app.TextComponent.generator,componentJson);
-	haxapp.app.TableEditComponent.init.call(this,haxapp.app.TextComponent.TABLE_EDIT_SETTINGS,componentJson);
     
     this.memberUpdated();
 };
 
 //add components to this class
 hax.base.mixin(haxapp.app.TextComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.TextComponent,haxapp.app.TableEditComponent);
 
 //==============================
 // Protected and Private Instance Methods

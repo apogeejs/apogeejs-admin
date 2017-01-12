@@ -3,14 +3,12 @@
 haxapp.app.GridTableComponent = function(workspaceUI,table,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,table,haxapp.app.GridTableComponent.generator,componentJson);
-	haxapp.app.TableEditComponent.init.call(this,haxapp.app.GridTableComponent.TABLE_EDIT_SETTINGS,componentJson);
     
     this.memberUpdated();
 };
 
 //add components to this class
 hax.base.mixin(haxapp.app.GridTableComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.GridTableComponent,haxapp.app.TableEditComponent);
 
 //==============================
 // Protected and Private Instance Methods

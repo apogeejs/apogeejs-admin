@@ -2,7 +2,7 @@
  
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-haxapp.app.ComponentDisplay = function(window,component,generator,options) {
+haxapp.app.ComponentDisplay = function(container,component,options) {
     
     if(!options) {
         options = {};
@@ -16,18 +16,18 @@ haxapp.app.ComponentDisplay = function(window,component,generator,options) {
     
     //set fixed pane for header container - will customize later
     this.windowInsideContainer = new haxapp.ui.HeaderContainer(haxapp.ui.DisplayAndHeader.FIXED_PANE);
-    window.setContent(this.windowInsideContainer.getOuterElement());
+    container.getBody().appendChild(this.windowInsideContainer.getOuterElement());
 
     //------------------
     // Add menu (we will add the items later. This populates it.)
     //------------------
 
-    var menu = window.getMenu();
+    var menu = container.getMenu();
     
     //------------------
     //set the title
     //------------------
-    window.setTitle(this.getObject().getDisplayName());
+    container.setTitle(component.getObject().getDisplayName());
     
     //headers
     this.toolbarDiv = null;
@@ -76,12 +76,12 @@ haxapp.app.ComponentDisplay.BANNER_FGCOLOR_UNKNOWN = "black";
 
 haxapp.app.ComponentDisplay.PENDING_MESSAGE = "Calculation pending...";
 
-haxapp.app.ComponentDisplay.getTreeEntry = function() {
+haxapp.app.ComponentDisplay.prototype.getTreeEntry = function() {
     return this.treeEntry;
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.ComponentDisplay.showBannerBar = function(text,type) {
+haxapp.app.ComponentDisplay.prototype.showBannerBar = function(text,type) {
     
     if(!this.bannerDiv) {
         this.bannerDiv = haxapp.ui.createElement("div",null,
@@ -122,20 +122,20 @@ haxapp.app.ComponentDisplay.showBannerBar = function(text,type) {
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.ComponentDisplay.hideBannerBar = function() {
+haxapp.app.ComponentDisplay.prototype.hideBannerBar = function() {
 	this.bannerBarActive = false;
 	this.showActiveHeaders();
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.ComponentDisplay.showToolbar = function(toolbarDiv) {
+haxapp.app.ComponentDisplay.prototype.showToolbar = function(toolbarDiv) {
     this.toolbarActive = true;
     this.toolbarDiv = toolbarDiv;
 	this.showActiveHeaders();
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.ComponentDisplay.hideToolbar = function() {
+haxapp.app.ComponentDisplay.prototype.hideToolbar = function() {
     this.toolbarActive = false;
     this.toolbarDiv = null;	
 	this.showActiveHeaders();
@@ -143,7 +143,7 @@ haxapp.app.ComponentDisplay.hideToolbar = function() {
 
 /** This method shows the active headers. 
  * @private */
-haxapp.app.ComponentDisplay.showActiveHeaders = function() {
+haxapp.app.ComponentDisplay.prototype.showActiveHeaders = function() {
 	var headers = [];
     if((this.toolbarActive)&&(this.toolbarDiv)) {
 		headers.push(this.toolbarDiv);
@@ -164,18 +164,18 @@ haxapp.app.ComponentDisplay.showActiveHeaders = function() {
 
 
 /** This method sets the content element as a scrolling element. */
-haxapp.app.ComponentDisplay.setScrollingContentElement = function() {
+haxapp.app.ComponentDisplay.prototype.setScrollingContentElement = function() {
     this.windowInsideContainer.setBodyType(haxapp.ui.DisplayAndHeader.SCROLLING_PANE);
 }
 
 /** This method sets the content element as a fixed element. */
-haxapp.app.ComponentDisplay.setFixedContentElement = function() {
+haxapp.app.ComponentDisplay.prototype.setFixedContentElement = function() {
     //load the content div
     this.windowInsideContainer.setBodyType(haxapp.ui.DisplayAndHeader.FIXED_PANE);
 }
 
 /** This method returns the content element for the windowframe for this component. */
-haxapp.app.ComponentDisplay.getContentElement = function() {
+haxapp.app.ComponentDisplay.prototype.getContentElement = function() {
      return this.windowInsideContainer.getBodyElement();
 }
 
@@ -185,7 +185,7 @@ haxapp.app.ComponentDisplay.getContentElement = function() {
 
 /** This method extends the member udpated function from the base.
  * @protected */    
-haxapp.app.ComponentDisplay.memberUpdated = function() {
+haxapp.app.ComponentDisplay.prototype.memberUpdated = function() {
     //check for change of parent
     if(this.object.getParent() !== this.activeParent) {
         this.activeParent = this.object.getParent();
@@ -217,7 +217,7 @@ haxapp.app.ComponentDisplay.memberUpdated = function() {
 
 /** This method makes sure the window title is up to date.
  * @private */    
-haxapp.app.ComponentDisplay.updateTitle = function() {
+haxapp.app.ComponentDisplay.prototype.updateTitle = function() {
     //make sure the title is up to date
     var member = this.getObject();
     

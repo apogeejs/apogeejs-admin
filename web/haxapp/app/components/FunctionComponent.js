@@ -2,14 +2,12 @@
 haxapp.app.FunctionComponent = function(workspaceUI, functionObject, componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,functionObject,haxapp.app.FunctionComponent.generator,componentJson);
-    haxapp.app.TableEditComponent.init.call(this,haxapp.app.FunctionComponent.TABLE_EDIT_SETTINGS,componentJson);
     
     this.memberUpdated();
 };
 
 //add components to this class
 hax.base.mixin(haxapp.app.FunctionComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.FunctionComponent,haxapp.app.TableEditComponent);
 
 //==============================
 // Protected and Private Instance Methods

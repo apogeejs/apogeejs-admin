@@ -2,16 +2,12 @@
 haxapp.app.JsonTableComponent = function(workspaceUI,table,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,table,haxapp.app.JsonTableComponent.generator,componentJson);
-    haxapp.app.TableEditComponent.init.call(this,
-		haxapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS,
-        componentJson);
 	
     this.memberUpdated();
 };
 
 //add components to this class
 hax.base.mixin(haxapp.app.JsonTableComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.JsonTableComponent,haxapp.app.TableEditComponent);
 
 //==============================
 // Protected and Private Instance Methods
@@ -38,6 +34,11 @@ haxapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS = {
     "defaultView": haxapp.app.JsonTableComponent.VIEW_PLAIN_TEXT,
     "clearFunctionMenuText": "Clear Formula",
     "emptyDataValue": ""
+}
+
+haxapp.app.JsonTableComponent.prototype.populateDisplay = function(componentDisplay) {
+    var content = new haxapp.app.TableEditComponent(this,haxapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS);
+    content.initUI(componentDisplay);
 }
 
 /** This method should be implemented to retrieve a view mode of the give type. 
