@@ -53,7 +53,7 @@ haxapp.app.JsonFormEditor.prototype.showData = function(data,editOk) {
         this.editorDiv.style.backgroundColor = "";
     }
     else {
-        this.editorDiv.style.backgroundColor = haxapp.app.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
+        this.editorDiv.style.backgroundColor = haxapp.app.EditComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
     }
 }
 

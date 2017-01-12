@@ -36,34 +36,33 @@ haxapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS = {
     "emptyDataValue": ""
 }
 
-haxapp.app.JsonTableComponent.prototype.populateDisplay = function(componentDisplay) {
-    var content = new haxapp.app.TableEditComponent(this,haxapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS);
-    content.initUI(componentDisplay);
+haxapp.app.JsonTableComponent.prototype.createComponentDisplay = function(container) {
+    return new haxapp.app.EditComponentDisplay(this,container,haxapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS);
 }
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-haxapp.app.JsonTableComponent.prototype.getViewModeElement = function(viewType) {
+haxapp.app.JsonTableComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
 	
 	//create the new view element;
 	switch(viewType) {
         case haxapp.app.JsonTableComponent.VIEW_PLAIN_TEXT:
-            return new haxapp.app.AceDataMode(this,false);
+            return new haxapp.app.AceDataMode(editComponentDisplay,false);
             
 		case haxapp.app.JsonTableComponent.VIEW_JSON_TEXT:
-			return new haxapp.app.AceDataMode(this,true);
+			return new haxapp.app.AceDataMode(editComponentDisplay,true);
 			
 		case haxapp.app.JsonTableComponent.VIEW_FORM:
-			return new haxapp.app.FormDataMode(this);
+			return new haxapp.app.FormDataMode(editComponentDisplay);
 			
 		case haxapp.app.JsonTableComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(this,haxapp.app.JsonTableComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
+			return new haxapp.app.AceCodeMode(editComponentDisplay,haxapp.app.JsonTableComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
 			
 		case haxapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new haxapp.app.AceSupplementalMode(this);
+			return new haxapp.app.AceSupplementalMode(editComponentDisplay);
             
         case haxapp.app.JsonTableComponent.VIEW_DESCRIPTION:
-			return new haxapp.app.AceDescriptionMode(this);
+			return new haxapp.app.AceDescriptionMode(editComponentDisplay);
 			
 		default:
 //temporary error handling...

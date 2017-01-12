@@ -64,7 +64,7 @@ module.exports = function(grunt) {
                 "haxapp/app/Hax.js",
                 "haxapp/app/LinkManager.js",
                 "haxapp/app/Component.js",
-                "haxapp/app/TableEditComponent.js",
+                "haxapp/app/EditComponentDisplay.js",
                 "haxapp/app/WorkspaceUI.js",
                 "haxapp/app/components/FolderComponent.js",
                 "haxapp/app/components/JsonTableComponent.js",

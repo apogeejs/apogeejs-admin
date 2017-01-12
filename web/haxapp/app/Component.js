@@ -284,14 +284,17 @@ haxapp.app.Component.getPropertyValues = function() {
 haxapp.app.Component.openWindow = function() {
     if(this.tab) {
         //we already have an opened window - make it active
-        this.workspaceUI.setTabActive(this.tab);
+        this.workspaceUI.setActiveTab(this.tab);
     }
     else {
-        this.tab = this.workspaceUI.requestTab(this.object.getFullName());
-        this.componentDisplay = new haxapp.app.ComponentDisplay(this.tab,this);
-        this.populateDisplay(this.componentDisplay);
+        this.tab = this.workspaceUI.requestTab(this.object.getFullName(),true);
+        this.createComponentDisplay(this.tab);
     }
 }
+
+///** This method shoudl be implemented by an extending class to create a component
+// * display, given a container, for the component. */
+//haxapp.app.Component.prototype.createComponentDisplay = function(container);
 
 //=============================
 // Action UI Entry Points

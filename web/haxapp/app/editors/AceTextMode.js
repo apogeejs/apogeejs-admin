@@ -1,6 +1,6 @@
 
-haxapp.app.AceTextMode = function(component) {
-	this.component = component;
+haxapp.app.AceTextMode = function(componentDisplay) {
+	this.componentDisplay = componentDisplay;
 	
 	this.editOk = false;
 	
@@ -12,7 +12,7 @@ haxapp.app.AceTextMode = function(component) {
 		return instance.onCancel();
 	}
 	
-	this.editor = new haxapp.app.AceTextEditor(component,"ace/mode/text",onSave,onCancel);
+	this.editor = new haxapp.app.AceTextEditor(componentDisplay,"ace/mode/text",onSave,onCancel);
 	
 }
 
@@ -29,7 +29,7 @@ haxapp.app.AceTextMode.prototype.getElement = function() {
 	
 haxapp.app.AceTextMode.prototype.showData = function(editOk) {
 		
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
 	var json = table.getData();	
 
 	this.editOk = editOk;
@@ -60,7 +60,7 @@ haxapp.app.AceTextMode.prototype.onSave = function(text) {
 		text = "";
 	}
 	
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
     
     var actionData = {};
     actionData.action = "updateData";

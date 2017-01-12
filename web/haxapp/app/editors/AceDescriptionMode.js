@@ -1,6 +1,6 @@
 
-haxapp.app.AceDescriptionMode = function(component) {
-	this.component = component;
+haxapp.app.AceDescriptionMode = function(componentDisplay) {
+	this.componentDisplay = componentDisplay;
 	
 	this.editOk = false;
 	
@@ -12,8 +12,8 @@ haxapp.app.AceDescriptionMode = function(component) {
 		return instance.onCancel();
 	}
 	
-    this.editor = new haxapp.app.TextAreaEditor(component,onSave,onCancel);
-	//this.editor = new haxapp.app.AceTextEditor(component,"ace/mode/text",onSave,onCancel);
+    this.editor = new haxapp.app.TextAreaEditor(componentDisplay,onSave,onCancel);
+	//this.editor = new haxapp.app.AceTextEditor(componentDisplay,"ace/mode/text",onSave,onCancel);
 	
 }
 
@@ -30,7 +30,7 @@ haxapp.app.AceDescriptionMode.prototype.getElement = function() {
 	
 haxapp.app.AceDescriptionMode.prototype.showData = function(editOk) {
 		
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
 	var json = table.getDescription();	
 
 	this.editOk = editOk;
@@ -61,7 +61,7 @@ haxapp.app.AceDescriptionMode.prototype.onSave = function(text) {
 		text = "";
 	}
 	
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
     
     var actionData = {};
     actionData.action = "updateDescription";

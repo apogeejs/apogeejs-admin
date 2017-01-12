@@ -1,6 +1,6 @@
 
-haxapp.app.ResourceOutputMode = function(component) {
-	this.component = component;
+haxapp.app.ResourceOutputMode = function(componentDisplay) {
+	this.componentDisplay = componentDisplay;
 	
 	this.outputElement = haxapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -22,7 +22,7 @@ haxapp.app.ResourceOutputMode.prototype.getElement = function() {
 haxapp.app.ResourceOutputMode.prototype.showData = function(editOk) {
 	//edit ok ignored - no edit of the control data object - there is none
 	
-	var control = this.component.getObject();
+	var control = this.componentDisplay.getObject();
     var resource = control.getResource();
     if((resource)&&(resource.show)) {
         resource.show();
@@ -30,7 +30,7 @@ haxapp.app.ResourceOutputMode.prototype.showData = function(editOk) {
 }
 
 haxapp.app.ResourceOutputMode.prototype.destroy = function() {
-    var control = this.component.getObject();
+    var control = this.componentDisplay.getObject();
     var resource = control.getResource();
     if((resource)&&(resource.hide)) {
         resource.hide();

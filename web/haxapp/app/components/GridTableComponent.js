@@ -35,24 +35,28 @@ haxapp.app.GridTableComponent.TABLE_EDIT_SETTINGS = {
 
 haxapp.app.GridTableComponent.DEFAULT_VIEW = haxapp.app.GridTableComponent.VIEW_GRID;
 
+haxapp.app.GridTableComponent.prototype.createComponentDisplay = function(container) {
+    return new haxapp.app.EditComponentDisplay(this,container,haxapp.app.GridTableComponent.TABLE_EDIT_SETTINGS);
+}
+
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-haxapp.app.GridTableComponent.prototype.getViewModeElement = function(viewType) {
+haxapp.app.GridTableComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
 	
 	//create the new view element;
 	switch(viewType) {
 			
 		case haxapp.app.GridTableComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(this,haxapp.app.GridTableComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
+			return new haxapp.app.AceCodeMode(editComponentDisplay,haxapp.app.GridTableComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
 			
 		case haxapp.app.GridTableComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new haxapp.app.AceSupplementalMode(this);
+			return new haxapp.app.AceSupplementalMode(editComponentDisplay);
 			
 		case haxapp.app.GridTableComponent.VIEW_GRID:
-			return new haxapp.app.HandsonGridMode(this);
+			return new haxapp.app.HandsonGridMode(editComponentDisplay);
             
         case haxapp.app.GridTableComponent.VIEW_DESCRIPTION:
-			return new haxapp.app.AceDescriptionMode(this);
+			return new haxapp.app.AceDescriptionMode(editComponentDisplay);
 			
 		default:
 //temporary error handling...

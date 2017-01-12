@@ -1,6 +1,6 @@
 
-haxapp.app.FormDataMode = function(component) {
-	this.component = component;
+haxapp.app.FormDataMode = function(componentDisplay) {
+	this.componentDisplay = componentDisplay;
 
 	var instance = this;
 	var onSave = function(data) {
@@ -20,7 +20,7 @@ haxapp.app.FormDataMode.prototype.getElement = function() {
 	
 haxapp.app.FormDataMode.prototype.showData = function(editOk) {
 		
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
 	var json = table.getData();	
 	
 	this.editor.showData(json,editOk);
@@ -35,7 +35,7 @@ haxapp.app.FormDataMode.prototype.destroy = function() {
 
 haxapp.app.FormDataMode.prototype.onSave = function(data) {
 
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
     
     var actionData = {};
     actionData.action = "updateData";

@@ -1,11 +1,11 @@
 /** Editor that uses the Ace text editor.
  * 
- * @param {type} component - the hax component
+ * @param {type} componentDisplay - the hax componentDisplay
  * @param {type} aceMode - the display format, such as "ace/mode/json"
  * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
  * @param {type} onCancel - returns true if the edit should end
  */
-haxapp.app.TextAreaEditor = function(component,onSave,onCancel) {
+haxapp.app.TextAreaEditor = function(componentDisplay,onSave,onCancel) {
     
     this.outsideDiv = haxapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -28,8 +28,8 @@ haxapp.app.TextAreaEditor = function(component,onSave,onCancel) {
     this.textArea.readOnly = true;
     this.outsideDiv.appendChild(this.textArea);  
 	
-	this.component = component;
-	this.table = component.getObject();
+	this.componentDisplay = componentDisplay;
+	this.table = componentDisplay.getObject();
 	this.workingData = null;
 	this.editOk = false;
 	this.editMode = false;
@@ -90,7 +90,7 @@ haxapp.app.TextAreaEditor.prototype.showData = function(text,editOk) {
         this.textArea.style.backgroundColor = "";
     }
     else {
-        this.textArea.style.backgroundColor = haxapp.app.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
+        this.textArea.style.backgroundColor = haxapp.app.EditComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
     }
     
 }
@@ -106,7 +106,7 @@ haxapp.app.TextAreaEditor.prototype.destroy = function() {
 haxapp.app.TextAreaEditor.prototype.endEditMode = function() {
 	this.editMode = false;
 	this.textArea.readOnly = true;
-	this.component.endEditUI();
+	this.componentDisplay.endEditUI();
 }
 
 /** @private */
@@ -121,7 +121,7 @@ haxapp.app.TextAreaEditor.prototype.onMouseClick = function() {
 			instance.cancel();
 		}
 		
-		this.component.startEditUI(onSave,onCancel);
+		this.componentDisplay.startEditUI(onSave,onCancel);
 		
 		this.textArea.readOnly = false;
 		this.editMode = true;

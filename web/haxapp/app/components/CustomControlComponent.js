@@ -71,33 +71,37 @@ haxapp.app.CustomControlComponent.TABLE_EDIT_SETTINGS = {
     "defaultView": haxapp.app.CustomControlComponent.VIEW_OUTPUT
 }
 
+haxapp.app.CustomControlComponent.prototype.createComponentDisplay = function(container) {
+    return new haxapp.app.EditComponentDisplay(this,container,haxapp.app.CustomControlComponent.TABLE_EDIT_SETTINGS);
+}
+
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-haxapp.app.CustomControlComponent.prototype.getViewModeElement = function(viewType) {
+haxapp.app.CustomControlComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
 	
 	//create the new view element;
 	switch(viewType) {
 		
 		case haxapp.app.CustomControlComponent.VIEW_OUTPUT:
 			if(!this.outputMode) {
-				this.outputMode = new haxapp.app.ResourceOutputMode(this);
+				this.outputMode = new haxapp.app.ResourceOutputMode(editComponentDisplay);
 			}
 			return this.outputMode;
 			
 		case haxapp.app.CustomControlComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(this,false);
+			return new haxapp.app.AceCodeMode(editComponentDisplay,false);
 			
 		case haxapp.app.CustomControlComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new haxapp.app.AceSupplementalMode(this);
+			return new haxapp.app.AceSupplementalMode(editComponentDisplay);
 			
 		case haxapp.app.CustomControlComponent.VIEW_CUSTOM_CODE:
-			return new haxapp.app.AceCustomCodeMode(this);
+			return new haxapp.app.AceCustomCodeMode(editComponentDisplay);
 			
 		case haxapp.app.CustomControlComponent.VIEW_CUSTOM_SUPPLEMENTAL_CODE:
-			return new haxapp.app.AceCustomSupplementalMode(this);
+			return new haxapp.app.AceCustomSupplementalMode(editComponentDisplay);
             
         case haxapp.app.CustomControlComponent.VIEW_DESCRIPTION:
-			return new haxapp.app.AceDescriptionMode(this);
+			return new haxapp.app.AceDescriptionMode(editComponentDisplay);
 			
 		default:
 //temporary error handling...

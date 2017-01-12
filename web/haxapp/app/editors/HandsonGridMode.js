@@ -1,6 +1,6 @@
 
-haxapp.app.HandsonGridMode = function(component) {
-	this.component = component;
+haxapp.app.HandsonGridMode = function(componentDisplay) {
+	this.componentDisplay = componentDisplay;
 	
 	this.editOk = false;
 	
@@ -12,7 +12,7 @@ haxapp.app.HandsonGridMode = function(component) {
 		return instance.onCancel();
 	}
 	
-	this.editor = new haxapp.app.HandsonGridEditor(component,onSave,onCancel);
+	this.editor = new haxapp.app.HandsonGridEditor(componentDisplay,onSave,onCancel);
 	
 }
 
@@ -25,7 +25,7 @@ haxapp.app.HandsonGridMode.prototype.getElement = function() {
 	
 haxapp.app.HandsonGridMode.prototype.showData = function(editOk) {
 		
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
 	var json = table.getData();	
 
 	this.editOk = editOk;
@@ -41,7 +41,7 @@ haxapp.app.HandsonGridMode.prototype.destroy = function() {
 //==============================
 
 haxapp.app.HandsonGridMode.prototype.onSave = function(data) {
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
     
 	var actionData = {};
     actionData.action = "updateData";

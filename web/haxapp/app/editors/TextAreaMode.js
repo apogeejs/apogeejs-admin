@@ -1,6 +1,6 @@
 
-haxapp.app.TextAreaMode = function(component) {
-	this.component = component;
+haxapp.app.TextAreaMode = function(componentDisplay) {
+	this.componentDisplay = componentDisplay;
 	
 	this.editOk = false;
 	
@@ -12,7 +12,7 @@ haxapp.app.TextAreaMode = function(component) {
 		return instance.onCancel();
 	}
 	
-	this.editor = new haxapp.app.TextAreaEditor(component,onSave,onCancel);
+	this.editor = new haxapp.app.TextAreaEditor(componentDisplay,onSave,onCancel);
 	
 }
 
@@ -29,7 +29,7 @@ haxapp.app.TextAreaMode.prototype.getElement = function() {
 	
 haxapp.app.TextAreaMode.prototype.showData = function(editOk) {
 		
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
 	var json = table.getData();	
 
 	this.editOk = editOk;
@@ -74,7 +74,7 @@ haxapp.app.TextAreaMode.prototype.onSave = function(text) {
 		data = "";
 	}
 	
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
 	
     var actionData = {};
     actionData.action = "updateData";

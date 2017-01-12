@@ -192,13 +192,17 @@ haxapp.app.WorkspaceUI.prototype.close = function() {
     this.setLinks([],[]);
 }
 
-haxapp.app.WorkspaceUI.prototype.setTabActive = function(tab) {
+haxapp.app.WorkspaceUI.prototype.setActiveTab = function(tab) {
     var name = tab.getName();
-    this.tabFrame.setTabActive(name);
+    this.tabFrame.setActiveTab(name);
 }
 
-haxapp.app.WorkspaceUI.prototype.requestTab = function(name) {
-    return this.tabFrame.addTab(name);
+haxapp.app.WorkspaceUI.prototype.requestTab = function(name,makeActive) {
+    var tab = this.tabFrame.addTab(name);
+    if(makeActive) {
+        this.tabFrame.setActiveTab(name);
+    }
+    return tab;
 }
 
 //====================================

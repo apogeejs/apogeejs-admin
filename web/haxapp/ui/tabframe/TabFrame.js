@@ -13,8 +13,9 @@ haxapp.ui.TabFrame = function() {
     this.activeTab = null;
     
     this.tabFrameControl = haxapp.ui.createElementWithClass("div","visiui-tf-frame");
-    this.tabFrame = haxapp.ui.createElementWithClass("div","visiui-tf-tab-container",this.tabFrameControl);   
     this.tabBar = haxapp.ui.createElementWithClass("div","visiui-tf-tab-bar",this.tabFrameControl);
+    this.tabFrame = haxapp.ui.createElementWithClass("div","visiui-tf-tab-container",this.tabFrameControl);   
+    
     
     //base init for parent continer mixin
     haxapp.ui.ParentContainer.init.call(this,this.tabFrame,this);	

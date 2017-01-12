@@ -33,24 +33,28 @@ haxapp.app.TextComponent.TABLE_EDIT_SETTINGS = {
     "emptyDataValue": ""
 }
 
+haxapp.app.TextComponent.prototype.createComponentDisplay = function(container) {
+    return new haxapp.app.EditComponentDisplay(this,container,haxapp.app.TextComponent.TABLE_EDIT_SETTINGS);
+}
+
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-haxapp.app.TextComponent.prototype.getViewModeElement = function(viewType) {
+haxapp.app.TextComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
 	
 	//create the new view element;
 	switch(viewType) {
 			
 		case haxapp.app.TextComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(this,haxapp.app.TextComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
+			return new haxapp.app.AceCodeMode(editComponentDisplay,haxapp.app.TextComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
 			
 		case haxapp.app.TextComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new haxapp.app.AceSupplementalMode(this);
+			return new haxapp.app.AceSupplementalMode(editComponentDisplay);
 			
 		case haxapp.app.TextComponent.VIEW_TEXT:
-			return new haxapp.app.AceTextMode(this);
+			return new haxapp.app.AceTextMode(editComponentDisplay);
             
         case haxapp.app.TextComponent.VIEW_DESCRIPTION:
-			return new haxapp.app.AceDescriptionMode(this);
+			return new haxapp.app.AceDescriptionMode(editComponentDisplay);
 			
 		default:
 //temporary error handling...

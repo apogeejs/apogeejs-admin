@@ -1,6 +1,6 @@
 /** This is a base class for different code editors (this is not a mixin). */
-haxapp.app.AceCodeModeBase = function(component,mode) {
-	this.component = component;
+haxapp.app.AceCodeModeBase = function(componentDisplay,mode) {
+	this.componentDisplay = componentDisplay;
 	
 	this.editOk = false;
 	
@@ -12,7 +12,7 @@ haxapp.app.AceCodeModeBase = function(component,mode) {
 		return instance.onCancel();
 	}
 	
-	this.editor = new haxapp.app.AceTextEditor(component,mode,onSave,onCancel);
+	this.editor = new haxapp.app.AceTextEditor(componentDisplay,mode,onSave,onCancel);
 	
 }
 
@@ -21,10 +21,6 @@ haxapp.app.AceCodeModeBase.prototype.isData = false;
 
 haxapp.app.AceCodeModeBase.prototype.getElement = function() {
 	return this.editor.getElement();
-}
-
-haxapp.app.AceCodeModeBase.prototype.getComponent = function() {
-	return this.component;
 }
 	
 //Implement this!

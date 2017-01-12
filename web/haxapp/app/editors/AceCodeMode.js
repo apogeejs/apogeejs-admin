@@ -6,9 +6,9 @@
  * code is set to the empty string. If no action is desired, false or any value that evaluates to
  * false can be sent in.
  */
-haxapp.app.AceCodeMode = function(component,optionalOnBlankData,optionalEditorCodeWrapper) {
+haxapp.app.AceCodeMode = function(componentDisplay,optionalOnBlankData,optionalEditorCodeWrapper) {
 	//base constructor
-	haxapp.app.AceCodeModeBase.call(this,component,"ace/mode/javascript");
+	haxapp.app.AceCodeModeBase.call(this,componentDisplay,"ace/mode/javascript");
 	
 	this.onBlankData = optionalOnBlankData;
 	this.editorCodeWrapper = optionalEditorCodeWrapper;
@@ -19,7 +19,7 @@ haxapp.app.AceCodeMode.prototype.constructor = haxapp.app.AceCodeMode;
 	
 haxapp.app.AceCodeMode.prototype.showData = function(editOk) {
 		
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
 	var functionBody = table.getFunctionBody();
 	
 	var codeText;
@@ -36,7 +36,7 @@ haxapp.app.AceCodeMode.prototype.showData = function(editOk) {
 
 haxapp.app.AceCodeMode.prototype.onSave = function(text) {	
 	
-	var table = this.component.getObject();
+	var table = this.componentDisplay.getObject();
     var actionData = {};
 	
 	if((this.onBlankData)&&(text === "")) {

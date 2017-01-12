@@ -23,6 +23,10 @@ haxapp.app.FolderComponent.prototype.getContentIsShowing = function() {
 // Protected and Private Instance Methods
 //==============================
 
+haxapp.app.FolderComponent.prototype.createComponentDisplay = function(container) {
+    return new haxapp.app.EditComponentDisplay(this,container,haxapp.app.FolderComponent.TABLE_EDIT_SETTINGS);
+}
+
 
 /** This method populates the frame for this component. 
  * @protected */

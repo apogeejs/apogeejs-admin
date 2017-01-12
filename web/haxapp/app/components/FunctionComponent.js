@@ -28,21 +28,25 @@ haxapp.app.FunctionComponent.TABLE_EDIT_SETTINGS = {
     "defaultView": haxapp.app.FunctionComponent.VIEW_CODE
 }
 
+haxapp.app.FunctionComponent.prototype.createComponentDisplay = function(container) {
+    return new haxapp.app.EditComponentDisplay(this,container,haxapp.app.FunctionComponent.TABLE_EDIT_SETTINGS);
+}
+
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-haxapp.app.FunctionComponent.prototype.getViewModeElement = function(viewType) {
+haxapp.app.FunctionComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
 	
 	//create the new view element;
 	switch(viewType) {
 			
 		case haxapp.app.FunctionComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(this,false);
+			return new haxapp.app.AceCodeMode(editComponentDisplay,false);
 			
 		case haxapp.app.FunctionComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new haxapp.app.AceSupplementalMode(this);
+			return new haxapp.app.AceSupplementalMode(editComponentDisplay);
             
         case haxapp.app.FunctionComponent.VIEW_DESCRIPTION:
-			return new haxapp.app.AceDescriptionMode(this);
+			return new haxapp.app.AceDescriptionMode(editComponentDisplay);
 			
 		default:
 //temporary error handling...
