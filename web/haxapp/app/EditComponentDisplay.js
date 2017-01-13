@@ -33,6 +33,8 @@ haxapp.app.EditComponentDisplay = function(editComponent,container,settings,opti
 //    this.addCleanupAction(haxapp.app.EditComponentDisplay.destroy);
 
     this.initUI();
+    
+    this.memberUpdated();
 
 }
 

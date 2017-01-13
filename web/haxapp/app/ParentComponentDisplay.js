@@ -58,11 +58,47 @@ haxapp.app.ParentComponentDisplay.prototype.initUI = function() {
     
     this.setScrollingContentElement();
     
+    var workspaceUI = this.component.getWorkspaceUI();
+    
     //add context menu to create childrent
-    var contentElement = this.getContentElement();
+    var contentElement = this.getDisplayBodyElement();
     var folder = this.getObject();
-    var app = this.getWorkspaceUI().getApp();
+    var app = workspaceUI.getApp();
     app.setFolderContextMenu(contentElement,folder);
+    
+    
+    //window options
+    var memberWindowOptions = {};
+    memberWindowOptions.minimizable = true;
+    memberWindowOptions.maximizable = true;
+    memberWindowOptions.resizable = true;
+    memberWindowOptions.movable = true;
+    memberWindowOptions.frameColorClass = "visicomp_windowColor";
+    memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
+    
+    var children = folder.getChildMap();
+    for(var childName in children) {
+        var child = children[childName];
+        if(!child.isOwner) {
+            var childComponent = workspaceUI.getComponent(child);
+            var windowFrame = new haxapp.ui.WindowFrame(this, memberWindowOptions);
+            var childComponentDisplay = childComponent.createWindowDisplay(windowFrame);
+            
+             //show the window
+    
+            var pos = this.getNextWindowPosition();
+            windowFrame.setPosition(pos[0],pos[1]);
+
+            //set default size
+            windowFrame.setSize(childComponent.generator.DEFAULT_WIDTH,childComponent.generator.DEFAULT_HEIGHT);
+
+//            if(options.windowState) {
+//                this.window.setWindowState(options.windowState);
+//            }
+            windowFrame.show();
+        }
+        
+    }
 }
 
 

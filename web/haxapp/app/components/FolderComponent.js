@@ -24,7 +24,7 @@ haxapp.app.FolderComponent.prototype.getContentIsShowing = function() {
 //==============================
 
 haxapp.app.FolderComponent.prototype.createComponentDisplay = function(container) {
-    return new haxapp.app.EditComponentDisplay(this,container,haxapp.app.FolderComponent.TABLE_EDIT_SETTINGS);
+    return new haxapp.app.ParentComponentDisplay(this,container);
 }
 
 

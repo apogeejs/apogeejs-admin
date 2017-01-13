@@ -31,7 +31,7 @@ haxapp.app.FolderFunctionComponent.prototype.getContentIsShowing = function() {
 //==============================
 
 haxapp.app.FolderFunctionComponent.prototype.createComponentDisplay = function(container) {
-    return new haxapp.app.EditComponentDisplay(this,container,haxapp.app.FolderFunctionComponent.TABLE_EDIT_SETTINGS);
+    return new haxapp.app.ParentComponentDisplay(this,container);
 }
 
 /** This method populates the frame for this component. 

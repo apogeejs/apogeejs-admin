@@ -26,7 +26,7 @@ haxapp.ui.WindowFrame = function(parentContainer, options) {
     this.parentElement = parentContainer.getContainerElement();
     this.options = options;
 
-    this.windowState = haxapp.ui.WINDOW_STATE_NORMAL; //minimize, normal, maximize
+    this.windowState = (options.initialState !== undefined) ? options.initialState : haxapp.ui.WINDOW_STATE_NORMAL; //minimize, normal, maximize
     
 	//set default size values
 	this.coordinateInfo = {};

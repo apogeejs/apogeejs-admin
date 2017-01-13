@@ -16,13 +16,11 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     this.object = object;
     this.activeParent = object.getParent();
     this.generator = generator;
-    
-//    this.parentContainer = this.workspaceUI.getParentContainerObject(this.object);
-//    if(!this.parentContainer) {
-//        throw hax.base.createError("Parent object not found: " + object.getFullName());
-//    }
-    
+   
     this.workspaceUI.registerMember(this.object,this);
+    
+    this.tabDisplay = null;
+    this.windowDisplays = [];
     
     //inheriting objects can pass functions here to be called on cleanup, save, etc
     this.saveActions = [];
@@ -38,33 +36,6 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
         var parentTreeEntry = parentComponent.getTreeEntry();
         parentTreeEntry.addChild(this.getObject().getId(),this.treeEntry);
     }
-    
-    //--------------
-    //create window
-    //--------------
-    
-//    this.window = this.createDisplayFrame();
-//    this.componentDisplay = new haxapp.app.ComponentDisplay(this.window, this, this.generator, this.options);
-//    this.populateFrame(this.componentDisplay);
-//    
-//    //THESE OPTIONS - SHOULD THEY DEPEND ON THE PARTICULAR CONTAINER TAB?
-//    //show the window
-//    if(this.options.coordInfo) {
-//        this.window.setCoordinateInfo(this.options.coordInfo);
-//    }
-//    else {
-//        //set position 
-//        var pos = this.parentContainer.getNextWindowPosition();
-//        this.window.setPosition(pos[0],pos[1]);
-//        
-//        //set default size
-//        this.window.setSize(this.generator.DEFAULT_WIDTH,this.generator.DEFAULT_HEIGHT);
-//    }
-//    if(this.options.windowState) {
-//        this.window.setWindowState(this.options.windowState);
-//    }
-//    
-//    this.window.show();
    
 }
 
@@ -78,31 +49,6 @@ haxapp.app.Component.addSaveAction = function(saveFunction) {
  * The callback will be executed in the context of the current object. */
 haxapp.app.Component.addCleanupAction = function(cleanupFunction) {
     this.cleanupActions.push(cleanupFunction);
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-haxapp.app.Component.createDisplayFrame = function() {
-    var windowOptions = {};
-    windowOptions.minimizable = true;
-    windowOptions.maximizable = true;
-    windowOptions.resizable = true;
-    windowOptions.movable = true;
-    
-    var window = new haxapp.ui.WindowFrame(this.parentContainer,windowOptions); 
-    return window;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-//=======================
-// Headers
-//=======================
-
-
-haxapp.app.Component.getTreeEntry = function() {
-    return this.treeEntry;
 }
 
 
@@ -125,16 +71,21 @@ haxapp.app.Component.getWorkspaceUI = function() {
     return this.workspaceUI;
 }
 
-/** This method populates the frame for this component. */
-haxapp.app.Component.getWindow = function() {
-     return this.window;
-}
-
-
 /** This method returns the content element for the windowframe for this component. */
 haxapp.app.Component.getContentElement = function() {
     alert("This shouldn't be called!");
      return this.windowInsideContainer.getBodyElement();
+}
+
+/** This method creates a window display for this component. */
+haxapp.app.Component.createWindowDisplay = function(window) {
+    var display = this.createComponentDisplay(window);
+    this.windowDisplays.push(display);
+    return display;
+}
+
+haxapp.app.Component.getTreeEntry = function() {
+    return this.treeEntry;
 }
 
 /** This serializes the component. */
@@ -166,7 +117,7 @@ haxapp.app.Component.createTreeEntry = function() {
     var instance = this;
     
     var openCallback = function() {
-        instance.openWindow();
+        instance.openDisplay();
     } 
     
     var contextMenuCallback = function(event) {
@@ -261,6 +212,13 @@ haxapp.app.Component.memberUpdated = function() {
     else {   
 //        this.hideBannerBar();
     }
+    
+    if(this.tabDisplay) {
+        this.tabDisplay.memberUpdated();
+    }
+    for(var i = 0; i < this.windowDisplays.length; i++) {
+        this.windowDisplays[i].memberUpdated();
+    }
 }
 
 /** This method is used for setting initial values in the property dialog. 
@@ -281,14 +239,14 @@ haxapp.app.Component.getPropertyValues = function() {
     return values;
 }
 
-haxapp.app.Component.openWindow = function() {
+haxapp.app.Component.openDisplay = function() {
     if(this.tab) {
         //we already have an opened window - make it active
         this.workspaceUI.setActiveTab(this.tab);
     }
     else {
         this.tab = this.workspaceUI.requestTab(this.object.getFullName(),true);
-        this.createComponentDisplay(this.tab);
+        this.tabDisplay = this.createComponentDisplay(this.tab);
     }
 }
 
