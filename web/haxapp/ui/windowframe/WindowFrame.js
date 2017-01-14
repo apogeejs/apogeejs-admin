@@ -113,15 +113,16 @@ haxapp.ui.WindowFrame.RESIZE_SW = haxapp.ui.WindowFrame.RESIZE_SOUTH + haxapp.ui
 haxapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT = 300;
 haxapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH = 300;
 
-//======================================
-// CSS STYLES
-//======================================
 
 
 
 //====================================
 // Public Methods
 //====================================
+
+//---------------------------
+// WINDOW CONTAINER
+//---------------------------
 
 /** This method shows the window. */
 haxapp.ui.WindowFrame.prototype.getTitle = function() {
@@ -137,6 +138,36 @@ haxapp.ui.WindowFrame.prototype.setTitle = function(title) {
 haxapp.ui.WindowFrame.prototype.getMenu = function() {
     return this.titleBar.getMenu();
 }
+
+/** This method returns the window body.*/
+haxapp.ui.WindowFrame.prototype.getBody = function() {
+    return this.body;
+}
+
+/** This method returns the window body.*/
+haxapp.ui.WindowFrame.prototype.getParent = function() {
+    return this.parentContainer;
+}
+
+/** This method sets a content element in the body. Alternatively the body can 
+ * be retrieved and loaded as desired. */
+haxapp.ui.WindowFrame.prototype.setContent = function(element) {
+    //remove the old content
+    while(this.body.firstChild) {
+        this.body.removeChild(this.body.firstChild);
+    }
+	
+    //add the new content
+    this.content = element;
+    if(this.content) {
+        this.body.appendChild(this.content);
+    }
+}
+
+
+//---------------------------
+// WINDOW CHILD
+//---------------------------
 
 /** This method shows the window. */
 haxapp.ui.WindowFrame.prototype.changeParent = function(newParentContainer) {
@@ -190,6 +221,8 @@ haxapp.ui.WindowFrame.prototype.deleteWindow = function() {
     this.hide();
 }
 
+
+
 /** This method returns true if the window is showing. */
 haxapp.ui.WindowFrame.prototype.getIsShowing = function() {
     return this.isShowing;
@@ -219,6 +252,38 @@ haxapp.ui.WindowFrame.prototype.setSize = function(width,height) {
     this.updateCoordinates();
 }
 
+/** This method gets the location and size info for the window. */
+haxapp.ui.WindowFrame.prototype.getCoordinateInfo= function() {
+    return this.coordinateInfo;
+}
+
+/** This method sets the location and size info for the window. */
+haxapp.ui.WindowFrame.prototype.setCoordinateInfo= function(coordinateInfo) {
+    this.coordinateInfo = coordinateInfo;
+    this.updateCoordinates();
+}
+
+
+/** This method sets the size of the window, including the title bar and other decorations. */
+haxapp.ui.WindowFrame.prototype.setZIndex = function(zIndex) {
+    this.frame.style.zIndex = String(zIndex);
+}
+
+
+//---------------------------
+// GUI ELEMENT
+//---------------------------
+
+/** This method returns the main dom element for the window frame. */
+haxapp.ui.WindowFrame.prototype.getElement = function() {
+    return this.frame;
+}
+
+
+
+//----------------------------------------------------------------
+//objecdt specific
+
 /** This method sets the size of the window to fit the content. It should only be 
  * called after the window has been shown. The argument passed should be the element
  * that holds the content and is sized to it. */
@@ -246,17 +311,7 @@ haxapp.ui.WindowFrame.prototype.centerInParent = function() {
 haxapp.ui.WindowFrame.FIT_HEIGHT_BUFFER = 20;
 /** @private */
 haxapp.ui.WindowFrame.FIT_WIDTH_BUFFER = 20;
-	
-/** This method gets the location and size info for the window. */
-haxapp.ui.WindowFrame.prototype.getCoordinateInfo= function() {
-    return this.coordinateInfo;
-}
 
-/** This method sets the location and size info for the window. */
-haxapp.ui.WindowFrame.prototype.setCoordinateInfo= function(coordinateInfo) {
-    this.coordinateInfo = coordinateInfo;
-    this.updateCoordinates();
-}
 
 /** This method gets the location and size info for the window. */
 haxapp.ui.WindowFrame.prototype.getWindowState = function() {
@@ -282,41 +337,6 @@ haxapp.ui.WindowFrame.prototype.setWindowState = function(windowState) {
             alert("Unknown window state: " + windowState);
             break;
     }
-}
-
-/** This method returns the main dom element for the window frame. */
-haxapp.ui.WindowFrame.prototype.getElement = function() {
-    return this.frame;
-}
-
-/** This method returns the window body.*/
-haxapp.ui.WindowFrame.prototype.getBody = function() {
-    return this.body;
-}
-
-/** This method returns the window body.*/
-haxapp.ui.WindowFrame.prototype.getParent = function() {
-    return this.parentContainer;
-}
-
-/** This method sets a content element in the body. Alternatively the body can 
- * be retrieved and loaded as desired. */
-haxapp.ui.WindowFrame.prototype.setContent = function(element) {
-    //remove the old content
-    while(this.body.firstChild) {
-        this.body.removeChild(this.body.firstChild);
-    }
-	
-    //add the new content
-    this.content = element;
-    if(this.content) {
-        this.body.appendChild(this.content);
-    }
-}
-
-/** This method sets the size of the window, including the title bar and other decorations. */
-haxapp.ui.WindowFrame.prototype.setZIndex = function(zIndex) {
-    this.frame.style.zIndex = String(zIndex);
 }
 
 //====================================

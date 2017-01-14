@@ -19,7 +19,11 @@ haxapp.app.ComponentDisplay.init = function(component,container,options) {
     //------------------
     
     //set fixed pane for header container - will customize later
-    this.windowInsideContainer = new haxapp.ui.HeaderContainer(haxapp.ui.DisplayAndHeader.FIXED_PANE);
+    this.windowInsideContainer = new haxapp.ui.DisplayAndHeader(haxapp.ui.DisplayAndHeader.FIXED_PANE,
+            null,
+            haxapp.ui.DisplayAndHeader.FIXED_PANE,
+            null
+        );
     container.getBody().appendChild(this.windowInsideContainer.getOuterElement());
 
     //------------------
@@ -154,18 +158,25 @@ haxapp.app.ComponentDisplay.hideToolbar = function() {
 /** This method shows the active headers. 
  * @private */
 haxapp.app.ComponentDisplay.showActiveHeaders = function() {
-	var headers = [];
+	var headerElements = [];
     if((this.toolbarActive)&&(this.toolbarDiv)) {
-		headers.push(this.toolbarDiv);
+		headerElements.push(this.toolbarDiv);
 	}
     if((this.saveBarActive)&&(this.saveDiv)) {
-		headers.push(this.saveDiv);
+		headerElements.push(this.saveDiv);
 	}
 	if((this.bannerBarActive)&&(this.bannerDiv)) {
-		headers.push(this.bannerDiv);
+		headerElements.push(this.bannerDiv);
 	}
 	
-    this.windowInsideContainer.loadHeaders(headers);
+    var headerContainer = this.windowInsideContainer.getHeader();
+    
+    haxapp.ui.removeAllChildren(headerContainer);
+    if(headerElements.length > 0) {
+        for(var i = 0; i < headerElements.length; i++) {
+			headerContainer.appendChild(headerElements[i]);
+		}
+    }
 }
 
 //==============================
@@ -186,7 +197,7 @@ haxapp.app.ComponentDisplay.setFixedContentElement = function() {
 
 /** This method returns the content element for the windowframe for this component. */
 haxapp.app.ComponentDisplay.getDisplayBodyElement = function() {
-     return this.windowInsideContainer.getBodyElement();
+     return this.windowInsideContainer.getBody();
 }
 
 //==============================

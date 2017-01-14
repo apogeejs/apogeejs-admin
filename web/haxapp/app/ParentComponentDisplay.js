@@ -79,8 +79,16 @@ haxapp.app.ParentComponentDisplay.prototype.initUI = function() {
     var children = folder.getChildMap();
     for(var childName in children) {
         var child = children[childName];
-        if(!child.isOwner) {
-            var childComponent = workspaceUI.getComponent(child);
+        var childComponent = workspaceUI.getComponent(child);
+        if(child.isOwner) {
+            var windowIcon = new haxapp.ui.WindowIcon(this);
+            windowIcon.setTitle(child.getName());
+            var pos = this.getNextWindowPosition();
+            windowIcon.setPosition(pos[0],pos[1]);
+            windowIcon.show();
+        }
+        else {
+            
             var windowFrame = new haxapp.ui.WindowFrame(this, memberWindowOptions);
             var childComponentDisplay = childComponent.createWindowDisplay(windowFrame);
             

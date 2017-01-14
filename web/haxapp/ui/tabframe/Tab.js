@@ -1,6 +1,8 @@
 
 haxapp.ui.Tab = function(name, tabFrame) {
     
+    this.tabFrame = tabFrame;
+    
     //create the tab element
     this.displayFrame = haxapp.ui.createElementWithClass("div","visiui-tf-tab-window");
     
@@ -42,22 +44,14 @@ hax.base.mixin(haxapp.ui.Tab,hax.EventManager);
 //hax.base.mixin(haxapp.ui.Tab,haxapp.ui.ParentContainer);
 //hax.base.mixin(haxapp.ui.Tab,haxapp.ui.ParentHighlighter);
 
+//---------------------------
+// WINDOW CONTAINER
+//---------------------------
+
 /** This method must be implemented in inheriting objects. */
 haxapp.ui.Tab.prototype.getContentIsShowing = function() {
     return this.isShowing;
 }
-
-/** This method must be implemented in inheriting objects. */
-haxapp.ui.Tab.prototype.getOuterElement = function() {
-    return this.displayFrame;
-}
-
-/** This method returns the window body.*/
-haxapp.ui.Tab.prototype.getBody = function() {
-    return this.headerContainer.getBody();
-}
-
-
 
 /** This method must be implemented in inheriting objects. */
 haxapp.ui.Tab.prototype.getName = function() {
@@ -79,3 +73,18 @@ haxapp.ui.Tab.prototype.setTitle = function(title) {
 haxapp.ui.Tab.prototype.getMenu = function() {
     return this.titleBar.getMenu();
 }
+
+//---------------------------
+// GUI ELEMENT
+//---------------------------
+
+/** This method must be implemented in inheriting objects. */
+haxapp.ui.Tab.prototype.getOuterElement = function() {
+    return this.displayFrame;
+}
+
+/** This method returns the window body.*/
+haxapp.ui.Tab.prototype.getBody = function() {
+    return this.headerContainer.getBody();
+}
+
