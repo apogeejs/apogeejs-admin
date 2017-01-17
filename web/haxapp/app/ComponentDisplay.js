@@ -92,6 +92,8 @@ haxapp.app.ComponentDisplay.BANNER_FGCOLOR_PENDING = "black";
 haxapp.app.ComponentDisplay.BANNER_BGCOLOR_UNKNOWN = "yellow";
 haxapp.app.ComponentDisplay.BANNER_FGCOLOR_UNKNOWN = "black";
 
+haxapp.app.ComponentDisplay.BANNER_TYPE_NONE = "none";
+
 haxapp.app.ComponentDisplay.PENDING_MESSAGE = "Calculation pending...";
 
 /** This method returns the base member for this component. */
@@ -211,7 +213,7 @@ haxapp.app.ComponentDisplay.memberUpdated = function() {
     if(this.object.getParent() !== this.activeParent) {
         this.activeParent = this.object.getParent();
         this.parenContainer = this.getWorkspaceUI().getParentContainerObject(this.object);
-        this.window.changeParent(this.parenContainer);
+        this.window.setParent(this.parenContainer);
     }
     
     //update title

@@ -11,7 +11,7 @@
  *
  * @class 
  */
-haxapp.ui.WindowFrame = function(parentContainer, options) {
+haxapp.ui.WindowFrame = function(options) {
 	
     //set the options
     if(!options) {
@@ -22,8 +22,8 @@ haxapp.ui.WindowFrame = function(parentContainer, options) {
     hax.EventManager.init.call(this);
 	
     //variables
-    this.parentContainer = parentContainer;
-    this.parentElement = parentContainer.getContainerElement();
+    this.parentContainer = null;
+    this.parentElement = null;
     this.options = options;
 
     this.windowState = (options.initialState !== undefined) ? options.initialState : haxapp.ui.WINDOW_STATE_NORMAL; //minimize, normal, maximize
@@ -87,10 +87,7 @@ haxapp.ui.WindowFrame = function(parentContainer, options) {
     this.onHide = function() {
         //don't remove element, but mark it as hidden
         instance.isShowing = false;
-    }
-    var parentEventManager = this.parentContainer.getEventManager();
-    parentEventManager.addListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
-    parentEventManager.addListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);    
+    }  
 }
 
 //add components to this class
@@ -170,12 +167,14 @@ haxapp.ui.WindowFrame.prototype.setContent = function(element) {
 //---------------------------
 
 /** This method shows the window. */
-haxapp.ui.WindowFrame.prototype.changeParent = function(newParentContainer) {
-    this.hide();
-    var oldParentContainer = this.parentContainer;
-    var oldParentEventManager = oldParentContainer.getEventManager();
-    oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
-    oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);
+haxapp.ui.WindowFrame.prototype.setParent = function(newParentContainer) {
+    if(this.parentContainer) {
+        this.hide();
+        var oldParentContainer = this.parentContainer;
+        var oldParentEventManager = oldParentContainer.getEventManager();
+        oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
+        oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);
+    }
     
     this.parentContainer = newParentContainer;
     this.parentElement = newParentContainer.getContainerElement();
@@ -189,6 +188,7 @@ haxapp.ui.WindowFrame.prototype.changeParent = function(newParentContainer) {
 /** This method shows the window. */
 haxapp.ui.WindowFrame.prototype.show = function() {
     if(this.isShowing) return;
+    if(!this.parentContainer) return;
     
     //add window to the parent
     this.parentContainer.addWindow(this);
@@ -206,6 +206,8 @@ haxapp.ui.WindowFrame.prototype.show = function() {
 
 /** This method hides the window. */
 haxapp.ui.WindowFrame.prototype.hide = function() {
+    if(!this.parentContainer) return;
+    
     this.parentContainer.removeWindow(this);
     if(this.isShowing) {
         this.isShowing = false;
@@ -215,6 +217,8 @@ haxapp.ui.WindowFrame.prototype.hide = function() {
 
 /** This method closes the window. */
 haxapp.ui.WindowFrame.prototype.deleteWindow = function() {
+    if(!this.parentContainer) return;
+    
     var parentEventManager = this.parentContainer.getEventManager();
     parentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
     parentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);

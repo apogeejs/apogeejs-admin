@@ -29,14 +29,7 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     //-------------
     //create tree entry
     //-------------
-    this.treeEntry = this.createTreeEntry();
-    //TREE_ENTRY - add the tree entry to the parent
-    if(this.activeParent) {
-        var parentComponent = this.workspaceUI.getComponent(this.activeParent);
-        var parentTreeEntry = parentComponent.getTreeEntry();
-        parentTreeEntry.addChild(this.getObject().getId(),this.treeEntry);
-    }
-   
+    this.treeDisplay = new haxapp.app.TreeComponentDisplay(this);
 }
 
 /** If an extending object has any save actions, a callback should be passed here.
@@ -71,21 +64,21 @@ haxapp.app.Component.getWorkspaceUI = function() {
     return this.workspaceUI;
 }
 
-/** This method returns the content element for the windowframe for this component. */
-haxapp.app.Component.getContentElement = function() {
-    alert("This shouldn't be called!");
-     return this.windowInsideContainer.getBodyElement();
-}
-
 /** This method creates a window display for this component. */
-haxapp.app.Component.createWindowDisplay = function(window) {
-    var display = this.createComponentDisplay(window);
-    this.windowDisplays.push(display);
-    return display;
+haxapp.app.Component.createWindowDisplay = function(parentContainer) {
+    var windowComponentDisplay = new haxapp.app.WindowComponentDisplay(this,parentContainer);
+    this.windowDisplays.push(windowComponentDisplay);
 }
 
 haxapp.app.Component.getTreeEntry = function() {
-    return this.treeEntry;
+    return this.treeDisplay.getTreeEntry();
+}
+
+haxapp.app.Component.openDisplay = function() {
+    if(!this.tabComponentDisplay) {
+        this.tabComponentDisplay = new haxapp.app.TabComponentDisplay(this);
+    }
+    this.workspaceUI.setActiveTab(this.tabComponentDisplay.getTab());
 }
 
 /** This serializes the component. */
@@ -107,36 +100,6 @@ haxapp.app.Component.toJson = function() {
 // Protected Instance Methods
 //==============================
 
-/** This creates the tree entry. */
-haxapp.app.Component.createTreeEntry = function() {
-    
-    //TREE_ENTRY
-    //FIX THIS CODE!!!
-    //open doesn't work and the context menu is duplicated code (that shouldn't be)
-    
-    var instance = this;
-    
-    var openCallback = function() {
-        instance.openDisplay();
-    } 
-    
-    var contextMenuCallback = function(event) {
-        var contextMenu = new haxapp.ui.MenuBody();
-        
-        var callback;
-        
-        callback = haxapp.app.updatecomponent.getUpdateComponentCallback(instance,instance.generator);
-        contextMenu.addCallbackMenuItem("Edit Properties",callback);
-        
-        callback = instance.createDeleteCallback("Delete");
-        contextMenu.addCallbackMenuItem("Delete",callback);
-        
-        haxapp.ui.Menu.showContextMenu(contextMenu,event);
-    }
-    
-    var labelText = this.getObject().getName();
-    return new haxapp.ui.treecontrol.TreeEntry(labelText, openCallback, contextMenuCallback);
-}
 
 //This method should be populated by an extending object.
 //** This serializes the table component. */
@@ -175,27 +138,25 @@ haxapp.app.Component.memberUpdated = function() {
     //check for change of parent
     if(this.object.getParent() !== this.activeParent) {
         var oldParent = this.activeParent;
+        var newParent = this.object.getParent();
         
-        this.activeParent = this.object.getParent();
+        this.activeParent = newParent;
         
-        //TREE_ENTRY - remove tree entry from old parent
-        if(oldParent) {
-            var parentComponent = this.workspaceUI.getComponent(oldParent);
-            var parentTreeEntry = parentComponent.getTreeEntry();
-            parentTreeEntry.removeChild(this.getObject().getId());
+        //update the tree entry
+        this.treeDisplay.changeParent(newParent,oldParent);
+        
+        //delete windows for old parent, add to the new parent
+        for(var i = 0; i < this.windowDisplays.length; i++) {
+            var windowDisplay = this.windowDisplays[i];
+            windowDisplay.delete();
         }
-        //TREE_ENTRY - add it to the new parent
-        if(this.activeParent) {
-            var parentComponent = this.workspaceUI.getComponent(this.activeParent);
-            var parentTreeEntry = parentComponent.getTreeEntry();
-            parentTreeEntry.removeChild(this.getObject().getId());
-        }
+        
+        newParent.childComponentAdded(this);
     }
     
-    //TREE_ENTRY - set the title on the tree entry
-    this.treeEntry.setLabel(this.object.getName());
-    
-    //update data
+    //get the banner info
+    var bannerState;
+    var bannerMessage;
     var object = this.getObject();
     if(object.hasError()) {
         var errorMsg = "";
@@ -204,21 +165,31 @@ haxapp.app.Component.memberUpdated = function() {
             errorMsg += actionErrors[i].msg + "\n";
         }
         
-//        this.showBannerBar(errorMsg,haxapp.app.Component.BANNER_TYPE_ERROR);
+        bannerState = haxapp.app.ComponentDisplay.BANNER_TYPE_ERROR;
+        bannerMessage = errorMsg;
     }
     else if(object.getResultPending()) {
-//        this.showBannerBar(haxapp.app.Component.PENDING_MESSAGE,haxapp.app.Component.BANNER_TYPE_PENDING);
+        bannerState = haxapp.app.ComponentDisplay.BANNER_TYPE_PENDING;
+        bannerMessage = haxapp.app.ComponentDisplay.PENDING_MESSAGE;
+        
     }
     else {   
-//        this.hideBannerBar();
+        bannerState = haxapp.app.ComponentDisplay.BANNER_TYPE_NONE;
+        bannerMessage = null;
     }
     
+    //update for new data
+    this.treeEntry.setBannerState(bannerState,bannerMessage);
     if(this.tabDisplay) {
-        this.tabDisplay.memberUpdated();
+        this.tabDisplay.updateData();
+        this.tabDisplay.setBannerState(bannerState,bannerMessage);
     }
     for(var i = 0; i < this.windowDisplays.length; i++) {
-        this.windowDisplays[i].memberUpdated();
+        var windowDisplay = this.windowDisplays[i];
+        windowDisplay.updateData();
+        windowDisplay.setBannerState(bannerState,bannerMessage);
     }
+
 }
 
 /** This method is used for setting initial values in the property dialog. 
@@ -237,17 +208,6 @@ haxapp.app.Component.getPropertyValues = function() {
         generator.addPropFunction(member,values);
     }
     return values;
-}
-
-haxapp.app.Component.openDisplay = function() {
-    if(this.tab) {
-        //we already have an opened window - make it active
-        this.workspaceUI.setActiveTab(this.tab);
-    }
-    else {
-        this.tab = this.workspaceUI.requestTab(this.object.getFullName(),true);
-        this.tabDisplay = this.createComponentDisplay(this.tab);
-    }
 }
 
 ///** This method shoudl be implemented by an extending class to create a component

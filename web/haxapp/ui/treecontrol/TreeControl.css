@@ -1,5 +1,7 @@
+.visiui-tc-main {
+}
 .visiui-tc-entry {
-    
+    display: inline-table;
 }
 .visiui-tc-label {
     display:inline-block;
@@ -11,5 +13,5 @@
     
 }
 .visiui-tc-child {
-    
+    display:block;
 }

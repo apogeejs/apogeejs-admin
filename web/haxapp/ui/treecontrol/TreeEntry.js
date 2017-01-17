@@ -3,7 +3,7 @@ if(!haxapp.ui.treecontrol) haxapp.ui.treecontrol = {};
 
 haxapp.ui.treecontrol.TreeEntry = function(labelText,dblClickCallback,contextMenuCallback) {
     
-    this.element = haxapp.ui.createElementWithClass("span", "visiui-tc-entry");
+    this.element = haxapp.ui.createElementWithClass("div", "visiui-tc-entry");
     this.label = haxapp.ui.createElementWithClass("div", "visiui-tc-label",this.element);
     this.childList = null;
     this.childMap = {};

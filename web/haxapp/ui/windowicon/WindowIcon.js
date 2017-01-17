@@ -94,12 +94,14 @@ haxapp.ui.WindowIcon.prototype.getMenu = function() {
 //---------------------------
 
 /** This method shows the window. */
-haxapp.ui.WindowIcon.prototype.changeParent = function(newParentContainer) {
-    this.hide();
-    var oldParentContainer = this.parentContainer;
-    var oldParentEventManager = oldParentContainer.getEventManager();
-    oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
-    oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);
+haxapp.ui.WindowIcon.prototype.setParent = function(newParentContainer) {
+    if(this.parentContainer) {
+        this.hide();
+        var oldParentContainer = this.parentContainer;
+        var oldParentEventManager = oldParentContainer.getEventManager();
+        oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
+        oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);
+    }
     
     this.parentContainer = newParentContainer;
     this.parentElement = newParentContainer.getContainerElement();
