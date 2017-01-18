@@ -2,7 +2,7 @@
  *
  * @class 
  */
-haxapp.ui.WindowIcon = function(parentContainer, options) {
+haxapp.ui.WindowIcon = function(options) {
 	
     //set the options
     if(!options) {
@@ -13,8 +13,8 @@ haxapp.ui.WindowIcon = function(parentContainer, options) {
     hax.EventManager.init.call(this);
 	
     //variables
-    this.parentContainer = parentContainer;
-    this.parentElement = parentContainer.getContainerElement();
+    this.parentContainer = null;
+    this.parentElement = null;
     this.options = options;
     
 	//set default size values
@@ -55,10 +55,7 @@ haxapp.ui.WindowIcon = function(parentContainer, options) {
     this.onHide = function() {
         //don't remove element, but mark it as hidden
         instance.isShowing = false;
-    }
-    var parentEventManager = this.parentContainer.getEventManager();
-    parentEventManager.addListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
-    parentEventManager.addListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);    
+    }   
 }
 
 //add components to this class

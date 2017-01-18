@@ -9,52 +9,63 @@
 
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-haxapp.app.ParentComponentDisplay = function(component,container,options) {
+haxapp.app.ParentDisplayContent = function(component,container,options) {
     
     //base init
-    haxapp.app.ComponentDisplay.init.call(this,component,container,options);
+    haxapp.app.DisplayContent.init.call(this,component,container,options);
     haxapp.ui.ParentContainer.init.call(this,this.getDisplayBodyElement(),container);
 	haxapp.ui.ParentHighlighter.init.call(this,this.getDisplayBodyElement());
     
     this.container = container;
     
     //add a cleanup action to the base component - component must already be initialized
-//    this.addSaveAction(haxapp.app.EditComponentDisplay.writeToJson);
-//    this.addCleanupAction(haxapp.app.EditComponentDisplay.destroy);
+//    this.addSaveAction(haxapp.app.EditDisplayContent.writeToJson);
+//    this.addCleanupAction(haxapp.app.EditDisplayContent.destroy);
 
     this.initUI();
+    
+    this.memberUpdated();
 
 }
 
 //add components to this class
-hax.base.mixin(haxapp.app.ParentComponentDisplay,haxapp.app.ComponentDisplay);
-hax.base.mixin(haxapp.app.ParentComponentDisplay,haxapp.ui.ParentContainer);
-hax.base.mixin(haxapp.app.ParentComponentDisplay,haxapp.ui.ParentHighlighter);
+hax.base.mixin(haxapp.app.ParentDisplayContent,haxapp.app.DisplayContent);
+hax.base.mixin(haxapp.app.ParentDisplayContent,haxapp.ui.ParentContainer);
+hax.base.mixin(haxapp.app.ParentDisplayContent,haxapp.ui.ParentHighlighter);
+
+/** This creates and adds a display for the child component to the parent container. */
+haxapp.app.ParentDisplayContent.prototype.addChildComponent = function(childComponent) {
+    var windowComponentDisplay = childComponent.createWindowDisplay();
+    var childWindow = windowComponentDisplay.getWindowEntry();
+
+    childWindow.setParent(this);
+    var pos = this.getNextWindowPosition();
+    childWindow.setPosition(pos[0],pos[1]);
+    childWindow.show();
+}
 
 //----------------------
 // ParentContainer Methods
 //----------------------
 
 /** This method must be implemented in inheriting objects. */
-haxapp.app.ParentComponentDisplay.prototype.getContentIsShowing = function() {
+haxapp.app.ParentDisplayContent.prototype.getContentIsShowing = function() {
     return this.container.getContentIsShowing(); 
 }
 
 /** This value is used as the background color when an editor is read only. */
-haxapp.app.ParentComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
+haxapp.app.ParentDisplayContent.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
 
 /** This method updates the table data 
  * @private */    
-haxapp.app.ParentComponentDisplay.prototype.memberUpdated = function() {
-    
-    var object = this.component.getObject();
+haxapp.app.ParentDisplayContent.prototype.memberUpdated = function() {
 }
 
 
 /** This method populates the frame for this component. 
  * @protected */
-haxapp.app.ParentComponentDisplay.prototype.initUI = function() {
+haxapp.app.ParentDisplayContent.prototype.initUI = function() {
     
     this.setScrollingContentElement();
     
@@ -62,9 +73,9 @@ haxapp.app.ParentComponentDisplay.prototype.initUI = function() {
     
     //add context menu to create childrent
     var contentElement = this.getDisplayBodyElement();
-    var folder = this.getObject();
+    var parentMember = this.component.getParentMember();
     var app = workspaceUI.getApp();
-    app.setFolderContextMenu(contentElement,folder);
+    app.setFolderContextMenu(contentElement,parentMember);
     
     
     //window options
@@ -76,36 +87,11 @@ haxapp.app.ParentComponentDisplay.prototype.initUI = function() {
     memberWindowOptions.frameColorClass = "visicomp_windowColor";
     memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
     
-    var children = folder.getChildMap();
+    var children = parentMember.getChildMap();
     for(var childName in children) {
         var child = children[childName];
         var childComponent = workspaceUI.getComponent(child);
-        if(child.isOwner) {
-            var windowIcon = new haxapp.ui.WindowIcon(this);
-            windowIcon.setTitle(child.getName());
-            var pos = this.getNextWindowPosition();
-            windowIcon.setPosition(pos[0],pos[1]);
-            windowIcon.show();
-        }
-        else {
-            
-            var windowFrame = new haxapp.ui.WindowFrame(this, memberWindowOptions);
-            var childComponentDisplay = childComponent.createWindowDisplay(windowFrame);
-            
-             //show the window
-    
-            var pos = this.getNextWindowPosition();
-            windowFrame.setPosition(pos[0],pos[1]);
-
-            //set default size
-            windowFrame.setSize(childComponent.generator.DEFAULT_WIDTH,childComponent.generator.DEFAULT_HEIGHT);
-
-//            if(options.windowState) {
-//                this.window.setWindowState(options.windowState);
-//            }
-            windowFrame.show();
-        }
-        
+        this.addChildComponent(childComponent);
     }
 }
 
@@ -116,10 +102,12 @@ haxapp.app.ParentComponentDisplay.prototype.initUI = function() {
 //======================================
 
 /** @protected */
-haxapp.app.ParentComponentDisplay.prototype.destroy = function() {
+haxapp.app.ParentDisplayContent.prototype.destroy = function() {
 }
 
 /** This serializes the table component. */
-haxapp.app.ParentComponentDisplay.prototype.writeToJson = function(json) {
+haxapp.app.ParentDisplayContent.prototype.writeToJson = function(json) {
     json.viewType = this.viewType;
 }
+
+

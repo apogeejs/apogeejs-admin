@@ -116,7 +116,7 @@ haxapp.app.HandsonGridEditor.prototype.showData = function(json,editOk) {
         this.gridDiv.style.backgroundColor = "";
     }
     else {
-        this.gridDiv.style.backgroundColor = haxapp.app.EditComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
+        this.gridDiv.style.backgroundColor = haxapp.app.EditDisplayContent.NO_EDIT_BACKGROUND_COLOR;
     }
 }
 

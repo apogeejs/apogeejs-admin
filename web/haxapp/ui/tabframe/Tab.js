@@ -1,7 +1,12 @@
 
-haxapp.ui.Tab = function(name, tabFrame) {
+haxapp.ui.Tab = function(id, tabLabelElement, tabFrame) {
+    
+    //base init
+    hax.EventManager.init.call(this);
     
     this.tabFrame = tabFrame;
+    this.id = id;
+    this.tabLabelElement= tabLabelElement;
     
     //create the tab element
     this.displayFrame = haxapp.ui.createElementWithClass("div","visiui-tf-tab-window");
@@ -14,13 +19,7 @@ haxapp.ui.Tab = function(name, tabFrame) {
     
     this.titleBar = new haxapp.ui.TitleBar(this,haxapp.ui.CLOSEABLE);
     this.headerContainer.getHeader().appendChild(this.titleBar.getOuterElement());
-
-    //base init
-    hax.EventManager.init.call(this);
-//    haxapp.ui.ParentContainer.init.call(this,element,this);
-//	haxapp.ui.ParentHighlighter.init.call(this,element);
     
-    this.name = name;
     this.isShowing = false;
     
     //add handlers for resize and show
@@ -51,6 +50,12 @@ hax.base.mixin(haxapp.ui.Tab,hax.EventManager);
 /** This method must be implemented in inheriting objects. */
 haxapp.ui.Tab.prototype.getContentIsShowing = function() {
     return this.isShowing;
+}
+
+/** This method must be implemented in inheriting objects. */
+haxapp.ui.Tab.prototype.setName = function(name) {
+    this.tabLabelElement.innerHTML = name;
+    this.name = name;
 }
 
 /** This method must be implemented in inheriting objects. */

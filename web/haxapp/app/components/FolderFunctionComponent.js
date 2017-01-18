@@ -3,6 +3,7 @@
 haxapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,folderFunction,haxapp.app.FolderFunctionComponent.generator,componentJson);
+    haxapp.app.ParentComponent.init.call(this);
     
     //register this object as a parent container
     var internalFolder = folderFunction.getInternalFolder();
@@ -16,6 +17,7 @@ haxapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,compone
 
 //add components to this class
 hax.base.mixin(haxapp.app.FolderFunctionComponent,haxapp.app.Component);
+hax.base.mixin(haxapp.app.FolderFunctionComponent,haxapp.app.ParentComponent);
 
 //----------------------
 // ParentContainer Methods
@@ -26,12 +28,17 @@ haxapp.app.FolderFunctionComponent.prototype.getContentIsShowing = function() {
     return this.getWindow().getContentIsShowing();
 }
 
+/** This returned the parent member object associated with this component. */
+haxapp.app.FolderFunctionComponent.prototype.getParentMember = function() {
+    return this.getObject().getInternalFolder();
+}
+
 //==============================
 // Protected and Private Instance Methods
 //==============================
 
-haxapp.app.FolderFunctionComponent.prototype.createComponentDisplay = function(container) {
-    return new haxapp.app.ParentComponentDisplay(this,container);
+haxapp.app.FolderFunctionComponent.prototype.createDisplayContent = function(container) {
+    return new haxapp.app.ParentDisplayContent(this,container);
 }
 
 /** This method populates the frame for this component. 

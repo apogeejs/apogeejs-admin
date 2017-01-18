@@ -10,15 +10,23 @@ haxapp.app.TabComponentDisplay.prototype.getTab = function() {
     return this.tab;
 }
 
-haxapp.app.TabComponentDisplay.prototype.changeParent = function(newParentComponent,oldParentComponent) {
+haxapp.app.TabComponentDisplay.prototype.getDisplayContent = function() {
+    return this.displayContent;
 }
 
-haxapp.app.TabComponentDisplay.prototype.setBannerState = function() {
-    
+haxapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
+    if(bannerState == haxapp.app.DisplayContent.BANNER_TYPE_NONE) {
+        this.displayContent.hideBannerBar();
+    }
+    else {
+        this.displayContent.showBannerBar(bannerMessage,bannerState);
+    }
 }
 
 haxapp.app.TabComponentDisplay.prototype.updateData = function() {
-    
+    this.tab.setName(this.object.getName());
+    this.tab.setTitle(this.object.getDisplayName());
+    this.displayContent.memberUpdated();
 }
 
 //===============================
@@ -27,6 +35,7 @@ haxapp.app.TabComponentDisplay.prototype.updateData = function() {
 
 /** @private */
 haxapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
-    this.tab = this.component.getWorkspaceUI().requestTab(this.object.getFullName(),true);   
-    this.displayObject = this.component.createComponentDisplay(this.tab);   
+    this.tab = this.component.getWorkspaceUI().requestTab(this.object.getId(),true);   
+    this.displayContent = this.component.createDisplayContent(this.tab); 
+    this.tab.setName(this.object.getName());
 }

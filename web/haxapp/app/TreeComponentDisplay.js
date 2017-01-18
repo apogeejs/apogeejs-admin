@@ -18,14 +18,13 @@ haxapp.app.TreeComponentDisplay.prototype.changeParent = function(newParentCompo
     newParentTreeEntry.addChild(this.object.getId(),this.treeEntry);
 }
 
-haxapp.app.TreeComponentDisplay.prototype.setBannerState = function() {
-    
+haxapp.app.TreeComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
+    //add this!
 }
 
 haxapp.app.TreeComponentDisplay.prototype.updateData = function() {
-    treeEntry.setLabel(this.object.getName());
+    this.treeEntry.setLabel(this.object.getName());
 }
-
 //===============================
 // Private Functions
 //===============================
@@ -39,7 +38,7 @@ haxapp.app.TreeComponentDisplay.prototype._createTreeEntry = function() {
     var instance = this;
     
     var openCallback = function() {
-        instance.openDisplay();
+        instance.component.openTabDisplay();
     } 
     
     var contextMenuCallback = function(event) {
@@ -56,6 +55,6 @@ haxapp.app.TreeComponentDisplay.prototype._createTreeEntry = function() {
         haxapp.ui.Menu.showContextMenu(contextMenu,event);
     }
     
-    var labelText = this.getObject().getName();
+    var labelText = this.object.getName();
     return new haxapp.ui.treecontrol.TreeEntry(labelText, openCallback, contextMenuCallback);
 }

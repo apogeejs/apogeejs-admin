@@ -28,8 +28,8 @@ haxapp.app.FunctionComponent.TABLE_EDIT_SETTINGS = {
     "defaultView": haxapp.app.FunctionComponent.VIEW_CODE
 }
 
-haxapp.app.FunctionComponent.prototype.createComponentDisplay = function(container) {
-    return new haxapp.app.EditComponentDisplay(this,container,haxapp.app.FunctionComponent.TABLE_EDIT_SETTINGS);
+haxapp.app.FunctionComponent.prototype.createDisplayContent = function(container) {
+    return new haxapp.app.EditDisplayContent(this,container,haxapp.app.FunctionComponent.TABLE_EDIT_SETTINGS);
 }
 
 /** This method should be implemented to retrieve a view mode of the give type. 

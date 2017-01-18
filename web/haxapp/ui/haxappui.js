@@ -150,6 +150,7 @@ haxapp.ui.createDialog = function(options) {
     
     var dialog = new haxapp.ui.WindowFrame(options);
     dialog.setParent(dialogParent);
+    return dialog;
 }
 
 /** This method closes a dialog created with haxapp.ui.createDialog. It

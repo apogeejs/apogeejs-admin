@@ -2,13 +2,17 @@
 haxapp.app.FolderComponent = function(workspaceUI,folder,componentJson) {
     //base init
     haxapp.app.Component.init.call(this,workspaceUI,folder,haxapp.app.FolderComponent.generator,componentJson);
+    haxapp.app.ParentComponent.init.call(this);
     
     //add a cleanup and save actions
     this.addSaveAction(haxapp.app.FolderComponent.writeToJson);
+    
+    this.memberUpdated();
 };
 
 //add components to this class
 hax.base.mixin(haxapp.app.FolderComponent,haxapp.app.Component);
+hax.base.mixin(haxapp.app.FolderComponent,haxapp.app.ParentComponent);
 
 //----------------------
 // ParentContainer Methods
@@ -19,12 +23,17 @@ haxapp.app.FolderComponent.prototype.getContentIsShowing = function() {
     return this.getWindow().getContentIsShowing();
 }
 
+/** This returned the parent member object associated with this component. */
+haxapp.app.FolderComponent.prototype.getParentMember = function() {
+    return this.getObject();
+}
+
 //==============================
 // Protected and Private Instance Methods
 //==============================
 
-haxapp.app.FolderComponent.prototype.createComponentDisplay = function(container) {
-    return new haxapp.app.ParentComponentDisplay(this,container);
+haxapp.app.FolderComponent.prototype.createDisplayContent = function(container) {
+    return new haxapp.app.ParentDisplayContent(this,container);
 }
 
 

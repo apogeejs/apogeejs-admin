@@ -43,8 +43,9 @@ haxapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, componentsJs
         this.loadFolderComponentContentFromJson(rootFolder,componentsJson);
     }
     
-    //TREE_ENTRY - add the root tree entyr to the panel
-    this.tree.setRootEntry(rootFolderComponent.getTreeEntry().getElement());
+    //add the root tree entyr to the panel
+    var rootTreeEntry = rootFolderComponent.getTreeEntry();
+    this.tree.setRootEntry(rootTreeEntry.getElement());
     
     //listeners
     var instance = this;
@@ -192,15 +193,14 @@ haxapp.app.WorkspaceUI.prototype.close = function() {
     this.setLinks([],[]);
 }
 
-haxapp.app.WorkspaceUI.prototype.setActiveTab = function(tab) {
-    var name = tab.getName();
-    this.tabFrame.setActiveTab(name);
+haxapp.app.WorkspaceUI.prototype.setActiveTab = function(id) {
+    this.tabFrame.setActiveTab(id);
 }
 
-haxapp.app.WorkspaceUI.prototype.requestTab = function(name,makeActive) {
-    var tab = this.tabFrame.addTab(name);
+haxapp.app.WorkspaceUI.prototype.requestTab = function(id,makeActive) {
+    var tab = this.tabFrame.addTab(id);
     if(makeActive) {
-        this.tabFrame.setActiveTab(name);
+        this.tabFrame.setActiveTab(id);
     }
     return tab;
 }

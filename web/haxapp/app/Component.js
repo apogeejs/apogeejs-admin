@@ -14,7 +14,7 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
     
     this.workspaceUI = workspaceUI;
     this.object = object;
-    this.activeParent = object.getParent();
+    this.uiActiveParent = null;
     this.generator = generator;
    
     this.workspaceUI.registerMember(this.object,this);
@@ -65,20 +65,29 @@ haxapp.app.Component.getWorkspaceUI = function() {
 }
 
 /** This method creates a window display for this component. */
-haxapp.app.Component.createWindowDisplay = function(parentContainer) {
-    var windowComponentDisplay = new haxapp.app.WindowComponentDisplay(this,parentContainer);
+haxapp.app.Component.createWindowDisplay = function() {
+    var windowComponentDisplay = new haxapp.app.WindowComponentDisplay(this);
     this.windowDisplays.push(windowComponentDisplay);
+    return windowComponentDisplay;
+}
+
+haxapp.app.Component.openTabDisplay = function() {
+    if(!this.tabDisplay) {
+        this.tabDisplay = new haxapp.app.TabComponentDisplay(this);
+    }
+    this.workspaceUI.setActiveTab(this.getObject().getId());
 }
 
 haxapp.app.Component.getTreeEntry = function() {
     return this.treeDisplay.getTreeEntry();
 }
 
-haxapp.app.Component.openDisplay = function() {
-    if(!this.tabComponentDisplay) {
-        this.tabComponentDisplay = new haxapp.app.TabComponentDisplay(this);
-    }
-    this.workspaceUI.setActiveTab(this.tabComponentDisplay.getTab());
+haxapp.app.Component.getTabDisplay = function() {
+    return this.tabDisplay;
+}
+
+haxapp.app.Component.getWindowDisplays = function() {
+    return this.windowDisplays;
 }
 
 /** This serializes the component. */
@@ -118,8 +127,8 @@ haxapp.app.Component.onDelete = function() {
 //    componentWindow.deleteWindow();
     
     //TREE_ENTRY - remove tree entry from the parent
-    if(this.activeParent) {
-        var parentComponent = this.workspaceUI.getComponent(this.activeParent);
+    if(this.uiActiveParent) {
+        var parentComponent = this.workspaceUI.getComponent(this.uiActiveParent);
         if(parentComponent) {
             var parentTreeEntry = parentComponent.getTreeEntry();
             parentTreeEntry.removeChild(this.getObject().getId());
@@ -136,22 +145,28 @@ haxapp.app.Component.onDelete = function() {
  * @protected */    
 haxapp.app.Component.memberUpdated = function() {
     //check for change of parent
-    if(this.object.getParent() !== this.activeParent) {
-        var oldParent = this.activeParent;
+    if(this.object.getParent() !== this.uiActiveParent) {
+        var oldParent = this.uiActiveParent;
         var newParent = this.object.getParent();
+       
+        this.uiActiveParent = newParent;
         
-        this.activeParent = newParent;
-        
-        //update the tree entry
-        this.treeDisplay.changeParent(newParent,oldParent);
-        
-        //delete windows for old parent, add to the new parent
-        for(var i = 0; i < this.windowDisplays.length; i++) {
-            var windowDisplay = this.windowDisplays[i];
-            windowDisplay.delete();
+        //remove from old parent component
+        if(oldParent) {
+            var oldParentComponent = this.workspaceUI.getComponent(oldParent);
+            oldParentComponent.removeChildComponent(this);
+            //delete all the old windows
+            for(var i = 0; i < this.windowDisplays.length; i++) {
+                this.windowDisplays[i].deleteWindow();
+            }
+            this.windowDisplays = [];
         }
         
-        newParent.childComponentAdded(this);
+        //add to the new parent component
+        if(newParent) {
+            var newParentComponent = this.workspaceUI.getComponent(newParent);
+            newParentComponent.addChildComponent(this);
+        }
     }
     
     //get the banner info
@@ -165,21 +180,22 @@ haxapp.app.Component.memberUpdated = function() {
             errorMsg += actionErrors[i].msg + "\n";
         }
         
-        bannerState = haxapp.app.ComponentDisplay.BANNER_TYPE_ERROR;
+        bannerState = haxapp.app.DisplayContent.BANNER_TYPE_ERROR;
         bannerMessage = errorMsg;
     }
     else if(object.getResultPending()) {
-        bannerState = haxapp.app.ComponentDisplay.BANNER_TYPE_PENDING;
-        bannerMessage = haxapp.app.ComponentDisplay.PENDING_MESSAGE;
+        bannerState = haxapp.app.DisplayContent.BANNER_TYPE_PENDING;
+        bannerMessage = haxapp.app.DisplayContent.PENDING_MESSAGE;
         
     }
     else {   
-        bannerState = haxapp.app.ComponentDisplay.BANNER_TYPE_NONE;
+        bannerState = haxapp.app.DisplayContent.BANNER_TYPE_NONE;
         bannerMessage = null;
     }
     
     //update for new data
-    this.treeEntry.setBannerState(bannerState,bannerMessage);
+    this.treeDisplay.updateData();
+    this.treeDisplay.setBannerState(bannerState,bannerMessage);
     if(this.tabDisplay) {
         this.tabDisplay.updateData();
         this.tabDisplay.setBannerState(bannerState,bannerMessage);
@@ -212,7 +228,7 @@ haxapp.app.Component.getPropertyValues = function() {
 
 ///** This method shoudl be implemented by an extending class to create a component
 // * display, given a container, for the component. */
-//haxapp.app.Component.prototype.createComponentDisplay = function(container);
+//haxapp.app.Component.prototype.createDisplayContent = function(container);
 
 //=============================
 // Action UI Entry Points

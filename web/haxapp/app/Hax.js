@@ -77,7 +77,7 @@ haxapp.app.Hax.prototype.setWorkspaceUI = function(workspaceUI) {
 haxapp.app.Hax.prototype.clearWorkspaceUI = function() {
     //remove the workspace from the app
     this.workspaceUI = null;
-//    this.tabFrame.removeTab("DUMMY NAME");
+    
     return true;
 }
 

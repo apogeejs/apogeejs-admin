@@ -47,25 +47,25 @@ haxapp.ui.TabFrame.prototype.getTab = function(name) {
 }
 
 /** This method adds a tab to the tab frame. */
-haxapp.ui.TabFrame.prototype.addTab = function(name) {
+haxapp.ui.TabFrame.prototype.addTab = function(id) {
     //make sure there is no tab with this name
-    if(this.tabTable[name]) {
+    if(this.tabTable[id]) {
         alert("There is already a tab with this name!");
         return null;
     }
     
-    //create the tab object
-    var tab = new haxapp.ui.Tab(name, this);
-    this.tabFrame.appendChild(tab.getOuterElement());
-    
-    //create tab label
+    //create tab label - initialize with the id (should be renamed)
     var tabLabelElement = haxapp.ui.createElementWithClass("div","visiui-tf-tab-base visiui-tf-tab-inactive",this.tabBar);
-    tabLabelElement.innerHTML = name;
+    tabLabelElement.innerHTML = id;
+    
+    //create the tab object
+    var tab = new haxapp.ui.Tab(id, tabLabelElement, this);
+    this.tabFrame.appendChild(tab.getOuterElement());
 	
     //add the click handler
     var instance = this;
     tabLabelElement.onclick = function() {
-        instance.setActiveTab(name);
+        instance.setActiveTab(id);
     }
     tabLabelElement.onmousedown = function(e) {
         //this prevents text selection
@@ -77,9 +77,9 @@ haxapp.ui.TabFrame.prototype.addTab = function(name) {
     tabData.tabDisplay = tab;
     tabData.tabLabel = tabLabelElement;
     
-    this.tabTable[name] = tabData;
+    this.tabTable[id] = tabData;
     if(this.activeTab == null) {
-        this.activeTab = name;
+        this.activeTab = id;
     }
     this.updateTabDisplay();
     
@@ -90,14 +90,14 @@ haxapp.ui.TabFrame.prototype.addTab = function(name) {
 }
 
 /** This method adds a tab to the tab frame. */
-haxapp.ui.TabFrame.prototype.removeTab = function(name) {
-    var tabData = this.tabTable[name];
+haxapp.ui.TabFrame.prototype.removeTab = function(id) {
+    var tabData = this.tabTable[id];
     if(tabData) {
         this.tabFrame.removeChild(tabData.tabDisplay.getContainerElement());
         this.tabBar.removeChild(tabData.tabLabel);
-        delete this.tabTable[name];
+        delete this.tabTable[id];
 		
-        if(this.activeTab == name) {
+        if(this.activeTab == id) {
             this.activeTab = null;
             //choose a random tab
             for(var title in this.tabTable) {
@@ -110,8 +110,8 @@ haxapp.ui.TabFrame.prototype.removeTab = function(name) {
 }
 
 /** This mesets the active tab, by tab title. */
-haxapp.ui.TabFrame.prototype.setActiveTab = function(title) {
-    this.activeTab = title;
+haxapp.ui.TabFrame.prototype.setActiveTab = function(id) {
+    this.activeTab = id;
     this.updateTabDisplay();
 }
 

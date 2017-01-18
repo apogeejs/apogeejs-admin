@@ -1,11 +1,11 @@
 /** This is a mixin to form the base for a component display, which is used
  * for different types of components and for both window and tab containers. */
- haxapp.app.ComponentDisplay = {};
+haxapp.app.DisplayContent = {};
  
  
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-haxapp.app.ComponentDisplay.init = function(component,container,options) {
+haxapp.app.DisplayContent.init = function(component,container,options) {
     
     if(!options) {
         options = {};
@@ -67,12 +67,12 @@ haxapp.app.ComponentDisplay.init = function(component,container,options) {
 }
 
 /** This method returns the component object. */
-haxapp.app.ComponentDisplay.getComponent = function() {
+haxapp.app.DisplayContent.getComponent = function() {
 	return this.component;
 }
 
 /** This method returns the member object. */
-haxapp.app.ComponentDisplay.getObject = function() {
+haxapp.app.DisplayContent.getObject = function() {
 	return this.component.getObject();
 }
 
@@ -81,23 +81,23 @@ haxapp.app.ComponentDisplay.getObject = function() {
 //=======================
 
 //constants for the window banner bar
-haxapp.app.ComponentDisplay.BANNER_TYPE_ERROR = "error";
-haxapp.app.ComponentDisplay.BANNER_BGCOLOR_ERROR = "red";
-haxapp.app.ComponentDisplay.BANNER_FGCOLOR_ERROR = "white";
+haxapp.app.DisplayContent.BANNER_TYPE_ERROR = "error";
+haxapp.app.DisplayContent.BANNER_BGCOLOR_ERROR = "red";
+haxapp.app.DisplayContent.BANNER_FGCOLOR_ERROR = "white";
 
-haxapp.app.ComponentDisplay.BANNER_TYPE_PENDING = "pending";
-haxapp.app.ComponentDisplay.BANNER_BGCOLOR_PENDING = "yellow";
-haxapp.app.ComponentDisplay.BANNER_FGCOLOR_PENDING = "black";
+haxapp.app.DisplayContent.BANNER_TYPE_PENDING = "pending";
+haxapp.app.DisplayContent.BANNER_BGCOLOR_PENDING = "yellow";
+haxapp.app.DisplayContent.BANNER_FGCOLOR_PENDING = "black";
 
-haxapp.app.ComponentDisplay.BANNER_BGCOLOR_UNKNOWN = "yellow";
-haxapp.app.ComponentDisplay.BANNER_FGCOLOR_UNKNOWN = "black";
+haxapp.app.DisplayContent.BANNER_BGCOLOR_UNKNOWN = "yellow";
+haxapp.app.DisplayContent.BANNER_FGCOLOR_UNKNOWN = "black";
 
-haxapp.app.ComponentDisplay.BANNER_TYPE_NONE = "none";
+haxapp.app.DisplayContent.BANNER_TYPE_NONE = "none";
 
-haxapp.app.ComponentDisplay.PENDING_MESSAGE = "Calculation pending...";
+haxapp.app.DisplayContent.PENDING_MESSAGE = "Calculation pending...";
 
 /** This method returns the base member for this component. */
-haxapp.app.ComponentDisplay.showBannerBar = function(text,type) {
+haxapp.app.DisplayContent.showBannerBar = function(text,type) {
     
     if(!this.bannerDiv) {
         this.bannerDiv = haxapp.ui.createElement("div",null,
@@ -113,17 +113,17 @@ haxapp.app.ComponentDisplay.showBannerBar = function(text,type) {
     //get banner color
     var bgColor;
     var fgColor;
-    if(type == haxapp.app.ComponentDisplay.BANNER_TYPE_ERROR) {
-        bgColor = haxapp.app.ComponentDisplay.BANNER_BGCOLOR_ERROR;
-        fgColor = haxapp.app.ComponentDisplay.BANNER_FGCOLOR_ERROR;
+    if(type == haxapp.app.DisplayContent.BANNER_TYPE_ERROR) {
+        bgColor = haxapp.app.DisplayContent.BANNER_BGCOLOR_ERROR;
+        fgColor = haxapp.app.DisplayContent.BANNER_FGCOLOR_ERROR;
     }
-    else if(type == haxapp.app.ComponentDisplay.BANNER_TYPE_PENDING) {
-        bgColor = haxapp.app.ComponentDisplay.BANNER_BGCOLOR_PENDING;
-        fgColor = haxapp.app.ComponentDisplay.BANNER_FGCOLOR_PENDING;
+    else if(type == haxapp.app.DisplayContent.BANNER_TYPE_PENDING) {
+        bgColor = haxapp.app.DisplayContent.BANNER_BGCOLOR_PENDING;
+        fgColor = haxapp.app.DisplayContent.BANNER_FGCOLOR_PENDING;
     }
     else {
-        bgColor = haxapp.app.ComponentDisplay.BANNER_BGCOLOR_UNKNOWN;
-        fgColor = haxapp.app.ComponentDisplay.BANNER_FGCOLOR_UNKNOWN;
+        bgColor = haxapp.app.DisplayContent.BANNER_BGCOLOR_UNKNOWN;
+        fgColor = haxapp.app.DisplayContent.BANNER_FGCOLOR_UNKNOWN;
    }
    var colorStyle = {};
    colorStyle.backgroundColor = bgColor;
@@ -138,20 +138,20 @@ haxapp.app.ComponentDisplay.showBannerBar = function(text,type) {
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.ComponentDisplay.hideBannerBar = function() {
+haxapp.app.DisplayContent.hideBannerBar = function() {
 	this.bannerBarActive = false;
 	this.showActiveHeaders();
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.ComponentDisplay.showToolbar = function(toolbarDiv) {
+haxapp.app.DisplayContent.showToolbar = function(toolbarDiv) {
     this.toolbarActive = true;
     this.toolbarDiv = toolbarDiv;
 	this.showActiveHeaders();
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.ComponentDisplay.hideToolbar = function() {
+haxapp.app.DisplayContent.hideToolbar = function() {
     this.toolbarActive = false;
     this.toolbarDiv = null;	
 	this.showActiveHeaders();
@@ -159,7 +159,7 @@ haxapp.app.ComponentDisplay.hideToolbar = function() {
 
 /** This method shows the active headers. 
  * @private */
-haxapp.app.ComponentDisplay.showActiveHeaders = function() {
+haxapp.app.DisplayContent.showActiveHeaders = function() {
 	var headerElements = [];
     if((this.toolbarActive)&&(this.toolbarDiv)) {
 		headerElements.push(this.toolbarDiv);
@@ -187,18 +187,18 @@ haxapp.app.ComponentDisplay.showActiveHeaders = function() {
 
 
 /** This method sets the content element as a scrolling element. */
-haxapp.app.ComponentDisplay.setScrollingContentElement = function() {
+haxapp.app.DisplayContent.setScrollingContentElement = function() {
     this.windowInsideContainer.setBodyType(haxapp.ui.DisplayAndHeader.SCROLLING_PANE);
 }
 
 /** This method sets the content element as a fixed element. */
-haxapp.app.ComponentDisplay.setFixedContentElement = function() {
+haxapp.app.DisplayContent.setFixedContentElement = function() {
     //load the content div
     this.windowInsideContainer.setBodyType(haxapp.ui.DisplayAndHeader.FIXED_PANE);
 }
 
 /** This method returns the content element for the windowframe for this component. */
-haxapp.app.ComponentDisplay.getDisplayBodyElement = function() {
+haxapp.app.DisplayContent.getDisplayBodyElement = function() {
      return this.windowInsideContainer.getBody();
 }
 
@@ -208,7 +208,7 @@ haxapp.app.ComponentDisplay.getDisplayBodyElement = function() {
 
 /** This method extends the member udpated function from the base.
  * @protected */    
-haxapp.app.ComponentDisplay.memberUpdated = function() {
+haxapp.app.DisplayContent.memberUpdated = function() {
     //check for change of parent
     if(this.object.getParent() !== this.activeParent) {
         this.activeParent = this.object.getParent();
@@ -228,10 +228,10 @@ haxapp.app.ComponentDisplay.memberUpdated = function() {
             errorMsg += actionErrors[i].msg + "\n";
         }
         
-        this.showBannerBar(errorMsg,haxapp.app.ComponentDisplay.BANNER_TYPE_ERROR);
+        this.showBannerBar(errorMsg,haxapp.app.DisplayContent.BANNER_TYPE_ERROR);
     }
     else if(object.getResultPending()) {
-        this.showBannerBar(haxapp.app.ComponentDisplay.PENDING_MESSAGE,haxapp.app.ComponentDisplay.BANNER_TYPE_PENDING);
+        this.showBannerBar(haxapp.app.DisplayContent.PENDING_MESSAGE,haxapp.app.DisplayContent.BANNER_TYPE_PENDING);
     }
     else {   
         this.hideBannerBar();
@@ -240,7 +240,7 @@ haxapp.app.ComponentDisplay.memberUpdated = function() {
 
 /** This method makes sure the window title is up to date.
  * @private */    
-haxapp.app.ComponentDisplay.updateTitle = function() {
+haxapp.app.DisplayContent.updateTitle = function() {
     //make sure the title is up to date
     var member = this.getObject();
     

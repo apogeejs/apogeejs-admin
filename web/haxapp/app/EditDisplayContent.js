@@ -9,10 +9,10 @@
 
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-haxapp.app.EditComponentDisplay = function(editComponent,container,settings,options) {
+haxapp.app.EditDisplayContent = function(editComponent,container,settings,options) {
     
     //base init
-    haxapp.app.ComponentDisplay.init.call(this,editComponent,container,options);
+    haxapp.app.DisplayContent.init.call(this,editComponent,container,options);
 	
 	this.viewTypes = settings.viewModes;
     this.defaultViewType = settings.defaultView;
@@ -29,8 +29,8 @@ haxapp.app.EditComponentDisplay = function(editComponent,container,settings,opti
 	this.clearFunctionCallback = null;
     
     //add a cleanup action to the base component - component must already be initialized
-//    this.addSaveAction(haxapp.app.EditComponentDisplay.writeToJson);
-//    this.addCleanupAction(haxapp.app.EditComponentDisplay.destroy);
+//    this.addSaveAction(haxapp.app.EditDisplayContent.writeToJson);
+//    this.addCleanupAction(haxapp.app.EditDisplayContent.destroy);
 
     this.initUI();
     
@@ -39,14 +39,14 @@ haxapp.app.EditComponentDisplay = function(editComponent,container,settings,opti
 }
 
 //add components to this class
-hax.base.mixin(haxapp.app.EditComponentDisplay,haxapp.app.ComponentDisplay);
+hax.base.mixin(haxapp.app.EditDisplayContent,haxapp.app.DisplayContent);
 
 /** This value is used as the background color when an editor is read only. */
-haxapp.app.EditComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
+haxapp.app.EditDisplayContent.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
 /** This method populates the frame for this component. 
  * @protected */
-haxapp.app.EditComponentDisplay.prototype.setViewType = function(viewType) {
+haxapp.app.EditDisplayContent.prototype.setViewType = function(viewType) {
 	//return if there is no change
 	if(this.viewType === viewType) return false;
     
@@ -71,7 +71,7 @@ haxapp.app.EditComponentDisplay.prototype.setViewType = function(viewType) {
 //haxapp.app.EditComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType);
 
 //this function will update the view shown in the dropdown
-haxapp.app.EditComponentDisplay.prototype.updateViewDropdown = function(viewType) {
+haxapp.app.EditDisplayContent.prototype.updateViewDropdown = function(viewType) {
     if(!viewType) {
         viewType = this.defaultViewType;
     }
@@ -80,7 +80,7 @@ haxapp.app.EditComponentDisplay.prototype.updateViewDropdown = function(viewType
 
 /** This method updates the table data 
  * @private */    
-haxapp.app.EditComponentDisplay.prototype.memberUpdated = function() {
+haxapp.app.EditDisplayContent.prototype.memberUpdated = function() {
     
     var object = this.component.getObject();
         
@@ -117,7 +117,7 @@ haxapp.app.EditComponentDisplay.prototype.memberUpdated = function() {
 	}
 }
 
-haxapp.app.EditComponentDisplay.prototype.getClearFunctionCallback = function() {
+haxapp.app.EditDisplayContent.prototype.getClearFunctionCallback = function() {
 	var table = this.getObject();
 	var blankDataValue = this.clearFunctionDataValue;
     return function() {
@@ -130,20 +130,20 @@ haxapp.app.EditComponentDisplay.prototype.getClearFunctionCallback = function() 
 
 /** This method should be called to set up the component ui for edit mode. 
  * @protected */
-haxapp.app.EditComponentDisplay.prototype.startEditUI = function(onSave,onCancel) {
+haxapp.app.EditDisplayContent.prototype.startEditUI = function(onSave,onCancel) {
     this.select.disabled = true;
     this.showSaveBar(onSave,onCancel);
 }
 
 /** This method populates the frame for this component. 
  * @protected */
-haxapp.app.EditComponentDisplay.prototype.endEditUI = function() {
+haxapp.app.EditDisplayContent.prototype.endEditUI = function() {
     this.hideSaveBar();
     this.select.disabled = false;
 }
 /** This method populates the frame for this component. 
  * @protected */
-haxapp.app.EditComponentDisplay.prototype.initUI = function() {
+haxapp.app.EditDisplayContent.prototype.initUI = function() {
     
     //set initial view type
     var initialViewType;
@@ -208,7 +208,7 @@ haxapp.app.EditComponentDisplay.prototype.initUI = function() {
 
 
 /** This method returns the base member for this component. */
-haxapp.app.EditComponentDisplay.prototype.showSaveBar = function(onSave,onCancel) {
+haxapp.app.EditDisplayContent.prototype.showSaveBar = function(onSave,onCancel) {
     if(!this.saveDiv) {
         this.saveDiv = haxapp.ui.createElement("div",null,
             {
@@ -242,13 +242,13 @@ haxapp.app.EditComponentDisplay.prototype.showSaveBar = function(onSave,onCancel
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.EditComponentDisplay.prototype.hideSaveBar = function() {
+haxapp.app.EditDisplayContent.prototype.hideSaveBar = function() {
     this.saveBarActive = false;	
 	this.showToolbar(this.normalToolbarDiv);
 }
 
 /** @private */
-haxapp.app.EditComponentDisplay.prototype.showModeElement = function(viewModeElement) {
+haxapp.app.EditDisplayContent.prototype.showModeElement = function(viewModeElement) {
     
     var displayBody = this.getDisplayBodyElement();
     
@@ -271,13 +271,13 @@ haxapp.app.EditComponentDisplay.prototype.showModeElement = function(viewModeEle
 //======================================
 
 /** @protected */
-haxapp.app.EditComponentDisplay.prototype.destroy = function() {
+haxapp.app.EditDisplayContent.prototype.destroy = function() {
     if(this.viewModeElement) {
         this.viewModeElement.destroy();
     }
 }
 
 /** This serializes the table component. */
-haxapp.app.EditComponentDisplay.prototype.writeToJson = function(json) {
+haxapp.app.EditDisplayContent.prototype.writeToJson = function(json) {
     json.viewType = this.viewType;
 }
