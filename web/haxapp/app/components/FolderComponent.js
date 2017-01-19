@@ -36,20 +36,6 @@ haxapp.app.FolderComponent.prototype.createDisplayContent = function(container) 
     return new haxapp.app.ParentDisplayContent(this,container);
 }
 
-
-/** This method populates the frame for this component. 
- * @protected */
-haxapp.app.FolderComponent.prototype.populateFrame = function() {
-	this.setScrollingContentElement();
-    
-    //add context menu to create childrent
-    var contentElement = this.getContentElement();
-    var folder = this.getObject();
-    var app = this.getWorkspaceUI().getApp();
-    app.setFolderContextMenu(contentElement,folder);
-    
-}
-
 //======================================
 // Callbacks
 // These are defined as static but are called in the objects context

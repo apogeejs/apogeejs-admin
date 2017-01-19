@@ -20,6 +20,7 @@ haxapp.ui.WindowFrame = function(options) {
     
     //base init
     hax.EventManager.init.call(this);
+    haxapp.ui.WindowHeaderManager.init.call(this);
 	
     //variables
     this.parentContainer = null;
@@ -42,8 +43,6 @@ haxapp.ui.WindowFrame = function(options) {
     this.bodyCell = null;
     
     this.titleBar = null;
-    this.body = null;
-    this.content = null;
     
     this.windowDragActive = false;
     this.moveOffsetX = null;
@@ -92,6 +91,7 @@ haxapp.ui.WindowFrame = function(options) {
 
 //add components to this class
 hax.base.mixin(haxapp.ui.WindowFrame,hax.EventManager);
+hax.base.mixin(haxapp.ui.WindowFrame,haxapp.ui.WindowHeaderManager);
 
 haxapp.ui.WindowFrame.RESIZE_LOCATION_SIZE = 10;
 
@@ -137,30 +137,9 @@ haxapp.ui.WindowFrame.prototype.getMenu = function() {
 }
 
 /** This method returns the window body.*/
-haxapp.ui.WindowFrame.prototype.getBody = function() {
-    return this.body;
-}
-
-/** This method returns the window body.*/
 haxapp.ui.WindowFrame.prototype.getParent = function() {
     return this.parentContainer;
 }
-
-/** This method sets a content element in the body. Alternatively the body can 
- * be retrieved and loaded as desired. */
-haxapp.ui.WindowFrame.prototype.setContent = function(element) {
-    //remove the old content
-    while(this.body.firstChild) {
-        this.body.removeChild(this.body.firstChild);
-    }
-	
-    //add the new content
-    this.content = element;
-    if(this.content) {
-        this.body.appendChild(this.content);
-    }
-}
-
 
 //---------------------------
 // WINDOW CHILD
@@ -286,15 +265,16 @@ haxapp.ui.WindowFrame.prototype.getElement = function() {
 
 
 //----------------------------------------------------------------
-//objecdt specific
+//object specific
 
 /** This method sets the size of the window to fit the content. It should only be 
  * called after the window has been shown. The argument passed should be the element
  * that holds the content and is sized to it. */
 haxapp.ui.WindowFrame.prototype.fitToContent = function(contentContainer) {
 	//figure out how big to make the frame to fit the content
-    var viewWidth = this.body.offsetWidth;
-    var viewHeight = this.body.offsetHeight;
+    var bodyContainer = this.getBodyContainer();
+    var viewWidth = bodyContainer.offsetWidth;
+    var viewHeight = bodyContainer.offsetHeight;
     var contentWidth = contentContainer.offsetWidth;
     var contentHeight = contentContainer.offsetHeight;
 	
@@ -304,17 +284,18 @@ haxapp.ui.WindowFrame.prototype.fitToContent = function(contentContainer) {
     this.setSize(targetWidth,targetHeight);
 }
 
+/** @private */
+haxapp.ui.WindowFrame.FIT_HEIGHT_BUFFER = 20;
+/** @private */
+haxapp.ui.WindowFrame.FIT_WIDTH_BUFFER = 20;
+
+
 /** This method centers the window in its parent. it should only be called
  *after the window is shown. */
 haxapp.ui.WindowFrame.prototype.centerInParent = function() {
     var coords = this.parentContainer.getCenterOnPagePosition(this);
     this.setPosition(coords[0],coords[1]);
 }
-
-/** @private */
-haxapp.ui.WindowFrame.FIT_HEIGHT_BUFFER = 20;
-/** @private */
-haxapp.ui.WindowFrame.FIT_WIDTH_BUFFER = 20;
 
 
 /** This method gets the location and size info for the window. */
@@ -774,8 +755,10 @@ haxapp.ui.WindowFrame.prototype.createTitleBar = function() {
 /** @private */
 haxapp.ui.WindowFrame.prototype.createBody = function() {
     
-    this.body = document.createElement("div");
-    this.body.className = "visiui_win_body";
+    this.outerBody = document.createElement("div");
+    this.outerBody.className = "visiui_win_body";
     
-    this.bodyCell.appendChild(this.body);
+    this.bodyCell.appendChild(this.outerBody);
+    
+    this.createHeaders(this.outerBody);
 }

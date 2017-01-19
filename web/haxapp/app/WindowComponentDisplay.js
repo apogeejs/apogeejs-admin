@@ -50,23 +50,23 @@ haxapp.app.WindowComponentDisplay.prototype.deleteDisplay = function() {
 }
 
 haxapp.app.WindowComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
-    if(this.displayContent) {
+    if(this.windowFrame) {
         if(bannerState == haxapp.app.DisplayContent.BANNER_TYPE_NONE) {
-            this.displayContent.hideBannerBar();
+            this.windowFrame.hideBannerBar();
         }
         else {
-            this.displayContent.showBannerBar(bannerMessage,bannerState);
+            this.windowFrame.showBannerBar(bannerMessage,bannerState);
         }
     }
 }
 
 haxapp.app.WindowComponentDisplay.prototype.updateData = function() {
     if(this.windowOpened) {
-        this.windowFrame.setTitle(this.object.getTitle());
+        this.windowFrame.setTitle(this.object.getDisplayName());
         this.displayContent.memberUpdated();
     }
     else {
-        this.windowIcon.setTitle(this.object.getTitle());
+        this.windowIcon.setTitle(this.object.getDisplayName());
     }
 }
 
@@ -80,6 +80,7 @@ haxapp.app.WindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
     var memberWindowOptions = {};
     memberWindowOptions.closeable = true;
     memberWindowOptions.movable = true;
+    memberWindowOptions.resizable = true;
     memberWindowOptions.frameColorClass = "visicomp_windowColor";
     memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
 

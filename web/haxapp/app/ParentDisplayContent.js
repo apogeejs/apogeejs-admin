@@ -13,10 +13,8 @@ haxapp.app.ParentDisplayContent = function(component,container,options) {
     
     //base init
     haxapp.app.DisplayContent.init.call(this,component,container,options);
-    haxapp.ui.ParentContainer.init.call(this,this.getDisplayBodyElement(),container);
-	haxapp.ui.ParentHighlighter.init.call(this,this.getDisplayBodyElement());
-    
-    this.container = container;
+    haxapp.ui.ParentContainer.init.call(this,container.getBody(),container);
+	haxapp.ui.ParentHighlighter.init.call(this,container.getBody());
     
     //add a cleanup action to the base component - component must already be initialized
 //    this.addSaveAction(haxapp.app.EditDisplayContent.writeToJson);
@@ -67,12 +65,12 @@ haxapp.app.ParentDisplayContent.prototype.memberUpdated = function() {
  * @protected */
 haxapp.app.ParentDisplayContent.prototype.initUI = function() {
     
-    this.setScrollingContentElement();
+    this.container.setScrollingContentElement();
     
     var workspaceUI = this.component.getWorkspaceUI();
     
     //add context menu to create childrent
-    var contentElement = this.getDisplayBodyElement();
+    var contentElement = this.container.getBody();
     var parentMember = this.component.getParentMember();
     var app = workspaceUI.getApp();
     app.setFolderContextMenu(contentElement,parentMember);

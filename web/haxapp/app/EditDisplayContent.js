@@ -157,7 +157,7 @@ haxapp.app.EditDisplayContent.prototype.initUI = function() {
         initialViewType = this.defaultViewType;
     }    
 	
-	this.setFixedContentElement();
+	this.container.setFixedContentElement();
     
 	
 	//create the view selection ui
@@ -200,7 +200,7 @@ haxapp.app.EditDisplayContent.prototype.initUI = function() {
 
     this.normalToolbarDiv.appendChild(document.createTextNode("View: "));
     this.normalToolbarDiv.appendChild(this.select);
-    this.showToolbar(this.normalToolbarDiv);
+    this.container.showToolbar(this.normalToolbarDiv);
     
     this.setViewType(initialViewType);
     this.updateViewDropdown(this.viewType);
@@ -238,19 +238,19 @@ haxapp.app.EditDisplayContent.prototype.showSaveBar = function(onSave,onCancel) 
 	this.saveBarActive = true;
     
     //show the save toolbar
-    this.showToolbar(this.saveDiv);
+    this.container.showToolbar(this.saveDiv);
 }
 
 /** This method returns the base member for this component. */
 haxapp.app.EditDisplayContent.prototype.hideSaveBar = function() {
     this.saveBarActive = false;	
-	this.showToolbar(this.normalToolbarDiv);
+	this.container.showToolbar(this.normalToolbarDiv);
 }
 
 /** @private */
 haxapp.app.EditDisplayContent.prototype.showModeElement = function(viewModeElement) {
     
-    var displayBody = this.getDisplayBodyElement();
+    var displayBody = this.container.getBody();
     
 	haxapp.ui.removeAllChildren(displayBody);
 	

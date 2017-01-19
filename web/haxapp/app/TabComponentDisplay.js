@@ -14,12 +14,16 @@ haxapp.app.TabComponentDisplay.prototype.getDisplayContent = function() {
     return this.displayContent;
 }
 
+haxapp.app.TabComponentDisplay.prototype.deleteDisplay = function() {
+    alert("Delete tabcomponent display not implemneted");
+}
+
 haxapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     if(bannerState == haxapp.app.DisplayContent.BANNER_TYPE_NONE) {
-        this.displayContent.hideBannerBar();
+        this.tab.hideBannerBar();
     }
     else {
-        this.displayContent.showBannerBar(bannerMessage,bannerState);
+        this.tab.showBannerBar(bannerMessage,bannerState);
     }
 }
 

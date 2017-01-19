@@ -6,7 +6,6 @@ haxapp.ui.TabFrame = function() {
     
     //base init
     hax.EventManager.init.call(this);
-    //initialize parent container after conatiner div created
 	
     //variables
     this.tabTable = {};
@@ -14,19 +13,16 @@ haxapp.ui.TabFrame = function() {
     
     this.tabFrameControl = haxapp.ui.createElementWithClass("div","visiui-tf-frame");
     this.tabBar = haxapp.ui.createElementWithClass("div","visiui-tf-tab-bar",this.tabFrameControl);
-    this.tabFrame = haxapp.ui.createElementWithClass("div","visiui-tf-tab-container",this.tabFrameControl);   
-    
-    
-    //base init for parent continer mixin
-    haxapp.ui.ParentContainer.init.call(this,this.tabFrame,this);	
+    this.tabFrame = haxapp.ui.createElementWithClass("div","visiui-tf-tab-container",this.tabFrameControl);   	
 }
 
 //add components to this class
 hax.base.mixin(haxapp.ui.TabFrame,hax.EventManager);
-hax.base.mixin(haxapp.ui.TabFrame,haxapp.ui.ParentContainer);
 
 //events
+haxapp.ui.TabFrame.TAB_ADDED = "tabAdded";
 haxapp.ui.TabFrame.TAB_SHOWN = "tabShown";
+haxapp.ui.TabFrame.TAB_CLOSED = "tabClosed";
 
 haxapp.ui.TabFrame.CONTAINER_FRAME_MARGIN_PX = 5;
 
@@ -81,16 +77,14 @@ haxapp.ui.TabFrame.prototype.addTab = function(id) {
     if(this.activeTab == null) {
         this.activeTab = id;
     }
+    
+    this.dispatchEvent(haxapp.ui.TabFrame.TAB_ADDED,tab);
     this.updateTabDisplay();
-    
-//    //resize the main control element
-//    this.resizeElement();
-    
     return tab;
 }
 
 /** This method adds a tab to the tab frame. */
-haxapp.ui.TabFrame.prototype.removeTab = function(id) {
+haxapp.ui.TabFrame.prototype.closeTab = function(id) {
     var tabData = this.tabTable[id];
     if(tabData) {
         this.tabFrame.removeChild(tabData.tabDisplay.getContainerElement());
@@ -105,6 +99,7 @@ haxapp.ui.TabFrame.prototype.removeTab = function(id) {
                 break;
             }
         }
+        this.dispatchEvent(haxapp.ui.TabFrame.TAB_CLOSED,id);
         this.updateTabDisplay();
     }
 }
@@ -112,6 +107,7 @@ haxapp.ui.TabFrame.prototype.removeTab = function(id) {
 /** This mesets the active tab, by tab title. */
 haxapp.ui.TabFrame.prototype.setActiveTab = function(id) {
     this.activeTab = id;
+    this.dispatchEvent(haxapp.ui.TabFrame.TAB_SHOWN,id);
     this.updateTabDisplay();
 }
 

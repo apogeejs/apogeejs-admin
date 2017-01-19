@@ -122,6 +122,77 @@ haxapp.app.Component.toJson = function() {
 /** This method cleans up after a delete. Any extending object that has delete
  * actions should pass a callback function to the method "addClenaupAction" */
 haxapp.app.Component.onDelete = function() {
+    //-----------------------------------------------------------------------------------
+    //start
+    
+    //check for change of parent
+    if(this.object.getParent() !== this.uiActiveParent) {
+        var oldParent = this.uiActiveParent;
+        var newParent = this.object.getParent();
+       
+        this.uiActiveParent = newParent;
+        
+        //remove from old parent component
+        if(oldParent) {
+            var oldParentComponent = this.workspaceUI.getComponent(oldParent);
+            oldParentComponent.removeChildComponent(this);
+            //delete all the old windows
+            for(var i = 0; i < this.windowDisplays.length; i++) {
+                this.windowDisplays[i].deleteWindow();
+            }
+            this.windowDisplays = [];
+        }
+        
+        //add to the new parent component
+        if(newParent) {
+            var newParentComponent = this.workspaceUI.getComponent(newParent);
+            newParentComponent.addChildComponent(this);
+        }
+    }
+    
+    //get the banner info
+    var bannerState;
+    var bannerMessage;
+    var object = this.getObject();
+    if(object.hasError()) {
+        var errorMsg = "";
+        var actionErrors = object.getErrors();
+        for(var i = 0; i < actionErrors.length; i++) {
+            errorMsg += actionErrors[i].msg + "\n";
+        }
+        
+        bannerState = haxapp.ui.WindowHeaderManager.BANNER_TYPE_ERROR;
+        bannerMessage = errorMsg;
+    }
+    else if(object.getResultPending()) {
+        bannerState = haxapp.ui.WindowHeaderManager.BANNER_TYPE_PENDING;
+        bannerMessage = haxapp.ui.WindowHeaderManager.PENDING_MESSAGE;
+        
+    }
+    else {   
+        bannerState = haxapp.ui.WindowHeaderManager.BANNER_TYPE_NONE;
+        bannerMessage = null;
+    }
+    
+    //update for new data
+    this.treeDisplay.updateData();
+    this.treeDisplay.setBannerState(bannerState,bannerMessage);
+    if(this.tabDisplay) {
+        this.tabDisplay.updateData();
+        this.tabDisplay.setBannerState(bannerState,bannerMessage);
+    }
+    for(var i = 0; i < this.windowDisplays.length; i++) {
+        var windowDisplay = this.windowDisplays[i];
+        windowDisplay.updateData();
+        windowDisplay.setBannerState(bannerState,bannerMessage);
+    }
+    
+    //end
+    //-------------------------------------------------------------------------------------
+    
+    
+    
+    
     //remove the UI element
 //    var componentWindow = this.getWindow();
 //    componentWindow.deleteWindow();
@@ -180,16 +251,78 @@ haxapp.app.Component.memberUpdated = function() {
             errorMsg += actionErrors[i].msg + "\n";
         }
         
-        bannerState = haxapp.app.DisplayContent.BANNER_TYPE_ERROR;
+        bannerState = haxapp.ui.WindowHeaderManager.BANNER_TYPE_ERROR;
         bannerMessage = errorMsg;
     }
     else if(object.getResultPending()) {
-        bannerState = haxapp.app.DisplayContent.BANNER_TYPE_PENDING;
-        bannerMessage = haxapp.app.DisplayContent.PENDING_MESSAGE;
+        bannerState = haxapp.ui.WindowHeaderManager.BANNER_TYPE_PENDING;
+        bannerMessage = haxapp.ui.WindowHeaderManager.PENDING_MESSAGE;
         
     }
     else {   
-        bannerState = haxapp.app.DisplayContent.BANNER_TYPE_NONE;
+        bannerState = haxapp.ui.WindowHeaderManager.BANNER_TYPE_NONE;
+        bannerMessage = null;
+    }
+    
+    //update for new data
+    this.treeDisplay.updateData();
+    this.treeDisplay.setBannerState(bannerState,bannerMessage);
+    if(this.tabDisplay) {
+        this.tabDisplay.updateData();
+        this.tabDisplay.setBannerState(bannerState,bannerMessage);
+    }
+    for(var i = 0; i < this.windowDisplays.length; i++) {
+        var windowDisplay = this.windowDisplays[i];
+        windowDisplay.updateData();
+        windowDisplay.setBannerState(bannerState,bannerMessage);
+    }
+    
+    //check for change of parent
+    if(this.object.getParent() !== this.uiActiveParent) {
+        var oldParent = this.uiActiveParent;
+        var newParent = this.object.getParent();
+       
+        this.uiActiveParent = newParent;
+        
+        //remove from old parent component
+        if(oldParent) {
+            var oldParentComponent = this.workspaceUI.getComponent(oldParent);
+            oldParentComponent.removeChildComponent(this);
+            //delete all the old windows
+            for(var i = 0; i < this.windowDisplays.length; i++) {
+                this.windowDisplays[i].deleteWindow();
+            }
+            this.windowDisplays = [];
+        }
+        
+        //add to the new parent component
+        if(newParent) {
+            var newParentComponent = this.workspaceUI.getComponent(newParent);
+            newParentComponent.addChildComponent(this);
+        }
+    }
+    
+    //get the banner info
+    var bannerState;
+    var bannerMessage;
+    var object = this.getObject();
+    if(object.hasError()) {
+        var errorMsg = "";
+        var actionErrors = object.getErrors();
+        for(var i = 0; i < actionErrors.length; i++) {
+            errorMsg += actionErrors[i].msg + "\n";
+        }
+        
+        bannerState = haxapp.ui.WindowHeaderManager.BANNER_TYPE_ERROR;
+        bannerMessage = errorMsg;
+    }
+    else if(object.getResultPending()) {
+        bannerState = haxapp.ui.WindowHeaderManager.BANNER_TYPE_PENDING;
+        bannerMessage = haxapp.ui.WindowHeaderManager.PENDING_MESSAGE;
+        
+    }
+    else {   
+        bannerState = haxapp.ui.WindowHeaderManager.BANNER_TYPE_NONE;
         bannerMessage = null;
     }
     

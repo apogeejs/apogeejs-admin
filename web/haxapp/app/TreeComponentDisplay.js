@@ -18,6 +18,10 @@ haxapp.app.TreeComponentDisplay.prototype.changeParent = function(newParentCompo
     newParentTreeEntry.addChild(this.object.getId(),this.treeEntry);
 }
 
+haxapp.app.TreeComponentDisplay.prototype.deleteDisplay = function() {
+    alert("Delete tree component display not implemneted");
+}
+
 haxapp.app.TreeComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     //add this!
 }
