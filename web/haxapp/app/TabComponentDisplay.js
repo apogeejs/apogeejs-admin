@@ -29,7 +29,7 @@ haxapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerState,b
 
 haxapp.app.TabComponentDisplay.prototype.updateData = function() {
     this.tab.setName(this.object.getName());
-    this.tab.setTitle(this.object.getDisplayName());
+    //this.tab.setTitle(this.object.getDisplayName());
     this.displayContent.memberUpdated();
 }
 

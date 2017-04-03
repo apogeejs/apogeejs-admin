@@ -52,7 +52,6 @@ haxapp.ui.TabFrame.prototype.addTab = function(id) {
     
     //create tab label - initialize with the id (should be renamed)
     var tabLabelElement = haxapp.ui.createElementWithClass("div","visiui-tf-tab-base visiui-tf-tab-inactive",this.tabBar);
-    tabLabelElement.innerHTML = id;
     
     //create the tab object
     var tab = new haxapp.ui.Tab(id, tabLabelElement, this);

@@ -86,3 +86,50 @@
 .visiui_win_bottomRight {
   cursor: se-resize;
 }
+
+
+.visiui_win_left_style {
+    /* fixed */
+    display:inline;
+    width:100%;
+}
+
+.visiui_win_right_style {
+    /* fixed */
+    float:right;
+    display:inline;
+}
+
+.visiui_win_title {
+    /* fixed */
+    display:inline-block;
+    cursor:default;
+    font-weight:bold;
+    color:darkblue;
+    
+}
+
+.visiui_win_menu_style {
+    /* fixed */
+    display:inline-block;
+
+    /* configurable */
+    margin-right:3px;
+}
+
+.visiui_win_cmd_button { 
+    /* fixed */
+    display:inline-block;
+
+    /* configurable */
+    margin-right:3px;
+}
+
+.visiui_win_tool_style {
+    /* fixed */
+    display:inline-block;
+
+    /* configurable */
+    margin-right:3px;
+}
+ 
