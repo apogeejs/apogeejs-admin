@@ -1,8 +1,4 @@
-/** This is a mixin that encapsulates the base functionality of a parent container for a control
- * The parent container must provide events for when is is shown, hidden.
- * 
- * This is not a class, but it is used for the prototype of the objects that inherit from it.
- */
+/** This object is a container for window frames.  */
 haxapp.ui.ParentContainer = function(containerElement) {
     
     this.containerElement = containerElement;
