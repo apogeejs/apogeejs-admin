@@ -145,7 +145,7 @@ haxapp.ui.initWindows = function(appElementId) {
  *the app they may need to be shileded too.) */
 haxapp.ui.createDialog = function(options) {
     var shieldElement = haxapp.ui.createElement("div",null,haxapp.ui.DIALOG_SHIELD_STYLE);
-    var dialogParent = new haxapp.ui.SimpleParentContainer(shieldElement,true);
+    var dialogParent = new haxapp.ui.ParentContainer(shieldElement);
     haxapp.ui.dialogLayer.appendChild(shieldElement);
     
     var dialog = new haxapp.ui.WindowFrame(options);

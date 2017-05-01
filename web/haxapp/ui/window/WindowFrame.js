@@ -41,6 +41,8 @@ haxapp.ui.WindowFrame = function(options) {
     this.titleCell = null;
     this.bodyCell = null;
     
+    this.content = null;
+    
     this.windowDragActive = false;
     this.moveOffsetX = null;
     this.moveOffsetX = null;
@@ -143,6 +145,18 @@ haxapp.ui.WindowFrame.prototype.getMenu = function() {
     return this.menu;
 }
 
+/** This sets the content for the window */
+haxapp.ui.WindowFrame.prototype.setContent = function(contentElement) {
+    
+//    this.outerBody = document.createElement("div");
+//    this.outerBody.className = "visiui_win_body";  
+//    this.bodyCell.appendChild(this.outerBody);
+
+    haxapp.ui.removeAllChildren(this.bodyCell);
+    this.bodyCell.appendChild(contentElement);
+    this.content = contentElement;
+}
+
 /** This method returns the window body.*/
 haxapp.ui.WindowFrame.prototype.getParent = function() {
     return this.parentContainer;
@@ -154,20 +168,8 @@ haxapp.ui.WindowFrame.prototype.getParent = function() {
 
 /** This method shows the window. */
 haxapp.ui.WindowFrame.prototype.setParent = function(newParentContainer) {
-    if(this.parentContainer) {
-        this.hide();
-        var oldParentContainer = this.parentContainer;
-        var oldParentEventManager = oldParentContainer.getEventManager();
-        oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
-        oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);
-    }
-    
     this.parentContainer = newParentContainer;
     this.parentElement = newParentContainer.getContainerElement();
-    
-    var newParentEventManager = newParentContainer.getEventManager();
-    newParentEventManager.addListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
-    newParentEventManager.addListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);
     this.show();
 }
 
@@ -179,15 +181,14 @@ haxapp.ui.WindowFrame.prototype.show = function() {
     //add window to the parent
     this.parentContainer.addWindow(this);
 
-    if(this.parentContainer.getContentIsShowing()) {
-        this.isShowing = true;
-        this.frameShown();
+    this.isShowing = true;
+    this.frameShown();
 
-        //we will redo this since the size of elements used in calculation may have been wrong
-        if(this.coordinateInfo.height !== undefined) {
-            this.updateCoordinates();
-        }
+    //we will redo this since the size of elements used in calculation may have been wrong
+    if(this.coordinateInfo.height !== undefined) {
+        this.updateCoordinates();
     }
+
 }
 
 /** This method hides the window. */
@@ -204,10 +205,6 @@ haxapp.ui.WindowFrame.prototype.hide = function() {
 /** This method closes the window. */
 haxapp.ui.WindowFrame.prototype.deleteWindow = function() {
     if(!this.parentContainer) return;
-    
-    var parentEventManager = this.parentContainer.getEventManager();
-    parentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
-    parentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);
     this.hide();
 }
 
@@ -277,13 +274,12 @@ haxapp.ui.WindowFrame.prototype.getElement = function() {
 /** This method sets the size of the window to fit the content. It should only be 
  * called after the window has been shown. The argument passed should be the element
  * that holds the content and is sized to it. */
-haxapp.ui.WindowFrame.prototype.fitToContent = function(contentContainer) {
+haxapp.ui.WindowFrame.prototype.fitToContent = function() {
 	//figure out how big to make the frame to fit the content
-    var bodyContainer = this.getBodyContainer();
-    var viewWidth = bodyContainer.offsetWidth;
-    var viewHeight = bodyContainer.offsetHeight;
-    var contentWidth = contentContainer.offsetWidth;
-    var contentHeight = contentContainer.offsetHeight;
+    var viewWidth = this.bodyCell.offsetWidth;
+    var viewHeight = this.bodyCell.offsetHeight;
+    var contentWidth = this.content.offsetWidth;
+    var contentHeight = this.content.offsetHeight;
 	
 	var targetWidth = this.coordinateInfo.width + contentWidth - viewWidth + haxapp.ui.WindowFrame.FIT_WIDTH_BUFFER;
 	var targetHeight = this.coordinateInfo.height + contentHeight - viewHeight + haxapp.ui.WindowFrame.FIT_HEIGHT_BUFFER;
@@ -683,9 +679,6 @@ haxapp.ui.WindowFrame.prototype.initUI = function() {
  
     //create the title bar
     this.createTitleBar();
-    
-    //create body
-    this.createBody();
 }
 
 /** @private */
@@ -758,7 +751,7 @@ haxapp.ui.WindowFrame.prototype.createTitleBar = function() {
     }
     
     //layout the window buttons
-    this.windowState = haxapp.ui.WindowFrame.NORMAL;
+    this.windowState = haxapp.ui.WINDOW_STATE_NORMAL;
     this.setMinMaxButtons();
     
     //close button
@@ -833,15 +826,4 @@ haxapp.ui.WindowFrame.prototype.setMinMaxButtons = function() {
             this.maximizeButton.style.display = "";
         }
     }
-}
-	
-/** @private */
-haxapp.ui.WindowFrame.prototype.createBody = function() {
-    
-    this.outerBody = document.createElement("div");
-    this.outerBody.className = "visiui_win_body";
-    
-    this.bodyCell.appendChild(this.outerBody);
-    
-    this.createHeaders(this.outerBody);
 }

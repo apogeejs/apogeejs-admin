@@ -94,18 +94,11 @@ haxapp.ui.WindowIcon.prototype.getMenu = function() {
 haxapp.ui.WindowIcon.prototype.setParent = function(newParentContainer) {
     if(this.parentContainer) {
         this.hide();
-        var oldParentContainer = this.parentContainer;
-        var oldParentEventManager = oldParentContainer.getEventManager();
-        oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
-        oldParentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);
     }
     
     this.parentContainer = newParentContainer;
     this.parentElement = newParentContainer.getContainerElement();
     
-    var newParentEventManager = newParentContainer.getEventManager();
-    newParentEventManager.addListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
-    newParentEventManager.addListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);
     this.show();
 }
 
@@ -116,10 +109,8 @@ haxapp.ui.WindowIcon.prototype.show = function() {
     //add window to the parent
     this.parentContainer.addWindow(this);
 
-    if(this.parentContainer.getContentIsShowing()) {
-        this.isShowing = true;
-        this.frameShown();
-    }
+    this.isShowing = true;
+    this.frameShown();
 }
 
 /** This method hides the window. */
@@ -133,9 +124,6 @@ haxapp.ui.WindowIcon.prototype.hide = function() {
 
 /** This method closes the window. */
 haxapp.ui.WindowIcon.prototype.deleteWindow = function() {
-    var parentEventManager = this.parentContainer.getEventManager();
-    parentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_SHOWN, this.onShow);
-    parentEventManager.removeListener(haxapp.ui.ParentContainer.CONTENT_HIDDEN, this.onHide);
     this.hide();
 }
 

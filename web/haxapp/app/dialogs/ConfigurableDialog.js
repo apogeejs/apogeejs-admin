@@ -58,7 +58,7 @@ haxapp.app.dialog.showConfigurableDialog = function(layout,onSubmitFunction) {
     dialog.show();
     
     //size the dialog to the content
-    dialog.fitToContent(content);
+    dialog.fitToContent();
     dialog.centerInParent();
 }
     
