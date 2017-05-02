@@ -1,4 +1,5 @@
-/** This object is a container for window frames.  */
+/** This object is a container for window frames. The argument of the constructor should
+ * be an element that will hold the window frames.  */
 haxapp.ui.ParentContainer = function(containerElement) {
     
     this.containerElement = containerElement;
@@ -28,8 +29,7 @@ haxapp.ui.ParentContainer.CONTENT_HIDDEN = "content hidden";
 // Public Instance Methods
 //==============================
 
-/** This returns the dom element taht contains the child. */
-haxapp.ui.ParentContainer.prototype.getContainerElement = function() {
+haxapp.ui.ParentContainer.prototype.getOuterElement = function() {
     return this.containerElement;
 }
 

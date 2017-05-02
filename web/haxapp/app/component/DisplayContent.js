@@ -12,8 +12,9 @@ haxapp.app.DisplayContent.init = function(component,container,options) {
     }
     
     this.component = component;
-    this.container = container;
     this.options = options;
+    
+    this.windowHeaderManager = new WindowHeaderManager();
 
     //------------------
     // Add menu (we will add the items later. This populates it.)

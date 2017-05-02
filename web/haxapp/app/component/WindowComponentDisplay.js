@@ -1,36 +1,15 @@
 /** This component represents a json table object. */
 haxapp.app.WindowComponentDisplay = function(component) {
     this.component = component;
-    this.parentContainer = null;
     this.object = component.getObject();
    
-    //change this logic
-    if(!this.component.isParentComponent) {
-        this._loadWindowFrameEntry();
-        this.windowIconEntry = null;
-        this.windowOpened = true;
-    }
-    else {
-        this._loadWindowIconEntry();
-        this.windowFrameEntry = null;
-        this.windowOpened = false;
-    }
+    this._loadWindowFrameEntry();
+    this.windowOpened = true;
+
 };
 
 haxapp.app.WindowComponentDisplay.prototype.getWindowEntry = function() {
-    if(this.windowOpened) {
-        return this.windowFrame;
-    }
-    else {
-        return this.windowIcon;
-    }
-}
-
-/** This returns true if the window is opened and false is the
- * icon is displayed. In either case the object is accessible using 
- * the getWindowEntry call. */ 
-haxapp.app.WindowComponentDisplay.prototype.isOpened = function() {
-    return this.windowOpened;
+    return this.windowFrame;
 }
 
 /** This returns the display content of the window. It will be null if the window
@@ -44,29 +23,23 @@ haxapp.app.WindowComponentDisplay.prototype.deleteDisplay = function() {
     if(this.windowFrame) {
         this.windowFrame.deleteWindow();
     }
-    if(this.windowIcon) {
-        this.windowIcon.deleteWindow();
-    }
 }
 
 haxapp.app.WindowComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
-    if(this.windowFrame) {
+    if(this.windowHeaderManager) {
         if(bannerState == haxapp.app.DisplayContent.BANNER_TYPE_NONE) {
-            this.windowFrame.hideBannerBar();
+            this.windowHeaderManager.hideBannerBar();
         }
         else {
-            this.windowFrame.showBannerBar(bannerMessage,bannerState);
+            this.windowHeaderManager.showBannerBar(bannerMessage,bannerState);
         }
     }
 }
 
 haxapp.app.WindowComponentDisplay.prototype.updateData = function() {
-    if(this.windowOpened) {
+    if(this.windowFrame) {
         this.windowFrame.setTitle(this.object.getDisplayName());
         this.displayContent.memberUpdated();
-    }
-    else {
-        this.windowIcon.setTitle(this.object.getDisplayName());
     }
 }
 
@@ -76,25 +49,37 @@ haxapp.app.WindowComponentDisplay.prototype.updateData = function() {
 
 /** @private */
 haxapp.app.WindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
-    //window options
-    var memberWindowOptions = {};
-    memberWindowOptions.closeable = true;
-    memberWindowOptions.movable = true;
-    memberWindowOptions.resizable = true;
-    memberWindowOptions.frameColorClass = "visicomp_windowColor";
-    memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
-
-    this.windowFrame = new haxapp.ui.WindowFrame(memberWindowOptions);
-    this.windowFrame.setSize(this.component.generator.DEFAULT_WIDTH,this.component.generator.DEFAULT_HEIGHT);
-    this.displayContent = this.component.createDisplayContent(this.windowFrame);  
-}
-
-/** @private */
-haxapp.app.WindowComponentDisplay.prototype._loadWindowIconEntry = function() {
-    this.windowIcon = new haxapp.ui.WindowIcon();
-    this.displayContent = null;
     
-    //set title
-    var child = this.component.getObject();
-    this.windowIcon.setTitle(child.getName());
+    if(this.component.isParentComponent) {
+        //window options
+        var memberWindowOptions = {};
+        memberWindowOptions.closeable = false;
+        memberWindowOptions.movable = true;
+        memberWindowOptions.resizable = true;
+        memberWindowOptions.frameColorClass = "visicomp_windowColor";
+        memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
+
+        this.windowFrame = new haxapp.ui.WindowFrame(memberWindowOptions);
+        this.windowFrame.setSize(this.component.generator.DEFAULT_WIDTH,this.component.generator.DEFAULT_HEIGHT); 
+        
+        this.displayContent = null;
+    }
+    else {
+        //window options
+        var memberWindowOptions = {};
+        memberWindowOptions.closeable = false;
+        memberWindowOptions.movable = true;
+        memberWindowOptions.resizable = true;
+        memberWindowOptions.frameColorClass = "visicomp_windowColor";
+        memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
+
+        this.windowFrame = new haxapp.ui.WindowFrame(memberWindowOptions);
+        this.windowFrame.setSize(this.component.generator.DEFAULT_WIDTH,this.component.generator.DEFAULT_HEIGHT);
+        this.windowHeaderManager = new haxapp.app.WindowHeaderManager();
+        
+        this.displayContent = this.component.createDisplayContent(this.windowFrame);  
+        
+        this.windowFrame.setContent(this.windowHeaderManager.getOuterElement());
+        this.windowHeaderManager.setContent(this.displayContent.getOuterElement())
+    }
 }

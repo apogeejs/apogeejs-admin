@@ -7,8 +7,37 @@ haxapp.app.ParentComponent = {};
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
 haxapp.app.ParentComponent.init = function(options) {
-    
+    this.tabDisplay = null;
 }
+
+//////////////////////////////////////////
+    
+haxapp.app.Component.openTabDisplay = function() {
+    if(!this.tabDisplay) {
+        this.tabDisplay = new haxapp.app.TabComponentDisplay(this);
+    }
+    this.workspaceUI.setActiveTab(this.getObject().getId());
+}
+
+haxapp.app.Component.getTabDisplay = function() {
+    return this.tabDisplay;
+}
+
+////in memberUPdated
+//    if(this.tabDisplay) {
+//        this.tabDisplay.updateData();
+//        this.tabDisplay.setBannerState(bannerState,bannerMessage);
+//    }
+//
+////in member deleted
+//    if(this.tabDisplay) {
+//        this.tabDisplay.updateData();
+//        this.tabDisplay.setBannerState(bannerState,bannerMessage);
+//    }
+
+//////////////////////////////////////////
+
+
 
 /** This flags indicates the component is a parent component. */
 haxapp.app.ParentComponent.isParentComponent = true;

@@ -20,10 +20,10 @@ haxapp.app.TabComponentDisplay.prototype.deleteDisplay = function() {
 
 haxapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     if(bannerState == haxapp.app.DisplayContent.BANNER_TYPE_NONE) {
-        this.tab.hideBannerBar();
+        this.windowHeaderManager.hideBannerBar();
     }
     else {
-        this.tab.showBannerBar(bannerMessage,bannerState);
+        this.windowHeaderManager.showBannerBar(bannerMessage,bannerState);
     }
 }
 
@@ -39,7 +39,15 @@ haxapp.app.TabComponentDisplay.prototype.updateData = function() {
 
 /** @private */
 haxapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
-    this.tab = this.component.getWorkspaceUI().requestTab(this.object.getId(),true);   
-    this.displayContent = this.component.createDisplayContent(this.tab); 
+    this.tab = this.component.getWorkspaceUI().requestTab(this.object.getId(),true);
+    
+    this.windowHeaderManager = new haxapp.app.WindowHeaderManager();
+    this.tab.setContent(this.windowHeaderManager.getOuterElement());
+
+    this.displayContent = this.component.createDisplayContent(); 
+    this.windowHeaderManager.setContent(this.displayContent.getOuterElement());
+    
     this.tab.setName(this.object.getName());
 }
+
+

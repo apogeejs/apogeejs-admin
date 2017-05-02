@@ -109,8 +109,6 @@ haxapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT = 300;
 haxapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH = 300;
 
 
-
-
 //====================================
 // Public Methods
 //====================================
@@ -157,19 +155,19 @@ haxapp.ui.WindowFrame.prototype.setContent = function(contentElement) {
     this.content = contentElement;
 }
 
-/** This method returns the window body.*/
-haxapp.ui.WindowFrame.prototype.getParent = function() {
-    return this.parentContainer;
-}
-
 //---------------------------
 // WINDOW CHILD
 //---------------------------
 
+/** This method returns the parent container for the window.*/
+haxapp.ui.WindowFrame.prototype.getParent = function() {
+    return this.parentContainer;
+}
+
 /** This method shows the window. */
 haxapp.ui.WindowFrame.prototype.setParent = function(newParentContainer) {
     this.parentContainer = newParentContainer;
-    this.parentElement = newParentContainer.getContainerElement();
+    this.parentElement = newParentContainer.getOuterElement();
     this.show();
 }
 

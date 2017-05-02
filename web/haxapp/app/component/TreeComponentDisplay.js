@@ -42,7 +42,10 @@ haxapp.app.TreeComponentDisplay.prototype._createTreeEntry = function() {
     var instance = this;
     
     var openCallback = function() {
-        instance.component.openTabDisplay();
+        //of rnow only open if it is a parent. Later we shoudl do something for non-parents, like maybe open the parent.
+        if(instance.component.isParentComponent) {
+            instance.component.openTabDisplay();
+        }
     } 
     
     var contextMenuCallback = function(event) {

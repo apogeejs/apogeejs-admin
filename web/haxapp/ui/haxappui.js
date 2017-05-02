@@ -158,7 +158,7 @@ haxapp.ui.createDialog = function(options) {
 haxapp.ui.closeDialog = function(dialog) {
     var parent = dialog.getParent();
     dialog.hide();
-    haxapp.ui.dialogLayer.removeChild(parent.getContainerElement());
+    haxapp.ui.dialogLayer.removeChild(parent.getOuterElement());
 }
 
 haxapp.ui.WINDOW_STATE_MINIMIZED = -1;

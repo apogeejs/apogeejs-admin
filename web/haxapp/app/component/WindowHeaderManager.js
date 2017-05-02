@@ -1,11 +1,5 @@
-/** This is a mixin to form the base for a component display, which is used
- * for different types of components and for both window and tab containers. */
-haxapp.ui.WindowHeaderManager = {};
- 
- 
-/** This is the initializer for the component. The object passed is the core object
- * associated with this component. */
-haxapp.ui.WindowHeaderManager.init = function() {
+/** This is a class that manages banner messages for display classes. */
+haxapp.app.WindowHeaderManager = function() {
     
     //set fixed pane for header container - will customize later
     this.windowInsideContainer = null;
@@ -16,6 +10,14 @@ haxapp.ui.WindowHeaderManager.init = function() {
     this.toolbarActive = false;
     this.bannerDiv = null;
     this.bannerBarActive = false;
+    
+    this.windowInsideContainer = new haxapp.ui.DisplayAndHeader(haxapp.ui.DisplayAndHeader.FIXED_PANE,
+            null,
+            haxapp.ui.DisplayAndHeader.FIXED_PANE,
+            null
+        );
+    
+    this.body = this.windowInsideContainer.getBody();
       
 }
 
@@ -24,23 +26,23 @@ haxapp.ui.WindowHeaderManager.init = function() {
 //=======================
 
 //constants for the window banner bar
-haxapp.ui.WindowHeaderManager.BANNER_TYPE_ERROR = "error";
-haxapp.ui.WindowHeaderManager.BANNER_BGCOLOR_ERROR = "red";
-haxapp.ui.WindowHeaderManager.BANNER_FGCOLOR_ERROR = "white";
+haxapp.app.WindowHeaderManager.BANNER_TYPE_ERROR = "error";
+haxapp.app.WindowHeaderManager.BANNER_BGCOLOR_ERROR = "red";
+haxapp.app.WindowHeaderManager.BANNER_FGCOLOR_ERROR = "white";
 
-haxapp.ui.WindowHeaderManager.BANNER_TYPE_PENDING = "pending";
-haxapp.ui.WindowHeaderManager.BANNER_BGCOLOR_PENDING = "yellow";
-haxapp.ui.WindowHeaderManager.BANNER_FGCOLOR_PENDING = "black";
+haxapp.app.WindowHeaderManager.BANNER_TYPE_PENDING = "pending";
+haxapp.app.WindowHeaderManager.BANNER_BGCOLOR_PENDING = "yellow";
+haxapp.app.WindowHeaderManager.BANNER_FGCOLOR_PENDING = "black";
 
-haxapp.ui.WindowHeaderManager.BANNER_BGCOLOR_UNKNOWN = "yellow";
-haxapp.ui.WindowHeaderManager.BANNER_FGCOLOR_UNKNOWN = "black";
+haxapp.app.WindowHeaderManager.BANNER_BGCOLOR_UNKNOWN = "yellow";
+haxapp.app.WindowHeaderManager.BANNER_FGCOLOR_UNKNOWN = "black";
 
-haxapp.ui.WindowHeaderManager.BANNER_TYPE_NONE = "none";
+haxapp.app.WindowHeaderManager.BANNER_TYPE_NONE = "none";
 
-haxapp.ui.WindowHeaderManager.PENDING_MESSAGE = "Calculation pending...";
+haxapp.app.WindowHeaderManager.PENDING_MESSAGE = "Calculation pending...";
 
 /** This method returns the base member for this component. */
-haxapp.ui.WindowHeaderManager.showBannerBar = function(text,type) {
+haxapp.app.WindowHeaderManager.prototype.showBannerBar = function(text,type) {
     
     if(!this.bannerDiv) {
         this.bannerDiv = haxapp.ui.createElement("div",null,
@@ -56,17 +58,17 @@ haxapp.ui.WindowHeaderManager.showBannerBar = function(text,type) {
     //get banner color
     var bgColor;
     var fgColor;
-    if(type == haxapp.ui.WindowHeaderManager.BANNER_TYPE_ERROR) {
-        bgColor = haxapp.ui.WindowHeaderManager.BANNER_BGCOLOR_ERROR;
-        fgColor = haxapp.ui.WindowHeaderManager.BANNER_FGCOLOR_ERROR;
+    if(type == haxapp.app.WindowHeaderManager.BANNER_TYPE_ERROR) {
+        bgColor = haxapp.app.WindowHeaderManager.BANNER_BGCOLOR_ERROR;
+        fgColor = haxapp.app.WindowHeaderManager.BANNER_FGCOLOR_ERROR;
     }
-    else if(type == haxapp.ui.WindowHeaderManager.BANNER_TYPE_PENDING) {
-        bgColor = haxapp.ui.WindowHeaderManager.BANNER_BGCOLOR_PENDING;
-        fgColor = haxapp.ui.WindowHeaderManager.BANNER_FGCOLOR_PENDING;
+    else if(type == haxapp.app.WindowHeaderManager.BANNER_TYPE_PENDING) {
+        bgColor = haxapp.app.WindowHeaderManager.BANNER_BGCOLOR_PENDING;
+        fgColor = haxapp.app.WindowHeaderManager.BANNER_FGCOLOR_PENDING;
     }
     else {
-        bgColor = haxapp.ui.WindowHeaderManager.BANNER_BGCOLOR_UNKNOWN;
-        fgColor = haxapp.ui.WindowHeaderManager.BANNER_FGCOLOR_UNKNOWN;
+        bgColor = haxapp.app.WindowHeaderManager.BANNER_BGCOLOR_UNKNOWN;
+        fgColor = haxapp.app.WindowHeaderManager.BANNER_FGCOLOR_UNKNOWN;
    }
    var colorStyle = {};
    colorStyle.backgroundColor = bgColor;
@@ -81,20 +83,20 @@ haxapp.ui.WindowHeaderManager.showBannerBar = function(text,type) {
 }
 
 /** This method returns the base member for this component. */
-haxapp.ui.WindowHeaderManager.hideBannerBar = function() {
+haxapp.app.WindowHeaderManager.prototype.hideBannerBar = function() {
 	this.bannerBarActive = false;
 	this.showActiveHeaders();
 }
 
 /** This method returns the base member for this component. */
-haxapp.ui.WindowHeaderManager.showToolbar = function(toolbarDiv) {
+haxapp.app.WindowHeaderManager.prototype.showToolbar = function(toolbarDiv) {
     this.toolbarActive = true;
     this.toolbarDiv = toolbarDiv;
 	this.showActiveHeaders();
 }
 
 /** This method returns the base member for this component. */
-haxapp.ui.WindowHeaderManager.hideToolbar = function() {
+haxapp.app.WindowHeaderManager.prototype.hideToolbar = function() {
     this.toolbarActive = false;
     this.toolbarDiv = null;	
 	this.showActiveHeaders();
@@ -102,7 +104,7 @@ haxapp.ui.WindowHeaderManager.hideToolbar = function() {
 
 /** This method shows the active headers. 
  * @private */
-haxapp.ui.WindowHeaderManager.showActiveHeaders = function() {
+haxapp.app.WindowHeaderManager.prototype.showActiveHeaders = function() {
 	var headerElements = [];
     if((this.toolbarActive)&&(this.toolbarDiv)) {
 		headerElements.push(this.toolbarDiv);
@@ -130,24 +132,24 @@ haxapp.ui.WindowHeaderManager.showActiveHeaders = function() {
 
 
 /** This method sets the content element as a scrolling element. */
-haxapp.ui.WindowHeaderManager.setScrollingContentElement = function() {
+haxapp.app.WindowHeaderManager.prototype.setScrollingContentElement = function() {
     this.windowInsideContainer.setBodyType(haxapp.ui.DisplayAndHeader.SCROLLING_PANE);
 }
 
 /** This method sets the content element as a fixed element. */
-haxapp.ui.WindowHeaderManager.setFixedContentElement = function() {
+haxapp.app.WindowHeaderManager.prototype.setFixedContentElement = function() {
     //load the content div
     this.windowInsideContainer.setBodyType(haxapp.ui.DisplayAndHeader.FIXED_PANE);
 }
 
 /** This method returns the content element for the windowframe for this component. */
-haxapp.ui.WindowHeaderManager.getBody = function() {
+haxapp.app.WindowHeaderManager.prototype.getBody = function() {
      return this.body;
 }
 
 /** This method sets a content element in the body. Alternatively the body can 
  * be retrieved and loaded as desired. */
-haxapp.ui.WindowHeaderManager.setContent = function(element) {
+haxapp.app.WindowHeaderManager.prototype.setContent = function(element) {
     //remove the old content
     while(this.body.firstChild) {
         this.body.removeChild(this.body.firstChild);
@@ -161,31 +163,14 @@ haxapp.ui.WindowHeaderManager.setContent = function(element) {
 }
 
 
+/** This method returns the fixed element which contains the body element. */
+haxapp.app.WindowHeaderManager.prototype.getOuterElement = function() {
+     return this.windowInsideContainer.getOuterElement();
+}
+
 
 
 //===========================
 // Protected Methods
 //===========================
-
-/** This is the initializer for the component. The object passed is the core object
- * associated with this component. 
- * @protected */
-haxapp.ui.WindowHeaderManager.createHeaders = function(containerBodyElement) {
-    
-    //set fixed pane for header container - will customize later
-    this.windowInsideContainer = new haxapp.ui.DisplayAndHeader(haxapp.ui.DisplayAndHeader.FIXED_PANE,
-            null,
-            haxapp.ui.DisplayAndHeader.FIXED_PANE,
-            null
-        );
-    containerBodyElement.appendChild(this.windowInsideContainer.getOuterElement());
-    
-    this.body = this.windowInsideContainer.getBody();
-    
-}
-
-/** This method returns the fixed element which contains the body element. */
-haxapp.ui.WindowHeaderManager.getBodyContainer = function() {
-     return this.windowInsideContainer.getBodyContainer();
-}
 

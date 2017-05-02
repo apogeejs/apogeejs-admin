@@ -37,7 +37,7 @@ haxapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS = {
 }
 
 haxapp.app.JsonTableComponent.prototype.createDisplayContent = function(container) {
-    return new haxapp.app.EditDisplayContent(this,container,haxapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS);
+    return new haxapp.app.EditDisplayContent(this,haxapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS);
 }
 
 /** This method should be implemented to retrieve a view mode of the give type. 

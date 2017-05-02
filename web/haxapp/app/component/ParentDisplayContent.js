@@ -9,12 +9,9 @@
 
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-haxapp.app.ParentDisplayContent = function(component,container,options) {
+haxapp.app.ParentDisplayContent = function(component,options) {
     
-    //base init
-    haxapp.app.DisplayContent.init.call(this,component,container,options);
-    haxapp.ui.ParentContainer.init.call(this,container.getBody(),container);
-	haxapp.ui.ParentHighlighter.init.call(this,container.getBody());
+    this.component = component;
     
     //add a cleanup action to the base component - component must already be initialized
 //    this.addSaveAction(haxapp.app.EditDisplayContent.writeToJson);
@@ -26,18 +23,31 @@ haxapp.app.ParentDisplayContent = function(component,container,options) {
 
 }
 
-//add components to this class
-hax.base.mixin(haxapp.app.ParentDisplayContent,haxapp.app.DisplayContent);
-hax.base.mixin(haxapp.app.ParentDisplayContent,haxapp.ui.ParentContainer);
-hax.base.mixin(haxapp.app.ParentDisplayContent,haxapp.ui.ParentHighlighter);
+/** This creates and adds a display for the child component to the parent container. */
+haxapp.app.ParentDisplayContent.prototype.getOuterElement = function() {
+    return this.containerElement;
+}
 
 /** This creates and adds a display for the child component to the parent container. */
 haxapp.app.ParentDisplayContent.prototype.addChildComponent = function(childComponent) {
-    var windowComponentDisplay = childComponent.createWindowDisplay();
+    
+    //for now skip parent components
+    if(childComponent.isParentComponent) return;
+       
+//    //window options
+//    var memberWindowOptions = {};
+//    memberWindowOptions.minimizable = true;
+//    memberWindowOptions.maximizable = true;
+//    memberWindowOptions.resizable = true;
+//    memberWindowOptions.movable = true;
+//    memberWindowOptions.frameColorClass = "visicomp_windowColor";
+//    memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
+    
+    var windowComponentDisplay = childComponent.getWindowDisplay();
     var childWindow = windowComponentDisplay.getWindowEntry();
 
-    childWindow.setParent(this);
-    var pos = this.getNextWindowPosition();
+    childWindow.setParent(this.parentContainer);
+    var pos = this.parentContainer.getNextWindowPosition();
     childWindow.setPosition(pos[0],pos[1]);
     childWindow.show();
 }
@@ -65,25 +75,15 @@ haxapp.app.ParentDisplayContent.prototype.memberUpdated = function() {
  * @protected */
 haxapp.app.ParentDisplayContent.prototype.initUI = function() {
     
-    this.container.setScrollingContentElement();
+    this.containerElement = haxapp.ui.createElement("div");
+    this.parentContainer = new haxapp.ui.ParentContainer(this.containerElement);
     
     var workspaceUI = this.component.getWorkspaceUI();
     
     //add context menu to create childrent
-    var contentElement = this.container.getBody();
     var parentMember = this.component.getParentMember();
     var app = workspaceUI.getApp();
-    app.setFolderContextMenu(contentElement,parentMember);
-    
-    
-    //window options
-    var memberWindowOptions = {};
-    memberWindowOptions.minimizable = true;
-    memberWindowOptions.maximizable = true;
-    memberWindowOptions.resizable = true;
-    memberWindowOptions.movable = true;
-    memberWindowOptions.frameColorClass = "visicomp_windowColor";
-    memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
+    app.setFolderContextMenu(this.containerElement,parentMember);
     
     var children = parentMember.getChildMap();
     for(var childName in children) {

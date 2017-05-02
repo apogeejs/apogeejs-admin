@@ -50,6 +50,13 @@ haxapp.ui.Tab.prototype.setTitle = function(name) {
 }
 
 /** This method must be implemented in inheriting objects. */
+haxapp.ui.Tab.prototype.setContent = function(contentElement) {
+    haxapp.ui.removeAllChildren(this.displayFrame);
+    this.displayFrame.appendChild(contentElement);
+    this.content = contentElement;
+}
+
+/** This method must be implemented in inheriting objects. */
 haxapp.ui.Tab.prototype.getName = function() {
     return this.name;
 }
@@ -77,11 +84,6 @@ haxapp.ui.Tab.prototype.closeTab = function() {
 
 /** This method must be implemented in inheriting objects. */
 haxapp.ui.Tab.prototype.getOuterElement = function() {
-    return this.displayFrame;
-}
-
-/** This method must be implemented in inheriting objects. */
-haxapp.ui.Tab.prototype.getDisplayElement = function() {
     return this.displayFrame;
 }
 

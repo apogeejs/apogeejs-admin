@@ -9,10 +9,9 @@
 
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-haxapp.app.EditDisplayContent = function(editComponent,container,settings,options) {
+haxapp.app.EditDisplayContent = function(editComponent,settings,options) {
     
-    //base init
-    haxapp.app.DisplayContent.init.call(this,editComponent,container,options);
+    this.component = editComponent;
 	
 	this.viewTypes = settings.viewModes;
     this.defaultViewType = settings.defaultView;
@@ -38,8 +37,9 @@ haxapp.app.EditDisplayContent = function(editComponent,container,settings,option
 
 }
 
-//add components to this class
-hax.base.mixin(haxapp.app.EditDisplayContent,haxapp.app.DisplayContent);
+haxapp.app.EditDisplayContent.prototype.getObject = function() {
+    return this.component.getObject();
+}
 
 /** This value is used as the background color when an editor is read only. */
 haxapp.app.EditDisplayContent.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
@@ -117,6 +117,11 @@ haxapp.app.EditDisplayContent.prototype.memberUpdated = function() {
 	}
 }
 
+haxapp.app.EditDisplayContent.prototype.getOuterElement = function(viewType) {
+    return this.windowHeaderManager.getOuterElement();
+}
+
+
 haxapp.app.EditDisplayContent.prototype.getClearFunctionCallback = function() {
 	var table = this.getObject();
 	var blankDataValue = this.clearFunctionDataValue;
@@ -145,6 +150,8 @@ haxapp.app.EditDisplayContent.prototype.endEditUI = function() {
  * @protected */
 haxapp.app.EditDisplayContent.prototype.initUI = function() {
     
+    this.windowHeaderManager = new haxapp.app.WindowHeaderManager();
+    
     //set initial view type
     var initialViewType;
     if( (this.options) &&
@@ -156,8 +163,6 @@ haxapp.app.EditDisplayContent.prototype.initUI = function() {
     else {
         initialViewType = this.defaultViewType;
     }    
-	
-	this.container.setFixedContentElement();
     
 	
 	//create the view selection ui
@@ -200,7 +205,7 @@ haxapp.app.EditDisplayContent.prototype.initUI = function() {
 
     this.normalToolbarDiv.appendChild(document.createTextNode("View: "));
     this.normalToolbarDiv.appendChild(this.select);
-    this.container.showToolbar(this.normalToolbarDiv);
+    this.windowHeaderManager.showToolbar(this.normalToolbarDiv);
     
     this.setViewType(initialViewType);
     this.updateViewDropdown(this.viewType);
@@ -238,19 +243,19 @@ haxapp.app.EditDisplayContent.prototype.showSaveBar = function(onSave,onCancel) 
 	this.saveBarActive = true;
     
     //show the save toolbar
-    this.container.showToolbar(this.saveDiv);
+    this.windowHeaderManager.showToolbar(this.saveDiv);
 }
 
 /** This method returns the base member for this component. */
 haxapp.app.EditDisplayContent.prototype.hideSaveBar = function() {
     this.saveBarActive = false;	
-	this.container.showToolbar(this.normalToolbarDiv);
+	this.windowHeaderManager.showToolbar(this.normalToolbarDiv);
 }
 
 /** @private */
 haxapp.app.EditDisplayContent.prototype.showModeElement = function(viewModeElement) {
     
-    var displayBody = this.container.getBody();
+    var displayBody = this.windowHeaderManager.getBody();
     
 	haxapp.ui.removeAllChildren(displayBody);
 	
