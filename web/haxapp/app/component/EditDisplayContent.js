@@ -9,9 +9,10 @@
 
 /** This is the initializer for the component. The object passed is the core object
  * associated with this component. */
-haxapp.app.EditDisplayContent = function(editComponent,settings,options) {
+haxapp.app.EditDisplayContent = function(editComponent,options) {
     
     this.component = editComponent;
+    var settings = editComponent.getTableEditSettings();
 	
 	this.viewTypes = settings.viewModes;
     this.defaultViewType = settings.defaultView;
@@ -88,9 +89,7 @@ haxapp.app.EditDisplayContent.prototype.memberUpdated = function() {
         this.showModeElement(this.viewModeElement);
     }
 
-    var editable = ((this.viewModeElement.isData === false)||(!object.hasCode()));
-
-    this.viewModeElement.showData(editable);
+    this.viewModeElement.showData();
 	
 	//add the clear function menu item if needed
 	if(this.doClearFunction) {

@@ -1,12 +1,5 @@
-/** This is a mixin that encapsulates the base functionality of a Component
- * 
- * This is not a class, but it is used for the prototype of the objects that inherit from it.
- */
-haxapp.app.Component = {};
-    
-/** This is the initializer for the component. The object passed is the core object
- * associated with this component. */
-haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
+/** This is the base functionality for a component. */
+haxapp.app.Component = function(workspaceUI,object,generator,options) {
     
     if(!options) {
         options = {};
@@ -33,13 +26,13 @@ haxapp.app.Component.init = function(workspaceUI,object,generator,options) {
 
 /** If an extending object has any save actions, a callback should be passed here.
  * The callback will be executed in the context of the current object. */
-haxapp.app.Component.addSaveAction = function(saveFunction) {
+haxapp.app.Component.prototype.addSaveAction = function(saveFunction) {
     this.saveActions.push(saveFunction);
 }
 
 /** If an extending object has any cleanup actions, a callback should be passed here.
  * The callback will be executed in the context of the current object. */
-haxapp.app.Component.addCleanupAction = function(cleanupFunction) {
+haxapp.app.Component.prototype.addCleanupAction = function(cleanupFunction) {
     this.cleanupActions.push(cleanupFunction);
 }
 
@@ -49,25 +42,25 @@ haxapp.app.Component.addCleanupAction = function(cleanupFunction) {
 //==============================
 
 /** This method returns the base member for this component. */
-haxapp.app.Component.getObject = function() {
+haxapp.app.Component.prototype.getObject = function() {
     return this.object;
 }
 
 /** This method returns the workspace for this component. */
-haxapp.app.Component.getWorkspace = function() {
+haxapp.app.Component.prototype.getWorkspace = function() {
     return this.object.getWorkspace();
 }
 
 /** This method returns the workspaceUI for this component. */
-haxapp.app.Component.getWorkspaceUI = function() {
+haxapp.app.Component.prototype.getWorkspaceUI = function() {
     return this.workspaceUI;
 }
 
-haxapp.app.Component.getTreeEntry = function() {
+haxapp.app.Component.prototype.getTreeEntry = function() {
     return this.treeDisplay.getTreeEntry();
 }
 
-haxapp.app.Component.getWindowDisplay = function() {
+haxapp.app.Component.prototype.getWindowDisplay = function() {
     if(this.windowDisplay == null) {
         this.windowDisplay = new haxapp.app.WindowComponentDisplay(this);
     }
@@ -75,7 +68,7 @@ haxapp.app.Component.getWindowDisplay = function() {
 }
 
 /** This serializes the component. */
-haxapp.app.Component.toJson = function() {
+haxapp.app.Component.prototype.toJson = function() {
     var json = {};
     json.type = this.generator.uniqueName;
     
@@ -105,7 +98,7 @@ haxapp.app.Component.toJson = function() {
 
 /** This method cleans up after a delete. Any extending object that has delete
  * actions should pass a callback function to the method "addClenaupAction" */
-haxapp.app.Component.onDelete = function() {
+haxapp.app.Component.prototype.onDelete = function() {
     //-----------------------------------------------------------------------------------
     //start
     
@@ -194,7 +187,7 @@ haxapp.app.Component.onDelete = function() {
 
 /** This method extends the member udpated function from the base.
  * @protected */    
-haxapp.app.Component.memberUpdated = function() {
+haxapp.app.Component.prototype.memberUpdated = function() {
     //check for change of parent
     if(this.object.getParent() !== this.uiActiveParent) {
         var oldParent = this.uiActiveParent;
@@ -256,7 +249,7 @@ haxapp.app.Component.memberUpdated = function() {
 /** This method is used for setting initial values in the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to give the values of those properties too. */
-haxapp.app.Component.getPropertyValues = function() {
+haxapp.app.Component.prototype.getPropertyValues = function() {
     
     var member = this.object;
     var generator = member.generator;
@@ -281,7 +274,7 @@ haxapp.app.Component.getPropertyValues = function() {
 
 /** This method creates a callback for deleting the component. 
  *  @private */
-haxapp.app.Component.createDeleteCallback = function() {
+haxapp.app.Component.prototype.createDeleteCallback = function() {
     var object = this.getObject();
     return function() {
         var doDelete = confirm("Are you sure you want to delete this object?");

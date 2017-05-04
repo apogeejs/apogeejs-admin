@@ -1,16 +1,16 @@
 
 haxapp.app.AceCustomSupplementalMode = function(componentDisplay) {
-	//base constructor
-	haxapp.app.AceCodeModeBase.call(this,componentDisplay,"ace/mode/javascript");
+    haxapp.app.ViewMode.call(this,componentDisplay,false);
+	this.setEditor(new haxapp.app.AceTextEditor(this,"ace/mode/javascript"));
 }
 
-haxapp.app.AceCustomSupplementalMode.prototype = Object.create(haxapp.app.AceCodeModeBase.prototype);
+haxapp.app.AceCustomSupplementalMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.AceCustomSupplementalMode.prototype.constructor = haxapp.app.AceCustomSupplementalMode;
 
-haxapp.app.AceCustomSupplementalMode.prototype.showData = function(editOk) {
+haxapp.app.AceCustomSupplementalMode.prototype.showData = function() {
     var component = this.componentDisplay.getComponent();
 	var codeText = component.getSupplementalCode();
-	this.editor.showData(codeText,editOk);
+	this.editor.showData(codeText,this.getIsEditable());
 }
 
 haxapp.app.AceCustomSupplementalMode.prototype.onSave = function(text) {

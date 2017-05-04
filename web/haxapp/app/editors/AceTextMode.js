@@ -1,38 +1,20 @@
 
 haxapp.app.AceTextMode = function(componentDisplay) {
-	this.componentDisplay = componentDisplay;
-	
-	this.editOk = false;
-	
-	var instance = this;
-	var onSave = function(text) {
-		return instance.onSave(text);
-	}
-	var onCancel = function() {
-		return instance.onCancel();
-	}
-	
-	this.editor = new haxapp.app.AceTextEditor(componentDisplay,"ace/mode/text",onSave,onCancel);
-	
+    haxapp.app.ViewMode.call(this,componentDisplay,true);
+	this.setEditor(new haxapp.app.AceTextEditor(this,"ace/mode/text"));
 }
+
+haxapp.app.AceTextMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
+haxapp.app.AceTextMode.prototype.constructor = haxapp.app.AceTextMode;
 
 /** This is the format character use to display tabs in the display editor. 
  * @private*/
 haxapp.app.AceTextMode.formatString = "\t";
-
-/** This indicates if this element displays data or something else (code) */
-haxapp.app.AceTextMode.prototype.isData = true;
-
-haxapp.app.AceTextMode.prototype.getElement = function() {
-	return this.editor.getElement();
-}
 	
-haxapp.app.AceTextMode.prototype.showData = function(editOk) {
+haxapp.app.AceTextMode.prototype.showData = function() {
 		
 	var table = this.componentDisplay.getObject();
 	var json = table.getData();	
-
-	this.editOk = editOk;
 	
 	var textData;
 	if((json === null)||(json === undefined)) {
@@ -41,17 +23,9 @@ haxapp.app.AceTextMode.prototype.showData = function(editOk) {
 	else {
 		textData = json;
 	}
-	
-	this.editor.showData(textData,editOk);
+    
+	this.editor.showData(textData,this.getIsEditable());
 }
-
-haxapp.app.AceTextMode.prototype.destroy = function() {
-	this.editor.destroy();
-}
-
-//==============================
-// internal
-//==============================
 
 haxapp.app.AceTextMode.prototype.onSave = function(text) {
 	
@@ -67,12 +41,6 @@ haxapp.app.AceTextMode.prototype.onSave = function(text) {
     actionData.member = table;
     actionData.data = text;
 	var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
-	
-	return true;
-}
-haxapp.app.AceTextMode.prototype.onCancel = function() {
-	//reload old data
-	this.showData(this.editOk);
 	
 	return true;
 }

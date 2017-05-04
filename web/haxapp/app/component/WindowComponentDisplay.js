@@ -27,7 +27,7 @@ haxapp.app.WindowComponentDisplay.prototype.deleteDisplay = function() {
 
 haxapp.app.WindowComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     if(this.windowHeaderManager) {
-        if(bannerState == haxapp.app.DisplayContent.BANNER_TYPE_NONE) {
+        if(bannerState == haxapp.app.WindowHeaderManager.BANNER_TYPE_NONE) {
             this.windowHeaderManager.hideBannerBar();
         }
         else {
@@ -50,36 +50,42 @@ haxapp.app.WindowComponentDisplay.prototype.updateData = function() {
 /** @private */
 haxapp.app.WindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
     
-    if(this.component.isParentComponent) {
-        //window options
-        var memberWindowOptions = {};
-        memberWindowOptions.closeable = false;
-        memberWindowOptions.movable = true;
-        memberWindowOptions.resizable = true;
-        memberWindowOptions.frameColorClass = "visicomp_windowColor";
-        memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
+    //window options
+    var memberWindowOptions = {};
+    memberWindowOptions.closeable = false;
+    memberWindowOptions.movable = true;
+    memberWindowOptions.resizable = true;
+    memberWindowOptions.frameColorClass = "visicomp_windowColor";
+    memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
 
-        this.windowFrame = new haxapp.ui.WindowFrame(memberWindowOptions);
-        this.windowFrame.setSize(this.component.generator.DEFAULT_WIDTH,this.component.generator.DEFAULT_HEIGHT); 
-        
-        this.displayContent = null;
-    }
-    else {
-        //window options
-        var memberWindowOptions = {};
-        memberWindowOptions.closeable = false;
-        memberWindowOptions.movable = true;
-        memberWindowOptions.resizable = true;
-        memberWindowOptions.frameColorClass = "visicomp_windowColor";
-        memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
+    this.windowFrame = new haxapp.ui.WindowFrame(memberWindowOptions);
+    this.windowFrame.setSize(this.component.generator.DEFAULT_WIDTH,this.component.generator.DEFAULT_HEIGHT);
 
-        this.windowFrame = new haxapp.ui.WindowFrame(memberWindowOptions);
-        this.windowFrame.setSize(this.component.generator.DEFAULT_WIDTH,this.component.generator.DEFAULT_HEIGHT);
-        this.windowHeaderManager = new haxapp.app.WindowHeaderManager();
-        
-        this.displayContent = this.component.createDisplayContent(this.windowFrame);  
-        
-        this.windowFrame.setContent(this.windowHeaderManager.getOuterElement());
-        this.windowHeaderManager.setContent(this.displayContent.getOuterElement())
-    }
+    this.windowHeaderManager = new haxapp.app.WindowHeaderManager();
+    this.windowFrame.setContent(this.windowHeaderManager.getOuterElement());
+
+    this.displayContent = new haxapp.app.EditDisplayContent(this.component);
+    this.windowHeaderManager.setContent(this.displayContent.getOuterElement());
+
+    //------------------
+    // set menu
+    //------------------
+    var menu = this.windowFrame.getMenu();
+
+    //menu items
+    var menuItemInfoList = [];
+
+    //add the standard entries
+    var itemInfo = {};
+    itemInfo.title = "Edit Properties";
+    itemInfo.callback = haxapp.app.updatecomponent.getUpdateComponentCallback(this.component,this.generator);
+    menuItemInfoList.push(itemInfo);
+
+    var itemInfo = {};
+    itemInfo.title = "Delete";
+    itemInfo.callback = this.component.createDeleteCallback(itemInfo.title);
+    menuItemInfoList.push(itemInfo);
+
+    //set the menu items
+    menu.setMenuItems(menuItemInfoList);
 }

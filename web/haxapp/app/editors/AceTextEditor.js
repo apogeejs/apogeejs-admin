@@ -5,7 +5,7 @@
  * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
  * @param {type} onCancel - returns true if the edit should end
  */
-haxapp.app.AceTextEditor = function(componentDisplay,aceMode,onSave,onCancel) {
+haxapp.app.AceTextEditor = function(viewMode,aceMode) {
     
     this.outsideDiv = haxapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -26,14 +26,11 @@ haxapp.app.AceTextEditor = function(componentDisplay,aceMode,onSave,onCancel) {
 	});
     this.outsideDiv.appendChild(this.editorDiv);
 	
-	this.componentDisplay = componentDisplay;
-	this.table = componentDisplay.getObject();
+	this.viewMode = viewMode;
 	this.workingData = null;
 	this.editOk = false;
 	this.editMode = false;
 	
-	this.parentSave = onSave;
-	this.parentCancel = onCancel;
 	
 	var editor = ace.edit(this.editorDiv);
     editor.renderer.setShowGutter(true);
@@ -62,7 +59,7 @@ haxapp.app.AceTextEditor.prototype.save = function() {
 	
 	var text = this.editor.getSession().getValue();
 	
-	var saveComplete = this.parentSave(text);
+	var saveComplete = this.viewMode.onSave(text);
 	
 	if(saveComplete) {
 		this.endEditMode();
@@ -71,7 +68,7 @@ haxapp.app.AceTextEditor.prototype.save = function() {
 
 haxapp.app.AceTextEditor.prototype.cancel = function() {
 	//reset the original data
-	var cancelComplete = this.parentCancel();
+	var cancelComplete = this.viewMode.onCancel();
 	
 	if(cancelComplete) {
 		this.endEditMode();
@@ -115,7 +112,7 @@ haxapp.app.AceTextEditor.prototype.destroy = function() {
 haxapp.app.AceTextEditor.prototype.endEditMode = function() {
 	this.editMode = false;
 	this.editor.setReadOnly(true);
-	this.componentDisplay.endEditUI();
+	this.viewMode.endEditUI();
 }
 
 /** @private */
@@ -130,7 +127,7 @@ haxapp.app.AceTextEditor.prototype.onMouseClick = function() {
 			instance.cancel();
 		}
 		
-		this.componentDisplay.startEditUI(onSave,onCancel);
+		this.viewMode.startEditUI(onSave,onCancel);
 		
 		this.editor.setReadOnly(false);
 		this.editMode = true;

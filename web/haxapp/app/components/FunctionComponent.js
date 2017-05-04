@@ -1,13 +1,13 @@
 /** This component represents a table object. */
 haxapp.app.FunctionComponent = function(workspaceUI, functionObject, componentJson) {
-    //base init
-    haxapp.app.Component.init.call(this,workspaceUI,functionObject,haxapp.app.FunctionComponent.generator,componentJson);
+    //extend edit component
+    haxapp.app.EditComponent.call(this,workspaceUI,functionObject,haxapp.app.FunctionComponent.generator,componentJson);
     
     this.memberUpdated();
 };
 
-//add components to this class
-hax.base.mixin(haxapp.app.FunctionComponent,haxapp.app.Component);
+haxapp.app.FunctionComponent.prototype = Object.create(haxapp.app.EditComponent.prototype);
+haxapp.app.FunctionComponent.prototype.constructor = haxapp.app.FunctionComponent;
 
 //==============================
 // Protected and Private Instance Methods
@@ -28,8 +28,10 @@ haxapp.app.FunctionComponent.TABLE_EDIT_SETTINGS = {
     "defaultView": haxapp.app.FunctionComponent.VIEW_CODE
 }
 
-haxapp.app.FunctionComponent.prototype.createDisplayContent = function(container) {
-    return new haxapp.app.EditDisplayContent(this,haxapp.app.FunctionComponent.TABLE_EDIT_SETTINGS);
+/**  This method retrieves the table edit settings for this component instance
+ * @protected */
+haxapp.app.FunctionComponent.prototype.getTableEditSettings = function() {
+    return haxapp.app.FunctionComponent.TABLE_EDIT_SETTINGS;
 }
 
 /** This method should be implemented to retrieve a view mode of the give type. 

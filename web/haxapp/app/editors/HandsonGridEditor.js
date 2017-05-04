@@ -4,7 +4,7 @@
  * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
  * @param {type} onCancel - returns true if the edit should end
  */
-haxapp.app.HandsonGridEditor = function(componentDisplay,onSave,onCancel) {
+haxapp.app.HandsonGridEditor = function(viewMode) {
    
 	this.outsideDiv = haxapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -28,13 +28,9 @@ haxapp.app.HandsonGridEditor = function(componentDisplay,onSave,onCancel) {
 	});
 	this.outsideDiv.appendChild(this.gridDiv);
 	
-	this.componentDisplay = componentDisplay;
-	this.table = componentDisplay.getObject();
+	this.viewMode = viewMode;
 	this.inputData = null;
 	this.editOk = false;
-	
-	this.parentSave = onSave;
-	this.parentCancel = onCancel;
 	
 	//resize the editor on window size change
     var instance = this;
@@ -78,12 +74,12 @@ haxapp.app.HandsonGridEditor.prototype.save = function(argArray) {
 	//update "input" data before calling update
 	this.inputData = hax.util.deepJsonCopy(this.gridControl.getData());
 
-	this.parentSave(this.inputData);
+	this.viewMode.onSave(this.inputData);
 }
 
 haxapp.app.HandsonGridEditor.prototype.cancel = function() {
 	//reset the original data
-	this.parentCancel();
+	this.viewMode.onCancel();
 }
 
 //=============================

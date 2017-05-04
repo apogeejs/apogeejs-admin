@@ -1,39 +1,22 @@
 
 haxapp.app.AceDataMode = function(componentDisplay,doJsonFormatting) {
-	this.componentDisplay = componentDisplay;
-	
-	this.editOk = false;
-	
-	var instance = this;
-	var onSave = function(text) {
-		return instance.onSave(text);
-	}
-	var onCancel = function() {
-		return instance.onCancel();
-	}
+	haxapp.app.ViewMode.call(this,componentDisplay,true);
 	
     var mode = doJsonFormatting ? "ace/mode/json" : "ace/mode/text";
-	this.editor = new haxapp.app.AceTextEditor(componentDisplay,mode,onSave,onCancel);
-	
+	this.setEditor(new haxapp.app.AceTextEditor(this,mode));
 }
+
+haxapp.app.AceDataMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
+haxapp.app.AceDataMode.prototype.constructor = haxapp.app.AceDataMode;
 
 /** This is the format character use to display tabs in the display editor. 
  * @private*/
 haxapp.app.AceDataMode.formatString = "\t";
 
-/** This indicates if this element displays data or something else (code) */
-haxapp.app.AceDataMode.prototype.isData = true;
-
-haxapp.app.AceDataMode.prototype.getElement = function() {
-	return this.editor.getElement();
-}
-	
-haxapp.app.AceDataMode.prototype.showData = function(editOk) {
+haxapp.app.AceDataMode.prototype.showData = function() {
 		
 	var table = this.componentDisplay.getObject();
 	var json = table.getData();	
-
-	this.editOk = editOk;
 	
 	var textData;
 	if(json === null) {
@@ -46,16 +29,8 @@ haxapp.app.AceDataMode.prototype.showData = function(editOk) {
 		textData = JSON.stringify(json,null,haxapp.app.AceDataMode.formatString);
 	}
 	
-	this.editor.showData(textData,editOk);
+	this.editor.showData(textData,this.getIsEditable());
 }
-
-haxapp.app.AceDataMode.prototype.destroy = function() {
-	this.editor.destroy();
-}
-
-//==============================
-// internal
-//==============================
 
 haxapp.app.AceDataMode.prototype.onSave = function(text) {
 	
@@ -82,12 +57,6 @@ haxapp.app.AceDataMode.prototype.onSave = function(text) {
     actionData.member = table;
     actionData.data = data;
 	var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
-	
-	return true;
-}
-haxapp.app.AceDataMode.prototype.onCancel = function() {
-	//reload old data
-	this.showData(this.editOk);
 	
 	return true;
 }

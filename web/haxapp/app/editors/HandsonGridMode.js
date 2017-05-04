@@ -1,39 +1,19 @@
 
 haxapp.app.HandsonGridMode = function(componentDisplay) {
-	this.componentDisplay = componentDisplay;
-	
-	this.editOk = false;
-	
-	var instance = this;
-	var onSave = function(data) {
-		return instance.onSave(data);
-	}
-	var onCancel = function() {
-		return instance.onCancel();
-	}
-	
-	this.editor = new haxapp.app.HandsonGridEditor(componentDisplay,onSave,onCancel);
+	haxapp.app.ViewMode.call(this,componentDisplay,true);
+	this.setEditor(new haxapp.app.HandsonGridEditor(this));
 	
 }
 
-/** This indicates if this element displays data or something else (code) */
-haxapp.app.HandsonGridMode.prototype.isData = true;
+haxapp.app.HandsonGridMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
+haxapp.app.HandsonGridMode.prototype.constructor = haxapp.app.HandsonGridMode;
 
-haxapp.app.HandsonGridMode.prototype.getElement = function() {
-	return this.editor.getElement();
-}
-	
-haxapp.app.HandsonGridMode.prototype.showData = function(editOk) {
+haxapp.app.HandsonGridMode.prototype.showData = function() {
 		
 	var table = this.componentDisplay.getObject();
 	var json = table.getData();	
 
-	this.editOk = editOk;
-	this.editor.showData(json,editOk);
-}
-
-haxapp.app.HandsonGridMode.prototype.destroy = function() {
-	this.editor.destroy();
+	this.editor.showData(json,this.getIsEditable());
 }
 
 //==============================
@@ -51,12 +31,5 @@ haxapp.app.HandsonGridMode.prototype.onSave = function(data) {
 	
 	return true;
 }
-haxapp.app.HandsonGridMode.prototype.onCancel = function() {
-	//reload old data
-	this.showData(this.editOk);
-	
-	return true;
-}
 
-////////////////////////////////////////////////////////////////////////
 

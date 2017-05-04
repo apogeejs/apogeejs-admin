@@ -7,17 +7,17 @@
  * false can be sent in.
  */
 haxapp.app.AceCodeMode = function(componentDisplay,optionalOnBlankData,optionalEditorCodeWrapper) {
-	//base constructor
-	haxapp.app.AceCodeModeBase.call(this,componentDisplay,"ace/mode/javascript");
+    haxapp.app.ViewMode.call(this,componentDisplay,false);
+	this.setEditor(new haxapp.app.AceTextEditor(this,"ace/mode/javascript"));
 	
 	this.onBlankData = optionalOnBlankData;
 	this.editorCodeWrapper = optionalEditorCodeWrapper;
 }
 
-haxapp.app.AceCodeMode.prototype = Object.create(haxapp.app.AceCodeModeBase.prototype);
+haxapp.app.AceCodeMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.AceCodeMode.prototype.constructor = haxapp.app.AceCodeMode;
 	
-haxapp.app.AceCodeMode.prototype.showData = function(editOk) {
+haxapp.app.AceCodeMode.prototype.showData = function() {
 		
 	var table = this.componentDisplay.getObject();
 	var functionBody = table.getFunctionBody();
@@ -30,8 +30,7 @@ haxapp.app.AceCodeMode.prototype.showData = function(editOk) {
 		codeText = functionBody;
 	}
 	
-    this.editOk = editOk;
-	this.editor.showData(codeText,editOk);
+	this.editor.showData(codeText,this.getIsEditable());
 }
 
 haxapp.app.AceCodeMode.prototype.onSave = function(text) {	

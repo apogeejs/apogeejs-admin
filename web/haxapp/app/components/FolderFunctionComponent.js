@@ -1,9 +1,8 @@
 /** This component represents a folderFunction, which is a function that is programmed using
  *hax tables rather than writing code. */
 haxapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,componentJson) {
-    //base init
-    haxapp.app.Component.init.call(this,workspaceUI,folderFunction,haxapp.app.FolderFunctionComponent.generator,componentJson);
-    haxapp.app.ParentComponent.init.call(this);
+    //extend parent component
+    haxapp.app.ParentComponent.call(this,workspaceUI,folderFunction,haxapp.app.FolderFunctionComponent.generator,componentJson);
     
     //register this object as a parent container
     var internalFolder = folderFunction.getInternalFolder();
@@ -15,30 +14,16 @@ haxapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,compone
     this.addSaveAction(haxapp.app.FolderFunctionComponent.writeToJson);
 };
 
-//add components to this class
-hax.base.mixin(haxapp.app.FolderFunctionComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.FolderFunctionComponent,haxapp.app.ParentComponent);
+haxapp.app.FolderFunctionComponent.prototype = Object.create(haxapp.app.ParentComponent.prototype);
+haxapp.app.FolderFunctionComponent.prototype.constructor = haxapp.app.FolderFunctionComponent;
 
 //----------------------
 // ParentContainer Methods
 //----------------------
 
-/** This method must be implemented in inheriting objects. */
-haxapp.app.FolderFunctionComponent.prototype.getContentIsShowing = function() {
-    return this.getWindow().getContentIsShowing();
-}
-
 /** This returned the parent member object associated with this component. */
 haxapp.app.FolderFunctionComponent.prototype.getParentMember = function() {
     return this.getObject().getInternalFolder();
-}
-
-//==============================
-// Protected and Private Instance Methods
-//==============================
-
-haxapp.app.FolderFunctionComponent.prototype.createDisplayContent = function(container) {
-    return new haxapp.app.ParentDisplayContent(this,container);
 }
 
 //======================================

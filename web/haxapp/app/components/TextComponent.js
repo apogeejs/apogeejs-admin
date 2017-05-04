@@ -1,14 +1,14 @@
 
 /** This component represents a json table object. */
 haxapp.app.TextComponent = function(workspaceUI,table,componentJson) {
-    //base init
-    haxapp.app.Component.init.call(this,workspaceUI,table,haxapp.app.TextComponent.generator,componentJson);
+    //extend edit component
+    haxapp.app.EditComponent.call(this,workspaceUI,table,haxapp.app.TextComponent.generator,componentJson);
     
     this.memberUpdated();
 };
 
-//add components to this class
-hax.base.mixin(haxapp.app.TextComponent,haxapp.app.Component);
+haxapp.app.TextComponent.prototype = Object.create(haxapp.app.EditComponent.prototype);
+haxapp.app.TextComponent.prototype.constructor = haxapp.app.TextComponent;
 
 //==============================
 // Protected and Private Instance Methods
@@ -33,8 +33,10 @@ haxapp.app.TextComponent.TABLE_EDIT_SETTINGS = {
     "emptyDataValue": ""
 }
 
-haxapp.app.TextComponent.prototype.createDisplayContent = function(container) {
-    return new haxapp.app.EditDisplayContent(this,haxapp.app.TextComponent.TABLE_EDIT_SETTINGS);
+/**  This method retrieves the table edit settings for this component instance
+ * @protected */
+haxapp.app.TextComponent.prototype.getTableEditSettings = function() {
+    return haxapp.app.TextComponent.TABLE_EDIT_SETTINGS;
 }
 
 /** This method should be implemented to retrieve a view mode of the give type. 

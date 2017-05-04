@@ -1,25 +1,37 @@
-/** This is a mixin that encapsulates the base functionality of a Component
- * 
- * This is not a class, but it is used for the prototype of the objects that inherit from it.
- */
-haxapp.app.ParentComponent = {};
-
-/** This is the initializer for the component. The object passed is the core object
- * associated with this component. */
-haxapp.app.ParentComponent.init = function(options) {
+/** This is the base class for a parent component (an object that has children),
+ * It extends the component class. */
+haxapp.app.ParentComponent = function(workspaceUI,object,generator,options) {
+    //base constructor
+	haxapp.app.Component.call(this,workspaceUI,object,generator,options);
+    
     this.tabDisplay = null;
 }
 
-//////////////////////////////////////////
+haxapp.app.ParentComponent.prototype = Object.create(haxapp.app.Component.prototype);
+haxapp.app.ParentComponent.prototype.constructor = haxapp.app.ParentComponent;
+
+//----------------------
+// ParentContainer Methods
+//----------------------
+
+/** This method must be implemented in inheriting objects. */
+haxapp.app.ParentComponent.prototype.getContentIsShowing = function() {
+    return this.getWindow().getContentIsShowing();
+}
+
+
+//Implement in extending classes
+///** This returned the parent member object associated with this component. */
+//haxapp.app.ParentComponent.prototype.getParentMember = function();
     
-haxapp.app.Component.openTabDisplay = function() {
+haxapp.app.Component.prototype.openTabDisplay = function() {
     if(!this.tabDisplay) {
         this.tabDisplay = new haxapp.app.TabComponentDisplay(this);
     }
     this.workspaceUI.setActiveTab(this.getObject().getId());
 }
 
-haxapp.app.Component.getTabDisplay = function() {
+haxapp.app.Component.prototype.getTabDisplay = function() {
     return this.tabDisplay;
 }
 
@@ -40,14 +52,14 @@ haxapp.app.Component.getTabDisplay = function() {
 
 
 /** This flags indicates the component is a parent component. */
-haxapp.app.ParentComponent.isParentComponent = true;
+haxapp.app.ParentComponent.prototype.isParentComponent = true;
 
 ///** This shoudl be implemented by the inheritieing class to give the member
 // * object associated with this component. */
 //haxapp.app.ParentComponent.getParentMember = function();
 
 /** This function adds a fhile componeent to the displays for this parent component. */
-haxapp.app.ParentComponent.removeChildComponent = function(childComponent) {
+haxapp.app.ParentComponent.prototype.removeChildComponent = function(childComponent) {
     //remove from tree entry
     var treeEntry = this.getTreeEntry();
     var childId = childComponent.getObject().getId();
@@ -61,28 +73,16 @@ haxapp.app.ParentComponent.removeChildComponent = function(childComponent) {
 }
 
 /** This function adds a fhile componeent to the displays for this parent component. */
-haxapp.app.ParentComponent.addChildComponent = function(childComponent) {
+haxapp.app.ParentComponent.prototype.addChildComponent = function(childComponent) {
     //add the child to the tree entry
     var treeEntry = this.getTreeEntry();
     var childTreeEntry = childComponent.getTreeEntry();
     var childId = childComponent.getObject().getId();
     treeEntry.addChild(childId,childTreeEntry);
     
-    //add to tab and windows
-    var parentContainer;
-    
     //add child entry for tab
     if(this.tabDisplay) {
-        parentContainer = this.tabDisplay.getDisplayContent();
-        parentContainer.addChildComponent(childComponent); 
-    }
-    
-    for(var i = 0; i < this.windowDisplays; i++) {
-        var windowDisplay = this.windowDisplays[i];
-        parentContainer = windowDisplay.getDisplayContent();
-        if(parentContainer) {
-            parentContainer.addChildComponent(childComponent);
-        }
+        this.tabDisplay.addChildComponent(childComponent); 
     }
 }
 

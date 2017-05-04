@@ -1,6 +1,6 @@
 
 haxapp.app.ResourceOutputMode = function(componentDisplay) {
-	this.componentDisplay = componentDisplay;
+	haxapp.app.ViewMode.call(this,componentDisplay,false);
 	
 	this.outputElement = haxapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -10,16 +10,18 @@ haxapp.app.ResourceOutputMode = function(componentDisplay) {
         "right":"0px",
 		"overflow":"auto"
 	});
+    
+    //no editor - override methods below as needed
 }
 
-/** This indicates if this element displays data or something else (code) */
-haxapp.app.ResourceOutputMode.prototype.isData = true;
+haxapp.app.ResourceOutputMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
+haxapp.app.ResourceOutputMode.prototype.constructor = haxapp.app.ResourceOutputMode;
 
 haxapp.app.ResourceOutputMode.prototype.getElement = function() {
 	return this.outputElement;
 }
 	
-haxapp.app.ResourceOutputMode.prototype.showData = function(editOk) {
+haxapp.app.ResourceOutputMode.prototype.showData = function() {
 	//edit ok ignored - no edit of the control data object - there is none
 	
 	var control = this.componentDisplay.getObject();

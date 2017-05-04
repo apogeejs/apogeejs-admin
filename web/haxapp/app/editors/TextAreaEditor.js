@@ -5,7 +5,7 @@
  * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
  * @param {type} onCancel - returns true if the edit should end
  */
-haxapp.app.TextAreaEditor = function(componentDisplay,onSave,onCancel) {
+haxapp.app.TextAreaEditor = function(viewMode) {
     
     this.outsideDiv = haxapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -28,14 +28,10 @@ haxapp.app.TextAreaEditor = function(componentDisplay,onSave,onCancel) {
     this.textArea.readOnly = true;
     this.outsideDiv.appendChild(this.textArea);  
 	
-	this.componentDisplay = componentDisplay;
-	this.table = componentDisplay.getObject();
+	this.viewMode = viewMode;
 	this.workingData = null;
 	this.editOk = false;
 	this.editMode = false;
-	
-	this.parentSave = onSave;
-	this.parentCancel = onCancel;
 	
 //	//resize the editor on window size change
 //    var resizeCallback = function() {
@@ -56,7 +52,7 @@ haxapp.app.TextAreaEditor.prototype.save = function() {
 	
 	var text = this.textArea.value;
 	
-	var saveComplete = this.parentSave(text);
+	var saveComplete = this.viewMode.onSave(text);
 	
 	if(saveComplete) {
 		this.endEditMode();
@@ -65,7 +61,7 @@ haxapp.app.TextAreaEditor.prototype.save = function() {
 
 haxapp.app.TextAreaEditor.prototype.cancel = function() {
 	//reset the original data
-	var cancelComplete = this.parentCancel();
+	var cancelComplete = this.viewMode.onCancel();
 	
 	if(cancelComplete) {
 		this.endEditMode();

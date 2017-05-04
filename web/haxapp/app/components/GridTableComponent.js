@@ -1,14 +1,14 @@
 
 /** This component represents a json table object. */
 haxapp.app.GridTableComponent = function(workspaceUI,table,componentJson) {
-    //base init
-    haxapp.app.Component.init.call(this,workspaceUI,table,haxapp.app.GridTableComponent.generator,componentJson);
+    //extend edit component
+    haxapp.app.EditComponent.call(this,workspaceUI,table,haxapp.app.GridTableComponent.generator,componentJson);
     
     this.memberUpdated();
 };
 
-//add components to this class
-hax.base.mixin(haxapp.app.GridTableComponent,haxapp.app.Component);
+haxapp.app.GridTableComponent.prototype = Object.create(haxapp.app.EditComponent.prototype);
+haxapp.app.GridTableComponent.prototype.constructor = haxapp.app.GridTableComponent;
 
 //==============================
 // Protected and Private Instance Methods
@@ -35,8 +35,10 @@ haxapp.app.GridTableComponent.TABLE_EDIT_SETTINGS = {
 
 haxapp.app.GridTableComponent.DEFAULT_VIEW = haxapp.app.GridTableComponent.VIEW_GRID;
 
-haxapp.app.GridTableComponent.prototype.createDisplayContent = function(container) {
-    return new haxapp.app.EditDisplayContent(this,container,haxapp.app.GridTableComponent.TABLE_EDIT_SETTINGS);
+/**  This method retrieves the table edit settings for this component instance
+ * @protected */
+haxapp.app.GridTableComponent.prototype.getTableEditSettings = function() {
+    return haxapp.app.GridTableComponent.TABLE_EDIT_SETTINGS;
 }
 
 /** This method should be implemented to retrieve a view mode of the give type. 
