@@ -7,8 +7,7 @@
  * false can be sent in.
  */
 haxapp.app.AceCodeMode = function(componentDisplay,optionalOnBlankData,optionalEditorCodeWrapper) {
-    haxapp.app.ViewMode.call(this,componentDisplay,false);
-	this.setEditor(new haxapp.app.AceTextEditor(this,"ace/mode/javascript"));
+    haxapp.app.ViewMode.call(this,componentDisplay);
 	
 	this.onBlankData = optionalOnBlankData;
 	this.editorCodeWrapper = optionalEditorCodeWrapper;
@@ -30,7 +29,10 @@ haxapp.app.AceCodeMode.prototype.showData = function() {
 		codeText = functionBody;
 	}
 	
-	this.editor.showData(codeText,this.getIsEditable());
+    if(!this.editor) {
+        this.editor = new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
+    }
+	this.editor.showData(codeText,true);
 }
 
 haxapp.app.AceCodeMode.prototype.onSave = function(text) {	

@@ -1,7 +1,6 @@
 
 haxapp.app.AceSupplementalMode = function(componentDisplay) {
-    haxapp.app.ViewMode.call(this,componentDisplay,false);
-	this.setEditor(new haxapp.app.AceTextEditor(this,"ace/mode/javascript"));
+    haxapp.app.ViewMode.call(this,componentDisplay);
 }
 
 haxapp.app.AceSupplementalMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
@@ -12,7 +11,10 @@ haxapp.app.AceSupplementalMode.prototype.showData = function() {
 	var table = this.componentDisplay.getObject();
 	var codeText = table.getSupplementalCode();	
 	
-	this.editor.showData(codeText,this.getIsEditable());
+    if(!this.editor) {
+        this.editor = new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
+    }
+	this.editor.showData(codeText,true);
 }
 
 haxapp.app.AceSupplementalMode.prototype.onSave = function(text) {	

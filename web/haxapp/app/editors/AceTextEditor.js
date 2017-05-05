@@ -112,7 +112,7 @@ haxapp.app.AceTextEditor.prototype.destroy = function() {
 haxapp.app.AceTextEditor.prototype.endEditMode = function() {
 	this.editMode = false;
 	this.editor.setReadOnly(true);
-	this.viewMode.endEditUI();
+	this.viewMode.endEditMode();
 }
 
 /** @private */
@@ -127,7 +127,7 @@ haxapp.app.AceTextEditor.prototype.onMouseClick = function() {
 			instance.cancel();
 		}
 		
-		this.viewMode.startEditUI(onSave,onCancel);
+		this.viewMode.startEditMode(onSave,onCancel);
 		
 		this.editor.setReadOnly(false);
 		this.editMode = true;

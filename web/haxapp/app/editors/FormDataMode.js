@@ -1,8 +1,6 @@
 
 haxapp.app.FormDataMode = function(componentDisplay) {
-	haxapp.app.ViewMode.call(this,componentDisplay,true);
-	this.setEditor(new haxapp.app.JsonFormEditor(this));
-	
+	haxapp.app.ViewMode.call(this,componentDisplay,true);	
 }
 
 haxapp.app.FormDataMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
@@ -13,7 +11,10 @@ haxapp.app.FormDataMode.prototype.showData = function() {
 	var table = this.componentDisplay.getObject();
 	var json = table.getData();	
 	
-	this.editor.showData(json,this.getIsEditable());
+    if(!this.editor) {
+        this.editor = new haxapp.app.JsonFormEditor(this);
+    }
+	this.editor.showData(json,this.getDataIsEditable(table));
 }
 
 //==============================

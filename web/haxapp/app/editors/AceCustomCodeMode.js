@@ -1,7 +1,6 @@
 
 haxapp.app.AceCustomCodeMode = function(componentDisplay) {
-    haxapp.app.ViewMode.call(this,componentDisplay,false);
-	this.setEditor( new haxapp.app.AceTextEditor(this,"ace/mode/javascript"));
+    haxapp.app.ViewMode.call(this,componentDisplay);
 }
 
 haxapp.app.AceCustomCodeMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
@@ -9,7 +8,10 @@ haxapp.app.AceCustomCodeMode.prototype.constructor = haxapp.app.AceCustomCodeMod
 	
 haxapp.app.AceCustomCodeMode.prototype.showData = function() {
 	var codeText = this.component.getCustomizeScript();
-	this.editor.showData(codeText,this.getIsEditable());
+    if(!this.editor) {
+        this.editor = new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
+    }
+	this.editor.showData(codeText,true);
 }
 
 haxapp.app.AceCustomCodeMode.prototype.onSave = function(text) {	

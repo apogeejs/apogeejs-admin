@@ -1,8 +1,6 @@
 
 haxapp.app.HandsonGridMode = function(componentDisplay) {
 	haxapp.app.ViewMode.call(this,componentDisplay,true);
-	this.setEditor(new haxapp.app.HandsonGridEditor(this));
-	
 }
 
 haxapp.app.HandsonGridMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
@@ -13,7 +11,10 @@ haxapp.app.HandsonGridMode.prototype.showData = function() {
 	var table = this.componentDisplay.getObject();
 	var json = table.getData();	
 
-	this.editor.showData(json,this.getIsEditable());
+    if(!this.editor) {
+        this.editor = new haxapp.app.HandsonGridEditor(this);
+    }
+	this.editor.showData(json,this.getDataIsEditable(table));
 }
 
 //==============================

@@ -1,9 +1,6 @@
 
 haxapp.app.TextAreaMode = function(componentDisplay) {
-	haxapp.app.ViewMode.call(this,componentDisplay,true);
-
-	this.setEditor(new haxapp.app.TextAreaEditor(this));
-	
+	haxapp.app.ViewMode.call(this,componentDisplay,true);	
 }
 
 haxapp.app.TextAreaMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
@@ -29,7 +26,10 @@ haxapp.app.TextAreaMode.prototype.showData = function() {
 		textData = JSON.stringify(json,null,haxapp.app.TextAreaMode.formatString);
 	}
 	
-	this.editor.showData(textData,this.getIsEditable());
+    if(!this.editor) {
+        this.editor = new haxapp.app.TextAreaEditor(this);;
+    }
+	this.editor.showData(textData,this.getDataIsEditable(table));
 }
 
 //==============================

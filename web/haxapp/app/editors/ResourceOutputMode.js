@@ -17,6 +17,10 @@ haxapp.app.ResourceOutputMode = function(componentDisplay) {
 haxapp.app.ResourceOutputMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.ResourceOutputMode.prototype.constructor = haxapp.app.ResourceOutputMode;
 
+haxapp.app.AceTextMode.prototype.createEditor = function() {
+    throw new Error("Implement control resource output mode");
+}
+
 haxapp.app.ResourceOutputMode.prototype.getElement = function() {
 	return this.outputElement;
 }
