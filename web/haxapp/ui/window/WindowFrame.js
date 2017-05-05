@@ -155,6 +155,17 @@ haxapp.ui.WindowFrame.prototype.setContent = function(contentElement) {
     this.content = contentElement;
 }
 
+haxapp.ui.WindowFrame.prototype.addTitleToolElement = function(element) {
+    this.titleBarToolElement.appendChild(element);
+}
+
+haxapp.ui.WindowFrame.prototype.removeTitleToolElement = function(element) {
+    this.titleBarToolElement.removeChild(element);
+}
+
+
+
+
 //---------------------------
 // WINDOW CHILD
 //---------------------------

@@ -28,16 +28,14 @@ haxapp.app.ResourceOutputMode.prototype.getElement = function() {
 haxapp.app.ResourceOutputMode.prototype.showData = function() {
 	//edit ok ignored - no edit of the control data object - there is none
 	
-	var control = this.componentDisplay.getObject();
-    var resource = control.getResource();
+    var resource = this.member.getResource();
     if((resource)&&(resource.show)) {
         resource.show();
     }   
 }
 
 haxapp.app.ResourceOutputMode.prototype.destroy = function() {
-    var control = this.componentDisplay.getObject();
-    var resource = control.getResource();
+    var resource = this.member.getResource();
     if((resource)&&(resource.hide)) {
         resource.hide();
     }

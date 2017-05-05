@@ -3,7 +3,7 @@
 haxapp.app.ViewMode = function(componentDisplay) {
     this.componentDisplay = componentDisplay;
     this.component = componentDisplay.getComponent();
-    this.member = componentDisplay.getObject();
+    this.member = this.component.getObject();
     
     this.editor = null;
     
@@ -97,7 +97,7 @@ haxapp.app.ViewMode.prototype.endEditMode = function() {
 
 /** This method returns whether or not the given member has editable data.
  *  The data is not editable if there is code. */ 
-haxapp.app.ViewMode.prototype.getIsDataEditable = function(member) {
-    return !(member.hasCode());
+haxapp.app.ViewMode.prototype.getIsDataEditable = function() {
+    return !(this.member.hasCode());
 }
 

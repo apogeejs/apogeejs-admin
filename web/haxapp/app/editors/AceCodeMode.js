@@ -18,8 +18,7 @@ haxapp.app.AceCodeMode.prototype.constructor = haxapp.app.AceCodeMode;
 	
 haxapp.app.AceCodeMode.prototype.showData = function() {
 		
-	var table = this.componentDisplay.getObject();
-	var functionBody = table.getFunctionBody();
+	var functionBody = this.member.getFunctionBody();
 	
 	var codeText;
 	if(this.editorCodeWrapper) {
@@ -37,21 +36,20 @@ haxapp.app.AceCodeMode.prototype.showData = function() {
 
 haxapp.app.AceCodeMode.prototype.onSave = function(text) {	
 	
-	var table = this.componentDisplay.getObject();
     var actionData = {};
 	
 	if((this.onBlankData)&&(text === "")) {
 		//special case - clear code
         actionData.action = "updateData";
-        actionData.member = table;
+        actionData.member = this.member;
         actionData.data = this.onBlankData.dataValue;
 		
 	}
 	else {
 		//standard case - edit code
         actionData.action = "updateCode";
-        actionData.member = table;
-        actionData.argList = table.getArgList();
+        actionData.member = this.member;
+        actionData.argList = this.member.getArgList();
 
 		if(this.editorCodeWrapper) {
 			actionData.functionBody = this.editorCodeWrapper.wrapCode(text);
@@ -60,10 +58,10 @@ haxapp.app.AceCodeMode.prototype.onSave = function(text) {
 			actionData.functionBody = text;
 		}
 
-        actionData.supplementalCode = table.getSupplementalCode();  
+        actionData.supplementalCode = this.member.getSupplementalCode();  
 	}
     
-    var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
+    var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
         
 	return true;  
 }

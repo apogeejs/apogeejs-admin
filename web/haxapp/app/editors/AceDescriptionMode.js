@@ -8,8 +8,7 @@ haxapp.app.AceDescriptionMode.prototype.constructor = haxapp.app.AceDescriptionM
 
 haxapp.app.AceDescriptionMode.prototype.showData = function() {
 		
-	var table = this.componentDisplay.getObject();
-	var json = table.getDescription();	
+	var json = this.member.getDescription();	
 	
 	var textData;
 	if((json === null)||(json === undefined)) {
@@ -36,14 +35,12 @@ haxapp.app.AceDescriptionMode.prototype.onSave = function(text) {
 	if((text === null)||(text === undefined)) {
 		text = "";
 	}
-	
-	var table = this.componentDisplay.getObject();
     
     var actionData = {};
     actionData.action = "updateDescription";
-    actionData.member = table;
+    actionData.member = this.member;
     actionData.description = text;
-	var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
+	var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
 	
 	return true;
 }

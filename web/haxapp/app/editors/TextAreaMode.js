@@ -12,8 +12,7 @@ haxapp.app.TextAreaMode.formatString = "\t";
 
 haxapp.app.TextAreaMode.prototype.showData = function() {
 		
-	var table = this.componentDisplay.getObject();
-	var json = table.getData();	
+	var json = this.member.getData();	
 	
 	var textData;
 	if(json === null) {
@@ -29,7 +28,7 @@ haxapp.app.TextAreaMode.prototype.showData = function() {
     if(!this.editor) {
         this.editor = new haxapp.app.TextAreaEditor(this);;
     }
-	this.editor.showData(textData,this.getDataIsEditable(table));
+	this.editor.showData(textData,this.getDataIsEditable());
 }
 
 //==============================
@@ -54,13 +53,11 @@ haxapp.app.TextAreaMode.prototype.onSave = function(text) {
 		data = "";
 	}
 	
-	var table = this.componentDisplay.getObject();
-	
     var actionData = {};
     actionData.action = "updateData";
-    actionData.member = table;
+    actionData.member = this.member;
     actionData.data = data;
-	var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
+	var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
 	
 	return true;
 }

@@ -14,8 +14,7 @@ haxapp.app.AceDataMode.formatString = "\t";
 
 haxapp.app.AceDataMode.prototype.showData = function() {
 		
-	var table = this.componentDisplay.getObject();
-	var json = table.getData();	
+	var json = this.member.getData();	
 	
 	var textData;
 	if(json === null) {
@@ -32,7 +31,7 @@ haxapp.app.AceDataMode.prototype.showData = function() {
         var mode = this.doJsonFormatting ? "ace/mode/json" : "ace/mode/text";
         this.editor = new haxapp.app.AceTextEditor(this,mode);
     }
-	this.editor.showData(textData,this.getIsDataEditable(table));
+	this.editor.showData(textData,this.getIsDataEditable());
 }
 
 haxapp.app.AceDataMode.prototype.onSave = function(text) {
@@ -52,14 +51,12 @@ haxapp.app.AceDataMode.prototype.onSave = function(text) {
 	else {
 		data = "";
 	}
-	
-	var table = this.componentDisplay.getObject();
     
     var actionData = {};
     actionData.action = "updateData";
-    actionData.member = table;
+    actionData.member = this.member;
     actionData.data = data;
-	var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
+	var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
 	
 	return true;
 }

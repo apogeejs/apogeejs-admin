@@ -4,14 +4,14 @@ haxapp.app.TabComponentDisplay = function(component) {
     this.object = component.getObject();
     
     this._loadTabEntry();
+    
+    //add a cleanup action to the base component - component must already be initialized
+//    this.addSaveAction(haxapp.app.EditDisplayContent.writeToJson);
+//    this.addCleanupAction(haxapp.app.EditDisplayContent.destroy);
 };
 
 haxapp.app.TabComponentDisplay.prototype.getTab = function() {
     return this.tab;
-}
-
-haxapp.app.TabComponentDisplay.prototype.getDisplayContent = function() {
-    return this.displayContent;
 }
 
 haxapp.app.TabComponentDisplay.prototype.deleteDisplay = function() {
@@ -107,7 +107,6 @@ haxapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
 
  /** @private */
 haxapp.app.TabComponentDisplay.prototype._createDisplayContent = function() {
-    //this.displayContent = new haxapp.app.ParentDisplayContent(this.component);
    
     this.contentElement = haxapp.ui.createElement("div");
     this.parentContainer = new haxapp.ui.ParentContainer(this.contentElement);
@@ -126,5 +125,21 @@ haxapp.app.TabComponentDisplay.prototype._createDisplayContent = function() {
         this.addChildComponent(childComponent);
     }
 }
+
+//======================================
+// Callbacks
+// These are defined as static but are called in the objects context
+//======================================
+
+/** @protected */
+haxapp.app.ParentDisplayContent.prototype.destroy = function() {
+}
+
+/** This serializes the table component. */
+haxapp.app.ParentDisplayContent.prototype.writeToJson = function(json) {
+    json.viewType = this.viewType;
+}
+
+
 
 

@@ -8,8 +8,7 @@ haxapp.app.AceSupplementalMode.prototype.constructor = haxapp.app.AceSupplementa
 
 haxapp.app.AceSupplementalMode.prototype.showData = function() {
 		
-	var table = this.componentDisplay.getObject();
-	var codeText = table.getSupplementalCode();	
+	var codeText = this.member.getSupplementalCode();	
 	
     if(!this.editor) {
         this.editor = new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
@@ -18,16 +17,15 @@ haxapp.app.AceSupplementalMode.prototype.showData = function() {
 }
 
 haxapp.app.AceSupplementalMode.prototype.onSave = function(text) {	
-	var table = this.componentDisplay.getObject();
-    
+
 	var actionData = {};
         actionData.action = "updateCode";
-        actionData.member = table;
-        actionData.argList = table.getArgList();
-        actionData.functionBody = table.getFunctionBody();
+        actionData.member = this.member;
+        actionData.argList = this.member.getArgList();
+        actionData.functionBody = this.member.getFunctionBody();
         actionData.supplementalCode = text;  
         
-		var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
+		var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
         
 	if(!actionResponse.getSuccess()) {
 		//show an error message
