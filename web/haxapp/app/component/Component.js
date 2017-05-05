@@ -113,11 +113,11 @@ haxapp.app.Component.prototype.onDelete = function() {
         if(oldParent) {
             var oldParentComponent = this.workspaceUI.getComponent(oldParent);
             oldParentComponent.removeChildComponent(this);
-            //delete all the old windows
-            for(var i = 0; i < this.windowDisplays.length; i++) {
-                this.windowDisplays[i].deleteWindow();
+            //delete all the window display
+            if(this.windowDisplay) {
+                this.windowDisplay.deleteDisplay();
+                this.windowDisplay = null;
             }
-            this.windowDisplays = [];
         }
         
         //add to the new parent component
@@ -199,11 +199,11 @@ haxapp.app.Component.prototype.memberUpdated = function() {
         if(oldParent) {
             var oldParentComponent = this.workspaceUI.getComponent(oldParent);
             oldParentComponent.removeChildComponent(this);
-            //delete all the old windows
-            for(var i = 0; i < this.windowDisplays.length; i++) {
-                this.windowDisplays[i].deleteWindow();
+            //delete all the window display
+            if(this.windowDisplay) {
+                this.windowDisplay.deleteDisplay();
+                this.windowDisplay = null;
             }
-            this.windowDisplays = [];
         }
         
         //add to the new parent component

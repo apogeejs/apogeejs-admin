@@ -66,9 +66,9 @@ haxapp.app.ParentComponent.prototype.removeChildComponent = function(childCompon
     treeEntry.removeChild(childId);
     
     //remove child windows - just hide them. They will be deleted in the component
-    var childWindowDisplays = childComponent.getWindowDisplays();
-    for(var i = 0; i < childWindowDisplays.length; i++) {
-        childWindowDisplays[i].hide();
+    var childWindowDisplay = childComponent.getWindowDisplay();
+    if(childWindowDisplay) {
+        childWindowDisplay.getWindowEntry().hide();
     }
 }
 

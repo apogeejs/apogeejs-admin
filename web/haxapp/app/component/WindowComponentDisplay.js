@@ -82,6 +82,9 @@ haxapp.app.WindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
     this.windowHeaderManager = new haxapp.app.WindowHeaderManager();
     this.windowFrame.setContent(this.windowHeaderManager.getOuterElement());
     
+    //set title
+    this.windowFrame.setTitle(this.object.getDisplayName());
+    
     // set menu
     this._populateMenu();
     
@@ -215,7 +218,7 @@ haxapp.app.WindowComponentDisplay.prototype._populateMenu = function() {
     //add the standard entries
     var itemInfo = {};
     itemInfo.title = "Edit Properties";
-    itemInfo.callback = haxapp.app.updatecomponent.getUpdateComponentCallback(this.component,this.generator);
+    itemInfo.callback = haxapp.app.updatecomponent.getUpdateComponentCallback(this.component,this.object.generator);
     menuItemInfoList.push(itemInfo);
 
     var itemInfo = {};

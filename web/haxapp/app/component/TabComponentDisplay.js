@@ -88,7 +88,7 @@ haxapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     //add the standard entries
     var itemInfo = {};
     itemInfo.title = "Edit Properties";
-    itemInfo.callback = haxapp.app.updatecomponent.getUpdateComponentCallback(this.component,this.generator);
+    itemInfo.callback = haxapp.app.updatecomponent.getUpdateComponentCallback(this.component,this.object.generator);
     menuItemInfoList.push(itemInfo);
     
     var itemInfo = {};
@@ -132,11 +132,11 @@ haxapp.app.TabComponentDisplay.prototype._createDisplayContent = function() {
 //======================================
 
 /** @protected */
-haxapp.app.ParentDisplayContent.prototype.destroy = function() {
+haxapp.app.TabComponentDisplay.prototype.destroy = function() {
 }
 
 /** This serializes the table component. */
-haxapp.app.ParentDisplayContent.prototype.writeToJson = function(json) {
+haxapp.app.TabComponentDisplay.prototype.writeToJson = function(json) {
     json.viewType = this.viewType;
 }
 

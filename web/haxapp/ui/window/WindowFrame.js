@@ -204,8 +204,8 @@ haxapp.ui.WindowFrame.prototype.show = function() {
 haxapp.ui.WindowFrame.prototype.hide = function() {
     if(!this.parentContainer) return;
     
-    this.parentContainer.removeWindow(this);
     if(this.isShowing) {
+        this.parentContainer.removeWindow(this);
         this.isShowing = false;
         this.frameHidden();
     }
