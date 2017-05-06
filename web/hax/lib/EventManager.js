@@ -66,14 +66,14 @@ hax.EventManager.removeHandler = function(handlerName) {
 }
 
 /** This method calls a handler by name and returns the result. If no 
- * handler is found an error is thrown. */
+ * handler is found undefined is returned. */
 hax.EventManager.callHandler = function(handlerName, handlerData) {
     var callback = this.handlerTable[handlerName];
     if(callback) {
         return callback(handlerData)
     }
     else {
-        throw "Handler not found: " + handlerName;
+        return undefined;
     }
 }
 

@@ -157,7 +157,7 @@ haxapp.ui.createDialog = function(options) {
  *hides the window and removes the modal shiled. */
 haxapp.ui.closeDialog = function(dialog) {
     var parent = dialog.getParent();
-    dialog.hide();
+    dialog.close();
     haxapp.ui.dialogLayer.removeChild(parent.getOuterElement());
 }
 
@@ -168,6 +168,12 @@ haxapp.ui.WINDOW_STATE_MAXIMIZED = 1;
 haxapp.ui.MINIMIZABLE = 0x01;
 haxapp.ui.MAXIMIZABLE = 0x02;
 haxapp.ui.CLOSEABLE = 0x04;
+
+/** This is a handler name used to request closing the window, tab or other UI element. */
+haxapp.ui.REQUEST_CLOSE = "request_close";
+haxapp.ui.DENY_CLOSE = -1;
+
+haxapp.ui.CLOSE_EVENT = "closed";
 
 
 

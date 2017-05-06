@@ -67,6 +67,12 @@ haxapp.app.Component.prototype.getWindowDisplay = function() {
     return this.windowDisplay;
 }
 
+haxapp.app.Component.prototype.closeWindowDisplay = function() {
+    if(this.windowDisplay) {
+        this.windowDisplay.deleteDisplay();
+    }
+}
+
 /** This serializes the component. */
 haxapp.app.Component.prototype.toJson = function() {
     var json = {};
@@ -163,12 +169,6 @@ haxapp.app.Component.prototype.onDelete = function() {
     //end
     //-------------------------------------------------------------------------------------
     
-    
-    
-    
-    //remove the UI element
-//    var componentWindow = this.getWindow();
-//    componentWindow.deleteWindow();
     
     //TREE_ENTRY - remove tree entry from the parent
     if(this.uiActiveParent) {

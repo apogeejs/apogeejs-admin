@@ -14,10 +14,6 @@ haxapp.app.TabComponentDisplay.prototype.getTab = function() {
     return this.tab;
 }
 
-haxapp.app.TabComponentDisplay.prototype.deleteDisplay = function() {
-    alert("Delete tabcomponent display not implemneted");
-}
-
 haxapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     if(bannerState == haxapp.app.WindowHeaderManager.BANNER_TYPE_NONE) {
         this.windowHeaderManager.hideBannerBar();
@@ -103,6 +99,15 @@ haxapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     //set the tab title
     //-----------------
     this.tab.setName(this.object.getName());
+    
+    //-----------------------------
+    //add the handlers for the tab
+    //-----------------------------
+    var instance = this;
+    var onClose = function() {
+        instance.destroy();
+    }
+    this.tab.addListener(haxapp.ui.CLOSE_EVENT,onClose);
 }
 
  /** @private */
@@ -133,6 +138,17 @@ haxapp.app.TabComponentDisplay.prototype._createDisplayContent = function() {
 
 /** @protected */
 haxapp.app.TabComponentDisplay.prototype.destroy = function() {
+    var children = this.object.getChildMap();
+    var workspaceUI = this.component.getWorkspaceUI();
+    
+    //TODO THIS LOGIC IS NOT GOOD! FIX IT!
+    for(var childName in children) {
+        var child = children[childName];
+        var childComponent = workspaceUI.getComponent(child);
+        childComponent.closeWindowDisplay();
+    }
+    
+    this.component.closeTabDisplay();
 }
 
 /** This serializes the table component. */

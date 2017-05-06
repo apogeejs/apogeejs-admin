@@ -31,6 +31,12 @@ haxapp.app.Component.prototype.openTabDisplay = function() {
     this.workspaceUI.setActiveTab(this.getObject().getId());
 }
 
+haxapp.app.Component.prototype.closeTabDisplay = function() {
+    if(this.tabDisplay) {
+        this.tabDisplay = null;
+    }
+}
+
 haxapp.app.Component.prototype.getTabDisplay = function() {
     return this.tabDisplay;
 }
@@ -68,7 +74,7 @@ haxapp.app.ParentComponent.prototype.removeChildComponent = function(childCompon
     //remove child windows - just hide them. They will be deleted in the component
     var childWindowDisplay = childComponent.getWindowDisplay();
     if(childWindowDisplay) {
-        childWindowDisplay.getWindowEntry().hide();
+        childWindowDisplay.getWindowEntry().close();
     }
 }
 

@@ -22,7 +22,7 @@ hax.base.mixin(haxapp.ui.TabFrame,hax.EventManager);
 //events
 haxapp.ui.TabFrame.TAB_ADDED = "tabAdded";
 haxapp.ui.TabFrame.TAB_SHOWN = "tabShown";
-haxapp.ui.TabFrame.TAB_CLOSED = "tabClosed";
+haxapp.ui.TabFrame.TAB_HIDDEN = "tabHidden";
 
 haxapp.ui.TabFrame.CONTAINER_FRAME_MARGIN_PX = 5;
 
@@ -86,19 +86,18 @@ haxapp.ui.TabFrame.prototype.addTab = function(id) {
 haxapp.ui.TabFrame.prototype.closeTab = function(id) {
     var tabData = this.tabTable[id];
     if(tabData) {
-        this.tabFrame.removeChild(tabData.tabDisplay.getContainerElement());
+        this.tabFrame.removeChild(tabData.tabDisplay.getOuterElement());
         this.tabBar.removeChild(tabData.tabLabel);
         delete this.tabTable[id];
 		
         if(this.activeTab == id) {
+            this.dispatchEvent(haxapp.ui.TabFrame.TAB_HIDDEN,id);
             this.activeTab = null;
             //choose a random tab
-            for(var title in this.tabTable) {
-                this.activeTab = title;
-                break;
+            for(var newId in this.tabTable) {
+                this.setActiveTab(newId);
             }
         }
-        this.dispatchEvent(haxapp.ui.TabFrame.TAB_CLOSED,id);
         this.updateTabDisplay();
     }
 }

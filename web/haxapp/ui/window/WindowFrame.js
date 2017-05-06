@@ -108,7 +108,6 @@ haxapp.ui.WindowFrame.RESIZE_SW = haxapp.ui.WindowFrame.RESIZE_SOUTH + haxapp.ui
 haxapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT = 300;
 haxapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH = 300;
 
-
 //====================================
 // Public Methods
 //====================================
@@ -200,24 +199,27 @@ haxapp.ui.WindowFrame.prototype.show = function() {
 
 }
 
-/** This method hides the window. */
-haxapp.ui.WindowFrame.prototype.hide = function() {
+/** This method closes the window. If the argument forceClose is not
+ * set to true the "request_close" handler is called to check if
+ * it is ok to close the window. */
+haxapp.ui.WindowFrame.prototype.close = function(forceClose) {
     if(!this.parentContainer) return;
     
     if(this.isShowing) {
+        if(!forceClose) {
+            //make a close request
+            var requestResponse = this.callHandler(haxapp.ui.REQUEST_CLOSE,this);
+            if(requestResponse == haxapp.ui.DENY_CLOSE) {
+                //do not close the window
+                return;
+            }
+        }
+        
         this.parentContainer.removeWindow(this);
         this.isShowing = false;
-        this.frameHidden();
+        this.frameClosed();
     }
 }
-
-/** This method closes the window. */
-haxapp.ui.WindowFrame.prototype.deleteWindow = function() {
-    if(!this.parentContainer) return;
-    this.hide();
-}
-
-
 
 /** This method returns true if the window is showing. */
 haxapp.ui.WindowFrame.prototype.getIsShowing = function() {
@@ -590,10 +592,10 @@ haxapp.ui.WindowFrame.prototype.frameShown = function() {
 
 /** This method should be called when the entire window is hidden.
  * @private */
-haxapp.ui.WindowFrame.prototype.frameHidden = function() {
+haxapp.ui.WindowFrame.prototype.frameClosed = function() {
     
     //dispatch event
-    this.dispatchEvent(haxapp.ui.ParentContainer.CONTENT_HIDDEN,this);
+    this.dispatchEvent(haxapp.ui.CLOSE_EVENT,this);
 }
 
 /** This method should be called when the entire window is hidden
@@ -768,7 +770,7 @@ haxapp.ui.WindowFrame.prototype.createTitleBar = function() {
         this.closeButton = haxapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
         this.closeButton.src = haxapp.ui.getResourcePath(haxapp.ui.WindowFrame.CLOSE_CMD_IMAGE);
         this.closeButton.onclick = function() {
-            instance.hide();
+            instance.close();
         }
     }
 	

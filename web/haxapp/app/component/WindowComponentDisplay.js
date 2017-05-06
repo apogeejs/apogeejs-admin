@@ -32,7 +32,7 @@ haxapp.app.WindowComponentDisplay.prototype.getComponent = function() {
 haxapp.app.WindowComponentDisplay.prototype.deleteDisplay = function() {
     //window will get deleted! New parent will get new windows, as is appropriate
     if(this.windowFrame) {
-        this.windowFrame.deleteWindow();
+        this.windowFrame.close();
     }
 }
 
@@ -93,7 +93,6 @@ haxapp.app.WindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
     
     //set the content
     this._initContentUI();
-    
 }
 
 //------------------------------------
