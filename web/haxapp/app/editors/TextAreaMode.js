@@ -28,7 +28,7 @@ haxapp.app.TextAreaMode.prototype.showData = function() {
     if(!this.editor) {
         this.editor = new haxapp.app.TextAreaEditor(this);;
     }
-	this.editor.showData(textData,this.getDataIsEditable());
+	this.editor.showData(textData,this.getIsDataEditable());
 }
 
 //==============================

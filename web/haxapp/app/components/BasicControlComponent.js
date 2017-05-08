@@ -4,7 +4,7 @@
  * confugred with initialization data from the model. */
 haxapp.app.BasicControlComponent = function(workspaceUI,control,generator,componentJson) {
     //extend edit component
-    haxapp.app.EditComponent.call(this,workspaceUI,control,haxapp.app.BasicControlComponent.generator,componentJson);
+    haxapp.app.EditComponent.call(this,workspaceUI,control,generator,componentJson);
 	
 	var resource = control.getResource();
 	resource.setComponent(this);

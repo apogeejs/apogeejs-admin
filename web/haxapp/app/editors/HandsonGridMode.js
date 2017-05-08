@@ -13,7 +13,7 @@ haxapp.app.HandsonGridMode.prototype.showData = function() {
     if(!this.editor) {
         this.editor = new haxapp.app.HandsonGridEditor(this);
     }
-	this.editor.showData(json,this.getDataIsEditable());
+	this.editor.showData(json,this.getIsDataEditable());
 }
 
 //==============================
