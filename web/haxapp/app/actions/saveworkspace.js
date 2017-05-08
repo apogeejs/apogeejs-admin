@@ -24,17 +24,6 @@ haxapp.app.saveworkspace.getSaveCallback = function(app,filename) {
     }
 }
 
-haxapp.app.saveworkspace.getSaveAsCallback = function(app) {
-    return function() {       
-        var workspaceText = haxapp.app.saveworkspace.getWorkspaceText();
-        if(!workspaceText) {
-            alert("There is no workspace open.");
-            return;
-        }
-        haxapp.app.saveworkspace.showSaveDialog(workspaceText);
-    }
-}
-
 haxapp.app.saveworkspace.getWorkspaceText = function() {
     var activeWorkspaceUI = app.getWorkspaceUI();
     if(activeWorkspaceUI) {

@@ -78,8 +78,8 @@ haxapp.app.Component.prototype.toJson = function() {
     var json = {};
     json.type = this.generator.uniqueName;
     
-    json.coordInfo = this.window.getCoordinateInfo();
-    json.windowState = this.window.getWindowState();
+//    json.coordInfo = this.window.getCoordinateInfo();
+//    json.windowState = this.window.getWindowState();
     
     for(var i = 0; i < this.saveActions.length; i++) {
         this.saveActions[i].call(this,json);
@@ -256,8 +256,11 @@ haxapp.app.Component.prototype.getPropertyValues = function() {
     
     var values = {};
     values.name = member.getName();
-    values.parentName = member.getParent().getFullName();
-    
+    var parent = member.getParent();
+    if(parent) {
+        values.parentName = parent.getFullName();
+    }
+
     if(generator.addPropFunction) {
         generator.addPropFunction(member,values);
     }

@@ -19,7 +19,7 @@ hax.movemember.moveMember = function(actionData,processedActions) {
         
     var movedMemberList = [];
     hax.movemember.loadMovedList(member,movedMemberList);
-    member.move(actionData.name,actionData.folder);
+    member.move(actionData.name,actionData.owner);
     
     //add the individual moves
     for(var i = 0; i < movedMemberList.length; i++) {
@@ -35,7 +35,7 @@ hax.movemember.moveMember = function(actionData,processedActions) {
             actionDataEntry.action = "moveMember";
             actionDataEntry.member = member;
             actionDataEntry.name = member.getName();
-            actionDataEntry.folder = member.getParent();
+            actionDataEntry.owner = member.getOwner();
             actionDataEntry.actionInfo = actionData.actionInfo;
         }
         
