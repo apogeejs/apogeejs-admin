@@ -102,7 +102,7 @@ haxapp.app.TextAreaEditor.prototype.destroy = function() {
 haxapp.app.TextAreaEditor.prototype.endEditMode = function() {
 	this.editMode = false;
 	this.textArea.readOnly = true;
-	this.componentDisplay.endEditMode();
+	this.viewMode.endEditMode();
 }
 
 /** @private */
@@ -117,7 +117,7 @@ haxapp.app.TextAreaEditor.prototype.onMouseClick = function() {
 			instance.cancel();
 		}
 		
-		this.componentDisplay.startEditMode(onSave,onCancel);
+		this.viewMode.startEditMode(onSave,onCancel);
 		
 		this.textArea.readOnly = false;
 		this.editMode = true;

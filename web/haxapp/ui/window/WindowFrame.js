@@ -364,7 +364,7 @@ haxapp.ui.WindowFrame.prototype.moveMouseDown = function(e) {
 }
 
 /** Mouse m,ove handler for moving the window. */
-haxapp.ui.WindowFrame.prototype.moveMouseMove = function(e) {
+haxapp.ui.WindowFrame.prototype.moveMouseMoveImpl = function(e) {
     if(!this.windowDragActive) return;
 	var newX = e.clientX - this.moveOffsetX;
 	if(newX < 0) newX = 0;

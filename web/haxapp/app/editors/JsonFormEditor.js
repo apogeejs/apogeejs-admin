@@ -57,3 +57,7 @@ haxapp.app.JsonFormEditor.prototype.showData = function(data,editOk) {
     }
 }
 
+haxapp.app.JsonFormEditor.prototype.destroy = function() {
+	//no action
+}
+
