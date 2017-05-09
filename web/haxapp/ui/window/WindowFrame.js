@@ -145,11 +145,6 @@ haxapp.ui.WindowFrame.prototype.getMenu = function() {
 
 /** This sets the content for the window */
 haxapp.ui.WindowFrame.prototype.setContent = function(contentElement) {
-    
-//    this.outerBody = document.createElement("div");
-//    this.outerBody.className = "visiui_win_body";  
-//    this.bodyCell.appendChild(this.outerBody);
-
     haxapp.ui.removeAllChildren(this.bodyCell);
     this.bodyCell.appendChild(contentElement);
     this.content = contentElement;
@@ -290,8 +285,8 @@ haxapp.ui.WindowFrame.prototype.getElement = function() {
 //object specific
 
 /** This method sets the size of the window to fit the content. It should only be 
- * called after the window has been shown. The argument passed should be the element
- * that holds the content and is sized to it. */
+ * called after the window has been shown. If this is used a scrolling frame should not be
+ * used a the content. */
 haxapp.ui.WindowFrame.prototype.fitToContent = function() {
 	//figure out how big to make the frame to fit the content
     var viewWidth = this.bodyCell.offsetWidth;

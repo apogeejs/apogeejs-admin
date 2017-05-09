@@ -5,26 +5,16 @@ haxapp.app.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
 
     var dialog = haxapp.ui.createDialog({"resizable":true,"movable":true});
     dialog.setTitle("&nbsp;");
-
-    //add a scroll container
-    var contentContainer = haxapp.ui.createElement("div",null,
-        {
-			"display":"block",
-            "position":"relative",
-            "top":"0px",
-            "height":"100%",
-            "overflow": "auto"
-        });
-	dialog.setContent(contentContainer);
     
     var line;
     
+    //no scroll container - we will fit the dialog to the content
 	var content = haxapp.ui.createElement("div",null,
 			{
 				"display":"table",
 				"overflow":"hidden"
 			});
-	contentContainer.appendChild(content);
+    dialog.setContent(content);
   
     //title
     line = haxapp.ui.createElement("div",{"className":"dialogLine"});
@@ -68,7 +58,7 @@ haxapp.app.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
     dialog.show();
     
     //size the dialog to the content
-    dialog.fitToContent(content);
+    dialog.fitToContent();
     dialog.centerInParent();
 }
 
