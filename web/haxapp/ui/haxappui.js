@@ -44,6 +44,16 @@ haxapp.ui.applyStyle = function(element,style) {
 }
 
 //=========================================
+// resources
+//=========================================
+
+haxapp.ui.MINIMIZE_CMD_IMAGE = "/minimize.png";
+haxapp.ui.RESTORE_CMD_IMAGE = "/restore.png";
+haxapp.ui.MAXIMIZE_CMD_IMAGE = "/maximize.png";
+haxapp.ui.CLOSE_CMD_IMAGE = "/close.png";
+haxapp.ui.MENU_IMAGE = "/hamburger.png";
+
+//=========================================
 // dom methods
 //=========================================
 

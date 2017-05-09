@@ -131,7 +131,7 @@ haxapp.ui.WindowFrame.prototype.setTitle = function(title) {
 /** This method shows the window. */
 haxapp.ui.WindowFrame.prototype.getMenu = function() {
     if(!this.menu) {
-        this.menu = haxapp.ui.Menu.createMenuFromImage(haxapp.ui.getResourcePath(haxapp.ui.TitleBar.MENU_IMAGE));
+        this.menu = haxapp.ui.Menu.createMenuFromImage(haxapp.ui.getResourcePath(haxapp.ui.MENU_IMAGE));
 		var firstLeftElementChild = this.titleBarLeftElements.firstChild;
 		if(firstLeftElementChild) {
 			this.titleBarLeftElements.insertBefore(this.menu.getElement(),firstLeftElementChild);
@@ -744,7 +744,7 @@ haxapp.ui.WindowFrame.prototype.createTitleBar = function() {
     //minimize button
     if(this.options.minimizable) {
         this.minimizeButton = haxapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
-        this.minimizeButton.src = haxapp.ui.getResourcePath(haxapp.ui.WindowFrame.MINIMIZE_CMD_IMAGE);
+        this.minimizeButton.src = haxapp.ui.getResourcePath(haxapp.ui.MINIMIZE_CMD_IMAGE);
         this.minimizeButton.onclick = function() {
             instance.minimizeContent();
         }
@@ -753,7 +753,7 @@ haxapp.ui.WindowFrame.prototype.createTitleBar = function() {
     //restore button - only if we cn minimize or maximize
     if(this.options.minimizable || this.options.maximizable) {	
         this.restoreButton = haxapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
-        this.restoreButton.src = haxapp.ui.getResourcePath(haxapp.ui.WindowFrame.RESTORE_CMD_IMAGE);
+        this.restoreButton.src = haxapp.ui.getResourcePath(haxapp.ui.RESTORE_CMD_IMAGE);
         this.restoreButton.onclick = function() {
             instance.restoreContent();
         }
@@ -762,7 +762,7 @@ haxapp.ui.WindowFrame.prototype.createTitleBar = function() {
     //maximize button and logic
     if(this.options.maximizable) {
         this.maximizeButton = haxapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
-        this.maximizeButton.src = haxapp.ui.getResourcePath(haxapp.ui.WindowFrame.MAXIMIZE_CMD_IMAGE);
+        this.maximizeButton.src = haxapp.ui.getResourcePath(haxapp.ui.MAXIMIZE_CMD_IMAGE);
         this.maximizeButton.onclick = function() {
             instance.maximizeContent();
         }
@@ -775,7 +775,7 @@ haxapp.ui.WindowFrame.prototype.createTitleBar = function() {
     //close button
     if(this.options.closable) {
         this.closeButton = haxapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
-        this.closeButton.src = haxapp.ui.getResourcePath(haxapp.ui.WindowFrame.CLOSE_CMD_IMAGE);
+        this.closeButton.src = haxapp.ui.getResourcePath(haxapp.ui.CLOSE_CMD_IMAGE);
         this.closeButton.onclick = function() {
             instance.close();
         }

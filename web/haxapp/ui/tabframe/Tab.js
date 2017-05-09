@@ -11,7 +11,7 @@ haxapp.ui.Tab = function(id, tabLabelElement, tabFrame) {
     this.titleElement = haxapp.ui.createElementWithClass("div","visiui_tf_tab_title",this.tabLabelElement);
     
     this.closeButton = haxapp.ui.createElementWithClass("img","visiui_tf_tab_cmd_button",this.tabLabelElement);
-    this.closeButton.src = haxapp.ui.getResourcePath(haxapp.ui.TitleBar.CLOSE_CMD_IMAGE);
+    this.closeButton.src = haxapp.ui.getResourcePath(haxapp.ui.CLOSE_CMD_IMAGE);
     
     var instance = this;
     this.closeButton.onclick = function() {
@@ -80,7 +80,7 @@ haxapp.ui.Tab.prototype.getName = function() {
 /** This method shows the window. */
 haxapp.ui.Tab.prototype.getMenu = function() {
     if(!this.menu) {
-        this.menu = haxapp.ui.Menu.createMenuFromImage(haxapp.ui.getResourcePath(haxapp.ui.TitleBar.MENU_IMAGE));
+        this.menu = haxapp.ui.Menu.createMenuFromImage(haxapp.ui.getResourcePath(haxapp.ui.MENU_IMAGE));
 		this.menuContainer.appendChild(this.menu.domElement);
     }
     return this.menu;
