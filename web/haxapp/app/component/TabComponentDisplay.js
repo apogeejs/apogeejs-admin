@@ -110,10 +110,19 @@ haxapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     this.tab.addListener(haxapp.ui.CLOSE_EVENT,onClose);
 }
 
+haxapp.app.TabComponentDisplay.PARENT_CONTAINER_STYLE = {
+    "position":"relative",
+    "display":"table",
+    "width":"100%",
+    "height":"100%",
+    "top":"0px",
+    "left":"0px"
+}
+
  /** @private */
 haxapp.app.TabComponentDisplay.prototype._createDisplayContent = function() {
    
-    this.contentElement = haxapp.ui.createElement("div");
+    this.contentElement = haxapp.ui.createElement("div",null,haxapp.app.TabComponentDisplay.PARENT_CONTAINER_STYLE);
     this.parentContainer = new haxapp.ui.ParentContainer(this.contentElement);
 
     var workspaceUI = this.component.getWorkspaceUI();

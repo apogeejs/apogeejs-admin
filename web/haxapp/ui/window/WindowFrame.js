@@ -376,17 +376,17 @@ haxapp.ui.WindowFrame.prototype.moveMouseMove = function(e) {
 }
 
 /** Mouse up handler for moving the window. */
-haxapp.ui.WindowFrame.prototype.moveMouseUp = function(e) {
+haxapp.ui.WindowFrame.prototype.moveMouseUpImpl = function(e) {
     this.endMove();
 }
 
 /** Mouse leave handler for moving the window. */
-haxapp.ui.WindowFrame.prototype.moveMouseLeave = function(e) {
+haxapp.ui.WindowFrame.prototype.moveMouseLeaveImpl = function(e) {
     this.endMove();
 }
 
 /** Mouse down handler for resizing the window. */
-haxapp.ui.WindowFrame.prototype.resizeMouseDown = function(e,resizeFlags) {
+haxapp.ui.WindowFrame.prototype.resizeMouseDownImpl = function(e,resizeFlags) {
     //do not do resize in maximized state
     if(this.windowState === haxapp.ui.WINDOW_STATE_MAXIMIZED) return;
 
@@ -418,7 +418,7 @@ haxapp.ui.WindowFrame.prototype.resizeMouseDown = function(e,resizeFlags) {
 }
 
 /** Mouse move handler for resizing the window. */
-haxapp.ui.WindowFrame.prototype.resizeMouseMove = function(e) {
+haxapp.ui.WindowFrame.prototype.resizeMouseMoveImpl = function(e) {
     var newHeight;
     var newWidth;
     var newX;
@@ -463,12 +463,12 @@ haxapp.ui.WindowFrame.prototype.resizeMouseMove = function(e) {
 }
 
 /** Mouse up handler for resizing the window. */
-haxapp.ui.WindowFrame.prototype.resizeMouseUp = function(e) {
+haxapp.ui.WindowFrame.prototype.resizeMouseUpImpl = function(e) {
     this.endResize();
 }
 
 /** Mouse up handler for resizing the window. */
-haxapp.ui.WindowFrame.prototype.resizeMouseLeave = function(e) {
+haxapp.ui.WindowFrame.prototype.resizeMouseLeaveImpl = function(e) {
     this.endResize();
 }
 
@@ -479,6 +479,7 @@ haxapp.ui.WindowFrame.prototype.endMove = function(e) {
     this.windowDragActive = false;
     this.parentElement.removeEventListener("mousemove",this.moveOnMouseMove);
     this.parentElement.removeEventListener("mouseup",this.moveOnMouseUp);
+    this.parentElement.removeEventListener("mouseleave",this.moveOnMouseLeave);
 }
 
 /** this method ends a resize action.
@@ -490,6 +491,7 @@ haxapp.ui.WindowFrame.prototype.endResize = function() {
 	this.resizeNorthActive = false;
 	this.parentElement.removeEventListener("mouseup",this.resizeOnMouseUp);
 	this.parentElement.removeEventListener("mousemove",this.resizeOnMouseMove);
+    this.parentElement.removeEventListener("mouseleave",this.resizeOnMouseLeave);
 }
 
 //====================================
@@ -700,20 +702,20 @@ haxapp.ui.WindowFrame.prototype.addResizeHandlers = function(cell,flags) {
     if(this.options.resizable) {
         var instance = this;
         cell.onmousedown = function(event) {
-            instance.resizeMouseDown(event,flags);
+            instance.resizeMouseDownImpl(event,flags);
         }
         
         //these are not cel specific. they are used on all cells and on the parent container
         //during a move.
         if(!this.resizeOnMouseMove) {
             this.resizeOnMouseMove = function(event) {
-                instance.resizeMouseMove(event);
+                instance.resizeMouseMoveImpl(event);
             };
             this.resizeOnMouseUp = function(event) {
-                instance.resizeMouseUp(event);
+                instance.resizeMouseUpImpl(event);
             };
             this.resizeOnMouseLeave = function(event) {
-                instance.resizeMouseLeave(event);
+                instance.resizeMouseLeaveImpl(event);
             };
         }
     }
@@ -789,13 +791,13 @@ haxapp.ui.WindowFrame.prototype.createTitleBar = function() {
         //mouse window drag events we will place on the parent container - since the mouse drag 
         //may leave the window frame during the move
         this.moveOnMouseMove = function(event) {
-            instance.moveMouseMove(event);
+            instance.moveMouseMoveImpl(event);
         };
         this.moveOnMouseUp = function(event) {
-            instance.moveMouseUp(event);
+            instance.moveMouseUpImpl(event);
         }
         this.moveOnMouseLeave = function(event) {
-            instance.moveMouseLeave(event);
+            instance.moveMouseLeaveImpl(event);
         }
     }
     
