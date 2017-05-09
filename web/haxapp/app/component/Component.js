@@ -4,6 +4,7 @@ haxapp.app.Component = function(workspaceUI,object,generator,options) {
     if(!options) {
         options = {};
     }
+    this.options = options;
     
     this.workspaceUI = workspaceUI;
     this.object = object;
@@ -60,17 +61,25 @@ haxapp.app.Component.prototype.getTreeEntry = function() {
     return this.treeDisplay.getTreeEntry();
 }
 
-haxapp.app.Component.prototype.getWindowDisplay = function() {
+haxapp.app.Component.prototype.createWindowDisplay = function() {
     if(this.windowDisplay == null) {
-        this.windowDisplay = new haxapp.app.WindowComponentDisplay(this);
+        this.windowDisplay = new haxapp.app.WindowComponentDisplay(this,this.options.windowState);
     }
     return this.windowDisplay;
 }
 
 haxapp.app.Component.prototype.closeWindowDisplay = function() {
     if(this.windowDisplay) {
+        //first store the window state
+        this.windowDisplayStateJson = this.windowDisplay.getStateJson();
+        
+        //delete the window
         this.windowDisplay.deleteDisplay();
     }
+}
+
+haxapp.app.Component.prototype.getWindowDisplay = function() {
+    return this.windowDisplay;
 }
 
 /** This serializes the component. */
@@ -78,8 +87,13 @@ haxapp.app.Component.prototype.toJson = function() {
     var json = {};
     json.type = this.generator.uniqueName;
     
-//    json.coordInfo = this.window.getCoordinateInfo();
-//    json.windowState = this.window.getWindowState();
+    if(this.windowDisplay != null) {
+        this.windowDisplayStateJson = this.windowDisplay.getStateJson();
+    }
+    
+    if(this.windowDisplayStateJson) {
+        json.windowState = this.windowDisplayStateJson;
+    }
     
     for(var i = 0; i < this.saveActions.length; i++) {
         this.saveActions[i].call(this,json);

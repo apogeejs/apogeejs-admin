@@ -6,7 +6,6 @@ haxapp.app.TabComponentDisplay = function(component) {
     this._loadTabEntry();
     
     //add a cleanup action to the base component - component must already be initialized
-//    this.addSaveAction(haxapp.app.EditDisplayContent.writeToJson);
 //    this.addCleanupAction(haxapp.app.EditDisplayContent.destroy);
 };
 
@@ -44,12 +43,16 @@ haxapp.app.TabComponentDisplay.prototype.addChildComponent = function(childCompo
 //    memberWindowOptions.frameColorClass = "visicomp_windowColor";
 //    memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
     
-    var windowComponentDisplay = childComponent.getWindowDisplay();
+    var windowComponentDisplay = childComponent.createWindowDisplay();
     var childWindow = windowComponentDisplay.getWindowEntry();
 
     childWindow.setParent(this.parentContainer);
-    var pos = this.parentContainer.getNextWindowPosition();
-    childWindow.setPosition(pos[0],pos[1]);
+    
+    var pos = windowComponentDisplay.getPreferredPosition();
+    if(!pos) {
+        pos = this.parentContainer.getNextWindowPosition();
+    }
+    childWindow.setPosition(pos.x,pos.y);
     childWindow.show();
 }
 
@@ -150,12 +153,6 @@ haxapp.app.TabComponentDisplay.prototype.destroy = function() {
     
     this.component.closeTabDisplay();
 }
-
-/** This serializes the table component. */
-haxapp.app.TabComponentDisplay.prototype.writeToJson = function(json) {
-    json.viewType = this.viewType;
-}
-
 
 
 

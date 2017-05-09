@@ -14,7 +14,6 @@ haxapp.app.WindowComponentDisplay = function(component, options) {
     this._loadWindowFrameEntry();
     
     //add a cleanup action to the base component - component must already be initialized
-//    this.addSaveAction(haxapp.app.WindowComponentDisplay.writeToJson);
 //    this.addCleanupAction(haxapp.app.WindowComponentDisplay.destroy);
 };
 
@@ -23,6 +22,20 @@ haxapp.app.WindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
 haxapp.app.WindowComponentDisplay.prototype.getWindowEntry = function() {
     return this.windowFrame;
+}
+
+/** This returns the preferred size, to be used by the parent to set the window position.
+ * The result may be undefined.
+ * 
+ * return {"x":x,"y":y}
+ */
+haxapp.app.WindowComponentDisplay.prototype.getPreferredPosition = function() {
+    if(this.options) {
+        return this.options.posInfo;
+    }
+    else {
+        return undefined;
+    }
 }
 
 haxapp.app.WindowComponentDisplay.prototype.getComponent = function() {
@@ -60,6 +73,26 @@ haxapp.app.WindowComponentDisplay.prototype.updateData = function() {
     }
 }
 
+/** This gets the current window state, to reconstruct the view. */
+haxapp.app.WindowComponentDisplay.prototype.getStateJson = function() {
+    var json = {};
+    var dataPresent = false;
+    
+    if(this.windowFrame) {
+        json.sizeInfo = this.windowFrame.getSizeInfo();
+        json.posInfo = this.windowFrame.getPosInfo();
+        dataPresent = true;
+    }
+    
+    if(this.viewType) {
+        json.viewType = this.viewType;
+        dataPresent = true;
+    }
+    
+    if(dataPresent) return json;
+    else return undefined;
+}
+
 //===============================
 // Private Functions
 //===============================
@@ -76,7 +109,13 @@ haxapp.app.WindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
     memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
 
     this.windowFrame = new haxapp.ui.WindowFrame(memberWindowOptions);
-    this.windowFrame.setSize(this.component.generator.DEFAULT_WIDTH,this.component.generator.DEFAULT_HEIGHT);
+    
+    if((this.options)&&(this.options.sizeInfo)) {
+        this.windowFrame.setSize(this.options.sizeInfo.width,this.options.sizeInfo.height);
+    }
+    else {
+        this.windowFrame.setSize(this.component.generator.DEFAULT_WIDTH,this.component.generator.DEFAULT_HEIGHT);
+    }
 
     //header manager - for banner and toolbars
     this.windowHeaderManager = new haxapp.app.WindowHeaderManager();
@@ -344,9 +383,4 @@ haxapp.app.WindowComponentDisplay.prototype.destroy = function() {
         var viewModeElement = this.viewModeElemens[viewType];
         viewModeElement.destroy();
     }
-}
-
-/** This serializes the table component. */
-haxapp.app.WindowComponentDisplay.prototype.writeToJson = function(json) {
-    json.viewType = this.viewType;
 }

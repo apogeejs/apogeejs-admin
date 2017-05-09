@@ -29,11 +29,12 @@ haxapp.ui.WindowFrame = function(options) {
     this.windowState = (options.initialState !== undefined) ? options.initialState : haxapp.ui.WINDOW_STATE_NORMAL; //minimize, normal, maximize
     
 	//set default size values
-	this.coordinateInfo = {};
-	this.coordinateInfo.x = 0;
-	this.coordinateInfo.y = 0;
-	this.coordinateInfo.width = haxapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH;
-	this.coordinateInfo.height = haxapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT;
+	this.posInfo = {};
+	this.posInfo.x = 0;
+	this.posInfo.y = 0;
+    this.sizeInfo = {};
+	this.sizeInfo.width = haxapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH;
+	this.sizeInfo.height = haxapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT;
 	
     this.isShowing = false;
 	
@@ -193,7 +194,7 @@ haxapp.ui.WindowFrame.prototype.show = function() {
     this.frameShown();
 
     //we will redo this since the size of elements used in calculation may have been wrong
-    if(this.coordinateInfo.height !== undefined) {
+    if(this.sizeInfo.height !== undefined) {
         this.updateCoordinates();
     }
 
@@ -236,28 +237,34 @@ haxapp.ui.WindowFrame.prototype.setPosition = function(x,y) {
 	//don't let window be placed at a negative coord. We can lose it.
 	if(x < 0) x = 0;
 	if(y < 0) y = 0;
-	this.coordinateInfo.x = x;
-	this.coordinateInfo.y = y;
+	this.posInfo.x = x;
+	this.posInfo.y = y;
 	
     this.updateCoordinates();
 }
 
 /** This method sets the size of the window frame, including the title bar. */
 haxapp.ui.WindowFrame.prototype.setSize = function(width,height) {
-    this.coordinateInfo.width = width;
-	this.coordinateInfo.height = height;
+    this.sizeInfo.width = width;
+	this.sizeInfo.height = height;
     
     this.updateCoordinates();
 }
 
 /** This method gets the location and size info for the window. */
-haxapp.ui.WindowFrame.prototype.getCoordinateInfo= function() {
-    return this.coordinateInfo;
+haxapp.ui.WindowFrame.prototype.getPosInfo = function() {
+    return this.posInfo;
 }
 
-/** This method sets the location and size info for the window. */
-haxapp.ui.WindowFrame.prototype.setCoordinateInfo= function(coordinateInfo) {
-    this.coordinateInfo = coordinateInfo;
+/** This method gets the location and size info for the window. */
+haxapp.ui.WindowFrame.prototype.getSizeInfo = function() {
+    return this.sizeInfo;
+}
+
+/** This method sets the location and size info for the window at the same time. */
+haxapp.ui.WindowFrame.prototype.setCoordinateInfo= function(posInfo,sizeInfo) {
+    this.posInfo = posInfo;
+    this.sizeInfo = sizeInfo;
     this.updateCoordinates();
 }
 
@@ -292,8 +299,8 @@ haxapp.ui.WindowFrame.prototype.fitToContent = function() {
     var contentWidth = this.content.offsetWidth;
     var contentHeight = this.content.offsetHeight;
 	
-	var targetWidth = this.coordinateInfo.width + contentWidth - viewWidth + haxapp.ui.WindowFrame.FIT_WIDTH_BUFFER;
-	var targetHeight = this.coordinateInfo.height + contentHeight - viewHeight + haxapp.ui.WindowFrame.FIT_HEIGHT_BUFFER;
+	var targetWidth = this.sizeInfo.width + contentWidth - viewWidth + haxapp.ui.WindowFrame.FIT_WIDTH_BUFFER;
+	var targetHeight = this.sizeInfo.height + contentHeight - viewHeight + haxapp.ui.WindowFrame.FIT_HEIGHT_BUFFER;
 	
     this.setSize(targetWidth,targetHeight);
 }
@@ -368,8 +375,8 @@ haxapp.ui.WindowFrame.prototype.moveMouseMove = function(e) {
 	if(newX < 0) newX = 0;
 	var newY = e.clientY - this.moveOffsetY;
 	if(newY < 0) newY = 0;
-    this.coordinateInfo.x = newX;
-    this.coordinateInfo.y = newY;
+    this.posInfo.x = newX;
+    this.posInfo.y = newY;
     this.updateCoordinates();
 }
 
@@ -426,7 +433,7 @@ haxapp.ui.WindowFrame.prototype.resizeMouseMove = function(e) {
 	if(this.resizeEastActive) {
 		newWidth = e.clientX - this.resizeOffsetWidth;
 		if(newWidth < this.minWidth) return;
-        this.coordinateInfo.width = newWidth;
+        this.sizeInfo.width = newWidth;
         changeMade = true;
 	}
 	else if(this.resizeWestActive) {
@@ -434,14 +441,14 @@ haxapp.ui.WindowFrame.prototype.resizeMouseMove = function(e) {
 		if(newWidth < this.minWidth) return;
 		newX = e.clientX - this.moveOffsetX;
 		if(newX < 0) newX = 0;
-        this.coordinateInfo.width = newWidth;
-        this.coordinateInfo.x = newX;
+        this.sizeInfo.width = newWidth;
+        this.posInfo.x = newX;
         changeMade = true;
 	}
 	if(this.resizeSouthActive) {
 		newHeight = e.clientY - this.resizeOffsetHeight;
 		if(newHeight < this.minHeight) return;
-		this.coordinateInfo.height = newHeight;
+		this.sizeInfo.height = newHeight;
         changeMade = true;
 	}
 	else if(this.resizeNorthActive) {
@@ -449,8 +456,8 @@ haxapp.ui.WindowFrame.prototype.resizeMouseMove = function(e) {
 		if(newHeight < this.minHeight) return;
 		newY = e.clientY - this.moveOffsetY;
 		if(newY < 0) newY = 0;
-		this.coordinateInfo.height = newHeight;
-		this.coordinateInfo.y = newY;
+		this.sizeInfo.height = newHeight;
+		this.posInfo.y = newY;
         changeMade = true;
 	}
         
@@ -557,16 +564,16 @@ haxapp.ui.WindowFrame.prototype.updateCoordinates = function() {
     }
     else if(this.windowState === haxapp.ui.WINDOW_STATE_NORMAL) {
         //apply the normal size to the window
-		this.frame.style.left = this.coordinateInfo.x + "px";
-        this.frame.style.top = this.coordinateInfo.y + "px";
-		if(this.coordinateInfo.height !== undefined) {
-			this.frame.style.height = this.coordinateInfo.height + "px";
+		this.frame.style.left = this.posInfo.x + "px";
+        this.frame.style.top = this.posInfo.y + "px";
+		if(this.sizeInfo.height !== undefined) {
+			this.frame.style.height = this.sizeInfo.height + "px";
 		}
 		else {
 			this.frame.style.height = haxapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT + "px";
 		}
-		if(this.coordinateInfo.width !== undefined) {
-			this.frame.style.width = this.coordinateInfo.width + "px";
+		if(this.sizeInfo.width !== undefined) {
+			this.frame.style.width = this.sizeInfo.width + "px";
 		}
 		else {
 			this.frame.style.width = haxapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH + "px";
@@ -574,8 +581,8 @@ haxapp.ui.WindowFrame.prototype.updateCoordinates = function() {
     }
     else if(this.windowState === haxapp.ui.WINDOW_STATE_MINIMIZED) {
         //apply the minimized size to the window
-		this.frame.style.left = this.coordinateInfo.x + "px";
-        this.frame.style.top = this.coordinateInfo.y + "px";
+		this.frame.style.left = this.posInfo.x + "px";
+        this.frame.style.top = this.posInfo.y + "px";
 		
 		this.frame.style.height = "0px";
 		this.frame.style.width = "0px";

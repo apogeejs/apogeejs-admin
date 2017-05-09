@@ -83,7 +83,10 @@ haxapp.ui.ParentContainer.prototype.getNextWindowPosition = function() {
     this.prevNewChildX = x;
     this.prevNewChildY = y;
     
-    return [x,y];
+    var pos = {};
+    pos.x = x;
+    pos.y = y;
+    return pos;
 }
 
 //=========================
