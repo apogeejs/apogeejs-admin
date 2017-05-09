@@ -38,6 +38,18 @@ haxapp.app.WindowComponentDisplay.prototype.getPreferredPosition = function() {
     }
 }
 
+/** This returns the preferred state - minimized, maximized, normal */
+haxapp.app.WindowComponentDisplay.prototype.getPreferredState = function() {
+    if((this.options)&&(this.options.state !== undefined)) {
+        return this.options.state;
+    }
+    else {
+        return haxapp.ui.WINDOW_STATE_NORMAL;
+    }
+}
+
+
+
 haxapp.app.WindowComponentDisplay.prototype.getComponent = function() {
     return this.component;
 }
@@ -81,7 +93,9 @@ haxapp.app.WindowComponentDisplay.prototype.getStateJson = function() {
     if(this.windowFrame) {
         json.sizeInfo = this.windowFrame.getSizeInfo();
         json.posInfo = this.windowFrame.getPosInfo();
+        json.state = this.windowFrame.getWindowState();
         dataPresent = true;
+        
     }
     
     if(this.viewType) {
@@ -99,12 +113,13 @@ haxapp.app.WindowComponentDisplay.prototype.getStateJson = function() {
 
 /** @private */
 haxapp.app.WindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
-    
+   
     //window options
     var memberWindowOptions = {};
-    memberWindowOptions.closeable = false;
-    memberWindowOptions.movable = true;
+    memberWindowOptions.minimizable = true;
+    memberWindowOptions.maximizable = true;
     memberWindowOptions.resizable = true;
+    memberWindowOptions.movable = true;
     memberWindowOptions.frameColorClass = "visicomp_windowColor";
     memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
 

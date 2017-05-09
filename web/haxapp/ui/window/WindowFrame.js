@@ -505,7 +505,7 @@ haxapp.ui.WindowFrame.prototype.endResize = function() {
 haxapp.ui.WindowFrame.prototype.minimizeContent = function() {
     
     //set body as hidden
-    this.body.style.display = "none";
+    this.bodyCell.style.display = "none";
     
     var wasMinimized = (this.windowState === haxapp.ui.WINDOW_STATE_MINIMIZED);
     var wasMaximized = (this.windowState === haxapp.ui.WINDOW_STATE_MAXIMIZED);
@@ -523,7 +523,7 @@ haxapp.ui.WindowFrame.prototype.minimizeContent = function() {
 haxapp.ui.WindowFrame.prototype.restoreContent = function() {
     
     //set body as not hidden
-    this.body.style.display = "";
+    this.bodyCell.style.display = "";
     
     var wasMinimized = (this.windowState === haxapp.ui.WINDOW_STATE_MINIMIZED);
     var wasMaximized = (this.windowState === haxapp.ui.WINDOW_STATE_MAXIMIZED);
@@ -540,7 +540,7 @@ haxapp.ui.WindowFrame.prototype.restoreContent = function() {
 haxapp.ui.WindowFrame.prototype.maximizeContent = function() {
     
     //set body as not hidden
-    this.body.style.display = "";
+    this.bodyCell.style.display = "";
     
     var wasMinimized = (this.windowState === haxapp.ui.WINDOW_STATE_MINIMIZED);
     

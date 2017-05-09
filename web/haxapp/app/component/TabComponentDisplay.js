@@ -33,27 +33,24 @@ haxapp.app.TabComponentDisplay.prototype.addChildComponent = function(childCompo
     
     //for now skip parent components
     if(childComponent.isParentComponent) return;
-       
-//    //window options
-//    var memberWindowOptions = {};
-//    memberWindowOptions.minimizable = true;
-//    memberWindowOptions.maximizable = true;
-//    memberWindowOptions.resizable = true;
-//    memberWindowOptions.movable = true;
-//    memberWindowOptions.frameColorClass = "visicomp_windowColor";
-//    memberWindowOptions.titleBarClass = "visicomp_titleBarClass";
     
     var windowComponentDisplay = childComponent.createWindowDisplay();
     var childWindow = windowComponentDisplay.getWindowEntry();
 
     childWindow.setParent(this.parentContainer);
     
+    //set position
     var pos = windowComponentDisplay.getPreferredPosition();
     if(!pos) {
         pos = this.parentContainer.getNextWindowPosition();
     }
     childWindow.setPosition(pos.x,pos.y);
+    
     childWindow.show();
+    
+    //set state 
+    var state = windowComponentDisplay.getPreferredState();
+    childWindow.setWindowState(state);
 }
 
 //===============================
