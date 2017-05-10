@@ -96,6 +96,7 @@ haxapp.ui.TabFrame.prototype.closeTab = function(id) {
             //choose a random tab
             for(var newId in this.tabTable) {
                 this.setActiveTab(newId);
+                break;
             }
         }
         this.updateTabDisplay();
@@ -104,9 +105,13 @@ haxapp.ui.TabFrame.prototype.closeTab = function(id) {
 
 /** This mesets the active tab, by tab title. */
 haxapp.ui.TabFrame.prototype.setActiveTab = function(id) {
-    this.activeTab = id;
-    this.dispatchEvent(haxapp.ui.TabFrame.TAB_SHOWN,id);
-    this.updateTabDisplay();
+    var tabEntry = this.tabTable[id];
+	if(tabEntry) {
+		this.activeTab = id;
+		this.tabFrame.appendChild(tabEntry.tabDisplay.getOuterElement());
+		this.updateTabDisplay();
+		this.dispatchEvent(haxapp.ui.TabFrame.TAB_SHOWN,id);
+	}
 }
 
 /** This mesets the active tab, by tab title. */
