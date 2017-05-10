@@ -10,6 +10,13 @@ haxapp.app.ParentComponent = function(workspaceUI,object,generator,options) {
 haxapp.app.ParentComponent.prototype = Object.create(haxapp.app.Component.prototype);
 haxapp.app.ParentComponent.prototype.constructor = haxapp.app.ParentComponent;
 
+haxapp.app.ParentComponent.prototype.createWindowDisplay = function() {
+    if(this.windowDisplay == null) {
+        this.windowDisplay = new haxapp.app.ParentWindowComponentDisplay(this,this.options.windowState);
+    }
+    return this.windowDisplay;
+}
+
 //----------------------
 // ParentContainer Methods
 //----------------------
@@ -24,21 +31,21 @@ haxapp.app.ParentComponent.prototype.getContentIsShowing = function() {
 ///** This returned the parent member object associated with this component. */
 //haxapp.app.ParentComponent.prototype.getParentMember = function();
     
-haxapp.app.Component.prototype.openTabDisplay = function() {
+haxapp.app.ParentComponent.prototype.hasTabDisplay = function() {    
+    return true;
+}
+
+haxapp.app.ParentComponent.prototype.openTabDisplay = function() {
     if(!this.tabDisplay) {
         this.tabDisplay = new haxapp.app.TabComponentDisplay(this);
     }
     this.workspaceUI.setActiveTab(this.getObject().getId());
 }
 
-haxapp.app.Component.prototype.closeTabDisplay = function() {
+haxapp.app.ParentComponent.prototype.closeTabDisplay = function() {
     if(this.tabDisplay) {
         this.tabDisplay = null;
     }
-}
-
-haxapp.app.Component.prototype.getTabDisplay = function() {
-    return this.tabDisplay;
 }
 
 ////in memberUPdated

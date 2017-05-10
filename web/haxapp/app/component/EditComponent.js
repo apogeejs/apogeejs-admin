@@ -8,6 +8,13 @@ haxapp.app.EditComponent = function(workspaceUI,object,generator,options) {
 haxapp.app.EditComponent.prototype = Object.create(haxapp.app.Component.prototype);
 haxapp.app.EditComponent.prototype.constructor = haxapp.app.EditComponent;
 
+haxapp.app.EditComponent.prototype.createWindowDisplay = function() {
+    if(this.windowDisplay == null) {
+        this.windowDisplay = new haxapp.app.EditWindowComponentDisplay(this,this.options.windowState);
+    }
+    return this.windowDisplay;
+}
+
 //===============================
 // Protected Functions
 //===============================
@@ -16,5 +23,22 @@ haxapp.app.EditComponent.prototype.constructor = haxapp.app.EditComponent;
 ///**  This method retrieves the table edit settings for this component instance
 // * @protected */
 //haxapp.app.EditComponent.prototype.getTableEditSettings = function();
+
+haxapp.app.Component.prototype.hasTabDisplay = function() {    
+    return false;
+}
+
+haxapp.app.Component.prototype.openTabDisplay = function() {
+    if(!this.tabDisplay) {
+        this.tabDisplay = new haxapp.app.TabComponentDisplay(this);
+    }
+    this.workspaceUI.setActiveTab(this.getObject().getId());
+}
+
+haxapp.app.Component.prototype.closeTabDisplay = function() {
+    if(this.tabDisplay) {
+        this.tabDisplay = null;
+    }
+}
 
 

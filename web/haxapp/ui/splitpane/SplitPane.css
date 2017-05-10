@@ -35,6 +35,7 @@
     width:5px;
     height:100%;
     background-color: rgb(220,220,240);
+    cursor: ew-resize;
 }
 .visiui-sp-right {
     height:100%;

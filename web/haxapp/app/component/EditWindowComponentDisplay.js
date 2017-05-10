@@ -1,5 +1,5 @@
 /** This component represents a json table object. */
-haxapp.app.WindowComponentDisplay = function(component, options) {
+haxapp.app.EditWindowComponentDisplay = function(component, options) {
     this.component = component;
     this.object = component.getObject();
     
@@ -14,13 +14,13 @@ haxapp.app.WindowComponentDisplay = function(component, options) {
     this._loadWindowFrameEntry();
     
     //add a cleanup action to the base component - component must already be initialized
-//    this.addCleanupAction(haxapp.app.WindowComponentDisplay.destroy);
+//    this.addCleanupAction(haxapp.app.EditWindowComponentDisplay.destroy);
 };
 
 /** This value is used as the background color when an editor is read only. */
-haxapp.app.WindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
+haxapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
-haxapp.app.WindowComponentDisplay.prototype.getWindowEntry = function() {
+haxapp.app.EditWindowComponentDisplay.prototype.getWindowEntry = function() {
     return this.windowFrame;
 }
 
@@ -29,7 +29,7 @@ haxapp.app.WindowComponentDisplay.prototype.getWindowEntry = function() {
  * 
  * return {"x":x,"y":y}
  */
-haxapp.app.WindowComponentDisplay.prototype.getPreferredPosition = function() {
+haxapp.app.EditWindowComponentDisplay.prototype.getPreferredPosition = function() {
     if(this.options) {
         return this.options.posInfo;
     }
@@ -39,7 +39,7 @@ haxapp.app.WindowComponentDisplay.prototype.getPreferredPosition = function() {
 }
 
 /** This returns the preferred state - minimized, maximized, normal */
-haxapp.app.WindowComponentDisplay.prototype.getPreferredState = function() {
+haxapp.app.EditWindowComponentDisplay.prototype.getPreferredState = function() {
     if((this.options)&&(this.options.state !== undefined)) {
         return this.options.state;
     }
@@ -50,18 +50,18 @@ haxapp.app.WindowComponentDisplay.prototype.getPreferredState = function() {
 
 
 
-haxapp.app.WindowComponentDisplay.prototype.getComponent = function() {
+haxapp.app.EditWindowComponentDisplay.prototype.getComponent = function() {
     return this.component;
 }
 
-haxapp.app.WindowComponentDisplay.prototype.deleteDisplay = function() {
+haxapp.app.EditWindowComponentDisplay.prototype.deleteDisplay = function() {
     //window will get deleted! New parent will get new windows, as is appropriate
     if(this.windowFrame) {
         this.windowFrame.close();
     }
 }
 
-haxapp.app.WindowComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
+haxapp.app.EditWindowComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     if(this.windowHeaderManager) {
         if(bannerState == haxapp.app.WindowHeaderManager.BANNER_TYPE_NONE) {
             this.windowHeaderManager.hideBannerBar();
@@ -72,7 +72,7 @@ haxapp.app.WindowComponentDisplay.prototype.setBannerState = function(bannerStat
     }
 }
 
-haxapp.app.WindowComponentDisplay.prototype.updateData = function() {
+haxapp.app.EditWindowComponentDisplay.prototype.updateData = function() {
     if(this.windowFrame) {
         //update the title
         this.windowFrame.setTitle(this.object.getDisplayName());
@@ -86,7 +86,7 @@ haxapp.app.WindowComponentDisplay.prototype.updateData = function() {
 }
 
 /** This gets the current window state, to reconstruct the view. */
-haxapp.app.WindowComponentDisplay.prototype.getStateJson = function() {
+haxapp.app.EditWindowComponentDisplay.prototype.getStateJson = function() {
     var json = {};
     var dataPresent = false;
     
@@ -112,7 +112,7 @@ haxapp.app.WindowComponentDisplay.prototype.getStateJson = function() {
 //===============================
 
 /** @private */
-haxapp.app.WindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
+haxapp.app.EditWindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
    
     //window options
     var memberWindowOptions = {};
@@ -153,7 +153,7 @@ haxapp.app.WindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
 // Window Content Management - switch between edit modes
 //------------------------------------
 
-haxapp.app.WindowComponentDisplay.prototype._createSelectTool = function() {
+haxapp.app.EditWindowComponentDisplay.prototype._createSelectTool = function() {
     
 	this.select = haxapp.ui.createElement("select",null,{
         "marginRight":"3px",
@@ -170,7 +170,7 @@ haxapp.app.WindowComponentDisplay.prototype._createSelectTool = function() {
 
 /** This method populates the frame for this component. 
  * @protected */
-haxapp.app.WindowComponentDisplay.prototype._initContentUI = function() {
+haxapp.app.EditWindowComponentDisplay.prototype._initContentUI = function() {
     
     var settings = this.component.getTableEditSettings();
     var viewTypes = settings.viewModes;
@@ -184,7 +184,7 @@ haxapp.app.WindowComponentDisplay.prototype._initContentUI = function() {
     this.setViewType(initialViewType);
 }
 
-haxapp.app.WindowComponentDisplay.prototype._getInitialViewType = function(viewTypes,defaultViewType) {
+haxapp.app.EditWindowComponentDisplay.prototype._getInitialViewType = function(viewTypes,defaultViewType) {
     if( (this.options) &&
         (this.options.viewType) &&
         (viewTypes.indexOf(this.options.viewType) >= 0) ) {
@@ -204,7 +204,7 @@ haxapp.app.WindowComponentDisplay.prototype._getInitialViewType = function(viewT
 
 /** This method populates the frame for this component. 
  * @protected */
-haxapp.app.WindowComponentDisplay.prototype.setViewType = function(viewType) {
+haxapp.app.EditWindowComponentDisplay.prototype.setViewType = function(viewType) {
 	//return if there is no change
 	if(this.viewType === viewType) return;
     
@@ -242,13 +242,13 @@ haxapp.app.WindowComponentDisplay.prototype.setViewType = function(viewType) {
     this._updateViewContent();
 }
 
-haxapp.app.WindowComponentDisplay.prototype._updateViewTypeSelect = function() {
+haxapp.app.EditWindowComponentDisplay.prototype._updateViewTypeSelect = function() {
     if(this.select.value != this.viewType) {
         this.select.value = this.viewType;
     }
 }
 
-haxapp.app.WindowComponentDisplay.prototype._updateViewContent = function() {
+haxapp.app.EditWindowComponentDisplay.prototype._updateViewContent = function() {
     if(this.viewModeElement) {
         this.viewModeElement.showData();
         this.windowHeaderManager.setContent(this.viewModeElement.getElement());
@@ -262,7 +262,7 @@ haxapp.app.WindowComponentDisplay.prototype._updateViewContent = function() {
 // Menu Functions
 //------------------------------------
 
-haxapp.app.WindowComponentDisplay.prototype._populateMenu = function() {
+haxapp.app.EditWindowComponentDisplay.prototype._populateMenu = function() {
     var menu = this.windowFrame.getMenu();
 
     //menu items
@@ -294,7 +294,7 @@ haxapp.app.WindowComponentDisplay.prototype._populateMenu = function() {
     
 }
 
-haxapp.app.WindowComponentDisplay.prototype._updateClearFunctionMenuItem = function() {
+haxapp.app.EditWindowComponentDisplay.prototype._updateClearFunctionMenuItem = function() {
     //add the clear function menu item if needed
 	if(this.doClearFunction) {
 		if(this.object.hasCode()) {
@@ -319,7 +319,7 @@ haxapp.app.WindowComponentDisplay.prototype._updateClearFunctionMenuItem = funct
 	}
 }
 
-haxapp.app.WindowComponentDisplay.prototype._getClearFunctionCallback = function() {
+haxapp.app.EditWindowComponentDisplay.prototype._getClearFunctionCallback = function() {
 	var table = this.getObject();
 	var blankDataValue = this.clearFunctionDataValue;
     return function() {
@@ -336,20 +336,20 @@ haxapp.app.WindowComponentDisplay.prototype._getClearFunctionCallback = function
 
 /** This method should be called to set up the component ui for edit mode. 
  * @protected */
-haxapp.app.WindowComponentDisplay.prototype.startEditUI = function(onSave,onCancel) {
+haxapp.app.EditWindowComponentDisplay.prototype.startEditUI = function(onSave,onCancel) {
     this.select.disabled = true;
     this.showSaveBar(onSave,onCancel);
 }
 
 /** This method populates the frame for this component. 
  * @protected */
-haxapp.app.WindowComponentDisplay.prototype.endEditUI = function() {
+haxapp.app.EditWindowComponentDisplay.prototype.endEditUI = function() {
     this.hideSaveBar();
     this.select.disabled = false;
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.WindowComponentDisplay.prototype.showSaveBar = function(onSave,onCancel) {
+haxapp.app.EditWindowComponentDisplay.prototype.showSaveBar = function(onSave,onCancel) {
     if(!this.saveDiv) {
         this.saveDiv = haxapp.ui.createElement("div",null,
             {
@@ -383,7 +383,7 @@ haxapp.app.WindowComponentDisplay.prototype.showSaveBar = function(onSave,onCanc
 }
 
 /** This method returns the base member for this component. */
-haxapp.app.WindowComponentDisplay.prototype.hideSaveBar = function() {
+haxapp.app.EditWindowComponentDisplay.prototype.hideSaveBar = function() {
     this.saveBarActive = false;	
 	this.windowHeaderManager.showToolbar(this.normalToolbarDiv);
 }
@@ -393,7 +393,7 @@ haxapp.app.WindowComponentDisplay.prototype.hideSaveBar = function() {
 //-----------------------------------
 
 /** @protected */
-haxapp.app.WindowComponentDisplay.prototype.destroy = function() {
+haxapp.app.EditWindowComponentDisplay.prototype.destroy = function() {
     for(var viewType in viewModeElements) {
         var viewModeElement = this.viewModeElemens[viewType];
         viewModeElement.destroy();

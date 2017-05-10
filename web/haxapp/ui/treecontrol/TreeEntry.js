@@ -13,7 +13,9 @@ haxapp.ui.treecontrol.TreeEntry = function(labelText,dblClickCallback,contextMen
     }
     
     this.label.oncontextmenu = contextMenuCallback;
-    this.label.ondblclick = dblClickCallback
+    if(dblClickCallback) {
+        this.label.ondblclick = dblClickCallback
+    }
 }
 
 /** The outer DOM element */

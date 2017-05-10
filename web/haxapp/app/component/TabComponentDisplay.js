@@ -24,15 +24,10 @@ haxapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerState,b
 
 haxapp.app.TabComponentDisplay.prototype.updateData = function() {
     this.tab.setName(this.object.getName());
-    //this.tab.setTitle(this.object.getDisplayName());
-    this.displayContent.memberUpdated();
 }
 
 /** This creates and adds a display for the child component to the parent container. */
 haxapp.app.TabComponentDisplay.prototype.addChildComponent = function(childComponent) {
-    
-    //for now skip parent components
-    if(childComponent.isParentComponent) return;
     
     var windowComponentDisplay = childComponent.createWindowDisplay();
     var childWindow = windowComponentDisplay.getWindowEntry();

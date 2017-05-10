@@ -86,7 +86,7 @@ haxapp.app.TextAreaEditor.prototype.showData = function(text,editOk) {
         this.textArea.style.backgroundColor = "";
     }
     else {
-        this.textArea.style.backgroundColor = haxapp.app.WindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
+        this.textArea.style.backgroundColor = haxapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
     }
     
 }
