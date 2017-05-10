@@ -40,6 +40,7 @@
   /* - min - height and width set to empty string */
   /* - max - height and width set to 100% */
   background-color: rgb(240,240,240);
+  outline: 1px solid rgb(150,150,190);
 }
 .visiui_win_main td {
   position: relative;

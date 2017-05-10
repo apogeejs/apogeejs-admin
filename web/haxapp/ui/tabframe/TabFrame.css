@@ -46,7 +46,8 @@
 .visiui-tf-tab-inactive {
 }
 .visiui-tf-tab-active {
-    background-color: white;
+    background-color: rgb(220,220,240);
+    border-bottom: 1px solid rgb(220,220,240);
 }
 
 .visiui-tf-tab-window {
