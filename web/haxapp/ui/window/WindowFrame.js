@@ -129,17 +129,21 @@ haxapp.ui.WindowFrame.prototype.setTitle = function(title) {
 }
 
 /** This method shows the window. */
-haxapp.ui.WindowFrame.prototype.getMenu = function() {
-    if(!this.menu) {
-        this.menu = haxapp.ui.Menu.createMenuFromImage(haxapp.ui.getResourcePath(haxapp.ui.MENU_IMAGE));
-		var firstLeftElementChild = this.titleBarLeftElements.firstChild;
-		if(firstLeftElementChild) {
-			this.titleBarLeftElements.insertBefore(this.menu.getElement(),firstLeftElementChild);
-		}
-		else {
-			this.titleBarLeftElements.appendChild(this.menu.getElement());
-		}
+haxapp.ui.WindowFrame.prototype.createMenu = function(iconUrl) {
+    if(!iconUrl) iconUrl = haxapp.ui.getResourcePath(haxapp.ui.MENU_IMAGE);
+    this.menu = haxapp.ui.Menu.createMenuFromImage(iconUrl);
+    var firstLeftElementChild = this.titleBarLeftElements.firstChild;
+    if(firstLeftElementChild) {
+        this.titleBarLeftElements.insertBefore(this.menu.getElement(),firstLeftElementChild);
     }
+    else {
+        this.titleBarLeftElements.appendChild(this.menu.getElement());
+    }
+    return this.menu;
+}
+
+/** This method shows the window. */
+haxapp.ui.WindowFrame.prototype.getMenu = function() {
     return this.menu;
 }
 

@@ -98,8 +98,9 @@ haxapp.app.FunctionComponent.generator.displayName = "Function";
 haxapp.app.FunctionComponent.generator.uniqueName = "haxapp.app.FunctionComponent";
 haxapp.app.FunctionComponent.generator.createComponent = haxapp.app.FunctionComponent.createComponent;
 haxapp.app.FunctionComponent.generator.createComponentFromJson = haxapp.app.FunctionComponent.createComponentFromJson;
-haxapp.app.FunctionComponent.generator.DEFAULT_WIDTH = 200;
-haxapp.app.FunctionComponent.generator.DEFAULT_HEIGHT = 200;
+haxapp.app.FunctionComponent.generator.DEFAULT_WIDTH = 400;
+haxapp.app.FunctionComponent.generator.DEFAULT_HEIGHT = 400;
+haxapp.app.FunctionComponent.generator.ICON_RES_PATH = "/functionIcon.png";
 
 haxapp.app.FunctionComponent.generator.propertyDialogLines = [
     {

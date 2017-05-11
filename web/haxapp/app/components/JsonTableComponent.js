@@ -110,8 +110,9 @@ haxapp.app.JsonTableComponent.generator.displayName = "Data Table";
 haxapp.app.JsonTableComponent.generator.uniqueName = "haxapp.app.JsonTableComponent";
 haxapp.app.JsonTableComponent.generator.createComponent = haxapp.app.JsonTableComponent.createComponent;
 haxapp.app.JsonTableComponent.generator.createComponentFromJson = haxapp.app.JsonTableComponent.createComponentFromJson;
-haxapp.app.JsonTableComponent.generator.DEFAULT_WIDTH = 200;
-haxapp.app.JsonTableComponent.generator.DEFAULT_HEIGHT = 200;
+haxapp.app.JsonTableComponent.generator.DEFAULT_WIDTH = 300;
+haxapp.app.JsonTableComponent.generator.DEFAULT_HEIGHT = 300;
+haxapp.app.JsonTableComponent.generator.ICON_RES_PATH = "/dataIcon.png";
 
 //======================================
 // This is a code wrapper so the user works with the formula rather than the function body

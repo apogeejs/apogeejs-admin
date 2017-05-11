@@ -106,8 +106,9 @@ haxapp.app.GridTableComponent.generator.displayName = "Grid Table";
 haxapp.app.GridTableComponent.generator.uniqueName = "haxapp.app.GridTableComponent";
 haxapp.app.GridTableComponent.generator.createComponent = haxapp.app.GridTableComponent.createComponent;
 haxapp.app.GridTableComponent.generator.createComponentFromJson = haxapp.app.GridTableComponent.createComponentFromJson;
-haxapp.app.GridTableComponent.generator.DEFAULT_WIDTH = 200;
-haxapp.app.GridTableComponent.generator.DEFAULT_HEIGHT = 200;
+haxapp.app.GridTableComponent.generator.DEFAULT_WIDTH = 300;
+haxapp.app.GridTableComponent.generator.DEFAULT_HEIGHT = 300;
+haxapp.app.GridTableComponent.generator.ICON_RES_PATH = "/gridIcon.png";
 
 //======================================
 // Use the json table code wrapper

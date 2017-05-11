@@ -104,8 +104,9 @@ haxapp.app.TextComponent.generator.displayName = "Text Table";
 haxapp.app.TextComponent.generator.uniqueName = "haxapp.app.TextComponent";
 haxapp.app.TextComponent.generator.createComponent = haxapp.app.TextComponent.createComponent;
 haxapp.app.TextComponent.generator.createComponentFromJson = haxapp.app.TextComponent.createComponentFromJson;
-haxapp.app.TextComponent.generator.DEFAULT_WIDTH = 200;
-haxapp.app.TextComponent.generator.DEFAULT_HEIGHT = 200;
+haxapp.app.TextComponent.generator.DEFAULT_WIDTH = 300;
+haxapp.app.TextComponent.generator.DEFAULT_HEIGHT = 300;
+haxapp.app.TextComponent.generator.ICON_RES_PATH = "/textIcon.png";
 
 
 

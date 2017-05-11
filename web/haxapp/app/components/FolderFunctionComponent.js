@@ -88,6 +88,7 @@ haxapp.app.FolderFunctionComponent.generator.createComponent = haxapp.app.Folder
 haxapp.app.FolderFunctionComponent.generator.createComponentFromJson = haxapp.app.FolderFunctionComponent.createComponentFromJson;
 haxapp.app.FolderFunctionComponent.generator.DEFAULT_WIDTH = 500;
 haxapp.app.FolderFunctionComponent.generator.DEFAULT_HEIGHT = 500;
+haxapp.app.FolderFunctionComponent.generator.ICON_RES_PATH = "/functionFolderIcon.png";
 
 haxapp.app.FolderFunctionComponent.generator.propertyDialogLines = [
     {

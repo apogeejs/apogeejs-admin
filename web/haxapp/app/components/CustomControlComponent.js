@@ -300,4 +300,5 @@ haxapp.app.CustomControlComponent.generator.createComponent = haxapp.app.CustomC
 haxapp.app.CustomControlComponent.generator.createComponentFromJson = haxapp.app.CustomControlComponent.createComponentFromJson;
 haxapp.app.CustomControlComponent.generator.DEFAULT_WIDTH = 500;
 haxapp.app.CustomControlComponent.generator.DEFAULT_HEIGHT = 500;
+haxapp.app.CustomControlComponent.generator.ICON_RES_PATH = "/controlIcon.png";
 

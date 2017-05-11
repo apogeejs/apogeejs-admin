@@ -44,10 +44,12 @@
     padding:2px;
 }
 .visiui-tf-tab-inactive {
+    font-weight:normal;
 }
 .visiui-tf-tab-active {
     background-color: rgb(220,220,240);
     border-bottom: 1px solid rgb(220,220,240);
+    font-weight:bold;
 }
 
 .visiui-tf-tab-window {
@@ -67,8 +69,8 @@
     /* fixed */
     display:inline-block;
     cursor:default;
-    font-weight:bold;
     color:darkblue;
+    padding: 0px 5px;
 }
 .visiui_tf_tab_cmd_button {
     /* fixed */

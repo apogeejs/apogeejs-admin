@@ -106,7 +106,7 @@ haxapp.app.ParentWindowComponentDisplay.prototype._loadWindowFrameEntry = functi
 //------------------------------------
 
 haxapp.app.ParentWindowComponentDisplay.prototype._populateMenu = function() {
-    var menu = this.windowFrame.getMenu();
+    var menu = this.windowFrame.createMenu(this.component.getIconUrl());
 
     //menu items
     var menuItemInfoList = [];

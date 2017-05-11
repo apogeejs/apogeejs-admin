@@ -79,3 +79,4 @@ haxapp.app.FolderComponent.generator.createComponent = haxapp.app.FolderComponen
 haxapp.app.FolderComponent.generator.createComponentFromJson = haxapp.app.FolderComponent.createComponentFromJson;
 haxapp.app.FolderComponent.generator.DEFAULT_WIDTH = 500;
 haxapp.app.FolderComponent.generator.DEFAULT_HEIGHT = 500;
+haxapp.app.FolderComponent.generator.ICON_RES_PATH = "/folderIcon.png";

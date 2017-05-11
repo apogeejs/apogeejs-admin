@@ -17,7 +17,7 @@ haxapp.ui.Menu.createMenuBarElement = function() {
 
 /** This method creates a static menu with the given text. */
 haxapp.ui.Menu.createMenu = function(text) {
-    var element = haxapp.ui.createElementWithClass("div", "visiui-menu-heading");
+    var element = haxapp.ui.createElementWithClass("div", "visiui-menu-heading visiui-menu-text");
     element.innerHTML = text;
     return new haxapp.ui.MenuHeader(element);
 }
@@ -26,7 +26,7 @@ haxapp.ui.Menu.createMenu = function(text) {
 haxapp.ui.Menu.createMenuFromImage = function(imageUrl) {
     var imageElement = document.createElement("img");
     imageElement.src = imageUrl;
-    var element = haxapp.ui.createElementWithClass("div", "visiui-menu-heading");
+    var element = haxapp.ui.createElementWithClass("div", "visiui-menu-heading visiui-menu-image");
     element.appendChild(imageElement);
     return new haxapp.ui.MenuHeader(element);
 }

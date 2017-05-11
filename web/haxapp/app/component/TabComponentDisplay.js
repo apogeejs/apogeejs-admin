@@ -71,7 +71,7 @@ haxapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     //------------------
     // set menu
     //------------------
-    var menu = this.tab.getMenu();
+    var menu = this.tab.createMenu(this.component.getIconUrl());
     
     //menu items
     var menuItemInfoList = [];

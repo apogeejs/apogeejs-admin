@@ -7,7 +7,8 @@
 .visiui-tc-label {
     display:inline-block;
     cursor:default;
-    color:darkblue;
+    color: #369;
+    padding-left: 5px;
 }
 .visiui-tc-control {
     display:inline-block;
@@ -32,7 +33,6 @@
     margin: 0;
     padding: 0px;
     line-height: 20px;
-    color: #369;
     border-left:1px solid rgb(190,190,190);
 }
 .visiui-tc-child:last-child {

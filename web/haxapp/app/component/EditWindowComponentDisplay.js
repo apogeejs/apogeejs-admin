@@ -263,7 +263,7 @@ haxapp.app.EditWindowComponentDisplay.prototype._updateViewContent = function() 
 //------------------------------------
 
 haxapp.app.EditWindowComponentDisplay.prototype._populateMenu = function() {
-    var menu = this.windowFrame.getMenu();
+    var menu = this.windowFrame.createMenu(this.component.getIconUrl());
 
     //menu items
     var menuItemInfoList = [];

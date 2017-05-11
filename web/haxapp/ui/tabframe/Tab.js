@@ -78,11 +78,15 @@ haxapp.ui.Tab.prototype.getName = function() {
 }
 
 /** This method shows the window. */
+haxapp.ui.Tab.prototype.createMenu = function(iconUrl) {
+    if(!iconUrl) iconUrl = haxapp.ui.getResourcePath(haxapp.ui.MENU_IMAGE);
+    this.menu = haxapp.ui.Menu.createMenuFromImage(iconUrl);
+    this.menuContainer.appendChild(this.menu.domElement);
+    return this.menu;
+}
+
+/** This method shows the window. */
 haxapp.ui.Tab.prototype.getMenu = function() {
-    if(!this.menu) {
-        this.menu = haxapp.ui.Menu.createMenuFromImage(haxapp.ui.getResourcePath(haxapp.ui.MENU_IMAGE));
-		this.menuContainer.appendChild(this.menu.domElement);
-    }
     return this.menu;
 }
 

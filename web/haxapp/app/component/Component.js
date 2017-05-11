@@ -37,6 +37,8 @@ haxapp.app.Component.prototype.addCleanupAction = function(cleanupFunction) {
     this.cleanupActions.push(cleanupFunction);
 }
 
+haxapp.app.Component.DEFAULT_ICON_RES_PATH = "/genericIcon.png";
+
 
 //==============================
 // Public Instance Methods
@@ -45,6 +47,18 @@ haxapp.app.Component.prototype.addCleanupAction = function(cleanupFunction) {
 /** This method returns the base member for this component. */
 haxapp.app.Component.prototype.getObject = function() {
     return this.object;
+}
+
+/** This method returns the icon url for the component. */
+haxapp.app.Component.prototype.getIconUrl = function() {
+    if(this.generator.ICON_URL) {
+        return this.generator.ICON_URL;
+    }
+    else {
+        var resPath = this.generator.ICON_RES_PATH;
+        if(!resPath) resPath = haxapp.app.Component.DEFAULT_ICON_RES_PATH;
+        return haxapp.ui.getResourcePath(resPath);
+    }
 }
 
 /** This method returns the workspace for this component. */
@@ -346,3 +360,5 @@ haxapp.app.Component.prototype.createDeleteCallback = function() {
 //haxapp.app.JsonTableComponent.generator.createComponentFromJson = haxapp.app.JsonTableComponent.createComponentFromJson;
 //haxapp.app.JsonTableComponent.generator.DEFAULT_WIDTH = 200;
 //haxapp.app.JsonTableComponent.generator.DEFAULT_HEIGHT = 200;
+//haxapp.app.JsonTableComponent.generator.ICON_RES_PATH = "path to icon in resource directory";
+//haxapp.app.JsonTableComponent.generator.ICON_URL = "absolute icon url";
