@@ -63,5 +63,5 @@ haxapp.app.TreeComponentDisplay.prototype._createTreeEntry = function() {
     }
     
     var labelText = this.object.getName();
-    return new haxapp.ui.treecontrol.TreeEntry(labelText, openCallback, contextMenuCallback);
+    return new haxapp.ui.treecontrol.TreeEntry(labelText, null, openCallback, contextMenuCallback);
 }

@@ -21,6 +21,7 @@ haxapp.app.WorkspaceUI.prototype.setApp = function(app,tabFrame,treePane) {
     this.app = app;
     this.tabFrame = tabFrame;
     this.tree = new haxapp.ui.treecontrol.TreeControl();
+    haxapp.ui.removeAllChildren(treePane);
     treePane.appendChild(this.tree.getElement());
 }
 
@@ -45,7 +46,7 @@ haxapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, componentsJs
     
     //add the root tree entyr to the panel
     var rootTreeEntry = rootFolderComponent.getTreeEntry();
-    this.tree.setRootEntry(rootTreeEntry.getElement());
+    this.tree.setRootEntry(rootTreeEntry);
     
     //listeners
     var instance = this;
