@@ -37,6 +37,37 @@ input[type=text] focus {
     top:0;
     bottom:0;
 }
+.menu_bar {
+    background-color: rgb(220,220,240);
+    position:relative;
+}
+.menu_bar_left {
+    /* fixed */
+    display:inline;
+    width:100%;
+}
+.menu_bar_right {
+    /* fixed */
+    float:right;
+    display:inline;
+}
+.tab-icon-display {
+    /* fixed */
+    display:inline-block;
+    
+    /* configurable */
+    margin-right:5px;
+}
+.tab-title-display {
+    /* fixed */
+    display:inline-block;
+    cursor:default;
+    padding: 2px 0px;
+    vertical-align: top;
+    
+    /* configurable */
+    margin-right:5px;
+}
 /* overrides for the handsontable coloring */
 .handsontable th {
     background-color: rgb(220,220,240);

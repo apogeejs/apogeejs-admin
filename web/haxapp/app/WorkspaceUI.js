@@ -80,6 +80,17 @@ haxapp.app.WorkspaceUI.prototype.getComponent = function(object) {
 	}
 }
 
+/** This method gets the component associated with a member object. */
+haxapp.app.WorkspaceUI.prototype.getComponentById = function(objectId) {
+	var componentInfo = this.componentMap[objectId];
+	if(componentInfo) {
+		return componentInfo.component;
+	}
+	else {
+		return null;
+	}
+}
+
 /** This returns the map of component objects. */
 haxapp.app.WorkspaceUI.prototype.getFolders = function() {
     var folders = {}

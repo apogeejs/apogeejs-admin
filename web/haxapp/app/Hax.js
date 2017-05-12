@@ -190,7 +190,29 @@ haxapp.app.Hax.prototype.createUI = function(containerId) {
     //----------------------
     this.tabFrame = new haxapp.ui.TabFrame();
     splitPane.getRightPaneContainer().appendChild(this.tabFrame.getElement());
-   
+    
+    //add listener for displaying the active tab
+    var instance = this;
+    this.tabFrame.addListener(haxapp.ui.TabFrame.TAB_SHOWN,function(tabId){instance.onTabShown(tabId);});
+    this.tabFrame.addListener(haxapp.ui.TabFrame.TAB_HIDDEN,function(tabId){instance.onTabHidden(tabId);});
+
+}
+
+/** This method creates the app ui. 
+ * @private */
+haxapp.app.Hax.prototype.onTabHidden = function(tabId) {
+    this.activeTabIconDisplay.style.display = "none";
+    this.activeTabTitleDisplay.style.display = "none";
+}
+
+haxapp.app.Hax.prototype.onTabShown = function(tabId) {
+    var component = this.workspaceUI.getComponentById(tabId);
+    if(component) {
+        this.activeTabIconDisplay.src = component.getIconUrl();
+        this.activeTabTitleDisplay.innerHTML = component.getObject().getDisplayName(true);
+        this.activeTabIconDisplay.style.display = "";
+        this.activeTabTitleDisplay.style.display = "";
+    }
 }
 
 //=================================
@@ -210,12 +232,15 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
     var name;
     var menus = {};
     
-    var menuBar = haxapp.ui.Menu.createMenuBarElement();
+    //creat menu  bar with left elements (menus) and right elements (active tab display)
+    var menuBar = haxapp.ui.createElementWithClass("div","menu_bar");
+    var menuBarLeft = haxapp.ui.createElementWithClass("div","menu_bar_left",menuBar);
+    var menuBarRight = haxapp.ui.createElementWithClass("div","menu_bar_right",menuBar);
 
     //Workspace menu
     name = "Workspace";
     menu = haxapp.ui.Menu.createMenu(name);
-    menuBar.appendChild(menu.getElement());
+    menuBarLeft.appendChild(menu.getElement());
     menus[name] = menu;
     
     var newCallback = haxapp.app.createworkspace.getCreateCallback(this);
@@ -233,7 +258,7 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
     //Components Menu
     name = "Components";
     menu = haxapp.ui.Menu.createMenu(name);
-    menuBar.appendChild(menu.getElement());
+    menuBarLeft.appendChild(menu.getElement());
     menus[name] = menu;
     
     //add create child elements
@@ -242,7 +267,7 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
     //libraries menu
     name = "Libraries";
     menu = haxapp.ui.Menu.createMenu(name);
-    menuBar.appendChild(menu.getElement());
+    menuBarLeft.appendChild(menu.getElement());
     menus[name] = menu;
     
     var linksCallback = haxapp.app.updatelinks.getUpdateLinksCallback(this);
@@ -253,6 +278,11 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
         this.addToMenuBar(menuBar,menus);
     }
     
+    //add the active tab display
+    this.activeTabIconDisplay = haxapp.ui.createElementWithClass("img","tab-icon-display",menuBarRight);
+    this.activeTabIconDisplay.style.display = "none";
+    this.activeTabTitleDisplay = haxapp.ui.createElementWithClass("div","tab-title-display",menuBarRight);
+    this.activeTabTitleDisplay.style.display = "none";
     return menuBar;
     
 }

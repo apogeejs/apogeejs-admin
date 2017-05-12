@@ -10,11 +10,6 @@ haxapp.ui.Menu = {};
 haxapp.ui.Menu.initialized = false;
 haxapp.ui.Menu.activeMenu = null;
 
-/** This creates a menu bar element. */
-haxapp.ui.Menu.createMenuBarElement = function() {
-    return haxapp.ui.createElementWithClass("div","visiui-menu-bar");
-}
-
 /** This method creates a static menu with the given text. */
 haxapp.ui.Menu.createMenu = function(text) {
     var element = haxapp.ui.createElementWithClass("div", "visiui-menu-heading visiui-menu-text");

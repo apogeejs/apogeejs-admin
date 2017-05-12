@@ -41,7 +41,8 @@
     
     /*configurable*/
     border: 1px solid black;
-    padding:2px;
+    padding:0px;
+    margin:0px;
 }
 .visiui-tf-tab-inactive {
     font-weight:normal;
@@ -64,18 +65,28 @@
 .visiui-tf_tab-menuDiv {
     /* fixed */
     display:inline;
+    
+    /* configurable */
+    margin-right:3px;
 }
 .visiui_tf_tab_title {
     /* fixed */
     display:inline-block;
     cursor:default;
     color:darkblue;
-    padding: 0px 5px;
+    padding: 2px 0px;
+    vertical-align: top;
+    
+    /* configurable */
+    margin-right:5px;
 }
 .visiui_tf_tab_cmd_button {
     /* fixed */
     display:inline-block;
 
     /* configurable */
-    margin-right:3px;
+    margin:0px;
+    padding:0px;
+    /* configurable */
+    margin-right:5px;
 }

@@ -2,7 +2,7 @@
 /* The default values are ugly for now to make sure people set them for the app. */
 .visiui_win_titleBarClass {
 	background-color: rgb(185,185,220);
-    padding:3px;
+    padding:0px;
 }
 .visiui_win_windowColorClass {
     background-color: rgb(185,185,220);
@@ -107,7 +107,9 @@
     cursor:default;
     font-weight:bold;
     color:darkblue;
-    
+    vertical-align: top;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 .visiui_win_menu_style {

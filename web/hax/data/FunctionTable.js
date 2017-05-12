@@ -40,8 +40,8 @@ hax.FunctionTable.prototype.processMemberFunction = function(memberFunction) {
 //------------------------------
 
 /** This overrides the get title method of child to return the function declaration. */
-hax.FunctionTable.prototype.getDisplayName = function() {
-    var name = this.getName();
+hax.FunctionTable.prototype.getDisplayName = function(useFullPath) {
+    var name = useFullPath ? this.getFullName() : this.getName();
     var argList = this.getArgList();
     var argListString = argList.join(",");
     return name + "(" + argListString + ")";

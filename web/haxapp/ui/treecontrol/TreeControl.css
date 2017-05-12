@@ -9,6 +9,9 @@
     cursor:default;
     color: #369;
     padding-left: 5px;
+    vertical-align: top;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 .visiui-tc-control {
     display:inline-block;

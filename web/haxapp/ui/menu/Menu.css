@@ -1,8 +1,4 @@
 /* menu style */
-.visiui-menu-bar {
-    background-color: rgb(220,220,240);
-    position:relative;
-}
 .visiui-menu-body {
     /* fixed */
     overflow:visible;
@@ -33,7 +29,8 @@
 	overflow:visible;
 
     /* configurable */
-    padding:2px
+    padding:2px;
+    margin:0px;
 }
 .visiui-menu-text:hover {
     background-color:lightgray;
