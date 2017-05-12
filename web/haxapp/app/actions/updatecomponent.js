@@ -7,7 +7,9 @@ haxapp.app.updatecomponent = {};
 //=====================================
 
 /** This method gets a callback to update the properties of a component. */
-haxapp.app.updatecomponent.getUpdateComponentCallback = function(component,generator) {
+haxapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
+    
+    var generator = component.generator;
     
     var createCallback = function() {
         

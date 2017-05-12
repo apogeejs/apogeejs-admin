@@ -53,7 +53,7 @@ haxapp.app.TreeComponentDisplay.prototype._createTreeEntry = function() {
         
         var callback;
         
-        callback = haxapp.app.updatecomponent.getUpdateComponentCallback(instance,instance.object.generator);
+        callback = haxapp.app.updatecomponent.getUpdateComponentCallback(instance);
         contextMenu.addCallbackMenuItem("Edit Properties",callback);
         
         callback = instance.createDeleteCallback("Delete");

@@ -79,7 +79,7 @@ haxapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     //add the standard entries
     var itemInfo = {};
     itemInfo.title = "Edit Properties";
-    itemInfo.callback = haxapp.app.updatecomponent.getUpdateComponentCallback(this.component,this.object.generator);
+    itemInfo.callback = haxapp.app.updatecomponent.getUpdateComponentCallback(this.component);
     menuItemInfoList.push(itemInfo);
     
     var itemInfo = {};
