@@ -13,6 +13,13 @@ haxapp.app.TabComponentDisplay.prototype.getTab = function() {
     return this.tab;
 }
 
+haxapp.app.TabComponentDisplay.prototype.closeTab = function() {
+    if(this.tab) {
+        this.tab.close();
+        this.tab = null;
+    }
+}
+
 haxapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     if(bannerState == haxapp.app.WindowHeaderManager.BANNER_TYPE_NONE) {
         this.windowHeaderManager.hideBannerBar();
@@ -82,10 +89,13 @@ haxapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     itemInfo.callback = haxapp.app.updatecomponent.getUpdateComponentCallback(this.component);
     menuItemInfoList.push(itemInfo);
     
-    var itemInfo = {};
-    itemInfo.title = "Delete";
-    itemInfo.callback = this.component.createDeleteCallback(itemInfo.title);
-    menuItemInfoList.push(itemInfo);
+    //only allow delete if the object has a parent (not if it has a non-parent owner, or is a root object)
+    if(this.object.getParent()) {
+        var itemInfo = {};
+        itemInfo.title = "Delete";
+        itemInfo.callback = this.component.createDeleteCallback(itemInfo.title);
+        menuItemInfoList.push(itemInfo);
+    }
     
     //set the menu items
     menu.setMenuItems(menuItemInfoList);
@@ -100,6 +110,7 @@ haxapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     //-----------------------------
     var instance = this;
     var onClose = function() {
+        instance.component.closeTabDisplay();
         instance.destroy();
     }
     this.tab.addListener(haxapp.ui.CLOSE_EVENT,onClose);
@@ -152,7 +163,7 @@ haxapp.app.TabComponentDisplay.prototype.destroy = function() {
         childComponent.closeWindowDisplay();
     }
     
-    this.component.closeTabDisplay();
+    this.closeTab();
 }
 
 

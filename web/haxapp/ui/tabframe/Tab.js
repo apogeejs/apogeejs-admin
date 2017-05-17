@@ -103,11 +103,14 @@ haxapp.ui.Tab.prototype.close = function(forceClose) {
         }
     }
     
-    this.dispatchEvent(haxapp.ui.CLOSE_EVENT,this);
-    
     this.tabFrame.removeListener(haxapp.ui.TabFrame.TAB_SHOWN, this.tabShownListener);
     this.tabFrame.removeListener(haxapp.ui.TabFrame.TAB_HIDDEN, this.tabHiddenListener);
     this.tabFrame.closeTab(this.id);
+    this.tabFrame = null;
+    
+    this.dispatchEvent(haxapp.ui.CLOSE_EVENT,this);
+    
+    
 }
 
 //---------------------------

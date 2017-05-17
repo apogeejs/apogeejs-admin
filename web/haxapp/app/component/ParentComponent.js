@@ -44,6 +44,7 @@ haxapp.app.ParentComponent.prototype.openTabDisplay = function() {
 
 haxapp.app.ParentComponent.prototype.closeTabDisplay = function() {
     if(this.tabDisplay) {
+        this.tabDisplay.closeTab();
         this.tabDisplay = null;
     }
 }

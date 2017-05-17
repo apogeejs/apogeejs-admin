@@ -29,16 +29,11 @@ haxapp.app.Component.prototype.hasTabDisplay = function() {
 }
 
 haxapp.app.Component.prototype.openTabDisplay = function() {
-    if(!this.tabDisplay) {
-        this.tabDisplay = new haxapp.app.TabComponentDisplay(this);
-    }
-    this.workspaceUI.setActiveTab(this.getObject().getId());
+    //noop
 }
 
 haxapp.app.Component.prototype.closeTabDisplay = function() {
-    if(this.tabDisplay) {
-        this.tabDisplay = null;
-    }
+    //noop
 }
 
 

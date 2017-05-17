@@ -146,83 +146,18 @@ haxapp.app.Component.prototype.toJson = function() {
 /** This method cleans up after a delete. Any extending object that has delete
  * actions should pass a callback function to the method "addClenaupAction" */
 haxapp.app.Component.prototype.onDelete = function() {
-//    //-----------------------------------------------------------------------------------
-//    //start
-//    
-//    //check for change of parent
-//    if(this.object.getParent() !== this.uiActiveParent) {
-//        var oldParent = this.uiActiveParent;
-//        var newParent = this.object.getParent();
-//       
-//        this.uiActiveParent = newParent;
-//        
-//        //remove from old parent component
-//        if(oldParent) {
-//            var oldParentComponent = this.workspaceUI.getComponent(oldParent);
-//            oldParentComponent.removeChildComponent(this);
-//            //delete all the window display
-//            if(this.windowDisplay) {
-//                this.windowDisplay.deleteDisplay();
-//                this.windowDisplay = null;
-//            }
-//        }
-//        
-//        //add to the new parent component
-//        if(newParent) {
-//            var newParentComponent = this.workspaceUI.getComponent(newParent);
-//            newParentComponent.addChildComponent(this);
-//        }
-//    }
-//    
-//    //get the banner info
-//    var bannerState;
-//    var bannerMessage;
-//    var object = this.getObject();
-//    if(object.hasError()) {
-//        var errorMsg = "";
-//        var actionErrors = object.getErrors();
-//        for(var i = 0; i < actionErrors.length; i++) {
-//            errorMsg += actionErrors[i].msg + "\n";
-//        }
-//        
-//        bannerState = haxapp.app.WindowHeaderManager.BANNER_TYPE_ERROR;
-//        bannerMessage = errorMsg;
-//    }
-//    else if(object.getResultPending()) {
-//        bannerState = haxapp.app.WindowHeaderManager.BANNER_TYPE_PENDING;
-//        bannerMessage = haxapp.app.WindowHeaderManager.PENDING_MESSAGE;
-//        
-//    }
-//    else {   
-//        bannerState = haxapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
-//        bannerMessage = null;
-//    }
-//    
-//    //update for new data
-//    this.treeDisplay.updateData();
-//    this.treeDisplay.setBannerState(bannerState,bannerMessage);
-//    
-//    if(this.windowDisplay != null) {
-//        this.windowDisplay.updateData();
-//        this.windowDisplay.setBannerState(bannerState,bannerMessage);
-//    }
-//    
-//    if(this.tabDisplay != null) {
-//        this.tabDisplay.updateData();
-//        this.tabDisplay.setBannerState(bannerState,bannerMessage);
-//    }
-//    
-//    //end
-//    //-------------------------------------------------------------------------------------
     
-    
-    //TREE_ENTRY - remove tree entry from the parent
+    //remove from parent
     if(this.uiActiveParent) {
         var parentComponent = this.workspaceUI.getComponent(this.uiActiveParent);
         if(parentComponent) {
-            var parentTreeEntry = parentComponent.getTreeEntry();
-            parentTreeEntry.removeChild(this.getObject().getId());
+            //remove the tree from the parent
+            parentComponent.removeChildComponent(this);
         }
+    }
+    
+    if(this.tabDisplay) {
+        this.closeTabDisplay();
     }
     
     //execute cleanup actions
