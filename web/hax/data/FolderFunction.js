@@ -159,7 +159,7 @@ hax.FolderFunction.getPropertyUpdateAction = function(folderFunction,oldValues,n
         actionData.action = "updateFolderFunction";
         actionData.member = folderFunction;
         actionData.argList = newArgList;
-        actionData.returnString = newValues.returnValueString;
+        actionData.returnValueString = newValues.returnValueString;
         return actionData;
     }    
     else {
