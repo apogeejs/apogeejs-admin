@@ -34,6 +34,11 @@ haxapp.app.ResourceOutputMode.prototype.showData = function() {
     }   
 }
 
+/** Override this to properly update the control. */
+haxapp.app.ViewMode.prototype.memberUpdated = function() {
+    this.showData();
+}
+
 haxapp.app.ResourceOutputMode.prototype.destroy = function() {
     var resource = this.member.getResource();
     if((resource)&&(resource.hide)) {
