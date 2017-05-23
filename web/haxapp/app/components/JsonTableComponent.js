@@ -114,27 +114,3 @@ haxapp.app.JsonTableComponent.generator.DEFAULT_WIDTH = 300;
 haxapp.app.JsonTableComponent.generator.DEFAULT_HEIGHT = 300;
 haxapp.app.JsonTableComponent.generator.ICON_RES_PATH = "/dataIcon.png";
 
-//======================================
-// This is a code wrapper so the user works with the formula rather than the function body
-//======================================
-
-haxapp.app.JsonTableComponent.editorCodeWrapper = {};
-
-haxapp.app.JsonTableComponent.editorCodeWrapper.FUNCTION_PREFIX = "var value;\n";
-haxapp.app.JsonTableComponent.editorCodeWrapper.FUNCTION_SUFFIX = "\nreturn value;\n\n";
-
-haxapp.app.JsonTableComponent.editorCodeWrapper.displayName = "Formula";
-
-haxapp.app.JsonTableComponent.editorCodeWrapper.wrapCode = function(formula) { 
-    return haxapp.app.JsonTableComponent.editorCodeWrapper.FUNCTION_PREFIX + formula + 
-        haxapp.app.JsonTableComponent.editorCodeWrapper.FUNCTION_SUFFIX;
-}
-
-haxapp.app.JsonTableComponent.editorCodeWrapper.unwrapCode = function(functionBody) {
-	if((functionBody == null)||(functionBody.length = 0)) return "";
-	
-    var formula = functionBody.replace("var value;","");
-    formula = formula.replace("return value;","");
-    return formula.trim();
-}
-

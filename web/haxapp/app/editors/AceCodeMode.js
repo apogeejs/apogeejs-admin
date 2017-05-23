@@ -18,15 +18,7 @@ haxapp.app.AceCodeMode.prototype.constructor = haxapp.app.AceCodeMode;
 	
 haxapp.app.AceCodeMode.prototype.showData = function() {
 		
-	var functionBody = this.member.getFunctionBody();
-	
-	var codeText;
-	if(this.editorCodeWrapper) {
-		codeText = this.editorCodeWrapper.unwrapCode(functionBody);
-	}
-	else {
-		codeText = functionBody;
-	}
+	var codeText = this.member.getFunctionBody();
 	
     if(!this.editor) {
         this.editor = new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
@@ -50,13 +42,7 @@ haxapp.app.AceCodeMode.prototype.onSave = function(text) {
         actionData.action = "updateCode";
         actionData.member = this.member;
         actionData.argList = this.member.getArgList();
-
-		if(this.editorCodeWrapper) {
-			actionData.functionBody = this.editorCodeWrapper.wrapCode(text);
-		}
-		else {
-			actionData.functionBody = text;
-		}
+		actionData.functionBody = text;
 
         actionData.supplementalCode = this.member.getSupplementalCode();  
 	}
