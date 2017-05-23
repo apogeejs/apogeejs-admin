@@ -3,9 +3,8 @@
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
 haxapp.app.BasicControlComponent = function(workspaceUI,control,generator,componentJson) {
-    //base init
-    haxapp.app.Component.init.call(this,workspaceUI,control,generator,componentJson);
-	haxapp.app.TableEditComponent.init.call(this,haxapp.app.BasicControlComponent.TABLE_EDIT_SETTINGS,componentJson);
+    //extend edit component
+    haxapp.app.EditComponent.call(this,workspaceUI,control,generator,componentJson);
 	
 	var resource = control.getResource();
 	resource.setComponent(this);
@@ -14,9 +13,8 @@ haxapp.app.BasicControlComponent = function(workspaceUI,control,generator,compon
     control.calculate();
 };
 
-//add components to this class
-hax.base.mixin(haxapp.app.BasicControlComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.BasicControlComponent,haxapp.app.TableEditComponent);
+haxapp.app.BasicControlComponent.prototype = Object.create(haxapp.app.EditComponent.prototype);
+haxapp.app.BasicControlComponent.prototype.constructor = haxapp.app.BasicControlComponent;
 
 //==============================
 // Protected and Private Instance Methods
@@ -43,27 +41,33 @@ haxapp.app.BasicControlComponent.TABLE_EDIT_SETTINGS = {
     "defaultView": haxapp.app.BasicControlComponent.VIEW_OUTPUT
 }
 
+/**  This method retrieves the table edit settings for this component instance
+ * @protected */
+haxapp.app.BasicControlComponent.prototype.getTableEditSettings = function() {
+    return haxapp.app.BasicControlComponent.TABLE_EDIT_SETTINGS;
+}
+
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-haxapp.app.BasicControlComponent.prototype.getViewModeElement = function(viewType) {
+haxapp.app.BasicControlComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
 	
 	//create the new view element;
 	switch(viewType) {
 		
 		case haxapp.app.BasicControlComponent.VIEW_OUTPUT:
 			if(!this.outputMode) {
-				this.outputMode = new haxapp.app.ResourceOutputMode(this);
+				this.outputMode = new haxapp.app.ResourceOutputMode(editComponentDisplay);
 			}
 			return this.outputMode;
 			
 		case haxapp.app.BasicControlComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(this,false);
+			return new haxapp.app.AceCodeMode(editComponentDisplay,false);
 			
 		case haxapp.app.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new haxapp.app.AceSupplementalMode(this);
+			return new haxapp.app.AceSupplementalMode(editComponentDisplay);
             
         case haxapp.app.BasicControlComponent.VIEW_DESCRIPTION:
-			return new haxapp.app.AceDescriptionMode(this);
+			return new haxapp.app.AceDescriptionMode(editComponentDisplay);
 			
 		default:
 //temporary error handling...

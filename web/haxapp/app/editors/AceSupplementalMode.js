@@ -1,31 +1,31 @@
 
-haxapp.app.AceSupplementalMode = function(component) {
-	//base constructor
-	haxapp.app.AceCodeModeBase.call(this,component,"ace/mode/javascript");
+haxapp.app.AceSupplementalMode = function(componentDisplay) {
+    haxapp.app.ViewMode.call(this,componentDisplay);
 }
 
-haxapp.app.AceSupplementalMode.prototype = Object.create(haxapp.app.AceCodeModeBase.prototype);
+haxapp.app.AceSupplementalMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.AceSupplementalMode.prototype.constructor = haxapp.app.AceSupplementalMode;
 
-haxapp.app.AceSupplementalMode.prototype.showData = function(editOk) {
+haxapp.app.AceSupplementalMode.prototype.showData = function() {
 		
-	var table = this.component.getObject();
-	var codeText = table.getSupplementalCode();	
+	var codeText = this.member.getSupplementalCode();	
 	
-	this.editor.showData(codeText,editOk);
+    if(!this.editor) {
+        this.editor = new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
+    }
+	this.editor.showData(codeText,true);
 }
 
 haxapp.app.AceSupplementalMode.prototype.onSave = function(text) {	
-	var table = this.component.getObject();
-    
+
 	var actionData = {};
         actionData.action = "updateCode";
-        actionData.member = table;
-        actionData.argList = table.getArgList();
-        actionData.functionBody = table.getFunctionBody();
+        actionData.member = this.member;
+        actionData.argList = this.member.getArgList();
+        actionData.functionBody = this.member.getFunctionBody();
         actionData.supplementalCode = text;  
         
-		var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
+		var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
         
 	if(!actionResponse.getSuccess()) {
 		//show an error message

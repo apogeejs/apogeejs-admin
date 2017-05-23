@@ -1,15 +1,8 @@
-/** This is a mixin that encapsulates the base functionality of a parent container for a control
- * The parent container must provide events for when is is shown, hidden.
- * 
- * This is not a class, but it is used for the prototype of the objects that inherit from it.
- */
-haxapp.ui.ParentContainer = {};
+/** This object is a container for window frames. The argument of the constructor should
+ * be an element that will hold the window frames.  */
+haxapp.ui.ParentContainer = function(containerElement) {
     
-/** This is the initializer for the component. The object passed is the core object
- * associated with this control. */
-haxapp.ui.ParentContainer.init = function(containerElement, eventManager) {
     this.containerElement = containerElement;
-    this.eventManager = eventManager;
     
     this.windowFrameStack = [];
     
@@ -18,6 +11,7 @@ haxapp.ui.ParentContainer.init = function(containerElement, eventManager) {
     this.prevNewChildY = 0;
     this.wrapCount = 0;
 }
+
 
 haxapp.ui.ParentContainer.BASE_ZINDEX = 0;
 
@@ -35,29 +29,19 @@ haxapp.ui.ParentContainer.CONTENT_HIDDEN = "content hidden";
 // Public Instance Methods
 //==============================
 
-///** This method must be implemented in inheriting objects. */
-//haxapp.ui.ParentContainer.getContentIsShowing = function();
-
-/** This returns the dom element taht contains the child. */
-haxapp.ui.ParentContainer.getContainerElement = function() {
+haxapp.ui.ParentContainer.prototype.getOuterElement = function() {
     return this.containerElement;
 }
 
-/** This gets the event manager associated with window evetns for the container, such as resize. */
-haxapp.ui.ParentContainer.getEventManager = function() {
-    return this.eventManager;
-}
-
-
 /** This method adds a windows to the parent. It does not show the window. Show must be done. */
-haxapp.ui.ParentContainer.addWindow = function(windowFrame) {
+haxapp.ui.ParentContainer.prototype.addWindow = function(windowFrame) {
     this.containerElement.appendChild(windowFrame.getElement());
     this.windowFrameStack.push(windowFrame);
     this.updateOrder();
 }
 
 /** This method removes the window from the parent container. */
-haxapp.ui.ParentContainer.removeWindow = function(windowFrame) {
+haxapp.ui.ParentContainer.prototype.removeWindow = function(windowFrame) {
     this.containerElement.removeChild(windowFrame.getElement());
     var index = this.windowFrameStack.indexOf(windowFrame);
     this.windowFrameStack.splice(index,1);
@@ -65,7 +49,7 @@ haxapp.ui.ParentContainer.removeWindow = function(windowFrame) {
 }
 
 /** This brings the given window to the front inside this container. */
-haxapp.ui.ParentContainer.bringToFront = function(windowFrame) {
+haxapp.ui.ParentContainer.prototype.bringToFront = function(windowFrame) {
     //remove from array
     var index = this.windowFrameStack.indexOf(windowFrame);
     this.windowFrameStack.splice(index,1);
@@ -76,7 +60,7 @@ haxapp.ui.ParentContainer.bringToFront = function(windowFrame) {
 
 /** This method centers the dialog on the page. It must be called after the conten
  * is set, and possibly after it is rendered, so the size of it is calculated. */
-haxapp.ui.ParentContainer.getCenterOnPagePosition = function(child) {
+haxapp.ui.ParentContainer.prototype.getCenterOnPagePosition = function(child) {
     var element = child.getElement();
     var x = (this.containerElement.offsetWidth - element.clientWidth)/2;
     var y = (this.containerElement.offsetHeight - element.clientHeight)/2;
@@ -85,7 +69,7 @@ haxapp.ui.ParentContainer.getCenterOnPagePosition = function(child) {
 
 
 /** This method returns the position of the next window for auto/cascade positioning. */
-haxapp.ui.ParentContainer.getNextWindowPosition = function() {
+haxapp.ui.ParentContainer.prototype.getNextWindowPosition = function() {
     var x = this.prevNewChildX + haxapp.ui.ParentContainer.DELTA_CHILD_X;
     var y = this.prevNewChildY + haxapp.ui.ParentContainer.DELTA_CHILD_Y;
     
@@ -99,7 +83,10 @@ haxapp.ui.ParentContainer.getNextWindowPosition = function() {
     this.prevNewChildX = x;
     this.prevNewChildY = y;
     
-    return [x,y];
+    var pos = {};
+    pos.x = x;
+    pos.y = y;
+    return pos;
 }
 
 //=========================
@@ -108,7 +95,7 @@ haxapp.ui.ParentContainer.getNextWindowPosition = function() {
 
 /** This updates the order for the windows.
  * @private */
-haxapp.ui.ParentContainer.updateOrder = function() {
+haxapp.ui.ParentContainer.prototype.updateOrder = function() {
     var zIndex = haxapp.ui.ParentContainer.BASE_ZINDEX;
     for(var i = 0; i < this.windowFrameStack.length; i++) {
         var windowFrame = this.windowFrameStack[i];

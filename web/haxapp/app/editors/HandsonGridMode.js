@@ -1,39 +1,19 @@
 
-haxapp.app.HandsonGridMode = function(component) {
-	this.component = component;
-	
-	this.editOk = false;
-	
-	var instance = this;
-	var onSave = function(data) {
-		return instance.onSave(data);
-	}
-	var onCancel = function() {
-		return instance.onCancel();
-	}
-	
-	this.editor = new haxapp.app.HandsonGridEditor(component,onSave,onCancel);
-	
+haxapp.app.HandsonGridMode = function(componentDisplay) {
+	haxapp.app.ViewMode.call(this,componentDisplay,true);
 }
 
-/** This indicates if this element displays data or something else (code) */
-haxapp.app.HandsonGridMode.prototype.isData = true;
+haxapp.app.HandsonGridMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
+haxapp.app.HandsonGridMode.prototype.constructor = haxapp.app.HandsonGridMode;
 
-haxapp.app.HandsonGridMode.prototype.getElement = function() {
-	return this.editor.getElement();
-}
-	
-haxapp.app.HandsonGridMode.prototype.showData = function(editOk) {
+haxapp.app.HandsonGridMode.prototype.showData = function() {
 		
-	var table = this.component.getObject();
-	var json = table.getData();	
+	var json = this.member.getData();	
 
-	this.editOk = editOk;
-	this.editor.showData(json,editOk);
-}
-
-haxapp.app.HandsonGridMode.prototype.destroy = function() {
-	this.editor.destroy();
+    if(!this.editor) {
+        this.editor = new haxapp.app.HandsonGridEditor(this);
+    }
+	this.editor.showData(json,this.getIsDataEditable());
 }
 
 //==============================
@@ -41,22 +21,14 @@ haxapp.app.HandsonGridMode.prototype.destroy = function() {
 //==============================
 
 haxapp.app.HandsonGridMode.prototype.onSave = function(data) {
-	var table = this.component.getObject();
     
 	var actionData = {};
     actionData.action = "updateData";
-    actionData.member = table;
+    actionData.member = this.member;
     actionData.data = data;
-	var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
-	
-	return true;
-}
-haxapp.app.HandsonGridMode.prototype.onCancel = function() {
-	//reload old data
-	this.showData(this.editOk);
+	var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
 	
 	return true;
 }
 
-////////////////////////////////////////////////////////////////////////
 

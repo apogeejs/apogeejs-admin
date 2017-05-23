@@ -20,26 +20,6 @@ haxapp.ui.MenuHeader = function(domElement) {
     this.menuBody.attachToMenuHeader(this);
 }
 
-//style info
-haxapp.ui.MenuHeader.MENU_HEADING_BASE_STYLE = {
-    //fixed
-    "display":"inline-block",
-    "position":"relative",
-    "cursor":" default",
-	"overflow":"visible"
-}
-haxapp.ui.MenuHeader.MENU_HEADING_NORMAL_STYLE = {
-    //configurable
-    "border":"",
-    "backgroundColor":"",
-    "padding":"2px"
-}
-haxapp.ui.MenuHeader.MENU_HEADING_HOVER_STYLE = {
-    //configurable
-    "backgroundColor":"lightgray",
-    "padding":"2px"
-}
-
 /** this returns the dom element for the menu heading. */
 haxapp.ui.MenuHeader.prototype.getElement = function() {
     return this.domElement;
@@ -80,26 +60,11 @@ haxapp.ui.MenuHeader.prototype.removeMenuItem = function(title) {
 //================================
 
 /** this adds a menu item that dispatchs the given event when clicked. */
-haxapp.ui.MenuHeader.prototype.initHeadingElement = function() {
-    haxapp.ui.applyStyle(this.domElement,haxapp.ui.MenuHeader.MENU_HEADING_BASE_STYLE);
-    haxapp.ui.applyStyle(this.domElement,haxapp.ui.MenuHeader.MENU_HEADING_NORMAL_STYLE);
-	
+haxapp.ui.MenuHeader.prototype.initHeadingElement = function() {	
     var instance = this;
     this.domElement.onmousedown = function(e) {
         haxapp.ui.Menu.menuHeaderPressed(instance);
 		e.stopPropagation();
     }	
-	
-    this.domElement.onmouseenter = function(e) {
-		haxapp.ui.applyStyle(instance.domElement,haxapp.ui.MenuHeader.MENU_HEADING_HOVER_STYLE);
-        haxapp.ui.Menu.menuHeaderEntered(instance);
-    }
-	this.domElement.onmouseleave = function(e) {
-        haxapp.ui.applyStyle(instance.domElement,haxapp.ui.MenuHeader.MENU_HEADING_NORMAL_STYLE);
-    }
 }
 
-/** this adds a menu item that dispatchs the given event when clicked. */
-haxapp.ui.MenuHeader.prototype.restoreNormalAppearance = function() {
-    haxapp.ui.applyStyle(this.domElement,haxapp.ui.MenuHeader.MENU_HEADING_NORMAL_STYLE);
-}

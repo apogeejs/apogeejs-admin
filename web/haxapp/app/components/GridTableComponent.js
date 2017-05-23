@@ -1,16 +1,14 @@
 
 /** This component represents a json table object. */
 haxapp.app.GridTableComponent = function(workspaceUI,table,componentJson) {
-    //base init
-    haxapp.app.Component.init.call(this,workspaceUI,table,haxapp.app.GridTableComponent.generator,componentJson);
-	haxapp.app.TableEditComponent.init.call(this,haxapp.app.GridTableComponent.TABLE_EDIT_SETTINGS,componentJson);
+    //extend edit component
+    haxapp.app.EditComponent.call(this,workspaceUI,table,haxapp.app.GridTableComponent.generator,componentJson);
     
     this.memberUpdated();
 };
 
-//add components to this class
-hax.base.mixin(haxapp.app.GridTableComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.GridTableComponent,haxapp.app.TableEditComponent);
+haxapp.app.GridTableComponent.prototype = Object.create(haxapp.app.EditComponent.prototype);
+haxapp.app.GridTableComponent.prototype.constructor = haxapp.app.GridTableComponent;
 
 //==============================
 // Protected and Private Instance Methods
@@ -37,24 +35,30 @@ haxapp.app.GridTableComponent.TABLE_EDIT_SETTINGS = {
 
 haxapp.app.GridTableComponent.DEFAULT_VIEW = haxapp.app.GridTableComponent.VIEW_GRID;
 
+/**  This method retrieves the table edit settings for this component instance
+ * @protected */
+haxapp.app.GridTableComponent.prototype.getTableEditSettings = function() {
+    return haxapp.app.GridTableComponent.TABLE_EDIT_SETTINGS;
+}
+
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-haxapp.app.GridTableComponent.prototype.getViewModeElement = function(viewType) {
+haxapp.app.GridTableComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
 	
 	//create the new view element;
 	switch(viewType) {
 			
 		case haxapp.app.GridTableComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(this,haxapp.app.GridTableComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
+			return new haxapp.app.AceCodeMode(editComponentDisplay,haxapp.app.GridTableComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
 			
 		case haxapp.app.GridTableComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new haxapp.app.AceSupplementalMode(this);
+			return new haxapp.app.AceSupplementalMode(editComponentDisplay);
 			
 		case haxapp.app.GridTableComponent.VIEW_GRID:
-			return new haxapp.app.HandsonGridMode(this);
+			return new haxapp.app.HandsonGridMode(editComponentDisplay);
             
         case haxapp.app.GridTableComponent.VIEW_DESCRIPTION:
-			return new haxapp.app.AceDescriptionMode(this);
+			return new haxapp.app.AceDescriptionMode(editComponentDisplay);
 			
 		default:
 //temporary error handling...
@@ -102,8 +106,9 @@ haxapp.app.GridTableComponent.generator.displayName = "Grid Table";
 haxapp.app.GridTableComponent.generator.uniqueName = "haxapp.app.GridTableComponent";
 haxapp.app.GridTableComponent.generator.createComponent = haxapp.app.GridTableComponent.createComponent;
 haxapp.app.GridTableComponent.generator.createComponentFromJson = haxapp.app.GridTableComponent.createComponentFromJson;
-haxapp.app.GridTableComponent.generator.DEFAULT_WIDTH = 200;
-haxapp.app.GridTableComponent.generator.DEFAULT_HEIGHT = 200;
+haxapp.app.GridTableComponent.generator.DEFAULT_WIDTH = 300;
+haxapp.app.GridTableComponent.generator.DEFAULT_HEIGHT = 300;
+haxapp.app.GridTableComponent.generator.ICON_RES_PATH = "/gridIcon.png";
 
 //======================================
 // Use the json table code wrapper

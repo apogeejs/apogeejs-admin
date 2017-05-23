@@ -1,0 +1,56 @@
+.visiui-tc-main {
+}
+.visiui-tc-entry {
+    white-space: nowrap;
+    display:inline-block;
+}
+.visiui-tc-label {
+    display:inline-block;
+    cursor:default;
+    color: #369;
+    padding-left: 5px;
+    vertical-align: top;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+.visiui-tc-control {
+    display:inline-block;
+    cursor:default;
+    font-family: monospace;
+    
+    position:relative;
+    left:-5px;
+}
+.visiui-tc-icon {
+    display:inline-block;
+}
+.visiui-tc-child-list {
+    list-style: none;
+    margin: 0;
+    margin-left: 15px;
+    padding: 0;
+}
+.visiui-tc-child {
+    white-space: nowrap;
+    
+    margin: 0;
+    padding: 0px;
+    line-height: 20px;
+    border-left:1px solid rgb(190,190,190);
+}
+.visiui-tc-child:last-child {
+    border-left:none;
+}
+.visiui-tc-child:before {
+    position:relative;
+    top:-0.3em;
+    height:1em;
+    width:0px;
+    color:white;
+    content:"";
+    display:inline-block;
+    left:0px;
+}
+.visiui-tc-child:last-child:before {
+    border-left:1px solid rgb(190,190,190);   
+}

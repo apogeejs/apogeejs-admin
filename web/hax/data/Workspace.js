@@ -1,23 +1,20 @@
 /** This is the workspace. Typically owner should be null. It
  * is used for creating virtual workspaces. */
-hax.Workspace = function(nameOrJson,actionResponseForJson,owner) {
+hax.Workspace = function(optionalJson,actionResponseForJson,ownerForVirtualWorkspace) {
     //base init
     hax.EventManager.init.call(this);
     hax.ContextHolder.init.call(this);
     hax.Owner.init.call(this);
     hax.RootHolder.init.call(this);
     
-    if(owner === undefined) owner = null;
-    this.owner = owner;
+    if(ownerForVirtualWorkspace === undefined) ownerForVirtualWorkspace = null;
+    this.owner = ownerForVirtualWorkspace;
     
-    var inputArgType = hax.util.getObjectType(nameOrJson);
-    
-    if(inputArgType === "String") {
-        this.name = nameOrJson;
+    if(!optionalJson) {
         this.rootFolder = new hax.Folder(hax.Parent.ROOT_NAME,this);
     }
     else {
-        this.loadFromJson(nameOrJson,actionResponseForJson);
+        this.loadFromJson(optionalJson,actionResponseForJson);
     }
 }
 
@@ -26,11 +23,6 @@ hax.base.mixin(hax.Workspace,hax.EventManager);
 hax.base.mixin(hax.Workspace,hax.ContextHolder);
 hax.base.mixin(hax.Workspace,hax.Owner);
 hax.base.mixin(hax.Workspace,hax.RootHolder);
-
-/** this method gets the workspace name. */
-hax.Workspace.prototype.getName = function() {
-    return this.name;
-}
 
 /** this method gets the root package for the workspace. */
 hax.Workspace.prototype.getRoot = function() {
@@ -120,7 +112,6 @@ hax.Workspace.prototype.createContextManager = function() {
 hax.Workspace.createVirtualWorkpaceFromFolder = function(name,origRootFolder,ownerInWorkspace) {
 	//create a workspace json from the root folder json
 	var workspaceJson = {};
-    workspaceJson.name = name;
     workspaceJson.fileType = hax.Workspace.SAVE_FILE_TYPE;
     workspaceJson.version = hax.Workspace.SAVE_FILE_VERSION;
     workspaceJson.data = origRootFolder.toJson();
@@ -173,7 +164,6 @@ hax.Workspace.SAVE_FILE_VERSION = 0.2;
 
 hax.Workspace.prototype.toJson = function() {
     var json = {};
-    json.name = this.name;
     json.fileType = hax.Workspace.SAVE_FILE_TYPE;
     json.version = hax.Workspace.SAVE_FILE_VERSION;
     
@@ -194,8 +184,6 @@ hax.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     if(json.version !== hax.Workspace.SAVE_FILE_VERSION) {
         throw hax.base.createError("Incorrect file version. CHECK HAXAPP.COM FOR VERSION CONVERTER.",false);
     }
-    
-    this.name = json.name;
 	
     if(!actionResponse) actionResponse = new hax.ActionResponse();
 

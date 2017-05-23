@@ -7,18 +7,25 @@ haxapp.app.updatecomponent = {};
 //=====================================
 
 /** This method gets a callback to update the properties of a component. */
-haxapp.app.updatecomponent.getUpdateComponentCallback = function(component,generator) {
+haxapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
+    
+    var generator = component.generator;
     
     var createCallback = function() {
         
         var workspaceUI = component.getWorkspaceUI();       
         var initialValues = component.getPropertyValues();
         
-        //get the folder list
-        var folderMap = workspaceUI.getFolders();
-        var folderList = [];
-        for(var folderName in folderMap) {
-            folderList.push(folderName);
+        //add folder list, only if we can set the parent (if there is a parent)
+        var folderMap = null;
+        var folderList = null;
+        if(component.getObject().getParent()) {
+            //get the folder list
+             folderMap = workspaceUI.getFolders();
+            folderList = [];
+            for(var folderName in folderMap) {
+                folderList.push(folderName);
+            }
         }
         
         //create the dialog layout - do on the fly because folder list changes
@@ -46,9 +53,15 @@ haxapp.app.updatecomponent.getUpdateComponentCallback = function(component,gener
                 }
             }
             
-            //get the parent value
-            newValues.parent = folderMap[newValues.parentName];
-            
+            if(folderMap) {
+                //get the parent value
+                newValues.owner = folderMap[newValues.parentName];
+            }
+            else {
+                //no parent - use the owner
+                newValues.owner = component.getObject().getOwner();
+            }
+        
             //need to test if fields are valid!
 
             //update
@@ -94,7 +107,7 @@ haxapp.app.updatecomponent.updatePropertyValues = function(component,oldValues,n
         actionData.action = "moveMember";
         actionData.member = member;
         actionData.name = newValues.name;
-        actionData.folder = newValues.parent;
+        actionData.owner = newValues.owner;
         actionList.push(actionData);
     }
 

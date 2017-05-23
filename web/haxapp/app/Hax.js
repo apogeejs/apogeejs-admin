@@ -9,7 +9,7 @@ haxapp.app.Hax = function(containerId) {
     hax.EventManager.init.call(this);
     
     //workspaces
-    this.workspaceUIs = {};
+    this.workspaceUI = null;
     
     //component generators
     this.componentGenerators = {};
@@ -32,7 +32,7 @@ haxapp.app.Hax = function(containerId) {
     }
     else {
         //create a default workspace 
-        haxapp.app.createworkspace.createWorkspace(this,haxapp.app.Hax.DEFAULT_WORKSPACE_NAME);
+        haxapp.app.createworkspace.createWorkspace(this);
     }
 }
 	
@@ -41,34 +41,13 @@ hax.base.mixin(haxapp.app.Hax,hax.EventManager);
 
 haxapp.app.Hax.DEFAULT_WORKSPACE_NAME = "workspace";
 
-haxapp.app.Hax.prototype.getWorkspace = function(name) {
-    var workspaceUI = this.getWorkspaceUI(name);
-	if(workspaceUI) {
-		return workspaceUI.getWorkspace();
-	}
-	else {
-		return null;
-	}
+haxapp.app.Hax.prototype.getWorkspaceUI = function() {
+	return this.workspaceUI;
 }
 
-haxapp.app.Hax.prototype.getWorkspaceUI = function(name) {
-	return this.workspaceUIs[name];
-}
-
-haxapp.app.Hax.prototype.getActiveWorkspaceUI = function() {
-    var name = this.tabFrame.getActiveTabTitle();
-    if(name) {
-        return this.workspaceUIs[name];
-    }
-    else {
-        return null;
-    }
-}
-
-haxapp.app.Hax.prototype.getActiveWorkspace = function() {
-    var workspaceUI = this.getActiveWorkspaceUI();
-	if(workspaceUI) {
-		return workspaceUI.getWorkspace();
+haxapp.app.Hax.prototype.getWorkspace = function() {
+	if(this.workspaceUI) {
+		return this.workspaceUI.getWorkspace();
 	}
 	else {
 		return null;
@@ -82,25 +61,23 @@ haxapp.app.Hax.prototype.getActiveWorkspace = function() {
 /** This method makes an empty workspace ui object. This throws an exception if
  * the workspace can not be opened.
  */
-haxapp.app.Hax.prototype.addWorkspaceUI = function(workspaceUI,name) {
+haxapp.app.Hax.prototype.setWorkspaceUI = function(workspaceUI) {
     
     //we can only have one workspace of a given name!
-    if(this.workspaceUIs[name]) {
-        throw hax.base.createError("There is already an open workspace with the name " + name,false);
+    if(this.workspaceUI) {
+        throw hax.base.createError("There is already an open workspace",false);
     }
     
-	var tab = this.tabFrame.addTab(name);
-    this.tabFrame.setActiveTab(name);
-    workspaceUI.setApp(this,tab);
-    this.workspaceUIs[name] = workspaceUI;
+    workspaceUI.setApp(this,this.tabFrame,this.treePane);
+    this.workspaceUI = workspaceUI;
     return true;
 }
 
 /** This method closes the active workspace. */
-haxapp.app.Hax.prototype.removeWorkspaceUI = function(name) {
+haxapp.app.Hax.prototype.clearWorkspaceUI = function() {
     //remove the workspace from the app
-    delete this.workspaceUIs[name];
-    this.tabFrame.removeTab(name);
+    this.workspaceUI = null;
+    
     return true;
 }
 
@@ -114,8 +91,8 @@ haxapp.app.Hax.prototype.removeWorkspaceUI = function(name) {
  * workspase. The linksLoadedCallback is optional. It is called when all links have
  * been loaded on the page.
  */
-haxapp.app.Hax.prototype.updateWorkspaceLinks = function(workspaceName,addList,removeList,linksLoadedCallback) {
-	this.linkManager.updateWorkspaceLinks(workspaceName,addList,removeList,linksLoadedCallback);
+haxapp.app.Hax.prototype.updateWorkspaceLinks = function(ownerName,addList,removeList,linksLoadedCallback) {
+	this.linkManager.updateWorkspaceLinks(ownerName,addList,removeList,linksLoadedCallback);
 }
 
 //=================================
@@ -181,42 +158,61 @@ haxapp.app.Hax.prototype.createUI = function(containerId) {
     var windowElements = haxapp.ui.initWindows(containerId);
     var topContainer = windowElements.baseElement;
     
-    var container = document.createElement("div");
-    var containerStyle = {
-        "position":"relative",
-        "display":"table",
-        "width":"100%",
-        "height":"100%"
-    };
-    haxapp.ui.applyStyle(container,containerStyle);
-    topContainer.appendChild(container);
+    var mainContainer = new haxapp.ui.DisplayAndHeader(haxapp.ui.DisplayAndHeader.FIXED_PANE,
+            null,
+            haxapp.ui.DisplayAndHeader.FIXED_PANE,
+            null
+        );
+    topContainer.appendChild(mainContainer.getOuterElement());
     
     //-------------------
-    //create menus - note this functino is defined differently for web and electron, in a remote file
+    //create menus
     //-------------------
     var menuBar = this.createMenuBar();
-    container.appendChild(menuBar);
-
+    mainContainer.getHeader().appendChild(menuBar);
+    
     //----------------------
-    //create the tab frame - there is a tab for each workspace
-    //--------------------------
+    //create the split pane
+    //----------------------
+    var splitPane = new haxapp.ui.SplitPane(
+            haxapp.ui.SplitPane.SCROLLING_PANE,
+            haxapp.ui.SplitPane.FIXED_PANE
+        );
+    mainContainer.getBody().appendChild(splitPane.getOuterElement());
+
+    //---------------------
+    //load the tree pane
+    //---------------------
+    this.treePane = splitPane.getLeftPaneContainer();
     
-    var tabFrameDiv = document.createElement("div");
-    var tabFrameDivStyle = {
-        "position":"relative",
-        "backgroundColor":"white",
-        "display":"table-row",
-        "width":"100%",
-        "height":"100%"
+    //----------------------
+    //create the tab frame
+    //----------------------
+    this.tabFrame = new haxapp.ui.TabFrame();
+    splitPane.getRightPaneContainer().appendChild(this.tabFrame.getElement());
+    
+    //add listener for displaying the active tab
+    var instance = this;
+    this.tabFrame.addListener(haxapp.ui.TabFrame.TAB_SHOWN,function(tabId){instance.onTabShown(tabId);});
+    this.tabFrame.addListener(haxapp.ui.TabFrame.TAB_HIDDEN,function(tabId){instance.onTabHidden(tabId);});
+
+}
+
+/** This method creates the app ui. 
+ * @private */
+haxapp.app.Hax.prototype.onTabHidden = function(tabId) {
+    this.activeTabIconDisplay.style.display = "none";
+    this.activeTabTitleDisplay.style.display = "none";
+}
+
+haxapp.app.Hax.prototype.onTabShown = function(tabId) {
+    var component = this.workspaceUI.getComponentById(tabId);
+    if(component) {
+        this.activeTabIconDisplay.src = component.getIconUrl();
+        this.activeTabTitleDisplay.innerHTML = component.getObject().getDisplayName(true);
+        this.activeTabIconDisplay.style.display = "";
+        this.activeTabTitleDisplay.style.display = "";
     }
-    haxapp.ui.applyStyle(tabFrameDiv,tabFrameDivStyle);
-    container.appendChild(tabFrameDiv);
-    
-    var options = {};
-    options.tabBarColorClass = "visicomp_tabFrameColor";
-    options.activeTabColorClass = "visicomp_tabFrameActiveColor";
-    this.tabFrame = new haxapp.ui.TabFrame(tabFrameDiv,options);
-    
 }
 
 //=================================
@@ -230,25 +226,21 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
     //-------------------
     //create menus
     //-----------------------
-    var menuBar = document.createElement("div");
-    var menuBarStyle = {
-        "position":"relative",
-        "display":"table-row",
-        "width":"100%",
-        "padding":"2px"
-    };
-    haxapp.ui.applyStyle(menuBar,menuBarStyle);
-    menuBar.className = "visicomp_menuBarStyle";
     
     //create the menus
     var menu;
     var name;
     var menus = {};
+    
+    //creat menu  bar with left elements (menus) and right elements (active tab display)
+    var menuBar = haxapp.ui.createElementWithClass("div","menu_bar");
+    var menuBarLeft = haxapp.ui.createElementWithClass("div","menu_bar_left",menuBar);
+    var menuBarRight = haxapp.ui.createElementWithClass("div","menu_bar_right",menuBar);
 
     //Workspace menu
     name = "Workspace";
     menu = haxapp.ui.Menu.createMenu(name);
-    menuBar.appendChild(menu.getElement());
+    menuBarLeft.appendChild(menu.getElement());
     menus[name] = menu;
     
     var newCallback = haxapp.app.createworkspace.getCreateCallback(this);
@@ -260,13 +252,20 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
     var saveCallback = haxapp.app.saveworkspace.getSaveCallback(this);
     menu.addCallbackMenuItem("Save",saveCallback);
     
+    var saveCallback = haxapp.app.importworkspace.getImportCallback(this,haxapp.app.FolderComponent.generator);
+    menu.addCallbackMenuItem("Import as Folder",saveCallback);
+    
+    var saveCallback = haxapp.app.importworkspace.getImportCallback(this,haxapp.app.FolderFunctionComponent.generator);
+    menu.addCallbackMenuItem("Import as Folder Function",saveCallback);
+    
+    
     var closeCallback = haxapp.app.closeworkspace.getCloseCallback(this);
     menu.addCallbackMenuItem("Close",closeCallback);	
 	
     //Components Menu
     name = "Components";
     menu = haxapp.ui.Menu.createMenu(name);
-    menuBar.appendChild(menu.getElement());
+    menuBarLeft.appendChild(menu.getElement());
     menus[name] = menu;
     
     //add create child elements
@@ -275,7 +274,7 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
     //libraries menu
     name = "Libraries";
     menu = haxapp.ui.Menu.createMenu(name);
-    menuBar.appendChild(menu.getElement());
+    menuBarLeft.appendChild(menu.getElement());
     menus[name] = menu;
     
     var linksCallback = haxapp.app.updatelinks.getUpdateLinksCallback(this);
@@ -286,13 +285,17 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
         this.addToMenuBar(menuBar,menus);
     }
     
+    //add the active tab display
+    this.activeTabIconDisplay = haxapp.ui.createElementWithClass("img","tab-icon-display",menuBarRight);
+    this.activeTabIconDisplay.style.display = "none";
+    this.activeTabTitleDisplay = haxapp.ui.createElementWithClass("div","tab-title-display",menuBarRight);
+    this.activeTabTitleDisplay.style.display = "none";
     return menuBar;
     
 }
 
 ///** This method should be implemented if custom menus or menu items are desired. */
 //haxapp.app.Hax.prototype.addToMenuBar(menuBar,menus);
-
 
 haxapp.app.Hax.prototype.populateAddChildMenu = function(menu,optionalInitialValues,optionalComponentOptions) {
     

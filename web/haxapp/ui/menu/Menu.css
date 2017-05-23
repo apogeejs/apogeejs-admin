@@ -1,0 +1,45 @@
+/* menu style */
+.visiui-menu-body {
+    /* fixed */
+    overflow:visible;
+    position:absolute;
+    top:100%;
+    left:0%;
+    z-index:2000;
+    
+    /* configurable */
+    border:1px solid lightgray;
+    background-color:white;
+}
+.visiui-menu-item {
+    cursor:default;
+    font-weight:normal;
+    padding:2px;
+}
+.visiui-menu-item:hover {
+    background-color:lightgray;
+    padding:2px;
+}
+
+.visiui-menu-heading {
+    /* fixed */
+    display:inline-block;
+    position:relative;
+    cursor: default;
+	overflow:visible;
+
+    /* configurable */
+    padding:2px;
+    margin:0px;
+}
+.visiui-menu-text:hover {
+    background-color:lightgray;
+}
+.visiui-menu-image:hover {
+    background-color:lightyellow;
+}
+.visiui-menu-heading_active {
+    background-color:lightgray;
+}
+
+

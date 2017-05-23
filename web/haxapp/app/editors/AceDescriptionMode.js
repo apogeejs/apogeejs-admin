@@ -1,39 +1,14 @@
 
-haxapp.app.AceDescriptionMode = function(component) {
-	this.component = component;
-	
-	this.editOk = false;
-	
-	var instance = this;
-	var onSave = function(text) {
-		return instance.onSave(text);
-	}
-	var onCancel = function() {
-		return instance.onCancel();
-	}
-	
-    this.editor = new haxapp.app.TextAreaEditor(component,onSave,onCancel);
-	//this.editor = new haxapp.app.AceTextEditor(component,"ace/mode/text",onSave,onCancel);
-	
+haxapp.app.AceDescriptionMode = function(componentDisplay) {
+	haxapp.app.ViewMode.call(this,componentDisplay);
 }
 
-/** This is the format character use to display tabs in the display editor. 
- * @private*/
-haxapp.app.AceDescriptionMode.formatString = "\t";
+haxapp.app.AceDescriptionMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
+haxapp.app.AceDescriptionMode.prototype.constructor = haxapp.app.AceDescriptionMode;
 
-/** This indicates if this element displays data or something else (code) */
-haxapp.app.AceDescriptionMode.prototype.isData = false;
-
-haxapp.app.AceDescriptionMode.prototype.getElement = function() {
-	return this.editor.getElement();
-}
-	
-haxapp.app.AceDescriptionMode.prototype.showData = function(editOk) {
+haxapp.app.AceDescriptionMode.prototype.showData = function() {
 		
-	var table = this.component.getObject();
-	var json = table.getDescription();	
-
-	this.editOk = editOk;
+	var json = this.member.getDescription();	
 	
 	var textData;
 	if((json === null)||(json === undefined)) {
@@ -43,11 +18,11 @@ haxapp.app.AceDescriptionMode.prototype.showData = function(editOk) {
 		textData = json;
 	}
 	
-	this.editor.showData(textData,editOk);
-}
-
-haxapp.app.AceDescriptionMode.prototype.destroy = function() {
-	this.editor.destroy();
+    if(!this.editor) {
+        this.editor =  new haxapp.app.TextAreaEditor(this);
+        //this.editor =  new haxapp.app.AceTextEditor(componentDisplay,"ace/mode/text",onSave,onCancel);
+    }
+	this.editor.showData(textData,true);
 }
 
 //==============================
@@ -60,20 +35,12 @@ haxapp.app.AceDescriptionMode.prototype.onSave = function(text) {
 	if((text === null)||(text === undefined)) {
 		text = "";
 	}
-	
-	var table = this.component.getObject();
     
     var actionData = {};
     actionData.action = "updateDescription";
-    actionData.member = table;
+    actionData.member = this.member;
     actionData.description = text;
-	var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
-	
-	return true;
-}
-haxapp.app.AceDescriptionMode.prototype.onCancel = function() {
-	//reload old data
-	this.showData(this.editOk);
+	var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
 	
 	return true;
 }

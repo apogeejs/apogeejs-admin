@@ -1,47 +1,24 @@
 /** This component represents a table object. */
 haxapp.app.FolderComponent = function(workspaceUI,folder,componentJson) {
-    //base init
-    haxapp.app.Component.init.call(this,workspaceUI,folder,haxapp.app.FolderComponent.generator,componentJson);
-    haxapp.ui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
-	haxapp.ui.ParentHighlighter.init.call(this,this.getContentElement());
-    
-    //register this folder as a parent container
-    workspaceUI.addComponentContainer(folder,this);
+    //extend parent component
+    haxapp.app.ParentComponent.call(this,workspaceUI,folder,haxapp.app.FolderComponent.generator,componentJson);
     
     //add a cleanup and save actions
     this.addSaveAction(haxapp.app.FolderComponent.writeToJson);
+    
+    this.memberUpdated();
 };
 
-//add components to this class
-hax.base.mixin(haxapp.app.FolderComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.FolderComponent,haxapp.ui.ParentContainer);
-hax.base.mixin(haxapp.app.FolderComponent,haxapp.ui.ParentHighlighter);
+haxapp.app.FolderComponent.prototype = Object.create(haxapp.app.ParentComponent.prototype);
+haxapp.app.FolderComponent.prototype.constructor = haxapp.app.FolderComponent;
 
 //----------------------
 // ParentContainer Methods
 //----------------------
 
-/** This method must be implemented in inheriting objects. */
-haxapp.app.FolderComponent.prototype.getContentIsShowing = function() {
-    return this.getWindow().getContentIsShowing();
-}
-
-//==============================
-// Protected and Private Instance Methods
-//==============================
-
-
-/** This method populates the frame for this component. 
- * @protected */
-haxapp.app.FolderComponent.prototype.populateFrame = function() {
-	this.setScrollingContentElement();
-    
-    //add context menu to create childrent
-    var contentElement = this.getContentElement();
-    var folder = this.getObject();
-    var app = this.getWorkspaceUI().getApp();
-    app.setFolderContextMenu(contentElement,folder);
-    
+/** This returned the parent member object associated with this component. */
+haxapp.app.FolderComponent.prototype.getParentMember = function() {
+    return this.getObject();
 }
 
 //======================================
@@ -69,13 +46,16 @@ haxapp.app.FolderComponent.createComponent = function(workspaceUI,data,component
     json.action = "createMember";
     json.owner = data.parent;
     json.name = data.name;
+    if(data.children) {
+        json.children = data.children;
+    }
     json.type = hax.Folder.generator.type;
     var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
     
     var folder = json.member;
 
     if(folder) {       
-        var folderComponent = new haxapp.app.FolderComponent(workspaceUI,folder,componentOptions);
+        var folderComponent = haxapp.app.FolderComponent.createComponentFromJson(workspaceUI,folder,componentOptions);
         actionResponse.component = folderComponent;
     }
     return actionResponse;
@@ -102,3 +82,16 @@ haxapp.app.FolderComponent.generator.createComponent = haxapp.app.FolderComponen
 haxapp.app.FolderComponent.generator.createComponentFromJson = haxapp.app.FolderComponent.createComponentFromJson;
 haxapp.app.FolderComponent.generator.DEFAULT_WIDTH = 500;
 haxapp.app.FolderComponent.generator.DEFAULT_HEIGHT = 500;
+haxapp.app.FolderComponent.generator.ICON_RES_PATH = "/folderIcon.png";
+
+haxapp.app.FolderComponent.generator.propertyDialogLines = [
+    {
+        "type":"invisible",
+        "resultKey":"children"
+    }
+];
+
+//if we want to allow importing a workspace as this object, we must add this method to the generator
+haxapp.app.FolderComponent.generator.appendWorkspaceChildren = function(optionsJson,childrenJson) {
+    optionsJson.children = childrenJson;
+}

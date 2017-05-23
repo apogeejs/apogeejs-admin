@@ -26,7 +26,7 @@ haxapp.app.closeworkspace.closeWorkspace = function(app) {
     
     try {
     
-        var activeWorkspaceUI = app.getActiveWorkspaceUI();
+        var activeWorkspaceUI = app.getWorkspaceUI();
         if(activeWorkspaceUI === null) {
             var errorMsg = "There is no workspace open.";
             var actionError = new hax.ActionError(errorMsg,"User",null);
@@ -35,15 +35,12 @@ haxapp.app.closeworkspace.closeWorkspace = function(app) {
         }
 
         var workspace = activeWorkspaceUI.getWorkspace();
-        
-        var name = workspace.getName();
-        
-        var doRemove = confirm("Are you sure you want to close the workspace " + name + "?");
+        var doRemove = confirm("Are you sure you want to close the workspace?");
         if(!doRemove) {
             return actionResponse;
         }
         
-        workspaceUIRemoved = app.removeWorkspaceUI(name);
+        workspaceUIRemoved = app.clearWorkspaceUI();
         
         activeWorkspaceUI.close();
         workspace.onClose();

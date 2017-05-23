@@ -1,38 +1,18 @@
 
-haxapp.app.TextAreaMode = function(component) {
-	this.component = component;
-	
-	this.editOk = false;
-	
-	var instance = this;
-	var onSave = function(text) {
-		return instance.onSave(text);
-	}
-	var onCancel = function() {
-		return instance.onCancel();
-	}
-	
-	this.editor = new haxapp.app.TextAreaEditor(component,onSave,onCancel);
-	
+haxapp.app.TextAreaMode = function(componentDisplay) {
+	haxapp.app.ViewMode.call(this,componentDisplay,true);	
 }
+
+haxapp.app.TextAreaMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
+haxapp.app.TextAreaMode.prototype.constructor = haxapp.app.TextAreaMode;
 
 /** This is the format character use to display tabs in the display editor. 
  * @private*/
 haxapp.app.TextAreaMode.formatString = "\t";
 
-/** This indicates if this element displays data or something else (code) */
-haxapp.app.TextAreaMode.prototype.isData = true;
-
-haxapp.app.TextAreaMode.prototype.getElement = function() {
-	return this.editor.getElement();
-}
-	
-haxapp.app.TextAreaMode.prototype.showData = function(editOk) {
+haxapp.app.TextAreaMode.prototype.showData = function() {
 		
-	var table = this.component.getObject();
-	var json = table.getData();	
-
-	this.editOk = editOk;
+	var json = this.member.getData();	
 	
 	var textData;
 	if(json === null) {
@@ -45,11 +25,10 @@ haxapp.app.TextAreaMode.prototype.showData = function(editOk) {
 		textData = JSON.stringify(json,null,haxapp.app.TextAreaMode.formatString);
 	}
 	
-	this.editor.showData(textData,editOk);
-}
-
-haxapp.app.TextAreaMode.prototype.destroy = function() {
-	this.editor.destroy();
+    if(!this.editor) {
+        this.editor = new haxapp.app.TextAreaEditor(this);;
+    }
+	this.editor.showData(textData,this.getIsDataEditable());
 }
 
 //==============================
@@ -74,19 +53,11 @@ haxapp.app.TextAreaMode.prototype.onSave = function(text) {
 		data = "";
 	}
 	
-	var table = this.component.getObject();
-	
     var actionData = {};
     actionData.action = "updateData";
-    actionData.member = table;
+    actionData.member = this.member;
     actionData.data = data;
-	var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
-	
-	return true;
-}
-haxapp.app.TextAreaMode.prototype.onCancel = function() {
-	//reload old data
-	this.showData(this.editOk);
+	var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
 	
 	return true;
 }

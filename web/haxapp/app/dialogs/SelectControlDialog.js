@@ -62,7 +62,7 @@ haxapp.app.dialog.showSelectComponentDialog = function(componentList,onSelectFun
     dialog.show();
     
     //size the dialog to the content
-    dialog.fitToContent(content);
+    dialog.fitToContent();
     dialog.centerInParent();
 }
 

@@ -1,5 +1,8 @@
 /** Thiis is a namespace with functions to control menu operation
  *
+ * NOTE - the name haxapp.ui.Menu should be haxapp.ui.menu because this
+ * is just a namespace and not a class. 
+ *
  * @class 
  */
 haxapp.ui.Menu = {};
@@ -9,7 +12,7 @@ haxapp.ui.Menu.activeMenu = null;
 
 /** This method creates a static menu with the given text. */
 haxapp.ui.Menu.createMenu = function(text) {
-    var element = document.createElement("div");
+    var element = haxapp.ui.createElementWithClass("div", "visiui-menu-heading visiui-menu-text");
     element.innerHTML = text;
     return new haxapp.ui.MenuHeader(element);
 }
@@ -18,7 +21,7 @@ haxapp.ui.Menu.createMenu = function(text) {
 haxapp.ui.Menu.createMenuFromImage = function(imageUrl) {
     var imageElement = document.createElement("img");
     imageElement.src = imageUrl;
-    var element = document.createElement("div");
+    var element = haxapp.ui.createElementWithClass("div", "visiui-menu-heading visiui-menu-image");
     element.appendChild(imageElement);
     return new haxapp.ui.MenuHeader(element);
 }
@@ -33,20 +36,13 @@ haxapp.ui.Menu.showContextMenu = function(menuBody,contextEvent) {
 }
 
 haxapp.ui.Menu.menuHeaderPressed = function(menuHeader) {
-	//if there is an active menu, pressing the header closes the active menu otherwise show the menu
-	if(haxapp.ui.Menu.activeMenu) {
+	//if there is an active menu, pressing that header closes the active menu otherwise show the menu
+	if(haxapp.ui.Menu.activeMenu === menuHeader) {
 		//active menu - close the menu
 		haxapp.ui.Menu.hideActiveMenu();
 	}
 	else {
 		//no active menu, open this menu
-		haxapp.ui.Menu.show(menuHeader.getMenuBody());
-	}
-}
-
-haxapp.ui.Menu.menuHeaderEntered = function(menuHeader) {
-	//if a header is entered and there is an active, non-context menu, open this menu
-	if((haxapp.ui.Menu.activeMenu)&&(!haxapp.ui.Menu.activeMenu.getIsContext())) {
 		haxapp.ui.Menu.show(menuHeader.getMenuBody());
 	}
 }
@@ -71,21 +67,28 @@ haxapp.ui.Menu.show = function(menuBody) {
     if((parentElement)&&(menuElement)) {
         parentElement.appendChild(menuElement);
         haxapp.ui.Menu.activeMenu = menuBody;
+        //set the header to active
+        var menuHeader = menuBody.getMenuHeader();
+        if(menuHeader) {
+            menuHeader.className = "visiui-menu-heading visiui-menu-heading-active";
+        }
     }
 }
 
 haxapp.ui.Menu.hideActiveMenu = function() {
 	if(haxapp.ui.Menu.activeMenu) {
+        //set the header to normal (not active)
+        var menuHeader = haxapp.ui.Menu.activeMenu.getMenuHeader();
+        if(menuHeader) {
+            menuHeader.className = "visiui-menu-heading";
+        }
+        
         var parentElement = haxapp.ui.Menu.activeMenu.getParentElement();
         var menuElement = haxapp.ui.Menu.activeMenu.getMenuElement();
-        var menuHeader = haxapp.ui.Menu.activeMenu.getMenuHeader();
         if((parentElement)&&(menuElement)) {
             parentElement.removeChild(menuElement);
             haxapp.ui.Menu.activeMenu = null;
         }	
-        if(menuHeader) {
-            menuHeader.restoreNormalAppearance();
-        }
 	}
 }
 

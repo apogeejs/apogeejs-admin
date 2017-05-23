@@ -65,8 +65,8 @@ hax.FolderFunction.prototype.getArgList = function() {
 //------------------------------
 
 /** This overrides the get displaymethod of child to return the function declaration. */
-hax.FolderFunction.prototype.getDisplayName = function() {
-    var name = this.getName();
+hax.FolderFunction.prototype.getDisplayName = function(useFullPath) {
+    var name = useFullPath ? this.getFullName() : this.getName();
     var argList = this.getArgList();
     var argListString = argList.join(",");
     
@@ -159,7 +159,7 @@ hax.FolderFunction.getPropertyUpdateAction = function(folderFunction,oldValues,n
         actionData.action = "updateFolderFunction";
         actionData.member = folderFunction;
         actionData.argList = newArgList;
-        actionData.returnString = newValues.returnValueString;
+        actionData.returnValueString = newValues.returnValueString;
         return actionData;
     }    
     else {
@@ -215,6 +215,21 @@ hax.FolderFunction.prototype.updateDependeciesForModelChange = function(recalcul
 /** This method retrieve creates the loaded context manager. */
 hax.FolderFunction.prototype.createContextManager = function() {
     return new hax.ContextManager(this);
+}
+
+//------------------------------
+//Parent methods
+//------------------------------
+
+/** this method gets the table map. */
+hax.FolderFunction.prototype.getChildMap = function() {
+    return this.internalFolder.childMap;
+}
+
+/** This method looks up a child from this folder.  */
+hax.FolderFunction.prototype.lookupChild = function(name) {
+    //check look for object in this folder
+    return this.internalFolder.childMap[name];
 }
 
 //------------------------------

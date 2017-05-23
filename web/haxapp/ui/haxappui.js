@@ -44,6 +44,16 @@ haxapp.ui.applyStyle = function(element,style) {
 }
 
 //=========================================
+// resources
+//=========================================
+
+haxapp.ui.MINIMIZE_CMD_IMAGE = "/minimize.png";
+haxapp.ui.RESTORE_CMD_IMAGE = "/restore.png";
+haxapp.ui.MAXIMIZE_CMD_IMAGE = "/maximize.png";
+haxapp.ui.CLOSE_CMD_IMAGE = "/close.png";
+haxapp.ui.MENU_IMAGE = "/hamburger.png";
+
+//=========================================
 // dom methods
 //=========================================
 
@@ -72,6 +82,15 @@ haxapp.ui.createElement = function(type,properties,styleProperties) {
     if(styleProperties) {
         haxapp.ui.applyStyle(element,styleProperties);
     }
+    return element;
+}
+
+/** This method creates a DOM element of the given type, sets the class name
+ * and, if present, adds it to the given parent. */
+haxapp.ui.createElementWithClass = function(elementType,className,parent) {
+    var element = document.createElement(elementType);
+    element.className = className;
+    if(parent) parent.appendChild(element);
     return element;
 }
 
@@ -136,21 +155,35 @@ haxapp.ui.initWindows = function(appElementId) {
  *the app they may need to be shileded too.) */
 haxapp.ui.createDialog = function(options) {
     var shieldElement = haxapp.ui.createElement("div",null,haxapp.ui.DIALOG_SHIELD_STYLE);
-    var dialogParent = new haxapp.ui.SimpleParentContainer(shieldElement,true);
+    var dialogParent = new haxapp.ui.ParentContainer(shieldElement);
     haxapp.ui.dialogLayer.appendChild(shieldElement);
     
-    if(!options.frameColorClass) options.frameColorClass = "visicomp_windowColor";
-    if(!options.titleBarClass) options.titleBarClass = "visicomp_titleBarClass";
-    return new haxapp.ui.WindowFrame(dialogParent,options);
+    var dialog = new haxapp.ui.WindowFrame(options);
+    dialog.setParent(dialogParent);
+    return dialog;
 }
 
 /** This method closes a dialog created with haxapp.ui.createDialog. It
  *hides the window and removes the modal shiled. */
 haxapp.ui.closeDialog = function(dialog) {
     var parent = dialog.getParent();
-    dialog.hide();
-    haxapp.ui.dialogLayer.removeChild(parent.getContainerElement());
+    dialog.close();
+    haxapp.ui.dialogLayer.removeChild(parent.getOuterElement());
 }
+
+haxapp.ui.WINDOW_STATE_MINIMIZED = -1;
+haxapp.ui.WINDOW_STATE_NORMAL = 0;
+haxapp.ui.WINDOW_STATE_MAXIMIZED = 1;
+
+haxapp.ui.MINIMIZABLE = 0x01;
+haxapp.ui.MAXIMIZABLE = 0x02;
+haxapp.ui.CLOSEABLE = 0x04;
+
+/** This is a handler name used to request closing the window, tab or other UI element. */
+haxapp.ui.REQUEST_CLOSE = "request_close";
+haxapp.ui.DENY_CLOSE = -1;
+
+haxapp.ui.CLOSE_EVENT = "closed";
 
 
 

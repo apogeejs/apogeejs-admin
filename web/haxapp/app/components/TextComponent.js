@@ -1,16 +1,14 @@
 
 /** This component represents a json table object. */
 haxapp.app.TextComponent = function(workspaceUI,table,componentJson) {
-    //base init
-    haxapp.app.Component.init.call(this,workspaceUI,table,haxapp.app.TextComponent.generator,componentJson);
-	haxapp.app.TableEditComponent.init.call(this,haxapp.app.TextComponent.TABLE_EDIT_SETTINGS,componentJson);
+    //extend edit component
+    haxapp.app.EditComponent.call(this,workspaceUI,table,haxapp.app.TextComponent.generator,componentJson);
     
     this.memberUpdated();
 };
 
-//add components to this class
-hax.base.mixin(haxapp.app.TextComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.TextComponent,haxapp.app.TableEditComponent);
+haxapp.app.TextComponent.prototype = Object.create(haxapp.app.EditComponent.prototype);
+haxapp.app.TextComponent.prototype.constructor = haxapp.app.TextComponent;
 
 //==============================
 // Protected and Private Instance Methods
@@ -35,24 +33,30 @@ haxapp.app.TextComponent.TABLE_EDIT_SETTINGS = {
     "emptyDataValue": ""
 }
 
+/**  This method retrieves the table edit settings for this component instance
+ * @protected */
+haxapp.app.TextComponent.prototype.getTableEditSettings = function() {
+    return haxapp.app.TextComponent.TABLE_EDIT_SETTINGS;
+}
+
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-haxapp.app.TextComponent.prototype.getViewModeElement = function(viewType) {
+haxapp.app.TextComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
 	
 	//create the new view element;
 	switch(viewType) {
 			
 		case haxapp.app.TextComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(this,haxapp.app.TextComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
+			return new haxapp.app.AceCodeMode(editComponentDisplay,haxapp.app.TextComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
 			
 		case haxapp.app.TextComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new haxapp.app.AceSupplementalMode(this);
+			return new haxapp.app.AceSupplementalMode(editComponentDisplay);
 			
 		case haxapp.app.TextComponent.VIEW_TEXT:
-			return new haxapp.app.AceTextMode(this);
+			return new haxapp.app.AceTextMode(editComponentDisplay);
             
         case haxapp.app.TextComponent.VIEW_DESCRIPTION:
-			return new haxapp.app.AceDescriptionMode(this);
+			return new haxapp.app.AceDescriptionMode(editComponentDisplay);
 			
 		default:
 //temporary error handling...
@@ -100,8 +104,9 @@ haxapp.app.TextComponent.generator.displayName = "Text Table";
 haxapp.app.TextComponent.generator.uniqueName = "haxapp.app.TextComponent";
 haxapp.app.TextComponent.generator.createComponent = haxapp.app.TextComponent.createComponent;
 haxapp.app.TextComponent.generator.createComponentFromJson = haxapp.app.TextComponent.createComponentFromJson;
-haxapp.app.TextComponent.generator.DEFAULT_WIDTH = 200;
-haxapp.app.TextComponent.generator.DEFAULT_HEIGHT = 200;
+haxapp.app.TextComponent.generator.DEFAULT_WIDTH = 300;
+haxapp.app.TextComponent.generator.DEFAULT_HEIGHT = 300;
+haxapp.app.TextComponent.generator.ICON_RES_PATH = "/textIcon.png";
 
 
 

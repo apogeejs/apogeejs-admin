@@ -6,21 +6,19 @@
  * code is set to the empty string. If no action is desired, false or any value that evaluates to
  * false can be sent in.
  */
-haxapp.app.AceCodeMode = function(component,optionalOnBlankData,optionalEditorCodeWrapper) {
-	//base constructor
-	haxapp.app.AceCodeModeBase.call(this,component,"ace/mode/javascript");
+haxapp.app.AceCodeMode = function(componentDisplay,optionalOnBlankData,optionalEditorCodeWrapper) {
+    haxapp.app.ViewMode.call(this,componentDisplay);
 	
 	this.onBlankData = optionalOnBlankData;
 	this.editorCodeWrapper = optionalEditorCodeWrapper;
 }
 
-haxapp.app.AceCodeMode.prototype = Object.create(haxapp.app.AceCodeModeBase.prototype);
+haxapp.app.AceCodeMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.AceCodeMode.prototype.constructor = haxapp.app.AceCodeMode;
 	
-haxapp.app.AceCodeMode.prototype.showData = function(editOk) {
+haxapp.app.AceCodeMode.prototype.showData = function() {
 		
-	var table = this.component.getObject();
-	var functionBody = table.getFunctionBody();
+	var functionBody = this.member.getFunctionBody();
 	
 	var codeText;
 	if(this.editorCodeWrapper) {
@@ -30,27 +28,28 @@ haxapp.app.AceCodeMode.prototype.showData = function(editOk) {
 		codeText = functionBody;
 	}
 	
-    this.editOk = editOk;
-	this.editor.showData(codeText,editOk);
+    if(!this.editor) {
+        this.editor = new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
+    }
+	this.editor.showData(codeText,true);
 }
 
 haxapp.app.AceCodeMode.prototype.onSave = function(text) {	
 	
-	var table = this.component.getObject();
     var actionData = {};
 	
 	if((this.onBlankData)&&(text === "")) {
 		//special case - clear code
         actionData.action = "updateData";
-        actionData.member = table;
+        actionData.member = this.member;
         actionData.data = this.onBlankData.dataValue;
 		
 	}
 	else {
 		//standard case - edit code
         actionData.action = "updateCode";
-        actionData.member = table;
-        actionData.argList = table.getArgList();
+        actionData.member = this.member;
+        actionData.argList = this.member.getArgList();
 
 		if(this.editorCodeWrapper) {
 			actionData.functionBody = this.editorCodeWrapper.wrapCode(text);
@@ -59,10 +58,10 @@ haxapp.app.AceCodeMode.prototype.onSave = function(text) {
 			actionData.functionBody = text;
 		}
 
-        actionData.supplementalCode = table.getSupplementalCode();  
+        actionData.supplementalCode = this.member.getSupplementalCode();  
 	}
     
-    var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
+    var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
         
 	return true;  
 }

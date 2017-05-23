@@ -1,0 +1,92 @@
+
+
+.visiui-tf-frame {
+    position:relative;
+    display:table;
+    width:100%;
+    height:100%;
+    top:0px;
+    left:0px;
+}
+.visiui-tf-tab-container {
+    /*fixed*/
+    position:relative;
+    display:table-row;
+    width:100%;
+    height:100%;
+    top:0px;
+    left:0px;
+    
+    /*configurable*/
+    background-color:white;
+    /*border: 1px solid gray*/
+    border-bottom-width: 0px;
+}
+.visiui-tf-tab-bar {
+    /*fixed*/
+    position:relative;
+    display:table-row;
+    width:100%;
+    
+    /* configurable */
+    margin:0px;
+    border: 1px solid gray;
+    border-top-width: 0px;
+    background-color: rgb(185,185,220);
+}
+.visiui-tf-tab-base {
+    /*fixed*/
+    display:inline-block;
+    cursor: default;
+    
+    /*configurable*/
+    border: 1px solid black;
+    padding:0px;
+    margin:0px;
+}
+.visiui-tf-tab-inactive {
+    font-weight:normal;
+}
+.visiui-tf-tab-active {
+    background-color: rgb(220,220,240);
+    border-bottom: 1px solid rgb(220,220,240);
+    font-weight:bold;
+}
+
+.visiui-tf-tab-window {
+    top:0px;
+    left:0px;
+	height:100%;
+    position:relative;
+    background-color:white;
+    overflow:auto;
+}
+
+.visiui-tf_tab-menuDiv {
+    /* fixed */
+    display:inline;
+    
+    /* configurable */
+    margin-right:3px;
+}
+.visiui_tf_tab_title {
+    /* fixed */
+    display:inline-block;
+    cursor:default;
+    color:darkblue;
+    padding: 2px 0px;
+    vertical-align: top;
+    
+    /* configurable */
+    margin-right:5px;
+}
+.visiui_tf_tab_cmd_button {
+    /* fixed */
+    display:inline-block;
+
+    /* configurable */
+    margin:0px;
+    padding:0px;
+    /* configurable */
+    margin-right:5px;
+}

@@ -1,15 +1,12 @@
 /** This component represents a folderFunction, which is a function that is programmed using
  *hax tables rather than writing code. */
 haxapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,componentJson) {
-    //base init
-    haxapp.app.Component.init.call(this,workspaceUI,folderFunction,haxapp.app.FolderFunctionComponent.generator,componentJson);
-    haxapp.ui.ParentContainer.init.call(this,this.getContentElement(),this.getWindow());
-	haxapp.ui.ParentHighlighter.init.call(this,this.getContentElement());
+    //extend parent component
+    haxapp.app.ParentComponent.call(this,workspaceUI,folderFunction,haxapp.app.FolderFunctionComponent.generator,componentJson);
     
     //register this object as a parent container
     var internalFolder = folderFunction.getInternalFolder();
-    workspaceUI.registerMember(internalFolder,null);
-    workspaceUI.addComponentContainer(internalFolder,this);
+    workspaceUI.registerMember(internalFolder,this,folderFunction);
     
     this.memberUpdated();
     
@@ -17,35 +14,16 @@ haxapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,compone
     this.addSaveAction(haxapp.app.FolderFunctionComponent.writeToJson);
 };
 
-//add components to this class
-hax.base.mixin(haxapp.app.FolderFunctionComponent,haxapp.app.Component);
-hax.base.mixin(haxapp.app.FolderFunctionComponent,haxapp.ui.ParentContainer);
-hax.base.mixin(haxapp.app.FolderFunctionComponent,haxapp.ui.ParentHighlighter);
+haxapp.app.FolderFunctionComponent.prototype = Object.create(haxapp.app.ParentComponent.prototype);
+haxapp.app.FolderFunctionComponent.prototype.constructor = haxapp.app.FolderFunctionComponent;
 
 //----------------------
 // ParentContainer Methods
 //----------------------
 
-/** This method must be implemented in inheriting objects. */
-haxapp.app.FolderFunctionComponent.prototype.getContentIsShowing = function() {
-    return this.getWindow().getContentIsShowing();
-}
-
-//==============================
-// Protected and Private Instance Methods
-//==============================
-
-/** This method populates the frame for this component. 
- * @protected */
-haxapp.app.FolderFunctionComponent.prototype.populateFrame = function() {	
-	this.setScrollingContentElement();
-    
-    //add context menu to create childrent
-    var contentElement = this.getContentElement();
-    var folderFunction = this.getObject();
-    var internalFolder = folderFunction.getInternalFolder();
-    var app = this.getWorkspaceUI().getApp();
-    app.setFolderContextMenu(contentElement,internalFolder);
+/** This returned the parent member object associated with this component. */
+haxapp.app.FolderFunctionComponent.prototype.getParentMember = function() {
+    return this.getObject().getInternalFolder();
 }
 
 //======================================
@@ -79,12 +57,15 @@ haxapp.app.FolderFunctionComponent.createComponent = function(workspaceUI,data,c
     if(data.returnValueString) {
         json.returnValue = data.returnValueString;
     }
+    if(data.internalFolder) {
+        json.internalFolder = data.internalFolder;
+    }
     json.type = hax.FolderFunction.generator.type;
     var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
     
     var folderFunction = json.member;
     if(actionResponse.getSuccess()) {
-        var folderFunctionComponent = new haxapp.app.FolderFunctionComponent(workspaceUI,folderFunction,componentOptions);
+        var folderFunctionComponent = haxapp.app.FolderFunctionComponent.createComponentFromJson(workspaceUI,folderFunction,componentOptions);
         actionResponse.component = folderFunctionComponent;
     }
     return actionResponse;
@@ -110,6 +91,7 @@ haxapp.app.FolderFunctionComponent.generator.createComponent = haxapp.app.Folder
 haxapp.app.FolderFunctionComponent.generator.createComponentFromJson = haxapp.app.FolderFunctionComponent.createComponentFromJson;
 haxapp.app.FolderFunctionComponent.generator.DEFAULT_WIDTH = 500;
 haxapp.app.FolderFunctionComponent.generator.DEFAULT_HEIGHT = 500;
+haxapp.app.FolderFunctionComponent.generator.ICON_RES_PATH = "/functionFolderIcon.png";
 
 haxapp.app.FolderFunctionComponent.generator.propertyDialogLines = [
     {
@@ -121,5 +103,18 @@ haxapp.app.FolderFunctionComponent.generator.propertyDialogLines = [
         "type":"inputElement",
         "heading":"Return Val: ",
         "resultKey":"returnValueString"
+    },
+    {
+        "type":"invisible",
+        "resultKey":"internalFolder"
     }
 ];
+
+//if we want to allow importing a workspace as this object, we must add this method to the generator
+haxapp.app.FolderFunctionComponent.generator.appendWorkspaceChildren = function(optionsJson,childrenJson) {
+    var internalFolderJson = {};
+    internalFolderJson.name = optionsJson.name;
+    internalFolderJson.type = hax.Folder.generator.type;
+    haxapp.app.FolderComponent.generator.appendWorkspaceChildren(internalFolderJson,childrenJson);
+    optionsJson.internalFolder = internalFolderJson;
+}

@@ -75,9 +75,15 @@ hax.Child.getFullName = function() {
 }
 
 /** This method returns a display name for the child object. By default it returns
-/* the object name but can by overriden by the child implementation. */
-hax.Child.getDisplayName = function() {
-    return this.name;
+/* the object name but can by overriden by the child implementation. By setting 
+ * the input argument "useFullPath" to true, the path is included with the name. */
+hax.Child.getDisplayName = function(useFullPath) {
+    if(useFullPath) {
+        return this.getFullName();
+    }
+    else {
+        return this.name;
+    }
 }
 
 /** This returns the owner for this child. */

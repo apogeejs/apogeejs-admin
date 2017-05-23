@@ -1,32 +1,19 @@
 
-haxapp.app.FormDataMode = function(component) {
-	this.component = component;
-
-	var instance = this;
-	var onSave = function(data) {
-		instance.onSave(data);
-	}
-	
-	this.editor = new haxapp.app.JsonFormEditor(onSave);
-	
+haxapp.app.FormDataMode = function(componentDisplay) {
+	haxapp.app.ViewMode.call(this,componentDisplay,true);	
 }
 
-/** This indicates if this element displays data or something else (code) */
-haxapp.app.FormDataMode.prototype.isData = true;
+haxapp.app.FormDataMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
+haxapp.app.FormDataMode.prototype.constructor = haxapp.app.FormDataMode;
 
-haxapp.app.FormDataMode.prototype.getElement = function() {
-	return this.editor.getElement();
-}
-	
-haxapp.app.FormDataMode.prototype.showData = function(editOk) {
+haxapp.app.FormDataMode.prototype.showData = function() {
 		
-	var table = this.component.getObject();
-	var json = table.getData();	
+	var json = this.member.getData();	
 	
-	this.editor.showData(json,editOk);
-}
-
-haxapp.app.FormDataMode.prototype.destroy = function() {
+    if(!this.editor) {
+        this.editor = new haxapp.app.JsonFormEditor(this);
+    }
+	this.editor.showData(json,this.getIsDataEditable());
 }
 
 //==============================
@@ -34,14 +21,12 @@ haxapp.app.FormDataMode.prototype.destroy = function() {
 //==============================
 
 haxapp.app.FormDataMode.prototype.onSave = function(data) {
-
-	var table = this.component.getObject();
     
     var actionData = {};
     actionData.action = "updateData";
-    actionData.member = table;
+    actionData.member = this.member;
     actionData.data = data;
-	var actionResponse =  hax.action.doAction(table.getWorkspace(),actionData);
+	var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
 	
 	return true;
 }

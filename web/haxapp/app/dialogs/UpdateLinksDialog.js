@@ -136,7 +136,7 @@ haxapp.app.dialog.showUpdateLinksDialog = function(workspaceUI) {
     dialog.show();
     
     //size the dialog to the content
-    dialog.fitToContent(content);
+    dialog.fitToContent();
     dialog.centerInParent();
     
     var showJsLinksFunction = function() {

@@ -1,10 +1,10 @@
 /** Editor that uses the Ace text editor.
  * 
- * @param {type} component - the hax component
+ * @param {type} componentDisplay - the hax componentDisplay
  * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
  * @param {type} onCancel - returns true if the edit should end
  */
-haxapp.app.HandsonGridEditor = function(component,onSave,onCancel) {
+haxapp.app.HandsonGridEditor = function(viewMode) {
    
 	this.outsideDiv = haxapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -28,13 +28,9 @@ haxapp.app.HandsonGridEditor = function(component,onSave,onCancel) {
 	});
 	this.outsideDiv.appendChild(this.gridDiv);
 	
-	this.component = component;
-	this.table = component.getObject();
+	this.viewMode = viewMode;
 	this.inputData = null;
 	this.editOk = false;
-	
-	this.parentSave = onSave;
-	this.parentCancel = onCancel;
 	
 	//resize the editor on window size change
     var instance = this;
@@ -78,12 +74,12 @@ haxapp.app.HandsonGridEditor.prototype.save = function(argArray) {
 	//update "input" data before calling update
 	this.inputData = hax.util.deepJsonCopy(this.gridControl.getData());
 
-	this.parentSave(this.inputData);
+	this.viewMode.onSave(this.inputData);
 }
 
 haxapp.app.HandsonGridEditor.prototype.cancel = function() {
 	//reset the original data
-	this.parentCancel();
+	this.viewMode.onCancel();
 }
 
 //=============================
@@ -116,7 +112,7 @@ haxapp.app.HandsonGridEditor.prototype.showData = function(json,editOk) {
         this.gridDiv.style.backgroundColor = "";
     }
     else {
-        this.gridDiv.style.backgroundColor = haxapp.app.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
+        this.gridDiv.style.backgroundColor = haxapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
     }
 }
 

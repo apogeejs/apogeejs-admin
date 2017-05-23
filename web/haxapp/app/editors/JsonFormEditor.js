@@ -2,7 +2,7 @@
  * 
  * @param {type} onSave - should take a json object that should be saved.
  */
-haxapp.app.JsonFormEditor = function(onSave) {
+haxapp.app.JsonFormEditor = function(viewMode) {
 	
 	this.editorDiv = haxapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -22,7 +22,7 @@ haxapp.app.JsonFormEditor = function(onSave) {
 	this.editCallback = function() {
         var currentData = instance.editor.getCurrentValue();
         instance.workingData = currentData;
-        onSave(currentData);
+        viewMode.onSave(currentData);
     }
 }
 
@@ -53,7 +53,11 @@ haxapp.app.JsonFormEditor.prototype.showData = function(data,editOk) {
         this.editorDiv.style.backgroundColor = "";
     }
     else {
-        this.editorDiv.style.backgroundColor = haxapp.app.TableEditComponent.NO_EDIT_BACKGROUND_COLOR;
+        this.editorDiv.style.backgroundColor = haxapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
     }
+}
+
+haxapp.app.JsonFormEditor.prototype.destroy = function() {
+	//no action
 }
 

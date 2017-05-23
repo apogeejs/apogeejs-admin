@@ -9,7 +9,7 @@ haxapp.app.updatelinks = {};
 haxapp.app.updatelinks.getUpdateLinksCallback = function(app) {
     return function() {
         
-        var activeWorkspaceUI = app.getActiveWorkspaceUI();
+        var activeWorkspaceUI = app.getWorkspaceUI();
         if(!activeWorkspaceUI) {
             alert("There is no open workspace.");
             return;

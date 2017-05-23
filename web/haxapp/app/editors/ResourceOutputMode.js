@@ -1,6 +1,6 @@
 
-haxapp.app.ResourceOutputMode = function(component) {
-	this.component = component;
+haxapp.app.ResourceOutputMode = function(componentDisplay) {
+	haxapp.app.ViewMode.call(this,componentDisplay,false);
 	
 	this.outputElement = haxapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -10,28 +10,37 @@ haxapp.app.ResourceOutputMode = function(component) {
         "right":"0px",
 		"overflow":"auto"
 	});
+    
+    //no editor - override methods below as needed
 }
 
-/** This indicates if this element displays data or something else (code) */
-haxapp.app.ResourceOutputMode.prototype.isData = true;
+haxapp.app.ResourceOutputMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
+haxapp.app.ResourceOutputMode.prototype.constructor = haxapp.app.ResourceOutputMode;
+
+haxapp.app.AceTextMode.prototype.createEditor = function() {
+    throw new Error("Implement control resource output mode");
+}
 
 haxapp.app.ResourceOutputMode.prototype.getElement = function() {
 	return this.outputElement;
 }
 	
-haxapp.app.ResourceOutputMode.prototype.showData = function(editOk) {
+haxapp.app.ResourceOutputMode.prototype.showData = function() {
 	//edit ok ignored - no edit of the control data object - there is none
 	
-	var control = this.component.getObject();
-    var resource = control.getResource();
+    var resource = this.member.getResource();
     if((resource)&&(resource.show)) {
         resource.show();
     }   
 }
 
+/** Override this to properly update the control. */
+haxapp.app.ViewMode.prototype.memberUpdated = function() {
+    this.showData();
+}
+
 haxapp.app.ResourceOutputMode.prototype.destroy = function() {
-    var control = this.component.getObject();
-    var resource = control.getResource();
+    var resource = this.member.getResource();
     if((resource)&&(resource.hide)) {
         resource.hide();
     }

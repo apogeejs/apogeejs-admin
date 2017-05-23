@@ -22,35 +22,6 @@ haxapp.ui.MenuBody = function() {
     this.menuHeader = null;
 }
 
-//style info
-haxapp.ui.MenuBody.MENU_STYLE = {
-    //fixed
-    "overflow":"visible",
-    "position":"absolute",
-    "top":"100%",
-    "left":"0%",
-    "zIndex":"2000",
-    
-    //configurable
-    "border":"1px solid lightgray",
-    "backgroundColor":"white"
-}
-haxapp.ui.MenuBody.MENU_ITEM_BASE_STYLE = {
-    //fixed
-    "cursor":"default",
-    "display":"table"
-}
-haxapp.ui.MenuBody.MENU_ITEM_NORMAL_STYLE = {
-    //configurable
-    "backgroundColor":"",
-    "padding":"2px"
-}
-haxapp.ui.MenuBody.MENU_ITEM_HOVER_STYLE = {
-    //configurable
-    "backgroundColor":"lightgray",
-    "padding":"2px"
-}
-
 /** This method replaces on spaces with &nbsp; spaces. It is intedned to prevent
  * wrapping in html. */
 haxapp.ui.MenuBody.convertSpacesForHtml = function(text) {
@@ -137,8 +108,7 @@ haxapp.ui.MenuBody.prototype.addCallbackMenuItem = function(title, callback) {
     
 /** this adds a menu item that dispatchs the given event when clicked. */
 haxapp.ui.MenuBody.prototype.addMenuItem = function(itemInfo) {
-    itemInfo.element = document.createElement("div");
-    haxapp.ui.applyStyle(itemInfo.element,haxapp.ui.MenuBody.MENU_ITEM_NORMAL_STYLE);
+    itemInfo.element = haxapp.ui.createElementWithClass("div","visiui-menu-item");
     
     var title = haxapp.ui.MenuBody.convertSpacesForHtml(itemInfo.title);
     itemInfo.element.innerHTML = title;
@@ -160,14 +130,6 @@ haxapp.ui.MenuBody.prototype.addMenuItem = function(itemInfo) {
             itemInfo.callback();
         }
         event.stopPropagation();
-        haxapp.ui.applyStyle(itemInfo.element,haxapp.ui.MenuBody.MENU_ITEM_NORMAL_STYLE);
-    }
-	//css hover did not work with drag
-	itemInfo.element.onmouseenter= function(e) {
-        haxapp.ui.applyStyle(itemInfo.element,haxapp.ui.MenuBody.MENU_ITEM_HOVER_STYLE);
-    }
-	itemInfo.element.onmouseleave= function(e) {
-        haxapp.ui.applyStyle(itemInfo.element,haxapp.ui.MenuBody.MENU_ITEM_NORMAL_STYLE);
     }
 	
     this.menuDiv.appendChild(itemInfo.element);
@@ -196,8 +158,5 @@ haxapp.ui.MenuBody.prototype.removeMenuItem = function(title) {
 
 /** This method creates the menu body that is shown below the header. */
 haxapp.ui.MenuBody.prototype.createMenuElement = function() {
-    this.menuDiv = document.createElement("div");
-
-    //style like a normal manu
-    haxapp.ui.applyStyle(this.menuDiv,haxapp.ui.MenuBody.MENU_STYLE);
+    this.menuDiv = haxapp.ui.createElementWithClass("div","visiui-menu-body");
 }
