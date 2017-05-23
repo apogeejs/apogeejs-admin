@@ -252,6 +252,13 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
     var saveCallback = haxapp.app.saveworkspace.getSaveCallback(this);
     menu.addCallbackMenuItem("Save",saveCallback);
     
+    var saveCallback = haxapp.app.importworkspace.getImportCallback(this,haxapp.app.FolderComponent.generator);
+    menu.addCallbackMenuItem("Import as Folder",saveCallback);
+    
+    var saveCallback = haxapp.app.importworkspace.getImportCallback(this,haxapp.app.FolderFunctionComponent.generator);
+    menu.addCallbackMenuItem("Import as Folder Function",saveCallback);
+    
+    
     var closeCallback = haxapp.app.closeworkspace.getCloseCallback(this);
     menu.addCallbackMenuItem("Close",closeCallback);	
 	

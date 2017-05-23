@@ -46,13 +46,16 @@ haxapp.app.FolderComponent.createComponent = function(workspaceUI,data,component
     json.action = "createMember";
     json.owner = data.parent;
     json.name = data.name;
+    if(data.children) {
+        json.children = data.children;
+    }
     json.type = hax.Folder.generator.type;
     var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
     
     var folder = json.member;
 
     if(folder) {       
-        var folderComponent = new haxapp.app.FolderComponent(workspaceUI,folder,componentOptions);
+        var folderComponent = haxapp.app.FolderComponent.createComponentFromJson(workspaceUI,folder,componentOptions);
         actionResponse.component = folderComponent;
     }
     return actionResponse;
@@ -80,3 +83,15 @@ haxapp.app.FolderComponent.generator.createComponentFromJson = haxapp.app.Folder
 haxapp.app.FolderComponent.generator.DEFAULT_WIDTH = 500;
 haxapp.app.FolderComponent.generator.DEFAULT_HEIGHT = 500;
 haxapp.app.FolderComponent.generator.ICON_RES_PATH = "/folderIcon.png";
+
+haxapp.app.FolderComponent.generator.propertyDialogLines = [
+    {
+        "type":"invisible",
+        "resultKey":"children"
+    }
+];
+
+//if we want to allow importing a workspace as this object, we must add this method to the generator
+haxapp.app.FolderComponent.generator.appendWorkspaceChildren = function(optionsJson,childrenJson) {
+    optionsJson.children = childrenJson;
+}
