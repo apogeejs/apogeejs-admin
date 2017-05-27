@@ -68,3 +68,55 @@ hax.util.readQueryField = function(field,url) {
     var string = reg.exec(href);
     return string ? string[1] : null;
 }
+
+/** This method returns a copied json that has the order in all object normalized to alphabetical. 
+ * This is intended for the purpose of comparing json objects. */
+hax.util.getNormalizedCopy = function(json) {
+    var copiedJson;
+
+    var objectType = hax.util.getObjectType(json);
+    
+    switch(objectType) {
+        case "Object":
+            copiedJson = hax.util.getNormalizedObjectCopy(json);
+            break;
+            
+        case "Array": 
+            copiedJson = hax.util.getNormalizedArrayCopy(json);
+            break;
+            
+        default:
+            copiedJson = json;
+    }
+    
+    return copiedJson;
+}
+
+/** this orders the keys apphabetically, since order is not important in a json object */
+hax.util.getNormalizedObjectCopy = function(json) {
+    var copiedJson = {};
+    
+    var keys = [];
+    var key;
+    for(key in json) {
+        keys.push(key);
+    }
+    
+    keys.sort();
+    
+    for(var i = 0; i < keys.length; i++) {
+        key = keys[i];
+        copiedJson[key] = hax.util.getNormalizedCopy(json[key]);
+    }
+    return copiedJson;
+}
+
+/** This makes a copy of with any contained objects normalized. */
+hax.util.getNormalizedArrayCopy = function(json) {
+    var copiedJson = [];
+    for(var i = 0; i < json.length; i++) {
+        var element = json[i];
+        copiedJson.push(hax.util.getNormalizedCopy(element));
+    }
+    return copiedJson;
+}
