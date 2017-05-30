@@ -17,8 +17,7 @@ ButtonResource = function() {
 /** setFrame - required method for resource processor used in Basic Resource Control. */
 ButtonResource.prototype.setComponent = function(component) {
     this.component = component;
-    var contentElement = this.component.getOutputElement();
-    contentElement.appendChild(this.button);
+    this.component.memberUpdated();
 }
 
 ButtonResource.prototype.init = function(title,callback) {
@@ -28,7 +27,8 @@ ButtonResource.prototype.init = function(title,callback) {
 
 /** This is the method users will call to initialize the chart. */
 ButtonResource.prototype.show = function() {  
-  
+    var outputElement = this.component.getOutputElement();
+    outputElement.appendChild(this.button);
 }
 
 ButtonResource.prototype.hide = function() {  
