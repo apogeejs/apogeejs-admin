@@ -256,8 +256,20 @@ haxapp.ui.WindowFrame.prototype.getPosInfo = function() {
 }
 
 /** This method gets the location and size info for the window. */
+haxapp.ui.WindowFrame.prototype.setPosInfo = function(posInfo) {
+    this.posInfo = posInfo;
+    this.updateCoordinates();
+}
+
+/** This method gets the location and size info for the window. */
 haxapp.ui.WindowFrame.prototype.getSizeInfo = function() {
     return this.sizeInfo;
+}
+
+/** This method gets the location and size info for the window. */
+haxapp.ui.WindowFrame.prototype.setSizeInfo = function(sizeInfo) {
+    this.sizeInfo = sizeInfo;
+    this.updateCoordinates();
 }
 
 /** This method sets the location and size info for the window at the same time. */

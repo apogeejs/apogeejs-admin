@@ -107,6 +107,26 @@ haxapp.app.EditWindowComponentDisplay.prototype.getStateJson = function() {
     else return undefined;
 }
 
+/** This gets the current window state, to reconstruct the view. */
+haxapp.app.EditWindowComponentDisplay.prototype.setStateJson = function(json) {
+    
+    if(this.windowFrame) {
+        if(json.sizeInfo) {
+            this.windowFrame.setSizeInfo(json.sizeInfo);
+        }
+        if(json.posInfo) {
+            this.windowFrame.setPosInfo(json.posInfo);
+        }
+        if(json.state) {
+            this.windowFrame.setWindowState(json.state);
+        }
+    }
+    
+    if(json.viewType) {
+        this.viewType = json.viewType;
+    }
+}
+
 //===============================
 // Private Functions
 //===============================

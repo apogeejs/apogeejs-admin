@@ -14,6 +14,7 @@ haxapp.app.Component = function(workspaceUI,object,generator,options) {
     this.workspaceUI.registerMember(this.object,this);
 
     this.windowDisplay = null;
+    this.windowDisplayStateJson = this.options.windowState;
     
     //inheriting objects can pass functions here to be called on cleanup, save, etc
     this.saveActions = [];
@@ -75,12 +76,8 @@ haxapp.app.Component.prototype.getTreeEntry = function() {
     return this.treeDisplay.getTreeEntry();
 }
 
-haxapp.app.Component.prototype.createWindowDisplay = function() {
-    if(this.windowDisplay == null) {
-        this.windowDisplay = new haxapp.app.EditWindowComponentDisplay(this,this.options.windowState);
-    }
-    return this.windowDisplay;
-}
+//implement
+//haxapp.app.Component.prototype.createWindowDisplay = function();
 
 haxapp.app.Component.prototype.closeWindowDisplay = function() {
     if(this.windowDisplay) {

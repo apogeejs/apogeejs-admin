@@ -10,7 +10,10 @@ haxapp.app.EditComponent.prototype.constructor = haxapp.app.EditComponent;
 
 haxapp.app.EditComponent.prototype.createWindowDisplay = function() {
     if(this.windowDisplay == null) {
-        this.windowDisplay = new haxapp.app.EditWindowComponentDisplay(this,this.options.windowState);
+        this.windowDisplay = new haxapp.app.EditWindowComponentDisplay(this,this.windowDisplayStateJson);
+    }
+    else if(this.windowStateJson) {
+        this.windowDisplay.setStateJson(this.windowStateJson);
     }
     return this.windowDisplay;
 }
