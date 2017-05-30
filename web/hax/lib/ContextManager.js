@@ -23,12 +23,12 @@ hax.ContextManager.prototype.clearContextList = function() {
     this.contextList = [];
 }
 
-hax.ContextManager.prototype.getBaseData = function(baseName,generation) {
-    return this.hierarchicalLookup("lookupData",baseName,generation);
+hax.ContextManager.prototype.getBaseData = function(baseName) {
+    return this.hierarchicalLookup("lookupData",baseName);
 }
 
-hax.ContextManager.prototype.getImpactor = function(path,generation) {
-    return this.hierarchicalLookup("lookupImpactor",path,generation);
+hax.ContextManager.prototype.getImpactor = function(path) {
+    return this.hierarchicalLookup("lookupImpactor",path);
 }
 
 //==================================
