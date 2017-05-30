@@ -30,6 +30,13 @@
     margin-left: 15px;
     padding: 0;
 }
+.visiui-tc-root {
+    white-space: nowrap;
+    
+    margin: 0;
+    padding: 0px;
+    line-height: 20px;
+}
 .visiui-tc-child {
     white-space: nowrap;
     

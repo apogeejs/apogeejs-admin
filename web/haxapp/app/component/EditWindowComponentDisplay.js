@@ -284,7 +284,7 @@ haxapp.app.EditWindowComponentDisplay.prototype._populateMenu = function() {
     
     //initialize the "clear function" menu entry, used only when there is code
     var settings = this.component.getTableEditSettings();
-    this.doClearFunction = (settings.clearFunctionMenyText !== undefined);
+    this.doClearFunction = (settings.clearFunctionMenuText !== undefined);
 	this.clearFunctionMenuText = settings.clearFunctionMenuText;
     this.clearFunctionDataValue = settings.emptyDataValue;
 	this.clearFunctionActive = false;
@@ -299,7 +299,7 @@ haxapp.app.EditWindowComponentDisplay.prototype._updateClearFunctionMenuItem = f
 	if(this.doClearFunction) {
 		if(this.object.hasCode()) {
 			if(!this.clearFunctionActive) {
-				var menu = this.getWindow().getMenu();
+				var menu = this.windowFrame.getMenu();
 				
 				if(!this.clearFunctionCallback) {
 					this.clearFunctionCallback = this._getClearFunctionCallback();
@@ -311,7 +311,7 @@ haxapp.app.EditWindowComponentDisplay.prototype._updateClearFunctionMenuItem = f
 		}
 		else {
 			if(this.clearFunctionActive) {
-				var menu = this.getWindow().getMenu();
+				var menu = this.windowFrame.getMenu();
 				menu.removeMenuItem(this.clearFunctionMenuText);
 				this.clearFunctionActive = false;
 			}
@@ -320,10 +320,13 @@ haxapp.app.EditWindowComponentDisplay.prototype._updateClearFunctionMenuItem = f
 }
 
 haxapp.app.EditWindowComponentDisplay.prototype._getClearFunctionCallback = function() {
-	var table = this.getObject();
-	var blankDataValue = this.clearFunctionDataValue;
+    var actionData = {};
+    actionData.member = this.object;
+    actionData.data = this.clearFunctionDataValue;
+    actionData.action = hax.updatemember.UPDATE_DATA_ACTION_NAME
+    var workspace = this.object.getWorkspace();
     return function() {
-        var actionResponse = hax.updatemember.updateData(table,blankDataValue); 
+        var actionResponse = hax.action.doAction(workspace,actionData); 
         if(!actionResponse.getSuccess()) {
             alert(actionResponse.getErrorMsg());
         }
