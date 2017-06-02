@@ -1,13 +1,21 @@
 
 if(!haxapp.ui.treecontrol) haxapp.ui.treecontrol = {};
 
-haxapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback,contextMenuCallback) {
+haxapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback,contextMenuCallback,isRoot) {
     
     this.contractUrl = haxapp.ui.getResourcePath("/contractPlus2.png");
     this.expandUrl = haxapp.ui.getResourcePath("/expandPlus2.png");
     this.noControlUrl = haxapp.ui.getResourcePath("/nothingPlus2.png");
     
-    this.element = haxapp.ui.createElementWithClass("li", "visiui-tc-child");
+    var baseCssClass;
+    if(isRoot) {
+        baseCssClass = "visiui-tc-root";
+    }
+    else {
+        baseCssClass = "visiui-tc-child";
+    }
+    
+    this.element = haxapp.ui.createElementWithClass("li", baseCssClass);
     this.control = haxapp.ui.createElementWithClass("img", "visiui-tc-control",this.element);
     this.icon = haxapp.ui.createElementWithClass("img", "visiui-tc-icon",this.element);
     this.label = haxapp.ui.createElementWithClass("div", "visiui-tc-label",this.element);
@@ -36,6 +44,8 @@ haxapp.ui.treecontrol.NO_CONTROL = 0;
 haxapp.ui.treecontrol.EXPANDED = 1;
 haxapp.ui.treecontrol.COLLAPSED = -1;
 
+haxapp.ui.treecontrol.DEFAULT_STATE = haxapp.ui.treecontrol.COLLAPSED;
+
 /** The outer DOM element */
 haxapp.ui.treecontrol.TreeEntry.prototype.getElement = function() {
     return this.element;
@@ -50,7 +60,7 @@ haxapp.ui.treecontrol.TreeEntry.prototype.addChild = function(identifier,childTr
     if(!this.childList) {
         //add the child list if it does not exist
         this.childList = haxapp.ui.createElementWithClass("ul","visiui-tc-child-list",this.element); 
-        this.setState(haxapp.ui.treecontrol.EXPANDED);
+        this.setState(haxapp.ui.treecontrol.DEFAULT_STATE);
     }
     this.childMap[identifier] = childTreeEntry;
     this.childList.appendChild(childTreeEntry.getElement());

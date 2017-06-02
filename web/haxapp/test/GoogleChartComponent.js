@@ -136,6 +136,7 @@ GoogleChartComponent.generator.createComponent = GoogleChartComponent.createComp
 GoogleChartComponent.generator.createComponentFromJson = GoogleChartComponent.createComponentFromJson;
 GoogleChartComponent.generator.DEFAULT_WIDTH = 500;
 GoogleChartComponent.generator.DEFAULT_HEIGHT = 500;
+GoogleChartComponent.generator.ICON_RES_PATH = "/controlIcon.png";
 
 
 //auto registration

@@ -12,6 +12,8 @@ haxapp.app.WorkspaceUI = function() {
    
     this.jsLinkArray = [];
     this.cssLinkArray = [];
+    
+    this.workspaceTreeEntry = null;
 }
 
 haxapp.app.WorkspaceUI.MAIN_WORKSPACE_NAME = "main workspace";
@@ -45,8 +47,12 @@ haxapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, componentsJs
     }
     
     //add the root tree entyr to the panel
-    var rootTreeEntry = rootFolderComponent.getTreeEntry();
-    this.tree.setRootEntry(rootTreeEntry);
+    this.createWorkspaceTreeEntry();
+    
+    var rootFolderTreeEntry = rootFolderComponent.getTreeEntry();
+    this.workspaceTreeEntry.addChild(rootFolder.getId(),rootFolderTreeEntry);
+    //Set the root entry as expanded. Others parents will be default (collapsed)
+    this.workspaceTreeEntry.setState(haxapp.ui.treecontrol.EXPANDED);
     
     //listeners
     var instance = this;
@@ -104,22 +110,6 @@ haxapp.app.WorkspaceUI.prototype.getFolders = function() {
     return folders;
 }
 
-//haxapp.app.WorkspaceUI.prototype.getParentContainerObject = function(object) {
-//    var parent = object.getParent();
-//    if(parent) {
-//        var parentComponent = this.getComponent(parent);
-//        //I SHOULD DO A BETTER CHECK TO MAKE SURE THIS IS A PARENT COMPONENT
-//        if(!parentComponent.getContainerElement) {
-//            throw hax.base.createError("Parent container not found!");
-//        }
-//        return parentComponent;
-//    }
-//    else {
-//        //root of workspace! - TEMPORARY
-//        return this.tab;
-//    }
-//}
-
 /** This method registers a member data object and its associated component object.
  * If the member is not the main member assoicated with component but instead an included
  * member, the main componentMember should be passed in also. Otherwise it should be left 
@@ -147,19 +137,6 @@ haxapp.app.WorkspaceUI.prototype.registerMember = function(member,component,main
     this.componentMap[memberId] = componentInfo;
     
 }
-
-///** This method sets the parent for the given component. */
-//haxapp.app.WorkspaceUI.prototype.addComponentContainer = function(object,parentContainer) {
-//    
-//    //store the ui object
-//	
-//    var componentInfo = this.componentMap[object.getId()];
-//    if(!componentInfo) {
-//		alert("Unknown error - component info not found: " + key);
-//		return;
-//	}
-//	componentInfo.parentContainer = parentContainer;
-//}
 	
 
 /** This method responds to a member updated. */
@@ -217,6 +194,16 @@ haxapp.app.WorkspaceUI.prototype.requestTab = function(id,makeActive) {
     return tab;
 }
 
+haxapp.app.WorkspaceUI.prototype.createWorkspaceTreeEntry = function() {
+    
+    //get this from somewhere better
+    var iconSrc = haxapp.ui.getResourcePath("/genericIcon.png");
+   
+    var dblClickCallback = null;
+    var contextMenuCallback = null;
+    this.workspaceTreeEntry = new haxapp.ui.treecontrol.TreeEntry("Workspace",iconSrc,dblClickCallback,contextMenuCallback,true);
+    this.tree.setRootEntry(this.workspaceTreeEntry);
+}
 //====================================
 // open and save methods
 //====================================

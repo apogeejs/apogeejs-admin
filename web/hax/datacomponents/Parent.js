@@ -99,30 +99,12 @@ hax.Parent.createContextManager = function() {
 //------------------------------
 
 /** This method returns the full name in dot notation for this object. */
-hax.Parent.getFullName = function() {
-    if(this.isRoot()) {
-        return this.owner.getPossesionNameBase() + hax.Parent.ROOT_NAME;
-    }
-    else {
-        //this shouldn't happen
-        return hax.Child.getFullName.call(this);
-    }
-}
+//hax.Parent.getFullName = function() {
+//    return hax.Child.getFullName.call(this);
+//}
 
 /** this method gets the hame the children inherit for the full name. */
 hax.Parent.getPossesionNameBase = function() {
-    if(this.isRoot()) {
-        //we don't want to include the root name in the object full name
-        if(this.owner) {
-            return this.owner.getPossesionNameBase();
-        }
-        else {
-            //this shouldn't happen
-            return this.getName() + ".";
-        }
-    }
-    else {
-        return this.getFullName() + ".";
-    }
+    return this.getFullName() + ".";
 }
 

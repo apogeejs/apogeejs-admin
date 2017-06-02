@@ -12,7 +12,7 @@ haxapp.app.ParentComponent.prototype.constructor = haxapp.app.ParentComponent;
 
 haxapp.app.ParentComponent.prototype.createWindowDisplay = function() {
     if(this.windowDisplay == null) {
-        this.windowDisplay = new haxapp.app.ParentWindowComponentDisplay(this,this.options.windowState);
+        this.windowDisplay = new haxapp.app.ParentWindowComponentDisplay(this,this.windowDisplayStateJson);
     }
     return this.windowDisplay;
 }
