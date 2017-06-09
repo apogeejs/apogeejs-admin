@@ -34,6 +34,15 @@ haxapp.app.ResourceOutputMode.prototype.showData = function() {
     }   
 }
 
+//TEMP!!!
+haxapp.app.ResourceOutputMode.prototype.shown = function() {
+	
+    var resource = this.member.getResource();
+    if((resource)&&(resource.shown)) {
+        resource.shown();
+    }   
+}
+
 /** Override this to properly update the control. */
 haxapp.app.ViewMode.prototype.memberUpdated = function() {
     this.showData();
