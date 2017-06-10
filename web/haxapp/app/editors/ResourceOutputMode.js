@@ -17,9 +17,6 @@ haxapp.app.ResourceOutputMode = function(componentDisplay) {
 haxapp.app.ResourceOutputMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.ResourceOutputMode.prototype.constructor = haxapp.app.ResourceOutputMode;
 
-haxapp.app.AceTextMode.prototype.createEditor = function() {
-    throw new Error("Implement control resource output mode");
-}
 
 haxapp.app.ResourceOutputMode.prototype.getElement = function() {
 	return this.outputElement;
@@ -35,7 +32,7 @@ haxapp.app.ResourceOutputMode.prototype.showData = function() {
 }
 
 //TEMP!!!
-haxapp.app.ResourceOutputMode.prototype.shown = function() {
+haxapp.app.ResourceOutputMode.prototype.dataShown = function() {
 	
     var resource = this.member.getResource();
     if((resource)&&(resource.shown)) {
@@ -53,13 +50,5 @@ haxapp.app.ResourceOutputMode.prototype.destroy = function() {
     if((resource)&&(resource.hide)) {
         resource.hide();
     }
-}
-
-//==============================
-// internal
-//==============================
-
-haxapp.app.ResourceOutputMode.prototype.onSave = function(data) {
-	//no saving action
 }
 

@@ -20,8 +20,12 @@ haxapp.app.ViewMode.CLOSE_OK = 0;
 //------------------------------
 
 //Implement in extending classes
-///** This is called to show the editor window. */
+///** This is called immediately before the display element is shown. */
 //haxapp.app.ViewMode.prototype.showData = function();
+
+//Implement in extending classes - OPTIONAL
+///** This is called immediately after the display element is shown. This method may be omitted. */
+//haxapp.app.ViewMode.prototype.dataShown = function();
 
 /** This method is called before the view mode is hidden. It should
  * return true or false. */
@@ -66,10 +70,10 @@ haxapp.app.ViewMode.prototype.destroy = function() {
 }
 
 //------------------------------
-// Accessed by the Editor
+// Accessed by the Editor, if applicable
 //------------------------------
 
-//implement this in extending class
+//implement this in extending class if needed by an editor
 //haxapp.app.ViewMode.prototype.onSave = function(ARGUMENT TYPE DEPENDS ON EDITOR) {
 //    
 //}
@@ -95,8 +99,10 @@ haxapp.app.ViewMode.prototype.endEditMode = function() {
 // Protected
 //------------------------------
 
-/** This method returns whether or not the given member has editable data.
- *  The data is not editable if there is code. */ 
+/** This is a convenience method that can be used by data objects.
+ * It returns whether or not the given member has editable data.
+ *  The data is not editable if there is code. A general view mode may
+ *  not use this method, but use a hard code value internally instead.*/ 
 haxapp.app.ViewMode.prototype.getIsDataEditable = function() {
     return !(this.member.hasCode());
 }
