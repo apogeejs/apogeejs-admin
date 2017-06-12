@@ -158,13 +158,23 @@ hax.Workspace.SAVE_FILE_TYPE = "hax workspace";
 /** This is the supported file version. */
 hax.Workspace.SAVE_FILE_VERSION = 0.2;
 
-hax.Workspace.prototype.toJson = function() {
+/** This saves the workspace. It the optionalSavedRootFolder is passed in,
+ * it will save a workspace with that as the root folder. */
+hax.Workspace.prototype.toJson = function(optionalSavedRootFolder) {
     var json = {};
     json.fileType = hax.Workspace.SAVE_FILE_TYPE;
     json.version = hax.Workspace.SAVE_FILE_VERSION;
     
+    var rootFolder;
+    if(optionalSavedRootFolder) {
+        rootFolder = optionalSavedRootFolder;
+    }
+    else {
+        rootFolder = this.rootFolder;
+    }
+    
     //components
-    json.data = this.rootFolder.toJson();
+    json.data = rootFolder.toJson();
     
     return json;
 }

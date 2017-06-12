@@ -208,16 +208,25 @@ haxapp.app.WorkspaceUI.prototype.createWorkspaceTreeEntry = function() {
 // open and save methods
 //====================================
 
-haxapp.app.WorkspaceUI.prototype.toJson = function() {
+/** This saves the workspace. It the optionalSavedRootFolder is passed in,
+ * it will save a workspace with that as the root folder. */
+haxapp.app.WorkspaceUI.prototype.toJson = function(optionalSavedRootFolder) {
     var json = {};
     json.fileType = "hax workspace";
     
     json.jsLinks = this.jsLinkArray;
     json.cssLinks = this.cssLinkArray;
     
-    json.workspace = this.workspace.toJson();
+    json.workspace = this.workspace.toJson(optionalSavedRootFolder);
     
-    var rootFolder = this.workspace.getRoot();
+    var rootFolder;
+    if(optionalSavedRootFolder) {
+        rootFolder = optionalSavedRootFolder;
+    }
+    else {
+        rootFolder = this.rootFolder;
+    }
+    
     json.components = this.getFolderComponentContentJson(rootFolder);
     
     return json;

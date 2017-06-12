@@ -252,13 +252,6 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
     var saveCallback = haxapp.app.saveworkspace.getSaveCallback(this);
     menu.addCallbackMenuItem("Save",saveCallback);
     
-    var saveCallback = haxapp.app.importworkspace.getImportCallback(this,haxapp.app.FolderComponent.generator);
-    menu.addCallbackMenuItem("Import as Folder",saveCallback);
-    
-    var saveCallback = haxapp.app.importworkspace.getImportCallback(this,haxapp.app.FolderFunctionComponent.generator);
-    menu.addCallbackMenuItem("Import as Folder Function",saveCallback);
-    
-    
     var closeCallback = haxapp.app.closeworkspace.getCloseCallback(this);
     menu.addCallbackMenuItem("Close",closeCallback);	
 	
@@ -279,6 +272,15 @@ haxapp.app.Hax.prototype.createMenuBar = function() {
     
     var linksCallback = haxapp.app.updatelinks.getUpdateLinksCallback(this);
     menu.addCallbackMenuItem("Update Links",linksCallback);
+    
+    var importCallback = haxapp.app.importworkspace.getImportCallback(this,haxapp.app.FolderComponent.generator);
+    menu.addCallbackMenuItem("Import as Folder",importCallback);
+    
+    var import2Callback = haxapp.app.importworkspace.getImportCallback(this,haxapp.app.FolderFunctionComponent.generator);
+    menu.addCallbackMenuItem("Import as Folder Function",import2Callback);
+    
+    var exportCallback = haxapp.app.exportworkspace.getExportCallback(this);
+    menu.addCallbackMenuItem("Export as Workspace",exportCallback);
     
     //allow the implementation to add more menus or menu items
     if(this.addToMenuBar) {
