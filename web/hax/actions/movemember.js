@@ -13,7 +13,7 @@ hax.movemember = {};
 hax.movemember.ACTION_NAME = "moveMember";
 
 /** Move member action function */
-hax.movemember.moveMember = function(actionData,processedActions) {
+hax.movemember.moveMember = function(actionData,optionalContext,processedActions) {
         
     var member = actionData.member;
         

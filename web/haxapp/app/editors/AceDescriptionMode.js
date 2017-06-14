@@ -40,7 +40,7 @@ haxapp.app.AceDescriptionMode.prototype.onSave = function(text) {
     actionData.action = "updateDescription";
     actionData.member = this.member;
     actionData.description = text;
-	var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
+	var actionResponse =  hax.action.doAction(actionData);
 	
 	return true;
 }

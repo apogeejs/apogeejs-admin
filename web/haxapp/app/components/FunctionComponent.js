@@ -74,7 +74,7 @@ haxapp.app.FunctionComponent.createComponent = function(workspaceUI,data,compone
         json.updateData.argList = argList;
     }
     json.type = hax.FunctionTable.generator.type;
-    var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
+    var actionResponse = hax.action.doAction(json);
     
     var functionObject = json.member;
     if(functionObject) {

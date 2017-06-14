@@ -47,7 +47,7 @@ haxapp.app.AceCodeMode.prototype.onSave = function(text) {
         actionData.supplementalCode = this.member.getSupplementalCode();  
 	}
     
-    var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
+    var actionResponse =  hax.action.doAction(actionData);
         
 	return true;  
 }

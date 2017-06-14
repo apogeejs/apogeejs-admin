@@ -168,9 +168,25 @@ hax.Child.getResultPending = function() {
     return this.resultPending;
 }
 
-/** This sets the result pending flag. */
-hax.Child.setResultPending = function(isPending) {
+/** This sets the result pending flag. If is pending is set to true a
+ * pending token must be set. (from hax.action.getPendingToken) This 
+ * is used to ensure only the latest asynchronous action is kept. */
+hax.Child.setResultPending = function(isPending,pendingToken) {
     this.resultPending = isPending;
+    this.pendingToken = pendingToken;
+}
+
+/** This returns true if the pending token matches. */
+hax.Child.pendingTokenMatches = function(pendingToken) {
+    return (this.pendingToken === pendingToken);
+}
+
+hax.Child.getSetDataOk = function() {
+    return this.generator.setDataOk;
+}
+
+hax.Child.getSetCodeOk = function() {
+    return this.generator.setCodeOk;
 }
 
 /** This method writes the child to a json. */

@@ -21,7 +21,7 @@ hax.deletemember.ACTION_NAME = "deleteMember";
 hax.deletemember.MEMBER_DELETED_EVENT = "memberDeleted";
 
 /** Delete member action function */
-hax.deletemember.deleteMember = function(actionData,processedActions) {
+hax.deletemember.deleteMember = function(actionData,optionalContext,processedActions) {
 
     var deleteList = [];
 

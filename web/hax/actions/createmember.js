@@ -25,7 +25,7 @@ hax.createmember.MEMBER_CREATED_EVENT = "memberCreated";
 
 /** This method instantiates a member, without setting the update data. 
  *@private */
-hax.createmember.createMember = function(actionData,processedActions) {
+hax.createmember.createMember = function(actionData,optionalContext,processedActions) {
     
     //create member
     var generator = hax.Workspace.getMemberGenerator(actionData.type);
@@ -51,7 +51,7 @@ hax.createmember.createMember = function(actionData,processedActions) {
         childJson.action = "createMember";
         childJson.actionInfo = actionData.actionInfo; //assume parent action is alsl createMember!
         childJson.owner = member;
-        hax.createmember.createMember(childJson,processedActions);
+        hax.createmember.createMember(childJson,optionalContext,processedActions);
     }
     
     return member;

@@ -85,7 +85,7 @@ haxapp.app.JsonTableComponent.createComponent = function(workspaceUI,data,compon
     json.owner = data.parent;
     json.name = data.name;
     json.type = hax.JsonTable.generator.type;
-    var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
+    var actionResponse = hax.action.doAction(json);
     
     var table = json.member;
     if(table) {

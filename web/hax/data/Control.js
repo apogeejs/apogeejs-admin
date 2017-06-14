@@ -82,6 +82,8 @@ hax.Control.generator = {};
 hax.Control.generator.displayName = "Control";
 hax.Control.generator.type = "hax.Control";
 hax.Control.generator.createMember = hax.Control.fromJson;
+hax.Control.generator.setDataOk = false;
+hax.Control.generator.setCodeOk = true;
 
 //register this member
 hax.Workspace.addMemberGenerator(hax.Control.generator);

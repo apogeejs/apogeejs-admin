@@ -224,7 +224,7 @@ haxapp.app.WorkspaceUI.prototype.toJson = function(optionalSavedRootFolder) {
         rootFolder = optionalSavedRootFolder;
     }
     else {
-        rootFolder = this.rootFolder;
+        rootFolder = this.workspace.getRoot();
     }
     
     json.components = this.getFolderComponentContentJson(rootFolder);

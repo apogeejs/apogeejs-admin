@@ -15,7 +15,7 @@ hax.updatefolderfunction = {};
 hax.updatefolderfunction.ACTION_NAME = "updateFolderFunction";
 
 /** Update folder function action function */
-hax.updatefolderfunction.updateProperties = function(actionData,processedActions) { 
+hax.updatefolderfunction.updateProperties = function(actionData,optionalContext,processedActions) { 
           
     var folderFunction = actionData.member;
     

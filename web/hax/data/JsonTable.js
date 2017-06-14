@@ -74,26 +74,34 @@ hax.JsonTable.prototype.processMemberFunction = function(memberFunction) {
     
     //if the return value is a Promise, the data is asynch
     if(hax.base.isPromise(data)) {
-        //result is asynchronous - provide a funtion to pass the result
-        var member = this;
+        //result is asynchronous!
+
+        //set pending manually here rather than doing below in a separate action
+        var token = hax.action.getAsynchToken();
+        this.setResultPending(true,token);
+        
+        var instance = this;
+       
         var asynchCallback = function(memberValue) {
             //set the data for the table, along with triggering updates on dependent tables.
             var actionData = {};
-            actionData.action = "asynchUpdateData";
-            actionData.member = member;
+            actionData.action = "asynchFormulaData";
+            actionData.member = instance;
+            actionData.token = token;
             actionData.data = memberValue;
-            var actionResponse =  hax.action.doAction(member.getWorkspace(),actionData);
+            var actionResponse =  hax.action.doAction(actionData);
         }
         var asynchErrorCallback = function(errorMsg) {
             var actionData = {};
-            actionData.action = "asynchUpdateError";
-            actionData.member = member;
+            actionData.action = "updateError";
+            actionData.member = instance;
+            actionData.token = token;
             actionData.errorMsg = errorMsg;
-            var actionResponse =  hax.action.doAction(member.getWorkspace(),actionData);
+            var actionResponse =  hax.action.doAction(actionData);
         }
-        this.setResultPending(true);
-        
-        data.then(asynchCallback).catch(asynchErrorCallback);    
+
+        //call appropriate action when the promise resolves.
+        data.then(asynchCallback).catch(asynchErrorCallback);
     }
     else {
         //result is synchronous
@@ -119,6 +127,8 @@ hax.JsonTable.generator = {};
 hax.JsonTable.generator.displayName = "Table";
 hax.JsonTable.generator.type = "hax.JsonTable";
 hax.JsonTable.generator.createMember = hax.JsonTable.fromJson;
+hax.JsonTable.generator.setDataOk = true;
+hax.JsonTable.generator.setCodeOk = true;
 
 //register this member
 hax.Workspace.addMemberGenerator(hax.JsonTable.generator);

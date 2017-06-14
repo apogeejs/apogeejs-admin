@@ -209,6 +209,8 @@ hax.Folder.generator = {};
 hax.Folder.generator.displayName = "Folder";
 hax.Folder.generator.type = "hax.Folder";
 hax.Folder.generator.createMember = hax.Folder.fromJson;
+hax.Folder.generator.setDataOk = false;
+hax.Folder.generator.setCodeOk = false;
 
 //register this member
 hax.Workspace.addMemberGenerator(hax.Folder.generator);

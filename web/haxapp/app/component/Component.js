@@ -271,7 +271,7 @@ haxapp.app.Component.prototype.createDeleteCallback = function() {
         var json = {};
         json.action = "deleteMember";
         json.member = object;
-        var actionResponse = hax.action.doAction(object.getWorkspace(),json);
+        var actionResponse = hax.action.doAction(json);
 
         if(!actionResponse.getSuccess()) {
             //show an error message

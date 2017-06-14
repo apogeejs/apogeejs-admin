@@ -34,7 +34,7 @@ haxapp.app.AceTextMode.prototype.onSave = function(text) {
     actionData.action = "updateData";
     actionData.member = this.member;
     actionData.data = text;
-	var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
+	var actionResponse =  hax.action.doAction(actionData);
 	
 	return true;
 }

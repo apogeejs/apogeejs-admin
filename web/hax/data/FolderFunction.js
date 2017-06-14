@@ -94,7 +94,7 @@ hax.FolderFunction.prototype.onDelete = function() {
         var json = {};
         json.action = "deleteMember";
         json.member = this.internalFolder;
-        var actionResponse = hax.action.doAction(this.getWorkspace(),json);
+        var actionResponse = hax.action.doAction(json);
         if(!actionResponse.getSuccess()) {
             //show an error message
             var msg = actionResponse.getErrorMsg();
@@ -307,9 +307,10 @@ hax.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunction
         var actionData = {};
         actionData.action = "compoundAction";
         actionData.actions = updateActionList;
+        actionData.workspace = virtualWorkspace;
 
         //apply the update
-        var actionResponse = hax.action.doAction(virtualWorkspace,actionData);        
+        var actionResponse = hax.action.doAction(actionData);        
         if(actionResponse.getSuccess()) {
             //retrieve the result
             if(returnValueTable) {
@@ -386,6 +387,8 @@ hax.FolderFunction.generator.type = "hax.FolderFunction";
 hax.FolderFunction.generator.createMember = hax.FolderFunction.fromJson;
 hax.FolderFunction.generator.addPropFunction = hax.FolderFunction.addPropValues;
 hax.FolderFunction.generator.getPropertyUpdateAction = hax.FolderFunction.getPropertyUpdateAction;
+hax.FolderFunction.generator.setDataOk = false;
+hax.FolderFunction.generator.setCodeOk = false;
 
 //register this member
 hax.Workspace.addMemberGenerator(hax.FolderFunction.generator);

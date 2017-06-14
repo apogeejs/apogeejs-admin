@@ -81,7 +81,7 @@ haxapp.app.GridTableComponent.createComponent = function(workspaceUI,data,compon
     json.type = hax.JsonTable.generator.type;
 	json.updateData = {};
 	json.updateData.data = [[""]]; //empty single cell
-    var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
+    var actionResponse = hax.action.doAction(json);
     
     var table = json.member;
     if(table) {

@@ -61,7 +61,7 @@ haxapp.app.FolderFunctionComponent.createComponent = function(workspaceUI,data,c
         json.internalFolder = data.internalFolder;
     }
     json.type = hax.FolderFunction.generator.type;
-    var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
+    var actionResponse = hax.action.doAction(json);
     
     var folderFunction = json.member;
     if(actionResponse.getSuccess()) {

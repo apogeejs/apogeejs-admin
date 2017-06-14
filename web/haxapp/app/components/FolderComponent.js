@@ -50,7 +50,7 @@ haxapp.app.FolderComponent.createComponent = function(workspaceUI,data,component
         json.children = data.children;
     }
     json.type = hax.Folder.generator.type;
-    var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
+    var actionResponse = hax.action.doAction(json);
     
     var folder = json.member;
 

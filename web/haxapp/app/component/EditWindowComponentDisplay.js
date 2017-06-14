@@ -349,7 +349,7 @@ haxapp.app.EditWindowComponentDisplay.prototype._getClearFunctionCallback = func
     actionData.action = hax.updatemember.UPDATE_DATA_ACTION_NAME
     var workspace = this.object.getWorkspace();
     return function() {
-        var actionResponse = hax.action.doAction(workspace,actionData); 
+        var actionResponse = hax.action.doAction(actionData); 
         if(!actionResponse.getSuccess()) {
             alert(actionResponse.getErrorMsg());
         }

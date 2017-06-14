@@ -83,7 +83,7 @@ hax.Dependent.initializeImpactors = function() {
         this.createDependencyError(errorDependencies);
     }
     else if(resultPending) {
-        this.setResultPending(true);
+        this.setResultPending(true,hax.action.DEPENDENT_PENDING_TOKEN);
     }
 }
 

@@ -57,7 +57,7 @@ haxapp.app.TextAreaMode.prototype.onSave = function(text) {
     actionData.action = "updateData";
     actionData.member = this.member;
     actionData.data = data;
-	var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
+	var actionResponse =  hax.action.doAction(actionData);
 	
 	return true;
 }

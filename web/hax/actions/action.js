@@ -52,8 +52,34 @@ hax.action = {};
 hax.action.actionInfo = {
 }
 
-/** This method is used to execute an action for the data model. */
-hax.action.doAction = function(workspace,actionData,optionalActionResponse) {
+/** This flag is used to indiciate if an action is in provess. */
+hax.action.actionInProcess = false;
+
+/** This is a queue to hold actions while one is in process. */
+hax.action.actionQueue = [];
+
+/** This method is used to execute an action for the data model. 
+ * The optionalContext is a context manager to convert a member name to a
+ * member, if supported by the action.
+ * The optionalActionResponse allows you to pass an existing actionResponse rather
+ * than creating a new one inside this function as a return value. */
+hax.action.doAction = function(actionData,optionalContext,optionalActionResponse) {
+    
+    if(hax.action.actionInProcess) {
+        var queuedAction = {};
+        queuedAction.actionData = actionData;
+        queuedAction.optionalContext = optionalContext;
+        queuedAction.optionalActionResponse = optionalActionResponse;
+        hax.action.actionQueue.push(queuedAction);
+        
+        //return an empty (successful) action response
+        //we sould have a flag saying the action is pending
+        return new hax.ActionResponse();;
+    }
+    
+    //flag action in progress
+    hax.action.actionInProcess = true;
+    
     var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.ActionResponse();
     
     try {   
@@ -61,7 +87,19 @@ hax.action.doAction = function(workspace,actionData,optionalActionResponse) {
         var processedActions = [];
         
         //do the action
-        hax.action.callActionFunction(actionData,processedActions); 
+        hax.action.callActionFunction(actionData,optionalContext,processedActions); 
+        
+        //read the workspace
+        var workspace;
+        if(actionData.member) {
+            workspace = actionData.member.getWorkspace();
+        }
+        else if(actionData.workspace) {
+            workspace = actionData.workspace;
+        }
+        else {
+            throw new Error("Workspace info missing from action. ");
+        }
         
         //finish processing the action
         var recalculateList = [];
@@ -80,6 +118,15 @@ hax.action.doAction = function(workspace,actionData,optionalActionResponse) {
         actionResponse.addError(actionError);
     }
     
+    hax.action.actionInProcess = false;
+    
+    //trigger any pending actions
+    if(hax.action.actionQueue.length > 0) {
+        var queuedActionData = hax.action.actionQueue[0];
+        hax.action.actionQueue.splice(0,1)
+        hax.action.asynchRunQueuedAction(queuedActionData);
+    }
+    
     //return response
 	return actionResponse;
 }
@@ -90,22 +137,79 @@ hax.action.addActionInfo = function(actionName,actionInfo) {
 }
 
 /** This function looks up the proper function for an action and executes it. */
-hax.action.callActionFunction = function(actionData,processedActions) {
+hax.action.callActionFunction = function(actionData,context,processedActions) {
 
     //do the action
     var actionInfo = hax.action.actionInfo[actionData.action];
     if(actionInfo) {
         actionData.actionInfo = actionInfo;
-        actionInfo.actionFunction(actionData,processedActions);
+        actionInfo.actionFunction(actionData,context,processedActions);
     }
     else {
         actionData.error = new hax.ActionError("Unknown action: " + actionData.action,"AppException",null);
     }  
 }
 
+/** This is a convenience method to set a member to a given value when the dataPromise resolves. */
+hax.action.asynchDataUpdate = function(memberName,context,dataPromise) {
+    
+    var token = hax.action.getAsynchToken();
+        
+    var actionData = {};
+    actionData.action = "updateDataPending";
+    actionData.memberName = memberName;
+    actionData.token = token;
+    var actionResponse =  hax.action.doAction(actionData,context);
+    
+    var asynchCallback = function(memberValue) {
+        //set the data for the table, along with triggering updates on dependent tables.
+        var actionData = {};
+        actionData.action = "updateData";
+        actionData.memberName = memberName;
+        actionData.token = token;
+        actionData.data = memberValue;
+        var actionResponse =  hax.action.doAction(actionData,context);
+    }
+    var asynchErrorCallback = function(errorMsg) {
+        var actionData = {};
+        actionData.action = "updateError";
+        actionData.member = member;
+        actionData.token = token;
+        actionData.errorMsg = errorMsg;
+        var actionResponse =  hax.action.doAction(actionData,context);
+    }
+
+    //call appropriate action when the promise resolves.
+    dataPromise.then(asynchCallback).catch(asynchErrorCallback);
+}
+
+/** This method returns a random numberic token that is used in asynch updates.
+ * It serves two purposes, first to ensure only the _latest_ asyhc update is 
+ * done. Secondly it prevents someone arbitrarily using this method 
+ * without initially setting the pending flag.
+ */
+hax.action.getAsynchToken = function() {
+    return Math.random();
+}
+
+/** This token value should be used if a table is pending because it is waiting for
+ * an update in another table. */
+hax.action.DEPENDENT_PENDING_TOKEN = -1;
+
 //=======================================
 // Internal Methods
 //=======================================
+
+/** This function triggers the action for the queued action to be run when the current thread exits. */
+hax.action.asynchRunQueuedAction = function(queuedActionData) {
+    var callback = function() {
+        hax.action.doAction(queuedActionData.actionData,
+            queuedActionData.optionalContext,
+            queuedActionData.optionalActionResponse);
+    }
+    
+    setTimeout(callback,0);
+}
 
 /** This method makes sure the member dependencies in the workspace are properly updated. */
 hax.action.updateDependencies = function(workspace,processedActions,recalculateList) {

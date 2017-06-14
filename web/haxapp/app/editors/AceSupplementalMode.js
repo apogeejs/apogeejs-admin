@@ -25,7 +25,7 @@ haxapp.app.AceSupplementalMode.prototype.onSave = function(text) {
         actionData.functionBody = this.member.getFunctionBody();
         actionData.supplementalCode = text;  
         
-		var actionResponse =  hax.action.doAction(this.member.getWorkspace(),actionData);
+		var actionResponse =  hax.action.doAction(actionData);
         
 	if(!actionResponse.getSuccess()) {
 		//show an error message

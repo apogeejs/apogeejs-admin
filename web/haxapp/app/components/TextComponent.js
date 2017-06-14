@@ -79,7 +79,7 @@ haxapp.app.TextComponent.createComponent = function(workspaceUI,data,componentOp
     json.type = hax.JsonTable.generator.type;
 	json.updateData = {};
 	json.updateData.data = "";
-    var actionResponse = hax.action.doAction(workspaceUI.getWorkspace(),json);
+    var actionResponse = hax.action.doAction(json);
     
     var table = json.member;
     if(table) {

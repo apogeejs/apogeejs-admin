@@ -100,6 +100,8 @@ hax.FunctionTable.generator.type = "hax.FunctionTable";
 hax.FunctionTable.generator.createMember = hax.FunctionTable.fromJson;
 hax.FunctionTable.generator.addPropFunction = hax.FunctionTable.addPropValues;
 hax.FunctionTable.generator.getPropertyUpdateAction = hax.FunctionTable.getPropertyUpdateAction;
+hax.FunctionTable.generator.setDataOk = false;
+hax.FunctionTable.generator.setCodeOk = true;
 
 //register this member
 hax.Workspace.addMemberGenerator(hax.FunctionTable.generator);
