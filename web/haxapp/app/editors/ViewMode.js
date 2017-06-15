@@ -1,7 +1,9 @@
 /* This is a base class for a view mode. 
- * Note- the editor should be set when extending this class.*/
-haxapp.app.ViewMode = function(componentDisplay) {
+ * If the doKeepAlive flag is set to true the display will be maintained
+ * after it is hidden. Otherwise it id destroyed when hidden. */
+haxapp.app.ViewMode = function(componentDisplay, doKeepAlive) {
     this.componentDisplay = componentDisplay;
+    this.doKeepAlive = doKeepAlive;
     this.component = componentDisplay.getComponent();
     this.member = this.component.getObject();
     
@@ -30,7 +32,11 @@ haxapp.app.ViewMode.prototype.showData = function() {
 
 //Implement in extending classes - OPTIONAL
 ///** This is called immediately after the display element is shown. This method may be omitted. */
-//haxapp.app.ViewMode.prototype.dataShown = function();
+haxapp.app.ViewMode.prototype.dataShown = function() {
+    if(this.dataDisplay.dataShown) {
+        this.dataDisplay.dataShown();
+    }
+}
 
 /** This method is called before the view mode is hidden. It should
  * return true or false. */
@@ -47,10 +53,16 @@ haxapp.app.ViewMode.prototype.requestHide = function() {
 /** This method is caleld when the view mode is hidden. */
 haxapp.app.ViewMode.prototype.hide = function() {
     if(this.dataDisplay) {
-        if(this.dataDisplay.destroy) {
-            this.dataDisplay.destroy();
+        if(this.dataDisplay.hide) {
+            this.dataDisplay.hide();
         }
-        this.dataDisplay = null;
+        //if we do not keep alive, kill the data display
+        if(!this.doKeepAlive) {
+            if(this.dataDisplay.destroy) {
+                this.dataDisplay.destroy();
+            }
+            this.dataDisplay = null;
+        }
     }
 }
 
@@ -71,10 +83,12 @@ haxapp.app.ViewMode.prototype.getElement = function() {
 }
 
 haxapp.app.ViewMode.prototype.destroy = function() {
-    if((this.dataDisplay)&&(this.dataDisplay.destroy)) {
-        this.dataDisplay.destroy();
+    if(this.dataDisplay) {
+        if(this.dataDisplay.destroy) {
+            this.dataDisplay.destroy();
+        }
+        this.dataDisplay = null;
     }
-    this.dataDisplay = null;
 }
 
 //------------------------------
