@@ -90,7 +90,7 @@ haxapp.app.CustomControlComponent.prototype.getViewModeElement = function(editCo
 			return this.outputMode;
 			
 		case haxapp.app.CustomControlComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(editComponentDisplay,false);
+			return new haxapp.app.AceCodeMode(editComponentDisplay);
 			
 		case haxapp.app.CustomControlComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new haxapp.app.AceSupplementalMode(editComponentDisplay);

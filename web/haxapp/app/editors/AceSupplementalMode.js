@@ -6,14 +6,16 @@ haxapp.app.AceSupplementalMode = function(componentDisplay) {
 haxapp.app.AceSupplementalMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.AceSupplementalMode.prototype.constructor = haxapp.app.AceSupplementalMode;
 
-haxapp.app.AceSupplementalMode.prototype.showData = function() {
-		
-	var codeText = this.member.getSupplementalCode();	
-	
-    if(!this.editor) {
-        this.editor = new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
-    }
-	this.editor.showData(codeText,true);
+haxapp.app.AceSupplementalMode.prototype.createDisplay = function() {
+    return new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
+}
+
+haxapp.app.AceSupplementalMode.prototype.getDisplayData = function() {
+    return this.member.getSupplementalCode();;
+}
+
+haxapp.app.AceSupplementalMode.prototype.getIsDataEditable = function() {
+    return true;
 }
 
 haxapp.app.AceSupplementalMode.prototype.onSave = function(text) {	

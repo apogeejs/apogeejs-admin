@@ -1,6 +1,6 @@
 
 haxapp.app.TextAreaMode = function(componentDisplay) {
-	haxapp.app.ViewMode.call(this,componentDisplay,true);	
+	haxapp.app.ViewMode.call(this,componentDisplay);	
 }
 
 haxapp.app.TextAreaMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
@@ -10,8 +10,11 @@ haxapp.app.TextAreaMode.prototype.constructor = haxapp.app.TextAreaMode;
  * @private*/
 haxapp.app.TextAreaMode.formatString = "\t";
 
-haxapp.app.TextAreaMode.prototype.showData = function() {
-		
+haxapp.app.TextAreaMode.prototype.createDisplay = function() {
+    return new haxapp.app.TextAreaEditor(this);
+}
+
+haxapp.app.TextAreaMode.prototype.getDisplayData = function() {
 	var json = this.member.getData();	
 	
 	var textData;
@@ -24,19 +27,16 @@ haxapp.app.TextAreaMode.prototype.showData = function() {
 	else {
 		textData = JSON.stringify(json,null,haxapp.app.TextAreaMode.formatString);
 	}
-	
-    if(!this.editor) {
-        this.editor = new haxapp.app.TextAreaEditor(this);;
-    }
-	this.editor.showData(textData,this.getIsDataEditable());
+    
+    return textData;
 }
 
-//==============================
-// internal
-//==============================
+haxapp.app.TextAreaMode.prototype.getIsDataEditable = function() {
+    //data is editable only if there is no code
+    return !(this.member.hasCode());
+}
 
 haxapp.app.TextAreaMode.prototype.onSave = function(text) {
-	
 	
 	var data;
 	if(text.length > 0) {

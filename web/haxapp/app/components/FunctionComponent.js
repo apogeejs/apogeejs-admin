@@ -42,7 +42,7 @@ haxapp.app.FunctionComponent.prototype.getViewModeElement = function(editCompone
 	switch(viewType) {
 			
 		case haxapp.app.FunctionComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(editComponentDisplay,false);
+			return new haxapp.app.AceCodeMode(editComponentDisplay);
 			
 		case haxapp.app.FunctionComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new haxapp.app.AceSupplementalMode(editComponentDisplay);

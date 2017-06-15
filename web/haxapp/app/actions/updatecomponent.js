@@ -124,7 +124,7 @@ haxapp.app.updatecomponent.updatePropertyValues = function(component,oldValues,n
         actionData = {};
         actionData.action = "compoundAction";
         actionData.actions = actionList;
-        actionData.workspace = workspac;
+        actionData.workspace = workspace;
 
         actionResponse = hax.action.doAction(actionData,actionResponse);
     }

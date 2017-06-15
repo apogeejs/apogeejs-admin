@@ -6,24 +6,23 @@
  * code is set to the empty string. If no action is desired, false or any value that evaluates to
  * false can be sent in.
  */
-haxapp.app.AceCodeMode = function(componentDisplay,optionalOnBlankData,optionalEditorCodeWrapper) {
+haxapp.app.AceCodeMode = function(componentDisplay) {
     haxapp.app.ViewMode.call(this,componentDisplay);
-	
-	this.onBlankData = optionalOnBlankData;
-	this.editorCodeWrapper = optionalEditorCodeWrapper;
 }
 
 haxapp.app.AceCodeMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.AceCodeMode.prototype.constructor = haxapp.app.AceCodeMode;
-	
-haxapp.app.AceCodeMode.prototype.showData = function() {
-		
-	var codeText = this.member.getFunctionBody();
-	
-    if(!this.editor) {
-        this.editor = new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
-    }
-	this.editor.showData(codeText,true);
+
+haxapp.app.AceCodeMode.prototype.createDisplay = function() {
+    return new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
+}
+
+haxapp.app.AceCodeMode.prototype.getDisplayData = function() {
+    return this.member.getFunctionBody();
+}
+
+haxapp.app.AceCodeMode.prototype.getIsDataEditable = function() {
+    return true;
 }
 
 haxapp.app.AceCodeMode.prototype.onSave = function(text) {	

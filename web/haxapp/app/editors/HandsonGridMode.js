@@ -1,24 +1,23 @@
 
 haxapp.app.HandsonGridMode = function(componentDisplay) {
-	haxapp.app.ViewMode.call(this,componentDisplay,true);
+	haxapp.app.ViewMode.call(this,componentDisplay);
 }
 
 haxapp.app.HandsonGridMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.HandsonGridMode.prototype.constructor = haxapp.app.HandsonGridMode;
 
-haxapp.app.HandsonGridMode.prototype.showData = function() {
-		
-	var json = this.member.getData();	
-
-    if(!this.editor) {
-        this.editor = new haxapp.app.HandsonGridEditor(this);
-    }
-	this.editor.showData(json,this.getIsDataEditable());
+haxapp.app.HandsonGridMode.prototype.createDisplay = function() {
+    return new haxapp.app.HandsonGridEditor(this);
 }
 
-//==============================
-// internal
-//==============================
+haxapp.app.HandsonGridMode.prototype.getDisplayData = function() {
+	return this.member.getData();	
+}
+
+haxapp.app.HandsonGridMode.prototype.getIsDataEditable = function() {
+    //data is editable only if there is no code
+    return !(this.member.hasCode());
+}
 
 haxapp.app.HandsonGridMode.prototype.onSave = function(data) {
     

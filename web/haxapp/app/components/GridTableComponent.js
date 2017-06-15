@@ -49,7 +49,7 @@ haxapp.app.GridTableComponent.prototype.getViewModeElement = function(editCompon
 	switch(viewType) {
 			
 		case haxapp.app.GridTableComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(editComponentDisplay,haxapp.app.GridTableComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
+			return new haxapp.app.AceCodeMode(editComponentDisplay);
 			
 		case haxapp.app.GridTableComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new haxapp.app.AceSupplementalMode(editComponentDisplay);

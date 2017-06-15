@@ -58,7 +58,7 @@ haxapp.app.JsonTableComponent.prototype.getViewModeElement = function(editCompon
 			return new haxapp.app.FormDataMode(editComponentDisplay);
 			
 		case haxapp.app.JsonTableComponent.VIEW_CODE:
-			return new haxapp.app.AceCodeMode(editComponentDisplay,haxapp.app.JsonTableComponent.BLANK_DATA_VALUE_INFO,haxapp.app.JsonTableComponent.editorCodeWrapper);
+			return new haxapp.app.AceCodeMode(editComponentDisplay);
 			
 		case haxapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
 			return new haxapp.app.AceSupplementalMode(editComponentDisplay);

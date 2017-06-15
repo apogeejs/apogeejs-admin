@@ -1,19 +1,22 @@
 
 haxapp.app.FormDataMode = function(componentDisplay) {
-	haxapp.app.ViewMode.call(this,componentDisplay,true);	
+	haxapp.app.ViewMode.call(this,componentDisplay);	
 }
 
 haxapp.app.FormDataMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.FormDataMode.prototype.constructor = haxapp.app.FormDataMode;
 
-haxapp.app.FormDataMode.prototype.showData = function() {
-		
-	var json = this.member.getData();	
-	
-    if(!this.editor) {
-        this.editor = new haxapp.app.JsonFormEditor(this);
-    }
-	this.editor.showData(json,this.getIsDataEditable());
+haxapp.app.FormDataMode.prototype.createDisplay = function() {
+    return new haxapp.app.JsonFormEditor(this);
+}
+
+haxapp.app.FormDataMode.prototype.getDisplayData = function() {
+	return this.member.getData();	
+}
+
+haxapp.app.FormDataMode.prototype.getIsDataEditable = function() {
+    //data is editable only if there is no code
+    return !(this.member.hasCode());
 }
 
 //==============================

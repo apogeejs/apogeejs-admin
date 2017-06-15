@@ -134,6 +134,7 @@ haxapp.app.Hax.prototype.loadComponentGenerators = function() {
 	
     //additional components
     this.registerComponent(haxapp.app.CustomControlComponent.generator);
+    this.registerComponent(haxapp.app.NewCustomControlComponent.generator);
 }
 
 /** This method registers a component. 

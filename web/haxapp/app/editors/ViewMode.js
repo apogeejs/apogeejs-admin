@@ -5,7 +5,7 @@ haxapp.app.ViewMode = function(componentDisplay) {
     this.component = componentDisplay.getComponent();
     this.member = this.component.getObject();
     
-    this.editor = null;
+    this.dataDisplay = null;
     
     //this is to support editors that have a specila edit more (as opposed to inline editing)
     this.inEditMode = false;
@@ -19,9 +19,14 @@ haxapp.app.ViewMode.CLOSE_OK = 0;
 // Accessed by the Component Display
 //------------------------------
 
-//Implement in extending classes
-///** This is called immediately before the display element is shown. */
-//haxapp.app.ViewMode.prototype.showData = function();
+/** This is called immediately before the display element is shown. */
+haxapp.app.ViewMode.prototype.showData = function() {
+    if(!this.dataDisplay) {
+        this.dataDisplay = this.createDisplay();
+    }
+    
+    this.dataDisplay.showData(this.getDisplayData(),this.getIsDataEditable());
+}
 
 //Implement in extending classes - OPTIONAL
 ///** This is called immediately after the display element is shown. This method may be omitted. */
@@ -30,7 +35,7 @@ haxapp.app.ViewMode.CLOSE_OK = 0;
 /** This method is called before the view mode is hidden. It should
  * return true or false. */
 haxapp.app.ViewMode.prototype.requestHide = function() {
-    if(this.editor) {
+    if(this.dataDisplay) {
         if(this.inEditMode) {
             return haxapp.app.ViewMode.UNSAVED_DATA;
         }
@@ -41,22 +46,24 @@ haxapp.app.ViewMode.prototype.requestHide = function() {
 
 /** This method is caleld when the view mode is hidden. */
 haxapp.app.ViewMode.prototype.hide = function() {
-    if(this.editor) {
-        this.editor.destroy();
-        this.editor = null;
+    if(this.dataDisplay) {
+        if(this.dataDisplay.destroy) {
+            this.dataDisplay.destroy();
+        }
+        this.dataDisplay = null;
     }
 }
 
 /** This method is called when the member is updated. */
 haxapp.app.ViewMode.prototype.memberUpdated = function() {
-    if((this.editor)&&(!this.inEditMode)) {
+    if((this.dataDisplay)&&(!this.inEditMode)) {
         this.showData();
     }
 }
 
 haxapp.app.ViewMode.prototype.getElement = function() {
-    if(this.editor) {
-        return this.editor.getElement();
+    if(this.dataDisplay) {
+        return this.dataDisplay.getElement();
     }
     else {
         return null;
@@ -64,9 +71,10 @@ haxapp.app.ViewMode.prototype.getElement = function() {
 }
 
 haxapp.app.ViewMode.prototype.destroy = function() {
-    if((this.editor)&&(this.editor.destroy)) {
-        this.editor.destroy();
+    if((this.dataDisplay)&&(this.dataDisplay.destroy)) {
+        this.dataDisplay.destroy();
     }
+    this.dataDisplay = null;
 }
 
 //------------------------------
@@ -99,11 +107,12 @@ haxapp.app.ViewMode.prototype.endEditMode = function() {
 // Protected
 //------------------------------
 
-/** This is a convenience method that can be used by data objects.
- * It returns whether or not the given member has editable data.
- *  The data is not editable if there is code. A general view mode may
- *  not use this method, but use a hard code value internally instead.*/ 
-haxapp.app.ViewMode.prototype.getIsDataEditable = function() {
-    return !(this.member.hasCode());
-}
+///** This method creates the data display object. */
+//haxapp.app.ViewMode.prototype.createDisplay = function();
+
+///** This method gets the data to display in the data display object. */
+//haxapp.app.ViewMode.prototype.getDisplayData = function();
+
+/** This method returns true if the data should be editable. */
+//haxapp.app.ViewMode.prototype.getIsDataEditable = function();
 

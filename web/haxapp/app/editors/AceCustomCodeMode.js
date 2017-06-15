@@ -5,13 +5,17 @@ haxapp.app.AceCustomCodeMode = function(componentDisplay) {
 
 haxapp.app.AceCustomCodeMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.AceCustomCodeMode.prototype.constructor = haxapp.app.AceCustomCodeMode;
-	
-haxapp.app.AceCustomCodeMode.prototype.showData = function() {
-	var codeText = this.component.getCustomizeScript();
-    if(!this.editor) {
-        this.editor = new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
-    }
-	this.editor.showData(codeText,true);
+
+haxapp.app.AceCustomCodeMode.prototype.createDisplay = function() {
+    return new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
+}
+
+haxapp.app.AceCustomCodeMode.prototype.getDisplayData = function() {
+    return this.component.getCustomizeScript();
+}
+
+haxapp.app.AceCustomCodeMode.prototype.getIsDataEditable = function() {
+    return true;
 }
 
 haxapp.app.AceCustomCodeMode.prototype.onSave = function(text) {	

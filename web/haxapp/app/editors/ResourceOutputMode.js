@@ -1,6 +1,6 @@
 
 haxapp.app.ResourceOutputMode = function(componentDisplay) {
-	haxapp.app.ViewMode.call(this,componentDisplay,false);
+	haxapp.app.ViewMode.call(this,componentDisplay);
 	
 	this.outputElement = haxapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -17,18 +17,17 @@ haxapp.app.ResourceOutputMode = function(componentDisplay) {
 haxapp.app.ResourceOutputMode.prototype = Object.create(haxapp.app.ViewMode.prototype);
 haxapp.app.ResourceOutputMode.prototype.constructor = haxapp.app.ResourceOutputMode;
 
-
-haxapp.app.ResourceOutputMode.prototype.getElement = function() {
-	return this.outputElement;
+haxapp.app.ResourceOutputMode.prototype.createDisplay = function() {
+    //ADD THIS!!!
+    return null;
 }
-	
-haxapp.app.ResourceOutputMode.prototype.showData = function() {
-	//edit ok ignored - no edit of the control data object - there is none
-	
-    var resource = this.member.getResource();
-    if((resource)&&(resource.show)) {
-        resource.show();
-    }   
+
+haxapp.app.ResourceOutputMode.prototype.getDisplayData = function() {
+	return this.member.getData();	
+}
+
+haxapp.app.ResourceOutputMode.prototype.getIsDataEditable = function() {
+    return false;
 }
 
 //TEMP!!!
