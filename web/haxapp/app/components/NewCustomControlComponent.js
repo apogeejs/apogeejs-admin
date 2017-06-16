@@ -7,6 +7,7 @@ haxapp.app.NewCustomControlComponent = function(workspaceUI,control,componentJso
     haxapp.app.EditComponent.call(this,workspaceUI,control,haxapp.app.NewCustomControlComponent.generator,componentJson);
     
     this.uiCodeFields = {};
+    this.currentCss = "";
     this.loadResourceFromJson(componentJson);
 	
 	this.memberUpdated();
@@ -22,37 +23,11 @@ haxapp.app.NewCustomControlComponent.prototype.constructor = haxapp.app.NewCusto
 //Resource Accessors
 //==============================
 
-haxapp.app.NewCustomControlComponent.prototype.createResource = function() {
-    try {
-        var initCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_INIT);
-        var setDataCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_SET_DATA);
-        var onShownCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_SHOWN);
-        var onHideCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_HIDE);
-        var destroyCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_DESTROY);
-        var uiPrivateCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_UI_SUPPLEMENTAL);
-        
-        //create the resource generator wrapped with its closure
-        var generatorFunctionBody = hax.util.formatString(
-            haxapp.app.NewCustomControlComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
-            initCode,
-            setDataCode,
-            onShownCode,
-            onHideCode,
-            destroyCode,
-            uiPrivateCode
-        );
-
-        //create the function generator, with the aliased variables in the closure
-        var generatorFunction = new Function(generatorFunctionBody);
-        var resourceFunction = generatorFunction();
-
-        var resource = resourceFunction();
-
-        return resource;
-    }
-    catch(error) {
-        alert("Error creating custom control: " + error.message);
-    }
+haxapp.app.NewCustomControlComponent.prototype.getDataDisplay = function(viewMode) {
+    var html = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_HTML);
+    var resource = this.createResource();
+    var dataDisplay = new haxapp.app.CustomControlDataDisplay(html,resource,viewMode);
+    return dataDisplay;
 }
 
 haxapp.app.NewCustomControlComponent.prototype.getUiCodeFields = function() {
@@ -85,7 +60,7 @@ haxapp.app.NewCustomControlComponent.VIEW_HTML = "HTML";
 haxapp.app.NewCustomControlComponent.VIEW_CSS = "CSS";
 haxapp.app.NewCustomControlComponent.VIEW_INIT = "init(element,mode)";
 haxapp.app.NewCustomControlComponent.VIEW_SET_DATA = "setData(data,element,mode)";
-haxapp.app.NewCustomControlComponent.VIEW_ON_SHOWN = "onShown(data,element,mode)";
+haxapp.app.NewCustomControlComponent.VIEW_ON_SHOWN = "onShown(element,mode)";
 haxapp.app.NewCustomControlComponent.VIEW_ON_HIDE = "onHide(element,mode)";
 haxapp.app.NewCustomControlComponent.VIEW_DESTROY = "destroy(element,mode)";
 haxapp.app.NewCustomControlComponent.VIEW_UI_SUPPLEMENTAL = "UI Private";
@@ -126,7 +101,7 @@ haxapp.app.NewCustomControlComponent.prototype.getViewModeElement = function(edi
 		
 		case haxapp.app.NewCustomControlComponent.VIEW_OUTPUT:
 			if(!this.outputMode) {
-				this.outputMode = new haxapp.app.NewResourceOutputMode(editComponentDisplay);
+				this.outputMode = new haxapp.app.ControlOutputMode(editComponentDisplay);
 			}
 			return this.outputMode;
 			
@@ -174,32 +149,73 @@ haxapp.app.NewCustomControlComponent.prototype.getViewModeElement = function(edi
 
 /** This method deseriliazes data for the custom resource component. */
 haxapp.app.NewCustomControlComponent.prototype.updateFromJson = function(json) {  
-    //load resource
-    if(json.resource) {
-        this.loadResourceFromJson(json.resource);
-    }
-    else {
-        this.loadEmptyResource();
-    }
+    this.loadResourceFromJson(json);
 }
 
 /** This method deseriliazes data for the custom resource component. This will
  * work is no json is passed in. */
 haxapp.app.NewCustomControlComponent.prototype.loadResourceFromJson = function(json) {   
-	if((!json)||(!json.resource)) {
-		this.uiCodeFields = {};
+	var uiCodeFields;
+    if((!json)||(!json.resource)) {
+		uiCodeFields = {};
 	} 
 	else {
-		this.uiCodeFields = json.resource;
-	}    
+		uiCodeFields = json.resource;
+	}  
+    this.update(uiCodeFields);
+}
+
+
+haxapp.app.NewCustomControlComponent.prototype.createResource = function() {
+    try {
+        var initCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_INIT);
+        var setDataCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_SET_DATA);
+        var onShownCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_SHOWN);
+        var onHideCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_HIDE);
+        var destroyCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_DESTROY);
+        var uiPrivateCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_UI_SUPPLEMENTAL);
+        
+        //create the resource generator wrapped with its closure
+        var generatorFunctionBody = hax.util.formatString(
+            haxapp.app.NewCustomControlComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
+            initCode,
+            setDataCode,
+            onShownCode,
+            onHideCode,
+            destroyCode,
+            uiPrivateCode
+        );
+
+        //create the function generator, with the aliased variables in the closure
+        var generatorFunction = new Function(generatorFunctionBody);
+        var resourceFunction = generatorFunction();
+
+        var resource = resourceFunction();
+
+        return resource;
+    }
+    catch(error) {
+        alert("Error creating custom control: " + error.message);
+    }
 }
 
 //=============================
 // Action
 //=============================
 
-haxapp.app.NewCustomControlComponent.prototype.update = function(uiCodeFields) {
+haxapp.app.NewCustomControlComponent.prototype.update = function(uiCodeFields) {    
     this.uiCodeFields = uiCodeFields;
+    
+    var newCss = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_CSS);
+    
+    //update the css right away
+    
+    if(newCss !== this.currentCss) {
+        if(!((newCss == "")&&(this.currentCss == ""))) {
+            haxapp.ui.setMemberCssData(this.getObject().getId(),newCss);
+            this.currentCss = newCss;
+        }
+    }
     
 	var actionResponse = new hax.ActionResponse();
     return actionResponse; 
@@ -241,7 +257,7 @@ haxapp.app.NewCustomControlComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "resource.setData = function(data,element,mode) {",
 "{1}",
 "};",
-"resource.onShown = function(data,element,mode) {",
+"resource.onShown = function(element,mode) {",
 "{2}",
 "};",
 "resource.onHide = function(element,mode) {",

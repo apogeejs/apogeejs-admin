@@ -185,6 +185,26 @@ haxapp.ui.DENY_CLOSE = -1;
 
 haxapp.ui.CLOSE_EVENT = "closed";
 
+/** This function adds CSS data for a given member id. */
+haxapp.ui.setMemberCssData = function(objectId,cssText) {
+    var cssElementId = "css_" + objectId;
+    
+    var cssElement = document.getElementById(cssElementId);
+    if(cssText != "") {
+        if(!cssElement) {
+            cssElement = document.createElement("style");
+            cssElement.id = cssElementId;
+            document.head.appendChild(cssElement);
+        }
+        cssElement.innerHTML = cssText;
+    }
+    else {
+        if(cssElement) {
+            document.head.removeChild(cssElement);
+        }
+    }
+}
+
 
 
 

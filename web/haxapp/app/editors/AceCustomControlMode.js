@@ -11,16 +11,16 @@ haxapp.app.AceCustomControlMode.prototype.constructor = haxapp.app.AceCustomCont
 
 haxapp.app.AceCustomControlMode.prototype.createDisplay = function() {
     var format;
-    if(this.codeField === haxapp.app.AceCustomControlMode.CODE_FIELD_HTML) {
+    if(this.codeField === haxapp.app.NewCustomControlComponent.CODE_FIELD_HTML) {
         format = "ace/mode/html";
     }
-    else if(this.codeField === haxapp.app.AceCustomControlMode.CODE_FIELD_CSS) {
+    else if(this.codeField === haxapp.app.NewCustomControlComponent.CODE_FIELD_CSS) {
         format = "ace/mode/css";
     }
     else {
         format = "ace/mode/javascript";
     }
-    return new haxapp.app.AceTextEditor(this,"ace/mode/javascript");
+    return new haxapp.app.AceTextEditor(this,format);
 }
 
 haxapp.app.AceCustomControlMode.prototype.getDisplayData = function() {
