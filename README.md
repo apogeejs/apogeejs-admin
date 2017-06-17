@@ -1,3 +1,3 @@
-#Hax
+#Apogee
 
-Hax is a spreadsheet-inspired programmatic data editor. For more information go to http://www.haxapp.com.
+Apogee is a spreadsheet-inspired programming environmant. For more information go to http://www.apogeejs.com.
