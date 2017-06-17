@@ -96,6 +96,7 @@ haxapp.app.BasicControlComponent.createBaseComponent = function(workspaceUI,data
     json.action = "createMember";
     json.owner = data.parent;
     json.name = data.name;
+    json.workspace = data.parent.getWorkspace();
     json.type = hax.Control.generator.type;
     var actionResponse = hax.action.doAction(json);
     

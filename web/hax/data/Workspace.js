@@ -7,6 +7,10 @@ hax.Workspace = function(optionalJson,actionResponseForJson,ownerForVirtualWorks
     hax.Owner.init.call(this);
     hax.RootHolder.init.call(this);
     
+    // This is a queue to hold actions while one is in process.
+    this.actionInProgress = false;
+    this.actionQueue = [];
+    
     if(ownerForVirtualWorkspace === undefined) ownerForVirtualWorkspace = null;
     this.owner = ownerForVirtualWorkspace;
     
@@ -51,6 +55,31 @@ hax.Workspace.prototype.updateDependeciesForModelChange = function(recalculateLi
 hax.Workspace.prototype.onClose = function() {
     this.rootFolder.onClose();
 }
+
+/** This function triggers the action for the queued action to be run when the current thread exits. */
+hax.Workspace.prototype.isActionInProgress = function() {
+    return this.actionInProgress;
+}
+
+hax.Workspace.prototype.setActionInProgress = function(inProgress) {
+    this.actionInProgress = inProgress;
+}
+
+hax.Workspace.prototype.queueAction = function(actionInfo) {
+    this.actionQueue.push(actionInfo);
+}
+
+hax.Workspace.prototype.getQueuedAction = function() {
+    if(this.actionQueue.length > 0) {
+        var queuedActionInfo = hax.action.actionQueue[0];
+        hax.action.actionQueue.splice(0,1)
+        return queuedActionInfo;
+    }
+    else {
+        return null;
+    }
+}
+
 
 //------------------------------
 // Owner Methods
@@ -196,6 +225,7 @@ hax.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     var actionData = json.data;
     actionData.action = "createMember";
     actionData.owner = this;
+    actionData.workspace = this;
     hax.action.doAction(actionData,actionResponse);
     
     return actionResponse;

@@ -77,6 +77,7 @@ haxapp.app.GridTableComponent.createComponent = function(workspaceUI,data,compon
     var json = {};
     json.action = "createMember";
     json.owner = data.parent;
+    json.workspace = data.parent.getWorkspace();
     json.name = data.name;
     json.type = hax.JsonTable.generator.type;
 	json.updateData = {};

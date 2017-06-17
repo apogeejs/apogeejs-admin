@@ -52,12 +52,6 @@ hax.action = {};
 hax.action.actionInfo = {
 }
 
-/** This flag is used to indiciate if an action is in provess. */
-hax.action.actionInProcess = false;
-
-/** This is a queue to hold actions while one is in process. */
-hax.action.actionQueue = [];
-
 /** This method is used to execute an action for the data model. 
  * The optionalContext is a context manager to convert a member name to a
  * member, if supported by the action.
@@ -65,12 +59,25 @@ hax.action.actionQueue = [];
  * than creating a new one inside this function as a return value. */
 hax.action.doAction = function(actionData,optionalContext,optionalActionResponse) {
     
-    if(hax.action.actionInProcess) {
+    //read the workspace
+    var workspace;
+    if(actionData.member) {
+        workspace = actionData.member.getWorkspace();
+    }
+    else if(actionData.workspace) {
+        workspace = actionData.workspace;
+    }
+    else {
+        throw new Error("Workspace info missing from action. ");
+    }
+    
+    //only allow one action at a time
+    if(workspace.isActionInProgress()) {
         var queuedAction = {};
         queuedAction.actionData = actionData;
         queuedAction.optionalContext = optionalContext;
         queuedAction.optionalActionResponse = optionalActionResponse;
-        hax.action.actionQueue.push(queuedAction);
+        workspace.queueAction(queueAction);
         
         //return an empty (successful) action response
         //we sould have a flag saying the action is pending
@@ -78,7 +85,7 @@ hax.action.doAction = function(actionData,optionalContext,optionalActionResponse
     }
     
     //flag action in progress
-    hax.action.actionInProcess = true;
+    workspace.setActionInProgress(true);
     
     var actionResponse = optionalActionResponse ? optionalActionResponse : new hax.ActionResponse();
     
@@ -88,18 +95,6 @@ hax.action.doAction = function(actionData,optionalContext,optionalActionResponse
         
         //do the action
         hax.action.callActionFunction(actionData,optionalContext,processedActions); 
-        
-        //read the workspace
-        var workspace;
-        if(actionData.member) {
-            workspace = actionData.member.getWorkspace();
-        }
-        else if(actionData.workspace) {
-            workspace = actionData.workspace;
-        }
-        else {
-            throw new Error("Workspace info missing from action. ");
-        }
         
         //finish processing the action
         var recalculateList = [];
@@ -118,12 +113,12 @@ hax.action.doAction = function(actionData,optionalContext,optionalActionResponse
         actionResponse.addError(actionError);
     }
     
-    hax.action.actionInProcess = false;
+    //flag action in progress
+    workspace.setActionInProgress(false);
     
     //trigger any pending actions
-    if(hax.action.actionQueue.length > 0) {
-        var queuedActionData = hax.action.actionQueue[0];
-        hax.action.actionQueue.splice(0,1)
+    var queuedActionData = workspace.getQueuedAction();
+    if(queuedActionData) {
         hax.action.asynchRunQueuedAction(queuedActionData);
     }
     

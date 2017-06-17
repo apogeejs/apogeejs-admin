@@ -1,10 +1,10 @@
-/** This namespace contains the create member action */
+/** This namespace contains the compound action */
 hax.compoundaction = {};
 
-/** Create member action name 
+/** Compound action name 
  * Action Data format:
  * {
- *  "action": hax.createmember.ACTION_NAME,
+ *  "action": hax.compoundaction.ACTION_NAME,
  *  "workspace":the workspace object
  *  "actions": (list of actions in this compound action),
  * }

@@ -21,10 +21,6 @@ haxapp.ui.ParentContainer.DELTA_CHILD_Y = 75;
 haxapp.ui.ParentContainer.MIN_WRAP_WIDTH = 20; 
 haxapp.ui.ParentContainer.MIN_WRAP_HEIGHT = 200;
 
-//events
-haxapp.ui.ParentContainer.CONTENT_SHOWN = "content shown";
-haxapp.ui.ParentContainer.CONTENT_HIDDEN = "content hidden";
-
 //==============================
 // Public Instance Methods
 //==============================

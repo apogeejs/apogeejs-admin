@@ -45,6 +45,7 @@ haxapp.app.FolderComponent.createComponent = function(workspaceUI,data,component
     var json = {};
     json.action = "createMember";
     json.owner = data.parent;
+    json.workspace = data.parent.getWorkspace();
     json.name = data.name;
     if(data.children) {
         json.children = data.children;

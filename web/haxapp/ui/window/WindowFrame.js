@@ -77,16 +77,6 @@ haxapp.ui.WindowFrame = function(options) {
     };
     var element = this.getElement();
 	element.addEventListener("mousedown",frontHandler);
-    
-    //this makes sure to update the window when the parent becomes visible
-    this.onShow = function() {
-        //refresh the element
-        instance.show();
-    }
-    this.onHide = function() {
-        //don't remove element, but mark it as hidden
-        instance.isShowing = false;
-    }  
 }
 
 //add components to this class
@@ -108,6 +98,10 @@ haxapp.ui.WindowFrame.RESIZE_SW = haxapp.ui.WindowFrame.RESIZE_SOUTH + haxapp.ui
 /** size must be speicifed for the window. If not these values are used. */
 haxapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT = 300;
 haxapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH = 300;
+
+haxapp.ui.WindowFrame.WINDOW_MINIMIZED = "minimized";
+haxapp.ui.WindowFrame.WINDOW_RESTOREDED = "restored";
+haxapp.ui.WindowFrame.WINDOW_MAXIMIZED = "maximized";
 
 //====================================
 // Public Methods
@@ -190,7 +184,6 @@ haxapp.ui.WindowFrame.prototype.show = function() {
     this.parentContainer.addWindow(this);
 
     this.isShowing = true;
-    this.frameShown();
 
     //we will redo this since the size of elements used in calculation may have been wrong
     if(this.sizeInfo.height !== undefined) {
@@ -217,7 +210,8 @@ haxapp.ui.WindowFrame.prototype.close = function(forceClose) {
         
         this.parentContainer.removeWindow(this);
         this.isShowing = false;
-        this.frameClosed();
+        
+        this.dispatchEvent(haxapp.ui.CLOSE_EVENT,this);
     }
 }
 
@@ -526,10 +520,10 @@ haxapp.ui.WindowFrame.prototype.minimizeContent = function() {
     //set the window state
     this.windowState = haxapp.ui.WINDOW_STATE_MINIMIZED;
     this.updateCoordinates();
-    this.setMinMaxButtons();
+    this.setMinMaxButtons
     
     //dispatch resize event
-    if(!wasMinimized) this.contentOnlyHidden();
+    if(!wasMinimized) this.dispatchEvent(haxapp.ui.WindowFrame.WINDOW_MINIMIZED,this);
 }
 
 /** This is the restore function for the window.*/
@@ -546,7 +540,7 @@ haxapp.ui.WindowFrame.prototype.restoreContent = function() {
     this.updateCoordinates();
     this.setMinMaxButtons();
     
-    if(wasMinimized) this.contentOnlyShown();
+    if(wasMinimized) this.dispatchEvent(haxapp.ui.WindowFrame.WINDOW_RESTOREDED,this);
 }
 
 /** This is the minimize function for the window.*/
@@ -562,7 +556,7 @@ haxapp.ui.WindowFrame.prototype.maximizeContent = function() {
     this.updateCoordinates();
     this.setMinMaxButtons();
     
-    if(wasMinimized) this.contentOnlyShown();
+    if(wasMinimized) this.dispatchEvent(haxapp.ui.WindowFrame.WINDOW_MAXIMIZED,this);
 }
 
 /** @private */
@@ -600,38 +594,6 @@ haxapp.ui.WindowFrame.prototype.updateCoordinates = function() {
 		this.frame.style.height = "0px";
 		this.frame.style.width = "0px";
     }
-}
-
-/** This method should be called when the entire window is shown.
- * @private */
-haxapp.ui.WindowFrame.prototype.frameShown = function() {
-    
-    //dispatch event
-    this.dispatchEvent(haxapp.ui.ParentContainer.CONTENT_SHOWN,this);
-}
-
-/** This method should be called when the entire window is hidden.
- * @private */
-haxapp.ui.WindowFrame.prototype.frameClosed = function() {
-    
-    //dispatch event
-    this.dispatchEvent(haxapp.ui.CLOSE_EVENT,this);
-}
-
-/** This method should be called when the entire window is hidden
- * @private */
-haxapp.ui.WindowFrame.prototype.contentOnlyShown = function() {
-    
-    //dispatch event
-    this.dispatchEvent(haxapp.ui.ParentContainer.CONTENT_SHOWN,this);
-}
-
-/** This method shoudl be called when the window contents are show
- * @private */
-haxapp.ui.WindowFrame.prototype.contentOnlyHidden = function() {
-    
-    //dispatch event
-    this.dispatchEvent(haxapp.ui.ParentContainer.CONTENT_HIDDEN,this);
 }
 
 //====================================

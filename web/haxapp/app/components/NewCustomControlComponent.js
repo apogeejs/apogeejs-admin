@@ -286,6 +286,7 @@ haxapp.app.NewCustomControlComponent.createComponent = function(workspaceUI,data
     var json = {};
     json.action = "createMember";
     json.owner = data.parent;
+    json.workspace = data.parent.getWorkspace();
     json.name = data.name;
     json.type = hax.JsonTable.generator.type;
     var actionResponse = hax.action.doAction(json);

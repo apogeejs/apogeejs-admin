@@ -291,7 +291,9 @@ hax.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunction
             //lookup elements from virtual workspace
             rootFolder = virtualWorkspace.getRoot();
             inputElementArray = instance.loadInputElements(rootFolder,folderFunctionErrors);
-            returnValueTable = instance.loadOutputElement(rootFolder,folderFunctionErrors);     
+            returnValueTable = instance.loadOutputElement(rootFolder,folderFunctionErrors); 
+            
+            initialized = true;
         }
         
         //create an update array to set the table values to the elements  
@@ -314,6 +316,11 @@ hax.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunction
         if(actionResponse.getSuccess()) {
             //retrieve the result
             if(returnValueTable) {
+                
+                if(returnValueTable.getResultPending()) {
+                    throw new Error("A folder function must not be asynchronous: " + instance.getFullName());
+                }
+                
                 return returnValueTable.getData();
             }
             else {
