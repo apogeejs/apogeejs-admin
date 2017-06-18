@@ -30,14 +30,6 @@ haxapp.app.ViewMode.prototype.showData = function() {
     this.dataDisplay.showData(this.getDisplayData(),this.getIsDataEditable());
 }
 
-//Implement in extending classes - OPTIONAL
-///** This is called immediately after the display element is shown. This method may be omitted. */
-haxapp.app.ViewMode.prototype.dataShown = function() {
-    if(this.dataDisplay.dataShown) {
-        this.dataDisplay.dataShown();
-    }
-}
-
 /** This method is called before the view mode is hidden. It should
  * return true or false. */
 haxapp.app.ViewMode.prototype.requestHide = function() {

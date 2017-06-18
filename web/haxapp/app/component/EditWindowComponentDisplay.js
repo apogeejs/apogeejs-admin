@@ -272,9 +272,6 @@ haxapp.app.EditWindowComponentDisplay.prototype._updateViewContent = function() 
     if(this.viewModeElement) {
         this.viewModeElement.showData();
         this.windowHeaderManager.setContent(this.viewModeElement.getElement());
-        if(this.viewModeElement.dataShown) {
-            this.viewModeElement.dataShown();
-        }
     }
     else {
         alert("Error: View mode element not found!");

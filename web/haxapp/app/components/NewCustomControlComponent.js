@@ -48,9 +48,10 @@ haxapp.app.NewCustomControlComponent.CODE_FIELD_HTML = "html";
 haxapp.app.NewCustomControlComponent.CODE_FIELD_CSS = "css";
 haxapp.app.NewCustomControlComponent.CODE_FIELD_INIT = "init";
 haxapp.app.NewCustomControlComponent.CODE_FIELD_SET_DATA = "setData";
-haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_SHOWN = "onShown";
 haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_HIDE = "onHide";
 haxapp.app.NewCustomControlComponent.CODE_FIELD_DESTROY = "destroy";
+haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_LOAD = "onLoad";
+haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_RESIZE = "onResize";
 haxapp.app.NewCustomControlComponent.CODE_FIELD_UI_SUPPLEMENTAL = "uiPrivate";
 
 haxapp.app.NewCustomControlComponent.VIEW_OUTPUT = "Output";
@@ -60,10 +61,11 @@ haxapp.app.NewCustomControlComponent.VIEW_HTML = "HTML";
 haxapp.app.NewCustomControlComponent.VIEW_CSS = "CSS";
 haxapp.app.NewCustomControlComponent.VIEW_INIT = "init(element,mode)";
 haxapp.app.NewCustomControlComponent.VIEW_SET_DATA = "setData(data,element,mode)";
-haxapp.app.NewCustomControlComponent.VIEW_ON_SHOWN = "onShown(element,mode)";
 haxapp.app.NewCustomControlComponent.VIEW_ON_HIDE = "onHide(element,mode)";
 haxapp.app.NewCustomControlComponent.VIEW_DESTROY = "destroy(element,mode)";
-haxapp.app.NewCustomControlComponent.VIEW_UI_SUPPLEMENTAL = "UI Private";
+haxapp.app.NewCustomControlComponent.VIEW_ON_LOAD = "onLoad(element,mode)";
+haxapp.app.NewCustomControlComponent.VIEW_ON_RESIZE = "onResize(element,mode)";
+haxapp.app.NewCustomControlComponent.VIEW_UI_SUPPLEMENTAL = "UI Static";
 haxapp.app.NewCustomControlComponent.VIEW_DESCRIPTION = "Notes";
 
 haxapp.app.NewCustomControlComponent.VIEW_MODES = [
@@ -74,9 +76,10 @@ haxapp.app.NewCustomControlComponent.VIEW_MODES = [
     haxapp.app.NewCustomControlComponent.VIEW_CSS,
     haxapp.app.NewCustomControlComponent.VIEW_INIT,
     haxapp.app.NewCustomControlComponent.VIEW_SET_DATA,
-    haxapp.app.NewCustomControlComponent.VIEW_ON_SHOWN,
     haxapp.app.NewCustomControlComponent.VIEW_ON_HIDE,
     haxapp.app.NewCustomControlComponent.VIEW_DESTROY,
+    haxapp.app.NewCustomControlComponent.VIEW_ON_LOAD,
+    haxapp.app.NewCustomControlComponent.VIEW_ON_RESIZE,
     haxapp.app.NewCustomControlComponent.VIEW_UI_SUPPLEMENTAL,
     haxapp.app.NewCustomControlComponent.VIEW_DESCRIPTION
 ];
@@ -123,16 +126,19 @@ haxapp.app.NewCustomControlComponent.prototype.getViewModeElement = function(edi
     
         case haxapp.app.NewCustomControlComponent.VIEW_SET_DATA:
             return new haxapp.app.AceCustomControlMode(editComponentDisplay,haxapp.app.NewCustomControlComponent.CODE_FIELD_SET_DATA);
-    
-        case haxapp.app.NewCustomControlComponent.VIEW_ON_SHOWN:
-            return new haxapp.app.AceCustomControlMode(editComponentDisplay,haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_SHOWN);
-			  
+     
         case haxapp.app.NewCustomControlComponent.VIEW_ON_HIDE:
             return new haxapp.app.AceCustomControlMode(editComponentDisplay,haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_HIDE);    
             
         case haxapp.app.NewCustomControlComponent.VIEW_DESTROY:
             return new haxapp.app.AceCustomControlMode(editComponentDisplay,haxapp.app.NewCustomControlComponent.CODE_FIELD_DESTROY);    
             
+        case haxapp.app.NewCustomControlComponent.VIEW_ON_LOAD:
+            return new haxapp.app.AceCustomControlMode(editComponentDisplay,haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_LOAD);
+			
+        case haxapp.app.NewCustomControlComponent.VIEW_ON_RESIZE:
+            return new haxapp.app.AceCustomControlMode(editComponentDisplay,haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_RESIZE);
+			
         case haxapp.app.NewCustomControlComponent.VIEW_UI_SUPPLEMENTAL:
             return new haxapp.app.AceCustomControlMode(editComponentDisplay,haxapp.app.NewCustomControlComponent.CODE_FIELD_UI_SUPPLEMENTAL); 
 
@@ -168,21 +174,26 @@ haxapp.app.NewCustomControlComponent.prototype.loadResourceFromJson = function(j
 
 haxapp.app.NewCustomControlComponent.prototype.createResource = function() {
     try {
-        var initCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_INIT);
-        var setDataCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_SET_DATA);
-        var onShownCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_SHOWN);
-        var onHideCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_HIDE);
-        var destroyCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_DESTROY);
+        var resourceMethodsCode = "";
+        var uiCodeFields = this.getUiCodeFields();
+        
+        for(var fieldName in haxapp.app.NewCustomControlComponent.GENERATOR_INTERNAL_FORMATS) {
+            var fieldCode = uiCodeFields[fieldName];
+            if((fieldCode)&&(fieldCode != "")) {
+                
+                var format = haxapp.app.NewCustomControlComponent.GENERATOR_INTERNAL_FORMATS[fieldName];
+                var codeSnippet = hax.util.formatString(format,fieldCode);
+                
+                resourceMethodsCode += codeSnippet + "\n";
+            }
+        }
+        
         var uiPrivateCode = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_UI_SUPPLEMENTAL);
         
         //create the resource generator wrapped with its closure
         var generatorFunctionBody = hax.util.formatString(
             haxapp.app.NewCustomControlComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
-            initCode,
-            setDataCode,
-            onShownCode,
-            onHideCode,
-            destroyCode,
+            resourceMethodsCode,
             uiPrivateCode
         );
 
@@ -234,45 +245,40 @@ haxapp.app.NewCustomControlComponent.writeToJson = function(json) {
 
 /** This is the format string to create the code body for updateing the member
  * Input indices:
- * 0: init
- * 1: setData
- * 2: onShown
- * 3: onHide
- * 4: destroy
- * 5: uiPrivate
+ * 0: resouce methods code
+ * 1: uiPrivate
  * @private
  */
 haxapp.app.NewCustomControlComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "",
 "//supplemental code",
-"{5}",
+"{1}",
 "//end supplemental code",
 "",
 "//member function",
 "var resourceFunction = function(component) {",
 "var resource = {};",
-"resource.init = function(element,mode) {",
 "{0}",
-"};",
-"resource.setData = function(data,element,mode) {",
-"{1}",
-"};",
-"resource.onShown = function(element,mode) {",
-"{2}",
-"};",
-"resource.onHide = function(element,mode) {",
-"{3}",
-"};",
-"resource.destroy = function(element,mode) {",
-"{4}",
-"};",
 "return resource;",
 "}",
 "//end member function",
 "return resourceFunction;",
 ""
    ].join("\n");
-
+   
+   
+   
+/** This is the format string to create the resource method code
+ * @private
+ */
+haxapp.app.NewCustomControlComponent.GENERATOR_INTERNAL_FORMATS = {
+    "init":"resource.init = function(element,mode) {\n{0}\n};",
+    "setData":"resource.setData = function(data,element,mode) {\n{0}\n};",
+    "onHide":"resource.onHide = function(element,mode) {\n{0}\n};",
+    "destroy":"resource.destroy = function(element,mode) {\n{0}\n};",
+    "onLoad":"resource.onLoad = function(element,mode) {\n{0}\n};",
+    "onResize":"resource.onResize = function(element,mode) {\n{0}\n};"
+}
 
 
 //======================================
