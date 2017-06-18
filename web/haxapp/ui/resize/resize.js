@@ -1,11 +1,11 @@
 /** This file provides a resize listener. The element must be a positioned element
- * (position must be set to something besides static. It can only be called once (!)
+ * (position must be set to something besides static. It can only be done once per element(!)
  * 
  * It places an iframe inside the element to be tested and uses the onresize of the 
- * iframe document body.
+ * iframe document body. It calls load (and resize) on initial loading of the iframe.
  */
 
-haxapp.ui.setResizeListener = function(element, resizeCallback){
+haxapp.ui.setResizeListener = function(element, resizeCallback, loadCallback){
 
     var styleJson = {
         "position":"absolute",
@@ -18,14 +18,17 @@ haxapp.ui.setResizeListener = function(element, resizeCallback){
     };
 
     var onLoadCallback = function() {
-        var dummyFrameBody = dummyFrameElement.contentDocument.body;
-        dummyFrameBody.onresize = resizeCallback; 
+        var dummyFrameBody = dummyFrameElement.contentDocument.body; 
+        
+        if(loadCallback) {
+            loadCallback();
+        }
 
         //do an initial callback for each
-        resizeCallback();
-
-        //we can do an on load too
-        //onloadCallback();
+        if(resizeCallback) {
+            resizeCallback();
+            dummyFrameBody.onresize = resizeCallback;
+        }
     }
 
     //create and attach element
