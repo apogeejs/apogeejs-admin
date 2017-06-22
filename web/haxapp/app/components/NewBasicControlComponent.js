@@ -23,6 +23,17 @@ haxapp.app.NewBasicControlComponent.prototype.constructor = haxapp.app.NewBasicC
 // Protected and Private Instance Methods
 //==============================
 
+/** Set this value to true if the resource should not be destroyed each time
+ * the display is hidden.
+ */
+haxapp.app.NewBasicControlComponent.prototype.setDoKeepAlive = function(doKeepAlive) {
+    this.doKeepAlive = doKeepAlive;
+    
+    if(this.outputMode) {
+        this.outputMode.setDoKeepAlive(doKeepAlive);
+    }
+}
+
 haxapp.app.NewBasicControlComponent.VIEW_OUTPUT = "Output";
 haxapp.app.NewBasicControlComponent.VIEW_CODE = "Code";
 haxapp.app.NewBasicControlComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
@@ -55,7 +66,7 @@ haxapp.app.NewBasicControlComponent.prototype.getViewModeElement = function(edit
 		
 		case haxapp.app.NewBasicControlComponent.VIEW_OUTPUT:
 			if(!this.outputMode) {
-				this.outputMode = new haxapp.app.ControlOutputMode(editComponentDisplay);
+				this.outputMode = new haxapp.app.ControlOutputMode(editComponentDisplay,this.doKeepAlive);
 			}
 			return this.outputMode;
 			

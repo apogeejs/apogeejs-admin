@@ -160,7 +160,37 @@ haxapp.app.dialog.showConfigurableDialog.lineFunctions = {
     },
     
     "radioButton": function(lineDef,formActions) {
+        //implement!
+    },
+    
+    "checkbox": function(lineDef,formActions) {
+        var lineObject = {};
+        //create the element
+        var line = haxapp.ui.createElement("div",{"className":"dialogLine"});
+        if(lineDef.heading) {
+            line.appendChild(document.createTextNode(lineDef.heading));
+        }
+        var checkbox = haxapp.ui.createElement("input");
+        checkbox.type = "checkbox";
+        if(lineDef.name) {
+            checkbox.name = lineDef.name;
+        }
+        if(lineDef.value) {
+            checkbox.value = lineDef.value;
+        }
+        if(lineDef.initial) {
+            checkbox.checked = true;
+        }
+        line.appendChild(checkbox);
+        lineObject.element = line;
+        //get result
+        lineObject.addToResult = function(formData) {
+            var result = checkbox.checked;
+            formData[lineDef.resultKey] = result;
+        }
+        //no on Close
         
+        return lineObject;
     },
     
     //lineDef.type = "submit"

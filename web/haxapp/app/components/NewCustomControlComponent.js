@@ -9,6 +9,14 @@ haxapp.app.NewCustomControlComponent = function(workspaceUI,control,componentJso
     this.uiCodeFields = {};
     this.currentCss = "";
     this.loadResourceFromJson(componentJson);
+    
+    //create a resource based on the json (or lack of a json)
+    if((componentJson)&&(componentJson.doKeepAlive)) {
+        this.doKeepAlive = true;
+    }
+    else {
+        this.doKeepAlive = false;
+    }
 	
 	this.memberUpdated();
     
@@ -38,6 +46,18 @@ haxapp.app.NewCustomControlComponent.prototype.getUiCodeField = function(codeFie
     var text = this.uiCodeFields[codeField];
     if((text === null)||(text === undefined)) text = "";
     return text;
+}
+
+haxapp.app.NewCustomControlComponent.prototype.getDoKeepAlive = function() {
+    return this.doKeepAlive;
+}
+
+haxapp.app.NewCustomControlComponent.prototype.setDoKeepAlive = function(doKeepAlive) {
+    this.doKeepAlive = doKeepAlive;
+    
+    if(this.outputMode) {
+        this.outputMode.setDoKeepAlive(doKeepAlive);
+    }
 }
 
 //==============================
@@ -104,7 +124,7 @@ haxapp.app.NewCustomControlComponent.prototype.getViewModeElement = function(edi
 		
 		case haxapp.app.NewCustomControlComponent.VIEW_OUTPUT:
 			if(!this.outputMode) {
-				this.outputMode = new haxapp.app.ControlOutputMode(editComponentDisplay);
+				this.outputMode = new haxapp.app.ControlOutputMode(editComponentDisplay,this.doKeepAlive);
 			}
 			return this.outputMode;
 			
@@ -300,8 +320,21 @@ haxapp.app.NewCustomControlComponent.createComponent = function(workspaceUI,data
     var control = json.member;
     
     if(control) {
+        
+        if(!data.destroyOnHide) {
+            //update the component options, but don't modify the options structure passed in.
+            var activeComponentOptions;
+            if(componentOptions) {
+                activeComponentOptions = hax.util.deepJsonCopy(componentOptions);
+            }
+            else {
+                activeComponentOptions = {};
+            }
+            activeComponentOptions.doKeepAlive = true;
+        }
+        
         //create the component
-        var customControlComponent = new haxapp.app.NewCustomControlComponent.createComponentFromJson(workspaceUI,control,componentOptions);
+        var customControlComponent = new haxapp.app.NewCustomControlComponent.createComponentFromJson(workspaceUI,control,activeComponentOptions);
         actionResponse.component = customControlComponent;
     }
     return actionResponse;
@@ -310,6 +343,16 @@ haxapp.app.NewCustomControlComponent.createComponent = function(workspaceUI,data
 haxapp.app.NewCustomControlComponent.createComponentFromJson = function(workspaceUI,control,componentJson) {
     var customControlComponent = new haxapp.app.NewCustomControlComponent(workspaceUI,control,componentJson);
     return customControlComponent;
+}
+
+haxapp.app.NewCustomControlComponent.addPropFunction = function(component,values) {
+    var keepAlive = component.getDoKeepAlive();
+    values.destroyOnHide = !keepAlive;
+}
+
+haxapp.app.NewCustomControlComponent.updateProperties = function(component,oldValues,newValues,actionResponse) {
+    var doKeepAlive = (newValues.destroyOnHide) ? false : true;
+    component.setDoKeepAlive(doKeepAlive);
 }
 
 
@@ -325,4 +368,15 @@ haxapp.app.NewCustomControlComponent.generator.createComponentFromJson = haxapp.
 haxapp.app.NewCustomControlComponent.generator.DEFAULT_WIDTH = 500;
 haxapp.app.NewCustomControlComponent.generator.DEFAULT_HEIGHT = 500;
 haxapp.app.NewCustomControlComponent.generator.ICON_RES_PATH = "/controlIcon.png";
+
+haxapp.app.NewCustomControlComponent.generator.propertyDialogLines = [
+    {
+        "type":"checkbox",
+        "heading":"Destroy on Hide: ",
+        "resultKey":"destroyOnHide"
+    }
+];
+
+haxapp.app.NewCustomControlComponent.generator.addPropFunction = haxapp.app.NewCustomControlComponent.addPropFunction;
+haxapp.app.NewCustomControlComponent.generator.updateProperties = haxapp.app.NewCustomControlComponent.updateProperties;
 

@@ -234,7 +234,7 @@ haxapp.app.Component.prototype.memberUpdated = function() {
 haxapp.app.Component.prototype.getPropertyValues = function() {
     
     var member = this.object;
-    var generator = member.generator;
+//    var generator = member.generator;
     
     var values = {};
     values.name = member.getName();
@@ -243,8 +243,11 @@ haxapp.app.Component.prototype.getPropertyValues = function() {
         values.parentName = parent.getFullName();
     }
 
-    if(generator.addPropFunction) {
-        generator.addPropFunction(member,values);
+    if(member.generator.addPropFunction) {
+        member.generator.addPropFunction(member,values);
+    }
+    if(this.generator.addPropFunction) {
+        this.generator.addPropFunction(this,values);
     }
     return values;
 }

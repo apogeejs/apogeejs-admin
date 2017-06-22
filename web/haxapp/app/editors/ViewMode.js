@@ -21,6 +21,13 @@ haxapp.app.ViewMode.CLOSE_OK = 0;
 // Accessed by the Component Display
 //------------------------------
 
+/** If doKeepAlive is set to true, the output mode is not destroyed when it is 
+ * hidden. Otherwise it is destroyed when it is hidden and recreated nect time it
+ * is shown. */
+haxapp.app.ViewMode.prototype.setDoKeepAlive = function(doKeepAlive) {
+    this.doKeepAlive = doKeepAlive;
+}
+
 /** This is called immediately before the display element is shown. */
 haxapp.app.ViewMode.prototype.showData = function() {
     if(!this.dataDisplay) {

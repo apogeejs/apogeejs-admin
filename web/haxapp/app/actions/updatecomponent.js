@@ -128,6 +128,11 @@ haxapp.app.updatecomponent.updatePropertyValues = function(component,oldValues,n
 
         actionResponse = hax.action.doAction(actionData,actionResponse);
     }
+    
+    //allow for an component update
+    if(component.generator.updateProperties) {
+        component.generator.updateProperties(component,oldValues,newValues,actionResponse);
+    }
         
     return actionResponse;
 }

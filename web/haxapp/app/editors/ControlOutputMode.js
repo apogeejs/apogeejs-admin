@@ -1,6 +1,6 @@
 
-haxapp.app.ControlOutputMode = function(componentDisplay) {
-	haxapp.app.ViewMode.call(this,componentDisplay);   
+haxapp.app.ControlOutputMode = function(componentDisplay,doKeepAlive) {
+	haxapp.app.ViewMode.call(this,componentDisplay,doKeepAlive);   
         
     this.component = componentDisplay.getComponent();
     this.member = this.component.getObject();
