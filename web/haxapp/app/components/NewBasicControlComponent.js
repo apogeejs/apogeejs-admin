@@ -4,6 +4,9 @@
 haxapp.app.NewBasicControlComponent = function(workspaceUI,control,generator,componentJson) {
     //extend edit component
     haxapp.app.EditComponent.call(this,workspaceUI,control,generator,componentJson);
+    
+    //default to keep alive
+    this.doKeepAlive = true;
 
     this.memberUpdated();
 };
@@ -93,8 +96,10 @@ haxapp.app.NewBasicControlComponent.prototype.getViewModeElement = function(edit
 /** This method creates a basic generator for the extending object. */
 haxapp.app.NewBasicControlComponent.createGenerator = function(displayName,uniqueName,constructorFunction) {
     
+    var generator = {};
+    
     //function to create a new component
-    var createComponent = function(workspaceUI,data,resource,generator,componentOptions) {
+    var createComponent = function(workspaceUI,data,componentOptions) {
     
         var workspace = workspaceUI.getWorkspace();
         //should throw an exception if parent is invalid!
@@ -110,9 +115,6 @@ haxapp.app.NewBasicControlComponent.createGenerator = function(displayName,uniqu
         var control = json.member;
 
         if(control) {
-            //set the resource
-            control.updateResource(resource);
-
             //create the component
             var controlComponent = new constructorFunction(workspaceUI,control,generator,componentOptions);
             actionResponse.component = controlComponent;
@@ -121,13 +123,12 @@ haxapp.app.NewBasicControlComponent.createGenerator = function(displayName,uniqu
     }
 
     //function to deserialize the component
-    var createComponentFromJson = function(workspaceUI,member,generator,componentJson) {
+    var createComponentFromJson = function(workspaceUI,member,componentJson) {
         var controlComponent = new constructorFunction(workspaceUI,member,generator,componentJson);
         return controlComponent;
     }
 
     //generator
-    var generator = {};
     generator.displayName = displayName;
     generator.uniqueName = uniqueName;
     generator.createComponent = createComponent;

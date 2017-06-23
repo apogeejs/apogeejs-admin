@@ -34,7 +34,7 @@ haxapp.app.NewCustomControlComponent.prototype.constructor = haxapp.app.NewCusto
 haxapp.app.NewCustomControlComponent.prototype.getDataDisplay = function(viewMode) {
     var html = this.getUiCodeField(haxapp.app.NewCustomControlComponent.CODE_FIELD_HTML);
     var resource = this.createResource();
-    var dataDisplay = new haxapp.app.CustomControlDataDisplay(html,resource,viewMode);
+    var dataDisplay = new haxapp.app.HtmlJsDataDisplay(html,resource,viewMode);
     return dataDisplay;
 }
 
