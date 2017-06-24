@@ -5,13 +5,13 @@
  * 
  * init(outputElement,outputMode);
  * setData(data,outputElement,outputMode);
+ * requestHide(outputElement,outputMode);
  * onHide(outputElement,outputMode);
  * destroy(outputElement,outputMode);
  */
 
 /** This is the display/editor for the custom control output. */
-haxapp.app.JsDataDisplay = function(resource,outputMode) {
-    this.resource = resource;
+haxapp.app.JsDataDisplay = function(outputMode) {
     this.outputMode = outputMode;
     this.outputElement = haxapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -21,75 +21,33 @@ haxapp.app.JsDataDisplay = function(resource,outputMode) {
         "right":"0px",
 		"overflow":"auto"
 	});
-    
-    //-------------------------
-    //add the optional methods to this class
-    //-------------------------
-    
-    if(this.resource.setData) {
-        this.showData = function(data) {
-            try {
-                this.resource.setData.call(this.resource,data,this.outputElement,this.outputMode);
-            }
-            catch(error) {
-                alert("Error in " + this.outputMode.getFullName() + " setData function: " + error.message);
-            }
-        }
-    }
-    
-    if(this.resource.hideRequest) {     
-        this.hideRequest = function() {
-            try {
-                this.resource.onHide.call(this.resource,this.outputElement,this.outputMode);
-
-            }
-            catch(error) {
-                alert("Error in " + this.outputMode.getFullName() + " onHide function: " + error.message);
-            }
-        }
-    }
-
-    if(this.resource.onHide) {   
-        this.hide = function() {
-            try {
-                this.resource.onHide.call(this.resource,this.outputElement,this.outputMode);
-
-            }
-            catch(error) {
-                alert("Error in " + this.outputMode.getFullName() + " onHide function: " + error.message);
-            }
-        }
-    }
-
-    if(this.resource.destroy) {
-        this.destroy = function() {
-            try {
-                this.resource.destroy.call(this.resource,this.outputElement,this.outputMode);
-            }
-            catch(error) {
-                alert("Error in " + this.outputMode.getFullName() + " destroy function: " + error.message);
-            }
-        }
-    }
-    
-    //-------------------
-    //initialization
-    //-------------------
-    
-    if(resource.init) {
-        try {
-            resource.init.call(resource,this.outputElement,outputMode);
-        }
-        catch(error) {
-            alert("Error in " + this.outputMode.getFullName() + " init function: " + error.message);
-        }
-    }
 }
 
 haxapp.app.JsDataDisplay.prototype.getElement = function() {
     return this.outputElement;
 }
 
+haxapp.app.JsDataDisplay.prototype.getOutputMode = function() {
+    return this.outputMode;
+}
 
+//-------------------------
+//Implementation Methods (all optional)
+//-------------------------
+   
+/** This method is called to set data for the data display. */
+//haxapp.app.JsDataDisplay.prototype.showData = function(data)
 
+/** This method is called before the data display is hidden. 
+ * Possible return values:
+ * haxapp.app.ViewMode.UNSAVED_DATA: do not hide the data display. Show an unsaved data message.
+ * haxapp.app.ViewMode.CLOSE_OK: ok to hide the data display
+ */
+//haxapp.app.JsDataDisplay.prototype.hideRequest = function()
 
+/** This method is called after the data display is hidden. */
+//haxapp.app.JsDataDisplay.prototype.onHide = function()
+
+/** This method is called when the data display is being destroyed. */
+//haxapp.app.JsDataDisplay.prototype.destroy = function()
+    

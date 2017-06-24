@@ -1,136 +1,121 @@
-/** This is a simple chart control using the libary Chart.js. The Chart.js libarry
- * must be loaded separately for this control. */
-
 (function() {
 
-//=================================
-// Simple Chart Reousrce Processor
-//=================================
+/** This is a simple custom resource component example. */
+haxapp.app.SimpleGeojsonControl = function(workspaceUI,control,generator,componentJson) {
+    haxapp.app.NewBasicControlComponent.call(this,workspaceUI,control,generator,componentJson);
+};
 
-/** Constructor */
-SimpleGeojsonResource = function() {
+haxapp.app.SimpleGeojsonControl.prototype = Object.create(haxapp.app.NewBasicControlComponent.prototype);
+haxapp.app.SimpleGeojsonControl.prototype.constructor = haxapp.app.SimpleGeojsonControl;
 
-    this.map = null;
-    this.geoJsonLayer = null;
-    
-    this.contentElement = null;
-    this.mapDiv = null;
-    
-    //dummy initial view
-    this.lat = 37;
-    this.lon = -120;
-    this.zoom = 14;
+var DEFAULT_LAT_LNG = [0,0];
+var DEFAULT_ZOOM = 1;
+
+/** Implement the method to get the data display. JsDataDisplay is an 
+ * easily configurable data display. */
+haxapp.app.SimpleGeojsonControl.prototype.getDataDisplay = function(viewMode) {
+    return new haxapp.app.SimpleGeojsonDisplay(viewMode);
 }
 
-//required links for leaflet
-//https://unpkg.com/leaflet@1.0.1/dist/leaflet.js
-//https://unpkg.com/leaflet@1.0.1/dist/leaflet.css
-
-
-/** setFrame - required method for resource processor used in Basic Resource Control. */
-SimpleGeojsonResource.prototype.setComponent = function(component) {
-    this.component = component;
+/** TO use JsDataDisplay, implement a class with the following methods, all optional:
+ * init(outputElement,outputMode);
+ * setData(data,outputElement,outputMode);
+ * requestHide(outputElement,outputMode);
+ * onHide(outputElement,outputMode);
+ * destroy(outputElement,outputMode);
+ */
+haxapp.app.SimpleGeojsonDisplay = function(viewMode) {
+    //extend edit component
+    haxapp.app.JsDataDisplay.call(this,viewMode);
     
-    //initialize UI - to be ready for code to be set ---------------------------
-    this.mapDiv = document.createElement("div");
-    this.mapDiv.style.height = "100%";
-    this.mapDiv.style.width = "100%"; 
-    var contentElement = this.component.getOutputElement();
-    contentElement.appendChild(this.mapDiv);
-    
-    this.map = L.map(this.mapDiv);
-        
-    //osm tiles
-    L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-        maxZoom: 18
-    }).addTo(this.map);
-
-    //set view
-    this.map.setView([this.lat,this.lon], this.zoom);
+    //dummy initial view
+    this.previousSetView = null;
     
     //resize the editor on window size change
     var instance = this;
+    var onLoadCallback = function() {
+        instance.loadMap();
+    }
     var resizeCallback = function() {
         if(instance.map) {
             instance.map.invalidateSize();
         }
     }
-    haxapp.ui.setResizeListener(this.mapDiv, resizeCallback);
-    
-    
-    //end initailize UI --------------------------------------------------------
-    
-    //call component updated - though we usually don't need to
-    this.component.memberUpdated();
+    haxapp.ui.setResizeListener(this.getElement(), resizeCallback, onLoadCallback);
 }
 
-/** This is the method users will call to initialize the chart. */
-SimpleGeojsonResource.prototype.setView = function(lat,lon,zoom) {
-    this.lat = lat;
-    this.lon = lon;
-    this.zoom = zoom;
+haxapp.app.SimpleGeojsonDisplay.prototype = Object.create(haxapp.app.JsDataDisplay.prototype);
+haxapp.app.SimpleGeojsonDisplay.prototype.constructor = haxapp.app.SimpleGeojsonDisplay;
+
+haxapp.app.SimpleGeojsonDisplay.prototype.loadMap = function() {
     if(this.map) {
-        this.map.setView([this.lat,this.lon], this.zoom);
+        //already initialized
+        return;
+    }
+    
+    //create map
+    var outputElement = this.getElement();
+    this.map = L.map(outputElement);
+    
+    //add tiles
+    L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+        maxZoom: 18
+    }).addTo(this.map);
+    
+    this.map.setView(DEFAULT_LAT_LNG,DEFAULT_ZOOM);
+    
+    //if needed, reset the data
+    var outputMode = this.getOutputMode();
+    if(this.outputMode) {
+        this.outputMode.showData();
     }
 }
 
-SimpleGeojsonResource.prototype.setGeojson = function(features,theme) {
-    if(this.geoJsonLayer !== null) {
-        this.geoJsonLayer.remove();
-        this.geoJsonLayer = null;
+haxapp.app.SimpleGeojsonDisplay.prototype.showData = function(data) {
+    if(this.map) { 
+        var features = data.features;
+        var theme = data.theme;
+        var initialView = data.initialView;
+        
+        if((features)&&(theme)) {
+           
+            //set the initial view if it changes
+            if((initialView)&&(initialView !== this.previousSetView)) {
+                try {
+                    var latLng = data.initialView.latLng;
+                    var zoom = data.initialView.zoom;
+                    this.map.setView(latLng,zoom);
+                    this.previousSetView = initialView;
+                }
+                catch(error) {
+                    alert("Improper initial view format.");
+                }
+
+            }
+            
+            if(this.geoJsonLayer) {
+                this.geoJsonLayer.remove();
+                this.geoJsonLayer = null;
+            }
+            this.geoJsonLayer = L.geoJSON(features,theme).addTo(this.map);
+        }
     }
-    if(this.map) {
-        this.geoJsonLayer = L.geoJSON(features,theme).addTo(this.map);
-    }
 }
 
-/** This is the method users will call to initialize the chart. */
-SimpleGeojsonResource.prototype.show = function() {  
-  
-}
+//-----------------
+//create a component generator
+//-----------------
+haxapp.app.SimpleGeojsonControl.generator = haxapp.app.NewBasicControlComponent.createGenerator(
+        "SimpleGeojsonControl",
+        "haxapp.app.SimpleGeojsonControl",
+        haxapp.app.SimpleGeojsonControl);
 
-SimpleGeojsonResource.prototype.hide = function() {  
-    //no action
-}
-
-SimpleGeojsonResource.prototype.onDelete = function() {  
-    //no action
-}
-
-//======================================
-// Static methods
-//======================================
-
-var SimpleGeojsonComponent = {};
-
-/** This method creates the control. */
-SimpleGeojsonComponent.createComponent = function(workspaceUI,data,componentOptions) {
-    var resource = new SimpleGeojsonResource();
-	return haxapp.app.BasicControlComponent.createBaseComponent(workspaceUI,data,resource,SimpleGeojsonComponent.generator,componentOptions);
-}
-
-SimpleGeojsonComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
-    var resource = new SimpleGeojsonResource();
-	member.updateResource(resource);
-    return haxapp.app.BasicControlComponent.createBaseComponentFromJson(workspaceUI,member,SimpleGeojsonComponent.generator,componentJson);
-}
-
-//======================================
-// This is the control generator, to register the control
-//======================================
-
-SimpleGeojsonComponent.generator = {};
-SimpleGeojsonComponent.generator.displayName = "Simple GeoJSON Control";
-SimpleGeojsonComponent.generator.uniqueName = "hax.example.SimpleGeojsonComponent";
-SimpleGeojsonComponent.generator.createComponent = SimpleGeojsonComponent.createComponent;
-SimpleGeojsonComponent.generator.createComponentFromJson = SimpleGeojsonComponent.createComponentFromJson;
-SimpleGeojsonComponent.generator.DEFAULT_WIDTH = 500;
-SimpleGeojsonComponent.generator.DEFAULT_HEIGHT = 500;
-
+//-----------------
 //auto registration
+//-----------------
 if(registerComponent) {
-    registerComponent(SimpleGeojsonComponent.generator);
+    registerComponent(haxapp.app.SimpleGeojsonControl.generator);
 }
 
 }

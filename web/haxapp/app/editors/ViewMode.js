@@ -28,6 +28,16 @@ haxapp.app.ViewMode.prototype.setDoKeepAlive = function(doKeepAlive) {
     this.doKeepAlive = doKeepAlive;
 }
 
+/** This method cleasr the data display. It should only be called when the data display is not showing. */
+haxapp.app.ViewMode.prototype.triggerReload = function() {
+    if(this.dataDisplay) {
+        if(this.dataDisplay.destroy) {
+            this.dataDisplay.destroy();
+        }
+        this.dataDisplay = null;
+    }
+}
+
 /** This is called immediately before the display element is shown. */
 haxapp.app.ViewMode.prototype.showData = function() {
     if(!this.dataDisplay) {
@@ -41,6 +51,10 @@ haxapp.app.ViewMode.prototype.showData = function() {
  * return true or false. */
 haxapp.app.ViewMode.prototype.requestHide = function() {
     if(this.dataDisplay) {
+        if(this.dataDisplay.requestHide) {
+            return this.dataDisplay.requestHide();
+        }
+        
         if(this.inEditMode) {
             return haxapp.app.ViewMode.UNSAVED_DATA;
         }
@@ -55,12 +69,10 @@ haxapp.app.ViewMode.prototype.hide = function() {
         if(this.dataDisplay.hide) {
             this.dataDisplay.hide();
         }
+        
         //if we do not keep alive, kill the data display
         if(!this.doKeepAlive) {
-            if(this.dataDisplay.destroy) {
-                this.dataDisplay.destroy();
-            }
-            this.dataDisplay = null;
+            this.destroy();
         }
     }
 }

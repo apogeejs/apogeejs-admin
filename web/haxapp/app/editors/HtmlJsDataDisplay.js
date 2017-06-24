@@ -3,6 +3,7 @@
  * HTML and javascript code. Is should be passed a 
  * resource (javascript object) which has the following methods optionally defined: 
  * 
+ * constructorAddition(outputMode);
  * init(outputElement,outputMode);
  * setData(data,outputElement,outputMode);
  * onHide(outputElement,outputMode);
@@ -38,6 +39,19 @@ haxapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
         this.outputElement.innerHTML = html;
     }
     
+    //-------------------
+    //constructor code
+    //-------------------
+    
+    if(resource.constructorAddition) {
+        try {
+            resource.constructorAddition.call(this,outputMode);
+        }
+        catch(error) {
+            alert("Error in " + this.outputMode.getFullName() + " init function: " + error.message);
+        }
+    }
+    
     //------------------------
     //add resize/load listener if needed
     //------------------------
@@ -50,10 +64,10 @@ haxapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     if(resource.onLoad) {
         loadCallback = function() {
             try {
-                resource.onLoad.call(resource,instance.outputElement,instance.outputMode);
+                resource.onLoad.call(instance,instance.outputElement,instance.outputMode);
             }
             catch(error) {
-                alert("Error in " + this.outputMode.getFullName() + " onLoad function: " + error.message);
+                alert("Error in " + instance.outputMode.getFullName() + " onLoad function: " + error.message);
             }
             //set data now that element is loaded
             instance.outputMode.showData();
@@ -63,10 +77,10 @@ haxapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     if(resource.onResize) {
         resizeCallback = function() {
             try {
-                resource.onResize.call(resource,instance.outputElement,instance.outputMode);
+                resource.onResize.call(instance,instance.outputElement,instance.outputMode);
             }
             catch(error) {
-                console.log("Error in " + this.outputMode.getFullName() + " onResize function: " + error.message);
+                console.log("Error in " + instance.outputMode.getFullName() + " onResize function: " + error.message);
             }
         };
         addResizeListener = true;
@@ -82,22 +96,25 @@ haxapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     if(this.resource.setData) {
         this.showData = function(data) {
             try {
-                this.resource.setData.call(this.resource,data,this.outputElement,this.outputMode);
+                resource.setData.call(instance,data,instance.outputElement,instance.outputMode);
             }
             catch(error) {
-                alert("Error in " + this.outputMode.getFullName() + " setData function: " + error.message);
+                alert("Error in " + instance.outputMode.getFullName() + " setData function: " + error.message);
             }
         }
+    }
+    else {
+        this.showData = function(data){};
     }
     
     if(this.resource.hideRequest) {     
         this.hideRequest = function() {
             try {
-                this.resource.onHide.call(this.resource,this.outputElement,this.outputMode);
+                resource.onHide.call(instance,instance.outputElement,instance.outputMode);
 
             }
             catch(error) {
-                alert("Error in " + this.outputMode.getFullName() + " onHide function: " + error.message);
+                alert("Error in " + instance.outputMode.getFullName() + " onHide function: " + error.message);
             }
         }
     }
@@ -105,11 +122,11 @@ haxapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     if(this.resource.onHide) {   
         this.hide = function() {
             try {
-                this.resource.onHide.call(this.resource,this.outputElement,this.outputMode);
+                resource.onHide.call(instance,instance.outputElement,instance.outputMode);
 
             }
             catch(error) {
-                alert("Error in " + this.outputMode.getFullName() + " onHide function: " + error.message);
+                alert("Error in " + instance.outputMode.getFullName() + " onHide function: " + error.message);
             }
         }
     }
@@ -117,10 +134,10 @@ haxapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     if(this.resource.destroy) {
         this.destroy = function() {
             try {
-                this.resource.destroy.call(this.resource,this.outputElement,this.outputMode);
+                resource.destroy.call(instance,instance.outputElement,instance.outputMode);
             }
             catch(error) {
-                alert("Error in " + this.outputMode.getFullName() + " destroy function: " + error.message);
+                alert("Error in " + instance.outputMode.getFullName() + " destroy function: " + error.message);
             }
         }
     }
@@ -131,7 +148,7 @@ haxapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     
     if(resource.init) {
         try {
-            resource.init.call(resource,this.outputElement,outputMode);
+            resource.init.call(this,this.outputElement,outputMode);
         }
         catch(error) {
             alert("Error in " + this.outputMode.getFullName() + " init function: " + error.message);

@@ -48,6 +48,11 @@ haxapp.app.BasicControlComponent.prototype.getTableEditSettings = function() {
     return haxapp.app.BasicControlComponent.TABLE_EDIT_SETTINGS;
 }
 
+/** This gets the current output mode. It may be null.*/
+haxapp.app.BasicControlComponent.prototype.getOutputMode = function() {
+    return this.outputMode;
+}
+
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
 haxapp.app.BasicControlComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {

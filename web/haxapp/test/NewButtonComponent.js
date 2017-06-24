@@ -12,8 +12,7 @@ haxapp.app.NewButtonComponent.prototype.constructor = haxapp.app.NewButtonCompon
 /** Implement the method to get the data display. JsDataDisplay is an 
  * easily configurable data display. */
 haxapp.app.NewButtonComponent.prototype.getDataDisplay = function(viewMode) {
-    var resource = new haxapp.app.NewButtonResource();
-    return new haxapp.app.JsDataDisplay(resource,viewMode);
+    return new haxapp.app.NewButtonDisplay(viewMode);
 }
 
 /** TO use JsDataDisplay, implement a class with the following methods, all optional:
@@ -23,45 +22,51 @@ haxapp.app.NewButtonComponent.prototype.getDataDisplay = function(viewMode) {
  * onHide(outputElement,outputMode);
  * destroy(outputElement,outputMode);
  */
-haxapp.app.NewButtonResource = function() {
+haxapp.app.NewButtonDisplay = function(viewMode) {
+    //extend edit component
+    haxapp.app.JsDataDisplay.call(this,viewMode);
     
-}
-
-haxapp.app.NewButtonResource.prototype.init = function(outputElement,outputMode) {
     var button = document.createElement("button");
     button.innerHTML = "Click me!";
     var instance = this;
     button.onclick = function() {
         instance.buttonClicked();      
     }  
+    
+    var outputElement = this.getElement();
     outputElement.appendChild(button);
 }
 
-haxapp.app.NewButtonResource.prototype.buttonClicked = function() {
+haxapp.app.NewButtonDisplay.prototype = Object.create(haxapp.app.JsDataDisplay.prototype);
+haxapp.app.NewButtonDisplay.prototype.constructor = haxapp.app.NewButtonDisplay;
+
+
+haxapp.app.NewButtonDisplay.prototype.buttonClicked = function() {
     alert("The current value is: " + this.data);
 }
 
-haxapp.app.NewButtonResource.prototype.setData = function(data,outputElement,outputMode) {
+haxapp.app.NewButtonDisplay.prototype.showData = function(data) {
     console.log("NewButtonControl.setData");
     this.data = data;
 }
 
-haxapp.app.NewButtonResource.prototype.requestHide = function(outputElement,outputMode) {
+haxapp.app.NewButtonDisplay.prototype.requestHide = function() {
     console.log("NewButtonControl.requestHide");
+    return haxapp.app.ViewMode.CLOSE_OK;
 }
 
-haxapp.app.NewButtonResource.prototype.onHide = function(outputElement,outputMode) {
+haxapp.app.NewButtonDisplay.prototype.onHide = function() {
     console.log("NewButtonControl.onHide");
 }
 
-haxapp.app.NewButtonResource.prototype.destroy = function(outputElement,outputMode) {
+haxapp.app.NewButtonDisplay.prototype.destroy = function() {
     console.log("NewButtonControl.destroyed");
 }
 
 //-----------------
 //create a component generator
 //-----------------
-haxapp.app.NewButtonResource.generator = haxapp.app.NewBasicControlComponent.createGenerator(
+haxapp.app.NewButtonComponent.generator = haxapp.app.NewBasicControlComponent.createGenerator(
         "NewButtonComponent",
         "haxapp.app.NewButtonComponent",
         haxapp.app.NewButtonComponent);
@@ -70,7 +75,7 @@ haxapp.app.NewButtonResource.generator = haxapp.app.NewBasicControlComponent.cre
 //auto registration
 //-----------------
 if(registerComponent) {
-    registerComponent(haxapp.app.NewButtonResource.generator);
+    registerComponent(haxapp.app.NewButtonComponent.generator);
 }
 
 }
