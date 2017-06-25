@@ -11,10 +11,10 @@ haxapp.app.AceCustomControlMode.prototype.constructor = haxapp.app.AceCustomCont
 
 haxapp.app.AceCustomControlMode.prototype.createDisplay = function() {
     var format;
-    if(this.codeField === haxapp.app.NewCustomControlComponent.CODE_FIELD_HTML) {
+    if(this.codeField === haxapp.app.CustomControlComponent.CODE_FIELD_HTML) {
         format = "ace/mode/html";
     }
-    else if(this.codeField === haxapp.app.NewCustomControlComponent.CODE_FIELD_CSS) {
+    else if(this.codeField === haxapp.app.CustomControlComponent.CODE_FIELD_CSS) {
         format = "ace/mode/css";
     }
     else {

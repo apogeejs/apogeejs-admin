@@ -2,10 +2,10 @@
 
 /** This is a simple custom resource component example. */
 haxapp.app.SimpleGeojsonControl = function(workspaceUI,control,generator,componentJson) {
-    haxapp.app.NewBasicControlComponent.call(this,workspaceUI,control,generator,componentJson);
+    haxapp.app.BasicControlComponent.call(this,workspaceUI,control,generator,componentJson);
 };
 
-haxapp.app.SimpleGeojsonControl.prototype = Object.create(haxapp.app.NewBasicControlComponent.prototype);
+haxapp.app.SimpleGeojsonControl.prototype = Object.create(haxapp.app.BasicControlComponent.prototype);
 haxapp.app.SimpleGeojsonControl.prototype.constructor = haxapp.app.SimpleGeojsonControl;
 
 var DEFAULT_LAT_LNG = [0,0];
@@ -106,7 +106,7 @@ haxapp.app.SimpleGeojsonDisplay.prototype.showData = function(data) {
 //-----------------
 //create a component generator
 //-----------------
-haxapp.app.SimpleGeojsonControl.generator = haxapp.app.NewBasicControlComponent.createGenerator(
+haxapp.app.SimpleGeojsonControl.generator = haxapp.app.BasicControlComponent.createGenerator(
         "SimpleGeojsonControl",
         "haxapp.app.SimpleGeojsonControl",
         haxapp.app.SimpleGeojsonControl);

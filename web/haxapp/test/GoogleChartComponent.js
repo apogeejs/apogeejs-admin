@@ -26,7 +26,7 @@ function onLibLoad() {
 /** This is a simple google chart component. */
 haxapp.app.GoogleChartComponent = function(workspaceUI,control,generator,componentJson) {
     //extend edit component
-    haxapp.app.NewBasicControlComponent.call(this,workspaceUI,control,generator,componentJson);
+    haxapp.app.BasicControlComponent.call(this,workspaceUI,control,generator,componentJson);
     
     //if not yet done, load the google chart library
     if(!googleLoadCalled) {
@@ -36,7 +36,7 @@ haxapp.app.GoogleChartComponent = function(workspaceUI,control,generator,compone
     }
 };
 
-haxapp.app.GoogleChartComponent.prototype = Object.create(haxapp.app.NewBasicControlComponent.prototype);
+haxapp.app.GoogleChartComponent.prototype = Object.create(haxapp.app.BasicControlComponent.prototype);
 haxapp.app.GoogleChartComponent.prototype.constructor = haxapp.app.GoogleChartComponent;
 
 /** Implement the method to get the data display. JsDataDisplay is an 
@@ -126,7 +126,7 @@ haxapp.app.GoogleChartDisplay.prototype.createDataTable = function(data) {
 //-----------------
 //create a component generator
 //-----------------
-haxapp.app.GoogleChartComponent.generator = haxapp.app.NewBasicControlComponent.createGenerator(
+haxapp.app.GoogleChartComponent.generator = haxapp.app.BasicControlComponent.createGenerator(
         "GoogleChartComponent",
         "haxapp.app.GoogleChartComponent",
         haxapp.app.GoogleChartComponent);
