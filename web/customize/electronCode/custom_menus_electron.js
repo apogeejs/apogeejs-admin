@@ -1,17 +1,17 @@
     
-/** This method adds to the standard hax menus.  */
-haxapp.app.Hax.prototype.addToMenuBar = function(menuBar,menus) {
+/** This method adds to the standard apogee menus.  */
+apogeeapp.app.Apogee.prototype.addToMenuBar = function(menuBar,menus) {
     	
     //add an exit menu item to the file menu
     var menu = menus["Workspace"];
     if(!menu) {
         alert("Implementation Error - Workspace menu not found!");
     }
-    var exitCallback = haxapp.app.Hax.getExitCallback();
+    var exitCallback = apogeeapp.app.Apogee.getExitCallback();
     menu.addCallbackMenuItem("Exit",exitCallback);
 }
 
-haxapp.app.Hax.getExitCallback = function() {
+apogeeapp.app.Apogee.getExitCallback = function() {
     return function() {
         var remote = require('electron').remote;
         var window = remote.getCurrentWindow();

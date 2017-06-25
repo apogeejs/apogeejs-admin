@@ -1,15 +1,15 @@
 
 /** This method shows a open workspace dialog. The argument onOpenFunction
  * takes single argment, the workspace text. It does not need a return value. */
-haxapp.app.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
+apogeeapp.app.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
 
-    var dialog = haxapp.ui.createDialog({"resizable":true,"movable":true});
+    var dialog = apogeeapp.ui.createDialog({"resizable":true,"movable":true});
     dialog.setTitle("&nbsp;");
     
     var line;
     
     //no scroll container - we will fit the dialog to the content
-	var content = haxapp.ui.createElement("div",null,
+	var content = apogeeapp.ui.createElement("div",null,
 			{
 				"display":"table",
 				"overflow":"hidden"
@@ -17,25 +17,25 @@ haxapp.app.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
     dialog.setContent(content);
   
     //title
-    line = haxapp.ui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(haxapp.ui.createElement("div",{"className":"dialogTitle","innerHTML":"Open Workspace"}));
+    line = apogeeapp.ui.createElement("div",{"className":"dialogLine"});
+    line.appendChild(apogeeapp.ui.createElement("div",{"className":"dialogTitle","innerHTML":"Open Workspace"}));
     content.appendChild(line);
     
     //instructions
-    line = haxapp.ui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(haxapp.ui.createElement("div",{"innerHTML":"Paste saved workspace data in the space below."}));
+    line = apogeeapp.ui.createElement("div",{"className":"dialogLine"});
+    line.appendChild(apogeeapp.ui.createElement("div",{"innerHTML":"Paste saved workspace data in the space below."}));
     content.appendChild(line);
     
     //input
-    line = haxapp.ui.createElement("div",{"className":"dialogLine"});
-    var inputElement = haxapp.ui.createElement("textarea",{"rows":"15","cols":"75"});
+    line = apogeeapp.ui.createElement("div",{"className":"dialogLine"});
+    var inputElement = apogeeapp.ui.createElement("textarea",{"rows":"15","cols":"75"});
     line.appendChild(inputElement);
     content.appendChild(line);
     
     //buttons and handler
-    line = haxapp.ui.createElement("div",{"className":"dialogLine"});
+    line = apogeeapp.ui.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
-        haxapp.ui.closeDialog(dialog);
+        apogeeapp.ui.closeDialog(dialog);
     }
     
     var onOpen = function() {
@@ -47,11 +47,11 @@ haxapp.app.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
         
         onOpenFunction(jsonText);
         
-        haxapp.ui.closeDialog(dialog);
+        apogeeapp.ui.closeDialog(dialog);
 	}
     
-    line.appendChild(haxapp.ui.createElement("button",{"className":"dialogButton","innerHTML":"Open","onclick":onOpen}));
-    line.appendChild(haxapp.ui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
+    line.appendChild(apogeeapp.ui.createElement("button",{"className":"dialogButton","innerHTML":"Open","onclick":onOpen}));
+    line.appendChild(apogeeapp.ui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
     //show dialog

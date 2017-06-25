@@ -1,15 +1,15 @@
 
-haxapp.ui.MenuBar = function() {
-    this.element = haxapp.ui.createElement("div",{"className":"menu-bar"});
-    this.list = haxapp.ui.createElement("ul");
+apogeeapp.ui.MenuBar = function() {
+    this.element = apogeeapp.ui.createElement("div",{"className":"menu-bar"});
+    this.list = apogeeapp.ui.createElement("ul");
     this.element.appendChild(this.list);
 }
 
-haxapp.ui.MenuBar.prototype.getElement = function() {
+apogeeapp.ui.MenuBar.prototype.getElement = function() {
     return this.element;
 }
 
-haxapp.ui.MenuBar.prototype.addMenu = function(menu) {
+apogeeapp.ui.MenuBar.prototype.addMenu = function(menu) {
     this.list.appendChild(menu.getListEntry());
 }
 

@@ -4,7 +4,7 @@
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         
-        <script type="text/javascript" src="../../hax.js"></script>
+        <script type="text/javascript" src="../../apogee.js"></script>
         <script type="text/javascript" src="../../ui/visiui/visiui.js"></script>
         <script type="text/javascript" src="MenuBar.js"></script>	
         <script type="text/javascript" src="Menu.js"></script>	
@@ -15,36 +15,36 @@
         <script>
             function init() {
                 var menuBarContainer = document.getElementById("menu_bar_container");
-                var menuBar = new haxapp.ui.MenuBar();
+                var menuBar = new apogeeapp.ui.MenuBar();
                 menuBarContainer.appendChild(menuBar.getElement());
 
                 var menu;
                 var menuItem;
 
-                menu = new haxapp.ui.Menu("first");
+                menu = new apogeeapp.ui.Menu("first");
                 menuBar.addMenu(menu);
-                menuItem = new haxapp.ui.MenuItem("a",function() {alert("a pressed");});
+                menuItem = new apogeeapp.ui.MenuItem("a",function() {alert("a pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new haxapp.ui.MenuItem("b",function() {alert("b pressed");});
+                menuItem = new apogeeapp.ui.MenuItem("b",function() {alert("b pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new haxapp.ui.MenuItem("c",function() {alert("c pressed");});
+                menuItem = new apogeeapp.ui.MenuItem("c",function() {alert("c pressed");});
                 menu.addMenuItem(menuItem);
 
 
-                menu = new haxapp.ui.Menu("second");
+                menu = new apogeeapp.ui.Menu("second");
                 menuBar.addMenu(menu);
                 
-                menuItem = new haxapp.ui.MenuItem("1",function() {alert("1 pressed");});
+                menuItem = new apogeeapp.ui.MenuItem("1",function() {alert("1 pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new haxapp.ui.MenuItem("2",function() {alert("2 pressed");});
+                menuItem = new apogeeapp.ui.MenuItem("2",function() {alert("2 pressed");});
                 menu.addMenuItem(menuItem);
-                menuItem = new haxapp.ui.MenuItem("3",function() {alert("3 pressed");});
+                menuItem = new apogeeapp.ui.MenuItem("3",function() {alert("3 pressed");});
                 menu.addMenuItem(menuItem);
 
-                menu = new haxapp.ui.Menu("third");
+                menu = new apogeeapp.ui.Menu("third");
                 menuBar.addMenu(menu);
 
-                menu = new haxapp.ui.Menu("fourth");
+                menu = new apogeeapp.ui.Menu("fourth");
                 menuBar.addMenu(menu);
             }
         </script>	

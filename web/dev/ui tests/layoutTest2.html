@@ -7,10 +7,10 @@ and open the template in the editor.
     <head>
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script src="../../haxapp/haxapp.js"></script>
-        <script src="../../haxapp/ui/haxappui.js"></script>
-        <script src="../../haxapp/ui/displayandheader/DisplayAndHeader.js"></script>
-        <script src="../../haxapp/ui/splitpane/SplitPane.js"></script>
+        <script src="../../apogeeapp/apogeeapp.js"></script>
+        <script src="../../apogeeapp/ui/apogeeappui.js"></script>
+        <script src="../../apogeeapp/ui/displayandheader/DisplayAndHeader.js"></script>
+        <script src="../../apogeeapp/ui/splitpane/SplitPane.js"></script>
         <script>
             function init() {
                 var container = document.getElementById("container");
@@ -18,9 +18,9 @@ and open the template in the editor.
                 //------------------
                 //top level layout
                 //-------------------
-                var layout1 = new haxapp.ui.DisplayAndHeader(haxapp.ui.DisplayAndHeader.FIXED_PANE,
+                var layout1 = new apogeeapp.ui.DisplayAndHeader(apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
                         "menuBarColoring",
-                        haxapp.ui.DisplayAndHeader.FIXED_PANE
+                        apogeeapp.ui.DisplayAndHeader.FIXED_PANE
                     );
                 
                 var layout1Container = layout1.getOuterElement();
@@ -44,8 +44,8 @@ and open the template in the editor.
             }
             
             function loadMainBody(container) {
-                var splitPane = new haxapp.ui.SplitPane(haxapp.ui.SplitPane.SCROLLING_PANE,
-                        haxapp.ui.SplitPane.FIXED_PANE
+                var splitPane = new apogeeapp.ui.SplitPane(apogeeapp.ui.SplitPane.SCROLLING_PANE,
+                        apogeeapp.ui.SplitPane.FIXED_PANE
                     );
                 container.appendChild(splitPane.getOuterElement());
                 
@@ -64,9 +64,9 @@ and open the template in the editor.
             }
             
             function loadTabControl(container) {
-                var tabLayout = new haxapp.ui.DisplayAndHeader(haxapp.ui.DisplayAndHeader.FIXED_PANE,
+                var tabLayout = new apogeeapp.ui.DisplayAndHeader(apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
                         "tabBarColoring",
-                        haxapp.ui.DisplayAndHeader.SCROLLING_PANE                   
+                        apogeeapp.ui.DisplayAndHeader.SCROLLING_PANE                   
                     );
                 
                 var tabControlContainer = tabLayout.getOuterElement();
@@ -92,14 +92,14 @@ and open the template in the editor.
                 //-----------------
                 var window, row, cell;
                 
-                window = haxapp.ui.createElementWithClass("table","WINDOW1_STYLE windowColoring",container);
+                window = apogeeapp.ui.createElementWithClass("table","WINDOW1_STYLE windowColoring",container);
                 row = document.createElement("tr");
                 window.appendChild(row);
                 cell = document.createElement("td");
                 row.appendChild(cell);
                 cell.innerHTML = "Window 1";
                 
-                window = haxapp.ui.createElementWithClass("table","WINDOW2_STYLE windowColoring",container);
+                window = apogeeapp.ui.createElementWithClass("table","WINDOW2_STYLE windowColoring",container);
                 row = document.createElement("tr");
                 window.appendChild(row);
                 cell = document.createElement("td");
@@ -107,8 +107,8 @@ and open the template in the editor.
                 cell.innerHTML = "Window 2";
             }
         </script>
-        <link rel="stylesheet" type="text/css" href="../../haxapp/ui/displayandheader/DisplayAndHeader.css">
-        <link rel="stylesheet" type="text/css" href="../../haxapp/ui/splitpane/SplitPane.css">
+        <link rel="stylesheet" type="text/css" href="../../apogeeapp/ui/displayandheader/DisplayAndHeader.css">
+        <link rel="stylesheet" type="text/css" href="../../apogeeapp/ui/splitpane/SplitPane.css">
         <style>
             body {
                 overflow:hidden;

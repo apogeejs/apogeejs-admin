@@ -1,6 +1,6 @@
 
 //ELECTRON IMPLEMENTATION
-haxapp.app.openworkspace.openFile = function(onOpen) {
+apogeeapp.app.openworkspace.openFile = function(onOpen) {
     //show file open dialog
     var electron = require('electron').remote;
     var dialog = electron.dialog;
@@ -18,19 +18,19 @@ haxapp.app.openworkspace.openFile = function(onOpen) {
 }
 
 
-haxapp.app.saveworkspace.showSaveDialog = function(data) {
+apogeeapp.app.saveworkspace.showSaveDialog = function(data) {
     var electron = require('electron').remote;
     var dialog = electron.dialog;
     var filename = dialog.showSaveDialog();
     if(filename) {
-        haxapp.app.saveworkspace.saveFile(filename,data);
+        apogeeapp.app.saveworkspace.saveFile(filename,data);
     }
     else {
         return false;
     }
 }
 
-haxapp.app.saveworkspace.saveFile = function(filename,data) {
+apogeeapp.app.saveworkspace.saveFile = function(filename,data) {
     var onComplete = function(err,data) {
         if(err) {
             alert("Error: " + err.message);

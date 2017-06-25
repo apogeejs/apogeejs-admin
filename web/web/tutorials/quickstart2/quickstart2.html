@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Hax Quickstart Part 2</title>
+        <title>Apogee Quickstart Part 2</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="/web/base.css">
         <link rel="stylesheet" href="/web/tutorials/tutorial.css">
@@ -10,7 +10,7 @@
         <!-- header -->
         <a class="headerLink" href="/web/home.html"><img class="headerLogo" src="/web/logo51.png"></a>
         <a class="headerLink" href="/web/home.html">Home</a>
-        <a class="headerLink" href="/hax.html">Application</a>
+        <a class="headerLink" href="/apogee.html">Application</a>
         <a class="headerLink" href="/web/tutorials/tutorials.html">Tutorials</a>
         <a class="headerLink" href="/web/reference/reference.html">Reference</a>
         <a class="headerLink" href="/web/downloads/downloads.html">Downloads</a>
@@ -26,7 +26,7 @@
                     close you workspace and open the following one. To do this, select "Open" from the "Workspace" 
                     menu and paste in the following data:
                     <div><textarea class="codeText" readonly rows="6">
-{"name":"workspace","fileType":"hax workspace","jsLinks":[],"cssLinks":[],"workspace":{"name":"workspace","fileType":"hax workspace","version":0.1,"data":{"name":"workspace","type":"hax.core.Folder","children":{"settings":{"name":"settings","type":"hax.core.JsonTable","updateData":{"data":{"initialYear":2015,"initialRevenue":1000000,"growthRate":3,"projectionCount":10}}},"revenueList":{"name":"revenueList","type":"hax.core.JsonTable","updateData":{"argList":[],"functionBody":"var value;\nvalue = [];\r\nvalue[0] = settings.initialRevenue;\r\nfor(var i = 1; i < settings.projectionCount; i++) {\r\n    value[i] = value[i-1] * (1 + settings.growthRate/100);\r\n}\r\n       \nreturn value;\n\n","supplementalCode":""}}}}},"components":{"settings":{"key":"workspace:settings","type":"hax.app.visiui.JsonTableComponent","coordInfo":{"x":15,"y":19},"windowState":0},"revenueList":{"key":"workspace:revenueList","type":"hax.app.visiui.JsonTableComponent","coordInfo":{"x":386,"y":72},"windowState":0}}}
+{"name":"workspace","fileType":"apogee workspace","jsLinks":[],"cssLinks":[],"workspace":{"name":"workspace","fileType":"apogee workspace","version":0.1,"data":{"name":"workspace","type":"apogee.core.Folder","children":{"settings":{"name":"settings","type":"apogee.core.JsonTable","updateData":{"data":{"initialYear":2015,"initialRevenue":1000000,"growthRate":3,"projectionCount":10}}},"revenueList":{"name":"revenueList","type":"apogee.core.JsonTable","updateData":{"argList":[],"functionBody":"var value;\nvalue = [];\r\nvalue[0] = settings.initialRevenue;\r\nfor(var i = 1; i < settings.projectionCount; i++) {\r\n    value[i] = value[i-1] * (1 + settings.growthRate/100);\r\n}\r\n       \nreturn value;\n\n","supplementalCode":""}}}}},"components":{"settings":{"key":"workspace:settings","type":"apogee.app.visiui.JsonTableComponent","coordInfo":{"x":15,"y":19},"windowState":0},"revenueList":{"key":"workspace:revenueList","type":"apogee.app.visiui.JsonTableComponent","coordInfo":{"x":386,"y":72},"windowState":0}}}
                           </textarea>
                     </div>            
                 </li>
@@ -125,7 +125,7 @@ value[0].push("title for another column");
                 <li>Now modify the revenueGridAsJSON formula as follows:
                     <p class="sideNote">Here we are making a copy of the revenueGrid value. We can edit this copy.</p>
                     <div><textarea class="codeText" readonly rows="3">
-value = hax.util.deepJSONCopy(revenueGrid);
+value = apogee.util.deepJSONCopy(revenueGrid);
 value[0].push("title for another column");
                     </textarea></div>
                     <div><img src="gridToJsonEditNoError.png"/></div>                      

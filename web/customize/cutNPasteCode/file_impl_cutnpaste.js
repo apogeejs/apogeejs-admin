@@ -1,17 +1,17 @@
 
 
 //PASTE IMPLEMENTATION
-haxapp.app.openworkspace.openFile = function(onOpen) {
+apogeeapp.app.openworkspace.openFile = function(onOpen) {
     var onFileOpen = function(data) {
         onOpen(null,data);
     }
-    haxapp.app.dialog.showOpenWorkspaceDialog(onFileOpen);
+    apogeeapp.app.dialog.showOpenWorkspaceDialog(onFileOpen);
 }
 
-haxapp.app.saveworkspace.showSaveDialog = function(data) {
-    haxapp.app.dialog.showSaveWorkspaceDialog(data);
+apogeeapp.app.saveworkspace.showSaveDialog = function(data) {
+    apogeeapp.app.dialog.showSaveWorkspaceDialog(data);
 }
 
-haxapp.app.saveworkspace.saveFile = function(filename,data) {
-    haxapp.app.saveworkspace.showSaveDialog(data);
+apogeeapp.app.saveworkspace.saveFile = function(filename,data) {
+    apogeeapp.app.saveworkspace.showSaveDialog(data);
 }

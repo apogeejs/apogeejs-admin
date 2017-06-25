@@ -1,18 +1,18 @@
-haxapp.ui.Menu = function(label) {
-    this.element = haxapp.ui.createElement("li");
+apogeeapp.ui.Menu = function(label) {
+    this.element = apogeeapp.ui.createElement("li");
     
-    this.label = haxapp.ui.createElement("span"/*,{"className":"menu-head"}*/);
+    this.label = apogeeapp.ui.createElement("span"/*,{"className":"menu-head"}*/);
     this.label.innerHTML = label;
     this.element.appendChild(this.label);
     
-    this.list = haxapp.ui.createElement("ul");
+    this.list = apogeeapp.ui.createElement("ul");
     this.element.appendChild(this.list);
 }
 
-haxapp.ui.Menu.prototype.getListEntry = function() {
+apogeeapp.ui.Menu.prototype.getListEntry = function() {
     return this.element;
 }
 
-haxapp.ui.Menu.prototype.addMenuItem = function(menuItem) {
+apogeeapp.ui.Menu.prototype.addMenuItem = function(menuItem) {
     this.list.appendChild(menuItem.getListEntry());
 }
