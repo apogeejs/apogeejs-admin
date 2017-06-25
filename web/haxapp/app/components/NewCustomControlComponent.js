@@ -72,7 +72,7 @@ haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_HIDE = "onHide";
 haxapp.app.NewCustomControlComponent.CODE_FIELD_DESTROY = "destroy";
 haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_LOAD = "onLoad";
 haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_RESIZE = "onResize";
-haxapp.app.NewCustomControlComponent.CODE_FIELD_UI_SUPPLEMENTAL = "constructorAddition";
+haxapp.app.NewCustomControlComponent.CODE_FIELD_CONSTRUCTOR = "constructorAddition";
 
 haxapp.app.NewCustomControlComponent.VIEW_OUTPUT = "Output";
 haxapp.app.NewCustomControlComponent.VIEW_CODE = "Model Code";
@@ -160,7 +160,7 @@ haxapp.app.NewCustomControlComponent.prototype.getViewModeElement = function(edi
             return new haxapp.app.AceCustomControlMode(editComponentDisplay,haxapp.app.NewCustomControlComponent.CODE_FIELD_ON_RESIZE);
 			
         case haxapp.app.NewCustomControlComponent.VIEW_CONSTRUCTOR:
-            return new haxapp.app.AceCustomControlMode(editComponentDisplay,haxapp.app.NewCustomControlComponent.VIEW_CONSTRUCTOR); 
+            return new haxapp.app.AceCustomControlMode(editComponentDisplay,haxapp.app.NewCustomControlComponent.CODE_FIELD_CONSTRUCTOR); 
 
 
         case haxapp.app.NewCustomControlComponent.VIEW_DESCRIPTION:
@@ -285,7 +285,7 @@ haxapp.app.NewCustomControlComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
  * @private
  */
 haxapp.app.NewCustomControlComponent.GENERATOR_INTERNAL_FORMATS = {
-    "constructorAddition":"resource.constructor = function(mode) {\n{0}\n};",
+    "constructorAddition":"resource.constructorAddition = function(mode) {\n{0}\n};",
     "init":"resource.init = function(element,mode) {\n{0}\n};",
     "setData":"resource.setData = function(data,element,mode) {\n{0}\n};",
     "onHide":"resource.onHide = function(element,mode) {\n{0}\n};",
