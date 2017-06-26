@@ -21,6 +21,14 @@ apogeeapp.app.ViewMode.CLOSE_OK = 0;
 // Accessed by the Component Display
 //------------------------------
 
+apogeeapp.app.ViewMode.prototype.getMember = function() {
+    return this.member;
+}
+
+apogeeapp.app.ViewMode.prototype.getComponent = function() {
+    return this.component;
+}
+
 /** If doKeepAlive is set to true, the output mode is not destroyed when it is 
  * hidden. Otherwise it is destroyed when it is hidden and recreated nect time it
  * is shown. */

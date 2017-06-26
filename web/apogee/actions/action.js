@@ -146,32 +146,38 @@ apogee.action.callActionFunction = function(actionData,context,processedActions)
 }
 
 /** This is a convenience method to set a member to a given value when the dataPromise resolves. */
-apogee.action.asynchDataUpdate = function(memberName,context,dataPromise) {
+apogee.action.asynchDataUpdate = function(updateMemberName,fromMember,dataPromise) {
+    
+    var workspace = fromMember.getWorkspace();
+    var contextManager = fromMember.getContextManager();
     
     var token = apogee.action.getAsynchToken();
         
     var actionData = {};
     actionData.action = "updateDataPending";
-    actionData.memberName = memberName;
+    actionData.memberName = updateMemberName;
+    actionData.workspace = workspace;
     actionData.token = token;
-    var actionResponse =  apogee.action.doAction(actionData,context);
+    var actionResponse =  apogee.action.doAction(actionData,contextManager);
     
     var asynchCallback = function(memberValue) {
         //set the data for the table, along with triggering updates on dependent tables.
         var actionData = {};
         actionData.action = "updateData";
-        actionData.memberName = memberName;
+        actionData.memberName = updateMemberName;
+        actionData.workspace = workspace;
         actionData.token = token;
         actionData.data = memberValue;
-        var actionResponse =  apogee.action.doAction(actionData,context);
+        var actionResponse =  apogee.action.doAction(actionData,contextManager);
     }
     var asynchErrorCallback = function(errorMsg) {
         var actionData = {};
         actionData.action = "updateError";
-        actionData.member = member;
+        actionData.memberName = updateMemberName;
+        actionData.workspace = workspace;
         actionData.token = token;
         actionData.errorMsg = errorMsg;
-        var actionResponse =  apogee.action.doAction(actionData,context);
+        var actionResponse =  apogee.action.doAction(actionData,contextManager);
     }
 
     //call appropriate action when the promise resolves.
