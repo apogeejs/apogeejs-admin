@@ -15,7 +15,7 @@ apogee.Workspace = function(optionalJson,actionResponseForJson,ownerForVirtualWo
     this.owner = ownerForVirtualWorkspace;
     
     if(!optionalJson) {
-        this.rootFolder = new apogee.Folder(apogee.Parent.ROOT_NAME,this);
+        this.rootFolder = new apogee.Folder(apogee.Workspace.ROOT_FOLDER_NAME,this);
     }
     else {
         this.loadFromJson(optionalJson,actionResponseForJson);
@@ -27,6 +27,8 @@ apogee.base.mixin(apogee.Workspace,apogee.EventManager);
 apogee.base.mixin(apogee.Workspace,apogee.ContextHolder);
 apogee.base.mixin(apogee.Workspace,apogee.Owner);
 apogee.base.mixin(apogee.Workspace,apogee.RootHolder);
+
+apogee.Workspace.ROOT_FOLDER_NAME = "Workspace";
 
 /** this method gets the root package for the workspace. */
 apogee.Workspace.prototype.getRoot = function() {
@@ -99,7 +101,7 @@ apogee.Workspace.prototype.getPossesionNameBase = function() {
 /** This method looks up a member by its full name. */
 apogee.Workspace.prototype.getMemberByPathArray = function(path,startElement) {
     if(startElement === undefined) startElement = 0;
-    if(path[startElement] === apogee.Parent.ROOT_NAME) return this.rootFolder;
+    if(path.length === 0) return this.rootFolder;
     return this.rootFolder.lookupChildFromPathArray(path,startElement);
 }
 

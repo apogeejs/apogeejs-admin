@@ -46,13 +46,7 @@ apogeeapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, component
         this.loadFolderComponentContentFromJson(rootFolder,componentsJson);
     }
     
-    //add the root tree entyr to the panel
-    this.createWorkspaceTreeEntry();
-    
-    var rootFolderTreeEntry = rootFolderComponent.getTreeEntry();
-    this.workspaceTreeEntry.addChild(rootFolder.getId(),rootFolderTreeEntry);
-    //Set the root entry as expanded. Others parents will be default (collapsed)
-    this.workspaceTreeEntry.setState(apogeeapp.ui.treecontrol.EXPANDED);
+    this.tree.setRootEntry(rootFolderComponent.getTreeEntry());
     
     //listeners
     var instance = this;
@@ -194,16 +188,6 @@ apogeeapp.app.WorkspaceUI.prototype.requestTab = function(id,makeActive) {
     return tab;
 }
 
-apogeeapp.app.WorkspaceUI.prototype.createWorkspaceTreeEntry = function() {
-    
-    //get this from somewhere better
-    var iconSrc = apogeeapp.ui.getResourcePath("/genericIcon.png");
-   
-    var dblClickCallback = null;
-    var contextMenuCallback = null;
-    this.workspaceTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry("Workspace",iconSrc,dblClickCallback,contextMenuCallback,true);
-    this.tree.setRootEntry(this.workspaceTreeEntry);
-}
 //====================================
 // open and save methods
 //====================================

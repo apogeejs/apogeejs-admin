@@ -64,5 +64,6 @@ apogeeapp.app.TreeComponentDisplay.prototype._createTreeEntry = function() {
     
     var labelText = this.object.getName();
     var iconUrl = this.component.getIconUrl();
-    return new apogeeapp.ui.treecontrol.TreeEntry(labelText, iconUrl, openCallback, contextMenuCallback);
+    var isRoot = ((this.object.isParent)&&(this.object.isRoot()));
+    return new apogeeapp.ui.treecontrol.TreeEntry(labelText, iconUrl, openCallback, contextMenuCallback,isRoot);
 }
