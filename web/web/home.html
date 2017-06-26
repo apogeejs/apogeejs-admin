@@ -33,6 +33,9 @@
             .bulletCell {
                 padding: 5px;
             }
+            .bulletCell li {
+                padding: 5px;
+            }
         </style>
     </head>
     <body>
@@ -48,12 +51,9 @@
         <hr class="headerBreak">
         <!-- end header -->
         <p class="introP">
-            Apogee is a <b>programming tool</b> inspired by the Spreadsheet.
-        </p>
-        <p class="introP">
-            Apogee does not replace the spreadsheet, it is more of a <b>power user version of the spreadsheet</b> 
-            or a <b>quick and easy programming environment</b>. See the comparison below:
-        </p>        
+            Apogee is a spreadsheet-inspired <b>programming tool</b> designed for data processing, programmatic JSON editing 
+            and general software coding.
+        </p>      
         <table class="compareTable">
             <tr>
                 <td class="titleCell">
@@ -65,10 +65,10 @@
             </tr>
             <tr>
                 <td class="strengthCell">
-                    <em>Best for: simple models, data entry, data presentation.</em>
+                    <em>Best for: data entry, data presentation, simple calculations.</em>
                 </td>
                 <td class="strengthCell">
-                    <em>Best for: complex models, data manipulation, JSON data.</em>
+                    <em>Best for: data processing, programmatic JSON editing.</em>
                 </td>
             </tr>
             <tr>
@@ -83,42 +83,23 @@
                 <td class="bulletCell">
                     <ul>
                         <li>A <b>grid of cells</b>, each cell is named according to its <b>location in the grid</b>.</li>
+                        <li>A cell value is a <b>simple value</b> like a number or a string.</li>
+                        <li>Each cell has either static value or a formula to calculate this value.</li>
                     </ul>
                 </td>
                 <td class="bulletCell">
                     <ul>
                         <li>Apogee replaces cells with <b>individual tables</b>. Tables are given <b>descriptive names</b> such as "revenue".</li>
-                    </ul>
-                </td>
-            </tr>
-            <tr>
-                <td class="bulletCell">
-                    <ul>
-                        <li>Each cell has a static value or a formula to calculate this value.</li>
-                    </ul>
-                </td>
-                <td class="bulletCell">
-                    <ul>
+                        <li>A table value is a <b>data structure</b> such as a number, an array or something more complex.</li>
                         <li>Each table has a static value or a formula to calculate the value.</li>
-                    </ul>
-                </td>
-            </tr>
-            <tr>
-                <td class="bulletCell">
-                    <ul>
-                        <li>A cell value is a <b>simple value</b> like a number or a string.</li>
-                    </ul>
-                </td>
-                <td class="bulletCell">
-                    <ul>
-                        <li>A table value is a <b>data structure</b> such as an array, or something more complex.</li>
                     </ul>
                 </td>
             </tr>
         </table>
         <h2>Motivation for Apogee</h2>
         <p>
-            The motivation behind Apogee was to make it easier to write real code in a spreadsheet-like tool.
+            The motivation behind Apogee was to make a reactive functional programming environment like a spreadsheet but to
+            allow for more complex code and easier maintenance.
         </p>
         <ul>
             <li>The variables names from a spreadsheet, such as <b><em>B$5</em></b>, are replaced with descriptive names such as 
@@ -126,12 +107,6 @@
             <li>The formulas are applied to entire data structures, so <b>loops or recursive functions</b> can be used, rather than
                         <b>copying and pasting</b> formulas over a range of cells.</li>
         </ul>
-        <p>
-            These new features make the tool more of a coding environment. Admittedly there is
-            extra overhead in writing this code. For simple models, the spreadsheet is easier.
-            However, once the model gets more complex, it is much easier to organize, debug and 
-            maintain in Apogee.
-        </p>
         
         <h2>Implementation</h2>
         <p>The Apogee web application runs completely in the browser and is written in javascript. The user scripting language
@@ -144,8 +119,7 @@
         
         <h2>Compatibility</h2>
         <ul>
-            <li>Desktop Chrome, Firefox browsers tested. Safari also supported.</li>
-            <li>Edge support coming soon</li>
+            <li>Desktop Chrome, Firefox and Edge browsers tested. Safari also supported.</li>
             <li>Internet Explorer not supported</li>
             <li>Desktop support only. Touch not supported.</li>
         </ul>
