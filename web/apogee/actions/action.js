@@ -145,6 +145,34 @@ apogee.action.callActionFunction = function(actionData,context,processedActions)
     }  
 }
 
+/** This is a convenience method to set a member to a given value. */
+apogee.action.dataUpdate = function(updateMemberName,fromMember,data) {
+    var workspace = fromMember.getWorkspace();
+    var contextManager = fromMember.getContextManager();
+    
+    //set the data for the table, along with triggering updates on dependent tables.
+    var actionData = {};
+    actionData.action = "updateData";
+    actionData.memberName = updateMemberName;
+    actionData.workspace = workspace;
+    actionData.data = data;
+    return apogee.action.doAction(actionData,contextManager);
+}
+
+
+/** This is a convenience method to set a member tohave an error message. */
+apogee.action.errorUpdate = function(updateMemberName,fromMember,errorMessage) {
+    var workspace = fromMember.getWorkspace();
+    var contextManager = fromMember.getContextManager();
+        
+    var actionData = {};
+    actionData.action = "updateError";
+    actionData.memberName = updateMemberName;
+    actionData.workspace = workspace;
+    actionData.errorMsg = errorMessage;
+    return apogee.action.doAction(actionData,contextManager);
+}
+
 /** This is a convenience method to set a member to a given value when the dataPromise resolves. */
 apogee.action.asynchDataUpdate = function(updateMemberName,fromMember,dataPromise) {
     

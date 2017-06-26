@@ -204,7 +204,8 @@ apogee.updatemember.applyData = function(dataHolder,data) {
 apogee.updatemember.loadMemberName = function(actionData,context) { 
     
     if(actionData.memberName) {
-        actionData.member = context.getImpactor(actionData.memberName);
+        var path = actionData.memberName.split(".");
+        actionData.member = context.getImpactor(path);
     }
     if(!actionData.member) {
         throw new Error("Member not found for action: " + actionData.action);
