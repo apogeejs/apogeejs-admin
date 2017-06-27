@@ -520,7 +520,7 @@ apogeeapp.ui.WindowFrame.prototype.minimizeContent = function() {
     //set the window state
     this.windowState = apogeeapp.ui.WINDOW_STATE_MINIMIZED;
     this.updateCoordinates();
-    this.setMinMaxButtons
+    this.setMinMaxButtons();
     
     //dispatch resize event
     if(!wasMinimized) this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_MINIMIZED,this);
