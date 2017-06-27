@@ -4,8 +4,7 @@
 apogeeapp.app.ViewMode = function(componentDisplay, doKeepAlive) {
     this.componentDisplay = componentDisplay;
     this.doKeepAlive = doKeepAlive;
-    this.component = componentDisplay.getComponent();
-    this.member = this.component.getObject();
+    this.member = componentDisplay.getMember();
     
     this.dataDisplay = null;
     
@@ -23,10 +22,6 @@ apogeeapp.app.ViewMode.CLOSE_OK = 0;
 
 apogeeapp.app.ViewMode.prototype.getMember = function() {
     return this.member;
-}
-
-apogeeapp.app.ViewMode.prototype.getComponent = function() {
-    return this.component;
 }
 
 /** If doKeepAlive is set to true, the output mode is not destroyed when it is 

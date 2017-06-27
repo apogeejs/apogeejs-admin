@@ -54,6 +54,10 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.getComponent = function() {
     return this.component;
 }
 
+apogeeapp.app.EditWindowComponentDisplay.prototype.getMember = function() {
+    return this.object;
+}
+
 apogeeapp.app.EditWindowComponentDisplay.prototype.deleteDisplay = function() {
     //window will get deleted! New parent will get new windows, as is appropriate
     if(this.windowFrame) {

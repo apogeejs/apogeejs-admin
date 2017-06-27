@@ -1,10 +1,4 @@
-/** Editor that uses the Ace text editor.
- * 
- * @param {type} componentDisplay - the apogee componentDisplay
- * @param {type} aceMode - the display format, such as "ace/mode/json"
- * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
- * @param {type} onCancel - returns true if the edit should end
- */
+/** Editor that uses the basic text editor */
 apogeeapp.app.TextAreaEditor = function(viewMode) {
     
     this.outsideDiv = apogeeapp.ui.createElement("div",null,{

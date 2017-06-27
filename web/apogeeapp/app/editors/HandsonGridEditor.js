@@ -1,9 +1,4 @@
-/** Editor that uses the Ace text editor.
- * 
- * @param {type} componentDisplay - the apogee componentDisplay
- * @param {type} onSave - takes a text json representation for saving. returns true if the edit should end.
- * @param {type} onCancel - returns true if the edit should end
- */
+/** This is a grid editor using hands on table*/
 apogeeapp.app.HandsonGridEditor = function(viewMode) {
    
 	this.outsideDiv = apogeeapp.ui.createElement("div",null,{
