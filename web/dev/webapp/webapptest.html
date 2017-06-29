@@ -1,9 +1,4 @@
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <html>
     <head>
         <title>TODO supply a title</title>
@@ -14,13 +9,15 @@ and open the template in the editor.
 				width: 500px;
                 height: 500px;
 				outline: solid 1px gray;
-				padding: 10px;
 				margin: 10px;
 				display: table;
+                position: relative;
 			}
 		</style>
         
         <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
+        
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
         
         <script type="text/javascript" src="../../customize/webLibHeader.js"></script>
 		<script type="text/javascript" src="../../apogee/apogee.js"></script>
@@ -60,94 +57,161 @@ and open the template in the editor.
         <script type="text/javascript" src="../../apogeeapp/apogeeapp.js"></script>
         <script type="text/javascript" src="extraDefs.js"></script>
 		<script type="text/javascript" src="../../apogeeapp/ui/apogeeappui.js"></script>
-        
+             
+        <script type="text/javascript" src="../../apogeeapp/ui/window/ParentContainer.js"></script>
+		<script type="text/javascript" src="../../apogeeapp/ui/window/WindowFrame.js"></script>      
+		<script type="text/javascript" src="../../apogeeapp/ui/tabframe/TabFrame.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/ui/tabframe/Tab.js"></script>
+		<script type="text/javascript" src="../../apogeeapp/ui/menu/Menu.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/ui/menu/MenuHeader.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/ui/menu/MenuBody.js"></script>
+		<script type="text/javascript" src="../../apogeeapp/ui/jsonedit/jsonedit.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/ui/jsonedit/keyentry.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/ui/jsonedit/valueentry.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/ui/jsonedit/editfield.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/ui/jsonedit/jsoneditarea.js"></script>
         <script type="text/javascript" src="../../apogeeapp/ui/resize/resize.js"></script>
-        <script type="text/javascript" src="../../apogeeapp/app/editors/HtmlJsDataDisplay.js"></script>      
-        <!-- <script type="text/javascript" src="../ui/window/ParentContainer.js"></script>
-		<script type="text/javascript" src="../ui/window/WindowFrame.js"></script>      
-		<script type="text/javascript" src="../ui/tabframe/TabFrame.js"></script>
-        <script type="text/javascript" src="../ui/tabframe/Tab.js"></script>
-		<script type="text/javascript" src="../ui/menu/Menu.js"></script>
-        <script type="text/javascript" src="../ui/menu/MenuHeader.js"></script>
-        <script type="text/javascript" src="../ui/menu/MenuBody.js"></script>
-		<script type="text/javascript" src="../ui/jsonedit/jsonedit.js"></script>
-        <script type="text/javascript" src="../ui/jsonedit/keyentry.js"></script>
-        <script type="text/javascript" src="../ui/jsonedit/valueentry.js"></script>
-        <script type="text/javascript" src="../ui/jsonedit/editfield.js"></script>
-        <script type="text/javascript" src="../ui/jsonedit/jsoneditarea.js"></script>
-        <script type="text/javascript" src="../ui/resize/resize.js"></script>
-        <script type="text/javascript" src="../ui/displayandheader/DisplayAndHeader.js"></script>
-        <script type="text/javascript" src="../ui/splitpane/SplitPane.js"></script>
-        <script type="text/javascript" src="../ui/treecontrol/TreeControl.js"></script>
-        <script type="text/javascript" src="../ui/treecontrol/TreeEntry.js"></script>
-        <script type="text/javascript" src="../app/Apogee.js"></script>
-		<script type="text/javascript" src="../app/LinkManager.js"></script>
-        <script type="text/javascript" src="../app/WorkspaceUI.js"></script>
-        <script type="text/javascript" src="../app/component/WindowHeaderManager.js"></script>
-        <script type="text/javascript" src="../app/component/Component.js"></script>
-        <script type="text/javascript" src="../app/component/ParentComponent.js"></script>
-        <script type="text/javascript" src="../app/component/EditComponent.js"></script>
-        <script type="text/javascript" src="../app/component/TreeComponentDisplay.js"></script>
-        <script type="text/javascript" src="../app/component/TabComponentDisplay.js"></script>
-        <script type="text/javascript" src="../app/component/ParentWindowComponentDisplay.js"></script>
-        <script type="text/javascript" src="../app/component/EditWindowComponentDisplay.js"></script>
-		<script type="text/javascript" src="../app/components/FolderComponent.js"></script>
-        <script type="text/javascript" src="../app/components/JsonTableComponent.js"></script>
-        <script type="text/javascript" src="../app/components/GridTableComponent.js"></script>
-        <script type="text/javascript" src="../app/components/TextComponent.js"></script>
-        <script type="text/javascript" src="../app/components/FunctionComponent.js"></script>
-        <script type="text/javascript" src="../app/components/FolderFunctionComponent.js"></script>
-        <script type="text/javascript" src="../app/components/BasicControlComponent.js"></script>
-		<script type="text/javascript" src="../app/components/CustomControlComponent.js"></script>
-        <script type="text/javascript" src="../app/actions/createworkspace.js"></script>
-        <script type="text/javascript" src="../app/actions/openworkspace.js"></script>
-        <script type="text/javascript" src="../app/actions/saveworkspace.js"></script>
-        <script type="text/javascript" src="../app/actions/importworkspace.js"></script>
-        <script type="text/javascript" src="../app/actions/exportworkspace.js"></script>
-        <script type="text/javascript" src="../app/actions/closeworkspace.js"></script>
-        <script type="text/javascript" src="../app/actions/addcomponent.js"></script>
-        <script type="text/javascript" src="../app/actions/updatecomponent.js"></script>
-        <script type="text/javascript" src="../app/actions/updatelinks.js"></script>
-        <script type="text/javascript" src="../app/editors/ViewMode.js"></script>
-        <script type="text/javascript" src="../app/editors/TextAreaEditor.js"></script>
-        <script type="text/javascript" src="../app/editors/TextAreaMode.js"></script>
-		<script type="text/javascript" src="../app/editors/AceTextEditor.js"></script>		
-		<script type="text/javascript" src="../app/editors/AceCodeMode.js"></script>
-		<script type="text/javascript" src="../app/editors/AceDataMode.js"></script>
-        <script type="text/javascript" src="../app/editors/AceDescriptionMode.js"></script>
-        <script type="text/javascript" src="../app/editors/AceTextMode.js"></script>
-		<script type="text/javascript" src="../app/editors/AceSupplementalMode.js"></script>
-        <script type="text/javascript" src="../app/editors/AceCustomControlMode.js"></script>
-        <script type="text/javascript" src="../app/editors/HtmlJsDataDisplay.js"></script>
-        <script type="text/javascript" src="../app/editors/JsDataDisplay.js"></script>
-		<script type="text/javascript" src="../app/editors/JsonFormEditor.js"></script>
-		<script type="text/javascript" src="../app/editors/FormDataMode.js"></script>
-		<script type="text/javascript" src="../app/editors/HandsonGridEditor.js"></script>
-		<script type="text/javascript" src="../app/editors/HandsonGridMode.js"></script>
-        <script type="text/javascript" src="../app/editors/ControlOutputMode.js"></script>
-        <script type="text/javascript" src="../app/dialogs/ConfigurableDialog.js"></script>
-        <script type="text/javascript" src="../app/dialogs/UpdateLinksDialog.js"></script>
-        <script type="text/javascript" src="../app/dialogs/SelectControlDialog.js"></script>
-        <script type="text/javascript" src="../app/dialogs/propdialog.js"></script>-->
+        <script type="text/javascript" src="../../apogeeapp/ui/displayandheader/DisplayAndHeader.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/ui/splitpane/SplitPane.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/ui/treecontrol/TreeControl.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/ui/treecontrol/TreeEntry.js"></script>
         
-        <script type="text/javascript" src="ApogeeWebApp.js"></script>
-        <script type="text/javascript" src="WebAppComponentDisplay.js"></script>
-        <script type="text/javascript" src="WebCustomControlComponent.js"></script>
+        <!-- <script type="text/javascript" src="../../apogeeapp/app/Apogee.js"></script> -->
+        <script type="text/javascript" src="ApogeeWeb.js"></script>
+        
+		<script type="text/javascript" src="../../apogeeapp/app/LinkManager.js"></script>
+        
+        <!-- <script type="text/javascript" src="../../apogeeapp/app/WorkspaceUI.js"></script> -->
+        <script type="text/javascript" src="ApogeeWebWorkspaceUI.js"></script>
+        
+        <script type="text/javascript" src="../../apogeeapp/app/component/WindowHeaderManager.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/component/Component.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/component/ParentComponent.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/component/EditComponent.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/component/TreeComponentDisplay.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/component/TabComponentDisplay.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/component/ParentWindowComponentDisplay.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/component/EditWindowComponentDisplay.js"></script>
+        
+        <script type="text/javascript" src="EmbeddedContainerComponentDisplay.js"></script>
+
+		<script type="text/javascript" src="../../apogeeapp/app/components/FolderComponent.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/components/JsonTableComponent.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/components/GridTableComponent.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/components/TextComponent.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/components/FunctionComponent.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/components/FolderFunctionComponent.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/components/BasicControlComponent.js"></script>
+		<script type="text/javascript" src="../../apogeeapp/app/components/CustomControlComponent.js"></script>
+        
+        <!--<script type="text/javascript" src="../../apogeeapp/app/actions/createworkspace.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/actions/openworkspace.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/actions/saveworkspace.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/actions/importworkspace.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/actions/exportworkspace.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/actions/closeworkspace.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/actions/addcomponent.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/actions/updatecomponent.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/actions/updatelinks.js"></script> -->
+        <script type="text/javascript" src="openwebworkspace.js"></script>
+        
+        <script type="text/javascript" src="../../apogeeapp/app/editors/ViewMode.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/editors/TextAreaEditor.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/editors/TextAreaMode.js"></script>
+		<script type="text/javascript" src="../../apogeeapp/app/editors/AceTextEditor.js"></script>		
+		<script type="text/javascript" src="../../apogeeapp/app/editors/AceCodeMode.js"></script>
+		<script type="text/javascript" src="../../apogeeapp/app/editors/AceDataMode.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/editors/AceDescriptionMode.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/editors/AceTextMode.js"></script>
+		<script type="text/javascript" src="../../apogeeapp/app/editors/AceSupplementalMode.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/editors/AceCustomControlMode.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/editors/HtmlJsDataDisplay.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/editors/JsDataDisplay.js"></script>
+		<script type="text/javascript" src="../../apogeeapp/app/editors/JsonFormEditor.js"></script>
+		<script type="text/javascript" src="../../apogeeapp/app/editors/FormDataMode.js"></script>
+		<script type="text/javascript" src="../../apogeeapp/app/editors/HandsonGridEditor.js"></script>
+		<script type="text/javascript" src="../../apogeeapp/app/editors/HandsonGridMode.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/editors/ControlOutputMode.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/dialogs/ConfigurableDialog.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/dialogs/UpdateLinksDialog.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/dialogs/SelectControlDialog.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/dialogs/propdialog.js"></script>
+        
+        <!-- <link rel="stylesheet" type="text/css" href="../../apogeeapp/app/apogeeapp.css">
+		<link rel="stylesheet" type="text/css" href="../../apogeeapp/ui/jsonedit/jsonedit.css">
+        <link rel="stylesheet" type="text/css" href="../../apogeeapp/ui/window/WindowFrame.css">
+        <link rel="stylesheet" type="text/css" href="../../apogeeapp/ui/window/dialog.css">-->
+        <link rel="stylesheet" type="text/css" href="../../apogeeapp/ui/displayandheader/DisplayAndHeader.css">
+        <!-- <link rel="stylesheet" type="text/css" href="../../apogeeapp/ui/menu/Menu.css">
+        <link rel="stylesheet" type="text/css" href="../../apogeeapp/ui/splitpane/SplitPane.css">
+        <link rel="stylesheet" type="text/css" href="../../apogeeapp/ui/tabframe/TabFrame.css">
+        <link rel="stylesheet" type="text/css" href="../../apogeeapp/ui/treecontrol/TreeControl.css">-->
         
         <script>
-            var componentMap = {
-                "editMetaFile.selectEntriesControl":{
-                    "containerId":"contentTest"
-                }
-            };
             var workspaceUrl = "http://localhost:8383/apogee/dev/webapp/editWorkspace.json";
             
-            var webapp = new apogeeapp.webapp.ApogeeWebApp(componentMap,workspaceUrl);
+            'use strict'
+            var app = null;
+			function init() {
+                //apogeeapp.ui.initResourcePath("../../resources");
+                app = new apogeeapp.webapp.ApogeeWeb();
+                
+                apogeeapp.webapp.openwebworkspace.openWorkspaceFromUrl(app,workspaceUrl,onWorkspaceLoad);
+                
+            }
             
+            function registerComponent(controlBundle) {
+                app.registerComponent(controlBundle);
+            }   
             
+            function onWorkspaceLoad() {
+                
+                var memberName;
+                var viewType;
+                var parentElementId;
+                
+                //select control
+                memberName = "editMetaFile.selectEntriesControl";
+                viewType = apogeeapp.app.CustomControlComponent.VIEW_OUTPUT;
+                parentElementId = "selectionControl";
+                
+                addDisplay(memberName,viewType,parentElementId);
+                
+                //select output
+                memberName = "editMetaFile.selectedEntries";
+                viewType = apogeeapp.app.JsonTableComponent.VIEW_JSON_TEXT;
+                parentElementId = "selectedEntries";
+                
+                addDisplay(memberName,viewType,parentElementId);
+            }
+            
+            function addDisplay(memberName,viewType,parentElementId) {
+                var workspace = app.getWorkspace();
+                var workspaceUI = app.getWorkspaceUI();
+                
+                var member = workspace.getMemberByFullName(memberName); 
+                if(!member) {
+                    alert("Member not found: " + memberName);
+                    return;
+                }
+                var component = workspaceUI.getComponent(member);
+                
+                var parentElement = document.getElementById(parentElementId);
+                if(!parentElement) {
+                    alert("DOM Element not found:" + parentElementId);
+                    return;
+                }
+
+                //create an alternate component display (to the window display)
+                var componentDisplay = new apogeeapp.webapp.EmbeddedContainerComponentDisplay(component, viewType, parentElement);
+                component.setAlternateWindowDisplay(componentDisplay);
+                var viewMode = componentDisplay.getViewMode();
+                viewMode.showData();
+            }
         </script>
     </head>
-    <body>
-        <div class="contentTest" id="contentTest"></div>
+    <body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
+        <div class="contentTest" id="selectionControl"></div>
+        <div class="contentTest" id="selectedEntries"></div>
     </body>
 </html>

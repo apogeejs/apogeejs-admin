@@ -18,6 +18,12 @@ apogeeapp.app.EditComponent.prototype.createWindowDisplay = function() {
     return this.windowDisplay;
 }
 
+/** This is used when an alternate UI is used for the workspace. This replaces the window display 
+ *  used in the standard UI. */
+apogeeapp.app.EditComponent.prototype.setAlternateWindowDisplay = function(windowDisplay) {
+    this.windowDisplay = windowDisplay;
+}
+
 //===============================
 // Protected Functions
 //===============================
