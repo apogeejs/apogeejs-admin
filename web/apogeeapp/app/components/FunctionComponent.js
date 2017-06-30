@@ -69,11 +69,17 @@ apogeeapp.app.FunctionComponent.createComponent = function(workspaceUI,data,comp
     json.owner = data.parent;
     json.workspace = data.parent.getWorkspace();
     json.name = data.name;
+    
+    var argList;
     if(data.argListString) {
-        var argList = apogee.FunctionTable.parseStringArray(data.argListString);
-        json.updateData = {};
-        json.updateData.argList = argList;
+        argList = apogee.FunctionTable.parseStringArray(data.argListString);  
     }
+    else {
+        argList = [];
+    }
+    json.updateData = {};
+    json.updateData.argList = argList;
+    
     json.type = apogee.FunctionTable.generator.type;
     var actionResponse = apogee.action.doAction(json);
     

@@ -77,7 +77,7 @@ apogee.action.doAction = function(actionData,optionalContext,optionalActionRespo
         queuedAction.actionData = actionData;
         queuedAction.optionalContext = optionalContext;
         queuedAction.optionalActionResponse = optionalActionResponse;
-        workspace.queueAction(queueAction);
+        workspace.queueAction(queuedAction);
         
         //return an empty (successful) action response
         //we sould have a flag saying the action is pending

@@ -73,8 +73,8 @@ apogee.Workspace.prototype.queueAction = function(actionInfo) {
 
 apogee.Workspace.prototype.getQueuedAction = function() {
     if(this.actionQueue.length > 0) {
-        var queuedActionInfo = apogee.action.actionQueue[0];
-        apogee.action.actionQueue.splice(0,1)
+        var queuedActionInfo = this.actionQueue[0];
+        this.actionQueue.splice(0,1)
         return queuedActionInfo;
     }
     else {
