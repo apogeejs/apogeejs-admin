@@ -7,12 +7,37 @@
         <style>
 			.contentTest {
 				width: 500px;
-                height: 500px;
 				outline: solid 1px gray;
 				margin: 10px;
 				display: table;
                 position: relative;
 			}
+            
+            #loginControl {
+                height: 100px;
+            }
+            #context {
+                height: 50px;
+            }
+            #metaFileSelector {
+                height: 150px;
+            }
+            #newMetaFileName {
+                height: 50px;
+            }
+            #selectEntriesControl {
+                height: 700px;   
+            }
+            #submitControl {
+                height: 50px;
+            }
+            #commitFlag {
+                height: 50px;
+            }
+            #commitResult {
+                height: 150px;
+            }
+            
 		</style>
         
         <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
@@ -150,14 +175,24 @@
         <script>
             var workspaceUrl = "http://localhost:8383/apogee/dev/webapp/editWorkspace.json";
             
+            var embedInfo = [
+                ["login.loginControl","loginControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
+                ["loadMetaFileRecords.context","context",apogeeapp.app.JsonTableComponent.VIEW_JSON_TEXT],
+                ["loadMetaFileRecords.metaFileSelector","metaFileSelector",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
+                ["loadMetaFileRecords.newMetaFileName","newMetaFileName",apogeeapp.app.JsonTableComponent.VIEW_JSON_TEXT],
+                ["editMetaFile.selectEntriesControl","selectEntriesControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
+                ["submit.submitControl","submitControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
+                ["submit.commitFlag","commitFlag",apogeeapp.app.JsonTableComponent.VIEW_JSON_TEXT],
+                ["submit.commitResult","commitResult",apogeeapp.app.JsonTableComponent.VIEW_JSON_TEXT]
+            ];
+            
             'use strict'
             var app = null;
 			function init() {
                 //apogeeapp.ui.initResourcePath("../../resources");
                 app = new apogeeapp.webapp.ApogeeWeb();
                 
-                apogeeapp.webapp.openwebworkspace.openWorkspaceFromUrl(app,workspaceUrl,onWorkspaceLoad);
-                
+                apogeeapp.webapp.openwebworkspace.openWorkspaceFromUrl(app,workspaceUrl,onWorkspaceLoad);              
             }
             
             function registerComponent(controlBundle) {
@@ -165,27 +200,16 @@
             }   
             
             function onWorkspaceLoad() {
-                
-                var memberName;
-                var viewType;
-                var parentElementId;
-                
-                //select control
-                memberName = "editMetaFile.selectEntriesControl";
-                viewType = apogeeapp.app.CustomControlComponent.VIEW_OUTPUT;
-                parentElementId = "selectionControl";
-                
-                addDisplay(memberName,viewType,parentElementId);
-                
-                //select output
-                memberName = "editMetaFile.selectedEntries";
-                viewType = apogeeapp.app.JsonTableComponent.VIEW_JSON_TEXT;
-                parentElementId = "selectedEntries";
-                
-                addDisplay(memberName,viewType,parentElementId);
+                for(var i = 0; i < embedInfo.length; i++) {
+                    addDisplay(embedInfo[i]);
+                }
             }
             
-            function addDisplay(memberName,viewType,parentElementId) {
+            function addDisplay(embedEntry) {
+                var memberName = embedEntry[0];
+                var viewType = embedEntry[2];
+                var parentElementId = embedEntry[1];
+                
                 var workspace = app.getWorkspace();
                 var workspaceUI = app.getWorkspaceUI();
                 
@@ -202,7 +226,7 @@
                     return;
                 }
 
-                //create an alternate component display (to the window display)
+                //create an alternate component display (to the window display) 
                 var componentDisplay = new apogeeapp.webapp.EmbeddedContainerComponentDisplay(component, viewType, parentElement);
                 component.setAlternateWindowDisplay(componentDisplay);
                 var viewMode = componentDisplay.getViewMode();
@@ -211,7 +235,23 @@
         </script>
     </head>
     <body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
-        <div class="contentTest" id="selectionControl"></div>
-        <div class="contentTest" id="selectedEntries"></div>
+        
+        <h1>Login</h1>
+        <div class="contentTest" id="loginControl"></div>
+        <h1>File Selection</h1>
+        <h3>Context</h3>
+        <div class="contentTest" id="context"></div>
+        <h3>File Selector</h3>
+        <div class="contentTest" id="metaFileSelector"></div>
+        <h3>Meta File Name (for create)</h3>
+        <div class="contentTest" id="newMetaFileName"></div>
+        <h1>File Edit</h1>
+        <div class="contentTest" id="selectEntriesControl"></div>
+        <h1>Commit</h1>
+        <div class="contentTest" id="submitControl"></div>
+        <h3>Commit Flag</h3>
+        <div class="contentTest" id="commitFlag"></div>
+        <h3>Commit Result</h3>
+        <div class="contentTest" id="commitResult"></div>
     </body>
 </html>
