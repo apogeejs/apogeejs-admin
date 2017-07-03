@@ -25,14 +25,10 @@ apogeeapp.app.Apogee = function(containerId) {
 	//create the UI
 	this.createUI(containerId);
     
-    //open a workspace - from url or default
+    //open a workspace if there is a url present
     var workspaceUrl = apogee.util.readQueryField("url",document.URL);
     if(workspaceUrl) {
         apogeeapp.app.openworkspace.openWorkspaceFromUrl(this,workspaceUrl);
-    }
-    else {
-        //create a default workspace 
-        apogeeapp.app.createworkspace.createWorkspace(this);
     }
 }
 	

@@ -6,6 +6,9 @@ apogeeapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback
     this.contractUrl = apogeeapp.ui.getResourcePath("/contractPlus2.png");
     this.expandUrl = apogeeapp.ui.getResourcePath("/expandPlus2.png");
     this.noControlUrl = apogeeapp.ui.getResourcePath("/nothingPlus2.png");
+    this.emptyControlUrl = apogeeapp.ui.getResourcePath("/emptyPlus2.png");
+    
+    this.isRoot = isRoot;
     
     var baseCssClass;
     if(isRoot) {
@@ -85,7 +88,12 @@ apogeeapp.ui.treecontrol.TreeEntry.prototype.removeChild = function(identifier) 
 apogeeapp.ui.treecontrol.TreeEntry.prototype.setState = function(state) {
     this.state = state;
     if(this.state == apogeeapp.ui.treecontrol.NO_CONTROL) {
-        this.control.src = this.noControlUrl;
+        if(this.isRoot) {
+            this.control.src = this.emptyControlUrl;
+        }
+        else {
+            this.control.src = this.noControlUrl;
+        }
     }
     else if(this.state == apogeeapp.ui.treecontrol.EXPANDED) {
         this.control.src = this.contractUrl;
