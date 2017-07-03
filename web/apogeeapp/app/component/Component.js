@@ -40,6 +40,8 @@ apogeeapp.app.Component.prototype.addCleanupAction = function(cleanupFunction) {
 
 apogeeapp.app.Component.DEFAULT_ICON_RES_PATH = "/genericIcon.png";
 
+apogeeapp.app.Component.MENU_ITEM_OPEN = 0x01;
+
 
 //==============================
 // Public Instance Methods
@@ -91,6 +93,34 @@ apogeeapp.app.Component.prototype.closeWindowDisplay = function() {
 
 apogeeapp.app.Component.prototype.getWindowDisplay = function() {
     return this.windowDisplay;
+}
+
+apogeeapp.app.Component.prototype.getMenuItems = function(flags,optionalMenuItemList) {
+    //menu items
+    var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
+
+    if(flags & apogeeapp.app.Component.MENU_ITEM_OPEN) {
+        var openCallback = this.createOpenCallback();
+        if(openCallback) {
+            var itemInfo = {};
+            itemInfo.title = "Open";
+            itemInfo.callback = openCallback;
+            menuItemList.push(itemInfo);
+        }
+    }
+
+    //add the standard entries
+    var itemInfo = {};
+    itemInfo.title = "Edit Properties";
+    itemInfo.callback = apogeeapp.app.updatecomponent.getUpdateComponentCallback(this);
+    menuItemList.push(itemInfo);
+
+    var itemInfo = {};
+    itemInfo.title = "Delete";
+    itemInfo.callback = this.createDeleteCallback(itemInfo.title);
+    menuItemList.push(itemInfo);
+    
+    return menuItemList;
 }
 
 
@@ -259,6 +289,37 @@ apogeeapp.app.Component.prototype.getPropertyValues = function() {
 //=============================
 // Action UI Entry Points
 //=============================
+
+/** This method creates a callback for deleting the component. 
+ *  @private */
+apogeeapp.app.Component.prototype.createOpenCallback = function() {
+    var instance = this;
+    var openCallback;
+    
+    if(this.hasTabDisplay()) {
+        openCallback = function() {
+            instance.openTabDisplay();
+        }
+    }
+    else {
+        var parent = this.object.getParent();
+        if(parent) {
+            var parentComponent = this.workspaceUI.getComponent(parent);
+            if((parentComponent)&&(parentComponent.hasTabDisplay())) {
+                //remove the tree from the parent
+                openCallback = function() {
+                    //open the parent
+                    parentComponent.openTabDisplay();
+                    
+                    //bring thsi child to the front
+                    parentComponent.showChildComponent(instance);
+                }
+            }
+        }
+    }
+    
+    return openCallback;
+}
 
 /** This method creates a callback for deleting the component. 
  *  @private */

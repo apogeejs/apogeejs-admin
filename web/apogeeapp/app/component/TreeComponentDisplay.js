@@ -41,29 +41,17 @@ apogeeapp.app.TreeComponentDisplay.prototype._createTreeEntry = function() {
     
     var instance = this;
     
-    var openCallback = null;
-    if(instance.component.hasTabDisplay()) {
-        var openCallback = function() {
-            instance.component.openTabDisplay();
-        } 
+    //menu item callback
+    var menuItemCallback = function() {
+        var optionFlags = apogeeapp.app.Component.MENU_ITEM_OPEN;
+        return instance.component.getMenuItems(optionFlags);
     }
     
-    var contextMenuCallback = function(event) {
-        var contextMenu = new apogeeapp.ui.MenuBody();
-        
-        var callback;
-        
-        callback = apogeeapp.app.updatecomponent.getUpdateComponentCallback(instance);
-        contextMenu.addCallbackMenuItem("Edit Properties",callback);
-        
-        callback = instance.createDeleteCallback("Delete");
-        contextMenu.addCallbackMenuItem("Delete",callback);
-        
-        apogeeapp.ui.Menu.showContextMenu(contextMenu,event);
-    }
+    //double click callback
+    var openCallback = this.component.createOpenCallback();
     
     var labelText = this.object.getName();
     var iconUrl = this.component.getIconUrl();
     var isRoot = ((this.object.isParent)&&(this.object.isRoot()));
-    return new apogeeapp.ui.treecontrol.TreeEntry(labelText, iconUrl, openCallback, contextMenuCallback,isRoot);
+    return new apogeeapp.ui.treecontrol.TreeEntry(labelText, iconUrl, openCallback, menuItemCallback,isRoot);
 }

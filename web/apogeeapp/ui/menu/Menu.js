@@ -63,6 +63,7 @@ apogeeapp.ui.Menu.show = function(menuBody) {
 		apogeeapp.ui.Menu.hideActiveMenu();
 	}
 	var parentElement = menuBody.getParentElement();
+    menuBody.prepareShow();
     var menuElement = menuBody.getMenuElement();
     if((parentElement)&&(menuElement)) {
         parentElement.appendChild(menuElement);
@@ -77,18 +78,20 @@ apogeeapp.ui.Menu.show = function(menuBody) {
 
 apogeeapp.ui.Menu.hideActiveMenu = function() {
 	if(apogeeapp.ui.Menu.activeMenu) {
+        var activeMenu = apogeeapp.ui.Menu.activeMenu;
         //set the header to normal (not active)
-        var menuHeader = apogeeapp.ui.Menu.activeMenu.getMenuHeader();
+        var menuHeader = activeMenu.getMenuHeader();
         if(menuHeader) {
             menuHeader.className = "visiui-menu-heading";
         }
         
-        var parentElement = apogeeapp.ui.Menu.activeMenu.getParentElement();
-        var menuElement = apogeeapp.ui.Menu.activeMenu.getMenuElement();
+        var parentElement = activeMenu.getParentElement();
+        var menuElement = activeMenu.getMenuElement();
         if((parentElement)&&(menuElement)) {
             parentElement.removeChild(menuElement);
             apogeeapp.ui.Menu.activeMenu = null;
-        }	
+        }
+        activeMenu.menuHidden();
 	}
 }
 

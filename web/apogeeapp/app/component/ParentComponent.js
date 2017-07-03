@@ -49,6 +49,16 @@ apogeeapp.app.ParentComponent.prototype.closeTabDisplay = function() {
     }
 }
 
+/** This brings the child component to the front and takes any other actions
+ * to show the child in the open parent. */
+apogeeapp.app.ParentComponent.prototype.showChildComponent = function(childComponent) {
+    if(childComponent.getObject().getParent() != this.getObject()) return;
+    
+    if(this.tabDisplay) {
+        this.tabDisplay.showChildComponent(childComponent);
+    }
+}
+
 ////in memberUPdated
 //    if(this.tabDisplay) {
 //        this.tabDisplay.updateData();

@@ -97,32 +97,9 @@ apogeeapp.app.ParentWindowComponentDisplay.prototype._loadWindowFrameEntry = fun
     this.windowFrame.setTitle(this.object.getDisplayName());
     
     // set menu
-    this._populateMenu();
-}
-
-
-//------------------------------------
-// Menu Functions
-//------------------------------------
-
-apogeeapp.app.ParentWindowComponentDisplay.prototype._populateMenu = function() {
     var menu = this.windowFrame.createMenu(this.component.getIconUrl());
-
-    //menu items
-    var menuItemInfoList = [];
-
-    //add the standard entries
-    var itemInfo = {};
-    itemInfo.title = "Edit Properties";
-    itemInfo.callback = apogeeapp.app.updatecomponent.getUpdateComponentCallback(this.component);
-    menuItemInfoList.push(itemInfo);
-
-    var itemInfo = {};
-    itemInfo.title = "Delete";
-    itemInfo.callback = this.component.createDeleteCallback(itemInfo.title);
-    menuItemInfoList.push(itemInfo);
-
-    //set the menu items
+    var optionFlags = apogeeapp.app.Component.MENU_ITEM_OPEN;
+    var menuItemInfoList = this.component.getMenuItems(optionFlags);
     menu.setMenuItems(menuItemInfoList);
 }
 

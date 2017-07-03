@@ -81,9 +81,6 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.updateData = function() {
         //update the title
         this.windowFrame.setTitle(this.object.getDisplayName());
         
-        //update the menu
-        this._updateClearFunctionMenuItem();
-        
         //update the content
         this.viewModeElement.memberUpdated();
     }
@@ -164,7 +161,12 @@ apogeeapp.app.EditWindowComponentDisplay.prototype._loadWindowFrameEntry = funct
     this.windowFrame.setTitle(this.object.getDisplayName());
     
     // set menu
-    this._populateMenu();
+    var menu = this.windowFrame.createMenu(this.component.getIconUrl());
+    var component = this.component;
+    var menuItemCallback = function() {
+        return component.getMenuItems();
+    }
+    menu.setAsOnTheFlyMenu(menuItemCallback);
     
     //create the view selection ui
     this._createSelectTool();
@@ -279,81 +281,6 @@ apogeeapp.app.EditWindowComponentDisplay.prototype._updateViewContent = function
     }
     else {
         alert("Error: View mode element not found!");
-    }
-}
-
-//------------------------------------
-// Menu Functions
-//------------------------------------
-
-apogeeapp.app.EditWindowComponentDisplay.prototype._populateMenu = function() {
-    var menu = this.windowFrame.createMenu(this.component.getIconUrl());
-
-    //menu items
-    var menuItemInfoList = [];
-
-    //add the standard entries
-    var itemInfo = {};
-    itemInfo.title = "Edit Properties";
-    itemInfo.callback = apogeeapp.app.updatecomponent.getUpdateComponentCallback(this.component);
-    menuItemInfoList.push(itemInfo);
-
-    var itemInfo = {};
-    itemInfo.title = "Delete";
-    itemInfo.callback = this.component.createDeleteCallback(itemInfo.title);
-    menuItemInfoList.push(itemInfo);
-
-    //set the menu items
-    menu.setMenuItems(menuItemInfoList);
-    
-    //initialize the "clear function" menu entry, used only when there is code
-    var settings = this.component.getTableEditSettings();
-    this.doClearFunction = (settings.clearFunctionMenuText !== undefined);
-	this.clearFunctionMenuText = settings.clearFunctionMenuText;
-    this.clearFunctionDataValue = settings.emptyDataValue;
-	this.clearFunctionActive = false;
-	this.clearFunctionCallback = null;
-    
-    this._updateClearFunctionMenuItem();
-    
-}
-
-apogeeapp.app.EditWindowComponentDisplay.prototype._updateClearFunctionMenuItem = function() {
-    //add the clear function menu item if needed
-	if(this.doClearFunction) {
-		if(this.object.hasCode()) {
-			if(!this.clearFunctionActive) {
-				var menu = this.windowFrame.getMenu();
-				
-				if(!this.clearFunctionCallback) {
-					this.clearFunctionCallback = this._getClearFunctionCallback();
-				}
-				
-				menu.addCallbackMenuItem(this.clearFunctionMenuText,this.clearFunctionCallback);
-				this.clearFunctionActive = true;
-			}
-		}
-		else {
-			if(this.clearFunctionActive) {
-				var menu = this.windowFrame.getMenu();
-				menu.removeMenuItem(this.clearFunctionMenuText);
-				this.clearFunctionActive = false;
-			}
-		}
-	}
-}
-
-apogeeapp.app.EditWindowComponentDisplay.prototype._getClearFunctionCallback = function() {
-    var actionData = {};
-    actionData.member = this.object;
-    actionData.data = this.clearFunctionDataValue;
-    actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME
-    var workspace = this.object.getWorkspace();
-    return function() {
-        var actionResponse = apogee.action.doAction(actionData); 
-        if(!actionResponse.getSuccess()) {
-            alert(actionResponse.getErrorMsg());
-        }
     }
 }
 

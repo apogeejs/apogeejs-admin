@@ -1,7 +1,7 @@
 
 if(!apogeeapp.ui.treecontrol) apogeeapp.ui.treecontrol = {};
 
-apogeeapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback,contextMenuCallback,isRoot) {
+apogeeapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback,menuItemCallback,isRoot) {
     
     this.contractUrl = apogeeapp.ui.getResourcePath("/contractPlus2.png");
     this.expandUrl = apogeeapp.ui.getResourcePath("/expandPlus2.png");
@@ -20,26 +20,45 @@ apogeeapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback
     
     this.element = apogeeapp.ui.createElementWithClass("li", baseCssClass);
     this.control = apogeeapp.ui.createElementWithClass("img", "visiui-tc-control",this.element);
-    this.icon = apogeeapp.ui.createElementWithClass("img", "visiui-tc-icon",this.element);
+
+    //icon/menu
+    if(iconSrc) {
+        if(menuItemCallback) {
+            //icon as menu
+            this.menu = apogeeapp.ui.Menu.createMenuFromImage(iconSrc);
+            this.menu.setAsOnTheFlyMenu(menuItemCallback);
+            this.element.appendChild(this.menu.getElement());
+        }
+        else {
+            //plain icon
+            this.icon = apogeeapp.ui.createElementWithClass("img", "visiui-tc-icon",this.element);
+            this.icon.src = iconSrc; 
+        }
+    }
+    
+    //label
     this.label = apogeeapp.ui.createElementWithClass("div", "visiui-tc-label",this.element);
-    this.childList = null;
-    this.childMap = {};
-    
-    this.state = apogeeapp.ui.treecontrol.NO_CONTROL;
-    
     if(labelText) {
         this.setLabel(labelText);
     }
     
-    if(iconSrc) {
-       this.icon.src = iconSrc; 
+    this.childList = null;
+    this.childMap = {};
+    
+    this.setState(apogeeapp.ui.treecontrol.NO_CONTROL);
+    
+    //context menu and double click
+    var contextMenuCallback = function(event) {
+        var contextMenu = new apogeeapp.ui.MenuBody();
+        var menuItems = menuItemCallback();
+        contextMenu.setMenuItems(menuItems);
+        apogeeapp.ui.Menu.showContextMenu(contextMenu,event);
     }
-    
-   this.setState(apogeeapp.ui.treecontrol.NO_CONTROL);
-    
     this.label.oncontextmenu = contextMenuCallback;
+    
+    //double click action
     if(dblClickCallback) {
-        this.label.ondblclick = dblClickCallback
+        this.label.ondblclick = dblClickCallback;
     }
 }
 

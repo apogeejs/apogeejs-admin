@@ -55,6 +55,16 @@ apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childCo
     childWindow.setWindowState(state);
 }
 
+/** This method is used to bring the child component to the front. */
+apogeeapp.app.TabComponentDisplay.prototype.showChildComponent = function(childComponent) {
+    var windowComponentDisplay = childComponent.getWindowDisplay();
+    if(windowComponentDisplay) {
+        var childWindow = windowComponentDisplay.getWindowEntry();
+        if(childWindow) {
+            this.parentContainer.bringToFront(childWindow);
+        }
+    }
+}
 //===============================
 // Private Functions
 //===============================
@@ -79,25 +89,7 @@ apogeeapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     // set menu
     //------------------
     var menu = this.tab.createMenu(this.component.getIconUrl());
-    
-    //menu items
-    var menuItemInfoList = [];
-    
-    //add the standard entries
-    var itemInfo = {};
-    itemInfo.title = "Edit Properties";
-    itemInfo.callback = apogeeapp.app.updatecomponent.getUpdateComponentCallback(this.component);
-    menuItemInfoList.push(itemInfo);
-    
-    //only allow delete if the object has a parent (not if it has a non-parent owner, or is a root object)
-    if(this.object.getParent()) {
-        var itemInfo = {};
-        itemInfo.title = "Delete";
-        itemInfo.callback = this.component.createDeleteCallback(itemInfo.title);
-        menuItemInfoList.push(itemInfo);
-    }
-    
-    //set the menu items
+    var menuItemInfoList = this.component.getMenuItems();
     menu.setMenuItems(menuItemInfoList);
     
     //-----------------

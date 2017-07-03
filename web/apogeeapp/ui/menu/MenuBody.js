@@ -22,13 +22,6 @@ apogeeapp.ui.MenuBody = function() {
     this.menuHeader = null;
 }
 
-/** This method replaces on spaces with &nbsp; spaces. It is intedned to prevent
- * wrapping in html. */
-apogeeapp.ui.MenuBody.convertSpacesForHtml = function(text) {
-    return text.replace(/ /g,"&nbsp;");
-}
-
-
 /** this returns the dom element for the menu object. */
 apogeeapp.ui.MenuBody.prototype.getMenuElement = function() {
     return this.menuDiv;
@@ -47,6 +40,20 @@ apogeeapp.ui.MenuBody.prototype.getMenuHeader = function() {
 /** This returns the parent element for the menu.  */
 apogeeapp.ui.MenuBody.prototype.getIsContext = function() {
     return (this.menuHeader == null);
+}
+
+/** This is called before the menu body is shown */
+apogeeapp.ui.MenuBody.prototype.prepareShow = function() {
+    if(this.isOnTheFlyMenu) {
+        this.constructItemsForShow();
+    }
+}
+
+/** This is called after the menu body is hidden. */
+apogeeapp.ui.MenuBody.prototype.menuHidden = function() {
+    if(this.isOnTheFlyMenu) {
+        this.destroyItemsForHides();
+    }
 }
 
 /** This method is used to attach the menu to the menu head, in a static menu. */
@@ -88,6 +95,13 @@ parentElement.appendChild(this.menuDiv);
     }
 }
 
+/** This sets a callback to create the menu when the menu is opened. This is
+ * for static menus where we do not want to populate it ahead of time. */
+apogeeapp.ui.MenuBody.prototype.setAsOnTheFlyMenu = function(menuItemsCallback) {
+	this.isOnTheFlyMenu = true;
+    this.menuItemsCallback = menuItemsCallback;
+}
+
 /** this adds a menu item that dispatchs the given event when clicked. */
 apogeeapp.ui.MenuBody.prototype.addEventMenuItem = function(title, eventName, eventData, eventManager) {
     var itemInfo = {};
@@ -110,8 +124,7 @@ apogeeapp.ui.MenuBody.prototype.addCallbackMenuItem = function(title, callback) 
 apogeeapp.ui.MenuBody.prototype.addMenuItem = function(itemInfo) {
     itemInfo.element = apogeeapp.ui.createElementWithClass("div","visiui-menu-item");
     
-    var title = apogeeapp.ui.MenuBody.convertSpacesForHtml(itemInfo.title);
-    itemInfo.element.innerHTML = title;
+    itemInfo.element.innerHTML = itemInfo.title;
 	
     itemInfo.element.onmousedown = function(event) {
 		event.stopPropagation();
@@ -153,10 +166,25 @@ apogeeapp.ui.MenuBody.prototype.removeMenuItem = function(title) {
 }
 
 //================================
-// Init
+// Internal
 //================================
 
 /** This method creates the menu body that is shown below the header. */
 apogeeapp.ui.MenuBody.prototype.createMenuElement = function() {
     this.menuDiv = apogeeapp.ui.createElementWithClass("div","visiui-menu-body");
+}
+
+apogeeapp.ui.MenuBody.prototype.constructItemsForShow = function () {
+    if(this.menuItemsCallback) {
+        var menuItems = this.menuItemsCallback();
+        this.setMenuItems(menuItems);
+    }
+}
+
+/** This is called after the menu body is hidden. */
+apogeeapp.ui.MenuBody.prototype.destroyItemsForHides = function() {
+    if(this.menuDiv) {
+        apogeeapp.ui.removeAllChildren(this.menuDiv);
+    }
+    this.menuItems = {};
 }

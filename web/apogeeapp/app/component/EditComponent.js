@@ -33,16 +33,51 @@ apogeeapp.app.EditComponent.prototype.setAlternateWindowDisplay = function(windo
 // * @protected */
 //apogeeapp.app.EditComponent.prototype.getTableEditSettings = function();
 
-apogeeapp.app.Component.prototype.hasTabDisplay = function() {    
+apogeeapp.app.EditComponent.prototype.hasTabDisplay = function() {    
     return false;
 }
 
-apogeeapp.app.Component.prototype.openTabDisplay = function() {
+apogeeapp.app.EditComponent.prototype.openTabDisplay = function() {
     //noop
 }
 
-apogeeapp.app.Component.prototype.closeTabDisplay = function() {
+apogeeapp.app.EditComponent.prototype.closeTabDisplay = function() {
     //noop
+}
+
+apogeeapp.app.EditComponent.prototype.getMenuItems = function(flags,optionalMenuItemList) {
+    
+//    //menu items
+//    var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
+    
+    //call base class
+    var menuItemList = apogeeapp.app.Component.prototype.getMenuItems.call(this,flags,optionalMenuItemList);
+    
+    //initialize the "clear function" menu entry, used only when there is code
+     if((this.object.isCodeable)&&(this.object.hasCode())) {
+         var settings = this.getTableEditSettings();
+        if(settings.clearFunctionMenuText !== undefined) {
+            var itemInfo = {};
+            itemInfo.title = settings.clearFunctionMenuText;
+            itemInfo.callback = this.getClearFunctionCallback(settings.emptyDataValue);
+            menuItemList.push(itemInfo);
+        }   
+    }
+			
+    return menuItemList;
+}
+
+apogeeapp.app.EditComponent.prototype.getClearFunctionCallback = function(emptyDataValue) {
+    var actionData = {};
+    actionData.member = this.object;
+    actionData.data = emptyDataValue;
+    actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME
+    return function() {
+        var actionResponse = apogee.action.doAction(actionData); 
+        if(!actionResponse.getSuccess()) {
+            alert(actionResponse.getErrorMsg());
+        }
+    }
 }
 
 
