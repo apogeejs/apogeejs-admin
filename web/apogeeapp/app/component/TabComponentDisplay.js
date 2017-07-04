@@ -123,18 +123,50 @@ apogeeapp.app.TabComponentDisplay.prototype._createDisplayContent = function() {
     this.contentElement = apogeeapp.ui.createElement("div",null,apogeeapp.app.TabComponentDisplay.PARENT_CONTAINER_STYLE);
     this.parentContainer = new apogeeapp.ui.ParentContainer(this.contentElement);
 
+    //we ony use this context menu and child map for parents
+    //modify if we use this elsewhere
+    if(!this.object.isParent) return;
+    
+    //add content menu
+    this.setAddChildrenContextMenu();
+
+    //show all children
     var workspaceUI = this.component.getWorkspaceUI();
-
-    //add context menu to create childrent
-    var parentMember = this.component.getParentMember();
-    var app = workspaceUI.getApp();
-    app.setFolderContextMenu(this.contentElement,parentMember);
-
-    var children = parentMember.getChildMap();
+    var children = this.object.getChildMap();
     for(var childName in children) {
         var child = children[childName];
         var childComponent = workspaceUI.getComponent(child);
         this.addChildComponent(childComponent);
+    }
+}
+
+/** This loads the context menu for the key. It should be update if
+ *the key index changes. */
+apogeeapp.app.TabComponentDisplay.prototype.setAddChildrenContextMenu = function() {
+    
+    var workspaceUI = this.component.getWorkspaceUI();
+    var app = workspaceUI.getApp();
+
+    var initialValues = {};
+    initialValues.parentName = this.object.getFullName();
+    
+    this.contentElement.oncontextmenu = function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        //position the window if we can
+        if(event.offsetX) {
+            var componentOptions = {};
+            var coordInfo = {};
+            coordInfo.x = event.offsetX;
+            coordInfo.y = event.offsetY;
+            componentOptions.coordInfo = coordInfo;
+        }
+        
+        var contextMenu = new apogeeapp.ui.MenuBody();
+        contextMenu.setMenuItems(app.getAddChildMenuItems(initialValues,componentOptions));
+        
+        apogeeapp.ui.Menu.showContextMenu(contextMenu,event);
     }
 }
 

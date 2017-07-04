@@ -258,7 +258,7 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
     menus[name] = menu;
     
     //add create child elements
-    this.populateAddChildMenu(menu);
+    menu.setMenuItems(this.getAddChildMenuItems());
     
     //libraries menu
     name = "Libraries";
@@ -295,47 +295,27 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
 ///** This method should be implemented if custom menus or menu items are desired. */
 //apogeeapp.app.Apogee.prototype.addToMenuBar(menuBar,menus);
 
-apogeeapp.app.Apogee.prototype.populateAddChildMenu = function(menu,optionalInitialValues,optionalComponentOptions) {
+apogeeapp.app.Apogee.prototype.getAddChildMenuItems = function(optionalInitialValues,optionalComponentOptions) {
+    
+    var menuItemList = [];
+    var menuItem;
     
     for(var i = 0; i < this.standardComponents.length; i++) {
         var key = this.standardComponents[i];
         var generator = this.componentGenerators[key];
-        var title = "Add " + generator.displayName;
-        var callback = apogeeapp.app.addcomponent.getAddComponentCallback(this,generator,optionalInitialValues,optionalComponentOptions);
-        menu.addCallbackMenuItem(title,callback);
+        
+        menuItem = {};
+        menuItem.title = "Add " + generator.displayName;
+        menuItem.callback = apogeeapp.app.addcomponent.getAddComponentCallback(this,generator,optionalInitialValues,optionalComponentOptions);
+        menuItemList.push(menuItem);
     }
 
     //add the additional component item
-    var componentCallback = apogeeapp.app.addcomponent.getAddAdditionalComponentCallback(this,optionalInitialValues,optionalComponentOptions);
-    menu.addCallbackMenuItem("Other Components...",componentCallback);
-}
+    menuItem = {};
+    menuItem.title = "Other Components...";
+    menuItem.callback = apogeeapp.app.addcomponent.getAddAdditionalComponentCallback(this,optionalInitialValues,optionalComponentOptions);
+    menuItemList.push(menuItem);
 
-/** This loads the context menu for the key. It should be update if
- *the key index changes. */
-apogeeapp.app.Apogee.prototype.setFolderContextMenu = function(contentElement,folder) {
-    
-    var app = this;
-
-    var initialValues = {};
-    initialValues.parentName = folder.getFullName();
-    
-    contentElement.oncontextmenu = function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        //position the window if we can
-        if(event.offsetX) {
-            var componentOptions = {};
-            var coordInfo = {};
-            coordInfo.x = event.offsetX;
-            coordInfo.y = event.offsetY;
-            componentOptions.coordInfo = coordInfo;
-        }
-        
-        var contextMenu = new apogeeapp.ui.MenuBody();
-        app.populateAddChildMenu(contextMenu,initialValues,componentOptions);
-        
-        apogeeapp.ui.Menu.showContextMenu(contextMenu,event);
-    }
+    return menuItemList;
 }
 

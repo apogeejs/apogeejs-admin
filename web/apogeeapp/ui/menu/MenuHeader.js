@@ -25,6 +25,16 @@ apogeeapp.ui.MenuHeader.prototype.getElement = function() {
     return this.domElement;
 }
 
+/** this returns the dom element for the menu heading. */
+apogeeapp.ui.MenuHeader.prototype.setChildLocation = function(childLocation) {
+    this.childLocation = childLocation;
+}
+
+/** this returns the dom element for the menu heading. */
+apogeeapp.ui.MenuHeader.prototype.getChildLocation = function() {
+    return this.childLocation;
+}
+
 /** this returns the dom element for the menu object. */
 apogeeapp.ui.MenuHeader.prototype.getMenuBody = function() {
     return this.menuBody;

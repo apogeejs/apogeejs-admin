@@ -25,11 +25,6 @@ apogeeapp.app.ParentComponent.prototype.createWindowDisplay = function() {
 apogeeapp.app.ParentComponent.prototype.getContentIsShowing = function() {
     return this.getWindow().getContentIsShowing();
 }
-
-
-//Implement in extending classes
-///** This returned the parent member object associated with this component. */
-//apogeeapp.app.ParentComponent.prototype.getParentMember = function();
     
 apogeeapp.app.ParentComponent.prototype.hasTabDisplay = function() {    
     return true;
@@ -59,6 +54,26 @@ apogeeapp.app.ParentComponent.prototype.showChildComponent = function(childCompo
     }
 }
 
+apogeeapp.app.ParentComponent.prototype.getMenuItems = function(optionalMenuItemList) {
+    var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
+    
+    //initialize the "add components" menu
+    var itemInfo = {};
+    
+    var app = this.getWorkspaceUI().getApp();
+    var initialValues = {};
+    initialValues.parentName = this.object.getFullName();
+    
+    itemInfo.title = "Add Component...";
+    itemInfo.childMenuItems = app.getAddChildMenuItems(initialValues);
+    menuItemList.push(itemInfo);
+
+    //call base class
+    var menuItemList = apogeeapp.app.Component.prototype.getMenuItems.call(this,menuItemList);
+			
+    return menuItemList;
+}
+
 ////in memberUPdated
 //    if(this.tabDisplay) {
 //        this.tabDisplay.updateData();
@@ -77,10 +92,6 @@ apogeeapp.app.ParentComponent.prototype.showChildComponent = function(childCompo
 
 /** This flags indicates the component is a parent component. */
 apogeeapp.app.ParentComponent.prototype.isParentComponent = true;
-
-///** This shoudl be implemented by the inheritieing class to give the member
-// * object associated with this component. */
-//apogeeapp.app.ParentComponent.getParentMember = function();
 
 /** This function adds a fhile componeent to the displays for this parent component. */
 apogeeapp.app.ParentComponent.prototype.removeChildComponent = function(childComponent) {

@@ -16,10 +16,15 @@
     font-weight:normal;
     padding:2px;
     white-space: nowrap;
+    display: block;
+    position: relative;
+    overflow: hidden;
 }
 .visiui-menu-item:hover {
     background-color:lightgray;
     padding:2px;
+    
+    overflow: visible;
 }
 
 .visiui-menu-heading {

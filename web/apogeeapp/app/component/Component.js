@@ -95,19 +95,9 @@ apogeeapp.app.Component.prototype.getWindowDisplay = function() {
     return this.windowDisplay;
 }
 
-apogeeapp.app.Component.prototype.getMenuItems = function(flags,optionalMenuItemList) {
+apogeeapp.app.Component.prototype.getMenuItems = function(optionalMenuItemList) {
     //menu items
     var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
-
-    if(flags & apogeeapp.app.Component.MENU_ITEM_OPEN) {
-        var openCallback = this.createOpenCallback();
-        if(openCallback) {
-            var itemInfo = {};
-            itemInfo.title = "Open";
-            itemInfo.callback = openCallback;
-            menuItemList.push(itemInfo);
-        }
-    }
 
     //add the standard entries
     var itemInfo = {};
@@ -121,6 +111,19 @@ apogeeapp.app.Component.prototype.getMenuItems = function(flags,optionalMenuItem
     menuItemList.push(itemInfo);
     
     return menuItemList;
+}
+
+apogeeapp.app.Component.prototype.getOpenMenuItem = function() {
+    var openCallback = this.createOpenCallback();
+    if(openCallback) {
+        var itemInfo = {};
+        itemInfo.title = "Open";
+        itemInfo.callback = openCallback;
+        return itemInfo;
+    }
+    else {
+        return null;
+    }
 }
 
 

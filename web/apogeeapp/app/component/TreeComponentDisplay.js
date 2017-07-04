@@ -43,8 +43,12 @@ apogeeapp.app.TreeComponentDisplay.prototype._createTreeEntry = function() {
     
     //menu item callback
     var menuItemCallback = function() {
-        var optionFlags = apogeeapp.app.Component.MENU_ITEM_OPEN;
-        return instance.component.getMenuItems(optionFlags);
+        var menuItemList = [];
+        var openMenuItem = instance.component.getOpenMenuItem();
+        if(openMenuItem) {
+            menuItemList.push(openMenuItem);
+        }
+        return instance.component.getMenuItems(menuItemList);
     }
     
     //double click callback

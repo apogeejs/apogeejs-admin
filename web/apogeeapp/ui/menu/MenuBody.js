@@ -62,7 +62,6 @@ apogeeapp.ui.MenuBody.prototype.attachToMenuHeader = function(menuHeader) {
     this.parentElement = menuHeader.getElement();
     this.menuDiv.style.left = "0%";
     this.menuDiv.style.top = "100%";
-    
     this.menuHeader = menuHeader;
 }
 
@@ -123,26 +122,36 @@ apogeeapp.ui.MenuBody.prototype.addCallbackMenuItem = function(title, callback) 
 /** this adds a menu item that dispatchs the given event when clicked. */
 apogeeapp.ui.MenuBody.prototype.addMenuItem = function(itemInfo) {
     itemInfo.element = apogeeapp.ui.createElementWithClass("div","visiui-menu-item");
-    
     itemInfo.element.innerHTML = itemInfo.title;
-	
-    itemInfo.element.onmousedown = function(event) {
-		event.stopPropagation();
+    
+    if(itemInfo.childMenuItems) {
+        //create a parent menu item
+        var childMenuBody = this.createChildMenuBody(itemInfo.childMenuItems);
+        var childMenuDiv = childMenuBody.getMenuElement();
+        childMenuDiv.style.left = "100%";
+        childMenuDiv.style.top = "0%";
+        itemInfo.element.appendChild(childMenuDiv);
     }
-	itemInfo.element.onmouseup = function(event) {
-		//close menu
-		apogeeapp.ui.Menu.hideActiveMenu();
-        
-        //do menu action
-        if(itemInfo.eventName) {
-            //dispatch event
-            itemInfo.eventManager.dispatchEvent(itemInfo.eventName,itemInfo.eventData);
+    else {
+        //create a norman (clickable) menu item
+        itemInfo.element.onmousedown = function(event) {
+            event.stopPropagation();
         }
-        else if(itemInfo.callback) {
-            //use the callback
-            itemInfo.callback();
+        itemInfo.element.onclick = function(event) {
+            //close menu
+            apogeeapp.ui.Menu.hideActiveMenu();
+
+            //do menu action
+            if(itemInfo.eventName) {
+                //dispatch event
+                itemInfo.eventManager.dispatchEvent(itemInfo.eventName,itemInfo.eventData);
+            }
+            else if(itemInfo.callback) {
+                //use the callback
+                itemInfo.callback();
+            }
+            event.stopPropagation();
         }
-        event.stopPropagation();
     }
 	
     this.menuDiv.appendChild(itemInfo.element);
@@ -187,4 +196,10 @@ apogeeapp.ui.MenuBody.prototype.destroyItemsForHides = function() {
         apogeeapp.ui.removeAllChildren(this.menuDiv);
     }
     this.menuItems = {};
+}
+
+apogeeapp.ui.MenuBody.prototype.createChildMenuBody = function(menuItems) {
+    var childMenuBody = new apogeeapp.ui.MenuBody();
+    childMenuBody.setMenuItems(menuItems);
+    return childMenuBody;
 }

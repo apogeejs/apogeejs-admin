@@ -35,14 +35,12 @@
     
     margin: 0;
     padding: 0px;
-    line-height: 20px;
 }
 .visiui-tc-child {
     white-space: nowrap;
     
     margin: 0;
     padding: 0px;
-    line-height: 20px;
     border-left:1px solid rgb(190,190,190);
 }
 .visiui-tc-child:last-child {

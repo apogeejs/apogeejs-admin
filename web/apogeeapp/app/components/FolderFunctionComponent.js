@@ -17,15 +17,6 @@ apogeeapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,comp
 apogeeapp.app.FolderFunctionComponent.prototype = Object.create(apogeeapp.app.ParentComponent.prototype);
 apogeeapp.app.FolderFunctionComponent.prototype.constructor = apogeeapp.app.FolderFunctionComponent;
 
-//----------------------
-// ParentContainer Methods
-//----------------------
-
-/** This returned the parent member object associated with this component. */
-apogeeapp.app.FolderFunctionComponent.prototype.getParentMember = function() {
-    return this.getObject().getInternalFolder();
-}
-
 //======================================
 // Callbacks
 // These are defined as static but are called in the objects context

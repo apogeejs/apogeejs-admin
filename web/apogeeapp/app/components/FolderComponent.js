@@ -12,14 +12,6 @@ apogeeapp.app.FolderComponent = function(workspaceUI,folder,componentJson) {
 apogeeapp.app.FolderComponent.prototype = Object.create(apogeeapp.app.ParentComponent.prototype);
 apogeeapp.app.FolderComponent.prototype.constructor = apogeeapp.app.FolderComponent;
 
-//----------------------
-// ParentContainer Methods
-//----------------------
-
-/** This returned the parent member object associated with this component. */
-apogeeapp.app.FolderComponent.prototype.getParentMember = function() {
-    return this.getObject();
-}
 
 //======================================
 // Callbacks

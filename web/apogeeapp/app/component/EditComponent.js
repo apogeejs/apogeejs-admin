@@ -45,13 +45,8 @@ apogeeapp.app.EditComponent.prototype.closeTabDisplay = function() {
     //noop
 }
 
-apogeeapp.app.EditComponent.prototype.getMenuItems = function(flags,optionalMenuItemList) {
-    
-//    //menu items
-//    var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
-    
-    //call base class
-    var menuItemList = apogeeapp.app.Component.prototype.getMenuItems.call(this,flags,optionalMenuItemList);
+apogeeapp.app.EditComponent.prototype.getMenuItems = function(optionalMenuItemList) {
+    var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
     
     //initialize the "clear function" menu entry, used only when there is code
      if((this.object.isCodeable)&&(this.object.hasCode())) {
@@ -63,6 +58,9 @@ apogeeapp.app.EditComponent.prototype.getMenuItems = function(flags,optionalMenu
             menuItemList.push(itemInfo);
         }   
     }
+    
+    //call base class
+    var menuItemList = apogeeapp.app.Component.prototype.getMenuItems.call(this,optionalMenuItemList);
 			
     return menuItemList;
 }
