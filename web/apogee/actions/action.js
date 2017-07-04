@@ -159,6 +159,32 @@ apogee.action.dataUpdate = function(updateMemberName,fromMember,data) {
     return apogee.action.doAction(actionData,contextManager);
 }
 
+/** This is a convenience method to set a member to a given value. */
+apogee.action.compoundDataUpdate = function(updateInfo,fromMember) {
+    var workspace = fromMember.getWorkspace();
+    var contextManager = fromMember.getContextManager();
+    
+    //make the action list
+    var actionList = [];
+    for(var i = 0; i < updateInfo.length; i++) {
+        var updateEntry = updateInfo[i];
+        var subActionData = {};
+        subActionData.action = "updateData";
+        subActionData.memberName = updateEntry.memberName;
+        subActionData.workspace = workspace;
+        subActionData.data = updateEntry.data;
+        actionList.push(subActionData);
+    }
+    
+    //create the single compound action
+    var actionData = {};
+    actionData.action = apogee.compoundaction.ACTION_NAME;
+    actionData.actions = actionList;
+    actionData.workspace = workspace;
+
+    return apogee.action.doAction(actionData,contextManager);
+}
+
 
 /** This is a convenience method to set a member tohave an error message. */
 apogee.action.errorUpdate = function(updateMemberName,fromMember,errorMessage) {
