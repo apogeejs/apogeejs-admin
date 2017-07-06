@@ -145,6 +145,23 @@ apogee.action.callActionFunction = function(actionData,context,processedActions)
     }  
 }
 
+/** This method returns a random numberic token that is used in asynch updates.
+ * It serves two purposes, first to ensure only the _latest_ asyhc update is 
+ * done. Secondly it prevents someone arbitrarily using this method 
+ * without initially setting the pending flag.
+ */
+apogee.action.getAsynchToken = function() {
+    return Math.random();
+}
+
+/** This token value should be used if a table is pending because it is waiting for
+ * an update in another table. */
+apogee.action.DEPENDENT_PENDING_TOKEN = -1;
+
+//--------------------------------
+// Action Convenience Methods
+//--------------------------------
+
 /** This is a convenience method to set a member to a given value. */
 apogee.action.dataUpdate = function(updateMemberName,fromMember,data) {
     var workspace = fromMember.getWorkspace();
@@ -163,23 +180,11 @@ apogee.action.dataUpdate = function(updateMemberName,fromMember,data) {
 apogee.action.compoundDataUpdate = function(updateInfo,fromMember) {
     var workspace = fromMember.getWorkspace();
     var contextManager = fromMember.getContextManager();
-    
-    //make the action list
-    var actionList = [];
-    for(var i = 0; i < updateInfo.length; i++) {
-        var updateEntry = updateInfo[i];
-        var subActionData = {};
-        subActionData.action = "updateData";
-        subActionData.memberName = updateEntry.memberName;
-        subActionData.workspace = workspace;
-        subActionData.data = updateEntry.data;
-        actionList.push(subActionData);
-    }
-    
+
     //create the single compound action
     var actionData = {};
     actionData.action = apogee.compoundaction.ACTION_NAME;
-    actionData.actions = actionList;
+    actionData.actions = apogee.action.updateInfoToActionList(updateInfo,workspace);
     actionData.workspace = workspace;
 
     return apogee.action.doAction(actionData,contextManager);
@@ -238,18 +243,26 @@ apogee.action.asynchDataUpdate = function(updateMemberName,fromMember,dataPromis
     dataPromise.then(asynchCallback).catch(asynchErrorCallback);
 }
 
-/** This method returns a random numberic token that is used in asynch updates.
- * It serves two purposes, first to ensure only the _latest_ asyhc update is 
- * done. Secondly it prevents someone arbitrarily using this method 
- * without initially setting the pending flag.
- */
-apogee.action.getAsynchToken = function() {
-    return Math.random();
+/** This is a convenience method to set a member to a given value. 
+ * @private */
+apogee.action.updateInfoToActionList = function(updateInfo,workspace) {
+
+    //make the action list
+    var actionList = [];
+    for(var i = 0; i < updateInfo.length; i++) {
+        var updateEntry = updateInfo[i];
+        var subActionData = {};
+        subActionData.action = "updateData";
+        subActionData.memberName = updateEntry.memberName;
+        subActionData.workspace = workspace;
+        subActionData.data = updateEntry.data;
+        actionList.push(subActionData);
+    }
+    
+    return actionList;
 }
 
-/** This token value should be used if a table is pending because it is waiting for
- * an update in another table. */
-apogee.action.DEPENDENT_PENDING_TOKEN = -1;
+
 
 //=======================================
 // Internal Methods

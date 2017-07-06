@@ -3,7 +3,10 @@ apogee.codeCompiler = {};
 
 /** @private */
 apogee.codeCompiler.APOGEE_FORBIDDEN_NAMES = {
-    "root": true
+    "apogeeMessenger": true,
+    "__initFunction": true,
+    "__memberFunction": true,
+    "__memberFunctionDebugHook": true
 }
 
 /** @private */
@@ -18,7 +21,11 @@ apogee.codeCompiler.validateTableName = function(name) {
     if(apogee.codeAnalysis.KEYWORDS[name]) {
         nameResult.errorMessage = "Illegal name: " + name + " - Javascript reserved keyword";
         nameResult.valid = false;
-    }    
+    }  
+    else if(apogee.codeAnalysis.EXCLUSION_NAMES[name]) {
+        nameResult.errorMessage = "Illegal name: " + name + " - Javascript variable or value name";
+        nameResult.valid = false;
+    }
     else if(apogee.codeCompiler.APOGEE_FORBIDDEN_NAMES[name]) {
         nameResult.errorMessage = "Illegal name: " + name + " - Apogee reserved keyword";
         nameResult.valid = false;
@@ -96,7 +103,7 @@ apogee.codeCompiler.createCombinedFunctionBody = function(argList,
 apogee.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunctionBody) {
     
     var contextDeclarationText = "";
-    var contextSetterBody = "";
+    var initializerBody = "";
     
     //set the context - here we only defined the variables that are actually used.
 	for(var baseName in varInfo) {        
@@ -109,18 +116,18 @@ apogee.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunction
         contextDeclarationText += "var " + baseName + ";\n";
         
         //add to the context setter
-        contextSetterBody += baseName + ' = contextManager.getBaseData("' + baseName + '");\n';
+        initializerBody += baseName + ' = contextManager.getBaseData("' + baseName + '");\n';
     }
     
     //create the generator for the object function
     var generatorBody = apogee.util.formatString(
         apogee.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT,
 		contextDeclarationText,
-        contextSetterBody,
+        initializerBody,
         combinedFunctionBody
     );
         
-    var generatorFunction = new Function("__initFunction",generatorBody);
+    var generatorFunction = new Function("__initFunction","apogeeMessenger",generatorBody);
     return generatorFunction;    
 }
 
@@ -145,7 +152,7 @@ apogee.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT = [
 "function __memberFunction({1}) {",
 "//overhead code",
 "if(!__initFunction()) return undefined;",
-"apogee.memberFunctionDebugHook();",
+"__memberFunctionDebugHook();",
 "",
 "//user code",
 "{2}",
@@ -156,7 +163,7 @@ apogee.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT = [
 /** This line is added when getting the dependencies to account for some local 
  * variables in the member function.
  * @private */
-apogee.codeCompiler.MEMBER_LOCALS_TEXT = "var __initFunction, __memberFunction; " 
+apogee.codeCompiler.MEMBER_LOCALS_TEXT = "var __initFunction, apogeeMessenger, __memberFunction, __memberFunctionDebugHook;";
    
 /** This is the format string to create the code body for the object function
  * Input indices:
@@ -170,14 +177,14 @@ apogee.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//declare context variables",
 "{0}",
 "//context setter",
-"function __setContext(contextManager) {",
+"function __initializer(contextManager) {",
 "{1}};",
 "",
 "//user code",
 "{2}",
 "return {",
 "'memberFunction': __memberFunction,",
-"'contextSetter': __setContext",
+"'initializer': __initializer",
 "};"
    ].join("\n");
 

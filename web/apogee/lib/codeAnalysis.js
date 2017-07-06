@@ -190,8 +190,27 @@ apogee.codeAnalysis.KEYWORDS = {
 	"volatile": true,
 	"while": true,
 	"with": true,
-	"yield": true
+	"yield": true,
 };
+
+/** These are variable names we will not call out in setting the context.
+ * NOTE - it is OK if we do not exclude a global variable. It will still work. */
+apogee.codeAnalysis.EXCLUSION_NAMES = {
+    "undefined": true,
+    "Infinity": true,
+    "NaN": true,
+    
+    "String": true,
+    "Number": true,
+    "Math": true,
+    "Date": true,
+    "Array": true,
+    "Boolean": true,
+    "Error": true,
+    "RegExp": true,
+    
+    "console": true
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /** This method returns the error list for this formula. It is only valid
@@ -440,6 +459,11 @@ apogee.codeAnalysis.processVariable = function(processInfo,node,isModified,isDec
     if(!namePath) return;
     
     var baseName = namePath[0];
+    
+    //check if it is an excluded name - such as a variable name used by javascript
+    if(apogee.codeAnalysis.EXCLUSION_NAMES[baseName]) {
+        return;
+    }
     
     //add to the name table
     var nameEntry = processInfo.nameTable[baseName];

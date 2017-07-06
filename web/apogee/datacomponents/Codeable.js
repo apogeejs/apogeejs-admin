@@ -24,7 +24,7 @@ apogee.Codeable.init = function(argList) {
     this.description = "";
     this.varInfo = null;
     this.dependencyInfo = null;
-    this.contextSetter = null;
+    this.memberFunctionInitializer = null;
     this.memberFunction = null;
     this.codeErrors = [];
     
@@ -82,15 +82,18 @@ apogee.Codeable.setCodeInfo = function(codeInfo) {
     if((!codeInfo.errors)||(codeInfo.errors.length === 0)) {
         //set the code  by exectuing generator
         try {
-            //here we generate the init function we need, which also serves as a debug hook
+            //get the inputs to the generator
             var instance = this;
             var initFunction = function() {
                 return instance.memberFunctionInitialize();
             }
+            var messenger = new apogee.action.Messenger(this);
             
-            var generatedFunctions = codeInfo.generatorFunction(initFunction);
+            //get the generated fucntion
+            var generatedFunctions = codeInfo.generatorFunction(initFunction,messenger);
             this.memberFunction = generatedFunctions.memberFunction;
-            this.contextSetter = generatedFunctions.contextSetter;            
+            this.memberFunctionInitializer = generatedFunctions.initializer;            
+            
             this.codeErrors = [];
         }
         catch(ex) {
@@ -105,7 +108,7 @@ apogee.Codeable.setCodeInfo = function(codeInfo) {
     if(this.codeErrors.length > 0) {
         //code not valid
         this.memberFunction = null;
-        this.contextSetter = null;
+        this.memberFunctionInitializer = null;
     }
     this.codeSet = true;
 }
@@ -156,7 +159,7 @@ apogee.Codeable.clearCode = function() {
     this.supplementalCode = "";
     this.varInfo = null;
     this.dependencyInfo = null;
-    this.contextSetter = null;
+    this.memberFunctionInitializer = null;
     this.memberFunction = null;
     this.codeErrors = [];
     
@@ -195,7 +198,7 @@ apogee.Codeable.calculate = function() {
         return;
     }
     
-    if((!this.memberFunction)||(!this.contextSetter)) {
+    if((!this.memberFunction)||(!this.memberFunctionInitializer)) {
         var msg = "Function not found for member: " + this.getName();
         var actionError = new apogee.ActionError(msg,"Codeable - Calculate",this);
         this.addError(actionError);
@@ -262,7 +265,7 @@ apogee.Codeable.memberFunctionInitialize = function() {
         }
         
         //set the context
-        this.contextSetter(this.getContextManager());
+        this.memberFunctionInitializer(this.getContextManager());
         
         this.initReturnValue = true;
     }

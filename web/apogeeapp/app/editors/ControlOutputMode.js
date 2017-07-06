@@ -23,6 +23,11 @@ apogeeapp.app.ControlOutputMode.prototype.getFullName = function() {
 	return this.member.getFullName();
 }
 
+/** This method returns an action messenger object for doing data updates in other tables. */ 
+apogeeapp.app.ControlOutputMode.prototype.getMessenger = function() {
+    return new apogee.action.Messenger(this.member);
+}
+
 //this is not applicable, for now at least
 apogeeapp.app.ControlOutputMode.prototype.getIsDataEditable = function() {
     return false;
