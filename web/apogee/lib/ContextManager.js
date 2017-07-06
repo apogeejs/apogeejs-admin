@@ -3,8 +3,8 @@
 /** This class manages context for the user code. This is used to associate names
  *from the user code with objects from the workspace. The argument passed here is
  *the object assoicatd with the context manager. */
-apogee.ContextManager = function(member) {
-    this.member = member;
+apogee.ContextManager = function(contextHolder) {
+    this.contextHolder = contextHolder;
     this.contextList = [];
 }
 
@@ -43,8 +43,8 @@ apogee.ContextManager.prototype.hierarchicalLookup = function(lookupFunctionName
     if(result !== undefined) {
         return result;
     }
-    else if((this.member)&&(this.member.getOwner)) {
-        var owner = this.member.getOwner();
+    else if((this.contextHolder)&&(this.contextHolder.getOwner)) {
+        var owner = this.contextHolder.getOwner();
         if(owner) {
             var ownerContextManager = owner.getContextManager();
             return ownerContextManager.hierarchicalLookup(lookupFunctionName,lookupKey);

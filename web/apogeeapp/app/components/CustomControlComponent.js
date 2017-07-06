@@ -231,7 +231,12 @@ apogeeapp.app.CustomControlComponent.prototype.createResource = function() {
 // Action
 //=============================
 
-apogeeapp.app.CustomControlComponent.prototype.update = function(uiCodeFields) {   
+apogeeapp.app.CustomControlComponent.prototype.update = function(uiCodeFields) { 
+    
+    //make sure we get rid of the old display
+    if(this.outputMode) {
+        this.outputMode.triggerReload();
+    }
     
     this.uiCodeFields = uiCodeFields;
     
@@ -285,7 +290,7 @@ apogeeapp.app.CustomControlComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
  * @private
  */
 apogeeapp.app.CustomControlComponent.GENERATOR_INTERNAL_FORMATS = {
-    "constructorAddition":"resource.constructorAddition = function(mode) {\n{0}\n};",
+    "constructorAddition":"resource.constructorAddition = function(mode) {\napogee.customControlDebugHook();\n{0}\n};",
     "init":"resource.init = function(element,mode) {\n{0}\n};",
     "setData":"resource.setData = function(data,element,mode) {\n{0}\n};",
     "onHide":"resource.onHide = function(element,mode) {\n{0}\n};",

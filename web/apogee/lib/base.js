@@ -10,6 +10,7 @@ apogee.base.mixin = function(destObject,mixinObject) {
 
 /** This method creates an integer has value for a string. */
 apogee.base.isPromise = function(object) {
+    if(object === null) return false;
     return (typeof object === "object")&&(object.constructor === Promise);
 }
 

@@ -41,6 +41,8 @@ apogee.Codeable.init = function(argList) {
  * This property should not be implemented on non-codeables. */
 apogee.Codeable.isCodeable = true
 
+apogee.Codeable.MEMBER_FUNCTION_PENDING = "pending";
+
 /** This method returns the argument list.  */
 apogee.Codeable.getArgList = function() {
     return this.argList;
@@ -81,9 +83,12 @@ apogee.Codeable.setCodeInfo = function(codeInfo) {
         //set the code  by exectuing generator
         try {
             //here we generate the init function we need, which also serves as a debug hook
-            var testFunction = apogee.memberDebugHook(this);
+            var instance = this;
+            var initFunction = function() {
+                return instance.memberFunctionInitialize();
+            }
             
-            var generatedFunctions = codeInfo.generatorFunction(testFunction);
+            var generatedFunctions = codeInfo.generatorFunction(initFunction);
             this.memberFunction = generatedFunctions.memberFunction;
             this.contextSetter = generatedFunctions.contextSetter;            
             this.codeErrors = [];
@@ -202,22 +207,33 @@ apogee.Codeable.calculate = function() {
         this.processMemberFunction(this.memberFunction);
     }
     catch(error) {
-        //this is an error in the code
-        if(error.stack) {
-            console.error(error.stack);
+        if(error == apogee.Codeable.MEMBER_FUNCTION_PENDING) {
+            //This is not an error. I don't like to throw an error
+            //for an expected condition, but I didn't know how else
+            //to do this. See notes there this is thrown.
+            this.setResultPending(true);
         }
+        //--------------------------------------
+        else {
+            //normal error in member function execution
+        
+            //this is an error in the code
+            if(error.stack) {
+                console.error(error.stack);
+            }
 
-        var errorMsg = (error.message) ? error.message : "Unknown error";
-        var actionError = new apogee.ActionError(errorMsg,"Codeable - Calculate",this);
-        actionError.setParentException(error);
-        this.addError(actionError);
+            var errorMsg = (error.message) ? error.message : "Unknown error";
+            var actionError = new apogee.ActionError(errorMsg,"Codeable - Calculate",this);
+            actionError.setParentException(error);
+            this.addError(actionError);
+        }
     }
     
     this.clearCalcPending();
 }
 
 /** This makes sure user code of object function is ready to execute.  */
-apogee.Codeable.testFunction = function() {
+apogee.Codeable.memberFunctionInitialize = function() {
     
     if(this.functionInitialized) return this.initReturnValue;
     

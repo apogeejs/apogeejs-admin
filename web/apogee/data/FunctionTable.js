@@ -31,8 +31,21 @@ apogee.base.mixin(apogee.FunctionTable,apogee.Codeable);
 //------------------------------
 
 apogee.FunctionTable.prototype.processMemberFunction = function(memberFunction) {	
+    var instance = this;
+    var dataObject = function() {
+        
+        //member function wrapper
+        var returnValue = memberFunction.apply(null,arguments);
+        //pending check - we don't know if a function is pending until we
+        //actually call it. I didn't know how else to capture this in the 
+        //calling code other than use an error. But this is not an error.
+        if(instance.getResultPending()) {
+            throw apogee.Codeable.MEMBER_FUNCTION_PENDING;
+        }
+        return returnValue;
+    }
     //tjhe data is the function
-	this.setData(memberFunction);
+	this.setData(dataObject);
 }
 
 //------------------------------

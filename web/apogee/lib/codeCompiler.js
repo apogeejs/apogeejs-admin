@@ -120,7 +120,7 @@ apogee.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunction
         combinedFunctionBody
     );
         
-    var generatorFunction = new Function("__testFunction",generatorBody);
+    var generatorFunction = new Function("__initFunction",generatorBody);
     return generatorFunction;    
 }
 
@@ -144,7 +144,8 @@ apogee.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT = [
 "//member function----------------",
 "function __memberFunction({1}) {",
 "//overhead code",
-"if(!__testFunction()) return undefined;",
+"if(!__initFunction()) return undefined;",
+"apogee.memberFunctionDebugHook();",
 "",
 "//user code",
 "{2}",
@@ -155,7 +156,7 @@ apogee.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT = [
 /** This line is added when getting the dependencies to account for some local 
  * variables in the member function.
  * @private */
-apogee.codeCompiler.MEMBER_LOCALS_TEXT = "var __testFunction, __memberFunction; " 
+apogee.codeCompiler.MEMBER_LOCALS_TEXT = "var __initFunction, __memberFunction; " 
    
 /** This is the format string to create the code body for the object function
  * Input indices:

@@ -67,7 +67,7 @@ apogee.JsonTable.prototype.getArgList = function() {
     return [];
 }
 	
-apogee.JsonTable.prototype.processMemberFunction = function(memberFunction) {	
+apogee.JsonTable.prototype.processMemberFunction = function(memberFunction) {
     
     //the data is the output of the function
     var data = memberFunction();

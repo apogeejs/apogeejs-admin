@@ -45,6 +45,7 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     
     if(resource.constructorAddition) {
         try {
+            //custom code
             resource.constructorAddition.call(this,outputMode);
         }
         catch(error) {
