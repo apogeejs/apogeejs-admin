@@ -8,20 +8,25 @@ apogeeapp.app.EditComponent = function(workspaceUI,object,generator,options) {
 apogeeapp.app.EditComponent.prototype = Object.create(apogeeapp.app.Component.prototype);
 apogeeapp.app.EditComponent.prototype.constructor = apogeeapp.app.EditComponent;
 
-apogeeapp.app.EditComponent.prototype.createWindowDisplay = function() {
-    if(this.windowDisplay == null) {
-        this.windowDisplay = new apogeeapp.app.EditWindowComponentDisplay(this,this.windowDisplayStateJson);
+apogeeapp.app.EditComponent.prototype.instantiateWindowDisplay = function() {
+    var windowDisplay
+    
+    //here we allow for an existing window display so we can set an alternate window display 
+    if(this.alternateWindowDisplay) {
+        windowDisplay = this.alternateWindowDisplay;
+        windowDisplay.setStateJson(this.windowDisplayStateJson);
     }
-    else if(this.windowStateJson) {
-        this.windowDisplay.setStateJson(this.windowStateJson);
+    else {
+        windowDisplay = new apogeeapp.app.EditWindowComponentDisplay(this,this.windowDisplayStateJson);
     }
-    return this.windowDisplay;
+
+    return windowDisplay;
 }
 
 /** This is used when an alternate UI is used for the workspace. This replaces the window display 
  *  used in the standard UI. */
 apogeeapp.app.EditComponent.prototype.setAlternateWindowDisplay = function(windowDisplay) {
-    this.windowDisplay = windowDisplay;
+    this.alternateWindowDisplay = windowDisplay;
 }
 
 //===============================
@@ -37,12 +42,8 @@ apogeeapp.app.EditComponent.prototype.hasTabDisplay = function() {
     return false;
 }
 
-apogeeapp.app.EditComponent.prototype.openTabDisplay = function() {
-    //noop
-}
-
-apogeeapp.app.EditComponent.prototype.closeTabDisplay = function() {
-    //noop
+apogeeapp.app.EditComponent.prototype.instantiateTabDisplay = function() {
+    return null;
 }
 
 apogeeapp.app.EditComponent.prototype.getMenuItems = function(optionalMenuItemList) {

@@ -10,11 +10,8 @@ apogeeapp.app.ParentComponent = function(workspaceUI,object,generator,options) {
 apogeeapp.app.ParentComponent.prototype = Object.create(apogeeapp.app.Component.prototype);
 apogeeapp.app.ParentComponent.prototype.constructor = apogeeapp.app.ParentComponent;
 
-apogeeapp.app.ParentComponent.prototype.createWindowDisplay = function() {
-    if(this.windowDisplay == null) {
-        this.windowDisplay = new apogeeapp.app.ParentWindowComponentDisplay(this,this.windowDisplayStateJson);
-    }
-    return this.windowDisplay;
+apogeeapp.app.ParentComponent.prototype.instantiateWindowDisplay = function() {
+    return new apogeeapp.app.ParentWindowComponentDisplay(this,this.windowDisplayStateJson);
 }
 
 //----------------------
@@ -30,18 +27,9 @@ apogeeapp.app.ParentComponent.prototype.hasTabDisplay = function() {
     return true;
 }
 
-apogeeapp.app.ParentComponent.prototype.openTabDisplay = function() {
-    if(!this.tabDisplay) {
-        this.tabDisplay = new apogeeapp.app.TabComponentDisplay(this);
-    }
-    this.workspaceUI.setActiveTab(this.getObject().getId());
-}
-
-apogeeapp.app.ParentComponent.prototype.closeTabDisplay = function() {
-    if(this.tabDisplay) {
-        this.tabDisplay.closeTab();
-        this.tabDisplay = null;
-    }
+apogeeapp.app.ParentComponent.prototype.instantiateTabDisplay = function() {
+    this.tabDisplay = new apogeeapp.app.TabComponentDisplay(this);   
+    return this.tabDisplay;
 }
 
 /** This brings the child component to the front and takes any other actions

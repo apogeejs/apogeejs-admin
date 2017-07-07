@@ -16,6 +16,9 @@ apogeeapp.app.Component = function(workspaceUI,object,generator,options) {
     this.windowDisplay = null;
     this.windowDisplayStateJson = this.options.windowState;
     
+    this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
+    this.bannerMessage = "";
+    
     //inheriting objects can pass functions here to be called on cleanup, save, etc
     this.saveActions = [];
     this.cleanupActions = [];
@@ -79,7 +82,14 @@ apogeeapp.app.Component.prototype.getTreeEntry = function() {
 }
 
 //implement
-//apogeeapp.app.Component.prototype.createWindowDisplay = function();
+///** This creates an instance of the window display. */
+//apogeeapp.app.Component.prototype.instantiateWindowDisplay = function();
+
+apogeeapp.app.Component.prototype.createWindowDisplay = function() {
+    var windowDisplay = this.instantiateWindowDisplay();
+    windowDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    return windowDisplay;
+}
 
 apogeeapp.app.Component.prototype.closeWindowDisplay = function() {
     if(this.windowDisplay) {
@@ -132,12 +142,22 @@ apogeeapp.app.Component.prototype.getOpenMenuItem = function() {
 //apogeeapp.app.Component.prototype.hasTabDisplay = function();
 
 //Implement in extending class:
-///** This opens the tab display for the component. */
-//apogeeapp.app.Component.prototype.openTabDisplay = function();
+///** This creates the tab display for the component. */
+//apogeeapp.app.Component.prototype.instantiateTabDisplay = function();
 
-//Implement in extending class:
-///** This closes the tab display for the component. */
-//apogeeapp.app.Component.prototype.closeTabDisplay = function();
+apogeeapp.app.Component.prototype.openTabDisplay = function() {
+    var tabDisplay = this.instantiateTabDisplay();
+    tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    this.workspaceUI.setActiveTab(this.object.getId());
+}
+
+/** This closes the tab display for the component. */
+apogeeapp.app.Component.prototype.closeTabDisplay = function() {
+    if(this.tabDisplay) {
+        this.tabDisplay.closeTab();
+        this.tabDisplay = null;
+    }
+}
 
 /** This serializes the component. */
 apogeeapp.app.Component.prototype.toJson = function() {
@@ -225,8 +245,6 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
     }
     
     //get the banner info
-    var bannerState;
-    var bannerMessage;
     var object = this.getObject();
     if(object.hasError()) {
         var errorMsg = "";
@@ -235,29 +253,29 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
             errorMsg += actionErrors[i].msg + "\n";
         }
         
-        bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR;
-        bannerMessage = errorMsg;
+        this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR;
+        this.bannerMessage = errorMsg;
     }
     else if(object.getResultPending()) {
-        bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING;
-        bannerMessage = apogeeapp.app.WindowHeaderManager.PENDING_MESSAGE;
+        this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING;
+        this.bannerMessage = apogeeapp.app.WindowHeaderManager.PENDING_MESSAGE;
         
     }
     else {   
-        bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
-        bannerMessage = null;
+        this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
+        this.bannerMessage = null;
     }
     
     //update for new data
     this.treeDisplay.updateData();
-    this.treeDisplay.setBannerState(bannerState,bannerMessage);
+    this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
     if(this.windowDisplay != null) {
         this.windowDisplay.updateData();
-        this.windowDisplay.setBannerState(bannerState,bannerMessage);
+        this.windowDisplay.setBannerState(this.bannerState,this.bannerMessage);
     }
     if(this.tabDisplay != null) {
         this.tabDisplay.updateData();
-        this.tabDisplay.setBannerState(bannerState,bannerMessage);
+        this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
     }
 }
 
