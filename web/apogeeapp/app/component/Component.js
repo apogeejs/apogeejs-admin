@@ -147,8 +147,10 @@ apogeeapp.app.Component.prototype.getOpenMenuItem = function() {
 //apogeeapp.app.Component.prototype.instantiateTabDisplay = function();
 
 apogeeapp.app.Component.prototype.openTabDisplay = function() {
-    var tabDisplay = this.instantiateTabDisplay();
-    tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    if(!this.tabDisplay) {
+        this.tabDisplay = this.instantiateTabDisplay();
+        tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    }
     this.workspaceUI.setActiveTab(this.object.getId());
 }
 
