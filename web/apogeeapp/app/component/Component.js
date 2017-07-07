@@ -88,6 +88,7 @@ apogeeapp.app.Component.prototype.getTreeEntry = function() {
 apogeeapp.app.Component.prototype.createWindowDisplay = function() {
     var windowDisplay = this.instantiateWindowDisplay();
     windowDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    this.windowDisplay = windowDisplay;
     return windowDisplay;
 }
 
