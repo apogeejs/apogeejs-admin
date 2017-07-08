@@ -78,11 +78,10 @@
 		<script type="text/javascript" src="../../apogee/actions/movemember.js"></script>
         <script type="text/javascript" src="../../apogee/actions/deletemember.js"></script>
         <script type="text/javascript" src="../../apogee/actions/updatefolderfunction.js"></script>
+        <script type="text/javascript" src="../../apogee/actions/Messenger.js"></script>
         
         <script type="text/javascript" src="../../apogeeapp/apogeeapp.js"></script>
-        <script type="text/javascript" src="extraDefs.js"></script>
 		<script type="text/javascript" src="../../apogeeapp/ui/apogeeappui.js"></script>
-             
         <script type="text/javascript" src="../../apogeeapp/ui/window/ParentContainer.js"></script>
 		<script type="text/javascript" src="../../apogeeapp/ui/window/WindowFrame.js"></script>      
 		<script type="text/javascript" src="../../apogeeapp/ui/tabframe/TabFrame.js"></script>
@@ -200,6 +199,15 @@
             }   
             
             function onWorkspaceLoad() {
+                
+                //set initial panel state
+                //ADD THIS!!
+                
+                //set up callback
+                var workspace = app.getWorkspace();
+                workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT,onMemberUpdated);
+                
+                //load the UI controls
                 for(var i = 0; i < embedInfo.length; i++) {
                     addDisplay(embedInfo[i]);
                 }
@@ -232,26 +240,38 @@
                 var viewMode = componentDisplay.getViewMode();
                 viewMode.showData();
             }
+            
+            function onMemberUpdated(member) {
+                //ADD THIS!
+            }
+            
+            
         </script>
     </head>
     <body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
+        <div id="loginPanel">
+            <h1>Login</h1>
+            <div class="contentTest" id="loginControl"></div>
+        </div>
+        <div id="contextPanel">
+            <h1>Context</h1>
+            <div class="contentTest" id="context"></div>
+        </div>
+        <div id="selectFilePanel">
+            <h1>File Selection</h1>
+            <div class="contentTest" id="metaFileSelector"></div>
+        </div>
+        <div id="editPanel">
+            <h1>File Edit</h1>
+            <div class="contentTest" id="selectEntriesControl"></div>
+        </div>
+        <div id="commitPanel">
+            <h1>Commit</h1>
+            <div class="contentTest" id="submitControl"></div>
+            
+            <h3>Commit Result</h3>
+            <div class="contentTest" id="commitResult"></div>
+        </div>
         
-        <h1>Login</h1>
-        <div class="contentTest" id="loginControl"></div>
-        <h1>File Selection</h1>
-        <h3>Context</h3>
-        <div class="contentTest" id="context"></div>
-        <h3>File Selector</h3>
-        <div class="contentTest" id="metaFileSelector"></div>
-        <h3>Meta File Name (for create)</h3>
-        <div class="contentTest" id="newMetaFileName"></div>
-        <h1>File Edit</h1>
-        <div class="contentTest" id="selectEntriesControl"></div>
-        <h1>Commit</h1>
-        <div class="contentTest" id="submitControl"></div>
-        <h3>Commit Flag</h3>
-        <div class="contentTest" id="commitFlag"></div>
-        <h3>Commit Result</h3>
-        <div class="contentTest" id="commitResult"></div>
     </body>
 </html>
