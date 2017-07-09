@@ -9,7 +9,6 @@ module.exports = function(grunt) {
         "base_lib": {
             "src": [
                 "apogee/apogee.js",
-                "apogee/debugHook.js",
                 "apogee/lib/base.js",
                 "apogee/usrlib/util.js",
                 "apogee/usrlib/net.js",
@@ -40,7 +39,8 @@ module.exports = function(grunt) {
                 "apogee/actions/updatemember.js",
                 "apogee/actions/movemember.js",
                 "apogee/actions/deletemember.js",
-                "apogee/actions/updatefolderfunction.js"
+                "apogee/actions/updatefolderfunction.js",
+                "apogee/actions/Messenger.js"
             ],
             "dest": "../../dist/apogee-base-lib.js"
         },
