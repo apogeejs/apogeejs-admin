@@ -59,7 +59,14 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.getMember = function() {
 }
 
 apogeeapp.app.EditWindowComponentDisplay.prototype.deleteDisplay = function() {
-    //window will get deleted! New parent will get new windows, as is appropriate
+    //dispose any view elements
+    for(var viewType in this.viewModeElements) {
+        var viewModeElement = this.viewModeElements[viewType];
+        if(viewModeElement) {
+            viewModeElement.destroy();
+        }
+    }
+    
     if(this.windowFrame) {
         this.windowFrame.close();
     }
@@ -342,14 +349,3 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.hideSaveBar = function() {
 	this.windowHeaderManager.showToolbar(this.normalToolbarDiv);
 }
 
-//-----------------------------------
-// Callbacks for management
-//-----------------------------------
-
-/** @protected */
-apogeeapp.app.EditWindowComponentDisplay.prototype.destroy = function() {
-    for(var viewType in viewModeElements) {
-        var viewModeElement = this.viewModeElemens[viewType];
-        viewModeElement.destroy();
-    }
-}
