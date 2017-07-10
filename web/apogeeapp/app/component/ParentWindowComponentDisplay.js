@@ -98,13 +98,17 @@ apogeeapp.app.ParentWindowComponentDisplay.prototype._loadWindowFrameEntry = fun
     
     // set menu
     var menu = this.windowFrame.createMenu(this.component.getIconUrl());
-    var menuItemList = [];
-    var openMenuItem = this.component.getOpenMenuItem();
-    if(openMenuItem) {
-        menuItemList.push(openMenuItem);
+    
+    var instance = this;
+    var createMenuItemsCallback = function() {
+        var menuItemList = [];
+        var openMenuItem = instance.component.getOpenMenuItem();
+        if(openMenuItem) {
+            menuItemList.push(openMenuItem);
+        }
+        return instance.component.getMenuItems(menuItemList);
     }
-    var menuItemList = this.component.getMenuItems(menuItemList);
-    menu.setMenuItems(menuItemList);
+    menu.setAsOnTheFlyMenu(createMenuItemsCallback);
 }
 
 //-----------------------------------

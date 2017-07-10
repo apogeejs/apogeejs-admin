@@ -52,7 +52,7 @@ apogeeapp.app.EditComponent.prototype.getMenuItems = function(optionalMenuItemLi
     }
     
     //call base class
-    var menuItemList = apogeeapp.app.Component.prototype.getMenuItems.call(this,optionalMenuItemList);
+    var menuItemList = apogeeapp.app.Component.prototype.getMenuItems.call(this,menuItemList);
 			
     return menuItemList;
 }

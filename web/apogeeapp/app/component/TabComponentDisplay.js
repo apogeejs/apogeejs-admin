@@ -89,8 +89,11 @@ apogeeapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     // set menu
     //------------------
     var menu = this.tab.createMenu(this.component.getIconUrl());
-    var menuItemInfoList = this.component.getMenuItems();
-    menu.setMenuItems(menuItemInfoList);
+    var instance = this;
+    var createMenuItemsCallback = function() {
+        return instance.component.getMenuItems();
+    }
+    menu.setAsOnTheFlyMenu(createMenuItemsCallback);
     
     //-----------------
     //set the tab title
