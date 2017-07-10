@@ -7,7 +7,7 @@ apogee.net = {};
  * "body" - HTTP body
  * "header" - HTTP headers, example: {"Content-Type":"text/plain","other-header":"xxx"}
  */
-apogee.net.makeRequest = function(url,onSuccess,onError,options) {
+apogee.net.callbackRequest = function(url,onSuccess,onError,options) {
     
     var xmlhttp=new XMLHttpRequest();
 
@@ -49,15 +49,15 @@ apogee.net.makeRequest = function(url,onSuccess,onError,options) {
 }
 
 /** This method creates an integer has value for a string. 
- * See apogee.net.makeRequest for a list of options. */
-apogee.net.promiseRequest = function(url,options) {
+ * See apogee.net.callbackRequest for a list of options. */
+apogee.net.textRequest = function(url,options) {
     return new Promise(function(onSuccess,onError) {
-        apogee.net.makeRequest(url,onSuccess,onError,options);
+        apogee.net.callbackRequest(url,onSuccess,onError,options);
     });
 }
 
 /** This method creates an integer has value for a string.
- * See apogee.net.makeRequest for a list of options. */
-apogee.net.promiseJsonRequest = function(url,options) {
-    return apogee.net.promiseRequest(url,options).then(JSON.parse);
+ * See apogee.net.callbackRequest for a list of options. */
+apogee.net.jsonRequest = function(url,options) {
+    return apogee.net.textRequest(url,options).then(JSON.parse);
 }

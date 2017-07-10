@@ -18,7 +18,7 @@ apogee.action.Messenger = function(fromMember) {
 
     /** This is a convenience method to set a member to a given value when the dataPromise resolves. */
     this.asynchDataUpdate = function(updateMemberName,dataPromise) {
-        apogee.action.dataUpdate(updateMemberName,fromMember,dataPromise);
+        apogee.action.asynchDataUpdate(updateMemberName,fromMember,dataPromise);
     }
 }
 

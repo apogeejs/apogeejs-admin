@@ -253,9 +253,9 @@ apogee.action.updateInfoToActionList = function(updateInfo,workspace) {
         var updateEntry = updateInfo[i];
         var subActionData = {};
         subActionData.action = "updateData";
-        subActionData.memberName = updateEntry.memberName;
+        subActionData.memberName = updateEntry[0];
         subActionData.workspace = workspace;
-        subActionData.data = updateEntry.data;
+        subActionData.data = updateEntry[1];
         actionList.push(subActionData);
     }
     
