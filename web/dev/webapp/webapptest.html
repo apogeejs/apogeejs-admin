@@ -252,7 +252,6 @@
                 //create an alternate component display (to the window display) 
                 var componentDisplay = new apogeeapp.webapp.EmbeddedContainerComponentDisplay(component, viewType, parentElement);
                 component.setAlternateWindowDisplay(componentDisplay);
-                component.createWindowDisplay();
                 var viewMode = componentDisplay.getViewMode();
                 viewMode.showData();
             }

@@ -9,24 +9,15 @@ apogeeapp.app.EditComponent.prototype = Object.create(apogeeapp.app.Component.pr
 apogeeapp.app.EditComponent.prototype.constructor = apogeeapp.app.EditComponent;
 
 apogeeapp.app.EditComponent.prototype.instantiateWindowDisplay = function() {
-    var windowDisplay
-    
-    //here we allow for an existing window display so we can set an alternate window display 
-    if(this.alternateWindowDisplay) {
-        windowDisplay = this.alternateWindowDisplay;
-        windowDisplay.setStateJson(this.windowDisplayStateJson);
-    }
-    else {
-        windowDisplay = new apogeeapp.app.EditWindowComponentDisplay(this,this.windowDisplayStateJson);
-    }
-
-    return windowDisplay;
+    return new apogeeapp.app.EditWindowComponentDisplay(this,this.windowDisplayStateJson);
 }
 
 /** This is used when an alternate UI is used for the workspace. This replaces the window display 
  *  used in the standard UI. */
 apogeeapp.app.EditComponent.prototype.setAlternateWindowDisplay = function(windowDisplay) {
     this.alternateWindowDisplay = windowDisplay;
+    this.windowDisplay = windowDisplay;
+    windowDisplay.setBannerState(this.bannerState,this.bannerMessage);
 }
 
 //===============================
