@@ -131,6 +131,14 @@ apogeeapp.ui.MenuBody.prototype.addMenuItem = function(itemInfo) {
         childMenuDiv.style.left = "100%";
         childMenuDiv.style.top = "0%";
         itemInfo.element.appendChild(childMenuDiv);
+        
+        //prevent normal action on a click
+        itemInfo.element.onmousedown = function(event) {
+            event.stopPropagation();
+        }
+        itemInfo.element.onclick = function(event) {
+            event.stopPropagation();
+        }
     }
     else {
         //create a norman (clickable) menu item
