@@ -17,7 +17,9 @@ apogeeapp.ui.setResizeListener = function(element, resizeCallback, loadCallback)
         "zIndex":-1
     };
 
-    var onLoadCallback = function() {
+    //create and attach element
+    var dummyFrameElement = apogeeapp.ui.createElement("iframe",null,styleJson);
+    dummyFrameElement.onload = function() {
         var dummyFrameBody = dummyFrameElement.contentDocument.body; 
         
         if(loadCallback) {
@@ -30,11 +32,12 @@ apogeeapp.ui.setResizeListener = function(element, resizeCallback, loadCallback)
             dummyFrameBody.onresize = resizeCallback;
         }
     }
-
-    //create and attach element
-    var dummyFrameElement = apogeeapp.ui.createElement("iframe",null,styleJson);
-    dummyFrameElement.onload = onLoadCallback;
     element.appendChild(dummyFrameElement);
+}
+
+/** @private */
+apogeeapp.ui.createOnLoadCallback = function(frameElement, resizeCallback, loadCallback) {
+    
 }
 
 apogeeapp.ui.removeResizeListener = function(element, resizeCallback){
