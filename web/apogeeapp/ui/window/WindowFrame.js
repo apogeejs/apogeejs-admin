@@ -412,20 +412,20 @@ apogeeapp.ui.WindowFrame.prototype.resizeMouseDownImpl = function(e,resizeFlags)
 	if(resizeFlags) {
 		if(resizeFlags & apogeeapp.ui.WindowFrame.RESIZE_EAST) {
 			this.resizeEastActive = true;
-			this.resizeOffsetWidth = e.clientX - this.frame.clientWidth;
+			this.resizeOffsetWidth = e.clientX - this.bodyCell.clientWidth;
 		}
 		else if(resizeFlags & apogeeapp.ui.WindowFrame.RESIZE_WEST) {
 			this.resizeWestActive = true;
-			this.resizeOffsetWidth = e.clientX + this.frame.clientWidth;
+			this.resizeOffsetWidth = e.clientX + this.bodyCell.clientWidth;
 			this.moveOffsetX = e.clientX - this.frame.offsetLeft;
 		}
 		if(resizeFlags & apogeeapp.ui.WindowFrame.RESIZE_SOUTH) {
 			this.resizeSouthActive = true;
-			this.resizeOffsetHeight = e.clientY - this.frame.clientHeight;
+			this.resizeOffsetHeight = e.clientY - this.bodyCell.clientHeight;
 		}
 		else if(resizeFlags & apogeeapp.ui.WindowFrame.RESIZE_NORTH) {
 			this.resizeNorthActive = true;
-			this.resizeOffsetHeight = e.clientY + this.frame.clientHeight;
+			this.resizeOffsetHeight = e.clientY + this.bodyCell.clientHeight;
 			this.moveOffsetY = e.clientY - this.frame.offsetTop;
 		}
 
@@ -446,13 +446,13 @@ apogeeapp.ui.WindowFrame.prototype.resizeMouseMoveImpl = function(e) {
     
 	if(this.resizeEastActive) {
 		newWidth = e.clientX - this.resizeOffsetWidth;
-		if(newWidth < this.minWidth) return;
+		//if(newWidth < this.minWidth) return;
         this.sizeInfo.width = newWidth;
         changeMade = true;
 	}
 	else if(this.resizeWestActive) {
 		newWidth = this.resizeOffsetWidth - e.clientX;
-		if(newWidth < this.minWidth) return;
+		//if(newWidth < this.minWidth) return;
 		newX = e.clientX - this.moveOffsetX;
 		if(newX < 0) newX = 0;
         this.sizeInfo.width = newWidth;
@@ -461,13 +461,13 @@ apogeeapp.ui.WindowFrame.prototype.resizeMouseMoveImpl = function(e) {
 	}
 	if(this.resizeSouthActive) {
 		newHeight = e.clientY - this.resizeOffsetHeight;
-		if(newHeight < this.minHeight) return;
+		//if(newHeight < this.minHeight) return;
 		this.sizeInfo.height = newHeight;
         changeMade = true;
 	}
 	else if(this.resizeNorthActive) {
 		newHeight = this.resizeOffsetHeight - e.clientY;
-		if(newHeight < this.minHeight) return;
+		//if(newHeight < this.minHeight) return;
 		newY = e.clientY - this.moveOffsetY;
 		if(newY < 0) newY = 0;
 		this.sizeInfo.height = newHeight;
@@ -570,6 +570,9 @@ apogeeapp.ui.WindowFrame.prototype.maximizeContent = function() {
 
 /** @private */
 apogeeapp.ui.WindowFrame.prototype.updateCoordinates = function() {
+    
+    var initialBodyHeight = this.bodyCell.style.height;
+    var initialBodyWidth = this.bodyCell.style.width;
 	
     if(this.windowState === apogeeapp.ui.WINDOW_STATE_MAXIMIZED) {
         //apply the maximized coordinates size
@@ -577,31 +580,43 @@ apogeeapp.ui.WindowFrame.prototype.updateCoordinates = function() {
 		this.frame.style.top = "0px";
 		this.frame.style.height = "100%";
 		this.frame.style.width = "100%";
+        
+        this.bodyCell.style.height = "100%";
+        this.bodyCell.style.width = "100%";
     }
     else if(this.windowState === apogeeapp.ui.WINDOW_STATE_NORMAL) {
         //apply the normal size to the window
 		this.frame.style.left = this.posInfo.x + "px";
         this.frame.style.top = this.posInfo.y + "px";
+        this.frame.style.height = "";
+		this.frame.style.width = "";
+        
 		if(this.sizeInfo.height !== undefined) {
-			this.frame.style.height = this.sizeInfo.height + "px";
+			this.bodyCell.style.height = this.sizeInfo.height + "px";
 		}
 		else {
-			this.frame.style.height = apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT + "px";
+			this.bodyCell.style.height = apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT + "px";
 		}
 		if(this.sizeInfo.width !== undefined) {
-			this.frame.style.width = this.sizeInfo.width + "px";
+			this.bodyCell.style.width = this.sizeInfo.width + "px";
 		}
 		else {
-			this.frame.style.width = apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH + "px";
+			this.bodyCell.style.width = apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH + "px";
 		}
     }
     else if(this.windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED) {
         //apply the minimized size to the window
 		this.frame.style.left = this.posInfo.x + "px";
         this.frame.style.top = this.posInfo.y + "px";
-		
-		this.frame.style.height = "0px";
-		this.frame.style.width = "0px";
+		this.frame.style.height = "";
+		this.frame.style.width = "";
+        
+		this.bodyCell.style.height = "0px";
+		this.bodyCell.style.width = "0px";
+    }
+    
+    if((initialBodyHeight != this.bodyCell.style.height)||(initialBodyWidth != this.bodyCell.style.width)) {
+        //do resize event
     }
 }
 
@@ -642,7 +657,7 @@ apogeeapp.ui.WindowFrame.prototype.initUI = function() {
     cell = document.createElement("td");
     cell.className = "visiui_win_windowColorClass visiui_win_left";
     this.addResizeHandlers(cell,apogeeapp.ui.WindowFrame.RESIZE_WEST); 
-    cell.rowSpan = 2;
+    cell.rowSpan = 3;
     row.appendChild(cell);
     cell = document.createElement("td");
     cell.className = "visiui_win_windowColorClass";
