@@ -9,6 +9,8 @@
 }
 
 /* These elements should not be overridden */ 
+.visiui_win_headerCell {
+}
 .visiui_win_bodyCell {
   background-color: rgb(240,240,240);
   /*display set in javascript*/
@@ -51,6 +53,8 @@
 }
 
 .visiui_win_headerCell {
+}
+.visiui_win_headerRow {
 }
 .visiui_win_bodyRow {
   height: 100%;

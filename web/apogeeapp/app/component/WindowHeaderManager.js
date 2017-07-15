@@ -1,24 +1,13 @@
 /** This is a class that manages banner messages for display classes. */
 apogeeapp.app.WindowHeaderManager = function() {
     
-    //set fixed pane for header container - will customize later
-    this.windowInsideContainer = null;
-    this.body = null;
-    
     //headers
     this.toolbarDiv = null;
     this.toolbarActive = false;
     this.bannerDiv = null;
     this.bannerBarActive = false;
     
-    this.windowInsideContainer = new apogeeapp.ui.DisplayAndHeader(apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
-            null,
-            apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
-            null
-        );
-    
-    this.body = this.windowInsideContainer.getBody();
-      
+    this.headerContainer = document.createElement("div");
 }
 
 //=======================
@@ -78,33 +67,33 @@ apogeeapp.app.WindowHeaderManager.prototype.showBannerBar = function(text,type) 
     //set message
     this.bannerDiv.innerHTML = text;
     this.bannerBarActive = true;
-	
-	this.showActiveHeaders();
+    
+    this.updateHeaderElement();
 }
 
 /** This method returns the base member for this component. */
 apogeeapp.app.WindowHeaderManager.prototype.hideBannerBar = function() {
 	this.bannerBarActive = false;
-	this.showActiveHeaders();
+    this.updateHeaderElement();
 }
 
 /** This method returns the base member for this component. */
 apogeeapp.app.WindowHeaderManager.prototype.showToolbar = function(toolbarDiv) {
     this.toolbarActive = true;
     this.toolbarDiv = toolbarDiv;
-	this.showActiveHeaders();
+    this.updateHeaderElement();
 }
 
 /** This method returns the base member for this component. */
 apogeeapp.app.WindowHeaderManager.prototype.hideToolbar = function() {
     this.toolbarActive = false;
     this.toolbarDiv = null;	
-	this.showActiveHeaders();
+    this.updateHeaderElement();
 }
 
 /** This method shows the active headers. 
  * @private */
-apogeeapp.app.WindowHeaderManager.prototype.showActiveHeaders = function() {
+apogeeapp.app.WindowHeaderManager.prototype.updateHeaderElement = function() {
 	var headerElements = [];
     if((this.toolbarActive)&&(this.toolbarDiv)) {
 		headerElements.push(this.toolbarDiv);
@@ -115,13 +104,11 @@ apogeeapp.app.WindowHeaderManager.prototype.showActiveHeaders = function() {
 	if((this.bannerBarActive)&&(this.bannerDiv)) {
 		headerElements.push(this.bannerDiv);
 	}
-	
-    var headerContainer = this.windowInsideContainer.getHeader();
     
-    apogeeapp.ui.removeAllChildren(headerContainer);
+    apogeeapp.ui.removeAllChildren(this.headerContainer);
     if(headerElements.length > 0) {
         for(var i = 0; i < headerElements.length; i++) {
-			headerContainer.appendChild(headerElements[i]);
+			this.headerContainer.appendChild(headerElements[i]);
 		}
     }
 }
@@ -130,45 +117,10 @@ apogeeapp.app.WindowHeaderManager.prototype.showActiveHeaders = function() {
 // Public Instance Methods
 //==============================
 
-
-/** This method sets the content element as a scrolling element. */
-apogeeapp.app.WindowHeaderManager.prototype.setScrollingContentElement = function() {
-    this.windowInsideContainer.setBodyType(apogeeapp.ui.DisplayAndHeader.SCROLLING_PANE);
-}
-
-/** This method sets the content element as a fixed element. */
-apogeeapp.app.WindowHeaderManager.prototype.setFixedContentElement = function() {
-    //load the content div
-    this.windowInsideContainer.setBodyType(apogeeapp.ui.DisplayAndHeader.FIXED_PANE);
-}
-
 /** This method returns the content element for the windowframe for this component. */
-apogeeapp.app.WindowHeaderManager.prototype.getBody = function() {
-     return this.body;
+apogeeapp.app.WindowHeaderManager.prototype.getHeaderElement = function() {
+     return this.headerContainer;
 }
-
-/** This method sets a content element in the body. Alternatively the body can 
- * be retrieved and loaded as desired. */
-apogeeapp.app.WindowHeaderManager.prototype.setContent = function(element) {
-    //remove the old content
-    while(this.body.firstChild) {
-        this.body.removeChild(this.body.firstChild);
-    }
-	
-    //add the new content
-    this.content = element;
-    if(this.content) {
-        this.body.appendChild(this.content);
-    }
-}
-
-
-/** This method returns the fixed element which contains the body element. */
-apogeeapp.app.WindowHeaderManager.prototype.getOuterElement = function() {
-     return this.windowInsideContainer.getOuterElement();
-}
-
-
 
 //===========================
 // Protected Methods

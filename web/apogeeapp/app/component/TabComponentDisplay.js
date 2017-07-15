@@ -77,13 +77,14 @@ apogeeapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     //add headers for display
     //-----------------------
     this.windowHeaderManager = new apogeeapp.app.WindowHeaderManager();
-    this.tab.setContent(this.windowHeaderManager.getOuterElement());
+    this.tab.setHeaderContent(this.windowHeaderManager.getHeaderElement());
+    
 
     //-----------------------
     //set the content
     //-----------------------
     this._createDisplayContent();
-    this.windowHeaderManager.setContent(this.contentElement);
+    this.tab.setContent(this.contentElement);
     
     //------------------
     // set menu

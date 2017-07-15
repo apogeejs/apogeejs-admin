@@ -162,7 +162,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype._loadWindowFrameEntry = funct
 
     //header manager - for banner and toolbars
     this.windowHeaderManager = new apogeeapp.app.WindowHeaderManager();
-    this.windowFrame.setContent(this.windowHeaderManager.getOuterElement());
+    this.windowFrame.setHeaderContent(this.windowHeaderManager.getHeaderElement());
     
     //set title
     this.windowFrame.setTitle(this.object.getDisplayName());
@@ -284,7 +284,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype._updateViewTypeSelect = funct
 apogeeapp.app.EditWindowComponentDisplay.prototype._updateViewContent = function() {
     if(this.viewModeElement) {
         this.viewModeElement.showData();
-        this.windowHeaderManager.setContent(this.viewModeElement.getElement());
+        this.windowFrame.setContent(this.viewModeElement.getElement());
     }
     else {
         alert("Error: View mode element not found!");

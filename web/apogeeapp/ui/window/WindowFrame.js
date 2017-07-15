@@ -40,8 +40,10 @@ apogeeapp.ui.WindowFrame = function(options) {
 	
     this.frame = null;
     this.titleCell = null;
+    this.headerCell = null;
     this.bodyCell = null;
     
+    this.headerContent = null;
     this.content = null;
     
     this.windowDragActive = false;
@@ -139,6 +141,13 @@ apogeeapp.ui.WindowFrame.prototype.createMenu = function(iconUrl) {
 /** This method shows the window. */
 apogeeapp.ui.WindowFrame.prototype.getMenu = function() {
     return this.menu;
+}
+
+/** This sets the content for the window */
+apogeeapp.ui.WindowFrame.prototype.setHeaderContent = function(contentElement) {
+    apogeeapp.ui.removeAllChildren(this.headerCell);
+    this.headerCell.appendChild(contentElement);
+    this.headerContent = contentElement;
 }
 
 /** This sets the content for the window */
@@ -642,7 +651,16 @@ apogeeapp.ui.WindowFrame.prototype.initUI = function() {
     cell = document.createElement("td");
     cell.className = "visiui_win_windowColorClass visiui_win_right";
     this.addResizeHandlers(cell,apogeeapp.ui.WindowFrame.RESIZE_EAST); 
-    cell.rowSpan = 2;
+    cell.rowSpan = 3;
+    row.appendChild(cell);
+    
+    //header
+    row = document.createElement("tr");
+    row.className = "visiui_win_headerRow";
+    table.appendChild(row);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_headerCell";
+    this.headerCell = cell;
     row.appendChild(cell);
     
     //body

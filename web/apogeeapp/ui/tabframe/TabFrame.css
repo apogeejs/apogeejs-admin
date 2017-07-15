@@ -23,6 +23,14 @@
     /*border: 1px solid gray*/
     border-bottom-width: 0px;
 }
+.visiui-tf-tab-header {
+    /*fixed*/
+    position:relative;
+    display:table-row;
+    width:100%;
+    top:0px;
+    left:0px;
+}
 .visiui-tf-tab-bar {
     /*fixed*/
     position:relative;
