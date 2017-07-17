@@ -303,27 +303,11 @@ apogeeapp.ui.WindowFrame.prototype.getElement = function() {
 //----------------------------------------------------------------
 //object specific
 
-/** This method sets the size of the window to fit the content. It should only be 
- * called after the window has been shown. If this is used a scrolling frame should not be
- * used a the content. */
+/** This method sets the size of the window to fit the content. */
 apogeeapp.ui.WindowFrame.prototype.fitToContent = function() {
-	//figure out how big to make the frame to fit the content
-    var viewWidth = this.bodyCell.offsetWidth;
-    var viewHeight = this.bodyCell.offsetHeight;
-    var contentWidth = this.content.offsetWidth;
-    var contentHeight = this.content.offsetHeight;
-	
-	var targetWidth = this.sizeInfo.width + contentWidth - viewWidth + apogeeapp.ui.WindowFrame.FIT_WIDTH_BUFFER;
-	var targetHeight = this.sizeInfo.height + contentHeight - viewHeight + apogeeapp.ui.WindowFrame.FIT_HEIGHT_BUFFER;
-	
-    this.setSize(targetWidth,targetHeight);
+    this.sizeInfo.width = undefined;
+	this.sizeInfo.height = undefined;
 }
-
-/** @private */
-apogeeapp.ui.WindowFrame.FIT_HEIGHT_BUFFER = 20;
-/** @private */
-apogeeapp.ui.WindowFrame.FIT_WIDTH_BUFFER = 20;
-
 
 /** This method centers the window in its parent. it should only be called
  *after the window is shown. */
@@ -532,7 +516,9 @@ apogeeapp.ui.WindowFrame.prototype.minimizeContent = function() {
     this.setMinMaxButtons();
     
     //dispatch resize event
-    if(!wasMinimized) this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_MINIMIZED,this);
+    if(!wasMinimized) { 
+        this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_MINIMIZED,this);
+    }
 }
 
 /** This is the restore function for the window.*/
@@ -549,7 +535,9 @@ apogeeapp.ui.WindowFrame.prototype.restoreContent = function() {
     this.updateCoordinates();
     this.setMinMaxButtons();
     
-    if(wasMinimized) this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_RESTOREDED,this);
+    if((wasMinimized)||(wasMaximized)) {
+        this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_RESTOREDED,this);
+    }
 }
 
 /** This is the minimize function for the window.*/
@@ -565,7 +553,9 @@ apogeeapp.ui.WindowFrame.prototype.maximizeContent = function() {
     this.updateCoordinates();
     this.setMinMaxButtons();
     
-    if(wasMinimized) this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_MAXIMIZED,this);
+    if(!wasMaximized) {
+        this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_MAXIMIZED,this);
+    }
 }
 
 /** @private */
@@ -594,15 +584,15 @@ apogeeapp.ui.WindowFrame.prototype.updateCoordinates = function() {
 		if(this.sizeInfo.height !== undefined) {
 			this.bodyCell.style.height = this.sizeInfo.height + "px";
 		}
-		else {
-			this.bodyCell.style.height = apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT + "px";
-		}
+        else {
+            this.bodyCell.style.height = "";
+        }
 		if(this.sizeInfo.width !== undefined) {
 			this.bodyCell.style.width = this.sizeInfo.width + "px";
 		}
-		else {
-			this.bodyCell.style.width = apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH + "px";
-		}
+        else {
+            this.bodyCell.style.width = "";
+        }
     }
     else if(this.windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED) {
         //apply the minimized size to the window
@@ -616,7 +606,7 @@ apogeeapp.ui.WindowFrame.prototype.updateCoordinates = function() {
     }
     
     if((initialBodyHeight != this.bodyCell.style.height)||(initialBodyWidth != this.bodyCell.style.width)) {
-        //do resize event
+        this.dispatchEvent(apogeeapp.ui.RESIZED_EVENT,this);
     }
 }
 

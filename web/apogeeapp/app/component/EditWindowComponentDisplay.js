@@ -20,7 +20,7 @@ apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
 /** This value is used as the background color when an editor is read only. */
 apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.getWindowEntry = function() {
+apogeeapp.app.EditWindowComponentDisplay.prototype.getWindowFrame = function() {
     return this.windowFrame;
 }
 

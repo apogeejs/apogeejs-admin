@@ -39,11 +39,10 @@ apogeeapp.app.AceTextEditor = function(viewMode,aceMode) {
     this.editor = editor;
 	
 	//resize the editor on window size change
-    var resizeCallback = function() {
+    this.resizeCallback = function() {
         editor.resize();
     }
-	
-    apogeeapp.ui.setResizeListener(this.outsideDiv, resizeCallback);
+    this.callbackAttached = false;
 	
 	//add click handle to enter edit mode
 	var instance = this;
@@ -93,6 +92,25 @@ apogeeapp.app.AceTextEditor.prototype.showData = function(text,editOk) {
         this.editorDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
     }
     
+    if(!this.callbackAttached) {
+        var uiObject = this.viewMode.getUiObject();
+        if(uiObject) {
+            uiObject.addListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
+            this.callbackAttached = true;
+        }
+    }
+    
+    //call resize to make sure size is initialized
+    this.resizeCallback();
+    
+}
+
+apogeeapp.app.AceTextEditor.prototype.hide = function() {
+    var uiObject = this.viewMode.getUiObject();
+    if(uiObject) {
+        uiObject.removeListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
+        this.callbackAttached = false;
+    }
 }
 
 apogeeapp.app.AceTextEditor.prototype.destroy = function() {

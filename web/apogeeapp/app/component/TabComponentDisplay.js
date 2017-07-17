@@ -37,7 +37,7 @@ apogeeapp.app.TabComponentDisplay.prototype.updateData = function() {
 apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childComponent) {
     
     var windowComponentDisplay = childComponent.createWindowDisplay();
-    var childWindow = windowComponentDisplay.getWindowEntry();
+    var childWindow = windowComponentDisplay.getWindowFrame();
 
     childWindow.setParent(this.parentContainer);
     
@@ -59,7 +59,7 @@ apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childCo
 apogeeapp.app.TabComponentDisplay.prototype.showChildComponent = function(childComponent) {
     var windowComponentDisplay = childComponent.getWindowDisplay();
     if(windowComponentDisplay) {
-        var childWindow = windowComponentDisplay.getWindowEntry();
+        var childWindow = windowComponentDisplay.getWindowFrame();
         if(childWindow) {
             this.parentContainer.bringToFront(childWindow);
         }

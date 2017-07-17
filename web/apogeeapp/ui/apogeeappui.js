@@ -184,6 +184,7 @@ apogeeapp.ui.REQUEST_CLOSE = "request_close";
 apogeeapp.ui.DENY_CLOSE = -1;
 
 apogeeapp.ui.CLOSE_EVENT = "closed";
+apogeeapp.ui.RESIZED_EVENT = "resized";
 
 /** This function adds CSS data for a given member id. */
 apogeeapp.ui.setMemberCssData = function(objectId,cssText) {
