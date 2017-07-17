@@ -1,0 +1,2582 @@
+{
+	"name": "combineOverrides",
+	"fileType": "apogee workspace",
+	"jsLinks": [],
+	"cssLinks": [],
+	"workspace": {
+		"name": "combineOverrides",
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "root",
+			"type": "apogee.Folder",
+			"children": {
+				"presetsInputs": {
+					"name": "presetsInputs",
+					"type": "apogee.Folder",
+					"children": {
+						"overrides_20001_23999": {
+							"name": "overrides_20001_23999",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"trees": {
+										"geometry": {
+											"facility|stall": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"stall\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "stall",
+													"entry": {}
+												}
+											},
+											"facility|sink": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"sink\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "sink",
+													"entry": {}
+												}
+											},
+											"furnishing|countertops": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"countertops\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "countertops",
+													"entry": {}
+												}
+											},
+											"facility|refrigerator": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"refrigerator\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "refrigerator",
+													"entry": {}
+												}
+											},
+											"facility|urinal": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"urinal\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "urinal",
+													"entry": {}
+												}
+											},
+											"fixture|stall": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"stall\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "stall",
+													"entry": {}
+												}
+											},
+											"facility|quiet room": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"quiet room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "quiet room",
+													"entry": {}
+												}
+											},
+											"equipment|soda machine": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"soda machine\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "soda machine",
+													"entry": {}
+												}
+											},
+											"fixture|sink": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"sink\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "sink",
+													"entry": {}
+												}
+											},
+											"fixture|toilet": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"toilet\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "toilet",
+													"entry": {}
+												}
+											},
+											"furnishing|countertop": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"countertop\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "countertop",
+													"entry": {}
+												}
+											},
+											"equipment|refrigerator": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"refrigerator\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "refrigerator",
+													"entry": {}
+												}
+											},
+											"fixture|urinal": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"urinal\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "urinal",
+													"entry": {}
+												}
+											},
+											"service|salad bar": {
+												"{\"entry\":{},\"path\":[\"service\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"salad bar\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"service"
+													],
+													"value": "salad bar",
+													"entry": {}
+												}
+											},
+											"fixture|game room": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"game room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "game room",
+													"entry": {}
+												}
+											},
+											"facility|break room": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"break room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "break room",
+													"entry": {}
+												}
+											},
+											"|ong inspection": {
+												"{\"entry\":{\"input\":\"enum\",\"k\":\"ong inspection\",\"v\":{\"mfl hits\":{},\"patch plates\":{},\"pitting\":{},\"support plate\":{},\"ut inspection\":{}}},\"path\":[],\"tree\":\"geometry\",\"type\":\"key\"}": {
+													"type": "key",
+													"tree": "geometry",
+													"path": [],
+													"entry": {
+														"k": "ong inspection",
+														"input": "enum",
+														"v": {
+															"ut inspection": {},
+															"support plate": {},
+															"mfl hits": {},
+															"pitting": {},
+															"patch plates": {}
+														}
+													}
+												}
+											},
+											"equipment|server": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"server\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "server",
+													"entry": {}
+												}
+											},
+											"equipment|rack": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"rack\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "rack",
+													"entry": {}
+												}
+											},
+											"equipment|cage": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"cage\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "cage",
+													"entry": {}
+												}
+											},
+											"equipment|turbine": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"turbine\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "turbine",
+													"entry": {}
+												}
+											},
+											"equipment|security camera": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"security camera\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "security camera",
+													"entry": {}
+												}
+											},
+											"furnishing|bed": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"bed\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "bed",
+													"entry": {}
+												}
+											},
+											"furnishing|bench": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"bench\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "bench",
+													"entry": {}
+												}
+											}
+										}
+									},
+									"named_keys": {
+										"icon:stall": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"stall\"}": {
+												"name": "icon",
+												"value": "stall",
+												"entry": {}
+											}
+										},
+										"icon:sink": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"sink\"}": {
+												"name": "icon",
+												"value": "sink",
+												"entry": {}
+											}
+										},
+										"address keys:Countertops": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Countertops\"}": {
+												"name": "address keys",
+												"value": "Countertops",
+												"entry": {}
+											}
+										},
+										"address keys:Workspace": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Workspace\"}": {
+												"name": "address keys",
+												"value": "Workspace",
+												"entry": {}
+											}
+										},
+										"address keys:23587": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"23587\"}": {
+												"name": "address keys",
+												"value": "23587",
+												"entry": {}
+											}
+										},
+										"address keys:23590": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"23590\"}": {
+												"name": "address keys",
+												"value": "23590",
+												"entry": {}
+											}
+										},
+										"address keys:23633": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"23633\"}": {
+												"name": "address keys",
+												"value": "23633",
+												"entry": {}
+											}
+										},
+										"icon:toilet": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"toilet\"}": {
+												"name": "icon",
+												"value": "toilet",
+												"entry": {}
+											}
+										},
+										"icon:quiet room": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"quiet room\"}": {
+												"name": "icon",
+												"value": "quiet room",
+												"entry": {}
+											}
+										},
+										"icon:soda machine": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"soda machine\"}": {
+												"name": "icon",
+												"value": "soda machine",
+												"entry": {}
+											}
+										},
+										"icon:salad bar": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"salad bar\"}": {
+												"name": "icon",
+												"value": "salad bar",
+												"entry": {}
+											}
+										},
+										"icon:game room": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"game room\"}": {
+												"name": "icon",
+												"value": "game room",
+												"entry": {}
+											}
+										},
+										"icon:break room": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"break room\"}": {
+												"name": "icon",
+												"value": "break room",
+												"entry": {}
+											}
+										},
+										"address keys:Countertop": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Countertop\"}": {
+												"name": "address keys",
+												"value": "Countertop",
+												"entry": {}
+											}
+										},
+										"address keys:unit": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"unit\"}": {
+												"name": "address keys",
+												"value": "unit",
+												"entry": {}
+											}
+										},
+										"address keys:ut inspection": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"ut inspection\"}": {
+												"name": "address keys",
+												"value": "ut inspection",
+												"entry": {}
+											}
+										},
+										"address keys:support plate": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"support plate\"}": {
+												"name": "address keys",
+												"value": "support plate",
+												"entry": {}
+											}
+										},
+										"address keys:mfl hits": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"mfl hits\"}": {
+												"name": "address keys",
+												"value": "mfl hits",
+												"entry": {}
+											}
+										},
+										"address keys:pitting": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"pitting\"}": {
+												"name": "address keys",
+												"value": "pitting",
+												"entry": {}
+											}
+										},
+										"address keys:patch plates": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"patch plates\"}": {
+												"name": "address keys",
+												"value": "patch plates",
+												"entry": {}
+											}
+										},
+										"address keys:Server": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Server\"}": {
+												"name": "address keys",
+												"value": "Server",
+												"entry": {}
+											}
+										},
+										"address keys:Rack": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Rack\"}": {
+												"name": "address keys",
+												"value": "Rack",
+												"entry": {}
+											}
+										},
+										"address keys:Cage": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Cage\"}": {
+												"name": "address keys",
+												"value": "Cage",
+												"entry": {}
+											}
+										},
+										"icon:urinal": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"urinal\"}": {
+												"name": "icon",
+												"value": "urinal",
+												"entry": {}
+											}
+										},
+										"address keys:Bed": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Bed\"}": {
+												"name": "address keys",
+												"value": "Bed",
+												"entry": {}
+											}
+										},
+										"address keys:23947": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"23947\"}": {
+												"name": "address keys",
+												"value": "23947",
+												"entry": {}
+											}
+										}
+									}
+								},
+								"description": ""
+							}
+						},
+						"overrides_1_5000": {
+							"name": "overrides_1_5000",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"trees": {
+										"geometry": {
+											"marker|parking": {
+												"{\"entry\":{},\"path\":[\"marker\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"parking\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"marker"
+													],
+													"value": "parking",
+													"entry": {}
+												}
+											},
+											"service|seating": {
+												"{\"entry\":{},\"path\":[\"service\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"seating\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"service"
+													],
+													"value": "seating",
+													"entry": {}
+												}
+											},
+											"facility|unit|use|digital signage": {
+												"{\"entry\":{},\"path\":[\"facility\",\"unit\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"digital signage\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"unit",
+														"use"
+													],
+													"value": "digital signage",
+													"entry": {}
+												}
+											},
+											"sign|warning sign": {
+												"{\"entry\":{},\"path\":[\"sign\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"warning sign\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"sign"
+													],
+													"value": "warning sign",
+													"entry": {}
+												}
+											}
+										}
+									},
+									"named_keys": {
+										"address keys:test": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"test\"}": {
+												"name": "address keys",
+												"value": "test",
+												"entry": {}
+											}
+										},
+										"icon:parking": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"parking\"}": {
+												"name": "icon",
+												"value": "parking",
+												"entry": {}
+											}
+										},
+										"icon:seating": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"seating\"}": {
+												"name": "icon",
+												"value": "seating",
+												"entry": {}
+											}
+										},
+										"icon:digital signage": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"digital signage\"}": {
+												"name": "icon",
+												"value": "digital signage",
+												"entry": {}
+											}
+										},
+										"address keys:10005": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"10005\"}": {
+												"name": "address keys",
+												"value": "10005",
+												"entry": {}
+											}
+										},
+										"address keys:904": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"904\"}": {
+												"name": "address keys",
+												"value": "904",
+												"entry": {}
+											}
+										},
+										"icon:warning sign": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"warning sign\"}": {
+												"name": "icon",
+												"value": "warning sign",
+												"entry": {}
+											}
+										},
+										"address keys:3917": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"3917\"}": {
+												"name": "address keys",
+												"value": "3917",
+												"entry": {}
+											}
+										},
+										"address keys:3922": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"3922\"}": {
+												"name": "address keys",
+												"value": "3922",
+												"entry": {}
+											}
+										},
+										"address keys:3983": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"3983\"}": {
+												"name": "address keys",
+												"value": "3983",
+												"entry": {}
+											}
+										}
+									}
+								},
+								"description": ""
+							}
+						},
+						"overrides_5001_10000": {
+							"name": "overrides_5001_10000",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"trees": {
+										"geometry": {
+											"marker|parking": {
+												"{\"entry\":{},\"path\":[\"marker\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"parking\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"marker"
+													],
+													"value": "parking",
+													"entry": {}
+												}
+											},
+											"facility|cubicle": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"cubicle\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "cubicle",
+													"entry": {}
+												}
+											},
+											"traffic|driveway": {
+												"{\"entry\":{},\"path\":[\"traffic\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"driveway\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"traffic"
+													],
+													"value": "driveway",
+													"entry": {}
+												}
+											}
+										},
+										"community": {
+											"community_entity|entity2|alt_name": {
+												"{\"entry\":{\"input\":\"text\",\"k\":\"alt_name\",\"v\":{\"Test Alt Name\":{}}},\"path\":[\"community_entity\",\"entity2\"],\"tree\":\"community\",\"type\":\"key\"}": {
+													"type": "key",
+													"tree": "community",
+													"path": [
+														"community_entity",
+														"entity2"
+													],
+													"entry": {
+														"k": "alt_name",
+														"input": "text",
+														"v": {
+															"Test Alt Name": {}
+														}
+													}
+												}
+											}
+										}
+									},
+									"named_keys": {
+										"icon:parking": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"parking\"}": {
+												"name": "icon",
+												"value": "parking",
+												"entry": {}
+											}
+										},
+										"address keys:cubicle": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"cubicle\"}": {
+												"name": "address keys",
+												"value": "cubicle",
+												"entry": {}
+											}
+										},
+										"address keys:9677": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"9677\"}": {
+												"name": "address keys",
+												"value": "9677",
+												"entry": {}
+											}
+										}
+									}
+								},
+								"description": ""
+							}
+						},
+						"overrides_15001_20000": {
+							"name": "overrides_15001_20000",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"trees": {
+										"geometry": {
+											"marker|parking": {
+												"{\"entry\":{},\"path\":[\"marker\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"parking\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"marker"
+													],
+													"value": "parking",
+													"entry": {}
+												}
+											},
+											"marker|underground parking": {
+												"{\"entry\":{},\"path\":[\"marker\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"underground parking\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"marker"
+													],
+													"value": "underground parking",
+													"entry": {}
+												}
+											},
+											"facility|ramp": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"ramp\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "ramp",
+													"entry": {}
+												}
+											}
+										},
+										"link": {
+											"|flag": {
+												"{\"entry\":{\"input\":\"text\",\"k\":\"flag\",\"prop\":{\"linkType\":\"class\"}},\"path\":[],\"tree\":\"link\",\"type\":\"key\"}": {
+													"type": "key",
+													"tree": "link",
+													"path": [],
+													"entry": {
+														"k": "flag",
+														"input": "text",
+														"prop": {
+															"linkType": "class"
+														}
+													}
+												}
+											}
+										}
+									},
+									"named_keys": {
+										"icon:parking": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"parking\"}": {
+												"name": "icon",
+												"value": "parking",
+												"entry": {}
+											}
+										},
+										"icon:underground parking": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"underground parking\"}": {
+												"name": "icon",
+												"value": "underground parking",
+												"entry": {}
+											}
+										},
+										"icon:ramp": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"ramp\"}": {
+												"name": "icon",
+												"value": "ramp",
+												"entry": {}
+											}
+										}
+									}
+								},
+								"description": ""
+							}
+						},
+						"overrides_24000_24842": {
+							"name": "overrides_24000_24842",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"trees": {
+										"geometry": {
+											"fixture|stall": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"stall\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "stall",
+													"entry": {}
+												}
+											},
+											"fixture|sink": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"sink\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "sink",
+													"entry": {}
+												}
+											},
+											"fixture|urinal": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"urinal\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "urinal",
+													"entry": {}
+												}
+											},
+											"fixture|electric panel": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"electric panel\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "electric panel",
+													"entry": {}
+												}
+											},
+											"facility|room|use|workstation": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"workstation\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "workstation",
+													"entry": {}
+												}
+											},
+											"facility|partition": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"partition\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "partition",
+													"entry": {}
+												}
+											},
+											"facility|room|use|HVAC": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"HVAC\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "HVAC",
+													"entry": {}
+												}
+											},
+											"fixture|glazing": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"glazing\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "glazing",
+													"entry": {}
+												}
+											},
+											"furnishing|countertop": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"countertop\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "countertop",
+													"entry": {}
+												}
+											},
+											"equipment|rack": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"rack\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "rack",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Focus": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Focus\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Focus",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Collaboration": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Collaboration\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Collaboration",
+													"entry": {}
+												}
+											},
+											"equipment|aperio hub": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"aperio hub\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "aperio hub",
+													"entry": {}
+												}
+											},
+											"equipment|security camera": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"security camera\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "security camera",
+													"entry": {}
+												}
+											},
+											"equipment|siren": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"siren\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "siren",
+													"entry": {}
+												}
+											},
+											"equipment|alarm contact": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"alarm contact\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "alarm contact",
+													"entry": {}
+												}
+											},
+											"equipment|bmz": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"bmz\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "bmz",
+													"entry": {}
+												}
+											},
+											"equipment|card reader": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"card reader\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "card reader",
+													"entry": {}
+												}
+											},
+											"equipment|door guard": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"door guard\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "door guard",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Conference Room": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Conference Room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Conference Room",
+													"entry": {}
+												}
+											},
+											"facility|unit|use|digital signage": {
+												"{\"entry\":{},\"path\":[\"facility\",\"unit\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"digital signage\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"unit",
+														"use"
+													],
+													"value": "digital signage",
+													"entry": {}
+												}
+											},
+											"furnishing|countertops": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"countertops\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "countertops",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Electrical Room": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Electrical Room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Electrical Room",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Office": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Office\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Office",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Closet": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Closet\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Closet",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Computer Room": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Computer Room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Computer Room",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Work Room": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Work Room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Work Room",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Lockers": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Lockers\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Lockers",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Storage": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Storage\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Storage",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Maintanance": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Maintanance\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Maintanance",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Trash Enclosure": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Trash Enclosure\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Trash Enclosure",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Fire Riser Room": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Fire Riser Room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Fire Riser Room",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Kitchen": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Kitchen\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Kitchen",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Service Bar": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Service Bar\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Service Bar",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Lounge": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Lounge\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Lounge",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Main Bar Seating": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Main Bar Seating\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Main Bar Seating",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Event Space": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Event Space\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Event Space",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Beverage Station": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Beverage Station\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Beverage Station",
+													"entry": {}
+												}
+											},
+											"facility|room|use|Bag Room": {
+												"{\"entry\":{},\"path\":[\"facility\",\"room\",\"use\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"Bag Room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility",
+														"room",
+														"use"
+													],
+													"value": "Bag Room",
+													"entry": {}
+												}
+											},
+											"fixture|tee-mat": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"tee-mat\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "tee-mat",
+													"entry": {}
+												}
+											},
+											"equipment|lights": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"lights\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "lights",
+													"entry": {}
+												}
+											},
+											"equipment|rtu": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"rtu\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "rtu",
+													"entry": {}
+												}
+											},
+											"equipment|maintenance": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"maintenance\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "maintenance",
+													"entry": {}
+												}
+											},
+											"facility|stall": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"stall\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "stall",
+													"entry": {}
+												}
+											},
+											"equipment|air-conditioner": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"air-conditioner\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "air-conditioner",
+													"entry": {}
+												}
+											},
+											"traffic|parking sensor": {
+												"{\"entry\":{},\"path\":[\"traffic\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"parking sensor\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"traffic"
+													],
+													"value": "parking sensor",
+													"entry": {}
+												}
+											},
+											"barrier|turnstile": {
+												"{\"entry\":{},\"path\":[\"barrier\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"turnstile\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"barrier"
+													],
+													"value": "turnstile",
+													"entry": {}
+												}
+											},
+											"service|ticket vending machine": {
+												"{\"entry\":{},\"path\":[\"service\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"ticket vending machine\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"service"
+													],
+													"value": "ticket vending machine",
+													"entry": {}
+												}
+											},
+											"facility|club area": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"club area\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "club area",
+													"entry": {}
+												}
+											},
+											"facility|concourse section": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"concourse section\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "concourse section",
+													"entry": {}
+												}
+											},
+											"facility|employee area": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"employee area\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "employee area",
+													"entry": {}
+												}
+											},
+											"facility|food and beverage area": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"food and beverage area\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "food and beverage area",
+													"entry": {}
+												}
+											},
+											"facility|media area": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"media area\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "media area",
+													"entry": {}
+												}
+											},
+											"facility|seating section": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"seating section\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "seating section",
+													"entry": {}
+												}
+											},
+											"facility|suite": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"suite\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "suite",
+													"entry": {}
+												}
+											},
+											"facility|team area": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"team area\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "team area",
+													"entry": {}
+												}
+											},
+											"fixture|pallet": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"pallet\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "pallet",
+													"entry": {}
+												}
+											},
+											"facility|cubicle": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"cubicle\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "cubicle",
+													"entry": {}
+												}
+											},
+											"facility|electric panel": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"electric panel\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "electric panel",
+													"entry": {}
+												}
+											},
+											"furnishing|cabinet": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"cabinet\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "cabinet",
+													"entry": {}
+												}
+											},
+											"fixture|metal partition": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"metal partition\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "metal partition",
+													"entry": {}
+												}
+											},
+											"furnishing|locker": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"locker\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "locker",
+													"entry": {}
+												}
+											},
+											"furnishing|bench": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"bench\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "bench",
+													"entry": {}
+												}
+											},
+											"equipment|refrigerator": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"refrigerator\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "refrigerator",
+													"entry": {}
+												}
+											},
+											"facility|terrace": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"terrace\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "terrace",
+													"entry": {}
+												}
+											},
+											"fixture|lighting2x2": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"lighting2x2\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "lighting2x2",
+													"entry": {}
+												}
+											},
+											"fixture|lighting2x4": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"lighting2x4\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "lighting2x4",
+													"entry": {}
+												}
+											},
+											"equipment|sensor": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"sensor\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "sensor",
+													"entry": {}
+												}
+											},
+											"equipment|gateway": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"gateway\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "gateway",
+													"entry": {}
+												}
+											},
+											"equipment|stair climber": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"stair climber\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "stair climber",
+													"entry": {}
+												}
+											},
+											"equipment|elliptical": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"elliptical\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "elliptical",
+													"entry": {}
+												}
+											},
+											"equipment|recumbent bicycle": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"recumbent bicycle\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "recumbent bicycle",
+													"entry": {}
+												}
+											},
+											"equipment|treadmill": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"treadmill\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "treadmill",
+													"entry": {}
+												}
+											},
+											"equipment|abs": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"abs\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "abs",
+													"entry": {}
+												}
+											},
+											"equipment|arms": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"arms\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "arms",
+													"entry": {}
+												}
+											},
+											"equipment|back": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"back\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "back",
+													"entry": {}
+												}
+											},
+											"equipment|bench": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"bench\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "bench",
+													"entry": {}
+												}
+											},
+											"equipment|legs": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"legs\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "legs",
+													"entry": {}
+												}
+											},
+											"equipment|row": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"row\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "row",
+													"entry": {}
+												}
+											},
+											"equipment|squat bench": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"squat bench\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "squat bench",
+													"entry": {}
+												}
+											},
+											"facility|sink": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"sink\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "sink",
+													"entry": {}
+												}
+											},
+											"facility|custodian janitor": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"custodian janitor\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "custodian janitor",
+													"entry": {}
+												}
+											},
+											"equipment|tv": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"tv\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "tv",
+													"entry": {}
+												}
+											},
+											"furnishing|disabled chair": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"disabled chair\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "disabled chair",
+													"entry": {}
+												}
+											},
+											"fixture|light": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"light\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "light",
+													"entry": {}
+												}
+											},
+											"fixture|pipe": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"pipe\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "pipe",
+													"entry": {}
+												}
+											},
+											"fixture|connector": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"connector\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "connector",
+													"entry": {}
+												}
+											},
+											"furnishing|blackjack table": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"blackjack table\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "blackjack table",
+													"entry": {}
+												}
+											},
+											"furnishing|slot machine": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"slot machine\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "slot machine",
+													"entry": {}
+												}
+											},
+											"furnishing|poker table": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"poker table\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "poker table",
+													"entry": {}
+												}
+											},
+											"facility|wiring": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"wiring\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "wiring",
+													"entry": {}
+												}
+											},
+											"facility|refrigerator": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"refrigerator\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "refrigerator",
+													"entry": {}
+												}
+											},
+											"facility|ice rink": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"ice rink\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "ice rink",
+													"entry": {}
+												}
+											},
+											"facility|quiet room": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"quiet room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "quiet room",
+													"entry": {}
+												}
+											},
+											"equipment|soda machine": {
+												"{\"entry\":{},\"path\":[\"equipment\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"soda machine\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"equipment"
+													],
+													"value": "soda machine",
+													"entry": {}
+												}
+											},
+											"fixture|toilet": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"toilet\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "toilet",
+													"entry": {}
+												}
+											},
+											"service|salad bar": {
+												"{\"entry\":{},\"path\":[\"service\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"salad bar\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"service"
+													],
+													"value": "salad bar",
+													"entry": {}
+												}
+											},
+											"furnishing|bed": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"bed\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "bed",
+													"entry": {}
+												}
+											},
+											"furnishing|ping pong table": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"ping pong table\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "ping pong table",
+													"entry": {}
+												}
+											},
+											"furnishing|pool table": {
+												"{\"entry\":{},\"path\":[\"furnishing\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"pool table\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"furnishing"
+													],
+													"value": "pool table",
+													"entry": {}
+												}
+											},
+											"fixture|refrigerator": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"refrigerator\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "refrigerator",
+													"entry": {}
+												}
+											},
+											"marker|parking": {
+												"{\"entry\":{},\"path\":[\"marker\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"parking\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"marker"
+													],
+													"value": "parking",
+													"entry": {}
+												}
+											},
+											"fixture|lights": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"lights\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "lights",
+													"entry": {}
+												}
+											},
+											"fixture|tray": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"tray\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "tray",
+													"entry": {}
+												}
+											},
+											"fixture|plate": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"plate\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "plate",
+													"entry": {}
+												}
+											},
+											"fixture|game room": {
+												"{\"entry\":{},\"path\":[\"fixture\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"game room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"fixture"
+													],
+													"value": "game room",
+													"entry": {}
+												}
+											},
+											"facility|break room": {
+												"{\"entry\":{},\"path\":[\"facility\"],\"tree\":\"geometry\",\"type\":\"value\",\"value\":\"break room\"}": {
+													"type": "value",
+													"tree": "geometry",
+													"path": [
+														"facility"
+													],
+													"value": "break room",
+													"entry": {}
+												}
+											}
+										},
+										"undefined": {
+											"UNKNOWN": {
+												"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Countertop\"}": {
+													"name": "address keys",
+													"value": "Countertop",
+													"entry": {}
+												}
+											}
+										}
+									},
+									"named_keys": {
+										"icon:stall": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"stall\"}": {
+												"name": "icon",
+												"value": "stall",
+												"entry": {}
+											}
+										},
+										"icon:electric panel": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"electric panel\"}": {
+												"name": "icon",
+												"value": "electric panel",
+												"entry": {}
+											}
+										},
+										"address keys:workstation": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"workstation\"}": {
+												"name": "address keys",
+												"value": "workstation",
+												"entry": {}
+											}
+										},
+										"address keys:partition": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"partition\"}": {
+												"name": "address keys",
+												"value": "partition",
+												"entry": {}
+											}
+										},
+										"address keys:HVAC": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"HVAC\"}": {
+												"name": "address keys",
+												"value": "HVAC",
+												"entry": {}
+											}
+										},
+										"icon:sink": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"sink\"}": {
+												"name": "icon",
+												"value": "sink",
+												"entry": {}
+											}
+										},
+										"address keys:glazing": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"glazing\"}": {
+												"name": "address keys",
+												"value": "glazing",
+												"entry": {}
+											}
+										},
+										"address keys:countertop": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"countertop\"}": {
+												"name": "address keys",
+												"value": "countertop",
+												"entry": {}
+											}
+										},
+										"address keys:column": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"column\"}": {
+												"name": "address keys",
+												"value": "column",
+												"entry": {}
+											}
+										},
+										"address keys:rack": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"rack\"}": {
+												"name": "address keys",
+												"value": "rack",
+												"entry": {}
+											}
+										},
+										"icon:aperio hub": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"aperio hub\"}": {
+												"name": "icon",
+												"value": "aperio hub",
+												"entry": {}
+											}
+										},
+										"icon:security camera": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"security camera\"}": {
+												"name": "icon",
+												"value": "security camera",
+												"entry": {}
+											}
+										},
+										"icon:siren": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"siren\"}": {
+												"name": "icon",
+												"value": "siren",
+												"entry": {}
+											}
+										},
+										"icon:alarm contact": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"alarm contact\"}": {
+												"name": "icon",
+												"value": "alarm contact",
+												"entry": {}
+											}
+										},
+										"icon:bmz": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"bmz\"}": {
+												"name": "icon",
+												"value": "bmz",
+												"entry": {}
+											}
+										},
+										"icon:card reader": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"card reader\"}": {
+												"name": "icon",
+												"value": "card reader",
+												"entry": {}
+											}
+										},
+										"icon:door guard": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"door guard\"}": {
+												"name": "icon",
+												"value": "door guard",
+												"entry": {}
+											}
+										},
+										"icon:digital signage": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"digital signage\"}": {
+												"name": "icon",
+												"value": "digital signage",
+												"entry": {}
+											}
+										},
+										"address keys:Countertops": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Countertops\"}": {
+												"name": "address keys",
+												"value": "Countertops",
+												"entry": {}
+											}
+										},
+										"address keys:Maintenance": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Maintenance\"}": {
+												"name": "address keys",
+												"value": "Maintenance",
+												"entry": {}
+											}
+										},
+										"address keys:Rtu": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Rtu\"}": {
+												"name": "address keys",
+												"value": "Rtu",
+												"entry": {}
+											}
+										},
+										"address keys:Lights": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Lights\"}": {
+												"name": "address keys",
+												"value": "Lights",
+												"entry": {}
+											}
+										},
+										"icon:air-conditioner": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"air-conditioner\"}": {
+												"name": "icon",
+												"value": "air-conditioner",
+												"entry": {}
+											}
+										},
+										"icon:parking sensor": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"parking sensor\"}": {
+												"name": "icon",
+												"value": "parking sensor",
+												"entry": {}
+											}
+										},
+										"icon:ticket vending machine": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"ticket vending machine\"}": {
+												"name": "icon",
+												"value": "ticket vending machine",
+												"entry": {}
+											}
+										},
+										"address keys:cubicle": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"cubicle\"}": {
+												"name": "address keys",
+												"value": "cubicle",
+												"entry": {}
+											}
+										},
+										"address keys:Bench": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Bench\"}": {
+												"name": "address keys",
+												"value": "Bench",
+												"entry": {}
+											}
+										},
+										"address keys:Countertop": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Countertop\"}": {
+												"name": "address keys",
+												"value": "Countertop",
+												"entry": {}
+											}
+										},
+										"address keys:Sensor": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Sensor\"}": {
+												"name": "address keys",
+												"value": "Sensor",
+												"entry": {}
+											}
+										},
+										"address keys:Gateway": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Gateway\"}": {
+												"name": "address keys",
+												"value": "Gateway",
+												"entry": {}
+											}
+										},
+										"address keys:Stair Climber": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Stair Climber\"}": {
+												"name": "address keys",
+												"value": "Stair Climber",
+												"entry": {}
+											}
+										},
+										"address keys:Elliptical": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Elliptical\"}": {
+												"name": "address keys",
+												"value": "Elliptical",
+												"entry": {}
+											}
+										},
+										"address keys:Recumbent Bicycle": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Recumbent Bicycle\"}": {
+												"name": "address keys",
+												"value": "Recumbent Bicycle",
+												"entry": {}
+											}
+										},
+										"address keys:Treadmill": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Treadmill\"}": {
+												"name": "address keys",
+												"value": "Treadmill",
+												"entry": {}
+											}
+										},
+										"address keys:Abs": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Abs\"}": {
+												"name": "address keys",
+												"value": "Abs",
+												"entry": {}
+											}
+										},
+										"address keys:Arms": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Arms\"}": {
+												"name": "address keys",
+												"value": "Arms",
+												"entry": {}
+											}
+										},
+										"address keys:Back": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Back\"}": {
+												"name": "address keys",
+												"value": "Back",
+												"entry": {}
+											}
+										},
+										"address keys:Legs": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Legs\"}": {
+												"name": "address keys",
+												"value": "Legs",
+												"entry": {}
+											}
+										},
+										"address keys:Row": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Row\"}": {
+												"name": "address keys",
+												"value": "Row",
+												"entry": {}
+											}
+										},
+										"address keys:Squat Bench": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Squat Bench\"}": {
+												"name": "address keys",
+												"value": "Squat Bench",
+												"entry": {}
+											}
+										},
+										"icon:custodian janitor": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"custodian janitor\"}": {
+												"name": "icon",
+												"value": "custodian janitor",
+												"entry": {}
+											}
+										},
+										"icon:toilet": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"toilet\"}": {
+												"name": "icon",
+												"value": "toilet",
+												"entry": {}
+											}
+										},
+										"icon:urinal": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"urinal\"}": {
+												"name": "icon",
+												"value": "urinal",
+												"entry": {}
+											}
+										},
+										"icon:quiet room": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"quiet room\"}": {
+												"name": "icon",
+												"value": "quiet room",
+												"entry": {}
+											}
+										},
+										"icon:soda machine": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"soda machine\"}": {
+												"name": "icon",
+												"value": "soda machine",
+												"entry": {}
+											}
+										},
+										"icon:salad bar": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"salad bar\"}": {
+												"name": "icon",
+												"value": "salad bar",
+												"entry": {}
+											}
+										},
+										"address keys:Workspace": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Workspace\"}": {
+												"name": "address keys",
+												"value": "Workspace",
+												"entry": {}
+											}
+										},
+										"address keys:Ping Pong Table": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Ping Pong Table\"}": {
+												"name": "address keys",
+												"value": "Ping Pong Table",
+												"entry": {}
+											}
+										},
+										"address keys:Pool Table": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Pool Table\"}": {
+												"name": "address keys",
+												"value": "Pool Table",
+												"entry": {}
+											}
+										},
+										"icon:parking": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"parking\"}": {
+												"name": "icon",
+												"value": "parking",
+												"entry": {}
+											}
+										},
+										"address keys:Bed": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Bed\"}": {
+												"name": "address keys",
+												"value": "Bed",
+												"entry": {}
+											}
+										},
+										"undefined:undefined": {
+											"{}": {}
+										},
+										"address keys:Rack": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"Rack\"}": {
+												"name": "address keys",
+												"value": "Rack",
+												"entry": {}
+											}
+										},
+										"address keys:SC-Chair": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"SC-Chair\"}": {
+												"name": "address keys",
+												"value": "SC-Chair",
+												"entry": {}
+											}
+										},
+										"icon:game room": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"game room\"}": {
+												"name": "icon",
+												"value": "game room",
+												"entry": {}
+											}
+										},
+										"icon:break room": {
+											"{\"entry\":{},\"name\":\"icon\",\"value\":\"break room\"}": {
+												"name": "icon",
+												"value": "break room",
+												"entry": {}
+											}
+										}
+									}
+								},
+								"description": ""
+							}
+						},
+						"overrides_10001_15000": {
+							"name": "overrides_10001_15000",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"trees": {},
+									"named_keys": {
+										"address keys:10008": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"10008\"}": {
+												"name": "address keys",
+												"value": "10008",
+												"entry": {}
+											}
+										},
+										"address keys:10009": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"10009\"}": {
+												"name": "address keys",
+												"value": "10009",
+												"entry": {}
+											}
+										},
+										"address keys:10010": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"10010\"}": {
+												"name": "address keys",
+												"value": "10010",
+												"entry": {}
+											}
+										},
+										"address keys:10021": {
+											"{\"entry\":{},\"name\":\"address keys\",\"value\":\"10021\"}": {
+												"name": "address keys",
+												"value": "10021",
+												"entry": {}
+											}
+										}
+									}
+								},
+								"description": ""
+							}
+						}
+					}
+				},
+				"allPresets": {
+					"name": "allPresets",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var value;\nvar output = {};\noutput.trees = {};\noutput.named_keys = {};\n\nfor(var tableName in presetsInputs) {\n    var table = presetsInputs[tableName];\n    addtoOutput(table,output);\n}\n\nvalue = output;\nreturn value;\n\n",
+						"supplementalCode": "function addtoOutput(table,output) {\n    \n    //handle the trees entry\n    var outTrees = output.trees;\n    var inTrees = table.trees;\n    if(inTrees !== undefined) {\n        \n        //handle the different trees\n        for(var treeName in inTrees) {\n            var inTree = inTrees[treeName];\n            var outTree = outTrees[treeName];\n            if(outTree === undefined) {\n               outTree = {};\n               outTrees[treeName] = outTree\n            }\n            \n            processTagMap(inTree,outTree);\n            \n            // //copy the entries in the tree\n            // for(var entryTag in inTree) {\n            //     var inEntry = inTree[entryTag];\n            //     var outEntry = outTree[entryTag];\n            //     if(outEntry === undefined) {\n            //         outEntry = {};\n            //         outTree[entryTag] = outEntry;\n            //     }\n                \n            //     //copy the unique overrides\n            //     for(var entryString in inEntry) {\n            //         var inUniqueEntry = inEntry[entryString];\n            //         var outUniqueEntry = outEntry[entryString];\n            //         if(outUNiqueEntry === undefined) {\n            //             outEntry[entryString] = inUniqueEntry;\n            //         }\n            //     }\n            // }\n        }\n    }\n    \n    //handle the trees entry\n    var outNamedKeys = output.named_keys;\n    var inNamedKeys = table.named_keys;\n    if(inNamedKeys !== undefined) {\n        processTagMap(inNamedKeys,outNamedKeys);\n    }\n}\n\nfunction processTagMap(inTagMap,outTagMap) {\n    //copy the entries in the tree\n    for(var entryTag in inTagMap) {\n        var inEntry = inTagMap[entryTag];\n        var outEntry = outTagMap[entryTag];\n        if(outEntry === undefined) {\n            outEntry = {};\n            outTagMap[entryTag] = outEntry;\n        }\n        \n        //copy the unique overrides\n        for(var entryString in inEntry) {\n            var inUniqueEntry = inEntry[entryString];\n            var outUniqueEntry = outEntry[entryString];\n            if(outUNiqueEntry === undefined) {\n                outEntry[entryString] = inUniqueEntry;\n            }\n        }\n    }\n}",
+						"description": ""
+					}
+				},
+				"overrideInfo": {
+					"name": "overrideInfo",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var value;\nvar output = {};\n\noutput.trees = {};\nfor(var treeName in allPresets.trees) {\n    var tree = allPresets.trees[treeName];\n    outTree = {};\n    output.trees[treeName] = outTree;\n    \n    \n    for(var path in tree) {\n       outTree[path] = getOutputEntry(tree[path]);\n    }\n    \n    //get the total for different bin counts\n    output.trees[treeName + \"|INFO\"] = analyzeEntries(outTree);\n    \n}\n\noutput.named_keys = {};\nfor(var keyName in allPresets.named_keys) {\n    var namedKey = allPresets.named_keys[keyName];\n    output.named_keys[keyName] = getOutputEntry(namedKey);\n    \n    //get the total for different bin counts\n    output[\"named_keys|INFO\"] = analyzeEntries(output.named_keys);\n\n}\n\nvalue = output;\nreturn value;\n\n",
+						"supplementalCode": "function getOutputEntry(entry) {\n    var count = 0;\n    for(var contentKey in entry) {\n        var contentEntry = entry[contentKey];\n        count++;\n    }\n    return count;\n}\n\nfunction analyzeEntries(entryMap) {\n    var info = {};\n    for(var keyName in entryMap) {\n        var counts = entryMap[keyName];\n        if(info[counts] === undefined) info[counts] = 1;\n        else info[counts] = info[counts] + 1;\n    }\n    return info;\n}",
+						"description": ""
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"presetsInputs": {
+			"type": "apogeeapp.app.FolderComponent",
+			"coordInfo": {
+				"x": 46,
+				"y": 28,
+				"width": 705,
+				"height": 724
+			},
+			"windowState": -1,
+			"children": {
+				"overrides_20001_23999": {
+					"type": "apogeeapp.app.JsonTableComponent",
+					"coordInfo": {
+						"x": 377,
+						"y": 35
+					},
+					"windowState": 0,
+					"viewType": "Text"
+				},
+				"overrides_1_5000": {
+					"type": "apogeeapp.app.JsonTableComponent",
+					"coordInfo": {
+						"x": 50,
+						"y": 102,
+						"width": 514,
+						"height": 431
+					},
+					"windowState": 0,
+					"viewType": "JSON"
+				},
+				"overrides_5001_10000": {
+					"type": "apogeeapp.app.JsonTableComponent",
+					"coordInfo": {
+						"x": 50,
+						"y": 351
+					},
+					"windowState": 0,
+					"viewType": "Text"
+				},
+				"overrides_15001_20000": {
+					"type": "apogeeapp.app.JsonTableComponent",
+					"coordInfo": {
+						"x": 285,
+						"y": 373
+					},
+					"windowState": 0,
+					"viewType": "Text"
+				},
+				"overrides_24000_24842": {
+					"type": "apogeeapp.app.JsonTableComponent",
+					"coordInfo": {
+						"x": 43,
+						"y": 458
+					},
+					"windowState": 0,
+					"viewType": "Text"
+				},
+				"overrides_10001_15000": {
+					"type": "apogeeapp.app.JsonTableComponent",
+					"coordInfo": {
+						"x": 103,
+						"y": 536
+					},
+					"windowState": 0,
+					"viewType": "Text"
+				}
+			}
+		},
+		"allPresets": {
+			"type": "apogeeapp.app.JsonTableComponent",
+			"coordInfo": {
+				"x": 80,
+				"y": 34,
+				"width": 1055,
+				"height": 700
+			},
+			"windowState": 0,
+			"viewType": "JSON"
+		},
+		"overrideInfo": {
+			"type": "apogeeapp.app.JsonTableComponent",
+			"coordInfo": {
+				"x": 735,
+				"y": 21,
+				"width": 737,
+				"height": 676
+			},
+			"windowState": 0,
+			"viewType": "Text"
+		}
+	}
+}
