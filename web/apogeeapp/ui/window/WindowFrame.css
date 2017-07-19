@@ -119,11 +119,16 @@
 .visiui_win_menu_style {
     /* fixed */
     display:inline-block;
+    position: relative;
 
     /* configurable */
     margin-right:3px;
 }
-
+.visiui_win_icon_overlay_style {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
 .visiui_win_cmd_button { 
     /* fixed */
     display:inline-block;

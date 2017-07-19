@@ -4,7 +4,7 @@
  * 
  * options:
  * minimizable - allow content to be minimized. defaylt value: false
- * maximizable - allow content to be maximized. defaylt value: false
+ * maximizable - allow content to be maximized. default value: false
  * closable - display a close button. defalt value: false
  * resizable- allow resizing window with mouse. default vlue: false
  * movable - allow moving window with mouse. default value : false
@@ -128,19 +128,33 @@ apogeeapp.ui.WindowFrame.prototype.setTitle = function(title) {
 apogeeapp.ui.WindowFrame.prototype.createMenu = function(iconUrl) {
     if(!iconUrl) iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.ui.MENU_IMAGE);
     this.menu = apogeeapp.ui.Menu.createMenuFromImage(iconUrl);
-    var firstLeftElementChild = this.titleBarLeftElements.firstChild;
-    if(firstLeftElementChild) {
-        this.titleBarLeftElements.insertBefore(this.menu.getElement(),firstLeftElementChild);
-    }
-    else {
-        this.titleBarLeftElements.appendChild(this.menu.getElement());
-    }
+    this.titleBarMenuElement.appendChild(this.menu.getElement());
+    //create the icon (menu) overlay
+    this.iconOverlayElement = apogeeapp.ui.createElementWithClass("div","visiui_win_icon_overlay_style",this.titleBarMenuElement);
+    
     return this.menu;
 }
 
 /** This method shows the window. */
 apogeeapp.ui.WindowFrame.prototype.getMenu = function() {
     return this.menu;
+}
+
+/** This sets the given element as the icon overlay. If null or other [false} is passed
+ * this will just clear the icon overlay. */
+apogeeapp.ui.WindowFrame.prototype.setIconOverlay = function(element) {
+    if(this.iconOverlayElement) {
+        this.clearIconOverlay();
+        if(element) {
+            this.iconOverlayElement.appendChild(element);
+        }
+    }
+}
+
+apogeeapp.ui.WindowFrame.prototype.clearIconOverlay = function() {
+    if(this.iconOverlayElement) {
+        apogeeapp.ui.removeAllChildren(this.iconOverlayElement);
+    }
 }
 
 /** This sets the content for the window */
@@ -758,13 +772,14 @@ apogeeapp.ui.WindowFrame.prototype.createTitleBar = function() {
     }
     
     //maximize button and logic
-    if(this.options.maximizable) {
-        this.maximizeButton = apogeeapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
-        this.maximizeButton.src = apogeeapp.ui.getResourcePath(apogeeapp.ui.MAXIMIZE_CMD_IMAGE);
-        this.maximizeButton.onclick = function() {
-            instance.maximizeContent();
-        }
-    }
+//DISABLE MAXIMIZE - just don't show button for now
+//    if(this.options.maximizable) {
+//        this.maximizeButton = apogeeapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
+//        this.maximizeButton.src = apogeeapp.ui.getResourcePath(apogeeapp.ui.MAXIMIZE_CMD_IMAGE);
+//        this.maximizeButton.onclick = function() {
+//            instance.maximizeContent();
+//        }
+//    }
     
     //layout the window buttons
     this.windowState = apogeeapp.ui.WINDOW_STATE_NORMAL;
@@ -801,17 +816,6 @@ apogeeapp.ui.WindowFrame.prototype.createTitleBar = function() {
             instance.moveMouseLeaveImpl(event);
         }
     }
-    
-//    //listen for cmd events from title bar
-//    this.addListener("minimize_request",function() {
-//        instance.minimizeContent();
-//    });
-//    this.addListener("maximize_request",function() {
-//        instance.maximizeContent();
-//    });
-//    this.addListener("restore_request",function() {
-//        instance.restoreContent();
-//    });
 }
 
 

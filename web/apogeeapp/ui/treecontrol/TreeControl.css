@@ -21,8 +21,21 @@
     position:relative;
     left:-5px;
 }
+.visiui-tc-icon-container {
+    /* fixed */
+    display:inline-block;
+    position: relative;
+
+    /* configurable */
+    /*margin-right:3px;*/
+}
 .visiui-tc-icon {
     display:inline-block;
+}
+.visiui_tc_icon_overlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
 .visiui-tc-child-list {
     list-style: none;

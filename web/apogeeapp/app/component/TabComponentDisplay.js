@@ -27,6 +27,16 @@ apogeeapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerStat
     else {
         this.windowHeaderManager.showBannerBar(bannerMessage,bannerState);
     }
+    
+    if(this.tab) {
+        var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(bannerState);
+        if(iconOverlay) {
+            this.tab.setIconOverlay(iconOverlay);
+        }
+        else {
+            this.tab.clearIconOverlay();
+        }
+    }
 }
 
 apogeeapp.app.TabComponentDisplay.prototype.updateData = function() {

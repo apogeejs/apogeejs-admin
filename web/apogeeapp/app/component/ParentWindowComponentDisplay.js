@@ -49,7 +49,15 @@ apogeeapp.app.ParentWindowComponentDisplay.prototype.deleteDisplay = function() 
 }
 
 apogeeapp.app.ParentWindowComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
-    //banner not shown on parent window
+    if(this.windowFrame) {
+        var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(bannerState);
+        if(iconOverlay) {
+            this.windowFrame.setIconOverlay(iconOverlay);
+        }
+        else {
+            this.windowFrame.clearIconOverlay();
+        }
+    }
 }
 
 apogeeapp.app.ParentWindowComponentDisplay.prototype.updateData = function() {

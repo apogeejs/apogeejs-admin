@@ -18,10 +18,12 @@ apogeeapp.app.WindowHeaderManager = function() {
 apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR = "error";
 apogeeapp.app.WindowHeaderManager.BANNER_BGCOLOR_ERROR = "red";
 apogeeapp.app.WindowHeaderManager.BANNER_FGCOLOR_ERROR = "white";
+apogeeapp.app.WindowHeaderManager.ERROR_ICON_IMAGE = "/error.png";
 
 apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING = "pending";
 apogeeapp.app.WindowHeaderManager.BANNER_BGCOLOR_PENDING = "yellow";
 apogeeapp.app.WindowHeaderManager.BANNER_FGCOLOR_PENDING = "black";
+apogeeapp.app.WindowHeaderManager.PENDING_ICON_IMAGE = "/pending.png";
 
 apogeeapp.app.WindowHeaderManager.BANNER_BGCOLOR_UNKNOWN = "yellow";
 apogeeapp.app.WindowHeaderManager.BANNER_FGCOLOR_UNKNOWN = "black";
@@ -123,6 +125,21 @@ apogeeapp.app.WindowHeaderManager.prototype.getHeaderElement = function() {
 }
 
 //===========================
-// Protected Methods
+// Static Methods
 //===========================
 
+apogeeapp.app.WindowHeaderManager.getIconOverlay = function(bannerState) {
+    var resource;
+    if(bannerState == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR) {
+        resource = apogeeapp.app.WindowHeaderManager.ERROR_ICON_IMAGE;
+    }
+    else if(bannerState == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING) {
+        resource = apogeeapp.app.WindowHeaderManager.PENDING_ICON_IMAGE;
+    }
+    
+    if(!resource) return null;
+    var url = apogeeapp.ui.getResourcePath(resource);
+    var element = document.createElement("img");
+    element.src = url;
+    return element;
+}

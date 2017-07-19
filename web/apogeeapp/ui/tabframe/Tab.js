@@ -98,12 +98,31 @@ apogeeapp.ui.Tab.prototype.createMenu = function(iconUrl) {
     if(!iconUrl) iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.ui.MENU_IMAGE);
     this.menu = apogeeapp.ui.Menu.createMenuFromImage(iconUrl);
     this.menuContainer.appendChild(this.menu.domElement);
+    //add the icon overlay element
+    this.iconOverlayElement = apogeeapp.ui.createElementWithClass("div","visiui_tf_icon_overlay",this.menuContainer);
     return this.menu;
 }
 
 /** This method shows the window. */
 apogeeapp.ui.Tab.prototype.getMenu = function() {
     return this.menu;
+}
+
+/** This sets the given element as the icon overlay. If null or other [false} is passed
+ * this will just clear the icon overlay. */
+apogeeapp.ui.Tab.prototype.setIconOverlay = function(element) {
+    if(this.iconOverlayElement) {
+        this.clearIconOverlay();
+        if(element) {
+            this.iconOverlayElement.appendChild(element);
+        }
+    }
+}
+
+apogeeapp.ui.Tab.prototype.clearIconOverlay = function() {
+    if(this.iconOverlayElement) {
+        apogeeapp.ui.removeAllChildren(this.iconOverlayElement);
+    }
 }
 
 /** This method closes the window. */

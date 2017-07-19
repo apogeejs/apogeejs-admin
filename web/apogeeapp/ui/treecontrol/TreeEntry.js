@@ -20,21 +20,26 @@ apogeeapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback
     
     this.element = apogeeapp.ui.createElementWithClass("li", baseCssClass);
     this.control = apogeeapp.ui.createElementWithClass("img", "visiui-tc-control",this.element);
+    
 
     //icon/menu
     if(iconSrc) {
+        this.iconContainerElement = apogeeapp.ui.createElementWithClass("div", "visiui-tc-icon-container",this.element);
         if(menuItemCallback) {
             //icon as menu
             this.menu = apogeeapp.ui.Menu.createMenuFromImage(iconSrc);
             this.menu.setAsOnTheFlyMenu(menuItemCallback);
-            this.element.appendChild(this.menu.getElement());
+            this.iconContainerElement.appendChild(this.menu.getElement());
         }
         else {
             //plain icon
-            this.icon = apogeeapp.ui.createElementWithClass("img", "visiui-tc-icon",this.element);
+            this.icon = apogeeapp.ui.createElementWithClass("img", "visiui-tc-icon",this.iconContainerElement);
             this.icon.src = iconSrc; 
         }
+        this.iconOverlayElement = apogeeapp.ui.createElementWithClass("div","visiui_tc_icon_overlay",this.iconContainerElement);
     }
+    
+    
     
     //label
     this.label = apogeeapp.ui.createElementWithClass("div", "visiui-tc-label",this.element);
@@ -142,6 +147,18 @@ apogeeapp.ui.treecontrol.TreeEntry.prototype.setState = function(state) {
     }
 }
 
+/** This sets the given element as the icon overlay. If null or other [false} is passed
+ * this will just clear the icon overlay. */
+apogeeapp.ui.treecontrol.TreeEntry.prototype.setIconOverlay = function(element) {
+    this.clearIconOverlay();
+    if(element) {
+        this.iconOverlayElement.appendChild(element);
+    }
+}
+
+apogeeapp.ui.treecontrol.TreeEntry.prototype.clearIconOverlay = function() {
+    apogeeapp.ui.removeAllChildren(this.iconOverlayElement);
+}
 
 
 

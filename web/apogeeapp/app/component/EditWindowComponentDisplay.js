@@ -81,6 +81,15 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setBannerState = function(ban
             this.windowHeaderManager.showBannerBar(bannerMessage,bannerState);
         }
     }
+    if(this.windowFrame) {
+        var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(bannerState);
+        if(iconOverlay) {
+            this.windowFrame.setIconOverlay(iconOverlay);
+        }
+        else {
+            this.windowFrame.clearIconOverlay();
+        }
+    }
 }
 
 apogeeapp.app.EditWindowComponentDisplay.prototype.updateData = function() {

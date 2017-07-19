@@ -73,10 +73,16 @@
 
 .visiui-tf_tab-menuDiv {
     /* fixed */
-    display:inline;
+    display:inline-block;
+    position: relative;
     
     /* configurable */
     margin-right:3px;
+}
+.visiui_tf_icon_overlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
 .visiui_tf_tab_title {
     /* fixed */
