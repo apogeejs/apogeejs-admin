@@ -1,7 +1,7 @@
 /** This method shows a dialog to update the workspace links. */
 apogeeapp.app.dialog.showUpdateLinksDialog = function(workspaceUI) {
     
-    var dialog = apogeeapp.ui.createDialog({"minimizable":true,"maximizable":true,"movable":true,"resizable":true});
+    var dialog = apogeeapp.ui.createDialog({"minimizable":true,"maximizable":true,"movable":true});
             
 //    //create body
 //    var content = apogeeapp.ui.createElement("div",{"className":"dialogBody"}); 
@@ -197,26 +197,6 @@ cssLinksEditor.$blockScrolling = Infinity;
     
     cssLinksRadio.onchange = onRadioChange;
     jsLinksRadio.onchange = onRadioChange;
-    
-    //set the resize handler
-    //resize the editor on window size change
-    var resizeCallback = function() {
-        //this needs to be fixed
-        var container = content.parentElement;
-        //this is kind of cludgy, I am using this as the last line and assuming it has even margins
-        var margin = line.offsetLeft;
-        var endPosition = line.offsetTop + line.offsetHeight + margin;
-        var totalWidth = container.clientWidth - 2 * margin;
-        var extraHeight = container.clientHeight - endPosition;
-        //size the editor, with some arbitrary padding
-        editorDiv.style.width = (totalWidth - 5) + "px";
-        editorDiv.style.height = (editorDiv.offsetHeight + extraHeight - 5) + "px";
-       
-        if(cssLinksEditor) cssLinksEditor.resize();
-        if(jsLinksEditor) jsLinksEditor.resize();
-    }
-    var container = content.parentElement;
-    apogeeapp.ui.setResizeListener(container, resizeCallback);
 }
 
 /** @private */

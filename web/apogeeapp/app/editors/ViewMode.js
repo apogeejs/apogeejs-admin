@@ -24,6 +24,13 @@ apogeeapp.app.ViewMode.prototype.getMember = function() {
     return this.member;
 }
 
+/** This returns the UiObject, such as the window frame for this data display. */
+apogeeapp.app.ViewMode.prototype.getUiObject = function() {
+    return this.componentDisplay.getWindowFrame();
+}
+
+
+
 /** If doKeepAlive is set to true, the output mode is not destroyed when it is 
  * hidden. Otherwise it is destroyed when it is hidden and recreated nect time it
  * is shown. */

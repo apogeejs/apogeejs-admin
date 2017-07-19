@@ -5,12 +5,23 @@ apogeeapp.webapp.EmbeddedContainerComponentDisplay = function(component, viewTyp
     this.viewType = viewType;
     this.parentElement = parentElement;
     
+    
+    this.displayInsideContainer = new apogeeapp.ui.DisplayAndHeader(apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
+            null,
+            apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
+            null
+        );
+    this.parentElement.appendChild(this.displayInsideContainer.getOuterElement());
+    
+    this.headerContainer = this.displayInsideContainer.getHeaderContainer();
+    this.bodyContainer = this.displayInsideContainer.getBodyContainer();
+    
     this.windowHeaderManager = new apogeeapp.app.WindowHeaderManager();
-    parentElement.appendChild(this.windowHeaderManager.getOuterElement());
+    this.headerContainer.appendChild(this.windowHeaderManager.getHeaderElement());
 
     this.viewModeElement = component.getViewModeElement(this,viewType);
     this.viewModeElement.showData();
-    this.windowHeaderManager.setContent(this.viewModeElement.getElement());
+    this.bodyContainer.appendChilr(this.viewModeElement.getElement());
     
     //add a cleanup action to the base component - component must already be initialized
 //    this.addCleanupAction(apogeeapp.webapp.EmbeddedContainerComponentDisplay.destroy);

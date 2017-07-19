@@ -20,7 +20,7 @@ apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
 /** This value is used as the background color when an editor is read only. */
 apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.getWindowEntry = function() {
+apogeeapp.app.EditWindowComponentDisplay.prototype.getWindowFrame = function() {
     return this.windowFrame;
 }
 
@@ -79,6 +79,15 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setBannerState = function(ban
         }
         else {
             this.windowHeaderManager.showBannerBar(bannerMessage,bannerState);
+        }
+    }
+    if(this.windowFrame) {
+        var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(bannerState);
+        if(iconOverlay) {
+            this.windowFrame.setIconOverlay(iconOverlay);
+        }
+        else {
+            this.windowFrame.clearIconOverlay();
         }
     }
 }
@@ -162,7 +171,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype._loadWindowFrameEntry = funct
 
     //header manager - for banner and toolbars
     this.windowHeaderManager = new apogeeapp.app.WindowHeaderManager();
-    this.windowFrame.setContent(this.windowHeaderManager.getOuterElement());
+    this.windowFrame.setHeaderContent(this.windowHeaderManager.getHeaderElement());
     
     //set title
     this.windowFrame.setTitle(this.object.getDisplayName());
@@ -284,7 +293,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype._updateViewTypeSelect = funct
 apogeeapp.app.EditWindowComponentDisplay.prototype._updateViewContent = function() {
     if(this.viewModeElement) {
         this.viewModeElement.showData();
-        this.windowHeaderManager.setContent(this.viewModeElement.getElement());
+        this.windowFrame.setContent(this.viewModeElement.getElement());
     }
     else {
         alert("Error: View mode element not found!");

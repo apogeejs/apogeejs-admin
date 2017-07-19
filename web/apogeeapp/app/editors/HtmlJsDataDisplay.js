@@ -57,6 +57,7 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     //add resize/load listener if needed
     //------------------------
     
+    var addLoadListener = false;
     var addResizeListener = false;
     var resizeCallback;
     var loadCallback;
@@ -73,8 +74,13 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
             //set data now that element is loaded
             instance.outputMode.showData();
         };
-        addResizeListener = true;
+        addLoadListener = true;
     }
+    
+    if(addLoadListener) {
+        apogeeapp.ui.setLoadListener(this.containerElement, loadCallback);
+    }
+    
     if(resource.onResize) {
         resizeCallback = function() {
             try {
@@ -86,18 +92,25 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
         };
         addResizeListener = true;
     }
-    if(addResizeListener) {
-        apogeeapp.ui.setResizeListener(this.containerElement, resizeCallback, loadCallback);
-    }
     
     //-------------------------
     //add the (other) optional methods to this class
     //-------------------------
     
-    if(this.resource.setData) {
+    if((this.resource.setData)||(addResizeListener)) {
         this.showData = function(data) {
             try {
-                resource.setData.call(instance,data,instance.outputElement,instance.outputMode);
+                if(this.resource.setData) {
+                    resource.setData.call(instance,data,instance.outputElement,instance.outputMode);
+                }
+            
+                if((addResizeListener)&&(!instance.callbackAttached)) {
+                    var uiObject = instance.outputMode.getUiObject();
+                    if(uiObject) {
+                        uiObject.addListener(apogeeapp.ui.RESIZED_EVENT,resizeCallback);
+                        instance.callbackAttached = true;
+                    }
+                }
             }
             catch(error) {
                 alert("Error in " + instance.outputMode.getFullName() + " setData function: " + error.message);
@@ -105,6 +118,7 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
         }
     }
     else {
+        //we must include a function here
         this.showData = function(data){};
     }
     
@@ -112,7 +126,6 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
         this.hideRequest = function() {
             try {
                 resource.onHide.call(instance,instance.outputElement,instance.outputMode);
-
             }
             catch(error) {
                 alert("Error in " + instance.outputMode.getFullName() + " onHide function: " + error.message);
@@ -120,11 +133,20 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
         }
     }
 
-    if(this.resource.onHide) {   
+    if((this.resource.onHide)||(instance.callbackAttached)) {   
         this.hide = function() {
             try {
-                resource.onHide.call(instance,instance.outputElement,instance.outputMode);
-
+                if(instance.resource.onHide) {
+                    resource.onHide.call(instance,instance.outputElement,instance.outputMode);
+                }
+                
+                if(instance.callbackAttached) {
+                    var uiObject = instance.outputMode.getUiObject();
+                    if(uiObject) {
+                        uiObject.removeListener(apogeeapp.ui.RESIZED_EVENT,instance.resizeCallback);
+                        instance.callbackAttached = false;
+                    }
+                }
             }
             catch(error) {
                 alert("Error in " + instance.outputMode.getFullName() + " onHide function: " + error.message);

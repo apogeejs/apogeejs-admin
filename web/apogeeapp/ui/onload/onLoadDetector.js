@@ -1,11 +1,11 @@
-/** This file provides a resize listener. The element must be a positioned element
+/** This file provides a load listener. The element must be a positioned element
  * (position must be set to something besides static. It can only be done once per element(!)
  * 
  * It places an iframe inside the element to be tested and uses the onresize of the 
  * iframe document body. It calls load (and resize) on initial loading of the iframe.
  */
 
-apogeeapp.ui.setResizeListener = function(element, resizeCallback, loadCallback){
+apogeeapp.ui.setLoadListener = function(element, loadCallback, resizeCallback){
 
     var styleJson = {
         "position":"absolute",
@@ -33,11 +33,6 @@ apogeeapp.ui.setResizeListener = function(element, resizeCallback, loadCallback)
         }
     }
     element.appendChild(dummyFrameElement);
-}
-
-/** @private */
-apogeeapp.ui.createOnLoadCallback = function(frameElement, resizeCallback, loadCallback) {
-    
 }
 
 apogeeapp.ui.removeResizeListener = function(element, resizeCallback){

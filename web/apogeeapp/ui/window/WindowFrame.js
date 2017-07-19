@@ -4,7 +4,7 @@
  * 
  * options:
  * minimizable - allow content to be minimized. defaylt value: false
- * maximizable - allow content to be maximized. defaylt value: false
+ * maximizable - allow content to be maximized. default value: false
  * closable - display a close button. defalt value: false
  * resizable- allow resizing window with mouse. default vlue: false
  * movable - allow moving window with mouse. default value : false
@@ -40,8 +40,10 @@ apogeeapp.ui.WindowFrame = function(options) {
 	
     this.frame = null;
     this.titleCell = null;
+    this.headerCell = null;
     this.bodyCell = null;
     
+    this.headerContent = null;
     this.content = null;
     
     this.windowDragActive = false;
@@ -126,19 +128,40 @@ apogeeapp.ui.WindowFrame.prototype.setTitle = function(title) {
 apogeeapp.ui.WindowFrame.prototype.createMenu = function(iconUrl) {
     if(!iconUrl) iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.ui.MENU_IMAGE);
     this.menu = apogeeapp.ui.Menu.createMenuFromImage(iconUrl);
-    var firstLeftElementChild = this.titleBarLeftElements.firstChild;
-    if(firstLeftElementChild) {
-        this.titleBarLeftElements.insertBefore(this.menu.getElement(),firstLeftElementChild);
-    }
-    else {
-        this.titleBarLeftElements.appendChild(this.menu.getElement());
-    }
+    this.titleBarMenuElement.appendChild(this.menu.getElement());
+    //create the icon (menu) overlay
+    this.iconOverlayElement = apogeeapp.ui.createElementWithClass("div","visiui_win_icon_overlay_style",this.titleBarMenuElement);
+    
     return this.menu;
 }
 
 /** This method shows the window. */
 apogeeapp.ui.WindowFrame.prototype.getMenu = function() {
     return this.menu;
+}
+
+/** This sets the given element as the icon overlay. If null or other [false} is passed
+ * this will just clear the icon overlay. */
+apogeeapp.ui.WindowFrame.prototype.setIconOverlay = function(element) {
+    if(this.iconOverlayElement) {
+        this.clearIconOverlay();
+        if(element) {
+            this.iconOverlayElement.appendChild(element);
+        }
+    }
+}
+
+apogeeapp.ui.WindowFrame.prototype.clearIconOverlay = function() {
+    if(this.iconOverlayElement) {
+        apogeeapp.ui.removeAllChildren(this.iconOverlayElement);
+    }
+}
+
+/** This sets the content for the window */
+apogeeapp.ui.WindowFrame.prototype.setHeaderContent = function(contentElement) {
+    apogeeapp.ui.removeAllChildren(this.headerCell);
+    this.headerCell.appendChild(contentElement);
+    this.headerContent = contentElement;
 }
 
 /** This sets the content for the window */
@@ -294,27 +317,11 @@ apogeeapp.ui.WindowFrame.prototype.getElement = function() {
 //----------------------------------------------------------------
 //object specific
 
-/** This method sets the size of the window to fit the content. It should only be 
- * called after the window has been shown. If this is used a scrolling frame should not be
- * used a the content. */
+/** This method sets the size of the window to fit the content. */
 apogeeapp.ui.WindowFrame.prototype.fitToContent = function() {
-	//figure out how big to make the frame to fit the content
-    var viewWidth = this.bodyCell.offsetWidth;
-    var viewHeight = this.bodyCell.offsetHeight;
-    var contentWidth = this.content.offsetWidth;
-    var contentHeight = this.content.offsetHeight;
-	
-	var targetWidth = this.sizeInfo.width + contentWidth - viewWidth + apogeeapp.ui.WindowFrame.FIT_WIDTH_BUFFER;
-	var targetHeight = this.sizeInfo.height + contentHeight - viewHeight + apogeeapp.ui.WindowFrame.FIT_HEIGHT_BUFFER;
-	
-    this.setSize(targetWidth,targetHeight);
+    this.sizeInfo.width = undefined;
+	this.sizeInfo.height = undefined;
 }
-
-/** @private */
-apogeeapp.ui.WindowFrame.FIT_HEIGHT_BUFFER = 20;
-/** @private */
-apogeeapp.ui.WindowFrame.FIT_WIDTH_BUFFER = 20;
-
 
 /** This method centers the window in its parent. it should only be called
  *after the window is shown. */
@@ -403,20 +410,20 @@ apogeeapp.ui.WindowFrame.prototype.resizeMouseDownImpl = function(e,resizeFlags)
 	if(resizeFlags) {
 		if(resizeFlags & apogeeapp.ui.WindowFrame.RESIZE_EAST) {
 			this.resizeEastActive = true;
-			this.resizeOffsetWidth = e.clientX - this.frame.clientWidth;
+			this.resizeOffsetWidth = e.clientX - this.bodyCell.clientWidth;
 		}
 		else if(resizeFlags & apogeeapp.ui.WindowFrame.RESIZE_WEST) {
 			this.resizeWestActive = true;
-			this.resizeOffsetWidth = e.clientX + this.frame.clientWidth;
+			this.resizeOffsetWidth = e.clientX + this.bodyCell.clientWidth;
 			this.moveOffsetX = e.clientX - this.frame.offsetLeft;
 		}
 		if(resizeFlags & apogeeapp.ui.WindowFrame.RESIZE_SOUTH) {
 			this.resizeSouthActive = true;
-			this.resizeOffsetHeight = e.clientY - this.frame.clientHeight;
+			this.resizeOffsetHeight = e.clientY - this.bodyCell.clientHeight;
 		}
 		else if(resizeFlags & apogeeapp.ui.WindowFrame.RESIZE_NORTH) {
 			this.resizeNorthActive = true;
-			this.resizeOffsetHeight = e.clientY + this.frame.clientHeight;
+			this.resizeOffsetHeight = e.clientY + this.bodyCell.clientHeight;
 			this.moveOffsetY = e.clientY - this.frame.offsetTop;
 		}
 
@@ -437,13 +444,13 @@ apogeeapp.ui.WindowFrame.prototype.resizeMouseMoveImpl = function(e) {
     
 	if(this.resizeEastActive) {
 		newWidth = e.clientX - this.resizeOffsetWidth;
-		if(newWidth < this.minWidth) return;
+		//if(newWidth < this.minWidth) return;
         this.sizeInfo.width = newWidth;
         changeMade = true;
 	}
 	else if(this.resizeWestActive) {
 		newWidth = this.resizeOffsetWidth - e.clientX;
-		if(newWidth < this.minWidth) return;
+		//if(newWidth < this.minWidth) return;
 		newX = e.clientX - this.moveOffsetX;
 		if(newX < 0) newX = 0;
         this.sizeInfo.width = newWidth;
@@ -452,13 +459,13 @@ apogeeapp.ui.WindowFrame.prototype.resizeMouseMoveImpl = function(e) {
 	}
 	if(this.resizeSouthActive) {
 		newHeight = e.clientY - this.resizeOffsetHeight;
-		if(newHeight < this.minHeight) return;
+		//if(newHeight < this.minHeight) return;
 		this.sizeInfo.height = newHeight;
         changeMade = true;
 	}
 	else if(this.resizeNorthActive) {
 		newHeight = this.resizeOffsetHeight - e.clientY;
-		if(newHeight < this.minHeight) return;
+		//if(newHeight < this.minHeight) return;
 		newY = e.clientY - this.moveOffsetY;
 		if(newY < 0) newY = 0;
 		this.sizeInfo.height = newHeight;
@@ -523,7 +530,9 @@ apogeeapp.ui.WindowFrame.prototype.minimizeContent = function() {
     this.setMinMaxButtons();
     
     //dispatch resize event
-    if(!wasMinimized) this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_MINIMIZED,this);
+    if(!wasMinimized) { 
+        this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_MINIMIZED,this);
+    }
 }
 
 /** This is the restore function for the window.*/
@@ -540,7 +549,9 @@ apogeeapp.ui.WindowFrame.prototype.restoreContent = function() {
     this.updateCoordinates();
     this.setMinMaxButtons();
     
-    if(wasMinimized) this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_RESTOREDED,this);
+    if((wasMinimized)||(wasMaximized)) {
+        this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_RESTOREDED,this);
+    }
 }
 
 /** This is the minimize function for the window.*/
@@ -556,11 +567,16 @@ apogeeapp.ui.WindowFrame.prototype.maximizeContent = function() {
     this.updateCoordinates();
     this.setMinMaxButtons();
     
-    if(wasMinimized) this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_MAXIMIZED,this);
+    if(!wasMaximized) {
+        this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_MAXIMIZED,this);
+    }
 }
 
 /** @private */
 apogeeapp.ui.WindowFrame.prototype.updateCoordinates = function() {
+    
+    var initialBodyHeight = this.bodyCell.style.height;
+    var initialBodyWidth = this.bodyCell.style.width;
 	
     if(this.windowState === apogeeapp.ui.WINDOW_STATE_MAXIMIZED) {
         //apply the maximized coordinates size
@@ -568,31 +584,43 @@ apogeeapp.ui.WindowFrame.prototype.updateCoordinates = function() {
 		this.frame.style.top = "0px";
 		this.frame.style.height = "100%";
 		this.frame.style.width = "100%";
+        
+        this.bodyCell.style.height = "100%";
+        this.bodyCell.style.width = "100%";
     }
     else if(this.windowState === apogeeapp.ui.WINDOW_STATE_NORMAL) {
         //apply the normal size to the window
 		this.frame.style.left = this.posInfo.x + "px";
         this.frame.style.top = this.posInfo.y + "px";
+        this.frame.style.height = "";
+		this.frame.style.width = "";
+        
 		if(this.sizeInfo.height !== undefined) {
-			this.frame.style.height = this.sizeInfo.height + "px";
+			this.bodyCell.style.height = this.sizeInfo.height + "px";
 		}
-		else {
-			this.frame.style.height = apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT + "px";
-		}
+        else {
+            this.bodyCell.style.height = "";
+        }
 		if(this.sizeInfo.width !== undefined) {
-			this.frame.style.width = this.sizeInfo.width + "px";
+			this.bodyCell.style.width = this.sizeInfo.width + "px";
 		}
-		else {
-			this.frame.style.width = apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH + "px";
-		}
+        else {
+            this.bodyCell.style.width = "";
+        }
     }
     else if(this.windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED) {
         //apply the minimized size to the window
 		this.frame.style.left = this.posInfo.x + "px";
         this.frame.style.top = this.posInfo.y + "px";
-		
-		this.frame.style.height = "0px";
-		this.frame.style.width = "0px";
+		this.frame.style.height = "";
+		this.frame.style.width = "";
+        
+		this.bodyCell.style.height = "0px";
+		this.bodyCell.style.width = "0px";
+    }
+    
+    if((initialBodyHeight != this.bodyCell.style.height)||(initialBodyWidth != this.bodyCell.style.width)) {
+        this.dispatchEvent(apogeeapp.ui.RESIZED_EVENT,this);
     }
 }
 
@@ -633,7 +661,7 @@ apogeeapp.ui.WindowFrame.prototype.initUI = function() {
     cell = document.createElement("td");
     cell.className = "visiui_win_windowColorClass visiui_win_left";
     this.addResizeHandlers(cell,apogeeapp.ui.WindowFrame.RESIZE_WEST); 
-    cell.rowSpan = 2;
+    cell.rowSpan = 3;
     row.appendChild(cell);
     cell = document.createElement("td");
     cell.className = "visiui_win_windowColorClass";
@@ -642,7 +670,16 @@ apogeeapp.ui.WindowFrame.prototype.initUI = function() {
     cell = document.createElement("td");
     cell.className = "visiui_win_windowColorClass visiui_win_right";
     this.addResizeHandlers(cell,apogeeapp.ui.WindowFrame.RESIZE_EAST); 
-    cell.rowSpan = 2;
+    cell.rowSpan = 3;
+    row.appendChild(cell);
+    
+    //header
+    row = document.createElement("tr");
+    row.className = "visiui_win_headerRow";
+    table.appendChild(row);
+    cell = document.createElement("td");
+    cell.className = "visiui_win_headerCell";
+    this.headerCell = cell;
     row.appendChild(cell);
     
     //body
@@ -735,13 +772,14 @@ apogeeapp.ui.WindowFrame.prototype.createTitleBar = function() {
     }
     
     //maximize button and logic
-    if(this.options.maximizable) {
-        this.maximizeButton = apogeeapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
-        this.maximizeButton.src = apogeeapp.ui.getResourcePath(apogeeapp.ui.MAXIMIZE_CMD_IMAGE);
-        this.maximizeButton.onclick = function() {
-            instance.maximizeContent();
-        }
-    }
+//DISABLE MAXIMIZE - just don't show button for now
+//    if(this.options.maximizable) {
+//        this.maximizeButton = apogeeapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
+//        this.maximizeButton.src = apogeeapp.ui.getResourcePath(apogeeapp.ui.MAXIMIZE_CMD_IMAGE);
+//        this.maximizeButton.onclick = function() {
+//            instance.maximizeContent();
+//        }
+//    }
     
     //layout the window buttons
     this.windowState = apogeeapp.ui.WINDOW_STATE_NORMAL;
@@ -778,17 +816,6 @@ apogeeapp.ui.WindowFrame.prototype.createTitleBar = function() {
             instance.moveMouseLeaveImpl(event);
         }
     }
-    
-//    //listen for cmd events from title bar
-//    this.addListener("minimize_request",function() {
-//        instance.minimizeContent();
-//    });
-//    this.addListener("maximize_request",function() {
-//        instance.maximizeContent();
-//    });
-//    this.addListener("restore_request",function() {
-//        instance.restoreContent();
-//    });
 }
 
 

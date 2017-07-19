@@ -29,15 +29,22 @@ apogeeapp.app.HandsonGridEditor = function(viewMode) {
 	
 	//resize the editor on window size change
     var instance = this;
-    var resizeCallback = function() {
+    this.resizeCallback = function() {
         instance.gridDiv.style.width = instance.outsideDiv.clientWidth + "px";
         instance.gridDiv.style.height = instance.outsideDiv.clientHeight + "px";
         if(instance.gridControl) {
             instance.gridControl.render();
         }
     }
-   apogeeapp.ui.setResizeListener(this.outsideDiv, resizeCallback);
-	
+   this.callbackAttached = false;
+   
+   //we have to make sure the element is loaded before initailizing for handsontable to work properly
+   this.loadCallback = function() {
+       instance.onLoad(viewMode);
+   }
+   apogeeapp.ui.setLoadListener(this.outsideDiv, this.loadCallback);
+   this.loaded = false;
+   
 	//grid edited function
 	this.gridEdited = function(args) {
 		instance.save(arguments);
@@ -86,21 +93,25 @@ apogeeapp.app.HandsonGridEditor.prototype.getElement = function() {
 }
 	
 apogeeapp.app.HandsonGridEditor.prototype.showData = function(json,editOk) {
+    if(!this.loaded) return;
+    
 	if((this.inputData === json)&&(editOk)) return;
 	
 	var oldEditOk = this.editOk;
 	this.editOk = editOk;
 	this.inputData = json;
 	var editData = apogee.util.deepJsonCopy(json);
-	
-	if((!this.gridControl)||(oldEditOk !== editOk)) {
-		this.createNewGrid();
-	}
-	
+    
     if(!editData) {
         editData = [[]];
     }
-	this.gridControl.loadData(editData);
+
+    if((!this.gridControl)||(oldEditOk !== editOk)) {
+        this.createNewGrid(editData);
+    }
+    else {
+        this.gridControl.loadData(editData);
+    }
     
     //set the background color
     if(this.editOk) {
@@ -109,6 +120,32 @@ apogeeapp.app.HandsonGridEditor.prototype.showData = function(json,editOk) {
     else {
         this.gridDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
     }
+    
+    if(!this.callbackAttached) {
+        var uiObject = this.viewMode.getUiObject();
+        if(uiObject) {
+            uiObject.addListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
+            this.callbackAttached = true;
+        }
+        
+        //call resize to make sure size is initialized
+        this.resizeCallback();
+    }
+    
+}
+
+apogeeapp.app.HandsonGridEditor.prototype.onLoad = function(viewMode) {
+    this.loaded = true;
+    viewMode.showData();
+}
+
+apogeeapp.app.HandsonGridEditor.prototype.hide = function() {
+    var uiObject = this.viewMode.getUiObject();
+    if(uiObject) {
+        uiObject.removeListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
+        this.callbackAttached = false;
+    }
+    this.loaded = false;
 }
 
 apogeeapp.app.HandsonGridEditor.prototype.destroy = function() {
@@ -124,7 +161,7 @@ apogeeapp.app.HandsonGridEditor.prototype.destroy = function() {
 
 /** This method creates a new grid. 
  * @private */
-apogeeapp.app.HandsonGridEditor.prototype.createNewGrid = function() {
+apogeeapp.app.HandsonGridEditor.prototype.createNewGrid = function(initialData) {
     if(this.gridControl) {
         this.gridControl.destroy();
         this.gridControl = null;
@@ -133,6 +170,7 @@ apogeeapp.app.HandsonGridEditor.prototype.createNewGrid = function() {
     var gridOptions; 
     if(this.editOk) {
         gridOptions = {
+            data: initialData,
             rowHeaders: true,
             colHeaders: true,
             contextMenu: true,
@@ -147,9 +185,10 @@ apogeeapp.app.HandsonGridEditor.prototype.createNewGrid = function() {
     }
     else {
         gridOptions = {
+            data: initialData,
             readOnly: true,
             rowHeaders: true,
-            colHeaders: true
+            colHeaders: true,
         }
         this.gridEditable = false;
     }

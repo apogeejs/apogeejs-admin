@@ -27,13 +27,6 @@ apogeeapp.app.TextAreaEditor = function(viewMode) {
 	this.editOk = false;
 	this.editMode = false;
 	
-//	//resize the editor on window size change
-//    var resizeCallback = function() {
-//        editor.resize();
-//    }
-	
-//    apogeeapp.ui.setResizeListener(this.outsideDiv, resizeCallback);
-	
 	//add click handle to enter edit mode
 	var instance = this;
 	var onMouseClick = function() {

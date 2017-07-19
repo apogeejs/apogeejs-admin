@@ -23,7 +23,13 @@ apogeeapp.app.TreeComponentDisplay.prototype.deleteDisplay = function() {
 }
 
 apogeeapp.app.TreeComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
-    //add this!
+    var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(bannerState);
+    if(iconOverlay) {
+        this.treeEntry.setIconOverlay(iconOverlay);
+    }
+    else {
+        this.treeEntry.clearIconOverlay();
+    }
 }
 
 apogeeapp.app.TreeComponentDisplay.prototype.updateData = function() {

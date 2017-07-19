@@ -60,7 +60,7 @@ module.exports = function(grunt) {
                 "apogeeapp/ui/jsonedit/valueentry.js",
                 "apogeeapp/ui/jsonedit/editfield.js",
                 "apogeeapp/ui/jsonedit/jsoneditarea.js",
-                "apogeeapp/ui/resize/resize.js",
+                "apogeeapp/ui/onload/onLoadDetector.js",
                 "apogeeapp/ui/displayandheader/DisplayAndHeader.js",
                 "apogeeapp/ui/splitpane/SplitPane.js",
                 "apogeeapp/ui/treecontrol/TreeControl.js",

@@ -34,6 +34,15 @@ apogeeapp.ui.Tab = function(id, tabLabelElement, tabFrame) {
     
     //create the tab element
     this.displayFrame = apogeeapp.ui.createElementWithClass("div","visiui-tf-tab-window");
+    this.tabInsideContainer = new apogeeapp.ui.DisplayAndHeader(apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
+            null,
+            apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
+            null
+        );
+    this.displayFrame.appendChild(this.tabInsideContainer.getOuterElement());
+    
+    this.headerContainer = this.tabInsideContainer.getHeaderContainer();
+    this.bodyContainer = this.tabInsideContainer.getBodyContainer();
     
     this.isShowing = false;
 }
@@ -65,10 +74,17 @@ apogeeapp.ui.Tab.prototype.getTitle = function() {
 apogeeapp.ui.Tab.prototype.setTitle = function(name) {
 }
 
+/** This sets the content for the window */
+apogeeapp.ui.Tab.prototype.setHeaderContent = function(contentElement) {
+    apogeeapp.ui.removeAllChildren(this.headerContainer);
+    this.headerContainer.appendChild(contentElement);
+    this.headerContent = contentElement;
+}
+
 /** This method must be implemented in inheriting objects. */
 apogeeapp.ui.Tab.prototype.setContent = function(contentElement) {
-    apogeeapp.ui.removeAllChildren(this.displayFrame);
-    this.displayFrame.appendChild(contentElement);
+    apogeeapp.ui.removeAllChildren(this.bodyContainer);
+    this.bodyContainer.appendChild(contentElement);
     this.content = contentElement;
 }
 
@@ -82,12 +98,31 @@ apogeeapp.ui.Tab.prototype.createMenu = function(iconUrl) {
     if(!iconUrl) iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.ui.MENU_IMAGE);
     this.menu = apogeeapp.ui.Menu.createMenuFromImage(iconUrl);
     this.menuContainer.appendChild(this.menu.domElement);
+    //add the icon overlay element
+    this.iconOverlayElement = apogeeapp.ui.createElementWithClass("div","visiui_tf_icon_overlay",this.menuContainer);
     return this.menu;
 }
 
 /** This method shows the window. */
 apogeeapp.ui.Tab.prototype.getMenu = function() {
     return this.menu;
+}
+
+/** This sets the given element as the icon overlay. If null or other [false} is passed
+ * this will just clear the icon overlay. */
+apogeeapp.ui.Tab.prototype.setIconOverlay = function(element) {
+    if(this.iconOverlayElement) {
+        this.clearIconOverlay();
+        if(element) {
+            this.iconOverlayElement.appendChild(element);
+        }
+    }
+}
+
+apogeeapp.ui.Tab.prototype.clearIconOverlay = function() {
+    if(this.iconOverlayElement) {
+        apogeeapp.ui.removeAllChildren(this.iconOverlayElement);
+    }
 }
 
 /** This method closes the window. */

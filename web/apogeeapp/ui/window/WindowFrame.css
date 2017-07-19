@@ -9,6 +9,8 @@
 }
 
 /* These elements should not be overridden */ 
+.visiui_win_headerCell {
+}
 .visiui_win_bodyCell {
   background-color: rgb(240,240,240);
   /*display set in javascript*/
@@ -51,6 +53,8 @@
 }
 
 .visiui_win_headerCell {
+}
+.visiui_win_headerRow {
 }
 .visiui_win_bodyRow {
   height: 100%;
@@ -115,11 +119,16 @@
 .visiui_win_menu_style {
     /* fixed */
     display:inline-block;
+    position: relative;
 
     /* configurable */
     margin-right:3px;
 }
-
+.visiui_win_icon_overlay_style {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
 .visiui_win_cmd_button { 
     /* fixed */
     display:inline-block;

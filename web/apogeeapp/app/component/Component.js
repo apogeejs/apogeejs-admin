@@ -137,7 +137,6 @@ apogeeapp.app.Component.prototype.getOpenMenuItem = function() {
     }
 }
 
-
 //Implement in extending class:
 ///** This indicates if the component has a tab display. */
 //apogeeapp.app.Component.prototype.hasTabDisplay = function();

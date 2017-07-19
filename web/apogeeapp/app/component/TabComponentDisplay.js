@@ -27,6 +27,16 @@ apogeeapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerStat
     else {
         this.windowHeaderManager.showBannerBar(bannerMessage,bannerState);
     }
+    
+    if(this.tab) {
+        var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(bannerState);
+        if(iconOverlay) {
+            this.tab.setIconOverlay(iconOverlay);
+        }
+        else {
+            this.tab.clearIconOverlay();
+        }
+    }
 }
 
 apogeeapp.app.TabComponentDisplay.prototype.updateData = function() {
@@ -37,7 +47,7 @@ apogeeapp.app.TabComponentDisplay.prototype.updateData = function() {
 apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childComponent) {
     
     var windowComponentDisplay = childComponent.createWindowDisplay();
-    var childWindow = windowComponentDisplay.getWindowEntry();
+    var childWindow = windowComponentDisplay.getWindowFrame();
 
     childWindow.setParent(this.parentContainer);
     
@@ -59,7 +69,7 @@ apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childCo
 apogeeapp.app.TabComponentDisplay.prototype.showChildComponent = function(childComponent) {
     var windowComponentDisplay = childComponent.getWindowDisplay();
     if(windowComponentDisplay) {
-        var childWindow = windowComponentDisplay.getWindowEntry();
+        var childWindow = windowComponentDisplay.getWindowFrame();
         if(childWindow) {
             this.parentContainer.bringToFront(childWindow);
         }
@@ -77,13 +87,14 @@ apogeeapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     //add headers for display
     //-----------------------
     this.windowHeaderManager = new apogeeapp.app.WindowHeaderManager();
-    this.tab.setContent(this.windowHeaderManager.getOuterElement());
+    this.tab.setHeaderContent(this.windowHeaderManager.getHeaderElement());
+    
 
     //-----------------------
     //set the content
     //-----------------------
     this._createDisplayContent();
-    this.windowHeaderManager.setContent(this.contentElement);
+    this.tab.setContent(this.contentElement);
     
     //------------------
     // set menu
