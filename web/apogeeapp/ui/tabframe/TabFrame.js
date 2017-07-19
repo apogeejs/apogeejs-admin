@@ -32,30 +32,25 @@ apogeeapp.ui.TabFrame.prototype.getElement = function() {
 }
 
 /** This method returns the main dom element for the window frame. */
-apogeeapp.ui.TabFrame.prototype.getTab = function(name) {
-    var tabData = this.tabTable[name];
-    if(tabData) {
-        return tabData.tabDisplay;
-    }
-    else {
-        return null;
-    }
+apogeeapp.ui.TabFrame.prototype.getTab = function(id) {
+    return this.tabTable[id];
 }
 
 /** This method adds a tab to the tab frame. */
-apogeeapp.ui.TabFrame.prototype.addTab = function(id) {
+apogeeapp.ui.TabFrame.prototype.addTab = function(tab,makeActive) {
+    var id = tab.getId();
+    
     //make sure there is no tab with this name
     if(this.tabTable[id]) {
-        alert("There is already a tab with this name!");
+        alert("There is already a tab with this id!");
         return null;
     }
     
-    //create tab label - initialize with the id (should be renamed)
-    var tabLabelElement = apogeeapp.ui.createElementWithClass("div","visiui-tf-tab-base visiui-tf-tab-inactive",this.tabBar);
-    
-    //create the tab object
-    var tab = new apogeeapp.ui.Tab(id, tabLabelElement, this);
+    tab.setTabFrame(this);
     this.tabFrame.appendChild(tab.getOuterElement());
+    
+    var tabLabelElement = tab.getLabelElement();
+    this.tabBar.appendChild(tabLabelElement);
 	
     //add the click handler
     var instance = this;
@@ -68,26 +63,29 @@ apogeeapp.ui.TabFrame.prototype.addTab = function(id) {
     }
 	
     //add to tabs
-    var tabData = {};
-    tabData.tabDisplay = tab;
-    tabData.tabLabel = tabLabelElement;
-    
-    this.tabTable[id] = tabData;
-    if(this.activeTab == null) {
-        this.activeTab = id;
-    }
+    this.tabTable[id] = tab;
     
     this.dispatchEvent(apogeeapp.ui.TabFrame.TAB_ADDED,tab);
-    this.updateTabDisplay();
-    return tab;
+    
+    if((makeActive)||(this.activeTab == null)) {
+        this.setActiveTab(id);
+    }
+    else {
+        this.updateTabDisplay();
+    }
 }
 
 /** This method adds a tab to the tab frame. */
 apogeeapp.ui.TabFrame.prototype.closeTab = function(id) {
-    var tabData = this.tabTable[id];
-    if(tabData) {
-        this.tabFrame.removeChild(tabData.tabDisplay.getOuterElement());
-        this.tabBar.removeChild(tabData.tabLabel);
+    var tab = this.tabTable[id];
+    if(tab) {
+        this.tabFrame.removeChild(tab.getOuterElement());
+        
+        var tabLabelElement = tab.getLabelElement();
+        this.tabBar.removeChild(tabLabelElement);
+        delete tabLabelElement.onclick;
+        delete tabLabelElement.onmousedown;
+        
         delete this.tabTable[id];
 		
         if(this.activeTab == id) {
@@ -99,16 +97,17 @@ apogeeapp.ui.TabFrame.prototype.closeTab = function(id) {
                 break;
             }
         }
+        
         this.updateTabDisplay();
     }
 }
 
 /** This mesets the active tab, by tab title. */
 apogeeapp.ui.TabFrame.prototype.setActiveTab = function(id) {
-    var tabEntry = this.tabTable[id];
-	if(tabEntry) {
+    var tab = this.tabTable[id];
+	if(tab) {
 		this.activeTab = id;
-		this.tabFrame.appendChild(tabEntry.tabDisplay.getOuterElement());
+		this.tabFrame.appendChild(tab.getOuterElement());
 		this.updateTabDisplay();
 		this.dispatchEvent(apogeeapp.ui.TabFrame.TAB_SHOWN,id);
 	}
@@ -121,16 +120,16 @@ apogeeapp.ui.TabFrame.prototype.getActiveTabTitle = function() {
 
 /** This updates the tabs. */
 apogeeapp.ui.TabFrame.prototype.updateTabDisplay = function() {
-    var title;
-    for(title in this.tabTable) {
-        var tabData = this.tabTable[title];
-        if(title == this.activeTab) {
-            tabData.tabDisplay.getOuterElement().style.display = "";
-            tabData.tabLabel.className = "visiui-tf-tab-base visiui-tf-tab-active";
+    var id;
+    for(id in this.tabTable) {
+        var tab = this.tabTable[id];
+        if(id == this.activeTab) {
+            tab.getOuterElement().style.display = "";
+            tab.getLabelElement().className = "visiui-tf-tab-base visiui-tf-tab-active";
         }
         else {
-            tabData.tabDisplay.getOuterElement().style.display = "none";
-            tabData.tabLabel.className = "visiui-tf-tab-base visiui-tf-tab-inactive";
+            tab.getOuterElement().style.display = "none";
+            tab.getLabelElement().className = "visiui-tf-tab-base visiui-tf-tab-inactive";
         }
     }
 }

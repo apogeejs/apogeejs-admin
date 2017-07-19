@@ -92,6 +92,10 @@ apogeeapp.app.Component.prototype.createWindowDisplay = function() {
     return windowDisplay;
 }
 
+apogeeapp.app.Component.prototype.getWindowDisplay = function() {
+    return this.windowDisplay;
+}
+
 apogeeapp.app.Component.prototype.closeWindowDisplay = function() {
     if(this.windowDisplay) {
         //first store the window state
@@ -100,10 +104,6 @@ apogeeapp.app.Component.prototype.closeWindowDisplay = function() {
         //delete the window
         this.windowDisplay.deleteDisplay();
     }
-}
-
-apogeeapp.app.Component.prototype.getWindowDisplay = function() {
-    return this.windowDisplay;
 }
 
 apogeeapp.app.Component.prototype.getMenuItems = function(optionalMenuItemList) {
@@ -145,12 +145,13 @@ apogeeapp.app.Component.prototype.getOpenMenuItem = function() {
 ///** This creates the tab display for the component. */
 //apogeeapp.app.Component.prototype.instantiateTabDisplay = function();
 
-apogeeapp.app.Component.prototype.openTabDisplay = function() {
-    if(!this.tabDisplay) {
+apogeeapp.app.Component.prototype.getOrCreateTabDisplay = function() {
+    if((!this.tabDisplay)&&(this.hasTabDisplay())) {
         this.tabDisplay = this.instantiateTabDisplay();
         this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
+
     }
-    this.workspaceUI.setActiveTab(this.object.getId());
+    return this.tabDisplay;
 }
 
 /** This closes the tab display for the component. */
@@ -318,23 +319,27 @@ apogeeapp.app.Component.prototype.getPropertyValues = function() {
 apogeeapp.app.Component.prototype.createOpenCallback = function() {
     var instance = this;
     var openCallback;
+    var workspaceUI = this.workspaceUI;
     
     if(this.hasTabDisplay()) {
         openCallback = function() {
-            instance.openTabDisplay();
+            var tabDisplay = instance.getOrCreateTabDisplay();
+            var tab = tabDisplay.getTab();
+            workspaceUI.addTab(tab,true);
         }
     }
     else {
         var parent = this.object.getParent();
         if(parent) {
-            var parentComponent = this.workspaceUI.getComponent(parent);
+            
+            var parentComponent = workspaceUI.getComponent(parent);
             if((parentComponent)&&(parentComponent.hasTabDisplay())) {
                 //remove the tree from the parent
                 openCallback = function() {
-                    //open the parent
-                    parentComponent.openTabDisplay();
-                    
-                    //bring thsi child to the front
+                    //open the parent and bring this child to the front
+                    var tabDisplay = parentComponent.getOrCreateTabDisplay();
+                    var tab = tabDisplay.getTab();
+                    workspaceUI.addTab(tab,true);
                     parentComponent.showChildComponent(instance);
                 }
             }

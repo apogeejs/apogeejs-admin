@@ -81,7 +81,13 @@ apogeeapp.app.TabComponentDisplay.prototype.showChildComponent = function(childC
 
 /** @private */
 apogeeapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
-    this.tab = this.component.getWorkspaceUI().requestTab(this.object.getId(),true);
+    //-------------------------
+    //this.tab = this.component.getWorkspaceUI().requestTab(this.object.getId(),true);
+    ///instantiate tab
+    //create the tab object
+    this.tab = new apogeeapp.ui.Tab(this.object.getId());
+    //------------------------------
+    
     
     //-----------------------
     //add headers for display

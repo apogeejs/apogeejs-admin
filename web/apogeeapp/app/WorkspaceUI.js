@@ -180,11 +180,8 @@ apogeeapp.app.WorkspaceUI.prototype.setActiveTab = function(id) {
     this.tabFrame.setActiveTab(id);
 }
 
-apogeeapp.app.WorkspaceUI.prototype.requestTab = function(id,makeActive) {
-    var tab = this.tabFrame.addTab(id);
-    if(makeActive) {
-        this.tabFrame.setActiveTab(id);
-    }
+apogeeapp.app.WorkspaceUI.prototype.addTab = function(tab,makeActive) {
+    this.tabFrame.addTab(tab,makeActive);
     return tab;
 }
 
