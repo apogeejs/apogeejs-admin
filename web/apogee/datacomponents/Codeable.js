@@ -280,6 +280,13 @@ apogee.Codeable.memberFunctionInitialize = function() {
         this.addError(actionError);
         this.initReturnValue = false;
     }
+    finally {
+        //This lets us do something outside the catch block - mainly just to 
+        //let some things throw the (cludgy) pending error.
+        if(this.postInitializeAction) {
+            this.postInitializeAction();
+        }
+    }
     
     this.calcInProgress = false;
     this.functionInitialized = true;

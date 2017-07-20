@@ -16,10 +16,10 @@ apogeeapp.ui.ParentContainer = function(containerElement) {
 apogeeapp.ui.ParentContainer.BASE_ZINDEX = 0;
 
 //constants for window placement
-apogeeapp.ui.ParentContainer.DELTA_CHILD_X = 75;
-apogeeapp.ui.ParentContainer.DELTA_CHILD_Y = 75;
-apogeeapp.ui.ParentContainer.MIN_WRAP_WIDTH = 20; 
-apogeeapp.ui.ParentContainer.MIN_WRAP_HEIGHT = 200;
+apogeeapp.ui.ParentContainer.DELTA_CHILD_X = 25;
+apogeeapp.ui.ParentContainer.DELTA_CHILD_Y = 25;
+apogeeapp.ui.ParentContainer.MAX_WRAP_WIDTH = 400; 
+apogeeapp.ui.ParentContainer.MAX_WRAP_HEIGHT = 400;
 
 //==============================
 // Public Instance Methods
@@ -69,8 +69,8 @@ apogeeapp.ui.ParentContainer.prototype.getNextWindowPosition = function() {
     var x = this.prevNewChildX + apogeeapp.ui.ParentContainer.DELTA_CHILD_X;
     var y = this.prevNewChildY + apogeeapp.ui.ParentContainer.DELTA_CHILD_Y;
     
-    if( ((x > this.containerElement.offsetWidth)&&(x > apogeeapp.ui.ParentContainer.MIN_WRAP_WIDTH)) && 
-        ((y > this.containerElement.offsetHeight)&&(y > apogeeapp.ui.ParentContainer.MIN_WRAP_HEIGHT)) ) {
+    if( ((x > apogeeapp.ui.ParentContainer.MAX_WRAP_WIDTH) || 
+        (y > apogeeapp.ui.ParentContainer.MAX_WRAP_HEIGHT)) ) {
         this.wrapCount++;
         x = apogeeapp.ui.ParentContainer.DELTA_CHILD_X * (this.wrapCount + 1);
         y = apogeeapp.ui.ParentContainer.DELTA_CHILD_Y;
