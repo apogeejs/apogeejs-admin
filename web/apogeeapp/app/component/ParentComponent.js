@@ -27,11 +27,6 @@ apogeeapp.app.ParentComponent.prototype.hasTabDisplay = function() {
     return true;
 }
 
-apogeeapp.app.ParentComponent.prototype.instantiateTabDisplay = function() {
-    this.tabDisplay = new apogeeapp.app.TabComponentDisplay(this);   
-    return this.tabDisplay;
-}
-
 /** This brings the child component to the front and takes any other actions
  * to show the child in the open parent. */
 apogeeapp.app.ParentComponent.prototype.showChildComponent = function(childComponent) {

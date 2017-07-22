@@ -17,6 +17,13 @@ apogeeapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,comp
 apogeeapp.app.FolderFunctionComponent.prototype = Object.create(apogeeapp.app.ParentComponent.prototype);
 apogeeapp.app.FolderFunctionComponent.prototype.constructor = apogeeapp.app.FolderFunctionComponent;
 
+apogeeapp.app.FolderFunctionComponent.prototype.instantiateTabDisplay = function() {
+    var member = this.getObject();
+    var folder = member.getInternalFolder();
+    this.tabDisplay = new apogeeapp.app.TabComponentDisplay(this,member,folder);   
+    return this.tabDisplay;
+}
+
 //======================================
 // Callbacks
 // These are defined as static but are called in the objects context

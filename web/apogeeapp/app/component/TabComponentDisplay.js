@@ -1,7 +1,8 @@
 /** This component represents a json table object. */
-apogeeapp.app.TabComponentDisplay = function(component) {
+apogeeapp.app.TabComponentDisplay = function(component,member,folder) {
     this.component = component;
-    this.object = component.getObject();
+    this.member = member;
+    this.folder = folder;
     
     this._loadTabEntry();
     
@@ -40,7 +41,7 @@ apogeeapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerStat
 }
 
 apogeeapp.app.TabComponentDisplay.prototype.updateData = function() {
-    this.tab.setName(this.object.getName());
+    this.tab.setName(this.member.getName());
 }
 
 /** This creates and adds a display for the child component to the parent container. */
@@ -81,13 +82,7 @@ apogeeapp.app.TabComponentDisplay.prototype.showChildComponent = function(childC
 
 /** @private */
 apogeeapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
-    //-------------------------
-    //this.tab = this.component.getWorkspaceUI().requestTab(this.object.getId(),true);
-    ///instantiate tab
-    //create the tab object
-    this.tab = new apogeeapp.ui.Tab(this.object.getId());
-    //------------------------------
-    
+    this.tab = new apogeeapp.ui.Tab(this.member.getId());    
     
     //-----------------------
     //add headers for display
@@ -115,7 +110,7 @@ apogeeapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     //-----------------
     //set the tab title
     //-----------------
-    this.tab.setName(this.object.getName());
+    this.tab.setName(this.member.getName());
     
     //-----------------------------
     //add the handlers for the tab
@@ -145,14 +140,14 @@ apogeeapp.app.TabComponentDisplay.prototype._createDisplayContent = function() {
 
     //we ony use this context menu and child map for parents
     //modify if we use this elsewhere
-    if(!this.object.isParent) return;
+    if(!this.folder.isParent) return;
     
     //add content menu
     this.setAddChildrenContextMenu();
 
     //show all children
     var workspaceUI = this.component.getWorkspaceUI();
-    var children = this.object.getChildMap();
+    var children = this.folder.getChildMap();
     for(var childName in children) {
         var child = children[childName];
         var childComponent = workspaceUI.getComponent(child);
@@ -168,7 +163,7 @@ apogeeapp.app.TabComponentDisplay.prototype.setAddChildrenContextMenu = function
     var app = workspaceUI.getApp();
 
     var initialValues = {};
-    initialValues.parentName = this.object.getFullName();
+    initialValues.parentName = this.member.getFullName();
     
     this.contentElement.oncontextmenu = function(event) {
         event.preventDefault();
@@ -197,7 +192,7 @@ apogeeapp.app.TabComponentDisplay.prototype.setAddChildrenContextMenu = function
 
 /** @protected */
 apogeeapp.app.TabComponentDisplay.prototype.destroy = function() {
-    var children = this.object.getChildMap();
+    var children = this.folder.getChildMap();
     var workspaceUI = this.component.getWorkspaceUI();
     
     //TODO THIS LOGIC IS NOT GOOD! FIX IT!

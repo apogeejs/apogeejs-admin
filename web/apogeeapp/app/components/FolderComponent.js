@@ -12,6 +12,12 @@ apogeeapp.app.FolderComponent = function(workspaceUI,folder,componentJson) {
 apogeeapp.app.FolderComponent.prototype = Object.create(apogeeapp.app.ParentComponent.prototype);
 apogeeapp.app.FolderComponent.prototype.constructor = apogeeapp.app.FolderComponent;
 
+apogeeapp.app.FolderComponent.prototype.instantiateTabDisplay = function() {
+    var folder = this.getObject();
+    this.tabDisplay = new apogeeapp.app.TabComponentDisplay(this,folder,folder);   
+    return this.tabDisplay;
+}
+
 
 //======================================
 // Callbacks
