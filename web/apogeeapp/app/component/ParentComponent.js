@@ -86,7 +86,7 @@ apogeeapp.app.ParentComponent.prototype.removeChildComponent = function(childCom
     //remove child windows - just hide them. They will be deleted in the component
     var childWindowDisplay = childComponent.getWindowDisplay();
     if(childWindowDisplay) {
-        childWindowDisplay.getWindowFrame().close();
+        childWindowDisplay.deleteDisplay();
     }
 }
 

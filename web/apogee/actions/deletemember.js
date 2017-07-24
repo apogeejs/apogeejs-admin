@@ -52,7 +52,7 @@ apogee.deletemember.deleteMember = function(actionData,optionalContext,processed
 
 /** @private */
 apogee.deletemember.getDeleteList =  function(member,deleteList) {
-    deleteList.push(member);
+    //delete children first if there are any
     if(member.isParent) {
         var childMap = member.getChildMap();
         for(var key in childMap) {
@@ -64,6 +64,8 @@ apogee.deletemember.getDeleteList =  function(member,deleteList) {
         var root = member.getRoot();
         apogee.deletemember.getDeleteList(root,deleteList);
     }
+    //delete the member
+    deleteList.push(member);
 }
 
 
