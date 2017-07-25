@@ -60,6 +60,18 @@ apogeeapp.ui.Tab.prototype.setTabFrame = function(tabFrame) {
     this.tabFrame.addListener(apogeeapp.ui.TabFrame.TAB_HIDDEN, this.tabHiddenListener);
 }
 
+/** This sets the tab as the active tab. It returns true if it can do this. In the case
+ * it does not have an active frame, it returns false. */
+apogeeapp.ui.Tab.prototype.makeActive = function() {
+    if(this.tabFrame) {
+        this.tabFrame.setActiveTab(this.id);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 /** This method must be implemented in inheriting objects. */
 apogeeapp.ui.Tab.prototype.getContentIsShowing = function() {
     return this.isShowing;

@@ -29,7 +29,7 @@ apogeeapp.app.EditComponent.prototype.setAlternateWindowDisplay = function(windo
 // * @protected */
 //apogeeapp.app.EditComponent.prototype.getTableEditSettings = function();
 
-apogeeapp.app.EditComponent.prototype.hasTabDisplay = function() {    
+apogeeapp.app.EditComponent.prototype.usesTabDisplay = function() {    
     return false;
 }
 

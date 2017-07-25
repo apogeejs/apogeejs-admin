@@ -23,7 +23,7 @@ apogeeapp.app.ParentComponent.prototype.getContentIsShowing = function() {
     return this.getWindow().getContentIsShowing();
 }
     
-apogeeapp.app.ParentComponent.prototype.hasTabDisplay = function() {    
+apogeeapp.app.ParentComponent.prototype.usesTabDisplay = function() {    
     return true;
 }
 

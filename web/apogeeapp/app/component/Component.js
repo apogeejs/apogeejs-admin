@@ -139,18 +139,26 @@ apogeeapp.app.Component.prototype.getOpenMenuItem = function() {
 
 //Implement in extending class:
 ///** This indicates if the component has a tab display. */
-//apogeeapp.app.Component.prototype.hasTabDisplay = function();
+//apogeeapp.app.Component.prototype.usesTabDisplay = function();
 
 //Implement in extending class:
 ///** This creates the tab display for the component. */
 //apogeeapp.app.Component.prototype.instantiateTabDisplay = function();
 
-apogeeapp.app.Component.prototype.getOrCreateTabDisplay = function() {
-    if((!this.tabDisplay)&&(this.hasTabDisplay())) {
+apogeeapp.app.Component.prototype.createTabDisplay = function() {
+    //we shouldn't call if there is a tab!
+    if(this.tabDisplay) {
+        this.tabDisplay.closeTab();
+    }
+    
+    if(this.usesTabDisplay()) {
         this.tabDisplay = this.instantiateTabDisplay();
         this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
-
     }
+    return this.tabDisplay;
+}
+
+apogeeapp.app.Component.prototype.getTabDisplay = function() {
     return this.tabDisplay;
 }
 
@@ -321,11 +329,22 @@ apogeeapp.app.Component.prototype.createOpenCallback = function() {
     var openCallback;
     var workspaceUI = this.workspaceUI;
     
-    if(this.hasTabDisplay()) {
-        openCallback = function() {
-            var tabDisplay = instance.getOrCreateTabDisplay();
+    var makeTabActive = function(tabComponent) {
+        var tabDisplay = tabComponent.getTabDisplay();
+        if(tabDisplay) {
+            var tab = tabDisplay.getTab();
+            tab.makeActive();
+        }
+        else {
+            var tabDisplay = tabComponent.createTabDisplay();
             var tab = tabDisplay.getTab();
             workspaceUI.addTab(tab,true);
+        }
+    }
+    
+    if(this.usesTabDisplay()) {
+        openCallback = function() {
+            makeTabActive(instance);
         }
     }
     else {
@@ -333,13 +352,11 @@ apogeeapp.app.Component.prototype.createOpenCallback = function() {
         if(parent) {
             
             var parentComponent = workspaceUI.getComponent(parent);
-            if((parentComponent)&&(parentComponent.hasTabDisplay())) {
+            if((parentComponent)&&(parentComponent.usesTabDisplay())) {
                 //remove the tree from the parent
                 openCallback = function() {
                     //open the parent and bring this child to the front
-                    var tabDisplay = parentComponent.getOrCreateTabDisplay();
-                    var tab = tabDisplay.getTab();
-                    workspaceUI.addTab(tab,true);
+                    makeTabActive(parentComponent);
                     parentComponent.showChildComponent(instance);
                 }
             }
