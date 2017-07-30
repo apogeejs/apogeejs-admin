@@ -55,11 +55,14 @@
 .visiui_win_headerCell {
 }
 .visiui_win_headerRow {
+    z-index: -1; /* this is for a mouse resize event issue in firefox */
 }
 .visiui_win_bannerRow {
+    z-index: -1; /* this is for a mouse resize event issue in firefox */
 }
 .visiui_win_bodyRow {
   height: 100%;
+  z-index: -1; /* this is for a mouse resize event issue in firefox */
 }
 .visiui_win_topLeft {
   cursor: nw-resize;

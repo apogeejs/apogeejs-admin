@@ -509,6 +509,7 @@ apogeeapp.ui.WindowFrame.prototype.endResize = function() {
 apogeeapp.ui.WindowFrame.prototype.minimizeContent = function() {
     
     //set body as hidden
+    this.headerCell.style.display = "none";
     this.bodyCell.style.display = "none";
     
     var wasMinimized = (this.windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED);
@@ -529,6 +530,7 @@ apogeeapp.ui.WindowFrame.prototype.minimizeContent = function() {
 apogeeapp.ui.WindowFrame.prototype.restoreContent = function() {
     
     //set body as not hidden
+    this.headerCell.style.display = "";
     this.bodyCell.style.display = "";
     
     var wasMinimized = (this.windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED);
@@ -548,6 +550,7 @@ apogeeapp.ui.WindowFrame.prototype.restoreContent = function() {
 apogeeapp.ui.WindowFrame.prototype.maximizeContent = function() {
     
     //set body as not hidden
+    this.headerCell.style.display = "";
     this.bodyCell.style.display = "";
     
     var wasMinimized = (this.windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED);
