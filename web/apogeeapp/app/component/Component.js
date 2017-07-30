@@ -338,7 +338,8 @@ apogeeapp.app.Component.prototype.createOpenCallback = function() {
         else {
             var tabDisplay = tabComponent.createTabDisplay();
             var tab = tabDisplay.getTab();
-            workspaceUI.addTab(tab,true);
+            var tabFrame = workspaceUI.getTabFrame();
+            tabFrame.addTab(tab,true);
         }
     }
     

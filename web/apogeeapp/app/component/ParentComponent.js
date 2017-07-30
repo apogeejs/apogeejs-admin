@@ -15,13 +15,8 @@ apogeeapp.app.ParentComponent.prototype.instantiateWindowDisplay = function() {
 }
 
 //----------------------
-// ParentContainer Methods
+// WindowParent Methods
 //----------------------
-
-/** This method must be implemented in inheriting objects. */
-apogeeapp.app.ParentComponent.prototype.getContentIsShowing = function() {
-    return this.getWindow().getContentIsShowing();
-}
     
 apogeeapp.app.ParentComponent.prototype.usesTabDisplay = function() {    
     return true;

@@ -189,20 +189,21 @@ apogeeapp.app.Apogee.prototype.createUI = function(containerId) {
     
     //add listener for displaying the active tab
     var instance = this;
-    this.tabFrame.addListener(apogeeapp.ui.TabFrame.TAB_SHOWN,function(tabId){instance.onTabShown(tabId);});
-    this.tabFrame.addListener(apogeeapp.ui.TabFrame.TAB_HIDDEN,function(tabId){instance.onTabHidden(tabId);});
+    this.tabFrame.addListener(apogeeapp.ui.SHOWN_EVENT,function(tab){instance.onTabShown(tab);});
+    this.tabFrame.addListener(apogeeapp.ui.HIDDEN_EVENT,function(tab){instance.onTabHidden(tab);});
 
 }
 
 /** This method creates the app ui. 
  * @private */
-apogeeapp.app.Apogee.prototype.onTabHidden = function(tabId) {
+apogeeapp.app.Apogee.prototype.onTabHidden = function(tab) {
     this.activeTabIconDisplay.style.display = "none";
     this.activeTabTitleDisplay.style.display = "none";
 }
 
-apogeeapp.app.Apogee.prototype.onTabShown = function(tabId) {
-    var component = this.workspaceUI.getComponentById(tabId);
+apogeeapp.app.Apogee.prototype.onTabShown = function(tab) {
+    var id = tab.getId();
+    var component = this.workspaceUI.getComponentById(id);
     if(component) {
         this.activeTabIconDisplay.src = component.getIconUrl();
         this.activeTabTitleDisplay.innerHTML = component.getObject().getDisplayName(true);

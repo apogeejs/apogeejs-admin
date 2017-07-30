@@ -133,7 +133,7 @@ apogeeapp.app.dialog.showUpdateLinksDialog = function(workspaceUI) {
     dialog.setContent(content);
     
     //show dialog
-    dialog.show();
+    apogeeapp.ui.showDialog(dialog);
     
     //size the dialog to the content
     dialog.fitToContent();

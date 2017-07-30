@@ -59,7 +59,7 @@ apogeeapp.app.dialog.showSelectComponentDialog = function(componentList,onSelect
     dialog.setContent(content);  
     
     //show dialog
-    dialog.show();
+    apogeeapp.ui.showDialog(dialog);
     
     //size the dialog to the content
     dialog.fitToContent();

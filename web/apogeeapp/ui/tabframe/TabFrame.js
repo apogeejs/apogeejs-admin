@@ -19,11 +19,6 @@ apogeeapp.ui.TabFrame = function() {
 //add components to this class
 apogee.base.mixin(apogeeapp.ui.TabFrame,apogee.EventManager);
 
-//events
-apogeeapp.ui.TabFrame.TAB_ADDED = "tabAdded";
-apogeeapp.ui.TabFrame.TAB_SHOWN = "tabShown";
-apogeeapp.ui.TabFrame.TAB_HIDDEN = "tabHidden";
-
 apogeeapp.ui.TabFrame.CONTAINER_FRAME_MARGIN_PX = 5;
 
 /** This method returns the dom element for the control. */
@@ -47,7 +42,7 @@ apogeeapp.ui.TabFrame.prototype.addTab = function(tab,makeActive) {
     }
     
     tab.setTabFrame(this);
-    this.tabFrame.appendChild(tab.getOuterElement());
+    this.tabFrame.appendChild(tab.getMainElement());
     
     var tabLabelElement = tab.getLabelElement();
     this.tabBar.appendChild(tabLabelElement);
@@ -65,8 +60,6 @@ apogeeapp.ui.TabFrame.prototype.addTab = function(tab,makeActive) {
     //add to tabs
     this.tabTable[id] = tab;
     
-    this.dispatchEvent(apogeeapp.ui.TabFrame.TAB_ADDED,tab);
-    
     if((makeActive)||(this.activeTab == null)) {
         this.setActiveTab(id);
     }
@@ -79,7 +72,7 @@ apogeeapp.ui.TabFrame.prototype.addTab = function(tab,makeActive) {
 apogeeapp.ui.TabFrame.prototype.closeTab = function(id) {
     var tab = this.tabTable[id];
     if(tab) {
-        this.tabFrame.removeChild(tab.getOuterElement());
+        this.tabFrame.removeChild(tab.getMainElement());
         
         var tabLabelElement = tab.getLabelElement();
         this.tabBar.removeChild(tabLabelElement);
@@ -89,7 +82,7 @@ apogeeapp.ui.TabFrame.prototype.closeTab = function(id) {
         delete this.tabTable[id];
 		
         if(this.activeTab == id) {
-            this.dispatchEvent(apogeeapp.ui.TabFrame.TAB_HIDDEN,id);
+            this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,id);
             this.activeTab = null;
             //choose a random tab
             for(var newId in this.tabTable) {
@@ -107,15 +100,10 @@ apogeeapp.ui.TabFrame.prototype.setActiveTab = function(id) {
     var tab = this.tabTable[id];
 	if(tab) {
 		this.activeTab = id;
-		this.tabFrame.appendChild(tab.getOuterElement());
+		this.tabFrame.appendChild(tab.getMainElement());
 		this.updateTabDisplay();
-		this.dispatchEvent(apogeeapp.ui.TabFrame.TAB_SHOWN,id);
+		this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,tab);
 	}
-}
-
-/** This mesets the active tab, by tab title. */
-apogeeapp.ui.TabFrame.prototype.getActiveTabTitle = function() {
-    return this.activeTab;
 }
 
 /** This updates the tabs. */
@@ -124,11 +112,11 @@ apogeeapp.ui.TabFrame.prototype.updateTabDisplay = function() {
     for(id in this.tabTable) {
         var tab = this.tabTable[id];
         if(id == this.activeTab) {
-            tab.getOuterElement().style.display = "";
+            tab.getMainElement().style.display = "";
             tab.getLabelElement().className = "visiui-tf-tab-base visiui-tf-tab-active";
         }
         else {
-            tab.getOuterElement().style.display = "none";
+            tab.getMainElement().style.display = "none";
             tab.getLabelElement().className = "visiui-tf-tab-base visiui-tf-tab-inactive";
         }
     }

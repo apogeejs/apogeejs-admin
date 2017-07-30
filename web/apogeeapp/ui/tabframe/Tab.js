@@ -41,23 +41,23 @@ apogee.base.mixin(apogeeapp.ui.Tab,apogee.EventManager);
 // WINDOW CONTAINER
 //---------------------------
 
-/** This method must be implemented in inheriting objects. */
+/** This is called by the tab frame. */
 apogeeapp.ui.Tab.prototype.setTabFrame = function(tabFrame) {
     this.tabFrame = tabFrame;
     var instance = this;
     //attach to listeners to forward show and hide events
-    this.tabShownListener = function(shownId) {
-        if(shownId == instance.id) {
-            instance.dispatchEvent(apogeeapp.ui.TabFrame.TAB_SHOWN,this);
+    this.tabShownListener = function(tab) {
+        if(tab == instance) {
+            instance.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,instance);
         }
     };
-    this.tabFrame.addListener(apogeeapp.ui.TabFrame.TAB_SHOWN, this.tabShownListener);
-    this.tabHiddenListener = function(hiddenId) {
-        if(hiddenId == instance.id) {
-            instance.dispatchEvent(apogeeapp.ui.TabFrame.TAB_HIDDEN,this);
+    this.tabFrame.addListener(apogeeapp.ui.SHOWN_EVENT, this.tabShownListener);
+    this.tabHiddenListener = function(tab) {
+        if(tab == instance) {
+            instance.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,instance);
         }
     };
-    this.tabFrame.addListener(apogeeapp.ui.TabFrame.TAB_HIDDEN, this.tabHiddenListener);
+    this.tabFrame.addListener(apogeeapp.ui.HIDDEN_EVENT, this.tabHiddenListener);
 }
 
 /** This sets the tab as the active tab. It returns true if it can do this. In the case
@@ -73,19 +73,14 @@ apogeeapp.ui.Tab.prototype.makeActive = function() {
 }
 
 /** This method must be implemented in inheriting objects. */
-apogeeapp.ui.Tab.prototype.getContentIsShowing = function() {
-    return this.isShowing;
-}
-
-/** This method must be implemented in inheriting objects. */
 apogeeapp.ui.Tab.prototype.getId = function() {
     return this.id;
 }
 
 /** This method must be implemented in inheriting objects. */
-apogeeapp.ui.Tab.prototype.setName = function(name) {
-    this.titleElement.innerHTML = name;
-    this.name = name;
+apogeeapp.ui.Tab.prototype.setTitle = function(title) {
+    this.titleElement.innerHTML = title;
+    this.title = title;
 }
 
 /** This sets the content for the window */
@@ -103,8 +98,8 @@ apogeeapp.ui.Tab.prototype.setContent = function(contentElement) {
 }
 
 /** This method must be implemented in inheriting objects. */
-apogeeapp.ui.Tab.prototype.getName = function() {
-    return this.name;
+apogeeapp.ui.Tab.prototype.getTitle = function() {
+    return this.title;
 }
 
 /** This method shows the window. */
@@ -152,8 +147,8 @@ apogeeapp.ui.Tab.prototype.close = function(forceClose) {
         }
     }
     
-    this.tabFrame.removeListener(apogeeapp.ui.TabFrame.TAB_SHOWN, this.tabShownListener);
-    this.tabFrame.removeListener(apogeeapp.ui.TabFrame.TAB_HIDDEN, this.tabHiddenListener);
+    this.tabFrame.removeListener(apogeeapp.ui.SHOWN_EVENT, this.tabShownListener);
+    this.tabFrame.removeListener(apogeeapp.ui.HIDDEN_EVENT, this.tabHiddenListener);
     this.tabFrame.closeTab(this.id);
     this.tabFrame = null;
     
@@ -167,7 +162,7 @@ apogeeapp.ui.Tab.prototype.close = function(forceClose) {
 //---------------------------
 
 /** This method must be implemented in inheriting objects. */
-apogeeapp.ui.Tab.prototype.getOuterElement = function() {
+apogeeapp.ui.Tab.prototype.getMainElement = function() {
     return this.displayFrame;
 }
 

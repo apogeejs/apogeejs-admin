@@ -55,7 +55,7 @@ apogeeapp.app.dialog.showOpenWorkspaceDialog = function(onOpenFunction) {
     content.appendChild(line);
     
     //show dialog
-    dialog.show();
+    apogeeapp.ui.showDialog(dialog);
     
     //size the dialog to the content
     dialog.fitToContent();

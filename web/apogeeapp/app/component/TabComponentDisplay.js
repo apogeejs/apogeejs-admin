@@ -41,7 +41,7 @@ apogeeapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerStat
 }
 
 apogeeapp.app.TabComponentDisplay.prototype.updateData = function() {
-    this.tab.setName(this.member.getName());
+    this.tab.setTitle(this.member.getName());
 }
 
 /** This creates and adds a display for the child component to the parent container. */
@@ -50,7 +50,7 @@ apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childCo
     var windowComponentDisplay = childComponent.createWindowDisplay();
     var childWindow = windowComponentDisplay.getWindowFrame();
 
-    childWindow.setParent(this.parentContainer);
+    
     
     //set position
     var pos = windowComponentDisplay.getPreferredPosition();
@@ -59,7 +59,7 @@ apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childCo
     }
     childWindow.setPosition(pos.x,pos.y);
     
-    childWindow.show();
+    this.parentContainer.addWindow(childWindow);
     
     //set state 
     var state = windowComponentDisplay.getPreferredState();
@@ -97,6 +97,15 @@ apogeeapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     this._createDisplayContent();
     this.tab.setContent(this.contentElement);
     
+    var tabShown = function() {
+        instance.parentContainer.elementIsShown();
+    }
+    this.tab.addListener(apogeeapp.ui.SHOWN_EVENT,tabShown);
+    var tabHidden = function() {
+        instance.parentContainer.elementIsHidden();
+    }
+    this.tab.addListener(apogeeapp.ui.HIDDEN_EVENT,tabHidden);
+    
     //------------------
     // set menu
     //------------------
@@ -110,7 +119,7 @@ apogeeapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     //-----------------
     //set the tab title
     //-----------------
-    this.tab.setName(this.member.getName());
+    this.tab.setTitle(this.member.getName());
     
     //-----------------------------
     //add the handlers for the tab
@@ -136,7 +145,7 @@ apogeeapp.app.TabComponentDisplay.PARENT_CONTAINER_STYLE = {
 apogeeapp.app.TabComponentDisplay.prototype._createDisplayContent = function() {
    
     this.contentElement = apogeeapp.ui.createElement("div",null,apogeeapp.app.TabComponentDisplay.PARENT_CONTAINER_STYLE);
-    this.parentContainer = new apogeeapp.ui.ParentContainer(this.contentElement);
+    this.parentContainer = new apogeeapp.ui.WindowParent(this.contentElement);
 
     //we ony use this context menu and child map for parents
     //modify if we use this elsewhere

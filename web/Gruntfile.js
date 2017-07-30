@@ -48,7 +48,7 @@ module.exports = function(grunt) {
             "src": [
                 "apogeeapp/apogeeapp.js",
                 "apogeeapp/ui/apogeeappui.js",
-                "apogeeapp/ui/window/ParentContainer.js",
+                "apogeeapp/ui/window/WindowParent.js",
                 "apogeeapp/ui/window/WindowFrame.js",      
                 "apogeeapp/ui/tabframe/TabFrame.js",
                 "apogeeapp/ui/tabframe/Tab.js",

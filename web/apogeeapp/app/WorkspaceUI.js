@@ -176,13 +176,8 @@ apogeeapp.app.WorkspaceUI.prototype.close = function() {
     this.setLinks([],[]);
 }
 
-apogeeapp.app.WorkspaceUI.prototype.setActiveTab = function(id) {
-    this.tabFrame.setActiveTab(id);
-}
-
-apogeeapp.app.WorkspaceUI.prototype.addTab = function(tab,makeActive) {
-    this.tabFrame.addTab(tab,makeActive);
-    return tab;
+apogeeapp.app.WorkspaceUI.prototype.getTabFrame = function() {
+    return this.tabFrame;
 }
 
 //====================================

@@ -22,7 +22,7 @@ apogeeapp.ui.WindowFrame = function(options) {
     apogee.EventManager.init.call(this);
 	
     //variables
-    this.parentContainer = null;
+    this.windowParent = null;
     this.parentElement = null;
     this.options = options;
 
@@ -35,8 +35,6 @@ apogeeapp.ui.WindowFrame = function(options) {
     this.sizeInfo = {};
 	this.sizeInfo.width = apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH;
 	this.sizeInfo.height = apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT;
-	
-    this.isShowing = false;
 	
     this.frame = null;
     this.titleCell = null;
@@ -75,7 +73,7 @@ apogeeapp.ui.WindowFrame = function(options) {
     //add the handler to move the active window to the front
     var instance = this;
 	var frontHandler = function(e) {
-        instance.parentContainer.bringToFront(instance);
+        instance.windowParent.bringToFront(instance);
     };
     var element = this.getElement();
 	element.addEventListener("mousedown",frontHandler);
@@ -188,64 +186,30 @@ apogeeapp.ui.WindowFrame.prototype.removeTitleToolElement = function(element) {
 
 /** This method returns the parent container for the window.*/
 apogeeapp.ui.WindowFrame.prototype.getParent = function() {
-    return this.parentContainer;
-}
-
-/** This method shows the window. */
-apogeeapp.ui.WindowFrame.prototype.setParent = function(newParentContainer) {
-    this.parentContainer = newParentContainer;
-    this.parentElement = newParentContainer.getOuterElement();
-    this.show();
-}
-
-/** This method shows the window. */
-apogeeapp.ui.WindowFrame.prototype.show = function() {
-    if(this.isShowing) return;
-    if(!this.parentContainer) return;
-    
-    //add window to the parent
-    this.parentContainer.addWindow(this);
-
-    this.isShowing = true;
-
-    //we will redo this since the size of elements used in calculation may have been wrong
-    if(this.sizeInfo.height !== undefined) {
-        this.updateCoordinates();
-    }
-
+    return this.windowParent;
 }
 
 /** This method closes the window. If the argument forceClose is not
  * set to true the "request_close" handler is called to check if
  * it is ok to close the window. */
 apogeeapp.ui.WindowFrame.prototype.close = function(forceClose) {
-    if(!this.parentContainer) return;
+    if(!this.windowParent) return;
     
-    if(this.isShowing) {
-        if(!forceClose) {
-            //make a close request
-            var requestResponse = this.callHandler(apogeeapp.ui.REQUEST_CLOSE,this);
-            if(requestResponse == apogeeapp.ui.DENY_CLOSE) {
-                //do not close the window
-                return;
-            }
+    if(!forceClose) {
+        //make a close request
+        var requestResponse = this.callHandler(apogeeapp.ui.REQUEST_CLOSE,this);
+        if(requestResponse == apogeeapp.ui.DENY_CLOSE) {
+            //do not close the window
+            return;
         }
-        
-        this.parentContainer.removeWindow(this);
-        this.isShowing = false;
-        
-        this.dispatchEvent(apogeeapp.ui.CLOSE_EVENT,this);
     }
-}
 
-/** This method returns true if the window is showing. */
-apogeeapp.ui.WindowFrame.prototype.getIsShowing = function() {
-    return this.isShowing;
-}
+    this.windowParent.removeListener(apogeeapp.ui.SHOWN_EVENT, this.windowShownListener);
+    this.windowParent.removeListener(apogeeapp.ui.HIDDEN_EVENT, this.windowHiddenListener);
+    this.windowParent.removeWindow(this);
+    this.windowParent = null;
 
-/** This method returns true if the window is showing. */
-apogeeapp.ui.WindowFrame.prototype.getContentIsShowing = function() {
-    return (this.isShowing)&&(this.windowState != apogeeapp.ui.WINDOW_STATE_MINIMIZED);
+    this.dispatchEvent(apogeeapp.ui.CLOSE_EVENT,this);
 }
 
 /** This method sets the position of the window frame in the parent. */
@@ -326,7 +290,7 @@ apogeeapp.ui.WindowFrame.prototype.fitToContent = function() {
 /** This method centers the window in its parent. it should only be called
  *after the window is shown. */
 apogeeapp.ui.WindowFrame.prototype.centerInParent = function() {
-    var coords = this.parentContainer.getCenterOnPagePosition(this);
+    var coords = this.windowParent.getCenterOnPagePosition(this);
     this.setPosition(coords[0],coords[1]);
 }
 
@@ -354,6 +318,32 @@ apogeeapp.ui.WindowFrame.prototype.setWindowState = function(windowState) {
         default:
             alert("Unknown window state: " + windowState);
             break;
+    }
+}
+
+//================================
+// Internal
+//================================
+
+/** This method shows the window. */
+apogeeapp.ui.WindowFrame.prototype.setParent = function(newWindowParent) {
+    this.windowParent = newWindowParent;
+    this.parentElement = newWindowParent.getOuterElement();
+    
+    var instance = this;
+    //attach to listeners to forward show and hide events
+    this.windowShownListener = function(windowParent) {
+        instance.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,instance);
+    };
+    this.windowParent.addListener(apogeeapp.ui.SHOWN_EVENT, this.windowShownListener);
+    this.windowHiddenListener = function(windowParent) {
+        instance.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,instance);
+    };
+    this.windowParent.addListener(apogeeapp.ui.HIDDEN_EVENT, this.windowHiddenListener);
+
+    //we will redo this since the size of elements used in calculation may have been wrong
+    if(this.sizeInfo.height !== undefined) {
+        this.updateCoordinates();
     }
 }
 

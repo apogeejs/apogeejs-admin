@@ -154,13 +154,16 @@ apogeeapp.ui.initWindows = function(appElementId) {
  *normal options for a window frame. (Note - if there are other events with whihc to act with
  *the app they may need to be shileded too.) */
 apogeeapp.ui.createDialog = function(options) {
-    var shieldElement = apogeeapp.ui.createElement("div",null,apogeeapp.ui.DIALOG_SHIELD_STYLE);
-    var dialogParent = new apogeeapp.ui.ParentContainer(shieldElement);
-    apogeeapp.ui.dialogLayer.appendChild(shieldElement);
-    
     var dialog = new apogeeapp.ui.WindowFrame(options);
-    dialog.setParent(dialogParent);
     return dialog;
+}
+
+apogeeapp.ui.showDialog = function(dialog) {
+    var shieldElement = apogeeapp.ui.createElement("div",null,apogeeapp.ui.DIALOG_SHIELD_STYLE);
+    var dialogParent = new apogeeapp.ui.WindowParent(shieldElement);
+    apogeeapp.ui.dialogLayer.appendChild(shieldElement);
+
+    dialogParent.addWindow(dialog);
 }
 
 /** This method closes a dialog created with apogeeapp.ui.createDialog. It
@@ -185,6 +188,8 @@ apogeeapp.ui.DENY_CLOSE = -1;
 
 apogeeapp.ui.CLOSE_EVENT = "closed";
 apogeeapp.ui.RESIZED_EVENT = "resized";
+apogeeapp.ui.SHOWN_EVENT = "shown";
+apogeeapp.ui.HIDDEN_EVENT = "hidden";
 
 /** This function adds CSS data for a given member id. */
 apogeeapp.ui.setMemberCssData = function(objectId,cssText) {

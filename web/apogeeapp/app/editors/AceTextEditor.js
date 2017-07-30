@@ -96,6 +96,7 @@ apogeeapp.app.AceTextEditor.prototype.showData = function(text,editOk) {
         var uiObject = this.viewMode.getUiObject();
         if(uiObject) {
             uiObject.addListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
+            uiObject.addListener(apogeeapp.ui.SHOWN_EVENT,this.resizeCallback);
             this.callbackAttached = true;
         }
     }
@@ -109,6 +110,7 @@ apogeeapp.app.AceTextEditor.prototype.hide = function() {
     var uiObject = this.viewMode.getUiObject();
     if(uiObject) {
         uiObject.removeListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
+        uiObject.removeListener(apogeeapp.ui.SHOWN_EVENT,this.resizeCallback);
         this.callbackAttached = false;
     }
 }
