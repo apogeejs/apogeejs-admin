@@ -1,5 +1,4 @@
-/** This component encapsulates the member functionality for objects in the workspace,
- * allowing them to sit in a organizational hierarchy.
+/** This component encapsulates the member functionality for objects in the workspace.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  *  

@@ -1,5 +1,5 @@
-/** This mixin encapsulates an object in the workspace that depends on another
- * object. The dependent allows for a recalculation based on an update of the 
+/** This mixin encapsulates an member whose value depends on on another
+ * member. The dependent allows for a recalculation based on an update of the 
  * objects it depends on.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
