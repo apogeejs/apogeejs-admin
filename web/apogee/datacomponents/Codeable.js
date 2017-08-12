@@ -1,6 +1,6 @@
 /** This mixin encapsulates an object in that can be coded. It contains a function
- * and supplemental code. Object that are codeable should also be a child,
- * dependent and dataholder.
+ * and supplemental code. Object that are codeable should also be a child and
+ * dependent.
  * 
  * This is a mixin and not a class. It is used in the prototype of the objects that inherit from it.
  * 

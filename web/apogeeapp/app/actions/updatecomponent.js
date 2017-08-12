@@ -19,7 +19,7 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
         //add folder list, only if we can set the parent (if there is a parent)
         var folderMap = null;
         var folderList = null;
-        if(component.getObject().getParent()) {
+        if(component.getMember().getParent()) {
             //get the folder list
              folderMap = workspaceUI.getFolders();
             folderList = [];
@@ -59,7 +59,7 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
             }
             else {
                 //no parent - use the owner
-                newValues.owner = component.getObject().getOwner();
+                newValues.owner = component.getMember().getOwner();
             }
         
             //need to test if fields are valid!
@@ -96,7 +96,7 @@ apogeeapp.app.updatecomponent.updatePropertyValues = function(component,oldValue
 
     var actionResponse = new apogee.ActionResponse();
 
-    var member = component.getObject();
+    var member = component.getMember();
     var workspace = component.getWorkspace();
     var actionList = [];
     var actionData;

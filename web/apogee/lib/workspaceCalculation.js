@@ -3,7 +3,7 @@
 apogee.calculation = {};
 
 
-/** This moethod should be called on an Impactor (DataHolder) or Dependent object that changes.
+/** This moethod should be called on an member (impactor or dependent) that changes.
  * This will allow for any Dependents to be recaculated.
  * @private */
 apogee.calculation.addToRecalculateList = function(recalculateList,member) {
@@ -15,10 +15,8 @@ apogee.calculation.addToRecalculateList = function(recalculateList,member) {
         recalculateList.push(member);
         member.prepareForCalculate();
     }
-    
-    if(member.isDataHolder) {
-        apogee.calculation.addDependsOnToRecalculateList(recalculateList,member);
-    }
+        
+    apogee.calculation.addDependsOnToRecalculateList(recalculateList,member);
 }
 
 apogee.calculation.addDependsOnToRecalculateList = function(recalculateList,member) {

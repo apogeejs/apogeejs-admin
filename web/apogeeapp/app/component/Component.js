@@ -1,5 +1,5 @@
 /** This is the base functionality for a component. */
-apogeeapp.app.Component = function(workspaceUI,object,generator,options) {
+apogeeapp.app.Component = function(workspaceUI,member,generator,options) {
     
     if(!options) {
         options = {};
@@ -7,11 +7,11 @@ apogeeapp.app.Component = function(workspaceUI,object,generator,options) {
     this.options = options;
     
     this.workspaceUI = workspaceUI;
-    this.object = object;
+    this.member = member;
     this.uiActiveParent = null;
     this.generator = generator;
    
-    this.workspaceUI.registerMember(this.object,this);
+    this.workspaceUI.registerMember(this.member,this);
 
     this.windowDisplay = null;
     this.windowDisplayStateJson = this.options.windowState;
@@ -51,8 +51,8 @@ apogeeapp.app.Component.MENU_ITEM_OPEN = 0x01;
 //==============================
 
 /** This method returns the base member for this component. */
-apogeeapp.app.Component.prototype.getObject = function() {
-    return this.object;
+apogeeapp.app.Component.prototype.getMember = function() {
+    return this.member;
 }
 
 /** This method returns the icon url for the component. */
@@ -69,7 +69,7 @@ apogeeapp.app.Component.prototype.getIconUrl = function() {
 
 /** This method returns the workspace for this component. */
 apogeeapp.app.Component.prototype.getWorkspace = function() {
-    return this.object.getWorkspace();
+    return this.member.getWorkspace();
 }
 
 /** This method returns the workspaceUI for this component. */
@@ -231,9 +231,9 @@ apogeeapp.app.Component.prototype.onDelete = function() {
  * @protected */    
 apogeeapp.app.Component.prototype.memberUpdated = function() {
     //check for change of parent
-    if(this.object.getParent() !== this.uiActiveParent) {
+    if(this.member.getParent() !== this.uiActiveParent) {
         var oldParent = this.uiActiveParent;
-        var newParent = this.object.getParent();
+        var newParent = this.member.getParent();
        
         this.uiActiveParent = newParent;
         
@@ -256,10 +256,10 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
     }
     
     //get the banner info
-    var object = this.getObject();
-    if(object.hasError()) {
+    var member = this.getMember();
+    if(member.hasError()) {
         var errorMsg = "";
-        var actionErrors = object.getErrors();
+        var actionErrors = member.getErrors();
         for(var i = 0; i < actionErrors.length; i++) {
             errorMsg += actionErrors[i].msg + "\n";
         }
@@ -267,7 +267,7 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
         this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR;
         this.bannerMessage = errorMsg;
     }
-    else if(object.getResultPending()) {
+    else if(member.getResultPending()) {
         this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING;
         this.bannerMessage = apogeeapp.app.WindowHeaderManager.PENDING_MESSAGE;
         
@@ -295,7 +295,7 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
  * be extended to give the values of those properties too. */
 apogeeapp.app.Component.prototype.getPropertyValues = function() {
     
-    var member = this.object;
+    var member = this.member;
 //    var generator = member.generator;
     
     var values = {};
@@ -349,7 +349,7 @@ apogeeapp.app.Component.prototype.createOpenCallback = function() {
         }
     }
     else {
-        var parent = this.object.getParent();
+        var parent = this.member.getParent();
         if(parent) {
             
             var parentComponent = workspaceUI.getComponent(parent);
@@ -370,7 +370,7 @@ apogeeapp.app.Component.prototype.createOpenCallback = function() {
 /** This method creates a callback for deleting the component. 
  *  @private */
 apogeeapp.app.Component.prototype.createDeleteCallback = function() {
-    var object = this.getObject();
+    var member = this.getMember();
     return function() {
         var doDelete = confirm("Are you sure you want to delete this object?");
         if(!doDelete) {
@@ -380,7 +380,7 @@ apogeeapp.app.Component.prototype.createDeleteCallback = function() {
         //delete the object - the component we be deleted after the delete event received
         var json = {};
         json.action = "deleteMember";
-        json.member = object;
+        json.member = member;
         var actionResponse = apogee.action.doAction(json);
 
         if(!actionResponse.getSuccess()) {

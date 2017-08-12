@@ -246,7 +246,7 @@ apogeeapp.app.CustomControlComponent.prototype.update = function(uiCodeFields) {
     
     if(newCss !== this.currentCss) {
         if(!((newCss == "")&&(this.currentCss == ""))) {
-            apogeeapp.ui.setMemberCssData(this.getObject().getId(),newCss);
+            apogeeapp.ui.setMemberCssData(this.getMember().getId(),newCss);
             this.currentCss = newCss;
         }
     }

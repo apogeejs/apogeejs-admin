@@ -121,23 +121,18 @@ apogee.Dependent.updateDependencies = function(newDependsOn) {
     var i;
     for(i = 0; i < newDependsOn.length; i++) {
         remoteMember = newDependsOn[i];
-		
-		if(!remoteMember.isDataHolder) {
-            //PLACE A WARNING HERE!!!
-        }
-		else {	
 			
-			this.dependsOnList.push(remoteMember);
-			
-			//update this member
-			var isNewAddition = remoteMember.addToImpactsList(this);
-            if(isNewAddition) {
-                dependenciesUpdated = true;
-            }
+        this.dependsOnList.push(remoteMember);
 
-			//create a set of new member to use below
-			newDependencySet[remoteMember.getId()] = true;
-		}
+        //update this member
+        var isNewAddition = remoteMember.addToImpactsList(this);
+        if(isNewAddition) {
+            dependenciesUpdated = true;
+        }
+
+        //create a set of new member to use below
+        newDependencySet[remoteMember.getId()] = true;
+		
     }
 	
     //update for links that have gotten deleted

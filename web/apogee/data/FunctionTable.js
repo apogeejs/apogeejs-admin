@@ -2,7 +2,6 @@
 apogee.FunctionTable = function(name,owner,initialData) {
     //base init
     apogee.Child.init.call(this,name,apogee.FunctionTable.generator);
-    apogee.DataHolder.init.call(this);
     apogee.Dependent.init.call(this);
     apogee.ContextHolder.init.call(this);
 	apogee.Codeable.init.call(this,argList,false);
@@ -21,7 +20,6 @@ apogee.FunctionTable = function(name,owner,initialData) {
 
 //add components to this class
 apogee.base.mixin(apogee.FunctionTable,apogee.Child);
-apogee.base.mixin(apogee.FunctionTable,apogee.DataHolder);
 apogee.base.mixin(apogee.FunctionTable,apogee.Dependent);
 apogee.base.mixin(apogee.FunctionTable,apogee.ContextHolder);
 apogee.base.mixin(apogee.FunctionTable,apogee.Codeable);

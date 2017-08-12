@@ -2,7 +2,6 @@
 apogee.JsonTable = function(name,owner,initialData) {
     //base init
     apogee.Child.init.call(this,name,apogee.JsonTable.generator);
-    apogee.DataHolder.init.call(this);
     apogee.Dependent.init.call(this);
     apogee.ContextHolder.init.call(this);
 	apogee.Codeable.init.call(this,[],true);
@@ -35,26 +34,9 @@ apogee.JsonTable = function(name,owner,initialData) {
 
 //add components to this class
 apogee.base.mixin(apogee.JsonTable,apogee.Child);
-apogee.base.mixin(apogee.JsonTable,apogee.DataHolder);
 apogee.base.mixin(apogee.JsonTable,apogee.Dependent);
 apogee.base.mixin(apogee.JsonTable,apogee.ContextHolder);
 apogee.base.mixin(apogee.JsonTable,apogee.Codeable);
-
-//------------------------------
-// DataHolder Methods
-//------------------------------
-
-/** This method extends set data from DataHOlder. It also
- * freezes the object so it is immutable. (in the future we may
- * consider copying instead, or allowing a choice)*/
-apogee.JsonTable.prototype.setData = function(data) {
-    
-	//make this object immutable
-	apogee.base.deepFreeze(data);
-
-	//store the new object
-    return apogee.DataHolder.setData.call(this,data);
-}
 
 //------------------------------
 // Codeable Methods
@@ -112,6 +94,18 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberFunction) {
 //------------------------------
 // Child Methods
 //------------------------------
+
+/** This method extends set data from child. It also
+ * freezes the object so it is immutable. (in the future we may
+ * consider copying instead, or allowing a choice)*/
+apogee.JsonTable.prototype.setData = function(data) {
+    
+	//make this object immutable
+	apogee.base.deepFreeze(data);
+
+	//store the new object
+    return apogee.Child.setData.call(this,data);
+}
 
 /** This method creates a child from a json. It should be implemented as a static
  * method in a non-abstract class. */ 

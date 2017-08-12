@@ -1,7 +1,7 @@
 /** This component represents a json table object. */
 apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
     this.component = component;
-    this.object = component.getObject();
+    this.member = component.getMember();
     
     this.options = options;
     
@@ -55,7 +55,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.getComponent = function() {
 }
 
 apogeeapp.app.EditWindowComponentDisplay.prototype.getMember = function() {
-    return this.object;
+    return this.member;
 }
 
 apogeeapp.app.EditWindowComponentDisplay.prototype.deleteDisplay = function() {
@@ -95,7 +95,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setBannerState = function(ban
 apogeeapp.app.EditWindowComponentDisplay.prototype.updateData = function() {
     if(this.windowFrame) {
         //update the title
-        this.windowFrame.setTitle(this.object.getDisplayName());
+        this.windowFrame.setTitle(this.member.getDisplayName());
         
         //update the content
         this.viewModeElement.memberUpdated();
@@ -174,7 +174,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.loadWindowFrameEntry = functi
     this.windowFrame.setHeaderContent(this.windowHeaderManager.getHeaderElement());
     
     //set title
-    this.windowFrame.setTitle(this.object.getDisplayName());
+    this.windowFrame.setTitle(this.member.getDisplayName());
     
     // set menu
     var menu = this.windowFrame.createMenu(this.component.getIconUrl());

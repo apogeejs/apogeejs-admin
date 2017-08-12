@@ -59,8 +59,8 @@ apogeeapp.webapp.WorkspaceUI.prototype.getWorkspace = function() {
 }
 
 /** This method gets the component associated with a member object. */
-apogeeapp.webapp.WorkspaceUI.prototype.getComponent = function(object) {
-	var componentInfo = this.componentMap[object.getId()];
+apogeeapp.webapp.WorkspaceUI.prototype.getComponent = function(member) {
+	var componentInfo = this.componentMap[member.getId()];
 	if(componentInfo) {
 		return componentInfo.component;
 	}
@@ -70,8 +70,8 @@ apogeeapp.webapp.WorkspaceUI.prototype.getComponent = function(object) {
 }
 
 /** This method gets the component associated with a member object. */
-apogeeapp.webapp.WorkspaceUI.prototype.getComponentById = function(objectId) {
-	var componentInfo = this.componentMap[objectId];
+apogeeapp.webapp.WorkspaceUI.prototype.getComponentById = function(memberId) {
+	var componentInfo = this.componentMap[memberId];
 	if(componentInfo) {
 		return componentInfo.component;
 	}
@@ -100,7 +100,7 @@ apogeeapp.webapp.WorkspaceUI.prototype.registerMember = function(member,componen
 	}
 	
     var componentInfo = {};
-    componentInfo.object = member;
+    componentInfo.member = member;
 	componentInfo.component = component;
     if(mainComponentMember) componentInfo.componentMember = mainComponentMember;
 	
@@ -121,10 +121,10 @@ apogeeapp.webapp.WorkspaceUI.prototype.memberUpdated = function(memberObject) {
 }
 
 /** This method responds to a "new" menu event. */
-apogeeapp.webapp.WorkspaceUI.prototype.childDeleted = function(memberObject) {
+apogeeapp.webapp.WorkspaceUI.prototype.childDeleted = function(member) {
 	
 	//store the ui object
-	var memberId = memberObject.getId();
+	var memberId = member.getId();
 	
 	var componentInfo = this.componentMap[memberId];
 	delete this.componentMap[memberId];

@@ -2,7 +2,6 @@
 apogee.Folder = function(name,owner) {
     //base init
     apogee.Child.init.call(this,name,apogee.Folder.generator);
-    apogee.DataHolder.init.call(this);
     apogee.Dependent.init.call(this);
     apogee.ContextHolder.init.call(this);
     apogee.Owner.init.call(this);
@@ -21,7 +20,6 @@ apogee.Folder = function(name,owner) {
 
 //add components to this class
 apogee.base.mixin(apogee.Folder,apogee.Child);
-apogee.base.mixin(apogee.Folder,apogee.DataHolder);
 apogee.base.mixin(apogee.Folder,apogee.Dependent);                      
 apogee.base.mixin(apogee.Folder,apogee.ContextHolder);
 apogee.base.mixin(apogee.Folder,apogee.Owner);
@@ -54,12 +52,11 @@ apogee.Folder.prototype.addChild = function(child) {
     }
     //add object
     this.childMap[name] = child;
-    if(child.isDataHolder) {
-		var data = child.getData();
-		//object may first appear with no data
-		if(data !== undefined) {
-			this.spliceDataMap(name,data);
-		}
+    
+    var data = child.getData();
+    //object may first appear with no data
+    if(data !== undefined) {
+        this.spliceDataMap(name,data);
     }
     
     //set all children as dependents
@@ -75,9 +72,7 @@ apogee.Folder.prototype.removeChild = function(child) {
     //remove from folder
     var name = child.getName();
     delete(this.childMap[name]);
-	if(child.isDataHolder) {
-		this.spliceDataMap(name);
-	}
+    this.spliceDataMap(name);
     
     //set all children as dependents
     this.calculateDependents();
@@ -85,7 +80,6 @@ apogee.Folder.prototype.removeChild = function(child) {
 
 /** This method updates the table data object in the folder data map. */
 apogee.Folder.prototype.updateData = function(child) {
-	if(!child.isDataHolder) return;
 	
     var name = child.getName();
     var data = child.getData();
@@ -170,10 +164,8 @@ apogee.Folder.prototype.onClose = function () {
 apogee.Folder.prototype.calculateDependents = function() {
     var newDependsOn = [];
     for(var name in this.childMap) {
-        var object = this.childMap[name];
-        if(object.isDataHolder) {
-            newDependsOn.push(object);
-        }
+        var child = this.childMap[name];
+        newDependsOn.push(child);
     }
     this.updateDependencies(newDependsOn);
 }

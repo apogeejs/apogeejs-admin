@@ -15,6 +15,10 @@ apogee.Child = {};
 apogee.Child.init = function(name,generator) {
     this.id = apogee.Child._createId();
     this.name = name;
+    
+    this.data = null;
+    this.impactsList = [];
+    
     this.generator = generator;
     this.errors = []; 
     this.resultPending = false;
@@ -210,6 +214,32 @@ apogee.Child.toJson = function() {
 //apogee.Child.fromJson = function(owner,json,childrenJsonOutputList) {
 //}
 
+//-----------------------------------
+// Data methods
+//-----------------------------------
+
+/** this method gets the data map. */
+apogee.Child.getData = function() {
+    return this.data;
+}
+
+/** This returns an array of members this member impacts. */
+apogee.Child.getImpactsList = function() {
+    return this.impactsList;
+}
+
+/** This method sets the data for this object. This is the object used by the 
+ * code which is identified by this name, for example the JSON object associated
+ * with a JSON table. Besides hold the data object, this updates the parent data map. */
+apogee.Child.setData = function(data) {
+    this.data = data;
+  
+    var parent = this.getParent();
+    if(parent) {
+        parent.updateData(this);
+    }
+}
+
 //========================================
 // "Protected" Methods
 //========================================
@@ -250,6 +280,40 @@ apogee.Child.onDeleteChild = function() {
 //* @protected */
 //apogee.Child.getUpdateData = function() {
 //}
+
+
+//===================================
+// Private Functions
+//===================================
+
+/** This method adds a data member to the imapacts list for this node.
+ * The return value is true if the member was added and false if it was already there. 
+ * @private */
+apogee.Child.addToImpactsList = function(member) {
+    //exclude this member
+    if(member === this) return;
+    
+    //add to the list iff it is not already there
+    if(this.impactsList.indexOf(member) === -1) {
+        this.impactsList.push(member);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+/** This method removes a data member from the imapacts list for this node. 
+ * @private */
+apogee.Child.removeFromImpactsList = function(member) {
+    //it should appear only once
+    for(var i = 0; i < this.impactsList.length; i++) {
+        if(this.impactsList[i] == member) {
+            this.impactsList.splice(i,1);
+            return;
+        }
+    }
+}
 
 /** This is used for Id generation.
  * @private */

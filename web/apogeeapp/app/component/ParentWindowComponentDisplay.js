@@ -1,7 +1,7 @@
 /** This component represents a json table object. */
 apogeeapp.app.ParentWindowComponentDisplay = function(component, options) {
     this.component = component;
-    this.object = component.getObject();
+    this.member = component.getMember();
     
     this.options = options;
    
@@ -63,7 +63,7 @@ apogeeapp.app.ParentWindowComponentDisplay.prototype.setBannerState = function(b
 apogeeapp.app.ParentWindowComponentDisplay.prototype.updateData = function() {
     if(this.windowFrame) {
         //update the title
-        this.windowFrame.setTitle(this.object.getDisplayName());
+        this.windowFrame.setTitle(this.member.getDisplayName());
     }
 }
 
@@ -102,7 +102,7 @@ apogeeapp.app.ParentWindowComponentDisplay.prototype.loadWindowFrameEntry = func
     this.windowFrame.setContent(dummyDiv);
     
     //set title
-    this.windowFrame.setTitle(this.object.getDisplayName());
+    this.windowFrame.setTitle(this.member.getDisplayName());
     
     // set menu
     var menu = this.windowFrame.createMenu(this.component.getIconUrl());

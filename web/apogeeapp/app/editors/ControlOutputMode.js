@@ -3,7 +3,7 @@ apogeeapp.app.ControlOutputMode = function(componentDisplay,doKeepAlive) {
 	apogeeapp.app.ViewMode.call(this,componentDisplay,doKeepAlive);   
         
     this.component = componentDisplay.getComponent();
-    this.member = this.component.getObject();
+    this.member = this.component.getMember();
     
     //no editor - override methods below as needed
 }

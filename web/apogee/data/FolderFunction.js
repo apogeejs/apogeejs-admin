@@ -3,7 +3,6 @@
 apogee.FolderFunction = function(name,owner,initialData,createEmptyInternalFolder) {
     //base init
     apogee.Child.init.call(this,name,apogee.FolderFunction.generator);
-    apogee.DataHolder.init.call(this);
     apogee.Dependent.init.call(this);
     apogee.ContextHolder.init.call(this);
     apogee.Owner.init.call(this);
@@ -26,7 +25,6 @@ apogee.FolderFunction = function(name,owner,initialData,createEmptyInternalFolde
 
 //add components to this class
 apogee.base.mixin(apogee.FolderFunction,apogee.Child);
-apogee.base.mixin(apogee.FolderFunction,apogee.DataHolder);
 apogee.base.mixin(apogee.FolderFunction,apogee.Dependent);
 apogee.base.mixin(apogee.FolderFunction,apogee.ContextHolder);
 apogee.base.mixin(apogee.FolderFunction,apogee.Owner);

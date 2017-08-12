@@ -356,7 +356,7 @@ apogee.action.checkUpdateAllDep = function(processedActions) {
         var actionData = processedActions[i];
         var member = actionData.member;
         //check update only needed for data holders (no impact for non-data holder
-        if((member)&&(member.isDataHolder)) {
+        if(member) {
             if((actionData.actionInfo)&&(actionData.actionInfo.checkUpdateAll)){
                 return true;
             }

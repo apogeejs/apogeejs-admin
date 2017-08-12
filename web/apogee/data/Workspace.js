@@ -173,9 +173,7 @@ apogee.Workspace.flattenParentIntoContextManager = function(contextManager,virtu
 
 apogee.Workspace.convertToDataContextEntry = function(contextEntry) {
     var contextDataEntry = {};
-    if(contextEntry.parent.isDataHolder) {
-        contextDataEntry.data = contextEntry.parent.getData();
-    }
+    contextDataEntry.data = contextEntry.parent.getData();
     return contextDataEntry;
 }
     

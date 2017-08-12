@@ -195,9 +195,9 @@ apogee.updatemember.applyCode = function(codeable,argList,functionBody,supplemen
 }
 
 /** This method sets the data for a member. */
-apogee.updatemember.applyData = function(dataHolder,data) {
-    dataHolder.clearErrors();
-    dataHolder.setData(data);
+apogee.updatemember.applyData = function(child,data) {
+    child.clearErrors();
+    child.setData(data);
 }
 
 /** Update code action function. */

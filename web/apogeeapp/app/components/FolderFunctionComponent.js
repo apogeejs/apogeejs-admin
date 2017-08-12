@@ -18,7 +18,7 @@ apogeeapp.app.FolderFunctionComponent.prototype = Object.create(apogeeapp.app.Pa
 apogeeapp.app.FolderFunctionComponent.prototype.constructor = apogeeapp.app.FolderFunctionComponent;
 
 apogeeapp.app.FolderFunctionComponent.prototype.instantiateTabDisplay = function() {
-    var member = this.getObject();
+    var member = this.getMember();
     var folder = member.getInternalFolder();
     this.tabDisplay = new apogeeapp.app.TabComponentDisplay(this,member,folder);   
     return this.tabDisplay;
@@ -31,7 +31,7 @@ apogeeapp.app.FolderFunctionComponent.prototype.instantiateTabDisplay = function
 
 /** This serializes the folderFunction component. */
 apogeeapp.app.FolderFunctionComponent.writeToJson = function(json) {
-    var folderFunction = this.getObject();
+    var folderFunction = this.getMember();
     var internalFolder = folderFunction.getInternalFolder();
     var workspaceUI = this.getWorkspaceUI();
     json.children = workspaceUI.getFolderComponentContentJson(internalFolder);

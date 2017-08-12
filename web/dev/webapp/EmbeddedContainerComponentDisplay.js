@@ -1,7 +1,7 @@
 /** This component represents a json table object. */
 apogeeapp.webapp.EmbeddedContainerComponentDisplay = function(component, viewType, parentElement) {
     this.component = component;
-    this.object = component.getObject();
+    this.member = component.getMember();
     this.viewType = viewType;
     this.parentElement = parentElement;
     
@@ -32,7 +32,7 @@ apogeeapp.webapp.EmbeddedContainerComponentDisplay.prototype.getComponent = func
 }
 
 apogeeapp.webapp.EmbeddedContainerComponentDisplay.prototype.getMember = function() {
-    return this.object;
+    return this.member;
 }
 
 apogeeapp.webapp.EmbeddedContainerComponentDisplay.prototype.getViewMode = function() {
