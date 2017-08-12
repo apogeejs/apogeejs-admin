@@ -122,9 +122,9 @@ apogeeapp.app.HandsonGridEditor.prototype.showData = function(json,editOk) {
     }
     
     if(!this.callbackAttached) {
-        var uiObject = this.viewMode.getUiObject();
-        if(uiObject) {
-            uiObject.addListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
+        var displayWindow = this.viewMode.getDisplayWindow();
+        if(displayWindow) {
+            displayWindow.addListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
             this.callbackAttached = true;
         }
         
@@ -140,9 +140,9 @@ apogeeapp.app.HandsonGridEditor.prototype.onLoad = function(viewMode) {
 }
 
 apogeeapp.app.HandsonGridEditor.prototype.hide = function() {
-    var uiObject = this.viewMode.getUiObject();
-    if(uiObject) {
-        uiObject.removeListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
+    var displayWindow = this.viewMode.getDisplayWindow();
+    if(displayWindow) {
+        displayWindow.removeListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
         this.callbackAttached = false;
     }
     this.loaded = false;

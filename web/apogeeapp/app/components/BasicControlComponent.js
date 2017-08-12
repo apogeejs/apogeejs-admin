@@ -6,7 +6,7 @@ apogeeapp.app.BasicControlComponent = function(workspaceUI,control,generator,com
     apogeeapp.app.EditComponent.call(this,workspaceUI,control,generator,componentJson);
     
     //default to keep alive
-    this.doKeepAlive = true;
+    this.displayDestroyFlags = true;
 
     this.memberUpdated();
 };
@@ -29,11 +29,11 @@ apogeeapp.app.BasicControlComponent.prototype.constructor = apogeeapp.app.BasicC
 /** Set this value to true if the resource should not be destroyed each time
  * the display is hidden.
  */
-apogeeapp.app.BasicControlComponent.prototype.setDoKeepAlive = function(doKeepAlive) {
-    this.doKeepAlive = doKeepAlive;
+apogeeapp.app.BasicControlComponent.prototype.setDisplayDestroyFlags = function(displayDestroyFlags) {
+    this.displayDestroyFlags = displayDestroyFlags;
     
     if(this.outputMode) {
-        this.outputMode.setDoKeepAlive(doKeepAlive);
+        this.outputMode.setDisplayDestroyFlags(displayDestroyFlags);
     }
 }
 
@@ -69,7 +69,7 @@ apogeeapp.app.BasicControlComponent.prototype.getViewModeElement = function(edit
 		
 		case apogeeapp.app.BasicControlComponent.VIEW_OUTPUT:
 			if(!this.outputMode) {
-				this.outputMode = new apogeeapp.app.ControlOutputMode(editComponentDisplay,this.doKeepAlive);
+				this.outputMode = new apogeeapp.app.ControlOutputMode(editComponentDisplay,this.displayDestroyFlags);
 			}
 			return this.outputMode;
 			

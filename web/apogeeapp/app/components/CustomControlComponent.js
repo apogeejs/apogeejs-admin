@@ -11,11 +11,12 @@ apogeeapp.app.CustomControlComponent = function(workspaceUI,control,componentJso
     this.loadResourceFromJson(componentJson);
     
     //create a resource based on the json (or lack of a json)
-    if((componentJson)&&(componentJson.doKeepAlive)) {
-        this.doKeepAlive = true;
+    if((componentJson)&&(componentJson.destroyOnInactive !== undefined)) {
+        this.destroyOnInactive = componentJson.destroyOnInactive;
     }
     else {
-        this.doKeepAlive = false;
+        //just keep it alive, unless user specifies something else
+        this.destroyOnInactive = false;
     }
 	
 	this.memberUpdated();
@@ -48,15 +49,17 @@ apogeeapp.app.CustomControlComponent.prototype.getUiCodeField = function(codeFie
     return text;
 }
 
-apogeeapp.app.CustomControlComponent.prototype.getDoKeepAlive = function() {
-    return this.doKeepAlive;
+apogeeapp.app.CustomControlComponent.prototype.getDestroyOnInactive = function() {
+    return this.destroyOnInactive;
 }
 
-apogeeapp.app.CustomControlComponent.prototype.setDoKeepAlive = function(doKeepAlive) {
-    this.doKeepAlive = doKeepAlive;
+apogeeapp.app.CustomControlComponent.prototype.setDestroyOnInactive = function(destroyOnInactive) {
+    this.destroyOnInactive = destroyOnInactive;
     
     if(this.outputMode) {
-        this.outputMode.setDoKeepAlive(doKeepAlive);
+        var displayDestroyFlags = destroyOnInactive ? apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_INACTIVE :
+            apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
+        this.outputMode.setDisplayDestroyFlags(displayDestroyFlags);
     }
 }
 
@@ -124,7 +127,7 @@ apogeeapp.app.CustomControlComponent.prototype.getViewModeElement = function(edi
 		
 		case apogeeapp.app.CustomControlComponent.VIEW_OUTPUT:
 			if(!this.outputMode) {
-				this.outputMode = new apogeeapp.app.ControlOutputMode(editComponentDisplay,this.doKeepAlive);
+				this.outputMode = new apogeeapp.app.ControlOutputMode(editComponentDisplay,this.displayDestroyFlags);
 			}
 			return this.outputMode;
 			
@@ -329,7 +332,7 @@ apogeeapp.app.CustomControlComponent.createComponent = function(workspaceUI,data
             else {
                 activeComponentOptions = {};
             }
-            activeComponentOptions.doKeepAlive = true;
+            activeComponentOptions.destroyOnInactive = false;
         }
         
         //create the component
@@ -345,13 +348,12 @@ apogeeapp.app.CustomControlComponent.createComponentFromJson = function(workspac
 }
 
 apogeeapp.app.CustomControlComponent.addPropFunction = function(component,values) {
-    var keepAlive = component.getDoKeepAlive();
-    values.destroyOnHide = !keepAlive;
+    values.destroyOnHide = component.getDestroyOnInactive();
 }
 
 apogeeapp.app.CustomControlComponent.updateProperties = function(component,oldValues,newValues,actionResponse) {
-    var doKeepAlive = (newValues.destroyOnHide) ? false : true;
-    component.setDoKeepAlive(doKeepAlive);
+    var destroyOnInactive = (newValues.destroyOnHide) ? false : true;
+    component.setDestroyOnInactive(destroyOnInactive);
 }
 
 

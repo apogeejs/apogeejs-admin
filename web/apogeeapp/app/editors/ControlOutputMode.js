@@ -1,6 +1,6 @@
 
-apogeeapp.app.ControlOutputMode = function(componentDisplay,doKeepAlive) {
-	apogeeapp.app.ViewMode.call(this,componentDisplay,doKeepAlive);   
+apogeeapp.app.ControlOutputMode = function(componentDisplay,displayDestroyFlags) {
+	apogeeapp.app.ViewMode.call(this,componentDisplay,displayDestroyFlags);   
         
     this.component = componentDisplay.getComponent();
     this.member = this.component.getMember();

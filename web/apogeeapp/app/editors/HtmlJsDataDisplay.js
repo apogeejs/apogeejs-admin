@@ -105,9 +105,9 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
                 }
             
                 if((addResizeListener)&&(!instance.callbackAttached)) {
-                    var uiObject = instance.outputMode.getUiObject();
-                    if(uiObject) {
-                        uiObject.addListener(apogeeapp.ui.RESIZED_EVENT,resizeCallback);
+                    var displayWindow = instance.outputMode.getDisplayWindow();
+                    if(displayWindow) {
+                        displayWindow.addListener(apogeeapp.ui.RESIZED_EVENT,resizeCallback);
                         instance.callbackAttached = true;
                     }
                 }
@@ -141,9 +141,9 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
                 }
                 
                 if(instance.callbackAttached) {
-                    var uiObject = instance.outputMode.getUiObject();
-                    if(uiObject) {
-                        uiObject.removeListener(apogeeapp.ui.RESIZED_EVENT,instance.resizeCallback);
+                    var displayWindow = instance.outputMode.getDisplayWindow();
+                    if(displayWindow) {
+                        displayWindow.removeListener(apogeeapp.ui.RESIZED_EVENT,instance.resizeCallback);
                         instance.callbackAttached = false;
                     }
                 }

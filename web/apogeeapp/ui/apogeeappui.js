@@ -178,6 +178,9 @@ apogeeapp.ui.WINDOW_STATE_MINIMIZED = -1;
 apogeeapp.ui.WINDOW_STATE_NORMAL = 0;
 apogeeapp.ui.WINDOW_STATE_MAXIMIZED = 1;
 
+//refers to minimized, restored or maximized
+apogeeapp.ui.WINDOW_STATE_CHANGED = "window state change";
+
 apogeeapp.ui.MINIMIZABLE = 0x01;
 apogeeapp.ui.MAXIMIZABLE = 0x02;
 apogeeapp.ui.CLOSEABLE = 0x04;

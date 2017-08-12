@@ -7,7 +7,7 @@
  * false can be sent in.
  */
 apogeeapp.app.AceCodeMode = function(componentDisplay) {
-    apogeeapp.app.ViewMode.call(this,componentDisplay);
+    apogeeapp.app.ViewMode.call(this,componentDisplay,apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_INACTIVE_AND_MINIMIZED);
 }
 
 apogeeapp.app.AceCodeMode.prototype = Object.create(apogeeapp.app.ViewMode.prototype);
