@@ -5,7 +5,7 @@ apogeeapp.app.ParentWindowComponentDisplay = function(component, options) {
     
     this.options = options;
    
-    this._loadWindowFrameEntry();
+    this.loadWindowFrameEntry();
     
     //add a cleanup action to the base component - component must already be initialized
 //    this.addCleanupAction(apogeeapp.app.ParentWindowComponentDisplay.destroy);
@@ -83,7 +83,7 @@ apogeeapp.app.ParentWindowComponentDisplay.prototype.getStateJson = function() {
 //===============================
 
 /** @private */
-apogeeapp.app.ParentWindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
+apogeeapp.app.ParentWindowComponentDisplay.prototype.loadWindowFrameEntry = function() {
    
     //window options
     var memberWindowOptions = {};

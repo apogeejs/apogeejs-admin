@@ -3,7 +3,7 @@ apogeeapp.app.TreeComponentDisplay = function(component) {
     this.component = component;
     this.object = component.getObject();
     
-    this.treeEntry = this._createTreeEntry();
+    this.treeEntry = this.createTreeEntry();
 };
 
 apogeeapp.app.TreeComponentDisplay.prototype.getTreeEntry = function() {
@@ -40,7 +40,7 @@ apogeeapp.app.TreeComponentDisplay.prototype.updateData = function() {
 //===============================
 
 /** @private */
-apogeeapp.app.TreeComponentDisplay.prototype._createTreeEntry = function() {
+apogeeapp.app.TreeComponentDisplay.prototype.createTreeEntry = function() {
     //TREE_ENTRY
     //FIX THIS CODE!!!
     //open doesn't work and the context menu is duplicated code (that shouldn't be)

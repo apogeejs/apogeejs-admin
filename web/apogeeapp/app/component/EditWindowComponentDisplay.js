@@ -11,7 +11,7 @@ apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
     this.viewModeElements = {};
     this.viewModeElement = null;
    
-    this._loadWindowFrameEntry();
+    this.loadWindowFrameEntry();
     
     //add a cleanup action to the base component - component must already be initialized
 //    this.addCleanupAction(apogeeapp.app.EditWindowComponentDisplay.destroy);
@@ -149,7 +149,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setStateJson = function(json)
 //===============================
 
 /** @private */
-apogeeapp.app.EditWindowComponentDisplay.prototype._loadWindowFrameEntry = function() {
+apogeeapp.app.EditWindowComponentDisplay.prototype.loadWindowFrameEntry = function() {
    
     //window options
     var memberWindowOptions = {};
@@ -185,17 +185,17 @@ apogeeapp.app.EditWindowComponentDisplay.prototype._loadWindowFrameEntry = funct
     menu.setAsOnTheFlyMenu(menuItemCallback);
     
     //create the view selection ui
-    this._createSelectTool();
+    this.createSelectTool();
     
     //set the content
-    this._initContentUI();
+    this.initContentUI();
 }
 
 //------------------------------------
 // Window Content Management - switch between edit modes
 //------------------------------------
 
-apogeeapp.app.EditWindowComponentDisplay.prototype._createSelectTool = function() {
+apogeeapp.app.EditWindowComponentDisplay.prototype.createSelectTool = function() {
     
 	this.select = apogeeapp.ui.createElement("select",null,{
         "marginRight":"3px",
@@ -212,7 +212,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype._createSelectTool = function(
 
 /** This method populates the frame for this component. 
  * @protected */
-apogeeapp.app.EditWindowComponentDisplay.prototype._initContentUI = function() {
+apogeeapp.app.EditWindowComponentDisplay.prototype.initContentUI = function() {
     
     var settings = this.component.getTableEditSettings();
     var viewTypes = settings.viewModes;
@@ -222,11 +222,11 @@ apogeeapp.app.EditWindowComponentDisplay.prototype._initContentUI = function() {
         this.select.add(apogeeapp.ui.createElement("option",{"text":viewType}));
     }
     
-    var initialViewType = this._getInitialViewType(viewTypes,settings.defaultView);
+    var initialViewType = this.getInitialViewType(viewTypes,settings.defaultView);
     this.setViewType(initialViewType);
 }
 
-apogeeapp.app.EditWindowComponentDisplay.prototype._getInitialViewType = function(viewTypes,defaultViewType) {
+apogeeapp.app.EditWindowComponentDisplay.prototype.getInitialViewType = function(viewTypes,defaultViewType) {
     if( (this.options) &&
         (this.options.viewType) &&
         (viewTypes.indexOf(this.options.viewType) >= 0) ) {
@@ -264,7 +264,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setViewType = function(viewTy
             }
             
             //make sure view type display is correct
-            this._updateViewTypeSelect();
+            this.updateViewTypeSelect();
 
             return;
         }
@@ -274,23 +274,23 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setViewType = function(viewTy
     
     //set the view type
     this.viewType = viewType;
-    this._updateViewTypeSelect();
+    this.updateViewTypeSelect();
     
     this.viewModeElement = this.viewModeElements[viewType];
     if(!this.viewModeElement) {
         this.viewModeElement = this.component.getViewModeElement(this,viewType);
         this.viewModeElements[viewType] = this.viewModeElement;
     }
-    this._updateViewContent();
+    this.updateViewContent();
 }
 
-apogeeapp.app.EditWindowComponentDisplay.prototype._updateViewTypeSelect = function() {
+apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewTypeSelect = function() {
     if(this.select.value != this.viewType) {
         this.select.value = this.viewType;
     }
 }
 
-apogeeapp.app.EditWindowComponentDisplay.prototype._updateViewContent = function() {
+apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewContent = function() {
     if(this.viewModeElement) {
         this.viewModeElement.showData();
         this.windowFrame.setContent(this.viewModeElement.getElement());
