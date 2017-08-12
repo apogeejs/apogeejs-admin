@@ -1,6 +1,9 @@
 /* This is a base class for a view mode. 
- * If the doKeepAlive flag is set to true the display will be maintained
- * after it is hidden. Otherwise it id destroyed when hidden. */
+ * displayDestroy flags determine the cases under which the data display
+ * will be destroyed (or kept alive). The options are when the display mode
+ * is not active, when the window is minimized, and when the parent display
+ * is hidden (such as the tab parent for a window). Before the display is destroyed,
+ * a check is done to make sure it is ok, such as it is not in edit mode. */
 apogeeapp.app.ViewMode = function(componentDisplay, displayDestroyFlags) {
     this.componentDisplay = componentDisplay;
     this.member = componentDisplay.getMember();
@@ -52,7 +55,8 @@ apogeeapp.app.ViewMode.prototype.getDisplayWindow = function() {
 
 
 /** The displayDestroyFlags indicate when the display for this view mode will be destroyed,
- * refering to times it is not visible to the user. */
+ * refering to times it is not visible to the user. See further notes in the constructor
+ * description. */
 apogeeapp.app.ViewMode.prototype.setDisplayDestroyFlags = function(displayDestroyFlags) {
     this.displayDestroyFlags = displayDestroyFlags;
 }
