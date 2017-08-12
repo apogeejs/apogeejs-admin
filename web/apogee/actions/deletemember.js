@@ -29,7 +29,7 @@ apogee.deletemember.deleteMember = function(actionData,optionalContext,processed
     for(var i = 0; i < deleteList.length; i++) {
         //call delete handlers
         var member = deleteList[i];
-        member.onDeleteChild();
+        member.onDeleteMember();
         if(member.isDependent) {
             member.onDeleteDependent();
         }   

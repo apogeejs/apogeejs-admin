@@ -36,8 +36,8 @@ apogee.Workspace.prototype.getRoot = function() {
 }
 
 /** This method sets the root object - implemented from RootHolder.  */
-apogee.Workspace.prototype.setRoot = function(child) {
-    this.rootFolder = child;
+apogee.Workspace.prototype.setRoot = function(member) {
+    this.rootFolder = member;
 }
 
 /** This allows for a workspace to have a parent. For a normal workspace this should be null. 

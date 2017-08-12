@@ -3,7 +3,7 @@
  */
 apogee.EventManager = {};
     
-/** This serves as the constructor for the child object, when extending it. */
+/** This serves as the constructor. */
 apogee.EventManager.init = function() {
      /** This field holds the event listeners
     * @private */

@@ -202,6 +202,8 @@ apogeeapp.app.Apogee.prototype.onTabHidden = function(tab) {
 }
 
 apogeeapp.app.Apogee.prototype.onTabShown = function(tab) {
+    if(!this.workspaceUI) return;
+    
     var id = tab.getId();
     var component = this.workspaceUI.getComponentById(id);
     if(component) {

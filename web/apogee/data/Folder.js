@@ -1,7 +1,7 @@
 /** This is a folder. */
 apogee.Folder = function(name,owner) {
     //base init
-    apogee.Child.init.call(this,name,apogee.Folder.generator);
+    apogee.Member.init.call(this,name,apogee.Folder.generator);
     apogee.Dependent.init.call(this);
     apogee.ContextHolder.init.call(this);
     apogee.Owner.init.call(this);
@@ -19,7 +19,7 @@ apogee.Folder = function(name,owner) {
 }
 
 //add components to this class
-apogee.base.mixin(apogee.Folder,apogee.Child);
+apogee.base.mixin(apogee.Folder,apogee.Member);
 apogee.base.mixin(apogee.Folder,apogee.Dependent);                      
 apogee.base.mixin(apogee.Folder,apogee.ContextHolder);
 apogee.base.mixin(apogee.Folder,apogee.Owner);
@@ -121,10 +121,10 @@ apogee.Folder.prototype.updateDependeciesForModelChange = function(recalculateLi
 }
 
 //------------------------------
-// Child Methods
+// Member Methods
 //------------------------------
 
-/** This method creates a child from a json. It should be implemented as a static
+/** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 apogee.Folder.fromJson = function(owner,json,childrenJsonOutputList) {
     var folder = new apogee.Folder(json.name,owner);
@@ -137,7 +137,7 @@ apogee.Folder.fromJson = function(owner,json,childrenJsonOutputList) {
     return folder;
 }
 
-/** This method adds any additional data to the json to save for this child. 
+/** This method adds any additional data to the json to save for this member. 
  * @protected */
 apogee.Folder.prototype.addToJson = function(json) {
 	json.children = {};

@@ -1,4 +1,4 @@
-/** This component encapsulates the child functionality for members in the workspace,
+/** This component encapsulates the member functionality for objects in the workspace,
  * allowing them to sit in a organizational hierarchy.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
@@ -6,14 +6,14 @@
  * COMPONENT DEPENDENCIES:
  * 
  */
-apogee.Child = {};
+apogee.Member = {};
     
-/** This serves as the constructor for the child object, when extending it. 
- * The owner should be the parent that holds this child or the object that holds
+/** This serves as the constructor for the member object, when extending it. 
+ * The owner should be the parent that holds this member or the object that holds
  * the hierarchy (maybe the workspace). If the owner is not a parent, this is typically
  * a folder and it is called the root folder. */
-apogee.Child.init = function(name,generator) {
-    this.id = apogee.Child._createId();
+apogee.Member.init = function(name,generator) {
+    this.id = apogee.Member._createId();
     this.name = name;
     
     this.data = null;
@@ -24,7 +24,7 @@ apogee.Child.init = function(name,generator) {
     this.resultPending = false;
 }
 
-apogee.Child.initOwner = function(owner) {
+apogee.Member.initOwner = function(owner) {
     this.owner = owner;
     if(owner.isParent) {
         this.owner.addChild(this);
@@ -34,7 +34,7 @@ apogee.Child.initOwner = function(owner) {
     }
 }
 
-apogee.Child.move = function(newName,newOwner) {
+apogee.Member.move = function(newName,newOwner) {
     //remove from old owner
     if(this.owner) {
         if(this.owner.isParent) {
@@ -52,23 +52,23 @@ apogee.Child.move = function(newName,newOwner) {
     this.initOwner(newOwner);
 }
 
-/** This property tells if this object is a child.
- * This property should not be implemented on non-children. */
-apogee.Child.isChild = true
+/** This property tells if this object is a member.
+ * This property should not be implemented on non-members. */
+apogee.Member.isMember = true
 
 /** this method gets the ID. It is not persistent and is valid only for this 
  * instance the workspace is opened. */
-apogee.Child.getId = function() {
+apogee.Member.getId = function() {
     return this.id;
 }
 
 /** this method gets the name. */
-apogee.Child.getName = function() {
+apogee.Member.getName = function() {
     return this.name;
 }
 
 /** This method returns the full name in dot notation for this object. */
-apogee.Child.getFullName = function() {
+apogee.Member.getFullName = function() {
     if(this.owner) {
         return this.owner.getPossesionNameBase() + this.name;
     }
@@ -78,10 +78,10 @@ apogee.Child.getFullName = function() {
     }
 }
 
-/** This method returns a display name for the child object. By default it returns
-/* the object name but can by overriden by the child implementation. By setting 
+/** This method returns a display name for the member object. By default it returns
+/* the object name but can by overriden by the member implementation. By setting 
  * the input argument "useFullPath" to true, the path is included with the name. */
-apogee.Child.getDisplayName = function(useFullPath) {
+apogee.Member.getDisplayName = function(useFullPath) {
     if(useFullPath) {
         return this.getFullName();
     }
@@ -90,14 +90,14 @@ apogee.Child.getDisplayName = function(useFullPath) {
     }
 }
 
-/** This returns the owner for this child. */
-apogee.Child.getOwner = function() {
+/** This returns the owner for this member. */
+apogee.Member.getOwner = function() {
     return this.owner;
 }
 
-/** This returns the parent for this child. For the root folder
+/** This returns the parent for this member. For the root folder
  * this value is null. */
-apogee.Child.getParent = function() {
+apogee.Member.getParent = function() {
     if((this.owner)&&(this.owner.isParent)) {
         return this.owner;
     }
@@ -107,7 +107,7 @@ apogee.Child.getParent = function() {
 }
 
 /** this method gets the workspace. */
-apogee.Child.getWorkspace = function() {
+apogee.Member.getWorkspace = function() {
    if(this.owner) {
        return this.owner.getWorkspace();
    }
@@ -117,7 +117,7 @@ apogee.Child.getWorkspace = function() {
 }
 
 /** this method gets the root folder/namespace for this object. */
-apogee.Child.getRoot = function() {
+apogee.Member.getRoot = function() {
     var ancestor = this;
 	while(ancestor) {
 		var owner = ancestor.getOwner();
@@ -133,17 +133,17 @@ apogee.Child.getRoot = function() {
 }
 
 /** This method sets the pre calc error for this dependent. */
-apogee.Child.addError = function(error) {
+apogee.Member.addError = function(error) {
     this.errors.push(error);
 }
 
 /** This method sets the pre calc error for this dependent. */
-apogee.Child.addErrors = function(errorList) {
+apogee.Member.addErrors = function(errorList) {
     this.errors = this.errors.concat(errorList);
 }
 
 /** This method clears the error list. */
-apogee.Child.clearErrors = function(type) {
+apogee.Member.clearErrors = function(type) {
     var newList = [];
     if(type != null) {    
         for(var i = 0; i < this.errors.length; i++) {
@@ -157,44 +157,44 @@ apogee.Child.clearErrors = function(type) {
 }
 
 /** This returns true if there is a pre calc error. */
-apogee.Child.hasError = function() {
+apogee.Member.hasError = function() {
     return (this.errors.length > 0);
 }
 
 /** This returns the pre calc error. */
-apogee.Child.getErrors = function() {
+apogee.Member.getErrors = function() {
     return this.errors;
 }
 
 /** This returns true if the member is not up to date, typically
  * do to waiting on an asynchronous operation. */
-apogee.Child.getResultPending = function() {
+apogee.Member.getResultPending = function() {
     return this.resultPending;
 }
 
 /** This sets the result pending flag. If is pending is set to true a
  * pending token must be set. (from apogee.action.getPendingToken) This 
  * is used to ensure only the latest asynchronous action is kept. */
-apogee.Child.setResultPending = function(isPending,pendingToken) {
+apogee.Member.setResultPending = function(isPending,pendingToken) {
     this.resultPending = isPending;
     this.pendingToken = pendingToken;
 }
 
 /** This returns true if the pending token matches. */
-apogee.Child.pendingTokenMatches = function(pendingToken) {
+apogee.Member.pendingTokenMatches = function(pendingToken) {
     return (this.pendingToken === pendingToken);
 }
 
-apogee.Child.getSetDataOk = function() {
+apogee.Member.getSetDataOk = function() {
     return this.generator.setDataOk;
 }
 
-apogee.Child.getSetCodeOk = function() {
+apogee.Member.getSetCodeOk = function() {
     return this.generator.setCodeOk;
 }
 
 /** This method writes the child to a json. */
-apogee.Child.toJson = function() {
+apogee.Member.toJson = function() {
 	var json = {};
     json.name = this.name;
     json.type = this.generator.type;
@@ -209,9 +209,9 @@ apogee.Child.toJson = function() {
     return json;
 }
 
-///** This method creates a child from a json. IT should be implemented as a static
+///** This method creates a member from a json. IT should be implemented as a static
 // * function in extending objects. */ 
-//apogee.Child.fromJson = function(owner,json,childrenJsonOutputList) {
+//apogee.Member.fromJson = function(owner,json,childrenJsonOutputList) {
 //}
 
 //-----------------------------------
@@ -219,19 +219,19 @@ apogee.Child.toJson = function() {
 //-----------------------------------
 
 /** this method gets the data map. */
-apogee.Child.getData = function() {
+apogee.Member.getData = function() {
     return this.data;
 }
 
 /** This returns an array of members this member impacts. */
-apogee.Child.getImpactsList = function() {
+apogee.Member.getImpactsList = function() {
     return this.impactsList;
 }
 
 /** This method sets the data for this object. This is the object used by the 
  * code which is identified by this name, for example the JSON object associated
  * with a JSON table. Besides hold the data object, this updates the parent data map. */
-apogee.Child.setData = function(data) {
+apogee.Member.setData = function(data) {
     this.data = data;
   
     var parent = this.getParent();
@@ -244,11 +244,11 @@ apogee.Child.setData = function(data) {
 // "Protected" Methods
 //========================================
 
-/** This method is called when the child is deleted. If necessary the implementation
+/** This method is called when the member is deleted. If necessary the implementation
  * can extend this function, but it should call this base version of the function
  * if it does.  
  * @protected */
-apogee.Child.onDeleteChild = function() {
+apogee.Member.onDeleteMember = function() {
     if(!(this.owner)) return;
     
 	if(this.owner.isParent) {
@@ -263,22 +263,22 @@ apogee.Child.onDeleteChild = function() {
 ///** This method is called when the workspace is closed and also when an object
 // * is deleted. It should do any needed cleanup for the object.  
 // * @protected */
-//apogee.Child.onClose = function();
+//apogee.Member.onClose = function();
 
-//Implement this method if there is data to add to this child. Otherwise it may
+//Implement this method if there is data to add to this member. Otherwise it may
 //be omitted
-///** This method adds any additional data to the json saved for this child. 
+///** This method adds any additional data to the json saved for this member. 
 // * @protected */
-//apogee.Child.addToJson = function(json) {
+//apogee.Member.addToJson = function(json) {
 //}
 
 //Implement this method if there is update data for this json. otherwise it may
 //be omitted
-///** This gets an update structure to upsate a newly instantiated child
+///** This gets an update structure to upsate a newly instantiated member
 //* to match the current object. It may return "undefined" if there is no update
 //* data needed. 
 //* @protected */
-//apogee.Child.getUpdateData = function() {
+//apogee.Member.getUpdateData = function() {
 //}
 
 
@@ -289,7 +289,7 @@ apogee.Child.onDeleteChild = function() {
 /** This method adds a data member to the imapacts list for this node.
  * The return value is true if the member was added and false if it was already there. 
  * @private */
-apogee.Child.addToImpactsList = function(member) {
+apogee.Member.addToImpactsList = function(member) {
     //exclude this member
     if(member === this) return;
     
@@ -305,7 +305,7 @@ apogee.Child.addToImpactsList = function(member) {
 
 /** This method removes a data member from the imapacts list for this node. 
  * @private */
-apogee.Child.removeFromImpactsList = function(member) {
+apogee.Member.removeFromImpactsList = function(member) {
     //it should appear only once
     for(var i = 0; i < this.impactsList.length; i++) {
         if(this.impactsList[i] == member) {
@@ -317,13 +317,13 @@ apogee.Child.removeFromImpactsList = function(member) {
 
 /** This is used for Id generation.
  * @private */
-apogee.Child.nextId = 1;
+apogee.Member.nextId = 1;
 
-/** This method generates a member ID for the child. It is only valid
+/** This method generates a member ID for the member. It is only valid
  * for the duration the workspace is opened. It is not persisted.
  * @private
  */
-apogee.Child._createId = function() {
-    return apogee.Child.nextId++;
+apogee.Member._createId = function() {
+    return apogee.Member.nextId++;
 }
 

@@ -1,11 +1,11 @@
 /** This mixin encapsulates an object in that can be coded. It contains a function
- * and supplemental code. Object that are codeable should also be a child and
+ * and supplemental code. Object that are codeable should also be a member and
  * dependent.
  * 
  * This is a mixin and not a class. It is used in the prototype of the objects that inherit from it.
  * 
  * COMPONENT DEPENDENCIES:
- * - A Codeable must be a Child.
+ * - A Codeable must be a Member.
  * - A Codeable must be Dependent. 
  * - A Codeable must be ContextHolder
  */
@@ -294,10 +294,10 @@ apogee.Codeable.memberFunctionInitialize = function() {
 }
 
 //------------------------------
-// Child Methods
+// Member Methods
 //------------------------------
 
-/** This gets an update structure to upsate a newly instantiated child
+/** This gets an update structure to upsate a newly instantiated member
 /* to match the current object. */
 apogee.Codeable.getUpdateData = function() {
     var updateData = {};

@@ -1,5 +1,5 @@
-/** This component encapsulates an object that owns a child. This is different from
- * Parent in that Parent has a child within a data hierarchy. Parents are a subset of owners.
+/** This component encapsulates an object that owns a member. This is different from
+ * Parent in that Parent has a member within a data hierarchy. Parents are a subset of owners.
  * An object that owns a root folder if an owner but not a parent.
  * Examples of Owners that are not parent are the Workspace, which holds the workspace root folder
  * and the FolderFunction, which is a data object which has its own root folder containing its children,

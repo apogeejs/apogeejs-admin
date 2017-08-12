@@ -1,7 +1,7 @@
 /** This is a function. */
 apogee.FunctionTable = function(name,owner,initialData) {
     //base init
-    apogee.Child.init.call(this,name,apogee.FunctionTable.generator);
+    apogee.Member.init.call(this,name,apogee.FunctionTable.generator);
     apogee.Dependent.init.call(this);
     apogee.ContextHolder.init.call(this);
 	apogee.Codeable.init.call(this,argList,false);
@@ -19,7 +19,7 @@ apogee.FunctionTable = function(name,owner,initialData) {
 }
 
 //add components to this class
-apogee.base.mixin(apogee.FunctionTable,apogee.Child);
+apogee.base.mixin(apogee.FunctionTable,apogee.Member);
 apogee.base.mixin(apogee.FunctionTable,apogee.Dependent);
 apogee.base.mixin(apogee.FunctionTable,apogee.ContextHolder);
 apogee.base.mixin(apogee.FunctionTable,apogee.Codeable);
@@ -42,10 +42,10 @@ apogee.FunctionTable.prototype.postInitializeAction = function() {
 }
 
 //------------------------------
-// Child Methods
+// Member Methods
 //------------------------------
 
-/** This overrides the get title method of child to return the function declaration. */
+/** This overrides the get title method of member to return the function declaration. */
 apogee.FunctionTable.prototype.getDisplayName = function(useFullPath) {
     var name = useFullPath ? this.getFullName() : this.getName();
     var argList = this.getArgList();
@@ -53,7 +53,7 @@ apogee.FunctionTable.prototype.getDisplayName = function(useFullPath) {
     return name + "(" + argListString + ")";
 }
 
-/** This method creates a child from a json. It should be implemented as a static
+/** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 apogee.FunctionTable.fromJson = function(owner,json) {
     return new apogee.FunctionTable(json.name,owner,json.updateData);
