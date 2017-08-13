@@ -18,7 +18,13 @@ apogeeapp.app.ViewMode = function(componentDisplay, displayDestroyFlags) {
     this.viewStateFlags = apogeeapp.app.ViewMode.VIEW_STATE_INACTIVE;
     
     //set flag for window state
-    this.onWindowStateChange(componentDisplay.getWindowFrame());
+    var window = componentDisplay.getWindowFrame();
+    if(window.getWindowState() === apogeeapp.ui.WINDOW_STATE_MINIMIZED) {
+        this.setViewStateFlag(apogeeapp.app.ViewMode.VIEW_STATE_MINIMIZED);
+    }
+    else {
+        this.clearViewStateFlag(apogeeapp.app.ViewMode.VIEW_STATE_MINIMIZED);
+    }
     
     //set flat for showing/hidden - DON'T CURRRENTLY HAVE THIS INFO AVAILABLE!
     //assume window is not hidden
@@ -208,7 +214,7 @@ apogeeapp.app.ViewMode.prototype.addWindowListeners = function() {
 /** Handles minimize/restore/maximize event on window. */
 apogeeapp.app.ViewMode.prototype.onWindowStateChange = function(window) {
     var windowState = window.getWindowState();
-    if(windowState == apogeeapp.ui.WINDOW_STATE_MINIMIZED) {
+    if(windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED) {
         this.setViewStateFlag(apogeeapp.app.ViewMode.VIEW_STATE_MINIMIZED);
         this.checkDestroyDisplay();
     }
@@ -243,7 +249,7 @@ apogeeapp.app.ViewMode.prototype.checkDestroyDisplay = function() {
 
 /** Check for cases where we should reconstruct the display. */
 apogeeapp.app.ViewMode.prototype.checkPopulateDisplay = function() {
-    if( (!this.dataDisplay)&&((this.viewStateFlags & this.displayDestroyFlags) === 0)) {
+    if((this.viewStateFlags & this.displayDestroyFlags) === 0) {
         //create a new data display
         this.populateDataDisplay();
     }

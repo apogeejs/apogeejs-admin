@@ -118,6 +118,11 @@ apogee.FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
     
     var createEmptyInternalFolder;
     if(json.internalFolder) {
+        //enforce name of internal folder
+        //this is needed for importing a workspace as a folder function
+        //this will fail quietly if we change the format, but it will still run
+        json.internalFolder.name = apogee.FolderFunction.INTERNAL_FOLDER_NAME;
+        
         childrenJsonOutputList.push(json.internalFolder);
         createEmptyInternalFolder = false;
     }

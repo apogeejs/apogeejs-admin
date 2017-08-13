@@ -33,6 +33,14 @@ apogeeapp.app.SimpleGeojsonDisplay = function(viewMode) {
     
     //resize the editor on window size change
     var instance = this;
+    this.shownCallback = function() {
+        if(!instance.map) {
+            instance.loadMap();
+        }
+        else {
+            instance.map.invalidateSize();
+        }
+    }
     this.resizeCallback = function() {
         if(instance.map) {
             instance.map.invalidateSize();
@@ -96,13 +104,15 @@ apogeeapp.app.SimpleGeojsonDisplay.prototype.showData = function(data) {
                 this.geoJsonLayer = null;
             }
             this.geoJsonLayer = L.geoJSON(features,theme).addTo(this.map);
-        }
+        }       
     }
     
     if(!this.callbackAttached) {
-        var displayWindow = this.viewMode.getDisplayWindow();
+        var viewMode = this.getOutputMode();
+        var displayWindow = viewMode.getDisplayWindow();
         if(displayWindow) {
             displayWindow.addListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
+            displayWindow.addListener(apogeeapp.ui.SHOWN_EVENT,this.shownCallback);
             this.callbackAttached = true;
         }
     }
@@ -113,6 +123,7 @@ apogeeapp.app.SimpleGeojsonControl.prototype.hide = function() {
     var displayWindow = this.viewMode.getDisplayWindow();
     if(displayWindow) {
         displayWindow.removeListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
+        displayWindow.removeListener(apogeeapp.ui.RESIZED_EVENT,this.shownCallback);
         this.callbackAttached = false;
     }
 }

@@ -6,7 +6,7 @@ apogeeapp.app.BasicControlComponent = function(workspaceUI,control,generator,com
     apogeeapp.app.EditComponent.call(this,workspaceUI,control,generator,componentJson);
     
     //default to keep alive
-    this.displayDestroyFlags = true;
+    this.displayDestroyFlags = apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
 
     this.memberUpdated();
 };
