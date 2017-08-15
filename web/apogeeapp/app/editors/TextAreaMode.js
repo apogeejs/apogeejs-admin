@@ -1,6 +1,6 @@
 
 apogeeapp.app.TextAreaMode = function(componentDisplay) {
-	apogeeapp.app.ViewMode.call(this,componentDisplay);	
+	apogeeapp.app.ViewMode.call(this,componentDisplay,apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_INACTIVE_AND_MINIMIZED);	
 }
 
 apogeeapp.app.TextAreaMode.prototype = Object.create(apogeeapp.app.ViewMode.prototype);

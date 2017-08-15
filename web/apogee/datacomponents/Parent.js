@@ -1,13 +1,13 @@
-/** This component encapsulates an object that contains children, creating  a 
+/** This component encapsulates an object that contains children members, creating  a 
  * hierarchical structure in the workspace. Each child has a name and this name
  * forms the index of the child into its parent. (I guess that means it doesn't
  * have to be a string, in the case we made an ArrayFolder, which would index the
- * children by integer.) The Parent must also be a child.
+ * children by integer.) The Parent must also be a member.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
  * COMPONENT DEPENDENCIES:
- * - A Parent must be a Child.
+ * - A Parent must be a Member.
  * - A Parent must be an Owner.
  */
 apogee.Parent = {};
@@ -100,7 +100,7 @@ apogee.Parent.createContextManager = function() {
 
 /** This method returns the full name in dot notation for this object. */
 //apogee.Parent.getFullName = function() {
-//    return apogee.Child.getFullName.call(this);
+//    return apogee.Member.getFullName.call(this);
 //}
 
 /** this method gets the hame the children inherit for the full name. */

@@ -99,10 +99,6 @@ apogeeapp.ui.WindowFrame.RESIZE_SW = apogeeapp.ui.WindowFrame.RESIZE_SOUTH + apo
 apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_HEIGHT = 300;
 apogeeapp.ui.WindowFrame.DEFAULT_WINDOW_WIDTH = 300;
 
-apogeeapp.ui.WindowFrame.WINDOW_MINIMIZED = "minimized";
-apogeeapp.ui.WindowFrame.WINDOW_RESTOREDED = "restored";
-apogeeapp.ui.WindowFrame.WINDOW_MAXIMIZED = "maximized";
-
 //====================================
 // Public Methods
 //====================================
@@ -513,7 +509,6 @@ apogeeapp.ui.WindowFrame.prototype.minimizeContent = function() {
     this.bodyCell.style.display = "none";
     
     var wasMinimized = (this.windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED);
-    var wasMaximized = (this.windowState === apogeeapp.ui.WINDOW_STATE_MAXIMIZED);
  
     //set the window state
     this.windowState = apogeeapp.ui.WINDOW_STATE_MINIMIZED;
@@ -522,7 +517,7 @@ apogeeapp.ui.WindowFrame.prototype.minimizeContent = function() {
     
     //dispatch resize event
     if(!wasMinimized) { 
-        this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_MINIMIZED,this);
+        this.dispatchEvent(apogeeapp.ui.WINDOW_STATE_CHANGED,this);
     }
 }
 
@@ -542,7 +537,7 @@ apogeeapp.ui.WindowFrame.prototype.restoreContent = function() {
     this.setMinMaxButtons();
     
     if((wasMinimized)||(wasMaximized)) {
-        this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_RESTOREDED,this);
+        this.dispatchEvent(apogeeapp.ui.WINDOW_STATE_CHANGED,this);
     }
 }
 
@@ -553,7 +548,7 @@ apogeeapp.ui.WindowFrame.prototype.maximizeContent = function() {
     this.headerCell.style.display = "";
     this.bodyCell.style.display = "";
     
-    var wasMinimized = (this.windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED);
+    var wasMaximized = (this.windowState === apogeeapp.ui.WINDOW_STATE_MAXIMIZED);
     
     //set the window state
     this.windowState = apogeeapp.ui.WINDOW_STATE_MAXIMIZED;
@@ -561,7 +556,7 @@ apogeeapp.ui.WindowFrame.prototype.maximizeContent = function() {
     this.setMinMaxButtons();
     
     if(!wasMaximized) {
-        this.dispatchEvent(apogeeapp.ui.WindowFrame.WINDOW_MAXIMIZED,this);
+        this.dispatchEvent(apogeeapp.ui.WINDOW_STATE_CHANGED,this);
     }
 }
 

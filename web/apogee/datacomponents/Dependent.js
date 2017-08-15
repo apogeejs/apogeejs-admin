@@ -1,11 +1,11 @@
-/** This mixin encapsulates an object in the workspace that depends on another
- * object. The dependent allows for a recalculation based on an update of the 
+/** This mixin encapsulates an member whose value depends on on another
+ * member. The dependent allows for a recalculation based on an update of the 
  * objects it depends on.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
  * COMPONENT DEPENDENCIES:
- * - A Dependent must be a Child.
+ * - A Dependent must be a Member.
  * 
  */
 apogee.Dependent = {};
@@ -121,23 +121,18 @@ apogee.Dependent.updateDependencies = function(newDependsOn) {
     var i;
     for(i = 0; i < newDependsOn.length; i++) {
         remoteMember = newDependsOn[i];
-		
-		if(!remoteMember.isDataHolder) {
-            //PLACE A WARNING HERE!!!
-        }
-		else {	
 			
-			this.dependsOnList.push(remoteMember);
-			
-			//update this member
-			var isNewAddition = remoteMember.addToImpactsList(this);
-            if(isNewAddition) {
-                dependenciesUpdated = true;
-            }
+        this.dependsOnList.push(remoteMember);
 
-			//create a set of new member to use below
-			newDependencySet[remoteMember.getId()] = true;
-		}
+        //update this member
+        var isNewAddition = remoteMember.addToImpactsList(this);
+        if(isNewAddition) {
+            dependenciesUpdated = true;
+        }
+
+        //create a set of new member to use below
+        newDependencySet[remoteMember.getId()] = true;
+		
     }
 	
     //update for links that have gotten deleted

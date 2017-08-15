@@ -122,7 +122,7 @@ module.exports = function(grunt) {
                 "banner":"/* Apogee Web Lib Version <%= pkg.version %> */\n"
             },
             "src": [
-                "customize/webLibHeader.js",
+                "supplemental/webLibHeader.js",
                 "../../dist/apogee-base-lib.js"
             ],
             "dest": "../../dist/apogee-web-lib.js"
@@ -141,9 +141,9 @@ module.exports = function(grunt) {
                 "banner":"/* Apogee Web Customization Version <%= pkg.version %> - Cut-n-Paste file open/close */\n"
             },
             "src": [
-                "customize/cutNPasteCode/CutSaveDialog.js",
-                "customize/cutNPasteCode/PasteOpenDialog.js",
-                "customize/cutNPasteCode/file_impl_cutnpaste.js"
+                "supplemental/cutNPasteCode/CutSaveDialog.js",
+                "supplemental/cutNPasteCode/PasteOpenDialog.js",
+                "supplemental/cutNPasteCode/file_impl_cutnpaste.js"
             ],
             "dest": "../../dist/apogee-web-cutnpaste.js"
         },
@@ -152,9 +152,9 @@ module.exports = function(grunt) {
                 "banner":"/* Apogee NPM Lib Version <%= pkg.version %> */\n"
             },
             "src": [
-                "customize/npmLibHeader.js",
+                "supplemental/npmLibHeader.js",
                 "../../dist/apogee-base-lib.js",
-                "customize/npmLibFooter.js"
+                "supplemental/npmLibFooter.js"
             ],
             "dest": "../../dist/apogee-npm-lib.js"
         },
@@ -164,9 +164,9 @@ module.exports = function(grunt) {
             },
             "src": [
                 "../../dist/apogee-base-app.js",
-                "apogeeapp/customize/electronCode/custom_menus_electron.js",
-                "apogeeapp/customize/electronCode/file_impl_electron.js",
-                "customize/npmAppFooter.js"
+                "apogeeapp/supplemental/electronCode/custom_menus_electron.js",
+                "apogeeapp/supplemental/electronCode/file_impl_electron.js",
+                "supplemental/npmAppFooter.js"
             ],
             "dest": "../../dist/apogee-npm-app.js"
         }

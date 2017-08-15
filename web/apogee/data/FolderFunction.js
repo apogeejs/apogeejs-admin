@@ -2,8 +2,7 @@
  * that is expanded into data objects. */
 apogee.FolderFunction = function(name,owner,initialData,createEmptyInternalFolder) {
     //base init
-    apogee.Child.init.call(this,name,apogee.FolderFunction.generator);
-    apogee.DataHolder.init.call(this);
+    apogee.Member.init.call(this,name,apogee.FolderFunction.generator);
     apogee.Dependent.init.call(this);
     apogee.ContextHolder.init.call(this);
     apogee.Owner.init.call(this);
@@ -25,8 +24,7 @@ apogee.FolderFunction = function(name,owner,initialData,createEmptyInternalFolde
 }
 
 //add components to this class
-apogee.base.mixin(apogee.FolderFunction,apogee.Child);
-apogee.base.mixin(apogee.FolderFunction,apogee.DataHolder);
+apogee.base.mixin(apogee.FolderFunction,apogee.Member);
 apogee.base.mixin(apogee.FolderFunction,apogee.Dependent);
 apogee.base.mixin(apogee.FolderFunction,apogee.ContextHolder);
 apogee.base.mixin(apogee.FolderFunction,apogee.Owner);
@@ -63,10 +61,10 @@ apogee.FolderFunction.prototype.getArgList = function() {
 }
 
 //------------------------------
-// Child Methods
+// Member Methods
 //------------------------------
 
-/** This overrides the get displaymethod of child to return the function declaration. */
+/** This overrides the get displaymethod of member to return the function declaration. */
 apogee.FolderFunction.prototype.getDisplayName = function(useFullPath) {
     var name = useFullPath ? this.getFullName() : this.getName();
     var argList = this.getArgList();
@@ -85,7 +83,7 @@ apogee.FolderFunction.prototype.close = function() {
     this.internalFolder.onClose();
 }
 
-/** This method is called when the child is deleted. If necessary the implementation
+/** This method is called when the member is deleted. If necessary the implementation
  * can extend this function, but it should call this base version of the function
  * if it does.  */
 apogee.FolderFunction.prototype.onDelete = function() {
@@ -107,11 +105,11 @@ apogee.FolderFunction.prototype.onDelete = function() {
 //I don't know what to do if this fails. Figure that out.
     
     //call the base delete
-    returnValue = apogee.Child.onDelete.call(this);
+    returnValue = apogee.Member.onDelete.call(this);
 	return returnValue;
 }
 
-/** This method creates a child from a json. It should be implemented as a static
+/** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 apogee.FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
     var initialData = {};
@@ -120,6 +118,11 @@ apogee.FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
     
     var createEmptyInternalFolder;
     if(json.internalFolder) {
+        //enforce name of internal folder
+        //this is needed for importing a workspace as a folder function
+        //this will fail quietly if we change the format, but it will still run
+        json.internalFolder.name = apogee.FolderFunction.INTERNAL_FOLDER_NAME;
+        
         childrenJsonOutputList.push(json.internalFolder);
         createEmptyInternalFolder = false;
     }
@@ -131,7 +134,7 @@ apogee.FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
     return new apogee.FolderFunction(json.name,owner,initialData,createEmptyInternalFolder);
 }
 
-/** This method adds any additional data to the json saved for this child. 
+/** This method adds any additional data to the json saved for this member. 
  * @protected */
 apogee.FolderFunction.prototype.addToJson = function(json) {
     json.argList = this.argList;

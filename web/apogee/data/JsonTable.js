@@ -1,8 +1,7 @@
 /** This class encapsulatees a data table for a JSON object */
 apogee.JsonTable = function(name,owner,initialData) {
     //base init
-    apogee.Child.init.call(this,name,apogee.JsonTable.generator);
-    apogee.DataHolder.init.call(this);
+    apogee.Member.init.call(this,name,apogee.JsonTable.generator);
     apogee.Dependent.init.call(this);
     apogee.ContextHolder.init.call(this);
 	apogee.Codeable.init.call(this,[],true);
@@ -34,27 +33,10 @@ apogee.JsonTable = function(name,owner,initialData) {
 }
 
 //add components to this class
-apogee.base.mixin(apogee.JsonTable,apogee.Child);
-apogee.base.mixin(apogee.JsonTable,apogee.DataHolder);
+apogee.base.mixin(apogee.JsonTable,apogee.Member);
 apogee.base.mixin(apogee.JsonTable,apogee.Dependent);
 apogee.base.mixin(apogee.JsonTable,apogee.ContextHolder);
 apogee.base.mixin(apogee.JsonTable,apogee.Codeable);
-
-//------------------------------
-// DataHolder Methods
-//------------------------------
-
-/** This method extends set data from DataHOlder. It also
- * freezes the object so it is immutable. (in the future we may
- * consider copying instead, or allowing a choice)*/
-apogee.JsonTable.prototype.setData = function(data) {
-    
-	//make this object immutable
-	apogee.base.deepFreeze(data);
-
-	//store the new object
-    return apogee.DataHolder.setData.call(this,data);
-}
 
 //------------------------------
 // Codeable Methods
@@ -110,10 +92,22 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberFunction) {
 }
 
 //------------------------------
-// Child Methods
+// Member Methods
 //------------------------------
 
-/** This method creates a child from a json. It should be implemented as a static
+/** This method extends set data from member. It also
+ * freezes the object so it is immutable. (in the future we may
+ * consider copying instead, or allowing a choice)*/
+apogee.JsonTable.prototype.setData = function(data) {
+    
+	//make this object immutable
+	apogee.base.deepFreeze(data);
+
+	//store the new object
+    return apogee.Member.setData.call(this,data);
+}
+
+/** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 apogee.JsonTable.fromJson = function(owner,json) {
     return new apogee.JsonTable(json.name,owner,json.updateData);

@@ -16,7 +16,7 @@ apogee.RootHolder.isRootHolder = true;
 
 // Must be implemented in extending object
 ///** This method sets the root object.  */
-//apogee.RootHolder.setRoot = function(child);
+//apogee.RootHolder.setRoot = function(member);
 
 // Must be implemented in extending object
 ///** This method returns the root object.  */

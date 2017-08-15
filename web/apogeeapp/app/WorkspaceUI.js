@@ -70,8 +70,8 @@ apogeeapp.app.WorkspaceUI.prototype.getWorkspace = function() {
 }
 
 /** This method gets the component associated with a member object. */
-apogeeapp.app.WorkspaceUI.prototype.getComponent = function(object) {
-	var componentInfo = this.componentMap[object.getId()];
+apogeeapp.app.WorkspaceUI.prototype.getComponent = function(member) {
+	var componentInfo = this.componentMap[member.getId()];
 	if(componentInfo) {
 		return componentInfo.component;
 	}
@@ -81,8 +81,8 @@ apogeeapp.app.WorkspaceUI.prototype.getComponent = function(object) {
 }
 
 /** This method gets the component associated with a member object. */
-apogeeapp.app.WorkspaceUI.prototype.getComponentById = function(objectId) {
-	var componentInfo = this.componentMap[objectId];
+apogeeapp.app.WorkspaceUI.prototype.getComponentById = function(memberId) {
+	var componentInfo = this.componentMap[memberId];
 	if(componentInfo) {
 		return componentInfo.component;
 	}
@@ -96,7 +96,7 @@ apogeeapp.app.WorkspaceUI.prototype.getFolders = function() {
     var folders = {}
     for(var key in this.componentMap) {
 		var componentInfo = this.componentMap[key];
-        var member = componentInfo.object;
+        var member = componentInfo.member;
         if(member.isParent) { 
             folders[member.getFullName()] = member;
         }
@@ -124,7 +124,7 @@ apogeeapp.app.WorkspaceUI.prototype.registerMember = function(member,component,m
 	}
 	
     var componentInfo = {};
-    componentInfo.object = member;
+    componentInfo.member = member;
 	componentInfo.component = component;
     if(mainComponentMember) componentInfo.componentMember = mainComponentMember;
 	
@@ -134,9 +134,9 @@ apogeeapp.app.WorkspaceUI.prototype.registerMember = function(member,component,m
 	
 
 /** This method responds to a member updated. */
-apogeeapp.app.WorkspaceUI.prototype.memberUpdated = function(memberObject) {
+apogeeapp.app.WorkspaceUI.prototype.memberUpdated = function(member) {
     //store the ui object
-	var key = memberObject.getId();
+	var key = member.getId();
     
 	var componentInfo = this.componentMap[key];
 	if((componentInfo)&&(componentInfo.component)) {
@@ -145,10 +145,10 @@ apogeeapp.app.WorkspaceUI.prototype.memberUpdated = function(memberObject) {
 }
 
 /** This method responds to a "new" menu event. */
-apogeeapp.app.WorkspaceUI.prototype.childDeleted = function(memberObject) {
+apogeeapp.app.WorkspaceUI.prototype.childDeleted = function(member) {
 	
 	//store the ui object
-	var memberId = memberObject.getId();
+	var memberId = member.getId();
 	
 	var componentInfo = this.componentMap[memberId];
 	delete this.componentMap[memberId];

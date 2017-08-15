@@ -13,7 +13,7 @@ apogeeapp.app.FolderComponent.prototype = Object.create(apogeeapp.app.ParentComp
 apogeeapp.app.FolderComponent.prototype.constructor = apogeeapp.app.FolderComponent;
 
 apogeeapp.app.FolderComponent.prototype.instantiateTabDisplay = function() {
-    var folder = this.getObject();
+    var folder = this.getMember();
     this.tabDisplay = new apogeeapp.app.TabComponentDisplay(this,folder,folder);   
     return this.tabDisplay;
 }
@@ -26,7 +26,7 @@ apogeeapp.app.FolderComponent.prototype.instantiateTabDisplay = function() {
 
 /** This serializes the table component. */
 apogeeapp.app.FolderComponent.writeToJson = function(json) {
-    var folder = this.getObject();
+    var folder = this.getMember();
     var workspaceUI = this.getWorkspaceUI();
     json.children = workspaceUI.getFolderComponentContentJson(folder);
 }

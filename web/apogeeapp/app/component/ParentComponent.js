@@ -1,8 +1,8 @@
 /** This is the base class for a parent component (an object that has children),
  * It extends the component class. */
-apogeeapp.app.ParentComponent = function(workspaceUI,object,generator,options) {
+apogeeapp.app.ParentComponent = function(workspaceUI,member,generator,options) {
     //base constructor
-	apogeeapp.app.Component.call(this,workspaceUI,object,generator,options);
+	apogeeapp.app.Component.call(this,workspaceUI,member,generator,options);
     
     this.tabDisplay = null;
 }
@@ -25,7 +25,7 @@ apogeeapp.app.ParentComponent.prototype.usesTabDisplay = function() {
 /** This brings the child component to the front and takes any other actions
  * to show the child in the open parent. */
 apogeeapp.app.ParentComponent.prototype.showChildComponent = function(childComponent) {
-    if(childComponent.getObject().getParent() != this.getObject()) return;
+    if(childComponent.getMember().getParent() != this.getMember()) return;
     
     if(this.tabDisplay) {
         this.tabDisplay.showChildComponent(childComponent);
@@ -40,7 +40,7 @@ apogeeapp.app.ParentComponent.prototype.getMenuItems = function(optionalMenuItem
     
     var app = this.getWorkspaceUI().getApp();
     var initialValues = {};
-    initialValues.parentName = this.object.getFullName();
+    initialValues.parentName = this.member.getFullName();
     
     itemInfo.title = "Add Component...";
     itemInfo.childMenuItems = app.getAddChildMenuItems(initialValues);
@@ -75,7 +75,7 @@ apogeeapp.app.ParentComponent.prototype.isParentComponent = true;
 apogeeapp.app.ParentComponent.prototype.removeChildComponent = function(childComponent) {
     //remove from tree entry
     var treeEntry = this.getTreeEntry();
-    var childId = childComponent.getObject().getId();
+    var childId = childComponent.getMember().getId();
     treeEntry.removeChild(childId);
     
     //remove child windows - just hide them. They will be deleted in the component
@@ -90,7 +90,7 @@ apogeeapp.app.ParentComponent.prototype.addChildComponent = function(childCompon
     //add the child to the tree entry
     var treeEntry = this.getTreeEntry();
     var childTreeEntry = childComponent.getTreeEntry();
-    var childId = childComponent.getObject().getId();
+    var childId = childComponent.getMember().getId();
     treeEntry.addChild(childId,childTreeEntry);
     
     //add child entry for tab

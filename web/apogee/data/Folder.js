@@ -1,8 +1,7 @@
 /** This is a folder. */
 apogee.Folder = function(name,owner) {
     //base init
-    apogee.Child.init.call(this,name,apogee.Folder.generator);
-    apogee.DataHolder.init.call(this);
+    apogee.Member.init.call(this,name,apogee.Folder.generator);
     apogee.Dependent.init.call(this);
     apogee.ContextHolder.init.call(this);
     apogee.Owner.init.call(this);
@@ -20,8 +19,7 @@ apogee.Folder = function(name,owner) {
 }
 
 //add components to this class
-apogee.base.mixin(apogee.Folder,apogee.Child);
-apogee.base.mixin(apogee.Folder,apogee.DataHolder);
+apogee.base.mixin(apogee.Folder,apogee.Member);
 apogee.base.mixin(apogee.Folder,apogee.Dependent);                      
 apogee.base.mixin(apogee.Folder,apogee.ContextHolder);
 apogee.base.mixin(apogee.Folder,apogee.Owner);
@@ -54,12 +52,11 @@ apogee.Folder.prototype.addChild = function(child) {
     }
     //add object
     this.childMap[name] = child;
-    if(child.isDataHolder) {
-		var data = child.getData();
-		//object may first appear with no data
-		if(data !== undefined) {
-			this.spliceDataMap(name,data);
-		}
+    
+    var data = child.getData();
+    //object may first appear with no data
+    if(data !== undefined) {
+        this.spliceDataMap(name,data);
     }
     
     //set all children as dependents
@@ -75,9 +72,7 @@ apogee.Folder.prototype.removeChild = function(child) {
     //remove from folder
     var name = child.getName();
     delete(this.childMap[name]);
-	if(child.isDataHolder) {
-		this.spliceDataMap(name);
-	}
+    this.spliceDataMap(name);
     
     //set all children as dependents
     this.calculateDependents();
@@ -85,7 +80,6 @@ apogee.Folder.prototype.removeChild = function(child) {
 
 /** This method updates the table data object in the folder data map. */
 apogee.Folder.prototype.updateData = function(child) {
-	if(!child.isDataHolder) return;
 	
     var name = child.getName();
     var data = child.getData();
@@ -127,10 +121,10 @@ apogee.Folder.prototype.updateDependeciesForModelChange = function(recalculateLi
 }
 
 //------------------------------
-// Child Methods
+// Member Methods
 //------------------------------
 
-/** This method creates a child from a json. It should be implemented as a static
+/** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 apogee.Folder.fromJson = function(owner,json,childrenJsonOutputList) {
     var folder = new apogee.Folder(json.name,owner);
@@ -143,7 +137,7 @@ apogee.Folder.fromJson = function(owner,json,childrenJsonOutputList) {
     return folder;
 }
 
-/** This method adds any additional data to the json to save for this child. 
+/** This method adds any additional data to the json to save for this member. 
  * @protected */
 apogee.Folder.prototype.addToJson = function(json) {
 	json.children = {};
@@ -170,10 +164,8 @@ apogee.Folder.prototype.onClose = function () {
 apogee.Folder.prototype.calculateDependents = function() {
     var newDependsOn = [];
     for(var name in this.childMap) {
-        var object = this.childMap[name];
-        if(object.isDataHolder) {
-            newDependsOn.push(object);
-        }
+        var child = this.childMap[name];
+        newDependsOn.push(child);
     }
     this.updateDependencies(newDependsOn);
 }

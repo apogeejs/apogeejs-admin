@@ -4,7 +4,7 @@ apogeeapp.app.TabComponentDisplay = function(component,member,folder) {
     this.member = member;
     this.folder = folder;
     
-    this._loadTabEntry();
+    this.loadTabEntry();
     
     //add a cleanup action to the base component - component must already be initialized
 //    this.addCleanupAction(apogeeapp.app.EditDisplayContent.destroy);
@@ -81,7 +81,7 @@ apogeeapp.app.TabComponentDisplay.prototype.showChildComponent = function(childC
 //===============================
 
 /** @private */
-apogeeapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
+apogeeapp.app.TabComponentDisplay.prototype.loadTabEntry = function() {
     this.tab = new apogeeapp.ui.Tab(this.member.getId());    
     
     //-----------------------
@@ -94,7 +94,7 @@ apogeeapp.app.TabComponentDisplay.prototype._loadTabEntry = function() {
     //-----------------------
     //set the content
     //-----------------------
-    this._createDisplayContent();
+    this.createDisplayContent();
     this.tab.setContent(this.contentElement);
     
     var tabShown = function() {
@@ -142,7 +142,7 @@ apogeeapp.app.TabComponentDisplay.PARENT_CONTAINER_STYLE = {
 }
 
  /** @private */
-apogeeapp.app.TabComponentDisplay.prototype._createDisplayContent = function() {
+apogeeapp.app.TabComponentDisplay.prototype.createDisplayContent = function() {
    
     this.contentElement = apogeeapp.ui.createElement("div",null,apogeeapp.app.TabComponentDisplay.PARENT_CONTAINER_STYLE);
     this.parentContainer = new apogeeapp.ui.WindowParent(this.contentElement);

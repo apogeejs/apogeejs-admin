@@ -1,8 +1,8 @@
 /** This is the base class for a editable component (an object with code or data),
  * It extends the component class. */
-apogeeapp.app.EditComponent = function(workspaceUI,object,generator,options) {
+apogeeapp.app.EditComponent = function(workspaceUI,member,generator,options) {
     //base constructor
-	apogeeapp.app.Component.call(this,workspaceUI,object,generator,options);
+	apogeeapp.app.Component.call(this,workspaceUI,member,generator,options);
 }
 
 apogeeapp.app.EditComponent.prototype = Object.create(apogeeapp.app.Component.prototype);
@@ -44,7 +44,7 @@ apogeeapp.app.EditComponent.prototype.getMenuItems = function(optionalMenuItemLi
     var menuItemList = apogeeapp.app.Component.prototype.getMenuItems.call(this,menuItemList);
     
     //initialize the "clear function" menu entry, used only when there is code
-     if((this.object.isCodeable)&&(this.object.hasCode())) {
+     if((this.member.isCodeable)&&(this.member.hasCode())) {
          var settings = this.getTableEditSettings();
         if(settings.clearFunctionMenuText !== undefined) {
             var itemInfo = {};
@@ -59,7 +59,7 @@ apogeeapp.app.EditComponent.prototype.getMenuItems = function(optionalMenuItemLi
 
 apogeeapp.app.EditComponent.prototype.getClearFunctionCallback = function(emptyDataValue) {
     var actionData = {};
-    actionData.member = this.object;
+    actionData.member = this.member;
     actionData.data = emptyDataValue;
     actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME
     return function() {

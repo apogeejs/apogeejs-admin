@@ -202,11 +202,13 @@ apogeeapp.app.Apogee.prototype.onTabHidden = function(tab) {
 }
 
 apogeeapp.app.Apogee.prototype.onTabShown = function(tab) {
+    if(!this.workspaceUI) return;
+    
     var id = tab.getId();
     var component = this.workspaceUI.getComponentById(id);
     if(component) {
         this.activeTabIconDisplay.src = component.getIconUrl();
-        this.activeTabTitleDisplay.innerHTML = component.getObject().getDisplayName(true);
+        this.activeTabTitleDisplay.innerHTML = component.getMember().getDisplayName(true);
         this.activeTabIconDisplay.style.display = "";
         this.activeTabTitleDisplay.style.display = "";
     }
