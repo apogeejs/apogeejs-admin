@@ -165,6 +165,18 @@ apogeeapp.ui.WindowFrame.prototype.setContent = function(contentElement) {
     this.content = contentElement;
 }
 
+/** This method removes the given element from the content display. If the element
+ * is not in the content display, no action is taken. */
+apogeeapp.ui.WindowFrame.prototype.safeRemoveContent = function(contentElement) {
+    for(var i = 0; i < this.bodyCell.childNodes.length; i++) {
+		var node = this.bodyCell.childNodes[i];
+        if(node === contentElement) {
+        	this.bodyCell.removeChild(contentElement);
+            this.content = null;
+        }
+    }
+}
+
 apogeeapp.ui.WindowFrame.prototype.addTitleToolElement = function(element) {
     this.titleBarToolElement.appendChild(element);
 }

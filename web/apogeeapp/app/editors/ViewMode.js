@@ -69,12 +69,7 @@ apogeeapp.app.ViewMode.prototype.setDisplayDestroyFlags = function(displayDestro
 
 /** This method cleasr the data display. It should only be called when the data display is not showing. */
 apogeeapp.app.ViewMode.prototype.triggerReload = function() {
-    if(this.dataDisplay) {
-        if(this.dataDisplay.destroy) {
-            this.dataDisplay.destroy();
-        }
-        this.dataDisplay = null;
-    }
+    this.destroyDataDisplay();
 }
 
 /** This is called immediately before the display element is shown. */
@@ -259,18 +254,28 @@ apogeeapp.app.ViewMode.prototype.populateDataDisplay = function() {
     if(!this.dataDisplay) {
         this.dataDisplay = this.createDisplay();   
         this.addWindowListeners();
+        
+        //add to display here
+        this.componentDisplay.showDisplayElement(this.dataDisplay.getElement());
     }
     
-    this.dataDisplay.showData(this.getDisplayData(),this.getIsDataEditable());
+    //no dont overwrite data if we are in edit mode
+    if(this.inEditMode === false) {
+        this.dataDisplay.showData(this.getDisplayData(),this.getIsDataEditable());
+    }
 }
 
 apogeeapp.app.ViewMode.prototype.destroyDataDisplay = function() {
     if(this.dataDisplay) {
         
+        //remove from display here
+        this.componentDisplay.removeDisplayElement(this.dataDisplay.getElement());
+        
         //destroy display
         if(this.dataDisplay.destroy) {  
             this.dataDisplay.destroy();
         }
+        this.compon
         this.dataDisplay = null;
     }
 }

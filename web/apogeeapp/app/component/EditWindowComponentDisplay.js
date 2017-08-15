@@ -293,11 +293,21 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewTypeSelect = functi
 apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewContent = function() {
     if(this.viewModeElement) {
         this.viewModeElement.showData();
-        this.windowFrame.setContent(this.viewModeElement.getElement());
     }
     else {
         alert("Error: View mode element not found!");
     }
+}
+
+/** This method should be called to put the display element in the window. */
+apogeeapp.app.EditWindowComponentDisplay.prototype.showDisplayElement = function(displayElement) {
+    this.windowFrame.setContent(displayElement);
+}
+
+/** This method should be called to remove the given element from the window. 
+ * If this method is called when this is not the current element, no action is taken. */
+apogeeapp.app.EditWindowComponentDisplay.prototype.removeDisplayElement = function(displayElement) {
+    this.windowFrame.safeRemoveContent(displayElement);
 }
 
 //----------------------------
