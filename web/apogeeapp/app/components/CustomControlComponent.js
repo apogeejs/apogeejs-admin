@@ -11,13 +11,15 @@ apogeeapp.app.CustomControlComponent = function(workspaceUI,control,componentJso
     this.loadResourceFromJson(componentJson);
     
     //create a resource based on the json (or lack of a json)
+    var destroyOnInactive;
     if((componentJson)&&(componentJson.destroyOnInactive !== undefined)) {
-        this.destroyOnInactive = componentJson.destroyOnInactive;
+        destroyOnInactive = componentJson.destroyOnInactive;
     }
     else {
         //just keep it alive, unless user specifies something else
-        this.destroyOnInactive = false;
+        destroyOnInactive = false;
     }
+    this.setDestroyOnInactive(destroyOnInactive);
 	
 	this.memberUpdated();
     
