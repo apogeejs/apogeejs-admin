@@ -34,7 +34,7 @@ apogee.util.constructors = {
 /** This method returns the object type. The Allowed types are:
  * String, Number, Boolean, Date, Object, Array, Function, null, undefined. */
 apogee.util.getObjectType = function(object) {
-    if(object === "null") return "null";
+    if(object === null) return "null";
     if(object === undefined) return "undefined";
     
     var constructor = object.constructor;
