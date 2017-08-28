@@ -135,7 +135,7 @@ apogeeapp.app.ViewMode.prototype.memberUpdated = function() {
 
 apogeeapp.app.ViewMode.prototype.onCancel = function() {
 	//reload old data
-	this.showData();
+	this.setData();
 	
 	return true;
 }
