@@ -9,6 +9,8 @@ apogeeapp.ui.WindowParent = function(containerElement) {
     
     this.windowFrameStack = [];
     
+    this.showing = false;
+    
     //child auto positioning variables
     this.prevNewChildX = 0;
     this.prevNewChildY = 0;
@@ -33,13 +35,20 @@ apogeeapp.ui.WindowParent.MAX_WRAP_HEIGHT = 400;
 /** This should be called when the window parent element is shown, if the
  * "shown" event is to be supported.  */
 apogeeapp.ui.WindowParent.prototype.elementIsShown = function() {
+    this.showing = true;
     this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,this);
 }
 
 /** This should be called when the window parent element is shown, if the
  * "shown" event is to be supported.  */
 apogeeapp.ui.WindowParent.prototype.elementIsHidden = function() {
+    this.showing = false;
     this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,this);
+}
+
+/** This method returns true if this window parent is showing. */
+apogeeapp.ui.WindowParent.prototype.getIsShowing = function() {
+    return this.showing;
 }
 
 apogeeapp.ui.WindowParent.prototype.getOuterElement = function() {
@@ -52,7 +61,7 @@ apogeeapp.ui.WindowParent.prototype.addWindow = function(windowFrame) {
     this.windowFrameStack.push(windowFrame);
     this.updateOrder();
     
-    windowFrame.setParent(this);
+    windowFrame.onAddedToParent(this);
 }
 
 /** This method removes the window from the parent container. */

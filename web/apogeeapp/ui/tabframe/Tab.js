@@ -147,9 +147,9 @@ apogeeapp.ui.Tab.prototype.close = function(forceClose) {
         }
     }
     
+    this.tabFrame.closeTab(this.id);
     this.tabFrame.removeListener(apogeeapp.ui.SHOWN_EVENT, this.tabShownListener);
     this.tabFrame.removeListener(apogeeapp.ui.HIDDEN_EVENT, this.tabHiddenListener);
-    this.tabFrame.closeTab(this.id);
     this.tabFrame = null;
     
     this.dispatchEvent(apogeeapp.ui.CLOSE_EVENT,this);

@@ -45,13 +45,7 @@ apogeeapp.app.GoogleChartComponent.prototype.getDataDisplay = function(viewMode)
     return new apogeeapp.app.GoogleChartDisplay(viewMode);
 }
 
-/** TO use JsDataDisplay, implement a class with the following methods, all optional:
- * init(outputElement,outputMode);
- * setData(data,outputElement,outputMode);
- * requestHide(outputElement,outputMode);
- * onHide(outputElement,outputMode);
- * destroy(outputElement,outputMode);
- */
+/** Extend ths JsDataDisplay */
 apogeeapp.app.GoogleChartDisplay = function(viewMode) {
     //extend edit component
     apogeeapp.app.JsDataDisplay.call(this,viewMode);
@@ -76,14 +70,6 @@ apogeeapp.app.GoogleChartDisplay.prototype.showData = function(data) {
     if(this.libLoaded) {
         this.displayData();
     }
-}
-
-apogeeapp.app.GoogleChartDisplay.prototype.onHide = function() {
-    console.log("NewButtonControl.onHide");
-}
-
-apogeeapp.app.GoogleChartDisplay.prototype.destroy = function() {
-    console.log("NewButtonControl.destroyed");
 }
 
 apogeeapp.app.GoogleChartDisplay.prototype.onLibLoaded = function() {

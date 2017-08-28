@@ -26,23 +26,15 @@ apogeeapp.app.HandsonGridEditor = function(viewMode) {
 	this.viewMode = viewMode;
 	this.inputData = null;
 	this.editOk = false;
+    this.activeEditOk = undefined;
+    this.dataCached = false;
 	
 	//resize the editor on window size change
     var instance = this;
-    this.resizeCallback = function() {
-        instance.gridDiv.style.width = instance.outsideDiv.clientWidth + "px";
-        instance.gridDiv.style.height = instance.outsideDiv.clientHeight + "px";
-        if(instance.gridControl) {
-            instance.gridControl.render();
-        }
-    }
+    
    this.callbackAttached = false;
    
    //we have to make sure the element is loaded before initailizing for handsontable to work properly
-   this.loadCallback = function() {
-       instance.onLoad(viewMode);
-   }
-   apogeeapp.ui.setLoadListener(this.outsideDiv, this.loadCallback);
    this.loaded = false;
    
 	//grid edited function
@@ -65,7 +57,6 @@ apogeeapp.app.HandsonGridEditor = function(viewMode) {
             setTimeout(callEditEvent,REFRESH_DELAY);
         }
     }
-	
     
 }
 
@@ -93,21 +84,33 @@ apogeeapp.app.HandsonGridEditor.prototype.getElement = function() {
 }
 	
 apogeeapp.app.HandsonGridEditor.prototype.showData = function(json,editOk) {
-    if(!this.loaded) return;
     
 	if((this.inputData === json)&&(editOk)) return;
 	
-	var oldEditOk = this.editOk;
 	this.editOk = editOk;
 	this.inputData = json;
-	var editData = apogee.util.deepJsonCopy(json);
+    this.dataCached = true;
+	
+    if(this.loaded) {
+        this.displayData();
+    }
+}
     
+
+//we must be loaded before creating objects
+apogeeapp.app.HandsonGridEditor.prototype.displayData = function() {
+    
+    //clear the cached data flag, if it is present
+    this.dataCached = false;
+    
+    var editData = apogee.util.deepJsonCopy(this.inputData);
     if(!editData) {
         editData = [[]];
     }
 
-    if((!this.gridControl)||(oldEditOk !== editOk)) {
+    if((!this.gridControl)||(this.activeEditOk !== this.editOk)) {
         this.createNewGrid(editData);
+        this.activeEditOk = this.editOk;
     }
     else {
         this.gridControl.loadData(editData);
@@ -120,32 +123,31 @@ apogeeapp.app.HandsonGridEditor.prototype.showData = function(json,editOk) {
     else {
         this.gridDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
     }
-    
-    if(!this.callbackAttached) {
-        var displayWindow = this.viewMode.getDisplayWindow();
-        if(displayWindow) {
-            displayWindow.addListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
-            this.callbackAttached = true;
-        }
-        
-        //call resize to make sure size is initialized
-        this.resizeCallback();
-    }
-    
 }
 
-apogeeapp.app.HandsonGridEditor.prototype.onLoad = function(viewMode) {
+apogeeapp.app.HandsonGridEditor.prototype.onLoad = function() {
     this.loaded = true;
-    viewMode.showData();
+    if(this.dataCached) {
+        this.displayData();
+    }
 }
 
-apogeeapp.app.HandsonGridEditor.prototype.hide = function() {
-    var displayWindow = this.viewMode.getDisplayWindow();
-    if(displayWindow) {
-        displayWindow.removeListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
-        this.callbackAttached = false;
-    }
+apogeeapp.app.HandsonGridEditor.prototype.onUnload = function() {
     this.loaded = false;
+}
+
+apogeeapp.app.HandsonGridEditor.prototype.onResize = function() {
+    this.setSize();
+}
+    
+apogeeapp.app.HandsonGridEditor.prototype.setSize = function() {  
+    if(this.gridDiv) {
+        this.gridDiv.style.width = this.outsideDiv.clientWidth + "px";
+        this.gridDiv.style.height = this.outsideDiv.clientHeight + "px";
+        if(this.gridControl) {
+            this.gridControl.render();
+        }
+    }
 }
 
 apogeeapp.app.HandsonGridEditor.prototype.destroy = function() {
@@ -194,5 +196,7 @@ apogeeapp.app.HandsonGridEditor.prototype.createNewGrid = function(initialData) 
     }
         
     this.gridControl = new Handsontable(this.gridDiv,gridOptions); 
+    
+    this.setSize();
 }
 

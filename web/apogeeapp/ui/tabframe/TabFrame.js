@@ -82,7 +82,7 @@ apogeeapp.ui.TabFrame.prototype.closeTab = function(id) {
         delete this.tabTable[id];
 		
         if(this.activeTab == id) {
-            this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,id);
+            this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,tab);
             this.activeTab = null;
             //choose a random tab
             for(var newId in this.tabTable) {
@@ -99,10 +99,17 @@ apogeeapp.ui.TabFrame.prototype.closeTab = function(id) {
 apogeeapp.ui.TabFrame.prototype.setActiveTab = function(id) {
     var tab = this.tabTable[id];
 	if(tab) {
+        var oldTab;
+        if(this.activeTab) {
+            oldTab = this.tabTable[this.activeTab];
+        }
 		this.activeTab = id;
 		this.tabFrame.appendChild(tab.getMainElement());
 		this.updateTabDisplay();
 		this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,tab);
+        if(oldTab) {
+            this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,oldTab);
+        }
 	}
 }
 

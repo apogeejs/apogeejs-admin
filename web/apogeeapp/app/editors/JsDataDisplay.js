@@ -5,7 +5,7 @@
  * 
  * init(outputElement,outputMode);
  * setData(data,outputElement,outputMode);
- * requestHide(outputElement,outputMode);
+ * requestInactive(outputElement,outputMode);
  * onHide(outputElement,outputMode);
  * destroy(outputElement,outputMode);
  */
@@ -43,11 +43,19 @@ apogeeapp.app.JsDataDisplay.prototype.getOutputMode = function() {
  * apogeeapp.app.ViewMode.UNSAVED_DATA: do not hide the data display. Show an unsaved data message.
  * apogeeapp.app.ViewMode.CLOSE_OK: ok to hide the data display
  */
-//apogeeapp.app.JsDataDisplay.prototype.hideRequest = function()
+//apogeeapp.app.JsDataDisplay.prototype.isCloseOk = function()
 
-/** This method is called after the data display is hidden. */
-//apogeeapp.app.JsDataDisplay.prototype.onHide = function()
+/** This method is called when the element is added to the DOM. */
+//apogeeapp.app.JsDataDisplay.prototype.onLoad = function()
+
+/** This method is called when the element is removed from the DOM. */
+//apogeeapp.app.JsDataDisplay.prototype.onUnload = function()
+
+/** This method is called when the display is resized. */
+//apogeeapp.app.JsDataDisplay.prototype.onResize = function()
 
 /** This method is called when the data display is being destroyed. */
 //apogeeapp.app.JsDataDisplay.prototype.destroy = function()
+
+
     

@@ -38,12 +38,6 @@ apogeeapp.app.AceTextEditor = function(viewMode,aceMode) {
 	editor.$blockScrolling = Infinity;
     this.editor = editor;
 	
-	//resize the editor on window size change
-    this.resizeCallback = function() {
-        editor.resize();
-    }
-    this.callbackAttached = false;
-	
 	//add click handle to enter edit mode
 	var instance = this;
 	var onMouseClick = function() {
@@ -91,28 +85,14 @@ apogeeapp.app.AceTextEditor.prototype.showData = function(text,editOk) {
     else {
         this.editorDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
     }
+}
     
-    if(!this.callbackAttached) {
-        var displayWindow = this.viewMode.getDisplayWindow();
-        if(displayWindow) {
-            displayWindow.addListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
-            displayWindow.addListener(apogeeapp.ui.SHOWN_EVENT,this.resizeCallback);
-            this.callbackAttached = true;
-        }
-    }
-    
-    //call resize to make sure size is initialized
-    this.resizeCallback();
-    
+apogeeapp.app.AceTextEditor.prototype.onLoad = function() {
+    if(this.editor) this.editor.resize();
 }
 
-apogeeapp.app.AceTextEditor.prototype.hide = function() {
-    var displayWindow = this.viewMode.getDisplayWindow();
-    if(displayWindow) {
-        displayWindow.removeListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
-        displayWindow.removeListener(apogeeapp.ui.SHOWN_EVENT,this.resizeCallback);
-        this.callbackAttached = false;
-    }
+apogeeapp.app.AceTextEditor.prototype.onResize = function() {
+    if(this.editor) this.editor.resize();
 }
 
 apogeeapp.app.AceTextEditor.prototype.destroy = function() {

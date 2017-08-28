@@ -73,9 +73,10 @@ apogeeapp.app.CustomControlComponent.CODE_FIELD_HTML = "html";
 apogeeapp.app.CustomControlComponent.CODE_FIELD_CSS = "css";
 apogeeapp.app.CustomControlComponent.CODE_FIELD_INIT = "init";
 apogeeapp.app.CustomControlComponent.CODE_FIELD_SET_DATA = "setData";
-apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_HIDE = "onHide";
+apogeeapp.app.CustomControlComponent.CODE_FIELD_IS_CLOSE_OK = "isCloseOk";
 apogeeapp.app.CustomControlComponent.CODE_FIELD_DESTROY = "destroy";
 apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_LOAD = "onLoad";
+apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_UNLOAD = "onUnload";
 apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_RESIZE = "onResize";
 apogeeapp.app.CustomControlComponent.CODE_FIELD_CONSTRUCTOR = "constructorAddition";
 
@@ -86,9 +87,10 @@ apogeeapp.app.CustomControlComponent.VIEW_HTML = "HTML";
 apogeeapp.app.CustomControlComponent.VIEW_CSS = "CSS";
 apogeeapp.app.CustomControlComponent.VIEW_INIT = "init(element,mode)";
 apogeeapp.app.CustomControlComponent.VIEW_SET_DATA = "setData(data,element,mode)";
-apogeeapp.app.CustomControlComponent.VIEW_ON_HIDE = "onHide(element,mode)";
+apogeeapp.app.CustomControlComponent.VIEW_IS_CLOSE_OK = "isCloseOk(element,mode)";
 apogeeapp.app.CustomControlComponent.VIEW_DESTROY = "destroy(element,mode)";
 apogeeapp.app.CustomControlComponent.VIEW_ON_LOAD = "onLoad(element,mode)";
+apogeeapp.app.CustomControlComponent.VIEW_ON_UNLOAD = "onUnload(element,mode)";
 apogeeapp.app.CustomControlComponent.VIEW_ON_RESIZE = "onResize(element,mode)";
 apogeeapp.app.CustomControlComponent.VIEW_CONSTRUCTOR = "constructor(mode)";
 apogeeapp.app.CustomControlComponent.VIEW_DESCRIPTION = "Notes";
@@ -101,9 +103,10 @@ apogeeapp.app.CustomControlComponent.VIEW_MODES = [
     apogeeapp.app.CustomControlComponent.VIEW_CSS,
     apogeeapp.app.CustomControlComponent.VIEW_INIT,
     apogeeapp.app.CustomControlComponent.VIEW_SET_DATA,
-    apogeeapp.app.CustomControlComponent.VIEW_ON_HIDE,
+    apogeeapp.app.CustomControlComponent.VIEW_IS_CLOSE_OK,
     apogeeapp.app.CustomControlComponent.VIEW_DESTROY,
     apogeeapp.app.CustomControlComponent.VIEW_ON_LOAD,
+    apogeeapp.app.CustomControlComponent.VIEW_ON_UNLOAD,
     apogeeapp.app.CustomControlComponent.VIEW_ON_RESIZE,
     apogeeapp.app.CustomControlComponent.VIEW_CONSTRUCTOR,
     apogeeapp.app.CustomControlComponent.VIEW_DESCRIPTION
@@ -152,15 +155,18 @@ apogeeapp.app.CustomControlComponent.prototype.getViewModeElement = function(edi
         case apogeeapp.app.CustomControlComponent.VIEW_SET_DATA:
             return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_SET_DATA);
      
-        case apogeeapp.app.CustomControlComponent.VIEW_ON_HIDE:
-            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_HIDE);    
+        case apogeeapp.app.CustomControlComponent.VIEW_IS_CLOSE_OK:
+            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_IS_CLOSE_OK);    
             
         case apogeeapp.app.CustomControlComponent.VIEW_DESTROY:
             return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_DESTROY);    
             
         case apogeeapp.app.CustomControlComponent.VIEW_ON_LOAD:
             return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_LOAD);
-			
+		
+        case apogeeapp.app.CustomControlComponent.VIEW_ON_UNLOAD:
+            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_UNLOAD);
+        
         case apogeeapp.app.CustomControlComponent.VIEW_ON_RESIZE:
             return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_RESIZE);
 			
@@ -240,7 +246,7 @@ apogeeapp.app.CustomControlComponent.prototype.update = function(uiCodeFields) {
     
     //make sure we get rid of the old display
     if(this.outputMode) {
-        this.outputMode.triggerReload();
+        this.outputMode.forceClearDisplay();
     }
     
     this.uiCodeFields = uiCodeFields;
@@ -298,9 +304,10 @@ apogeeapp.app.CustomControlComponent.GENERATOR_INTERNAL_FORMATS = {
     "constructorAddition":"resource.constructorAddition = function(mode) {\n__customControlDebugHook();\n{0}\n};",
     "init":"resource.init = function(element,mode) {\n{0}\n};",
     "setData":"resource.setData = function(data,element,mode) {\n{0}\n};",
-    "onHide":"resource.onHide = function(element,mode) {\n{0}\n};",
+    "isCloseOk":"resource.isCloseOk = function(element,mode) {\n{0}\n};",
     "destroy":"resource.destroy = function(element,mode) {\n{0}\n};",
     "onLoad":"resource.onLoad = function(element,mode) {\n{0}\n};",
+    "onUnload":"resource.onUnload = function(element,mode) {\n{0}\n};",
     "onResize":"resource.onResize = function(element,mode) {\n{0}\n};"
 }
 

@@ -97,8 +97,10 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.updateData = function() {
         //update the title
         this.windowFrame.setTitle(this.member.getDisplayName());
         
-        //update the content
-        this.viewModeElement.memberUpdated();
+        //update the content in instantiated view mode elements
+        for(var elementTag in this.viewModeElements) {
+            this.viewModeElements[elementTag].memberUpdated();
+        }
     }
 }
 
@@ -252,7 +254,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setViewType = function(viewTy
     
     //check if we can change views
     if(this.viewModeElement) {
-        var hideRequestResponse = this.viewModeElement.requestHide();
+        var hideRequestResponse = this.viewModeElement.isCloseOk();
         
         if(hideRequestResponse !== apogeeapp.app.ViewMode.CLOSE_OK) {
             if(hideRequestResponse === apogeeapp.app.ViewMode.UNSAVED_DATA) {
@@ -269,7 +271,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setViewType = function(viewTy
             return;
         }
         
-        this.viewModeElement.hide();
+        this.viewModeElement.setInactive();
     }
     
     //set the view type
@@ -281,21 +283,17 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setViewType = function(viewTy
         this.viewModeElement = this.component.getViewModeElement(this,viewType);
         this.viewModeElements[viewType] = this.viewModeElement;
     }
-    this.updateViewContent();
+    if(this.viewModeElement) {
+        this.viewModeElement.setActive();
+    }
+    else {
+        alert("Error: View mode element not found!");
+    }
 }
 
 apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewTypeSelect = function() {
     if(this.select.value != this.viewType) {
         this.select.value = this.viewType;
-    }
-}
-
-apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewContent = function() {
-    if(this.viewModeElement) {
-        this.viewModeElement.showData();
-    }
-    else {
-        alert("Error: View mode element not found!");
     }
 }
 

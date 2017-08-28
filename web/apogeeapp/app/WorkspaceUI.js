@@ -8,15 +8,16 @@ apogeeapp.app.WorkspaceUI = function() {
     this.tabFrame = null;
     this.tree = null;
     this.componentMap = {};
-    this.activeFolderName = null;
    
     this.jsLinkArray = [];
     this.cssLinkArray = [];
-    
-    this.workspaceTreeEntry = null;
 }
 
 apogeeapp.app.WorkspaceUI.MAIN_WORKSPACE_NAME = "main workspace";
+
+//====================================
+// Workspace Management
+//====================================
 
 /** This sets the application. It must be done before the workspace is set. */
 apogeeapp.app.WorkspaceUI.prototype.setApp = function(app,tabFrame,treePane) {
@@ -69,6 +70,33 @@ apogeeapp.app.WorkspaceUI.prototype.getWorkspace = function() {
     return this.workspace;
 }
 
+apogeeapp.app.WorkspaceUI.prototype.getTabFrame = function() {
+    return this.tabFrame;
+}
+
+
+/** This method gets the workspace object. */
+apogeeapp.app.WorkspaceUI.prototype.close = function() {
+    //delete all the components - to make sure the are cleaned up
+    for(var key in this.componentMap) {
+        var componentInfo = this.componentMap[key];
+        if((componentInfo)&&(componentInfo.component)&&(!componentInfo.componentMember)) {
+            componentInfo.component.onDelete();
+        }
+    }
+    
+    //TREE_ENTRY - remove tree entry
+    this.tree.clearRootEntry();
+    
+    //remove links
+    this.setLinks([],[]);
+}
+
+
+//====================================
+// Component Management
+//====================================
+
 /** This method gets the component associated with a member object. */
 apogeeapp.app.WorkspaceUI.prototype.getComponent = function(member) {
 	var componentInfo = this.componentMap[member.getId()];
@@ -91,7 +119,7 @@ apogeeapp.app.WorkspaceUI.prototype.getComponentById = function(memberId) {
 	}
 }
 
-/** This returns the map of component objects. */
+/** This returns the map of folder objects. */
 apogeeapp.app.WorkspaceUI.prototype.getFolders = function() {
     var folders = {}
     for(var key in this.componentMap) {
@@ -157,27 +185,6 @@ apogeeapp.app.WorkspaceUI.prototype.childDeleted = function(member) {
         //do any needed cleanup
         componentInfo.component.onDelete();
 	}
-}
-
-/** This method gets the workspace object. */
-apogeeapp.app.WorkspaceUI.prototype.close = function() {
-    //delete all the components - to make sure the are cleaned up
-    for(var key in this.componentMap) {
-        var componentInfo = this.componentMap[key];
-        if((componentInfo)&&(componentInfo.component)&&(!componentInfo.componentMember)) {
-            componentInfo.component.onDelete();
-        }
-    }
-    
-    //TREE_ENTRY - remove tree entry
-    this.tree.clearRootEntry();
-    
-    //remove links
-    this.setLinks([],[]);
-}
-
-apogeeapp.app.WorkspaceUI.prototype.getTabFrame = function() {
-    return this.tabFrame;
 }
 
 //====================================

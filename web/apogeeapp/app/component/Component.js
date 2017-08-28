@@ -12,20 +12,21 @@ apogeeapp.app.Component = function(workspaceUI,member,generator,options) {
     this.generator = generator;
    
     this.workspaceUI.registerMember(this.member,this);
-
-    this.windowDisplay = null;
-    this.windowDisplayStateJson = this.options.windowState;
-    
-    this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
-    this.bannerMessage = "";
     
     //inheriting objects can pass functions here to be called on cleanup, save, etc
     this.saveActions = [];
     this.cleanupActions = [];
     
-    //-------------
-    //create tree entry
-    //-------------
+    //notifications
+    this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
+    this.bannerMessage = "";
+    
+    //ui elements
+    this.windowDisplay = null;
+    this.windowDisplayStateJson = this.options.windowState;
+    
+    this.tabDisplay = null;
+    
     this.treeDisplay = new apogeeapp.app.TreeComponentDisplay(this);
 }
 
@@ -199,11 +200,6 @@ apogeeapp.app.Component.prototype.toJson = function() {
 //** This serializes the table component. */
 //apogeeapp.app.Component.prototype.writeToJson = function(json);
 
-//This method should be populated by an extending object iof it needs to add any UI elements
-// to the frame.
-//** This method populates the frame for this component. */
-//apogeeapp.app.Component.populateFrame = function();
-
 /** This method cleans up after a delete. Any extending object that has delete
  * actions should pass a callback function to the method "addClenaupAction" */
 apogeeapp.app.Component.prototype.onDelete = function() {
@@ -314,10 +310,6 @@ apogeeapp.app.Component.prototype.getPropertyValues = function() {
     return values;
 }
 
-///** This method shoudl be implemented by an extending class to create a component
-// * display, given a container, for the component. */
-//apogeeapp.app.Component.prototype.createDisplayContent = function(container);
-
 //=============================
 // Action UI Entry Points
 //=============================
@@ -392,15 +384,6 @@ apogeeapp.app.Component.prototype.createDeleteCallback = function() {
 }
 
 //======================================
-// All components should have a generator to register the component, as below
+// All components should have a generator to creste the component
+// from a json. See existing components for examples.
 //======================================
-//
-//apogeeapp.app.JsonTableComponent.generator = {};
-//apogeeapp.app.JsonTableComponent.generator.displayName = "JSON Table";
-//apogeeapp.app.JsonTableComponent.generator.uniqueName = "apogeeapp.app.JsonTableComponent";
-//apogeeapp.app.JsonTableComponent.generator.createComponent = apogeeapp.app.JsonTableComponent.createComponent;
-//apogeeapp.app.JsonTableComponent.generator.createComponentFromJson = apogeeapp.app.JsonTableComponent.createComponentFromJson;
-//apogeeapp.app.JsonTableComponent.generator.DEFAULT_WIDTH = 200;
-//apogeeapp.app.JsonTableComponent.generator.DEFAULT_HEIGHT = 200;
-//apogeeapp.app.JsonTableComponent.generator.ICON_RES_PATH = "path to icon in resource directory";
-//apogeeapp.app.JsonTableComponent.generator.ICON_URL = "absolute icon url";

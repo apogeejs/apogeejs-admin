@@ -17,36 +17,13 @@ apogeeapp.app.SimpleGeojsonControl.prototype.getDataDisplay = function(viewMode)
     return new apogeeapp.app.SimpleGeojsonDisplay(viewMode);
 }
 
-/** TO use JsDataDisplay, implement a class with the following methods, all optional:
- * init(outputElement,outputMode);
- * setData(data,outputElement,outputMode);
- * requestHide(outputElement,outputMode);
- * onHide(outputElement,outputMode);
- * destroy(outputElement,outputMode);
- */
+/** Extend ths JsDataDisplay */
 apogeeapp.app.SimpleGeojsonDisplay = function(viewMode) {
     //extend edit component
     apogeeapp.app.JsDataDisplay.call(this,viewMode);
     
     //dummy initial view
     this.previousSetView = null;
-    
-    //resize the editor on window size change
-    var instance = this;
-    this.shownCallback = function() {
-        if(!instance.map) {
-            instance.loadMap();
-        }
-        else {
-            instance.map.invalidateSize();
-        }
-    }
-    this.resizeCallback = function() {
-        if(instance.map) {
-            instance.map.invalidateSize();
-        }
-    }
-    this.callbackAttached = false;
 }
 
 apogeeapp.app.SimpleGeojsonDisplay.prototype = Object.create(apogeeapp.app.JsDataDisplay.prototype);
@@ -69,62 +46,63 @@ apogeeapp.app.SimpleGeojsonDisplay.prototype.loadMap = function() {
     }).addTo(this.map);
     
     this.map.setView(DEFAULT_LAT_LNG,DEFAULT_ZOOM);
-    
-    //if needed, reset the data
-    var outputMode = this.getOutputMode();
-    if(this.outputMode) {
-        this.outputMode.showData();
-    }
 }
 
 apogeeapp.app.SimpleGeojsonDisplay.prototype.showData = function(data) {
-    if(this.map) { 
-        var features = data.features;
-        var theme = data.theme;
-        var initialView = data.initialView;
+    this.cachedData = data;
+    if(this.map) {
+        this.createLayerData();
+    }
+}
         
-        if((features)&&(theme)) {
-           
-            //set the initial view if it changes
-            if((initialView)&&(initialView !== this.previousSetView)) {
-                try {
-                    var latLng = data.initialView.latLng;
-                    var zoom = data.initialView.zoom;
-                    this.map.setView(latLng,zoom);
-                    this.previousSetView = initialView;
-                }
-                catch(error) {
-                    alert("Improper initial view format.");
-                }
+apogeeapp.app.SimpleGeojsonDisplay.prototype.createDataLayer = function() {
+    if(!this.cachedData) return;    
+    var data = this.cachedData;
+    this.cachedData = null;
 
+    var features = data.features;
+    var theme = data.theme;
+    var initialView = data.initialView;
+
+    if((features)&&(theme)) {
+
+        //set the initial view if it changes
+        if((initialView)&&(initialView !== this.previousSetView)) {
+            try {
+                var latLng = data.initialView.latLng;
+                var zoom = data.initialView.zoom;
+                this.map.setView(latLng,zoom);
+                this.previousSetView = initialView;
             }
-            
-            if(this.geoJsonLayer) {
-                this.geoJsonLayer.remove();
-                this.geoJsonLayer = null;
+            catch(error) {
+                alert("Improper initial view format.");
             }
-            this.geoJsonLayer = L.geoJSON(features,theme).addTo(this.map);
-        }       
-    }
-    
-    if(!this.callbackAttached) {
-        var viewMode = this.getOutputMode();
-        var displayWindow = viewMode.getDisplayWindow();
-        if(displayWindow) {
-            displayWindow.addListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
-            displayWindow.addListener(apogeeapp.ui.SHOWN_EVENT,this.shownCallback);
-            this.callbackAttached = true;
+
         }
-    }
-    
+
+        if(this.geoJsonLayer) {
+            this.geoJsonLayer.remove();
+            this.geoJsonLayer = null;
+        }
+        this.geoJsonLayer = L.geoJSON(features,theme).addTo(this.map);
+    }       
 }
 
-apogeeapp.app.SimpleGeojsonControl.prototype.hide = function() {
-    var displayWindow = this.viewMode.getDisplayWindow();
-    if(displayWindow) {
-        displayWindow.removeListener(apogeeapp.ui.RESIZED_EVENT,this.resizeCallback);
-        displayWindow.removeListener(apogeeapp.ui.RESIZED_EVENT,this.shownCallback);
-        this.callbackAttached = false;
+
+apogeeapp.app.SimpleGeojsonDisplay.prototype.onLoad = function() {
+    if(!this.map) {
+        this.loadMap();
+        //this will add data if it has already been cached
+        this.createDataLayer();
+    }
+    else {
+        this.map.invalidateSize();
+    }
+}
+
+apogeeapp.app.SimpleGeojsonDisplay.prototype.onResize = function() {
+    if(this.map) {
+        this.map.invalidateSize();
     }
 }
 

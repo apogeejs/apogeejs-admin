@@ -18,7 +18,7 @@ apogeeapp.app.ButtonComponent.prototype.getDataDisplay = function(viewMode) {
 /** TO use JsDataDisplay, implement a class with the following methods, all optional:
  * init(outputElement,outputMode);
  * setData(data,outputElement,outputMode);
- * requestHide(outputElement,outputMode);
+ * requestInactive(outputElement,outputMode);
  * onHide(outputElement,outputMode);
  * destroy(outputElement,outputMode);
  */
@@ -50,12 +50,20 @@ apogeeapp.app.ButtonDisplay.prototype.showData = function(data) {
     this.data = data;
 }
 
-apogeeapp.app.ButtonDisplay.prototype.requestHide = function() {
-    console.log("NewButtonControl.requestHide");
+apogeeapp.app.ButtonDisplay.prototype.isCloseOk = function() {
+    console.log("NewButtonControl.isCloseOk");
     return apogeeapp.app.ViewMode.CLOSE_OK;
 }
 
-apogeeapp.app.ButtonDisplay.prototype.onHide = function() {
+apogeeapp.app.ButtonDisplay.prototype.onLoad = function() {
+    console.log("NewButtonControl.onHide");
+}
+
+apogeeapp.app.ButtonDisplay.prototype.onUnload = function() {
+    console.log("NewButtonControl.onHide");
+}
+
+apogeeapp.app.ButtonDisplay.prototype.onResize = function() {
     console.log("NewButtonControl.onHide");
 }
 

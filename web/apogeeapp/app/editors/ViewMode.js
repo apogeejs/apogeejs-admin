@@ -8,27 +8,29 @@ apogeeapp.app.ViewMode = function(componentDisplay, displayDestroyFlags) {
     this.componentDisplay = componentDisplay;
     this.member = componentDisplay.getMember();
     
+    //for destroying display to save resources
+    this.setDisplayDestroyFlags(displayDestroyFlags);
+    
+    //data display
     this.dataDisplay = null;
+    this.modeActive = false;
+    this.displayInWindow = false;
     
     //this is to support editors that have a specila edit more (as opposed to inline editing)
-    this.inEditMode = false;
+    this.inEditMode = false; 
     
-    //for destroying display to save resources
-    this.displayDestroyFlags = displayDestroyFlags;
-    this.viewStateFlags = apogeeapp.app.ViewMode.VIEW_STATE_INACTIVE;
-    
-    //set flag for window state
+    //window state, and listener for changes to window state (minimize/restore)
     var window = componentDisplay.getWindowFrame();
-    if(window.getWindowState() === apogeeapp.ui.WINDOW_STATE_MINIMIZED) {
-        this.setViewStateFlag(apogeeapp.app.ViewMode.VIEW_STATE_MINIMIZED);
-    }
-    else {
-        this.clearViewStateFlag(apogeeapp.app.ViewMode.VIEW_STATE_MINIMIZED);
-    }
+    this.windowMinimized = (window.getWindowState() == apogeeapp.ui.WINDOW_STATE_MINIMIZED);
+    window.addListener(apogeeapp.ui.WINDOW_STATE_CHANGED,(window)=> this.onWindowStateChange(window));
     
-    //set flat for showing/hidden - DON'T CURRRENTLY HAVE THIS INFO AVAILABLE!
-    //assume window is not hidden
+    //add a listener for window showing/hidden
+    this.windowLoaded = window.getIsShowing();
+    window.addListener(apogeeapp.ui.SHOWN_EVENT, () => this.onWindowLoaded());
+    window.addListener(apogeeapp.ui.HIDDEN_EVENT, () => this.onWindowUnloaded());
     
+    //add resize event
+    window.addListener(apogeeapp.ui.RESIZED_EVENT, () => this.onWindowResized());
 }
 
 //these are responses to hide request and close request
@@ -37,7 +39,6 @@ apogeeapp.app.ViewMode.CLOSE_OK = 0;
 
 apogeeapp.app.ViewMode.VIEW_STATE_INACTIVE = 1;
 apogeeapp.app.ViewMode.VIEW_STATE_MINIMIZED = 2;
-apogeeapp.app.ViewMode.VIEW_STATE_HIDDEN = 4;
 
 //some common cases - made of the view state flags
 apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER = 0;
@@ -46,7 +47,7 @@ apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_INACTIVE_AND_MINIMIZED = 3;
 
 
 //------------------------------
-// Accessed by the Component Display
+// accessors
 //------------------------------
 
 apogeeapp.app.ViewMode.prototype.getMember = function() {
@@ -58,33 +59,54 @@ apogeeapp.app.ViewMode.prototype.getDisplayWindow = function() {
     return this.componentDisplay.getWindowFrame();
 }
 
-
+apogeeapp.app.ViewMode.prototype.getElement = function() {
+    if(this.dataDisplay) {
+        return this.dataDisplay.getElement();
+    }
+    else {
+        return null;
+    }
+}
 
 /** The displayDestroyFlags indicate when the display for this view mode will be destroyed,
  * refering to times it is not visible to the user. See further notes in the constructor
  * description. */
 apogeeapp.app.ViewMode.prototype.setDisplayDestroyFlags = function(displayDestroyFlags) {
-    this.displayDestroyFlags = displayDestroyFlags;
+    this.destroyOnInactive = ((displayDestroyFlags & apogeeapp.app.ViewMode.VIEW_STATE_INACTIVE) != 0);
+    this.destroyOnMinimize = ((displayDestroyFlags & apogeeapp.app.ViewMode.VIEW_STATE_MINIMIZED) != 0);
 }
 
 /** This method cleasr the data display. It should only be called when the data display is not showing. */
-apogeeapp.app.ViewMode.prototype.triggerReload = function() {
+apogeeapp.app.ViewMode.prototype.forceClearDisplay = function() {
     this.destroyDataDisplay();
 }
 
+//------------------------------
+// life cycle - show hide update
+//------------------------------
+
 /** This is called immediately before the display element is shown. */
-apogeeapp.app.ViewMode.prototype.showData = function() {
-    this.clearViewStateFlag(apogeeapp.app.ViewMode.VIEW_STATE_INACTIVE);
-    this.checkPopulateDisplay();
-    
+apogeeapp.app.ViewMode.prototype.setActive = function() {
+    this.modeActive = true;
+    this.setDisplayState();
+}
+
+/** This method is caleld when the view mode is hidden. */
+apogeeapp.app.ViewMode.prototype.setInactive = function() {
+    this.modeActive = false;
+    this.setDisplayState();
+}
+
+apogeeapp.app.ViewMode.prototype.destroy = function() {
+    this.destroyDataDisplay();
 }
 
 /** This method is called before the view mode is hidden. It should
  * return true or false. */
-apogeeapp.app.ViewMode.prototype.requestHide = function() {
+apogeeapp.app.ViewMode.prototype.isCloseOk = function() {
     if(this.dataDisplay) {
-        if(this.dataDisplay.requestHide) {
-            return this.dataDisplay.requestHide();
+        if(this.dataDisplay.isCloseOk) {
+            return this.dataDisplay.isCloseOk();
         }
         
         if(this.inEditMode) {
@@ -95,36 +117,11 @@ apogeeapp.app.ViewMode.prototype.requestHide = function() {
     return apogeeapp.app.ViewMode.CLOSE_OK;
 }
 
-/** This method is caleld when the view mode is hidden. */
-apogeeapp.app.ViewMode.prototype.hide = function() {
-    if(this.dataDisplay) {
-        if(this.dataDisplay.hide) {
-            this.dataDisplay.hide();
-        }
-        
-        this.setViewStateFlag(apogeeapp.app.ViewMode.VIEW_STATE_INACTIVE); 
-        this.checkDestroyDisplay();
-    }
-}
-
 /** This method is called when the member is updated. */
 apogeeapp.app.ViewMode.prototype.memberUpdated = function() {
     if((this.dataDisplay)&&(!this.inEditMode)) {
-        this.showData();
+        this.setData();
     }
-}
-
-apogeeapp.app.ViewMode.prototype.getElement = function() {
-    if(this.dataDisplay) {
-        return this.dataDisplay.getElement();
-    }
-    else {
-        return null;
-    }
-}
-
-apogeeapp.app.ViewMode.prototype.destroy = function() {
-    this.destroyDataDisplay();
 }
 
 //------------------------------
@@ -170,112 +167,87 @@ apogeeapp.app.ViewMode.prototype.endEditMode = function() {
 // Private
 //-----------------------------------
 
-apogeeapp.app.ViewMode.prototype.setViewStateFlag = function(viewStateFlag) {
-    this.viewStateFlags |= viewStateFlag;
-}
-
-apogeeapp.app.ViewMode.prototype.clearViewStateFlag = function(viewStateFlag) {
-    this.viewStateFlags &= ~viewStateFlag;
-}
-
-apogeeapp.app.ViewMode.prototype.getViewStateForFlag = function(viewStateFlag) {
-    return ((this.viewStateFlags |= ~viewStateFlag) !== 0);
-}
-
-/** This method adds needed listeners to the data display window. */
-apogeeapp.app.ViewMode.prototype.addWindowListeners = function() {
-    if(!this.dataDisplay) return;
-    
-    var window = this.getDisplayWindow();
-    var instance = this;
-
-    //add window event listeners
-    var onWindowStateChange = function(window) {
-        instance.onWindowStateChange(window);
-    }
-    window.addListener(apogeeapp.ui.WINDOW_STATE_CHANGED,onWindowStateChange);
-
-    var onWindowShown = function(window) {
-        instance.onWindowShown(window);
-    }
-    window.addListener(apogeeapp.ui.SHOWN_EVENT,onWindowShown);
-
-    var onWindowHidden = function(window) {
-        instance.onWindowHidden(window);
-    }
-    window.addListener(apogeeapp.ui.HIDDEN_EVENT,onWindowHidden);
-}
-
-/** Handles minimize/restore/maximize event on window. */
+/** Handles minimize/restore/maximize event on window - checks if we need to create or destroy the display. */
 apogeeapp.app.ViewMode.prototype.onWindowStateChange = function(window) {
-    var windowState = window.getWindowState();
-    if(windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED) {
-        this.setViewStateFlag(apogeeapp.app.ViewMode.VIEW_STATE_MINIMIZED);
-        this.checkDestroyDisplay();
-    }
-    else {
-        this.clearViewStateFlag(apogeeapp.app.ViewMode.VIEW_STATE_MINIMIZED);
-        this.checkPopulateDisplay();
+    this.windowMinimized = (window.getWindowState() == apogeeapp.ui.WINDOW_STATE_MINIMIZED);
+    this.setDisplayState();
+}
+
+apogeeapp.app.ViewMode.prototype.onWindowLoaded = function() {
+    if((this.dataDisplay)&&(this.dataDisplay.onLoad)) {
+        this.dataDisplay.onLoad();
     }
 }
 
-/** Handles window hidden event on window. */
-apogeeapp.app.ViewMode.prototype.onWindowHidden = function() {
-    this.setViewStateFlag(apogeeapp.app.ViewMode.VIEW_STATE_HIDDEN);
-    this.checkDestroyDisplay();
+apogeeapp.app.ViewMode.prototype.onWindowUnloaded = function() {
+    if((this.dataDisplay)&&(this.dataDisplay.onUnload)) {
+        this.dataDisplay.onUnload();
+    }
 }
 
-/** Handles window shown event on window. */
-apogeeapp.app.ViewMode.prototype.onWindowShown = function() {
-    this.clearViewStateFlag(apogeeapp.app.ViewMode.VIEW_STATE_HIDDEN);
-    this.checkPopulateDisplay();
+apogeeapp.app.ViewMode.prototype.onWindowResized = function() {
+    if((this.dataDisplay)&&(this.displayInWindow)&&(this.dataDisplay.onLoad)) {
+        this.dataDisplay.onResize();
+    }
+}
+
+apogeeapp.app.ViewMode.prototype.setData = function() {
+    this.dataDisplay.showData(this.getDisplayData(),this.getIsDataEditable());
 }
 
 /** If we enter a state where we want to destroy the display, try to do that. */
-apogeeapp.app.ViewMode.prototype.checkDestroyDisplay = function() {
-    if( (this.dataDisplay)&&((this.viewStateFlags & this.displayDestroyFlags) !== 0)) {
-        //destroy, if possible
-        //check if anything prevents us from hiding - this also serves for destroy
-        if(this.requestHide() === apogeeapp.app.ViewMode.CLOSE_OK) {
-            this.destroyDataDisplay();
+apogeeapp.app.ViewMode.prototype.setDisplayState = function() {
+    var showWindow = this.modeActive;
+    var destroyWindow = (((!this.modeActive) && this.destroyOnInactive)||(this.windowMinimized && this.destroyOnMinimize));
+ 
+    if(showWindow) {
+        //show window, maybe create
+        if(!this.dataDisplay) {
+            this.dataDisplay = this.createDisplay();
+            this.placeDisplayInWindow();
+            this.setData();
+        }
+        else if(!this.displayInWindow) {
+            this.placeDisplayInWindow();
+        }
+    }
+    else {
+        //hide window, maybe destroy
+        if(this.dataDisplay) {
+            if(this.displayInWindow) {
+                this.removeDisplayfromWindow();
+            }
+            
+            if(destroyWindow) {
+                //destroy display, but only is hidine is ok
+                if(this.isCloseOk() === apogeeapp.app.ViewMode.CLOSE_OK) {
+                    this.destroyDataDisplay();
+                }
+            }
         }
     }
 }
 
-/** Check for cases where we should reconstruct the display. */
-apogeeapp.app.ViewMode.prototype.checkPopulateDisplay = function() {
-    if((this.viewStateFlags & this.displayDestroyFlags) === 0) {
-        //create a new data display
-        this.populateDataDisplay();
-    }
-}
-
-apogeeapp.app.ViewMode.prototype.populateDataDisplay = function() {
-    if(!this.dataDisplay) {
-        this.dataDisplay = this.createDisplay();   
-        this.addWindowListeners();
-        
-        //add to display here
+apogeeapp.app.ViewMode.prototype.placeDisplayInWindow = function() {
+    if(this.dataDisplay) {
         this.componentDisplay.showDisplayElement(this.dataDisplay.getElement());
-    }
-    
-    //no dont overwrite data if we are in edit mode
-    if(this.inEditMode === false) {
-        this.dataDisplay.showData(this.getDisplayData(),this.getIsDataEditable());
+        if((this.windowLoaded)&&(this.dataDisplay.onLoad)) this.dataDisplay.onLoad();
+        this.displayInWindow = true;
     }
 }
 
+apogeeapp.app.ViewMode.prototype.removeDisplayfromWindow = function() {
+    if(this.dataDisplay) {
+        this.componentDisplay.removeDisplayElement(this.dataDisplay.getElement());
+        if((this.windowLoaded)&&(this.dataDisplay.onUnload)) this.dataDisplay.onUnload();
+        this.displayInWindow = false;
+    }
+}
+
+/** If we enter a state where we want to destroy the display, try to do that. */
 apogeeapp.app.ViewMode.prototype.destroyDataDisplay = function() {
     if(this.dataDisplay) {
-        
-        //remove from display here
-        this.componentDisplay.removeDisplayElement(this.dataDisplay.getElement());
-        
-        //destroy display
-        if(this.dataDisplay.destroy) {  
-            this.dataDisplay.destroy();
-        }
-        this.compon
+        if(this.dataDisplay.destroy) this.dataDisplay.destroy();
         this.dataDisplay = null;
     }
 }

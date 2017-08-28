@@ -197,6 +197,16 @@ apogeeapp.ui.WindowFrame.prototype.getParent = function() {
     return this.windowParent;
 }
 
+/** This method returns true if the window is showing. */
+apogeeapp.ui.WindowFrame.prototype.getIsShowing = function() {
+    if(this.windowParent) {
+        return this.windowParent.getIsShowing();
+    }
+    else {
+        return false;
+    }
+}
+
 /** This method closes the window. If the argument forceClose is not
  * set to true the "request_close" handler is called to check if
  * it is ok to close the window. */
@@ -333,8 +343,9 @@ apogeeapp.ui.WindowFrame.prototype.setWindowState = function(windowState) {
 // Internal
 //================================
 
-/** This method shows the window. */
-apogeeapp.ui.WindowFrame.prototype.setParent = function(newWindowParent) {
+/** This method shows the window. This automatically called internally when the window is
+ * added to the parent. */
+apogeeapp.ui.WindowFrame.prototype.onAddedToParent = function(newWindowParent) {
     this.windowParent = newWindowParent;
     this.parentElement = newWindowParent.getOuterElement();
     
@@ -348,7 +359,12 @@ apogeeapp.ui.WindowFrame.prototype.setParent = function(newWindowParent) {
         instance.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,instance);
     };
     this.windowParent.addListener(apogeeapp.ui.HIDDEN_EVENT, this.windowHiddenListener);
-
+    
+    //do the show event if the parent is currently wshowing
+    if(this.windowParent.getIsShowing()) {
+        this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,this);
+    }
+    
     //we will redo this since the size of elements used in calculation may have been wrong
     if(this.sizeInfo.height !== undefined) {
         this.updateCoordinates();

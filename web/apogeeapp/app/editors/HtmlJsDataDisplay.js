@@ -6,9 +6,10 @@
  * constructorAddition(outputMode);
  * init(outputElement,outputMode);
  * setData(data,outputElement,outputMode);
- * onHide(outputElement,outputMode);
+ * isCloseOk(outputElement,outputMode);
  * destroy(outputElement,outputMode);
  * onLoad(outputElement,outputMode);
+ * onUnload(outputElement,outputMode);
  * onResize(outputElement,outputMode);
  */
 
@@ -57,32 +58,34 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     //add resize/load listener if needed
     //------------------------
     
-    var addLoadListener = false;
-    var addResizeListener = false;
-    var resizeCallback;
-    var loadCallback;
     var instance = this;
     
-    if(resource.onLoad) {
-        loadCallback = function() {
+    if(this.resource.onLoad) {
+        this.onLoad = function() {
             try {
                 resource.onLoad.call(instance,instance.outputElement,instance.outputMode);
             }
             catch(error) {
                 alert("Error in " + instance.outputMode.getFullName() + " onLoad function: " + error.message);
             }
-            //set data now that element is loaded
-            instance.outputMode.showData();
         };
-        addLoadListener = true;
     }
     
-    if(addLoadListener) {
-        apogeeapp.ui.setLoadListener(this.containerElement, loadCallback);
+    if(this.resource.onUnload) {   
+        this.onUnload = function() {
+            try {
+                if(instance.resource.onHide) {
+                    resource.onUnload.call(instance,instance.outputElement,instance.outputMode);
+                }
+            }
+            catch(error) {
+                alert("Error in " + instance.outputMode.getFullName() + " onUnload function: " + error.message);
+            }
+        }
     }
     
-    if(resource.onResize) {
-        resizeCallback = function() {
+    if(this.resource.onResize) {
+        this.onResize = function() {
             try {
                 resource.onResize.call(instance,instance.outputElement,instance.outputMode);
             }
@@ -90,26 +93,13 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
                 console.log("Error in " + instance.outputMode.getFullName() + " onResize function: " + error.message);
             }
         };
-        addResizeListener = true;
     }
     
-    //-------------------------
-    //add the (other) optional methods to this class
-    //-------------------------
-    
-    if((this.resource.setData)||(addResizeListener)) {
+    if(this.resource.setData) {
         this.showData = function(data) {
             try {
                 if(this.resource.setData) {
                     resource.setData.call(instance,data,instance.outputElement,instance.outputMode);
-                }
-            
-                if((addResizeListener)&&(!instance.callbackAttached)) {
-                    var displayWindow = instance.outputMode.getDisplayWindow();
-                    if(displayWindow) {
-                        displayWindow.addListener(apogeeapp.ui.RESIZED_EVENT,resizeCallback);
-                        instance.callbackAttached = true;
-                    }
                 }
             }
             catch(error) {
@@ -122,34 +112,13 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
         this.showData = function(data){};
     }
     
-    if(this.resource.hideRequest) {     
-        this.hideRequest = function() {
+    if(this.resource.isCloseOk) {     
+        this.isCloseOk = function() {
             try {
-                resource.onHide.call(instance,instance.outputElement,instance.outputMode);
+                resource.isCloseOk.call(instance,instance.outputElement,instance.outputMode);
             }
             catch(error) {
-                alert("Error in " + instance.outputMode.getFullName() + " onHide function: " + error.message);
-            }
-        }
-    }
-
-    if((this.resource.onHide)||(instance.callbackAttached)) {   
-        this.hide = function() {
-            try {
-                if(instance.resource.onHide) {
-                    resource.onHide.call(instance,instance.outputElement,instance.outputMode);
-                }
-                
-                if(instance.callbackAttached) {
-                    var displayWindow = instance.outputMode.getDisplayWindow();
-                    if(displayWindow) {
-                        displayWindow.removeListener(apogeeapp.ui.RESIZED_EVENT,instance.resizeCallback);
-                        instance.callbackAttached = false;
-                    }
-                }
-            }
-            catch(error) {
-                alert("Error in " + instance.outputMode.getFullName() + " onHide function: " + error.message);
+                alert("Error in " + instance.outputMode.getFullName() + " isCloseOk function: " + error.message);
             }
         }
     }
