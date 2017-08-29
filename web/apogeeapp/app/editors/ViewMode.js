@@ -174,12 +174,14 @@ apogeeapp.app.ViewMode.prototype.onWindowStateChange = function(window) {
 }
 
 apogeeapp.app.ViewMode.prototype.onWindowLoaded = function() {
+    this.windowLoaded = true;
     if((this.dataDisplay)&&(this.dataDisplay.onLoad)) {
         this.dataDisplay.onLoad();
     }
 }
 
 apogeeapp.app.ViewMode.prototype.onWindowUnloaded = function() {
+    this.windowLoaded = true;
     if((this.dataDisplay)&&(this.dataDisplay.onUnload)) {
         this.dataDisplay.onUnload();
     }
