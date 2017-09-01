@@ -181,10 +181,11 @@ apogeeapp.app.TabComponentDisplay.prototype.setAddChildrenContextMenu = function
         //position the window if we can
         if(event.offsetX) {
             var componentOptions = {};
-            var coordInfo = {};
-            coordInfo.x = event.offsetX;
-            coordInfo.y = event.offsetY;
-            componentOptions.coordInfo = coordInfo;
+            var posInfo = {};
+            posInfo.x = event.offsetX;
+            posInfo.y = event.offsetY;
+            componentOptions.windowState = {};
+            componentOptions.windowState.posInfo = posInfo;
         }
         
         var contextMenu = new apogeeapp.ui.MenuBody();
