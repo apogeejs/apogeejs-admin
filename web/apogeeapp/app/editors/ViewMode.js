@@ -188,7 +188,7 @@ apogeeapp.app.ViewMode.prototype.onWindowUnloaded = function() {
 }
 
 apogeeapp.app.ViewMode.prototype.onWindowResized = function() {
-    if((this.dataDisplay)&&(this.displayInWindow)&&(this.dataDisplay.onLoad)) {
+    if((this.dataDisplay)&&(this.displayInWindow)&&(this.dataDisplay.onResize)) {
         this.dataDisplay.onResize();
     }
 }
