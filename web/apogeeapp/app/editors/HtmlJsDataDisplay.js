@@ -47,7 +47,7 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     if(resource.constructorAddition) {
         try {
             //custom code
-            resource.constructorAddition.call(this,outputMode);
+            resource.constructorAddition.call(resource,outputMode);
         }
         catch(error) {
             alert("Error in " + this.outputMode.getFullName() + " init function: " + error.message);
@@ -63,7 +63,7 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     if(this.resource.onLoad) {
         this.onLoad = function() {
             try {
-                resource.onLoad.call(instance,instance.outputElement,instance.outputMode);
+                resource.onLoad.call(resource,instance.outputElement,instance.outputMode);
             }
             catch(error) {
                 alert("Error in " + instance.outputMode.getFullName() + " onLoad function: " + error.message);
@@ -75,7 +75,7 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
         this.onUnload = function() {
             try {
                 if(instance.resource.onHide) {
-                    resource.onUnload.call(instance,instance.outputElement,instance.outputMode);
+                    resource.onUnload.call(resource,instance.outputElement,instance.outputMode);
                 }
             }
             catch(error) {
@@ -87,7 +87,7 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     if(this.resource.onResize) {
         this.onResize = function() {
             try {
-                resource.onResize.call(instance,instance.outputElement,instance.outputMode);
+                resource.onResize.call(resource,instance.outputElement,instance.outputMode);
             }
             catch(error) {
                 console.log("Error in " + instance.outputMode.getFullName() + " onResize function: " + error.message);
@@ -99,7 +99,7 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
         this.showData = function(data) {
             try {
                 if(this.resource.setData) {
-                    resource.setData.call(instance,data,instance.outputElement,instance.outputMode);
+                    resource.setData.call(resource,data,instance.outputElement,instance.outputMode);
                 }
             }
             catch(error) {
@@ -115,7 +115,7 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     if(this.resource.isCloseOk) {     
         this.isCloseOk = function() {
             try {
-                resource.isCloseOk.call(instance,instance.outputElement,instance.outputMode);
+                resource.isCloseOk.call(resource,instance.outputElement,instance.outputMode);
             }
             catch(error) {
                 alert("Error in " + instance.outputMode.getFullName() + " isCloseOk function: " + error.message);
@@ -126,7 +126,7 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     if(this.resource.destroy) {
         this.destroy = function() {
             try {
-                resource.destroy.call(instance,instance.outputElement,instance.outputMode);
+                resource.destroy.call(resource,instance.outputElement,instance.outputMode);
             }
             catch(error) {
                 alert("Error in " + instance.outputMode.getFullName() + " destroy function: " + error.message);
@@ -140,7 +140,7 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
     
     if(resource.init) {
         try {
-            resource.init.call(this,this.outputElement,outputMode);
+            resource.init.call(resource,this.outputElement,outputMode);
         }
         catch(error) {
             alert("Error in " + this.outputMode.getFullName() + " init function: " + error.message);
