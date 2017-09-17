@@ -5,7 +5,7 @@ apogeeapp.app.propdialog = {};
 //omit folder names (null) and folder initial value to omit the parent selection
 apogeeapp.app.propdialog.getDialogLayout = function(folderNames,generator,doCreate,initialValues) {
     
-    var additionalLines = apogee.util.deepJsonCopy(generator.propertyDialogLines);  
+    var additionalLines = apogee.util.jsonCopy(generator.propertyDialogLines);  
     
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};

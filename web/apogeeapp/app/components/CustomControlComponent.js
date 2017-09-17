@@ -336,7 +336,7 @@ apogeeapp.app.CustomControlComponent.createComponent = function(workspaceUI,data
             //update the component options, but don't modify the options structure passed in.
             var activeComponentOptions;
             if(componentOptions) {
-                activeComponentOptions = apogee.util.deepJsonCopy(componentOptions);
+                activeComponentOptions = apogee.util.jsonCopy(componentOptions);
             }
             else {
                 activeComponentOptions = {};

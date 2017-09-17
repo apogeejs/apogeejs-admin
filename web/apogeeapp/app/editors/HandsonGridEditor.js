@@ -65,7 +65,7 @@ apogeeapp.app.HandsonGridEditor.prototype.save = function(argArray) {
 	if(argArray[1] == "loadData") return;
 
 	//update "input" data before calling update
-	this.inputData = apogee.util.deepJsonCopy(this.gridControl.getData());
+	this.inputData = apogee.util.jsonCopy(this.gridControl.getData());
 
 	this.viewMode.onSave(this.inputData);
 }
@@ -103,7 +103,7 @@ apogeeapp.app.HandsonGridEditor.prototype.displayData = function() {
     //clear the cached data flag, if it is present
     this.dataCached = false;
     
-    var editData = apogee.util.deepJsonCopy(this.inputData);
+    var editData = apogee.util.jsonCopy(this.inputData);
     if(!editData) {
         editData = [[]];
     }

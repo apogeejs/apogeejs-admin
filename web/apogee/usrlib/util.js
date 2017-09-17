@@ -49,7 +49,7 @@ apogee.util.getObjectType = function(object) {
 
 /** This method creates a deep copy of an object, array or value. Note that
  * undefined is not a valid value in JSON. */
-apogee.util.deepJsonCopy = function(data) {
+apogee.util.jsonCopy = function(data) {
     if(data === null) return null;
     if(data === undefined) return undefined;
     return JSON.parse(JSON.stringify(data));

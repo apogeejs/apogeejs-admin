@@ -40,7 +40,7 @@ apogeeapp.app.JsonFormEditor.prototype.showData = function(data,editOk) {
 	//I should verify I handle this consistently through app.
 	if(data === undefined) data = null;
     
-    this.workingData = apogee.util.deepJsonCopy(data);
+    this.workingData = apogee.util.jsonCopy(data);
     this.editOk = editOk;
     
 	apogeeapp.ui.removeAllChildren(this.editorDiv);
