@@ -1,94 +1,98 @@
 taskAppModule = (function() {
-	var wrapper = {};
 	
-	//these holds the current task
-	var taskStack = [];	
+	var wrapper = {};
 
 	//---------------------
 	//internal functions
 	//---------------------
-	function getTaskResultName(taskPath) {
-		var name = "taskResults";
-		taskPath.forEach( (entry) => {name += "." + entry} );
-		return name;
+	
+	/** Converts a path to a string, starting with a base folder name. */
+	function getTaskPathString(baseFolderString,path) {
+		var pathString = baseFolderString;
+		path.forEach( (entry) => {pathString += "." + entry} );
+		return pathString;
+	}
+	
+	/** Adds a field to a path, returning a new path (not modifying old one) */
+	function getAppendedPath(path,field) {
+		return path.concat([field]);
 	}
 	
 	//---------------------
 	//exported functions
 	//----------------------
 	
-	/** This loads the result data for a given task. */
-	wrapper.loadTaskResultData = function(taskResultsFolder,taskPath) {
-		var taskName = getTaskResultName(taskPath);
-		var resultTable = taskResultsFolder[taskName];
-		if(!resultTable) throw new Error("Task result table not found: " + taskName);
-		
-		if(resultTable.state == "SUCCESS") {
-			return resultTable.data; 
-		}
-		else {
-			return null;
-		}
-	}
-	
-	wrapper.setInitialTask = function(messenger,taskPath) {
-
-		taskStack.push(taskPath);
-		
-		var clearData = {};
-		clearData.state = "INCOMPLETE";
-		
-		var taskResultName = getTaskResultName(taskPath);
-		
-		var updateInfo = [];
-		updateInfo.push([taskResultName,clearData]);
-		updateInfo.push(["activeTask",taskPath]);
-		messenger.compoundDataUpdate(updateInfo);
-		
-	}
 	
 	/** This method should be called when a task is completed. */
-	wrapper.taskCompleted = function(messenger,nextTaskPath,data) {
-		
-		taskPath.push(nextTaskPath);
+	wrapper.taskCompleted = function(messenger,currentTaskPath,nextTaskPath,data) {
 		
 		var taskResult = {};
-		taskResult.state = "SUCCESS";
+		taskResult.valid = true;
 		taskResult.data = data;
 		
+		var activeState = {};
+		activeState.active = true;
+		activeState.previousTask = currentTaskPath;
+		
+		var currentResultString = getTaskPathString("taskResults",getAppendedPath(currentTaskPath,"result"));
+		var nextStateString = getTaskPathString("taskResults",getAppendedPath(nextTaskPath,"state"));
+		
 		var updateInfo = [];
-		updateInfo.push(["result",taskResult]);
-		updateInfo.push(["activeTask",nextTaskPath]);
+		updateInfo.push([currentResultString,taskResult]);
+		updateInfo.push([nextStateString,activeState]);
+		updateInfo.push(["taskResults.currentTask",nextTaskPath]);
 		messenger.compoundDataUpdate(updateInfo);
 	}
 
 	/** This method should be called when a task is canceled. NOTE - we can't cancel the first task.*/
-	wrapper.taskCanceled = function(messenger) {
-		//go back 
-		returnToTask(messenger,taskStack.length-1);
+	wrapper.taskCanceled = function(messenger,currentTaskPath,previousTaskPath) {
+		
+		var invalidResult = {};
+		invalidResult.valid = false;
+		invalidResult.data = null;
+		
+		var inactiveState = {};
+		inactiveState.active = false;
+		inactiveState.previousTask = null;
+		
+		var previousResultString = getTaskPathString("taskResults",getAppendedPath(previousTaskPath,"result"));
+		var currentStateString = getTaskPathString("taskResults",getAppendedPath(currentTaskPath,"state"));
+			
+		var updateInfo = [];
+		updateInfo.push([previousResultString,invalidResult]);
+		updateInfo.push([currentStateString,inactiveState]);
+		updateInfo.push(["taskResults.currentTask",previousTaskPath]);
+		messenger.compoundDataUpdate(updateInfo);
 	}
 	
-	/** This method clears tasks until the task stack is the desired length. */
-	wrapper.returnToTask = function(messenger,destStackLength) {
+	/** This method clears tasks until is reaches the destination path. If not destination path
+	 *  is set it goes back one task. */
+	wrapper.clearTasksAndRestartFrom = function(messenger,clearTaskPathList,nextTaskPath) {
 
-		var clearData = {};
-		clearData.state = "INCOMPLETE";
-		
 		var updateInfo = [];
 		
-		//remove entries from task stack, and clear those entries
-		while(taskStack.length > destStackLength) {
-			var taskPath = taskStack.pop();
-			var taskResultName = getTaskResultName(taskPath);
-			updateInfo.push([taskResultName,clearData]);
-		}
+		var invalidResult = {};
+		invalidResult.valid = false;
+		invalidResult.data = null;
 		
-		//clear the current task
-		var taskPath = taskStack[destStackLength-1];
-		var taskResultName = getTaskResultName(taskPath);
-		updateInfo.push([taskResultName,clearData]);
+		var inactiveState = {};
+		inactiveState.active = false;
+		inactiveState.previousTask = null;
 		
-		updateInfo.push(["activeTask",taskPath]);
+		//clear tasks
+		var clearTask = (taskPath) => {		
+			let taskResultString = getTaskPathString("taskResults",getAppendedPath(taskPath,"result"));
+			let taskStateString = getTaskPathString("taskResults",getAppendedPath(taskPath,"state"));
+			updateInfo.push([taskResultString,invalidResult]);
+			updateInfo.push([taskStateString,inactiveState]);
+		};
+		clearTaskPathList.forEach(clearTask);
+		
+		//go to task
+		var nextTaskResultString = getTaskPathString("taskResults",getAppendedPath(nextTaskPath,"result"));
+		updateInfo.push([nextTaskResultString,invalidResult]);
+		updateInfo.push(["taskResults.currentTask",nextTaskPath]);
+		
 		messenger.compoundDataUpdate(updateInfo);
 	}
 	
