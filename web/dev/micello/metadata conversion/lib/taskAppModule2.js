@@ -34,13 +34,13 @@ taskAppModule = (function() {
 		activeState.active = true;
 		activeState.previousTask = currentTaskPath;
 		
-		var currentResultString = getTaskPathString("taskResults",getAppendedPath(currentTaskPath,"result"));
-		var nextStateString = getTaskPathString("taskResults",getAppendedPath(nextTaskPath,"state"));
+		var currentResultString = getTaskPathString("tasks",getAppendedPath(currentTaskPath,"result"));
+		var nextStateString = getTaskPathString("tasks",getAppendedPath(nextTaskPath,"state"));
 		
 		var updateInfo = [];
 		updateInfo.push([currentResultString,taskResult]);
 		updateInfo.push([nextStateString,activeState]);
-		updateInfo.push(["taskResults.currentTask",nextTaskPath]);
+		updateInfo.push(["tasks.currentTask",nextTaskPath]);
 		messenger.compoundDataUpdate(updateInfo);
 	}
 
@@ -55,13 +55,13 @@ taskAppModule = (function() {
 		inactiveState.active = false;
 		inactiveState.previousTask = null;
 		
-		var previousResultString = getTaskPathString("taskResults",getAppendedPath(previousTaskPath,"result"));
-		var currentStateString = getTaskPathString("taskResults",getAppendedPath(currentTaskPath,"state"));
+		var previousResultString = getTaskPathString("tasks",getAppendedPath(previousTaskPath,"result"));
+		var currentStateString = getTaskPathString("tasks",getAppendedPath(currentTaskPath,"state"));
 			
 		var updateInfo = [];
 		updateInfo.push([previousResultString,invalidResult]);
 		updateInfo.push([currentStateString,inactiveState]);
-		updateInfo.push(["taskResults.currentTask",previousTaskPath]);
+		updateInfo.push(["tasks.currentTask",previousTaskPath]);
 		messenger.compoundDataUpdate(updateInfo);
 	}
 	
@@ -81,17 +81,17 @@ taskAppModule = (function() {
 		
 		//clear tasks
 		var clearTask = (taskPath) => {		
-			let taskResultString = getTaskPathString("taskResults",getAppendedPath(taskPath,"result"));
-			let taskStateString = getTaskPathString("taskResults",getAppendedPath(taskPath,"state"));
+			let taskResultString = getTaskPathString("tasks",getAppendedPath(taskPath,"result"));
+			let taskStateString = getTaskPathString("tasks",getAppendedPath(taskPath,"state"));
 			updateInfo.push([taskResultString,invalidResult]);
 			updateInfo.push([taskStateString,inactiveState]);
 		};
 		clearTaskPathList.forEach(clearTask);
 		
 		//go to task
-		var nextTaskResultString = getTaskPathString("taskResults",getAppendedPath(nextTaskPath,"result"));
+		var nextTaskResultString = getTaskPathString("tasks",getAppendedPath(nextTaskPath,"result"));
 		updateInfo.push([nextTaskResultString,invalidResult]);
-		updateInfo.push(["taskResults.currentTask",nextTaskPath]);
+		updateInfo.push(["tasks.currentTask",nextTaskPath]);
 		
 		messenger.compoundDataUpdate(updateInfo);
 	}
