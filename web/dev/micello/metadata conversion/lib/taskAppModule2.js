@@ -17,6 +17,16 @@ taskAppModule = (function() {
 	function getAppendedPath(path,field) {
 		return path.concat([field]);
 	}
+    
+    function setActiveComponentByPath(relativeToTasksPath) {
+        var absolutePath = ["tasks"].concat(relativeToTasksPath);
+        var workspace = app.getWorkspace();
+        var workspaceUI = app.getWorkspaceUI();
+        var member = workspace.getMemberByPathArray(absolutePath);
+        var component = workspaceUI.getComponent(member);
+        var makeActiveCallback = component.createOpenCallback();
+        makeActiveCallback();
+    }
 	
 	//---------------------
 	//exported functions
@@ -42,6 +52,8 @@ taskAppModule = (function() {
 		updateInfo.push([nextStateString,activeState]);
 		updateInfo.push(["tasks.currentTask",nextTaskPath]);
 		messenger.compoundDataUpdate(updateInfo);
+        
+        setActiveComponentByPath(nextTaskPath);
 	}
 
 	/** This method should be called when a task is canceled. NOTE - we can't cancel the first task.*/
@@ -63,6 +75,8 @@ taskAppModule = (function() {
 		updateInfo.push([currentStateString,inactiveState]);
 		updateInfo.push(["tasks.currentTask",previousTaskPath]);
 		messenger.compoundDataUpdate(updateInfo);
+        
+        setActiveComponentByPath(previousTaskPath);
 	}
 	
 	/** This method clears tasks until is reaches the destination path. If not destination path
