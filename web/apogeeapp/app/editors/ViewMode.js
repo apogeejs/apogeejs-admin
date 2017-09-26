@@ -22,15 +22,15 @@ apogeeapp.app.ViewMode = function(componentDisplay, displayDestroyFlags) {
     //window state, and listener for changes to window state (minimize/restore)
     var window = componentDisplay.getWindowFrame();
     this.windowMinimized = (window.getWindowState() == apogeeapp.ui.WINDOW_STATE_MINIMIZED);
-    window.addListener(apogeeapp.ui.WINDOW_STATE_CHANGED,(window)=> this.onWindowStateChange(window));
+    window.addListener(apogeeapp.ui.WINDOW_STATE_CHANGED,(window) => (this.onWindowStateChange(window)) );
     
     //add a listener for window showing/hidden
     this.windowLoaded = window.getIsShowing();
-    window.addListener(apogeeapp.ui.SHOWN_EVENT, () => this.onWindowLoaded());
-    window.addListener(apogeeapp.ui.HIDDEN_EVENT, () => this.onWindowUnloaded());
+    window.addListener(apogeeapp.ui.SHOWN_EVENT, () => (this.onWindowLoaded()) );
+    window.addListener(apogeeapp.ui.HIDDEN_EVENT, () => (this.onWindowUnloaded()) );
     
     //add resize event
-    window.addListener(apogeeapp.ui.RESIZED_EVENT, () => this.onWindowResized());
+    window.addListener(apogeeapp.ui.RESIZED_EVENT, () => (this.onWindowResized()) );
 }
 
 //these are responses to hide request and close request
