@@ -108,6 +108,8 @@ taskAppModule = (function() {
 		updateInfo.push(["tasks.currentTask",nextTaskPath]);
 		
 		messenger.compoundDataUpdate(updateInfo);
+
+        setActiveComponentByPath(nextTaskPath);
 	}
 	
 	return wrapper;
