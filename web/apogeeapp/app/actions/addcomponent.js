@@ -17,6 +17,9 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,generator,opti
             return;
         }     
         
+        var displayName = generator.displayName
+        var additionalLines = apogee.util.jsonCopy(generator.propertyDialogLines); 
+        
         //get the folder list
         var folderMap = workspaceUI.getFolders();
         var folderList = [];
@@ -25,7 +28,7 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,generator,opti
         }
         
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = apogeeapp.app.propdialog.getDialogLayout(folderList,generator,true,optionalInitialValues);
+        var dialogLayout = apogeeapp.app.propdialog.getDialogLayout(displayName,folderList,additionalLines,true,optionalInitialValues);
         
         //create on submit callback
         var onSubmitFunction = function(result) {

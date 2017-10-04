@@ -3,9 +3,7 @@ apogeeapp.app.propdialog = {};
 
 //this is for a create or update dialog
 //omit folder names (null) and folder initial value to omit the parent selection
-apogeeapp.app.propdialog.getDialogLayout = function(folderNames,generator,doCreate,initialValues) {
-    
-    var additionalLines = apogee.util.jsonCopy(generator.propertyDialogLines);  
+apogeeapp.app.propdialog.getDialogLayout = function(displayName,folderNames,additionalLines,doCreate,initialValues) { 
     
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};
@@ -15,10 +13,10 @@ apogeeapp.app.propdialog.getDialogLayout = function(folderNames,generator,doCrea
     var titleLine = {};
     titleLine.type = "title";
     if(doCreate) {
-        titleLine.title = "New " + generator.displayName;
+        titleLine.title = "New " + displayName;
     }
     else {
-        titleLine.title = "Update " + generator.displayName; 
+        titleLine.title = "Update " + displayName; 
     }
     lines.push(titleLine);
 

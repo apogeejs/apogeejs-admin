@@ -13,8 +13,11 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
     
     var createCallback = function() {
         
-        var workspaceUI = component.getWorkspaceUI();       
-        var initialValues = component.getPropertyValues();
+        var displayName = generator.displayName
+        var additionalLines = apogee.util.jsonCopy(generator.propertyDialogLines); 
+        
+        var workspaceUI = component.getWorkspaceUI(); 
+        var initialValues = component.getPropertyValues(); 
         
         //add folder list, only if we can set the parent (if there is a parent)
         var folderMap = null;
@@ -29,7 +32,7 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
         }
         
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = apogeeapp.app.propdialog.getDialogLayout(folderList,generator,false,initialValues);
+        var dialogLayout = apogeeapp.app.propdialog.getDialogLayout(displayName,folderList,additionalLines,false,initialValues);
         
         //create on submit callback
         var onSubmitFunction = function(newValues) {
@@ -111,7 +114,7 @@ apogeeapp.app.updatecomponent.updatePropertyValues = function(component,oldValue
         actionList.push(actionData);
     }
 
-    //check if additional properties are needed
+    //create an action to update an member additional properties
     var memberGenerator = member.generator;
     if(memberGenerator.getPropertyUpdateAction) {
         actionData = memberGenerator.getPropertyUpdateAction(member,oldValues,newValues);
@@ -129,7 +132,7 @@ apogeeapp.app.updatecomponent.updatePropertyValues = function(component,oldValue
         actionResponse = apogee.action.doAction(actionData,actionResponse);
     }
     
-    //allow for an component update
+    //update an component additional properties
     if(component.generator.updateProperties) {
         component.generator.updateProperties(component,oldValues,newValues,actionResponse);
     }

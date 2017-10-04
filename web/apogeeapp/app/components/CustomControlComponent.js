@@ -58,10 +58,10 @@ apogeeapp.app.CustomControlComponent.prototype.getDestroyOnInactive = function()
 apogeeapp.app.CustomControlComponent.prototype.setDestroyOnInactive = function(destroyOnInactive) {
     this.destroyOnInactive = destroyOnInactive;
     
-    if(this.outputMode) {
+    if(this.activeOutputMode) {
         var displayDestroyFlags = destroyOnInactive ? apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_INACTIVE :
             apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
-        this.outputMode.setDisplayDestroyFlags(displayDestroyFlags);
+        this.activeOutputMode.setDisplayDestroyFlags(displayDestroyFlags);
     }
 }
 
@@ -131,10 +131,8 @@ apogeeapp.app.CustomControlComponent.prototype.getViewModeElement = function(edi
 	switch(viewType) {
 		
 		case apogeeapp.app.CustomControlComponent.VIEW_OUTPUT:
-			if(!this.outputMode) {
-				this.outputMode = new apogeeapp.app.ControlOutputMode(editComponentDisplay,this.displayDestroyFlags);
-			}
-			return this.outputMode;
+			this.activeOutputMode = new apogeeapp.app.ControlOutputMode(editComponentDisplay,this.displayDestroyFlags);
+			return this.activeOutputMode;
 			
 		case apogeeapp.app.CustomControlComponent.VIEW_CODE:
 			return new apogeeapp.app.AceCodeMode(editComponentDisplay);
@@ -245,8 +243,8 @@ apogeeapp.app.CustomControlComponent.prototype.createResource = function() {
 apogeeapp.app.CustomControlComponent.prototype.update = function(uiCodeFields) { 
     
     //make sure we get rid of the old display
-    if(this.outputMode) {
-        this.outputMode.forceClearDisplay();
+    if(this.activeOutputMode) {
+        this.activeOutputMode.forceClearDisplay();
     }
     
     this.uiCodeFields = uiCodeFields;
@@ -361,8 +359,7 @@ apogeeapp.app.CustomControlComponent.addPropFunction = function(component,values
 }
 
 apogeeapp.app.CustomControlComponent.updateProperties = function(component,oldValues,newValues,actionResponse) {
-    var destroyOnInactive = (newValues.destroyOnHide) ? false : true;
-    component.setDestroyOnInactive(destroyOnInactive);
+    component.setDestroyOnInactive(newValues.destroyOnHide);
 }
 
 
