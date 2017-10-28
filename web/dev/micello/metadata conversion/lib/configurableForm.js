@@ -148,10 +148,65 @@ var lineFunctions = {
         return lineObject;
     },
     
+    //lineDef.type = "radioButton"
+    //lineDef.heading = radio button group heading (optional)
+    //lineDef.groupName = the group name for the radio button group
+    //lineDef.entries = list of either (a) string pairs [title,value] or (b) string title/value - for entries in radio button group
+    //lineDef.initial = value of initial selection (optional)
+    //lineDef.resultKey = name of result in result data 
+    "radioButton": function(lineDef,formActions) {
+        var lineObject = {};
+        //create the element
+        var line = apogeeapp.ui.createElement("div",{"className":"apogee_configurableFormLine"});
+        if(lineDef.heading) {
+            line.appendChild(document.createTextNode(lineDef.heading));
+            line.appendChild(document.createElement("br"));
+        }
+        var groupName = lineDef.groupName;
+        var buttonList = [];
+        var addButton = buttonInfo => {
+            var radio = apogeeapp.ui.createElement("input");
+            radio.type = "radio";
+            radio.name = groupName;
+            
+            var label;
+            var value;
+            if(apogee.util.getObjectType(buttonInfo) == "Array") {
+                label = buttonInfo[0]
+                value = buttonInfo[1];
+            }
+            else {
+                label = buttonInfo;
+                value = buttonInfo;   
+            }
+            radio.value = value
+            if(lineDef.initial == buttonInfo[0]) radio.checked = true;
+            buttonList.push(radio);
+            line.appendChild(radio);
+            line.appendChild(document.createTextNode(label));
+            line.appendChild(document.createElement("br"));
+            
+            if(lineDef.disabled) radio.disabled = true;
+        };
+        lineDef.entries.forEach(addButton);
+        lineObject.element = line;
+        //get result
+        lineObject.addToResult = function(formData) {
+            var checkedRadio = buttonList.find(radio => radio.checked);
+            if(checkedRadio) {
+                formData[lineDef.resultKey] = checkedRadio.value;
+            }
+        }
+        //no on Close
+        
+        return lineObject;
+    },
+    
     //lineDef.type = "dropdown"
     //lineDef.heading = dropdown heading (optional)
     //lineDef.entries = list of strings (or values) in dropdown
-    //lineDef.initial = index of initial selection (optional)
+    //lineDef.entries = list of either (a) string pairs [title,value] or (b) string title/value - for entries in dropdown
+    //lineDef.initial = value of initial selection (optional)
     //lineDef.resultKey = name of result in result data
     "dropdown": function(lineDef,formActions) {
         var lineObject = {};
@@ -161,10 +216,23 @@ var lineFunctions = {
             line.appendChild(document.createTextNode(lineDef.heading));
         }
         var select = apogeeapp.ui.createElement("select");
-        for(var i = 0; i < lineDef.entries.length; i++) {
-            var entry = lineDef.entries[i];
-            select.add(apogeeapp.ui.createElement("option",{"text":entry}));
+        var addEntry = entryInfo => {
+            var label;
+            var value;
+            if(apogee.util.getObjectType(entryInfo) == "Array") {
+                label = entryInfo[0]
+                value = entryInfo[1];
+            }
+            else {
+                label = entryInfo;
+                value = entryInfo;   
+            }
+            var entry = document.createElement("option");
+            entry.text = label;
+            entry.value = value;
+            select.appendChild(entry);
         }
+        lineDef.entries.forEach(addEntry);
         if(lineDef.initial) {
             select.value = lineDef.initial;
         }
@@ -252,10 +320,6 @@ var lineFunctions = {
     
     "aceEditor": function(lineDef,formActions) {
         
-    },
-    
-    "radioButton": function(lineDef,formActions) {
-        //implement!
     },
     
     "checkbox": function(lineDef,formActions) {
