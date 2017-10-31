@@ -62,59 +62,79 @@ if(registerComponent) {
 
 apogeeapp.app.ConfigurableFormDisplay.prototype.loadForm = function() {
     
-    var layout = this.data.layout;
-    
-    //make sure valid data has been set
-    if(!layout) return;
-    
-    var onSubmit = this.data.onSubmit;
-    var onCancel = this.data.onCancel;
+    try {
+        var layout = this.data.layout;
 
-    var lineObjects = [];
-    
-    //this is the action for the form
-    var formActions = {};
+        //make sure valid data has been set
+        if(!layout) return;
 
-    //cancel
-    formActions.onCancel = onCancel;
-    //submit
-    formActions.onSubmit = function() {
-        //load the form data
-        var formData = {};
-        var lineObject;
-        for(var i = 0; i < lineObjects.length; i++) {
-            lineObject = lineObjects[i];
-            if(lineObject.addToResult) {
-                lineObject.addToResult(formData);
+        var onSubmit = this.data.onSubmit;
+        var onCancel = this.data.onCancel;
+
+        var lineObjects = [];
+
+        //this is the action for the form
+        var formActions = {};
+
+        //cancel
+        formActions.onCancel = function() {
+            try {
+                onCancel();
+            }
+            catch(error) {
+                var message = error.message ? error.message : "unknown error";
+                alert("Error canceling form: " + message)
             }
         }
-        //submit data
-        onSubmit(formData);
-    }
-    
-    var content = document.createElement("div");
-    content.style.position = "absolute";
-    content.style.top = "0px";
-    content.style.left = "0px";
-    content.style.bottom = "0px";
-    content.style.right = "0px";
-    
-    for(var i = 0; i < layout.lines.length; i++) {
-        var lineDef = layout.lines[i];
-        
-        //create line
-        var lineObject = createLine(lineDef,formActions);
-        lineObjects.push(lineObject);
-        if(lineObject.element) { //no element for "invisible" entry, which is used to pass values along
-            content.appendChild(lineObject.element);
+        //submit
+        formActions.onSubmit = function() {
+            try {
+                //load the form data
+                var formData = {};
+                var lineObject;
+                for(var i = 0; i < lineObjects.length; i++) {
+                    lineObject = lineObjects[i];
+                    if(lineObject.addToResult) {
+                        lineObject.addToResult(formData);
+                    }
+                }
+                //submit data
+                onSubmit(formData);
+            }
+            catch(error) {
+                var message = error.message ? error.message : "unknown error";
+                alert("Error submitting form: " + message)
+            }
         }
+
+        var content = document.createElement("div");
+        content.style.position = "absolute";
+        content.style.top = "0px";
+        content.style.left = "0px";
+        content.style.bottom = "0px";
+        content.style.right = "0px";
+
+        for(var i = 0; i < layout.lines.length; i++) {
+            var lineDef = layout.lines[i];
+
+            //create line
+            var lineObject = createLine(lineDef,formActions);
+            lineObjects.push(lineObject);
+            if(lineObject.element) { //no element for "invisible" entry, which is used to pass values along
+                content.appendChild(lineObject.element);
+            }
+        }
+
+        var outputElement = this.getElement();
+        apogeeapp.ui.removeAllChildren(outputElement);
+        outputElement.appendChild(content);
+
+        this.form = formActions;
     }
-    
-    var outputElement = this.getElement();
-    apogeeapp.ui.removeAllChildren(outputElement);
-    outputElement.appendChild(content);
-    
-    this.form = formActions;
+    catch(error) {
+        var message = error.message ? error.message : "unknown error";
+        alert("Error loading form: " + message)
+    }
 }
 
 //====================================================
