@@ -2,28 +2,39 @@
 apogeeapp.app.JsonTableComponent = function(workspaceUI,table,componentJson) {
     //extend edit component
     apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.JsonTableComponent.generator,componentJson);
-	
+
+    //to do:
+    //need to ave this and read if from component json, during create or read
+    //need to refresh a display if we change it when data view active
+    //need to refresh the view from the cache (whereit is happening...)
+    this.dataView = apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW;
+   
     this.memberUpdated();
 };
 
 apogeeapp.app.JsonTableComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
 apogeeapp.app.JsonTableComponent.prototype.constructor = apogeeapp.app.JsonTableComponent;
 
+apogeeapp.app.JsonTableComponent.prototype.getDataView = function() {
+    if(!this.dataView) this.dataView = "Plain";
+    return this.dataView;
+}
+
+apogeeapp.app.JsonTableComponent.prototype.setDataView = function(dataView) {
+    this.dataView = dataView;
+}
+
 //==============================
 // Protected and Private Instance Methods
 //==============================
 
-apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT = "Text";
-apogeeapp.app.JsonTableComponent.VIEW_JSON_TEXT = "JSON";
-apogeeapp.app.JsonTableComponent.VIEW_FORM = "Form";
+apogeeapp.app.JsonTableComponent.VIEW_DATA = "Data";
 apogeeapp.app.JsonTableComponent.VIEW_CODE = "Formula";
 apogeeapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
 apogeeapp.app.JsonTableComponent.VIEW_DESCRIPTION = "Notes";
 
 apogeeapp.app.JsonTableComponent.VIEW_MODES = [
-    apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT,
-    apogeeapp.app.JsonTableComponent.VIEW_JSON_TEXT,
-    apogeeapp.app.JsonTableComponent.VIEW_FORM,
+    apogeeapp.app.JsonTableComponent.VIEW_DATA,
     apogeeapp.app.JsonTableComponent.VIEW_CODE,
     apogeeapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE,
     apogeeapp.app.JsonTableComponent.VIEW_DESCRIPTION
@@ -31,10 +42,15 @@ apogeeapp.app.JsonTableComponent.VIEW_MODES = [
 
 apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS = {
     "viewModes": apogeeapp.app.JsonTableComponent.VIEW_MODES,
-    "defaultView": apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT,
+    "defaultView": apogeeapp.app.JsonTableComponent.VIEW_DATA,
     "clearFunctionMenuText": "Clear Formula",
     "emptyDataValue": ""
 }
+
+apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW = "Plain";
+apogeeapp.app.JsonTableComponent.JSON_DATA_VEW = "JSON";
+apogeeapp.app.JsonTableComponent.FORM_DATA_VIEW = "Form";
+
 
 /**  This method retrieves the table edit settings for this component instance
  * @protected */
@@ -48,14 +64,18 @@ apogeeapp.app.JsonTableComponent.prototype.getViewModeElement = function(editCom
 	
 	//create the new view element;
 	switch(viewType) {
-        case apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT:
-            return new apogeeapp.app.AceDataMode(editComponentDisplay,false);
-            
-		case apogeeapp.app.JsonTableComponent.VIEW_JSON_TEXT:
-			return new apogeeapp.app.AceDataMode(editComponentDisplay,true);
-			
-		case apogeeapp.app.JsonTableComponent.VIEW_FORM:
-			return new apogeeapp.app.FormDataMode(editComponentDisplay);
+        case apogeeapp.app.JsonTableComponent.VIEW_DATA:
+            switch(this.dataView) {
+                case apogeeapp.app.JsonTableComponent.JSON_DATA_VEW:
+                    return new apogeeapp.app.AceDataMode(editComponentDisplay,true);
+
+                case apogeeapp.app.JsonTableComponent.FORM_DATA_VIEW:
+                    return new apogeeapp.app.FormDataMode(editComponentDisplay);
+                    
+                case apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW:
+                default:
+                    return new apogeeapp.app.AceDataMode(editComponentDisplay,false);
+            }
 			
 		case apogeeapp.app.JsonTableComponent.VIEW_CODE:
 			return new apogeeapp.app.AceCodeMode(editComponentDisplay);
@@ -90,6 +110,10 @@ apogeeapp.app.JsonTableComponent.createComponent = function(workspaceUI,data,com
     
     var table = json.member;
     if(table) {
+        
+        //need to add data view to component options
+        //(and save it when saving!
+        
         var tableComponent = new apogeeapp.app.JsonTableComponent(workspaceUI,table,componentOptions);
         actionResponse.component = tableComponent;
     }
@@ -100,6 +124,14 @@ apogeeapp.app.JsonTableComponent.createComponent = function(workspaceUI,data,com
 apogeeapp.app.JsonTableComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
     var tableComponent = new apogeeapp.app.JsonTableComponent(workspaceUI,member,componentJson);
     return tableComponent;
+}
+
+apogeeapp.app.JsonTableComponent.addPropFunction = function(component,values) {
+    values.dataView = component.getDataView();
+}
+
+apogeeapp.app.JsonTableComponent.updateProperties = function(component,oldValues,newValues,actionResponse) {
+    component.setDataView(newValues.dataView);
 }
 
 //======================================
@@ -114,4 +146,20 @@ apogeeapp.app.JsonTableComponent.generator.createComponentFromJson = apogeeapp.a
 apogeeapp.app.JsonTableComponent.generator.DEFAULT_WIDTH = 300;
 apogeeapp.app.JsonTableComponent.generator.DEFAULT_HEIGHT = 300;
 apogeeapp.app.JsonTableComponent.generator.ICON_RES_PATH = "/dataIcon.png";
+
+apogeeapp.app.JsonTableComponent.generator.propertyDialogLines = [
+    {
+        "type":"dropdown",
+        "heading":"Data View: ",
+        "entries":[
+            "Plain",
+            "JSON",
+            "Form"
+        ],
+        "resultKey":"dataView"
+    }
+];
+
+apogeeapp.app.JsonTableComponent.generator.addPropFunction = apogeeapp.app.JsonTableComponent.addPropFunction;
+apogeeapp.app.JsonTableComponent.generator.updateProperties = apogeeapp.app.JsonTableComponent.updateProperties;
 
