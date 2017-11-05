@@ -104,6 +104,18 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.updateData = function() {
     }
 }
 
+/** This method should be called is a data element should be discarded, and possilby re-requested. */
+apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewModeElement = function(viewType) {
+    //get rid of the cached view type
+    delete this.viewModeElements[viewType];
+    
+    //reset it if it is currently in use
+    if(this.viewType == viewType) {
+        this.viewType = null;
+        this.setViewType(viewType);
+    }
+}
+
 /** This gets the current window state, to reconstruct the view. */
 apogeeapp.app.EditWindowComponentDisplay.prototype.getStateJson = function() {
     var json = {};

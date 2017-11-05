@@ -7,9 +7,12 @@ apogeeapp.app.JsonTableComponent = function(workspaceUI,table,componentJson) {
     //need to ave this and read if from component json, during create or read
     //need to refresh a display if we change it when data view active
     //need to refresh the view from the cache (whereit is happening...)
-    this.dataView = apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW;
+    this.dataView = (componentJson.dataView !== undefined ) ? componentJson.dataView : apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW;
    
     this.memberUpdated();
+    
+    //add a cleanup and save actions
+    this.addSaveAction(apogeeapp.app.JsonTableComponent.writeToJson);
 };
 
 apogeeapp.app.JsonTableComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -22,6 +25,11 @@ apogeeapp.app.JsonTableComponent.prototype.getDataView = function() {
 
 apogeeapp.app.JsonTableComponent.prototype.setDataView = function(dataView) {
     this.dataView = dataView;
+    //update the window display if needed
+    var windowDisplay = this.getWindowDisplay();
+    if(windowDisplay) {
+        windowDisplay.updateViewModeElement(apogeeapp.app.JsonTableComponent.VIEW_DATA);
+    }
 }
 
 //==============================
@@ -113,8 +121,12 @@ apogeeapp.app.JsonTableComponent.createComponent = function(workspaceUI,data,com
         
         //need to add data view to component options
         //(and save it when saving!
+        var componentJson = apogee.util.jsonCopy(componentOptions);
+        if(data.dataView) {
+            componentJson.dataView = data.dataView;
+        }
         
-        var tableComponent = new apogeeapp.app.JsonTableComponent(workspaceUI,table,componentOptions);
+        var tableComponent = new apogeeapp.app.JsonTableComponent(workspaceUI,table,componentJson);
         actionResponse.component = tableComponent;
     }
     return actionResponse;
@@ -125,6 +137,11 @@ apogeeapp.app.JsonTableComponent.createComponentFromJson = function(workspaceUI,
     var tableComponent = new apogeeapp.app.JsonTableComponent(workspaceUI,member,componentJson);
     return tableComponent;
 }
+
+apogeeapp.app.JsonTableComponent.writeToJson = function(json) {
+    json.dataView = this.dataView;
+}
+    
 
 apogeeapp.app.JsonTableComponent.addPropFunction = function(component,values) {
     values.dataView = component.getDataView();
