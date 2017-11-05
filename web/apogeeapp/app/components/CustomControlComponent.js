@@ -273,6 +273,7 @@ apogeeapp.app.CustomControlComponent.prototype.update = function(uiCodeFields) {
 apogeeapp.app.CustomControlComponent.writeToJson = function(json) {
     //store the resource info
     json.resource = this.uiCodeFields;
+    json.destroyOnInactive = this.destroyOnInactive;
 }
 
 /** This is the format string to create the code body for updateing the member
@@ -329,17 +330,19 @@ apogeeapp.app.CustomControlComponent.createComponent = function(workspaceUI,data
     var control = json.member;
     
     if(control) {
-        
-        if(!data.destroyOnHide) {
-            //update the component options, but don't modify the options structure passed in.
-            var activeComponentOptions;
-            if(componentOptions) {
-                activeComponentOptions = apogee.util.jsonCopy(componentOptions);
-            }
-            else {
-                activeComponentOptions = {};
-            }
-            activeComponentOptions.destroyOnInactive = false;
+         
+        //update the component options, but don't modify the options structure passed in.
+        var activeComponentOptions;
+        if(componentOptions) {
+            activeComponentOptions = apogee.util.jsonCopy(componentOptions);
+        }
+        else {
+            activeComponentOptions = {};
+        }
+
+        //added settings info
+        if(data.destroyOnHide !== undefined) {
+            activeComponentOptions.destroyOnInactive = data.destroyOnHide;
         }
         
         //create the component
