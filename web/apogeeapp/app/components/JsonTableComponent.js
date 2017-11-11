@@ -120,8 +120,14 @@ apogeeapp.app.JsonTableComponent.createComponent = function(workspaceUI,data,com
     if(table) {
         
         //need to add data view to component options
-        //(and save it when saving!
-        var componentJson = apogee.util.jsonCopy(componentOptions);
+        var componentJson;
+        if(componentOptions) {
+            componentJson = apogee.util.jsonCopy(componentOptions);
+        }
+        else {
+            componentJson = {};
+        }
+        
         if(data.dataView) {
             componentJson.dataView = data.dataView;
         }
