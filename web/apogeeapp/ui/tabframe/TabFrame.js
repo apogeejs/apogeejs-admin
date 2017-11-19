@@ -106,10 +106,11 @@ apogeeapp.ui.TabFrame.prototype.setActiveTab = function(id) {
 		this.activeTab = id;
 		this.tabFrame.appendChild(tab.getMainElement());
 		this.updateTabDisplay();
-		this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,tab);
         if(oldTab) {
             this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,oldTab);
         }
+		this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,tab);
+        
 	}
 }
 
