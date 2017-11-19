@@ -140,9 +140,18 @@
                 app.registerComponent(controlBundle);
             }
             
+            function beforeUnloadHandler() {
+                if(app.getWorkspaceIsDirty()) {
+                    return "There is unsaved data. Are you sure you want to exit?";
+                }
+                else {
+                    return undefined;
+                }
+            }
+            
 		</script>
 	</head>
-	<body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
+	<body onload="init()" onbeforeunload="return beforeUnloadHandler()">
         <div id="appContainer"></div>
 	</body>
 </html>

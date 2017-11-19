@@ -35,9 +35,11 @@ apogeeapp.app.closeworkspace.closeWorkspace = function(app) {
         }
 
         var workspace = activeWorkspaceUI.getWorkspace();
-        var doRemove = confirm("Are you sure you want to close the workspace?");
-        if(!doRemove) {
-            return actionResponse;
+        if(workspace.getIsDirty()) {
+            var doRemove = confirm("There is unsaved data. Are you sure you want to close the workspace?");
+            if(!doRemove) {
+                return actionResponse;
+            }
         }
         
         workspaceUIRemoved = app.clearWorkspaceUI();

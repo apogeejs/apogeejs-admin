@@ -50,6 +50,23 @@ apogeeapp.app.Apogee.prototype.getWorkspace = function() {
 	}
 }
 
+apogeeapp.app.Apogee.prototype.getWorkspaceIsDirty = function() {
+    var workspace = this.getWorkspace();
+    if(workspace) {
+        return workspace.getIsDirty();
+    }
+    else {
+        return false;
+    }
+}
+
+apogeeapp.app.Apogee.prototype.clearWorkspaceIsDirty = function() {
+    var workspace = this.getWorkspace();
+    if(workspace) {
+        workspace.clearIsDirty();
+    }
+}
+
 //==================================
 // Workspace Management
 //==================================

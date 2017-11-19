@@ -106,6 +106,10 @@ apogee.action.doAction = function(actionData,optionalContext,optionalActionRespo
         apogee.calculation.callRecalculateList(recalculateList,actionResponse);
     
         apogee.action.fireEvents(workspace,processedActions,recalculateList);
+        
+        //after any action, mark workspace dirty
+        //NOTE - I might not want to do that is the action fails - check into this
+        workspace.setIsDirty();
 	}
 	catch(error) {
         //unknown application error
