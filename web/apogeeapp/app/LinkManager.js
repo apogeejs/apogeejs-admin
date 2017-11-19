@@ -67,7 +67,7 @@ apogeeapp.app.LinkManager.prototype.updateWorkspaceLinks = function(ownerName,ad
 	cnt = addList.length;
     if(cnt === 0) {
 		//make sure we still return if there is nothing to add
-		linksLoadedCallback();
+		if(linksLoadedCallback) linksLoadedCallback();
 	}
 	else {
         for(i = 0; i < cnt; i++) {
