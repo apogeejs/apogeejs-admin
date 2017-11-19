@@ -65,36 +65,42 @@ apogeeapp.app.LinkManager.prototype.updateWorkspaceLinks = function(ownerName,ad
 	
 	//add links
 	cnt = addList.length;
-	for(i = 0; i < cnt; i++) {
-		linkObject = addList[i];
-		link = linkObject.link;
-		type = linkObject.type;
-		linkWorkspaces = this.linkMap[link];
-		if(linkWorkspaces) {
-			//link already present on page
-			index = linkWorkspaces.indexOf(link);
-			if(index != -1) {
-				//workspace already has link - no action
-			}
-			else {
-				//add workspace to link
-				linkWorkspaces.push(ownerName);
-			}
-	
-//SLOPPY!
-			//not pending
-			if(responseProcessor) {
-				responseProcessor.getOnLoad(link)();
-			}
-		}
-		else {
-			//link must be added, and workspace added to link
-			linkWorkspaces = [];
-			linkWorkspaces.push(ownerName);
-			this.linkMap[link] = linkWorkspaces;
-			this.addLinkToPage(link,type,responseProcessor);
-		}
+    if(cnt === 0) {
+		//make sure we still return if there is nothing to add
+		linksLoadedCallback();
 	}
+	else {
+        for(i = 0; i < cnt; i++) {
+            linkObject = addList[i];
+            link = linkObject.link;
+            type = linkObject.type;
+            linkWorkspaces = this.linkMap[link];
+            if(linkWorkspaces) {
+                //link already present on page
+                index = linkWorkspaces.indexOf(link);
+                if(index != -1) {
+                    //workspace already has link - no action
+                }
+                else {
+                    //add workspace to link
+                    linkWorkspaces.push(ownerName);
+                }
+
+    //SLOPPY!
+                //not pending
+                if(responseProcessor) {
+                    responseProcessor.getOnLoad(link)();
+                }
+            }
+            else {
+                //link must be added, and workspace added to link
+                linkWorkspaces = [];
+                linkWorkspaces.push(ownerName);
+                this.linkMap[link] = linkWorkspaces;
+                this.addLinkToPage(link,type,responseProcessor);
+            }
+        }
+    }
 }
 
 apogeeapp.app.LinkManager.prototype.addLinkToPage = function(link,type,responseProcessor) {
