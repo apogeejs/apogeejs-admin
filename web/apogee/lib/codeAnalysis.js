@@ -79,7 +79,7 @@ apogee.codeAnalysis.syntax = {
     ThisExpression: [],
     ThrowStatement: [{name:'argument'}],
     TryStatement: [
-        {name:'block',list:true},
+        {name:'block'},
         {name:'handler'},
         {name:'finalizer',list:true}
         //guards omitted, moz specific
