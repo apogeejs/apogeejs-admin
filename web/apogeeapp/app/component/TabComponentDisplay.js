@@ -171,10 +171,9 @@ apogeeapp.app.TabComponentDisplay.prototype.setAddChildrenContextMenu = function
     var workspaceUI = this.component.getWorkspaceUI();
     var app = workspaceUI.getApp();
 
-    var initialValues = {};
-    initialValues.parentName = this.member.getFullName();
     
-    this.contentElement.oncontextmenu = function(event) {
+    
+    this.contentElement.oncontextmenu = event => {
         event.preventDefault();
         event.stopPropagation();
         
@@ -187,6 +186,9 @@ apogeeapp.app.TabComponentDisplay.prototype.setAddChildrenContextMenu = function
             componentOptions.windowState = {};
             componentOptions.windowState.posInfo = posInfo;
         }
+        
+        var initialValues = {};
+        initialValues.parentName = this.member.getFullName();
         
         var contextMenu = new apogeeapp.ui.MenuBody();
         contextMenu.setMenuItems(app.getAddChildMenuItems(initialValues,componentOptions));
