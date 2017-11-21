@@ -8,6 +8,7 @@ apogee.Workspace = function(optionalJson,actionResponseForJson,ownerForVirtualWo
     apogee.RootHolder.init.call(this);
     
     // This is a queue to hold actions while one is in process.
+    this.isDirty = false;
     this.actionInProgress = false;
     this.actionQueue = [];
     
@@ -30,7 +31,23 @@ apogee.base.mixin(apogee.Workspace,apogee.RootHolder);
 
 apogee.Workspace.ROOT_FOLDER_NAME = "Workspace";
 
-/** this method gets the root package for the workspace. */
+/** this method should be used to set the workspace as dirty, meaning it has 
+ * new data to be saved. */
+apogee.Workspace.prototype.setIsDirty = function() {
+    this.isDirty = true;
+}
+
+/** This method returns true if the workspace needs to be saved. */
+apogee.Workspace.prototype.getIsDirty = function() {
+    return this.isDirty;
+}
+
+/** This method clears the is dirty flag. */
+apogee.Workspace.prototype.clearIsDirty = function() {
+    this.isDirty = false;
+}
+
+/** This method returns the root object - implemented from RootHolder.  */
 apogee.Workspace.prototype.getRoot = function() {
     return this.rootFolder;
 }
@@ -227,6 +244,11 @@ apogee.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     actionData.owner = this;
     actionData.workspace = this;
     apogee.action.doAction(actionData,actionResponse);
+    
+    //if we loaded the workspace, make sure it is clean 
+    if(actionResponse.success) {
+        this.clearIsDirty();
+    }
     
     return actionResponse;
 }

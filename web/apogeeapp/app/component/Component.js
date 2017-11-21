@@ -341,13 +341,13 @@ apogeeapp.app.Component.prototype.createOpenCallback = function() {
         }
     }
     else {
-        var parent = this.member.getParent();
-        if(parent) {
-            
-            var parentComponent = workspaceUI.getComponent(parent);
-            if((parentComponent)&&(parentComponent.usesTabDisplay())) {
-                //remove the tree from the parent
-                openCallback = function() {
+        //remove the tree from the parent
+        openCallback = function() {
+            var parent = instance.member.getParent();
+            if(parent) {
+                var parentComponent = workspaceUI.getComponent(parent);
+                if((parentComponent)&&(parentComponent.usesTabDisplay())) {
+
                     //open the parent and bring this child to the front
                     makeTabActive(parentComponent);
                     parentComponent.showChildComponent(instance);

@@ -18,24 +18,27 @@ apogeeapp.app.openworkspace.openFile = function(onOpen) {
 }
 
 
-apogeeapp.app.saveworkspace.showSaveDialog = function(data) {
+apogeeapp.app.saveworkspace.showSaveDialog = function(data,onSaveSuccess) {
     var electron = require('electron').remote;
     var dialog = electron.dialog;
     var filename = dialog.showSaveDialog();
     if(filename) {
-        apogeeapp.app.saveworkspace.saveFile(filename,data);
+        apogeeapp.app.saveworkspace.saveFile(filename,data,onSaveSuccess);
     }
     else {
         return false;
     }
 }
 
-apogeeapp.app.saveworkspace.saveFile = function(filename,data) {
+apogeeapp.app.saveworkspace.saveFile = function(filename,data,onSaveSuccess) {
     var onComplete = function(err,data) {
         if(err) {
             alert("Error: " + err.message);
         }
         else {
+            if(onSaveSuccess) {
+                onSaveSuccess();
+            }
             alert("Saved!");
         }
     }

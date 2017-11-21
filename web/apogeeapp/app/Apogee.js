@@ -50,6 +50,23 @@ apogeeapp.app.Apogee.prototype.getWorkspace = function() {
 	}
 }
 
+apogeeapp.app.Apogee.prototype.getWorkspaceIsDirty = function() {
+    var workspace = this.getWorkspace();
+    if(workspace) {
+        return workspace.getIsDirty();
+    }
+    else {
+        return false;
+    }
+}
+
+apogeeapp.app.Apogee.prototype.clearWorkspaceIsDirty = function() {
+    var workspace = this.getWorkspace();
+    if(workspace) {
+        workspace.clearIsDirty();
+    }
+}
+
 //==================================
 // Workspace Management
 //==================================
@@ -99,9 +116,8 @@ apogeeapp.app.Apogee.prototype.updateWorkspaceLinks = function(ownerName,addList
 apogeeapp.app.Apogee.prototype.registerComponent = function(componentGenerator) {
     var name = componentGenerator.uniqueName;
     if(this.componentGenerators[name]) {
-//in the future we can maybe do something other than punt
-        alert("There is already a registered component with this name. Either the component has already been added of the name is not unique.");
-        return;
+        var replace = confirm("There is already a registered component with this name. Replace it or cancel?");
+        if(!replace) return;
     }
 
 //we should maybe warn if another component bundle is being overwritten 
@@ -137,9 +153,8 @@ apogeeapp.app.Apogee.prototype.loadComponentGenerators = function() {
 apogeeapp.app.Apogee.prototype.registerStandardComponent = function(componentGenerator) {
     var name = componentGenerator.uniqueName;
     if(this.componentGenerators[name]) {
-//in the future we can maybe do something other than punt
-        alert("There is already a registered component with this name. Either the component has already been added of the name is not unique.");
-        return;
+        var replace = confirm("There is already a registered component with this name. Replace it or cancel?");
+        if(!replace) return;
     }
 
 //we should maybe warn if another component bundle is being overwritten 

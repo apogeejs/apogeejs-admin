@@ -15,11 +15,14 @@ apogeeapp.app.saveworkspace.getSaveCallback = function(app,filename) {
             return;
         }
         
+        //clear workspace dirty flag on completion of save
+        var onSaveSuccess = () => app.clearWorkspaceIsDirty();
+        
         if(filename === undefined) {
-            apogeeapp.app.saveworkspace.showSaveDialog(workspaceText);
+            apogeeapp.app.saveworkspace.showSaveDialog(workspaceText,onSaveSuccess);
         }
         else {
-            apogeeapp.app.saveworkspace.saveFile(filename,workspaceText);
+            apogeeapp.app.saveworkspace.saveFile(filename,workspaceText,onSaveSuccess);
         }
     }
 }

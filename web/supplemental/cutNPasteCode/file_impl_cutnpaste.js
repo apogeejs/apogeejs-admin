@@ -8,10 +8,13 @@ apogeeapp.app.openworkspace.openFile = function(onOpen) {
     apogeeapp.app.dialog.showOpenWorkspaceDialog(onFileOpen);
 }
 
-apogeeapp.app.saveworkspace.showSaveDialog = function(data) {
+apogeeapp.app.saveworkspace.showSaveDialog = function(data,onSaveSuccess) {
     apogeeapp.app.dialog.showSaveWorkspaceDialog(data);
+    
+    //assume it was saved...
+    if(onSaveSuccess) onSaveSuccess();
 }
 
-apogeeapp.app.saveworkspace.saveFile = function(filename,data) {
+apogeeapp.app.saveworkspace.saveFile = function(filename,data,onSaveSuccess) {
     apogeeapp.app.saveworkspace.showSaveDialog(data);
 }
