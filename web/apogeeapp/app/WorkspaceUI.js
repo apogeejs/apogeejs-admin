@@ -275,7 +275,7 @@ apogeeapp.app.WorkspaceUI.prototype.setLinks = function(newJsLinkArray,newCssLin
     
     //set workspace dirty here
     //we should look further into ui versus workspace being dirty and how we want to handle that.
-    this.workspace.setIsDirty();
+    if(this.workspace) this.workspace.setIsDirty();
 }
 
 apogeeapp.app.WorkspaceUI.prototype.getCssLinks = function() {
