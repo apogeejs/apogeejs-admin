@@ -83,32 +83,6 @@ apogee.FolderFunction.prototype.close = function() {
     this.internalFolder.onClose();
 }
 
-/** This method is called when the member is deleted. If necessary the implementation
- * can extend this function, but it should call this base version of the function
- * if it does.  */
-apogee.FolderFunction.prototype.onDelete = function() {
-    
-    var returnValue;
-    
-    if(this.internalFolder) {
-        var json = {};
-        json.action = "deleteMember";
-        json.member = this.internalFolder;
-        var actionResponse = apogee.action.doAction(json,false);
-        if(!actionResponse.getSuccess()) {
-            //show an error message
-            var msg = actionResponse.getErrorMsg();
-            alert(msg);
-        }
-    }
-    
-//I don't know what to do if this fails. Figure that out.
-    
-    //call the base delete
-    returnValue = apogee.Member.onDelete.call(this);
-	return returnValue;
-}
-
 /** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 apogee.FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
