@@ -2,7 +2,11 @@
   "name"    : "apogee-app",
   "version" : "0.3.0",
   "main"    : "main.js",
-  "dependencies": {
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "~1.7.8"
   },
   "author": "Dave Sutter"
 }

@@ -27,7 +27,7 @@ apogeeapp.app.AceSupplementalMode.prototype.onSave = function(text) {
         actionData.functionBody = this.member.getFunctionBody();
         actionData.supplementalCode = text;  
         
-		var actionResponse =  apogee.action.doAction(actionData);
+		var actionResponse =  apogee.action.doAction(actionData,true);
         
 	if(!actionResponse.getSuccess()) {
 		//show an error message

@@ -60,7 +60,7 @@ apogeeapp.app.FolderFunctionComponent.createComponent = function(workspaceUI,dat
         json.internalFolder = data.internalFolder;
     }
     json.type = apogee.FolderFunction.generator.type;
-    var actionResponse = apogee.action.doAction(json);
+    var actionResponse = apogee.action.doAction(json,true);
     
     var folderFunction = json.member;
     if(actionResponse.getSuccess()) {

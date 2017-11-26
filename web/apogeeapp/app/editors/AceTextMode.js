@@ -39,7 +39,7 @@ apogeeapp.app.AceTextMode.prototype.onSave = function(text) {
     actionData.action = "updateData";
     actionData.member = this.member;
     actionData.data = text;
-	var actionResponse =  apogee.action.doAction(actionData);
+	var actionResponse =  apogee.action.doAction(actionData,true);
 	
 	return true;
 }

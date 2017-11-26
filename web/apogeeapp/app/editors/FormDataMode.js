@@ -29,7 +29,7 @@ apogeeapp.app.FormDataMode.prototype.onSave = function(data) {
     actionData.action = "updateData";
     actionData.member = this.member;
     actionData.data = data;
-	var actionResponse =  apogee.action.doAction(actionData);
+	var actionResponse =  apogee.action.doAction(actionData,true);
 	
 	return true;
 }

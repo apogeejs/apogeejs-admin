@@ -52,12 +52,15 @@ apogee.action = {};
 apogee.action.actionInfo = {
 }
 
-/** This method is used to execute an action for the data model. 
- * The optionalContext is a context manager to convert a member name to a
+/** This method is used to execute an action for the data model.
+ * -The source tells the type of action. This affects how the action is treated. For 
+ * example, actions from the UI set the workspace dirty flag to true and are used in the
+ * undo list. (NOTE - UNDO LIST DOES NOT EXIST YET)
+ * -The optionalContext is a context manager to convert a member name to a
  * member, if supported by the action.
- * The optionalActionResponse allows you to pass an existing actionResponse rather
+ * -The optionalActionResponse allows you to pass an existing actionResponse rather
  * than creating a new one inside this function as a return value. */
-apogee.action.doAction = function(actionData,optionalContext,optionalActionResponse) {
+apogee.action.doAction = function(actionData,addToUndo,optionalContext,optionalActionResponse) {
     
     //read the workspace
     var workspace;
@@ -77,6 +80,7 @@ apogee.action.doAction = function(actionData,optionalContext,optionalActionRespo
         queuedAction.actionData = actionData;
         queuedAction.optionalContext = optionalContext;
         queuedAction.optionalActionResponse = optionalActionResponse;
+        queuedAction.addToUndo = addToUndo;
         workspace.queueAction(queuedAction);
         
         //return an empty (successful) action response
@@ -107,9 +111,13 @@ apogee.action.doAction = function(actionData,optionalContext,optionalActionRespo
     
         apogee.action.fireEvents(workspace,processedActions,recalculateList);
         
-        //after any action, mark workspace dirty
+        //save the action for the undo queue if needed
+        //WE HAVE NOT UNDO QUEUE NOT. But do set the workspace dirty flag, which 
+        //we use to warn the user if there is unsaved data.
         //NOTE - I might not want to do that is the action fails - check into this
-        workspace.setIsDirty();
+        if(addToUndo) {
+            workspace.setIsDirty();
+        }
 	}
 	catch(error) {
         //unknown application error
@@ -167,7 +175,7 @@ apogee.action.DEPENDENT_PENDING_TOKEN = -1;
 //--------------------------------
 
 /** This is a convenience method to set a member to a given value. */
-apogee.action.dataUpdate = function(updateMemberName,fromMember,data) {
+apogee.action.dataUpdate = function(updateMemberName,fromMember,data,addToUndo) {
     var workspace = fromMember.getWorkspace();
     var contextManager = fromMember.getContextManager();
     
@@ -177,11 +185,11 @@ apogee.action.dataUpdate = function(updateMemberName,fromMember,data) {
     actionData.memberName = updateMemberName;
     actionData.workspace = workspace;
     actionData.data = data;
-    return apogee.action.doAction(actionData,contextManager);
+    return apogee.action.doAction(actionData,addToUndo,contextManager);
 }
 
 /** This is a convenience method to set a member to a given value. */
-apogee.action.compoundDataUpdate = function(updateInfo,fromMember) {
+apogee.action.compoundDataUpdate = function(updateInfo,fromMember,addToUndo) {
     var workspace = fromMember.getWorkspace();
     var contextManager = fromMember.getContextManager();
 
@@ -191,12 +199,12 @@ apogee.action.compoundDataUpdate = function(updateInfo,fromMember) {
     actionData.actions = apogee.action.updateInfoToActionList(updateInfo,workspace);
     actionData.workspace = workspace;
 
-    return apogee.action.doAction(actionData,contextManager);
+    return apogee.action.doAction(actionData,addToUndo,contextManager);
 }
 
 
 /** This is a convenience method to set a member tohave an error message. */
-apogee.action.errorUpdate = function(updateMemberName,fromMember,errorMessage) {
+apogee.action.errorUpdate = function(updateMemberName,fromMember,errorMessage,addToUndo) {
     var workspace = fromMember.getWorkspace();
     var contextManager = fromMember.getContextManager();
         
@@ -205,11 +213,11 @@ apogee.action.errorUpdate = function(updateMemberName,fromMember,errorMessage) {
     actionData.memberName = updateMemberName;
     actionData.workspace = workspace;
     actionData.errorMsg = errorMessage;
-    return apogee.action.doAction(actionData,contextManager);
+    return apogee.action.doAction(actionData,addToUndo,contextManager);
 }
 
 /** This is a convenience method to set a member to a given value when the dataPromise resolves. */
-apogee.action.asynchDataUpdate = function(updateMemberName,fromMember,dataPromise) {
+apogee.action.asynchDataUpdate = function(updateMemberName,fromMember,dataPromise,addToUndo) {
     
     var workspace = fromMember.getWorkspace();
     var contextManager = fromMember.getContextManager();
@@ -221,7 +229,7 @@ apogee.action.asynchDataUpdate = function(updateMemberName,fromMember,dataPromis
     actionData.memberName = updateMemberName;
     actionData.workspace = workspace;
     actionData.token = token;
-    var actionResponse =  apogee.action.doAction(actionData,contextManager);
+    var actionResponse =  apogee.action.doAction(actionData,addToUndo,contextManager);
     
     var asynchCallback = function(memberValue) {
         //set the data for the table, along with triggering updates on dependent tables.
@@ -231,7 +239,7 @@ apogee.action.asynchDataUpdate = function(updateMemberName,fromMember,dataPromis
         actionData.workspace = workspace;
         actionData.token = token;
         actionData.data = memberValue;
-        var actionResponse =  apogee.action.doAction(actionData,contextManager);
+        var actionResponse =  apogee.action.doAction(actionData,addToUndo,contextManager);
     }
     var asynchErrorCallback = function(errorMsg) {
         var actionData = {};
@@ -240,7 +248,7 @@ apogee.action.asynchDataUpdate = function(updateMemberName,fromMember,dataPromis
         actionData.workspace = workspace;
         actionData.token = token;
         actionData.errorMsg = errorMsg;
-        var actionResponse =  apogee.action.doAction(actionData,contextManager);
+        var actionResponse =  apogee.action.doAction(actionData,addToUndo,contextManager);
     }
 
     //call appropriate action when the promise resolves.
@@ -276,6 +284,7 @@ apogee.action.updateInfoToActionList = function(updateInfo,workspace) {
 apogee.action.asynchRunQueuedAction = function(queuedActionData) {
     var callback = function() {
         apogee.action.doAction(queuedActionData.actionData,
+            queuedActionData.addToUndo,
             queuedActionData.optionalContext,
             queuedActionData.optionalActionResponse);
     }

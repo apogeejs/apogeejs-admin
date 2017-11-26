@@ -46,7 +46,7 @@ apogeeapp.app.AceCodeMode.prototype.onSave = function(text) {
         actionData.supplementalCode = this.member.getSupplementalCode();  
 	}
     
-    var actionResponse =  apogee.action.doAction(actionData);
+    var actionResponse =  apogee.action.doAction(actionData,true);
         
 	return true;  
 }

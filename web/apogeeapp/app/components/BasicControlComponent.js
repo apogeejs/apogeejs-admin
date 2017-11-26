@@ -110,7 +110,7 @@ apogeeapp.app.BasicControlComponent.createGenerator = function(displayName,uniqu
         json.workspace = data.parent.getWorkspace();
         json.name = data.name;
         json.type = apogee.JsonTable.generator.type;
-        var actionResponse = apogee.action.doAction(json);
+        var actionResponse = apogee.action.doAction(json,true);
 
         var control = json.member;
 

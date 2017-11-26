@@ -63,7 +63,7 @@ apogeeapp.app.EditComponent.prototype.getClearFunctionCallback = function(emptyD
     actionData.data = emptyDataValue;
     actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME
     return function() {
-        var actionResponse = apogee.action.doAction(actionData); 
+        var actionResponse = apogee.action.doAction(actionData,true); 
         if(!actionResponse.getSuccess()) {
             alert(actionResponse.getErrorMsg());
         }

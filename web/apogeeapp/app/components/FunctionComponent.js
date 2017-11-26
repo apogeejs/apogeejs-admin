@@ -81,7 +81,7 @@ apogeeapp.app.FunctionComponent.createComponent = function(workspaceUI,data,comp
     json.updateData.argList = argList;
     
     json.type = apogee.FunctionTable.generator.type;
-    var actionResponse = apogee.action.doAction(json);
+    var actionResponse = apogee.action.doAction(json,true);
     
     var functionObject = json.member;
     if(functionObject) {

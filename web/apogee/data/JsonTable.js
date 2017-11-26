@@ -71,7 +71,7 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberFunction) {
             actionData.member = instance;
             actionData.token = token;
             actionData.data = memberValue;
-            var actionResponse =  apogee.action.doAction(actionData);
+            var actionResponse =  apogee.action.doAction(actionData,false);
         }
         var asynchErrorCallback = function(errorMsg) {
             var actionData = {};
@@ -79,7 +79,7 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberFunction) {
             actionData.member = instance;
             actionData.token = token;
             actionData.errorMsg = errorMsg;
-            var actionResponse =  apogee.action.doAction(actionData);
+            var actionResponse =  apogee.action.doAction(actionData,false);
         }
 
         //call appropriate action when the promise resolves.

@@ -80,7 +80,7 @@ apogeeapp.app.TextComponent.createComponent = function(workspaceUI,data,componen
     json.type = apogee.JsonTable.generator.type;
 	json.updateData = {};
 	json.updateData.data = "";
-    var actionResponse = apogee.action.doAction(json);
+    var actionResponse = apogee.action.doAction(json,true);
     
     var table = json.member;
     if(table) {

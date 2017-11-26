@@ -82,7 +82,7 @@ apogeeapp.app.GridTableComponent.createComponent = function(workspaceUI,data,com
     json.type = apogee.JsonTable.generator.type;
 	json.updateData = {};
 	json.updateData.data = [[""]]; //empty single cell
-    var actionResponse = apogee.action.doAction(json);
+    var actionResponse = apogee.action.doAction(json,true);
     
     var table = json.member;
     if(table) {

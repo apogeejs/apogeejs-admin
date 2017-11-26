@@ -373,7 +373,7 @@ apogeeapp.app.Component.prototype.createDeleteCallback = function() {
         var json = {};
         json.action = "deleteMember";
         json.member = member;
-        var actionResponse = apogee.action.doAction(json);
+        var actionResponse = apogee.action.doAction(json,true);
 
         if(!actionResponse.getSuccess()) {
             //show an error message

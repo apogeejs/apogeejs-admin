@@ -49,7 +49,7 @@ apogeeapp.app.FolderComponent.createComponent = function(workspaceUI,data,compon
         json.children = data.children;
     }
     json.type = apogee.Folder.generator.type;
-    var actionResponse = apogee.action.doAction(json);
+    var actionResponse = apogee.action.doAction(json,true);
     
     var folder = json.member;
 

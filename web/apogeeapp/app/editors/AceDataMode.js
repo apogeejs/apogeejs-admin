@@ -61,7 +61,7 @@ apogeeapp.app.AceDataMode.prototype.onSave = function(text) {
     actionData.action = "updateData";
     actionData.member = this.member;
     actionData.data = data;
-	var actionResponse =  apogee.action.doAction(actionData);
+	var actionResponse =  apogee.action.doAction(actionData,true);
 	
 	return true;
 }

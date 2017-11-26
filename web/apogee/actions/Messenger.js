@@ -3,22 +3,22 @@ apogee.action.Messenger = function(fromMember) {
 
     /** This is a convenience method to set a member to a given value. */
     this.dataUpdate = function(updateMemberName,data) {
-        apogee.action.dataUpdate(updateMemberName,fromMember,data);
+        apogee.action.dataUpdate(updateMemberName,fromMember,data,false);
     }
 
     /** This is a convenience method to set a member to a given value. */
     this.compoundDataUpdate = function(updateInfo) {
-        apogee.action.compoundDataUpdate(updateInfo,fromMember);
+        apogee.action.compoundDataUpdate(updateInfo,fromMember,false);
     }
 
     /** This is a convenience method to set a member tohave an error message. */
     this.errorUpdate = function(updateMemberName,errorMessage) {
-        apogee.action.errorUpdate(updateMemberName,fromMember,errorMessage);
+        apogee.action.errorUpdate(updateMemberName,fromMember,errorMessage,false);
     }
 
     /** This is a convenience method to set a member to a given value when the dataPromise resolves. */
     this.asynchDataUpdate = function(updateMemberName,dataPromise) {
-        apogee.action.asynchDataUpdate(updateMemberName,fromMember,dataPromise);
+        apogee.action.asynchDataUpdate(updateMemberName,fromMember,dataPromise,false);
     }
 }
 

@@ -94,7 +94,7 @@ apogee.FolderFunction.prototype.onDelete = function() {
         var json = {};
         json.action = "deleteMember";
         json.member = this.internalFolder;
-        var actionResponse = apogee.action.doAction(json);
+        var actionResponse = apogee.action.doAction(json,false);
         if(!actionResponse.getSuccess()) {
             //show an error message
             var msg = actionResponse.getErrorMsg();
@@ -317,7 +317,7 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         actionData.workspace = virtualWorkspace;
 
         //apply the update
-        var actionResponse = apogee.action.doAction(actionData);        
+        var actionResponse = apogee.action.doAction(actionData,false);        
         if(actionResponse.getSuccess()) {
             //retrieve the result
             if(returnValueTable) {

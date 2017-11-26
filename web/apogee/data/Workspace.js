@@ -243,7 +243,7 @@ apogee.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     actionData.action = "createMember";
     actionData.owner = this;
     actionData.workspace = this;
-    apogee.action.doAction(actionData,actionResponse);
+    apogee.action.doAction(actionData,false,actionResponse);
     
     //if we loaded the workspace, make sure it is clean 
     if(actionResponse.success) {
