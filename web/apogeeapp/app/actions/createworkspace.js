@@ -16,7 +16,7 @@ apogeeapp.app.createworkspace.getCreateCallback = function(app) {
 
         var actionResponse = apogeeapp.app.createworkspace.createWorkspace(app);
         if(!actionResponse.getSuccess()) {
-            alert(actionResponse.getErrorMsg());
+            apogeeapp.app.errorHandling.handleActionError(actionResponse);
         }
     }
 }
@@ -51,7 +51,7 @@ apogeeapp.app.createworkspace.createWorkspace = function(app) {
             app.clearWorkspaceUI();
         }
         
-        var actionError = apogee.ActionError.processException(error,"AppException",false);
+        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
         actionResponse.addError(actionError);
     }
     

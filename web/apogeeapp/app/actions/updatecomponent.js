@@ -72,7 +72,7 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
               
             //print an error message if there was an error
             if(!actionResponse.getSuccess()) {
-                alert(actionResponse.getErrorMsg())
+                apogeeapp.app.errorHandling.handleActionError(actionResponse);
             }
 
             //return true to close the dialog

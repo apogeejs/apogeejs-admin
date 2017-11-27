@@ -22,7 +22,7 @@ apogeeapp.app.openworkspace.getOpenCallback = function(app) {
             else {
                 var actionCompletedCallback = function(actionResponse) {
                     if(!actionResponse.getSuccess()) {
-                        alert(actionResponse.getErrorMsg());
+                        apogeeapp.app.errorHandling.handleActionError(actionResponse);
                     }
                 };
 
@@ -102,7 +102,7 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
         if(workspaceUIAdded) {
             app.clearWorkspaceUI();
         }
-        var actionError = apogee.ActionError.processException(error,"AppException",false);
+        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
         actionResponse.addError(actionError);
         actionCompletedCallback(actionResponse);
     }
@@ -127,7 +127,7 @@ apogeeapp.app.openworkspace.loadWorkspace = function(workspaceUI,workspaceJson,a
 apogeeapp.app.openworkspace.openWorkspaceFromUrl = function(app,url) {
     var actionCompletedCallback = function(actionResponse) {
         if(!actionResponse.getSuccess()) {
-            alert(actionResponse.getErrorMsg());
+            apogeeapp.app.errorHandling.handleActionError(actionResponse);
         }
     };
     
@@ -141,7 +141,7 @@ apogeeapp.app.openworkspace.openWorkspaceFromUrlImpl = function(app,url,actionCo
     }
     
     var onFailure = function(msg) {
-        var actionError = new apogee.ActionError(msg,"AppException",null);
+        var actionError = new apogee.ActionError(msg,apogee.ActionError.ERROR_TYPE_APP,null);
         var actionResponse = new apogee.ActionResponse();
         actionResponse.addError(actionError);
         actionCompletedCallback(actionResponse);

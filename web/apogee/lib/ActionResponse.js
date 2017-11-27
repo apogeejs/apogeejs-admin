@@ -30,22 +30,27 @@ apogee.ActionResponse.prototype.getSuccess = function() {
     return this.success;
 }
 
+/** This method returns false if there were any errors during this action. */
+apogee.ActionResponse.prototype.getErrors = function() {
+    return this.errors;
+}
+
 /** This method returns the error message for this action. It is only valid if success = false. */
 apogee.ActionResponse.prototype.getErrorMsg = function() {
-    var msg = "";
-    if(this.fatal) {
-        msg += "Unknown Error: The application is in an indeterminant state. It is recommended it be closed.\n";
-    }
-    for(var i = 0; i < this.errors.length; i++) {
-        var actionError = this.errors[i];
-        var line = "";
+    return apogee.ActionResponse.getListErrorMsg(this.errors);
+}
+
+/** This method returns the error message for this action. It is only valid if success = false. */
+apogee.ActionResponse.getListErrorMsg = function(errorList) {
+    var msgList = errorList.map( actionError => {
+        var msg = "";
         if(actionError.member) {
-            line += actionError.member.getName() + ": ";
+            msg += actionError.member.getName() + ": ";
         }
-        line += actionError.msg;
-        msg += line + "\n";
-    }
-    return msg;
+        msg += actionError.msg;
+        return msg;
+    });
+    return msgList.join(";\n");
 }
         
 

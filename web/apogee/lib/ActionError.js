@@ -12,24 +12,18 @@ apogee.ActionError = function(msg,errorType,optionalMember) {
     this.parentException = null;
 }
 
+/* Error type Application - This is an error caused by the application. This is
+ * may be shown to the user in a dialog. */
+apogee.ActionError.ERROR_TYPE_APP = "AppException";
+/** Error Type Model - This is an error that arises from the user code. Note that
+ * rather than using this error type, a alternate descriptive string may be used. */
+apogee.ActionError.ERROR_TYPE_MODEL = "ModelException";
+/** Error Type User - this is operator error. */
+apogee.ActionError.ERROR_TYPE_USER = "UserException";
+
+/** This is used as the error message when no other error message is given. */
 apogee.ActionError.UNKNOWN_ERROR_MESSAGE = "Unknown Error";
 
-//"User App" - This is an error in the users application code
-//"Custom Control - Update" - in "update" of custom control (cleared and set)
-//"FolderFunction - Code" - error in setting the folderFunction function
-//"User" - This is an operator error
-//"Model" - This is an error in the data model, like a missing generator
-//"Code" - error in use model code (I used on folderFunction and in code. Maybe I should split these.)
-//"Calculate" - error when the object function is set as data (includes execution if necessary)
-//
-///** This is an error in the user model code. */
-//apogee.ActionError.ACTION_ERROR_MODEL = "model";
-///** This is an error in the application code. */
-//apogee.ActionError.ACTION_ERROR_APP = "app";
-///** This is an error in the user appliation level code, such as custom components. */
-//apogee.ActionError.ACTION_ERROR_USER_APP = "user app";
-///** This is an operator error. */
-//apogee.ActionError.ACTION_ERROR_USER = "user";
 
 /** This sets the exception that triggered this error. */
 apogee.ActionError.prototype.setParentException = function(exception) {

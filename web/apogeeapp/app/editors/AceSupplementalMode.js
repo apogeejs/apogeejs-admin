@@ -30,10 +30,7 @@ apogeeapp.app.AceSupplementalMode.prototype.onSave = function(text) {
 		var actionResponse =  apogee.action.doAction(actionData,true);
         
 	if(!actionResponse.getSuccess()) {
-		//show an error message
-//no alert here - error display is adequate
-//			var msg = actionResponse.getErrorMsg();
-//			alert(msg);
+		apogeeapp.app.errorHandling.handleActionError(actionResponse);
 	}
         
 	return true;  

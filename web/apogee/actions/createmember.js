@@ -31,9 +31,10 @@ apogee.createmember.createMember = function(actionData,optionalContext,processed
     var generator = apogee.Workspace.getMemberGenerator(actionData.type);
 
     if(!generator) {
-       //type not found
-       actionData.error = new apogee.ActionError("Member type not found: " + actionData.type,"AppException",null);
-       return null;
+        //type not found
+        actionData.error = new apogee.ActionError("Member type not found: " + actionData.type,apogee.ActionError.ERROR_TYPE_APP,null);
+        processedActions.push(actionData);
+        return null;
     }
 
     var childJsonOutputList = [];

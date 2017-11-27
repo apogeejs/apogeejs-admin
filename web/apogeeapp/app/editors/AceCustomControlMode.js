@@ -44,8 +44,7 @@ apogeeapp.app.AceCustomControlMode.prototype.onSave = function(text) {
 	var actionResponse = this.component.update(uiCodeFields);
 	if(!actionResponse.getSuccess()) {
 		//show an error message
-		var msg = actionResponse.getErrorMsg();
-		alert(msg);
+		apogeeapp.app.errorHandling.handleActionError(actionResponse);
 	}
         
 	return true;  

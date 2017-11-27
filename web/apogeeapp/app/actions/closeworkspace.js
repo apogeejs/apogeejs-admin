@@ -11,7 +11,7 @@ apogeeapp.app.closeworkspace.getCloseCallback = function(app) {
 
         var actionResponse = apogeeapp.app.closeworkspace.closeWorkspace(app); 
         if(!actionResponse.getSuccess()) {
-            alert(actionResponse.getErrorMsg());
+            apogeeapp.app.errorHandling.handleActionError(actionResponse);
         }
     }
 }
@@ -29,7 +29,7 @@ apogeeapp.app.closeworkspace.closeWorkspace = function(app) {
         var activeWorkspaceUI = app.getWorkspaceUI();
         if(activeWorkspaceUI === null) {
             var errorMsg = "There is no workspace open.";
-            var actionError = new apogee.ActionError(errorMsg,"User",null);
+            var actionError = new apogee.ActionError(errorMsg,apogee.ActionError.ERROR_TYPE_USER,null);
             actionResponse.addError(actionError);
             return actionResponse;
         }
@@ -49,7 +49,7 @@ apogeeapp.app.closeworkspace.closeWorkspace = function(app) {
     }
     catch(error) {
         var isFatal = !workspaceUIRemoved;
-        var actionError = apogee.ActionError.processException(error,"AppException",isFatal);
+        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,isFatal);
         actionResponse.addError(actionError);
     }
     

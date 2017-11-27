@@ -83,6 +83,7 @@ module.exports = function(grunt) {
                 "apogeeapp/app/components/FolderFunctionComponent.js",
                 "apogeeapp/app/components/BasicControlComponent.js",
                 "apogeeapp/app/components/CustomControlComponent.js",
+                "apogeeapp/app/actions/errorhandling.js",
                 "apogeeapp/app/actions/createworkspace.js",
                 "apogeeapp/app/actions/openworkspace.js",
                 "apogeeapp/app/actions/saveworkspace.js",

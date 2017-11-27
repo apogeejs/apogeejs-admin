@@ -44,7 +44,7 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,generator,opti
 
             var actionResponse =  generator.createComponent(workspaceUI,result,optionalComponentOptions);   
             if(!actionResponse.getSuccess()) {
-                alert(actionResponse.getErrorMsg())
+                apogeeapp.app.errorHandling.handleActionError(actionResponse);
             }
             //return true to close the dialog
             return true;

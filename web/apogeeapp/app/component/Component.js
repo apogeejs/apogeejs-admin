@@ -377,8 +377,7 @@ apogeeapp.app.Component.prototype.createDeleteCallback = function() {
 
         if(!actionResponse.getSuccess()) {
             //show an error message
-            var msg = actionResponse.getErrorMsg();
-            alert(msg);
+            apogeeapp.app.errorHandling.handleActionError(actionResponse);
         }
     }
 }

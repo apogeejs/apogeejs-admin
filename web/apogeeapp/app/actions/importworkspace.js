@@ -23,7 +23,7 @@ apogeeapp.app.importworkspace.getImportCallback = function(app,parentGenerator) 
             else {
                 var actionCompletedCallback = function(actionResponse) {
                     if(!actionResponse.getSuccess()) {
-                        alert(actionResponse.getErrorMsg());
+                        apogeeapp.app.errorHandling.handleActionError(actionResponse);
                     }
                 };
 
@@ -100,7 +100,7 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,parentGenerator,works
     catch(error) {
         //figure out what to do here???
         
-        var actionError = apogee.ActionError.processException(error,"AppException",false);
+        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
         actionResponse.addError(actionError);
         actionCompletedCallback(actionResponse);
     }
@@ -113,7 +113,7 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,parentGenerator,works
 apogeeapp.app.importworkspace.openWorkspaceFromUrl = function(app,url) {
     var actionCompletedCallback = function(actionResponse) {
         if(!actionResponse.getSuccess()) {
-            alert(actionResponse.getErrorMsg());
+            apogeeapp.app.errorHandling.handleActionError(actionResponse);
         }
     };
     
@@ -127,7 +127,7 @@ apogeeapp.app.importworkspace.openWorkspaceFromUrlImpl = function(app,url,action
     }
     
     var onFailure = function(msg) {
-        var actionError = new apogee.ActionError(msg,"AppException",null);
+        var actionError = new apogee.ActionError(msg,apogee.ActionError.ERROR_TYPE_APP,null);
         var actionResponse = new apogee.ActionResponse();
         actionResponse.addError(actionError);
         actionCompletedCallback(actionResponse);

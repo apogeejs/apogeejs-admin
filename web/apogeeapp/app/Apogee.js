@@ -129,6 +129,7 @@ apogeeapp.app.Apogee.prototype.registerComponent = function(componentGenerator) 
 apogeeapp.app.Apogee.prototype.getComponentGenerator = function(name) {
 	return this.componentGenerators[name];
 }
+
 //==========================
 // App Initialization
 //==========================

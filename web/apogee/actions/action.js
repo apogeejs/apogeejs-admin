@@ -103,12 +103,17 @@ apogee.action.doAction = function(actionData,addToUndo,optionalContext,optionalA
         //finish processing the action
         var recalculateList = [];
         
+        //handle cases without a valid object (failed create)
+        apogee.action.handleMissingMember(processedActions,actionResponse);
+        
+        //handle cases with a valid object 
         apogee.action.updateDependencies(workspace,processedActions,recalculateList);
         
         apogee.action.updateRecalculateList(processedActions,recalculateList);
         
         apogee.calculation.callRecalculateList(recalculateList,actionResponse);
     
+        //fire events
         apogee.action.fireEvents(workspace,processedActions,recalculateList);
         
         //save the action for the undo queue if needed
@@ -121,7 +126,7 @@ apogee.action.doAction = function(actionData,addToUndo,optionalContext,optionalA
 	}
 	catch(error) {
         //unknown application error
-        var actionError = apogee.ActionError.processException(error,"AppException",true);
+        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,true);
         actionResponse.addError(actionError);
     }
     
@@ -153,7 +158,7 @@ apogee.action.callActionFunction = function(actionData,context,processedActions)
         actionInfo.actionFunction(actionData,context,processedActions);
     }
     else {
-        actionData.error = new apogee.ActionError("Unknown action: " + actionData.action,"AppException",null);
+        actionData.error = new apogee.ActionError("Unknown action: " + actionData.action,apogee.ActionError.ERROR_TYPE_APP,null);
     }  
 }
 
@@ -292,7 +297,15 @@ apogee.action.asynchRunQueuedAction = function(queuedActionData) {
     setTimeout(callback,0);
 }
 
-/** This method makes sure the member dependencies in the workspace are properly updated. */
+/** This method handles any error action with no member - for example failed create. 
+ * @private */
+apogee.action.handleMissingMember = function(processedActions,actionResponse) {
+    var missingMemberActions = processedActions.filter( action => action.member == undefined);
+    missingMemberActions.forEach( action => { if(action.error) {actionResponse.addError(action.error);} } );
+}
+
+/** This method makes sure the member dependencies in the workspace are properly updated. 
+ * @private */
 apogee.action.updateDependencies = function(workspace,processedActions,recalculateList) {
     //check if we need to update the entire model
     var updateAllDep = apogee.action.checkUpdateAllDep(processedActions);
@@ -311,7 +324,8 @@ apogee.action.updateDependencies = function(workspace,processedActions,recalcula
     }
 }
     
-/** This function updates the recalculation list for the given processed actions. */
+/** This function updates the recalculation list for the given processed actions. 
+ * @private */
 apogee.action.updateRecalculateList = function(processedActions,recalculateList) {
     for(var i = 0; i < processedActions.length; i++) {
         var actionData = processedActions[i];
@@ -324,7 +338,8 @@ apogee.action.updateRecalculateList = function(processedActions,recalculateList)
     }
 }
     
-/** This function fires the proper events for the action. */
+/** This function fires the proper events for the action. 
+ * @private */
 apogee.action.fireEvents = function(workspace,processedActions,recalculateList) {
     
     //TEMPORARY EVENT PROCESSING - NEEDS TO BE IMPROVED
@@ -380,6 +395,8 @@ apogee.action.checkUpdateAllDep = function(processedActions) {
 
 /** This method if a single action entry requires updating dependencies for the associated member. */
 apogee.action.doInitializeDependencies = function(actionData) {
+    if(!actionData.member) return false;
+    
     if(actionData.actionInfo) {
         return actionData.actionInfo.updateDependencies;
     }
@@ -390,6 +407,8 @@ apogee.action.doInitializeDependencies = function(actionData) {
 
 /** This method checks if the associated member and its dependencies need to be added to the recalc list. */
 apogee.action.doAddToRecalc = function(actionData) {
+    if(!actionData.member) return false;
+    
     if(actionData.actionInfo) {
         return actionData.actionInfo.addToRecalc;
     }

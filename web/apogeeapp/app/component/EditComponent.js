@@ -65,7 +65,7 @@ apogeeapp.app.EditComponent.prototype.getClearFunctionCallback = function(emptyD
     return function() {
         var actionResponse = apogee.action.doAction(actionData,true); 
         if(!actionResponse.getSuccess()) {
-            alert(actionResponse.getErrorMsg());
+            apogeeapp.app.errorHandling.handleActionError(actionResponse);
         }
     }
 }
