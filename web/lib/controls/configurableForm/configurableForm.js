@@ -193,14 +193,14 @@ var lineFunctions = {
             var value;
             if(apogee.util.getObjectType(buttonInfo) == "Array") {
                 label = buttonInfo[0]
-                value = buttonInfo[1];
+                value = buttonInfo[1];     
             }
             else {
                 label = buttonInfo;
-                value = buttonInfo;   
+                value = buttonInfo; 
             }
-            radio.value = value
-            if(lineDef.initial == buttonInfo[0]) radio.checked = true;
+            radio.value = value;
+            if(lineDef.initial == value) radio.checked = true;
             buttonList.push(radio);
             line.appendChild(radio);
             line.appendChild(document.createTextNode(label));
