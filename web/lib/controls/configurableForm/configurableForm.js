@@ -30,7 +30,9 @@ apogeeapp.app.ConfigurableFormDisplay.prototype.constructor = apogeeapp.app.Conf
 apogeeapp.app.ConfigurableFormDisplay.prototype.showData = function(data) {
     this.data = data;
     //load or reload form
-    this.loadForm();
+    if(this.data) {
+        this.loadForm();
+    }
 }
         
 apogeeapp.app.ConfigurableFormDisplay.prototype.onLoad = function() {
@@ -342,6 +344,13 @@ var lineFunctions = {
         
     },
     
+    //This corresponds to a single checkbox item.
+    //lineDef.type = "checkbox"
+    //lineDef.heading = group heading (optional)
+    //lineDef.name = label for the checkbox (optional)
+    //lineDef.value = value associated with the checkbox
+    //lineDef.initial = value of initial selection - true/false (optional)
+    //lineDef.resultKey = name of result in result data 
     "checkbox": function(lineDef,formActions) {
         var lineObject = {};
         //create the element
@@ -366,6 +375,61 @@ var lineFunctions = {
         lineObject.addToResult = function(formData) {
             var result = checkbox.checked;
             formData[lineDef.resultKey] = result;
+        }
+        //no on Close
+        
+        return lineObject;
+    },
+    
+    
+    //This is for a list of checkbox items, where the initial value and result value are a list of values
+    //corresponding to the checked items.
+    //lineDef.type = "checkboxGroup"
+    //lineDef.heading = radio button group heading (optional)
+    //lineDef.groupName = the group name for the radio button group
+    //lineDef.entries = list of either (a) string pairs [title,value] or (b) string title/value - for entries in radio button group
+    //lineDef.initial = value of initial selection (optional)
+    //lineDef.resultKey = name of result in result data 
+    "checkboxGroup": function(lineDef,formActions) {
+        var lineObject = {};
+        //create the element
+        var line = apogeeapp.ui.createElement("div",{"className":"apogee_configurableFormLine"});
+        if(lineDef.heading) {
+            line.appendChild(document.createTextNode(lineDef.heading));
+            line.appendChild(document.createElement("br"));
+        }
+        var checkboxList = [];
+        var addCheckbox = checkboxInfo => {
+            var checkbox = apogeeapp.ui.createElement("input");
+            checkbox.type = "checkbox";
+            
+            var label;
+            var value;
+            if(apogee.util.getObjectType(checkboxInfo) == "Array") {
+                label = checkboxInfo[0]
+                value = checkboxInfo[1];     
+            }
+            else {
+                label = checkboxInfo;
+                value = checkboxInfo; 
+            }
+            checkbox.value = value;
+            if(lineDef.initial) {
+                if(lineDef.initial.indexOf(value) >= 0) checkbox.checked = true;
+            }
+            checkboxList.push(checkbox);
+            line.appendChild(checkbox);
+            line.appendChild(document.createTextNode(label));
+            line.appendChild(document.createElement("br"));
+            
+            if(lineDef.disabled) checkbox.disabled = true;
+        };
+        lineDef.entries.forEach(addCheckbox);
+        lineObject.element = line;
+        //get result
+        lineObject.addToResult = function(formData) {
+            var checkedList = checkboxList.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
+            formData[lineDef.resultKey] = checkedList;
         }
         //no on Close
         
