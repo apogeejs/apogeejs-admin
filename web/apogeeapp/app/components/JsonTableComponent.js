@@ -19,7 +19,7 @@ apogeeapp.app.JsonTableComponent.prototype = Object.create(apogeeapp.app.EditCom
 apogeeapp.app.JsonTableComponent.prototype.constructor = apogeeapp.app.JsonTableComponent;
 
 apogeeapp.app.JsonTableComponent.prototype.getDataView = function() {
-    if(!this.dataView) this.dataView = "Plain";
+    if(!this.dataView) this.dataView = "JSON";
     return this.dataView;
 }
 
@@ -175,8 +175,8 @@ apogeeapp.app.JsonTableComponent.generator.propertyDialogLines = [
         "type":"dropdown",
         "heading":"Data View: ",
         "entries":[
-            "Plain",
             "JSON",
+            "Plain",
             "Form"
         ],
         "resultKey":"dataView"
