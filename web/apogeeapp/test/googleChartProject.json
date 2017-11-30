@@ -1,1 +1,152 @@
-{"fileType":"apogee workspace","jsLinks":["https://www.gstatic.com/charts/loader.js","../test/GoogleChartComponent.js"],"cssLinks":[],"workspace":{"fileType":"apogee workspace","version":0.2,"data":{"name":"chartExample","type":"apogee.Folder","children":{"data":{"name":"data","type":"apogee.JsonTable","updateData":{"data":{"columns":[{"type":"number","name":"Time"},{"type":"number","name":"Dogs"},{"type":"number","name":"Cats"}],"rows":[[0,7,1],[1,10,1],[2,23,6],[3,17,13],[4,18,12],[5,9,5]]},"description":""}},"options":{"name":"options","type":"apogee.JsonTable","updateData":{"data":{"hAxis":{"title":"Time"},"vAxis":{"title":"Popularity"},"backgroundColor":"#f1f8e9","title":"Hello!","width":700,"height":500},"description":""}},"chart":{"name":"chart","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var value = {};\nvalue.chartData = data;\nvalue.chartOptions = options;\n\nreturn value;","supplementalCode":"","description":""}}}}},"components":{"data":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":300,"height":300},"posInfo":{"x":72,"y":23},"state":0,"viewType":"Text"}},"options":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":405,"height":258},"posInfo":{"x":458,"y":8},"state":0,"viewType":"Text"}},"chart":{"type":"apogeeapp.app.GoogleChartComponent","windowState":{"sizeInfo":{"width":716,"height":499},"posInfo":{"x":120,"y":145},"state":0,"viewType":"Output"}}}}
+{
+	"fileType": "apogee js web workspace",
+	"jsLinks": [
+		"https://www.gstatic.com/charts/loader.js",
+		"http://localhost:8383/lib/controls/googleChart/GoogleChartComponent.js"
+	],
+	"cssLinks": [],
+	"workspace": {
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "chartExample",
+			"type": "apogee.Folder",
+			"children": {
+				"data": {
+					"name": "data",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": {
+							"columns": [
+								{
+									"type": "number",
+									"name": "Time"
+								},
+								{
+									"type": "number",
+									"name": "Dogs"
+								},
+								{
+									"type": "number",
+									"name": "Cats"
+								}
+							],
+							"rows": [
+								[
+									0,
+									7,
+									1
+								],
+								[
+									1,
+									10,
+									1
+								],
+								[
+									2,
+									23,
+									6
+								],
+								[
+									3,
+									17,
+									13
+								],
+								[
+									4,
+									18,
+									12
+								],
+								[
+									5,
+									9,
+									5
+								]
+							]
+						},
+						"description": ""
+					}
+				},
+				"options": {
+					"name": "options",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": {
+							"hAxis": {
+								"title": "Time"
+							},
+							"vAxis": {
+								"title": "Popularity"
+							},
+							"backgroundColor": "#f1f8e9",
+							"title": "Hello!",
+							"width": 700,
+							"height": 500
+						},
+						"description": ""
+					}
+				},
+				"chart": {
+					"name": "chart",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var value = {};\nvalue.chartData = data;\nvalue.chartOptions = options;\n\nreturn value;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"children": {
+			"data": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 300,
+						"height": 300
+					},
+					"posInfo": {
+						"x": 72,
+						"y": 23
+					},
+					"state": 0,
+					"viewType": "Text"
+				}
+			},
+			"options": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 405,
+						"height": 258
+					},
+					"posInfo": {
+						"x": 458,
+						"y": 8
+					},
+					"state": 0,
+					"viewType": "Text"
+				}
+			},
+			"chart": {
+				"type": "apogeeapp.app.GoogleChartComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 716,
+						"height": 499
+					},
+					"posInfo": {
+						"x": 120,
+						"y": 145
+					},
+					"state": 0,
+					"viewType": "Output"
+				}
+			}
+		}
+	}
+}

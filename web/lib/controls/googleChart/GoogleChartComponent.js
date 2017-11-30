@@ -24,9 +24,9 @@ function onLibLoad() {
 //===================================
 
 /** This is a simple google chart component. */
-apogeeapp.app.GoogleChartComponent = function(workspaceUI,control,generator) {
+apogeeapp.app.GoogleChartComponent = function(workspaceUI,control) {
     //extend edit component
-    apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,generator);
+    apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,apogeeapp.app.GoogleChartComponent);
     
     //if not yet done, load the google chart library
     if(!googleLoadCalled) {

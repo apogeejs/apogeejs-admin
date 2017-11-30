@@ -1,9 +1,9 @@
 (function() {
 
 /** This is a simple custom resource component example. */
-apogeeapp.app.ButtonComponent = function(workspaceUI,control,generator) {
+apogeeapp.app.ButtonComponent = function(workspaceUI,control) {
     //extend edit component
-    apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,generator);
+    apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,apogeeapp.app.ButtonComponent);
 };
 
 apogeeapp.app.ButtonComponent.prototype = Object.create(apogeeapp.app.BasicControlComponent.prototype);
