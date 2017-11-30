@@ -1,15 +1,17 @@
 (function() {
 
 /** This is a simple custom resource component example. */
-apogeeapp.app.SimpleGeojsonControl = function(workspaceUI,control,generator,options) {
+apogeeapp.app.SimpleGeojsonControl = function(workspaceUI,control,generator) {
     apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,generator);
-    
-    this.setOptions(options);
-    this.memberUpdated();
 };
 
 apogeeapp.app.SimpleGeojsonControl.prototype = Object.create(apogeeapp.app.BasicControlComponent.prototype);
 apogeeapp.app.SimpleGeojsonControl.prototype.constructor = apogeeapp.app.SimpleGeojsonControl;
+
+//attach the standard static values to the static object (this can also be done manually)
+apogeeapp.app.BasicControlComponent.attachStandardStaticProperties(apogeeapp.app.SimpleGeojsonControl,
+        "SimpleGeojsonControl",
+        "apogeeapp.app.SimpleGeojsonControl");
 
 var DEFAULT_LAT_LNG = [0,0];
 var DEFAULT_ZOOM = 1;
@@ -110,18 +112,10 @@ apogeeapp.app.SimpleGeojsonDisplay.prototype.onResize = function() {
 }
 
 //-----------------
-//create a component generator
-//-----------------
-apogeeapp.app.SimpleGeojsonControl.generator = apogeeapp.app.BasicControlComponent.createGenerator(
-        "SimpleGeojsonControl",
-        "apogeeapp.app.SimpleGeojsonControl",
-        apogeeapp.app.SimpleGeojsonControl);
-
-//-----------------
 //auto registration
 //-----------------
 if(registerComponent) {
-    registerComponent(apogeeapp.app.SimpleGeojsonControl.generator);
+    registerComponent(apogeeapp.app.SimpleGeojsonControl);
 }
 
 }

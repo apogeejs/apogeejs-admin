@@ -1,10 +1,10 @@
 /** This is the base functionality for a component. */
-apogeeapp.app.Component = function(workspaceUI,member,generator) {
+apogeeapp.app.Component = function(workspaceUI,member,staticComponentObject) {
     
     this.workspaceUI = workspaceUI;
     this.member = member;
     this.uiActiveParent = null;
-    this.generator = generator;
+    this.staticComponentObject = staticComponentObject;
    
     this.workspaceUI.registerMember(this.member,this);
     
@@ -60,11 +60,11 @@ apogeeapp.app.Component.prototype.getMember = function() {
 
 /** This method returns the icon url for the component. */
 apogeeapp.app.Component.prototype.getIconUrl = function() {
-    if(this.generator.ICON_URL) {
-        return this.generator.ICON_URL;
+    if(this.staticComponentObject.ICON_URL) {
+        return this.staticComponentObject.ICON_URL;
     }
     else {
-        var resPath = this.generator.ICON_RES_PATH;
+        var resPath = this.staticComponentObject.ICON_RES_PATH;
         if(!resPath) resPath = apogeeapp.app.Component.DEFAULT_ICON_RES_PATH;
         return apogeeapp.ui.getResourcePath(resPath);
     }
@@ -176,7 +176,7 @@ apogeeapp.app.Component.prototype.closeTabDisplay = function() {
 /** This serializes the component. */
 apogeeapp.app.Component.prototype.toJson = function() {
     var json = {};
-    json.type = this.generator.uniqueName;
+    json.type = this.staticComponentObject.uniqueName;
     
     if(this.windowDisplay != null) {
         this.windowDisplayStateJson = this.windowDisplay.getStateJson();
@@ -204,9 +204,8 @@ apogeeapp.app.Component.prototype.toJson = function() {
     return json;
 }
 
-/** This serializes the component. 
- * @private */
-apogeeapp.app.Component.prototype.setOptions = function(json) {
+/** This serializes the component. */
+apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
     if(!json) json = {};
     this.options = json;
     
@@ -339,7 +338,6 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
 apogeeapp.app.Component.prototype.getPropertyValues = function() {
     
     var member = this.member;
-//    var generator = member.generator;
     
     var values = {};
     values.name = member.getName();
@@ -351,8 +349,8 @@ apogeeapp.app.Component.prototype.getPropertyValues = function() {
     if(member.generator.addPropFunction) {
         member.generator.addPropFunction(member,values);
     }
-    if(this.generator.addPropFunction) {
-        this.generator.addPropFunction(this,values);
+    if(this.staticComponentObject.addPropFunction) {
+        this.staticComponentObject.addPropFunction(this,values);
     }
     return values;
 }
@@ -427,6 +425,59 @@ apogeeapp.app.Component.prototype.createDeleteCallback = function() {
             apogeeapp.app.errorHandling.handleActionError(actionResponse);
         }
     }
+}
+
+//======================================
+// Static methods
+//======================================
+
+//This creates a component and a member from property values and component options, 
+apogeeapp.app.Component.createComponent = function(staticComponentObject,workspaceUI,userInputValues,serializedValues) {
+    
+
+    //create the member
+    var createAction = staticComponentObject.getMemberCreateAction(userInputValues);
+    var actionResponse = apogee.action.doAction(createAction,true);
+    var member = createAction.member;
+    
+    if(member) {
+
+        //create empty component
+        var component = new staticComponentObject(workspaceUI,member);
+        actionResponse.component = component;
+        
+        //apply any serialized values
+        if(serializedValues) {
+            component.loadSerializedValues(serializedValues);
+        }
+
+        //apply any user input (property dialog) values
+        if(component.updateProperties) {
+            component.updateProperties(component,null,userInputValues,actionResponse);
+        }
+        
+        //call member updated to process and notify of component creation
+        component.memberUpdated();
+    }
+
+    return actionResponse;
+}
+
+//this creates a component from a member and component options (not property values!)
+apogeeapp.app.Component.createComponentFromMember = function(staticComponentObject,workspaceUI,member,serializedValues) {
+    
+    //create empty component
+    var component = new staticComponentObject(workspaceUI,member);
+
+    //apply any serialized values
+    if(serializedValues) {
+        component.loadSerializedValues(serializedValues);
+    }
+
+    //call member updated to process and notify of component creation
+    component.memberUpdated();
+    
+    return component;
 }
 
 //======================================

@@ -116,15 +116,15 @@ apogeeapp.webapp.ApogeeWeb.prototype.getComponentGenerator = function(name) {
  * @private */
 apogeeapp.webapp.ApogeeWeb.prototype.loadComponentGenerators = function() {
     //standard components
-    this.registerStandardComponent(apogeeapp.app.JsonTableComponent.generator);
-    this.registerStandardComponent(apogeeapp.app.GridTableComponent.generator);
-    this.registerStandardComponent(apogeeapp.app.TextComponent.generator);
-	this.registerStandardComponent(apogeeapp.app.FolderComponent.generator);
-	this.registerStandardComponent(apogeeapp.app.FunctionComponent.generator);
-    this.registerStandardComponent(apogeeapp.app.FolderFunctionComponent.generator);
+    this.registerStandardComponent(apogeeapp.app.JsonTableComponent);
+    this.registerStandardComponent(apogeeapp.app.GridTableComponent);
+    this.registerStandardComponent(apogeeapp.app.TextComponent);
+	this.registerStandardComponent(apogeeapp.app.FolderComponent);
+	this.registerStandardComponent(apogeeapp.app.FunctionComponent);
+    this.registerStandardComponent(apogeeapp.app.FolderFunctionComponent);
 	
     //additional components
-    this.registerComponent(apogeeapp.app.CustomControlComponent.generator);
+    this.registerComponent(apogeeapp.app.CustomControlComponent);
 }
 
 /** This method registers a component. 

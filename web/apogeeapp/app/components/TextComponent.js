@@ -1,11 +1,8 @@
 
 /** This component represents a json table object. */
-apogeeapp.app.TextComponent = function(workspaceUI,table,options) {
+apogeeapp.app.TextComponent = function(workspaceUI,table) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.TextComponent.generator);
-    
-    this.setOptions(options);
-    this.memberUpdated();
+    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.TextComponent);
 };
 
 apogeeapp.app.TextComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -70,44 +67,36 @@ apogeeapp.app.TextComponent.prototype.getViewModeElement = function(editComponen
 // Static methods
 //======================================
 
-
-apogeeapp.app.TextComponent.createComponent = function(workspaceUI,data,componentOptions) {
-    
+apogeeapp.app.TextComponent.getMemberCreateAction = function(userInputValues) {
     var json = {};
     json.action = "createMember";
-    json.owner = data.parent;
-    json.workspace = data.parent.getWorkspace();
-    json.name = data.name;
+    json.owner = userInputValues.parent;
+    json.workspace = userInputValues.parent.getWorkspace();
+    json.name = userInputValues.name;
     json.type = apogee.JsonTable.generator.type;
 	json.updateData = {};
 	json.updateData.data = "";
-    var actionResponse = apogee.action.doAction(json,true);
-    
-    var table = json.member;
-    if(table) {
-        var tableComponent = apogeeapp.app.TextComponent.createComponentFromMember(workspaceUI,table,componentOptions);
-        actionResponse.component = tableComponent;
-    }
-    return actionResponse;
-}
-
-
-apogeeapp.app.TextComponent.createComponentFromMember = function(workspaceUI,member,componentJson) {
-    return new apogeeapp.app.TextComponent(workspaceUI,member,componentJson);
+    return json;
 }
 
 //======================================
 // This is the component generator, to register the component
 //======================================
 
-apogeeapp.app.TextComponent.generator = {};
-apogeeapp.app.TextComponent.generator.displayName = "Text Table";
-apogeeapp.app.TextComponent.generator.uniqueName = "apogeeapp.app.TextComponent";
-apogeeapp.app.TextComponent.generator.createComponent = apogeeapp.app.TextComponent.createComponent;
-apogeeapp.app.TextComponent.generator.createComponentFromMember = apogeeapp.app.TextComponent.createComponentFromMember;
-apogeeapp.app.TextComponent.generator.DEFAULT_WIDTH = 300;
-apogeeapp.app.TextComponent.generator.DEFAULT_HEIGHT = 300;
-apogeeapp.app.TextComponent.generator.ICON_RES_PATH = "/textIcon.png";
+apogeeapp.app.TextComponent.displayName = "Text Table";
+apogeeapp.app.TextComponent.uniqueName = "apogeeapp.app.TextComponent";
+apogeeapp.app.TextComponent.DEFAULT_WIDTH = 300;
+apogeeapp.app.TextComponent.DEFAULT_HEIGHT = 300;
+apogeeapp.app.TextComponent.ICON_RES_PATH = "/textIcon.png";
+
+//apogeeapp.app.TextComponent.generator = {};
+//apogeeapp.app.TextComponent.generator.displayName = "Text Table";
+//apogeeapp.app.TextComponent.generator.uniqueName = "apogeeapp.app.TextComponent";
+//apogeeapp.app.TextComponent.generator.constructor = apogeeapp.app.TextComponent;
+//apogeeapp.app.TextComponent.generator.getMemberCreateAction = apogeeapp.app.TextComponent.getMemberCreateAction;
+//apogeeapp.app.TextComponent.generator.DEFAULT_WIDTH = 300;
+//apogeeapp.app.TextComponent.generator.DEFAULT_HEIGHT = 300;
+//apogeeapp.app.TextComponent.generator.ICON_RES_PATH = "/textIcon.png";
 
 
 

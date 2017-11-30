@@ -2,9 +2,9 @@
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-apogeeapp.app.CustomControlComponent = function(workspaceUI,control,options) {
+apogeeapp.app.CustomControlComponent = function(workspaceUI,control) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,control,apogeeapp.app.CustomControlComponent.generator);
+    apogeeapp.app.EditComponent.call(this,workspaceUI,control,apogeeapp.app.CustomControlComponent);
     
     this.uiCodeFields = {};
     this.currentCss = "";
@@ -15,9 +15,6 @@ apogeeapp.app.CustomControlComponent = function(workspaceUI,control,options) {
     //add a cleanup and save actions
     this.addOpenAction(apogeeapp.app.CustomControlComponent.readFromJson);
     this.addSaveAction(apogeeapp.app.CustomControlComponent.writeToJson);
-    
-    this.setOptions(options);
-    this.memberUpdated();
 };
 
 apogeeapp.app.CustomControlComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -282,6 +279,14 @@ apogeeapp.app.CustomControlComponent.writeToJson = function(json) {
     json.destroyOnInactive = this.destroyOnInactive;
 }
 
+apogeeapp.app.CustomControlComponent.addPropFunction = function(component,values) {
+    values.destroyOnHide = component.getDestroyOnInactive();
+}
+
+apogeeapp.app.CustomControlComponent.updateProperties = function(component,oldValues,newValues,actionResponse) {
+    component.setDestroyOnInactive(newValues.destroyOnHide);
+}
+
 /** This is the format string to create the code body for updateing the member
  * Input indices:
  * 0: resouce methods code
@@ -321,70 +326,27 @@ apogeeapp.app.CustomControlComponent.GENERATOR_INTERNAL_FORMATS = {
 // Static methods
 //======================================
 
-
-/** This method creates the control. */
-apogeeapp.app.CustomControlComponent.createComponent = function(workspaceUI,data,componentOptions) {
-    
+apogeeapp.app.CustomControlComponent.getMemberCreateAction = function(userInputValues) {
     var json = {};
     json.action = "createMember";
-    json.owner = data.parent;
-    json.workspace = data.parent.getWorkspace();
-    json.name = data.name;
+    json.owner = userInputValues.parent;
+    json.workspace = userInputValues.parent.getWorkspace();
+    json.name = userInputValues.name;
     json.type = apogee.JsonTable.generator.type;
-    var actionResponse = apogee.action.doAction(json,true);
-    
-    var control = json.member;
-    
-    if(control) {
-         
-        //update the component options, but don't modify the options structure passed in.
-        var activeComponentOptions;
-        if(componentOptions) {
-            activeComponentOptions = apogee.util.jsonCopy(componentOptions);
-        }
-        else {
-            activeComponentOptions = {};
-        }
-
-        //added settings info
-        if(data.destroyOnHide !== undefined) {
-            activeComponentOptions.destroyOnInactive = data.destroyOnHide;
-        }
-        
-        //create the component
-        var customControlComponent = apogeeapp.app.CustomControlComponent.createComponentFromMember(workspaceUI,control,activeComponentOptions);
-        actionResponse.component = customControlComponent;
-    }
-    return actionResponse;
+    return json;
 }
-
-apogeeapp.app.CustomControlComponent.createComponentFromMember = function(workspaceUI,control,componentJson) {
-    return new apogeeapp.app.CustomControlComponent(workspaceUI,control,componentJson);
-}
-
-apogeeapp.app.CustomControlComponent.addPropFunction = function(component,values) {
-    values.destroyOnHide = component.getDestroyOnInactive();
-}
-
-apogeeapp.app.CustomControlComponent.updateProperties = function(component,oldValues,newValues,actionResponse) {
-    component.setDestroyOnInactive(newValues.destroyOnHide);
-}
-
 
 //======================================
 // This is the control generator, to register the control
 //======================================
 
-apogeeapp.app.CustomControlComponent.generator = {};
-apogeeapp.app.CustomControlComponent.generator.displayName = "Custom Control";
-apogeeapp.app.CustomControlComponent.generator.uniqueName = "apogeeapp.app.CustomControlComponent";
-apogeeapp.app.CustomControlComponent.generator.createComponent = apogeeapp.app.CustomControlComponent.createComponent;
-apogeeapp.app.CustomControlComponent.generator.createComponentFromMember = apogeeapp.app.CustomControlComponent.createComponentFromMember;
-apogeeapp.app.CustomControlComponent.generator.DEFAULT_WIDTH = 500;
-apogeeapp.app.CustomControlComponent.generator.DEFAULT_HEIGHT = 500;
-apogeeapp.app.CustomControlComponent.generator.ICON_RES_PATH = "/controlIcon.png";
+apogeeapp.app.CustomControlComponent.displayName = "Custom Control";
+apogeeapp.app.CustomControlComponent.uniqueName = "apogeeapp.app.CustomControlComponent";
+apogeeapp.app.CustomControlComponent.DEFAULT_WIDTH = 500;
+apogeeapp.app.CustomControlComponent.DEFAULT_HEIGHT = 500;
+apogeeapp.app.CustomControlComponent.ICON_RES_PATH = "/controlIcon.png";
 
-apogeeapp.app.CustomControlComponent.generator.propertyDialogLines = [
+apogeeapp.app.CustomControlComponent.propertyDialogLines = [
     {
         "type":"checkbox",
         "heading":"Destroy on Hide: ",
@@ -392,6 +354,22 @@ apogeeapp.app.CustomControlComponent.generator.propertyDialogLines = [
     }
 ];
 
-apogeeapp.app.CustomControlComponent.generator.addPropFunction = apogeeapp.app.CustomControlComponent.addPropFunction;
-apogeeapp.app.CustomControlComponent.generator.updateProperties = apogeeapp.app.CustomControlComponent.updateProperties;
+//apogeeapp.app.CustomControlComponent.generator = {};
+//apogeeapp.app.CustomControlComponent.generator.displayName = "Custom Control";
+//apogeeapp.app.CustomControlComponent.generator.uniqueName = "apogeeapp.app.CustomControlComponent";
+//apogeeapp.app.CustomControlComponent.generator.constructor = apogeeapp.app.CustomControlComponent;
+//apogeeapp.app.CustomControlComponent.generator.getMemberCreateAction = apogeeapp.app.CustomControlComponent.getMemberCreateAction;
+//apogeeapp.app.CustomControlComponent.generator.DEFAULT_WIDTH = 500;
+//apogeeapp.app.CustomControlComponent.generator.DEFAULT_HEIGHT = 500;
+//apogeeapp.app.CustomControlComponent.generator.ICON_RES_PATH = "/controlIcon.png";
+//
+//apogeeapp.app.CustomControlComponent.generator.propertyDialogLines = [
+//    {
+//        "type":"checkbox",
+//        "heading":"Destroy on Hide: ",
+//        "resultKey":"destroyOnHide"
+//    }
+//];
+
+
 

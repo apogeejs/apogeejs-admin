@@ -40,9 +40,11 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,generator,opti
                 return false;
             }
             
+            //get the parent object
             propertyValues.parent = folderMap[propertyValues.parentName];
 
-            var actionResponse =  generator.createComponent(workspaceUI,propertyValues,optionalComponentOptions);   
+            //create the component
+            var actionResponse =  apogeeapp.app.Component.createComponent(generator,workspaceUI,propertyValues,optionalComponentOptions);   
             if(!actionResponse.getSuccess()) {
                 apogeeapp.app.errorHandling.handleActionError(actionResponse);
             }

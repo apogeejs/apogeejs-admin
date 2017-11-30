@@ -1,16 +1,18 @@
 (function() {
 
 /** This is a simple custom resource component example. */
-apogeeapp.app.ButtonComponent = function(workspaceUI,control,generator,options) {
+apogeeapp.app.ButtonComponent = function(workspaceUI,control,generator) {
     //extend edit component
     apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,generator);
-    
-    this.setOptions(options);
-    this.memberUpdated();
 };
 
 apogeeapp.app.ButtonComponent.prototype = Object.create(apogeeapp.app.BasicControlComponent.prototype);
 apogeeapp.app.ButtonComponent.prototype.constructor = apogeeapp.app.ButtonComponent;
+
+//attach the standard static values to the static object (this can also be done manually)
+apogeeapp.app.BasicControlComponent.attachStandardStaticProperties(apogeeapp.app.ButtonComponent,
+        "ButtonComponent",
+        "apogeeapp.app.ButtonComponent");
 
 /** Implement the method to get the data display. JsDataDisplay is an 
  * easily configurable data display. */
@@ -75,18 +77,10 @@ apogeeapp.app.ButtonDisplay.prototype.destroy = function() {
 }
 
 //-----------------
-//create a component generator
-//-----------------
-apogeeapp.app.ButtonComponent.generator = apogeeapp.app.BasicControlComponent.createGenerator(
-        "ButtonComponent",
-        "apogeeapp.app.ButtonComponent",
-        apogeeapp.app.ButtonComponent);
-
-//-----------------
 //auto registration
 //-----------------
 if(registerComponent) {
-    registerComponent(apogeeapp.app.ButtonComponent.generator);
+    registerComponent(apogeeapp.app.ButtonComponent);
 }
 
 }

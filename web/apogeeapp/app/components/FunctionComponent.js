@@ -1,10 +1,7 @@
 /** This component represents a table object. */
-apogeeapp.app.FunctionComponent = function(workspaceUI, functionObject,options) {
+apogeeapp.app.FunctionComponent = function(workspaceUI, functionObject) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,functionObject,apogeeapp.app.FunctionComponent.generator);
-    
-    this.setOptions(options);
-    this.memberUpdated();
+    apogeeapp.app.EditComponent.call(this,workspaceUI,functionObject,apogeeapp.app.FunctionComponent);
 };
 
 apogeeapp.app.FunctionComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -62,59 +59,58 @@ apogeeapp.app.FunctionComponent.prototype.getViewModeElement = function(editComp
 // Static methods
 //======================================
 
-//create component call. data includes name and potentially other info
-apogeeapp.app.FunctionComponent.createComponent = function(workspaceUI,data,componentOptions) {
-    
+apogeeapp.app.FunctionComponent.getMemberCreateAction = function(userInputValues) {
     var json = {};
     json.action = "createMember";
-    json.owner = data.parent;
-    json.workspace = data.parent.getWorkspace();
-    json.name = data.name;
-    
+    json.owner = userInputValues.parent;
+    json.workspace = userInputValues.parent.getWorkspace();
+    json.name = userInputValues.name;
     var argList;
-    if(data.argListString) {
-        argList = apogee.FunctionTable.parseStringArray(data.argListString);  
+    if(userInputValues.argListString) {
+        argList = apogee.FunctionTable.parseStringArray(userInputValues.argListString);  
     }
     else {
         argList = [];
     }
     json.updateData = {};
     json.updateData.argList = argList;
-    
     json.type = apogee.FunctionTable.generator.type;
-    var actionResponse = apogee.action.doAction(json,true);
-    
-    var functionObject = json.member;
-    if(functionObject) {
-        var functionComponent = apogeeapp.app.FunctionComponent.createComponentFromMember(workspaceUI,functionObject,componentOptions);
-        actionResponse.component = functionComponent;
-    }
-    return actionResponse;
-}
-
-apogeeapp.app.FunctionComponent.createComponentFromMember = function(workspaceUI,member,componentJson) {
-    return new apogeeapp.app.FunctionComponent(workspaceUI,member,componentJson);
+    return json;
 }
 
 //======================================
 // This is the component generator, to register the component
 //======================================
 
-apogeeapp.app.FunctionComponent.generator = {};
-apogeeapp.app.FunctionComponent.generator.displayName = "Function";
-apogeeapp.app.FunctionComponent.generator.uniqueName = "apogeeapp.app.FunctionComponent";
-apogeeapp.app.FunctionComponent.generator.createComponent = apogeeapp.app.FunctionComponent.createComponent;
-apogeeapp.app.FunctionComponent.generator.createComponentFromMember = apogeeapp.app.FunctionComponent.createComponentFromMember;
-apogeeapp.app.FunctionComponent.generator.DEFAULT_WIDTH = 400;
-apogeeapp.app.FunctionComponent.generator.DEFAULT_HEIGHT = 400;
-apogeeapp.app.FunctionComponent.generator.ICON_RES_PATH = "/functionIcon.png";
+apogeeapp.app.FunctionComponent.displayName = "Function";
+apogeeapp.app.FunctionComponent.uniqueName = "apogeeapp.app.FunctionComponent";
+apogeeapp.app.FunctionComponent.DEFAULT_WIDTH = 400;
+apogeeapp.app.FunctionComponent.DEFAULT_HEIGHT = 400;
+apogeeapp.app.FunctionComponent.ICON_RES_PATH = "/functionIcon.png";
 
-apogeeapp.app.FunctionComponent.generator.propertyDialogLines = [
+apogeeapp.app.FunctionComponent.propertyDialogLines = [
     {
         "type":"inputElement",
         "heading":"Arg List: ",
         "resultKey":"argListString"
     }
 ];
+
+//apogeeapp.app.FunctionComponent.generator = {};
+//apogeeapp.app.FunctionComponent.generator.displayName = "Function";
+//apogeeapp.app.FunctionComponent.generator.uniqueName = "apogeeapp.app.FunctionComponent";
+//apogeeapp.app.FunctionComponent.generator.constructor = apogeeapp.app.FunctionComponent;
+//apogeeapp.app.FunctionComponent.generator.getMemberCreateAction = apogeeapp.app.FunctionComponent.getMemberCreateAction;
+//apogeeapp.app.FunctionComponent.generator.DEFAULT_WIDTH = 400;
+//apogeeapp.app.FunctionComponent.generator.DEFAULT_HEIGHT = 400;
+//apogeeapp.app.FunctionComponent.generator.ICON_RES_PATH = "/functionIcon.png";
+//
+//apogeeapp.app.FunctionComponent.generator.propertyDialogLines = [
+//    {
+//        "type":"inputElement",
+//        "heading":"Arg List: ",
+//        "resultKey":"argListString"
+//    }
+//];
 
  

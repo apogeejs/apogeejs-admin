@@ -1,11 +1,8 @@
 
 /** This component represents a json table object. */
-apogeeapp.app.GridTableComponent = function(workspaceUI,table,options) {
+apogeeapp.app.GridTableComponent = function(workspaceUI,table) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.GridTableComponent.generator);
-    
-    this.setOptions(options);
-    this.memberUpdated();
+    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.GridTableComponent);
 };
 
 apogeeapp.app.GridTableComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -72,44 +69,36 @@ apogeeapp.app.GridTableComponent.prototype.getViewModeElement = function(editCom
 // Static methods
 //======================================
 
-
-apogeeapp.app.GridTableComponent.createComponent = function(workspaceUI,data,componentOptions) {
-    
+apogeeapp.app.GridTableComponent.getMemberCreateAction = function(userInputValues) {
     var json = {};
     json.action = "createMember";
-    json.owner = data.parent;
-    json.workspace = data.parent.getWorkspace();
-    json.name = data.name;
+    json.owner = userInputValues.parent;
+    json.workspace = userInputValues.parent.getWorkspace();
+    json.name = userInputValues.name;
     json.type = apogee.JsonTable.generator.type;
 	json.updateData = {};
-	json.updateData.data = [[""]]; //empty single cell
-    var actionResponse = apogee.action.doAction(json,true);
-    
-    var table = json.member;
-    if(table) {
-        var tableComponent = apogeeapp.app.GridTableComponent.createComponentFromMember(workspaceUI,table,componentOptions);
-        actionResponse.component = tableComponent;
-    }
-    return actionResponse;
-}
-
-
-apogeeapp.app.GridTableComponent.createComponentFromMember = function(workspaceUI,member,componentJson) {
-    return new apogeeapp.app.GridTableComponent(workspaceUI,member,componentJson);
+	json.updateData.userInputValues = [[""]]; //empty single cell
+    return json;
 }
 
 //======================================
 // This is the component generator, to register the component
 //======================================
 
-apogeeapp.app.GridTableComponent.generator = {};
-apogeeapp.app.GridTableComponent.generator.displayName = "Grid Table";
-apogeeapp.app.GridTableComponent.generator.uniqueName = "apogeeapp.app.GridTableComponent";
-apogeeapp.app.GridTableComponent.generator.createComponent = apogeeapp.app.GridTableComponent.createComponent;
-apogeeapp.app.GridTableComponent.generator.createComponentFromMember = apogeeapp.app.GridTableComponent.createComponentFromMember;
-apogeeapp.app.GridTableComponent.generator.DEFAULT_WIDTH = 300;
-apogeeapp.app.GridTableComponent.generator.DEFAULT_HEIGHT = 300;
-apogeeapp.app.GridTableComponent.generator.ICON_RES_PATH = "/gridIcon.png";
+apogeeapp.app.GridTableComponent.displayName = "Grid Table";
+apogeeapp.app.GridTableComponent.uniqueName = "apogeeapp.app.GridTableComponent";
+apogeeapp.app.GridTableComponent.DEFAULT_WIDTH = 300;
+apogeeapp.app.GridTableComponent.DEFAULT_HEIGHT = 300;
+apogeeapp.app.GridTableComponent.ICON_RES_PATH = "/gridIcon.png";
+
+//apogeeapp.app.GridTableComponent.generator = {};
+//apogeeapp.app.GridTableComponent.generator.displayName = "Grid Table";
+//apogeeapp.app.GridTableComponent.generator.uniqueName = "apogeeapp.app.GridTableComponent";
+//apogeeapp.app.GridTableComponent.generator.constructor = apogeeapp.app.GridTableComponent;
+//apogeeapp.app.GridTableComponent.generator.getMemberCreateAction = apogeeapp.app.GridTableComponent.getMemberCreateAction;
+//apogeeapp.app.GridTableComponent.generator.DEFAULT_WIDTH = 300;
+//apogeeapp.app.GridTableComponent.generator.DEFAULT_HEIGHT = 300;
+//apogeeapp.app.GridTableComponent.generator.ICON_RES_PATH = "/gridIcon.png";
 
 //======================================
 // Use the json table code wrapper

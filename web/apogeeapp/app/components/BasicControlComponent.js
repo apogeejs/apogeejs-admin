@@ -1,15 +1,12 @@
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods
  * and create a generator. */
-apogeeapp.app.BasicControlComponent = function(workspaceUI,control,generator,options) {
+apogeeapp.app.BasicControlComponent = function(workspaceUI,control,staticComponentObject) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,control,generator);
+    apogeeapp.app.EditComponent.call(this,workspaceUI,control,staticComponentObject);
     
     //default to keep alive
     this.displayDestroyFlags = apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
-
-    this.setOptions(options);
-    this.memberUpdated();
 };
 
 apogeeapp.app.BasicControlComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -94,50 +91,24 @@ apogeeapp.app.BasicControlComponent.prototype.getViewModeElement = function(edit
 // Static methods
 //======================================
 
+apogeeapp.app.BasicControlComponent.getMemberCreateAction = function(userInputValues) {
+    var json = {};
+    json.action = "createMember";
+    json.owner = userInputValues.parent;
+    json.workspace = userInputValues.parent.getWorkspace();
+    json.name = userInputValues.name;
+    json.type = apogee.JsonTable.generator.type;
+    return json;
+}
+
 /** This method creates a basic generator for the extending object. */
-apogeeapp.app.BasicControlComponent.createGenerator = function(displayName,uniqueName,constructorFunction) {
-    
-    var generator = {};
-    
-    //function to create a new component
-    var createComponent = function(workspaceUI,data,componentJson) {
-    
-        var workspace = workspaceUI.getWorkspace();
-        //should throw an exception if parent is invalid!
-
-        var json = {};
-        json.action = "createMember";
-        json.owner = data.parent;
-        json.workspace = data.parent.getWorkspace();
-        json.name = data.name;
-        json.type = apogee.JsonTable.generator.type;
-        var actionResponse = apogee.action.doAction(json,true);
-
-        var control = json.member;
-
-        if(control) {
-            //create the component
-            var controlComponent = createComponentFromMember(workspaceUI,control,componentJson);
-            actionResponse.component = controlComponent;
-        }
-        return actionResponse;
-    }
-
-    //function to deserialize the component
-    var createComponentFromMember = function(workspaceUI,member,componentJson) {
-        return new constructorFunction(workspaceUI,member,generator,componentJson);
-    }
-
-    //generator
-    generator.displayName = displayName;
-    generator.uniqueName = uniqueName;
-    generator.createComponent = createComponent;
-    generator.createComponentFromMember = createComponentFromMember;
-    generator.DEFAULT_WIDTH = 500;
-    generator.DEFAULT_HEIGHT = 500;
-    generator.ICON_RES_PATH = "/controlIcon.png";
-    
-    return generator;
+apogeeapp.app.BasicControlComponent.attachStandardStaticProperties = function(staticComponentObject,displayName,uniqueName) {
+    staticComponentObject.displayName = displayName;
+    staticComponentObject.uniqueName = uniqueName;
+    staticComponentObject.createComponentFromMember = apogeeapp.app.BasicControlComponent.getMemberCreateAction;
+    staticComponentObject.DEFAULT_WIDTH = 500;
+    staticComponentObject.DEFAULT_HEIGHT = 500;
+    staticComponentObject.ICON_RES_PATH = "/controlIcon.png";
 }
 
 

@@ -9,12 +9,12 @@ apogeeapp.app.updatecomponent = {};
 /** This method gets a callback to update the properties of a component. */
 apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
     
-    var generator = component.generator;
+    var staticComponentObject = component.staticComponentObject;
     
     var createCallback = function() {
         
-        var displayName = generator.displayName
-        var additionalLines = apogee.util.jsonCopy(generator.propertyDialogLines); 
+        var displayName = staticComponentObject.displayName
+        var additionalLines = apogee.util.jsonCopy(staticComponentObject.propertyDialogLines); 
         
         var workspaceUI = component.getWorkspaceUI(); 
         var initialValues = component.getPropertyValues(); 
@@ -56,6 +56,7 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
                 }
             }
             
+            //lookup the parent object from the parent name
             if(folderMap) {
                 //get the parent value
                 newValues.owner = folderMap[newValues.parentName];
@@ -133,8 +134,8 @@ apogeeapp.app.updatecomponent.updatePropertyValues = function(component,oldValue
     }
     
     //update an component additional properties
-    if(component.generator.updateProperties) {
-        component.generator.updateProperties(component,oldValues,newValues,actionResponse);
+    if(component.staticComponentObject.updateProperties) {
+        component.staticComponentObject.updateProperties(component,oldValues,newValues,actionResponse);
     }
         
     return actionResponse;

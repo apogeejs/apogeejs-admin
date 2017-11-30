@@ -240,6 +240,7 @@ apogeeapp.app.WorkspaceUI.prototype.getMemberNameFromId = function(activeTabId) 
 
 apogeeapp.app.WorkspaceUI.prototype.getFolderComponentContentJson = function(folder) {
     var json = {};
+    var tableMap = folder.getChildMap();
 	for(var key in tableMap) {
 		var child = tableMap[key];
         
@@ -257,7 +258,7 @@ apogeeapp.app.WorkspaceUI.prototype.loadComponentFromJson = function(member,json
     var componentType = json.type;
     var generator = this.app.getComponentGenerator(componentType);
 	if(generator) {
-        return generator.createComponentFromMember(this,member,json);
+        return apogeeapp.app.Component.createComponentFromMember(generator,this,member,json);
     }
     else {
         throw apogee.base.createError("Component type not found: " + componentType);
