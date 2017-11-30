@@ -19,10 +19,12 @@ taskAppModule = (function() {
 	}
     
     function setActiveComponentByPath(relativeToTasksPath) {
+        //this is a little convuluted - I should fix up how we loda this object
         var absolutePath = ["tasks"].concat(relativeToTasksPath);
         var workspace = app.getWorkspace();
+        var rootFolder = workspace.getRoot();
         var workspaceUI = app.getWorkspaceUI();
-        var member = workspace.getMemberByPathArray(absolutePath);
+        var member = rootFolder.getMemberByPathArray(absolutePath);
         var component = workspaceUI.getComponent(member);
         var makeActiveCallback = component.createOpenCallback();
         makeActiveCallback();

@@ -1,9 +1,10 @@
 
 /** This component represents a json table object. */
-apogeeapp.app.GridTableComponent = function(workspaceUI,table,componentJson) {
+apogeeapp.app.GridTableComponent = function(workspaceUI,table,options) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.GridTableComponent.generator,componentJson);
+    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.GridTableComponent.generator);
     
+    this.setOptions(options);
     this.memberUpdated();
 };
 
@@ -86,16 +87,15 @@ apogeeapp.app.GridTableComponent.createComponent = function(workspaceUI,data,com
     
     var table = json.member;
     if(table) {
-        var tableComponent = new apogeeapp.app.GridTableComponent(workspaceUI,table,componentOptions);
+        var tableComponent = apogeeapp.app.GridTableComponent.createComponentFromMember(workspaceUI,table,componentOptions);
         actionResponse.component = tableComponent;
     }
     return actionResponse;
 }
 
 
-apogeeapp.app.GridTableComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
-    var tableComponent = new apogeeapp.app.GridTableComponent(workspaceUI,member,componentJson);
-    return tableComponent;
+apogeeapp.app.GridTableComponent.createComponentFromMember = function(workspaceUI,member,componentJson) {
+    return new apogeeapp.app.GridTableComponent(workspaceUI,member,componentJson);
 }
 
 //======================================
@@ -106,7 +106,7 @@ apogeeapp.app.GridTableComponent.generator = {};
 apogeeapp.app.GridTableComponent.generator.displayName = "Grid Table";
 apogeeapp.app.GridTableComponent.generator.uniqueName = "apogeeapp.app.GridTableComponent";
 apogeeapp.app.GridTableComponent.generator.createComponent = apogeeapp.app.GridTableComponent.createComponent;
-apogeeapp.app.GridTableComponent.generator.createComponentFromJson = apogeeapp.app.GridTableComponent.createComponentFromJson;
+apogeeapp.app.GridTableComponent.generator.createComponentFromMember = apogeeapp.app.GridTableComponent.createComponentFromMember;
 apogeeapp.app.GridTableComponent.generator.DEFAULT_WIDTH = 300;
 apogeeapp.app.GridTableComponent.generator.DEFAULT_HEIGHT = 300;
 apogeeapp.app.GridTableComponent.generator.ICON_RES_PATH = "/gridIcon.png";

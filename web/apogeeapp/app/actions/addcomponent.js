@@ -31,18 +31,18 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,generator,opti
         var dialogLayout = apogeeapp.app.propdialog.getDialogLayout(displayName,folderList,additionalLines,true,optionalInitialValues);
         
         //create on submit callback
-        var onSubmitFunction = function(result) {
+        var onSubmitFunction = function(propertyValues) {
             
             //validate name
-            var nameResult = apogee.codeCompiler.validateTableName(result.name);
+            var nameResult = apogee.codeCompiler.validateTableName(propertyValues.name);
             if(!nameResult.valid) {
                 alert(nameResult.errorMessage);
                 return false;
             }
             
-            result.parent = folderMap[result.parentName];
+            propertyValues.parent = folderMap[propertyValues.parentName];
 
-            var actionResponse =  generator.createComponent(workspaceUI,result,optionalComponentOptions);   
+            var actionResponse =  generator.createComponent(workspaceUI,propertyValues,optionalComponentOptions);   
             if(!actionResponse.getSuccess()) {
                 apogeeapp.app.errorHandling.handleActionError(actionResponse);
             }

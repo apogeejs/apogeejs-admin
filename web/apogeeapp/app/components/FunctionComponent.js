@@ -1,8 +1,9 @@
 /** This component represents a table object. */
-apogeeapp.app.FunctionComponent = function(workspaceUI, functionObject, componentJson) {
+apogeeapp.app.FunctionComponent = function(workspaceUI, functionObject,options) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,functionObject,apogeeapp.app.FunctionComponent.generator,componentJson);
+    apogeeapp.app.EditComponent.call(this,workspaceUI,functionObject,apogeeapp.app.FunctionComponent.generator);
     
+    this.setOptions(options);
     this.memberUpdated();
 };
 
@@ -85,15 +86,14 @@ apogeeapp.app.FunctionComponent.createComponent = function(workspaceUI,data,comp
     
     var functionObject = json.member;
     if(functionObject) {
-        var functionComponent = new apogeeapp.app.FunctionComponent(workspaceUI,functionObject,componentOptions);
+        var functionComponent = apogeeapp.app.FunctionComponent.createComponentFromMember(workspaceUI,functionObject,componentOptions);
         actionResponse.component = functionComponent;
     }
     return actionResponse;
 }
 
-apogeeapp.app.FunctionComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
-    var functionComponent = new apogeeapp.app.FunctionComponent(workspaceUI,member,componentJson);
-    return functionComponent;
+apogeeapp.app.FunctionComponent.createComponentFromMember = function(workspaceUI,member,componentJson) {
+    return new apogeeapp.app.FunctionComponent(workspaceUI,member,componentJson);
 }
 
 //======================================
@@ -104,7 +104,7 @@ apogeeapp.app.FunctionComponent.generator = {};
 apogeeapp.app.FunctionComponent.generator.displayName = "Function";
 apogeeapp.app.FunctionComponent.generator.uniqueName = "apogeeapp.app.FunctionComponent";
 apogeeapp.app.FunctionComponent.generator.createComponent = apogeeapp.app.FunctionComponent.createComponent;
-apogeeapp.app.FunctionComponent.generator.createComponentFromJson = apogeeapp.app.FunctionComponent.createComponentFromJson;
+apogeeapp.app.FunctionComponent.generator.createComponentFromMember = apogeeapp.app.FunctionComponent.createComponentFromMember;
 apogeeapp.app.FunctionComponent.generator.DEFAULT_WIDTH = 400;
 apogeeapp.app.FunctionComponent.generator.DEFAULT_HEIGHT = 400;
 apogeeapp.app.FunctionComponent.generator.ICON_RES_PATH = "/functionIcon.png";

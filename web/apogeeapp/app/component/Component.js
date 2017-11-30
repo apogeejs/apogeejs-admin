@@ -1,10 +1,5 @@
 /** This is the base functionality for a component. */
-apogeeapp.app.Component = function(workspaceUI,member,generator,options) {
-    
-    if(!options) {
-        options = {};
-    }
-    this.options = options;
+apogeeapp.app.Component = function(workspaceUI,member,generator) {
     
     this.workspaceUI = workspaceUI;
     this.member = member;
@@ -14,6 +9,7 @@ apogeeapp.app.Component = function(workspaceUI,member,generator,options) {
     this.workspaceUI.registerMember(this.member,this);
     
     //inheriting objects can pass functions here to be called on cleanup, save, etc
+    this.openActions = [];
     this.saveActions = [];
     this.cleanupActions = [];
     
@@ -23,11 +19,17 @@ apogeeapp.app.Component = function(workspaceUI,member,generator,options) {
     
     //ui elements
     this.windowDisplay = null;
-    this.windowDisplayStateJson = this.options.windowState;
+    this.windowDisplayStateJson = null;
     
     this.tabDisplay = null;
     
     this.treeDisplay = new apogeeapp.app.TreeComponentDisplay(this);
+}
+
+/** If an extending object has any open actions to read the open json, a callback should be passed here.
+ * The callback will be executed in the context of the current object. */
+apogeeapp.app.Component.prototype.addOpenAction = function(openFunction) {
+    this.openActions.push(openFunction);
 }
 
 /** If an extending object has any save actions, a callback should be passed here.
@@ -184,6 +186,17 @@ apogeeapp.app.Component.prototype.toJson = function() {
         json.windowState = this.windowDisplayStateJson;
     }
     
+    if(this.tabDisplay) {
+        json.tabOpen = true; 
+    }
+    
+    if(this.treeDisplay) {
+        var treeState = this.treeDisplay.getState();
+        if(treeState != apogeeapp.ui.treecontrol.NO_CONTROL) {
+            json.treeState = treeState;
+        }
+    }
+    
     for(var i = 0; i < this.saveActions.length; i++) {
         this.saveActions[i].call(this,json);
     }
@@ -191,6 +204,40 @@ apogeeapp.app.Component.prototype.toJson = function() {
     return json;
 }
 
+/** This serializes the component. 
+ * @private */
+apogeeapp.app.Component.prototype.setOptions = function(json) {
+    if(!json) json = {};
+    this.options = json;
+    
+    //take any immediate needed actions
+    
+    //set the tree state
+    if(json.treeState !== undefined) {
+        this.treeDisplay.setState(json.treeState);
+    }
+    
+    //open the tab
+    if((json.tabOpen)&&(this.usesTabDisplay())) {
+        if(!this.tabDisplay) {
+            this.tabDisplay = this.createTabDisplay();
+        }
+        var tab = this.tabDisplay.getTab();
+        var tabFrame = this.workspaceUI.getTabFrame();
+        tabFrame.addTab(tab,false);
+    }
+    
+    //set window options
+    if(json.windowState !== undefined) {
+        this.windowDisplayStateJson = json.windowState;
+    }
+    
+    if(json) {
+        for(var i = 0; i < this.openActions.length; i++) {
+            this.openActions[i].call(this,json);
+        }
+    }  
+}
 //==============================
 // Protected Instance Methods
 //==============================

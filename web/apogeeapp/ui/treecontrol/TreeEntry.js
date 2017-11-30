@@ -50,6 +50,9 @@ apogeeapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback
     this.childList = null;
     this.childMap = {};
     
+    //set the non-empty state for in case we get children
+    //but for now it will be empty
+    this.nonEmptyState = apogeeapp.ui.treecontrol.DEFAULT_STATE;
     this.setState(apogeeapp.ui.treecontrol.NO_CONTROL);
     
     //context menu and double click
@@ -87,7 +90,7 @@ apogeeapp.ui.treecontrol.TreeEntry.prototype.addChild = function(identifier,chil
     if(!this.childList) {
         //add the child list if it does not exist
         this.childList = apogeeapp.ui.createElementWithClass("ul","visiui-tc-child-list",this.element); 
-        this.setState(apogeeapp.ui.treecontrol.DEFAULT_STATE);
+        this.setState(this.nonEmptyState);
     }
     this.childMap[identifier] = childTreeEntry;
     this.childList.appendChild(childTreeEntry.getElement());
@@ -103,14 +106,34 @@ apogeeapp.ui.treecontrol.TreeEntry.prototype.removeChild = function(identifier) 
             if(this.childList.childElementCount === 0) {
                 this.element.removeChild(this.childList);
                 this.childList = null;
+                //set state to empty, but save our old setting
+                this.nonEmtpyState = this.state;
                 this.setState(apogeeapp.ui.treecontrol.NO_CONTROL); 
             }
         }
     }
 }
 
+apogeeapp.ui.treecontrol.TreeEntry.prototype.getState = function() {
+    return this.state;
+}
+
 apogeeapp.ui.treecontrol.TreeEntry.prototype.setState = function(state) {
-    this.state = state;
+    //if we have no children, always make the state no control
+    //but we will store the state below for latert
+    if((!this.childList)||(this.childList.length == 0)) {
+        this.state = apogeeapp.ui.treecontrol.NO_CONTROL;
+    }
+    else {
+        this.state = state;
+    }
+    
+    //save this as the non-empty state if it is not no control
+    if(state != apogeeapp.ui.treecontrol.NO_CONTROL) {
+        this.nonEmptyState = state;
+    }
+    
+    //configure the state
     if(this.state == apogeeapp.ui.treecontrol.NO_CONTROL) {
         if(this.isRoot) {
             this.control.src = this.emptyControlUrl;

@@ -1,8 +1,8 @@
 /** This is the base class for a editable component (an object with code or data),
  * It extends the component class. */
-apogeeapp.app.EditComponent = function(workspaceUI,member,generator,options) {
+apogeeapp.app.EditComponent = function(workspaceUI,member,generator) {
     //base constructor
-	apogeeapp.app.Component.call(this,workspaceUI,member,generator,options);
+	apogeeapp.app.Component.call(this,workspaceUI,member,generator);
 }
 
 apogeeapp.app.EditComponent.prototype = Object.create(apogeeapp.app.Component.prototype);

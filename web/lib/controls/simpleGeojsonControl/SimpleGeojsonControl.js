@@ -1,8 +1,11 @@
 (function() {
 
 /** This is a simple custom resource component example. */
-apogeeapp.app.SimpleGeojsonControl = function(workspaceUI,control,generator,componentJson) {
-    apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,generator,componentJson);
+apogeeapp.app.SimpleGeojsonControl = function(workspaceUI,control,generator,options) {
+    apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,generator);
+    
+    this.setOptions(options);
+    this.memberUpdated();
 };
 
 apogeeapp.app.SimpleGeojsonControl.prototype = Object.create(apogeeapp.app.BasicControlComponent.prototype);

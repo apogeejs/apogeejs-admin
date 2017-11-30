@@ -42,10 +42,10 @@ apogeeapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, component
     
     //set up the root folder
     var rootFolder = this.workspace.getRoot();
-    var rootFolderComponent = new apogeeapp.app.FolderComponent(this,rootFolder);
-    if(componentsJson) {
-        this.loadFolderComponentContentFromJson(rootFolder,componentsJson);
+    if(!componentsJson) {
+        componentsJson = apogeeapp.app.FolderComponent.EMPTY_FOLDER_COMPONENT_JSON;
     }
+    var rootFolderComponent = this.loadComponentFromJson(rootFolder,componentsJson);
     
     this.tree.setRootEntry(rootFolderComponent.getTreeEntry());
     
@@ -195,7 +195,9 @@ apogeeapp.app.WorkspaceUI.prototype.childDeleted = function(member) {
  * it will save a workspace with that as the root folder. */
 apogeeapp.app.WorkspaceUI.prototype.toJson = function(optionalSavedRootFolder) {
     var json = {};
-    json.fileType = "apogee workspace";
+    json.fileType = "apogee js web workspace";
+    
+    json.version = "0.3";
     
     json.jsLinks = this.jsLinkArray;
     json.cssLinks = this.cssLinkArray;
@@ -210,16 +212,36 @@ apogeeapp.app.WorkspaceUI.prototype.toJson = function(optionalSavedRootFolder) {
         rootFolder = this.workspace.getRoot();
     }
     
-    json.components = this.getFolderComponentContentJson(rootFolder);
+    var rootFolderComponent = this.getComponent(rootFolder);
+    json.components = rootFolderComponent.toJson();
+    
+    if(this.tabFrame) {
+        var activeTabId = this.tabFrame.getActiveTab();
+        if(activeTabId) {
+            json.activeTabMember = this.getMemberNameFromId(activeTabId);
+        }
+    }
     
     return json;
 }
 
+/** This is used in saving the active tab 
+ * @private */
+apogeeapp.app.WorkspaceUI.prototype.getMemberNameFromId = function(activeTabId) {
+    var component = this.getComponentById(activeTabId);
+    if(component) {
+        var member = component.getMember();
+        if(member) {
+            return member.getFullName();
+        }
+    }
+    return undefined;
+}
+
 apogeeapp.app.WorkspaceUI.prototype.getFolderComponentContentJson = function(folder) {
     var json = {};
-    var childMap = folder.getChildMap();
-	for(var key in childMap) {
-		var child = childMap[key];
+	for(var key in tableMap) {
+		var child = tableMap[key];
         
 		//get the object map for the workspace
 		var childComponent = this.getComponent(child);
@@ -231,23 +253,23 @@ apogeeapp.app.WorkspaceUI.prototype.getFolderComponentContentJson = function(fol
     return json;
 }
 
+apogeeapp.app.WorkspaceUI.prototype.loadComponentFromJson = function(member,json) {
+    var componentType = json.type;
+    var generator = this.app.getComponentGenerator(componentType);
+	if(generator) {
+        return generator.createComponentFromMember(this,member,json);
+    }
+    else {
+        throw apogee.base.createError("Component type not found: " + componentType);
+    }
+}
+
 apogeeapp.app.WorkspaceUI.prototype.loadFolderComponentContentFromJson = function(folder,json) {
 	for(var key in json) {
 		var childJson = json[key];
 		var childMember = folder.lookupChild(key);	
 		this.loadComponentFromJson(childMember,childJson);
 	}
-}
-
-apogeeapp.app.WorkspaceUI.prototype.loadComponentFromJson = function(member,json) {
-    var componentType = json.type;
-    var generator = this.app.getComponentGenerator(componentType);
-	if(generator) {
-        generator.createComponentFromJson(this,member,json);
-    }
-    else {
-        throw apogee.base.createError("Component type not found: " + componentType);
-    }
 }
 
 

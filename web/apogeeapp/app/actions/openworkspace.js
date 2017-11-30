@@ -116,6 +116,15 @@ apogeeapp.app.openworkspace.loadWorkspace = function(workspaceUI,workspaceJson,a
     var workspace = new apogee.Workspace(workspaceDataJson,actionResponse);
     
     workspaceUI.setWorkspace(workspace,workspaceComponentsJson);
+    
+        
+    //this is messy putting this here - clean it up
+    if(workspaceJson.activeTabMember) {
+        var activeTabMember = workspace.getMemberByFullName(workspaceJson.activeTabMember);
+        if(activeTabMember) {
+            workspaceUI.tabFrame.setActiveTab(activeTabMember.getId());
+        }
+    }
 }
 
 

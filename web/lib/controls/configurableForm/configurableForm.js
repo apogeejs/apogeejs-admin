@@ -1,8 +1,11 @@
 (function() {
 
 /** This is a simple custom resource component example. */
-apogeeapp.app.ConfigurableForm = function(workspaceUI,control,generator,componentJson) {
-    apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,generator,componentJson);
+apogeeapp.app.ConfigurableForm = function(workspaceUI,control,generator,options) {
+    apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,generator);
+    
+    this.setOptions(options);
+    this.memberUpdated();
 };
 
 apogeeapp.app.ConfigurableForm.prototype = Object.create(apogeeapp.app.BasicControlComponent.prototype);

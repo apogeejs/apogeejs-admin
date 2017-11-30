@@ -10,6 +10,14 @@ apogeeapp.app.TreeComponentDisplay.prototype.getTreeEntry = function() {
     return this.treeEntry;
 }
 
+apogeeapp.app.TreeComponentDisplay.prototype.getState = function() {
+    return this.treeEntry.getState();
+}
+
+apogeeapp.app.TreeComponentDisplay.prototype.setState = function(state) {
+    this.treeEntry.setState(state);
+}
+
 apogeeapp.app.TreeComponentDisplay.prototype.changeParent = function(newParentComponent,oldParentComponent) {
     var oldParentTreeEntry = oldParentComponent.getTreeEntry();
     oldParentTreeEntry.removeChild(this.member.getId());

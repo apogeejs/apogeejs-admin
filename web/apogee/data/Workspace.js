@@ -118,8 +118,18 @@ apogee.Workspace.prototype.getPossesionNameBase = function() {
 /** This method looks up a member by its full name. */
 apogee.Workspace.prototype.getMemberByPathArray = function(path,startElement) {
     if(startElement === undefined) startElement = 0;
-    if(path.length === 0) return this.rootFolder;
-    return this.rootFolder.lookupChildFromPathArray(path,startElement);
+    if(path[startElement] === this.rootFolder.getName()) {
+        if(startElement === path.length-1) {
+            return this.rootFolder;
+        }
+        else {
+            startElement++;
+            return this.rootFolder.lookupChildFromPathArray(path,startElement);
+        }
+    }
+    else {
+        return null;
+    }
 }
 
 //------------------------------

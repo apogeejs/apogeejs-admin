@@ -1,17 +1,19 @@
 /** This component represents a folderFunction, which is a function that is programmed using
  *apogee tables rather than writing code. */
-apogeeapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,componentJson) {
+apogeeapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction,options) {
     //extend parent component
-    apogeeapp.app.ParentComponent.call(this,workspaceUI,folderFunction,apogeeapp.app.FolderFunctionComponent.generator,componentJson);
+    apogeeapp.app.ParentComponent.call(this,workspaceUI,folderFunction,apogeeapp.app.FolderFunctionComponent.generator);
     
     //register this object as a parent container
     var internalFolder = folderFunction.getInternalFolder();
     workspaceUI.registerMember(internalFolder,this,folderFunction);
     
-    this.memberUpdated();
-    
     //add a cleanup and save actions
+    this.addOpenAction(apogeeapp.app.FolderFunctionComponent.readFromJson);
     this.addSaveAction(apogeeapp.app.FolderFunctionComponent.writeToJson);
+    
+    this.setOptions(options);
+    this.memberUpdated();
 };
 
 apogeeapp.app.FolderFunctionComponent.prototype = Object.create(apogeeapp.app.ParentComponent.prototype);
@@ -35,6 +37,15 @@ apogeeapp.app.FolderFunctionComponent.writeToJson = function(json) {
     var internalFolder = folderFunction.getInternalFolder();
     var workspaceUI = this.getWorkspaceUI();
     json.children = workspaceUI.getFolderComponentContentJson(internalFolder);
+}
+
+apogeeapp.app.FolderFunctionComponent.readFromJson = function(json) {
+    if(json.children) {
+        var workspaceUI = this.getWorkspaceUI();
+        var folderFunction = this.getMember();
+        var internalFolder = folderFunction.getInternalFolder();
+        workspaceUI.loadFolderComponentContentFromJson(internalFolder,json.children);
+    }
 }
 
 //======================================
@@ -64,18 +75,23 @@ apogeeapp.app.FolderFunctionComponent.createComponent = function(workspaceUI,dat
     
     var folderFunction = json.member;
     if(actionResponse.getSuccess()) {
-        var folderFunctionComponent = apogeeapp.app.FolderFunctionComponent.createComponentFromJson(workspaceUI,folderFunction,componentOptions);
+        var folderFunctionComponent = apogeeapp.app.FolderFunctionComponent.createComponentFromMember(workspaceUI,folderFunction,componentOptions);
         actionResponse.component = folderFunctionComponent;
     }
     return actionResponse;
 }
 
-apogeeapp.app.FolderFunctionComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
+apogeeapp.app.FolderFunctionComponent.createComponentFromMember = function(workspaceUI,member,componentJson) {
     var folderFunctionComponent = new apogeeapp.app.FolderFunctionComponent(workspaceUI,member,componentJson);
-    if((componentJson)&&(componentJson.children)) {
-        var folder = member.getInternalFolder();
-        workspaceUI.loadFolderComponentContentFromJson(folder,componentJson.children);
+    if(componentJson) {
+        if(componentJson.children) {
+            var folder = member.getInternalFolder();
+            workspaceUI.loadFolderComponentContentFromJson(folder,componentJson.children);
+        }
+        
+        folderFunctionComponent.setOptionsJson(componentJson);
     }
+    
     return folderFunctionComponent;
 }
 
@@ -87,7 +103,7 @@ apogeeapp.app.FolderFunctionComponent.generator = {};
 apogeeapp.app.FolderFunctionComponent.generator.displayName = "Folder Function";
 apogeeapp.app.FolderFunctionComponent.generator.uniqueName = "apogeeapp.app.FolderFunctionComponent";
 apogeeapp.app.FolderFunctionComponent.generator.createComponent = apogeeapp.app.FolderFunctionComponent.createComponent;
-apogeeapp.app.FolderFunctionComponent.generator.createComponentFromJson = apogeeapp.app.FolderFunctionComponent.createComponentFromJson;
+apogeeapp.app.FolderFunctionComponent.generator.createComponentFromMember = apogeeapp.app.FolderFunctionComponent.createComponentFromMember;
 apogeeapp.app.FolderFunctionComponent.generator.DEFAULT_WIDTH = 500;
 apogeeapp.app.FolderFunctionComponent.generator.DEFAULT_HEIGHT = 500;
 apogeeapp.app.FolderFunctionComponent.generator.ICON_RES_PATH = "/functionFolderIcon.png";

@@ -1,18 +1,17 @@
 /** This component represents a json table object. */
-apogeeapp.app.JsonTableComponent = function(workspaceUI,table,componentJson) {
+apogeeapp.app.JsonTableComponent = function(workspaceUI,table,options) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.JsonTableComponent.generator,componentJson);
+    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.JsonTableComponent.generator);
 
-    //to do:
-    //need to ave this and read if from component json, during create or read
-    //need to refresh a display if we change it when data view active
-    //need to refresh the view from the cache (whereit is happening...)
-    this.dataView = (componentJson.dataView !== undefined ) ? componentJson.dataView : apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW;
-   
-    this.memberUpdated();
+    //default view
+    this.dataView = apogeeapp.app.JsonTableComponent.JSON_DATA_VEW;
     
     //add a cleanup and save actions
+    this.addOpenAction(apogeeapp.app.JsonTableComponent.readFromJson);
     this.addSaveAction(apogeeapp.app.JsonTableComponent.writeToJson);
+    
+    this.setOptions(options);
+    this.memberUpdated();
 };
 
 apogeeapp.app.JsonTableComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -108,6 +107,9 @@ apogeeapp.app.JsonTableComponent.prototype.getViewModeElement = function(editCom
 
 apogeeapp.app.JsonTableComponent.createComponent = function(workspaceUI,data,componentOptions) {
     
+    //create the member using a create function and a type, argument is propValues.
+    //create functions: member, function, folder, folderFunction
+    
     var json = {};
     json.action = "createMember";
     json.owner = data.parent;
@@ -132,20 +134,25 @@ apogeeapp.app.JsonTableComponent.createComponent = function(workspaceUI,data,com
             componentJson.dataView = data.dataView;
         }
         
-        var tableComponent = new apogeeapp.app.JsonTableComponent(workspaceUI,table,componentJson);
+        var tableComponent = apogeeapp.app.JsonTableComponent.createComponentFromMember(workspaceUI,table,componentJson);
         actionResponse.component = tableComponent;
     }
     return actionResponse;
 }
 
 
-apogeeapp.app.JsonTableComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
-    var tableComponent = new apogeeapp.app.JsonTableComponent(workspaceUI,member,componentJson);
-    return tableComponent;
+apogeeapp.app.JsonTableComponent.createComponentFromMember = function(workspaceUI,member,componentJson) {
+    return new apogeeapp.app.JsonTableComponent(workspaceUI,member,componentJson);
 }
 
 apogeeapp.app.JsonTableComponent.writeToJson = function(json) {
     json.dataView = this.dataView;
+}
+
+apogeeapp.app.JsonTableComponent.readFromJson = function(json) {
+    if(json.dataView !== undefined) {
+        this.dataView = json.dataView;
+    }
 }
     
 
@@ -165,7 +172,7 @@ apogeeapp.app.JsonTableComponent.generator = {};
 apogeeapp.app.JsonTableComponent.generator.displayName = "Data Table";
 apogeeapp.app.JsonTableComponent.generator.uniqueName = "apogeeapp.app.JsonTableComponent";
 apogeeapp.app.JsonTableComponent.generator.createComponent = apogeeapp.app.JsonTableComponent.createComponent;
-apogeeapp.app.JsonTableComponent.generator.createComponentFromJson = apogeeapp.app.JsonTableComponent.createComponentFromJson;
+apogeeapp.app.JsonTableComponent.generator.createComponentFromMember = apogeeapp.app.JsonTableComponent.createComponentFromMember;
 apogeeapp.app.JsonTableComponent.generator.DEFAULT_WIDTH = 300;
 apogeeapp.app.JsonTableComponent.generator.DEFAULT_HEIGHT = 300;
 apogeeapp.app.JsonTableComponent.generator.ICON_RES_PATH = "/dataIcon.png";

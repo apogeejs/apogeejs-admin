@@ -2,29 +2,22 @@
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-apogeeapp.app.CustomControlComponent = function(workspaceUI,control,componentJson) {
+apogeeapp.app.CustomControlComponent = function(workspaceUI,control,options) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,control,apogeeapp.app.CustomControlComponent.generator,componentJson);
+    apogeeapp.app.EditComponent.call(this,workspaceUI,control,apogeeapp.app.CustomControlComponent.generator);
     
     this.uiCodeFields = {};
     this.currentCss = "";
-    this.loadResourceFromJson(componentJson);
     
-    //create a resource based on the json (or lack of a json)
-    var destroyOnInactive;
-    if((componentJson)&&(componentJson.destroyOnInactive !== undefined)) {
-        destroyOnInactive = componentJson.destroyOnInactive;
-    }
-    else {
-        //just keep it alive, unless user specifies something else
-        destroyOnInactive = false;
-    }
-    this.setDestroyOnInactive(destroyOnInactive);
-	
-	this.memberUpdated();
+    //keep alive or destroy on inactive
+    this.destroyOnInactive = false;
     
     //add a cleanup and save actions
+    this.addOpenAction(apogeeapp.app.CustomControlComponent.readFromJson);
     this.addSaveAction(apogeeapp.app.CustomControlComponent.writeToJson);
+    
+    this.setOptions(options);
+    this.memberUpdated();
 };
 
 apogeeapp.app.CustomControlComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -269,6 +262,19 @@ apogeeapp.app.CustomControlComponent.prototype.update = function(uiCodeFields) {
 // These are defined as static but are called in the objects context
 //======================================
 
+apogeeapp.app.CustomControlComponent.readFromJson = function(json) {
+    if(!json) return;
+    
+    //set destroy flag
+    if(json.destroyOnInactive !== undefined) {
+        var destroyOnInactive = json.destroyOnInactive;
+        this.setDestroyOnInactive(destroyOnInactive);
+    }
+    
+    //load the resource
+    this.loadResourceFromJson(json);
+}
+
 /** This serializes the table component. */
 apogeeapp.app.CustomControlComponent.writeToJson = function(json) {
     //store the resource info
@@ -346,15 +352,14 @@ apogeeapp.app.CustomControlComponent.createComponent = function(workspaceUI,data
         }
         
         //create the component
-        var customControlComponent = new apogeeapp.app.CustomControlComponent.createComponentFromJson(workspaceUI,control,activeComponentOptions);
+        var customControlComponent = apogeeapp.app.CustomControlComponent.createComponentFromMember(workspaceUI,control,activeComponentOptions);
         actionResponse.component = customControlComponent;
     }
     return actionResponse;
 }
 
-apogeeapp.app.CustomControlComponent.createComponentFromJson = function(workspaceUI,control,componentJson) {
-    var customControlComponent = new apogeeapp.app.CustomControlComponent(workspaceUI,control,componentJson);
-    return customControlComponent;
+apogeeapp.app.CustomControlComponent.createComponentFromMember = function(workspaceUI,control,componentJson) {
+    return new apogeeapp.app.CustomControlComponent(workspaceUI,control,componentJson);
 }
 
 apogeeapp.app.CustomControlComponent.addPropFunction = function(component,values) {
@@ -374,7 +379,7 @@ apogeeapp.app.CustomControlComponent.generator = {};
 apogeeapp.app.CustomControlComponent.generator.displayName = "Custom Control";
 apogeeapp.app.CustomControlComponent.generator.uniqueName = "apogeeapp.app.CustomControlComponent";
 apogeeapp.app.CustomControlComponent.generator.createComponent = apogeeapp.app.CustomControlComponent.createComponent;
-apogeeapp.app.CustomControlComponent.generator.createComponentFromJson = apogeeapp.app.CustomControlComponent.createComponentFromJson;
+apogeeapp.app.CustomControlComponent.generator.createComponentFromMember = apogeeapp.app.CustomControlComponent.createComponentFromMember;
 apogeeapp.app.CustomControlComponent.generator.DEFAULT_WIDTH = 500;
 apogeeapp.app.CustomControlComponent.generator.DEFAULT_HEIGHT = 500;
 apogeeapp.app.CustomControlComponent.generator.ICON_RES_PATH = "/controlIcon.png";

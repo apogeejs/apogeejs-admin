@@ -1,9 +1,10 @@
 
 /** This component represents a json table object. */
-apogeeapp.app.TextComponent = function(workspaceUI,table,componentJson) {
+apogeeapp.app.TextComponent = function(workspaceUI,table,options) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.TextComponent.generator,componentJson);
+    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.TextComponent.generator);
     
+    this.setOptions(options);
     this.memberUpdated();
 };
 
@@ -84,16 +85,15 @@ apogeeapp.app.TextComponent.createComponent = function(workspaceUI,data,componen
     
     var table = json.member;
     if(table) {
-        var tableComponent = new apogeeapp.app.TextComponent(workspaceUI,table,componentOptions);
+        var tableComponent = apogeeapp.app.TextComponent.createComponentFromMember(workspaceUI,table,componentOptions);
         actionResponse.component = tableComponent;
     }
     return actionResponse;
 }
 
 
-apogeeapp.app.TextComponent.createComponentFromJson = function(workspaceUI,member,componentJson) {
-    var tableComponent = new apogeeapp.app.TextComponent(workspaceUI,member,componentJson);
-    return tableComponent;
+apogeeapp.app.TextComponent.createComponentFromMember = function(workspaceUI,member,componentJson) {
+    return new apogeeapp.app.TextComponent(workspaceUI,member,componentJson);
 }
 
 //======================================
@@ -104,7 +104,7 @@ apogeeapp.app.TextComponent.generator = {};
 apogeeapp.app.TextComponent.generator.displayName = "Text Table";
 apogeeapp.app.TextComponent.generator.uniqueName = "apogeeapp.app.TextComponent";
 apogeeapp.app.TextComponent.generator.createComponent = apogeeapp.app.TextComponent.createComponent;
-apogeeapp.app.TextComponent.generator.createComponentFromJson = apogeeapp.app.TextComponent.createComponentFromJson;
+apogeeapp.app.TextComponent.generator.createComponentFromMember = apogeeapp.app.TextComponent.createComponentFromMember;
 apogeeapp.app.TextComponent.generator.DEFAULT_WIDTH = 300;
 apogeeapp.app.TextComponent.generator.DEFAULT_HEIGHT = 300;
 apogeeapp.app.TextComponent.generator.ICON_RES_PATH = "/textIcon.png";

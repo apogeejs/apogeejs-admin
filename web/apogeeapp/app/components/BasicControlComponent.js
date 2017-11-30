@@ -1,13 +1,14 @@
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods
  * and create a generator. */
-apogeeapp.app.BasicControlComponent = function(workspaceUI,control,generator,componentJson) {
+apogeeapp.app.BasicControlComponent = function(workspaceUI,control,generator,options) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,control,generator,componentJson);
+    apogeeapp.app.EditComponent.call(this,workspaceUI,control,generator);
     
     //default to keep alive
     this.displayDestroyFlags = apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
 
+    this.setOptions(options);
     this.memberUpdated();
 };
 
@@ -99,7 +100,7 @@ apogeeapp.app.BasicControlComponent.createGenerator = function(displayName,uniqu
     var generator = {};
     
     //function to create a new component
-    var createComponent = function(workspaceUI,data,componentOptions) {
+    var createComponent = function(workspaceUI,data,componentJson) {
     
         var workspace = workspaceUI.getWorkspace();
         //should throw an exception if parent is invalid!
@@ -116,23 +117,22 @@ apogeeapp.app.BasicControlComponent.createGenerator = function(displayName,uniqu
 
         if(control) {
             //create the component
-            var controlComponent = new constructorFunction(workspaceUI,control,generator,componentOptions);
+            var controlComponent = createComponentFromMember(workspaceUI,control,componentJson);
             actionResponse.component = controlComponent;
         }
         return actionResponse;
     }
 
     //function to deserialize the component
-    var createComponentFromJson = function(workspaceUI,member,componentJson) {
-        var controlComponent = new constructorFunction(workspaceUI,member,generator,componentJson);
-        return controlComponent;
+    var createComponentFromMember = function(workspaceUI,member,componentJson) {
+        return new constructorFunction(workspaceUI,member,generator,componentJson);
     }
 
     //generator
     generator.displayName = displayName;
     generator.uniqueName = uniqueName;
     generator.createComponent = createComponent;
-    generator.createComponentFromJson = createComponentFromJson;
+    generator.createComponentFromMember = createComponentFromMember;
     generator.DEFAULT_WIDTH = 500;
     generator.DEFAULT_HEIGHT = 500;
     generator.ICON_RES_PATH = "/controlIcon.png";

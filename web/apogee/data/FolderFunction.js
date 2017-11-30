@@ -130,9 +130,10 @@ apogee.FolderFunction.addPropValues = function(member,values) {
 apogee.FolderFunction.getPropertyUpdateAction = function(folderFunction,oldValues,newValues) {
     if((oldValues.argListString !== newValues.argListString)||(oldValues.returnValueString !== newValues.returnValueString)) {
         var newArgList = apogee.FunctionTable.parseStringArray(newValues.argListString);
-        
-        folderFunction.setArgList(newArgList);
-        folderFunction.setReturnValueString(newValues.returnValueString);
+  
+//I commented this out - I need to check to make sure that was correct        
+//        folderFunction.setArgList(newArgList);
+//        folderFunction.setReturnValueString(newValues.returnValueString);
         
         var actionData = {};
         actionData.action = "updateFolderFunction";
@@ -223,8 +224,18 @@ apogee.FolderFunction.prototype.getPossesionNameBase = function() {
 /** This method looks up a member by its full name. */
 apogee.FolderFunction.prototype.getMemberByPathArray = function(path,startElement) {
     if(startElement === undefined) startElement = 0;
-    if(path[startElement] === apogee.FolderFunction.INTERNAL_FOLDER_NAME) return this.internalFolder;
-    return this.internalFolder.lookupChildFromPathArray(path,startElement);
+    if(path[startElement] === this.internalFolder.getName()) {
+        if(startElement === path.length-1) {
+            return this.internalFolder;
+        }
+        else {
+            startElement++;
+            return this.internalFolder.lookupChildFromPathArray(path,startElement);
+        }
+    }
+    else {
+        return null;
+    }
 }
 
 

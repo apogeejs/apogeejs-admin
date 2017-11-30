@@ -160,6 +160,7 @@ apogeeapp.app.TabComponentDisplay.prototype.createDisplayContent = function() {
     for(var childName in children) {
         var child = children[childName];
         var childComponent = workspaceUI.getComponent(child);
+if(childComponent) //TEMPORARY!
         this.addChildComponent(childComponent);
     }
 }

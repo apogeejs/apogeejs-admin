@@ -95,7 +95,12 @@ apogeeapp.ui.TabFrame.prototype.closeTab = function(id) {
     }
 }
 
-/** This mesets the active tab, by tab title. */
+/** This gets the active tab, by tab id. */
+apogeeapp.ui.TabFrame.prototype.getActiveTab = function() {
+    return this.activeTab;
+}
+
+/** This sets the active tab, by tab id. */
 apogeeapp.ui.TabFrame.prototype.setActiveTab = function(id) {
     var tab = this.tabTable[id];
 	if(tab) {

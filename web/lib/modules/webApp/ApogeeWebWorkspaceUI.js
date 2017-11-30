@@ -32,10 +32,10 @@ apogeeapp.webapp.WorkspaceUI.prototype.setWorkspace = function(workspace, compon
     
     //set up the root folder
     var rootFolder = this.workspace.getRoot();
-    var rootFolderComponent = new apogeeapp.app.FolderComponent(this,rootFolder);
-    if(componentsJson) {
-        this.loadFolderComponentContentFromJson(rootFolder,componentsJson);
+    if(!componentsJson) {
+        componentsJson = apogeeapp.app.FolderComponent.EMPTY_FOLDER_COMPONENT_JSON;
     }
+    var rootFolderComponent = this.loadComponentFromJson(rootFolder,componentsJson);
     
     //listeners
     var instance = this;
@@ -168,7 +168,7 @@ apogeeapp.webapp.WorkspaceUI.prototype.loadComponentFromJson = function(member,j
     var componentType = json.type;
     var generator = this.app.getComponentGenerator(componentType);
 	if(generator) {
-        generator.createComponentFromJson(this,member,json);
+        generator.createComponentFromMember(this,member,json);
     }
     else {
         throw apogee.base.createError("Component type not found: " + componentType);
