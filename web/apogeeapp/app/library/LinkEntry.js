@@ -52,7 +52,7 @@ apogeeapp.app.LinkEntry.prototype.loadLink = function() {
             }
             else {
                 var errorMsg = "Unknown link type " + this.linkType;
-                this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING,errorMsg);
+                this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
                 reject(errorMsg);
                 return;
             }
@@ -64,8 +64,8 @@ apogeeapp.app.LinkEntry.prototype.loadLink = function() {
             }
             linkProps.onerror = (msg) => {
                 var errorMsg = "Error loading link " + this.url + ": " + msg;
-                this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING,errorMsg);
-                resolve(errorMsg);
+                this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
+                reject(errorMsg);
             }
             
             //insert the link entry
