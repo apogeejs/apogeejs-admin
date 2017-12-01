@@ -7,13 +7,17 @@ apogeeapp.app.WorkspaceUI = function() {
 	this.app = null;
     this.tabFrame = null;
     this.tree = null;
+    this.treeEntry = null;
     this.componentMap = {};
+    this.libraryManager = new apogeeapp.app.LibraryUI();
    
     this.jsLinkArray = [];
     this.cssLinkArray = [];
 }
 
 apogeeapp.app.WorkspaceUI.MAIN_WORKSPACE_NAME = "main workspace";
+
+apogeeapp.app.WorkspaceUI.ICON_RES_PATH = "/genericIcon.png";
 
 //====================================
 // Workspace Management
@@ -26,6 +30,11 @@ apogeeapp.app.WorkspaceUI.prototype.setApp = function(app,tabFrame,treePane) {
     this.tree = new apogeeapp.ui.treecontrol.TreeControl();
     apogeeapp.ui.removeAllChildren(treePane);
     treePane.appendChild(this.tree.getElement());
+    
+    this.treeEntry = this.createTreeEntry();
+    this.tree.setRootEntry(this.treeEntry);
+    
+    this.treeEntry.addChild("library",this.libraryManager.getTreeEntry());
 }
 
 /** This gets the application instance. */
@@ -46,8 +55,8 @@ apogeeapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, component
         componentsJson = apogeeapp.app.FolderComponent.EMPTY_FOLDER_COMPONENT_JSON;
     }
     var rootFolderComponent = this.loadComponentFromJson(rootFolder,componentsJson);
-    
-    this.tree.setRootEntry(rootFolderComponent.getTreeEntry());
+
+    this.treeEntry.addChild("rootFolder",rootFolderComponent.getTreeEntry());
     
     //listeners
     var instance = this;
@@ -274,32 +283,53 @@ apogeeapp.app.WorkspaceUI.prototype.loadFolderComponentContentFromJson = functio
 }
 
 
+//====================================
+// properties and display
+//====================================
+
+apogeeapp.app.WorkspaceUI.prototype.createTreeEntry = function() {
+    
+    
+    //menu item callback
+//    var instance = this;
+//    var menuItemCallback = function() {
+//        var menuItemList = [];
+//        var openMenuItem = instance.component.getOpenMenuItem();
+//        if(openMenuItem) {
+//            menuItemList.push(openMenuItem);
+//        }
+//        return instance.component.getMenuItems(menuItemList);
+//    }
+    
+    //double click callback
+//    var openCallback = this.component.createOpenCallback();
+    
+    var labelText = "Workspace"; //add the name
+    var iconUrl = this.getIconUrl();
+    var isRoot = true;
+    return new apogeeapp.ui.treecontrol.TreeEntry(labelText, iconUrl, null, null,isRoot);
+}
+
+/** This method returns the icon url for the component. */
+apogeeapp.app.WorkspaceUI.prototype.getIconUrl = function() {
+    return apogeeapp.ui.getResourcePath(apogeeapp.app.WorkspaceUI.ICON_RES_PATH);
+}
+
 //========================================
 // Links
 //========================================
 
-apogeeapp.app.WorkspaceUI.prototype.getJsLinks = function() {
-	return this.jsLinkArray;
+//apogeeapp.app.WorkspaceUI.prototype.getJsLinks = function() {
+//	return this.jsLinkArray;
+//}
+
+apogeeapp.app.WorkspaceUI.prototype.setLinks = function(jsLinkArray,cssLinkArray) {
+    return this.libraryManager.openLinks(jsLinkArray,cssLinkArray);
 }
 
-apogeeapp.app.WorkspaceUI.prototype.setLinks = function(newJsLinkArray,newCssLinkArray,onLinksLoaded) {
-    //update the page links
-    var oldJsLinkArray = this.jsLinkArray;
-	var oldCssLinkArray = this.cssLinkArray;
-	var addList = [];
-	var removeList = [];
-	
-    this.createLinkAddRemoveList(newJsLinkArray,oldJsLinkArray,"js",addList,removeList);
-	this.createLinkAddRemoveList(newCssLinkArray,oldCssLinkArray,"css",addList,removeList);
-	
-    this.jsLinkArray = newJsLinkArray;
-	this.cssLinkArray = newCssLinkArray;
-	this.app.updateWorkspaceLinks(apogeeapp.app.WorkspaceUI.MAIN_WORKSPACE_NAME,addList,removeList,onLinksLoaded);
-}
-
-apogeeapp.app.WorkspaceUI.prototype.getCssLinks = function() {
-	return this.cssLinkArray;
-}
+//apogeeapp.app.WorkspaceUI.prototype.getCssLinks = function() {
+//	return this.cssLinkArray;
+//}
 
 /** This method determins which links are new, which are old and which are removed.  
  * @private */

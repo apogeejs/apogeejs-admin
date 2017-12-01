@@ -90,8 +90,15 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
             actionCompletedCallback(actionResponse);
         }
         
+        var linkLoadError = function(errorMsg) {
+            alert("Error loading links: " + errorMsg);
+            //load the workspace anyway
+            doWorkspaceLoad();
+        }
+        
         if(linksAdded) {
-			workspaceUI.setLinks(jsLinks,cssLinks,doWorkspaceLoad);
+			var linksLoadedPromise = workspaceUI.setLinks(jsLinks,cssLinks);
+            linksLoadedPromise.then(doWorkspaceLoad).catch(linkLoadError);
 		}
 		else {
 			//immediately load the workspace - no links to wait for

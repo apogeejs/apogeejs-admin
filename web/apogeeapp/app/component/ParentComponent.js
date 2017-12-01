@@ -50,22 +50,6 @@ apogeeapp.app.ParentComponent.prototype.getMenuItems = function(optionalMenuItem
     return menuItemList;
 }
 
-////in memberUPdated
-//    if(this.tabDisplay) {
-//        this.tabDisplay.updateData();
-//        this.tabDisplay.setBannerState(bannerState,bannerMessage);
-//    }
-//
-////in member deleted
-//    if(this.tabDisplay) {
-//        this.tabDisplay.updateData();
-//        this.tabDisplay.setBannerState(bannerState,bannerMessage);
-//    }
-
-//////////////////////////////////////////
-
-
-
 /** This flags indicates the component is a parent component. */
 apogeeapp.app.ParentComponent.prototype.isParentComponent = true;
 
