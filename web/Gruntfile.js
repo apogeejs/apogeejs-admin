@@ -65,7 +65,6 @@ module.exports = function(grunt) {
                 "apogeeapp/ui/treecontrol/TreeControl.js",
                 "apogeeapp/ui/treecontrol/TreeEntry.js",
                 "apogeeapp/app/Apogee.js",
-                "apogeeapp/app/LinkManager.js",
                 "apogeeapp/app/WorkspaceUI.js",
                 "apogeeapp/app/component/WindowHeaderManager.js",
                 "apogeeapp/app/component/Component.js",

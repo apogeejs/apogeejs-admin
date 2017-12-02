@@ -1,0 +1,17 @@
+.apogee_configurableFormBody { 
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+}
+.apogee_configurableFormLine {
+    margin:10px;
+}
+.apogee_configurableFormTitle {
+    font-weight:bold;
+}
+.apogee_configurableFormButton {
+    margin-left:20px;
+    margin-right:20px;
+}
