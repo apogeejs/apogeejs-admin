@@ -65,24 +65,8 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
         var workspaceUI = new apogeeapp.app.WorkspaceUI();
         workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
     
-        //add links, if applicable
-		var jsLinks;
-		var cssLinks;
-        var linksAdded = false;
-        if((workspaceJson.jsLinks)&&(workspaceJson.jsLinks.length > 0)) {
-            jsLinks = workspaceJson.jsLinks;
-            linksAdded = true;
-        }
-		else {
-			jsLinks = [];
-		}
-        if((workspaceJson.cssLinks)&&(workspaceJson.cssLinks.length > 0)) {
-			cssLinks = workspaceJson.cssLinks;
-            linksAdded = true;
-        }
-		else {
-			cssLinks = [];
-		}
+        var libraryJson = workspaceJson.library;
+        var loadLibraryPromise = workspaceUI.loadLibrary(libraryJson);
     	
 		//if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {
@@ -96,14 +80,9 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
             doWorkspaceLoad();
         }
         
-        if(linksAdded) {
-			var linksLoadedPromise = workspaceUI.setLinks(jsLinks,cssLinks);
-            linksLoadedPromise.then(doWorkspaceLoad).catch(linkLoadError);
-		}
-		else {
-			//immediately load the workspace - no links to wait for
-            doWorkspaceLoad();
-		}
+//THIS NEEDS TO BE CLEANED UP - ESPECIALLY ERROR HANDLING
+        loadLibraryPromise.then(doWorkspaceLoad).catch(linkLoadError);
+        
     }
     catch(error) {
         if(workspaceUIAdded) {

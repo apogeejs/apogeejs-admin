@@ -1,153 +1,180 @@
 
 /** This class manages links and other reference entries.*/
 apogeeapp.app.LibraryUI = function() {
-    this.jsLinkEntries = [];
-    this.cssLinkEntries = [];
-    this.createTreeEntries();
+    this.createTreeEntry();
+    
+    this.libraryLists = {};
+    var jsInfo = apogeeapp.app.LinkEntry.JS_LINK_LIST_INFO;
+    var cssInfo = apogeeapp.app.LinkEntry.CSS_LINK_LIST_INFO;
+    this.libraryLists[jsInfo.typeName] = this.getListStruct(jsInfo);
+    this.libraryLists[cssInfo.typeName] = this.getListStruct(cssInfo);
 }
-
-apogeeapp.app.LibraryUI.LIBRARY_ICON_PATH = "/genericIcon.png";
-apogeeapp.app.LibraryUI.JS_LINKS_ICON_PATH = "/genericIcon.png";
-apogeeapp.app.LibraryUI.CSS_LINKS_ICON_PATH = "/genericIcon.png";
 
 apogeeapp.app.LibraryUI.prototype.getTreeEntry = function() {
     return this.libraryTreeEntry;
 }
 
-/** This method opens a list of js and css links. It returns a promise that
- * resolves when all links are loaded. 
+/** This method opens the reference entries, from the structure returned from
+ * the save call. It returns a promise that
+ * resolves when all entries are loaded. 
  */
-apogeeapp.app.LibraryUI.prototype.openLinks = function(jsLinks,cssLinks) {
+apogeeapp.app.LibraryUI.prototype.openEntries = function(libraryJson) {
+
+    var entryPromises = [];
     
-    var linkPromises = [];
-    
-    var addJsLink = url => {
-        var linkEntry = new apogeeapp.app.LinkEntry(this,url,null,apogeeapp.app.LinkEntry.LINK_TYPE_JS);
-        this.jsLinkEntries.push(linkEntry);
-        var treeEntry = linkEntry.getTreeEntry();
-        this.jsTreeEntry.addChild(linkEntry.getId(),treeEntry);
-        var promise = linkEntry.loadLink();
-        linkPromises.push(promise);
+    var loadEntry = entryJson => {
+        var listStruct = this.libraryLists[entryJson.entryType];
+        
+        //make sure it doesn't exist?
+        
+        var libraryEntry = listStruct.listInfo.createEntryFunction(this,entryJson);
+        var promise = libraryEntry.loadEntry();
+        entryPromises.push(promise);
     }
-    jsLinks.forEach(addJsLink);
-    
-    var addCssLink = url => {
-        var linkEntry = new apogeeapp.app.LinkEntry(this,url,null,apogeeapp.app.LinkEntry.LINK_TYPE_CSS);
-        this.cssLinkEntries.push(linkEntry);
-        var treeEntry = linkEntry.getTreeEntry();
-        this.cssTreeEntry.addChild(linkEntry.getId(),treeEntry);
-        var promise = linkEntry.loadLink();
-        linkPromises.push(promise);
-    }
-    cssLinks.forEach(addCssLink);
-    
-    return Promise.all(linkPromises);
+    libraryJson.forEach(loadEntry);
+   
+    return Promise.all(entryPromises);
 }
 
-/** This method opens a list of js and css links. It returns a promise that
- * resolves when all links are loaded. 
+/** This method opens the reference entries, from the structure returned from
+ * the save call. It returns a promise that
+ * resolves when all entries are loaded. 
  */
-apogeeapp.app.LibraryUI.prototype.addLink = function(url,nickName,linkType) {
-    
-    var linkEntry = new apogeeapp.app.LinkEntry(this,url,nickName,linkType);
-    var treeEntry = linkEntry.getTreeEntry();
-    
-    //check if link already exists
-    
-    if(linkType == apogeeapp.app.LinkEntry.LINK_TYPE_JS) {
-        this.jsLinkEntries.push(linkEntry);
-        this.jsTreeEntry.addChild(linkEntry.getId(),treeEntry);
-    }
-    else if(linkType == apogeeapp.app.LinkEntry.LINK_TYPE_CSS){
-        this.cssLinkEntries.push(linkEntry);
-        this.cssTreeEntry.addChild(linkEntry.getId(),treeEntry);
-    }
-    else {
-        throw new Error("Unrecognized link type: " + linkType);
+apogeeapp.app.LibraryUI.prototype.saveEntries = function() {
+    var entryListJson = [];
+    var saveEntry = listEntry => {
+        var entryJson = listEntry.saveEntry();
+        entryListJson.push(entryJson);
     }
     
-    return linkEntry.loadLink();
+    for(var listType in this.libraryLists) {
+        var listStruct =  this.libraryLists[listType];
+        listStruct.listEntries.forEach(saveEntry);
+    }
+   
+    return entryListJson;
+}
+
+/** This method adds a reference entry, from the structure returned from
+ * the save call. It returns a promise that
+ * resolves when the entry are loaded. 
+ */
+apogeeapp.app.LibraryUI.prototype.addEntry = function(entryJson) {
+    
+    //check if these object exist - if so, don't add them
+ 
+    var listStruct = this.libraryLists[entryJson.entryType];
+    var libraryEntry = listStruct.listInfo.createEntryFunction(this,entryJson);
+    return libraryEntry.loadEntry();
 }
 
 /** This method should be called when the workspace is closed. It removes all links. 
  */
 apogeeapp.app.LibraryUI.prototype.close = function() {
-    this.jsLinkEnties.forEach( linkEntry => linkEntry.remove() );
-    this.jsLinkEntries = [];
+    for(var listType in this.libraryLists) {
+        var listStruct = this.libraryLists[listType];
+        listStruct.listEntries.push( libraryEntry => libraryEntry.remove() );
+    }
+}
+
+//================================
+// Protected
+//================================
+
+/** This method opens a list of js and css links. It returns a promise that
+ * resolves when all links are loaded. 
+ * @protected */
+apogeeapp.app.LibraryUI.prototype.entryInserted = function(libraryEntry) {
+    var entryType = libraryEntry.getEntryType();
+    var treeEntry = libraryEntry.getTreeEntry();
     
-    this.cssLinkEntries.forEach( linkEntry => linkEntry.remove() );
-    this.cssLinkEntries = [];
+    var listStruct = this.libraryLists[entryType];
+    if(!listStruct) {
+        throw new Error("Unrecognized link type: " + entryType);
+    }
+    
+    listStruct.listEntries.push(libraryEntry);
+    listStruct.listTreeEntry.addChild(libraryEntry.getId(),treeEntry);
 }
 
 /** This method opens a list of js and css links. It returns a promise that
  * resolves when all links are loaded. 
  * @protected */
-apogeeapp.app.LibraryUI.prototype.linkReinserted = function(linkEntry,promise) {
-    var linkType = linkEntry.getLinkType();
-    var treeEntry = linkEntry.getTreeEntry();
+apogeeapp.app.LibraryUI.prototype.entryStatusChange = function(libraryEntry) {
     
-    if(linkType == apogeeapp.app.LinkEntry.LINK_TYPE_JS) {
-        this.jsLinkEntries.push(linkEntry);
-        this.jsTreeEntry.addChild(linkEntry.getId(),treeEntry);
-    }
-    else if(linkType == apogeeapp.app.LinkEntry.LINK_TYPE_CSS){
-        this.cssLinkEntries.push(linkEntry);
-        this.cssTreeEntry.addChild(linkEntry.getId(),treeEntry);
-    }
-    else {
-        throw new Error("Unrecognized link type: " + linkType);
-    }
 }
 
 /** This method opens a list of js and css links. It returns a promise that
  * resolves when all links are loaded. 
  * @protected */
-apogeeapp.app.LibraryUI.prototype.linkRemoved= function(linkEntry) {
-    var linkType = linkEntry.getLinkType();
-    if(linkType == apogeeapp.app.LinkEntry.LINK_TYPE_JS) {
-        this.jsLinkEntries = this.jsLinkEntries.filter( existingEntry => (existingEntry != linkEntry) );
-        this.jsTreeEntry.removeChild(linkEntry.getId());
+apogeeapp.app.LibraryUI.prototype.entryRemoved= function(libraryEntry) {
+    var entryType = libraryEntry.getEntryType();
+    
+    var listStruct = this.libraryLists[entryType];
+    if(!listStruct) {
+        throw new Error("Unrecognized link type: " + entryType);
     }
-    else if(linkType == apogeeapp.app.LinkEntry.LINK_TYPE_CSS){
-        this.cssLinkEntries = this.cssLinkEntries.filter( existingEntry => (existingEntry != linkEntry) );
-        this.cssTreeEntry.removeChild(linkEntry.getId());
-    }
-    else {
-        throw new Error("Unrecognized link type: " + linkType);
-    }
+    
+    listStruct.listEntries = listStruct.listEntries.filter( existingEntry => (existingEntry != libraryEntry) );
+    listStruct.listTreeEntry.removeChild(libraryEntry.getId());
 }
 
+//=================================
+// Private
+//=================================
+
+apogeeapp.app.LibraryUI.LIBRARY_ICON_PATH = "/genericIcon.png";
 
 
 /** @private */
-apogeeapp.app.LibraryUI.prototype.createTreeEntries = function() {
-    var iconUrl;
-    
+apogeeapp.app.LibraryUI.prototype.createTreeEntry = function() {
     var iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.app.LibraryUI.LIBRARY_ICON_PATH);
     this.libraryTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry("Library", iconUrl, null, null, false);
+}
+
+apogeeapp.app.LibraryUI.prototype.getListStruct = function(listInfo) {
     
-    var jsIconUrl = apogeeapp.ui.getResourcePath(apogeeapp.app.LibraryUI.JS_LINKS_ICON_PATH);
-    var jsMenuItemCallback = () => this.getMenuItems(apogeeapp.app.LinkEntry.LINK_TYPE_JS);
-    this.jsTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry("JS Links", jsIconUrl, null, jsMenuItemCallback, false);
+    //create the tree entry for this list
+    var iconUrl = apogeeapp.ui.getResourcePath(listInfo.listIconPath);
+    var menuItemCallback = () => this.getListMenuItems(listInfo);
+    var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(listInfo.listName, iconUrl, null, menuItemCallback, false);
+    this.libraryTreeEntry.addChild(listInfo.listName,listTreeEntry);
     
-    var cssIconUrl = apogeeapp.ui.getResourcePath(apogeeapp.app.LibraryUI.CSS_LINKS_ICON_PATH);
-    var cssMenuItemCallback = () => this.getMenuItems(apogeeapp.app.LinkEntry.LINK_TYPE_CSS);
-    this.cssTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry("CSS Links", cssIconUrl, null, cssMenuItemCallback, false);
-    
-    this.libraryTreeEntry.addChild("JS Links",this.jsTreeEntry);
-    this.libraryTreeEntry.addChild("CSS Links",this.cssTreeEntry);
+    //create the list struct
+    var listStruct = {};
+    listStruct.listInfo = listInfo;
+    listStruct.listEntries = [];
+    listStruct.listTreeEntry = listTreeEntry;
+ 
+    return listStruct;
 }
 
 /** @private */
-apogeeapp.app.LibraryUI.prototype.getMenuItems = function(linkType) {
+apogeeapp.app.LibraryUI.prototype.getListMenuItems = function(listInfo) {
     //menu items
     var menuItemList = [];
 
     //add the standard entries
     var itemInfo = {};
-    itemInfo.title = "Add Link";
-    itemInfo.callback = apogeeapp.app.updatelink.getAddLinkCallback(this,linkType);
+    itemInfo.title = listInfo.addEntryText;
+    itemInfo.callback = () => listInfo.addEntry(this);
     menuItemList.push(itemInfo);
     
     return menuItemList;
+}
+
+//=================================
+// Static
+//=================================
+
+/** THis is used to give an id to the link entries 
+ * @private */
+apogeeapp.app.LibraryUI.nextId = 1;
+
+/** This method generates a member ID for the member. It is only valid
+ * for the duration the workspace is opened. It is not persisted.
+ * @private
+ */
+apogeeapp.app.LibraryUI._createId = function() {
+    return apogeeapp.app.LibraryUI.nextId++;
 }

@@ -15,8 +15,6 @@ apogeeapp.app.WorkspaceUI = function() {
     this.cssLinkArray = [];
 }
 
-apogeeapp.app.WorkspaceUI.MAIN_WORKSPACE_NAME = "main workspace";
-
 apogeeapp.app.WorkspaceUI.ICON_RES_PATH = "/genericIcon.png";
 
 //====================================
@@ -89,7 +87,7 @@ apogeeapp.app.WorkspaceUI.prototype.close = function() {
     this.tree.clearRootEntry();
     
     //remove links
-    this.setLinks([],[]);
+    this.libraryManager.close();
 }
 
 
@@ -226,10 +224,9 @@ apogeeapp.app.WorkspaceUI.prototype.toJson = function(optionalSavedRootFolder) {
     var json = {};
     json.fileType = "apogee js web workspace";
     
-    json.version = "0.3";
+    json.version = "0.31";
     
-    json.jsLinks = this.jsLinkArray;
-    json.cssLinks = this.cssLinkArray;
+    json.library = this.libraryManager.saveEntries();
     
     json.workspace = this.workspace.toJson(optionalSavedRootFolder);
     
@@ -338,7 +335,7 @@ apogeeapp.app.WorkspaceUI.prototype.getMenuItems = function() {
 // Links
 //========================================
 
-apogeeapp.app.WorkspaceUI.prototype.setLinks = function(jsLinkArray,cssLinkArray) {
-    return this.libraryManager.openLinks(jsLinkArray,cssLinkArray);
+apogeeapp.app.WorkspaceUI.prototype.loadLibrary = function(libraryJson) {
+    return this.libraryManager.openEntries(libraryJson);
 }
     

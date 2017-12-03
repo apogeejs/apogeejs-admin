@@ -25,7 +25,7 @@ apogeeapp.app.updatelink.DIALOG_LAYOUT_URL_LINE = {
 apogeeapp.app.updatelink.DIALOG_LAYOUT_NICKNAME_LINE = {
     "type": "inputElement",
     "heading": "Nickname (optional): ",
-    "resultKey": "nickName",
+    "resultKey": "nickname",
     "initial": ""
 };
 apogeeapp.app.updatelink.DIALOG_LAYOUT_SUBMIT_LINE = {
@@ -69,7 +69,11 @@ apogeeapp.app.updatelink.getAddLinkCallback = function(libraryUI,linkType) {
             }
 
             //not sure what to do with promise
-            var promise = libraryUI.addLink(newValues.url,newValues.nickName,linkType);
+            var entryJson = {};
+            entryJson.url = newValues.url;
+            entryJson.nickname = newValues.nickname;
+            entryJson.entryType = linkType;
+            var promise = libraryUI.addEntry(entryJson);
 
             //return true to close the dialog
             return true;
@@ -90,23 +94,23 @@ apogeeapp.app.updatelink.getUpdateLinkCallback = function(linkEntry) {
         
         var initialValues = {};
         initialValues.url = linkEntry.getUrl();
-        initialValues.nickName = linkEntry.getNickName();
-        if(initialValues.nickName == initialValues.url) initialValues.nickName = "";
+        initialValues.nickname = linkEntry.getNickname();
+        if(initialValues.nickname == initialValues.url) initialValues.nickname = "";
         
         //create the dialog layout
-        var titleLine = (linkEntry.getLinkType() == apogeeapp.app.LinkEntry.LINK_TYPE_JS) ? 
+        var titleLine = (linkEntry.getEntryType() == apogeeapp.app.LinkEntry.LINK_TYPE_JS) ? 
             apogeeapp.app.updatelink.DIALOG_LAYOUT_UPDATE_JS_TITLE_LINE :
             apogeeapp.app.updatelink.DIALOG_LAYOUT_UPDATE_CSS_TITLE_LINE;
         var urlLine = apogee.util.jsonCopy(apogeeapp.app.updatelink.DIALOG_LAYOUT_URL_LINE);
         urlLine.initial = initialValues.url;
-        var nickNameLine = apogee.util.jsonCopy(apogeeapp.app.updatelink.DIALOG_LAYOUT_NICKNAME_LINE);
-        nickNameLine.initial = initialValues.nickName;
+        var nicknameLine = apogee.util.jsonCopy(apogeeapp.app.updatelink.DIALOG_LAYOUT_NICKNAME_LINE);
+        nicknameLine.initial = initialValues.nickname;
         
         var dialogLayout = {};
         dialogLayout.lines = [];
         dialogLayout.lines.push(titleLine);
         dialogLayout.lines.push(urlLine);
-        dialogLayout.lines.push(nickNameLine);
+        dialogLayout.lines.push(nicknameLine);
         dialogLayout.lines.push(apogeeapp.app.updatelink.DIALOG_LAYOUT_SUBMIT_LINE);
         
         //create on submit callback
@@ -119,7 +123,7 @@ apogeeapp.app.updatelink.getUpdateLinkCallback = function(linkEntry) {
             }
             
             //not sure what to do with promise
-            linkEntry.updateData(newValues.url,newValues.nickName);
+            linkEntry.updateData(newValues.url,newValues.nickname);
 
             //return true to close the dialog
             return true;

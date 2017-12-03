@@ -1,12 +1,17 @@
 
 /** This class manages links for the web page.*/
-apogeeapp.app.LinkEntry = function(libraryUI,url,nickName,linkType) {
-    this.id = apogeeapp.app.LinkEntry._createId();
+apogeeapp.app.LinkEntry = function(libraryUI,linkData,linkType) {
+    this.id = apogeeapp.app.LibraryUI._createId();
     this.libraryUI = libraryUI;
-    this.url = url;
-    if((!nickName)||(nickName.length === 0)) nickName = this.createLinkNameFromUrl(url);
-    this.nickName = nickName;
+    
     this.linkType = linkType;
+    this.url = linkData.url;
+    
+    var nickname = linkData.nickname;
+    if((!nickname)||(nickname.length === 0)) nickname = this.createLinkNameFromUrl(this.url);
+    this.nickname = nickname;
+    
+    
     this.treeEntry = this.createTreeEntry();
 }
 
@@ -19,6 +24,41 @@ apogeeapp.app.LinkEntry.CSS_ELEMENT_TYPE = "link";
 apogeeapp.app.LinkEntry.JS_ICON_RES_PATH = "/genericIcon.png";
 apogeeapp.app.LinkEntry.CSS_ICON_RES_PATH = "/genericIcon.png";
 
+apogeeapp.app.LinkEntry.JS_LINK_LIST_INFO = {
+    "typeName": apogeeapp.app.LinkEntry.LINK_TYPE_JS,
+    "addEntry": (libraryUI) => {
+        var addEntry = apogeeapp.app.updatelink.getAddLinkCallback(libraryUI,apogeeapp.app.LinkEntry.LINK_TYPE_JS);
+        addEntry();
+    },
+    "createEntryFunction": (libraryUI, linkData) => new apogeeapp.app.LinkEntry(libraryUI,linkData,apogeeapp.app.LinkEntry.LINK_TYPE_JS),
+    "listName": "JS Links",
+    "addEntryText":"Add JS Link",
+    "listIconPath":"/genericIcon.png"
+}
+
+apogeeapp.app.LinkEntry.CSS_LINK_LIST_INFO = {
+    "typeName": apogeeapp.app.LinkEntry.LINK_TYPE_CSS,
+    "addEntry": (libraryUI) => {
+        var addEntry = apogeeapp.app.updatelink.getAddLinkCallback(libraryUI,apogeeapp.app.LinkEntry.LINK_TYPE_CSS);
+        addEntry();
+    },
+    "createEntryFunction": (libraryUI, linkData) => new apogeeapp.app.LinkEntry(libraryUI,linkData,apogeeapp.app.LinkEntry.LINK_TYPE_CSS),
+    "listName": "CSS Links",
+    "addEntryText":"Add CSS Link",
+    "listIconPath":"/genericIcon.png"
+}
+
+//---------------------------
+// library entry interface
+//---------------------------
+
+apogeeapp.app.LinkEntry.prototype.getId = function() {
+    return this.id;
+}
+
+apogeeapp.app.LinkEntry.prototype.getEntryType = function() {
+    return this.linkType;
+}
 
 /** This method loads the link onto the page. It returns a promise that
  * resolves when the link is loaded. */
@@ -26,33 +66,28 @@ apogeeapp.app.LinkEntry.prototype.getTreeEntry = function() {
     return this.treeEntry;
 }
 
-apogeeapp.app.LinkEntry.prototype.getId = function() {
-    return this.id;
-}
-
 apogeeapp.app.LinkEntry.prototype.getUrl = function() {
     return this.url;
 }
 
-apogeeapp.app.LinkEntry.prototype.getNickName = function() {
-    return this.nickName;
+apogeeapp.app.LinkEntry.prototype.getNickname = function() {
+    return this.nickname;
 }
 
-apogeeapp.app.LinkEntry.prototype.getLinkType = function() {
-    return this.linkType;
-}
 
 /** This method loads the link onto the page. It returns a promise that
  * resolves when the link is loaded. */
-apogeeapp.app.LinkEntry.prototype.loadLink = function() {
+apogeeapp.app.LinkEntry.prototype.loadEntry = function() {
     
     var promiseFunction = (resolve,reject) => {
         //make sure this link does not already exist
+//OOPS - THIS NEEDS TO BE FIXED! CHECK THIS DIFFERENTLY
         var element = document.getElementById(this.url);
         if(element) {
             var errorMsg = "The link already exists: " + this.url;
-            this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING,errorMsg);
+            this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
             reject(errorMsg);
+this.libraryUI.entryStatusChange(this);
             return;
         }
         else {
@@ -72,6 +107,7 @@ apogeeapp.app.LinkEntry.prototype.loadLink = function() {
                 var errorMsg = "Unknown link type " + this.linkType;
                 this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
                 reject(errorMsg);
+this.libraryUI.entryStatusChange(this);
                 return;
             }
             
@@ -79,11 +115,13 @@ apogeeapp.app.LinkEntry.prototype.loadLink = function() {
             linkProps.onload = () => {
                 this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE);
                 resolve(this.url);
+this.libraryUI.entryStatusChange(this);
             }
             linkProps.onerror = (msg) => {
                 var errorMsg = "Error loading link " + this.url + ": " + msg;
                 this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
                 reject(errorMsg);
+this.libraryUI.entryStatusChange(this);
             }
             
             //insert the link entry
@@ -92,22 +130,21 @@ apogeeapp.app.LinkEntry.prototype.loadLink = function() {
         }
     }
     
+    //call link added to library
+    this.libraryUI.entryInserted(this);
+    
+    //return promise to track loading finish
     return new Promise(promiseFunction);
 }
 
-/** This method removes and reloads the link, returning a promise. */
-apogeeapp.app.LinkEntry.prototype.updateData = function(url,nickName) {
-    this.url = url;
-    if((!nickName)||(nickName.length === 0)) nickName = this.createLinkNameFromUrl(url);
-    this.nickName = nickName;
-    
-    //reload
-    this.remove();
-    var promise = this.loadLink();
-    
-    this.treeEntry.setLabel(this.nickName);
-    
-    this.libraryUI.linkReinserted(this,promise);
+/** This method loads the link onto the page. It returns a promise that
+ * resolves when the link is loaded. */
+apogeeapp.app.LinkEntry.prototype.saveEntry = function() {
+    var entryJson = {};
+    entryJson.url = this.url;
+    if(this.nickname != this.url) entryJson.nickname = this.nickname;
+    entryJson.entryType = this.linkType;
+    return entryJson;
 }
 
 /** This method removes the link. */
@@ -117,8 +154,37 @@ apogeeapp.app.LinkEntry.prototype.remove = function() {
         document.head.removeChild(element);
     }
     
-    this.libraryUI.linkRemoved(this);
+    this.libraryUI.entryRemoved(this);
 }
+
+//-------------------------
+// Entry specific management methods
+//-------------------------
+
+/** This method removes and reloads the link, returning a promise. */
+apogeeapp.app.LinkEntry.prototype.updateData = function(url,nickname) {
+    
+    //update nickname
+    if((!nickname)||(nickname.length === 0)) nickname = this.createLinkNameFromUrl(url);
+    if(this.nickname != nickname) {
+        this.nickname = nickname;
+        this.treeEntry.setLabel(this.nickname);
+    }
+    
+    //update url
+    if(this.url != url) {
+        this.url = url;
+        this.remove();
+        var promise = this.loadEntry();
+    }
+    
+    //if we didn't update, create a dummy promise
+    if(!promise) promise = Promise.resolve("No url update");
+    
+    return promise;
+}
+
+
 
 //===================================
 // private methods
@@ -145,6 +211,7 @@ apogeeapp.app.LinkEntry.prototype.getCssLinkProps = function() {
 }
 
 apogeeapp.app.LinkEntry.ELEMENT_ID_BASE = "__apogee_link_element_";
+
 apogeeapp.app.LinkEntry.prototype.getElementId = function() {
     return apogeeapp.app.LinkEntry.ELEMENT_ID_BASE + this.id;
 }
@@ -162,7 +229,7 @@ apogeeapp.app.LinkEntry.prototype.setBannerState = function(bannerState,bannerMe
 apogeeapp.app.LinkEntry.prototype.createTreeEntry = function() {
     var iconUrl = this.getIconUrl();
     var menuItemsCallback = () => this.getMenuItems();
-    return new apogeeapp.ui.treecontrol.TreeEntry(this.nickName, iconUrl, null, menuItemsCallback, false);
+    return new apogeeapp.ui.treecontrol.TreeEntry(this.nickname, iconUrl, null, menuItemsCallback, false);
 }
 
 /** This method returns the icon url for the component. */
@@ -199,17 +266,5 @@ apogeeapp.app.LinkEntry.prototype.getMenuItems = function() {
     menuItemList.push(itemInfo);
     
     return menuItemList;
-}
-
-/** THis is used to give an id to the link entries 
- * @private */
-apogeeapp.app.LinkEntry.nextId = 1;
-
-/** This method generates a member ID for the member. It is only valid
- * for the duration the workspace is opened. It is not persisted.
- * @private
- */
-apogeeapp.app.LinkEntry._createId = function() {
-    return apogeeapp.app.LinkEntry.nextId++;
 }
 
