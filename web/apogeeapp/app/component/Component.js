@@ -1,10 +1,10 @@
 /** This is the base functionality for a component. */
-apogeeapp.app.Component = function(workspaceUI,member,staticComponentObject) {
+apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
     
     this.workspaceUI = workspaceUI;
     this.member = member;
     this.uiActiveParent = null;
-    this.staticComponentObject = staticComponentObject;
+    this.componentGenerator = componentGenerator;
    
     this.workspaceUI.registerMember(this.member,this);
     
@@ -60,11 +60,11 @@ apogeeapp.app.Component.prototype.getMember = function() {
 
 /** This method returns the icon url for the component. */
 apogeeapp.app.Component.prototype.getIconUrl = function() {
-    if(this.staticComponentObject.ICON_URL) {
-        return this.staticComponentObject.ICON_URL;
+    if(this.componentGenerator.ICON_URL) {
+        return this.componentGenerator.ICON_URL;
     }
     else {
-        var resPath = this.staticComponentObject.ICON_RES_PATH;
+        var resPath = this.componentGenerator.ICON_RES_PATH;
         if(!resPath) resPath = apogeeapp.app.Component.DEFAULT_ICON_RES_PATH;
         return apogeeapp.ui.getResourcePath(resPath);
     }
@@ -176,7 +176,7 @@ apogeeapp.app.Component.prototype.closeTabDisplay = function() {
 /** This serializes the component. */
 apogeeapp.app.Component.prototype.toJson = function() {
     var json = {};
-    json.type = this.staticComponentObject.uniqueName;
+    json.type = this.componentGenerator.uniqueName;
     
     if(this.windowDisplay != null) {
         this.windowDisplayStateJson = this.windowDisplay.getStateJson();
@@ -349,8 +349,8 @@ apogeeapp.app.Component.prototype.getPropertyValues = function() {
     if(member.generator.addPropFunction) {
         member.generator.addPropFunction(member,values);
     }
-    if(this.staticComponentObject.addPropFunction) {
-        this.staticComponentObject.addPropFunction(this,values);
+    if(this.componentGenerator.addPropFunction) {
+        this.componentGenerator.addPropFunction(this,values);
     }
     return values;
 }
@@ -432,10 +432,10 @@ apogeeapp.app.Component.prototype.createDeleteCallback = function() {
 //======================================
 
 //this creates a component from a member and component options (not property values!)
-apogeeapp.app.Component.createComponentFromMember = function(staticComponentObject,workspaceUI,member,userInputValues,serializedValues) {
+apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,workspaceUI,member,userInputValues,serializedValues) {
     
     //create empty component
-    var component = new staticComponentObject(workspaceUI,member);
+    var component = new componentGenerator(workspaceUI,member);
 
     //apply any serialized values
     if(serializedValues) {

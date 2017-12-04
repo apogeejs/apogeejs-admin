@@ -7,7 +7,7 @@ apogeeapp.app.addcomponent = {};
 //=====================================
 
 /** This gets a callback to add a component. */
-apogeeapp.app.addcomponent.getAddComponentCallback = function(app,generator,optionalInitialValues,optionalComponentOptions) {
+apogeeapp.app.addcomponent.getAddComponentCallback = function(app,componentGenerator,optionalInitialValues,optionalComponentJson) {
     
     var createCallback = function() {
         //get the active workspace
@@ -17,8 +17,8 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,generator,opti
             return;
         }     
         
-        var displayName = generator.displayName
-        var additionalLines = apogee.util.jsonCopy(generator.propertyDialogLines); 
+        var displayName = componentGenerator.displayName
+        var additionalLines = apogee.util.jsonCopy(componentGenerator.propertyDialogLines); 
         
         //get the folder list
         var folderMap = workspaceUI.getFolders();
@@ -31,20 +31,20 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,generator,opti
         var dialogLayout = apogeeapp.app.propdialog.getDialogLayout(displayName,folderList,additionalLines,true,optionalInitialValues);
         
         //create on submit callback
-        var onSubmitFunction = function(propertyValues) {
+        var onSubmitFunction = function(userInputValues) {
             
             //validate name
-            var nameResult = apogee.codeCompiler.validateTableName(propertyValues.name);
+            var nameResult = apogee.codeCompiler.validateTableName(userInputValues.name);
             if(!nameResult.valid) {
                 alert(nameResult.errorMessage);
                 return false;
             }
             
             //get the parent object
-            propertyValues.parent = folderMap[propertyValues.parentName];
+            userInputValues.parent = folderMap[userInputValues.parentName];
             
             //create the member
-            var createAction = generator.getMemberCreateAction(propertyValues);
+            var createAction = componentGenerator.getMemberCreateAction(userInputValues);
             var actionResponse = apogee.action.doAction(createAction,true);
             var member = createAction.member;
             
@@ -53,7 +53,7 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,generator,opti
             }
             else {
                 //create the component
-                apogeeapp.app.Component.createComponentFromMember(generator,workspaceUI,member,propertyValues,optionalComponentOptions);
+                apogeeapp.app.Component.createComponentFromMember(componentGenerator,workspaceUI,member,userInputValues,optionalComponentJson);
             }
             
             //return true to close the dialog
@@ -70,13 +70,13 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,generator,opti
 
 /** This gets a callback to add an "additional" component, menaing one that is not
  * in the main component menu. */
-apogeeapp.app.addcomponent.getAddAdditionalComponentCallback = function(app,optionalInitialValues,optionalComponentOptions) {
+apogeeapp.app.addcomponent.getAddAdditionalComponentCallback = function(app,optionalInitialValues,optionalComponentJson) {
     return function() {
     
         var onSelect = function(componentType) {
-            var generator = app.getComponentGenerator(componentType);
-            if(generator) {
-                var doAddComponent = apogeeapp.app.addcomponent.getAddComponentCallback(app,generator,optionalInitialValues,optionalComponentOptions);
+            var componentGenerator = app.getComponentGenerator(componentType);
+            if(componentGenerator) {
+                var doAddComponent = apogeeapp.app.addcomponent.getAddComponentCallback(app,componentGenerator,optionalInitialValues,optionalComponentJson);
                 doAddComponent();
             }
             else {

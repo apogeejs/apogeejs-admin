@@ -180,7 +180,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.loadWindowFrameEntry = functi
         this.windowFrame.setSize(this.options.sizeInfo.width,this.options.sizeInfo.height);
     }
     else {
-        this.windowFrame.setSize(this.component.staticComponentObject.DEFAULT_WIDTH,this.component.staticComponentObject.DEFAULT_HEIGHT);
+        this.windowFrame.setSize(this.component.componentGenerator.DEFAULT_WIDTH,this.component.componentGenerator.DEFAULT_HEIGHT);
     }
 
     //header manager - for banner and toolbars

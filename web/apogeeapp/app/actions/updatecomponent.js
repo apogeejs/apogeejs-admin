@@ -9,12 +9,12 @@ apogeeapp.app.updatecomponent = {};
 /** This method gets a callback to update the properties of a component. */
 apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
     
-    var staticComponentObject = component.staticComponentObject;
+    var componentGenerator = component.componentGenerator;
     
     var createCallback = function() {
         
-        var displayName = staticComponentObject.displayName
-        var additionalLines = apogee.util.jsonCopy(staticComponentObject.propertyDialogLines); 
+        var displayName = componentGenerator.displayName
+        var additionalLines = apogee.util.jsonCopy(componentGenerator.propertyDialogLines); 
         
         var workspaceUI = component.getWorkspaceUI(); 
         var initialValues = component.getPropertyValues(); 
@@ -134,8 +134,8 @@ apogeeapp.app.updatecomponent.updatePropertyValues = function(component,oldValue
     }
     
     //update an component additional properties
-    if(component.staticComponentObject.updateProperties) {
-        component.staticComponentObject.updateProperties(component,oldValues,newValues,actionResponse);
+    if(component.componentGenerator.updateProperties) {
+        component.componentGenerator.updateProperties(component,oldValues,newValues,actionResponse);
     }
         
     return actionResponse;

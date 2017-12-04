@@ -354,22 +354,5 @@ apogeeapp.app.CustomControlComponent.propertyDialogLines = [
     }
 ];
 
-//apogeeapp.app.CustomControlComponent.generator = {};
-//apogeeapp.app.CustomControlComponent.generator.displayName = "Custom Control";
-//apogeeapp.app.CustomControlComponent.generator.uniqueName = "apogeeapp.app.CustomControlComponent";
-//apogeeapp.app.CustomControlComponent.generator.constructor = apogeeapp.app.CustomControlComponent;
-//apogeeapp.app.CustomControlComponent.generator.getMemberCreateAction = apogeeapp.app.CustomControlComponent.getMemberCreateAction;
-//apogeeapp.app.CustomControlComponent.generator.DEFAULT_WIDTH = 500;
-//apogeeapp.app.CustomControlComponent.generator.DEFAULT_HEIGHT = 500;
-//apogeeapp.app.CustomControlComponent.generator.ICON_RES_PATH = "/controlIcon.png";
-//
-//apogeeapp.app.CustomControlComponent.generator.propertyDialogLines = [
-//    {
-//        "type":"checkbox",
-//        "heading":"Destroy on Hide: ",
-//        "resultKey":"destroyOnHide"
-//    }
-//];
-
 
 

@@ -91,15 +91,6 @@ apogeeapp.app.GridTableComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.GridTableComponent.DEFAULT_HEIGHT = 300;
 apogeeapp.app.GridTableComponent.ICON_RES_PATH = "/gridIcon.png";
 
-//apogeeapp.app.GridTableComponent.generator = {};
-//apogeeapp.app.GridTableComponent.generator.displayName = "Grid Table";
-//apogeeapp.app.GridTableComponent.generator.uniqueName = "apogeeapp.app.GridTableComponent";
-//apogeeapp.app.GridTableComponent.generator.constructor = apogeeapp.app.GridTableComponent;
-//apogeeapp.app.GridTableComponent.generator.getMemberCreateAction = apogeeapp.app.GridTableComponent.getMemberCreateAction;
-//apogeeapp.app.GridTableComponent.generator.DEFAULT_WIDTH = 300;
-//apogeeapp.app.GridTableComponent.generator.DEFAULT_HEIGHT = 300;
-//apogeeapp.app.GridTableComponent.generator.ICON_RES_PATH = "/gridIcon.png";
-
 //======================================
 // Use the json table code wrapper
 //======================================

@@ -70,7 +70,7 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
     	
 		//if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {
-            apogeeapp.app.openworkspace.loadWorkspace(workspaceUI,workspaceJson);
+            workspaceUI.load(workspaceJson);
             actionCompletedCallback(actionResponse);
         }
         
@@ -93,12 +93,6 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
         actionCompletedCallback(actionResponse);
     }
 }
-
-/** This method loads an existing workspace into an empty workspace UI. */
-apogeeapp.app.openworkspace.loadWorkspace = function(workspaceUI,workspaceJson,actionResponse) {
-    workspaceUI.load(workspaceJson);
-}
-
 
 //------------------------
 // open from url

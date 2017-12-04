@@ -81,24 +81,3 @@ apogeeapp.app.FolderComponent.propertyDialogLines = [
 apogeeapp.app.FolderComponent.appendWorkspaceChildren = function(optionsJson,childrenJson) {
     optionsJson.children = childrenJson;
 }
-
-//apogeeapp.app.FolderComponent.generator = {};
-//apogeeapp.app.FolderComponent.generator.displayName = "Folder";
-//apogeeapp.app.FolderComponent.generator.uniqueName = "apogeeapp.app.FolderComponent";
-//apogeeapp.app.FolderComponent.generator.constructor = apogeeapp.app.FolderComponent;
-//apogeeapp.app.FolderComponent.generator.getMemberCreateAction = apogeeapp.app.FolderComponent.getMemberCreateAction;
-//apogeeapp.app.FolderComponent.generator.DEFAULT_WIDTH = 500;
-//apogeeapp.app.FolderComponent.generator.DEFAULT_HEIGHT = 500;
-//apogeeapp.app.FolderComponent.generator.ICON_RES_PATH = "/folderIcon.png";
-//
-//apogeeapp.app.FolderComponent.generator.propertyDialogLines = [
-//    {
-//        "type":"invisible",
-//        "resultKey":"children"
-//    }
-//];
-//
-////if we want to allow importing a workspace as this object, we must add this method to the generator
-//apogeeapp.app.FolderComponent.generator.appendWorkspaceChildren = function(optionsJson,childrenJson) {
-//    optionsJson.children = childrenJson;
-//}

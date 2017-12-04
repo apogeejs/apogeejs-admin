@@ -89,15 +89,3 @@ apogeeapp.app.TextComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.TextComponent.DEFAULT_HEIGHT = 300;
 apogeeapp.app.TextComponent.ICON_RES_PATH = "/textIcon.png";
 
-//apogeeapp.app.TextComponent.generator = {};
-//apogeeapp.app.TextComponent.generator.displayName = "Text Table";
-//apogeeapp.app.TextComponent.generator.uniqueName = "apogeeapp.app.TextComponent";
-//apogeeapp.app.TextComponent.generator.constructor = apogeeapp.app.TextComponent;
-//apogeeapp.app.TextComponent.generator.getMemberCreateAction = apogeeapp.app.TextComponent.getMemberCreateAction;
-//apogeeapp.app.TextComponent.generator.DEFAULT_WIDTH = 300;
-//apogeeapp.app.TextComponent.generator.DEFAULT_HEIGHT = 300;
-//apogeeapp.app.TextComponent.generator.ICON_RES_PATH = "/textIcon.png";
-
-
-
-

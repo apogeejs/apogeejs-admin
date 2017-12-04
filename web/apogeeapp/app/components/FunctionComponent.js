@@ -95,22 +95,3 @@ apogeeapp.app.FunctionComponent.propertyDialogLines = [
         "resultKey":"argListString"
     }
 ];
-
-//apogeeapp.app.FunctionComponent.generator = {};
-//apogeeapp.app.FunctionComponent.generator.displayName = "Function";
-//apogeeapp.app.FunctionComponent.generator.uniqueName = "apogeeapp.app.FunctionComponent";
-//apogeeapp.app.FunctionComponent.generator.constructor = apogeeapp.app.FunctionComponent;
-//apogeeapp.app.FunctionComponent.generator.getMemberCreateAction = apogeeapp.app.FunctionComponent.getMemberCreateAction;
-//apogeeapp.app.FunctionComponent.generator.DEFAULT_WIDTH = 400;
-//apogeeapp.app.FunctionComponent.generator.DEFAULT_HEIGHT = 400;
-//apogeeapp.app.FunctionComponent.generator.ICON_RES_PATH = "/functionIcon.png";
-//
-//apogeeapp.app.FunctionComponent.generator.propertyDialogLines = [
-//    {
-//        "type":"inputElement",
-//        "heading":"Arg List: ",
-//        "resultKey":"argListString"
-//    }
-//];
-
- 

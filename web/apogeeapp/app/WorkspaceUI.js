@@ -211,27 +211,6 @@ apogeeapp.app.WorkspaceUI.prototype.workspaceUpdated = function() {
     
     //update name
     this.treeEntry.setLabel(this.workspace.getName());
-
-    
-    //get the banner info
-//    var workspace = this.getWorkspace();
-//    if(workspace.hasError()) {
-//        var errorMsg = "";
-//        var actionErrors = workspace.getErrors();
-//        for(var i = 0; i < actionErrors.length; i++) {
-//            errorMsg += actionErrors[i].msg + "\n";
-//        }
-//        
-//        this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR;
-//        this.bannerMessage = errorMsg;
-//    }
-//    else {   
-//        this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
-//        this.bannerMessage = null;
-//    }
-    
-    
-//    this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
 }
 
 //====================================
@@ -300,20 +279,20 @@ apogeeapp.app.WorkspaceUI.prototype.getFolderComponentContentJson = function(fol
     return json;
 }
 
-apogeeapp.app.WorkspaceUI.prototype.loadComponentFromJson = function(member,json) {
-    var componentType = json.type;
-    var generator = this.app.getComponentGenerator(componentType);
-	if(generator) {
-        return apogeeapp.app.Component.createComponentFromMember(generator,this,member,null,json);
+apogeeapp.app.WorkspaceUI.prototype.loadComponentFromJson = function(member,componentJson) {
+    var componentType = componentJson.type;
+    var componentGenerator = this.app.getComponentGenerator(componentType);
+	if(componentGenerator) {
+        return apogeeapp.app.Component.createComponentFromMember(componentGenerator,this,member,null,componentJson);
     }
     else {
         throw apogee.base.createError("Component type not found: " + componentType);
     }
 }
 
-apogeeapp.app.WorkspaceUI.prototype.loadFolderComponentContentFromJson = function(folder,json) {
-	for(var key in json) {
-		var childJson = json[key];
+apogeeapp.app.WorkspaceUI.prototype.loadFolderComponentContentFromJson = function(folder,childrenJson) {
+	for(var key in childrenJson) {
+		var childJson = childrenJson[key];
 		var childMember = folder.lookupChild(key);	
 		this.loadComponentFromJson(childMember,childJson);
 	}

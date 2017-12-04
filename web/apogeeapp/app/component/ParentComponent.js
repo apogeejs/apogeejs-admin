@@ -1,8 +1,8 @@
 /** This is the base class for a parent component (an object that has children),
  * It extends the component class. */
-apogeeapp.app.ParentComponent = function(workspaceUI,member,staticComponentObject) {
+apogeeapp.app.ParentComponent = function(workspaceUI,member,componentGenerator) {
     //base constructor
-	apogeeapp.app.Component.call(this,workspaceUI,member,staticComponentObject);
+	apogeeapp.app.Component.call(this,workspaceUI,member,componentGenerator);
 }
 
 apogeeapp.app.ParentComponent.prototype = Object.create(apogeeapp.app.Component.prototype);

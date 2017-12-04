@@ -104,38 +104,3 @@ apogeeapp.app.FolderFunctionComponent.appendWorkspaceChildren = function(options
     apogeeapp.app.FolderComponent.generator.appendWorkspaceChildren(internalFolderJson,childrenJson);
     optionsJson.internalFolder = internalFolderJson;
 }
-
-//apogeeapp.app.FolderFunctionComponent.generator = {};
-//apogeeapp.app.FolderFunctionComponent.generator.displayName = "Folder Function";
-//apogeeapp.app.FolderFunctionComponent.generator.uniqueName = "apogeeapp.app.FolderFunctionComponent";
-//apogeeapp.app.FolderFunctionComponent.generator.constructor = apogeeapp.app.FolderFunctionComponent;
-//apogeeapp.app.FolderFunctionComponent.generator.getMemberCreateAction = apogeeapp.app.FolderFunctionComponent.getMemberCreateAction;
-//apogeeapp.app.FolderFunctionComponent.generator.DEFAULT_WIDTH = 500;
-//apogeeapp.app.FolderFunctionComponent.generator.DEFAULT_HEIGHT = 500;
-//apogeeapp.app.FolderFunctionComponent.generator.ICON_RES_PATH = "/functionFolderIcon.png";
-//
-//apogeeapp.app.FolderFunctionComponent.generator.propertyDialogLines = [
-//    {
-//        "type":"inputElement",
-//        "heading":"Arg List: ",
-//        "resultKey":"argListString"
-//    },
-//    {
-//        "type":"inputElement",
-//        "heading":"Return Val: ",
-//        "resultKey":"returnValueString"
-//    },
-//    {
-//        "type":"invisible",
-//        "resultKey":"internalFolder"
-//    }
-//];
-//
-////if we want to allow importing a workspace as this object, we must add this method to the generator
-//apogeeapp.app.FolderFunctionComponent.generator.appendWorkspaceChildren = function(optionsJson,childrenJson) {
-//    var internalFolderJson = {};
-//    internalFolderJson.name = optionsJson.name;
-//    internalFolderJson.type = apogee.Folder.generator.type;
-//    apogeeapp.app.FolderComponent.generator.appendWorkspaceChildren(internalFolderJson,childrenJson);
-//    optionsJson.internalFolder = internalFolderJson;
-//}
