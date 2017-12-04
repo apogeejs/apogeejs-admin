@@ -96,21 +96,7 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
 
 /** This method loads an existing workspace into an empty workspace UI. */
 apogeeapp.app.openworkspace.loadWorkspace = function(workspaceUI,workspaceJson,actionResponse) {
-    var workspaceDataJson = workspaceJson.workspace;
-    var workspaceComponentsJson = workspaceJson.components;
-
-    var workspace = new apogee.Workspace(workspaceDataJson,actionResponse);
-    
-    workspaceUI.setWorkspace(workspace,workspaceComponentsJson);
-    
-        
-    //this is messy putting this here - clean it up
-    if(workspaceJson.activeTabMember) {
-        var activeTabMember = workspace.getMemberByFullName(workspaceJson.activeTabMember);
-        if(activeTabMember) {
-            workspaceUI.tabFrame.setActiveTab(activeTabMember.getId());
-        }
-    }
+    workspaceUI.load(workspaceJson);
 }
 
 

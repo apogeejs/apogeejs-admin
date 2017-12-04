@@ -168,7 +168,7 @@ apogeeapp.webapp.WorkspaceUI.prototype.loadComponentFromJson = function(member,j
     var componentType = json.type;
     var generator = this.app.getComponentGenerator(componentType);
 	if(generator) {
-        generator.createComponentFromMember(this,member,json);
+        apogeeapp.app.Component.createComponentFromMember(generator,this,member,null,json);
     }
     else {
         throw apogee.base.createError("Component type not found: " + componentType);

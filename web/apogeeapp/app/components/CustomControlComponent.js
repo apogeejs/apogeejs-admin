@@ -283,7 +283,7 @@ apogeeapp.app.CustomControlComponent.addPropFunction = function(component,values
     values.destroyOnHide = component.getDestroyOnInactive();
 }
 
-apogeeapp.app.CustomControlComponent.updateProperties = function(component,oldValues,newValues,actionResponse) {
+apogeeapp.app.CustomControlComponent.updateProperties = function(component,oldValues,newValues) {
     component.setDestroyOnInactive(newValues.destroyOnHide);
 }
 

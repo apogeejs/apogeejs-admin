@@ -59,43 +59,26 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,parentGenerator,works
         //parse the workspace json
         var workspaceJson = JSON.parse(workspaceText);
 
-//I should verify the file type and format!    
-    
-        //add links, if applicable
-		var jsLinks;
-		var cssLinks;
-        var linksAdded = false;
-        if((workspaceJson.jsLinks)&&(workspaceJson.jsLinks.length > 0)) {
-            jsLinks = workspaceJson.jsLinks;
-            linksAdded = true;
-        }
-		else {
-			jsLinks = [];
-		}
-        if((workspaceJson.cssLinks)&&(workspaceJson.cssLinks.length > 0)) {
-			cssLinks = workspaceJson.cssLinks;
-            linksAdded = true;
-        }
-		else {
-			cssLinks = [];
-		}
-        
+//I should verify the file type and format!  
+
+        var libraryJson = workspaceJson.library;
+        var loadLibraryPromise = workspaceUI.loadLibrary(libraryJson);
     	
 		//if we have to load links wait for them to load
         var newParentOptionsJson = {};
         newParentOptionsJson.name = workspaceJson.workspace.data.name;
         parentGenerator.appendWorkspaceChildren(newParentOptionsJson,workspaceJson.workspace.data.children);
-        var newChildComponentsJson = {};
-        newChildComponentsJson.children = workspaceJson.components;
-		var workspaceImportDialogFunction = apogeeapp.app.addcomponent.getAddComponentCallback(app,parentGenerator,newParentOptionsJson,newChildComponentsJson);
+        var serializedComponentsJson = workspaceJson.components;
+		var workspaceImportDialogFunction = apogeeapp.app.addcomponent.getAddComponentCallback(app,parentGenerator,newParentOptionsJson,serializedComponentsJson);
         
-        if(linksAdded) {
-			workspaceUI.setLinks(jsLinks,cssLinks,workspaceImportDialogFunction);
-		}
-		else {
-			//immediately load the workspace - no links to wait for
+        var linkLoadError = function(errorMsg) {
+            alert("Error loading links: " + errorMsg);
+            //load the workspace anyway
             workspaceImportDialogFunction();
-		}
+        }
+        
+        //THIS NEEDS TO BE CLEANED UP - ESPECIALLY ERROR HANDLING
+        loadLibraryPromise.then(workspaceImportDialogFunction).catch(linkLoadError);
     }
     catch(error) {
         //figure out what to do here???

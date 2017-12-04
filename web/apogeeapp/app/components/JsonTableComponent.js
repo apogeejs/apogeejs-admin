@@ -125,7 +125,7 @@ apogeeapp.app.JsonTableComponent.addPropFunction = function(component,values) {
     values.dataView = component.getDataView();
 }
 
-apogeeapp.app.JsonTableComponent.updateProperties = function(component,oldValues,newValues,actionResponse) {
+apogeeapp.app.JsonTableComponent.updateProperties = function(component,oldValues,newValues) {
     component.setDataView(newValues.dataView);
 }
 

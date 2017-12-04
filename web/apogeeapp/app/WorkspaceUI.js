@@ -41,18 +41,30 @@ apogeeapp.app.WorkspaceUI.prototype.getApp = function() {
   * if the workspace is not empty, such as when opening a existing workspace. It
   * contains the data for the component associated with each workspace member. For 
   * a new empty workspace the componentsJson should be omitted. */
-apogeeapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, componentsJson) {   
-    this.workspace = workspace; 
+apogeeapp.app.WorkspaceUI.prototype.load = function(workspaceJson,actionResponse) { 
     
-    //set up the root folder
-    var rootFolder = this.workspace.getRoot();
-    if(!componentsJson) {
-        componentsJson = apogeeapp.app.FolderComponent.EMPTY_FOLDER_COMPONENT_JSON;
+    var workspaceDataJson;
+    var workspaceComponentsJson;
+    
+    if(workspaceJson) {
+        workspaceDataJson = workspaceJson.workspace;
+        workspaceComponentsJson = workspaceJson.components;
     }
-    var rootFolderComponent = this.loadComponentFromJson(rootFolder,componentsJson);
+    else {
+        workspaceDataJson = undefined;
+        workspaceComponentsJson = apogeeapp.app.FolderComponent.EMPTY_FOLDER_COMPONENT_JSON;
+    }
+
+    //create workspace
+    this.workspace = new apogee.Workspace(workspaceDataJson,actionResponse);
+    
+    //set up the root folder conmponent, with children if applicable
+    var rootFolder = this.workspace.getRoot();
+    var rootFolderComponent = this.loadComponentFromJson(rootFolder,workspaceComponentsJson);
 
     //set up the tree
     this.treeEntry = this.createTreeEntry();
+    this.treeEntry.setState(apogeeapp.ui.treecontrol.EXPANDED);
     this.tree.setRootEntry(this.treeEntry);
     this.treeEntry.addChild("library",this.libraryManager.getTreeEntry());
     this.treeEntry.addChild("rootFolder",rootFolderComponent.getTreeEntry());
@@ -61,6 +73,14 @@ apogeeapp.app.WorkspaceUI.prototype.setWorkspace = function(workspace, component
     this.workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT, member => this.memberUpdated(member));
     this.workspace.addListener(apogee.deletemember.MEMBER_DELETED_EVENT, member => this.childDeleted(member));
     this.workspace.addListener(apogee.updateworkspace.WORKSPACE_UPDATED_EVENT, () => this.workspaceUpdated());
+    
+    //this is messy putting this here - clean it up
+    if(workspaceJson.activeTabMember) {
+        var activeTabMember = this.workspace.getMemberByFullName(workspaceJson.activeTabMember);
+        if(activeTabMember) {
+           this.tabFrame.setActiveTab(activeTabMember.getId());
+        }
+    }
 }
 
 /** This method gets the workspace object. */
@@ -284,7 +304,7 @@ apogeeapp.app.WorkspaceUI.prototype.loadComponentFromJson = function(member,json
     var componentType = json.type;
     var generator = this.app.getComponentGenerator(componentType);
 	if(generator) {
-        return apogeeapp.app.Component.createComponentFromMember(generator,this,member,json);
+        return apogeeapp.app.Component.createComponentFromMember(generator,this,member,null,json);
     }
     else {
         throw apogee.base.createError("Component type not found: " + componentType);

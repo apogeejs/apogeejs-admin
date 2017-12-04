@@ -1,7 +1,5 @@
 {
 	"fileType": "apogee js web workspace",
-	"jsLinks": [],
-	"cssLinks": [],
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
@@ -114,5 +112,7 @@
 				"dataView": "Plain"
 			}
 		}
-	}
+	},
+	"library": [],
+	"version": 0.31
 }

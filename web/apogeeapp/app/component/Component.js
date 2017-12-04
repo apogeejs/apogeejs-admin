@@ -431,40 +431,8 @@ apogeeapp.app.Component.prototype.createDeleteCallback = function() {
 // Static methods
 //======================================
 
-//This creates a component and a member from property values and component options, 
-apogeeapp.app.Component.createComponent = function(staticComponentObject,workspaceUI,userInputValues,serializedValues) {
-    
-
-    //create the member
-    var createAction = staticComponentObject.getMemberCreateAction(userInputValues);
-    var actionResponse = apogee.action.doAction(createAction,true);
-    var member = createAction.member;
-    
-    if(member) {
-
-        //create empty component
-        var component = new staticComponentObject(workspaceUI,member);
-        actionResponse.component = component;
-        
-        //apply any serialized values
-        if(serializedValues) {
-            component.loadSerializedValues(serializedValues);
-        }
-
-        //apply any user input (property dialog) values
-        if(component.updateProperties) {
-            component.updateProperties(component,null,userInputValues,actionResponse);
-        }
-        
-        //call member updated to process and notify of component creation
-        component.memberUpdated();
-    }
-
-    return actionResponse;
-}
-
 //this creates a component from a member and component options (not property values!)
-apogeeapp.app.Component.createComponentFromMember = function(staticComponentObject,workspaceUI,member,serializedValues) {
+apogeeapp.app.Component.createComponentFromMember = function(staticComponentObject,workspaceUI,member,userInputValues,serializedValues) {
     
     //create empty component
     var component = new staticComponentObject(workspaceUI,member);
@@ -472,6 +440,11 @@ apogeeapp.app.Component.createComponentFromMember = function(staticComponentObje
     //apply any serialized values
     if(serializedValues) {
         component.loadSerializedValues(serializedValues);
+    }
+    
+    //apply any user input (property dialog) values
+    if((userInputValues)&&(component.updateProperties)) {
+        component.updateProperties(component,null,userInputValues);
     }
 
     //call member updated to process and notify of component creation

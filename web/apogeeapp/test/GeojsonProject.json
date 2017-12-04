@@ -1,12 +1,5 @@
 {
 	"fileType": "apogee js web workspace",
-	"jsLinks": [
-		"http://localhost:8383/lib/controls/simpleGeojsonControl/SimpleGeojsonControl.js",
-		"https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"
-	],
-	"cssLinks": [
-		"https://unpkg.com/leaflet@1.0.1/dist/leaflet.css"
-	],
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
@@ -318,5 +311,20 @@
 				}
 			}
 		}
-	}
+	},
+	"library": [
+		{
+			"url": "http://localhost:8383/lib/controls/simpleGeojsonControl/SimpleGeojsonControl.js",
+			"entryType": "js link"
+		},
+		{
+			"url": "https://unpkg.com/leaflet@1.0.1/dist/leaflet.js",
+			"entryType": "js link"
+		},
+		{
+			"url": "https://unpkg.com/leaflet@1.0.1/dist/leaflet.css",
+			"entryType": "css link"
+		}
+	],
+	"version": 0.31
 }

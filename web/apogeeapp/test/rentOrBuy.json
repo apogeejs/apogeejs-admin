@@ -1,10 +1,5 @@
 {
 	"fileType": "apogee js web workspace",
-	"jsLinks": [
-		"https://www.gstatic.com/charts/loader.js",
-		"http://localhost:8383/lib/controls/googleChart/GoogleChartComponent.js"
-	],
-	"cssLinks": [],
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
@@ -1002,5 +997,16 @@
 				}
 			}
 		}
-	}
+	},
+	"library": [
+		{
+			"url": "https://www.gstatic.com/charts/loader.js",
+			"entryType": "js link"
+		},
+		{
+			"url": "http://localhost:8383/lib/controls/googleChart/GoogleChartComponent.js",
+			"entryType": "js link"
+		}
+	],
+	"version": 0.31
 }
