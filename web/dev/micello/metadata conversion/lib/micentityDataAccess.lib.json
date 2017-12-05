@@ -1,1 +1,938 @@
-{"fileType":"apogee workspace","jsLinks":[],"cssLinks":[],"workspace":{"fileType":"apogee workspace","version":0.2,"data":{"name":"micentityDataAccess","type":"apogee.Folder","children":{"createRecord":{"name":"createRecord","type":"apogee.FunctionTable","updateData":{"argList":["recordType","fieldMap"],"functionBody":"var record = {};\n\nvar recordInfo = getRecordInfo(recordType);\n\nrecord.Id = getId();\nrecord.Type = recordInfo.name;\nrecord.Fields = fieldMap;\nrecord.read_perm = READ_PERM;\nrecord.edit_perm = EDIT_PERM;\n\nreturn record;","supplementalCode":"var READ_PERM = 2;\nvar EDIT_PERM = 15;\n\nvar nextId = -1;\n\nfunction getId() {\n    return nextId--;\n}","description":"This method creates a record given the field values and record info \nfrom the data set info. It creates and ID and uses standard permissions."}},"recordsToCreateInstructions":{"name":"recordsToCreateInstructions","type":"apogee.FunctionTable","updateData":{"argList":["recordList"],"functionBody":"var instructions = [];\n\nfor(var i = 0; i < recordList.length; i++) {\n    var createRecord = recordList[i];\n    var instruction = createCreateInstruction(createRecord);\n    instructions.push(instruction);\n}\n\nreturn instructions;","supplementalCode":"","description":"This creates a list of create instructions to go along with a list of records to be created.\n\nThere is the option to assign the ID or to leave it as undefined, in which case\nan automatically incremented ID will be assigned. (For consistency in the data\nset, either all records should be preassigned or all records should be \nautomatically assigned."}},"createCommitBody":{"name":"createCommitBody","type":"apogee.FunctionTable","updateData":{"argList":["instructionList","commitMessage"],"functionBody":"var commit = {};\nvar actions = [];\n\nif(commitMessage.length === 0) throw new Error(\"Commit message missing!\");\n\ncommit.Name = dataSetInfo.name;\ncommit.Message = commitMessage;\ncommit.Actions = actions;\n\n//single action with commits\nvar action = {};\naction.Title = \"bulk create commit\";\naction.Instr = instructionList;\nactions.push(action);\n\nreturn commit","supplementalCode":"","description":"This creates a body for a commit request, given a list of instructions and a commit message."}},"createRequestOptions":{"name":"createRequestOptions","type":"apogee.FunctionTable","updateData":{"argList":["bodyJson","sessionKey"],"functionBody":"var header = {};\nheader[\"Content-Type\"] = \"text/plain;charset=UTF-8\";\nheader.sessionKey = sessionKey;\nheader[\"proto-version\"] = \"4.0\";\nheader[\"db-version\"] = dataSetInfo.version;\n\nrequestInfo = {};\nrequestInfo.header = header;\nif(bodyJson) {\n    requestInfo.method = \"POST\";\n    requestInfo.body = JSON.stringify(bodyJson);\n}\n\nreturn requestInfo;\n","supplementalCode":"","description":"This creates the requestOptions, suitable for apogee.net.jsonRequest, to go with an type of request to the workingset (micemetarequest) server."}},"host":{"name":"host","type":"apogee.JsonTable","updateData":{"data":"http://factory.micello.com/micemapsws","description":""}},"commitUrl":{"name":"commitUrl","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var value;\nvalue = host + \"/commit\";\nreturn value;\n\n","supplementalCode":"","description":""}},"requestUrl":{"name":"requestUrl","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var value;\nvalue = host + \"/cannedsearch\";\nreturn value;\n\n","supplementalCode":"","description":""}},"createUpdateInstruction":{"name":"createUpdateInstruction","type":"apogee.FunctionTable","updateData":{"argList":["initialRecord","targetRecord"],"functionBody":"if(initialRecord.Id != targetRecord.Id) {\n    throw new Error(\"Record ID mismatch in create update instruction for target record: \" + getRecordErrString(targetRecord));\n}\n\nif(initialRecord.Type != targetRecord.Type) {\n    throw new Error(\"Inital and target record types do not match. Target record: \" + getRecordErrString(targetRecord));\n}\n\nvar recordsDifferent = false;\n\nvar recordInfo = getRecordInfo(initialRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Update\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = initialRecord.Id;\n\ninstruction.initialReadPerm = initialRecord.read_perm;\ninstruction.initialEditPerm = initialRecord.edit_perm;\n\nif(initialRecord.readPerm != targetRecord.readPerm) {\n    instruction.targetReadPerm = targetRecord.read_perm;\n    recordsDifferent = true;\n}\n\nif(initialRecord.editPerm != targetRecord.editPerm) {\n    instruction.targetEditPerm = targetRecord.edit_perm;\n    recordsDifferent = true;\n}\n\nvar initialData = {};\ninstruction.Initial = initialData;\nvar targetData = {};\ninstruction.Target = targetData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    \n    var initialValue;\n    var targetValue;\n    \n    var initialValue = initialRecord.Fields[field.name];\n    var targetValue = targetRecord.Fields[field.name];\n    \n    //validate target values\n    if(targetValue === undefined) {\n        //use default\n        targetValue = field.defaultValue;\n    }\n    \n    if(targetValue === undefined) {\n        throw new Error(\"Unknown problem: undefined field value: \" + getFieldErrString(targetRecord,field));\n    }\n    \n    if(targetValue === null) {\n        if(!field.nullOk) {\n            throw new Error(\"Illegal null value: \" + getFieldErrString(targetRecord,field));\n        }\n    }\n    \n    if(!fieldsMatch(initialValue,targetValue,field)) {\n        initialData[field.name] = initialValue;\n        targetData[field.name] = targetValue;\n        recordsDifferent = true;\n    }\n}\n\nif(recordsDifferent) {\n    return instruction;\n}\nelse {\n    return null;\n}\n","supplementalCode":"function fieldsMatch(initialValue,targetValue,fieldInfo) {\n    if(fieldInfo.fieldClass === \"java.lang.String\") {\n        //compare strings with \"==\"\n        return (initialValue == targetValue);\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"java.lang\")) {\n        //compare other basic values with \"===\"\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"com.micello\")) {\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONObject\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONArray\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else {\n        throw new Error(\"unrecognized field type: \" + fieldInfo.fieldClass);\n    }\n}\n\nfunction compareJsonData(a,b) {\n    var an = apogee.util.getNormalizedObjectCopy(a);\n    var bn = apogee.util.getNormalizedObjectCopy(b);\n    var aString = JSON.stringify(an);\n    var bString = JSON.stringify(bn);\n    return aString == bString;\n}\n    ","description":"This function creates an update instruction given an initial and target record. If the records are the same then NULL is returned. (No update is needed.)"}},"createCreateInstruction":{"name":"createCreateInstruction","type":"apogee.FunctionTable","updateData":{"argList":["createRecord"],"functionBody":"\nvar recordInfo = getRecordInfo(createRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Create\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = createRecord.Id;\n\ninstruction.targetReadPerm = createRecord.read_perm;\ninstruction.targetEditPerm = createRecord.edit_perm;\n\nvar targetData = {};\ninstruction.Target = targetData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    var targetValue;\n    var targetValue = createRecord.Fields[field.name];\n    if(targetValue === undefined) {\n        //use default\n        targetValue = field.defaultValue;\n    }\n    \n    if(targetValue === undefined) {\n        throw new Error(\"Unknown problem: undefined field value: \" + getFieldErrString(createRecord,field));\n    }\n    \n    if(targetValue === null) {\n        if(!field.nullOk) {\n            throw new Error(\"Illegal null value: \" + getFieldErrString(createRecord,field));\n        }\n    }\n    \n    targetData[field.name] = targetValue;\n}\n\nreturn instruction;\n","supplementalCode":"","description":""}},"getFieldErrString":{"name":"getFieldErrString","type":"apogee.FunctionTable","updateData":{"argList":["record","fieldInfo"],"functionBody":"return getRecordErrString(record) + \" - \" + fieldInfo.name;","supplementalCode":"","description":""}},"getRecordErrString":{"name":"getRecordErrString","type":"apogee.FunctionTable","updateData":{"argList":["record"],"functionBody":"return record.Type + \" \" + record.Id;","supplementalCode":"","description":""}},"createDeleteInstruction":{"name":"createDeleteInstruction","type":"apogee.FunctionTable","updateData":{"argList":["deleteRecord"],"functionBody":"\nvar recordInfo = getRecordInfo(deleteRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Delete\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = deleteRecord.Id;\n\ninstruction.initialReadPerm = deleteRecord.read_perm;\ninstruction.initialEditPerm = deleteRecord.edit_perm;\n\nvar initialData = {};\ninstruction.Initial = initialData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    var initialValue = deleteRecord.Fields[field.name];\n    \n    initialData[field.name] = initialValue;\n}\n\nreturn instruction;\n","supplementalCode":"","description":""}},"getRecordInfo":{"name":"getRecordInfo","type":"apogee.FunctionTable","updateData":{"argList":["recordType"],"functionBody":"var recordInfo = dataSetInfo.records[recordType];\n\nif(!recordInfo) {\n    throw new Error(\"Record type not found in getRecordInfo: \" + recordType);\n}\n\nreturn recordInfo;","supplementalCode":"","description":""}},"combinedEntriesToInstructionList":{"name":"combinedEntriesToInstructionList","type":"apogee.FunctionTable","updateData":{"argList":["combinedEntries"],"functionBody":"var output = [];\nfor(var key in combinedEntries) {\n    var entry = combinedEntries[key];\n    var instruction = getInstructionForCombinedEntry(entry);\n    if(instruction) {\n        output.push(instruction);\n    }\n}\n\nreturn output;","supplementalCode":"function getInstructionForCombinedEntry(combinedEntry) {\n    var newEntry = combinedEntry.newEntry;\n    var oldEntry = combinedEntry.oldEntry;\n    \n    if(newEntry) {\n        if(!oldEntry) {\n            console.log(\"Create: \" + newEntry.Id);\n            return createCreateInstruction(newEntry);\n        }\n        else {\n            //this will return null for matching records\n            console.log(\"Update(maybe): \" + newEntry.Id);\n            return createUpdateInstruction(oldEntry,newEntry);\n        }\n    }\n    else if(oldEntry) {\n        console.log(\"Delete: \" + oldEntry.Id);\n        return createDeleteInstruction(oldEntry);\n    }\n    \n    return null;\n}\n\nfunction entriesDifferent(entry1,entry2) {\n    var string1 = JSON.stringify(apogee.util.getNormalizedCopy(entry1));\n    var string2 = JSON.stringify(apogee.util.getNormalizedCopy(entry2));\n    return (string1 == string2);\n}","description":"This function takes a combined entry map of the format:\n\n{\n  \"some-identifier\":{\n    \"oldEntry\":{original record entry, if applicable},\n    \"newEntry\":{new record entry, if applicable}\n  },\n  ...\n}\n\nIt returns an instruction list.\n\n"}},"getCommitPromise":{"name":"getCommitPromise","type":"apogee.FunctionTable","updateData":{"argList":["instructionList","commitMessage","sessionKey"],"functionBody":"var commitBody = createCommitBody(instructionList,commitMessage);\nvar requestOptions = createRequestOptions(commitBody,sessionKey);\nvalue = apogee.net.jsonRequest(commitUrl,requestOptions);\nreturn value;","supplementalCode":"","description":""}},"getRequestPromise":{"name":"getRequestPromise","type":"apogee.FunctionTable","updateData":{"argList":["requestBody","sessionKey"],"functionBody":"var requestOptions = createRequestOptions(requestBody,sessionKey);\nvalue = apogee.net.jsonRequest(requestUrl,requestOptions);\nreturn value;","supplementalCode":"","description":""}},"dataSetInfo":{"name":"dataSetInfo","type":"apogee.JsonTable","updateData":{"data":{"name":"Micentity","records":{"chain":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"chain_id","remoteRecord":"chain_prop","orderField":"ordr","name":"props"}],"idField":"chain_id","name":"chain","recordClass":"com.micello.micentity.data.Chain","fields":[]},"entity":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"entity_id","remoteRecord":"entity_address","orderField":"address_order","name":"address_list"},{"restrictDelete":true,"isUnique":false,"remoteField":"entity_id","remoteRecord":"entity_prop","orderField":"ordr","name":"props"}],"idField":"entity_id","name":"entity","recordClass":"com.micello.micentity.data.Entity","fields":[{"fieldClass":"com.micello.micentity.data.CommunityEntity","name":"community_id","nullOk":false},{"fieldClass":"com.micello.micentity.data.Chain","name":"chain_id","nullOk":true},{"fieldClass":"java.lang.Boolean","name":"deleted","nullOk":false,"defaultValue":false}]},"chain_prop":{"foreignList":[],"idField":"chain_prop_id","name":"chain_prop","recordClass":"com.micello.micentity.data.ChainProp","fields":[{"fieldClass":"java.lang.Integer","name":"ordr","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micentity.data.Chain","name":"chain_id","nullOk":false},{"fieldClass":"java.lang.String","name":"key_name","nullOk":false},{"fieldClass":"java.lang.String","name":"key_value","nullOk":true},{"fieldClass":"java.lang.String","name":"lang","nullOk":true}]},"community":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"community_id","remoteRecord":"entity","name":"entities"},{"restrictDelete":true,"isUnique":false,"remoteField":"community_id","remoteRecord":"entity_address","name":"entity_addresses"},{"restrictDelete":true,"isUnique":false,"remoteField":"community_id","remoteRecord":"community_prop","orderField":"ordr","name":"community_props"}],"idField":"community_id","name":"community","recordClass":"com.micello.micentity.data.CommunityEntity","fields":[]},"src_entity_prop":{"foreignList":[],"idField":"src_entity_prop_id","name":"src_entity_prop","recordClass":"com.micello.micentity.data.SourceEntityProp","fields":[{"fieldClass":"java.lang.Integer","name":"ordr","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micentity.data.SourceEntity","name":"src_entity_id","nullOk":false},{"fieldClass":"java.lang.String","name":"key_name","nullOk":false},{"fieldClass":"java.lang.String","name":"key_value","nullOk":true},{"fieldClass":"java.lang.String","name":"lang","nullOk":true}]},"entity_prop":{"foreignList":[],"idField":"entity_prop_id","name":"entity_prop","recordClass":"com.micello.micentity.data.EntityProp","fields":[{"fieldClass":"java.lang.Integer","name":"ordr","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micentity.data.Entity","name":"entity_id","nullOk":false},{"fieldClass":"java.lang.String","name":"key_name","nullOk":false},{"fieldClass":"java.lang.String","name":"key_value","nullOk":true},{"fieldClass":"java.lang.String","name":"lang","nullOk":true}]},"collection":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"collection_id","remoteRecord":"staging_entity_address","name":"staging_addresses"},{"restrictDelete":true,"isUnique":false,"remoteField":"collection_id","remoteRecord":"src_entity","name":"src_entities"}],"idField":"collection_id","name":"collection","recordClass":"com.micello.micentity.data.DataCollection","fields":[{"fieldClass":"java.lang.Long","name":"community_id","nullOk":false},{"fieldClass":"java.lang.String","name":"source_type","nullOk":false},{"fieldClass":"java.lang.String","name":"source_name","nullOk":false},{"fieldClass":"java.lang.String","name":"operator","nullOk":true},{"fieldClass":"java.lang.String","name":"notes","nullOk":true},{"fieldClass":"java.lang.Float","name":"score","nullOk":false},{"fieldClass":"java.lang.Long","name":"collection_time","nullOk":false},{"fieldClass":"java.lang.Long","name":"prev_time","nullOk":true},{"fieldClass":"java.lang.Boolean","name":"is_complete","nullOk":false},{"fieldClass":"java.lang.Boolean","name":"no_update","nullOk":false,"defaultValue":false},{"fieldClass":"java.lang.Boolean","name":"is_verified","nullOk":false,"defaultValue":false},{"fieldClass":"java.lang.Boolean","name":"in_process","nullOk":false}]},"staging_entity_address":{"foreignList":[],"idField":"staging_address_id","name":"staging_entity_address","recordClass":"com.micello.micentity.data.StagingEntityAddress","fields":[{"fieldClass":"com.micello.micentity.data.DataCollection","name":"collection_id","nullOk":false},{"fieldClass":"java.lang.Long","name":"entity_id","nullOk":true},{"fieldClass":"java.lang.String","name":"address_key","nullOk":false},{"fieldClass":"java.lang.String","name":"address_value","nullOk":false},{"fieldClass":"java.lang.String","name":"address_parent","nullOk":true},{"fieldClass":"java.lang.String","name":"location","nullOk":true},{"fieldClass":"java.lang.Boolean","name":"is_identifier","nullOk":false,"defaultValue":true},{"fieldClass":"java.lang.Long","name":"change_timestamp","nullOk":true}]},"community_prop":{"foreignList":[],"idField":"community_prop_id","name":"community_prop","recordClass":"com.micello.micentity.data.CommunityEntityProp","fields":[{"fieldClass":"java.lang.Integer","name":"ordr","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micentity.data.CommunityEntity","name":"community_id","nullOk":false},{"fieldClass":"java.lang.String","name":"key_name","nullOk":false},{"fieldClass":"java.lang.String","name":"key_value","nullOk":true},{"fieldClass":"java.lang.String","name":"lang","nullOk":true}]},"src_entity":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"src_entity_id","remoteRecord":"src_entity_prop","orderField":"ordr","name":"props"}],"idField":"src_entity_id","name":"src_entity","recordClass":"com.micello.micentity.data.SourceEntity","fields":[{"fieldClass":"com.micello.micentity.data.DataCollection","name":"collection_id","nullOk":false},{"fieldClass":"com.micello.micentity.data.Entity","name":"entity_id","nullOk":false}]},"entity_address":{"foreignList":[],"idField":"entity_address_id","name":"entity_address","recordClass":"com.micello.micentity.data.EntityAddress","fields":[{"fieldClass":"com.micello.micentity.data.CommunityEntity","name":"community_id","nullOk":false},{"fieldClass":"java.lang.Integer","name":"address_order","nullOk":false,"defaultValue":0},{"fieldClass":"java.lang.Integer","name":"address_number","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micentity.data.Entity","name":"entity_id","nullOk":false},{"fieldClass":"java.lang.String","name":"address_key","nullOk":false},{"fieldClass":"java.lang.String","name":"address_value","nullOk":false},{"fieldClass":"java.lang.Boolean","name":"is_identifier","nullOk":false,"defaultValue":true}]}},"version":"5.0"},"description":""}},"getEntityRequest":{"name":"getEntityRequest","type":"apogee.FunctionTable","updateData":{"argList":["cid","sessionKey"],"functionBody":"var requestBody = {};\nrequestBody.search = \"community_entity\";\nrequestBody.id = cid;\n\nvar requestOptions = createRequestOptions(requestBody,sessionKey);\n\nvar requestUrl = host + \"/cannedsearch\";\nreturn apogee.net.jsonRequest(requestUrl,requestOptions);","supplementalCode":"","description":""}}}}},"components":{"createRecord":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":560,"height":321},"posInfo":{"x":32,"y":420},"state":-1,"viewType":"Code"}},"recordsToCreateInstructions":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":834,"height":391},"posInfo":{"x":32,"y":467},"state":-1,"viewType":"Code"}},"createCommitBody":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":568,"height":400},"posInfo":{"x":786,"y":273},"state":-1,"viewType":"Code"}},"createRequestOptions":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":523,"height":254},"posInfo":{"x":786,"y":321},"state":-1,"viewType":"Code"}},"host":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":353,"height":71},"posInfo":{"x":18,"y":11},"state":-1,"viewType":"Text"}},"commitUrl":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":433,"height":-4},"posInfo":{"x":22,"y":60},"state":-1,"viewType":"Text"}},"requestUrl":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":450,"height":4},"posInfo":{"x":22,"y":101},"state":-1,"viewType":"Formula"}},"createUpdateInstruction":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":886,"height":655},"posInfo":{"x":36,"y":247},"state":-1,"viewType":"Code"}},"createCreateInstruction":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":994,"height":643},"posInfo":{"x":35,"y":209},"state":-1,"viewType":"Code"}},"getFieldErrString":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":512,"height":68},"posInfo":{"x":761,"y":616},"state":-1,"viewType":"Code"}},"getRecordErrString":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":400,"height":81},"posInfo":{"x":762,"y":664},"state":-1,"viewType":"Code"}},"createDeleteInstruction":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":678,"height":540},"posInfo":{"x":36,"y":289},"state":-1,"viewType":"Code"}},"getRecordInfo":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":480,"height":400},"posInfo":{"x":788,"y":372},"state":-1,"viewType":"Code"}},"combinedEntriesToInstructionList":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":721,"height":524},"posInfo":{"x":32,"y":512},"state":-1,"viewType":"Private"}},"getCommitPromise":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":741,"height":400},"posInfo":{"x":292,"y":61},"state":-1,"viewType":"Code"}},"getRequestPromise":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":810,"height":400},"posInfo":{"x":292,"y":16},"state":-1,"viewType":"Code"}},"dataSetInfo":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":1064,"height":611},"posInfo":{"x":288,"y":141},"state":-1,"viewType":"Text"}},"getEntityRequest":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":492,"height":400},"posInfo":{"x":34,"y":601},"state":-1,"viewType":"Code"}}}}
+{
+	"fileType": "apogee js web workspace",
+	"workspace": {
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "micentityDataAccess",
+			"type": "apogee.Folder",
+			"children": {
+				"createRecord": {
+					"name": "createRecord",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"recordType",
+							"fieldMap"
+						],
+						"functionBody": "var record = {};\n\nvar recordInfo = getRecordInfo(recordType);\n\nrecord.Id = getId();\nrecord.Type = recordInfo.name;\nrecord.Fields = fieldMap;\nrecord.read_perm = READ_PERM;\nrecord.edit_perm = EDIT_PERM;\n\nreturn record;",
+						"supplementalCode": "var READ_PERM = 2;\nvar EDIT_PERM = 15;\n\nvar nextId = -1;\n\nfunction getId() {\n    return nextId--;\n}",
+						"description": "This method creates a record given the field values and record info \nfrom the data set info. It creates and ID and uses standard permissions."
+					}
+				},
+				"recordsToCreateInstructions": {
+					"name": "recordsToCreateInstructions",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"recordList"
+						],
+						"functionBody": "var instructions = [];\n\nfor(var i = 0; i < recordList.length; i++) {\n    var createRecord = recordList[i];\n    var instruction = createCreateInstruction(createRecord);\n    instructions.push(instruction);\n}\n\nreturn instructions;",
+						"supplementalCode": "",
+						"description": "This creates a list of create instructions to go along with a list of records to be created.\n\nThere is the option to assign the ID or to leave it as undefined, in which case\nan automatically incremented ID will be assigned. (For consistency in the data\nset, either all records should be preassigned or all records should be \nautomatically assigned."
+					}
+				},
+				"createCommitBody": {
+					"name": "createCommitBody",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"instructionList",
+							"commitMessage"
+						],
+						"functionBody": "var commit = {};\nvar actions = [];\n\nif(commitMessage.length === 0) throw new Error(\"Commit message missing!\");\n\ncommit.Name = dataSetInfo.name;\ncommit.Message = commitMessage;\ncommit.Actions = actions;\n\n//single action with commits\nvar action = {};\naction.Title = \"bulk create commit\";\naction.Instr = instructionList;\nactions.push(action);\n\nreturn commit",
+						"supplementalCode": "",
+						"description": "This creates a body for a commit request, given a list of instructions and a commit message."
+					}
+				},
+				"createRequestOptions": {
+					"name": "createRequestOptions",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"bodyJson",
+							"sessionKey"
+						],
+						"functionBody": "var header = {};\nheader[\"Content-Type\"] = \"text/plain;charset=UTF-8\";\nheader.sessionKey = sessionKey;\nheader[\"proto-version\"] = \"4.0\";\nheader[\"db-version\"] = dataSetInfo.version;\n\nrequestInfo = {};\nrequestInfo.header = header;\nif(bodyJson) {\n    requestInfo.method = \"POST\";\n    requestInfo.body = JSON.stringify(bodyJson);\n}\n\nreturn requestInfo;\n",
+						"supplementalCode": "",
+						"description": "This creates the requestOptions, suitable for apogee.net.jsonRequest, to go with an type of request to the workingset (micemetarequest) server."
+					}
+				},
+				"host": {
+					"name": "host",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": "http://factory.micello.com/micemapsws",
+						"description": ""
+					}
+				},
+				"commitUrl": {
+					"name": "commitUrl",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var value;\nvalue = host + \"/commit\";\nreturn value;\n\n",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"requestUrl": {
+					"name": "requestUrl",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var value;\nvalue = host + \"/cannedsearch\";\nreturn value;\n\n",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"createUpdateInstruction": {
+					"name": "createUpdateInstruction",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"initialRecord",
+							"targetRecord"
+						],
+						"functionBody": "if(initialRecord.Id != targetRecord.Id) {\n    throw new Error(\"Record ID mismatch in create update instruction for target record: \" + getRecordErrString(targetRecord));\n}\n\nif(initialRecord.Type != targetRecord.Type) {\n    throw new Error(\"Inital and target record types do not match. Target record: \" + getRecordErrString(targetRecord));\n}\n\nvar recordsDifferent = false;\n\nvar recordInfo = getRecordInfo(initialRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Update\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = initialRecord.Id;\n\ninstruction.initialReadPerm = initialRecord.read_perm;\ninstruction.initialEditPerm = initialRecord.edit_perm;\n\nif(initialRecord.readPerm != targetRecord.readPerm) {\n    instruction.targetReadPerm = targetRecord.read_perm;\n    recordsDifferent = true;\n}\n\nif(initialRecord.editPerm != targetRecord.editPerm) {\n    instruction.targetEditPerm = targetRecord.edit_perm;\n    recordsDifferent = true;\n}\n\nvar initialData = {};\ninstruction.Initial = initialData;\nvar targetData = {};\ninstruction.Target = targetData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    \n    var initialValue;\n    var targetValue;\n    \n    var initialValue = initialRecord.Fields[field.name];\n    var targetValue = targetRecord.Fields[field.name];\n    \n    //validate target values\n    if(targetValue === undefined) {\n        //use default\n        targetValue = field.defaultValue;\n    }\n    \n    if(targetValue === undefined) {\n        throw new Error(\"Unknown problem: undefined field value: \" + getFieldErrString(targetRecord,field));\n    }\n    \n    if(targetValue === null) {\n        if(!field.nullOk) {\n            throw new Error(\"Illegal null value: \" + getFieldErrString(targetRecord,field));\n        }\n    }\n    \n    if(!fieldsMatch(initialValue,targetValue,field)) {\n        initialData[field.name] = initialValue;\n        targetData[field.name] = targetValue;\n        recordsDifferent = true;\n    }\n}\n\nif(recordsDifferent) {\n    return instruction;\n}\nelse {\n    return null;\n}\n",
+						"supplementalCode": "function fieldsMatch(initialValue,targetValue,fieldInfo) {\n    if(fieldInfo.fieldClass === \"java.lang.String\") {\n        //compare strings with \"==\"\n        return (initialValue == targetValue);\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"java.lang\")) {\n        //compare other basic values with \"===\"\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"com.micello\")) {\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONObject\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONArray\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else {\n        throw new Error(\"unrecognized field type: \" + fieldInfo.fieldClass);\n    }\n}\n\nfunction compareJsonData(a,b) {\n    var an = apogee.util.getNormalizedObjectCopy(a);\n    var bn = apogee.util.getNormalizedObjectCopy(b);\n    var aString = JSON.stringify(an);\n    var bString = JSON.stringify(bn);\n    return aString == bString;\n}\n    ",
+						"description": "This function creates an update instruction given an initial and target record. If the records are the same then NULL is returned. (No update is needed.)"
+					}
+				},
+				"createCreateInstruction": {
+					"name": "createCreateInstruction",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"createRecord"
+						],
+						"functionBody": "\nvar recordInfo = getRecordInfo(createRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Create\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = createRecord.Id;\n\ninstruction.targetReadPerm = createRecord.read_perm;\ninstruction.targetEditPerm = createRecord.edit_perm;\n\nvar targetData = {};\ninstruction.Target = targetData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    var targetValue;\n    var targetValue = createRecord.Fields[field.name];\n    if(targetValue === undefined) {\n        //use default\n        targetValue = field.defaultValue;\n    }\n    \n    if(targetValue === undefined) {\n        throw new Error(\"Unknown problem: undefined field value: \" + getFieldErrString(createRecord,field));\n    }\n    \n    if(targetValue === null) {\n        if(!field.nullOk) {\n            throw new Error(\"Illegal null value: \" + getFieldErrString(createRecord,field));\n        }\n    }\n    \n    targetData[field.name] = targetValue;\n}\n\nreturn instruction;\n",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"getFieldErrString": {
+					"name": "getFieldErrString",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"record",
+							"fieldInfo"
+						],
+						"functionBody": "return getRecordErrString(record) + \" - \" + fieldInfo.name;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"getRecordErrString": {
+					"name": "getRecordErrString",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"record"
+						],
+						"functionBody": "return record.Type + \" \" + record.Id;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"createDeleteInstruction": {
+					"name": "createDeleteInstruction",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"deleteRecord"
+						],
+						"functionBody": "\nvar recordInfo = getRecordInfo(deleteRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Delete\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = deleteRecord.Id;\n\ninstruction.initialReadPerm = deleteRecord.read_perm;\ninstruction.initialEditPerm = deleteRecord.edit_perm;\n\nvar initialData = {};\ninstruction.Initial = initialData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    var initialValue = deleteRecord.Fields[field.name];\n    \n    initialData[field.name] = initialValue;\n}\n\nreturn instruction;\n",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"getRecordInfo": {
+					"name": "getRecordInfo",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"recordType"
+						],
+						"functionBody": "var recordInfo = dataSetInfo.records[recordType];\n\nif(!recordInfo) {\n    throw new Error(\"Record type not found in getRecordInfo: \" + recordType);\n}\n\nreturn recordInfo;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"combinedEntriesToInstructionList": {
+					"name": "combinedEntriesToInstructionList",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"combinedEntries"
+						],
+						"functionBody": "var output = [];\nfor(var key in combinedEntries) {\n    var entry = combinedEntries[key];\n    var instruction = getInstructionForCombinedEntry(entry);\n    if(instruction) {\n        output.push(instruction);\n    }\n}\n\nreturn output;",
+						"supplementalCode": "function getInstructionForCombinedEntry(combinedEntry) {\n    var newEntry = combinedEntry.newEntry;\n    var oldEntry = combinedEntry.oldEntry;\n    \n    if(newEntry) {\n        if(!oldEntry) {\n            console.log(\"Create: \" + newEntry.Id);\n            return createCreateInstruction(newEntry);\n        }\n        else {\n            //this will return null for matching records\n            console.log(\"Update(maybe): \" + newEntry.Id);\n            return createUpdateInstruction(oldEntry,newEntry);\n        }\n    }\n    else if(oldEntry) {\n        console.log(\"Delete: \" + oldEntry.Id);\n        return createDeleteInstruction(oldEntry);\n    }\n    \n    return null;\n}\n\nfunction entriesDifferent(entry1,entry2) {\n    var string1 = JSON.stringify(apogee.util.getNormalizedCopy(entry1));\n    var string2 = JSON.stringify(apogee.util.getNormalizedCopy(entry2));\n    return (string1 == string2);\n}",
+						"description": "This function takes a combined entry map of the format:\n\n{\n  \"some-identifier\":{\n    \"oldEntry\":{original record entry, if applicable},\n    \"newEntry\":{new record entry, if applicable}\n  },\n  ...\n}\n\nIt returns an instruction list.\n\n"
+					}
+				},
+				"getCommitPromise": {
+					"name": "getCommitPromise",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"instructionList",
+							"commitMessage",
+							"sessionKey"
+						],
+						"functionBody": "var commitBody = createCommitBody(instructionList,commitMessage);\nvar requestOptions = createRequestOptions(commitBody,sessionKey);\nvalue = apogee.net.jsonRequest(commitUrl,requestOptions);\nreturn value;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"getRequestPromise": {
+					"name": "getRequestPromise",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"requestBody",
+							"sessionKey"
+						],
+						"functionBody": "var requestOptions = createRequestOptions(requestBody,sessionKey);\nvalue = apogee.net.jsonRequest(requestUrl,requestOptions);\nreturn value;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"dataSetInfo": {
+					"name": "dataSetInfo",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": {
+							"name": "Micentity",
+							"records": {
+								"chain": {
+									"foreignList": [
+										{
+											"restrictDelete": true,
+											"isUnique": false,
+											"remoteField": "chain_id",
+											"remoteRecord": "chain_prop",
+											"orderField": "ordr",
+											"name": "props"
+										}
+									],
+									"idField": "chain_id",
+									"name": "chain",
+									"recordClass": "com.micello.micentity.data.Chain",
+									"fields": []
+								},
+								"entity": {
+									"foreignList": [
+										{
+											"restrictDelete": true,
+											"isUnique": false,
+											"remoteField": "entity_id",
+											"remoteRecord": "entity_address",
+											"orderField": "address_order",
+											"name": "address_list"
+										},
+										{
+											"restrictDelete": true,
+											"isUnique": false,
+											"remoteField": "entity_id",
+											"remoteRecord": "entity_prop",
+											"orderField": "ordr",
+											"name": "props"
+										}
+									],
+									"idField": "entity_id",
+									"name": "entity",
+									"recordClass": "com.micello.micentity.data.Entity",
+									"fields": [
+										{
+											"fieldClass": "com.micello.micentity.data.CommunityEntity",
+											"name": "community_id",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "com.micello.micentity.data.Chain",
+											"name": "chain_id",
+											"nullOk": true
+										},
+										{
+											"fieldClass": "java.lang.Boolean",
+											"name": "deleted",
+											"nullOk": false,
+											"defaultValue": false
+										}
+									]
+								},
+								"chain_prop": {
+									"foreignList": [],
+									"idField": "chain_prop_id",
+									"name": "chain_prop",
+									"recordClass": "com.micello.micentity.data.ChainProp",
+									"fields": [
+										{
+											"fieldClass": "java.lang.Integer",
+											"name": "ordr",
+											"nullOk": false,
+											"defaultValue": 0
+										},
+										{
+											"fieldClass": "com.micello.micentity.data.Chain",
+											"name": "chain_id",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "key_name",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "key_value",
+											"nullOk": true
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "lang",
+											"nullOk": true
+										}
+									]
+								},
+								"community": {
+									"foreignList": [
+										{
+											"restrictDelete": true,
+											"isUnique": false,
+											"remoteField": "community_id",
+											"remoteRecord": "entity",
+											"name": "entities"
+										},
+										{
+											"restrictDelete": true,
+											"isUnique": false,
+											"remoteField": "community_id",
+											"remoteRecord": "entity_address",
+											"name": "entity_addresses"
+										},
+										{
+											"restrictDelete": true,
+											"isUnique": false,
+											"remoteField": "community_id",
+											"remoteRecord": "community_prop",
+											"orderField": "ordr",
+											"name": "community_props"
+										}
+									],
+									"idField": "community_id",
+									"name": "community",
+									"recordClass": "com.micello.micentity.data.CommunityEntity",
+									"fields": []
+								},
+								"src_entity_prop": {
+									"foreignList": [],
+									"idField": "src_entity_prop_id",
+									"name": "src_entity_prop",
+									"recordClass": "com.micello.micentity.data.SourceEntityProp",
+									"fields": [
+										{
+											"fieldClass": "java.lang.Integer",
+											"name": "ordr",
+											"nullOk": false,
+											"defaultValue": 0
+										},
+										{
+											"fieldClass": "com.micello.micentity.data.SourceEntity",
+											"name": "src_entity_id",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "key_name",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "key_value",
+											"nullOk": true
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "lang",
+											"nullOk": true
+										}
+									]
+								},
+								"entity_prop": {
+									"foreignList": [],
+									"idField": "entity_prop_id",
+									"name": "entity_prop",
+									"recordClass": "com.micello.micentity.data.EntityProp",
+									"fields": [
+										{
+											"fieldClass": "java.lang.Integer",
+											"name": "ordr",
+											"nullOk": false,
+											"defaultValue": 0
+										},
+										{
+											"fieldClass": "com.micello.micentity.data.Entity",
+											"name": "entity_id",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "key_name",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "key_value",
+											"nullOk": true
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "lang",
+											"nullOk": true
+										}
+									]
+								},
+								"collection": {
+									"foreignList": [
+										{
+											"restrictDelete": true,
+											"isUnique": false,
+											"remoteField": "collection_id",
+											"remoteRecord": "staging_entity_address",
+											"name": "staging_addresses"
+										},
+										{
+											"restrictDelete": true,
+											"isUnique": false,
+											"remoteField": "collection_id",
+											"remoteRecord": "src_entity",
+											"name": "src_entities"
+										}
+									],
+									"idField": "collection_id",
+									"name": "collection",
+									"recordClass": "com.micello.micentity.data.DataCollection",
+									"fields": [
+										{
+											"fieldClass": "java.lang.Long",
+											"name": "community_id",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "source_type",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "source_name",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "operator",
+											"nullOk": true
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "notes",
+											"nullOk": true
+										},
+										{
+											"fieldClass": "java.lang.Float",
+											"name": "score",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.Long",
+											"name": "collection_time",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.Long",
+											"name": "prev_time",
+											"nullOk": true
+										},
+										{
+											"fieldClass": "java.lang.Boolean",
+											"name": "is_complete",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.Boolean",
+											"name": "no_update",
+											"nullOk": false,
+											"defaultValue": false
+										},
+										{
+											"fieldClass": "java.lang.Boolean",
+											"name": "is_verified",
+											"nullOk": false,
+											"defaultValue": false
+										},
+										{
+											"fieldClass": "java.lang.Boolean",
+											"name": "in_process",
+											"nullOk": false
+										}
+									]
+								},
+								"staging_entity_address": {
+									"foreignList": [],
+									"idField": "staging_address_id",
+									"name": "staging_entity_address",
+									"recordClass": "com.micello.micentity.data.StagingEntityAddress",
+									"fields": [
+										{
+											"fieldClass": "com.micello.micentity.data.DataCollection",
+											"name": "collection_id",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.Long",
+											"name": "entity_id",
+											"nullOk": true
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "address_key",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "address_value",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "address_parent",
+											"nullOk": true
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "location",
+											"nullOk": true
+										},
+										{
+											"fieldClass": "java.lang.Boolean",
+											"name": "is_identifier",
+											"nullOk": false,
+											"defaultValue": true
+										},
+										{
+											"fieldClass": "java.lang.Long",
+											"name": "change_timestamp",
+											"nullOk": true
+										}
+									]
+								},
+								"community_prop": {
+									"foreignList": [],
+									"idField": "community_prop_id",
+									"name": "community_prop",
+									"recordClass": "com.micello.micentity.data.CommunityEntityProp",
+									"fields": [
+										{
+											"fieldClass": "java.lang.Integer",
+											"name": "ordr",
+											"nullOk": false,
+											"defaultValue": 0
+										},
+										{
+											"fieldClass": "com.micello.micentity.data.CommunityEntity",
+											"name": "community_id",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "key_name",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "key_value",
+											"nullOk": true
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "lang",
+											"nullOk": true
+										}
+									]
+								},
+								"src_entity": {
+									"foreignList": [
+										{
+											"restrictDelete": true,
+											"isUnique": false,
+											"remoteField": "src_entity_id",
+											"remoteRecord": "src_entity_prop",
+											"orderField": "ordr",
+											"name": "props"
+										}
+									],
+									"idField": "src_entity_id",
+									"name": "src_entity",
+									"recordClass": "com.micello.micentity.data.SourceEntity",
+									"fields": [
+										{
+											"fieldClass": "com.micello.micentity.data.DataCollection",
+											"name": "collection_id",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "com.micello.micentity.data.Entity",
+											"name": "entity_id",
+											"nullOk": false
+										}
+									]
+								},
+								"entity_address": {
+									"foreignList": [],
+									"idField": "entity_address_id",
+									"name": "entity_address",
+									"recordClass": "com.micello.micentity.data.EntityAddress",
+									"fields": [
+										{
+											"fieldClass": "com.micello.micentity.data.CommunityEntity",
+											"name": "community_id",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.Integer",
+											"name": "address_order",
+											"nullOk": false,
+											"defaultValue": 0
+										},
+										{
+											"fieldClass": "java.lang.Integer",
+											"name": "address_number",
+											"nullOk": false,
+											"defaultValue": 0
+										},
+										{
+											"fieldClass": "com.micello.micentity.data.Entity",
+											"name": "entity_id",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "address_key",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.String",
+											"name": "address_value",
+											"nullOk": false
+										},
+										{
+											"fieldClass": "java.lang.Boolean",
+											"name": "is_identifier",
+											"nullOk": false,
+											"defaultValue": true
+										}
+									]
+								}
+							},
+							"version": "5.0"
+						},
+						"description": ""
+					}
+				},
+				"getEntityRequest": {
+					"name": "getEntityRequest",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"cid",
+							"sessionKey"
+						],
+						"functionBody": "var requestBody = {};\nrequestBody.search = \"community_entity\";\nrequestBody.id = cid;\n\nvar requestOptions = createRequestOptions(requestBody,sessionKey);\n\nvar requestUrl = host + \"/cannedsearch\";\nreturn apogee.net.jsonRequest(requestUrl,requestOptions);",
+						"supplementalCode": "",
+						"description": ""
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"children": {
+			"createRecord": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 560,
+						"height": 321
+					},
+					"posInfo": {
+						"x": 32,
+						"y": 420
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"recordsToCreateInstructions": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 834,
+						"height": 391
+					},
+					"posInfo": {
+						"x": 32,
+						"y": 467
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"createCommitBody": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 568,
+						"height": 400
+					},
+					"posInfo": {
+						"x": 786,
+						"y": 273
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"createRequestOptions": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 523,
+						"height": 254
+					},
+					"posInfo": {
+						"x": 786,
+						"y": 321
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"host": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 353,
+						"height": 71
+					},
+					"posInfo": {
+						"x": 18,
+						"y": 11
+					},
+					"state": -1,
+					"viewType": "Text"
+				}
+			},
+			"commitUrl": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 433,
+						"height": -4
+					},
+					"posInfo": {
+						"x": 22,
+						"y": 60
+					},
+					"state": -1,
+					"viewType": "Text"
+				}
+			},
+			"requestUrl": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 450,
+						"height": 4
+					},
+					"posInfo": {
+						"x": 22,
+						"y": 101
+					},
+					"state": -1,
+					"viewType": "Formula"
+				}
+			},
+			"createUpdateInstruction": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 886,
+						"height": 655
+					},
+					"posInfo": {
+						"x": 36,
+						"y": 247
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"createCreateInstruction": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 994,
+						"height": 643
+					},
+					"posInfo": {
+						"x": 35,
+						"y": 209
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"getFieldErrString": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 512,
+						"height": 68
+					},
+					"posInfo": {
+						"x": 761,
+						"y": 616
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"getRecordErrString": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 400,
+						"height": 81
+					},
+					"posInfo": {
+						"x": 762,
+						"y": 664
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"createDeleteInstruction": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 678,
+						"height": 540
+					},
+					"posInfo": {
+						"x": 36,
+						"y": 289
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"getRecordInfo": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 480,
+						"height": 400
+					},
+					"posInfo": {
+						"x": 788,
+						"y": 372
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"combinedEntriesToInstructionList": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 721,
+						"height": 524
+					},
+					"posInfo": {
+						"x": 32,
+						"y": 512
+					},
+					"state": -1,
+					"viewType": "Private"
+				}
+			},
+			"getCommitPromise": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 741,
+						"height": 400
+					},
+					"posInfo": {
+						"x": 292,
+						"y": 61
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"getRequestPromise": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 810,
+						"height": 400
+					},
+					"posInfo": {
+						"x": 292,
+						"y": 16
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"dataSetInfo": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 1064,
+						"height": 611
+					},
+					"posInfo": {
+						"x": 288,
+						"y": 141
+					},
+					"state": -1,
+					"viewType": "Text"
+				}
+			},
+			"getEntityRequest": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 492,
+						"height": 400
+					},
+					"posInfo": {
+						"x": 34,
+						"y": 601
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			}
+		}
+	},
+	"version": 0.31,
+	"library": []
+}

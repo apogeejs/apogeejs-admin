@@ -1,1 +1,2495 @@
-{"fileType":"apogee workspace","jsLinks":[],"cssLinks":[],"workspace":{"fileType":"apogee workspace","version":0.2,"data":{"name":"rescale","type":"apogee.Folder","children":{"did":{"name":"did","type":"apogee.JsonTable","updateData":{"data":0,"description":""}},"mapData":{"name":"mapData","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return micemapsDataAccess.getMapRequest(cid,sessionKey);","supplementalCode":"","description":""}},"sessionKey":{"name":"sessionKey","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return login.sessionResponse.sessionKey;","supplementalCode":"","description":""}},"cid":{"name":"cid","type":"apogee.JsonTable","updateData":{"data":0,"description":""}},"getRecord":{"name":"getRecord","type":"apogee.FunctionTable","updateData":{"argList":["recordType","recordId"],"functionBody":"//get the suppporting records\nvar recordList = mapData.data.Records;\n\nfor(var i = 0; i < recordList.length; i++) {\n    var record = recordList[i];\n    \n    if((record.Type == recordType)&&(record.Id == recordId)) {\n        return record;\n    }\n}\n\nreturn null;","supplementalCode":"","description":""}},"getCommunityRecord":{"name":"getCommunityRecord","type":"apogee.FunctionTable","updateData":{"argList":[],"functionBody":"return mapData.data.Response[0];","supplementalCode":"","description":""}},"coords":{"name":"coords","type":"apogee.Folder","children":{"metersPerMerc":{"name":"metersPerMerc","type":"apogee.FunctionTable","updateData":{"argList":["latRad"],"functionBody":"\nreturn METERS_PER_MERC0 * Math.cos(latRad);","supplementalCode":"","description":""}},"METERS_PER_MERC0":{"name":"METERS_PER_MERC0","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var EARTH_CIRCUMFERENCE = 40040000.0; //somewhere between polar and equitorial value - I picked it at random though\nvar METERS_PER_MERC0 = EARTH_CIRCUMFERENCE / TWO_TO_25;\n\nreturn METERS_PER_MERC0;\n\n","supplementalCode":"","description":""}},"lonRadToMercX":{"name":"lonRadToMercX","type":"apogee.FunctionTable","updateData":{"argList":["lonRad"],"functionBody":"return TWO_TO_25 * (.5 + lonRad/(2 * Math.PI) );","supplementalCode":"","description":""}},"TWO_TO_25":{"name":"TWO_TO_25","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return 0x01 << MERCATOR_ZOOM;","supplementalCode":"","description":""}},"MERCATOR_ZOOM":{"name":"MERCATOR_ZOOM","type":"apogee.JsonTable","updateData":{"data":25,"description":""}},"latRadToMercY":{"name":"latRadToMercY","type":"apogee.FunctionTable","updateData":{"argList":["latRad"],"functionBody":"var sinLat = Math.sin(latRad);\nreturn TWO_TO_25 * ( .5 - Math.log((1 + sinLat)/(1-sinLat))/(4 * Math.PI) );","supplementalCode":"","description":""}},"radToDeg":{"name":"radToDeg","type":"apogee.FunctionTable","updateData":{"argList":["angleRad"],"functionBody":"return 180 * angleRad / Math.PI;","supplementalCode":"","description":""}},"degToRad":{"name":"degToRad","type":"apogee.FunctionTable","updateData":{"argList":["angleDeg"],"functionBody":"return Math.PI * angleDeg /180;","supplementalCode":"","description":""}},"mercYToLatRad":{"name":"mercYToLatRad","type":"apogee.FunctionTable","updateData":{"argList":["mercY"],"functionBody":"return Math.atan( Math.sinh( 2*Math.PI * (.5 - my/TWO_TO_25) ));","supplementalCode":"","description":""}},"mercXToLonRad":{"name":"mercXToLonRad","type":"apogee.FunctionTable","updateData":{"argList":["mercX"],"functionBody":"return 2*Math.PI * (mx/TWO_TO_25 - .5);","supplementalCode":"","description":""}}}},"working":{"name":"working","type":"apogee.Folder","children":{"desiredTransform":{"name":"desiredTransform","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var output = [];\n\nfor(var i = 0; i < 4; i++) {\n    output[i] = mercToNatTransform[i] * currentMetersPerPixel /desiredMetersPerPixel;    \n}\n\n//maintain community center point\nvar mercCenterX = coords.lonRadToMercX(centerLatLonDeg[1] * Math.PI / 180);\nvar mercCenterY = coords.latRadToMercY(centerLatLonDeg[0] * Math.PI / 180);\n\noutput[4] = -(output[0] * mercCenterX + output[2] * mercCenterY);\noutput[5] = -(output[1] * mercCenterX + output[3] * mercCenterY);\n\nreturn output;","supplementalCode":"","description":""}},"mercToNatTransform":{"name":"mercToNatTransform","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return [\n    initialRecord.Fields.mxx,\n    initialRecord.Fields.myx,\n    initialRecord.Fields.mxy,\n    initialRecord.Fields.myy,\n    initialRecord.Fields.mx0,\n    initialRecord.Fields.my0,\n];","supplementalCode":"","description":""}},"desiredMetersPerPixel":{"name":"desiredMetersPerPixel","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"if(worldInchesOrMeters == \"inches\") {\n    return 1.0 / (inchesPerMeter * pixelsPerWorldInch);\n}\nelse if(worldInchesOrMeters == \"meters\") {\n    return 1.0 / pixelsPerWorldMeter;\n}\nelse {\n    throw new Error(\"Unknown unit choice: \" + worldInchesOrMeters);\n}","supplementalCode":"","description":""}},"centerLatLonDeg":{"name":"centerLatLonDeg","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var community = getCommunityRecord();\n\nreturn [community.Fields.center_lat,community.Fields.center_lon];\n\n","supplementalCode":"","description":""}},"initialRecord":{"name":"initialRecord","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return getRecord(\"drawing\",did);","supplementalCode":"","description":""}},"targetRecord":{"name":"targetRecord","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var record = apogee.util.jsonCopy(initialRecord);\n\nrecord.Fields.mxx = desiredTransform[0];\nrecord.Fields.myx = desiredTransform[1];\nrecord.Fields.mxy = desiredTransform[2];\nrecord.Fields.myy = desiredTransform[3];\nrecord.Fields.mx0 = desiredTransform[4];\nrecord.Fields.my0 = desiredTransform[5];\n\nreturn record;","supplementalCode":"","description":""}},"editedRecords":{"name":"editedRecords","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var output = {};\n\nvar entry = {};\nentry.oldEntry = initialRecord;\nentry.newEntry = targetRecord;\n\noutput[\"drawing\" + did] = entry;\n\nreturn output;","supplementalCode":"","description":""}},"test":{"name":"test","type":"apogee.Folder","children":{"distance":{"name":"distance","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var result = {};\n\nvar distMerc12 = distance(p1,p2);\nvar distMerc23 = distance(p2,p3);\n\nresult.distMeters12 = coords.metersPerMerc(coords.degToRad(centerLatLonDeg[0])) * distMerc12;\nresult.distMeters23 = coords.metersPerMerc(coords.degToRad(centerLatLonDeg[0])) * distMerc23;\n\nresult.distNat12 = distance(p1Map,p2Map);\nresult.distNat23 = distance(p2Map,p3Map);\n\nresult.scale12 = result.distNat12/result.distMeters12;\nresult.scale23 = result.distNat23/result.distMeters23;\n\nreturn result;","supplementalCode":"function distance(a,b) {\n    return  Math.sqrt( (a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));\n}","description":""}},"p2Map":{"name":"p2Map","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var xNat = mercToNatTransform[0] * p2[0] + mercToNatTransform[2] * p2[1] + mercToNatTransform[4];\nvar yNat = mercToNatTransform[1] * p2[0] + mercToNatTransform[3] * p2[1] + mercToNatTransform[5];\n\nreturn [xNat,yNat];","supplementalCode":"","description":""}},"p3Map":{"name":"p3Map","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var xNat = mercToNatTransform[0] * p3[0] + mercToNatTransform[2] * p3[1] + mercToNatTransform[4];\nvar yNat = mercToNatTransform[1] * p3[0] + mercToNatTransform[3] * p3[1] + mercToNatTransform[5];\n\nreturn [xNat,yNat];","supplementalCode":"","description":""}},"p1Map":{"name":"p1Map","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var xNat = mercToNatTransform[0] * p1[0] + mercToNatTransform[2] * p1[1] + mercToNatTransform[4];\nvar yNat = mercToNatTransform[1] * p1[0] + mercToNatTransform[3] * p1[1] + mercToNatTransform[5];\n\nreturn [xNat,yNat];","supplementalCode":"","description":""}},"p3":{"name":"p3","type":"apogee.JsonTable","updateData":{"data":[5410874.552317001,13022197.48733345],"description":""}},"p2":{"name":"p2","type":"apogee.JsonTable","updateData":{"data":[5410902.667355812,13022480.752022566],"description":""}},"p1":{"name":"p1","type":"apogee.JsonTable","updateData":{"data":[5411268.443915,13022458.420276431],"description":""}}}},"pixelsPerPaperInch":{"name":"pixelsPerPaperInch","type":"apogee.JsonTable","updateData":{"data":72,"description":""}},"pixelsPerWorldInch":{"name":"pixelsPerWorldInch","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"if(worldInchesOrMeters == \"inches\") {\n    return pixelsPerPaperInch / worldInchesPerPaperInch;\n}\nelse {\n    return \"NOT APPLICABLE\";\n}","supplementalCode":"","description":""}},"inchesPerMeter":{"name":"inchesPerMeter","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return 1.0 / 0.0254;","supplementalCode":"","description":""}},"mercCenter":{"name":"mercCenter","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var mercX = coords.lonRadToMercX(centerLatLonDeg[1] * Math.PI / 180);\nvar mercY = coords.latRadToMercY(centerLatLonDeg[0] * Math.PI / 180);\n\nreturn [mercX,mercY];","supplementalCode":"","description":""}},"natCenter":{"name":"natCenter","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var nat = [];\nnat[0] = desiredTransform[0] * mercCenter[0] + desiredTransform[2] * mercCenter[1] + desiredTransform[4];\nnat[1] = desiredTransform[1] * mercCenter[0] + desiredTransform[3] * mercCenter[1] + desiredTransform[5];\n\nreturn nat;","supplementalCode":"","description":""}},"worldInchesPerPaperInch":{"name":"worldInchesPerPaperInch","type":"apogee.JsonTable","updateData":{"data":420,"description":""}},"NOTE":{"name":"NOTE","type":"apogee.JsonTable","updateData":{"data":"First login and set the appropriate\nCID and DID.\n\nSet the table \"worldInchesOrMeters\" to\neither \"inches\" or \"meters\", then\nfill in the corresponding table:\n\n\"worldInchesPerPaperInch\" or\n\"worldMetersPerPaperInch\"\n\nLastly, go to \"submit\" and add a\ncommit message and submit it.\n\n------------------------------\n\nThis process will mess up the geocode!\n\nThis transform will set the community\ncenter lat lon to the top left corner \nof the community. ","description":""}},"worldMetersPerPaperInch":{"name":"worldMetersPerPaperInch","type":"apogee.JsonTable","updateData":{"data":10,"description":""}},"pixelsPerWorldMeter":{"name":"pixelsPerWorldMeter","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"if(worldInchesOrMeters == \"meters\") {\n    return pixelsPerPaperInch / worldMetersPerPaperInch;\n}\nelse {\n    return \"NOT APPLICABLE\";\n}","supplementalCode":"","description":""}},"worldInchesOrMeters":{"name":"worldInchesOrMeters","type":"apogee.JsonTable","updateData":{"data":"inches","description":""}},"currentMetersPerPixel":{"name":"currentMetersPerPixel","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var pixelOverMercScaleFactor = Math.sqrt(mercToNatTransform[0] * mercToNatTransform[3] - mercToNatTransform[1] * mercToNatTransform[2]); \nvar centerLatRad = coords.degToRad(centerLatLonDeg[0]);\n\nreturn  coords.metersPerMerc(centerLatRad) / pixelOverMercScaleFactor;","supplementalCode":"","description":""}}}},"submit":{"name":"submit","type":"apogee.Folder","children":{"submitControl":{"name":"submitControl","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return instructionList;","supplementalCode":"","description":""}},"instructionList":{"name":"instructionList","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"if(!combinedEntries) return null;\n\nreturn micemapsDataAccess.combinedEntriesToInstructionList(combinedEntries);","supplementalCode":"","description":""}},"combinedEntries":{"name":"combinedEntries","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return working.editedRecords;","supplementalCode":"","description":""}},"commitMessage":{"name":"commitMessage","type":"apogee.JsonTable","updateData":{"data":"another try....","description":""}},"liveInstructionList":{"name":"liveInstructionList","type":"apogee.JsonTable","updateData":{"data":null,"description":""}},"taskResult":{"name":"taskResult","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"//only process the commit response if there are\n//live instructions\nif(!liveInstructionList) return \"OK\";\n\nvar taskResult = {};\nif(!commitAction) {\n    taskResult.state = \"INCOMPLETE\";\n}\nelse if(commitAction.success === true) {\n    taskResult.state = \"SUCCESS\";\n}\nelse {\n    taskResult.status = \"ERROR\";\n    taskResult.msg = commitResponse.msg;\n}\n\nvar commitResult = {};\ncommitResult.commitMessage = commitMessage;\ncommitResult.commitResponse = commitResponse;\ntaskResult.data = commitResult;\n\n\n\n//set data\nvar updateInfo = [];\nupdateInfo.push([\"response\",taskResult]);\nupdateInfo.push([\"liveInstructionList\",null]);\napogeeMessenger.compoundDataUpdate(updateInfo);\n    \nreturn \"OK\";","supplementalCode":"","description":""}},"response":{"name":"response","type":"apogee.JsonTable","updateData":{"data":"","description":""}},"commitAction":{"name":"commitAction","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"if(!liveInstructionList) return null;\n\nreturn micemapsDataAccess.getCommitPromise(liveInstructionList,commitMessage,sessionKey);","supplementalCode":"","description":""}}}},"micemapsDataAccess":{"name":"micemapsDataAccess","type":"apogee.Folder","children":{"createRecord":{"name":"createRecord","type":"apogee.FunctionTable","updateData":{"argList":["recordType","fieldMap"],"functionBody":"var record = {};\n\nvar recordInfo = getRecordInfo(recordType);\n\nrecord.Id = getId();\nrecord.Type = recordInfo.name;\nrecord.Fields = fieldMap;\nrecord.read_perm = READ_PERM;\nrecord.edit_perm = EDIT_PERM;\n\nreturn record;","supplementalCode":"var READ_PERM = 2;\nvar EDIT_PERM = 15;\n\nvar nextId = -1;\n\nfunction getId() {\n    return nextId--;\n}","description":"This method creates a record given the field values and record info \nfrom the data set info. It creates and ID and uses standard permissions."}},"recordsToCreateInstructions":{"name":"recordsToCreateInstructions","type":"apogee.FunctionTable","updateData":{"argList":["recordList"],"functionBody":"var instructions = [];\n\nfor(var i = 0; i < recordList.length; i++) {\n    var createRecord = recordList[i];\n    var instruction = createCreateInstruction(createRecord);\n    instructions.push(instruction);\n}\n\nreturn instructions;","supplementalCode":"","description":"This creates a list of create instructions to go along with a list of records to be created.\n\nThere is the option to assign the ID or to leave it as undefined, in which case\nan automatically incremented ID will be assigned. (For consistency in the data\nset, either all records should be preassigned or all records should be \nautomatically assigned."}},"createCommitBody":{"name":"createCommitBody","type":"apogee.FunctionTable","updateData":{"argList":["instructionList","commitMessage"],"functionBody":"var commit = {};\nvar actions = [];\n\nif(commitMessage.length === 0) throw new Error(\"Commit message missing!\");\n\ncommit.Name = dataSetInfo.name;\ncommit.Message = commitMessage;\ncommit.Actions = actions;\n\n//single action with commits\nvar action = {};\naction.Title = \"bulk create commit\";\naction.Instr = instructionList;\nactions.push(action);\n\nreturn commit","supplementalCode":"","description":"This creates a body for a commit request, given a list of instructions and a commit message."}},"createRequestOptions":{"name":"createRequestOptions","type":"apogee.FunctionTable","updateData":{"argList":["bodyJson","sessionKey"],"functionBody":"var header = {};\nheader[\"Content-Type\"] = \"text/plain;charset=UTF-8\";\nheader.sessionKey = sessionKey;\nheader[\"proto-version\"] = \"4.0\";\nheader[\"db-version\"] = dataSetInfo.version;\n\nrequestInfo = {};\nrequestInfo.header = header;\nif(bodyJson) {\n    requestInfo.method = \"POST\";\n    requestInfo.body = JSON.stringify(bodyJson);\n}\n\nreturn requestInfo;\n","supplementalCode":"","description":"This creates the requestOptions, suitable for apogee.net.jsonRequest, to go with an type of request to the workingset (micemetarequest) server."}},"host":{"name":"host","type":"apogee.JsonTable","updateData":{"data":"http://factory.micello.com/micemapsws","description":""}},"commitUrl":{"name":"commitUrl","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var value;\nvalue = host + \"/commit\";\nreturn value;\n\n","supplementalCode":"","description":""}},"requestUrl":{"name":"requestUrl","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var value;\nvalue = host + \"/cannedsearch\";\nreturn value;\n\n","supplementalCode":"","description":""}},"dataSetInfo":{"name":"dataSetInfo","type":"apogee.JsonTable","updateData":{"data":{"name":"Micemaps","records":{"community":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"community_id","remoteRecord":"geometry_address","name":"geom_addresses"},{"restrictDelete":true,"isUnique":false,"remoteField":"community_id","remoteRecord":"drawing","name":"drawings"},{"restrictDelete":true,"isUnique":false,"remoteField":"community_id","remoteRecord":"community_prop","orderField":"ordr","name":"community_props"}],"idField":"community_id","name":"community","recordClass":"com.micello.micemaps.data.Community","fields":[{"fieldClass":"java.lang.Double","name":"center_lat","nullOk":true},{"fieldClass":"java.lang.Double","name":"center_lon","nullOk":true}]},"drawing":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"drawing_id","remoteRecord":"drawing_level","orderField":"zlevel","name":"site_level"},{"restrictDelete":true,"isUnique":false,"remoteField":"drawing_id","remoteRecord":"drawing_prop","orderField":"ordr","name":"drawing_props"}],"idField":"drawing_id","name":"drawing","recordClass":"com.micello.micemaps.data.Drawing","fields":[{"fieldClass":"com.micello.micemaps.data.Community","name":"community_id","nullOk":false},{"fieldClass":"java.lang.Boolean","name":"is_root","nullOk":false},{"fieldClass":"java.lang.Boolean","name":"is_locked","nullOk":false,"defaultValue":false},{"fieldClass":"java.lang.Float","name":"width","nullOk":false,"defaultValue":-1},{"fieldClass":"java.lang.Float","name":"height","nullOk":false,"defaultValue":-1},{"fieldClass":"java.lang.Double","name":"mxx","nullOk":false,"defaultValue":1},{"fieldClass":"java.lang.Double","name":"myx","nullOk":false,"defaultValue":0},{"fieldClass":"java.lang.Double","name":"mxy","nullOk":false,"defaultValue":0},{"fieldClass":"java.lang.Double","name":"myy","nullOk":false,"defaultValue":1},{"fieldClass":"java.lang.Double","name":"mx0","nullOk":false,"defaultValue":0},{"fieldClass":"java.lang.Double","name":"my0","nullOk":false,"defaultValue":0}]},"nav_node":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"node_id","remoteRecord":"nav_node_level","name":"level_list"},{"restrictDelete":true,"isUnique":false,"remoteField":"node1_id","remoteRecord":"nav_link","name":"link_starts"},{"restrictDelete":true,"isUnique":false,"remoteField":"node2_id","remoteRecord":"nav_link","name":"link_ends"},{"restrictDelete":true,"isUnique":false,"remoteField":"node_id","remoteRecord":"node_prop","orderField":"ordr","name":"node_prop"}],"idField":"node_id","name":"nav_node","recordClass":"com.micello.micemaps.data.NavNode","fields":[{"fieldClass":"java.lang.Double","name":"mx","nullOk":false},{"fieldClass":"java.lang.Double","name":"my","nullOk":false}]},"geometry":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"main_geom_id","remoteRecord":"geometry_group","name":"my_group_map"},{"restrictDelete":true,"isUnique":true,"remoteField":"geom_id","remoteRecord":"geometry_group","name":"group_map"},{"restrictDelete":true,"isUnique":false,"remoteField":"geometry_id","remoteRecord":"geometry_prop","orderField":"ordr","name":"geometry_prop"},{"restrictDelete":true,"isUnique":true,"remoteField":"geometry_id","remoteRecord":"geometry_address","name":"geometry_address"}],"idField":"geom_id","name":"geometry","recordClass":"com.micello.micemaps.data.Geometry","fields":[{"fieldClass":"java.lang.Integer","name":"zorder","nullOk":false,"defaultValue":0},{"fieldClass":"java.lang.Integer","name":"parent_draw_order","nullOk":false,"defaultValue":9999},{"fieldClass":"java.lang.Integer","name":"parent_zorder","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micemaps.data.DrawingLevel","name":"parent_level_id","nullOk":true},{"fieldClass":"com.micello.micemaps.data.DrawingLevel","name":"my_level_id","nullOk":true},{"fieldClass":"com.micello.miceditor.geometry.MShape","name":"geom","nullOk":false},{"fieldClass":"com.micello.miceditor.geometry.RotRect","name":"label","nullOk":true},{"fieldClass":"java.lang.Double","name":"mark_x","nullOk":true},{"fieldClass":"java.lang.Double","name":"mark_y","nullOk":true},{"fieldClass":"java.lang.Boolean","name":"is_locked","nullOk":false,"defaultValue":false},{"fieldClass":"java.lang.Boolean","name":"custom_label","nullOk":false,"defaultValue":false}]},"drawing_prop":{"foreignList":[],"idField":"drawing_prop_id","name":"drawing_prop","recordClass":"com.micello.micemaps.data.DrawingProp","fields":[{"fieldClass":"java.lang.Integer","name":"ordr","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micemaps.data.Drawing","name":"drawing_id","nullOk":false},{"fieldClass":"java.lang.String","name":"key_name","nullOk":false},{"fieldClass":"java.lang.String","name":"key_value","nullOk":true},{"fieldClass":"java.lang.String","name":"lang","nullOk":true}]},"geometry_prop":{"foreignList":[],"idField":"prop_id","name":"geometry_prop","recordClass":"com.micello.micemaps.data.GeometryProp","fields":[{"fieldClass":"java.lang.Integer","name":"ordr","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micemaps.data.Geometry","name":"geometry_id","nullOk":true},{"fieldClass":"java.lang.String","name":"key_name","nullOk":false},{"fieldClass":"java.lang.String","name":"key_value","nullOk":false},{"fieldClass":"java.lang.String","name":"lang","nullOk":true}]},"node_prop":{"foreignList":[],"idField":"prop_id","name":"node_prop","recordClass":"com.micello.micemaps.data.NavNodeProp","fields":[{"fieldClass":"java.lang.Integer","name":"ordr","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micemaps.data.NavNode","name":"node_id","nullOk":true},{"fieldClass":"java.lang.String","name":"key_name","nullOk":false},{"fieldClass":"java.lang.String","name":"key_value","nullOk":false},{"fieldClass":"java.lang.String","name":"lang","nullOk":true}]},"geometry_group":{"foreignList":[],"idField":"geom_group_id","name":"geometry_group","recordClass":"com.micello.micemaps.data.GeometryGroup","fields":[{"fieldClass":"com.micello.micemaps.data.Geometry","name":"main_geom_id","nullOk":false},{"fieldClass":"com.micello.micemaps.data.Geometry","name":"geom_id","nullOk":false}]},"geometry_address":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"parent_address_id","remoteRecord":"geometry_address","name":"child_address"}],"idField":"address_id","name":"geometry_address","recordClass":"com.micello.micemaps.data.GeometryAddress","fields":[{"fieldClass":"com.micello.micemaps.data.Community","name":"community_id","nullOk":false},{"fieldClass":"com.micello.micemaps.data.Geometry","name":"geometry_id","nullOk":true},{"fieldClass":"java.lang.String","name":"address_key","nullOk":false},{"fieldClass":"java.lang.String","name":"address_value","nullOk":false},{"fieldClass":"com.micello.micemaps.data.GeometryAddress","name":"parent_address_id","nullOk":true}]},"nav_node_level":{"foreignList":[],"idField":"node_level_id","name":"nav_node_level","recordClass":"com.micello.micemaps.data.NavNodeLevel","fields":[{"fieldClass":"com.micello.micemaps.data.NavNode","name":"node_id","nullOk":false},{"fieldClass":"com.micello.micemaps.data.DrawingLevel","name":"level_id","nullOk":false}]},"level_prop":{"foreignList":[],"idField":"level_prop_id","name":"level_prop","recordClass":"com.micello.micemaps.data.LevelProp","fields":[{"fieldClass":"java.lang.Integer","name":"ordr","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micemaps.data.DrawingLevel","name":"level_id","nullOk":false},{"fieldClass":"java.lang.String","name":"key_name","nullOk":false},{"fieldClass":"java.lang.String","name":"key_value","nullOk":true},{"fieldClass":"java.lang.String","name":"lang","nullOk":true}]},"nav_link":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"link_id","remoteRecord":"link_prop","orderField":"ordr","name":"link_prop"}],"idField":"link_id","name":"nav_link","recordClass":"com.micello.micemaps.data.NavLink","fields":[{"fieldClass":"com.micello.micemaps.data.NavNode","name":"node1_id","nullOk":false},{"fieldClass":"com.micello.micemaps.data.NavNode","name":"node2_id","nullOk":false},{"fieldClass":"java.lang.Double","name":"distance","nullOk":false},{"fieldClass":"java.lang.Byte","name":"direction","nullOk":false},{"fieldClass":"java.lang.Integer","name":"delta_zlevel","nullOk":false}]},"drawing_level":{"foreignList":[{"restrictDelete":true,"isUnique":false,"remoteField":"parent_level_id","remoteRecord":"geometry","orderField":"parent_draw_order","name":"child_geometry"},{"restrictDelete":true,"isUnique":true,"remoteField":"my_level_id","remoteRecord":"geometry","name":"root_geoemtry"},{"restrictDelete":true,"isUnique":false,"remoteField":"level_id","remoteRecord":"nav_node_level","name":"nav_node_list"},{"restrictDelete":true,"isUnique":false,"remoteField":"level_id","remoteRecord":"level_prop","orderField":"ordr","name":"level_props"}],"idField":"id","name":"drawing_level","recordClass":"com.micello.micemaps.data.DrawingLevel","fields":[{"fieldClass":"java.lang.Integer","name":"zlevel","nullOk":false,"defaultValue":0},{"fieldClass":"java.lang.Boolean","name":"is_main","nullOk":false,"defaultValue":false},{"fieldClass":"com.micello.micemaps.data.Drawing","name":"drawing_id","nullOk":false},{"fieldClass":"java.lang.Byte","name":"view_parent_flags","nullOk":false,"defaultValue":2}]},"community_prop":{"foreignList":[],"idField":"community_prop_id","name":"community_prop","recordClass":"com.micello.micemaps.data.CommunityProp","fields":[{"fieldClass":"java.lang.Integer","name":"ordr","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micemaps.data.Community","name":"community_id","nullOk":false},{"fieldClass":"java.lang.String","name":"key_name","nullOk":false},{"fieldClass":"java.lang.String","name":"key_value","nullOk":true},{"fieldClass":"java.lang.String","name":"lang","nullOk":true}]},"link_prop":{"foreignList":[],"idField":"prop_id","name":"link_prop","recordClass":"com.micello.micemaps.data.NavLinkProp","fields":[{"fieldClass":"java.lang.Integer","name":"ordr","nullOk":false,"defaultValue":0},{"fieldClass":"com.micello.micemaps.data.NavLink","name":"link_id","nullOk":true},{"fieldClass":"java.lang.String","name":"key_name","nullOk":false},{"fieldClass":"java.lang.String","name":"key_value","nullOk":false},{"fieldClass":"java.lang.String","name":"lang","nullOk":true}]}},"version":"5.2"},"description":""}},"createUpdateInstruction":{"name":"createUpdateInstruction","type":"apogee.FunctionTable","updateData":{"argList":["initialRecord","targetRecord"],"functionBody":"if(initialRecord.Id != targetRecord.Id) {\n    throw new Error(\"Record ID mismatch in create update instruction for target record: \" + getRecordErrString(targetRecord));\n}\n\nif(initialRecord.Type != targetRecord.Type) {\n    throw new Error(\"Inital and target record types do not match. Target record: \" + getRecordErrString(targetRecord));\n}\n\nvar recordsDifferent = false;\n\nvar recordInfo = getRecordInfo(initialRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Update\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = initialRecord.Id;\n\ninstruction.initialReadPerm = initialRecord.read_perm;\ninstruction.initialEditPerm = initialRecord.edit_perm;\n\nif(initialRecord.readPerm != targetRecord.readPerm) {\n    instruction.targetReadPerm = targetRecord.read_perm;\n    recordsDifferent = true;\n}\n\nif(initialRecord.editPerm != targetRecord.editPerm) {\n    instruction.targetEditPerm = targetRecord.edit_perm;\n    recordsDifferent = true;\n}\n\nvar initialData = {};\ninstruction.Initial = initialData;\nvar targetData = {};\ninstruction.Target = targetData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    \n    var initialValue;\n    var targetValue;\n    \n    var initialValue = initialRecord.Fields[field.name];\n    var targetValue = targetRecord.Fields[field.name];\n    \n    //validate target values\n    if(targetValue === undefined) {\n        //use default\n        targetValue = field.defaultValue;\n    }\n    \n    if(targetValue === undefined) {\n        throw new Error(\"Unknown problem: undefined field value: \" + getFieldErrString(createRecordInfo,createRecord.Id,field));\n    }\n    \n    if(targetValue === null) {\n        if(!field.nullOk) {\n            throw new Error(\"Illegal null value: \" + getFieldErrString(createRecordInfo,createRecord.Id,field));\n        }\n    }\n    \n    if(!fieldsMatch(initialValue,targetValue,field)) {\n        initialData[field.name] = initialValue;\n        targetData[field.name] = targetValue;\n        recordsDifferent = true;\n    }\n}\n\nif(recordsDifferent) {\n    return instruction;\n}\nelse {\n    return null;\n}\n","supplementalCode":"function fieldsMatch(initialValue,targetValue,fieldInfo) {\n    if(fieldInfo.fieldClass === \"java.lang.String\") {\n        //compare strings with \"==\"\n        return (initialValue == targetValue);\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"java.lang\")) {\n        //compare other basic values with \"===\"\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"com.micello\")) {\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONObject\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONArray\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else {\n        throw new Error(\"unrecognized field type: \" + fieldInfo.fieldClass);\n    }\n}\n\nfunction compareJsonData(a,b) {\n    var an = apogee.util.getNormalizedObjectCopy(a);\n    var bn = apogee.util.getNormalizedObjectCopy(b);\n    var aString = JSON.stringify(an);\n    var bString = JSON.stringify(bn);\n    return aString == bString;\n}\n    ","description":"This function creates an update instruction given an initial and target record. If the records are the same then NULL is returned. (No update is needed.)"}},"createCreateInstruction":{"name":"createCreateInstruction","type":"apogee.FunctionTable","updateData":{"argList":["createRecord"],"functionBody":"\nvar recordInfo = getRecordInfo(createRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Create\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = createRecord.Id;\n\ninstruction.targetReadPerm = createRecord.read_perm;\ninstruction.targetEditPerm = createRecord.edit_perm;\n\nvar targetData = {};\ninstruction.Target = targetData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    var targetValue;\n    var targetValue = createRecord.Fields[field.name];\n    if(targetValue === undefined) {\n        //use default\n        targetValue = field.defaultValue;\n    }\n    \n    if(targetValue === undefined) {\n        throw new Error(\"Unknown problem: undefined field value: \" + getFieldErrString(createRecord,field));\n    }\n    \n    if(targetValue === null) {\n        if(!field.nullOk) {\n            throw new Error(\"Illegal null value: \" + getFieldErrString(createRecord,field));\n        }\n    }\n    \n    targetData[field.name] = targetValue;\n}\n\nreturn instruction;\n","supplementalCode":"","description":""}},"getFieldErrString":{"name":"getFieldErrString","type":"apogee.FunctionTable","updateData":{"argList":["record","fieldInfo"],"functionBody":"return getRecordErrString(record) + \" - \" + fieldInfo.name;","supplementalCode":"","description":""}},"getRecordErrString":{"name":"getRecordErrString","type":"apogee.FunctionTable","updateData":{"argList":["record"],"functionBody":"return record.Type + \" \" + record.Id;","supplementalCode":"","description":""}},"createDeleteInstruction":{"name":"createDeleteInstruction","type":"apogee.FunctionTable","updateData":{"argList":["deleteRecord"],"functionBody":"\nvar recordInfo = getRecordInfo(deleteRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Delete\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = deleteRecord.Id;\n\ninstruction.initialReadPerm = deleteRecord.read_perm;\ninstruction.initialEditPerm = deleteRecord.edit_perm;\n\nvar initialData = {};\ninstruction.Initial = initialData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    var initialValue = deleteRecord.Fields[field.name];\n    \n    initialData[field.name] = initialValue;\n}\n\nreturn instruction;\n","supplementalCode":"","description":""}},"getRecordInfo":{"name":"getRecordInfo","type":"apogee.FunctionTable","updateData":{"argList":["recordType"],"functionBody":"var recordInfo = dataSetInfo.records[recordType];\n\nif(!recordInfo) {\n    throw new Error(\"Record type not found in getRecordInfo: \" + recordType);\n}\n\nreturn recordInfo;","supplementalCode":"","description":""}},"combinedEntriesToInstructionList":{"name":"combinedEntriesToInstructionList","type":"apogee.FunctionTable","updateData":{"argList":["combinedEntries"],"functionBody":"var output = [];\nfor(var key in combinedEntries) {\n    var entry = combinedEntries[key];\n    var instruction = getInstructionForCombinedEntry(entry);\n    if(instruction) {\n        output.push(instruction);\n    }\n}\n\nreturn output;","supplementalCode":"function getInstructionForCombinedEntry(combinedEntry) {\n    var newEntry = combinedEntry.newEntry;\n    var oldEntry = combinedEntry.oldEntry;\n    \n    if(newEntry) {\n        if(!oldEntry) {\n            console.log(\"Create: \" + newEntry.Id);\n            return createCreateInstruction(newEntry);\n        }\n        else {\n            //this will return null for matching records\n            console.log(\"Update(maybe): \" + newEntry.Id);\n            return createUpdateInstruction(oldEntry,newEntry);\n        }\n    }\n    else if(oldEntry) {\n        console.log(\"Delete: \" + oldEntry.Id);\n        return createDeleteInstruction(oldEntry);\n    }\n    \n    return null;\n}\n\nfunction entriesDifferent(entry1,entry2) {\n    var string1 = JSON.stringify(apogee.util.getNormalizedCopy(entry1));\n    var string2 = JSON.stringify(apogee.util.getNormalizedCopy(entry2));\n    return (string1 == string2);\n}","description":"This function takes a combined entry map of the format:\n\n{\n  \"some-identifier\":{\n    \"oldEntry\":{original record entry, if applicable},\n    \"newEntry\":{new record entry, if applicable}\n  },\n  ...\n}\n\nIt returns an instruction list.\n\n"}},"getCommitPromise":{"name":"getCommitPromise","type":"apogee.FunctionTable","updateData":{"argList":["instructionList","commitMessage","sessionKey"],"functionBody":"var commitBody = createCommitBody(instructionList,commitMessage);\nvar requestOptions = createRequestOptions(commitBody,sessionKey);\nvalue = apogee.net.jsonRequest(commitUrl,requestOptions);\nreturn value;","supplementalCode":"","description":""}},"getRequestPromise":{"name":"getRequestPromise","type":"apogee.FunctionTable","updateData":{"argList":["requestBody","sessionKey"],"functionBody":"var requestOptions = createRequestOptions(requestBody,sessionKey);\nvalue = apogee.net.jsonRequest(requestUrl,requestOptions);\nreturn value;","supplementalCode":"","description":""}},"getMapRequest":{"name":"getMapRequest","type":"apogee.FunctionTable","updateData":{"argList":["cid","sessionKey"],"functionBody":"var requestBody = {};\nrequestBody.search = \"community_map\";\nrequestBody.id = cid;\n\nvar requestOptions = createRequestOptions(requestBody,sessionKey);\n\nvar requestUrl = host + \"/cannedsearch\";\nreturn apogee.net.jsonRequest(requestUrl,requestOptions);","supplementalCode":"","description":""}}}},"login":{"name":"login","type":"apogee.Folder","children":{"loginUrl":{"name":"loginUrl","type":"apogee.JsonTable","updateData":{"data":"http://factory.micello.com/TestAuthorization/loginjson","description":""}},"loginControl":{"name":"loginControl","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return loginUrl;","supplementalCode":"","description":""}},"sessionResponse":{"name":"sessionResponse","type":"apogee.JsonTable","updateData":{"data":"","description":""}}}}}}},"components":{"did":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":196,"height":51},"posInfo":{"x":513,"y":21},"state":0,"viewType":"Text"}},"mapData":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":588,"height":347},"posInfo":{"x":601,"y":334},"state":0,"viewType":"Formula"}},"sessionKey":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":543,"height":90},"posInfo":{"x":532,"y":121},"state":0,"viewType":"Text"}},"cid":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":234,"height":58},"posInfo":{"x":235,"y":25},"state":0,"viewType":"Text"}},"getRecord":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":571,"height":216},"posInfo":{"x":44,"y":423},"state":-1,"viewType":"Code"}},"getCommunityRecord":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":400,"height":33},"posInfo":{"x":43,"y":372},"state":-1,"viewType":"Code"}},"coords":{"type":"apogeeapp.app.FolderComponent","windowState":{"posInfo":{"x":46,"y":209}},"children":{"metersPerMerc":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":400,"height":63},"posInfo":{"x":803,"y":158},"state":0,"viewType":"Code"}},"METERS_PER_MERC0":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":387,"height":96},"posInfo":{"x":563,"y":30},"state":-1,"viewType":"Formula"}},"lonRadToMercX":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":461,"height":36},"posInfo":{"x":64,"y":272},"state":0,"viewType":"Code"}},"TWO_TO_25":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":316,"height":42},"posInfo":{"x":329,"y":29},"state":-1,"viewType":"Text"}},"MERCATOR_ZOOM":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":298,"height":42},"posInfo":{"x":61,"y":32},"state":-1,"viewType":"Text"}},"latRadToMercY":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":601,"height":62},"posInfo":{"x":59,"y":158},"state":0,"viewType":"Code"}},"radToDeg":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":400,"height":39},"posInfo":{"x":823,"y":286},"state":-1,"viewType":"Code"}},"degToRad":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":400,"height":36},"posInfo":{"x":834,"y":386},"state":-1,"viewType":"Code"}},"mercYToLatRad":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":653,"height":42},"posInfo":{"x":67,"y":454},"state":0,"viewType":"Code"}},"mercXToLonRad":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":400,"height":44},"posInfo":{"x":63,"y":359},"state":0,"viewType":"Code"}}}},"working":{"type":"apogeeapp.app.FolderComponent","windowState":{"posInfo":{"x":42,"y":77}},"children":{"desiredTransform":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":273,"height":119},"posInfo":{"x":423,"y":460},"state":-1,"viewType":"Text"}},"mercToNatTransform":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":268,"height":122},"posInfo":{"x":426,"y":415},"state":-1,"viewType":"Text"}},"desiredMetersPerPixel":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":272,"height":48},"posInfo":{"x":16,"y":351},"state":0,"viewType":"Text"}},"centerLatLonDeg":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":533,"height":300},"posInfo":{"x":1048,"y":191},"state":-1,"viewType":"Text"}},"initialRecord":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":300,"height":306},"posInfo":{"x":703,"y":441},"state":-1,"viewType":"JSON"}},"targetRecord":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":352,"height":285},"posInfo":{"x":701,"y":478},"state":-1,"viewType":"Formula"}},"editedRecords":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":447,"height":306},"posInfo":{"x":700,"y":517},"state":-1,"viewType":"Text"}},"test":{"type":"apogeeapp.app.FolderComponent","windowState":{"posInfo":{"x":1212,"y":21}},"children":{"distance":{"type":"apogeeapp.app.JsonTableComponent"},"p2Map":{"type":"apogeeapp.app.JsonTableComponent"},"p3Map":{"type":"apogeeapp.app.JsonTableComponent"},"p1Map":{"type":"apogeeapp.app.JsonTableComponent"},"p3":{"type":"apogeeapp.app.JsonTableComponent"},"p2":{"type":"apogeeapp.app.JsonTableComponent"},"p1":{"type":"apogeeapp.app.JsonTableComponent"}}},"pixelsPerPaperInch":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":287,"height":21},"posInfo":{"x":710,"y":338},"state":-1,"viewType":"Text"}},"pixelsPerWorldInch":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":273,"height":45},"posInfo":{"x":18,"y":259},"state":0,"viewType":"Text"}},"inchesPerMeter":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":248,"height":41},"posInfo":{"x":709,"y":376},"state":-1,"viewType":"Text"}},"mercCenter":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":221,"height":85},"posInfo":{"x":1045,"y":334},"state":0,"viewType":"Text"}},"natCenter":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":218,"height":51},"posInfo":{"x":1047,"y":236},"state":0,"viewType":"Text"}},"worldInchesPerPaperInch":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":275,"height":45},"posInfo":{"x":28,"y":84},"state":0,"viewType":"Text"}},"NOTE":{"type":"apogeeapp.app.TextComponent","windowState":{"sizeInfo":{"width":326,"height":286},"posInfo":{"x":654,"y":5},"state":0,"viewType":"Text"}},"worldMetersPerPaperInch":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":306,"height":40},"posInfo":{"x":328,"y":87},"state":0,"viewType":"Text"}},"pixelsPerWorldMeter":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":281,"height":40},"posInfo":{"x":325,"y":263},"state":0,"viewType":"Text"}},"worldInchesOrMeters":{"type":"apogeeapp.app.TextComponent","windowState":{"sizeInfo":{"width":278,"height":33},"posInfo":{"x":30,"y":7},"state":0,"viewType":"Text"}},"currentMetersPerPixel":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":463,"height":25},"posInfo":{"x":28,"y":453},"state":0,"viewType":"Text"}}}},"submit":{"type":"apogeeapp.app.FolderComponent","windowState":{"posInfo":{"x":43,"y":129}},"children":{"submitControl":{"type":"apogeeapp.app.CustomControlComponent","windowState":{"sizeInfo":{"width":374,"height":304},"posInfo":{"x":34,"y":189},"state":0,"viewType":"Output"},"resource":{"html":"<textarea id=\"submit_messageInput\"></textarea><br>\n<input type=\"button\" id=\"submit_commitButton\" value=\"Commit\"></input>\n<input type=\"button\" id=\"submit_cancelButton\" value=\"Cancel\"></input>","onLoad":"this.submitButton = document.getElementById(\"submit_commitButton\");\nthis.cancelButton = document.getElementById(\"submit_cancelButton\");\nthis.messageInput = document.getElementById(\"submit_messageInput\");\nthis.initialized = true;\n\nvar instance = this;\nthis.submitButton.onclick = function() {\n    instance.onSubmit();\n}\nthis.cancelButton.onclick = function() {\n    instance.onCancel();\n}","constructorAddition":"this.messageInput = null;\nthis.submitButton = null;\nthis.cancelButton = null;\nthis.initialized = false;\n\nthis.onSubmit = function() {\n    \n    if(!this.initialized) {\n        return;\n    }\n    \n    var commitMessage = this.messageInput.value.trim();\n    if((!commitMessage)||(commitMessage.length === 0)) {\n        alert(\"You must enter a commit message!\");\n        return;\n    }\n    this.messageInput.value = \"\";\n    \n    if((!this.instructionList)||(this.instructionList.length === 0)) {\n        alert(\"There is no data to commit.\");\n        return;\n    }\n    \n    var updateInfo = [];\n    updateInfo.push([ \"commitMessage\",commitMessage]);\n    updateInfo.push([\"liveInstructionList\",this.instructionList]);\n    mode.getMessenger().compoundDataUpdate(updateInfo,true);\n}\n\nthis.onCancel = function() {\n    mode.getMessenger().dataUpdate(\"taskResults.editMetaFile\",\"\");\n}","setData":"this.instructionList = data;","css":"#submit_messageInput {\n    height: 200px;\n    width: 300px;\n}"}},"instructionList":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":646,"height":371},"posInfo":{"x":40,"y":78},"state":-1,"viewType":"Text"}},"combinedEntries":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":797,"height":442},"posInfo":{"x":42,"y":22},"state":-1,"viewType":"Formula"}},"commitMessage":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":271,"height":103},"posInfo":{"x":527,"y":12},"state":-1,"viewType":"Text"}},"liveInstructionList":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":315,"height":124},"posInfo":{"x":526,"y":52},"state":-1,"viewType":"Text"}},"taskResult":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":793,"height":447},"posInfo":{"x":519,"y":160},"state":-1,"viewType":"Text"}},"response":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":416,"height":201},"posInfo":{"x":492,"y":284},"state":0,"viewType":"Text"}},"commitAction":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":733,"height":439},"posInfo":{"x":522,"y":93},"state":-1,"viewType":"Text"}}}},"micemapsDataAccess":{"type":"apogeeapp.app.FolderComponent","windowState":{"posInfo":{"x":47,"y":265}},"children":{"createRecord":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":560,"height":321},"posInfo":{"x":32,"y":389},"state":-1,"viewType":"Code"}},"recordsToCreateInstructions":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":834,"height":391},"posInfo":{"x":32,"y":440},"state":-1,"viewType":"Code"}},"createCommitBody":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":568,"height":400},"posInfo":{"x":752,"y":206},"state":-1,"viewType":"Code"}},"createRequestOptions":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":523,"height":254},"posInfo":{"x":749,"y":43},"state":-1,"viewType":"Code"}},"host":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":353,"height":71},"posInfo":{"x":21,"y":19},"state":0,"viewType":"Text"}},"commitUrl":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":433,"height":-4},"posInfo":{"x":35,"y":88},"state":-1,"viewType":"Text"}},"requestUrl":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":450,"height":68},"posInfo":{"x":31,"y":139},"state":-1,"viewType":"Formula"}},"dataSetInfo":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":1064,"height":611},"posInfo":{"x":40,"y":558},"state":-1,"viewType":"Text"}},"createUpdateInstruction":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":886,"height":655},"posInfo":{"x":36,"y":248},"state":-1,"viewType":"Code"}},"createCreateInstruction":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":994,"height":643},"posInfo":{"x":35,"y":209},"state":-1,"viewType":"Code"}},"getFieldErrString":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":512,"height":68},"posInfo":{"x":761,"y":616},"state":-1,"viewType":"Code"}},"getRecordErrString":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":400,"height":81},"posInfo":{"x":762,"y":664},"state":-1,"viewType":"Code"}},"createDeleteInstruction":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":678,"height":540},"posInfo":{"x":36,"y":289},"state":-1,"viewType":"Code"}},"getRecordInfo":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":480,"height":400},"posInfo":{"x":821,"y":426},"state":-1,"viewType":"Code"}},"combinedEntriesToInstructionList":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":721,"height":524},"posInfo":{"x":34,"y":485},"state":-1,"viewType":"Private"}},"getCommitPromise":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":741,"height":400},"posInfo":{"x":754,"y":158},"state":-1,"viewType":"Code"}},"getRequestPromise":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":810,"height":400},"posInfo":{"x":752,"y":108},"state":-1,"viewType":"Code"}},"getMapRequest":{"type":"apogeeapp.app.FunctionComponent","windowState":{"sizeInfo":{"width":400,"height":400},"posInfo":{"x":292,"y":11},"state":-1,"viewType":"Code"}}}},"login":{"type":"apogeeapp.app.FolderComponent","windowState":{"posInfo":{"x":41,"y":24}},"children":{"loginUrl":{"type":"apogeeapp.app.TextComponent","windowState":{"sizeInfo":{"width":463,"height":38},"posInfo":{"x":26,"y":27},"state":0,"viewType":"Text"}},"loginControl":{"type":"apogeeapp.app.CustomControlComponent","windowState":{"sizeInfo":{"width":369,"height":87},"posInfo":{"x":27,"y":159},"state":0,"viewType":"Output"},"resource":{"html":"","css":"","setData":"this.loginUrl = data;","constructorAddition":"\n\n//this uses the updated version of test authorization that takes and returns a JSON\nthis.onClick = function() {\n    \n    //on click\n    var bodyJson = {};\n    bodyJson.userName = resource.userInput.value;\n    bodyJson.password = resource.passwordInput.value;\n    \n    //cleaer password field\n    resource.passwordInput.value = \"\";\n    \n    var options = {};\n    options.body = JSON.stringify(bodyJson);\n    options.method = \"POST\";\n    \n    var requestPromise = apogee.net.jsonRequest(this.loginUrl,options);\n    \n    //set the response\n    mode.getMessenger().asynchDataUpdate(\"sessionResponse\",requestPromise);\n}","init":"\nvar label1 = document.createElement(\"label\");\nlabel1.for = \"userInput\";\nlabel1.innerHTML = \"User:\"\nelement.appendChild(label1);\n\nvar input1 = document.createElement(\"input\");\ninput1.id = \"userInput\";\nresource.userInput = input1;\nelement.appendChild(input1);\n\nelement.appendChild(document.createElement(\"br\"));\n\nvar label2 = document.createElement(\"label\");\nlabel2.for = \"passwordInput\";\nlabel2.innerHTML = \"Password:\"\nelement.appendChild(label2);\n\nvar input2 = document.createElement(\"input\");\ninput2.id = \"passwordInput\";\ninput2.type = \"password\";\nresource.passwordInput = input2;\nelement.appendChild(input2);\n\nelement.appendChild(document.createElement(\"br\"));\n\nvar button = document.createElement(\"button\");\nbutton.innerHTML = \"Login\";\nelement.appendChild(button);\n\nvar instance = this;\nbutton.onclick = function() {\n    instance.onClick();\n}\n\n\n"}},"sessionResponse":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":697,"height":93},"posInfo":{"x":26,"y":296},"state":0,"viewType":"Text"}}}}}}
+{
+	"fileType": "apogee js web workspace",
+	"workspace": {
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "rescale",
+			"type": "apogee.Folder",
+			"children": {
+				"did": {
+					"name": "did",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": 0,
+						"description": ""
+					}
+				},
+				"mapData": {
+					"name": "mapData",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "return micemapsDataAccess.getMapRequest(cid,sessionKey);",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"sessionKey": {
+					"name": "sessionKey",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "return login.sessionResponse.sessionKey;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"cid": {
+					"name": "cid",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": 0,
+						"description": ""
+					}
+				},
+				"getRecord": {
+					"name": "getRecord",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"recordType",
+							"recordId"
+						],
+						"functionBody": "//get the suppporting records\nvar recordList = mapData.data.Records;\n\nfor(var i = 0; i < recordList.length; i++) {\n    var record = recordList[i];\n    \n    if((record.Type == recordType)&&(record.Id == recordId)) {\n        return record;\n    }\n}\n\nreturn null;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"getCommunityRecord": {
+					"name": "getCommunityRecord",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "return mapData.data.Response[0];",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"coords": {
+					"name": "coords",
+					"type": "apogee.Folder",
+					"children": {
+						"metersPerMerc": {
+							"name": "metersPerMerc",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"latRad"
+								],
+								"functionBody": "\nreturn METERS_PER_MERC0 * Math.cos(latRad);",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"METERS_PER_MERC0": {
+							"name": "METERS_PER_MERC0",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "var EARTH_CIRCUMFERENCE = 40040000.0; //somewhere between polar and equitorial value - I picked it at random though\nvar METERS_PER_MERC0 = EARTH_CIRCUMFERENCE / TWO_TO_25;\n\nreturn METERS_PER_MERC0;\n\n",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"lonRadToMercX": {
+							"name": "lonRadToMercX",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"lonRad"
+								],
+								"functionBody": "return TWO_TO_25 * (.5 + lonRad/(2 * Math.PI) );",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"TWO_TO_25": {
+							"name": "TWO_TO_25",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "return 0x01 << MERCATOR_ZOOM;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"MERCATOR_ZOOM": {
+							"name": "MERCATOR_ZOOM",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": 25,
+								"description": ""
+							}
+						},
+						"latRadToMercY": {
+							"name": "latRadToMercY",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"latRad"
+								],
+								"functionBody": "var sinLat = Math.sin(latRad);\nreturn TWO_TO_25 * ( .5 - Math.log((1 + sinLat)/(1-sinLat))/(4 * Math.PI) );",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"radToDeg": {
+							"name": "radToDeg",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"angleRad"
+								],
+								"functionBody": "return 180 * angleRad / Math.PI;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"degToRad": {
+							"name": "degToRad",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"angleDeg"
+								],
+								"functionBody": "return Math.PI * angleDeg /180;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"mercYToLatRad": {
+							"name": "mercYToLatRad",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"mercY"
+								],
+								"functionBody": "return Math.atan( Math.sinh( 2*Math.PI * (.5 - my/TWO_TO_25) ));",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"mercXToLonRad": {
+							"name": "mercXToLonRad",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"mercX"
+								],
+								"functionBody": "return 2*Math.PI * (mx/TWO_TO_25 - .5);",
+								"supplementalCode": "",
+								"description": ""
+							}
+						}
+					}
+				},
+				"working": {
+					"name": "working",
+					"type": "apogee.Folder",
+					"children": {
+						"desiredTransform": {
+							"name": "desiredTransform",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "var output = [];\n\nfor(var i = 0; i < 4; i++) {\n    output[i] = mercToNatTransform[i] * currentMetersPerPixel /desiredMetersPerPixel;    \n}\n\n//maintain community center point\nvar mercCenterX = coords.lonRadToMercX(centerLatLonDeg[1] * Math.PI / 180);\nvar mercCenterY = coords.latRadToMercY(centerLatLonDeg[0] * Math.PI / 180);\n\noutput[4] = -(output[0] * mercCenterX + output[2] * mercCenterY);\noutput[5] = -(output[1] * mercCenterX + output[3] * mercCenterY);\n\nreturn output;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"mercToNatTransform": {
+							"name": "mercToNatTransform",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "return [\n    initialRecord.Fields.mxx,\n    initialRecord.Fields.myx,\n    initialRecord.Fields.mxy,\n    initialRecord.Fields.myy,\n    initialRecord.Fields.mx0,\n    initialRecord.Fields.my0,\n];",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"desiredMetersPerPixel": {
+							"name": "desiredMetersPerPixel",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "if(worldInchesOrMeters == \"inches\") {\n    return 1.0 / (inchesPerMeter * pixelsPerWorldInch);\n}\nelse if(worldInchesOrMeters == \"meters\") {\n    return 1.0 / pixelsPerWorldMeter;\n}\nelse {\n    throw new Error(\"Unknown unit choice: \" + worldInchesOrMeters);\n}",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"centerLatLonDeg": {
+							"name": "centerLatLonDeg",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "var community = getCommunityRecord();\n\nreturn [community.Fields.center_lat,community.Fields.center_lon];\n\n",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"initialRecord": {
+							"name": "initialRecord",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "return getRecord(\"drawing\",did);",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"targetRecord": {
+							"name": "targetRecord",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "var record = apogee.util.jsonCopy(initialRecord);\n\nrecord.Fields.mxx = desiredTransform[0];\nrecord.Fields.myx = desiredTransform[1];\nrecord.Fields.mxy = desiredTransform[2];\nrecord.Fields.myy = desiredTransform[3];\nrecord.Fields.mx0 = desiredTransform[4];\nrecord.Fields.my0 = desiredTransform[5];\n\nreturn record;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"editedRecords": {
+							"name": "editedRecords",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "var output = {};\n\nvar entry = {};\nentry.oldEntry = initialRecord;\nentry.newEntry = targetRecord;\n\noutput[\"drawing\" + did] = entry;\n\nreturn output;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"test": {
+							"name": "test",
+							"type": "apogee.Folder",
+							"children": {
+								"distance": {
+									"name": "distance",
+									"type": "apogee.JsonTable",
+									"updateData": {
+										"argList": [],
+										"functionBody": "var result = {};\n\nvar distMerc12 = distance(p1,p2);\nvar distMerc23 = distance(p2,p3);\n\nresult.distMeters12 = coords.metersPerMerc(coords.degToRad(centerLatLonDeg[0])) * distMerc12;\nresult.distMeters23 = coords.metersPerMerc(coords.degToRad(centerLatLonDeg[0])) * distMerc23;\n\nresult.distNat12 = distance(p1Map,p2Map);\nresult.distNat23 = distance(p2Map,p3Map);\n\nresult.scale12 = result.distNat12/result.distMeters12;\nresult.scale23 = result.distNat23/result.distMeters23;\n\nreturn result;",
+										"supplementalCode": "function distance(a,b) {\n    return  Math.sqrt( (a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));\n}",
+										"description": ""
+									}
+								},
+								"p2Map": {
+									"name": "p2Map",
+									"type": "apogee.JsonTable",
+									"updateData": {
+										"argList": [],
+										"functionBody": "var xNat = mercToNatTransform[0] * p2[0] + mercToNatTransform[2] * p2[1] + mercToNatTransform[4];\nvar yNat = mercToNatTransform[1] * p2[0] + mercToNatTransform[3] * p2[1] + mercToNatTransform[5];\n\nreturn [xNat,yNat];",
+										"supplementalCode": "",
+										"description": ""
+									}
+								},
+								"p3Map": {
+									"name": "p3Map",
+									"type": "apogee.JsonTable",
+									"updateData": {
+										"argList": [],
+										"functionBody": "var xNat = mercToNatTransform[0] * p3[0] + mercToNatTransform[2] * p3[1] + mercToNatTransform[4];\nvar yNat = mercToNatTransform[1] * p3[0] + mercToNatTransform[3] * p3[1] + mercToNatTransform[5];\n\nreturn [xNat,yNat];",
+										"supplementalCode": "",
+										"description": ""
+									}
+								},
+								"p1Map": {
+									"name": "p1Map",
+									"type": "apogee.JsonTable",
+									"updateData": {
+										"argList": [],
+										"functionBody": "var xNat = mercToNatTransform[0] * p1[0] + mercToNatTransform[2] * p1[1] + mercToNatTransform[4];\nvar yNat = mercToNatTransform[1] * p1[0] + mercToNatTransform[3] * p1[1] + mercToNatTransform[5];\n\nreturn [xNat,yNat];",
+										"supplementalCode": "",
+										"description": ""
+									}
+								},
+								"p3": {
+									"name": "p3",
+									"type": "apogee.JsonTable",
+									"updateData": {
+										"data": [
+											5410874.552317001,
+											13022197.48733345
+										],
+										"description": ""
+									}
+								},
+								"p2": {
+									"name": "p2",
+									"type": "apogee.JsonTable",
+									"updateData": {
+										"data": [
+											5410902.667355812,
+											13022480.752022566
+										],
+										"description": ""
+									}
+								},
+								"p1": {
+									"name": "p1",
+									"type": "apogee.JsonTable",
+									"updateData": {
+										"data": [
+											5411268.443915,
+											13022458.420276431
+										],
+										"description": ""
+									}
+								}
+							}
+						},
+						"pixelsPerPaperInch": {
+							"name": "pixelsPerPaperInch",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": 72,
+								"description": ""
+							}
+						},
+						"pixelsPerWorldInch": {
+							"name": "pixelsPerWorldInch",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "if(worldInchesOrMeters == \"inches\") {\n    return pixelsPerPaperInch / worldInchesPerPaperInch;\n}\nelse {\n    return \"NOT APPLICABLE\";\n}",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"inchesPerMeter": {
+							"name": "inchesPerMeter",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "return 1.0 / 0.0254;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"mercCenter": {
+							"name": "mercCenter",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "var mercX = coords.lonRadToMercX(centerLatLonDeg[1] * Math.PI / 180);\nvar mercY = coords.latRadToMercY(centerLatLonDeg[0] * Math.PI / 180);\n\nreturn [mercX,mercY];",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"natCenter": {
+							"name": "natCenter",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "var nat = [];\nnat[0] = desiredTransform[0] * mercCenter[0] + desiredTransform[2] * mercCenter[1] + desiredTransform[4];\nnat[1] = desiredTransform[1] * mercCenter[0] + desiredTransform[3] * mercCenter[1] + desiredTransform[5];\n\nreturn nat;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"worldInchesPerPaperInch": {
+							"name": "worldInchesPerPaperInch",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": 420,
+								"description": ""
+							}
+						},
+						"NOTE": {
+							"name": "NOTE",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": "First login and set the appropriate\nCID and DID.\n\nSet the table \"worldInchesOrMeters\" to\neither \"inches\" or \"meters\", then\nfill in the corresponding table:\n\n\"worldInchesPerPaperInch\" or\n\"worldMetersPerPaperInch\"\n\nLastly, go to \"submit\" and add a\ncommit message and submit it.\n\n------------------------------\n\nThis process will mess up the geocode!\n\nThis transform will set the community\ncenter lat lon to the top left corner \nof the community. ",
+								"description": ""
+							}
+						},
+						"worldMetersPerPaperInch": {
+							"name": "worldMetersPerPaperInch",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": 10,
+								"description": ""
+							}
+						},
+						"pixelsPerWorldMeter": {
+							"name": "pixelsPerWorldMeter",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "if(worldInchesOrMeters == \"meters\") {\n    return pixelsPerPaperInch / worldMetersPerPaperInch;\n}\nelse {\n    return \"NOT APPLICABLE\";\n}",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"worldInchesOrMeters": {
+							"name": "worldInchesOrMeters",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": "inches",
+								"description": ""
+							}
+						},
+						"currentMetersPerPixel": {
+							"name": "currentMetersPerPixel",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "var pixelOverMercScaleFactor = Math.sqrt(mercToNatTransform[0] * mercToNatTransform[3] - mercToNatTransform[1] * mercToNatTransform[2]); \nvar centerLatRad = coords.degToRad(centerLatLonDeg[0]);\n\nreturn  coords.metersPerMerc(centerLatRad) / pixelOverMercScaleFactor;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						}
+					}
+				},
+				"submit": {
+					"name": "submit",
+					"type": "apogee.Folder",
+					"children": {
+						"submitControl": {
+							"name": "submitControl",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "return instructionList;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"instructionList": {
+							"name": "instructionList",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "if(!combinedEntries) return null;\n\nreturn micemapsDataAccess.combinedEntriesToInstructionList(combinedEntries);",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"combinedEntries": {
+							"name": "combinedEntries",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "return working.editedRecords;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"commitMessage": {
+							"name": "commitMessage",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": "another try....",
+								"description": ""
+							}
+						},
+						"liveInstructionList": {
+							"name": "liveInstructionList",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": null,
+								"description": ""
+							}
+						},
+						"taskResult": {
+							"name": "taskResult",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "//only process the commit response if there are\n//live instructions\nif(!liveInstructionList) return \"OK\";\n\nvar taskResult = {};\nif(!commitAction) {\n    taskResult.state = \"INCOMPLETE\";\n}\nelse if(commitAction.success === true) {\n    taskResult.state = \"SUCCESS\";\n}\nelse {\n    taskResult.status = \"ERROR\";\n    taskResult.msg = commitResponse.msg;\n}\n\nvar commitResult = {};\ncommitResult.commitMessage = commitMessage;\ncommitResult.commitResponse = commitResponse;\ntaskResult.data = commitResult;\n\n\n\n//set data\nvar updateInfo = [];\nupdateInfo.push([\"response\",taskResult]);\nupdateInfo.push([\"liveInstructionList\",null]);\napogeeMessenger.compoundDataUpdate(updateInfo);\n    \nreturn \"OK\";",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"response": {
+							"name": "response",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": "",
+								"description": ""
+							}
+						},
+						"commitAction": {
+							"name": "commitAction",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "if(!liveInstructionList) return null;\n\nreturn micemapsDataAccess.getCommitPromise(liveInstructionList,commitMessage,sessionKey);",
+								"supplementalCode": "",
+								"description": ""
+							}
+						}
+					}
+				},
+				"micemapsDataAccess": {
+					"name": "micemapsDataAccess",
+					"type": "apogee.Folder",
+					"children": {
+						"createRecord": {
+							"name": "createRecord",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"recordType",
+									"fieldMap"
+								],
+								"functionBody": "var record = {};\n\nvar recordInfo = getRecordInfo(recordType);\n\nrecord.Id = getId();\nrecord.Type = recordInfo.name;\nrecord.Fields = fieldMap;\nrecord.read_perm = READ_PERM;\nrecord.edit_perm = EDIT_PERM;\n\nreturn record;",
+								"supplementalCode": "var READ_PERM = 2;\nvar EDIT_PERM = 15;\n\nvar nextId = -1;\n\nfunction getId() {\n    return nextId--;\n}",
+								"description": "This method creates a record given the field values and record info \nfrom the data set info. It creates and ID and uses standard permissions."
+							}
+						},
+						"recordsToCreateInstructions": {
+							"name": "recordsToCreateInstructions",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"recordList"
+								],
+								"functionBody": "var instructions = [];\n\nfor(var i = 0; i < recordList.length; i++) {\n    var createRecord = recordList[i];\n    var instruction = createCreateInstruction(createRecord);\n    instructions.push(instruction);\n}\n\nreturn instructions;",
+								"supplementalCode": "",
+								"description": "This creates a list of create instructions to go along with a list of records to be created.\n\nThere is the option to assign the ID or to leave it as undefined, in which case\nan automatically incremented ID will be assigned. (For consistency in the data\nset, either all records should be preassigned or all records should be \nautomatically assigned."
+							}
+						},
+						"createCommitBody": {
+							"name": "createCommitBody",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"instructionList",
+									"commitMessage"
+								],
+								"functionBody": "var commit = {};\nvar actions = [];\n\nif(commitMessage.length === 0) throw new Error(\"Commit message missing!\");\n\ncommit.Name = dataSetInfo.name;\ncommit.Message = commitMessage;\ncommit.Actions = actions;\n\n//single action with commits\nvar action = {};\naction.Title = \"bulk create commit\";\naction.Instr = instructionList;\nactions.push(action);\n\nreturn commit",
+								"supplementalCode": "",
+								"description": "This creates a body for a commit request, given a list of instructions and a commit message."
+							}
+						},
+						"createRequestOptions": {
+							"name": "createRequestOptions",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"bodyJson",
+									"sessionKey"
+								],
+								"functionBody": "var header = {};\nheader[\"Content-Type\"] = \"text/plain;charset=UTF-8\";\nheader.sessionKey = sessionKey;\nheader[\"proto-version\"] = \"4.0\";\nheader[\"db-version\"] = dataSetInfo.version;\n\nrequestInfo = {};\nrequestInfo.header = header;\nif(bodyJson) {\n    requestInfo.method = \"POST\";\n    requestInfo.body = JSON.stringify(bodyJson);\n}\n\nreturn requestInfo;\n",
+								"supplementalCode": "",
+								"description": "This creates the requestOptions, suitable for apogee.net.jsonRequest, to go with an type of request to the workingset (micemetarequest) server."
+							}
+						},
+						"host": {
+							"name": "host",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": "http://factory.micello.com/micemapsws",
+								"description": ""
+							}
+						},
+						"commitUrl": {
+							"name": "commitUrl",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "var value;\nvalue = host + \"/commit\";\nreturn value;\n\n",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"requestUrl": {
+							"name": "requestUrl",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "var value;\nvalue = host + \"/cannedsearch\";\nreturn value;\n\n",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"dataSetInfo": {
+							"name": "dataSetInfo",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"name": "Micemaps",
+									"records": {
+										"community": {
+											"foreignList": [
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "community_id",
+													"remoteRecord": "geometry_address",
+													"name": "geom_addresses"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "community_id",
+													"remoteRecord": "drawing",
+													"name": "drawings"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "community_id",
+													"remoteRecord": "community_prop",
+													"orderField": "ordr",
+													"name": "community_props"
+												}
+											],
+											"idField": "community_id",
+											"name": "community",
+											"recordClass": "com.micello.micemaps.data.Community",
+											"fields": [
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "center_lat",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "center_lon",
+													"nullOk": true
+												}
+											]
+										},
+										"drawing": {
+											"foreignList": [
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "drawing_id",
+													"remoteRecord": "drawing_level",
+													"orderField": "zlevel",
+													"name": "site_level"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "drawing_id",
+													"remoteRecord": "drawing_prop",
+													"orderField": "ordr",
+													"name": "drawing_props"
+												}
+											],
+											"idField": "drawing_id",
+											"name": "drawing",
+											"recordClass": "com.micello.micemaps.data.Drawing",
+											"fields": [
+												{
+													"fieldClass": "com.micello.micemaps.data.Community",
+													"name": "community_id",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.Boolean",
+													"name": "is_root",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.Boolean",
+													"name": "is_locked",
+													"nullOk": false,
+													"defaultValue": false
+												},
+												{
+													"fieldClass": "java.lang.Float",
+													"name": "width",
+													"nullOk": false,
+													"defaultValue": -1
+												},
+												{
+													"fieldClass": "java.lang.Float",
+													"name": "height",
+													"nullOk": false,
+													"defaultValue": -1
+												},
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "mxx",
+													"nullOk": false,
+													"defaultValue": 1
+												},
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "myx",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "mxy",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "myy",
+													"nullOk": false,
+													"defaultValue": 1
+												},
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "mx0",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "my0",
+													"nullOk": false,
+													"defaultValue": 0
+												}
+											]
+										},
+										"nav_node": {
+											"foreignList": [
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "node_id",
+													"remoteRecord": "nav_node_level",
+													"name": "level_list"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "node1_id",
+													"remoteRecord": "nav_link",
+													"name": "link_starts"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "node2_id",
+													"remoteRecord": "nav_link",
+													"name": "link_ends"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "node_id",
+													"remoteRecord": "node_prop",
+													"orderField": "ordr",
+													"name": "node_prop"
+												}
+											],
+											"idField": "node_id",
+											"name": "nav_node",
+											"recordClass": "com.micello.micemaps.data.NavNode",
+											"fields": [
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "mx",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "my",
+													"nullOk": false
+												}
+											]
+										},
+										"geometry": {
+											"foreignList": [
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "main_geom_id",
+													"remoteRecord": "geometry_group",
+													"name": "my_group_map"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": true,
+													"remoteField": "geom_id",
+													"remoteRecord": "geometry_group",
+													"name": "group_map"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "geometry_id",
+													"remoteRecord": "geometry_prop",
+													"orderField": "ordr",
+													"name": "geometry_prop"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": true,
+													"remoteField": "geometry_id",
+													"remoteRecord": "geometry_address",
+													"name": "geometry_address"
+												}
+											],
+											"idField": "geom_id",
+											"name": "geometry",
+											"recordClass": "com.micello.micemaps.data.Geometry",
+											"fields": [
+												{
+													"fieldClass": "java.lang.Integer",
+													"name": "zorder",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "java.lang.Integer",
+													"name": "parent_draw_order",
+													"nullOk": false,
+													"defaultValue": 9999
+												},
+												{
+													"fieldClass": "java.lang.Integer",
+													"name": "parent_zorder",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.DrawingLevel",
+													"name": "parent_level_id",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.DrawingLevel",
+													"name": "my_level_id",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "com.micello.miceditor.geometry.MShape",
+													"name": "geom",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "com.micello.miceditor.geometry.RotRect",
+													"name": "label",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "mark_x",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "mark_y",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "java.lang.Boolean",
+													"name": "is_locked",
+													"nullOk": false,
+													"defaultValue": false
+												},
+												{
+													"fieldClass": "java.lang.Boolean",
+													"name": "custom_label",
+													"nullOk": false,
+													"defaultValue": false
+												}
+											]
+										},
+										"drawing_prop": {
+											"foreignList": [],
+											"idField": "drawing_prop_id",
+											"name": "drawing_prop",
+											"recordClass": "com.micello.micemaps.data.DrawingProp",
+											"fields": [
+												{
+													"fieldClass": "java.lang.Integer",
+													"name": "ordr",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.Drawing",
+													"name": "drawing_id",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_name",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_value",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "lang",
+													"nullOk": true
+												}
+											]
+										},
+										"geometry_prop": {
+											"foreignList": [],
+											"idField": "prop_id",
+											"name": "geometry_prop",
+											"recordClass": "com.micello.micemaps.data.GeometryProp",
+											"fields": [
+												{
+													"fieldClass": "java.lang.Integer",
+													"name": "ordr",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.Geometry",
+													"name": "geometry_id",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_name",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_value",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "lang",
+													"nullOk": true
+												}
+											]
+										},
+										"node_prop": {
+											"foreignList": [],
+											"idField": "prop_id",
+											"name": "node_prop",
+											"recordClass": "com.micello.micemaps.data.NavNodeProp",
+											"fields": [
+												{
+													"fieldClass": "java.lang.Integer",
+													"name": "ordr",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.NavNode",
+													"name": "node_id",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_name",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_value",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "lang",
+													"nullOk": true
+												}
+											]
+										},
+										"geometry_group": {
+											"foreignList": [],
+											"idField": "geom_group_id",
+											"name": "geometry_group",
+											"recordClass": "com.micello.micemaps.data.GeometryGroup",
+											"fields": [
+												{
+													"fieldClass": "com.micello.micemaps.data.Geometry",
+													"name": "main_geom_id",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.Geometry",
+													"name": "geom_id",
+													"nullOk": false
+												}
+											]
+										},
+										"geometry_address": {
+											"foreignList": [
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "parent_address_id",
+													"remoteRecord": "geometry_address",
+													"name": "child_address"
+												}
+											],
+											"idField": "address_id",
+											"name": "geometry_address",
+											"recordClass": "com.micello.micemaps.data.GeometryAddress",
+											"fields": [
+												{
+													"fieldClass": "com.micello.micemaps.data.Community",
+													"name": "community_id",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.Geometry",
+													"name": "geometry_id",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "address_key",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "address_value",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.GeometryAddress",
+													"name": "parent_address_id",
+													"nullOk": true
+												}
+											]
+										},
+										"nav_node_level": {
+											"foreignList": [],
+											"idField": "node_level_id",
+											"name": "nav_node_level",
+											"recordClass": "com.micello.micemaps.data.NavNodeLevel",
+											"fields": [
+												{
+													"fieldClass": "com.micello.micemaps.data.NavNode",
+													"name": "node_id",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.DrawingLevel",
+													"name": "level_id",
+													"nullOk": false
+												}
+											]
+										},
+										"level_prop": {
+											"foreignList": [],
+											"idField": "level_prop_id",
+											"name": "level_prop",
+											"recordClass": "com.micello.micemaps.data.LevelProp",
+											"fields": [
+												{
+													"fieldClass": "java.lang.Integer",
+													"name": "ordr",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.DrawingLevel",
+													"name": "level_id",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_name",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_value",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "lang",
+													"nullOk": true
+												}
+											]
+										},
+										"nav_link": {
+											"foreignList": [
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "link_id",
+													"remoteRecord": "link_prop",
+													"orderField": "ordr",
+													"name": "link_prop"
+												}
+											],
+											"idField": "link_id",
+											"name": "nav_link",
+											"recordClass": "com.micello.micemaps.data.NavLink",
+											"fields": [
+												{
+													"fieldClass": "com.micello.micemaps.data.NavNode",
+													"name": "node1_id",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.NavNode",
+													"name": "node2_id",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.Double",
+													"name": "distance",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.Byte",
+													"name": "direction",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.Integer",
+													"name": "delta_zlevel",
+													"nullOk": false
+												}
+											]
+										},
+										"drawing_level": {
+											"foreignList": [
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "parent_level_id",
+													"remoteRecord": "geometry",
+													"orderField": "parent_draw_order",
+													"name": "child_geometry"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": true,
+													"remoteField": "my_level_id",
+													"remoteRecord": "geometry",
+													"name": "root_geoemtry"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "level_id",
+													"remoteRecord": "nav_node_level",
+													"name": "nav_node_list"
+												},
+												{
+													"restrictDelete": true,
+													"isUnique": false,
+													"remoteField": "level_id",
+													"remoteRecord": "level_prop",
+													"orderField": "ordr",
+													"name": "level_props"
+												}
+											],
+											"idField": "id",
+											"name": "drawing_level",
+											"recordClass": "com.micello.micemaps.data.DrawingLevel",
+											"fields": [
+												{
+													"fieldClass": "java.lang.Integer",
+													"name": "zlevel",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "java.lang.Boolean",
+													"name": "is_main",
+													"nullOk": false,
+													"defaultValue": false
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.Drawing",
+													"name": "drawing_id",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.Byte",
+													"name": "view_parent_flags",
+													"nullOk": false,
+													"defaultValue": 2
+												}
+											]
+										},
+										"community_prop": {
+											"foreignList": [],
+											"idField": "community_prop_id",
+											"name": "community_prop",
+											"recordClass": "com.micello.micemaps.data.CommunityProp",
+											"fields": [
+												{
+													"fieldClass": "java.lang.Integer",
+													"name": "ordr",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.Community",
+													"name": "community_id",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_name",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_value",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "lang",
+													"nullOk": true
+												}
+											]
+										},
+										"link_prop": {
+											"foreignList": [],
+											"idField": "prop_id",
+											"name": "link_prop",
+											"recordClass": "com.micello.micemaps.data.NavLinkProp",
+											"fields": [
+												{
+													"fieldClass": "java.lang.Integer",
+													"name": "ordr",
+													"nullOk": false,
+													"defaultValue": 0
+												},
+												{
+													"fieldClass": "com.micello.micemaps.data.NavLink",
+													"name": "link_id",
+													"nullOk": true
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_name",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "key_value",
+													"nullOk": false
+												},
+												{
+													"fieldClass": "java.lang.String",
+													"name": "lang",
+													"nullOk": true
+												}
+											]
+										}
+									},
+									"version": "5.2"
+								},
+								"description": ""
+							}
+						},
+						"createUpdateInstruction": {
+							"name": "createUpdateInstruction",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"initialRecord",
+									"targetRecord"
+								],
+								"functionBody": "if(initialRecord.Id != targetRecord.Id) {\n    throw new Error(\"Record ID mismatch in create update instruction for target record: \" + getRecordErrString(targetRecord));\n}\n\nif(initialRecord.Type != targetRecord.Type) {\n    throw new Error(\"Inital and target record types do not match. Target record: \" + getRecordErrString(targetRecord));\n}\n\nvar recordsDifferent = false;\n\nvar recordInfo = getRecordInfo(initialRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Update\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = initialRecord.Id;\n\ninstruction.initialReadPerm = initialRecord.read_perm;\ninstruction.initialEditPerm = initialRecord.edit_perm;\n\nif(initialRecord.readPerm != targetRecord.readPerm) {\n    instruction.targetReadPerm = targetRecord.read_perm;\n    recordsDifferent = true;\n}\n\nif(initialRecord.editPerm != targetRecord.editPerm) {\n    instruction.targetEditPerm = targetRecord.edit_perm;\n    recordsDifferent = true;\n}\n\nvar initialData = {};\ninstruction.Initial = initialData;\nvar targetData = {};\ninstruction.Target = targetData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    \n    var initialValue;\n    var targetValue;\n    \n    var initialValue = initialRecord.Fields[field.name];\n    var targetValue = targetRecord.Fields[field.name];\n    \n    //validate target values\n    if(targetValue === undefined) {\n        //use default\n        targetValue = field.defaultValue;\n    }\n    \n    if(targetValue === undefined) {\n        throw new Error(\"Unknown problem: undefined field value: \" + getFieldErrString(createRecordInfo,createRecord.Id,field));\n    }\n    \n    if(targetValue === null) {\n        if(!field.nullOk) {\n            throw new Error(\"Illegal null value: \" + getFieldErrString(createRecordInfo,createRecord.Id,field));\n        }\n    }\n    \n    if(!fieldsMatch(initialValue,targetValue,field)) {\n        initialData[field.name] = initialValue;\n        targetData[field.name] = targetValue;\n        recordsDifferent = true;\n    }\n}\n\nif(recordsDifferent) {\n    return instruction;\n}\nelse {\n    return null;\n}\n",
+								"supplementalCode": "function fieldsMatch(initialValue,targetValue,fieldInfo) {\n    if(fieldInfo.fieldClass === \"java.lang.String\") {\n        //compare strings with \"==\"\n        return (initialValue == targetValue);\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"java.lang\")) {\n        //compare other basic values with \"===\"\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"com.micello\")) {\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONObject\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONArray\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else {\n        throw new Error(\"unrecognized field type: \" + fieldInfo.fieldClass);\n    }\n}\n\nfunction compareJsonData(a,b) {\n    var an = apogee.util.getNormalizedObjectCopy(a);\n    var bn = apogee.util.getNormalizedObjectCopy(b);\n    var aString = JSON.stringify(an);\n    var bString = JSON.stringify(bn);\n    return aString == bString;\n}\n    ",
+								"description": "This function creates an update instruction given an initial and target record. If the records are the same then NULL is returned. (No update is needed.)"
+							}
+						},
+						"createCreateInstruction": {
+							"name": "createCreateInstruction",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"createRecord"
+								],
+								"functionBody": "\nvar recordInfo = getRecordInfo(createRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Create\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = createRecord.Id;\n\ninstruction.targetReadPerm = createRecord.read_perm;\ninstruction.targetEditPerm = createRecord.edit_perm;\n\nvar targetData = {};\ninstruction.Target = targetData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    var targetValue;\n    var targetValue = createRecord.Fields[field.name];\n    if(targetValue === undefined) {\n        //use default\n        targetValue = field.defaultValue;\n    }\n    \n    if(targetValue === undefined) {\n        throw new Error(\"Unknown problem: undefined field value: \" + getFieldErrString(createRecord,field));\n    }\n    \n    if(targetValue === null) {\n        if(!field.nullOk) {\n            throw new Error(\"Illegal null value: \" + getFieldErrString(createRecord,field));\n        }\n    }\n    \n    targetData[field.name] = targetValue;\n}\n\nreturn instruction;\n",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"getFieldErrString": {
+							"name": "getFieldErrString",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"record",
+									"fieldInfo"
+								],
+								"functionBody": "return getRecordErrString(record) + \" - \" + fieldInfo.name;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"getRecordErrString": {
+							"name": "getRecordErrString",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"record"
+								],
+								"functionBody": "return record.Type + \" \" + record.Id;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"createDeleteInstruction": {
+							"name": "createDeleteInstruction",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"deleteRecord"
+								],
+								"functionBody": "\nvar recordInfo = getRecordInfo(deleteRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Delete\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = deleteRecord.Id;\n\ninstruction.initialReadPerm = deleteRecord.read_perm;\ninstruction.initialEditPerm = deleteRecord.edit_perm;\n\nvar initialData = {};\ninstruction.Initial = initialData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    var initialValue = deleteRecord.Fields[field.name];\n    \n    initialData[field.name] = initialValue;\n}\n\nreturn instruction;\n",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"getRecordInfo": {
+							"name": "getRecordInfo",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"recordType"
+								],
+								"functionBody": "var recordInfo = dataSetInfo.records[recordType];\n\nif(!recordInfo) {\n    throw new Error(\"Record type not found in getRecordInfo: \" + recordType);\n}\n\nreturn recordInfo;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"combinedEntriesToInstructionList": {
+							"name": "combinedEntriesToInstructionList",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"combinedEntries"
+								],
+								"functionBody": "var output = [];\nfor(var key in combinedEntries) {\n    var entry = combinedEntries[key];\n    var instruction = getInstructionForCombinedEntry(entry);\n    if(instruction) {\n        output.push(instruction);\n    }\n}\n\nreturn output;",
+								"supplementalCode": "function getInstructionForCombinedEntry(combinedEntry) {\n    var newEntry = combinedEntry.newEntry;\n    var oldEntry = combinedEntry.oldEntry;\n    \n    if(newEntry) {\n        if(!oldEntry) {\n            console.log(\"Create: \" + newEntry.Id);\n            return createCreateInstruction(newEntry);\n        }\n        else {\n            //this will return null for matching records\n            console.log(\"Update(maybe): \" + newEntry.Id);\n            return createUpdateInstruction(oldEntry,newEntry);\n        }\n    }\n    else if(oldEntry) {\n        console.log(\"Delete: \" + oldEntry.Id);\n        return createDeleteInstruction(oldEntry);\n    }\n    \n    return null;\n}\n\nfunction entriesDifferent(entry1,entry2) {\n    var string1 = JSON.stringify(apogee.util.getNormalizedCopy(entry1));\n    var string2 = JSON.stringify(apogee.util.getNormalizedCopy(entry2));\n    return (string1 == string2);\n}",
+								"description": "This function takes a combined entry map of the format:\n\n{\n  \"some-identifier\":{\n    \"oldEntry\":{original record entry, if applicable},\n    \"newEntry\":{new record entry, if applicable}\n  },\n  ...\n}\n\nIt returns an instruction list.\n\n"
+							}
+						},
+						"getCommitPromise": {
+							"name": "getCommitPromise",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"instructionList",
+									"commitMessage",
+									"sessionKey"
+								],
+								"functionBody": "var commitBody = createCommitBody(instructionList,commitMessage);\nvar requestOptions = createRequestOptions(commitBody,sessionKey);\nvalue = apogee.net.jsonRequest(commitUrl,requestOptions);\nreturn value;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"getRequestPromise": {
+							"name": "getRequestPromise",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"requestBody",
+									"sessionKey"
+								],
+								"functionBody": "var requestOptions = createRequestOptions(requestBody,sessionKey);\nvalue = apogee.net.jsonRequest(requestUrl,requestOptions);\nreturn value;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"getMapRequest": {
+							"name": "getMapRequest",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"cid",
+									"sessionKey"
+								],
+								"functionBody": "var requestBody = {};\nrequestBody.search = \"community_map\";\nrequestBody.id = cid;\n\nvar requestOptions = createRequestOptions(requestBody,sessionKey);\n\nvar requestUrl = host + \"/cannedsearch\";\nreturn apogee.net.jsonRequest(requestUrl,requestOptions);",
+								"supplementalCode": "",
+								"description": ""
+							}
+						}
+					}
+				},
+				"login": {
+					"name": "login",
+					"type": "apogee.Folder",
+					"children": {
+						"loginUrl": {
+							"name": "loginUrl",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": "http://factory.micello.com/TestAuthorization/loginjson",
+								"description": ""
+							}
+						},
+						"loginControl": {
+							"name": "loginControl",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "return loginUrl;",
+								"supplementalCode": "",
+								"description": ""
+							}
+						},
+						"sessionResponse": {
+							"name": "sessionResponse",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": "",
+								"description": ""
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"children": {
+			"did": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 196,
+						"height": 51
+					},
+					"posInfo": {
+						"x": 513,
+						"y": 21
+					},
+					"state": 0,
+					"viewType": "Text"
+				}
+			},
+			"mapData": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 588,
+						"height": 347
+					},
+					"posInfo": {
+						"x": 601,
+						"y": 334
+					},
+					"state": 0,
+					"viewType": "Formula"
+				}
+			},
+			"sessionKey": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 543,
+						"height": 90
+					},
+					"posInfo": {
+						"x": 532,
+						"y": 121
+					},
+					"state": 0,
+					"viewType": "Text"
+				}
+			},
+			"cid": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 234,
+						"height": 58
+					},
+					"posInfo": {
+						"x": 235,
+						"y": 25
+					},
+					"state": 0,
+					"viewType": "Text"
+				}
+			},
+			"getRecord": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 571,
+						"height": 216
+					},
+					"posInfo": {
+						"x": 44,
+						"y": 423
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"getCommunityRecord": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 400,
+						"height": 33
+					},
+					"posInfo": {
+						"x": 43,
+						"y": 372
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"coords": {
+				"type": "apogeeapp.app.FolderComponent",
+				"windowState": {
+					"posInfo": {
+						"x": 46,
+						"y": 209
+					}
+				},
+				"children": {
+					"metersPerMerc": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 400,
+								"height": 63
+							},
+							"posInfo": {
+								"x": 803,
+								"y": 158
+							},
+							"state": 0,
+							"viewType": "Code"
+						}
+					},
+					"METERS_PER_MERC0": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 387,
+								"height": 96
+							},
+							"posInfo": {
+								"x": 563,
+								"y": 30
+							},
+							"state": -1,
+							"viewType": "Formula"
+						}
+					},
+					"lonRadToMercX": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 461,
+								"height": 36
+							},
+							"posInfo": {
+								"x": 64,
+								"y": 272
+							},
+							"state": 0,
+							"viewType": "Code"
+						}
+					},
+					"TWO_TO_25": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 316,
+								"height": 42
+							},
+							"posInfo": {
+								"x": 329,
+								"y": 29
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"MERCATOR_ZOOM": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 298,
+								"height": 42
+							},
+							"posInfo": {
+								"x": 61,
+								"y": 32
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"latRadToMercY": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 601,
+								"height": 62
+							},
+							"posInfo": {
+								"x": 59,
+								"y": 158
+							},
+							"state": 0,
+							"viewType": "Code"
+						}
+					},
+					"radToDeg": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 400,
+								"height": 39
+							},
+							"posInfo": {
+								"x": 823,
+								"y": 286
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"degToRad": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 400,
+								"height": 36
+							},
+							"posInfo": {
+								"x": 834,
+								"y": 386
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"mercYToLatRad": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 653,
+								"height": 42
+							},
+							"posInfo": {
+								"x": 67,
+								"y": 454
+							},
+							"state": 0,
+							"viewType": "Code"
+						}
+					},
+					"mercXToLonRad": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 400,
+								"height": 44
+							},
+							"posInfo": {
+								"x": 63,
+								"y": 359
+							},
+							"state": 0,
+							"viewType": "Code"
+						}
+					}
+				}
+			},
+			"working": {
+				"type": "apogeeapp.app.FolderComponent",
+				"windowState": {
+					"posInfo": {
+						"x": 42,
+						"y": 77
+					}
+				},
+				"children": {
+					"desiredTransform": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 273,
+								"height": 119
+							},
+							"posInfo": {
+								"x": 423,
+								"y": 460
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"mercToNatTransform": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 268,
+								"height": 122
+							},
+							"posInfo": {
+								"x": 426,
+								"y": 415
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"desiredMetersPerPixel": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 272,
+								"height": 48
+							},
+							"posInfo": {
+								"x": 16,
+								"y": 351
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"centerLatLonDeg": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 533,
+								"height": 300
+							},
+							"posInfo": {
+								"x": 1048,
+								"y": 191
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"initialRecord": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 300,
+								"height": 306
+							},
+							"posInfo": {
+								"x": 703,
+								"y": 441
+							},
+							"state": -1,
+							"viewType": "JSON"
+						}
+					},
+					"targetRecord": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 352,
+								"height": 285
+							},
+							"posInfo": {
+								"x": 701,
+								"y": 478
+							},
+							"state": -1,
+							"viewType": "Formula"
+						}
+					},
+					"editedRecords": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 447,
+								"height": 306
+							},
+							"posInfo": {
+								"x": 700,
+								"y": 517
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"test": {
+						"type": "apogeeapp.app.FolderComponent",
+						"windowState": {
+							"posInfo": {
+								"x": 1212,
+								"y": 21
+							}
+						},
+						"children": {
+							"distance": {
+								"type": "apogeeapp.app.JsonTableComponent"
+							},
+							"p2Map": {
+								"type": "apogeeapp.app.JsonTableComponent"
+							},
+							"p3Map": {
+								"type": "apogeeapp.app.JsonTableComponent"
+							},
+							"p1Map": {
+								"type": "apogeeapp.app.JsonTableComponent"
+							},
+							"p3": {
+								"type": "apogeeapp.app.JsonTableComponent"
+							},
+							"p2": {
+								"type": "apogeeapp.app.JsonTableComponent"
+							},
+							"p1": {
+								"type": "apogeeapp.app.JsonTableComponent"
+							}
+						}
+					},
+					"pixelsPerPaperInch": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 287,
+								"height": 21
+							},
+							"posInfo": {
+								"x": 710,
+								"y": 338
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"pixelsPerWorldInch": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 273,
+								"height": 45
+							},
+							"posInfo": {
+								"x": 18,
+								"y": 259
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"inchesPerMeter": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 248,
+								"height": 41
+							},
+							"posInfo": {
+								"x": 709,
+								"y": 376
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"mercCenter": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 221,
+								"height": 85
+							},
+							"posInfo": {
+								"x": 1045,
+								"y": 334
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"natCenter": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 218,
+								"height": 51
+							},
+							"posInfo": {
+								"x": 1047,
+								"y": 236
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"worldInchesPerPaperInch": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 275,
+								"height": 45
+							},
+							"posInfo": {
+								"x": 28,
+								"y": 84
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"NOTE": {
+						"type": "apogeeapp.app.TextComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 326,
+								"height": 286
+							},
+							"posInfo": {
+								"x": 654,
+								"y": 5
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"worldMetersPerPaperInch": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 306,
+								"height": 40
+							},
+							"posInfo": {
+								"x": 328,
+								"y": 87
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"pixelsPerWorldMeter": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 281,
+								"height": 40
+							},
+							"posInfo": {
+								"x": 325,
+								"y": 263
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"worldInchesOrMeters": {
+						"type": "apogeeapp.app.TextComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 278,
+								"height": 33
+							},
+							"posInfo": {
+								"x": 30,
+								"y": 7
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"currentMetersPerPixel": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 463,
+								"height": 25
+							},
+							"posInfo": {
+								"x": 28,
+								"y": 453
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					}
+				}
+			},
+			"submit": {
+				"type": "apogeeapp.app.FolderComponent",
+				"windowState": {
+					"posInfo": {
+						"x": 43,
+						"y": 129
+					}
+				},
+				"children": {
+					"submitControl": {
+						"type": "apogeeapp.app.CustomControlComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 374,
+								"height": 304
+							},
+							"posInfo": {
+								"x": 34,
+								"y": 189
+							},
+							"state": 0,
+							"viewType": "Output"
+						},
+						"resource": {
+							"html": "<textarea id=\"submit_messageInput\"></textarea><br>\n<input type=\"button\" id=\"submit_commitButton\" value=\"Commit\"></input>\n<input type=\"button\" id=\"submit_cancelButton\" value=\"Cancel\"></input>",
+							"onLoad": "this.submitButton = document.getElementById(\"submit_commitButton\");\nthis.cancelButton = document.getElementById(\"submit_cancelButton\");\nthis.messageInput = document.getElementById(\"submit_messageInput\");\nthis.initialized = true;\n\nvar instance = this;\nthis.submitButton.onclick = function() {\n    instance.onSubmit();\n}\nthis.cancelButton.onclick = function() {\n    instance.onCancel();\n}",
+							"constructorAddition": "this.messageInput = null;\nthis.submitButton = null;\nthis.cancelButton = null;\nthis.initialized = false;\n\nthis.onSubmit = function() {\n    \n    if(!this.initialized) {\n        return;\n    }\n    \n    var commitMessage = this.messageInput.value.trim();\n    if((!commitMessage)||(commitMessage.length === 0)) {\n        alert(\"You must enter a commit message!\");\n        return;\n    }\n    this.messageInput.value = \"\";\n    \n    if((!this.instructionList)||(this.instructionList.length === 0)) {\n        alert(\"There is no data to commit.\");\n        return;\n    }\n    \n    var updateInfo = [];\n    updateInfo.push([ \"commitMessage\",commitMessage]);\n    updateInfo.push([\"liveInstructionList\",this.instructionList]);\n    mode.getMessenger().compoundDataUpdate(updateInfo,true);\n}\n\nthis.onCancel = function() {\n    mode.getMessenger().dataUpdate(\"taskResults.editMetaFile\",\"\");\n}",
+							"setData": "this.instructionList = data;",
+							"css": "#submit_messageInput {\n    height: 200px;\n    width: 300px;\n}"
+						}
+					},
+					"instructionList": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 646,
+								"height": 371
+							},
+							"posInfo": {
+								"x": 40,
+								"y": 78
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"combinedEntries": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 797,
+								"height": 442
+							},
+							"posInfo": {
+								"x": 42,
+								"y": 22
+							},
+							"state": -1,
+							"viewType": "Formula"
+						}
+					},
+					"commitMessage": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 271,
+								"height": 103
+							},
+							"posInfo": {
+								"x": 527,
+								"y": 12
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"liveInstructionList": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 315,
+								"height": 124
+							},
+							"posInfo": {
+								"x": 526,
+								"y": 52
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"taskResult": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 793,
+								"height": 447
+							},
+							"posInfo": {
+								"x": 519,
+								"y": 160
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"response": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 416,
+								"height": 201
+							},
+							"posInfo": {
+								"x": 492,
+								"y": 284
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"commitAction": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 733,
+								"height": 439
+							},
+							"posInfo": {
+								"x": 522,
+								"y": 93
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					}
+				}
+			},
+			"micemapsDataAccess": {
+				"type": "apogeeapp.app.FolderComponent",
+				"windowState": {
+					"posInfo": {
+						"x": 47,
+						"y": 265
+					}
+				},
+				"children": {
+					"createRecord": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 560,
+								"height": 321
+							},
+							"posInfo": {
+								"x": 32,
+								"y": 389
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"recordsToCreateInstructions": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 834,
+								"height": 391
+							},
+							"posInfo": {
+								"x": 32,
+								"y": 440
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"createCommitBody": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 568,
+								"height": 400
+							},
+							"posInfo": {
+								"x": 752,
+								"y": 206
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"createRequestOptions": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 523,
+								"height": 254
+							},
+							"posInfo": {
+								"x": 749,
+								"y": 43
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"host": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 353,
+								"height": 71
+							},
+							"posInfo": {
+								"x": 21,
+								"y": 19
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"commitUrl": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 433,
+								"height": -4
+							},
+							"posInfo": {
+								"x": 35,
+								"y": 88
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"requestUrl": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 450,
+								"height": 68
+							},
+							"posInfo": {
+								"x": 31,
+								"y": 139
+							},
+							"state": -1,
+							"viewType": "Formula"
+						}
+					},
+					"dataSetInfo": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 1064,
+								"height": 611
+							},
+							"posInfo": {
+								"x": 40,
+								"y": 558
+							},
+							"state": -1,
+							"viewType": "Text"
+						}
+					},
+					"createUpdateInstruction": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 886,
+								"height": 655
+							},
+							"posInfo": {
+								"x": 36,
+								"y": 248
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"createCreateInstruction": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 994,
+								"height": 643
+							},
+							"posInfo": {
+								"x": 35,
+								"y": 209
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"getFieldErrString": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 512,
+								"height": 68
+							},
+							"posInfo": {
+								"x": 761,
+								"y": 616
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"getRecordErrString": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 400,
+								"height": 81
+							},
+							"posInfo": {
+								"x": 762,
+								"y": 664
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"createDeleteInstruction": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 678,
+								"height": 540
+							},
+							"posInfo": {
+								"x": 36,
+								"y": 289
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"getRecordInfo": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 480,
+								"height": 400
+							},
+							"posInfo": {
+								"x": 821,
+								"y": 426
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"combinedEntriesToInstructionList": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 721,
+								"height": 524
+							},
+							"posInfo": {
+								"x": 34,
+								"y": 485
+							},
+							"state": -1,
+							"viewType": "Private"
+						}
+					},
+					"getCommitPromise": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 741,
+								"height": 400
+							},
+							"posInfo": {
+								"x": 754,
+								"y": 158
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"getRequestPromise": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 810,
+								"height": 400
+							},
+							"posInfo": {
+								"x": 752,
+								"y": 108
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					},
+					"getMapRequest": {
+						"type": "apogeeapp.app.FunctionComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 400,
+								"height": 400
+							},
+							"posInfo": {
+								"x": 292,
+								"y": 11
+							},
+							"state": -1,
+							"viewType": "Code"
+						}
+					}
+				}
+			},
+			"login": {
+				"type": "apogeeapp.app.FolderComponent",
+				"windowState": {
+					"posInfo": {
+						"x": 41,
+						"y": 24
+					}
+				},
+				"children": {
+					"loginUrl": {
+						"type": "apogeeapp.app.TextComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 463,
+								"height": 38
+							},
+							"posInfo": {
+								"x": 26,
+								"y": 27
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					},
+					"loginControl": {
+						"type": "apogeeapp.app.CustomControlComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 369,
+								"height": 87
+							},
+							"posInfo": {
+								"x": 27,
+								"y": 159
+							},
+							"state": 0,
+							"viewType": "Output"
+						},
+						"resource": {
+							"html": "",
+							"css": "",
+							"setData": "this.loginUrl = data;",
+							"constructorAddition": "\n\n//this uses the updated version of test authorization that takes and returns a JSON\nthis.onClick = function() {\n    \n    //on click\n    var bodyJson = {};\n    bodyJson.userName = resource.userInput.value;\n    bodyJson.password = resource.passwordInput.value;\n    \n    //cleaer password field\n    resource.passwordInput.value = \"\";\n    \n    var options = {};\n    options.body = JSON.stringify(bodyJson);\n    options.method = \"POST\";\n    \n    var requestPromise = apogee.net.jsonRequest(this.loginUrl,options);\n    \n    //set the response\n    mode.getMessenger().asynchDataUpdate(\"sessionResponse\",requestPromise);\n}",
+							"init": "\nvar label1 = document.createElement(\"label\");\nlabel1.for = \"userInput\";\nlabel1.innerHTML = \"User:\"\nelement.appendChild(label1);\n\nvar input1 = document.createElement(\"input\");\ninput1.id = \"userInput\";\nresource.userInput = input1;\nelement.appendChild(input1);\n\nelement.appendChild(document.createElement(\"br\"));\n\nvar label2 = document.createElement(\"label\");\nlabel2.for = \"passwordInput\";\nlabel2.innerHTML = \"Password:\"\nelement.appendChild(label2);\n\nvar input2 = document.createElement(\"input\");\ninput2.id = \"passwordInput\";\ninput2.type = \"password\";\nresource.passwordInput = input2;\nelement.appendChild(input2);\n\nelement.appendChild(document.createElement(\"br\"));\n\nvar button = document.createElement(\"button\");\nbutton.innerHTML = \"Login\";\nelement.appendChild(button);\n\nvar instance = this;\nbutton.onclick = function() {\n    instance.onClick();\n}\n\n\n"
+						}
+					},
+					"sessionResponse": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 697,
+								"height": 93
+							},
+							"posInfo": {
+								"x": 26,
+								"y": 296
+							},
+							"state": 0,
+							"viewType": "Text"
+						}
+					}
+				}
+			}
+		}
+	},
+	"version": 0.31,
+	"library": []
+}
