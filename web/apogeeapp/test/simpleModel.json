@@ -3,8 +3,9 @@
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
+        "name": "Revenue Projection",
 		"data": {
-			"name": "revenueProjection",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"revenue_A": {

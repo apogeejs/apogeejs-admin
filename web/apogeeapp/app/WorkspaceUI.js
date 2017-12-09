@@ -66,16 +66,16 @@ apogeeapp.app.WorkspaceUI.prototype.load = function(workspaceJson,actionResponse
     this.treeEntry = this.createTreeEntry();
     this.treeEntry.setState(apogeeapp.ui.treecontrol.EXPANDED);
     this.tree.setRootEntry(this.treeEntry);
-    this.treeEntry.addChild("library",this.libraryManager.getTreeEntry());
-    this.treeEntry.addChild("rootFolder",rootFolderComponent.getTreeEntry());
+    this.treeEntry.addChild(rootFolderComponent.getTreeEntry());
+    this.treeEntry.addChild(this.libraryManager.getTreeEntry());
     
     //add listeners
     this.workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT, member => this.memberUpdated(member));
     this.workspace.addListener(apogee.deletemember.MEMBER_DELETED_EVENT, member => this.childDeleted(member));
     this.workspace.addListener(apogee.updateworkspace.WORKSPACE_UPDATED_EVENT, () => this.workspaceUpdated());
     
-    //this is messy putting this here - clean it up
-    if(workspaceJson.activeTabMember) {
+    //set the initial active tab
+    if((workspaceJson)&&(workspaceJson.activeTabMember)) {
         var activeTabMember = this.workspace.getMemberByFullName(workspaceJson.activeTabMember);
         if(activeTabMember) {
            this.tabFrame.setActiveTab(activeTabMember.getId());

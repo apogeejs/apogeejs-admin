@@ -24,7 +24,12 @@ apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
     this.tabDisplay = null;
     
     this.treeDisplay = new apogeeapp.app.TreeComponentDisplay(this);
+    this.treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER);
 }
+
+//These parameters are used to order the components in the tree entry.
+apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER = 5;
+apogeeapp.app.Component.FOLDER_COMPONENT_TYPE_SORT_ORDER = 0;
 
 /** If an extending object has any open actions to read the open json, a callback should be passed here.
  * The callback will be executed in the context of the current object. */

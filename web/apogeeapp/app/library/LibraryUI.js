@@ -94,7 +94,7 @@ apogeeapp.app.LibraryUI.prototype.entryInserted = function(libraryEntry) {
     }
     
     listStruct.listEntries.push(libraryEntry);
-    listStruct.listTreeEntry.addChild(libraryEntry.getId(),treeEntry);
+    listStruct.listTreeEntry.addChild(treeEntry);
 }
 
 /** This method opens a list of js and css links. It returns a promise that
@@ -116,7 +116,7 @@ apogeeapp.app.LibraryUI.prototype.entryRemoved= function(libraryEntry) {
     }
     
     listStruct.listEntries = listStruct.listEntries.filter( existingEntry => (existingEntry != libraryEntry) );
-    listStruct.listTreeEntry.removeChild(libraryEntry.getId());
+    listStruct.listTreeEntry.removeChild(libraryEntry.getTreeEntry());
 }
 
 //=================================
@@ -138,7 +138,7 @@ apogeeapp.app.LibraryUI.prototype.getListStruct = function(listInfo) {
     var iconUrl = apogeeapp.ui.getResourcePath(listInfo.listIconPath);
     var menuItemCallback = () => this.getListMenuItems(listInfo);
     var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(listInfo.listName, iconUrl, null, menuItemCallback, false);
-    this.libraryTreeEntry.addChild(listInfo.listName,listTreeEntry);
+    this.libraryTreeEntry.addChild(listTreeEntry);
     
     //create the list struct
     var listStruct = {};
