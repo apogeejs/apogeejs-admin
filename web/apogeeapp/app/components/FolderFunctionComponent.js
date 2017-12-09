@@ -56,7 +56,7 @@ apogeeapp.app.FolderFunctionComponent.getMemberCreateAction = function(userInput
     json.workspace = userInputValues.parent.getWorkspace();
     json.name = userInputValues.name;
     if(userInputValues.argListString) {
-        var argList = apogee.FunctionTable.parseStringArray(data.argListString);
+        var argList = apogee.FunctionTable.parseStringArray(userInputValues.argListString);
         json.argList = argList;
     }
     if(userInputValues.returnValueString) {
