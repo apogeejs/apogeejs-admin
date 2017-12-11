@@ -129,7 +129,7 @@ apogeeapp.app.LibraryUI.LIBRARY_ICON_PATH = "/componentIcons/library.png";
 /** @private */
 apogeeapp.app.LibraryUI.prototype.createTreeEntry = function() {
     var iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.app.LibraryUI.LIBRARY_ICON_PATH);
-    this.libraryTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry("Library", iconUrl, null, null, false);
+    this.libraryTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry("References", iconUrl, null, null, false);
 }
 
 apogeeapp.app.LibraryUI.prototype.getListStruct = function(listInfo) {
