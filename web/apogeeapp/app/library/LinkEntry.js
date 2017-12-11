@@ -21,8 +21,8 @@ apogeeapp.app.LinkEntry.LINK_TYPE_CSS = "css link";
 apogeeapp.app.LinkEntry.JS_ELEMENT_TYPE = "script";
 apogeeapp.app.LinkEntry.CSS_ELEMENT_TYPE = "link";
 
-apogeeapp.app.LinkEntry.JS_ICON_RES_PATH = "/genericIcon.png";
-apogeeapp.app.LinkEntry.CSS_ICON_RES_PATH = "/genericIcon.png";
+apogeeapp.app.LinkEntry.JS_ICON_RES_PATH = "/componentIcons/javascriptLink.png";
+apogeeapp.app.LinkEntry.CSS_ICON_RES_PATH = "/componentIcons/cssLink.png";
 
 apogeeapp.app.LinkEntry.JS_LINK_LIST_INFO = {
     "typeName": apogeeapp.app.LinkEntry.LINK_TYPE_JS,
@@ -33,7 +33,7 @@ apogeeapp.app.LinkEntry.JS_LINK_LIST_INFO = {
     "createEntryFunction": (libraryUI, linkData) => new apogeeapp.app.LinkEntry(libraryUI,linkData,apogeeapp.app.LinkEntry.LINK_TYPE_JS),
     "listName": "JS Links",
     "addEntryText":"Add JS Link",
-    "listIconPath":"/genericIcon.png"
+    "listIconPath":"/componentIcons/folder.png"
 }
 
 apogeeapp.app.LinkEntry.CSS_LINK_LIST_INFO = {
@@ -45,7 +45,7 @@ apogeeapp.app.LinkEntry.CSS_LINK_LIST_INFO = {
     "createEntryFunction": (libraryUI, linkData) => new apogeeapp.app.LinkEntry(libraryUI,linkData,apogeeapp.app.LinkEntry.LINK_TYPE_CSS),
     "listName": "CSS Links",
     "addEntryText":"Add CSS Link",
-    "listIconPath":"/genericIcon.png"
+    "listIconPath":"/componentIcons/folder.png"
 }
 
 //---------------------------

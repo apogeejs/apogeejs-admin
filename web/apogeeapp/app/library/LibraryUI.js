@@ -123,7 +123,7 @@ apogeeapp.app.LibraryUI.prototype.entryRemoved= function(libraryEntry) {
 // Private
 //=================================
 
-apogeeapp.app.LibraryUI.LIBRARY_ICON_PATH = "/genericIcon.png";
+apogeeapp.app.LibraryUI.LIBRARY_ICON_PATH = "/componentIcons/library.png";
 
 
 /** @private */

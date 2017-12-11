@@ -70,7 +70,7 @@ apogeeapp.app.FolderComponent.displayName = "Folder";
 apogeeapp.app.FolderComponent.uniqueName = "apogeeapp.app.FolderComponent";
 apogeeapp.app.FolderComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.FolderComponent.DEFAULT_HEIGHT = 500;
-apogeeapp.app.FolderComponent.ICON_RES_PATH = "/folderIcon.png";
+apogeeapp.app.FolderComponent.ICON_RES_PATH = "/componentIcons/folder.png";
 
 apogeeapp.app.FolderComponent.propertyDialogLines = [
     {

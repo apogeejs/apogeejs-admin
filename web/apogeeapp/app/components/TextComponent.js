@@ -87,5 +87,5 @@ apogeeapp.app.TextComponent.displayName = "Text Table";
 apogeeapp.app.TextComponent.uniqueName = "apogeeapp.app.TextComponent";
 apogeeapp.app.TextComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.TextComponent.DEFAULT_HEIGHT = 300;
-apogeeapp.app.TextComponent.ICON_RES_PATH = "/textIcon.png";
+apogeeapp.app.TextComponent.ICON_RES_PATH = "/componentIcons/textTable.png";
 

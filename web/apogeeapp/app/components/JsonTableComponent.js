@@ -137,7 +137,7 @@ apogeeapp.app.JsonTableComponent.displayName = "Data Table";
 apogeeapp.app.JsonTableComponent.uniqueName = "apogeeapp.app.JsonTableComponent";
 apogeeapp.app.JsonTableComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.JsonTableComponent.DEFAULT_HEIGHT = 300;
-apogeeapp.app.JsonTableComponent.ICON_RES_PATH = "/dataIcon.png";
+apogeeapp.app.JsonTableComponent.ICON_RES_PATH = "/componentIcons/dataTable.png";
 apogeeapp.app.JsonTableComponent.propertyDialogLines = [
     {
         "type":"dropdown",

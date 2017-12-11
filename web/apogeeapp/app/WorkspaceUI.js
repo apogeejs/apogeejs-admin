@@ -15,7 +15,7 @@ apogeeapp.app.WorkspaceUI = function() {
     this.cssLinkArray = [];
 }
 
-apogeeapp.app.WorkspaceUI.ICON_RES_PATH = "/genericIcon.png";
+apogeeapp.app.WorkspaceUI.ICON_RES_PATH = "/componentIcons/workspace.png";
 
 //====================================
 // Workspace Management

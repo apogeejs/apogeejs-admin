@@ -89,7 +89,7 @@ apogeeapp.app.GridTableComponent.displayName = "Grid Table";
 apogeeapp.app.GridTableComponent.uniqueName = "apogeeapp.app.GridTableComponent";
 apogeeapp.app.GridTableComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.GridTableComponent.DEFAULT_HEIGHT = 300;
-apogeeapp.app.GridTableComponent.ICON_RES_PATH = "/gridIcon.png";
+apogeeapp.app.GridTableComponent.ICON_RES_PATH = "/componentIcons/gridTable.png";
 
 //======================================
 // Use the json table code wrapper

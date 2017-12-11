@@ -344,7 +344,7 @@ apogeeapp.app.CustomControlComponent.displayName = "Custom Control";
 apogeeapp.app.CustomControlComponent.uniqueName = "apogeeapp.app.CustomControlComponent";
 apogeeapp.app.CustomControlComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.CustomControlComponent.DEFAULT_HEIGHT = 500;
-apogeeapp.app.CustomControlComponent.ICON_RES_PATH = "/controlIcon.png";
+apogeeapp.app.CustomControlComponent.ICON_RES_PATH = "/componentIcons/chartControl.png";
 
 apogeeapp.app.CustomControlComponent.propertyDialogLines = [
     {

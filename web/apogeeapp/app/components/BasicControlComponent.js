@@ -108,7 +108,7 @@ apogeeapp.app.BasicControlComponent.attachStandardStaticProperties = function(co
     componentGenerator.createComponentFromMember = apogeeapp.app.BasicControlComponent.getMemberCreateAction;
     componentGenerator.DEFAULT_WIDTH = 500;
     componentGenerator.DEFAULT_HEIGHT = 500;
-    componentGenerator.ICON_RES_PATH = "/controlIcon.png";
+    componentGenerator.ICON_RES_PATH = "/componentIcons/chartControl.png";
 }
 
 

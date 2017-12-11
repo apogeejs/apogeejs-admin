@@ -86,7 +86,7 @@ apogeeapp.app.FunctionComponent.displayName = "Function";
 apogeeapp.app.FunctionComponent.uniqueName = "apogeeapp.app.FunctionComponent";
 apogeeapp.app.FunctionComponent.DEFAULT_WIDTH = 400;
 apogeeapp.app.FunctionComponent.DEFAULT_HEIGHT = 400;
-apogeeapp.app.FunctionComponent.ICON_RES_PATH = "/functionIcon.png";
+apogeeapp.app.FunctionComponent.ICON_RES_PATH = "/componentIcons/functionTable.png";
 
 apogeeapp.app.FunctionComponent.propertyDialogLines = [
     {
