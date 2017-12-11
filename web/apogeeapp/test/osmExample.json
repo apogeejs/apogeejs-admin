@@ -1,11 +1,11 @@
 {
-	"fileType": "apogee js web workspace",
-	"version": 0.31,
+	"fileType": "apogee app js workspace",
+	"version": 0.4,
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "Workspace",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"swneBoundingBox": {
@@ -838,7 +838,8 @@
 					}
 				}
 			}
-		}
+		},
+		"name": "Workspace"
 	},
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
@@ -1226,7 +1227,7 @@
 		}
 	},
 	"activeTabMember": "Workspace.render",
-	"library": [
+	"references": [
 		{
 			"url": "https://unpkg.com/leaflet@1.2.0/dist/leaflet.js",
 			"entryType": "js link"

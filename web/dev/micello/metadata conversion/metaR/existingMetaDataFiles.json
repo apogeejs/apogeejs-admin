@@ -1,10 +1,10 @@
 {
-	"fileType": "apogee js web workspace",
+	"fileType": "apogee app js workspace",
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "metaDataFiles",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"presets_Standard": {
@@ -11162,7 +11162,8 @@
 					}
 				}
 			}
-		}
+		},
+		"name": "metaDataFiles"
 	},
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
@@ -11319,6 +11320,6 @@
 			}
 		}
 	},
-	"version": 0.31,
-	"library": []
+	"version": 0.4,
+	"references": []
 }

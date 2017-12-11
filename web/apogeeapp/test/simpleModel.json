@@ -1,9 +1,9 @@
 {
-	"fileType": "apogee js web workspace",
+	"fileType": "apogee app js workspace",
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
-        "name": "Revenue Projection",
+		"name": "Revenue Projection",
 		"data": {
 			"name": "Model",
 			"type": "apogee.Folder",
@@ -144,6 +144,6 @@
 			}
 		}
 	},
-	"library": [],
-	"version": 0.31
+	"version": 0.4,
+	"references": []
 }

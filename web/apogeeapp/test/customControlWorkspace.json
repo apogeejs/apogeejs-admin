@@ -1,10 +1,10 @@
 {
-	"fileType": "apogee js web workspace",
+	"fileType": "apogee app js workspace",
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "customControlExample",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"test": {
@@ -26,7 +26,8 @@
 					}
 				}
 			}
-		}
+		},
+		"name": "customControlExample"
 	},
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
@@ -72,6 +73,6 @@
 			}
 		}
 	},
-	"library": [],
-	"version": 0.31
+	"version": 0.4,
+	"references": []
 }

@@ -1,10 +1,10 @@
 {
-	"fileType": "apogee js web workspace",
+	"fileType": "apogee app js workspace",
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "uploadMetaFile",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"tasks": {
@@ -1666,7 +1666,8 @@
 					}
 				}
 			}
-		}
+		},
+		"name": "uploadMetaFile"
 	},
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
@@ -3422,8 +3423,8 @@
 			}
 		}
 	},
-	"version": 0.31,
-	"library": [
+	"version": 0.4,
+	"references": [
 		{
 			"url": "http://localhost:8383/lib/modules/taskApp/taskAppModule.js",
 			"entryType": "js link"
