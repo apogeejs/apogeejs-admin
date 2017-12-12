@@ -1,1 +1,127 @@
-{"fileType":"apogee workspace","jsLinks":[],"cssLinks":[],"workspace":{"fileType":"apogee workspace","version":0.2,"data":{"name":"customControlExample","type":"apogee.Folder","children":{"submitOutput":{"name":"submitOutput","type":"apogee.JsonTable","updateData":{"data":"","description":""}},"initialFormContent":{"name":"initialFormContent","type":"apogee.JsonTable","updateData":{"data":"Content for control","description":""}},"NOTES":{"name":"NOTES","type":"apogee.JsonTable","updateData":{"data":"This workspace has a custom control\nwhich acts as a simple form. It loads\ndata from the table \"initialFormContent\"\nand sends data using the messenger to the\ntable \"submitOutput\".","description":""}},"testCustomControl":{"name":"testCustomControl","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return initialFormContent;","supplementalCode":"","description":""}}}}},"components":{"submitOutput":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":338,"height":104},"posInfo":{"x":38,"y":319},"state":0,"viewType":"Data"},"dataView":"Plain"},"initialFormContent":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":339,"height":76},"posInfo":{"x":37,"y":191},"state":0,"viewType":"Data"},"dataView":"Plain"},"NOTES":{"type":"apogeeapp.app.TextComponent","windowState":{"sizeInfo":{"width":339,"height":111},"posInfo":{"x":35,"y":24},"state":0,"viewType":"Text"}},"testCustomControl":{"type":"apogeeapp.app.CustomControlComponent","windowState":{"sizeInfo":{"width":359,"height":313},"posInfo":{"x":408,"y":23},"state":0,"viewType":"Output"},"resource":{"setData":"if(!this.initialized) {\n    this.cachedData = data;\n    return;\n}\n\nthis.loadForm(data);\n","html":"<div id=\"test_backgroundDiv\">\n    <textarea name=\"message\" rows=\"10\" cols=\"30\" id=\"test_textArea\"></textarea><br>\n    <button type=\"button\" id=\"test_button\">Submit</button>\n</div>","onLoad":"if(!this.initialized) {\n    this.textArea = document.getElementById(\"test_textArea\");\n    this.button = document.getElementById(\"test_button\");\n    this.button.onclick = () => this.onClick();\n    this.initialized = true;\n    \n    if(this.cachedData) {\n        this.loadForm(this.cachedData);\n        this.cachedData = null;\n    }\n}","uiPrivate":"","css":"#test_backgroundDiv {\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    bottom: 0;\r\n    right: 0;\r\n    background-color: lightgray;\r\n    padding: 10px;\r\n}","init":"","constructorAddition":"this.initialized = false;\nthis.cachedData = null;\n\nthis.loadForm = function(data) {\n    this.textArea.value = data;\n}\n\nthis.onClick = function() {\n    if(this.textArea) {\n        mode.getMessenger().dataUpdate(\"submitOutput\",this.textArea.value);\n    }\n}"},"destroyOnInactive":false}}}
+{
+	"fileType": "apogee app js workspace",
+	"workspace": {
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "Model",
+			"type": "apogee.Folder",
+			"children": {
+				"submitOutput": {
+					"name": "submitOutput",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": "",
+						"description": ""
+					}
+				},
+				"initialFormContent": {
+					"name": "initialFormContent",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": "Content for control",
+						"description": ""
+					}
+				},
+				"NOTES": {
+					"name": "NOTES",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": "This workspace has a custom control\nwhich acts as a simple form. It loads\ndata from the table \"initialFormContent\"\nand sends data using the messenger to the\ntable \"submitOutput\".",
+						"description": ""
+					}
+				},
+				"testCustomControl": {
+					"name": "testCustomControl",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "return initialFormContent;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				}
+			}
+		},
+		"name": "customControlExample"
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"children": {
+			"submitOutput": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 338,
+						"height": 104
+					},
+					"posInfo": {
+						"x": 38,
+						"y": 319
+					},
+					"state": 0,
+					"viewType": "Data"
+				},
+				"dataView": "Plain"
+			},
+			"initialFormContent": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 339,
+						"height": 76
+					},
+					"posInfo": {
+						"x": 37,
+						"y": 191
+					},
+					"state": 0,
+					"viewType": "Data"
+				},
+				"dataView": "Plain"
+			},
+			"NOTES": {
+				"type": "apogeeapp.app.TextComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 339,
+						"height": 111
+					},
+					"posInfo": {
+						"x": 35,
+						"y": 24
+					},
+					"state": 0,
+					"viewType": "Text"
+				}
+			},
+			"testCustomControl": {
+				"type": "apogeeapp.app.CustomControlComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 359,
+						"height": 313
+					},
+					"posInfo": {
+						"x": 408,
+						"y": 23
+					},
+					"state": 0,
+					"viewType": "Output"
+				},
+				"resource": {
+					"setData": "if(!this.initialized) {\n    this.cachedData = data;\n    return;\n}\n\nthis.loadForm(data);\n",
+					"html": "<div id=\"test_backgroundDiv\">\n    <textarea name=\"message\" rows=\"10\" cols=\"30\" id=\"test_textArea\"></textarea><br>\n    <button type=\"button\" id=\"test_button\">Submit</button>\n</div>",
+					"onLoad": "if(!this.initialized) {\n    this.textArea = document.getElementById(\"test_textArea\");\n    this.button = document.getElementById(\"test_button\");\n    this.button.onclick = () => this.onClick();\n    this.initialized = true;\n    \n    if(this.cachedData) {\n        this.loadForm(this.cachedData);\n        this.cachedData = null;\n    }\n}",
+					"uiPrivate": "",
+					"css": "#test_backgroundDiv {\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    bottom: 0;\r\n    right: 0;\r\n    background-color: lightgray;\r\n    padding: 10px;\r\n}",
+					"init": "",
+					"constructorAddition": "this.initialized = false;\nthis.cachedData = null;\n\nthis.loadForm = function(data) {\n    this.textArea.value = data;\n}\n\nthis.onClick = function() {\n    if(this.textArea) {\n        mode.getMessenger().dataUpdate(\"submitOutput\",this.textArea.value);\n    }\n}"
+				},
+				"destroyOnInactive": false
+			}
+		}
+	},
+	"version": 0.4,
+	"references": []
+}

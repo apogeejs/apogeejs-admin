@@ -1,10 +1,10 @@
 {
-	"fileType": "apogee js web workspace",
+	"fileType": "apogee app js workspace",
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "processPropertyRules",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"tasks": {
@@ -5963,7 +5963,8 @@
 					}
 				}
 			}
-		}
+		},
+		"name": "processPropertyRules"
 	},
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
@@ -7142,8 +7143,8 @@
 			}
 		}
 	},
-	"version": 0.31,
-	"library": [
+	"version": 0.4,
+	"references": [
 		{
 			"url": "http://localhost:8383/apogee/dev/micello/metadata%20conversion/lib/taskAppModule.js",
 			"entryType": "js link"

@@ -1,1801 +1,2234 @@
 {
-	"fileType": "apogee js web workspace",
+	"name": "createStringsJson",
+	"fileType": "apogee app js workspace",
 	"workspace": {
+		"name": "createStringsJson",
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "createStringsGrid",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
-				"stringsFile": {
-					"name": "stringsFile",
-					"type": "apogee.JsonTable",
-					"updateData": {
-						"data": {
-							"translations": {
-								"com_type:Academic Building": {
-									"en": "Academic Building",
-									"ja": "学術の建物"
-								},
-								"com_type:Airport": {
-									"en": "Airport",
-									"ja": "空港"
-								},
-								"com_type:Apartment Complex": {
-									"en": "Apartment Complex",
-									"ja": "団地"
-								},
-								"com_type:Bus Station": {
-									"en": "Bus Station",
-									"ja": "バスターミナル"
-								},
-								"com_type:Business Campus": {
-									"en": "Business Campus",
-									"ja": "ビジネスキャンパス"
-								},
-								"com_type:Campground": {
-									"en": "Campground",
-									"ja": "キャンプ場"
-								},
-								"com_type:Casino": {
-									"en": "Casino",
-									"ja": "カジノ"
-								},
-								"com_type:College Campus Building": {
-									"en": "College Campus Building",
-									"ja": "大学キャンパス構築"
-								},
-								"com_type:Convention Center": {
-									"en": "Convention Center",
-									"ja": "コンベンションセンター"
-								},
-								"com_type:Dormitory": {
-									"en": "Dormitory",
-									"ja": "寮"
-								},
-								"com_type:Government": {
-									"en": "Government",
-									"ja": "政府"
-								},
-								"com_type:High School": {
-									"en": "High School",
-									"ja": "高等学校"
-								},
-								"com_type:Hospital": {
-									"en": "Hospital",
-									"ja": "病院"
-								},
-								"com_type:Hotel": {
-									"en": "Hotel",
-									"ja": "ホテル"
-								},
-								"com_type:Industry": {
-									"en": "Industry",
-									"ja": "産業"
-								},
-								"com_type:Library": {
-									"en": "Library",
-									"ja": "図書館"
-								},
-								"com_type:Metro Station": {
-									"en": "Metro Station",
-									"ja": "地下鉄"
-								},
-								"com_type:Museum": {
-									"en": "Museum",
-									"ja": "博物館"
-								},
-								"com_type:Other": {
-									"en": "Other",
-									"ja": "その他"
-								},
-								"com_type:Parking Garage": {
-									"en": "Parking Garage",
-									"ja": "駐車場"
-								},
-								"com_type:Religious Building": {
-									"en": "Religious Building",
-									"ja": "宗教建築"
-								},
-								"com_type:Retail": {
-									"en": "Retail",
-									"ja": "リテール"
-								},
-								"com_type:School": {
-									"en": "School",
-									"ja": "学校"
-								},
-								"com_type:Shopping Center": {
-									"en": "Shopping Center",
-									"ja": "ショッピングセンター"
-								},
-								"com_type:Shopping Mall": {
-									"en": "Shopping Mall",
-									"ja": "ショッピングモール"
-								},
-								"com_type:Sports Center": {
-									"en": "Sports Center",
-									"ja": "スポーツセンター"
-								},
-								"com_type:Stadium": {
-									"en": "Stadium",
-									"ja": "スタジアム"
-								},
-								"com_type:Theater": {
-									"en": "Theater",
-									"ja": "劇場"
-								},
-								"com_type:Theme Park": {
-									"en": "Theme Park",
-									"ja": "テーマパーク"
-								},
-								"com_type:Train Station": {
-									"en": "Train Station",
-									"ja": "鉄道駅"
-								},
-								"country:AD": {
-									"en": "Andorra",
-									"ja": "アンドラ"
-								},
-								"country:AE": {
-									"en": "United Arab Emirates",
-									"ja": "United Arab Emirates"
-								},
-								"country:AF": {
-									"en": "Afghanistan",
-									"ja": "アフガニスタン"
-								},
-								"country:AG": {
-									"en": "Antigua and Barbuda",
-									"ja": "アンチグアバーブーダ"
-								},
-								"country:AI": {
-									"en": "Anguilla",
-									"ja": "アングィラ"
-								},
-								"country:AL": {
-									"en": "Albania",
-									"ja": "アルバニア"
-								},
-								"country:AM": {
-									"en": "Armenia",
-									"ja": "アルメニア"
-								},
-								"country:AN": {
-									"en": "Netherlands Antilles",
-									"ja": "Netherlands Antilles"
-								},
-								"country:AO": {
-									"en": "Angola",
-									"ja": "アンゴラ"
-								},
-								"country:AQ": {
-									"en": "Antarctica",
-									"ja": "南極大陸"
-								},
-								"country:AR": {
-									"en": "Argentina",
-									"ja": "アルゼンチン"
-								},
-								"country:AS": {
-									"en": "American Samoa",
-									"ja": "米サモア"
-								},
-								"country:AT": {
-									"en": "Austria",
-									"ja": "オーストリア"
-								},
-								"country:AU": {
-									"en": "Australia",
-									"ja": "オーストラリア"
-								},
-								"country:AW": {
-									"en": "Aruba",
-									"ja": "アルバ"
-								},
-								"country:AX": {
-									"en": "Aland Islands",
-									"ja": "オーランド島"
-								},
-								"country:AZ": {
-									"en": "Azerbaijan",
-									"ja": "アゼルバイジャン"
-								},
-								"country:BA": {
-									"en": "Bosnia and Herzegovina",
-									"ja": "ボスニア_ヘルツェゴビナ"
-								},
-								"country:BB": {
-									"en": "Barbados",
-									"ja": "バルバドス"
-								},
-								"country:BD": {
-									"en": "Bangladesh",
-									"ja": "バングラデシュ"
-								},
-								"country:BE": {
-									"en": "Belgium",
-									"ja": "ベルギー"
-								},
-								"country:BF": {
-									"en": "Burkina Faso",
-									"ja": "ブルキナファソ"
-								},
-								"country:BG": {
-									"en": "Bulgaria",
-									"ja": "ブルガリア"
-								},
-								"country:BH": {
-									"en": "Bahrain",
-									"ja": "バーレーン"
-								},
-								"country:BI": {
-									"en": "Burundi",
-									"ja": "ブルンジ"
-								},
-								"country:BJ": {
-									"en": "Benin",
-									"ja": "ベナン"
-								},
-								"country:BM": {
-									"en": "Bermuda",
-									"ja": "バミューダ"
-								},
-								"country:BN": {
-									"en": "Brunei Darussalam",
-									"ja": "ブルネイ_ダルサラーム国"
-								},
-								"country:BO": {
-									"en": "Bolivia",
-									"ja": "ボリビア"
-								},
-								"country:BR": {
-									"en": "Brazil",
-									"ja": "ブラジル"
-								},
-								"country:BS": {
-									"en": "Bahamas",
-									"ja": "バハマ"
-								},
-								"country:BT": {
-									"en": "Bhutan",
-									"ja": "ブータン"
-								},
-								"country:BV": {
-									"en": "Bouvet Island",
-									"ja": "ブーベ島"
-								},
-								"country:BW": {
-									"en": "Botswana",
-									"ja": "ボツワナ"
-								},
-								"country:BY": {
-									"en": "Belarus",
-									"ja": "ベラルーシ"
-								},
-								"country:BZ": {
-									"en": "Belize",
-									"ja": "ベリーズ"
-								},
-								"country:CA": {
-									"en": "Canada",
-									"ja": "カナダ"
-								},
-								"country:CC": {
-									"en": "Cocos (Keeling) Islands",
-									"ja": "ココス（キーリング）島"
-								},
-								"country:CD": {
-									"en": "The Democratic Republic of the Congo",
-									"ja": "The Democratic Republic of the Congo"
-								},
-								"country:CF": {
-									"en": "Central African Republic",
-									"ja": "中央アフリカ共和国"
-								},
-								"country:CG": {
-									"en": "Congo",
-									"ja": "コンゴ"
-								},
-								"country:CH": {
-									"en": "Switzerland",
-									"ja": "スイス"
-								},
-								"country:CI": {
-									"en": "Cote Divoire",
-									"ja": "Cote Divoire"
-								},
-								"country:CK": {
-									"en": "Cook Islands",
-									"ja": "クック島"
-								},
-								"country:CL": {
-									"en": "Chile",
-									"ja": "チリ"
-								},
-								"country:CM": {
-									"en": "Cameroon",
-									"ja": "カメルーン"
-								},
-								"country:CN": {
-									"en": "China",
-									"ja": "中国"
-								},
-								"country:CO": {
-									"en": "Colombia",
-									"ja": "コロンビア"
-								},
-								"country:CR": {
-									"en": "Costa Rica",
-									"ja": "コスタリカ"
-								},
-								"country:CV": {
-									"en": "Cape Verde",
-									"ja": "カーボベルデ"
-								},
-								"country:CX": {
-									"en": "Christmas Island",
-									"ja": "クリスマス島"
-								},
-								"country:CY": {
-									"en": "Cyprus",
-									"ja": "キプロス"
-								},
-								"country:CZ": {
-									"en": "Czech Republic",
-									"ja": "Czech Republic"
-								},
-								"country:DE": {
-									"en": "Germany",
-									"ja": "ドイツ"
-								},
-								"country:DJ": {
-									"en": "Djibouti",
-									"ja": "ジブチ"
-								},
-								"country:DK": {
-									"en": "Denmark",
-									"ja": "デンマーク"
-								},
-								"country:DM": {
-									"en": "Dominica",
-									"ja": "ドミニカ"
-								},
-								"country:DO": {
-									"en": "Dominican Republic",
-									"ja": "ドミニカ共和国"
-								},
-								"country:DZ": {
-									"en": "Algeria",
-									"ja": "アルジェリア"
-								},
-								"country:EC": {
-									"en": "Ecuador",
-									"ja": "エクアドル"
-								},
-								"country:EE": {
-									"en": "Estonia",
-									"ja": "エストニア"
-								},
-								"country:EG": {
-									"en": "Egypt",
-									"ja": "エジプト"
-								},
-								"country:EH": {
-									"en": "Western Sahara",
-									"ja": "西サハラ"
-								},
-								"country:ER": {
-									"en": "Eritrea",
-									"ja": "エリトリア"
-								},
-								"country:ES": {
-									"en": "Spain",
-									"ja": "スペイン"
-								},
-								"country:ET": {
-									"en": "Ethiopia",
-									"ja": "エチオピア"
-								},
-								"country:FI": {
-									"en": "Finland",
-									"ja": "フィンランド"
-								},
-								"country:FJ": {
-									"en": "Fiji",
-									"ja": "フィジー"
-								},
-								"country:FK": {
-									"en": "Falkland Islands (Malvinas)",
-									"ja": "フォークランド島（マルビナス）"
-								},
-								"country:FM": {
-									"en": "Micronesia",
-									"ja": "ミクロネシア"
-								},
-								"country:FO": {
-									"en": "Faroe Islands",
-									"ja": "フェロー島"
-								},
-								"country:FR": {
-									"en": "France",
-									"ja": "フランス"
-								},
-								"country:GA": {
-									"en": "Gabon",
-									"ja": "ガボン"
-								},
-								"country:GB": {
-									"en": "United Kingdom",
-									"ja": "イギリス"
-								},
-								"country:GD": {
-									"en": "Grenada",
-									"ja": "グレナダ"
-								},
-								"country:GE": {
-									"en": "Georgia",
-									"ja": "グルジア"
-								},
-								"country:GF": {
-									"en": "French Guiana",
-									"ja": "フレンチギアナ"
-								},
-								"country:GH": {
-									"en": "Ghana",
-									"ja": "ガーナ"
-								},
-								"country:GI": {
-									"en": "Gibraltar",
-									"ja": "ジブラルタル"
-								},
-								"country:GL": {
-									"en": "Greenland",
-									"ja": "グリーンランド"
-								},
-								"country:GM": {
-									"en": "Gambia",
-									"ja": "ガンビア"
-								},
-								"country:GN": {
-									"en": "Guinea",
-									"ja": "ギニア"
-								},
-								"country:GP": {
-									"en": "Guadeloupe",
-									"ja": "グアドループ島"
-								},
-								"country:GQ": {
-									"en": "Equatorial Guinea",
-									"ja": "Equatorial Guinea"
-								},
-								"country:GR": {
-									"en": "Greece",
-									"ja": "ギリシャ"
-								},
-								"country:GT": {
-									"en": "Guatemala",
-									"ja": "グアテマラ"
-								},
-								"country:GU": {
-									"en": "Guam",
-									"ja": "グアム島"
-								},
-								"country:GW": {
-									"en": "Guinea-Bissau",
-									"ja": "Guinea-Bissau"
-								},
-								"country:GY": {
-									"en": "Guyana",
-									"ja": "ガイアナ"
-								},
-								"country:HK": {
-									"en": "Hong Kong",
-									"ja": "香港"
-								},
-								"country:HM": {
-									"en": "Heard Island and McDonald Islands",
-									"ja": "Heard Island and McDonald Islands"
-								},
-								"country:HN": {
-									"en": "Honduras",
-									"ja": "ホンジュラス"
-								},
-								"country:HR": {
-									"en": "Croatia",
-									"ja": "クロアチア"
-								},
-								"country:HT": {
-									"en": "Haiti",
-									"ja": "ハイチ"
-								},
-								"country:HU": {
-									"en": "Hungary",
-									"ja": "ハンガリー"
-								},
-								"country:ID": {
-									"en": "Indonesia",
-									"ja": "インドネシア"
-								},
-								"country:IE": {
-									"en": "Ireland",
-									"ja": "アイルランド"
-								},
-								"country:IL": {
-									"en": "Israel",
-									"ja": "イスラエル"
-								},
-								"country:IN": {
-									"en": "India",
-									"ja": "インド"
-								},
-								"country:IO": {
-									"en": "British Indian Ocean Territory",
-									"ja": "イギリス領インド洋地域"
-								},
-								"country:IQ": {
-									"en": "Iraq",
-									"ja": "イラク"
-								},
-								"country:IS": {
-									"en": "Iceland",
-									"ja": "アイスランド"
-								},
-								"country:IT": {
-									"en": "Italy",
-									"ja": "イタリア"
-								},
-								"country:JM": {
-									"en": "Jamaica",
-									"ja": "ジャマイカ"
-								},
-								"country:JO": {
-									"en": "Jordan",
-									"ja": "ヨルダン"
-								},
-								"country:JP": {
-									"en": "Japan",
-									"ja": "日本"
-								},
-								"country:KE": {
-									"en": "Kenya",
-									"ja": "ケニア"
-								},
-								"country:KG": {
-									"en": "Kyrgyzstan",
-									"ja": "キルギスタン"
-								},
-								"country:KH": {
-									"en": "Cambodia",
-									"ja": "カンボジア"
-								},
-								"country:KI": {
-									"en": "Kiribati",
-									"ja": "キリバス"
-								},
-								"country:KM": {
-									"en": "Comoros",
-									"ja": "コモロ"
-								},
-								"country:KN": {
-									"en": "Saint Kitts-Nevis",
-									"ja": "セントクリストファー_ネイビス -"
-								},
-								"country:KR": {
-									"en": "Korea (South)",
-									"ja": "韓国"
-								},
-								"country:KW": {
-									"en": "Kuwait",
-									"ja": "クウェート"
-								},
-								"country:KY": {
-									"en": "Cayman Islands",
-									"ja": "ケイマン島"
-								},
-								"country:KZ": {
-									"en": "Kazakstan",
-									"ja": "カザフスタン"
-								},
-								"country:LA": {
-									"en": "Laos",
-									"ja": "ラオス"
-								},
-								"country:LB": {
-									"en": "Lebanon",
-									"ja": "レバノン"
-								},
-								"country:LC": {
-									"en": "Saint Lucia",
-									"ja": "セントルシア"
-								},
-								"country:LI": {
-									"en": "Liechtenstein",
-									"ja": "リヒテンシュタイン"
-								},
-								"country:LK": {
-									"en": "Sri Lanka",
-									"ja": "スリ_ランカ"
-								},
-								"country:LR": {
-									"en": "Liberia",
-									"ja": "リベリア"
-								},
-								"country:LS": {
-									"en": "Lesotho",
-									"ja": "レソト"
-								},
-								"country:LT": {
-									"en": "Lithuania",
-									"ja": "リトアニア"
-								},
-								"country:LU": {
-									"en": "Luxembourg",
-									"ja": "ルクセンブルク"
-								},
-								"country:LV": {
-									"en": "Latvia",
-									"ja": "ラトビア"
-								},
-								"country:LY": {
-									"en": "Libya",
-									"ja": "リビア"
-								},
-								"country:MA": {
-									"en": "Morocco",
-									"ja": "モロッコ"
-								},
-								"country:MC": {
-									"en": "Monaco",
-									"ja": "モナコ"
-								},
-								"country:MD": {
-									"en": "Moldova",
-									"ja": "モルドバ"
-								},
-								"country:MG": {
-									"en": "Madagascar",
-									"ja": "マダガスカル"
-								},
-								"country:MH": {
-									"en": "Marshall Islands",
-									"ja": "マーシャル島"
-								},
-								"country:MK": {
-									"en": "Macedonia",
-									"ja": "マケドニア"
-								},
-								"country:ML": {
-									"en": "Mali",
-									"ja": "マリ"
-								},
-								"country:MM": {
-									"en": "Myanmar",
-									"ja": "ミャンマー"
-								},
-								"country:MN": {
-									"en": "Mongolia",
-									"ja": "モンゴル国"
-								},
-								"country:MO": {
-									"en": "Macau",
-									"ja": "マカオ"
-								},
-								"country:MQ": {
-									"en": "Martinique",
-									"ja": "マルティニーク島"
-								},
-								"country:MR": {
-									"en": "Mauritania",
-									"ja": "モーリタニア"
-								},
-								"country:MS": {
-									"en": "Montserrat",
-									"ja": "モントセラト"
-								},
-								"country:MT": {
-									"en": "Malta",
-									"ja": "マルタ"
-								},
-								"country:MU": {
-									"en": "Mauritius",
-									"ja": "モーリシャス"
-								},
-								"country:MV": {
-									"en": "Maldives",
-									"ja": "モルディブ"
-								},
-								"country:MW": {
-									"en": "Malawi",
-									"ja": "マラウイ"
-								},
-								"country:MX": {
-									"en": "Mexico",
-									"ja": "メキシコ"
-								},
-								"country:MY": {
-									"en": "Malaysia",
-									"ja": "マレーシア"
-								},
-								"country:MZ": {
-									"en": "Mozambique",
-									"ja": "モザンビーク"
-								},
-								"country:NA": {
-									"en": "Namibia",
-									"ja": "ナミビア"
-								},
-								"country:NC": {
-									"en": "New Caledonia",
-									"ja": "ニューカレドニア"
-								},
-								"country:NE": {
-									"en": "Niger",
-									"ja": "ニジェール"
-								},
-								"country:NF": {
-									"en": "Norfolk Island",
-									"ja": "ノーフォーク島"
-								},
-								"country:NG": {
-									"en": "Nigeria",
-									"ja": "ナイジェリア"
-								},
-								"country:NI": {
-									"en": "Nicaragua",
-									"ja": "ニカラグア"
-								},
-								"country:NL": {
-									"en": "Netherlands",
-									"ja": "オランダ"
-								},
-								"country:NO": {
-									"en": "Norway",
-									"ja": "ノルウェー"
-								},
-								"country:NP": {
-									"en": "Nepal",
-									"ja": "ネパールl"
-								},
-								"country:NR": {
-									"en": "Nauru",
-									"ja": "ナウル"
-								},
-								"country:NU": {
-									"en": "Niue",
-									"ja": "ニウエ"
-								},
-								"country:NZ": {
-									"en": "New Zealand",
-									"ja": "ニュージーランド"
-								},
-								"country:OM": {
-									"en": "Oman",
-									"ja": "オマーン"
-								},
-								"country:PA": {
-									"en": "Panama",
-									"ja": "パナマ"
-								},
-								"country:PE": {
-									"en": "Peru",
-									"ja": "ペルー"
-								},
-								"country:PF": {
-									"en": "French Polynesia",
-									"ja": "フランス領ポリネシア"
-								},
-								"country:PG": {
-									"en": "Papua New Guinea",
-									"ja": "パプアニューギニア"
-								},
-								"country:PH": {
-									"en": "Philippines",
-									"ja": "フィリピン"
-								},
-								"country:PK": {
-									"en": "Pakistan",
-									"ja": "パキスタン"
-								},
-								"country:PL": {
-									"en": "Poland",
-									"ja": "ポーランド"
-								},
-								"country:PM": {
-									"en": "Saint Pierre and Miquelon",
-									"ja": "サンピエール島_ミクロン島"
-								},
-								"country:PN": {
-									"en": "Pitcairn",
-									"ja": "ピトケアン"
-								},
-								"country:PR": {
-									"en": "Puerto Rico",
-									"ja": "プエルトリコ"
-								},
-								"country:PS": {
-									"en": "Palestinian Territory, Occupied",
-									"ja": "パレスチナ"
-								},
-								"country:PT": {
-									"en": "Portugal",
-									"ja": "ポルトガル"
-								},
-								"country:PW": {
-									"en": "Palau",
-									"ja": "パラオ"
-								},
-								"country:PY": {
-									"en": "Paraguay",
-									"ja": "パラグアイ"
-								},
-								"country:QA": {
-									"en": "Qatar",
-									"ja": "カタール"
-								},
-								"country:RE": {
-									"en": "Reunion",
-									"ja": "再会"
-								},
-								"country:RO": {
-									"en": "Romania",
-									"ja": "ルーマニア"
-								},
-								"country:RU": {
-									"en": "Russian Federation",
-									"ja": "ロシア連邦"
-								},
-								"country:RW": {
-									"en": "Rwanda",
-									"ja": "ルワンダ"
-								},
-								"country:SA": {
-									"en": "Saudi Arabia",
-									"ja": "サウジアラビア"
-								},
-								"country:SB": {
-									"en": "Solomon Islands",
-									"ja": "ソロモン島"
-								},
-								"country:SC": {
-									"en": "Seychelles",
-									"ja": "セイシェル"
-								},
-								"country:SE": {
-									"en": "Sweden",
-									"ja": "スウェーデン"
-								},
-								"country:SG": {
-									"en": "Singapore",
-									"ja": "シンガポール"
-								},
-								"country:SH": {
-									"en": "Saint Helena",
-									"ja": "セント_ヘレナ島"
-								},
-								"country:SI": {
-									"en": "Slovenia",
-									"ja": "スロベニア"
-								},
-								"country:SJ": {
-									"en": "Svalbard and Jan Mayen",
-									"ja": "スバールバル島ヤンマイエン島"
-								},
-								"country:SK": {
-									"en": "Slovakia",
-									"ja": "スロバキア"
-								},
-								"country:SL": {
-									"en": "Sierra Leone",
-									"ja": "シエラレオネ"
-								},
-								"country:SM": {
-									"en": "San Marino",
-									"ja": "サン_マリノ"
-								},
-								"country:SN": {
-									"en": "Senegal",
-									"ja": "セネガル"
-								},
-								"country:SO": {
-									"en": "Somalia",
-									"ja": "ソマリア"
-								},
-								"country:SR": {
-									"en": "Suriname",
-									"ja": "スリナム"
-								},
-								"country:ST": {
-									"en": "Sao Tome and Principe",
-									"ja": "サントメプリンシペ"
-								},
-								"country:SV": {
-									"en": "El Salvador",
-									"ja": "エルサルバドル"
-								},
-								"country:SZ": {
-									"en": "Swaziland",
-									"ja": "スワジランド"
-								},
-								"country:TC": {
-									"en": "Turks and Caicos Islands",
-									"ja": "タークス_カイコス諸島"
-								},
-								"country:TD": {
-									"en": "Chad",
-									"ja": "チャド"
-								},
-								"country:TF": {
-									"en": "French Southern Territories",
-									"ja": "フランス領極南島"
-								},
-								"country:TG": {
-									"en": "Togo",
-									"ja": "トーゴ"
-								},
-								"country:TH": {
-									"en": "Thailand",
-									"ja": "タイ"
-								},
-								"country:TJ": {
-									"en": "Tajikistan",
-									"ja": "タジキスタン"
-								},
-								"country:TK": {
-									"en": "Tokelau",
-									"ja": "トケラウ島"
-								},
-								"country:TM": {
-									"en": "Turkmenistan",
-									"ja": "トルクメニスタン"
-								},
-								"country:TN": {
-									"en": "Tunisia",
-									"ja": "チュニジア"
-								},
-								"country:TO": {
-									"en": "Tonga",
-									"ja": "トンガ"
-								},
-								"country:TR": {
-									"en": "Turkey",
-									"ja": "トルコ"
-								},
-								"country:TT": {
-									"en": "Trinidad and Tobago",
-									"ja": "トリニダード_トバゴ"
-								},
-								"country:TV": {
-									"en": "Tuvalu",
-									"ja": "ツバル"
-								},
-								"country:TW": {
-									"en": "Taiwan",
-									"ja": "台湾"
-								},
-								"country:TZ": {
-									"en": "Tanzania",
-									"ja": "タンザニア"
-								},
-								"country:UA": {
-									"en": "Ukraine",
-									"ja": "ウクライナ"
-								},
-								"country:UG": {
-									"en": "Uganda",
-									"ja": "ウガンダ"
-								},
-								"country:UM": {
-									"en": "United States Minor Outlying Islands",
-									"ja": "アメリカ合衆国外島"
-								},
-								"country:US": {
-									"en": "United States",
-									"ja": "米国"
-								},
-								"country:UY": {
-									"en": "Uruguay",
-									"ja": "ウルグアイ"
-								},
-								"country:UZ": {
-									"en": "Uzbekistan",
-									"ja": "ウズベキスタン"
-								},
-								"country:VC": {
-									"en": "Saint Vincent and the Grenadines",
-									"ja": "Saint Vincent and the Grenadines"
-								},
-								"country:VE": {
-									"en": "Venezuela",
-									"ja": "ベネズエラ"
-								},
-								"country:VG": {
-									"en": "Virgin Islands, British",
-									"ja": "英領バージン島"
-								},
-								"country:VI": {
-									"en": "Virgin Islands, US",
-									"ja": "米領バージン島"
-								},
-								"country:VN": {
-									"en": "Viet Nam",
-									"ja": "ベトナム"
-								},
-								"country:VU": {
-									"en": "Vanuatu",
-									"ja": "バヌアツ"
-								},
-								"country:WF": {
-									"en": "Wallis and Futuna",
-									"ja": "ワリー_エ_フトゥーナ"
-								},
-								"country:WS": {
-									"en": "Samoa",
-									"ja": "サモア"
-								},
-								"country:YE": {
-									"en": "Yemen",
-									"ja": "イエメン"
-								},
-								"country:YT": {
-									"en": "Mayotte",
-									"ja": "マヨット島"
-								},
-								"country:ZA": {
-									"en": "South Africa",
-									"ja": "南アフリカ"
-								},
-								"country:ZM": {
-									"en": "Zambia",
-									"ja": "ザンビア"
-								},
-								"country:ZW": {
-									"en": "Zimbabwe",
-									"ja": "ジンバブエ"
-								},
-								"icon:ATM": {
-									"en": "ATM",
-									"ja": "ATM"
-								},
-								"icon:ATM:Dollar": {
-									"en": "ATM",
-									"ja": "ATM"
-								},
-								"icon:ATM:General": {
-									"en": "ATM",
-									"ja": "ATM:General"
-								},
-								"icon:ATM:Yen": {
-									"en": "ATM",
-									"ja": "ATM:Yen"
-								},
-								"icon:Baggage Claim": {
-									"en": "Baggage Claim",
-									"ja": "手荷物引渡場"
-								},
-								"icon:Bathroom": {
-									"en": "Bathroom",
-									"ja": "トイレ"
-								},
-								"icon:Bathroom M": {
-									"en": "Men's Bathroom",
-									"ja": "男子トイレ"
-								},
-								"icon:Bathroom W": {
-									"en": "Women's Bathroom",
-									"ja": "女子トイレ"
-								},
-								"icon:Bathroom Fam": {
-									"en": "Family Bathroom",
-									"ja": "ファミリールーム"
-								},
-								"icon:Bathroom W DA": {
-									"en": "Bathroom W DA",
-									"ja": "Bathroom W DA"
-								},
-								"icon:Bathroom M DA": {
-									"en": "Bathroom M DA",
-									"ja": "Bathroom M DA"
-								},
-								"icon:Bathroom Fam DA": {
-									"en": "",
-									"ja": "多目的トイレ"
-								},
-								"icon:Bathroom DA": {
-									"en": "Bathroom DA",
-									"ja": "Bathroom DA"
-								},
-								"icon:Bus": {
-									"en": "Bus",
-									"ja": "バス"
-								},
-								"icon:Bike Rack": {
-									"en": "Bike Rack",
-									"ja": "バイクラック"
-								},
-								"icon:Car Rental": {
-									"en": "Car Rental",
-									"ja": "レンタカー"
-								},
-								"icon:Changing Station": {
-									"en": "Changing Station",
-									"ja": "オムツ替え"
-								},
-								"icon:Cash Register": {
-									"en": "Cash Register",
-									"ja": "Cash Register"
-								},
-								"icon:Cocktails": {
-									"en": "Cocktails",
-									"ja": "カクテル"
-								},
-								"icon:Coffee": {
-									"en": "Coffee",
-									"ja": "コーヒー"
-								},
-								"icon:Copy/Print": {
-									"en": "Copy/Print",
-									"ja": "Copy/Print"
-								},
-								"icon:Crosswalk": {
-									"en": "Crosswalk",
-									"ja": "歩道橋"
-								},
-								"icon:Customs": {
-									"en": "Customs",
-									"ja": "税関検査"
-								},
-								"icon:Customer Service": {
-									"en": "Customer Service",
-									"ja": "顧客サービス"
-								},
-								"icon:Defibrillator": {
-									"en": "Defibrillator",
-									"ja": "AED"
-								},
-								"icon:Disabled Access": {
-									"en": "Disabled Access",
-									"ja": "車いす対応"
-								},
-								"icon:Elevator": {
-									"en": "Elevator",
-									"ja": "エレベータ"
-								},
-								"icon:Emergency Exit": {
-									"en": "Emergency Exit",
-									"ja": "非常口"
-								},
-								"icon:Escalator": {
-									"en": "Escalator",
-									"ja": "エスカレーター"
-								},
-								"icon:Eyewash": {
-									"en": "Eyewash",
-									"ja": "目薬"
-								},
-								"icon:Fire Extinguisher": {
-									"en": "Fire Extinguisher",
-									"ja": "消火器"
-								},
-								"icon:Fire Hose": {
-									"en": "Fire Hose",
-									"ja": "消防ホース"
-								},
-								"icon:Fire Pull": {
-									"en": "Fire Pull",
-									"ja": "火災プル"
-								},
-								"icon:First Aid": {
-									"en": "First Aid",
-									"ja": "救護室"
-								},
-								"icon:Fitness Center": {
-									"en": "Fitness Center",
-									"ja": "フィットネスセンター"
-								},
-								"icon:Flight Monitor": {
-									"en": "Flight Monitor",
-									"ja": "飛行モニター"
-								},
-								"icon:Food and Drink": {
-									"en": "Food and Drink",
-									"ja": "飲食物"
-								},
-								"icon:Ground Transportation": {
-									"en": "Ground Transportation",
-									"ja": "Ground Transportation"
-								},
-								"icon:Gym": {
-									"en": "Gym",
-									"ja": "ジム"
-								},
-								"icon:Immigration and Customs": {
-									"en": "Immigration and Customs",
-									"ja": "入国審査、税関審査"
-								},
-								"icon:Information": {
-									"en": "Information",
-									"ja": "インフォメーション"
-								},
-								"icon:Locker": {
-									"en": "Locker",
-									"ja": "コインロッカー"
-								},
-								"icon:Lost and Found": {
-									"en": "Lost and Found",
-									"ja": "お忘れ物承り場所"
-								},
-								"icon:Luggage Cart": {
-									"en": "Luggage Cart",
-									"ja": "荷物カート"
-								},
-								"icon:Mail": {
-									"en": "Mail",
-									"ja": "郵便"
-								},
-								"icon:Massage Chair": {
-									"en": "Massage Chair",
-									"ja": "マッサージチェア"
-								},
-								"icon:Medical": {
-									"en": "Medical",
-									"ja": "医療"
-								},
-								"icon:Meditation Room": {
-									"en": "Meditation Room",
-									"ja": "瞑想ルーム"
-								},
-								"icon:Meeting Point": {
-									"en": "Meeting Point",
-									"ja": "打ち合わせポイント"
-								},
-								"icon:Money Changer": {
-									"en": "Money Changer",
-									"ja": "マネーチェンジャー"
-								},
-								"icon:Movie Theater": {
-									"en": "Movie Theater",
-									"ja": "映画館"
-								},
-								"icon:Moving Walkway": {
-									"en": "Moving Walkway",
-									"ja": "動く歩道"
-								},
-								"icon:Passport Control": {
-									"en": "Passport Control",
-									"ja": "Passport Control"
-								},
-								"icon:Paid Parking": {
-									"en": "Paid Parking",
-									"ja": "有料駐車場"
-								},
-								"icon:Parking": {
-									"en": "Parking",
-									"ja": "駐車場"
-								},
-								"icon:Pet Relief Area": {
-									"en": "Pet Relief Area",
-									"ja": "ペット救済エリア"
-								},
-								"icon:Playground": {
-									"en": "Playground",
-									"ja": "遊び場"
-								},
-								"icon:Police/Security": {
-									"en": "Police/Security",
-									"ja": "警察／セキュリティ"
-								},
-								"icon:Power": {
-									"en": "Power",
-									"ja": "電源"
-								},
-								"icon:Rest Area": {
-									"en": "Rest Area",
-									"ja": "休憩所"
-								},
-								"icon:Restaurant": {
-									"en": "Restaurant",
-									"ja": "レストラン"
-								},
-								"icon:Santa": {
-									"en": "Santa",
-									"ja": "Santa"
-								},
-								"icon:Security Section": {
-									"en": "Security Section",
-									"ja": "セキュリティ"
-								},
-								"icon:Shoe Shine": {
-									"en": "Shoe Shine",
-									"ja": "靴磨き"
-								},
-								"icon:Shower": {
-									"en": "Shower",
-									"ja": "シャワー"
-								},
-								"icon:Smoke": {
-									"en": "Smoking Area",
-									"ja": "喫煙所"
-								},
-								"icon:Stairs": {
-									"en": "Stairs",
-									"ja": "階段"
-								},
-								"icon:Stop Sign": {
-									"en": "Stop Sign",
-									"ja": "停止"
-								},
-								"icon:Stroller": {
-									"en": "Stroller",
-									"ja": "ベビーカー"
-								},
-								"icon:Taxi": {
-									"en": "Taxi",
-									"ja": "タクシ"
-								},
-								"icon:Telephone": {
-									"en": "Telephone",
-									"ja": "電話"
-								},
-								"icon:Ticketing, Check-in": {
-									"en": "Ticketing, Check-in",
-									"ja": "鉄道乗車券販売"
-								},
-								"icon:Traffic Light": {
-									"en": "Traffic Light",
-									"ja": "信号"
-								},
-								"icon:Train": {
-									"en": "Train",
-									"ja": "電車"
-								},
-								"icon:Transit Hotel": {
-									"en": "Transit Hotel",
-									"ja": "トランジットホテル"
-								},
-								"icon:TV": {
-									"en": "TV",
-									"ja": "テレビ"
-								},
-								"icon:Valet Parking": {
-									"en": "Valet Parking",
-									"ja": "駐車サービス"
-								},
-								"icon:Vending Machine": {
-									"en": "Vending Machine",
-									"ja": "自販機"
-								},
-								"icon:Wheelchair Ramp": {
-									"en": "Wheelchair Ramp",
-									"ja": "車椅子用のスロープ"
-								},
-								"icon:Wifi": {
-									"en": "Wifi",
-									"ja": "Wifi"
-								},
-								"icon:Yield Sign": {
-									"en": "Yield Sign",
-									"ja": "収量サイン"
-								},
-								"lang:ar": {
-									"en": "Arabic",
-									"ja": "アラビア語"
-								},
-								"lang:da": {
-									"en": "Danish",
-									"ja": "デンマーク語"
-								},
-								"lang:de": {
-									"en": "German",
-									"ja": "ドイツ語"
-								},
-								"lang:en": {
-									"en": "English",
-									"ja": "英語"
-								},
-								"lang:es": {
-									"en": "Spanish",
-									"ja": "スペイン語"
-								},
-								"lang:fr": {
-									"en": "French",
-									"ja": "フランス語"
-								},
-								"lang:gu": {
-									"en": "Gujarati",
-									"ja": "グジャラート語"
-								},
-								"lang:he": {
-									"en": "Hebrew",
-									"ja": "ヘブライ語"
-								},
-								"lang:hi": {
-									"en": "Hindi",
-									"ja": "ヒンディー語"
-								},
-								"lang:id": {
-									"en": "Indonesian",
-									"ja": "インドネシア語"
-								},
-								"lang:it": {
-									"en": "Italian",
-									"ja": "イタリア語"
-								},
-								"lang:ja": {
-									"en": "Japanese",
-									"ja": "日本語"
-								},
-								"lang:ko": {
-									"en": "Korean",
-									"ja": "韓国語"
-								},
-								"lang:nl": {
-									"en": "Dutch",
-									"ja": "オランダ語"
-								},
-								"lang:pt": {
-									"en": "Portuguese",
-									"ja": "ポルトガル語"
-								},
-								"lang:ro": {
-									"en": "Romanian",
-									"ja": "ルーマニア語"
-								},
-								"lang:ru": {
-									"en": "Russian",
-									"ja": "ロシア語"
-								},
-								"lang:sv": {
-									"en": "Swedish",
-									"ja": "スウェーデン語"
-								},
-								"lang:tr": {
-									"en": "Turkish",
-									"ja": "トルコ語"
-								},
-								"lang:zh": {
-									"en": "Chinese",
-									"ja": "中国語"
-								},
-								"map_type:Airport": {
-									"en": "Airport",
-									"ja": "空港"
-								},
-								"map_type:Airport Terminal": {
-									"en": "Airport Terminal",
-									"ja": "空港ターミナル"
-								},
-								"map_type:Casino": {
-									"en": "Casino",
-									"ja": "カジノ"
-								},
-								"map_type:College Building": {
-									"en": "College Building",
-									"ja": "カレッジビル"
-								},
-								"map_type:College Campus": {
-									"en": "College Campus",
-									"ja": "大学のキャンパス"
-								},
-								"map_type:Convention": {
-									"en": "Convention",
-									"ja": "コンベンション"
-								},
-								"map_type:Hospital": {
-									"en": "Hospital",
-									"ja": "病院"
-								},
-								"map_type:Retail": {
-									"en": "Retail",
-									"ja": "リテール"
-								},
-								"map_type:School Building": {
-									"en": "School Building",
-									"ja": "校舎"
-								},
-								"map_type:School Campus": {
-									"en": "School Campus",
-									"ja": "学校のキャンパス"
-								},
-								"map_type:Shopping Mall": {
-									"en": "Shopping Mall",
-									"ja": "ショッピングモール"
-								},
-								"map_type:Station": {
-									"en": "Station",
-									"ja": "駅"
-								},
-								"state:AB": {
-									"en": "Alberta",
-									"ja": "アルバータ州"
-								},
-								"state:AK": {
-									"en": "Alaska",
-									"ja": "アラスカ州"
-								},
-								"state:AL": {
-									"en": "Alabama",
-									"ja": "アラバマ州"
-								},
-								"state:AR": {
-									"en": "Arkansas",
-									"ja": "アーカンソー州"
-								},
-								"state:AZ": {
-									"en": "Arizona",
-									"ja": "アリゾナ州"
-								},
-								"state:BC": {
-									"en": "British Columbia",
-									"ja": "ブリティッシュコロンビア州"
-								},
-								"state:CA": {
-									"en": "California",
-									"ja": "カリフォルニア州"
-								},
-								"state:CO": {
-									"en": "Colorado",
-									"ja": "コロラド州"
-								},
-								"state:CT": {
-									"en": "Connecticut",
-									"ja": "コネチカット州"
-								},
-								"state:DC": {
-									"en": "District Of Columbia",
-									"ja": "コロンビア州"
-								},
-								"state:DE": {
-									"en": "Delaware",
-									"ja": "デラウェア州"
-								},
-								"state:FL": {
-									"en": "Florida",
-									"ja": "フロリダ州"
-								},
-								"state:GA": {
-									"en": "Georgia",
-									"ja": "グルジア州"
-								},
-								"state:HI": {
-									"en": "Hawaii",
-									"ja": "ハワイ"
-								},
-								"state:IA": {
-									"en": "Iowa",
-									"ja": "アイオワ州"
-								},
-								"state:ID": {
-									"en": "Idaho",
-									"ja": "アイダホ州"
-								},
-								"state:IL": {
-									"en": "Illinois",
-									"ja": "イリノイ州"
-								},
-								"state:IN": {
-									"en": "Indiana",
-									"ja": "インディアナ州"
-								},
-								"state:KS": {
-									"en": "Kansas",
-									"ja": "カンザス州"
-								},
-								"state:KY": {
-									"en": "Kentucky",
-									"ja": "ケンタッキー州"
-								},
-								"state:LA": {
-									"en": "Louisiana",
-									"ja": "ルイジアナ州"
-								},
-								"state:MA": {
-									"en": "Massachusetts",
-									"ja": "マサチューセッツ州"
-								},
-								"state:MB": {
-									"en": "Manitoba",
-									"ja": "マニトバ州"
-								},
-								"state:MD": {
-									"en": "Maryland",
-									"ja": "メリーランド州"
-								},
-								"state:ME": {
-									"en": "Maine",
-									"ja": "メイン州"
-								},
-								"state:MI": {
-									"en": "Michigan",
-									"ja": "ミシガン州"
-								},
-								"state:MN": {
-									"en": "Minnesota",
-									"ja": "ミネソタ州"
-								},
-								"state:MO": {
-									"en": "Missouri",
-									"ja": "ミズーリ州"
-								},
-								"state:MS": {
-									"en": "Mississippi",
-									"ja": "ミシシッピー州"
-								},
-								"state:MT": {
-									"en": "Montana",
-									"ja": "モンタナ州"
-								},
-								"state:NB": {
-									"en": "New Brunswick",
-									"ja": "ニューブランズウィック州"
-								},
-								"state:NC": {
-									"en": "North Carolina",
-									"ja": "ノースカロライナ州"
-								},
-								"state:ND": {
-									"en": "North Dakota",
-									"ja": "ノースダコタ州"
-								},
-								"state:NE": {
-									"en": "Nebraska",
-									"ja": "ネブラスカ州"
-								},
-								"state:NH": {
-									"en": "New Hampshire",
-									"ja": "ニューハンプシャー州"
-								},
-								"state:NJ": {
-									"en": "New Jersey",
-									"ja": "ニュージャージー州"
-								},
-								"state:NL": {
-									"en": "Newfoundland and Labrador",
-									"ja": "ニューファンドランド_ラブラドール州"
-								},
-								"state:NM": {
-									"en": "New Mexico",
-									"ja": "ニューメキシコ州"
-								},
-								"state:NS": {
-									"en": "Nova Scotia",
-									"ja": "ノバスコシア州"
-								},
-								"state:NSW": {
-									"en": "New South Wales",
-									"ja": "ニューサウスウェールズ州"
-								},
-								"state:NV": {
-									"en": "Nevada",
-									"ja": "ネバダ州"
-								},
-								"state:NY": {
-									"en": "New York",
-									"ja": "ニューヨーク"
-								},
-								"state:OH": {
-									"en": "Ohio",
-									"ja": "オハイオ州"
-								},
-								"state:OK": {
-									"en": "Oklahoma",
-									"ja": "オクラホマ州"
-								},
-								"state:ON": {
-									"en": "Ontario",
-									"ja": "オンタリオ州"
-								},
-								"state:OR": {
-									"en": "Oregon",
-									"ja": "オレゴン州"
-								},
-								"state:PA": {
-									"en": "Pennsylvania",
-									"ja": "ペンシルベニア州"
-								},
-								"state:PE": {
-									"en": "Prince Edward Island",
-									"ja": "プリンスエドワードアイランド"
-								},
-								"state:QC": {
-									"en": "Quebec",
-									"ja": "ケベック州"
-								},
-								"state:QLD": {
-									"en": "Queensland",
-									"ja": "クイーンズランド州"
-								},
-								"state:RI": {
-									"en": "Rhode Island",
-									"ja": "ロードアイランド州"
-								},
-								"state:SA": {
-									"en": "South Australia",
-									"ja": "南オーストラリア州"
-								},
-								"state:SC": {
-									"en": "South Carolina",
-									"ja": "サウスカロライナ州"
-								},
-								"state:SD": {
-									"en": "South Dakota",
-									"ja": "サウスダコタ州"
-								},
-								"state:SK": {
-									"en": "Saskatchewan",
-									"ja": "サスカチュワン州"
-								},
-								"state:TAS": {
-									"en": "Tasmania",
-									"ja": "タスマニア州"
-								},
-								"state:TN": {
-									"en": "Tennessee",
-									"ja": "テネシー州"
-								},
-								"state:Tokyo": {
-									"en": "Tokyo",
-									"ja": "東京"
-								},
-								"state:TX": {
-									"en": "Texas",
-									"ja": "テキサス州"
-								},
-								"state:UT": {
-									"en": "Utah",
-									"ja": "ユタ州"
-								},
-								"state:VA": {
-									"en": "Virginia",
-									"ja": "バージニア州"
-								},
-								"state:VIC": {
-									"en": "Victoria",
-									"ja": "ビクトリア"
-								},
-								"state:VT": {
-									"en": "Vermont",
-									"ja": "バーモント州"
-								},
-								"state:WA": {
-									"en": "Western Australia",
-									"ja": "西オーストラリア州"
-								},
-								"state:WI": {
-									"en": "Wisconsin",
-									"ja": "ウィスコンシン州"
-								},
-								"state:WV": {
-									"en": "West Virginia",
-									"ja": "ウェストバージニア州"
-								},
-								"state:WY": {
-									"en": "Wyoming",
-									"ja": "ワイオミング州"
-								}
-							}
-						},
-						"description": ""
-					}
-				},
 				"stringsGrid": {
 					"name": "stringsGrid",
 					"type": "apogee.JsonTable",
 					"updateData": {
-						"argList": [],
-						"functionBody": "var value;\nvalue = gridMatrix;\nreturn value;\n\n",
-						"supplementalCode": "",
-						"description": ""
+						"data": [
+							[
+								"Key",
+								"en",
+								"ja"
+							],
+							[
+								"com_type:Academic Building",
+								"Academic Building",
+								"学術の建物"
+							],
+							[
+								"com_type:Airport",
+								"Airport",
+								"空港"
+							],
+							[
+								"com_type:Apartment Complex",
+								"Apartment Complex",
+								"団地"
+							],
+							[
+								"com_type:Bus Station",
+								"Bus Station",
+								"バスターミナル"
+							],
+							[
+								"com_type:Business Campus",
+								"Business Campus",
+								"ビジネスキャンパス"
+							],
+							[
+								"com_type:Campground",
+								"Campground",
+								"キャンプ場"
+							],
+							[
+								"com_type:Casino",
+								"Casino",
+								"カジノ"
+							],
+							[
+								"com_type:College Campus Building",
+								"College Campus Building",
+								"大学キャンパス構築"
+							],
+							[
+								"com_type:Convention Center",
+								"Convention Center",
+								"コンベンションセンター"
+							],
+							[
+								"com_type:Dormitory",
+								"Dormitory",
+								"寮"
+							],
+							[
+								"com_type:Government",
+								"Government",
+								"政府"
+							],
+							[
+								"com_type:High School",
+								"High School",
+								"高等学校"
+							],
+							[
+								"com_type:Hospital",
+								"Hospital",
+								"病院"
+							],
+							[
+								"com_type:Hotel",
+								"Hotel",
+								"ホテル"
+							],
+							[
+								"com_type:Industry",
+								"Industry",
+								"産業"
+							],
+							[
+								"com_type:Library",
+								"Library",
+								"図書館"
+							],
+							[
+								"com_type:Metro Station",
+								"Metro Station",
+								"地下鉄"
+							],
+							[
+								"com_type:Museum",
+								"Museum",
+								"博物館"
+							],
+							[
+								"com_type:Other",
+								"Other",
+								"その他"
+							],
+							[
+								"com_type:Parking Garage",
+								"Parking Garage",
+								"駐車場"
+							],
+							[
+								"com_type:Religious Building",
+								"Religious Building",
+								"宗教建築"
+							],
+							[
+								"com_type:Retail",
+								"Retail",
+								"リテール"
+							],
+							[
+								"com_type:School",
+								"School",
+								"学校"
+							],
+							[
+								"com_type:Shopping Center",
+								"Shopping Center",
+								"ショッピングセンター"
+							],
+							[
+								"com_type:Shopping Mall",
+								"Shopping Mall",
+								"ショッピングモール"
+							],
+							[
+								"com_type:Sports Center",
+								"Sports Center",
+								"スポーツセンター"
+							],
+							[
+								"com_type:Stadium",
+								"Stadium",
+								"スタジアム"
+							],
+							[
+								"com_type:Theater",
+								"Theater",
+								"劇場"
+							],
+							[
+								"com_type:Theme Park",
+								"Theme Park",
+								"テーマパーク"
+							],
+							[
+								"com_type:Train Station",
+								"Train Station",
+								"鉄道駅"
+							],
+							[
+								"country:AD",
+								"Andorra",
+								"アンドラ"
+							],
+							[
+								"country:AE",
+								"United Arab Emirates",
+								"United Arab Emirates"
+							],
+							[
+								"country:AF",
+								"Afghanistan",
+								"アフガニスタン"
+							],
+							[
+								"country:AG",
+								"Antigua and Barbuda",
+								"アンチグアバーブーダ"
+							],
+							[
+								"country:AI",
+								"Anguilla",
+								"アングィラ"
+							],
+							[
+								"country:AL",
+								"Albania",
+								"アルバニア"
+							],
+							[
+								"country:AM",
+								"Armenia",
+								"アルメニア"
+							],
+							[
+								"country:AN",
+								"Netherlands Antilles",
+								"Netherlands Antilles"
+							],
+							[
+								"country:AO",
+								"Angola",
+								"アンゴラ"
+							],
+							[
+								"country:AQ",
+								"Antarctica",
+								"南極大陸"
+							],
+							[
+								"country:AR",
+								"Argentina",
+								"アルゼンチン"
+							],
+							[
+								"country:AS",
+								"American Samoa",
+								"米サモア"
+							],
+							[
+								"country:AT",
+								"Austria",
+								"オーストリア"
+							],
+							[
+								"country:AU",
+								"Australia",
+								"オーストラリア"
+							],
+							[
+								"country:AW",
+								"Aruba",
+								"アルバ"
+							],
+							[
+								"country:AX",
+								"Aland Islands",
+								"オーランド島"
+							],
+							[
+								"country:AZ",
+								"Azerbaijan",
+								"アゼルバイジャン"
+							],
+							[
+								"country:BA",
+								"Bosnia and Herzegovina",
+								"ボスニア_ヘルツェゴビナ"
+							],
+							[
+								"country:BB",
+								"Barbados",
+								"バルバドス"
+							],
+							[
+								"country:BD",
+								"Bangladesh",
+								"バングラデシュ"
+							],
+							[
+								"country:BE",
+								"Belgium",
+								"ベルギー"
+							],
+							[
+								"country:BF",
+								"Burkina Faso",
+								"ブルキナファソ"
+							],
+							[
+								"country:BG",
+								"Bulgaria",
+								"ブルガリア"
+							],
+							[
+								"country:BH",
+								"Bahrain",
+								"バーレーン"
+							],
+							[
+								"country:BI",
+								"Burundi",
+								"ブルンジ"
+							],
+							[
+								"country:BJ",
+								"Benin",
+								"ベナン"
+							],
+							[
+								"country:BM",
+								"Bermuda",
+								"バミューダ"
+							],
+							[
+								"country:BN",
+								"Brunei Darussalam",
+								"ブルネイ_ダルサラーム国"
+							],
+							[
+								"country:BO",
+								"Bolivia",
+								"ボリビア"
+							],
+							[
+								"country:BR",
+								"Brazil",
+								"ブラジル"
+							],
+							[
+								"country:BS",
+								"Bahamas",
+								"バハマ"
+							],
+							[
+								"country:BT",
+								"Bhutan",
+								"ブータン"
+							],
+							[
+								"country:BV",
+								"Bouvet Island",
+								"ブーベ島"
+							],
+							[
+								"country:BW",
+								"Botswana",
+								"ボツワナ"
+							],
+							[
+								"country:BY",
+								"Belarus",
+								"ベラルーシ"
+							],
+							[
+								"country:BZ",
+								"Belize",
+								"ベリーズ"
+							],
+							[
+								"country:CA",
+								"Canada",
+								"カナダ"
+							],
+							[
+								"country:CC",
+								"Cocos (Keeling) Islands",
+								"ココス（キーリング）島"
+							],
+							[
+								"country:CD",
+								"The Democratic Republic of the Congo",
+								"The Democratic Republic of the Congo"
+							],
+							[
+								"country:CF",
+								"Central African Republic",
+								"中央アフリカ共和国"
+							],
+							[
+								"country:CG",
+								"Congo",
+								"コンゴ"
+							],
+							[
+								"country:CH",
+								"Switzerland",
+								"スイス"
+							],
+							[
+								"country:CI",
+								"Cote Divoire",
+								"Cote Divoire"
+							],
+							[
+								"country:CK",
+								"Cook Islands",
+								"クック島"
+							],
+							[
+								"country:CL",
+								"Chile",
+								"チリ"
+							],
+							[
+								"country:CM",
+								"Cameroon",
+								"カメルーン"
+							],
+							[
+								"country:CN",
+								"China",
+								"中国"
+							],
+							[
+								"country:CO",
+								"Colombia",
+								"コロンビア"
+							],
+							[
+								"country:CR",
+								"Costa Rica",
+								"コスタリカ"
+							],
+							[
+								"country:CV",
+								"Cape Verde",
+								"カーボベルデ"
+							],
+							[
+								"country:CX",
+								"Christmas Island",
+								"クリスマス島"
+							],
+							[
+								"country:CY",
+								"Cyprus",
+								"キプロス"
+							],
+							[
+								"country:CZ",
+								"Czech Republic",
+								"Czech Republic"
+							],
+							[
+								"country:DE",
+								"Germany",
+								"ドイツ"
+							],
+							[
+								"country:DJ",
+								"Djibouti",
+								"ジブチ"
+							],
+							[
+								"country:DK",
+								"Denmark",
+								"デンマーク"
+							],
+							[
+								"country:DM",
+								"Dominica",
+								"ドミニカ"
+							],
+							[
+								"country:DO",
+								"Dominican Republic",
+								"ドミニカ共和国"
+							],
+							[
+								"country:DZ",
+								"Algeria",
+								"アルジェリア"
+							],
+							[
+								"country:EC",
+								"Ecuador",
+								"エクアドル"
+							],
+							[
+								"country:EE",
+								"Estonia",
+								"エストニア"
+							],
+							[
+								"country:EG",
+								"Egypt",
+								"エジプト"
+							],
+							[
+								"country:EH",
+								"Western Sahara",
+								"西サハラ"
+							],
+							[
+								"country:ER",
+								"Eritrea",
+								"エリトリア"
+							],
+							[
+								"country:ES",
+								"Spain",
+								"スペイン"
+							],
+							[
+								"country:ET",
+								"Ethiopia",
+								"エチオピア"
+							],
+							[
+								"country:FI",
+								"Finland",
+								"フィンランド"
+							],
+							[
+								"country:FJ",
+								"Fiji",
+								"フィジー"
+							],
+							[
+								"country:FK",
+								"Falkland Islands (Malvinas)",
+								"フォークランド島（マルビナス）"
+							],
+							[
+								"country:FM",
+								"Micronesia",
+								"ミクロネシア"
+							],
+							[
+								"country:FO",
+								"Faroe Islands",
+								"フェロー島"
+							],
+							[
+								"country:FR",
+								"France",
+								"フランス"
+							],
+							[
+								"country:GA",
+								"Gabon",
+								"ガボン"
+							],
+							[
+								"country:GB",
+								"United Kingdom",
+								"イギリス"
+							],
+							[
+								"country:GD",
+								"Grenada",
+								"グレナダ"
+							],
+							[
+								"country:GE",
+								"Georgia",
+								"グルジア"
+							],
+							[
+								"country:GF",
+								"French Guiana",
+								"フレンチギアナ"
+							],
+							[
+								"country:GH",
+								"Ghana",
+								"ガーナ"
+							],
+							[
+								"country:GI",
+								"Gibraltar",
+								"ジブラルタル"
+							],
+							[
+								"country:GL",
+								"Greenland",
+								"グリーンランド"
+							],
+							[
+								"country:GM",
+								"Gambia",
+								"ガンビア"
+							],
+							[
+								"country:GN",
+								"Guinea",
+								"ギニア"
+							],
+							[
+								"country:GP",
+								"Guadeloupe",
+								"グアドループ島"
+							],
+							[
+								"country:GQ",
+								"Equatorial Guinea",
+								"Equatorial Guinea"
+							],
+							[
+								"country:GR",
+								"Greece",
+								"ギリシャ"
+							],
+							[
+								"country:GT",
+								"Guatemala",
+								"グアテマラ"
+							],
+							[
+								"country:GU",
+								"Guam",
+								"グアム島"
+							],
+							[
+								"country:GW",
+								"Guinea-Bissau",
+								"Guinea-Bissau"
+							],
+							[
+								"country:GY",
+								"Guyana",
+								"ガイアナ"
+							],
+							[
+								"country:HK",
+								"Hong Kong",
+								"香港"
+							],
+							[
+								"country:HM",
+								"Heard Island and McDonald Islands",
+								"Heard Island and McDonald Islands"
+							],
+							[
+								"country:HN",
+								"Honduras",
+								"ホンジュラス"
+							],
+							[
+								"country:HR",
+								"Croatia",
+								"クロアチア"
+							],
+							[
+								"country:HT",
+								"Haiti",
+								"ハイチ"
+							],
+							[
+								"country:HU",
+								"Hungary",
+								"ハンガリー"
+							],
+							[
+								"country:ID",
+								"Indonesia",
+								"インドネシア"
+							],
+							[
+								"country:IE",
+								"Ireland",
+								"アイルランド"
+							],
+							[
+								"country:IL",
+								"Israel",
+								"イスラエル"
+							],
+							[
+								"country:IN",
+								"India",
+								"インド"
+							],
+							[
+								"country:IO",
+								"British Indian Ocean Territory",
+								"イギリス領インド洋地域"
+							],
+							[
+								"country:IQ",
+								"Iraq",
+								"イラク"
+							],
+							[
+								"country:IS",
+								"Iceland",
+								"アイスランド"
+							],
+							[
+								"country:IT",
+								"Italy",
+								"イタリア"
+							],
+							[
+								"country:JM",
+								"Jamaica",
+								"ジャマイカ"
+							],
+							[
+								"country:JO",
+								"Jordan",
+								"ヨルダン"
+							],
+							[
+								"country:JP",
+								"Japan",
+								"日本"
+							],
+							[
+								"country:KE",
+								"Kenya",
+								"ケニア"
+							],
+							[
+								"country:KG",
+								"Kyrgyzstan",
+								"キルギスタン"
+							],
+							[
+								"country:KH",
+								"Cambodia",
+								"カンボジア"
+							],
+							[
+								"country:KI",
+								"Kiribati",
+								"キリバス"
+							],
+							[
+								"country:KM",
+								"Comoros",
+								"コモロ"
+							],
+							[
+								"country:KN",
+								"Saint Kitts-Nevis",
+								"セントクリストファー_ネイビス -"
+							],
+							[
+								"country:KR",
+								"Korea (South)",
+								"韓国"
+							],
+							[
+								"country:KW",
+								"Kuwait",
+								"クウェート"
+							],
+							[
+								"country:KY",
+								"Cayman Islands",
+								"ケイマン島"
+							],
+							[
+								"country:KZ",
+								"Kazakstan",
+								"カザフスタン"
+							],
+							[
+								"country:LA",
+								"Laos",
+								"ラオス"
+							],
+							[
+								"country:LB",
+								"Lebanon",
+								"レバノン"
+							],
+							[
+								"country:LC",
+								"Saint Lucia",
+								"セントルシア"
+							],
+							[
+								"country:LI",
+								"Liechtenstein",
+								"リヒテンシュタイン"
+							],
+							[
+								"country:LK",
+								"Sri Lanka",
+								"スリ_ランカ"
+							],
+							[
+								"country:LR",
+								"Liberia",
+								"リベリア"
+							],
+							[
+								"country:LS",
+								"Lesotho",
+								"レソト"
+							],
+							[
+								"country:LT",
+								"Lithuania",
+								"リトアニア"
+							],
+							[
+								"country:LU",
+								"Luxembourg",
+								"ルクセンブルク"
+							],
+							[
+								"country:LV",
+								"Latvia",
+								"ラトビア"
+							],
+							[
+								"country:LY",
+								"Libya",
+								"リビア"
+							],
+							[
+								"country:MA",
+								"Morocco",
+								"モロッコ"
+							],
+							[
+								"country:MC",
+								"Monaco",
+								"モナコ"
+							],
+							[
+								"country:MD",
+								"Moldova",
+								"モルドバ"
+							],
+							[
+								"country:MG",
+								"Madagascar",
+								"マダガスカル"
+							],
+							[
+								"country:MH",
+								"Marshall Islands",
+								"マーシャル島"
+							],
+							[
+								"country:MK",
+								"Macedonia",
+								"マケドニア"
+							],
+							[
+								"country:ML",
+								"Mali",
+								"マリ"
+							],
+							[
+								"country:MM",
+								"Myanmar",
+								"ミャンマー"
+							],
+							[
+								"country:MN",
+								"Mongolia",
+								"モンゴル国"
+							],
+							[
+								"country:MO",
+								"Macau",
+								"マカオ"
+							],
+							[
+								"country:MQ",
+								"Martinique",
+								"マルティニーク島"
+							],
+							[
+								"country:MR",
+								"Mauritania",
+								"モーリタニア"
+							],
+							[
+								"country:MS",
+								"Montserrat",
+								"モントセラト"
+							],
+							[
+								"country:MT",
+								"Malta",
+								"マルタ"
+							],
+							[
+								"country:MU",
+								"Mauritius",
+								"モーリシャス"
+							],
+							[
+								"country:MV",
+								"Maldives",
+								"モルディブ"
+							],
+							[
+								"country:MW",
+								"Malawi",
+								"マラウイ"
+							],
+							[
+								"country:MX",
+								"Mexico",
+								"メキシコ"
+							],
+							[
+								"country:MY",
+								"Malaysia",
+								"マレーシア"
+							],
+							[
+								"country:MZ",
+								"Mozambique",
+								"モザンビーク"
+							],
+							[
+								"country:NA",
+								"Namibia",
+								"ナミビア"
+							],
+							[
+								"country:NC",
+								"New Caledonia",
+								"ニューカレドニア"
+							],
+							[
+								"country:NE",
+								"Niger",
+								"ニジェール"
+							],
+							[
+								"country:NF",
+								"Norfolk Island",
+								"ノーフォーク島"
+							],
+							[
+								"country:NG",
+								"Nigeria",
+								"ナイジェリア"
+							],
+							[
+								"country:NI",
+								"Nicaragua",
+								"ニカラグア"
+							],
+							[
+								"country:NL",
+								"Netherlands",
+								"オランダ"
+							],
+							[
+								"country:NO",
+								"Norway",
+								"ノルウェー"
+							],
+							[
+								"country:NP",
+								"Nepal",
+								"ネパールl"
+							],
+							[
+								"country:NR",
+								"Nauru",
+								"ナウル"
+							],
+							[
+								"country:NU",
+								"Niue",
+								"ニウエ"
+							],
+							[
+								"country:NZ",
+								"New Zealand",
+								"ニュージーランド"
+							],
+							[
+								"country:OM",
+								"Oman",
+								"オマーン"
+							],
+							[
+								"country:PA",
+								"Panama",
+								"パナマ"
+							],
+							[
+								"country:PE",
+								"Peru",
+								"ペルー"
+							],
+							[
+								"country:PF",
+								"French Polynesia",
+								"フランス領ポリネシア"
+							],
+							[
+								"country:PG",
+								"Papua New Guinea",
+								"パプアニューギニア"
+							],
+							[
+								"country:PH",
+								"Philippines",
+								"フィリピン"
+							],
+							[
+								"country:PK",
+								"Pakistan",
+								"パキスタン"
+							],
+							[
+								"country:PL",
+								"Poland",
+								"ポーランド"
+							],
+							[
+								"country:PM",
+								"Saint Pierre and Miquelon",
+								"サンピエール島_ミクロン島"
+							],
+							[
+								"country:PN",
+								"Pitcairn",
+								"ピトケアン"
+							],
+							[
+								"country:PR",
+								"Puerto Rico",
+								"プエルトリコ"
+							],
+							[
+								"country:PS",
+								"Palestinian Territory, Occupied",
+								"パレスチナ"
+							],
+							[
+								"country:PT",
+								"Portugal",
+								"ポルトガル"
+							],
+							[
+								"country:PW",
+								"Palau",
+								"パラオ"
+							],
+							[
+								"country:PY",
+								"Paraguay",
+								"パラグアイ"
+							],
+							[
+								"country:QA",
+								"Qatar",
+								"カタール"
+							],
+							[
+								"country:RE",
+								"Reunion",
+								"再会"
+							],
+							[
+								"country:RO",
+								"Romania",
+								"ルーマニア"
+							],
+							[
+								"country:RU",
+								"Russian Federation",
+								"ロシア連邦"
+							],
+							[
+								"country:RW",
+								"Rwanda",
+								"ルワンダ"
+							],
+							[
+								"country:SA",
+								"Saudi Arabia",
+								"サウジアラビア"
+							],
+							[
+								"country:SB",
+								"Solomon Islands",
+								"ソロモン島"
+							],
+							[
+								"country:SC",
+								"Seychelles",
+								"セイシェル"
+							],
+							[
+								"country:SE",
+								"Sweden",
+								"スウェーデン"
+							],
+							[
+								"country:SG",
+								"Singapore",
+								"シンガポール"
+							],
+							[
+								"country:SH",
+								"Saint Helena",
+								"セント_ヘレナ島"
+							],
+							[
+								"country:SI",
+								"Slovenia",
+								"スロベニア"
+							],
+							[
+								"country:SJ",
+								"Svalbard and Jan Mayen",
+								"スバールバル島ヤンマイエン島"
+							],
+							[
+								"country:SK",
+								"Slovakia",
+								"スロバキア"
+							],
+							[
+								"country:SL",
+								"Sierra Leone",
+								"シエラレオネ"
+							],
+							[
+								"country:SM",
+								"San Marino",
+								"サン_マリノ"
+							],
+							[
+								"country:SN",
+								"Senegal",
+								"セネガル"
+							],
+							[
+								"country:SO",
+								"Somalia",
+								"ソマリア"
+							],
+							[
+								"country:SR",
+								"Suriname",
+								"スリナム"
+							],
+							[
+								"country:ST",
+								"Sao Tome and Principe",
+								"サントメプリンシペ"
+							],
+							[
+								"country:SV",
+								"El Salvador",
+								"エルサルバドル"
+							],
+							[
+								"country:SZ",
+								"Swaziland",
+								"スワジランド"
+							],
+							[
+								"country:TC",
+								"Turks and Caicos Islands",
+								"タークス_カイコス諸島"
+							],
+							[
+								"country:TD",
+								"Chad",
+								"チャド"
+							],
+							[
+								"country:TF",
+								"French Southern Territories",
+								"フランス領極南島"
+							],
+							[
+								"country:TG",
+								"Togo",
+								"トーゴ"
+							],
+							[
+								"country:TH",
+								"Thailand",
+								"タイ"
+							],
+							[
+								"country:TJ",
+								"Tajikistan",
+								"タジキスタン"
+							],
+							[
+								"country:TK",
+								"Tokelau",
+								"トケラウ島"
+							],
+							[
+								"country:TM",
+								"Turkmenistan",
+								"トルクメニスタン"
+							],
+							[
+								"country:TN",
+								"Tunisia",
+								"チュニジア"
+							],
+							[
+								"country:TO",
+								"Tonga",
+								"トンガ"
+							],
+							[
+								"country:TR",
+								"Turkey",
+								"トルコ"
+							],
+							[
+								"country:TT",
+								"Trinidad and Tobago",
+								"トリニダード_トバゴ"
+							],
+							[
+								"country:TV",
+								"Tuvalu",
+								"ツバル"
+							],
+							[
+								"country:TW",
+								"Taiwan",
+								"台湾"
+							],
+							[
+								"country:TZ",
+								"Tanzania",
+								"タンザニア"
+							],
+							[
+								"country:UA",
+								"Ukraine",
+								"ウクライナ"
+							],
+							[
+								"country:UG",
+								"Uganda",
+								"ウガンダ"
+							],
+							[
+								"country:UM",
+								"United States Minor Outlying Islands",
+								"アメリカ合衆国外島"
+							],
+							[
+								"country:US",
+								"United States",
+								"米国"
+							],
+							[
+								"country:UY",
+								"Uruguay",
+								"ウルグアイ"
+							],
+							[
+								"country:UZ",
+								"Uzbekistan",
+								"ウズベキスタン"
+							],
+							[
+								"country:VC",
+								"Saint Vincent and the Grenadines",
+								"Saint Vincent and the Grenadines"
+							],
+							[
+								"country:VE",
+								"Venezuela",
+								"ベネズエラ"
+							],
+							[
+								"country:VG",
+								"Virgin Islands, British",
+								"英領バージン島"
+							],
+							[
+								"country:VI",
+								"Virgin Islands, US",
+								"米領バージン島"
+							],
+							[
+								"country:VN",
+								"Viet Nam",
+								"ベトナム"
+							],
+							[
+								"country:VU",
+								"Vanuatu",
+								"バヌアツ"
+							],
+							[
+								"country:WF",
+								"Wallis and Futuna",
+								"ワリー_エ_フトゥーナ"
+							],
+							[
+								"country:WS",
+								"Samoa",
+								"サモア"
+							],
+							[
+								"country:YE",
+								"Yemen",
+								"イエメン"
+							],
+							[
+								"country:YT",
+								"Mayotte",
+								"マヨット島"
+							],
+							[
+								"country:ZA",
+								"South Africa",
+								"南アフリカ"
+							],
+							[
+								"country:ZM",
+								"Zambia",
+								"ザンビア"
+							],
+							[
+								"country:ZW",
+								"Zimbabwe",
+								"ジンバブエ"
+							],
+							[
+								"icon:ATM",
+								"ATM",
+								"ATM"
+							],
+							[
+								"icon:ATM:Dollar",
+								"ATM",
+								"ATM"
+							],
+							[
+								"icon:ATM:General",
+								"ATM",
+								"ATM:General"
+							],
+							[
+								"icon:ATM:Yen",
+								"ATM",
+								"ATM:Yen"
+							],
+							[
+								"icon:Baggage Claim",
+								"Baggage Claim",
+								"手荷物引渡場"
+							],
+							[
+								"icon:Bathroom",
+								"Bathroom",
+								"トイレ"
+							],
+							[
+								"icon:Bathroom M",
+								"Men's Bathroom",
+								"男子トイレ"
+							],
+							[
+								"icon:Bathroom W",
+								"Women's Bathroom",
+								"女子トイレ"
+							],
+							[
+								"icon:Bathroom Fam",
+								"Family Bathroom",
+								"ファミリールーム"
+							],
+							[
+								"icon:Bathroom W DA",
+								"Bathroom W DA",
+								"Bathroom W DA"
+							],
+							[
+								"icon:Bathroom M DA",
+								"Bathroom M DA",
+								"Bathroom M DA"
+							],
+							[
+								"icon:Bathroom Fam DA",
+								"",
+								"多目的トイレ"
+							],
+							[
+								"icon:Bathroom DA",
+								"Bathroom DA",
+								"Bathroom DA"
+							],
+							[
+								"icon:Bus",
+								"Bus",
+								"バス"
+							],
+							[
+								"icon:Bike Rack",
+								"Bike Rack",
+								"バイクラック"
+							],
+							[
+								"icon:Car Rental",
+								"Car Rental",
+								"レンタカー"
+							],
+							[
+								"icon:Changing Station",
+								"Changing Station",
+								"オムツ替え"
+							],
+							[
+								"icon:Cash Register",
+								"Cash Register",
+								"Cash Register"
+							],
+							[
+								"icon:Cocktails",
+								"Cocktails",
+								"カクテル"
+							],
+							[
+								"icon:Coffee",
+								"Coffee",
+								"コーヒー"
+							],
+							[
+								"icon:Copy/Print",
+								"Copy/Print",
+								"Copy/Print"
+							],
+							[
+								"icon:Crosswalk",
+								"Crosswalk",
+								"歩道橋"
+							],
+							[
+								"icon:Customs",
+								"Customs",
+								"税関検査"
+							],
+							[
+								"icon:Customer Service",
+								"Customer Service",
+								"顧客サービス"
+							],
+							[
+								"icon:Defibrillator",
+								"Defibrillator",
+								"AED"
+							],
+							[
+								"icon:Disabled Access",
+								"Disabled Access",
+								"車いす対応"
+							],
+							[
+								"icon:Elevator",
+								"Elevator",
+								"エレベータ"
+							],
+							[
+								"icon:Emergency Exit",
+								"Emergency Exit",
+								"非常口"
+							],
+							[
+								"icon:Escalator",
+								"Escalator",
+								"エスカレーター"
+							],
+							[
+								"icon:Eyewash",
+								"Eyewash",
+								"目薬"
+							],
+							[
+								"icon:Fire Extinguisher",
+								"Fire Extinguisher",
+								"消火器"
+							],
+							[
+								"icon:Fire Hose",
+								"Fire Hose",
+								"消防ホース"
+							],
+							[
+								"icon:Fire Pull",
+								"Fire Pull",
+								"火災プル"
+							],
+							[
+								"icon:First Aid",
+								"First Aid",
+								"救護室"
+							],
+							[
+								"icon:Fitness Center",
+								"Fitness Center",
+								"フィットネスセンター"
+							],
+							[
+								"icon:Flight Monitor",
+								"Flight Monitor",
+								"飛行モニター"
+							],
+							[
+								"icon:Food and Drink",
+								"Food and Drink",
+								"飲食物"
+							],
+							[
+								"icon:Ground Transportation",
+								"Ground Transportation",
+								"Ground Transportation"
+							],
+							[
+								"icon:Gym",
+								"Gym",
+								"ジム"
+							],
+							[
+								"icon:Immigration and Customs",
+								"Immigration and Customs",
+								"入国審査、税関審査"
+							],
+							[
+								"icon:Information",
+								"Information",
+								"インフォメーション"
+							],
+							[
+								"icon:Locker",
+								"Locker",
+								"コインロッカー"
+							],
+							[
+								"icon:Lost and Found",
+								"Lost and Found",
+								"お忘れ物承り場所"
+							],
+							[
+								"icon:Luggage Cart",
+								"Luggage Cart",
+								"荷物カート"
+							],
+							[
+								"icon:Mail",
+								"Mail",
+								"郵便"
+							],
+							[
+								"icon:Massage Chair",
+								"Massage Chair",
+								"マッサージチェア"
+							],
+							[
+								"icon:Medical",
+								"Medical",
+								"医療"
+							],
+							[
+								"icon:Meditation Room",
+								"Meditation Room",
+								"瞑想ルーム"
+							],
+							[
+								"icon:Meeting Point",
+								"Meeting Point",
+								"打ち合わせポイント"
+							],
+							[
+								"icon:Money Changer",
+								"Money Changer",
+								"マネーチェンジャー"
+							],
+							[
+								"icon:Movie Theater",
+								"Movie Theater",
+								"映画館"
+							],
+							[
+								"icon:Moving Walkway",
+								"Moving Walkway",
+								"動く歩道"
+							],
+							[
+								"icon:Passport Control",
+								"Passport Control",
+								"Passport Control"
+							],
+							[
+								"icon:Paid Parking",
+								"Paid Parking",
+								"有料駐車場"
+							],
+							[
+								"icon:Parking",
+								"Parking",
+								"駐車場"
+							],
+							[
+								"icon:Pet Relief Area",
+								"Pet Relief Area",
+								"ペット救済エリア"
+							],
+							[
+								"icon:Playground",
+								"Playground",
+								"遊び場"
+							],
+							[
+								"icon:Police/Security",
+								"Police/Security",
+								"警察／セキュリティ"
+							],
+							[
+								"icon:Power",
+								"Power",
+								"電源"
+							],
+							[
+								"icon:Rest Area",
+								"Rest Area",
+								"休憩所"
+							],
+							[
+								"icon:Restaurant",
+								"Restaurant",
+								"レストラン"
+							],
+							[
+								"icon:Santa",
+								"Santa",
+								"Santa"
+							],
+							[
+								"icon:Security Section",
+								"Security Section",
+								"セキュリティ"
+							],
+							[
+								"icon:Shoe Shine",
+								"Shoe Shine",
+								"靴磨き"
+							],
+							[
+								"icon:Shower",
+								"Shower",
+								"シャワー"
+							],
+							[
+								"icon:Smoke",
+								"Smoking Area",
+								"喫煙所"
+							],
+							[
+								"icon:Stairs",
+								"Stairs",
+								"階段"
+							],
+							[
+								"icon:Stop Sign",
+								"Stop Sign",
+								"停止"
+							],
+							[
+								"icon:Stroller",
+								"Stroller",
+								"ベビーカー"
+							],
+							[
+								"icon:Taxi",
+								"Taxi",
+								"タクシ"
+							],
+							[
+								"icon:Telephone",
+								"Telephone",
+								"電話"
+							],
+							[
+								"icon:Ticketing, Check-in",
+								"Ticketing, Check-in",
+								"鉄道乗車券販売"
+							],
+							[
+								"icon:Traffic Light",
+								"Traffic Light",
+								"信号"
+							],
+							[
+								"icon:Train",
+								"Train",
+								"電車"
+							],
+							[
+								"icon:Transit Hotel",
+								"Transit Hotel",
+								"トランジットホテル"
+							],
+							[
+								"icon:TV",
+								"TV",
+								"テレビ"
+							],
+							[
+								"icon:Valet Parking",
+								"Valet Parking",
+								"駐車サービス"
+							],
+							[
+								"icon:Vending Machine",
+								"Vending Machine",
+								"自販機"
+							],
+							[
+								"icon:Wheelchair Ramp",
+								"Wheelchair Ramp",
+								"車椅子用のスロープ"
+							],
+							[
+								"icon:Wifi",
+								"Wifi",
+								"Wifi"
+							],
+							[
+								"icon:Yield Sign",
+								"Yield Sign",
+								"収量サイン"
+							],
+							[
+								"lang:ar",
+								"Arabic",
+								"アラビア語"
+							],
+							[
+								"lang:da",
+								"Danish",
+								"デンマーク語"
+							],
+							[
+								"lang:de",
+								"German",
+								"ドイツ語"
+							],
+							[
+								"lang:en",
+								"English",
+								"英語"
+							],
+							[
+								"lang:es",
+								"Spanish",
+								"スペイン語"
+							],
+							[
+								"lang:fr",
+								"French",
+								"フランス語"
+							],
+							[
+								"lang:gu",
+								"Gujarati",
+								"グジャラート語"
+							],
+							[
+								"lang:he",
+								"Hebrew",
+								"ヘブライ語"
+							],
+							[
+								"lang:hi",
+								"Hindi",
+								"ヒンディー語"
+							],
+							[
+								"lang:id",
+								"Indonesian",
+								"インドネシア語"
+							],
+							[
+								"lang:it",
+								"Italian",
+								"イタリア語"
+							],
+							[
+								"lang:ja",
+								"Japanese",
+								"日本語"
+							],
+							[
+								"lang:ko",
+								"Korean",
+								"韓国語"
+							],
+							[
+								"lang:nl",
+								"Dutch",
+								"オランダ語"
+							],
+							[
+								"lang:pt",
+								"Portuguese",
+								"ポルトガル語"
+							],
+							[
+								"lang:ro",
+								"Romanian",
+								"ルーマニア語"
+							],
+							[
+								"lang:ru",
+								"Russian",
+								"ロシア語"
+							],
+							[
+								"lang:sv",
+								"Swedish",
+								"スウェーデン語"
+							],
+							[
+								"lang:tr",
+								"Turkish",
+								"トルコ語"
+							],
+							[
+								"lang:zh",
+								"Chinese",
+								"中国語"
+							],
+							[
+								"map_type:Airport",
+								"Airport",
+								"空港"
+							],
+							[
+								"map_type:Airport Terminal",
+								"Airport Terminal",
+								"空港ターミナル"
+							],
+							[
+								"map_type:Casino",
+								"Casino",
+								"カジノ"
+							],
+							[
+								"map_type:College Building",
+								"College Building",
+								"カレッジビル"
+							],
+							[
+								"map_type:College Campus",
+								"College Campus",
+								"大学のキャンパス"
+							],
+							[
+								"map_type:Convention",
+								"Convention",
+								"コンベンション"
+							],
+							[
+								"map_type:Hospital",
+								"Hospital",
+								"病院"
+							],
+							[
+								"map_type:Retail",
+								"Retail",
+								"リテール"
+							],
+							[
+								"map_type:School Building",
+								"School Building",
+								"校舎"
+							],
+							[
+								"map_type:School Campus",
+								"School Campus",
+								"学校のキャンパス"
+							],
+							[
+								"map_type:Shopping Mall",
+								"Shopping Mall",
+								"ショッピングモール"
+							],
+							[
+								"map_type:Station",
+								"Station",
+								"駅"
+							],
+							[
+								"state:AB",
+								"Alberta",
+								"アルバータ州"
+							],
+							[
+								"state:AK",
+								"Alaska",
+								"アラスカ州"
+							],
+							[
+								"state:AL",
+								"Alabama",
+								"アラバマ州"
+							],
+							[
+								"state:AR",
+								"Arkansas",
+								"アーカンソー州"
+							],
+							[
+								"state:AZ",
+								"Arizona",
+								"アリゾナ州"
+							],
+							[
+								"state:BC",
+								"British Columbia",
+								"ブリティッシュコロンビア州"
+							],
+							[
+								"state:CA",
+								"California",
+								"カリフォルニア州"
+							],
+							[
+								"state:CO",
+								"Colorado",
+								"コロラド州"
+							],
+							[
+								"state:CT",
+								"Connecticut",
+								"コネチカット州"
+							],
+							[
+								"state:DC",
+								"District Of Columbia",
+								"コロンビア州"
+							],
+							[
+								"state:DE",
+								"Delaware",
+								"デラウェア州"
+							],
+							[
+								"state:FL",
+								"Florida",
+								"フロリダ州"
+							],
+							[
+								"state:GA",
+								"Georgia",
+								"グルジア州"
+							],
+							[
+								"state:HI",
+								"Hawaii",
+								"ハワイ"
+							],
+							[
+								"state:IA",
+								"Iowa",
+								"アイオワ州"
+							],
+							[
+								"state:ID",
+								"Idaho",
+								"アイダホ州"
+							],
+							[
+								"state:IL",
+								"Illinois",
+								"イリノイ州"
+							],
+							[
+								"state:IN",
+								"Indiana",
+								"インディアナ州"
+							],
+							[
+								"state:KS",
+								"Kansas",
+								"カンザス州"
+							],
+							[
+								"state:KY",
+								"Kentucky",
+								"ケンタッキー州"
+							],
+							[
+								"state:LA",
+								"Louisiana",
+								"ルイジアナ州"
+							],
+							[
+								"state:MA",
+								"Massachusetts",
+								"マサチューセッツ州"
+							],
+							[
+								"state:MB",
+								"Manitoba",
+								"マニトバ州"
+							],
+							[
+								"state:MD",
+								"Maryland",
+								"メリーランド州"
+							],
+							[
+								"state:ME",
+								"Maine",
+								"メイン州"
+							],
+							[
+								"state:MI",
+								"Michigan",
+								"ミシガン州"
+							],
+							[
+								"state:MN",
+								"Minnesota",
+								"ミネソタ州"
+							],
+							[
+								"state:MO",
+								"Missouri",
+								"ミズーリ州"
+							],
+							[
+								"state:MS",
+								"Mississippi",
+								"ミシシッピー州"
+							],
+							[
+								"state:MT",
+								"Montana",
+								"モンタナ州"
+							],
+							[
+								"state:NB",
+								"New Brunswick",
+								"ニューブランズウィック州"
+							],
+							[
+								"state:NC",
+								"North Carolina",
+								"ノースカロライナ州"
+							],
+							[
+								"state:ND",
+								"North Dakota",
+								"ノースダコタ州"
+							],
+							[
+								"state:NE",
+								"Nebraska",
+								"ネブラスカ州"
+							],
+							[
+								"state:NH",
+								"New Hampshire",
+								"ニューハンプシャー州"
+							],
+							[
+								"state:NJ",
+								"New Jersey",
+								"ニュージャージー州"
+							],
+							[
+								"state:NL",
+								"Newfoundland and Labrador",
+								"ニューファンドランド_ラブラドール州"
+							],
+							[
+								"state:NM",
+								"New Mexico",
+								"ニューメキシコ州"
+							],
+							[
+								"state:NS",
+								"Nova Scotia",
+								"ノバスコシア州"
+							],
+							[
+								"state:NSW",
+								"New South Wales",
+								"ニューサウスウェールズ州"
+							],
+							[
+								"state:NV",
+								"Nevada",
+								"ネバダ州"
+							],
+							[
+								"state:NY",
+								"New York",
+								"ニューヨーク"
+							],
+							[
+								"state:OH",
+								"Ohio",
+								"オハイオ州"
+							],
+							[
+								"state:OK",
+								"Oklahoma",
+								"オクラホマ州"
+							],
+							[
+								"state:ON",
+								"Ontario",
+								"オンタリオ州"
+							],
+							[
+								"state:OR",
+								"Oregon",
+								"オレゴン州"
+							],
+							[
+								"state:PA",
+								"Pennsylvania",
+								"ペンシルベニア州"
+							],
+							[
+								"state:PE",
+								"Prince Edward Island",
+								"プリンスエドワードアイランド"
+							],
+							[
+								"state:QC",
+								"Quebec",
+								"ケベック州"
+							],
+							[
+								"state:QLD",
+								"Queensland",
+								"クイーンズランド州"
+							],
+							[
+								"state:RI",
+								"Rhode Island",
+								"ロードアイランド州"
+							],
+							[
+								"state:SA",
+								"South Australia",
+								"南オーストラリア州"
+							],
+							[
+								"state:SC",
+								"South Carolina",
+								"サウスカロライナ州"
+							],
+							[
+								"state:SD",
+								"South Dakota",
+								"サウスダコタ州"
+							],
+							[
+								"state:SK",
+								"Saskatchewan",
+								"サスカチュワン州"
+							],
+							[
+								"state:TAS",
+								"Tasmania",
+								"タスマニア州"
+							],
+							[
+								"state:TN",
+								"Tennessee",
+								"テネシー州"
+							],
+							[
+								"state:Tokyo",
+								"Tokyo",
+								"東京"
+							],
+							[
+								"state:TX",
+								"Texas",
+								"テキサス州"
+							],
+							[
+								"state:UT",
+								"Utah",
+								"ユタ州"
+							],
+							[
+								"state:VA",
+								"Virginia",
+								"バージニア州"
+							],
+							[
+								"state:VIC",
+								"Victoria",
+								"ビクトリア"
+							],
+							[
+								"state:VT",
+								"Vermont",
+								"バーモント州"
+							],
+							[
+								"state:WA",
+								"Western Australia",
+								"西オーストラリア州"
+							],
+							[
+								"state:WI",
+								"Wisconsin",
+								"ウィスコンシン州"
+							],
+							[
+								"state:WV",
+								"West Virginia",
+								"ウェストバージニア州"
+							],
+							[
+								"state:WY",
+								"Wyoming",
+								"ワイオミング州"
+							]
+						]
 					}
 				},
-				"gridMatrix": {
-					"name": "gridMatrix",
+				"stringsJson": {
+					"name": "stringsJson",
 					"type": "apogee.JsonTable",
 					"updateData": {
 						"argList": [],
-						"functionBody": "var value;\nvalue = [];\n\n//create the header, with \"Key\" as the leading entry\nvar header = [\"Key\"];\nvalue.push(header);\n//create a map from key to column\nvar langToIndex = {};\n\n//process each entry in the strings file\nfor(var key in stringsFile.translations) {\n    //read an entry\n    var entry = stringsFile.translations[key];\n    //create row, same length as header\n    var row = new Array(header.length);\n    ///add key as first entry\n    row[0] = key;\n    for(var lang in entry) {\n        //lookup tgyhe index for this string\n        var index = langToIndex[lang];\n        //if index doesn't exist, add it to the header\n        if(index === undefined) {\n            index = header.length;\n            header.push(lang);\n            langToIndex[lang] = index;\n        }\n        //add to row\n        row[index] = entry[lang];\n    }\n    \n    //add to the matrix\n    value.push(row);\n}\nreturn value;\n\n",
-						"supplementalCode": "",
-						"description": ""
+						"functionBody": "var value;\nvalue = {};\nvar translationMap = {};\nvalue.translations = translationMap;\n\nvar header = stringsGrid[0];\nfor(var iRow = 1; iRow < stringsGrid.length; iRow++) {\n    var row = stringsGrid[iRow];\n    translationMap[getKey(row)] = getEntry(row,header);\n}\nreturn value;\n\n",
+						"supplementalCode": "function getEntry(row, header) {\n    entry = {};\n    for(var i = 1; i < header.length; i++) {\n        var lang = header[i];\n        var value = row[i];\n        if((value)&&(value.length > 0)) {\n            entry[lang] = value;\n        }\n    }\n    return entry;\n}\n\nfunction getKey(row) {\n    return row[0];\n}"
 					}
 				}
 			}
@@ -1804,53 +2237,33 @@
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
 		"children": {
-			"stringsFile": {
-				"type": "apogeeapp.app.JsonTableComponent",
-				"windowState": {
-					"sizeInfo": {
-						"width": 300,
-						"height": 300
+			"type": "apogeeapp.app.FolderComponent",
+			"children": {
+				"stringsGrid": {
+					"key": "createStringsJson:stringsGrid",
+					"type": "apogeeapp.app.GridTableComponent",
+					"coordInfo": {
+						"x": 124,
+						"y": 20,
+						"width": 776,
+						"height": 698
 					},
-					"posInfo": {
-						"x": 30,
-						"y": 14
+					"windowState": 0
+				},
+				"stringsJson": {
+					"key": "createStringsJson:stringsJson",
+					"type": "apogeeapp.app.JsonTableComponent",
+					"coordInfo": {
+						"x": 831,
+						"y": 65,
+						"width": 344,
+						"height": 235
 					},
-					"state": 0,
-					"viewType": "Text"
-				}
-			},
-			"stringsGrid": {
-				"type": "apogeeapp.app.GridTableComponent",
-				"windowState": {
-					"sizeInfo": {
-						"width": 300,
-						"height": 300
-					},
-					"posInfo": {
-						"x": 92,
-						"y": 341
-					},
-					"state": 0,
-					"viewType": "Grid"
-				}
-			},
-			"gridMatrix": {
-				"type": "apogeeapp.app.JsonTableComponent",
-				"windowState": {
-					"sizeInfo": {
-						"width": 300,
-						"height": 300
-					},
-					"posInfo": {
-						"x": 428,
-						"y": 42
-					},
-					"state": 0,
-					"viewType": "Text"
+					"windowState": 0
 				}
 			}
 		}
 	},
-	"library": [],
-	"version": 0.31
+	"version": 0.4,
+	"references": []
 }

@@ -1,10 +1,10 @@
 {
-	"fileType": "apogee js web workspace",
+	"fileType": "apogee app js workspace",
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "chartExample",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"data": {
@@ -92,7 +92,8 @@
 					}
 				}
 			}
-		}
+		},
+		"name": "chartExample"
 	},
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
@@ -144,7 +145,8 @@
 			}
 		}
 	},
-	"library": [
+	"version": 0.4,
+	"references": [
 		{
 			"url": "https://www.gstatic.com/charts/loader.js",
 			"entryType": "js link"
@@ -153,6 +155,5 @@
 			"url": "http://localhost:8383/lib/controls/googleChart/GoogleChartComponent.js",
 			"entryType": "js link"
 		}
-	],
-	"version": 0.31
+	]
 }
