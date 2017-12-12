@@ -1,8 +1,8 @@
 
 /** This class manages links for the web page.*/
-apogeeapp.app.LinkEntry = function(libraryUI,linkData,linkType) {
-    this.id = apogeeapp.app.LibraryUI._createId();
-    this.libraryUI = libraryUI;
+apogeeapp.app.LinkEntry = function(referenceManager,linkData,linkType) {
+    this.id = apogeeapp.app.ReferenceManager._createId();
+    this.referenceManager = referenceManager;
     
     this.linkType = linkType;
     this.url = linkData.url;
@@ -26,11 +26,11 @@ apogeeapp.app.LinkEntry.CSS_ICON_RES_PATH = "/componentIcons/cssLink.png";
 
 apogeeapp.app.LinkEntry.JS_LINK_LIST_INFO = {
     "typeName": apogeeapp.app.LinkEntry.LINK_TYPE_JS,
-    "addEntry": (libraryUI) => {
-        var addEntry = apogeeapp.app.updatelink.getAddLinkCallback(libraryUI,apogeeapp.app.LinkEntry.LINK_TYPE_JS);
+    "addEntry": (referenceManager) => {
+        var addEntry = apogeeapp.app.updatelink.getAddLinkCallback(referenceManager,apogeeapp.app.LinkEntry.LINK_TYPE_JS);
         addEntry();
     },
-    "createEntryFunction": (libraryUI, linkData) => new apogeeapp.app.LinkEntry(libraryUI,linkData,apogeeapp.app.LinkEntry.LINK_TYPE_JS),
+    "createEntryFunction": (referenceManager, linkData) => new apogeeapp.app.LinkEntry(referenceManager,linkData,apogeeapp.app.LinkEntry.LINK_TYPE_JS),
     "listName": "JS Links",
     "addEntryText":"Add JS Link",
     "listIconPath":"/componentIcons/folder.png"
@@ -38,18 +38,18 @@ apogeeapp.app.LinkEntry.JS_LINK_LIST_INFO = {
 
 apogeeapp.app.LinkEntry.CSS_LINK_LIST_INFO = {
     "typeName": apogeeapp.app.LinkEntry.LINK_TYPE_CSS,
-    "addEntry": (libraryUI) => {
-        var addEntry = apogeeapp.app.updatelink.getAddLinkCallback(libraryUI,apogeeapp.app.LinkEntry.LINK_TYPE_CSS);
+    "addEntry": (referenceManager) => {
+        var addEntry = apogeeapp.app.updatelink.getAddLinkCallback(referenceManager,apogeeapp.app.LinkEntry.LINK_TYPE_CSS);
         addEntry();
     },
-    "createEntryFunction": (libraryUI, linkData) => new apogeeapp.app.LinkEntry(libraryUI,linkData,apogeeapp.app.LinkEntry.LINK_TYPE_CSS),
+    "createEntryFunction": (referenceManager, linkData) => new apogeeapp.app.LinkEntry(referenceManager,linkData,apogeeapp.app.LinkEntry.LINK_TYPE_CSS),
     "listName": "CSS Links",
     "addEntryText":"Add CSS Link",
     "listIconPath":"/componentIcons/folder.png"
 }
 
 //---------------------------
-// library entry interface
+// references entry interface
 //---------------------------
 
 apogeeapp.app.LinkEntry.prototype.getId = function() {
@@ -87,7 +87,7 @@ apogeeapp.app.LinkEntry.prototype.loadEntry = function() {
             var errorMsg = "The link already exists: " + this.url;
             this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
             reject(errorMsg);
-this.libraryUI.entryStatusChange(this);
+this.referenceManager.entryStatusChange(this);
             return;
         }
         else {
@@ -107,7 +107,7 @@ this.libraryUI.entryStatusChange(this);
                 var errorMsg = "Unknown link type " + this.linkType;
                 this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
                 reject(errorMsg);
-this.libraryUI.entryStatusChange(this);
+this.referenceManager.entryStatusChange(this);
                 return;
             }
             
@@ -115,13 +115,13 @@ this.libraryUI.entryStatusChange(this);
             linkProps.onload = () => {
                 this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE);
                 resolve(this.url);
-this.libraryUI.entryStatusChange(this);
+this.referenceManager.entryStatusChange(this);
             }
             linkProps.onerror = (msg) => {
                 var errorMsg = "Error loading link " + this.url + ": " + msg;
                 this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
                 reject(errorMsg);
-this.libraryUI.entryStatusChange(this);
+this.referenceManager.entryStatusChange(this);
             }
             
             //insert the link entry
@@ -130,8 +130,8 @@ this.libraryUI.entryStatusChange(this);
         }
     }
     
-    //call link added to library
-    this.libraryUI.entryInserted(this);
+    //call link added to references
+    this.referenceManager.entryInserted(this);
     
     //return promise to track loading finish
     return new Promise(promiseFunction);
@@ -154,7 +154,7 @@ apogeeapp.app.LinkEntry.prototype.remove = function() {
         document.head.removeChild(element);
     }
     
-    this.libraryUI.entryRemoved(this);
+    this.referenceManager.entryRemoved(this);
 }
 
 //-------------------------

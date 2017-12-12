@@ -1,37 +1,37 @@
 
 /** This class manages links and other reference entries.*/
-apogeeapp.app.LibraryUI = function() {
+apogeeapp.app.ReferenceManager = function() {
     this.createTreeEntry();
     
-    this.libraryLists = {};
+    this.referenceLists = {};
     var jsInfo = apogeeapp.app.LinkEntry.JS_LINK_LIST_INFO;
     var cssInfo = apogeeapp.app.LinkEntry.CSS_LINK_LIST_INFO;
-    this.libraryLists[jsInfo.typeName] = this.getListStruct(jsInfo);
-    this.libraryLists[cssInfo.typeName] = this.getListStruct(cssInfo);
+    this.referenceLists[jsInfo.typeName] = this.getListStruct(jsInfo);
+    this.referenceLists[cssInfo.typeName] = this.getListStruct(cssInfo);
 }
 
-apogeeapp.app.LibraryUI.prototype.getTreeEntry = function() {
-    return this.libraryTreeEntry;
+apogeeapp.app.ReferenceManager.prototype.getTreeEntry = function() {
+    return this.referencesTreeEntry;
 }
 
 /** This method opens the reference entries, from the structure returned from
  * the save call. It returns a promise that
  * resolves when all entries are loaded. 
  */
-apogeeapp.app.LibraryUI.prototype.openEntries = function(libraryJson) {
+apogeeapp.app.ReferenceManager.prototype.openEntries = function(referencesJson) {
 
     var entryPromises = [];
     
     var loadEntry = entryJson => {
-        var listStruct = this.libraryLists[entryJson.entryType];
+        var listStruct = this.referenceLists[entryJson.entryType];
         
         //make sure it doesn't exist?
         
-        var libraryEntry = listStruct.listInfo.createEntryFunction(this,entryJson);
-        var promise = libraryEntry.loadEntry();
+        var referenceEntry = listStruct.listInfo.createEntryFunction(this,entryJson);
+        var promise = referenceEntry.loadEntry();
         entryPromises.push(promise);
     }
-    libraryJson.forEach(loadEntry);
+    referencesJson.forEach(loadEntry);
    
     return Promise.all(entryPromises);
 }
@@ -40,15 +40,15 @@ apogeeapp.app.LibraryUI.prototype.openEntries = function(libraryJson) {
  * the save call. It returns a promise that
  * resolves when all entries are loaded. 
  */
-apogeeapp.app.LibraryUI.prototype.saveEntries = function() {
+apogeeapp.app.ReferenceManager.prototype.saveEntries = function() {
     var entryListJson = [];
     var saveEntry = listEntry => {
         var entryJson = listEntry.saveEntry();
         entryListJson.push(entryJson);
     }
     
-    for(var listType in this.libraryLists) {
-        var listStruct =  this.libraryLists[listType];
+    for(var listType in this.referenceLists) {
+        var listStruct =  this.referenceLists[listType];
         listStruct.listEntries.forEach(saveEntry);
     }
    
@@ -59,21 +59,21 @@ apogeeapp.app.LibraryUI.prototype.saveEntries = function() {
  * the save call. It returns a promise that
  * resolves when the entry are loaded. 
  */
-apogeeapp.app.LibraryUI.prototype.addEntry = function(entryJson) {
+apogeeapp.app.ReferenceManager.prototype.addEntry = function(entryJson) {
     
     //check if these object exist - if so, don't add them
  
-    var listStruct = this.libraryLists[entryJson.entryType];
-    var libraryEntry = listStruct.listInfo.createEntryFunction(this,entryJson);
-    return libraryEntry.loadEntry();
+    var listStruct = this.referenceLists[entryJson.entryType];
+    var referenceEntry = listStruct.listInfo.createEntryFunction(this,entryJson);
+    return referenceEntry.loadEntry();
 }
 
 /** This method should be called when the workspace is closed. It removes all links. 
  */
-apogeeapp.app.LibraryUI.prototype.close = function() {
-    for(var listType in this.libraryLists) {
-        var listStruct = this.libraryLists[listType];
-        listStruct.listEntries.push( libraryEntry => libraryEntry.remove() );
+apogeeapp.app.ReferenceManager.prototype.close = function() {
+    for(var listType in this.referenceLists) {
+        var listStruct = this.referenceLists[listType];
+        listStruct.listEntries.push( referenceEntry => referenceEntry.remove() );
     }
 }
 
@@ -84,61 +84,61 @@ apogeeapp.app.LibraryUI.prototype.close = function() {
 /** This method opens a list of js and css links. It returns a promise that
  * resolves when all links are loaded. 
  * @protected */
-apogeeapp.app.LibraryUI.prototype.entryInserted = function(libraryEntry) {
-    var entryType = libraryEntry.getEntryType();
-    var treeEntry = libraryEntry.getTreeEntry();
+apogeeapp.app.ReferenceManager.prototype.entryInserted = function(referenceEntry) {
+    var entryType = referenceEntry.getEntryType();
+    var treeEntry = referenceEntry.getTreeEntry();
     
-    var listStruct = this.libraryLists[entryType];
+    var listStruct = this.referenceLists[entryType];
     if(!listStruct) {
         throw new Error("Unrecognized link type: " + entryType);
     }
     
-    listStruct.listEntries.push(libraryEntry);
+    listStruct.listEntries.push(referenceEntry);
     listStruct.listTreeEntry.addChild(treeEntry);
 }
 
 /** This method opens a list of js and css links. It returns a promise that
  * resolves when all links are loaded. 
  * @protected */
-apogeeapp.app.LibraryUI.prototype.entryStatusChange = function(libraryEntry) {
+apogeeapp.app.ReferenceManager.prototype.entryStatusChange = function(referenceEntry) {
     
 }
 
 /** This method opens a list of js and css links. It returns a promise that
  * resolves when all links are loaded. 
  * @protected */
-apogeeapp.app.LibraryUI.prototype.entryRemoved= function(libraryEntry) {
-    var entryType = libraryEntry.getEntryType();
+apogeeapp.app.ReferenceManager.prototype.entryRemoved= function(referenceEntry) {
+    var entryType = referenceEntry.getEntryType();
     
-    var listStruct = this.libraryLists[entryType];
+    var listStruct = this.referenceLists[entryType];
     if(!listStruct) {
         throw new Error("Unrecognized link type: " + entryType);
     }
     
-    listStruct.listEntries = listStruct.listEntries.filter( existingEntry => (existingEntry != libraryEntry) );
-    listStruct.listTreeEntry.removeChild(libraryEntry.getTreeEntry());
+    listStruct.listEntries = listStruct.listEntries.filter( existingEntry => (existingEntry != referenceEntry) );
+    listStruct.listTreeEntry.removeChild(referenceEntry.getTreeEntry());
 }
 
 //=================================
 // Private
 //=================================
 
-apogeeapp.app.LibraryUI.LIBRARY_ICON_PATH = "/componentIcons/library.png";
+apogeeapp.app.ReferenceManager.REFERENCES_ICON_PATH = "/componentIcons/references.png";
 
 
 /** @private */
-apogeeapp.app.LibraryUI.prototype.createTreeEntry = function() {
-    var iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.app.LibraryUI.LIBRARY_ICON_PATH);
-    this.libraryTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry("References", iconUrl, null, null, false);
+apogeeapp.app.ReferenceManager.prototype.createTreeEntry = function() {
+    var iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.app.ReferenceManager.REFERENCES_ICON_PATH);
+    this.referencesTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry("References", iconUrl, null, null, false);
 }
 
-apogeeapp.app.LibraryUI.prototype.getListStruct = function(listInfo) {
+apogeeapp.app.ReferenceManager.prototype.getListStruct = function(listInfo) {
     
     //create the tree entry for this list
     var iconUrl = apogeeapp.ui.getResourcePath(listInfo.listIconPath);
     var menuItemCallback = () => this.getListMenuItems(listInfo);
     var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(listInfo.listName, iconUrl, null, menuItemCallback, false);
-    this.libraryTreeEntry.addChild(listTreeEntry);
+    this.referencesTreeEntry.addChild(listTreeEntry);
     
     //create the list struct
     var listStruct = {};
@@ -150,7 +150,7 @@ apogeeapp.app.LibraryUI.prototype.getListStruct = function(listInfo) {
 }
 
 /** @private */
-apogeeapp.app.LibraryUI.prototype.getListMenuItems = function(listInfo) {
+apogeeapp.app.ReferenceManager.prototype.getListMenuItems = function(listInfo) {
     //menu items
     var menuItemList = [];
 
@@ -169,12 +169,12 @@ apogeeapp.app.LibraryUI.prototype.getListMenuItems = function(listInfo) {
 
 /** THis is used to give an id to the link entries 
  * @private */
-apogeeapp.app.LibraryUI.nextId = 1;
+apogeeapp.app.ReferenceManager.nextId = 1;
 
 /** This method generates a member ID for the member. It is only valid
  * for the duration the workspace is opened. It is not persisted.
  * @private
  */
-apogeeapp.app.LibraryUI._createId = function() {
-    return apogeeapp.app.LibraryUI.nextId++;
+apogeeapp.app.ReferenceManager._createId = function() {
+    return apogeeapp.app.ReferenceManager.nextId++;
 }

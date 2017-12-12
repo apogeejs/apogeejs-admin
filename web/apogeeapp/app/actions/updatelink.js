@@ -41,7 +41,7 @@ apogeeapp.app.updatelink.DIALOG_LAYOUT_SUBMIT_LINE = {
 //itemInfo.callback = apogeeapp.app.updatelink.getAddLinkCallback(this,linkType);
 
 /** This method gets a callback to update the properties of a workspace. */
-apogeeapp.app.updatelink.getAddLinkCallback = function(libraryUI,linkType) {
+apogeeapp.app.updatelink.getAddLinkCallback = function(referencesUI,linkType) {
     
     var createCallback = function() {
         
@@ -73,7 +73,7 @@ apogeeapp.app.updatelink.getAddLinkCallback = function(libraryUI,linkType) {
             entryJson.url = newValues.url;
             entryJson.nickname = newValues.nickname;
             entryJson.entryType = linkType;
-            var promise = libraryUI.addEntry(entryJson);
+            var promise = referencesUI.addEntry(entryJson);
 
             //return true to close the dialog
             return true;

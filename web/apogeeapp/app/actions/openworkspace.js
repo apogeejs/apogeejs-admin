@@ -65,8 +65,8 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
         var workspaceUI = new apogeeapp.app.WorkspaceUI();
         workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
     
-        var libraryJson = workspaceJson.references;
-        var loadLibraryPromise = workspaceUI.loadLibrary(libraryJson);
+        var referencesJson = workspaceJson.references;
+        var loadReferencesPromise = workspaceUI.loadReferences(referencesJson);
     	
 		//if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {
@@ -81,7 +81,7 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
         }
         
 //THIS NEEDS TO BE CLEANED UP - ESPECIALLY ERROR HANDLING
-        loadLibraryPromise.then(doWorkspaceLoad).catch(linkLoadError);
+        loadReferencesPromise.then(doWorkspaceLoad).catch(linkLoadError);
         
     }
     catch(error) {

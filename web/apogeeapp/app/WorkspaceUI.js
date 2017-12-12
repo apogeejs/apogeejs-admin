@@ -9,7 +9,7 @@ apogeeapp.app.WorkspaceUI = function() {
     this.tree = null;
     this.treeEntry = null;
     this.componentMap = {};
-    this.libraryManager = new apogeeapp.app.LibraryUI();
+    this.referencesManager = new apogeeapp.app.ReferenceManager();
    
     this.jsLinkArray = [];
     this.cssLinkArray = [];
@@ -67,7 +67,7 @@ apogeeapp.app.WorkspaceUI.prototype.load = function(workspaceJson,actionResponse
     this.treeEntry.setState(apogeeapp.ui.treecontrol.EXPANDED);
     this.tree.setRootEntry(this.treeEntry);
     this.treeEntry.addChild(rootFolderComponent.getTreeEntry());
-    this.treeEntry.addChild(this.libraryManager.getTreeEntry());
+    this.treeEntry.addChild(this.referencesManager.getTreeEntry());
     
     //add listeners
     this.workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT, member => this.memberUpdated(member));
@@ -107,7 +107,7 @@ apogeeapp.app.WorkspaceUI.prototype.close = function() {
     this.tree.clearRootEntry();
     
     //remove links
-    this.libraryManager.close();
+    this.referencesManager.close();
 }
 
 
@@ -221,11 +221,11 @@ apogeeapp.app.WorkspaceUI.prototype.workspaceUpdated = function() {
  * it will save a workspace with that as the root folder. */
 apogeeapp.app.WorkspaceUI.prototype.toJson = function(optionalSavedRootFolder) {
     var json = {};
-    json.fileType = "apogee js web workspace";
+    json.fileType = "apogee app js workspace";
     
-    json.version = "0.31";
+    json.version = "0.40";
     
-    json.library = this.libraryManager.saveEntries();
+    json.references = this.referencesManager.saveEntries();
     
     json.workspace = this.workspace.toJson(optionalSavedRootFolder);
     
@@ -334,7 +334,7 @@ apogeeapp.app.WorkspaceUI.prototype.getMenuItems = function() {
 // Links
 //========================================
 
-apogeeapp.app.WorkspaceUI.prototype.loadLibrary = function(libraryJson) {
-    return this.libraryManager.openEntries(libraryJson);
+apogeeapp.app.WorkspaceUI.prototype.loadReferences = function(referencesJson) {
+    return this.referencesManager.openEntries(referencesJson);
 }
     

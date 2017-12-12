@@ -61,8 +61,8 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,wo
 
 //I should verify the file type and format!  
 
-        var libraryJson = workspaceJson.library;
-        var loadLibraryPromise = workspaceUI.loadLibrary(libraryJson);
+        var referencesJson = workspaceJson.references;
+        var loadReferencesPromise = workspaceUI.loadReferences(referencesJson);
     	
 		//if we have to load links wait for them to load
         var newParentOptionsJson = {};
@@ -78,7 +78,7 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,wo
         }
         
         //THIS NEEDS TO BE CLEANED UP - ESPECIALLY ERROR HANDLING
-        loadLibraryPromise.then(workspaceImportDialogFunction).catch(linkLoadError);
+        loadReferencesPromise.then(workspaceImportDialogFunction).catch(linkLoadError);
     }
     catch(error) {
         //figure out what to do here???
