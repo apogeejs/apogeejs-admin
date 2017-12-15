@@ -5149,15 +5149,15 @@
 	"version": 0.4,
 	"references": [
 		{
-			"url": "http://eng.micello.com/apogee/javascript/taskAppModule.js",
+			"url": "http://localhost:8383/lib/modules/taskApp/taskAppModule.js",
 			"entryType": "js link"
 		},
 		{
-			"url": "http://eng.micello.com/apogee/javascript/configurableForm.js",
+			"url": "http://localhost:8383/lib/controls/configurableForm/configurableForm.js",
 			"entryType": "js link"
 		},
 		{
-			"url": "http://eng.micello.com/apogee/javascript/configurableForm.css",
+			"url": "http://localhost:8383/lib/controls/configurableForm/configurableForm.css",
 			"entryType": "css link"
 		}
 	]

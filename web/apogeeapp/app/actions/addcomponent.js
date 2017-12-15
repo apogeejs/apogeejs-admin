@@ -48,12 +48,13 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,componentGener
             var actionResponse = apogee.action.doAction(createAction,true);
             var member = createAction.member;
             
-            if(!actionResponse.getSuccess()) {
-                apogeeapp.app.errorHandling.handleActionError(actionResponse);
-            }
-            else {
+            if(member) {
                 //create the component
                 apogeeapp.app.Component.createComponentFromMember(componentGenerator,workspaceUI,member,userInputValues,optionalComponentJson);
+            }
+            
+            if(!actionResponse.getSuccess()) {
+                apogeeapp.app.errorHandling.handleActionError(actionResponse);
             }
             
             //return true to close the dialog
