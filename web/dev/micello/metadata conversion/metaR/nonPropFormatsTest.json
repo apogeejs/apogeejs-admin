@@ -1,1 +1,133 @@
-{"fileType":"apogee workspace","jsLinks":[],"cssLinks":[],"workspace":{"fileType":"apogee workspace","version":0.2,"data":{"name":"nonPropFormatsTemp","type":"apogee.Folder","children":{"format":{"name":"format","type":"apogee.JsonTable","updateData":{"data":{"themeRules":{"label":[{"name":"keyType","type":"enum","values":["geometry","entity","address"],"required":true},{"name":"path","type":"array(array(string,2))","required":true},{"name":"legacyPath","type":"array(array(string,2))","required":true},{"name":"payload","type":"map(inputs)","mapFields":[{"name":"lt","type":"enum","values":[0,1,2],"required":true},{"name":"r","type":"string","required":false},{"name":"trans","type":"string","required":false}],"required":true}],"style":[{"name":"keyType","type":"enum","values":["geometry","entity","address"],"required":true},{"name":"path","type":"array(array(string,2))","required":true},{"name":"legacyPath","type":"array(array(string,2))","required":true},{"name":"payload","type":"map(inputs)","mapFields":[{"name":"n","type":"string","required":false}],"required":true}]},"theme":"","inputColors":"","strings":""},"description":""}}}}},"components":{"format":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":572,"height":606},"posInfo":{"x":48,"y":52},"state":0,"viewType":"JSON"}}}}
+{
+	"fileType": "apogee app js workspace",
+	"workspace": {
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "Model",
+			"type": "apogee.Folder",
+			"children": {
+				"format": {
+					"name": "format",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": {
+							"themeRules": {
+								"label": [
+									{
+										"name": "keyType",
+										"type": "enum",
+										"values": [
+											"geometry",
+											"entity",
+											"address"
+										],
+										"required": true
+									},
+									{
+										"name": "path",
+										"type": "array(array(string,2))",
+										"required": true
+									},
+									{
+										"name": "legacyPath",
+										"type": "array(array(string,2))",
+										"required": true
+									},
+									{
+										"name": "payload",
+										"type": "map(inputs)",
+										"mapFields": [
+											{
+												"name": "lt",
+												"type": "enum",
+												"values": [
+													0,
+													1,
+													2
+												],
+												"required": true
+											},
+											{
+												"name": "r",
+												"type": "string",
+												"required": false
+											},
+											{
+												"name": "trans",
+												"type": "string",
+												"required": false
+											}
+										],
+										"required": true
+									}
+								],
+								"style": [
+									{
+										"name": "keyType",
+										"type": "enum",
+										"values": [
+											"geometry",
+											"entity",
+											"address"
+										],
+										"required": true
+									},
+									{
+										"name": "path",
+										"type": "array(array(string,2))",
+										"required": true
+									},
+									{
+										"name": "legacyPath",
+										"type": "array(array(string,2))",
+										"required": true
+									},
+									{
+										"name": "payload",
+										"type": "map(inputs)",
+										"mapFields": [
+											{
+												"name": "n",
+												"type": "string",
+												"required": false
+											}
+										],
+										"required": true
+									}
+								]
+							},
+							"theme": "",
+							"inputColors": "",
+							"strings": ""
+						},
+						"description": ""
+					}
+				}
+			}
+		},
+		"name": "nonPropFormatsTemp"
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"children": {
+			"format": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 572,
+						"height": 606
+					},
+					"posInfo": {
+						"x": 48,
+						"y": 52
+					},
+					"state": 0,
+					"viewType": "JSON"
+				}
+			}
+		}
+	},
+	"version": 0.4,
+	"references": []
+}

@@ -3,6 +3,8 @@ apogeeapp.app.FolderComponent = function(workspaceUI,folder) {
     //extend parent component
     apogeeapp.app.ParentComponent.call(this,workspaceUI,folder,apogeeapp.app.FolderComponent);
     
+    this.treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.FOLDER_COMPONENT_TYPE_SORT_ORDER);
+    
     //add a cleanup and save actions
     this.addOpenAction(apogeeapp.app.FolderComponent.readFromJson);
     this.addSaveAction(apogeeapp.app.FolderComponent.writeToJson);
@@ -68,7 +70,7 @@ apogeeapp.app.FolderComponent.displayName = "Folder";
 apogeeapp.app.FolderComponent.uniqueName = "apogeeapp.app.FolderComponent";
 apogeeapp.app.FolderComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.FolderComponent.DEFAULT_HEIGHT = 500;
-apogeeapp.app.FolderComponent.ICON_RES_PATH = "/folderIcon.png";
+apogeeapp.app.FolderComponent.ICON_RES_PATH = "/componentIcons/folder.png";
 
 apogeeapp.app.FolderComponent.propertyDialogLines = [
     {
@@ -81,24 +83,3 @@ apogeeapp.app.FolderComponent.propertyDialogLines = [
 apogeeapp.app.FolderComponent.appendWorkspaceChildren = function(optionsJson,childrenJson) {
     optionsJson.children = childrenJson;
 }
-
-//apogeeapp.app.FolderComponent.generator = {};
-//apogeeapp.app.FolderComponent.generator.displayName = "Folder";
-//apogeeapp.app.FolderComponent.generator.uniqueName = "apogeeapp.app.FolderComponent";
-//apogeeapp.app.FolderComponent.generator.constructor = apogeeapp.app.FolderComponent;
-//apogeeapp.app.FolderComponent.generator.getMemberCreateAction = apogeeapp.app.FolderComponent.getMemberCreateAction;
-//apogeeapp.app.FolderComponent.generator.DEFAULT_WIDTH = 500;
-//apogeeapp.app.FolderComponent.generator.DEFAULT_HEIGHT = 500;
-//apogeeapp.app.FolderComponent.generator.ICON_RES_PATH = "/folderIcon.png";
-//
-//apogeeapp.app.FolderComponent.generator.propertyDialogLines = [
-//    {
-//        "type":"invisible",
-//        "resultKey":"children"
-//    }
-//];
-//
-////if we want to allow importing a workspace as this object, we must add this method to the generator
-//apogeeapp.app.FolderComponent.generator.appendWorkspaceChildren = function(optionsJson,childrenJson) {
-//    optionsJson.children = childrenJson;
-//}

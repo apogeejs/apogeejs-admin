@@ -40,9 +40,8 @@ apogeeapp.app.createworkspace.createWorkspace = function(app) {
         var workspaceUI = new apogeeapp.app.WorkspaceUI();
         workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
         
-        //create and edd an empty workspace
-        var workspace = new apogee.Workspace();
-        workspaceUI.setWorkspace(workspace);
+        //load
+        workspaceUI.load();
     
         actionResponse.workspaceUI = workspaceUI;
     }

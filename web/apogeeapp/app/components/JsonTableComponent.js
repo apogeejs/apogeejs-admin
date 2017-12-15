@@ -125,7 +125,7 @@ apogeeapp.app.JsonTableComponent.addPropFunction = function(component,values) {
     values.dataView = component.getDataView();
 }
 
-apogeeapp.app.JsonTableComponent.updateProperties = function(component,oldValues,newValues,actionResponse) {
+apogeeapp.app.JsonTableComponent.updateProperties = function(component,oldValues,newValues) {
     component.setDataView(newValues.dataView);
 }
 
@@ -137,7 +137,7 @@ apogeeapp.app.JsonTableComponent.displayName = "Data Table";
 apogeeapp.app.JsonTableComponent.uniqueName = "apogeeapp.app.JsonTableComponent";
 apogeeapp.app.JsonTableComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.JsonTableComponent.DEFAULT_HEIGHT = 300;
-apogeeapp.app.JsonTableComponent.ICON_RES_PATH = "/dataIcon.png";
+apogeeapp.app.JsonTableComponent.ICON_RES_PATH = "/componentIcons/dataTable.png";
 apogeeapp.app.JsonTableComponent.propertyDialogLines = [
     {
         "type":"dropdown",
@@ -150,28 +150,4 @@ apogeeapp.app.JsonTableComponent.propertyDialogLines = [
         "resultKey":"dataView"
     }
 ];
-
-//apogeeapp.app.JsonTableComponent.generator = {};
-//apogeeapp.app.JsonTableComponent.generator.displayName = "Data Table";
-//apogeeapp.app.JsonTableComponent.generator.uniqueName = "apogeeapp.app.JsonTableComponent";
-//apogeeapp.app.JsonTableComponent.generator.constructor = apogeeapp.app.JsonTableComponent;
-//apogeeapp.app.JsonTableComponent.generator.getMemberCreateAction = apogeeapp.app.JsonTableComponent.getMemberCreateAction;
-//apogeeapp.app.JsonTableComponent.generator.DEFAULT_WIDTH = 300;
-//apogeeapp.app.JsonTableComponent.generator.DEFAULT_HEIGHT = 300;
-//apogeeapp.app.JsonTableComponent.generator.ICON_RES_PATH = "/dataIcon.png";
-//
-//apogeeapp.app.JsonTableComponent.generator.propertyDialogLines = [
-//    {
-//        "type":"dropdown",
-//        "heading":"Data View: ",
-//        "entries":[
-//            "JSON",
-//            "Plain",
-//            "Form"
-//        ],
-//        "resultKey":"dataView"
-//    }
-//];
-
-
 

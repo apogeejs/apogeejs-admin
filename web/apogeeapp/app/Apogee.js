@@ -17,8 +17,6 @@ apogeeapp.app.Apogee = function(containerId) {
     //these are a list of names of components that go in the "added component" list
     this.additionalComponents = [];
 	
-	this.linkManager = new apogeeapp.app.LinkManager();
-	
 	//load the standard component generators
 	this.loadComponentGenerators();
 	
@@ -94,20 +92,6 @@ apogeeapp.app.Apogee.prototype.clearWorkspaceUI = function() {
     return true;
 }
 
-//==================================
-// Link Management
-//==================================
-
-/** This method adds links as registered by a given workspace. Links can be added and
- * removed. Removing links may or may not remove them from the page (currently
- * js links are not removed and css links are, once they are not used by any 
- * workspase. The linksLoadedCallback is optional. It is called when all links have
- * been loaded on the page.
- */
-apogeeapp.app.Apogee.prototype.updateWorkspaceLinks = function(ownerName,addList,removeList,linksLoadedCallback) {
-	this.linkManager.updateWorkspaceLinks(ownerName,addList,removeList,linksLoadedCallback);
-}
-
 //=================================
 // Component Management
 //=================================
@@ -116,7 +100,7 @@ apogeeapp.app.Apogee.prototype.updateWorkspaceLinks = function(ownerName,addList
 apogeeapp.app.Apogee.prototype.registerComponent = function(componentGenerator) {
     var name = componentGenerator.uniqueName;
     if(this.componentGenerators[name]) {
-        var replace = confirm("There is already a registered component with this name. Replace it or cancel?");
+        var replace = confirm("There is already a registered component with this name. Would you like to continue?");
         if(!replace) return;
     }
 
@@ -154,7 +138,7 @@ apogeeapp.app.Apogee.prototype.loadComponentGenerators = function() {
 apogeeapp.app.Apogee.prototype.registerStandardComponent = function(componentGenerator) {
     var name = componentGenerator.uniqueName;
     if(this.componentGenerators[name]) {
-        var replace = confirm("There is already a registered component with this name. Replace it or cancel?");
+        var replace = confirm("There is already a registered component with this name. Would you like to continue?");
         if(!replace) return;
     }
 
@@ -280,13 +264,10 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
     menu.setMenuItems(this.getAddChildMenuItems());
     
     //libraries menu
-    name = "Libraries";
+    name = "Import/Export";
     menu = apogeeapp.ui.Menu.createMenu(name);
     menuBarLeft.appendChild(menu.getElement());
     menus[name] = menu;
-    
-    var linksCallback = apogeeapp.app.updatelinks.getUpdateLinksCallback(this);
-    menu.addCallbackMenuItem("Update Links",linksCallback);
     
     var importCallback = apogeeapp.app.importworkspace.getImportCallback(this,apogeeapp.app.FolderComponent);
     menu.addCallbackMenuItem("Import as Folder",importCallback);

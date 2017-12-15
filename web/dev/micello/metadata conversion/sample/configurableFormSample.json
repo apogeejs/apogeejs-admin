@@ -1,1 +1,114 @@
-{"fileType":"apogee workspace","jsLinks":["http://localhost:8383/apogee/dev/micello/metadata%20conversion/lib/configurableForm.js"],"cssLinks":[],"workspace":{"fileType":"apogee workspace","version":0.2,"data":{"name":"Workspace","type":"apogee.Folder","children":{"dummyForm":{"name":"dummyForm","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"var data = {};\n\ndata.layout = layout;\ndata.onCancel = () => alert(\"Canceled!\");\ndata.onSubmit = (formData) => alert(\"Submitted: \" + JSON.stringify(formData));\n\nreturn data;","supplementalCode":"","description":""}},"layout":{"name":"layout","type":"apogee.JsonTable","updateData":{"data":{"lines":[{"type":"title","title":"New Folder Function"},{"type":"dropdown","heading":"Folder: ","entries":["Workspace"],"resultKey":"parentName","initial":"Workspace"},{"type":"inputElement","heading":"Name: ","resultKey":"name"},{"type":"inputElement","heading":"Arg List: ","resultKey":"argListString"},{"type":"inputElement","heading":"Return Val: ","resultKey":"returnValueString"},{"type":"invisible","resultKey":"internalFolder"},{"type":"submit","submit":"Create","cancel":"Cancel"}]},"description":""}}}}},"components":{"dummyForm":{"type":"apogeeapp.app.ConfigurableForm","windowState":{"sizeInfo":{"width":636,"height":380},"posInfo":{"x":88,"y":64},"state":0,"viewType":"Output"}},"layout":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":507,"height":494},"posInfo":{"x":777,"y":77},"state":0,"viewType":"JSON"}}}}
+{
+	"fileType": "apogee app js workspace",
+	"workspace": {
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "Model",
+			"type": "apogee.Folder",
+			"children": {
+				"dummyForm": {
+					"name": "dummyForm",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var data = {};\n\ndata.layout = layout;\ndata.onCancel = () => alert(\"Canceled!\");\ndata.onSubmit = (formData) => alert(\"Submitted: \" + JSON.stringify(formData));\n\nreturn data;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"layout": {
+					"name": "layout",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": {
+							"lines": [
+								{
+									"type": "title",
+									"title": "New Folder Function"
+								},
+								{
+									"type": "dropdown",
+									"heading": "Folder: ",
+									"entries": [
+										"Workspace"
+									],
+									"resultKey": "parentName",
+									"initial": "Workspace"
+								},
+								{
+									"type": "inputElement",
+									"heading": "Name: ",
+									"resultKey": "name"
+								},
+								{
+									"type": "inputElement",
+									"heading": "Arg List: ",
+									"resultKey": "argListString"
+								},
+								{
+									"type": "inputElement",
+									"heading": "Return Val: ",
+									"resultKey": "returnValueString"
+								},
+								{
+									"type": "invisible",
+									"resultKey": "internalFolder"
+								},
+								{
+									"type": "submit",
+									"submit": "Create",
+									"cancel": "Cancel"
+								}
+							]
+						},
+						"description": ""
+					}
+				}
+			}
+		},
+		"name": "Workspace"
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"children": {
+			"dummyForm": {
+				"type": "apogeeapp.app.ConfigurableForm",
+				"windowState": {
+					"sizeInfo": {
+						"width": 636,
+						"height": 380
+					},
+					"posInfo": {
+						"x": 88,
+						"y": 64
+					},
+					"state": 0,
+					"viewType": "Output"
+				}
+			},
+			"layout": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 507,
+						"height": 494
+					},
+					"posInfo": {
+						"x": 777,
+						"y": 77
+					},
+					"state": 0,
+					"viewType": "JSON"
+				}
+			}
+		}
+	},
+	"version": 0.4,
+	"references": [
+		{
+			"url": "http://localhost:8383/apogee/dev/micello/metadata%20conversion/lib/configurableForm.js",
+			"entryType": "js link"
+		}
+	]
+}

@@ -24,7 +24,7 @@ taskAppModule = (function() {
         var workspace = app.getWorkspace();
         var rootFolder = workspace.getRoot();
         var workspaceUI = app.getWorkspaceUI();
-        var member = rootFolder.getMemberByPathArray(absolutePath);
+        var member = rootFolder.lookupChildFromPathArray(absolutePath);
         var component = workspaceUI.getComponent(member);
         var makeActiveCallback = component.createOpenCallback();
         makeActiveCallback();

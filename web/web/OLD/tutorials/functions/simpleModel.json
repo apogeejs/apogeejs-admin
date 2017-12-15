@@ -1,1 +1,105 @@
-{"name":"Revenue Projection","fileType":"apogee workspace","jsLinks":[],"cssLinks":[],"workspace":{"name":"Revenue Projection","fileType":"apogee workspace","version":0.1,"data":{"name":"Revenue Projection","type":"apogee.core.Folder","children":{"settings":{"name":"settings","type":"apogee.core.JsonTable","updateData":{"data":{"initialYear":2015,"initialRevenue":1000000,"growthRate":3,"projectionCount":7}}},"revenueTable":{"name":"revenueTable","type":"apogee.core.JsonTable","updateData":{"argList":[],"functionBody":"var value;\nvalue = [];\n\n//add heading\nvalue.push([\"Year\",\"Revenue\"]);\n\n//add yearly values\nfor(var i = 0; i < revenue.length; i++) {\n    value.push([revenue[i].year,revenue[i].revenue]);\n}\n\n//add total\nvalue.push([\"Total\",totalRevenue]);\nreturn value;\n\n","supplementalCode":""}},"totalRevenue":{"name":"totalRevenue","type":"apogee.core.JsonTable","updateData":{"argList":[],"functionBody":"var value;\nvalue = 0;\n\nfor(var i = 0; i < revenue.length; i++) {\n    value += revenue[i].revenue;\n}\nreturn value;\n\n","supplementalCode":""}},"revenue":{"name":"revenue","type":"apogee.core.JsonTable","updateData":{"argList":[],"functionBody":"var value;\nvalue = [];\nvalue[0] = createEntry(settings.initialYear,settings.initialRevenue);\nfor(var i = 0; i < settings.projectionCount; i++) {\n    value[i+1] = getNextEntry(value[i]);\n}\nreturn value;\n\n","supplementalCode":"function createEntry(year,revenue) {\n    entry = {};\n    entry.year = year;\n    entry.revenue = revenue;\n    return entry;\n}\n\nfunction getNextEntry(entry) {\n    var nextEntry = {};\n    nextEntry.year = entry.year + 1;\n    nextEntry.revenue = entry.revenue * (1 + settings.growthRate/100);\n    return nextEntry;\n}"}}}}},"components":{"settings":{"key":"Revenue Projection:settings","type":"apogee.app.visiui.JsonTableComponent","coordInfo":{"x":29,"y":14,"width":282,"height":140},"windowState":0},"revenueTable":{"key":"Revenue Projection:revenueTable","type":"apogee.app.visiui.GridTableComponent","coordInfo":{"x":349,"y":131,"width":266,"height":314},"windowState":0},"totalRevenue":{"key":"Revenue Projection:totalRevenue","type":"apogee.app.visiui.JsonTableComponent","coordInfo":{"x":346,"y":19,"width":234,"height":82},"windowState":0},"revenue":{"key":"Revenue Projection:revenue","type":"apogee.app.visiui.JsonTableComponent","coordInfo":{"x":25,"y":178,"width":288,"height":249},"windowState":0}}}
+{
+	"name": "Revenue Projection",
+	"fileType": "apogee app js workspace",
+	"workspace": {
+		"name": "Revenue Projection",
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "Model",
+			"type": "apogee.core.Folder",
+			"children": {
+				"settings": {
+					"name": "settings",
+					"type": "apogee.core.JsonTable",
+					"updateData": {
+						"data": {
+							"initialYear": 2015,
+							"initialRevenue": 1000000,
+							"growthRate": 3,
+							"projectionCount": 7
+						}
+					}
+				},
+				"revenueTable": {
+					"name": "revenueTable",
+					"type": "apogee.core.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var value;\nvalue = [];\n\n//add heading\nvalue.push([\"Year\",\"Revenue\"]);\n\n//add yearly values\nfor(var i = 0; i < revenue.length; i++) {\n    value.push([revenue[i].year,revenue[i].revenue]);\n}\n\n//add total\nvalue.push([\"Total\",totalRevenue]);\nreturn value;\n\n",
+						"supplementalCode": ""
+					}
+				},
+				"totalRevenue": {
+					"name": "totalRevenue",
+					"type": "apogee.core.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var value;\nvalue = 0;\n\nfor(var i = 0; i < revenue.length; i++) {\n    value += revenue[i].revenue;\n}\nreturn value;\n\n",
+						"supplementalCode": ""
+					}
+				},
+				"revenue": {
+					"name": "revenue",
+					"type": "apogee.core.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var value;\nvalue = [];\nvalue[0] = createEntry(settings.initialYear,settings.initialRevenue);\nfor(var i = 0; i < settings.projectionCount; i++) {\n    value[i+1] = getNextEntry(value[i]);\n}\nreturn value;\n\n",
+						"supplementalCode": "function createEntry(year,revenue) {\n    entry = {};\n    entry.year = year;\n    entry.revenue = revenue;\n    return entry;\n}\n\nfunction getNextEntry(entry) {\n    var nextEntry = {};\n    nextEntry.year = entry.year + 1;\n    nextEntry.revenue = entry.revenue * (1 + settings.growthRate/100);\n    return nextEntry;\n}"
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"children": {
+			"settings": {
+				"key": "Revenue Projection:settings",
+				"type": "apogee.app.visiui.JsonTableComponent",
+				"coordInfo": {
+					"x": 29,
+					"y": 14,
+					"width": 282,
+					"height": 140
+				},
+				"windowState": 0
+			},
+			"revenueTable": {
+				"key": "Revenue Projection:revenueTable",
+				"type": "apogee.app.visiui.GridTableComponent",
+				"coordInfo": {
+					"x": 349,
+					"y": 131,
+					"width": 266,
+					"height": 314
+				},
+				"windowState": 0
+			},
+			"totalRevenue": {
+				"key": "Revenue Projection:totalRevenue",
+				"type": "apogee.app.visiui.JsonTableComponent",
+				"coordInfo": {
+					"x": 346,
+					"y": 19,
+					"width": 234,
+					"height": 82
+				},
+				"windowState": 0
+			},
+			"revenue": {
+				"key": "Revenue Projection:revenue",
+				"type": "apogee.app.visiui.JsonTableComponent",
+				"coordInfo": {
+					"x": 25,
+					"y": 178,
+					"width": 288,
+					"height": 249
+				},
+				"windowState": 0
+			}
+		}
+	},
+	"version": 0.4,
+	"references": []
+}

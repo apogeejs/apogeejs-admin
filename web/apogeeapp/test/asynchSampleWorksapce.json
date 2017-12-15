@@ -1,12 +1,10 @@
 {
-	"fileType": "apogee js web workspace",
-	"jsLinks": [],
-	"cssLinks": [],
+	"fileType": "apogee app js workspace",
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "AsynchSample",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"a": {
@@ -48,7 +46,8 @@
 					}
 				}
 			}
-		}
+		},
+		"name": "AsynchSample"
 	},
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
@@ -114,5 +113,7 @@
 				}
 			}
 		}
-	}
+	},
+	"version": 0.4,
+	"references": []
 }

@@ -6,7 +6,7 @@ apogeeapp.app.importworkspace = {};
 //=====================================
 
 /** Call this withthe appropriate generator - folder or folder function, for the given import type. */
-apogeeapp.app.importworkspace.getImportCallback = function(app,parentGenerator) {
+apogeeapp.app.importworkspace.getImportCallback = function(app,componentGenerator) {
     return function() {
     
         //make sure there is not an open workspace
@@ -28,7 +28,7 @@ apogeeapp.app.importworkspace.getImportCallback = function(app,parentGenerator) 
                 };
 
                 //open workspace
-                apogeeapp.app.importworkspace.openWorkspace(app,parentGenerator,workspaceData,workspaceHandle,actionCompletedCallback);
+                apogeeapp.app.importworkspace.openWorkspace(app,componentGenerator,workspaceData,workspaceHandle,actionCompletedCallback);
             }
         }    
         
@@ -48,7 +48,7 @@ apogeeapp.app.importworkspace.getImportCallback = function(app,parentGenerator) 
 /** This method opens an workspace, from the text file. 
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
-apogeeapp.app.importworkspace.openWorkspace = function(app,parentGenerator,workspaceText,workspaceHandle,actionCompletedCallback) {
+apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,workspaceText,workspaceHandle,actionCompletedCallback) {
     var actionResponse = new apogee.ActionResponse();
     var name;
     
@@ -59,43 +59,26 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,parentGenerator,works
         //parse the workspace json
         var workspaceJson = JSON.parse(workspaceText);
 
-//I should verify the file type and format!    
-    
-        //add links, if applicable
-		var jsLinks;
-		var cssLinks;
-        var linksAdded = false;
-        if((workspaceJson.jsLinks)&&(workspaceJson.jsLinks.length > 0)) {
-            jsLinks = workspaceJson.jsLinks;
-            linksAdded = true;
-        }
-		else {
-			jsLinks = [];
-		}
-        if((workspaceJson.cssLinks)&&(workspaceJson.cssLinks.length > 0)) {
-			cssLinks = workspaceJson.cssLinks;
-            linksAdded = true;
-        }
-		else {
-			cssLinks = [];
-		}
-        
+//I should verify the file type and format!  
+
+        var referencesJson = workspaceJson.references;
+        var loadReferencesPromise = workspaceUI.loadReferences(referencesJson);
     	
 		//if we have to load links wait for them to load
         var newParentOptionsJson = {};
         newParentOptionsJson.name = workspaceJson.workspace.data.name;
-        parentGenerator.appendWorkspaceChildren(newParentOptionsJson,workspaceJson.workspace.data.children);
-        var newChildComponentsJson = {};
-        newChildComponentsJson.children = workspaceJson.components;
-		var workspaceImportDialogFunction = apogeeapp.app.addcomponent.getAddComponentCallback(app,parentGenerator,newParentOptionsJson,newChildComponentsJson);
+        componentGenerator.appendWorkspaceChildren(newParentOptionsJson,workspaceJson.workspace.data.children);
+        var serializedComponentsJson = workspaceJson.components;
+		var workspaceImportDialogFunction = apogeeapp.app.addcomponent.getAddComponentCallback(app,componentGenerator,newParentOptionsJson,serializedComponentsJson);
         
-        if(linksAdded) {
-			workspaceUI.setLinks(jsLinks,cssLinks,workspaceImportDialogFunction);
-		}
-		else {
-			//immediately load the workspace - no links to wait for
+        var linkLoadError = function(errorMsg) {
+            alert("Error loading links: " + errorMsg);
+            //load the workspace anyway
             workspaceImportDialogFunction();
-		}
+        }
+        
+        //THIS NEEDS TO BE CLEANED UP - ESPECIALLY ERROR HANDLING
+        loadReferencesPromise.then(workspaceImportDialogFunction).catch(linkLoadError);
     }
     catch(error) {
         //figure out what to do here???

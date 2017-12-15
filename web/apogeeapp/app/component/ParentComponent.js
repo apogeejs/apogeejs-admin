@@ -1,8 +1,8 @@
 /** This is the base class for a parent component (an object that has children),
  * It extends the component class. */
-apogeeapp.app.ParentComponent = function(workspaceUI,member,staticComponentObject) {
+apogeeapp.app.ParentComponent = function(workspaceUI,member,componentGenerator) {
     //base constructor
-	apogeeapp.app.Component.call(this,workspaceUI,member,staticComponentObject);
+	apogeeapp.app.Component.call(this,workspaceUI,member,componentGenerator);
 }
 
 apogeeapp.app.ParentComponent.prototype = Object.create(apogeeapp.app.Component.prototype);
@@ -57,8 +57,7 @@ apogeeapp.app.ParentComponent.prototype.isParentComponent = true;
 apogeeapp.app.ParentComponent.prototype.removeChildComponent = function(childComponent) {
     //remove from tree entry
     var treeEntry = this.getTreeEntry();
-    var childId = childComponent.getMember().getId();
-    treeEntry.removeChild(childId);
+    treeEntry.removeChild(childComponent.getTreeEntry());
     
     //remove child windows - just hide them. They will be deleted in the component
     var childWindowDisplay = childComponent.getWindowDisplay();
@@ -72,8 +71,7 @@ apogeeapp.app.ParentComponent.prototype.addChildComponent = function(childCompon
     //add the child to the tree entry
     var treeEntry = this.getTreeEntry();
     var childTreeEntry = childComponent.getTreeEntry();
-    var childId = childComponent.getMember().getId();
-    treeEntry.addChild(childId,childTreeEntry);
+    treeEntry.addChild(childTreeEntry);
     
     //add child entry for tab
     if(this.tabDisplay) {

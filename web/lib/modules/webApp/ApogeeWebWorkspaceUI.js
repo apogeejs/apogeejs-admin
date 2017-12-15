@@ -164,11 +164,11 @@ apogeeapp.webapp.WorkspaceUI.prototype.loadFolderComponentContentFromJson = func
 	}
 }
 
-apogeeapp.webapp.WorkspaceUI.prototype.loadComponentFromJson = function(member,json) {
-    var componentType = json.type;
+apogeeapp.webapp.WorkspaceUI.prototype.loadComponentFromJson = function(member,componentJson) {
+    var componentType = componentJson.type;
     var generator = this.app.getComponentGenerator(componentType);
 	if(generator) {
-        generator.createComponentFromMember(this,member,json);
+        apogeeapp.app.Component.createComponentFromMember(generator,this,member,null,componentJson);
     }
     else {
         throw apogee.base.createError("Component type not found: " + componentType);

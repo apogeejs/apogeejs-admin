@@ -1,14 +1,12 @@
 {
 	"name": "createStringsJson",
-	"fileType": "apogee js web workspace",
-	"jsLinks": [],
-	"cssLinks": [],
+	"fileType": "apogee app js workspace",
 	"workspace": {
 		"name": "createStringsJson",
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "createStringsJson",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"stringsGrid": {
@@ -2239,28 +2237,33 @@
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
 		"children": {
-			"stringsGrid": {
-				"key": "createStringsJson:stringsGrid",
-				"type": "apogeeapp.app.GridTableComponent",
-				"coordInfo": {
-					"x": 124,
-					"y": 20,
-					"width": 776,
-					"height": 698
+			"type": "apogeeapp.app.FolderComponent",
+			"children": {
+				"stringsGrid": {
+					"key": "createStringsJson:stringsGrid",
+					"type": "apogeeapp.app.GridTableComponent",
+					"coordInfo": {
+						"x": 124,
+						"y": 20,
+						"width": 776,
+						"height": 698
+					},
+					"windowState": 0
 				},
-				"windowState": 0
-			},
-			"stringsJson": {
-				"key": "createStringsJson:stringsJson",
-				"type": "apogeeapp.app.JsonTableComponent",
-				"coordInfo": {
-					"x": 831,
-					"y": 65,
-					"width": 344,
-					"height": 235
-				},
-				"windowState": 0
+				"stringsJson": {
+					"key": "createStringsJson:stringsJson",
+					"type": "apogeeapp.app.JsonTableComponent",
+					"coordInfo": {
+						"x": 831,
+						"y": 65,
+						"width": 344,
+						"height": 235
+					},
+					"windowState": 0
+				}
 			}
 		}
-	}
+	},
+	"version": 0.4,
+	"references": []
 }

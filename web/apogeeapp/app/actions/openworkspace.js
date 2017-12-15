@@ -65,28 +65,12 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
         var workspaceUI = new apogeeapp.app.WorkspaceUI();
         workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
     
-        //add links, if applicable
-		var jsLinks;
-		var cssLinks;
-        var linksAdded = false;
-        if((workspaceJson.jsLinks)&&(workspaceJson.jsLinks.length > 0)) {
-            jsLinks = workspaceJson.jsLinks;
-            linksAdded = true;
-        }
-		else {
-			jsLinks = [];
-		}
-        if((workspaceJson.cssLinks)&&(workspaceJson.cssLinks.length > 0)) {
-			cssLinks = workspaceJson.cssLinks;
-            linksAdded = true;
-        }
-		else {
-			cssLinks = [];
-		}
+        var referencesJson = workspaceJson.references;
+        var loadReferencesPromise = workspaceUI.loadReferences(referencesJson);
     	
 		//if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {
-            apogeeapp.app.openworkspace.loadWorkspace(workspaceUI,workspaceJson);
+            workspaceUI.load(workspaceJson);
             actionCompletedCallback(actionResponse);
         }
         
@@ -96,14 +80,9 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
             doWorkspaceLoad();
         }
         
-        if(linksAdded) {
-			var linksLoadedPromise = workspaceUI.setLinks(jsLinks,cssLinks);
-            linksLoadedPromise.then(doWorkspaceLoad).catch(linkLoadError);
-		}
-		else {
-			//immediately load the workspace - no links to wait for
-            doWorkspaceLoad();
-		}
+//THIS NEEDS TO BE CLEANED UP - ESPECIALLY ERROR HANDLING
+        loadReferencesPromise.then(doWorkspaceLoad).catch(linkLoadError);
+        
     }
     catch(error) {
         if(workspaceUIAdded) {
@@ -114,26 +93,6 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
         actionCompletedCallback(actionResponse);
     }
 }
-
-/** This method loads an existing workspace into an empty workspace UI. */
-apogeeapp.app.openworkspace.loadWorkspace = function(workspaceUI,workspaceJson,actionResponse) {
-    var workspaceDataJson = workspaceJson.workspace;
-    var workspaceComponentsJson = workspaceJson.components;
-
-    var workspace = new apogee.Workspace(workspaceDataJson,actionResponse);
-    
-    workspaceUI.setWorkspace(workspace,workspaceComponentsJson);
-    
-        
-    //this is messy putting this here - clean it up
-    if(workspaceJson.activeTabMember) {
-        var activeTabMember = workspace.getMemberByFullName(workspaceJson.activeTabMember);
-        if(activeTabMember) {
-            workspaceUI.tabFrame.setActiveTab(activeTabMember.getId());
-        }
-    }
-}
-
 
 //------------------------
 // open from url

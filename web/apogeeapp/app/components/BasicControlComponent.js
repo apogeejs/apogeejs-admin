@@ -1,9 +1,9 @@
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods
  * and create a generator. */
-apogeeapp.app.BasicControlComponent = function(workspaceUI,control,staticComponentObject) {
+apogeeapp.app.BasicControlComponent = function(workspaceUI,control,componentGenerator) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,control,staticComponentObject);
+    apogeeapp.app.EditComponent.call(this,workspaceUI,control,componentGenerator);
     
     //default to keep alive
     this.displayDestroyFlags = apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
@@ -102,13 +102,13 @@ apogeeapp.app.BasicControlComponent.getMemberCreateAction = function(userInputVa
 }
 
 /** This method creates a basic generator for the extending object. */
-apogeeapp.app.BasicControlComponent.attachStandardStaticProperties = function(staticComponentObject,displayName,uniqueName) {
-    staticComponentObject.displayName = displayName;
-    staticComponentObject.uniqueName = uniqueName;
-    staticComponentObject.createComponentFromMember = apogeeapp.app.BasicControlComponent.getMemberCreateAction;
-    staticComponentObject.DEFAULT_WIDTH = 500;
-    staticComponentObject.DEFAULT_HEIGHT = 500;
-    staticComponentObject.ICON_RES_PATH = "/controlIcon.png";
+apogeeapp.app.BasicControlComponent.attachStandardStaticProperties = function(componentGenerator,displayName,uniqueName) {
+    componentGenerator.displayName = displayName;
+    componentGenerator.uniqueName = uniqueName;
+    componentGenerator.createComponentFromMember = apogeeapp.app.BasicControlComponent.getMemberCreateAction;
+    componentGenerator.DEFAULT_WIDTH = 500;
+    componentGenerator.DEFAULT_HEIGHT = 500;
+    componentGenerator.ICON_RES_PATH = "/componentIcons/chartControl.png";
 }
 
 

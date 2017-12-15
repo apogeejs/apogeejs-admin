@@ -1,17 +1,10 @@
 {
-	"fileType": "apogee js web workspace",
-	"jsLinks": [
-		"http://localhost:8383/lib/controls/simpleGeojsonControl/SimpleGeojsonControl.js",
-		"https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"
-	],
-	"cssLinks": [
-		"https://unpkg.com/leaflet@1.0.1/dist/leaflet.css"
-	],
+	"fileType": "apogee app js workspace",
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "mapExample",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"map": {
@@ -170,7 +163,8 @@
 					}
 				}
 			}
-		}
+		},
+		"name": "mapExample"
 	},
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
@@ -318,5 +312,20 @@
 				}
 			}
 		}
-	}
+	},
+	"version": 0.4,
+	"references": [
+		{
+			"url": "http://localhost:8383/lib/controls/simpleGeojsonControl/SimpleGeojsonControl.js",
+			"entryType": "js link"
+		},
+		{
+			"url": "https://unpkg.com/leaflet@1.0.1/dist/leaflet.js",
+			"entryType": "js link"
+		},
+		{
+			"url": "https://unpkg.com/leaflet@1.0.1/dist/leaflet.css",
+			"entryType": "css link"
+		}
+	]
 }

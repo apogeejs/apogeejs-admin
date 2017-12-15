@@ -4,6 +4,10 @@ apogeeapp.app.TreeComponentDisplay = function(component) {
     this.member = component.getMember();
     
     this.treeEntry = this.createTreeEntry();
+    //opnly needed for parents...
+    this.treeEntry.setSortFunction(apogeeapp.app.TreeComponentDisplay.treeSortFunction);
+    //this should be overwritten in component
+    this.treeEntry.setExtraSortParam(0);
 };
 
 apogeeapp.app.TreeComponentDisplay.prototype.getTreeEntry = function() {
@@ -18,12 +22,16 @@ apogeeapp.app.TreeComponentDisplay.prototype.setState = function(state) {
     this.treeEntry.setState(state);
 }
 
+apogeeapp.app.TreeComponentDisplay.prototype.setComponentTypeSortOrder = function(typeSortOrder) {
+    this.treeEntry.setExtraSortParam(typeSortOrder);
+}
+
 apogeeapp.app.TreeComponentDisplay.prototype.changeParent = function(newParentComponent,oldParentComponent) {
     var oldParentTreeEntry = oldParentComponent.getTreeEntry();
-    oldParentTreeEntry.removeChild(this.member.getId());
+    oldParentTreeEntry.removeChild(this.treeEntry);
     
     var newParentTreeEntry = newParentComponent.getTreeEntry();
-    newParentTreeEntry.addChild(this.member.getId(),this.treeEntry);
+    newParentTreeEntry.addChild(this.treeEntry);
 }
 
 apogeeapp.app.TreeComponentDisplay.prototype.deleteDisplay = function() {
@@ -72,4 +80,17 @@ apogeeapp.app.TreeComponentDisplay.prototype.createTreeEntry = function() {
     var iconUrl = this.component.getIconUrl();
     var isRoot = ((this.member.isParent)&&(this.member.isRoot()));
     return new apogeeapp.ui.treecontrol.TreeEntry(labelText, iconUrl, openCallback, menuItemCallback,isRoot);
+}
+
+/** This is used to sort the child tree entries. 
+ * We allow for a different ordering for different types by using the extrar sort parameter.
+ * (for now, we put folers first. Other component type parameters can be set too) */
+apogeeapp.app.TreeComponentDisplay.treeSortFunction = function(entry1,entry2) {
+    var typeOrderDiff = (entry1.getExtraSortParam() - entry2.getExtraSortParam());
+    if(typeOrderDiff) {
+        return typeOrderDiff;
+    }
+    else {
+        return entry1.getLabel().localeCompare(entry2.getLabel());
+    }
 }

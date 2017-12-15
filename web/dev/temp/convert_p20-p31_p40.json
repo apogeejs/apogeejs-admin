@@ -1,0 +1,315 @@
+{
+	"fileType": "apogee app js workspace",
+	"version": 0.4,
+	"workspace": {
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"name": "workspaceConvert_p20-p31_p40",
+		"data": {
+			"name": "Model",
+			"type": "apogee.Folder",
+			"children": {
+				"oldWorkspace": {
+					"name": "oldWorkspace",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": {
+							"fileType": "apogee workspace",
+							"jsLinks": [],
+							"cssLinks": [],
+							"workspace": {
+								"fileType": "apogee workspace",
+								"version": 0.2,
+								"data": {
+									"name": "AsynchronousFormulas",
+									"type": "apogee.Folder",
+									"children": {
+										"customPromise": {
+											"name": "customPromise",
+											"type": "apogee.Folder",
+											"children": {
+												"delayMilliseconds": {
+													"name": "delayMilliseconds",
+													"type": "apogee.JsonTable",
+													"updateData": {
+														"data": 5000,
+														"description": ""
+													}
+												},
+												"MAX_DELAY": {
+													"name": "MAX_DELAY",
+													"type": "apogee.JsonTable",
+													"updateData": {
+														"data": 5000,
+														"description": ""
+													}
+												},
+												"asynchResult": {
+													"name": "asynchResult",
+													"type": "apogee.JsonTable",
+													"updateData": {
+														"argList": [],
+														"functionBody": "var promiseFunction = function(resolve,reject) {\n\n    //create msg\n    var msg;\n    var error;\n    if(!isFinite(delayMilliseconds)) {\n        error = true;\n        msg = \"Not a valid number: \" + delayMilliseconds;\n    }\n    else if(delayMilliseconds < 0) {\n        error = true;\n        msg = \"The delay must be at least 0 miliseconds\";\n    }\n    else if(delayMilliseconds > MAX_DELAY) {\n        error = true;\n        msg = \"The max delay is \" + MAX_DELAY + \" milliseconds!\";\n    }\n    else {\n        error = false;\n        msg = \"That was a delay of \" + delayMilliseconds + \" milliseconds\";\n    }\n    \n    //resolve/reject\n    if(!error) {\n        setTimeout( () => resolve(msg), delayMilliseconds);\n    }\n    else {\n        reject(msg);\n    }\n}\n\nreturn new Promise(promiseFunction);\n",
+														"supplementalCode": "",
+														"description": "The formula for this table returns a custom promise. It will delay\nthe amount of time given in the field \"delayMilliseconds\". If there\nis a problem with that value (such as if it is not a number), the \npromise will be rejected and an error will be thrown."
+													}
+												}
+											}
+										},
+										"webRequest": {
+											"name": "webRequest",
+											"type": "apogee.Folder",
+											"children": {
+												"webRequest": {
+													"name": "webRequest",
+													"type": "apogee.JsonTable",
+													"updateData": {
+														"argList": [],
+														"functionBody": "return apogee.net.jsonRequest(url);",
+														"supplementalCode": "",
+														"description": "This is a simple web request returning a JSON object."
+													}
+												},
+												"url": {
+													"name": "url",
+													"type": "apogee.JsonTable",
+													"updateData": {
+														"data": "http://www.apogeejs.com/web/examples/BasicExample.json",
+														"description": ""
+													}
+												}
+											}
+										},
+										"NOTES": {
+											"name": "NOTES",
+											"type": "apogee.JsonTable",
+											"updateData": {
+												"data": "A formula for a table must be synchronous. If you need\nto do something synchronous, like make a web request,\nthe forumula should return a promise.\n\nTwo examples are shown here.",
+												"description": ""
+											}
+										}
+									}
+								}
+							},
+							"components": {
+								"customPromise": {
+									"type": "apogeeapp.app.FolderComponent",
+									"windowState": {
+										"posInfo": {
+											"x": 80,
+											"y": 108
+										}
+									},
+									"children": {
+										"delayMilliseconds": {
+											"type": "apogeeapp.app.JsonTableComponent",
+											"windowState": {
+												"sizeInfo": {
+													"width": 244,
+													"height": 72
+												},
+												"posInfo": {
+													"x": 48,
+													"y": 59
+												},
+												"state": 0,
+												"viewType": "Data"
+											}
+										},
+										"MAX_DELAY": {
+											"type": "apogeeapp.app.JsonTableComponent",
+											"windowState": {
+												"sizeInfo": {
+													"width": 216,
+													"height": 56
+												},
+												"posInfo": {
+													"x": 330,
+													"y": 58
+												},
+												"state": 0,
+												"viewType": "Data"
+											}
+										},
+										"asynchResult": {
+											"type": "apogeeapp.app.JsonTableComponent",
+											"windowState": {
+												"sizeInfo": {
+													"width": 543,
+													"height": 177
+												},
+												"posInfo": {
+													"x": 61,
+													"y": 196
+												},
+												"state": 0,
+												"viewType": "Data"
+											}
+										}
+									}
+								},
+								"webRequest": {
+									"type": "apogeeapp.app.FolderComponent",
+									"windowState": {
+										"posInfo": {
+											"x": 85,
+											"y": 191
+										}
+									},
+									"children": {
+										"webRequest": {
+											"type": "apogeeapp.app.JsonTableComponent",
+											"windowState": {
+												"sizeInfo": {
+													"width": 516,
+													"height": 300
+												},
+												"posInfo": {
+													"x": 121,
+													"y": 173
+												},
+												"state": 0,
+												"viewType": "Text"
+											}
+										},
+										"url": {
+											"type": "apogeeapp.app.JsonTableComponent",
+											"windowState": {
+												"sizeInfo": {
+													"width": 495,
+													"height": 53
+												},
+												"posInfo": {
+													"x": 120,
+													"y": 61
+												},
+												"state": 0,
+												"viewType": "Text"
+											}
+										}
+									}
+								},
+								"NOTES": {
+									"type": "apogeeapp.app.TextComponent",
+									"windowState": {
+										"sizeInfo": {
+											"width": 503,
+											"height": 129
+										},
+										"posInfo": {
+											"x": 315,
+											"y": 82
+										},
+										"state": 0,
+										"viewType": "Text"
+									}
+								}
+							}
+						},
+						"description": ""
+					}
+				},
+				"NOTES": {
+					"name": "NOTES",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": "This workspace converts workspaces to an updated format 0.40",
+						"description": ""
+					}
+				},
+				"workspace40": {
+					"name": "workspace40",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var newWorkspace = apogee.util.jsonCopy(workspace31);\n\nnewWorkspace.fileType = \"apogee app js workspace\";\nnewWorkspace.version = .40;\nnewWorkspace.references = newWorkspace.library;\ndelete newWorkspace.library;\n\nvar rootFolderName = newWorkspace.workspace.data.name;\nif(rootFolderName != \"Model\") {\n    newWorkspace.workspace.data.name = \"Model\";\n    newWorkspace.workspace.name = rootFolderName;\n}\nif(newWorkspace.workspace.name === undefined) {\n    newWorkspace.workspace.name = \"Workspace\";\n}\n\nreturn newWorkspace;\n",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"workspace31": {
+					"name": "workspace31",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "if(oldWorkspace.version == 0.31) {\n    return oldWorkspace;\n}\nelse {\n    var newWorkspace = apogee.util.jsonCopy(oldWorkspace);\n    \n    newWorkspace.fileType = \"apogee js web workspace\";\n    newWorkspace.version = .31;\n    \n    var oldComponents = newWorkspace.components;\n    newComponents = {};\n    newComponents.type = \"apogeeapp.app.FolderComponent\"\n    newComponents.children = oldComponents;\n    newWorkspace.components = newComponents;\n    \n    var jsEntries = newWorkspace.jsLinks.map( url => {return {\"url\":url,\"entryType\":\"js link\"}});\n    var cssEntries = newWorkspace.cssLinks.map( url => {return {\"url\":url,\"entryType\":\"css link\"}});\n    newWorkspace.library = jsEntries.concat(cssEntries);\n    delete newWorkspace.jsLinks;\n    delete newWorkspace.cssLinks;\n    \n    return newWorkspace;\n}\n",
+						"supplementalCode": "",
+						"description": ""
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"tabOpen": true,
+		"treeState": -1,
+		"children": {
+			"oldWorkspace": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 504,
+						"height": 475
+					},
+					"posInfo": {
+						"x": 14,
+						"y": 4
+					},
+					"state": 0,
+					"viewType": "Data"
+				},
+				"dataView": "JSON"
+			},
+			"NOTES": {
+				"type": "apogeeapp.app.TextComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 541,
+						"height": 233
+					},
+					"posInfo": {
+						"x": 708,
+						"y": 9
+					},
+					"state": 0,
+					"viewType": "Text"
+				}
+			},
+			"workspace40": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 726,
+						"height": 378
+					},
+					"posInfo": {
+						"x": 532,
+						"y": 311
+					},
+					"state": 0,
+					"viewType": "Data"
+				},
+				"dataView": "JSON"
+			},
+			"workspace31": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 626,
+						"height": 415
+					},
+					"posInfo": {
+						"x": 22,
+						"y": 174
+					},
+					"state": 0,
+					"viewType": "Data"
+				},
+				"dataView": "JSON"
+			}
+		}
+	},
+	"activeTabMember": "workspaceConvert",
+	"references": []
+}

@@ -20,8 +20,6 @@ apogeeapp.webapp.ApogeeWeb = function() {
     //these are a list of names of components that go in the "added component" list
     this.additionalComponents = [];
 	
-	this.linkManager = new apogeeapp.app.LinkManager();
-	
 	//load the standard component generators
 	this.loadComponentGenerators();
 	
@@ -70,20 +68,6 @@ apogeeapp.webapp.ApogeeWeb.prototype.clearWorkspaceUI = function() {
     this.workspaceUI = null;
     
     return true;
-}
-
-//==================================
-// Link Management
-//==================================
-
-/** This method adds links as registered by a given workspace. Links can be added and
- * removed. Removing links may or may not remove them from the page (currently
- * js links are not removed and css links are, once they are not used by any 
- * workspase. The linksLoadedCallback is optional. It is called when all links have
- * been loaded on the page.
- */
-apogeeapp.webapp.ApogeeWeb.prototype.updateWorkspaceLinks = function(ownerName,addList,removeList,linksLoadedCallback) {
-	this.linkManager.updateWorkspaceLinks(ownerName,addList,removeList,linksLoadedCallback);
 }
 
 //=================================

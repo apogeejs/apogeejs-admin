@@ -11,6 +11,7 @@ apogee.Workspace = function(optionalJson,actionResponseForJson,ownerForVirtualWo
     this.isDirty = false;
     this.actionInProgress = false;
     this.actionQueue = [];
+    this.name = apogee.Workspace.DEFAULT_WORKSPACE_NAME;
     
     if(ownerForVirtualWorkspace === undefined) ownerForVirtualWorkspace = null;
     this.owner = ownerForVirtualWorkspace;
@@ -29,7 +30,9 @@ apogee.base.mixin(apogee.Workspace,apogee.ContextHolder);
 apogee.base.mixin(apogee.Workspace,apogee.Owner);
 apogee.base.mixin(apogee.Workspace,apogee.RootHolder);
 
-apogee.Workspace.ROOT_FOLDER_NAME = "Workspace";
+
+apogee.Workspace.DEFAULT_WORKSPACE_NAME = "Workspace";
+apogee.Workspace.ROOT_FOLDER_NAME = "Model";
 
 /** this method should be used to set the workspace as dirty, meaning it has 
  * new data to be saved. */
@@ -45,6 +48,16 @@ apogee.Workspace.prototype.getIsDirty = function() {
 /** This method clears the is dirty flag. */
 apogee.Workspace.prototype.clearIsDirty = function() {
     this.isDirty = false;
+}
+
+/** This method returns the root object - implemented from RootHolder.  */
+apogee.Workspace.prototype.setName = function(name) {
+    this.name = name;
+}
+
+/** This method returns the root object - implemented from RootHolder.  */
+apogee.Workspace.prototype.getName = function() {
+    return this.name;
 }
 
 /** This method returns the root object - implemented from RootHolder.  */
@@ -221,6 +234,8 @@ apogee.Workspace.prototype.toJson = function(optionalSavedRootFolder) {
     json.fileType = apogee.Workspace.SAVE_FILE_TYPE;
     json.version = apogee.Workspace.SAVE_FILE_VERSION;
     
+    json.name = this.name;
+    
     var rootFolder;
     if(optionalSavedRootFolder) {
         rootFolder = optionalSavedRootFolder;
@@ -248,17 +263,16 @@ apogee.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     }
 	
     if(!actionResponse) actionResponse = new apogee.ActionResponse();
+    
+    if(json.name !== undefined) {
+        this.name = json.name;
+    }
 
     var actionData = json.data;
     actionData.action = "createMember";
     actionData.owner = this;
     actionData.workspace = this;
     apogee.action.doAction(actionData,false,actionResponse);
-    
-    //if we loaded the workspace, make sure it is clean 
-    if(actionResponse.success) {
-        this.clearIsDirty();
-    }
     
     return actionResponse;
 }

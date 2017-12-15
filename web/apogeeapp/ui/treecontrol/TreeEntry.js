@@ -47,8 +47,11 @@ apogeeapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback
         this.setLabel(labelText);
     }
     
-    this.childList = null;
-    this.childMap = {};
+    this.childContainer = null;
+    this.childEntries = [];
+    this.parent = null;
+    this.sortFunction = null;
+    this.extraSortParam = null;
     
     //set the non-empty state for in case we get children
     //but for now it will be empty
@@ -81,35 +84,49 @@ apogeeapp.ui.treecontrol.TreeEntry.prototype.getElement = function() {
     return this.element;
 }
 
+/** This sets a sort function for the children of the node. If none is set the
+ * children will be sorted by the order they are added. */
+apogeeapp.ui.treecontrol.TreeEntry.prototype.setSortFunction = function(sortFunction) {
+    this.sortFunction = sortFunction;
+}
+
 /** The label for the entry. */
 apogeeapp.ui.treecontrol.TreeEntry.prototype.setLabel = function(labelText) {
+    this.labelText = labelText;
     this.label.innerHTML = labelText;
-}
-
-apogeeapp.ui.treecontrol.TreeEntry.prototype.addChild = function(identifier,childTreeEntry) {
-    if(!this.childList) {
-        //add the child list if it does not exist
-        this.childList = apogeeapp.ui.createElementWithClass("ul","visiui-tc-child-list",this.element); 
-        this.setState(this.nonEmptyState);
+    if(this.parent) {
+        this.parent._notifyNameChange(this);
     }
-    this.childMap[identifier] = childTreeEntry;
-    this.childList.appendChild(childTreeEntry.getElement());
 }
 
-apogeeapp.ui.treecontrol.TreeEntry.prototype.removeChild = function(identifier) {
-    if(this.childList) {
-        var listEntry = this.childMap[identifier];
-        if(listEntry) {
-            delete this.childMap[identifier];
-            this.childList.removeChild(listEntry.getElement()); 
-            //remove the child list if there are no children
-            if(this.childList.childElementCount === 0) {
-                this.element.removeChild(this.childList);
-                this.childList = null;
-                //set state to empty, but save our old setting
-                this.nonEmtpyState = this.state;
-                this.setState(apogeeapp.ui.treecontrol.NO_CONTROL); 
-            }
+/** The label for the entry. */
+apogeeapp.ui.treecontrol.TreeEntry.prototype.getLabel = function() {
+    return this.labelText;
+}
+
+/** This allows for specified ordering of the chidlren. */
+apogeeapp.ui.treecontrol.TreeEntry.prototype.setExtraSortParam = function(value) {
+    this.extraSortParam = value;
+}
+
+/** This allows for specified ordering of the chidlren. */
+apogeeapp.ui.treecontrol.TreeEntry.prototype.getExtraSortParam = function() {
+    return this.extraSortParam;
+}
+
+apogeeapp.ui.treecontrol.TreeEntry.prototype.addChild = function(childTreeEntry) {
+    this.childEntries.push(childTreeEntry);
+    this._insertChildIntoList(childTreeEntry);
+    childTreeEntry._setParent(this);
+}
+
+apogeeapp.ui.treecontrol.TreeEntry.prototype.removeChild = function(childTreeEntry) {
+    if(this.childContainer) {
+        var index = this.childEntries.indexOf(childTreeEntry);
+        if(index >= 0) {
+            this.childEntries.splice(index,1);
+            this._removeChildFromList(childTreeEntry);
+            childTreeEntry._setParent(null);
         }
     }
 }
@@ -121,7 +138,7 @@ apogeeapp.ui.treecontrol.TreeEntry.prototype.getState = function() {
 apogeeapp.ui.treecontrol.TreeEntry.prototype.setState = function(state) {
     //if we have no children, always make the state no control
     //but we will store the state below for latert
-    if((!this.childList)||(this.childList.length == 0)) {
+    if((!this.childContainer)||(this.childContainer.length == 0)) {
         this.state = apogeeapp.ui.treecontrol.NO_CONTROL;
     }
     else {
@@ -153,7 +170,7 @@ apogeeapp.ui.treecontrol.TreeEntry.prototype.setState = function(state) {
         }
         
         this.control.onclick = this.collapse
-        this.childList.style.display = "";
+        this.childContainer.style.display = "";
     }
     else if(this.state == apogeeapp.ui.treecontrol.COLLAPSED) {
         this.control.src = this.expandUrl;
@@ -166,7 +183,7 @@ apogeeapp.ui.treecontrol.TreeEntry.prototype.setState = function(state) {
         }
         
         this.control.onclick = this.expand;
-        this.childList.style.display = "none";
+        this.childContainer.style.display = "none";
     }
 }
 
@@ -183,6 +200,65 @@ apogeeapp.ui.treecontrol.TreeEntry.prototype.clearIconOverlay = function() {
     apogeeapp.ui.removeAllChildren(this.iconOverlayElement);
 }
 
+//=====================================
+// Private
+//=====================================
+
+/** I want to make sure people don't do this themselves. It is done in add/remove child. 
+ * @private */
+apogeeapp.ui.treecontrol.TreeEntry.prototype._setParent = function(parent) {
+    this.parent = parent;
+}
+
+/** I want to make sure people don't do this themselves. It is done in add/remove child. 
+ * @private */
+apogeeapp.ui.treecontrol.TreeEntry.prototype._insertChildIntoList = function(childEntry) {
+    if(!this.childContainer) {
+        //add the child list if it does not exist
+        this.childContainer = apogeeapp.ui.createElementWithClass("ul","visiui-tc-child-list",this.element); 
+        this.setState(this.nonEmptyState);
+    }
+    
+    if(this.sortFunction) {
+        this._updateChildElements();
+    }
+    else {
+        this.childContainer.appendChild(childEntry.getElement());
+    }
+}
+
+/** I want to make sure people don't do this themselves. It is done in add/remove child. 
+ * @private */
+apogeeapp.ui.treecontrol.TreeEntry.prototype._removeChildFromList = function(childEntry) {
+    this.childContainer.removeChild(childEntry.getElement());
+    
+    //remove the child list if there are no children
+    if(this.childContainer.childElementCount === 0) {
+        this.element.removeChild(this.childContainer);
+        this.childContainer = null;
+        //set state to empty, but save our old setting
+        this.nonEmtpyState = this.state;
+        this.setState(apogeeapp.ui.treecontrol.NO_CONTROL); 
+    }
+}
+
+/** I want to make sure people don't do this themselves. It is done in add/remove child. 
+ * @private */
+apogeeapp.ui.treecontrol.TreeEntry.prototype._notifyNameChange = function(childEntry) {
+    if(this.sortFunction) {
+        this._updateChildElements();
+    }
+}
+
+/** This sets the children elements in the sorted order 
+ * @private */
+apogeeapp.ui.treecontrol.TreeEntry.prototype._updateChildElements = function() {
+  var temp = this.childEntries.map( element => element);
+  temp.sort(this.sortFunction);
+  apogeeapp.ui.removeAllChildren(this.childContainer);
+  temp.forEach(child => this.childContainer.appendChild(child.getElement()));
+
+}    
 
 
 

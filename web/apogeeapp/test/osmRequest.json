@@ -1,12 +1,10 @@
 {
-	"fileType": "apogee js web workspace",
-	"jsLinks": [],
-	"cssLinks": [],
+	"fileType": "apogee app js workspace",
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "osmRequest",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"url": {
@@ -87,7 +85,8 @@
 					}
 				}
 			}
-		}
+		},
+		"name": "osmRequest"
 	},
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
@@ -198,5 +197,7 @@
 				}
 			}
 		}
-	}
+	},
+	"version": 0.4,
+	"references": []
 }

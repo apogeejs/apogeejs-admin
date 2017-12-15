@@ -1,1 +1,616 @@
-{"fileType":"apogee workspace","jsLinks":[],"cssLinks":[],"workspace":{"fileType":"apogee workspace","version":0.2,"data":{"name":"fieldDefs","type":"apogee.Folder","children":{"db_tables":{"name":"db_tables","type":"apogee.Folder","children":{"file_entry":{"name":"file_entry","type":"apogee.JsonTable","updateData":{"data":{"entry_context":"auth string, sort of","entry_name":"a unique descriptive name","file_type_id":"file type","entry_section":"section of meta file","entry_key":"the key for this entry data","option_name":"name for this entry","entry_data":"data"},"description":""}},"meta_file":{"name":"meta_file","type":"apogee.JsonTable","updateData":{"data":{"file_type_id":"the file type","file_context":"domain for the file (the auth string, sort of)","name":"a reference name for the file","use_type":"the type fo meta data file - base or override"},"description":""}},"file_type":{"name":"file_type","type":"apogee.JsonTable","updateData":{"data":{"file_type_name":"The name of the file type."},"description":""}},"recipe_entry":{"name":"recipe_entry","type":"apogee.JsonTable","updateData":{"data":{"meta_file_id":"the file for this entry","file_entry_id":"the entry","insertion_info":{"DESC":"additional info for entry in file as a json object","FIELDS":{"orderedEntry":"number giving an ordered subsection section for this entry (optional)","taggedEntry":"string giving a tagged subsection for this entry (optional)"}}},"description":""}},"com_file":{"name":"com_file","type":"apogee.JsonTable","updateData":{"data":{"file_context":"the cid for the file (as an auth string)","name":"a reference name for the file","ref":"currently used to indicate legacy or normal meta data"},"description":""}},"com_file_entry":{"name":"com_file_entry","type":"apogee.JsonTable","updateData":{"data":{"com_file_id":"the com file for this entry","meta_file_id":"the meta file that composes this entry","file_group":"json array of strings for the file usage","ordr":"Ordering value for entry in com file"},"description":""}},"meta_parent_entry":{"name":"meta_parent_entry","type":"apogee.JsonTable","updateData":{"data":{"meta_file_id":"the file for this entry","parent_file_id":"the parent meta file","relation":"either 'depends on' or 'overrides' "},"description":""}}}},"entry_data_format":{"name":"entry_data_format","type":"apogee.Folder","children":{"theme":{"name":"theme","type":"apogee.JsonTable","updateData":{"data":{"entry_section":["style","icon","labelStyle","marker"],"entry_namee":"the display name of this entry","entry_key":"the lookup name of this entry","entry_data":{"STYLE SECTION":{"m":"body color","o":"outline color","w":"outline width","l":"label style","t":"text color (alternative to label style - deprecated)","zmin":"min zoom scale to show object","img":"background image","shadow":"drop shadow array values"},"ICON SECTION":{"lt":"label type integer (none/text/icon/image)","r":"reference","ar":"absolute reference (must be translated)","url":"url for image or icon","rurl":"relative url (to iurl) fro image or icon DEPRECATE THIS"},"LABEL STYLE SECTION":{"font":"font","minFont":"pixels","maxFont":"pixels","caps":"","fill":"","outline":"","outlineWidth":"","padding":"","bgFill":"","bgOutline":"","bgOutlineWidth":"","bgPadding":"","bgR":"","bgShadow":"","zmin":"min scale to display"},"MARKER SECTION":{"src":"url","ox":"offset x","oy":"offset y"}}},"description":""}},"strings":{"name":"strings","type":"apogee.JsonTable","updateData":{"data":{"entry_section":["language code"],"entry_name":"a display name for the entry: ","entry_key":"the lookup key","entry_data":{"trans":"translation into the given language"}},"description":""}},"inputColors":{"name":"inputColors","type":"apogee.JsonTable","updateData":{"data":{"entry_section":["inputMap"],"entry_name":"a display name for this entry","entry_key":"the property string, ordered","entry_data":{"props":"map of key value properties","legacyProps":"map of key vbalue pairs, legacy values","doLinearArea":"how to handle lines","color":"the color corresponding to this entry"}},"description":""}},"themeRules":{"name":"themeRules","type":"apogee.JsonTable","updateData":{"data":{"entry_section":["label","style"],"entry_name":"a display name for this entry","entry_key":"the name for this entry","entry_data":{"propType":"the key type - geometry, entity or address. FOR NOW only one allowed.","path":"an array of key value pairs. The value may be omitted if 'any' is acceptable. FOR NOW, only do this at the end of the path.","legacyPath":"an array path in legacy values","payload":{"LABEL SECTION ENTRY":{"lt":"label type","r":"the reference value (not used for type 0)","trans":"flag to translate the ref value - for text label only. (optional)"},"STYLE SECTION ENTRY":{"n":"name of the style entry from the theme file"}}}},"description":""}},"propertyRules":{"name":"propertyRules","type":"apogee.JsonTable","updateData":{"data":{"section":["community_map","community_entity","drawing","level","geometry","entity","chain","link","node","named_entries"],"entry_name":"the display name for this entry","entry_key":"the looup name for this entry","entry_data":{"name":"name for feature type","extends":"parent entry name that is extended (optional)","modifies":"parent entry name that is modified (optional)","deletes":"parent entry name that is deleted (optional)","description":"description","properties":{"DESC":"Properties for this type of object.","ENTRY FORMAT":{"key":"the property key","type":{"DESC":"type of property, text valued from, options below","OPTIONS":{"enum":{"DESC":"list of allowed values","ADDITIONAL FIELDS":{"values":{"DESC":"an array of value entries","ENTRY FORMAT":{"value":"the value","description":"A description of this value entry. (optional)"}}}},"type":{"DESC":"like an enum, but there is an individual preset entry for each value","ADDITIONAL FIELDS":{"value":"The value of this entry"}},"conditional":{"DESC":"This is a key whose properties are conditional on the value of other properties.","ADDITIONAL FIELDS":{"conditionalKey":"The key on which the option will be selected","cases":"A map of values, each including a key definition to use in this case.","default":"A key definition to use if no valid cases are present. If there is no default, no key is used."}},"multikey":{"DESC":"multiple keys, one of which may be selected","ADDITIONAL FIELDS":{"options":"an aray of key definitions to select from"}},"text":{"DESC":"free text input","ADDITIONAL FIELDS":{"has_lang":"the property value is language specific","is_array":"the input allows an array of values"}},"boolean":{"DESC":"boolean value","ADDITIONAL FIELDS":{}},"fixed":{"DESC":"a constant value. These fields are required.","ADDITIONAL FIELDS":{"value":"The value for this fixed property"}},"named_entry":{"DESC":"a reference to a named group of properties","ADDITIONAL FIELDS":{"named_entry":"the name of the group"}}}},"required":"indicates property required (optional)","description":"description","prop":"a list of properties for this property","action":{"DESC":"instruction for how to apply property","OPTIONS":{"create":"This means create a new entry (default - no need to use this entry)","replace":"This entry replace an existing property of the same name","modify":"This entry modifies an existing property of the same name.","delete":"This entry deletes an existing property of the same name"}},"legacyKey":"Used in multikeys that are being converted. This is the legacy key.","altKey":"Used for geom when mulitple old multikeys were combined to a single feature type.","legacyValue":"Used in multikeys that are being converted. This is the legacy value."}}}},"description":""}}}},"metaFileDependencies":{"name":"metaFileDependencies","type":"apogee.JsonTable","updateData":{"data":{"propertyRules":[],"themeRules":["propertyRules"],"theme":["themeRules"],"strings":["propertyRules","themeRules"],"inputColors":["propertyRules"]},"description":""}}}}},"components":{"db_tables":{"type":"apogeeapp.app.FolderComponent","windowState":{"posInfo":{"x":25,"y":25}},"children":{"file_entry":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":432,"height":193},"posInfo":{"x":21,"y":350},"state":0,"viewType":"Data"},"dataView":"Plain"},"meta_file":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":539,"height":102},"posInfo":{"x":611,"y":36},"state":0,"viewType":"Data"},"dataView":"Plain"},"file_type":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":424,"height":75},"posInfo":{"x":26,"y":604},"state":0,"viewType":"Data"},"dataView":"Plain"},"recipe_entry":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":797,"height":154},"posInfo":{"x":612,"y":203},"state":0,"viewType":"Data"},"dataView":"Plain"},"com_file":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":510,"height":123},"posInfo":{"x":23,"y":22},"state":0,"viewType":"Data"},"dataView":"Plain"},"com_file_entry":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":508,"height":111},"posInfo":{"x":23,"y":189},"state":0,"viewType":"Data"},"dataView":"Plain"},"meta_parent_entry":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":552,"height":79},"posInfo":{"x":608,"y":411},"state":0,"viewType":"Data"},"dataView":"Plain"}}},"entry_data_format":{"type":"apogeeapp.app.FolderComponent","windowState":{"posInfo":{"x":19,"y":70}},"children":{"theme":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":581,"height":631},"posInfo":{"x":60,"y":118},"state":-1,"viewType":"Data"},"dataView":"Plain"},"strings":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":532,"height":212},"posInfo":{"x":60,"y":161},"state":-1,"viewType":"Data"},"dataView":"Plain"},"inputColors":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":569,"height":265},"posInfo":{"x":59,"y":211},"state":-1,"viewType":"Data"},"dataView":"Plain"},"themeRules":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":1160,"height":495},"posInfo":{"x":60,"y":71},"state":-1,"viewType":"Data"},"dataView":"Plain"},"propertyRules":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":696,"height":660},"posInfo":{"x":59,"y":21},"state":-1,"viewType":"Data"},"dataView":"Plain"}}},"metaFileDependencies":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"sizeInfo":{"width":396,"height":269},"posInfo":{"x":19,"y":195},"state":0,"viewType":"Data"},"dataView":"Plain"}}}
+{
+	"fileType": "apogee app js workspace",
+	"workspace": {
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "Model",
+			"type": "apogee.Folder",
+			"children": {
+				"db_tables": {
+					"name": "db_tables",
+					"type": "apogee.Folder",
+					"children": {
+						"file_entry": {
+							"name": "file_entry",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"entry_context": "auth string, sort of",
+									"entry_name": "a unique descriptive name",
+									"file_type_id": "file type",
+									"entry_section": "section of meta file",
+									"entry_key": "the key for this entry data",
+									"option_name": "name for this entry",
+									"entry_data": "data"
+								},
+								"description": ""
+							}
+						},
+						"meta_file": {
+							"name": "meta_file",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"file_type_id": "the file type",
+									"file_context": "domain for the file (the auth string, sort of)",
+									"name": "a reference name for the file",
+									"use_type": "the type fo meta data file - base or override"
+								},
+								"description": ""
+							}
+						},
+						"file_type": {
+							"name": "file_type",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"file_type_name": "The name of the file type."
+								},
+								"description": ""
+							}
+						},
+						"recipe_entry": {
+							"name": "recipe_entry",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"meta_file_id": "the file for this entry",
+									"file_entry_id": "the entry",
+									"insertion_info": {
+										"DESC": "additional info for entry in file as a json object",
+										"FIELDS": {
+											"orderedEntry": "number giving an ordered subsection section for this entry (optional)",
+											"taggedEntry": "string giving a tagged subsection for this entry (optional)"
+										}
+									}
+								},
+								"description": ""
+							}
+						},
+						"com_file": {
+							"name": "com_file",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"file_context": "the cid for the file (as an auth string)",
+									"name": "a reference name for the file",
+									"ref": "currently used to indicate legacy or normal meta data"
+								},
+								"description": ""
+							}
+						},
+						"com_file_entry": {
+							"name": "com_file_entry",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"com_file_id": "the com file for this entry",
+									"meta_file_id": "the meta file that composes this entry",
+									"file_group": "json array of strings for the file usage",
+									"ordr": "Ordering value for entry in com file"
+								},
+								"description": ""
+							}
+						},
+						"meta_parent_entry": {
+							"name": "meta_parent_entry",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"meta_file_id": "the file for this entry",
+									"parent_file_id": "the parent meta file",
+									"relation": "either 'depends on' or 'overrides' "
+								},
+								"description": ""
+							}
+						}
+					}
+				},
+				"entry_data_format": {
+					"name": "entry_data_format",
+					"type": "apogee.Folder",
+					"children": {
+						"theme": {
+							"name": "theme",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"entry_section": [
+										"style",
+										"icon",
+										"labelStyle",
+										"marker"
+									],
+									"entry_namee": "the display name of this entry",
+									"entry_key": "the lookup name of this entry",
+									"entry_data": {
+										"STYLE SECTION": {
+											"m": "body color",
+											"o": "outline color",
+											"w": "outline width",
+											"l": "label style",
+											"t": "text color (alternative to label style - deprecated)",
+											"zmin": "min zoom scale to show object",
+											"img": "background image",
+											"shadow": "drop shadow array values"
+										},
+										"ICON SECTION": {
+											"lt": "label type integer (none/text/icon/image)",
+											"r": "reference",
+											"ar": "absolute reference (must be translated)",
+											"url": "url for image or icon",
+											"rurl": "relative url (to iurl) fro image or icon DEPRECATE THIS"
+										},
+										"LABEL STYLE SECTION": {
+											"font": "font",
+											"minFont": "pixels",
+											"maxFont": "pixels",
+											"caps": "",
+											"fill": "",
+											"outline": "",
+											"outlineWidth": "",
+											"padding": "",
+											"bgFill": "",
+											"bgOutline": "",
+											"bgOutlineWidth": "",
+											"bgPadding": "",
+											"bgR": "",
+											"bgShadow": "",
+											"zmin": "min scale to display"
+										},
+										"MARKER SECTION": {
+											"src": "url",
+											"ox": "offset x",
+											"oy": "offset y"
+										}
+									}
+								},
+								"description": ""
+							}
+						},
+						"strings": {
+							"name": "strings",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"entry_section": [
+										"language code"
+									],
+									"entry_name": "a display name for the entry: ",
+									"entry_key": "the lookup key",
+									"entry_data": {
+										"trans": "translation into the given language"
+									}
+								},
+								"description": ""
+							}
+						},
+						"inputColors": {
+							"name": "inputColors",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"entry_section": [
+										"inputMap"
+									],
+									"entry_name": "a display name for this entry",
+									"entry_key": "the property string, ordered",
+									"entry_data": {
+										"props": "map of key value properties",
+										"legacyProps": "map of key vbalue pairs, legacy values",
+										"doLinearArea": "how to handle lines",
+										"color": "the color corresponding to this entry"
+									}
+								},
+								"description": ""
+							}
+						},
+						"themeRules": {
+							"name": "themeRules",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"entry_section": [
+										"label",
+										"style"
+									],
+									"entry_name": "a display name for this entry",
+									"entry_key": "the name for this entry",
+									"entry_data": {
+										"propType": "the key type - geometry, entity or address. FOR NOW only one allowed.",
+										"path": "an array of key value pairs. The value may be omitted if 'any' is acceptable. FOR NOW, only do this at the end of the path.",
+										"legacyPath": "an array path in legacy values",
+										"payload": {
+											"LABEL SECTION ENTRY": {
+												"lt": "label type",
+												"r": "the reference value (not used for type 0)",
+												"trans": "flag to translate the ref value - for text label only. (optional)"
+											},
+											"STYLE SECTION ENTRY": {
+												"n": "name of the style entry from the theme file"
+											}
+										}
+									}
+								},
+								"description": ""
+							}
+						},
+						"propertyRules": {
+							"name": "propertyRules",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"section": [
+										"community_map",
+										"community_entity",
+										"drawing",
+										"level",
+										"geometry",
+										"entity",
+										"chain",
+										"link",
+										"node",
+										"named_entries"
+									],
+									"entry_name": "the display name for this entry",
+									"entry_key": "the looup name for this entry",
+									"entry_data": {
+										"name": "name for feature type",
+										"extends": "parent entry name that is extended (optional)",
+										"modifies": "parent entry name that is modified (optional)",
+										"deletes": "parent entry name that is deleted (optional)",
+										"description": "description",
+										"properties": {
+											"DESC": "Properties for this type of object.",
+											"ENTRY FORMAT": {
+												"key": "the property key",
+												"type": {
+													"DESC": "type of property, text valued from, options below",
+													"OPTIONS": {
+														"enum": {
+															"DESC": "list of allowed values",
+															"ADDITIONAL FIELDS": {
+																"values": {
+																	"DESC": "an array of value entries",
+																	"ENTRY FORMAT": {
+																		"value": "the value",
+																		"description": "A description of this value entry. (optional)"
+																	}
+																}
+															}
+														},
+														"type": {
+															"DESC": "like an enum, but there is an individual preset entry for each value",
+															"ADDITIONAL FIELDS": {
+																"value": "The value of this entry"
+															}
+														},
+														"conditional": {
+															"DESC": "This is a key whose properties are conditional on the value of other properties.",
+															"ADDITIONAL FIELDS": {
+																"conditionalKey": "The key on which the option will be selected",
+																"cases": "A map of values, each including a key definition to use in this case.",
+																"default": "A key definition to use if no valid cases are present. If there is no default, no key is used."
+															}
+														},
+														"multikey": {
+															"DESC": "multiple keys, one of which may be selected",
+															"ADDITIONAL FIELDS": {
+																"options": "an aray of key definitions to select from"
+															}
+														},
+														"text": {
+															"DESC": "free text input",
+															"ADDITIONAL FIELDS": {
+																"has_lang": "the property value is language specific",
+																"is_array": "the input allows an array of values"
+															}
+														},
+														"boolean": {
+															"DESC": "boolean value",
+															"ADDITIONAL FIELDS": {}
+														},
+														"fixed": {
+															"DESC": "a constant value. These fields are required.",
+															"ADDITIONAL FIELDS": {
+																"value": "The value for this fixed property"
+															}
+														},
+														"named_entry": {
+															"DESC": "a reference to a named group of properties",
+															"ADDITIONAL FIELDS": {
+																"named_entry": "the name of the group"
+															}
+														}
+													}
+												},
+												"required": "indicates property required (optional)",
+												"description": "description",
+												"prop": "a list of properties for this property",
+												"action": {
+													"DESC": "instruction for how to apply property",
+													"OPTIONS": {
+														"create": "This means create a new entry (default - no need to use this entry)",
+														"replace": "This entry replace an existing property of the same name",
+														"modify": "This entry modifies an existing property of the same name.",
+														"delete": "This entry deletes an existing property of the same name"
+													}
+												},
+												"legacyKey": "Used in multikeys that are being converted. This is the legacy key.",
+												"altKey": "Used for geom when mulitple old multikeys were combined to a single feature type.",
+												"legacyValue": "Used in multikeys that are being converted. This is the legacy value."
+											}
+										}
+									}
+								},
+								"description": ""
+							}
+						}
+					}
+				},
+				"metaFileDependencies": {
+					"name": "metaFileDependencies",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": {
+							"propertyRules": [],
+							"themeRules": [
+								"propertyRules"
+							],
+							"theme": [
+								"themeRules"
+							],
+							"strings": [
+								"propertyRules",
+								"themeRules"
+							],
+							"inputColors": [
+								"propertyRules"
+							]
+						},
+						"description": ""
+					}
+				}
+			}
+		},
+		"name": "fieldDefs"
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"children": {
+			"db_tables": {
+				"type": "apogeeapp.app.FolderComponent",
+				"windowState": {
+					"posInfo": {
+						"x": 25,
+						"y": 25
+					}
+				},
+				"children": {
+					"file_entry": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 432,
+								"height": 193
+							},
+							"posInfo": {
+								"x": 21,
+								"y": 350
+							},
+							"state": 0,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					},
+					"meta_file": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 539,
+								"height": 102
+							},
+							"posInfo": {
+								"x": 611,
+								"y": 36
+							},
+							"state": 0,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					},
+					"file_type": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 424,
+								"height": 75
+							},
+							"posInfo": {
+								"x": 26,
+								"y": 604
+							},
+							"state": 0,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					},
+					"recipe_entry": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 797,
+								"height": 154
+							},
+							"posInfo": {
+								"x": 612,
+								"y": 203
+							},
+							"state": 0,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					},
+					"com_file": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 510,
+								"height": 123
+							},
+							"posInfo": {
+								"x": 23,
+								"y": 22
+							},
+							"state": 0,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					},
+					"com_file_entry": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 508,
+								"height": 111
+							},
+							"posInfo": {
+								"x": 23,
+								"y": 189
+							},
+							"state": 0,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					},
+					"meta_parent_entry": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 552,
+								"height": 79
+							},
+							"posInfo": {
+								"x": 608,
+								"y": 411
+							},
+							"state": 0,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					}
+				}
+			},
+			"entry_data_format": {
+				"type": "apogeeapp.app.FolderComponent",
+				"windowState": {
+					"posInfo": {
+						"x": 19,
+						"y": 70
+					}
+				},
+				"children": {
+					"theme": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 581,
+								"height": 631
+							},
+							"posInfo": {
+								"x": 60,
+								"y": 118
+							},
+							"state": -1,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					},
+					"strings": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 532,
+								"height": 212
+							},
+							"posInfo": {
+								"x": 60,
+								"y": 161
+							},
+							"state": -1,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					},
+					"inputColors": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 569,
+								"height": 265
+							},
+							"posInfo": {
+								"x": 59,
+								"y": 211
+							},
+							"state": -1,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					},
+					"themeRules": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 1160,
+								"height": 495
+							},
+							"posInfo": {
+								"x": 60,
+								"y": 71
+							},
+							"state": -1,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					},
+					"propertyRules": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"sizeInfo": {
+								"width": 696,
+								"height": 660
+							},
+							"posInfo": {
+								"x": 59,
+								"y": 21
+							},
+							"state": -1,
+							"viewType": "Data"
+						},
+						"dataView": "Plain"
+					}
+				}
+			},
+			"metaFileDependencies": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 396,
+						"height": 269
+					},
+					"posInfo": {
+						"x": 19,
+						"y": 195
+					},
+					"state": 0,
+					"viewType": "Data"
+				},
+				"dataView": "Plain"
+			}
+		}
+	},
+	"version": 0.4,
+	"references": []
+}

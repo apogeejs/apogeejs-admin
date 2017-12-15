@@ -1,12 +1,10 @@
 {
-	"fileType": "apogee js web workspace",
-	"jsLinks": [],
-	"cssLinks": [],
+	"fileType": "apogee app js workspace",
 	"workspace": {
 		"fileType": "apogee workspace",
 		"version": 0.2,
 		"data": {
-			"name": "folderFunctionExample",
+			"name": "Model",
 			"type": "apogee.Folder",
 			"children": {
 				"getRevenueGrid": {
@@ -90,7 +88,8 @@
 					}
 				}
 			}
-		}
+		},
+		"name": "folderFunctionExample"
 	},
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
@@ -149,5 +148,7 @@
 				}
 			}
 		}
-	}
+	},
+	"version": 0.4,
+	"references": []
 }

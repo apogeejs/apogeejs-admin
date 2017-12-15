@@ -1,1 +1,142 @@
-{"name":"CloudTest","fileType":"apogee workspace","jsLinks":["https://apis.google.com/js/client.js","/apogee/dev/GoogleDrive/GoogleSheetsWrapper.js"],"cssLinks":[],"workspace":{"name":"CloudTest","fileType":"apogee workspace","version":0.2,"data":{"name":"CloudTest","type":"apogee.Folder","children":{"Load":{"name":"Load","type":"apogee.Control","updateData":{"argList":["resource"],"functionBody":"resource.setCallbacks(onDownloadPress,onAddPress,onUploadPress);","supplementalCode":"\r\n\r\nvar CLIENT_ID = '933018598900-o6ejkguvna42eu66epreehm5nuirocua.apps.googleusercontent.com'; //intransix\r\nvar spreadsheetId = '1VlcMRBzYsalrRw4E9W2D5c6-cowftX5QY6w4gbjFUWE';\r\nvar range = 'Sheet1!A1:G'; \r\n\r\nfunction onDownloadPress() {\r\n    var downloadAction = function() {\r\n        getRange(spreadsheetId,range,onDownload);\r\n    }\r\n    \r\n    initiateAction(downloadAction,CLIENT_ID);\r\n}\r\n\r\nfunction onAddPress() {\r\n    var date = new Date();\r\n    var name = date.toUTCString();\r\n    var addAction = function() {\r\n        addNewSheet(spreadsheetId,name,onResult);\r\n    }\r\n    \r\n    initiateAction(addAction,CLIENT_ID);\r\n}\r\n\r\nfunction onUploadPress() {\r\n    var uploadAction = function() {\r\n        doUpload(spreadsheetId,range,grid,onResult);\r\n    }\r\n    \r\n    initiateAction(uploadAction,CLIENT_ID);\r\n}\r\n\r\n\r\nfunction onDownload(response) {\r\n    var range = response.result;\r\n    if (range.values.length > 0) {\r\n        setTableData(range.values);\r\n    } else {\r\n        alert('No data found.');\r\n    }\r\n}\r\n\r\nfunction setTableData(data) {\r\n    var workspace = app.getWorkspace(\"CloudTest\");\r\n    var rootFolder = workspace.getRoot();\r\n    var gridTable = rootFolder.lookupChildFromPathArray([\"grid\"]);\r\n    if(gridTable) {\r\n        var actionResponse = apogee.updatemember.updateData(gridTable,data);\r\n        if(actionResponse.getSuccess()) {\r\n            //alert(\"Data loaded!\");\r\n        }\r\n        else {\r\n            alert(actionResponse.getErrorMsg());\r\n        }\r\n    }\r\n    \r\n}\r\n\r\nfunction onResult(response) {\r\n    alert(JSON.stringify(response));\r\n}\r\n\r\n\r\n\r\n"}},"grid":{"name":"grid","type":"apogee.JsonTable","updateData":{"data":[["kjhgkjhg","3:14:00","10,000 Maniacs","Blind Man's Zoo","Pop","","8"],["Sentimientos","4:31:00","Andres Linetzky & Ernesto Romeo","Chai Room","Reggae","","10"],["Slipped away","3:34:00","AVRil Lavigne","My worldl","Blues","","10"],["Allentown","3:50:00","Billy Joel","The Essential Billy Joel","Rock"],["An Innocent Man","5:18:00","Billy Joel","An Innocent Man","Soft Rock","","10"],["Careless Talk","3:47:00","Billy Joel","An Innocent Man","Soft Rock"],["Christie Lee","3:30:00","Billy Joel","An Innocent Man","Soft Rock"],["Easy  OLD END!","4:06:00","Billy Joel","An Innocent Man","Soft Rock"]]}}}}},"components":{"Load":{"key":"CloudTest:Load","type":"apogeeapp.app.CustomControlComponent","coordInfo":{"x":37,"y":63,"width":915,"height":870},"windowState":0,"resource":{"html":"","customizeScript":"var resource = {};\r\n\r\nresource.setComponent = function(component) {\r\n    var loadButton = document.createElement(\"input\");\r\n    loadButton.setAttribute(\"type\",\"button\");\r\n    loadButton.value = \"Download\";\r\n    loadButton.onclick = function() {\r\n        if(resource.onDownload) {\r\n            resource.onDownload();\r\n        }\r\n    }\r\n    \r\n    var addSheetButton = document.createElement(\"input\");\r\n    addSheetButton.setAttribute(\"type\",\"button\");\r\n    addSheetButton.value = \"Add Sheet\";\r\n    addSheetButton.onclick = function() {\r\n        if(resource.onAdd) {\r\n            resource.onAdd();\r\n        }\r\n    }\r\n    \r\n    var saveButton = document.createElement(\"input\");\r\n    saveButton.setAttribute(\"type\",\"button\");\r\n    saveButton.value = \"Upload\";\r\n    saveButton.onclick = function() {\r\n        if(resource.onUpload) {\r\n            resource.onUpload();\r\n        }\r\n    }\r\n    \r\n    var container = component.getOutputElement();\r\n    container.innerHTML = \"\";\r\n    container.appendChild(loadButton);\r\n    container.appendChild(addSheetButton);\r\n    container.appendChild(saveButton);\r\n}\r\n\r\nresource.setCallbacks = function(onDownload,onAdd,onUpload) {\r\n    resource.onDownload = onDownload;\r\n    resource.onAdd = onAdd;\r\n    resource.onUpload = onUpload;\r\n}\r\n\r\nreturn resource;\r\n","supplementalCode":"","css":""}},"grid":{"key":"CloudTest:grid","type":"apogeeapp.app.GridTableComponent","coordInfo":{"x":572,"y":40,"width":908,"height":637},"windowState":0}}}
+{
+	"name": "CloudTest",
+	"fileType": "apogee app js workspace",
+	"workspace": {
+		"name": "CloudTest",
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "Model",
+			"type": "apogee.Folder",
+			"children": {
+				"Load": {
+					"name": "Load",
+					"type": "apogee.Control",
+					"updateData": {
+						"argList": [
+							"resource"
+						],
+						"functionBody": "resource.setCallbacks(onDownloadPress,onAddPress,onUploadPress);",
+						"supplementalCode": "\r\n\r\nvar CLIENT_ID = '933018598900-o6ejkguvna42eu66epreehm5nuirocua.apps.googleusercontent.com'; //intransix\r\nvar spreadsheetId = '1VlcMRBzYsalrRw4E9W2D5c6-cowftX5QY6w4gbjFUWE';\r\nvar range = 'Sheet1!A1:G'; \r\n\r\nfunction onDownloadPress() {\r\n    var downloadAction = function() {\r\n        getRange(spreadsheetId,range,onDownload);\r\n    }\r\n    \r\n    initiateAction(downloadAction,CLIENT_ID);\r\n}\r\n\r\nfunction onAddPress() {\r\n    var date = new Date();\r\n    var name = date.toUTCString();\r\n    var addAction = function() {\r\n        addNewSheet(spreadsheetId,name,onResult);\r\n    }\r\n    \r\n    initiateAction(addAction,CLIENT_ID);\r\n}\r\n\r\nfunction onUploadPress() {\r\n    var uploadAction = function() {\r\n        doUpload(spreadsheetId,range,grid,onResult);\r\n    }\r\n    \r\n    initiateAction(uploadAction,CLIENT_ID);\r\n}\r\n\r\n\r\nfunction onDownload(response) {\r\n    var range = response.result;\r\n    if (range.values.length > 0) {\r\n        setTableData(range.values);\r\n    } else {\r\n        alert('No data found.');\r\n    }\r\n}\r\n\r\nfunction setTableData(data) {\r\n    var workspace = app.getWorkspace(\"CloudTest\");\r\n    var rootFolder = workspace.getRoot();\r\n    var gridTable = rootFolder.lookupChildFromPathArray([\"grid\"]);\r\n    if(gridTable) {\r\n        var actionResponse = apogee.updatemember.updateData(gridTable,data);\r\n        if(actionResponse.getSuccess()) {\r\n            //alert(\"Data loaded!\");\r\n        }\r\n        else {\r\n            alert(actionResponse.getErrorMsg());\r\n        }\r\n    }\r\n    \r\n}\r\n\r\nfunction onResult(response) {\r\n    alert(JSON.stringify(response));\r\n}\r\n\r\n\r\n\r\n"
+					}
+				},
+				"grid": {
+					"name": "grid",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": [
+							[
+								"kjhgkjhg",
+								"3:14:00",
+								"10,000 Maniacs",
+								"Blind Man's Zoo",
+								"Pop",
+								"",
+								"8"
+							],
+							[
+								"Sentimientos",
+								"4:31:00",
+								"Andres Linetzky & Ernesto Romeo",
+								"Chai Room",
+								"Reggae",
+								"",
+								"10"
+							],
+							[
+								"Slipped away",
+								"3:34:00",
+								"AVRil Lavigne",
+								"My worldl",
+								"Blues",
+								"",
+								"10"
+							],
+							[
+								"Allentown",
+								"3:50:00",
+								"Billy Joel",
+								"The Essential Billy Joel",
+								"Rock"
+							],
+							[
+								"An Innocent Man",
+								"5:18:00",
+								"Billy Joel",
+								"An Innocent Man",
+								"Soft Rock",
+								"",
+								"10"
+							],
+							[
+								"Careless Talk",
+								"3:47:00",
+								"Billy Joel",
+								"An Innocent Man",
+								"Soft Rock"
+							],
+							[
+								"Christie Lee",
+								"3:30:00",
+								"Billy Joel",
+								"An Innocent Man",
+								"Soft Rock"
+							],
+							[
+								"Easy  OLD END!",
+								"4:06:00",
+								"Billy Joel",
+								"An Innocent Man",
+								"Soft Rock"
+							]
+						]
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"children": {
+			"Load": {
+				"key": "CloudTest:Load",
+				"type": "apogeeapp.app.CustomControlComponent",
+				"coordInfo": {
+					"x": 37,
+					"y": 63,
+					"width": 915,
+					"height": 870
+				},
+				"windowState": 0,
+				"resource": {
+					"html": "",
+					"customizeScript": "var resource = {};\r\n\r\nresource.setComponent = function(component) {\r\n    var loadButton = document.createElement(\"input\");\r\n    loadButton.setAttribute(\"type\",\"button\");\r\n    loadButton.value = \"Download\";\r\n    loadButton.onclick = function() {\r\n        if(resource.onDownload) {\r\n            resource.onDownload();\r\n        }\r\n    }\r\n    \r\n    var addSheetButton = document.createElement(\"input\");\r\n    addSheetButton.setAttribute(\"type\",\"button\");\r\n    addSheetButton.value = \"Add Sheet\";\r\n    addSheetButton.onclick = function() {\r\n        if(resource.onAdd) {\r\n            resource.onAdd();\r\n        }\r\n    }\r\n    \r\n    var saveButton = document.createElement(\"input\");\r\n    saveButton.setAttribute(\"type\",\"button\");\r\n    saveButton.value = \"Upload\";\r\n    saveButton.onclick = function() {\r\n        if(resource.onUpload) {\r\n            resource.onUpload();\r\n        }\r\n    }\r\n    \r\n    var container = component.getOutputElement();\r\n    container.innerHTML = \"\";\r\n    container.appendChild(loadButton);\r\n    container.appendChild(addSheetButton);\r\n    container.appendChild(saveButton);\r\n}\r\n\r\nresource.setCallbacks = function(onDownload,onAdd,onUpload) {\r\n    resource.onDownload = onDownload;\r\n    resource.onAdd = onAdd;\r\n    resource.onUpload = onUpload;\r\n}\r\n\r\nreturn resource;\r\n",
+					"supplementalCode": "",
+					"css": ""
+				}
+			},
+			"grid": {
+				"key": "CloudTest:grid",
+				"type": "apogeeapp.app.GridTableComponent",
+				"coordInfo": {
+					"x": 572,
+					"y": 40,
+					"width": 908,
+					"height": 637
+				},
+				"windowState": 0
+			}
+		}
+	},
+	"version": 0.4,
+	"references": [
+		{
+			"url": "https://apis.google.com/js/client.js",
+			"entryType": "js link"
+		},
+		{
+			"url": "/apogee/dev/GoogleDrive/GoogleSheetsWrapper.js",
+			"entryType": "js link"
+		}
+	]
+}
