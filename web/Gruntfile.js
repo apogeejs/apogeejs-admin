@@ -166,6 +166,7 @@ module.exports = function(grunt) {
                 "banner":"/* Apogee NPM App Version <%= pkg.version %> */\n"
             },
             "src": [
+                "supplemental/npmAppHeader.js",
                 "../../dist/lib/apogee-base-app.js",
                 "supplemental/electronCode/custom_menus_electron.js",
                 "supplemental/electronCode/file_impl_electron.js",
@@ -243,9 +244,12 @@ module.exports = function(grunt) {
           {expand: true, flatten: false, src: ['lib/**'], dest: '../../dist/web-dist/v<%= pkg.version %>/'},
           
           //electron
+          {src: 'supplemental/debugHook.js', dest: '../../dist/electron-dist/v<%= pkg.version %>/debugHook.js'},
           {expand: true, flatten: true, src: ['supplemental/electronCode/app/*'], dest: '../../dist/electron-dist/v<%= pkg.version %>/', filter: 'isFile'},
           {src: '../../dist/lib/apogee-npm-lib.js', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogee-npm-lib.js'},
-          {src: '../../dist/lib/apogee-npm-app.js', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogee-npm-app.js'}
+          {src: '../../dist/lib/apogee-npm-app.js', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogee-npm-app.js'},
+          {src: '../../dist/lib/apogeeapp.css', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogeeapp.css'},
+          {expand: true, flatten: false, src: ['resources/**'], dest: '../../dist/electron-dist/v<%= pkg.version %>/'},
           
           
           

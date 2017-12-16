@@ -4,14 +4,13 @@
 		<title></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <base href="http://localhost:8383/v0.6.0/" target="_blank">
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
+        <script type="text/javascript" src="./debugHook.js"></script>
+        <link rel="stylesheet" type="text/css" href="./apogeeapp.css">
         
-        <script type="text/javascript" src="http://localhost:8383/v0.6.0/debugHook.js"></script>
-        <link rel="stylesheet" type="text/css" href="http://localhost:8383/v0.6.0/apogeeapp.css">
-          
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
+        <script type="text/javascript" src="./ace_min_1.2.3.js"></script>
+        <script type="text/javascript" src="./handsontable.full.min.0.33.0.js"></script>
+        <link rel="stylesheet" type="text/css" href="./handsontable.full.min.0.33.0.css">
+	
 		<script>
             'use strict'
             var apogee = require("./apogee-npm-lib.js");
@@ -19,7 +18,7 @@
             
             var app = null;
 			function init() {
-                apogeeapp.ui.initResourcePath("resources");
+                apogeeapp.ui.initResourcePath("./resources");
                 app = new apogeeapp.app.Apogee("appContainer");
             }
             
