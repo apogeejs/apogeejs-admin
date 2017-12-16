@@ -1,12 +1,13 @@
 {
-  "name"    : "apogee-app",
-  "version" : "0.3.0",
+  "name"    : "apogeejs",
+  "version" : #SET_THIS#,
   "main"    : "main.js",
   "scripts": {
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "~1.7.8"
+    "electron": "~1.7.8",
+	"esprima": "~2.7.2"
   },
   "author": "Dave Sutter"
 }
