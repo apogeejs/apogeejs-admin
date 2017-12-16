@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
+        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
+        <script type="text/javascript" src="apogee-web-lib.min.js"></script>
+        <script type="text/javascript" src="apogee-web-app.min.js"></script>
+        <script type="text/javascript" src="apogee-web-cutnpaste.min.js"></script>
+        <script type="text/javascript" src="debugHook.js"></script>
+		<link rel="stylesheet" type="text/css" href="apogeeapp.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
+		<script>
+            'use strict'
+            var app = null;
+			function init() {
+                apogeeapp.ui.initResourcePath("resources");
+                app = new apogeeapp.app.Apogee("appContainer");
+            }
+            
+            function registerComponent(controlBundle) {
+                app.registerComponent(controlBundle);
+            }
+            
+		</script>
+	</head>
+	<body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
+        <div id="appContainer"></div>
+	</body>
+</html>

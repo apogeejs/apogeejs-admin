@@ -35,13 +35,14 @@ module.exports = function(grunt) {
                 "apogee/actions/action.js",
                 "apogee/actions/compoundaction.js",
                 "apogee/actions/createmember.js",
+                "apogee/actions/updateworkspace.js",
                 "apogee/actions/updatemember.js",
                 "apogee/actions/movemember.js",
                 "apogee/actions/deletemember.js",
                 "apogee/actions/updatefolderfunction.js",
                 "apogee/actions/Messenger.js"
             ],
-            "dest": "../../dist/apogee-base-lib.js"
+            "dest": "../../dist/lib/apogee-base-lib.js"
         },
         "base_app": {
             "src": [
@@ -66,6 +67,8 @@ module.exports = function(grunt) {
                 "apogeeapp/ui/treecontrol/TreeEntry.js",
                 "apogeeapp/app/Apogee.js",
                 "apogeeapp/app/WorkspaceUI.js",
+                "apogeeapp/app/references/ReferenceManager.js",
+                "apogeeapp/app/references/LinkEntry.js",
                 "apogeeapp/app/component/WindowHeaderManager.js",
                 "apogeeapp/app/component/Component.js",
                 "apogeeapp/app/component/ParentComponent.js",
@@ -84,6 +87,7 @@ module.exports = function(grunt) {
                 "apogeeapp/app/components/CustomControlComponent.js",
                 "apogeeapp/app/actions/errorhandling.js",
                 "apogeeapp/app/actions/createworkspace.js",
+                "apogeeapp/app/actions/updateworkspace.js",
                 "apogeeapp/app/actions/openworkspace.js",
                 "apogeeapp/app/actions/saveworkspace.js",
                 "apogeeapp/app/actions/importworkspace.js",
@@ -114,7 +118,7 @@ module.exports = function(grunt) {
                 "apogeeapp/app/dialogs/SelectControlDialog.js",
                 "apogeeapp/app/dialogs/propdialog.js"
             ],
-            "dest": "../../dist/apogee-base-app.js"
+            "dest": "../../dist/lib/apogee-base-app.js"
         },
         "dist_web_lib": {
             "options":{
@@ -122,18 +126,18 @@ module.exports = function(grunt) {
             },
             "src": [
                 "supplemental/webLibHeader.js",
-                "../../dist/apogee-base-lib.js"
+                "../../dist/lib/apogee-base-lib.js"
             ],
-            "dest": "../../dist/apogee-web-lib.js"
+            "dest": "../../dist/lib/apogee-web-lib.js"
         },
         "dist_web_app": {
             "options":{
                 "banner":"/* Apogee Web App Version <%= pkg.version %> */\n"
             },
             "src": [
-                "../../dist/apogee-base-app.js"
+                "../../dist/lib/apogee-base-app.js"
             ],
-            "dest": "../../dist/apogee-web-app.js"
+            "dest": "../../dist/lib/apogee-web-app.js"
         },
         "dist_web_cutnpaste": {
             "options":{
@@ -144,7 +148,7 @@ module.exports = function(grunt) {
                 "supplemental/cutNPasteCode/PasteOpenDialog.js",
                 "supplemental/cutNPasteCode/file_impl_cutnpaste.js"
             ],
-            "dest": "../../dist/apogee-web-cutnpaste.js"
+            "dest": "../../dist/lib/apogee-web-cutnpaste.js"
         },
         "dist_npm_lib": {
             "options":{
@@ -152,22 +156,22 @@ module.exports = function(grunt) {
             },
             "src": [
                 "supplemental/npmLibHeader.js",
-                "../../dist/apogee-base-lib.js",
+                "../../dist/lib/apogee-base-lib.js",
                 "supplemental/npmLibFooter.js"
             ],
-            "dest": "../../dist/apogee-npm-lib.js"
+            "dest": "../../dist/lib/apogee-npm-lib.js"
         },
         "dist_npm_app": {
             "options":{
                 "banner":"/* Apogee NPM App Version <%= pkg.version %> */\n"
             },
             "src": [
-                "../../dist/apogee-base-app.js",
+                "../../dist/lib/apogee-base-app.js",
                 "apogeeapp/supplemental/electronCode/custom_menus_electron.js",
                 "apogeeapp/supplemental/electronCode/file_impl_electron.js",
                 "supplemental/npmAppFooter.js"
             ],
-            "dest": "../../dist/apogee-npm-app.js"
+            "dest": "../../dist/lib/apogee-npm-app.js"
         }
     },
     uglify: {
@@ -176,27 +180,27 @@ module.exports = function(grunt) {
       },
       dist_web_lib: {
         files: {
-          '../../dist/apogee-web-lib.min.js': ['<%= concat.dist_web_lib.dest %>']
+          '../../dist/lib/apogee-web-lib.min.js': ['<%= concat.dist_web_lib.dest %>']
         }
       },
       dist_web_app: {
         files: {
-          '../../dist/apogee-web-app.min.js': ['<%= concat.dist_web_app.dest %>']
+          '../../dist/lib/apogee-web-app.min.js': ['<%= concat.dist_web_app.dest %>']
         }
       },
       dist_web_cutnpaste: {
         files: {
-          '../../dist/apogee-web-cutnpaste.min.js': ['<%= concat.dist_web_cutnpaste.dest %>']
+          '../../dist/lib/apogee-web-cutnpaste.min.js': ['<%= concat.dist_web_cutnpaste.dest %>']
         }
       },
 	  dist_npm_lib: {
         files: {
-          '../../dist/apogee-npm-lib.min.js': ['<%= concat.dist_npm_lib.dest %>']
+          '../../dist/lib/apogee-npm-lib.min.js': ['<%= concat.dist_npm_lib.dest %>']
         }
       },
 	  dist_npm_app: {
         files: {
-          '../../dist/apogee-npm-app.min.js': ['<%= concat.dist_npm_app.dest %>']
+          '../../dist/lib/apogee-npm-app.min.js': ['<%= concat.dist_npm_app.dest %>']
         }
       }
     },
@@ -216,15 +220,33 @@ module.exports = function(grunt) {
             "apogeeapp/ui/tabframe/TabFrame.css",
             "apogeeapp/ui/treecontrol/TreeControl.css",
           ],
-          dest: "../../dist/apogeeapp.css"
+          dest: "../../dist/lib/apogeeapp.css"
         },
       },
     copy: {
       main: {
         files: [
 
-          // includes files within path and its sub-directories 
-          {expand: true, flatten: true, src: ['resources/*'], dest: '../../dist/resources/', filter: 'isFile'},
+          //construct app speckfic directories
+          
+          //web cutnpaste
+          {src: 'supplemental/debugHook.js', dest: '../../dist/web-dist/v<%= pkg.version %>/debugHook.js'},
+          {expand: true, flatten: true, src: ['supplemental/cutNPasteCode/app/*'], dest: '../../dist/web-dist/v<%= pkg.version %>/', filter: 'isFile'},
+          {src: '../../dist/lib/apogee-web-lib.js', dest: '../../dist/web-dist/v<%= pkg.version %>/apogee-web-lib.js'},
+          {src: '../../dist/lib/apogee-web-lib.min.js', dest: '../../dist/web-dist/v<%= pkg.version %>/apogee-web-lib.min.js'},
+          {src: '../../dist/lib/apogee-web-app.js', dest: '../../dist/web-dist/v<%= pkg.version %>/apogee-web-app.js'},
+          {src: '../../dist/lib/apogee-web-app.min.js', dest: '../../dist/web-dist/v<%= pkg.version %>/apogee-web-app.min.js'},
+          {src: '../../dist/lib/apogee-web-cutnpaste.js', dest: '../../dist/web-dist/v<%= pkg.version %>/apogee-web-cutnpaste.js'},
+          {src: '../../dist/lib/apogee-web-cutnpaste.min.js', dest: '../../dist/web-dist/v<%= pkg.version %>/apogee-web-cutnpaste.min.js'},
+          {src: '../../dist/lib/apogeeapp.css', dest: '../../dist/web-dist/v<%= pkg.version %>/apogeeapp.css'},
+          {expand: true, flatten: false, src: ['resources/**'], dest: '../../dist/web-dist/v<%= pkg.version %>/'},
+          {expand: true, flatten: false, src: ['lib/**'], dest: '../../dist/web-dist/v<%= pkg.version %>/'},
+          
+          //electron
+          {expand: true, flatten: true, src: ['supplemental/electronCode/app/*'], dest: '../../dist/electron-dist/', filter: 'isFile'},
+          
+          
+          
 
         ],
       }

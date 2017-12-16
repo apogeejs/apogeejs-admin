@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
+        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
+
+        
+        <script type="text/javascript" src="../../supplemental/debugHook.js"></script>
+        
+        <link rel="stylesheet" type="text/css" href="../app/apogeeapp.css">
+		<link rel="stylesheet" type="text/css" href="../ui/jsonedit/jsonedit.css">
+        <link rel="stylesheet" type="text/css" href="../ui/window/WindowFrame.css">
+        <link rel="stylesheet" type="text/css" href="../ui/window/dialog.css">
+        <link rel="stylesheet" type="text/css" href="../ui/displayandheader/DisplayAndHeader.css">
+        <link rel="stylesheet" type="text/css" href="../ui/menu/Menu.css">
+        <link rel="stylesheet" type="text/css" href="../ui/splitpane/SplitPane.css">
+        <link rel="stylesheet" type="text/css" href="../ui/tabframe/TabFrame.css">
+        <link rel="stylesheet" type="text/css" href="../ui/treecontrol/TreeControl.css">
+          
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
+		<script>
+            'use strict'
+            var apogee = require("apogee-npm-lib");
+            var apogeeapp = require("apogee-npm-app");
+            
+            var app = null;
+			function init() {
+                apogeeapp.ui.initResourcePath("../../resources");
+                app = new apogeeapp.app.Apogee("appContainer");
+            }
+            
+            function registerComponent(controlBundle) {
+                app.registerComponent(controlBundle);
+            }
+            
+            /*function beforeUnloadHandler() {
+                if(app.getWorkspaceIsDirty()) {
+                    return "There is unsaved data. Are you sure you want to exit?";
+                }
+                else {
+                    return undefined;
+                }
+            }*/
+            
+		</script>
+	</head>
+    <!-- <body onload="init()" onbeforeunload="return beforeUnloadHandler()"> -->
+	<body onload="init()">
+        <div id="appContainer"></div>
+	</body>
+</html>
