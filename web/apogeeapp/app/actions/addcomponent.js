@@ -49,8 +49,36 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,componentGener
             var member = createAction.member;
             
             if(member) {
-                //create the component
-                apogeeapp.app.Component.createComponentFromMember(componentGenerator,workspaceUI,member,userInputValues,optionalComponentJson);
+                var component;
+                
+                try {
+                    //create the component
+                    component = apogeeapp.app.Component.createComponentFromMember(componentGenerator,workspaceUI,member,userInputValues,optionalComponentJson);
+                    
+                    //unknown failure
+                    if(!component) {
+                        var message = "Unknown error creating component";
+                        var actionError = new apogee.ActionError(message,apogee.ActionError.ERROR_TYPE_APP);
+                        actionResponse.addError(actionError);
+                    }
+                }
+                catch(error) {
+                    //exception creating component
+                    var message = "Failed to created UI component: " + error.message;
+                    var actionError = new apogee.ActionError(message,apogee.ActionError.ERROR_TYPE_APP);
+                    actionResponse.addError(actionError);
+                }
+                
+                if(!component) {
+                    //delete the already created member
+                    var json = {};
+                    json.action = "deleteMember";
+                    json.member = member;
+                    //if this fails, we will just ignore it for now
+                    apogee.action.doAction(json,true);
+                }
+                
+                
             }
             
             if(!actionResponse.getSuccess()) {

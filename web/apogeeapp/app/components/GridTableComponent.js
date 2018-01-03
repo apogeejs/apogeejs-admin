@@ -28,7 +28,7 @@ apogeeapp.app.GridTableComponent.TABLE_EDIT_SETTINGS = {
     "viewModes": apogeeapp.app.GridTableComponent.VIEW_MODES,
     "defaultView": apogeeapp.app.GridTableComponent.VIEW_GRID,
     "clearFunctionMenuText": "Clear Formula",
-    "emptyDataValue": [[null]]
+    "emptyDataValue": [[""]]
 }
 
 apogeeapp.app.GridTableComponent.DEFAULT_VIEW = apogeeapp.app.GridTableComponent.VIEW_GRID;
@@ -77,7 +77,7 @@ apogeeapp.app.GridTableComponent.getMemberCreateAction = function(userInputValue
     json.name = userInputValues.name;
     json.type = apogee.JsonTable.generator.type;
 	json.updateData = {};
-	json.updateData.userInputValues = [[""]]; //empty single cell
+	json.updateData.data = [[""]]; //empty single cell
     return json;
 }
 
