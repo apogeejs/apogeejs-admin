@@ -73,7 +73,7 @@ apogeeapp.app.ReferenceManager.prototype.addEntry = function(entryJson) {
 apogeeapp.app.ReferenceManager.prototype.close = function() {
     for(var listType in this.referenceLists) {
         var listStruct = this.referenceLists[listType];
-        listStruct.listEntries.push( referenceEntry => referenceEntry.remove() );
+        listStruct.listEntries.forEach( referenceEntry => referenceEntry.remove() );
     }
 }
 

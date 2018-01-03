@@ -74,6 +74,8 @@ apogeeapp.app.updatelink.getAddLinkCallback = function(referencesUI,linkType) {
             entryJson.nickname = newValues.nickname;
             entryJson.entryType = linkType;
             var promise = referencesUI.addEntry(entryJson);
+            
+            promise.catch(errorMsg => {alert("There was an error loading the link: " + errorMsg);});
 
             //return true to close the dialog
             return true;

@@ -81,13 +81,13 @@ apogeeapp.app.LinkEntry.prototype.loadEntry = function() {
     
     var promiseFunction = (resolve,reject) => {
         //make sure this link does not already exist
-//OOPS - THIS NEEDS TO BE FIXED! CHECK THIS DIFFERENTLY
+//OOPS - I am not longer using the url for the id. This wont work and needs to be fixed.
         var element = document.getElementById(this.url);
         if(element) {
             var errorMsg = "The link already exists: " + this.url;
             this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
             reject(errorMsg);
-this.referenceManager.entryStatusChange(this);
+            this.referenceManager.entryStatusChange(this);
             return;
         }
         else {
@@ -107,7 +107,7 @@ this.referenceManager.entryStatusChange(this);
                 var errorMsg = "Unknown link type " + this.linkType;
                 this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
                 reject(errorMsg);
-this.referenceManager.entryStatusChange(this);
+                this.referenceManager.entryStatusChange(this);
                 return;
             }
             
@@ -115,13 +115,13 @@ this.referenceManager.entryStatusChange(this);
             linkProps.onload = () => {
                 this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE);
                 resolve(this.url);
-this.referenceManager.entryStatusChange(this);
+                this.referenceManager.entryStatusChange(this);
             }
-            linkProps.onerror = (msg) => {
-                var errorMsg = "Error loading link " + this.url + ": " + msg;
+            linkProps.onerror = (error) => {
+                var errorMsg = "Failed to load link '" + this.url + "'";
                 this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
                 reject(errorMsg);
-this.referenceManager.entryStatusChange(this);
+                this.referenceManager.entryStatusChange(this);
             }
             
             //insert the link entry

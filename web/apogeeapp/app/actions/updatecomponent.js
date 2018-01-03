@@ -60,6 +60,11 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
             if(folderMap) {
                 //get the parent value
                 newValues.owner = folderMap[newValues.parentName];
+                
+                if(newValues.owner == component.getMember()) {
+                    alert("Illegal destination: you put an object inside itself");
+                    return false;
+                }
             }
             else {
                 //no parent - use the owner
