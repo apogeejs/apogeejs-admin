@@ -1,27 +1,8 @@
 /** This component represents a json table object. */
-apogeeapp.webapp.EmbeddedContainerComponentDisplay = function(component, viewType, parentElement) {
+apogeeapp.webapp.EmbeddedContainerComponentDisplay = function(component, parentElement) {
     this.component = component;
     this.member = component.getMember();
-    this.viewType = viewType;
     this.parentElement = parentElement;
-    
-    
-    this.displayInsideContainer = new apogeeapp.ui.DisplayAndHeader(apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
-            null,
-            apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
-            null
-        );
-    this.parentElement.appendChild(this.displayInsideContainer.getOuterElement());
-    
-    this.headerContainer = this.displayInsideContainer.getHeaderContainer();
-    this.bodyContainer = this.displayInsideContainer.getBodyContainer();
-    
-    this.windowHeaderManager = new apogeeapp.app.WindowHeaderManager();
-    this.headerContainer.appendChild(this.windowHeaderManager.getHeaderElement());
-
-    this.viewModeElement = component.getViewModeElement(this,viewType);
-    this.viewModeElement.showData();
-    this.bodyContainer.appendChilr(this.viewModeElement.getElement());
     
     //add a cleanup action to the base component - component must already be initialized
 //    this.addCleanupAction(apogeeapp.webapp.EmbeddedContainerComponentDisplay.destroy);
