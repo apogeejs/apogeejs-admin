@@ -11,8 +11,7 @@ apogeeapp.app.LinkEntry = function(referenceManager,linkData,linkType) {
     if((!nickname)||(nickname.length === 0)) nickname = this.createLinkNameFromUrl(this.url);
     this.nickname = nickname;
     
-    
-    this.treeEntry = this.createTreeEntry();
+    this.treeEntry = null;
 }
 
 apogeeapp.app.LinkEntry.LINK_TYPE_JS = "js link";
@@ -62,7 +61,10 @@ apogeeapp.app.LinkEntry.prototype.getEntryType = function() {
 
 /** This method loads the link onto the page. It returns a promise that
  * resolves when the link is loaded. */
-apogeeapp.app.LinkEntry.prototype.getTreeEntry = function() {
+apogeeapp.app.LinkEntry.prototype.getTreeEntry = function(createIfMissing) {
+    if((createIfMissing)&&(!this.treeEntry)) {
+        this.treeEntry = this.instantiateTreeEntry();
+    }
     return this.treeEntry;
 }
 
@@ -226,7 +228,7 @@ apogeeapp.app.LinkEntry.prototype.setBannerState = function(bannerState,bannerMe
     }
 }
 
-apogeeapp.app.LinkEntry.prototype.createTreeEntry = function() {
+apogeeapp.app.LinkEntry.prototype.instantiateTreeEntry = function() {
     var iconUrl = this.getIconUrl();
     var menuItemsCallback = () => this.getMenuItems();
     return new apogeeapp.ui.treecontrol.TreeEntry(this.nickname, iconUrl, null, menuItemsCallback, false);

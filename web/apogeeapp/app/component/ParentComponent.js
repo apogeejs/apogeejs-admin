@@ -8,8 +8,10 @@ apogeeapp.app.ParentComponent = function(workspaceUI,member,componentGenerator) 
 apogeeapp.app.ParentComponent.prototype = Object.create(apogeeapp.app.Component.prototype);
 apogeeapp.app.ParentComponent.prototype.constructor = apogeeapp.app.ParentComponent;
 
-apogeeapp.app.ParentComponent.prototype.instantiateWindowDisplay = function() {
-    return new apogeeapp.app.ParentWindowComponentDisplay(this,this.windowDisplayStateJson);
+/** @protected */
+apogeeapp.app.ParentComponent.prototype.instantiateWindowDisplay = function(windowDisplayOverrideOptions) {
+    var options = windowDisplayOverrideOptions ? windowDisplayOverrideOptions : this.windowDisplayStateJson;
+    return new apogeeapp.app.ParentWindowComponentDisplay(this,options);
 }
 
 //----------------------
@@ -57,8 +59,11 @@ apogeeapp.app.ParentComponent.prototype.isParentComponent = true;
 apogeeapp.app.ParentComponent.prototype.removeChildComponent = function(childComponent) {
     //remove from tree entry
     var treeEntry = this.getTreeEntry();
-    if(this.treeEntry) {
-        treeEntry.removeChild(childComponent.getTreeEntry());
+    if(treeEntry) {
+        var childTreeEntry = childComponent.getTreeEntry();
+        if(childTreeEntry) {
+            treeEntry.removeChild(childTreeEntry);
+        }
     }
     
     //remove child windows - just hide them. They will be deleted in the component
@@ -73,10 +78,8 @@ apogeeapp.app.ParentComponent.prototype.addChildComponent = function(childCompon
     //add the child to the tree entry
     var treeEntry = this.getTreeEntry();
     if(treeEntry) {
-        var childTreeEntry = childComponent.getTreeEntry();
-        if(childTreeEntry) {
-            treeEntry.addChild(childTreeEntry);
-        }
+        var childTreeEntry = childComponent.getTreeEntry(true);
+        treeEntry.addChild(childTreeEntry);
     }
 
     //add child entry for tab

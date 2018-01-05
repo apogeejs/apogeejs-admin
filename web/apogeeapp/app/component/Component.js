@@ -23,10 +23,7 @@ apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
     
     this.tabDisplay = null;
     
-    if(!__APOGEE_ALTERNATE_UI__) {
-        this.treeDisplay = new apogeeapp.app.TreeComponentDisplay(this);
-        this.treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER);
-    }
+    this.treeDisplay = null;
 }
 
 //These parameters are used to order the components in the tree entry.
@@ -87,7 +84,12 @@ apogeeapp.app.Component.prototype.getWorkspaceUI = function() {
     return this.workspaceUI;
 }
 
-apogeeapp.app.Component.prototype.getTreeEntry = function() {
+apogeeapp.app.Component.prototype.getTreeEntry = function(createIfMissing) {
+    if((createIfMissing)&&(!this.treeDisplay)) {
+        this.treeDisplay = this.instantiateTreeEntry();
+        this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    }
+    
     if(this.treeDisplay) {
         return this.treeDisplay.getTreeEntry();
     }
@@ -96,18 +98,26 @@ apogeeapp.app.Component.prototype.getTreeEntry = function() {
     }
 }
 
-//implement
-///** This creates an instance of the window display. */
-//apogeeapp.app.Component.prototype.instantiateWindowDisplay = function();
-
-apogeeapp.app.Component.prototype.createWindowDisplay = function() {
-    var windowDisplay = this.instantiateWindowDisplay();
-    windowDisplay.setBannerState(this.bannerState,this.bannerMessage);
-    this.windowDisplay = windowDisplay;
-    return windowDisplay;
+/** @protected */
+apogeeapp.app.Component.prototype.instantiateTreeEntry = function() {
+    var treeDisplay = new apogeeapp.app.TreeComponentDisplay(this);
+    
+    //default sort order within parent
+    treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER);
+    
+    return treeDisplay;
 }
 
-apogeeapp.app.Component.prototype.getWindowDisplay = function() {
+//implement
+///** This creates an instance of the window display. 
+///* The windowDisplayOverrideOptions are optional options to override ths existing window options from the parent. */
+//apogeeapp.app.Component.prototype.instantiateWindowDisplay = function(windowDisplayOverrideOptions);
+
+apogeeapp.app.Component.prototype.getWindowDisplay = function(createIfMissing,windowDisplayOverrideOptions) {
+    if((createIfMissing)&&(!this.windowDisplay)) {
+        this.windowDisplay = this.instantiateWindowDisplay(windowDisplayOverrideOptions);
+        this.windowDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    }
     return this.windowDisplay;
 }
 
@@ -160,20 +170,11 @@ apogeeapp.app.Component.prototype.getOpenMenuItem = function() {
 ///** This creates the tab display for the component. */
 //apogeeapp.app.Component.prototype.instantiateTabDisplay = function();
 
-apogeeapp.app.Component.prototype.createTabDisplay = function() {
-    //we shouldn't call if there is a tab!
-    if(this.tabDisplay) {
-        this.tabDisplay.closeTab();
-    }
-    
-    if(this.usesTabDisplay()) {
+apogeeapp.app.Component.prototype.getTabDisplay = function(createIfMissing) {
+    if((createIfMissing)&&(this.usesTabDisplay())&&(!this.tabDisplay)) {
         this.tabDisplay = this.instantiateTabDisplay();
         this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
     }
-    return this.tabDisplay;
-}
-
-apogeeapp.app.Component.prototype.getTabDisplay = function() {
     return this.tabDisplay;
 }
 
@@ -232,9 +233,9 @@ apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
     if((json.tabOpen)&&(this.usesTabDisplay())) {
         var tabFrame = this.workspaceUI.getTabFrame();
         if(tabFrame) {
-            if(!this.tabDisplay) {
-                this.tabDisplay = this.createTabDisplay();
-            }
+            //create the tab display if it is not present
+            this.getTabDisplay(true);
+            
             var tab = this.tabDisplay.getTab();
 
             tabFrame.addTab(tab,false);
@@ -390,7 +391,7 @@ apogeeapp.app.Component.prototype.createOpenCallback = function() {
             tab.makeActive();
         }
         else {
-            var tabDisplay = tabComponent.createTabDisplay();
+            var tabDisplay = tabComponent.getTabDisplay(true);
             var tab = tabDisplay.getTab();
             var tabFrame = workspaceUI.getTabFrame();
             tabFrame.addTab(tab,true);

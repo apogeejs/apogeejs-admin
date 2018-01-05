@@ -68,8 +68,8 @@ apogeeapp.app.WorkspaceUI.prototype.load = function(workspaceJson,actionResponse
         this.treeEntry = this.createTreeEntry();
         this.treeEntry.setState(apogeeapp.ui.treecontrol.EXPANDED);
         this.tree.setRootEntry(this.treeEntry);
-        this.treeEntry.addChild(rootFolderComponent.getTreeEntry());
-        this.treeEntry.addChild(this.referencesManager.getTreeEntry());
+        this.treeEntry.addChild(rootFolderComponent.getTreeEntry(true));
+        this.treeEntry.addChild(this.referencesManager.getTreeEntry(true));
     }
     
     //add listeners

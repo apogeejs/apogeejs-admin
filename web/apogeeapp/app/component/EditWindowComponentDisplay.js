@@ -11,7 +11,7 @@ apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
     this.viewModeElements = {};
     this.viewModeElement = null;
    
-    if(__APOGEE_ALTERNATE_UI__) {
+    if(options.PLAIN_FRAME_UI) {
         //this is a non standard UI where we load a plain div rather than window.
         this.loadPlainFrameEntry();
     }
@@ -32,7 +32,7 @@ apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
 /** This value is used as the background color when an editor is read only. */
 apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.getWindowFrame = function() {
+apogeeapp.app.EditWindowComponentDisplay.prototype.getDisplayFrame = function() {
     if(this.windowFrame) {
         return this.windowFrame;
     }
@@ -340,27 +340,23 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewTypeSelect = functi
 
 /** This method should be called to put the display element in the window. */
 apogeeapp.app.EditWindowComponentDisplay.prototype.showDisplayElement = function(displayElement) {
-    if(__APOGEE_ALTERNATE_UI__) {
-        //this is a non standard UI where we load a plain div rather than window.
-        this.plainFrame.setContent(displayElement);
-    }
-    else {
-        //this is the standard windo for a component
+    if(this.windowFrame) {
         this.windowFrame.setContent(displayElement);
     } 
+    else if(this.plainFrame) {
+        this.plainFrame.setContent(displayElement);
+    }
 }
 
 /** This method should be called to remove the given element from the window. 
  * If this method is called when this is not the current element, no action is taken. */
 apogeeapp.app.EditWindowComponentDisplay.prototype.removeDisplayElement = function(displayElement) {
-    if(__APOGEE_ALTERNATE_UI__) {
-        //this is a non standard UI where we load a plain div rather than window.
+    if(this.windowFrame) { 
+        this.windowFrame.safeRemoveContent(displayElement);
+    }
+    else if(this.plainFrame) {
         this.plainFrame.safeRemoveContent(displayElement);
     }
-    else {
-        //this is the standard windo for a component
-        this.windowFrame.safeRemoveContent(displayElement);
-    } 
 }
 
 //----------------------------

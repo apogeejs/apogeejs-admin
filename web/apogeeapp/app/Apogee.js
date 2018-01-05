@@ -1,8 +1,10 @@
 apogeeapp.app = {};
 apogeeapp.app.dialog = {};
-var __APOGEE_ALTERNATE_UI__ = false;
 
-/** This is the main class of the apogee application. */
+/** This is the main class of the apogee application. 
+ * The UI is set up in the element with the given container ID. If the container
+ * ID is undefined, no top level UI will be created. See the documentation for 
+ * using this to run the application with a alternate UI. */
 apogeeapp.app.Apogee = function(containerId) {
     
     //temp - until we figure out what to do with menu and events
@@ -21,11 +23,8 @@ apogeeapp.app.Apogee = function(containerId) {
 	//load the standard component generators
 	this.loadComponentGenerators();
 	
-	//create the UI
-    if(__APOGEE_ALTERNATE_UI__) {
-        //do nothing
-    }
-    else {
+	//create the UI - if a container ID is passed in
+    if(containerId !== undefined) {
         this.createUI(containerId);
     }
     

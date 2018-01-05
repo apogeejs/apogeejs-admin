@@ -153,13 +153,12 @@
             
             var embedInfo = [
                 ["Model.plainValue","plainValueCell",apogeeapp.app.JsonTableComponent.VIEW_DATA],
-                ["Model.derivedValue","derivedValueCell",apogeeapp.app.JsonTableComponent.VIEW_DATA],
+                ["Model.derivedValue","derivedValueCell",apogeeapp.app.JsonTableComponent.VIEW_DATA]
             ];
             
             
             'use strict'
             var app = null;
-            var __APOGEE_ALTERNATE_UI__ = true;
 			function init() {
                 //apogeeapp.ui.initResourcePath("../../resources");
                 app = new apogeeapp.app.Apogee();
@@ -204,9 +203,11 @@
 
                 //show the display
 //set desired view type
-                var componentDisplay = component.createWindowDisplay();
-                //componentDisplay.setViewType("Formula");
-                var plainFrame = componentDisplay.getWindowFrame();
+                var options = {};
+                options.viewType = viewType;
+                options.PLAIN_FRAME_UI = true;
+                var componentDisplay = component.getWindowDisplay(true,options);
+                var plainFrame = componentDisplay.getDisplayFrame();
                 var element = plainFrame.getElement();
                 element.style = "position:realtive";
                 parentElement.appendChild(element);

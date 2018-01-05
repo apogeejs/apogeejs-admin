@@ -1,7 +1,8 @@
 
 /** This class manages links and other reference entries.*/
 apogeeapp.app.ReferenceManager = function() {
-    this.createTreeEntry();
+    
+    this.referencesTreeEntry = null;
     
     this.referenceLists = {};
     var jsInfo = apogeeapp.app.LinkEntry.JS_LINK_LIST_INFO;
@@ -10,7 +11,10 @@ apogeeapp.app.ReferenceManager = function() {
     this.referenceLists[cssInfo.typeName] = this.getListStruct(cssInfo);
 }
 
-apogeeapp.app.ReferenceManager.prototype.getTreeEntry = function() {
+apogeeapp.app.ReferenceManager.prototype.getTreeEntry = function(createIfMissing) {
+    if((createIfMissing)&&(!this.referencesTreeEntry)) {
+        this.referencesTreeEntry = this.instantiateTreeEntry();
+    }
     return this.referencesTreeEntry;
 }
 
@@ -125,29 +129,35 @@ apogeeapp.app.ReferenceManager.prototype.entryRemoved= function(referenceEntry) 
 
 apogeeapp.app.ReferenceManager.REFERENCES_ICON_PATH = "/componentIcons/references.png";
 
-
-/** @private */
-apogeeapp.app.ReferenceManager.prototype.createTreeEntry = function() {
-    var iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.app.ReferenceManager.REFERENCES_ICON_PATH);
-    this.referencesTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry("References", iconUrl, null, null, false);
-}
-
 apogeeapp.app.ReferenceManager.prototype.getListStruct = function(listInfo) {
-    
-    //create the tree entry for this list
-    var iconUrl = apogeeapp.ui.getResourcePath(listInfo.listIconPath);
-    var menuItemCallback = () => this.getListMenuItems(listInfo);
-    var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(listInfo.listName, iconUrl, null, menuItemCallback, false);
-    this.referencesTreeEntry.addChild(listTreeEntry);
-    
-    //create the list struct
     var listStruct = {};
     listStruct.listInfo = listInfo;
     listStruct.listEntries = [];
-    listStruct.listTreeEntry = listTreeEntry;
- 
+    //listStruct.listTreeEntry - add on creation
     return listStruct;
 }
+
+
+/** @private */
+apogeeapp.app.ReferenceManager.prototype.instantiateTreeEntry = function() {
+    var iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.app.ReferenceManager.REFERENCES_ICON_PATH);
+    var treeEntry = new apogeeapp.ui.treecontrol.TreeEntry("References", iconUrl, null, null, false);
+    
+    //add child lists
+    for(var childKey in this.referenceLists) {
+        var childInfo = this.referenceLists[childKey];
+        var iconUrl = apogeeapp.ui.getResourcePath(childInfo.listIconPath);
+        var menuItemCallback = () => this.getListMenuItems(childInfo);
+        var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(childInfo.listName, iconUrl, null, menuItemCallback, false);
+        treeEntry.addChild(listTreeEntry);
+        
+        childInfo.listTreeEntry = listTreeEntry;
+    }
+    
+    return treeEntry;
+}
+
+
 
 /** @private */
 apogeeapp.app.ReferenceManager.prototype.getListMenuItems = function(listInfo) {
