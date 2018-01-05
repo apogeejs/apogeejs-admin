@@ -1,5 +1,6 @@
 apogeeapp.app = {};
 apogeeapp.app.dialog = {};
+var __APOGEE_ALTERNATE_UI__ = false;
 
 /** This is the main class of the apogee application. */
 apogeeapp.app.Apogee = function(containerId) {
@@ -21,7 +22,12 @@ apogeeapp.app.Apogee = function(containerId) {
 	this.loadComponentGenerators();
 	
 	//create the UI
-	this.createUI(containerId);
+    if(__APOGEE_ALTERNATE_UI__) {
+        //do nothing
+    }
+    else {
+        this.createUI(containerId);
+    }
     
     //open a workspace if there is a url present
     var workspaceUrl = apogee.util.readQueryField("url",document.URL);

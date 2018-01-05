@@ -3,7 +3,9 @@ apogeeapp.app.FolderComponent = function(workspaceUI,folder) {
     //extend parent component
     apogeeapp.app.ParentComponent.call(this,workspaceUI,folder,apogeeapp.app.FolderComponent);
     
-    this.treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.FOLDER_COMPONENT_TYPE_SORT_ORDER);
+    if(this.treeDisplay) {
+        this.treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.FOLDER_COMPONENT_TYPE_SORT_ORDER);
+    }
     
     //add a cleanup and save actions
     this.addOpenAction(apogeeapp.app.FolderComponent.readFromJson);

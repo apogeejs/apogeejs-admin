@@ -23,8 +23,10 @@ apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
     
     this.tabDisplay = null;
     
-    this.treeDisplay = new apogeeapp.app.TreeComponentDisplay(this);
-    this.treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER);
+    if(!__APOGEE_ALTERNATE_UI__) {
+        this.treeDisplay = new apogeeapp.app.TreeComponentDisplay(this);
+        this.treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER);
+    }
 }
 
 //These parameters are used to order the components in the tree entry.
@@ -86,7 +88,12 @@ apogeeapp.app.Component.prototype.getWorkspaceUI = function() {
 }
 
 apogeeapp.app.Component.prototype.getTreeEntry = function() {
-    return this.treeDisplay.getTreeEntry();
+    if(this.treeDisplay) {
+        return this.treeDisplay.getTreeEntry();
+    }
+    else {
+        return null;
+    }
 }
 
 //implement
@@ -217,18 +224,21 @@ apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
     //take any immediate needed actions
     
     //set the tree state
-    if(json.treeState !== undefined) {
+    if((this.treeDisplay)&&(json.treeState !== undefined)) {
         this.treeDisplay.setState(json.treeState);
     }
     
-    //open the tab
+    //open the tab - if tab frame exists
     if((json.tabOpen)&&(this.usesTabDisplay())) {
-        if(!this.tabDisplay) {
-            this.tabDisplay = this.createTabDisplay();
-        }
-        var tab = this.tabDisplay.getTab();
         var tabFrame = this.workspaceUI.getTabFrame();
-        tabFrame.addTab(tab,false);
+        if(tabFrame) {
+            if(!this.tabDisplay) {
+                this.tabDisplay = this.createTabDisplay();
+            }
+            var tab = this.tabDisplay.getTab();
+
+            tabFrame.addTab(tab,false);
+        }
     }
     
     //set window options
@@ -325,8 +335,10 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
     }
     
     //update for new data
-    this.treeDisplay.updateData();
-    this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    if(this.treeDisplay) {
+        this.treeDisplay.updateData();
+        this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    }
     if(this.windowDisplay != null) {
         this.windowDisplay.updateData();
         this.windowDisplay.setBannerState(this.bannerState,this.bannerMessage);

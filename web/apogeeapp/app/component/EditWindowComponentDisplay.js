@@ -11,7 +11,19 @@ apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
     this.viewModeElements = {};
     this.viewModeElement = null;
    
-    this.loadWindowFrameEntry();
+    if(__APOGEE_ALTERNATE_UI__) {
+        //this is a non standard UI where we load a plain div rather than window.
+        this.loadPlainFrameEntry();
+    }
+    else {
+        //this is the standard windo for a component
+        this.loadWindowFrameEntry();
+    }
+    
+    //load initial data
+    var settings = this.component.getTableEditSettings();
+    var initialViewType = this.getInitialViewType(settings.viewModes,settings.defaultView);
+    this.setViewType(initialViewType);
     
     //add a cleanup action to the base component - component must already be initialized
 //    this.addCleanupAction(apogeeapp.app.EditWindowComponentDisplay.destroy);
@@ -21,7 +33,15 @@ apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
 apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
 apogeeapp.app.EditWindowComponentDisplay.prototype.getWindowFrame = function() {
-    return this.windowFrame;
+    if(this.windowFrame) {
+        return this.windowFrame;
+    }
+    else if(this.plainFrame) {
+        return this.plainFrame;
+    }
+    else {
+        return null;
+    }
 }
 
 /** This returns the preferred size, to be used by the parent to set the window position.
@@ -96,7 +116,9 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.updateData = function() {
     if(this.windowFrame) {
         //update the title
         this.windowFrame.setTitle(this.member.getDisplayName());
-        
+    }
+     
+    if((this.windowFrame)||(this.plainFrame)) {
         //update the content in instantiated view mode elements
         for(var elementTag in this.viewModeElements) {
             this.viewModeElements[elementTag].memberUpdated();
@@ -162,7 +184,8 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setStateJson = function(json)
 // Private Functions
 //===============================
 
-/** @private */
+/** This is the standard window for the component.  
+ * @private */
 apogeeapp.app.EditWindowComponentDisplay.prototype.loadWindowFrameEntry = function() {
    
     //window options
@@ -205,6 +228,15 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.loadWindowFrameEntry = functi
     this.initContentUI();
 }
 
+/** This is the non standard, plain div container for the component.  
+ * @private */
+apogeeapp.app.EditWindowComponentDisplay.prototype.loadPlainFrameEntry = function() {
+    this.plainFrame = new apogeeapp.ui.PlainFrame();
+  
+    this.windowHeaderManager = new apogeeapp.app.WindowHeaderManager();
+    this.plainFrame.setHeaderContent(this.windowHeaderManager.getHeaderElement());    
+}
+
 //------------------------------------
 // Window Content Management - switch between edit modes
 //------------------------------------
@@ -235,9 +267,6 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.initContentUI = function() {
         var viewType = viewTypes[i];
         this.select.add(apogeeapp.ui.createElement("option",{"text":viewType}));
     }
-    
-    var initialViewType = this.getInitialViewType(viewTypes,settings.defaultView);
-    this.setViewType(initialViewType);
 }
 
 apogeeapp.app.EditWindowComponentDisplay.prototype.getInitialViewType = function(viewTypes,defaultViewType) {
@@ -304,20 +333,34 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setViewType = function(viewTy
 }
 
 apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewTypeSelect = function() {
-    if(this.select.value != this.viewType) {
+    if((this.select)&&(this.select.value != this.viewType)) {
         this.select.value = this.viewType;
     }
 }
 
 /** This method should be called to put the display element in the window. */
 apogeeapp.app.EditWindowComponentDisplay.prototype.showDisplayElement = function(displayElement) {
-    this.windowFrame.setContent(displayElement);
+    if(__APOGEE_ALTERNATE_UI__) {
+        //this is a non standard UI where we load a plain div rather than window.
+        this.plainFrame.setContent(displayElement);
+    }
+    else {
+        //this is the standard windo for a component
+        this.windowFrame.setContent(displayElement);
+    } 
 }
 
 /** This method should be called to remove the given element from the window. 
  * If this method is called when this is not the current element, no action is taken. */
 apogeeapp.app.EditWindowComponentDisplay.prototype.removeDisplayElement = function(displayElement) {
-    this.windowFrame.safeRemoveContent(displayElement);
+    if(__APOGEE_ALTERNATE_UI__) {
+        //this is a non standard UI where we load a plain div rather than window.
+        this.plainFrame.safeRemoveContent(displayElement);
+    }
+    else {
+        //this is the standard windo for a component
+        this.windowFrame.safeRemoveContent(displayElement);
+    } 
 }
 
 //----------------------------
@@ -327,7 +370,11 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.removeDisplayElement = functi
 /** This method should be called to set up the component ui for edit mode. 
  * @protected */
 apogeeapp.app.EditWindowComponentDisplay.prototype.startEditUI = function(onSave,onCancel) {
-    this.select.disabled = true;
+    //disable select (if we are using it)
+    if(this.select) {
+        this.select.disabled = true;
+    }
+    
     this.showSaveBar(onSave,onCancel);
 }
 
@@ -335,7 +382,11 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.startEditUI = function(onSave
  * @protected */
 apogeeapp.app.EditWindowComponentDisplay.prototype.endEditUI = function() {
     this.hideSaveBar();
-    this.select.disabled = false;
+    
+    //re-enable select (if we are using it)
+    if(this.select) {
+        this.select.disabled = false;
+    }
 }
 
 /** This method returns the base member for this component. */
