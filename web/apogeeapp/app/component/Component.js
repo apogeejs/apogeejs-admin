@@ -103,8 +103,14 @@ apogeeapp.app.Component.prototype.instantiateTreeEntry = function() {
     var treeDisplay = new apogeeapp.app.TreeComponentDisplay(this);
     
     //default sort order within parent
-    treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER);
+    var treeEntrySortOrder = (this.componentGenerator.TREE_ENTRY_SORT_ORDER !== undefined) ? this.componentGenerator.TREE_ENTRY_SORT_ORDER : apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER;
+    treeDisplay.setComponentTypeSortOrder(treeEntrySortOrder);
     
+       
+//    if(this.treeDisplay) {
+//        this.treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.FOLDER_COMPONENT_TYPE_SORT_ORDER);
+//    } 
+//    
     return treeDisplay;
 }
 

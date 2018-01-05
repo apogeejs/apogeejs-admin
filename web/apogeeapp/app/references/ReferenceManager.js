@@ -90,7 +90,6 @@ apogeeapp.app.ReferenceManager.prototype.close = function() {
  * @protected */
 apogeeapp.app.ReferenceManager.prototype.entryInserted = function(referenceEntry) {
     var entryType = referenceEntry.getEntryType();
-    var treeEntry = referenceEntry.getTreeEntry();
     
     var listStruct = this.referenceLists[entryType];
     if(!listStruct) {
@@ -98,7 +97,12 @@ apogeeapp.app.ReferenceManager.prototype.entryInserted = function(referenceEntry
     }
     
     listStruct.listEntries.push(referenceEntry);
-    listStruct.listTreeEntry.addChild(treeEntry);
+    
+    //add tree entry if applicable
+    if(listStruct.listTreeEntry) {
+        var treeEntry = referenceEntry.getTreeEntry(true);
+        listStruct.listTreeEntry.addChild(treeEntry);
+    }
 }
 
 /** This method opens a list of js and css links. It returns a promise that

@@ -5,37 +5,26 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-			.contentTest {
-				width: 500px;
+			#displayPanel {
 				outline: solid 1px gray;
 				margin: 10px;
 				display: table;
+                
                 position: relative;
+                width: 800px;
 			}
             
-            #loginControl {
-                height: 100px;
-            }
-            #contextControl {
-                height: 100px;
-            }
-            #metaFileSelector {
-                height: 150px;
-            }
-            #selectEntriesControl {
-                height: 700px;   
-            }
-            #submitControl {
-                height: 400px;
-            }
-            #resetControl {
-                height: 50px;
-            }
-            .debug {
-                height: 200px;
+            .wrapperElementClass {
+                position: relative;         
             }
             
+            .frameHolderClass {
+                position: relative;
+                height: 500px;
+            }
+     
 		</style>
+        
         
         <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
         <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
@@ -79,7 +68,10 @@
         <script type="text/javascript" src="../../../apogeeapp/apogeeapp.js"></script>
 		<script type="text/javascript" src="../../../apogeeapp/ui/apogeeappui.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/ui/window/WindowParent.js"></script>
-		<script type="text/javascript" src="../../../apogeeapp/ui/window/WindowFrame.js"></script>      
+		<script type="text/javascript" src="../../../apogeeapp/ui/window/WindowFrame.js"></script>
+        
+        <script type="text/javascript" src="../../../apogeeapp/ui/plainframe/PlainFrame.js"></script>  
+        
 		<script type="text/javascript" src="../../../apogeeapp/ui/tabframe/TabFrame.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/ui/tabframe/Tab.js"></script>
 		<script type="text/javascript" src="../../../apogeeapp/ui/menu/Menu.js"></script>
@@ -154,7 +146,7 @@
         
         <script type="text/javascript" src="../../../supplemental/debugHook.js"></script>
         
-        <link rel="stylesheet" type="text/css" href="../../../apogeeapp/app/apogeeapp.css">
+        <!--<link rel="stylesheet" type="text/css" href="../../../apogeeapp/app/apogeeapp.css">-->
 		<link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/jsonedit/jsonedit.css">
         <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/window/WindowFrame.css">
         <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/window/dialog.css">
@@ -169,41 +161,64 @@
         <script>
             var workspaceUrl = "editMetaFile.json";
             
-            var embedInfo = [
-                ["tasks.login.loginControl","loginControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                ["tasks.loadContext.contextControl","contextControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                ["tasks.loadMetaFileRecords.metaFileSelector","metaFileSelector",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                ["tasks.editMetaFile.selectEntriesControl","selectEntriesControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                ["tasks.submit.submitControl","submitControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                ["tasks.completed.resetControl","resetControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                
-                /* These lines are for debugging status
-                ["taskResults.login","loginTest",apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT],
-                ["taskResults.loadContext","loadContextTest",apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT],
-                ["taskResults.loadMetaFileRecords","loadMetaFileRecordsTest",apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT],
-                ["taskResults.editMetaFile","editMetaFileTest",apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT],
-                ["taskResults.submit","submitTest",apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT]*/
-                
-            ];
-            
-            var taskStatusInfo = [
-                ["login","loginPanel"],
-                ["loadContext","loadContextPanel"],
-                ["loadMetaFileRecords","loadMetaFileRecordsPanel"],
-                ["editMetaFile","editMetaFilePanel"],
-                ["submit","submitPanel"]
-            ]
-            
-            var COMPLETE_TASK_PANEL_ID = "completedPanel";
+            var configInfo = {
+                "Model.tasks.login.loginControl":{
+                    "elementId":"loginControl",
+                    "title":"Login"
+                },
+                "Model.tasks.switcher.selectSequence":{
+                    "elementId":"switcherControl",
+                    "title":"Edit Type"
+                },
+                "Model.tasks.editMeta.selectMetaContext.contextControl":{
+                    "elementId":"metaFileContext",
+                    "title":"Meta File Context"
+                },
+                "Model.tasks.editMeta.selectMetaFile.metaFileSelector":{
+                    "elementId":"metaFileFile",
+                    "title":"Meta File File Selection"
+                },
+                "Model.tasks.editMeta.selectDependencies.selectDepForm":{
+                    "elementId":"metaFileDependencies",
+                    "title":"Meta File Dependencies"
+                },
+                "Model.tasks.editMeta.editMetaFile.selectEntriesControl":{
+                    "elementId":"metaFileEntries",
+                    "title":"Select Meta File Entries"
+                },
+                "Model.tasks.editCom.selectCid.selectCidControl":{
+                    "elementId":"comFileCid",
+                    "title":"Com File CID"
+                },
+                "Model.tasks.editCom.editComFile.selectComEntries":{
+                    "elementId":"comFileEntries",
+                    "title":"Com File Entries"
+                },
+                "Model.tasks.submit.submitControl":{
+                    "elementId":"submitControl",
+                    "title":"Submit"
+                },
+                "Model.tasks.completed.resetControl":{
+                    "elementId":"resetControl",
+                    "title":"Completed"
+                }
+            };
+            var INITIAL_PANEL_NAME = "Model.tasks.login.loginControl";
             
             'use strict'
             var app = null;
-            var __APOGEE_ALTERNATE_UI__ = true;
+            var activeDisplayFrame = null;
+            var displayPanel = null;
 			function init() {
+                //load the display panel
+                displayPanel = document.getElementById("displayPanel");
+                
                 //apogeeapp.ui.initResourcePath("../../resources");
                 app = new apogeeapp.app.Apogee();
                 
-                apogeeapp.app.openworkspace.openWorkspaceFromUrl(app,workspaceUrl,onWorkspaceLoad);              
+                __globals__.__WEB_APP_MAKE_ACTIVE_FUNCTION__ = setActiveComponent;
+                
+                apogeeapp.app.openworkspace.openWorkspaceFromUrlImpl(app,workspaceUrl,onWorkspaceLoad);              
             }
             
             function registerComponent(controlBundle) {
@@ -211,27 +226,41 @@
             }   
             
             function onWorkspaceLoad() {
-                
-                var workspace = app.getWorkspace();
-                
-                //set initial panel state
-                var taskStatusFolder = workspace.getMemberByFullName("taskResults");
-                setActiveTask(taskStatusFolder);
-                
-                //set up update callback
-                workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT,onMemberUpdated);
-                
+              
                 //load the UI controls
-                for(var i = 0; i < embedInfo.length; i++) {
-                    addDisplay(embedInfo[i]);
+                for(var fullName in configInfo) {
+                    initDisplay(fullName,configInfo[fullName]);
                 }
+                
+                //set the initial component
+                setActiveComponent(INITIAL_PANEL_NAME);
             }
             
-            function addDisplay(embedEntry) {
-                var memberName = embedEntry[0];
-                var viewType = embedEntry[2];
-                var parentElementId = embedEntry[1];
+            function initDisplay(memberName,configEntry) {
                 
+                //get the display element
+                var displayFrame = getDisplayFrame(app,memberName);
+                configEntry.displayFrame = displayFrame;
+                
+                //create wrapper dom Element
+                var wrapperElement = document.createElement("div");
+                wrapperElement.className = "wrapperElementClass";
+                
+                var titleElement = document.createElement("h3");
+                titleElement.innerHTML = configEntry.title;
+                wrapperElement.appendChild(titleElement);
+                
+                var frameHolder = document.createElement("div");
+                frameHolder.className = "frameHolderClass";
+                frameHolder.appendChild(displayFrame.getElement())
+                wrapperElement.appendChild(frameHolder);
+                
+                configEntry.panel = wrapperElement;             
+            }
+            
+            /** This method returns a PlainFrame object which contains the component display object. 
+             * If the optionalViewType is not set, the default view (which is typically the desired one) will be used.*/
+            function getDisplayFrame(app,memberName,optionalViewType) {
                 var workspace = app.getWorkspace();
                 var workspaceUI = app.getWorkspaceUI();
                 
@@ -242,111 +271,54 @@
                 }
                 var component = workspaceUI.getComponent(member);
                 
-                var parentElement = document.getElementById(parentElementId);
-                if(!parentElement) {
-                    alert("DOM Element not found:" + parentElementId);
+                var options = {};
+                options.viewType = optionalViewType;
+                options.PLAIN_FRAME_UI = true;
+                
+                var componentDisplay = component.getWindowDisplay(true,options);
+                return componentDisplay.getDisplayFrame();
+            }
+            
+            
+            function setActiveComponent(memberFolderName) {
+                if(activeDisplayFrame != null) {
+                    activeDisplayFrame.setIsShowing(false);
+                    activeDisplayFrame = null;
+                    apogeeapp.ui.removeAllChildren(displayPanel);
+                }
+                
+                var memberName;
+                var found = false;
+                for(memberName in configInfo) {
+                    if(memberName.startsWith(memberFolderName)) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if(!found) {
+                    alert("Member folder not found: " + memberName);
                     return;
                 }
+                
+                var memberConfigEntry = configInfo[memberName];
+                
+                displayPanel.appendChild(memberConfigEntry.panel);
+                
+                activeDisplayFrame = memberConfigEntry.displayFrame;
+                activeDisplayFrame.setIsShowing(true);
+                
+            }
 
-                //show the display
-//set desired view type
-                var componentDisplay = component.instantiateWindowDisplay();
-                var viewMode = componentDisplay.getViewMode();
-                var nonWindowFrame = componentDisplay.getNonWindowFrame();
-                viewMode.showData();
-                
-                parentElement.appendChild(nonWindowFrame.getOuterElement());
-            }
-            
-            function onMemberUpdated(member) {
-                var memberName = member.getFullName();
-                if(memberName == "editMetaFileTest.taskResults") {
-                    setActiveTask(member);
-                }
-            }
-            
-            function setActiveTask(taskStatusFolder) {
-                var taskStatusData = taskStatusFolder.getData();
-                var activePanelSet = false;
-                for(var i = 0; i < taskStatusInfo.length; i++) {
-                    var taskStatusInfoEntry = taskStatusInfo[i];
-                    var taskStatus = taskStatusData[taskStatusInfoEntry[0]];
-                    var taskVisible;
-                    if((taskIncomplete(taskStatus))&&(!activePanelSet)) {
-                        taskVisible = true;
-                        activePanelSet = true;
-                    }
-                    else {
-                        taskVisible = false;
-                    }
-                    setPanelVisible(taskVisible,taskStatusInfoEntry[1]);
-                }
-                
-                //set visibility of complete panel
-                var showCompletedPanel = !activePanelSet
-                setPanelVisible(showCompletedPanel,COMPLETE_TASK_PANEL_ID);
-            }
-            
-            function taskIncomplete(taskStatus) {
-                return ((!taskStatus)||(!taskStatus.state)||(taskStatus.state != "SUCCESS"));
-            }
-            
-            function setPanelVisible(makeVisible,id) {
-                var panel = document.getElementById(id);
-                if(panel) {
-                    if(makeVisible) {
-                        panel.style.display = "";
-                    }
-                    else {
-                        panel.style.display = "none";
-                    }
-                }
-            }
-            
             
             
         </script>
     </head>
     <body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
-        <div id="loginPanel">
-            <h1>Login</h1>
-            <div class="contentTest" id="loginControl"></div>
-        </div>
-        <div id="loadContextPanel">
-            <h1>Context</h1>
-            <div class="contentTest" id="contextControl"></div>
-        </div>
-        <div id="loadMetaFileRecordsPanel">
-            <h1>File Selection</h1>
-            <div class="contentTest" id="metaFileSelector"></div>
-        </div>
-        <div id="editMetaFilePanel">
-            <h1>File Edit</h1>
-            <div class="contentTest" id="selectEntriesControl"></div>
-        </div>
-        <div id="submitPanel">
-            <h1>Commit</h1>
-            <div class="contentTest" id="submitControl"></div>
-        </div>
-        <div id="completedPanel">    
-            <h1>Commit Result</h1>
-            <div class="contentTest" id="resetControl"></div>
+        <div id="displayPanel">
+                
         </div>
         
-        <!-- The lines below are for debugging the status
-        <div>    
-            <h1>Login Status</h1>
-            <div class="contentTest debug" id="loginTest"></div>
-            <h1>Context Status</h1>
-            <div class="contentTest debug" id="loadContextTest"></div>
-            <h1>Load Meta Files Status</h1>
-            <div class="contentTest debug" id="loadMetaFileRecordsTest"></div>
-            <h1>Edit Meta File Status</h1>
-            <div class="contentTest debug" id="editMetaFileTest"></div>
-            <h1>Submit Status</h1>
-            <div class="contentTest debug" id="submitTest"></div>
-        </div>
-        -->
         
     </body>
 </html>

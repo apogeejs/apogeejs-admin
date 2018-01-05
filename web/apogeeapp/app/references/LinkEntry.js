@@ -167,10 +167,12 @@ apogeeapp.app.LinkEntry.prototype.remove = function() {
 apogeeapp.app.LinkEntry.prototype.updateData = function(url,nickname) {
     
     //update nickname
-    if((!nickname)||(nickname.length === 0)) nickname = this.createLinkNameFromUrl(url);
-    if(this.nickname != nickname) {
-        this.nickname = nickname;
-        this.treeEntry.setLabel(this.nickname);
+    if(this.treeEntry) {
+        if((!nickname)||(nickname.length === 0)) nickname = this.createLinkNameFromUrl(url);
+        if(this.nickname != nickname) {
+            this.nickname = nickname;
+            this.treeEntry.setLabel(this.nickname);
+        }
     }
     
     //update url
@@ -219,6 +221,8 @@ apogeeapp.app.LinkEntry.prototype.getElementId = function() {
 }
 
 apogeeapp.app.LinkEntry.prototype.setBannerState = function(bannerState,bannerMessage) {
+    if(!this.treeEntry) return;
+    
     var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(bannerState);
     if(iconOverlay) {
         this.treeEntry.setIconOverlay(iconOverlay);

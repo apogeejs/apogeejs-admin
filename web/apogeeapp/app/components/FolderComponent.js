@@ -3,10 +3,6 @@ apogeeapp.app.FolderComponent = function(workspaceUI,folder) {
     //extend parent component
     apogeeapp.app.ParentComponent.call(this,workspaceUI,folder,apogeeapp.app.FolderComponent);
     
-    if(this.treeDisplay) {
-        this.treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.FOLDER_COMPONENT_TYPE_SORT_ORDER);
-    }
-    
     //add a cleanup and save actions
     this.addOpenAction(apogeeapp.app.FolderComponent.readFromJson);
     this.addSaveAction(apogeeapp.app.FolderComponent.writeToJson);
@@ -73,6 +69,7 @@ apogeeapp.app.FolderComponent.uniqueName = "apogeeapp.app.FolderComponent";
 apogeeapp.app.FolderComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.FolderComponent.DEFAULT_HEIGHT = 500;
 apogeeapp.app.FolderComponent.ICON_RES_PATH = "/componentIcons/folder.png";
+apogeeapp.app.FolderComponent.TREE_ENTRY_SORT_ORDER = apogeeapp.app.Component.FOLDER_COMPONENT_TYPE_SORT_ORDER;
 
 apogeeapp.app.FolderComponent.propertyDialogLines = [
     {

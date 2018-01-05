@@ -14,6 +14,23 @@ apogeeapp.app.ParentComponent.prototype.instantiateWindowDisplay = function(wind
     return new apogeeapp.app.ParentWindowComponentDisplay(this,options);
 }
 
+apogeeapp.app.ParentComponent.prototype.instantiateTreeEntry = function() {
+    var treeDisplay = apogeeapp.app.Component.prototype.instantiateTreeEntry.call(this);
+    
+    //add any existing children to the tree entry
+    var treeEntry = treeDisplay.getTreeEntry();
+    var member = this.getMember();
+    var childMap = member.getChildMap();
+    for(var childKey in childMap) {
+        var childMember = childMap[childKey];
+        var childComponent = this.getWorkspaceUI().getComponent(childMember);
+        var childTreeEntry = childComponent.getTreeEntry(true);
+        treeEntry.addChild(childTreeEntry);
+    }
+    
+    return treeDisplay;
+}
+
 //----------------------
 // WindowParent Methods
 //----------------------

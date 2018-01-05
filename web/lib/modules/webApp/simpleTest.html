@@ -185,6 +185,26 @@
                 var viewType = embedEntry[2];
                 var parentElementId = embedEntry[1];
                 
+                var parentElement = document.getElementById(parentElementId);
+                if(!parentElement) {
+                    alert("DOM Element not found:" + parentElementId);
+                    return;
+                }
+
+                //show the display
+                var displayFrame = getDisplayFrame(app,memberName,viewType);
+                
+                var element = displayFrame.getElement();
+                parentElement.appendChild(element);
+                
+                //the display frame method "setIsShowing" must be called when
+                //the object is shown or hidden for proper operation
+                displayFrame.setIsShowing(true);
+            }
+            
+            /** This method returns a PlainFrame object which contains the component display object. 
+             * If the optionalViewType is not set, the default view (which is typically the desired one) will be used.*/
+            function getDisplayFrame(app,memberName,optionalViewType) {
                 var workspace = app.getWorkspace();
                 var workspaceUI = app.getWorkspaceUI();
                 
@@ -195,23 +215,12 @@
                 }
                 var component = workspaceUI.getComponent(member);
                 
-                var parentElement = document.getElementById(parentElementId);
-                if(!parentElement) {
-                    alert("DOM Element not found:" + parentElementId);
-                    return;
-                }
-
-                //show the display
-//set desired view type
                 var options = {};
-                options.viewType = viewType;
+                options.viewType = optionalViewType;
                 options.PLAIN_FRAME_UI = true;
+                
                 var componentDisplay = component.getWindowDisplay(true,options);
-                var plainFrame = componentDisplay.getDisplayFrame();
-                var element = plainFrame.getElement();
-                element.style = "position:realtive";
-                parentElement.appendChild(element);
-                plainFrame.setIsShowing(true);
+                return componentDisplay.getDisplayFrame();
             }
            
             
