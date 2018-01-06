@@ -146,6 +146,9 @@
         
         <script type="text/javascript" src="../../../supplemental/debugHook.js"></script>
         
+        <script type="text/javascript" src="webAppAccess.js"></script>
+        <script type="text/javascript" src="../taskApp/taskWebApp.js"></script>
+        
         <!--<link rel="stylesheet" type="text/css" href="../../../apogeeapp/app/apogeeapp.css">-->
 		<link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/jsonedit/jsonedit.css">
         <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/window/WindowFrame.css">
@@ -163,162 +166,49 @@
             
             var configInfo = {
                 "Model.tasks.login.loginControl":{
-                    "elementId":"loginControl",
                     "title":"Login"
                 },
                 "Model.tasks.switcher.selectSequence":{
-                    "elementId":"switcherControl",
                     "title":"Edit Type"
                 },
                 "Model.tasks.editMeta.selectMetaContext.contextControl":{
-                    "elementId":"metaFileContext",
                     "title":"Meta File Context"
                 },
                 "Model.tasks.editMeta.selectMetaFile.metaFileSelector":{
-                    "elementId":"metaFileFile",
                     "title":"Meta File File Selection"
                 },
                 "Model.tasks.editMeta.selectDependencies.selectDepForm":{
-                    "elementId":"metaFileDependencies",
                     "title":"Meta File Dependencies"
                 },
                 "Model.tasks.editMeta.editMetaFile.selectEntriesControl":{
-                    "elementId":"metaFileEntries",
                     "title":"Select Meta File Entries"
                 },
                 "Model.tasks.editCom.selectCid.selectCidControl":{
-                    "elementId":"comFileCid",
                     "title":"Com File CID"
                 },
                 "Model.tasks.editCom.editComFile.selectComEntries":{
-                    "elementId":"comFileEntries",
                     "title":"Com File Entries"
                 },
                 "Model.tasks.submit.submitControl":{
-                    "elementId":"submitControl",
                     "title":"Submit"
                 },
                 "Model.tasks.completed.resetControl":{
-                    "elementId":"resetControl",
                     "title":"Completed"
                 }
             };
             var INITIAL_PANEL_NAME = "Model.tasks.login.loginControl";
+            var CONTAINER_PANEL_ID = "displayPanel";
             
             'use strict'
-            var app = null;
-            var activeDisplayFrame = null;
-            var displayPanel = null;
+            
 			function init() {
-                //load the display panel
-                displayPanel = document.getElementById("displayPanel");
-                
-                //apogeeapp.ui.initResourcePath("../../resources");
-                app = new apogeeapp.app.Apogee();
-                
-                __globals__.__WEB_APP_MAKE_ACTIVE_FUNCTION__ = setActiveComponent;
-                
-                apogeeapp.app.openworkspace.openWorkspaceFromUrlImpl(app,workspaceUrl,onWorkspaceLoad);              
+                initTaskApp(workspaceUrl,configInfo,CONTAINER_PANEL_ID,INITIAL_PANEL_NAME);                      
             }
-            
-            function registerComponent(controlBundle) {
-                app.registerComponent(controlBundle);
-            }   
-            
-            function onWorkspaceLoad() {
-              
-                //load the UI controls
-                for(var fullName in configInfo) {
-                    initDisplay(fullName,configInfo[fullName]);
-                }
-                
-                //set the initial component
-                setActiveComponent(INITIAL_PANEL_NAME);
-            }
-            
-            function initDisplay(memberName,configEntry) {
-                
-                //get the display element
-                var displayFrame = getDisplayFrame(app,memberName);
-                configEntry.displayFrame = displayFrame;
-                
-                //create wrapper dom Element
-                var wrapperElement = document.createElement("div");
-                wrapperElement.className = "wrapperElementClass";
-                
-                var titleElement = document.createElement("h3");
-                titleElement.innerHTML = configEntry.title;
-                wrapperElement.appendChild(titleElement);
-                
-                var frameHolder = document.createElement("div");
-                frameHolder.className = "frameHolderClass";
-                frameHolder.appendChild(displayFrame.getElement())
-                wrapperElement.appendChild(frameHolder);
-                
-                configEntry.panel = wrapperElement;             
-            }
-            
-            /** This method returns a PlainFrame object which contains the component display object. 
-             * If the optionalViewType is not set, the default view (which is typically the desired one) will be used.*/
-            function getDisplayFrame(app,memberName,optionalViewType) {
-                var workspace = app.getWorkspace();
-                var workspaceUI = app.getWorkspaceUI();
-                
-                var member = workspace.getMemberByFullName(memberName); 
-                if(!member) {
-                    alert("Member not found: " + memberName);
-                    return;
-                }
-                var component = workspaceUI.getComponent(member);
-                
-                var options = {};
-                options.viewType = optionalViewType;
-                options.PLAIN_FRAME_UI = true;
-                
-                var componentDisplay = component.getWindowDisplay(true,options);
-                return componentDisplay.getDisplayFrame();
-            }
-            
-            
-            function setActiveComponent(memberFolderName) {
-                if(activeDisplayFrame != null) {
-                    activeDisplayFrame.setIsShowing(false);
-                    activeDisplayFrame = null;
-                    apogeeapp.ui.removeAllChildren(displayPanel);
-                }
-                
-                var memberName;
-                var found = false;
-                for(memberName in configInfo) {
-                    if(memberName.startsWith(memberFolderName)) {
-                        found = true;
-                        break;
-                    }
-                }
-                
-                if(!found) {
-                    alert("Member folder not found: " + memberName);
-                    return;
-                }
-                
-                var memberConfigEntry = configInfo[memberName];
-                
-                displayPanel.appendChild(memberConfigEntry.panel);
-                
-                activeDisplayFrame = memberConfigEntry.displayFrame;
-                activeDisplayFrame.setIsShowing(true);
-                
-            }
-
-            
             
         </script>
     </head>
     <body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
-        <div id="displayPanel">
-                
+        <div id="displayPanel">  
         </div>
-        
-        
     </body>
 </html>
