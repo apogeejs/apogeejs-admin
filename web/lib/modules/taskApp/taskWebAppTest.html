@@ -5,23 +5,25 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
+            html,body {
+                position: relative;
+                top: 0px;
+                left: 0px;
+                width: 100%;
+                height: 100%;
+                margin: 0px;
+                padding: 0px;
+            }
 			#displayPanel {
-				outline: solid 1px gray;
-				margin: 10px;
 				display: table;
+                margin: 0px;
                 
                 position: relative;
-                width: 800px;
+                top: 0px;
+                left: 0px;
+                width: 100%;
+                height: 100%;
 			}
-            
-            .wrapperElementClass {
-                position: relative;         
-            }
-            
-            .frameHolderClass {
-                position: relative;
-                height: 500px;
-            }
      
 		</style>
         
@@ -146,8 +148,9 @@
         
         <script type="text/javascript" src="../../../supplemental/debugHook.js"></script>
         
-        <script type="text/javascript" src="webAppAccess.js"></script>
-        <script type="text/javascript" src="../taskApp/taskWebApp.js"></script>
+        <script type="text/javascript" src="../webApp/webAppAccess.js"></script>
+        <script type="text/javascript" src="taskWebApp.js"></script>
+        <link rel="stylesheet" type="text/css" href="taskWebApp.css">
         
         <!--<link rel="stylesheet" type="text/css" href="../../../apogeeapp/app/apogeeapp.css">-->
 		<link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/jsonedit/jsonedit.css">

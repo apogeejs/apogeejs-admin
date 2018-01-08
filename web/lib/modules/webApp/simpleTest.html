@@ -153,12 +153,6 @@
         <script>
             var workspaceUrl = "BasicExample.json";
             
-            var embedInfo = [
-                ["Model.plainValue","plainValueCell",apogeeapp.app.JsonTableComponent.VIEW_DATA],
-                ["Model.derivedValue","derivedValueCell",apogeeapp.app.JsonTableComponent.VIEW_DATA]
-            ];
-            
-            
             'use strict'
 			function init() {
                 //apogeeapp.ui.initResourcePath("../../resources");
@@ -168,15 +162,11 @@
               
             function onWorkspaceLoad() {
                 //load the UI controls
-                for(var i = 0; i < embedInfo.length; i++) {
-                    addDisplay(embedInfo[i]);
-                }
+                addDisplay("Model.plainValue","plainValueCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.derivedValue","derivedValueCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
             }
             
-            function addDisplay(embedEntry) {
-                var memberName = embedEntry[0];
-                var viewType = embedEntry[2];
-                var parentElementId = embedEntry[1];
+            function addDisplay(memberName,parentElementId,optionalViewType) {
                 
                 var parentElement = document.getElementById(parentElementId);
                 if(!parentElement) {
@@ -185,8 +175,9 @@
                 }
 
                 //show the display
-                var displayFrame = webAppAccess.getDisplayFrame(memberName,viewType);
+                var displayFrame = webAppAccess.getDisplayFrame(memberName,optionalViewType);
                 
+                //put the display element in the parent
                 var element = displayFrame.getElement();
                 parentElement.appendChild(element);
                 
