@@ -3,6 +3,7 @@ apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
     this.component = component;
     this.member = component.getMember();
     
+    if(!options) options = {};
     this.options = options;
     
     //content management
