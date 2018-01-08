@@ -149,18 +149,29 @@ apogeeapp.app.ReferenceManager.prototype.instantiateTreeEntry = function() {
     
     //add child lists
     for(var childKey in this.referenceLists) {
-        var childInfo = this.referenceLists[childKey];
-        var iconUrl = apogeeapp.ui.getResourcePath(childInfo.listIconPath);
-        var menuItemCallback = () => this.getListMenuItems(childInfo);
-        var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(childInfo.listName, iconUrl, null, menuItemCallback, false);
-        treeEntry.addChild(listTreeEntry);
-        
-        childInfo.listTreeEntry = listTreeEntry;
+        var childStruct = this.referenceLists[childKey];
+        this.addListTreeEntry(treeEntry,childStruct);
     }
     
     return treeEntry;
 }
 
+apogeeapp.app.ReferenceManager.prototype.addListTreeEntry = function(referenceTreeEntry,childStruct) {
+    var listInfo = childStruct.listInfo;
+    var iconUrl = apogeeapp.ui.getResourcePath(listInfo.listIconPath);
+    var menuItemCallback = () => this.getListMenuItems(listInfo);
+    var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(listInfo.listName, iconUrl, null, menuItemCallback, false);
+    
+    //add existing child entries
+    for(var childKey in childStruct.listEntries) {
+        var childEntry = childStruct.listEntries[childKey];
+        var treeEntry = childEntry.getTreeEntry(true);
+        listTreeEntry.addChild(treeEntry);
+    }
+    
+    childStruct.listTreeEntry = listTreeEntry;
+    referenceTreeEntry.addChild(listTreeEntry);
+}
 
 
 /** @private */

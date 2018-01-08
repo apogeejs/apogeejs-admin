@@ -1,19 +1,16 @@
+var webAppAccess = {};
 
-var app = null;
-
-function initWebApp(workspaceUrl,onWorkspaceLoad) {
-    app = new apogeeapp.app.Apogee();
+webAppAccess.initWebApp = function(workspaceUrl,onWorkspaceLoad) {
+    //create with no container id to not use the standard UI
+    var app = apogeeapp.app.Apogee.createApp();
     
     apogeeapp.app.openworkspace.openWorkspaceFromUrlImpl(app,workspaceUrl,onWorkspaceLoad);     
 }
 
-function registerComponent(controlBundle) {
-    app.registerComponent(controlBundle);
-}   
-
 /** This method returns a PlainFrame object which contains the component display object. 
 * If the optionalViewType is not set, the default view (which is typically the desired one) will be used.*/
-function getDisplayFrame(memberName,optionalViewType) {
+webAppAccess.getDisplayFrame = function(memberName,optionalViewType) {
+   var app = apogeeapp.app.Apogee.getInstance();
    var workspace = app.getWorkspace();
    var workspaceUI = app.getWorkspaceUI();
 

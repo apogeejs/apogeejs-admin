@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Sample Apogee Web App</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
@@ -163,7 +163,7 @@
 			function init() {
                 //apogeeapp.ui.initResourcePath("../../resources");
                 
-                initWebApp(workspaceUrl,onWorkspaceLoad)           
+                webAppAccess.initWebApp(workspaceUrl,onWorkspaceLoad)           
             }
               
             function onWorkspaceLoad() {
@@ -185,7 +185,7 @@
                 }
 
                 //show the display
-                var displayFrame = getDisplayFrame(memberName,viewType);
+                var displayFrame = webAppAccess.getDisplayFrame(memberName,viewType);
                 
                 var element = displayFrame.getElement();
                 parentElement.appendChild(element);

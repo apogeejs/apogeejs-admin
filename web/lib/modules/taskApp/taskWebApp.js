@@ -1,14 +1,6 @@
+var taskWebApp = {};
 
-
-//this can be in an object - wrap this part
-var app = null;
-
-//this must be global
-function registerComponent(controlBundle) {
-    app.registerComponent(controlBundle);
-} 
-
-function initTaskApp(workspaceUrl,configData,containerElementId,initialComponentName) {
+taskWebApp.initTaskApp = function(workspaceUrl,configData,containerElementId,initialComponentName) {
 
     //==============================
     //internal variables and functions
@@ -33,7 +25,7 @@ function initTaskApp(workspaceUrl,configData,containerElementId,initialComponent
     function initDisplay(memberName,configEntry) {
 
         //get the display element
-        var displayFrame = getDisplayFrame(app,memberName);
+        var displayFrame = webAppAccess.getDisplayFrame(memberName);
         configEntry.displayFrame = displayFrame;
 
         //create wrapper dom Element
@@ -86,13 +78,12 @@ function initTaskApp(workspaceUrl,configData,containerElementId,initialComponent
     //==================
     // Init body
     //==================
-
-    //apogeeapp.ui.initResourcePath("../../resources");
-    app = new apogeeapp.app.Apogee();
-
+    
     //set some globals
      __globals__.__WEB_APP_MAKE_ACTIVE_FUNCTION__ = setActiveComponent;
-     __globals__.registerComponent = registerComponent;
+
+    //create with no container id to not use the standard UI
+    var app = apogeeapp.app.Apogee.createApp();
 
      //open workspace
     apogeeapp.app.openworkspace.openWorkspaceFromUrlImpl(app,workspaceUrl,onWorkspaceLoad);

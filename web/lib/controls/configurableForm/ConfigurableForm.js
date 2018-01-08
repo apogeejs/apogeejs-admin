@@ -50,8 +50,12 @@ apogeeapp.app.ConfigurableFormDisplay.prototype.onLoad = function() {
 //-----------------
 //auto registration
 //-----------------
-if(registerComponent) {
-    registerComponent(apogeeapp.app.ConfigurableForm);
+var app = apogeeapp.app.Apogee.getInstance();
+if(app) {
+    app.registerComponent(apogeeapp.app.ConfigurableForm);
+}
+else {
+    console.log("Component could not be registered because no Apogee app instance was available at component load time: apogeeapp.app.ConfigurableForm");
 }
 
 //====================================================

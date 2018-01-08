@@ -117,9 +117,14 @@ apogeeapp.app.GoogleChartDisplay.prototype.createDataTable = function(data) {
 //-----------------
 //auto registration
 //-----------------
-if(registerComponent) {
-    registerComponent(apogeeapp.app.GoogleChartComponent);
+var app = apogeeapp.app.Apogee.getInstance();
+if(app) {
+    app.registerComponent(apogeeapp.app.GoogleChartComponent);
+}
+else {
+    console.log("Component could not be registered because no Apogee app instance was available at component load time: apogeeapp.app.GoogleChartComponent");
 }
 
-}
-)();
+
+//end definition
+})();

@@ -7,11 +7,11 @@
       "entryType": "js link"
     },
     {
-      "url": "http://www.apogeejs.com/lib/controls/configurableForm/configurableForm.js",
+      "url": "../../controls/configurableForm/configurableForm.js",
       "entryType": "js link"
     },
     {
-      "url": "http://www.apogeejs.com/lib/controls/configurableForm/configurableForm.css",
+      "url": "../../controls/configurableForm/configurableForm.css",
       "entryType": "css link"
     }
   ],

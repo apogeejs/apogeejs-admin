@@ -1,15 +1,27 @@
 apogeeapp.app = {};
 apogeeapp.app.dialog = {};
 
+//======================================
+//class definition
+//======================================
+
+
 /** This is the main class of the apogee application. 
- * The UI is set up in the element with the given container ID. If the container
- * ID is undefined, no top level UI will be created. See the documentation for 
- * using this to run the application with a alternate UI. */
+ * This constuctor should not be called externally, the static creation method 
+ * should be used. 
+ * @private */
 apogeeapp.app.Apogee = function(containerId) {
     
     //temp - until we figure out what to do with menu and events
     //for now we have application events, using the EventManager mixin below.
     apogee.EventManager.init.call(this);
+    
+    if(apogeeapp.app.Apogee.instance != null) {
+        throw new Error("Error: There is already an Apogee app instance - apogeeapp.app.Apogee is a singleton.");
+    }
+    else {
+        apogeeapp.app.Apogee.instance = this;
+    }
     
     //workspaces
     this.workspaceUI = null;
@@ -39,6 +51,30 @@ apogeeapp.app.Apogee = function(containerId) {
 apogee.base.mixin(apogeeapp.app.Apogee,apogee.EventManager);
 
 apogeeapp.app.Apogee.DEFAULT_WORKSPACE_NAME = "workspace";
+
+//======================================
+// static singleton methods
+//======================================
+
+/** @private */
+apogeeapp.app.Apogee.instance = null;
+
+/** This creates and returns an app instance. The app is a singleton. This call
+ * should only be made once. The containerId is the DOM element ID in which the
+ * app UI is created. If this is left as undefined the UI will not be created. This
+ * is used when creating an alternate UI such as with the web app. */
+apogeeapp.app.Apogee.createApp = function(containerId) {
+    return new apogeeapp.app.Apogee(containerId);
+}
+
+/** This retrieves an existing instance. It does not create an instance. */
+apogeeapp.app.Apogee.getInstance = function() {
+    return apogeeapp.app.Apogee.instance;
+}
+
+//======================================
+// public methods
+//======================================
 
 apogeeapp.app.Apogee.prototype.getWorkspaceUI = function() {
 	return this.workspaceUI;

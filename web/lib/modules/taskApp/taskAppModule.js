@@ -1,4 +1,4 @@
-taskAppModule = (function() {
+var taskAppModule = (function() {
 	
 	var wrapper = {};
 
@@ -20,6 +20,8 @@ taskAppModule = (function() {
     
     function setActiveComponentByPath(relativeToTasksPath) {
         //this is a little convuluted - I should fix up how we loda this object
+        var app = apogeeapp.app.Apogee.getInstance();
+        
         var absolutePath = ["tasks"].concat(relativeToTasksPath);
         var workspace = app.getWorkspace();
         var rootFolder = workspace.getRoot();
