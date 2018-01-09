@@ -9,7 +9,7 @@ apogeeapp.app.saveworkspace = {};
 apogeeapp.app.saveworkspace.getSaveCallback = function(app,filename) {
     return function() {
         
-        var workspaceText = apogeeapp.app.saveworkspace.getWorkspaceText();
+        var workspaceText = apogeeapp.app.saveworkspace.getWorkspaceText(app);
         if(!workspaceText) {
             alert("There is no workspace open.");
             return;
@@ -27,7 +27,7 @@ apogeeapp.app.saveworkspace.getSaveCallback = function(app,filename) {
     }
 }
 
-apogeeapp.app.saveworkspace.getWorkspaceText = function() {
+apogeeapp.app.saveworkspace.getWorkspaceText = function(app) {
     var activeWorkspaceUI = app.getWorkspaceUI();
     if(activeWorkspaceUI) {
         var workspaceJson = activeWorkspaceUI.toJson();
