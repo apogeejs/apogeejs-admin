@@ -3,15 +3,15 @@
   "version": "0.40",
   "references": [
     {
-      "url": "/lib/modules/taskApp/taskAppModule.js",
+      "url": "../taskApp/taskAppModule.js",
       "entryType": "js link"
     },
     {
-      "url": "/lib/controls/configurableForm/configurableForm.js",
+      "url": "../../controls/configurableForm/configurableForm.js",
       "entryType": "js link"
     },
     {
-      "url": "/lib/controls/configurableForm/configurableForm.css",
+      "url": "../../controls/configurableForm/configurableForm.css",
       "entryType": "css link"
     }
   ],

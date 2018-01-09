@@ -1,49 +1,39 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Sample Apogee Task Web App</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-			.contentTest {
-				width: 500px;
-				outline: solid 1px gray;
-				margin: 10px;
-				display: table;
+            html,body {
                 position: relative;
+                top: 0px;
+                left: 0px;
+                width: 100%;
+                height: 100%;
+                margin: 0px;
+                padding: 0px;
+            }
+			#displayPanel {
+				display: table;
+                margin: 0px;
+                
+                position: relative;
+                top: 0px;
+                left: 0px;
+                width: 100%;
+                height: 100%;
 			}
-            
-            #loginControl {
-                height: 100px;
-            }
-            #contextControl {
-                height: 100px;
-            }
-            #metaFileSelector {
-                height: 150px;
-            }
-            #selectEntriesControl {
-                height: 700px;   
-            }
-            #submitControl {
-                height: 400px;
-            }
-            #resetControl {
-                height: 50px;
-            }
-            .debug {
-                height: 200px;
-            }
-            
+     
 		</style>
         
-        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
         
         <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
+        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
         
         <script type="text/javascript" src="../../../supplemental/webLibHeader.js"></script>
-		<script type="text/javascript" src="../../../apogee/apogee.js"></script>
-        <script type="text/javascript" src="../../../supplemental/debugHook.js"></script>
+		<script type="text/javascript" src="../../../apogee/apogee.js"></script>        
         <script type="text/javascript" src="../../../apogee/lib/base.js"></script>
         <script type="text/javascript" src="../../../apogee/usrlib/util.js"></script>
         <script type="text/javascript" src="../../../apogee/usrlib/net.js"></script>
@@ -70,6 +60,7 @@
         <script type="text/javascript" src="../../../apogee/actions/action.js"></script>
         <script type="text/javascript" src="../../../apogee/actions/compoundaction.js"></script>
         <script type="text/javascript" src="../../../apogee/actions/createmember.js"></script>
+        <script type="text/javascript" src="../../../apogee/actions/updateworkspace.js"></script>
         <script type="text/javascript" src="../../../apogee/actions/updatemember.js"></script>
 		<script type="text/javascript" src="../../../apogee/actions/movemember.js"></script>
         <script type="text/javascript" src="../../../apogee/actions/deletemember.js"></script>
@@ -79,7 +70,10 @@
         <script type="text/javascript" src="../../../apogeeapp/apogeeapp.js"></script>
 		<script type="text/javascript" src="../../../apogeeapp/ui/apogeeappui.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/ui/window/WindowParent.js"></script>
-		<script type="text/javascript" src="../../../apogeeapp/ui/window/WindowFrame.js"></script>      
+		<script type="text/javascript" src="../../../apogeeapp/ui/window/WindowFrame.js"></script>
+        
+        <script type="text/javascript" src="../../../apogeeapp/ui/plainframe/PlainFrame.js"></script>  
+        
 		<script type="text/javascript" src="../../../apogeeapp/ui/tabframe/TabFrame.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/ui/tabframe/Tab.js"></script>
 		<script type="text/javascript" src="../../../apogeeapp/ui/menu/Menu.js"></script>
@@ -95,13 +89,10 @@
         <script type="text/javascript" src="../../../apogeeapp/ui/splitpane/SplitPane.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/ui/treecontrol/TreeControl.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/ui/treecontrol/TreeEntry.js"></script>
-        
-        <!-- <script type="text/javascript" src="../../../apogeeapp/app/Apogee.js"></script> -->
-        <script type="text/javascript" src="ApogeeWeb.js"></script>
-        
-        <!-- <script type="text/javascript" src="../../../apogeeapp/app/WorkspaceUI.js"></script> -->
-        <script type="text/javascript" src="ApogeeWebWorkspaceUI.js"></script>
-        
+        <script type="text/javascript" src="../../../apogeeapp/app/Apogee.js"></script>
+        <script type="text/javascript" src="../../../apogeeapp/app/WorkspaceUI.js"></script>
+        <script type="text/javascript" src="../../../apogeeapp/app/references/ReferenceManager.js"></script>
+        <script type="text/javascript" src="../../../apogeeapp/app/references/LinkEntry.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/component/WindowHeaderManager.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/component/Component.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/component/ParentComponent.js"></script>
@@ -110,9 +101,6 @@
         <script type="text/javascript" src="../../../apogeeapp/app/component/TabComponentDisplay.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/component/ParentWindowComponentDisplay.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/component/EditWindowComponentDisplay.js"></script>
-        
-        <script type="text/javascript" src="EmbeddedContainerComponentDisplay.js"></script>
-
 		<script type="text/javascript" src="../../../apogeeapp/app/components/FolderComponent.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/components/JsonTableComponent.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/components/GridTableComponent.js"></script>
@@ -121,8 +109,9 @@
         <script type="text/javascript" src="../../../apogeeapp/app/components/FolderFunctionComponent.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/components/BasicControlComponent.js"></script>
 		<script type="text/javascript" src="../../../apogeeapp/app/components/CustomControlComponent.js"></script>
-        
-        <!--<script type="text/javascript" src="../../../apogeeapp/app/actions/createworkspace.js"></script>
+        <script type="text/javascript" src="../../../apogeeapp/app/actions/errorhandling.js"></script>
+        <script type="text/javascript" src="../../../apogeeapp/app/actions/createworkspace.js"></script>
+        <script type="text/javascript" src="../../../apogeeapp/app/actions/updateworkspace.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/actions/openworkspace.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/actions/saveworkspace.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/actions/importworkspace.js"></script>
@@ -130,9 +119,7 @@
         <script type="text/javascript" src="../../../apogeeapp/app/actions/closeworkspace.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/actions/addcomponent.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/actions/updatecomponent.js"></script>
-        <script type="text/javascript" src="../../../apogeeapp/app/actions/updatelinks.js"></script> -->
-        <script type="text/javascript" src="openwebworkspace.js"></script>
-        
+        <script type="text/javascript" src="../../../apogeeapp/app/actions/updatelink.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/editors/ViewMode.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/editors/TextAreaEditor.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/editors/TextAreaMode.js"></script>
@@ -155,193 +142,76 @@
         <script type="text/javascript" src="../../../apogeeapp/app/dialogs/SelectControlDialog.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/dialogs/propdialog.js"></script>
         
-        <!-- <link rel="stylesheet" type="text/css" href="../../../apogeeapp/app/apogeeapp.css">
+        <script type="text/javascript" src="../../../supplemental/cutNPasteCode/file_impl_cutnpaste.js"></script>
+        <script type="text/javascript" src="../../../supplemental/cutNPasteCode/PasteOpenDialog.js"></script>
+        <script type="text/javascript" src="../../../supplemental/cutNPasteCode/CutSaveDialog.js"></script>
+        
+        <script type="text/javascript" src="../../../supplemental/debugHook.js"></script>
+        
+        <script type="text/javascript" src="../webApp/webAppAccess.js"></script>
+        <script type="text/javascript" src="taskWebApp.js"></script>
+        <link rel="stylesheet" type="text/css" href="taskWebApp.css">
+        
+        <!--<link rel="stylesheet" type="text/css" href="../../../apogeeapp/app/apogeeapp.css">-->
 		<link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/jsonedit/jsonedit.css">
         <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/window/WindowFrame.css">
-        <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/window/dialog.css">-->
+        <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/window/dialog.css">
         <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/displayandheader/DisplayAndHeader.css">
-        <!-- <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/menu/Menu.css">
+        <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/menu/Menu.css">
         <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/splitpane/SplitPane.css">
         <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/tabframe/TabFrame.css">
-        <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/treecontrol/TreeControl.css">-->
+        <link rel="stylesheet" type="text/css" href="../../../apogeeapp/ui/treecontrol/TreeControl.css">
+          
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
         
         <script>
             var workspaceUrl = "editMetaFile.json";
             
-            var embedInfo = [
-                ["tasks.login.loginControl","loginControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                ["tasks.loadContext.contextControl","contextControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                ["tasks.loadMetaFileRecords.metaFileSelector","metaFileSelector",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                ["tasks.editMetaFile.selectEntriesControl","selectEntriesControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                ["tasks.submit.submitControl","submitControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                ["tasks.completed.resetControl","resetControl",apogeeapp.app.CustomControlComponent.VIEW_OUTPUT],
-                
-                /* These lines are for debugging status
-                ["taskResults.login","loginTest",apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT],
-                ["taskResults.loadContext","loadContextTest",apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT],
-                ["taskResults.loadMetaFileRecords","loadMetaFileRecordsTest",apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT],
-                ["taskResults.editMetaFile","editMetaFileTest",apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT],
-                ["taskResults.submit","submitTest",apogeeapp.app.JsonTableComponent.VIEW_PLAIN_TEXT]*/
-                
-            ];
-            
-            var taskStatusInfo = [
-                ["login","loginPanel"],
-                ["loadContext","loadContextPanel"],
-                ["loadMetaFileRecords","loadMetaFileRecordsPanel"],
-                ["editMetaFile","editMetaFilePanel"],
-                ["submit","submitPanel"]
-            ]
-            
-            var COMPLETE_TASK_PANEL_ID = "completedPanel";
+            var configInfo = {
+                "Model.tasks.login.loginControl":{
+                    "title":"Login"
+                },
+                "Model.tasks.switcher.selectSequence":{
+                    "title":"Edit Type"
+                },
+                "Model.tasks.editMeta.selectMetaContext.contextControl":{
+                    "title":"Meta File Context"
+                },
+                "Model.tasks.editMeta.selectMetaFile.metaFileSelector":{
+                    "title":"Meta File File Selection"
+                },
+                "Model.tasks.editMeta.selectDependencies.selectDepForm":{
+                    "title":"Meta File Dependencies"
+                },
+                "Model.tasks.editMeta.editMetaFile.selectEntriesControl":{
+                    "title":"Select Meta File Entries"
+                },
+                "Model.tasks.editCom.selectCid.selectCidControl":{
+                    "title":"Com File CID"
+                },
+                "Model.tasks.editCom.editComFile.selectComEntries":{
+                    "title":"Com File Entries"
+                },
+                "Model.tasks.submit.submitControl":{
+                    "title":"Submit"
+                },
+                "Model.tasks.completed.resetControl":{
+                    "title":"Completed"
+                }
+            };
+            var INITIAL_PANEL_NAME = "Model.tasks.login.loginControl";
+            var CONTAINER_PANEL_ID = "displayPanel";
             
             'use strict'
-            var app = null;
+            
 			function init() {
-                //apogeeapp.ui.initResourcePath("../../resources");
-                app = new apogeeapp.webapp.ApogeeWeb();
-                
-                apogeeapp.webapp.openwebworkspace.openWorkspaceFromUrl(app,workspaceUrl,onWorkspaceLoad);              
+                taskWebApp.initTaskApp(workspaceUrl,configInfo,CONTAINER_PANEL_ID,INITIAL_PANEL_NAME);                      
             }
-            
-            function registerComponent(controlBundle) {
-                app.registerComponent(controlBundle);
-            }   
-            
-            function onWorkspaceLoad() {
-                
-                var workspace = app.getWorkspace();
-                
-                //set initial panel state
-                var taskStatusFolder = workspace.getMemberByFullName("taskResults");
-                setActiveTask(taskStatusFolder);
-                
-                //set up update callback
-                workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT,onMemberUpdated);
-                
-                //load the UI controls
-                for(var i = 0; i < embedInfo.length; i++) {
-                    addDisplay(embedInfo[i]);
-                }
-            }
-            
-            function addDisplay(embedEntry) {
-                var memberName = embedEntry[0];
-                var viewType = embedEntry[2];
-                var parentElementId = embedEntry[1];
-                
-                var workspace = app.getWorkspace();
-                var workspaceUI = app.getWorkspaceUI();
-                
-                var member = workspace.getMemberByFullName(memberName); 
-                if(!member) {
-                    alert("Member not found: " + memberName);
-                    return;
-                }
-                var component = workspaceUI.getComponent(member);
-                
-                var parentElement = document.getElementById(parentElementId);
-                if(!parentElement) {
-                    alert("DOM Element not found:" + parentElementId);
-                    return;
-                }
-
-                //create an alternate component display (to the window display) 
-                var componentDisplay = new apogeeapp.webapp.EmbeddedContainerComponentDisplay(component, viewType, parentElement);
-                component.setAlternateWindowDisplay(componentDisplay);
-                var viewMode = componentDisplay.getViewMode();
-                viewMode.showData();
-            }
-            
-            function onMemberUpdated(member) {
-                var memberName = member.getFullName();
-                if(memberName == "editMetaFileTest.taskResults") {
-                    setActiveTask(member);
-                }
-            }
-            
-            function setActiveTask(taskStatusFolder) {
-                var taskStatusData = taskStatusFolder.getData();
-                var activePanelSet = false;
-                for(var i = 0; i < taskStatusInfo.length; i++) {
-                    var taskStatusInfoEntry = taskStatusInfo[i];
-                    var taskStatus = taskStatusData[taskStatusInfoEntry[0]];
-                    var taskVisible;
-                    if((taskIncomplete(taskStatus))&&(!activePanelSet)) {
-                        taskVisible = true;
-                        activePanelSet = true;
-                    }
-                    else {
-                        taskVisible = false;
-                    }
-                    setPanelVisible(taskVisible,taskStatusInfoEntry[1]);
-                }
-                
-                //set visibility of complete panel
-                var showCompletedPanel = !activePanelSet
-                setPanelVisible(showCompletedPanel,COMPLETE_TASK_PANEL_ID);
-            }
-            
-            function taskIncomplete(taskStatus) {
-                return ((!taskStatus)||(!taskStatus.state)||(taskStatus.state != "SUCCESS"));
-            }
-            
-            function setPanelVisible(makeVisible,id) {
-                var panel = document.getElementById(id);
-                if(panel) {
-                    if(makeVisible) {
-                        panel.style.display = "";
-                    }
-                    else {
-                        panel.style.display = "none";
-                    }
-                }
-            }
-            
-            
             
         </script>
     </head>
     <body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
-        <div id="loginPanel">
-            <h1>Login</h1>
-            <div class="contentTest" id="loginControl"></div>
+        <div id="displayPanel">  
         </div>
-        <div id="loadContextPanel">
-            <h1>Context</h1>
-            <div class="contentTest" id="contextControl"></div>
-        </div>
-        <div id="loadMetaFileRecordsPanel">
-            <h1>File Selection</h1>
-            <div class="contentTest" id="metaFileSelector"></div>
-        </div>
-        <div id="editMetaFilePanel">
-            <h1>File Edit</h1>
-            <div class="contentTest" id="selectEntriesControl"></div>
-        </div>
-        <div id="submitPanel">
-            <h1>Commit</h1>
-            <div class="contentTest" id="submitControl"></div>
-        </div>
-        <div id="completedPanel">    
-            <h1>Commit Result</h1>
-            <div class="contentTest" id="resetControl"></div>
-        </div>
-        
-        <!-- The lines below are for debugging the status
-        <div>    
-            <h1>Login Status</h1>
-            <div class="contentTest debug" id="loginTest"></div>
-            <h1>Context Status</h1>
-            <div class="contentTest debug" id="loadContextTest"></div>
-            <h1>Load Meta Files Status</h1>
-            <div class="contentTest debug" id="loadMetaFileRecordsTest"></div>
-            <h1>Edit Meta File Status</h1>
-            <div class="contentTest debug" id="editMetaFileTest"></div>
-            <h1>Submit Status</h1>
-            <div class="contentTest debug" id="submitTest"></div>
-        </div>
-        -->
-        
     </body>
 </html>

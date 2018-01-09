@@ -20,7 +20,7 @@ apogeeapp.app.ViewMode = function(componentDisplay, displayDestroyFlags) {
     this.inEditMode = false; 
     
     //window state, and listener for changes to window state (minimize/restore)
-    var window = componentDisplay.getWindowFrame();
+    var window = componentDisplay.getDisplayFrame();
     this.windowMinimized = (window.getWindowState() == apogeeapp.ui.WINDOW_STATE_MINIMIZED);
     window.addListener(apogeeapp.ui.WINDOW_STATE_CHANGED,(window) => (this.onWindowStateChange(window)) );
     
@@ -56,7 +56,7 @@ apogeeapp.app.ViewMode.prototype.getMember = function() {
 
 /** This returns the UiObject, such as the window frame for this data display. */
 apogeeapp.app.ViewMode.prototype.getDisplayWindow = function() {
-    return this.componentDisplay.getWindowFrame();
+    return this.componentDisplay.getDisplayFrame();
 }
 
 apogeeapp.app.ViewMode.prototype.getElement = function() {

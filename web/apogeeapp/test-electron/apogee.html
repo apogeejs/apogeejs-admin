@@ -136,24 +136,14 @@
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
 		<script>
             'use strict'
-            var app = null;
+
 			function init() {
+                //set resounce path
                 apogeeapp.ui.initResourcePath("../../resources");
-                app = new apogeeapp.app.Apogee("appContainer");
+                
+                //create the application
+                apogeeapp.app.Apogee.createApp("appContainer");
             }
-            
-            function registerComponent(controlBundle) {
-                app.registerComponent(controlBundle);
-            }
-            
-            /*function beforeUnloadHandler() {
-                if(app.getWorkspaceIsDirty()) {
-                    return "There is unsaved data. Are you sure you want to exit?";
-                }
-                else {
-                    return undefined;
-                }
-            }*/
             
 		</script>
 	</head>

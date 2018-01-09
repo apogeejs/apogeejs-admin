@@ -1,12 +1,27 @@
 apogeeapp.app = {};
 apogeeapp.app.dialog = {};
 
-/** This is the main class of the apogee application. */
+//======================================
+//class definition
+//======================================
+
+
+/** This is the main class of the apogee application. 
+ * This constuctor should not be called externally, the static creation method 
+ * should be used. 
+ * @private */
 apogeeapp.app.Apogee = function(containerId) {
     
     //temp - until we figure out what to do with menu and events
     //for now we have application events, using the EventManager mixin below.
     apogee.EventManager.init.call(this);
+    
+    if(apogeeapp.app.Apogee.instance != null) {
+        throw new Error("Error: There is already an Apogee app instance - apogeeapp.app.Apogee is a singleton.");
+    }
+    else {
+        apogeeapp.app.Apogee.instance = this;
+    }
     
     //workspaces
     this.workspaceUI = null;
@@ -20,8 +35,10 @@ apogeeapp.app.Apogee = function(containerId) {
 	//load the standard component generators
 	this.loadComponentGenerators();
 	
-	//create the UI
-	this.createUI(containerId);
+	//create the UI - if a container ID is passed in
+    if(containerId !== undefined) {
+        this.createUI(containerId);
+    }
     
     //open a workspace if there is a url present
     var workspaceUrl = apogee.util.readQueryField("url",document.URL);
@@ -34,6 +51,30 @@ apogeeapp.app.Apogee = function(containerId) {
 apogee.base.mixin(apogeeapp.app.Apogee,apogee.EventManager);
 
 apogeeapp.app.Apogee.DEFAULT_WORKSPACE_NAME = "workspace";
+
+//======================================
+// static singleton methods
+//======================================
+
+/** @private */
+apogeeapp.app.Apogee.instance = null;
+
+/** This creates and returns an app instance. The app is a singleton. This call
+ * should only be made once. The containerId is the DOM element ID in which the
+ * app UI is created. If this is left as undefined the UI will not be created. This
+ * is used when creating an alternate UI such as with the web app. */
+apogeeapp.app.Apogee.createApp = function(containerId) {
+    return new apogeeapp.app.Apogee(containerId);
+}
+
+/** This retrieves an existing instance. It does not create an instance. */
+apogeeapp.app.Apogee.getInstance = function() {
+    return apogeeapp.app.Apogee.instance;
+}
+
+//======================================
+// public methods
+//======================================
 
 apogeeapp.app.Apogee.prototype.getWorkspaceUI = function() {
 	return this.workspaceUI;

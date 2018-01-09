@@ -8,8 +8,9 @@ apogeeapp.app.EditComponent = function(workspaceUI,member,componentGenerator) {
 apogeeapp.app.EditComponent.prototype = Object.create(apogeeapp.app.Component.prototype);
 apogeeapp.app.EditComponent.prototype.constructor = apogeeapp.app.EditComponent;
 
-apogeeapp.app.EditComponent.prototype.instantiateWindowDisplay = function() {
-    return new apogeeapp.app.EditWindowComponentDisplay(this,this.windowDisplayStateJson);
+apogeeapp.app.EditComponent.prototype.instantiateWindowDisplay = function(windowDisplayOverrideOptions) {
+    var options = windowDisplayOverrideOptions ? windowDisplayOverrideOptions : this.windowDisplayStateJson;
+    return new apogeeapp.app.EditWindowComponentDisplay(this,options);
 }
 
 /** This is used when an alternate UI is used for the workspace. This replaces the window display 

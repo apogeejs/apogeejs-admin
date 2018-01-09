@@ -1,4 +1,4 @@
-taskAppModule = (function() {
+var taskAppModule = (function() {
 	
 	var wrapper = {};
 
@@ -20,19 +20,33 @@ taskAppModule = (function() {
     
     function setActiveComponentByPath(relativeToTasksPath) {
         //this is a little convuluted - I should fix up how we loda this object
+        var app = apogeeapp.app.Apogee.getInstance();
+        
         var absolutePath = ["tasks"].concat(relativeToTasksPath);
         var workspace = app.getWorkspace();
         var rootFolder = workspace.getRoot();
         var workspaceUI = app.getWorkspaceUI();
         var member = rootFolder.lookupChildFromPathArray(absolutePath);
         var component = workspaceUI.getComponent(member);
-        var makeActiveCallback = component.createOpenCallback();
-        makeActiveCallback();
+        
+        var makeActiveFuntion;
+        if(__globals__.__WEB_APP_MAKE_ACTIVE_FUNCTION__) {
+            //this is if the user sets the make active function
+            makeActiveFuntion = __globals__.__WEB_APP_MAKE_ACTIVE_FUNCTION__;
+            makeActiveFuntion(component.getMember().getFullName());
+        }
+        else {
+            makeActiveFuntion = component.createOpenCallback();
+            makeActiveFuntion();
+        }
+        
     }
 	
 	//---------------------
 	//exported functions
 	//----------------------
+    
+    wrapper.WEB_APP_UI = false;
 	
 	
 	/** This method should be called when a task is completed. */

@@ -1,7 +1,8 @@
 
 /** This class manages links and other reference entries.*/
 apogeeapp.app.ReferenceManager = function() {
-    this.createTreeEntry();
+    
+    this.referencesTreeEntry = null;
     
     this.referenceLists = {};
     var jsInfo = apogeeapp.app.LinkEntry.JS_LINK_LIST_INFO;
@@ -10,7 +11,10 @@ apogeeapp.app.ReferenceManager = function() {
     this.referenceLists[cssInfo.typeName] = this.getListStruct(cssInfo);
 }
 
-apogeeapp.app.ReferenceManager.prototype.getTreeEntry = function() {
+apogeeapp.app.ReferenceManager.prototype.getTreeEntry = function(createIfMissing) {
+    if((createIfMissing)&&(!this.referencesTreeEntry)) {
+        this.referencesTreeEntry = this.instantiateTreeEntry();
+    }
     return this.referencesTreeEntry;
 }
 
@@ -86,7 +90,6 @@ apogeeapp.app.ReferenceManager.prototype.close = function() {
  * @protected */
 apogeeapp.app.ReferenceManager.prototype.entryInserted = function(referenceEntry) {
     var entryType = referenceEntry.getEntryType();
-    var treeEntry = referenceEntry.getTreeEntry();
     
     var listStruct = this.referenceLists[entryType];
     if(!listStruct) {
@@ -94,7 +97,12 @@ apogeeapp.app.ReferenceManager.prototype.entryInserted = function(referenceEntry
     }
     
     listStruct.listEntries.push(referenceEntry);
-    listStruct.listTreeEntry.addChild(treeEntry);
+    
+    //add tree entry if applicable
+    if(listStruct.listTreeEntry) {
+        var treeEntry = referenceEntry.getTreeEntry(true);
+        listStruct.listTreeEntry.addChild(treeEntry);
+    }
 }
 
 /** This method opens a list of js and css links. It returns a promise that
@@ -125,29 +133,46 @@ apogeeapp.app.ReferenceManager.prototype.entryRemoved= function(referenceEntry) 
 
 apogeeapp.app.ReferenceManager.REFERENCES_ICON_PATH = "/componentIcons/references.png";
 
-
-/** @private */
-apogeeapp.app.ReferenceManager.prototype.createTreeEntry = function() {
-    var iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.app.ReferenceManager.REFERENCES_ICON_PATH);
-    this.referencesTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry("References", iconUrl, null, null, false);
-}
-
 apogeeapp.app.ReferenceManager.prototype.getListStruct = function(listInfo) {
-    
-    //create the tree entry for this list
-    var iconUrl = apogeeapp.ui.getResourcePath(listInfo.listIconPath);
-    var menuItemCallback = () => this.getListMenuItems(listInfo);
-    var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(listInfo.listName, iconUrl, null, menuItemCallback, false);
-    this.referencesTreeEntry.addChild(listTreeEntry);
-    
-    //create the list struct
     var listStruct = {};
     listStruct.listInfo = listInfo;
     listStruct.listEntries = [];
-    listStruct.listTreeEntry = listTreeEntry;
- 
+    //listStruct.listTreeEntry - add on creation
     return listStruct;
 }
+
+
+/** @private */
+apogeeapp.app.ReferenceManager.prototype.instantiateTreeEntry = function() {
+    var iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.app.ReferenceManager.REFERENCES_ICON_PATH);
+    var treeEntry = new apogeeapp.ui.treecontrol.TreeEntry("References", iconUrl, null, null, false);
+    
+    //add child lists
+    for(var childKey in this.referenceLists) {
+        var childStruct = this.referenceLists[childKey];
+        this.addListTreeEntry(treeEntry,childStruct);
+    }
+    
+    return treeEntry;
+}
+
+apogeeapp.app.ReferenceManager.prototype.addListTreeEntry = function(referenceTreeEntry,childStruct) {
+    var listInfo = childStruct.listInfo;
+    var iconUrl = apogeeapp.ui.getResourcePath(listInfo.listIconPath);
+    var menuItemCallback = () => this.getListMenuItems(listInfo);
+    var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(listInfo.listName, iconUrl, null, menuItemCallback, false);
+    
+    //add existing child entries
+    for(var childKey in childStruct.listEntries) {
+        var childEntry = childStruct.listEntries[childKey];
+        var treeEntry = childEntry.getTreeEntry(true);
+        listTreeEntry.addChild(treeEntry);
+    }
+    
+    childStruct.listTreeEntry = listTreeEntry;
+    referenceTreeEntry.addChild(listTreeEntry);
+}
+
 
 /** @private */
 apogeeapp.app.ReferenceManager.prototype.getListMenuItems = function(listInfo) {

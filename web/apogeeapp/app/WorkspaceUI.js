@@ -10,9 +10,6 @@ apogeeapp.app.WorkspaceUI = function() {
     this.treeEntry = null;
     this.componentMap = {};
     this.referencesManager = new apogeeapp.app.ReferenceManager();
-   
-    this.jsLinkArray = [];
-    this.cssLinkArray = [];
 }
 
 apogeeapp.app.WorkspaceUI.ICON_RES_PATH = "/componentIcons/workspace.png";
@@ -25,9 +22,13 @@ apogeeapp.app.WorkspaceUI.ICON_RES_PATH = "/componentIcons/workspace.png";
 apogeeapp.app.WorkspaceUI.prototype.setApp = function(app,tabFrame,treePane) {
     this.app = app;
     this.tabFrame = tabFrame;
-    this.tree = new apogeeapp.ui.treecontrol.TreeControl();
-    apogeeapp.ui.removeAllChildren(treePane);
-    treePane.appendChild(this.tree.getElement());
+    
+    //omit tree if tree pane is missing 
+    if(treePane) {
+        this.tree = new apogeeapp.ui.treecontrol.TreeControl();
+        apogeeapp.ui.removeAllChildren(treePane);
+        treePane.appendChild(this.tree.getElement());
+    }
     
     this.treeEntry = null;
 }
@@ -62,20 +63,22 @@ apogeeapp.app.WorkspaceUI.prototype.load = function(workspaceJson,actionResponse
     var rootFolder = this.workspace.getRoot();
     var rootFolderComponent = this.loadComponentFromJson(rootFolder,workspaceComponentsJson);
 
-    //set up the tree
-    this.treeEntry = this.createTreeEntry();
-    this.treeEntry.setState(apogeeapp.ui.treecontrol.EXPANDED);
-    this.tree.setRootEntry(this.treeEntry);
-    this.treeEntry.addChild(rootFolderComponent.getTreeEntry());
-    this.treeEntry.addChild(this.referencesManager.getTreeEntry());
+    //set up the tree (if tree in use)
+    if(this.tree) {
+        this.treeEntry = this.createTreeEntry();
+        this.treeEntry.setState(apogeeapp.ui.treecontrol.EXPANDED);
+        this.tree.setRootEntry(this.treeEntry);
+        this.treeEntry.addChild(rootFolderComponent.getTreeEntry(true));
+        this.treeEntry.addChild(this.referencesManager.getTreeEntry(true));
+    }
     
     //add listeners
     this.workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT, member => this.memberUpdated(member));
     this.workspace.addListener(apogee.deletemember.MEMBER_DELETED_EVENT, member => this.childDeleted(member));
     this.workspace.addListener(apogee.updateworkspace.WORKSPACE_UPDATED_EVENT, () => this.workspaceUpdated());
     
-    //set the initial active tab
-    if((workspaceJson)&&(workspaceJson.activeTabMember)) {
+    //set the initial active tab (allow for no tab frame - used in alternate UI)
+    if((workspaceJson)&&(workspaceJson.activeTabMember)&&(this.tabFrame)) {
         var activeTabMember = this.workspace.getMemberByFullName(workspaceJson.activeTabMember);
         if(activeTabMember) {
            this.tabFrame.setActiveTab(activeTabMember.getId());
@@ -103,8 +106,10 @@ apogeeapp.app.WorkspaceUI.prototype.close = function() {
         }
     }
     
-    //TREE_ENTRY - remove tree entry
-    this.tree.clearRootEntry();
+    //remove tree entry (if tree active)
+    if(this.tree) {
+        this.tree.clearRootEntry();
+    }
     
     //remove links
     this.referencesManager.close();
@@ -210,7 +215,9 @@ apogeeapp.app.WorkspaceUI.prototype.childDeleted = function(member) {
 apogeeapp.app.WorkspaceUI.prototype.workspaceUpdated = function() {
     
     //update name
-    this.treeEntry.setLabel(this.workspace.getName());
+    if(this.treeEnry) {
+        this.treeEntry.setLabel(this.workspace.getName());
+    }
 }
 
 //====================================

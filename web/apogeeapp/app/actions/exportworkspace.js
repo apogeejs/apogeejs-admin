@@ -32,7 +32,7 @@ apogeeapp.app.exportworkspace.getExportCallback = function(app) {
         var onSubmitFunction = function(result) {         
             var folder = folderMap[result.parentName];
         
-            var workspaceText = apogeeapp.app.exportworkspace.getWorkspaceText(folder);
+            var workspaceText = apogeeapp.app.exportworkspace.getWorkspaceText(app,folder);
             if(!workspaceText) {
                 alert("There is no workspace open.");
                 return;
@@ -52,7 +52,7 @@ apogeeapp.app.exportworkspace.getExportCallback = function(app) {
     
 }
 
-apogeeapp.app.exportworkspace.getWorkspaceText = function(folder) {
+apogeeapp.app.exportworkspace.getWorkspaceText = function(app,folder) {
     var activeWorkspaceUI = app.getWorkspaceUI();
     if(activeWorkspaceUI) {
         var workspaceJson = activeWorkspaceUI.toJson(folder);

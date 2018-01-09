@@ -99,7 +99,11 @@ apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
         this.showData = function(data) {
             try {
                 if(this.resource.setData) {
-                    resource.setData.call(resource,data,instance.outputElement,instance.outputMode);
+                    //set data, but only if the member does not have and error and is not pending
+                    var member = instance.outputMode.getMember();
+                    if((!member.hasError())&&(!member.getResultPending())) {
+                        resource.setData.call(resource,data,instance.outputElement,instance.outputMode);
+                    }
                 }
             }
             catch(error) {

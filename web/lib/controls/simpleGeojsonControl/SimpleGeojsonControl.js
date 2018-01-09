@@ -114,9 +114,13 @@ apogeeapp.app.SimpleGeojsonDisplay.prototype.onResize = function() {
 //-----------------
 //auto registration
 //-----------------
-if(registerComponent) {
-    registerComponent(apogeeapp.app.SimpleGeojsonControl);
+var app = apogeeapp.app.Apogee.getInstance();
+if(app) {
+    app.registerComponent(apogeeapp.app.SimpleGeojsonControl);
+}
+else {
+    console.log("Component could not be registered because no Apogee app instance was available at component load time: apogeeapp.app.SimpleGeojsonControl");
 }
 
-}
-)();
+//end definition
+})();

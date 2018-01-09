@@ -3,6 +3,7 @@ apogeeapp.app.ParentWindowComponentDisplay = function(component, options) {
     this.component = component;
     this.member = component.getMember();
     
+    if(!options) options = {};
     this.options = options;
    
     this.loadWindowFrameEntry();
@@ -12,7 +13,7 @@ apogeeapp.app.ParentWindowComponentDisplay = function(component, options) {
 };
 
 
-apogeeapp.app.ParentWindowComponentDisplay.prototype.getWindowFrame = function() {
+apogeeapp.app.ParentWindowComponentDisplay.prototype.getDisplayFrame = function() {
     return this.windowFrame;
 }
 

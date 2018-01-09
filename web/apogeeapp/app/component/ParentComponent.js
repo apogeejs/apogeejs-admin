@@ -8,8 +8,27 @@ apogeeapp.app.ParentComponent = function(workspaceUI,member,componentGenerator) 
 apogeeapp.app.ParentComponent.prototype = Object.create(apogeeapp.app.Component.prototype);
 apogeeapp.app.ParentComponent.prototype.constructor = apogeeapp.app.ParentComponent;
 
-apogeeapp.app.ParentComponent.prototype.instantiateWindowDisplay = function() {
-    return new apogeeapp.app.ParentWindowComponentDisplay(this,this.windowDisplayStateJson);
+/** @protected */
+apogeeapp.app.ParentComponent.prototype.instantiateWindowDisplay = function(windowDisplayOverrideOptions) {
+    var options = windowDisplayOverrideOptions ? windowDisplayOverrideOptions : this.windowDisplayStateJson;
+    return new apogeeapp.app.ParentWindowComponentDisplay(this,options);
+}
+
+apogeeapp.app.ParentComponent.prototype.instantiateTreeEntry = function() {
+    var treeDisplay = apogeeapp.app.Component.prototype.instantiateTreeEntry.call(this);
+    
+    //add any existing children to the tree entry
+    var treeEntry = treeDisplay.getTreeEntry();
+    var member = this.getMember();
+    var childMap = member.getChildMap();
+    for(var childKey in childMap) {
+        var childMember = childMap[childKey];
+        var childComponent = this.getWorkspaceUI().getComponent(childMember);
+        var childTreeEntry = childComponent.getTreeEntry(true);
+        treeEntry.addChild(childTreeEntry);
+    }
+    
+    return treeDisplay;
 }
 
 //----------------------
@@ -57,7 +76,12 @@ apogeeapp.app.ParentComponent.prototype.isParentComponent = true;
 apogeeapp.app.ParentComponent.prototype.removeChildComponent = function(childComponent) {
     //remove from tree entry
     var treeEntry = this.getTreeEntry();
-    treeEntry.removeChild(childComponent.getTreeEntry());
+    if(treeEntry) {
+        var childTreeEntry = childComponent.getTreeEntry();
+        if(childTreeEntry) {
+            treeEntry.removeChild(childTreeEntry);
+        }
+    }
     
     //remove child windows - just hide them. They will be deleted in the component
     var childWindowDisplay = childComponent.getWindowDisplay();
@@ -70,9 +94,11 @@ apogeeapp.app.ParentComponent.prototype.removeChildComponent = function(childCom
 apogeeapp.app.ParentComponent.prototype.addChildComponent = function(childComponent) {
     //add the child to the tree entry
     var treeEntry = this.getTreeEntry();
-    var childTreeEntry = childComponent.getTreeEntry();
-    treeEntry.addChild(childTreeEntry);
-    
+    if(treeEntry) {
+        var childTreeEntry = childComponent.getTreeEntry(true);
+        treeEntry.addChild(childTreeEntry);
+    }
+
     //add child entry for tab
     if(this.tabDisplay) {
         this.tabDisplay.addChildComponent(childComponent); 
