@@ -215,7 +215,7 @@ apogeeapp.app.WorkspaceUI.prototype.childDeleted = function(member) {
 apogeeapp.app.WorkspaceUI.prototype.workspaceUpdated = function() {
     
     //update name
-    if(this.treeEnry) {
+    if(this.treeEntry) {
         this.treeEntry.setLabel(this.workspace.getName());
     }
 }
