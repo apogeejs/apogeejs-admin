@@ -140,14 +140,16 @@ apogeeapp.app.Apogee.prototype.clearWorkspaceUI = function() {
 /** This method registers a component. */
 apogeeapp.app.Apogee.prototype.registerComponent = function(componentGenerator) {
     var name = componentGenerator.uniqueName;
-    if(this.componentGenerators[name]) {
-        var replace = confirm("There is already a registered component with this name. Would you like to continue?");
-        if(!replace) return;
-    }
+//just replace - but existing ones will not change!
+//    if(this.componentGenerators[name]) {
+//        var replace = confirm("There is already a registered component with this name. Would you like to continue?");
+//        if(!replace) return;
+//    }
 
-//we should maybe warn if another component bundle is being overwritten 
     this.componentGenerators[name] = componentGenerator;
-    this.additionalComponents.push(name);
+    if(this.additionalComponents.indexOf(name) < 0) {
+        this.additionalComponents.push(name);
+    }
 }
 
 /** This method registers a component. */
@@ -185,7 +187,9 @@ apogeeapp.app.Apogee.prototype.registerStandardComponent = function(componentGen
 
 //we should maybe warn if another component bundle is being overwritten 
     this.componentGenerators[name] = componentGenerator;
-    this.standardComponents.push(name);
+    if(this.standardComponents.indexOf(name) < 0) {
+        this.standardComponents.push(name);
+    }
 }
 
 /** This method creates the app ui. 
