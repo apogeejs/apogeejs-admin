@@ -7,11 +7,11 @@
       "entryType": "js link"
     },
     {
-      "url": "/lib/controls/configurableForm/configurableForm.js",
+      "url": "/lib/controls/configurableForm/ConfigurableForm.js",
       "entryType": "js link"
     },
     {
-      "url": "/lib/controls/configurableForm/configurableForm.css",
+      "url": "/lib/controls/configurableForm/ConfigurableForm.css",
       "entryType": "css link"
     }
   ],
