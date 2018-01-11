@@ -143,7 +143,7 @@ apogeeapp.app.JsonTableComponent.propertyDialogLines = [
         "type":"dropdown",
         "heading":"Data View: ",
         "entries":[
-            "JSON",
+            "Colorized",
             "Plain",
             "Form"
         ],

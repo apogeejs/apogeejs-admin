@@ -28,7 +28,7 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,componentGener
         }
         
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = apogeeapp.app.propdialog.getDialogLayout(displayName,folderList,additionalLines,true,optionalInitialValues);
+        var dialogLayout = apogeeapp.app.updatecomponent.getPropertiesDialogLayout(displayName,folderList,additionalLines,true,optionalInitialValues);
         
         //create on submit callback
         var onSubmitFunction = function(userInputValues) {

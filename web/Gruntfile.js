@@ -114,9 +114,8 @@ module.exports = function(grunt) {
                 "apogeeapp/app/editors/HandsonGridMode.js",
                 "apogeeapp/app/editors/ControlOutputMode.js",
                 "apogeeapp/app/dialogs/ConfigurableDialog.js",
-                "apogeeapp/app/dialogs/UpdateLinksDialog.js",
+                "apogeeapp/app/dialogs/TextIoDialog.js",
                 "apogeeapp/app/dialogs/SelectControlDialog.js",
-                "apogeeapp/app/dialogs/propdialog.js"
             ],
             "dest": "../../dist/lib/apogee-base-app.js"
         },
@@ -144,8 +143,6 @@ module.exports = function(grunt) {
                 "banner":"/* Apogee Web Customization Version <%= pkg.version %> - Cut-n-Paste file open/close */\n"
             },
             "src": [
-                "supplemental/cutNPasteCode/CutSaveDialog.js",
-                "supplemental/cutNPasteCode/PasteOpenDialog.js",
                 "supplemental/cutNPasteCode/file_impl_cutnpaste.js"
             ],
             "dest": "../../dist/lib/apogee-web-cutnpaste.js"
