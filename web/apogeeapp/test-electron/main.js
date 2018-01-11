@@ -26,7 +26,7 @@ function createWindow () {
     win.on('close',(e) => {
         const {dialog} = require('electron');
  
-        var isDirtyPromise = win.webContents.executeJavaScript("app.getWorkspaceIsDirty()");
+        var isDirtyPromise = win.webContents.executeJavaScript("apogeeapp.app.Apogee.getInstance().getWorkspaceIsDirty()");
         isDirtyPromise.then( (isDirty) => {
             var doClose;
             if(isDirty) {
@@ -40,12 +40,13 @@ function createWindow () {
                 doClose = true;
             }
             
-            console.log("Do close result: " + doClose);
-            
             if(doClose) {
                 win.destroy();
             }
-        });
+        }).catch( (msg) => {
+            console.log("Error checking if app has saved data - Exiting! Message: " + msg);
+            win.destroy();
+        })
         
         //we won't close here - we will use promise result above
         e.preventDefault();
