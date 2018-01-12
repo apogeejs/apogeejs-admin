@@ -82,54 +82,43 @@ apogeeapp.app.LinkEntry.prototype.getNickname = function() {
 apogeeapp.app.LinkEntry.prototype.loadEntry = function() {
     
     var promiseFunction = (resolve,reject) => {
-        //make sure this link does not already exist
-//OOPS - I am not longer using the url for the id. This wont work and needs to be fixed.
-        var element = document.getElementById(this.url);
-        if(element) {
-            var errorMsg = "The link already exists: " + this.url;
+
+        var linkProps;
+        var elementType;
+
+        //create link properties
+        if(this.linkType == apogeeapp.app.LinkEntry.LINK_TYPE_JS) {
+            linkProps = this.getJsLinkProps();
+            elementType = apogeeapp.app.LinkEntry.JS_ELEMENT_TYPE;
+        }
+        else if(this.linkType == apogeeapp.app.LinkEntry.LINK_TYPE_CSS) {
+            linkProps = this.getCssLinkProps();
+            elementType = apogeeapp.app.LinkEntry.CSS_ELEMENT_TYPE;
+        }
+        else {
+            var errorMsg = "Unknown link type " + this.linkType;
             this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
             reject(errorMsg);
             this.referenceManager.entryStatusChange(this);
             return;
         }
-        else {
-            var linkProps;
-            var elementType;
-            
-            //create link properties
-            if(this.linkType == apogeeapp.app.LinkEntry.LINK_TYPE_JS) {
-                linkProps = this.getJsLinkProps();
-                elementType = apogeeapp.app.LinkEntry.JS_ELEMENT_TYPE;
-            }
-            else if(this.linkType == apogeeapp.app.LinkEntry.LINK_TYPE_CSS) {
-                linkProps = this.getCssLinkProps();
-                elementType = apogeeapp.app.LinkEntry.CSS_ELEMENT_TYPE;
-            }
-            else {
-                var errorMsg = "Unknown link type " + this.linkType;
-                this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
-                reject(errorMsg);
-                this.referenceManager.entryStatusChange(this);
-                return;
-            }
-            
-            //add event handlers
-            linkProps.onload = () => {
-                this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE);
-                resolve(this.url);
-                this.referenceManager.entryStatusChange(this);
-            }
-            linkProps.onerror = (error) => {
-                var errorMsg = "Failed to load link '" + this.url + "'";
-                this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
-                reject(errorMsg);
-                this.referenceManager.entryStatusChange(this);
-            }
-            
-            //insert the link entry
-            element = apogeeapp.ui.createElement(elementType,linkProps);
-            document.head.appendChild(element);
+
+        //add event handlers
+        linkProps.onload = () => {
+            this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE);
+            resolve(this.url);
+            this.referenceManager.entryStatusChange(this);
         }
+        linkProps.onerror = (error) => {
+            var errorMsg = "Failed to load link '" + this.url + "'";
+            this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
+            reject(errorMsg);
+            this.referenceManager.entryStatusChange(this);
+        }
+
+        //insert the link entry
+        element = apogeeapp.ui.createElement(elementType,linkProps);
+        document.head.appendChild(element);
     }
     
     //call link added to references
