@@ -47,11 +47,8 @@ apogeeapp.app.FolderComponent.EMPTY_FOLDER_COMPONENT_JSON  = {
     "type":"apogeeapp.app.FolderComponent"
 };
 
-apogeeapp.app.FolderComponent.getMemberCreateAction = function(userInputValues) {
+apogeeapp.app.FolderComponent.getCreateMemberPayload = function(userInputValues) {
     var json = {};
-    json.action = "createMember";
-    json.owner = userInputValues.parent;
-    json.workspace = userInputValues.parent.getWorkspace();
     json.name = userInputValues.name;
     if(userInputValues.children) {
         json.children = userInputValues.children;

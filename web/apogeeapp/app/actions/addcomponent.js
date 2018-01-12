@@ -41,10 +41,14 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,componentGener
             }
             
             //get the parent object
-            userInputValues.parent = folderMap[userInputValues.parentName];
+            var parent = folderMap[userInputValues.parentName];
             
             //create the member
-            var createAction = componentGenerator.getMemberCreateAction(userInputValues);
+            var createAction = {};
+            createAction.action = "createMember";
+            createAction.owner = parent;
+            createAction.workspace = parent.getWorkspace();
+            createAction.createData = componentGenerator.getCreateMemberPayload(userInputValues);
             var actionResponse = apogee.action.doAction(createAction,true);
             var member = createAction.member;
             

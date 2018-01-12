@@ -62,7 +62,7 @@
 					"state": 0,
 					"viewType": "Data"
 				},
-				"dataView": "Plain"
+				"dataView": "Colorized"
 			},
 			"nMinus1Factorial": {
 				"type": "apogeeapp.app.JsonTableComponent",
@@ -78,7 +78,7 @@
 					"state": 0,
 					"viewType": "Data"
 				},
-				"dataView": "Plain"
+				"dataView": "Colorized"
 			},
 			"nFactorial": {
 				"type": "apogeeapp.app.JsonTableComponent",
@@ -94,7 +94,7 @@
 					"state": 0,
 					"viewType": "Data"
 				},
-				"dataView": "Plain"
+				"dataView": "Colorized"
 			},
 			"desiredN": {
 				"type": "apogeeapp.app.JsonTableComponent",
@@ -110,7 +110,7 @@
 					"state": 0,
 					"viewType": "Data"
 				},
-				"dataView": "Plain"
+				"dataView": "Colorized"
 			}
 		}
 	},

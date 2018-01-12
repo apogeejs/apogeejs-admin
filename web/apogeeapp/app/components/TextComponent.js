@@ -67,11 +67,8 @@ apogeeapp.app.TextComponent.prototype.getViewModeElement = function(editComponen
 // Static methods
 //======================================
 
-apogeeapp.app.TextComponent.getMemberCreateAction = function(userInputValues) {
+apogeeapp.app.TextComponent.getCreateMemberPayload = function(userInputValues) {
     var json = {};
-    json.action = "createMember";
-    json.owner = userInputValues.parent;
-    json.workspace = userInputValues.parent.getWorkspace();
     json.name = userInputValues.name;
     json.type = apogee.JsonTable.generator.type;
 	json.updateData = {};

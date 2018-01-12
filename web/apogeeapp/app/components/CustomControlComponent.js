@@ -326,11 +326,8 @@ apogeeapp.app.CustomControlComponent.GENERATOR_INTERNAL_FORMATS = {
 // Static methods
 //======================================
 
-apogeeapp.app.CustomControlComponent.getMemberCreateAction = function(userInputValues) {
+apogeeapp.app.CustomControlComponent.getCreateMemberPayload = function(userInputValues) {
     var json = {};
-    json.action = "createMember";
-    json.owner = userInputValues.parent;
-    json.workspace = userInputValues.parent.getWorkspace();
     json.name = userInputValues.name;
     json.type = apogee.JsonTable.generator.type;
     return json;

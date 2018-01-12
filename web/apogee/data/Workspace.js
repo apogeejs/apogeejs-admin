@@ -268,10 +268,11 @@ apogee.Workspace.prototype.loadFromJson = function(json,actionResponse) {
         this.name = json.name;
     }
 
-    var actionData = json.data;
+    var actionData = {};
     actionData.action = "createMember";
     actionData.owner = this;
     actionData.workspace = this;
+    actionData.createData = json.data;
     apogee.action.doAction(actionData,false,actionResponse);
     
     return actionResponse;

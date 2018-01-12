@@ -289,12 +289,14 @@ apogeeapp.app.WorkspaceUI.prototype.getFolderComponentContentJson = function(fol
 apogeeapp.app.WorkspaceUI.prototype.loadComponentFromJson = function(member,componentJson) {
     var componentType = componentJson.type;
     var componentGenerator = this.app.getComponentGenerator(componentType);
-	if(componentGenerator) {
-        return apogeeapp.app.Component.createComponentFromMember(componentGenerator,this,member,null,componentJson);
+	if((!componentGenerator)||(member.constructor == apogee.ErrorTable)) {
+        //throw apogee.base.createError("Component type not found: " + componentType);
+        
+        //table not found - create an empty table
+        componentGenerator = apogeeapp.app.ErrorTableComponent;
     }
-    else {
-        throw apogee.base.createError("Component type not found: " + componentType);
-    }
+    
+    return apogeeapp.app.Component.createComponentFromMember(componentGenerator,this,member,null,componentJson);
 }
 
 apogeeapp.app.WorkspaceUI.prototype.loadFolderComponentContentFromJson = function(folder,childrenJson) {

@@ -7,7 +7,10 @@ apogee.createmember = {};
  *  "action": apogee.createmember.ACTION_NAME,
  *  "owner": (parent/owner for new member),
  *  "name": (name of the new member),
- *  "updateData": (an initial data for the table, table dependent)
+ *  "createData": 
+ *      - name
+ *      - unique table type name
+ *      - additional table specific data
  *  
  *  "member": (OUTPUT - the created member),
  *  "error": (OUTPUT - an error created in the action function)
@@ -28,31 +31,37 @@ apogee.createmember.MEMBER_CREATED_EVENT = "memberCreated";
 apogee.createmember.createMember = function(actionData,optionalContext,processedActions) {
     
     //create member
-    var generator = apogee.Workspace.getMemberGenerator(actionData.type);
+    var generator = apogee.Workspace.getMemberGenerator(actionData.createData.type);
 
-    if(!generator) {
-        //type not found
-        actionData.error = new apogee.ActionError("Member type not found: " + actionData.type,apogee.ActionError.ERROR_TYPE_APP,null);
+    if(generator) {
+        var childJsonOutputList = [];
+        var member = generator.createMember(actionData.owner,actionData.createData,childJsonOutputList);
+
+        //store the created object
+        actionData.member = member;
+
+        //we are potentially adding multiple creates here, including children
         processedActions.push(actionData);
-        return null;
-    }
 
-    var childJsonOutputList = [];
-    var member = generator.createMember(actionData.owner,actionData,childJsonOutputList);
-    
-    //store the created object
-    actionData.member = member;
-    
-    //we are potentially adding multiple creates here, including children
-    processedActions.push(actionData);
-    
-    //instantiate children if there are any
-    for(var i = 0; i < childJsonOutputList.length; i++) {
-        var childJson = childJsonOutputList[i];
-        childJson.action = "createMember";
-        childJson.actionInfo = actionData.actionInfo; //assume parent action is alsl createMember!
-        childJson.owner = member;
-        apogee.createmember.createMember(childJson,optionalContext,processedActions);
+        //instantiate children if there are any
+        for(var i = 0; i < childJsonOutputList.length; i++) {
+            var childActionData = {};
+            childActionData.action = "createMember";
+            childActionData.actionInfo = apogee.createmember.ACTION_INFO;
+            childActionData.owner = member;
+            childActionData.createData = childJsonOutputList[i];
+            apogee.createmember.createMember(childActionData,optionalContext,processedActions);
+        }
+    }
+    else {
+        //type not found! - create a dummy object
+        member = apogee.ErrorTable.generator.createMember(actionData.owner,actionData.createData);
+        var error = new apogee.ActionError("Member type not found: " + actionData.createData.type,apogee.ActionError.ERROR_TYPE_APP,null);
+        member.addError(error);
+        
+        actionData.member = member;
+        actionData.error = error;
+        processedActions.push(actionData);
     }
     
     return member;

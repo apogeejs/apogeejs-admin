@@ -259,7 +259,7 @@
 					"state": 0,
 					"viewType": "Data"
 				},
-				"dataView": "JSON"
+				"dataView": "Colorized"
 			},
 			"NOTES": {
 				"type": "apogeeapp.app.TextComponent",
@@ -290,7 +290,7 @@
 					"state": 0,
 					"viewType": "Data"
 				},
-				"dataView": "JSON"
+				"dataView": "Colorized"
 			},
 			"workspace31": {
 				"type": "apogeeapp.app.JsonTableComponent",
@@ -306,7 +306,7 @@
 					"state": 0,
 					"viewType": "Data"
 				},
-				"dataView": "JSON"
+				"dataView": "Colorized"
 			}
 		}
 	},

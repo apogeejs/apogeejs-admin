@@ -192,7 +192,7 @@ apogeeapp.app.Component.prototype.closeTabDisplay = function() {
     }
 }
 
-/** This serializes the component. */
+/** This deserializes the component. */
 apogeeapp.app.Component.prototype.toJson = function() {
     var json = {};
     json.type = this.componentGenerator.uniqueName;

@@ -69,11 +69,8 @@ apogeeapp.app.GridTableComponent.prototype.getViewModeElement = function(editCom
 // Static methods
 //======================================
 
-apogeeapp.app.GridTableComponent.getMemberCreateAction = function(userInputValues) {
+apogeeapp.app.GridTableComponent.getCreateMemberPayload = function(userInputValues) {
     var json = {};
-    json.action = "createMember";
-    json.owner = userInputValues.parent;
-    json.workspace = userInputValues.parent.getWorkspace();
     json.name = userInputValues.name;
     json.type = apogee.JsonTable.generator.type;
 	json.updateData = {};

@@ -68,7 +68,7 @@ apogee.Dependent.initializeImpactors = function() {
     //make sure dependencies are up to date
     for(var i = 0; i < this.dependsOnList.length; i++) {
         var impactor = this.dependsOnList[i];
-        if(impactor.getCalcPending()) {
+        if((impactor.isDependent)&&(impactor.getCalcPending())) {
             impactor.calculate();
         }
         if(impactor.hasError()) {

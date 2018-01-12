@@ -103,9 +103,6 @@ apogee.action.doAction = function(actionData,addToUndo,optionalContext,optionalA
         //finish processing the action
         var recalculateList = [];
         
-        //handle cases without a valid object (failed create)
-        apogee.action.handleMissingMember(processedActions,actionResponse);
-        
         //handle cases with a valid object 
         apogee.action.updateDependencies(workspace,processedActions,recalculateList);
         
@@ -297,13 +294,6 @@ apogee.action.asynchRunQueuedAction = function(queuedActionData) {
     setTimeout(callback,0);
 }
 
-/** This method handles any error action with no member - for example failed create. 
- * @private */
-apogee.action.handleMissingMember = function(processedActions,actionResponse) {
-    var missingMemberActions = processedActions.filter( action => action.member == undefined);
-    missingMemberActions.forEach( action => { if(action.error) {actionResponse.addError(action.error);} } );
-}
-
 /** This method makes sure the member dependencies in the workspace are properly updated. 
  * @private */
 apogee.action.updateDependencies = function(workspace,processedActions,recalculateList) {
@@ -408,6 +398,7 @@ apogee.action.doInitializeDependencies = function(actionData) {
 /** This method checks if the associated member and its dependencies need to be added to the recalc list. */
 apogee.action.doAddToRecalc = function(actionData) {
     if(!actionData.member) return false;
+    if(!actionData.member.isDependent) return false;
     
     if(actionData.actionInfo) {
         return actionData.actionInfo.addToRecalc;

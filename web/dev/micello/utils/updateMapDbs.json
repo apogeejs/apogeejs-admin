@@ -1808,7 +1808,7 @@
 							"state": 0,
 							"viewType": "Data"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					}
 				}
 			},
@@ -1835,7 +1835,7 @@
 							"state": 0,
 							"viewType": "Formula"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"sessionKey": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -1851,7 +1851,7 @@
 							"state": -1,
 							"viewType": "Data"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"updatedRecords": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -1867,7 +1867,7 @@
 							"state": -1,
 							"viewType": "Data"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"createdRecords": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -1883,7 +1883,7 @@
 							"state": -1,
 							"viewType": "Data"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"preUpdateRecords": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -1899,7 +1899,7 @@
 							"state": -1,
 							"viewType": "Data"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"instructionList": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -1915,7 +1915,7 @@
 							"state": -1,
 							"viewType": "Data"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"deletedRecords": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -1931,7 +1931,7 @@
 							"state": -1,
 							"viewType": "Data"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					}
 				}
 			},
@@ -1958,7 +1958,7 @@
 							"state": 0,
 							"viewType": "Formula"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"sessionKey": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -1974,7 +1974,7 @@
 							"state": -1,
 							"viewType": "Text"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"updatedRecords": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -1990,7 +1990,7 @@
 							"state": -1,
 							"viewType": "Text"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"createdRecords": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -2006,7 +2006,7 @@
 							"state": -1,
 							"viewType": "JSON"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"preUpdateRecords": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -2022,7 +2022,7 @@
 							"state": -1,
 							"viewType": "JSON"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"instructionList": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -2038,7 +2038,7 @@
 							"state": -1,
 							"viewType": "Formula"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"deletedRecords": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -2054,7 +2054,7 @@
 							"state": -1,
 							"viewType": "Text"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					}
 				}
 			},
@@ -2141,7 +2141,7 @@
 							"state": -1,
 							"viewType": "Data"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"commitUrl": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -2157,7 +2157,7 @@
 							"state": -1,
 							"viewType": "Data"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"requestUrl": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -2173,7 +2173,7 @@
 							"state": -1,
 							"viewType": "Formula"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"dataSetInfo": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -2189,7 +2189,7 @@
 							"state": -1,
 							"viewType": "Data"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"createUpdateInstruction": {
 						"type": "apogeeapp.app.FunctionComponent",
@@ -2370,7 +2370,7 @@
 							"state": -1,
 							"viewType": "Formula"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					}
 				}
 			},
@@ -2457,7 +2457,7 @@
 							"state": -1,
 							"viewType": "Text"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"commitUrl": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -2473,7 +2473,7 @@
 							"state": -1,
 							"viewType": "Text"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"requestUrl": {
 						"type": "apogeeapp.app.JsonTableComponent",
@@ -2489,7 +2489,7 @@
 							"state": -1,
 							"viewType": "Formula"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"createUpdateInstruction": {
 						"type": "apogeeapp.app.FunctionComponent",
@@ -2640,7 +2640,7 @@
 							"state": -1,
 							"viewType": "Text"
 						},
-						"dataView": "Plain"
+						"dataView": "Colorized"
 					},
 					"getEntityRequest": {
 						"type": "apogeeapp.app.FunctionComponent",

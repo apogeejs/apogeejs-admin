@@ -4,7 +4,7 @@ apogeeapp.app.JsonTableComponent = function(workspaceUI,table) {
     apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.JsonTableComponent);
 
     //default view
-    this.dataView = apogeeapp.app.JsonTableComponent.JSON_DATA_VEW;
+    this.dataView = apogeeapp.app.JsonTableComponent.DEFAULT_DATA_VIEW;
     
     //add a cleanup and save actions
     this.addOpenAction(apogeeapp.app.JsonTableComponent.readFromJson);
@@ -15,7 +15,7 @@ apogeeapp.app.JsonTableComponent.prototype = Object.create(apogeeapp.app.EditCom
 apogeeapp.app.JsonTableComponent.prototype.constructor = apogeeapp.app.JsonTableComponent;
 
 apogeeapp.app.JsonTableComponent.prototype.getDataView = function() {
-    if(!this.dataView) this.dataView = "JSON";
+    if(!this.dataView) this.dataView = apogeeapp.app.JsonTableComponent.DEFAULT_DATA_VIEW;
     return this.dataView;
 }
 
@@ -52,8 +52,10 @@ apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS = {
 }
 
 apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW = "Plain";
-apogeeapp.app.JsonTableComponent.JSON_DATA_VEW = "JSON";
+apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW = "Colorized";
 apogeeapp.app.JsonTableComponent.FORM_DATA_VIEW = "Form";
+
+apogeeapp.app.JsonTableComponent.DEFAULT_DATA_VIEW = apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW;;
 
 
 /**  This method retrieves the table edit settings for this component instance
@@ -70,7 +72,7 @@ apogeeapp.app.JsonTableComponent.prototype.getViewModeElement = function(editCom
 	switch(viewType) {
         case apogeeapp.app.JsonTableComponent.VIEW_DATA:
             switch(this.dataView) {
-                case apogeeapp.app.JsonTableComponent.JSON_DATA_VEW:
+                case apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW:
                     return new apogeeapp.app.AceDataMode(editComponentDisplay,true);
 
                 case apogeeapp.app.JsonTableComponent.FORM_DATA_VIEW:
@@ -101,11 +103,8 @@ apogeeapp.app.JsonTableComponent.prototype.getViewModeElement = function(editCom
 // Static methods
 //======================================
 
-apogeeapp.app.JsonTableComponent.getMemberCreateAction = function(userInputValues) {
+apogeeapp.app.JsonTableComponent.getCreateMemberPayload = function(userInputValues) {
     var json = {};
-    json.action = "createMember";
-    json.owner = userInputValues.parent;
-    json.workspace = userInputValues.parent.getWorkspace();
     json.name = userInputValues.name;
     json.type = apogee.JsonTable.generator.type;
     return json;

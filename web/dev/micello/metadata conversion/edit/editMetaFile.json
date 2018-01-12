@@ -1841,7 +1841,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "taskResult": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -1857,7 +1857,7 @@
                   "state": -1,
                   "viewType": "Formula"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "result": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -1873,7 +1873,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "state": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -1889,7 +1889,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               }
             }
           },
@@ -1940,7 +1940,7 @@
                   "state": -1,
                   "viewType": "Formula"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "commitMessage": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -1956,7 +1956,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "liveInstructionList": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -1972,7 +1972,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "taskResult": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -1988,7 +1988,7 @@
                   "state": -1,
                   "viewType": "Formula"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "sessionKey": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2004,7 +2004,7 @@
                   "state": -1,
                   "viewType": "Formula"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "result": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2020,7 +2020,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "state": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2036,7 +2036,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "instructionList": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2052,7 +2052,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               }
             }
           },
@@ -2102,7 +2102,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "state": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2118,7 +2118,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               }
             }
           },
@@ -2179,7 +2179,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "result": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2195,7 +2195,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "state": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2211,7 +2211,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "insertionInfoOptions": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2227,7 +2227,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "availableFileEntries": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2243,7 +2243,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   }
                 }
               },
@@ -2271,7 +2271,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "metaFileSelector": {
                     "type": "apogeeapp.app.CustomControlComponent",
@@ -2309,7 +2309,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "state": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2325,7 +2325,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   }
                 }
               },
@@ -2375,7 +2375,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "state": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2391,7 +2391,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   }
                 }
               },
@@ -2419,7 +2419,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "JSON"
+                    "dataView": "Colorized"
                   },
                   "createMetaFileEntries": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2435,7 +2435,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "createRecipeEntries": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2451,7 +2451,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "editRecipeEntryPairs": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2467,7 +2467,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "deleteRecipeEntries": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2483,7 +2483,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "instructionList": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2499,7 +2499,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "JSON"
+                    "dataView": "Colorized"
                   },
                   "createParentFileEntries": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2515,7 +2515,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "deleteParentFileEntries": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2531,7 +2531,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "editParentFileEntryPairs": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2547,7 +2547,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "mergedSelections": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2563,7 +2563,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   }
                 }
               },
@@ -2591,7 +2591,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "result": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2607,7 +2607,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "state": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2623,7 +2623,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "metaFileList": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2639,7 +2639,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "availableMetaFiles": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2655,7 +2655,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "configInfo": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2671,7 +2671,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "JSON"
+                    "dataView": "Colorized"
                   },
                   "selectDepForm": {
                     "type": "apogeeapp.app.ConfigurableForm",
@@ -2702,7 +2702,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "layout": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2718,7 +2718,7 @@
                       "state": -1,
                       "viewType": "Private"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "parentMetaFileOptions": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2734,7 +2734,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "mergedSelections": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2750,7 +2750,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "JSON"
+                    "dataView": "Colorized"
                   },
                   "relationForUseType": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2766,7 +2766,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "JSON"
+                    "dataView": "Colorized"
                   }
                 }
               },
@@ -2784,7 +2784,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "sessionKey": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2800,7 +2800,7 @@
                   "state": -1,
                   "viewType": "Formula"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "fileSelection": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2816,7 +2816,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "metaFileResponse": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2832,7 +2832,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "JSON"
+                "dataView": "Colorized"
               },
               "activeMetaFileEntry": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2848,7 +2848,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "metaFileType": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2864,7 +2864,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "dependentContexts": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2880,7 +2880,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "existingRecipeEntries": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2896,7 +2896,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "existingParentEntries": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -2912,7 +2912,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               }
             }
           },
@@ -2950,7 +2950,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "state": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -2966,7 +2966,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "selectCidControl": {
                     "type": "apogeeapp.app.ConfigurableForm",
@@ -2997,7 +2997,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "layout": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3013,7 +3013,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   }
                 }
               },
@@ -3041,7 +3041,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "result": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3057,7 +3057,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "state": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3073,7 +3073,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "selection": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3089,7 +3089,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "comFileResponse": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3105,7 +3105,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "metaFileList": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3121,7 +3121,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "existingComFileEntries": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3137,7 +3137,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "availableMetaFiles": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3153,7 +3153,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "comFile": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3169,7 +3169,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "NEW_COM_FILE_REF": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3185,7 +3185,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "layout": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3201,7 +3201,7 @@
                       "state": -1,
                       "viewType": "Private"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "sections": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3217,7 +3217,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "JSON"
+                    "dataView": "Colorized"
                   },
                   "selectComEntries": {
                     "type": "apogeeapp.app.ConfigurableForm",
@@ -3248,7 +3248,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "JSON"
+                    "dataView": "Colorized"
                   },
                   "mergedSelections": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3264,7 +3264,7 @@
                       "state": -1,
                       "viewType": "Private"
                     },
-                    "dataView": "JSON"
+                    "dataView": "Colorized"
                   }
                 }
               },
@@ -3292,7 +3292,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "createComFileEntries": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3308,7 +3308,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "editComFileEntryPairs": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3324,7 +3324,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "deleteComFileEntries": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3340,7 +3340,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "createComFile": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3356,7 +3356,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "comFile": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3372,7 +3372,7 @@
                       "state": -1,
                       "viewType": "Data"
                     },
-                    "dataView": "Plain"
+                    "dataView": "Colorized"
                   },
                   "mergedSelections": {
                     "type": "apogeeapp.app.JsonTableComponent",
@@ -3388,7 +3388,7 @@
                       "state": -1,
                       "viewType": "Formula"
                     },
-                    "dataView": "JSON"
+                    "dataView": "Colorized"
                   }
                 }
               }
@@ -3449,7 +3449,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "state": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -3465,7 +3465,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               }
             }
           },
@@ -3498,7 +3498,7 @@
               "state": -1,
               "viewType": "Data"
             },
-            "dataView": "Plain"
+            "dataView": "Colorized"
           },
           "getFileTypeName": {
             "type": "apogeeapp.app.FunctionComponent",
@@ -3539,7 +3539,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "fileTypeIdToName": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -3555,7 +3555,7 @@
                   "state": -1,
                   "viewType": "Formula"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "fileTypeNameToId": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -3571,7 +3571,7 @@
                   "state": -1,
                   "viewType": "Formula"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "customerInfo": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -3587,7 +3587,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "INACTIVE_LAYOUT": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -3603,7 +3603,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "DUMMY_DROPDOWN_ENTRY": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -3619,7 +3619,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "GLOBAL_CONTEXT": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -3635,7 +3635,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "CID_CONTEXT_PREFIX": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -3651,7 +3651,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "DEFAULT_COM_FILE_NAME": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -3667,7 +3667,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               },
               "DEFAULT_META_FILE_NAME": {
                 "type": "apogeeapp.app.JsonTableComponent",
@@ -3683,7 +3683,7 @@
                   "state": -1,
                   "viewType": "Data"
                 },
-                "dataView": "Plain"
+                "dataView": "Colorized"
               }
             }
           },
@@ -3788,7 +3788,7 @@
               "state": -1,
               "viewType": "Data"
             },
-            "dataView": "Plain"
+            "dataView": "Colorized"
           },
           "commitUrl": {
             "type": "apogeeapp.app.JsonTableComponent",
@@ -3804,7 +3804,7 @@
               "state": -1,
               "viewType": "Data"
             },
-            "dataView": "Plain"
+            "dataView": "Colorized"
           },
           "requestUrl": {
             "type": "apogeeapp.app.JsonTableComponent",
@@ -3820,7 +3820,7 @@
               "state": -1,
               "viewType": "Formula"
             },
-            "dataView": "Plain"
+            "dataView": "Colorized"
           },
           "dataSetInfo": {
             "type": "apogeeapp.app.JsonTableComponent",
@@ -3836,7 +3836,7 @@
               "state": -1,
               "viewType": "Data"
             },
-            "dataView": "Plain"
+            "dataView": "Colorized"
           },
           "createUpdateInstruction": {
             "type": "apogeeapp.app.FunctionComponent",
@@ -3987,7 +3987,7 @@
               "state": -1,
               "viewType": "Formula"
             },
-            "dataView": "Plain"
+            "dataView": "Colorized"
           },
           "getCustomRequestPromise": {
             "type": "apogeeapp.app.FunctionComponent",

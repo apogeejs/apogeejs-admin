@@ -91,11 +91,8 @@ apogeeapp.app.BasicControlComponent.prototype.getViewModeElement = function(edit
 // Static methods
 //======================================
 
-apogeeapp.app.BasicControlComponent.getMemberCreateAction = function(userInputValues) {
+apogeeapp.app.BasicControlComponent.getCreateMemberPayload = function(userInputValues) {
     var json = {};
-    json.action = "createMember";
-    json.owner = userInputValues.parent;
-    json.workspace = userInputValues.parent.getWorkspace();
     json.name = userInputValues.name;
     json.type = apogee.JsonTable.generator.type;
     return json;
@@ -105,7 +102,7 @@ apogeeapp.app.BasicControlComponent.getMemberCreateAction = function(userInputVa
 apogeeapp.app.BasicControlComponent.attachStandardStaticProperties = function(componentGenerator,displayName,uniqueName) {
     componentGenerator.displayName = displayName;
     componentGenerator.uniqueName = uniqueName;
-    componentGenerator.getMemberCreateAction = apogeeapp.app.BasicControlComponent.getMemberCreateAction;
+    componentGenerator.getCreateMemberPayload = apogeeapp.app.BasicControlComponent.getCreateMemberPayload;
     componentGenerator.DEFAULT_WIDTH = 500;
     componentGenerator.DEFAULT_HEIGHT = 500;
     componentGenerator.ICON_RES_PATH = "/componentIcons/chartControl.png";

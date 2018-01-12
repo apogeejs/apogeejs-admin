@@ -59,11 +59,8 @@ apogeeapp.app.FunctionComponent.prototype.getViewModeElement = function(editComp
 // Static methods
 //======================================
 
-apogeeapp.app.FunctionComponent.getMemberCreateAction = function(userInputValues) {
+apogeeapp.app.FunctionComponent.getCreateMemberPayload = function(userInputValues) {
     var json = {};
-    json.action = "createMember";
-    json.owner = userInputValues.parent;
-    json.workspace = userInputValues.parent.getWorkspace();
     json.name = userInputValues.name;
     var argList;
     if(userInputValues.argListString) {

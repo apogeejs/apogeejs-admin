@@ -534,7 +534,7 @@
 					"state": -1,
 					"viewType": "Data"
 				},
-				"dataView": "Plain"
+				"dataView": "Colorized"
 			},
 			"commitUrl": {
 				"type": "apogeeapp.app.JsonTableComponent",
@@ -550,7 +550,7 @@
 					"state": -1,
 					"viewType": "Data"
 				},
-				"dataView": "Plain"
+				"dataView": "Colorized"
 			},
 			"requestUrl": {
 				"type": "apogeeapp.app.JsonTableComponent",
@@ -566,7 +566,7 @@
 					"state": -1,
 					"viewType": "Formula"
 				},
-				"dataView": "Plain"
+				"dataView": "Colorized"
 			},
 			"dataSetInfo": {
 				"type": "apogeeapp.app.JsonTableComponent",
@@ -582,7 +582,7 @@
 					"state": -1,
 					"viewType": "Data"
 				},
-				"dataView": "Plain"
+				"dataView": "Colorized"
 			},
 			"createUpdateInstruction": {
 				"type": "apogeeapp.app.FunctionComponent",
@@ -733,7 +733,7 @@
 					"state": -1,
 					"viewType": "Formula"
 				},
-				"dataView": "Plain"
+				"dataView": "Colorized"
 			},
 			"getCustomRequestPromise": {
 				"type": "apogeeapp.app.FunctionComponent",
