@@ -7,6 +7,8 @@ apogeeapp.app.LinkEntry = function(referenceManager,linkData,linkType) {
     this.linkType = linkType;
     this.url = linkData.url;
     
+    this.state = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
+    
     var nickname = linkData.nickname;
     if((!nickname)||(nickname.length === 0)) nickname = this.createLinkNameFromUrl(this.url);
     this.nickname = nickname;
@@ -59,6 +61,10 @@ apogeeapp.app.LinkEntry.prototype.getEntryType = function() {
     return this.linkType;
 }
 
+apogeeapp.app.LinkEntry.prototype.getState = function() {
+    return this.state;
+}
+
 /** This method loads the link onto the page. It returns a promise that
  * resolves when the link is loaded. */
 apogeeapp.app.LinkEntry.prototype.getTreeEntry = function(createIfMissing) {
@@ -97,26 +103,24 @@ apogeeapp.app.LinkEntry.prototype.loadEntry = function() {
         }
         else {
             var errorMsg = "Unknown link type " + this.linkType;
-            this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
+            this.setError(errorMsg);
             reject(errorMsg);
-            this.referenceManager.entryStatusChange(this);
             return;
         }
 
         //add event handlers
         linkProps.onload = () => {
-            this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE);
+            this.setClearState();
             resolve(this.url);
-            this.referenceManager.entryStatusChange(this);
         }
         linkProps.onerror = (error) => {
             var errorMsg = "Failed to load link '" + this.url + "'";
-            this.setBannerState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
+            this.setError(errorMsg);
             reject(errorMsg);
-            this.referenceManager.entryStatusChange(this);
         }
 
         //insert the link entry
+        this.setPendingState();
         element = apogeeapp.ui.createElement(elementType,linkProps);
         document.head.appendChild(element);
     }
@@ -209,22 +213,32 @@ apogeeapp.app.LinkEntry.prototype.getElementId = function() {
     return apogeeapp.app.LinkEntry.ELEMENT_ID_BASE + this.id;
 }
 
-apogeeapp.app.LinkEntry.prototype.setBannerState = function(bannerState,bannerMessage) {
-    if(!this.treeEntry) return;
-    
-    var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(bannerState);
-    if(iconOverlay) {
-        this.treeEntry.setIconOverlay(iconOverlay);
+apogeeapp.app.LinkEntry.prototype.setClearState = function() {
+    this.setState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE);
+}
+
+apogeeapp.app.LinkEntry.prototype.setError = function(errorMsg) {
+    this.setState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
+}
+
+apogeeapp.app.LinkEntry.prototype.setPendingState = function() {
+    this.setState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING,"loading");
+}
+
+apogeeapp.app.LinkEntry.prototype.setState = function(state,msg) {
+    this.state = state;
+    if(this.treeEntry) {
+        apogeeapp.app.ReferenceManager.applyBannerState(this.treeEntry,this.state);
     }
-    else {
-        this.treeEntry.clearIconOverlay();
-    }
+    this.referenceManager.entryStatusChange(this);
 }
 
 apogeeapp.app.LinkEntry.prototype.instantiateTreeEntry = function() {
     var iconUrl = this.getIconUrl();
     var menuItemsCallback = () => this.getMenuItems();
-    return new apogeeapp.ui.treecontrol.TreeEntry(this.nickname, iconUrl, null, menuItemsCallback, false);
+    var treeEntry = new apogeeapp.ui.treecontrol.TreeEntry(this.nickname, iconUrl, null, menuItemsCallback, false);
+    apogeeapp.app.ReferenceManager.applyBannerState(treeEntry,this.state);
+    return treeEntry;
 }
 
 /** This method returns the icon url for the component. */

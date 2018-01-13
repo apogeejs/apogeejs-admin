@@ -56,7 +56,7 @@ apogeeapp.app.SimpleGeojsonDisplay.prototype.loadMap = function() {
 apogeeapp.app.SimpleGeojsonDisplay.prototype.showData = function(data) {
     this.cachedData = data;
     if(this.map) {
-        this.createLayerData();
+        this.createDataLayer();
     }
 }
         
