@@ -5,7 +5,16 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            html,body {
+            html {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                bottom: 10px;
+                right: 10px;
+                margin: 0px;
+                padding: 0px;
+            }
+            body {
                 position: relative;
                 top: 0px;
                 left: 0px;
@@ -57,6 +66,7 @@
         <script type="text/javascript" src="../../../apogee/data/FunctionTable.js"></script>
         <script type="text/javascript" src="../../../apogee/data/Folder.js"></script>
         <script type="text/javascript" src="../../../apogee/data/FolderFunction.js"></script>
+        <script type="text/javascript" src="../../../apogee/data/ErrorTable.js"></script>
         <script type="text/javascript" src="../../../apogee/actions/action.js"></script>
         <script type="text/javascript" src="../../../apogee/actions/compoundaction.js"></script>
         <script type="text/javascript" src="../../../apogee/actions/createmember.js"></script>
@@ -109,6 +119,7 @@
         <script type="text/javascript" src="../../../apogeeapp/app/components/FolderFunctionComponent.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/components/BasicControlComponent.js"></script>
 		<script type="text/javascript" src="../../../apogeeapp/app/components/CustomControlComponent.js"></script>
+        <script type="text/javascript" src="../../../apogeeapp/app/components/ErrorTableComponent.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/actions/errorhandling.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/actions/createworkspace.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/actions/updateworkspace.js"></script>
@@ -137,14 +148,14 @@
 		<script type="text/javascript" src="../../../apogeeapp/app/editors/HandsonGridEditor.js"></script>
 		<script type="text/javascript" src="../../../apogeeapp/app/editors/HandsonGridMode.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/editors/ControlOutputMode.js"></script>
+        <script type="text/javascript" src="../../../apogeeapp/app/editors/ErrorDisplay.js"></script>
+		<script type="text/javascript" src="../../../apogeeapp/app/editors/ErrorMode.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/dialogs/ConfigurableDialog.js"></script>
-        <script type="text/javascript" src="../../../apogeeapp/app/dialogs/UpdateLinksDialog.js"></script>
+        <script type="text/javascript" src="../../../apogeeapp/app/dialogs/TextIoDialog.js"></script>
         <script type="text/javascript" src="../../../apogeeapp/app/dialogs/SelectControlDialog.js"></script>
-        <script type="text/javascript" src="../../../apogeeapp/app/dialogs/propdialog.js"></script>
         
         <script type="text/javascript" src="../../../supplemental/cutNPasteCode/file_impl_cutnpaste.js"></script>
-        <script type="text/javascript" src="../../../supplemental/cutNPasteCode/PasteOpenDialog.js"></script>
-        <script type="text/javascript" src="../../../supplemental/cutNPasteCode/CutSaveDialog.js"></script>
+
         
         <script type="text/javascript" src="../../../supplemental/debugHook.js"></script>
         
@@ -167,51 +178,20 @@
         <script>
             var workspaceUrl = "editMetaFile.json";
             
-            var configInfo = {
-                "Model.tasks.login.loginControl":{
-                    "title":"Login"
-                },
-                "Model.tasks.switcher.selectSequence":{
-                    "title":"Edit Type"
-                },
-                "Model.tasks.editMeta.selectMetaContext.contextControl":{
-                    "title":"Meta File Context"
-                },
-                "Model.tasks.editMeta.selectMetaFile.metaFileSelector":{
-                    "title":"Meta File File Selection"
-                },
-                "Model.tasks.editMeta.selectDependencies.selectDepForm":{
-                    "title":"Meta File Dependencies"
-                },
-                "Model.tasks.editMeta.editMetaFile.selectEntriesControl":{
-                    "title":"Select Meta File Entries"
-                },
-                "Model.tasks.editCom.selectCid.selectCidControl":{
-                    "title":"Com File CID"
-                },
-                "Model.tasks.editCom.editComFile.selectComEntries":{
-                    "title":"Com File Entries"
-                },
-                "Model.tasks.submit.submitControl":{
-                    "title":"Submit"
-                },
-                "Model.tasks.completed.resetControl":{
-                    "title":"Completed"
-                }
-            };
             var INITIAL_PANEL_NAME = "Model.tasks.login.loginControl";
             var CONTAINER_PANEL_ID = "displayPanel";
             
             'use strict'
             
 			function init() {
-                taskWebApp.initTaskApp(workspaceUrl,configInfo,CONTAINER_PANEL_ID,INITIAL_PANEL_NAME);                      
+                taskWebApp.initTaskApp(workspaceUrl,CONTAINER_PANEL_ID,INITIAL_PANEL_NAME);                      
             }
             
         </script>
     </head>
-    <body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
-        <div id="displayPanel">  
+    <body onload="init()" onbeforeunload="return 'Are you sure you want to leave this page?'">
+        <div id="displayPanel">
+            <h3>Loading...</h3>
         </div>
     </body>
 </html>

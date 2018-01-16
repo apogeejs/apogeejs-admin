@@ -14,8 +14,18 @@ var taskAppModule = (function() {
 	}
 	
 	/** Adds a field to a path, returning a new path (not modifying old one) */
-	function getAppendedPath(path,field) {
-		return path.concat([field]);
+	function getResultPath(controlPath,field) {
+		//copy array and replace last element of path with the "result" object
+        var resultPath = controlPath.slice();
+		resultPath[resultPath.length-1] = "result";
+        return resultPath;
+	}
+    
+    function getStatePath(controlPath,field) {
+        //copy array and replace last element of path with the "state" object
+        var statePath = controlPath.slice();
+		statePath[statePath.length-1] = "state";
+        return statePath;
 	}
     
     function setActiveComponentByPath(relativeToTasksPath) {
@@ -60,8 +70,8 @@ var taskAppModule = (function() {
 		activeState.active = true;
 		activeState.previousTask = currentTaskPath;
 		
-		var currentResultString = getTaskPathString("tasks",getAppendedPath(currentTaskPath,"result"));
-		var nextStateString = getTaskPathString("tasks",getAppendedPath(nextTaskPath,"state"));
+		var currentResultString = getTaskPathString("tasks",getResultPath(currentTaskPath));
+		var nextStateString = getTaskPathString("tasks",getStatePath(nextTaskPath));
 		
 		var updateInfo = [];
 		updateInfo.push([currentResultString,taskResult]);
@@ -83,8 +93,8 @@ var taskAppModule = (function() {
 		inactiveState.active = false;
 		inactiveState.previousTask = null;
 		
-		var previousResultString = getTaskPathString("tasks",getAppendedPath(previousTaskPath,"result"));
-		var currentStateString = getTaskPathString("tasks",getAppendedPath(currentTaskPath,"state"));
+		var previousResultString = getTaskPathString("tasks",getResultPath(previousTaskPath));
+		var currentStateString = getTaskPathString("tasks",getStatePath(currentTaskPath));
 			
 		var updateInfo = [];
 		updateInfo.push([previousResultString,invalidResult]);
@@ -111,15 +121,15 @@ var taskAppModule = (function() {
 		
 		//clear tasks
 		var clearTask = (taskPath) => {		
-			let taskResultString = getTaskPathString("tasks",getAppendedPath(taskPath,"result"));
-			let taskStateString = getTaskPathString("tasks",getAppendedPath(taskPath,"state"));
+			let taskResultString = getTaskPathString("tasks",getResultPath(taskPath));
+			let taskStateString = getTaskPathString("tasks",getStatePath(taskPath));
 			updateInfo.push([taskResultString,invalidResult]);
 			updateInfo.push([taskStateString,inactiveState]);
 		};
 		clearTaskPathList.forEach(clearTask);
 		
 		//go to task
-		var nextTaskResultString = getTaskPathString("tasks",getAppendedPath(nextTaskPath,"result"));
+		var nextTaskResultString = getTaskPathString("tasks",getResultPath(nextTaskPath));
 		updateInfo.push([nextTaskResultString,invalidResult]);
 		updateInfo.push(["tasks.currentTask",nextTaskPath]);
 		

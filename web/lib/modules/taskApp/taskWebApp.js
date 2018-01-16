@@ -1,51 +1,50 @@
 var taskWebApp = {};
 
-taskWebApp.initTaskApp = function(workspaceUrl,configData,containerElementId,initialComponentName) {
+taskWebApp.initTaskApp = function(workspaceUrl,containerElementId,initialComponentName) {
 
     //==============================
     //internal variables and functions
     //==============================
+    //display fram initialization
     var _displayPanel = document.getElementById(containerElementId);
-    var _configData = configData;
-    var _initialComponentName = initialComponentName;
+    var _displayFrames = {};
     var _activeDisplayFrame = null;
-    var _titleElementHeight = 0;
-    var _titleTotalHeight = 0;
+    var _initialComponentName = initialComponentName;
 
     function onWorkspaceLoad() {
-        //load the UI controls
-        for(var fullName in _configData) {
-            initDisplay(fullName,_configData[fullName]);
-        }
         
         //remove loading label
         apogeeapp.ui.removeAllChildren(_displayPanel);
 
         //set the initial component
         setActiveComponent(_initialComponentName);
-    }
-
-    function initDisplay(memberName,configEntry) {
-
+    }  
+        
+    function createDisplayFrameEntry(fullMemberPath) {
+        
+        var displayFrameEntry = {};
+        
         //get the display element
-        var displayFrame = webAppAccess.getDisplayFrame(memberName);
-        configEntry.displayFrame = displayFrame;
-
-        //create wrapper dom Element
-        var wrapperElement = document.createElement("div");
-        wrapperElement.className = "taskApp_wrapperElementClass";
-
-        var titleElement = getTitleElement(configEntry.title);
-        titleElement.style.height = _titleElementHeight + "px";
-        wrapperElement.appendChild(titleElement);
-
-        var frameHolder = document.createElement("div");
-        frameHolder.className = "taskApp_frameHolderClass";
-        frameHolder.appendChild(displayFrame.getElement());
-        frameHolder.style.top = _titleTotalHeight + "px";
-        wrapperElement.appendChild(frameHolder);
-
-        configEntry.panel = wrapperElement;             
+        var displayFrame = webAppAccess.getDisplayFrame(fullMemberPath);
+        displayFrameEntry.displayFrame = displayFrame;
+        displayFrameEntry.wrapperElement = displayFrame.getElement();
+        
+//         //create wrapper dom Element
+//        var wrapperElement = document.createElement("div");
+//        wrapperElement.className = "taskApp_wrapperElementClass";
+//        displayFrameEntry.wrapperElement = wrapperElement;
+//
+//        var titleElement = getTitleElement("Title for " + fullMemberPath);
+//        titleElement.style.height = _titleElementHeight + "px";
+//        wrapperElement.appendChild(titleElement);
+//
+//        var frameHolder = document.createElement("div");
+//        frameHolder.className = "taskApp_frameHolderClass";
+//        frameHolder.appendChild(displayFrame.getElement());
+//        frameHolder.style.top = _titleTotalHeight + "px";
+//        wrapperElement.appendChild(frameHolder);
+        
+        return displayFrameEntry;
     }
     
     function getTitleElement(name) {
@@ -60,46 +59,33 @@ taskWebApp.initTaskApp = function(workspaceUrl,configData,containerElementId,ini
         return Math.ceil(parseFloat(styles.marginTop) + element.offsetHeight + parseFloat(styles['marginBottom']));
     }
 
-
-    function setActiveComponent(memberFolderName) {
+    function setActiveComponent(fullMemberPath) {
         if(_activeDisplayFrame != null) {
             _activeDisplayFrame.setIsShowing(false);
             _activeDisplayFrame = null;
             apogeeapp.ui.removeAllChildren(_displayPanel);
         }
-
-        var memberName;
-        var found = false;
-        for(memberName in _configData) {
-            if(memberName.startsWith(memberFolderName)) {
-                found = true;
-                break;
-            }
+        
+        var displayFrameEntry = _displayFrames[fullMemberPath];
+        if(!displayFrameEntry) {
+            displayFrameEntry = createDisplayFrameEntry(fullMemberPath);
+            _displayFrames[fullMemberPath] = displayFrameEntry
         }
 
-        if(!found) {
-            alert("Member folder not found: " + memberName);
+        if(!displayFrameEntry) {
+            alert("Member folder not found: " + fullMemberPath);
             return;
         }
 
-        var memberConfigEntry = _configData[memberName];
+        _displayPanel.appendChild(displayFrameEntry.wrapperElement);
 
-        _displayPanel.appendChild(memberConfigEntry.panel);
-
-        _activeDisplayFrame = memberConfigEntry.displayFrame;
+        _activeDisplayFrame = displayFrameEntry.displayFrame;
         _activeDisplayFrame.setIsShowing(true);
-
     }
 
     //==================
     // Init body
     //==================
-    
-    //create a loading page - this is to measure the title height
-    var loadingElement = getTitleElement("loading...");
-    _displayPanel.appendChild(loadingElement);
-    _titleElementHeight = loadingElement.clientHeight;
-    _titleTotalHeight = getActualHeight(loadingElement);
     
     //set some globals
      __globals__.__WEB_APP_MAKE_ACTIVE_FUNCTION__ = setActiveComponent;
