@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Sample Apogee Task Web App</title>
+        <title>Apogee Task Web App</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
@@ -176,22 +176,37 @@
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
         
         <script>
-            var workspaceUrl = "editMetaFile.json";
-            
-            var INITIAL_PANEL_NAME = "Model.tasks.login.loginControl";
             var CONTAINER_PANEL_ID = "displayPanel";
+            var INITIAL_MESSAGE_ID = "initialMessage";
             
             'use strict'
             
 			function init() {
-                taskWebApp.initTaskApp(workspaceUrl,CONTAINER_PANEL_ID,INITIAL_PANEL_NAME);                      
+                //note we can not use 'url' because apogee will try to automatically load that
+                var workspaceUrl = apogee.util.readQueryField("wsurl",document.URL);
+                if(!workspaceUrl) {
+                    showInitialError("The query parameter 'wsurl' must be provided!");
+                    return;
+                }
+                
+                var initialComponentName = apogee.util.readQueryField("component",document.URL);
+                if(!initialComponentName) {
+                    showInitialError("The query parameter 'component' must be provided!");
+                    return;
+                }
+                taskWebApp.initTaskApp(workspaceUrl,CONTAINER_PANEL_ID,initialComponentName);                      
+            }
+            
+            function showInitialError(msg) {
+                var element = document.getElementById(INITIAL_MESSAGE_ID);
+                element.innerHTML = msg;
             }
             
         </script>
     </head>
     <body onload="init()" onbeforeunload="return 'Are you sure you want to leave this page?'">
         <div id="displayPanel">
-            <h3>Loading...</h3>
+            <h3 id="initialMessage">Loading...</h3>
         </div>
     </body>
 </html>

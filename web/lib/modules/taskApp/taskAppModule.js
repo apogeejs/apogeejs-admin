@@ -30,14 +30,24 @@ var taskAppModule = (function() {
     
     function setActiveComponentByPath(relativeToTasksPath) {
         //this is a little convuluted - I should fix up how we loda this object
+        
+        //on initial load some of these variables are not yet initialized, so we check for them
         var app = apogeeapp.app.Apogee.getInstance();
+        if(!app) return;
         
         var absolutePath = ["tasks"].concat(relativeToTasksPath);
         var workspace = app.getWorkspace();
+        if(!workspace) return;
+        
         var rootFolder = workspace.getRoot();
         var workspaceUI = app.getWorkspaceUI();
+        if(!workspaceUI) return;
+        
         var member = rootFolder.lookupChildFromPathArray(absolutePath);
+        if(!member) return;
+        
         var component = workspaceUI.getComponent(member);
+        if(!component) return;
         
         var makeActiveFuntion;
         if(__globals__.__WEB_APP_MAKE_ACTIVE_FUNCTION__) {

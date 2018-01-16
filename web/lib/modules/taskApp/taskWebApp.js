@@ -28,35 +28,7 @@ taskWebApp.initTaskApp = function(workspaceUrl,containerElementId,initialCompone
         var displayFrame = webAppAccess.getDisplayFrame(fullMemberPath);
         displayFrameEntry.displayFrame = displayFrame;
         displayFrameEntry.wrapperElement = displayFrame.getElement();
-        
-//         //create wrapper dom Element
-//        var wrapperElement = document.createElement("div");
-//        wrapperElement.className = "taskApp_wrapperElementClass";
-//        displayFrameEntry.wrapperElement = wrapperElement;
-//
-//        var titleElement = getTitleElement("Title for " + fullMemberPath);
-//        titleElement.style.height = _titleElementHeight + "px";
-//        wrapperElement.appendChild(titleElement);
-//
-//        var frameHolder = document.createElement("div");
-//        frameHolder.className = "taskApp_frameHolderClass";
-//        frameHolder.appendChild(displayFrame.getElement());
-//        frameHolder.style.top = _titleTotalHeight + "px";
-//        wrapperElement.appendChild(frameHolder);
-        
         return displayFrameEntry;
-    }
-    
-    function getTitleElement(name) {
-        var titleElement = document.createElement("h2");
-        titleElement.innerHTML = name;
-        titleElement.className = "taskApp_titleElement";
-        return titleElement;
-    }
-    
-    function getActualHeight(element) {
-        var styles = getComputedStyle(element);
-        return Math.ceil(parseFloat(styles.marginTop) + element.offsetHeight + parseFloat(styles['marginBottom']));
     }
 
     function setActiveComponent(fullMemberPath) {
