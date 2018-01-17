@@ -212,7 +212,6 @@ module.exports = function(grunt) {
         },
         all: {
           src: [
-			"apogeeapp/app/apogeeapp.css",
             "apogeeapp/ui/jsonedit/jsonedit.css",
             "apogeeapp/ui/window/WindowFrame.css",
             "apogeeapp/ui/window/dialog.css",
@@ -222,7 +221,7 @@ module.exports = function(grunt) {
             "apogeeapp/ui/tabframe/TabFrame.css",
             "apogeeapp/ui/treecontrol/TreeControl.css",
           ],
-          dest: "../../dist/lib/apogeeapp.css"
+          dest: "../../dist/lib/apogeeui.css"
         },
       },
     copy: {
@@ -240,7 +239,8 @@ module.exports = function(grunt) {
           {src: '../../dist/lib/apogee-web-app.min.js', dest: '../../dist/web-dist/v<%= pkg.version %>/apogee-web-app.min.js'},
           {src: '../../dist/lib/apogee-web-cutnpaste.js', dest: '../../dist/web-dist/v<%= pkg.version %>/apogee-web-cutnpaste.js'},
           {src: '../../dist/lib/apogee-web-cutnpaste.min.js', dest: '../../dist/web-dist/v<%= pkg.version %>/apogee-web-cutnpaste.min.js'},
-          {src: '../../dist/lib/apogeeapp.css', dest: '../../dist/web-dist/v<%= pkg.version %>/apogeeapp.css'},
+          {src: 'apogeeapp/app/apogeeapp.css', dest: '../../dist/web-dist/v<%= pkg.version %>/apogeeapp.css'},
+          {src: '../../dist/lib/apogeeui.css', dest: '../../dist/web-dist/v<%= pkg.version %>/apogeeui.css'},
           {expand: true, flatten: false, src: ['resources/**'], dest: '../../dist/web-dist/v<%= pkg.version %>/'},
           {expand: true, flatten: false, src: ['lib/**'], dest: '../../dist/web-dist/v<%= pkg.version %>/'},
           
