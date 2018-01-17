@@ -249,7 +249,8 @@ module.exports = function(grunt) {
           {expand: true, flatten: true, src: ['supplemental/electronCode/app/*'], dest: '../../dist/electron-dist/v<%= pkg.version %>/', filter: 'isFile'},
           {src: '../../dist/lib/apogee-npm-lib.js', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogee-npm-lib.js'},
           {src: '../../dist/lib/apogee-npm-app.js', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogee-npm-app.js'},
-          {src: '../../dist/lib/apogeeapp.css', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogeeapp.css'},
+          {src: 'apogeeapp/app/apogeeapp.css', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogeeapp.css'},
+          {src: '../../dist/lib/apogeeui.css', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogeeui.css'},
           {expand: true, flatten: false, src: ['resources/**'], dest: '../../dist/electron-dist/v<%= pkg.version %>/'},
           
           
