@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Apogee Task Web App</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
+        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
+        <script type="text/javascript" src="apogee-web-lib.min.js"></script>
+        <script type="text/javascript" src="apogee-web-app.min.js"></script>
+        <script type="text/javascript" src="apogee-web-cutnpaste.min.js"></script>
+        <script type="text/javascript" src="/lib/modules/webApp/webAppAccess.js"></script>
+        <script type="text/javascript" src="/lib/modules/taskApp/taskWebApp.js"></script>
+        <script type="text/javascript" src="debugHook.js"></script>
+        <link rel="stylesheet" type="text/css" href="apogeeui.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
+        <style>
+            html {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                bottom: 10px;
+                right: 10px;
+                margin: 0px;
+                padding: 0px;
+            }
+            body {
+                position: relative;
+                top: 0px;
+                left: 0px;
+                width: 100%;
+                height: 100%;
+                margin: 0px;
+                padding: 0px;
+            }
+			#displayPanel {
+				display: table;
+                margin: 0px;
+                
+                position: relative;
+                top: 0px;
+                left: 0px;
+                width: 100%;
+                height: 100%;
+			}
+     
+		</style> 
+        
+        <script>
+            var CONTAINER_PANEL_ID = "displayPanel";
+            var INITIAL_MESSAGE_ID = "initialMessage";
+            
+            'use strict'
+            
+			function init() {
+                //note we can not use 'url' because apogee will try to automatically load that
+                var workspaceUrl = apogee.util.readQueryField("wsurl",document.URL);
+                if(!workspaceUrl) {
+                    showInitialError("The query parameter 'wsurl' must be provided!");
+                    return;
+                }
+                
+                var initialComponentName = apogee.util.readQueryField("component",document.URL);
+                if(!initialComponentName) {
+                    showInitialError("The query parameter 'component' must be provided!");
+                    return;
+                }
+                taskWebApp.initTaskApp(workspaceUrl,CONTAINER_PANEL_ID,initialComponentName);                      
+            }
+            
+            function showInitialError(msg) {
+                var element = document.getElementById(INITIAL_MESSAGE_ID);
+                element.innerHTML = msg;
+            }
+            
+        </script>
+    </head>
+    <body onload="init()" onbeforeunload="return 'Are you sure you want to leave this page?'">
+        <div id="displayPanel">
+            <h3 id="initialMessage">Loading...</h3>
+        </div>
+    </body>
+</html>
