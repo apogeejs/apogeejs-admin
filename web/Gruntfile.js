@@ -97,7 +97,7 @@ module.exports = function(grunt) {
                 "apogeeapp/app/actions/closeworkspace.js",
                 "apogeeapp/app/actions/addcomponent.js",
                 "apogeeapp/app/actions/updatecomponent.js",
-                "apogeeapp/app/actions/updatelinks.js",
+                "apogeeapp/app/actions/updatelink.js",
                 "apogeeapp/app/editors/ViewMode.js",
                 "apogeeapp/app/editors/TextAreaEditor.js",
                 "apogeeapp/app/editors/TextAreaMode.js",
