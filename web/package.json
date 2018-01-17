@@ -1,6 +1,6 @@
 {
   "name": "apogee",
-  "version": "0.7.0",
+  "version": [set this],
   "description": "Apogee programming tool",
   "main": "apogee.js",
   "devDependencies": {
