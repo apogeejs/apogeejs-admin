@@ -246,13 +246,13 @@ module.exports = function(grunt) {
           {expand: true, flatten: false, src: ['lib/**'], dest: '../../dist/web-dist/v<%= pkg.version %>/'},
           
           //electron
-          {src: 'supplemental/debugHook.js', dest: '../../dist/electron-dist/v<%= pkg.version %>/debugHook.js'},
-          {expand: true, flatten: true, src: ['supplemental/electronCode/app/*'], dest: '../../dist/electron-dist/v<%= pkg.version %>/', filter: 'isFile'},
-          {src: '../../dist/lib/apogee-npm-lib.js', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogee-npm-lib.js'},
-          {src: '../../dist/lib/apogee-npm-app.js', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogee-npm-app.js'},
-          {src: 'apogeeapp/app/apogeeapp.css', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogeeapp.css'},
-          {src: '../../dist/lib/apogeeui.css', dest: '../../dist/electron-dist/v<%= pkg.version %>/apogeeui.css'},
-          {expand: true, flatten: false, src: ['resources/**'], dest: '../../dist/electron-dist/v<%= pkg.version %>/'},
+          {src: 'supplemental/debugHook.js', dest: '../../dist/electron-dist/ApogeeJS_v<%= pkg.version %>/debugHook.js'},
+          {expand: true, flatten: true, src: ['supplemental/electronCode/app/*'], dest: '../../dist/electron-dist/ApogeeJS_v<%= pkg.version %>/', filter: 'isFile'},
+          {src: '../../dist/lib/apogee-npm-lib.js', dest: '../../dist/electron-dist/ApogeeJS_v<%= pkg.version %>/apogee-npm-lib.js'},
+          {src: '../../dist/lib/apogee-npm-app.js', dest: '../../dist/electron-dist/ApogeeJS_v<%= pkg.version %>/apogee-npm-app.js'},
+          {src: 'apogeeapp/app/apogeeapp.css', dest: '../../dist/electron-dist/ApogeeJS_v<%= pkg.version %>/apogeeapp.css'},
+          {src: '../../dist/lib/apogeeui.css', dest: '../../dist/electron-dist/ApogeeJS_v<%= pkg.version %>/apogeeui.css'},
+          {expand: true, flatten: false, src: ['resources/**'], dest: '../../dist/electron-dist/ApogeeJS_v<%= pkg.version %>/'},
           
           
           
