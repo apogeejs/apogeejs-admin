@@ -36,6 +36,10 @@ apogee.FunctionTable.prototype.postInitializeAction = function() {
     //pending check - we don't know if a function is pending until we
     //actually call it. I didn't know how else to capture this in the 
     //calling code other than use an error. But this is not an error
+    if(this.hasError()) {
+        throw new Error("Error in dependency: " + this.getFullName());
+        
+    }
     if(this.getResultPending()) {
         throw apogee.Codeable.MEMBER_FUNCTION_PENDING;
     }
