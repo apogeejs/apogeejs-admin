@@ -43,6 +43,10 @@ apogee.Codeable.isCodeable = true
 
 apogee.Codeable.MEMBER_FUNCTION_PENDING = "pending";
 
+apogee.Codeable.getSetCodeOk = function() {
+    return this.generator.setCodeOk;
+}
+
 /** This method returns the argument list.  */
 apogee.Codeable.getArgList = function() {
     return this.argList;

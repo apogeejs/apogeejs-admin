@@ -73,7 +73,8 @@ apogee.updatemember.MEMBER_UPDATED_EVENT = "memberUpdated";
 /** Update code action function. */
 apogee.updatemember.updateCode = function(actionData,optionalContext,processedActions) { 
     
-    if(!actionData.member.getSetCodeOk()) {
+    var member = actionData.member;
+    if((!member.isCodeable)||(!member.getSetCodeOk())) {
         throw new Error("can not set code on member: " + member.getFullName());
     }
           

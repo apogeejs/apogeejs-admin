@@ -1,4 +1,4 @@
-/** This component encapsulates an object that contains a single child (usually a folder) which
+/** This component encapsulates an owner object which is not a member and it contains a single child (usually a folder) which
  * is the "root" object for a hierarchy.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.

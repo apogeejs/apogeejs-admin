@@ -387,7 +387,8 @@ apogee.action.checkUpdateAllDep = function(processedActions) {
 apogee.action.doInitializeDependencies = function(actionData) {
     if(!actionData.member) return false;
     
-    if(actionData.actionInfo) {
+    //only applicable to codeables
+    if((actionData.actionInfo)&&(actionData.member.isCodeable)) {
         return actionData.actionInfo.updateDependencies;
     }
     else {

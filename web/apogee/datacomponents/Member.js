@@ -188,10 +188,6 @@ apogee.Member.getSetDataOk = function() {
     return this.generator.setDataOk;
 }
 
-apogee.Member.getSetCodeOk = function() {
-    return this.generator.setCodeOk;
-}
-
 /** This method writes the child to a json. */
 apogee.Member.toJson = function() {
 	var json = {};

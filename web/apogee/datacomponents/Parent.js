@@ -1,8 +1,8 @@
-/** This component encapsulates an object that contains children members, creating  a 
+/** This component encapsulates an owner object that is a member and contains children members, creating  a 
  * hierarchical structure in the workspace. Each child has a name and this name
  * forms the index of the child into its parent. (I guess that means it doesn't
  * have to be a string, in the case we made an ArrayFolder, which would index the
- * children by integer.) The Parent must also be a member.
+ * children by integer.)
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  * 
