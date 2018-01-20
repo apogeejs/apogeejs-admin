@@ -25,7 +25,7 @@ apogee.Codeable.init = function(argList) {
     this.varInfo = null;
     this.dependencyInfo = null;
     this.memberFunctionInitializer = null;
-    this.memberFunction = null;
+    this.memberGenerator = null;
     this.codeErrors = [];
     
     this.clearCalcPending();
@@ -87,15 +87,14 @@ apogee.Codeable.setCodeInfo = function(codeInfo) {
         //set the code  by exectuing generator
         try {
             //get the inputs to the generator
-            var instance = this;
-            var initFunction = function() {
-                return instance.memberFunctionInitialize();
-            }
             var messenger = new apogee.action.Messenger(this);
             
             //get the generated fucntion
-            var generatedFunctions = codeInfo.generatorFunction(initFunction,messenger);
-            this.memberFunction = generatedFunctions.memberFunction;
+            var generatedFunctions = codeInfo.generatorFunction(messenger);
+            //-------------------------------------------------------------
+            //this is a standin for memeber generator before we fix the code compiler
+            this.memberGenerator = generatedFunctions.memberGenerator;
+            //-------------------------------------------------------------
             this.memberFunctionInitializer = generatedFunctions.initializer;            
             
             this.codeErrors = [];
@@ -111,7 +110,7 @@ apogee.Codeable.setCodeInfo = function(codeInfo) {
     
     if(this.codeErrors.length > 0) {
         //code not valid
-        this.memberFunction = null;
+        this.memberGenerator = null;
         this.memberFunctionInitializer = null;
     }
     this.codeSet = true;
@@ -164,7 +163,7 @@ apogee.Codeable.clearCode = function() {
     this.varInfo = null;
     this.dependencyInfo = null;
     this.memberFunctionInitializer = null;
-    this.memberFunction = null;
+    this.memberGenerator = null;
     this.codeErrors = [];
     
     this.clearCalcPending();
@@ -202,7 +201,7 @@ apogee.Codeable.calculate = function() {
         return;
     }
     
-    if((!this.memberFunction)||(!this.memberFunctionInitializer)) {
+    if((!this.memberGenerator)||(!this.memberFunctionInitializer)) {
         var msg = "Function not found for member: " + this.getName();
         var actionError = new apogee.ActionError(msg,"Codeable - Calculate",this);
         this.addError(actionError);
@@ -211,7 +210,7 @@ apogee.Codeable.calculate = function() {
     } 
     
     try {
-        this.processMemberFunction(this.memberFunction);
+        this.processMemberFunction(this.memberGenerator);
     }
     catch(error) {
         if(error == apogee.Codeable.MEMBER_FUNCTION_PENDING) {
@@ -283,13 +282,6 @@ apogee.Codeable.memberFunctionInitialize = function() {
         actionError.setParentException(error);
         this.addError(actionError);
         this.initReturnValue = false;
-    }
-    finally {
-        //This lets us do something outside the catch block - mainly just to 
-        //let some things throw the (cludgy) pending error.
-        if(this.postInitializeAction) {
-            this.postInitializeAction();
-        }
     }
     
     this.calcInProgress = false;

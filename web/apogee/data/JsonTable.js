@@ -49,10 +49,21 @@ apogee.JsonTable.prototype.getArgList = function() {
     return [];
 }
 	
-apogee.JsonTable.prototype.processMemberFunction = function(memberFunction) {
+apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
     
-    //the data is the output of the function
-    var data = memberFunction();
+    //first initialize
+    var initialized = this.memberFunctionInitialize();
+    
+    var data;
+    if(initialized) {
+        //the data is the output of the function
+        var memberFunction = memberGenerator();
+        data = memberFunction();
+    }
+    else {
+        //initialization issue = error or pending dependancy
+        data = undefined;
+    }
     
     //if the return value is a Promise, the data is asynch
     if(apogee.base.isPromise(data)) {

@@ -28,21 +28,54 @@ apogee.base.mixin(apogee.FunctionTable,apogee.Codeable);
 // Codeable Methods
 //------------------------------
 
-apogee.FunctionTable.prototype.processMemberFunction = function(memberFunction) {	
-	this.setData(memberFunction);
-}
-
-apogee.FunctionTable.prototype.postInitializeAction = function() {
-    //pending check - we don't know if a function is pending until we
-    //actually call it. I didn't know how else to capture this in the 
-    //calling code other than use an error. But this is not an error
-    if(this.hasError()) {
-        throw new Error("Error in dependency: " + this.getFullName());
+apogee.FunctionTable.prototype.processMemberFunction = function(memberGenerator) {
+    var instance = this;
+    
+    var packagerFunction = function() {
+        var src = {};
+        var memberInitialized = false;
+        var memberFunction = null;
+        var issue = null;
         
+        
+        var initMember = function() {
+            memberInitialized = true;
+            var impactorSuccess = instance.memberFunctionInitialize();
+            if(impactorSuccess) {
+                memberFunction = memberGenerator();
+            }
+            else {
+                if(instance.hasError()) {
+                    issue = new Error("Error in dependency: " + instance.getFullName());
+
+                }
+                if(instance.getResultPending()) {
+                    issue = apogee.Codeable.MEMBER_FUNCTION_PENDING;
+                }
+                else {
+                    issue = new Error("Unknown problem in initializing: " + instance.getFullName());
+                }
+            } 
+        }
+        
+        var wrapperMemberFunction = function(argList) {
+            if(!memberInitialized) {
+                initMember();
+            }
+
+            if(memberFunction) {
+                return memberFunction.apply(null,arguments);
+            }
+            else {
+                throw issue;
+            }
+        }
+        
+        return wrapperMemberFunction;
     }
-    if(this.getResultPending()) {
-        throw apogee.Codeable.MEMBER_FUNCTION_PENDING;
-    }
+    
+    var memberFunction = packagerFunction();
+	this.setData(memberFunction);
 }
 
 //------------------------------
