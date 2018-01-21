@@ -4,8 +4,9 @@ apogee.codeCompiler = {};
 /** @private */
 apogee.codeCompiler.APOGEE_FORBIDDEN_NAMES = {
     "apogeeMessenger": true,
-    "__initFunction": true,
+    "__initializer": true,
     "__memberFunction": true,
+    "__memberGenerator": true,
     "__memberFunctionDebugHook": true
 }
 

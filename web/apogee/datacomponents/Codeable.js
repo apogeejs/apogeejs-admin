@@ -91,10 +91,7 @@ apogee.Codeable.setCodeInfo = function(codeInfo) {
             
             //get the generated fucntion
             var generatedFunctions = codeInfo.generatorFunction(messenger);
-            //-------------------------------------------------------------
-            //this is a standin for memeber generator before we fix the code compiler
             this.memberGenerator = generatedFunctions.memberGenerator;
-            //-------------------------------------------------------------
             this.memberFunctionInitializer = generatedFunctions.initializer;            
             
             this.codeErrors = [];

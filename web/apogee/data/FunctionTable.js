@@ -29,53 +29,57 @@ apogee.base.mixin(apogee.FunctionTable,apogee.Codeable);
 //------------------------------
 
 apogee.FunctionTable.prototype.processMemberFunction = function(memberGenerator) {
-    var instance = this;
-    
-    var packagerFunction = function() {
-        var src = {};
-        var memberInitialized = false;
-        var memberFunction = null;
-        var issue = null;
-        
-        
-        var initMember = function() {
-            memberInitialized = true;
-            var impactorSuccess = instance.memberFunctionInitialize();
-            if(impactorSuccess) {
-                memberFunction = memberGenerator();
-            }
-            else {
-                if(instance.hasError()) {
-                    issue = new Error("Error in dependency: " + instance.getFullName());
-
-                }
-                if(instance.getResultPending()) {
-                    issue = apogee.Codeable.MEMBER_FUNCTION_PENDING;
-                }
-                else {
-                    issue = new Error("Unknown problem in initializing: " + instance.getFullName());
-                }
-            } 
-        }
-        
-        var wrapperMemberFunction = function(argList) {
-            if(!memberInitialized) {
-                initMember();
-            }
-
-            if(memberFunction) {
-                return memberFunction.apply(null,arguments);
-            }
-            else {
-                throw issue;
-            }
-        }
-        
-        return wrapperMemberFunction;
-    }
-    
-    var memberFunction = packagerFunction();
+    var memberFunction = this.getLazyInitializedMemberFunction(memberGenerator);
 	this.setData(memberFunction);
+}
+
+apogee.FunctionTable.prototype.getLazyInitializedMemberFunction = function(memberGenerator) {
+    var memberInitialized = false;
+    var memberFunction = null;
+    var issue = null;
+    var instance = this;
+
+    //create init member function for lazy initialization
+    //we need to do this for recursive functions, or else we will get a circular reference
+    var initMember = function() {
+        memberInitialized = true;
+        var impactorSuccess = instance.memberFunctionInitialize();
+        if(impactorSuccess) {
+            memberFunction = memberGenerator();
+        }
+        else {
+            //error handling
+            //in the case of "result pending" this is NOT an error. But I don't know
+            //how else to stop the calculation other than throwing an error, so 
+            //we do that here. It should be handled by anyone calling a function.
+            if(instance.hasError()) {
+                issue = new Error("Error in dependency: " + instance.getFullName());
+
+            }
+            if(instance.getResultPending()) {
+                issue = apogee.Codeable.MEMBER_FUNCTION_PENDING;
+            }
+            else {
+                issue = new Error("Unknown problem in initializing: " + instance.getFullName());
+            }
+        } 
+    }
+
+    //create member function for lazy initialization
+    var wrapperMemberFunction = function(argList) {
+        if(!memberInitialized) {
+            initMember();
+        }
+
+        if(memberFunction) {
+            return memberFunction.apply(null,arguments);
+        }
+        else {
+            throw issue;
+        }
+    }
+
+    return wrapperMemberFunction;
 }
 
 //------------------------------
