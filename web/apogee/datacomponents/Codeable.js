@@ -73,7 +73,7 @@ apogee.Codeable.setDescription = function(description) {
 }
 
 /** This method returns the formula for this member.  */
-apogee.Codeable.setCodeInfo = function(codeInfo) {
+apogee.Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
 
     //set the base data
     this.argList = codeInfo.argList;
@@ -81,16 +81,16 @@ apogee.Codeable.setCodeInfo = function(codeInfo) {
     this.supplementalCode = codeInfo.supplementalCode;
 
     //save the variables accessed
-    this.varInfo = codeInfo.varInfo;
+    this.varInfo = compiledInfo.varInfo;
 
-    if((!codeInfo.errors)||(codeInfo.errors.length === 0)) {
+    if((!compiledInfo.errors)||(compiledInfo.errors.length === 0)) {
         //set the code  by exectuing generator
         try {
             //get the inputs to the generator
             var messenger = new apogee.action.Messenger(this);
             
             //get the generated fucntion
-            var generatedFunctions = codeInfo.generatorFunction(messenger);
+            var generatedFunctions = compiledInfo.generatorFunction(messenger);
             this.memberGenerator = generatedFunctions.memberGenerator;
             this.memberFunctionInitializer = generatedFunctions.initializer;            
             
@@ -102,7 +102,7 @@ apogee.Codeable.setCodeInfo = function(codeInfo) {
     }
     else {
 //doh - i am throwing away errors - handle this differently!
-        this.codeErrors = codeInfo.errors;
+        this.codeErrors = compiledInfo.errors;
     }
     
     if(this.codeErrors.length > 0) {

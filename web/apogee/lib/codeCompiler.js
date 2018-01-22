@@ -62,19 +62,21 @@ apogee.codeCompiler.processCode = function(codeInfo,codeLabel) {
     var effectiveCombinedFunctionBody = apogee.codeCompiler.MEMBER_LOCALS_TEXT + combinedFunctionBody;
     var analyzeOutput = apogee.codeAnalysis.analyzeCode(effectiveCombinedFunctionBody);
     
+    var compiledInfo = {};
+    
     if(analyzeOutput.success) {
-        codeInfo.varInfo = analyzeOutput.varInfo;
+        compiledInfo.varInfo = analyzeOutput.varInfo;
     }
     else {
-        codeInfo.errors = analyzeOutput.errors;
-        return codeInfo;
+        compiledInfo.errors = analyzeOutput.errors;
+        return compiledInfo;
     }
 
     //create the object function and context setter from the code text
-    var generatorFunction = apogee.codeCompiler.createGeneratorFunction(codeInfo.varInfo, combinedFunctionBody);
-    codeInfo.generatorFunction = generatorFunction;
+    var generatorFunction = apogee.codeCompiler.createGeneratorFunction(compiledInfo.varInfo, combinedFunctionBody);
+    compiledInfo.generatorFunction = generatorFunction;
     
-    return codeInfo;   
+    return compiledInfo;   
 }
 
 
