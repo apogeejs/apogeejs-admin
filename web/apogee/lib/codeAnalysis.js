@@ -68,12 +68,14 @@ apogee.codeAnalysis.syntax = {
     MemberExpression: [], //this handled specially
     NewExpression: [{name:'callee'},{name:'arguments',list:true}],
     Program: [{name:'body',list:true}],
-    Property: [], //this is handled specially
+    Property: [{name:'key'},{name:'value'}], //this is handled specially
     ReturnStatement: [{name:'argument'}],
     SequenceExpression: [{name:'expressions',list:true}],
-    ObjectExpression: [], //this is handled specially  
+    ObjectExpression: [{name:'properties',list:true}], //this is handled specially  
     SwitchCase: [{name:'test'},{name:'consequent',list:true}],
     SwitchStatement: [{name:'discriminant'},{name:'cases',list:true}],
+    TemplateElement: [],
+    TemplateLiteral: [{name:'quasis',list:true},{name:'expressions',list:true}],
     ThisExpression: [],
     ThrowStatement: [{name:'argument'}],
     TryStatement: [
@@ -118,9 +120,7 @@ apogee.codeAnalysis.syntax = {
     RestElement: null,
     SpreadElement: null,
     Super: null,
-    TaggedTemplateExpression: null,
-    TemplateElement: null,
-    TemplateLiteral: null
+    TaggedTemplateExpression: null
     
 };
 
@@ -500,18 +500,8 @@ apogee.codeAnalysis.getVariableDotPath = function(processInfo,node) {
         return [node.name];
     }
     else if(node.type == "MemberExpression") {
-        if(node.object.type == "CallExpression") {
-            //CALL EXPRESSION
-            //ignore the variable path after the call. We will set a dependence
-            //on the parent which should work but is too strong. For example
-            //we may be including dependence on a while folder when really we depend
-            //on a single child in the folder.
-            this.processTreeNode(processInfo,node.object,false);
-            
-            return null;
-        }
-        else {
-            //MEMBER EXPRESSION OR IDENTIFIER hopefully. We should throw an exception if not.
+        if((node.object.type == "MemberExpression")||(node.object.type == "Identifier")) {
+            //MEMBER EXPRESSION OR IDENTIFIER - variable name and/or path
             var variable = this.getVariableDotPath(processInfo,node.object);
 
             if(node.computed) {
@@ -528,6 +518,16 @@ apogee.codeAnalysis.getVariableDotPath = function(processInfo,node) {
             }
 
             return variable;
+        }
+        else {
+            //something other than a variable as the object for the member expressoin
+            //ignore the variable path after the call. We will set a dependence
+            //on the parent which should work but is too strong. For example
+            //we may be including dependence on a while folder when really we depend
+            //on a single child in the folder.
+            this.processTreeNode(processInfo,node.object,false);
+            
+            return null;
         }
     }
     else {
