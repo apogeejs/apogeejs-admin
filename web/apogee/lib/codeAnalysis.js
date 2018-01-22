@@ -7,7 +7,6 @@
  * -- nameUse.path: an array of names constructing the field accessed.
    -- nameUse.scope: a reference to a scope object
    -- nameUse.node: the AST node that identifies this variable
-   -- nameUse.isModified: true if the variable is modified (not 100% accurate)
    -- nameUse.isLocal: true if this is a reference to a local variable
    -- nameUse.decalredScope: for local variables only, gives the scope in which the lcoal variable is declared.
  * - additionally, there is a flag indicating if all uses of a name are local variables
@@ -22,11 +21,10 @@ apogee.codeAnalysis = {};
  * {
  *     name:[the name of the field in the node]
  *     list:[true if the field is a list of nodes]
- *     modified:[boolean indicating if the field correspondes to a modified variable
  *     declaration:[boolean indicating if the field corrsponds to a field declaration]
  * @private */
 apogee.codeAnalysis.syntax = {
-    AssignmentExpression: [{name:'left',modified:true},{name:'right'}],
+    AssignmentExpression: [{name:'left'},{name:'right'}],
     ArrayExpression: [{name:'elements',list:true}],
     ArrowFunctionExpression: [{name:'params',list:true},{name:'body'},{name:'defaults',list:true}],
     BlockStatement: [{name:'body',list:true}],
@@ -70,12 +68,14 @@ apogee.codeAnalysis.syntax = {
     MemberExpression: [], //this handled specially
     NewExpression: [{name:'callee'},{name:'arguments',list:true}],
     Program: [{name:'body',list:true}],
-    Property: [], //this is handled specially
+    Property: [{name:'key'},{name:'value'}], //this is handled specially
     ReturnStatement: [{name:'argument'}],
     SequenceExpression: [{name:'expressions',list:true}],
-    ObjectExpression: [], //this is handled specially  
+    ObjectExpression: [{name:'properties',list:true}], //this is handled specially  
     SwitchCase: [{name:'test'},{name:'consequent',list:true}],
     SwitchStatement: [{name:'discriminant'},{name:'cases',list:true}],
+    TemplateElement: [],
+    TemplateLiteral: [{name:'quasis',list:true},{name:'expressions',list:true}],
     ThisExpression: [],
     ThrowStatement: [{name:'argument'}],
     TryStatement: [
@@ -89,7 +89,7 @@ apogee.codeAnalysis.syntax = {
         //the delete operator modifies, but we will skip that error check here
         //"-" | "+" | "!" | "~" | "typeof" | "void" | "delete"
     ],
-    UpdateExpression: [{identifierNode:'argument',modified:true}],
+    UpdateExpression: [{identifierNode:'argument'}],
     VariableDeclaration: [{name:'declarations',list:true,declaration:true}],
     VariableDeclarator: [{name:'id',declaration:true},{name:'init'}],
     WhileStatement: [{name:'body'},{name:'test',list:true}],
@@ -120,9 +120,7 @@ apogee.codeAnalysis.syntax = {
     RestElement: null,
     SpreadElement: null,
     Super: null,
-    TaggedTemplateExpression: null,
-    TemplateElement: null,
-    TemplateLiteral: null
+    TaggedTemplateExpression: null
     
 };
 
@@ -266,10 +264,7 @@ apogee.codeAnalysis.analyzeCode = function(functionText) {
 }
 
 /** This method analyzes the AST to find the variabls accessed from the formula.
- * This is done to find the dependencies to determine the order of calculation
- * and to do some checks (not exhaustive) that the user didn't access or modify 
- * some variables that should not be accessed or modified: no access of globals,
- * no modify tables other than through the "value" variable. 
+ * This is done to find the dependencies to determine the order of calculation. 
  * 
  * - The tree is composed of nodes. Each nodes has a type which correspondds to
  * a specific statement or other program syntax element. In particular, some
@@ -281,9 +276,6 @@ apogee.codeAnalysis.analyzeCode = function(functionText) {
  * are also collected for how the variable is used. 
  * -- is declaration - this node should contain an identifier that is a declaration
  * of a local variable
- * -- is modified - this node should contain an identifier that is a variable that
- * is modified. (Note this is not exhaustive. Checks that are not doen here will
- * be enforced elsewhere, though it would be preferebly to get them here.
  * @private */
 apogee.codeAnalysis.getVariableInfo = function(ast) {
     
@@ -296,7 +288,7 @@ apogee.codeAnalysis.getVariableInfo = function(ast) {
     var scope = apogee.codeAnalysis.startScope(processInfo);
 
     //traverse the tree, recursively
-    apogee.codeAnalysis.processTreeNode(processInfo,ast,false,false);
+    apogee.codeAnalysis.processTreeNode(processInfo,ast,false);
     
     //finish the base scope
     apogee.codeAnalysis.endScope(processInfo,scope);
@@ -341,12 +333,12 @@ apogee.codeAnalysis.endScope = function(processInfo) {
 
 /** This method analyzes the AST (abstract syntax tree). 
  * @private */
-apogee.codeAnalysis.processTreeNode = function(processInfo,node,isModified,isDeclaration) {
+apogee.codeAnalysis.processTreeNode = function(processInfo,node,isDeclaration) {
     
     //process the node type
     if((node.type == "Identifier")||(node.type == "MemberExpression")) {
         //process a variable
-        apogee.codeAnalysis.processVariable(processInfo,node,isModified,isDeclaration);
+        apogee.codeAnalysis.processVariable(processInfo,node,isDeclaration);
     } 
     else if((node.type == "FunctionDeclaration")||(node.type == "FunctionExpression")) {
         //process the functoin
@@ -397,12 +389,12 @@ apogee.codeAnalysis.processGenericNode = function(processInfo,node) {
                 if(nodeInfo.list) {
                     //this is a list of child nodes
                     for(var j = 0; j < childField.length; j++) {
-                        apogee.codeAnalysis.processTreeNode(processInfo,childField[j],nodeInfo.modified,nodeInfo.declaration);
+                        apogee.codeAnalysis.processTreeNode(processInfo,childField[j],nodeInfo.declaration);
                     }
                 }
                 else {
                     //this is a single node
-                    apogee.codeAnalysis.processTreeNode(processInfo,childField,nodeInfo.modified,nodeInfo.declaration);
+                    apogee.codeAnalysis.processTreeNode(processInfo,childField,nodeInfo.declaration);
                 }
             }
         }
@@ -426,7 +418,7 @@ apogee.codeAnalysis.processFunction = function(processInfo,node) {
     
     if((nodeType === "FunctionDeclaration")&&(idNode)) {
         //parse id node (variable name) in the parent scope
-        apogee.codeAnalysis.processTreeNode(processInfo,idNode,false,true);
+        apogee.codeAnalysis.processTreeNode(processInfo,idNode,true);
     }
     
     //create a new scope for this function
@@ -434,16 +426,16 @@ apogee.codeAnalysis.processFunction = function(processInfo,node) {
     
     if((nodeType === "FunctionExpression")&&(idNode)) {
         //parse id node (variable name) in the parent scope
-        apogee.codeAnalysis.processTreeNode(processInfo,idNode,false,true);
+        apogee.codeAnalysis.processTreeNode(processInfo,idNode,true);
     }
     
     //process the variable list
     for(var i = 0; i < params.length; i++) {
-        apogee.codeAnalysis.processTreeNode(processInfo,params[i],false,true);
+        apogee.codeAnalysis.processTreeNode(processInfo,params[i],true);
     }
     
     //process the function body
-    apogee.codeAnalysis.processTreeNode(processInfo,body,false,false);
+    apogee.codeAnalysis.processTreeNode(processInfo,body,false);
     
     //end the scope for this function
     apogee.codeAnalysis.endScope(processInfo,scope);
@@ -452,7 +444,7 @@ apogee.codeAnalysis.processFunction = function(processInfo,node) {
 /** This method processes nodes that are variables (identifiers and member expressions), adding
  * them to the list of variables which are used in tehe formula.
  * @private */
-apogee.codeAnalysis.processVariable = function(processInfo,node,isModified,isDeclaration) {
+apogee.codeAnalysis.processVariable = function(processInfo,node,isDeclaration) {
     
     //get the variable path and the base name
     var namePath = this.getVariableDotPath(processInfo,node);
@@ -480,7 +472,6 @@ apogee.codeAnalysis.processVariable = function(processInfo,node,isModified,isDec
     nameUse.path = namePath;
     nameUse.scope = processInfo.currentScope;
     nameUse.node = node;
-    nameUse.isModified = isModified;
     
     nameEntry.uses.push(nameUse);
     
@@ -509,18 +500,8 @@ apogee.codeAnalysis.getVariableDotPath = function(processInfo,node) {
         return [node.name];
     }
     else if(node.type == "MemberExpression") {
-        if(node.object.type == "CallExpression") {
-            //CALL EXPRESSION
-            //ignore the variable path after the call. We will set a dependence
-            //on the parent which should work but is too strong. For example
-            //we may be including dependence on a while folder when really we depend
-            //on a single child in the folder.
-            this.processTreeNode(processInfo,node.object,false,false);
-            
-            return null;
-        }
-        else {
-            //MEMBER EXPRESSION OR IDENTIFIER hopefully. We should throw an exception if not.
+        if((node.object.type == "MemberExpression")||(node.object.type == "Identifier")) {
+            //MEMBER EXPRESSION OR IDENTIFIER - variable name and/or path
             var variable = this.getVariableDotPath(processInfo,node.object);
 
             if(node.computed) {
@@ -529,7 +510,7 @@ apogee.codeAnalysis.getVariableDotPath = function(processInfo,node) {
                 //the parent. This should work but it is too strong. For example
                 //we may be including dependence on a while folder when really we depend
                 //on a single child in the folder.
-                this.processTreeNode(processInfo,node.property,false,false);
+                this.processTreeNode(processInfo,node.property,false);
             }
             else {
                 //append the member expression property to it
@@ -537,6 +518,16 @@ apogee.codeAnalysis.getVariableDotPath = function(processInfo,node) {
             }
 
             return variable;
+        }
+        else {
+            //something other than a variable as the object for the member expressoin
+            //ignore the variable path after the call. We will set a dependence
+            //on the parent which should work but is too strong. For example
+            //we may be including dependence on a while folder when really we depend
+            //on a single child in the folder.
+            this.processTreeNode(processInfo,node.object,false);
+            
+            return null;
         }
     }
     else {
