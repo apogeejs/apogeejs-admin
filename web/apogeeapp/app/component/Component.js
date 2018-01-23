@@ -88,6 +88,9 @@ apogeeapp.app.Component.prototype.getTreeEntry = function(createIfMissing) {
     if((createIfMissing)&&(!this.treeDisplay)) {
         this.treeDisplay = this.instantiateTreeEntry();
         this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
+        if((this.options)&&(this.options.treeState !== undefined)) {
+            this.treeDisplay.setState(this.options.treeState);
+        }
     }
     
     if(this.treeDisplay) {
