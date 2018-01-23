@@ -3,6 +3,17 @@
 //=============================
 
 const url = "http://api.population.io/1.0/population/2017/United%20States/?format=json";
+	
+const options = {
+	"hAxis": {
+		"title": "Person's Age"
+	},
+	"vAxis": {
+		"title": "Population"
+	},
+	"backgroundColor": "#f1f8e9",
+	"title": "Population by Age and Gender"
+}
 
 const columns = [
 	{
@@ -18,17 +29,6 @@ const columns = [
 		"name": "Females"
 	}
 ]
-
-const options = {
-	"hAxis": {
-		"title": "Person's Age"
-	},
-	"vAxis": {
-		"title": "Population"
-	},
-	"backgroundColor": "#f1f8e9",
-	"title": "Population by Age and Gender"
-}
 
 //=============================
 // Render Chart Main Flow
