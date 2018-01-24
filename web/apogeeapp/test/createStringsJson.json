@@ -2237,8 +2237,6 @@
 	"components": {
 		"type": "apogeeapp.app.FolderComponent",
 		"children": {
-			"type": "apogeeapp.app.FolderComponent",
-			"children": {
 				"stringsGrid": {
 					"key": "createStringsJson:stringsGrid",
 					"type": "apogeeapp.app.GridTableComponent",
@@ -2261,7 +2259,6 @@
 					},
 					"windowState": 0
 				}
-			}
 		}
 	},
 	"version": 0.4,

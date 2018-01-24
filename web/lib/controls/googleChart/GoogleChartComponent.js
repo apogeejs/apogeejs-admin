@@ -159,8 +159,13 @@ apogeeapp.app.GoogleChartDisplay.prototype.displayData = function() {
     var chartOptions = this.data.options;
     if(!chartOptions) chartOptions = {};
 
-    var chartData = this.createDataTable(this.data.columns,this.data.rows);
-    this.chart.draw(chartData, chartOptions);
+    try {
+        var chartData = this.createDataTable(this.data.columns,this.data.rows);
+        this.chart.draw(chartData, chartOptions);
+    }
+    catch(error) {
+        console.error(error.stack);
+    }
 }
 
 apogeeapp.app.GoogleChartDisplay.prototype.instantiateChart = function() {

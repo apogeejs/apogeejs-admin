@@ -188,11 +188,11 @@ apogee.updatemember.applyCode = function(codeable,argList,functionBody,supplemen
     var codeLabel = codeable.getFullName();
     
     //process the code text into javascript code
-    apogee.codeCompiler.processCode(codeInfo,
+    var compiledInfo = apogee.codeCompiler.processCode(codeInfo,
         codeLabel);
 
     //save the code
-    codeable.setCodeInfo(codeInfo);
+    codeable.setCodeInfo(codeInfo,compiledInfo);
 }
 
 /** This method sets the data for a member. */

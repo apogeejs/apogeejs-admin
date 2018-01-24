@@ -4,8 +4,9 @@ apogee.codeCompiler = {};
 /** @private */
 apogee.codeCompiler.APOGEE_FORBIDDEN_NAMES = {
     "apogeeMessenger": true,
-    "__initFunction": true,
+    "__initializer": true,
     "__memberFunction": true,
+    "__memberGenerator": true,
     "__memberFunctionDebugHook": true
 }
 
@@ -61,19 +62,21 @@ apogee.codeCompiler.processCode = function(codeInfo,codeLabel) {
     var effectiveCombinedFunctionBody = apogee.codeCompiler.MEMBER_LOCALS_TEXT + combinedFunctionBody;
     var analyzeOutput = apogee.codeAnalysis.analyzeCode(effectiveCombinedFunctionBody);
     
+    var compiledInfo = {};
+    
     if(analyzeOutput.success) {
-        codeInfo.varInfo = analyzeOutput.varInfo;
+        compiledInfo.varInfo = analyzeOutput.varInfo;
     }
     else {
-        codeInfo.errors = analyzeOutput.errors;
-        return codeInfo;
+        compiledInfo.errors = analyzeOutput.errors;
+        return compiledInfo;
     }
 
     //create the object function and context setter from the code text
-    var generatorFunction = apogee.codeCompiler.createGeneratorFunction(codeInfo.varInfo, combinedFunctionBody);
-    codeInfo.generatorFunction = generatorFunction;
+    var generatorFunction = apogee.codeCompiler.createGeneratorFunction(compiledInfo.varInfo, combinedFunctionBody);
+    compiledInfo.generatorFunction = generatorFunction;
     
-    return codeInfo;   
+    return compiledInfo;   
 }
 
 
@@ -127,7 +130,7 @@ apogee.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunction
         combinedFunctionBody
     );
         
-    var generatorFunction = new Function("__initFunction","apogeeMessenger",generatorBody);
+    var generatorFunction = new Function("apogeeMessenger",generatorBody);
     return generatorFunction;    
 }
 
@@ -151,7 +154,6 @@ apogee.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT = [
 "//member function----------------",
 "function __memberFunction({1}) {",
 "//overhead code",
-"if(!__initFunction()) return undefined;",
 "__memberFunctionDebugHook();",
 "",
 "//user code",
@@ -163,7 +165,7 @@ apogee.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT = [
 /** This line is added when getting the dependencies to account for some local 
  * variables in the member function.
  * @private */
-apogee.codeCompiler.MEMBER_LOCALS_TEXT = "var __initFunction, apogeeMessenger, __memberFunction, __memberFunctionDebugHook;";
+apogee.codeCompiler.MEMBER_LOCALS_TEXT = "var apogeeMessenger, __memberFunction, __memberFunctionDebugHook;";
    
 /** This is the format string to create the code body for the object function
  * Input indices:
@@ -181,9 +183,12 @@ apogee.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "{1}};",
 "",
 "//user code",
+"function __memberGenerator() {",
 "{2}",
+"return __memberFunction",
+"}",
 "return {",
-"'memberFunction': __memberFunction,",
+"'memberGenerator': __memberGenerator,",
 "'initializer': __initializer",
 "};"
    ].join("\n");
