@@ -276,6 +276,7 @@ var lineFunctions = {
     
     //lineDef.type = "inputElement"
     //lineDef.heading = element heading (optional)
+    //lineDef.initial = value of initial selection (optional)
     //lineDef.resultKey = name of result in result data
     "inputElement": function(lineDef,formActions) {
         var lineObject = {};
@@ -307,6 +308,7 @@ var lineFunctions = {
     //lineDef.cols = (optional)
     //lineDef.rows = (optional)
     //lineDef.heading = element heading (optional)
+    //ineDef.initial = value of initial selection (optional)
     //lineDef.resultKey = name of result in result data
     "textarea": function(lineDef,formActions) {
         var lineObject = {};
@@ -339,10 +341,6 @@ var lineFunctions = {
         //no on Close
         
         return lineObject;
-    },
-    
-    "aceEditor": function(lineDef,formActions) {
-        
     },
     
     //This corresponds to a single checkbox item.
