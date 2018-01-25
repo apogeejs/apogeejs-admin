@@ -4,7 +4,9 @@
  */
 apogeeapp.ui.InvisibleElement = class extends apogeeapp.ui.ConfigurableElement {
     constructor(form,elementInitData) {
-        //supress the dom element - this is hidden
+        //we will hide this element by setting display none. Someone can go ahead 
+        //and show it, in which case they will get an empty element with margins.
+        //maybe we should have a way to not create the element in the first place.
         super(form,elementInitData,apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_INVISIBLE);
         
         this.value = elementInitData.value;       
