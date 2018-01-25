@@ -1,0 +1,16 @@
+.apogee_configurablePanelBody { 
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+}
+.apogee_configurablePanelLine {
+    margin:10px;
+}
+.apogee_configurablePanelHeading {
+}
+.apogee_configurablePanelButton {
+    margin-left:20px;
+    margin-right:20px;
+}
