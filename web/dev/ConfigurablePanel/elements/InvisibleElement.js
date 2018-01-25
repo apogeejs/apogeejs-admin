@@ -5,7 +5,7 @@
 apogeeapp.ui.InvisibleElement = class extends apogeeapp.ui.ConfigurableElement {
     constructor(form,elementInitData) {
         //supress the dom element - this is hidden
-        super(form,elementInitData,true);
+        super(form,elementInitData,apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_INVISIBLE);
         
         this.value = elementInitData.value;       
     }

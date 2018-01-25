@@ -23,6 +23,7 @@ and open the template in the editor.
         <script src="elements/CheckboxGroupElement.js"></script>
         <script src="elements/RadioGroupElement.js"></script>
         <script src="elements/InvisibleElement.js"></script>
+        <script src="elements/PanelElement.js"></script>
         <script src="elements/SubmitElement.js"></script>
         <link rel="stylesheet" type="text/css" href="ConfigurablePanel.css">
         <style>
@@ -94,15 +95,6 @@ and open the template in the editor.
                 entry.key = "cbg1";
                 layout.push(entry);
                 
-                //checkbox group 1
-                entry = {};
-                entry.type = "checkboxGroup";
-                entry.label = "Check 2: ";
-                entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]];
-                entry.value = ["freeze","slop"];
-                entry.key = "cbg2";
-                layout.push(entry);
-                
                 //checkbox 1
                 entry = {};
                 entry.type = "checkbox";
@@ -120,13 +112,45 @@ and open the template in the editor.
                 entry.key = "d1";
                 layout.push(entry);
                 
-                //select group 1
+                //child panel
+                var childFormData = [];
+                
+                //title
+                entry = {};
+                entry.type = "heading";
+                entry.level = 3;
+                entry.text = "Child Form";
+                childFormData.push(entry);
+                
+                //select group 2
                 entry = {};
                 entry.type = "dropdown";
                 entry.label = "Dropdown 2: ";
                 entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]];
                 entry.value = "freeze";
                 entry.key = "d2";
+                childFormData.push(entry);
+                
+                                //checkbox group 2
+                entry = {};
+                entry.type = "checkboxGroup";
+                entry.label = "Check 2: ";
+                entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]];
+                entry.value = ["freeze","slop"];
+                entry.key = "cbg2";
+                childFormData.push(entry);
+                
+                //end title
+                entry = {};
+                entry.type = "heading";
+                entry.level = 3;
+                entry.text = "End of Child Form";
+                childFormData.push(entry);
+                
+                entry = {};
+                entry.type = "panel";
+                entry.formData = childFormData;
+                entry.key = "childPanel";
                 layout.push(entry);
                 
                 //invisible 1

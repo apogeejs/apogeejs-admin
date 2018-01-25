@@ -4,9 +4,9 @@
  */
 apogeeapp.ui.ConfigurablePanel = class {
     
-    constructor(formInitData) {
+    constructor(formInitData,optionalContainerClassName = apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT) {
         this.elementObjects = [];
-        this.panelElement = this.createPanelElement();
+        this.panelElement = this.createPanelElement(optionalContainerClassName);
         
         formInitData.forEach(elementInitData => this.addToPanel(elementInitData));
     }
@@ -44,13 +44,9 @@ apogeeapp.ui.ConfigurablePanel = class {
     //=================================
     
     /** This creates the container element for the panel. */
-    createPanelElement() {
+    createPanelElement(containerClassName) {
         var panelElement = document.createElement("div");
-        panelElement.style.position = "absolute";
-        panelElement.style.top = "0px";
-        panelElement.style.left = "0px";
-        panelElement.style.bottom = "0px";
-        panelElement.style.right = "0px";
+        panelElement.className = containerClassName;
         return panelElement;
     }
     
@@ -90,6 +86,9 @@ apogeeapp.ui.ConfigurablePanel = class {
 
 //static fields
 apogeeapp.ui.ConfigurablePanel.elementMap = {};
+
+apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT = "apogee_configurablePanelBody_fillParent";
+apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED = "apogee_configurablePanelBody_selfSized";
 
 
 
