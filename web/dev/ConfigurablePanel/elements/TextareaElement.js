@@ -2,7 +2,7 @@
  * 
  * @class 
  */
-apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
+apogeeapp.ui.TextareaElement = class extends apogeeapp.ui.ConfigurableElement {
     constructor(form,elementInitData) {
         super(form,elementInitData);
         
@@ -20,12 +20,18 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
         }
         
         //text field
-        this.inputElement = apogeeapp.ui.createElement("input",{"type":"text"});
+        this.inputElement = apogeeapp.ui.createElement("textarea");
         if(elementInitData.value) {
             this.inputElement.value = elementInitData.value;
         }
         if(elementInitData.disabled) {
             this.inputElement.disabled = true;
+        }
+        if(elementInitData.rows) {
+            this.inputElement.rows = elementInitData.rows;
+        }
+        if(elementInitData.cols) {
+            this.inputElement.cols = elementInitData.cols;
         }
         containerElement.appendChild(this.inputElement);        
     }
@@ -49,6 +55,6 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
     }
 }
 
-apogeeapp.ui.TextFieldElement.TYPE_NAME = "textField";
+apogeeapp.ui.TextareaElement.TYPE_NAME = "textarea";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.TextFieldElement.TYPE_NAME,apogeeapp.ui.TextFieldElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.TextareaElement.TYPE_NAME,apogeeapp.ui.TextareaElement);

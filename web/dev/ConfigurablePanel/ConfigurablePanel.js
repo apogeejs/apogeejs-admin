@@ -61,14 +61,26 @@ apogeeapp.ui.ConfigurablePanel = class {
             throw new Error("Type not found for configurable form entry!");
         }
         
-        var constructor = apogeeapp.ui.ConfigurablePanel.getTypeConstructor(type);
-        if(!constructor) {
-            throw new Error("Type not found for configurable element: " + type);
+        var elementObject;
+        if(type == "custom") {
+            //special case - just use the object passed in
+            elementObject = elementInitData.customObject;
+        }
+        else {
+            //standard case - lookup constructor and instantiate
+            var constructor = apogeeapp.ui.ConfigurablePanel.getTypeConstructor(type);
+            if(!constructor) {
+                throw new Error("Type not found for configurable element: " + type);
+            }
+
+            elementObject = new constructor(this,elementInitData);
         }
         
-        var elementObject = new constructor(this,elementInitData);
         this.elementObjects.push(elementObject);
-        this.panelElement.appendChild(elementObject.getElement());
+        var domElement = elementObject.getElement();
+        if(domElement) {
+            this.panelElement.appendChild(domElement);
+        }
     }
     
     static getTypeConstructor(type) {

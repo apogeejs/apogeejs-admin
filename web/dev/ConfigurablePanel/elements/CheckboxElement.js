@@ -2,7 +2,7 @@
  * 
  * @class 
  */
-apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
+apogeeapp.ui.CheckboxElement = class extends apogeeapp.ui.ConfigurableElement {
     constructor(form,elementInitData) {
         super(form,elementInitData);
         
@@ -20,20 +20,20 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
         }
         
         //text field
-        this.inputElement = apogeeapp.ui.createElement("input",{"type":"text"});
-        if(elementInitData.value) {
-            this.inputElement.value = elementInitData.value;
+        this.checkbox = apogeeapp.ui.createElement("input",{"type":"checkbox"});
+        if(elementInitData.value === true) {
+            this.checkbox.checked = true;
         }
         if(elementInitData.disabled) {
-            this.inputElement.disabled = true;
+            this.checkbox.disabled = true;
         }
-        containerElement.appendChild(this.inputElement);        
+        containerElement.appendChild(this.checkbox);        
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
      * this method returns undefined. */
     getValue() {
-        return this.inputElement.value.trim();
+        return this.checkbox.checked;
     }   
 
     /** This method updates the data for the given element. See the specific element
@@ -45,10 +45,12 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
     updateValue(value) {
-        this.inputElement.value = value;
+        if(value === true) {
+            this.checkbox.checked = true;
+        }
     }
 }
 
-apogeeapp.ui.TextFieldElement.TYPE_NAME = "textField";
+apogeeapp.ui.CheckboxElement.TYPE_NAME = "checkbox";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.TextFieldElement.TYPE_NAME,apogeeapp.ui.TextFieldElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.CheckboxElement.TYPE_NAME,apogeeapp.ui.CheckboxElement);

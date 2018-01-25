@@ -9,13 +9,20 @@ and open the template in the editor.
         <title>TODO supply a title</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="/apogee/apogee.js"></script>
+        <script type="text/javascript" src="/apogee/usrlib/util.js"></script>
         <script type="text/javascript" src="/apogeeapp/apogeeapp.js"></script>
 		<script type="text/javascript" src="/apogeeapp/ui/apogeeappui.js"></script>
-        <script src="ConfigurablePanel.js"></script>
         <script src="ConfigurablePanel.js"></script>
         <script src="ConfigurableElement.js"></script>
         <script src="elements/HeadingElement.js"></script>
         <script src="elements/TextFieldElement.js"></script>
+        <script src="elements/TextareaElement.js"></script>
+        <script src="elements/DropdownElement.js"></script>
+        <script src="elements/CheckboxElement.js"></script>
+        <script src="elements/CheckboxGroupElement.js"></script>
+        <script src="elements/RadioGroupElement.js"></script>
+        <script src="elements/InvisibleElement.js"></script>
         <script src="elements/SubmitElement.js"></script>
         <link rel="stylesheet" type="text/css" href="ConfigurablePanel.css">
         <style>
@@ -36,22 +43,103 @@ and open the template in the editor.
                 //title
                 entry = {};
                 entry.type = "heading";
-                entry.level = 3;
-                entry.title = "Test Form";
+                entry.level = 2;
+                entry.text = "Test Form";
                 layout.push(entry);
                 
                 //text entry
                 entry = {};
                 entry.type = "textField";
-                entry.heading = "Test text entry: ";
-                entry.initial = "xxx";
+                entry.label = "Test text entry: ";
+                entry.value = "xxx";
                 entry.key = "text1";
+                layout.push(entry);
+                
+                //text entry
+                entry = {};
+                entry.type = "textarea";
+                entry.label = "Test text area: ";
+                entry.value = "asdfasdfasldfa;lskdjfas";
+                entry.cols = 30;
+                entry.rows = 5;
+                entry.key = "text2";
+                layout.push(entry);
+                
+                //radio group 1
+                entry = {};
+                entry.type = "radioButtonGroup";
+                entry.label = "Radio 1: ";
+                entry.groupName = "rg1";
+                entry.entries = ["slop","freeze","dew"];
+                entry.value = "freeze";
+                entry.key = "rg1";
+                layout.push(entry);
+                
+                //radio group 1
+                entry = {};
+                entry.type = "radioButtonGroup";
+                entry.label = "Radio 2: ";
+                entry.groupName = "rg2";
+                entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]]
+                entry.value = "freeze";
+                entry.key = "rg2";
+                layout.push(entry);
+                
+                //ckeckbox group 1
+                entry = {};
+                entry.type = "checkboxGroup";
+                entry.label = "Check 1: ";
+                entry.entries = ["slop","freeze","dew"];
+                entry.value = ["freeze","slop"];
+                entry.key = "cbg1";
+                layout.push(entry);
+                
+                //checkbox group 1
+                entry = {};
+                entry.type = "checkboxGroup";
+                entry.label = "Check 2: ";
+                entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]];
+                entry.value = ["freeze","slop"];
+                entry.key = "cbg2";
+                layout.push(entry);
+                
+                //checkbox 1
+                entry = {};
+                entry.type = "checkbox";
+                entry.label = "Checkbox 1: ";
+                entry.value = true;
+                entry.key = "cb1";
+                layout.push(entry);
+                
+                //select group 1
+                entry = {};
+                entry.type = "dropdown";
+                entry.label = "Dropdown 1: ";
+                entry.entries = ["slop","freeze","dew"];
+                entry.value = "freeze";
+                entry.key = "d1";
+                layout.push(entry);
+                
+                //select group 1
+                entry = {};
+                entry.type = "dropdown";
+                entry.label = "Dropdown 2: ";
+                entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]];
+                entry.value = "freeze";
+                entry.key = "d2";
+                layout.push(entry);
+                
+                //invisible 1
+                entry = {};
+                entry.type = "invisible";
+                entry.value = [3,4,3];
+                entry.key = "i1";
                 layout.push(entry);
                 
                 //submit
                 entry = {};
                 entry.type = "submit";
-                entry.onSubmit = formData => alert("result " + formData.text1);
+                entry.onSubmit = formData => alert("result " + JSON.stringify(formData));
                 entry.onCancel = () => alert("Canceled!");
                 layout.push(entry);
                 

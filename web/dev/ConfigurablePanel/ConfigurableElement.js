@@ -3,12 +3,14 @@
  * @class 
  */
 apogeeapp.ui.ConfigurableElement = class {
-    constructor(form,elementInitData) {
+    constructor(form,elementInitData,supressElement = false) {
         this.form = form;
         this.initData = elementInitData;
         this.key = elementInitData.key;
         
-        this.domElement = apogeeapp.ui.createElement("div",{"className":"apogee_configurablePanelLine"});
+        if(!supressElement) {
+            this.domElement = apogeeapp.ui.createElement("div",{"className":"apogee_configurablePanelLine"});
+        }
     }
     
     /** This method returns the key for this ConfigurableElement within this panel. */

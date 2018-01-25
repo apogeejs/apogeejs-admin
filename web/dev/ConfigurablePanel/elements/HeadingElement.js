@@ -18,7 +18,7 @@ apogeeapp.ui.HeadingElement = class extends apogeeapp.ui.ConfigurableElement {
         }
         var headingType = "h" + headingLevel;
         
-        this.headingElement = apogeeapp.ui.createElement(headingType,{"className":"apogee_configurablePanelHeading","innerHTML":elementInitData.title});
+        this.headingElement = apogeeapp.ui.createElement(headingType,{"className":"apogee_configurablePanelHeading","innerHTML":elementInitData.text});
         containerElement.appendChild(this.headingElement);
     }
 

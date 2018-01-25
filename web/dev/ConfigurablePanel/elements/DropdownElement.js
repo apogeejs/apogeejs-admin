@@ -2,7 +2,7 @@
  * 
  * @class 
  */
-apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
+apogeeapp.ui.DropdownElement = class extends apogeeapp.ui.ConfigurableElement {
     constructor(form,elementInitData) {
         super(form,elementInitData);
         
@@ -19,21 +19,37 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
             this.labelElement = null;
         }
         
-        //text field
-        this.inputElement = apogeeapp.ui.createElement("input",{"type":"text"});
+        this.select = apogeeapp.ui.createElement("select");
+        var addEntry = entryInfo => {
+            var label;
+            var value;
+            if(apogee.util.getObjectType(entryInfo) == "Array") {
+                label = entryInfo[0]
+                value = entryInfo[1];
+            }
+            else {
+                label = entryInfo;
+                value = entryInfo;   
+            }
+            var entry = document.createElement("option");
+            entry.text = label;
+            entry.value = value;
+            this.select.appendChild(entry);
+        }
+        elementInitData.entries.forEach(addEntry);
         if(elementInitData.value) {
-            this.inputElement.value = elementInitData.value;
+            this.select.value = elementInitData.value;
         }
         if(elementInitData.disabled) {
-            this.inputElement.disabled = true;
+            this.select.disabled = true;
         }
-        containerElement.appendChild(this.inputElement);        
+        containerElement.appendChild(this.select);        
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
      * this method returns undefined. */
     getValue() {
-        return this.inputElement.value.trim();
+        return this.select.value;
     }   
 
     /** This method updates the data for the given element. See the specific element
@@ -45,10 +61,10 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
     updateValue(value) {
-        this.inputElement.value = value;
+        this.select.value = value;
     }
 }
 
-apogeeapp.ui.TextFieldElement.TYPE_NAME = "textField";
+apogeeapp.ui.DropdownElement.TYPE_NAME = "dropdown";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.TextFieldElement.TYPE_NAME,apogeeapp.ui.TextFieldElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.DropdownElement.TYPE_NAME,apogeeapp.ui.DropdownElement);
