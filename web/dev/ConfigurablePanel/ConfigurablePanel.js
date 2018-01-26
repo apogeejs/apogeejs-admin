@@ -34,6 +34,28 @@ apogeeapp.ui.ConfigurablePanel = class {
         return this.panelElement;
     }
     
+    /** This is an alternate way to add a submit entry to the form. This is useful
+     * if the layout has no other handlers in it and is a pure JSON object. This 
+     * will then separate out any handlers from the layout. */
+    addSubmit(onSubmit,
+            onCancel,
+            optionalSubmitLabel = apogeeapp.ui.SubmitElement.DEFAULT_SUBMIT_LABEL,
+            optionalCancelLabel = apogeeapp.ui.SubmitElement.DEFAULT_CANCEL_LABEL) {
+                
+        var data = {};
+        data.type = apogeeapp.ui.SubmitElement.TYPE_NAME;
+        if(onSubmit) {
+            data.onSubmit = onSubmit;
+            data.submitLabel = optionalSubmitLabel;
+        }
+        if(onCancel) {
+            data.onCancel = onCancel;
+            data.cancelLabel = optionalCancelLabel;
+        }
+        
+        this.addToPanel(data);
+    }
+    
     /** This method is used to register configurable elements with the panel */
     static addConfigurableElement(type,constructor) {
         apogeeapp.ui.ConfigurablePanel.elementMap[type] = constructor;

@@ -54,6 +54,8 @@ and open the template in the editor.
                 entry.label = "Test text entry: ";
                 entry.value = "xxx";
                 entry.key = "text1";
+                entry.onChange = (form,value) => alert("Value updated: " + value);
+                entry.onCharacter = (form,value) => alert("Key typed into field: " + value);
                 layout.push(entry);
                 
                 //text entry
@@ -64,6 +66,8 @@ and open the template in the editor.
                 entry.cols = 30;
                 entry.rows = 5;
                 entry.key = "text2";
+                entry.onChange = (form,value) => alert("Value updated: " + value);
+                entry.onCharacter = (form,value) => alert("Key typed into field: " + value);
                 layout.push(entry);
                 
                 //radio group 1
@@ -74,6 +78,7 @@ and open the template in the editor.
                 entry.entries = ["slop","freeze","dew"];
                 entry.value = "freeze";
                 entry.key = "rg1";
+                entry.onChange = (form,value) => alert("Value updated: " + value);
                 layout.push(entry);
                 
                 //radio group 1
@@ -84,6 +89,7 @@ and open the template in the editor.
                 entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]]
                 entry.value = "freeze";
                 entry.key = "rg2";
+                entry.onChange = (form,value) => alert("Value updated: " + value);
                 layout.push(entry);
                 
                 //ckeckbox group 1
@@ -93,14 +99,19 @@ and open the template in the editor.
                 entry.entries = ["slop","freeze","dew"];
                 entry.value = ["freeze","slop"];
                 entry.key = "cbg1";
+                entry.onChange = (form,value) => alert("Value updated: " + value);
                 layout.push(entry);
                 
                 //checkbox 1
                 entry = {};
                 entry.type = "checkbox";
-                entry.label = "Checkbox 1: ";
+                entry.label = "Show child panel ";
                 entry.value = true;
                 entry.key = "cb1";
+                entry.onChange = (form,value) => {
+                    var childPanel = form.getEntry("childPanel");
+                    childPanel.setVisible(value);
+                };
                 layout.push(entry);
                 
                 //select group 1
@@ -110,6 +121,7 @@ and open the template in the editor.
                 entry.entries = ["slop","freeze","dew"];
                 entry.value = "freeze";
                 entry.key = "d1";
+                entry.onChange = (form,value) => alert("Value updated: " + value);
                 layout.push(entry);
                 
                 //child panel
@@ -129,6 +141,7 @@ and open the template in the editor.
                 entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]];
                 entry.value = "freeze";
                 entry.key = "d2";
+                entry.onChange = (form,value) => alert("Value updated: " + value);
                 childFormData.push(entry);
                 
                                 //checkbox group 2
@@ -138,6 +151,7 @@ and open the template in the editor.
                 entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]];
                 entry.value = ["freeze","slop"];
                 entry.key = "cbg2";
+                entry.onChange = (form,value) => alert("Value updated: " + value);
                 childFormData.push(entry);
                 
                 //end title
@@ -161,13 +175,20 @@ and open the template in the editor.
                 layout.push(entry);
                 
                 //submit
+                var onSubmit = formData => alert("result " + JSON.stringify(formData));
+                var onCancel = () => alert("Canceled!");
+                //standard method to add submit buttons
                 entry = {};
                 entry.type = "submit";
-                entry.onSubmit = formData => alert("result " + JSON.stringify(formData));
-                entry.onCancel = () => alert("Canceled!");
-                layout.push(entry);
+                entry.onSubmit = onSubmit;
+                entry.onCancel = onCancel;
+                //layout.push(entry);
                 
                 var panel = new apogeeapp.ui.ConfigurablePanel(layout);
+                
+                //alternate method to add submit buttons
+                panel.addSubmit(onSubmit,onCancel);
+                
                 var mainDiv = document.getElementById("mainDiv");
                 mainDiv.appendChild(panel.getElement());
                 

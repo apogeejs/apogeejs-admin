@@ -22,8 +22,18 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
             this.labelElement = null;
         }
         
-        //radio buttons
+        //check boxes
         this.checkboxList = [];
+        var onChange;
+        if(elementInitData.onChange) {
+            var onChange = () => {
+                elementInitData.onChange(this.getForm(),this.getValue());
+            }
+        }
+        else {
+            onChange = null;
+        }
+        
         var addCheckbox = checkboxInfo => {
             var checkbox = apogeeapp.ui.createElement("input");
             checkbox.type = "checkbox";
@@ -41,6 +51,9 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
             checkbox.value = value;
             if(elementInitData.value) {
                 if(elementInitData.value.indexOf(value) >= 0) checkbox.checked = true;
+            }
+            if(onChange) {
+                checkbox.onchange = onChange;
             }
             this.checkboxList.push(checkbox);
             containerElement.appendChild(checkbox);

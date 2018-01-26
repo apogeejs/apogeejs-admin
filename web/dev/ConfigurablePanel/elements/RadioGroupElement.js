@@ -25,6 +25,15 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
         //radio buttons
         this.buttonList = [];
         var groupName = elementInitData.groupName;
+        var onChange;
+        if(elementInitData.onChange) {
+            var onChange = (event) => {
+                if(event.target.checked) elementInitData.onChange(this.getForm(),this.getValue());
+            }
+        }
+        else {
+            onChange = null;
+        }
         var addButton = buttonInfo => {
             var radio = apogeeapp.ui.createElement("input");
             radio.type = "radio";
@@ -42,6 +51,9 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
             }
             radio.value = value;
             if(elementInitData.value == value) radio.checked = true;
+            if(onChange) {
+                radio.onchange = onChange;
+            }
             this.buttonList.push(radio);
             containerElement.appendChild(radio);
             containerElement.appendChild(document.createTextNode(label));

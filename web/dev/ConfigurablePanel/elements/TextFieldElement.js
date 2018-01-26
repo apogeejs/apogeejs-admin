@@ -27,7 +27,15 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
         if(elementInitData.disabled) {
             this.inputElement.disabled = true;
         }
-        containerElement.appendChild(this.inputElement);        
+        containerElement.appendChild(this.inputElement);   
+        
+        //events
+        if(elementInitData.onChange) {
+            this.addOnChange(elementInitData.onChange);
+        }
+        if(elementInitData.onCharacter) {
+            this.addOnCharacter(elementInitData.onCharacter);
+        }
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -46,6 +54,20 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
      * to see if this method is applicable. */
     updateValue(value) {
         this.inputElement.value = value;
+    }
+    
+    /** This should be extended in elements to handle on change listeners. */
+    addOnChange(onChange) {
+        this.inputElement.onchange = () => {
+            onChange(this.getForm(),this.getValue());
+        }
+    }
+    
+    /** This should be extended in elements to handle on change listeners. */
+    addOnCharacter(onCharacter) {
+        this.inputElement.oninput = () => {
+            onCharacter(this.getForm(),this.getValue());
+        }
     }
 }
 

@@ -24,12 +24,12 @@ apogeeapp.ui.ConfigurableElement = class {
 
     /** This hides or shows the given element within the panel. */
     setVisible(isVisible) {
-        if(this.element) {
+        if(this.domElement) {
             if(isVisible) {
-                this.style.display = "";
+                this.domElement.style.display = "";
             }
             else {
-                this.style.display = "none";
+                this.domElement.style.display = "none";
             }
         }
     }
