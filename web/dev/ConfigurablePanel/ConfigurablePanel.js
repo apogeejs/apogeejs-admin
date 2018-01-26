@@ -4,9 +4,9 @@
  */
 apogeeapp.ui.ConfigurablePanel = class {
     
-    constructor(formInitData) {
+    constructor(formInitData,optionalContainerClassName = apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT) {
         this.elementObjects = [];
-        this.panelElement = this.createPanelElement();
+        this.panelElement = this.createPanelElement(optionalContainerClassName);
         
         formInitData.forEach(elementInitData => this.addToPanel(elementInitData));
     }
@@ -34,6 +34,28 @@ apogeeapp.ui.ConfigurablePanel = class {
         return this.panelElement;
     }
     
+    /** This is an alternate way to add a submit entry to the form. This is useful
+     * if the layout has no other handlers in it and is a pure JSON object. This 
+     * will then separate out any handlers from the layout. */
+    addSubmit(onSubmit,
+            onCancel,
+            optionalSubmitLabel = apogeeapp.ui.SubmitElement.DEFAULT_SUBMIT_LABEL,
+            optionalCancelLabel = apogeeapp.ui.SubmitElement.DEFAULT_CANCEL_LABEL) {
+                
+        var data = {};
+        data.type = apogeeapp.ui.SubmitElement.TYPE_NAME;
+        if(onSubmit) {
+            data.onSubmit = onSubmit;
+            data.submitLabel = optionalSubmitLabel;
+        }
+        if(onCancel) {
+            data.onCancel = onCancel;
+            data.cancelLabel = optionalCancelLabel;
+        }
+        
+        this.addToPanel(data);
+    }
+    
     /** This method is used to register configurable elements with the panel */
     static addConfigurableElement(type,constructor) {
         apogeeapp.ui.ConfigurablePanel.elementMap[type] = constructor;
@@ -44,13 +66,9 @@ apogeeapp.ui.ConfigurablePanel = class {
     //=================================
     
     /** This creates the container element for the panel. */
-    createPanelElement() {
+    createPanelElement(containerClassName) {
         var panelElement = document.createElement("div");
-        panelElement.style.position = "absolute";
-        panelElement.style.top = "0px";
-        panelElement.style.left = "0px";
-        panelElement.style.bottom = "0px";
-        panelElement.style.right = "0px";
+        panelElement.className = containerClassName;
         return panelElement;
     }
     
@@ -90,6 +108,9 @@ apogeeapp.ui.ConfigurablePanel = class {
 
 //static fields
 apogeeapp.ui.ConfigurablePanel.elementMap = {};
+
+apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT = "apogee_configurablePanelBody_fillParent";
+apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED = "apogee_configurablePanelBody_selfSized";
 
 
 

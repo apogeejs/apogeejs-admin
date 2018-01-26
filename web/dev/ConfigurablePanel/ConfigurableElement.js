@@ -3,14 +3,12 @@
  * @class 
  */
 apogeeapp.ui.ConfigurableElement = class {
-    constructor(form,elementInitData,supressElement = false) {
+    constructor(form,elementInitData,optionalContainerClassName = apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_STANDARD) {
         this.form = form;
         this.initData = elementInitData;
         this.key = elementInitData.key;
-        
-        if(!supressElement) {
-            this.domElement = apogeeapp.ui.createElement("div",{"className":"apogee_configurablePanelLine"});
-        }
+
+        this.domElement = apogeeapp.ui.createElement("div",{"className":optionalContainerClassName});
     }
     
     /** This method returns the key for this ConfigurableElement within this panel. */
@@ -26,12 +24,12 @@ apogeeapp.ui.ConfigurableElement = class {
 
     /** This hides or shows the given element within the panel. */
     setVisible(isVisible) {
-        if(this.element) {
+        if(this.domElement) {
             if(isVisible) {
-                this.style.display = "";
+                this.domElement.style.display = "";
             }
             else {
-                this.style.display = "none";
+                this.domElement.style.display = "none";
             }
         }
     }
@@ -67,6 +65,10 @@ apogeeapp.ui.ConfigurableElement = class {
         this.element = element;
     }
 }
+
+apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_STANDARD = "apogee_configurablePanelLine_standard";
+apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_NO_MARGIN = "apogee_configurablePanelPanelLine_noMargin";
+apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_INVISIBLE = "apogee_configurablePanelPanelLine_hidden";
 
 
 

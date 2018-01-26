@@ -27,7 +27,12 @@ apogeeapp.ui.CheckboxElement = class extends apogeeapp.ui.ConfigurableElement {
         if(elementInitData.disabled) {
             this.checkbox.disabled = true;
         }
-        containerElement.appendChild(this.checkbox);        
+        containerElement.appendChild(this.checkbox);  
+        
+        //events
+        if(elementInitData.onChange) {
+            this.addOnChange(elementInitData.onChange);
+        }
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -47,6 +52,13 @@ apogeeapp.ui.CheckboxElement = class extends apogeeapp.ui.ConfigurableElement {
     updateValue(value) {
         if(value === true) {
             this.checkbox.checked = true;
+        }
+    }
+    
+    /** This should be extended in elements to handle on change listeners. */
+    addOnChange(onChange) {
+        this.checkbox.onchange = () => {
+            onChange(this.getForm(),this.getValue());
         }
     }
 }
