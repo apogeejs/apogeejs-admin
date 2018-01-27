@@ -1,133 +1,78 @@
 /** Editor that uses the Ace text editor.
  * 
  * @param {type} viewMode - the apogee view mode
+ * @param {type} callbacks - {getData,getEditOk,setData}; format for data is text
  * @param {type} aceMode - the display format, such as "ace/mode/json"
  */
-apogeeapp.app.AceTextEditor = function(viewMode,aceMode) {
+apogeeapp.app.AceTextEditor = class extends apogeeapp.app.EditorDataDisplay {
     
-    this.outsideDiv = apogeeapp.ui.createElement("div",null,{
-		"position":"absolute",
-        "top":"0px",
-        "left":"0px",
-		"bottom":"0px",
-        "right":"0px",
-		"overflow":"hidden"
-	});
-   
-	this.editorDiv = apogeeapp.ui.createElement("div",null,{
-		"position":"absolute",
-        "top":"0px",
-        "left":"0px",
-		"bottom":"0px",
-        "right":"0px",
-		"overflow":"auto"
-	});
-    this.outsideDiv.appendChild(this.editorDiv);
-	
-	this.viewMode = viewMode;
-	this.workingData = null;
-	this.editOk = false;
-	this.editMode = false;
-	
-	
-	var editor = ace.edit(this.editorDiv);
-    editor.renderer.setShowGutter(true);
-    editor.setReadOnly(true);
-    editor.setTheme("ace/theme/eclipse"); //good
-    editor.getSession().setMode(aceMode); 
-	editor.$blockScrolling = Infinity;
-    this.editor = editor;
-	
-	//add click handle to enter edit mode
-	var instance = this;
-	var onMouseClick = function() {
-		instance.onMouseClick();
-	}
-	this.editorDiv.addEventListener("click",onMouseClick);
-}
+    constructor(viewMode,callbacks,aceMode) {
+        super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.NON_SCROLLING);
+        
+        var containerDiv = this.getElement();
 
-apogeeapp.app.AceTextEditor.prototype.save = function() {
-	
-	var text = this.editor.getSession().getValue();
-	
-	var saveComplete = this.viewMode.onSave(text);
-	
-	if(saveComplete) {
-		this.endEditMode();
-	}
-}
+        this.editorDiv = apogeeapp.ui.createElement("div",null,{
+            "position":"absolute",
+            "top":"0px",
+            "left":"0px",
+            "bottom":"0px",
+            "right":"0px",
+            "overflow":"auto"
+        });
+        containerDiv.appendChild(this.editorDiv);
 
-apogeeapp.app.AceTextEditor.prototype.cancel = function() {
-	//reset the original data
-	var cancelComplete = this.viewMode.onCancel();
-	
-	if(cancelComplete) {
-		this.endEditMode();
-	}
-}
+        this.workingData = null;
 
-//=============================
-// "Package" Methods
-//=============================
+        var editor = ace.edit(this.editorDiv);
+        editor.renderer.setShowGutter(true);
+        editor.setReadOnly(true);
+        editor.setTheme("ace/theme/eclipse"); //good
+        editor.getSession().setMode(aceMode); 
+        editor.$blockScrolling = Infinity;
+        this.editor = editor;
 
-apogeeapp.app.AceTextEditor.prototype.getElement = function() {
-	return this.outsideDiv;
-}
-	
-apogeeapp.app.AceTextEditor.prototype.showData = function(text,editOk) {
-	this.editOk = editOk;
-	this.editor.getSession().setValue(text);
+        //add click handle to enter edit mode
+        containerDiv.addEventListener("click",() => this.onTriggerEditMode());
+    }
+
+    getEditorData() {
+        return this.editor.getSession().getValue();
+    }
     
-    //set the background color
-    if(this.editOk) {
-        this.editorDiv.style.backgroundColor = "";
+    setEditorData(text) {
+        this.editor.getSession().setValue(text);
+
+        //set the background color
+        if(this.editOk) {
+            this.editorDiv.style.backgroundColor = "";
+        }
+        else {
+            this.editorDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
+        }
     }
-    else {
-        this.editorDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
-    }
-}
     
-apogeeapp.app.AceTextEditor.prototype.onLoad = function() {
-    if(this.editor) this.editor.resize();
-}
-
-apogeeapp.app.AceTextEditor.prototype.onResize = function() {
-    if(this.editor) this.editor.resize();
-}
-
-apogeeapp.app.AceTextEditor.prototype.destroy = function() {
-	if(this.editor) {
-        this.editor.destroy();
-        this.editor = null;
+    onLoad() {
+        if(this.editor) this.editor.resize();
     }
-}
 
-//==============================
-// Private Methods
-//==============================
+    onResize() {
+        if(this.editor) this.editor.resize();
+    }
 
-/** @private */
-apogeeapp.app.AceTextEditor.prototype.endEditMode = function() {
-	this.editMode = false;
-	this.editor.setReadOnly(true);
-	this.viewMode.endEditMode();
-}
-
-/** @private */
-apogeeapp.app.AceTextEditor.prototype.onMouseClick = function() {
-	if((this.editOk)&&(!this.editMode)) {
-		
-		var instance = this;
-		var onSave = function() {
-			instance.save();
-		}
-		var onCancel = function() {
-			instance.cancel();
-		}
-		
-		this.viewMode.startEditMode(onSave,onCancel);
-		
-		this.editor.setReadOnly(false);
-		this.editMode = true;
-	}
+    destroy() {
+        if(this.editor) {
+            this.editor.destroy();
+            this.editor = null;
+        }
+    }
+    
+    endEditMode() {
+        this.editor.setReadOnly(true);
+        super.endEditMode();
+    }
+    
+    startEditMode() {
+        super.startEditMode();
+        this.editor.setReadOnly(false);
+    }
 }

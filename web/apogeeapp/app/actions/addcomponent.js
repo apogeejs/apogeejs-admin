@@ -68,7 +68,7 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,componentGener
                 }
                 catch(error) {
                     //exception creating component
-                    var message = "Failed to created UI component: " + error.message;
+                    var message = "Failed to create UI component: " + error.message;
                     var actionError = new apogee.ActionError(message,apogee.ActionError.ERROR_TYPE_APP);
                     actionResponse.addError(actionError);
                 }

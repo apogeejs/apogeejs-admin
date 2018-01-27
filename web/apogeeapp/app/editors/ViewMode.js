@@ -1,17 +1,18 @@
-/* This is a base class for a view mode. 
- * displayDestroy flags determine the cases under which the data display
- * will be destroyed (or kept alive). The options are when the display mode
- * is not active, when the window is minimized, and when the parent display
- * is hidden (such as the tab parent for a window). Before the display is destroyed,
- * a check is done to make sure it is ok, such as it is not in edit mode. */
-apogeeapp.app.ViewMode = function(componentDisplay, displayDestroyFlags) {
+/* This is a base class for a view mode. */
+apogeeapp.app.ViewMode = function(componentDisplay, viewType) {
     this.componentDisplay = componentDisplay;
     this.member = componentDisplay.getMember();
     
     //for destroying display to save resources
-    this.setDisplayDestroyFlags(displayDestroyFlags);
+/* displayDestroy flags determine the cases under which the data display
+ * will be destroyed (or kept alive). The options are when the display mode
+ * is not active, when the window is minimized, and when the parent display
+ * is hidden (such as the tab parent for a window). Before the display is destroyed,
+ * a check is done to make sure it is ok, such as it is not in edit mode. */
+    this.setDisplayDestroyFlags(apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_INACTIVE_AND_MINIMIZED);
     
     //data display
+    this.viewType = viewType;
     this.dataDisplay = null;
     this.modeActive = false;
     this.displayInWindow = false;
@@ -150,19 +151,6 @@ apogeeapp.app.ViewMode.prototype.endEditMode = function() {
     this.componentDisplay.endEditUI();
 }
 
-//------------------------------
-// Protected
-//------------------------------
-
-///** This method creates the data display object. */
-//apogeeapp.app.ViewMode.prototype.createDisplay = function();
-
-///** This method gets the data to display in the data display object. */
-//apogeeapp.app.ViewMode.prototype.getDisplayData = function();
-
-/** This method returns true if the data should be editable. */
-//apogeeapp.app.ViewMode.prototype.getIsDataEditable = function();
-
 //-----------------------------------
 // Private
 //-----------------------------------
@@ -194,7 +182,7 @@ apogeeapp.app.ViewMode.prototype.onWindowResized = function() {
 }
 
 apogeeapp.app.ViewMode.prototype.setData = function() {
-    this.dataDisplay.showData(this.getDisplayData(),this.getIsDataEditable());
+    this.dataDisplay.showData();
 }
 
 /** If we enter a state where we want to destroy the display, try to do that. */
@@ -205,7 +193,7 @@ apogeeapp.app.ViewMode.prototype.setDisplayState = function() {
     if(showWindow) {
         //show window, maybe create
         if(!this.dataDisplay) {
-            this.dataDisplay = this.createDisplay();
+            this.dataDisplay = this.componentDisplay.getDataDisplay(this,this.viewType);
             this.placeDisplayInWindow();
             this.setData();
         }

@@ -66,31 +66,42 @@ apogeeapp.app.JsonTableComponent.prototype.getTableEditSettings = function() {
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-apogeeapp.app.JsonTableComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
+apogeeapp.app.JsonTableComponent.prototype.getDataDisplay = function(viewMode,viewType) {
 	
+    var callbacks;
+    
 	//create the new view element;
 	switch(viewType) {
         case apogeeapp.app.JsonTableComponent.VIEW_DATA:
             switch(this.dataView) {
                 case apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW:
-                    return new apogeeapp.app.AceDataMode(editComponentDisplay,true);
+                    callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.member);
+                    return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/json");
 
                 case apogeeapp.app.JsonTableComponent.FORM_DATA_VIEW:
-                    return new apogeeapp.app.FormDataMode(editComponentDisplay);
+                    alert("FORM EDITOR NOT IMPLEMENTED YET!");
+                    callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks(this.member);
+                    //return new apogeeapp.app.FormDataMode(editComponentDisplay);
+                    //drop through to below
                     
                 case apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW:
                 default:
-                    return new apogeeapp.app.AceDataMode(editComponentDisplay,false);
+                    callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.member);
+                    return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
             }
 			
 		case apogeeapp.app.JsonTableComponent.VIEW_CODE:
-			return new apogeeapp.app.AceCodeMode(editComponentDisplay);
+            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member,apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
 			
 		case apogeeapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new apogeeapp.app.AceSupplementalMode(editComponentDisplay);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member,apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
             
         case apogeeapp.app.JsonTableComponent.VIEW_DESCRIPTION:
-			return new apogeeapp.app.AceDescriptionMode(editComponentDisplay);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
+            //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
+            return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
 			
 		default:
 //temporary error handling...
@@ -98,6 +109,7 @@ apogeeapp.app.JsonTableComponent.prototype.getViewModeElement = function(editCom
 			return null;
 	}
 }
+
 
 //======================================
 // Static methods

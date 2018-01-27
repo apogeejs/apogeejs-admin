@@ -1,0 +1,18 @@
+.apogee_datadisplay_container_fixed {
+    position:absolute;
+    top:0px;
+    left:0px;
+    bottom:0px;
+    right:0px;
+    overflow:hidden;
+}
+
+.apogee_datadisplay_container_scrolling {
+	position:absolute;
+    top:0px;
+    left:0px;
+    bottom:0px;
+    right:0px;
+    overflow:auto;
+}
+
