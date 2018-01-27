@@ -64,7 +64,7 @@ apogeeapp.app.JsonTableComponent.prototype.getTableEditSettings = function() {
     return apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS;
 }
 
-/** This method should be implemented to retrieve a view mode of the give type. 
+/** This method should be implemented to retrieve a data display of the give type. 
  * @protected. */
 apogeeapp.app.JsonTableComponent.prototype.getDataDisplay = function(viewMode,viewType) {
 	
