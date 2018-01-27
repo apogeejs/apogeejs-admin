@@ -58,9 +58,11 @@ apogeeapp.app.BasicControlComponent.prototype.getTableEditSettings = function() 
     return apogeeapp.app.BasicControlComponent.TABLE_EDIT_SETTINGS;
 }
 
-/** This method should be implemented to retrieve a view mode of the give type. 
+/** This method should be implemented to retrieve a data display of the give type. 
  * @protected. */
-apogeeapp.app.BasicControlComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
+apogeeapp.app.BasicControlComponent.prototype.getDataDisplay = function(viewMode,viewType) {
+	
+    var callbacks;
 	
 	//create the new view element;
 	switch(viewType) {
@@ -70,15 +72,19 @@ apogeeapp.app.BasicControlComponent.prototype.getViewModeElement = function(edit
 				this.outputMode = new apogeeapp.app.ControlOutputMode(editComponentDisplay,this.displayDestroyFlags);
 			}
 			return this.outputMode;
-			
-		case apogeeapp.app.BasicControlComponent.VIEW_CODE:
-			return new apogeeapp.app.AceCodeMode(editComponentDisplay);
+            
+        case apogeeapp.app.BasicControlComponent.VIEW_CODE:
+            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member);
+			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
 			
 		case apogeeapp.app.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new apogeeapp.app.AceSupplementalMode(editComponentDisplay);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
             
         case apogeeapp.app.BasicControlComponent.VIEW_DESCRIPTION:
-			return new apogeeapp.app.AceDescriptionMode(editComponentDisplay);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
+            //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
+            return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
 			
 		default:
 //temporary error handling...
