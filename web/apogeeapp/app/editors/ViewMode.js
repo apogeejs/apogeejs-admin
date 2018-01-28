@@ -1,7 +1,6 @@
 /* This is a base class for a view mode. */
 apogeeapp.app.ViewMode = function(componentDisplay, viewType) {
     this.componentDisplay = componentDisplay;
-    this.member = componentDisplay.getMember();
     
     //for destroying display to save resources
 /* displayDestroy flags determine the cases under which the data display
@@ -50,10 +49,6 @@ apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_INACTIVE_AND_MINIMIZED = 3;
 //------------------------------
 // accessors
 //------------------------------
-
-apogeeapp.app.ViewMode.prototype.getMember = function() {
-    return this.member;
-}
 
 /** This returns the UiObject, such as the window frame for this data display. */
 apogeeapp.app.ViewMode.prototype.getDisplayWindow = function() {

@@ -1,6 +1,8 @@
 
 apogeeapp.app.dataDisplayCallbackHelper = {};
 
+apogeeapp.app.dataDisplayCallbackHelper.formatString = "\t";
+
 /** This function creates editor callbacks or member data where the editor takes JSON format. */
 apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks = function(member) {
     return {
@@ -24,7 +26,7 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks = function(me
                 textData = "undefined";
             }
             else {
-                textData = JSON.stringify(json,null,apogeeapp.app.AceDataMode.formatString);
+                textData = JSON.stringify(json,null,apogeeapp.app.dataDisplayCallbackHelper.formatString);
             }
 
             return textData;

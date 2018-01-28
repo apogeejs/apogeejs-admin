@@ -53,11 +53,14 @@ apogeeapp.app.EditorDataDisplay = class {
     //This method gets the data from the editor. REQUIRED
     //getEditorData() {}
     
-    //this sets the data into the editor display. REQUIRED
+    //this sets the data into the editor display. REQUIRED if edit mode or save is used
     //setEditorData(data) {}
     
     //this methodis called on loading the display. OPTIONAL
     //onLoad() {}
+    
+    //this methodis called on loading the display. OPTIONAL
+    //onUnLoad() {}
 
     //this methodis called on loading the display. OPTIONAL
     //onResize() { }

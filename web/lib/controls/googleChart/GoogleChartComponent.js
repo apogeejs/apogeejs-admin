@@ -24,22 +24,49 @@ function onLibLoad() {
 //===================================
 
 /** This is a simple google chart component. */
-apogeeapp.app.GoogleChartComponent = function(workspaceUI,control) {
-    //extend edit component
-    apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,apogeeapp.app.GoogleChartComponent);
+apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlComponent {
     
-    this.chartType = apogeeapp.app.GoogleChartComponent.DEFAULT_CHART;
-    
-    //if not yet done, load the google chart library
-    if(!googleLoadCalled) {
-        googleLoadCalled = true;
-        google.charts.load('current', {packages: ['corechart']});
-        google.charts.setOnLoadCallback(onLibLoad);
-    }
-};
+    constructor(workspaceUI,control) {
+        super(workspaceUI,control,apogeeapp.app.GoogleChartComponent);
 
-apogeeapp.app.GoogleChartComponent.prototype = Object.create(apogeeapp.app.BasicControlComponent.prototype);
-apogeeapp.app.GoogleChartComponent.prototype.constructor = apogeeapp.app.GoogleChartComponent;
+        this.chartType = apogeeapp.app.GoogleChartComponent.DEFAULT_CHART;
+
+        //if not yet done, load the google chart library
+        if(!googleLoadCalled) {
+            googleLoadCalled = true;
+            google.charts.load('current', {packages: ['corechart']});
+            google.charts.setOnLoadCallback(onLibLoad);
+        }
+    }
+        
+    /** Implement the method to get the data display. JsDataDisplay is an 
+    * easily configurable data display. */
+    getOutputDisplay(viewMode) {
+        this.chartDisplay = new apogeeapp.app.GoogleChartDisplay(viewMode,this.getMember(),this.chartType);
+        return this.chartDisplay;
+    }
+    
+
+    getChartType() {
+        return this.chartType;
+    }
+
+    setChartType(chartType) {
+        this.chartType = chartType;
+        if(this.chartDisplay) {
+            this.chartDisplay.setChartType(chartType);
+        }
+    }
+
+    addPropFunction(component,values) {
+        values.chartType = component.getChartType();
+    }
+
+    updateProperties(component,oldValues,newValues) {
+        component.setChartType(newValues.chartType);
+    }
+
+};
 
 //attach the standard static values to the static object (this can also be done manually)
 apogeeapp.app.BasicControlComponent.attachStandardStaticProperties(apogeeapp.app.GoogleChartComponent,
@@ -53,35 +80,9 @@ apogeeapp.app.GoogleChartComponent.SCATTER_CHART = "scatter";
 
 apogeeapp.app.GoogleChartComponent.DEFAULT_CHART = apogeeapp.app.GoogleChartComponent.LINE_CHART;
 
-/** Implement the method to get the data display. JsDataDisplay is an 
- * easily configurable data display. */
-apogeeapp.app.GoogleChartComponent.prototype.getDataDisplay = function(viewMode) {
-    this.chartDisplay = new apogeeapp.app.GoogleChartDisplay(viewMode,this.chartType);
-    return this.chartDisplay;
-}
-
 //----------------------------
 // methods to add a custom property
 //----------------------------
-
-apogeeapp.app.GoogleChartComponent.prototype.getChartType = function() {
-    return this.chartType;
-}
-
-apogeeapp.app.GoogleChartComponent.prototype.setChartType = function(chartType) {
-    this.chartType = chartType;
-    if(this.chartDisplay) {
-        this.chartDisplay.setChartType(chartType);
-    }
-}
-
-apogeeapp.app.GoogleChartComponent.addPropFunction = function(component,values) {
-    values.chartType = component.getChartType();
-}
-
-apogeeapp.app.GoogleChartComponent.updateProperties = function(component,oldValues,newValues) {
-    component.setChartType(newValues.chartType);
-}
 
 apogeeapp.app.GoogleChartComponent.propertyDialogLines = [
     {
@@ -97,110 +98,6 @@ apogeeapp.app.GoogleChartComponent.propertyDialogLines = [
     }
 ];
 
-//-----------------------
-// data display
-//-----------------------
-
-/** Extend ths JsDataDisplay */
-apogeeapp.app.GoogleChartDisplay = function(viewMode,chartType) {
-    //extend edit component
-    apogeeapp.app.JsDataDisplay.call(this,viewMode);
-    
-    this.chartType = chartType;
-    
-    if(!google.visualization) {
-        //register this instance
-        addInstance(this);
-    }
-    else {
-        this.libLoaded = true;
-    }
-}
-
-apogeeapp.app.GoogleChartDisplay.prototype = Object.create(apogeeapp.app.JsDataDisplay.prototype);
-apogeeapp.app.GoogleChartDisplay.prototype.constructor = apogeeapp.app.GoogleChartDisplay;
-
-
-apogeeapp.app.GoogleChartDisplay.prototype.setChartType = function(chartType) {
-    this.chartType = chartType;
-    if(this.chart) {
-        this.chart = null;
-        this.displayData();
-    }
-}
-
-apogeeapp.app.GoogleChartDisplay.prototype.showData = function(data) {
-    this.data = data;
-    this.dataLoaded = true;
-    
-    if(this.libLoaded) {
-        this.displayData();
-    }
-}
-
-apogeeapp.app.GoogleChartDisplay.prototype.onLibLoaded = function() {
-    this.libLoaded = true;
-    
-    if(this.dataLoaded) {
-        this.displayData();
-    }
-}
-
-apogeeapp.app.GoogleChartDisplay.prototype.displayData = function() {
-    if(!this.data) return;
-    
-    //if((this.data.rows === undefined)||(this.data.columns === undefined)) return;
-    
-    if(!this.chart) {
-        this.chart = this.instantiateChart();
-        if(!this.chart) return null;
-    }
-    
-    var chartOptions = this.data.options;
-    if(!chartOptions) chartOptions = {};
-
-    try {
-        var chartData = this.createDataTable(this.data.columns,this.data.rows);
-        this.chart.draw(chartData, chartOptions);
-    }
-    catch(error) {
-        console.error(error.stack);
-    }
-}
-
-apogeeapp.app.GoogleChartDisplay.prototype.instantiateChart = function() {
-    var element = this.getElement();
-    switch(this.chartType) {
-        case apogeeapp.app.GoogleChartComponent.AREA_CHART:
-            return new google.visualization.AreaChart(element);
-            
-        case apogeeapp.app.GoogleChartComponent.BAR_CHART:
-            return new google.visualization.BarChart(element);
-        
-        case apogeeapp.app.GoogleChartComponent.LINE_CHART:
-            return new google.visualization.LineChart(element);
-        
-        case apogeeapp.app.GoogleChartComponent.SCATTER_CHART:
-            return new google.visualization.ScatterChart(element);
-            
-        default:
-            console.log("Unsupported chart type: " + this.chartType);
-            return null;
-    }
-}
-
-/** This is constructs the data table from the given data. */
-apogeeapp.app.GoogleChartDisplay.prototype.createDataTable = function(columns,rows) {
-    var dataTable = new google.visualization.DataTable();
-    for(var i = 0; i < columns.length; i++) {
-        var columnInfo = columns[i];
-        dataTable.addColumn(columnInfo.type,columnInfo.name);
-    }
-    dataTable.addRows(rows);
-    
-    return dataTable;
-}
-
 //-----------------
 //auto registration
 //-----------------
@@ -212,6 +109,107 @@ else {
     console.log("Component could not be registered because no Apogee app instance was available at component load time: apogeeapp.app.GoogleChartComponent");
 }
 
+//-----------------------
+// data display
+//-----------------------
+
+/** Extend ths JsDataDisplay */
+apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisplay {;
+    constructor(viewMode,member,chartType) {
+        super(viewMode,apogeeapp.app.NonEditorDataDisplay.SCROLLING);
+    
+        this.member = member;
+        this.chartType = chartType;
+
+        if(!google.visualization) {
+            //register this instance
+            addInstance(this);
+        }
+        else {
+            this.libLoaded = true;
+        }
+    }
+
+    setChartType(chartType) {
+        this.chartType = chartType;
+        if(this.chart) {
+            this.chart = null;
+            this.displayData();
+        }
+    }
+
+    showData() {
+        this.data = this.member.getData();
+        this.dataLoaded = true;
+
+        if(this.libLoaded) {
+            this.displayData();
+        }
+    }
+
+    onLibLoaded() {
+        this.libLoaded = true;
+
+        if(this.dataLoaded) {
+            this.displayData();
+        }
+    }
+
+    displayData() {
+        if(!this.data) return;
+
+        //if((this.data.rows === undefined)||(this.data.columns === undefined)) return;
+
+        if(!this.chart) {
+            this.chart = this.instantiateChart();
+            if(!this.chart) return null;
+        }
+
+        var chartOptions = this.data.options;
+        if(!chartOptions) chartOptions = {};
+
+        try {
+            var chartData = this.createDataTable(this.data.columns,this.data.rows);
+            this.chart.draw(chartData, chartOptions);
+        }
+        catch(error) {
+            console.error(error.stack);
+        }
+    }
+
+    instantiateChart() {
+        var element = this.getElement();
+        switch(this.chartType) {
+            case apogeeapp.app.GoogleChartComponent.AREA_CHART:
+                return new google.visualization.AreaChart(element);
+
+            case apogeeapp.app.GoogleChartComponent.BAR_CHART:
+                return new google.visualization.BarChart(element);
+
+            case apogeeapp.app.GoogleChartComponent.LINE_CHART:
+                return new google.visualization.LineChart(element);
+
+            case apogeeapp.app.GoogleChartComponent.SCATTER_CHART:
+                return new google.visualization.ScatterChart(element);
+
+            default:
+                console.log("Unsupported chart type: " + this.chartType);
+                return null;
+        }
+    }
+
+    /** This is constructs the data table from the given data. */
+    createDataTable(columns,rows) {
+        var dataTable = new google.visualization.DataTable();
+        for(var i = 0; i < columns.length; i++) {
+            var columnInfo = columns[i];
+            dataTable.addColumn(columnInfo.type,columnInfo.name);
+        }
+        dataTable.addRows(rows);
+
+        return dataTable;
+    }
+}
 
 //end definition
 })();

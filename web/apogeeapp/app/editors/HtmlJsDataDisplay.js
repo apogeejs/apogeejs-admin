@@ -3,158 +3,161 @@
  * HTML and javascript code. Is should be passed a 
  * resource (javascript object) which has the following methods optionally defined: 
  * 
- * constructorAddition(outputMode);
- * init(outputElement,outputMode);
- * setData(data,outputElement,outputMode);
- * isCloseOk(outputElement,outputMode);
- * destroy(outputElement,outputMode);
- * onLoad(outputElement,outputMode);
- * onUnload(outputElement,outputMode);
- * onResize(outputElement,outputMode);
+ * constructorAddition(viewMode);
+ * init(outputElement,viewMode);
+ * setData(data,outputElement,viewMode);
+ * isCloseOk(outputElement,viewMode);
+ * destroy(outputElement,viewMode);
+ * onLoad(outputElement,viewMode);
+ * onUnload(outputElement,viewMode);
+ * onResize(outputElement,viewMode);
  */
 
 /** This is the display/editor for the custom control output. */
-apogeeapp.app.HtmlJsDataDisplay = function(html,resource,outputMode) {
-    this.resource = resource;
-    this.outputMode = outputMode;
-    this.containerElement = apogeeapp.ui.createElement("div",null,{
-		"position":"absolute",
-        "top":"0px",
-        "left":"0px",
-		"bottom":"0px",
-        "right":"0px",
-		"overflow":"hidden"
-	});
-    this.outputElement = apogeeapp.ui.createElement("div",null,{
-		"position":"absolute",
-        "top":"0px",
-        "left":"0px",
-		"bottom":"0px",
-        "right":"0px",
-		"overflow":"auto"
-	});
-    this.containerElement.appendChild(this.outputElement);
+apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
+    constructor(viewMode,member,html,resource) {
+        super(viewMode,apogeeapp.app.EditorDataDisplay.NON_SCROLLING);
+        
+        this.resource = resource;
+        this.member = member;
+
+        var containerElement = this.getElement();
     
-    //content
-    if(html) {
-        this.outputElement.innerHTML = html;
-    }
-    
-    //-------------------
-    //constructor code
-    //-------------------
-    
-    if(resource.constructorAddition) {
-        try {
-            //custom code
-            resource.constructorAddition.call(resource,outputMode);
+        this.outputElement = apogeeapp.ui.createElement("div",null,{
+            "position":"absolute",
+            "top":"0px",
+            "left":"0px",
+            "bottom":"0px",
+            "right":"0px",
+            "overflow":"auto"
+        });
+        containerElement.appendChild(this.outputElement);
+
+        //content
+        if(html) {
+            this.outputElement.innerHTML = html;
         }
-        catch(error) {
-            alert("Error in " + this.outputMode.getFullName() + " init function: " + error.message);
+        
+        //TEMP - I used to pass the view mode, now I just want to pass something else.
+        var mode = {
+            getMessenger: () => new apogee.action.Messenger(this.member)
         }
-    }
-    
-    //------------------------
-    //add resize/load listener if needed
-    //------------------------
-    
-    var instance = this;
-    
-    if(this.resource.onLoad) {
-        this.onLoad = function() {
+
+        //-------------------
+        //constructor code
+        //-------------------
+
+        if(resource.constructorAddition) {
             try {
-                resource.onLoad.call(resource,instance.outputElement,instance.outputMode);
+                //custom code
+                resource.constructorAddition.call(resource,mode);
             }
             catch(error) {
-                alert("Error in " + instance.outputMode.getFullName() + " onLoad function: " + error.message);
+                alert("Error in " + this.member.getFullName() + " init function: " + error.message);
             }
-        };
-    }
-    
-    if(this.resource.onUnload) {   
-        this.onUnload = function() {
-            try {
-                if(instance.resource.onHide) {
-                    resource.onUnload.call(resource,instance.outputElement,instance.outputMode);
+        }
+
+        //------------------------
+        //add resize/load listener if needed
+        //------------------------
+
+        
+
+        if(this.resource.onLoad) {
+            this.onLoad = () => {
+                try {
+                    resource.onLoad.call(resource,this.outputElement,mode);
                 }
-            }
-            catch(error) {
-                alert("Error in " + instance.outputMode.getFullName() + " onUnload function: " + error.message);
-            }
+                catch(error) {
+                    alert("Error in " + this.member.getFullName() + " onLoad function: " + error.message);
+                }
+            };
         }
-    }
-    
-    if(this.resource.onResize) {
-        this.onResize = function() {
-            try {
-                resource.onResize.call(resource,instance.outputElement,instance.outputMode);
-            }
-            catch(error) {
-                console.log("Error in " + instance.outputMode.getFullName() + " onResize function: " + error.message);
-            }
-        };
-    }
-    
-    if(this.resource.setData) {
-        this.showData = function(data) {
-            try {
-                if(this.resource.setData) {
-                    //set data, but only if the member does not have and error and is not pending
-                    var member = instance.outputMode.getMember();
-                    if((!member.hasError())&&(!member.getResultPending())) {
-                        resource.setData.call(resource,data,instance.outputElement,instance.outputMode);
+
+        if(this.resource.onUnload) {   
+            this.onUnload = () => {
+                try {
+                    if(this.resource.onHide) {
+                        resource.onUnload.call(resource,this.outputElement,mode);
                     }
                 }
-            }
-            catch(error) {
-                alert("Error in " + instance.outputMode.getFullName() + " setData function: " + error.message);
-            }
-        }
-    }
-    else {
-        //we must include a function here
-        this.showData = function(data){};
-    }
-    
-    if(this.resource.isCloseOk) {     
-        this.isCloseOk = function() {
-            try {
-                resource.isCloseOk.call(resource,instance.outputElement,instance.outputMode);
-            }
-            catch(error) {
-                alert("Error in " + instance.outputMode.getFullName() + " isCloseOk function: " + error.message);
+                catch(error) {
+                    alert("Error in " + this.member.getFullName()+ " onUnload function: " + error.message);
+                }
             }
         }
-    }
 
-    if(this.resource.destroy) {
-        this.destroy = function() {
+        if(this.resource.onResize) {
+            this.onResize = () => {
+                try {
+                    resource.onResize.call(resource,this.outputElement,mode);
+                }
+                catch(error) {
+                    console.log("Error in " + this.member.getFullName() + " onResize function: " + error.message);
+                }
+            };
+        }
+
+        if(this.resource.setData) {
+            this.showData = () => {
+                try {
+                    if(this.resource.setData) {
+                        //set data, but only if the member does not have and error and is not pending
+                        if((!this.member.hasError())&&(!this.member.getResultPending())) {
+                            var data = this.member.getData();
+                            resource.setData.call(resource,data,this.outputElement,mode);
+                        }
+                    }
+                }
+                catch(error) {
+                    alert("Error in " + this.member.getFullName() + " setData function: " + error.message);
+                }
+            }
+        }
+        else {
+            //we must include a function here
+            this.showData = () => {};
+        }
+
+        if(this.resource.isCloseOk) {     
+            this.isCloseOk = () => {
+                try {
+                    resource.isCloseOk.call(resource,this.outputElement,mode);
+                }
+                catch(error) {
+                    alert("Error in " + this.member.getFullName() + " isCloseOk function: " + error.message);
+                }
+            }
+        }
+
+        if(this.resource.destroy) {
+            this.destroy = () => {
+                try {
+                    resource.destroy.call(resource,this.outputElement,mode);
+                }
+                catch(error) {
+                    alert("Error in " + this.member.getFullName() + " destroy function: " + error.message);
+                }
+            }
+        }
+
+        //-------------------
+        //initialization
+        //-------------------
+
+        if(resource.init) {
             try {
-                resource.destroy.call(resource,instance.outputElement,instance.outputMode);
+                resource.init.call(resource,this.outputElement,mode);
             }
             catch(error) {
-                alert("Error in " + instance.outputMode.getFullName() + " destroy function: " + error.message);
+                alert("Error in " + this.member.getFullName() + " init function: " + error.message);
             }
         }
     }
-    
-    //-------------------
-    //initialization
-    //-------------------
-    
-    if(resource.init) {
-        try {
-            resource.init.call(resource,this.outputElement,outputMode);
-        }
-        catch(error) {
-            alert("Error in " + this.outputMode.getFullName() + " init function: " + error.message);
-        }
-    }
+   
 }
 
-apogeeapp.app.HtmlJsDataDisplay.prototype.getElement = function() {
-    return this.containerElement;
-}
+
 
 
 

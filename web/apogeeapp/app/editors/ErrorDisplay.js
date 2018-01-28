@@ -11,32 +11,20 @@
  */
 
 /** This is the display/editor for the custom control output. */
-apogeeapp.app.ErrorDisplay = function(outputMode) {
-    this.outputMode = outputMode;
-    this.outputElement = apogeeapp.ui.createElement("div",null,{
-		"position":"absolute",
-        "top":"0px",
-        "left":"0px",
-		"bottom":"0px",
-        "right":"0px",
-		"overflow":"auto"
-	});
+apogeeapp.app.ErrorDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
+    constructor(viewMode) {
+        super(viewMode);
     
-    var msg = "ERROR - Component not loaded!";
-    var msgDiv = apogeeapp.ui.createElement("div");
-    msgDiv.style = "color:red; font-weight:bold";
-    msgDiv.innerHTML = msg;
-    this.outputElement.appendChild(msgDiv);
-}
+        var containerDiv = this.getElement();
+        
+        var msg = "ERROR - Component not loaded!";
+        var msgDiv = apogeeapp.ui.createElement("div");
+        msgDiv.style = "color:red; font-weight:bold";
+        msgDiv.innerHTML = msg;
+        containerDiv.appendChild(msgDiv);
+    }
 
-apogeeapp.app.ErrorDisplay.prototype.getElement = function() {
-    return this.outputElement;
-}
-
-apogeeapp.app.ErrorDisplay.prototype.getOutputMode = function() {
-    return this.outputMode;
-}
-
-apogeeapp.app.ErrorDisplay.prototype.showData = function(text,editOk) {
-    //no action
+    showData() {
+        //no action
+    }
 }

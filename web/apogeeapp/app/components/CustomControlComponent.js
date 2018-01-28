@@ -24,13 +24,6 @@ apogeeapp.app.CustomControlComponent.prototype.constructor = apogeeapp.app.Custo
 //Resource Accessors
 //==============================
 
-apogeeapp.app.CustomControlComponent.prototype.getDataDisplay = function(viewMode) {
-    var html = this.getUiCodeField(apogeeapp.app.CustomControlComponent.CODE_FIELD_HTML);
-    var resource = this.createResource();
-    var dataDisplay = new apogeeapp.app.HtmlJsDataDisplay(html,resource,viewMode);
-    return dataDisplay;
-}
-
 apogeeapp.app.CustomControlComponent.prototype.getUiCodeFields = function() {
     return this.uiCodeFields;
 }
@@ -45,13 +38,16 @@ apogeeapp.app.CustomControlComponent.prototype.getDestroyOnInactive = function()
     return this.destroyOnInactive;
 }
 
+apogeeapp.app.CustomControlComponent.prototype.getDisplayDestroyFlags = function() {
+    return this.destroyOnInactive ? apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_INACTIVE :
+            apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
+}
+
 apogeeapp.app.CustomControlComponent.prototype.setDestroyOnInactive = function(destroyOnInactive) {
     this.destroyOnInactive = destroyOnInactive;
     
     if(this.activeOutputMode) {
-        var displayDestroyFlags = destroyOnInactive ? apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_INACTIVE :
-            apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
-        this.activeOutputMode.setDisplayDestroyFlags(displayDestroyFlags);
+        this.activeOutputMode.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
     }
 }
 
@@ -113,63 +109,105 @@ apogeeapp.app.CustomControlComponent.prototype.getTableEditSettings = function()
     return apogeeapp.app.CustomControlComponent.TABLE_EDIT_SETTINGS;
 }
 
-/** This method should be implemented to retrieve a view mode of the give type. 
+/** This method should be implemented to retrieve a data display of the give type. 
  * @protected. */
-apogeeapp.app.CustomControlComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
+apogeeapp.app.CustomControlComponent.prototype.getDataDisplay = function(viewMode,viewType) {
+	
+    var callbacks;
 	
 	//create the new view element;
 	switch(viewType) {
 		
 		case apogeeapp.app.CustomControlComponent.VIEW_OUTPUT:
-			this.activeOutputMode = new apogeeapp.app.ControlOutputMode(editComponentDisplay,this.displayDestroyFlags);
-			return this.activeOutputMode;
+            viewMode.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
+            this.activeOutputMode = viewMode;
+            var html = this.getUiCodeField(apogeeapp.app.CustomControlComponent.CODE_FIELD_HTML);
+            var resource = this.createResource();
+            var dataDisplay = new apogeeapp.app.HtmlJsDataDisplay(viewMode,this.member,html,resource);
+            return dataDisplay;
 			
 		case apogeeapp.app.CustomControlComponent.VIEW_CODE:
-			return new apogeeapp.app.AceCodeMode(editComponentDisplay);
+            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member);
+			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
 			
 		case apogeeapp.app.CustomControlComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new apogeeapp.app.AceSupplementalMode(editComponentDisplay);
-            
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
         
         case apogeeapp.app.CustomControlComponent.VIEW_HTML:
-            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_HTML);
+            callbacks = this.getCallbacks(apogeeapp.app.CustomControlComponent.CODE_FIELD_HTML);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/html");
     
         case apogeeapp.app.CustomControlComponent.VIEW_CSS:
-            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_CSS);
+            callbacks = this.getCallbacks(apogeeapp.app.CustomControlComponent.CODE_FIELD_CSS);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/css");
             
         case apogeeapp.app.CustomControlComponent.VIEW_INIT:
-            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_INIT);
-    
+            callbacks = this.getCallbacks(apogeeapp.app.CustomControlComponent.CODE_FIELD_INIT);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+            
         case apogeeapp.app.CustomControlComponent.VIEW_SET_DATA:
-            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_SET_DATA);
-     
+            callbacks = this.getCallbacks(apogeeapp.app.CustomControlComponent.CODE_FIELD_SET_DATA);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+            
         case apogeeapp.app.CustomControlComponent.VIEW_IS_CLOSE_OK:
-            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_IS_CLOSE_OK);    
+            callbacks = this.getCallbacks(apogeeapp.app.CustomControlComponent.CODE_FIELD_IS_CLOSE_OK);    
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
             
         case apogeeapp.app.CustomControlComponent.VIEW_DESTROY:
-            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_DESTROY);    
+            callbacks = this.getCallbacks(apogeeapp.app.CustomControlComponent.CODE_FIELD_DESTROY);    
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
             
         case apogeeapp.app.CustomControlComponent.VIEW_ON_LOAD:
-            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_LOAD);
-		
+            callbacks = this.getCallbacks(apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_LOAD);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+            
         case apogeeapp.app.CustomControlComponent.VIEW_ON_UNLOAD:
-            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_UNLOAD);
-        
+            callbacks = this.getCallbacks(apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_UNLOAD);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+            
         case apogeeapp.app.CustomControlComponent.VIEW_ON_RESIZE:
-            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_RESIZE);
-			
+            callbacks = this.getCallbacks(apogeeapp.app.CustomControlComponent.CODE_FIELD_ON_RESIZE);
+			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+            
         case apogeeapp.app.CustomControlComponent.VIEW_CONSTRUCTOR:
-            return new apogeeapp.app.AceCustomControlMode(editComponentDisplay,apogeeapp.app.CustomControlComponent.CODE_FIELD_CONSTRUCTOR); 
-
+            callbacks = this.getCallbacks(apogeeapp.app.CustomControlComponent.CODE_FIELD_CONSTRUCTOR); 
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
 
         case apogeeapp.app.CustomControlComponent.VIEW_DESCRIPTION:
-			return new apogeeapp.app.AceDescriptionMode(editComponentDisplay);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
+            //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
+            return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
 			
 		default:
 //temporary error handling...
 			alert("unrecognized view element!");
 			return null;
 	}
+}
+
+apogeeapp.app.CustomControlComponent.prototype.getCallbacks = function(codeField) {
+    return {
+        getData: () => {
+            var uiCodeFields = this.getUiCodeFields();
+            var data = uiCodeFields[codeField];
+            if((data === undefined)||(data === null)) data = "";
+            return data;
+        },
+        
+        getEditOk: () => true,
+        
+        saveData: (text) => {
+            var uiCodeFields = this.getUiCodeFields();
+            uiCodeFields[codeField] = text;
+            var actionResponse = this.update(uiCodeFields);
+            if(!actionResponse.getSuccess()) {
+                //show an error message
+                apogeeapp.app.errorHandling.handleActionError(actionResponse);
+            }
+            return true;  
+        }
+    }
 }
 
 /** This method deseriliazes data for the custom resource component. */

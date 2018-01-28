@@ -46,8 +46,8 @@ apogeeapp.app.ErrorTableComponent.prototype.getTableEditSettings = function() {
 
 /** This method should be implemented to retrieve a view mode of the give type. 
  * @protected. */
-apogeeapp.app.ErrorTableComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
-    return new apogeeapp.app.ErrorMode(editComponentDisplay,false);
+apogeeapp.app.ErrorTableComponent.prototype.getDataDisplay = function(viewMode,viewType) {
+    return new apogeeapp.app.ErrorDisplay(viewMode,false);
 }
 
 //======================================
