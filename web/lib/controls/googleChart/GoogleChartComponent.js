@@ -37,6 +37,12 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
             google.charts.load('current', {packages: ['corechart']});
             google.charts.setOnLoadCallback(onLibLoad);
         }
+        
+        this.storedData = apogeeapp.app.GoogleChartComponent.DEFAULT_STORED_DATA;
+        
+        //add a cleanup and save actions
+        this.addOpenAction(apogeeapp.app.GoogleChartComponent.readFromJson);
+        this.addSaveAction(apogeeapp.app.GoogleChartComponent.writeToJson);
     }
         
     /** Implement the method to get the data display. JsDataDisplay is an 
@@ -66,6 +72,67 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
         component.setChartType(newValues.chartType);
     }
 
+    //==================================
+    // overrides for alternate "code" entry
+    //==================================
+    
+    getTableEditSettings() {
+        return apogeeapp.app.GoogleChartComponent.TABLE_EDIT_SETTINGS;
+    }
+    
+    /** This method should be implemented to retrieve a data display of the give type. 
+     * @protected. */
+    getDataDisplay(viewMode,viewType) {
+        
+        if(viewType == apogeeapp.app.GoogleChartComponent.VIEW_INPUT_FORM) {
+            var getFormData = () => this.storedData;
+            var dataDisplay = new apogeeapp.app.ConfigurableFormEditor(viewMode,getFormData,apogeeapp.app.GoogleChartComponent.FORM_LAYOUT);
+            var panel = dataDisplay.getPanel();
+            var onSubmit = (formData) => this.onSubmit(formData);
+            var onCancel = () => this.onCancel(panel);
+            panel.addSubmit(onSubmit,onCancel,"Save","Reset");
+            return dataDisplay;
+        }
+        else {
+            return super.getDataDisplay(viewMode,viewType);
+        }
+    }
+    
+    onSubmit(formData) {
+        this.storedData = formData;
+        
+        var dataValid = ((formData.rows)&&(formData.rows != "")); 
+
+        var member = this.getMember();
+        var functionBody = (dataValid) ?
+`
+return {
+    "columns": ${formData.columns},
+    "rows": ${formData.rows},
+    "options": ${formData.options}
+};` :
+"";
+        
+        var argList = member.getArgList();
+        var supplementalCode = member.getSupplementalCode();
+        return apogeeapp.app.dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode); 
+    }       
+    
+    onCancel(panel) {
+        panel.setValue(this.storedData);
+    }
+    
+    static writeToJson(json) {
+        json.formData = this.storedData;
+    }
+
+    static readFromJson(json) {
+        if(json.formData !== undefined) {
+            this.storedData = json.formData;
+        }
+    }
+            
+
 };
 
 //attach the standard static values to the static object (this can also be done manually)
@@ -79,6 +146,44 @@ apogeeapp.app.GoogleChartComponent.LINE_CHART = "line";
 apogeeapp.app.GoogleChartComponent.SCATTER_CHART = "scatter";
 
 apogeeapp.app.GoogleChartComponent.DEFAULT_CHART = apogeeapp.app.GoogleChartComponent.LINE_CHART;
+
+apogeeapp.app.GoogleChartComponent.VIEW_INPUT_FORM = "Input";
+
+apogeeapp.app.GoogleChartComponent.VIEW_MODES = [
+	apogeeapp.app.BasicControlComponent.VIEW_OUTPUT,
+	apogeeapp.app.GoogleChartComponent.VIEW_INPUT_FORM,
+    apogeeapp.app.BasicControlComponent.VIEW_DESCRIPTION
+];
+
+apogeeapp.app.GoogleChartComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": apogeeapp.app.GoogleChartComponent.VIEW_MODES,
+    "defaultView": apogeeapp.app.BasicControlComponent.VIEW_OUTPUT
+}
+
+apogeeapp.app.GoogleChartComponent.DEFAULT_STORED_DATA = {};
+
+apogeeapp.app.GoogleChartComponent.FORM_LAYOUT = [
+    {
+        type: "heading",
+        level: 3,
+        text: "Chart Inputs"
+    },
+    {   
+        type: "textField",
+        label: "Columns: ",
+        key: "columns",
+    },
+    {
+        type: "textField",
+        label: "Rows: ",
+        key: "rows",
+    },
+    {
+        type: "textField",
+        label: "Options: ",
+        key: "options",
+    }
+];
 
 //----------------------------
 // methods to add a custom property

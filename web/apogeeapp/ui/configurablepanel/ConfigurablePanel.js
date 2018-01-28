@@ -30,6 +30,16 @@ apogeeapp.ui.ConfigurablePanel = class {
         return formValue;
     }
     
+    /** This method returns the data value object for this given panel. */
+    setValue(formValue) {
+        for(var key in formValue) {
+            var entry = this.getEntry(key);
+            if(entry) {
+                entry.updateValue(formValue[key]);
+            }
+        }
+    }
+    
     getElement() {
         return this.panelElement;
     }
