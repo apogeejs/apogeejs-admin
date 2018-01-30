@@ -170,29 +170,18 @@ apogeeapp.app.GoogleChartComponent.DEFAULT_STORED_DATA = {
 
 //format for entries below [ display name , enumeration name, Google constructor name] 
 apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO = [
-    ["Annotation","annotation","AnnotationChart"],
     ["Area","area","AreaChart"],
     ["Bar","bar","BarChart"],
     ["Bubble","bubble","BubbleChart"],
-    ["Calendar","calendar","Calendar"],
     ["Candlestick","candlestick","CandlestickChart"],
     ["Column","column","ColumnChart"],
     ["Combo","combo","ComboChart"],
-    ["Gannt","gannt","Gannt"],
-    ["Gauge","gauge","Gauge"],
     ["GeoChart","geochart","GeoChart"],
     ["Histogram","histogram","Histogram"],
     ["Line","line","LineChart"],
-    ["Map","map","Map"],
-    ["Org","org","OrgChart"],
     ["Pie","pie","PieChart"],
-    ["Sankey","sankey","Sankey"],
     ["Scatter","scatter","ScatterChart"],
-    ["Stepped Area","steppedArea","SteppedAreaCharts"],
-    ["Table","table","Table"],
-    ["Timeline","timeline","Timeline"],
-    ["Tree Map","treeMap","TreeMap"],
-    ["Word Tree","wordTree","WordTree"]
+    ["Stepped Area","steppedArea","SteppedAreaCharts"]
 ];
 
 apogeeapp.app.GoogleChartComponent.CHART_SELECT_FORM_INFO = apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO.map(entry => entry.slice(0,2));
