@@ -37,18 +37,9 @@ apogeeapp.ui.DropdownElement = class extends apogeeapp.ui.ConfigurableElement {
             this.select.appendChild(entry);
         }
         elementInitData.entries.forEach(addEntry);
-        if(elementInitData.value) {
-            this.select.value = elementInitData.value;
-        }
-        if(elementInitData.disabled) {
-            this.select.disabled = true;
-        }
         containerElement.appendChild(this.select); 
         
-        //events
-        if(elementInitData.onChange) {
-            this.addOnChange(elementInitData.onChange);
-        }
+        this._postInstantiateInit(elementInitData);
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -57,23 +48,26 @@ apogeeapp.ui.DropdownElement = class extends apogeeapp.ui.ConfigurableElement {
         return this.select.value;
     }   
 
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action
-    }
-
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
-    updateValue(value) {
+    setValue(value) {
         this.select.value = value;
     }
     
     /** This should be extended in elements to handle on change listeners. */
     addOnChange(onChange) {
-        this.select.onchange = () => {
+        var onChangeImpl = () => {
             onChange(this.getForm(),this.getValue());
         }
+        this.select.addEventListener("change",onChangeImpl);
+    }
+    
+    //===================================
+    // internal Methods
+    //==================================
+    
+    _setDisabled(isDisabled) { 
+        this.select.disabled = isDisabled;
     }
 }
 

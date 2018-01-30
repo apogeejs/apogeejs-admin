@@ -19,20 +19,11 @@ apogeeapp.ui.CheckboxElement = class extends apogeeapp.ui.ConfigurableElement {
             this.labelElement = null;
         }
         
-        //text field
+        //checkbox field
         this.checkbox = apogeeapp.ui.createElement("input",{"type":"checkbox"});
-        if(elementInitData.value === true) {
-            this.checkbox.checked = true;
-        }
-        if(elementInitData.disabled) {
-            this.checkbox.disabled = true;
-        }
         containerElement.appendChild(this.checkbox);  
         
-        //events
-        if(elementInitData.onChange) {
-            this.addOnChange(elementInitData.onChange);
-        }
+        this._postInstantiateInit(elementInitData);
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -41,15 +32,9 @@ apogeeapp.ui.CheckboxElement = class extends apogeeapp.ui.ConfigurableElement {
         return this.checkbox.checked;
     }   
 
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action
-    }
-
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
-    updateValue(value) {
+    setValue(value) {
         if(value === true) {
             this.checkbox.checked = true;
         }
@@ -57,9 +42,18 @@ apogeeapp.ui.CheckboxElement = class extends apogeeapp.ui.ConfigurableElement {
     
     /** This should be extended in elements to handle on change listeners. */
     addOnChange(onChange) {
-        this.checkbox.onchange = () => {
+        var onChangeImpl = () => {
             onChange(this.getForm(),this.getValue());
         }
+        this.checkbox.addEventListener("change",onChangeImpl);
+    }
+    
+    //===================================
+    // internal Methods
+    //==================================
+    
+    _setDisabled(isDisabled) { 
+        this.checkbox.disabled = isDisabled;
     }
 }
 

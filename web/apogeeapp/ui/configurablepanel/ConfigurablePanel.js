@@ -20,10 +20,12 @@ apogeeapp.ui.ConfigurablePanel = class {
     getValue() {
         var formValue = {};
         var addValue = elementObject => {
-            var elementValue = elementObject.getValue();
-            if(elementValue !== undefined) {
-                var key = elementObject.getKey();
-                formValue[key] = elementValue;
+            if(elementObject.getState() != apogeeapp.ui.ConfigurableElement.STATE_INACTIVE) {
+                var elementValue = elementObject.getValue();
+                if(elementValue !== undefined) {
+                    var key = elementObject.getKey();
+                    formValue[key] = elementValue;
+                }
             }
         }
         this.elementObjects.forEach(addValue);
@@ -35,7 +37,7 @@ apogeeapp.ui.ConfigurablePanel = class {
         for(var key in formValue) {
             var entry = this.getEntry(key);
             if(entry) {
-                entry.updateValue(formValue[key]);
+                entry.setValue(formValue[key]);
             }
         }
     }
@@ -64,6 +66,16 @@ apogeeapp.ui.ConfigurablePanel = class {
         }
         
         this.addToPanel(data);
+    }
+    
+    addOnChange(onChange) {
+        this.elementObjects.forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(onChange);} );
+    }
+    
+    setDisabled(isDisabled) {
+        var state = isDisabled ? apogeeapp.ui.ConfigurableElement.STATE_DISABLED :
+                apogeeapp.ui.ConfigurableElement.STATE_NORMAL;
+        this.elementObjects.forEach( elementObject => elementObject.setState(state) );
     }
     
     /** This method is used to register configurable elements with the panel */

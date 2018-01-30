@@ -25,15 +25,6 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
         //radio buttons
         this.buttonList = [];
         var groupName = elementInitData.groupName;
-        var onChange;
-        if(elementInitData.onChange) {
-            var onChange = (event) => {
-                if(event.target.checked) elementInitData.onChange(this.getForm(),this.getValue());
-            }
-        }
-        else {
-            onChange = null;
-        }
         var addButton = buttonInfo => {
             var radio = apogeeapp.ui.createElement("input");
             radio.type = "radio";
@@ -50,18 +41,14 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
                 value = buttonInfo; 
             }
             radio.value = value;
-            if(elementInitData.value == value) radio.checked = true;
-            if(onChange) {
-                radio.onchange = onChange;
-            }
             this.buttonList.push(radio);
             containerElement.appendChild(radio);
             containerElement.appendChild(document.createTextNode(label));
             containerElement.appendChild(document.createElement("br"));
-            
-            if(elementInitData.disabled) radio.disabled = true;
         };
-        elementInitData.entries.forEach(addButton);   
+        elementInitData.entries.forEach(addButton);
+        
+        this._postInstantiateInit(elementInitData);
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -76,16 +63,28 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
         }
     }   
 
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action
+    /** This method updates the list of checked entries. */
+    setValue(value) {
+        var checkedButton = this.buttonList.find(radioButton => (radioButton.value == value));
+        if(checkedButton) {
+            checkedButton.checked = true;
+        }
     }
-
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    updateValue(value) {
-        this.inputElement.value = value;
+    
+    /** This should be extended in elements to handle on change listeners. */
+    addOnChange(onChange) {
+        var onChangeImpl = () => {
+            onChange(this.getForm(),this.getValue());
+        }
+        this.buttonList.forEach(radioButton => radioButton.addEventListener("change",onChangeImpl));
+    }
+    
+    //===================================
+    // internal Methods
+    //==================================
+    
+    _setDisabled(isDisabled) { 
+        this.buttonList.forEach(radioButton => radioButton.disabled = isDisabled);
     }
 }
 

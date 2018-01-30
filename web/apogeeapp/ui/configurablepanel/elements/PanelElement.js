@@ -14,7 +14,9 @@ apogeeapp.ui.PanelElement = class extends apogeeapp.ui.ConfigurableElement {
         this.panel = new apogeeapp.ui.ConfigurablePanel(formInitData);
         var panelElement = this.panel.getElement();
         panelElement.className = "apogee_configurablePanelPanelLine";
-        containerElement.appendChild(panelElement);        
+        containerElement.appendChild(panelElement);  
+        
+        this._postInstantiateInit(elementInitData);
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -23,22 +25,23 @@ apogeeapp.ui.PanelElement = class extends apogeeapp.ui.ConfigurableElement {
         return this.panel.getValue();
     }   
 
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action
-    }
-
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
-    updateValue(value) {
-        for(var key in value) {
-            var keyValue = value[key];
-            var formEntry = this.panel.getEntry(key);
-            if(formEntry) {
-                formEntry.updateValue(keyValue);
-            }
-        }
+    setValue(value) {
+        this.panel.setValue(value);
+    }
+    
+    /** This should be extended in elements to handle on change listeners. */
+    addOnChange(onChange) {
+        this.panel.addOnChange(onChange);
+    }
+    
+    //===================================
+    // internal Methods
+    //==================================
+    
+    _setDisabled(isDisabled) { 
+        this.panel.setDisabled(isDisabled);
     }
 }
 

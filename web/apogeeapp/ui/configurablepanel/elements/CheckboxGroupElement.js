@@ -24,16 +24,6 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
         
         //check boxes
         this.checkboxList = [];
-        var onChange;
-        if(elementInitData.onChange) {
-            var onChange = () => {
-                elementInitData.onChange(this.getForm(),this.getValue());
-            }
-        }
-        else {
-            onChange = null;
-        }
-        
         var addCheckbox = checkboxInfo => {
             var checkbox = apogeeapp.ui.createElement("input");
             checkbox.type = "checkbox";
@@ -49,12 +39,6 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
                 value = checkboxInfo; 
             }
             checkbox.value = value;
-            if(elementInitData.value) {
-                if(elementInitData.value.indexOf(value) >= 0) checkbox.checked = true;
-            }
-            if(onChange) {
-                checkbox.onchange = onChange;
-            }
             this.checkboxList.push(checkbox);
             containerElement.appendChild(checkbox);
             containerElement.appendChild(document.createTextNode(label));
@@ -62,7 +46,9 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
             
             if(elementInitData.disabled) checkbox.disabled = true;
         };
-        elementInitData.entries.forEach(addCheckbox);       
+        elementInitData.entries.forEach(addCheckbox);   
+        
+        this._postInstantiateInit(elementInitData);
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -71,16 +57,25 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
         return this.checkboxList.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
     }   
 
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action
+    /** This method updates the list of checked entries. */
+    setValue(valueList) {
+        this.checkboxList.forEach(checkbox => checkbox.checked = (valueList.indexOf(checkbox.value) >= 0));
     }
-
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    updateValue(value) {
-        this.inputElement.value = value;
+    
+    /** This should be extended in elements to handle on change listeners. */
+    addOnChange(onChange) {
+        var onChangeImpl = () => {
+            onChange(this.getForm(),this.getValue());
+        }
+        this.checkboxList.forEach(checkbox => checkbox.addEventListener("change",onChangeImpl));
+    }
+    
+    //===================================
+    // internal Methods
+    //==================================
+    
+    _setDisabled(isDisabled) { 
+        this.checkboxList.forEach(checkbox => checkbox.disabled = isDisabled);
     }
 }
 

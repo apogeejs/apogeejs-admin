@@ -51,12 +51,17 @@ apogeeapp.ui.SubmitElement = class extends apogeeapp.ui.ConfigurableElement {
         else {
             this.cancelButton = null;
         }      
+        
+        this._postInstantiateInit(elementInitData);
     }
 
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action
+    //===================================
+    // internal Methods
+    //==================================
+    
+    _setDisabled(isDisabled) { 
+        if(this.submitButton) this.submitButton.disabled = isDisabled;
+        if(this.cancelButton) this.cancelButton.disabled = isDisabled;
     }
 }
  

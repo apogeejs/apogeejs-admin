@@ -21,12 +21,6 @@ apogeeapp.ui.TextareaElement = class extends apogeeapp.ui.ConfigurableElement {
         
         //text field
         this.inputElement = apogeeapp.ui.createElement("textarea");
-        if(elementInitData.value) {
-            this.inputElement.value = elementInitData.value;
-        }
-        if(elementInitData.disabled) {
-            this.inputElement.disabled = true;
-        }
         if(elementInitData.rows) {
             this.inputElement.rows = elementInitData.rows;
         }
@@ -35,13 +29,12 @@ apogeeapp.ui.TextareaElement = class extends apogeeapp.ui.ConfigurableElement {
         }
         containerElement.appendChild(this.inputElement); 
         
-        //events
-        if(elementInitData.onChange) {
-            this.addOnChange(elementInitData.onChange);
+        //non standard events
+        if(elementInitData.onChangeCompleted) {
+            this.addOnChangeCompleted(elementInitData.onChangeCompleted);
         }
-        if(elementInitData.onCharacter) {
-            this.addOnCharacter(elementInitData.onCharacter);
-        }
+        
+        this._postInstantiateInit(elementInitData);
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -50,37 +43,34 @@ apogeeapp.ui.TextareaElement = class extends apogeeapp.ui.ConfigurableElement {
         return this.inputElement.value.trim();
     }   
 
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action
-    }
-
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
-    updateValue(value) {
+    setValue(value) {
         this.inputElement.value = value;
     }
     
     /** This should be extended in elements to handle on change listeners. */
     addOnChange(onChange) {
-        this.inputElement.onchange = () => {
+        var onChangeImpl = () => {
             onChange(this.getForm(),this.getValue());
         }
+        this.inputElement.addEventListener("input",onChangeImpl);
     }
     
     /** This should be extended in elements to handle on change listeners. */
-    addOnKeyPress(onChange) {
-        this.inputElement.onkeypress = () => {
-            onChange(this.getForm(),this.getValue());
+    addOnChangeCompleted(onChangeCompleted) {
+        var onChangeCompletedImpl = () => {
+            onChangeCompleted(this.getForm(),this.getValue());
         }
+        this.inputElement.addEventListener("change",onChangeCompletedImpl);
     }
     
-    /** This should be extended in elements to handle on change listeners. */
-    addOnCharacter(onCharacter) {
-        this.inputElement.oninput = () => {
-            onCharacter(this.getForm(),this.getValue());
-        }
+    //===================================
+    // internal Methods
+    //==================================
+    
+    _setDisabled(isDisabled) { 
+        this.inputElement.disabled = isDisabled;
     }
 }
 

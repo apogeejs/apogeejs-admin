@@ -54,8 +54,8 @@ and open the template in the editor.
                 entry.label = "Test text entry: ";
                 entry.value = "xxx";
                 entry.key = "text1";
-                entry.onChange = (form,value) => alert("Value updated: " + value);
-                entry.onCharacter = (form,value) => alert("Key typed into field: " + value);
+                entry.onChangeCompleted = (form,value) => alert("Value updated: " + value);
+                entry.onChange = (form,value) => alert("Key typed into field: " + value);
                 layout.push(entry);
                 
                 //text entry
@@ -66,8 +66,8 @@ and open the template in the editor.
                 entry.cols = 30;
                 entry.rows = 5;
                 entry.key = "text2";
-                entry.onChange = (form,value) => alert("Value updated: " + value);
-                entry.onCharacter = (form,value) => alert("Key typed into field: " + value);
+                entry.onChangeCompleted = (form,value) => alert("Value updated: " + value);
+                entry.onChange = (form,value) => alert("Key typed into field: " + value);
                 layout.push(entry);
                 
                 //radio group 1
@@ -78,17 +78,6 @@ and open the template in the editor.
                 entry.entries = ["slop","freeze","dew"];
                 entry.value = "freeze";
                 entry.key = "rg1";
-                entry.onChange = (form,value) => alert("Value updated: " + value);
-                layout.push(entry);
-                
-                //radio group 1
-                entry = {};
-                entry.type = "radioButtonGroup";
-                entry.label = "Radio 2: ";
-                entry.groupName = "rg2";
-                entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]]
-                entry.value = "freeze";
-                entry.key = "rg2";
                 entry.onChange = (form,value) => alert("Value updated: " + value);
                 layout.push(entry);
                 
@@ -110,7 +99,18 @@ and open the template in the editor.
                 entry.key = "cb1";
                 entry.onChange = (form,value) => {
                     var childPanel = form.getEntry("childPanel");
-                    childPanel.setVisible(value);
+                    var state = value ? apogeeapp.ui.ConfigurableElement.STATE_NORMAL : apogeeapp.ui.ConfigurableElement.STATE_INACTIVE;
+                    childPanel.setState(state);
+                    
+//                    var newPanelValue = {
+//                        "d2":"dew",
+//                        "rg2":"dew",
+//                        "cbg2":["dew"],
+//                        "text3":"xyz",
+//                        "text4":"xyz"
+//                        
+//                    };
+//                    childPanel.setValue(newPanelValue);
                 };
                 layout.push(entry);
                 
@@ -144,7 +144,18 @@ and open the template in the editor.
                 entry.onChange = (form,value) => alert("Value updated: " + value);
                 childFormData.push(entry);
                 
-                                //checkbox group 2
+                //radio group 1
+                entry = {};
+                entry.type = "radioButtonGroup";
+                entry.label = "Radio 2: ";
+                entry.groupName = "rg2";
+                entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]]
+                entry.value = "freeze";
+                entry.key = "rg2";
+                entry.onChange = (form,value) => alert("Value updated: " + value);
+                childFormData.push(entry);
+                
+                //checkbox group 2
                 entry = {};
                 entry.type = "checkboxGroup";
                 entry.label = "Check 2: ";
@@ -154,6 +165,26 @@ and open the template in the editor.
                 entry.onChange = (form,value) => alert("Value updated: " + value);
                 childFormData.push(entry);
                 
+                //text entry
+                entry = {};
+                entry.type = "textField";
+                entry.label = "Test text entry: ";
+                entry.value = "xxx";
+                entry.key = "text3";
+                entry.onChangeCompleted = (form,value) => alert("Value updated: " + value);
+                childFormData.push(entry);
+                
+                //text entry
+                entry = {};
+                entry.type = "textarea";
+                entry.label = "Test text area: ";
+                entry.value = "asdfasdfasldfa;lskdjfas";
+                entry.cols = 30;
+                entry.rows = 5;
+                entry.key = "text4";
+                entry.onChangeCompleted = (form,value) => alert("Value updated: " + value);
+                childFormData.push(entry);        
+                                
                 //end title
                 entry = {};
                 entry.type = "heading";

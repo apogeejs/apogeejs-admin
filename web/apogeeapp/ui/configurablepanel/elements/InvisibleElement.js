@@ -9,7 +9,7 @@ apogeeapp.ui.InvisibleElement = class extends apogeeapp.ui.ConfigurableElement {
         //maybe we should have a way to not create the element in the first place.
         super(form,elementInitData,apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_INVISIBLE);
         
-        this.value = elementInitData.value;       
+        this._postInstantiateInit(elementInitData);
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -17,12 +17,6 @@ apogeeapp.ui.InvisibleElement = class extends apogeeapp.ui.ConfigurableElement {
     getValue() {
         return this.value;
     }   
-
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action
-    }
 
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
