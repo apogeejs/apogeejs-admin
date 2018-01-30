@@ -15,8 +15,7 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
             this.labelElement.innerHTML = elementInitData.label;
             containerElement.appendChild(this.labelElement);
             
-            this.labelSpacer = document.createElement("br");
-            containerElement.appendChild(this.labelSpacer);
+            if(!elementInitData.horizontal) containerElement.appendChild(document.createElement("br"));
         }
         else {
             this.labelElement = null;
@@ -44,7 +43,7 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
             this.buttonList.push(radio);
             containerElement.appendChild(radio);
             containerElement.appendChild(document.createTextNode(label));
-            containerElement.appendChild(document.createElement("br"));
+            if(!elementInitData.horizontal) containerElement.appendChild(document.createElement("br"));
         };
         elementInitData.entries.forEach(addButton);
         

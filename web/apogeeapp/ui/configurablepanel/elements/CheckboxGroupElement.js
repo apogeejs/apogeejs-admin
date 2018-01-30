@@ -15,8 +15,7 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
             this.labelElement.innerHTML = elementInitData.label;
             containerElement.appendChild(this.labelElement);
             
-            this.labelSpacer = document.createElement("br");
-            containerElement.appendChild(this.labelSpacer);
+            if(!elementInitData.horizontal) containerElement.appendChild(document.createElement("br"));
         }
         else {
             this.labelElement = null;
@@ -42,7 +41,7 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
             this.checkboxList.push(checkbox);
             containerElement.appendChild(checkbox);
             containerElement.appendChild(document.createTextNode(label));
-            containerElement.appendChild(document.createElement("br"));
+            if(!elementInitData.horizontal) containerElement.appendChild(document.createElement("br"));
             
             if(elementInitData.disabled) checkbox.disabled = true;
         };

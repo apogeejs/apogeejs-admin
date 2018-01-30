@@ -88,6 +88,7 @@ and open the template in the editor.
                 entry.entries = ["slop","freeze","dew"];
                 entry.value = ["freeze","slop"];
                 entry.key = "cbg1";
+                entry.horizontal = true;
                 entry.onChange = (form,value) => alert("Value updated: " + value);
                 layout.push(entry);
                 
@@ -151,6 +152,7 @@ and open the template in the editor.
                 entry.groupName = "rg2";
                 entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]]
                 entry.value = "freeze";
+                entry.horizontal = true;
                 entry.key = "rg2";
                 entry.onChange = (form,value) => alert("Value updated: " + value);
                 childFormData.push(entry);
