@@ -10,10 +10,13 @@
 }
 .apogee_configurablePanelLine_standard {
     position: relative;
-    margin:10px;
+    padding:5px;
+    margin:0px;
 }
-.apogee_configurablePanelPanelLine_noMargin {
+.apogee_configurablePanelPanelLine_noMaring {
     position: relative;
+    padding:0px;
+    margin:0px;
 }
 .apogee_configurablePanelPanelLine_hidden {
     position: relative;

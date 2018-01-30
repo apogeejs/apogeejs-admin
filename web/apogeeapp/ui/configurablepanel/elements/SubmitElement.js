@@ -70,5 +70,5 @@ apogeeapp.ui.SubmitElement.DEFAULT_CANCEL_LABEL = "Cancel";
 
 apogeeapp.ui.SubmitElement.TYPE_NAME = "submit";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.SubmitElement.TYPE_NAME,apogeeapp.ui.SubmitElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.SubmitElement);
 

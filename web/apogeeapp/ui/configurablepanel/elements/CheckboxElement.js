@@ -59,4 +59,4 @@ apogeeapp.ui.CheckboxElement = class extends apogeeapp.ui.ConfigurableElement {
 
 apogeeapp.ui.CheckboxElement.TYPE_NAME = "checkbox";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.CheckboxElement.TYPE_NAME,apogeeapp.ui.CheckboxElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.CheckboxElement);

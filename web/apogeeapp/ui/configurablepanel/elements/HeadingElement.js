@@ -34,6 +34,6 @@ apogeeapp.ui.HeadingElement.DEFAULT_HEADING_LEVEL = 2;
 
 apogeeapp.ui.HeadingElement.TYPE_NAME = "heading";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.HeadingElement.TYPE_NAME,apogeeapp.ui.HeadingElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.HeadingElement);
 
 

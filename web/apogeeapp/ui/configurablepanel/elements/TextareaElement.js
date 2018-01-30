@@ -76,4 +76,4 @@ apogeeapp.ui.TextareaElement = class extends apogeeapp.ui.ConfigurableElement {
 
 apogeeapp.ui.TextareaElement.TYPE_NAME = "textarea";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.TextareaElement.TYPE_NAME,apogeeapp.ui.TextareaElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.TextareaElement);

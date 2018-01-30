@@ -27,4 +27,4 @@ apogeeapp.ui.InvisibleElement = class extends apogeeapp.ui.ConfigurableElement {
 
 apogeeapp.ui.InvisibleElement.TYPE_NAME = "invisible";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.InvisibleElement.TYPE_NAME,apogeeapp.ui.InvisibleElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.InvisibleElement);

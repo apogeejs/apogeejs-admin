@@ -79,8 +79,9 @@ apogeeapp.ui.ConfigurablePanel = class {
     }
     
     /** This method is used to register configurable elements with the panel */
-    static addConfigurableElement(type,constructor) {
-        apogeeapp.ui.ConfigurablePanel.elementMap[type] = constructor;
+    static addConfigurableElement(constructorFunction) {
+        var type = constructorFunction.TYPE_NAME;
+        apogeeapp.ui.ConfigurablePanel.elementMap[type] = constructorFunction;
     }
     
     //=================================

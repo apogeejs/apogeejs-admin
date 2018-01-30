@@ -70,4 +70,4 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
 
 apogeeapp.ui.TextFieldElement.TYPE_NAME = "textField";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.TextFieldElement.TYPE_NAME,apogeeapp.ui.TextFieldElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.TextFieldElement);

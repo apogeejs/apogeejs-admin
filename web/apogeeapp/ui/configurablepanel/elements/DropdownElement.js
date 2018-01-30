@@ -73,4 +73,4 @@ apogeeapp.ui.DropdownElement = class extends apogeeapp.ui.ConfigurableElement {
 
 apogeeapp.ui.DropdownElement.TYPE_NAME = "dropdown";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.DropdownElement.TYPE_NAME,apogeeapp.ui.DropdownElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.DropdownElement);

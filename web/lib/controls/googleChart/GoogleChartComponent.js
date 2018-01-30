@@ -38,7 +38,7 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
             google.charts.setOnLoadCallback(onLibLoad);
         }
         
-        this.storedData = apogeeapp.app.GoogleChartComponent.DEFAULT_STORED_DATA;
+        this._setStoredData(apogeeapp.app.GoogleChartComponent.DEFAULT_STORED_DATA);
         
         //add a cleanup and save actions
         this.addOpenAction(apogeeapp.app.GoogleChartComponent.readFromJson);
@@ -49,27 +49,10 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
     * easily configurable data display. */
     getOutputDisplay(viewMode) {
         this.chartDisplay = new apogeeapp.app.GoogleChartDisplay(viewMode,this.getMember(),this.chartType);
+        //set the config data
+        this.chartDisplay.setChartType(this.chartType);
+        this.chartDisplay.setHasHeaderRow(this.hasHeaderRow);
         return this.chartDisplay;
-    }
-    
-
-    getChartType() {
-        return this.chartType;
-    }
-
-    setChartType(chartType) {
-        this.chartType = chartType;
-        if(this.chartDisplay) {
-            this.chartDisplay.setChartType(chartType);
-        }
-    }
-
-    addPropFunction(component,values) {
-        values.chartType = component.getChartType();
-    }
-
-    updateProperties(component,oldValues,newValues) {
-        component.setChartType(newValues.chartType);
     }
 
     //==================================
@@ -88,7 +71,7 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
             var callbacks = {
                 getData: () => this.storedData,
                 getEditOk: () => true,
-                saveData: (formData) => this.onSubmit(formData)
+                saveData: (formData) => this._onSubmit(formData)
             }
             return new apogeeapp.app.ConfigurableFormEditor(viewMode,callbacks,apogeeapp.app.GoogleChartComponent.FORM_LAYOUT);
         }
@@ -97,32 +80,57 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
         }
     }
     
-    onSubmit(formData) {
+    //=====================================
+    // Private Methods
+    //=====================================
+    
+    _setStoredData(formData) {
         this.storedData = formData;
-        //options may be the empty string - map this to undefined
+        this.chartType = formData.chartType;
+        this.hasHeaderRow = formData.headerRow;
+        if(this.chartDisplay) {
+            this.chartDisplay.setChartType(this.chartType);
+            this.chartDisplay.setHasHeaderRow(this.hasHeaderRow);
+        }
+    }
+    
+    _onSubmit(formData) {
+        
+        //there is one thing I am not sure I like here - the form data, which translates 
+        //directly to code, is stored separately from the code, rather than reverse engineering the code.
+        //One alternate option is to encode the relevent form data as a comment in the code, but I am
+        //not sure this is any better, since the same information is stored twice. At least it is
+        //in thge same place though.
+        this._setStoredData(formData);
+        
+        //options or columns may be the empty string - map this to undefined
         var options = formData.options.trim();
         if(options == "") options = "undefined";
+        var columns = formData.columns.trim();
+        if(columns == "") columns = "undefined";
+        var rows = formData.rows.trim();
         
-        var dataValid = ((formData.rows)&&(formData.rows != "")); 
+        var dataValid = (rows != ""); 
 
-        var member = this.getMember();
+        //compile the function body
         var functionBody = (dataValid) ?
 `
 return {
-    "columns": ${formData.columns},
-    "rows": ${formData.rows},
+    "columns": ${columns},
+    "rows": ${rows},
     "options": ${options}
 };` :
 "";
-        
+        //set the code
+        var member = this.getMember();
         var argList = member.getArgList();
         var supplementalCode = member.getSupplementalCode();
         return apogeeapp.app.dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode); 
     }       
     
-    onCancel(panel) {
-        panel.setValue(this.storedData);
-    }
+    //=====================================
+    // Static Methods
+    //=====================================
     
     static writeToJson(json) {
         json.formData = this.storedData;
@@ -130,7 +138,7 @@ return {
 
     static readFromJson(json) {
         if(json.formData !== undefined) {
-            this.storedData = json.formData;
+            this._setStoredData(json.formData);
         }
     }
             
@@ -141,13 +149,6 @@ return {
 apogeeapp.app.BasicControlComponent.attachStandardStaticProperties(apogeeapp.app.GoogleChartComponent,
         "GoogleChartComponent",
         "apogeeapp.app.GoogleChartComponent");
-        
-apogeeapp.app.GoogleChartComponent.AREA_CHART = "area";
-apogeeapp.app.GoogleChartComponent.BAR_CHART = "bar";
-apogeeapp.app.GoogleChartComponent.LINE_CHART = "line";
-apogeeapp.app.GoogleChartComponent.SCATTER_CHART = "scatter";
-
-apogeeapp.app.GoogleChartComponent.DEFAULT_CHART = apogeeapp.app.GoogleChartComponent.LINE_CHART;
 
 apogeeapp.app.GoogleChartComponent.VIEW_INPUT_FORM = "Input";
 
@@ -162,13 +163,53 @@ apogeeapp.app.GoogleChartComponent.TABLE_EDIT_SETTINGS = {
     "defaultView": apogeeapp.app.BasicControlComponent.VIEW_OUTPUT
 }
 
-apogeeapp.app.GoogleChartComponent.DEFAULT_STORED_DATA = {};
+apogeeapp.app.GoogleChartComponent.DEFAULT_STORED_DATA = {
+    chartType: "line",
+    hasHeaderRow: false
+};
+
+//format for entries below [ display name , enumeration name, Google constructor name] 
+apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO = [
+    ["Annotation","annotation","AnnotationChart"],
+    ["Area","area","AreaChart"],
+    ["Bar","bar","BarChart"],
+    ["Bubble","bubble","BubbleChart"],
+    ["Calendar","calendar","Calendar"],
+    ["Candlestick","candlestick","CandlestickChart"],
+    ["Column","column","ColumnChart"],
+    ["Combo","combo","ComboChart"],
+    ["Gannt","gannt","Gannt"],
+    ["Gauge","gauge","Gauge"],
+    ["GeoChart","geochart","GeoChart"],
+    ["Histogram","histogram","Histogram"],
+    ["Line","line","LineChart"],
+    ["Map","map","Map"],
+    ["Org","org","OrgChart"],
+    ["Pie","pie","PieChart"],
+    ["Sankey","sankey","Sankey"],
+    ["Scatter","scatter","ScatterChart"],
+    ["Stepped Area","steppedArea","SteppedAreaCharts"],
+    ["Table","table","Table"],
+    ["Timeline","timeline","Timeline"],
+    ["Tree Map","treeMap","TreeMap"],
+    ["Word Tree","wordTree","WordTree"]
+];
+
+apogeeapp.app.GoogleChartComponent.CHART_SELECT_FORM_INFO = apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO.map(entry => entry.slice(0,2));
 
 apogeeapp.app.GoogleChartComponent.FORM_LAYOUT = [
     {
-        type: "heading",
-        level: 3,
-        text: "Chart Inputs"
+        type: "spacer"
+    },
+    {   
+        type: "dropdown",
+        label: "Chart Type: ",
+        entries: apogeeapp.app.GoogleChartComponent.CHART_SELECT_FORM_INFO,
+        value: "<SET CURRENT>", //set current value
+        key: "chartType",
+    },
+    {
+        type: "spacer"
     },
     {   
         type: "textField",
@@ -184,25 +225,16 @@ apogeeapp.app.GoogleChartComponent.FORM_LAYOUT = [
         type: "textField",
         label: "Options: ",
         key: "options",
-    }
-];
-
-//----------------------------
-// methods to add a custom property
-//----------------------------
-
-apogeeapp.app.GoogleChartComponent.propertyDialogLines = [
+    },
     {
-        "type":"dropdown",
-        "heading":"Chart Type: ",
-        "entries":[
-            apogeeapp.app.GoogleChartComponent.AREA_CHART,
-            apogeeapp.app.GoogleChartComponent.BAR_CHART,
-            apogeeapp.app.GoogleChartComponent.LINE_CHART,
-            apogeeapp.app.GoogleChartComponent.SCATTER_CHART
-        ],
-        "resultKey":"chartType"
-    }
+        type: "spacer"
+    },
+    {   
+        type: "checkbox",
+        label: "Columns included as row header: ",
+        value: "<SET CURRENT>", //set current value
+        key: "headerRow",
+    },
 ];
 
 //-----------------
@@ -221,7 +253,12 @@ else {
 //-----------------------
 
 /** Extend ths JsDataDisplay */
-apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisplay {;
+apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
+    
+    //=====================================
+    // Public Methods
+    //=====================================
+    
     constructor(viewMode,member,chartType) {
         super(viewMode,apogeeapp.app.NonEditorDataDisplay.SCROLLING);
     
@@ -237,20 +274,12 @@ apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisp
         }
     }
 
-    setChartType(chartType) {
-        this.chartType = chartType;
-        if(this.chart) {
-            this.chart = null;
-            this.displayData();
-        }
-    }
-
     showData() {
         this.data = this.member.getData();
         this.dataLoaded = true;
 
         if(this.libLoaded) {
-            this.displayData();
+            this._displayData();
         }
     }
 
@@ -258,17 +287,37 @@ apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisp
         this.libLoaded = true;
 
         if(this.dataLoaded) {
-            this.displayData();
+            this._displayData();
         }
     }
+    
+    setChartType(chartType) {
+        if(this.chartType == chartType) return;
+        
+        this.chartType = chartType;
+        if(this.chart) {
+            this.chart = null;
+        }
+    }
+    
+    setHasHeaderRow(hasHeaderRow) {
+        if(this.hasHeaderRow == hasHeaderRow) return;
+        
+        this.hasHeaderRow = hasHeaderRow;
+        if(this.chart) {
+            this.chart = null;
+        }
+    }
+    
+    //=====================================
+    // Private Methods
+    //=====================================
 
-    displayData() {
+    _displayData() {
         if(!this.data) return;
 
-        //if((this.data.rows === undefined)||(this.data.columns === undefined)) return;
-
         if(!this.chart) {
-            this.chart = this.instantiateChart();
+            this.chart = this._instantiateChart();
             if(!this.chart) return null;
         }
 
@@ -276,44 +325,40 @@ apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisp
         if(!chartOptions) chartOptions = {};
 
         try {
-            var chartData = this.createDataTable(this.data.columns,this.data.rows);
+            var chartData = this._createDataTable(this.data.columns,this.data.rows,this.hasHeaderRow);
             this.chart.draw(chartData, chartOptions);
         }
         catch(error) {
-            console.error(error.stack);
+            alert("Error rendering chart: " + error.message);
+            this.chart.clearChart();
         }
     }
 
-    instantiateChart() {
+    _instantiateChart() {
         var element = this.getElement();
-        switch(this.chartType) {
-            case apogeeapp.app.GoogleChartComponent.AREA_CHART:
-                return new google.visualization.AreaChart(element);
-
-            case apogeeapp.app.GoogleChartComponent.BAR_CHART:
-                return new google.visualization.BarChart(element);
-
-            case apogeeapp.app.GoogleChartComponent.LINE_CHART:
-                return new google.visualization.LineChart(element);
-
-            case apogeeapp.app.GoogleChartComponent.SCATTER_CHART:
-                return new google.visualization.ScatterChart(element);
-
-            default:
-                console.log("Unsupported chart type: " + this.chartType);
-                return null;
+        var chartInfoEntry = apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO.find(entry => (entry[1] == this.chartType) );
+        if(!chartInfoEntry) {
+            alert("Chart type not found: " + this.chartType);
+        }
+        else {
+            var constructorName = chartInfoEntry[2];
+            return new google.visualization[constructorName](element);
         }
     }
 
     /** This is constructs the data table from the given data. */
-    createDataTable(columns,rows) {
-        var dataTable = new google.visualization.DataTable();
-        for(var i = 0; i < columns.length; i++) {
-            var columnInfo = columns[i];
-            dataTable.addColumn(columnInfo.type,columnInfo.name);
+    _createDataTable(columns,rows,hasHeaderRow) {
+        var noHeaderRow;
+        var combinedData;
+        if((hasHeaderRow)||(columns === undefined)){
+            combinedData = rows;
+            noHeaderRow = !hasHeaderRow; 
         }
-        dataTable.addRows(rows);
-
+        else {
+            combinedData = [columns].concat(rows);
+            noHeaderRow = false;    
+        }
+        var dataTable = google.visualization.arrayToDataTable(combinedData,noHeaderRow);
         return dataTable;
     }
 }

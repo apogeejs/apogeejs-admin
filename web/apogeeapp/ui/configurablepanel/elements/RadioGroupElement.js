@@ -89,4 +89,4 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
 
 apogeeapp.ui.RadioGroupElement.TYPE_NAME = "radioButtonGroup";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.RadioGroupElement.TYPE_NAME,apogeeapp.ui.RadioGroupElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.RadioGroupElement);

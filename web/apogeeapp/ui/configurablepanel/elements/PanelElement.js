@@ -47,4 +47,4 @@ apogeeapp.ui.PanelElement = class extends apogeeapp.ui.ConfigurableElement {
 
 apogeeapp.ui.PanelElement.TYPE_NAME = "panel";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.PanelElement.TYPE_NAME,apogeeapp.ui.PanelElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.PanelElement);

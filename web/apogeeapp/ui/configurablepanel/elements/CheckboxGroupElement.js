@@ -80,4 +80,4 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
 
 apogeeapp.ui.CheckboxGroupElement.TYPE_NAME = "checkboxGroup";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.CheckboxGroupElement.TYPE_NAME,apogeeapp.ui.CheckboxGroupElement);
+apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.CheckboxGroupElement);
