@@ -19,6 +19,10 @@ apogeeapp.app.EditorDataDisplay = class {
         this.callbacks = callbacks;
     }
 
+    inEditMode() {
+        return this.editMode;
+    }
+    
     save() {
         var text = this.getEditorData();
         var saveComplete;

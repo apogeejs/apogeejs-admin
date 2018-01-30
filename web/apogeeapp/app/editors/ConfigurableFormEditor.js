@@ -4,30 +4,35 @@
  * @param {type} callbacks - {getData,getEditOk,setData}; format for data is text
  * @param {type} formLayout - the layout for the configurable panel
  */
-apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.NonEditorDataDisplay {
+apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.EditorDataDisplay {
     
-    constructor(viewMode,getFormData,formLayout) {
-        super(viewMode,apogeeapp.app.EditorDataDisplay.SCROLLING);
-        
-        this.getFormData = getFormData;
+    constructor(viewMode,callbacks,formLayout) {
+        super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.SCROLLING);
         
         var containerDiv = this.getElement();
         
         this.panel = new apogeeapp.ui.ConfigurablePanel(formLayout);    
         var mainDiv = document.getElementById("mainDiv");
         containerDiv.appendChild(this.panel.getElement());
+        
+        var onChange = (form,value) => {
+            if(!this.inEditMode()) {
+                this.onTriggerEditMode();
+            }
+        } 
+        this.panel.addOnChange(onChange);
     }
     
     getPanel() {
         return this.panel;
     }
-
+    
     getEditorData() {
         return this.panel.getValue();
     }
     
-    showData() {
-        this.panel.setValue(this.getFormData());
+    setEditorData(data) {
+        this.panel.setValue(data);
     }
     
 //    endEditMode() {

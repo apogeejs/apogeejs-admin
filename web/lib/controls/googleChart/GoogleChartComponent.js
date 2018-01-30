@@ -85,13 +85,12 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
     getDataDisplay(viewMode,viewType) {
         
         if(viewType == apogeeapp.app.GoogleChartComponent.VIEW_INPUT_FORM) {
-            var getFormData = () => this.storedData;
-            var dataDisplay = new apogeeapp.app.ConfigurableFormEditor(viewMode,getFormData,apogeeapp.app.GoogleChartComponent.FORM_LAYOUT);
-            var panel = dataDisplay.getPanel();
-            var onSubmit = (formData) => this.onSubmit(formData);
-            var onCancel = () => this.onCancel(panel);
-            panel.addSubmit(onSubmit,onCancel,"Save","Reset");
-            return dataDisplay;
+            var callbacks = {
+                getData: () => this.storedData,
+                getEditOk: () => true,
+                saveData: (formData) => this.onSubmit(formData)
+            }
+            return new apogeeapp.app.ConfigurableFormEditor(viewMode,callbacks,apogeeapp.app.GoogleChartComponent.FORM_LAYOUT);
         }
         else {
             return super.getDataDisplay(viewMode,viewType);
@@ -100,6 +99,9 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
     
     onSubmit(formData) {
         this.storedData = formData;
+        //options may be the empty string - map this to undefined
+        var options = formData.options.trim();
+        if(options == "") options = "undefined";
         
         var dataValid = ((formData.rows)&&(formData.rows != "")); 
 
@@ -109,7 +111,7 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
 return {
     "columns": ${formData.columns},
     "rows": ${formData.rows},
-    "options": ${formData.options}
+    "options": ${options}
 };` :
 "";
         
