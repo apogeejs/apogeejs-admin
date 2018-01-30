@@ -181,7 +181,7 @@ apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO = [
     ["Line","line","LineChart"],
     ["Pie","pie","PieChart"],
     ["Scatter","scatter","ScatterChart"],
-    ["Stepped Area","steppedArea","SteppedAreaCharts"]
+    ["Stepped Area","steppedArea","SteppedAreaChart"]
 ];
 
 apogeeapp.app.GoogleChartComponent.CHART_SELECT_FORM_INFO = apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO.map(entry => entry.slice(0,2));
