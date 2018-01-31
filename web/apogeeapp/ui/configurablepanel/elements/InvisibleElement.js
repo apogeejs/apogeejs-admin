@@ -20,7 +20,7 @@ apogeeapp.ui.InvisibleElement = class extends apogeeapp.ui.ConfigurableElement {
 
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
-    updateValue(value) {
+    setValue(value) {
         this.value = value;
     }
 }

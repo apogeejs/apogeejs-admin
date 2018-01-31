@@ -48,7 +48,7 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
     /** Implement the method to get the data display. JsDataDisplay is an 
     * easily configurable data display. */
     getOutputDisplay(viewMode) {
-        this.chartDisplay = new apogeeapp.app.GoogleChartDisplay(viewMode,this.getMember(),this.chartType);
+        this.chartDisplay = new apogeeapp.app.GoogleChartDisplay(viewMode,this.getMember());
         //set the config data
         this.chartDisplay.setChartType(this.chartType);
         this.chartDisplay.setHasHeaderRow(this.hasHeaderRow);
@@ -248,11 +248,10 @@ apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisp
     // Public Methods
     //=====================================
     
-    constructor(viewMode,member,chartType) {
+    constructor(viewMode,member) {
         super(viewMode,apogeeapp.app.NonEditorDataDisplay.SCROLLING);
     
         this.member = member;
-        this.chartType = chartType;
 
         if(!google.visualization) {
             //register this instance
