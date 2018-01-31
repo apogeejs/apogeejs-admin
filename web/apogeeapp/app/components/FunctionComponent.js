@@ -32,21 +32,27 @@ apogeeapp.app.FunctionComponent.prototype.getTableEditSettings = function() {
     return apogeeapp.app.FunctionComponent.TABLE_EDIT_SETTINGS;
 }
 
-/** This method should be implemented to retrieve a view mode of the give type. 
+/** This method should be implemented to retrieve a data display of the give type. 
  * @protected. */
-apogeeapp.app.FunctionComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
+apogeeapp.app.FunctionComponent.prototype.getDataDisplay = function(viewMode,viewType) {
+	
+    var callbacks;
 	
 	//create the new view element;
 	switch(viewType) {
 			
 		case apogeeapp.app.FunctionComponent.VIEW_CODE:
-			return new apogeeapp.app.AceCodeMode(editComponentDisplay);
+            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member);
+			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
 			
 		case apogeeapp.app.FunctionComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new apogeeapp.app.AceSupplementalMode(editComponentDisplay);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
             
         case apogeeapp.app.FunctionComponent.VIEW_DESCRIPTION:
-			return new apogeeapp.app.AceDescriptionMode(editComponentDisplay);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
+            //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
+            return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
 			
 		default:
 //temporary error handling...

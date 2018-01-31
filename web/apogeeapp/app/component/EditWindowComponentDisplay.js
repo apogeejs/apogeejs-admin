@@ -79,6 +79,10 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.getMember = function() {
     return this.member;
 }
 
+apogeeapp.app.EditWindowComponentDisplay.prototype.getDataDisplay = function(viewMode,viewType) {
+    return this.component.getDataDisplay(viewMode,viewType);
+}
+
 apogeeapp.app.EditWindowComponentDisplay.prototype.deleteDisplay = function() {
     //dispose any view elements
     for(var viewType in this.viewModeElements) {
@@ -322,7 +326,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setViewType = function(viewTy
     
     this.viewModeElement = this.viewModeElements[viewType];
     if(!this.viewModeElement) {
-        this.viewModeElement = this.component.getViewModeElement(this,viewType);
+        this.viewModeElement = new apogeeapp.app.ViewMode(this,viewType);
         this.viewModeElements[viewType] = this.viewModeElement;
     }
     if(this.viewModeElement) {

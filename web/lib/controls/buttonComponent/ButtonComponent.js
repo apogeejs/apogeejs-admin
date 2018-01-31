@@ -1,81 +1,24 @@
 (function() {
 
 /** This is a simple custom resource component example. */
-apogeeapp.app.ButtonComponent = function(workspaceUI,control) {
-    //extend edit component
-    apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,apogeeapp.app.ButtonComponent);
-};
+apogeeapp.app.ButtonComponent = class extends apogeeapp.app.BasicControlComponent {
+    constructor(workspaceUI,control) {
+        super(workspaceUI,control,apogeeapp.app.ButtonComponent);
+    }
 
-apogeeapp.app.ButtonComponent.prototype = Object.create(apogeeapp.app.BasicControlComponent.prototype);
-apogeeapp.app.ButtonComponent.prototype.constructor = apogeeapp.app.ButtonComponent;
+    /** Implement the method to get the output data display. This should typically 
+     * extend NonEditorDataDisplay. */
+    getOutputDisplay(viewMode) {
+        return new apogeeapp.app.ButtonDisplay(viewMode,this.getMember());
+    }
+    
+}
 
 //attach the standard static values to the static object (this can also be done manually)
 apogeeapp.app.BasicControlComponent.attachStandardStaticProperties(apogeeapp.app.ButtonComponent,
         "ButtonComponent",
         "apogeeapp.app.ButtonComponent");
-
-/** Implement the method to get the data display. JsDataDisplay is an 
- * easily configurable data display. */
-apogeeapp.app.ButtonComponent.prototype.getDataDisplay = function(viewMode) {
-    return new apogeeapp.app.ButtonDisplay(viewMode);
-}
-
-/** TO use JsDataDisplay, implement a class with the following methods, all optional:
- * init(outputElement,outputMode);
- * setData(data,outputElement,outputMode);
- * requestInactive(outputElement,outputMode);
- * onHide(outputElement,outputMode);
- * destroy(outputElement,outputMode);
- */
-apogeeapp.app.ButtonDisplay = function(viewMode) {
-    //extend edit component
-    apogeeapp.app.JsDataDisplay.call(this,viewMode);
-    
-    var button = document.createElement("button");
-    button.innerHTML = "Click me!";
-    var instance = this;
-    button.onclick = function() {
-        instance.buttonClicked();      
-    }  
-    
-    var outputElement = this.getElement();
-    outputElement.appendChild(button);
-}
-
-apogeeapp.app.ButtonDisplay.prototype = Object.create(apogeeapp.app.JsDataDisplay.prototype);
-apogeeapp.app.ButtonDisplay.prototype.constructor = apogeeapp.app.ButtonDisplay;
-
-
-apogeeapp.app.ButtonDisplay.prototype.buttonClicked = function() {
-    alert("The current value is: " + this.data);
-}
-
-apogeeapp.app.ButtonDisplay.prototype.showData = function(data) {
-    console.log("NewButtonControl.setData");
-    this.data = data;
-}
-
-apogeeapp.app.ButtonDisplay.prototype.isCloseOk = function() {
-    console.log("NewButtonControl.isCloseOk");
-    return apogeeapp.app.ViewMode.CLOSE_OK;
-}
-
-apogeeapp.app.ButtonDisplay.prototype.onLoad = function() {
-    console.log("NewButtonControl.onHide");
-}
-
-apogeeapp.app.ButtonDisplay.prototype.onUnload = function() {
-    console.log("NewButtonControl.onHide");
-}
-
-apogeeapp.app.ButtonDisplay.prototype.onResize = function() {
-    console.log("NewButtonControl.onHide");
-}
-
-apogeeapp.app.ButtonDisplay.prototype.destroy = function() {
-    console.log("NewButtonControl.destroyed");
-}
-
+        
 //-----------------
 //auto registration
 //-----------------
@@ -86,6 +29,73 @@ if(app) {
 else {
     console.log("Component could not be registered because no Apogee app instance was available at component load time: apogeeapp.app.ButtonComponent");
 }
+
+
+/** TO use JsDataDisplay, implement a class with the following methods, all optional:
+ * init(outputElement,outputMode);
+ * setData(data,outputElement,outputMode);
+ * requestInactive(outputElement,outputMode);
+ * onHide(outputElement,outputMode);
+ * destroy(outputElement,outputMode);
+ */
+apogeeapp.app.ButtonDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
+    
+    constructor(viewMode,member) {
+        //extend edit component
+        super(viewMode);
+    
+        this.member = member;
+        
+        //populate the UI element
+        this.button = document.createElement("button");
+        this.button.innerHTML = "Click me!";
+        this.button.onclick = () => this.buttonClicked();      
+    
+        var outputElement = this.getElement();
+        outputElement.appendChild(this.button);
+    }
+    
+    buttonClicked() {
+        alert("The current value is: " + this.msg);
+    }
+    
+    /** This is called when the control object updates. */
+    showData() {
+        console.log("NewButtonControl.setData");
+        var data = this.member.getData();
+        
+        if(data) {
+            this.msg = data.msg;
+            var label = data.label;
+            if(label !== undefined) {
+                this.button.innerHTML = label;
+            }
+        }
+    }
+
+    isCloseOk() {
+        console.log("NewButtonControl.isCloseOk");
+        return apogeeapp.app.ViewMode.CLOSE_OK;
+    }
+
+    onLoad() {
+        console.log("NewButtonControl.onHide");
+    }
+
+    onUnload() {
+        console.log("NewButtonControl.onHide");
+    }
+
+    onResize() {
+        console.log("NewButtonControl.onHide");
+    }
+
+    destroy() {
+        console.log("NewButtonControl.destroyed");
+    }
+}
+
+
 
 //end definition
 })();

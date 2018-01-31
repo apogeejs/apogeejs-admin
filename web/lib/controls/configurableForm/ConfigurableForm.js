@@ -1,52 +1,25 @@
 (function() {
 
 /** This is a simple custom resource component example. */
-apogeeapp.app.ConfigurableForm = function(workspaceUI,control) {
-    apogeeapp.app.BasicControlComponent.call(this,workspaceUI,control,apogeeapp.app.ConfigurableForm);
-};
+apogeeapp.app.ConfigurableForm = class extends apogeeapp.app.BasicControlComponent {
+    
+    constructor(workspaceUI,control) {
+        super(workspaceUI,control,apogeeapp.app.ConfigurableForm);
+    }
 
-apogeeapp.app.ConfigurableForm.prototype = Object.create(apogeeapp.app.BasicControlComponent.prototype);
-apogeeapp.app.ConfigurableForm.prototype.constructor = apogeeapp.app.ConfigurableForm;
+    /** Implement the method to get the data display. JsDataDisplay is an 
+     * easily configurable data display. */
+    getOutputDisplay(viewMode) {
+        return new apogeeapp.app.ConfigurableFormDisplay(viewMode,this.getMember());
+    }
+}
+
 
 //attach the standard static values to the static object (this can also be done manually)
 apogeeapp.app.BasicControlComponent.attachStandardStaticProperties(apogeeapp.app.ConfigurableForm,
         "ConfigurableForm",
         "apogeeapp.app.ConfigurableForm");
-
-/** Implement the method to get the data display. JsDataDisplay is an 
- * easily configurable data display. */
-apogeeapp.app.ConfigurableForm.prototype.getDataDisplay = function(viewMode) {
-    return new apogeeapp.app.ConfigurableFormDisplay(viewMode);
-}
-
-/** Extend ths JsDataDisplay */
-apogeeapp.app.ConfigurableFormDisplay = function(viewMode) {
-    //extend edit component
-    apogeeapp.app.JsDataDisplay.call(this,viewMode);
-    
-    //dummy initial view
-    this.previousSetView = null;
-}
-
-apogeeapp.app.ConfigurableFormDisplay.prototype = Object.create(apogeeapp.app.JsDataDisplay.prototype);
-apogeeapp.app.ConfigurableFormDisplay.prototype.constructor = apogeeapp.app.ConfigurableFormDisplay;
-
-
-apogeeapp.app.ConfigurableFormDisplay.prototype.showData = function(data) {
-    this.data = data;
-    //load or reload form
-    if(this.data) {
-        this.loadForm();
-    }
-}
         
-apogeeapp.app.ConfigurableFormDisplay.prototype.onLoad = function() {
-    this.containerLoaded = true;
-    if((this.data)&&(!this.form)) {
-       this.loadForm(); 
-    }
-}
-
 //-----------------
 //auto registration
 //-----------------
@@ -58,85 +31,113 @@ else {
     console.log("Component could not be registered because no Apogee app instance was available at component load time: apogeeapp.app.ConfigurableForm");
 }
 
-//====================================================
-// Form Generator Code
-//====================================================
 
-
-apogeeapp.app.ConfigurableFormDisplay.prototype.loadForm = function() {
+/** Extend ths JsDataDisplay */
+apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
+    constructor(viewMode,member) {
+        super(viewMode);
     
-    try {
-        var layout = this.data.layout;
-
-        //make sure valid data has been set
-        if(!layout) return;
-
-        var onSubmit = this.data.onSubmit;
-        var onCancel = this.data.onCancel;
-
-        var lineObjects = [];
-
-        //this is the action for the form
-        var formActions = {};
-
-        //cancel
-        formActions.onCancel = function() {
-            try {
-                onCancel();
-            }
-            catch(error) {
-                var message = error.message ? error.message : "unknown error";
-                alert("Error canceling form: " + message)
-            }
-        }
-        //submit
-        formActions.onSubmit = function() {
-            try {
-                //load the form data
-                var formData = {};
-                var lineObject;
-                for(var i = 0; i < lineObjects.length; i++) {
-                    lineObject = lineObjects[i];
-                    if(lineObject.addToResult) {
-                        lineObject.addToResult(formData);
-                    }
-                }
-                //submit data
-                onSubmit(formData);
-            }
-            catch(error) {
-                var message = error.message ? error.message : "unknown error";
-                alert("Error submitting form: " + message)
-            }
-        }
-
-        var content = document.createElement("div");
-        content.style.position = "absolute";
-        content.style.top = "0px";
-        content.style.left = "0px";
-        content.style.bottom = "0px";
-        content.style.right = "0px";
-
-        for(var i = 0; i < layout.lines.length; i++) {
-            var lineDef = layout.lines[i];
-
-            //create line
-            var lineObject = createLine(lineDef,formActions);
-            lineObjects.push(lineObject);
-            if(lineObject.element) { //no element for "invisible" entry, which is used to pass values along
-                content.appendChild(lineObject.element);
-            }
-        }
-
-        var outputElement = this.getElement();
-        apogeeapp.ui.removeAllChildren(outputElement);
-        outputElement.appendChild(content);
-
-        this.form = formActions;
+        this.member = member;
+        this.previousSetView = null;
     }
-    catch(error) {
-        var message = error.message ? error.message : "unknown error";
-        alert("Error loading form: " + message)
+
+    showData() {
+        this.data = this.member.getData();
+        //load or reload form
+        if(this.containerLoaded) {
+            this.loadForm();
+        }
+    }
+
+    onLoad() {
+        this.containerLoaded = true;
+        if((this.data)&&(!this.form)) {
+           this.loadForm(); 
+        }
+    }
+
+
+
+    //====================================================
+    // Form Generator Code
+    //====================================================
+
+
+    loadForm() {
+
+        try {
+            var layout = this.data.layout;
+
+            //make sure valid data has been set
+            if(!layout) return;
+
+            var onSubmit = this.data.onSubmit;
+            var onCancel = this.data.onCancel;
+
+            var lineObjects = [];
+
+            //this is the action for the form
+            var formActions = {};
+
+            //cancel
+            formActions.onCancel = function() {
+                try {
+                    onCancel();
+                }
+                catch(error) {
+                    var message = error.message ? error.message : "unknown error";
+                    alert("Error canceling form: " + message)
+                }
+            }
+            //submit
+            formActions.onSubmit = function() {
+                try {
+                    //load the form data
+                    var formData = {};
+                    var lineObject;
+                    for(var i = 0; i < lineObjects.length; i++) {
+                        lineObject = lineObjects[i];
+                        if(lineObject.addToResult) {
+                            lineObject.addToResult(formData);
+                        }
+                    }
+                    //submit data
+                    onSubmit(formData);
+                }
+                catch(error) {
+                    var message = error.message ? error.message : "unknown error";
+                    alert("Error submitting form: " + message)
+                }
+            }
+
+            var content = document.createElement("div");
+            content.style.position = "absolute";
+            content.style.top = "0px";
+            content.style.left = "0px";
+            content.style.bottom = "0px";
+            content.style.right = "0px";
+
+            for(var i = 0; i < layout.lines.length; i++) {
+                var lineDef = layout.lines[i];
+
+                //create line
+                var lineObject = createLine(lineDef,formActions);
+                lineObjects.push(lineObject);
+                if(lineObject.element) { //no element for "invisible" entry, which is used to pass values along
+                    content.appendChild(lineObject.element);
+                }
+            }
+
+            var outputElement = this.getElement();
+            apogeeapp.ui.removeAllChildren(outputElement);
+            outputElement.appendChild(content);
+
+            this.form = formActions;
+        }
+        catch(error) {
+            var message = error.message ? error.message : "unknown error";
+            alert("Error loading form: " + message)
+        }
     }
 }
 

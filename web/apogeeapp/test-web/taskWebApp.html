@@ -97,6 +97,19 @@
         <script type="text/javascript" src="/apogeeapp/ui/splitpane/SplitPane.js"></script>
         <script type="text/javascript" src="/apogeeapp/ui/treecontrol/TreeControl.js"></script>
         <script type="text/javascript" src="/apogeeapp/ui/treecontrol/TreeEntry.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/ConfigurablePanel.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/ConfigurableElement.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/HeadingElement.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/TextFieldElement.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/TextareaElement.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/DropdownElement.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/CheckboxElement.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/CheckboxGroupElement.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/RadioGroupElement.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/InvisibleElement.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/PanelElement.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/SubmitElement.js"></script>
+        <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/SpacerElement.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/Apogee.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/WorkspaceUI.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/references/ReferenceManager.js"></script>
@@ -129,25 +142,17 @@
         <script type="text/javascript" src="/apogeeapp/app/actions/addcomponent.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/actions/updatecomponent.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/actions/updatelink.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/editors/ViewMode.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/editors/TextAreaEditor.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/editors/TextAreaMode.js"></script>
-		<script type="text/javascript" src="/apogeeapp/app/editors/AceTextEditor.js"></script>		
-		<script type="text/javascript" src="/apogeeapp/app/editors/AceCodeMode.js"></script>
-		<script type="text/javascript" src="/apogeeapp/app/editors/AceDataMode.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/editors/AceDescriptionMode.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/editors/AceTextMode.js"></script>
-		<script type="text/javascript" src="/apogeeapp/app/editors/AceSupplementalMode.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/editors/AceCustomControlMode.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/editors/HtmlJsDataDisplay.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/editors/JsDataDisplay.js"></script>
-		<script type="text/javascript" src="/apogeeapp/app/editors/JsonFormEditor.js"></script>
-		<script type="text/javascript" src="/apogeeapp/app/editors/FormDataMode.js"></script>
-		<script type="text/javascript" src="/apogeeapp/app/editors/HandsonGridEditor.js"></script>
-		<script type="text/javascript" src="/apogeeapp/app/editors/HandsonGridMode.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/editors/ControlOutputMode.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/editors/ErrorDisplay.js"></script>
-		<script type="text/javascript" src="/apogeeapp/app/editors/ErrorMode.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/datadisplay/ViewMode.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/datadisplay/EditorDataDisplay.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/datadisplay/NonEditorDataDisplay.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/datadisplay/TextAreaEditor.js"></script>
+		<script type="text/javascript" src="/apogeeapp/app/datadisplay/AceTextEditor.js"></script>		
+        <script type="text/javascript" src="/apogeeapp/app/datadisplay/HtmlJsDataDisplay.js"></script>
+		<script type="text/javascript" src="/apogeeapp/app/datadisplay/JsonFormEditor.js"></script>
+		<script type="text/javascript" src="/apogeeapp/app/datadisplay/HandsonGridEditor.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/datadisplay/ConfigurableFormEditor.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/datadisplay/ErrorDisplay.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/dialogs/ConfigurableDialog.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/dialogs/TextIoDialog.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/dialogs/SelectControlDialog.js"></script>
@@ -169,6 +174,8 @@
         <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/splitpane/SplitPane.css">
         <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/tabframe/TabFrame.css">
         <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/treecontrol/TreeControl.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/app/datadisplay/datadisplay.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/configurablepanel/ConfigurablePanel.css">
           
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
         

@@ -37,24 +37,31 @@ apogeeapp.app.TextComponent.prototype.getTableEditSettings = function() {
     return apogeeapp.app.TextComponent.TABLE_EDIT_SETTINGS;
 }
 
-/** This method should be implemented to retrieve a view mode of the give type. 
+/** This method should be implemented to retrieve a data display of the give type. 
  * @protected. */
-apogeeapp.app.TextComponent.prototype.getViewModeElement = function(editComponentDisplay,viewType) {
+apogeeapp.app.TextComponent.prototype.getDataDisplay = function(viewMode,viewType) {
+	
+    var callbacks;
 	
 	//create the new view element;
 	switch(viewType) {
 			
+		case apogeeapp.app.TextComponent.VIEW_TEXT:
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks(this.member);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
+            
 		case apogeeapp.app.TextComponent.VIEW_CODE:
-			return new apogeeapp.app.AceCodeMode(editComponentDisplay);
+            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member,apogeeapp.app.TextComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
 			
 		case apogeeapp.app.TextComponent.VIEW_SUPPLEMENTAL_CODE:
-			return new apogeeapp.app.AceSupplementalMode(editComponentDisplay);
-			
-		case apogeeapp.app.TextComponent.VIEW_TEXT:
-			return new apogeeapp.app.AceTextMode(editComponentDisplay);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member,apogeeapp.app.TextComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
             
         case apogeeapp.app.TextComponent.VIEW_DESCRIPTION:
-			return new apogeeapp.app.AceDescriptionMode(editComponentDisplay);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
+            //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
+            return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
 			
 		default:
 //temporary error handling...
