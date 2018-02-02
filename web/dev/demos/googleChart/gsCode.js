@@ -5,29 +5,19 @@
 const url = "http://api.population.io/1.0/population/2017/United%20States/?format=json";
 
 const columns = [
-	{
-		"type": "number",
-		"name": "Age"
-	},
-	{
-		"type": "number",
-		"name": "Males"
-	},
-	{
-		"type": "number",
-		"name": "Females"
-	}
-]
+	"Age",
+	"Males",
+	"Females"
+];
 
 const options = {
 	"hAxis": {
 		"title": "Person's Age"
 	},
-	"vAxis": {
-		"title": "Population"
-	},
 	"backgroundColor": "#f1f8e9",
-	"title": "Population by Age and Gender"
+	"title": "Population by Age and Gender",
+	"height": 400,
+	"width": 600
 }
 
 //=============================
