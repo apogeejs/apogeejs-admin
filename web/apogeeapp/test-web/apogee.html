@@ -4,10 +4,10 @@
 		<title></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/noconflict/ace.js"></script>
         <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
-        
+
         <script type="text/javascript" src="/supplemental/webLibHeader.js"></script>
 		<script type="text/javascript" src="/apogee/apogee.js"></script>        
         <script type="text/javascript" src="/apogee/lib/base.js"></script>
@@ -119,7 +119,7 @@
 		<script type="text/javascript" src="/apogeeapp/app/datadisplay/JsonFormEditor.js"></script>
 		<script type="text/javascript" src="/apogeeapp/app/datadisplay/HandsonGridEditor.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/datadisplay/ConfigurableFormEditor.js"></script>
-<script type="text/javascript" src="/apogeeapp/app/datadisplay/ConfigurableFormDisplay.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/datadisplay/ConfigurableFormDisplay.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/datadisplay/ErrorDisplay.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/dialogs/ConfigurableDialog.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/dialogs/TextIoDialog.js"></script>
@@ -139,9 +139,10 @@
         <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/tabframe/TabFrame.css">
         <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/treecontrol/TreeControl.css">
         <link rel="stylesheet" type="text/css" href="/apogeeapp/app/datadisplay/datadisplay.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/configurablepanel/ConfigurablePanel.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/configurablepanel/ConfigurablePanel.css">           
           
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
+        
 		<script>
             'use strict'
 			function init() {
@@ -149,7 +150,7 @@
                 apogeeapp.ui.initResourcePath("/resources");
                 
                 //create the application
-                apogeeapp.app.Apogee.createApp("appContainer");
+                apogeeapp.app.Apogee.createApp("appContainer"); 
             }
             
             function beforeUnloadHandler() {

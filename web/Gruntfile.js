@@ -122,6 +122,7 @@ module.exports = function(grunt) {
                 "apogeeapp/app/datadisplay/JsonFormEditor.js",
                 "apogeeapp/app/datadisplay/HandsonGridEditor.js",
                 "apogeeapp/app/datadisplay/ConfigurableFormEditor.js",
+                "apogeeapp/app/datadisplay/ConfigurableFormDisplay.js",
                 "apogeeapp/app/datadisplay/ErrorDisplay.js",
                 "apogeeapp/app/dialogs/ConfigurableDialog.js",
                 "apogeeapp/app/dialogs/TextIoDialog.js",

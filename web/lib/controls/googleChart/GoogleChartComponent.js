@@ -6,6 +6,7 @@
 //
 //we need to make sure we try to load only once
 var googleLoadCalled = false;
+var googleChartLoaded = false;
 
 var instances = [];
 function addInstance(instance) {
@@ -15,6 +16,7 @@ function addInstance(instance) {
 function onLibLoad() {
     for(var i = 0; i < instances.length; i++) {
         var instance = instances[i];
+        googleChartLoaded = true;
         instance.onLibLoaded();
     }
 }
@@ -253,7 +255,7 @@ apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisp
     
         this.member = member;
 
-        if(!google.visualization) {
+        if(!googleChartLoaded) {
             //register this instance
             addInstance(this);
         }
