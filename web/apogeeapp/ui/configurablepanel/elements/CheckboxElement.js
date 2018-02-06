@@ -35,9 +35,7 @@ apogeeapp.ui.CheckboxElement = class extends apogeeapp.ui.ConfigurableElement {
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
     setValue(value) {
-        if(value === true) {
-            this.checkbox.checked = true;
-        }
+        this.checkbox.checked = (value === true);
     }
     
     /** This should be extended in elements to handle on change listeners. */
