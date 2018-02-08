@@ -10,7 +10,7 @@ apogeeapp.app.ConfigurableForm = class extends apogeeapp.app.BasicControlCompone
     /** Implement the method to get the data display. JsDataDisplay is an 
      * easily configurable data display. */
     getOutputDisplay(viewMode) {
-        return new apogeeapp.app.ConfigurableFormDisplay(viewMode,this.getMember());
+        return new apogeeapp.app.ConfigurableFormDisplayOLD(viewMode,this.getMember());
     }
 }
 
@@ -33,7 +33,7 @@ else {
 
 
 /** Extend ths JsDataDisplay */
-apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
+apogeeapp.app.ConfigurableFormDisplayOLD = class extends apogeeapp.app.NonEditorDataDisplay {
     constructor(viewMode,member) {
         super(viewMode);
     
