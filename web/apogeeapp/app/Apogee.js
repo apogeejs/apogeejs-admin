@@ -173,6 +173,7 @@ apogeeapp.app.Apogee.prototype.loadComponentGenerators = function() {
     this.registerStandardComponent(apogeeapp.app.FolderFunctionComponent);
 	
     //additional components
+    this.registerComponent(apogeeapp.app.DynamicForm);
     this.registerComponent(apogeeapp.app.CustomControlComponent);
 }
 

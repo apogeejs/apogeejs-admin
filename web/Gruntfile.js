@@ -100,6 +100,7 @@ module.exports = function(grunt) {
                 "apogeeapp/app/components/FolderFunctionComponent.js",
                 "apogeeapp/app/components/BasicControlComponent.js",
                 "apogeeapp/app/components/CustomControlComponent.js",
+                "apogeeapp/app/components/DynamicForm.js",
                 "apogeeapp/app/components/ErrorTableComponent.js",
                 "apogeeapp/app/actions/errorhandling.js",
                 "apogeeapp/app/actions/createworkspace.js",

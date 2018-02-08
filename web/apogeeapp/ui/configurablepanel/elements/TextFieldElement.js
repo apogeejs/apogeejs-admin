@@ -19,9 +19,14 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
             this.labelElement = null;
         }
         
-        //text field
-        this.inputElement = apogeeapp.ui.createElement("input",{"type":"text"});
-        containerElement.appendChild(this.inputElement);   
+        //text field (maight had password flag)
+        var type = (elementInitData.password === true) ? "password" : "text";
+        this.inputElement = apogeeapp.ui.createElement("input",{"type":type});
+        containerElement.appendChild(this.inputElement); 
+        
+        if(elementInitData.size !== undefined) {
+            this.inputElement.size = elementInitData.size;
+        }
         
         //non-standard events
         if(elementInitData.onChangeCompleted) {
