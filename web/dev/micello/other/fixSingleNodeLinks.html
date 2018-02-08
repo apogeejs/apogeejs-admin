@@ -5,11 +5,23 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-			.contentTest {
-				width: 500px;
-                height: 300px;
+            body {
+                overflow: auto;
+            }
+			.formCell {
+				width: 700px;
+                height: 250px;
 				outline: solid 1px gray;
 				margin: 10px;
+				display: table;
+                position: relative;
+			}
+            .dataCell {
+				width: 500px;
+                height: 100px;
+				outline: solid 1px gray;
+				margin: 10px;
+                margin-right: 30px;
 				display: table;
                 position: relative;
 			}
@@ -23,14 +35,14 @@
         <script type="text/javascript" src="http://www.apogeejs.com/v0.8.5/apogee-web-app.min.js"></script>
         <script type="text/javascript" src="http://www.apogeejs.com/v0.8.5/apogee-web-cutnpaste.min.js"></script>
         <script type="text/javascript" src="http://www.apogeejs.com/v0.8.5/debugHook.js"></script>
-		<link rel="stylesheet" type="text/css" href="http://www.apogeejs.com/v0.8.5/apogeeapp.css">
+		<!--<link rel="stylesheet" type="text/css" href="http://www.apogeejs.com/v0.8.5/apogeeapp.css">-->
         <link rel="stylesheet" type="text/css" href="http://www.apogeejs.com/v0.8.5/apogeeui.css">
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
         
         <script type="text/javascript" src="http://www.apogeejs.com/v0.8.5/lib/modules/webApp/webAppAccess.js"></script>
         
         <script>
-            var workspaceUrl = "BasicExample.json";
+            var workspaceUrl = "http://eng.micello.com/apogee/workspaces/fixSingleNodeLinks.json";
             
             'use strict'
 			function init() {
@@ -41,8 +53,14 @@
               
             function onWorkspaceLoad() {
                 //load the UI controls
-                addDisplay("Model.plainValue","plainValueCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                addDisplay("Model.derivedValue","derivedValueCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.settings","settingsCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.login.loginControl","loginCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.login.sessionKey","sessionKeyCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.working.cidSelectForm","cidSelectCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.working.cidDataSuccess","downloadSuccessCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.commit.instructionList","instructionListCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.commit.submitForm","submitCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.commit.commitResponse","commitResponseCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
             }
             
             function addDisplay(memberName,parentElementId,optionalViewType) {
@@ -68,9 +86,18 @@
         </script>
     </head>
     <body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
-        <h1>Plain Value</h1>
-        <div class="contentTest" id="plainValueCell"></div>
-        <h1>Derived Value</h1>
-        <div class="contentTest" id="derivedValueCell"></div>
+        <h1>Community Single Node Link Fix</h1>
+        <div class="formCell" id="settingsCell"></div>
+        <div class="formCell" id="loginCell"></div>
+        Session Key:
+        <div class="dataCell" id="sessionKeyCell"></div>
+        <div class="formCell" id="cidSelectCell"></div>
+        Download Status:
+        <div class="dataCell" id="downloadSuccessCell"></div>
+        Correction List:
+        <div class="dataCell" id="instructionListCell"></div>
+        <div class="formCell" id="submitCell"></div>
+        Commit Response:
+        <div class="dataCell" id="commitResponseCell"></div>
     </body>
 </html>
