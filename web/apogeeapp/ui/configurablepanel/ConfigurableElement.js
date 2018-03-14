@@ -60,7 +60,7 @@ apogeeapp.ui.ConfigurableElement = class {
         return this.domElement;
     }
     
-    /** This method returns the DOM element for this configurable element. */
+    /** This method returns the parent form for this configurable element. */
     getForm() {
         return this.form;
     }
