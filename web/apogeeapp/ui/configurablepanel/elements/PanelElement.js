@@ -33,7 +33,8 @@ apogeeapp.ui.PanelElement = class extends apogeeapp.ui.ConfigurableElement {
     
     /** This should be extended in elements to handle on change listeners. */
     addOnChange(onChange) {
-        this.panel.addOnChange(onChange);
+        var panelOnChange = () => onChange(this.getForm(),this.getValue());
+        this.panel.addOnChange(panelOnChange);
     }
     
     //===================================

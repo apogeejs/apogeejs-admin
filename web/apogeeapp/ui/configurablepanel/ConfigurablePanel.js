@@ -104,8 +104,9 @@ apogeeapp.ui.ConfigurablePanel = class {
         
         var elementObject;
         if(type == "custom") {
-            //special case - just use the object passed in
-            elementObject = elementInitData.customObject;
+            //special case - let the user construct an explict object from the base element
+            elementObject = new apogeeapp.ui.ConfigurableElement(this,elementInitData);
+            elementInitData.builderFunction(elementObject);
         }
         else {
             //standard case - lookup constructor and instantiate
