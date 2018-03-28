@@ -54,8 +54,8 @@ and open the template in the editor.
                 entry.label = "Test text entry: ";
                 entry.value = "xxx";
                 entry.key = "text1";
-                entry.onChangeCompleted = (form,value) => alert("Value updated: " + value);
-                entry.onChange = (form,value) => alert("Key typed into field: " + value);
+                entry.onChangeCompleted = (value,form) => alert("Value updated: " + value);
+                entry.onChange = (value,form) => alert("Key typed into field: " + value);
                 layout.push(entry);
                 
                 //text entry
@@ -66,8 +66,8 @@ and open the template in the editor.
                 entry.cols = 30;
                 entry.rows = 5;
                 entry.key = "text2";
-                entry.onChangeCompleted = (form,value) => alert("Value updated: " + value);
-                entry.onChange = (form,value) => alert("Key typed into field: " + value);
+                entry.onChangeCompleted = (value,form) => alert("Value updated: " + value);
+                entry.onChange = (value,form) => alert("Key typed into field: " + value);
                 layout.push(entry);
                 
                 //radio group 1
@@ -78,7 +78,7 @@ and open the template in the editor.
                 entry.entries = ["slop","freeze","dew"];
                 entry.value = "freeze";
                 entry.key = "rg1";
-                entry.onChange = (form,value) => alert("Value updated: " + value);
+                entry.onChange = (value,form) => alert("Value updated: " + value);
                 layout.push(entry);
                 
                 //ckeckbox group 1
@@ -89,7 +89,7 @@ and open the template in the editor.
                 entry.value = ["freeze","slop"];
                 entry.key = "cbg1";
                 entry.horizontal = true;
-                entry.onChange = (form,value) => alert("Value updated: " + value);
+                entry.onChange = (value,form) => alert("Value updated: " + value);
                 layout.push(entry);
                 
                 //checkbox 1
@@ -98,7 +98,7 @@ and open the template in the editor.
                 entry.label = "Show child panel ";
                 entry.value = true;
                 entry.key = "cb1";
-                entry.onChange = (form,value) => {
+                entry.onChange = (value,form) => {
                     var childPanel = form.getEntry("childPanel");
                     var state = value ? apogeeapp.ui.ConfigurableElement.STATE_NORMAL : apogeeapp.ui.ConfigurableElement.STATE_INACTIVE;
                     childPanel.setState(state);
@@ -122,7 +122,7 @@ and open the template in the editor.
                 entry.entries = ["slop","freeze","dew"];
                 entry.value = "freeze";
                 entry.key = "d1";
-                entry.onChange = (form,value) => alert("Value updated: " + value);
+                entry.onChange = (value,form) => alert("Value updated: " + value);
                 layout.push(entry);
                 
                 //child panel
@@ -142,7 +142,7 @@ and open the template in the editor.
                 entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]];
                 entry.value = "freeze";
                 entry.key = "d2";
-                entry.onChange = (form,value) => alert("Value updated: " + value);
+                entry.onChange = (value,form) => alert("Value updated: " + value);
                 childFormData.push(entry);
                 
                 //radio group 1
@@ -154,7 +154,7 @@ and open the template in the editor.
                 entry.value = "freeze";
                 entry.horizontal = true;
                 entry.key = "rg2";
-                entry.onChange = (form,value) => alert("Value updated: " + value);
+                entry.onChange = (value,form) => alert("Value updated: " + value);
                 childFormData.push(entry);
                 
                 //checkbox group 2
@@ -164,7 +164,7 @@ and open the template in the editor.
                 entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]];
                 entry.value = ["freeze","slop"];
                 entry.key = "cbg2";
-                entry.onChange = (form,value) => alert("Value updated: " + value);
+                entry.onChange = (value,form) => alert("Value updated: " + value);
                 childFormData.push(entry);
                 
                 //text entry
@@ -173,7 +173,7 @@ and open the template in the editor.
                 entry.label = "Test text entry: ";
                 entry.value = "xxx";
                 entry.key = "text3";
-                entry.onChangeCompleted = (form,value) => alert("Value updated: " + value);
+                entry.onChangeCompleted = (value,form) => alert("Value updated: " + value);
                 childFormData.push(entry);
                 
                 //text entry
@@ -184,7 +184,7 @@ and open the template in the editor.
                 entry.cols = 30;
                 entry.rows = 5;
                 entry.key = "text4";
-                entry.onChangeCompleted = (form,value) => alert("Value updated: " + value);
+                entry.onChangeCompleted = (value,form) => alert("Value updated: " + value);
                 childFormData.push(entry);        
                                 
                 //end title

@@ -64,7 +64,7 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
     /** This should be extended in elements to handle on change listeners. */
     addOnChange(onChange) {
         var onChangeImpl = () => {
-            onChange(this.getForm(),this.getValue());
+            onChange(this.getValue(),this.getForm());
         }
         this.checkboxList.forEach(checkbox => checkbox.addEventListener("change",onChangeImpl));
     }
