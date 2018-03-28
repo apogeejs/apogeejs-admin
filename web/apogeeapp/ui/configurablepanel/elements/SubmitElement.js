@@ -17,7 +17,7 @@ apogeeapp.ui.SubmitElement = class extends apogeeapp.ui.ConfigurableElement {
             
             var onSubmit = () => {
                 var formValue = form.getValue();
-                elementInitData.onSubmit(formValue);
+                elementInitData.onSubmit(formValue,form);
             }
             
             var submitLabel;
@@ -38,7 +38,9 @@ apogeeapp.ui.SubmitElement = class extends apogeeapp.ui.ConfigurableElement {
         //create the cancel button
         if(elementInitData.onCancel) {
             
-            var onCancel = elementInitData.onCancel;
+            var onCancel = () => {
+                elementInitData.onCancel(form);
+            }
             
             var cancelLabel;
             if(elementInitData.cancelLabel) { 
