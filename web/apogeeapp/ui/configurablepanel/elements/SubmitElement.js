@@ -8,13 +8,16 @@ apogeeapp.ui.SubmitElement = class extends apogeeapp.ui.ConfigurableElement {
         super(form,elementInitData);
         
         var containerElement = this.getElement();
+
+        this.submitDisabled = elementInitData.submitDisabled;
+        this.cancelDisabled = elementInitData.cancelDisabled;
         
         //create the submit button
         if(elementInitData.onSubmit) {
             
             var onSubmit = () => {
                 var formValue = form.getValue();
-                elementInitData.onSubmit(formValue);
+                elementInitData.onSubmit(formValue,form);
             }
             
             var submitLabel;
@@ -35,7 +38,9 @@ apogeeapp.ui.SubmitElement = class extends apogeeapp.ui.ConfigurableElement {
         //create the cancel button
         if(elementInitData.onCancel) {
             
-            var onCancel = elementInitData.onCancel;
+            var onCancel = () => {
+                elementInitData.onCancel(form);
+            }
             
             var cancelLabel;
             if(elementInitData.cancelLabel) { 
@@ -50,9 +55,21 @@ apogeeapp.ui.SubmitElement = class extends apogeeapp.ui.ConfigurableElement {
         }
         else {
             this.cancelButton = null;
-        }      
+        }  
+
+        this._setButtonState();    
         
         this._postInstantiateInit(elementInitData);
+    }
+    
+    submitDisable(isDisabled) {
+        this.submitDisabled = isDisabled;
+        this._setButtonState();
+    }
+    
+    cancelDisable(isDisabled) {
+        this.cancelDisabled = isDisabled;
+        this._setButtonState();
     }
 
     //===================================
@@ -60,8 +77,13 @@ apogeeapp.ui.SubmitElement = class extends apogeeapp.ui.ConfigurableElement {
     //==================================
     
     _setDisabled(isDisabled) { 
-        if(this.submitButton) this.submitButton.disabled = isDisabled;
-        if(this.cancelButton) this.cancelButton.disabled = isDisabled;
+        this.overallDisabled = isDisabled;
+        this._setButtonState();
+    }
+
+    _setButtonState() {
+        if(this.submitButton) this.submitButton.disabled = this.overallDisabled || this.submitDisabled;
+        if(this.cancelButton) this.cancelButton.disabled = this.overallDisabled || this.cancelDisabled;
     }
 }
  
@@ -71,4 +93,3 @@ apogeeapp.ui.SubmitElement.DEFAULT_CANCEL_LABEL = "Cancel";
 apogeeapp.ui.SubmitElement.TYPE_NAME = "submit";
 
 apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.SubmitElement);
-

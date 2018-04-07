@@ -336,6 +336,12 @@ apogeeapp.app.WorkspaceUI.prototype.getMenuItems = function() {
     itemInfo.callback = apogeeapp.app.updateworkspace.getUpdateWorkspaceCallback(this);
     menuItemList.push(itemInfo);
     
+    //DEV ENTRY
+    itemInfo = {};
+    itemInfo.title = "Print Dependencies";
+    itemInfo.callback = () => this.showDependencies();
+    menuItemList.push(itemInfo);
+    
     return menuItemList;
 }
 
@@ -345,5 +351,40 @@ apogeeapp.app.WorkspaceUI.prototype.getMenuItems = function() {
 
 apogeeapp.app.WorkspaceUI.prototype.loadReferences = function(referencesJson) {
     return this.referencesManager.openEntries(referencesJson);
+}
+
+//==================================
+// DEV FUNCTION
+//==================================
+
+apogeeapp.app.WorkspaceUI.prototype.showDependencies = function() {
+    console.log(JSON.stringify(this.createDependencies()));
+}
+
+apogeeapp.app.WorkspaceUI.prototype.createDependencies = function() {
+    var memberInfo = [];
+    
+    for(var key in this.componentMap) {
+        var componentInfo = this.componentMap[key];
+        if((componentInfo)&&(componentInfo.member)&&(componentInfo.member.isCodeable)) {
+            
+            
+            var member = componentInfo.member;
+            
+            var memberStruct = {};
+            memberStruct.member = member.getFullName();
+            memberStruct.memberType = member.generator.type;
+            
+            if(member.isDependent) {
+                if(member.getDependsOn().length > 0) {
+                    memberStruct.dependsOn = member.getDependsOn().map(dependency => dependency.getFullName());
+                }
+            }
+            
+            memberInfo.push(memberStruct);
+        }
+    }
+    
+    return memberInfo;
 }
     

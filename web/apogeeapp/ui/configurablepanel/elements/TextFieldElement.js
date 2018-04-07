@@ -51,7 +51,7 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
     /** This should be extended in elements to handle on change listeners. */
     addOnChange(onChange) {
         var onChangeImpl = () => {
-            onChange(this.getForm(),this.getValue());
+            onChange(this.getValue(),this.getForm());
         }
         this.inputElement.addEventListener("input",onChangeImpl);
     }
@@ -59,7 +59,7 @@ apogeeapp.ui.TextFieldElement = class extends apogeeapp.ui.ConfigurableElement {
     /** This should be extended in elements to handle on change listeners. */
     addOnChangeCompleted(onChangeCompleted) {
         var onChangeCompletedImpl = () => {
-            onChangeCompleted(this.getForm(),this.getValue());
+            onChangeCompleted(this.getValue(),this.getForm());
         }
         this.inputElement.addEventListener("change",onChangeCompletedImpl);
     }
