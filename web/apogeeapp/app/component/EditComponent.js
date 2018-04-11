@@ -13,13 +13,14 @@ apogeeapp.app.EditComponent.prototype.instantiateWindowDisplay = function(window
     return new apogeeapp.app.EditWindowComponentDisplay(this,options);
 }
 
-/** This is used when an alternate UI is used for the workspace. This replaces the window display 
- *  used in the standard UI. */
-apogeeapp.app.EditComponent.prototype.setAlternateWindowDisplay = function(windowDisplay) {
-    this.alternateWindowDisplay = windowDisplay;
-    this.windowDisplay = windowDisplay;
-    windowDisplay.setBannerState(this.bannerState,this.bannerMessage);
-}
+//no longer used
+///** This is used when an alternate UI is used for the workspace. This replaces the window display 
+// *  used in the standard UI. */
+//apogeeapp.app.EditComponent.prototype.setAlternateWindowDisplay = function(windowDisplay) {
+//    this.alternateWindowDisplay = windowDisplay;
+//    this.windowDisplay = windowDisplay;
+//    windowDisplay.setBannerState(this.bannerState,this.bannerMessage);
+//}
 
 //===============================
 // Protected Functions
