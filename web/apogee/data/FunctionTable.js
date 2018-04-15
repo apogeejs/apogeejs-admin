@@ -75,6 +75,7 @@ apogee.FunctionTable.prototype.getLazyInitializedMemberFunction = function(membe
             return memberFunction.apply(null,arguments);
         }
         else {
+            //This was an error with initialization
             throw issue;
         }
     }
