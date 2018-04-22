@@ -53,6 +53,8 @@ apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS = {
 
 apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW = "Plain";
 apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW = "Colorized";
+apogeeapp.app.JsonTableComponent.TEXT_DATA_VEW = "Text Data";
+apogeeapp.app.JsonTableComponent.GRID_DATA_VEW = "Grid";
 apogeeapp.app.JsonTableComponent.FORM_DATA_VIEW = "Form";
 
 apogeeapp.app.JsonTableComponent.DEFAULT_DATA_VIEW = apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW;;
@@ -77,6 +79,14 @@ apogeeapp.app.JsonTableComponent.prototype.getDataDisplay = function(viewMode,vi
                 case apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW:
                     callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.member);
                     return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/json");
+                    
+                case apogeeapp.app.JsonTableComponent.TEXT_DATA_VEW:
+                    callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks(this.member);
+                    return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
+                    
+                case apogeeapp.app.JsonTableComponent.GRID_DATA_VEW:
+                    callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks(this.member);
+                    return new apogeeapp.app.HandsonGridEditor(viewMode,callbacks);
 
                 case apogeeapp.app.JsonTableComponent.FORM_DATA_VIEW:
                     alert("FORM EDITOR NOT IMPLEMENTED YET!");
@@ -156,6 +166,8 @@ apogeeapp.app.JsonTableComponent.propertyDialogLines = [
         "entries":[
             "Colorized",
             "Plain",
+            "Text Data",
+            "Grid",
             "Form"
         ],
         "resultKey":"dataView"

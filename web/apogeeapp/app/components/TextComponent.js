@@ -87,7 +87,7 @@ apogeeapp.app.TextComponent.getCreateMemberPayload = function(userInputValues) {
 // This is the component generator, to register the component
 //======================================
 
-apogeeapp.app.TextComponent.displayName = "Text Table";
+apogeeapp.app.TextComponent.displayName = "Text Table DEPRECATED";
 apogeeapp.app.TextComponent.uniqueName = "apogeeapp.app.TextComponent";
 apogeeapp.app.TextComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.TextComponent.DEFAULT_HEIGHT = 300;

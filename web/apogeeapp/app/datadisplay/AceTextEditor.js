@@ -40,7 +40,13 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.EditorDataDisplay {
     }
     
     setEditorData(text) {
+        if(apogee.util.getObjectType(text) != "String") {
+            var errorMsg = "ERROR: Data value is not text";
+            //this.setError(errorMsg);
+            text = errorMsg;
+        }
         this.editor.getSession().setValue(text);
+//figure out how to handle this error
 
         //set the background color
         if(this.editOk) {

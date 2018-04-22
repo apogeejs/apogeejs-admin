@@ -90,7 +90,7 @@ apogeeapp.app.GridTableComponent.getCreateMemberPayload = function(userInputValu
 // This is the component generator, to register the component
 //======================================
 
-apogeeapp.app.GridTableComponent.displayName = "Grid Table";
+apogeeapp.app.GridTableComponent.displayName = "Grid Table DEPRECATED";
 apogeeapp.app.GridTableComponent.uniqueName = "apogeeapp.app.GridTableComponent";
 apogeeapp.app.GridTableComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.GridTableComponent.DEFAULT_HEIGHT = 300;

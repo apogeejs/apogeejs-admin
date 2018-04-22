@@ -64,6 +64,14 @@ apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.EditorDataDisplay 
     
     setEditorData(json) {
         if((this.inputData === json)&&(this.editOk)) return;
+        
+        //verify data is the proper format
+        if(!this.dataIsValidFormat(json)) {
+            var errorMsg = "ERROR: Data value is not an array of arrays"
+            json = [[errorMsg]];
+        }
+//figure out how to handle this error
+//I should detect an error if the first array is not as long as all other arrays - handsontable issue
 	
         this.inputData = json;
         this.dataCached = true;
@@ -174,6 +182,16 @@ apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.EditorDataDisplay 
         }
         else {
             this.gridDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
+        }
+    }
+    
+    //this merifies the data is an array of arrays
+    dataIsValidFormat(json) {
+        if(Array.isArray(json)) {
+            return json.every(Array.isArray);
+        }
+        else {
+            return false;
         }
     }
 
