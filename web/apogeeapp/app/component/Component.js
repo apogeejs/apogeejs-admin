@@ -137,6 +137,8 @@ apogeeapp.app.Component.prototype.closeWindowDisplay = function() {
         
         //delete the window
         this.windowDisplay.deleteDisplay();
+        
+        this.windowDisplay = null;
     }
 }
 
