@@ -87,6 +87,7 @@
                 
                 //put the display element in the parent
                 var element = displayFrame.getElement();
+                apogeeapp.ui.removeAllChildren(parentElement);
                 parentElement.appendChild(element);
                 
                 //the display frame method "setIsShowing" must be called when
@@ -96,7 +97,7 @@
               
         </script>
     </head>
-    <body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
+    <body onload="init()">
         <h1>Create New File Entry</h1>
         <!-- <div class="formCell" id="settingsCell"></div> -->
         <div class="formCell" id="loginCell"></div>
