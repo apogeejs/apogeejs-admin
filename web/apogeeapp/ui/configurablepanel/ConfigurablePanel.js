@@ -4,7 +4,7 @@
  */
 apogeeapp.ui.ConfigurablePanel = class {
     
-    constructor(formInitData,optionalContainerClassName = apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT) {
+    constructor(formInitData,optionalContainerClassName = apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED) {
         this.elementObjects = [];
         this.panelElement = this.createPanelElement(optionalContainerClassName);
         

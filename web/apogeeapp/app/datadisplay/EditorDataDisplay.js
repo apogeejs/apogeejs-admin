@@ -132,3 +132,5 @@ apogeeapp.app.EditorDataDisplay = class {
 
 apogeeapp.app.EditorDataDisplay.NON_SCROLLING = "apogee_datadisplay_container_fixed";
 apogeeapp.app.EditorDataDisplay.SCROLLING = "apogee_datadisplay_container_scrolling";
+
+apogeeapp.app.EditorDataDisplay.FIT_CONTENT = "apogee_datadisplay_container_fit_content";

@@ -45,4 +45,4 @@ apogeeapp.app.NonEditorDataDisplay = class {
 apogeeapp.app.NonEditorDataDisplay.NON_SCROLLING = "apogee_datadisplay_container_fixed";
 apogeeapp.app.NonEditorDataDisplay.SCROLLING = "apogee_datadisplay_container_scrolling";
 
-
+apogeeapp.app.NonEditorDataDisplay.FIT_CONTENT = "apogee_datadisplay_container_fit_content";

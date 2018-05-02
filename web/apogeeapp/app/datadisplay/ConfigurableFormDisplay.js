@@ -6,7 +6,7 @@
 apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
     
     constructor(viewMode,getLayout) {
-        super(viewMode,apogeeapp.app.EditorDataDisplay.SCROLLING);  
+        super(viewMode,apogeeapp.app.NonEditorDataDisplay.SCROLLING);  
         
         this.getLayout = getLayout;
     }
