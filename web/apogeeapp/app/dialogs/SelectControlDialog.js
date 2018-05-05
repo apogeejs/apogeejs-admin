@@ -12,7 +12,7 @@ apogeeapp.app.dialog.showSelectComponentDialog = function(componentList,onSelect
             "height":"100%",
             "overflow": "auto"
         });
-	dialog.setContent(contentContainer);
+	dialog.setContent(contentContainer,apogeeapp.ui.SIZE_WINDOW_TO_CONTENT);
     
     var line;
     
@@ -56,7 +56,7 @@ apogeeapp.app.dialog.showSelectComponentDialog = function(componentList,onSelect
     line.appendChild(apogeeapp.ui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
-    dialog.setContent(content);  
+    dialog.setContent(content,apogeeapp.ui.SIZE_WINDOW_TO_CONTENT);  
     
     //show dialog
     apogeeapp.ui.showDialog(dialog);

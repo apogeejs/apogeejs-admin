@@ -151,17 +151,41 @@ apogeeapp.ui.WindowFrame.prototype.clearIconOverlay = function() {
     }
 }
 
-/** This sets the content for the window */
+/** This sets the content for the window. */
 apogeeapp.ui.WindowFrame.prototype.setHeaderContent = function(contentElement) {
     apogeeapp.ui.removeAllChildren(this.headerCell);
     this.headerCell.appendChild(contentElement);
     this.headerContent = contentElement;
 }
 
-/** This sets the content for the window */
-apogeeapp.ui.WindowFrame.prototype.setContent = function(contentElement) {
-    apogeeapp.ui.removeAllChildren(this.bodyCell);
-    this.bodyCell.appendChild(contentElement);
+/** This sets the content for the window. The content type
+ *  can be:
+ *  apogeeapp.ui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
+ *  apogeeapp.ui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.
+ *  apogeeapp.ui.SIZE_WINDOW_TO_CONTENT - this is not a content type but a input option for content FIXED_SIZE that shrinks the window to fit the content. */
+apogeeapp.ui.WindowFrame.prototype.setContent = function(contentElement,elementType) {
+    
+    if(!this.contentContainer) {
+        this.contentContainer = apogeeapp.ui.createElement("div");
+        apogeeapp.ui.removeAllChildren(this.bodyCell);
+        this.bodyCell.appendChild(this.contentContainer);
+    }
+    if(elementType == apogeeapp.ui.RESIZABLE) {
+        this.contentContainer.className = "visiui_win_container_fixed";
+    }
+    else if(elementType == apogeeapp.ui.FIXED_SIZE) {
+        this.contentContainer.className = "visiui_win_container_scrolling";
+    }
+    else if(elementType == apogeeapp.ui.SIZE_WINDOW_TO_CONTENT) {
+        this.contentContainer.className = "visiui_win_container_fit_content";
+    }
+    else {
+        throw new Error("Unknown content type: " + elementType);
+    }
+    
+    apogeeapp.ui.removeAllChildren(this.contentContainer);
+    this.contentContainer.appendChild(contentElement);
+    
     this.content = contentElement;
 }
 

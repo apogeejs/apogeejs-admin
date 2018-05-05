@@ -3,8 +3,6 @@ apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.EditorDataDisplay {
     
     constructor(viewMode,callbacks) {
         super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.SCROLLING);
-        
-        var containerDiv = this.getElement();
 
         var textArea = apogeeapp.ui.createElement("TEXTAREA",null,{
             "position":"absolute",
@@ -16,12 +14,19 @@ apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.EditorDataDisplay {
         });
         this.textArea = textArea;
         this.textArea.readOnly = true;
-        containerDiv.appendChild(this.textArea);  
 
         this.workingData = null;
 
         //add click handle to enter edit mode
         this.textArea.addEventListener("click",() => this.onTriggerEditMode());
+    }
+    
+    getContent() {
+        return this.textArea;
+    }
+    
+    getContentType() {
+        return apogeeapp.ui.RESIZABLE;
     }
 
     getEditorData() {

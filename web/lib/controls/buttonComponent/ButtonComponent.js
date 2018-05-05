@@ -51,12 +51,23 @@ apogeeapp.app.ButtonDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
         this.button.innerHTML = "Click me!";
         this.button.onclick = () => this.buttonClicked();      
     
-        var outputElement = this.getElement();
-        outputElement.appendChild(this.button);
+        this.outputElement = apogeeapp.ui.createElement("div");
+        this.outputElement.appendChild(this.button);
     }
     
     buttonClicked() {
         alert("The current value is: " + this.msg);
+    }
+    
+    getContent() {
+        return this.outputElement;
+    }
+    
+    //this method tells the window the type of content:
+    //apogeeapp.ui.RESIZABLE - if the window can freely resize it
+    //apogeeapp.ui.FIXED_SIZE - if the content is fixed size
+    getContentType() {
+        return apogeeapp.ui.FIXED_SIZE;
     }
     
     /** This is called when the control object updates. */

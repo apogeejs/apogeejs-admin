@@ -83,17 +83,36 @@ apogeeapp.ui.Tab.prototype.setTitle = function(title) {
     this.title = title;
 }
 
-/** This sets the content for the window */
+/** This sets the content for the window. */
 apogeeapp.ui.Tab.prototype.setHeaderContent = function(contentElement) {
     apogeeapp.ui.removeAllChildren(this.headerContainer);
     this.headerContainer.appendChild(contentElement);
     this.headerContent = contentElement;
 }
 
-/** This method must be implemented in inheriting objects. */
-apogeeapp.ui.Tab.prototype.setContent = function(contentElement) {
-    apogeeapp.ui.removeAllChildren(this.bodyContainer);
-    this.bodyContainer.appendChild(contentElement);
+/** This sets the content for the window. The content type
+ *  can be:
+ *  apogeeapp.ui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
+ *  apogeeapp.ui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.*/
+apogeeapp.ui.Tab.prototype.setContent = function(contentElement,elementType) {
+    if(!this.contentContainer) {
+        this.contentContainer = apogeeapp.ui.createElement("div");
+        apogeeapp.ui.removeAllChildren(this.bodyContainer);
+        this.bodyContainer.appendChild(this.contentContainer);
+    }
+    if(elementType == apogeeapp.ui.RESIZABLE) {
+        this.contentContainer.className = "visiui_tf_tab_contents_fixed";
+    }
+    else if(elementType == apogeeapp.ui.FIXED_SIZE) {
+        this.contentContainer.className = "visiui_tf_tab_contents_scrolling";
+    }
+    else {
+        throw new Error("Unknown content type: " + elementType);
+    }
+    
+    apogeeapp.ui.removeAllChildren(this.contentContainer);
+    this.contentContainer.appendChild(contentElement);
+    
     this.content = contentElement;
 }
 

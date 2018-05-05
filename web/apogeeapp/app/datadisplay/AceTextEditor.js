@@ -8,8 +8,6 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.EditorDataDisplay {
     
     constructor(viewMode,callbacks,aceMode) {
         super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.NON_SCROLLING);
-        
-        var containerDiv = this.getElement();
 
         this.editorDiv = apogeeapp.ui.createElement("div",null,{
             "position":"absolute",
@@ -19,7 +17,6 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.EditorDataDisplay {
             "right":"0px",
             "overflow":"auto"
         });
-        containerDiv.appendChild(this.editorDiv);
 
         this.workingData = null;
 
@@ -32,7 +29,15 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.EditorDataDisplay {
         this.editor = editor;
 
         //add click handle to enter edit mode
-        containerDiv.addEventListener("click",() => this.onTriggerEditMode());
+        this.editorDiv.addEventListener("click",() => this.onTriggerEditMode());
+    }
+    
+    getContent() {
+        return this.editorDiv;
+    }
+    
+    getContentType() {
+        return apogeeapp.ui.RESIZABLE;
     }
 
     getEditorData() {

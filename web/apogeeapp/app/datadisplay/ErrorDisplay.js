@@ -14,14 +14,22 @@
 apogeeapp.app.ErrorDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
     constructor(viewMode) {
         super(viewMode);
-    
-        var containerDiv = this.getElement();
         
         var msg = "ERROR - Component not loaded!";
         var msgDiv = apogeeapp.ui.createElement("div");
         msgDiv.style = "color:red; font-weight:bold";
         msgDiv.innerHTML = msg;
-        containerDiv.appendChild(msgDiv);
+        
+        this.displayElement = msgDiv;
+    }
+    
+    /** This method will return undefined until showData is called. */
+    getContent() {
+        return this.displayElement;
+    }
+    
+    getContentType() {
+        return apogeeapp.ui.FIXED_SIZE;
     }
 
     showData() {

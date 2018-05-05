@@ -9,6 +9,22 @@ apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDat
         super(viewMode,apogeeapp.app.NonEditorDataDisplay.SCROLLING);  
         
         this.getLayout = getLayout;
+        
+        this.panel = this.panel = new apogeeapp.ui.ConfigurablePanel();
+    }
+    
+    /** This method will return undefined until showData is called. */
+    getContent() {
+        if(this.panel) {
+            return this.panel.getElement();
+        }
+        else {
+            return undefined;
+        }
+    }
+    
+    getContentType() {
+        return apogeeapp.ui.FIXED_SIZE;
     }
     
     
@@ -25,11 +41,7 @@ apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDat
             ];
         }
         
-        this.panel = new apogeeapp.ui.ConfigurablePanel(layout);
-        
-        var containerDiv = this.getElement();
-        apogeeapp.ui.removeAllChildren(containerDiv);
-        containerDiv.appendChild(this.panel.getElement());
+        this.panel.configureForm(layout);
     }
     
     /**  Override this to return a custom empty value

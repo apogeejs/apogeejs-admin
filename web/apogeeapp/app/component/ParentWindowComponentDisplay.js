@@ -100,7 +100,7 @@ apogeeapp.app.ParentWindowComponentDisplay.prototype.loadWindowFrameEntry = func
 
     //add zero size content
     var dummyDiv = apogeeapp.ui.createElement("div");
-    this.windowFrame.setContent(dummyDiv);
+    this.windowFrame.setContent(dummyDiv,apogeeapp.ui.RESIZABLE);
     
     //set title
     this.windowFrame.setTitle(this.member.getDisplayName());

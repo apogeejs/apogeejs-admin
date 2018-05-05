@@ -95,7 +95,7 @@ apogeeapp.app.TabComponentDisplay.prototype.loadTabEntry = function() {
     //set the content
     //-----------------------
     this.createDisplayContent();
-    this.tab.setContent(this.contentElement);
+    this.tab.setContent(this.contentElement,apogeeapp.ui.RESIZABLE);
     
     var tabShown = function() {
         instance.parentContainer.elementIsShown();

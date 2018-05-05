@@ -4,10 +4,16 @@
  */
 apogeeapp.ui.ConfigurablePanel = class {
     
-    constructor(formInitData,optionalContainerClassName = apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED) {
+    constructor(optionalContainerClassName = apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED) {
         this.elementObjects = [];
-        this.panelElement = this.createPanelElement(optionalContainerClassName);
-        
+        this.panelElement = this.createPanelElement(optionalContainerClassName); 
+    }
+    
+    configureForm(formInitData) {
+        //clear data
+        apogeeapp.ui.removeAllChildren(this.panelElement);
+        this.elementObjects = [];
+        //create elements
         formInitData.forEach(elementInitData => this.addToPanel(elementInitData));
     }
     

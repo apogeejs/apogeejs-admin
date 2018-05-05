@@ -9,11 +9,9 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.EditorDataDis
     constructor(viewMode,callbacks,formLayout) {
         super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.SCROLLING);
         
-        var containerDiv = this.getElement();
-        
-        this.panel = new apogeeapp.ui.ConfigurablePanel(formLayout);    
+        this.panel = new apogeeapp.ui.ConfigurablePanel();   
+        this.panel.configureForm(formLayout);
         var mainDiv = document.getElementById("mainDiv");
-        containerDiv.appendChild(this.panel.getElement());
         
         var onChange = (form,value) => {
             if(!this.inEditMode()) {
@@ -25,6 +23,15 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.EditorDataDis
     
     getPanel() {
         return this.panel;
+    }
+    
+    /** This method will return undefined until showData is called. */
+    getContent() {
+        return this.panel.getElement();
+    }
+    
+    getContentType() {
+        return apogeeapp.ui.FIXED_SIZE;
     }
     
     getEditorData() {

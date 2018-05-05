@@ -57,7 +57,7 @@ apogeeapp.app.ViewMode.prototype.getDisplayWindow = function() {
 
 apogeeapp.app.ViewMode.prototype.getElement = function() {
     if(this.dataDisplay) {
-        return this.dataDisplay.getElement();
+        return this.dataDisplay.getContent();
     }
     else {
         return null;
@@ -215,7 +215,7 @@ apogeeapp.app.ViewMode.prototype.setDisplayState = function() {
 
 apogeeapp.app.ViewMode.prototype.placeDisplayInWindow = function() {
     if(this.dataDisplay) {
-        this.componentDisplay.showDisplayElement(this.dataDisplay.getElement());
+        this.componentDisplay.showDataDisplay(this.dataDisplay);
         if((this.windowLoaded)&&(this.dataDisplay.onLoad)) this.dataDisplay.onLoad();
         this.displayInWindow = true;
     }
@@ -223,7 +223,7 @@ apogeeapp.app.ViewMode.prototype.placeDisplayInWindow = function() {
 
 apogeeapp.app.ViewMode.prototype.removeDisplayfromWindow = function() {
     if(this.dataDisplay) {
-        this.componentDisplay.removeDisplayElement(this.dataDisplay.getElement());
+        this.componentDisplay.removeDisplayElement(this.dataDisplay.getContent());
         if((this.windowLoaded)&&(this.dataDisplay.onUnload)) this.dataDisplay.onUnload();
         this.displayInWindow = false;
     }

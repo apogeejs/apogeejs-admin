@@ -36,6 +36,10 @@ var DEFAULT_ZOOM = 1;
 apogeeapp.app.SimpleGeojsonDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
     constructor(viewMode,member) {
         super(viewMode)
+        
+        //create map element - this css class will fill the parent (the window frame) with no scrolling 
+        this.mapElement = apogeeapp.ui.createElement("div");
+        this.mapElement.className = "visiui_win_container_fixed";
     
         this.member = member;
         this.previousSetView = null;
@@ -46,10 +50,8 @@ apogeeapp.app.SimpleGeojsonDisplay = class extends apogeeapp.app.NonEditorDataDi
             //already initialized
             return;
         }
-
-        //create map
-        var outputElement = this.getElement();
-        this.map = L.map(outputElement);
+        
+        this.map = L.map(this.mapElement);
 
         //add tiles
         L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -58,6 +60,18 @@ apogeeapp.app.SimpleGeojsonDisplay = class extends apogeeapp.app.NonEditorDataDi
         }).addTo(this.map);
 
         this.map.setView(DEFAULT_LAT_LNG,DEFAULT_ZOOM);
+    }
+    
+    //This gets the content for the display
+    getContent() {
+        return this.mapElement;
+    }
+    
+    //this method tells the window the type of content:
+    //apogeeapp.ui.RESIZABLE - if the window can freely resize it
+    //apogeeapp.ui.FIXED_SIZE - if the content is fixed size
+    getContentType() {
+        return apogeeapp.ui.RESIZABLE;
     }
 
     showData() {

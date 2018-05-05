@@ -71,15 +71,21 @@ apogeeapp.app.EditorDataDisplay = class {
 
     //this methodis called on loading the display. OPTIONAL
     //destroy() {}
+    
+    //This method returns the content element for the data display REQUIRED
+    //getContent() {}
+    
+    //This method returns the content type for the content. The choices of values are REQUIRED
+    //apogeeapp.ui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
+    //apogeeapp.ui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.*/
+    //getContentType() {}
+    
+    
 
 
     //=============================
     // protected, package and private Methods
     //=============================
-
-    getElement() {
-        return this.outsideDiv;
-    }
 	
     showData() {
         var data;

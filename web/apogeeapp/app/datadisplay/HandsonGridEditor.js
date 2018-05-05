@@ -3,8 +3,6 @@ apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.EditorDataDisplay 
     
     constructor(viewMode,callbacks) {
         super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.NON_SCROLLING);
-        
-        var containerDiv = this.getElement();
 
         //TBR initial sizing. now I just set it to a dummy number	
         this.gridDiv = apogeeapp.ui.createElement("div",null,{
@@ -16,7 +14,6 @@ apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.EditorDataDisplay 
             "overflow":"hidden",
             "zIndex":0
         });
-        containerDiv.appendChild(this.gridDiv);
 
         this.inputData = null;
         this.activeEditOk = undefined;
@@ -56,6 +53,15 @@ apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.EditorDataDisplay 
 //=============================
 // "Package" Methods
 //=============================
+
+    getContent() {
+        return this.gridDiv;
+    }
+    
+    getContentType() {
+        return apogeeapp.ui.RESIZABLE;
+    }
+    
     getEditorData() {
         //update "input" data before calling update
         if(this.gridControl) this.inputData = apogee.util.jsonCopy(this.gridControl.getData());

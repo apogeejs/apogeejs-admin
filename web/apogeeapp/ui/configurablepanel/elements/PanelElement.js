@@ -11,7 +11,8 @@ apogeeapp.ui.PanelElement = class extends apogeeapp.ui.ConfigurableElement {
         containerElement.className = "apogee_configurablePanelPanelLine";
         
         var formInitData = elementInitData.formData;
-        this.panel = new apogeeapp.ui.ConfigurablePanel(formInitData);
+        this.panel = new apogeeapp.ui.ConfigurablePanel();
+        this.panel.configureForm(formInitData);
         var panelElement = this.panel.getElement();
         panelElement.className = "apogee_configurablePanelPanelLine";
         containerElement.appendChild(panelElement);  

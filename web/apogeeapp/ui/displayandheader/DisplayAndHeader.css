@@ -29,3 +29,8 @@
     position:relative;
     overflow:auto;
 }
+.visiui-dnh-shrink-to-fit {
+    left:0px;
+    top:0px;
+    position:relative;
+}

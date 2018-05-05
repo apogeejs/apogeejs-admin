@@ -54,7 +54,7 @@ apogeeapp.app.dialog.showConfigurableDialog = function(layout,onSubmitFunction) 
     }
     
     //show dialog
-    dialog.setContent(content);
+    dialog.setContent(content,apogeeapp.ui.SIZE_WINDOW_TO_CONTENT);
     apogeeapp.ui.showDialog(dialog);
     
     //size the dialog to the content

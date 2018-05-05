@@ -149,4 +149,26 @@
     /* configurable */
     margin-right:3px;
 }
+
+.visiui_win_container_fixed {
+    position:absolute;
+    top:0px;
+    left:0px;
+    bottom:0px;
+    right:0px;
+    overflow:hidden;
+}
+
+.visiui_win_container_scrolling {
+	position:absolute;
+    top:0px;
+    left:0px;
+    bottom:0px;
+    right:0px;
+    overflow:auto;
+}
+
+.visiui_win_container_fit_content {
+	position:relative;
+}
  

@@ -344,12 +344,12 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewTypeSelect = functi
 }
 
 /** This method should be called to put the display element in the window. */
-apogeeapp.app.EditWindowComponentDisplay.prototype.showDisplayElement = function(displayElement) {
+apogeeapp.app.EditWindowComponentDisplay.prototype.showDataDisplay = function(dataDisplay) {
     if(this.windowFrame) {
-        this.windowFrame.setContent(displayElement);
+        this.windowFrame.setContent(dataDisplay.getContent(),dataDisplay.getContentType());
     } 
     else if(this.plainFrame) {
-        this.plainFrame.setContent(displayElement);
+        this.plainFrame.setContent(dataDisplay.getContent(),dataDisplay.getContentType());
     }
 }
 

@@ -228,7 +228,6 @@ module.exports = function(grunt) {
             "apogeeapp/ui/splitpane/SplitPane.css",
             "apogeeapp/ui/tabframe/TabFrame.css",
             "apogeeapp/ui/treecontrol/TreeControl.css",
-            "apogeeapp/app/datadisplay/datadisplay.css",
             "apogeeapp/ui/configurablepanel/ConfigurablePanel.css"
           ],
           dest: "../../dist/lib/apogeeui.css"

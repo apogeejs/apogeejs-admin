@@ -217,7 +217,8 @@ and open the template in the editor.
                 entry.onCancel = onCancel;
                 //layout.push(entry);
                 
-                var panel = new apogeeapp.ui.ConfigurablePanel(layout);
+                var panel = new apogeeapp.ui.ConfigurablePanel();
+                panel.configureForm(layout);
                 
                 //alternate method to add submit buttons
                 panel.addSubmit(onSubmit,onCancel);

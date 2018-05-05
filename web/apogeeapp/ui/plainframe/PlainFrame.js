@@ -36,16 +36,35 @@ apogee.base.mixin(apogeeapp.ui.PlainFrame,apogee.EventManager);
 // Public Methods
 //====================================
 
-/** This sets the content for the window */
+/** This sets the content for the window. */
 apogeeapp.ui.PlainFrame.prototype.setHeaderContent = function(contentElement) {
     apogeeapp.ui.removeAllChildren(this.headerCell);
     this.headerCell.appendChild(contentElement);
     this.headerContent = contentElement;
 }
 
-/** This sets the content for the window */
-apogeeapp.ui.PlainFrame.prototype.setContent = function(contentElement) {
+/** This sets the content for the window. The content type
+ *  can be:
+ *  apogeeapp.ui.RESIZABLE - for this content, the content is resized to fit the plane frame. The place frame should be initialized with a size.
+ *  apogeeapp.ui.FIXED_SIZE - for this content, the plain frame is sized to fit the content. ITs size should not be externally set.  */
+apogeeapp.ui.PlainFrame.prototype.setContent = function(contentElement,elementType) {
+    
     apogeeapp.ui.removeAllChildren(this.bodyCell);
+    
+    //set the body type
+    var bodyClassName;
+    if(elementType == apogeeapp.ui.RESIZABLE) {
+       bodyClassName = "visiui-dnh-fixed";
+    }
+    else if(elementType == apogeeapp.ui.FIXED_SIZE) {
+        bodyClassName = "visiui-dnh-shrink-to-fit";
+    }
+    else {
+        throw new Error("Unknown content type: " + elementType);
+    }
+    this.displayAndHeader.setBodyType(bodyClassName);
+    
+    //set the content
     this.bodyCell.appendChild(contentElement);
     this.content = contentElement;
 }

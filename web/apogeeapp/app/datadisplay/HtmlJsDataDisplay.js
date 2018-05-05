@@ -20,8 +20,6 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
         
         this.resource = resource;
         this.member = member;
-
-        var containerElement = this.getElement();
     
         this.outputElement = apogeeapp.ui.createElement("div",null,{
             "position":"absolute",
@@ -31,7 +29,6 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
             "right":"0px",
             "overflow":"auto"
         });
-        containerElement.appendChild(this.outputElement);
 
         //content
         if(html) {
@@ -153,6 +150,14 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
                 alert("Error in " + this.member.getFullName() + " init function: " + error.message);
             }
         }
+    }
+    
+    getContent() {
+        return this.outputElement;
+    }
+    
+    getContentType() {
+        return apogeeapp.ui.RESIZABLE;
     }
    
 }

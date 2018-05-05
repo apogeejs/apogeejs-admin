@@ -254,6 +254,13 @@ apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisp
         super(viewMode,apogeeapp.app.NonEditorDataDisplay.SCROLLING);
     
         this.member = member;
+        //create a content element of variable size in the top left of the parent
+        //the chart library will set the size to match the rendered chart
+        this.element = apogeeapp.ui.createElement("div");
+        this.element.style =  {
+            position:"relative",
+            overflow:"auto"
+        };
 
         if(!googleChartLoaded) {
             //register this instance
@@ -262,6 +269,18 @@ apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisp
         else {
             this.libLoaded = true;
         }
+    }
+    
+    //This gets the content for the display
+    getContent() {
+        return this.element;
+    }
+    
+    //this method tells the window the type of content:
+    //apogeeapp.ui.RESIZABLE - if the window can freely resize it
+    //apogeeapp.ui.FIXED_SIZE - if the content is fixed size
+    getContentType() {
+        return apogeeapp.ui.FIXED_SIZE;
     }
 
     showData() {
@@ -325,14 +344,13 @@ apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisp
     }
 
     _instantiateChart() {
-        var element = this.getElement();
         var chartInfoEntry = apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO.find(entry => (entry[1] == this.chartType) );
         if(!chartInfoEntry) {
             alert("Chart type not found: " + this.chartType);
         }
         else {
             var constructorName = chartInfoEntry[2];
-            return new google.visualization[constructorName](element);
+            return new google.visualization[constructorName](this.element);
         }
     }
 

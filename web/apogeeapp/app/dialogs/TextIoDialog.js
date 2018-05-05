@@ -14,7 +14,7 @@ apogeeapp.app.dialog.showTextIoDialog = function(options,onSubmitFunction) {
             "height":"100%",
             "overflow": "auto"
         });
-	dialog.setContent(contentContainer);
+	dialog.setContent(contentContainer,apogeeapp.ui.SIZE_WINDOW_TO_CONTENT);
     
 	var content = apogeeapp.ui.createElement("div",null,
 			{
@@ -100,7 +100,7 @@ textEditor.$blockScrolling = Infinity;
     line.appendChild(apogeeapp.ui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
-    dialog.setContent(content);
+    dialog.setContent(content,apogeeapp.ui.SIZE_WINDOW_TO_CONTENT);
     
     //show dialog
     apogeeapp.ui.showDialog(dialog);

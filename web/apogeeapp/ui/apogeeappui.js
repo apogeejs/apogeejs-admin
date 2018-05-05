@@ -214,6 +214,17 @@ apogeeapp.ui.setMemberCssData = function(objectId,cssText) {
     }
 }
 
+//======================================
+//window content types
+//These are types of content that can be put in a window or other container. If is it 
+//resizable it can be fitted to the window size. If it is fixed size it can be 
+//added to a scrolling window or used to set the container size
+//======================================
+apogeeapp.ui.RESIZABLE = 0x01;
+apogeeapp.ui.FIXED_SIZE = 0x02;
+
+//this is not an actual content type, but an option for displaying FIXED_SIZE content
+apogeeapp.ui.SIZE_WINDOW_TO_CONTENT = 0x03;
 
 
 
