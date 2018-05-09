@@ -26,7 +26,7 @@ apogee.codeAnalysis = {};
 apogee.codeAnalysis.syntax = {
     AssignmentExpression: [{name:'left'},{name:'right'}],
     ArrayExpression: [{name:'elements',list:true}],
-    ArrowFunctionExpression: [{name:'params',list:true},{name:'body'},{name:'defaults',list:true}],
+    ArrowFunctionExpression: [{name:'params',list:true,declaration:true},{name:'body'},{name:'defaults',list:true}],
     BlockStatement: [{name:'body',list:true}],
     BinaryExpression: [
         {name:'left'},
