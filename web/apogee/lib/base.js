@@ -16,24 +16,26 @@ apogee.base.isPromise = function(object) {
 
 /** This method takes a field which can be an object, 
  *array or other value. If it is an object or array it 
- *freezes that object and all of its children, recursively. */
-apogee.base.deepFreeze = function(field) {
-    if((field === null)||(field === undefined)) return;
+ *freezes that object and all of its children, recursively.
+ * Warning - this does not check for cycles (which are not in JSON 
+ * objects but can be in javascript objects)
+ * Implementation from Mozilla */
+apogee.base.deepFreeze = function(obj) {
+    if((obj === null)||(obj === undefined)) return;
     
-    var type = apogee.util.getObjectType(field);
-	var i;
-	if(type == "Object") {
-		Object.freeze(field);
-		for(i in field) {
-			apogee.base.deepFreeze(field[i]);
-		}
-	}
-	else if(type == "Array") {
-		Object.freeze(field);
-		for(i = 0; i < field.length; i++) {
-			apogee.base.deepFreeze(field[i]);
-		}
-	}
+    //retrieve the property names defined on obj
+    var propNames = Object.getOwnPropertyNames(obj);
+
+    //freeze properties before freezing self
+    propNames.forEach(function(name) {
+        var prop = obj[name];
+
+        //freeze prop if it is an object
+        if(typeof prop == 'object' && prop !== null) apogee.base.deepFreeze(prop);
+    });
+
+    //freeze self (no-op if already frozen)
+    return Object.freeze(obj);
 }
 
 /** This method creates an error object, which has a "message" in the format
