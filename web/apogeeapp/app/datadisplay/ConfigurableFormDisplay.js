@@ -5,10 +5,10 @@
  */
 apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
     
-    constructor(viewMode,getLayout) {
+    constructor(viewMode,getLayoutInfo) {
         super(viewMode,apogeeapp.app.NonEditorDataDisplay.SCROLLING);  
         
-        this.getLayout = getLayout;
+        this.getLayoutInfo = getLayoutInfo;
         
         this.panel = this.panel = new apogeeapp.ui.ConfigurablePanel();
     }
@@ -30,9 +30,10 @@ apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDat
     
     //this sets the data into the editor display. REQUIRED
     showData() {
-        var layout = this.getLayout();
-        if(apogee.util.getObjectType(layout) != "Array") {
-            layout = [
+        var layoutInfo = this.getLayoutInfo();
+        if((!layoutInfo)||(apogee.util.getObjectType(layoutInfo.layout) != "Array")) {
+            layoutInfo = {};
+            layoutInfo.layout = [
                 {
                     type: "heading",
                     text: "INVALID FORM LAYOUT!",
@@ -41,7 +42,7 @@ apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDat
             ];
         }
         
-        this.panel.configureForm(layout);
+        this.panel.configureForm(layoutInfo);
     }
     
     /**  Override this to return a custom empty value

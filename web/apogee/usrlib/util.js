@@ -73,6 +73,13 @@ apogee.util.readQueryField = function(field,url) {
     return string ? string[1] : null;
 }
 
+/** This is a not-so-efficient equals for json objects. */
+apogee.util.jsonEquals = function(json1,json2) {
+    var string1 = JSON.stringify(apogee.util.getNormalizedCopy(json1));
+    var string2 = JSON.stringify(apogee.util.getNormalizedCopy(json2));
+    return (string1 == string2);
+}
+
 /** This method returns a copied json that has the order in all object normalized to alphabetical. 
  * This is intended for the purpose of comparing json objects. */
 apogee.util.getNormalizedCopy = function(json) {

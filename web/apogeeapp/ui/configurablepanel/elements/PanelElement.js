@@ -38,7 +38,7 @@ apogeeapp.ui.PanelElement = class extends apogeeapp.ui.ConfigurableElement {
             onChange(this.getValue(),this.getForm());
         }
         //add this to each element in the panel
-        this.panel.addOnChange(childOnChange);
+        this.panel.getChildElements().forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(onChange);} );
     }
     
     //===================================

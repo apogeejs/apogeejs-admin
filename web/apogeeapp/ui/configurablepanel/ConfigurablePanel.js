@@ -14,7 +14,24 @@ apogeeapp.ui.ConfigurablePanel = class {
         apogeeapp.ui.removeAllChildren(this.panelElement);
         this.elementObjects = [];
         //create elements
-        formInitData.forEach(elementInitData => this.addToPanel(elementInitData));
+        
+        //TEMPORARY FOR TESTING!!!
+        var layout;
+        var onChange;
+        if(apogee.util.getObjectType(formInitData) == "Array") {
+            layout = formInitData;
+        }
+        else {
+            layout = formInitData.layout;
+            onChange = formInitData.onChange;
+        }
+        
+        layout.forEach(elementInitData => this.addToPanel(elementInitData));
+        if(onChange) {
+            this.addOnChange(onChange);
+            //call this for initial for setting
+            onChange(this.getValue(),this);
+        }
     }
     
     /** This method returns the ConfigurableElement for the given key. */
@@ -52,6 +69,10 @@ apogeeapp.ui.ConfigurablePanel = class {
         return this.panelElement;
     }
     
+    getChildEntries() {
+        return this.elementObjects;
+    }
+    
     /** This is an alternate way to add a submit entry to the form. This is useful
      * if the layout has no other handlers in it and is a pure JSON object. This 
      * will then separate out any handlers from the layout. */
@@ -74,7 +95,12 @@ apogeeapp.ui.ConfigurablePanel = class {
         this.addToPanel(data);
     }
     
+    //takes a handler onChange(formValue,form)
     addOnChange(onChange) {
+        var childOnChange = (childValue,form) => {
+            var formValue = this.getValue();
+            onChange(formValue,form);
+        }
         this.elementObjects.forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(onChange);} );
     }
     
