@@ -148,7 +148,7 @@ apogeeapp.app.WorkspaceUI.prototype.getFolders = function() {
     for(var key in this.componentMap) {
 		var componentInfo = this.componentMap[key];
         var member = componentInfo.member;
-        if(member.isParent) { 
+        if((member.isParent)&&(member.getChildrenWriteable())) { 
             folders[member.getFullName()] = member;
         }
     }
