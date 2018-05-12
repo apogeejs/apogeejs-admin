@@ -15,12 +15,7 @@ apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDat
     
     /** This method will return undefined until showData is called. */
     getContent() {
-        if(this.panel) {
-            return this.panel.getElement();
-        }
-        else {
-            return undefined;
-        }
+        return this.panel.getElement();
     }
     
     getContentType() {
@@ -30,32 +25,6 @@ apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDat
     
     //this sets the data into the editor display. REQUIRED
     showData() {
-        var layoutInfo = this.getLayoutInfo();
-        if((!layoutInfo)||(apogee.util.getObjectType(layoutInfo.layout) != "Array")) {
-            layoutInfo = {};
-            layoutInfo.layout = [
-                {
-                    type: "heading",
-                    text: "INVALID FORM LAYOUT!",
-                    level: 4
-                }
-            ];
-        }
-        
-        this.panel.configureForm(layoutInfo);
+        this.panel.configureForm(this.getLayoutInfo());
     }
-    
-    /**  Override this to return a custom empty value
-     * @protected */
-    getTableEditSettings() {
-        return apogeeapp.app.ConfigurableFormDisplay.TABLE_EDIT_SETTINGS;
-    }
-
-}
-
-//set a custom empty value - an empty array
-apogeeapp.app.ConfigurableFormDisplay.TABLE_EDIT_SETTINGS = {
-    "viewModes": apogeeapp.app.BasicControlComponent.VIEW_MODES,
-    "defaultView": apogeeapp.app.BasicControlComponent.VIEW_OUTPUT,
-    "emptyDataValue": []
 }

@@ -10,27 +10,39 @@ apogeeapp.ui.ConfigurablePanel = class {
     }
     
     configureForm(formInitData) {
+        
+        //TEMPORARY - legacy check correction----------------------
+        if((formInitData)&&(formInitData.constructor == Array)) {
+            formInitData = {layout:formInitData};
+        }
+        //---------------------------------------------------------
+        
+        //check for an invalid input
+        if((!formInitData)||(!formInitData.layout)||(formInitData.layout.constructor != Array)) {
+            formInitData = apogeeapp.ui.ConfigurablePanel.INVALID_INIT_DATA;
+        }
+             
         //clear data
         apogeeapp.ui.removeAllChildren(this.panelElement);
         this.elementObjects = [];
-        //create elements
         
-        //TEMPORARY FOR TESTING!!!
-        var layout;
-        var onChange;
-        if(apogee.util.getObjectType(formInitData) == "Array") {
-            layout = formInitData;
-        }
-        else {
-            layout = formInitData.layout;
-            onChange = formInitData.onChange;
-        }
+        //create elements     
+        formInitData.layout.forEach(elementInitData => this.addToPanel(elementInitData));
         
-        layout.forEach(elementInitData => this.addToPanel(elementInitData));
-        if(onChange) {
+        //additional init
+        if(formInitData.onChange) {
             this.addOnChange(onChange);
-            //call this for initial for setting
-            onChange(this.getValue(),this);
+        }
+        
+        if(formInitData.onSubmitInfo) {
+            this.addSubmit(formInitData.onSubmitInfo.onSubmit,
+                formInitData.onSubmitInfo.onCancel,
+                formInitData.onSubmitInfo.submitLabel,
+                formInitData.onSubmitInfo.cancelLabel);
+        }
+        
+        if(formInitData.disabled) {
+            this.setDisabled(true);
         }
     }
     
@@ -101,7 +113,7 @@ apogeeapp.ui.ConfigurablePanel = class {
             var formValue = this.getValue();
             onChange(formValue,form);
         }
-        this.elementObjects.forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(onChange);} );
+        this.elementObjects.forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(childOnChange);} );
     }
     
     setDisabled(isDisabled) {
@@ -168,6 +180,16 @@ apogeeapp.ui.ConfigurablePanel.elementMap = {};
 apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT = "apogee_configurablePanelBody_fillParent";
 apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED = "apogee_configurablePanelBody_selfSized";
 
+//This is displayed if there is an invalid layout passed in
+apogeeapp.ui.ConfigurablePanel.INVALID_INIT_DATA = {
+    layout: [
+        {
+            type: "heading",
+            text: "INVALID FORM LAYOUT!",
+            level: 4
+        }
+    ]
+}
 
 
 

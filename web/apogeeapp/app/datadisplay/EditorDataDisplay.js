@@ -24,14 +24,14 @@ apogeeapp.app.EditorDataDisplay = class {
     }
     
     save() {
-        var text = this.getEditorData();
+        var data = this.getEditorData();
         var saveComplete;
 
         if((this.callbacks)&&(this.callbacks.saveData)) {
-            saveComplete = this.callbacks.saveData(text);
+            saveComplete = this.callbacks.saveData(data);
         }
         else {
-            alert("Error: Data not saved: ave callback not set!");
+            alert("Error: Data not saved: save callback not set!");
             saveComplete = true;
         }
 

@@ -7,9 +7,6 @@ apogeeapp.app.FormTableComponent = function(workspaceUI,folder) {
     this.dataTable = folder.lookupChildFromPathArray(["data"]) ;
     this.layoutTable = folder.lookupChildFromPathArray(["layout"]) ;
     
-    //keep the form display alive
-    this.displayDestroyFlags = apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
-    
     //add a cleanup and save actions
     this.addOpenAction(apogeeapp.app.FormTableComponent.readFromJson);
     this.addSaveAction(apogeeapp.app.FormTableComponent.writeToJson);
@@ -58,9 +55,8 @@ apogeeapp.app.FormTableComponent.prototype.getDataDisplay = function(viewMode,vi
             
         case apogeeapp.app.FormTableComponent.VIEW_FORM:
             viewMode.setDisplayDestroyFlags(this.displayDestroyFlags);
-            callbacks = this.getFormEditorCallbacks();
-            var formEditorDisplay = new apogeeapp.app.ConfigurableFormEditor(viewMode,callbacks);
-            return formEditorDisplay;
+            this.outputMode = viewMode;
+            return this.getOutputDisplay(viewMode);
 			
 		case apogeeapp.app.FormTableComponent.VIEW_LAYOUT_CODE:
             callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.layoutTable,apogeeapp.app.FormTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
@@ -70,7 +66,7 @@ apogeeapp.app.FormTableComponent.prototype.getDataDisplay = function(viewMode,vi
 			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.layoutTable,apogeeapp.app.FormTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
             return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
         
-        case apogeeapp.app.FormTableComponent.VIEW_FORM_VALUE:
+        case apogeeapp.app.FormTableComponent.VIEW_FORM_DATA:
             callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.dataTable);
             return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/json");
             
@@ -86,40 +82,111 @@ apogeeapp.app.FormTableComponent.prototype.getDataDisplay = function(viewMode,vi
 	}
 }
 
-apogeeapp.app.FormTableComponent.prototype.getFormEditorCallbacks = function() {
-    var callbacks = {};
+/** This creates a form whose layout is the member value. */
+apogeeapp.app.FormTableComponent.prototype.getOutputDisplay = function(viewMode) {
     
-    //return desired form value
-    callbacks.getData = () => this.dataTable.getData();
+    var getLayoutInfo = () => {
+        var formLayoutInfo = this.layoutTable.getData();
+        var formValue = this.dataTable.getData();
+        var messenger = new apogee.action.Messenger(this.layoutTable);
+        
+        return apogeeapp.app.FormTableComponent.createGetLayoutInfo(formLayoutInfo,formValue,messenger);
+    } 
     
-    //return form layout
-    callbacks.getLayoutInfo = () => this.layoutTable.getData();
+    //////////////////////////////////////////////////////
+    //var getLayoutInfo = () => this.layoutTable.getData();
+    return new apogeeapp.app.ConfigurableFormDisplay(viewMode,getLayoutInfo);
+}
+
+/** This static method constructs the form layout from the input layout and the input value. */
+apogeeapp.app.FormTableComponent.createGetLayoutInfo = function(formLayoutInfo,formValue,messenger) {
     
-    //edit ok - always true
-    callbacks.getEditOk = () => true;
+    var layout = apogee.util.jsonCopy(formLayoutInfo.layout);
+    var doClear = formLayoutInfo.doClear;
+    var clearValue = formLayoutInfo.clearValue;
+    var checkDataInvalid = formLayoutInfo.checkDataInvalid;
     
-    //save data - just form value here
-    var messenger = new apogee.action.Messenger(this.layoutTable);
-    callbacks.saveData = (formData) => {
-        if(this.checkDataInvalid) {
+    var onSave = (formData) => {
+        if(checkDataInvalid) {
             //check data invalid returns false or a message
-            var invalidResult = this.checkDataInvalid(formData);
+            var invalidResult = checkDataInvalid(formData);
             if(invalidResult) {
                 alert(invalidResult.errorMessage);
-                return false;
+                return;
             }
         }
 
         messenger.dataUpdate("data",formData);
-        return true;
     }
-    
-    return callbacks;
+
+    if(doClear) {
+        var onClear = () => {
+            messenger.dataUpdate("data",clearValue);
+        }
+    }
+
+    var onChange = (value,form) => {
+        var submitElement = form.getEntry("submitElement");
+        if(apogee.util.jsonEquals(value,formValue)) {
+            submitElement.submitDisable(true);
+        }
+        else {
+            submitElement.submitDisable(false);
+        }
+    }
+
+    layout.map(element => apogeeapp.app.FormTableComponent.setElementValue(element,formValue));
+
+    //submit (no cancel)
+    var entry = {};
+    entry.type = "submit";
+    entry.onSubmit = onSave;
+    entry.submitLabel = "Save";
+    if(doClear) {
+        entry.onCancel = onClear;
+        entry.cancelLabel = "Clear";
+    }
+    entry.key = "submitElement";
+    layout.push(entry);
+
+    //return value
+    var data = {};
+    data.layout = layout;
+    data.onChange = onChange;
+    return data;
 }
+
+apogeeapp.app.FormTableComponent.setElementValue = function(element,formValue) {
+    if(element.type == "panel") {
+        //compound element
+        if(formValue) {
+           var childValue = formValue[element.key];
+           setFormValue(element.layout,childValue,null);
+        }
+    }
+    if(element.default != undefined) {
+        //simple valued elements
+        if((formValue)&&(formValue[element.key] != undefined)) {
+            element.value = formValue[element.key];
+        }
+        else {
+            element.value = element.default;
+        }
+        
+    }
+}
+
 
 //======================================
 // Static methods
 //======================================
+
+apogeeapp.app.FormTableComponent.getCreateMemberPayload = function(userInputValues) {
+    var json = {};
+    json.name = userInputValues.name;
+    json.type = apogee.JsonTable.generator.type;
+    return json;
+}
 
 apogeeapp.app.FormTableComponent.getCreateMemberPayload = function(userInputValues) {
     var json = {};

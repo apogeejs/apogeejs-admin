@@ -1,30 +1,32 @@
-/** Editor that uses the Ace text editor.
- * 
- * @param {type} viewMode - the apogee view mode
- * @param {type} callbacks - {getData,getEditOk,setData}; format for data is text
- * @param {type} formLayout - the layout for the configurable panel
- */
+/** This is an editor that displays a customized form for data input. */
 apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.EditorDataDisplay {
     
-    constructor(viewMode,callbacks,formLayout) {
+    /** This allows for a static or dynamic layout setting
+     * @param {type} viewMode - the apogee view mode
+     * @param {type} callbacks - {
+     *  - getData - returns the desired form value,
+     *  - getEditOk - gets if form is editable,
+     *  - setData - called when data is saved, with the form value
+     *  - getLayoutInfo - OPTIONAL - if this is set, the layout will be dynamically loaded whenever the
+     *  form is updated. Alternatively, the fixed layout info can be passed in as a constructor argument.
+     *  }
+     * @param {type} optionalFixedLayoutInfo - the layout for the configurable panel. 
+     * It should be populated if a fixed layout is OK. In this case, the getLayoutInfo
+     * allack should not be populated. 
+     */
+    constructor(viewMode,callbacks,optionalFixedLayoutInfo) {
         super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.SCROLLING);
         
-        this.panel = new apogeeapp.ui.ConfigurablePanel();   
-        this.panel.configureForm(formLayout);
-        var mainDiv = document.getElementById("mainDiv");
+        //layout can be fixed or dynamic
+        this.dynamicLayoutCallback = callbacks.getLayoutInfo;
         
-        var onChange = (form,value) => {
-            if(!this.inEditMode()) {
-                this.onTriggerEditMode();
-            }
-        } 
-        this.panel.addOnChange(onChange);
+        this.panel = new apogeeapp.ui.ConfigurablePanel();
+        
+        if(optionalFixedLayoutInfo) {
+            this.panel.configureLayout(optionalFixedLayoutInfo);
+        }
     }
-    
-    getPanel() {
-        return this.panel;
-    }
-    
+
     /** This method will return undefined until showData is called. */
     getContent() {
         return this.panel.getElement();
@@ -34,21 +36,34 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.EditorDataDis
         return apogeeapp.ui.FIXED_SIZE;
     }
     
+    /** This returns the form value (not the layout too) */
     getEditorData() {
+        //output data is the form
         return this.panel.getValue();
     }
     
-    setEditorData(data) {
-        this.panel.setValue(data);
+    /** This is passed the data form the data callback, which should be the extended data  - including layout + value */
+    setEditorData(savedFormValue) {
+        //input data is the layout and the value
+
+        //set layout if dynmaically loaded
+        if(this.dynamicLayoutCallback) {
+            var layoutInfo = this.dynamicLayoutCallback();
+            this.panel.configureForm(layoutInfo);
+        }
+        
+        //set change to enable save bar is form value differs from initial data
+        var onChange = (currentFormValue,form) => {
+            if(apogee.util.jsonEquals(currentFormValue,savedFormValue)) {
+                this.endEditMode()
+            }
+            else {
+                this.startEditMode();
+            }
+        }
+        this.panel.addOnChange(onChange);
+        
+        this.panel.setValue(savedFormValue);
     }
-    
-//    endEditMode() {
-//        this.editor.setReadOnly(true);
-//        super.endEditMode();
-//    }
-//    
-//    startEditMode() {
-//        super.startEditMode();
-//        this.editor.setReadOnly(false);
-//    }
 }
+
