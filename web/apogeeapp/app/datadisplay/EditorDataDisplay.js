@@ -12,20 +12,20 @@ apogeeapp.app.EditorDataDisplay = class {
         this.viewMode = viewMode;
         this.callbacks = callbacks;
         this.editOk = false;
-        this.editMode = false;
     }
 
     setCallbacks(callbacks) {
         this.callbacks = callbacks;
     }
-
-    inEditMode() {
-        return this.editMode;
-    }
     
     save() {
         var data = this.getEditorData();
         var saveComplete;
+        
+        //figure out if there is a problem with this - we hav to end edit mode before
+        //we save because in edit mode it will not overwrite the data in the display
+        //if we fail, we restart edit mode below
+        this.endEditMode();
 
         if((this.callbacks)&&(this.callbacks.saveData)) {
             saveComplete = this.callbacks.saveData(data);
@@ -36,8 +36,8 @@ apogeeapp.app.EditorDataDisplay = class {
         }
 
         //end edit mode if we entered it
-        if((saveComplete)&&(this.editMode)) {
-            this.endEditMode();
+        if(!saveComplete) {
+            this.startEditMode();
         }
     }
 
@@ -114,8 +114,8 @@ apogeeapp.app.EditorDataDisplay = class {
 
     /** @protected */
     endEditMode() {
-        this.editMode = false;
         this.viewMode.endEditMode();
+
     }
     
     /** @protected */
@@ -124,13 +124,11 @@ apogeeapp.app.EditorDataDisplay = class {
         var onCancel = () => this.cancel();
 
         this.viewMode.startEditMode(onSave,onCancel);
-
-        this.editMode = true;
     }
 
     /** @protected */
     onTriggerEditMode() {
-        if((this.editOk)&&(!this.editMode)) {
+        if(this.editOk) {
             this.startEditMode();
         }
     }

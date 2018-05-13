@@ -4,8 +4,9 @@ apogeeapp.app.FormTableComponent = function(workspaceUI,folder) {
     apogeeapp.app.EditComponent.call(this,workspaceUI,folder,apogeeapp.app.FormTableComponent);
     
     //load these!
-    this.dataTable = folder.lookupChildFromPathArray(["data"]) ;
-    this.layoutTable = folder.lookupChildFromPathArray(["layout"]) ;
+    this.dataTable = folder.lookupChildFromPathArray(["data"]);
+    this.layoutTable = folder.lookupChildFromPathArray(["layout"]);
+    this.isInputValidFunctionTable = folder.lookupChildFromPathArray(["isInputValid"]);
     
     //keep the form display alive
     this.displayDestroyFlags = apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
@@ -26,12 +27,16 @@ apogeeapp.app.FormTableComponent.VIEW_FORM = "Form";
 apogeeapp.app.FormTableComponent.VIEW_LAYOUT_CODE = "Layout Code";
 apogeeapp.app.FormTableComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE = "Layout Private";
 apogeeapp.app.FormTableComponent.VIEW_FORM_VALUE = "Form Value";
+apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_CODE = "isInputValid(formValue)";
+apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE = "isInputValid Private";
 apogeeapp.app.FormTableComponent.VIEW_DESCRIPTION = "Notes";
 
 apogeeapp.app.FormTableComponent.VIEW_MODES = [
     apogeeapp.app.FormTableComponent.VIEW_FORM,
     apogeeapp.app.FormTableComponent.VIEW_LAYOUT_CODE,
     apogeeapp.app.FormTableComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE,
+    apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_CODE,
+    apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE,
     apogeeapp.app.FormTableComponent.VIEW_FORM_VALUE,
     apogeeapp.app.FormTableComponent.VIEW_DESCRIPTION
 ];
@@ -74,6 +79,14 @@ apogeeapp.app.FormTableComponent.prototype.getDataDisplay = function(viewMode,vi
             callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.dataTable);
             return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/json");
             
+        case apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_CODE:
+            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.isInputValidFunctionTable,apogeeapp.app.FormTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+			
+		case apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE:
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.isInputValidFunctionTable,apogeeapp.app.FormTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+            
         case apogeeapp.app.FormTableComponent.VIEW_DESCRIPTION:
 			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.dataTable);
             //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
@@ -100,17 +113,24 @@ apogeeapp.app.FormTableComponent.prototype.getFormEditorCallbacks = function() {
     
     //save data - just form value here
     var messenger = new apogee.action.Messenger(this.layoutTable);
-    callbacks.saveData = (formData) => {
-        if(this.checkDataInvalid) {
-            //check data invalid returns false or a message
-            var invalidResult = this.checkDataInvalid(formData);
-            if(invalidResult) {
-                alert(invalidResult.errorMessage);
+    callbacks.saveData = (formValue) => {
+        
+        //validate input
+        var isInputValid = this.isInputValidFunctionTable.getData();
+        var validateResult = isInputValid(formValue);
+        if(validateResult !== true) {
+            if(typeof validateResult == 'string') {
+                alert(validateResult);
                 return false;
+            }
+            else {
+                alert("Improper format for isInputValid function. It should return true or an error message");
+                return;
             }
         }
 
-        messenger.dataUpdate("data",formData);
+        //save the data
+        messenger.dataUpdate("data",formValue);
         return true;
     }
     
@@ -132,7 +152,6 @@ apogeeapp.app.FormTableComponent.getCreateMemberPayload = function(userInputValu
             "type": "apogee.JsonTable",
             "updateData": {
                 "data": "",
-                "description": ""
             }
         },
         "data": {
@@ -140,7 +159,14 @@ apogeeapp.app.FormTableComponent.getCreateMemberPayload = function(userInputValu
             "type": "apogee.JsonTable",
             "updateData": {
                 "data": "",
-                "description": ""
+            }
+        },
+        "isInputValid": {
+            "name": "isInputValid",
+            "type": "apogee.FunctionTable",
+            "updateData": {
+                "argList":["formValue"],
+                "functionBody": "//If data valid, return true. If data is invalid, return an error message.\nreturn true;"
             }
         }
     };
