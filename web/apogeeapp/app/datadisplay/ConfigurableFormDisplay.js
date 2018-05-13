@@ -1,4 +1,5 @@
-/** This is a form that the is configurable.
+/* This is a form display. It is meant for taking a submit action. If you want a form
+ * tied to a data value, the ConfigurableFormEditor can be used.
  * 
  * @param {type} viewMode - the apogee view mode
  * @param {type} getLayout - this callback retrieves the form layout

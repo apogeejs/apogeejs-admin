@@ -23,7 +23,7 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.EditorDataDis
         this.panel = new apogeeapp.ui.ConfigurablePanel();
         
         if(optionalFixedLayoutInfo) {
-            this.panel.configureLayout(optionalFixedLayoutInfo);
+            this.panel.configureForm(optionalFixedLayoutInfo);
         }
     }
 

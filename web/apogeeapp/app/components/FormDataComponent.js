@@ -1,7 +1,13 @@
-/** This component represents a json table object. */
-apogeeapp.app.FormTableComponent = function(workspaceUI,folder) {
+/** This ccomponent represents a data value, with input being from a configurable form.
+ * This is an example of componound component. The data associated with the form
+ * can be accessed from the variables (componentName).data. There are also subtables
+ * "layout" which contains the form layout and "isInputValid" which is a function
+ * to validate form input.
+ * If you want a form to take an action on submit rather than create and edit a 
+ * data value, you can use the dynmaic form. */
+apogeeapp.app.FormDataComponent = function(workspaceUI,folder) {
     //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,folder,apogeeapp.app.FormTableComponent);
+    apogeeapp.app.EditComponent.call(this,workspaceUI,folder,apogeeapp.app.FormDataComponent);
     
     //load these!
     this.dataTable = folder.lookupChildFromPathArray(["data"]);
@@ -12,82 +18,82 @@ apogeeapp.app.FormTableComponent = function(workspaceUI,folder) {
     this.displayDestroyFlags = apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
     
     //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.FormTableComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.FormTableComponent.writeToJson);
+    this.addOpenAction(apogeeapp.app.FormDataComponent.readFromJson);
+    this.addSaveAction(apogeeapp.app.FormDataComponent.writeToJson);
 };
 
-apogeeapp.app.FormTableComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
-apogeeapp.app.FormTableComponent.prototype.constructor = apogeeapp.app.FormTableComponent;
+apogeeapp.app.FormDataComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
+apogeeapp.app.FormDataComponent.prototype.constructor = apogeeapp.app.FormDataComponent;
 
 //==============================
 // Protected and Private Instance Methods
 //==============================
 
-apogeeapp.app.FormTableComponent.VIEW_FORM = "Form";
-apogeeapp.app.FormTableComponent.VIEW_LAYOUT_CODE = "Layout Code";
-apogeeapp.app.FormTableComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE = "Layout Private";
-apogeeapp.app.FormTableComponent.VIEW_FORM_VALUE = "Form Value";
-apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_CODE = "isInputValid(formValue)";
-apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE = "isInputValid Private";
-apogeeapp.app.FormTableComponent.VIEW_DESCRIPTION = "Notes";
+apogeeapp.app.FormDataComponent.VIEW_FORM = "Form";
+apogeeapp.app.FormDataComponent.VIEW_LAYOUT_CODE = "Layout Code";
+apogeeapp.app.FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE = "Layout Private";
+apogeeapp.app.FormDataComponent.VIEW_FORM_VALUE = "Form Value";
+apogeeapp.app.FormDataComponent.VIEW_INPUT_INVALID_CODE = "isInputValid(formValue)";
+apogeeapp.app.FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE = "isInputValid Private";
+apogeeapp.app.FormDataComponent.VIEW_DESCRIPTION = "Notes";
 
-apogeeapp.app.FormTableComponent.VIEW_MODES = [
-    apogeeapp.app.FormTableComponent.VIEW_FORM,
-    apogeeapp.app.FormTableComponent.VIEW_LAYOUT_CODE,
-    apogeeapp.app.FormTableComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE,
-    apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_CODE,
-    apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE,
-    apogeeapp.app.FormTableComponent.VIEW_FORM_VALUE,
-    apogeeapp.app.FormTableComponent.VIEW_DESCRIPTION
+apogeeapp.app.FormDataComponent.VIEW_MODES = [
+    apogeeapp.app.FormDataComponent.VIEW_FORM,
+    apogeeapp.app.FormDataComponent.VIEW_LAYOUT_CODE,
+    apogeeapp.app.FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE,
+    apogeeapp.app.FormDataComponent.VIEW_INPUT_INVALID_CODE,
+    apogeeapp.app.FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE,
+    apogeeapp.app.FormDataComponent.VIEW_FORM_VALUE,
+    apogeeapp.app.FormDataComponent.VIEW_DESCRIPTION
 ];
 
-apogeeapp.app.FormTableComponent.TABLE_EDIT_SETTINGS = {
-    "viewModes": apogeeapp.app.FormTableComponent.VIEW_MODES,
-    "defaultView": apogeeapp.app.FormTableComponent.VIEW_FORM,
+apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": apogeeapp.app.FormDataComponent.VIEW_MODES,
+    "defaultView": apogeeapp.app.FormDataComponent.VIEW_FORM,
 }
 
 /**  This method retrieves the table edit settings for this component instance
  * @protected */
-apogeeapp.app.FormTableComponent.prototype.getTableEditSettings = function() {
-    return apogeeapp.app.FormTableComponent.TABLE_EDIT_SETTINGS;
+apogeeapp.app.FormDataComponent.prototype.getTableEditSettings = function() {
+    return apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS;
 }
 
 /** This method should be implemented to retrieve a data display of the give type. 
  * @protected. */
-apogeeapp.app.FormTableComponent.prototype.getDataDisplay = function(viewMode,viewType) {
+apogeeapp.app.FormDataComponent.prototype.getDataDisplay = function(viewMode,viewType) {
 	
     var callbacks;
     
 	//create the new view element;
 	switch(viewType) {
             
-        case apogeeapp.app.FormTableComponent.VIEW_FORM:
+        case apogeeapp.app.FormDataComponent.VIEW_FORM:
             viewMode.setDisplayDestroyFlags(this.displayDestroyFlags);
             callbacks = this.getFormEditorCallbacks();
             var formEditorDisplay = new apogeeapp.app.ConfigurableFormEditor(viewMode,callbacks);
             return formEditorDisplay;
 			
-		case apogeeapp.app.FormTableComponent.VIEW_LAYOUT_CODE:
-            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.layoutTable,apogeeapp.app.FormTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+		case apogeeapp.app.FormDataComponent.VIEW_LAYOUT_CODE:
+            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.layoutTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
 			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
 			
-		case apogeeapp.app.FormTableComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE:
-			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.layoutTable,apogeeapp.app.FormTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+		case apogeeapp.app.FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE:
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.layoutTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
             return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
         
-        case apogeeapp.app.FormTableComponent.VIEW_FORM_VALUE:
+        case apogeeapp.app.FormDataComponent.VIEW_FORM_VALUE:
             callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.dataTable);
             return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/json");
             
-        case apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_CODE:
-            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.isInputValidFunctionTable,apogeeapp.app.FormTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+        case apogeeapp.app.FormDataComponent.VIEW_INPUT_INVALID_CODE:
+            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.isInputValidFunctionTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
 			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
 			
-		case apogeeapp.app.FormTableComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE:
-			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.isInputValidFunctionTable,apogeeapp.app.FormTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+		case apogeeapp.app.FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE:
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.isInputValidFunctionTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
             return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
             
-        case apogeeapp.app.FormTableComponent.VIEW_DESCRIPTION:
+        case apogeeapp.app.FormDataComponent.VIEW_DESCRIPTION:
 			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.dataTable);
             //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
             return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
@@ -99,7 +105,7 @@ apogeeapp.app.FormTableComponent.prototype.getDataDisplay = function(viewMode,vi
 	}
 }
 
-apogeeapp.app.FormTableComponent.prototype.getFormEditorCallbacks = function() {
+apogeeapp.app.FormDataComponent.prototype.getFormEditorCallbacks = function() {
     var callbacks = {};
     
     //return desired form value
@@ -141,7 +147,7 @@ apogeeapp.app.FormTableComponent.prototype.getFormEditorCallbacks = function() {
 // Static methods
 //======================================
 
-apogeeapp.app.FormTableComponent.getCreateMemberPayload = function(userInputValues) {
+apogeeapp.app.FormDataComponent.getCreateMemberPayload = function(userInputValues) {
     var json = {};
     json.name = userInputValues.name;
     json.type = apogee.Folder.generator.type;
@@ -173,11 +179,11 @@ apogeeapp.app.FormTableComponent.getCreateMemberPayload = function(userInputValu
     return json;
 }
 
-apogeeapp.app.FormTableComponent.writeToJson = function(json) {
+apogeeapp.app.FormDataComponent.writeToJson = function(json) {
     json.dataView = this.dataView;
 }
 
-apogeeapp.app.FormTableComponent.readFromJson = function(json) {
+apogeeapp.app.FormDataComponent.readFromJson = function(json) {
     if(json.dataView !== undefined) {
         this.dataView = json.dataView;
     }
@@ -187,9 +193,9 @@ apogeeapp.app.FormTableComponent.readFromJson = function(json) {
 // This is the component generator, to register the component
 //======================================
 
-apogeeapp.app.FormTableComponent.displayName = "Form Table";
-apogeeapp.app.FormTableComponent.uniqueName = "apogeeapp.app.FormTableComponent";
-apogeeapp.app.FormTableComponent.DEFAULT_WIDTH = 300;
-apogeeapp.app.FormTableComponent.DEFAULT_HEIGHT = 300;
-apogeeapp.app.FormTableComponent.ICON_RES_PATH = "/componentIcons/formControl.png";
+apogeeapp.app.FormDataComponent.displayName = "Form Data Table";
+apogeeapp.app.FormDataComponent.uniqueName = "apogeeapp.app.FormDataComponent";
+apogeeapp.app.FormDataComponent.DEFAULT_WIDTH = 300;
+apogeeapp.app.FormDataComponent.DEFAULT_HEIGHT = 300;
+apogeeapp.app.FormDataComponent.ICON_RES_PATH = "/componentIcons/formControl.png";
 

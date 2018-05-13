@@ -31,7 +31,7 @@ apogeeapp.ui.ConfigurablePanel = class {
         
         //additional init
         if(formInitData.onChange) {
-            this.addOnChange(onChange);
+            this.addOnChange(formInitData.onChange);
         }
         
         if(formInitData.onSubmitInfo) {
