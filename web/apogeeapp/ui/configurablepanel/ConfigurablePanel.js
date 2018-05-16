@@ -21,28 +21,36 @@ apogeeapp.ui.ConfigurablePanel = class {
         if((!formInitData)||(!formInitData.layout)||(formInitData.layout.constructor != Array)) {
             formInitData = apogeeapp.ui.ConfigurablePanel.INVALID_INIT_DATA;
         }
-             
+        
         //clear data
         apogeeapp.ui.removeAllChildren(this.panelElement);
         this.elementObjects = [];
         
-        //create elements     
-        formInitData.layout.forEach(elementInitData => this.addToPanel(elementInitData));
-        
-        //additional init
-        if(formInitData.onChange) {
-            this.addOnChange(formInitData.onChange);
+        try {
+            //create elements     
+            formInitData.layout.forEach(elementInitData => this.addToPanel(elementInitData));
+
+            //additional init
+            if(formInitData.onChange) {
+                this.addOnChange(formInitData.onChange);
+            }
+
+            if(formInitData.onSubmitInfo) {
+                this.addSubmit(formInitData.onSubmitInfo.onSubmit,
+                    formInitData.onSubmitInfo.onCancel,
+                    formInitData.onSubmitInfo.submitLabel,
+                    formInitData.onSubmitInfo.cancelLabel);
+            }
+
+            if(formInitData.disabled) {
+                this.setDisabled(true);
+            }
         }
-        
-        if(formInitData.onSubmitInfo) {
-            this.addSubmit(formInitData.onSubmitInfo.onSubmit,
-                formInitData.onSubmitInfo.onCancel,
-                formInitData.onSubmitInfo.submitLabel,
-                formInitData.onSubmitInfo.cancelLabel);
-        }
-        
-        if(formInitData.disabled) {
-            this.setDisabled(true);
+        catch(error) {
+            var errorMsg = "Error in panel: " + error.message;
+            
+            var errorLayoutInfo = apogeeapp.ui.ConfigurablePanel.getErrorMessageLayoutInfo(errorMsg);
+            this.configureForm(errorLayoutInfo);
         }
     }
     
@@ -126,6 +134,16 @@ apogeeapp.ui.ConfigurablePanel = class {
     static addConfigurableElement(constructorFunction) {
         var type = constructorFunction.TYPE_NAME;
         apogeeapp.ui.ConfigurablePanel.elementMap[type] = constructorFunction;
+    }
+    
+    /** This method can be used to generate an error message layout. */
+    static getErrorMessageLayoutInfo(errorMsg) {
+        var layout = [];
+        var entry = {};
+        entry.type = "htmlDisplay";
+        entry.html = "<em style='color:red'>" + errorMsg + "</em>";
+        layout.push(entry);
+        return {"layout":layout};
     }
     
     //=================================
