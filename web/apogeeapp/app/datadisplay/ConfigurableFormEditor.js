@@ -51,6 +51,7 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.EditorDataDis
             var layoutInfo = this.dynamicLayoutCallback();
             this.panel.configureForm(layoutInfo);
         }
+        this.panel.setValue(savedFormValue);
         
         //set change to enable save bar is form value differs from initial data
         var onChange = (currentFormValue,form) => {
@@ -61,9 +62,7 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.EditorDataDis
                 this.startEditMode();
             }
         }
-        this.panel.addOnChange(onChange);
-        
-        this.panel.setValue(savedFormValue);
+        this.panel.addOnChange(onChange);     
     }
 }
 
