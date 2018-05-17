@@ -78,7 +78,7 @@ apogeeapp.ui.ConfigurableElement = class {
         childData.keepActiveOnHide = keepActiveOnHide;
         this.childSelectionElements.push(childData);
         
-        this.setChildState(childData,this.select.value);
+        this.setChildState(childData,this.getValue());
     }
     
     checkChildSelection(value) {
