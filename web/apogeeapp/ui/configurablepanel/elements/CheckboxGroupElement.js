@@ -64,7 +64,7 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
         this.checkboxList.forEach(checkbox => checkbox.checked = (valueList.indexOf(checkbox.value) >= 0));
         
         //needed for selection children
-        this.checkChildSelection(value);
+        this.checkChildSelection(valueList);
     }
     
     /** This should be extended in elements to handle on change listeners. */
