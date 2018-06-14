@@ -104,10 +104,13 @@ apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.EditorDataDisplay 
 
     setSize() {  
         if(this.gridDiv) {
-            this.gridDiv.style.width = this.outsideDiv.clientWidth + "px";
-            this.gridDiv.style.height = this.outsideDiv.clientHeight + "px";
-            if(this.gridControl) {
-                this.gridControl.render();
+            var gridDivParent = this.gridDiv.parentElement;
+            if(gridDivParent) {
+                this.gridDiv.style.width = gridDivParent.clientWidth + "px";
+                this.gridDiv.style.height = gridDivParent.clientHeight + "px";
+                if(this.gridControl) {
+                    this.gridControl.render();
+                }
             }
         }
     }
