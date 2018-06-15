@@ -117,23 +117,25 @@
         <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/references/ReferenceManager.js"></script>
         <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/references/LinkEntry.js"></script>
         <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/component/WindowHeaderManager.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/component/Component.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/component/ParentComponent.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/component/EditComponent.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/component/TreeComponentDisplay.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/component/TabComponentDisplay.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/component/ParentWindowComponentDisplay.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/component/EditWindowComponentDisplay.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/components/FolderComponent.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/components/JsonTableComponent.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/components/GridTableComponent.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/components/TextComponent.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/components/FunctionComponent.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/components/FolderFunctionComponent.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/components/BasicControlComponent.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/components/CustomControlComponent.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/components/DynamicForm.js"></script>
-        <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/components/ErrorTableComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/component/Component.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/component/ParentComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/component/EditComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/component/TreeComponentDisplay.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/component/TabComponentDisplay.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/component/ParentWindowComponentDisplay.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/component/EditWindowComponentDisplay.js"></script>
+		<script type="text/javascript" src="/apogeeapp/app/components/FolderComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/components/JsonTableComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/components/GridTableComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/components/TextComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/components/JavascriptComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/components/FunctionComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/components/FolderFunctionComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/components/BasicControlComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/components/DynamicForm.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/components/FormDataComponent.js"></script>
+		<script type="text/javascript" src="/apogeeapp/app/components/CustomControlComponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/components/ErrorTableComponent.js"></script>        
         <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/actions/errorhandling.js"></script>
         <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/actions/createworkspace.js"></script>
         <script type="text/javascript" src="http://localhost:8383/apogeeapp/app/actions/updateworkspace.js"></script>
@@ -176,9 +178,7 @@
         <link rel="stylesheet" type="text/css" href="http://localhost:8383/apogeeapp/ui/splitpane/SplitPane.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:8383/apogeeapp/ui/tabframe/TabFrame.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:8383/apogeeapp/ui/treecontrol/TreeControl.css">
-        <link rel="stylesheet" type="text/css" href="http://localhost:8383/apogeeapp/app/datadisplay/datadisplay.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:8383/apogeeapp/ui/configurablepanel/ConfigurablePanel.css">
-        
         
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
         
@@ -206,10 +206,10 @@
                 addDisplay("Model.tasks.selectEditType.selectEditType","selectEditTypeCell",true,apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
                 
                 addDisplay("Model.tasks.selectFileEntry.selectEntriesControl","selectFileEntryCell",false,apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.selectFileEntry.selectedEntry","selectedEntryCell",false,apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.tasks.selectFileEntry.selectedFileEntry","selectedEntryCell",false,apogeeapp.app.JsonTableComponent.VIEW_DATA);
                 addDisplay("Model.tasks.selectFileEntry.compiledEntry","compiledEntryCell",false,apogeeapp.app.JsonTableComponent.VIEW_DATA);
                 
-                addDisplay("Model.tasks.setContent.selectKeyInfoForm","setContentCell",true,apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.tasks.setContent.selectEntryContent","setContentCell",true,apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
                 addDisplay("Model.tasks.setContent.createdFieldMap","createdFieldMapCell",false,apogeeapp.app.JsonTableComponent.VIEW_DATA);
                 addDisplay("Model.tasks.setContent.relatedEntries","relatedEntriesCell",false,apogeeapp.app.JsonTableComponent.VIEW_DATA);
                 
