@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Create File Entry Web App</title>
+        <title>Upload Com File Web App</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
@@ -25,7 +25,7 @@
                 position: relative;
 			}
             .dataCell {
-				width: 500px;
+				width: 700px;
                 height: 200px;
 				outline: solid 2px gray;
 				margin: 10px;
@@ -186,7 +186,7 @@
         <script type="text/javascript" src="http://localhost:8383/lib/modules/webApp/webAppAccess.js"></script>
     
         <script>
-            var workspaceUrl = "http://localhost:8383/dev/micello/metadata%20conversion/edit/createFileEntryWebApp.json";
+            var workspaceUrl = "http://localhost:8383/dev/micello/metadata%20conversion/metaR/uploadComFileWebApp.json";
             
             'use strict'
 			function init() {
@@ -199,23 +199,13 @@
                 //load the UI controls
                 //addDisplay("Model.settings","settingsCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
                 addDisplay("Model.tasks.login.loginControl","loginCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.login.sessionKey","sessionKeyCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.tasks.login.sessionResponse","sessionResponseCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
                 
-                addDisplay("Model.tasks.completed.resetForm","resetCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.tasks.loadCid.selectCid","selectContextCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
                 
-                addDisplay("Model.tasks.selectEditType.selectEditType","selectEditTypeCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                
-                addDisplay("Model.tasks.selectFileEntry.selectEntriesControl","selectFileEntryCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.selectFileEntry.selectedFileEntry","selectedEntryCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                addDisplay("Model.tasks.selectFileEntry.compiledEntry","compiledEntryCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                
-                addDisplay("Model.tasks.setContent.selectEntryContent","setContentCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.setContent.createdFieldMap","createdFieldMapCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                addDisplay("Model.tasks.setContent.relatedEntries","relatedEntriesCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                
-                addDisplay("Model.tasks.submit.submitForm","submitCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.submit.commitResult","commitResultCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                addDisplay("Model.tasks.submit.commitResponse","commitResponseCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.tasks.upload.submitForm","submitCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.tasks.upload.uploadFile","uploadFileCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.tasks.upload.uploadResponse","uploadResponseCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
             }
             
             function addDisplay(memberName,parentElementId,optionalViewType) {
@@ -242,32 +232,18 @@
         </script>
     </head>
     <body onload="init()">
-        <h1>Create New File Entry</h1>
+        <h1>Upload Com File</h1>
         <!-- <div class="formCell" id="settingsCell"></div> -->
         <div class="formCell" id="loginCell"></div>
-        Session Key:
-        <div class="dataCell" id="sessionKeyCell"></div>
+        Session Response:
+        <div class="dataCell" id="sessionResponseCell"></div>
         
-        <div class="formCell" id="resetCell"></div>
+        <div class="formCell" id="selectContextCell"></div>
         
-        <div class="formCell" id="selectEditTypeCell"></div>
-        
-        <div class="altFormCell" id="selectFileEntryCell"></div>
-        Selected Base Entry:
-        <div class="dataCell" id="selectedEntryCell"></div>
-        Compiled Base Entry:
-        <div class="dataCell" id="compiledEntryCell"></div>
-        
-        <div class="formCell" id="setContentCell"></div>
-        Created Field Map:
-        <div class="dataCell" id="createdFieldMapCell"></div>
-        Related Entries:
-        <div class="dataCell" id="relatedEntriesCell"></div>
-  
         <div class="formCell" id="submitCell"></div>
-        Commit Result:
-        <div class="dataCell" id="commitResultCell"></div>
-        Commit Response:
-        <div class="dataCell" id="commitResponseCell"></div>
+        Upload File:
+        <div class="dataCell" id="uploadFileCell"></div>
+        Upload Response:
+        <div class="dataCell" id="uploadResponseCell"></div>
     </body>
 </html>
