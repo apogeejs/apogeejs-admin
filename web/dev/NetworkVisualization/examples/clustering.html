@@ -8,8 +8,8 @@
 
   <style type="text/css">
     #mynetwork {
-        width: 600px;
-        height: 600px;
+        width: 2000px;
+        height: 800px;
         border: 1px solid lightgray;
     }
     p {
@@ -103,6 +103,28 @@ Click any of the buttons below to cluster the network. On every push the network
         }
     }
     
+    //styling options
+    var GROUPS_OPTIONS = {
+        dataNode: {
+            color: "LightBlue",
+            shape: "ellipse"
+        },
+        functionNode: {
+            color: "LightGreen",
+            shape: "ellipse"
+        },
+        folderNode: {
+            shape: "image",
+            image: "http://localhost:8383/dev/NetworkVisualization/examples/icons8-open-50.png",
+            size: 16
+        },
+        closedFolderNode: {
+            shape: "image",
+            image: "http://localhost:8383/dev/NetworkVisualization/examples/icons8-folder-50.png",
+            size: 8
+        }
+    }
+    
     //checkboxes
     var rootCB = document.getElementById("rootChckbox");
     var f1CB = document.getElementById("f1Chckbox");
@@ -119,15 +141,45 @@ Click any of the buttons below to cluster the network. On every push the network
         var node = {};
         node.id = nodeName;
         node.label = nodeName;
-        node.color = (nodeInfo.type == "data") ? "LightBlue" : "Gray";
+        
+        if(nodeInfo.type == "folder") {
+            node.group = "folderNode";
+            //node.shape = "image";
+            //node.image = "http://localhost:8383/dev/NetworkVisualization/examples/icons8-open-50.png"
+        }
+        else {
+            node.group = "dataNode";
+            //node.color = "LightBlue";
+            //node.shape = "ellipse";
+        }
+
         nodes.push(node);
         //add edges
         if(nodeInfo.parent) {
-            edges.push( {from:nodeName, to:nodeInfo.parent, color:"LightGray", arrows:"to"})
+            edges.push( {
+                from:nodeName, 
+                to:nodeInfo.parent, 
+                color:{
+                    color:"LightGray",
+                    highlight:"LightGray",
+                    inherit:false,
+                },
+                dashes: true,
+                arrows:"to"
+            })
         }
         if(nodeInfo.dep) {
             //add edge from the parent node (in dependency list) to the child node (the node that has the dependency)
-            nodeInfo.dep.forEach( dep => edges.push( {from:dep, to:nodeName, color:"LightBlue", arrows:"to"}));
+            nodeInfo.dep.forEach( dep => edges.push( {
+                from:dep, 
+                to:nodeName, 
+                color:{
+                    color:"Blue",
+                    highlight:"Blue",
+                    inherit:false
+                }, 
+                arrows:"to"
+            }));
         }
     }
 
@@ -144,7 +196,8 @@ Click any of the buttons below to cluster the network. On every push the network
             smooth:{
                 enabled: false
             }
-        }
+        },
+        groups:GROUPS_OPTIONS
     };
     var network = new vis.Network(container, data, options);
     
@@ -168,7 +221,16 @@ function clusterByFolder(folderName) {
             var id = childOptions.id;
             return id.startsWith(folderName);
         },
-        clusterNodeProperties: {id:folderName + ":collapsed", label:folderName, allowSingleNodeCluster: true, borderWidth:1, color:"LightGray", x:folderNode.x, y:folderNode.y}
+        clusterNodeProperties: {
+            id:folderName + ":collapsed", 
+            label:folderName, 
+            allowSingleNodeCluster: true,
+            group: "closedFolderNode",
+            //shape: "image",
+            //image: "http://localhost:8383/dev/NetworkVisualization/examples/icons8-folder-50.png" ,
+            x:folderNode.x, 
+            y:folderNode.y
+        }
     };
     network.cluster(clusterOptionsByData);
 }
@@ -184,9 +246,23 @@ function updateFolders() {
 function processDragEnd(params) {
 
     params.nodes.forEach( nodeName => {
-        var node = nodes.find( n => (n.id == nodeName) );
-        node.x = params.pointer.DOM.x;
-        node.y = params.pointer.DOM.y;
+        if(nodeName.endsWith(":collapsed")) {
+            var folderNodeName = nodeName.slice(0,nodeName.length - ":collapsed".length);
+            var folderNode = nodes.find( n => (n.id == folderNodeName) );
+            var deltaX = params.pointer.canvas.x - folderNode.x;
+            var deltaY = params.pointer.canvas.y - folderNode.y;
+            //move the folder and all the children this much
+            var nodesArray = nodes.filter( n => n.id.startsWith(folderNodeName));
+            nodesArray.forEach( n => {
+                n.x = n.x + deltaX;
+                n.y = n.y + deltaY;
+            })    
+        }
+        else {
+            var node = nodes.find( n => (n.id == nodeName) );
+            node.x = params.pointer.canvas.x;
+            node.y = params.pointer.canvas.y;
+        }
     });
     
     document.getElementById('eventSpan').innerHTML = '<h2>dragEnd event:</h2>' + JSON.stringify(params, null, 4);
