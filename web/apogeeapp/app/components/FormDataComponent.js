@@ -9,6 +9,9 @@ apogeeapp.app.FormDataComponent = function(workspaceUI,folder) {
     //extend edit component
     apogeeapp.app.EditComponent.call(this,workspaceUI,folder,apogeeapp.app.FormDataComponent);
     
+    //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
+    folder.setChildrenWriteable(false);
+    
     //load these!
     this.dataTable = folder.lookupChildFromPathArray(["data"]);
     this.layoutTable = folder.lookupChildFromPathArray(["layout"]);
@@ -151,6 +154,7 @@ apogeeapp.app.FormDataComponent.getCreateMemberPayload = function(userInputValue
     var json = {};
     json.name = userInputValues.name;
     json.type = apogee.Folder.generator.type;
+    json.childrenNotWriteable = true;
     //add the children
     json.children = {
         "layout": {
