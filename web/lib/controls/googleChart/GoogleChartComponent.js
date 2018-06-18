@@ -188,45 +188,47 @@ apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO = [
 
 apogeeapp.app.GoogleChartComponent.CHART_SELECT_FORM_INFO = apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO.map(entry => entry.slice(0,2));
 
-apogeeapp.app.GoogleChartComponent.FORM_LAYOUT = [
-    {
-        type: "spacer"
-    },
-    {   
-        type: "dropdown",
-        label: "Chart Type: ",
-        entries: apogeeapp.app.GoogleChartComponent.CHART_SELECT_FORM_INFO,
-        value: "<SET CURRENT>", //set current value
-        key: "chartType",
-    },
-    {
-        type: "spacer"
-    },
-    {   
-        type: "textField",
-        label: "Columns: ",
-        key: "columns",
-    },
-    {
-        type: "textField",
-        label: "Rows: ",
-        key: "rows",
-    },
-    {
-        type: "textField",
-        label: "Options: ",
-        key: "options",
-    },
-    {
-        type: "spacer"
-    },
-    {   
-        type: "checkbox",
-        label: "Columns included as row header: ",
-        value: "<SET CURRENT>", //set current value
-        key: "headerRow",
-    },
-];
+apogeeapp.app.GoogleChartComponent.FORM_LAYOUT = {
+    layout: [
+        {
+            type: "spacer"
+        },
+        {   
+            type: "dropdown",
+            label: "Chart Type: ",
+            entries: apogeeapp.app.GoogleChartComponent.CHART_SELECT_FORM_INFO,
+            value: "<SET CURRENT>", //set current value
+            key: "chartType",
+        },
+        {
+            type: "spacer"
+        },
+        {   
+            type: "textField",
+            label: "Columns: ",
+            key: "columns",
+        },
+        {
+            type: "textField",
+            label: "Rows: ",
+            key: "rows",
+        },
+        {
+            type: "textField",
+            label: "Options: ",
+            key: "options",
+        },
+        {
+            type: "spacer"
+        },
+        {   
+            type: "checkbox",
+            label: "Columns included as row header: ",
+            value: "<SET CURRENT>", //set current value
+            key: "headerRow",
+        },
+    ]
+};
 
 //-----------------
 //auto registration

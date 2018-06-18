@@ -40,6 +40,9 @@ apogeeapp.ui.DropdownElement = class extends apogeeapp.ui.ConfigurableElement {
         containerElement.appendChild(this.select); 
         
         this._postInstantiateInit(elementInitData);
+        
+        //add suport for selection children
+        this.setChildState = apogeeapp.ui.ConfigurableElement.setChildStateSingleValue;
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -52,6 +55,9 @@ apogeeapp.ui.DropdownElement = class extends apogeeapp.ui.ConfigurableElement {
      * to see if this method is applicable. */
     setValue(value) {
         this.select.value = value;
+        
+        //needed for selection children
+        this.checkChildSelection(value);
     }
     
     /** This should be extended in elements to handle on change listeners. */
@@ -61,6 +67,9 @@ apogeeapp.ui.DropdownElement = class extends apogeeapp.ui.ConfigurableElement {
         }
         this.select.addEventListener("change",onChangeImpl);
     }
+    
+    
+  
     
     //===================================
     // internal Methods

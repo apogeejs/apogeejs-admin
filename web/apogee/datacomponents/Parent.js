@@ -17,6 +17,7 @@ apogee.Parent.ROOT_NAME = "root";
 
 /** This initializes the component */
 apogee.Parent.init = function() {
+    this.childrenWriteable = true;
 }
 
 apogee.Parent.isParent = true;
@@ -59,6 +60,18 @@ apogee.Parent.lookupChildFromPathArray = function(path,startElement) {
     else {
         return member;
     }
+}
+
+/** This method allows the UI to decide if the user can add children to it. This
+ * value defaults to true. */
+apogee.Parent.getChildrenWriteable = function() {
+    return this.childrenWriteable;
+}
+
+/** This method sets the writeable property for adding child members. This value of
+ * the method is not enforced (since children must be added one way or another). */
+apogee.Parent.setChildrenWriteable = function(writeable) {
+    this.childrenWriteable = writeable; 
 }
 
 // Must be implemented in extending object

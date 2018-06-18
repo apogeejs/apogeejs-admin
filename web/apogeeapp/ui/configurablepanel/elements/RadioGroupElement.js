@@ -48,6 +48,9 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
         elementInitData.entries.forEach(addButton);
         
         this._postInstantiateInit(elementInitData);
+        
+        //add suport for selection children
+        this.setChildState = apogeeapp.ui.ConfigurableElement.setChildStateSingleValue;
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -68,6 +71,9 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
         if(checkedButton) {
             checkedButton.checked = true;
         }
+        
+        //needed for selection children
+        this.checkChildSelection(value);
     }
     
     /** This should be extended in elements to handle on change listeners. */

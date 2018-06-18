@@ -137,13 +137,17 @@ apogeeapp.app.ViewMode.prototype.onCancel = function() {
 }
 
 apogeeapp.app.ViewMode.prototype.startEditMode = function(onSave,onCancel) {
-    this.inEditMode = true;
-    this.componentDisplay.startEditUI(onSave,onCancel);
+    if(!this.inEditMode) {
+        this.inEditMode = true;
+        this.componentDisplay.startEditUI(onSave,onCancel);
+    }
 }
 
 apogeeapp.app.ViewMode.prototype.endEditMode = function() {
-    this.inEditMode = false;
-    this.componentDisplay.endEditUI();
+    if(this.inEditMode) {
+        this.inEditMode = false;
+        this.componentDisplay.endEditUI();
+    }
 }
 
 //-----------------------------------

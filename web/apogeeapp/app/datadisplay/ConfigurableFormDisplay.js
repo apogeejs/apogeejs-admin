@@ -1,26 +1,22 @@
-/** This is a form that the is configurable.
+/* This is a form display. It is meant for taking a submit action. If you want a form
+ * tied to a data value, the ConfigurableFormEditor can be used.
  * 
  * @param {type} viewMode - the apogee view mode
  * @param {type} getLayout - this callback retrieves the form layout
  */
 apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
     
-    constructor(viewMode,getLayout) {
+    constructor(viewMode,getLayoutInfo) {
         super(viewMode,apogeeapp.app.NonEditorDataDisplay.SCROLLING);  
         
-        this.getLayout = getLayout;
+        this.getLayoutInfo = getLayoutInfo;
         
         this.panel = this.panel = new apogeeapp.ui.ConfigurablePanel();
     }
     
     /** This method will return undefined until showData is called. */
     getContent() {
-        if(this.panel) {
-            return this.panel.getElement();
-        }
-        else {
-            return undefined;
-        }
+        return this.panel.getElement();
     }
     
     getContentType() {
@@ -30,31 +26,6 @@ apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDat
     
     //this sets the data into the editor display. REQUIRED
     showData() {
-        var layout = this.getLayout();
-        if(apogee.util.getObjectType(layout) != "Array") {
-            layout = [
-                {
-                    type: "heading",
-                    text: "INVALID FORM LAYOUT!",
-                    level: 4
-                }
-            ];
-        }
-        
-        this.panel.configureForm(layout);
+        this.panel.configureForm(this.getLayoutInfo());
     }
-    
-    /**  Override this to return a custom empty value
-     * @protected */
-    getTableEditSettings() {
-        return apogeeapp.app.ConfigurableFormDisplay.TABLE_EDIT_SETTINGS;
-    }
-
-}
-
-//set a custom empty value - an empty array
-apogeeapp.app.ConfigurableFormDisplay.TABLE_EDIT_SETTINGS = {
-    "viewModes": apogeeapp.app.BasicControlComponent.VIEW_MODES,
-    "defaultView": apogeeapp.app.BasicControlComponent.VIEW_OUTPUT,
-    "emptyDataValue": []
 }

@@ -128,6 +128,9 @@ apogee.Folder.prototype.updateDependeciesForModelChange = function(recalculateLi
  * method in a non-abstract class. */ 
 apogee.Folder.fromJson = function(owner,json,childrenJsonOutputList) {
     var folder = new apogee.Folder(json.name,owner);
+    if(json.childrenNotWriteable) {
+        folder.setChildrenWriteable(false);
+    }
     
     for(var key in json.children) {
         var childJson = json.children[key];
@@ -141,6 +144,10 @@ apogee.Folder.fromJson = function(owner,json,childrenJsonOutputList) {
  * @protected */
 apogee.Folder.prototype.addToJson = function(json) {
 	json.children = {};
+    
+    if(!this.getChildrenWriteable()) {
+        json.childrenNotWriteable = true;
+    }
     
     for(var key in this.childMap) {
         var child = this.childMap[key];

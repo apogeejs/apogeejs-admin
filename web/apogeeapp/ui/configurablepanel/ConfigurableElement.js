@@ -65,6 +65,59 @@ apogeeapp.ui.ConfigurableElement = class {
         return this.form;
     }
     
+    /** This allows this element to control visibility of the given child.
+     * When the value of the element is set, the child will be made visible depending
+     * if its childs target valud matches the current element value. */
+    addSelectionChild(childElement,value,keepActiveOnHide) {
+        if(!this.childSelectionElements) {
+            this._initAsParent();
+        }
+        var childData = {};
+        childData.element = childElement;
+        childData.value = value;
+        childData.keepActiveOnHide = keepActiveOnHide;
+        this.childSelectionElements.push(childData);
+        
+        this.setChildState(childData,this.getValue());
+    }
+    
+    checkChildSelection(value) {
+        if((this.childSelectionElements)&&(this.setChildState)) {
+            this.childSelectionElements.forEach( childData => this.setChildState(childData,value));
+        } 
+    }
+    
+//    /* Implement this if the element can selector children */
+//    setChildState(childData,value) {
+//        
+//    }
+
+    //---------------------------------
+    //set child state implementations
+    //---------------------------------
+    
+    /** This is a function that can be used to set values when the parent element has a single value. */
+    static setChildStateSingleValue(childData,value) {
+        if(childData.value == value) {
+            childData.element.setState(apogeeapp.ui.ConfigurableElement.STATE_NORMAL);
+        }
+        else {
+            var state = childData.keepActiveOnHide ? apogeeapp.ui.ConfigurableElement.STATE_HIDDEN : apogeeapp.ui.ConfigurableElement.STATE_INACTIVE;
+            childData.element.setState(state);
+        }
+    }
+    
+    /** This is a function that can be used to set values when the parent element has an array value. */
+    static setChildStateArrayValue(childData,value) {
+        if(value.indexOf(childData.value) >= 0) {
+            childData.element.setState(apogeeapp.ui.ConfigurableElement.STATE_NORMAL);
+        }
+        else {
+            var state = childData.keepActiveOnHide ? apogeeapp.ui.ConfigurableElement.STATE_HIDDEN : apogeeapp.ui.ConfigurableElement.STATE_INACTIVE;
+            childData.element.setState(state);
+        }
+    }
+    
     
     //===================================
     // internal Methods
@@ -86,6 +139,17 @@ apogeeapp.ui.ConfigurableElement = class {
         if(elementInitData.onChange) {
             this.addOnChange(elementInitData.onChange);
         }
+        
+        //accont for parent elements
+        if(elementInitData.selector) {
+            if(!elementInitData.selector.parentKey) throw new Error("Parent key is required for a selectable child element:" + elementInitData.key);
+            if(elementInitData.selector.parentValue === undefined) throw new Error("A child selectable element must contain a value: " + elementInitData.key)
+            var parentElement = this.form.getEntry(elementInitData.selector.parentKey);
+            if(!parentElement) throw new Error("Parent element " + elementInitData.selector.parentKey + " not found for selectable child element " + elementInitData.key);
+            if(!parentElement.setChildState) throw new Error("Parent element " + elementInitData.selector.parentKey + " does not support selection of a child element - in element = " + elementInitData.key);
+            
+            parentElement.addSelectionChild(this,elementInitData.selector.parentValue,elementInitData.keepActiveOnHide);
+        }
     }
     
     _setDisabled(isDisabled) {};
@@ -97,6 +161,12 @@ apogeeapp.ui.ConfigurableElement = class {
         else {
             this.domElement.style.display = "none";
         }
+    }
+    
+    _initAsParent() {
+        this.childSelectionElements = [];
+        this.parentOnChangeHandler = (value,form) => this.childSelectionElements.forEach( childElement => this.setChildState(childElement,value));
+        this.addOnChange(this.parentOnChangeHandler);
     }
 }
 

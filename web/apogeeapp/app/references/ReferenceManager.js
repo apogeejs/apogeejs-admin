@@ -30,14 +30,15 @@ apogeeapp.app.ReferenceManager.prototype.openEntries = function(referencesJson) 
     var loadEntry = entryJson => {
         var listStruct = this.referenceLists[entryJson.entryType];
         
-        //make sure it doesn't exist?
-        
-        var referenceEntry = listStruct.listInfo.createEntryFunction(this,entryJson);
-        var promise = referenceEntry.loadEntry();
-        entryPromises.push(promise);
+        //load this url if it doesn't exist
+        if(!listStruct.listEntries.some( listEntry => (listEntry.url == entryJson.url) )) {
+            var referenceEntry = listStruct.listInfo.createEntryFunction(this,entryJson);
+            var promise = referenceEntry.loadEntry();
+            entryPromises.push(promise);
+        }
     }
     referencesJson.forEach(loadEntry);
-   
+    
     return Promise.all(entryPromises);
 }
 

@@ -10,11 +10,48 @@ apogeeapp.ui.ConfigurablePanel = class {
     }
     
     configureForm(formInitData) {
+        
+        //TEMPORARY - legacy check correction----------------------
+        if((formInitData)&&(formInitData.constructor == Array)) {
+            formInitData = {layout:formInitData};
+        }
+        //---------------------------------------------------------
+        
+        //check for an invalid input
+        if((!formInitData)||(!formInitData.layout)||(formInitData.layout.constructor != Array)) {
+            formInitData = apogeeapp.ui.ConfigurablePanel.INVALID_INIT_DATA;
+        }
+        
         //clear data
         apogeeapp.ui.removeAllChildren(this.panelElement);
         this.elementObjects = [];
-        //create elements
-        formInitData.forEach(elementInitData => this.addToPanel(elementInitData));
+        
+        try {
+            //create elements     
+            formInitData.layout.forEach(elementInitData => this.addToPanel(elementInitData));
+
+            //additional init
+            if(formInitData.onChange) {
+                this.addOnChange(formInitData.onChange);
+            }
+
+            if(formInitData.onSubmitInfo) {
+                this.addSubmit(formInitData.onSubmitInfo.onSubmit,
+                    formInitData.onSubmitInfo.onCancel,
+                    formInitData.onSubmitInfo.submitLabel,
+                    formInitData.onSubmitInfo.cancelLabel);
+            }
+
+            if(formInitData.disabled) {
+                this.setDisabled(true);
+            }
+        }
+        catch(error) {
+            var errorMsg = "Error in panel: " + error.message;
+            
+            var errorLayoutInfo = apogeeapp.ui.ConfigurablePanel.getErrorMessageLayoutInfo(errorMsg);
+            this.configureForm(errorLayoutInfo);
+        }
     }
     
     /** This method returns the ConfigurableElement for the given key. */
@@ -52,6 +89,10 @@ apogeeapp.ui.ConfigurablePanel = class {
         return this.panelElement;
     }
     
+    getChildEntries() {
+        return this.elementObjects;
+    }
+    
     /** This is an alternate way to add a submit entry to the form. This is useful
      * if the layout has no other handlers in it and is a pure JSON object. This 
      * will then separate out any handlers from the layout. */
@@ -74,8 +115,13 @@ apogeeapp.ui.ConfigurablePanel = class {
         this.addToPanel(data);
     }
     
+    //takes a handler onChange(formValue,form)
     addOnChange(onChange) {
-        this.elementObjects.forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(onChange);} );
+        var childOnChange = (childValue,form) => {
+            var formValue = this.getValue();
+            onChange(formValue,form);
+        }
+        this.elementObjects.forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(childOnChange);} );
     }
     
     setDisabled(isDisabled) {
@@ -88,6 +134,16 @@ apogeeapp.ui.ConfigurablePanel = class {
     static addConfigurableElement(constructorFunction) {
         var type = constructorFunction.TYPE_NAME;
         apogeeapp.ui.ConfigurablePanel.elementMap[type] = constructorFunction;
+    }
+    
+    /** This method can be used to generate an error message layout. */
+    static getErrorMessageLayoutInfo(errorMsg) {
+        var layout = [];
+        var entry = {};
+        entry.type = "htmlDisplay";
+        entry.html = "<em style='color:red'>" + errorMsg + "</em>";
+        layout.push(entry);
+        return {"layout":layout};
     }
     
     //=================================
@@ -142,6 +198,16 @@ apogeeapp.ui.ConfigurablePanel.elementMap = {};
 apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT = "apogee_configurablePanelBody_fillParent";
 apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED = "apogee_configurablePanelBody_selfSized";
 
+//This is displayed if there is an invalid layout passed in
+apogeeapp.ui.ConfigurablePanel.INVALID_INIT_DATA = {
+    layout: [
+        {
+            type: "heading",
+            text: "INVALID FORM LAYOUT!",
+            level: 4
+        }
+    ]
+}
 
 
 
