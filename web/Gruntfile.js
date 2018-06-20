@@ -224,7 +224,6 @@ module.exports = function(grunt) {
         },
         all: {
           src: [
-			"apogeeapp/app/apogeeapp.css",
             "apogeeapp/ui/jsonedit/jsonedit.css",
             "apogeeapp/ui/window/WindowFrame.css",
             "apogeeapp/ui/window/dialog.css",
