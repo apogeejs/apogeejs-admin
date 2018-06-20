@@ -36,7 +36,9 @@ apogeeapp.ui.DropdownElement = class extends apogeeapp.ui.ConfigurableElement {
             entry.value = value;
             this.select.appendChild(entry);
         }
-        elementInitData.entries.forEach(addEntry);
+        if(elementInitData.entries) {
+            elementInitData.entries.forEach(addEntry);
+        }
         containerElement.appendChild(this.select); 
         
         this._postInstantiateInit(elementInitData);
