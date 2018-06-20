@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Upload Com File Web App</title>
+        <title>Edit Meta File Web App</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
@@ -17,15 +17,15 @@
                 position: relative;
 			}
             .altFormCell {
-            	width: 700px;
-                height: 400px;
+            	width: 1000px;
+                height: 1000px;
 				outline: solid 2px #aaaaaa;
 				margin: 20px;
 				display: table;
                 position: relative;
 			}
             .dataCell {
-				width: 700px;
+				width: 500px;
                 height: 200px;
 				outline: solid 2px #aaaaaa;
 				margin: 20px;
@@ -186,7 +186,8 @@
         <script type="text/javascript" src="http://localhost:8383/lib/modules/webApp/webAppAccess.js"></script>
     
         <script>
-            var workspaceUrl = "http://localhost:8383/dev/micello/metadata%20conversion/metaR/uploadComFileWebApp.json";
+            //using relative url
+            var workspaceUrl = "editMetaFileWebApp.json";
             
             'use strict'
 			function init() {
@@ -197,15 +198,20 @@
               
             function onWorkspaceLoad() {
                 //load the UI controls
-                //addDisplay("Model.settings","settingsCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.login.loginControl","loginCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.login.loginResult","loginResultCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                //addDisplay("Model.settings","settingsCell");
+                addDisplay("Model.tasks.login.loginControl","loginCell");
+                addDisplay("Model.tasks.login.loginResult","loginResultCell");
                 
-                addDisplay("Model.tasks.loadCid.selectCid","selectContextCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.tasks.loadContext.selectContext","selectContextCell");
                 
-                addDisplay("Model.tasks.upload.submitForm","submitCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.upload.uploadResponse","uploadResponseCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                addDisplay("Model.tasks.upload.uploadFile","uploadFileCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.tasks.selectMetaFile.selectMetaFile","selectMetaFileCell");
+                
+                addDisplay("Model.tasks.selectParents.selectParentFiles","selectParentCell");
+                
+                addDisplay("Model.tasks.editMetaFile.selectEntriesControl","selectEntriesCell");
+                
+                addDisplay("Model.tasks.commit.submitForm","submitCell");
+                addDisplay("Model.tasks.commit.commitResult","commitResultCell");
             }
             
             function addDisplay(memberName,parentElementId,optionalViewType) {
@@ -232,17 +238,20 @@
         </script>
     </head>
     <body onload="init()">
-        <h1>Upload Com File</h1>
+        <h1>Edit Meta File</h1>
         <!-- <div class="formCell" id="settingsCell"></div> -->
         <div class="formCell" id="loginCell"></div>
         <div class="formCell" id="loginResultCell"></div>
         
         <div class="formCell" id="selectContextCell"></div>
         
+        <div class="formCell" id="selectMetaFileCell"></div>
+        
+        <div class="formCell" id="selectParentCell"></div>
+        
+        <div class="altFormCell" id="selectEntriesCell"></div>
+  
         <div class="formCell" id="submitCell"></div>
-        Upload Result:
-        <div class="dataCell" id="uploadResponseCell"></div>
-        Upload File:
-        <div class="dataCell" id="uploadFileCell"></div>
+        <div class="formCell" id="commitResultCell"></div>
     </body>
 </html>

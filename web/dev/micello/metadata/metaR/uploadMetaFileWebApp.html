@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Edit Com File Web App</title>
+        <title>Upload Meta File Web App</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
@@ -186,7 +186,8 @@
         <script type="text/javascript" src="http://localhost:8383/lib/modules/webApp/webAppAccess.js"></script>
     
         <script>
-            var workspaceUrl = "http://localhost:8383/dev/micello/metadata%20conversion/edit/editComFileWebApp.json";
+            //using relative url
+            var workspaceUrl = "uploadMetaFileWebApp.json";
             
             'use strict'
 			function init() {
@@ -197,16 +198,17 @@
               
             function onWorkspaceLoad() {
                 //load the UI controls
-                //addDisplay("Model.settings","settingsCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.login.loginControl","loginCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.login.loginResult","loginResultCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.tasks.login.loginControl","loginCell");
+                addDisplay("Model.tasks.login.loginResult","loginResultCell");
                 
-                addDisplay("Model.tasks.selectCid.selectContext","selectContextCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.tasks.loadContext.selectContext","selectContextCell");
                 
-                addDisplay("Model.tasks.editComFile.editComFile","editComFileCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.tasks.selectMetaFile.selectMetaFile","selectMetaFileCell");
                 
-                addDisplay("Model.tasks.commit.submitForm","submitCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.commit.commitResult","commitResultCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.tasks.upload.submitForm","submitCell");
+                addDisplay("Model.tasks.upload.uploadResponse","uploadResponseCell");
+                addDisplay("Model.tasks.upload.uploadFile","uploadFileCell");
+                
             }
             
             function addDisplay(memberName,parentElementId,optionalViewType) {
@@ -233,16 +235,19 @@
         </script>
     </head>
     <body onload="init()">
-        <h1>Edit Com File</h1>
+        <h1>Upload Meta File</h1>
         <!-- <div class="formCell" id="settingsCell"></div> -->
         <div class="formCell" id="loginCell"></div>
         <div class="formCell" id="loginResultCell"></div>
         
         <div class="formCell" id="selectContextCell"></div>
         
-        <div class="formCell" id="editComFileCell"></div>
+        <div class="formCell" id="selectMetaFileCell"></div>
 
         <div class="formCell" id="submitCell"></div>
-        <div class="formCell" id="commitResultCell"></div>
+        Upload Response:
+        <div class="dataCell" id="uploadResponseCell"></div>
+        Upload File:
+        <div class="dataCell" id="uploadFileCell"></div>
     </body>
 </html>

@@ -186,7 +186,8 @@
         <script type="text/javascript" src="http://localhost:8383/lib/modules/webApp/webAppAccess.js"></script>
     
         <script>
-            var workspaceUrl = "http://localhost:8383/dev/micello/metadata%20conversion/edit/createFileEntryWebApp.json";
+            //using relative url
+            var workspaceUrl = "createFileEntryWebApp.json";
             
             var baseFileEntryTables = null;
             var baseEntryFormVisible = true;
@@ -201,25 +202,21 @@
               
             function onWorkspaceLoad() {
                 //load the UI controls
-                //addDisplay("Model.settings","settingsCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.login.loginControl","loginCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.login.loginResult","loginResultCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                //addDisplay("Model.settings","settingsCell");
+                addDisplay("Model.tasks.login.loginControl","loginCell");
+                addDisplay("Model.tasks.login.loginResult","loginResultCell");
                  
-                addDisplay("Model.tasks.selectEditType.selectEditType","selectEditTypeCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.tasks.selectEditType.selectEditType","selectEditTypeCell");
                 
-                addDisplay("Model.tasks.selectFileEntry.selectEntriesControl","selectFileEntryCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                //addDisplay("Model.tasks.selectFileEntry.selectedFileEntry","selectedEntryCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                //addDisplay("Model.tasks.selectFileEntry.compiledEntry","compiledEntryCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.tasks.selectFileEntry.selectEntriesControl","selectFileEntryCell");
                 
-                addDisplay("Model.tasks.setContent.selectEntryContent","setContentCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                //addDisplay("Model.tasks.setContent.createdFieldMap","createdFieldMapCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                addDisplay("Model.tasks.setContent.relatedEntries","relatedEntriesCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.tasks.setContent.selectEntryContent","setContentCell");
+                addDisplay("Model.tasks.setContent.relatedEntries","relatedEntriesCell");
                 
-                addDisplay("Model.tasks.submit.submitForm","submitCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.submit.commitResult","commitResultCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                //addDisplay("Model.tasks.submit.commitResponse","commitResponseCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.tasks.submit.submitForm","submitCell");
+                addDisplay("Model.tasks.submit.commitResult","commitResultCell");
                 
-                addDisplay("Model.tasks.completed.resetForm","resetCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                addDisplay("Model.tasks.completed.resetForm","resetCell");
                 
                 //===================
                 //OTHER INIT
