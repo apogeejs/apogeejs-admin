@@ -11,24 +11,24 @@
 			.formCell {
 				width: 700px;
                 /*height: 400px;*/
-				outline: solid 2px gray;
-				margin: 10px;
+				outline: solid 2px #aaaaaa;
+				margin: 20px;
 				display: table;
                 position: relative;
 			}
             .altFormCell {
             	width: 700px;
                 height: 400px;
-				outline: solid 2px gray;
-				margin: 10px;
+				outline: solid 2px #aaaaaa;
+				margin: 20px;
 				display: table;
                 position: relative;
 			}
             .dataCell {
-				width: 500px;
+				width: 700px;
                 height: 200px;
-				outline: solid 2px gray;
-				margin: 10px;
+				outline: solid 2px #aaaaaa;
+				margin: 20px;
                 margin-right: 30px;
 				display: table;
                 position: relative;
@@ -188,34 +188,51 @@
         <script>
             var workspaceUrl = "http://localhost:8383/dev/micello/metadata%20conversion/edit/createFileEntryWebApp.json";
             
+            var baseFileEntryTables = null;
+            var baseEntryFormVisible = true;
+            var baseEntryDisplayFrame = null;
+            
             'use strict'
 			function init() {
                 //apogeeapp.ui.initResourcePath("../../resources");
                 
-                webAppAccess.initWebApp(workspaceUrl,onWorkspaceLoad)           
+                webAppAccess.initWebApp(workspaceUrl,onWorkspaceLoad);   
             }
               
             function onWorkspaceLoad() {
                 //load the UI controls
                 //addDisplay("Model.settings","settingsCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
                 addDisplay("Model.tasks.login.loginControl","loginCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.login.sessionKey","sessionKeyCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                
-                addDisplay("Model.tasks.completed.resetForm","resetCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                
+                addDisplay("Model.tasks.login.loginResult","loginResultCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                 
                 addDisplay("Model.tasks.selectEditType.selectEditType","selectEditTypeCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
                 
                 addDisplay("Model.tasks.selectFileEntry.selectEntriesControl","selectFileEntryCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.selectFileEntry.selectedFileEntry","selectedEntryCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                addDisplay("Model.tasks.selectFileEntry.compiledEntry","compiledEntryCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                //addDisplay("Model.tasks.selectFileEntry.selectedFileEntry","selectedEntryCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                //addDisplay("Model.tasks.selectFileEntry.compiledEntry","compiledEntryCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
                 
                 addDisplay("Model.tasks.setContent.selectEntryContent","setContentCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.setContent.createdFieldMap","createdFieldMapCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                //addDisplay("Model.tasks.setContent.createdFieldMap","createdFieldMapCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
                 addDisplay("Model.tasks.setContent.relatedEntries","relatedEntriesCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
                 
                 addDisplay("Model.tasks.submit.submitForm","submitCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
-                addDisplay("Model.tasks.submit.commitResult","commitResultCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                addDisplay("Model.tasks.submit.commitResponse","commitResponseCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                addDisplay("Model.tasks.submit.commitResult","commitResultCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                //addDisplay("Model.tasks.submit.commitResponse","commitResponseCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                
+                addDisplay("Model.tasks.completed.resetForm","resetCell",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                
+                //===================
+                //OTHER INIT
+                //===================
+                
+                //initialize element we will hide/show
+                baseFileEntryTables = document.getElementById("baseFileEntryTables");
+                baseEntryDisplayFrame = webAppAccess.getDisplayFrame("Model.tasks.selectFileEntry.fileEntryInfo",apogeeapp.app.BasicControlComponent.VIEW_OUTPUT);
+                
+                //add listener event
+                var app = apogeeapp.app.Apogee.getInstance();
+                var workspace = app.getWorkspace();
+                workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT,onMemberUpdate);
             }
             
             function addDisplay(memberName,parentElementId,optionalViewType) {
@@ -238,6 +255,32 @@
                 //the object is shown or hidden for proper operation
                 displayFrame.setIsShowing(true);
             }
+            
+            //react to member updates 
+            function onMemberUpdate(member) {
+                var memberName = member.getFullName();
+                if(memberName == "Model.tasks.selectFileEntry.fileEntryInfo") {
+                    var fileEntryInfo = member.getData();
+                    if(fileEntryInfo) {
+                        if(fileEntryInfo.useBaseEntry != baseEntryFormVisible) {
+                            setBaseEntryFormVisible(fileEntryInfo.useBaseEntry)
+                        }
+                    }
+                }
+            }
+            
+            function setBaseEntryFormVisible(formVisible) {
+                baseEntryFormVisible = formVisible;
+                if(formVisible) {
+                    baseFileEntryTables.style.display = "";
+                    baseEntryDisplayFrame.setIsShowing(true);
+                }
+                else {
+                    baseFileEntryTables.style.display = "none";
+                    baseEntryDisplayFrame.setIsShowing(false);
+                }
+                
+            }
               
         </script>
     </head>
@@ -245,29 +288,21 @@
         <h1>Create New File Entry</h1>
         <!-- <div class="formCell" id="settingsCell"></div> -->
         <div class="formCell" id="loginCell"></div>
-        Session Key:
-        <div class="dataCell" id="sessionKeyCell"></div>
-        
-        <div class="formCell" id="resetCell"></div>
+        <div class="formCell" id="loginResultCell"></div>
         
         <div class="formCell" id="selectEditTypeCell"></div>
         
-        <div class="altFormCell" id="selectFileEntryCell"></div>
-        Selected Base Entry:
-        <div class="dataCell" id="selectedEntryCell"></div>
-        Compiled Base Entry:
-        <div class="dataCell" id="compiledEntryCell"></div>
+        <div id="baseFileEntryTables">
+            <div class="altFormCell" id="selectFileEntryCell"></div>
+        </div>
         
         <div class="formCell" id="setContentCell"></div>
-        Created Field Map:
-        <div class="dataCell" id="createdFieldMapCell"></div>
         Related Entries:
         <div class="dataCell" id="relatedEntriesCell"></div>
   
         <div class="formCell" id="submitCell"></div>
-        Commit Result:
-        <div class="dataCell" id="commitResultCell"></div>
-        Commit Response:
-        <div class="dataCell" id="commitResponseCell"></div>
+        <div class="formCell" id="commitResultCell"></div>
+        
+        <div class="formCell" id="resetCell"></div>
     </body>
 </html>
