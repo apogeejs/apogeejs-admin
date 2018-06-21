@@ -9,7 +9,7 @@
                 overflow: auto;
             }
 			.formCell {
-				width: 700px;
+				width: 800px;
                 /*height: 400px;*/
 				outline: solid 2px #aaaaaa;
 				margin: 20px;
@@ -17,7 +17,7 @@
                 position: relative;
 			}
             .altFormCell {
-            	width: 700px;
+            	width: 800px;
                 height: 400px;
 				outline: solid 2px #aaaaaa;
 				margin: 20px;
@@ -25,7 +25,7 @@
                 position: relative;
 			}
             .dataCell {
-				width: 700px;
+				width: 800px;
                 height: 200px;
 				outline: solid 2px #aaaaaa;
 				margin: 20px;
@@ -202,7 +202,8 @@
               
             function onWorkspaceLoad() {
                 //load the UI controls
-                //addDisplay("Model.settings","settingsCell");
+                addDisplay("Model.settings","settingsCell");
+                
                 addDisplay("Model.tasks.login.loginControl","loginCell");
                 addDisplay("Model.tasks.login.loginResult","loginResultCell");
                  
@@ -283,7 +284,8 @@
     </head>
     <body onload="init()">
         <h1>Create New File Entry</h1>
-        <!-- <div class="formCell" id="settingsCell"></div> -->
+        <div class="formCell" id="settingsCell"></div>
+        
         <div class="formCell" id="loginCell"></div>
         <div class="formCell" id="loginResultCell"></div>
         
