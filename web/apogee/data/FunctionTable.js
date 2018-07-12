@@ -56,7 +56,7 @@ apogee.FunctionTable.prototype.getLazyInitializedMemberFunction = function(membe
                 issue = new Error("Error in dependency: " + instance.getFullName());
 
             }
-            if(instance.getResultPending()) {
+            else if(instance.getResultPending()) {
                 issue = apogee.Codeable.MEMBER_FUNCTION_PENDING;
             }
             else {
