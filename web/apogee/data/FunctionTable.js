@@ -34,18 +34,14 @@ apogee.FunctionTable.prototype.processMemberFunction = function(memberGenerator)
 }
 
 apogee.FunctionTable.prototype.getLazyInitializedMemberFunction = function(memberGenerator) {
-    var memberInitialized = false;
-    var memberFunction = null;
-    var issue = null;
     var instance = this;
 
     //create init member function for lazy initialization
     //we need to do this for recursive functions, or else we will get a circular reference
     var initMember = function() {
-        memberInitialized = true;
         var impactorSuccess = instance.memberFunctionInitialize();
         if(impactorSuccess) {
-            memberFunction = memberGenerator();
+            return memberGenerator();
         }
         else {
             //error handling
@@ -62,25 +58,13 @@ apogee.FunctionTable.prototype.getLazyInitializedMemberFunction = function(membe
             else {
                 issue = new Error("Unknown problem in initializing: " + instance.getFullName());
             }
+            
+            throw issue;
         } 
     }
 
-    //create member function for lazy initialization
-    var wrapperMemberFunction = function(argList) {
-        if(!memberInitialized) {
-            initMember();
-        }
-
-        if(memberFunction) {
-            return memberFunction.apply(null,arguments);
-        }
-        else {
-            //This was an error with initialization
-            throw issue;
-        }
-    }
-
-    return wrapperMemberFunction;
+    //this is called from separate code to make debugging more readable
+    return __functionTableWrapper(initMember);
 }
 
 //------------------------------
