@@ -12,4 +12,25 @@ __memberFunctionDebugHook = function(member) {
 __customControlDebugHook = function(member) {
 }
 
+/** This is a wrapper used in function table creation to help make 
+ * debugging more readable, rather than placing this code in the section that
+ * is obfuscated. */
+__functionTableWrapper = function(initMember) {
+
+    var memberFunction;
+    var memberInitialized = false;
+
+    //create member function for lazy initialization
+    var wrapperMemberFunction = function(argList) {
+        if(!memberInitialized) {
+            memberFunction = initMember();
+            memberInitialized = true;
+        }
+
+        return memberFunction.apply(null,arguments);
+    }
+    
+    return wrapperMemberFunction;
+}
+
 
