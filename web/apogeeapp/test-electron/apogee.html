@@ -8,7 +8,7 @@
         <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
         
-        <script type="text/javascript" src="../../supplemental/webLibHeader.js"></script>
+        <script type="text/javascript" src="../../supplemental/npmLibHeader.js"></script>
 		<script type="text/javascript" src="../../apogee/apogee.js"></script>        
         <script type="text/javascript" src="../../apogee/lib/base.js"></script>
         <script type="text/javascript" src="../../apogee/usrlib/util.js"></script>
@@ -65,33 +65,42 @@
         <script type="text/javascript" src="../ui/splitpane/SplitPane.js"></script>
         <script type="text/javascript" src="../ui/treecontrol/TreeControl.js"></script>
         <script type="text/javascript" src="../ui/treecontrol/TreeEntry.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/ConfigurablePanel.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/ConfigurableElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/HeadingElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/TextFieldElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/TextareaElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/DropdownElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/CheckboxElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/CheckboxGroupElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/RadioGroupElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/InvisibleElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/PanelElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/SubmitElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/SpacerElement.js"></script>
+        <script type="text/javascript" src="../ui/configurablepanel/elements/HTMLDisplayElement.js"></script>
         <script type="text/javascript" src="../app/Apogee.js"></script>
         <script type="text/javascript" src="../app/WorkspaceUI.js"></script>
         <script type="text/javascript" src="../app/references/ReferenceManager.js"></script>
-		<script type="text/javascript" src="../ui/configurablepanel/elements/TextFieldElement.js"></script>
         <script type="text/javascript" src="../app/references/LinkEntry.js"></script>
         <script type="text/javascript" src="../app/component/WindowHeaderManager.js"></script>
         <script type="text/javascript" src="../app/component/Component.js"></script>
         <script type="text/javascript" src="../app/component/ParentComponent.js"></script>
         <script type="text/javascript" src="../app/component/EditComponent.js"></script>
-		<script type="text/javascript" src="../ui/configurablepanel/elements/InvisibleElement.js"></script>
-        <script type="text/javascript" src="../ui/configurablepanel/elements/PanelElement.js"></script>
-        <script type="text/javascript" src="../ui/configurablepanel/elements/SubmitElement.js"></script>
-        <script type="text/javascript" src="../ui/configurablepanel/elements/SpacerElement.js"></script>
         <script type="text/javascript" src="../app/component/TreeComponentDisplay.js"></script>
         <script type="text/javascript" src="../app/component/TabComponentDisplay.js"></script>
-		<script type="text/javascript" src="../app/WorkspaceUI.js"></script>
-        <script type="text/javascript" src="../app/references/ReferenceManager.js"></script>
-        <script type="text/javascript" src="../app/references/LinkEntry.js"></script>
         <script type="text/javascript" src="../app/component/ParentWindowComponentDisplay.js"></script>
         <script type="text/javascript" src="../app/component/EditWindowComponentDisplay.js"></script>
 		<script type="text/javascript" src="../app/components/FolderComponent.js"></script>
         <script type="text/javascript" src="../app/components/JsonTableComponent.js"></script>
         <script type="text/javascript" src="../app/components/GridTableComponent.js"></script>
         <script type="text/javascript" src="../app/components/TextComponent.js"></script>
+        <script type="text/javascript" src="../app/components/JavascriptComponent.js"></script>
         <script type="text/javascript" src="../app/components/FunctionComponent.js"></script>
         <script type="text/javascript" src="../app/components/FolderFunctionComponent.js"></script>
         <script type="text/javascript" src="../app/components/BasicControlComponent.js"></script>
+        <script type="text/javascript" src="../app/components/DynamicForm.js"></script>
+        <script type="text/javascript" src="../app/components/FormDataComponent.js"></script>
 		<script type="text/javascript" src="../app/components/CustomControlComponent.js"></script>
         <script type="text/javascript" src="../app/components/ErrorTableComponent.js"></script>
         <script type="text/javascript" src="../app/actions/errorhandling.js"></script>
@@ -106,26 +115,16 @@
         <script type="text/javascript" src="../app/actions/updatecomponent.js"></script>
         <script type="text/javascript" src="../app/actions/updatelink.js"></script>
         <script type="text/javascript" src="../app/datadisplay/ViewMode.js"></script>
+        <script type="text/javascript" src="../app/datadisplay/EditorDataDisplay.js"></script>
+        <script type="text/javascript" src="../app/datadisplay/NonEditorDataDisplay.js"></script>
+        <script type="text/javascript" src="../app/datadisplay/dataDisplayCallbackHelper.js"></script>
         <script type="text/javascript" src="../app/datadisplay/TextAreaEditor.js"></script>
-        <script type="text/javascript" src="../app/editors/TextAreaMode.js"></script>
 		<script type="text/javascript" src="../app/datadisplay/AceTextEditor.js"></script>		
-		<script type="text/javascript" src="../app/editors/AceCodeMode.js"></script>
-		<script type="text/javascript" src="../app/editors/AceDataMode.js"></script>
-        <script type="text/javascript" src="../app/editors/AceDescriptionMode.js"></script>
-        <script type="text/javascript" src="../app/editors/AceTextMode.js"></script>
-		<script type="text/javascript" src="../app/editors/AceSupplementalMode.js"></script>
-        <script type="text/javascript" src="../app/editors/AceCustomControlMode.js"></script>
         <script type="text/javascript" src="../app/datadisplay/HtmlJsDataDisplay.js"></script>
-        <script type="text/javascript" src="../app/editors/JsDataDisplay.js"></script>
-		<script type="text/javascript" src="../app/datadisplay/dataDisplayCallbackHelper.js"></script>
 		<script type="text/javascript" src="../app/datadisplay/JsonFormEditor.js"></script>
-		<script type="text/javascript" src="../app/editors/FormDataMode.js"></script>
-		<script type="text/javascript" src="../app/datadisplay/HtmlJsDataDisplay.js"></script>
-		<script type="text/javascript" src="../app/datadisplay/HandsonGridEditor.js"></script>
-		<script type="text/javascript" src="../app/editors/HandsonGridMode.js"></script>
-        <script type="text/javascript" src="../app/editors/ControlOutputMode.js"></script>
+		<script type="text/javascript" src="../app/datadisplay/ConfigurableFormEditor.js"></script>
+        <script type="text/javascript" src="../app/datadisplay/ConfigurableFormDisplay.js"></script>
         <script type="text/javascript" src="../app/datadisplay/ErrorDisplay.js"></script>
-        <script type="text/javascript" src="../app/editors/ErrorMode.js"></script>
         <script type="text/javascript" src="../app/dialogs/ConfigurableDialog.js"></script>
         <script type="text/javascript" src="../app/dialogs/TextIoDialog.js"></script>
         <script type="text/javascript" src="../app/dialogs/SelectControlDialog.js"></script>
