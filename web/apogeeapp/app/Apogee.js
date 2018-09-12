@@ -174,6 +174,7 @@ apogeeapp.app.Apogee.prototype.loadComponentGenerators = function() {
 	
     //additional components
     this.registerComponent(apogeeapp.app.CustomControlComponent);
+    this.registerComponent(apogeeapp.app.CustomDataComponent);
     this.registerComponent(apogeeapp.app.JavascriptComponent);
     this.registerComponent(apogeeapp.app.GridTableComponent);
     this.registerComponent(apogeeapp.app.TextComponent);
