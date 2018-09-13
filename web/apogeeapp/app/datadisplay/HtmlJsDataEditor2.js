@@ -1,4 +1,4 @@
-/** HtmlJsDataEditor
+/** HtmlJsDataEditor2
  * This is the data display for a custom control where the display is generated from
  * HTML and javascript code. Is should be passed a 
  * resource (javascript object) which has the following methods optionally defined: 
@@ -15,7 +15,7 @@
  */
 
 /** This is the display/editor for the custom control output. */
-apogeeapp.app.HtmlJsDataEditor = class extends apogeeapp.app.EditorDataDisplay {
+apogeeapp.app.HtmlJsDataEditor2 = class extends apogeeapp.app.EditorDataDisplay {
     constructor(viewMode,callbacks,member,html,resource) {
         super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.NON_SCROLLING);
         
@@ -23,7 +23,9 @@ apogeeapp.app.HtmlJsDataEditor = class extends apogeeapp.app.EditorDataDisplay {
         this.member = member;
         
 //test
-resource.onTriggerEditMode = () => this.onTriggerEditMode();
+if(resource.setStartEditMode) {
+    resource.setStartEditMode( () => this.onTriggerEditMode());
+}
     
         this.outputElement = apogeeapp.ui.createElement("div",null,{
             "position":"absolute",
@@ -48,7 +50,6 @@ resource.onTriggerEditMode = () => this.onTriggerEditMode();
         //constructor code
         //-------------------
 
-//NOT USED IN #2
         if(resource.constructorAddition) {
             try {
                 //custom code
@@ -122,12 +123,11 @@ resource.onTriggerEditMode = () => this.onTriggerEditMode();
 //        }
 
         if(this.resource.setData) {
-            this.setEditorData = (workingData) => {
+            this.setEditorData = (data) => {
                 try {
                     if(this.resource.setData) {
                         if((!this.member.hasError())&&(!this.member.getResultPending())) {
-                            var baseData = this.member.getData();
-                            resource.setData.call(resource,baseData,workingData,this.outputElement,mode);
+                            resource.setData.call(resource,data,this.outputElement,mode);
                         }
                     }
                 }

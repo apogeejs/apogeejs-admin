@@ -1,4 +1,6 @@
-/** This me a custom data component just like the custom control component. */
+/** This attempt has a single form edit page which returns an object. */
+// To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 
+//than making the user do that.
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
@@ -67,55 +69,31 @@ apogeeapp.app.CustomDataComponent.prototype.setDestroyOnInactive = function(dest
 
 apogeeapp.app.CustomDataComponent.CODE_FIELD_HTML = "html";
 apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS = "css";
-apogeeapp.app.CustomDataComponent.CODE_FIELD_INIT = "init";
-apogeeapp.app.CustomDataComponent.CODE_FIELD_SET_DATA = "setData";
-apogeeapp.app.CustomDataComponent.CODE_FIELD_GET_DATA = "getData";
-apogeeapp.app.CustomDataComponent.CODE_FIELD_IS_CLOSE_OK = "isCloseOk";
-apogeeapp.app.CustomDataComponent.CODE_FIELD_DESTROY = "destroy";
-apogeeapp.app.CustomDataComponent.CODE_FIELD_ON_LOAD = "onLoad";
-apogeeapp.app.CustomDataComponent.CODE_FIELD_ON_UNLOAD = "onUnload";
-apogeeapp.app.CustomDataComponent.CODE_FIELD_ON_RESIZE = "onResize";
-apogeeapp.app.CustomDataComponent.CODE_FIELD_CONSTRUCTOR = "constructorAddition";
+apogeeapp.app.CustomDataComponent.CODE_FIELD_UI_CODE = "uiCode";
 
-apogeeapp.app.CustomDataComponent.VIEW_OUTPUT = "Output";
-apogeeapp.app.CustomDataComponent.VIEW_VALUE = "Value";
-apogeeapp.app.CustomDataComponent.VIEW_CODE = "Model Code";
-apogeeapp.app.CustomDataComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+apogeeapp.app.CustomDataComponent.VIEW_FORM = "Form";
+apogeeapp.app.CustomDataComponent.VIEW_VALUE = "Data Value";
+apogeeapp.app.CustomDataComponent.VIEW_CODE = "Edit Code";
+apogeeapp.app.CustomDataComponent.VIEW_SUPPLEMENTAL_CODE = "Edit Private";
 apogeeapp.app.CustomDataComponent.VIEW_HTML = "HTML";
 apogeeapp.app.CustomDataComponent.VIEW_CSS = "CSS";
-apogeeapp.app.CustomDataComponent.VIEW_INIT = "init(element,mode)";
-apogeeapp.app.CustomDataComponent.VIEW_SET_DATA = "setData(baseData,formData,element,mode)";
-apogeeapp.app.CustomDataComponent.VIEW_GET_DATA = "getData(element,mode)";
-apogeeapp.app.CustomDataComponent.VIEW_IS_CLOSE_OK = "isCloseOk(element,mode)";
-apogeeapp.app.CustomDataComponent.VIEW_DESTROY = "destroy(element,mode)";
-apogeeapp.app.CustomDataComponent.VIEW_ON_LOAD = "onLoad(element,mode)";
-apogeeapp.app.CustomDataComponent.VIEW_ON_UNLOAD = "onUnload(element,mode)";
-apogeeapp.app.CustomDataComponent.VIEW_ON_RESIZE = "onResize(element,mode)";
-apogeeapp.app.CustomDataComponent.VIEW_CONSTRUCTOR = "constructor(mode)";
+apogeeapp.app.CustomDataComponent.VIEW_UI_CODE = "uiGenerator(mode)";
 apogeeapp.app.CustomDataComponent.VIEW_DESCRIPTION = "Notes";
 
 apogeeapp.app.CustomDataComponent.VIEW_MODES = [
-	apogeeapp.app.CustomDataComponent.VIEW_OUTPUT,
+	apogeeapp.app.CustomDataComponent.VIEW_FORM,
     apogeeapp.app.CustomDataComponent.VIEW_VALUE,
 	apogeeapp.app.CustomDataComponent.VIEW_CODE,
     apogeeapp.app.CustomDataComponent.VIEW_SUPPLEMENTAL_CODE,
     apogeeapp.app.CustomDataComponent.VIEW_HTML,
     apogeeapp.app.CustomDataComponent.VIEW_CSS,
-    apogeeapp.app.CustomDataComponent.VIEW_INIT,
-    apogeeapp.app.CustomDataComponent.VIEW_SET_DATA,
-    apogeeapp.app.CustomDataComponent.VIEW_GET_DATA,
-    apogeeapp.app.CustomDataComponent.VIEW_IS_CLOSE_OK,
-    apogeeapp.app.CustomDataComponent.VIEW_DESTROY,
-    apogeeapp.app.CustomDataComponent.VIEW_ON_LOAD,
-    apogeeapp.app.CustomDataComponent.VIEW_ON_UNLOAD,
-    apogeeapp.app.CustomDataComponent.VIEW_ON_RESIZE,
-    apogeeapp.app.CustomDataComponent.VIEW_CONSTRUCTOR,
+    apogeeapp.app.CustomDataComponent.VIEW_UI_CODE,
     apogeeapp.app.CustomDataComponent.VIEW_DESCRIPTION
 ];
 
 apogeeapp.app.CustomDataComponent.TABLE_EDIT_SETTINGS = {
     "viewModes": apogeeapp.app.CustomDataComponent.VIEW_MODES,
-    "defaultView": apogeeapp.app.CustomDataComponent.VIEW_OUTPUT
+    "defaultView": apogeeapp.app.CustomDataComponent.VIEW_FORM
 }
 
 /**  This method retrieves the table edit settings for this component instance
@@ -133,7 +111,7 @@ apogeeapp.app.CustomDataComponent.prototype.getDataDisplay = function(viewMode,v
 	//create the new view element;
 	switch(viewType) {
 		
-		case apogeeapp.app.CustomDataComponent.VIEW_OUTPUT:
+		case apogeeapp.app.CustomDataComponent.VIEW_FORM:
             viewMode.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
             this.activeOutputMode = viewMode;
             var callbacks = this.getFormEditorCallbacks();
@@ -162,40 +140,8 @@ apogeeapp.app.CustomDataComponent.prototype.getDataDisplay = function(viewMode,v
             callbacks = this.getCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS);
             return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/css");
             
-        case apogeeapp.app.CustomDataComponent.VIEW_INIT:
+        case apogeeapp.app.CustomDataComponent.VIEW_UI_CODE:
             callbacks = this.getCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_INIT);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-            
-        case apogeeapp.app.CustomDataComponent.VIEW_SET_DATA:
-            callbacks = this.getCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_SET_DATA);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-            
-        case apogeeapp.app.CustomDataComponent.VIEW_GET_DATA:
-            callbacks = this.getCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_GET_DATA);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-            
-        case apogeeapp.app.CustomDataComponent.VIEW_IS_CLOSE_OK:
-            callbacks = this.getCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_IS_CLOSE_OK);    
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-            
-        case apogeeapp.app.CustomDataComponent.VIEW_DESTROY:
-            callbacks = this.getCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_DESTROY);    
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-            
-        case apogeeapp.app.CustomDataComponent.VIEW_ON_LOAD:
-            callbacks = this.getCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_ON_LOAD);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-            
-        case apogeeapp.app.CustomDataComponent.VIEW_ON_UNLOAD:
-            callbacks = this.getCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_ON_UNLOAD);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-            
-        case apogeeapp.app.CustomDataComponent.VIEW_ON_RESIZE:
-            callbacks = this.getCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_ON_RESIZE);
-			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-            
-        case apogeeapp.app.CustomDataComponent.VIEW_CONSTRUCTOR:
-            callbacks = this.getCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_CONSTRUCTOR); 
             return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
 
         case apogeeapp.app.CustomDataComponent.VIEW_DESCRIPTION:
@@ -292,24 +238,14 @@ apogeeapp.app.CustomDataComponent.prototype.loadResourceFromJson = function(json
 
 apogeeapp.app.CustomDataComponent.prototype.createResource = function() {
     try {
-        var resourceMethodsCode = "";
         var uiCodeFields = this.getUiCodeFields();
-        
-        for(var fieldName in apogeeapp.app.CustomDataComponent.GENERATOR_INTERNAL_FORMATS) {
-            var fieldCode = uiCodeFields[fieldName];
-            if((fieldCode)&&(fieldCode != "")) {
-                
-                var format = apogeeapp.app.CustomDataComponent.GENERATOR_INTERNAL_FORMATS[fieldName];
-                var codeSnippet = apogee.util.formatString(format,fieldCode);
-                
-                resourceMethodsCode += codeSnippet + "\n";
-            }
-        }
+
+        var uiGeneratorBody = uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_UI_CODE];
         
         //create the resource generator wrapped with its closure
         var generatorFunctionBody = apogee.util.formatString(
             apogeeapp.app.CustomDataComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
-            resourceMethodsCode
+            uiGeneratorBody
         );
 
         //create the function generator, with the aliased variables in the closure
@@ -395,9 +331,7 @@ apogeeapp.app.CustomDataComponent.updateProperties = function(component,oldValue
 apogeeapp.app.CustomDataComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//member functions",
 "var resourceFunction = function(component) {",
-"var resource = {};",
 "{0}",
-"return resource;",
 "}",
 "//end member functions",
 "return resourceFunction;",
