@@ -4,10 +4,10 @@
  * @param {type} callbacks - {getData,getEditOk,setData}; format for data is text
  * @param {type} aceMode - the display format, such as "ace/mode/json"
  */
-apogeeapp.app.AceTextEditor = class extends apogeeapp.app.EditorDataDisplay {
+apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
     
     constructor(viewMode,callbacks,aceMode) {
-        super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.NON_SCROLLING);
+        super(viewMode,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
 
         this.editorDiv = apogeeapp.ui.createElement("div",null,{
             "position":"absolute",
@@ -40,11 +40,11 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.EditorDataDisplay {
         return apogeeapp.ui.RESIZABLE;
     }
 
-    getEditorData() {
+    getData() {
         return this.editor.getSession().getValue();
     }
     
-    setEditorData(text) {
+    setData(text) {
         if(apogee.util.getObjectType(text) != "String") {
             var errorMsg = "ERROR: Data value is not text";
             //this.setError(errorMsg);

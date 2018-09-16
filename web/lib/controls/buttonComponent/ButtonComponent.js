@@ -7,7 +7,7 @@ apogeeapp.app.ButtonComponent = class extends apogeeapp.app.BasicControlComponen
     }
 
     /** Implement the method to get the output data display. This should typically 
-     * extend NonEditorDataDisplay. */
+     * extend DataDisplay. */
     getOutputDisplay(viewMode) {
         return new apogeeapp.app.ButtonDisplay(viewMode,this.getMember());
     }
@@ -38,11 +38,16 @@ else {
  * onHide(outputElement,outputMode);
  * destroy(outputElement,outputMode);
  */
-apogeeapp.app.ButtonDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
+apogeeapp.app.ButtonDisplay = class extends apogeeapp.app.DataDisplay {
     
     constructor(viewMode,member) {
+        
+        var callbacks = {
+            getData: () => this.member.getData()
+        }
+        
         //extend edit component
-        super(viewMode);
+        super(viewMode,callbacks);
     
         this.member = member;
         
@@ -52,6 +57,8 @@ apogeeapp.app.ButtonDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
         this.button.onclick = () => this.buttonClicked();      
     
         this.outputElement = apogeeapp.ui.createElement("div");
+        this.outputElement.appendChild(document.createTextNode("This is a stupid component because you can't set the action."));
+        this.outputElement.appendChild(document.createElement("br"));
         this.outputElement.appendChild(this.button);
     }
     
@@ -71,10 +78,7 @@ apogeeapp.app.ButtonDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
     }
     
     /** This is called when the control object updates. */
-    showData() {
-        console.log("NewButtonControl.setData");
-        var data = this.member.getData();
-        
+    setData(data) {
         if(data) {
             this.msg = data.msg;
             var label = data.label;

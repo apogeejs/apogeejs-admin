@@ -15,9 +15,9 @@
  */
 
 /** This is the display/editor for the custom control output. */
-apogeeapp.app.HtmlJsDataEditor2 = class extends apogeeapp.app.EditorDataDisplay {
+apogeeapp.app.HtmlJsDataEditor2 = class extends apogeeapp.app.DataDisplay {
     constructor(viewMode,callbacks,member,html,resource) {
-        super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.NON_SCROLLING);
+        super(viewMode,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
         
         this.resource = resource;
         this.member = member;
@@ -123,7 +123,7 @@ if(resource.setStartEditMode) {
 //        }
 
         if(this.resource.setData) {
-            this.setEditorData = (data) => {
+            this.setData = (data) => {
                 try {
                     if(this.resource.setData) {
                         if((!this.member.hasError())&&(!this.member.getResultPending())) {
@@ -138,11 +138,11 @@ if(resource.setStartEditMode) {
         }
         else {
             //we must include a function here
-            this.setEditorData = () => {};
+            this.setData = () => {};
         }
         
         if(this.resource.getData) {
-            this.getEditorData = () => {
+            this.getData = () => {
                 try {
                     if(this.resource.getData) {
                         return this.resource.getData.call(resource,this.outputElement,viewMode);
@@ -155,7 +155,7 @@ if(resource.setStartEditMode) {
         }
         else {
             //we must include a function here
-            this.setEditorData = () => {};
+            this.setData = () => {};
         }
 
         if(this.resource.isCloseOk) {     

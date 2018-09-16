@@ -14,12 +14,16 @@
  */
 
 /** This is the display/editor for the custom control output. */
-apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
-    constructor(viewMode,member,html,resource) {
-        super(viewMode,apogeeapp.app.EditorDataDisplay.NON_SCROLLING);
+apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
+    constructor(viewMode,member,callbacks,html,resource) {
+        
+        super(viewMode,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
         
         this.resource = resource;
         this.member = member;
+        
+        this.isLoaded = false;
+        this.cachedData = undefined;
     
         this.outputElement = apogeeapp.ui.createElement("div",null,{
             "position":"absolute",
@@ -64,6 +68,13 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
             this.onLoad = () => {
                 try {
                     resource.onLoad.call(resource,this.outputElement,mode);
+                    this.isLoaded = true;
+                    
+                    //handle the case the data loaded before the html (which we don't want)
+                    if(this.cachedData != undefined) {
+                        this.setData(this.cachedData);
+                        this.cachedData = undefined;
+                    }
                 }
                 catch(error) {
                     alert("Error in " + this.member.getFullName() + " onLoad function: " + error.message);
@@ -74,6 +85,10 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
         if(this.resource.onUnload) {   
             this.onUnload = () => {
                 try {
+                    
+                    this.isLoaded = false;
+                    this.cachedData = undefined;
+                    
                     if(this.resource.onHide) {
                         resource.onUnload.call(resource,this.outputElement,mode);
                     }
@@ -95,26 +110,23 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
             };
         }
 
-        if(this.resource.setData) {
-            this.showData = () => {
-                try {
-                    if(this.resource.setData) {
-                        //set data, but only if the member does not have and error and is not pending
-                        if((!this.member.hasError())&&(!this.member.getResultPending())) {
-                            var data = this.member.getData();
-                            resource.setData.call(resource,data,this.outputElement,mode);
-                        }
+
+        this.setData = (data) => {
+            try {
+                if(this.resource.setData) {
+                    if(!this.isLoaded) {
+                        this.cachedData = data;
+                        return;
                     }
-                }
-                catch(error) {
-                    alert("Error in " + this.member.getFullName() + " setData function: " + error.message);
+                    
+                    resource.setData.call(resource,data,this.outputElement,mode);
                 }
             }
+            catch(error) {
+                alert("Error in " + this.member.getFullName() + " setData function: " + error.message);
+            }
         }
-        else {
-            //we must include a function here
-            this.showData = () => {};
-        }
+
 
         if(this.resource.isCloseOk) {     
             this.isCloseOk = () => {

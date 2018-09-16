@@ -1,8 +1,8 @@
 /** Editor that uses the basic text editor */
-apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.EditorDataDisplay {
+apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.DataDisplay {
     
     constructor(viewMode,callbacks) {
-        super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.SCROLLING);
+        super(viewMode,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
 
         var textArea = apogeeapp.ui.createElement("TEXTAREA",null,{
             "position":"absolute",
@@ -29,11 +29,11 @@ apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.EditorDataDisplay {
         return apogeeapp.ui.RESIZABLE;
     }
 
-    getEditorData() {
+    getData() {
         return this.textArea.value;
     }
     
-    setEditorData(text) {
+    setData(text) {
         this.textArea.value = text;
 
         //set the background color

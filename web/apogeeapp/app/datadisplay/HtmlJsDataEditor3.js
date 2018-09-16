@@ -15,9 +15,9 @@
  */
 
 /** This is the display/editor for the custom control output. */
-apogeeapp.app.HtmlJsDataEditor3 = class extends apogeeapp.app.EditorDataDisplay {
+apogeeapp.app.HtmlJsDataEditor3 = class extends apogeeapp.app.DataDisplay {
     constructor(viewMode,callbacks,member,html,resource) {
-        super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.NON_SCROLLING);
+        super(viewMode,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
         
         this.resource = resource;
         this.member = member;
@@ -41,24 +41,10 @@ if(resource.setStartEditMode) {
             this.outputElement.innerHTML = html;
         }
         
-        //TEMP - I used to pass the view mode, now I just want to pass something else.
-        var mode = {
-            getMessenger: () => new apogee.action.Messenger(this.member)
-        }
-
-        //-------------------
-        //constructor code
-        //-------------------
-
-//NOT USED IN #2
-        if(resource.constructorAddition) {
-            try {
-                //custom code
-                resource.constructorAddition.call(resource,mode);
-            }
-            catch(error) {
-                alert("Error in " + this.member.getFullName() + " init function: " + error.message);
-            }
+        //This provides some services to the user code
+        var admin = {
+            getMessenger: () => new apogee.action.Messenger(this.member),
+            startEditMode: () => this.member.onTriggerEditMode()
         }
 
         //------------------------
@@ -70,7 +56,7 @@ if(resource.setStartEditMode) {
         if(this.resource.onLoad) {
             this.onLoad = () => {
                 try {
-                    resource.onLoad.call(resource,this.outputElement,mode);
+                    resource.onLoad.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     alert("Error in " + this.member.getFullName() + " onLoad function: " + error.message);
@@ -82,7 +68,7 @@ if(resource.setStartEditMode) {
             this.onUnload = () => {
                 try {
                     if(this.resource.onHide) {
-                        resource.onUnload.call(resource,this.outputElement,mode);
+                        resource.onUnload.call(resource,this.outputElement,admin);
                     }
                 }
                 catch(error) {
@@ -94,42 +80,20 @@ if(resource.setStartEditMode) {
         if(this.resource.onResize) {
             this.onResize = () => {
                 try {
-                    resource.onResize.call(resource,this.outputElement,mode);
+                    resource.onResize.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     console.log("Error in " + this.member.getFullName() + " onResize function: " + error.message);
                 }
             };
         }
-        
-//        if(this.resource.setData) {
-//            this.showData = () => {
-//                try {
-//                    if(this.resource.setData) {
-//                        //set data, but only if the member does not have and error and is not pending
-//                        if((!this.member.hasError())&&(!this.member.getResultPending())) {
-//                            var data = this.member.getData();
-//                            resource.setData.call(resource,data,this.outputElement,mode);
-//                        }
-//                    }
-//                }
-//                catch(error) {
-//                    alert("Error in " + this.member.getFullName() + " setData function: " + error.message);
-//                }
-//            }
-//        }
-//        else {
-//            //we must include a function here
-//            this.showData = () => {};
-//        }
 
         if(this.resource.setData) {
-            this.setEditorData = (workingData) => {
+            this.setData = (data) => {
                 try {
                     if(this.resource.setData) {
                         if((!this.member.hasError())&&(!this.member.getResultPending())) {
-                            var baseData = this.member.getData();
-                            resource.setData.call(resource,baseData,workingData,this.outputElement,mode);
+                            resource.setData.call(resource,data,this.outputElement,admin);
                         }
                     }
                 }
@@ -140,14 +104,14 @@ if(resource.setStartEditMode) {
         }
         else {
             //we must include a function here
-            this.setEditorData = () => {};
+            this.setData = () => {};
         }
         
         if(this.resource.getData) {
-            this.getEditorData = () => {
+            this.getData = () => {
                 try {
                     if(this.resource.getData) {
-                        return this.resource.getData.call(resource,this.outputElement,viewMode);
+                        return this.resource.getData.call(resource,this.outputElement,admin);
                     }
                 }
                 catch(error) {
@@ -157,13 +121,13 @@ if(resource.setStartEditMode) {
         }
         else {
             //we must include a function here
-            this.setEditorData = () => {};
+            this.setData = () => {};
         }
 
         if(this.resource.isCloseOk) {     
             this.isCloseOk = () => {
                 try {
-                    resource.isCloseOk.call(resource,this.outputElement,mode);
+                    resource.isCloseOk.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     alert("Error in " + this.member.getFullName() + " isCloseOk function: " + error.message);
@@ -174,7 +138,7 @@ if(resource.setStartEditMode) {
         if(this.resource.destroy) {
             this.destroy = () => {
                 try {
-                    resource.destroy.call(resource,this.outputElement,mode);
+                    resource.destroy.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     alert("Error in " + this.member.getFullName() + " destroy function: " + error.message);
@@ -188,7 +152,7 @@ if(resource.setStartEditMode) {
 
         if(resource.init) {
             try {
-                resource.init.call(resource,this.outputElement,mode);
+                resource.init.call(resource,this.outputElement,admin);
             }
             catch(error) {
                 alert("Error in " + this.member.getFullName() + " init function: " + error.message);

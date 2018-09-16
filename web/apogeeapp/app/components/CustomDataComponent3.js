@@ -15,7 +15,7 @@ apogeeapp.app.CustomDataComponent3 = function(workspaceUI,folder) {
     
     //load these!
     this.dataTable = folder.lookupChildFromPathArray(["data"]);
-    this.controlTable = folder.lookupChildFromPathArray(["control"]);
+    this.inputTable = folder.lookupChildFromPathArray(["control"]);
     this.isInputValidFunctionTable = folder.lookupChildFromPathArray(["isInputValid"]);
     
     this.uiCodeFields = {};
@@ -73,8 +73,8 @@ apogeeapp.app.CustomDataComponent3.CODE_FIELD_UI_CODE = "uiCode";
 
 apogeeapp.app.CustomDataComponent3.VIEW_FORM = "Form";
 apogeeapp.app.CustomDataComponent3.VIEW_VALUE = "Data Value";
-apogeeapp.app.CustomDataComponent3.VIEW_CODE = "Edit Code";
-apogeeapp.app.CustomDataComponent3.VIEW_SUPPLEMENTAL_CODE = "Edit Private";
+apogeeapp.app.CustomDataComponent3.VIEW_CODE = "Input Code";
+apogeeapp.app.CustomDataComponent3.VIEW_SUPPLEMENTAL_CODE = "Input Private";
 apogeeapp.app.CustomDataComponent3.VIEW_HTML = "HTML";
 apogeeapp.app.CustomDataComponent3.VIEW_CSS = "CSS";
 apogeeapp.app.CustomDataComponent3.VIEW_UI_CODE = "uiGenerator(mode)";
@@ -117,7 +117,7 @@ apogeeapp.app.CustomDataComponent3.prototype.getDataDisplay = function(viewMode,
             var callbacks = this.getFormEditorCallbacks();
             var html = this.getUiCodeField(apogeeapp.app.CustomDataComponent3.CODE_FIELD_HTML);
             var resource = this.createResource();
-            var dataDisplay = new apogeeapp.app.HtmlJsDataEditor3(viewMode,callbacks,this.controlTable,html,resource);
+            var dataDisplay = new apogeeapp.app.HtmlJsDataEditor3(viewMode,callbacks,this.inputTable,html,resource);
             return dataDisplay;
             
         case apogeeapp.app.CustomDataComponent3.VIEW_VALUE:
@@ -125,11 +125,11 @@ apogeeapp.app.CustomDataComponent3.prototype.getDataDisplay = function(viewMode,
             return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/json");
 			
 		case apogeeapp.app.CustomDataComponent3.VIEW_CODE:
-            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.controlTable);
+            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.inputTable);
 			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
 			
 		case apogeeapp.app.CustomDataComponent3.VIEW_SUPPLEMENTAL_CODE:
-			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.controlTable);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.inputTable);
             return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
         
         case apogeeapp.app.CustomDataComponent3.VIEW_HTML:
@@ -145,7 +145,7 @@ apogeeapp.app.CustomDataComponent3.prototype.getDataDisplay = function(viewMode,
             return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
 
         case apogeeapp.app.CustomDataComponent3.VIEW_DESCRIPTION:
-			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.controlTable);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.inputTable);
             //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
             return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
 			
@@ -161,13 +161,18 @@ apogeeapp.app.CustomDataComponent3.prototype.getFormEditorCallbacks = function()
     var callbacks = {};
     
     //return desired form value
-    callbacks.getData = () => this.dataTable.getData();
+    callbacks.getData = () => {
+        var data = {};
+        data.inputData = this.inputTable.getData();
+        data.editData = this.dataTable.getData();
+        return data;
+    }
     
     //edit ok - always true
     callbacks.getEditOk = () => true;
     
     //save data - just form value here
-    var messenger = new apogee.action.Messenger(this.controlTable);
+    var messenger = new apogee.action.Messenger(this.inputTable);
     callbacks.saveData = (formValue) => {
         
         //validate input

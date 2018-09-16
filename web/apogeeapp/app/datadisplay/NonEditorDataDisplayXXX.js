@@ -5,19 +5,21 @@
  * @param {type} containerClass - the is the css class for the container element OPTIONAL
  */
 apogeeapp.app.NonEditorDataDisplay = class {
-    constructor(viewMode,containerClass = apogeeapp.app.NonEditorDataDisplay.NON_SCROLLING) {
+    constructor(viewMode,callbacks,containerClass = apogeeapp.app.NonEditorDataDisplay.NON_SCROLLING) {
         
         this.outsideDiv = apogeeapp.ui.createElementWithClass("div",containerClass);
 	
         this.viewMode = viewMode;
+        this.callbacks = callbacks;
+        this.editOk = false;
     }
 
     //=============================
     // Implemement in extending class
     //=============================
     
-    //this sets the data into the editor display. REQUIRED
-    //showData() {}
+    //this sets the data into the editor display
+    //setData(data) {}
     
     //this methodis called on loading the display. OPTIONAL
     //onLoad() {}
@@ -40,6 +42,35 @@ apogeeapp.app.NonEditorDataDisplay = class {
     //=============================
     // protected, package and private Methods
     //=============================
+    
+    //=============================
+    // protected, package and private Methods
+    //=============================
+	
+    showData() {
+        var data;
+        var editOk;
+        if(this.callbacks) {
+            if(this.callbacks.getData) {
+                data = this.callbacks.getData();
+            }
+            if(this.callbacks.getEditOk) {
+                editOk = this.callbacks.getEditOk();
+            }
+        }
+        if(data === undefined) {
+            data = "DATA UNAVAILABLE";
+            this.editOK = false;
+        }
+        else if(editOk === undefined) {
+            this.editOk = false;
+        }
+        else {
+            this.editOk = editOk;
+        }
+        
+        this.setData(data);
+    }
 
 }
 

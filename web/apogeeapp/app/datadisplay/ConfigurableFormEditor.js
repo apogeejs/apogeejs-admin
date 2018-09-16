@@ -1,5 +1,5 @@
 /** This is an editor that displays a customized form for data input. */
-apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.EditorDataDisplay {
+apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.DataDisplay {
     
     /** This allows for a static or dynamic layout setting
      * @param {type} viewMode - the apogee view mode
@@ -15,7 +15,7 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.EditorDataDis
      * allack should not be populated. 
      */
     constructor(viewMode,callbacks,optionalFixedLayoutInfo) {
-        super(viewMode,callbacks,apogeeapp.app.EditorDataDisplay.SCROLLING);
+        super(viewMode,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
         
         //layout can be fixed or dynamic
         this.dynamicLayoutCallback = callbacks.getLayoutInfo;
@@ -37,13 +37,13 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.EditorDataDis
     }
     
     /** This returns the form value (not the layout too) */
-    getEditorData() {
+    getData() {
         //output data is the form
         return this.panel.getValue();
     }
     
     /** This is passed the data form the data callback, which should be the extended data  - including layout + value */
-    setEditorData(savedFormValue) {
+    setData(savedFormValue) {
         //input data is the layout and the value
 
         //set layout if dynmaically loaded

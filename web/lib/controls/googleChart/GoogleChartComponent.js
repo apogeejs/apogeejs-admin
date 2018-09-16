@@ -246,14 +246,19 @@ else {
 //-----------------------
 
 /** Extend ths JsDataDisplay */
-apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
+apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.DataDisplay {
     
     //=====================================
     // Public Methods
     //=====================================
     
     constructor(viewMode,member) {
-        super(viewMode,apogeeapp.app.NonEditorDataDisplay.SCROLLING);
+        
+        var callbacks = {
+            getData: () => this.member.getData()
+        }
+        
+        super(viewMode,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
     
         this.member = member;
         //create a content element of variable size in the top left of the parent
@@ -285,8 +290,8 @@ apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.NonEditorDataDisp
         return apogeeapp.ui.FIXED_SIZE;
     }
 
-    showData() {
-        this.data = this.member.getData();
+    setData(data) {
+        this.data = data;
         this.dataLoaded = true;
 
         if(this.libLoaded) {
