@@ -124,7 +124,7 @@ apogeeapp.app.CustomControlComponent.prototype.getDataDisplay = function(viewMod
             var callbacks = this.getCustomFormCallbacks();
             var html = this.getUiCodeField(apogeeapp.app.CustomControlComponent.CODE_FIELD_HTML);
             var resource = this.createResource();
-            var dataDisplay = new apogeeapp.app.HtmlJsDataDisplay(viewMode,this.member,callbacks,html,resource);
+            var dataDisplay = new apogeeapp.app.HtmlJsDataDisplay(viewMode,callbacks,this.member,html,resource);
             return dataDisplay;
 			
 		case apogeeapp.app.CustomControlComponent.VIEW_CODE:
@@ -382,7 +382,7 @@ apogeeapp.app.CustomControlComponent.getCreateMemberPayload = function(userInput
 // This is the control generator, to register the control
 //======================================
 
-apogeeapp.app.CustomControlComponent.displayName = "Custom Control";
+apogeeapp.app.CustomControlComponent.displayName = "Custom Control (Deprecated)";
 apogeeapp.app.CustomControlComponent.uniqueName = "apogeeapp.app.CustomControlComponent";
 apogeeapp.app.CustomControlComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.CustomControlComponent.DEFAULT_HEIGHT = 500;

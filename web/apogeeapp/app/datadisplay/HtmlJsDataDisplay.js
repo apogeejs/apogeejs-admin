@@ -15,7 +15,7 @@
 
 /** This is the display/editor for the custom control output. */
 apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
-    constructor(viewMode,member,callbacks,html,resource) {
+    constructor(viewMode,callbacks,member,html,resource) {
         
         super(viewMode,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
         
@@ -39,19 +39,20 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
             this.outputElement.innerHTML = html;
         }
         
-        //TEMP - I used to pass the view mode, now I just want to pass something else.
-        var mode = {
-            getMessenger: () => new apogee.action.Messenger(this.member)
+        //this gives the ui code access to some data display functions
+        var admin = {
+            getMessenger: () => new apogee.action.Messenger(this.member),
+            startEditMode: () => this.onTriggerEditMode()
         }
 
         //-------------------
         //constructor code
         //-------------------
-
+        //I have this for legacy reasons
         if(resource.constructorAddition) {
             try {
                 //custom code
-                resource.constructorAddition.call(resource,mode);
+                resource.constructorAddition.call(resource,admin);
             }
             catch(error) {
                 alert("Error in " + this.member.getFullName() + " init function: " + error.message);
@@ -67,7 +68,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
         if(this.resource.onLoad) {
             this.onLoad = () => {
                 try {
-                    resource.onLoad.call(resource,this.outputElement,mode);
+                    resource.onLoad.call(resource,this.outputElement,admin);
                     this.isLoaded = true;
                     
                     //handle the case the data loaded before the html (which we don't want)
@@ -90,7 +91,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     this.cachedData = undefined;
                     
                     if(this.resource.onHide) {
-                        resource.onUnload.call(resource,this.outputElement,mode);
+                        resource.onUnload.call(resource,this.outputElement,admin);
                     }
                 }
                 catch(error) {
@@ -102,7 +103,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
         if(this.resource.onResize) {
             this.onResize = () => {
                 try {
-                    resource.onResize.call(resource,this.outputElement,mode);
+                    resource.onResize.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     console.log("Error in " + this.member.getFullName() + " onResize function: " + error.message);
@@ -119,19 +120,40 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                         return;
                     }
                     
-                    resource.setData.call(resource,data,this.outputElement,mode);
+                    resource.setData.call(resource,data,this.outputElement,admin);
+                }
+                else {
+                     //we must include a function here
+                     this.setData = () => {};
                 }
             }
             catch(error) {
                 alert("Error in " + this.member.getFullName() + " setData function: " + error.message);
             }
         }
+        
+        if(this.resource.getData) {
+            this.getData = () => {
+                try {
+                    if(this.resource.getData) {
+                        return this.resource.getData.call(resource,this.outputElement,admin);
+                    }
+                }
+                catch(error) {
+                    alert("Error in " + this.member.getFullName() + " setData function: " + error.message);
+                }
+            }
+        }
+        else {
+            //we must include a function here
+            this.setData = () => {};
+        }
 
 
         if(this.resource.isCloseOk) {     
             this.isCloseOk = () => {
                 try {
-                    resource.isCloseOk.call(resource,this.outputElement,mode);
+                    resource.isCloseOk.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     alert("Error in " + this.member.getFullName() + " isCloseOk function: " + error.message);
@@ -142,7 +164,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
         if(this.resource.destroy) {
             this.destroy = () => {
                 try {
-                    resource.destroy.call(resource,this.outputElement,mode);
+                    resource.destroy.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     alert("Error in " + this.member.getFullName() + " destroy function: " + error.message);
@@ -156,7 +178,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
 
         if(resource.init) {
             try {
-                resource.init.call(resource,this.outputElement,mode);
+                resource.init.call(resource,this.outputElement,admin);
             }
             catch(error) {
                 alert("Error in " + this.member.getFullName() + " init function: " + error.message);

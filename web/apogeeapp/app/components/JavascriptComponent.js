@@ -87,7 +87,7 @@ apogeeapp.app.JavascriptComponent.getCreateMemberPayload = function(userInputVal
 // This is the component generator, to register the component
 //======================================
 
-apogeeapp.app.JavascriptComponent.displayName = "Javascript Object";
+apogeeapp.app.JavascriptComponent.displayName = "Javascript Object (TEMPORARY!)";
 apogeeapp.app.JavascriptComponent.uniqueName = "apogeeapp.app.JavascriptComponent";
 apogeeapp.app.JavascriptComponent.DEFAULT_WIDTH = 400;
 apogeeapp.app.JavascriptComponent.DEFAULT_HEIGHT = 400;
