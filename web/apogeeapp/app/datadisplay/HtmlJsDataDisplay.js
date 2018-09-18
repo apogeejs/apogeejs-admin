@@ -42,7 +42,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
         //this gives the ui code access to some data display functions
         var admin = {
             getMessenger: () => new apogee.action.Messenger(this.member),
-            startEditMode: () => this.onTriggerEditMode()
+            startEditMode: () => this.startEditMode(),
+            endEditMode: () => this.endEditMode()
         }
 
         //-------------------
@@ -81,6 +82,9 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     alert("Error in " + this.member.getFullName() + " onLoad function: " + error.message);
                 }
             };
+        }
+        else {
+            this.isLoaded = true;
         }
 
         if(this.resource.onUnload) {   
@@ -146,7 +150,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
         }
         else {
             //we must include a function here
-            this.setData = () => {};
+            //WHY RETURN A DUMMY OBJECT? WHY NOT NULL? OR INVALID?
+            this.getData = () => {};
         }
 
 
