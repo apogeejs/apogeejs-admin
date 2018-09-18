@@ -186,8 +186,8 @@ apogeeapp.app.ViewMode.prototype.setData = function() {
 
 /** If we enter a state where we want to destroy the display, try to do that. */
 apogeeapp.app.ViewMode.prototype.setDisplayState = function() {
-    var showWindow = this.modeActive;
     var destroyWindow = (((!this.modeActive) && this.destroyOnInactive)||(this.windowMinimized && this.destroyOnMinimize));
+    var showWindow = destroyWindow ? false : this.modeActive;
  
     if(showWindow) {
         //show window, maybe create
