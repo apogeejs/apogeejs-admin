@@ -382,7 +382,7 @@ apogeeapp.app.CustomControlComponent.getCreateMemberPayload = function(userInput
 // This is the control generator, to register the control
 //======================================
 
-apogeeapp.app.CustomControlComponent.displayName = "Custom Control (Deprecated)";
+apogeeapp.app.CustomControlComponent.displayName = "Custom Control Component (Deprecated)";
 apogeeapp.app.CustomControlComponent.uniqueName = "apogeeapp.app.CustomControlComponent";
 apogeeapp.app.CustomControlComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.CustomControlComponent.DEFAULT_HEIGHT = 500;

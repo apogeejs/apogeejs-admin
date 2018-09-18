@@ -116,8 +116,18 @@ apogeeapp.app.addcomponent.getAddAdditionalComponentCallback = function(app,opti
                 alert("Unknown component type: " + componentType);
             }
         }
+        //get the display names
+        var componentNames = app.additionalComponents.map(componentClassName => {
+            var generator = app.getComponentGenerator(componentClassName);
+            if(generator) {
+                return generator.displayName;
+            }
+            else {
+                return componentClassName + " (ERROR - not found!)";
+            }
+        })
         //open select component dialog
-        apogeeapp.app.dialog.showSelectComponentDialog(app.additionalComponents,onSelect);
+        apogeeapp.app.dialog.showSelectComponentDialog(componentNames,app.additionalComponents,onSelect);
     }
 }
 

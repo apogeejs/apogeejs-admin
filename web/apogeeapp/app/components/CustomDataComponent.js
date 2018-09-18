@@ -372,7 +372,7 @@ apogeeapp.app.CustomDataComponent.getCreateMemberPayload = function(userInputVal
 // This is the control generator, to register the control
 //======================================
 
-apogeeapp.app.CustomDataComponent.displayName = "Custom Data Component3";
+apogeeapp.app.CustomDataComponent.displayName = "Custom Data Component";
 apogeeapp.app.CustomDataComponent.uniqueName = "apogeeapp.app.CustomDataComponent";
 apogeeapp.app.CustomDataComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.CustomDataComponent.DEFAULT_HEIGHT = 500;
