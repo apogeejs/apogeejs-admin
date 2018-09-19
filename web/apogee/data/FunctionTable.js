@@ -45,10 +45,16 @@ apogee.FunctionTable.prototype.getLazyInitializedMemberFunction = function(membe
         }
         else {
             //error handling
-            //in the case of "result pending" this is NOT an error. But I don't know
+            var issue;
+            
+            //in the case of "result invalid" or "result pending" this is 
+            //NOT an error. But I don't know
             //how else to stop the calculation other than throwing an error, so 
             //we do that here. It should be handled by anyone calling a function.
-            if(instance.hasError()) {
+            if(instance.getResultInvalid()) {
+                issue = apogee.Codeable.MEMBER_FUNCTION_INVALID;
+            }
+            else if(instance.hasError()) {
                 issue = new Error("Error in dependency: " + instance.getFullName());
 
             }

@@ -1,4 +1,16 @@
-/** This class encapsulatees a data table for a JSON object */
+/** This class encapsulatees a data table for a jvascript object
+ * There are two problems with this right now
+ * 1) This freezes the object the sme way it freezes a JSON object, however, a 
+ * javascript object can have loops, which will cause an infinite code loop.
+ * 2) The real bad think about this is that a javascript object can be used to store state,
+ * which will invalidate some of our functional programming/immutable concept. I think
+ * maybe we want to not use this. (Note, this problem also can exist in a function. We
+ * should figure out how to prevent it there if possible.)
+ * 
+ *  What I really want out of this is an object that is like a JSON but allows functions.
+ *  
+ *   TBD on if we actually use this. 
+ * */
 apogee.JavascriptTable = function(name,owner,initialData) {
     //base init
     apogee.Member.init.call(this,name,apogee.JavascriptTable.generator);
@@ -65,9 +77,13 @@ apogee.JavascriptTable.prototype.processMemberFunction = function(memberGenerato
         data = undefined;
     }
     
-    //if the return value is a Promise, the data is asynch
-    if(apogee.base.isPromise(data)) {
-        //result is asynchronous!
+    
+    if(data === apogee.util.INVALID_VALUE) {
+        //value is invalid if return is this predefined value
+        this.setResultInvalid(true);
+    }
+    else if(apogee.base.isPromise(data)) {
+        //if the return value is a Promise, the data is asynch asynchronous!
 
         //set pending manually here rather than doing below in a separate action
         var token = apogee.action.getAsynchToken();

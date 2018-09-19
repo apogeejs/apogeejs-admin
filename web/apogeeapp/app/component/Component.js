@@ -326,7 +326,11 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
     
     //get the banner info
     var member = this.getMember();
-    if(member.hasError()) {
+    if(member.getResultInvalid()) {
+        this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_INVALID;
+        this.bannerMessage = apogeeapp.app.WindowHeaderManager.INVALID_MESSAGE;
+    }
+    else if(member.hasError()) {
         var errorMsg = "";
         var actionErrors = member.getErrors();
         for(var i = 0; i < actionErrors.length; i++) {

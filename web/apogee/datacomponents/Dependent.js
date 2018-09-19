@@ -53,6 +53,7 @@ apogee.Dependent.clearCalcPending = function() {
 apogee.Dependent.prepareForCalculate = function() {
     this.clearErrors();
     this.setResultPending(false);
+    this.setResultInvalid(false);
     this.calcPending = true;
 }
 
@@ -64,6 +65,7 @@ apogee.Dependent.prepareForCalculate = function() {
 apogee.Dependent.initializeImpactors = function() {
     var errorDependencies = [];
     var resultPending = false;
+    var resultInvalid = false;
     
     //make sure dependencies are up to date
     for(var i = 0; i < this.dependsOnList.length; i++) {
@@ -71,7 +73,10 @@ apogee.Dependent.initializeImpactors = function() {
         if((impactor.isDependent)&&(impactor.getCalcPending())) {
             impactor.calculate();
         }
-        if(impactor.hasError()) {
+        if(impactor.getResultInvalid()) {
+            resultInvalid = true;
+        }
+        else if(impactor.hasError()) {
             errorDependencies.push(impactor);
         } 
         else if(impactor.getResultPending()) {
@@ -79,7 +84,10 @@ apogee.Dependent.initializeImpactors = function() {
         }
     }
 
-    if(errorDependencies.length > 0) {
+    if(resultInvalid) {
+        this.setResultInvalid(true);
+    }
+    else if(errorDependencies.length > 0) {
         this.createDependencyError(errorDependencies);
     }
     else if(resultPending) {

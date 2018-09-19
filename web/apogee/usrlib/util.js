@@ -2,6 +2,8 @@
  * are also used in the applictaion. */
 apogee.util = {};
 
+apogee.util.INVALID_VALUE = {"apogeeValue":"INVALID VALUE"};
+
 /** This method creates an integer has value for a string. */
 apogee.util.stringHash = function(string) {
     var HASH_SIZE = 0xffffffff;
