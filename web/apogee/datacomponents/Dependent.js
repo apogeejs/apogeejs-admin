@@ -73,25 +73,25 @@ apogee.Dependent.initializeImpactors = function() {
         if((impactor.isDependent)&&(impactor.getCalcPending())) {
             impactor.calculate();
         }
-        if(impactor.getResultInvalid()) {
-            resultInvalid = true;
-        }
-        else if(impactor.hasError()) {
+        if(impactor.hasError()) {
             errorDependencies.push(impactor);
         } 
         else if(impactor.getResultPending()) {
             resultPending = true;
         }
+        else if(impactor.getResultInvalid()) {
+            resultInvalid = true;
+        }
     }
 
-    if(resultInvalid) {
-        this.setResultInvalid(true);
-    }
-    else if(errorDependencies.length > 0) {
+    if(errorDependencies.length > 0) {
         this.createDependencyError(errorDependencies);
     }
     else if(resultPending) {
         this.setResultPending(true,apogee.action.DEPENDENT_PENDING_TOKEN);
+    }
+    else if(resultInvalid) {
+        this.setResultInvalid(true);
     }
 }
 
