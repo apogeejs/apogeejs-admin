@@ -162,20 +162,20 @@ apogeeapp.app.ViewMode.prototype.onWindowStateChange = function(window) {
 
 apogeeapp.app.ViewMode.prototype.onWindowLoaded = function() {
     this.windowLoaded = true;
-    if((this.dataDisplay)&&(this.dataDisplay.onLoad)) {
+    if((this.dataDisplay)&&(this.dataDisplay.onLoad)&&(this.modeActive)) {
         this.dataDisplay.onLoad();
     }
 }
 
 apogeeapp.app.ViewMode.prototype.onWindowUnloaded = function() {
     this.windowLoaded = false;
-    if((this.dataDisplay)&&(this.dataDisplay.onUnload)) {
+    if((this.dataDisplay)&&(this.dataDisplay.onUnload)&&(this.modeActive)) {
         this.dataDisplay.onUnload();
     }
 }
 
 apogeeapp.app.ViewMode.prototype.onWindowResized = function() {
-    if((this.dataDisplay)&&(this.displayInWindow)&&(this.dataDisplay.onResize)) {
+    if((this.dataDisplay)&&(this.displayInWindow)&&(this.dataDisplay.onResize)&&(this.modeActive)) {
         this.dataDisplay.onResize();
     }
 }
