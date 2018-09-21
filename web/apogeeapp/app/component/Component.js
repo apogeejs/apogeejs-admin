@@ -341,6 +341,10 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
         this.bannerMessage = apogeeapp.app.WindowHeaderManager.PENDING_MESSAGE;
         
     }
+    else if(member.getResultInvalid()) {
+        this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_INVALID;
+        this.bannerMessage = apogeeapp.app.WindowHeaderManager.INVALID_MESSAGE;
+    }
     else {   
         this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
         this.bannerMessage = null;

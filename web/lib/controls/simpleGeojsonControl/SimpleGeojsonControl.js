@@ -27,15 +27,18 @@ else {
     console.log("Component could not be registered because no Apogee app instance was available at component load time: apogeeapp.app.SimpleGeojsonControl");
 }
 
-
-
 var DEFAULT_LAT_LNG = [0,0];
 var DEFAULT_ZOOM = 1;
 
 /** Extend ths JsDataDisplay */
-apogeeapp.app.SimpleGeojsonDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
+apogeeapp.app.SimpleGeojsonDisplay = class extends apogeeapp.app.DataDisplay {
     constructor(viewMode,member) {
-        super(viewMode)
+        
+        var callbacks = {
+            getData: () => this.member.getData()
+        }
+        
+        super(viewMode,callbacks)
         
         //create map element - this css class will fill the parent (the window frame) with no scrolling 
         this.mapElement = apogeeapp.ui.createElement("div");
@@ -74,8 +77,8 @@ apogeeapp.app.SimpleGeojsonDisplay = class extends apogeeapp.app.NonEditorDataDi
         return apogeeapp.ui.RESIZABLE;
     }
 
-    showData() {
-        this.cachedData = this.member.getData();
+    setData(data) {
+        this.cachedData = data;
         if(this.map) {
             this.createDataLayer();
         }

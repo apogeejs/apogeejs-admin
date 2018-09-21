@@ -20,6 +20,7 @@ apogee.Member.init = function(name,generator) {
     
     this.generator = generator;
     this.errors = []; 
+    this.resultInvalid = false;
     this.resultPending = false;
 }
 
@@ -177,6 +178,19 @@ apogee.Member.getResultPending = function() {
 apogee.Member.setResultPending = function(isPending,pendingToken) {
     this.resultPending = isPending;
     this.pendingToken = pendingToken;
+}
+
+/** This returns true if the member is invalid, typically
+ * meaning the calculation could not properly be performed becase the
+ * needed data is not available. */
+apogee.Member.getResultInvalid = function() {
+    return this.resultInvalid;
+}
+
+/** This sets the result invalid flag. If the result is invalid, any
+ * table depending on this will also have an invalid value. */
+apogee.Member.setResultInvalid = function(isInvalid) {
+    this.resultInvalid = isInvalid;
 }
 
 /** This returns true if the pending token matches. */

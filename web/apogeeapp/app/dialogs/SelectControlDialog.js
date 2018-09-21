@@ -1,5 +1,7 @@
 /** This method shows a dialog to select from additional components. */
-apogeeapp.app.dialog.showSelectComponentDialog = function(componentList,onSelectFunction) {
+apogeeapp.app.dialog.showSelectComponentDialog = function(displayNameList,componentList,onSelectFunction) {
+    
+    if(displayNameList.length != componentList.length) throw new Error("Mismatch in additional component display name and class name lists!");
 
     var dialog = apogeeapp.ui.createDialog({"movable":true});
     
@@ -36,8 +38,9 @@ apogeeapp.app.dialog.showSelectComponentDialog = function(componentList,onSelect
     var select = apogeeapp.ui.createElement("select");
     line.appendChild(select);
     for(var i = 0; i < componentList.length; i++) {
-		var name = componentList[i];
-		select.add(apogeeapp.ui.createElement("option",{"text":name}));
+		var displayName = displayNameList[i];
+        var className = componentList[i];
+		select.add(apogeeapp.ui.createElement("option",{"text":displayName,"value":className}));
     }
     content.appendChild(line);
     

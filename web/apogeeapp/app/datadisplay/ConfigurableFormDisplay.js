@@ -4,12 +4,10 @@
  * @param {type} viewMode - the apogee view mode
  * @param {type} getLayout - this callback retrieves the form layout
  */
-apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
+apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.DataDisplay {
     
-    constructor(viewMode,getLayoutInfo) {
-        super(viewMode,apogeeapp.app.NonEditorDataDisplay.SCROLLING);  
-        
-        this.getLayoutInfo = getLayoutInfo;
+    constructor(viewMode,callbacks,getLayoutInfo) {
+        super(viewMode,callbacks,apogeeapp.app.DataDisplay.SCROLLING);  
         
         this.panel = this.panel = new apogeeapp.ui.ConfigurablePanel();
     }
@@ -25,7 +23,7 @@ apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.NonEditorDat
     
     
     //this sets the data into the editor display. REQUIRED
-    showData() {
-        this.panel.configureForm(this.getLayoutInfo());
+    setData(layoutData) {
+        this.panel.configureForm(layoutData);
     }
 }

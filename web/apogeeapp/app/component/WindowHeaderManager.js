@@ -25,12 +25,18 @@ apogeeapp.app.WindowHeaderManager.BANNER_BGCOLOR_PENDING = "yellow";
 apogeeapp.app.WindowHeaderManager.BANNER_FGCOLOR_PENDING = "black";
 apogeeapp.app.WindowHeaderManager.PENDING_ICON_IMAGE = "/pending.png";
 
+apogeeapp.app.WindowHeaderManager.BANNER_TYPE_INVALID = "invalid";
+apogeeapp.app.WindowHeaderManager.BANNER_BGCOLOR_INVALID = "gray";
+apogeeapp.app.WindowHeaderManager.BANNER_FGCOLOR_INVALID = "white";
+apogeeapp.app.WindowHeaderManager.INVALID_ICON_IMAGE = "/invalid.png";
+
 apogeeapp.app.WindowHeaderManager.BANNER_BGCOLOR_UNKNOWN = "yellow";
 apogeeapp.app.WindowHeaderManager.BANNER_FGCOLOR_UNKNOWN = "black";
 
 apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE = "none";
 
 apogeeapp.app.WindowHeaderManager.PENDING_MESSAGE = "Calculation pending...";
+apogeeapp.app.WindowHeaderManager.INVALID_MESSAGE = "Result not valid!";
 
 /** This method returns the base member for this component. */
 apogeeapp.app.WindowHeaderManager.prototype.showBannerBar = function(text,type) {
@@ -49,7 +55,11 @@ apogeeapp.app.WindowHeaderManager.prototype.showBannerBar = function(text,type) 
     //get banner color
     var bgColor;
     var fgColor;
-    if(type == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR) {
+    if(type == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_INVALID) {
+        bgColor = apogeeapp.app.WindowHeaderManager.BANNER_BGCOLOR_INVALID;
+        fgColor = apogeeapp.app.WindowHeaderManager.BANNER_FGCOLOR_INVALID;
+    }
+    else if(type == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR) {
         bgColor = apogeeapp.app.WindowHeaderManager.BANNER_BGCOLOR_ERROR;
         fgColor = apogeeapp.app.WindowHeaderManager.BANNER_FGCOLOR_ERROR;
     }
@@ -130,7 +140,10 @@ apogeeapp.app.WindowHeaderManager.prototype.getHeaderElement = function() {
 
 apogeeapp.app.WindowHeaderManager.getIconOverlay = function(bannerState) {
     var resource;
-    if(bannerState == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR) {
+    if(bannerState == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_INVALID) {
+        resource = apogeeapp.app.WindowHeaderManager.INVALID_ICON_IMAGE;
+    }
+    else if(bannerState == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR) {
         resource = apogeeapp.app.WindowHeaderManager.ERROR_ICON_IMAGE;
     }
     else if(bannerState == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING) {

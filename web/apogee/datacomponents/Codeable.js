@@ -30,6 +30,7 @@ apogee.Codeable.init = function(argList) {
     
     this.clearCalcPending();
     this.setResultPending(false);
+    this.setResultInvalid(false);
     
     //fields used in calculation
     this.calcInProgress = false;
@@ -40,8 +41,6 @@ apogee.Codeable.init = function(argList) {
 /** This property tells if this object is a codeable.
  * This property should not be implemented on non-codeables. */
 apogee.Codeable.isCodeable = true
-
-apogee.Codeable.MEMBER_FUNCTION_PENDING = "pending";
 
 apogee.Codeable.getSetCodeOk = function() {
     return this.generator.setCodeOk;
@@ -165,6 +164,7 @@ apogee.Codeable.clearCode = function() {
     
     this.clearCalcPending();
     this.setResultPending(false);
+    this.setResultInvalid(false);
     
     var newDependsOn = [];
 	this.updateDependencies(newDependsOn);
@@ -210,10 +210,16 @@ apogee.Codeable.calculate = function() {
         this.processMemberFunction(this.memberGenerator);
     }
     catch(error) {
-        if(error == apogee.Codeable.MEMBER_FUNCTION_PENDING) {
+        if(error == apogee.base.MEMBER_FUNCTION_INVALID_THROWABLE) {
             //This is not an error. I don't like to throw an error
             //for an expected condition, but I didn't know how else
-            //to do this. See notes there this is thrown.
+            //to do this. See notes where this is thrown.
+            this.setResultInvalid(true);
+        }
+        else if(error == apogee.base.MEMBER_FUNCTION_PENDING_THROWABLE) {
+            //This is not an error. I don't like to throw an error
+            //for an expected condition, but I didn't know how else
+            //to do this. See notes where this is thrown.
             this.setResultPending(true);
         }
         //--------------------------------------
@@ -257,7 +263,7 @@ apogee.Codeable.memberFunctionInitialize = function() {
         
         //make sure the data is set in each impactor
         this.initializeImpactors();
-        if((this.hasError())||(this.getResultPending())) {
+        if((this.hasError())||(this.getResultPending())||(this.getResultInvalid())) {
             this.calcInProgress = false;
             this.functionInitialized = true;
             this.initReturnValue = false;

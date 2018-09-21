@@ -65,9 +65,12 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
         data = undefined;
     }
     
-    //if the return value is a Promise, the data is asynch
-    if(apogee.base.isPromise(data)) {
-        //result is asynchronous!
+    if(data === apogee.util.INVALID_VALUE) {
+        //value is invalid if return is this predefined value
+        this.setResultInvalid(true);
+    }
+    else if(apogee.base.isPromise(data)) {
+        //if the return value is a Promise, the data is asynch asynchronous!
 
         //set pending manually here rather than doing below in a separate action
         var token = apogee.action.getAsynchToken();

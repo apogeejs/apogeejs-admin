@@ -9,8 +9,10 @@ apogeeapp.app.DynamicForm = class extends apogeeapp.app.BasicControlComponent {
         
     /** This creates a form whose layout is the member value. */
     getOutputDisplay(viewMode) {
-        var getLayout = () => this.getMember().getData();
-        return new apogeeapp.app.ConfigurableFormDisplay(viewMode,getLayout);
+        var callbacks = {
+            getData: () => this.getMember().getData()
+        }
+        return new apogeeapp.app.ConfigurableFormDisplay(viewMode,callbacks);
     }
 };
 

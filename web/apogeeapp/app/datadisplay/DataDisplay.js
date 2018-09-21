@@ -4,8 +4,8 @@
  * @param {type} callbacks - the callbacks for the editor {getData,getEditOk,saveData}
  * @param {type} containerClass - the is the css class for the container element OPTIONAL
  */
-apogeeapp.app.EditorDataDisplay = class {
-    constructor(viewMode,callbacks,containerClass = apogeeapp.app.EditorDataDisplay.NON_SCROLLING) {
+apogeeapp.app.DataDisplay = class {
+    constructor(viewMode,callbacks,containerClass = apogeeapp.app.DataDisplay.NON_SCROLLING) {
         
         this.outsideDiv = apogeeapp.ui.createElementWithClass("div",containerClass);
 	
@@ -19,7 +19,7 @@ apogeeapp.app.EditorDataDisplay = class {
     }
     
     save() {
-        var data = this.getEditorData();
+        var data = this.getData();
         var saveComplete;
         
         //figure out if there is a problem with this - we hav to end edit mode before
@@ -55,10 +55,10 @@ apogeeapp.app.EditorDataDisplay = class {
     //=============================
     
     //This method gets the data from the editor. REQUIRED
-    //getEditorData() {}
+    //getData() {}
     
     //this sets the data into the editor display. REQUIRED if edit mode or save is used
-    //setEditorData(data) {}
+    //setData(data) {}
     
     //this methodis called on loading the display. OPTIONAL
     //onLoad() {}
@@ -79,9 +79,6 @@ apogeeapp.app.EditorDataDisplay = class {
     //apogeeapp.ui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
     //apogeeapp.ui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.*/
     //getContentType() {}
-    
-    
-
 
     //=============================
     // protected, package and private Methods
@@ -109,7 +106,7 @@ apogeeapp.app.EditorDataDisplay = class {
             this.editOk = editOk;
         }
         
-        this.setEditorData(data);
+        this.setData(data);
     }
 
     /** @protected */
@@ -134,7 +131,7 @@ apogeeapp.app.EditorDataDisplay = class {
     }
 }
 
-apogeeapp.app.EditorDataDisplay.NON_SCROLLING = "apogee_datadisplay_container_fixed";
-apogeeapp.app.EditorDataDisplay.SCROLLING = "apogee_datadisplay_container_scrolling";
+apogeeapp.app.DataDisplay.NON_SCROLLING = "apogee_datadisplay_container_fixed";
+apogeeapp.app.DataDisplay.SCROLLING = "apogee_datadisplay_container_scrolling";
 
-apogeeapp.app.EditorDataDisplay.FIT_CONTENT = "apogee_datadisplay_container_fit_content";
+apogeeapp.app.DataDisplay.FIT_CONTENT = "apogee_datadisplay_container_fit_content";

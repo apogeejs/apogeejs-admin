@@ -14,12 +14,16 @@
  */
 
 /** This is the display/editor for the custom control output. */
-apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDisplay {
-    constructor(viewMode,member,html,resource) {
-        super(viewMode,apogeeapp.app.EditorDataDisplay.NON_SCROLLING);
+apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
+    constructor(viewMode,callbacks,member,html,resource) {
+        
+        super(viewMode,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
         
         this.resource = resource;
         this.member = member;
+        
+        this.isLoaded = false;
+        this.cachedData = undefined;
     
         this.outputElement = apogeeapp.ui.createElement("div",null,{
             "position":"absolute",
@@ -35,19 +39,21 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
             this.outputElement.innerHTML = html;
         }
         
-        //TEMP - I used to pass the view mode, now I just want to pass something else.
-        var mode = {
-            getMessenger: () => new apogee.action.Messenger(this.member)
+        //this gives the ui code access to some data display functions
+        var admin = {
+            getMessenger: () => new apogee.action.Messenger(this.member),
+            startEditMode: () => this.startEditMode(),
+            endEditMode: () => this.endEditMode()
         }
 
         //-------------------
         //constructor code
         //-------------------
-
+        //I have this for legacy reasons
         if(resource.constructorAddition) {
             try {
                 //custom code
-                resource.constructorAddition.call(resource,mode);
+                resource.constructorAddition.call(resource,admin);
             }
             catch(error) {
                 alert("Error in " + this.member.getFullName() + " init function: " + error.message);
@@ -63,19 +69,33 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
         if(this.resource.onLoad) {
             this.onLoad = () => {
                 try {
-                    resource.onLoad.call(resource,this.outputElement,mode);
+                    resource.onLoad.call(resource,this.outputElement,admin);
+                    this.isLoaded = true;
+                    
+                    //handle the case the data loaded before the html (which we don't want)
+                    if(this.cachedData != undefined) {
+                        this.setData(this.cachedData);
+                        this.cachedData = undefined;
+                    }
                 }
                 catch(error) {
                     alert("Error in " + this.member.getFullName() + " onLoad function: " + error.message);
                 }
             };
         }
+        else {
+            this.isLoaded = true;
+        }
 
         if(this.resource.onUnload) {   
             this.onUnload = () => {
                 try {
+                    
+                    this.isLoaded = false;
+                    this.cachedData = undefined;
+                    
                     if(this.resource.onHide) {
-                        resource.onUnload.call(resource,this.outputElement,mode);
+                        resource.onUnload.call(resource,this.outputElement,admin);
                     }
                 }
                 catch(error) {
@@ -87,7 +107,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
         if(this.resource.onResize) {
             this.onResize = () => {
                 try {
-                    resource.onResize.call(resource,this.outputElement,mode);
+                    resource.onResize.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     console.log("Error in " + this.member.getFullName() + " onResize function: " + error.message);
@@ -95,15 +115,32 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
             };
         }
 
-        if(this.resource.setData) {
-            this.showData = () => {
+
+        this.setData = (data) => {
+            try {
+                if(this.resource.setData) {
+                    if(!this.isLoaded) {
+                        this.cachedData = data;
+                        return;
+                    }
+                    
+                    resource.setData.call(resource,data,this.outputElement,admin);
+                }
+                else {
+                     //we must include a function here
+                     this.setData = () => {};
+                }
+            }
+            catch(error) {
+                alert("Error in " + this.member.getFullName() + " setData function: " + error.message);
+            }
+        }
+        
+        if(this.resource.getData) {
+            this.getData = () => {
                 try {
-                    if(this.resource.setData) {
-                        //set data, but only if the member does not have and error and is not pending
-                        if((!this.member.hasError())&&(!this.member.getResultPending())) {
-                            var data = this.member.getData();
-                            resource.setData.call(resource,data,this.outputElement,mode);
-                        }
+                    if(this.resource.getData) {
+                        return this.resource.getData.call(resource,this.outputElement,admin);
                     }
                 }
                 catch(error) {
@@ -113,13 +150,15 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
         }
         else {
             //we must include a function here
-            this.showData = () => {};
+            //WHY RETURN A DUMMY OBJECT? WHY NOT NULL? OR INVALID?
+            this.getData = () => {};
         }
+
 
         if(this.resource.isCloseOk) {     
             this.isCloseOk = () => {
                 try {
-                    resource.isCloseOk.call(resource,this.outputElement,mode);
+                    resource.isCloseOk.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     alert("Error in " + this.member.getFullName() + " isCloseOk function: " + error.message);
@@ -130,7 +169,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
         if(this.resource.destroy) {
             this.destroy = () => {
                 try {
-                    resource.destroy.call(resource,this.outputElement,mode);
+                    resource.destroy.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     alert("Error in " + this.member.getFullName() + " destroy function: " + error.message);
@@ -144,7 +183,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.NonEditorDataDispl
 
         if(resource.init) {
             try {
-                resource.init.call(resource,this.outputElement,mode);
+                resource.init.call(resource,this.outputElement,admin);
             }
             catch(error) {
                 alert("Error in " + this.member.getFullName() + " init function: " + error.message);

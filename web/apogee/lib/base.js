@@ -1,6 +1,9 @@
 /** This namespace contains some basic functions for the application. */
 apogee.base = {};
 
+apogee.base.MEMBER_FUNCTION_INVALID_THROWABLE = {"apogeeException":"invalid"};
+apogee.base.MEMBER_FUNCTION_PENDING_THROWABLE = {"apogeeException":"pending"};
+
 /** This method creates an integer has value for a string. */
 apogee.base.mixin = function(destObject,mixinObject) {
     for(var key in mixinObject) {
