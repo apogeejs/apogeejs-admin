@@ -1,6 +1,6 @@
 {
   "name": "apogee",
-  "version": #set version - latest release version = 0.8.7#,
+  "version": #set this#,
   "description": "Apogee programming tool",
   "main": "apogee.js",
   "devDependencies": {
