@@ -133,7 +133,23 @@ apogee.action.doAction = function(actionData,addToUndo,optionalContext,optionalA
     //trigger any pending actions
     var queuedActionData = workspace.getQueuedAction();
     if(queuedActionData) {
-        apogee.action.asynchRunQueuedAction(queuedActionData);
+        var runQueuedAction = true;
+        
+        if(workspace.checkConsecutiveQueuedActionLimitExceeded()) {
+            //ask user if about continueing
+            var doContinue = confirm("The calculation is taking a long time. Continue?");
+            if(!doContinue) {
+                workspace.setCalculationCanceled();
+                runQueuedAction = false;
+            }
+        }
+        
+        if(runQueuedAction) {
+            apogee.action.asynchRunQueuedAction(queuedActionData);
+        }
+    }
+    else {
+        workspace.clearConsecutiveQueuedTracking();
     }
     
     //return response

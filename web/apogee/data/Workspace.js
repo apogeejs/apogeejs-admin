@@ -11,6 +11,8 @@ apogee.Workspace = function(optionalJson,actionResponseForJson,ownerForVirtualWo
     this.isDirty = false;
     this.actionInProgress = false;
     this.actionQueue = [];
+    this.consecutiveActionCount = 0;
+    this.activeConsecutiveActionLimit = apogee.Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT;
     this.name = apogee.Workspace.DEFAULT_WORKSPACE_NAME;
     
     if(ownerForVirtualWorkspace === undefined) ownerForVirtualWorkspace = null;
@@ -33,6 +35,8 @@ apogee.base.mixin(apogee.Workspace,apogee.RootHolder);
 
 apogee.Workspace.DEFAULT_WORKSPACE_NAME = "Workspace";
 apogee.Workspace.ROOT_FOLDER_NAME = "Model";
+
+apogee.Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT = 500;
 
 /** this method should be used to set the workspace as dirty, meaning it has 
  * new data to be saved. */
@@ -88,6 +92,10 @@ apogee.Workspace.prototype.onClose = function() {
     this.rootFolder.onClose();
 }
 
+//------------------------------
+// Queded Action Methods
+//------------------------------
+
 /** This function triggers the action for the queued action to be run when the current thread exits. */
 apogee.Workspace.prototype.isActionInProgress = function() {
     return this.actionInProgress;
@@ -110,6 +118,39 @@ apogee.Workspace.prototype.getQueuedAction = function() {
     else {
         return null;
     }
+}
+
+/** This method should be called for each consecutive queued action. It checks it if there are 
+ * too many. If so, it returns true. In so doing, it also backs of the consecutive queued 
+ * action count so next time it will take longer. Any call to clearConsecutiveQueuedActionCount
+ * will return it to the default initial value.
+ */
+apogee.Workspace.prototype.checkConsecutiveQueuedActionLimitExceeded = function() {
+    this.consecutiveActionCount++;
+    
+    //check the limit
+    var exceedsLimit = (this.consecutiveActionCount > this.activeConsecutiveActionLimit);
+    if(exceedsLimit) {
+        //back off limit for next time
+        this.activeConsecutiveActionLimit *= 2;
+    }
+    
+    return exceedsLimit;
+}
+
+/** This should be called wo abort any queued actions. */
+apogee.Workspace.prototype.setCalculationCanceled = function() {
+    //reset queued action variables
+    this.actionQueue = [];
+    this.clearConsecutiveQueuedTracking();
+    
+    alert("The tables are left in improper state because the calculation was aborted. :( ");
+}
+
+/** This should be called when there is not a queued action. */
+apogee.Workspace.prototype.clearConsecutiveQueuedTracking = function() {
+    this.consecutiveActionCount = 0;
+    this.activeConsecutiveActionLimit = apogee.Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT;
 }
 
 
