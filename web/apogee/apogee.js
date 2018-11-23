@@ -1,3 +1,6 @@
-/** Main project name space */
+/** 
+ * Main namespace for apoge core logic 
+ * @namespace
+ */
 apogee = {};
 

@@ -1,13 +1,18 @@
-/** This namespace includes some utility function available to the user. They 
- * are also used in the applictaion. */
+/** 
+ * This namespace includes some utility functions available to the user.
+ * @namespace
+ */
 apogee.util = {};
 
-/** This value can be assigned to a data table to signify that data is not valid.
+/** 
+ * This value can be assigned to a data table to signify that data is not valid.
  * Any other member depending on this value will withhold the calcalation and also
- * return this invalid value. */
+ * return this invalid value.
+ */
 apogee.util.INVALID_VALUE = {"apogeeValue":"INVALID VALUE"};
 
-/** This function should be called from the body of a function table
+/** 
+ * This function should be called from the body of a function table
  * to indicate the function will not return a valid value. (The actual invalid value
  * can not be returned since this typically will not have the desired effect.)
  */
@@ -15,7 +20,12 @@ apogee.util.invalidFunctionReturn = function() {
     throw apogee.base.MEMBER_FUNCTION_INVALID_THROWABLE;
 }
 
-/** This method creates an integer has value for a string. */
+/** 
+ * This method creates an integer hash value for a string. 
+ * 
+ * @param {String} string - This is the string for which a hash number is desired.
+ * @return {integer} This is the hash value for the string.
+ */
 apogee.util.stringHash = function(string) {
     var HASH_SIZE = 0xffffffff;
     var hash = 0;
@@ -27,13 +37,21 @@ apogee.util.stringHash = function(string) {
     return hash;
 }
 
-/** This method creates an integer hash value for an object. */
+/** 
+ * This method creates an integer hash value for a JSON object. 
+ * 
+ * @param {JSON} object - This is the json valued object for which a hash number is desired.
+ * @return {integer} This is the hash value for the JSON.
+ */
 apogee.util.objectHash = function(object) {
     //this is not real efficient. It should be implemented differently
     var string = JSON.stringify(object);
     return stringHash(string);
 }
 
+/**
+ * @private
+ */
 apogee.util.constructors = {
     "String": ("").constructor,
     "Number": (3).constructor,
@@ -45,7 +63,10 @@ apogee.util.constructors = {
 }
 
 /** This method returns the object type. The Allowed types are:
- * String, Number, Boolean, Date, Object, Array, Function, null, undefined. */
+ * String, Number, Boolean, Date, Object, Array, Function, null, undefined.
+ * @param {Object} object - This is the object for which the type is desired.
+ * @returns {String} This is the type for the object. 
+ */
 apogee.util.getObjectType = function(object) {
     if(object === null) return "null";
     if(object === undefined) return "undefined";
@@ -61,7 +82,11 @@ apogee.util.getObjectType = function(object) {
 }
 
 /** This method creates a deep copy of an object, array or value. Note that
- * undefined is not a valid value in JSON. */
+ * undefined is not a valid value in JSON. 
+ * 
+ * @param {JSON} data - This is a JSON valued object
+ * @returns {JSON} A JSON object which is a deep copy of the input.
+ */
 apogee.util.jsonCopy = function(data) {
     if(data === null) return null;
     if(data === undefined) return undefined;
@@ -69,7 +94,11 @@ apogee.util.jsonCopy = function(data) {
 }
 
 /** This method does format string functionality. Text should include
- * {i} to insert the ith string argument passed. */
+ * {i} to insert the ith string argument passed. 
+ *  @param {String} format - This is a format string to format the output.
+ *  @param {Array} stringArgs - These are the values which should be placed into the format string.
+ *  @returns {String} The format string with the proper inserted values is returned.  
+ */
 apogee.util.formatString = function(format,stringArgs) {
     var formatParams = arguments;
     return format.replace(/{(\d+)}/g, function(match,p1) {
@@ -78,7 +107,12 @@ apogee.util.formatString = function(format,stringArgs) {
     });
 };
 
-/** This method reads the query string from a url */
+/** This method reads the query string from a url
+ * 
+ *  @param {String} field - This is the field that should be read from the url query string
+ *  @param {String} url - This is the url from which we read the query string
+ *  @returns {String} The value associated with the query string key passed in. 
+ */
 apogee.util.readQueryField = function(field,url) {
     var href = url ? url : window.location.href;
     var reg = new RegExp( '[?&]' + field + '=([^&#]*)', 'i' );
@@ -86,15 +120,29 @@ apogee.util.readQueryField = function(field,url) {
     return string ? string[1] : null;
 }
 
-/** This is a not-so-efficient equals for json objects. */
+/** 
+ * This is a not-so-efficient equals for json objects. For JSON objects it
+ * does not require order matching of the keys. For JSON arrays it does require
+ * order matching of the array values.
+ * 
+ *  @param {JSON} json1 - This is a JSON valued object 
+ *  @param {JSON} json1 - This is a JSON valued object 
+ *  @returns {Boolean}  - Returns whether or not the objects are equal
+ */
 apogee.util.jsonEquals = function(json1,json2) {
     var string1 = JSON.stringify(apogee.util.getNormalizedCopy(json1));
     var string2 = JSON.stringify(apogee.util.getNormalizedCopy(json2));
     return (string1 == string2);
 }
 
-/** This method returns a copied json that has the order in all object normalized to alphabetical. 
- * This is intended for the purpose of comparing json objects. */
+/** 
+ * This method returns a copied json that has the order in all JSON objects/"maps" normalized to alphabetical. 
+ * The order of JSON arrays is NOT modified.
+ * This is intended for the purpose of comparing json objects. 
+ * 
+ *  @param {JSON} json1 - This is a JSON valued object 
+ *  @returns {Boolean}  - Returns whether or not the objects are equal
+ */  
 apogee.util.getNormalizedCopy = function(json) {
     var copiedJson;
 
@@ -116,7 +164,9 @@ apogee.util.getNormalizedCopy = function(json) {
     return copiedJson;
 }
 
-/** this orders the keys apphabetically, since order is not important in a json object */
+/** this orders the keys apphabetically, since order is not important in a json object 
+ * @private
+ */
 apogee.util.getNormalizedObjectCopy = function(json) {
     var copiedJson = {};
     
@@ -135,7 +185,9 @@ apogee.util.getNormalizedObjectCopy = function(json) {
     return copiedJson;
 }
 
-/** This makes a copy of with any contained objects normalized. */
+/** This makes a copy of with any contained objects normalized. 
+ * @private 
+ */
 apogee.util.getNormalizedArrayCopy = function(json) {
     var copiedJson = [];
     for(var i = 0; i < json.length; i++) {

@@ -272,6 +272,16 @@ module.exports = function(grunt) {
 
         ],
       }
+    },
+    jsdoc: {
+        dist: {
+            "src": ["apogee/*.js","apogee/usrlib/*.js"]
+        },
+        options: {
+            destination: '../../dist/docs/v<%= pkg.version %>/userLibDocs',
+            XXXtemplate : "node_modules/ink-docstrap/template",
+            configure : "jsdoc.conf.json"
+        }
     }
 
   });
@@ -280,7 +290,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-concat-css');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-jsdoc');
 
-  grunt.registerTask('default', ['concat', 'concat_css', 'uglify', 'copy']);
+  grunt.registerTask('default', ['concat', 'concat_css', 'uglify', 'copy', 'jsdoc']);
 
 };
