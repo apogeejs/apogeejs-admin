@@ -1,4 +1,4 @@
-(function() {
+define(['apogee-web-lib','apogee-web-app'],function(apogee,apogeeapp) {
 
 /** This is a simple custom resource component example. */
 apogeeapp.app.SimpleGeojsonControl = class extends apogeeapp.app.BasicControlComponent {
@@ -136,4 +136,4 @@ apogeeapp.app.SimpleGeojsonDisplay = class extends apogeeapp.app.DataDisplay {
     }
 }
 //end definition
-})();
+});
