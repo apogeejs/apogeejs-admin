@@ -141,9 +141,10 @@ module.exports = function(grunt) {
                 "banner":"/* Apogee Web Lib Version <%= pkg.version %> */\n"
             },
             "src": [
+                "supplemental/webLibPackHeader.js",
                 "supplemental/webLibHeader.js",
                 "../../dist/lib/apogee-base-lib.js",
-                "supplemental/webLibFooter.js",
+                "supplemental/webLibPackFooter.js",
             ],
             "dest": "../../dist/lib/apogee-web-lib.js"
         },
@@ -152,10 +153,10 @@ module.exports = function(grunt) {
                 "banner":"/* Apogee Web App Version <%= pkg.version %> */\n"
             },
             "src": [
-                "supplemental/webAppHeader.js",
+                "supplemental/webAppPackHeader.js",
                 "../../dist/lib/apogee-base-app.js",
                 "supplemental/cutNPasteCode/file_impl_cutnpaste.js",
-                "supplemental/webAppFooter.js"
+                "supplemental/webAppPackFooter.js"
             ],
             "dest": "../../dist/lib/apogee-web-app.js"
         },
