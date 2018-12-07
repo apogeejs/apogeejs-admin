@@ -5,9 +5,15 @@ apogeeapp.app.ReferenceManager = function() {
     this.referencesTreeEntry = null;
     this.state = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NORMAL;
     
+    //references
     this.referenceLists = {};
+    this.referenceLists[apogeeapp.app.AmdModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(apogeeapp.app.AmdModuleEntry.REFERENCE_TYPE_INFO);
     this.referenceLists[apogeeapp.app.JsScriptEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(apogeeapp.app.JsScriptEntry.REFERENCE_TYPE_INFO);
     this.referenceLists[apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO);
+    
+    //link elements
+    this.scriptElements = [];
+    this.cssElements = [];
 }
 
 apogeeapp.app.ReferenceManager.prototype.getTreeEntry = function(createIfMissing) {
@@ -26,12 +32,12 @@ apogeeapp.app.ReferenceManager.prototype.openEntries = function(referencesJson) 
     var entryPromises = [];
     
     var loadEntry = entryJson => {
-        var referenceListEntry = this.referenceLists[entryJson.entryType];
+        var listStruct = this.referenceLists[entryJson.entryType];
         
         //load this url if it doesn't exist
         if(!listStruct.listEntries.some( listEntry => (listEntry.url == entryJson.url) )) {
             var referenceEntry = listStruct.typeInfo.createEntryFunction(this,entryJson);
-            var promise = referenceListEntry.loadEntry();
+            var promise = referenceEntry.loadEntry();
             entryPromises.push(promise);
         }
     }
@@ -128,6 +134,111 @@ apogeeapp.app.ReferenceManager.prototype.entryRemoved= function(referenceEntry) 
     listStruct.listEntries = listStruct.listEntries.filter( existingEntry => (existingEntry != referenceEntry) );
     listStruct.treeEntry.removeChild(referenceEntry.getTreeEntry());
 }
+
+//---------------------------------
+// Link Element Management - This manages DOM elements for links
+//---------------------------------
+
+/** This method adds a link element to a page, supporting 'css' and 'script'. 
+ * The caller identifer should be a unique identifier among people
+ * requesting links of this given type. It cna be requested from
+ * apogeeapp.app.ReferenceManager._createId
+ * @protected */
+apogeeapp.app.ReferenceManager.prototype.addLinkElement = function(type,url,callerIdentifier,onLoad,onError) {
+    try {
+        var addElementToPage = false;
+        var elementType;
+        
+        var elementList;
+        if(type == "css") {
+            elementList = this.cssElements
+            elementType = "link";
+        }
+        else if(type == "script") {
+            elementList = this.scriptElements;
+            elementType = "script";
+        }
+        else throw new Error("Unknown link type: " + type);
+
+        var elementEntry = elementList[url];
+        if(!elementEntry) {
+            //create script element reference
+            elementEntry = {};
+            elementEntry.url = url;
+            elementEntry.callerInfoList = [];
+
+            //create script element
+            var linkProps = {};
+            if(type == "css") {
+                linkProps.href = url;
+                linkProps.rel = "stylesheet";
+                linkProps.type = "text/css";
+            }
+            else if(type == "script") {
+                linkProps.src = scriptEntry.url;
+            }
+
+            linkProps.onload = () => {
+                elementEntry.callerInfoList.forEach(callerInfo => {if(callerInfo.onLoad) callerInfo.onLoad()});
+            }
+            linkProps.onerror = (error) => {
+                elementEntry.callerInfoList.forEach(callerInfo => {if(callerInfo.onError) callerInfo.onError(error)});
+            }
+
+            var element = apogeeapp.ui.createElement(elementType,linkProps);
+            elementEntry.element = element;
+            elementList[url] = elementEntry;
+            
+            addElementToPage = true;  
+        }
+
+        //add this to the caller info only if it is not there
+        if(!elementEntry.callerInfoList.some(callerInfo => (callerInfo.id == callerIdentifier))) {
+            var callerInfo = {};
+            callerInfo.id = callerIdentifier;
+            if(onLoad) callerInfo.onLoad = onLoad;
+            if(onError) callerInfo.onError = onError;
+
+            elementEntry.callerInfoList.push(callerInfo);
+        }
+        
+        if(addElementToPage) {
+            document.head.appendChild(elementEntry.element);
+        }
+    }
+    catch(error) {
+        //error loading link  
+        if(onError) {
+            onError(error);
+        }
+        else {
+            console.error(error.stack);
+        }
+    }
+     
+}
+
+/** This method removes a link element from the page.
+ * @protected */
+apogeeapp.app.ReferenceManager.prototype.removeLinkElement = function(type,url,callerIdentifier) {
+    var elementList;
+    if(type == "css") elementList = this.cssElements
+    else if(type == "script") elementList = this.scriptElements;
+    else throw new Error("Unknown link type: " + type);
+        
+    var elementEntry = elementList[url];
+    if(elementEntry) {
+        //remove this caller from caller list
+        elementEntry.callerInfoList = elementEntry.callerInfoList.filter(callerInfo => callerInfo.id != callerIdentifier);
+        
+        //remove link if there are no people left using it
+        if(elementEntry.callerInfoList.length === 0) {
+            if(elementEntry.element) document.head.removeChild(elementEntry.element);
+            delete elementList[url];
+        }
+    }
+}
+
 
 //=================================
 // Private

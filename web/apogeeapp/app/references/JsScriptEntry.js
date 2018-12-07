@@ -16,28 +16,18 @@ apogeeapp.app.JsScriptEntry = class extends apogeeapp.app.ReferenceEntry {
 
         var promiseFunction = (resolve,reject) => {
 
-            var elementType = "script";
-            
-            //create link properties
-            var linkProps = {};
-            linkProps.id = this.getElementId();
-            linkProps.src = this.url;
-
             //add event handlers
-            linkProps.onload = () => {
+            var onLoad = () => {
                 this.setClearState();
                 resolve(this.url);
             }
-            linkProps.onerror = (error) => {
+            var onError = (error) => {
                 var errorMsg = "Failed to load link '" + this.url + "'";
                 this.setError(errorMsg);
                 reject(errorMsg);
             }
 
-            //insert the link entry
-            this.setPendingState();
-            var element = apogeeapp.ui.createElement(elementType,linkProps);
-            document.head.appendChild(element);
+            this.referenceManager.addLinkElement("script",this.url,this.id,onLoad,onError);
         }
 
         //call link added to references
@@ -47,6 +37,12 @@ apogeeapp.app.JsScriptEntry = class extends apogeeapp.app.ReferenceEntry {
         return new Promise(promiseFunction);
     }
     
+    /** This method removes the link. */
+    remove() {
+        this.referenceManager.removeLinkElement("script",this.url,this.id);
+        
+        this.referenceManager.entryRemoved(this);
+    }
 }
 
 apogeeapp.app.JsScriptEntry.REFERENCE_TYPE_INFO = {

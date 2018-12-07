@@ -1,4 +1,4 @@
-define(['apogee-web-lib','apogee-web-app'],function(apogee,apogeeapp) {
+define(['apogee-web-lib','apogee-web-app','http://localhost:8383/lib/controls/simpleGeojsonControl/leaflet_1.0.1_AMD.js'],function(apogee,apogeeapp,L) {
 
 /** This is a simple custom resource component example. */
 apogeeapp.app.SimpleGeojsonControl = class extends apogeeapp.app.BasicControlComponent {
@@ -136,4 +136,23 @@ apogeeapp.app.SimpleGeojsonDisplay = class extends apogeeapp.app.DataDisplay {
     }
 }
 //end definition
+
+    /** module return object
+     * We can define a module return object if we have initialization or tear down actions to take.
+     * This includes loading additional scripts and css files. Note that these will be asynchronous. If we need a script
+     * for initializing above (synchronously), it needs to be loaded through a AMD module.
+     * 
+     * In this example we will load a CSS link, and also remove it when the modeul is removed.
+     */
+    var moduleReturn = {};
+    moduleReturn.id = null;
+    moduleReturn.cssUrl = "https://unpkg.com/leaflet@1.0.1/dist/leaflet.css";
+    moduleReturn.initModule = function(apogee,apogeeapp,referenceManager) {
+        moduleReturn.id = apogeeapp.app.ReferenceManager._createId();
+        referenceManager.addLinkElement("css",moduleReturn.cssUrl,moduleReturn.id);
+    }
+    moduleReturn.removeModule = function(apogee,apogeeapp,referenceManager) {
+        referenceManager.removeLinkElement("css",moduleReturn.cssUrl,moduleReturn.id);
+    }
+    return moduleReturn;
 });

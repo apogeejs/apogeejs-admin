@@ -58,12 +58,12 @@ apogeeapp.app.ReferenceEntry = class {
     ///////////////////////////////////////////////////////////////////////////
 
     /** This method loads the link onto the page. It returns a promise that
-     * resolves when the link is loaded. */
-    loadEntry() {}
+     * resolves when the reference is loaded. */
+    //loadEntry()
     
-    getJsLinkProps() {}
+    /** This method removes the reference. */
+    //remove()
     
-    getCssLinkProps() {}
     
     ///////////////////////////////////////////////////////////////////////////
     
@@ -71,7 +71,6 @@ apogeeapp.app.ReferenceEntry = class {
     getIconUrl() {
         return apogeeapp.ui.getResourcePath(this.referenceTypeInfo.ENTRY_ICON_PATH);
     }
-    
 
     /** This method loads the link onto the page. It returns a promise that
      * resolves when the link is loaded. */
@@ -79,18 +78,8 @@ apogeeapp.app.ReferenceEntry = class {
         var entryJson = {};
         entryJson.url = this.url;
         if(this.nickname != this.url) entryJson.nickname = this.nickname;
-        entryJson.entryType = this.referenceType;
+        entryJson.entryType = this.referenceTypeInfo.REFERENCE_TYPE;
         return entryJson;
-    }
-
-    /** This method removes the link. */
-    remove() {
-        var element = document.getElementById(this.getElementId());
-        if(element) {
-            document.head.removeChild(element);
-        }
-
-        this.referenceManager.entryRemoved(this);
     }
 
     //-------------------------

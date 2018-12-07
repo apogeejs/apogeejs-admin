@@ -8,37 +8,25 @@ apogeeapp.app.CssEntry = class extends apogeeapp.app.ReferenceEntry {
     constructor(referenceManager,referenceData) {
         super(referenceManager,referenceData,apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO);
     }
-
+    
     /** This method loads the link onto the page. It returns a promise that
      * resolves when the link is loaded. */
     loadEntry() {
 
         var promiseFunction = (resolve,reject) => {
 
-            var elementType = "link";
-            
-            //create link properties
-            var linkProps = {};
-            linkProps.id = this.getElementId();
-            linkProps.rel = "stylesheet";
-            linkProps.type = "text/css";
-            linkProps.href = this.url;
-
             //add event handlers
-            linkProps.onload = () => {
+            var onLoad = () => {
                 this.setClearState();
                 resolve(this.url);
             }
-            linkProps.onerror = (error) => {
+            var onError = (error) => {
                 var errorMsg = "Failed to load link '" + this.url + "'";
                 this.setError(errorMsg);
                 reject(errorMsg);
             }
 
-            //insert the link entry
-            this.setPendingState();
-            var element = apogeeapp.ui.createElement(elementType,linkProps);
-            document.head.appendChild(element);
+            this.referenceManager.addLinkElement("css",this.url,this.id,onLoad,onError);
         }
 
         //call link added to references
@@ -48,6 +36,12 @@ apogeeapp.app.CssEntry = class extends apogeeapp.app.ReferenceEntry {
         return new Promise(promiseFunction);
     }
     
+    /** This method removes the link. */
+    remove() {
+        this.referenceManager.removeLinkElement("css",this.url,this.id);
+        
+        this.referenceManager.entryRemoved(this);
+    }
 }
 
 apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO = {

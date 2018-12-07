@@ -9,6 +9,8 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/6.2.0/handsontable.full.min.js"></script>
         <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>-->
 
+        <script type="text/javascript" src="require.js"></script>
+        
         <script type="text/javascript" src="/supplemental/webLibHeader.js"></script>
 		<script type="text/javascript" src="/apogee/apogee.js"></script>        
         <script type="text/javascript" src="/apogee/lib/base.js"></script>
@@ -173,6 +175,20 @@
                     return undefined;
                 }
             }
+            
+//            //shim config to define apogee and apogeeapp modules
+//            requirejs.config({
+//               shim:{
+//                   'apogee-web-lib': {
+//                       deps: [],
+//                       exports: 'apogee'
+//                   },
+//                   'apogee-web-app': {
+//                       deps: [],
+//                       exports: 'apogeeapp'
+//                   }
+//               } 
+//            });
             
 		</script>
 	</head>
