@@ -43,7 +43,19 @@ apogeeapp.app.Apogee = function(containerId) {
     //open a workspace if there is a url present
     var workspaceUrl = apogee.util.readQueryField("url",document.URL);
     if(workspaceUrl) {
-        apogeeapp.app.openworkspace.openWorkspaceFromUrl(this,workspaceUrl);
+        
+        var workspaceTextPromise = apogee.net.textRequest(workspaceUrl);
+        
+        var actionCompletedCallback = actionResponse => {
+            if(!actionResponse.getSuccess()) {
+                apogeeapp.app.errorHandling.handleActionError(actionResponse);
+            }
+        };
+        var openWorkspace = workspaceText => {
+            apogeeapp.app.openworkspace.openWorkspace(this,workspaceText,null,actionCompletedCallback);
+        };
+        
+        workspaceTextPromise.then(openWorkspace).catch(errorMsg => alert("Error downloading workspace."));
     }
 }
 	
