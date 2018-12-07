@@ -15,12 +15,12 @@ apogeeapp.app.AmdModuleEntry = class extends apogeeapp.app.ReferenceEntry {
     loadEntry() {
 
         var promiseFunction = (resolve,reject) => {
-            //self installing module
             
             var onLoad = (module) => {
-                //allow for an option module initialization step
-                if((module)&&(module.initModule)) module.initModule(apogee,apogeeapp,this.referenceManager);
+                //store the module return, if there is one
+                //this is only used for cleanup
                 this.module = module;
+                if((module)&&(module.initApogeeModule)) module.initApogeeModule(apogee,apogeeapp);
                 
                 console.log("Module loaded: " + this.url);
                 this.setClearState();
@@ -28,8 +28,8 @@ apogeeapp.app.AmdModuleEntry = class extends apogeeapp.app.ReferenceEntry {
             }
             var onError = (error) => {
                 //I should read the error passed in for a better message!!!
-                var errorMsg = "Failed to load module " + this.url;
-                console.log(errorMsg);
+                if(error.stack) console.error(error.stack);
+                var errorMsg = error.message ? error.message : "Failed to load module " + this.url;
                 this.setError(errorMsg);
                 reject(errorMsg);
             }
@@ -48,7 +48,7 @@ apogeeapp.app.AmdModuleEntry = class extends apogeeapp.app.ReferenceEntry {
     /** This method removes the link. */
     remove() {
         //allow for an optional module remove step
-        if((this.module)&&(this.module.removeModule)) this.module.removeModule(apogee,apogeeapp,this.referenceManager);
+        if((this.module)&&(this.module.removeApogeeModule)) this.module.removeApogeeModule(apogee,apogeeapp);
         
         require.undef(this.url);
 

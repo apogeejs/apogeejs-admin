@@ -27,7 +27,8 @@ apogeeapp.app.JsScriptEntry = class extends apogeeapp.app.ReferenceEntry {
                 reject(errorMsg);
             }
 
-            this.referenceManager.addLinkElement("script",this.url,this.id,onLoad,onError);
+            this.linkCallerId = apogeeapp.app.getLinkLoader().createLinkCallerId();
+            apogeeapp.app.getLinkLoader().addLinkElement("script",this.url,this.linkCallerId,onLoad,onError);
         }
 
         //call link added to references
@@ -39,9 +40,13 @@ apogeeapp.app.JsScriptEntry = class extends apogeeapp.app.ReferenceEntry {
     
     /** This method removes the link. */
     remove() {
-        this.referenceManager.removeLinkElement("script",this.url,this.id);
+        apogeeapp.app.getLinkLoader().removeLinkElement("script",this.url,this.linkCallerId);
         
         this.referenceManager.entryRemoved(this);
+    }
+    
+    _getLinkCallerHandle() {
+        return "JsScriptEntry-" + this.id;
     }
 }
 
