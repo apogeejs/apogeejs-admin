@@ -22,17 +22,14 @@ apogeeapp.app.openworkspace.getOpenCallback = function(app,fileAccessObject) {
 apogeeapp.app.openworkspace.onOpen = function(err,app,workspaceData,fileMetadata) {
 
     if(err) {
-        alert("Error: " + err.message);
+        var actionResponse = new apogee.ActionResponse();
+        var actionError = apogee.ActionError.processException(err,apogee.ActionError.ERROR_TYPE_USER,false);
+        actionResponse.addError(actionError);
+        apogeeapp.app.errorHandling.handleActionError(actionResponse);
     }
     else {
-        var actionCompletedCallback = function(actionResponse) {
-            if(!actionResponse.getSuccess()) {
-                apogeeapp.app.errorHandling.handleActionError(actionResponse);
-            }
-        };
-
         //open workspace
-        apogeeapp.app.openworkspace.openWorkspace(app,workspaceData,fileMetadata,actionCompletedCallback);
+        apogeeapp.app.openworkspace.openWorkspace(app,workspaceData,fileMetadata);
     }
 }
 
@@ -44,9 +41,8 @@ apogeeapp.app.openworkspace.onOpen = function(err,app,workspaceData,fileMetadata
 /** This method opens an workspace, from the text file. 
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
-apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,fileMetadata,actionCompletedCallback) {
+apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,fileMetadata) {
     var actionResponse = new apogee.ActionResponse();
-    var name;
     var workspaceUIAdded;
     
     try {
@@ -70,18 +66,23 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,fileMetad
 		var doWorkspaceLoad = function() {
             workspaceUI.load(workspaceJson);
             workspaceUI.setFileMetadata(fileMetadata);
-            actionCompletedCallback(actionResponse);
         }
         
         var linkLoadError = function(errorMsg) {
             alert("Error loading links: " + errorMsg);
-            //load the workspace anyway
-            doWorkspaceLoad();
+            //we should continue with the workpace load
         }
         
-//THIS NEEDS TO BE CLEANED UP - ESPECIALLY ERROR HANDLING
-        loadReferencesPromise.then(doWorkspaceLoad).catch(linkLoadError);
+        var workspaceLoadError = function(errorMsg) {
+            app.clearWorkspaceUI();
+            var actionError = new apogee.ActionError(errorMsg,apogee.ActionError.ERROR_TYPE_USER,false);
+            actionResponse.addError(actionError);
+            apogeeapp.app.errorHandling.handleActionError(actionResponse);
+        }
         
+        //load references and then workspace
+        //on a reference error, we continue loading the workspace
+        loadReferencesPromise.catch(linkLoadError).then(doWorkspaceLoad).catch(workspaceLoadError);
     }
     catch(error) {
         if(workspaceUIAdded) {
@@ -89,7 +90,9 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,fileMetad
         }
         var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
         actionResponse.addError(actionError);
-        actionCompletedCallback(actionResponse);
+        apogeeapp.app.errorHandling.handleActionError(actionResponse);
     }
+        
+    return true;
 }
 

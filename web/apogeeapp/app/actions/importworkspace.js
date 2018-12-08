@@ -17,17 +17,14 @@ apogeeapp.app.importworkspace.getImportCallback = function(app,fileAccessObject,
         
         var onOpen = function(err,app,workspaceData,fileMetadata) {
             if(err) {
-                alert("Error: " + err.message);
+                var actionResponse = new apogee.ActionResponse();
+                var actionError = apogee.ActionError.processException(err,apogee.ActionError.ERROR_TYPE_USER,false);
+                actionResponse.addError(actionError);
+                apogeeapp.app.errorHandling.handleActionError(actionResponse);
             }
             else {
-                var actionCompletedCallback = function(actionResponse) {
-                    if(!actionResponse.getSuccess()) {
-                        apogeeapp.app.errorHandling.handleActionError(actionResponse);
-                    }
-                };
-
                 //open workspace
-                apogeeapp.app.importworkspace.openWorkspace(app,componentGenerator,workspaceData,fileMetadata,actionCompletedCallback);
+                apogeeapp.app.importworkspace.openWorkspace(app,componentGenerator,workspaceData,fileMetadata);
             }
         }
         
@@ -44,7 +41,7 @@ apogeeapp.app.importworkspace.getImportCallback = function(app,fileAccessObject,
 /** This method opens an workspace, from the text file. 
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
-apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,workspaceText,fileMetadata,actionCompletedCallback) {
+apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,workspaceText,fileMetadata) {
     var actionResponse = new apogee.ActionResponse();
     var name;
     
@@ -69,20 +66,26 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,wo
         
         var linkLoadError = function(errorMsg) {
             alert("Error loading links: " + errorMsg);
-            //load the workspace anyway
-            workspaceImportDialogFunction();
         }
         
-        //THIS NEEDS TO BE CLEANED UP - ESPECIALLY ERROR HANDLING
-        loadReferencesPromise.then(workspaceImportDialogFunction).catch(linkLoadError);
+        var workspaceImportError2 = function(errorMsg) {
+            var actionError = new apogee.ActionError(errorMsg,apogee.ActionError.ERROR_TYPE_USER,false);
+            actionResponse.addError(actionError);
+            apogeeapp.app.errorHandling.handleActionError(actionResponse);
+        }
+        
+        //load links then import the workspace. On a link load error, continue with importing the workspace
+        //we should not have a workspace import error from the workspaceImportDialogFunction since it should 
+        //capture its own errors 
+        loadReferencesPromise.catch(linkLoadError).then(workspaceImportDialogFunction).catch(workspaceImportError2);
     }
     catch(error) {
-        //figure out what to do here???
-        
         var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
         actionResponse.addError(actionError);
-        actionCompletedCallback(actionResponse);
+        apogeeapp.app.errorHandling.handleActionError(actionResponse);
     }
+    
+    return true;
 }
 //------------------------
 // open from url
