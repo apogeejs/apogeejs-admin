@@ -10,7 +10,7 @@ apogeeapp.app.dialog = {};
  * This constuctor should not be called externally, the static creation method 
  * should be used. 
  * @private */
-apogeeapp.app.Apogee = function(containerId) {
+apogeeapp.app.Apogee = function(containerId,fileAccessObject) {
     
     //temp - until we figure out what to do with menu and events
     //for now we have application events, using the EventManager mixin below.
@@ -22,6 +22,8 @@ apogeeapp.app.Apogee = function(containerId) {
     else {
         apogeeapp.app.Apogee.instance = this;
     }
+    
+    this.fileAccessObject = fileAccessObject;
     
     //workspaces
     this.workspaceUI = null;
@@ -75,8 +77,8 @@ apogeeapp.app.Apogee.instance = null;
  * should only be made once. The containerId is the DOM element ID in which the
  * app UI is created. If this is left as undefined the UI will not be created. This
  * is used when creating an alternate UI such as with the web app. */
-apogeeapp.app.Apogee.createApp = function(containerId) {
-    return new apogeeapp.app.Apogee(containerId);
+apogeeapp.app.Apogee.createApp = function(containerId,fileAccessObject) {
+    return new apogeeapp.app.Apogee(containerId,fileAccessObject);
 }
 
 /** This retrieves an existing instance. It does not create an instance. */
@@ -134,6 +136,7 @@ apogeeapp.app.Apogee.prototype.setWorkspaceUI = function(workspaceUI) {
     
     workspaceUI.setApp(this,this.tabFrame,this.treePane);
     this.workspaceUI = workspaceUI;
+    
     return true;
 }
 
@@ -300,21 +303,13 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
 
     //Workspace menu
     name = "Workspace";
-    menu = apogeeapp.ui.Menu.createMenu(name);
-    menuBarLeft.appendChild(menu.getElement());
-    menus[name] = menu;
+    this.workspaceMenu = apogeeapp.ui.Menu.createMenu(name);
+    menuBarLeft.appendChild(this.workspaceMenu.getElement());
+    menus[name] = this.workspaceMenu;
     
-    var newCallback = apogeeapp.app.createworkspace.getCreateCallback(this);
-    menu.addCallbackMenuItem("New",newCallback);
-    
-    var openCallback = apogeeapp.app.openworkspace.getOpenCallback(this);
-    menu.addCallbackMenuItem("Open",openCallback);
-    
-    var saveCallback = apogeeapp.app.saveworkspace.getSaveCallback(this);
-    menu.addCallbackMenuItem("Save",saveCallback);
-    
-    var closeCallback = apogeeapp.app.closeworkspace.getCloseCallback(this);
-    menu.addCallbackMenuItem("Close",closeCallback);	
+    //populate thie menu on the fly
+    var getMenuItemsCallback = () => this.getWorkspaceMenuItems();
+    this.workspaceMenu.setAsOnTheFlyMenu(getMenuItemsCallback);
 	
     //Components Menu
     name = "Components";
@@ -352,6 +347,28 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
     this.activeTabTitleDisplay.style.display = "none";
     return menuBar;
     
+}
+
+/** This method populates or repopulates the workspace menu. It is called whenever a workspace is created, opened or closed */
+apogeeapp.app.Apogee.prototype.getWorkspaceMenuItems = function() {
+    
+    var menuItems = [];
+    var menuItem;
+    
+    menuItem = {};
+    menuItem.title = "New";
+    menuItem.callback = apogeeapp.app.createworkspace.getCreateCallback(this);
+    menuItems.push(menuItem);
+    
+    var openSaveMenuItems = this.fileAccessObject.getWorkspaceOpenSaveMenuOptions(this);
+    menuItems = menuItems.concat(openSaveMenuItems);
+    
+    menuItem = {};
+    menuItem.title = "Close";
+    menuItem.callback = apogeeapp.app.closeworkspace.getCloseCallback(this);
+    menuItems.push(menuItem);
+    
+    return menuItems;
 }
 
 ///** This method should be implemented if custom menus or menu items are desired. */

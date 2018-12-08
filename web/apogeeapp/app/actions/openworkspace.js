@@ -1,42 +1,62 @@
 
 apogeeapp.app.openworkspace = {};
 
-//=====================================
-// UI Entry Point
-//=====================================
+////=====================================
+//// UI Entry Point
+////=====================================
+//
+//apogeeapp.app.openworkspace.getOpenCallback = function(app) {
+//    return function() {
+//    
+//        //make sure there is not an open workspace
+//        if(app.getWorkspaceUI()) {
+//            alert("There is already an open workspace. You must close the workspace first.");
+//            return;
+//        }
+//    
+//        var onOpen = function(err,workspaceData,fileMetadata) {
+//            
+//            if(err) {
+//                alert("Error: " + err.message);
+//            }
+//            else {
+//                var actionCompletedCallback = function(actionResponse) {
+//                    if(!actionResponse.getSuccess()) {
+//                        apogeeapp.app.errorHandling.handleActionError(actionResponse);
+//                    }
+//                };
+//
+//                //open workspace
+//                apogeeapp.app.openworkspace.openWorkspace(app,workspaceData,fileMetadata,actionCompletedCallback);
+//            }
+//        }    
+//        
+//        apogeeapp.app.openworkspace.openFile(onOpen);
+//    }
+//}
+//
+////THIS FUNCTION MUST BE IMPLEMENTED!
+////apogeeapp.app.openworkspace.openFile(onOpen);
 
-apogeeapp.app.openworkspace.getOpenCallback = function(app) {
-    return function() {
-    
-        //make sure there is not an open workspace
-        if(app.getWorkspaceUI()) {
-            alert("There is already an open workspace. You must close the workspace first.");
-            return;
-        }
-    
-        var onOpen = function(err,workspaceData,workspaceHandle) {
-            
-            if(err) {
-                alert("Error: " + err.message);
-            }
-            else {
-                var actionCompletedCallback = function(actionResponse) {
-                    if(!actionResponse.getSuccess()) {
-                        apogeeapp.app.errorHandling.handleActionError(actionResponse);
-                    }
-                };
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
-                //open workspace
-                apogeeapp.app.openworkspace.openWorkspace(app,workspaceData,workspaceHandle,actionCompletedCallback);
+/** This method should be called when workspace data is opened, to create the workspace. */
+apogeeapp.app.openworkspace.onOpen = function(err,app,workspaceData,fileMetadata) {
+
+    if(err) {
+        alert("Error: " + err.message);
+    }
+    else {
+        var actionCompletedCallback = function(actionResponse) {
+            if(!actionResponse.getSuccess()) {
+                apogeeapp.app.errorHandling.handleActionError(actionResponse);
             }
-        }    
-        
-        apogeeapp.app.openworkspace.openFile(onOpen);
+        };
+
+        //open workspace
+        apogeeapp.app.openworkspace.openWorkspace(app,workspaceData,fileMetadata,actionCompletedCallback);
     }
 }
-
-//THIS FUNCTION MUST BE IMPLEMENTED!
-//apogeeapp.app.openworkspace.openFile(onOpen);
 
 //=====================================
 // Action
@@ -46,7 +66,7 @@ apogeeapp.app.openworkspace.getOpenCallback = function(app) {
 /** This method opens an workspace, from the text file. 
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
-apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspaceHandle,actionCompletedCallback) {
+apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,fileMetadata,actionCompletedCallback) {
     var actionResponse = new apogee.ActionResponse();
     var name;
     var workspaceUIAdded;
@@ -71,6 +91,7 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
 		//if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {
             workspaceUI.load(workspaceJson);
+            workspaceUI.setFileMetadata(fileMetadata);
             actionCompletedCallback(actionResponse);
         }
         

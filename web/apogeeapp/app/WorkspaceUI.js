@@ -2,6 +2,7 @@
 apogeeapp.app.WorkspaceUI = function() {
 
     this.workspace = null;
+    this.fileMetadata = null;
 	
     //properties
 	this.app = null;
@@ -223,6 +224,19 @@ apogeeapp.app.WorkspaceUI.prototype.workspaceUpdated = function() {
 //====================================
 // open and save methods
 //====================================
+
+/** This should be set to store file source info, for saving the file. 
+ * The format is arbitrary except it should hold one field "saveOK, which 
+ * will be used to enable the menu option to save the file to the same source from
+ * which it was opened.*/
+apogeeapp.app.WorkspaceUI.prototype.setFileMetadata = function(fileMetadata) {
+    this.fileMetadata = fileMetadata;
+}
+
+/** This retrieves the file metadata used to save the file. */
+apogeeapp.app.WorkspaceUI.prototype.getFileMetadata = function() {
+    return this.fileMetadata;
+}
 
 /** This saves the workspace. It the optionalSavedRootFolder is passed in,
  * it will save a workspace with that as the root folder. */

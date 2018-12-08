@@ -82,6 +82,7 @@
         <script type="text/javascript" src="../../apogeeapp/ui/configurablepanel/elements/HTMLDisplayElement.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/Apogee.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/WorkspaceUI.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/BaseFileAccess.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/references/LinkLoader.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/references/ReferenceManager.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/references/ReferenceEntry.js"></script>
@@ -134,12 +135,10 @@
         <script type="text/javascript" src="../../apogeeapp/app/datadisplay/ConfigurableFormDisplay.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/datadisplay/ErrorDisplay.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/dialogs/ConfigurableDialog.js"></script>
-        <script type="text/javascript" src="../../apogeeapp/app/dialogs/TextIoDialog.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/dialogs/SelectControlDialog.js"></script>
         
-        <script type="text/javascript" src="../../supplemental/electronCode/file_impl_electron.js"></script>
+        <script type="text/javascript" src="../../supplemental/electronCode/ElectronFileAccess.js"></script>
         <script type="text/javascript" src="../../supplemental/electronCode/custom_menus_electron.js"></script>
-        <!-- <script type="text/javascript" src="../../supplemental/cutNPasteCode/file_impl_cutnpaste.js"></script>-->
         
         <script type="text/javascript" src="../../supplemental/debugHook.js"></script>
         
@@ -162,8 +161,11 @@
                 //set resounce path
                 apogeeapp.ui.initResourcePath("../../resources");
                 
+                //use electron file access
+                var fileAccessObject = new apogeeapp.app.ElectronFileAccess();
+                
                 //create the application
-                apogeeapp.app.Apogee.createApp("appContainer");
+                apogeeapp.app.Apogee.createApp("appContainer",fileAccessObject);
             }
             
 		</script>
