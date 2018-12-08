@@ -84,6 +84,7 @@ module.exports = function(grunt) {
 				"apogeeapp/ui/configurablepanel/elements/HTMLDisplayElement.js",
                 "apogeeapp/app/Apogee.js",
                 "apogeeapp/app/WorkspaceUI.js",
+                "apogeeapp/app/BaseFileAccess.js",
                 "apogeeapp/app/references/ReferenceManager.js",
                 "apogeeapp/app/references/LinkEntry.js",
                 "apogeeapp/app/component/WindowHeaderManager.js",
@@ -131,7 +132,6 @@ module.exports = function(grunt) {
                 "apogeeapp/app/datadisplay/ConfigurableFormDisplay.js",
                 "apogeeapp/app/datadisplay/ErrorDisplay.js",
                 "apogeeapp/app/dialogs/ConfigurableDialog.js",
-                "apogeeapp/app/dialogs/TextIoDialog.js",
                 "apogeeapp/app/dialogs/SelectControlDialog.js",
             ],
             "dest": "../../dist/lib/apogee-base-app.js"
@@ -155,7 +155,8 @@ module.exports = function(grunt) {
             "src": [
                 "supplemental/webAppPackHeader.js",
                 "../../dist/lib/apogee-base-app.js",
-                "supplemental/cutNPasteCode/file_impl_cutnpaste.js",
+                "supplemental/cutNPasteCode/CutNPasteFileAccess.js",
+                "supplemental/cutNPasteCode/TextIoDialog.js",
                 "supplemental/webAppPackFooter.js"
             ],
             "dest": "../../dist/lib/apogee-web-app.js"
@@ -179,7 +180,7 @@ module.exports = function(grunt) {
                 "supplemental/npmAppHeader.js",
                 "../../dist/lib/apogee-base-app.js",
                 "supplemental/electronCode/custom_menus_electron.js",
-                "supplemental/electronCode/file_impl_electron.js",
+                "supplemental/electronCode/ElectronFileAccess.js",
                 "supplemental/npmAppFooter.js"
             ],
             "dest": "../../dist/lib/apogee-npm-app.js"

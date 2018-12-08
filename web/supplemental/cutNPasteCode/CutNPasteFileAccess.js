@@ -12,31 +12,7 @@ apogeeapp.app.CutNPasteFileAccess = class extends apogeeapp.app.BaseFileAccess {
     constructor() {
         super();
     }
-    
-    /** 
-     * This method should return a list of menu options for opening and closing
-     * the workspace. The format should be a array with each entry being a
-     * two entry array. The first item is the menu entry text and the second 
-     * is the callback for the menu item action. 
-     * Example: [["Open",openCallback],["Save",saveCallback]]
-     * */
-    getWorkspaceOpenSaveMenuOptions(app) {
-        var menuEntryList = [];
-        var itemInfo;
-
-        itemInfo = {};
-        itemInfo.title = "Open";
-        itemInfo.callback = this.getOpenCallback(app);
-        menuEntryList.push(itemInfo);
-        
-        itemInfo = {};
-        itemInfo.title = "Save";
-        itemInfo.callback = this.getSaveCallback(app);
-        menuEntryList.push(itemInfo);
-        
-        return menuEntryList;
-    }
-    
+   
     /**
      * This method returns fileMetadata appropriate for a new workspace.
      */
@@ -44,51 +20,18 @@ apogeeapp.app.CutNPasteFileAccess = class extends apogeeapp.app.BaseFileAccess {
         return null;
     }
     
-    //========================================
-    // Private
-    //========================================
-    
-    
-    getOpenCallback(app) {
-        return () => {
-
-            //make sure there is not an open workspace
-            if(app.getWorkspaceUI()) {
-                alert("There is an open workspace. You must close the workspace first.");
-                return;
-            }    
-
-            this.openFile(app,apogeeapp.app.openworkspace.onOpen);
-        }
+    /**
+     * This method returns true if the workspace has an existing file to which 
+     * is can be saved without opening a save dialog. 
+     */
+    directSaveOk(fileMetadata) {
+        return false;
     }
     
-
-    getSaveCallback(app) {
-        return () => {
-
-            var activeWorkspaceUI = app.getWorkspaceUI();
-            var workspaceText;
-            if(activeWorkspaceUI) {
-                var workspaceJson = activeWorkspaceUI.toJson();
-                workspaceText = JSON.stringify(workspaceJson);
-            }
-            else {
-                alert("There is no workspace open.");
-                return;
-            }
-
-            //clear workspace dirty flag on completion of save
-            var onSaveSuccess = () => {
-                app.clearWorkspaceIsDirty();
-            }
-
-            this.saveFile(workspaceText,onSaveSuccess);
-        }
-    }
-    
-    
-
-//PASTE IMPLEMENTATION
+    /**
+     * This method opens a file, including dispalying a dialog
+     * to select the file.
+     */
     openFile(app,onOpen) {
         var onFileOpen = function(data) {
             onOpen(null,app,data,null);
@@ -102,7 +45,8 @@ apogeeapp.app.CutNPasteFileAccess = class extends apogeeapp.app.BaseFileAccess {
         apogeeapp.app.dialog.showTextIoDialog(options,onFileOpen);
     }
 
-    showSaveDialog(data,onSaveSuccess) {
+    /** This  method shows a save dialog and saves the file. */
+    showSaveDialog(fileMetadata,data,onSaveSuccess) {
         var onSubmit = () => true;
         var options = {};
         options.title = "Save Workspace";
@@ -115,8 +59,11 @@ apogeeapp.app.CutNPasteFileAccess = class extends apogeeapp.app.BaseFileAccess {
         if(onSaveSuccess) onSaveSuccess();
     }
 
-    saveFile(data,onSaveSuccess) {
-        apogeeapp.app.saveworkspace.showSaveDialog(data);
+    /** 
+     * This method saves a file to the give location. 
+     */
+    saveFile(fileMetadata,data,onSaveSuccess) {
+        apogeeapp.app.saveworkspace.showSaveDialog(fileMetadata,data,onSaveSuccess);
     }
 
 

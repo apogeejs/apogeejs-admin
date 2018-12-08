@@ -1,7 +1,5 @@
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This class provides file open and save in electron.
  */
 apogeeapp.app.ElectronFileAccess = class extends apogeeapp.app.BaseFileAccess {
     
@@ -13,42 +11,6 @@ apogeeapp.app.ElectronFileAccess = class extends apogeeapp.app.BaseFileAccess {
         super();
     }
     
-    /** 
-     * This method should return a list of menu options for opening and closing
-     * the workspace. The format should be a array with each entry being a
-     * two entry array. The first item is the menu entry text and the second 
-     * is the callback for the menu item action. 
-     * Example: [["Open",openCallback],["Save",saveCallback]]
-     * */
-    getWorkspaceOpenSaveMenuOptions(app) {
-        var menuEntryList = [];
-        var itemInfo;
-
-        itemInfo = {};
-        itemInfo.title = "Open";
-        itemInfo.callback = this.getOpenCallback(app);
-        menuEntryList.push(itemInfo);
-
-        var workspaceUI = app.getWorkspaceUI();
-        if(workspaceUI) {
-            var fileMetadata = workspaceUI.getFileMetadata();
-            
-            if(fileMetadata.path) {
-                itemInfo = {};
-                itemInfo.title = "Save";
-                itemInfo.callback = this.getSaveCallback(app,true);
-                menuEntryList.push(itemInfo);
-            }
-
-            itemInfo = {};
-            itemInfo.title = "Save as";
-            itemInfo.callback = this.getSaveCallback(app,false);
-            menuEntryList.push(itemInfo);
-        }  
-        
-        return menuEntryList;
-    }
-    
     /**
      * This method returns fileMetadata appropriate for a new workspace.
      */
@@ -56,58 +18,18 @@ apogeeapp.app.ElectronFileAccess = class extends apogeeapp.app.BaseFileAccess {
         return {};
     }
     
-    //========================================
-    // Private
-    //========================================
-    
-    
-    getOpenCallback(app) {
-        return () => {
-
-            //make sure there is not an open workspace
-            if(app.getWorkspaceIsDirty()) {
-                alert("There is an open workspace with unsaved data. You must close the workspace first.");
-                return;
-            }    
-
-            this.openFile(app,apogeeapp.app.openworkspace.onOpen);
-        }
-    }
-    
-
-    getSaveCallback(app,doDirectSave) {
-        return () => {
-
-            var activeWorkspaceUI = app.getWorkspaceUI();
-            var workspaceText;
-            var fileMetadata;
-            if(activeWorkspaceUI) {
-                var workspaceJson = activeWorkspaceUI.toJson();
-                workspaceText = JSON.stringify(workspaceJson);
-                fileMetadata = activeWorkspaceUI.getFileMetadata();
-            }
-            else {
-                alert("There is no workspace open.");
-                return;
-            }
-
-            //clear workspace dirty flag on completion of save
-            var onSaveSuccess = (updatedFileMetadata) => {
-                var workspaceUI = app.getWorkspaceUI();
-                workspaceUI.setFileMetadata(updatedFileMetadata);
-                app.clearWorkspaceIsDirty();
-            }
-
-            if((!doDirectSave)||(!fileMetadata)||(!fileMetadata.directSaveOk)) {
-                this.showSaveDialog(fileMetadata,workspaceText,onSaveSuccess);
-            }
-            else {
-                this.saveFile(fileMetadata,workspaceText,onSaveSuccess);
-            }
-        }
+    /**
+     * This method returns true if the workspace has an existing file to which 
+     * is can be saved without opening a save dialog. 
+     */
+    directSaveOk(fileMetadata) {
+        return ((fileMetadata)&&(fileMetadata.path));
     }
 
-
+    /**
+     * This method opens a file, including dispalying a dialog
+     * to select the file.
+     */
     openFile(app,onOpen) {
         //show file open dialog
         var electron = require('electron').remote;
@@ -127,7 +49,7 @@ apogeeapp.app.ElectronFileAccess = class extends apogeeapp.app.BaseFileAccess {
         }
     }
 
-
+    /** This  method shows a save dialog and saves the file. */
     showSaveDialog(fileMetadata,data,onSaveSuccess) {
         var electron = require('electron').remote;
         var dialog = electron.dialog;
@@ -142,13 +64,16 @@ apogeeapp.app.ElectronFileAccess = class extends apogeeapp.app.BaseFileAccess {
         updatedFileMetadata.directSaveOk = true;
         updatedFileMetadata.path = filename;
         if(filename) {
-            apogeeapp.app.saveworkspace.saveFile(updatedFileMetadata,data,onSaveSuccess);
+            this.saveFile(updatedFileMetadata,data,onSaveSuccess);
         }
         else {
             return false;
         }
     }
 
+    /** 
+     * This method saves a file to the give location. 
+     */
     saveFile(fileMetadata,data,onSaveSuccess) {
         var onComplete = function(err,data) {
             if(err) {

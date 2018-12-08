@@ -326,13 +326,13 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
     menuBarLeft.appendChild(menu.getElement());
     menus[name] = menu;
     
-    var importCallback = apogeeapp.app.importworkspace.getImportCallback(this,apogeeapp.app.FolderComponent);
+    var importCallback = apogeeapp.app.importworkspace.getImportCallback(this,this.fileAccessObject,apogeeapp.app.FolderComponent);
     menu.addCallbackMenuItem("Import as Folder",importCallback);
     
-    var import2Callback = apogeeapp.app.importworkspace.getImportCallback(this,apogeeapp.app.FolderFunctionComponent);
+    var import2Callback = apogeeapp.app.importworkspace.getImportCallback(this,this.fileAccessObject,apogeeapp.app.FolderFunctionComponent);
     menu.addCallbackMenuItem("Import as Folder Function",import2Callback);
     
-    var exportCallback = apogeeapp.app.exportworkspace.getExportCallback(this);
+    var exportCallback = apogeeapp.app.exportworkspace.getExportCallback(this,this.fileAccessObject);
     menu.addCallbackMenuItem("Export as Workspace",exportCallback);
     
     //allow the implementation to add more menus or menu items
@@ -360,9 +360,28 @@ apogeeapp.app.Apogee.prototype.getWorkspaceMenuItems = function() {
     menuItem.callback = apogeeapp.app.createworkspace.getCreateCallback(this);
     menuItems.push(menuItem);
     
-    var openSaveMenuItems = this.fileAccessObject.getWorkspaceOpenSaveMenuOptions(this);
-    menuItems = menuItems.concat(openSaveMenuItems);
-    
+    menuItem = {};
+    menuItem.title = "Open";
+    menuItem.callback = apogeeapp.app.openworkspace.getOpenCallback(this,this.fileAccessObject);
+    menuItems.push(menuItem);
+
+    var workspaceUI = this.getWorkspaceUI();
+    if(workspaceUI) {
+        var fileMetadata = workspaceUI.getFileMetadata();
+
+        if(this.fileAccessObject.directSaveOk(fileMetadata)) {
+            menuItem = {};
+            menuItem.title = "Save";
+            menuItem.callback = apogeeapp.app.saveworkspace.getSaveCallback(this,this.fileAccessObject,true);
+            menuItems.push(menuItem);
+        }
+
+        menuItem = {};
+        menuItem.title = "Save as";
+        menuItem.callback = apogeeapp.app.saveworkspace.getSaveCallback(this,this.fileAccessObject,false);
+        menuItems.push(menuItem);
+    }  
+
     menuItem = {};
     menuItem.title = "Close";
     menuItem.callback = apogeeapp.app.closeworkspace.getCloseCallback(this);

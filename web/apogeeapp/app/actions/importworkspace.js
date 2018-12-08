@@ -6,17 +6,16 @@ apogeeapp.app.importworkspace = {};
 //=====================================
 
 /** Call this withthe appropriate generator - folder or folder function, for the given import type. */
-apogeeapp.app.importworkspace.getImportCallback = function(app,componentGenerator) {
+apogeeapp.app.importworkspace.getImportCallback = function(app,fileAccessObject,componentGenerator) {
     return function() {
     
         //make sure there is not an open workspace
         if(!app.getWorkspaceUI()) {
             alert("There must be an open workspace to import a workspace.");
             return;
-        }
-    
-        var onOpen = function(err,workspaceData,workspaceHandle) {
-            
+        }    
+        
+        var onOpen = function(err,app,workspaceData,fileMetadata) {
             if(err) {
                 alert("Error: " + err.message);
             }
@@ -28,17 +27,14 @@ apogeeapp.app.importworkspace.getImportCallback = function(app,componentGenerato
                 };
 
                 //open workspace
-                apogeeapp.app.importworkspace.openWorkspace(app,componentGenerator,workspaceData,workspaceHandle,actionCompletedCallback);
+                apogeeapp.app.importworkspace.openWorkspace(app,componentGenerator,workspaceData,fileMetadata,actionCompletedCallback);
             }
-        }    
+        }
         
         //use open file from open workspace
-        apogeeapp.app.openworkspace.openFile(onOpen);
+        fileAccessObject.openFile(app,onOpen);
     }
 }
-
-//THIS FUNCTION MUST BE IMPLEMENTED!
-//apogeeapp.app.openworkspace.openFile(onOpen);
 
 //=====================================
 // Action
@@ -48,7 +44,7 @@ apogeeapp.app.importworkspace.getImportCallback = function(app,componentGenerato
 /** This method opens an workspace, from the text file. 
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
-apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,workspaceText,workspaceHandle,actionCompletedCallback) {
+apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,workspaceText,fileMetadata,actionCompletedCallback) {
     var actionResponse = new apogee.ActionResponse();
     var name;
     

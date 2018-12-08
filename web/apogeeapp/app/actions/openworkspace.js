@@ -1,44 +1,22 @@
 
 apogeeapp.app.openworkspace = {};
 
-////=====================================
-//// UI Entry Point
-////=====================================
-//
-//apogeeapp.app.openworkspace.getOpenCallback = function(app) {
-//    return function() {
-//    
-//        //make sure there is not an open workspace
-//        if(app.getWorkspaceUI()) {
-//            alert("There is already an open workspace. You must close the workspace first.");
-//            return;
-//        }
-//    
-//        var onOpen = function(err,workspaceData,fileMetadata) {
-//            
-//            if(err) {
-//                alert("Error: " + err.message);
-//            }
-//            else {
-//                var actionCompletedCallback = function(actionResponse) {
-//                    if(!actionResponse.getSuccess()) {
-//                        apogeeapp.app.errorHandling.handleActionError(actionResponse);
-//                    }
-//                };
-//
-//                //open workspace
-//                apogeeapp.app.openworkspace.openWorkspace(app,workspaceData,fileMetadata,actionCompletedCallback);
-//            }
-//        }    
-//        
-//        apogeeapp.app.openworkspace.openFile(onOpen);
-//    }
-//}
-//
-////THIS FUNCTION MUST BE IMPLEMENTED!
-////apogeeapp.app.openworkspace.openFile(onOpen);
+//=====================================
+// UI Entry Point
+//=====================================
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
+apogeeapp.app.openworkspace.getOpenCallback = function(app,fileAccessObject) {
+    return function() {
+
+        //make sure there is not an open workspace
+        if(app.getWorkspaceUI()) {
+            alert("There is an open workspace. You must close the workspace first.");
+            return;
+        }    
+
+        fileAccessObject.openFile(app,apogeeapp.app.openworkspace.onOpen);
+    }
+}
 
 /** This method should be called when workspace data is opened, to create the workspace. */
 apogeeapp.app.openworkspace.onOpen = function(err,app,workspaceData,fileMetadata) {
