@@ -63,7 +63,7 @@ apogeeapp.app.AmdModuleEntry.REFERENCE_TYPE_INFO = {
     "ADD_ENTRY_TEXT":"Add Web Module",
     "UPDATE_ENTRY_TEXT":"Update Web Module",
     "LIST_ICON_PATH":"/componentIcons/folder.png",
-    "ENTRY_ICON_PATH":"/componentIcons/module.png",
+    "ENTRY_ICON_PATH":"/componentIcons/webModule.png",
     "createEntryFunction": (referenceManager, referenceData) => new apogeeapp.app.AmdModuleEntry(referenceManager,referenceData)
 }
 
