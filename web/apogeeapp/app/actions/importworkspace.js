@@ -55,7 +55,7 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,wo
 //I should verify the file type and format!  
 
         var referencesJson = workspaceJson.references;
-        var loadReferencesPromise = workspaceUI.loadReferences(referencesJson);
+        var loadReferencesPromise = workspaceUI.getLoadReferencesPromise(referencesJson);
     	
 		//if we have to load links wait for them to load
         var newParentOptionsJson = {};

@@ -139,6 +139,7 @@
         <script type="text/javascript" src="/apogeeapp/app/dialogs/ConfigurableDialog.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/dialogs/SelectControlDialog.js"></script>
         
+        <script type="text/javascript" src="/supplemental/cutNPasteCode/CutNPasteAppConfigManager.js"></script>
         <script type="text/javascript" src="/supplemental/cutNPasteCode/CutNPasteFileAccess.js"></script>
         <script type="text/javascript" src="/supplemental/cutNPasteCode/TextIoDialog.js"></script>
         
@@ -166,10 +167,10 @@
                 apogeeapp.ui.initResourcePath("/resources");
                 
                 //use cutnpaste file access
-                var fileAccessObject = new apogeeapp.app.CutNPasteFileAccess();
+                var appConfigManager = new apogeeapp.app.CutNPasteAppConfigManager();
                 
                 //create the application
-                apogeeapp.app.Apogee.createApp("appContainer",fileAccessObject); 
+                apogeeapp.app.Apogee.createApp("appContainer",appConfigManager); 
             }
             
             function beforeUnloadHandler() {

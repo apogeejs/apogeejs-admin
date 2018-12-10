@@ -5,15 +5,12 @@ apogeeapp.app.dialog = {};
 //class definition
 //======================================
 
-
 /** This is the main class of the apogee application. 
  * This constuctor should not be called externally, the static creation method 
  * should be used. 
  * @private */
-apogeeapp.app.Apogee = function(containerId,fileAccessObject) {
+apogeeapp.app.Apogee = function(containerId,appConfigManager) {
     
-    //temp - until we figure out what to do with menu and events
-    //for now we have application events, using the EventManager mixin below.
     apogee.EventManager.init.call(this);
     
     if(apogeeapp.app.Apogee.instance != null) {
@@ -23,7 +20,12 @@ apogeeapp.app.Apogee = function(containerId,fileAccessObject) {
         apogeeapp.app.Apogee.instance = this;
     }
     
-    this.fileAccessObject = fileAccessObject;
+    this.appConfigManager = appConfigManager;
+    this.containerId = containerId;
+    
+    //---------------------------------
+    //construct the base app structures
+    //---------------------------------
     
     //workspaces
     this.workspaceUI = null;
@@ -33,32 +35,25 @@ apogeeapp.app.Apogee = function(containerId,fileAccessObject) {
     this.standardComponents = [];
     //these are a list of names of components that go in the "added component" list
     this.additionalComponents = [];
-	
-	//load the standard component generators
-	this.loadComponentGenerators();
-	
-	//create the UI - if a container ID is passed in
-    if(containerId !== undefined) {
-        this.createUI(containerId);
-    }
     
-    //open a workspace if there is a url present
-    var workspaceUrl = apogee.util.readQueryField("url",document.URL);
-    if(workspaceUrl) {
-        
-        var workspaceTextPromise = apogee.net.textRequest(workspaceUrl);
-        
-        var actionCompletedCallback = actionResponse => {
-            if(!actionResponse.getSuccess()) {
-                apogeeapp.app.errorHandling.handleActionError(actionResponse);
-            }
-        };
-        var openWorkspace = workspaceText => {
-            apogeeapp.app.openworkspace.openWorkspace(this,workspaceText,null,actionCompletedCallback);
-        };
-        
-        workspaceTextPromise.then(openWorkspace).catch(errorMsg => alert("Error downloading workspace."));
-    }
+    //default settings
+    this.appSettings = {};
+    
+    //reference manager
+    this.referenceManager = new apogeeapp.app.ReferenceManager();
+    
+    //load the standard component generators
+    //(for now this is not configurable. This is called first so loaded modules
+    //in config can self load after the defaults)
+	this.loadComponentGenerators();
+    
+    //----------------------------------
+    //configure the application
+    //----------------------------------
+    var appConfigPromise = this.appConfigManager.getConfigPromise(this);
+    
+    appConfigPromise.then(() => this.initApp()).catch(errorMsg => alert("Fatal error configuring application!"));
+    
 }
 	
 //add components to this class
@@ -89,6 +84,14 @@ apogeeapp.app.Apogee.getInstance = function() {
 //======================================
 // public methods
 //======================================
+
+apogeeapp.app.Apogee.prototype.getAppSettings = function() {
+    return this.appSettings;
+}
+
+apogeeapp.app.Apogee.prototype.getAppReferenceManager = function() {
+    return this.referenceManager;
+}
 
 apogeeapp.app.Apogee.prototype.getWorkspaceUI = function() {
 	return this.workspaceUI;
@@ -175,6 +178,66 @@ apogeeapp.app.Apogee.prototype.getComponentGenerator = function(name) {
 //==========================
 // App Initialization
 //==========================
+
+
+//==================================
+// App Initialization
+//==================================
+
+/** This should be called to set any settings, if there are any. If there are
+ * no settings, this may be omitted.
+ * @private
+ */ 
+apogeeapp.app.Apogee.prototype.getInitSettingsPromise = function(appSettings) {    
+    
+    if(!appSettings) appSettings = {};
+    
+    //set the settings JSON
+    this.appSettings = appSettings;
+    
+    //load references
+    var openEntriesPromise;
+    if(this.appSettings.references) {
+        openEntriesPromise = this.referenceManager.getOpenEntriesPromise(this.appSettings.references);
+    }
+    else {
+        //instant resolve promise (with no meaningful return)
+        openEntriesPromise = Promise.resolve();
+    }
+    
+    var onLoadReferenceError = errorMsg => alert("Error setting application level modules - some functionality may not be available: " + errorMsg);
+    
+    //if there is an error loading the promise, print a mesage and continue.
+    return openEntriesPromise.catch(onLoadReferenceError);
+}
+    
+/** This completes application initialization after any settings have been set. 
+ * @private
+ * */    
+apogeeapp.app.Apogee.prototype.initApp = function() {
+    
+    //file accessor
+    this.fileAccessObject = this.appConfigManager.getFileAccessObject(this);
+	
+	//create the UI - if a container ID is passed in
+    if(this.containerId !== undefined) {
+        this.createUI(this.containerId);
+    }
+    
+    //open the initial workspace
+    var workspaceFilePromise = this.appConfigManager.getInitialWorkspaceFilePromise(this);
+    if(workspaceFilePromise) {
+        var workspaceFileMetadata = this.appConfigManager.getInitialWorkspaceFileMetadata(this);
+        
+        var openWorkspace = workspaceText => {
+            apogeeapp.app.openworkspace.openWorkspace(this,workspaceText,workspaceFileMetadata);
+        };
+        
+        workspaceFilePromise.then(openWorkspace).catch(errorMsg => alert("Error downloading initial workspace."));
+    }
+    
+}
+
 
 /** This method adds the standard components to the app. 
  * @private */
@@ -307,7 +370,7 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
     menuBarLeft.appendChild(this.workspaceMenu.getElement());
     menus[name] = this.workspaceMenu;
     
-    //populate thie menu on the fly
+    //populate the workspace menu on the fly - depends on workspace state
     var getMenuItemsCallback = () => this.getWorkspaceMenuItems();
     this.workspaceMenu.setAsOnTheFlyMenu(getMenuItemsCallback);
 	
@@ -349,7 +412,8 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
     
 }
 
-/** This method populates or repopulates the workspace menu. It is called whenever a workspace is created, opened or closed */
+/** This method gets the workspace menu items. This is created on the fly because the
+ * items will change depending on the state of the workspace. */
 apogeeapp.app.Apogee.prototype.getWorkspaceMenuItems = function() {
     
     var menuItems = [];

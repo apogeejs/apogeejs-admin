@@ -363,8 +363,8 @@ apogeeapp.app.WorkspaceUI.prototype.getMenuItems = function() {
 // Links
 //========================================
 
-apogeeapp.app.WorkspaceUI.prototype.loadReferences = function(referencesJson) {
-    return this.referencesManager.openEntries(referencesJson);
+apogeeapp.app.WorkspaceUI.prototype.getLoadReferencesPromise = function(referencesJson) {
+    return this.referencesManager.getOpenEntriesPromise(referencesJson);
 }
 
 //==================================

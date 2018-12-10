@@ -60,7 +60,7 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,fileMetad
         workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
     
         var referencesJson = workspaceJson.references;
-        var loadReferencesPromise = workspaceUI.loadReferences(referencesJson);
+        var loadReferencesPromise = workspaceUI.getLoadReferencesPromise(referencesJson);
     	
 		//if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {

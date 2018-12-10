@@ -37,9 +37,7 @@ apogeeapp.app.ElectronFileAccess = class extends apogeeapp.app.BaseFileAccess {
 
         var fileList = dialog.showOpenDialog({properties: ['openFile']});
         if((fileList)&&(fileList.length > 0)) {
-            var fileMetadata = {};
-            fileMetadata.directSaveOk = true;
-            fileMetadata.path = fileList[0];
+            var fileMetadata = apogeeapp.app.ElectronFileAccess.createFileMetaData(fileList[0]);
             var onFileOpen = function(err,data) {
                 onOpen(err,app,data,fileMetadata);
             }
@@ -57,12 +55,10 @@ apogeeapp.app.ElectronFileAccess = class extends apogeeapp.app.BaseFileAccess {
         //show file save dialog
         var options = {};
         if((fileMetadata)&&(fileMetadata.path)) options.defaultPath = fileMetadata.path;
-        var filename = dialog.showSaveDialog(options);
+        var newPath = dialog.showSaveDialog(options);
 
         //save file
-        var updatedFileMetadata = {};
-        updatedFileMetadata.directSaveOk = true;
-        updatedFileMetadata.path = filename;
+        var updatedFileMetadata = apogeeapp.app.ElectronFileAccess.createFileMetaData(newPath);
         if(filename) {
             this.saveFile(updatedFileMetadata,data,onSaveSuccess);
         }
@@ -90,5 +86,11 @@ apogeeapp.app.ElectronFileAccess = class extends apogeeapp.app.BaseFileAccess {
         var fs = require('fs');
         fs.writeFile(fileMetadata.path,data,onComplete);
     }
+}
+
+//static method
+/** This creates the file metadata for a given path. */
+apogeeapp.app.ElectronFileAccess.createFileMetaData = function(path) {
+    return {"path":path};
 }
 

@@ -1,0 +1,8 @@
+{
+    "references": [
+        {
+            "url":"./SimpleGeojsonControlNPM.js",
+            "entryType":"npm module"
+        }
+    ]
+}

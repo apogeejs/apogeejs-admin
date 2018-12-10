@@ -137,6 +137,7 @@
         <script type="text/javascript" src="../../apogeeapp/app/dialogs/ConfigurableDialog.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/dialogs/SelectControlDialog.js"></script>
         
+        <script type="text/javascript" src="../../supplemental/electronCode/ElectronAppConfigManager.js"></script>
         <script type="text/javascript" src="../../supplemental/electronCode/ElectronFileAccess.js"></script>
         <script type="text/javascript" src="../../supplemental/electronCode/custom_menus_electron.js"></script>
         
@@ -158,14 +159,16 @@
             'use strict'
 
 			function init() {
+                console.log("In!")
+                
                 //set resounce path
                 apogeeapp.ui.initResourcePath("../../resources");
                 
                 //use electron file access
-                var fileAccessObject = new apogeeapp.app.ElectronFileAccess();
+                var appConfigManager = new apogeeapp.app.ElectronAppConfigManager();
                 
                 //create the application
-                apogeeapp.app.Apogee.createApp("appContainer",fileAccessObject);
+                apogeeapp.app.Apogee.createApp("appContainer",appConfigManager);
             }
             
 		</script>

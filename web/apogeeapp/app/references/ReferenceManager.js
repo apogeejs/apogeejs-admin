@@ -1,5 +1,10 @@
 
-/** This class manages links and other reference entries.*/
+/** This class manages links and other reference entries, loading the references and
+ * creating the UI tree elements for display of the references.
+ * 
+ * Any links needed for the page are managed externally by the Link Loader, which
+ * allows multiple users to request the same link.
+ */
 apogeeapp.app.ReferenceManager = function() {
     
     this.referencesTreeEntry = null;
@@ -13,6 +18,7 @@ apogeeapp.app.ReferenceManager = function() {
     this.referenceLists[apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO);
 }
 
+/** This returns the tree entry to display the reference entry for this reference manager. */
 apogeeapp.app.ReferenceManager.prototype.getTreeEntry = function(createIfMissing) {
     if((createIfMissing)&&(!this.referencesTreeEntry)) {
         this.referencesTreeEntry = this.instantiateTreeEntry();
@@ -24,7 +30,7 @@ apogeeapp.app.ReferenceManager.prototype.getTreeEntry = function(createIfMissing
  * the save call. It returns a promise that
  * resolves when all entries are loaded. 
  */
-apogeeapp.app.ReferenceManager.prototype.openEntries = function(referencesJson) {
+apogeeapp.app.ReferenceManager.prototype.getOpenEntriesPromise = function(referencesJson) {
 
     var entryPromises = [];
     
@@ -80,7 +86,7 @@ apogeeapp.app.ReferenceManager.prototype.addEntry = function(entryJson) {
     return referenceEntry.loadEntry();
 }
 
-/** This method should be called when the workspace is closed. It removes all links. 
+/** This method should be called when the parent is closed. It removes all links. 
  */
 apogeeapp.app.ReferenceManager.prototype.close = function() {
     for(var listType in this.referenceLists) {
@@ -286,7 +292,7 @@ apogeeapp.app.ReferenceManager.prototype.getListState = function(listStruct) {
 apogeeapp.app.ReferenceManager.nextId = 1;
 
 /** This method generates a member ID for the member. It is only valid
- * for the duration the workspace is opened. It is not persisted.
+ * for the duration the application is opened. It is not persisted.
  * @private
  */
 apogeeapp.app.ReferenceManager._createId = function() {
