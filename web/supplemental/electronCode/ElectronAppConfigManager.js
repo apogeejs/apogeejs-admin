@@ -27,7 +27,7 @@ apogeeapp.app.ElectronAppConfigManager = class {
             var configFilePromise = new Promise(promiseFunction);
             
             //chain the file download promise to the init settings promise
-            return configFilePromise.then(appSettings => app.getInitSettingsPromise(appSettings));
+            return configFilePromise.then(appSettings => app.getConfigurationPromise(appSettings));
         }
         else { 
             //if there is no config file, just return an "empty" promise
@@ -35,13 +35,15 @@ apogeeapp.app.ElectronAppConfigManager = class {
         }
     };
     
-    /** This method should return a FileAccessObject. */
-    getFileAccessObject(app) {
+    /** This method should return a default FileAccessObject. It will be loaded
+     * if an alternate is not loaded in configuration.
+     */
+    getDefaultFileAccessObject(app) {
         return new apogeeapp.app.ElectronFileAccess();
     }
     
     /** This method should return a promise for the initial workspace
-     * that should be loaded
+     * that should be loaded.
      */
     getInitialWorkspaceFilePromise(app) {
         //no initial workspace set up in electron

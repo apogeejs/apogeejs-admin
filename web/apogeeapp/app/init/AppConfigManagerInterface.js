@@ -8,8 +8,10 @@ apogeeapp.app.AppConfigManagerInterface = class {
      */
     getConfigPromise(app) {};
     
-    /** This method should return a FileAccessObject. */
-    getFileAccessObject(app) {};
+    /** This method should return a default FileAccessObject. It will be loaded
+     * if an alternate is not loaded in configuration.
+     */
+    getDefaultFileAccessObject(app) {};
     
     /** This method should return a promise for the initial workspace
      * that should be loaded

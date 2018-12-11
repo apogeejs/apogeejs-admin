@@ -16,7 +16,7 @@ apogeeapp.app.CutNPasteAppConfigManager = class {
         if(configUrl) {
             configFilePromise = apogee.net.jsonRequest(configUrl);
             //chain the file download promise to the init settings promise
-            return configFilePromise.then(appSettings => app.getInitSettingsPromise(appSettings));
+            return configFilePromise.then(appSettings => app.getConfigurationPromise(appSettings));
         }
         else {
             //is there is no config file return an "empty" promise
@@ -24,8 +24,10 @@ apogeeapp.app.CutNPasteAppConfigManager = class {
         }   
     };
     
-    /** This method should return a FileAccessObject. */
-    getFileAccessObject(app) {
+    /** This method should return a default FileAccessObject. It will be loaded
+     * if an alternate is not loaded in configuration.
+     */
+    getDefaultFileAccessObject(app) {
         return new apogeeapp.app.CutNPasteFileAccess();
     }
     
