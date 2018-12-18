@@ -376,26 +376,27 @@ apogeeapp.app.WorkspaceUI.prototype.showDependencies = function() {
 }
 
 apogeeapp.app.WorkspaceUI.prototype.createDependencies = function() {
-    var memberInfo = [];
+    var memberInfo = {};
     
     for(var key in this.componentMap) {
         var componentInfo = this.componentMap[key];
-        if((componentInfo)&&(componentInfo.member)&&(componentInfo.member.isCodeable)) {
+        if((componentInfo)&&(componentInfo.member)) {
             
             
             var member = componentInfo.member;
             
             var memberStruct = {};
-            memberStruct.member = member.getFullName();
-            memberStruct.memberType = member.generator.type;
+            memberStruct.type = member.generator.type;
+            var parent = member.getParent();
+            memberStruct.parent = parent ? parent.getFullName() : null;
             
             if(member.isDependent) {
                 if(member.getDependsOn().length > 0) {
-                    memberStruct.dependsOn = member.getDependsOn().map(dependency => dependency.getFullName());
+                    memberStruct.dep = member.getDependsOn().map(dependency => dependency.getFullName());
                 }
             }
             
-            memberInfo.push(memberStruct);
+            memberInfo[member.getFullName()] = memberStruct;
         }
     }
     
