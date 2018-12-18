@@ -58,7 +58,7 @@ apogeeapp.app.LinkLoader = class {
                     linkProps.type = "text/css";
                 }
                 else if(type == "script") {
-                    linkProps.src = scriptEntry.url;
+                    linkProps.src = url;
                 }
 
                 linkProps.onload = () => {
