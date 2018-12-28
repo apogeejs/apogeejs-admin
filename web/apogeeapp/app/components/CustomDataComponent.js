@@ -159,12 +159,7 @@ apogeeapp.app.CustomDataComponent.prototype.getFormCallbacks = function() {
     var callbacks = {};
     
     //return desired form value
-    callbacks.getData = () => {
-        var data = {};
-        data.inputData = this.inputTable.getData();
-        data.editData = this.dataTable.getData();
-        return data;
-    }
+    callbacks.getData = () => this.getMember().getData();
     
     //edit ok - always true
     callbacks.getEditOk = () => true;

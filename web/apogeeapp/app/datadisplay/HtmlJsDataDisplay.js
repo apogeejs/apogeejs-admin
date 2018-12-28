@@ -3,14 +3,21 @@
  * HTML and javascript code. Is should be passed a 
  * resource (javascript object) which has the following methods optionally defined: 
  * 
- * constructorAddition(viewMode);
- * init(outputElement,viewMode);
- * setData(data,outputElement,viewMode);
- * isCloseOk(outputElement,viewMode);
- * destroy(outputElement,viewMode);
- * onLoad(outputElement,viewMode);
- * onUnload(outputElement,viewMode);
- * onResize(outputElement,viewMode);
+ * init(outputElement,admin)
+ * setData(data,outputElement,admin)
+ * getData(outputElement,admin)
+ * isCloseOk(outputElement,admin)
+ * destroy(outputElement,admin)
+ * onLoad(outputElement,admin)
+ * onUnload(outputElement,admin)
+ * onResize(outputElement,admin)
+ * 
+ * constructorAddition(admin) DEPRECATED!
+ * 
+ * The admin object includes the following functions on it:
+ * getMessenger()
+ * startEditMode()
+ * endEditMode()
  */
 
 /** This is the display/editor for the custom control output. */
@@ -94,9 +101,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     this.isLoaded = false;
                     this.cachedData = undefined;
                     
-                    if(this.resource.onHide) {
-                        resource.onUnload.call(resource,this.outputElement,admin);
-                    }
+                    resource.onUnload.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     alert("Error in " + this.member.getFullName()+ " onUnload function: " + error.message);
@@ -139,12 +144,10 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
         if(this.resource.getData) {
             this.getData = () => {
                 try {
-                    if(this.resource.getData) {
-                        return this.resource.getData.call(resource,this.outputElement,admin);
-                    }
+                    return this.resource.getData.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
-                    alert("Error in " + this.member.getFullName() + " setData function: " + error.message);
+                    alert("Error in " + this.member.getFullName() + " getData function: " + error.message);
                 }
             }
         }
