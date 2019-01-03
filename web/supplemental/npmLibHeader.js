@@ -1,7 +1,7 @@
 
 var esprima = require('esprima');
 
-var __globals__ = global;
-var __APOGEE_ENVIRONMENT__ = "NODE";
+__globals__ = global;
+__APOGEE_ENVIRONMENT__ = "NODE";
 
 
