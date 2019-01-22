@@ -14,7 +14,10 @@
             'use strict'
             var apogee = require("./apogee-npm-lib.js");
             var apogeeapp = require("./apogee-npm-app.js");
-            var esprima = require("esprima");
+            
+            //any needs mode or theme files for the ace editor should go in the folder set below
+			var ace = require('ace-builds');
+			ace.config.set('basePath',"./ace_includes");
 
 			function init() {
                 apogeeapp.ui.initResourcePath("./resources");
