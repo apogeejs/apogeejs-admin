@@ -13,11 +13,23 @@
             gtag('config', 'UA-114935409-1');
         </script>
         <style>
-			.contentTest {
-				width: 500px;
-                height: 300px;
+			.fixedSizeContent {
 				outline: solid 1px gray;
 				margin: 10px;
+                background-color: #eee;
+                
+                padding: 0px;               
+				display: table;
+                position: relative;
+			}
+            
+            .resizableContent {
+                outline: solid 1px gray;
+                margin: 10px;
+                
+				width: 500px;
+                height: 300px;
+                padding: 0px;
 				display: table;
                 position: relative;
 			}
@@ -27,58 +39,36 @@
         <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/noconflict/ace.js"></script>
         <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
-        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.5/apogee-web-lib.min.js"></script>
-        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.5/apogee-web-app.min.js"></script>
-        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.5/apogee-web-cutnpaste.min.js"></script>
-        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.5/debugHook.js"></script>
-		<link rel="stylesheet" type="text/css" href="http://www.apogeejs.com/v0.8.5/apogeeapp.css">
-        <link rel="stylesheet" type="text/css" href="http://www.apogeejs.com/v0.8.5/apogeeui.css">
+        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.8/apogee-web-lib.min.js"></script>
+        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.8/apogee-web-app.min.js"></script>
+        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.8/apogee-web-cutnpaste.min.js"></script>
+        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.8/debugHook.js"></script>
+		<link rel="stylesheet" type="text/css" href="http://www.apogeejs.com/v0.8.8/apogeeapp.css">
+        <link rel="stylesheet" type="text/css" href="http://www.apogeejs.com/v0.8.8/apogeeui.css">
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
         
-        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.5/lib/modules/webApp/webAppAccess.js"></script>
+        <script type="text/javascript" src="webAppAccess.js"></script>
         
         <script>
-            var workspaceUrl = "BasicExample.json";
+            var workspaceUrl = "SimpleAppTestWorkspace.json";
             
             'use strict'
 			function init() {
-                //apogeeapp.ui.initResourcePath("../../resources");
-                
                 webAppAccess.initWebApp(workspaceUrl,onWorkspaceLoad)           
             }
               
             function onWorkspaceLoad() {
                 //load the UI controls
-                addDisplay("Model.plainValue","plainValueCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
-                addDisplay("Model.derivedValue","derivedValueCell",apogeeapp.app.JsonTableComponent.VIEW_DATA);
+                webAppAccess.addDisplay("Model.dataEntryForm","formCell",true);
+                webAppAccess.addDisplay("Model.output","outputCell",true);
             }
             
-            function addDisplay(memberName,parentElementId,optionalViewType) {
-                
-                var parentElement = document.getElementById(parentElementId);
-                if(!parentElement) {
-                    alert("DOM Element not found:" + parentElementId);
-                    return;
-                }
-
-                //show the display
-                var displayFrame = webAppAccess.getDisplayFrame(memberName,optionalViewType);
-                
-                //put the display element in the parent
-                var element = displayFrame.getElement();
-                parentElement.appendChild(element);
-                
-                //the display frame method "setIsShowing" must be called when
-                //the object is shown or hidden for proper operation
-                displayFrame.setIsShowing(true);
-            }
-              
         </script>
     </head>
-    <body onload="init()" onbeforeunload="return '[add a dirty flag check]'">
-        <h1>Plain Value</h1>
-        <div class="contentTest" id="plainValueCell"></div>
-        <h1>Derived Value</h1>
-        <div class="contentTest" id="derivedValueCell"></div>
+    <body onload="init()">
+        <h1>Input</h1>
+        <div id="formCell" class="fixedSizeContent"></div>
+        <h1>Stored Data</h1>
+        <div id="outputCell" class="resizableContent"></div>
     </body>
 </html>

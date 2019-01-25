@@ -18,7 +18,7 @@
         <link rel="stylesheet" type="text/css" href="http://www.apogeejs.com/v0.8.8/apogeeui.css">
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
         
-        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.8/lib/modules/webApp/webAppAccess.js"></script>
+        <script type="text/javascript" src="webAppAccess.js"></script>
         
         
         <script>
@@ -35,9 +35,6 @@
                                
                 //add the apogee content to the page
                 webAppAccess.initWebApp(workspaceUrl,onWorkspaceLoad);
-                
-                //opan a tab
-                openSettings();
             }
             
             //================================
@@ -46,33 +43,14 @@
             
             function onWorkspaceLoad() {
                 //load the UI controls
-                addDisplay("Model.settingsForm","settingsFormContainer",false);
-                addDisplay("Model.map","mapContainer",true);
-                addDisplay("Model.themeInput","inputTableContainer",false);
-                addDisplay("Model.propertyFunctions.themeTemplate","templateTableContainer",false);
+                webAppAccess.addDisplay("Model.settingsForm","settingsFormContainer",false);
+                webAppAccess.addDisplay("Model.map","mapContainer",true);
+                webAppAccess.addDisplay("Model.themeInput","inputTableContainer",false);
+                webAppAccess.addDisplay("Model.propertyFunctions.themeTemplate","templateTableContainer",false);
                 
-            }
-            
-            function addDisplay(memberName,parentElementId,isShowing,optionalViewType) {
+                //opan a tab
+                openSettings();
                 
-                var parentElement = document.getElementById(parentElementId);
-                if(!parentElement) {
-                    alert("DOM Element not found:" + parentElementId);
-                    return;
-                }
-
-                //show the display
-                var displayFrame = webAppAccess.getDisplayFrame(memberName,optionalViewType);
-                
-                //put the display element in the parent
-                var element = displayFrame.getElement();
-                parentElement.appendChild(element);
-                
-                //the display frame method "setIsShowing" must be called when
-                //the object is shown or hidden for proper operation
-                if(isShowing) {
-                    displayFrame.setIsShowing(true);
-                }
             }
             
             //================================
@@ -84,15 +62,13 @@
                 var displayFrame
                 //hide old if there is one
                 if(activeTabTableName) {
-                    displayFrame = webAppAccess.getDisplayFrame(activeTabTableName);
-                    if(displayFrame) displayFrame.setIsShowing(false);
+                    webAppAccess.setIsShowing(activeTabTableName,false);
                 }
                 
                 //set new one showing
                 activeTabTableName = tableName;
                 if(activeTabTableName) {
-                    displayFrame = webAppAccess.getDisplayFrame(activeTabTableName);
-                    if(displayFrame) displayFrame.setIsShowing(true);
+                    webAppAccess.setIsShowing(activeTabTableName,true);
                 }
             }
             
@@ -133,7 +109,7 @@
         <style>
             html {
                 height: calc(100% - 20px);
-                background-color: #ddd;
+                background-color: #fff;
                 padding: 10px;
                 position: relative;
             }
@@ -151,7 +127,7 @@
             }
             .gutter {
                 float: left;
-                background-color: #ddd;
+                background-color: #aaa;
                 cursor: ew-resize;
                 width: 10px;
                 height: 100%;
@@ -181,8 +157,8 @@
             
             .tab {
                 overflow: hidden;
-                border: 1px solid #999;
-                background-color: #bbb;
+                border: 1px solid #aaa;
+                background-color: #ccc;
             }
             .tab button {
                 background-color: inherit;
@@ -222,7 +198,7 @@
                 position: relative;
                 height: 300px;
                 width: 400px;
-                outline: 1px solid black;
+                outline: 1px solid #777;
                 background-color: #eee;
             }
             
