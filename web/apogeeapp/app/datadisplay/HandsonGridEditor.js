@@ -141,12 +141,13 @@ apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.DataDisplay {
                 rowHeaders: true,
                 colHeaders: true,
                 contextMenu: true,
-                //edit callbacks
-                afterChange:this.gridEdited,
+                //edit callbacks - I am using a delay on the grid edited because the table fires too many updates - one for 
+                //each row (soemthing like that I forget) on a big paste
+                afterChange:this.delayGridEdited,
                 afterCreateCol:this.delayGridEdited,
                 afterCreateRow:this.delayGridEdited,
-                afterRemoveCol:this.gridEdited,
-                afterRemoveRow:this.gridEdited
+                afterRemoveCol:this.delayGridEdited,
+                afterRemoveRow:this.delayGridEdited
             }
             this.gridEditable = true;
         }
