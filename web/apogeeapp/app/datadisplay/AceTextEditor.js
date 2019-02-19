@@ -18,18 +18,22 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
             "overflow":"auto"
         });
 
-        this.workingData = null;
+        this.uneditedData = null;
 
         var editor = ace.edit(this.editorDiv);
         editor.renderer.setShowGutter(true);
-        editor.setReadOnly(true);
+        //editor.setReadOnly(true);
         editor.setTheme("ace/theme/eclipse"); //good
         editor.getSession().setMode(aceMode); 
         editor.$blockScrolling = Infinity;
         this.editor = editor;
+        
+        //enter edit mode on change to the data
+        this.editor.addEventListener("input",() => this.checkStartEditMode());
 
+        //old
         //add click handle to enter edit mode
-        this.editorDiv.addEventListener("click",() => this.onTriggerEditMode());
+        //this.editorDiv.addEventListener("click",() => this.onTriggerEditMode());
     }
     
     getContent() {
@@ -50,15 +54,19 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
             //this.setError(errorMsg);
             text = errorMsg;
         }
+        
+        //record the set value so we know if we need to NOT do edit mode
+        this.uneditedValue = text;
         this.editor.getSession().setValue(text);
-//figure out how to handle this error
 
-        //set the background color
+        //set the edit mode and background color
         if(this.editOk) {
             this.editorDiv.style.backgroundColor = "";
+            this.editor.setReadOnly(false);
         }
         else {
             this.editorDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
+            this.editor.setReadOnly(true);
         }
     }
     
@@ -78,12 +86,20 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
     }
     
     endEditMode() {
-        this.editor.setReadOnly(true);
+        //this.editor.setReadOnly(true);
         super.endEditMode();
     }
     
     startEditMode() {
         super.startEditMode();
-        this.editor.setReadOnly(false);
+        //this.editor.setReadOnly(false);
+    }
+    
+    checkStartEditMode() {
+        if(!this.viewMode.isInEditMode()) {
+            if(this.getData() != this.uneditedValue) {
+                this.onTriggerEditMode();
+            }
+        }
     }
 }

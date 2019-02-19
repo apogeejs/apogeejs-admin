@@ -150,6 +150,10 @@ apogeeapp.app.ViewMode.prototype.endEditMode = function() {
     }
 }
 
+apogeeapp.app.ViewMode.prototype.isInEditMode = function() {
+    return this.inEditMode;
+}
+
 //-----------------------------------
 // Private
 //-----------------------------------
