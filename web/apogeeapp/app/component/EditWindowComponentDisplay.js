@@ -302,7 +302,8 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setViewType = function(viewTy
     if(this.viewModeElement) {
         var hideRequestResponse = this.viewModeElement.isCloseOk();
         
-        if(hideRequestResponse !== apogeeapp.app.ViewMode.CLOSE_OK) {
+        //UGH, I am accepting the predefined constant or the value "true". I should reconsider how this is done
+        if((hideRequestResponse !== apogeeapp.app.ViewMode.CLOSE_OK)&&(hideRequestResponse !== true)) {
             if(hideRequestResponse === apogeeapp.app.ViewMode.UNSAVED_DATA) {
                 alert("You must save or cancel the edit session to change the view mode.");
             }

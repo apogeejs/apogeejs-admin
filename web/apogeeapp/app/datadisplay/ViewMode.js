@@ -35,7 +35,7 @@ apogeeapp.app.ViewMode = function(componentDisplay, viewType) {
 
 //these are responses to hide request and close request
 apogeeapp.app.ViewMode.UNSAVED_DATA = -1;
-apogeeapp.app.ViewMode.CLOSE_OK = 0;
+apogeeapp.app.ViewMode.CLOSE_OK = 1;
 
 apogeeapp.app.ViewMode.VIEW_STATE_INACTIVE = 1;
 apogeeapp.app.ViewMode.VIEW_STATE_MINIMIZED = 2;
@@ -209,7 +209,8 @@ apogeeapp.app.ViewMode.prototype.setDisplayState = function() {
             
             if(destroyWindow) {
                 //destroy display, but only is hidine is ok
-                if(this.isCloseOk() === apogeeapp.app.ViewMode.CLOSE_OK) {
+                var closeOkResult = this.isCloseOk();
+                if((closeOkResult === apogeeapp.app.ViewMode.CLOSE_OK)||(closeOkResult === true)) {
                     this.destroyDataDisplay();
                 }
             }

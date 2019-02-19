@@ -161,7 +161,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
         if(this.resource.isCloseOk) {     
             this.isCloseOk = () => {
                 try {
-                    resource.isCloseOk.call(resource,this.outputElement,admin);
+                    return resource.isCloseOk.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     alert("Error in " + this.member.getFullName() + " isCloseOk function: " + error.message);
