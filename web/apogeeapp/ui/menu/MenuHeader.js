@@ -65,6 +65,11 @@ apogeeapp.ui.MenuHeader.prototype.removeMenuItem = function(title) {
 	this.menuBody.removeMenuItem(title);
 }
 
+/** this adds a menu item that dispatchs the given event when clicked. */
+apogeeapp.ui.MenuHeader.prototype.removeAllMenuItems = function() {
+	this.menuBody.removeAllMenuItems();
+}
+
 /** This sets a callback to create the menu when the menu is opened. This is
  * for static menus where we do not want to populate it ahead of time. */
 apogeeapp.ui.MenuHeader.prototype.setAsOnTheFlyMenu = function(getMenuItemsCallback) {

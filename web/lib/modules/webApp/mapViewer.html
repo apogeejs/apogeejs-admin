@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Apogee Sample Client App - OSM GeoJSON Generator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.9/split.min.js"></script>
+        
+        
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/noconflict/ace.js"></script>
+        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
+        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.8/apogee-web-lib.min.js"></script>
+        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.8/apogee-web-app.min.js"></script>
+        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.8/apogee-web-cutnpaste.min.js"></script>
+        <script type="text/javascript" src="http://www.apogeejs.com/v0.8.8/debugHook.js"></script>
+		<link rel="stylesheet" type="text/css" href="http://www.apogeejs.com/v0.8.8/apogeeapp.css">
+        <link rel="stylesheet" type="text/css" href="http://www.apogeejs.com/v0.8.8/apogeeui.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
+        
+        <script type="text/javascript" src="webAppAccess.js"></script>
+        
+        
+        <script>
+            //split panel docs: https://github.com/nathancahill/split/tree/master/packages/splitjs#installation
+            
+            var workspaceUrl = "OsmGeoJSON.json";
+            
+            /** initialize the page */
+            function init() {
+                Split(['#leftPanel', '#rightPanel'], {
+                    sizes: [25, 75],
+                    minSize: 200,
+                })
+                               
+                //add the apogee content to the page
+                webAppAccess.initWebApp(workspaceUrl,onWorkspaceLoad);
+            }
+            
+            //================================
+            // Tab funtionality
+            //================================
+            
+            function onWorkspaceLoad() {
+                //load the UI controls
+                webAppAccess.addDisplay("Model.settingsForm","settingsFormContainer",false);
+                webAppAccess.addDisplay("Model.map","mapContainer",true);
+                webAppAccess.addDisplay("Model.themeInput","inputTableContainer",false);
+                webAppAccess.addDisplay("Model.propertyFunctions.themeTemplate","templateTableContainer",false);
+                
+                //opan a tab
+                openSettings();
+                
+            }
+            
+            //================================
+            // Tab funtionality
+            //================================
+            var activeTabTableName = null;
+            
+            function updateShownTable(tableName) {
+                var displayFrame
+                //hide old if there is one
+                if(activeTabTableName) {
+                    webAppAccess.setIsShowing(activeTabTableName,false);
+                }
+                
+                //set new one showing
+                activeTabTableName = tableName;
+                if(activeTabTableName) {
+                    webAppAccess.setIsShowing(activeTabTableName,true);
+                }
+            }
+            
+            function openSettings() {
+                openTab("settings");
+                updateShownTable("Model.settingsForm");
+            }
+            
+            function openInput() {
+                openTab("input");
+                updateShownTable("Model.themeInput");
+            }
+            
+            function openTemplate() {
+                openTab("template");
+                updateShownTable("Model.propertyFunctions.themeTemplate");
+            }
+            
+            function openAbout() {
+                openTab("about");
+                updateShownTable(null);
+            }
+            
+            function openTab(tabName) {
+                var i, tabcontent, tablinks;
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                  tabcontent[i].style.display = "none";
+                }
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                  tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                document.getElementById("tab_" + tabName).style.display = "block";
+                document.getElementById("tabLink_" + tabName).className += " active";
+            }
+        </script>
+        <style>
+            html {
+                height: calc(100% - 20px);
+                background-color: #fff;
+                padding: 10px;
+                position: relative;
+            }
+            body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            
+            /* split panel styles */
+            
+            #leftPanel, #rightPanel {
+                float: left;
+                height: 100%;
+            }
+            .gutter {
+                float: left;
+                background-color: #aaa;
+                cursor: ew-resize;
+                width: 10px;
+                height: 100%;
+            }
+            .split-parent {
+                height: 100%;
+                background-color: white;
+            }
+            .split-parent:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+            .content {
+                margin: 10px;
+                height: calc(100% - 20px);
+            }
+            #tabContainer {
+                height: 100%;
+            }
+            #mapContainer {
+                height: 100%;
+                position: relative;
+            }
+
+            /* tab styles */
+            
+            .tab {
+                overflow: hidden;
+                border: 1px solid #aaa;
+                background-color: #ccc;
+            }
+            .tab button {
+                background-color: inherit;
+                float: left;
+                border: none;
+                outline: none;
+                cursor: pointer;
+                padding: 5px 10px;
+                transition: 0.3s;
+                font-size: 14px;
+            }
+            .tab button:hover {
+                background-color: #ddd;
+            }
+            .tab button.active {
+                background-color: #fff;
+            }
+            .tabcontent {
+                display: none;
+                height: calc(100% - 28px);
+            }
+            .scrollingContent {
+                height: 100%;
+                position: relative;
+                overflow: auto;
+            }
+            .nonScrollingContent {
+                height: 100%;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            #settingsTabContent {
+                padding: 15px;
+            }
+            #settingsFormContainer {
+                position: relative;
+                height: 300px;
+                width: 400px;
+                outline: 1px solid #777;
+                background-color: #eee;
+            }
+            
+            
+
+        </style>
+    </head>
+    <body onload="init()">
+        <div class="split-parent">
+            <div id="leftPanel">
+                <div id="tabContainer">
+                    <div class="tab">
+                        <button id="tabLink_settings" class="tablinks" onclick="openSettings()">Settings</button>
+                        <button id="tabLink_input" class="tablinks" onclick="openInput()">Input</button>
+                        <button id="tabLink_template" class="tablinks" onclick="openTemplate()">Input Template</button>
+                        <button id="tabLink_about" class="tablinks" onclick="openAbout()">About</button>
+                    </div>
+                    <div id="tab_settings" class="tabcontent">
+                        <div id="settingsTabContent" class="scrollingContent">
+                            <div id="settingsFormContainer">
+                            </div>
+                            <h3>Settings Help</h3>
+                            <ul>
+                                <li><b>Content</b> - This selection determines what content is placed in the GeoJSON
+                                    <ul>
+                                        <li><b>All</b> - All content in the downloaded OSM file is added to the GeoJSON. This setting is primarily 
+                                            intended for review of the data before you select the data to include.</li>
+                                        <li><b>Selected</b> - Only the content filtered from the table on the <em>Input</em> tab is places in the GeoJSON.</li>
+                                    </ul>
+                                </li>
+                                <li><b>Theme</b> - This selection determines how the data on the preview map is rendered. 
+                                    <ul>
+                                        <li><b>Default</b> - No styling information is passed to the map. It id rendered with the default leaflet
+                                            GeoJSON styling.</li>
+                                        <li><b>Theme Input</b> - The map is rendered with styling information added to the <em>Input</em> tab.</li>
+                                    </ul>
+                                </li>
+                                <li><b>Keys of Interest</b> - To help generating the input information for the <em>Input</em> tab, a input template is given
+                                    on the <em>Input Template</em> tab. This is composed of all the keys of interest placed here, along with all the 
+                                    associated values from the downloaded data. (This will not change the input values or the map display.)
+                                </li>
+                            </ul>
+                            <p>See the <em>About</em> tab for information on the <em>Input</em> tab and the <em>Input Template</em> tab.
+                        </div>   
+                    </div>
+
+                    <div id="tab_input" class="tabcontent">
+                        <div id="inputTableContainer" class="nonScrollingContent">
+                            
+                        </div>                        
+                    </div>
+
+                    <div id="tab_template" class="tabcontent">
+                        <div  id="templateTableContainer" class="nonScrollingContent">
+                            
+                        </div> 
+                    </div>
+                    
+                    <div id="tab_about" class="tabcontent">
+                        <div class="scrollingContent">
+                            <h3>About</h3>
+                            <p>This is the info on how to use.</p>
+                            <h3>Paris</h3>
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                            <p>Paris is the capital of France.</p> 
+                        </div> 
+                    </div>
+                </div>
+            </div>
+            <div id="rightPanel">
+                <div id="mapContainer"></div>
+            </div>
+        </div>
+    </body>
+</html>

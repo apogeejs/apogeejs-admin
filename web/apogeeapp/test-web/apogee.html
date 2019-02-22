@@ -6,8 +6,11 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/noconflict/ace.js"></script>
         <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/6.2.0/handsontable.full.min.js"></script>
+        <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>-->
 
+        <script type="text/javascript" src="require.js"></script>
+        
         <script type="text/javascript" src="/supplemental/webLibHeader.js"></script>
 		<script type="text/javascript" src="/apogee/apogee.js"></script>        
         <script type="text/javascript" src="/apogee/lib/base.js"></script>
@@ -81,8 +84,14 @@
         <script type="text/javascript" src="/apogeeapp/ui/configurablepanel/elements/HTMLDisplayElement.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/Apogee.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/WorkspaceUI.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/BaseFileAccess.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/references/LinkLoader.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/references/ReferenceManager.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/references/LinkEntry.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/references/ReferenceEntry.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/references/JsScriptEntry.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/references/CssEntry.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/references/AmdModuleEntry.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/references/NpmModuleEntry.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/component/WindowHeaderManager.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/component/Component.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/component/ParentComponent.js"></script>
@@ -128,10 +137,11 @@
         <script type="text/javascript" src="/apogeeapp/app/datadisplay/ConfigurableFormDisplay.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/datadisplay/ErrorDisplay.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/dialogs/ConfigurableDialog.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/dialogs/TextIoDialog.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/dialogs/SelectControlDialog.js"></script>
         
-        <script type="text/javascript" src="/supplemental/cutNPasteCode/file_impl_cutnpaste.js"></script>
+        <script type="text/javascript" src="/supplemental/cutNPasteCode/CutNPasteAppConfigManager.js"></script>
+        <script type="text/javascript" src="/supplemental/cutNPasteCode/CutNPasteFileAccess.js"></script>
+        <script type="text/javascript" src="/supplemental/cutNPasteCode/TextIoDialog.js"></script>
         
         <script type="text/javascript" src="/supplemental/debugHook.js"></script>
         
@@ -144,9 +154,11 @@
         <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/splitpane/SplitPane.css">
         <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/tabframe/TabFrame.css">
         <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/treecontrol/TreeControl.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/configurablepanel/ConfigurablePanel.css">           
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/configurablepanel/ConfigurablePanel.css">     
+        
           
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/6.2.0/handsontable.full.min.css">
+        <!--<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">-->
         
 		<script>
             'use strict'
@@ -154,8 +166,11 @@
                 //initialize resource path
                 apogeeapp.ui.initResourcePath("/resources");
                 
+                //use cutnpaste file access
+                var appConfigManager = new apogeeapp.app.CutNPasteAppConfigManager();
+                
                 //create the application
-                apogeeapp.app.Apogee.createApp("appContainer"); 
+                apogeeapp.app.Apogee.createApp("appContainer",appConfigManager); 
             }
             
             function beforeUnloadHandler() {

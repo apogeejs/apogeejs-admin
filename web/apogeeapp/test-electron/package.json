@@ -6,7 +6,8 @@
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "~3.0.0"
+    "electron": "~3.0.0",
+	"leaflet": "~1.0.1"
   },
   "author": "Dave Sutter"
 }

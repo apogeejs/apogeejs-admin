@@ -2,6 +2,7 @@
 apogeeapp.app.WorkspaceUI = function() {
 
     this.workspace = null;
+    this.fileMetadata = null;
 	
     //properties
 	this.app = null;
@@ -224,6 +225,19 @@ apogeeapp.app.WorkspaceUI.prototype.workspaceUpdated = function() {
 // open and save methods
 //====================================
 
+/** This should be set to store file source info, for saving the file. 
+ * The format is arbitrary except it should hold one field "saveOK, which 
+ * will be used to enable the menu option to save the file to the same source from
+ * which it was opened.*/
+apogeeapp.app.WorkspaceUI.prototype.setFileMetadata = function(fileMetadata) {
+    this.fileMetadata = fileMetadata;
+}
+
+/** This retrieves the file metadata used to save the file. */
+apogeeapp.app.WorkspaceUI.prototype.getFileMetadata = function() {
+    return this.fileMetadata;
+}
+
 /** This saves the workspace. It the optionalSavedRootFolder is passed in,
  * it will save a workspace with that as the root folder. */
 apogeeapp.app.WorkspaceUI.prototype.toJson = function(optionalSavedRootFolder) {
@@ -349,8 +363,8 @@ apogeeapp.app.WorkspaceUI.prototype.getMenuItems = function() {
 // Links
 //========================================
 
-apogeeapp.app.WorkspaceUI.prototype.loadReferences = function(referencesJson) {
-    return this.referencesManager.openEntries(referencesJson);
+apogeeapp.app.WorkspaceUI.prototype.getLoadReferencesPromise = function(referencesJson) {
+    return this.referencesManager.getOpenEntriesPromise(referencesJson);
 }
 
 //==================================
@@ -362,26 +376,27 @@ apogeeapp.app.WorkspaceUI.prototype.showDependencies = function() {
 }
 
 apogeeapp.app.WorkspaceUI.prototype.createDependencies = function() {
-    var memberInfo = [];
+    var memberInfo = {};
     
     for(var key in this.componentMap) {
         var componentInfo = this.componentMap[key];
-        if((componentInfo)&&(componentInfo.member)&&(componentInfo.member.isCodeable)) {
+        if((componentInfo)&&(componentInfo.member)) {
             
             
             var member = componentInfo.member;
             
             var memberStruct = {};
-            memberStruct.member = member.getFullName();
-            memberStruct.memberType = member.generator.type;
+            memberStruct.type = member.generator.type;
+            var parent = member.getParent();
+            memberStruct.parent = parent ? parent.getFullName() : null;
             
             if(member.isDependent) {
                 if(member.getDependsOn().length > 0) {
-                    memberStruct.dependsOn = member.getDependsOn().map(dependency => dependency.getFullName());
+                    memberStruct.dep = member.getDependsOn().map(dependency => dependency.getFullName());
                 }
             }
             
-            memberInfo.push(memberStruct);
+            memberInfo[member.getFullName()] = memberStruct;
         }
     }
     

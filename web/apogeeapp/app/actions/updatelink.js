@@ -1,21 +1,5 @@
 apogeeapp.app.updatelink = {};
 
-apogeeapp.app.updatelink.DIALOG_LAYOUT_ADD_JS_TITLE_LINE = {
-    "type": "title",
-    "title": "Add JS Link"
-};
-apogeeapp.app.updatelink.DIALOG_LAYOUT_ADD_CSS_TITLE_LINE = {
-    "type": "title",
-    "title": "Add CSS Link"
-};
-apogeeapp.app.updatelink.DIALOG_LAYOUT_UPDATE_JS_TITLE_LINE = {
-    "type": "title",
-    "title": "Update JS Link"
-};
-apogeeapp.app.updatelink.DIALOG_LAYOUT_UPDATE_CSS_TITLE_LINE = {
-    "type": "title",
-    "title": "Update CSS Link"
-};
 apogeeapp.app.updatelink.DIALOG_LAYOUT_URL_LINE = {
     "type": "inputElement",
     "heading": "URL: ",
@@ -41,16 +25,14 @@ apogeeapp.app.updatelink.DIALOG_LAYOUT_SUBMIT_LINE = {
 //itemInfo.callback = apogeeapp.app.updatelink.getAddLinkCallback(this,linkType);
 
 /** This method gets a callback to update the properties of a workspace. */
-apogeeapp.app.updatelink.getAddLinkCallback = function(referencesUI,linkType) {
+apogeeapp.app.updatelink.getAddLinkCallback = function(referencesUI,entryTypeInfo) {
     
     var createCallback = function() {
         
-        var initialValues = {};
-        
         //create the dialog layout 
-        var titleLine = (linkType == apogeeapp.app.LinkEntry.LINK_TYPE_JS) ? 
-            apogeeapp.app.updatelink.DIALOG_LAYOUT_ADD_JS_TITLE_LINE :
-            apogeeapp.app.updatelink.DIALOG_LAYOUT_ADD_CSS_TITLE_LINE;
+        var titleLine = {};
+        titleLine.type = "title";
+        titleLine.title = entryTypeInfo.ADD_ENTRY_TEXT
     
         var dialogLayout = {};
         dialogLayout.lines = [];
@@ -72,7 +54,7 @@ apogeeapp.app.updatelink.getAddLinkCallback = function(referencesUI,linkType) {
             var entryJson = {};
             entryJson.url = newValues.url;
             entryJson.nickname = newValues.nickname;
-            entryJson.entryType = linkType;
+            entryJson.entryType = entryTypeInfo.REFERENCE_TYPE;
             var promise = referencesUI.addEntry(entryJson);
             
             promise.catch(errorMsg => {alert("There was an error loading the link: " + errorMsg);});
@@ -90,19 +72,22 @@ apogeeapp.app.updatelink.getAddLinkCallback = function(referencesUI,linkType) {
 }
 
 /** This method gets a callback to update the properties of a workspace. */
-apogeeapp.app.updatelink.getUpdateLinkCallback = function(linkEntry) {
+apogeeapp.app.updatelink.getUpdateLinkCallback = function(referenceEntry) {
     
     var createCallback = function() {
         
         var initialValues = {};
-        initialValues.url = linkEntry.getUrl();
-        initialValues.nickname = linkEntry.getNickname();
+        initialValues.url = referenceEntry.getUrl();
+        initialValues.nickname = referenceEntry.getNickname();
         if(initialValues.nickname == initialValues.url) initialValues.nickname = "";
         
+        var entryTypeInfo = referenceEntry.getTypeInfo();
+        
         //create the dialog layout
-        var titleLine = (linkEntry.getEntryType() == apogeeapp.app.LinkEntry.LINK_TYPE_JS) ? 
-            apogeeapp.app.updatelink.DIALOG_LAYOUT_UPDATE_JS_TITLE_LINE :
-            apogeeapp.app.updatelink.DIALOG_LAYOUT_UPDATE_CSS_TITLE_LINE;
+        var titleLine = {};
+        titleLine.type = "title";
+        titleLine.title = entryTypeInfo.UPDATE_ENTRY_TEXT;
+        
         var urlLine = apogee.util.jsonCopy(apogeeapp.app.updatelink.DIALOG_LAYOUT_URL_LINE);
         urlLine.initial = initialValues.url;
         var nicknameLine = apogee.util.jsonCopy(apogeeapp.app.updatelink.DIALOG_LAYOUT_NICKNAME_LINE);
@@ -125,7 +110,7 @@ apogeeapp.app.updatelink.getUpdateLinkCallback = function(linkEntry) {
             }
             
             //not sure what to do with promise
-            linkEntry.updateData(newValues.url,newValues.nickname);
+            referenceEntry.updateData(newValues.url,newValues.nickname);
 
             //return true to close the dialog
             return true;
@@ -141,7 +126,7 @@ apogeeapp.app.updatelink.getUpdateLinkCallback = function(linkEntry) {
 
 
 /** This method gets a callback to update the properties of a workspace. */
-apogeeapp.app.updatelink.getRemoveLinkCallback = function(linkEntry) {
+apogeeapp.app.updatelink.getRemoveLinkCallback = function(referenceEntry) {
     
     var createCallback = function() {
 
@@ -149,7 +134,7 @@ apogeeapp.app.updatelink.getRemoveLinkCallback = function(linkEntry) {
         
         //create on submit callback
         if(doDelete) {
-            linkEntry.remove();
+            referenceEntry.remove();
         }
         
     }

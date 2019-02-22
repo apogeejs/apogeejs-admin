@@ -1,13 +1,16 @@
 {
   "name"    : "apogeejs",
-  "version" : #SET_THIS#,
+  "version" : "0.8.9",
   "main"    : "main.js",
   "scripts": {
     "start": "electron ."
   },
   "devDependencies": {
     "electron": "~3.0.0",
-	"esprima": "~2.7.2"
+	"esprima": "~2.7.2",
+    "handsontable": "~6.2.0",
+    "ace-builds": "~1.4.2",
+    "core-js": "~2.5.7"
   },
   "author": "Dave Sutter"
 }

@@ -1,17 +1,24 @@
 
-/** This class manages links and other reference entries.*/
+/** This class manages links and other reference entries, loading the references and
+ * creating the UI tree elements for display of the references.
+ * 
+ * Any links needed for the page are managed externally by the Link Loader, which
+ * allows multiple users to request the same link.
+ */
 apogeeapp.app.ReferenceManager = function() {
     
     this.referencesTreeEntry = null;
     this.state = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NORMAL;
     
+    //references
     this.referenceLists = {};
-    var jsInfo = apogeeapp.app.LinkEntry.JS_LINK_LIST_INFO;
-    var cssInfo = apogeeapp.app.LinkEntry.CSS_LINK_LIST_INFO;
-    this.referenceLists[jsInfo.typeName] = this.getListStruct(jsInfo);
-    this.referenceLists[cssInfo.typeName] = this.getListStruct(cssInfo);
+    if(__APOGEE_ENVIRONMENT__ == "WEB") this.referenceLists[apogeeapp.app.AmdModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(apogeeapp.app.AmdModuleEntry.REFERENCE_TYPE_INFO);
+    if(__APOGEE_ENVIRONMENT__ == "NODE") this.referenceLists[apogeeapp.app.NpmModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(apogeeapp.app.NpmModuleEntry.REFERENCE_TYPE_INFO);
+    this.referenceLists[apogeeapp.app.JsScriptEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(apogeeapp.app.JsScriptEntry.REFERENCE_TYPE_INFO);
+    this.referenceLists[apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO);
 }
 
+/** This returns the tree entry to display the reference entry for this reference manager. */
 apogeeapp.app.ReferenceManager.prototype.getTreeEntry = function(createIfMissing) {
     if((createIfMissing)&&(!this.referencesTreeEntry)) {
         this.referencesTreeEntry = this.instantiateTreeEntry();
@@ -23,16 +30,18 @@ apogeeapp.app.ReferenceManager.prototype.getTreeEntry = function(createIfMissing
  * the save call. It returns a promise that
  * resolves when all entries are loaded. 
  */
-apogeeapp.app.ReferenceManager.prototype.openEntries = function(referencesJson) {
+apogeeapp.app.ReferenceManager.prototype.getOpenEntriesPromise = function(referencesJson) {
 
     var entryPromises = [];
     
     var loadEntry = entryJson => {
         var listStruct = this.referenceLists[entryJson.entryType];
         
+        if(!listStruct) throw new Error("Entry type nopt found: " + entryJson.entryType);
+        
         //load this url if it doesn't exist
         if(!listStruct.listEntries.some( listEntry => (listEntry.url == entryJson.url) )) {
-            var referenceEntry = listStruct.listInfo.createEntryFunction(this,entryJson);
+            var referenceEntry = listStruct.typeInfo.createEntryFunction(this,entryJson);
             var promise = referenceEntry.loadEntry();
             entryPromises.push(promise);
         }
@@ -70,11 +79,14 @@ apogeeapp.app.ReferenceManager.prototype.addEntry = function(entryJson) {
     //check if these object exist - if so, don't add them
  
     var listStruct = this.referenceLists[entryJson.entryType];
-    var referenceEntry = listStruct.listInfo.createEntryFunction(this,entryJson);
+    
+    if(!listStruct) throw new Error("Entry type nopt found: " + entryJson.entryType);
+    
+    var referenceEntry = listStruct.typeInfo.createEntryFunction(this,entryJson);
     return referenceEntry.loadEntry();
 }
 
-/** This method should be called when the workspace is closed. It removes all links. 
+/** This method should be called when the parent is closed. It removes all links. 
  */
 apogeeapp.app.ReferenceManager.prototype.close = function() {
     for(var listType in this.referenceLists) {
@@ -137,9 +149,9 @@ apogeeapp.app.ReferenceManager.prototype.entryRemoved= function(referenceEntry) 
 
 apogeeapp.app.ReferenceManager.REFERENCES_ICON_PATH = "/componentIcons/references.png";
 
-apogeeapp.app.ReferenceManager.prototype.getListStruct = function(listInfo) {
+apogeeapp.app.ReferenceManager.prototype.getListStruct = function(typeInfo) {
     var listStruct = {};
-    listStruct.listInfo = listInfo;
+    listStruct.typeInfo = typeInfo;
     listStruct.listEntries = [];
     listStruct.treeEntry = null;
     listStruct.state = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NORMAL;
@@ -155,6 +167,7 @@ apogeeapp.app.ReferenceManager.prototype.instantiateTreeEntry = function() {
     //add child lists
     for(var childKey in this.referenceLists) {
         var childStruct = this.referenceLists[childKey];
+        
         this.addListTreeEntry(treeEntry,childStruct);
     }
     
@@ -165,10 +178,10 @@ apogeeapp.app.ReferenceManager.prototype.instantiateTreeEntry = function() {
 }
 
 apogeeapp.app.ReferenceManager.prototype.addListTreeEntry = function(referenceTreeEntry,childStruct) {
-    var listInfo = childStruct.listInfo;
-    var iconUrl = apogeeapp.ui.getResourcePath(listInfo.listIconPath);
-    var menuItemCallback = () => this.getListMenuItems(listInfo);
-    var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(listInfo.listName, iconUrl, null, menuItemCallback, false);
+    var typeInfo = childStruct.typeInfo;
+    var iconUrl = apogeeapp.ui.getResourcePath(typeInfo.LIST_ICON_PATH);
+    var menuItemCallback = () => this.getListMenuItems(typeInfo);
+    var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(typeInfo.LIST_NAME, iconUrl, null, menuItemCallback, false);
     
     //add existing child entries
     for(var childKey in childStruct.listEntries) {
@@ -186,14 +199,14 @@ apogeeapp.app.ReferenceManager.prototype.addListTreeEntry = function(referenceTr
 
 
 /** @private */
-apogeeapp.app.ReferenceManager.prototype.getListMenuItems = function(listInfo) {
+apogeeapp.app.ReferenceManager.prototype.getListMenuItems = function(typeInfo) {
     //menu items
     var menuItemList = [];
 
     //add the standard entries
     var itemInfo = {};
-    itemInfo.title = listInfo.addEntryText;
-    itemInfo.callback = () => listInfo.addEntry(this);
+    itemInfo.title = typeInfo.ADD_ENTRY_TEXT;
+    itemInfo.callback = apogeeapp.app.updatelink.getAddLinkCallback(this,typeInfo);
     menuItemList.push(itemInfo);
     
     return menuItemList;
@@ -279,7 +292,7 @@ apogeeapp.app.ReferenceManager.prototype.getListState = function(listStruct) {
 apogeeapp.app.ReferenceManager.nextId = 1;
 
 /** This method generates a member ID for the member. It is only valid
- * for the duration the workspace is opened. It is not persisted.
+ * for the duration the application is opened. It is not persisted.
  * @private
  */
 apogeeapp.app.ReferenceManager._createId = function() {

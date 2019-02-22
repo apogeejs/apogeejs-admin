@@ -63,7 +63,7 @@ apogeeapp.app.CustomComponent.VIEW_CODE = "Input Code";
 apogeeapp.app.CustomComponent.VIEW_SUPPLEMENTAL_CODE = "Input Private";
 apogeeapp.app.CustomComponent.VIEW_HTML = "HTML";
 apogeeapp.app.CustomComponent.VIEW_CSS = "CSS";
-apogeeapp.app.CustomComponent.VIEW_UI_CODE = "uiGenerator(mode)";
+apogeeapp.app.CustomComponent.VIEW_UI_CODE = "uiGenerator()";
 apogeeapp.app.CustomComponent.VIEW_DESCRIPTION = "Notes";
 
 apogeeapp.app.CustomComponent.VIEW_MODES = [

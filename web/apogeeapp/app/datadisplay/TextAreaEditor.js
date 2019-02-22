@@ -13,12 +13,11 @@ apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.DataDisplay {
             "overflow":"auto"
         });
         this.textArea = textArea;
-        this.textArea.readOnly = true;
 
         this.workingData = null;
 
-        //add click handle to enter edit mode
-        this.textArea.addEventListener("click",() => this.onTriggerEditMode());
+        //enter edit mode on change to the data
+        this.textArea.addEventListener("input",() => this.checkStartEditMode());
     }
     
     getContent() {
@@ -34,25 +33,34 @@ apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.DataDisplay {
     }
     
     setData(text) {
+        this.uneditedValue = text;
         this.textArea.value = text;
 
         //set the background color
         if(this.editOk) {
             this.textArea.style.backgroundColor = "";
+            this.textArea.readOnly = false;
         }
         else {
             this.textArea.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
+            this.textArea.readOnly = true;
         }
     }
  
     endEditMode() {
-        this.textArea.readOnly = true;
         super.endEditMode();
     }
     
     startEditMode() {
         super.startEditMode();
-        this.textArea.readOnly = false;
+    }
+    
+    checkStartEditMode() {
+        if(!this.viewMode.isInEditMode()) {
+            if(this.getData() != this.uneditedValue) {
+                this.onTriggerEditMode();
+            }
+        }
     }
 }
 

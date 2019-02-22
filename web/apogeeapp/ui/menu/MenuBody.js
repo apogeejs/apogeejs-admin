@@ -182,6 +182,13 @@ apogeeapp.ui.MenuBody.prototype.removeMenuItem = function(title) {
     }
 }
 
+/** this adds a menu item that dispatchs the given event when clicked. */
+apogeeapp.ui.MenuBody.prototype.removeAllMenuItems = function() {
+    for(var title in this.menuItems) {
+        this.removeMenuItem(title);
+    }
+}
+
 //================================
 // Internal
 //================================

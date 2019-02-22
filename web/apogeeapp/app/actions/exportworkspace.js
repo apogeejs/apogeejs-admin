@@ -8,7 +8,7 @@ apogeeapp.app.exportworkspace = {};
 
 
 /** This gets a callback to add a component. */
-apogeeapp.app.exportworkspace.getExportCallback = function(app) {
+apogeeapp.app.exportworkspace.getExportCallback = function(app,fileAccessObject) {
     
     var exportCallback = function() {
         //get the active workspace
@@ -38,7 +38,7 @@ apogeeapp.app.exportworkspace.getExportCallback = function(app) {
                 return;
             }
 
-            apogeeapp.app.saveworkspace.showSaveDialog(workspaceText);
+            fileAccessObject.showSaveDialog(null,workspaceText,null);
             
             //return true to close the dialog
             return true;

@@ -148,7 +148,7 @@ apogeeapp.ui.ConfigurableElement = class {
             if(!parentElement) throw new Error("Parent element " + elementInitData.selector.parentKey + " not found for selectable child element " + elementInitData.key);
             if(!parentElement.setChildState) throw new Error("Parent element " + elementInitData.selector.parentKey + " does not support selection of a child element - in element = " + elementInitData.key);
             
-            parentElement.addSelectionChild(this,elementInitData.selector.parentValue,elementInitData.keepActiveOnHide);
+            parentElement.addSelectionChild(this,elementInitData.selector.parentValue,elementInitData.selector.keepActiveOnHide);
         }
     }
     

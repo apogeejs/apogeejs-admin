@@ -46,7 +46,9 @@ apogeeapp.ui.PlainFrame.prototype.setHeaderContent = function(contentElement) {
 /** This sets the content for the window. The content type
  *  can be:
  *  apogeeapp.ui.RESIZABLE - for this content, the content is resized to fit the plane frame. The place frame should be initialized with a size.
- *  apogeeapp.ui.FIXED_SIZE - for this content, the plain frame is sized to fit the content. ITs size should not be externally set.  */
+ *  apogeeapp.ui.FIXED_SIZE - for this content, the plain frame is sized to fit the content. ITs size should not be externally set.
+ *  apogeeapp.ui.SIZE_WINDOW_TO_CONTENT - this is not a content type but a input option for content FIXED_SIZE that shrinks the window to fit the content. It is typically only used for dialog boxes so isn't really relevent here.
+ */
 apogeeapp.ui.PlainFrame.prototype.setContent = function(contentElement,elementType) {
     
     apogeeapp.ui.removeAllChildren(this.bodyCell);
@@ -57,6 +59,9 @@ apogeeapp.ui.PlainFrame.prototype.setContent = function(contentElement,elementTy
        bodyClassName = "visiui-dnh-fixed";
     }
     else if(elementType == apogeeapp.ui.FIXED_SIZE) {
+        bodyClassName = "visiui-dnh-shrink-to-fit";
+    }
+    else if(elementType == apogeeapp.ui.SIZE_WINDOW_TO_CONTENT) {
         bodyClassName = "visiui-dnh-shrink-to-fit";
     }
     else {
@@ -87,7 +92,7 @@ apogeeapp.ui.PlainFrame.prototype.safeRemoveContent = function(contentElement) {
 // WINDOW CHILD
 //---------------------------
 
-/** This method returns true if the window is showing. */
+/** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
 apogeeapp.ui.PlainFrame.prototype.setIsShowing = function(isShowing) {
     if(isShowing) {
         if(!this.isShowing) {
@@ -99,6 +104,11 @@ apogeeapp.ui.PlainFrame.prototype.setIsShowing = function(isShowing) {
         this.isShowing = false;
         this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,this);
     }
+}
+
+/** This method should be called if the plain frame container is resized.. */
+apogeeapp.ui.PlainFrame.prototype.onResize = function() {
+    this.dispatchEvent(apogeeapp.ui.RESIZED_EVENT,this);
 }
 
 /** This method returns true if the window is showing. */

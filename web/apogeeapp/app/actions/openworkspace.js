@@ -5,38 +5,33 @@ apogeeapp.app.openworkspace = {};
 // UI Entry Point
 //=====================================
 
-apogeeapp.app.openworkspace.getOpenCallback = function(app) {
+apogeeapp.app.openworkspace.getOpenCallback = function(app,fileAccessObject) {
     return function() {
-    
+
         //make sure there is not an open workspace
         if(app.getWorkspaceUI()) {
-            alert("There is already an open workspace. You must close the workspace first.");
+            alert("There is an open workspace. You must close the workspace first.");
             return;
-        }
-    
-        var onOpen = function(err,workspaceData,workspaceHandle) {
-            
-            if(err) {
-                alert("Error: " + err.message);
-            }
-            else {
-                var actionCompletedCallback = function(actionResponse) {
-                    if(!actionResponse.getSuccess()) {
-                        apogeeapp.app.errorHandling.handleActionError(actionResponse);
-                    }
-                };
-
-                //open workspace
-                apogeeapp.app.openworkspace.openWorkspace(app,workspaceData,workspaceHandle,actionCompletedCallback);
-            }
         }    
-        
-        apogeeapp.app.openworkspace.openFile(onOpen);
+
+        fileAccessObject.openFile(app,apogeeapp.app.openworkspace.onOpen);
     }
 }
 
-//THIS FUNCTION MUST BE IMPLEMENTED!
-//apogeeapp.app.openworkspace.openFile(onOpen);
+/** This method should be called when workspace data is opened, to create the workspace. */
+apogeeapp.app.openworkspace.onOpen = function(err,app,workspaceData,fileMetadata) {
+
+    if(err) {
+        var actionResponse = new apogee.ActionResponse();
+        var actionError = apogee.ActionError.processException(err,apogee.ActionError.ERROR_TYPE_USER,false);
+        actionResponse.addError(actionError);
+        apogeeapp.app.errorHandling.handleActionError(actionResponse);
+    }
+    else {
+        //open workspace
+        apogeeapp.app.openworkspace.openWorkspace(app,workspaceData,fileMetadata);
+    }
+}
 
 //=====================================
 // Action
@@ -46,9 +41,8 @@ apogeeapp.app.openworkspace.getOpenCallback = function(app) {
 /** This method opens an workspace, from the text file. 
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
-apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspaceHandle,actionCompletedCallback) {
+apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,fileMetadata) {
     var actionResponse = new apogee.ActionResponse();
-    var name;
     var workspaceUIAdded;
     
     try {
@@ -66,23 +60,29 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
         workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
     
         var referencesJson = workspaceJson.references;
-        var loadReferencesPromise = workspaceUI.loadReferences(referencesJson);
+        var loadReferencesPromise = workspaceUI.getLoadReferencesPromise(referencesJson);
     	
 		//if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {
             workspaceUI.load(workspaceJson);
-            actionCompletedCallback(actionResponse);
+            workspaceUI.setFileMetadata(fileMetadata);
         }
         
         var linkLoadError = function(errorMsg) {
             alert("Error loading links: " + errorMsg);
-            //load the workspace anyway
-            doWorkspaceLoad();
+            //we should continue with the workpace load
         }
         
-//THIS NEEDS TO BE CLEANED UP - ESPECIALLY ERROR HANDLING
-        loadReferencesPromise.then(doWorkspaceLoad).catch(linkLoadError);
+        var workspaceLoadError = function(errorMsg) {
+            app.clearWorkspaceUI();
+            var actionError = new apogee.ActionError(errorMsg,apogee.ActionError.ERROR_TYPE_USER,false);
+            actionResponse.addError(actionError);
+            apogeeapp.app.errorHandling.handleActionError(actionResponse);
+        }
         
+        //load references and then workspace
+        //on a reference error, we continue loading the workspace
+        loadReferencesPromise.catch(linkLoadError).then(doWorkspaceLoad).catch(workspaceLoadError);
     }
     catch(error) {
         if(workspaceUIAdded) {
@@ -90,57 +90,9 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,workspace
         }
         var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
         actionResponse.addError(actionError);
-        actionCompletedCallback(actionResponse);
+        apogeeapp.app.errorHandling.handleActionError(actionResponse);
     }
+        
+    return true;
 }
 
-//------------------------
-// open from url
-//------------------------
-
-/** This method opens an workspace by getting the workspace file from the url. */
-apogeeapp.app.openworkspace.openWorkspaceFromUrl = function(app,url) {
-    var actionCompletedCallback = function(actionResponse) {
-        if(!actionResponse.getSuccess()) {
-            apogeeapp.app.errorHandling.handleActionError(actionResponse);
-        }
-    };
-    
-    apogeeapp.app.openworkspace.openWorkspaceFromUrlImpl(app,url,actionCompletedCallback);
-}
-
-/** This method opens an workspace by getting the workspace file from the url. */
-apogeeapp.app.openworkspace.openWorkspaceFromUrlImpl = function(app,url,actionCompletedCallback) {
-    var onDownload = function(workspaceText) {
-        apogeeapp.app.openworkspace.openWorkspace(app,workspaceText,url,actionCompletedCallback);
-    }
-    
-    var onFailure = function(msg) {
-        var actionError = new apogee.ActionError(msg,apogee.ActionError.ERROR_TYPE_APP,null);
-        var actionResponse = new apogee.ActionResponse();
-        actionResponse.addError(actionError);
-        actionCompletedCallback(actionResponse);
-    }   
-    apogeeapp.app.openworkspace.doRequest(url,onDownload,onFailure);   
-}
-
-/**
- * This is an http request for the worksheet data
- */
-apogeeapp.app.openworkspace.doRequest= function(url,onDownload,onFailure) {
-	var xmlhttp=new XMLHttpRequest();
-
-    xmlhttp.onreadystatechange=function() {
-        var msg;
-        if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-            onDownload(xmlhttp.responseText);
-        }
-        else if(xmlhttp.readyState==4  && xmlhttp.status >= 400)  {
-            msg = "Error in http request. Status: " + xmlhttp.status;
-            onFailure(msg);
-        }
-    }
-	
-	xmlhttp.open("GET",url,true);
-    xmlhttp.send();
-}
