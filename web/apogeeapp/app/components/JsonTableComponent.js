@@ -22,9 +22,9 @@ apogeeapp.app.JsonTableComponent.prototype.getDataView = function() {
 apogeeapp.app.JsonTableComponent.prototype.setDataView = function(dataView) {
     this.dataView = dataView;
     //update the window display if needed
-    var windowDisplay = this.getWindowDisplay();
-    if(windowDisplay) {
-        windowDisplay.updateViewModeElement(apogeeapp.app.JsonTableComponent.VIEW_DATA);
+    var componentDisplay = this.getComponentDisplay();
+    if(componentDisplay) {
+        componentDisplay.updateViewModeElement(apogeeapp.app.JsonTableComponent.VIEW_DATA);
     }
 }
 

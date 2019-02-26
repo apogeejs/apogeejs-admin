@@ -8,19 +8,8 @@ apogeeapp.app.EditComponent = function(workspaceUI,member,componentGenerator) {
 apogeeapp.app.EditComponent.prototype = Object.create(apogeeapp.app.Component.prototype);
 apogeeapp.app.EditComponent.prototype.constructor = apogeeapp.app.EditComponent;
 
-apogeeapp.app.EditComponent.prototype.instantiateWindowDisplay = function(windowDisplayOverrideOptions) {
-    var options = windowDisplayOverrideOptions ? windowDisplayOverrideOptions : this.windowDisplayStateJson;
-    return new apogeeapp.app.EditWindowComponentDisplay(this,options);
-}
-
-//no longer used
-///** This is used when an alternate UI is used for the workspace. This replaces the window display 
-// *  used in the standard UI. */
-//apogeeapp.app.EditComponent.prototype.setAlternateWindowDisplay = function(windowDisplay) {
-//    this.alternateWindowDisplay = windowDisplay;
-//    this.windowDisplay = windowDisplay;
-//    windowDisplay.setBannerState(this.bannerState,this.bannerMessage);
-//}
+/** This is used to flag this as an edit component. */
+apogeeapp.app.EditComponent.prototype.isEditComponent = true;
 
 //===============================
 // Protected Functions

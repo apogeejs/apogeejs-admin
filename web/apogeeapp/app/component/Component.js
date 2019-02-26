@@ -18,8 +18,8 @@ apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
     this.bannerMessage = "";
     
     //ui elements
-    this.windowDisplay = null;
-    this.windowDisplayStateJson = null;
+    this.componentDisplay = null;
+    this.componentDisplayStateJson = null;
     
     this.tabDisplay = null;
     
@@ -117,28 +117,27 @@ apogeeapp.app.Component.prototype.instantiateTreeEntry = function() {
     return treeDisplay;
 }
 
-//implement
-///** This creates an instance of the window display. 
-///* The windowDisplayOverrideOptions are optional options to override ths existing window options from the parent. */
-//apogeeapp.app.Component.prototype.instantiateWindowDisplay = function(windowDisplayOverrideOptions);
-
-apogeeapp.app.Component.prototype.getWindowDisplay = function(createIfMissing,windowDisplayOverrideOptions) {
-    if((createIfMissing)&&(!this.windowDisplay)) {
-        this.windowDisplay = this.instantiateWindowDisplay(windowDisplayOverrideOptions);
-        this.windowDisplay.setBannerState(this.bannerState,this.bannerMessage);
-    }
-    return this.windowDisplay;
+apogeeapp.app.Component.prototype.getComponentDisplayOptions = function() {
+    return this.componentDisplayStateJson;
 }
 
-apogeeapp.app.Component.prototype.closeWindowDisplay = function() {
-    if(this.windowDisplay) {
+apogeeapp.app.Component.prototype.setComponentDisplay = function(componentDisplay) {
+    this.componentDisplay = componentDisplay; 
+}
+
+apogeeapp.app.Component.prototype.getComponentDisplay = function() {
+    return this.componentDisplay;
+}
+
+apogeeapp.app.Component.prototype.closeComponentDisplay = function() {
+    if(this.componentDisplay) {
         //first store the window state
-        this.windowDisplayStateJson = this.windowDisplay.getStateJson();
+        this.componentDisplayStateJson = this.componentDisplay.getStateJson();
         
         //delete the window
-        this.windowDisplay.deleteDisplay();
+        this.componentDisplay.deleteDisplay();
         
-        this.windowDisplay = null;
+        this.componentDisplay = null;
     }
 }
 
@@ -202,12 +201,12 @@ apogeeapp.app.Component.prototype.toJson = function() {
     var json = {};
     json.type = this.componentGenerator.uniqueName;
     
-    if(this.windowDisplay != null) {
-        this.windowDisplayStateJson = this.windowDisplay.getStateJson();
+    if(this.componentDisplay != null) {
+        this.componentDisplayStateJson = this.componentDisplay.getStateJson();
     }
     
-    if(this.windowDisplayStateJson) {
-        json.windowState = this.windowDisplayStateJson;
+    if(this.componentDisplayStateJson) {
+        json.windowState = this.componentDisplayStateJson;
     }
     
     if(this.tabDisplay) {
@@ -255,7 +254,7 @@ apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
     
     //set window options
     if(json.windowState !== undefined) {
-        this.windowDisplayStateJson = json.windowState;
+        this.componentDisplayStateJson = json.windowState;
     }
     
     if(json) {
@@ -311,9 +310,9 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
             var oldParentComponent = this.workspaceUI.getComponent(oldParent);
             oldParentComponent.removeChildComponent(this);
             //delete all the window display
-            if(this.windowDisplay) {
-                this.windowDisplay.deleteDisplay();
-                this.windowDisplay = null;
+            if(this.componentDisplay) {
+                this.componentDisplay.deleteDisplay();
+                this.componentDisplay = null;
             }
         }
         
@@ -321,6 +320,8 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
         if(newParent) {
             var newParentComponent = this.workspaceUI.getComponent(newParent);
             newParentComponent.addChildComponent(this);
+            
+            //TODO - delete the current component display and add a new one
         }
     }
     
@@ -355,9 +356,9 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
         this.treeDisplay.updateData();
         this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
     }
-    if(this.windowDisplay != null) {
-        this.windowDisplay.updateData();
-        this.windowDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    if(this.componentDisplay != null) {
+        this.componentDisplay.updateData();
+        this.componentDisplay.setBannerState(this.bannerState,this.bannerMessage);
     }
     if(this.tabDisplay != null) {
         this.tabDisplay.updateData();

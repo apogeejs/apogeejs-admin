@@ -88,7 +88,7 @@ webAppAccess.getDisplayFrame = function(memberName,optionalViewType) {
    options.viewType = optionalViewType;
    options.PLAIN_FRAME_UI = true;
 
-   var componentDisplay = component.getWindowDisplay(true,options);
+   var componentDisplay = component.getComponentDisplay(true,options);
    return componentDisplay.getDisplayFrame();
 }
 

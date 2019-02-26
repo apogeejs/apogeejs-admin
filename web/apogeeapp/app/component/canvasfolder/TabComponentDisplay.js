@@ -44,16 +44,41 @@ apogeeapp.app.TabComponentDisplay.prototype.updateData = function() {
     this.tab.setTitle(this.member.getName());
 }
 
+/** This method is used to bring the child component to the front. */
+apogeeapp.app.TabComponentDisplay.prototype.showChildComponent = function(childComponent) {
+    var windowComponentDisplay = childComponent.getComponentDisplay();
+    if(windowComponentDisplay) {
+        var childWindow = windowComponentDisplay.getDisplayFrame();
+        if(childWindow) {
+            this.parentContainer.bringToFront(childWindow);
+        }
+    }
+}
+
+
+
 /** This creates and adds a display for the child component to the parent container. */
 apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childComponent) {
     
-    var windowComponentDisplay = childComponent.getWindowDisplay(true);
-    var childWindow = windowComponentDisplay.getDisplayFrame();
-
+    var childComponentDisplay;
+    var componentDisplayOptions = childComponent.getComponentDisplayOptions();
     
+    //create a new component display for this child
+    if(childComponent.isEditComponent) {
+        childComponentDisplay = new apogeeapp.app.EditWindowComponentDisplay(childComponent,componentDisplayOptions);
+    }
+    else if(childComponent.isParentComponent) {
+        childComponentDisplay = new apogeeapp.app.ParentWindowComponentDisplay(childComponent,componentDisplayOptions);
+    }
+    else {
+        throw new Error("Unrecognized child component type! " + childComponent.constructor)
+    }
+    childComponent.setComponentDisplay(childComponentDisplay);
+    
+    var childWindow = childComponentDisplay.getDisplayFrame();
     
     //set position
-    var pos = windowComponentDisplay.getPreferredPosition();
+    var pos = childComponentDisplay.getPreferredPosition();
     if(!pos) {
         pos = this.parentContainer.getNextWindowPosition();
     }
@@ -62,20 +87,11 @@ apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childCo
     this.parentContainer.addWindow(childWindow);
     
     //set state 
-    var state = windowComponentDisplay.getPreferredState();
+    var state = childComponentDisplay.getPreferredState();
     childWindow.setWindowState(state);
 }
 
-/** This method is used to bring the child component to the front. */
-apogeeapp.app.TabComponentDisplay.prototype.showChildComponent = function(childComponent) {
-    var windowComponentDisplay = childComponent.getWindowDisplay();
-    if(windowComponentDisplay) {
-        var childWindow = windowComponentDisplay.getDisplayFrame();
-        if(childWindow) {
-            this.parentContainer.bringToFront(childWindow);
-        }
-    }
-}
+
 //===============================
 // Private Functions
 //===============================
@@ -160,8 +176,9 @@ apogeeapp.app.TabComponentDisplay.prototype.createDisplayContent = function() {
     for(var childName in children) {
         var child = children[childName];
         var childComponent = workspaceUI.getComponent(child);
-if(childComponent) //TEMPORARY!
-        this.addChildComponent(childComponent);
+        if(childComponent) {
+            this.addChildComponent(childComponent);
+        }
     }
 }
 
@@ -171,8 +188,6 @@ apogeeapp.app.TabComponentDisplay.prototype.setAddChildrenContextMenu = function
     
     var workspaceUI = this.component.getWorkspaceUI();
     var app = workspaceUI.getApp();
-
-    
     
     this.contentElement.oncontextmenu = event => {
         event.preventDefault();
@@ -198,6 +213,7 @@ apogeeapp.app.TabComponentDisplay.prototype.setAddChildrenContextMenu = function
     }
 }
 
+
 //======================================
 // Callbacks
 // These are defined as static but are called in the objects context
@@ -212,7 +228,9 @@ apogeeapp.app.TabComponentDisplay.prototype.destroy = function() {
     for(var childName in children) {
         var child = children[childName];
         var childComponent = workspaceUI.getComponent(child);
-        childComponent.closeWindowDisplay();
+        if(childComponent) {
+            childComponent.closeComponentDisplay();
+        }
     }
     
     this.closeTab();

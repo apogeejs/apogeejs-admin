@@ -8,11 +8,8 @@ apogeeapp.app.ParentComponent = function(workspaceUI,member,componentGenerator) 
 apogeeapp.app.ParentComponent.prototype = Object.create(apogeeapp.app.Component.prototype);
 apogeeapp.app.ParentComponent.prototype.constructor = apogeeapp.app.ParentComponent;
 
-/** @protected */
-apogeeapp.app.ParentComponent.prototype.instantiateWindowDisplay = function(windowDisplayOverrideOptions) {
-    var options = windowDisplayOverrideOptions ? windowDisplayOverrideOptions : this.windowDisplayStateJson;
-    return new apogeeapp.app.ParentWindowComponentDisplay(this,options);
-}
+/** This is used to flag this as an edit component. */
+apogeeapp.app.ParentComponent.prototype.isParentComponent = true;
 
 apogeeapp.app.ParentComponent.prototype.instantiateTreeEntry = function() {
     var treeDisplay = apogeeapp.app.Component.prototype.instantiateTreeEntry.call(this);
@@ -84,10 +81,7 @@ apogeeapp.app.ParentComponent.prototype.removeChildComponent = function(childCom
     }
     
     //remove child windows - just hide them. They will be deleted in the component
-    var childWindowDisplay = childComponent.getWindowDisplay();
-    if(childWindowDisplay) {
-        childWindowDisplay.deleteDisplay();
-    }
+    childComponent.closeComponentDisplay();
 }
 
 /** This function adds a fhile componeent to the displays for this parent component. */
