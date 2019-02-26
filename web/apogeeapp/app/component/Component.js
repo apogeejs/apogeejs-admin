@@ -18,12 +18,12 @@ apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
     this.bannerMessage = "";
     
     //ui elements
-    this.componentDisplay = null;
+    this.componentDisplay = null; //this is the main display, inside the parent tab
     this.componentDisplayStateJson = null;
     
-    this.tabDisplay = null;
+    this.tabDisplay = null; //only valid on parents, which open into a tab
     
-    this.treeDisplay = null;
+    this.treeDisplay = null; //this is shown in the tree view
 }
 
 //These parameters are used to order the components in the tree entry.
@@ -84,6 +84,10 @@ apogeeapp.app.Component.prototype.getWorkspaceUI = function() {
     return this.workspaceUI;
 }
 
+//-------------------
+// tree entry methods - this is the element in the tree view
+//-------------------
+
 apogeeapp.app.Component.prototype.getTreeEntry = function(createIfMissing) {
     if((createIfMissing)&&(!this.treeDisplay)) {
         this.treeDisplay = this.instantiateTreeEntry();
@@ -109,13 +113,12 @@ apogeeapp.app.Component.prototype.instantiateTreeEntry = function() {
     var treeEntrySortOrder = (this.componentGenerator.TREE_ENTRY_SORT_ORDER !== undefined) ? this.componentGenerator.TREE_ENTRY_SORT_ORDER : apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER;
     treeDisplay.setComponentTypeSortOrder(treeEntrySortOrder);
     
-       
-//    if(this.treeDisplay) {
-//        this.treeDisplay.setComponentTypeSortOrder(apogeeapp.app.Component.FOLDER_COMPONENT_TYPE_SORT_ORDER);
-//    } 
-//    
     return treeDisplay;
 }
+
+//-------------------
+// component display methods - this is the element in the parent tab (main display)
+//-------------------
 
 apogeeapp.app.Component.prototype.getComponentDisplayOptions = function() {
     return this.componentDisplayStateJson;
@@ -140,6 +143,38 @@ apogeeapp.app.Component.prototype.closeComponentDisplay = function() {
         this.componentDisplay = null;
     }
 }
+
+//-------------------
+// tab display methods - this is the tab element, only used for parent members
+//-------------------
+
+//Implement in extending class:
+///** This indicates if the component has a tab display. */
+//apogeeapp.app.Component.prototype.usesTabDisplay = function();
+
+//Implement in extending class:
+///** This creates the tab display for the component. */
+//apogeeapp.app.Component.prototype.instantiateTabDisplay = function();
+
+apogeeapp.app.Component.prototype.getTabDisplay = function(createIfMissing) {
+    if((createIfMissing)&&(this.usesTabDisplay())&&(!this.tabDisplay)) {
+        this.tabDisplay = this.instantiateTabDisplay();
+        this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    }
+    return this.tabDisplay;
+}
+
+/** This closes the tab display for the component. */
+apogeeapp.app.Component.prototype.closeTabDisplay = function() {
+    if(this.tabDisplay) {
+        this.tabDisplay.closeTab();
+        this.tabDisplay = null;
+    }
+}
+
+//-------------------
+// Menu methods
+//-------------------
 
 apogeeapp.app.Component.prototype.getMenuItems = function(optionalMenuItemList) {
     //menu items
@@ -172,29 +207,9 @@ apogeeapp.app.Component.prototype.getOpenMenuItem = function() {
     }
 }
 
-//Implement in extending class:
-///** This indicates if the component has a tab display. */
-//apogeeapp.app.Component.prototype.usesTabDisplay = function();
-
-//Implement in extending class:
-///** This creates the tab display for the component. */
-//apogeeapp.app.Component.prototype.instantiateTabDisplay = function();
-
-apogeeapp.app.Component.prototype.getTabDisplay = function(createIfMissing) {
-    if((createIfMissing)&&(this.usesTabDisplay())&&(!this.tabDisplay)) {
-        this.tabDisplay = this.instantiateTabDisplay();
-        this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
-    }
-    return this.tabDisplay;
-}
-
-/** This closes the tab display for the component. */
-apogeeapp.app.Component.prototype.closeTabDisplay = function() {
-    if(this.tabDisplay) {
-        this.tabDisplay.closeTab();
-        this.tabDisplay = null;
-    }
-}
+//------------------
+// serialization
+//------------------
 
 /** This deserializes the component. */
 apogeeapp.app.Component.prototype.toJson = function() {
@@ -488,6 +503,6 @@ apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,
 }
 
 //======================================
-// All components should have a generator to creste the component
+// All components should have a generator to create the component
 // from a json. See existing components for examples.
 //======================================

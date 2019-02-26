@@ -39,10 +39,10 @@ apogeeapp.app.WorkspaceUI.prototype.getApp = function() {
     return this.app;
 }
 
- /** This method sets the workspace. The argument componentsJson should be included
+ /** This method sets the workspace. The argument workspaceJson should be included
   * if the workspace is not empty, such as when opening a existing workspace. It
   * contains the data for the component associated with each workspace member. For 
-  * a new empty workspace the componentsJson should be omitted. */
+  * a new empty workspace the workspaceJson should be omitted. */
 apogeeapp.app.WorkspaceUI.prototype.load = function(workspaceJson,actionResponse) { 
     
     var workspaceDataJson;

@@ -12,14 +12,8 @@ apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
     this.viewModeElements = {};
     this.viewModeElement = null;
    
-    if(options.PLAIN_FRAME_UI) {
-        //this is a non standard UI where we load a plain div rather than window.
-        this.loadPlainFrameEntry();
-    }
-    else {
-        //this is the standard windo for a component
-        this.loadWindowFrameEntry();
-    }
+    //this is the window in which the component is displayed
+    this.loadWindowFrameEntry();
     
     //load initial data
     var settings = this.component.getTableEditSettings();
@@ -34,15 +28,7 @@ apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
 apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
 apogeeapp.app.EditWindowComponentDisplay.prototype.getDisplayFrame = function() {
-    if(this.windowFrame) {
-        return this.windowFrame;
-    }
-    else if(this.plainFrame) {
-        return this.plainFrame;
-    }
-    else {
-        return null;
-    }
+    return this.windowFrame;
 }
 
 /** This returns the preferred size, to be used by the parent to set the window position.
@@ -121,9 +107,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.updateData = function() {
     if(this.windowFrame) {
         //update the title
         this.windowFrame.setTitle(this.member.getDisplayName());
-    }
-     
-    if((this.windowFrame)||(this.plainFrame)) {
+
         //update the content in instantiated view mode elements
         for(var elementTag in this.viewModeElements) {
             this.viewModeElements[elementTag].memberUpdated();
@@ -152,8 +136,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.getStateJson = function() {
         json.sizeInfo = this.windowFrame.getSizeInfo();
         json.posInfo = this.windowFrame.getPosInfo();
         json.state = this.windowFrame.getWindowState();
-        dataPresent = true;
-        
+        dataPresent = true;  
     }
     
     if(this.viewType) {
@@ -231,15 +214,6 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.loadWindowFrameEntry = functi
     
     //set the content
     this.initContentUI();
-}
-
-/** This is the non standard, plain div container for the component.  
- * @private */
-apogeeapp.app.EditWindowComponentDisplay.prototype.loadPlainFrameEntry = function() {
-    this.plainFrame = new apogeeapp.ui.PlainFrame();
-  
-    this.windowHeaderManager = new apogeeapp.app.WindowHeaderManager();
-    this.plainFrame.setHeaderContent(this.windowHeaderManager.getHeaderElement());    
 }
 
 //------------------------------------

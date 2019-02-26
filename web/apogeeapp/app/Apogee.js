@@ -7,7 +7,7 @@ apogeeapp.app.dialog = {};
 
 /** This is the main class of the apogee application. 
  * This constuctor should not be called externally, the static creation method 
- * should be used. 
+ * should be used. This is a singlet.
  * 
  * @param containerId - The DOM element ID for the app container
  * @param appConfigManager - An instance of an AppConfigManager on configure the application.
