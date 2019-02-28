@@ -1,9 +1,11 @@
 /** Editor that uses json edit area. I am NOT using it for the time being because
  * I need to improve it a little before it is used.
  * 
+ * OUT OF DATE!!!
+ * 
  * @param {type} onSave - should take a json object that should be saved.
  */
-apogeeapp.app.JsonFormEditor = function(viewMode) {
+apogeeapp.app.JsonFormEditor = function(displayContainer) {
 	
 	this.editorDiv = apogeeapp.ui.createElement("div",null,{
 		"position":"absolute",
@@ -23,7 +25,7 @@ apogeeapp.app.JsonFormEditor = function(viewMode) {
 	this.editCallback = function() {
         var currentData = instance.editor.getCurrentValue();
         instance.workingData = currentData;
-        viewMode.onSave(currentData);
+        displayContainer.onSave(currentData);
     }
 }
 

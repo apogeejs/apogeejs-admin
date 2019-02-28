@@ -2,7 +2,7 @@
 apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.DataDisplay {
     
     /** This allows for a static or dynamic layout setting
-     * @param {type} viewMode - the apogee view mode
+     * @param {type} displayContainer - the displayContainer
      * @param {type} callbacks - {
      *  - getData - returns the desired form value,
      *  - getEditOk - gets if form is editable,
@@ -14,8 +14,8 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.DataDisplay {
      * It should be populated if a fixed layout is OK. In this case, the getLayoutInfo
      * allack should not be populated. 
      */
-    constructor(viewMode,callbacks,optionalFixedLayoutInfo) {
-        super(viewMode,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
+    constructor(displayContainer,callbacks,optionalFixedLayoutInfo) {
+        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
         
         //layout can be fixed or dynamic
         this.dynamicLayoutCallback = callbacks.getLayoutInfo;

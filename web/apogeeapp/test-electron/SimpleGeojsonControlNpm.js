@@ -35,8 +35,8 @@ moduleReturn.initApogeeModule = function(apogee,apogeeapp) {
             super(workspaceUI,control,apogeeapp.app.SimpleGeojsonControl);
         }
 
-        getOutputDisplay(viewMode) {
-            return new apogeeapp.app.SimpleGeojsonDisplay(viewMode,this.getMember());
+        getOutputDisplay(displayContainer) {
+            return new apogeeapp.app.SimpleGeojsonDisplay(displayContainer,this.getMember());
         }
     };
 
@@ -65,13 +65,13 @@ moduleReturn.initApogeeModule = function(apogee,apogeeapp) {
         //==============================
         // Public
         //==============================
-        constructor(viewMode,member) {
+        constructor(displayContainer,member) {
 
             var callbacks = {
                 getData: () => this.member.getData()
             }
 
-            super(viewMode,callbacks)
+            super(displayContainer,callbacks)
 
             //create map element - this css class will fill the parent (the window frame) with no scrolling 
             this.mapElement = apogeeapp.ui.createElement("div");

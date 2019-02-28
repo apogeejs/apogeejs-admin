@@ -34,7 +34,7 @@ apogeeapp.app.FunctionComponent.prototype.getTableEditSettings = function() {
 
 /** This method should be implemented to retrieve a data display of the give type. 
  * @protected. */
-apogeeapp.app.FunctionComponent.prototype.getDataDisplay = function(viewMode,viewType) {
+apogeeapp.app.FunctionComponent.prototype.getDataDisplay = function(displayContainer,viewType) {
 	
     var callbacks;
 	
@@ -43,16 +43,16 @@ apogeeapp.app.FunctionComponent.prototype.getDataDisplay = function(viewMode,vie
 			
 		case apogeeapp.app.FunctionComponent.VIEW_CODE:
             callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member);
-			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+			return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 			
 		case apogeeapp.app.FunctionComponent.VIEW_SUPPLEMENTAL_CODE:
 			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+            return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
             
         case apogeeapp.app.FunctionComponent.VIEW_DESCRIPTION:
 			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
-            //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
-            return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
+            //return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+            return new apogeeapp.app.TextAreaEditor(displayContainer,callbacks);
 			
 		default:
 //temporary error handling...

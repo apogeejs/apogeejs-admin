@@ -1,8 +1,8 @@
 /** This is a grid editor using hands on table*/
 apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.DataDisplay {
     
-    constructor(viewMode,callbacks) {
-        super(viewMode,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
+    constructor(displayContainer,callbacks) {
+        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
 
         //TBR initial sizing. now I just set it to a dummy number	
         this.gridDiv = apogeeapp.ui.createElement("div",null,{

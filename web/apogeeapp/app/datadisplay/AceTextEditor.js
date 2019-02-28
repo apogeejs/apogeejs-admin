@@ -1,13 +1,13 @@
 /** Editor that uses the Ace text editor.
  * 
- * @param {type} viewMode - the apogee view mode
+ * @param {type} displayContainer - the display container
  * @param {type} callbacks - {getData,getEditOk,setData}; format for data is text
  * @param {type} aceMode - the display format, such as "ace/mode/json"
  */
 apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
     
-    constructor(viewMode,callbacks,aceMode) {
-        super(viewMode,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
+    constructor(displayContainer,callbacks,aceMode) {
+        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
 
         this.editorDiv = apogeeapp.ui.createElement("div",null,{
             "position":"absolute",
@@ -96,7 +96,7 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
     }
     
     checkStartEditMode() {
-        if(!this.viewMode.isInEditMode()) {
+        if(!this.displayContainer.isInEditMode()) {
             if(this.getData() != this.uneditedValue) {
                 this.onTriggerEditMode();
             }

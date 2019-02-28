@@ -12,11 +12,11 @@
 
 /** This is the display/editor for the custom control output. */
 apogeeapp.app.ErrorDisplay = class extends apogeeapp.app.DataDisplay {
-    constructor(viewMode) {
+    constructor(displayContainer) {
         var callbacks = {
             getData: () => null
         }
-        super(viewMode,callbacks);
+        super(displayContainer,callbacks);
         
         var msg = "ERROR - Component not loaded!";
         var msgDiv = apogeeapp.ui.createElement("div");

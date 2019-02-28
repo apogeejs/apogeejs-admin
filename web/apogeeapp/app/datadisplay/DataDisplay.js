@@ -1,15 +1,15 @@
 /** Editor that uses the Ace text editor.
  * 
- * @param {type} viewMode - the apogee view mode
+ * @param {type} displayContainer - this is the ui container that will show the display
  * @param {type} callbacks - the callbacks for the editor {getData,getEditOk,saveData}
- * @param {type} containerClass - the is the css class for the container element OPTIONAL
+ * @param {type} containerClass - the is the css class for the display container OPTIONAL
  */
 apogeeapp.app.DataDisplay = class {
-    constructor(viewMode,callbacks,containerClass = apogeeapp.app.DataDisplay.NON_SCROLLING) {
+    constructor(displayContainer,callbacks,containerClass = apogeeapp.app.DataDisplay.NON_SCROLLING) {
         
         this.outsideDiv = apogeeapp.ui.createElementWithClass("div",containerClass);
 	
-        this.viewMode = viewMode;
+        this.displayContainer = displayContainer;
         this.callbacks = callbacks;
         this.editOk = false;
     }
@@ -43,7 +43,7 @@ apogeeapp.app.DataDisplay = class {
 
     cancel() {
         //reset the original data
-        var cancelComplete = this.viewMode.onCancel();
+        var cancelComplete = this.displayContainer.onCancel();
 
         if(cancelComplete) {
             this.endEditMode();
@@ -111,7 +111,7 @@ apogeeapp.app.DataDisplay = class {
 
     /** @protected */
     endEditMode() {
-        this.viewMode.endEditMode();
+        this.displayContainer.endEditMode();
 
     }
     
@@ -120,7 +120,7 @@ apogeeapp.app.DataDisplay = class {
         var onSave = () => this.save();
         var onCancel = () => this.cancel();
 
-        this.viewMode.startEditMode(onSave,onCancel);
+        this.displayContainer.startEditMode(onSave,onCancel);
     }
 
     /** @protected */

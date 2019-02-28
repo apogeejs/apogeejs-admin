@@ -18,7 +18,7 @@ apogeeapp.app.FormDataComponent = function(workspaceUI,folder) {
     this.isInputValidFunctionTable = folder.lookupChildFromPathArray(["isInputValid"]);
     
     //keep the form display alive
-    this.displayDestroyFlags = apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
+    this.displayDestroyFlags = apogeeapp.app.DisplayContainer.DISPLAY_DESTROY_FLAG_NEVER;
     
     //add a cleanup and save actions
     this.addOpenAction(apogeeapp.app.FormDataComponent.readFromJson);
@@ -63,7 +63,7 @@ apogeeapp.app.FormDataComponent.prototype.getTableEditSettings = function() {
 
 /** This method should be implemented to retrieve a data display of the give type. 
  * @protected. */
-apogeeapp.app.FormDataComponent.prototype.getDataDisplay = function(viewMode,viewType) {
+apogeeapp.app.FormDataComponent.prototype.getDataDisplay = function(displayContainer,viewType) {
 	
     var callbacks;
     
@@ -71,35 +71,35 @@ apogeeapp.app.FormDataComponent.prototype.getDataDisplay = function(viewMode,vie
 	switch(viewType) {
             
         case apogeeapp.app.FormDataComponent.VIEW_FORM:
-            viewMode.setDisplayDestroyFlags(this.displayDestroyFlags);
+            displayContainer.setDisplayDestroyFlags(this.displayDestroyFlags);
             callbacks = this.getFormEditorCallbacks();
-            var formEditorDisplay = new apogeeapp.app.ConfigurableFormEditor(viewMode,callbacks);
+            var formEditorDisplay = new apogeeapp.app.ConfigurableFormEditor(displayContainer,callbacks);
             return formEditorDisplay;
 			
 		case apogeeapp.app.FormDataComponent.VIEW_LAYOUT_CODE:
             callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.layoutTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+			return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 			
 		case apogeeapp.app.FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE:
 			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.layoutTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+            return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
         
         case apogeeapp.app.FormDataComponent.VIEW_FORM_VALUE:
             callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.dataTable);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/json");
+            return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/json");
             
         case apogeeapp.app.FormDataComponent.VIEW_INPUT_INVALID_CODE:
             callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.isInputValidFunctionTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+			return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 			
 		case apogeeapp.app.FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE:
 			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.isInputValidFunctionTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+            return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
             
         case apogeeapp.app.FormDataComponent.VIEW_DESCRIPTION:
 			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.dataTable);
-            //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
-            return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
+            //return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+            return new apogeeapp.app.TextAreaEditor(displayContainer,callbacks);
 			
 		default:
 //temporary error handling...

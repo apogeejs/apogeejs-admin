@@ -1,8 +1,8 @@
 /** Editor that uses the basic text editor */
 apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.DataDisplay {
     
-    constructor(viewMode,callbacks) {
-        super(viewMode,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
+    constructor(displayContainer,callbacks) {
+        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
 
         var textArea = apogeeapp.ui.createElement("TEXTAREA",null,{
             "position":"absolute",
@@ -56,7 +56,7 @@ apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.DataDisplay {
     }
     
     checkStartEditMode() {
-        if(!this.viewMode.isInEditMode()) {
+        if(!this.displayContainer.isInEditMode()) {
             if(this.getData() != this.uneditedValue) {
                 this.onTriggerEditMode();
             }

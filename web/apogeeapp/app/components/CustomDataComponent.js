@@ -51,15 +51,15 @@ apogeeapp.app.CustomDataComponent.prototype.getDestroyOnInactive = function() {
 }
 
 apogeeapp.app.CustomDataComponent.prototype.getDisplayDestroyFlags = function() {
-    return this.destroyOnInactive ? apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_INACTIVE :
-            apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
+    return this.destroyOnInactive ? apogeeapp.app.DisplayContainer.DISPLAY_DESTROY_FLAG_INACTIVE :
+            apogeeapp.app.DisplayContainer.DISPLAY_DESTROY_FLAG_NEVER;
 }
 
 apogeeapp.app.CustomDataComponent.prototype.setDestroyOnInactive = function(destroyOnInactive) {
     this.destroyOnInactive = destroyOnInactive;
     
-    if(this.activeOutputMode) {
-        this.activeOutputMode.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
+    if(this.activeOutputDisplayContainer) {
+        this.activeOutputDisplayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
     }
 }
 
@@ -103,7 +103,7 @@ apogeeapp.app.CustomDataComponent.prototype.getTableEditSettings = function() {
 
 /** This method should be implemented to retrieve a data display of the give type. 
  * @protected. */
-apogeeapp.app.CustomDataComponent.prototype.getDataDisplay = function(viewMode,viewType) {
+apogeeapp.app.CustomDataComponent.prototype.getDataDisplay = function(displayContainer,viewType) {
 	
     var callbacks;
 	
@@ -111,42 +111,42 @@ apogeeapp.app.CustomDataComponent.prototype.getDataDisplay = function(viewMode,v
 	switch(viewType) {
 		
 		case apogeeapp.app.CustomDataComponent.VIEW_FORM:
-            viewMode.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
-            this.activeOutputMode = viewMode;
+            displayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
+            this.activeOutputDisplayContainer = displayContainer;
             var callbacks = this.getFormCallbacks();
             var html = this.getUiCodeField(apogeeapp.app.CustomDataComponent.CODE_FIELD_HTML);
             var resource = this.createResource();
-            var dataDisplay = new apogeeapp.app.HtmlJsDataDisplay(viewMode,callbacks,this.inputTable,html,resource);
+            var dataDisplay = new apogeeapp.app.HtmlJsDataDisplay(displayContainer,callbacks,this.inputTable,html,resource);
             return dataDisplay;
             
         case apogeeapp.app.CustomDataComponent.VIEW_VALUE:
             callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.dataTable);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/json");
+            return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/json");
 			
 		case apogeeapp.app.CustomDataComponent.VIEW_CODE:
             callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.inputTable);
-			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+			return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 			
 		case apogeeapp.app.CustomDataComponent.VIEW_SUPPLEMENTAL_CODE:
 			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.inputTable);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+            return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
         
         case apogeeapp.app.CustomDataComponent.VIEW_HTML:
             callbacks = this.getUiCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_HTML);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/html");
+            return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/html");
     
         case apogeeapp.app.CustomDataComponent.VIEW_CSS:
             callbacks = this.getUiCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/css");
+            return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/css");
             
         case apogeeapp.app.CustomDataComponent.VIEW_UI_CODE:
             callbacks = this.getUiCallbacks(apogeeapp.app.CustomDataComponent.CODE_FIELD_UI_CODE);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+            return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
         case apogeeapp.app.CustomDataComponent.VIEW_DESCRIPTION:
 			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.inputTable);
-            //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
-            return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
+            //return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+            return new apogeeapp.app.TextAreaEditor(displayContainer,callbacks);
 			
 		default:
 //temporary error handling...
@@ -264,8 +264,8 @@ apogeeapp.app.CustomDataComponent.prototype.createResource = function() {
 apogeeapp.app.CustomDataComponent.prototype.update = function(uiCodeFields) { 
     
     //make sure we get rid of the old display
-    if(this.activeOutputMode) {
-        this.activeOutputMode.forceClearDisplay();
+    if(this.activeOutputDisplayContainer) {
+        this.activeOutputDisplayContainer.forceClearDisplay();
     }
     
     this.uiCodeFields = uiCodeFields;

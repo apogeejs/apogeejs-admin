@@ -22,9 +22,9 @@
 
 /** This is the display/editor for the custom control output. */
 apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
-    constructor(viewMode,callbacks,member,html,resource) {
+    constructor(displayContainer,callbacks,member,html,resource) {
         
-        super(viewMode,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
+        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
         
         this.resource = resource;
         this.member = member;

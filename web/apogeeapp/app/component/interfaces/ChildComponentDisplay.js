@@ -1,5 +1,5 @@
 /** This component represents a json table object. */
-apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
+apogeeapp.app.ChildComponentDisplay = function(component, options) {
     this.component = component;
     this.member = component.getMember();
     
@@ -21,13 +21,13 @@ apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
     this.setViewType(initialViewType);
     
     //add a cleanup action to the base component - component must already be initialized
-//    this.addCleanupAction(apogeeapp.app.EditWindowComponentDisplay.destroy);
+//    this.addCleanupAction(apogeeapp.app.ChildComponentDisplay.destroy);
 };
 
 /** This value is used as the background color when an editor is read only. */
-apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
+apogeeapp.app.ChildComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.getDisplayFrame = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.getDisplayFrame = function() {
     return this.windowFrame;
 }
 
@@ -36,7 +36,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.getDisplayFrame = function() 
  * 
  * return {"x":x,"y":y}
  */
-apogeeapp.app.EditWindowComponentDisplay.prototype.getPreferredPosition = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.getPreferredPosition = function() {
     if(this.options) {
         return this.options.posInfo;
     }
@@ -46,7 +46,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.getPreferredPosition = functi
 }
 
 /** This returns the preferred state - minimized, maximized, normal */
-apogeeapp.app.EditWindowComponentDisplay.prototype.getPreferredState = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.getPreferredState = function() {
     if((this.options)&&(this.options.state !== undefined)) {
         return this.options.state;
     }
@@ -57,19 +57,19 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.getPreferredState = function(
 
 
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.getComponent = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.getComponent = function() {
     return this.component;
 }
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.getMember = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.getMember = function() {
     return this.member;
 }
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.getDataDisplay = function(displayContainer,viewType) {
+apogeeapp.app.ChildComponentDisplay.prototype.getDataDisplay = function(displayContainer,viewType) {
     return this.component.getDataDisplay(displayContainer,viewType);
 }
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.deleteDisplay = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.deleteDisplay = function() {
     //dispose any view elements
     for(var viewType in this.viewModeElements) {
         var viewModeElement = this.viewModeElements[viewType];
@@ -83,7 +83,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.deleteDisplay = function() {
     }
 }
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
+apogeeapp.app.ChildComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     if(this.windowHeaderManager) {
         if(bannerState == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE) {
             this.windowHeaderManager.hideBannerBar();
@@ -103,7 +103,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setBannerState = function(ban
     }
 }
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.updateData = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.updateData = function() {
     if(this.windowFrame) {
         //update the title
         this.windowFrame.setTitle(this.member.getDisplayName());
@@ -116,7 +116,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.updateData = function() {
 }
 
 /** This method should be called is a data element should be discarded, and possilby re-requested. */
-apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewModeElement = function(viewType) {
+apogeeapp.app.ChildComponentDisplay.prototype.updateViewModeElement = function(viewType) {
     //get rid of the cached view type
     delete this.viewModeElements[viewType];
     
@@ -128,7 +128,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewModeElement = funct
 }
 
 /** This gets the current window state, to reconstruct the view. */
-apogeeapp.app.EditWindowComponentDisplay.prototype.getStateJson = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.getStateJson = function() {
     var json = {};
     var dataPresent = false;
     
@@ -149,7 +149,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.getStateJson = function() {
 }
 
 /** This gets the current window state, to reconstruct the view. */
-apogeeapp.app.EditWindowComponentDisplay.prototype.setStateJson = function(json) {
+apogeeapp.app.ChildComponentDisplay.prototype.setStateJson = function(json) {
     
     if(this.windowFrame) {
         if(json.sizeInfo) {
@@ -174,7 +174,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setStateJson = function(json)
 
 /** This is the standard window for the component.  
  * @private */
-apogeeapp.app.EditWindowComponentDisplay.prototype.loadWindowFrameEntry = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.loadWindowFrameEntry = function() {
    
     //window options
     var memberWindowOptions = {};
@@ -220,7 +220,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.loadWindowFrameEntry = functi
 // Window Content Management - switch between edit modes
 //------------------------------------
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.createSelectTool = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.createSelectTool = function() {
     
 	this.select = apogeeapp.ui.createElement("select",null,{
         "marginRight":"3px",
@@ -237,7 +237,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.createSelectTool = function()
 
 /** This method populates the frame for this component. 
  * @protected */
-apogeeapp.app.EditWindowComponentDisplay.prototype.initContentUI = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.initContentUI = function() {
     
     var settings = this.component.getTableEditSettings();
     var viewTypes = settings.viewModes;
@@ -248,7 +248,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.initContentUI = function() {
     }
 }
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.getInitialViewType = function(viewTypes,defaultViewType) {
+apogeeapp.app.ChildComponentDisplay.prototype.getInitialViewType = function(viewTypes,defaultViewType) {
     if( (this.options) &&
         (this.options.viewType) &&
         (viewTypes.indexOf(this.options.viewType) >= 0) ) {
@@ -268,7 +268,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.getInitialViewType = function
 
 /** This method populates the frame for this component. 
  * @protected */
-apogeeapp.app.EditWindowComponentDisplay.prototype.setViewType = function(viewType) {
+apogeeapp.app.ChildComponentDisplay.prototype.setViewType = function(viewType) {
 	//return if there is no change
 	if(this.viewType === viewType) return;
     
@@ -312,14 +312,14 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setViewType = function(viewTy
     }
 }
 
-apogeeapp.app.EditWindowComponentDisplay.prototype.updateViewTypeSelect = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.updateViewTypeSelect = function() {
     if((this.select)&&(this.select.value != this.viewType)) {
         this.select.value = this.viewType;
     }
 }
 
 /** This method should be called to put the display element in the window. */
-apogeeapp.app.EditWindowComponentDisplay.prototype.showDataDisplay = function(dataDisplay) {
+apogeeapp.app.ChildComponentDisplay.prototype.showDataDisplay = function(dataDisplay) {
     if(this.windowFrame) {
         this.windowFrame.setContent(dataDisplay.getContent(),dataDisplay.getContentType());
     } 
@@ -330,7 +330,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.showDataDisplay = function(da
 
 /** This method should be called to remove the given element from the window. 
  * If this method is called when this is not the current element, no action is taken. */
-apogeeapp.app.EditWindowComponentDisplay.prototype.removeDisplayElement = function(displayElement) {
+apogeeapp.app.ChildComponentDisplay.prototype.removeDisplayElement = function(displayElement) {
     if(this.windowFrame) { 
         this.windowFrame.safeRemoveContent(displayElement);
     }
@@ -345,7 +345,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.removeDisplayElement = functi
 
 /** This method should be called to set up the component ui for edit mode. 
  * @protected */
-apogeeapp.app.EditWindowComponentDisplay.prototype.startEditUI = function(onSave,onCancel) {
+apogeeapp.app.ChildComponentDisplay.prototype.startEditUI = function(onSave,onCancel) {
     //disable select (if we are using it)
     if(this.select) {
         this.select.disabled = true;
@@ -356,7 +356,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.startEditUI = function(onSave
 
 /** This method populates the frame for this component. 
  * @protected */
-apogeeapp.app.EditWindowComponentDisplay.prototype.endEditUI = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.endEditUI = function() {
     this.hideSaveBar();
     
     //re-enable select (if we are using it)
@@ -366,7 +366,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.endEditUI = function() {
 }
 
 /** This method returns the base member for this component. */
-apogeeapp.app.EditWindowComponentDisplay.prototype.showSaveBar = function(onSave,onCancel) {
+apogeeapp.app.ChildComponentDisplay.prototype.showSaveBar = function(onSave,onCancel) {
     if(!this.saveDiv) {
         this.saveDiv = apogeeapp.ui.createElement("div",null,
             {
@@ -400,7 +400,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.showSaveBar = function(onSave
 }
 
 /** This method returns the base member for this component. */
-apogeeapp.app.EditWindowComponentDisplay.prototype.hideSaveBar = function() {
+apogeeapp.app.ChildComponentDisplay.prototype.hideSaveBar = function() {
     this.saveBarActive = false;	
 	this.windowHeaderManager.showToolbar(this.normalToolbarDiv);
 }

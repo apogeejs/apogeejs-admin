@@ -7,7 +7,7 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
         super(workspaceUI,control,componentGenerator);
     
         //default to keep alive
-        this.displayDestroyFlags = apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
+        this.displayDestroyFlags = apogeeapp.app.DisplayContainer.DISPLAY_DESTROY_FLAG_NEVER;
     };
 
     //==============================
@@ -16,7 +16,7 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
 
     //This method must be implemented
     ///** This method returns the outout data display/editor for the control */
-    //getOutputDisplay(viewMode);
+    //getOutputDisplay(displayContainer);
 
     //==============================
     // Protected and Private Instance Methods
@@ -28,8 +28,8 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
     setDisplayDestroyFlags(displayDestroyFlags) {
         this.displayDestroyFlags = displayDestroyFlags;
 
-        if(this.outputMode) {
-            this.outputMode.setDisplayDestroyFlags(displayDestroyFlags);
+        if(this.outputDisplayContainer) {
+            this.outputDisplayContainer.setDisplayDestroyFlags(displayDestroyFlags);
         }
     }
 
@@ -43,7 +43,7 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
 
     /** This method should be implemented to retrieve a data display of the give type. 
      * @protected. */
-    getDataDisplay(viewMode,viewType) {
+    getDataDisplay(displayContainer,viewType) {
 
         var callbacks;
 
@@ -51,22 +51,22 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
         switch(viewType) {
 
             case apogeeapp.app.BasicControlComponent.VIEW_OUTPUT:
-                viewMode.setDisplayDestroyFlags(this.displayDestroyFlags);
-                this.outputMode = viewMode;
-                return this.getOutputDisplay(viewMode);
+                displayContainer.setDisplayDestroyFlags(this.displayDestroyFlags);
+                this.outputDisplayContainer = displayContainer;
+                return this.getOutputDisplay(displayContainer);
 
             case apogeeapp.app.BasicControlComponent.VIEW_CODE:
                 callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member);
-                return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
             case apogeeapp.app.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
                 callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member);
-                return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
+                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
             case apogeeapp.app.BasicControlComponent.VIEW_DESCRIPTION:
                 callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
-                //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
-                return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
+                //return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                return new apogeeapp.app.TextAreaEditor(displayContainer,callbacks);
 
             default:
     //temporary error handling...
