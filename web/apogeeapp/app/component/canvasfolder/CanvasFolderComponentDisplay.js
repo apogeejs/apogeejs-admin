@@ -1,5 +1,5 @@
 /** This component represents a json table object. */
-apogeeapp.app.TabComponentDisplay = function(component,member,folder) {
+apogeeapp.app.CanvasFolderComponentDisplay = function(component,member,folder) {
     this.component = component;
     this.member = member;
     this.folder = folder;
@@ -10,18 +10,18 @@ apogeeapp.app.TabComponentDisplay = function(component,member,folder) {
 //    this.addCleanupAction(apogeeapp.app.EditDisplayContent.destroy);
 };
 
-apogeeapp.app.TabComponentDisplay.prototype.getTab = function() {
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.getTab = function() {
     return this.tab;
 }
 
-apogeeapp.app.TabComponentDisplay.prototype.closeTab = function() {
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.closeTab = function() {
     if(this.tab) {
         this.tab.close();
         this.tab = null;
     }
 }
 
-apogeeapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     if(bannerState == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE) {
         this.windowHeaderManager.hideBannerBar();
     }
@@ -40,12 +40,12 @@ apogeeapp.app.TabComponentDisplay.prototype.setBannerState = function(bannerStat
     }
 }
 
-apogeeapp.app.TabComponentDisplay.prototype.updateData = function() {
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.updateData = function() {
     this.tab.setTitle(this.member.getName());
 }
 
 /** This method is used to bring the child component to the front. */
-apogeeapp.app.TabComponentDisplay.prototype.showChildComponent = function(childComponent) {
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.showChildComponent = function(childComponent) {
     var windowComponentDisplay = childComponent.getComponentDisplay();
     if(windowComponentDisplay) {
         var childWindow = windowComponentDisplay.getDisplayFrame();
@@ -58,7 +58,7 @@ apogeeapp.app.TabComponentDisplay.prototype.showChildComponent = function(childC
 
 
 /** This creates and adds a display for the child component to the parent container. */
-apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childComponent) {
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.addChildComponent = function(childComponent) {
     
     var childComponentDisplay;
     var componentDisplayOptions = childComponent.getComponentDisplayOptions();
@@ -97,7 +97,7 @@ apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childCo
 //===============================
 
 /** @private */
-apogeeapp.app.TabComponentDisplay.prototype.loadTabEntry = function() {
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.loadTabEntry = function() {
     this.tab = new apogeeapp.ui.Tab(this.member.getId());    
     
     //-----------------------
@@ -148,7 +148,7 @@ apogeeapp.app.TabComponentDisplay.prototype.loadTabEntry = function() {
     this.tab.addListener(apogeeapp.ui.CLOSE_EVENT,onClose);
 }
 
-apogeeapp.app.TabComponentDisplay.PARENT_CONTAINER_STYLE = {
+apogeeapp.app.CanvasFolderComponentDisplay.PARENT_CONTAINER_STYLE = {
     "position":"relative",
     "display":"table",
     "width":"100%",
@@ -158,9 +158,9 @@ apogeeapp.app.TabComponentDisplay.PARENT_CONTAINER_STYLE = {
 }
 
  /** @private */
-apogeeapp.app.TabComponentDisplay.prototype.createDisplayContent = function() {
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.createDisplayContent = function() {
    
-    this.contentElement = apogeeapp.ui.createElement("div",null,apogeeapp.app.TabComponentDisplay.PARENT_CONTAINER_STYLE);
+    this.contentElement = apogeeapp.ui.createElement("div",null,apogeeapp.app.CanvasFolderComponentDisplay.PARENT_CONTAINER_STYLE);
     this.parentContainer = new apogeeapp.ui.WindowParent(this.contentElement);
 
     //we ony use this context menu and child map for parents
@@ -184,7 +184,7 @@ apogeeapp.app.TabComponentDisplay.prototype.createDisplayContent = function() {
 
 /** This loads the context menu for the key. It should be update if
  *the key index changes. */
-apogeeapp.app.TabComponentDisplay.prototype.setAddChildrenContextMenu = function() {
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.setAddChildrenContextMenu = function() {
     
     var workspaceUI = this.component.getWorkspaceUI();
     var app = workspaceUI.getApp();
@@ -220,7 +220,7 @@ apogeeapp.app.TabComponentDisplay.prototype.setAddChildrenContextMenu = function
 //======================================
 
 /** @protected */
-apogeeapp.app.TabComponentDisplay.prototype.destroy = function() {
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.destroy = function() {
     var children = this.folder.getChildMap();
     var workspaceUI = this.component.getWorkspaceUI();
     
