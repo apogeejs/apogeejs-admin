@@ -51,7 +51,7 @@ apogeeapp.app.ParentWindowComponentDisplay.prototype.deleteDisplay = function() 
 
 apogeeapp.app.ParentWindowComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     if(this.windowFrame) {
-        var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(bannerState);
+        var iconOverlay = apogeeapp.app.banner.getIconOverlay(bannerState);
         if(iconOverlay) {
             this.windowFrame.setIconOverlay(iconOverlay);
         }

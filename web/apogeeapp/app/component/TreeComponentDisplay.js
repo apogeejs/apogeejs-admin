@@ -39,7 +39,7 @@ apogeeapp.app.TreeComponentDisplay.prototype.deleteDisplay = function() {
 }
 
 apogeeapp.app.TreeComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
-    var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(bannerState);
+    var iconOverlay = apogeeapp.app.banner.getIconOverlay(bannerState);
     if(iconOverlay) {
         this.treeEntry.setIconOverlay(iconOverlay);
     }

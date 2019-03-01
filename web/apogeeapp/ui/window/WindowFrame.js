@@ -41,7 +41,6 @@ apogeeapp.ui.WindowFrame = function(options) {
     this.headerCell = null;
     this.bodyCell = null;
     
-    this.headerContent = null;
     this.content = null;
     
     this.windowDragActive = false;
@@ -151,11 +150,13 @@ apogeeapp.ui.WindowFrame.prototype.clearIconOverlay = function() {
     }
 }
 
-/** This sets the content for the window. */
+/** This sets the content for the window. If null (or otherwise false) is passed
+ * the content will be set to empty.*/
 apogeeapp.ui.WindowFrame.prototype.setHeaderContent = function(contentElement) {
     apogeeapp.ui.removeAllChildren(this.headerCell);
-    this.headerCell.appendChild(contentElement);
-    this.headerContent = contentElement;
+    if(contentElement) {
+        this.headerCell.appendChild(contentElement);
+    }
 }
 
 /** This sets the content for the window. The content type

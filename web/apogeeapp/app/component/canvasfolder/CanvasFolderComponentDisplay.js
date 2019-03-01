@@ -22,15 +22,16 @@ apogeeapp.app.CanvasFolderComponentDisplay.prototype.closeTab = function() {
 }
 
 apogeeapp.app.CanvasFolderComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
-    if(bannerState == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE) {
-        this.windowHeaderManager.hideBannerBar();
+    if(bannerState == apogeeapp.app.banner.BANNER_TYPE_NONE) {
+       this.tab.setHeaderContent(null);
     }
     else {
-        this.windowHeaderManager.showBannerBar(bannerMessage,bannerState);
+        var banner = apogeeapp.app.banner.getBanner(bannerMessage,bannerState);
+        this.tab.setHeaderContent(banner);
     }
     
     if(this.tab) {
-        var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(bannerState);
+        var iconOverlay = apogeeapp.app.banner.getIconOverlay(bannerState);
         if(iconOverlay) {
             this.tab.setIconOverlay(iconOverlay);
         }
@@ -99,14 +100,7 @@ apogeeapp.app.CanvasFolderComponentDisplay.prototype.addChildComponent = functio
 /** @private */
 apogeeapp.app.CanvasFolderComponentDisplay.prototype.loadTabEntry = function() {
     this.tab = new apogeeapp.ui.Tab(this.member.getId());    
-    
-    //-----------------------
-    //add headers for display
-    //-----------------------
-    this.windowHeaderManager = new apogeeapp.app.WindowHeaderManager();
-    this.tab.setHeaderContent(this.windowHeaderManager.getHeaderElement());
-    
-
+   
     //-----------------------
     //set the content
     //-----------------------

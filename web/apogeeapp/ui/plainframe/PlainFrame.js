@@ -22,7 +22,6 @@ apogeeapp.ui.PlainFrame = function(options) {
     
     this.isShowing = false;
     
-    this.headerContent = null;
     this.content = null;
 	
     //initialize
@@ -36,11 +35,13 @@ apogee.base.mixin(apogeeapp.ui.PlainFrame,apogee.EventManager);
 // Public Methods
 //====================================
 
-/** This sets the content for the window. */
+/** This sets the content for the window. If null (or otherwise false) is passed
+ * the content will be set to empty.*/
 apogeeapp.ui.PlainFrame.prototype.setHeaderContent = function(contentElement) {
     apogeeapp.ui.removeAllChildren(this.headerCell);
-    this.headerCell.appendChild(contentElement);
-    this.headerContent = contentElement;
+    if(contentElement) {
+        this.headerCell.appendChild(contentElement);
+    }
 }
 
 /** This sets the content for the window. The content type
@@ -167,9 +168,6 @@ apogeeapp.ui.PlainFrame.prototype.initUI = function() {
   
     this.headerCell= this.displayAndHeader.getHeaderContainer();  
     this.bodyCell = this.displayAndHeader.getBody();
-    
-    this.windowHeaderManager = new apogeeapp.app.WindowHeaderManager();
-    this.headerCell.appendChild(this.windowHeaderManager.getHeaderElement());  
     
 }
 

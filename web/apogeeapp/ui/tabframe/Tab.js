@@ -83,11 +83,13 @@ apogeeapp.ui.Tab.prototype.setTitle = function(title) {
     this.title = title;
 }
 
-/** This sets the content for the window. */
+/** This sets the content for the window. If null (or otherwise false) is passed
+ * the content will be set to empty.*/
 apogeeapp.ui.Tab.prototype.setHeaderContent = function(contentElement) {
     apogeeapp.ui.removeAllChildren(this.headerContainer);
-    this.headerContainer.appendChild(contentElement);
-    this.headerContent = contentElement;
+    if(contentElement) {
+        this.headerContainer.appendChild(contentElement);
+    }
 }
 
 /** This sets the content for the window. The content type

@@ -9,7 +9,7 @@ apogeeapp.app.ReferenceEntry = class {
         this.url = referenceData.url;
         this.referenceTypeInfo = referenceTypeInfo;
 
-        this.state = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
+        this.state = apogeeapp.app.banner.BANNER_TYPE_NONE;
 
         var nickname = referenceData.nickname;
         if((!nickname)||(nickname.length === 0)) nickname = this.createEntryNameFromUrl(this.url);
@@ -126,15 +126,15 @@ apogeeapp.app.ReferenceEntry = class {
     }
 
     setClearState() {
-        this.setState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE);
+        this.setState(apogeeapp.app.banner.BANNER_TYPE_NONE);
     }
 
     setError(errorMsg) {
-        this.setState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
+        this.setState(apogeeapp.app.banner.BANNER_TYPE_ERROR,errorMsg);
     }
 
     setPendingState() {
-        this.setState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING,"loading");
+        this.setState(apogeeapp.app.banner.BANNER_TYPE_PENDING,"loading");
     }
 
     setState(state,msg) {

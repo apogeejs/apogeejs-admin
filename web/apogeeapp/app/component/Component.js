@@ -14,7 +14,7 @@ apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
     this.cleanupActions = [];
     
     //notifications
-    this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
+    this.bannerState = apogeeapp.app.banner.BANNER_TYPE_NONE;
     this.bannerMessage = "";
     
     //ui elements
@@ -349,20 +349,20 @@ apogeeapp.app.Component.prototype.memberUpdated = function() {
             errorMsg += actionErrors[i].msg + "\n";
         }
         
-        this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR;
+        this.bannerState = apogeeapp.app.banner.BANNER_TYPE_ERROR;
         this.bannerMessage = errorMsg;
     }
     else if(member.getResultPending()) {
-        this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING;
-        this.bannerMessage = apogeeapp.app.WindowHeaderManager.PENDING_MESSAGE;
+        this.bannerState = apogeeapp.app.banner.BANNER_TYPE_PENDING;
+        this.bannerMessage = apogeeapp.app.banner.PENDING_MESSAGE;
         
     }
     else if(member.getResultInvalid()) {
-        this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_INVALID;
-        this.bannerMessage = apogeeapp.app.WindowHeaderManager.INVALID_MESSAGE;
+        this.bannerState = apogeeapp.app.banner.BANNER_TYPE_INVALID;
+        this.bannerMessage = apogeeapp.app.banner.INVALID_MESSAGE;
     }
     else {   
-        this.bannerState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
+        this.bannerState = apogeeapp.app.banner.BANNER_TYPE_NONE;
         this.bannerMessage = null;
     }
     

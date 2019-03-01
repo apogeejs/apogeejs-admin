@@ -8,7 +8,7 @@
 apogeeapp.app.ReferenceManager = function() {
     
     this.referencesTreeEntry = null;
-    this.state = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NORMAL;
+    this.state = apogeeapp.app.banner.BANNER_TYPE_NORMAL;
     
     //references
     this.referenceLists = {};
@@ -154,7 +154,7 @@ apogeeapp.app.ReferenceManager.prototype.getListStruct = function(typeInfo) {
     listStruct.typeInfo = typeInfo;
     listStruct.listEntries = [];
     listStruct.treeEntry = null;
-    listStruct.state = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NORMAL;
+    listStruct.state = apogeeapp.app.banner.BANNER_TYPE_NORMAL;
     return listStruct;
 }
 
@@ -225,19 +225,19 @@ apogeeapp.app.ReferenceManager.prototype.processReferenceState = function() {
         
         var listState = this.getListState(listStruct);
         
-        if(listState == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR) hasError = true;
-        else if(listState == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING) hasPending = true;
+        if(listState == apogeeapp.app.banner.BANNER_TYPE_ERROR) hasError = true;
+        else if(listState == apogeeapp.app.banner.BANNER_TYPE_PENDING) hasPending = true;
     }
         
     var newState;
     if(hasError) {
-        newState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR;
+        newState = apogeeapp.app.banner.BANNER_TYPE_ERROR;
     }
     else if(hasPending) {
-        newState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING;
+        newState = apogeeapp.app.banner.BANNER_TYPE_PENDING;
     }
     else {
-        newState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NORMAL;
+        newState = apogeeapp.app.banner.BANNER_TYPE_NORMAL;
     }
     
     if(this.state != newState) {
@@ -254,10 +254,10 @@ apogeeapp.app.ReferenceManager.prototype.getListState = function(listStruct) {
     
     var checkStatus = refEntry => {
         var state = refEntry.getState();
-        if(state == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR) {
+        if(state == apogeeapp.app.banner.BANNER_TYPE_ERROR) {
             hasError = true;
         }
-        else if(state == apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING) {
+        else if(state == apogeeapp.app.banner.BANNER_TYPE_PENDING) {
             hasPending = true;
         }
     }
@@ -266,13 +266,13 @@ apogeeapp.app.ReferenceManager.prototype.getListState = function(listStruct) {
         
     var listState;
     if(hasError) {
-        listState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR;
+        listState = apogeeapp.app.banner.BANNER_TYPE_ERROR;
     }
     else if(hasPending) {
-        listState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING;
+        listState = apogeeapp.app.banner.BANNER_TYPE_PENDING;
     }
     else {
-        listState = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NORMAL;
+        listState = apogeeapp.app.banner.BANNER_TYPE_NORMAL;
     }
     
     if(listState != listStruct.state) {
@@ -301,7 +301,7 @@ apogeeapp.app.ReferenceManager._createId = function() {
 
 /** @private */
 apogeeapp.app.ReferenceManager.applyBannerState = function(treeEntry,state) {
-    var iconOverlay = apogeeapp.app.WindowHeaderManager.getIconOverlay(state);
+    var iconOverlay = apogeeapp.app.banner.getIconOverlay(state);
     if(iconOverlay) {
         treeEntry.setIconOverlay(iconOverlay);
     }
