@@ -19,7 +19,8 @@ apogeeapp.app.PageDisplayContainer = function(component, viewType, options) {
     this.headerCell = null;
     this.bodyCell = null;
     
-    this.isShowing = false;
+    this.isFrameShowing = false;
+    this.isContentLoaded = false;
     
     this.inEditMode = false;
     
@@ -42,17 +43,19 @@ apogee.base.mixin(apogeeapp.app.PageDisplayContainer,apogee.EventManager);
 //---------------------------
 
 /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
-apogeeapp.app.PageDisplayContainer.prototype.setIsShowing = function(isShowing) {
-    if(isShowing) {
-        if(!this.isShowing) {
-            this.isShowing = true;
+apogeeapp.app.PageDisplayContainer.prototype.setIsShowing = function(isFrameShowing) {
+    if(isFrameShowing) {
+        if(!this.isFrameShowing) {
+            this.isFrameShowing = true;
             this.dispatchEvent(apogeeapp.app.SHOWN_EVENT,this);
         }
     }
-    else if(this.isShowing) {
-        this.isShowing = false;
+    else if(this.isFrameShowing) {
+        this.isFrameShowing = false;
         this.dispatchEvent(apogeeapp.app.HIDDEN_EVENT,this);
     }
+    
+    this.updateDataDisplayActiveState();
 }
 
 /** This method should be called if the plain frame container is resized.. */
@@ -60,9 +63,10 @@ apogeeapp.app.PageDisplayContainer.prototype.onResize = function() {
     this.dispatchEvent(apogeeapp.app.RESIZED_EVENT,this);
 }
 
-/** This method returns true if the window is showing. */
+/** This method returns true if the frame is showing. This does not mean the 
+ * content is loaded into the frame */
 apogeeapp.app.PageDisplayContainer.prototype.getIsShowing = function() {
-    return this.isShowing;
+    return this.isFrameShowing;
 }
 
 /** This method returns the data display. */
@@ -100,35 +104,85 @@ apogeeapp.app.PageDisplayContainer.prototype.getElement = function() {
 // Initialization Methods
 //====================================
 
+/** This method returns the main dom element for the window frame. */
+apogeeapp.app.PageDisplayContainer.CONTRACT_BUTTON_PATH = "/contract.png";
+apogeeapp.app.PageDisplayContainer.EXPAND_BUTTON_PATH = "/expand.png";
+
 /** @private */
 apogeeapp.app.PageDisplayContainer.prototype.initUI = function() {
     
     this.mainDiv = document.createElement("div");
     
-    this.viewTitleDiv = document.createElement("div");
-    this.viewTitleDiv.style.padding = "3px";
-    this.viewTitleDiv.style.backgroundColor = "lightgray";
-    this.viewTitleDiv.innerHTML = this.viewType;
-    this.mainDiv.appendChild(this.viewTitleDiv);
+    this.viewTitleBarDiv = document.createElement("div");
+    this.viewTitleBarDiv.style.padding = "3px";
+    this.viewTitleBarDiv.style.backgroundColor = "lightgray";
+    this.mainDiv.appendChild(this.viewTitleBarDiv);
+    
+    this.viewShowButton = document.createElement("img");
+    this.viewShowButton.src = apogeeapp.ui.getResourcePath(apogeeapp.app.PageDisplayContainer.EXPAND_BUTTON_PATH);
+    this.viewShowButton.onclick = () => this.setIsContentLoaded(true);
+    this.viewTitleBarDiv.appendChild(this.viewShowButton);
+    
+    this.viewHideButton = document.createElement("img");
+    this.viewHideButton.src = apogeeapp.ui.getResourcePath(apogeeapp.app.PageDisplayContainer.CONTRACT_BUTTON_PATH);
+    this.viewHideButton.onclick = () => this.setIsContentLoaded(false);
+    this.viewTitleBarDiv.appendChild(this.viewHideButton);
+    
+    this.titleLabel = document.createTextNode(this.viewType);
+    this.viewTitleBarDiv.appendChild(this.titleLabel);  
     
     this.displayAndHeader = new apogeeapp.ui.DisplayAndHeader(apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
         null,
         apogeeapp.ui.DisplayAndHeader.SCROLLING_PANE,
         null
     );
-  
+    this.contentCell = this.displayAndHeader.getOuterElement();
     this.headerCell= this.displayAndHeader.getHeaderContainer();  
     this.bodyCell = this.displayAndHeader.getBody();
-    this.mainDiv.appendChild(this.displayAndHeader.getOuterElement());
+    this.mainDiv.appendChild(this.contentCell);
     
     this.bodyCell.style.height = "300px";
     
+    //set the show/hide state
+    this.setIsContentLoaded(this.isContentLoaded);
+    
     //load the content
     this.dataDisplay =  this.component.getDataDisplay(this,this.viewType);
-    this.setContent(this.dataDisplay.getContent(),this.dataDisplay.getContentType());  
+    this.setContent(this.dataDisplay.getContent(),this.dataDisplay.getContentType()); 
     
     //fyi - this is remove code, when we need to add it
     //this.safeRemoveContent(displayElement);
+}
+
+/** This method should be called to set the content as loaded or not loaded.
+ * @private */
+apogeeapp.app.PageDisplayContainer.prototype.setIsContentLoaded = function(isContentLoaded) {
+    this.isContentLoaded = isContentLoaded;
+    if(isContentLoaded) {
+        this.viewShowButton.style.display = "none";
+        this.viewHideButton.style.display = "";
+        this.contentCell.style.display = "";
+    }
+    else {
+        this.viewShowButton.style.display = "";
+        this.viewHideButton.style.display = "none";
+        this.contentCell.style.display = "none";
+    }
+    this.updateDataDisplayActiveState();
+}
+
+/** This method shold be called when the content loaded or frame visible state 
+ * changes to manage the data display.
+ * private */
+apogeeapp.app.PageDisplayContainer.prototype.updateDataDisplayActiveState = function() {
+    if(!this.dataDisplay) return;
+    
+    if((this.isContentLoaded)&&(this.isFrameShowing)) {
+        if(this.dataDisplay.onUnload) this.dataDisplay.onLoad();
+    }
+    else {
+        if(this.dataDisplay.onUnload) this.dataDisplay.onUnload();
+    }
 }
 
 //------------------------------
@@ -145,16 +199,6 @@ apogeeapp.app.PageDisplayContainer.prototype.setDisplayDestroyFlags = function(d
 /** This method cleasr the data display. It should only be called when the data display is not showing. */
 apogeeapp.app.PageDisplayContainer.prototype.forceClearDisplay = function() {
     alert("Implement forceClearDisplay!");
-}
-
-/** This method shows the data display ion the display component. */
-apogeeapp.app.PageDisplayContainer.prototype.setActive = function() {
-    alert("Implement setActive!");
-}
-
-/** This method hides the data display in the display component. */
-apogeeapp.app.PageDisplayContainer.prototype.setInactive = function() {
-    alert("Implement setInactive!");
 }
 
 /** This method destroys the data display. */

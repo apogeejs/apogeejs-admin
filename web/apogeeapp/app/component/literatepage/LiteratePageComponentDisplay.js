@@ -1,5 +1,13 @@
 /** This component represents a json table object. */
 apogeeapp.app.LiteratePageComponentDisplay = function(component,member,folder) {
+    
+    //base init
+    apogee.EventManager.init.call(this);
+    
+    if(!apogeeapp.app.LiteratePageComponentDisplay.quillInitialized()) {
+        apogeeapp.app.LiteratePageComponentDisplay.initializeQuill();
+    }
+    
     this.component = component;
     this.member = member;
     this.folder = folder;
@@ -9,6 +17,9 @@ apogeeapp.app.LiteratePageComponentDisplay = function(component,member,folder) {
     //add a cleanup action to the base component - component must already be initialized
 //    this.addCleanupAction(apogeeapp.app.EditDisplayContent.destroy);
 };
+
+//add components to this class
+apogee.base.mixin(apogeeapp.app.LiteratePageComponentDisplay,apogee.EventManager);
 
 apogeeapp.app.LiteratePageComponentDisplay.prototype.getTab = function() {
     return this.tab;
@@ -75,8 +86,14 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.addChildComponent = functio
     if(childComponentDisplay) {
         //for now there is no state - just show in order
         childComponent.setComponentDisplay(childComponentDisplay);
-        var childDisplayElement = childComponentDisplay.getElement();
-        this.contentElement.appendChild(childDisplayElement);
+//        var childDisplayElement = childComponentDisplay.getElement();
+//        this.contentElement.appendChild(childDisplayElement);
+        let range = this.quill.getSelection(true);
+        var childMember = childComponent.getMember();
+        let value = { path: childMember.getFullName() };
+        this.quill.insertText(range.index, '\n', Quill.sources.USER);
+        this.quill.insertEmbed(range.index + 1, 'apogeedisplay', value, Quill.sources.USER);
+        this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
     }
 }
 
@@ -95,14 +112,8 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.loadTabEntry = function() {
     this.createDisplayContent();
     this.tab.setContent(this.contentElement,apogeeapp.ui.FIXED_SIZE);
     
-    var tabShown = () => {
-        this.tabShown();
-    }
-    this.tab.addListener(apogeeapp.ui.SHOWN_EVENT,tabShown);
-    var tabHidden = () => {
-        this.tabHidden();
-    }
-    this.tab.addListener(apogeeapp.ui.HIDDEN_EVENT,tabHidden);
+    this.tab.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.tabShown);
+    this.tab.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.tabHidden());
     
     //------------------
     // set menu
@@ -148,16 +159,22 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.createDisplayContent = func
     //modify if we use this elsewhere
     if(!this.folder.isParent) return;
 
-    //show all children
-    var workspaceUI = this.component.getWorkspaceUI();
-    var children = this.folder.getChildMap();
-    for(var childName in children) {
-        var child = children[childName];
-        var childComponent = workspaceUI.getComponent(child);
-        if(childComponent) {
-            this.addChildComponent(childComponent);
-        }
-    }
+    var container = document.createElement("div");
+    this.contentElement.appendChild(container);
+    var options = {};
+    options.theme = 'snow';
+    this.quill = new Quill(container,options);
+
+//    //show all children
+//    var workspaceUI = this.component.getWorkspaceUI();
+//    var children = this.folder.getChildMap();
+//    for(var childName in children) {
+//        var child = children[childName];
+//        var childComponent = workspaceUI.getComponent(child);
+//        if(childComponent) {
+//            this.addChildComponent(childComponent);
+//        }
+//    }
 }
 
 /** @protected */
@@ -179,26 +196,61 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.destroy = function() {
 
 /** @protected */
 apogeeapp.app.LiteratePageComponentDisplay.prototype.tabShown = function() {
-    var children = this.folder.getChildMap();
-    for(var childName in children) {
-        var child = children[childName];
-        var childComponent = workspaceUI.getComponent(child);
-        if(childComponent) {
-            childComponent.closeComponentDisplay();
-        }
-    }
+    this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,this);
 }
 
 /** @protected */
 apogeeapp.app.LiteratePageComponentDisplay.prototype.tabHidden = function() {
-    var children = this.folder.getChildMap();
-    for(var childName in children) {
-        var child = children[childName];
-        var childComponent = workspaceUI.getComponent(child);
-        if(childComponent) {
-            childComponent.closeComponentDisplay();
+    this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,this);
+}
+
+//===========================
+// Static methods for editor initialization
+//===========================
+apogeeapp.app.LiteratePageComponentDisplay.quillInitDone = false;
+apogeeapp.app.LiteratePageComponentDisplay.quillInitialized = function() {
+    return apogeeapp.app.LiteratePageComponentDisplay.quillInitDone;
+}
+
+apogeeapp.app.LiteratePageComponentDisplay.initializeQuill = function() {
+    var BlockEmbed = Quill.import('blots/block/embed');
+    //apogee custom  blot
+    class ApogeeDisplayBlot extends BlockEmbed {
+        static create(value) {
+            var node = super.create();
+            node.setAttribute('path',value.path);
+            
+            var app = apogeeapp.app.Apogee.getInstance();
+            if(app) {                
+                var workspace = app.getWorkspace();
+                if(workspace) {
+                    var member = workspace.getMemberByFullName(value.path);
+                    var workspaceUI = app.getWorkspaceUI();
+                    var component = workspaceUI.getComponent(member);
+                    //we should have just created this
+                    var componentDisplay = component.getComponentDisplay();
+                    var element = componentDisplay.getElement();
+                    
+                    //get the container from the node shadow root
+                    var internalContainer = node.shadowRoot.getElementById("mainDiv");
+                    internalContainer.appendChild(element);
+                }
+            }
+
+            return node;
         }
-    }
+
+        static value(node) {
+            return {
+                path: node.getAttribute('path')
+            };
+        }
+    };
+    ApogeeDisplayBlot.blotName = 'apogeedisplay';
+    ApogeeDisplayBlot.tagName = 'apogee-element';
+    Quill.register(ApogeeDisplayBlot);	
+    
+    apogeeapp.app.LiteratePageComponentDisplay.quillInitDone = true;
 }
 
 

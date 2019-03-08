@@ -62,17 +62,6 @@ apogeeapp.app.PageChildComponentDisplay.prototype.setBannerState = function(bann
     }
 }
 
-//apogeeapp.app.PageChildComponentDisplay.prototype.setIsShowing = function(isShowing) {
-//    Implement this!
-//    this.isShowing = isShowing;
-//    
-//    //set on views
-//    for(var viewType in this.displayContainerMap) {
-//        var displayContainer = this.displayContainerMap[viewType];
-//        displayContainer.setIsShowing(isShowing);
-//    }
-//}
-
 apogeeapp.app.PageChildComponentDisplay.prototype.updateData = function() {
     //update the title
     this.titleBarTitleElement.innerHTML = this.member.getDisplayName();
@@ -136,8 +125,36 @@ apogeeapp.app.PageChildComponentDisplay.prototype.loadComponentDisplay = functio
         this.mainDiv.appendChild(displayContainer.getElement());
         this.displayContainerMap[viewType] = displayContainer;
     }
+    
+    var parent = this.member.getParent();
+    var workspaceUI = this.component.getWorkspaceUI();
+    var parentComponent = workspaceUI.getComponent(parent);
+    if(parentComponent) {
+        var tabDisplay = parentComponent.getTabDisplay();
+        tabDisplay.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.componentShown());
+        tabDisplay.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.componentHidden());
+    }
 }
 
+/** This takes needed action when the component is shown. */
+apogeeapp.app.PageChildComponentDisplay.prototype.componentShown = function(element) {
+    this.displayContainerMap = {};  
+    for(var i = 0; i < viewTypes.length; i++) {
+        var viewType = viewTypes[i];
+        var displayContainer = this.displayContainerMap[viewType];
+        displayContainer.setIsShowing(true);
+    }
+}
+
+/** This takes needed actions when the component is hidden. */
+apogeeapp.app.PageChildComponentDisplay.prototype.componentHidden = function(element) {
+    this.displayContainerMap = {};  
+    for(var i = 0; i < viewTypes.length; i++) {
+        var viewType = viewTypes[i];
+        var displayContainer = this.displayContainerMap[viewType];
+        displayContainer.setIsShowing(false);
+    }
+}
 
 /** This sets the given element as the icon overlay. If null or other [false} is passed
  * this will just clear the icon overlay. */
