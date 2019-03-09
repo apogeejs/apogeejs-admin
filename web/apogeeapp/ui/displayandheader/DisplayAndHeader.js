@@ -9,10 +9,27 @@
  * coloring and, for the sake of the header, height.
  */ 
 apogeeapp.ui.DisplayAndHeader = function(headerType,headerStyleClass,bodyType,bodyStyleClass) {
-    this.container = apogeeapp.ui.createElementWithClass("div","visiui-dnh-container");
+//    this.container = apogeeapp.ui.createElementWithClass("div","visiui-dnh-container");
+//    
+//    this.headerOuter = apogeeapp.ui.createElementWithClass("div","visiui-dnh-header",this.container);
+//    this.header = apogeeapp.ui.createElementWithClass("div","visiui-dnh-header-inner",this.headerOuter);
+//    this.bodyOuter = apogeeapp.ui.createElementWithClass("div","visiui-dnh-body",this.container);
+//    this.body = apogeeapp.ui.createElementWithClass("div","visiui-dnh-body-inner",this.bodyOuter);
+//    
+//    this.headerStyleClass = headerStyleClass;
+//    this.bodyStyleClass = bodyStyleClass;
+//    
+//    this.headerContent = document.createElement("div");
+//    this.header.appendChild(this.headerContent);
+//    this.bodyContent = document.createElement("div");
+//    this.body.appendChild(this.bodyContent);
     
-    this.header = apogeeapp.ui.createElementWithClass("div","visiui-dnh-header",this.container);
-    this.body = apogeeapp.ui.createElementWithClass("div","visiui-dnh-body",this.container);
+    this.container = apogeeapp.ui.createElementWithClass("table","visiui-dnh-container");
+    
+    this.headerOuter = apogeeapp.ui.createElementWithClass("tr","visiui-dnh-header",this.container);
+    this.header = apogeeapp.ui.createElementWithClass("td","visiui-dnh-header-inner",this.headerOuter);
+    this.bodyOuter = apogeeapp.ui.createElementWithClass("tr","visiui-dnh-body",this.container);
+    this.body = apogeeapp.ui.createElementWithClass("td","visiui-dnh-body-inner",this.bodyOuter);
     
     this.headerStyleClass = headerStyleClass;
     this.bodyStyleClass = bodyStyleClass;
@@ -22,7 +39,8 @@ apogeeapp.ui.DisplayAndHeader = function(headerType,headerStyleClass,bodyType,bo
     this.bodyContent = document.createElement("div");
     this.body.appendChild(this.bodyContent);
     
-    this.setHeaderType(headerType);
+    //this.setHeaderType(headerType);
+    this.setHeaderType("visiui-dnh-shrink-to-fit");
     this.setBodyType(bodyType);
 }
 

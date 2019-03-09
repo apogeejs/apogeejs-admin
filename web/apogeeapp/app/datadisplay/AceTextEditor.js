@@ -1,43 +1,30 @@
-/** Editor that uses the Ace text editor.
- * 
- * @param {type} displayContainer - the display container
- * @param {type} callbacks - {getData,getEditOk,setData}; format for data is text
- * @param {type} aceMode - the display format, such as "ace/mode/json"
+/**
+ * THIS IS THE TEXT AREA EDITOR RENAMED ACE. I NEED TO USE THIS FOR DEVELOPMENT 
+ * INSTEAD OF ACE CSEIN I HAVE SOME CSS ISUSUES THERE.
  */
-apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
+apogeeapp.app.AceTextEditor = class extends  apogeeapp.app.DataDisplay {
     
-    constructor(displayContainer,callbacks,aceMode) {
-        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
+    constructor(displayContainer,callbacks) {
+        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
 
-        this.editorDiv = apogeeapp.ui.createElement("div",null,{
+        var textArea = apogeeapp.ui.createElement("TEXTAREA",null,{
             "position":"absolute",
             "top":"0px",
             "left":"0px",
-            "bottom":"0px",
-            "right":"0px",
+            "width":"100%",
+            "height":"100%",
             "overflow":"auto"
         });
+        this.textArea = textArea;
 
-        this.uneditedData = null;
+        this.workingData = null;
 
-        var editor = ace.edit(this.editorDiv);
-        editor.renderer.setShowGutter(true);
-        //editor.setReadOnly(true);
-        editor.setTheme("ace/theme/eclipse"); //good
-        editor.getSession().setMode(aceMode); 
-        editor.$blockScrolling = Infinity;
-        this.editor = editor;
-        
         //enter edit mode on change to the data
-        this.editor.addEventListener("input",() => this.checkStartEditMode());
-
-        //old
-        //add click handle to enter edit mode
-        //this.editorDiv.addEventListener("click",() => this.onTriggerEditMode());
+        this.textArea.addEventListener("input",() => this.checkStartEditMode());
     }
     
     getContent() {
-        return this.editorDiv;
+        return this.textArea;
     }
     
     getContentType() {
@@ -45,54 +32,30 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
     }
 
     getData() {
-        return this.editor.getSession().getValue();
+        return this.textArea.value;
     }
     
     setData(text) {
-        if(apogee.util.getObjectType(text) != "String") {
-            var errorMsg = "ERROR: Data value is not text";
-            //this.setError(errorMsg);
-            text = errorMsg;
-        }
-        
-        //record the set value so we know if we need to NOT do edit mode
         this.uneditedValue = text;
-        this.editor.getSession().setValue(text);
+        this.textArea.value = text;
 
-        //set the edit mode and background color
+        //set the background color
         if(this.editOk) {
-            this.editorDiv.style.backgroundColor = "";
-            this.editor.setReadOnly(false);
+            this.textArea.style.backgroundColor = "";
+            this.textArea.readOnly = false;
         }
         else {
-            this.editorDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
-            this.editor.setReadOnly(true);
+            this.textArea.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
+            this.textArea.readOnly = true;
         }
     }
-    
-    onLoad() {
-        if(this.editor) this.editor.resize();
-    }
-
-    onResize() {
-        if(this.editor) this.editor.resize();
-    }
-
-    destroy() {
-        if(this.editor) {
-            this.editor.destroy();
-            this.editor = null;
-        }
-    }
-    
+ 
     endEditMode() {
-        //this.editor.setReadOnly(true);
         super.endEditMode();
     }
     
     startEditMode() {
         super.startEditMode();
-        //this.editor.setReadOnly(false);
     }
     
     checkStartEditMode() {
@@ -103,3 +66,5 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
         }
     }
 }
+
+

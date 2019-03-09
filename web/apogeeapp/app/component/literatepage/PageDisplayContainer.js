@@ -112,6 +112,7 @@ apogeeapp.app.PageDisplayContainer.EXPAND_BUTTON_PATH = "/expand.png";
 apogeeapp.app.PageDisplayContainer.prototype.initUI = function() {
     
     this.mainDiv = document.createElement("div");
+    this.mainDiv.style.position = "relative";
     
     this.viewTitleBarDiv = document.createElement("div");
     this.viewTitleBarDiv.style.padding = "3px";
@@ -136,12 +137,19 @@ apogeeapp.app.PageDisplayContainer.prototype.initUI = function() {
         apogeeapp.ui.DisplayAndHeader.SCROLLING_PANE,
         null
     );
-    this.contentCell = this.displayAndHeader.getOuterElement();
-    this.headerCell= this.displayAndHeader.getHeaderContainer();  
-    this.bodyCell = this.displayAndHeader.getBody();
+    this.contentCell = document.createElement("div");
+    this.contentCell.style.position = "relative";
+    this.headerCell= document.createElement("div"); 
+    this.headerCell.style.position = "relative";
+    this.contentCell.appendChild(this.headerCell);
+    this.bodyCell = document.createElement("div");
+    this.bodyCell.style.position = "relative";
+    this.bodyCell.style.height = "300px";
+    this.contentCell.appendChild(this.bodyCell);
     this.mainDiv.appendChild(this.contentCell);
     
     this.bodyCell.style.height = "300px";
+    this.bodyCell.style.width = "700px";
     
     //set the show/hide state
     this.setIsContentLoaded(this.isContentLoaded);
@@ -178,7 +186,7 @@ apogeeapp.app.PageDisplayContainer.prototype.updateDataDisplayActiveState = func
     if(!this.dataDisplay) return;
     
     if((this.isContentLoaded)&&(this.isFrameShowing)) {
-        if(this.dataDisplay.onUnload) this.dataDisplay.onLoad();
+        if(this.dataDisplay.onLoad) this.dataDisplay.onLoad();
     }
     else {
         if(this.dataDisplay.onUnload) this.dataDisplay.onUnload();
@@ -236,7 +244,7 @@ apogeeapp.app.PageDisplayContainer.prototype.memberUpdated = function() {
 
 apogeeapp.app.PageDisplayContainer.prototype.onCancel = function() {
 	//reload old data
-	this.setData();
+	this.dataDisplay.showData();
 	
 	return true;
 }

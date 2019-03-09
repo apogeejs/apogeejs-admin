@@ -224,8 +224,15 @@ apogeeapp.app.Component.prototype.toJson = function() {
         json.windowState = this.childComponentDisplayStateJson;
     }
     
-    if(this.tabDisplay) {
-        json.tabOpen = true; 
+    if(this.usesTabDisplay) {
+        if(this.tabDisplay != null) {
+            this.tabDisplayStateJson = this.tabDisplay.getStateJson();
+            json.tabOpen = true;
+        }
+        
+        if(this.tabDisplayStateJson) {
+            json.folderState = this.tabDisplayStateJson;
+        }
     }
     
     if(this.treeDisplay) {
@@ -255,15 +262,19 @@ apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
     }
     
     //open the tab - if tab frame exists
-    if((json.tabOpen)&&(this.usesTabDisplay())) {
-        var tabFrame = this.workspaceUI.getTabFrame();
-        if(tabFrame) {
-            //create the tab display if it is not present
-            this.getTabDisplay(true);
-            
-            var tab = this.tabDisplay.getTab();
-
-            tabFrame.addTab(tab,false);
+    if(this.usesTabDisplay()) {
+        if(json.folderState) {
+            this.tabDisplayStateJson = json.folderState;
+        }
+        if(json.tabOpen) {       
+            var tabFrame = this.workspaceUI.getTabFrame();
+            if(tabFrame) {
+                //create the tab display if it is not present
+                this.getTabDisplay(true);
+                this.tabDisplay.setStateJson(this.tabDisplayStateJson);
+                var tab = this.tabDisplay.getTab();
+                tabFrame.addTab(tab,false);
+            }
         }
     }
     

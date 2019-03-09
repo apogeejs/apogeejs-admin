@@ -25,3 +25,9 @@
 
 /** This creates and adds a display for the child component to the parent container. */
 //apogeeapp.app.TabComponentDisplay.prototype.addChildComponent = function(childComponent);
+
+/** This is to record any state in the tab object. */
+//apogeeapp.app.TabComponentDisplay.prototype.getStateJson = function();
+
+/** This is to restore any state in the tab object. */
+//apogeeapp.app.TabComponentDisplay.prototype.setStateJson = function(json);

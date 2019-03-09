@@ -21,6 +21,9 @@ apogeeapp.app.LiteratePageComponentDisplay = function(component,member,folder) {
 //add components to this class
 apogee.base.mixin(apogeeapp.app.LiteratePageComponentDisplay,apogee.EventManager);
 
+/** This is the data to load an empty page. */
+apogeeapp.app.LiteratePageComponentDisplay.EMPTY_PAGE_BODY = [];
+
 apogeeapp.app.LiteratePageComponentDisplay.prototype.getTab = function() {
     return this.tab;
 }
@@ -64,8 +67,6 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.showChildComponent = functi
     }
 }
 
-
-
 /** This creates and adds a display for the child component to the parent container. */
 apogeeapp.app.LiteratePageComponentDisplay.prototype.addChildComponent = function(childComponent) {
     
@@ -86,21 +87,69 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.addChildComponent = functio
     if(childComponentDisplay) {
         //for now there is no state - just show in order
         childComponent.setComponentDisplay(childComponentDisplay);
-//        var childDisplayElement = childComponentDisplay.getElement();
-//        this.contentElement.appendChild(childDisplayElement);
         let range = this.quill.getSelection(true);
         var childMember = childComponent.getMember();
-        let value = { path: childMember.getFullName() };
+        let value = { 
+            path: childMember.getFullName(),
+            componentDisplay: childComponentDisplay
+        };
         this.quill.insertText(range.index, '\n', Quill.sources.USER);
         this.quill.insertEmbed(range.index + 1, 'apogeedisplay', value, Quill.sources.USER);
-        this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        this.quill.insertText(range.index + 2, '\n', Quill.sources.USER);
+        this.quill.setSelection(range.index + 3, Quill.sources.SILENT);
     }
 }
 
+/** This is to record any state in the tab object. */
+apogeeapp.app.LiteratePageComponentDisplay.prototype.getStateJson = function() {
+    var json;
+    if(this.quill) {
+        json = this.readStateJson();
+    }
+    else if(this.storedContent) {
+        json = this.storedContent;
+    }
+    return json;
+}
+
+/** This is to restore any state in the tab object. */
+apogeeapp.app.LiteratePageComponentDisplay.prototype.setStateJson = function(json) {
+    if(this.quill) {
+        this.applyStateJson(json);
+    }
+    else {
+        this.storedContent = json;
+    }
+}
 
 //===============================
 // Private Functions
 //===============================
+
+/** @private */
+apogeeapp.app.LiteratePageComponentDisplay.prototype.readStateJson = function() {
+    var json = {};
+    json.pageBody = this.quill.getContents().ops;
+    return json;
+}
+
+/** This method loads the given state json into the page text editor
+ * @private */
+apogeeapp.app.LiteratePageComponentDisplay.prototype.applyStateJson = function(json) {
+    if(this.quill) {
+        var pageBody;
+        if((json)&&(json.pageBody)) {
+            pageBody = json.pageBody;
+        }
+        else {
+            pageBody = apogeeapp.app.LiteratePageComponentDisplay.EMPTY_PAGE_BODY;
+        }
+        this.quill.setContents(pageBody,'api');
+        
+        //clear the stored content, since it will get out of date
+        this.storedContent = null;
+    }
+}
 
 /** @private */
 apogeeapp.app.LiteratePageComponentDisplay.prototype.loadTabEntry = function() {
@@ -164,17 +213,11 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.createDisplayContent = func
     var options = {};
     options.theme = 'snow';
     this.quill = new Quill(container,options);
-
-//    //show all children
-//    var workspaceUI = this.component.getWorkspaceUI();
-//    var children = this.folder.getChildMap();
-//    for(var childName in children) {
-//        var child = children[childName];
-//        var childComponent = workspaceUI.getComponent(child);
-//        if(childComponent) {
-//            this.addChildComponent(childComponent);
-//        }
-//    }
+    
+    //add content if we have it
+    if(this.storedContent) {
+        this.applyStateJson(this.storedContent);
+    }
 }
 
 /** @protected */
@@ -219,24 +262,13 @@ apogeeapp.app.LiteratePageComponentDisplay.initializeQuill = function() {
         static create(value) {
             var node = super.create();
             node.setAttribute('path',value.path);
-            
-            var app = apogeeapp.app.Apogee.getInstance();
-            if(app) {                
-                var workspace = app.getWorkspace();
-                if(workspace) {
-                    var member = workspace.getMemberByFullName(value.path);
-                    var workspaceUI = app.getWorkspaceUI();
-                    var component = workspaceUI.getComponent(member);
-                    //we should have just created this
-                    var componentDisplay = component.getComponentDisplay();
-                    var element = componentDisplay.getElement();
-                    
-                    //get the container from the node shadow root
-                    var internalContainer = node.shadowRoot.getElementById("mainDiv");
-                    internalContainer.appendChild(element);
-                }
+            if(value.componentDisplay) {
+                node.setComponentDisplay(value.componentDisplay);
             }
-
+            else {
+                //implement!
+                alert("not implemented - component display lookup");
+            }
             return node;
         }
 

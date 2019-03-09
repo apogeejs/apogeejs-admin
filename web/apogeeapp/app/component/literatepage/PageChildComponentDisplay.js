@@ -131,26 +131,22 @@ apogeeapp.app.PageChildComponentDisplay.prototype.loadComponentDisplay = functio
     var parentComponent = workspaceUI.getComponent(parent);
     if(parentComponent) {
         var tabDisplay = parentComponent.getTabDisplay();
-        tabDisplay.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.componentShown());
-        tabDisplay.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.componentHidden());
+//        tabDisplay.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.componentShown());
+//        tabDisplay.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.componentHidden());
     }
 }
 
 /** This takes needed action when the component is shown. */
-apogeeapp.app.PageChildComponentDisplay.prototype.componentShown = function(element) {
-    this.displayContainerMap = {};  
-    for(var i = 0; i < viewTypes.length; i++) {
-        var viewType = viewTypes[i];
+apogeeapp.app.PageChildComponentDisplay.prototype.componentShown = function() {
+    for(var viewType in this.displayContainerMap) {
         var displayContainer = this.displayContainerMap[viewType];
         displayContainer.setIsShowing(true);
     }
 }
 
 /** This takes needed actions when the component is hidden. */
-apogeeapp.app.PageChildComponentDisplay.prototype.componentHidden = function(element) {
-    this.displayContainerMap = {};  
-    for(var i = 0; i < viewTypes.length; i++) {
-        var viewType = viewTypes[i];
+apogeeapp.app.PageChildComponentDisplay.prototype.componentHidden = function() {
+    for(var viewType in this.displayContainerMap) {
         var displayContainer = this.displayContainerMap[viewType];
         displayContainer.setIsShowing(false);
     }

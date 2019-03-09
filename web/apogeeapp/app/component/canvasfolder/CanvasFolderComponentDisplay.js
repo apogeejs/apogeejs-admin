@@ -92,6 +92,16 @@ apogeeapp.app.CanvasFolderComponentDisplay.prototype.addChildComponent = functio
     childWindow.setWindowState(state);
 }
 
+/** This is to record any state in the tab object. */
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.getStateJson = function() {
+    //noop
+}
+
+/** This is to restore any state in the tab object. */
+apogeeapp.app.CanvasFolderComponentDisplay.prototype.setStateJson = function(json) {
+    //noop
+}
+
 
 //===============================
 // Private Functions
