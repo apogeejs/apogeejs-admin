@@ -55,7 +55,6 @@ apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW = "Plain";
 apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW = "Colorized";
 apogeeapp.app.JsonTableComponent.TEXT_DATA_VEW = "Text Data";
 apogeeapp.app.JsonTableComponent.GRID_DATA_VEW = "Grid";
-apogeeapp.app.JsonTableComponent.FORM_DATA_VIEW = "Form";
 
 apogeeapp.app.JsonTableComponent.DEFAULT_DATA_VIEW = apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW;;
 
@@ -87,12 +86,6 @@ apogeeapp.app.JsonTableComponent.prototype.getDataDisplay = function(displayCont
                 case apogeeapp.app.JsonTableComponent.GRID_DATA_VEW:
                     callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks(this.member);
                     return new apogeeapp.app.HandsonGridEditor(displayContainer,callbacks);
-
-                case apogeeapp.app.JsonTableComponent.FORM_DATA_VIEW:
-                    alert("FORM EDITOR NOT IMPLEMENTED YET!");
-                    callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks(this.member);
-                    //return new apogeeapp.app.FormDataMode(editComponentDisplay);
-                    //drop through to below
                     
                 case apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW:
                 default:
@@ -103,7 +96,7 @@ apogeeapp.app.JsonTableComponent.prototype.getDataDisplay = function(displayCont
 		case apogeeapp.app.JsonTableComponent.VIEW_CODE:
             callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member,apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
 			return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
-			
+            
 		case apogeeapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
 			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member,apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
             return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
