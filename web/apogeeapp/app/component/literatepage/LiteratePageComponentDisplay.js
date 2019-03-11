@@ -1,4 +1,7 @@
-/** This component represents a json table object. */
+/** This component represents a json table object. 
+ * The member argument is the main member for this component. The folder argument is 
+ * the parent folde associated with this component, which may be different from the
+ * main member, which is the case for the folder function. */
 apogeeapp.app.LiteratePageComponentDisplay = function(component,member,folder) {
     
     //base init
@@ -11,6 +14,9 @@ apogeeapp.app.LiteratePageComponentDisplay = function(component,member,folder) {
     this.component = component;
     this.member = member;
     this.folder = folder;
+    
+    //these are the editor blots that represent components
+    this.blotMap = {};
     
     this.loadTabEntry();
     
@@ -70,6 +76,9 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.showChildComponent = functi
 /** This creates and adds a display for the child component to the parent container. */
 apogeeapp.app.LiteratePageComponentDisplay.prototype.addChildComponent = function(childComponent) {
     
+    //-----------------
+    // Get component display
+    //-----------------
     var childComponentDisplay;
     var componentDisplayOptions = childComponent.getComponentDisplayOptions();
     
@@ -84,19 +93,52 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.addChildComponent = functio
         throw new Error("Unrecognized child component type! " + childComponent.constructor)
     }
     
+    //------------------
+    // add to editor
+    //------------------
     if(childComponentDisplay) {
-        //for now there is no state - just show in order
+        //set the component display
         childComponent.setComponentDisplay(childComponentDisplay);
-        let range = this.quill.getSelection(true);
-        var childMember = childComponent.getMember();
-        let value = { 
-            path: childMember.getFullName(),
-            componentDisplay: childComponentDisplay
-        };
-        this.quill.insertText(range.index, '\n', Quill.sources.USER);
-        this.quill.insertEmbed(range.index + 1, 'apogeedisplay', value, Quill.sources.USER);
-        this.quill.insertText(range.index + 2, '\n', Quill.sources.USER);
-        this.quill.setSelection(range.index + 3, Quill.sources.SILENT);
+        
+        var childName = childComponent.getMember().getName();
+        var componentBlot = this.blotMap[childName];
+        
+        if(componentBlot) { 
+            //blot is in editor, set the display componet for it
+            componentBlot.setComponentDisplay(childComponentDisplay);
+        }
+        else {
+            //blot doesn't exist - create it
+            //component display will be set when it registers
+            
+            //this should be fixed - replace a range if there is one, add to end if no active range.
+            let range = this.quill.getSelection(true);
+            
+            let value = { 
+                name: childName,
+                parent: this.folder.getFullName()
+            };
+            this.quill.insertText(range.index, '\n', Quill.sources.USER);
+            this.quill.insertEmbed(range.index + 1, 'apogeedisplay', value, Quill.sources.USER);
+            this.quill.insertText(range.index + 2, '\n', Quill.sources.USER);
+            this.quill.setSelection(range.index + 3, Quill.sources.SILENT);
+        }
+    }
+}
+
+/** This is to record any state in the tab object. */
+apogeeapp.app.LiteratePageComponentDisplay.prototype.registerBlot = function(blot, name) {
+    this.blotMap[name] = blot;
+
+    //if we already have the component and component display for this component, set it on the blot
+    var childMember = this.folder.getChildMap()[name];
+    if(childMember) {
+        var workspaceUI = this.component.getWorkspaceUI();
+        var childComponent = workspaceUI.getComponent(childMember);
+        var childComponentDisplay;
+        if((childComponent)&&(childComponentDisplay = childComponent.getComponentDisplay())) {
+            blot.setComponentDisplay(childComponentDisplay);
+        }
     }
 }
 
@@ -255,28 +297,41 @@ apogeeapp.app.LiteratePageComponentDisplay.quillInitialized = function() {
     return apogeeapp.app.LiteratePageComponentDisplay.quillInitDone;
 }
 
+/** Here we initialize quill, for one thing loading our custom component that
+ * will represent the apogee component. */
 apogeeapp.app.LiteratePageComponentDisplay.initializeQuill = function() {
     var BlockEmbed = Quill.import('blots/block/embed');
     //apogee custom  blot
     class ApogeeDisplayBlot extends BlockEmbed {
         static create(value) {
             var node = super.create();
-            node.setAttribute('path',value.path);
-            if(value.componentDisplay) {
-                node.setComponentDisplay(value.componentDisplay);
+            node.setAttribute('parent',value.parent);
+            node.setAttribute('name',value.name);
+                       
+            try {
+                //register this blot with the parent component
+                var app = apogeeapp.app.Apogee.getInstance();
+                var workspaceUI = app.getWorkspaceUI();
+                var workspace = workspaceUI.getWorkspace();
+                var parent = workspace.getMemberByFullName(value.parent);
+                var parentComponent = workspaceUI.getComponent(parent);
+                var parentTabDisplay = parentComponent.getTabDisplay();
+                parentTabDisplay.registerBlot(node,value.name);
             }
-            else {
-                //implement!
-                alert("not implemented - component display lookup");
+            catch(error) {
+                console.log("Error adding blot to component!")
+                console.error(error.stack);
             }
+            
             return node;
         }
 
         static value(node) {
             return {
-                path: node.getAttribute('path')
+                name: node.getAttribute('name'),
+                parent: node.getAttribute('parent')
             };
-        }
+        }    
     };
     ApogeeDisplayBlot.blotName = 'apogeedisplay';
     ApogeeDisplayBlot.tagName = 'apogee-element';

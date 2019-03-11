@@ -1,4 +1,7 @@
-/** This component represents a json table object. */
+/** This component represents a json table object.
+ * The member argument is the main member for this component. The folder argument is 
+ * the parent folde associated with this component, which may be different from the
+ * main member, which is the case for the folder function. */
 apogeeapp.app.CanvasFolderComponentDisplay = function(component,member,folder) {
     this.component = component;
     this.member = member;

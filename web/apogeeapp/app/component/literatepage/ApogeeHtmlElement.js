@@ -89,13 +89,19 @@ class ApogeeHtmlElement extends HTMLElement {
 		
 	}
     
+    /** This sets the component associated with this element. */
     setComponentDisplay(componentDisplay) {
         apogeeapp.ui.removeAllChildren(this.container);
+        
         this.componentDisplay = componentDisplay;
         if(componentDisplay) {
             this.container.appendChild(componentDisplay.getElement());
             componentDisplay.componentShown();
         }
+    }
+    
+    getComponentDisplay() {
+        return this.componentDisplay;
     }
 }
 

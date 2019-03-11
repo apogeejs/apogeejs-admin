@@ -92,8 +92,9 @@ apogeeapp.app.Component.prototype.getTreeEntry = function(createIfMissing) {
     if((createIfMissing)&&(!this.treeDisplay)) {
         this.treeDisplay = this.instantiateTreeEntry();
         this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
-        if((this.options)&&(this.options.treeState !== undefined)) {
-            this.treeDisplay.setState(this.options.treeState);
+
+        if(this.treeStateJson !== undefined) {
+            this.treeDisplay.setState(this.treeStateJson);
         }
     }
     
@@ -252,13 +253,16 @@ apogeeapp.app.Component.prototype.toJson = function() {
 /** This serializes the component. */
 apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
     if(!json) json = {};
-    this.options = json;
     
     //take any immediate needed actions
     
     //set the tree state
-    if((this.treeDisplay)&&(json.treeState !== undefined)) {
-        this.treeDisplay.setState(json.treeState);
+    if(json.treeState !== undefined) {
+        this.treeStateJson = json.treeState; 
+        
+        if(this.treeDisplay) {
+            this.treeDisplay.setState(this.treeStateJson);
+        }
     }
     
     //open the tab - if tab frame exists
@@ -283,11 +287,10 @@ apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
         this.childComponentDisplayStateJson = json.windowState;
     }
     
-    if(json) {
-        for(var i = 0; i < this.openActions.length; i++) {
-            this.openActions[i].call(this,json);
-        }
-    }  
+    //do any registered open actions
+    for(var i = 0; i < this.openActions.length; i++) {
+        this.openActions[i].call(this,json);
+    }
 }
 //==============================
 // Protected Instance Methods
