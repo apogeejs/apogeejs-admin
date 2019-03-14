@@ -8,18 +8,18 @@ apogeeapp.app.PageDisplayContainer = function(component, viewType, options) {
     if(!options) {
         options = {};
     }
-    
-    //base init
-    apogee.EventManager.init.call(this);
 	
     //variables
     this.options = options;
-
-    this.displayAndHeader = null;
-    this.headerCell = null;
-    this.bodyCell = null;
     
-    this.isFrameShowing = false;
+    this.mainElement = null;
+    this.viewTitleBarElement = null;
+    this.componentViewLabelContainer = null;
+    this.headerContainer = null;
+    this.viewContainer = null;
+    
+    this.isComponentShowing = false;
+    this.isViewActive = false;
     this.isContentLoaded = false;
     
     this.inEditMode = false;
@@ -34,45 +34,38 @@ apogeeapp.app.PageDisplayContainer = function(component, viewType, options) {
     this.initUI();
 }
 
-//add components to this class
-apogee.base.mixin(apogeeapp.app.PageDisplayContainer,apogee.EventManager);
-
-
-//---------------------------
-// WINDOW CHILD
-//---------------------------
+/** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
+apogeeapp.app.PageDisplayContainer.prototype.setComponentIsShowing = function(isComponentShowing) {
+    this.isComponentShowing = isComponentShowing;
+    this.updateDataDisplayLoadedState();
+}
 
 /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
-apogeeapp.app.PageDisplayContainer.prototype.setIsShowing = function(isFrameShowing) {
-    if(isFrameShowing) {
-        if(!this.isFrameShowing) {
-            this.isFrameShowing = true;
-            this.dispatchEvent(apogeeapp.app.SHOWN_EVENT,this);
-        }
+apogeeapp.app.PageDisplayContainer.prototype.setViewIsActive = function(isViewActive) {
+    this.isViewActive = isViewActive;
+    //show/hide ui elements
+    if(isViewActive) {
+        this.mainElement.style.display = ""; 
+        this.componentViewLabelContainer.style.display = "none";
     }
-    else if(this.isFrameShowing) {
-        this.isFrameShowing = false;
-        this.dispatchEvent(apogeeapp.app.HIDDEN_EVENT,this);
+    else {
+        this.mainElement.style.display = "none"; 
+        this.componentViewLabelContainer.style.display = "";
     }
     
-    this.updateDataDisplayActiveState();
+    this.updateDataDisplayLoadedState();
 }
 
-/** This method should be called if the plain frame container is resized.. */
-apogeeapp.app.PageDisplayContainer.prototype.onResize = function() {
-    this.dispatchEvent(apogeeapp.app.RESIZED_EVENT,this);
-}
-
-/** This method returns true if the frame is showing. This does not mean the 
- * content is loaded into the frame */
-apogeeapp.app.PageDisplayContainer.prototype.getIsShowing = function() {
-    return this.isFrameShowing;
-}
-
-/** This method returns the data display. */
-apogeeapp.app.PageDisplayContainer.prototype.getDataDisplay = function() {
-    return this.dataDisplay;
-}
+///** This method returns true if the frame is showing. This does not mean the 
+// * content is loaded into the frame */
+//apogeeapp.app.PageDisplayContainer.prototype.getIsComponentShowing = function() {
+//    return this.isFrameShowing;
+//}
+//
+///** This method returns the data display. */
+//apogeeapp.app.PageDisplayContainer.prototype.getDataDisplay = function() {
+//    return this.dataDisplay;
+//}
 
 /** This method closes the window. If the argument forceClose is not
  * set to true the "request_close" handler is called to check if
@@ -95,9 +88,14 @@ apogeeapp.app.PageDisplayContainer.prototype.close = function(forceClose) {
 // GUI ELEMENT
 //---------------------------
 
+/** This method returns the view label element to be used in the component title bar. */
+apogeeapp.app.PageDisplayContainer.prototype.getViewLabelElement = function() {
+    return this.componentViewLabelContainer;
+}
+
 /** This method returns the main dom element for the window frame. */
-apogeeapp.app.PageDisplayContainer.prototype.getElement = function() {
-    return this.mainDiv;
+apogeeapp.app.PageDisplayContainer.prototype.getDisplayElement = function() {
+    return this.mainElement;
 }
 
 //====================================
@@ -105,54 +103,46 @@ apogeeapp.app.PageDisplayContainer.prototype.getElement = function() {
 //====================================
 
 /** This method returns the main dom element for the window frame. */
-apogeeapp.app.PageDisplayContainer.CONTRACT_BUTTON_PATH = "/contract.png";
-apogeeapp.app.PageDisplayContainer.EXPAND_BUTTON_PATH = "/expand.png";
+apogeeapp.app.PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH = "/expand.png";
+apogeeapp.app.PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH = "/contract.png";
 
 /** @private */
 apogeeapp.app.PageDisplayContainer.prototype.initUI = function() {
     
-    this.mainDiv = document.createElement("div");
-    this.mainDiv.style.position = "relative";
+    //make the container
+    this.mainElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_mainClass",null);
     
-    this.viewTitleBarDiv = document.createElement("div");
-    this.viewTitleBarDiv.style.padding = "3px";
-    this.viewTitleBarDiv.style.backgroundColor = "lightgray";
-    this.mainDiv.appendChild(this.viewTitleBarDiv);
+    //make the view title bar element
+    this.viewTitleBarElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewTitleBarClass",this.mainElement);
+
+    this.viewTitleActiveElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewTitleActiveClass",this.viewTitleBarElement);
+    this.viewTitleElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewTitleClass",this.viewTitleBarElement);
     
-    this.viewShowButton = document.createElement("img");
-    this.viewShowButton.src = apogeeapp.ui.getResourcePath(apogeeapp.app.PageDisplayContainer.EXPAND_BUTTON_PATH);
-    this.viewShowButton.onclick = () => this.setIsContentLoaded(true);
-    this.viewTitleBarDiv.appendChild(this.viewShowButton);
+    this.viewTitleElement.innerHTML = this.viewType;
     
-    this.viewHideButton = document.createElement("img");
-    this.viewHideButton.src = apogeeapp.ui.getResourcePath(apogeeapp.app.PageDisplayContainer.CONTRACT_BUTTON_PATH);
-    this.viewHideButton.onclick = () => this.setIsContentLoaded(false);
-    this.viewTitleBarDiv.appendChild(this.viewHideButton);
+    //make the label for the view in the componennt title bar
+    this.componentViewLabelContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_componentViewLabelClass",null);
+
+    this.componentViewActiveElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_componentViewActiveClass",this.componentViewLabelContainer);
+    this.componentViewTitleElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_componentViewTitleClass",this.componentViewLabelContainer);
     
-    this.titleLabel = document.createTextNode(this.viewType);
-    this.viewTitleBarDiv.appendChild(this.titleLabel);  
+    this.componentViewTitleElement.innerHTML = this.viewType;
     
-    this.displayAndHeader = new apogeeapp.ui.DisplayAndHeader(apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
-        null,
-        apogeeapp.ui.DisplayAndHeader.SCROLLING_PANE,
-        null
-    );
-    this.contentCell = document.createElement("div");
-    this.contentCell.style.position = "relative";
-    this.headerCell= document.createElement("div"); 
-    this.headerCell.style.position = "relative";
-    this.contentCell.appendChild(this.headerCell);
-    this.bodyCell = document.createElement("div");
-    this.bodyCell.style.position = "relative";
-    this.bodyCell.style.height = "300px";
-    this.contentCell.appendChild(this.bodyCell);
-    this.mainDiv.appendChild(this.contentCell);
+
+    this.expandImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.componentViewActiveElement);
+    this.expandImage.src = apogeeapp.ui.getResourcePath(apogeeapp.app.PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
+    this.expandImage.onclick = () => this.setViewIsActive(true);
+    this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewTitleActiveElement);
+    this.contractImage.src = apogeeapp.ui.getResourcePath(apogeeapp.app.PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
+    this.contractImage.onclick = () => this.setViewIsActive(false);
     
-    this.bodyCell.style.height = "300px";
-    this.bodyCell.style.width = "700px";
+    //add the header elment (for the save bar)
+    this.headerContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
     
-    //set the show/hide state
-    this.setIsContentLoaded(this.isContentLoaded);
+    //add the view container
+    this.viewContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
+    
+    //TODO - resize element!!!
     
     //load the content
     this.dataDisplay =  this.component.getDataDisplay(this,this.viewType);
@@ -160,6 +150,9 @@ apogeeapp.app.PageDisplayContainer.prototype.initUI = function() {
     
     //fyi - this is remove code, when we need to add it
     //this.safeRemoveContent(displayElement);
+    
+    //set the visibility state for the element
+    this.setViewIsActive(this.isViewActive);
 }
 
 /** This method should be called to set the content as loaded or not loaded.
@@ -167,25 +160,23 @@ apogeeapp.app.PageDisplayContainer.prototype.initUI = function() {
 apogeeapp.app.PageDisplayContainer.prototype.setIsContentLoaded = function(isContentLoaded) {
     this.isContentLoaded = isContentLoaded;
     if(isContentLoaded) {
-        this.viewShowButton.style.display = "none";
-        this.viewHideButton.style.display = "";
-        this.contentCell.style.display = "";
+        this.mainElement.style.display = "";
+        this.componentViewLabelContainer.style.display = "none";
     }
     else {
-        this.viewShowButton.style.display = "";
-        this.viewHideButton.style.display = "none";
-        this.contentCell.style.display = "none";
+        this.mainElement.style.display = "none";
+        this.componentViewLabelContainer.style.display = "";
     }
-    this.updateDataDisplayActiveState();
+    this.updateDataDisplayActiveState(); 
 }
 
 /** This method shold be called when the content loaded or frame visible state 
  * changes to manage the data display.
  * private */
-apogeeapp.app.PageDisplayContainer.prototype.updateDataDisplayActiveState = function() {
+apogeeapp.app.PageDisplayContainer.prototype.updateDataDisplayLoadedState = function() {
     if(!this.dataDisplay) return;
     
-    if((this.isContentLoaded)&&(this.isFrameShowing)) {
+    if((this.isComponentShowing)&&(this.isViewActive)) {
         if(this.dataDisplay.onLoad) this.dataDisplay.onLoad();
     }
     else {
@@ -276,9 +267,9 @@ apogeeapp.app.PageDisplayContainer.prototype.isInEditMode = function() {
 /** This sets the content for the window. If null (or otherwise false) is passed
  * the content will be set to empty.*/
 apogeeapp.app.PageDisplayContainer.prototype.setHeaderContent = function(contentElement) {
-    apogeeapp.ui.removeAllChildren(this.headerCell);
+    apogeeapp.ui.removeAllChildren(this.headerContainer);
     if(contentElement) {
-        this.headerCell.appendChild(contentElement);
+        this.headerContainer.appendChild(contentElement);
     }
 }
 
@@ -290,26 +281,26 @@ apogeeapp.app.PageDisplayContainer.prototype.setHeaderContent = function(content
  */
 apogeeapp.app.PageDisplayContainer.prototype.setContent = function(contentElement,elementType) {
     
-    apogeeapp.ui.removeAllChildren(this.bodyCell);
+    apogeeapp.ui.removeAllChildren(this.viewContainer);
     
-    //set the body type
-    var bodyClassName;
-    if(elementType == apogeeapp.ui.RESIZABLE) {
-       bodyClassName = "visiui-dnh-fixed";
-    }
-    else if(elementType == apogeeapp.ui.FIXED_SIZE) {
-        bodyClassName = "visiui-dnh-shrink-to-fit";
-    }
-    else if(elementType == apogeeapp.ui.SIZE_WINDOW_TO_CONTENT) {
-        bodyClassName = "visiui-dnh-shrink-to-fit";
-    }
-    else {
-        throw new Error("Unknown content type: " + elementType);
-    }
-    this.displayAndHeader.setBodyType(bodyClassName);
+//    //set the body type
+//    var bodyClassName;
+//    if(elementType == apogeeapp.ui.RESIZABLE) {
+//       bodyClassName = "visiui-dnh-fixed";
+//    }
+//    else if(elementType == apogeeapp.ui.FIXED_SIZE) {
+//        bodyClassName = "visiui-dnh-shrink-to-fit";
+//    }
+//    else if(elementType == apogeeapp.ui.SIZE_WINDOW_TO_CONTENT) {
+//        bodyClassName = "visiui-dnh-shrink-to-fit";
+//    }
+//    else {
+//        throw new Error("Unknown content type: " + elementType);
+//    }
+//    this.displayAndHeader.setBodyType(bodyClassName);
     
     //set the content
-    this.bodyCell.appendChild(contentElement);
+    this.viewContainer.appendChild(contentElement);
     this.content = contentElement;
 }
 

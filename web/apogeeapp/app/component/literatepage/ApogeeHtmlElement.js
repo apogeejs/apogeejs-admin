@@ -11,7 +11,7 @@ class ApogeeHtmlElement extends HTMLElement {
         var dnhCssElement = document.createElement("link");
         dnhCssElement.rel = "stylesheet";
         dnhCssElement.type = "text/css";
-        dnhCssElement.href = "/apogeeapp/ui/displayandheader/DisplayAndHeader.css";
+        dnhCssElement.href = "/apogeeapp/ui/menu/Menu.css";
         shadow.appendChild(dnhCssElement);
         
         var literatePageCssElement = document.createElement("link");

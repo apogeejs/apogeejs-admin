@@ -1,85 +1,60 @@
-
-
-/* These are default window colors. User can set alternate colors. */
-/* The default values are ugly for now to make sure people set them for the app. */
-.visiui_litpage_titleBarClass {
-	background-color: rgb(210,210,210);
+.visiui_pageChild_mainClass {
+    position: relative;
+    background-color: rgb(235,235,240);
     padding:3px;
 }
-
-.visiui_litpage_mainClass {
-	display:block;
-    top:0px;
-    left:0px;
-    bottom:0px;
-    right:0px;
-    position:relative;
-    overflow:hidden;
-
-	background-color:white;
-}
-
-
-.visiui_litpage_title {
-    /* fixed */
-    display:inline-block;
-    cursor:default;
-    font-weight:bold;
-    color:darkblue;
-    vertical-align: top;
-    padding-top: 2px;
-    padding-bottom: 2px;
-}
-
-.visiui_litpage_menu_style {
-    /* fixed */
-    display:inline-block;
+.visiui_pageChild_bannerContainerClass {
     position: relative;
-
-    /* configurable */
-    margin-right:3px;
 }
-.visiui_litpage_icon_overlay_style {
+.visiui_pageChild_viewContainerClass {
+    position: relative;
+}
+.visiui_pageChild_titleBarClass {
+    position: relative;
+}
+.visiui_pageChild_titleBarActiveClass {
+    display: inline;
+}
+.visiui_pageChild_titleBarMenuClass {
+    position: relative;
+    display: inline;
+}
+.visiui_pageChild_titleBarTitleClass {
+    display: inline;
+}
+.visiui_pageChild_titleBarViewsClass {
+    display: inline;
+}
+.visiui_pageChild_icon_overlay_style {
     position: absolute;
     top: 0px;
     left: 0px;
 }
 
-.visiui_win_left_style {
-    /* fixed */
-    display:inline;
-    width:100%;
+.visiui_displayContainer_mainClass {
+    position: relative;
 }
-
-.visiui_win_right_style {
-    /* fixed */
-    float:right;
-    display:inline;
+.visiui_displayContainer_viewTitleBarClass {
+    position: relative;
 }
-
-.visiui_litpage_bannerContainerClass {
-    
+.visiui_displayContainer_viewTitleActiveClass {
+    display: inline;
 }
-
-/*.visiui_litpage_container_fixed {
-    position:absolute;
-    top:0px;
-    left:0px;
-    bottom:0px;
-    right:0px;
-    overflow:hidden;
+.visiui_displayContainer_viewTitleClass {
+    display: inline;
 }
-
-.visiui_litpage_container_scrolling {
-	position:absolute;
-    top:0px;
-    left:0px;
-    bottom:0px;
-    right:0px;
-    overflow:auto;
+.visiui_displayContainer_componentViewLabelClass {
+    display: inline;
 }
-
-.visiui_litpage_container_fit_content {
-	position:relative;
-}*/
- 
+.visiui_displayContainer_componentViewActiveClass {
+    display: inline;
+}
+.visiui_displayContainer_componentViewTitleClass {
+    display: inline;
+}
+.visiui_displayContainer_headerContainerClass {
+    position: relative;
+}
+.visiui_displayContainer_viewContainerClass {
+    position: relative;
+}
