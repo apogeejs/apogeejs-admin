@@ -34,14 +34,23 @@ apogeeapp.app.PageDisplayContainer = function(component, viewType, options) {
     this.initUI();
 }
 
+//-------------------
+// state management
+//-------------------
+
 /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
-apogeeapp.app.PageDisplayContainer.prototype.setComponentIsShowing = function(isComponentShowing) {
+apogeeapp.app.PageDisplayContainer.prototype.setIsComponentShowing = function(isComponentShowing) {
     this.isComponentShowing = isComponentShowing;
     this.updateDataDisplayLoadedState();
 }
 
+/** This returns the isComponentShowing status of the display. */
+apogeeapp.app.PageDisplayContainer.prototype.getIsComponentShowing = function() {
+    return this.isComponentShowing;
+}
+
 /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
-apogeeapp.app.PageDisplayContainer.prototype.setViewIsActive = function(isViewActive) {
+apogeeapp.app.PageDisplayContainer.prototype.setIsViewActive = function(isViewActive) {
     this.isViewActive = isViewActive;
     //show/hide ui elements
     if(isViewActive) {
@@ -53,19 +62,12 @@ apogeeapp.app.PageDisplayContainer.prototype.setViewIsActive = function(isViewAc
         this.componentViewLabelContainer.style.display = "";
     }
     
+    //this lets the data display know if its visibility changes
     this.updateDataDisplayLoadedState();
+    
+    //fyi - this is remove code, when we need to add it
+    //[this.safeRemoveContent(displayElement);]
 }
-
-///** This method returns true if the frame is showing. This does not mean the 
-// * content is loaded into the frame */
-//apogeeapp.app.PageDisplayContainer.prototype.getIsComponentShowing = function() {
-//    return this.isFrameShowing;
-//}
-//
-///** This method returns the data display. */
-//apogeeapp.app.PageDisplayContainer.prototype.getDataDisplay = function() {
-//    return this.dataDisplay;
-//}
 
 /** This method closes the window. If the argument forceClose is not
  * set to true the "request_close" handler is called to check if
@@ -131,10 +133,10 @@ apogeeapp.app.PageDisplayContainer.prototype.initUI = function() {
 
     this.expandImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.componentViewActiveElement);
     this.expandImage.src = apogeeapp.ui.getResourcePath(apogeeapp.app.PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
-    this.expandImage.onclick = () => this.setViewIsActive(true);
+    this.expandImage.onclick = () => this.setIsViewActive(true);
     this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewTitleActiveElement);
     this.contractImage.src = apogeeapp.ui.getResourcePath(apogeeapp.app.PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
-    this.contractImage.onclick = () => this.setViewIsActive(false);
+    this.contractImage.onclick = () => this.setIsViewActive(false);
     
     //add the header elment (for the save bar)
     this.headerContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
@@ -144,43 +146,28 @@ apogeeapp.app.PageDisplayContainer.prototype.initUI = function() {
     
     //TODO - resize element!!!
     
-    //load the content
-    this.dataDisplay =  this.component.getDataDisplay(this,this.viewType);
-    this.setContent(this.dataDisplay.getContent(),this.dataDisplay.getContentType()); 
-    
-    //fyi - this is remove code, when we need to add it
-    //this.safeRemoveContent(displayElement);
-    
     //set the visibility state for the element
-    this.setViewIsActive(this.isViewActive);
-}
-
-/** This method should be called to set the content as loaded or not loaded.
- * @private */
-apogeeapp.app.PageDisplayContainer.prototype.setIsContentLoaded = function(isContentLoaded) {
-    this.isContentLoaded = isContentLoaded;
-    if(isContentLoaded) {
-        this.mainElement.style.display = "";
-        this.componentViewLabelContainer.style.display = "none";
-    }
-    else {
-        this.mainElement.style.display = "none";
-        this.componentViewLabelContainer.style.display = "";
-    }
-    this.updateDataDisplayActiveState(); 
+    this.setIsViewActive(this.isViewActive);
 }
 
 /** This method shold be called when the content loaded or frame visible state 
  * changes to manage the data display.
  * private */
 apogeeapp.app.PageDisplayContainer.prototype.updateDataDisplayLoadedState = function() {
-    if(!this.dataDisplay) return;
     
     if((this.isComponentShowing)&&(this.isViewActive)) {
+        if(!this.dataDisplay) {
+            //the display shoudl be created only when it is made visible
+            this.dataDisplay =  this.component.getDataDisplay(this,this.viewType);
+            this.setContent(this.dataDisplay.getContent(),this.dataDisplay.getContentType());
+            this.dataDisplay.showData();
+        }
         if(this.dataDisplay.onLoad) this.dataDisplay.onLoad();
     }
     else {
-        if(this.dataDisplay.onUnload) this.dataDisplay.onUnload();
+        if(this.dataDisplay) {
+            if(this.dataDisplay.onUnload) this.dataDisplay.onUnload();
+        }  
     }
 }
 

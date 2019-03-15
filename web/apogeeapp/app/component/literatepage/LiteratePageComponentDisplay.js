@@ -15,6 +15,8 @@ apogeeapp.app.LiteratePageComponentDisplay = function(component,member,folder) {
     this.member = member;
     this.folder = folder;
     
+    this.isShowing = false;
+    
     //these are the editor blots that represent components
     this.blotMap = {};
     
@@ -32,6 +34,10 @@ apogeeapp.app.LiteratePageComponentDisplay.EMPTY_PAGE_BODY = [];
 
 apogeeapp.app.LiteratePageComponentDisplay.prototype.getTab = function() {
     return this.tab;
+}
+
+apogeeapp.app.LiteratePageComponentDisplay.prototype.getIsShowing = function() {
+    return this.isShowing;
 }
 
 apogeeapp.app.LiteratePageComponentDisplay.prototype.closeTab = function() {
@@ -203,7 +209,13 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.loadTabEntry = function() {
     this.createDisplayContent();
     this.tab.setContent(this.contentElement,apogeeapp.ui.FIXED_SIZE);
     
-    this.tab.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.tabShown);
+    if(this.tab.getIsShowing()) {
+        this.tabShown()
+    }
+    else {
+        this.tabHidden()
+    }
+    this.tab.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.tabShown());
     this.tab.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.tabHidden());
     
     //------------------
@@ -281,11 +293,13 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.destroy = function() {
 
 /** @protected */
 apogeeapp.app.LiteratePageComponentDisplay.prototype.tabShown = function() {
+    this.isShowing = true;
     this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,this);
 }
 
 /** @protected */
 apogeeapp.app.LiteratePageComponentDisplay.prototype.tabHidden = function() {
+    this.isShowing = false;
     this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,this);
 }
 

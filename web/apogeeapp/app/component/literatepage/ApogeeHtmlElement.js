@@ -35,57 +35,7 @@ class ApogeeHtmlElement extends HTMLElement {
 		//add content
 		this.container = document.createElement("div");
         this.container.style.position = "relative";
-        shadow.appendChild(this.container);
-        
-//		container.style.backgroundColor = "lightgray";
-//		container.style.outline = "1px solid gray";
-//		
-//		container.appendChild(document.createTextNode("Hello there:"));
-//		
-//		var attachedButtonAction = () => {
-//			alert("It worked! Index = " + index);
-//		};
-//		
-//		var saveAction = () => {
-//			var data = inTextarea.value;
-//			outTextarea.value = data;
-//			saveData(index,{"text":data});
-//		}
-//		
-//		var cancelAction = () => {
-//			var oldValue = getData(index);
-//			inTextarea.value = oldValue.text;
-//		}
-//		
-//		var saveButton = document.createElement("button");
-//		saveButton.onclick = saveAction;
-//		saveButton.innerHTML = "Save";
-//		container.appendChild(saveButton);
-//		
-//		var cancelButton = document.createElement("button");
-//		cancelButton.onclick = cancelAction;
-//		cancelButton.innerHTML = "cancel";
-//		container.appendChild(cancelButton);
-//		
-//		container.appendChild(document.createElement("br"));
-//		
-//		var inTextarea = document.createElement("textarea");
-//		inTextarea.rows = 5;
-//		inTextarea.cols = 20;
-//		container.appendChild(inTextarea);
-//		
-//		var outTextarea = document.createElement("textarea");
-//		outTextarea.rows = 5;
-//		outTextarea.cols = 20;
-//		outTextarea.disabled = true;
-//		container.appendChild(outTextarea);
-//		
-//		var savedData = getData(index);
-//		if(savedData) {
-//			inTextarea.value = savedData.text;
-//			outTextarea.value = savedData.text;
-//		}
-		
+        shadow.appendChild(this.container);	
 		
 	}
     
@@ -96,7 +46,7 @@ class ApogeeHtmlElement extends HTMLElement {
         this.componentDisplay = componentDisplay;
         if(componentDisplay) {
             this.container.appendChild(componentDisplay.getElement());
-            componentDisplay.componentShown();
+            componentDisplay.setIsComponentOnPage(true);
         }
     }
     

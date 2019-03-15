@@ -1,30 +1,45 @@
-/**
- * THIS IS THE TEXT AREA EDITOR RENAMED ACE. I NEED TO USE THIS FOR DEVELOPMENT 
- * INSTEAD OF ACE CSEIN I HAVE SOME CSS ISUSUES THERE.
+/** Editor that uses the Ace text editor.
+ * 
+ * @param {type} displayContainer - the display container
+ * @param {type} callbacks - {getData,getEditOk,setData}; format for data is text
+ * @param {type} aceMode - the display format, such as "ace/mode/json"
  */
-apogeeapp.app.AceTextEditor = class extends  apogeeapp.app.DataDisplay {
+apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
     
-    constructor(displayContainer,callbacks) {
-        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
+    constructor(displayContainer,callbacks,aceMode) {
+        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
 
-        var textArea = apogeeapp.ui.createElement("TEXTAREA",null,{
-            "position":"absolute",
-            "top":"0px",
-            "left":"0px",
-            "width":"100%",
-            "height":"100%",
-            "overflow":"auto"
-        });
-        this.textArea = textArea;
+        this.editorDiv = document.createElement("div");
+        this.aceMode = aceMode;
 
-        this.workingData = null;
-
+        this.storedData = null;
+    }
+    
+    createEditor() {
+        var editor = ace.edit(this.editorDiv);
+        editor.setOptions({
+            minLines: 2,
+            maxLines: 20
+        })
+        editor.renderer.setShowGutter(true);
+        editor.setTheme("ace/theme/eclipse"); //good
+        editor.getSession().setMode(this.aceMode); 
+        
+        editor.$blockScrolling = Infinity;
+        editor.renderer.attachToShadowRoot();        
+        
+        this.editor = editor;
+        
+        if(this.storedData) {
+            this.setData(this.storedData);
+        }
+        
         //enter edit mode on change to the data
-        this.textArea.addEventListener("input",() => this.checkStartEditMode());
+        this.editor.addEventListener("input",() => this.checkStartEditMode());
     }
     
     getContent() {
-        return this.textArea;
+        return this.editorDiv;
     }
     
     getContentType() {
@@ -32,24 +47,57 @@ apogeeapp.app.AceTextEditor = class extends  apogeeapp.app.DataDisplay {
     }
 
     getData() {
-        return this.textArea.value;
+        if(this.editor) {
+            this.storedData = this.editor.getSession().getValue();
+        }
+        return this.storedData; 
     }
     
     setData(text) {
-        this.uneditedValue = text;
-        this.textArea.value = text;
-
-        //set the background color
-        if(this.editOk) {
-            this.textArea.style.backgroundColor = "";
-            this.textArea.readOnly = false;
+        //check data is valid
+        if(apogee.util.getObjectType(text) != "String") {
+            var errorMsg = "ERROR: Data value is not text";
+            //this.setError(errorMsg);
+            text = errorMsg;
         }
-        else {
-            this.textArea.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
-            this.textArea.readOnly = true;
+            
+        //store the data
+        this.storedData = text;
+        
+        //place ineditor, if it is present
+        if(this.editor) {
+            this.editor.getSession().setValue(text);
+
+            //set the edit mode and background color
+            if(this.editOk) {
+                this.editorDiv.style.backgroundColor = "";
+                this.editor.setReadOnly(false);
+            }
+            else {
+                this.editorDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
+                this.editor.setReadOnly(true);
+            }
         }
     }
- 
+    
+    onLoad() {
+        if(!this.editor) {
+            this.createEditor();
+        }
+        this.editor.resize();
+    }
+
+    onResize() {
+        if(this.editor) this.editor.resize();
+    }
+
+    destroy() {
+        if(this.editor) {
+            this.editor.destroy();
+            this.editor = null;
+        }
+    }
+    
     endEditMode() {
         super.endEditMode();
     }
@@ -60,11 +108,10 @@ apogeeapp.app.AceTextEditor = class extends  apogeeapp.app.DataDisplay {
     
     checkStartEditMode() {
         if(!this.displayContainer.isInEditMode()) {
-            if(this.getData() != this.uneditedValue) {
+            var activeData = this.editor.getSession().getValue();
+            if(activeData != this.storedData) {
                 this.onTriggerEditMode();
             }
         }
     }
 }
-
-

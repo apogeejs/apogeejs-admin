@@ -1,20 +1,21 @@
-/** Editor that uses the basic text editor */
-apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.DataDisplay {
+/**
+ * THIS IS THE TEXT AREA EDITOR RENAMED ACE. I NEED TO USE THIS FOR DEVELOPMENT 
+ * INSTEAD OF ACE CSEIN I HAVE SOME CSS ISUSUES THERE.
+ */
+apogeeapp.app.AceTextEditor = class extends  apogeeapp.app.DataDisplay {
     
     constructor(displayContainer,callbacks) {
         super(displayContainer,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
 
         var textArea = apogeeapp.ui.createElement("TEXTAREA",null,{
-//            "position":"absolute",
-//            "top":"0px",
-//            "left":"0px",
-//            "width":"100%",
-//            "height":"100%",
+            "position":"absolute",
+            "top":"0px",
+            "left":"0px",
+            "bottom":"0px",
+            "right":"0px",
 //            "overflow":"auto"
-            "position":"relative",
-            "width":"400px",
-            "height":"300px",
-            "overflow":"auto"
+//            "position":"relative",
+//            "overflow":"auto"
         });
         this.textArea = textArea;
 

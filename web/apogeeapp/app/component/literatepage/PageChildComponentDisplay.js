@@ -16,8 +16,10 @@ apogeeapp.app.PageChildComponentDisplay = function(component, options) {
     
     this.displayContainerMap = null;
     
-    this.isShowing = false;
+    this.isPageShowing = false;
+    this.isComponentOnPage = false;
     this.isExpanded = true;
+    
    
     //this is the window in which the component is displayed
     this.loadComponentDisplay();
@@ -66,28 +68,6 @@ apogeeapp.app.PageChildComponentDisplay.prototype.setBannerState = function(bann
     }
 }
 
-apogeeapp.app.PageChildComponentDisplay.prototype.setIsExpanded = function(isExpanded) {
-    this.isExpanded = isExpanded;
-    //update ui components
-    if(isExpanded) {
-        this.expandImage.style.display = "none";
-        this.contractImage.style.display = "";
-        this.titleBarViewsElement.style.display = "";
-        this.bannerContainer.style.display = "";
-        this.viewContainer.style.display = "";
-    }
-    else {
-        this.expandImage.style.display = "";
-        this.contractImage.style.display = "none";
-        this.titleBarViewsElement.style.display = "none";
-        this.bannerContainer.style.display = "none";
-        this.viewContainer.style.display = "none";
-    }
-    
-    //update state for children, as needed
-    this.updateChildVisibleState();
-}
-
 apogeeapp.app.PageChildComponentDisplay.prototype.updateData = function() {
     //update the title
     this.titleBarTitleElement.innerHTML = this.member.getDisplayName();
@@ -122,6 +102,43 @@ apogeeapp.app.PageChildComponentDisplay.prototype.deleteDisplay = function() {
             dataDisplay.destroy();
         }
     }
+}
+
+//-------------------
+// state management
+//-------------------
+
+apogeeapp.app.PageChildComponentDisplay.prototype.setIsComponentOnPage = function(isComponentOnPage) {
+    this.isComponentOnPage = isComponentOnPage;
+    
+    //update state for children, as needed
+    this.updateChildVisibleState();
+}
+
+apogeeapp.app.PageChildComponentDisplay.prototype.getIsComponentOnPage = function() {
+    return this.isComponentOnPage;
+}
+
+apogeeapp.app.PageChildComponentDisplay.prototype.setIsExpanded = function(isExpanded) {
+    this.isExpanded = isExpanded;
+    //update ui components
+    if(isExpanded) {
+        this.expandImage.style.display = "none";
+        this.contractImage.style.display = "";
+        this.titleBarViewsElement.style.display = "";
+        this.bannerContainer.style.display = "";
+        this.viewContainer.style.display = "";
+    }
+    else {
+        this.expandImage.style.display = "";
+        this.contractImage.style.display = "none";
+        this.titleBarViewsElement.style.display = "none";
+        this.bannerContainer.style.display = "none";
+        this.viewContainer.style.display = "none";
+    }
+    
+    //update state for children, as needed
+    this.updateChildVisibleState();
 }
 
 //===============================
@@ -176,8 +193,10 @@ apogeeapp.app.PageChildComponentDisplay.prototype.loadComponentDisplay = functio
     var parentComponent = workspaceUI.getComponent(parent);
     if(parentComponent) {
         var tabDisplay = parentComponent.getTabDisplay();
-//        tabDisplay.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.componentShown(true));
-//        tabDisplay.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.componentShown(false));
+        var tabIsShowing = tabDisplay.getIsShowing();
+        this.setIsPageShowing(tabIsShowing);
+        tabDisplay.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.setIsPageShowing(true));
+        tabDisplay.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.setIsPageShowing(false));
     }
 }
 
@@ -226,16 +245,20 @@ apogeeapp.app.PageChildComponentDisplay.prototype.addTitleBar = function() {
 
 }
 
-apogeeapp.app.PageChildComponentDisplay.prototype.componentShown = function(isShowing) {
-    this.isShowing = isShowing;
-    this.updateChildVisibleState();
+apogeeapp.app.PageChildComponentDisplay.prototype.setIsPageShowing = function(isPageShowing) {
+    if(!this.isPageShowing) {
+        this.isPageShowing = isPageShowing;
+        this.updateChildVisibleState();
+    }
 }
 
 apogeeapp.app.PageChildComponentDisplay.prototype.updateChildVisibleState = function() {
-    var componentBodyShowing = ((this.isShowing)&&(this.isExpanded));
+    var componentBodyShowing = ((this.isPageShowing)&&(this.isComponentOnPage)&&(this.isExpanded));
     for(var viewType in this.displayContainerMap) {
         var displayContainer = this.displayContainerMap[viewType];
-        displayContainer.setComponentIsShowing(componentBodyShowing);
+        if(displayContainer.getIsComponentShowing() != componentBodyShowing) {
+            displayContainer.setIsComponentShowing(componentBodyShowing);
+        }
     }
 }
 

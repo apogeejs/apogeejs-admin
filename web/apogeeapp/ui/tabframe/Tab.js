@@ -48,12 +48,14 @@ apogeeapp.ui.Tab.prototype.setTabFrame = function(tabFrame) {
     //attach to listeners to forward show and hide events
     this.tabShownListener = function(tab) {
         if(tab == instance) {
+            this.isShowing = true;
             instance.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,instance);
         }
     };
     this.tabFrame.addListener(apogeeapp.ui.SHOWN_EVENT, this.tabShownListener);
     this.tabHiddenListener = function(tab) {
         if(tab == instance) {
+            this.isShowing = false;
             instance.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,instance);
         }
     };
@@ -75,6 +77,11 @@ apogeeapp.ui.Tab.prototype.makeActive = function() {
 /** This method must be implemented in inheriting objects. */
 apogeeapp.ui.Tab.prototype.getId = function() {
     return this.id;
+}
+
+/** This returns true if the tab is showing in the display. */
+apogeeapp.ui.Tab.prototype.getIsShowing = function() {
+    return this.isShowing;
 }
 
 /** This method must be implemented in inheriting objects. */
