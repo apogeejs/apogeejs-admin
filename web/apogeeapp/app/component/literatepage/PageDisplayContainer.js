@@ -19,8 +19,11 @@ apogeeapp.app.PageDisplayContainer = function(component, viewType, options) {
     this.viewContainer = null;
     
     this.isComponentShowing = false;
+    this.isComponentActive = false;
     this.isViewActive = false;
     this.isContentLoaded = false;
+    
+    this.destroyViewOnInactive = true;
     
     this.inEditMode = false;
     
@@ -50,6 +53,17 @@ apogeeapp.app.PageDisplayContainer.prototype.getIsComponentShowing = function() 
 }
 
 /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
+apogeeapp.app.PageDisplayContainer.prototype.setIsComponentActive = function(isComponentActive) {
+    this.isComponentActive = isComponentActive;
+    this.updateDataDisplayLoadedState();
+}
+
+/** This returns the isComponentShowing status of the display. */
+apogeeapp.app.PageDisplayContainer.prototype.getIsComponentActive = function() {
+    return this.isComponentActive;
+}
+
+/** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
 apogeeapp.app.PageDisplayContainer.prototype.setIsViewActive = function(isViewActive) {
     this.isViewActive = isViewActive;
     //show/hide ui elements
@@ -64,9 +78,6 @@ apogeeapp.app.PageDisplayContainer.prototype.setIsViewActive = function(isViewAc
     
     //this lets the data display know if its visibility changes
     this.updateDataDisplayLoadedState();
-    
-    //fyi - this is remove code, when we need to add it
-    //[this.safeRemoveContent(displayElement);]
 }
 
 /** This method closes the window. If the argument forceClose is not
@@ -155,20 +166,40 @@ apogeeapp.app.PageDisplayContainer.prototype.initUI = function() {
  * private */
 apogeeapp.app.PageDisplayContainer.prototype.updateDataDisplayLoadedState = function() {
     
-    if((this.isComponentShowing)&&(this.isViewActive)) {
-        if(!this.dataDisplay) {
-            //the display shoudl be created only when it is made visible
-            this.dataDisplay =  this.component.getDataDisplay(this,this.viewType);
-            this.setContent(this.dataDisplay.getContent(),this.dataDisplay.getContentType());
-            this.dataDisplay.showData();
+    if((this.isComponentShowing)&&(this.isComponentActive)&&(this.isViewActive)) {
+        if(!this.dataDisplayLoaded) {
+            if(!this.dataDisplay) {
+                //the display should be created only when it is made visible
+                this.dataDisplay =  this.component.getDataDisplay(this,this.viewType);
+                this.setContent(this.dataDisplay.getContent(),this.dataDisplay.getContentType());
+                this.dataDisplay.showData();
+            }
+        
+            if(this.dataDisplay.onLoad) this.dataDisplay.onLoad();
+            this.dataDisplayLoaded = true;
         }
-        if(this.dataDisplay.onLoad) this.dataDisplay.onLoad();
     }
     else {
         if(this.dataDisplay) {
-            if(this.dataDisplay.onUnload) this.dataDisplay.onUnload();
+            if(this.dataDisplayLoaded) {
+                this.dataDisplayLoaded = false;
+                if(this.dataDisplay.onUnload) this.dataDisplay.onUnload();
+            }
+            
+            //we will destroy the display is the destroyViewOnInactive flag is set, and we are inactive
+            if((this.destroyViewOnInactive)&&((!this.isComponentActive)||(!this.isViewActive))) {
+                //remove content
+                this.safeRemoveContent();
+                //destroy the display
+                if(this.dataDisplay.destroy) this.dataDisplay.destroy();
+                this.dataDisplay = null;
+            }
         }  
     }
+    
+        
+    //fyi - this is remove code, when we need to add it
+    //[]
 }
 
 //------------------------------
@@ -179,17 +210,23 @@ apogeeapp.app.PageDisplayContainer.prototype.updateDataDisplayLoadedState = func
  * refering to times it is not visible to the user. See further notes in the constructor
  * description. */
 apogeeapp.app.PageDisplayContainer.prototype.setDisplayDestroyFlags = function(displayDestroyFlags) {
-    alert("Implement setDisplayDestroyFlags!");
+    
+    //note - I should probably update app to only use this one flag.
+    this.destroyViewOnInactive = (displayDestroyFlags & apogeeapp.app.ViewModeDisplayContainer.DISPLAY_DESTROY_FLAG_INACTIVE != 0);
 }   
 
-/** This method cleasr the data display. It should only be called when the data display is not showing. */
+/** This method cleasr the data display. It should only be called when the data display is not showing. 
+ * maybe allow this when the display is showing - unload and reload it*/
 apogeeapp.app.PageDisplayContainer.prototype.forceClearDisplay = function() {
     alert("Implement forceClearDisplay!");
 }
 
 /** This method destroys the data display. */
 apogeeapp.app.PageDisplayContainer.prototype.destroy = function() {
-
+    if((this.dataDisplay)&&(this.dataDisplay.destroy)) {
+        this.dataDisplay.destroy();
+        this.dataDisplay = null;
+    }
 }
 
 /** This method should be called called before the view mode is closed. It should
@@ -293,11 +330,11 @@ apogeeapp.app.PageDisplayContainer.prototype.setContent = function(contentElemen
 
 /** This method removes the given element from the content display. If the element
  * is not in the content display, no action is taken. */
-apogeeapp.app.PageDisplayContainer.prototype.safeRemoveContent = function(contentElement) {
-    for(var i = 0; i < this.bodyCell.childNodes.length; i++) {
-		var node = this.bodyCell.childNodes[i];
-        if(node === contentElement) {
-        	this.bodyCell.removeChild(contentElement);
+apogeeapp.app.PageDisplayContainer.prototype.safeRemoveContent = function() {
+    for(var i = 0; i < this.viewContainer.childNodes.length; i++) {
+		var node = this.viewContainer.childNodes[i];
+        if(node === this.content) {
+        	this.viewContainer.removeChild(this.content);
             this.content = null;
         }
     }

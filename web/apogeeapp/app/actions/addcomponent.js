@@ -41,7 +41,7 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,componentGener
             }
             
             //get the parent object
-            var parent = folderMap[userInputValues.parentName];
+            var parent = folderMap[userInputValues.parentName];        
             
             //create the member
             var createAction = {};
@@ -65,6 +65,19 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,componentGener
                         var actionError = new apogee.ActionError(message,apogee.ActionError.ERROR_TYPE_APP);
                         actionResponse.addError(actionError);
                     }
+//TEMP---------------------------------------------------------
+                    else {
+                        
+if(component.isEditComponent) {
+    var parentComponent = workspaceUI.getComponent(parent);
+    var tabDisplay = parentComponent.getTabDisplay();
+    if(!tabDisplay) {
+        tabDisplay = parentComponent.createTabDisplay();
+    }
+    tabDisplay.insertChildIntoDisplay(member.getName());                      
+}               
+                    }
+//--------------------------------------------------------------
                 }
                 catch(error) {
                     //exception creating component

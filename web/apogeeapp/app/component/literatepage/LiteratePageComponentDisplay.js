@@ -36,15 +36,15 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.getTab = function() {
     return this.tab;
 }
 
-apogeeapp.app.LiteratePageComponentDisplay.prototype.getIsShowing = function() {
-    return this.isShowing;
-}
-
 apogeeapp.app.LiteratePageComponentDisplay.prototype.closeTab = function() {
     if(this.tab) {
         this.tab.close();
         this.tab = null;
     }
+}
+
+apogeeapp.app.LiteratePageComponentDisplay.prototype.getIsShowing = function() {
+    return this.isShowing;
 }
 
 apogeeapp.app.LiteratePageComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
@@ -90,7 +90,7 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.addChildComponent = functio
     
     //create a new component display for this child
     if(childComponent.isEditComponent) {
-        childComponentDisplay = new apogeeapp.app.PageChildComponentDisplay(childComponent,componentDisplayOptions);
+        childComponentDisplay = new apogeeapp.app.PageChildComponentDisplay(childComponent,this,componentDisplayOptions);
     }
     else if(childComponent.isParentComponent) {
         //don't display the child parents!
@@ -105,31 +105,30 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.addChildComponent = functio
     if(childComponentDisplay) {
         //set the component display
         childComponent.setComponentDisplay(childComponentDisplay);
-        
-        var childName = childComponent.getMember().getName();
-        var componentBlot = this.blotMap[childName];
-        
-        if(componentBlot) { 
-            //blot is in editor, set the display componet for it
-            componentBlot.setComponentDisplay(childComponentDisplay);
-        }
-        else {
-            //blot doesn't exist - create it
-            //component display will be set when it registers
-            
-            //this should be fixed - replace a range if there is one, add to end if no active range.
-            let range = this.quill.getSelection(true);
-            
-            let value = { 
-                name: childName,
-                parent: this.folder.getFullName()
-            };
-            this.quill.insertText(range.index, '\n', Quill.sources.USER);
-            this.quill.insertEmbed(range.index + 1, 'apogeedisplay', value, Quill.sources.USER);
-            this.quill.insertText(range.index + 2, '\n', Quill.sources.USER);
-            this.quill.setSelection(range.index + 3, Quill.sources.SILENT);
-        }
     }
+}
+
+
+/** This method creates a page entry for the child. */
+apogeeapp.app.LiteratePageComponentDisplay.prototype.insertChildIntoDisplay = function(childName) {
+    //this should be fixed - replace a range if there is one, add to end if no active range.
+    var range = this.quill.getSelection();
+    
+if(!range) {
+    //if range not set, put the cursor at the end
+    var pageLength = this.quill.getLength();
+    this.quill.setSelection(pageLength,0,'api');
+    range = this.quill.getSelection();
+}
+
+    var value = { 
+        name: childName,
+        parent: this.folder.getFullName()
+    };
+    this.quill.insertText(range.index, '\n', Quill.sources.USER);
+    this.quill.insertEmbed(range.index + 1, 'apogeedisplay', value, Quill.sources.USER);
+    this.quill.insertText(range.index + 2, '\n', Quill.sources.USER);
+    this.quill.setSelection(range.index + 3, Quill.sources.SILENT);
 }
 
 /** This is to record any state in the tab object. */
@@ -217,6 +216,7 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.loadTabEntry = function() {
     }
     this.tab.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.tabShown());
     this.tab.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.tabHidden());
+    this.tab.addListener(apogeeapp.ui.CLOSE_EVENT,() => this.tabClosed());
     
     //------------------
     // set menu
@@ -268,18 +268,30 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.createDisplayContent = func
     options.theme = 'snow';
     this.quill = new Quill(container,options);
     
+    //show all children
+    var workspaceUI = this.component.getWorkspaceUI();
+    var children = this.folder.getChildMap();
+    for(var childName in children) {
+        var child = children[childName];
+        var childComponent = workspaceUI.getComponent(child);
+        if(childComponent) {
+            this.addChildComponent(childComponent);
+        }
+    }
+    
     //add content if we have it
     if(this.storedContent) {
         this.applyStateJson(this.storedContent);
     }
 }
 
-/** @protected */
+/** This should be called by the parent component when it is discarding the 
+ * page display.  
+ * @protected */
 apogeeapp.app.LiteratePageComponentDisplay.prototype.destroy = function() {
     var children = this.folder.getChildMap();
     var workspaceUI = this.component.getWorkspaceUI();
     
-    //TODO THIS LOGIC IS NOT GOOD! FIX IT!
     for(var childName in children) {
         var child = children[childName];
         var childComponent = workspaceUI.getComponent(child);
@@ -288,7 +300,7 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.destroy = function() {
         }
     }
     
-    this.closeTab();
+    if(this.tab) this.closeTab();
 }
 
 /** @protected */
@@ -301,6 +313,12 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.tabShown = function() {
 apogeeapp.app.LiteratePageComponentDisplay.prototype.tabHidden = function() {
     this.isShowing = false;
     this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,this);
+}
+
+apogeeapp.app.LiteratePageComponentDisplay.prototype.tabClosed = function() {
+    //delete the page
+    this.component.closeTabDisplay();
+    this.dispatchEvent(apogeeapp.ui.CLOSE_EVENT,this);
 }
 
 //===========================

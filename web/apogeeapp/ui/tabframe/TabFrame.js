@@ -119,6 +119,16 @@ apogeeapp.ui.TabFrame.prototype.setActiveTab = function(id) {
 	}
 }
 
+/** This gets the active tab, by tab id. */
+apogeeapp.ui.TabFrame.prototype.getOpenTabs = function() {
+    var openTabs = [];
+    for(var idString in this.tabTable) {
+        var id = parseInt(idString);
+        openTabs.push(id);
+    }
+    return openTabs;
+}
+
 /** This updates the tabs. */
 apogeeapp.ui.TabFrame.prototype.updateTabDisplay = function() {
     var id;

@@ -1,7 +1,8 @@
 /** This component represents a json table object. */
-apogeeapp.app.PageChildComponentDisplay = function(component, options) {
+apogeeapp.app.PageChildComponentDisplay = function(component, parentComponentDisplay, options) {
     this.component = component;
     this.member = component.getMember();
+    this.parentComponentDisplay = parentComponentDisplay;
     
     if(!options) options = {};
     this.options = options;
@@ -23,6 +24,11 @@ apogeeapp.app.PageChildComponentDisplay = function(component, options) {
    
     //this is the window in which the component is displayed
     this.loadComponentDisplay();
+    
+    //connect to parent
+    this.setIsPageShowing(this.parentComponentDisplay.getIsShowing());
+    this.parentComponentDisplay.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.setIsPageShowing(true));
+    this.parentComponentDisplay.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.setIsPageShowing(false));
     
 
     //add a cleanup action to the base component - component must already be initialized
@@ -93,13 +99,14 @@ apogeeapp.app.PageChildComponentDisplay.prototype.setStateJson = function(json) 
     
 }
 
+/** This should be called by the component when it discards this display. */
 apogeeapp.app.PageChildComponentDisplay.prototype.deleteDisplay = function() {
     //dispose any view elements
     for(var viewType in this.displayContainerMap) {
         var displayContainer = this.displayContainerMap[viewType];
-        var dataDisplay = displayContainer.getDataDisplay();
-        if((dataDisplay)&&(dataDisplay.destroy)) {
-            dataDisplay.destroy();
+        if(displayContainer) {
+            displayContainer.destroy();
+            delete this.displayContainerMap[viewType];
         }
     }
 }
@@ -112,7 +119,7 @@ apogeeapp.app.PageChildComponentDisplay.prototype.setIsComponentOnPage = functio
     this.isComponentOnPage = isComponentOnPage;
     
     //update state for children, as needed
-    this.updateChildVisibleState();
+    this.updateChildDisplayStates();
 }
 
 apogeeapp.app.PageChildComponentDisplay.prototype.getIsComponentOnPage = function() {
@@ -138,7 +145,7 @@ apogeeapp.app.PageChildComponentDisplay.prototype.setIsExpanded = function(isExp
     }
     
     //update state for children, as needed
-    this.updateChildVisibleState();
+    this.updateChildDisplayStates();
 }
 
 //===============================
@@ -186,18 +193,6 @@ apogeeapp.app.PageChildComponentDisplay.prototype.loadComponentDisplay = functio
     }
     
     this.setIsExpanded(this.isExpanded);
-    
-    //FIX THIS???
-    var parent = this.member.getParent();
-    var workspaceUI = this.component.getWorkspaceUI();
-    var parentComponent = workspaceUI.getComponent(parent);
-    if(parentComponent) {
-        var tabDisplay = parentComponent.getTabDisplay();
-        var tabIsShowing = tabDisplay.getIsShowing();
-        this.setIsPageShowing(tabIsShowing);
-        tabDisplay.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.setIsPageShowing(true));
-        tabDisplay.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.setIsPageShowing(false));
-    }
 }
 
 /** This makes the title bar, and installs it inline */
@@ -248,16 +243,24 @@ apogeeapp.app.PageChildComponentDisplay.prototype.addTitleBar = function() {
 apogeeapp.app.PageChildComponentDisplay.prototype.setIsPageShowing = function(isPageShowing) {
     if(!this.isPageShowing) {
         this.isPageShowing = isPageShowing;
-        this.updateChildVisibleState();
+        this.updateChildDisplayStates();
     }
 }
 
-apogeeapp.app.PageChildComponentDisplay.prototype.updateChildVisibleState = function() {
+apogeeapp.app.PageChildComponentDisplay.prototype.updateChildDisplayStates = function() {
     var componentBodyShowing = ((this.isPageShowing)&&(this.isComponentOnPage)&&(this.isExpanded));
+    var componentActive = this.isExpanded;
     for(var viewType in this.displayContainerMap) {
         var displayContainer = this.displayContainerMap[viewType];
-        if(displayContainer.getIsComponentShowing() != componentBodyShowing) {
-            displayContainer.setIsComponentShowing(componentBodyShowing);
+        if(displayContainer) {
+            //notify display container if component display body is loaded
+            if(displayContainer.getIsComponentShowing() != componentBodyShowing) {
+                displayContainer.setIsComponentShowing(componentBodyShowing);
+            }
+            //notify display container if component display is active
+            if(displayContainer.getIsComponentActive() != componentActive) {
+                displayContainer.setIsComponentActive(componentActive);
+            }
         }
     }
 }

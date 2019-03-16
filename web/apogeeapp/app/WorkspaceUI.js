@@ -78,11 +78,24 @@ apogeeapp.app.WorkspaceUI.prototype.load = function(workspaceJson,actionResponse
     this.workspace.addListener(apogee.deletemember.MEMBER_DELETED_EVENT, member => this.childDeleted(member));
     this.workspace.addListener(apogee.updateworkspace.WORKSPACE_UPDATED_EVENT, () => this.workspaceUpdated());
     
-    //set the initial active tab (allow for no tab frame - used in alternate UI)
-    if((workspaceJson)&&(workspaceJson.activeTabMember)&&(this.tabFrame)) {
-        var activeTabMember = this.workspace.getMemberByFullName(workspaceJson.activeTabMember);
-        if(activeTabMember) {
-           this.tabFrame.setActiveTab(activeTabMember.getId());
+    //process the workspace state - open tabs
+    if(workspaceJson) {
+        if(this.tabFrame) {
+            if(workspaceJson.openTabs) {
+                workspaceJson.openTabs.map(memberName => {
+                    var openTabMember = this.workspace.getMemberByFullName(memberName);
+                    if(openTabMember) {
+                        var openTabComponent = this.getComponent(openTabMember);
+                        openTabComponent.createTabDisplay();
+                    }
+                });
+                if(workspaceJson.activeTabMember) {
+                    var activeTabMember = this.workspace.getMemberByFullName(workspaceJson.activeTabMember);
+                    if(activeTabMember) {
+                       this.tabFrame.setActiveTab(activeTabMember.getId());
+                    }
+                }
+            }
         }
     }
 }
@@ -262,6 +275,10 @@ apogeeapp.app.WorkspaceUI.prototype.toJson = function(optionalSavedRootFolder) {
     json.components = rootFolderComponent.toJson();
     
     if(this.tabFrame) {
+        var openTabs = this.tabFrame.getOpenTabs();
+        if(openTabs.length > 0) {
+            json.openTabs = openTabs.map(tabId => this.getMemberNameFromId(tabId));
+        }
         var activeTabId = this.tabFrame.getActiveTab();
         if(activeTabId) {
             json.activeTabMember = this.getMemberNameFromId(activeTabId);

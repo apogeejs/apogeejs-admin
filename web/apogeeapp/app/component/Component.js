@@ -157,18 +157,29 @@ apogeeapp.app.Component.prototype.closeComponentDisplay = function() {
 ///** This creates the tab display for the component. */
 //apogeeapp.app.Component.prototype.instantiateTabDisplay = function();
 
-apogeeapp.app.Component.prototype.getTabDisplay = function(createIfMissing) {
-    if((createIfMissing)&&(this.usesTabDisplay())&&(!this.tabDisplay)) {
+apogeeapp.app.Component.prototype.createTabDisplay = function() {
+    if((this.usesTabDisplay())&&(!this.tabDisplay)) {
         this.tabDisplay = this.instantiateTabDisplay();
+        if(this.tabDisplayStateJson) this.tabDisplay.setStateJson(this.tabDisplayStateJson);
         this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
+        //add the tab display to the tab frame
+        var tab = this.tabDisplay.getTab();
+        var tabFrame = this.workspaceUI.getTabFrame();
+        tabFrame.addTab(tab,true);
     }
+    return this.tabDisplay;
+}
+
+apogeeapp.app.Component.prototype.getTabDisplay = function(createIfMissing) {
     return this.tabDisplay;
 }
 
 /** This closes the tab display for the component. */
 apogeeapp.app.Component.prototype.closeTabDisplay = function() {
     if(this.tabDisplay) {
+        this.tabDisplayStateJson = this.tabDisplay.getStateJson();
         this.tabDisplay.closeTab();
+        this.tabDisplay.destroy();
         this.tabDisplay = null;
     }
 }
@@ -269,16 +280,6 @@ apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
     if(this.usesTabDisplay()) {
         if(json.folderState) {
             this.tabDisplayStateJson = json.folderState;
-        }
-        if(json.tabOpen) {       
-            var tabFrame = this.workspaceUI.getTabFrame();
-            if(tabFrame) {
-                //create the tab display if it is not present
-                this.getTabDisplay(true);
-                this.tabDisplay.setStateJson(this.tabDisplayStateJson);
-                var tab = this.tabDisplay.getTab();
-                tabFrame.addTab(tab,false);
-            }
         }
     }
     
@@ -436,10 +437,8 @@ apogeeapp.app.Component.prototype.createOpenCallback = function() {
             tab.makeActive();
         }
         else {
-            var tabDisplay = tabComponent.getTabDisplay(true);
-            var tab = tabDisplay.getTab();
-            var tabFrame = workspaceUI.getTabFrame();
-            tabFrame.addTab(tab,true);
+            //create the tab display - this automaticaly puts it in the tab frame
+            tabComponent.createTabDisplay();
         }
     }
     
