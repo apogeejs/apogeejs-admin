@@ -7,7 +7,7 @@ apogeeapp.app.addcomponent = {};
 //=====================================
 
 /** This gets a callback to add a component. */
-apogeeapp.app.addcomponent.getAddComponentCallback = function(app,componentGenerator,optionalInitialValues,optionalComponentJson) {
+apogeeapp.app.addcomponent.getAddComponentCallback = function(app,componentGenerator,optionalInitialValues,optionalComponentJson,optionalOnSuccess,optionalOnError) {
     
     var createCallback = function() {
         //get the active workspace
@@ -65,19 +65,19 @@ apogeeapp.app.addcomponent.getAddComponentCallback = function(app,componentGener
                         var actionError = new apogee.ActionError(message,apogee.ActionError.ERROR_TYPE_APP);
                         actionResponse.addError(actionError);
                     }
-//TEMP---------------------------------------------------------
-                    else {
-                        
-if(component.isEditComponent) {
-    var parentComponent = workspaceUI.getComponent(parent);
-    var tabDisplay = parentComponent.getTabDisplay();
-    if(!tabDisplay) {
-        tabDisplay = parentComponent.createTabDisplay();
-    }
-    tabDisplay.insertChildIntoDisplay(member.getName());                      
-}               
-                    }
-//--------------------------------------------------------------
+////TEMP---------------------------------------------------------
+//                    else {
+//                        
+//if(component.isEditComponent) {
+//    var parentComponent = workspaceUI.getComponent(parent);
+//    var tabDisplay = parentComponent.getTabDisplay();
+//    if(!tabDisplay) {
+//        tabDisplay = parentComponent.createTabDisplay();
+//    }
+//    tabDisplay.insertChildIntoDisplay(member.getName());                      
+//}               
+//                    }
+////--------------------------------------------------------------
                 }
                 catch(error) {
                     //exception creating component
@@ -100,6 +100,12 @@ if(component.isEditComponent) {
             
             if(!actionResponse.getSuccess()) {
                 apogeeapp.app.errorHandling.handleActionError(actionResponse);
+                
+                //this should be improved - error message?
+                if(optionalOnError) optionalOnError();
+            }
+            else {
+                if(optionalOnSuccess) optionalOnSuccess(member,component);
             }
             
             //return true to close the dialog

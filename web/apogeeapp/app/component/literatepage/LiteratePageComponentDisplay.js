@@ -48,12 +48,13 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.getIsShowing = function() {
 }
 
 apogeeapp.app.LiteratePageComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
+    apogeeapp.ui.removeAllChildren(this.bannerElement);
     if(bannerState == apogeeapp.app.banner.BANNER_TYPE_NONE) {
-       this.tab.setHeaderContent(null);
+       //no action
     }
     else {
         var banner = apogeeapp.app.banner.getBanner(bannerMessage,bannerState);
-        this.tab.setHeaderContent(banner);
+        this.bannerElement.appendChild(banner);
     }
     
     if(this.tab) {
@@ -110,11 +111,9 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.addChildComponent = functio
 
 
 /** This method creates a page entry for the child. */
-apogeeapp.app.LiteratePageComponentDisplay.prototype.insertChildIntoDisplay = function(childName) {
-    //this should be fixed - replace a range if there is one, add to end if no active range.
-    var range = this.quill.getSelection();
+apogeeapp.app.LiteratePageComponentDisplay.prototype.insertChildIntoDisplay = function(childName,selectedRange) {
     
-if(!range) {
+if(!selectedRange) {
     //if range not set, put the cursor at the end
     var pageLength = this.quill.getLength();
     this.quill.setSelection(pageLength,0,'api');
@@ -125,10 +124,10 @@ if(!range) {
         name: childName,
         parent: this.folder.getFullName()
     };
-    this.quill.insertText(range.index, '\n', Quill.sources.USER);
-    this.quill.insertEmbed(range.index + 1, 'apogeedisplay', value, Quill.sources.USER);
-    this.quill.insertText(range.index + 2, '\n', Quill.sources.USER);
-    this.quill.setSelection(range.index + 3, Quill.sources.SILENT);
+    this.quill.insertText(selectedRange.index, '\n', Quill.sources.USER);
+    this.quill.insertEmbed(selectedRange.index + 1, 'apogeedisplay', value, Quill.sources.USER);
+    this.quill.insertText(selectedRange.index + 2, '\n', Quill.sources.USER);
+    this.quill.setSelection(selectedRange.index + 3, Quill.sources.SILENT);
 }
 
 /** This is to record any state in the tab object. */
@@ -244,29 +243,33 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.loadTabEntry = function() {
     this.tab.addListener(apogeeapp.ui.CLOSE_EVENT,onClose);
 }
 
-apogeeapp.app.LiteratePageComponentDisplay.PARENT_CONTAINER_STYLE = {
-    "position":"relative",
-    "display":"table",
-    "width":"100%",
-    "height":"100%",
-    "top":"0px",
-    "left":"0px"
-}
-
  /** @private */
 apogeeapp.app.LiteratePageComponentDisplay.prototype.createDisplayContent = function() {
-   
-    this.contentElement = apogeeapp.ui.createElement("div",null,apogeeapp.app.LiteratePageComponentDisplay.PARENT_CONTAINER_STYLE);
-
+    
+    //-----------
+    //page header
+    //------------
+    this.headerElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_header",null);
+    this.tab.setHeaderContent(this.headerElement);
+    
+    this.bannerElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_banner",this.headerElement);
+    this.editorToolbarElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_editorToolbar",this.headerElement);
+    this.componentToolbarElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentToolbar",this.headerElement);
+    
+    this.initEditorToolbar();
+    this.initComponentToolbar();
+    
+    //-------------------
+    //page body
+    //-------------------
+    this.contentElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_body",null);
+    this.tab.setContent(this.contentElement,apogeeapp.ui.FIXED_SIZE);
+    
     //we ony use this context menu and child map for parents
     //modify if we use this elsewhere
     if(!this.folder.isParent) return;
 
-    var container = document.createElement("div");
-    this.contentElement.appendChild(container);
-    var options = {};
-    options.theme = 'snow';
-    this.quill = new Quill(container,options);
+    this.initEditor();
     
     //show all children
     var workspaceUI = this.component.getWorkspaceUI();
@@ -283,6 +286,152 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.createDisplayContent = func
     if(this.storedContent) {
         this.applyStateJson(this.storedContent);
     }
+}
+
+apogeeapp.app.LiteratePageComponentDisplay.prototype.initEditorToolbar = function() {
+    var html = `
+        <span class="ql-formats">
+            <select class="ql-size">
+            <option value="small"></option>
+            <option selected></option><!-- Note a missing, thus falsy value, is used to reset to default -->
+            <option value="large"></option>
+            <option value="huge"></option>
+        </select>
+        <button type="button" class="ql-italic"></button>
+        <button type="button" class="ql-underline"></button>
+        <span class="ql-formats">
+            <button type="button" class="ql-indent" value="-1"></button>
+            <button type="button" class="ql-indent" value="+1"></button>
+            <select class="ql-align">
+                <option selected="selected"></option>
+                <option value="center"></option>
+                <option value="right"></option>
+                <option value="justify"></option>
+            </select>
+            <button type="button" class="ql-direction" value="rtl"></button>
+            <button type="button" class="ql-list" value="ordered"></button>
+            <button type="button" class="ql-list" value="bullet"></button>
+        </span>
+        <span class="ql-formats">
+            <button type="button" class="ql-image"></button>
+            <button type="button" class="ql-code-block"></button>
+            <button type="button" class="ql-script" value="sub"></button>
+            <button type="button" class="ql-script" value="super"></button>
+            <button type="button" class="ql-clean"></button>
+        </span>
+    `;
+
+    this.editorToolbarElement.innerHTML = html;
+}
+
+apogeeapp.app.LiteratePageComponentDisplay.prototype.initComponentToolbar = function() {
+    //we will add a button for each standard component, and a button for the additional components
+    
+    //THIS IS BAD - IT IS ONLY TO GET THIS WORKING AS A TRIAL
+    //MAKE A WAY TO GET COMPONENT GENERATORS FOR BUTTONS RATHER THAN READING A PRIVATE VARIABLE FROM APP
+    var workspaceUI = this.component.getWorkspaceUI();
+    var app = workspaceUI.getApp();
+    
+    for(var i = 0; i < app.standardComponents.length; i++) {
+        var key = app.standardComponents[i];
+        var generator = app.componentGenerators[key];
+        
+        var buttonElement = document.createElement("button");
+        buttonElement.innerHTML = generator.displayName;
+        buttonElement.onclick = () => {
+            var selection = this.quill.getSelection();
+
+            var initialValues = {};
+            initialValues.parentName = this.member.getFullName();
+            
+            var onSuccess = (member,component) => {
+                this.insertChildIntoDisplay(member.getName(),selection);
+            }
+            
+            var doAddComponent = apogeeapp.app.addcomponent.getAddComponentCallback(app,generator,initialValues,null,onSuccess);
+            doAddComponent();
+        }
+        this.componentToolbarElement.appendChild(buttonElement);
+    }
+
+    //add the additional component item
+    var buttonElement = document.createElement("button");
+    buttonElement.innerHTML = "Additional Components";
+    buttonElement.onclick = () => {
+        var selection = this.quill.getSelection();
+
+        var initialValues = {};
+        initialValues.parentName = this.member.getFullName();
+
+        var onSuccess = (member,component) => {
+            this.insertChildIntoDisplay(member.getName(),selection);
+        }
+
+        var doAddComponent = apogeeapp.app.addcomponent.getAddAdditionalComponentCallback(app,initialValues,null,onSuccess);
+        doAddComponent();
+        
+        //if successfull, add to the ui
+        //need a better success check!
+    }
+    this.componentToolbarElement.appendChild(buttonElement);
+}
+
+apogeeapp.app.LiteratePageComponentDisplay.prototype.initEditor = function() {
+    
+    var container = document.createElement("div");
+    this.contentElement.appendChild(container);
+    var options = {};
+    options.theme = 'snow';
+    options.modules = {};
+    options.modules.toolbar = {};
+    options.modules.toolbar.container = this.editorToolbarElement;
+    
+    var showImageElement = function(value) {
+        var range = this.quill.getSelection();
+        var value = prompt('What is the image URL');
+        this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
+    }
+    
+    //options.modules.toolbar.handlers = 
+    
+////////////////////////////////////
+//var toolbarOptions = [
+//  ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+//  ['blockquote', 'code-block'],
+//
+//  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+//  [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+//  [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+//
+//  [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+//  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+//
+//  [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+//  [{ 'font': [] }],
+//  [{ 'align': [] }],
+//  
+//  ['link','image'],
+//
+//  ['clean']
+//];
+//
+//options.modules = {};
+//options.modules.toolbar = toolbarOptions;
+////////////////////////////////////
+    
+    this.quill = new Quill(container,options);
+    
+/////////////////////////////////////////////
+//    var toolbar = this.quill.getModule('toolbar');
+//    
+//    var showImageElement = function(value) {
+//        var range = this.quill.getSelection();
+//        var value = prompt('What is the image URL');
+//        this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
+//    }
+//    
+//    toolbar.addHandler('image',showImageElement);
+//////////////////////////////////////////////////
 }
 
 /** This should be called by the parent component when it is discarding the 
