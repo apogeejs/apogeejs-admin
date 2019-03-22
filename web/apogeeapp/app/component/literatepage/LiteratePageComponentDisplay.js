@@ -333,8 +333,8 @@ apogeeapp.app.LiteratePageComponentDisplay.prototype.initComponentToolbar = func
     var app = workspaceUI.getApp();
     
     for(var i = 0; i < app.standardComponents.length; i++) {
-        var key = app.standardComponents[i];
-        var generator = app.componentGenerators[key];
+        let key = app.standardComponents[i];
+        let generator = app.componentGenerators[key];
         
         var buttonElement = document.createElement("button");
         buttonElement.innerHTML = generator.displayName;
