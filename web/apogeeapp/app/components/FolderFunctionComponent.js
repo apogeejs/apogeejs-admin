@@ -7,10 +7,6 @@ apogeeapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction) {
     //register this object as a parent container
     var internalFolder = folderFunction.getInternalFolder();
     workspaceUI.registerMember(internalFolder,this,folderFunction);
-    
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.FolderFunctionComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.FolderFunctionComponent.writeToJson);
 };
 
 apogeeapp.app.FolderFunctionComponent.prototype = Object.create(apogeeapp.app.ParentComponent.prototype);
@@ -23,20 +19,19 @@ apogeeapp.app.FolderFunctionComponent.prototype.instantiateTabDisplay = function
     return this.tabDisplay;
 }
 
-//======================================
-// Callbacks
-// These are defined as static but are called in the objects context
-//======================================
+//==============================
+// serialization
+//==============================
 
 /** This serializes the folderFunction component. */
-apogeeapp.app.FolderFunctionComponent.writeToJson = function(json) {
+apogeeapp.app.FolderFunctionComponent.prototype.writeToJson = function(json) {
     var folderFunction = this.getMember();
     var internalFolder = folderFunction.getInternalFolder();
     var workspaceUI = this.getWorkspaceUI();
     json.children = workspaceUI.getFolderComponentContentJson(internalFolder);
 }
 
-apogeeapp.app.FolderFunctionComponent.readFromJson = function(json) {
+apogeeapp.app.FolderFunctionComponent.prototype.readFromJson = function(json) {
     if(json.children) {
         var workspaceUI = this.getWorkspaceUI();
         var folderFunction = this.getMember();

@@ -41,10 +41,6 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
         }
         
         this._setStoredData(apogeeapp.app.GoogleChartComponent.DEFAULT_STORED_DATA);
-        
-        //add a cleanup and save actions
-        this.addOpenAction(apogeeapp.app.GoogleChartComponent.readFromJson);
-        this.addSaveAction(apogeeapp.app.GoogleChartComponent.writeToJson);
     }
         
     /** Implement the method to get the data display. JsDataDisplay is an 
@@ -79,6 +75,20 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
         }
         else {
             return super.getDataDisplay(viewMode,viewType);
+        }
+    }
+    
+    //=====================================
+    // serialization
+    //=====================================
+    
+    writeToJson(json) {
+        json.formData = this.storedData;
+    }
+
+    readFromJson(json) {
+        if(json.formData !== undefined) {
+            this._setStoredData(json.formData);
         }
     }
     
@@ -129,20 +139,6 @@ return {
         var supplementalCode = member.getSupplementalCode();
         return apogeeapp.app.dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode); 
     }       
-    
-    //=====================================
-    // Static Methods
-    //=====================================
-    
-    static writeToJson(json) {
-        json.formData = this.storedData;
-    }
-
-    static readFromJson(json) {
-        if(json.formData !== undefined) {
-            this._setStoredData(json.formData);
-        }
-    }
             
 
 };

@@ -2,10 +2,6 @@
 apogeeapp.app.FolderComponent = function(workspaceUI,folder) {
     //extend parent component
     apogeeapp.app.ParentComponent.call(this,workspaceUI,folder,apogeeapp.app.FolderComponent);
-    
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.FolderComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.FolderComponent.writeToJson);
 };
 
 apogeeapp.app.FolderComponent.prototype = Object.create(apogeeapp.app.ParentComponent.prototype);
@@ -19,19 +15,23 @@ apogeeapp.app.FolderComponent.prototype.instantiateTabDisplay = function() {
 }
 
 
-//======================================
-// Callbacks
-// These are defined as static but are called in the objects context
-//======================================
+//==============================
+// serialization
+//==============================
 
 /** This serializes the table component. */
-apogeeapp.app.FolderComponent.writeToJson = function(json) {
+apogeeapp.app.FolderComponent.prototype.writeToJson = function(json) {
     var folder = this.getMember();
     var workspaceUI = this.getWorkspaceUI();
     json.children = workspaceUI.getFolderComponentContentJson(folder);
 }
 
-apogeeapp.app.FolderComponent.readFromJson = function(json) {
+apogeeapp.app.FolderComponent.prototype.readFromJson = function(json) {
+    
+    //note - we are currently keeping all the edit state in the tabDisplayState
+    //rather than as data in the component. The reason we are doing this is 
+    //because we are managing that data in the display/editor rather than here
+    
     if(json.children) {
         var workspaceUI = this.getWorkspaceUI();
         var folder = this.getMember();

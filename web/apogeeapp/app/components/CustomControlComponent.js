@@ -11,10 +11,6 @@ apogeeapp.app.CustomControlComponent = function(workspaceUI,control) {
     
     //keep alive or destroy on inactive
     this.destroyOnInactive = false;
-    
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.CustomControlComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.CustomControlComponent.writeToJson);
 };
 
 apogeeapp.app.CustomControlComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -299,12 +295,11 @@ apogeeapp.app.CustomControlComponent.prototype.update = function(uiCodeFields) {
     return actionResponse; 
 }
 
-//======================================
-// Callbacks
-// These are defined as static but are called in the objects context
-//======================================
+//==============================
+// serialization
+//==============================
 
-apogeeapp.app.CustomControlComponent.readFromJson = function(json) {
+apogeeapp.app.CustomControlComponent.prototype.readFromJson = function(json) {
     if(!json) return;
     
     //set destroy flag
@@ -318,18 +313,22 @@ apogeeapp.app.CustomControlComponent.readFromJson = function(json) {
 }
 
 /** This serializes the table component. */
-apogeeapp.app.CustomControlComponent.writeToJson = function(json) {
+apogeeapp.app.CustomControlComponent.prototype.writeToJson = function(json) {
     //store the resource info
     json.resource = this.uiCodeFields;
     json.destroyOnInactive = this.destroyOnInactive;
 }
 
-apogeeapp.app.CustomControlComponent.addPropFunction = function(component,values) {
-    values.destroyOnHide = component.getDestroyOnInactive();
+//=================================
+// Properties
+//=================================
+
+apogeeapp.app.CustomControlComponent.prototype.addPropFunction = function(values) {
+    values.destroyOnHide = this.getDestroyOnInactive();
 }
 
-apogeeapp.app.CustomControlComponent.updateProperties = function(component,oldValues,newValues) {
-    component.setDestroyOnInactive(newValues.destroyOnHide);
+apogeeapp.app.CustomControlComponent.prototype.updateProperties = function(oldValues,newValues) {
+    this.setDestroyOnInactive(newValues.destroyOnHide);
 }
 
 /** This is the format string to create the code body for updateing the member

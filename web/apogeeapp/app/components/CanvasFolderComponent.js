@@ -2,10 +2,6 @@
 apogeeapp.app.CanvasFolderComponent = function(workspaceUI,folder) {
     //extend parent component
     apogeeapp.app.ParentComponent.call(this,workspaceUI,folder,apogeeapp.app.CanvasFolderComponent);
-    
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.CanvasFolderComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.CanvasFolderComponent.writeToJson);
 };
 
 apogeeapp.app.CanvasFolderComponent.prototype = Object.create(apogeeapp.app.ParentComponent.prototype);
@@ -17,20 +13,18 @@ apogeeapp.app.CanvasFolderComponent.prototype.instantiateTabDisplay = function()
     return this.tabDisplay;
 }
 
-
 //======================================
-// Callbacks
-// These are defined as static but are called in the objects context
+// serialization methods
 //======================================
 
 /** This serializes the table component. */
-apogeeapp.app.CanvasFolderComponent.writeToJson = function(json) {
+apogeeapp.app.CanvasFolderComponent.prototype.writeToJson = function(json) {
     var folder = this.getMember();
     var workspaceUI = this.getWorkspaceUI();
     json.children = workspaceUI.getFolderComponentContentJson(folder);
 }
 
-apogeeapp.app.CanvasFolderComponent.readFromJson = function(json) {
+apogeeapp.app.CanvasFolderComponent.prototype.readFromJson = function(json) {
     if(json.children) {
         var workspaceUI = this.getWorkspaceUI();
         var folder = this.getMember();

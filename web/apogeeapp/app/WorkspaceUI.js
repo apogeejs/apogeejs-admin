@@ -301,6 +301,25 @@ apogeeapp.app.WorkspaceUI.prototype.getMemberNameFromId = function(activeTabId) 
     return undefined;
 }
 
+apogeeapp.app.WorkspaceUI.prototype.loadComponentFromJson = function(member,componentJson) {
+    var componentType = componentJson.type;
+    var componentGenerator = this.app.getComponentGenerator(componentType);
+	if((!componentGenerator)||(member.constructor == apogee.ErrorTable)) {
+        //throw apogee.base.createError("Component type not found: " + componentType);
+        
+        //table not found - create an empty table
+        componentGenerator = apogeeapp.app.ErrorTableComponent;
+    }
+    
+    return apogeeapp.app.Component.createComponentFromMember(componentGenerator,this,member,null,componentJson);
+}
+
+//================================
+// Folder child methods
+// The following methods are standard methods to serialize and deserialize the children in a folder. This
+// can be used by different folder component representations.
+//================================
+
 apogeeapp.app.WorkspaceUI.prototype.getFolderComponentContentJson = function(folder) {
     var json = {};
     var tableMap = folder.getChildMap();
@@ -317,19 +336,6 @@ apogeeapp.app.WorkspaceUI.prototype.getFolderComponentContentJson = function(fol
     return json;
 }
 
-apogeeapp.app.WorkspaceUI.prototype.loadComponentFromJson = function(member,componentJson) {
-    var componentType = componentJson.type;
-    var componentGenerator = this.app.getComponentGenerator(componentType);
-	if((!componentGenerator)||(member.constructor == apogee.ErrorTable)) {
-        //throw apogee.base.createError("Component type not found: " + componentType);
-        
-        //table not found - create an empty table
-        componentGenerator = apogeeapp.app.ErrorTableComponent;
-    }
-    
-    return apogeeapp.app.Component.createComponentFromMember(componentGenerator,this,member,null,componentJson);
-}
-
 apogeeapp.app.WorkspaceUI.prototype.loadFolderComponentContentFromJson = function(folder,childrenJson) {
 	for(var key in childrenJson) {
 		var childJson = childrenJson[key];
@@ -337,7 +343,6 @@ apogeeapp.app.WorkspaceUI.prototype.loadFolderComponentContentFromJson = functio
 		this.loadComponentFromJson(childMember,childJson);
 	}
 }
-
 
 //====================================
 // properties and display

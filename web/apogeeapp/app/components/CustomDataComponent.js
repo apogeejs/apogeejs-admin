@@ -23,10 +23,6 @@ apogeeapp.app.CustomDataComponent = function(workspaceUI,folder) {
     
     //keep alive or destroy on inactive
     this.destroyOnInactive = false;
-    
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.CustomDataComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.CustomDataComponent.writeToJson);
 };
 
 apogeeapp.app.CustomDataComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -285,12 +281,11 @@ apogeeapp.app.CustomDataComponent.prototype.update = function(uiCodeFields) {
     return actionResponse; 
 }
 
-//======================================
-// Callbacks
-// These are defined as static but are called in the objects context
-//======================================
+//==============================
+// serialization
+//==============================
 
-apogeeapp.app.CustomDataComponent.readFromJson = function(json) {
+apogeeapp.app.CustomDataComponent.prototype.readFromJson = function(json) {
     if(!json) return;
     
     //set destroy flag
@@ -304,18 +299,22 @@ apogeeapp.app.CustomDataComponent.readFromJson = function(json) {
 }
 
 /** This serializes the table component. */
-apogeeapp.app.CustomDataComponent.writeToJson = function(json) {
+apogeeapp.app.CustomDataComponent.prototype.writeToJson = function(json) {
     //store the resource info
     json.resource = this.uiCodeFields;
     json.destroyOnInactive = this.destroyOnInactive;
 }
 
-apogeeapp.app.CustomDataComponent.addPropFunction = function(component,values) {
-    values.destroyOnHide = component.getDestroyOnInactive();
+//======================================
+// properties
+//======================================
+
+apogeeapp.app.CustomDataComponent.prototype.addPropFunction = function(values) {
+    values.destroyOnHide = this.getDestroyOnInactive();
 }
 
-apogeeapp.app.CustomDataComponent.updateProperties = function(component,oldValues,newValues) {
-    component.setDestroyOnInactive(newValues.destroyOnHide);
+apogeeapp.app.CustomDataComponent.prototype.updateProperties = function(oldValues,newValues) {
+    this.setDestroyOnInactive(newValues.destroyOnHide);
 }
 
 /** This is the format string to create the code body for updateing the member

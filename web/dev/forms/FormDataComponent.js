@@ -10,10 +10,6 @@ apogeeapp.app.FormDataComponent = class extends apogeeapp.app.EditComponent {
         this.dataView = apogeeapp.app.FormDataComponent.DEFAULT_DATA_VIEW;
         
         this.layout = apogeeapp.app.FormDataComponent.DEFAULT_LAYOUT;
-
-        //add a cleanup and save actions
-        this.addOpenAction(apogeeapp.app.FormDataComponent.readFromJson);
-        this.addSaveAction(apogeeapp.app.FormDataComponent.writeToJson);
     };
 
     //==============================
@@ -83,7 +79,19 @@ apogeeapp.app.FormDataComponent = class extends apogeeapp.app.EditComponent {
         }
     }
 
+    //=====================================
+    // serialization
+    //=====================================
+    
+    writeToJson(json) {
+        json.layout = this.layout;
+    }
 
+    readFromJson(json) {
+        if(json.layout !== undefined) {
+            this.layout = json.layout;
+        }
+    }
 
     //======================================
     // Static methods
@@ -94,16 +102,6 @@ apogeeapp.app.FormDataComponent = class extends apogeeapp.app.EditComponent {
         json.name = userInputValues.name;
         json.type = apogee.JsonTable.generator.type;
         return json;
-    }
-
-    static writeToJson(json) {
-        json.layout = this.layout;
-    }
-
-    static readFromJson(json) {
-        if(json.layout !== undefined) {
-            this.layout = json.layout;
-        }
     }
 }
 

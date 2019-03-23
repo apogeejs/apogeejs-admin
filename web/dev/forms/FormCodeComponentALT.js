@@ -14,10 +14,6 @@ apogeeapp.app.FormCodeComponent = class extends apogeeapp.app.EditComponent {
         this.formData = apogeeapp.app.FormCodeComponent.DEFAULT_FORM_DATA;
         this.encodingFunctionText = apogeeapp.app.FormCodeComponent.DEFAULT_ENCODING_FUNCTION_TEXT
         this.encodingFunction = apogeeapp.app.FormCodeComponent.DEFAULT_ENCODING_FUNCTION;
-
-        //add a cleanup and save actions
-        this.addOpenAction(apogeeapp.app.FormCodeComponent.readFromJson);
-        this.addSaveAction(apogeeapp.app.FormCodeComponent.writeToJson);
     };
 
     //==============================
@@ -139,20 +135,11 @@ apogeeapp.app.FormCodeComponent = class extends apogeeapp.app.EditComponent {
         }
         return apogeeapp.app.dataDisplayCallbackHelper.setCode(this.member,[],code,"",undefined); 
     }
-
-
-
-    //======================================
-    // Static methods
-    //======================================
-
-    static getCreateMemberPayload(userInputValues) {
-        var json = {};
-        json.name = userInputValues.name;
-        json.type = apogee.JsonTable.generator.type;
-        return json;
-    }
-
+    
+    //=====================================
+    // serialization
+    //=====================================
+    
     static writeToJson(json) {
         json.layoutCode = this.layoutCode;
         json.formData = this.formData;
@@ -169,6 +156,19 @@ apogeeapp.app.FormCodeComponent = class extends apogeeapp.app.EditComponent {
         if(json.encodingFunctionText !== undefined) {
             this.encodingFunctionText = json.encodingFunctionText;
         }
+    }
+
+
+
+    //======================================
+    // Static methods
+    //======================================
+
+    static getCreateMemberPayload(userInputValues) {
+        var json = {};
+        json.name = userInputValues.name;
+        json.type = apogee.JsonTable.generator.type;
+        return json;
     }
 }
 

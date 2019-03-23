@@ -5,10 +5,6 @@ apogeeapp.app.JsonTableComponent = function(workspaceUI,table) {
 
     //default view
     this.dataView = apogeeapp.app.JsonTableComponent.DEFAULT_DATA_VIEW;
-    
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.JsonTableComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.JsonTableComponent.writeToJson);
 };
 
 apogeeapp.app.JsonTableComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -113,6 +109,31 @@ apogeeapp.app.JsonTableComponent.prototype.getDataDisplay = function(displayCont
 	}
 }
 
+//==============================
+// serialization
+//==============================
+
+apogeeapp.app.JsonTableComponent.prototype.writeToJson = function(json) {
+    json.dataView = this.dataView;
+}
+
+apogeeapp.app.JsonTableComponent.prototype.readFromJson = function(json) {
+    if(json.dataView !== undefined) {
+        this.dataView = json.dataView;
+    }
+}
+
+//======================================
+// properties
+//======================================
+
+apogeeapp.app.JsonTableComponent.prototype.addPropFunction = function(values) {
+    values.dataView = this.getDataView();
+}
+
+apogeeapp.app.JsonTableComponent.prototype.updateProperties = function(oldValues,newValues) {
+    this.setDataView(newValues.dataView);
+}
 
 //======================================
 // Static methods
@@ -123,24 +144,6 @@ apogeeapp.app.JsonTableComponent.getCreateMemberPayload = function(userInputValu
     json.name = userInputValues.name;
     json.type = apogee.JsonTable.generator.type;
     return json;
-}
-
-apogeeapp.app.JsonTableComponent.writeToJson = function(json) {
-    json.dataView = this.dataView;
-}
-
-apogeeapp.app.JsonTableComponent.readFromJson = function(json) {
-    if(json.dataView !== undefined) {
-        this.dataView = json.dataView;
-    }
-}
-
-apogeeapp.app.JsonTableComponent.addPropFunction = function(component,values) {
-    values.dataView = component.getDataView();
-}
-
-apogeeapp.app.JsonTableComponent.updateProperties = function(component,oldValues,newValues) {
-    component.setDataView(newValues.dataView);
 }
 
 //======================================

@@ -19,10 +19,6 @@ apogeeapp.app.FormDataComponent = function(workspaceUI,folder) {
     
     //keep the form display alive
     this.displayDestroyFlags = apogeeapp.app.DisplayContainer.DISPLAY_DESTROY_FLAG_NEVER;
-    
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.FormDataComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.FormDataComponent.writeToJson);
 };
 
 apogeeapp.app.FormDataComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -181,16 +177,6 @@ apogeeapp.app.FormDataComponent.getCreateMemberPayload = function(userInputValue
         }
     };
     return json;
-}
-
-apogeeapp.app.FormDataComponent.writeToJson = function(json) {
-    json.dataView = this.dataView;
-}
-
-apogeeapp.app.FormDataComponent.readFromJson = function(json) {
-    if(json.dataView !== undefined) {
-        this.dataView = json.dataView;
-    }
 }
 
 //======================================

@@ -139,8 +139,8 @@ apogeeapp.app.updatecomponent.updatePropertyValues = function(component,oldValue
     }
     
     //update an component additional properties
-    if(component.componentGenerator.updateProperties) {
-        component.componentGenerator.updateProperties(component,oldValues,newValues,actionResponse);
+    if(component.updateProperties) {
+        component.updateProperties(oldValues,newValues,actionResponse);
     }
         
     return actionResponse;

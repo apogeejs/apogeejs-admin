@@ -11,10 +11,6 @@ apogeeapp.app.CustomComponent = function(workspaceUI,control) {
     
     //keep alive or destroy on inactive
     this.destroyOnInactive = false;
-    
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.CustomComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.CustomComponent.writeToJson);
 };
 
 apogeeapp.app.CustomComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -255,12 +251,11 @@ apogeeapp.app.CustomComponent.prototype.update = function(uiCodeFields) {
     return actionResponse; 
 }
 
-//======================================
-// Callbacks
-// These are defined as static but are called in the objects context
-//======================================
+//==============================
+// serialization
+//==============================
 
-apogeeapp.app.CustomComponent.readFromJson = function(json) {
+apogeeapp.app.CustomComponent.prototype.readFromJson = function(json) {
     if(!json) return;
     
     //set destroy flag
@@ -274,18 +269,22 @@ apogeeapp.app.CustomComponent.readFromJson = function(json) {
 }
 
 /** This serializes the table component. */
-apogeeapp.app.CustomComponent.writeToJson = function(json) {
+apogeeapp.app.CustomComponent.prototype.writeToJson = function(json) {
     //store the resource info
     json.resource = this.uiCodeFields;
     json.destroyOnInactive = this.destroyOnInactive;
 }
 
-apogeeapp.app.CustomComponent.addPropFunction = function(component,values) {
-    values.destroyOnHide = component.getDestroyOnInactive();
+//======================================
+// properties
+//======================================
+
+apogeeapp.app.CustomComponent.prototype.addPropFunction = function(values) {
+    values.destroyOnHide = this.getDestroyOnInactive();
 }
 
-apogeeapp.app.CustomComponent.updateProperties = function(component,oldValues,newValues) {
-    component.setDestroyOnInactive(newValues.destroyOnHide);
+apogeeapp.app.CustomComponent.prototype.updateProperties = function(oldValues,newValues) {
+    this.setDestroyOnInactive(newValues.destroyOnHide);
 }
 
 /** This is the format string to create the code body for updateing the member

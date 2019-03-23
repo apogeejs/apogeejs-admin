@@ -5,10 +5,6 @@ apogeeapp.app.ErrorTableComponent = function(workspaceUI,table) {
 
     //default view
     this.dataView = apogeeapp.app.ErrorTableComponent.EMPTY_VIEW;
-    
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.ErrorTableComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.ErrorTableComponent.writeToJson);
 };
 
 apogeeapp.app.ErrorTableComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -72,16 +68,6 @@ apogeeapp.app.ErrorTableComponent.prototype.toJson = function() {
 /** This overrides the open deserialize method to save the entire json. */
 apogeeapp.app.ErrorTableComponent.prototype.loadSerializedValues = function(json) {
     this.completeJson = json;
-}
-
-apogeeapp.app.ErrorTableComponent.writeToJson = function(json) {
-    json.dataView = this.dataView;
-}
-
-apogeeapp.app.ErrorTableComponent.readFromJson = function(json) {
-    if(json.dataView !== undefined) {
-        this.dataView = json.dataView;
-    }
 }
 
 //======================================

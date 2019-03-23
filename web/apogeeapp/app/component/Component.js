@@ -9,8 +9,6 @@ apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
     this.workspaceUI.registerMember(this.member,this);
     
     //inheriting objects can pass functions here to be called on cleanup, save, etc
-    this.openActions = [];
-    this.saveActions = [];
     this.cleanupActions = [];
     
     //notifications
@@ -22,25 +20,15 @@ apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
     this.childComponentDisplayStateJson = null;
     
     this.tabDisplay = null; //only valid on parents, which open into a tab
+    this.tabDisplayStateJson = null;
     
     this.treeDisplay = null; //this is shown in the tree view
+    this.treeStateJson = null;
 }
 
 //These parameters are used to order the components in the tree entry.
 apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER = 5;
 apogeeapp.app.Component.FOLDER_COMPONENT_TYPE_SORT_ORDER = 0;
-
-/** If an extending object has any open actions to read the open json, a callback should be passed here.
- * The callback will be executed in the context of the current object. */
-apogeeapp.app.Component.prototype.addOpenAction = function(openFunction) {
-    this.openActions.push(openFunction);
-}
-
-/** If an extending object has any save actions, a callback should be passed here.
- * The callback will be executed in the context of the current object. */
-apogeeapp.app.Component.prototype.addSaveAction = function(saveFunction) {
-    this.saveActions.push(saveFunction);
-}
 
 /** If an extending object has any cleanup actions, a callback should be passed here.
  * The callback will be executed in the context of the current object. */
@@ -243,7 +231,7 @@ apogeeapp.app.Component.prototype.toJson = function() {
         }
         
         if(this.tabDisplayStateJson) {
-            json.folderState = this.tabDisplayStateJson;
+            json.tabState = this.tabDisplayStateJson;
         }
     }
     
@@ -254,8 +242,9 @@ apogeeapp.app.Component.prototype.toJson = function() {
         }
     }
     
-    for(var i = 0; i < this.saveActions.length; i++) {
-        this.saveActions[i].call(this,json);
+    //allow the specific component implementation to write to the json
+    if(this.writeToJson) {
+        this.writeToJson(json);
     }
     
     return json;
@@ -278,8 +267,8 @@ apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
     
     //open the tab - if tab frame exists
     if(this.usesTabDisplay()) {
-        if(json.folderState) {
-            this.tabDisplayStateJson = json.folderState;
+        if(json.tabState) {
+            this.tabDisplayStateJson = json.tabState;
         }
     }
     
@@ -288,19 +277,35 @@ apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
         this.childComponentDisplayStateJson = json.windowState;
     }
     
-    //do any registered open actions
-    for(var i = 0; i < this.openActions.length; i++) {
-        this.openActions[i].call(this,json);
+    //allow the component implemnetation ro read from the json
+    if(this.readFromJson) {
+        this.readFromJson(json);
     }
 }
 //==============================
 // Protected Instance Methods
 //==============================
 
+//This method should optionally be populated by an extending object.
+//** This method reads any necessary component implementation-specific data
+// * from the json. OPTIONAL */
+//apogeeapp.app.Component.prototype.readFromJson = function(json);
 
-//This method should be populated by an extending object.
-//** This serializes the table component. */
+//This method should optionally be populated by an extending object.
+//** This method writes any necessary component implementation-specific data
+// * to the json. OPTIONAL */
 //apogeeapp.app.Component.prototype.writeToJson = function(json);
+
+//This method should optionally be populated by an extending object.
+//** This method adds any necessary implementation-specific property
+// * key value pairs to the passed in the json. OPTIONAL */
+//apogeeapp.app.Component.prototype.addPropFunction = function(values);
+
+//This method should optionally be populated by an extending object.
+//** This method gets updated component implementation-specific properties from 
+// * the passed in newValues. OldValues will be the original values passed back
+// to this function. OPTIONAL */
+//apogeeapp.app.Component.prototype.updateProperties = function(oldValues,newValues);
 
 /** This method cleans up after a delete. Any extending object that has delete
  * actions should pass a callback function to the method "addClenaupAction" */
@@ -413,8 +418,8 @@ apogeeapp.app.Component.prototype.getPropertyValues = function() {
     if(member.generator.addPropFunction) {
         member.generator.addPropFunction(member,values);
     }
-    if(this.componentGenerator.addPropFunction) {
-        this.componentGenerator.addPropFunction(this,values);
+    if(this.addPropFunction) {
+        this.addPropFunction(values);
     }
     return values;
 }
@@ -493,8 +498,19 @@ apogeeapp.app.Component.prototype.createDeleteCallback = function() {
 // Static methods
 //======================================
 
-//this creates a component from a member and component options (not property values!)
-apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,workspaceUI,member,userInputValues,serializedValues) {
+/** This creates a component from a member along with two sources of data for the component, the serialized values
+ * and propertyValues. Both of these are optional. Typically serializaed values are used when we are opening the
+ * component from a saved state and property values are used when we are creating a new component where the 
+ * users filled out a dialog populating the properties.
+ * 
+ * @param {type} componentGenerator - This is the generator for the component
+ * @param {type} workspaceUI - this is the workspace UI in which we wil create the component
+ * @param {type} member - this is the member associated with the component
+ * @param {type} propertyValues - (optional) these are property values, which may be used to create the component (like when it is loaded from a create dialog)
+ * @param {type} serializedValues - (optional) these are serialized values for the componnet, (like when it is loaded from a serialized json)
+ * @returns the component created
+ */
+apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,workspaceUI,member,propertyValues,serializedValues) {
     
     //create empty component
     var component = new componentGenerator(workspaceUI,member);
@@ -505,8 +521,8 @@ apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,
     }
     
     //apply any user input (property dialog) values
-    if((userInputValues)&&(componentGenerator.updateProperties)) {
-        componentGenerator.updateProperties(component,null,userInputValues);
+    if((propertyValues)&&(this.updateProperties)) {
+        this.updateProperties(null,propertyValues);
     }
 
     //call member updated to process and notify of component creation
