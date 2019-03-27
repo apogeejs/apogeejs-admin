@@ -503,14 +503,14 @@ apogeeapp.app.Apogee.prototype.getAddChildMenuItems = function(optionalInitialVa
         
         menuItem = {};
         menuItem.title = "Add " + generator.displayName;
-        menuItem.callback = apogeeapp.app.addcomponent.getAddComponentCallback(this,generator,optionalInitialValues,optionalComponentOptions);
+        menuItem.callback = () => apogeeapp.app.addcomponent.addComponent(this,generator,optionalInitialValues,optionalComponentOptions);
         menuItemList.push(menuItem);
     }
 
     //add the additional component item
     menuItem = {};
     menuItem.title = "Other Components...";
-    menuItem.callback = apogeeapp.app.addcomponent.getAddAdditionalComponentCallback(this,optionalInitialValues,optionalComponentOptions);
+    menuItem.callback = () => apogeeapp.app.addcomponent.addAdditionalComponent(this,optionalInitialValues,optionalComponentOptions);
     menuItemList.push(menuItem);
 
     return menuItemList;

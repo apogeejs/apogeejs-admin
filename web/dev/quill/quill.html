@@ -1,0 +1,207 @@
+<html>
+	<head>
+		<!-- This is a test of the Quill Editor -->
+		
+		<!-- Include stylesheet -->
+		<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+		<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+		<script src="MyElement.js"></script>
+		
+		<style>
+			boldItalicStyle: {
+				font-weight: bold;
+				font-style: italic;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- Create the editor container -->
+		<button id="textInsertButton">Insert Text</button>
+		<button id="widgetButton">Test Widget</button>
+		<button id="boldButton">Bold</button>
+		<button id="divider">Divider</button>
+		<button id="imageButton">Image</button>
+		<button id="saveButton">Save</button>
+		<button id="openButton">Open</button>
+		<button id="clearButton">New</button>
+        <button id="testButton">TEST</button>
+		<div id="editor">
+		  <p>Hello World!</p>
+		  <p>Some initial <strong>bold</strong> text</p>
+		  <p><br></p>
+          <p><my-element data-value="This is test content"></my-element></p>
+		</div>
+		
+		<!-- Include the Quill library -->
+		<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+		
+		<!-- Initialize Quill editor -->
+		<script>
+			var container = document.getElementById('editor');
+			var options = {};
+			options.theme = 'snow';
+			
+			// it we want to define a toolbar, otherwise a default is added
+			//options.modules = {};
+			//options.modules.toolbar = '#toolbar'
+			
+			var Inline = Quill.import('blots/inline');
+			var BlockEmbed = Quill.import('blots/block/embed');
+			
+			//bold blot
+			class BoldBlot extends Inline { }
+			BoldBlot.blotName = 'bold';
+			BoldBlot.tagName = 'strong';
+			Quill.register(BoldBlot);
+
+			//Divider blot
+			class DividerBlot extends BlockEmbed { }
+			DividerBlot.blotName = 'divider';
+			DividerBlot.tagName = 'hr';
+			Quill.register(DividerBlot);	
+			
+			//test widget blot
+			class TestWidgetBlot extends BlockEmbed {
+				static create(value) {
+					var node = super.create();
+					node.setAttribute('data-value',value.dataValue);
+					return node;
+				}
+				
+				static value(node) {
+					return {
+						dataValue: node.getAttribute('data-value')
+					};
+				}
+                
+                static formats(domNode) {
+                    return null;
+                }
+                
+                format(format,value) {
+                    return super.format(format,value);
+                }
+                
+                update(mutations,context) {
+                    console.log("In update!");
+                }
+			};
+			TestWidgetBlot.blotName = 'testwidget';
+			TestWidgetBlot.tagName = 'my-element';
+			Quill.register(TestWidgetBlot);	
+
+			//image blot
+			class ImageBlot extends BlockEmbed {
+				static create(value) {
+					var node = super.create();
+					node.setAttribute('src',value.url);
+					return node;
+				}
+				
+				static value(node) {
+					return {
+						url: node.getAttribute('src'),
+					};
+				}
+			};
+			ImageBlot.blotName = 'image';
+			ImageBlot.tagName = 'img';
+			Quill.register(ImageBlot);				
+			
+			//editor
+			var quill = new Quill(container,options);
+			
+			//ui
+			var boldButton = document.getElementById("boldButton");
+			boldButton.onclick = () => {
+			  quill.format('bold', true);
+			};
+			
+			var dividerButton = document.getElementById("divider");
+			dividerButton.onclick = () => {
+			  let range = quill.getSelection(true);
+			  quill.insertText(range.index, '\n', Quill.sources.USER);
+			  quill.insertEmbed(range.index + 1, 'divider', true, Quill.sources.USER);
+			  quill.setSelection(range.index + 2, Quill.sources.SILENT);
+			};
+			
+			//This doesnt handle paste properly. We need to think about that.
+			var widgetButton = document.getElementById("widgetButton");
+			widgetButton.onclick = () => {
+			  var dataValue = prompt('What data do you want in the widget?');
+			  var value = {};
+			  value.dataValue = dataValue;
+
+			  let range = quill.getSelection(true);
+			  quill.insertText(range.index, '\n', Quill.sources.USER);
+			  quill.insertEmbed(range.index + 1, 'testwidget', value, Quill.sources.USER);
+			  quill.setSelection(range.index + 2, Quill.sources.SILENT);
+              
+              alert("widget index = " + (range.index + 1));
+			};
+			
+			//this doesn't replace test properly! Fix that and use it in the other places too.
+			var textInsertButton = document.getElementById("textInsertButton");
+			textInsertButton.onclick = () => {
+			  var text = prompt('What text do you want to insert?');
+			  
+			  let range = quill.getSelection(true);
+			  quill.insertText(range.index,text, Quill.sources.USER);
+			  quill.setSelection(range.index + text.length, Quill.sources.SILENT);
+			};
+			
+			var imageButton = document.getElementById("imageButton");
+			imageButton.onclick = () => {
+			  var url = prompt('What is the url for the image?');
+			  var value = {};
+			  value.url = url;
+
+			  let range = quill.getSelection(true);
+			  quill.insertText(range.index, '\n', Quill.sources.USER);
+			  quill.insertEmbed(range.index + 1, 'image', value, Quill.sources.USER);
+			  quill.setSelection(range.index + 2, Quill.sources.SILENT);
+			};
+			
+			var saveButton = document.getElementById("saveButton");
+			saveButton.onclick = () => {
+				alert("writing to console");
+				var delta = quill.getContents();
+				console.log(JSON.stringify(delta));
+			}
+			var openButton = document.getElementById("openButton");
+			openButton.onclick = () => {
+				var data = prompt('Paste saved file here?');
+				try {
+					var delta = JSON.parse(data);
+					quill.setContents(delta);
+				}
+				catch(error) {
+					alert("Oops! There was an error: " + error.message);
+					if(error.stack) console.error(error.stack);
+				}
+			}
+			var clearButton = document.getElementById("clearButton");
+			clearButton.onclick = () => {
+				var delta = [{insert: '\n'}];
+				quill.setContents(delta);
+			}
+            var testButton = document.getElementById("testButton");
+			testButton.onclick = () => {
+                let range = quill.getSelection(true);
+				var delta = [
+                    {
+                        retain: range.index
+                    },
+                    {
+                        retain: range.length,
+                        attributes:{
+                            bold: true
+                        }   
+                    }
+                ]
+				quill.updateContents(delta);
+			}
+		</script>
+		
+	</body>
+</html>

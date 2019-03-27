@@ -62,7 +62,7 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,wo
         newParentOptionsJson.name = workspaceJson.workspace.data.name;
         componentGenerator.appendWorkspaceChildren(newParentOptionsJson,workspaceJson.workspace.data.children);
         var serializedComponentsJson = workspaceJson.components;
-		var workspaceImportDialogFunction = apogeeapp.app.addcomponent.getAddComponentCallback(app,componentGenerator,newParentOptionsJson,serializedComponentsJson);
+		var workspaceImportDialogFunction = () => apogeeapp.app.addcomponent.addComponent(app,componentGenerator,newParentOptionsJson,serializedComponentsJson);
         
         var linkLoadError = function(errorMsg) {
             alert("Error loading links: " + errorMsg);
