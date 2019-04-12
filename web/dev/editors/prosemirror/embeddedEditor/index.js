@@ -178,7 +178,7 @@ class CodeBlockView {
       let start = this.getPos() + 1
       let tr = this.view.state.tr.replaceWith(
         start + change.from, start + change.to,
-        change.text ? schema.text(change.text) : null)
+        change.text ? mySchema.text(change.text) : null)
       this.view.dispatch(tr)
     }
   }
@@ -244,7 +244,7 @@ var startDoc = DOMParser.fromSchema(mySchema).parse(document.querySelector("#con
 
 var state = EditorState.create({
     doc: startDoc,
-    plugins: exampleSetup({schema: mySchema})
+    plugins: exampleSetup({schema: mySchema}).concat(arrowHandlers)
   })
 
 window.view = new EditorView(document.querySelector("#editor"), {

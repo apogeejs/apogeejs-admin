@@ -181,3 +181,13 @@ window.view = new EditorView(document.querySelector("#editor"), {
     }
   }
 })
+
+function saveState() {
+    var stateJson = window.view.state.toJSON();
+    console.log(JSON.stringify(stateJson));
+}
+
+function showSelection() {
+    var selection = window.view.state.selection;
+    console.log(JSON.stringify(selection));
+}
