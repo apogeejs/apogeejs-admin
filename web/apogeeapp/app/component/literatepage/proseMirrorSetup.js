@@ -1,4 +1,13 @@
 function proseMirrorSetup() {
+    
+    // Kludge to make requiring prosemirror core libraries possible. The
+    // PM global is defined by http://prosemirror.net/examples/prosemirror.js,
+    // which bundles all the core libraries.
+    function require(name) {
+      let id = /^prosemirror-(.*)/.exec(name), mod = id && PM[id[1].replace(/-/g, "_")]
+      if (!mod) throw new Error(`Library basic isn't loaded`)
+      return mod
+    }
 
     //=======================
     // Create the test block schema
@@ -269,7 +278,10 @@ function proseMirrorSetup() {
     return proseMirror;
 }
 
-var proseMirror = proseMirrorSetup();
+//for now I will ad an explicit delay to load this. I do need to do it a different way.
+var proseMirror;
+        
+setTimeout(() => {proseMirror = proseMirrorSetup()},2000);
 
 
 
