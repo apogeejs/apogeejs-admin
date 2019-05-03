@@ -495,20 +495,19 @@ apogeeapp.app.Apogee.prototype.getWorkspaceMenuItems = function() {
 apogeeapp.app.Apogee.prototype.getAddChildMenuItems = function(optionalInitialValues,optionalComponentOptions) {
     
     var menuItemList = [];
-    var menuItem;
     
     for(var i = 0; i < this.standardComponents.length; i++) {
-        var key = this.standardComponents[i];
-        var generator = this.componentGenerators[key];
+        let key = this.standardComponents[i];
+        let generator = this.componentGenerators[key];
         
-        menuItem = {};
+        let menuItem = {};
         menuItem.title = "Add " + generator.displayName;
         menuItem.callback = () => apogeeapp.app.addcomponent.addComponent(this,generator,optionalInitialValues,optionalComponentOptions);
         menuItemList.push(menuItem);
     }
 
     //add the additional component item
-    menuItem = {};
+    let menuItem = {};
     menuItem.title = "Other Components...";
     menuItem.callback = () => apogeeapp.app.addcomponent.addAdditionalComponent(this,optionalInitialValues,optionalComponentOptions);
     menuItemList.push(menuItem);

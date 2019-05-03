@@ -20,7 +20,7 @@ apogee.codeDependencies.getDependencyInfo = function(varInfo,contextManager) {
                 var namePath = nameUse.path;
 
                 //lookup this object
-                var impactor = contextManager.getImpactor(namePath);
+                var impactor = contextManager.getMember(namePath);
                 if(impactor) {
 
                     //add as dependent (note this may not be a data object - check later!)

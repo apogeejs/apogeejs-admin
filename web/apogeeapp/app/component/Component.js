@@ -166,9 +166,10 @@ apogeeapp.app.Component.prototype.getTabDisplay = function(createIfMissing) {
 apogeeapp.app.Component.prototype.closeTabDisplay = function() {
     if(this.tabDisplay) {
         this.tabDisplayStateJson = this.tabDisplay.getStateJson();
-        this.tabDisplay.closeTab();
-        this.tabDisplay.destroy();
+        var tabDisplay = this.tabDisplay;
         this.tabDisplay = null;
+        tabDisplay.closeTab();
+        tabDisplay.destroy();    
     }
 }
 

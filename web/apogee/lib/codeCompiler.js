@@ -119,7 +119,7 @@ apogee.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunction
         contextDeclarationText += "var " + baseName + ";\n";
         
         //add to the context setter
-        initializerBody += baseName + ' = contextManager.getBaseData("' + baseName + '");\n';
+        initializerBody += baseName + ' = contextManager.getValue("' + baseName + '");\n';
     }
     
     //create the generator for the object function
