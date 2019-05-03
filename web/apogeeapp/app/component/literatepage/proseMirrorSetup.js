@@ -15,6 +15,7 @@ function proseMirrorSetup() {
 
     const {Schema} = require("prosemirror-model")
     const {schema} = require("prosemirror-schema-basic")
+    const {addListNodes} = require("prosemirror-schema-list")
 
     var NodeXXX;
     function NodeLoad() {
@@ -49,7 +50,7 @@ function proseMirrorSetup() {
 
     //schema object
     const testBlockSchema = new Schema({
-       nodes: schema.spec.nodes.addBefore("image", "testBlock", testBlockSpec),
+       nodes: addListNodes(schema.spec.nodes.addBefore("image", "testBlock", testBlockSpec), "paragraph block*", "block"),
        marks: schema.spec.marks
     })
 
