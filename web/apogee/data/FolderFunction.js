@@ -130,11 +130,7 @@ apogee.FolderFunction.addPropValues = function(member,values) {
 apogee.FolderFunction.getPropertyUpdateAction = function(folderFunction,oldValues,newValues) {
     if((oldValues.argListString !== newValues.argListString)||(oldValues.returnValueString !== newValues.returnValueString)) {
         var newArgList = apogee.FunctionTable.parseStringArray(newValues.argListString);
-  
-//I commented this out - I need to check to make sure that was correct        
-//        folderFunction.setArgList(newArgList);
-//        folderFunction.setReturnValueString(newValues.returnValueString);
-        
+ 
         var actionData = {};
         actionData.action = "updateFolderFunction";
         actionData.member = folderFunction;
@@ -331,10 +327,13 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
  * @private */
 apogee.FolderFunction.prototype.createVirtualWorkspace = function(folderFunctionErrors) {
     try {
-		return apogee.Workspace.createVirtualWorkpaceFromFolder(this.getName(),this.internalFolder,this.getOwner());
+        var folderJson = this.internalFolder.toJson();
+		var workspaceJson = apogee.Workspace.createWorkpaceJsonFromFolderJson(this.getName(),folderJson);
+        var virtualWorkspace = new apogee.Workspace(workspaceJson,null,this.getOwner());
+        return virtualWorkspace;
 	}
 	catch(error) {
-        var actionError = apogee.ActionError.processException(exception,"FolderFunction - Code",false);
+        var actionError = apogee.ActionError.processException(error,"FolderFunction - Code",false);
 		folderFunctionErrors.push(actionError);
 		return null;
 	}

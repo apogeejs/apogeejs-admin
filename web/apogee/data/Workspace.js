@@ -1,6 +1,14 @@
 /** This is the workspace. Typically owner should be null. It
- * is used for creating virtual workspaces. */
-apogee.Workspace = function(optionalJson,actionResponseForJson,ownerForVirtualWorkspace) {
+ * is used for creating virtual workspaces. 
+ * - optionalJson - For new workspaces this can be empty. If we are deserializing an existing
+ * workspace, the json for it goes here.
+ * - actionResponseForJson - This will take any error messages for deserializing the json. This is
+ * only used if there is a json to deserialize.
+ * - optionalContextOwner - This is used if the workspace should be placed in a context. This is 
+ * used for the virtual workspace created for folder functions, so the folder function can 
+ * access variables from the larger workspace.
+ * */
+apogee.Workspace = function(optionalJson,actionResponseForJson,optionalContextOwner) {
     //base init
     apogee.EventManager.init.call(this);
     apogee.ContextHolder.init.call(this);
@@ -15,8 +23,7 @@ apogee.Workspace = function(optionalJson,actionResponseForJson,ownerForVirtualWo
     this.activeConsecutiveActionLimit = apogee.Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT;
     this.name = apogee.Workspace.DEFAULT_WORKSPACE_NAME;
     
-    if(ownerForVirtualWorkspace === undefined) ownerForVirtualWorkspace = null;
-    this.owner = ownerForVirtualWorkspace;
+    this.owner = optionalContextOwner ? optionalContextOwner : null;
     
     if(!optionalJson) {
         this.rootFolder = new apogee.Folder(apogee.Workspace.ROOT_FOLDER_NAME,this);
@@ -195,69 +202,21 @@ apogee.Workspace.prototype.createContextManager = function() {
     //set the context manager
     var contextManager = new apogee.ContextManager(this);
     
-    if(this.owner) {
-        //get the context of the owner, but flattened so we don't reference
-        //the owner's tables
-        apogee.Workspace.flattenParentIntoContextManager(contextManager,this.owner);
-    }
-    else {
-        //global variables from window object
+    //if no owner is defined for the workspace - the standard scenario, we will
+    //add all global variables as a data entry for the context, so these variables
+    //can be called from the workspace. 
+    if(!this.owner) {
         var globalVarEntry = {};
         globalVarEntry.data = __globals__;
         contextManager.addToContextList(globalVarEntry);
     }
+    //if there is an owner defined, the context manager for the owner will be used
+    //to lokoup variables. This is done for a folder function, so that it has
+    //access to other variables in the workspace.
     
     return contextManager;
 }
 
-
-//==========================
-//virtual workspace methods
-//==========================
-
-/** This method makes a virtual workspace that contains a copy of the give folder
- * as the root folder. Optionally the context manager may be set. */
-apogee.Workspace.createVirtualWorkpaceFromFolder = function(name,origRootFolder,ownerInWorkspace) {
-	//create a workspace json from the root folder json
-	var workspaceJson = {};
-    workspaceJson.fileType = apogee.Workspace.SAVE_FILE_TYPE;
-    workspaceJson.version = apogee.Workspace.SAVE_FILE_VERSION;
-    workspaceJson.data = origRootFolder.toJson();
-	
-    var virtualWorkspace = new apogee.Workspace(workspaceJson,null,ownerInWorkspace);
-    
-    return virtualWorkspace;
-}
-
-//this is a cludge. look into fixing it.
-apogee.Workspace.flattenParentIntoContextManager = function(contextManager,virtualWorkspaceParent) {
-    for(var owner = virtualWorkspaceParent; owner != null; owner = owner.getOwner()) {
-        var ownerContextManager = owner.getContextManager();
-        var contextList = ownerContextManager.contextList; //IF WE USE THIS WE NEED TO MAKE IT ACCESSIBLE!
-        for(var i = 0; i < contextList.length; i++) {
-            var contextEntry = contextList[i];
-            //only take non-local entries
-            if(contextEntry.parent) {
-                //add this entry after converting it to a data entry, 
-                contextManager.addToContextList(apogee.Workspace.convertToDataContextEntry(contextEntry));
-            }
-            else if(contextEntry.data) {
-                //already a data entry - add it directly
-                contextManager.addToContextList(contextEntry);
-            }
-            else {
-                //unknown case - ignore
-            }
-        }
-    }
-}
-
-apogee.Workspace.convertToDataContextEntry = function(contextEntry) {
-    var contextDataEntry = {};
-    contextDataEntry.data = contextEntry.parent.getData();
-    return contextDataEntry;
-}
-    
 //============================
 // Save Functions
 //============================
@@ -268,27 +227,22 @@ apogee.Workspace.SAVE_FILE_TYPE = "apogee workspace";
 /** This is the supported file version. */
 apogee.Workspace.SAVE_FILE_VERSION = 0.2;
 
-/** This saves the workspace. It the optionalSavedRootFolder is passed in,
- * it will save a workspace with that as the root folder. */
-apogee.Workspace.prototype.toJson = function(optionalSavedRootFolder) {
-    var json = {};
-    json.fileType = apogee.Workspace.SAVE_FILE_TYPE;
-    json.version = apogee.Workspace.SAVE_FILE_VERSION;
-    
-    json.name = this.name;
-    
-    var rootFolder;
-    if(optionalSavedRootFolder) {
-        rootFolder = optionalSavedRootFolder;
-    }
-    else {
-        rootFolder = this.rootFolder;
-    }
-    
-    //components
-    json.data = rootFolder.toJson();
-    
-    return json;
+/** This method creates a headless workspace json from a folder json. It
+ * is used in the folder function. */
+apogee.Workspace.createWorkpaceJsonFromFolderJson = function(name,folderJson) {
+	//create a workspace json from the root folder json
+	var workspaceJson = {};
+    workspaceJson.fileType = apogee.Workspace.SAVE_FILE_TYPE;
+    workspaceJson.version = apogee.Workspace.SAVE_FILE_VERSION;
+    workspaceJson.name = name;
+    workspaceJson.data = folderJson;
+	return workspaceJson;
+}
+
+/** This saves the workspace */
+apogee.Workspace.prototype.toJson = function() {
+    var rootFolderJson = this.rootFolder.toJson();
+    return apogee.Workspace.createWorkpaceJsonFromFolderJson(this.name,rootFolderJson);
 }
 
 
