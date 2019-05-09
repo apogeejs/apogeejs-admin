@@ -522,8 +522,8 @@ apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,
     }
     
     //apply any user input (property dialog) values
-    if((propertyValues)&&(this.updateProperties)) {
-        this.updateProperties(null,propertyValues);
+    if((propertyValues)&&(component.updateProperties)) {
+        component.updateProperties(null,propertyValues);
     }
 
     //call member updated to process and notify of component creation
