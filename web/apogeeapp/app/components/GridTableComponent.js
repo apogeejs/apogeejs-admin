@@ -27,7 +27,6 @@ apogeeapp.app.GridTableComponent.VIEW_MODES = [
 apogeeapp.app.GridTableComponent.TABLE_EDIT_SETTINGS = {
     "viewModes": apogeeapp.app.GridTableComponent.VIEW_MODES,
     "defaultView": apogeeapp.app.GridTableComponent.VIEW_GRID,
-    "clearFunctionMenuText": "Clear Formula",
     "emptyDataValue": [[""]]
 }
 

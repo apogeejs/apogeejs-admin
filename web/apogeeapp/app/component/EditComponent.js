@@ -33,32 +33,8 @@ apogeeapp.app.EditComponent.prototype.getMenuItems = function(optionalMenuItemLi
     
     //call base class
     var menuItemList = apogeeapp.app.Component.prototype.getMenuItems.call(this,menuItemList);
-    
-    //initialize the "clear function" menu entry, used only when there is code
-     if((this.member.isCodeable)&&(this.member.hasCode())) {
-         var settings = this.getTableEditSettings();
-        if(settings.clearFunctionMenuText !== undefined) {
-            var itemInfo = {};
-            itemInfo.title = settings.clearFunctionMenuText;
-            itemInfo.callback = this.getClearFunctionCallback(settings.emptyDataValue);
-            menuItemList.push(itemInfo);
-        }   
-    }
 			
     return menuItemList;
-}
-
-apogeeapp.app.EditComponent.prototype.getClearFunctionCallback = function(emptyDataValue) {
-    var actionData = {};
-    actionData.member = this.member;
-    actionData.data = emptyDataValue;
-    actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME
-    return function() {
-        var actionResponse = apogee.action.doAction(actionData,true); 
-        if(!actionResponse.getSuccess()) {
-            apogeeapp.app.errorHandling.handleActionError(actionResponse);
-        }
-    }
 }
 
 

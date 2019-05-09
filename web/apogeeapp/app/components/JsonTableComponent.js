@@ -43,7 +43,6 @@ apogeeapp.app.JsonTableComponent.VIEW_MODES = [
 apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS = {
     "viewModes": apogeeapp.app.JsonTableComponent.VIEW_MODES,
     "defaultView": apogeeapp.app.JsonTableComponent.VIEW_DATA,
-    "clearFunctionMenuText": "Clear Formula",
     "emptyDataValue": ""
 }
 

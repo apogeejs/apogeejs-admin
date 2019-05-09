@@ -27,7 +27,6 @@ apogeeapp.app.TextComponent.VIEW_MODES = [
 apogeeapp.app.TextComponent.TABLE_EDIT_SETTINGS = {
     "viewModes": apogeeapp.app.TextComponent.VIEW_MODES,
     "defaultView": apogeeapp.app.TextComponent.VIEW_TEXT,
-    "clearFunctionMenuText": "Clear Formula",
     "emptyDataValue": ""
 }
 
