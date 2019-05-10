@@ -102,30 +102,28 @@ apogeeapp.app.addcomponent.addComponent = function(app,componentGenerator,option
 /** This gets a callback to add an "additional" component, menaing one that is not
  * in the main component menu. */
 apogeeapp.app.addcomponent.addAdditionalComponent = function(app,optionalInitialValues,optionalComponentJson) {
-    return function() {
-    
-        var onSelect = function(componentType) {
-            var componentGenerator = app.getComponentGenerator(componentType);
-            if(componentGenerator) {
-                apogeeapp.app.addcomponent.addComponent(app,componentGenerator,optionalInitialValues,optionalComponentJson);
-            }
-            else {
-                alert("Unknown component type: " + componentType);
-            }
+        
+    var onSelect = function(componentType) {
+        var componentGenerator = app.getComponentGenerator(componentType);
+        if(componentGenerator) {
+            apogeeapp.app.addcomponent.addComponent(app,componentGenerator,optionalInitialValues,optionalComponentJson);
         }
-        //get the display names
-        var componentNames = app.additionalComponents.map(componentClassName => {
-            var generator = app.getComponentGenerator(componentClassName);
-            if(generator) {
-                return generator.displayName;
-            }
-            else {
-                return componentClassName + " (ERROR - not found!)";
-            }
-        })
-        //open select component dialog
-        apogeeapp.app.dialog.showSelectComponentDialog(componentNames,app.additionalComponents,onSelect);
+        else {
+            alert("Unknown component type: " + componentType);
+        }
     }
+    //get the display names
+    var componentNames = app.additionalComponents.map(componentClassName => {
+        var generator = app.getComponentGenerator(componentClassName);
+        if(generator) {
+            return generator.displayName;
+        }
+        else {
+            return componentClassName + " (ERROR - not found!)";
+        }
+    })
+    //open select component dialog
+    apogeeapp.app.dialog.showSelectComponentDialog(componentNames,app.additionalComponents,onSelect);
 }
 
 //=====================================
