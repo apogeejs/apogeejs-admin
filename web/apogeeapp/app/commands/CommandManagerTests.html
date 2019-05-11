@@ -1,22 +1,29 @@
-<!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Command Manager Tests</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script>
-            //I should include the proper files for this, but for now I will explicitly define them
-            var apogee = {};
-            apogee.app = {};
-        </script>
+        <script src="../../../apogee/apogee.js"></script>
+        <script src="../../../apogee/usrlib/util.js"></script>
+        <script src="../../apogeeapp.js"></script>
         <script src="CommandManager.js"></script>
         <script src="CommandManagerTests.js"></script>
-        <script>
+        <script>         
+            
+            function runTests() {
+                var commandManagerTests = new CommandManagerTests();
+                var tests = commandManagerTests.getTests();
+                var results = [];
+                runTestCollection(tests,results);
+                
+                var output = document.getElementById("output");
+                output.innerHTML = JSON.stringify(results,null,4);
+            }
+            
+            //======================================
+            // THESE ARE THINGS THAT SHOULD BE IN THE TEST FRAMEWORK (pri
+            //======================================
+            
             /** This runs a set of tests, where tests is a map of test functions which throw an error if they fail. */
             function runTestCollection(tests,results) {
 
@@ -33,15 +40,19 @@ and open the template in the editor.
                     }
                 }
             }
-            
-            function runTests() {
-                var commandManagerTests = new CommandManagerTests();
-                var tests = commandManagerTests.getTests();
-                var results = [];
-                runTestCollection(tests,results);
-                
-                var output = document.getElementById("output");
-                output.innerHTML = JSON.stringify(results,null,4);
+
+            /** This is one of the compares that should be in the test suit. */
+            function testSimpleEquals(desc,value1,value2) {
+                if(value1 !== value2) {
+                    throw new Error("Failure in test: " + desc + " " + value1 + " != " + value2);
+                }
+            }
+
+            /** This is one of the compares that should be in the test suit. */
+            function testJsonEquals(desc,value1,value2) {
+                if(!apogee.util.jsonEquals(value1,value2)) {
+                    throw new Error("Failure in test: " + desc + " " + JSON.stringify(value1) + " != " + JSON.stringify(value2));
+                }
             }
         </script>
     </head>

@@ -26,9 +26,9 @@
  * - once the max number of commands are reached, additional added commands replace he oldeest command in the queue
  * 
  */
-apogee.app.CommandManager = class {
+apogeeapp.app.CommandManager = class {
     constructor(optionalUndoCommandCount) {
-        this.undoCommandCount = (optionalUndoCommandCount !== undefined) ? optionalUndoCommandCount : apogee.app.CommandManager.DEFAULT_UNDO_COMMAND_COUNT;
+        this.undoCommandCount = (optionalUndoCommandCount !== undefined) ? optionalUndoCommandCount : apogeeapp.app.CommandManager.DEFAULT_UNDO_COMMAND_COUNT;
         this.clearHistory();
     }
     
@@ -60,7 +60,7 @@ apogee.app.CommandManager = class {
     /** This method clears the undo/redo history. */
     clearHistory() {
         //set a fixed size array for our circular queue
-        this.undoQueue = new Array[this.undoCommandCount];
+        this.undoQueue = new Array(this.undoCommandCount);
         
         //we will keep cmd index values that DO NOT wrap.
         //we will assume we do not overflow the integers for now
@@ -89,7 +89,7 @@ apogee.app.CommandManager = class {
             }
         }
         else {
-            return apogee.app.CommandManager.NO_COMMAND;
+            return apogeeapp.app.CommandManager.NO_COMMAND;
         }
     }
     
@@ -107,7 +107,7 @@ apogee.app.CommandManager = class {
             }
         }
         else {
-            return apogee.app.CommandManager.NO_COMMAND;
+            return apogeeapp.app.CommandManager.NO_COMMAND;
         }
     }
     
@@ -150,6 +150,14 @@ apogee.app.CommandManager = class {
     _executeCmdFunction(cmdFunction) {
         //TODO: FIGURE OUT WHAT GOES HERE AND HOW TO MANAGE FAILURE
         //should return true or false for success
+        //for now just ecxecute the function
+        try {
+            cmdFunction();
+            return true;
+        }
+        catch(error) {
+            return false;
+        }
     }
     
     //-------------------------
@@ -162,7 +170,7 @@ apogee.app.CommandManager = class {
         let oldFirstCmdIndex = this.firstUsedCmdIndex;
         
         let insertArrayIndex = this._getArrayIndex(this.nextInsertCmdIndex);
-        this.undoQueue[insertArrayIndex];
+        this.undoQueue[insertArrayIndex] = command;
         
         //update cmd index vlues
         this.lastUsedCmdIndex = this.nextInsertCmdIndex;
@@ -181,7 +189,7 @@ apogee.app.CommandManager = class {
     
     _getNextUndoCommand(doQueuePositionUpdate) {
         if((this.nextInsertCmdIndex - 1 >= this.firstUsedCmdIndex)&&(this.nextInsertCmdIndex - 1 <= this.lastUsedCmdIndex)) {
-            let undoArrayIndex = _getArrayIndex(this.nextInsertCmdIndex - 1);
+            let undoArrayIndex = this._getArrayIndex(this.nextInsertCmdIndex - 1);
             
             //update the queue positions, if requested
             if(doQueuePositionUpdate) {
@@ -198,7 +206,7 @@ apogee.app.CommandManager = class {
     
     _getNextRedoCommand(doQueuePositionUpdate) {
         if((this.nextInsertCmdIndex >= this.firstUsedCmdIndex)&&(this.nextInsertCmdIndex <= this.lastUsedCmdIndex)) {
-            let redoArrayIndex = _getArrayIndex(this.nextInsertCmdIndex);
+            let redoArrayIndex = this._getArrayIndex(this.nextInsertCmdIndex);
             
             //update the queue positions, if requested
             if(doQueuePositionUpdate) {
@@ -248,9 +256,9 @@ apogee.app.CommandManager = class {
 
 /** This is a token to represent there is no command available, either for 
  * undo or redo. */
-apogee.app.CommandManager.NO_COMMAND = {};
+apogeeapp.app.CommandManager.NO_COMMAND = {};
 
 /** This is the default number of stored undo/redo commands */
-apogee.app.CommandManager.DEFAULT_UNDO_COMMAND_COUNT = 50;
+apogeeapp.app.CommandManager.DEFAULT_UNDO_COMMAND_COUNT = 50;
 
 

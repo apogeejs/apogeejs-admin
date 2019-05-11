@@ -1,4 +1,3 @@
-apogeeapp.app = {};
 apogeeapp.app.dialog = {};
 
 //======================================
