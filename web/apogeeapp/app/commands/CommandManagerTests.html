@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script>
+            //I should include the proper files for this, but for now I will explicitly define them
+            var apogee = {};
+            apogee.app = {};
+        </script>
+        <script src="CommandManager.js"></script>
+        <script src="CommandManagerTests.js"></script>
+        <script>
+            /** This runs a set of tests, where tests is a map of test functions which throw an error if they fail. */
+            function runTestCollection(tests,results) {
+
+                for(var testName in tests) {
+                    try {
+                        tests[testName]();
+
+                        results.push([testName,"pass"])
+                    }
+                    catch(error) {
+                        console.error(testName + "Failed!");
+                        console.error(error.stack);
+                        results.push([testName,"fail",error.message]);
+                    }
+                }
+            }
+            
+            function runTests() {
+                var commandManagerTests = new CommandManagerTests();
+                var tests = commandManagerTests.getTests();
+                var results = [];
+                runTestCollection(tests,results);
+                
+                var output = document.getElementById("output");
+                output.innerHTML = JSON.stringify(results,null,4);
+            }
+        </script>
+    </head>
+    <body onload="runTests()">
+        Results:<pre id="output"></pre>
+    </body>
+</html>

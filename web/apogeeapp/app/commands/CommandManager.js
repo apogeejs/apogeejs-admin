@@ -1,29 +1,34 @@
 /* 
  * This class manages executing commands and storign and operating the command history for undo/redo.
+ * It provides standarde error handling for the commands in addition to managing undo/redo or commands.
  * 
  * Command Structure:
  * {
  *      cmd - This is a function that executes the command. It should return a 
  *      ActionResponse, and take as optional input an action response to use.
  *     
- *      cmdList - for a compound command, instead of cmd there is a list of cmd functions.
- *     
  *      undoCmd - This is a cmd that will undo the given cmd. It should have the
  *      same structure. If this is left undefined (or any false value) then the command
  *      will not allow undo
- *     
- *      undoCmdList - This is used instead fo undoCmd if there are multiple 
- *      commands to undo.
  *      
  *      desc - This is an option description of what the command does.
  *      
  *      [other items, such as "view" are tbd]
  * }
  * 
- * NOTE - THERE ARE A FEW TODOS HERE.
+ * Commands that can be undone are stored in a circular queue with a length that is optionally 
+ * settable at startup. (Otherwise a default len this used.)
+ * 
+ * Some rules for the undo/redo queue:
+ * - only a max number of commands are stored
+ * - when a command is undone or redone, the next undo and redo position is updated
+ * - new commands are inserted replacing the next redo command (if there is one, otherwise they areput at the end)
+ * - once the max number of commands are reached, additional added commands replace he oldeest command in the queue
+ * 
  */
 apogee.app.CommandManager = class {
-    constructor() {
+    constructor(optionalUndoCommandCount) {
+        this.undoCommandCount = (optionalUndoCommandCount !== undefined) ? optionalUndoCommandCount : apogee.app.CommandManager.DEFAULT_UNDO_COMMAND_COUNT;
         this.clearHistory();
     }
     
@@ -32,10 +37,7 @@ apogee.app.CommandManager = class {
         let success;
         
         if(command.cmd) {
-            success = this.executeCommandFunction(command.cmd);
-        }
-        else if(command.cmdList) {
-            success = this.executeCommandFunctionList(command.cmdList);
+            success = this._executeCmdFunction(command.cmd);
         }
         else {
             //this shouldn't happen
@@ -45,9 +47,9 @@ apogee.app.CommandManager = class {
         
         //handle success or failue
         if(success) {
-            if((command.undoCmd)||(command.undoCmdList)) {
-                this.history.push(command);
-                this.nextUndoIndex++;
+            //store the command if it is undoable
+            if(command.undoCmd) {
+                this._saveCommand(command);
             }
         }
         else {
@@ -57,18 +59,30 @@ apogee.app.CommandManager = class {
     
     /** This method clears the undo/redo history. */
     clearHistory() {
-        this.nextUndoIndex = -1;
-        this.history = [];
+        //set a fixed size array for our circular queue
+        this.undoQueue = new Array[this.undoCommandCount];
+        
+        //we will keep cmd index values that DO NOT wrap.
+        //we will assume we do not overflow the integers for now
+        //to get an array index, we convert from cmd index to array index with a function using modulo
+        
+        //this where we will put the next added command
+        this.nextInsertCmdIndex = 0;
+        //this is last index that has a valid command, but only if it is greater or equal to our first cmd index
+        this.lastUsedCmdIndex = -1;
+        //this is the first command index that has a valid command, but only if it is less than or equal to our last cmd index
+        this.firstUsedCmdIndex = 0;
+        
     }
     
-    /** If there is an undo command, this method will return a description if there
+    /** If there is an undo command, this method will return the description if there
      * is one or an empty string. If there is no undo command, this method will return
      * the value apogee.app.CommandManager.NO_COMMAND. */
     getNextUndoDesc() {
-        if((this.nextUndoIndex >= 0)&&(this.nextUndoIndex < this.history.length)) {
-            let nextCommandForUndo = this.history[this.nextUndoIndex];
-            if(nextCommandForUndo.desc) {
-                return nextCommandForUndo.desc
+        let command = this._getNextUndoCommand(false);
+        if(command) {
+            if(command.desc) {
+                return command.desc
             }
             else {
                 return "";
@@ -79,14 +93,14 @@ apogee.app.CommandManager = class {
         }
     }
     
-    /** If there is an redo command, this method will return a description if there
+    /** If there is an redo command, this method will return the description if there
      * is one or an empty string. If there is no undo command, this method will return
      * the value apogee.app.CommandManager.NO_COMMAND. */
     getNextRedoDesc() {
-        if((this.nextUndoIndex >= -1)&&(this.nextUndoIndex < this.history.length - 1)) {            
-            let nextCommandForRedo = this.history[this.nextUndoIndex + 1];
-            if(nextCommandForRedo.desc) {
-                return nextCommandForRedo.desc
+        let command = this._getNextRedoCommand(false);
+        if(command) {
+            if(command.desc) {
+                return command.desc
             }
             else {
                 return "";
@@ -99,84 +113,32 @@ apogee.app.CommandManager = class {
     
     /** This method undoes the next command to be undone. */
     undo() {
-        let nextCommandForUndo;
-        if((this.nextUndoIndex >= 0)&&(this.nextUndoIndex < this.history.length)) {
-            nextCommandForUndo = this.history[this.nextUndoIndex];
+        let command = this._getNextUndoCommand(true);
+        if((command)&&(command.undoCmd)) {
+            let success = this._executeCmdFunction(command.undoCmd);
+            if(!success) {
+                this._commandUndoneFailed();
+            }
         }
         else {
             //the ui should not let us get here
             alert("There is not command to undo");
-        }
-        
-        //execute undo for this command
-        let success;
-        if(nextCommandForUndo.undoCmd) {
-            let undoFunction = nextCommandForUndo.undoCmd
-            success = this.executeCommandFunction(undoFunction);
-        }
-        else if(nextCommandForUndo.undoCmdList) {
-            let undoFunctionList = nextCommandForUndo.undoCmdList
-            success = this.executeCommandFunctionList(undoFunctionList);
-        }
-        else {
-            //we shouldn't get here
-            alert("Error: There is no command to undo.");
-            return;
-        }
-        
-        //update the command history
-        if(success) {
-            //back up the undo index to the previous command
-            this.nextUndoIndex--;
-        }
-        else {
-            //clear this undo command and all those before it. 
-            //set next undo to invalid
-            this.history = this.history.slice(this.nextUndoIndex + 1);
-            this.nextUndoIndex = -1;
-            //TODO: Add an alert? Or is that handled below?
-        }
-        
+        }  
     }
     
     /** This method redones the next command to be redone. */
     redo() {
-        let nextCommandForRedo;
-        if((this.nextUndoIndex >= -1)&&(this.nextUndoIndex < this.history.length - 1)) {            
-            nextCommandForRedo = this.history[this.nextUndoIndex + 1];
+        let command = this._getNextRedoCommand(true);
+        if((command)&&(command.cmd)) {
+            let success = this._executeCmdFunction(command.cmd);
+            if(!success) {
+                this.commandRedoneFailed();
+            }
         }
         else {
             //the ui should not let us get here
-            alert("There is no command to redo");
-        }
-        
-        //execute redo for this command
-        let success;
-        if(nextCommandForRedo.cmd) {
-            let redoFunction = nextCommandForRedo.cmd
-            success = this.executeCommandFunction(redoFunction);
-        }
-        else if(nextCommandForRedo.cmdList) {
-            let redoFunctionList = nextCommandForRedo.redoCmdList
-            success = this.executeCommandFunctionList(redoFunctionList);
-        }
-        else {
-            //we shouldn't get here
-            alert("Error: There is no command to redo.");
-            return;
-        }
-        
-        //update the command history
-        if(success) {
-            //back up the undo index
-            this.nextUndoIndex++;
-        }
-        else {
-            //clear this failed command and all commands after it, keeping the same undo index
-            this.history = this.history.slice(0,this.nextUndoIndex + 1);
-            //TODO: Add an alert? Or is that handled below?
-        }
-        
+            alert("There is not command to undo");
+        }  
     }
     
     //=================================
@@ -185,21 +147,110 @@ apogee.app.CommandManager = class {
     
     /** This method executes a cmd function. 
      * @private */
-    this.executeCommandFunction(cmdFunction) {
+    _executeCmdFunction(cmdFunction) {
         //TODO: FIGURE OUT WHAT GOES HERE AND HOW TO MANAGE FAILURE
         //should return true or false for success
     }
     
-    /** This method executes a list of cmd fucntions.*/
-    this.executeCommandFunctionList(cmdFunctionList) {
-        //TODO: FIGURE OUT WHAT GOES HERE AND HOW TO MANAGE FAILURE
-        //should return true or false for success
-        //DO WE EVEN WANT THE COMMAND LIST OPTION?
+    //-------------------------
+    // These functions manage the undo queue
+    //-------------------------
+    
+    _saveCommand(command) {
+        let oldNextCmdIndex = this.nextInsertCmdIndex;
+        let oldLastCmdIndex = this.lastUsedCmdIndex;
+        let oldFirstCmdIndex = this.firstUsedCmdIndex;
+        
+        let insertArrayIndex = this._getArrayIndex(this.nextInsertCmdIndex);
+        this.undoQueue[insertArrayIndex];
+        
+        //update cmd index vlues
+        this.lastUsedCmdIndex = this.nextInsertCmdIndex;
+        this.nextInsertCmdIndex++;
+        
+        let oldFirstArrayIndex = this._getArrayIndex(this.oldFirstCmdIndex);
+        if(insertArrayIndex == oldFirstArrayIndex) {
+            this.firstUsedCmdIndex++;
+        }
+        
+        //clear out any now unreachable redo commands
+        if(this.nextInsertCmdIndex <= oldLastCmdIndex) {
+            this._clearCommands(this.nextInsertCmdIndex,oldLastCmdIndex);
+        }    
+    }
+    
+    _getNextUndoCommand(doQueuePositionUpdate) {
+        if((this.nextInsertCmdIndex - 1 >= this.firstUsedCmdIndex)&&(this.nextInsertCmdIndex - 1 <= this.lastUsedCmdIndex)) {
+            let undoArrayIndex = _getArrayIndex(this.nextInsertCmdIndex - 1);
+            
+            //update the queue positions, if requested
+            if(doQueuePositionUpdate) {
+                this.nextInsertCmdIndex--;
+            }
+            
+            return this.undoQueue[undoArrayIndex];
+        }
+        else {
+            //no available command
+            return null;
+        }
+    }
+    
+    _getNextRedoCommand(doQueuePositionUpdate) {
+        if((this.nextInsertCmdIndex >= this.firstUsedCmdIndex)&&(this.nextInsertCmdIndex <= this.lastUsedCmdIndex)) {
+            let redoArrayIndex = _getArrayIndex(this.nextInsertCmdIndex);
+            
+            //update the queue positions, if requested
+            if(doQueuePositionUpdate) {
+                this.nextInsertCmdIndex++;
+            }
+            
+            return this.undoQueue[redoArrayIndex];
+        }
+        else {
+            return null;
+        }
+    }
+    
+    _commandUndoneFailed() {
+        //clear the undone command so it can not be redone (at the current position this.nextInsertCmdIndex)
+        //and clear all commands previous to this one
+        this.clearCommands(this.firstUsedCmdIndex,this.nextInsertCmdIndex);
+        this.firstUsedCmdIndex = this.nextInsertCmdIndex;
+        //we also need to update the last used index if it was the cmd we just failed to undo
+        if(this.lastUsedCmdIndex === this.nextInsertCmdIndex) {
+            this.lastUsedCmdIndex--;
+        }
+    }
+    
+    _commandRedoneFailed() {
+        //clear the redone command so it can not be undone (at the current position this.nextInsertCmdIndex-1)
+        //and clear all commands after to this one
+        this.clearCommands(this.nextInsertCmdIndex-1,this.lastUsedCmdIndex);
+        this.lastUsedCmdIndex = this.nextInsertCmdIndex-1;
+        //we also need to update the first used index if it was the cmd we just failed to redo
+        if(this.firstUsedCmdIndex === this.nextInsertCmdIndex-1) {
+            this.firstUsedCmdIndex++;
+        }
+    }
+    
+    _getArrayIndex(cmdIndex) {
+        return cmdIndex % this.undoCommandCount;
+    }
+    
+    _clearCommands(startCmdIndex,endCmdIndex) {
+        for(var cmdIndex = startCmdIndex; cmdIndex <= endCmdIndex; cmdIndex++) {
+            let arrayIndex = this._getArrayIndex(cmdIndex);
+            this.commandQueue[arrayIndex] = null;
+        }
     }
 }
 
 /** This is a token to represent there is no command available, either for 
  * undo or redo. */
 apogee.app.CommandManager.NO_COMMAND = {};
+
+/** This is the default number of stored undo/redo commands */
+apogee.app.CommandManager.DEFAULT_UNDO_COMMAND_COUNT = 50;
 
 
