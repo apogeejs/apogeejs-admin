@@ -68,9 +68,9 @@ apogeeapp.app.CommandManager = class {
         
         //this where we will put the next added command
         this.nextInsertCmdIndex = 0;
-        //this is last index that has a valid command, but only if it is greater or equal to our first cmd index
+        //this is last index that has a valid command, but only if it is greater than or equal to our first cmd index
         this.lastUsedCmdIndex = -1;
-        //this is the first command index that has a valid command, but only if it is less than or equal to our last cmd index
+        //this is the first command index that has a valid command, but only if it is less than or equal to the last command index.
         this.firstUsedCmdIndex = 0;
         
     }
@@ -95,7 +95,9 @@ apogeeapp.app.CommandManager = class {
     
     /** If there is an redo command, this method will return the description if there
      * is one or an empty string. If there is no undo command, this method will return
-     * the value apogee.app.CommandManager.NO_COMMAND. */
+     * the value apogee.app.CommandManager.NO_COMMAND. To test equality with
+     * apogee.app.CommandManager.NO_COMMAND, use == or ===. Do not test equality
+     * with json equals!*/
     getNextRedoDesc() {
         let command = this._getNextRedoCommand(false);
         if(command) {
@@ -173,12 +175,22 @@ apogeeapp.app.CommandManager = class {
         this.undoQueue[insertArrayIndex] = command;
         
         //update cmd index vlues
+        // -last used index is the one just added
         this.lastUsedCmdIndex = this.nextInsertCmdIndex;
+        // -next insert index is one more than the previous (wrapping is NOT done in the cmd index values, only in the array index values)
         this.nextInsertCmdIndex++;
         
-        let oldFirstArrayIndex = this._getArrayIndex(this.oldFirstCmdIndex);
-        if(insertArrayIndex == oldFirstArrayIndex) {
-            this.firstUsedCmdIndex++;
+        // -set the first used index
+        if(oldFirstCmdIndex > oldLastCmdIndex) {
+            //we need to set a valid value
+            this.firstUsedCmdIndex == oldNextCmdIndex;
+        }
+        else {
+            //check for wrapping commands
+            let oldFirstArrayIndex = this._getArrayIndex(oldFirstCmdIndex);
+            if(insertArrayIndex == oldFirstArrayIndex) {
+                this.firstUsedCmdIndex++;
+            }
         }
         
         //clear out any now unreachable redo commands
@@ -249,7 +261,7 @@ apogeeapp.app.CommandManager = class {
     _clearCommands(startCmdIndex,endCmdIndex) {
         for(var cmdIndex = startCmdIndex; cmdIndex <= endCmdIndex; cmdIndex++) {
             let arrayIndex = this._getArrayIndex(cmdIndex);
-            this.commandQueue[arrayIndex] = null;
+            this.undoQueue[arrayIndex] = undefined;
         }
     }
 }
