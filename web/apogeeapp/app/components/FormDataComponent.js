@@ -14,7 +14,7 @@ apogeeapp.app.FormDataComponent = function(workspaceUI,folder) {
     
     //load these!
     this.dataTable = folder.lookupChildFromPathArray(["data"]);
-    this.layoutTable = folder.lookupChildFromPathArray(["layout"]);
+    this.layoutFunctionTable = folder.lookupChildFromPathArray(["layout"]);
     this.isInputValidFunctionTable = folder.lookupChildFromPathArray(["isInputValid"]);
     
     //keep the form display alive
@@ -73,11 +73,11 @@ apogeeapp.app.FormDataComponent.prototype.getDataDisplay = function(displayConta
             return formEditorDisplay;
 			
 		case apogeeapp.app.FormDataComponent.VIEW_LAYOUT_CODE:
-            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.layoutTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.layoutFunctionTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
 			return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 			
 		case apogeeapp.app.FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE:
-			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.layoutTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.layoutFunctionTable,apogeeapp.app.FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
             return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
         
         case apogeeapp.app.FormDataComponent.VIEW_FORM_VALUE:
@@ -111,13 +111,20 @@ apogeeapp.app.FormDataComponent.prototype.getFormEditorCallbacks = function() {
     callbacks.getData = () => this.dataTable.getData();
     
     //return form layout
-    callbacks.getLayoutInfo = () => this.layoutTable.getData();
+    callbacks.getLayoutInfo = () => {              
+            let layoutFunction = this.layoutFunctionTable.getData();
+            //need to define admin!
+            let admin = {
+                getMessenger: () => new apogee.action.Messenger(this.member),
+            }
+            return layoutFunction(admin);
+        }
     
     //edit ok - always true
     callbacks.getEditOk = () => true;
     
     //save data - just form value here
-    var messenger = new apogee.action.Messenger(this.layoutTable);
+    var messenger = new apogee.action.Messenger(this.layoutFunctionTable);
     callbacks.saveData = (formValue) => {
         
         //validate input
@@ -155,9 +162,9 @@ apogeeapp.app.FormDataComponent.getCreateMemberPayload = function(userInputValue
     json.children = {
         "layout": {
             "name": "layout",
-            "type": "apogee.JsonTable",
+            "type": "apogee.FunctionTable",
             "updateData": {
-                "data": "",
+                "argList":["admin"],
             }
         },
         "data": {
