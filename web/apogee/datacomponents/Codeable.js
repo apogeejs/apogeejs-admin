@@ -33,7 +33,7 @@ apogee.Codeable.init = function(argList) {
     this.setResultInvalid(false);
     
     //fields used in calculation
-    this.calcInProgress = false;
+    this.dependencyInitInProgress = false;
     this.functionInitialized = false;
     this.initReturnValue = false;
 }
@@ -84,6 +84,8 @@ apogee.Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
 
     if((!compiledInfo.errors)||(compiledInfo.errors.length === 0)) {
         //set the code  by exectuing generator
+        this.codeErrors = [];
+        
         try {
             //get the inputs to the generator
             var messenger = new apogee.action.Messenger(this);
@@ -91,9 +93,7 @@ apogee.Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
             //get the generated fucntion
             var generatedFunctions = compiledInfo.generatorFunction(messenger);
             this.memberGenerator = generatedFunctions.memberGenerator;
-            this.memberFunctionInitializer = generatedFunctions.initializer;            
-            
-            this.codeErrors = [];
+            this.memberFunctionInitializer = generatedFunctions.initializer;                       
         }
         catch(ex) {
             this.codeErrors.push(apogee.ActionError.processException(ex,"Codeable - Set Code",false));
@@ -247,24 +247,24 @@ apogee.Codeable.memberFunctionInitialize = function() {
     if(this.functionInitialized) return this.initReturnValue;
     
     //make sure this in only called once
-    if(this.calcInProgress) {
+    if(this.dependencyInitInProgress) {
         var errorMsg = "Circular reference error";
         var actionError = new apogee.ActionError(errorMsg,"Codeable - Calculate",this);
         this.addError(actionError);
         //clear calc in progress flag
-        this.calcInProgress = false;
+        this.dependencyInitInProgress = false;
         this.functionInitialized = true;
         this.initReturnValue = false;
         return this.initReturnValue;
     }
-    this.calcInProgress = true;
+    this.dependencyInitInProgress = true;
     
     try {
         
         //make sure the data is set in each impactor
         this.initializeImpactors();
         if((this.hasError())||(this.getResultPending())||(this.getResultInvalid())) {
-            this.calcInProgress = false;
+            this.dependencyInitInProgress = false;
             this.functionInitialized = true;
             this.initReturnValue = false;
             return this.initReturnValue;
@@ -287,7 +287,7 @@ apogee.Codeable.memberFunctionInitialize = function() {
         this.initReturnValue = false;
     }
     
-    this.calcInProgress = false;
+    this.dependencyInitInProgress = false;
     this.functionInitialized = true;
     return this.initReturnValue;
 }

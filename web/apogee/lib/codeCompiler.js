@@ -72,7 +72,8 @@ apogee.codeCompiler.processCode = function(codeInfo,codeLabel) {
         return compiledInfo;
     }
 
-    //create the object function and context setter from the code text
+    //this generator creates two functions - a function that creates the member function
+    //and function that initializes external variables for that member fuction.
     var generatorFunction = apogee.codeCompiler.createGeneratorFunction(compiledInfo.varInfo, combinedFunctionBody);
     compiledInfo.generatorFunction = generatorFunction;
     
@@ -101,7 +102,15 @@ apogee.codeCompiler.createCombinedFunctionBody = function(argList,
     return combinedFunctionBody;
 }
 
-/** This method creates the wrapped user code object function, including the context variables. 
+/** This method creates (1) a closure function that returns another generator function
+ * which makes the member function and (2) a function that initializes any external 
+ * variables needed in the member function.
+ * This closure wraps the variables that are external to this member, meaning other
+ * members in the model.
+ * This initializer function allows the code to be compiled once and then used with different
+ * values for other data in the model.
+ * The generator that makes the member function is a closure to wrap the member private
+ * code and any other needed data with the member function.
  * @private */
 apogee.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunctionBody) {
     

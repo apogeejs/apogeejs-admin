@@ -278,12 +278,15 @@ apogee.action.fireEvent = function(workspace,name,data) {
     workspace.dispatchEvent(name,data);
 }
 
-/** This method determines if updating all dependencies is necessary. */
+/** This method determines if updating all dependencies is necessary. Our dependency 
+ * tracking may be in error if a new member is created, a member is deleted or
+ * a member is moved. In these actions we flag that the entire model should be
+ * updated.*/
 apogee.action.checkUpdateAllDep = function(processedActions) {
     for(var i = 0; i < processedActions.length; i++) {
         var actionData = processedActions[i];
         var member = actionData.member;
-        //check update only needed for data holders (no impact for non-data holder
+        //we need to update the entire model if any actino is flagged as such
         if(member) {
             if((actionData.actionInfo)&&(actionData.actionInfo.checkUpdateAll)){
                 return true;
