@@ -129,7 +129,6 @@ apogeeapp.app.WorkspaceUI = class {
         this.referencesManager.close();
     }
 
-
     //====================================
     // Component Management
     //====================================

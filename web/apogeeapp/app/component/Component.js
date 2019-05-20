@@ -483,10 +483,9 @@ apogeeapp.app.Component.prototype.createDeleteCallback = function() {
         }
         
         //delete the object - the component we be deleted after the delete event received
-        var json = {};
-        json.action = "deleteMember";
-        json.member = member;
-        var actionResponse = apogee.action.doAction(json,true);
+        var workspace = member.getWorkspace();
+        var memberFullName = member.getFullName();
+        var actionResponse = apogeeapp.app.addcomponent.doDeleteComponent(workspace,memberFullName);
 
         if(!actionResponse.getSuccess()) {
             //show an error message

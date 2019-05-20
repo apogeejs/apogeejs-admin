@@ -54,7 +54,7 @@ apogeeapp.app.openworkspace.openWorkspace = function(app,workspaceText,fileMetad
         //parse the workspace json
         var workspaceJson = JSON.parse(workspaceText);
 
-//I should verify the file type and format!    
+//I should verify the file type and format!  
         
         var workspaceUI = new apogeeapp.app.WorkspaceUI();
         workspaceUIAdded = app.setWorkspaceUI(workspaceUI);

@@ -45,6 +45,9 @@ apogeeapp.app.Apogee = function(containerId,appConfigManager) {
     //reference manager
     this.referenceManager = new apogeeapp.app.ReferenceManager();
     
+    //command manager
+    this.commandManager = new apogeeapp.app.CommandManager(this);
+    
     //load the standard component generators
     //(for now this is not configurable. This is called first so loaded modules
     //in config can self load after the defaults)
@@ -167,6 +170,20 @@ apogeeapp.app.Apogee.prototype.clearWorkspaceIsDirty = function() {
     if(workspace) {
         workspace.clearIsDirty();
     }
+}
+
+//====================================
+// Command Management
+//====================================
+
+/** This method should be called to execute commands. */
+apogeeapp.app.Apogee.prototype.executeCommand = function(command) {
+    this.commandManager.executeCommand(command);
+}
+
+/** This method is intended for the UI for the undo/redo functionality */
+apogeeapp.app.Apogee.prototype.getCommandManager = function() {
+    return commandManager;
 }
 
 //==================================
@@ -405,9 +422,19 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
     menus[name] = this.workspaceMenu;
     
     //populate the workspace menu on the fly - depends on workspace state
-    var getMenuItemsCallback = () => this.getWorkspaceMenuItems();
-    this.workspaceMenu.setAsOnTheFlyMenu(getMenuItemsCallback);
+    var getWorkspaceMenuCallback = () => this.getWorkspaceMenuItems();
+    this.workspaceMenu.setAsOnTheFlyMenu(getWorkspaceMenuCallback);
 	
+    //Edit menu
+    name = "Edit";
+    this.editMenu = apogeeapp.ui.Menu.createMenu(name);
+    menuBarLeft.appendChild(this.editMenu.getElement());
+    menus[name] = this.editMenu;
+    
+    //populate the workspace menu on the fly - depends on workspace state
+    var getEditMenuCallback = () => this.getEditMenuItems();
+    this.editMenu.setAsOnTheFlyMenu(getEditMenuCallback);
+    
     //Components Menu
     name = "Components";
     menu = apogeeapp.ui.Menu.createMenu(name);
@@ -483,6 +510,60 @@ apogeeapp.app.Apogee.prototype.getWorkspaceMenuItems = function() {
     menuItem = {};
     menuItem.title = "Close";
     menuItem.callback = apogeeapp.app.closeworkspace.getCloseCallback(this);
+    menuItems.push(menuItem);
+    
+    return menuItems;
+}
+
+/** This method gets the workspace menu items. This is created on the fly because the
+ * items will change depending on the state of the workspace. */
+apogeeapp.app.Apogee.prototype.getEditMenuItems = function() {
+    
+    var menuItems = [];
+    var menuItem;
+    
+    //populate the undo menu item
+    var undoLabel;
+    var undoCallback;
+    var nextUndoDesc = this.commandManager.getNextUndoDesc();
+    if(nextUndoDesc === apogeeapp.app.CommandManager.NO_COMMAND) {
+        undoLabel = "-no undo-"
+        undoCallback = null;
+    }
+    else {
+        if(nextUndoDesc == "") {
+            undoLabel = "Undo"
+        }
+        else {
+            undoLabel = "Undo: " + nextUndoDesc;
+        }
+        undoCallback = () => this.commandManager.undo();
+    }
+    menuItem = {};
+    menuItem.title = undoLabel;
+    menuItem.callback = undoCallback;
+    menuItems.push(menuItem);
+    
+    //populate the redo menu item
+    var redoLabel;
+    var redoCallback;
+    var nextRedoDesc = this.commandManager.getNextRedoDesc();
+    if(nextRedoDesc === apogeeapp.app.CommandManager.NO_COMMAND) {
+        redoLabel = "-no redo-"
+        redoCallback = null;
+    }
+    else {
+        if(nextRedoDesc == "") {
+            redoLabel = "Redo"
+        }
+        else {
+            redoLabel = "Redo: " + nextRedoDesc;
+        }
+        redoCallback = () => this.commandManager.redo();
+    }
+    menuItem = {};
+    menuItem.title = redoLabel;
+    menuItem.callback = redoCallback;
     menuItems.push(menuItem);
     
     return menuItems;

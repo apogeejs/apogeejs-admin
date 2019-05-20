@@ -40,56 +40,11 @@ apogeeapp.app.addcomponent.addComponent = function(app,componentGenerator,option
             }
             
             //get the parent object
-            var parent = folderMap[userInputValues.parentName];        
+            var parent = folderMap[userInputValues.parentName]; 
             
-            //create the member
-            var createAction = {};
-            createAction.action = "createMember";
-            createAction.owner = parent;
-            createAction.workspace = parent.getWorkspace();
-            createAction.createData = componentGenerator.getCreateMemberPayload(userInputValues);
-            var actionResponse = apogee.action.doAction(createAction,true);
-            var member = createAction.member;
-            
-            if(member) {
-                var component;
-                
-                try {
-                    //create the component
-                    component = apogeeapp.app.Component.createComponentFromMember(componentGenerator,workspaceUI,member,userInputValues,optionalComponentJson);
-                    
-                    //unknown failure
-                    if(!component) {
-                        var message = "Unknown error creating component";
-                        var actionError = new apogee.ActionError(message,apogee.ActionError.ERROR_TYPE_APP);
-                        actionResponse.addError(actionError);
-                    }
-                }
-                catch(error) {
-                    //exception creating component
-                    var message = "Failed to create UI component: " + error.message;
-                    var actionError = new apogee.ActionError(message,apogee.ActionError.ERROR_TYPE_APP);
-                    actionResponse.addError(actionError);
-                }
-                
-                if(!component) {
-                    //delete the already created member
-                    var json = {};
-                    json.action = "deleteMember";
-                    json.member = member;
-                    //if this fails, we will just ignore it for now
-                    apogee.action.doAction(json,true);
-                }
-                
-                
-            }
-            
-            if(!actionResponse.getSuccess()) {
-                apogeeapp.app.errorHandling.handleActionError(actionResponse);
-            }
-            else {
-                if(optionalOnSuccess) optionalOnSuccess(member,component);
-            }
+            //add the component
+            var command = apogeeapp.app.addcomponent.createAddComponentCommand(workspaceUI,parent,componentGenerator,userInputValues,optionalComponentJson,optionalOnSuccess);
+            workspaceUI.getApp().executeCommand(command);
             
             //return true to close the dialog
             return true;
@@ -130,4 +85,74 @@ apogeeapp.app.addcomponent.addAdditionalComponent = function(app,optionalInitial
 // Action
 //=====================================
 
+apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,parent,componentGenerator,initialValues,optionalComponentJson,optionalOnSuccess) {
+    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parent,componentGenerator,initialValues,optionalComponentJson,optionalOnSuccess);
+    
+    var workspace = workspaceUI.getWorkspace();
+    var memberName = initialValues.name;
+//WE NEED THE PROPER WAY OF DOING THIS!!! - HERE I AM COPYING CODE FROM ELSEWHERE. FIX THIS!!!
+    var memberFullName = parent.getPossesionNameBase() + memberName;
+    
+    var deleteFunction = () => apogeeapp.app.addcomponent.doDeleteComponent(workspace,memberFullName);
+    
+    var command = {};
+    command.cmd = createFunction;
+    command.undoCmd = deleteFunction;
+    command.desc = "Create member: " + memberFullName;
+    command.alertOnFailure = true;
+    
+    return command;
+}
 
+apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parent,componentGenerator,initialValues,optionalComponentJson,optionalOnSuccess) {
+
+    //create the member
+    var createAction = {};
+    createAction.action = "createMember";
+    createAction.owner = parent;
+    createAction.workspace = parent.getWorkspace();
+    createAction.createData = componentGenerator.getCreateMemberPayload(initialValues);
+    var actionResponse = apogee.action.doAction(createAction,true);
+    var member = createAction.member;
+
+    if(member) {
+        var component;
+
+        try {
+            //create the component
+            component = apogeeapp.app.Component.createComponentFromMember(componentGenerator,workspaceUI,member,initialValues,optionalComponentJson);
+
+            //unknown failure
+            if(!component) {
+                var message = "Unknown error creating component";
+                var actionError = new apogee.ActionError(message,apogee.ActionError.ERROR_TYPE_APP);
+                actionResponse.addError(actionError);
+            }
+        }
+        catch(error) {
+            //exception creating component
+            var message = "Failed to create UI component: " + error.message;
+            var actionError = new apogee.ActionError(message,apogee.ActionError.ERROR_TYPE_APP);
+            actionResponse.addError(actionError);
+        }
+
+        if(!component) {
+            //delete the already created member
+            var json = {};
+            json.action = "deleteMember";
+            json.member = member;
+            //if this fails, we will just ignore it for now
+            apogee.action.doAction(json,true);
+        }
+
+
+    }
+
+    if(actionResponse.getSuccess()) {
+//NOTE - WE PROBABLY SHOULD ALLOW ERROR INFORMATION FROM optionalOnSuccess
+//ALSO CONSIDIER IF THIS  SHOULD BE OUTSIDE OF ACTION (probably not, I'm thinking for now)
+        if(optionalOnSuccess) optionalOnSuccess(member,component);
+    }
+
+    return actionResponse;
+}

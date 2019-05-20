@@ -13,7 +13,7 @@
  *      
  *      desc - This is an option description of what the command does.
  *      
- *      [other items, such as "view" are tbd]
+ *      (other - view prior to command?...)
  * }
  * 
  * Commands that can be undone are stored in a circular queue with a length that is optionally 
@@ -25,9 +25,11 @@
  * - new commands are inserted replacing the next redo command (if there is one, otherwise they areput at the end)
  * - once the max number of commands are reached, additional added commands replace he oldeest command in the queue
  * 
+ * The command manager fires an event each time the command history is updated.
  */
 apogeeapp.app.CommandManager = class {
-    constructor(optionalUndoCommandCount) {
+    constructor(eventManager, optionalUndoCommandCount) {
+        this.eventManager = eventManager;
         this.undoCommandCount = (optionalUndoCommandCount !== undefined) ? optionalUndoCommandCount : apogeeapp.app.CommandManager.DEFAULT_UNDO_COMMAND_COUNT;
         this.clearHistory();
     }
@@ -72,6 +74,10 @@ apogeeapp.app.CommandManager = class {
         this.lastUsedCmdIndex = -1;
         //this is the first command index that has a valid command, but only if it is less than or equal to the last command index.
         this.firstUsedCmdIndex = 0;
+        
+        if(this.eventManager) {
+            this.eventManager.dispatchEvent("historyUpdate",this);
+        }
         
     }
     
@@ -150,14 +156,27 @@ apogeeapp.app.CommandManager = class {
     /** This method executes a cmd function. 
      * @private */
     _executeCmdFunction(cmdFunction) {
-        //TODO: FIGURE OUT WHAT GOES HERE AND HOW TO MANAGE FAILURE
-        //should return true or false for success
-        //for now just ecxecute the function
+        //cmd functions should return an action response.
         try {
-            cmdFunction();
-            return true;
+            let actionResponse = cmdFunction();
+            if(actionResponse.getSuccess()) {
+                return true;
+            }
+            else {
+                //do standard error handling
+                apogeeapp.app.errorHandling.handleActionError(actionResponse);
+                return false;
+            }
+
         }
         catch(error) {
+            if(error.stack) console.error(error.stack);
+            
+            //we shouldn't get errors here. This is a fatal error.
+            let actionResponse = new apogee.ActionResponse();
+            let actionError = apogee.ActionError.processException(error,ActionError.ERROR_TYPE_APP,true,"Unknown error executing command: ");
+            actionResponse.addError(actionError);
+            apogeeapp.app.errorHandling.handleActionError(actionResponse);
             return false;
         }
     }
@@ -206,6 +225,12 @@ apogeeapp.app.CommandManager = class {
             //update the queue positions, if requested
             if(doQueuePositionUpdate) {
                 this.nextInsertCmdIndex--;
+                
+                //notify of change to command history
+                if(this.eventManager) {
+                    this.eventManager.dispatchEvent("historyUpdate",this);
+                }
+                
             }
             
             return this.undoQueue[undoArrayIndex];
@@ -223,6 +248,11 @@ apogeeapp.app.CommandManager = class {
             //update the queue positions, if requested
             if(doQueuePositionUpdate) {
                 this.nextInsertCmdIndex++;
+                
+                //notify of change to command history
+                if(this.eventManager) {
+                    this.eventManager.dispatchEvent("historyUpdate",this);
+                }
             }
             
             return this.undoQueue[redoArrayIndex];
@@ -241,6 +271,11 @@ apogeeapp.app.CommandManager = class {
         if(this.lastUsedCmdIndex === this.nextInsertCmdIndex) {
             this.lastUsedCmdIndex--;
         }
+        
+        //notify of change to command history
+        if(this.eventManager) {
+            this.eventManager.dispatchEvent("historyUpdate",this);
+        }
     }
     
     _commandRedoneFailed() {
@@ -251,6 +286,11 @@ apogeeapp.app.CommandManager = class {
         //we also need to update the first used index if it was the cmd we just failed to redo
         if(this.firstUsedCmdIndex === this.nextInsertCmdIndex-1) {
             this.firstUsedCmdIndex++;
+        }
+        
+        //notify of change to command history
+        if(this.eventManager) {
+            this.eventManager.dispatchEvent("historyUpdate",this);
         }
     }
     
