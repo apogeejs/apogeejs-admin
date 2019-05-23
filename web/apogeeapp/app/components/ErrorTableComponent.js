@@ -46,20 +46,6 @@ apogeeapp.app.ErrorTableComponent.prototype.getDataDisplay = function(displayCon
     return new apogeeapp.app.ErrorDisplay(displayContainer,false);
 }
 
-//======================================
-// Static methods
-//======================================
-
-apogeeapp.app.ErrorTableComponent.getCreateMemberPayload = function(userInputValues) {
-    
-    //we shouldn't be creating this - it should only be used to open from a json
-    
-    var json = {};
-    json.name = userInputValues.name;
-    json.type = apogee.ErrorTable.generator.type;
-    return json;
-}
-
 /** This overrides the save method to return the original input. */
 apogeeapp.app.ErrorTableComponent.prototype.toJson = function() {
     return this.completeJson;
@@ -71,6 +57,15 @@ apogeeapp.app.ErrorTableComponent.prototype.loadSerializedValues = function(json
 }
 
 //======================================
+// Static methods
+//======================================
+
+apogeeapp.app.ErrorTableComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.ErrorTableComponent,userInputValues,optionalBaseJson);
+    return json;
+}
+
+//======================================
 // This is the component generator, to register the component
 //======================================
 
@@ -79,4 +74,7 @@ apogeeapp.app.ErrorTableComponent.uniqueName = "apogeeapp.app.ErrorTableComponen
 apogeeapp.app.ErrorTableComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.ErrorTableComponent.DEFAULT_HEIGHT = 100;
 apogeeapp.app.ErrorTableComponent.ICON_RES_PATH = "/componentIcons/genericDataTable.png";
+apogeeapp.app.ErrorTableComponent.DEFAULT_MEMBER_JSON = {
+    "type": apogee.ErrorTable.generator.type
+};
 

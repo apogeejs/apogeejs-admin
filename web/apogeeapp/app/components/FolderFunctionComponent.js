@@ -44,9 +44,8 @@ apogeeapp.app.FolderFunctionComponent.prototype.readFromJson = function(json) {
 // Static methods
 //======================================
 
-apogeeapp.app.FolderFunctionComponent.getCreateMemberPayload = function(userInputValues) {
-    var json = {};
-    json.name = userInputValues.name;
+apogeeapp.app.FolderFunctionComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.FolderFunctionComponent,userInputValues,optionalBaseJson);
     if(userInputValues.argListString) {
         var argList = apogee.FunctionTable.parseStringArray(userInputValues.argListString);
         json.argList = argList;
@@ -57,7 +56,6 @@ apogeeapp.app.FolderFunctionComponent.getCreateMemberPayload = function(userInpu
     if(userInputValues.internalFolder) {
         json.internalFolder = userInputValues.internalFolder;
     }
-    json.type = apogee.FolderFunction.generator.type;
     return json;
 }
 
@@ -70,7 +68,9 @@ apogeeapp.app.FolderFunctionComponent.uniqueName = "apogeeapp.app.FolderFunction
 apogeeapp.app.FolderFunctionComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.FolderFunctionComponent.DEFAULT_HEIGHT = 500;
 apogeeapp.app.FolderFunctionComponent.ICON_RES_PATH = "/componentIcons/folderFunction.png";
-
+apogeeapp.app.FolderFunctionComponent.DEFAULT_MEMBER_JSON = {
+    "type": apogee.FolderFunction.generator.type
+};
 apogeeapp.app.FolderFunctionComponent.propertyDialogLines = [
     {
         "type":"inputElement",

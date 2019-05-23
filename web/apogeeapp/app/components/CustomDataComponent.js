@@ -337,29 +337,15 @@ apogeeapp.app.CustomDataComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 // Static methods
 //======================================
 
-apogeeapp.app.CustomDataComponent.getCreateMemberPayload = function(userInputValues) {
-    var json = {};
-    json.name = userInputValues.name;
-    json.type = apogee.Folder.generator.type;
-    json.childrenNotWriteable = true;
-    //add the children
-    json.children = {
-        "input": {
-            "name": "input",
-            "type": "apogee.JsonTable",
-            "updateData": {
-                "data": "",
-            }
-        },
-        "data": {
-            "name": "data",
-            "type": "apogee.JsonTable",
-            "updateData": {
-                "data": "",
-            }
-        }
-    };
+apogeeapp.app.CustomDataComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.CustomDataComponent,userInputValues,optionalBaseJson);
     return json;
+}
+
+apogeeapp.app.CustomDataComponent.mergePropertiesToSourceJson = function(userInputValues,sourceJson) {
+    if(userInputValues.destroyOnInactive !== undefined) {
+        json.destroyOnInactive = userInputValues.destroyOnInactive;
+    }
 }
 
 //======================================
@@ -371,7 +357,26 @@ apogeeapp.app.CustomDataComponent.uniqueName = "apogeeapp.app.CustomDataComponen
 apogeeapp.app.CustomDataComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.CustomDataComponent.DEFAULT_HEIGHT = 500;
 apogeeapp.app.CustomDataComponent.ICON_RES_PATH = "/componentIcons/formControl.png";
-
+apogeeapp.app.CustomDataComponent.DEFAULT_MEMBER_JSON = {
+        "type": apogee.Folder.generator.type,
+        "childrenNotWriteable": true,
+        "children": {
+            "input": {
+                "name": "input",
+                "type": "apogee.JsonTable",
+                "updateData": {
+                    "data":"",
+                }
+            },
+            "data": {
+                "name": "data",
+                "type": "apogee.JsonTable",
+                "updateData": {
+                    "data": "",
+                }
+            }
+        }
+    };
 apogeeapp.app.CustomDataComponent.propertyDialogLines = [
     {
         "type":"checkbox",

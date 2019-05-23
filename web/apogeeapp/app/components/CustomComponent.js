@@ -316,6 +316,12 @@ apogeeapp.app.CustomComponent.getCreateMemberPayload = function(userInputValues)
     return json;
 }
 
+apogeeapp.app.CustomComponent.mergePropertiesToSourceJson = function(userInputValues,sourceJson) {
+    if(userInputValues.destroyOnInactive !== undefined) {
+        json.destroyOnInactive = userInputValues.destroyOnInactive;
+    }
+}
+
 //======================================
 // This is the control generator, to register the control
 //======================================

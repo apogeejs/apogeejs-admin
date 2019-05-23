@@ -83,6 +83,11 @@ apogeeapp.app.JavascriptComponent.getCreateMemberPayload = function(userInputVal
     return json;
 }
 
+apogeeapp.app.JavascriptComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.JavascriptComponent,userInputValues,optionalBaseJson);
+    return json;
+}
+
 //======================================
 // This is the component generator, to register the component
 //======================================
@@ -92,3 +97,6 @@ apogeeapp.app.JavascriptComponent.uniqueName = "apogeeapp.app.JavascriptComponen
 apogeeapp.app.JavascriptComponent.DEFAULT_WIDTH = 400;
 apogeeapp.app.JavascriptComponent.DEFAULT_HEIGHT = 400;
 apogeeapp.app.JavascriptComponent.ICON_RES_PATH = "/componentIcons/javascriptTable.png";
+apogeeapp.app.JavascriptComponent.DEFAULT_MEMBER_JSON = {
+    "type": apogee.JsonTable.generator.type
+};

@@ -310,7 +310,7 @@ apogeeapp.app.WorkspaceUI = class {
             componentGenerator = apogeeapp.app.ErrorTableComponent;
         }
 
-        return apogeeapp.app.Component.createComponentFromMember(componentGenerator,this,member,null,componentJson);
+        return apogeeapp.app.Component.createComponentFromMember(componentGenerator,this,member,componentJson);
     }
 
     //================================

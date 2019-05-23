@@ -7,7 +7,7 @@ apogeeapp.app.addcomponent = {};
 //=====================================
 
 /** This functions initiates the add component action. */   
-apogeeapp.app.addcomponent.addComponent = function(app,componentGenerator,optionalInitialValues,optionalComponentJson,optionalOnSuccess) {
+apogeeapp.app.addcomponent.addComponent = function(app,componentGenerator,optionalInitialValues,optionalMemberOptions,optionalComponentJson,optionalOnSuccess) {
 
         //get the active workspace
         var workspaceUI = app.getWorkspaceUI();
@@ -43,7 +43,7 @@ apogeeapp.app.addcomponent.addComponent = function(app,componentGenerator,option
             var parent = folderMap[userInputValues.parentName]; 
             
             //add the component
-            var command = apogeeapp.app.addcomponent.createAddComponentCommand(workspaceUI,parent,componentGenerator,userInputValues,optionalComponentJson,optionalOnSuccess);
+            var command = apogeeapp.app.addcomponent.createAddComponentCommand(workspaceUI,parent,componentGenerator,userInputValues,optionalMemberOptions,optionalComponentJson,optionalOnSuccess);
             workspaceUI.getApp().executeCommand(command);
             
             //return true to close the dialog
@@ -56,12 +56,12 @@ apogeeapp.app.addcomponent.addComponent = function(app,componentGenerator,option
 
 /** This gets a callback to add an "additional" component, menaing one that is not
  * in the main component menu. */
-apogeeapp.app.addcomponent.addAdditionalComponent = function(app,optionalInitialValues,optionalComponentJson) {
+apogeeapp.app.addcomponent.addAdditionalComponent = function(app,optionalInitialValues,optionalMemberOptions,optionalComponentJson) {
         
     var onSelect = function(componentType) {
         var componentGenerator = app.getComponentGenerator(componentType);
         if(componentGenerator) {
-            apogeeapp.app.addcomponent.addComponent(app,componentGenerator,optionalInitialValues,optionalComponentJson);
+            apogeeapp.app.addcomponent.addComponent(app,componentGenerator,optionalInitialValues,optionalMemberOptions,optionalComponentJson);
         }
         else {
             alert("Unknown component type: " + componentType);
@@ -85,33 +85,51 @@ apogeeapp.app.addcomponent.addAdditionalComponent = function(app,optionalInitial
 // Action
 //=====================================
 
-apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,parent,componentGenerator,initialValues,optionalComponentJson,optionalOnSuccess) {
-    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parent,componentGenerator,initialValues,optionalComponentJson,optionalOnSuccess);
+apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,parent,componentGenerator,initialValues,optionalMemberOptions,optionalComponentJson,optionalOnSuccess) {
+    
+    //convert property values so they can be used to create the member object
+    //NO - the second arg must be a complete member json!!! Not just options!
+    var memeberJson = componentGenerator.getCreateMemberPayload(initialValues,optionalMemberOptions);
+    
+    //convert property values so they can be used to create the component object
+    var componentJson;
+    if(!optionalComponentJson) {
+        componentJson = {};
+    }
+    else {
+        componentJson = apogee.util.jsonCopy(optionalComponentJson);
+    }
+    if(componentGenerator.mergePropertiesToSourceJson) {
+        componentGenerator.mergePropertiesToSourceJson(initialValues,optionalComponentJson)
+    }
+    
+    //create function
+    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parent,componentGenerator,memberJson,componentJson,optionalOnSuccess);
     
     var workspace = workspaceUI.getWorkspace();
     var memberName = initialValues.name;
 //WE NEED THE PROPER WAY OF DOING THIS!!! - HERE I AM COPYING CODE FROM ELSEWHERE. FIX THIS!!!
     var memberFullName = parent.getPossesionNameBase() + memberName;
     
-    var deleteFunction = () => apogeeapp.app.addcomponent.doDeleteComponent(workspace,memberFullName);
+    //un-create function
+    var deleteFunction = () => apogeeapp.app.deletecomponent.doDeleteComponent(workspace,memberFullName);
     
     var command = {};
     command.cmd = createFunction;
     command.undoCmd = deleteFunction;
     command.desc = "Create member: " + memberFullName;
-    command.alertOnFailure = true;
     
     return command;
 }
 
-apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parent,componentGenerator,initialValues,optionalComponentJson,optionalOnSuccess) {
+apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parent,componentGenerator,memberJson,componentJson,optionalOnSuccess) {
 
     //create the member
     var createAction = {};
     createAction.action = "createMember";
     createAction.owner = parent;
     createAction.workspace = parent.getWorkspace();
-    createAction.createData = componentGenerator.getCreateMemberPayload(initialValues);
+    createAction.createData = memberJson;
     var actionResponse = apogee.action.doAction(createAction,true);
     var member = createAction.member;
 
@@ -119,8 +137,9 @@ apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parent,componen
         var component;
 
         try {
+            
             //create the component
-            component = apogeeapp.app.Component.createComponentFromMember(componentGenerator,workspaceUI,member,initialValues,optionalComponentJson);
+            component = apogeeapp.app.Component.createComponentFromMember(componentGenerator,workspaceUI,member,componentJson);
 
             //unknown failure
             if(!component) {

@@ -138,22 +138,43 @@ apogeeapp.app.JsonTableComponent.prototype.updateProperties = function(oldValues
 // Static methods
 //======================================
 
-apogeeapp.app.JsonTableComponent.getCreateMemberPayload = function(userInputValues) {
-    var json = {};
-    json.name = userInputValues.name;
-    json.type = apogee.JsonTable.generator.type;
+/** This method takes input Property values and create a member json to create the member object.
+ * Optionally a base member json can be passed in.
+ */
+apogeeapp.app.JsonTableComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.JsonTableComponent,userInputValues,optionalBaseJson);
     return json;
+}
+
+/** If this component has property values, this function should be implemedted to
+ * copy the property values into a source json which will create the component.
+ */
+apogeeapp.app.CustomDataComponent.mergePropertiesToSourceJson = function(userInputValues,sourceJson) {
+    if(userInputValues.dataView !== undefined) {
+        sourceJson.dataView = userInputValues.dataView;
+    }
 }
 
 //======================================
 // This is the component generator, to register the component
 //======================================
 
+/** This is the display name for the type of component */
 apogeeapp.app.JsonTableComponent.displayName = "Data Table";
+/** This is the univeral uniaue name for the component, used to deserialize the component. */
 apogeeapp.app.JsonTableComponent.uniqueName = "apogeeapp.app.JsonTableComponent";
 apogeeapp.app.JsonTableComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.JsonTableComponent.DEFAULT_HEIGHT = 300;
+/** This is the icon url for the component. */
 apogeeapp.app.JsonTableComponent.ICON_RES_PATH = "/componentIcons/dataTable.png";
+/** This field gives the default value for the JSON taht should be deserialized to
+ * create the member for this object. The field "name" can be omitted. This will 
+ * be added when the member is created. */
+apogeeapp.app.JsonTableComponent.DEFAULT_MEMBER_JSON = {
+    "type": apogee.JsonTable.generator.type
+};
+/** This is configuration for the properties dialog box, the results of which
+ * our code will read in. */
 apogeeapp.app.JsonTableComponent.propertyDialogLines = [
     {
         "type":"dropdown",

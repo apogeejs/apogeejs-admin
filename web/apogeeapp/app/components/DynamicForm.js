@@ -67,10 +67,6 @@ apogeeapp.app.DynamicForm.prototype.getDataDisplay = function(displayContainer,v
 	}
 }
 
-//======================================
-// Static methods
-//======================================
-
 apogeeapp.app.DynamicForm.prototype.getFormCallbacks = function() {
     var callbacks = {
             getData: () => {              
@@ -84,18 +80,15 @@ apogeeapp.app.DynamicForm.prototype.getFormCallbacks = function() {
         }
     return callbacks;
 }
-        
+     
+//======================================
+// Static methods
+//======================================
 
-apogeeapp.app.DynamicForm.getCreateMemberPayload = function(userInputValues) {
-    var json = {};
-    json.name = userInputValues.name;
-    json.updateData = {};
-    json.updateData.argList = apogeeapp.app.DynamicForm.STANDARD_ARG_LIST;
-    json.type = apogee.FunctionTable.generator.type;
+apogeeapp.app.DynamicForm.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.DynamicForm,userInputValues,optionalBaseJson);
     return json;
 }
-
-apogeeapp.app.DynamicForm.STANDARD_ARG_LIST = ["admin"];
 
 //======================================
 // This is the component generator, to register the component
@@ -106,3 +99,9 @@ apogeeapp.app.DynamicForm.uniqueName = "apogeeapp.app.DynamicForm";
 apogeeapp.app.DynamicForm.DEFAULT_WIDTH = 400;
 apogeeapp.app.DynamicForm.DEFAULT_HEIGHT = 400;
 apogeeapp.app.DynamicForm.ICON_RES_PATH = "/componentIcons/functionTable.png";
+apogeeapp.app.DynamicForm.DEFAULT_MEMBER_JSON = {
+    "type": apogee.JsonTable.generator.type,
+    "updateData": {
+        "argList": ["admin"]
+    }
+};

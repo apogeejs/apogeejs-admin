@@ -65,19 +65,14 @@ apogeeapp.app.FunctionComponent.prototype.getDataDisplay = function(displayConta
 // Static methods
 //======================================
 
-apogeeapp.app.FunctionComponent.getCreateMemberPayload = function(userInputValues) {
-    var json = {};
-    json.name = userInputValues.name;
-    var argList;
-    if(userInputValues.argListString) {
-        argList = apogee.FunctionTable.parseStringArray(userInputValues.argListString);  
+apogeeapp.app.FunctionComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.FunctionComponent,userInputValues,optionalBaseJson);
+    if(userInputValues.argListString) { 
+        if(!json.updateData) {
+            json.updateData = {};
+        }
+        json.updateData.argList = apogee.FunctionTable.parseStringArray(userInputValues.argListString);
     }
-    else {
-        argList = [];
-    }
-    json.updateData = {};
-    json.updateData.argList = argList;
-    json.type = apogee.FunctionTable.generator.type;
     return json;
 }
 
@@ -90,7 +85,9 @@ apogeeapp.app.FunctionComponent.uniqueName = "apogeeapp.app.FunctionComponent";
 apogeeapp.app.FunctionComponent.DEFAULT_WIDTH = 400;
 apogeeapp.app.FunctionComponent.DEFAULT_HEIGHT = 400;
 apogeeapp.app.FunctionComponent.ICON_RES_PATH = "/componentIcons/functionTable.png";
-
+apogeeapp.app.FunctionComponent.DEFAULT_MEMBER_JSON = {
+    "type": apogee.FunctionTable.generator.type
+};
 apogeeapp.app.FunctionComponent.propertyDialogLines = [
     {
         "type":"inputElement",

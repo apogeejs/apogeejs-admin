@@ -41,13 +41,11 @@ apogeeapp.app.CanvasFolderComponent.EMPTY_FOLDER_COMPONENT_JSON  = {
     "type":"apogeeapp.app.CanvasFolderComponent"
 };
 
-apogeeapp.app.CanvasFolderComponent.getCreateMemberPayload = function(userInputValues) {
-    var json = {};
-    json.name = userInputValues.name;
+apogeeapp.app.CanvasFolderComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.CanvasFolderComponent,userInputValues,optionalBaseJson);
     if(userInputValues.children) {
         json.children = userInputValues.children;
     }
-    json.type = apogee.Folder.generator.type;
     return json;
 }
 
@@ -61,7 +59,9 @@ apogeeapp.app.CanvasFolderComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.CanvasFolderComponent.DEFAULT_HEIGHT = 500;
 apogeeapp.app.CanvasFolderComponent.ICON_RES_PATH = "/componentIcons/folder.png";
 apogeeapp.app.CanvasFolderComponent.TREE_ENTRY_SORT_ORDER = apogeeapp.app.Component.FOLDER_COMPONENT_TYPE_SORT_ORDER;
-
+apogeeapp.app.CanvasFolderComponent.DEFAULT_MEMBER_JSON = {
+    "type": apogee.Folder.generator.type
+};
 apogeeapp.app.CanvasFolderComponent.propertyDialogLines = [
     {
         "type":"invisible",

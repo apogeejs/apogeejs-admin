@@ -370,11 +370,15 @@ apogeeapp.app.CustomControlComponent.GENERATOR_INTERNAL_FORMATS = {
 // Static methods
 //======================================
 
-apogeeapp.app.CustomControlComponent.getCreateMemberPayload = function(userInputValues) {
-    var json = {};
-    json.name = userInputValues.name;
-    json.type = apogee.JsonTable.generator.type;
+apogeeapp.app.CustomControlComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.CustomControlComponent,userInputValues,optionalBaseJson);
     return json;
+}
+
+apogeeapp.app.CustomControlComponent.mergePropertiesToSourceJson = function(userInputValues,sourceJson) {
+    if(userInputValues.destroyOnInactive !== undefined) {
+        json.destroyOnInactive = userInputValues.destroyOnInactive;
+    }
 }
 
 //======================================
@@ -386,7 +390,9 @@ apogeeapp.app.CustomControlComponent.uniqueName = "apogeeapp.app.CustomControlCo
 apogeeapp.app.CustomControlComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.CustomControlComponent.DEFAULT_HEIGHT = 500;
 apogeeapp.app.CustomControlComponent.ICON_RES_PATH = "/componentIcons/chartControl.png";
-
+apogeeapp.app.CustomControlComponent.DEFAULT_MEMBER_JSON = {
+    "type": apogee.JsonTable.generator.type
+};
 apogeeapp.app.CustomControlComponent.propertyDialogLines = [
     {
         "type":"checkbox",

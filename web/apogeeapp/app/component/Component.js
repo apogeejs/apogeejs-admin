@@ -475,22 +475,14 @@ apogeeapp.app.Component.prototype.createOpenCallback = function() {
 /** This method creates a callback for deleting the component. 
  *  @private */
 apogeeapp.app.Component.prototype.createDeleteCallback = function() {
-    var member = this.getMember();
-    return function() {
+    return () => {
         var doDelete = confirm("Are you sure you want to delete this object?");
         if(!doDelete) {
             return;
         }
         
-        //delete the object - the component we be deleted after the delete event received
-        var workspace = member.getWorkspace();
-        var memberFullName = member.getFullName();
-        var actionResponse = apogeeapp.app.addcomponent.doDeleteComponent(workspace,memberFullName);
-
-        if(!actionResponse.getSuccess()) {
-            //show an error message
-            apogeeapp.app.errorHandling.handleActionError(actionResponse);
-        }
+        var command = apogeeapp.app.deletecomponent.createDeleteComponentCommand(this);
+        this.workspaceUI.getApp().executeCommand(command);
     }
 }
 
@@ -510,7 +502,7 @@ apogeeapp.app.Component.prototype.createDeleteCallback = function() {
  * @param {type} serializedValues - (optional) these are serialized values for the componnet, (like when it is loaded from a serialized json)
  * @returns the component created
  */
-apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,workspaceUI,member,propertyValues,serializedValues) {
+apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,workspaceUI,member,serializedValues) {
     
     //create empty component
     var component = new componentGenerator(workspaceUI,member);
@@ -519,17 +511,40 @@ apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,
     if(serializedValues) {
         component.loadSerializedValues(serializedValues);
     }
-    
-    //apply any user input (property dialog) values
-    if((propertyValues)&&(component.updateProperties)) {
-        component.updateProperties(null,propertyValues);
-    }
 
     //call member updated to process and notify of component creation
     component.memberUpdated();
     
     return component;
 }
+
+/** This function creates a basic json to create the member for a new component instance. It can create a
+ * new json based on user input values (as in from a proeprties dialog box) or it can add these 
+ * properties to an optinoal base json. The base json is expected to be in the proper format.
+ * This method only adds the member name from input values, if present. Any other properties
+ * needed for the member/component should be added elsewhere.
+ */
+apogeeapp.app.Component.createMemberJson = function(componentGenerator,userInputValues,optionalBaseJson) {
+    var json;
+    if(optionalBaseJson) {
+        //use the passed in json as a base to create the member if applicable
+        json = apogee.util.jsonCopy(optionalBaseJson);
+    }
+    else {
+        //otherwise create the default base json from the component
+        json = apogee.util.jsonCopy(componentGenerator.DEFAULT_MEMBER_JSON);
+    }
+    //set the name for the member
+    //this should be included in user input values.
+    //?: for now we allow the name to not be included, but to instead be in the optionalBaseJson,
+    //I'm not sure if this is a good idea, or even something that would ever be used.
+    if(userInputValues.name) {
+        json.name = userInputValues.name
+    }
+    
+    return json;
+}
+
 
 //======================================
 // All components should have a generator to create the component

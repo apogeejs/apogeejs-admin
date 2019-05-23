@@ -153,36 +153,8 @@ apogeeapp.app.FormDataComponent.prototype.getFormEditorCallbacks = function() {
 // Static methods
 //======================================
 
-apogeeapp.app.FormDataComponent.getCreateMemberPayload = function(userInputValues) {
-    var json = {};
-    json.name = userInputValues.name;
-    json.type = apogee.Folder.generator.type;
-    json.childrenNotWriteable = true;
-    //add the children
-    json.children = {
-        "layout": {
-            "name": "layout",
-            "type": "apogee.FunctionTable",
-            "updateData": {
-                "argList":["admin"],
-            }
-        },
-        "data": {
-            "name": "data",
-            "type": "apogee.JsonTable",
-            "updateData": {
-                "data": "",
-            }
-        },
-        "isInputValid": {
-            "name": "isInputValid",
-            "type": "apogee.FunctionTable",
-            "updateData": {
-                "argList":["formValue"],
-                "functionBody": "//If data valid, return true. If data is invalid, return an error message.\nreturn true;"
-            }
-        }
-    };
+apogeeapp.app.FormDataComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.FormDataComponent,userInputValues,optionalBaseJson);
     return json;
 }
 
@@ -195,4 +167,32 @@ apogeeapp.app.FormDataComponent.uniqueName = "apogeeapp.app.FormDataComponent";
 apogeeapp.app.FormDataComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.FormDataComponent.DEFAULT_HEIGHT = 300;
 apogeeapp.app.FormDataComponent.ICON_RES_PATH = "/componentIcons/formControl.png";
+apogeeapp.app.FormDataComponent.DEFAULT_MEMBER_JSON = {
+        "type": apogee.Folder.generator.type,
+        "childrenNotWriteable": true,
+        "children": {
+            "layout": {
+                "name": "layout",
+                "type": "apogee.FunctionTable",
+                "updateData": {
+                    "argList":["admin"],
+                }
+            },
+            "data": {
+                "name": "data",
+                "type": "apogee.JsonTable",
+                "updateData": {
+                    "data": "",
+                }
+            },
+            "isInputValid": {
+                "name": "isInputValid",
+                "type": "apogee.FunctionTable",
+                "updateData": {
+                    "argList":["formValue"],
+                    "functionBody": "//If data valid, return true. If data is invalid, return an error message.\nreturn true;"
+                }
+            }
+        }
+    };
 
