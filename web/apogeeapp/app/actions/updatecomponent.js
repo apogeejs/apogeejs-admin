@@ -40,9 +40,11 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
             //see if there were no changes
             var change = false;
             var newValues = {};
+            var undoValues = {}
             for(var key in submittedValues) {
                 if(submittedValues[key] !== initialValues[key]) {
                     newValues[key] = submittedValues[key];
+                    undoValues[key] = initialValues[key];
                     change = true;
                 }
             }
@@ -70,17 +72,15 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
                     alert("Illegal destination: you put an object inside itself");
                     return false;
                 }
+                
+                undoValues.owner = component.getMember().getOwner();
             }
         
             //need to test if fields are valid!
 
-            //update
-            var actionResponse = apogeeapp.app.updatecomponent.updatePropertyValues(component,newValues);
-              
-            //print an error message if there was an error
-            if(!actionResponse.getSuccess()) {
-                apogeeapp.app.errorHandling.handleActionError(actionResponse);
-            }
+            //update command
+            var command = apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand(component,newValues,undoValues);
+            workspaceUI.getApp().executeCommand(command);
 
             //return true to close the dialog
             return true;
@@ -94,6 +94,13 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
     
 }
 
+apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand = function(component,newValues,undoValues) {
+    var command = {};
+    command.cmd = () => apogeeapp.app.updatecomponent.updatePropertyValues(component,newValues);
+    command.undoCmd = () => apogeeapp.app.updatecomponent.updatePropertyValues(component,undoValues);
+    command.desc = "Update properties: " + component.getMember().getFullName();
+    return command;
+}
 //=====================================
 // Action
 //=====================================
