@@ -174,7 +174,7 @@ apogeeapp.app.CommandManager = class {
             
             //we shouldn't get errors here. This is a fatal error.
             let actionResponse = new apogee.ActionResponse();
-            let actionError = apogee.ActionError.processException(error,ActionError.ERROR_TYPE_APP,true,"Unknown error executing command: ");
+            let actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,true,"Unknown error executing command: ");
             actionResponse.addError(actionError);
             apogeeapp.app.errorHandling.handleActionError(actionResponse);
             return false;
@@ -265,7 +265,7 @@ apogeeapp.app.CommandManager = class {
     _commandUndoneFailed() {
         //clear the undone command so it can not be redone (at the current position this.nextInsertCmdIndex)
         //and clear all commands previous to this one
-        this.clearCommands(this.firstUsedCmdIndex,this.nextInsertCmdIndex);
+        this._clearCommands(this.firstUsedCmdIndex,this.nextInsertCmdIndex);
         this.firstUsedCmdIndex = this.nextInsertCmdIndex;
         //we also need to update the last used index if it was the cmd we just failed to undo
         if(this.lastUsedCmdIndex === this.nextInsertCmdIndex) {
@@ -281,7 +281,7 @@ apogeeapp.app.CommandManager = class {
     _commandRedoneFailed() {
         //clear the redone command so it can not be undone (at the current position this.nextInsertCmdIndex-1)
         //and clear all commands after to this one
-        this.clearCommands(this.nextInsertCmdIndex-1,this.lastUsedCmdIndex);
+        this._clearCommands(this.nextInsertCmdIndex-1,this.lastUsedCmdIndex);
         this.lastUsedCmdIndex = this.nextInsertCmdIndex-1;
         //we also need to update the first used index if it was the cmd we just failed to redo
         if(this.firstUsedCmdIndex === this.nextInsertCmdIndex-1) {

@@ -21,6 +21,10 @@ apogeeapp.app.ReferenceEntry = class {
     //---------------------------
     // references entry interface
     //---------------------------
+    
+    getReferenceManager() {
+        return this.referenceManager;
+    }
 
     getId() {
         return this.id;

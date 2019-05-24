@@ -95,6 +95,15 @@ apogeeapp.app.ReferenceManager.prototype.close = function() {
     }
 }
 
+apogeeapp.app.ReferenceManager.prototype.lookupEntry = function(entryType,url) {
+    var listStruct = this.referenceLists[entryType];
+    if(listStruct) {
+        return listStruct.listEntries.find(referenceEntry => referenceEntry.getUrl() == url);
+    }
+    else {
+        return null;
+    }
+}
 //================================
 // Protected
 //================================
