@@ -35,19 +35,23 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
         var dialogLayout = apogeeapp.app.updatecomponent.getPropertiesDialogLayout(displayName,folderList,additionalLines,false,initialValues);
         
         //create on submit callback
-        var onSubmitFunction = function(newValues) {
+        var onSubmitFunction = function(submittedValues) {
             
             //see if there were no changes
             var change = false;
-            for(var key in newValues) {
-                if(newValues[key] !== initialValues[key]) change = true;
+            var newValues = {};
+            for(var key in submittedValues) {
+                if(submittedValues[key] !== initialValues[key]) {
+                    newValues[key] = submittedValues[key];
+                    change = true;
+                }
             }
             if(!change) {
                 return true;
             }
             
             //validate the name, if it changed
-            if(newValues.name !== initialValues.name) {
+            if(newValues.name !== undefined) {
                 //validate name
                 var nameResult = apogee.codeCompiler.validateTableName(newValues.name);
                 if(!nameResult.valid) {
@@ -56,25 +60,22 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
                 }
             }
             
-            //lookup the parent object from the parent name
-            if(folderMap) {
+            // if the parent name is included, convert it to the parent/owner object
+            if((folderMap)&&(newValues.parentName)) {
                 //get the parent value
-                newValues.owner = folderMap[newValues.parentName];
+               newValues.owner = folderMap[newValues.parentName];
+               delete newValues.parentName;
                 
                 if(newValues.owner == component.getMember()) {
                     alert("Illegal destination: you put an object inside itself");
                     return false;
                 }
             }
-            else {
-                //no parent - use the owner
-                newValues.owner = component.getMember().getOwner();
-            }
         
             //need to test if fields are valid!
 
             //update
-            var actionResponse = apogeeapp.app.updatecomponent.updatePropertyValues(component,initialValues,newValues);
+            var actionResponse = apogeeapp.app.updatecomponent.updatePropertyValues(component,newValues);
               
             //print an error message if there was an error
             if(!actionResponse.getSuccess()) {
@@ -101,7 +102,7 @@ apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-apogeeapp.app.updatecomponent.updatePropertyValues = function(component,oldValues,newValues) {
+apogeeapp.app.updatecomponent.updatePropertyValues = function(component,newValues) {
 
     var actionResponse = new apogee.ActionResponse();
 
@@ -111,19 +112,19 @@ apogeeapp.app.updatecomponent.updatePropertyValues = function(component,oldValue
     var actionData;
 
     //check if a move action is needed
-    if((oldValues.name !== newValues.name)||(oldValues.parentName !== newValues.parentName)) {
+    if((newValues.name)||(newValues.owner)) {
         actionData = {};
         actionData.action = "moveMember";
         actionData.member = member;
-        actionData.name = newValues.name;
-        actionData.owner = newValues.owner;
+        actionData.name = newValues.name ? newValues.name : member.getName();
+        actionData.owner = newValues.owner ? newValues.owner : member.getOwner();
         actionList.push(actionData);
     }
 
     //create an action to update an member additional properties
     var memberGenerator = member.generator;
     if(memberGenerator.getPropertyUpdateAction) {
-        actionData = memberGenerator.getPropertyUpdateAction(member,oldValues,newValues);
+        actionData = memberGenerator.getPropertyUpdateAction(member,newValues);
         if(actionData) {
            actionList.push(actionData); 
         }
@@ -139,9 +140,7 @@ apogeeapp.app.updatecomponent.updatePropertyValues = function(component,oldValue
     }
     
     //update an component additional properties
-    if(component.updateProperties) {
-        component.updateProperties(oldValues,newValues,actionResponse);
-    }
+    component.loadPropertyValues(newValues);
         
     return actionResponse;
 }

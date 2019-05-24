@@ -73,7 +73,7 @@ apogeeapp.app.JavascriptComponent.prototype.getDataDisplay = function(displayCon
 // Static methods
 //======================================
 
-apogeeapp.app.JavascriptComponent.getCreateMemberPayload = function(userInputValues) {
+apogeeapp.app.JavascriptComponent.createMemberJson = function(userInputValues) {
     var json = {};
     json.name = userInputValues.name;
     var argList = [];
@@ -83,7 +83,7 @@ apogeeapp.app.JavascriptComponent.getCreateMemberPayload = function(userInputVal
     return json;
 }
 
-apogeeapp.app.JavascriptComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+apogeeapp.app.JavascriptComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
     var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.JavascriptComponent,userInputValues,optionalBaseJson);
     return json;
 }

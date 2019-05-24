@@ -118,7 +118,7 @@ apogeeapp.app.JsonTableComponent.prototype.writeToJson = function(json) {
 
 apogeeapp.app.JsonTableComponent.prototype.readFromJson = function(json) {
     if(json.dataView !== undefined) {
-        this.dataView = json.dataView;
+        this.setDataView(json.dataView);
     }
 }
 
@@ -126,12 +126,8 @@ apogeeapp.app.JsonTableComponent.prototype.readFromJson = function(json) {
 // properties
 //======================================
 
-apogeeapp.app.JsonTableComponent.prototype.addPropFunction = function(values) {
+apogeeapp.app.JsonTableComponent.prototype.readExtendedProperties = function(values) {
     values.dataView = this.getDataView();
-}
-
-apogeeapp.app.JsonTableComponent.prototype.updateProperties = function(oldValues,newValues) {
-    this.setDataView(newValues.dataView);
 }
 
 //======================================
@@ -141,18 +137,9 @@ apogeeapp.app.JsonTableComponent.prototype.updateProperties = function(oldValues
 /** This method takes input Property values and create a member json to create the member object.
  * Optionally a base member json can be passed in.
  */
-apogeeapp.app.JsonTableComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+apogeeapp.app.JsonTableComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
     var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.JsonTableComponent,userInputValues,optionalBaseJson);
     return json;
-}
-
-/** If this component has property values, this function should be implemedted to
- * copy the property values into a source json which will create the component.
- */
-apogeeapp.app.CustomDataComponent.mergePropertiesToSourceJson = function(userInputValues,sourceJson) {
-    if(userInputValues.dataView !== undefined) {
-        sourceJson.dataView = userInputValues.dataView;
-    }
 }
 
 //======================================

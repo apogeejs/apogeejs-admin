@@ -58,11 +58,11 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,wo
         var loadReferencesPromise = workspaceUI.getLoadReferencesPromise(referencesJson);
     	
 		//if we have to load links wait for them to load
-        var newParentOptionsJson = {};
-        newParentOptionsJson.name = workspaceJson.workspace.data.name;
+        var initialProperties = {};
+        initialProperties.name = workspaceJson.workspace.data.name;
         var serializedMemberJson = workspaceJson.workspace.data;
         var serializedComponentsJson = workspaceJson.components;
-		var workspaceImportDialogFunction = () => apogeeapp.app.addcomponent.addComponent(app,componentGenerator,newParentOptionsJson,serializedMemberJson,serializedComponentsJson);
+		var workspaceImportDialogFunction = () => apogeeapp.app.addcomponent.addComponent(app,componentGenerator,initialProperties,serializedMemberJson,serializedComponentsJson);
         
         var linkLoadError = function(errorMsg) {
             alert("Error loading links: " + errorMsg);

@@ -52,7 +52,7 @@ apogeeapp.app.ErrorTableComponent.prototype.toJson = function() {
 }
 
 /** This overrides the open deserialize method to save the entire json. */
-apogeeapp.app.ErrorTableComponent.prototype.loadSerializedValues = function(json) {
+apogeeapp.app.ErrorTableComponent.prototype.loadPropertyValues = function(json) {
     this.completeJson = json;
 }
 
@@ -60,7 +60,7 @@ apogeeapp.app.ErrorTableComponent.prototype.loadSerializedValues = function(json
 // Static methods
 //======================================
 
-apogeeapp.app.ErrorTableComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+apogeeapp.app.ErrorTableComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
     var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.ErrorTableComponent,userInputValues,optionalBaseJson);
     return json;
 }

@@ -85,7 +85,7 @@ apogeeapp.app.DynamicForm.prototype.getFormCallbacks = function() {
 // Static methods
 //======================================
 
-apogeeapp.app.DynamicForm.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+apogeeapp.app.DynamicForm.createMemberJson = function(userInputValues,optionalBaseJson) {
     var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.DynamicForm,userInputValues,optionalBaseJson);
     return json;
 }
@@ -100,7 +100,7 @@ apogeeapp.app.DynamicForm.DEFAULT_WIDTH = 400;
 apogeeapp.app.DynamicForm.DEFAULT_HEIGHT = 400;
 apogeeapp.app.DynamicForm.ICON_RES_PATH = "/componentIcons/functionTable.png";
 apogeeapp.app.DynamicForm.DEFAULT_MEMBER_JSON = {
-    "type": apogee.JsonTable.generator.type,
+    "type": apogee.FunctionTable.generator.type,
     "updateData": {
         "argList": ["admin"]
     }

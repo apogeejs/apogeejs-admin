@@ -184,8 +184,9 @@ apogeeapp.app.TabWebComponentDisplay.prototype.setAddChildrenContextMenu = funct
         event.stopPropagation();
         
         //position the window if we can
+        var componentOptions;
         if(event.offsetX) {
-            var componentOptions = {};
+            componentOptions = {};
             var posInfo = {};
             posInfo.x = event.offsetX;
             posInfo.y = event.offsetY;

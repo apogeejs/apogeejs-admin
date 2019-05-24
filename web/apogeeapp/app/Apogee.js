@@ -569,7 +569,7 @@ apogeeapp.app.Apogee.prototype.getEditMenuItems = function() {
 ///** This method should be implemented if custom menus or menu items are desired. */
 //apogeeapp.app.Apogee.prototype.addToMenuBar(menuBar,menus);
 
-apogeeapp.app.Apogee.prototype.getAddChildMenuItems = function(optionalInitialValues,optionalMemberOptions,optionalComponentOptions) {
+apogeeapp.app.Apogee.prototype.getAddChildMenuItems = function(optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
     
     var menuItemList = [];
     
@@ -579,14 +579,14 @@ apogeeapp.app.Apogee.prototype.getAddChildMenuItems = function(optionalInitialVa
         
         let menuItem = {};
         menuItem.title = "Add " + generator.displayName;
-        menuItem.callback = () => apogeeapp.app.addcomponent.addComponent(this,generator,optionalInitialValues,optionalMemberOptions,optionalComponentOptions);
+        menuItem.callback = () => apogeeapp.app.addcomponent.addComponent(this,generator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
         menuItemList.push(menuItem);
     }
 
     //add the additional component item
     let menuItem = {};
     menuItem.title = "Other Components...";
-    menuItem.callback = () => apogeeapp.app.addcomponent.addAdditionalComponent(this,optionalInitialValues,optionalMemberOptions,optionalComponentOptions);
+    menuItem.callback = () => apogeeapp.app.addcomponent.addAdditionalComponent(this,optionalInitialProperties,optionalBaseMemberJson,optionalBaseComponentJson);
     menuItemList.push(menuItem);
 
     return menuItemList;

@@ -93,7 +93,7 @@ apogee.FunctionTable.fromJson = function(owner,json) {
 
 /** This method extends the base method to get the property values
  * for the property editting. */
-apogee.FunctionTable.addPropValues = function(member,values) {
+apogee.FunctionTable.readProperties = function(member,values) {
     var argList = member.getArgList();
     var argListString = argList.toString();
     values.argListString = argListString;
@@ -101,8 +101,8 @@ apogee.FunctionTable.addPropValues = function(member,values) {
 }
 
 /** This method executes a property update. */
-apogee.FunctionTable.getPropertyUpdateAction = function(member,oldValues,newValues) {
-    if(oldValues.argListString !== newValues.argListString) {
+apogee.FunctionTable.getPropertyUpdateAction = function(member,newValues) {
+    if(newValues.argListString !== undefined) {
         var newArgList = apogee.FunctionTable.parseStringArray(newValues.argListString);
   
         var actionData = {};
@@ -136,7 +136,7 @@ apogee.FunctionTable.generator = {};
 apogee.FunctionTable.generator.displayName = "Function";
 apogee.FunctionTable.generator.type = "apogee.FunctionTable";
 apogee.FunctionTable.generator.createMember = apogee.FunctionTable.fromJson;
-apogee.FunctionTable.generator.addPropFunction = apogee.FunctionTable.addPropValues;
+apogee.FunctionTable.generator.readProperties = apogee.FunctionTable.readProperties;
 apogee.FunctionTable.generator.getPropertyUpdateAction = apogee.FunctionTable.getPropertyUpdateAction;
 apogee.FunctionTable.generator.setDataOk = false;
 apogee.FunctionTable.generator.setCodeOk = true;

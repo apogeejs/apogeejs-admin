@@ -203,14 +203,9 @@ apogeeapp.app.CustomDataComponent.prototype.updateFromJson = function(json) {
 /** This method deseriliazes data for the custom resource component. This will
  * work is no json is passed in. */
 apogeeapp.app.CustomDataComponent.prototype.loadResourceFromJson = function(json) {   
-	var uiCodeFields;
-    if((!json)||(!json.resource)) {
-		uiCodeFields = {};
+    if((json)&&(json.resource)) {
+        this.update(json.resource);
 	} 
-	else {
-		uiCodeFields = json.resource;
-	}  
-    this.update(uiCodeFields);
 }
 
 
@@ -309,12 +304,8 @@ apogeeapp.app.CustomDataComponent.prototype.writeToJson = function(json) {
 // properties
 //======================================
 
-apogeeapp.app.CustomDataComponent.prototype.addPropFunction = function(values) {
+apogeeapp.app.CustomDataComponent.prototype.readExtendedProperties = function(values) {
     values.destroyOnHide = this.getDestroyOnInactive();
-}
-
-apogeeapp.app.CustomDataComponent.prototype.updateProperties = function(oldValues,newValues) {
-    this.setDestroyOnInactive(newValues.destroyOnHide);
 }
 
 /** This is the format string to create the code body for updateing the member
@@ -337,15 +328,9 @@ apogeeapp.app.CustomDataComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 // Static methods
 //======================================
 
-apogeeapp.app.CustomDataComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+apogeeapp.app.CustomDataComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
     var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.CustomDataComponent,userInputValues,optionalBaseJson);
     return json;
-}
-
-apogeeapp.app.CustomDataComponent.mergePropertiesToSourceJson = function(userInputValues,sourceJson) {
-    if(userInputValues.destroyOnInactive !== undefined) {
-        json.destroyOnInactive = userInputValues.destroyOnInactive;
-    }
 }
 
 //======================================

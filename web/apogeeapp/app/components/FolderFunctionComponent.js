@@ -44,7 +44,7 @@ apogeeapp.app.FolderFunctionComponent.prototype.readFromJson = function(json) {
 // Static methods
 //======================================
 
-apogeeapp.app.FolderFunctionComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+apogeeapp.app.FolderFunctionComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
     var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.FolderFunctionComponent,userInputValues,optionalBaseJson);
     if(userInputValues.argListString) {
         var argList = apogee.FunctionTable.parseStringArray(userInputValues.argListString);

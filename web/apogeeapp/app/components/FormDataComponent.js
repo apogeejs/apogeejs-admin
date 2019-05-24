@@ -153,7 +153,7 @@ apogeeapp.app.FormDataComponent.prototype.getFormEditorCallbacks = function() {
 // Static methods
 //======================================
 
-apogeeapp.app.FormDataComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+apogeeapp.app.FormDataComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
     var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.FormDataComponent,userInputValues,optionalBaseJson);
     return json;
 }

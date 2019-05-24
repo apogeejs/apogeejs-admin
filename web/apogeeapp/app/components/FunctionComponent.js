@@ -65,7 +65,7 @@ apogeeapp.app.FunctionComponent.prototype.getDataDisplay = function(displayConta
 // Static methods
 //======================================
 
-apogeeapp.app.FunctionComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+apogeeapp.app.FunctionComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
     var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.FunctionComponent,userInputValues,optionalBaseJson);
     if(userInputValues.argListString) { 
         if(!json.updateData) {

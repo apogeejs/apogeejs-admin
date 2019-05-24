@@ -211,10 +211,10 @@ apogeeapp.app.CanvasFolderComponentDisplay.prototype.setAddChildrenContextMenu =
         }
         
         var initialValues = {};
-        initialValues.parentName = this.member.getFullName();
+        initialValues.parentName = this.folder.getFullName();
         
         var contextMenu = new apogeeapp.ui.MenuBody();
-        contextMenu.setMenuItems(app.getAddChildMenuItems(initialValues,componentOptions));
+        contextMenu.setMenuItems(app.getAddChildMenuItems(initialValues,null,componentOptions));
         
         apogeeapp.ui.Menu.showContextMenu(contextMenu,event);
     }

@@ -41,7 +41,7 @@ apogeeapp.app.CanvasFolderComponent.EMPTY_FOLDER_COMPONENT_JSON  = {
     "type":"apogeeapp.app.CanvasFolderComponent"
 };
 
-apogeeapp.app.CanvasFolderComponent.getCreateMemberPayload = function(userInputValues,optionalBaseJson) {
+apogeeapp.app.CanvasFolderComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
     var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.CanvasFolderComponent,userInputValues,optionalBaseJson);
     if(userInputValues.children) {
         json.children = userInputValues.children;

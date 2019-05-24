@@ -75,10 +75,8 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
         }
     }
 
-    static getCreateMemberPayload(userInputValues) {
-        var json = {};
-        json.name = userInputValues.name;
-        json.type = apogee.JsonTable.generator.type;
+    static createMemberJson(userInputValues,optionalBaseJson) {
+        var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.JsonTable,userInputValues,optionalBaseJson);
         return json;
     }
 
@@ -86,7 +84,7 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
     static attachStandardStaticProperties(componentGenerator,displayName,uniqueName) {
         componentGenerator.displayName = displayName;
         componentGenerator.uniqueName = uniqueName;
-        componentGenerator.getCreateMemberPayload = apogeeapp.app.BasicControlComponent.getCreateMemberPayload;
+        componentGenerator.createMemberJson = apogeeapp.app.BasicControlComponent.createMemberJson;
         componentGenerator.DEFAULT_WIDTH = 500;
         componentGenerator.DEFAULT_HEIGHT = 500;
         componentGenerator.ICON_RES_PATH = "/componentIcons/chartControl.png";

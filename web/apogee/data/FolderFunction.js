@@ -118,7 +118,7 @@ apogee.FolderFunction.prototype.addToJson = function(json) {
 
 /** This method extends the base method to get the property values
  * for the property editting. */
-apogee.FolderFunction.addPropValues = function(member,values) {
+apogee.FolderFunction.readProperties = function(member,values) {
     var argList = member.getArgList();
     var argListString = argList.toString();
     values.argListString = argListString;
@@ -127,15 +127,24 @@ apogee.FolderFunction.addPropValues = function(member,values) {
 }
 
 /** This method executes a property update. */
-apogee.FolderFunction.getPropertyUpdateAction = function(folderFunction,oldValues,newValues) {
-    if((oldValues.argListString !== newValues.argListString)||(oldValues.returnValueString !== newValues.returnValueString)) {
-        var newArgList = apogee.FunctionTable.parseStringArray(newValues.argListString);
+apogee.FolderFunction.getPropertyUpdateAction = function(folderFunction,newValues) {
+    if((newValues.argListString !== undefined)||(newValues.returnValueString!== undefined)) {
+        
+        var argList;
+        if(newValues.argListString) {
+            argList = apogee.FunctionTable.parseStringArray(newValues.argListString);
+        }
+        else {
+            argList = this.argList;
+        }
+        
+        var returnValueString = newValues.returnValueString ? newValues.returnValueString : this.returnValueString;
  
         var actionData = {};
         actionData.action = "updateFolderFunction";
         actionData.member = folderFunction;
-        actionData.argList = newArgList;
-        actionData.returnValueString = newValues.returnValueString;
+        actionData.argList = argList;
+        actionData.returnValueString = returnValueString;
         return actionData;
     }    
     else {
@@ -381,7 +390,7 @@ apogee.FolderFunction.generator = {};
 apogee.FolderFunction.generator.displayName = "Folder Function";
 apogee.FolderFunction.generator.type = "apogee.FolderFunction";
 apogee.FolderFunction.generator.createMember = apogee.FolderFunction.fromJson;
-apogee.FolderFunction.generator.addPropFunction = apogee.FolderFunction.addPropValues;
+apogee.FolderFunction.generator.readProperties = apogee.FolderFunction.readProperties;
 apogee.FolderFunction.generator.getPropertyUpdateAction = apogee.FolderFunction.getPropertyUpdateAction;
 apogee.FolderFunction.generator.setDataOk = false;
 apogee.FolderFunction.generator.setCodeOk = false;

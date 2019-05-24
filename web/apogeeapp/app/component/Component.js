@@ -252,7 +252,7 @@ apogeeapp.app.Component.prototype.toJson = function() {
 }
 
 /** This serializes the component. */
-apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
+apogeeapp.app.Component.prototype.loadPropertyValues = function(json) {
     if(!json) json = {};
     
     //take any immediate needed actions
@@ -301,12 +301,6 @@ apogeeapp.app.Component.prototype.loadSerializedValues = function(json) {
 //** This method adds any necessary implementation-specific property
 // * key value pairs to the passed in the json. OPTIONAL */
 //apogeeapp.app.Component.prototype.addPropFunction = function(values);
-
-//This method should optionally be populated by an extending object.
-//** This method gets updated component implementation-specific properties from 
-// * the passed in newValues. OldValues will be the original values passed back
-// to this function. OPTIONAL */
-//apogeeapp.app.Component.prototype.updateProperties = function(oldValues,newValues);
 
 /** This method cleans up after a delete. Any extending object that has delete
  * actions should pass a callback function to the method "addClenaupAction" */
@@ -416,11 +410,11 @@ apogeeapp.app.Component.prototype.getPropertyValues = function() {
         values.parentName = parent.getFullName();
     }
 
-    if(member.generator.addPropFunction) {
-        member.generator.addPropFunction(member,values);
+    if(member.generator.readProperties) {
+        member.generator.readProperties(member,values);
     }
-    if(this.addPropFunction) {
-        this.addPropFunction(values);
+    if(this.readExtendedProperties) {
+        this.readExtendedProperties(values);
     }
     return values;
 }
@@ -490,26 +484,16 @@ apogeeapp.app.Component.prototype.createDeleteCallback = function() {
 // Static methods
 //======================================
 
-/** This creates a component from a member along with two sources of data for the component, the serialized values
- * and propertyValues. Both of these are optional. Typically serializaed values are used when we are opening the
- * component from a saved state and property values are used when we are creating a new component where the 
- * users filled out a dialog populating the properties.
- * 
- * @param {type} componentGenerator - This is the generator for the component
- * @param {type} workspaceUI - this is the workspace UI in which we wil create the component
- * @param {type} member - this is the member associated with the component
- * @param {type} propertyValues - (optional) these are property values, which may be used to create the component (like when it is loaded from a create dialog)
- * @param {type} serializedValues - (optional) these are serialized values for the componnet, (like when it is loaded from a serialized json)
- * @returns the component created
- */
-apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,workspaceUI,member,serializedValues) {
+/** This creates a component from a member along with a set of initial component property
+ * values. */
+apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,workspaceUI,member,propertyValues) {
     
     //create empty component
     var component = new componentGenerator(workspaceUI,member);
 
     //apply any serialized values
-    if(serializedValues) {
-        component.loadSerializedValues(serializedValues);
+    if(propertyValues) {
+        component.loadPropertyValues(propertyValues);
     }
 
     //call member updated to process and notify of component creation
@@ -518,31 +502,32 @@ apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,
     return component;
 }
 
-/** This function creates a basic json to create the member for a new component instance. It can create a
- * new json based on user input values (as in from a proeprties dialog box) or it can add these 
- * properties to an optinoal base json. The base json is expected to be in the proper format.
- * This method only adds the member name from input values, if present. Any other properties
- * needed for the member/component should be added elsewhere.
- */
-apogeeapp.app.Component.createMemberJson = function(componentGenerator,userInputValues,optionalBaseJson) {
-    var json;
-    if(optionalBaseJson) {
-        //use the passed in json as a base to create the member if applicable
-        json = apogee.util.jsonCopy(optionalBaseJson);
+/** This function creates a json to create the member for a new component instance. 
+ * It uses default values and then overwrites in with optionalBaseValues (these are intended to be base values outside of user input values)
+ * and then optionalOverrideValues (these are intended to be user input values) */
+apogeeapp.app.Component.createMemberJson = function(componentGenerator,optionalOverrideValues,optionalBaseValues) {
+    var json = apogee.util.jsonCopy(componentGenerator.DEFAULT_MEMBER_JSON);
+    if(optionalBaseValues) {
+        for(var key in optionalBaseValues) {
+            json[key]= optionalBaseValues[key];
+        }
     }
-    else {
-        //otherwise create the default base json from the component
-        json = apogee.util.jsonCopy(componentGenerator.DEFAULT_MEMBER_JSON);
-    }
-    //set the name for the member
-    //this should be included in user input values.
-    //?: for now we allow the name to not be included, but to instead be in the optionalBaseJson,
-    //I'm not sure if this is a good idea, or even something that would ever be used.
-    if(userInputValues.name) {
-        json.name = userInputValues.name
+    if(optionalOverrideValues) {
+        for(var key in optionalOverrideValues) {
+            json[key]= optionalOverrideValues[key];
+        }
     }
     
     return json;
+}
+
+/** This function merges values from two objects containing component property values. */
+apogeeapp.app.Component.mergePropertyValues = function(overridePropertyValues,basePropertyValues) {
+    var newPropertyValues = apogee.util.jsonCopy(basePropertyValues);
+    for(var key in overridePropertyValues) {
+        newPropertyValues[key] = overridePropertyValues[key];
+    }
+    return newPropertyValues;
 }
 
 
