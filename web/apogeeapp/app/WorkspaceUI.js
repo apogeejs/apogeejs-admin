@@ -368,7 +368,7 @@ apogeeapp.app.WorkspaceUI = class {
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = "Edit Properties";
-        itemInfo.callback = apogeeapp.app.updateworkspace.getUpdateWorkspaceCallback(this);
+        itemInfo.callback = () => apogeeapp.app.updateworkspace.updateWorkspaceProperties(this);
         menuItemList.push(itemInfo);
 
         //DEV ENTRY

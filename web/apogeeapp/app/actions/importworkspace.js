@@ -6,31 +6,29 @@ apogeeapp.app.importworkspace = {};
 //=====================================
 
 /** Call this withthe appropriate generator - folder or folder function, for the given import type. */
-apogeeapp.app.importworkspace.getImportCallback = function(app,fileAccessObject,componentGenerator) {
-    return function() {
-    
-        //make sure there is not an open workspace
-        if(!app.getWorkspaceUI()) {
-            alert("There must be an open workspace to import a workspace.");
-            return;
-        }    
-        
-        var onOpen = function(err,app,workspaceData,fileMetadata) {
-            if(err) {
-                var actionResponse = new apogee.ActionResponse();
-                var actionError = apogee.ActionError.processException(err,apogee.ActionError.ERROR_TYPE_USER,false);
-                actionResponse.addError(actionError);
-                apogeeapp.app.errorHandling.handleActionError(actionResponse);
-            }
-            else {
-                //open workspace
-                apogeeapp.app.importworkspace.openWorkspace(app,componentGenerator,workspaceData,fileMetadata);
-            }
+ apogeeapp.app.importworkspace.importWorkspace = function(app,fileAccessObject,componentGenerator) {
+
+    //make sure there is not an open workspace
+    if(!app.getWorkspaceUI()) {
+        alert("There must be an open workspace to import a workspace.");
+        return;
+    }    
+
+    var onOpen = function(err,app,workspaceData,fileMetadata) {
+        if(err) {
+            var actionResponse = new apogee.ActionResponse();
+            var actionError = apogee.ActionError.processException(err,apogee.ActionError.ERROR_TYPE_USER,false);
+            actionResponse.addError(actionError);
+            apogeeapp.app.errorHandling.handleActionError(actionResponse);
         }
-        
-        //use open file from open workspace
-        fileAccessObject.openFile(app,onOpen);
+        else {
+            //open workspace
+            apogeeapp.app.importworkspace.openWorkspace(app,componentGenerator,workspaceData,fileMetadata);
+        }
     }
+
+    //use open file from open workspace
+    fileAccessObject.openFile(app,onOpen);
 }
 
 //=====================================

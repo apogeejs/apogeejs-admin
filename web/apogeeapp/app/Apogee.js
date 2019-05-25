@@ -447,10 +447,10 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
     menuBarLeft.appendChild(menu.getElement());
     menus[name] = menu;
     
-    var importCallback = apogeeapp.app.importworkspace.getImportCallback(this,this.fileAccessObject,apogeeapp.app.FolderComponent);
+    var importCallback = () => apogeeapp.app.importworkspace.importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderComponent);
     menu.addCallbackMenuItem("Import as Folder",importCallback);
     
-    var import2Callback = apogeeapp.app.importworkspace.getImportCallback(this,this.fileAccessObject,apogeeapp.app.FolderFunctionComponent);
+    var import2Callback = () => apogeeapp.app.importworkspace.importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderFunctionComponent);
     menu.addCallbackMenuItem("Import as Folder Function",import2Callback);
     
     var exportCallback = apogeeapp.app.exportworkspace.getExportCallback(this,this.fileAccessObject);

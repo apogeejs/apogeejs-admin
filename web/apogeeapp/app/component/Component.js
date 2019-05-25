@@ -184,12 +184,12 @@ apogeeapp.app.Component.prototype.getMenuItems = function(optionalMenuItemList) 
     //add the standard entries
     var itemInfo = {};
     itemInfo.title = "Edit Properties";
-    itemInfo.callback = apogeeapp.app.updatecomponent.getUpdateComponentCallback(this);
+    itemInfo.callback = () => apogeeapp.app.updatecomponent.updateComponent(this);
     menuItemList.push(itemInfo);
 
     var itemInfo = {};
     itemInfo.title = "Delete";
-    itemInfo.callback = this.createDeleteCallback(itemInfo.title);
+    itemInfo.callback = () => this.deleteComponent(itemInfo.title);
     menuItemList.push(itemInfo);
     
     return menuItemList;
@@ -468,16 +468,14 @@ apogeeapp.app.Component.prototype.createOpenCallback = function() {
 
 /** This method creates a callback for deleting the component. 
  *  @private */
-apogeeapp.app.Component.prototype.createDeleteCallback = function() {
-    return () => {
-        var doDelete = confirm("Are you sure you want to delete this object?");
-        if(!doDelete) {
-            return;
-        }
-        
-        var command = apogeeapp.app.deletecomponent.createDeleteComponentCommand(this);
-        this.workspaceUI.getApp().executeCommand(command);
+apogeeapp.app.Component.prototype.deleteComponent = function() {
+    var doDelete = confirm("Are you sure you want to delete this object?");
+    if(!doDelete) {
+        return;
     }
+
+    var command = apogeeapp.app.deletecomponent.createDeleteComponentCommand(this);
+    this.workspaceUI.getApp().executeCommand(command);
 }
 
 //======================================

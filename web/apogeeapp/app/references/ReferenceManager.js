@@ -215,7 +215,7 @@ apogeeapp.app.ReferenceManager.prototype.getListMenuItems = function(typeInfo) {
     //add the standard entries
     var itemInfo = {};
     itemInfo.title = typeInfo.ADD_ENTRY_TEXT;
-    itemInfo.callback = apogeeapp.app.updatelink.getAddLinkCallback(this,typeInfo);
+    itemInfo.callback = apogeeapp.app.updatelink.addLink(this,typeInfo);
     menuItemList.push(itemInfo);
     
     return menuItemList;

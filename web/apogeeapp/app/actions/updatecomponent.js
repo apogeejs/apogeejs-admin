@@ -7,91 +7,85 @@ apogeeapp.app.updatecomponent = {};
 //=====================================
 
 /** This method gets a callback to update the properties of a component. */
-apogeeapp.app.updatecomponent.getUpdateComponentCallback = function(component) {
+apogeeapp.app.updatecomponent.updateComponent = function(component) {
     
     var componentGenerator = component.componentGenerator;
-    
-    var createCallback = function() {
-        
-        var displayName = componentGenerator.displayName
-        var additionalLines = apogee.util.jsonCopy(componentGenerator.propertyDialogLines); 
-        
-        var workspaceUI = component.getWorkspaceUI(); 
-        var initialValues = component.getPropertyValues(); 
-        
-        //add folder list, only if we can set the parent (if there is a parent)
-        var folderMap = null;
-        var folderList = null;
-        if(component.getMember().getParent()) {
-            //get the folder list
-             folderMap = workspaceUI.getFolders();
-            folderList = [];
-            for(var folderName in folderMap) {
-                folderList.push(folderName);
+
+    var displayName = componentGenerator.displayName
+    var additionalLines = apogee.util.jsonCopy(componentGenerator.propertyDialogLines); 
+
+    var workspaceUI = component.getWorkspaceUI(); 
+    var initialValues = component.getPropertyValues(); 
+
+    //add folder list, only if we can set the parent (if there is a parent)
+    var folderMap = null;
+    var folderList = null;
+    if(component.getMember().getParent()) {
+        //get the folder list
+         folderMap = workspaceUI.getFolders();
+        folderList = [];
+        for(var folderName in folderMap) {
+            folderList.push(folderName);
+        }
+    }
+
+    //create the dialog layout - do on the fly because folder list changes
+    var dialogLayout = apogeeapp.app.updatecomponent.getPropertiesDialogLayout(displayName,folderList,additionalLines,false,initialValues);
+
+    //create on submit callback
+    var onSubmitFunction = function(submittedValues) {
+
+        //see if there were no changes
+        var change = false;
+        var newValues = {};
+        var undoValues = {}
+        for(var key in submittedValues) {
+            if(submittedValues[key] !== initialValues[key]) {
+                newValues[key] = submittedValues[key];
+                undoValues[key] = initialValues[key];
+                change = true;
             }
         }
-        
-        //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = apogeeapp.app.updatecomponent.getPropertiesDialogLayout(displayName,folderList,additionalLines,false,initialValues);
-        
-        //create on submit callback
-        var onSubmitFunction = function(submittedValues) {
-            
-            //see if there were no changes
-            var change = false;
-            var newValues = {};
-            var undoValues = {}
-            for(var key in submittedValues) {
-                if(submittedValues[key] !== initialValues[key]) {
-                    newValues[key] = submittedValues[key];
-                    undoValues[key] = initialValues[key];
-                    change = true;
-                }
-            }
-            if(!change) {
-                return true;
-            }
-            
-            //validate the name, if it changed
-            if(newValues.name !== undefined) {
-                //validate name
-                var nameResult = apogee.codeCompiler.validateTableName(newValues.name);
-                if(!nameResult.valid) {
-                    alert(nameResult.errorMessage);
-                    return false;
-                }
-            }
-            
-            // if the parent name is included, convert it to the parent/owner object
-            if((folderMap)&&(newValues.parentName)) {
-                //get the parent value
-               newValues.owner = folderMap[newValues.parentName];
-               delete newValues.parentName;
-                
-                if(newValues.owner == component.getMember()) {
-                    alert("Illegal destination: you put an object inside itself");
-                    return false;
-                }
-                
-                undoValues.owner = component.getMember().getOwner();
-            }
-        
-            //need to test if fields are valid!
-
-            //update command
-            var command = apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand(component,newValues,undoValues);
-            workspaceUI.getApp().executeCommand(command);
-
-            //return true to close the dialog
+        if(!change) {
             return true;
         }
-        
-        //show dialog
-        apogeeapp.app.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
+
+        //validate the name, if it changed
+        if(newValues.name !== undefined) {
+            //validate name
+            var nameResult = apogee.codeCompiler.validateTableName(newValues.name);
+            if(!nameResult.valid) {
+                alert(nameResult.errorMessage);
+                return false;
+            }
+        }
+
+        // if the parent name is included, convert it to the parent/owner object
+        if((folderMap)&&(newValues.parentName)) {
+            //get the parent value
+           newValues.owner = folderMap[newValues.parentName];
+           delete newValues.parentName;
+
+            if(newValues.owner == component.getMember()) {
+                alert("Illegal destination: you put an object inside itself");
+                return false;
+            }
+
+            undoValues.owner = component.getMember().getOwner();
+        }
+
+        //need to test if fields are valid!
+
+        //update command
+        var command = apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand(component,newValues,undoValues);
+        workspaceUI.getApp().executeCommand(command);
+
+        //return true to close the dialog
+        return true;
     }
-    
-    return createCallback;
-    
+
+    //show dialog
+    apogeeapp.app.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand = function(component,newValues,undoValues) {
