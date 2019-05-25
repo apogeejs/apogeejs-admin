@@ -6,41 +6,43 @@ apogeeapp.app.closeworkspace = {};
 // UI Entry Point
 //=====================================
 
-apogeeapp.app.closeworkspace.getCloseCallback = function(app) {
-    return function() {
+apogeeapp.app.closeworkspace.closeWorkspace = function(app) {
+    
+    var activeWorkspaceUI = app.getWorkspaceUI();
+    if(activeWorkspaceUI === null) {
+        alert("There is no workspace close.");
+        return;
+    }
 
-        var actionResponse = apogeeapp.app.closeworkspace.closeWorkspace(app); 
-        if(!actionResponse.getSuccess()) {
-            apogeeapp.app.errorHandling.handleActionError(actionResponse);
+    //update this to use undo queue, when it is finished 
+    var workspace = activeWorkspaceUI.getWorkspace();
+    if(workspace.getIsDirty()) {
+        var doClose = confirm("There is unsaved data. Are you sure you want to close the workspace?");
+        if(!doClose) {
+            return;
         }
     }
+    
+    var command = {};
+    command.cmd = () => apogeeapp.app.closeworkspace.doCloseWorkspace(app);
+    //no undo
+    command.desc = "Close workspace";
+    
+    app.executeCommand(command);
 }
 
 //=====================================
 // Action
 //=====================================
 
-apogeeapp.app.closeworkspace.closeWorkspace = function(app) {
+apogeeapp.app.closeworkspace.doCloseWorkspace = function(app) {
+    var activeWorkspaceUI = app.getWorkspaceUI();
+    var workspace = activeWorkspaceUI.getWorkspace();
+    
     var actionResponse = new apogee.ActionResponse();
     var workspaceUIRemoved = false;
     
     try {
-    
-        var activeWorkspaceUI = app.getWorkspaceUI();
-        if(activeWorkspaceUI === null) {
-            var errorMsg = "There is no workspace open.";
-            var actionError = new apogee.ActionError(errorMsg,apogee.ActionError.ERROR_TYPE_USER,null);
-            actionResponse.addError(actionError);
-            return actionResponse;
-        }
-
-        var workspace = activeWorkspaceUI.getWorkspace();
-        if(workspace.getIsDirty()) {
-            var doRemove = confirm("There is unsaved data. Are you sure you want to close the workspace?");
-            if(!doRemove) {
-                return actionResponse;
-            }
-        }
         
         workspaceUIRemoved = app.clearWorkspaceUI();
         

@@ -8,49 +8,46 @@ apogeeapp.app.exportworkspace = {};
 
 
 /** This gets a callback to add a component. */
-apogeeapp.app.exportworkspace.getExportCallback = function(app,fileAccessObject) {
-    
-    var exportCallback = function() {
-        //get the active workspace
-        var workspaceUI = app.getWorkspaceUI();
-        if(!workspaceUI) {
-            alert("There is no open workspace.");
-            return;
-        }   
-        
-        //get the folder list
-        var folderMap = workspaceUI.getFolders();
-        var folderNames = [];
-        for(var folderName in folderMap) {
-            folderNames.push(folderName);
-        }
-               
-        //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = apogeeapp.app.exportworkspace.getExportDialogLayout(folderNames);
-        
-        //create on submit callback
-        var onSubmitFunction = function(result) {         
-            var folder = folderMap[result.parentName];
-        
-            var workspaceText = apogeeapp.app.exportworkspace.getWorkspaceText(app,folder);
-            if(!workspaceText) {
-                alert("There is no workspace open.");
-                return;
-            }
+apogeeapp.app.exportworkspace.exportWorkspace = function(app,fileAccessObject) {
+    //get the active workspace
+    var workspaceUI = app.getWorkspaceUI();
+    if(!workspaceUI) {
+        alert("There is no open workspace.");
+        return;
+    }   
 
-            fileAccessObject.showSaveDialog(null,workspaceText,null);
-            
-            //return true to close the dialog
-            return true;
-        }
-        
-        //show dialog
-        apogeeapp.app.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
+    //get the folder list
+    var folderMap = workspaceUI.getFolders();
+    var folderNames = [];
+    for(var folderName in folderMap) {
+        folderNames.push(folderName);
     }
-    
-    return exportCallback;
-    
+
+    //create the dialog layout - do on the fly because folder list changes
+    var dialogLayout = apogeeapp.app.exportworkspace.getExportDialogLayout(folderNames);
+
+    //create on submit callback
+    var onSubmitFunction = function(result) {         
+        var folder = folderMap[result.parentName];
+
+        var workspaceText = apogeeapp.app.exportworkspace.getWorkspaceText(app,folder);
+        if(!workspaceText) {
+            alert("There is no workspace open.");
+            return;
+        }
+
+        //no command used here - we should add thatlogic in
+        //along with having proper error handling
+        fileAccessObject.showSaveDialog(null,workspaceText,null);
+
+        //return true to close the dialog
+        return true;
+    }
+
+    //show dialog
+    apogeeapp.app.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
+    
 
 apogeeapp.app.exportworkspace.getWorkspaceText = function(app,folder) {
     var activeWorkspaceUI = app.getWorkspaceUI();
