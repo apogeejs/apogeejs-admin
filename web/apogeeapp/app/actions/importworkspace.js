@@ -58,10 +58,13 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,wo
         var loadReferencesPromise = workspaceUI.getLoadReferencesPromise(referencesJson);
     	
 		//if we have to load links wait for them to load
+        //for initial properties take the workspace name as the object name
         var initialProperties = {};
         initialProperties.name = workspaceJson.workspace.data.name;
-        var serializedMemberJson = workspaceJson.workspace.data;
-        var serializedComponentsJson = workspaceJson.components;
+
+        var serializedMemberJson = apogeeapp.app.importworkspace.getMemberJsonFromWorkspaceJson(workspaceJson,componentGenerator);
+        var serializedComponentsJson = apogeeapp.app.importworkspace.getComponentJsonFromWorkspaceJson(workspaceJson,componentGenerator);
+        
 		var workspaceImportDialogFunction = () => apogeeapp.app.addcomponent.addComponent(app,componentGenerator,initialProperties,serializedMemberJson,serializedComponentsJson);
         
         var linkLoadError = function(errorMsg) {
@@ -137,3 +140,46 @@ apogeeapp.app.importworkspace.doRequest= function(url,onDownload,onFailure) {
 	xmlhttp.open("GET",url,true);
     xmlhttp.send();
 }
+
+/** This reads the proper member json from the imported workspace json. */
+apogeeapp.app.importworkspace.getMemberJsonFromWorkspaceJson = function(workspaceJson,componentGenerator) {
+    var memberFolderJson = workspaceJson.workspace.data;
+    
+    if(componentGenerator.uniqueName == "apogeeapp.app.FolderFunctionComponent") {
+        //I should probably do this conversion in the folder function code, so it is easier to maintain
+        var memberFolderFunctionJson = componentGenerator.DEFAULT_MEMBER_JSON;
+        var internalFolderJson = apogee.util.jsonCopy(memberFolderJson);
+        internalFolderJson.name = "root";
+        memberFolderFunctionJson.internalFolder = internalFolderJson;
+        return memberFolderFunctionJson;
+    }
+    else if(componentGenerator.uniqueName == "apogeeapp.app.FolderComponent") {
+        return memberFolderJson;
+    }
+    else {
+        throw new Error("Unknown target type: " + componentGenerator.uniqueName);
+    }
+
+}
+        
+/** This reads the proper component json from the imported workspace json. */
+apogeeapp.app.importworkspace.getComponentJsonFromWorkspaceJson = function(workspaceJson,componentGenerator) {
+    var componentFolderJson = workspaceJson.components;
+    
+    if(componentGenerator.uniqueName == "apogeeapp.app.FolderFunctionComponent") {
+        //I should probably do this conversion in the folder function code, so it is easier to maintain
+        var componentFolderFunctionJson = {
+            type: componentGenerator.uniqueName,
+            children: componentFolderJson.children
+        }
+        return componentFolderFunctionJson;
+    }
+    else if(componentGenerator.uniqueName == "apogeeapp.app.FolderComponent") {
+        return componentFolderJson;
+    }
+    else {
+        throw new Error("Unknown target type: " + componentGenerator.uniqueName);
+    }
+}
+        
+        

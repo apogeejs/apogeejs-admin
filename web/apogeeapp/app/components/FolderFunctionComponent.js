@@ -81,10 +81,6 @@ apogeeapp.app.FolderFunctionComponent.propertyDialogLines = [
         "type":"inputElement",
         "heading":"Return Val: ",
         "resultKey":"returnValueString"
-    },
-    {
-        "type":"invisible",
-        "resultKey":"internalFolder"
     }
 ];
 

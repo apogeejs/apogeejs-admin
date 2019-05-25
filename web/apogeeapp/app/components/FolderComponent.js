@@ -69,12 +69,6 @@ apogeeapp.app.FolderComponent.TREE_ENTRY_SORT_ORDER = apogeeapp.app.Component.FO
 apogeeapp.app.FolderComponent.DEFAULT_MEMBER_JSON = {
     "type": apogee.Folder.generator.type
 };
-apogeeapp.app.FolderComponent.propertyDialogLines = [
-    {
-        "type":"invisible",
-        "resultKey":"children"
-    }
-];
 
 //if we want to allow importing a workspace as this object, we must add this method to the generator
 apogeeapp.app.FolderComponent.appendWorkspaceChildren = function(optionsJson,childrenJson) {
