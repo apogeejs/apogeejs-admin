@@ -89,9 +89,13 @@ apogeeapp.app.updatecomponent.updateComponent = function(component) {
 }
 
 apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand = function(component,newValues,undoValues) {
+    
+    var workspaceUI = component.getWorkspaceUI();
+    var componentFullName = component.getMember().getFullName(); 
+    
     var command = {};
-    command.cmd = () => apogeeapp.app.updatecomponent.updatePropertyValues(component,newValues);
-    command.undoCmd = () => apogeeapp.app.updatecomponent.updatePropertyValues(component,undoValues);
+    command.cmd = () => apogeeapp.app.updatecomponent.updatePropertyValues(workspaceUI,componentFullName,newValues);
+    command.undoCmd = () => apogeeapp.app.updatecomponent.updatePropertyValues(workspaceUI,componentFullName,undoValues);
     command.desc = "Update properties: " + component.getMember().getFullName();
     return command;
 }
@@ -103,12 +107,14 @@ apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand = function(compo
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-apogeeapp.app.updatecomponent.updatePropertyValues = function(component,newValues) {
+apogeeapp.app.updatecomponent.updatePropertyValues = function(workspaceUI,componentFullName,newValues) {
+    
+    var workspace = workspaceUI.getWorkspace();
+    var member = workspace.getMemberByFullName(componentFullName);
+    var component = workspaceUI.getComponent(member);
 
     var actionResponse = new apogee.ActionResponse();
 
-    var member = component.getMember();
-    var workspace = component.getWorkspace();
     var actionList = [];
     var actionData;
 

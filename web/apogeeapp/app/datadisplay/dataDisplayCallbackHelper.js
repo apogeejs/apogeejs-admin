@@ -56,7 +56,7 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks = function(me
 /** This function creates editor callbacks or the member function body. 
  * The argument optionalClearCodeValue can optionally be set. If so, the member data will be 
  * set with this value if the function body and supplemental code are empty. */
-apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks = function(member,optionalClearCodeValue) {
+apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks = function(member,optionalClearCodeDataValue) {
     return {
         getData: () => member.getFunctionBody(),
         getEditOk: () => true,
@@ -64,13 +64,13 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks = functio
             var argList = member.getArgList();
             var functionBody = text;
             var supplementalCode = member.getSupplementalCode();
-            return apogeeapp.app.dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode,optionalClearCodeValue);
+            return apogeeapp.app.dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode,optionalClearCodeDataValue);
         }
     }
 }
 
 /** This function creates editor callbacks or the member supplemental code. */
-apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks = function(member,optionalClearCodeValue) {
+apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks = function(member,optionalClearCodeDataValue) {
     return {
         getData: () => member.getSupplementalCode(),
         getEditOk: () => true,
@@ -78,7 +78,7 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks = functio
             var argList = member.getArgList();
             var functionBody = member.getFunctionBody();
             var supplementalCode = text;
-            return apogeeapp.app.dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode,optionalClearCodeValue);
+            return apogeeapp.app.dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode,optionalClearCodeDataValue);
         }
     }
 }
@@ -88,20 +88,7 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks = function
     return {
         getData: () => member.getDescription(),
         getEditOk: () => true,
-        saveData: (text) => {	
-            if((text === null)||(text === undefined)) {
-                text = "";
-            }
-
-            var actionData = {};
-            actionData.action = "updateDescription";
-            actionData.member = member;
-            actionData.description = text;
-            var actionResponse =  apogee.action.doAction(actionData,true);
-
-            return true;
-        }
-    
+        saveData: (text) => apogeeapp.app.dataDisplayCallbackHelper.saveDescription(member,text)
     }
 }
 
@@ -111,26 +98,108 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks = function
 
 /** @private */
 apogeeapp.app.dataDisplayCallbackHelper.saveData = function(member,data) {
+    
+    var workspace = member.getWorkspace();
+    var memberFullName = member.getFullName();
+    
+    var command = {};
+    command.cmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSaveData(workspace,memberFullName,data);
+    
+    //undo command may be setting data or code
+    if((member.isCodeable)&&(member.hasCode())) {
+        let oldArgList = member.getArgList();
+        let oldFunctionBody = member.getFunctionBody();
+        let oldPrivateCode = member.getSupplementalCode();
+        command.undoCmd = () => apogeeapp.app.dataDisplayCallbackHelper.setCode(workspace,memberFullName,oldArgList,oldFunctionBody,oldPrivateCode);
+    }
+    else {
+        let oldData = member.getData();
+        command.undoCmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSaveData(workspace,memberFullName,oldData);
+    }
+    
+    command.desc = "Set data value: " + member.getFullName();
+    
+    apogeeapp.app.Apogee.getInstance().executeCommand(command);
+    
+    return true;
+}
+
+/** This method is a common method to set the code and supplemental code. It also
+ * will clear the code if both code fields are empty and a defined optionalClearCodeDataValue is set. 
+ * @private */
+apogeeapp.app.dataDisplayCallbackHelper.setCode = function(member,argList,functionBody,supplementalCode,optionalClearCodeDataValue) {
+    var workspace = member.getWorkspace();
+    var memberFullName = member.getFullName();
+    
+    var command = {};
+    command.cmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSetCode(workspace,memberFullName,argList,functionBody,supplementalCode,optionalClearCodeDataValue);
+    
+    //undo command may be setting data or code
+    if(member.hasCode()) {
+        let oldArgList = member.getArgList();
+        let oldFunctionBody = member.getFunctionBody();
+        let oldPrivateCode = member.getSupplementalCode();
+        command.undoCmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSetCode(workspace,memberFullName,oldArgList,oldFunctionBody,oldPrivateCode);
+    }
+    else {
+        let oldData = member.getData();
+        command.undoCmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSaveData(workspace,memberFullName,oldData);
+    }
+    
+    command.desc = "Set code: " + member.getFullName();
+    
+    apogeeapp.app.Apogee.getInstance().executeCommand(command);
+    
+    return true;
+}
+
+apogeeapp.app.dataDisplayCallbackHelper.saveDescription = function(member,text) {
+    
+    var workspace = member.getWorkspace();
+    var memberFullName = member.getFullName();
+    var oldDescription = member.getDescription();
+    
+    var command = {};
+    command.cmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSaveDescription(workspace,memberFullName,text);
+    command.undoCmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSaveDescription(workspace,memberFullName,oldDescription);
+    command.desc = "Set Description: " + memberFullName;
+    
+    apogeeapp.app.Apogee.getInstance().executeCommand(command);
+    
+    return true;
+}
+
+//===============================
+// Command functions
+//===============================
+
+
+/** @private */
+apogeeapp.app.dataDisplayCallbackHelper.doSaveData = function(workspace,memberFullName,data) {
+    
+    var member  = workspace.getMemberByFullName(memberFullName);
+    
     var actionData = {};
     actionData.action = "updateData";
     actionData.member = member;
     actionData.data = data;
     var actionResponse =  apogee.action.doAction(actionData,true);
 
-    return true;    
+    return actionResponse;    
 }
 
-/** This method is a common method to set the code and supplemental code. It also
- * will clear the code if both code fields are empty and a defined clearCodeValue is set. 
- * @private */
- apogeeapp.app.dataDisplayCallbackHelper.setCode = function(member,argList,functionBody,supplementalCode,clearCodeValue) {
+/** @private */
+apogeeapp.app.dataDisplayCallbackHelper.doSetCode = function(workspace,memberFullName,argList,functionBody,supplementalCode,optionalClearCodeDataValue) {
+     
+    var member  = workspace.getMemberByFullName(memberFullName);
+     
     var actionData = {};
 
-    if((clearCodeValue !== undefined)&&(functionBody == "")&&(supplementalCode == "")) {
+    if((optionalClearCodeDataValue != undefined)&&(functionBody == "")&&(supplementalCode == "")) {
         //special case - clear code
         actionData.action = "updateData";
         actionData.member = member;
-        actionData.data = clearCodeValue;
+        actionData.data = optionalClearCodeDataValue;
     }
     else {
         //standard case - edit code
@@ -143,7 +212,25 @@ apogeeapp.app.dataDisplayCallbackHelper.saveData = function(member,data) {
 
     var actionResponse =  apogee.action.doAction(actionData,true);
 
-    return true;  
+    return actionResponse;  
+}
+
+/** @private */
+apogeeapp.app.dataDisplayCallbackHelper.doSaveDescription = function(workspace,memberFullName,text) {
+
+    var member  = workspace.getMemberByFullName(memberFullName);
+    
+    if((text === null)||(text === undefined)) {
+        text = "";
+    }
+
+    var actionData = {};
+    actionData.action = "updateDescription";
+    actionData.member = member;
+    actionData.description = text;
+    var actionResponse =  apogee.action.doAction(actionData,true);
+
+    return actionResponse;
 }
 
 
