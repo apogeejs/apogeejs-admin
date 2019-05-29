@@ -15,7 +15,7 @@ apogee.updatefolderfunction = {};
 apogee.updatefolderfunction.ACTION_NAME = "updateFolderFunction";
 
 /** Update folder function action function */
-apogee.updatefolderfunction.updateProperties = function(actionData,optionalContext,processedActions) { 
+apogee.updatefolderfunction.updateProperties = function(actionData,processedActions) { 
           
     var folderFunction = actionData.member;
     

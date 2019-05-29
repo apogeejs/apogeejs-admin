@@ -48,7 +48,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
         
         //this gives the ui code access to some data display functions
         var admin = {
-            getMessenger: () => new apogee.action.Messenger(this.member),
+            getMessenger: () => new apogeeapp.app.UiCommandMessenger(this.member),
             startEditMode: () => this.startEditMode(),
             endEditMode: () => this.endEditMode()
         }

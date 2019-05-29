@@ -106,7 +106,7 @@ apogee.FunctionTable.getPropertyUpdateAction = function(member,newValues) {
         var newArgList = apogee.FunctionTable.parseStringArray(newValues.argListString);
   
         var actionData = {};
-        actionData.action = "updateCode";
+        actionData.action = apogee.updatemember.UPDATE_CODE_ACTION_NAME;
         actionData.member = member;
         actionData.argList = newArgList;
         actionData.functionBody = member.getFunctionBody();

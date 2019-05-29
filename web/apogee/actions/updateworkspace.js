@@ -21,7 +21,7 @@ apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_NAME = "updateWorkspace";
 apogee.updateworkspace.WORKSPACE_UPDATED_EVENT = "workspaceUpdated";
 
 /** Update code action function. */
-apogee.updateworkspace.updateWorkspace = function(actionData,optionalContext,processedActions) { 
+apogee.updateworkspace.updateWorkspace = function(actionData,processedActions) { 
     
     actionData.workspace.setName(actionData.name);
         

@@ -12,12 +12,12 @@ apogee.compoundaction = {};
 apogee.compoundaction.ACTION_NAME = "compoundAction";
 
 /** This method is the action function for a compound action. */
-apogee.compoundaction.compoundActionFunction = function(actionData,optionalContext,processedActions) {
+apogee.compoundaction.compoundActionFunction = function(actionData,processedActions) {
 
     var actionList = actionData.actions;
     for(var i = 0; i < actionList.length; i++) {
         var childActionData = actionList[i];
-        apogee.action.callActionFunction(childActionData,optionalContext,processedActions);
+        apogee.action.callActionFunction(childActionData,processedActions);
     }
 }
 

@@ -586,7 +586,7 @@ apogeeapp.app.Apogee.prototype.getAddChildMenuItems = function(optionalInitialPr
     //add the additional component item
     let menuItem = {};
     menuItem.title = "Other Components...";
-    menuItem.callback = () => apogeeapp.app.addcomponent.addAdditionalComponent(this,optionalInitialProperties,optionalBaseMemberJson,optionalBaseComponentJson);
+    menuItem.callback = () => apogeeapp.app.addcomponent.addAdditionalComponent(this,optionalInitialProperties,optionalBaseMemberValues,optionalBaseMemberValues);
     menuItemList.push(menuItem);
 
     return menuItemList;

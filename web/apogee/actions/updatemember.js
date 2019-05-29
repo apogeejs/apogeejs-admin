@@ -45,7 +45,7 @@ apogee.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME = "asynchFormulaData";
 /** Update asynch error action name - used for publishing an error after an asynchronous formula
  * Action Data format:
  * {
- *  "action": apogee.updatemember.UPDATE_DATA_ACTION_NAME,
+ *  "action": apogee.updatemember.UPDATE_ERROR_ACTION_NAME,
  *  "member": (member to update),
  *  "errorMsg": (new value for the table)
  * }
@@ -71,7 +71,7 @@ apogee.updatemember.UPDATE_DESCRIPTION_ACTION_NAME = "updateDescription";
 apogee.updatemember.MEMBER_UPDATED_EVENT = "memberUpdated";
 
 /** Update code action function. */
-apogee.updatemember.updateCode = function(actionData,optionalContext,processedActions) { 
+apogee.updatemember.updateCode = function(actionData,processedActions) { 
     
     var member = actionData.member;
     if((!member.isCodeable)||(!member.getSetCodeOk())) {
@@ -86,12 +86,8 @@ apogee.updatemember.updateCode = function(actionData,optionalContext,processedAc
     processedActions.push(actionData);
 }
 
-/** Update data action function */
-apogee.updatemember.updateData = function(actionData,optionalContext,processedActions) {
-    
-    if(!actionData.member) {
-        apogee.updatemember.loadMemberName(actionData,optionalContext);
-    }
+/** Update data action function. */
+apogee.updatemember.updateData = function(actionData,processedActions) {
     
     if(!actionData.member.getSetDataOk()) {
         throw new Error("can not set data on member: " + member.getFullName());
@@ -110,11 +106,7 @@ apogee.updatemember.updateData = function(actionData,optionalContext,processedAc
 }
 
 /** Update asynch data action function */
-apogee.updatemember.updateDataPending = function(actionData,optionalContext,processedActions) {
-    
-    if(!actionData.member) {
-        apogee.updatemember.loadMemberName(actionData,optionalContext);
-    }
+apogee.updatemember.updateDataPending = function(actionData,processedActions) {
 	
     var member = actionData.member;
     var token = actionData.token;
@@ -125,7 +117,7 @@ apogee.updatemember.updateDataPending = function(actionData,optionalContext,proc
 }
 
 /** Asynch function update data action function (resulting from code) */
-apogee.updatemember.asynchFunctionUpdateData = function(actionData,optionalContext,processedActions) {
+apogee.updatemember.asynchFunctionUpdateData = function(actionData,processedActions) {
     
     if(!actionData.member.getSetCodeOk()) {
         throw new Error("can not set code on member: " + member.getFullName());
@@ -144,11 +136,7 @@ apogee.updatemember.asynchFunctionUpdateData = function(actionData,optionalConte
 }
 
 /** Update asynch error action function. */
-apogee.updatemember.asynchFunctionUpdateError = function(actionData,optionalContext,processedActions) {
-    
-    if(!actionData.member) {
-        apogee.updatemember.loadMemberName(actionData,optionalContext);
-    }
+apogee.updatemember.asynchFunctionUpdateError = function(actionData,processedActions) {
 
     var member = actionData.member;
     var token = actionData.token;
@@ -165,7 +153,7 @@ apogee.updatemember.asynchFunctionUpdateError = function(actionData,optionalCont
 }
 
 /** Update description */
-apogee.updatemember.updateDescription = function(actionData,optionalContext,processedActions) {
+apogee.updatemember.updateDescription = function(actionData,processedActions) {
         
     var member = actionData.member;
 
@@ -200,19 +188,6 @@ apogee.updatemember.applyData = function(member,data) {
     member.clearErrors();
     member.setData(data);
 }
-
-/** Update code action function. */
-apogee.updatemember.loadMemberName = function(actionData,context) { 
-    
-    if(actionData.memberName) {
-        var path = actionData.memberName.split(".");
-        actionData.member = context.getMember(path);
-    }
-    if(!actionData.member) {
-        throw new Error("Member not found for action: " + actionData.action);
-    }
-}
-
 
 /** Update data action info */
 apogee.updatemember.UPDATE_DATA_ACTION_INFO = {

@@ -28,7 +28,7 @@ apogee.createmember.MEMBER_CREATED_EVENT = "memberCreated";
 
 /** This method instantiates a member, without setting the update data. 
  *@private */
-apogee.createmember.createMember = function(actionData,optionalContext,processedActions) {
+apogee.createmember.createMember = function(actionData,processedActions) {
     
     //create member
     var generator = apogee.Workspace.getMemberGenerator(actionData.createData.type);
@@ -50,7 +50,7 @@ apogee.createmember.createMember = function(actionData,optionalContext,processed
             childActionData.actionInfo = apogee.createmember.ACTION_INFO;
             childActionData.owner = member;
             childActionData.createData = childJsonOutputList[i];
-            apogee.createmember.createMember(childActionData,optionalContext,processedActions);
+            apogee.createmember.createMember(childActionData,processedActions);
         }
     }
     else {

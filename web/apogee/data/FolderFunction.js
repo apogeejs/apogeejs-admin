@@ -295,7 +295,7 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         var updateActionList = [];
         for(var i = 0; i < inputElementArray.length; i++) {
             var entry = {};
-            entry.action = "updateData";
+            entry.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
             entry.member = inputElementArray[i];
             entry.data = arguments[i];
             updateActionList.push(entry);

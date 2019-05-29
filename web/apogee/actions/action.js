@@ -56,11 +56,9 @@ apogee.action.actionInfo = {
  * -The source tells the type of action. This affects how the action is treated. For 
  * example, actions from the UI set the workspace dirty flag to true and are used in the
  * undo list. (NOTE - UNDO LIST DOES NOT EXIST YET)
- * -The optionalContext is a context manager to convert a member name to a
- * member, if supported by the action.
  * -The optionalActionResponse allows you to pass an existing actionResponse rather
  * than creating a new one inside this function as a return value. */
-apogee.action.doAction = function(actionData,addToUndo,optionalContext,optionalActionResponse) {
+apogee.action.doAction = function(actionData,addToUndo,optionalActionResponse) {
     
     //read the workspace
     var workspace;
@@ -78,7 +76,6 @@ apogee.action.doAction = function(actionData,addToUndo,optionalContext,optionalA
     if(workspace.isActionInProgress()) {
         var queuedAction = {};
         queuedAction.actionData = actionData;
-        queuedAction.optionalContext = optionalContext;
         queuedAction.optionalActionResponse = optionalActionResponse;
         queuedAction.addToUndo = addToUndo;
         workspace.queueAction(queuedAction);
@@ -98,7 +95,7 @@ apogee.action.doAction = function(actionData,addToUndo,optionalContext,optionalA
         var processedActions = [];
         
         //do the action
-        apogee.action.callActionFunction(actionData,optionalContext,processedActions); 
+        apogee.action.callActionFunction(actionData,processedActions); 
         
         //finish processing the action
         var recalculateList = [];
@@ -197,7 +194,6 @@ apogee.action.asynchRunQueuedAction = function(queuedActionData) {
     var callback = function() {
         apogee.action.doAction(queuedActionData.actionData,
             queuedActionData.addToUndo,
-            queuedActionData.optionalContext,
             queuedActionData.optionalActionResponse);
     }
     

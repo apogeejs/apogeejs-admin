@@ -54,6 +54,7 @@ apogeeapp.app.CustomComponent.prototype.setDestroyOnInactive = function(destroyO
 apogeeapp.app.CustomComponent.CODE_FIELD_HTML = "html";
 apogeeapp.app.CustomComponent.CODE_FIELD_CSS = "css";
 apogeeapp.app.CustomComponent.CODE_FIELD_UI_CODE = "uiCode";
+
 apogeeapp.app.CustomComponent.VIEW_OUTPUT = "Display";
 apogeeapp.app.CustomComponent.VIEW_CODE = "Input Code";
 apogeeapp.app.CustomComponent.VIEW_SUPPLEMENTAL_CODE = "Input Private";
@@ -301,7 +302,7 @@ apogeeapp.app.CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 //======================================
 
 apogeeapp.app.CustomComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
-    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.JsonTable,userInputValues,optionalBaseJson);
+    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.CustomComponent,userInputValues,optionalBaseJson);
     return json;
 }
 
@@ -314,7 +315,9 @@ apogeeapp.app.CustomComponent.uniqueName = "apogeeapp.app.CustomComponent";
 apogeeapp.app.CustomComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.CustomComponent.DEFAULT_HEIGHT = 500;
 apogeeapp.app.CustomComponent.ICON_RES_PATH = "/componentIcons/chartControl.png";
-
+apogeeapp.app.CustomComponent.DEFAULT_MEMBER_JSON = {
+    "type": apogee.JsonTable.generator.type
+};
 apogeeapp.app.CustomComponent.propertyDialogLines = [
     {
         "type":"checkbox",

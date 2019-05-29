@@ -143,7 +143,7 @@ apogeeapp.app.updatecomponent.updatePropertyValues = function(workspaceUI,compon
         actionData.actions = actionList;
         actionData.workspace = workspace;
 
-        actionResponse = apogee.action.doAction(actionData,true,null,actionResponse);
+        actionResponse = apogee.action.doAction(actionData,true,actionResponse);
     }
     
     //update an component additional properties

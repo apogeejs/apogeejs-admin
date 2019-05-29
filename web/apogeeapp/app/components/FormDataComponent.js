@@ -113,11 +113,7 @@ apogeeapp.app.FormDataComponent.prototype.getFormEditorCallbacks = function() {
     //return form layout
     callbacks.getLayoutInfo = () => {              
             let layoutFunction = this.layoutFunctionTable.getData();
-            //need to define admin!
-            let admin = {
-                getMessenger: () => new apogee.action.Messenger(this.member),
-            }
-            return layoutFunction(admin);
+            return layoutFunction();
         }
     
     //edit ok - always true
@@ -175,7 +171,7 @@ apogeeapp.app.FormDataComponent.DEFAULT_MEMBER_JSON = {
                 "name": "layout",
                 "type": "apogee.FunctionTable",
                 "updateData": {
-                    "argList":["admin"],
+                    "argList":[],
                 }
             },
             "data": {

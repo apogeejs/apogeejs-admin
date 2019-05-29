@@ -100,7 +100,7 @@ apogeeapp.app.updateworkspace.updatePropertyValues = function(workspaceUI,oldVal
         actionData.workspace = workspace;
         actionData.name = newValues.name;
         
-        actionResponse = apogee.action.doAction(actionData,true,null,actionResponse);
+        actionResponse = apogee.action.doAction(actionData,true,actionResponse);
     }
     
     //update any workspace ui properties here

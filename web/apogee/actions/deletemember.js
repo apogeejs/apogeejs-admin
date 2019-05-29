@@ -21,7 +21,7 @@ apogee.deletemember.ACTION_NAME = "deleteMember";
 apogee.deletemember.MEMBER_DELETED_EVENT = "memberDeleted";
 
 /** Delete member action function */
-apogee.deletemember.deleteMember = function(actionData,optionalContext,processedActions) {
+apogee.deletemember.deleteMember = function(actionData,processedActions) {
 
     var deleteList = [];
 

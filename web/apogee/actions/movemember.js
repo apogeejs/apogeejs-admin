@@ -13,7 +13,7 @@ apogee.movemember = {};
 apogee.movemember.ACTION_NAME = "moveMember";
 
 /** Move member action function */
-apogee.movemember.moveMember = function(actionData,optionalContext,processedActions) {
+apogee.movemember.moveMember = function(actionData,processedActions) {
         
     var member = actionData.member;
         

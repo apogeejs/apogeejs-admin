@@ -180,7 +180,7 @@ apogeeapp.app.dataDisplayCallbackHelper.doSaveData = function(workspace,memberFu
     var member  = workspace.getMemberByFullName(memberFullName);
     
     var actionData = {};
-    actionData.action = "updateData";
+    actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
     actionData.member = member;
     actionData.data = data;
     var actionResponse =  apogee.action.doAction(actionData,true);
@@ -197,13 +197,13 @@ apogeeapp.app.dataDisplayCallbackHelper.doSetCode = function(workspace,memberFul
 
     if((optionalClearCodeDataValue != undefined)&&(functionBody == "")&&(supplementalCode == "")) {
         //special case - clear code
-        actionData.action = "updateData";
+        actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
         actionData.member = member;
         actionData.data = optionalClearCodeDataValue;
     }
     else {
         //standard case - edit code
-        actionData.action = "updateCode";
+        actionData.action = apogee.updatemember.UPDATE_CODE_ACTION_NAME;
         actionData.member = member;
         actionData.argList = argList;
         actionData.functionBody = functionBody;
@@ -225,7 +225,7 @@ apogeeapp.app.dataDisplayCallbackHelper.doSaveDescription = function(workspace,m
     }
 
     var actionData = {};
-    actionData.action = "updateDescription";
+    actionData.action = apogee.updatemember.UPDATE_DESCRIPTION_ACTION_NAME;
     actionData.member = member;
     actionData.description = text;
     var actionResponse =  apogee.action.doAction(actionData,true);

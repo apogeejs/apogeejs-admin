@@ -71,9 +71,8 @@ apogeeapp.app.DynamicForm.prototype.getFormCallbacks = function() {
     var callbacks = {
             getData: () => {              
                 let layoutFunction = this.member.getData();
-                //need to define admin!
                 let admin = {
-                    getMessenger: () => new apogee.action.Messenger(this.member),
+                    getMessenger: () => new apogeeapp.app.UiCommandMessenger(this.member)
                 }
                 return layoutFunction(admin);
             }
@@ -98,7 +97,7 @@ apogeeapp.app.DynamicForm.displayName = "Dynamic Form";
 apogeeapp.app.DynamicForm.uniqueName = "apogeeapp.app.DynamicForm";
 apogeeapp.app.DynamicForm.DEFAULT_WIDTH = 400;
 apogeeapp.app.DynamicForm.DEFAULT_HEIGHT = 400;
-apogeeapp.app.DynamicForm.ICON_RES_PATH = "/componentIcons/functionTable.png";
+apogeeapp.app.DynamicForm.ICON_RES_PATH = "/componentIcons/formControl.png";
 apogeeapp.app.DynamicForm.DEFAULT_MEMBER_JSON = {
     "type": apogee.FunctionTable.generator.type,
     "updateData": {
