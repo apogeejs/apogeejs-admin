@@ -86,8 +86,7 @@ apogee.JavascriptTable.prototype.processMemberFunction = function(memberGenerato
         //if the return value is a Promise, the data is asynch asynchronous!
 
         //set pending manually here rather than doing below in a separate action
-        var token = apogee.action.getAsynchToken();
-        this.setResultPending(true,token);
+        this.setResultPending(true,data);
         
         var instance = this;
        
@@ -96,7 +95,7 @@ apogee.JavascriptTable.prototype.processMemberFunction = function(memberGenerato
             var actionData = {};
             actionData.action = "asynchFormulaData";
             actionData.member = instance;
-            actionData.token = token;
+            actionData.promise = data;
             actionData.data = memberValue;
             var actionResponse =  apogee.action.doAction(actionData,false);
         }
@@ -104,7 +103,7 @@ apogee.JavascriptTable.prototype.processMemberFunction = function(memberGenerato
             var actionData = {};
             actionData.action = "updateError";
             actionData.member = instance;
-            actionData.token = token;
+            actionData.promise = data;
             actionData.errorMsg = errorMsg;
             var actionResponse =  apogee.action.doAction(actionData,false);
         }

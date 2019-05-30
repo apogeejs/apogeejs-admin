@@ -50,6 +50,11 @@ apogeeapp.app.updatecomponent.updateComponent = function(component) {
             return true;
         }
 
+        var nameChange = false;
+        var targetName;
+        var targetOwner;
+        var member = component.getMember();
+        
         //validate the name, if it changed
         if(newValues.name !== undefined) {
             //validate name
@@ -58,26 +63,44 @@ apogeeapp.app.updatecomponent.updateComponent = function(component) {
                 alert(nameResult.errorMessage);
                 return false;
             }
+            
+            targetName = newValues.name;
+            nameChange = true;
+        }
+        else {
+            targetName = member.getName();
         }
 
-        // if the parent name is included, convert it to the parent/owner object
+        //make sure the parent is value
         if((folderMap)&&(newValues.parentName)) {
-            //get the parent value
-           newValues.owner = folderMap[newValues.parentName];
-           delete newValues.parentName;
 
-            if(newValues.owner == component.getMember()) {
+            if(newValues.parentName == component.getMember().getFullName()) {
                 alert("Illegal destination: you put an object inside itself");
                 return false;
             }
-
-            undoValues.owner = component.getMember().getOwner();
+              
+            targetOwner = folderMap[newValues.parentName];
+            nameChange = true;
+        }
+        else {
+            targetOwner = member.getOwner();
         }
 
-        //need to test if fields are valid!
+        //need to test if other fields are valid!
+        
+        var initialFullName = component.getMember().getFullName();
+        var targetFullName;
+        if(nameChange) { 
+            //this will be the new full name
+            targetFullName = targetOwner.getChildFullName(targetName);
+        }
+        else {
+            targetFullName = initialFullName;
+        }
 
         //update command
-        var command = apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand(component,newValues,undoValues);
+        var workspaceUI = component.getWorkspaceUI();     
+        var command = apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand(workspaceUI,newValues,undoValues,initialFullName,targetFullName);
         workspaceUI.getApp().executeCommand(command);
 
         //return true to close the dialog
@@ -88,15 +111,13 @@ apogeeapp.app.updatecomponent.updateComponent = function(component) {
     apogeeapp.app.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
-apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand = function(component,newValues,undoValues) {
-    
-    var workspaceUI = component.getWorkspaceUI();
-    var componentFullName = component.getMember().getFullName(); 
-    
+/** This creates the command. Both the initial and full names should be passed in 
+ * even is they are the same. */
+apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand = function(workspaceUI,newValues,undoValues,initialFullName,targetFullName) {
     var command = {};
-    command.cmd = () => apogeeapp.app.updatecomponent.updatePropertyValues(workspaceUI,componentFullName,newValues);
-    command.undoCmd = () => apogeeapp.app.updatecomponent.updatePropertyValues(workspaceUI,componentFullName,undoValues);
-    command.desc = "Update properties: " + component.getMember().getFullName();
+    command.cmd = () => apogeeapp.app.updatecomponent.updatePropertyValues(workspaceUI,initialFullName,newValues);
+    command.undoCmd = () => apogeeapp.app.updatecomponent.updatePropertyValues(workspaceUI,targetFullName,undoValues);
+    command.desc = "Update properties: " + initialFullName;
     return command;
 }
 //=====================================
@@ -110,7 +131,8 @@ apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand = function(compo
 apogeeapp.app.updatecomponent.updatePropertyValues = function(workspaceUI,componentFullName,newValues) {
     
     var workspace = workspaceUI.getWorkspace();
-    var member = workspace.getMemberByFullName(componentFullName);
+    //get the member
+    var member = workspace.getMemberByFullName(componentFullName);   
     var component = workspaceUI.getComponent(member);
 
     var actionResponse = new apogee.ActionResponse();
@@ -120,11 +142,16 @@ apogeeapp.app.updatecomponent.updatePropertyValues = function(workspaceUI,compon
 
     //check if a move action is needed
     if((newValues.name)||(newValues.owner)) {
+        //get the new name
+        var newMemberName = newValues.name ? newValues.name : member.getName();
+        //get the new owner
+        var newMemberOwner = newValues.parentName ? workspace.getMemberByFullName(newValues.parentName) : member.getOwner(); 
+        
         actionData = {};
         actionData.action = "moveMember";
         actionData.member = member;
-        actionData.name = newValues.name ? newValues.name : member.getName();
-        actionData.owner = newValues.owner ? newValues.owner : member.getOwner();
+        actionData.name = newMemberName;
+        actionData.owner = newMemberOwner;
         actionList.push(actionData);
     }
 

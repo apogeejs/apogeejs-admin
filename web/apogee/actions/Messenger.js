@@ -73,7 +73,7 @@ apogee.action.Messenger = class {
         
         var actionData = {};
         actionData.action = apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME;
-        actionData.memberName = member;
+        actionData.member = member;
         actionData.errorMsg = errorMessage;
         
         var actionResponse = apogee.action.doAction(actionData,addToUndo);
@@ -90,13 +90,11 @@ apogee.action.Messenger = class {
         if(!member) {
             throw new Error("Error calling messenger - member not fond: " + updateMemberName);
         }
-        
-        var token = apogee.action.getAsynchToken();
 
         var actionData = {};
         actionData.action = apogee.updatemember.UPDATE_DATA_PENDING_ACTION_NAME;
-        actionData.memberName = member;
-        actionData.token = token;
+        actionData.member = member;
+        actionData.promise = dataPromise;
         
         var actionResponse =  apogee.action.doAction(actionData,addToUndo);
 
@@ -105,7 +103,7 @@ apogee.action.Messenger = class {
             var actionData = {};
             actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
             actionData.member = member;
-            actionData.token = token;
+            actionData.promise = dataPromise;
             actionData.data = memberValue;
             var actionResponse =  apogee.action.doAction(actionData,addToUndo);
         }
@@ -113,7 +111,7 @@ apogee.action.Messenger = class {
             var actionData = {};
             actionData.action = apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME;
             actionData.member = member;
-            actionData.token = token;
+            actionData.promise = dataPromise;
             actionData.errorMsg = errorMsg;
             var actionResponse =  apogee.action.doAction(actionData,addToUndo);
         }

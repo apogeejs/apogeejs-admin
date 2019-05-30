@@ -111,8 +111,7 @@ apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,pare
     
     var workspace = workspaceUI.getWorkspace();
     var memberName = propertyValues.name;
-//WE NEED THE PROPER WAY OF DOING THIS!!! - HERE I AM COPYING CODE FROM ELSEWHERE. FIX THIS!!!
-    var memberFullName = parent.getPossesionNameBase() + memberName;
+    var memberFullName = parent.getChildFullName(memberName);
     
     //un-create function
     var deleteFunction = () => apogeeapp.app.deletecomponent.doDeleteComponent(workspace,memberFullName);

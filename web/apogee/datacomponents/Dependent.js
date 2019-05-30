@@ -88,7 +88,7 @@ apogee.Dependent.initializeImpactors = function() {
         this.createDependencyError(errorDependencies);
     }
     else if(resultPending) {
-        this.setResultPending(true,apogee.action.DEPENDENT_PENDING_TOKEN);
+        this.setResultPending(true,null);
     }
     else if(resultInvalid) {
         this.setResultInvalid(true);

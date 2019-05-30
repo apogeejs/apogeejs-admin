@@ -104,18 +104,7 @@ apogeeapp.app.dataDisplayCallbackHelper.saveData = function(member,data) {
     
     var command = {};
     command.cmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSaveData(workspace,memberFullName,data);
-    
-    //undo command may be setting data or code
-    if((member.isCodeable)&&(member.hasCode())) {
-        let oldArgList = member.getArgList();
-        let oldFunctionBody = member.getFunctionBody();
-        let oldPrivateCode = member.getSupplementalCode();
-        command.undoCmd = () => apogeeapp.app.dataDisplayCallbackHelper.setCode(workspace,memberFullName,oldArgList,oldFunctionBody,oldPrivateCode);
-    }
-    else {
-        let oldData = member.getData();
-        command.undoCmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSaveData(workspace,memberFullName,oldData);
-    }
+    command.undoCmd = apogeeapp.app.dataDisplayCallbackHelper.getMemberStateUndoCommand(member);
     
     command.desc = "Set data value: " + member.getFullName();
     
@@ -133,18 +122,7 @@ apogeeapp.app.dataDisplayCallbackHelper.setCode = function(member,argList,functi
     
     var command = {};
     command.cmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSetCode(workspace,memberFullName,argList,functionBody,supplementalCode,optionalClearCodeDataValue);
-    
-    //undo command may be setting data or code
-    if(member.hasCode()) {
-        let oldArgList = member.getArgList();
-        let oldFunctionBody = member.getFunctionBody();
-        let oldPrivateCode = member.getSupplementalCode();
-        command.undoCmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSetCode(workspace,memberFullName,oldArgList,oldFunctionBody,oldPrivateCode);
-    }
-    else {
-        let oldData = member.getData();
-        command.undoCmd = () => apogeeapp.app.dataDisplayCallbackHelper.doSaveData(workspace,memberFullName,oldData);
-    }
+    command.undoCmd = apogeeapp.app.dataDisplayCallbackHelper.getMemberStateUndoCommand(member);
     
     command.desc = "Set code: " + member.getFullName();
     
@@ -167,6 +145,87 @@ apogeeapp.app.dataDisplayCallbackHelper.saveDescription = function(member,text) 
     apogeeapp.app.Apogee.getInstance().executeCommand(command);
     
     return true;
+}
+
+/** This method can be called to create a undo function to return a member to the current state
+ * following a code or data update. */
+apogeeapp.app.dataDisplayCallbackHelper.getMemberStateUndoCommand = function(member) {
+    
+    let undoCommand;
+    
+    let workspace = member.getWorkspace();
+    let memberFullName = member.getFullName();
+    
+    if((member.isCodeable)&&(member.hasCode())) {
+        //check if the current state has code set - if so, set the code for the undo function
+        let oldArgList = member.getArgList();
+        let oldFunctionBody = member.getFunctionBody();
+        let oldPrivateCode = member.getSupplementalCode();
+        undoCommand = () => apogeeapp.app.dataDisplayCallbackHelper.doSetCode(workspace,memberFullName,oldArgList,oldFunctionBody,oldPrivateCode);
+    }
+    else {
+        //here the object has data set. Check if an "alternate" data values was set - error, pending or invalid
+        if(member.hasError()) {
+            //member has an error
+            let errors = member.getErrors();
+            let errorMessage = apogee.ActionResponse.getListErrorMsg(errors);
+            undoCommand = () => apogeeapp.app.dataDisplayCallbackHelper.doErrorUpdate(workspace,memberFullName,errorMessage);
+            
+        }
+        else if(member.getResultPending()) {
+            //the result is pending
+            //our undo will have to either reinstate this promse, if it is not yet resolved,
+            //or if it is resolved, set the data to the resolved value or set the error message.
+            let pendingPromise = member.getPendingPromise();
+            
+            let promiseResolved = false;
+            let promiseFailed = false;
+            let promiseValue;
+            let promiseErrorMessage;
+            
+            let storePromiseResolution = resultValue => {
+                promiseResolved = true;
+                promiseValue = resultValue;
+            }
+            
+            let storePromiseErrorMessage = errorMsg => {
+                promiseFailed = true;
+                promiseErrorMessage = errorMsg;
+            }
+            
+            //add another then/catch to the promise
+            pendingPromise.then(storePromiseResolution).catch(storePromiseErrorMessage);
+            
+            //the undo command reinstates the pending state or it sets the appropriate value/error
+            undoCommand = () => {
+                
+                if(promiseResolved) {
+                    //if the promise if resolved, the undo should be a data update
+                    return apogeeapp.app.dataDisplayCallbackHelper.doSaveData(workspace,memberFullName,promiseValue);
+                }
+                else if(promiseFailed) {
+                    //if the promise is failed the undo should be a error message
+                    return apogeeapp.app.dataDisplayCallbackHelper.doErrorUpdate(workspace,memberFullName,promiseErrorMessage);
+                }
+                else {
+                    //if the promise is not resolved or failed, we can just reset the member to pending with this promise
+                    return apogeeapp.app.dataDisplayCallbackHelper.doResetPendingState(workspace,memberFullName,pendingPromise);
+                }  
+            }
+        }
+        else if(member.getResultInvalid()) {
+            //result is invalid - set value to invalid in undo
+            undoCommand = () => apogeeapp.app.dataDisplayCallbackHelper.doSaveData(workspace,memberFullName,apogee.util.INVALID_VALUE);
+        }
+        else {
+            //this is a standard data value
+            let oldData = member.getData();
+            undoCommand = () => apogeeapp.app.dataDisplayCallbackHelper.doSaveData(workspace,memberFullName,oldData);
+        }
+    }
+    
+    return undoCommand;
+    
 }
 
 //===============================
@@ -218,7 +277,7 @@ apogeeapp.app.dataDisplayCallbackHelper.doSetCode = function(workspace,memberFul
 /** @private */
 apogeeapp.app.dataDisplayCallbackHelper.doSaveDescription = function(workspace,memberFullName,text) {
 
-    var member  = workspace.getMemberByFullName(memberFullName);
+    var member = workspace.getMemberByFullName(memberFullName);
     
     if((text === null)||(text === undefined)) {
         text = "";
@@ -230,6 +289,44 @@ apogeeapp.app.dataDisplayCallbackHelper.doSaveDescription = function(workspace,m
     actionData.description = text;
     var actionResponse =  apogee.action.doAction(actionData,true);
 
+    return actionResponse;
+}
+
+//THESE ARE EXTERNALLY CALLED
+
+
+/** @private */
+apogeeapp.app.dataDisplayCallbackHelper.doErrorUpdate = function(workspace,memberFullName,errorMessage) {
+    var member = workspace.getMemberByFullName(memberFullName);
+    if(!member) {
+        throw new Error("Error calling messenger - member not fond: " + memberFullName);
+    }
+
+    var actionData = {};
+    actionData.action = apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME;
+    actionData.member = member;
+    actionData.errorMsg = errorMessage;
+
+    var actionResponse = apogee.action.doAction(actionData,true);
+    
+    return actionResponse;
+}
+
+/** This method resets the pending state for a member. It does not reissue the pending promise, that should al 
+ * @private */
+apogeeapp.app.dataDisplayCallbackHelper.doResetPendingState = function(workspace,memberFullName,pendingPromise) {
+    var member = workspace.getMemberByFullName(memberFullName);
+    if(!member) {
+        throw new Error("Error calling messenger - member not fond: " + memberFullName);
+    }
+
+    var actionData = {};
+    actionData.action = apogee.updatemember.UPDATE_DATA_PENDING_ACTION_NAME;
+    actionData.member = member;
+    actionData.promise = pendingPromise;
+    
+    var actionResponse =  apogee.action.doAction(actionData,true);
+    
     return actionResponse;
 }
 

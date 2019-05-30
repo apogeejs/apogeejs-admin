@@ -27,6 +27,11 @@ apogee.Owner.isOwner = true;
 // * by this object. */
 //apogee.Owner.getPossesionNameBase = function();
 
+/** This method returns the full name in dot notation for this object. */
+apogee.Owner.getChildFullName = function(childName) {
+    return this.getPossesionNameBase() + childName;
+}
+
 //must be implented by extending object
 ///** This method retrieves the context manager for this owner. */
 //apogee.Owner.getContextManager = function();

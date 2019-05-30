@@ -109,9 +109,9 @@ apogee.updatemember.updateData = function(actionData,processedActions) {
 apogee.updatemember.updateDataPending = function(actionData,processedActions) {
 	
     var member = actionData.member;
-    var token = actionData.token;
+    var promise = actionData.promise;
     
-    member.setResultPending(true,token);
+    member.setResultPending(true,promise);
     
     processedActions.push(actionData);
 }
@@ -124,9 +124,9 @@ apogee.updatemember.asynchFunctionUpdateData = function(actionData,processedActi
     }
         
     var member = actionData.member;
-    var token = actionData.token;
+    var promise = actionData.promise;
 
-    if(member.pendingTokenMatches(token)) {
+    if(member.pendingPromiseMatches(promise)) {
         //apply the data but DO NOT clear the code (this is an asymch update to a coded member)
         apogee.updatemember.applyData(member,actionData.data);
         member.setResultPending(false);
@@ -139,9 +139,9 @@ apogee.updatemember.asynchFunctionUpdateData = function(actionData,processedActi
 apogee.updatemember.asynchFunctionUpdateError = function(actionData,processedActions) {
 
     var member = actionData.member;
-    var token = actionData.token;
+    var promise = actionData.promise;
     
-    if(member.pendingTokenMatches(token)) {
+    if(member.pendingPromiseMatches(promise)) {
         //set the error flag
         var actionError = new apogee.ActionError(actionData.errorMsg,"Codeable - Calculate",member);
         member.addError(actionError);

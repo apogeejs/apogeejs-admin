@@ -172,19 +172,6 @@ apogee.action.callActionFunction = function(actionData,context,processedActions)
     }  
 }
 
-/** This method returns a random numberic token that is used in asynch updates.
- * It serves two purposes, first to ensure only the _latest_ asyhc update is 
- * done. Secondly it prevents someone arbitrarily using this method 
- * without initially setting the pending flag.
- */
-apogee.action.getAsynchToken = function() {
-    return Math.random();
-}
-
-/** This token value should be used if a table is pending because it is waiting for
- * an update in another table. */
-apogee.action.DEPENDENT_PENDING_TOKEN = -1;
-
 //=======================================
 // Internal Methods
 //=======================================

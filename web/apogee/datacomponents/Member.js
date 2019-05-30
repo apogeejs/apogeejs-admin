@@ -70,7 +70,7 @@ apogee.Member.getName = function() {
 /** This method returns the full name in dot notation for this object. */
 apogee.Member.getFullName = function() {
     if(this.owner) {
-        return this.owner.getPossesionNameBase() + this.name;
+        return this.owner.getChildFullName(this.name);
     }
     else {
         //this shouldn't happen
@@ -172,12 +172,19 @@ apogee.Member.getResultPending = function() {
     return this.resultPending;
 }
 
-/** This sets the result pending flag. If is pending is set to true a
- * pending token must be set. (from apogee.action.getPendingToken) This 
- * is used to ensure only the latest asynchronous action is kept. */
-apogee.Member.setResultPending = function(isPending,pendingToken) {
+/** This returns true if the member is not up to date, typically
+ * do to waiting on an asynchronous operation. */
+apogee.Member.getPendingPromise = function() {
+    return this.pendingPromise;
+}
+
+/** This sets the result pending flag. If is pending is set to true and
+ * this is the object whose value is pending (as opposed to a member that 
+ * is dependent on the pending member) the promise should be saved. This 
+ * is used to ensure only a matching asynchronous action is kept. */
+apogee.Member.setResultPending = function(isPending,promise) {
     this.resultPending = isPending;
-    this.pendingToken = pendingToken;
+    this.pendingPromise = promise;
 }
 
 /** This returns true if the member is invalid, typically
@@ -194,8 +201,8 @@ apogee.Member.setResultInvalid = function(isInvalid) {
 }
 
 /** This returns true if the pending token matches. */
-apogee.Member.pendingTokenMatches = function(pendingToken) {
-    return (this.pendingToken === pendingToken);
+apogee.Member.pendingPromiseMatches = function(promise) {
+    return (this.pendingPromise === promise);
 }
 
 apogee.Member.getSetDataOk = function() {
