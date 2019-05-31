@@ -82,7 +82,7 @@ apogee.JavascriptTable.prototype.processMemberFunction = function(memberGenerato
         //value is invalid if return is this predefined value
         this.setResultInvalid(true);
     }
-    else if(apogee.base.isPromise(data)) {
+    else if(data instanceof Promise) {
         //if the return value is a Promise, the data is asynch asynchronous!
 
         //set pending manually here rather than doing below in a separate action

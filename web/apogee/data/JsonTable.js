@@ -69,7 +69,7 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
         //value is invalid if return is this predefined value
         this.setResultInvalid(true);
     }
-    else if(apogee.base.isPromise(data)) {
+    else if(data instanceof Promise) {
         //if the return value is a Promise, the data is asynch asynchronous!
 
         //set pending manually here rather than doing below in a separate action
@@ -80,7 +80,7 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
         var asynchCallback = function(memberValue) {
             //set the data for the table, along with triggering updates on dependent tables.
             var actionData = {};
-            actionData.action = "asynchFormulaData";
+            actionData.action = apogee.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME;
             actionData.member = instance;
             actionData.promise = data;
             actionData.data = memberValue;
@@ -88,7 +88,7 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
         }
         var asynchErrorCallback = function(errorMsg) {
             var actionData = {};
-            actionData.action = "updateError";
+            actionData.action = apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME;
             actionData.member = instance;
             actionData.promise = data;
             actionData.errorMsg = errorMsg;

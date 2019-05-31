@@ -101,7 +101,7 @@ apogee.action.Messenger = class {
         var asynchCallback = function(memberValue) {
             //set the data for the table, along with triggering updates on dependent tables.
             var actionData = {};
-            actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
+            actionData.action = apogee.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME;
             actionData.member = member;
             actionData.promise = dataPromise;
             actionData.data = memberValue;

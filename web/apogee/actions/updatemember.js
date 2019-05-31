@@ -96,11 +96,6 @@ apogee.updatemember.updateData = function(actionData,processedActions) {
     var member = actionData.member;
 
     apogee.updatemember.applyData(member,actionData.data);
-
-    //clear the code - so the data is used
-    if(member.isCodeable) {
-        member.clearCode();
-    }
     
     processedActions.push(actionData);
 }
@@ -187,6 +182,10 @@ apogee.updatemember.applyCode = function(codeable,argList,functionBody,supplemen
 apogee.updatemember.applyData = function(member,data) {
     member.clearErrors();
     member.setData(data);
+    if(member.isCodeable) {
+        //clear the code - so the data is used
+        member.clearCode();
+    }
 }
 
 /** Update data action info */
