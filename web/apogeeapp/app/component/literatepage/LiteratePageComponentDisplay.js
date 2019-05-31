@@ -272,7 +272,7 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
 //                    this.insertChildIntoDisplay(member.getName(),selection);
 //                }
 //
-//                apogeeapp.app.addcomponent.addComponent(app,generator,initialValues,null,onSuccess);
+//                apogeeapp.app.addcomponentseq.addComponent(app,generator,initialValues,null,onSuccess);
 //            }
 //            this.componentToolbarElement.appendChild(buttonElement);
 //        }

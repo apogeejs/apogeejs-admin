@@ -184,7 +184,7 @@ apogeeapp.app.Component.prototype.getMenuItems = function(optionalMenuItemList) 
     //add the standard entries
     var itemInfo = {};
     itemInfo.title = "Edit Properties";
-    itemInfo.callback = () => apogeeapp.app.updatecomponent.updateComponent(this);
+    itemInfo.callback = () => apogeeapp.app.updatecomponentseq.updateComponent(this);
     menuItemList.push(itemInfo);
 
     var itemInfo = {};

@@ -276,7 +276,7 @@ apogeeapp.app.Apogee.prototype.initApp = function() {
         var workspaceFileMetadata = this.appConfigManager.getInitialWorkspaceFileMetadata(this);
         
         var openWorkspace = workspaceText => {
-            apogeeapp.app.openworkspace.openWorkspace(this,workspaceText,workspaceFileMetadata);
+            apogeeapp.app.openworkspaceseq.openWorkspace(this,workspaceText,workspaceFileMetadata);
         };
         
         workspaceFilePromise.then(openWorkspace).catch(errorMsg => alert("Error downloading initial workspace."));
@@ -447,13 +447,13 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
     menuBarLeft.appendChild(menu.getElement());
     menus[name] = menu;
     
-    var importCallback = () => apogeeapp.app.importworkspace.importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderComponent);
+    var importCallback = () => apogeeapp.app.importworkspaceseq.importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderComponent);
     menu.addCallbackMenuItem("Import as Folder",importCallback);
     
-    var import2Callback = () => apogeeapp.app.importworkspace.importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderFunctionComponent);
+    var import2Callback = () => apogeeapp.app.importworkspaceseq.importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderFunctionComponent);
     menu.addCallbackMenuItem("Import as Folder Function",import2Callback);
     
-    var exportCallback = () => apogeeapp.app.exportworkspace.exportWorkspace(this,this.fileAccessObject);
+    var exportCallback = () => apogeeapp.app.exportworkspaceseq.exportWorkspace(this,this.fileAccessObject);
     menu.addCallbackMenuItem("Export as Workspace",exportCallback);
     
     //allow the implementation to add more menus or menu items
@@ -479,12 +479,12 @@ apogeeapp.app.Apogee.prototype.getWorkspaceMenuItems = function() {
     
     menuItem = {};
     menuItem.title = "New";
-    menuItem.callback = () => apogeeapp.app.createworkspace.createWorkspace(this);
+    menuItem.callback = () => apogeeapp.app.createworkspaceseq.createWorkspace(this);
     menuItems.push(menuItem);
     
     menuItem = {};
     menuItem.title = "Open";
-    menuItem.callback = () => apogeeapp.app.openworkspace.openWorkspace(this,this.fileAccessObject);
+    menuItem.callback = () => apogeeapp.app.openworkspaceseq.openWorkspace(this,this.fileAccessObject);
     menuItems.push(menuItem);
 
     var workspaceUI = this.getWorkspaceUI();
@@ -494,19 +494,19 @@ apogeeapp.app.Apogee.prototype.getWorkspaceMenuItems = function() {
         if(this.fileAccessObject.directSaveOk(fileMetadata)) {
             menuItem = {};
             menuItem.title = "Save";
-            menuItem.callback = () => apogeeapp.app.saveworkspace.saveWorkspace(this,this.fileAccessObject,true);
+            menuItem.callback = () => apogeeapp.app.saveworkspaceseq.saveWorkspace(this,this.fileAccessObject,true);
             menuItems.push(menuItem);
         }
 
         menuItem = {};
         menuItem.title = "Save as";
-        menuItem.callback = () => apogeeapp.app.saveworkspace.saveWorkspace(this,this.fileAccessObject,false);
+        menuItem.callback = () => apogeeapp.app.saveworkspaceseq.saveWorkspace(this,this.fileAccessObject,false);
         menuItems.push(menuItem);
     }  
 
     menuItem = {};
     menuItem.title = "Close";
-    menuItem.callback = () => apogeeapp.app.closeworkspace.closeWorkspace(this);
+    menuItem.callback = () => apogeeapp.app.closeworkspaceseq.closeWorkspace(this);
     menuItems.push(menuItem);
     
     return menuItems;
@@ -579,14 +579,14 @@ apogeeapp.app.Apogee.prototype.getAddChildMenuItems = function(optionalInitialPr
         
         let menuItem = {};
         menuItem.title = "Add " + generator.displayName;
-        menuItem.callback = () => apogeeapp.app.addcomponent.addComponent(this,generator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
+        menuItem.callback = () => apogeeapp.app.addcomponentseq.addComponent(this,generator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
         menuItemList.push(menuItem);
     }
 
     //add the additional component item
     let menuItem = {};
     menuItem.title = "Other Components...";
-    menuItem.callback = () => apogeeapp.app.addcomponent.addAdditionalComponent(this,optionalInitialProperties,optionalBaseMemberValues,optionalBaseMemberValues);
+    menuItem.callback = () => apogeeapp.app.addcomponentseq.addAdditionalComponent(this,optionalInitialProperties,optionalBaseMemberValues,optionalBaseMemberValues);
     menuItemList.push(menuItem);
 
     return menuItemList;

@@ -345,7 +345,7 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
                     this.insertChildIntoDisplay(member.getName(),selection);
                 }
 
-                apogeeapp.app.addcomponent.addComponent(app,generator,initialValues,null,onSuccess);
+                apogeeapp.app.addcomponentseq.addComponent(app,generator,initialValues,null,onSuccess);
             }
             this.componentToolbarElement.appendChild(buttonElement);
         }
@@ -363,7 +363,7 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
                 this.insertChildIntoDisplay(member.getName(),selection);
             }
 
-            var doAddComponent = apogeeapp.app.addcomponent.getAddAdditionalComponentCallback(app,initialValues,null,onSuccess);
+            var doAddComponent = apogeeapp.app.addcomponentseq.getAddAdditionalComponentCallback(app,initialValues,null,onSuccess);
             doAddComponent();
 
             //if successfull, add to the ui

@@ -3,37 +3,17 @@
 apogeeapp.app.closeworkspace = {};
 
 //=====================================
-// UI Entry Point
+// Action
 //=====================================
 
-apogeeapp.app.closeworkspace.closeWorkspace = function(app) {
-    
-    var activeWorkspaceUI = app.getWorkspaceUI();
-    if(activeWorkspaceUI === null) {
-        alert("There is no workspace close.");
-        return;
-    }
-
-    //update this to use undo queue, when it is finished 
-    var workspace = activeWorkspaceUI.getWorkspace();
-    if(workspace.getIsDirty()) {
-        var doClose = confirm("There is unsaved data. Are you sure you want to close the workspace?");
-        if(!doClose) {
-            return;
-        }
-    }
-    
+apogeeapp.app.closeworkspace.createCloseWorkspaceCommand = function(app) {
     var command = {};
     command.cmd = () => apogeeapp.app.closeworkspace.doCloseWorkspace(app);
     //no undo
     command.desc = "Close workspace";
     
-    app.executeCommand(command);
+    return command;
 }
-
-//=====================================
-// Action
-//=====================================
 
 apogeeapp.app.closeworkspace.doCloseWorkspace = function(app) {
     var activeWorkspaceUI = app.getWorkspaceUI();

@@ -1,6 +1,6 @@
 
 
-apogeeapp.app.exportworkspace = {};
+apogeeapp.app.exportworkspaceseq = {};
 
 //=====================================
 // UI Entry Point
@@ -8,7 +8,7 @@ apogeeapp.app.exportworkspace = {};
 
 
 /** This gets a callback to add a component. */
-apogeeapp.app.exportworkspace.exportWorkspace = function(app,fileAccessObject) {
+apogeeapp.app.exportworkspaceseq.exportWorkspace = function(app,fileAccessObject) {
     //get the active workspace
     var workspaceUI = app.getWorkspaceUI();
     if(!workspaceUI) {
@@ -24,13 +24,13 @@ apogeeapp.app.exportworkspace.exportWorkspace = function(app,fileAccessObject) {
     }
 
     //create the dialog layout - do on the fly because folder list changes
-    var dialogLayout = apogeeapp.app.exportworkspace.getExportDialogLayout(folderNames);
+    var dialogLayout = apogeeapp.app.exportworkspaceseq.getExportDialogLayout(folderNames);
 
     //create on submit callback
     var onSubmitFunction = function(result) {         
         var folder = folderMap[result.parentName];
 
-        var workspaceText = apogeeapp.app.exportworkspace.getWorkspaceText(app,folder);
+        var workspaceText = apogeeapp.app.exportworkspaceseq.getWorkspaceText(app,folder);
         if(!workspaceText) {
             alert("There is no workspace open.");
             return;
@@ -49,7 +49,7 @@ apogeeapp.app.exportworkspace.exportWorkspace = function(app,fileAccessObject) {
 }
     
 
-apogeeapp.app.exportworkspace.getWorkspaceText = function(app,folder) {
+apogeeapp.app.exportworkspaceseq.getWorkspaceText = function(app,folder) {
     var activeWorkspaceUI = app.getWorkspaceUI();
     if(activeWorkspaceUI) {
         var workspaceJson = activeWorkspaceUI.toJson(folder);
@@ -65,7 +65,7 @@ apogeeapp.app.exportworkspace.getWorkspaceText = function(app,folder) {
 //---------------------------------
 
 /** @private */
-apogeeapp.app.exportworkspace.getExportDialogLayout = function(folderNames) {
+apogeeapp.app.exportworkspaceseq.getExportDialogLayout = function(folderNames) {
         
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};

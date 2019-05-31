@@ -5,7 +5,7 @@ webAppAccess.initWebApp = function(workspaceUrl,onWorkspaceLoad) {
     //create with no container id to not use the standard UI
     var app = apogeeapp.app.Apogee.createApp();
     
-    apogeeapp.app.openworkspace.openWorkspaceFromUrlImpl(app,workspaceUrl,onWorkspaceLoad);     
+    apogeeapp.app.openworkspaceseq.openWorkspaceFromUrlImpl(app,workspaceUrl,onWorkspaceLoad);     
 }
 
 /** This method attaches the apgee output display to the dom element. See the 

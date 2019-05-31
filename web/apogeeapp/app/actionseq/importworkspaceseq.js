@@ -1,12 +1,12 @@
 
-apogeeapp.app.importworkspace = {};
+apogeeapp.app.importworkspaceseq = {};
 
 //=====================================
 // UI Entry Point
 //=====================================
 
 /** Call this withthe appropriate generator - folder or folder function, for the given import type. */
- apogeeapp.app.importworkspace.importWorkspace = function(app,fileAccessObject,componentGenerator) {
+ apogeeapp.app.importworkspaceseq.importWorkspace = function(app,fileAccessObject,componentGenerator) {
 
     //make sure there is not an open workspace
     if(!app.getWorkspaceUI()) {
@@ -23,7 +23,7 @@ apogeeapp.app.importworkspace = {};
         }
         else {
             //open workspace
-            apogeeapp.app.importworkspace.openWorkspace(app,componentGenerator,workspaceData,fileMetadata);
+            apogeeapp.app.importworkspaceseq.openWorkspace(app,componentGenerator,workspaceData,fileMetadata);
         }
     }
 
@@ -39,7 +39,7 @@ apogeeapp.app.importworkspace = {};
 /** This method opens an workspace, from the text file. 
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
-apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,workspaceText,fileMetadata) {
+apogeeapp.app.importworkspaceseq.openWorkspace = function(app,componentGenerator,workspaceText,fileMetadata) {
     var actionResponse = new apogee.ActionResponse();
     var name;
     
@@ -60,10 +60,10 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,wo
         var initialProperties = {};
         initialProperties.name = workspaceJson.workspace.data.name;
 
-        var serializedMemberJson = apogeeapp.app.importworkspace.getMemberJsonFromWorkspaceJson(workspaceJson,componentGenerator);
-        var serializedComponentsJson = apogeeapp.app.importworkspace.getComponentJsonFromWorkspaceJson(workspaceJson,componentGenerator);
+        var serializedMemberJson = apogeeapp.app.importworkspaceseq.getMemberJsonFromWorkspaceJson(workspaceJson,componentGenerator);
+        var serializedComponentsJson = apogeeapp.app.importworkspaceseq.getComponentJsonFromWorkspaceJson(workspaceJson,componentGenerator);
         
-		var workspaceImportDialogFunction = () => apogeeapp.app.addcomponent.addComponent(app,componentGenerator,initialProperties,serializedMemberJson,serializedComponentsJson);
+		var workspaceImportDialogFunction = () => apogeeapp.app.addcomponentseq.addComponent(app,componentGenerator,initialProperties,serializedMemberJson,serializedComponentsJson);
         
         var linkLoadError = function(errorMsg) {
             alert("Error loading links: " + errorMsg);
@@ -93,20 +93,20 @@ apogeeapp.app.importworkspace.openWorkspace = function(app,componentGenerator,wo
 //------------------------
 
 /** This method opens an workspace by getting the workspace file from the url. */
-apogeeapp.app.importworkspace.openWorkspaceFromUrl = function(app,url) {
+apogeeapp.app.importworkspaceseq.openWorkspaceFromUrl = function(app,url) {
     var actionCompletedCallback = function(actionResponse) {
         if(!actionResponse.getSuccess()) {
             apogeeapp.app.errorHandling.handleActionError(actionResponse);
         }
     };
     
-    apogeeapp.app.importworkspace.openWorkspaceFromUrlImpl(app,url,actionCompletedCallback);
+    apogeeapp.app.importworkspaceseq.openWorkspaceFromUrlImpl(app,url,actionCompletedCallback);
 }
 
 /** This method opens an workspace by getting the workspace file from the url. */
-apogeeapp.app.importworkspace.openWorkspaceFromUrlImpl = function(app,url,actionCompletedCallback) {
+apogeeapp.app.importworkspaceseq.openWorkspaceFromUrlImpl = function(app,url,actionCompletedCallback) {
     var onDownload = function(workspaceText) {
-        apogeeapp.app.importworkspace.openWorkspace(app,workspaceText,url,actionCompletedCallback);
+        apogeeapp.app.importworkspaceseq.openWorkspace(app,workspaceText,url,actionCompletedCallback);
     }
     
     var onFailure = function(msg) {
@@ -115,13 +115,13 @@ apogeeapp.app.importworkspace.openWorkspaceFromUrlImpl = function(app,url,action
         actionResponse.addError(actionError);
         actionCompletedCallback(actionResponse);
     }   
-    apogeeapp.app.importworkspace.doRequest(url,onDownload,onFailure);   
+    apogeeapp.app.importworkspaceseq.doRequest(url,onDownload,onFailure);   
 }
 
 /**
  * This is an http request for the worksheet data
  */
-apogeeapp.app.importworkspace.doRequest= function(url,onDownload,onFailure) {
+apogeeapp.app.importworkspaceseq.doRequest= function(url,onDownload,onFailure) {
 	var xmlhttp=new XMLHttpRequest();
 
     xmlhttp.onreadystatechange=function() {
@@ -140,7 +140,7 @@ apogeeapp.app.importworkspace.doRequest= function(url,onDownload,onFailure) {
 }
 
 /** This reads the proper member json from the imported workspace json. */
-apogeeapp.app.importworkspace.getMemberJsonFromWorkspaceJson = function(workspaceJson,componentGenerator) {
+apogeeapp.app.importworkspaceseq.getMemberJsonFromWorkspaceJson = function(workspaceJson,componentGenerator) {
     var memberFolderJson = workspaceJson.workspace.data;
     
     if(componentGenerator.uniqueName == "apogeeapp.app.FolderFunctionComponent") {
@@ -161,7 +161,7 @@ apogeeapp.app.importworkspace.getMemberJsonFromWorkspaceJson = function(workspac
 }
         
 /** This reads the proper component json from the imported workspace json. */
-apogeeapp.app.importworkspace.getComponentJsonFromWorkspaceJson = function(workspaceJson,componentGenerator) {
+apogeeapp.app.importworkspaceseq.getComponentJsonFromWorkspaceJson = function(workspaceJson,componentGenerator) {
     var componentFolderJson = workspaceJson.components;
     
     if(componentGenerator.uniqueName == "apogeeapp.app.FolderFunctionComponent") {

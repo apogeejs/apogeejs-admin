@@ -1,12 +1,12 @@
 
 
-apogeeapp.app.saveworkspace = {};
+apogeeapp.app.saveworkspaceseq = {};
 
 //=====================================
 // UI Entry Point
 //=====================================
 
-apogeeapp.app.saveworkspace.saveWorkspace = function(app,fileAccessObject,doDirectSave) {
+apogeeapp.app.saveworkspaceseq.saveWorkspace = function(app,fileAccessObject,doDirectSave) {
 
     var activeWorkspaceUI = app.getWorkspaceUI();
     var workspaceText;
@@ -35,8 +35,3 @@ apogeeapp.app.saveworkspace.saveWorkspace = function(app,fileAccessObject,doDire
         fileAccessObject.saveFile(fileMetadata,workspaceText,onSaveSuccess);
     }
 }
-
-//=====================================
-// Action
-//=====================================
-

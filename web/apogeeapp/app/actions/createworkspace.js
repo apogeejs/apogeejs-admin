@@ -6,19 +6,13 @@ apogeeapp.app.createworkspace = {};
 //=====================================
 
 
-apogeeapp.app.createworkspace.createWorkspace = function(app) {
-    //make sure there is not an open workspace
-    if(app.getWorkspaceUI()) {
-        alert("There is already an open workspace. You must close the workspace first.");
-        return;
-    }      
-    
+apogeeapp.app.createworkspace.createCreateWorkspaceCommand = function(app) {
     var command = {};
     command.cmd = () => apogeeapp.app.createworkspace.doCreateWorkspace(app);
     //no undo
     command.desc = "Create workspace";
     
-    app.executeCommand(command);
+    return command;
 }
 
 //=====================================

@@ -2,47 +2,17 @@
 apogeeapp.app.openworkspace = {};
 
 //=====================================
-// UI Entry Point
-//=====================================
-
-apogeeapp.app.openworkspace.openWorkspace = function(app,fileAccessObject) {
-    
-    //make sure there is not an open workspace
-    if(app.getWorkspaceUI()) {
-        alert("There is an open workspace. You must close the workspace first.");
-        return;
-    }    
-
-    fileAccessObject.openFile(app,apogeeapp.app.openworkspace.onOpen);
-}
-
-/** This method should be called when workspace data is opened, to create the workspace. */
-apogeeapp.app.openworkspace.onOpen = function(err,app,workspaceData,fileMetadata) {
-
-    if(err) {
-        var errorMessage = "There was an error opening the file";
-        if(err.message)errorMessage += ": " + err.message;
-        alert(errorMessage);
-        return;
-    }
-    else {
-        if(app.getWorkspaceUI()) {
-            alert("There is already an open workspace");
-            return;
-        }
-        
-        //open workspace
-        var command = {};
-        command.cmd =() => apogeeapp.app.openworkspace.doOpenWorkspace(app,workspaceData,fileMetadata);
-        command.desc = "Open Workspace";
-        
-        app.executeCommand(command);
-    }
-}
-
-//=====================================
 // Action
 //=====================================
+
+apogeeapp.app.openworkspace.createOpenWorkspaceCommand = function(app,workspaceData,fileMetadata) {
+    //open workspace
+    var command = {};
+    command.cmd =() => apogeeapp.app.openworkspace.doOpenWorkspace(app,workspaceData,fileMetadata);
+    command.desc = "Open Workspace";
+
+    return command;
+}
 
 
 /** This method opens an workspace, from the text file. 

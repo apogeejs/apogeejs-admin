@@ -164,13 +164,13 @@ apogeeapp.app.ReferenceEntry = class {
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = "Update Reference";
-        itemInfo.callback = () => apogeeapp.app.updatelink.updateLink(this);
+        itemInfo.callback = () => apogeeapp.app.updatelinkseq.updateLink(this);
         menuItemList.push(itemInfo);
 
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = "Remove Reference";
-        itemInfo.callback = () => apogeeapp.app.updatelink.removeLink(this);
+        itemInfo.callback = () => apogeeapp.app.updatelinkseq.removeLink(this);
         menuItemList.push(itemInfo);
 
         return menuItemList;
