@@ -103,11 +103,13 @@ apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,pare
         componentProperties = propertyValues;
     }
     else {
-        componentProperties = optionalBaseComponentJson;
+        componentProperties = optionalBaseComponentValues;
     }
     
+    var parentFullName = parent.getFullName();
+    
     //create function
-    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parent,componentGenerator,memberJson,componentProperties,optionalOnSuccess);
+    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parentFullName,componentGenerator,memberJson,componentProperties,optionalOnSuccess);
     
     var workspace = workspaceUI.getWorkspace();
     var memberName = propertyValues.name;
@@ -124,13 +126,16 @@ apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,pare
     return command;
 }
 
-apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parent,componentGenerator,memberJson,componentProperties,optionalOnSuccess) {
+apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,componentGenerator,memberJson,componentProperties,optionalOnSuccess) {
+    
+    var workspace = workspaceUI.getWorkspace();
+    var parent = workspace.getMemberByFullName(parentFullName);
 
     //create the member
     var createAction = {};
     createAction.action = "createMember";
     createAction.owner = parent;
-    createAction.workspace = parent.getWorkspace();
+    createAction.workspace = workspace;
     createAction.createData = memberJson;
     var actionResponse = apogee.action.doAction(createAction,true);
     var member = createAction.member;
