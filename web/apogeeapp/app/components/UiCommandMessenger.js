@@ -19,7 +19,7 @@ apogeeapp.app.UiCommandMessenger = class {
         
         var command = {};
         command.cmd = () => this._messengerCallWrapper(() => this.messenger.dataUpdate(updateMemberName,data));
-        command.undoCmd = apogeeapp.app.dataDisplayCallbackHelper.getMemberStateUndoCommand(member);
+        command.undoCmd = apogeeapp.app.membersave.getMemberStateUndoCommand(member);
         command.desc = "User Input write to " + updateMemberName;
         
         apogeeapp.app.Apogee.getInstance().executeCommand(command);
@@ -59,7 +59,7 @@ apogeeapp.app.UiCommandMessenger = class {
         
         var command = {};
         command.cmd = () => this._messengerCallWrapper(() => this.messenger.errorUpdate(updateMemberName,errorMessage));
-        command.undoCmd = apogeeapp.app.dataDisplayCallbackHelper.getMemberStateUndoCommand(member);
+        command.undoCmd = apogeeapp.app.membersave.getMemberStateUndoCommand(member);
         command.desc = "User Input error action";
         
         apogeeapp.app.Apogee.getInstance().executeCommand(command);
@@ -76,7 +76,7 @@ apogeeapp.app.UiCommandMessenger = class {
         
         var command = {};
         command.cmd = () => this._messengerCallWrapper(() => this.messenger.asynchDataUpdate(updateMemberName,dataPromise));
-        command.undoCmd = apogeeapp.app.dataDisplayCallbackHelper.getMemberStateUndoCommand(member);
+        command.undoCmd = apogeeapp.app.membersave.getMemberStateUndoCommand(member);
         command.desc = "User Input write to " + updateMemberName;
         
         apogeeapp.app.Apogee.getInstance().executeCommand(command);

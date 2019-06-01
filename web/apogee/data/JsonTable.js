@@ -71,36 +71,11 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
     }
     else if(data instanceof Promise) {
         //if the return value is a Promise, the data is asynch asynchronous!
-
-        //set pending manually here rather than doing below in a separate action
-        this.setResultPending(true,data);
-        
-        var instance = this;
-       
-        var asynchCallback = function(memberValue) {
-            //set the data for the table, along with triggering updates on dependent tables.
-            var actionData = {};
-            actionData.action = apogee.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME;
-            actionData.member = instance;
-            actionData.promise = data;
-            actionData.data = memberValue;
-            var actionResponse =  apogee.action.doAction(actionData,false);
-        }
-        var asynchErrorCallback = function(errorMsg) {
-            var actionData = {};
-            actionData.action = apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME;
-            actionData.member = instance;
-            actionData.promise = data;
-            actionData.errorMsg = errorMsg;
-            var actionResponse =  apogee.action.doAction(actionData,false);
-        }
-
-        //call appropriate action when the promise resolves.
-        data.then(asynchCallback).catch(asynchErrorCallback);
+        apogee.updatemember.applyPromiseData(this,data);
     }
     else {
-        //result is synchronous
-        this.setData(data);
+        //result is normal synchronous data
+        this.setData(data); 
     }
 }
 

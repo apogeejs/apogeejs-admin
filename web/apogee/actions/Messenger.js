@@ -72,9 +72,9 @@ apogee.action.Messenger = class {
         }
         
         var actionData = {};
-        actionData.action = apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME;
+        actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
         actionData.member = member;
-        actionData.errorMsg = errorMessage;
+        actionData.data = new Error(errorMessage);
         
         var actionResponse = apogee.action.doAction(actionData,addToUndo);
         if(!actionResponse.getSuccess()) {
@@ -92,33 +92,12 @@ apogee.action.Messenger = class {
         }
 
         var actionData = {};
-        actionData.action = apogee.updatemember.UPDATE_DATA_PENDING_ACTION_NAME;
+        actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
         actionData.member = member;
-        actionData.promise = dataPromise;
+        actionData.data = dataPromise;
         
         var actionResponse =  apogee.action.doAction(actionData,addToUndo);
 
-        var asynchCallback = function(memberValue) {
-            //set the data for the table, along with triggering updates on dependent tables.
-            var actionData = {};
-            actionData.action = apogee.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME;
-            actionData.member = member;
-            actionData.promise = dataPromise;
-            actionData.data = memberValue;
-            var actionResponse =  apogee.action.doAction(actionData,addToUndo);
-        }
-        var asynchErrorCallback = function(errorMsg) {
-            var actionData = {};
-            actionData.action = apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME;
-            actionData.member = member;
-            actionData.promise = dataPromise;
-            actionData.errorMsg = errorMsg;
-            var actionResponse =  apogee.action.doAction(actionData,addToUndo);
-        }
-
-        //call appropriate action when the promise resolves.
-        dataPromise.then(asynchCallback).catch(asynchErrorCallback);
-        
         //throw an error if the original action call fails
         if(!actionResponse.getSuccess()) {
             throw new Error(actionResponse.getErrorMsg());

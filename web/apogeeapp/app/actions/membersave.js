@@ -61,6 +61,9 @@ apogeeapp.app.membersave.createSaveDescriptionCommand = function(member,text) {
 apogeeapp.app.membersave.doSaveData = function(workspace,memberFullName,data) {
     
     var member  = workspace.getMemberByFullName(memberFullName);
+    if(!member) {
+        throw new Error("Error calling save - member not fond: " + memberFullName);
+    }
     
     var actionData = {};
     actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
@@ -75,6 +78,9 @@ apogeeapp.app.membersave.doSaveData = function(workspace,memberFullName,data) {
 apogeeapp.app.membersave.doSetCode = function(workspace,memberFullName,argList,functionBody,supplementalCode,optionalClearCodeDataValue) {
      
     var member  = workspace.getMemberByFullName(memberFullName);
+    if(!member) {
+        throw new Error("Error calling save - member not fond: " + memberFullName);
+    }
      
     var actionData = {};
 
@@ -102,6 +108,9 @@ apogeeapp.app.membersave.doSetCode = function(workspace,memberFullName,argList,f
 apogeeapp.app.membersave.doSaveDescription = function(workspace,memberFullName,text) {
 
     var member = workspace.getMemberByFullName(memberFullName);
+    if(!member) {
+        throw new Error("Error calling save - member not fond: " + memberFullName);
+    }
     
     if((text === null)||(text === undefined)) {
         text = "";
@@ -118,37 +127,26 @@ apogeeapp.app.membersave.doSaveDescription = function(workspace,memberFullName,t
 
 /** @private */
 apogeeapp.app.membersave.doErrorUpdate = function(workspace,memberFullName,errorMessage) {
-    var member = workspace.getMemberByFullName(memberFullName);
-    if(!member) {
-        throw new Error("Error calling messenger - member not fond: " + memberFullName);
-    }
-
-    var actionData = {};
-    actionData.action = apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME;
-    actionData.member = member;
-    actionData.errorMsg = errorMessage;
-
-    var actionResponse = apogee.action.doAction(actionData,true);
-    
-    return actionResponse;
+    return apogeeapp.app.membersave.doSaveData(workspace,memberFullName,new Error(errorMessage));
 }
 
 /** This method resets the pending state for a member. It does not reissue the pending promise, that should al 
  * @private */
 apogeeapp.app.membersave.doResetPendingState = function(workspace,memberFullName,pendingPromise) {
-    var member = workspace.getMemberByFullName(memberFullName);
+    
+    var member  = workspace.getMemberByFullName(memberFullName);
     if(!member) {
-        throw new Error("Error calling messenger - member not fond: " + memberFullName);
+        throw new Error("Error calling save - member not fond: " + memberFullName);
     }
-
+    
     var actionData = {};
-    actionData.action = apogee.updatemember.UPDATE_DATA_PENDING_ACTION_NAME;
+    actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
     actionData.member = member;
-    actionData.promise = pendingPromise;
-    
+    actionData.data = pendingPromise;
+    actionData.promiseRefresh = true;
     var actionResponse =  apogee.action.doAction(actionData,true);
-    
-    return actionResponse;
+
+    return actionResponse;  
 }
 
 

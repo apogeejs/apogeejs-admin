@@ -7,6 +7,11 @@ apogee.updatemember = {};
  *  "action": apogee.updatemember.UPDATE_DATA_ACTION_NAME,
  *  "member": (member to update),
  *  "data": (new value for the table)
+ *  "sourcePromise": (OPTIONAL - If this is the completion of an asynchronous action, the
+ *      source promise shoudl be included to make sure it has not been overwritten with a
+ *      more recent operation.)
+ *  "promiseRefresh": (OPTIONAL - If this action reinstates a previously set promise,
+ *      this flag will prevent setting additional then/catch statements on the promise)
  * }
  */
 apogee.updatemember.UPDATE_DATA_ACTION_NAME = "updateData";
@@ -94,8 +99,49 @@ apogee.updatemember.updateData = function(actionData,processedActions) {
     }
         
     var member = actionData.member;
-
-    apogee.updatemember.applyData(member,actionData.data);
+    var data = actionData.data;
+    
+    //if this is the resolution (or rejection) of a previously set promise
+    var optionalSourcePromise = actionData.sourcePromise ? actionData.sourcePromise : undefined;
+    if(actionData.sourcePromise) {
+        if(member.pendingPromiseMatches(actionData.sourcePromise)) {
+            //this is the reoslution of pending data
+            member.setResultPending(false);
+        }
+        else {
+            //no action - this is from an asynch action that has been overwritten
+            return;
+        }
+    }
+    
+    //some cleanup for new data
+    member.clearErrors();
+    if(member.isCodeable) {
+        //clear the code - so the data is used
+        member.clearCode();
+    }
+    
+    //handle four types of data inputs
+    if(data instanceof Promise) {
+        //data is a promise - will be updated asynchromously
+        
+        //check if this is only a refresh
+        var optionalPromiseRefresh = actionData.promiseRefresh ? true : false;
+        
+        apogee.updatemember.applyPromiseData(member,data,optionalPromiseRefresh);
+    }
+    else if(data instanceof Error) {
+        //data is an error
+        apogee.updatemember.applyErrorData(member,data);
+    }
+    else if(data === apogee.util.INVALID_VALUE) {
+        //data is an invalid value
+        apogee.updatemember.applyInvalidData(member,data);
+    }
+    else {
+        //normal data update (poosibly from an asynchronouse update)
+        apogee.updatemember.applyData(member,data);
+    }
     
     processedActions.push(actionData);
 }
@@ -138,7 +184,7 @@ apogee.updatemember.asynchFunctionUpdateError = function(actionData,processedAct
     
     if(member.pendingPromiseMatches(promise)) {
         //set the error flag
-        var actionError = new apogee.ActionError(actionData.errorMsg,"Codeable - Calculate",member);
+        var actionError = new apogee.ActionError(actionData.errorMsg,apogee.ActionError.ERROR_TYPE_MODEL,member);
         member.addError(actionError);
         member.setResultPending(false);
 
@@ -180,14 +226,49 @@ apogee.updatemember.applyCode = function(codeable,argList,functionBody,supplemen
 
 /** This method sets the data for a member. */
 apogee.updatemember.applyData = function(member,data) {
-    member.clearErrors();
-    member.setData(data);
-    if(member.isCodeable) {
-        //clear the code - so the data is used
-        member.clearCode();
+    member.setData(data);  
+}
+
+apogee.updatemember.applyPromiseData = function(member,promise,optionalPromiseRefresh) {
+    //set the result as pending
+    member.setResultPending(true,promise);
+
+    //kick off the asynch update, if this is not only a refresh of the promise
+    if(!optionalPromiseRefresh) {
+        var asynchCallback = function(memberValue) {
+            //set the data for the table, along with triggering updates on dependent tables.
+            let actionData = {};
+            actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
+            actionData.member = member;
+            actionData.sourcePromise = promise;
+            actionData.data = memberValue;
+            let actionResponse =  apogee.action.doAction(actionData,true);
+        }
+        var asynchErrorCallback = function(errorMsg) {
+            let actionData = {};
+            actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
+            actionData.member = member;
+            actionData.sourcePromise = promise;
+            actionData.data = new Error(errorMsg);
+            let actionResponse =  apogee.action.doAction(actionData,true);
+        }
+
+        //call appropriate action when the promise completes
+        promise.then(asynchCallback).catch(asynchErrorCallback);
     }
 }
 
+apogee.updatemember.applyErrorData = function(member,error) {
+    //set the error flag
+    var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_MODEL);
+    member.addError(actionError);
+}
+
+apogee.updatemember.applyInvalidData = function(member) {
+    //value is invalid if return is this predefined value
+    member.setResultInvalid(true);
+}
+        
 /** Update data action info */
 apogee.updatemember.UPDATE_DATA_ACTION_INFO = {
     "actionFunction": apogee.updatemember.updateData,
