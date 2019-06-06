@@ -32,7 +32,7 @@ apogee.calculation.addDependsOnToRecalculateList = function(recalculateList,memb
 /** This calls execute for each member in the recalculate list. The return value
  * is false if there are any errors.
  * @private */
-apogee.calculation.callRecalculateList = function(recalculateList,actionResponse) {
+apogee.calculation.callRecalculateList = function(recalculateList) {
     var dependent;
     var i;
     var success = true;
@@ -40,15 +40,6 @@ apogee.calculation.callRecalculateList = function(recalculateList,actionResponse
         dependent = recalculateList[i];
         if(dependent.getCalcPending()) {
             dependent.calculate();   
-            if(dependent.hasError()) {
-                var actionErrors = dependent.getErrors();
-                if(actionErrors) {
-                    for(var j = 0; j < actionErrors.length; j++) {
-                        actionResponse.addError(actionErrors[j]);
-                    }
-                }
-                success = false;
-            }
         }
     }
     
