@@ -79,6 +79,7 @@
             function onWorkspaceLoad() {
                 //load the UI controls
                 addDisplay("Model.overridesTemplate","templateCell");
+                addDisplay("Model.login.loginUrl","loginUrlCell");
                 
                 addDisplay("Model.login.loginControl","loginCell");
                 addDisplay("Model.login.loginResult","loginResultCell");
@@ -119,7 +120,10 @@
     <body onload="init()">
         <h1>Community Overrides Display</h1>
         
+        Overrides Template:
         <div class="dataCell0" id="templateCell"></div>
+        Login URL:
+        <div class="dataCell0" id="loginUrlCell"></div>
         
         <div class="formCell" id="loginCell"></div>
         <div class="formCell" id="loginResultCell"></div>
