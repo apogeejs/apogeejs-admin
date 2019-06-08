@@ -2,13 +2,11 @@
  * is used for creating virtual workspaces. 
  * - optionalJson - For new workspaces this can be empty. If we are deserializing an existing
  * workspace, the json for it goes here.
- * - actionResponseForJson - This will take any error messages for deserializing the json. This is
- * only used if there is a json to deserialize.
  * - optionalContextOwner - This is used if the workspace should be placed in a context. This is 
  * used for the virtual workspace created for folder functions, so the folder function can 
  * access variables from the larger workspace.
  * */
-apogee.Workspace = function(optionalJson,actionResponseForJson,optionalContextOwner) {
+apogee.Workspace = function(optionalJson,optionalContextOwner) {
     //base init
     apogee.EventManager.init.call(this);
     apogee.ContextHolder.init.call(this);
@@ -29,7 +27,7 @@ apogee.Workspace = function(optionalJson,actionResponseForJson,optionalContextOw
         this.rootFolder = new apogee.Folder(apogee.Workspace.ROOT_FOLDER_NAME,this);
     }
     else {
-        this.loadFromJson(optionalJson,actionResponseForJson);
+        this.loadFromJson(optionalJson);
     }
 }
 
@@ -148,8 +146,7 @@ apogee.Workspace.prototype.checkConsecutiveQueuedActionLimitExceeded = function(
 /** This should be called wo abort any queued actions. */
 apogee.Workspace.prototype.setCalculationCanceled = function() {
     //reset queued action variables
-    this.actionQueue = [];
-    this.clearConsecutiveQueuedTracking();
+    this.clearCommandQueue();
     
     alert("The tables are left in improper state because the calculation was aborted. :( ");
 }
@@ -158,6 +155,13 @@ apogee.Workspace.prototype.setCalculationCanceled = function() {
 apogee.Workspace.prototype.clearConsecutiveQueuedTracking = function() {
     this.consecutiveActionCount = 0;
     this.activeConsecutiveActionLimit = apogee.Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT;
+}
+
+/** This method resets the command queue */
+apogee.Workspace.prototype.clearCommandQueue = function() {
+    //reset queued action variables
+    this.actionQueue = [];
+    this.clearConsecutiveQueuedTracking();
 }
 
 
@@ -248,7 +252,7 @@ apogee.Workspace.prototype.toJson = function() {
 
 /** This is loads data from the given json into this workspace. 
  * @private */
-apogee.Workspace.prototype.loadFromJson = function(json,actionResponse) {
+apogee.Workspace.prototype.loadFromJson = function(json) {
     var fileType = json.fileType;
 	if(fileType !== apogee.Workspace.SAVE_FILE_TYPE) {
 		throw apogee.base.createError("Bad file format.",false);
@@ -256,21 +260,18 @@ apogee.Workspace.prototype.loadFromJson = function(json,actionResponse) {
     if(json.version !== apogee.Workspace.SAVE_FILE_VERSION) {
         throw apogee.base.createError("Incorrect file version. CHECK APOGEEJS.COM FOR VERSION CONVERTER.",false);
     }
-	
-    if(!actionResponse) actionResponse = new apogee.ActionResponse();
-    
+
     if(json.name !== undefined) {
         this.name = json.name;
     }
 
     var actionData = {};
     actionData.action = "createMember";
-    actionData.owner = this;
-    actionData.workspace = this;
+    actionData.workspaceIsOwner = true;
     actionData.createData = json.data;
-    apogee.action.doAction(actionData,false,actionResponse);
+    var actionResult = apogee.action.doAction(this,actionData,false);
     
-    return actionResponse;
+    return actionResult;
 }
 
 //================================

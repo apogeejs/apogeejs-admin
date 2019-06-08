@@ -21,11 +21,20 @@ apogee.deletemember.ACTION_NAME = "deleteMember";
 apogee.deletemember.MEMBER_DELETED_EVENT = "memberDeleted";
 
 /** Delete member action function */
-apogee.deletemember.deleteMember = function(actionData,processedActions) {
+apogee.deletemember.deleteMember = function(workspace,actionData,actionResult) {
+    
+    var memberFullName = actionData.memberName;
+    var member = workspace.getMemberByFullName(memberFullName);
+    if(!member) {
+        actionResult.cmdDone = false;
+        actionResult.errorMsg = "Member not found for delete member";
+        return;
+    }
+    actionResult.member = member;
 
     var deleteList = [];
 
-    apogee.deletemember.getDeleteList(actionData.member,deleteList);
+    apogee.deletemember.getDeleteList(member,deleteList);
     for(var i = 0; i < deleteList.length; i++) {
         //call delete handlers
         var member = deleteList[i];
@@ -37,16 +46,22 @@ apogee.deletemember.deleteMember = function(actionData,processedActions) {
         //we are adding multiple delete events here
         var actionDataEntry;
         if(member == actionData.member) {
-            actionDataEntry = actionData;
+            actionResult.cmdDone = true;
         }
         else {
-            actionDataEntry = {};
-            actionDataEntry.action = "deleteMember";
-            actionDataEntry.member = member;
-            actionDataEntry.actionInfo = actionData.actionInfo;
+            if(!actionResult.childActionResults) actionResult.childActionResults = [];
+            
+            let childActionData = {};
+            childActionData.action = "deleteMember";
+            childActionData.memberName = member.getFullName();           
+            
+            let childActionResult = {};
+            childActionResult.member = member;
+            childActionResult.actionInfo = apogee.deletemember.ACTION_INFO;
+            childActionResult.cmdDone = true;
+            
+            actionResult.childActionResults.push(childReponse);
         }
-        
-        processedActions.push(actionDataEntry);
     }
 }
 

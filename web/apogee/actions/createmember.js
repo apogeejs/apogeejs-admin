@@ -28,43 +28,66 @@ apogee.createmember.MEMBER_CREATED_EVENT = "memberCreated";
 
 /** This method instantiates a member, without setting the update data. 
  *@private */
-apogee.createmember.createMember = function(actionData,processedActions) {
+apogee.createmember.createMember = function(workspace,actionData,processedActions,actionResult) {
     
+    var owner;
+    if(actionData.workspaceIsOwner) {
+        owner = workspace;
+    }
+    else {
+        var ownerFullName = actionData.ownerName;
+        var owner = workspace.getMemberByFullName(ownerFullName);
+        if(!owner) {
+            actionResult.cmdDone = false;
+            actionResult.errorMsg = "Parent not found for created member";
+            return;
+        }
+    }
+ 
+    apogee.createmember._createMemberImpl(owner,actionData,processedActions,actionResult);
+}
+ 
+    
+apogee.createmember._createMemberImpl = function(owner,actionData,actionResult) {
+    
+    var memberJson = actionData.createData;
+    var member;
+     
     //create member
-    var generator = apogee.Workspace.getMemberGenerator(actionData.createData.type);
+    var generator;
+    if(memberJson) {
+        generator = apogee.Workspace.getMemberGenerator(memberJson.type);
+    }
 
     if(generator) {
-        var childJsonOutputList = [];
-        var member = generator.createMember(actionData.owner,actionData.createData,childJsonOutputList);
-
-        //store the created object
-        actionData.member = member;
-
-        //we are potentially adding multiple creates here, including children
-        processedActions.push(actionData);
+        member = generator.createMember(owner,memberJson);   
 
         //instantiate children if there are any
-        for(var i = 0; i < childJsonOutputList.length; i++) {
-            var childActionData = {};
-            childActionData.action = "createMember";
-            childActionData.actionInfo = apogee.createmember.ACTION_INFO;
-            childActionData.owner = member;
-            childActionData.createData = childJsonOutputList[i];
-            apogee.createmember.createMember(childActionData,processedActions);
+        if(memberJson.children) {
+            actionResult.childActionResults = [];
+            for(var childName in memberJson.children) {
+                var childActionData = {};
+                childActionData.action = "createMember";
+                childActionData.createData = memberJson.children[childName];
+                var childActionResult = {};
+                childActionResult.actionInfo = apogee.createmember.ACTION_INFO;
+                apogee.createmember._createMemberImpl(member,childActionData,childActionResult);
+                actionResult.childActionResults.push(childActionResult);
+            }
         }
     }
     else {
-        //type not found! - create a dummy object
-        member = apogee.ErrorTable.generator.createMember(actionData.owner,actionData.createData);
-        var error = new apogee.ActionError("Member type not found: " + actionData.createData.type,apogee.ActionError.ERROR_TYPE_APP,null);
+        //type not found! - create a dummy object and add an error to it
+        member = apogee.ErrorTable.generator.createMember(owner,memberJson);
+        var error = new apogee.ActionError("Member type not found: " + memberJson.type,apogee.ActionError.ERROR_TYPE_APP,null);
         member.addError(error);
         
-        actionData.member = member;
-        actionData.error = error;
-        processedActions.push(actionData);
+        //store an error message, but this still counts as command done.
+        actionResult.alertMsg = "Error creating member: member type not found: " + memberJson.type;
     }
-    
-    return member;
+
+    actionResult.member = member;
+    actionResult.cmdDone = true;
 }
 
 /** Action info */

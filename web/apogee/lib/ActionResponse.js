@@ -1,6 +1,6 @@
 apogee.action = {};
 
-/** This class encapsulates a response to an action. It include a success flag,
+/** This class encapsulates a actionResponse to an action. It include a success flag,
  * a list of ActionErrors, and a fatal flag. Success is set to true unless there
  * are errors set. The fatal flag indicates that one of the errors was a fatal error.
  * When processing an action, only model data errors should be set. A code error 

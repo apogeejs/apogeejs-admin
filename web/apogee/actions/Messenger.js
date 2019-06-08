@@ -20,12 +20,12 @@ apogee.action.Messenger = class {
         //set the data for the table, along with triggering updates on dependent tables.
         var actionData = {};
         actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
-        actionData.member = member;
+        actionData.memberName = member.getFullName();
         actionData.data = data;
         
-        var actionResponse = apogee.action.doAction(actionData,addToUndo);
-        if(!actionResponse.getSuccess()) {
-            throw new Error(actionResponse.getErrorMsg());
+        var actionResult = apogee.action.doAction(this.workspace,actionData,addToUndo);
+        if(!actionResult.cmdDone) {
+            throw new Error("Error setting remote data: " + actionResult.alertMsg);
         }
     }
 
@@ -45,7 +45,7 @@ apogee.action.Messenger = class {
             }
             
             subActionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
-            subActionData.member = member;
+            subActionData.memberName = member.getFullName();
             subActionData.data = updateEntry[1];
             actionList.push(subActionData);
         }
@@ -54,11 +54,10 @@ apogee.action.Messenger = class {
         var actionData = {};
         actionData.action = apogee.compoundaction.ACTION_NAME;
         actionData.actions = actionList;
-        actionData.workspace = this.workspace;
         
-        var actionResponse = apogee.action.doAction(actionData,addToUndo);
-        if(!actionResponse.getSuccess()) {
-            throw new Error(actionResponse.getErrorMsg());
+        var actionResult = apogee.action.doAction(this.workspace,actionData,addToUndo);
+        if(!actionResult.cmdDone) {
+            throw new Error("Error setting remote data: " + actionResult.alertMsg);
         }
     }
 
@@ -73,12 +72,12 @@ apogee.action.Messenger = class {
         
         var actionData = {};
         actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
-        actionData.member = member;
+        actionData.memberName = member.getFullName();
         actionData.data = new Error(errorMessage);
         
-        var actionResponse = apogee.action.doAction(actionData,addToUndo);
-        if(!actionResponse.getSuccess()) {
-            throw new Error(actionResponse.getErrorMsg());
+        var actionResult = apogee.action.doAction(this.workspace,actionData,addToUndo);
+        if(!actionResult.cmdDone) {
+            throw new Error("Error setting remote data: " + actionResult.alertMsg);
         }
     }
 
@@ -93,14 +92,14 @@ apogee.action.Messenger = class {
 
         var actionData = {};
         actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
-        actionData.member = member;
+        actionData.memberName = member.getFullName();
         actionData.data = dataPromise;
         
-        var actionResponse =  apogee.action.doAction(actionData,addToUndo);
+        var actionResult =  apogee.action.doAction(this.workspace,actionData,addToUndo);
 
         //throw an error if the original action call fails
-        if(!actionResponse.getSuccess()) {
-            throw new Error(actionResponse.getErrorMsg());
+        if(!actionResult.cmdDone) {
+            throw new Error("Error setting remote data: " + actionResult.alertMsg);
         }
     }
     

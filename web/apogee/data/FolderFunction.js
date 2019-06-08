@@ -91,13 +91,7 @@ apogee.FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
     initialData.returnValue = json.returnValue;
     
     var createEmptyInternalFolder;
-    if(json.internalFolder) {
-        //enforce name of internal folder
-        //this is needed for importing a workspace as a folder function
-        //this will fail quietly if we change the format, but it will still run
-        json.internalFolder.name = apogee.FolderFunction.INTERNAL_FOLDER_NAME;
-        
-        childrenJsonOutputList.push(json.internalFolder);
+    if((json.children)&&(json.children.length >= 1)) {
         createEmptyInternalFolder = false;
     }
     else {
@@ -113,7 +107,8 @@ apogee.FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
 apogee.FolderFunction.prototype.addToJson = function(json) {
     json.argList = this.argList;
     json.returnValue = this.returnValueString;
-    json.internalFolder = this.internalFolder.toJson();
+    json.children = {};
+    json.children[apogee.FolderFunction.INTERNAL_FOLDER_NAME] = this.internalFolder.toJson();
 }
 
 /** This method extends the base method to get the property values
@@ -142,7 +137,7 @@ apogee.FolderFunction.getPropertyUpdateAction = function(folderFunction,newValue
  
         var actionData = {};
         actionData.action = "updateFolderFunction";
-        actionData.member = folderFunction;
+        actionData.memberName = folderFunction.getFullName();
         actionData.argList = argList;
         actionData.returnValueString = returnValueString;
         return actionData;
@@ -296,7 +291,7 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         for(var i = 0; i < inputElementArray.length; i++) {
             var entry = {};
             entry.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
-            entry.member = inputElementArray[i];
+            entry.memberName = inputElementArray[i].getFullName();
             entry.data = arguments[i];
             updateActionList.push(entry);
         }
@@ -304,11 +299,10 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         var actionData = {};
         actionData.action = "compoundAction";
         actionData.actions = updateActionList;
-        actionData.workspace = virtualWorkspace;
 
         //apply the update
-        var actionResponse = apogee.action.doAction(actionData,false);        
-        if(actionResponse.getSuccess()) {
+        var actionResult = apogee.action.doAction(virtualWorkspace,actionData,false);        
+        if(actionResult.cmdDone) {
             //retrieve the result
             if(returnValueTable) {
                 
@@ -325,7 +319,7 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         }
         else {
             //error exectuing folderFunction function - thro wan exception
-            throw apogee.base.createError(actionResponse.getErrorMsg());
+            throw apogee.base.createError(actionResult.getErrorMsg());
         }
     }
     
@@ -338,7 +332,7 @@ apogee.FolderFunction.prototype.createVirtualWorkspace = function(folderFunction
     try {
         var folderJson = this.internalFolder.toJson();
 		var workspaceJson = apogee.Workspace.createWorkpaceJsonFromFolderJson(this.getName(),folderJson);
-        var virtualWorkspace = new apogee.Workspace(workspaceJson,null,this.getOwner());
+        var virtualWorkspace = new apogee.Workspace(workspaceJson,this.getOwner());
         return virtualWorkspace;
 	}
 	catch(error) {

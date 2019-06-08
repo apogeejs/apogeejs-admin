@@ -89,23 +89,24 @@ apogee.JavascriptTable.prototype.processMemberFunction = function(memberGenerato
         this.setResultPending(true,data);
         
         var instance = this;
+        var workspace = this.getWorkspace();
        
         var asynchCallback = function(memberValue) {
             //set the data for the table, along with triggering updates on dependent tables.
             var actionData = {};
             actionData.action = "asynchFormulaData";
-            actionData.member = instance;
+            actionData.memberName = instance.getFullName();
             actionData.promise = data;
             actionData.data = memberValue;
-            var actionResponse =  apogee.action.doAction(actionData,false);
+            var actionResult =  apogee.action.doAction(workspace,actionData,false);
         }
         var asynchErrorCallback = function(errorMsg) {
             var actionData = {};
             actionData.action = "updateError";
-            actionData.member = instance;
+            actionData.memberName = instance.getFullName();
             actionData.promise = data;
             actionData.errorMsg = errorMsg;
-            var actionResponse =  apogee.action.doAction(actionData,false);
+            var actionResult =  apogee.action.doAction(workspace,actionData,false);
         }
 
         //call appropriate action when the promise resolves.

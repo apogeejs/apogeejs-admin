@@ -13,33 +13,54 @@ apogee.movemember = {};
 apogee.movemember.ACTION_NAME = "moveMember";
 
 /** Move member action function */
-apogee.movemember.moveMember = function(actionData,processedActions) {
+apogee.movemember.moveMember = function(workspace,actionData,actionResult) {
         
-    var member = actionData.member;
+    var memberFullName = actionData.memberName;
+    var member = workspace.getMemberByFullName(memberFullName);
+    if(!member) {
+        actionResult.cmdDone = false;
+        actionResult.errorMsg = "Member not found for move member";
+        return;
+    }
+    actionResult.member = member;
+    
+    var targetOwnerFullName = actionData.targetOwnerName;
+    var targetOwner = workspace.getMemberByFullName(targetOwnerFullName);
+    if(!targetOwner) {
+        actionResult.cmdDone = false;
+        actionResult.errorMsg = "New parent not found for move member";
+        return;
+    }
         
     var movedMemberList = [];
     apogee.movemember.loadMovedList(member,movedMemberList);
-    member.move(actionData.name,actionData.owner);
+    member.move(actionData.targetName,targetOwner);
     
     //add the individual moves
     for(var i = 0; i < movedMemberList.length; i++) {
-        var moveMember = movedMemberList[i];
+        var movedMember = movedMemberList[i];
         
         //we are adding multiple delete events here
         var actionDataEntry;
-        if(moveMember === member) {
+        if(movedMember === member) {
             actionDataEntry = actionData;
         }
         else {
-            actionDataEntry = {};
-            actionDataEntry.action = "moveMember";
-            actionDataEntry.member = member;
-            actionDataEntry.name = member.getName();
-            actionDataEntry.owner = member.getOwner();
-            actionDataEntry.actionInfo = actionData.actionInfo;
+            if(!actionResult.childActionResults) actionResult.childActionResults = [];
+            
+            let childActionData = {};
+            childActionData.action = "moveMember";
+            childActionData.memberName = movedMember.getFullName();
+            childActionData.targetName = movedMember.getName();
+            childActionData.targetOwnerName = movedMember.getOwner().getFullName();
+            
+            let childActionResult = {};
+            childActionResult.cmdDone = true;
+            childActionResult.member = movedMember;
+            childRepsonse.actionInfo = apogee.movemember.ACTION_INFO
+            
+            actionResult.childActionResults.push(childActionResult);
         }
-        
-        processedActions.push(actionDataEntry);
     }
 
 }
@@ -63,7 +84,7 @@ apogee.movemember.loadMovedList = function(member,movedMemberList) {
 }
 
 /** Action info */
-apogee.movemember.ACTION_INFO= {
+apogee.movemember.ACTION_INFO = {
     "actionFunction": apogee.movemember.moveMember,
     "checkUpdateAll": true,
     "updateDependencies": true,

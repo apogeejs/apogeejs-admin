@@ -55,60 +55,51 @@ apogee.action.actionInfo = {
 /** This method is used to execute an action for the data model.
  * -The source tells the type of action. This affects how the action is treated. For 
  * example, actions from the UI set the workspace dirty flag to true and are used in the
- * undo list. (NOTE - UNDO LIST DOES NOT EXIST YET)
- * -The optionalActionResponse allows you to pass an existing actionResponse rather
- * than creating a new one inside this function as a return value. */
-apogee.action.doAction = function(actionData,addToUndo,optionalActionResponse) {
+ * undo list. (NOTE - UNDO LIST DOES NOT EXIST YET) */
+apogee.action.doAction = function(workspace,actionData,addToUndo) {
     
-    //read the workspace
-    var workspace;
-    if(actionData.member) {
-        workspace = actionData.member.getWorkspace();
-    }
-    else if(actionData.workspace) {
-        workspace = actionData.workspace;
-    }
-    else {
-        throw new Error("Workspace info missing from action. ");
-    }
+    var actionResult = {};
     
     //only allow one action at a time
     if(workspace.isActionInProgress()) {
         var queuedAction = {};
+        queuedActionData.workspace = workspace;
         queuedAction.actionData = actionData;
-        queuedAction.optionalActionResponse = optionalActionResponse;
         queuedAction.addToUndo = addToUndo;
         workspace.queueAction(queuedAction);
         
-        //return an empty (successful) action response
-        //we sould have a flag saying the action is pending
-        return new apogee.ActionResponse();;
+        //WORK OUT WHAT GOES HERE!!
+        //I think this only happens when we submit an action during a calculation
+        //I am relying on that. TBR
+        //I also need to work out what to return for a pending command
+        actionResult.cmdDone = false;
+        actionResult.cmdPending = true;
+        return actionResult;
     }
     
     //flag action in progress
     workspace.setActionInProgress(true);
     
-    var actionResponse = optionalActionResponse ? optionalActionResponse : new apogee.ActionResponse();
-    
     try {   
         
-        var processedActions = [];
-        
         //do the action
-        apogee.action.callActionFunction(actionData,processedActions); 
+        apogee.action.callActionFunction(workspace,actionData,actionResult); 
         
         //finish processing the action
         var recalculateList = [];
         
+        var completedResults = [];
+        apogee.action.addToCompletedResultList(completedResults,actionResult)
+        
         //handle cases with a valid object 
-        apogee.action.updateDependencies(workspace,processedActions,recalculateList);
+        apogee.action.updateDependencies(workspace,completedResults,recalculateList);
         
-        apogee.action.updateRecalculateList(processedActions,recalculateList);
+        apogee.action.updateRecalculateList(completedResults,recalculateList);
         
-        apogee.calculation.callRecalculateList(recalculateList,actionResponse);
+        apogee.calculation.callRecalculateList(recalculateList);
     
         //fire events
-        apogee.action.fireEvents(workspace,processedActions,recalculateList);
+        apogee.action.fireEvents(workspace,completedResults,recalculateList);
         
         //save the action for the undo queue if needed
         //WE HAVE NOT UNDO QUEUE NOT. But do set the workspace dirty flag, which 
@@ -119,19 +110,29 @@ apogee.action.doAction = function(actionData,addToUndo,optionalActionResponse) {
         }
 	}
 	catch(error) {
-        //unknown application error
-        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,true);
-        actionResponse.addError(actionError);
+        if(error.stack) console.error(error.stack);
+        
+        //unknown application error - this is fatal
+        actionResult.cmdDone = false;
+        actionResult.isFatal = true
+        actionResult.alertMsg = "Unknown error updating model: " + error.message;
+        
+        workspace.clearCommandQueue();
+        workspace.setActionInProgress(false);
+        return actionResult;
+        
     }
     
     //flag action in progress
     workspace.setActionInProgress(false);
+    actionResult.cmdDone = true;
     
     //trigger any pending actions
+    //these will be done asynchronously
     var queuedActionData = workspace.getQueuedAction();
     if(queuedActionData) {
         var runQueuedAction = true;
-        
+
         if(workspace.checkConsecutiveQueuedActionLimitExceeded()) {
             //ask user if about continueing
             var doContinue = confirm("The calculation is taking a long time. Continue?");
@@ -140,7 +141,7 @@ apogee.action.doAction = function(actionData,addToUndo,optionalActionResponse) {
                 runQueuedAction = false;
             }
         }
-        
+
         if(runQueuedAction) {
             apogee.action.asynchRunQueuedAction(queuedActionData);
         }
@@ -149,8 +150,8 @@ apogee.action.doAction = function(actionData,addToUndo,optionalActionResponse) {
         workspace.clearConsecutiveQueuedTracking();
     }
     
-    //return response
-	return actionResponse;
+    //return actionResult
+	return actionResult;
 }
 
 /** This function is used to register an action. */
@@ -159,16 +160,17 @@ apogee.action.addActionInfo = function(actionName,actionInfo) {
 }
 
 /** This function looks up the proper function for an action and executes it. */
-apogee.action.callActionFunction = function(actionData,context,processedActions) {
+apogee.action.callActionFunction = function(workspace,actionData,actionResult) {
 
     //do the action
     var actionInfo = apogee.action.actionInfo[actionData.action];
     if(actionInfo) {
-        actionData.actionInfo = actionInfo;
-        actionInfo.actionFunction(actionData,context,processedActions);
+        actionResult.actionInfo = actionInfo;
+        actionInfo.actionFunction(workspace,actionData,actionResult);
     }
     else {
-        actionData.error = new apogee.ActionError("Unknown action: " + actionData.action,apogee.ActionError.ERROR_TYPE_APP,null);
+        actionResult.cmdDone = false;
+        actionResult.alertMsg = "Unknown action: " + actionData.action;
     }  
 }
 
@@ -179,9 +181,10 @@ apogee.action.callActionFunction = function(actionData,context,processedActions)
 /** This function triggers the action for the queued action to be run when the current thread exits. */
 apogee.action.asynchRunQueuedAction = function(queuedActionData) {
     var callback = function() {
-        apogee.action.doAction(queuedActionData.actionData,
-            queuedActionData.addToUndo,
-            queuedActionData.optionalActionResponse);
+        apogee.action.doAction(
+            queuedActionData.workspace,
+            queuedActionData.actionData,
+            queuedActionData.addToUndo);
     }
     
     setTimeout(callback,0);
@@ -189,19 +192,21 @@ apogee.action.asynchRunQueuedAction = function(queuedActionData) {
 
 /** This method makes sure the member dependencies in the workspace are properly updated. 
  * @private */
-apogee.action.updateDependencies = function(workspace,processedActions,recalculateList) {
+apogee.action.updateDependencies = function(workspace,completedResults,recalculateList) {
     //check if we need to update the entire model
-    var updateAllDep = apogee.action.checkUpdateAllDep(processedActions);
+    var updateAllDep = apogee.action.checkUpdateAllDep(completedResults);
     if(updateAllDep) {
         //update entire model - see conditions bewlo
         workspace.updateDependeciesForModelChange(recalculateList);
     }
     else {
         //upate dependencies on table with updated code
-        for(var i = 0; i < processedActions.length; i++) {
-            var actionData = processedActions[i];
-            if(apogee.action.doInitializeDependencies(actionData)) {
-                actionData.member.initializeDependencies();
+        for(var i = 0; i < completedResults.length; i++) {
+            var actionResult = completedResults[i];
+            if((actionResult.cmdDone)&&(actionResult.member)) {
+                if(apogee.action.doInitializeDependencies(actionResult)) {
+                    actionResult.member.initializeDependencies();
+                }
             }
         }
     }
@@ -209,45 +214,52 @@ apogee.action.updateDependencies = function(workspace,processedActions,recalcula
     
 /** This function updates the recalculation list for the given processed actions. 
  * @private */
-apogee.action.updateRecalculateList = function(processedActions,recalculateList) {
-    for(var i = 0; i < processedActions.length; i++) {
-        var actionData = processedActions[i];
-        if(apogee.action.doAddToRecalc(actionData)) {
-            apogee.calculation.addToRecalculateList(recalculateList,actionData.member);            
-        }
-        else if((apogee.action.doAddDependOnToRecalc(actionData))) {
-            apogee.calculation.addDependsOnToRecalculateList(recalculateList,actionData.member);                         
+apogee.action.updateRecalculateList = function(completedResults,recalculateList) {
+    for(var i = 0; i < completedResults.length; i++) {
+        var actionResult = completedResults[i];
+        if((actionResult.cmdDone)&&(actionResult.member)) {
+            if(apogee.action.doAddToRecalc(actionResult)) {
+                apogee.calculation.addToRecalculateList(recalculateList,actionResult.member);            
+            }
+            else if((apogee.action.doAddDependOnToRecalc(actionResult))) {
+                apogee.calculation.addDependsOnToRecalculateList(recalculateList,actionResult.member);                         
+            }
         }
     }
 }
     
 /** This function fires the proper events for the action. 
  * @private */
-apogee.action.fireEvents = function(workspace,processedActions,recalculateList) {
+apogee.action.fireEvents = function(workspace,completedResults,recalculateList) {
     
     //TEMPORARY EVENT PROCESSING - NEEDS TO BE IMPROVED
     var eventSet = {};
     var member;
     
-    for(var i = 0; i < processedActions.length; i++) {
-        var actionData = processedActions[i];
+    for(var i = 0; i < completedResults.length; i++) {
+        var actionResult = completedResults[i];
+        var actionInfo = actionResult.actionInfo;
         
-        if(actionData.actionInfo) {
-            var eventName = actionData.actionInfo.event;
+        if(actionInfo) {
+            var eventName = actionInfo.event;
             if(!eventName) continue;
             
-            var member = actionData.member;
+            var member = actionResult.member;
       
             apogee.action.fireEvent(workspace,eventName,member);
 
             //temporary processing!
             if(member) {
-                eventSet[actionData.member.getId()] = true;
+                eventSet[member.getId()] = true;
             }
         }
     }
     
     //Doh! WE NEED TO DO THIS DIFFERENTLY FOR LOTS OF REASONS
+    //later note - I am not sure what those reasons are. I need to think about this.
+    //maybe I want a better control over what events are actually fired - meaning I don't 
+    //want to fire updated twice, but there may be cases where I fire some event in addition
+    //to updated?
     for(i = 0; i < recalculateList.length; i++) {
         var member = recalculateList[i];
         if(!eventSet[member.getId()]) {
@@ -265,13 +277,14 @@ apogee.action.fireEvent = function(workspace,name,data) {
  * tracking may be in error if a new member is created, a member is deleted or
  * a member is moved. In these actions we flag that the entire model should be
  * updated.*/
-apogee.action.checkUpdateAllDep = function(processedActions) {
-    for(var i = 0; i < processedActions.length; i++) {
-        var actionData = processedActions[i];
-        var member = actionData.member;
+apogee.action.checkUpdateAllDep = function(completedResults) {
+    for(var i = 0; i < completedResults.length; i++) {
+        var actionResult = completedResults[i];
+        
         //we need to update the entire model if any actino is flagged as such
-        if(member) {
-            if((actionData.actionInfo)&&(actionData.actionInfo.checkUpdateAll)){
+        if(actionResult.member) {
+            var actionInfo = actionResult.actionInfo;
+            if((actionInfo)&&(actionInfo.checkUpdateAll)){
                 return true;
             }
         }
@@ -280,12 +293,12 @@ apogee.action.checkUpdateAllDep = function(processedActions) {
 }
 
 /** This method if a single action entry requires updating dependencies for the associated member. */
-apogee.action.doInitializeDependencies = function(actionData) {
-    if(!actionData.member) return false;
+apogee.action.doInitializeDependencies = function(actionResult) {
+    if(!actionResult.member) return false;
     
     //only applicable to codeables
-    if((actionData.actionInfo)&&(actionData.member.isCodeable)) {
-        return actionData.actionInfo.updateDependencies;
+    if((actionResult.actionInfo)&&(actionResult.member.isCodeable)) {
+        return actionResult.actionInfo.updateDependencies;
     }
     else {
         return false;
@@ -293,12 +306,12 @@ apogee.action.doInitializeDependencies = function(actionData) {
 }
 
 /** This method checks if the associated member and its dependencies need to be added to the recalc list. */
-apogee.action.doAddToRecalc = function(actionData) {
-    if(!actionData.member) return false;
-    if(!actionData.member.isDependent) return false;
+apogee.action.doAddToRecalc = function(actionResult) {
+    if(!actionResult.member) return false;
+    if(!actionResult.member.isDependent) return false;
     
-    if(actionData.actionInfo) {
-        return actionData.actionInfo.addToRecalc;
+    if(actionResult.actionInfo) {
+        return actionResult.actionInfo.addToRecalc;
     }
     else {
         return false;
@@ -306,12 +319,20 @@ apogee.action.doAddToRecalc = function(actionData) {
 }
 
 /** This method checks if the dependencies of the associated needs to be added to the recalc list, but not the member itself. */
-apogee.action.doAddDependOnToRecalc = function(actionData) {
-    if(actionData.actionInfo) {
-        return actionData.actionInfo.addDependenceiesToRecalc;
+apogee.action.doAddDependOnToRecalc = function(actionResult) {
+    if(actionResult.actionInfo) {
+        return actionResult.actionInfo.addDependenceiesToRecalc;
     }
     else {
         return false;
+    }
+}
+
+/** This method unpacks the actionResult and its child reponse into an array of actionResult. */
+apogee.action.addToCompletedResultList = function(completedResults,actionResult) {
+    completedResults.push(actionResult);
+    if(actionResult.childActionResults) {
+        actionResult.childActionResults.forEach( childActionResult => apogee.action.addToCompletedResultList(completedResults,childActionResult));
     }
 }
 

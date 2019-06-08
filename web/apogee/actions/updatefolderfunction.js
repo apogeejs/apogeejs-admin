@@ -15,14 +15,21 @@ apogee.updatefolderfunction = {};
 apogee.updatefolderfunction.ACTION_NAME = "updateFolderFunction";
 
 /** Update folder function action function */
-apogee.updatefolderfunction.updateProperties = function(actionData,processedActions) { 
-          
-    var folderFunction = actionData.member;
+apogee.updatefolderfunction.updateProperties = function(workspace,actionData,actionResult) { 
+    
+    var memberFullName = actionData.memberName;
+    var folderFunction = workspace.getMemberByFullName(memberFullName);
+    if(!folderFunction) {
+        actionResult.cmdDone = false;
+        actionResult.errorMsg = "Member not found for update member code";
+        return;
+    }
+    actionResult.member = folderFunction;
     
     folderFunction.setArgList(actionData.argList);
     folderFunction.setReturnValueString(actionData.returnValueString);
     
-    processedActions.push(actionData);
+    actionResult.cmdDone = true;
 }
 
 /** Action info */

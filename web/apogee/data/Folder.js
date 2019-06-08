@@ -126,17 +126,11 @@ apogee.Folder.prototype.updateDependeciesForModelChange = function(recalculateLi
 
 /** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-apogee.Folder.fromJson = function(owner,json,childrenJsonOutputList) {
+apogee.Folder.fromJson = function(owner,json) {
     var folder = new apogee.Folder(json.name,owner);
     if(json.childrenNotWriteable) {
         folder.setChildrenWriteable(false);
     }
-    
-    for(var key in json.children) {
-        var childJson = json.children[key];
-        childrenJsonOutputList.push(childJson);
-    }
-    
     return folder;
 }
 
