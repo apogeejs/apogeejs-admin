@@ -43,7 +43,7 @@ apogeeapp.app.WorkspaceUI = class {
       * if the workspace is not empty, such as when opening a existing workspace. It
       * contains the data for the component associated with each workspace member. For 
       * a new empty workspace the workspaceJson should be omitted. */
-    load(workspaceJson,actionResponse) { 
+    load(workspaceJson) { 
 
         var workspaceDataJson;
         var workspaceComponentsJson;
@@ -58,7 +58,7 @@ apogeeapp.app.WorkspaceUI = class {
         }
 
         //create workspace
-        this.workspace = new apogee.Workspace(workspaceDataJson,actionResponse);
+        this.workspace = new apogee.Workspace(workspaceDataJson);
 
         //set up the root folder conmponent, with children if applicable
         var rootFolder = this.workspace.getRoot();

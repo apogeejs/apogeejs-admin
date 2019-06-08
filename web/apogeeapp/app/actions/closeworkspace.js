@@ -19,7 +19,6 @@ apogeeapp.app.closeworkspace.doCloseWorkspace = function(app) {
     var activeWorkspaceUI = app.getWorkspaceUI();
     var workspace = activeWorkspaceUI.getWorkspace();
     
-    var actionResponse = new apogee.ActionResponse();
     var workspaceUIRemoved = false;
     
     try {
@@ -31,11 +30,11 @@ apogeeapp.app.closeworkspace.doCloseWorkspace = function(app) {
     }
     catch(error) {
         var isFatal = !workspaceUIRemoved;
-        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,isFatal);
-        actionResponse.addError(actionError);
+        var errorMsg = "Error closeing workspace: " + error.message;
+        apogeeapp.app.CommandManager.errorAlert(errorMsg,isFatal);
     }
     
-    return actionResponse;
+    return workspaceUIRemoved;
 }
 
 

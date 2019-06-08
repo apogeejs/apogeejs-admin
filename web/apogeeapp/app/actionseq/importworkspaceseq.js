@@ -11,19 +11,17 @@ apogeeapp.app.importworkspaceseq = {};
     //make sure there is not an open workspace
     if(!app.getWorkspaceUI()) {
         alert("There must be an open workspace to import a workspace.");
-        return;
+        return false;
     }    
 
     var onOpen = function(err,app,workspaceData,fileMetadata) {
         if(err) {
-            var actionResponse = new apogee.ActionResponse();
-            var actionError = apogee.ActionError.processException(err,apogee.ActionError.ERROR_TYPE_USER,false);
-            actionResponse.addError(actionError);
-            apogeeapp.app.errorHandling.handleActionError(actionResponse);
+            apogeeapp.app.CommandManager.errorAlert("Error adding link: " + err);
+            return false;
         }
         else {
             //open workspace
-            apogeeapp.app.importworkspaceseq.openWorkspace(app,componentGenerator,workspaceData,fileMetadata);
+            return apogeeapp.app.importworkspaceseq.openWorkspace(app,componentGenerator,workspaceData,fileMetadata);
         }
     }
 
@@ -40,7 +38,6 @@ apogeeapp.app.importworkspaceseq = {};
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
 apogeeapp.app.importworkspaceseq.openWorkspace = function(app,componentGenerator,workspaceText,fileMetadata) {
-    var actionResponse = new apogee.ActionResponse();
     var name;
     
     try {
@@ -70,9 +67,7 @@ apogeeapp.app.importworkspaceseq.openWorkspace = function(app,componentGenerator
         }
         
         var workspaceImportError2 = function(errorMsg) {
-            var actionError = new apogee.ActionError(errorMsg,apogee.ActionError.ERROR_TYPE_USER,false);
-            actionResponse.addError(actionError);
-            apogeeapp.app.errorHandling.handleActionError(actionResponse);
+            apogeeapp.app.CommandManager.errorAlert(errorMsg);
         }
         
         //load links then import the workspace. On a link load error, continue with importing the workspace
@@ -81,9 +76,8 @@ apogeeapp.app.importworkspaceseq.openWorkspace = function(app,componentGenerator
         loadReferencesPromise.catch(linkLoadError).then(workspaceImportDialogFunction).catch(workspaceImportError2);
     }
     catch(error) {
-        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
-        actionResponse.addError(actionError);
-        apogeeapp.app.errorHandling.handleActionError(actionResponse);
+        apogeeapp.app.CommandManager.errorAlert("Error importing workspace: " + error.message);
+        return false;
     }
     
     return true;
@@ -94,9 +88,9 @@ apogeeapp.app.importworkspaceseq.openWorkspace = function(app,componentGenerator
 
 /** This method opens an workspace by getting the workspace file from the url. */
 apogeeapp.app.importworkspaceseq.openWorkspaceFromUrl = function(app,url) {
-    var actionCompletedCallback = function(actionResponse) {
-        if(!actionResponse.getSuccess()) {
-            apogeeapp.app.errorHandling.handleActionError(actionResponse);
+    var actionCompletedCallback = function(success,errorMsg) {
+        if(!success) {
+            apogeeapp.app.CommandManager.errorAlert(errroMsg);
         }
     };
     
@@ -110,10 +104,7 @@ apogeeapp.app.importworkspaceseq.openWorkspaceFromUrlImpl = function(app,url,act
     }
     
     var onFailure = function(msg) {
-        var actionError = new apogee.ActionError(msg,apogee.ActionError.ERROR_TYPE_APP,null);
-        var actionResponse = new apogee.ActionResponse();
-        actionResponse.addError(actionError);
-        actionCompletedCallback(actionResponse);
+        actionCompletedCallback(false,msg);
     }   
     apogeeapp.app.importworkspaceseq.doRequest(url,onDownload,onFailure);   
 }

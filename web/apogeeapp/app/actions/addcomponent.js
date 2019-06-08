@@ -47,16 +47,22 @@ apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,pare
 apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,componentGenerator,memberJson,componentProperties,optionalOnSuccess) {
     
     var workspace = workspaceUI.getWorkspace();
-    var parent = workspace.getMemberByFullName(parentFullName);
 
+    //##########################################################################
     //create the member
     var createAction = {};
     createAction.action = "createMember";
-    createAction.owner = parent;
-    createAction.workspace = workspace;
+    createAction.ownerName = parentFullName;
     createAction.createData = memberJson;
-    var actionResponse = apogee.action.doAction(createAction,true);
-    var member = createAction.member;
+    var response = apogee.action.doAction(workspace,createAction,true);
+    
+    //response - get new member
+    var member = response.member;
+    var cmdDone = true;
+    var errorMessage = null;
+    
+    //end create member
+    //##########################################################################
 
     if(member) {
         var component;
@@ -68,35 +74,41 @@ apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,
 
             //unknown failure
             if(!component) {
-                var message = "Unknown error creating component";
-                var actionError = new apogee.ActionError(message,apogee.ActionError.ERROR_TYPE_APP);
-                actionResponse.addError(actionError);
+                errorMessage = "Unknown error creating component";
             }
         }
         catch(error) {
             //exception creating component
-            var message = "Failed to create UI component: " + error.message;
-            var actionError = new apogee.ActionError(message,apogee.ActionError.ERROR_TYPE_APP);
-            actionResponse.addError(actionError);
+            errorMessage = "Failed to create UI component: " + error.message;
         }
 
         if(!component) {
-            //delete the already created member
+            //##########################################################################
+            //undo create the member
             var json = {};
             json.action = "deleteMember";
-            json.member = member;
+            json.memberName = member.getFullName();
             //if this fails, we will just ignore it for now
-            apogee.action.doAction(json,true);
+            apogee.action.doAction(workspace,json,true);
+            //end undo create member
+            //##########################################################################
+            
+            //this should have already been set
+            cmdDone = false;
         }
-
-
+    }
+    else {
+        errorMessage = response.alertMsg;
     }
 
-    if(actionResponse.getSuccess()) {
+    if(response.cmdDone) {
 //NOTE - WE PROBABLY SHOULD ALLOW ERROR INFORMATION FROM optionalOnSuccess
 //ALSO CONSIDIER IF THIS  SHOULD BE OUTSIDE OF ACTION (probably not, I'm thinking for now)
         if(optionalOnSuccess) optionalOnSuccess(member,component);
     }
+    
+    //alert user if we had an error message
+    if(errorMessage) alert(errorMessage);
 
-    return actionResponse;
+    return cmdDone;
 }

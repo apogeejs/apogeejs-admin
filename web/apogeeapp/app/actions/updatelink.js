@@ -38,19 +38,18 @@ apogeeapp.app.updatelink.createRemoveEntryCommand = function(referenceEntry) {
 
 /** This is the command function to add a reference entry */
 apogeeapp.app.updatelink.doAddEntry = function(referenceManager,entryJson) {
-    var actionResponse = new apogee.ActionResponse();
     try {
         //add entry function
         var promise = referenceManager.addEntry(entryJson);
 
         promise.catch(errorMsg => {alert("There was an error loading the link: " + errorMsg);});
+        
+        //we don't know if we had success - think about how to do this rather than just saying true now
+        return true;
     }
     catch(error) {
-        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
-        actionResponse.addError(actionError);
+        apogeeapp.app.CommandManager.errorAlert("Error adding link: " + error.message);
     }
-    
-    return actionResponse;
 }
 
 /** This is the command function to update a reference entry */
@@ -63,25 +62,25 @@ apogeeapp.app.updatelink.doUpdateEntry = function(referenceManager,entryType,old
         if(referenceEntry) {
             //update entry
             referenceEntry.updateData(newUrl,newNickname);
+            
+            //TODO - think about how to add result one link updaye completion
+            return true;
         }
         else {
             //entry not found
-            var actionError = new apogee.ActionError("Entry to update not found!",apogee.ActionError.ERROR_TYPE_APP);
-            actionResponse.addError(actionError);
+            apogeeapp.app.CommandManager.errorAlert("Entry to update not found!");
+            return false;
         }
     }
     catch(error) {
         //unkown error
-        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
-        actionResponse.addError(actionError);
+        apogeeapp.app.CommandManager.errorAlert("Error adding link: " + error.message);
+        return false;
     }
-    
-    return actionResponse;
 }
 
 /** This is the command function to delete a reference entry */
 apogeeapp.app.updatelink.doRemoveEntry = function(referenceManager,entryType,url) {
-    var actionResponse = new apogee.ActionResponse();
     try {
         //lookup entry for this reference
         var referenceEntry = referenceManager.lookupEntry(entryType,url);
@@ -89,20 +88,22 @@ apogeeapp.app.updatelink.doRemoveEntry = function(referenceManager,entryType,url
         if(referenceEntry) {
             //update entry
             referenceEntry.remove();
+            
+            //TODO - handle error properly
+            return true;
         }
         else {
             //entry not found
-            var actionError = new apogee.ActionError("Entry to delete not found!",apogee.ActionError.ERROR_TYPE_APP);
-            actionResponse.addError(actionError);
+            apogeeapp.app.CommandManager.errorAlert("Entry to delete not found!");
+            return false;
         }
     }
     catch(error) {
         //unkown error
-        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
-        actionResponse.addError(actionError);
+        apogeeapp.app.CommandManager.errorAlert("Error deleting link: " + error.message);
+        return false;
     }
-    
-    return actionResponse;
+
 }
 
 

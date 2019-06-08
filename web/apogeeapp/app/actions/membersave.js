@@ -59,70 +59,56 @@ apogeeapp.app.membersave.createSaveDescriptionCommand = function(member,text) {
 
 /** @private */
 apogeeapp.app.membersave.doSaveData = function(workspace,memberFullName,data) {
-    
-    var member  = workspace.getMemberByFullName(memberFullName);
-    if(!member) {
-        throw new Error("Error calling save - member not fond: " + memberFullName);
-    }
-    
+
     var actionData = {};
     actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
-    actionData.member = member;
+    actionData.memberName = memberFullName;
     actionData.data = data;
-    var actionResponse =  apogee.action.doAction(actionData,true);
-
-    return actionResponse;    
+    
+    var response =  apogee.action.doAction(workspace,actionData,true);
+    if(response.alertMsg) alert(alertMsg);
+    return response.cmdDone;
 }
 
 /** @private */
 apogeeapp.app.membersave.doSetCode = function(workspace,memberFullName,argList,functionBody,supplementalCode,optionalClearCodeDataValue) {
-     
-    var member  = workspace.getMemberByFullName(memberFullName);
-    if(!member) {
-        throw new Error("Error calling save - member not fond: " + memberFullName);
-    }
      
     var actionData = {};
 
     if((optionalClearCodeDataValue != undefined)&&(functionBody == "")&&(supplementalCode == "")) {
         //special case - clear code
         actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
-        actionData.member = member;
+        actionData.memberName = memberFullName;
         actionData.data = optionalClearCodeDataValue;
     }
     else {
         //standard case - edit code
         actionData.action = apogee.updatemember.UPDATE_CODE_ACTION_NAME;
-        actionData.member = member;
+        actionData.memberName = memberFullName;
         actionData.argList = argList;
         actionData.functionBody = functionBody;
         actionData.supplementalCode = supplementalCode;  
     }
 
-    var actionResponse =  apogee.action.doAction(actionData,true);
-
-    return actionResponse;  
+    var response =  apogee.action.doAction(workspace,actionData,true);
+    if(response.alertMsg) alert(alertMsg);
+    return response.cmdDone;  
 }
 
 /** @private */
 apogeeapp.app.membersave.doSaveDescription = function(workspace,memberFullName,text) {
 
-    var member = workspace.getMemberByFullName(memberFullName);
-    if(!member) {
-        throw new Error("Error calling save - member not fond: " + memberFullName);
-    }
-    
     if((text === null)||(text === undefined)) {
         text = "";
     }
 
     var actionData = {};
     actionData.action = apogee.updatemember.UPDATE_DESCRIPTION_ACTION_NAME;
-    actionData.member = member;
+    actionData.memberName = memberFullName;
     actionData.description = text;
-    var actionResponse =  apogee.action.doAction(actionData,true);
-
-    return actionResponse;
+    var response =  apogee.action.doAction(workspace,actionData,true);
+    if(response.alertMsg) alert(alertMsg);
+    return response.cmdDone;
 }
 
 /** @private */
@@ -134,19 +120,18 @@ apogeeapp.app.membersave.doErrorUpdate = function(workspace,memberFullName,error
  * @private */
 apogeeapp.app.membersave.doResetPendingState = function(workspace,memberFullName,pendingPromise) {
     
-    var member  = workspace.getMemberByFullName(memberFullName);
-    if(!member) {
-        throw new Error("Error calling save - member not fond: " + memberFullName);
-    }
-    
     var actionData = {};
     actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
-    actionData.member = member;
+    actionData.memberName = memberFullName;
     actionData.data = pendingPromise;
     actionData.promiseRefresh = true;
-    var actionResponse =  apogee.action.doAction(actionData,true);
+    var actionResult =  apogee.action.doAction(workspace,actionData,true);
 
-    return actionResponse;  
+    if(actionResult.alertMsg) {
+        apogeeapp.app.CommandManager.errorAlert(alertMsg);
+    }
+
+    return actionResult.cmdDone;  
 }
 
 

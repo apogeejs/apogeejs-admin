@@ -185,11 +185,7 @@ apogeeapp.app.CustomDataComponent.prototype.getUiCallbacks = function(codeField)
         saveData: (text) => {
             var uiCodeFields = this.getUiCodeFields();
             uiCodeFields[codeField] = text;
-            var actionResponse = this.update(uiCodeFields);
-            if(!actionResponse.getSuccess()) {
-                //show an error message
-                apogeeapp.app.errorHandling.handleActionError(actionResponse);
-            }
+            this.update(uiCodeFields);
             return true;  
         }
     }
@@ -271,9 +267,6 @@ apogeeapp.app.CustomDataComponent.prototype.update = function(uiCodeFields) {
             this.currentCss = newCss;
         }
     }
-    
-	var actionResponse = new apogee.ActionResponse();
-    return actionResponse; 
 }
 
 //==============================

@@ -21,7 +21,6 @@ apogeeapp.app.createworkspace.createCreateWorkspaceCommand = function(app) {
 
 /** This method creates a new workspace. */
 apogeeapp.app.createworkspace.doCreateWorkspace = function(app) {
-    var actionResponse = new apogee.ActionResponse();
     var workspaceUIAdded;
     
     try {
@@ -32,17 +31,15 @@ apogeeapp.app.createworkspace.doCreateWorkspace = function(app) {
         
         //load
         workspaceUI.load();
-    
-        actionResponse.workspaceUI = workspaceUI;
     }
     catch(error) { 
         if(workspaceUIAdded) {
             app.clearWorkspaceUI();
         }
         
-        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
-        actionResponse.addError(actionError);
+        var errorMsg = "Error opening workspace: " + error.message;
+        apogeeapp.app.CommandManager.errorAlert(errorMsg);
     }
     
-    return actionResponse; 
+    return workspaceUIAdded; 
 }

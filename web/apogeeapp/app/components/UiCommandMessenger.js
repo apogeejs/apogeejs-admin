@@ -9,7 +9,8 @@ apogeeapp.app.UiCommandMessenger = class {
         this.messenger = new apogee.action.Messenger(fromMember);
     }
     
-    dataUpdate(updateMemberName,data) {
+    /** This method gets the command to update the given table using the messenger */
+    getDataUpdateCommand(updateMemberName,data,optionalCommandDescription) {
         var member = this.messenger.getMemberObject(updateMemberName);
         if(!member) {
             var msg = "Member not found: " + updateMemberName;
@@ -20,12 +21,13 @@ apogeeapp.app.UiCommandMessenger = class {
         var command = {};
         command.cmd = () => this._messengerCallWrapper(() => this.messenger.dataUpdate(updateMemberName,data));
         command.undoCmd = apogeeapp.app.membersave.getMemberStateUndoCommand(member);
-        command.desc = "User Input write to " + updateMemberName;
+        command.desc = optionalCommandDescription ? optionalCommandDescription : "User Input write to " + updateMemberName;
         
-        apogeeapp.app.Apogee.getInstance().executeCommand(command);
+        return command;
     }
     
-    compoundDataUpdate(updateInfo) { 
+    /** This method gets the command to do a compound data update with the messenger. */
+    getCompoundDataUpdateCommand(updateInfo,optionalCommandDescription) {
         //get the compound update to undo this one
         var getUndoValue = updateElement => {
             var member = this.messenger.getMemberObject(updateElement[0]);
@@ -44,42 +46,30 @@ apogeeapp.app.UiCommandMessenger = class {
         var command = {};
         command.cmd = () => this._messengerCallWrapper(() => this.messenger.compoundDataUpdate(updateInfo));
         command.undoCmd = () => this._messengerCallWrapper(() => this.messenger.compoundDataUpdate(undoUpdateInfo));
-        command.desc = "User Input compound data action";
+        command.desc = optionalCommandDescription ? optionalCommandDescription : "User Input compound data action";
         
-        apogeeapp.app.Apogee.getInstance().executeCommand(command);
-        
+        return command
     }
-    errorUpdate(updateMemberName,errorMessage) {
-        var member = this.messenger.getMemberObject(updateMemberName);
-        if(!member) {
-            var msg = "Member not found: " + updateMemberName;
-            alert(msg);
-            return;
-        }
-        
-        var command = {};
-        command.cmd = () => this._messengerCallWrapper(() => this.messenger.errorUpdate(updateMemberName,errorMessage));
-        command.undoCmd = apogeeapp.app.membersave.getMemberStateUndoCommand(member);
-        command.desc = "User Input error action";
-        
+    
+    /** This method executes a command. */
+    executeCommand(command) {
         apogeeapp.app.Apogee.getInstance().executeCommand(command);
     }
     
-    asynchDataUpdate(updateMemberName,dataPromise) {
-        var member = this.messenger.getMemberObject(updateMemberName);
-        if(!member) {
-            var msg = "Member not found: " + updateMemberName;
-            alert(msg);
-            return;
-        }
-        var initialData = member.getData();
-        
-        var command = {};
-        command.cmd = () => this._messengerCallWrapper(() => this.messenger.asynchDataUpdate(updateMemberName,dataPromise));
-        command.undoCmd = apogeeapp.app.membersave.getMemberStateUndoCommand(member);
-        command.desc = "User Input write to " + updateMemberName;
-        
-        apogeeapp.app.Apogee.getInstance().executeCommand(command);
+    
+    //###############################################
+    // THERE ARE THE OLD MESSENGER-LIKE METHODS
+    // I IWLL KEEP THESE TEMPORARILY FOR BACK COMPATIBILITY
+    //###############################################
+    
+    dataUpdate(updateMemberName,data) {
+        var command = this.getDataUpdateCommand(updateMemberName,data);
+        this.executeCommand(command);
+    }
+    
+    compoundDataUpdate(updateInfo) { 
+        var command = this.getCompoundDataUpdateCommand(updateInfo);
+        this.executeCommand(command);       
     }
     
     //=============================
@@ -89,15 +79,15 @@ apogeeapp.app.UiCommandMessenger = class {
     /** This method wraps the call to the messenger to return an action response
      * rather than throw an error. */
     _messengerCallWrapper(messengerCallFunction) {
-        var actionResponse = new apogee.ActionResponse();
+
         try {
             messengerCallFunction();
+            return true;
         }
         catch(error) {
-            var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false,"Error in executing user input: ");
-            actionResponse.addError(actionError);
+            apogeeapp.app.CommandManager.errorAlert("Error setting remote data: " + error.message);
+            return false;
         }
-        return actionResponse;
     }
 
     

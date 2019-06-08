@@ -18,7 +18,7 @@ apogeeapp.app.updateworkspace.doUpdatePropertyValues = function(workspaceUI,oldV
     
     var workspace = workspaceUI.getWorkspace();
 
-    var actionResponse = new apogee.ActionResponse();
+    var response;
     
     //check if rename is needed
     if(oldValues.name !== newValues.name) {
@@ -28,12 +28,18 @@ apogeeapp.app.updateworkspace.doUpdatePropertyValues = function(workspaceUI,oldV
         actionData.workspace = workspace;
         actionData.name = newValues.name;
         
-        actionResponse = apogee.action.doAction(actionData,true,actionResponse);
+        response = apogee.action.doAction(workspace,actionData,true);
     }
     
     //update any workspace ui properties here
         
-    return actionResponse;
+    if(response) {
+        if(response.alertMsg) alert(response.alertMsg);
+        return response.cmdDone;
+    }
+    else {
+        return true;
+    }
 }
 
 

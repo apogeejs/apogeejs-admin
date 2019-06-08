@@ -19,8 +19,8 @@ apogeeapp.app.openworkspace.createOpenWorkspaceCommand = function(app,workspaceD
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
 apogeeapp.app.openworkspace.doOpenWorkspace = function(app,workspaceText,fileMetadata) {
-    var actionResponse = new apogee.ActionResponse();
     var workspaceUIAdded;
+    var success = true;
     
     try {
         //parse the workspace json
@@ -41,15 +41,14 @@ apogeeapp.app.openworkspace.doOpenWorkspace = function(app,workspaceText,fileMet
         }
         
         var linkLoadError = function(errorMsg) {
-            alert("Error loading links: " + errorMsg);
+            apogeeapp.app.CommandManager.errorAlert("Error loading links: " + errorMsg);
             //we should continue with the workpace load
         }
         
         var workspaceLoadError = function(errorMsg) {
             app.clearWorkspaceUI();
-            var actionError = new apogee.ActionError(errorMsg,apogee.ActionError.ERROR_TYPE_USER,false);
-            actionResponse.addError(actionError);
-            apogeeapp.app.errorHandling.handleActionError(actionResponse);
+            apogeeapp.app.CommandManager.errorAlert(errorMsg);
+            success = false;
         }
         
         //load references and then workspace
@@ -60,10 +59,10 @@ apogeeapp.app.openworkspace.doOpenWorkspace = function(app,workspaceText,fileMet
         if(workspaceUIAdded) {
             app.clearWorkspaceUI();
         }
-        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,false);
-        actionResponse.addError(actionError);
+        apogeeapp.app.CommandManager.errorAlert("Error loading links: " + error.message);
+        success = false;
     }
         
-    return actionResponse;
+    return success;
 }
 

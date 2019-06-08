@@ -28,8 +28,6 @@ apogeeapp.app.updatecomponent.doUpdatePropertyValues = function(workspaceUI,comp
     var member = workspace.getMemberByFullName(componentFullName);   
     var component = workspaceUI.getComponent(member);
 
-    var actionResponse = new apogee.ActionResponse();
-
     var actionList = [];
     var actionData;
 
@@ -38,13 +36,13 @@ apogeeapp.app.updatecomponent.doUpdatePropertyValues = function(workspaceUI,comp
         //get the new name
         var newMemberName = newValues.name ? newValues.name : member.getName();
         //get the new owner
-        var newMemberOwner = newValues.parentName ? workspace.getMemberByFullName(newValues.parentName) : member.getOwner(); 
+        var newOwnerName = newValues.parentName; 
         
         actionData = {};
         actionData.action = "moveMember";
-        actionData.member = member;
-        actionData.name = newMemberName;
-        actionData.owner = newMemberOwner;
+        actionData.memberName = componentFullName;
+        actionData.targetName = newMemberName;
+        actionData.targetOwnerName = newOwnerName;
         actionList.push(actionData);
     }
 
@@ -57,19 +55,26 @@ apogeeapp.app.updatecomponent.doUpdatePropertyValues = function(workspaceUI,comp
         }
     }
 
+    var response;
     if(actionList.length > 0) {
         actionData = {};
         actionData.action = "compoundAction";
         actionData.actions = actionList;
-        actionData.workspace = workspace;
 
-        actionResponse = apogee.action.doAction(actionData,true,actionResponse);
+        response = apogee.action.doAction(workspace,actionData,true);
     }
     
     //update an component additional properties
+    //NEED ERROR HANDLING HERE!!!
     component.loadPropertyValues(newValues);
         
-    return actionResponse;
+    if(response) {
+        if(response.alertMsg) alert(response.alertMsg);
+        return response.cmdDone;
+    }
+    else {
+        return true;
+    }
 }
 
 

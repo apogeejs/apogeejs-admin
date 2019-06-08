@@ -36,23 +36,15 @@ apogeeapp.app.deletecomponent.createDeleteComponentCommand = function(component)
  *  undo/redo cases where the instance of the member changes.)
  */
 apogeeapp.app.deletecomponent.doDeleteComponent = function(workspace,memberFullName) {
+
+    var json = {};
+    json.action = "deleteMember";
+    json.memberName = memberFullName;
+    var response = apogee.action.doAction(workspace,json,true);
     
-    var member = workspace.getMemberByFullName(memberFullName);
-    var actionResponse;
-    
-    if(member) {
-        //delete the object - the component we be deleted after the delete event received
-        var json = {};
-        json.action = "deleteMember";
-        json.member = member;
-        actionResponse = apogee.action.doAction(json,true);
-    }
-    else {
-        var actionResponse = new apogee.ActionResponse();
-        var errorMsg = "Error: Member " + memberFullName + " not found.";
-        var actionError = new apogee.ActionError(errorMsg,apogee.ActionError.ERROR_TYPE_APP,null);
-        actionResponse.addError(actionError);
+    if(response.alertMsg) {
+        alert(response.alertMsg);
     }
     
-    return actionResponse;
+    return response.cmdDone;
 }

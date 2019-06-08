@@ -4,8 +4,9 @@
  * 
  * Command Structure:
  * {
- *      cmd - This is a function that executes the command. It should return a 
- *      ActionResponse, and take as optional input an action response to use.
+ *      cmd - This is a function that executes the command. It should return true 
+ *      if the command was executed and false if it was not. This is used to determine
+ *      if the user should be able to undo the action.
  *     
  *      undoCmd - This is a cmd that will undo the given cmd. It should have the
  *      same structure. If this is left undefined (or any false value) then the command
@@ -149,6 +150,17 @@ apogeeapp.app.CommandManager = class {
         }  
     }
     
+    /** This message does a standard error alert for the user. If the error is
+     * fatal, meaning the application is not in a stable state, the flag isFatal
+     * should be set to true. Otherwise it can be omitted or set to false.  */
+    static errorAlert(errorMsg,isFatal) {
+        if(isFatal) {
+            errorMsg = "Fatal Error: The application is in an indterminate state and should be closed!. " + errorMsg;
+        }
+        
+        alert(errorMsg);
+    }
+    
     //=================================
     // Private Methods
     //=================================
@@ -158,25 +170,16 @@ apogeeapp.app.CommandManager = class {
     _executeCmdFunction(cmdFunction) {
         //cmd functions should return an action response.
         try {
-            let actionResponse = cmdFunction();
-            if(actionResponse.getSuccess()) {
-                return true;
-            }
-            else {
-                //do standard error handling
-                apogeeapp.app.errorHandling.handleActionError(actionResponse);
-                return false;
-            }
+            let success = cmdFunction();
+            return success;
 
         }
         catch(error) {
             if(error.stack) console.error(error.stack);
             
             //we shouldn't get errors here. This is a fatal error.
-            let actionResponse = new apogee.ActionResponse();
-            let actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,true,"Unknown error executing command: ");
-            actionResponse.addError(actionError);
-            apogeeapp.app.errorHandling.handleActionError(actionResponse);
+            var fatalErrorMessage = ("Fatal error: The application is in an indetemrinate state. It is recommended you exit.");
+            alert(fatalErrorMessage);
             return false;
         }
     }
