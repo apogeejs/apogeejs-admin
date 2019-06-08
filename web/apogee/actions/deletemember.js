@@ -60,7 +60,7 @@ apogee.deletemember.deleteMember = function(workspace,actionData,actionResult) {
             childActionResult.actionInfo = apogee.deletemember.ACTION_INFO;
             childActionResult.cmdDone = true;
             
-            actionResult.childActionResults.push(childReponse);
+            actionResult.childActionResults.push(childActionResult);
         }
     }
 }

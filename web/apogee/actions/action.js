@@ -63,7 +63,7 @@ apogee.action.doAction = function(workspace,actionData,addToUndo) {
     //only allow one action at a time
     if(workspace.isActionInProgress()) {
         var queuedAction = {};
-        queuedActionData.workspace = workspace;
+        queuedAction.workspace = workspace;
         queuedAction.actionData = actionData;
         queuedAction.addToUndo = addToUndo;
         workspace.queueAction(queuedAction);
@@ -72,8 +72,7 @@ apogee.action.doAction = function(workspace,actionData,addToUndo) {
         //I think this only happens when we submit an action during a calculation
         //I am relying on that. TBR
         //I also need to work out what to return for a pending command
-        actionResult.cmdDone = false;
-        actionResult.cmdPending = true;
+        actionResult.cmdDone = true;
         return actionResult;
     }
     
