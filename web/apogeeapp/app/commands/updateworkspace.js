@@ -9,6 +9,7 @@ apogeeapp.app.updateworkspace.createUpdatePropertyValuesCommand = function(works
     command.cmd = () => apogeeapp.app.updateworkspace.doUpdatePropertyValues(workspaceUI,oldValues,newValues);
     command.undoCmd = () => apogeeapp.app.updateworkspace.doUpdatePropertyValues(workspaceUI,newValues,oldValues);
     command.desc = "Update workspace properties"
+    command.setsDirty = true;
     return command;
 }
 
@@ -18,7 +19,7 @@ apogeeapp.app.updateworkspace.doUpdatePropertyValues = function(workspaceUI,oldV
     
     var workspace = workspaceUI.getWorkspace();
 
-    var response;
+    var actionResult;
     
     //check if rename is needed
     if(oldValues.name !== newValues.name) {
@@ -28,14 +29,14 @@ apogeeapp.app.updateworkspace.doUpdatePropertyValues = function(workspaceUI,oldV
         actionData.workspace = workspace;
         actionData.name = newValues.name;
         
-        response = apogee.action.doAction(workspace,actionData,true);
+        actionResult = apogee.action.doAction(workspace,actionData);
     }
     
     //update any workspace ui properties here
         
-    if(response) {
-        if(response.alertMsg) alert(response.alertMsg);
-        return response.cmdDone;
+    if(actionResult) {
+        if(actionResult.alertMsg) apogeeapp.app.CommandMessenger.errorAlert(actionResult.alertMsg);
+        return actionResult.cmdDone;
     }
     else {
         return true;

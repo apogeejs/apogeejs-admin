@@ -301,7 +301,10 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         actionData.actions = updateActionList;
 
         //apply the update
-        var actionResult = apogee.action.doAction(virtualWorkspace,actionData,false);        
+        var actionResult = apogee.action.doAction(virtualWorkspace,actionData);        
+        if(actionResult.alertMsg) {
+            apogeeapp.app.CommandManager.errorAlert(actionResult.alertMsg);
+        }
         if(actionResult.cmdDone) {
             //retrieve the result
             if(returnValueTable) {
@@ -316,10 +319,6 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
                 //no return value found
                 return undefined;
             }
-        }
-        else {
-            //error exectuing folderFunction function - thro wan exception
-            throw apogee.base.createError(actionResult.getErrorMsg());
         }
     }
     

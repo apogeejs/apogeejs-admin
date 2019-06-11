@@ -14,9 +14,8 @@ apogeeapp.app.closeworkspaceseq.closeWorkspace = function(app) {
         return;
     }
 
-    //update this to use undo queue, when it is finished 
-    var workspace = activeWorkspaceUI.getWorkspace();
-    if(workspace.getIsDirty()) {
+    //
+    if(activeWorkspaceUI.getIsDirty()) {
         var doClose = confirm("There is unsaved data. Are you sure you want to close the workspace?");
         if(!doClose) {
             return;

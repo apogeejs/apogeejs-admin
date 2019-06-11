@@ -14,7 +14,6 @@ apogee.Workspace = function(optionalJson,optionalContextOwner) {
     apogee.RootHolder.init.call(this);
     
     // This is a queue to hold actions while one is in process.
-    this.isDirty = false;
     this.actionInProgress = false;
     this.actionQueue = [];
     this.consecutiveActionCount = 0;
@@ -42,22 +41,6 @@ apogee.Workspace.DEFAULT_WORKSPACE_NAME = "Workspace";
 apogee.Workspace.ROOT_FOLDER_NAME = "Model";
 
 apogee.Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT = 500;
-
-/** this method should be used to set the workspace as dirty, meaning it has 
- * new data to be saved. */
-apogee.Workspace.prototype.setIsDirty = function() {
-    this.isDirty = true;
-}
-
-/** This method returns true if the workspace needs to be saved. */
-apogee.Workspace.prototype.getIsDirty = function() {
-    return this.isDirty;
-}
-
-/** This method clears the is dirty flag. */
-apogee.Workspace.prototype.clearIsDirty = function() {
-    this.isDirty = false;
-}
 
 /** This method returns the root object - implemented from RootHolder.  */
 apogee.Workspace.prototype.setName = function(name) {
@@ -269,7 +252,7 @@ apogee.Workspace.prototype.loadFromJson = function(json) {
     actionData.action = "createMember";
     actionData.workspaceIsOwner = true;
     actionData.createData = json.data;
-    var actionResult = apogee.action.doAction(this,actionData,false);
+    var actionResult = apogee.action.doAction(this,actionData);
     
     return actionResult;
 }

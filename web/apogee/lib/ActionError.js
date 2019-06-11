@@ -72,5 +72,17 @@ apogee.ActionError.processException = function(exception,type,defaultToFatal,opt
     return actionError;
 }
 
+apogee.ActionError.getListErrorMsg = function(errorList) {
+    var msgList = errorList.map( actionError => {
+        var msg = "";
+        if(actionError.member) {
+            msg += actionError.member.getName() + ": ";
+        }
+        msg += actionError.msg;
+        return msg;
+    });
+    return msgList.join(";\n");
+}
+
 
  

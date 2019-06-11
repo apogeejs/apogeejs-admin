@@ -6,6 +6,7 @@ apogeeapp.app.updatelink.createAddEntryCommand = function(referenceManager,entry
     command.cmd = () => apogeeapp.app.updatelink.doAddEntry(referenceManager,entryJson);
     command.undoCmd = () => apogeeapp.app.updatelink.doRemoveEntry(referenceManager,entryJson.entryType,entryJson.url)
     command.desc = "Insert reference: " + (entryJson.nickname ? entryJson.nickname : entryJson.url);
+    command.setsDirty = true;
     return command;
 }
 
@@ -19,6 +20,7 @@ apogeeapp.app.updatelink.createUpdateEntryCommand = function(referenceEntry,newU
     command.cmd = () => apogeeapp.app.updatelink.doUpdateEntry(referenceManager,entryType,oldUrl,newUrl,newNickname);
     command.undoCmd = () => apogeeapp.app.updatelink.doUpdateEntry(referenceManager,entryType,newUrl,oldUrl,oldNickname);
     command.desc = "Update reference: " + (oldNickname ? oldNickname : oldUrl);
+    command.setsDirty = true;
     return command;
 }
 
@@ -33,6 +35,7 @@ apogeeapp.app.updatelink.createRemoveEntryCommand = function(referenceEntry) {
     command.cmd = () => apogeeapp.app.updatelink.doRemoveEntry(referenceManager,entryJson.entryType,entryJson.url);
     command.undoCmd = () => apogeeapp.app.updatelink.doAddEntry(referenceManager,entryJson);
     command.desc = "Remove reference: " + (entryJson.nickname ? entryJson.nickname : entryJson.url);
+    command.setsDirty = true;
     return command;
 }
 
@@ -54,7 +57,6 @@ apogeeapp.app.updatelink.doAddEntry = function(referenceManager,entryJson) {
 
 /** This is the command function to update a reference entry */
 apogeeapp.app.updatelink.doUpdateEntry = function(referenceManager,entryType,oldUrl,newUrl,newNickname) {
-    var actionResponse = new apogee.ActionResponse();
     try {
         //lookup entry for this reference
         var referenceEntry = referenceManager.lookupEntry(entryType,oldUrl);

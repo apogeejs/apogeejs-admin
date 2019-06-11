@@ -25,7 +25,7 @@ apogeeapp.app.saveworkspaceseq.saveWorkspace = function(app,fileAccessObject,doD
     var onSaveSuccess = (updatedFileMetadata) => {
         var workspaceUI = app.getWorkspaceUI();
         workspaceUI.setFileMetadata(updatedFileMetadata);
-        app.clearWorkspaceIsDirty();
+        workspaceUI.clearIsDirty();
     }
 
     if((!doDirectSave)||(!fileMetadata)||(!fileMetadata.directSaveOk)) {

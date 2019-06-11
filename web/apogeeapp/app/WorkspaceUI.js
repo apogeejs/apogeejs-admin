@@ -32,6 +32,9 @@ apogeeapp.app.WorkspaceUI = class {
         }
 
         this.treeEntry = null;
+        
+        //listen to the workspace dirty event from the app
+        this.app.addListener("workspaceDirty",() => this.setIsDirty());
     }
 
     /** This gets the application instance. */
@@ -127,6 +130,19 @@ apogeeapp.app.WorkspaceUI = class {
 
         //remove links
         this.referencesManager.close();
+    }
+    
+    getIsDirty() {
+        return this.isDirty;
+        
+    }
+    
+    setIsDirty() {
+        this.isDirty = true;
+    }
+    
+    clearIsDirty() {
+        this.isDirty = false;
     }
 
     //====================================

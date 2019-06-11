@@ -26,7 +26,6 @@
         <script type="text/javascript" src="/apogee/lib/codeAnalysis.js"></script>
 		<script type="text/javascript" src="/apogee/lib/codeDependencies.js"></script>
 		<script type="text/javascript" src="/apogee/lib/workspaceCalculation.js"></script>
-        <script type="text/javascript" src="/apogee/lib/ActionResponse.js"></script>
         <script type="text/javascript" src="/apogee/lib/ActionError.js"></script>
         <script type="text/javascript" src="/apogee/datacomponents/Member.js"></script>
         <script type="text/javascript" src="/apogee/datacomponents/ContextHolder.js"></script>
@@ -38,7 +37,6 @@
         <script type="text/javascript" src="/apogee/data/Workspace.js"></script>
         <script type="text/javascript" src="/apogee/data/JsonTable.js"></script>
         <script type="text/javascript" src="/apogee/data/FunctionTable.js"></script>
-        <script type="text/javascript" src="/apogee/data/JavascriptTable.js"></script>
         <script type="text/javascript" src="/apogee/data/Folder.js"></script>
         <script type="text/javascript" src="/apogee/data/FolderFunction.js"></script>
         <script type="text/javascript" src="/apogee/data/ErrorTable.js"></script>
@@ -90,6 +88,7 @@
         <script type="text/javascript" src="/apogeeapp/app/WorkspaceUI.js"></script>       
         <script type="text/javascript" src="/apogeeapp/app/BaseFileAccess.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/commands/CommandManager.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commands/UiCommandMessenger.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/references/LinkLoader.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/references/ReferenceManager.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/references/ReferenceEntry.js"></script>
@@ -112,7 +111,6 @@
         <script type="text/javascript" src="/apogeeapp/app/component/literatepage/LiteratePageComponentDisplay.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/component/literatepage/PageChildComponentDisplay.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/component/literatepage/PageDisplayContainer.js"></script> -->
-        <script type="text/javascript" src="/apogeeapp/app/components/UiCommandMessenger.js"></script>
 		<script type="text/javascript" src="/apogeeapp/app/components/FolderComponent.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/components/CanvasFolderComponent.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/components/JsonTableComponent.js"></script>
@@ -125,26 +123,25 @@
         <script type="text/javascript" src="/apogeeapp/app/components/CustomComponent.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/components/CustomDataComponent.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/components/ErrorTableComponent.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actions/addcomponent.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actions/closeworkspace.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actions/createworkspace.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actions/deletecomponent.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actions/errorhandling.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actions/membersave.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actions/openworkspace.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actions/updatecomponent.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actions/updatelink.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actions/updateworkspace.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actionseq/addcomponentseq.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actionseq/closeworkspaceseq.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actionseq/createworkspaceseq.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actionseq/exportworkspaceseq.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actionseq/importworkspaceseq.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actionseq/openworkspaceseq.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actionseq/saveworkspaceseq.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actionseq/updatecomponentseq.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actionseq/updatelinkseq.js"></script>
-        <script type="text/javascript" src="/apogeeapp/app/actionseq/updateworkspaceseq.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commands/addcomponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commands/closeworkspace.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commands/createworkspace.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commands/deletecomponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commands/membersave.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commands/openworkspace.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commands/updatecomponent.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commands/updatelink.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commands/updateworkspace.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commandseq/addcomponentseq.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commandseq/closeworkspaceseq.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commandseq/createworkspaceseq.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commandseq/exportworkspaceseq.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commandseq/importworkspaceseq.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commandseq/openworkspaceseq.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commandseq/saveworkspaceseq.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commandseq/updatecomponentseq.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commandseq/updatelinkseq.js"></script>
+        <script type="text/javascript" src="/apogeeapp/app/commandseq/updateworkspaceseq.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/datadisplay/DataDisplay.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js"></script>
         <script type="text/javascript" src="/apogeeapp/app/datadisplay/TextAreaEditor.js"></script>
@@ -190,7 +187,7 @@
                 var appConfigManager = new apogeeapp.app.CutNPasteAppConfigManager();
                 
                 //create the application
-                apogeeapp.app.Apogee.createApp("appContainer",appConfigManager); 
+                apogeeapp.app.Apogee.createApp("appContainer",appConfigManager);
             }
             
             function beforeUnloadHandler() {

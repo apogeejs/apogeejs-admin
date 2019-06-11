@@ -195,7 +195,10 @@ apogee.updatemember.applyPromiseData = function(member,promise,optionalPromiseRe
             actionData.memberName = member.getFullName();
             actionData.sourcePromise = promise;
             actionData.data = memberValue;
-            let actionResult =  apogee.action.doAction(workspace,actionData,true);
+            let actionResult =  apogee.action.doAction(workspace,actionData);
+            if(actionData.promiseCallback) {
+                actionData.promiseCallback(actionResult);
+            }
         }
         var asynchErrorCallback = function(errorMsg) {
             let actionData = {};
@@ -203,7 +206,10 @@ apogee.updatemember.applyPromiseData = function(member,promise,optionalPromiseRe
             actionData.memberName = member.getFullName();
             actionData.sourcePromise = promise;
             actionData.data = new Error(errorMsg);
-            let actionResult =  apogee.action.doAction(workspace,actionData,true);
+            let actionResult =  apogee.action.doAction(workspace,actionData);
+            if(actionData.promiseCallback) {
+                actionData.promiseCallback(actionResult);
+            }
         }
 
         //call appropriate action when the promise completes

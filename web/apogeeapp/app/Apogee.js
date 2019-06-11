@@ -155,9 +155,8 @@ apogeeapp.app.Apogee.prototype.getWorkspace = function() {
 
 /** This method returns true if the workspcae contains unsaved data. */
 apogeeapp.app.Apogee.prototype.getWorkspaceIsDirty = function() {
-    var workspace = this.getWorkspace();
-    if(workspace) {
-        return workspace.getIsDirty();
+    if(this.workspaceUI) {
+        return this.workspaceUI.getIsDirty();
     }
     else {
         return false;
@@ -166,9 +165,11 @@ apogeeapp.app.Apogee.prototype.getWorkspaceIsDirty = function() {
 
 /** This method clears the workspace dirty flag. */
 apogeeapp.app.Apogee.prototype.clearWorkspaceIsDirty = function() {
-    var workspace = this.getWorkspace();
-    if(workspace) {
-        workspace.clearIsDirty();
+    if(this.workspaceUI) {
+        return this.workspaceUI.clearIsDirty();
+    }
+    else {
+        return false;
     }
 }
 

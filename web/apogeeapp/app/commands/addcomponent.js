@@ -40,6 +40,7 @@ apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,pare
     command.cmd = createFunction;
     command.undoCmd = deleteFunction;
     command.desc = "Create member: " + memberFullName;
+    command.setsDirty = true;
     
     return command;
 }
@@ -54,10 +55,10 @@ apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,
     createAction.action = "createMember";
     createAction.ownerName = parentFullName;
     createAction.createData = memberJson;
-    var response = apogee.action.doAction(workspace,createAction,true);
+    var actionResult = apogee.action.doAction(workspace,createAction);
     
     //response - get new member
-    var member = response.member;
+    var member = actionResult.member;
     var cmdDone = true;
     var errorMessage = null;
     
@@ -89,7 +90,7 @@ apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,
             json.action = "deleteMember";
             json.memberName = member.getFullName();
             //if this fails, we will just ignore it for now
-            apogee.action.doAction(workspace,json,true);
+            var actionResult = apogee.action.doAction(workspace,json);
             //end undo create member
             //##########################################################################
             
@@ -98,10 +99,10 @@ apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,
         }
     }
     else {
-        errorMessage = response.alertMsg;
+        errorMessage = actionResult.alertMsg;
     }
 
-    if(response.cmdDone) {
+    if(actionResult.cmdDone) {
 //NOTE - WE PROBABLY SHOULD ALLOW ERROR INFORMATION FROM optionalOnSuccess
 //ALSO CONSIDIER IF THIS  SHOULD BE OUTSIDE OF ACTION (probably not, I'm thinking for now)
         if(optionalOnSuccess) optionalOnSuccess(member,component);

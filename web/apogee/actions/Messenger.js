@@ -10,9 +10,8 @@ apogee.action.Messenger = class {
 
     /** This is a convenience method to set a member to a given value. */
     dataUpdate(updateMemberName,data) {
-        var addToUndo = false;
         
-        var member = this.getMemberObject(updateMemberName);
+        var member = this._getMemberObject(updateMemberName);
         if(!member) {
             throw new Error("Error calling messenger - member not fond: " + updateMemberName);
         }
@@ -22,16 +21,23 @@ apogee.action.Messenger = class {
         actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
         actionData.memberName = member.getFullName();
         actionData.data = data;
-        
-        var actionResult = apogee.action.doAction(this.workspace,actionData,addToUndo);
-        if(!actionResult.cmdDone) {
-            throw new Error("Error setting remote data: " + actionResult.alertMsg);
+        if(data instanceof Promise) {
+            //for now no callback on promise
         }
+        
+        //action is done later after the current action completes
+        actionData.queuedCallback = actionResult => {
+            if(!actionResult.cmdDone) {
+                throw new Error("Error setting remote data: " + actionResult.alertMsg);
+            }
+        }
+        
+        //return is handled above asynchronously
+        apogee.action.doAction(this.workspace,actionData);
     }
 
     /** This is a convenience method to set a member to a given value. */
     compoundDataUpdate(updateInfo) { 
-        var addToUndo = false;
         
         //make the action list
         var actionList = [];
@@ -39,14 +45,18 @@ apogee.action.Messenger = class {
             let updateEntry = updateInfo[i];
             let subActionData = {};
             
-            let member = this.getMemberObject(updateEntry[0]);
+            let member = this._getMemberObject(updateEntry[0]);
             if(!member) {
                 throw new Error("Error calling messenger - member not fond: " + updateMemberName);
             }
+            let data = updateEntry[1];
             
             subActionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
             subActionData.memberName = member.getFullName();
-            subActionData.data = updateEntry[1];
+            subActionData.data = data;
+            if(data instanceof Promise) {
+                //for now no callback on promise
+            }
             actionList.push(subActionData);
         }
         
@@ -55,58 +65,25 @@ apogee.action.Messenger = class {
         actionData.action = apogee.compoundaction.ACTION_NAME;
         actionData.actions = actionList;
         
-        var actionResult = apogee.action.doAction(this.workspace,actionData,addToUndo);
-        if(!actionResult.cmdDone) {
-            throw new Error("Error setting remote data: " + actionResult.alertMsg);
+        //action is done later after the current action completes
+        actionData.queuedCallback = actionResult => {
+            if(!actionResult.cmdDone) {
+                throw new Error("Error setting remote data: " + actionResult.alertMsg);
+            }
         }
+        
+        //return is handled above asynchronously
+        apogee.action.doAction(this.workspace,actionData);
     }
-
-    /** This is a convenience method to set a member tohave an error message. */
-    errorUpdate(updateMemberName,errorMessage) {
-        var addToUndo = false;
-        
-        var member = this.getMemberObject(updateMemberName);
-        if(!member) {
-            throw new Error("Error calling messenger - member not fond: " + updateMemberName);
-        }
-        
-        var actionData = {};
-        actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
-        actionData.memberName = member.getFullName();
-        actionData.data = new Error(errorMessage);
-        
-        var actionResult = apogee.action.doAction(this.workspace,actionData,addToUndo);
-        if(!actionResult.cmdDone) {
-            throw new Error("Error setting remote data: " + actionResult.alertMsg);
-        }
-    }
-
-    /** This is a convenience method to set a member to a given value when the dataPromise resolves. */
-    asynchDataUpdate(updateMemberName,dataPromise) {
-        var addToUndo = false;
-        
-        var member = this.getMemberObject(updateMemberName);
-        if(!member) {
-            throw new Error("Error calling messenger - member not fond: " + updateMemberName);
-        }
-
-        var actionData = {};
-        actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
-        actionData.memberName = member.getFullName();
-        actionData.data = dataPromise;
-        
-        var actionResult =  apogee.action.doAction(this.workspace,actionData,addToUndo);
-
-        //throw an error if the original action call fails
-        if(!actionResult.cmdDone) {
-            throw new Error("Error setting remote data: " + actionResult.alertMsg);
-        }
-    }
+    
+    //=====================
+    // Private Functions
+    //=====================
     
     
     /** This method returns the member instance for a given local member name,
      * as defined from the source object context. */
-    getMemberObject = function(localMemberName) { 
+    _getMemberObject = function(localMemberName) { 
         var path = localMemberName.split(".");
         var member = this.contextManager.getMember(path);
         return member;

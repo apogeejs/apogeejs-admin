@@ -14,6 +14,8 @@
  *      
  *      desc - This is an option description of what the command does.
  *      
+ *      setsDirty - This flag should be set if the command sets the workspace as dirty
+ *      
  *      (other - view prior to command?...)
  * }
  * 
@@ -40,7 +42,7 @@ apogeeapp.app.CommandManager = class {
         let success;
         
         if(command.cmd) {
-            success = this._executeCmdFunction(command.cmd);
+            success = this._executeCmdFunction(command.cmd,command.setsDirty);
         }
         else {
             //this shouldn't happen
@@ -124,7 +126,7 @@ apogeeapp.app.CommandManager = class {
     undo() {
         let command = this._getNextUndoCommand(true);
         if((command)&&(command.undoCmd)) {
-            let success = this._executeCmdFunction(command.undoCmd);
+            let success = this._executeCmdFunction(command.undoCmd,command.setsDirty);
             if(!success) {
                 this._commandUndoneFailed();
             }
@@ -139,7 +141,7 @@ apogeeapp.app.CommandManager = class {
     redo() {
         let command = this._getNextRedoCommand(true);
         if((command)&&(command.cmd)) {
-            let success = this._executeCmdFunction(command.cmd);
+            let success = this._executeCmdFunction(command.cmd,command.setsDirty);
             if(!success) {
                 this.commandRedoneFailed();
             }
@@ -167,10 +169,13 @@ apogeeapp.app.CommandManager = class {
     
     /** This method executes a cmd function. 
      * @private */
-    _executeCmdFunction(cmdFunction) {
+    _executeCmdFunction(cmdFunction,setsWorkspaceDirty) {
         //cmd functions should return an action response.
         try {
             let success = cmdFunction();
+            if((success)&&(setsWorkspaceDirty)) {
+                this.eventManager.dispatchEvent("workspaceDirty",null);
+            }
             return success;
 
         }

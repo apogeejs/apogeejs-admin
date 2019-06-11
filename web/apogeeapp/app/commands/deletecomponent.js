@@ -14,6 +14,7 @@ apogeeapp.app.deletecomponent.createDeleteComponentCommand = function(component)
     //get the un-delete command
     var workspaceUI = component.getWorkspaceUI();
     var parent = member.getParent();
+    var parentFullName = parent.getFullName();
     var componentGenerator = component.componentGenerator;
     var componentJson = component.toJson();
     var memberJson = member.toJson();
@@ -21,12 +22,13 @@ apogeeapp.app.deletecomponent.createDeleteComponentCommand = function(component)
     //need to add optionalOnSuccess for LiteratePage!!!
     var optionalOnSuccess = undefined;
     
-    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parent,componentGenerator,memberJson,componentJson,optionalOnSuccess); 
+    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parentFullName,componentGenerator,memberJson,componentJson,optionalOnSuccess); 
     
     var command = {};
     command.cmd = deleteFunction;
     command.undoCmd = createFunction;
     command.desc = "Delete member: " + member.getFullName();
+    command.setsDirty = true;
     
     return command;
 }
@@ -40,11 +42,11 @@ apogeeapp.app.deletecomponent.doDeleteComponent = function(workspace,memberFullN
     var json = {};
     json.action = "deleteMember";
     json.memberName = memberFullName;
-    var response = apogee.action.doAction(workspace,json,true);
+    var actionResult = apogee.action.doAction(workspace,json);
     
-    if(response.alertMsg) {
-        alert(response.alertMsg);
+    if(actionResult.alertMsg) {
+        apogeeapp.app.CommandManager.errorAlert(actionResult.alertMsg);
     }
     
-    return response.cmdDone;
+    return actionResult.cmdDone;
 }

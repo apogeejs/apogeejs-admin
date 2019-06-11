@@ -53,10 +53,8 @@ apogee.action.actionInfo = {
 }
 
 /** This method is used to execute an action for the data model.
- * -The source tells the type of action. This affects how the action is treated. For 
- * example, actions from the UI set the workspace dirty flag to true and are used in the
- * undo list. (NOTE - UNDO LIST DOES NOT EXIST YET) */
-apogee.action.doAction = function(workspace,actionData,addToUndo) {
+ * -The source tells the type of action. */
+apogee.action.doAction = function(workspace,actionData) {
     
     var actionResult = {};
     
@@ -65,14 +63,10 @@ apogee.action.doAction = function(workspace,actionData,addToUndo) {
         var queuedAction = {};
         queuedAction.workspace = workspace;
         queuedAction.actionData = actionData;
-        queuedAction.addToUndo = addToUndo;
         workspace.queueAction(queuedAction);
         
-        //WORK OUT WHAT GOES HERE!!
-        //I think this only happens when we submit an action during a calculation
-        //I am relying on that. TBR
-        //I also need to work out what to return for a pending command
-        actionResult.cmdDone = true;
+        //mark command as pending
+        actionResult.cmdPending = true;
         return actionResult;
     }
     
@@ -99,14 +93,6 @@ apogee.action.doAction = function(workspace,actionData,addToUndo) {
     
         //fire events
         apogee.action.fireEvents(workspace,completedResults,recalculateList);
-        
-        //save the action for the undo queue if needed
-        //WE HAVE NOT UNDO QUEUE NOT. But do set the workspace dirty flag, which 
-        //we use to warn the user if there is unsaved data.
-        //NOTE - I might not want to do that is the action fails - check into this
-        if(addToUndo) {
-            workspace.setIsDirty();
-        }
 	}
 	catch(error) {
         if(error.stack) console.error(error.stack);
@@ -180,10 +166,14 @@ apogee.action.callActionFunction = function(workspace,actionData,actionResult) {
 /** This function triggers the action for the queued action to be run when the current thread exits. */
 apogee.action.asynchRunQueuedAction = function(queuedActionData) {
     var callback = function() {
-        apogee.action.doAction(
+        var actionResult = apogee.action.doAction(
             queuedActionData.workspace,
-            queuedActionData.actionData,
-            queuedActionData.addToUndo);
+            queuedActionData.actionData);
+            
+        //return result if a callback is provided
+        if(queuedActionData.actionData.queuedCallback) {
+            queuedActionData.actionData.queuedCallback(actionResult);
+        }
     }
     
     setTimeout(callback,0);

@@ -13,6 +13,7 @@ apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand = function(works
     command.cmd = () => apogeeapp.app.updatecomponent.doUpdatePropertyValues(workspaceUI,initialFullName,newValues);
     command.undoCmd = () => apogeeapp.app.updatecomponent.doUpdatePropertyValues(workspaceUI,targetFullName,undoValues);
     command.desc = "Update properties: " + initialFullName;
+    command.setDirty = true;
     return command;
 }
 
@@ -55,22 +56,22 @@ apogeeapp.app.updatecomponent.doUpdatePropertyValues = function(workspaceUI,comp
         }
     }
 
-    var response;
+    var actionResult;
     if(actionList.length > 0) {
         actionData = {};
         actionData.action = "compoundAction";
         actionData.actions = actionList;
 
-        response = apogee.action.doAction(workspace,actionData,true);
+        actionResult = apogee.action.doAction(workspace,actionData);
     }
     
     //update an component additional properties
     //NEED ERROR HANDLING HERE!!!
     component.loadPropertyValues(newValues);
         
-    if(response) {
-        if(response.alertMsg) alert(response.alertMsg);
-        return response.cmdDone;
+    if(actionResult) {
+        if(actionResult.alertMsg) alert(actionResult.alertMsg);
+        return actionResult.cmdDone;
     }
     else {
         return true;
