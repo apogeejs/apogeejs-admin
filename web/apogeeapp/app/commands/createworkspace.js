@@ -6,6 +6,7 @@ apogeeapp.app.createworkspace = {};
 //=====================================
 
 
+/** This function creates a command to create a workspace. */
 apogeeapp.app.createworkspace.createCreateWorkspaceCommand = function(app) {
     var command = {};
     command.cmd = () => apogeeapp.app.createworkspace.doCreateWorkspace(app);

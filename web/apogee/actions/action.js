@@ -10,14 +10,14 @@
  * - Available actions are registered through the method apogee.action.addActionInfo.
  *   this allows the doAction method to dispatch the actionData to the proper
  *   action specific code.
- * - After the action specific code is completed, generic code runs to ensure eny
- *   remote tables that need to be updated do get updated, and that the proper
- *   events are fired.
+ * - Included in doing that action is any updates to dependent tables and the 
+ * firing of any events for the changes.
  *   
  * Registering a specific action:
  * To register a specific action, apogee.action.addActionInfo must be called with 
  * a actionInfo object. An action info object is of the following format.
  * actionInfo object: {
+ *   "action": (string - this is the name of the action)
  *   "actionFunction": (funtion to exectue object - arguments = actionData,processedActions),
  *   "checkUpdateAll": (boolean - indicates if change in the underlying data model),
  *   "updateDependencies": [Indicates the changed object requires its dependecies be updated),
@@ -33,8 +33,28 @@
  *   "action": (The name of the action to execute),
  *   "member": (The data object that is acted upon , if applicable),
  *   (other, multiple): (Specific data for the action),
- *   "error": (output only - An action error giving an error in action specific code execution)
- *   "actionInfo": (This is the action info for the action. It is added within doAction and should not be added the user.)
+ *   "pendingCallback": (OPTIONAL - If this is a queued action, this callback will be called with
+ *      the result once the action is run)
+ *   "promiseCallback": (OPTIONAL - If this is an asynchronouse update, this callback will be called
+ *      with a result when the action is finished.)
+ * }
+ * 
+ * ActionResult:
+ * The return value of the doAction function is an ActionResult struct, with the following data: {
+ *   "actionDone": (If this is returned true the action was done. This does not mean it was error free but
+ *      it typically does mean the action can be reversed such as with an undo. An example of
+ *      where there was an error is if the user is setting code that has a syntax error or that does 
+ *      not properly (exectue.)
+ *   "actionPending": This flag is returned if the action is a queued action and will be run after the
+ *      current action completes.)
+ *   "member":
+ *   "actionInfo" - (This is the action info associated with the action, mainly used for bookeeping.)
+ *   "alertMsg"" (This is a message that should be given to the user. It usually will be sent if there is an error
+ *      where actionDone is false, though it may be set on actionDone = true too.)
+ *   "isFatal": "If this value is set to true then the application is in an indeterminate state and the user
+ *      should not continue."
+ *   "childActionResults" - (This is a list of action results if there are additional child actions done with this
+ *      action. Examples where this is used are on creating, moving or deleting a folder that has chilren.)
  * }
  * 
  * Action Function:
@@ -52,8 +72,7 @@ apogee.action = {};
 apogee.action.actionInfo = {
 }
 
-/** This method is used to execute an action for the data model.
- * -The source tells the type of action. */
+/** This method is used to execute an action for the data model. */
 apogee.action.doAction = function(workspace,actionData) {
     
     var actionResult = {};

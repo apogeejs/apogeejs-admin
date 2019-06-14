@@ -8,7 +8,13 @@ apogee.action.Messenger = class {
         this.fromMember = fromMember;
     }
 
-    /** This is a convenience method to set a member to a given value. */
+    /** This is a convenience method to set a member to a given value.
+     * updateMemberName - This is a member name as it would be accessed from the local code
+     * data - This is the data to set on the given member. Aside from a JSON value, additional 
+     * options are a Promise, to do an asynchronous update, a Error, to send an error to 
+     * that table, or apogee.util.INVALID_VALUE to send the invalid value.
+     * These updates are applied after the current calculation is completed. See documentation
+     * for more information on the messenger. */
     dataUpdate(updateMemberName,data) {
         
         var member = this._getMemberObject(updateMemberName);
@@ -36,7 +42,10 @@ apogee.action.Messenger = class {
         apogee.action.doAction(this.workspace,actionData);
     }
 
-    /** This is a convenience method to set a member to a given value. */
+    /** This is similar to dataUpdate except is allows multiple values to be set.
+     * The argument update info is an array with each element representing an individual
+     * data update. Each element shoudl be a 2-element array with the first entry being
+     * the table name and the second being the data value. */
     compoundDataUpdate(updateInfo) { 
         
         //make the action list

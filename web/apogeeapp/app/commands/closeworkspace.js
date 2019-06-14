@@ -6,6 +6,7 @@ apogeeapp.app.closeworkspace = {};
 // Action
 //=====================================
 
+/** This function creates a command to close the workspace. */
 apogeeapp.app.closeworkspace.createCloseWorkspaceCommand = function(app) {
     var command = {};
     command.cmd = () => apogeeapp.app.closeworkspace.doCloseWorkspace(app);

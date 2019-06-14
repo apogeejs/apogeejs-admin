@@ -6,6 +6,7 @@ apogeeapp.app.addcomponent = {};
 // Action
 //=====================================
 
+/** This function creates a command to add a component. */
 apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,parent,componentGenerator,propertyValues,optionalBaseMemberValues,optionalBaseComponentValues,optionalOnSuccess) {
     
     //convert property values so they can be used to create the member object

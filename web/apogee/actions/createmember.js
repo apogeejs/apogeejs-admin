@@ -12,8 +12,6 @@ apogee.createmember = {};
  *      - unique table type name
  *      - additional table specific data
  *  
- *  "member": (OUTPUT - the created member),
- *  "error": (OUTPUT - an error created in the action function)
  * }
  */
 apogee.createmember.ACTION_NAME = "createMember";
@@ -39,7 +37,7 @@ apogee.createmember.createMember = function(workspace,actionData,processedAction
         var owner = workspace.getMemberByFullName(ownerFullName);
         if(!owner) {
             actionResult.actionDone = false;
-            actionResult.errorMsg = "Parent not found for created member";
+            actionResult.alertMsg = "Parent not found for created member";
             return;
         }
     }

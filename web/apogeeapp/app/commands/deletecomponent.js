@@ -1,6 +1,7 @@
 apogeeapp.app.deletecomponent = {};
 
 
+/** This function creates a command to delete a component. */
 apogeeapp.app.deletecomponent.createDeleteComponentCommand = function(component) {
     
     var member = component.getMember();

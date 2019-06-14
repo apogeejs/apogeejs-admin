@@ -1,4 +1,6 @@
-
+/** This file contains some methods for creating commands to do updates for component members.
+ * There are 
+ */
 
 apogeeapp.app.membersave = {};
 
@@ -76,10 +78,52 @@ apogeeapp.app.membersave.createSaveDescriptionCommand = function(member,text,opt
     return apogeeapp.app.membersave.createCommand(workspace,setDescriptionActionData,undoActionData,commandLabel,optionalSetsWorkspaceDirty);
 }
 
+
+/** This method can be called to create a undo function to return a member to the current state
+ * following a code or data update. */
+apogeeapp.app.membersave.getMemberStateUndoAction = function(member) {
+    
+    let workspace = member.getWorkspace();
+    let memberFullName = member.getFullName();
+    
+    if((member.isCodeable)&&(member.hasCode())) {
+        //check if the current state has code set - if so, set the code for the undo function
+        let oldArgList = member.getArgList();
+        let oldFunctionBody = member.getFunctionBody();
+        let oldPrivateCode = member.getSupplementalCode();
+        return apogeeapp.app.membersave.getSetCodeAction(workspace,memberFullName,oldArgList,oldFunctionBody,oldPrivateCode);
+    }
+    else {
+        //here the object has data set. Check if an "alternate" data values was set - error, pending or invalid
+        if(member.hasError()) {
+            //member has an error
+            let errors = member.getErrors();
+            let errorMessage = apogee.ActionError.getListErrorMsg(errors);
+            return apogeeapp.app.membersave.getSaveDataAction(workspace,memberFullName,new Error(errorMessage));
+            
+        }
+        else if(member.getResultInvalid()) {
+            //result is invalid - set value to invalid in undo
+            return apogeeapp.app.membersave.getSaveDataAction(workspace,memberFullName,apogee.util.INVALID_VALUE);
+        }
+        else {
+            //this is a standard data value or a promise
+            //note if it is a promise and the promise has not yet resolved we will have mutliple then/catch functions
+            //attached to it. That is OK, only one will succeed because for others the promise is no longer pending.
+            let oldData = member.getData();
+            return apogeeapp.app.membersave.getSaveDataAction(workspace,memberFullName,oldData);
+        }
+    }
+}
+
+
+
 //===============================
-// Command functions
+// Internal functions - these are not necessarily intended for public use.
 //===============================
 
+/** This is a convenience method for creating a command. 
+ * @private */
 apogeeapp.app.membersave.createCommand = function(workspace,cmdActionData,undoCmdActionData,commandLabel,optionalSetsWorkspaceDirty) {
     var command = {};
     command.cmd = () => apogeeapp.app.membersave.doCommandAction(workspace,cmdActionData);
@@ -89,6 +133,8 @@ apogeeapp.app.membersave.createCommand = function(workspace,cmdActionData,undoCm
     return command
 }
 
+/** This is a convenience method for exeduing a command. 
+ * @private */
 apogeeapp.app.membersave.doCommandAction = function(workspace,actionData) {
     var actionResult =  apogee.action.doAction(workspace,actionData);
     if(actionResult.alertMsg) apogeeapp.app.CommandManager.errorAlert(actionResult.alertMsg);
@@ -149,44 +195,6 @@ apogeeapp.app.membersave.getSaveDescriptionAction = function(workspace,memberFul
     
     return actionData;
 }
-
-/** This method can be called to create a undo function to return a member to the current state
- * following a code or data update. */
-apogeeapp.app.membersave.getMemberStateUndoAction = function(member) {
-    
-    let workspace = member.getWorkspace();
-    let memberFullName = member.getFullName();
-    
-    if((member.isCodeable)&&(member.hasCode())) {
-        //check if the current state has code set - if so, set the code for the undo function
-        let oldArgList = member.getArgList();
-        let oldFunctionBody = member.getFunctionBody();
-        let oldPrivateCode = member.getSupplementalCode();
-        return apogeeapp.app.membersave.getSetCodeAction(workspace,memberFullName,oldArgList,oldFunctionBody,oldPrivateCode);
-    }
-    else {
-        //here the object has data set. Check if an "alternate" data values was set - error, pending or invalid
-        if(member.hasError()) {
-            //member has an error
-            let errors = member.getErrors();
-            let errorMessage = apogee.ActionError.getListErrorMsg(errors);
-            return apogeeapp.app.membersave.getSaveDataAction(workspace,memberFullName,new Error(errorMessage));
-            
-        }
-        else if(member.getResultInvalid()) {
-            //result is invalid - set value to invalid in undo
-            return apogeeapp.app.membersave.getSaveDataAction(workspace,memberFullName,apogee.util.INVALID_VALUE);
-        }
-        else {
-            //this is a standard data value or a promise
-            //note if it is a promise and the promise has not yet resolved we will have mutliple then/catch functions
-            //attached to it. That is OK, only one will succeed because for others the promise is no longer pending.
-            let oldData = member.getData();
-            return apogeeapp.app.membersave.getSaveDataAction(workspace,memberFullName,oldData);
-        }
-    }
-}
-
 
 
 
