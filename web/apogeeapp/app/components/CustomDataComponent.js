@@ -182,12 +182,7 @@ apogeeapp.app.CustomDataComponent.prototype.getUiCallbacks = function(codeField)
         
         getEditOk: () => true,
         
-        saveData: (text) => {
-            var uiCodeFields = this.getUiCodeFields();
-            uiCodeFields[codeField] = text;
-            this.update(uiCodeFields);
-            return true;  
-        }
+        saveData: (text) => this.doCodeFieldUpdate(codeField,text)
     }
 }
 
@@ -248,11 +243,28 @@ apogeeapp.app.CustomDataComponent.prototype.createResource = function() {
 // Action
 //=============================
 
+apogeeapp.app.CustomDataComponent.prototype.doCodeFieldUpdate = function(uiCodeField,fieldValue) { 
+
+    var initialCodeFields = this.getUiCodeFields();
+    var targetCodeFields = apogee.util.jsonCopy(initialCodeFields);
+    targetCodeFields[uiCodeField] = fieldValue;
+
+    var command = {};
+    command.cmd = () => this.update(targetCodeFields);
+    command.undoCmd = () => this.update(initialCodeFields);
+    command.desc = "Update code field " + uiCodeField + " - " + this.getMember().getFullName();
+    command.setDirty = true;
+
+    apogeeapp.app.Apogee.getInstance().executeCommand(command);
+    return true;  
+}
+
 apogeeapp.app.CustomDataComponent.prototype.update = function(uiCodeFields) { 
     
     //make sure we get rid of the old display
     if(this.activeOutputDisplayContainer) {
         this.activeOutputDisplayContainer.forceClearDisplay();
+        this.activeOutputDisplayContainer.memberUpdated();
     }
     
     this.uiCodeFields = uiCodeFields;
@@ -267,6 +279,8 @@ apogeeapp.app.CustomDataComponent.prototype.update = function(uiCodeFields) {
             this.currentCss = newCss;
         }
     }
+    
+    return true;
 }
 
 //==============================

@@ -152,12 +152,7 @@ apogeeapp.app.CustomComponent.prototype.getUiCallbacks = function(codeField) {
         
         getEditOk: () => true,
         
-        saveData: (text) => {
-            var uiCodeFields = this.getUiCodeFields();
-            uiCodeFields[codeField] = text;
-            this.update(uiCodeFields);
-            return true;  
-        }
+        saveData: (text) => this.doCodeFieldUpdate(codeField,text)
     }
 }
 
@@ -218,6 +213,22 @@ apogeeapp.app.CustomComponent.prototype.createResource = function() {
 //=============================
 // Action
 //=============================
+
+apogeeapp.app.CustomComponent.prototype.doCodeFieldUpdate = function(uiCodeField,fieldValue) { 
+
+    var initialCodeFields = this.getUiCodeFields();
+    var targetCodeFields = apogee.util.jsonCopy(initialCodeFields);
+    targetCodeFields[uiCodeField] = fieldValue;
+
+    var command = {};
+    command.cmd = () => this.update(targetCodeFields);
+    command.undoCmd = () => this.update(initialCodeFields);
+    command.desc = "Update code field " + uiCodeField + " - " + this.getMember().getFullName();
+    command.setDirty = true;
+
+    apogeeapp.app.Apogee.getInstance().executeCommand(command);
+    return true;  
+}
 
 apogeeapp.app.CustomComponent.prototype.update = function(uiCodeFields) { 
     

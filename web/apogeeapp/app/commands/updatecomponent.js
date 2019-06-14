@@ -33,11 +33,11 @@ apogeeapp.app.updatecomponent.doUpdatePropertyValues = function(workspaceUI,comp
     var actionData;
 
     //check if a move action is needed
-    if((newValues.name)||(newValues.owner)) {
+    if((newValues.name)||(newValues.parentName)) {
         //get the new name
         var newMemberName = newValues.name ? newValues.name : member.getName();
         //get the new owner
-        var newOwnerName = newValues.parentName; 
+        var newOwnerName = newValues.parentName ? newValues.parentName : member.getParent().getFullName(); 
         
         actionData = {};
         actionData.action = "moveMember";
