@@ -92,7 +92,7 @@ apogeeapp.app.membersave.createCommand = function(workspace,cmdActionData,undoCm
 apogeeapp.app.membersave.doCommandAction = function(workspace,actionData) {
     var actionResult =  apogee.action.doAction(workspace,actionData);
     if(actionResult.alertMsg) apogeeapp.app.CommandManager.errorAlert(actionResult.alertMsg);
-    return actionResult.cmdDone;
+    return actionResult.actionDone;
 }
 
 /** @private */

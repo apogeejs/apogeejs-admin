@@ -26,7 +26,7 @@ apogee.deletemember.deleteMember = function(workspace,actionData,actionResult) {
     var memberFullName = actionData.memberName;
     var member = workspace.getMemberByFullName(memberFullName);
     if(!member) {
-        actionResult.cmdDone = false;
+        actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for delete member";
         return;
     }
@@ -46,7 +46,7 @@ apogee.deletemember.deleteMember = function(workspace,actionData,actionResult) {
         //we are adding multiple delete events here
         var actionDataEntry;
         if(member == actionData.member) {
-            actionResult.cmdDone = true;
+            actionResult.actionDone = true;
         }
         else {
             if(!actionResult.childActionResults) actionResult.childActionResults = [];
@@ -58,7 +58,7 @@ apogee.deletemember.deleteMember = function(workspace,actionData,actionResult) {
             let childActionResult = {};
             childActionResult.member = member;
             childActionResult.actionInfo = apogee.deletemember.ACTION_INFO;
-            childActionResult.cmdDone = true;
+            childActionResult.actionDone = true;
             
             actionResult.childActionResults.push(childActionResult);
         }
@@ -87,6 +87,7 @@ apogee.deletemember.getDeleteList =  function(member,deleteList) {
 
 /** Action info */
 apogee.deletemember.ACTION_INFO = {
+    "action": apogee.deletemember.ACTION_NAME,
     "actionFunction": apogee.deletemember.deleteMember,
     "checkUpdateAll": true,
     "updateDependencies": false,

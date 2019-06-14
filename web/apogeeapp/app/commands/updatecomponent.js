@@ -71,7 +71,7 @@ apogeeapp.app.updatecomponent.doUpdatePropertyValues = function(workspaceUI,comp
         
     if(actionResult) {
         if(actionResult.alertMsg) alert(actionResult.alertMsg);
-        return actionResult.cmdDone;
+        return actionResult.actionDone;
     }
     else {
         return true;

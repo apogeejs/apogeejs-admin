@@ -4,12 +4,12 @@ apogee.updateworkspace = {};
 /** Update workspace action name 
  * Action Data format:
  * {
- *  "action": apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_NAME,
+ *  "action": apogee.updateworkspace.ACTION_NAME,
  *  "workspace": (workspace to update),
  *  "name": (new name)
  * }
  */
-apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_NAME = "updateWorkspace";
+apogee.updateworkspace.ACTION_NAME = "updateWorkspace";
 
 
 /** member UPDATED EVENT
@@ -25,11 +25,12 @@ apogee.updateworkspace.updateWorkspace = function(workspace,actionData,actionRes
     
     workspace.setName(actionData.name);
         
-    actionResult.cmdDone = true;
+    actionResult.actionDone = true;
 }
 
 /** Update data action info */
 apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_INFO = {
+    "action": apogee.updateworkspace.ACTION_NAME,
     "actionFunction": apogee.updateworkspace.updateWorkspace,
     "checkUpdateAll": false,
     "updateDependencies": false,
@@ -39,4 +40,4 @@ apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_INFO = {
 };
 
 //The following code registers the actions
-apogee.action.addActionInfo(apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_NAME,apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_INFO);
+apogee.action.addActionInfo(apogee.updateworkspace.ACTION_NAME,apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_INFO);

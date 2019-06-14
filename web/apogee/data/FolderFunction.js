@@ -305,7 +305,7 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         if(actionResult.alertMsg) {
             apogeeapp.app.CommandManager.errorAlert(actionResult.alertMsg);
         }
-        if(actionResult.cmdDone) {
+        if(actionResult.actionDone) {
             //retrieve the result
             if(returnValueTable) {
                 

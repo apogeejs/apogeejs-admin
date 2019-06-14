@@ -27,7 +27,7 @@ apogee.action.Messenger = class {
         
         //action is done later after the current action completes
         actionData.queuedCallback = actionResult => {
-            if(!actionResult.cmdDone) {
+            if(!actionResult.actionDone) {
                 throw new Error("Error setting remote data: " + actionResult.alertMsg);
             }
         }
@@ -67,7 +67,7 @@ apogee.action.Messenger = class {
         
         //action is done later after the current action completes
         actionData.queuedCallback = actionResult => {
-            if(!actionResult.cmdDone) {
+            if(!actionResult.actionDone) {
                 throw new Error("Error setting remote data: " + actionResult.alertMsg);
             }
         }

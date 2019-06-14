@@ -38,7 +38,7 @@ apogee.createmember.createMember = function(workspace,actionData,processedAction
         var ownerFullName = actionData.ownerName;
         var owner = workspace.getMemberByFullName(ownerFullName);
         if(!owner) {
-            actionResult.cmdDone = false;
+            actionResult.actionDone = false;
             actionResult.errorMsg = "Parent not found for created member";
             return;
         }
@@ -87,11 +87,12 @@ apogee.createmember._createMemberImpl = function(owner,actionData,actionResult) 
     }
 
     actionResult.member = member;
-    actionResult.cmdDone = true;
+    actionResult.actionDone = true;
 }
 
 /** Action info */
 apogee.createmember.ACTION_INFO = {
+    "action": apogee.createmember.ACTION_NAME,
     "actionFunction": apogee.createmember.createMember,
     "checkUpdateAll": true,
     "updateDependencies": true,

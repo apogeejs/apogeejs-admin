@@ -48,5 +48,5 @@ apogeeapp.app.deletecomponent.doDeleteComponent = function(workspace,memberFullN
         apogeeapp.app.CommandManager.errorAlert(actionResult.alertMsg);
     }
     
-    return actionResult.cmdDone;
+    return actionResult.actionDone;
 }

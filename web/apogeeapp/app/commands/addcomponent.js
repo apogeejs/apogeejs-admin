@@ -102,7 +102,7 @@ apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,
         errorMessage = actionResult.alertMsg;
     }
 
-    if(actionResult.cmdDone) {
+    if(actionResult.actionDone) {
 //NOTE - WE PROBABLY SHOULD ALLOW ERROR INFORMATION FROM optionalOnSuccess
 //ALSO CONSIDIER IF THIS  SHOULD BE OUTSIDE OF ACTION (probably not, I'm thinking for now)
         if(optionalOnSuccess) optionalOnSuccess(member,component);

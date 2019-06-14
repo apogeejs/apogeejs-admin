@@ -66,7 +66,7 @@ apogee.action.doAction = function(workspace,actionData) {
         workspace.queueAction(queuedAction);
         
         //mark command as pending
-        actionResult.cmdPending = true;
+        actionResult.actionPending = true;
         return actionResult;
     }
     
@@ -98,7 +98,7 @@ apogee.action.doAction = function(workspace,actionData) {
         if(error.stack) console.error(error.stack);
         
         //unknown application error - this is fatal
-        actionResult.cmdDone = false;
+        actionResult.actionDone = false;
         actionResult.isFatal = true
         actionResult.alertMsg = "Unknown error updating model: " + error.message;
         
@@ -110,7 +110,7 @@ apogee.action.doAction = function(workspace,actionData) {
     
     //flag action in progress
     workspace.setActionInProgress(false);
-    actionResult.cmdDone = true;
+    actionResult.actionDone = true;
     
     //trigger any pending actions
     //these will be done asynchronously
@@ -154,7 +154,7 @@ apogee.action.callActionFunction = function(workspace,actionData,actionResult) {
         actionInfo.actionFunction(workspace,actionData,actionResult);
     }
     else {
-        actionResult.cmdDone = false;
+        actionResult.actionDone = false;
         actionResult.alertMsg = "Unknown action: " + actionData.action;
     }  
 }
@@ -192,7 +192,7 @@ apogee.action.updateDependencies = function(workspace,completedResults,recalcula
         //upate dependencies on table with updated code
         for(var i = 0; i < completedResults.length; i++) {
             var actionResult = completedResults[i];
-            if((actionResult.cmdDone)&&(actionResult.member)) {
+            if((actionResult.actionDone)&&(actionResult.member)) {
                 if(apogee.action.doInitializeDependencies(actionResult)) {
                     actionResult.member.initializeDependencies();
                 }
@@ -206,7 +206,7 @@ apogee.action.updateDependencies = function(workspace,completedResults,recalcula
 apogee.action.updateRecalculateList = function(completedResults,recalculateList) {
     for(var i = 0; i < completedResults.length; i++) {
         var actionResult = completedResults[i];
-        if((actionResult.cmdDone)&&(actionResult.member)) {
+        if((actionResult.actionDone)&&(actionResult.member)) {
             if(apogee.action.doAddToRecalc(actionResult)) {
                 apogee.calculation.addToRecalculateList(recalculateList,actionResult.member);            
             }

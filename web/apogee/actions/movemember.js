@@ -18,7 +18,7 @@ apogee.movemember.moveMember = function(workspace,actionData,actionResult) {
     var memberFullName = actionData.memberName;
     var member = workspace.getMemberByFullName(memberFullName);
     if(!member) {
-        actionResult.cmdDone = false;
+        actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for move member";
         return;
     }
@@ -27,7 +27,7 @@ apogee.movemember.moveMember = function(workspace,actionData,actionResult) {
     var targetOwnerFullName = actionData.targetOwnerName;
     var targetOwner = workspace.getMemberByFullName(targetOwnerFullName);
     if(!targetOwner) {
-        actionResult.cmdDone = false;
+        actionResult.actionDone = false;
         actionResult.errorMsg = "New parent not found for move member";
         return;
     }
@@ -55,7 +55,7 @@ apogee.movemember.moveMember = function(workspace,actionData,actionResult) {
             childActionData.targetOwnerName = movedMember.getOwner().getFullName();
             
             let childActionResult = {};
-            childActionResult.cmdDone = true;
+            childActionResult.actionDone = true;
             childActionResult.member = movedMember;
             childRepsonse.actionInfo = apogee.movemember.ACTION_INFO
             
@@ -85,6 +85,7 @@ apogee.movemember.loadMovedList = function(member,movedMemberList) {
 
 /** Action info */
 apogee.movemember.ACTION_INFO = {
+    "action": apogee.movemember.ACTION_NAME,
     "actionFunction": apogee.movemember.moveMember,
     "checkUpdateAll": true,
     "updateDependencies": true,

@@ -25,7 +25,7 @@ apogeeapp.app.updateworkspace.doUpdatePropertyValues = function(workspaceUI,oldV
     if(oldValues.name !== newValues.name) {
         var actionData;
         actionData = {};
-        actionData.action = "updateWorkspace";
+        actionData.action = apogee.updateworkspace.ACTION_NAME;
         actionData.workspace = workspace;
         actionData.name = newValues.name;
         
@@ -36,7 +36,7 @@ apogeeapp.app.updateworkspace.doUpdatePropertyValues = function(workspaceUI,oldV
         
     if(actionResult) {
         if(actionResult.alertMsg) apogeeapp.app.CommandMessenger.errorAlert(actionResult.alertMsg);
-        return actionResult.cmdDone;
+        return actionResult.actionDone;
     }
     else {
         return true;

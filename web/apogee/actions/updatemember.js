@@ -52,14 +52,14 @@ apogee.updatemember.updateCode = function(workspace,actionData,actionResult) {
     var memberFullName = actionData.memberName;
     var member = workspace.getMemberByFullName(memberFullName);
     if(!member) {
-        actionResult.cmdDone = false;
+        actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member code";
         return;
     }
     actionResult.member = member;
 
     if((!member.isCodeable)||(!member.getSetCodeOk())) {
-        actionResult.cmdDone = false;
+        actionResult.actionDone = false;
         actionResult.errorMsg = "can not set code on member: " + member.getFullName();
         return;
     }
@@ -70,7 +70,7 @@ apogee.updatemember.updateCode = function(workspace,actionData,actionResult) {
         actionData.supplementalCode);
         
     
-    actionResult.cmdDone = true;
+    actionResult.actionDone = true;
 }
 
 /** Update data action function. */
@@ -79,14 +79,14 @@ apogee.updatemember.updateData = function(workspace,actionData,actionResult) {
     var memberFullName = actionData.memberName;
     var member = workspace.getMemberByFullName(memberFullName);
     if(!member) {
-        actionResult.cmdDone = false;
+        actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member data";
         return;
     }
     actionResult.member = member;
     
     if(!member.getSetDataOk()) {
-        actionResult.cmdDone = false;
+        actionResult.actionDone = false;
         actionResult.errorMsg = "Can not set data on member: " + memberFullName;
         return;
     }
@@ -101,7 +101,7 @@ apogee.updatemember.updateData = function(workspace,actionData,actionResult) {
         }
         else {
             //no action - this is from an asynch action that has been overwritten
-            actionResult.cmdDone = false;
+            actionResult.actionDone = false;
             return;
         }
     }
@@ -135,7 +135,7 @@ apogee.updatemember.updateData = function(workspace,actionData,actionResult) {
         apogee.updatemember.applyData(member,data);
     }
     
-    actionResult.cmdDone = true;
+    actionResult.actionDone = true;
 }
 
 /** Update description */
@@ -144,7 +144,7 @@ apogee.updatemember.updateDescription = function(workspace,actionData,actionResu
     var memberFullName = actionData.memberName;
     var member = workspace.getMemberByFullName(memberFullName);
     if(!member) {
-        actionResult.cmdDone = false;
+        actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member description";
         return;
     }
@@ -152,7 +152,7 @@ apogee.updatemember.updateDescription = function(workspace,actionData,actionResu
 
     member.setDescription(actionData.description);
     
-    actionResult.cmdDone = true;
+    actionResult.actionDone = true;
 }
 
 
@@ -230,6 +230,7 @@ apogee.updatemember.applyInvalidData = function(member) {
         
 /** Update data action info */
 apogee.updatemember.UPDATE_DATA_ACTION_INFO = {
+    "action": apogee.updatemember.UPDATE_DATA_ACTION_NAME,
     "actionFunction": apogee.updatemember.updateData,
     "checkUpdateAll": false,
     "updateDependencies": true,
@@ -239,6 +240,7 @@ apogee.updatemember.UPDATE_DATA_ACTION_INFO = {
 };
 /** Update code action info */
 apogee.updatemember.UPDATE_CODE_ACTION_INFO = {
+    "action": apogee.updatemember.UPDATE_CODE_ACTION_NAME,
     "actionFunction": apogee.updatemember.updateCode,
     "checkUpdateAll": false,
     "updateDependencies": true,
@@ -247,6 +249,7 @@ apogee.updatemember.UPDATE_CODE_ACTION_INFO = {
 };
 /** Update data action info */
 apogee.updatemember.UPDATE_DESCRIPTION_ACTION_INFO = {
+    "action": apogee.updatemember.UPDATE_CODE_ACTION_NAME,
     "actionFunction": apogee.updatemember.updateDescription,
     "checkUpdateAll": false,
     "updateDependencies": false,

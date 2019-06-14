@@ -5,7 +5,6 @@ apogee.compoundaction = {};
  * Action Data format:
  * {
  *  "action": apogee.compoundaction.ACTION_NAME,
- *  "workspace":the workspace object
  *  "actions": (list of actions in this compound action),
  * }
  */
@@ -22,11 +21,12 @@ apogee.compoundaction.compoundActionFunction = function(workspace,actionData,act
         apogee.action.callActionFunction(workspace,childActionData,childActionResult);
         actionResult.childActionResults.push(childActionResult);   
     }
-    actionResult.cmdDone = true;
+    actionResult.actionDone = true;
 }
 
 /** Action info */
 apogee.compoundaction.ACTION_INFO = {
+    "action": apogee.compoundaction.ACTION_NAME,
     "actionFunction": apogee.compoundaction.compoundActionFunction,
     "checkUpdateAll": false,
     "updateDependencies": false,
