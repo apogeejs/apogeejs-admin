@@ -36,16 +36,6 @@ apogeeapp.app.ParentComponent.prototype.usesTabDisplay = function() {
     return true;
 }
 
-/** This brings the child component to the front and takes any other actions
- * to show the child in the open parent. */
-apogeeapp.app.ParentComponent.prototype.showChildComponent = function(childComponent) {
-    if(childComponent.getMember().getParent() != this.getMember()) return;
-    
-    if(this.tabDisplay) {
-        this.tabDisplay.showChildComponent(childComponent);
-    }
-}
-
 apogeeapp.app.ParentComponent.prototype.getMenuItems = function(optionalMenuItemList) {
     var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
     
@@ -64,6 +54,16 @@ apogeeapp.app.ParentComponent.prototype.getMenuItems = function(optionalMenuItem
     var menuItemList = apogeeapp.app.Component.prototype.getMenuItems.call(this,menuItemList);
 			
     return menuItemList;
+}
+
+/** This brings the child component to the front and takes any other actions
+ * to show the child in the open parent. */
+apogeeapp.app.ParentComponent.prototype.showChildComponent = function(childComponent) {
+    if(childComponent.getMember().getParent() != this.getMember()) return;
+    
+    if(this.tabDisplay) {
+        this.tabDisplay.showChildComponent(childComponent);
+    }
 }
 
 /** This flags indicates the component is a parent component. */

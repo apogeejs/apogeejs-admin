@@ -15,8 +15,7 @@ apogeeapp.app.FolderFunctionComponent.prototype.constructor = apogeeapp.app.Fold
 apogeeapp.app.FolderFunctionComponent.prototype.instantiateTabDisplay = function() {
     var member = this.getMember();
     var folder = member.getInternalFolder();
-    this.tabDisplay = new apogeeapp.app.CanvasFolderComponentDisplay(this,member,folder);   
-    return this.tabDisplay;
+    return new apogeeapp.app.CanvasFolderComponentDisplay(this,member,folder);   
 }
 
 //==============================

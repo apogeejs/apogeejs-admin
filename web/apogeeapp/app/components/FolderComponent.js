@@ -10,9 +10,8 @@ apogeeapp.app.FolderComponent.prototype.constructor = apogeeapp.app.FolderCompon
 apogeeapp.app.FolderComponent.prototype.instantiateTabDisplay = function() {
     var folder = this.getMember();
     
-    this.tabDisplay = new apogeeapp.app.LiteratePageComponentDisplay(this,folder,folder);
-    //this.tabDisplay = new apogeeapp.app.CanvasFolderComponentDisplay(this,folder,folder);   
-    return this.tabDisplay;
+    return new apogeeapp.app.LiteratePageComponentDisplay(this,folder,folder);
+    //return new apogeeapp.app.CanvasFolderComponentDisplay(this,folder,folder);   
 }
 
 //==============================

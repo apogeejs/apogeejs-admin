@@ -200,11 +200,6 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
 //                this.addChildComponent(childComponent);
 //            }
 //        }
-
-        //add content if we have it
-        if(this.storedContent) {
-            this.applyStateJson(this.storedContent);
-        }
     }
 
     initComponentToolbar() {

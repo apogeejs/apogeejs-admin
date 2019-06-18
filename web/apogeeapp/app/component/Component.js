@@ -155,7 +155,6 @@ apogeeapp.app.Component.prototype.createTabDisplay = function() {
         var tabFrame = this.workspaceUI.getTabFrame();
         tabFrame.addTab(tab,true);
     }
-    return this.tabDisplay;
 }
 
 apogeeapp.app.Component.prototype.getTabDisplay = function(createIfMissing) {
@@ -296,11 +295,6 @@ apogeeapp.app.Component.prototype.loadPropertyValues = function(json) {
 //** This method writes any necessary component implementation-specific data
 // * to the json. OPTIONAL */
 //apogeeapp.app.Component.prototype.writeToJson = function(json);
-
-//This method should optionally be populated by an extending object.
-//** This method adds any necessary implementation-specific property
-// * key value pairs to the passed in the json. OPTIONAL */
-//apogeeapp.app.Component.prototype.addPropFunction = function(values);
 
 /** This method cleans up after a delete. Any extending object that has delete
  * actions should pass a callback function to the method "addClenaupAction" */

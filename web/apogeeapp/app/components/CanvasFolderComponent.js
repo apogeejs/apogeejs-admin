@@ -9,8 +9,7 @@ apogeeapp.app.CanvasFolderComponent.prototype.constructor = apogeeapp.app.Canvas
 
 apogeeapp.app.CanvasFolderComponent.prototype.instantiateTabDisplay = function() {
     var folder = this.getMember();
-    this.tabDisplay = new apogeeapp.app.CanvasFolderComponentDisplay(this,folder,folder);   
-    return this.tabDisplay;
+    return new apogeeapp.app.CanvasFolderComponentDisplay(this,folder,folder);   
 }
 
 //======================================

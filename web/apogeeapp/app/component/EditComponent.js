@@ -28,13 +28,4 @@ apogeeapp.app.EditComponent.prototype.instantiateTabDisplay = function() {
     return null;
 }
 
-apogeeapp.app.EditComponent.prototype.getMenuItems = function(optionalMenuItemList) {
-    var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];    
-    
-    //call base class
-    var menuItemList = apogeeapp.app.Component.prototype.getMenuItems.call(this,menuItemList);
-			
-    return menuItemList;
-}
-
 
