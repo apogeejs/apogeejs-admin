@@ -61,6 +61,10 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
     updateData() {
         this.tab.setTitle(this.member.getName());
     }
+    
+    updateDocumentData(editorData) {
+        this.editorView.updateState(editorData);
+    }
 
     /** This method is used to bring the child component to the front. */
     showChildComponent(childComponent) {
@@ -105,13 +109,15 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
 
     /** This is to record any state in the tab object. */
     getStateJson() {
-        return this.editorView.state.toJSON();
+        return null;
+//        return this.editorView.state.toJSON();
     }
 
     /** This is to restore any state in the tab object. */
     setStateJson(json) {
-        var editorState = proseMirror.createEditorState(json.doc);
-        this.editorView.updateState(editorState);
+        return null
+//        var editorState = proseMirror.createEditorState(json.doc);
+//        this.editorView.updateState(editorState);
     }
 
     //===============================
@@ -191,15 +197,18 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
         this.initEditor();
 
         //show all children
-//        var workspaceUI = this.component.getWorkspaceUI();
-//        var children = this.folder.getChildMap();
-//        for(var childName in children) {
-//            var child = children[childName];
-//            var childComponent = workspaceUI.getComponent(child);
-//            if(childComponent) {
-//                this.addChildComponent(childComponent);
-//            }
-//        }
+        var workspaceUI = this.component.getWorkspaceUI();
+        var children = this.folder.getChildMap();
+        for(var childName in children) {
+            var child = children[childName];
+            var childComponent = workspaceUI.getComponent(child);
+            if(childComponent) {
+                this.addChildComponent(childComponent);
+            }
+        }
+        
+        var editorData = this.component.getEditorData();
+        this.editorView.updateState(editorData);
     }
 
     initComponentToolbar() {
@@ -267,9 +276,10 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
         var container = document.createElement("div");
         this.contentElement.appendChild(container);
         
-        var initialEditorState = proseMirror.createEditorState();
+        //start with an empty component display
+        var emptyEditorState = proseMirror.createEditorState();
         
-        this.editorView = proseMirror.createEditorView(container,this.component, this.member, initialEditorState);
+        this.editorView = proseMirror.createEditorView(container,this.component, this.member, emptyEditorState);
         
     }
 

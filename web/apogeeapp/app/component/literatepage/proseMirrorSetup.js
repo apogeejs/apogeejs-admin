@@ -426,14 +426,17 @@ function proseMirrorSetup() {
         return state;
     }
     
-    proseMirror.createEditorView = function(containerElement,folderComponent,folderMember,editorState) {
+    proseMirror.createEditorView = function(containerElement,folderComponent,folderMember,editorData) {
 
         var nodeViews = {};
         nodeViews.testBlock = (node, view, getPos) => new TestBlockView(node, view, getPos);
         nodeViews.apogeeComponent = (node, view, getPos) => new ApogeeComponentView(node, view, getPos, folderComponent, folderMember);
 
+        var dispatchTransaction = transaction => folderComponent.applyTransaction(transaction);
+
         var editorView = new EditorView(containerElement, {
-          state: editorState,
+          state: editorData,
+          dispatchTransaction: dispatchTransaction,
           nodeViews: nodeViews
         })
 

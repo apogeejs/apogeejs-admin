@@ -2,16 +2,32 @@
 apogeeapp.app.FolderComponent = function(workspaceUI,folder) {
     //extend parent component
     apogeeapp.app.ParentComponent.call(this,workspaceUI,folder,apogeeapp.app.FolderComponent);
+    
+    //create an empty edit state to start
+    this.editorData = proseMirror.createEditorState();
 };
 
 apogeeapp.app.FolderComponent.prototype = Object.create(apogeeapp.app.ParentComponent.prototype);
 apogeeapp.app.FolderComponent.prototype.constructor = apogeeapp.app.FolderComponent;
 
+apogeeapp.app.FolderComponent.prototype.getEditorData = function() {
+    return this.editorData;
+}
+
+apogeeapp.app.FolderComponent.prototype.applyTransaction = function(transaction) {
+    if(this.editorData) {
+        this.editorData = this.editorData.apply(transaction);
+    }
+    
+    var tabDisplay = this.getTabDisplay();
+    if(tabDisplay) {
+        tabDisplay.updateDocumentData(this.editorData);
+    }
+}
+
 apogeeapp.app.FolderComponent.prototype.instantiateTabDisplay = function() {
     var folder = this.getMember();
-    
-    return new apogeeapp.app.LiteratePageComponentDisplay(this,folder,folder);
-    //return new apogeeapp.app.CanvasFolderComponentDisplay(this,folder,folder);   
+    return new apogeeapp.app.LiteratePageComponentDisplay(this,folder,folder); 
 }
 
 //==============================
@@ -20,17 +36,28 @@ apogeeapp.app.FolderComponent.prototype.instantiateTabDisplay = function() {
 
 /** This serializes the table component. */
 apogeeapp.app.FolderComponent.prototype.writeToJson = function(json) {
+    //save the editor state
+    if(this.editorData) {
+        json.data = this.editorData.toJSON();
+    }
+    
+    //save the children
     var folder = this.getMember();
     var workspaceUI = this.getWorkspaceUI();
     json.children = workspaceUI.getFolderComponentContentJson(folder);
 }
 
 apogeeapp.app.FolderComponent.prototype.readFromJson = function(json) {
-    
+    //read the childresn
     if(json.children) {
         var workspaceUI = this.getWorkspaceUI();
         var folder = this.getMember();
         workspaceUI.loadFolderComponentContentFromJson(folder,json.children);
+    }
+    
+    //read the editor state
+    if((json.data)&&(json.data.doc)) {
+        this.editorData = proseMirror.createEditorState(json.data.doc);
     }
 }
 
