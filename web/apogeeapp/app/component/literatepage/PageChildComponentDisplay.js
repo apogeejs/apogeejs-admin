@@ -18,7 +18,6 @@ apogeeapp.app.PageChildComponentDisplay = function(component, parentComponentDis
     this.displayContainerMap = null;
     
     this.isPageShowing = false;
-    this.isComponentOnPage = false;
     this.isExpanded = true;
     
    
@@ -114,17 +113,6 @@ apogeeapp.app.PageChildComponentDisplay.prototype.deleteDisplay = function() {
 //-------------------
 // state management
 //-------------------
-
-apogeeapp.app.PageChildComponentDisplay.prototype.setIsComponentOnPage = function(isComponentOnPage) {
-    this.isComponentOnPage = isComponentOnPage;
-    
-    //update state for children, as needed
-    this.updateChildDisplayStates();
-}
-
-apogeeapp.app.PageChildComponentDisplay.prototype.getIsComponentOnPage = function() {
-    return this.isComponentOnPage;
-}
 
 apogeeapp.app.PageChildComponentDisplay.prototype.setIsExpanded = function(isExpanded) {
     this.isExpanded = isExpanded;
@@ -241,14 +229,14 @@ apogeeapp.app.PageChildComponentDisplay.prototype.addTitleBar = function() {
 }
 
 apogeeapp.app.PageChildComponentDisplay.prototype.setIsPageShowing = function(isPageShowing) {
-    if(!this.isPageShowing) {
+    if(this.isPageShowing != isPageShowing) {
         this.isPageShowing = isPageShowing;
         this.updateChildDisplayStates();
     }
 }
 
 apogeeapp.app.PageChildComponentDisplay.prototype.updateChildDisplayStates = function() {
-    var componentBodyShowing = ((this.isPageShowing)&&(this.isComponentOnPage)&&(this.isExpanded));
+    var componentBodyShowing = ((this.isPageShowing)&&(this.isExpanded));
     var componentActive = this.isExpanded;
     for(var viewType in this.displayContainerMap) {
         var displayContainer = this.displayContainerMap[viewType];

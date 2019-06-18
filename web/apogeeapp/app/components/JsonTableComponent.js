@@ -20,7 +20,8 @@ apogeeapp.app.JsonTableComponent.prototype.setDataView = function(dataView) {
     //update the window display if needed
     var componentDisplay = this.getComponentDisplay();
     if(componentDisplay) {
-        componentDisplay.updateViewModeElement(apogeeapp.app.JsonTableComponent.VIEW_DATA);
+        alert("I need to fix set data view in json table!");
+        //componentDisplay.updateViewModeElement(apogeeapp.app.JsonTableComponent.VIEW_DATA);
     }
 }
 

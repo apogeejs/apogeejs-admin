@@ -9,22 +9,22 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
     constructor(displayContainer,callbacks,aceMode) {
         super(displayContainer,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
 
-//        //#################################################
-//        //use this for literate page - also add line options below
-//        this.editorDiv = document.createElement("div");
-//        //##################################################
+        //#################################################
+        //use this for literate page - also add line options below
+        this.editorDiv = document.createElement("div");
+        //##################################################
         
-        //###################################################
-        //use this for canvas folder
-        this.editorDiv = apogeeapp.ui.createElement("div",null,{
-            "position":"absolute",
-            "top":"0px",
-            "left":"0px",
-            "bottom":"0px",
-            "right":"0px",
-            "overflow":"auto"
-        });
-        //#######################################################
+//        //###################################################
+//        //use this for canvas folder
+//        this.editorDiv = apogeeapp.ui.createElement("div",null,{
+//            "position":"absolute",
+//            "top":"0px",
+//            "left":"0px",
+//            "bottom":"0px",
+//            "right":"0px",
+//            "overflow":"auto"
+//        });
+//        //#######################################################
         
         this.aceMode = aceMode;
 
@@ -33,13 +33,13 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
     
     createEditor() {
         var editor = ace.edit(this.editorDiv);
-//        //##########################################################
-//        //use this for literate page
-//        editor.setOptions({
-//            minLines: 2,
-//            maxLines: 20
-//        })
-//        //############################################################
+        //##########################################################
+        //use this for literate page
+        editor.setOptions({
+            minLines: 2,
+            maxLines: 20
+        })
+        //############################################################
         editor.renderer.setShowGutter(true);
         editor.setTheme("ace/theme/eclipse"); //good
         editor.getSession().setMode(this.aceMode); 

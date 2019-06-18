@@ -103,51 +103,15 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
         }
     }
 
-
-    /** This method creates a page entry for the child. */
-    insertChildIntoDisplay(childName,selectedRange) {
-        
-        //########################################
-        // rewrite this for prosemirror (if I need it)
-        //########################################
-
-//        if(!selectedRange) {
-//            //if range not set, put the cursor at the end
-//            var pageLength = this.quill.getLength();
-//            this.quill.setSelection(pageLength,0,'api');
-//            range = this.quill.getSelection();
-//        }
-//
-//        var value = { 
-//            name: childName,
-//            parent: this.folder.getFullName()
-//        };
-//        this.quill.insertText(selectedRange.index, '\n', Quill.sources.USER);
-//        this.quill.insertEmbed(selectedRange.index + 1, 'apogeedisplay', value, Quill.sources.USER);
-//        this.quill.insertText(selectedRange.index + 2, '\n', Quill.sources.USER);
-//        this.quill.setSelection(selectedRange.index + 3, Quill.sources.SILENT);
-    }
-
     /** This is to record any state in the tab object. */
     getStateJson() {
-        var json;
-        if(this.editorView) {
-            json = proseMirror.getEditorState(this.editorView);
-        }
-        else if(this.storedContent) {
-            json = this.storedContent;
-        }
-        return json;
+        return this.editorView.state.toJSON();
     }
 
     /** This is to restore any state in the tab object. */
     setStateJson(json) {
-        if(this.editorView) {
-            proseMirror.setEditorState(this.editorView,json);
-        }
-        else {
-            this.storedContent = json;
-        }
+        var editorState = proseMirror.createEditorState(json.doc);
+        this.editorView.updateState(editorState);
     }
 
     //===============================
@@ -308,7 +272,9 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
         var container = document.createElement("div");
         this.contentElement.appendChild(container);
         
-        this.editorView = proseMirror.createEditorView(container);
+        var initialEditorState = proseMirror.createEditorState();
+        
+        this.editorView = proseMirror.createEditorView(container,this.component, this.member, initialEditorState);
         
     }
 

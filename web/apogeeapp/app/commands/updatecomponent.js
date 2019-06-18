@@ -68,6 +68,11 @@ apogeeapp.app.updatecomponent.doUpdatePropertyValues = function(workspaceUI,comp
     //update an component additional properties
     //NEED ERROR HANDLING HERE!!!
     component.loadPropertyValues(newValues);
+    
+    //=================================
+    //PLACE TO INSERT INTO PARENT???
+    //=================================
+    
         
     if(actionResult) {
         if(actionResult.alertMsg) alert(actionResult.alertMsg);

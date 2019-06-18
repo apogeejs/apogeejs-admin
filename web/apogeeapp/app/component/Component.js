@@ -489,13 +489,17 @@ apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,
     //create empty component
     var component = new componentGenerator(workspaceUI,member);
 
+    //call member updated to process and notify of component creation
+    component.memberUpdated();
+    
     //apply any serialized values
     if(propertyValues) {
         component.loadPropertyValues(propertyValues);
     }
-
-    //call member updated to process and notify of component creation
-    component.memberUpdated();
+    
+    //=================================
+    //PLACE TO INSERT INTO PARENT???
+    //=================================
     
     return component;
 }

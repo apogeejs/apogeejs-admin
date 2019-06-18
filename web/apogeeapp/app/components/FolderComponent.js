@@ -9,11 +9,11 @@ apogeeapp.app.FolderComponent.prototype.constructor = apogeeapp.app.FolderCompon
 
 apogeeapp.app.FolderComponent.prototype.instantiateTabDisplay = function() {
     var folder = this.getMember();
-    //this.tabDisplay = new apogeeapp.app.LiteratePageComponentDisplay(this,folder,folder);
-    this.tabDisplay = new apogeeapp.app.CanvasFolderComponentDisplay(this,folder,folder);   
+    
+    this.tabDisplay = new apogeeapp.app.LiteratePageComponentDisplay(this,folder,folder);
+    //this.tabDisplay = new apogeeapp.app.CanvasFolderComponentDisplay(this,folder,folder);   
     return this.tabDisplay;
 }
-
 
 //==============================
 // serialization
@@ -27,10 +27,6 @@ apogeeapp.app.FolderComponent.prototype.writeToJson = function(json) {
 }
 
 apogeeapp.app.FolderComponent.prototype.readFromJson = function(json) {
-    
-    //note - we are currently keeping all the edit state in the tabDisplayState
-    //rather than as data in the component. The reason we are doing this is 
-    //because we are managing that data in the display/editor rather than here
     
     if(json.children) {
         var workspaceUI = this.getWorkspaceUI();
