@@ -381,6 +381,7 @@ function proseMirrorSetup() {
     const {DOMParser} = require("prosemirror-model")
     const {EditorView} = require("prosemirror-view")
     const {exampleSetup} = require("prosemirror-example-setup")
+    const {Step} = require("prosemirror-transform")
 
     function saveState() {
         var stateJson = window.view.state.toJSON();
@@ -442,6 +443,21 @@ function proseMirrorSetup() {
 
         return editorView;
 
+    }
+    
+    proseMirror.getNewEditorData = function(editorData, stepsJson) {
+        var transaction = editorData.tr;
+        stepsJson.forEach( stepJson => {
+            try {
+                var step = Step.fromJSON(testBlockSchema,stepJson);
+                transaction.step(step);
+            }
+            catch(error) {
+                console.log("Step failed: " + JSON.stringify(stepJson));
+                return null;
+            }
+        });
+       return editorData.apply(transaction);
     }
 
     return proseMirror;
