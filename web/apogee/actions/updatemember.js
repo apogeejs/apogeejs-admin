@@ -120,7 +120,7 @@ apogee.updatemember.updateData = function(workspace,actionData,actionResult) {
         //check if this is only a refresh
         var optionalPromiseRefresh = actionData.promiseRefresh ? true : false;
         
-        apogee.updatemember.applyPromiseData(member,data,optionalPromiseRefresh);
+        apogee.updatemember.applyPromiseData(member,data,actionData.onAsynchComplete,optionalPromiseRefresh);
     }
     else if(data instanceof Error) {
         //data is an error
@@ -181,7 +181,7 @@ apogee.updatemember.applyData = function(member,data) {
     member.setData(data);  
 }
 
-apogee.updatemember.applyPromiseData = function(member,promise,optionalPromiseRefresh) {
+apogee.updatemember.applyPromiseData = function(member,promise,onAsynchComplete,optionalPromiseRefresh) {
     //set the result as pending
     member.setResultPending(true,promise);
 
@@ -195,10 +195,10 @@ apogee.updatemember.applyPromiseData = function(member,promise,optionalPromiseRe
             actionData.memberName = member.getFullName();
             actionData.sourcePromise = promise;
             actionData.data = memberValue;
-            let actionResult =  apogee.action.doAction(workspace,actionData);
-            if(actionData.promiseCallback) {
-                actionData.promiseCallback(actionResult);
+            if(onAsynchComplete) {
+                actionData.onComplete = onAsynchComplete;
             }
+            apogee.action.doAction(workspace,actionData);
         }
         var asynchErrorCallback = function(errorMsg) {
             let actionData = {};
@@ -206,10 +206,10 @@ apogee.updatemember.applyPromiseData = function(member,promise,optionalPromiseRe
             actionData.memberName = member.getFullName();
             actionData.sourcePromise = promise;
             actionData.data = new Error(errorMsg);
-            let actionResult =  apogee.action.doAction(workspace,actionData);
-            if(actionData.promiseCallback) {
-                actionData.promiseCallback(actionResult);
+            if(onAsynchComplete) {
+                actionData.onComplete = onAsynchComplete;
             }
+            apogee.action.doAction(workspace,actionData);
         }
 
         //call appropriate action when the promise completes

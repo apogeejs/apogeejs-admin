@@ -33,10 +33,9 @@
  *   "action": (The name of the action to execute),
  *   "member": (The data object that is acted upon , if applicable),
  *   (other, multiple): (Specific data for the action),
- *   "pendingCallback": (OPTIONAL - If this is a queued action, this callback will be called with
- *      the result once the action is run)
- *   "promiseCallback": (OPTIONAL - If this is an asynchronouse update, this callback will be called
- *      with a result when the action is finished.)
+ *   "onComplete": (OPTIONAL - If this is set it will be called after the action is completed.)
+ *   "onAsynchComplete": (OPTIONAL - FOr an asynchronous update, this can be set. It will be
+ *   called when the asynch action completes.)
  * }
  * 
  * ActionResult:
@@ -79,10 +78,8 @@ apogee.action.doAction = function(workspace,actionData) {
     
     //only allow one action at a time
     if(workspace.isActionInProgress()) {
-        var queuedAction = {};
-        queuedAction.workspace = workspace;
-        queuedAction.actionData = actionData;
-        workspace.queueAction(queuedAction);
+        //this is a messenger action - we will save it and execute it after this computation cycle is complete
+        workspace.saveMessengerAction(actionData);
         
         //mark command as pending
         actionResult.actionPending = true;
@@ -131,10 +128,15 @@ apogee.action.doAction = function(workspace,actionData) {
     workspace.setActionInProgress(false);
     actionResult.actionDone = true;
     
+    //if the action has an onComplete callback, call it here.
+    if(actionData.onComplete) {
+        actionData.onComplete(actionResult);
+    }
+    
     //trigger any pending actions
     //these will be done asynchronously
-    var queuedActionData = workspace.getQueuedAction();
-    if(queuedActionData) {
+    var savedMessengerAction = workspace.getSavedMessengerAction();
+    if(savedMessengerAction) {
         var runQueuedAction = true;
 
         if(workspace.checkConsecutiveQueuedActionLimitExceeded()) {
@@ -147,7 +149,8 @@ apogee.action.doAction = function(workspace,actionData) {
         }
 
         if(runQueuedAction) {
-            apogee.action.asynchRunQueuedAction(queuedActionData);
+            //FOR NOW WE WILL RUN SYNCHRONOUSLY!!!
+            apogee.action.doAction(workspace,savedMessengerAction);
         }
     }
     else {
@@ -181,22 +184,6 @@ apogee.action.callActionFunction = function(workspace,actionData,actionResult) {
 //=======================================
 // Internal Methods
 //=======================================
-
-/** This function triggers the action for the queued action to be run when the current thread exits. */
-apogee.action.asynchRunQueuedAction = function(queuedActionData) {
-    var callback = function() {
-        var actionResult = apogee.action.doAction(
-            queuedActionData.workspace,
-            queuedActionData.actionData);
-            
-        //return result if a callback is provided
-        if(queuedActionData.actionData.queuedCallback) {
-            queuedActionData.actionData.queuedCallback(actionResult);
-        }
-    }
-    
-    setTimeout(callback,0);
-}
 
 /** This method makes sure the member dependencies in the workspace are properly updated. 
  * @private */

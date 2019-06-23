@@ -15,7 +15,7 @@ apogee.Workspace = function(optionalJson,optionalContextOwner) {
     
     // This is a queue to hold actions while one is in process.
     this.actionInProgress = false;
-    this.actionQueue = [];
+    this.messengerActionList = []
     this.consecutiveActionCount = 0;
     this.activeConsecutiveActionLimit = apogee.Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT;
     this.name = apogee.Workspace.DEFAULT_WORKSPACE_NAME;
@@ -93,15 +93,17 @@ apogee.Workspace.prototype.setActionInProgress = function(inProgress) {
     this.actionInProgress = inProgress;
 }
 
-apogee.Workspace.prototype.queueAction = function(actionInfo) {
-    this.actionQueue.push(actionInfo);
+apogee.Workspace.prototype.saveMessengerAction = function(actionInfo) {
+    this.messengerActionList.push(actionInfo);
 }
 
-apogee.Workspace.prototype.getQueuedAction = function() {
-    if(this.actionQueue.length > 0) {
-        var queuedActionInfo = this.actionQueue[0];
-        this.actionQueue.splice(0,1)
-        return queuedActionInfo;
+apogee.Workspace.prototype.getSavedMessengerAction = function() {
+    if(this.messengerActionList.length > 0) {
+        var actionData = {};
+        actionData.action = apogee.compoundaction.ACTION_NAME;
+        actionData.actions = this.messengerActionList;
+        this.messengerActionList = []
+        return actionData;
     }
     else {
         return null;
@@ -143,7 +145,7 @@ apogee.Workspace.prototype.clearConsecutiveQueuedTracking = function() {
 /** This method resets the command queue */
 apogee.Workspace.prototype.clearCommandQueue = function() {
     //reset queued action variables
-    this.actionQueue = [];
+    this.messengerActionList = [];
     this.clearConsecutiveQueuedTracking();
 }
 
