@@ -223,49 +223,79 @@ apogee.action.updateRecalculateList = function(completedResults,recalculateList)
     }
 }
     
-/** This function fires the proper events for the action. 
+/** This function fires the proper events for the action. It combines events to 
+ * fire a single event for each member.
  * @private */
 apogee.action.fireEvents = function(workspace,completedResults,recalculateList) {
-    
-    //TEMPORARY EVENT PROCESSING - NEEDS TO BE IMPROVED
-    var eventSet = {};
+
+    var eventMap = {};
     var member;
     
+    //go through explicitly called events from results
     for(var i = 0; i < completedResults.length; i++) {
         var actionResult = completedResults[i];
         var actionInfo = actionResult.actionInfo;
         
         if(actionInfo) {
-            var eventName = actionInfo.event;
+            
+            let eventName = actionInfo.event;
             if(!eventName) continue;
             
-            var member = actionResult.member;
-      
-            apogee.action.fireEvent(workspace,eventName,member);
-
-            //temporary processing!
-            if(member) {
-                eventSet[member.getId()] = true;
-            }
+            let member = actionResult.member;
+            
+            this.mergeEventIntoEventMap(eventMap,member,eventName);
         }
     }
     
-    //Doh! WE NEED TO DO THIS DIFFERENTLY FOR LOTS OF REASONS
-    //later note - I am not sure what those reasons are. I need to think about this.
-    //maybe I want a better control over what events are actually fired - meaning I don't 
-    //want to fire updated twice, but there may be cases where I fire some event in addition
-    //to updated?
+    //add an update event for any object not accounted from
     for(i = 0; i < recalculateList.length; i++) {
         var member = recalculateList[i];
-        if(!eventSet[member.getId()]) {
-            apogee.action.fireEvent(workspace,apogee.updatemember.MEMBER_UPDATED_EVENT,member);
-        }
+        this.mergeEventIntoEventMap(eventMap,member,apogee.updatemember.MEMBER_UPDATED_EVENT);
     } 
+    
+    //fire events from the event map
+    for(var idString in eventMap) {
+        let eventInfo = eventMap[idString];
+        workspace.dispatchEvent(eventInfo.event,eventInfo);
+        //clear the update map for this member (the member should be set
+        if(eventInfo.member) {
+            eventInfo.member.clearUpdated();
+        }
+        else {
+            console.log("Error: Member not set for event: " + eventInfo.event);
+        }
+    }
 }
 
 /** This is a helper function to dispatch an event. */
-apogee.action.fireEvent = function(workspace,name,data) {
-    workspace.dispatchEvent(name,data);
+apogee.action.mergeEventIntoEventMap = function(eventMap,member,eventName) {
+    var memberId = member.getId();
+     
+    var existingInfo = eventMap[memberId];
+    var newInfo;
+     
+    if(existingInfo) {
+        if((existingInfo.event == eventName)) {
+            //repeat event - including case of both being apogee.updatemember.MEMBER_UPDATED_EVENT
+            newInfo = existingInfo;
+        }
+        else if((existingInfo.event == apogee.deletemember.MEMBER_DELETED_EVENT)||(eventName == apogee.deletemember.MEMBER_DELETED_EVENT)) {
+            newInfo =  { member: member, event: apogee.deletemember.MEMBER_DELETED_EVENT };
+        }
+        else if((existingInfo.event == apogee.createmember.MEMBER_CREATED_EVENT)||(eventName == apogee.createmember.MEMBER_CREATED_EVENT)) {
+            newInfo =  { member: member, updated: member.getUpdated(), event: apogee.createmember.MEMBER_CREATED_EVENT };
+        }
+        else {
+            //we this shouldn't happen - it means we hace an unknown event type
+            throw new Error("Unknown event type: " + existingInfo.event + ", " + eventName);
+        }
+    }
+    else {
+        //create event object - note we don't need the "updated" field on a delete event, but that is ok
+        newInfo =  { member: member, updated: member.getUpdated(), event: eventName };
+    }
+     
+    eventMap[memberId] = newInfo; 
 }
 
 /** This method determines if updating all dependencies is necessary. Our dependency 

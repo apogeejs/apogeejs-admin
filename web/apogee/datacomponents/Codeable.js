@@ -8,6 +8,12 @@
  * - A Codeable must be a Member.
  * - A Codeable must be Dependent. 
  * - A Codeable must be ContextHolder
+ * 
+ * FIELD NAMES (from update event):
+ * - argList
+ * - functionBody
+ * - private
+ * - description
  */
 apogee.Codeable = {};
 
@@ -15,7 +21,12 @@ apogee.Codeable = {};
 apogee.Codeable.init = function(argList) {
     
     //arguments of the member function
-    this.argList = argList;
+    if(argList) {
+        this.argList = argList;
+    }
+    else {
+        this.argList = [];
+    }
     
     //initialze the code as empty
     this.codeSet = false;
@@ -31,6 +42,11 @@ apogee.Codeable.init = function(argList) {
     this.clearCalcPending();
     this.setResultPending(false);
     this.setResultInvalid(false);
+    
+    //set field updated in init
+    this.fieldUpdated("argList");
+    this.fieldUpdated("functionBody");
+    this.fieldUpdated("private");
     
     //fields used in calculation
     this.dependencyInitInProgress = false;
@@ -68,6 +84,7 @@ apogee.Codeable.getDescription = function() {
 
 /** This method returns the supplemental code for this member.  */
 apogee.Codeable.setDescription = function(description) {
+    this.fieldUpdated("description");
     this.description = description;
 }
 
@@ -75,9 +92,20 @@ apogee.Codeable.setDescription = function(description) {
 apogee.Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
 
     //set the base data
-    this.argList = codeInfo.argList;
-    this.functionBody = codeInfo.functionBody;
-    this.supplementalCode = codeInfo.supplementalCode;
+    if(this.argList.toString() != codeInfo.argList.toString()) {
+        this.fieldUpdated("argList");
+        this.argList = codeInfo.argList;
+    }
+    
+    if(this.functionBody != codeInfo.functionBody) {
+        this.fieldUpdated("functionBody");
+        this.functionBody = codeInfo.functionBody;
+    }
+    
+    if(this.supplementalCode != codeInfo.supplementalCode) {
+        this.fieldUpdated("private");
+        this.supplementalCode = codeInfo.supplementalCode;
+    }
 
     //save the variables accessed
     this.varInfo = compiledInfo.varInfo;
@@ -154,8 +182,14 @@ apogee.Codeable.updateDependeciesForModelChange = function(recalculateList) {
 /** This method returns the formula for this member.  */
 apogee.Codeable.clearCode = function() {
     this.codeSet = false;
-    this.functionBody = "";
-    this.supplementalCode = "";
+    if(this.functionBody != "") {
+        this.fieldUpdated("functionBody");
+        this.functionBody = "";
+    }
+    if(this.supplementalCode != "") {
+        this.fieldUpdated("private");
+        this.supplementalCode = "";
+    }
     this.varInfo = null;
     this.dependencyInfo = null;
     this.memberFunctionInitializer = null;

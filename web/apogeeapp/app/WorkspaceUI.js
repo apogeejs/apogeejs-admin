@@ -77,8 +77,9 @@ apogeeapp.app.WorkspaceUI = class {
         }
 
         //add listeners
-        this.workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT, member => this.memberUpdated(member));
-        this.workspace.addListener(apogee.deletemember.MEMBER_DELETED_EVENT, member => this.childDeleted(member));
+        this.workspace.addListener(apogee.createmember.MEMBER_CREATED_EVENT, eventInfo => this.memberCreated(eventInfo));
+        this.workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT, eventInfo => this.memberUpdated(eventInfo));
+        this.workspace.addListener(apogee.deletemember.MEMBER_DELETED_EVENT, eventInfo => this.memberDeleted(eventInfo));
         this.workspace.addListener(apogee.updateworkspace.WORKSPACE_UPDATED_EVENT, () => this.workspaceUpdated());
 
         //process the workspace state - open tabs
@@ -211,11 +212,37 @@ apogeeapp.app.WorkspaceUI = class {
         this.componentMap[memberId] = componentInfo;
 
     }
+    
+    testPrint(eventInfo) {
+        console.log("Event: " + eventInfo.event + "; Name: " + eventInfo.member.getFullName());
+        if(eventInfo.updated) {
+            console.log(JSON.stringify(eventInfo.updated));
+        }
+    }
+    
+    /** This method responds to a member updated. */
+    memberCreated(eventInfo) {
+        
+        this.testPrint(eventInfo);
+        
+        //store the ui object
+        var member = eventInfo.member;
+        var key = member.getId();
+
+//        var componentInfo = this.componentMap[key];
+//        if((componentInfo)&&(componentInfo.component)) {
+//            componentInfo.component.memberCreated();
+//        }
+    }
 
 
     /** This method responds to a member updated. */
-    memberUpdated(member) {
+    memberUpdated(eventInfo) {
+        
+        this.testPrint(eventInfo);
+        
         //store the ui object
+        var member = eventInfo.member;
         var key = member.getId();
 
         var componentInfo = this.componentMap[key];
@@ -225,9 +252,12 @@ apogeeapp.app.WorkspaceUI = class {
     }
 
     /** This method responds to a "new" menu event. */
-    childDeleted(member) {
+    memberDeleted(eventInfo) {
+        
+        this.testPrint(eventInfo);
 
         //store the ui object
+        var member = eventInfo.member;
         var memberId = member.getId();
 
         var componentInfo = this.componentMap[memberId];

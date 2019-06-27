@@ -4,6 +4,11 @@
  *  
  * COMPONENT DEPENDENCIES:
  * 
+ * FIELD NAMES (from update event):
+ * - data
+ * - name
+ * - owner
+ * 
  */
 apogee.Member = {};
     
@@ -22,9 +27,19 @@ apogee.Member.init = function(name,generator) {
     this.errors = []; 
     this.resultInvalid = false;
     this.resultPending = false;
+    
+    this.updated = {};
+    
+    //set updated in constructor
+    this.fieldUpdated("name");
+    this.fieldUpdated("data");
 }
 
 apogee.Member.initOwner = function(owner) {
+    if(this.owner != owner) {
+        this.fieldUpdated("owner");
+    }
+    
     this.owner = owner;
     if(owner.isParent) {
         this.owner.addChild(this);
@@ -35,6 +50,7 @@ apogee.Member.initOwner = function(owner) {
 }
 
 apogee.Member.move = function(newName,newOwner) {
+
     //remove from old owner
     if(this.owner) {
         if(this.owner.isParent) {
@@ -45,10 +61,16 @@ apogee.Member.move = function(newName,newOwner) {
             //or renaiming either!
         }
     }
-    //change name
-    this.name = newName;
     
-    //place in the new owner
+    //check for change of name
+    if(newName != this.name) {
+        this.fieldUpdated("name");
+        
+        this.name = newName;
+    }
+    
+    //place in the new owner or update the name in the old owner
+    //owner field updated here
     this.initOwner(newOwner);
 }
 
@@ -249,6 +271,7 @@ apogee.Member.getImpactsList = function() {
  * with a JSON table. Besides hold the data object, this updates the parent data map. */
 apogee.Member.setData = function(data) {
     this.data = data;
+    this.fieldUpdated("data");
   
     var parent = this.getParent();
     if(parent) {
@@ -296,6 +319,22 @@ apogee.Member.onDeleteMember = function() {
 //* @protected */
 //apogee.Member.getUpdateData = function() {
 //}
+
+//-------------------------
+// Update Event Methods
+//-------------------------
+
+apogee.Member.getUpdated = function() {
+    return this.updated;
+}
+
+apogee.Member.clearUpdated = function() {
+    this.updated = {};
+}
+
+apogee.Member.fieldUpdated = function(field) {
+    this.updated[field] = true;
+}
 
 
 //===================================

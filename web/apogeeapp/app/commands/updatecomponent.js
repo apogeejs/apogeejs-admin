@@ -32,6 +32,15 @@ apogeeapp.app.updatecomponent.doUpdatePropertyValues = function(workspaceUI,comp
     var actionList = [];
     var actionData;
 
+    //create an action to update an member additional properties
+    var memberGenerator = member.generator;
+    if(memberGenerator.getPropertyUpdateAction) {
+        actionData = memberGenerator.getPropertyUpdateAction(member,newValues);
+        if(actionData) {
+           actionList.push(actionData); 
+        }
+    }
+    
     //check if a move action is needed
     if((newValues.name)||(newValues.parentName)) {
         //get the new name
@@ -45,15 +54,6 @@ apogeeapp.app.updatecomponent.doUpdatePropertyValues = function(workspaceUI,comp
         actionData.targetName = newMemberName;
         actionData.targetOwnerName = newOwnerName;
         actionList.push(actionData);
-    }
-
-    //create an action to update an member additional properties
-    var memberGenerator = member.generator;
-    if(memberGenerator.getPropertyUpdateAction) {
-        actionData = memberGenerator.getPropertyUpdateAction(member,newValues);
-        if(actionData) {
-           actionList.push(actionData); 
-        }
     }
 
     var actionResult;
