@@ -13,6 +13,7 @@ apogee.ErrorTable = function(name,owner,completeJson) {
     
     //store this to use during save later
     this.completeJson = completeJson;
+    this.fieldUpdated("completeJson");
 
     var dummyData = "";
     apogee.updatemember.applyData(this,dummyData);

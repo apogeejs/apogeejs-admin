@@ -15,6 +15,8 @@ apogee.FolderFunction = function(name,owner,initialData,createEmptyInternalFolde
     this.returnValueString = initialData.returnValue !== undefined ? initialData.returnValue : [];
     //set to an empty function
     this.setData(function(){});
+    this.fieldUpdated("argList");
+    this.fieldUpdated("returnValue");
     
     //recreate the root folder if info is specified
     if(createEmptyInternalFolder) {
@@ -245,11 +247,17 @@ apogee.FolderFunction.prototype.getMemberByPathArray = function(path,startElemen
 
 /** This is called from the update action. It should not be called externally. */
 apogee.FolderFunction.prototype.setReturnValueString = function(returnValueString) {
+    if(this.returnValueString != returnValueString) {
+        this.fieldUpdated("returnValue");
+    }
     this.returnValueString = returnValueString;
 }
 
 /** This is called from the update action. It should not be called externally. */
 apogee.FolderFunction.prototype.setArgList = function(argList) {
+    if(this.argList != argList) {
+        this.fieldUpdated("argList");
+    }
     this.argList = argList;
 }
 
