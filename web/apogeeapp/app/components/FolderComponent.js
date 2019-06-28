@@ -63,8 +63,10 @@ apogeeapp.app.FolderComponent.prototype.applyTransaction = function(transaction)
     else {
         //this is a editor state change that doesn't change the data
         this.editorData = this.editorData.apply(transaction);
-        if(tabDisplay) {
-            tabDisplay.updateDocumentData(this.editorData);
+        this.fieldUpdated("document");
+        
+        if(this.tabDisplay) {
+            this.tabDisplay.updateDocumentData(this.editorData);
         }
     }
         
@@ -110,6 +112,7 @@ apogeeapp.app.FolderComponent.prototype.readFromJson = function(json) {
     //read the editor state
     if((json.data)&&(json.data.doc)) {
         this.editorData = proseMirror.createEditorState(json.data.doc);
+        this.fieldUpdated("document");
     }
 }
 

@@ -23,6 +23,8 @@ apogeeapp.app.CustomDataComponent = function(workspaceUI,folder) {
     
     //keep alive or destroy on inactive
     this.destroyOnInactive = false;
+    
+    this.fieldUpdated("destroyOnInactive");
 };
 
 apogeeapp.app.CustomDataComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
@@ -52,10 +54,13 @@ apogeeapp.app.CustomDataComponent.prototype.getDisplayDestroyFlags = function() 
 }
 
 apogeeapp.app.CustomDataComponent.prototype.setDestroyOnInactive = function(destroyOnInactive) {
-    this.destroyOnInactive = destroyOnInactive;
-    
-    if(this.activeOutputDisplayContainer) {
-        this.activeOutputDisplayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
+    if(destroyOnInactive != this.destroyOnInactive) {
+        this.fieldUpdated("destroyOnInactive");
+        this.destroyOnInactive = destroyOnInactive;
+
+        if(this.activeOutputDisplayContainer) {
+            this.activeOutputDisplayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
+        }
     }
 }
 
@@ -266,19 +271,23 @@ apogeeapp.app.CustomDataComponent.prototype.update = function(uiCodeFields) {
         this.activeOutputDisplayContainer.forceClearDisplay();
         this.activeOutputDisplayContainer.memberUpdated();
     }
+
+    //record the updates
+    if(uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_CSS] != this.uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_CSS]) {
+        this.fieldUpdated(apogeeapp.app.CustomComponent.CODE_FIELD_CSS);
+        
+        //update css now
+        let cssInfo = uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_CSS];
+        apogeeapp.ui.setMemberCssData(this.getMember().getId(),cssInfo);
+    }
+    if(uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_HTML] != this.uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_HTML]) {
+        this.fieldUpdated(apogeeapp.app.CustomComponent.CODE_FIELD_HTML);
+    }
+    if(uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_UI_CODE] != this.uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_UI_CODE]) {
+        this.fieldUpdated(apogeeapp.app.CustomComponent.CODE_FIELD_UI_CODE);
+    }
     
     this.uiCodeFields = uiCodeFields;
-    
-    var newCss = this.getUiCodeField(apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS);
-    
-    //update the css right away
-    
-    if(newCss !== this.currentCss) {
-        if(!((newCss == "")&&(this.currentCss == ""))) {
-            apogeeapp.ui.setMemberCssData(this.getMember().getId(),newCss);
-            this.currentCss = newCss;
-        }
-    }
     
     return true;
 }

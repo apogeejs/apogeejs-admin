@@ -77,7 +77,7 @@ apogeeapp.app.WorkspaceUI = class {
         }
 
         //add listeners
-        this.workspace.addListener(apogee.createmember.MEMBER_CREATED_EVENT, eventInfo => this.memberCreated(eventInfo));
+        //this.workspace.addListener(apogee.createmember.MEMBER_CREATED_EVENT, eventInfo => this.memberCreated(eventInfo));
         this.workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT, eventInfo => this.memberUpdated(eventInfo));
         this.workspace.addListener(apogee.deletemember.MEMBER_DELETED_EVENT, eventInfo => this.memberDeleted(eventInfo));
         this.workspace.addListener(apogee.updateworkspace.WORKSPACE_UPDATED_EVENT, () => this.workspaceUpdated());
@@ -243,11 +243,13 @@ apogeeapp.app.WorkspaceUI = class {
         
         //store the ui object
         var member = eventInfo.member;
-        var key = member.getId();
+        if(member) {
+            var key = member.getId();
 
-        var componentInfo = this.componentMap[key];
-        if((componentInfo)&&(componentInfo.component)) {
-            componentInfo.component.memberUpdated();
+            var componentInfo = this.componentMap[key];
+            if((componentInfo)&&(componentInfo.component)) {
+                componentInfo.component.memberUpdated(eventInfo);
+            }
         }
     }
 

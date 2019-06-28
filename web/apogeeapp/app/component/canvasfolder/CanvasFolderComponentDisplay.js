@@ -65,14 +65,14 @@ apogeeapp.app.CanvasFolderComponentDisplay.prototype.showChildComponent = functi
 apogeeapp.app.CanvasFolderComponentDisplay.prototype.addChildComponent = function(childComponent) {
     
     var childComponentDisplay;
-    var componentDisplayOptions = childComponent.getComponentDisplayOptions();
+    var childDisplayState = childComponent.getChildDisplayState();
     
     //create a new component display for this child
     if(childComponent.isEditComponent) {
-        childComponentDisplay = new apogeeapp.app.EditWindowComponentDisplay(childComponent,componentDisplayOptions);
+        childComponentDisplay = new apogeeapp.app.EditWindowComponentDisplay(childComponent,childDisplayState);
     }
     else if(childComponent.isParentComponent) {
-        childComponentDisplay = new apogeeapp.app.ParentWindowComponentDisplay(childComponent,componentDisplayOptions);
+        childComponentDisplay = new apogeeapp.app.ParentWindowComponentDisplay(childComponent,childDisplayState);
     }
     else {
         throw new Error("Unrecognized child component type! " + childComponent.constructor)

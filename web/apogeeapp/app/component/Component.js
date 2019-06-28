@@ -15,15 +15,16 @@ apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
     this.bannerState = apogeeapp.app.banner.BANNER_TYPE_NONE;
     this.bannerMessage = "";
     
+    this.updated = {};
+    
     //ui elements
     this.childComponentDisplay = null; //this is the main display, inside the parent tab
-    this.childComponentDisplayStateJson = null;
+    this.childDisplayState = null;
     
     this.tabDisplay = null; //only valid on parents, which open into a tab
-    this.tabDisplayStateJson = null;
     
     this.treeDisplay = null; //this is shown in the tree view
-    this.treeStateJson = null;
+    this.treeExpanded = null;
 }
 
 //These parameters are used to order the components in the tree entry.
@@ -81,8 +82,8 @@ apogeeapp.app.Component.prototype.getTreeEntry = function(createIfMissing) {
         this.treeDisplay = this.instantiateTreeEntry();
         this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
 
-        if(this.treeStateJson !== undefined) {
-            this.treeDisplay.setState(this.treeStateJson);
+        if(this.treeExpanded !== undefined) {
+            this.treeDisplay.setState(this.treeExpanded);
         }
     }
     
@@ -109,8 +110,8 @@ apogeeapp.app.Component.prototype.instantiateTreeEntry = function() {
 // component display methods - this is the element in the parent tab (main display)
 //-------------------
 
-apogeeapp.app.Component.prototype.getComponentDisplayOptions = function() {
-    return this.childComponentDisplayStateJson;
+apogeeapp.app.Component.prototype.getChildDisplayState = function() {
+    return this.childDisplayState;
 }
 
 apogeeapp.app.Component.prototype.setComponentDisplay = function(childComponentDisplay) {
@@ -124,7 +125,7 @@ apogeeapp.app.Component.prototype.getComponentDisplay = function() {
 apogeeapp.app.Component.prototype.closeComponentDisplay = function() {
     if(this.childComponentDisplay) {
         //first store the window state
-        this.childComponentDisplayStateJson = this.childComponentDisplay.getStateJson();
+        this.childDisplayState = this.childComponentDisplay.getStateJson();
         
         //delete the window
         this.childComponentDisplay.deleteDisplay();
@@ -148,7 +149,6 @@ apogeeapp.app.Component.prototype.closeComponentDisplay = function() {
 apogeeapp.app.Component.prototype.createTabDisplay = function() {
     if((this.usesTabDisplay())&&(!this.tabDisplay)) {
         this.tabDisplay = this.instantiateTabDisplay();
-        if(this.tabDisplayStateJson) this.tabDisplay.setStateJson(this.tabDisplayStateJson);
         this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
         //add the tab display to the tab frame
         var tab = this.tabDisplay.getTab();
@@ -164,7 +164,6 @@ apogeeapp.app.Component.prototype.getTabDisplay = function(createIfMissing) {
 /** This closes the tab display for the component. */
 apogeeapp.app.Component.prototype.closeTabDisplay = function() {
     if(this.tabDisplay) {
-        this.tabDisplayStateJson = this.tabDisplay.getStateJson();
         var tabDisplay = this.tabDisplay;
         this.tabDisplay = null;
         tabDisplay.closeTab();
@@ -207,6 +206,19 @@ apogeeapp.app.Component.prototype.getOpenMenuItem = function() {
     }
 }
 
+apogeeapp.app.Component.prototype.getUpdated = function() {
+    return this.updated;
+}
+
+apogeeapp.app.Component.prototype.clearUpdated = function() {
+    this.updated = {};
+}
+
+apogeeapp.app.Component.prototype.fieldUpdated = function(field) {
+    this.updated[field] = true;
+}
+
+
 //------------------
 // serialization
 //------------------
@@ -217,22 +229,11 @@ apogeeapp.app.Component.prototype.toJson = function() {
     json.type = this.componentGenerator.uniqueName;
     
     if(this.childComponentDisplay != null) {
-        this.childComponentDisplayStateJson = this.childComponentDisplay.getStateJson();
+        this.childDisplayState = this.childComponentDisplay.getStateJson();
     }
     
-    if(this.childComponentDisplayStateJson) {
-        json.windowState = this.childComponentDisplayStateJson;
-    }
-    
-    if(this.usesTabDisplay) {
-        if(this.tabDisplay != null) {
-            this.tabDisplayStateJson = this.tabDisplay.getStateJson();
-            json.tabOpen = true;
-        }
-        
-        if(this.tabDisplayStateJson) {
-            json.tabState = this.tabDisplayStateJson;
-        }
+    if(this.childDisplayState) {
+        json.windowState = this.childDisplayState;
     }
     
     if(this.treeDisplay) {
@@ -258,23 +259,30 @@ apogeeapp.app.Component.prototype.loadPropertyValues = function(json) {
     
     //set the tree state
     if(json.treeState !== undefined) {
-        this.treeStateJson = json.treeState; 
+        
+        if(this.treeExpanded != json.streeState) {
+            this.fieldUpdated("treeExpanded");
+        }
+        
+        this.treeExpanded = json.treeState; 
         
         if(this.treeDisplay) {
-            this.treeDisplay.setState(this.treeStateJson);
-        }
-    }
-    
-    //open the tab - if tab frame exists
-    if(this.usesTabDisplay()) {
-        if(json.tabState) {
-            this.tabDisplayStateJson = json.tabState;
+            this.treeDisplay.setState(this.treeExpanded);
         }
     }
     
     //set window options
     if(json.windowState !== undefined) {
-        this.childComponentDisplayStateJson = json.windowState;
+        
+        if(this.childDisplayState != json.windowState) {
+            this.fieldUpdated("childDisplayState");
+        }
+        
+        this.childDisplayState = json.windowState;
+        
+        if(this.childComponentDisplay) {
+            this.childComponentDisplay.setStateJson(this.childDisplayState);
+        }
     }
     
     //allow the component implemnetation ro read from the json
@@ -321,59 +329,89 @@ apogeeapp.app.Component.prototype.onDelete = function() {
 
 /** This method extends the member udpated function from the base.
  * @protected */    
-apogeeapp.app.Component.prototype.memberUpdated = function() {
-    //check for change of parent
-    if(this.member.getParent() !== this.uiActiveParent) {
-        var oldParent = this.uiActiveParent;
-        var newParent = this.member.getParent();
-       
-        this.uiActiveParent = newParent;
+apogeeapp.app.Component.prototype.memberUpdated = function(eventInfo) {
+    
+    let updatedMemberFields = eventInfo.updated;
+    let updatedMember = eventInfo.member;
+    
+    if(updatedMember = this.member) {
+        this.fieldUpdated("member");
         
-        //remove from old parent component
-        if(oldParent) {
-            var oldParentComponent = this.workspaceUI.getComponent(oldParent);
-            oldParentComponent.removeChildComponent(this);
-            //delete all the window display
-            if(this.childComponentDisplay) {
-                this.childComponentDisplay.deleteDisplay();
-                this.childComponentDisplay = null;
-            }
+        //check for name changes
+        if(updatedMemberFields.name) {
+            this.fieldUpdated("name");
         }
         
-        //add to the new parent component
-        if(newParent) {
-            var newParentComponent = this.workspaceUI.getComponent(newParent);
-            newParentComponent.addChildComponent(this);
+        //check for parent change
+        if(updatedMemberFields.owner) {
+            this.fieldUpdated("owner");
             
-            //TODO - delete the current component display and add a new one
+            //old parent change logic!!!
+            var oldParent = this.uiActiveParent;
+            var newParent = this.member.getParent();
+
+            this.uiActiveParent = newParent;
+
+            //remove from old parent component
+            if(oldParent) {
+                var oldParentComponent = this.workspaceUI.getComponent(oldParent);
+                oldParentComponent.removeChildComponent(this);
+                //delete all the window display
+                if(this.childComponentDisplay) {
+                    this.childComponentDisplay.deleteDisplay();
+                    this.childComponentDisplay = null;
+                }
+            }
+
+            //add to the new parent component
+            if(newParent) {
+                var newParentComponent = this.workspaceUI.getComponent(newParent);
+                newParentComponent.addChildComponent(this);
+
+                //TODO - delete the current component display and add a new one
+            }
+        }  
+        
+        //check for banner update
+        let newBannerState;
+        let newBannerMessage;
+        if(updatedMember.hasError()) {
+            var errorMsg = "";
+            var actionErrors = updatedMember.getErrors();
+            for(var i = 0; i < actionErrors.length; i++) {
+                errorMsg += actionErrors[i].msg + "\n";
+            }
+
+            newBannerState = apogeeapp.app.banner.BANNER_TYPE_ERROR;
+            newBannerMessage = errorMsg;
         }
+        else if(updatedMember.getResultPending()) {
+            newBannerState = apogeeapp.app.banner.BANNER_TYPE_PENDING;
+            newBannerMessage = apogeeapp.app.banner.PENDING_MESSAGE;
+
+        }
+        else if(updatedMember.getResultInvalid()) {
+            newBannerState = apogeeapp.app.banner.BANNER_TYPE_INVALID;
+            newBannerMessage = apogeeapp.app.banner.INVALID_MESSAGE;
+        }
+        else {   
+            newBannerState = apogeeapp.app.banner.BANNER_TYPE_NONE;
+            newBannerMessage = null;
+        }
+        
+        if((newBannerState != this.bannerState)||(newBannerMessage != this.bannerMessage)) {
+            this.fieldUpdated("bannerState");
+            this.bannerState = newBannerState;
+            this.bannerMessage = newBannerMessage;
+        }
+    }
+    else {
+        this.fieldUpdated(updatedMember.getName());
+        
+        //for now we will assume the internal members do not have their name update!!!
+        //maybe I should add a error check 
     }
     
-    //get the banner info
-    var member = this.getMember();
-    if(member.hasError()) {
-        var errorMsg = "";
-        var actionErrors = member.getErrors();
-        for(var i = 0; i < actionErrors.length; i++) {
-            errorMsg += actionErrors[i].msg + "\n";
-        }
-        
-        this.bannerState = apogeeapp.app.banner.BANNER_TYPE_ERROR;
-        this.bannerMessage = errorMsg;
-    }
-    else if(member.getResultPending()) {
-        this.bannerState = apogeeapp.app.banner.BANNER_TYPE_PENDING;
-        this.bannerMessage = apogeeapp.app.banner.PENDING_MESSAGE;
-        
-    }
-    else if(member.getResultInvalid()) {
-        this.bannerState = apogeeapp.app.banner.BANNER_TYPE_INVALID;
-        this.bannerMessage = apogeeapp.app.banner.INVALID_MESSAGE;
-    }
-    else {   
-        this.bannerState = apogeeapp.app.banner.BANNER_TYPE_NONE;
-        this.bannerMessage = null;
-    }
     
     //update for new data
     if(this.treeDisplay) {

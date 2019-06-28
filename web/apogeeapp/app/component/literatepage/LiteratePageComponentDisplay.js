@@ -85,11 +85,11 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
         // Get component display
         //-----------------
         var childComponentDisplay;
-        var componentDisplayOptions = childComponent.getComponentDisplayOptions();
+        var childDisplayState = childComponent.getChildDisplayState();
 
         //create a new component display for this child
         if(childComponent.isEditComponent) {
-            childComponentDisplay = new apogeeapp.app.PageChildComponentDisplay(childComponent,this,componentDisplayOptions);
+            childComponentDisplay = new apogeeapp.app.PageChildComponentDisplay(childComponent,this,childDisplayState);
         }
         else if(childComponent.isParentComponent) {
             //don't display the child parents!

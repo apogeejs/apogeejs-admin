@@ -301,7 +301,6 @@ apogeeapp.app.Apogee.prototype.loadComponentGenerators = function() {
     //additional components
     this.registerComponent(apogeeapp.app.CustomComponent);
     this.registerComponent(apogeeapp.app.CustomDataComponent);
-    this.registerComponent(apogeeapp.app.CustomControlComponent);
 }
 
 /** This method registers a component. 

@@ -16,12 +16,16 @@ apogeeapp.app.JsonTableComponent.prototype.getDataView = function() {
 }
 
 apogeeapp.app.JsonTableComponent.prototype.setDataView = function(dataView) {
-    this.dataView = dataView;
-    //update the window display if needed
-    var componentDisplay = this.getComponentDisplay();
-    if(componentDisplay) {
-        alert("I need to fix set data view in json table!");
-        //componentDisplay.updateViewModeElement(apogeeapp.app.JsonTableComponent.VIEW_DATA);
+    if(this.dataView != dataView) {
+        this.fieldUpdated("dataView");
+        
+        this.dataView = dataView;
+        //update the window display if needed
+        var componentDisplay = this.getComponentDisplay();
+        if(componentDisplay) {
+            alert("I need to fix set data view in json table!");
+            //componentDisplay.updateViewModeElement(apogeeapp.app.JsonTableComponent.VIEW_DATA);
+        }
     }
 }
 
