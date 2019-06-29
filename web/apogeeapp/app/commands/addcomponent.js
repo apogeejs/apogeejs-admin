@@ -48,6 +48,23 @@ apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,pare
 
 apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,componentGenerator,memberJson,componentProperties,optionalOnSuccess) {
     
+//    //##########################################################################
+//    //dev trial data
+//    var command = {};
+//    command.type = "addComponent";
+//    command.owner = parentFullName; //but parent may not be a member, it could be the workspace
+//    command.componentType = componentType;
+//    command.memberJson = memberJson
+//    command.componentJson = componentProperties;
+//    
+//    var inverseCommand = {};
+//    inverseCommand.type = "deleteComponent";
+//    inverseCommand.target = memberFullName;
+//    
+//    //tbd - how to handle children?
+//    
+//    //##########################################################################
+    
     var workspace = workspaceUI.getWorkspace();
 
     //##########################################################################

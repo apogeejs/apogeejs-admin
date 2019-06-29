@@ -357,7 +357,9 @@ apogee.action.doAddDependOnToRecalc = function(actionResult) {
 apogee.action.addToCompletedResultList = function(completedResults,actionResult) {
     completedResults.push(actionResult);
     if(actionResult.childActionResults) {
-        actionResult.childActionResults.forEach( childActionResult => apogee.action.addToCompletedResultList(completedResults,childActionResult));
+        for(var key in actionResult.childActionResults) {
+            apogee.action.addToCompletedResultList(completedResults,actionResult.childActionResults[key]);
+        }      
     }
 }
 

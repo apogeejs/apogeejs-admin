@@ -62,7 +62,7 @@ apogee.createmember._createMemberImpl = function(owner,actionData,actionResult) 
 
         //instantiate children if there are any
         if(memberJson.children) {
-            actionResult.childActionResults = [];
+            actionResult.childActionResults = {};
             for(var childName in memberJson.children) {
                 var childActionData = {};
                 childActionData.action = "createMember";
@@ -70,7 +70,7 @@ apogee.createmember._createMemberImpl = function(owner,actionData,actionResult) 
                 var childActionResult = {};
                 childActionResult.actionInfo = apogee.createmember.ACTION_INFO;
                 apogee.createmember._createMemberImpl(member,childActionData,childActionResult);
-                actionResult.childActionResults.push(childActionResult);
+                actionResult.childActionResults[childName] = childActionResult;
             }
         }
     }

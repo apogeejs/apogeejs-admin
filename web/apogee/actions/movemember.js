@@ -32,56 +32,48 @@ apogee.movemember.moveMember = function(workspace,actionData,actionResult) {
         return;
     }
         
-    var movedMemberList = [];
-    apogee.movemember.loadMovedList(member,movedMemberList);
     member.move(actionData.targetName,targetOwner);
+    actionResult.actionDone = true;
     
-    //add the individual moves
-    for(var i = 0; i < movedMemberList.length; i++) {
-        var movedMember = movedMemberList[i];
-        
-        //we are adding multiple delete events here
-        var actionDataEntry;
-        if(movedMember === member) {
-            actionDataEntry = actionData;
-        }
-        else {
-            if(!actionResult.childActionResults) actionResult.childActionResults = [];
-            
-            let childActionData = {};
-            childActionData.action = "moveMember";
-            childActionData.memberName = movedMember.getFullName();
-            childActionData.targetName = movedMember.getName();
-            childActionData.targetOwnerName = movedMember.getOwner().getFullName();
-            
-            let childActionResult = {};
-            childActionResult.actionDone = true;
-            childActionResult.member = movedMember;
-            childRepsonse.actionInfo = apogee.movemember.ACTION_INFO
-            
-            actionResult.childActionResults.push(childActionResult);
-        }
-    }
-
+    //add the child action results
+    apogee.movemember.addChildResults(member,actionResult);
 }
 
-/** this creates the moved info list, including the member and the old name, but not the new name
- * @private */
-apogee.movemember.loadMovedList = function(member,movedMemberList) {
-    movedMemberList.push(member);
+apogee.movemember.addChildResults = function(member,actionResult) {
     
     if(member.isParent) {
+        actionResult.childActionResults = {};
+        
         var childMap = member.getChildMap();
-        for(var key in childMap) {
-            var child = childMap[key];
-            apogee.movemember.loadMovedList(child,movedMemberList);
+        for(var childName in childMap) {
+            var child = childMap[childName];
+            let childActionResult = {};
+            childActionResult.actionDone = true;
+            childActionResult.member = child;
+            childActionResult.actionInfo = apogee.movemember.ACTION_INFO
+            
+            actionResult.childActionResults[childName] = childActionResult;
+            
+            //add results for children to this member
+            apogee.movemember.addChildResults(child,childActionResult);
         }
     }
     else if(member.isRootHolder) {
+        actionResult.childActionResults = {};
+        
         var root = member.getRoot();
-        apogee.movemember.loadMovedList(root,movedMemberList);
+        let childActionResult = {};
+        childActionResult.actionDone = true;
+        childActionResult.member = root;
+        childActionResult.actionInfo = apogee.movemember.ACTION_INFO
+
+        actionResult.childActionResults["root"] = childActionResult;
+        
+        //add results for children to this member
+        addChildResults(child,childActionResult);
     }
 }
+
 
 /** Action info */
 apogee.movemember.ACTION_INFO = {

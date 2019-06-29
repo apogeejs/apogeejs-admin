@@ -31,58 +31,54 @@ apogee.deletemember.deleteMember = function(workspace,actionData,actionResult) {
         return;
     }
     actionResult.member = member;
-
-    var deleteList = [];
-
-    apogee.deletemember.getDeleteList(member,deleteList);
-    for(var i = 0; i < deleteList.length; i++) {
-        //call delete handlers
-        var member = deleteList[i];
-        member.onDeleteMember();
-        if(member.isDependent) {
-            member.onDeleteDependent();
-        }   
-        
-        //we are adding multiple delete events here
-        var actionDataEntry;
-        if(member == actionData.member) {
-            actionResult.actionDone = true;
-        }
-        else {
-            if(!actionResult.childActionResults) actionResult.childActionResults = [];
-            
-            let childActionData = {};
-            childActionData.action = "deleteMember";
-            childActionData.memberName = member.getFullName();           
-            
-            let childActionResult = {};
-            childActionResult.member = member;
-            childActionResult.actionInfo = apogee.deletemember.ACTION_INFO;
-            childActionResult.actionDone = true;
-            
-            actionResult.childActionResults.push(childActionResult);
-        }
-    }
+    
+    apogee.deletemember.doDelete(member,actionResult);
+    
 }
 
+
 /** @private */
-apogee.deletemember.getDeleteList =  function(member,deleteList) {
-    //delete children first if there are any
+apogee.deletemember.doDelete = function(member,actionResult) {
+    
+    //delete children
     if(member.isParent) {
+        actionResult.childActionResults = {};
+        
         var childMap = member.getChildMap();
-        for(var key in childMap) {
-            var child = childMap[key];
-            apogee.deletemember.getDeleteList(child,deleteList);
+        for(var childName in childMap) {
+            var child = childMap[childName];
+            let childActionResult = {};
+            childActionResult.member = child;
+            childActionResult.actionInfo = apogee.deletemember.ACTION_INFO
+            
+            actionResult.childActionResults[childName] = childActionResult;
+            
+            //add results for children to this member
+            apogee.deletemember.doDelete(child,childActionResult);
         }
     }
     else if(member.isRootHolder) {
+        actionResult.childActionResults = {};
+        
         var root = member.getRoot();
-        apogee.deletemember.getDeleteList(root,deleteList);
-    }
-    //delete the member
-    deleteList.push(member);
-}
+        let childActionResult = {};
+        childActionResult.member = root;
+        childActionResult.actionInfo = apogee.deletemember.ACTION_INFO
 
+        actionResult.childActionResults["root"] = childActionResult;
+        
+        //add results for children to this member
+        apogee.deletemember.doDelete(child,childActionResult);
+    }
+    
+    //delete member
+    member.onDeleteMember();
+    if(member.isDependent) {
+        member.onDeleteDependent();
+    }
+    
+    actionResult.actionDone = true;
+}
 
 
 /** Action info */

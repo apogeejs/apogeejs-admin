@@ -1,5 +1,6 @@
 /** This is the base functionality for a component. */
 apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
+    apogee.EventManager.init.call(this);
     
     this.workspaceUI = workspaceUI;
     this.member = member;
@@ -24,8 +25,11 @@ apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
     this.tabDisplay = null; //only valid on parents, which open into a tab
     
     this.treeDisplay = null; //this is shown in the tree view
-    this.treeExpanded = null;
+    this.treeState = null;
 }
+
+//add components to this class
+apogee.base.mixin(apogeeapp.app.Component,apogee.EventManager);
 
 //These parameters are used to order the components in the tree entry.
 apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER = 5;
@@ -82,8 +86,8 @@ apogeeapp.app.Component.prototype.getTreeEntry = function(createIfMissing) {
         this.treeDisplay = this.instantiateTreeEntry();
         this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
 
-        if(this.treeExpanded !== undefined) {
-            this.treeDisplay.setState(this.treeExpanded);
+        if(this.treeState !== undefined) {
+            this.treeDisplay.setState(this.treeState);
         }
     }
     
@@ -260,14 +264,14 @@ apogeeapp.app.Component.prototype.loadPropertyValues = function(json) {
     //set the tree state
     if(json.treeState !== undefined) {
         
-        if(this.treeExpanded != json.streeState) {
-            this.fieldUpdated("treeExpanded");
+        if(this.treeState != json.treeState) {
+            this.fieldUpdated("treeState");
         }
         
-        this.treeExpanded = json.treeState; 
+        this.treeState = json.treeState; 
         
         if(this.treeDisplay) {
-            this.treeDisplay.setState(this.treeExpanded);
+            this.treeDisplay.setState(this.treeState);
         }
     }
     
@@ -280,9 +284,9 @@ apogeeapp.app.Component.prototype.loadPropertyValues = function(json) {
         
         this.childDisplayState = json.windowState;
         
-        if(this.childComponentDisplay) {
-            this.childComponentDisplay.setStateJson(this.childDisplayState);
-        }
+//        if(this.childComponentDisplay) {
+//            this.childComponentDisplay.setStateJson(this.childDisplayState);
+//        }
     }
     
     //allow the component implemnetation ro read from the json
@@ -338,12 +342,12 @@ apogeeapp.app.Component.prototype.memberUpdated = function(eventInfo) {
         this.fieldUpdated("member");
         
         //check for name changes
-        if(updatedMemberFields.name) {
+        if(apogee.util.isFieldUpdated(updatedMemberFields,"name")) {
             this.fieldUpdated("name");
         }
         
         //check for parent change
-        if(updatedMemberFields.owner) {
+        if(apogee.util.isFieldUpdated(updatedMemberFields,"owner")) {
             this.fieldUpdated("owner");
             
             //old parent change logic!!!
@@ -522,7 +526,8 @@ apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,
     var component = new componentGenerator(workspaceUI,member);
 
     //call member updated to process and notify of component creation
-    component.memberUpdated();
+    var eventInfo = apogee.util.getAllFieldsInfo(member);
+    component.memberUpdated(eventInfo);
     
     //apply any serialized values
     if(propertyValues) {
