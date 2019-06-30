@@ -21,13 +21,6 @@ apogee.Workspace = function(optionalJson,optionalContextOwner) {
     this.name = apogee.Workspace.DEFAULT_WORKSPACE_NAME;
     
     this.owner = optionalContextOwner ? optionalContextOwner : null;
-    
-    if(!optionalJson) {
-        this.rootFolder = new apogee.Folder(apogee.Workspace.ROOT_FOLDER_NAME,this);
-    }
-    else {
-        this.loadFromJson(optionalJson);
-    }
 }
 
 //add components to this class
@@ -233,10 +226,14 @@ apogee.Workspace.prototype.toJson = function() {
     var rootFolderJson = this.rootFolder.toJson();
     return apogee.Workspace.createWorkpaceJsonFromFolderJson(this.name,rootFolderJson);
 }
+    
+/** To create a new empty workspace, call this method to set the root folder. */ 
+apogee.Workspace.prototype.initializeNewWorkspace = function() {
+    this.rootFolder = new apogee.Folder(apogee.Workspace.ROOT_FOLDER_NAME,this);
+}
 
 
-/** This is loads data from the given json into this workspace. 
- * @private */
+/** This is loads data from the given json into this workspace. */
 apogee.Workspace.prototype.loadFromJson = function(json) {
     var fileType = json.fileType;
 	if(fileType !== apogee.Workspace.SAVE_FILE_TYPE) {

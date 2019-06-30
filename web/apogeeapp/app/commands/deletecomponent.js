@@ -16,14 +16,13 @@ apogeeapp.app.deletecomponent.createDeleteComponentCommand = function(component)
     var workspaceUI = component.getWorkspaceUI();
     var parent = member.getParent();
     var parentFullName = parent.getFullName();
-    var componentGenerator = component.componentGenerator;
     var componentJson = component.toJson();
     var memberJson = member.toJson();
     
     //need to add optionalOnSuccess for LiteratePage!!!
     var optionalOnSuccess = undefined;
     
-    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parentFullName,componentGenerator,memberJson,componentJson,optionalOnSuccess); 
+    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parentFullName,memberJson,componentJson,optionalOnSuccess); 
     
     var command = {};
     command.cmd = deleteFunction;

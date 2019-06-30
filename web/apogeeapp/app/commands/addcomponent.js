@@ -19,16 +19,23 @@ apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,pare
         componentProperties = apogeeapp.app.Component.mergePropertyValues(propertyValues,optionalBaseComponentValues);
     }
     else if(propertyValues) {
-        componentProperties = propertyValues;
+        componentProperties = apogee.util.jsonCopy(propertyValues);
     }
     else {
-        componentProperties = optionalBaseComponentValues;
+        componentProperties = apogee.util.jsonCopy(optionalBaseComponentValues);
     }
+    //##########################################
+    //cludge for now - go back and fix this
+    //I should pass in the type, not the generator,
+    //and I should clean up how I create these properties
+    //and maybe just call it the component json?
+    componentProperties.type = componentGenerator.uniqueName;
+    //################################################
     
     var parentFullName = parent.getFullName();
     
     //create function
-    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parentFullName,componentGenerator,memberJson,componentProperties,optionalOnSuccess);
+    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parentFullName,memberJson,componentProperties,optionalOnSuccess);
     
     var workspace = workspaceUI.getWorkspace();
     var memberName = propertyValues.name;
@@ -46,28 +53,10 @@ apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,pare
     return command;
 }
 
-apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,componentGenerator,memberJson,componentProperties,optionalOnSuccess) {
-    
-//    //##########################################################################
-//    //dev trial data
-//    var command = {};
-//    command.type = "addComponent";
-//    command.owner = parentFullName; //but parent may not be a member, it could be the workspace
-//    command.componentType = componentType;
-//    command.memberJson = memberJson
-//    command.componentJson = componentProperties;
-//    
-//    var inverseCommand = {};
-//    inverseCommand.type = "deleteComponent";
-//    inverseCommand.target = memberFullName;
-//    
-//    //tbd - how to handle children?
-//    
-//    //##########################################################################
+apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,memberJson,componentProperties) {
     
     var workspace = workspaceUI.getWorkspace();
 
-    //##########################################################################
     //create the member
     var createAction = {};
     createAction.action = "createMember";
@@ -75,59 +64,77 @@ apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,
     createAction.createData = memberJson;
     var actionResult = apogee.action.doAction(workspace,createAction);
     
-    //response - get new member
-    var member = actionResult.member;
-    var cmdDone = true;
-    var errorMessage = null;
+    var cmdDone;
     
-    //end create member
-    //##########################################################################
-
-    if(member) {
-        var component;
-
-        try {
-            
-            //create the component
-            component = apogeeapp.app.Component.createComponentFromMember(componentGenerator,workspaceUI,member,componentProperties);
-
-            //unknown failure
-            if(!component) {
-                errorMessage = "Unknown error creating component";
-            }
-        }
-        catch(error) {
-            //exception creating component
-            errorMessage = "Failed to create UI component: " + error.message;
-        }
-
-        if(!component) {
-            //##########################################################################
-            //undo create the member
-            var json = {};
-            json.action = "deleteMember";
-            json.memberName = member.getFullName();
-            //if this fails, we will just ignore it for now
-            var actionResult = apogee.action.doAction(workspace,json);
-            //end undo create member
-            //##########################################################################
-            
-            //this should have already been set
-            cmdDone = false;
-        }
-    }
-    else {
-        errorMessage = actionResult.alertMsg;
-    }
-
+    //create the components for the member
     if(actionResult.actionDone) {
-//NOTE - WE PROBABLY SHOULD ALLOW ERROR INFORMATION FROM optionalOnSuccess
-//ALSO CONSIDIER IF THIS  SHOULD BE OUTSIDE OF ACTION (probably not, I'm thinking for now)
-        if(optionalOnSuccess) optionalOnSuccess(member,component);
+        apogeeapp.app.addcomponent.createComponentFromMember(workspaceUI,actionResult,componentProperties);
     }
     
     //alert user if we had an error message
-    if(errorMessage) alert(errorMessage);
+    if(actionResult.errorMsg) alert(errorMsg);
 
     return cmdDone;
+}
+
+apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,createMemberResult,componentProperties) {
+    
+    //response - get new member
+    var member = createMemberResult.member;
+    var component;
+    var errorMessage;
+    try {
+        if(member) {
+            
+            var componentGenerator = this.app.getComponentGenerator(componentProperties.type);
+            if((!componentGenerator)||(member.constructor == apogee.ErrorTable)) {
+                //throw apogee.base.createError("Component type not found: " + componentType);
+
+                //table not found - create an empty table
+                componentGenerator = apogeeapp.app.ErrorTableComponent;
+            }
+
+            //create empty component
+            var component = new componentGenerator(workspaceUI,member);
+
+            //call member updated to process and notify of component creation
+            var eventInfo = apogee.util.getAllFieldsInfo(member);
+            component.memberUpdated(eventInfo);
+
+            //apply any serialized values
+            if(componentProperties) {
+                component.loadPropertyValues(componentProperties);
+            }
+        }
+    }
+    catch(error) {
+        //exception creating component
+        errorMessage = "Failed to create UI component: " + error.message;
+        component = null;
+    }
+
+    //I WANT BETTER ERROR HANDLING HERE (AND ABOVE)
+    if(!component) {
+        //##########################################################################
+        //undo create the member
+        var json = {};
+        json.action = "deleteMember";
+        json.memberName = member.getFullName();
+        //if this fails, we will just ignore it for now
+        var workspace = workspaceUI.getWorkspace();
+        var actionResult = apogee.action.doAction(workspace,json);
+        //end undo create member
+        //##########################################################################
+
+        //this should have already been set
+        return false;
+    }
+    
+    //load the children, if there are any (BETTER ERROR CHECKING!)
+    if(component.readChildrenFromJson) {      
+        component.readChildrenFromJson(workspaceUI,createMemberResult.childActionResults,json);
+    }
+        
+    return true;
+    
 }

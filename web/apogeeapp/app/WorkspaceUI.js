@@ -48,24 +48,24 @@ apogeeapp.app.WorkspaceUI = class {
       * a new empty workspace the workspaceJson should be omitted. */
     load(workspaceJson) { 
 
-        var workspaceDataJson;
         var workspaceComponentsJson;
-
-        if(workspaceJson) {
-            workspaceDataJson = workspaceJson.workspace;
-            workspaceComponentsJson = workspaceJson.components;
-        }
-        else {
-            workspaceDataJson = undefined;
-            workspaceComponentsJson = apogeeapp.app.FolderComponent.EMPTY_FOLDER_COMPONENT_JSON;
-        }
+        var actionResult;
 
         //create workspace
         this.workspace = new apogee.Workspace(workspaceDataJson);
+        if(workspaceJson) {
+            actionResult = this.workspace.loadFromJson(workspaceJson.data);
+            workspaceComponentsJson = workspaceJson.components;
+        }
+        else {
+            actionResult = this.workspace.initializeNewWorkspace();
+            workspaceComponentsJson = apogeeapp.app.FolderComponent.EMPTY_FOLDER_COMPONENT_JSON;
+        }
 
         //set up the root folder conmponent, with children if applicable
         var rootFolder = this.workspace.getRoot();
-        var rootFolderComponent = this.loadComponentFromJson(rootFolder,workspaceComponentsJson);
+        var success = apogeeapp.app.addcomponent.createComponentFromMember(workspaceUI,actionResult,workspaceComponentsJson);
+        var rootFolderComponent = this.getComponent(rootFolder);
 
         //set up the tree (if tree in use)
         if(this.tree) {
@@ -348,19 +348,6 @@ apogeeapp.app.WorkspaceUI = class {
         return undefined;
     }
 
-    loadComponentFromJson(member,componentJson) {
-        var componentType = componentJson.type;
-        var componentGenerator = this.app.getComponentGenerator(componentType);
-        if((!componentGenerator)||(member.constructor == apogee.ErrorTable)) {
-            //throw apogee.base.createError("Component type not found: " + componentType);
-
-            //table not found - create an empty table
-            componentGenerator = apogeeapp.app.ErrorTableComponent;
-        }
-
-        return apogeeapp.app.Component.createComponentFromMember(componentGenerator,this,member,componentJson);
-    }
-
     //================================
     // Folder child methods
     // The following methods are standard methods to serialize and deserialize the children in a folder. This
@@ -382,12 +369,14 @@ apogeeapp.app.WorkspaceUI = class {
         }
         return json;
     }
+    
+    loadFolderComponentContentFromJson(actionResults,childrenJson) {
+        for(var childName in childrenJson) {
+            var childComponentJson = childrenJson[childName];
+            var childActionResult = actionResults[childName];
 
-    loadFolderComponentContentFromJson(folder,childrenJson) {
-        for(var key in childrenJson) {
-            var childJson = childrenJson[key];
-            var childMember = folder.lookupChild(key);	
-            this.loadComponentFromJson(childMember,childJson);
+            var childSuccess = apogeeapp.app.addcomponent.createComponentFromMember(workspaceUI,childActionResult,childComponentJson);
+            if(!childSuccess) return false;
         }
     }
 

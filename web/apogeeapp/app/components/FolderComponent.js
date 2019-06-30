@@ -99,21 +99,24 @@ apogeeapp.app.FolderComponent.prototype.writeToJson = function(json) {
     var folder = this.getMember();
     var workspaceUI = this.getWorkspaceUI();
     json.children = workspaceUI.getFolderComponentContentJson(folder);
+
+    return json;
 }
 
 apogeeapp.app.FolderComponent.prototype.readFromJson = function(json) {
-    //read the childresn
-    if(json.children) {
-        var workspaceUI = this.getWorkspaceUI();
-        var folder = this.getMember();
-        workspaceUI.loadFolderComponentContentFromJson(folder,json.children);
-    }
-    
     //read the editor state
     if((json.data)&&(json.data.doc)) {
         this.editorData = proseMirror.createEditorState(json.data.doc);
         this.fieldUpdated("document");
     }
+}
+
+/** This method is used to load the child components from a json */
+apogeeapp.app.FolderComponent.prototype.readChildrenFromJson = function(workspaceUI,childActionResults,json) {
+    if(json.children) {
+        workspaceUI.loadFolderComponentContentFromJson(childActionResults,json.children);
+    }
+    return true;  
 }
 
 //======================================

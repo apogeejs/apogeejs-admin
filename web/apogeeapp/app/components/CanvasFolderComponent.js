@@ -23,12 +23,12 @@ apogeeapp.app.CanvasFolderComponent.prototype.writeToJson = function(json) {
     json.children = workspaceUI.getFolderComponentContentJson(folder);
 }
 
-apogeeapp.app.CanvasFolderComponent.prototype.readFromJson = function(json) {
+/** This method is used to load the child components from a json */
+apogeeapp.app.CanvasFolderComponent.prototype.readChildrenFromJson = function(workspaceUI,childActionResults,json) {
     if(json.children) {
-        var workspaceUI = this.getWorkspaceUI();
-        var folder = this.getMember();
-        workspaceUI.loadFolderComponentContentFromJson(folder,json.children);
+        workspaceUI.loadFolderComponentContentFromJson(childActionResults,json.children);
     }
+    return true;  
 }
 
 //======================================

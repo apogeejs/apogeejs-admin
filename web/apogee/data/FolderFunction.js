@@ -339,7 +339,11 @@ apogee.FolderFunction.prototype.createVirtualWorkspace = function(folderFunction
     try {
         var folderJson = this.internalFolder.toJson();
 		var workspaceJson = apogee.Workspace.createWorkpaceJsonFromFolderJson(this.getName(),folderJson);
-        var virtualWorkspace = new apogee.Workspace(workspaceJson,this.getOwner());
+        var virtualWorkspace = new apogee.Workspace(this.getOwner());
+        var actionResult = virtualWorkspace.loadFromJson(workspaceJson);
+        
+        //do something with action result!!!
+        
         return virtualWorkspace;
 	}
 	catch(error) {

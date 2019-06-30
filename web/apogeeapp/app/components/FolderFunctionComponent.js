@@ -30,13 +30,19 @@ apogeeapp.app.FolderFunctionComponent.prototype.writeToJson = function(json) {
     json.children = workspaceUI.getFolderComponentContentJson(internalFolder);
 }
 
-apogeeapp.app.FolderFunctionComponent.prototype.readFromJson = function(json) {
+apogeeapp.app.FolderFunctionComponent.prototype.readChildrenFromJson = function(workspaceUI,childActionResults,json) {
+    //verify the internal folder was loaded
+    var internalFolderActionResult = childActionResults[apogee.FolderFunction.INTERNAL_FOLDER_NAME];
+    
+    //verify success???
+    //verify the action result exists!!!
+    
+    var internalFolderChildActionResults = internalFolderActionResult.childActionResults;
+    
     if(json.children) {
-        var workspaceUI = this.getWorkspaceUI();
-        var folderFunction = this.getMember();
-        var internalFolder = folderFunction.getInternalFolder();
-        workspaceUI.loadFolderComponentContentFromJson(internalFolder,json.children);
+        workspaceUI.loadFolderComponentContentFromJson(internalFolderChildActionResults,json.children);
     }
+    return true;  
 }
 
 //======================================
