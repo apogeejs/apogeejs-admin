@@ -14,28 +14,28 @@ apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,pare
     var memberJson = componentGenerator.createMemberJson(propertyValues,optionalBaseMemberValues);
     
     //merge component property values and the base json, if needed
-    var componentProperties;
+    var componentJson;
     if((propertyValues)&&(optionalBaseComponentValues)) {
-        componentProperties = apogeeapp.app.Component.mergePropertyValues(propertyValues,optionalBaseComponentValues);
+        componentJson = apogeeapp.app.Component.mergePropertyValues(propertyValues,optionalBaseComponentValues);
     }
     else if(propertyValues) {
-        componentProperties = apogee.util.jsonCopy(propertyValues);
+        componentJson = apogee.util.jsonCopy(propertyValues);
     }
     else {
-        componentProperties = apogee.util.jsonCopy(optionalBaseComponentValues);
+        componentJson = apogee.util.jsonCopy(optionalBaseComponentValues);
     }
     //##########################################
     //cludge for now - go back and fix this
     //I should pass in the type, not the generator,
     //and I should clean up how I create these properties
     //and maybe just call it the component json?
-    componentProperties.type = componentGenerator.uniqueName;
+    componentJson.type = componentGenerator.uniqueName;
     //################################################
     
     var parentFullName = parent.getFullName();
     
     //create function
-    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parentFullName,memberJson,componentProperties,optionalOnSuccess);
+    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parentFullName,memberJson,componentJson,optionalOnSuccess);
     
     var workspace = workspaceUI.getWorkspace();
     var memberName = propertyValues.name;
@@ -77,7 +77,7 @@ apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,
     return cmdDone;
 }
 
-apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,createMemberResult,componentProperties) {
+apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,createMemberResult,componentJson) {
     
     //response - get new member
     var member = createMemberResult.member;
@@ -86,7 +86,7 @@ apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,crea
     try {
         if(member) {
             
-            var componentGenerator = this.app.getComponentGenerator(componentProperties.type);
+            var componentGenerator = apogeeapp.app.Apogee.getInstance().getComponentGenerator(componentJson.type);
             if((!componentGenerator)||(member.constructor == apogee.ErrorTable)) {
                 //throw apogee.base.createError("Component type not found: " + componentType);
 
@@ -102,8 +102,8 @@ apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,crea
             component.memberUpdated(eventInfo);
 
             //apply any serialized values
-            if(componentProperties) {
-                component.loadPropertyValues(componentProperties);
+            if(componentJson) {
+                component.loadPropertyValues(componentJson);
             }
         }
     }
@@ -131,8 +131,8 @@ apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,crea
     }
     
     //load the children, if there are any (BETTER ERROR CHECKING!)
-    if(component.readChildrenFromJson) {      
-        component.readChildrenFromJson(workspaceUI,createMemberResult.childActionResults,json);
+    if((component.readChildrenFromJson)&&(createMemberResult.childActionResults)) {      
+        component.readChildrenFromJson(workspaceUI,createMemberResult.childActionResults,componentJson);
     }
         
     return true;

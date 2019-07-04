@@ -6,7 +6,7 @@
  * used for the virtual workspace created for folder functions, so the folder function can 
  * access variables from the larger workspace.
  * */
-apogee.Workspace = function(optionalJson,optionalContextOwner) {
+apogee.Workspace = function(optionalContextOwner) {
     //base init
     apogee.EventManager.init.call(this);
     apogee.ContextHolder.init.call(this);
@@ -34,6 +34,16 @@ apogee.Workspace.DEFAULT_WORKSPACE_NAME = "Workspace";
 apogee.Workspace.ROOT_FOLDER_NAME = "Model";
 
 apogee.Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT = 500;
+
+apogee.Workspace.EMPTY_WORKSPACE_JSON = {
+    "fileType": "apogee workspace",
+    "version": 0.2,
+    "name": "Custom Component Demo",
+    "data": {
+        "name": "Model",
+        "type": "apogee.Folder"
+    }
+}
 
 /** This method returns the root object - implemented from RootHolder.  */
 apogee.Workspace.prototype.setName = function(name) {
@@ -226,12 +236,6 @@ apogee.Workspace.prototype.toJson = function() {
     var rootFolderJson = this.rootFolder.toJson();
     return apogee.Workspace.createWorkpaceJsonFromFolderJson(this.name,rootFolderJson);
 }
-    
-/** To create a new empty workspace, call this method to set the root folder. */ 
-apogee.Workspace.prototype.initializeNewWorkspace = function() {
-    this.rootFolder = new apogee.Folder(apogee.Workspace.ROOT_FOLDER_NAME,this);
-}
-
 
 /** This is loads data from the given json into this workspace. */
 apogee.Workspace.prototype.loadFromJson = function(json) {
@@ -271,3 +275,4 @@ apogee.Workspace.getMemberGenerator = function(type) {
 apogee.Workspace.addMemberGenerator = function(generator) {
     apogee.Workspace.memberGenerators[generator.type] = generator;
 }
+

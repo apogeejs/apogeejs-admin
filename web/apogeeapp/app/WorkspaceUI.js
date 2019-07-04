@@ -48,23 +48,27 @@ apogeeapp.app.WorkspaceUI = class {
       * a new empty workspace the workspaceJson should be omitted. */
     load(workspaceJson) { 
 
+        var workspaceDataJson;
         var workspaceComponentsJson;
         var actionResult;
 
         //create workspace
-        this.workspace = new apogee.Workspace(workspaceDataJson);
+        this.workspace = new apogee.Workspace();
         if(workspaceJson) {
-            actionResult = this.workspace.loadFromJson(workspaceJson.data);
+            workspaceDataJson = workspaceJson.workspace;
             workspaceComponentsJson = workspaceJson.components;
         }
         else {
-            actionResult = this.workspace.initializeNewWorkspace();
+            //set up an empty workspace
+            workspaceDataJson = apogee.Workspace.EMPTY_WORKSPACE_JSON;
             workspaceComponentsJson = apogeeapp.app.FolderComponent.EMPTY_FOLDER_COMPONENT_JSON;
         }
+        
+        actionResult = this.workspace.loadFromJson(workspaceDataJson);
 
         //set up the root folder conmponent, with children if applicable
         var rootFolder = this.workspace.getRoot();
-        var success = apogeeapp.app.addcomponent.createComponentFromMember(workspaceUI,actionResult,workspaceComponentsJson);
+        var success = apogeeapp.app.addcomponent.createComponentFromMember(this,actionResult,workspaceComponentsJson);
         var rootFolderComponent = this.getComponent(rootFolder);
 
         //set up the tree (if tree in use)
@@ -375,7 +379,7 @@ apogeeapp.app.WorkspaceUI = class {
             var childComponentJson = childrenJson[childName];
             var childActionResult = actionResults[childName];
 
-            var childSuccess = apogeeapp.app.addcomponent.createComponentFromMember(workspaceUI,childActionResult,childComponentJson);
+            var childSuccess = apogeeapp.app.addcomponent.createComponentFromMember(this,childActionResult,childComponentJson);
             if(!childSuccess) return false;
         }
     }

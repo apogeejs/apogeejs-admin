@@ -21,8 +21,10 @@ apogeeapp.app.ParentComponent.prototype.instantiateTreeEntry = function() {
     for(var childKey in childMap) {
         var childMember = childMap[childKey];
         var childComponent = this.getWorkspaceUI().getComponent(childMember);
-        var childTreeEntry = childComponent.getTreeEntry(true);
-        treeEntry.addChild(childTreeEntry);
+        if(childComponent) {
+            var childTreeEntry = childComponent.getTreeEntry(true);
+            treeEntry.addChild(childTreeEntry);
+        }
     }
     
     return treeDisplay;

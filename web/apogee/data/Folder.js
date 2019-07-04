@@ -207,3 +207,4 @@ apogee.Folder.generator.setCodeOk = false;
 
 //register this member
 apogee.Workspace.addMemberGenerator(apogee.Folder.generator);
+
