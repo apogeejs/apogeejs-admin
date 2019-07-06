@@ -46,25 +46,6 @@ apogeeapp.app.FolderFunctionComponent.prototype.readChildrenFromJson = function(
 }
 
 //======================================
-// Static methods
-//======================================
-
-apogeeapp.app.FolderFunctionComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
-    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.FolderFunctionComponent,userInputValues,optionalBaseJson);
-    if(userInputValues.argListString) {
-        var argList = apogee.FunctionTable.parseStringArray(userInputValues.argListString);
-        json.argList = argList;
-    }
-    if(userInputValues.returnValueString) {
-        json.returnValue = userInputValues.returnValueString;
-    }
-    if(userInputValues.internalFolder) {
-        json.internalFolder = userInputValues.internalFolder;
-    }
-    return json;
-}
-
-//======================================
 // This is the component generator, to register the component
 //======================================
 
@@ -88,6 +69,15 @@ apogeeapp.app.FolderFunctionComponent.propertyDialogLines = [
         "resultKey":"returnValueString"
     }
 ];
+apogeeapp.app.FunctionComponent.transferMemberProperties = function(inputValues,propertyJson) {
+    if(inputValues.argListString !== undefined) {
+        var argList = apogee.FunctionTable.parseStringArray(inputValues.argListString);
+        propertyJson.argList = argList;
+    }
+    if(inputValues.returnValueString !== undefined) {
+        propertyJson.returnValue = inputValues.returnValueString;
+    }
+}
 
 //if we want to allow importing a workspace as this object, we must add this method to the generator
 apogeeapp.app.FolderFunctionComponent.appendWorkspaceChildren = function(optionsJson,childrenJson) {

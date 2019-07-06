@@ -3,79 +3,52 @@
 apogeeapp.app.addcomponent = {};
 
 //=====================================
-// Action
+// Command Object
 //=====================================
 
-/** This function creates a command to add a component. */
-apogeeapp.app.addcomponent.createAddComponentCommand = function(workspaceUI,parent,componentGenerator,propertyValues,optionalBaseMemberValues,optionalBaseComponentValues,optionalOnSuccess) {
-    
-    //convert property values so they can be used to create the member object
-    //NO - the second arg must be a complete member json!!! Not just options!
-    var memberJson = componentGenerator.createMemberJson(propertyValues,optionalBaseMemberValues);
-    
-    //merge component property values and the base json, if needed
-    var componentJson;
-    if((propertyValues)&&(optionalBaseComponentValues)) {
-        componentJson = apogeeapp.app.Component.mergePropertyValues(propertyValues,optionalBaseComponentValues);
-    }
-    else if(propertyValues) {
-        componentJson = apogee.util.jsonCopy(propertyValues);
-    }
-    else {
-        componentJson = apogee.util.jsonCopy(optionalBaseComponentValues);
-    }
-    //##########################################
-    //cludge for now - go back and fix this
-    //I should pass in the type, not the generator,
-    //and I should clean up how I create these properties
-    //and maybe just call it the component json?
-    componentJson.type = componentGenerator.uniqueName;
-    //################################################
-    
-    var parentFullName = parent.getFullName();
-    
-    //create function
-    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parentFullName,memberJson,componentJson,optionalOnSuccess);
+apogeeapp.app.addcomponent.createUndoCommand = function(workspaceUI,commandJson) {
     
     var workspace = workspaceUI.getWorkspace();
-    var memberName = propertyValues.name;
+    var memberName = commandJson.mebmerJson.name;
+    var parent = workspace.getMemberByFullName(parentFullName);
     var memberFullName = parent.getChildFullName(memberName);
     
-    //un-create function
-    var deleteFunction = () => apogeeapp.app.deletecomponent.doDeleteComponent(workspace,memberFullName);
+    var undoCommandJson = {};
+    undoCommandJson.type = apogeeapp.app.deletecomponent.COMMAND_TYPE;
+    undoCommandJson.memberFullName = memberFullName;
     
-    var command = {};
-    command.cmd = createFunction;
-    command.undoCmd = deleteFunction;
-    command.desc = "Create member: " + memberFullName;
-    command.setsDirty = true;
-    
-    return command;
+    return undoCommandJson;
 }
 
-apogeeapp.app.addcomponent.doAddComponent = function(workspaceUI,parentFullName,memberJson,componentProperties) {
+apogeeapp.app.addcomponent.executeCommand = function(workspaceUI,commandJson) { 
     
     var workspace = workspaceUI.getWorkspace();
 
     //create the member
     var createAction = {};
     createAction.action = "createMember";
-    createAction.ownerName = parentFullName;
-    createAction.createData = memberJson;
+    createAction.ownerName = commandJson.parentFullName;
+    createAction.createData = commandJson.memberJson;
     var actionResult = apogee.action.doAction(workspace,createAction);
     
     var cmdDone;
     
     //create the components for the member
+    //I need error handling for the create component action
     if(actionResult.actionDone) {
-        apogeeapp.app.addcomponent.createComponentFromMember(workspaceUI,actionResult,componentProperties);
+        apogeeapp.app.addcomponent.createComponentFromMember(workspaceUI,actionResult,commandJson.componentProperties);
     }
-    
-    //alert user if we had an error message
-    if(actionResult.errorMsg) alert(errorMsg);
 
-    return cmdDone;
+    var commandResult = {};
+    commandResult.cmdDone = actionResult.actionDone;
+    if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
+    
+    return commandResult;
 }
+
+//==========================
+// Internal Methods
+//==========================
 
 apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,createMemberResult,componentJson) {
     
@@ -138,3 +111,7 @@ apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,crea
     return true;
     
 }
+
+apogeeapp.app.addcomponent.COMMAND_TYPE = "addComponent";
+
+apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.addcomponent);

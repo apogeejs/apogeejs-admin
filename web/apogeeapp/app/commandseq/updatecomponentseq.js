@@ -18,90 +18,99 @@ apogeeapp.app.updatecomponentseq.updateComponent = function(component) {
     var initialValues = component.getPropertyValues(); 
 
     //add folder list, only if we can set the parent (if there is a parent)
-    var folderMap = null;
-    var folderList = null;
-    if(component.getMember().getParent()) {
-        //get the folder list
-         folderMap = workspaceUI.getFolders();
-        folderList = [];
-        for(var folderName in folderMap) {
-            folderList.push(folderName);
-        }
-    }
+    var folderList = workspaceUI.getFolders();
 
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = apogeeapp.app.updatecomponentseq.getPropertiesDialogLayout(displayName,folderList,additionalLines,false,initialValues);
 
     //create on submit callback
     var onSubmitFunction = function(submittedValues) {
-
-        //see if there were no changes
-        var change = false;
+        
+        //get the changed values
         var newValues = {};
-        var undoValues = {}
-        for(var key in submittedValues) {
-            if(submittedValues[key] !== initialValues[key]) {
+        for(var key in initialValues) {
+            if(initialValues[key] !== submittedValues[key]) {
                 newValues[key] = submittedValues[key];
-                undoValues[key] = initialValues[key];
-                change = true;
             }
         }
-        if(!change) {
-            return true;
-        }
-
-        var nameChange = false;
-        var targetName;
-        var targetOwner;
-        var member = component.getMember();
         
-        //validate the name, if it changed
-        if(newValues.name !== undefined) {
-            //validate name
+        var member = component.getMember();
+        var memberFullName = member.getFullName();
+        
+        var updateCommand;
+        var moveCommand;
+        
+        //--------------
+        // Update Properties
+        //--------------
+        var componentGenerator = component.componentGenerator;
+        
+        var memberUpdateJson = {};
+        if(componentGenerator.transferMemberProperties) {
+            componentGenerator.transferMemberProperties(newValues,memberUpdateJson);
+        }
+        var numMemberProps = apogee.util.jsonObjectLength(memberUpdateJson);
+        
+        var componentUpdateJson = {};
+        if(componentGenerator.transferComponentProperties) {
+            componentGenerator.transferComponentProperties(newValues,componentUpdateJson);
+        }
+        var numComponentProps = apogee.util.jsonObjectLength(componentUpdateJson);
+        
+        if((numMemberProps > 0)||(numComponentProps > 0)) {
+            updateCommand = {};
+            updateCommand.type = apogeeapp.app.updatecomponent.COMMAND_TYPE;
+            updateCommand.memberFullName = memberFullName;
+            if(numMemberProps > 0) updateCommand.updatedMemberProperties = memberUpdateJson;
+            if(numComponentProps > 0) updateCommand.updatedComponentProperties = componentUpdateJson;
+        }
+        
+        //--------------
+        // Move
+        //--------------
+        
+        if((newValues.name)||(newValues.parentName)) {
+            
+            //validate the name
             var nameResult = apogee.codeCompiler.validateTableName(newValues.name);
             if(!nameResult.valid) {
                 alert(nameResult.errorMessage);
                 return false;
             }
             
-            targetName = newValues.name;
-            nameChange = true;
+            moveCommand = {};
+            moveCommand.type = apogeeapp.app.movecomponent.COMMAND_TYPE;
+            moveCommand.memberFullName = memberFullName;
+            moveCommand.newMemberName = submittedValues.name;
+            moveCommand.newParentFullName = submittedValues.parentName;
         }
-        else {
-            targetName = member.getName();
-        }
-
-        //make sure the parent is value
-        if((folderMap)&&(newValues.parentName)) {
-
-            if(newValues.parentName == component.getMember().getFullName()) {
-                alert("Illegal destination: you put an object inside itself");
-                return false;
-            }
-              
-            targetOwner = folderMap[newValues.parentName];
-            nameChange = true;
-        }
-        else {
-            targetOwner = member.getOwner();
-        }
-
-        //need to test if other fields are valid!
         
-        var initialFullName = component.getMember().getFullName();
-        var targetFullName;
-        if(nameChange) { 
-            //this will be the new full name
-            targetFullName = targetOwner.getChildFullName(targetName);
-        }
-        else {
-            targetFullName = initialFullName;
-        }
+        //---------------
+        // combine commands (as needed)
+        //---------------
 
-        //update command
-        var workspaceUI = component.getWorkspaceUI();     
-        var command = apogeeapp.app.updatecomponent.createUpdatePropertyValuesCommand(workspaceUI,newValues,undoValues,initialFullName,targetFullName);
-        workspaceUI.getApp().executeCommand(command);
+        var command;
+        
+        if((updateCommand)&&(moveCommand)) {
+            //make a compound command
+            command = {};
+            command.type = "compound";
+            command.childCommands = {};
+            command.childCommands.push(updateCommand);
+            command.childCommands.push(moveCommand);
+        }
+        else if(updateCommand) {
+            command = updateCommand;
+        }
+        else if(moveCommand) {
+            command = moveCommand;
+        }
+        
+        //execute command
+        if(command) {
+            var workspaceUI = component.getWorkspaceUI();     
+            workspaceUI.getApp().executeCommand(command);
+        }
 
         //return true to close the dialog
         return true;

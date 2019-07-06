@@ -510,8 +510,10 @@ apogeeapp.app.Component.prototype.deleteComponent = function() {
         return;
     }
 
-    var command = apogeeapp.app.deletecomponent.createDeleteComponentCommand(this);
-    this.workspaceUI.getApp().executeCommand(command);
+    var commandJson = {};
+    commandJson.type = "deleteComponent";
+    commandJson.memberFullName = this.getMember().getFullName();
+    this.workspaceUI.getApp().executeCommand(commandJson);
 }
 
 //======================================
@@ -544,16 +546,20 @@ apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,
 /** This function creates a json to create the member for a new component instance. 
  * It uses default values and then overwrites in with optionalBaseValues (these are intended to be base values outside of user input values)
  * and then optionalOverrideValues (these are intended to be user input values) */
-apogeeapp.app.Component.createMemberJson = function(componentGenerator,optionalOverrideValues,optionalBaseValues) {
+apogeeapp.app.Component.createMemberJson = function(componentGenerator,optionalInputProperties,optionalBaseValues) {
     var json = apogee.util.jsonCopy(componentGenerator.DEFAULT_MEMBER_JSON);
     if(optionalBaseValues) {
         for(var key in optionalBaseValues) {
             json[key]= optionalBaseValues[key];
         }
     }
-    if(optionalOverrideValues) {
-        for(var key in optionalOverrideValues) {
-            json[key]= optionalOverrideValues[key];
+    if(optionalInputProperties) {
+        //add the base component values
+        if(optionalInputProperties.name !== undefined) json.name = optionalInputProperties.name;
+        
+        //add the specific member properties for this component type
+        if(componentGenerator.transferMemberProperties) {
+            componentGenerator.transferMemberProperties(optionalInputProperties,json);
         }
     }
     
@@ -561,11 +567,18 @@ apogeeapp.app.Component.createMemberJson = function(componentGenerator,optionalO
 }
 
 /** This function merges values from two objects containing component property values. */
-apogeeapp.app.Component.mergePropertyValues = function(overridePropertyValues,basePropertyValues) {
-    var newPropertyValues = apogee.util.jsonCopy(basePropertyValues);
-    for(var key in overridePropertyValues) {
-        newPropertyValues[key] = overridePropertyValues[key];
+apogeeapp.app.Component.createComponentJson = function(componentGenerator,optionalInputProperties,optionalBaseValues) {
+    //copy the base properties
+    var newPropertyValues = optionalBaseValues ? apogee.util.jsonCopy(optionalBaseValues) : {};
+    
+    //set the type
+    newPropertyValues.type = componentGenerator.uniqueName;
+    
+    //add in the input property Value
+    if((optionalInputProperties)&&(componentGenerator.transferComponentProperties)) {
+        componentGenerator.transferComponentProperties(optionalInputProperties,newPropertyValues);
     }
+    
     return newPropertyValues;
 }
 

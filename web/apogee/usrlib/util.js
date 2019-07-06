@@ -185,6 +185,17 @@ apogee.util.getNormalizedObjectCopy = function(json) {
     return copiedJson;
 }
 
+/** This method counts the properties in a object. */
+apogee.util.jsonObjectLength = function(jsonObject) {
+    var count = 0;
+
+    for(var key in jsonObject) {
+        count++;
+    }
+
+    return count;
+}
+
 /** This makes a copy of with any contained objects normalized. 
  * @private 
  */

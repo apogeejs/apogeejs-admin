@@ -42,9 +42,6 @@ apogeeapp.app.CanvasFolderComponent.EMPTY_FOLDER_COMPONENT_JSON  = {
 
 apogeeapp.app.CanvasFolderComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
     var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.CanvasFolderComponent,userInputValues,optionalBaseJson);
-    if(userInputValues.children) {
-        json.children = userInputValues.children;
-    }
     return json;
 }
 
@@ -61,12 +58,6 @@ apogeeapp.app.CanvasFolderComponent.TREE_ENTRY_SORT_ORDER = apogeeapp.app.Compon
 apogeeapp.app.CanvasFolderComponent.DEFAULT_MEMBER_JSON = {
     "type": apogee.Folder.generator.type
 };
-apogeeapp.app.CanvasFolderComponent.propertyDialogLines = [
-    {
-        "type":"invisible",
-        "resultKey":"children"
-    }
-];
 
 //if we want to allow importing a workspace as this object, we must add this method to the generator
 apogeeapp.app.CanvasFolderComponent.appendWorkspaceChildren = function(optionsJson,childrenJson) {

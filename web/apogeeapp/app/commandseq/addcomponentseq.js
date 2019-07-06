@@ -10,7 +10,7 @@ apogeeapp.app.addcomponentseq = {};
  * properties, with the values optionalInitialProperties preset. The created componenent will also use the 
  * property values in optionalBaseComponentValues, overridden by the user input properties where applicable. The member
  * created will be made using the optionalBaseMemberValues, agagin overidden by any user input values.  */   
-apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,optionalOnSuccess) {
+apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
 
         //get the active workspace
         var workspaceUI = app.getWorkspaceUI();
@@ -19,15 +19,14 @@ apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,opt
             return;
         }     
         
+        //get the tyep display name
         var displayName = componentGenerator.displayName
+        
+        //get any additional property content for dialog beyond basic properties
         var additionalLines = apogee.util.jsonCopy(componentGenerator.propertyDialogLines); 
         
         //get the folder list
-        var folderMap = workspaceUI.getFolders();
-        var folderList = [];
-        for(var folderName in folderMap) {
-            folderList.push(folderName);
-        }
+        var folderList = workspaceUI.getFolders();
         
         //create the dialog layout - do on the fly because folder list changes
         var dialogLayout = apogeeapp.app.updatecomponentseq.getPropertiesDialogLayout(displayName,folderList,additionalLines,true,optionalInitialProperties);
@@ -35,20 +34,25 @@ apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,opt
         //create on submit callback
         var onSubmitFunction = function(userInputProperties) {
             
-            //validate name
+            //validate the name
             var nameResult = apogee.codeCompiler.validateTableName(userInputProperties.name);
             if(!nameResult.valid) {
                 alert(nameResult.errorMessage);
                 return false;
             }
+
+            //other validation of inputs?
             
-            //get the parent object
-            var parent = folderMap[userInputProperties.parentName]; 
+            //create the command
+            var commandJson = {};
+            commandJson.type = apogeeapp.app.addcomponent.COMMAND_TYPE;
+            commandJson.parentFullName = userInputProperties.parentName;
+            commandJson.memberJson = apogeeapp.app.Component.createMemberJson(componentGenerator,userInputProperties,optionalBaseMemberValues);
+            commandJson.componentJson = apogeeapp.app.Component.createComponentJson(componentGenerator,userInputProperties,optionalBaseComponentValues);
             
-            //add the component
-            var command = apogeeapp.app.addcomponent.createAddComponentCommand(workspaceUI,parent,componentGenerator,userInputProperties,optionalBaseMemberValues,optionalBaseComponentValues,optionalOnSuccess);
-            workspaceUI.getApp().executeCommand(command);
-            
+            //execute command
+            workspaceUI.getApp().executeCommand(commandJson);
+
             //return true to close the dialog
             return true;
         }

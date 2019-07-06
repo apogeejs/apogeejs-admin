@@ -1,52 +1,50 @@
 apogeeapp.app.deletecomponent = {};
 
+//=====================================
+// Command Object
+//=====================================
 
-/** This function creates a command to delete a component. */
-apogeeapp.app.deletecomponent.createDeleteComponentCommand = function(component) {
+apogeeapp.app.deletecomponent.createUndoCommand = function(workspaceUI,commandJson) {
     
-    var member = component.getMember();
+    //problems
+    // - is this member a component main member?
+    // - is there a parent, or just an owner
     
-    //get the delete command;
-    var workspace = member.getWorkspace();
-    var memberFullName = member.getFullName();
-    
-    var deleteFunction = () => apogeeapp.app.deletecomponent.doDeleteComponent(workspace,memberFullName);
-    
-    //get the un-delete command
-    var workspaceUI = component.getWorkspaceUI();
+    var workspace = workspaceUI.getWorkspace();
+    var member = workspace.getMemberByFullName(commandJson.memberFullName);
+    var component = workspaceUI.getComponent(member);
     var parent = member.getParent();
-    var parentFullName = parent.getFullName();
-    var componentJson = component.toJson();
-    var memberJson = member.toJson();
     
-    //need to add optionalOnSuccess for LiteratePage!!!
-    var optionalOnSuccess = undefined;
+    var commandUndoJson = {};
+    commandUndoJson.type = apogeeapp.app.addcomponent.COMMAND_TYPE;
+    commandUndoJson.parentFullName = parent.getFullName();
+    commandUndoJson.memberJson = member.toJson();
+    commandUndoJson.componentJson = component.toJson();
     
-    var createFunction = () => apogeeapp.app.addcomponent.doAddComponent(workspaceUI,parentFullName,memberJson,componentJson,optionalOnSuccess); 
-    
-    var command = {};
-    command.cmd = deleteFunction;
-    command.undoCmd = createFunction;
-    command.desc = "Delete member: " + member.getFullName();
-    command.setsDirty = true;
-    
-    return command;
+    return commandUndoJson;
 }
 
 /** This method deletes the component and the underlying member. It should be passed
  *  the workspace and the member full name. (We delete by name and workspace to handle
  *  undo/redo cases where the instance of the member changes.)
  */
-apogeeapp.app.deletecomponent.doDeleteComponent = function(workspace,memberFullName) {
+apogeeapp.app.deletecomponent.executeCommand = function(workspaceUI,commandJson) {
+    
+    var workspace = workspaceUI.getWorkspace();
 
-    var json = {};
-    json.action = "deleteMember";
-    json.memberName = memberFullName;
-    var actionResult = apogee.action.doAction(workspace,json);
+    var actionJson = {};
+    actionJson.action = "deleteMember";
+    actionJson.memberName = commandJson.memberFullName;
     
-    if(actionResult.alertMsg) {
-        apogeeapp.app.CommandManager.errorAlert(actionResult.alertMsg);
-    }
+    var actionResult = apogee.action.doAction(workspace,actionJson);
     
-    return actionResult.actionDone;
+    var commandResult = {};
+    commandResult.cmdDone = actionResult.actionDone;
+    if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
+    
+    return commandResult;
 }
+
+apogeeapp.app.deletecomponent.COMMAND_TYPE = "deleteComponent";
+
+apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.deletecomponent);

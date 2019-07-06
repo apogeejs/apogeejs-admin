@@ -130,9 +130,6 @@ apogeeapp.app.FolderComponent.EMPTY_FOLDER_COMPONENT_JSON  = {
 
 apogeeapp.app.FolderComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
     var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.FolderComponent,userInputValues,optionalBaseJson);
-    if(userInputValues.children) {
-        json.children = userInputValues.children;
-    }
     return json;
 }
 

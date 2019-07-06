@@ -17,18 +17,16 @@ apogeeapp.app.exportworkspaceseq.exportWorkspace = function(app,fileAccessObject
     }   
 
     //get the folder list
-    var folderMap = workspaceUI.getFolders();
-    var folderNames = [];
-    for(var folderName in folderMap) {
-        folderNames.push(folderName);
-    }
+    var folderNames = workspaceUI.getFolders();
 
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = apogeeapp.app.exportworkspaceseq.getExportDialogLayout(folderNames);
 
     //create on submit callback
     var onSubmitFunction = function(result) {         
-        var folder = folderMap[result.parentName];
+        var folderFullName = result.parentName;
+        var workspace = workspaceUI.getWorkspace();
+        var folder = workspace.lookupMemberByName(folderFullName);
 
         var workspaceText = apogeeapp.app.exportworkspaceseq.getWorkspaceText(app,folder);
         if(!workspaceText) {

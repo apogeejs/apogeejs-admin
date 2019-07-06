@@ -62,21 +62,6 @@ apogeeapp.app.FunctionComponent.prototype.getDataDisplay = function(displayConta
 }
 
 //======================================
-// Static methods
-//======================================
-
-apogeeapp.app.FunctionComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
-    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.FunctionComponent,userInputValues,optionalBaseJson);
-    if(userInputValues.argListString) { 
-        if(!json.updateData) {
-            json.updateData = {};
-        }
-        json.updateData.argList = apogee.FunctionTable.parseStringArray(userInputValues.argListString);
-    }
-    return json;
-}
-
-//======================================
 // This is the component generator, to register the component
 //======================================
 
@@ -95,3 +80,11 @@ apogeeapp.app.FunctionComponent.propertyDialogLines = [
         "resultKey":"argListString"
     }
 ];
+apogeeapp.app.FunctionComponent.transferMemberProperties = function(inputValues,propertyJson) {
+    if(inputValues.argListString != undefined) { 
+        if(!propertyJson.updateData) {
+            propertyJson.updateData = {};
+        }
+        propertyJson.updateData.argList = apogee.FunctionTable.parseStringArray(inputValues.argListString);
+    }
+}

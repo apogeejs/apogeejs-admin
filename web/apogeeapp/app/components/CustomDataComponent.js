@@ -321,7 +321,7 @@ apogeeapp.app.CustomDataComponent.prototype.writeToJson = function(json) {
 //======================================
 
 apogeeapp.app.CustomDataComponent.prototype.readExtendedProperties = function(values) {
-    values.destroyOnHide = this.getDestroyOnInactive();
+    values.destroyOnInactive = this.getDestroyOnInactive();
 }
 
 /** This is the format string to create the code body for updateing the member
@@ -382,9 +382,14 @@ apogeeapp.app.CustomDataComponent.propertyDialogLines = [
     {
         "type":"checkbox",
         "heading":"Destroy on Hide: ",
-        "resultKey":"destroyOnHide"
+        "resultKey":"destroyOnInactive"
     }
 ];
+apogeeapp.app.CustomDataComponent.transferComponentProperties = function(inputValues,propertyJson) {
+    if(inputValues.destroyOnInactive !== undefined) {
+        propertyJson.destroyOnInactive = inputValues.destroyOnInactive;
+    }
+}
 
 
 

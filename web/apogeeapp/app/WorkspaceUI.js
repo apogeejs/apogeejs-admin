@@ -176,14 +176,14 @@ apogeeapp.app.WorkspaceUI = class {
         }
     }
 
-    /** This returns the map of folder objects. */
+    /** This returns the list of folder names. */
     getFolders() {
-        var folders = {}
+        var folders = []
         for(var key in this.componentMap) {
             var componentInfo = this.componentMap[key];
             var member = componentInfo.member;
             if((member.isParent)&&(member.getChildrenWriteable())) { 
-                folders[member.getFullName()] = member;
+                folders.push(member.getFullName());
             }
         }
         return folders;

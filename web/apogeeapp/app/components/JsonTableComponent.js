@@ -131,6 +131,8 @@ apogeeapp.app.JsonTableComponent.prototype.readFromJson = function(json) {
 // properties
 //======================================
 
+/** This returns the current values for the member and component properties in the  
+ * proeprties dialog. */
 apogeeapp.app.JsonTableComponent.prototype.readExtendedProperties = function(values) {
     values.dataView = this.getDataView();
 }
@@ -181,4 +183,16 @@ apogeeapp.app.JsonTableComponent.propertyDialogLines = [
         "resultKey":"dataView"
     }
 ];
+/** This optional static function reads property input from the property 
+ * dialog and copies it into a member property json. It is not needed for
+ * this componnet. */
+//apogeeapp.app.JsonTableComponent.transferMemberProperties = function(inputValues,propertyJson) {
+//}
+/** This optional static function reads property input from the property 
+ * dialog and copies it into a component property json. */
+apogeeapp.app.JsonTableComponent.transferComponentProperties = function(inputValues,propertyJson) {
+    if(inputValues.dataView !== undefined) {
+        propertyJson.dataView = inputValues.dataView;
+    }
+}
 
