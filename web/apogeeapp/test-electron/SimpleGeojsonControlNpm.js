@@ -161,6 +161,8 @@ moduleReturn.initApogeeModule = function(apogee,apogeeapp) {
                         this.previousSetView = initialView;
                     }
                     catch(error) {
+                        if(error.stack) console.error(error.stack);
+                        
                         alert("Improper initial view format.");
                     }
 

@@ -12,7 +12,7 @@ apogeeapp.app.WorkspaceUI = class {
         this.tree = null;
         this.treeEntry = null;
         this.componentMap = {};
-        this.referencesManager = new apogeeapp.app.ReferenceManager();
+        this.referenceManager = new apogeeapp.app.ReferenceManager();
     }
 
     //====================================
@@ -77,7 +77,7 @@ apogeeapp.app.WorkspaceUI = class {
             this.treeEntry.setState(apogeeapp.ui.treecontrol.EXPANDED);
             this.tree.setRootEntry(this.treeEntry);
             this.treeEntry.addChild(rootFolderComponent.getTreeEntry(true));
-            this.treeEntry.addChild(this.referencesManager.getTreeEntry(true));
+            this.treeEntry.addChild(this.referenceManager.getTreeEntry(true));
         }
 
         //add listeners
@@ -138,7 +138,7 @@ apogeeapp.app.WorkspaceUI = class {
         }
 
         //remove links
-        this.referencesManager.close();
+        this.referenceManager.close();
     }
     
     getIsDirty() {
@@ -314,7 +314,7 @@ apogeeapp.app.WorkspaceUI = class {
 
         json.version = "0.40";
 
-        json.references = this.referencesManager.saveEntries();
+        json.references = this.referenceManager.saveEntries();
 
         json.workspace = this.workspace.toJson(optionalSavedRootFolder);
 
@@ -430,7 +430,7 @@ apogeeapp.app.WorkspaceUI = class {
     //========================================
 
     getLoadReferencesPromise(referencesJson) {
-        return this.referencesManager.getOpenEntriesPromise(referencesJson);
+        return this.referenceManager.getOpenEntriesPromise(referencesJson);
     }
 
     //==================================

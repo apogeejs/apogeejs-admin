@@ -16,25 +16,22 @@ apogeeapp.app.savemembercode = {};
 // Action
 //=====================================
 
-apogeeapp.app.savemembercode.createUndoCommand = function(workspaceUI,commandJson) {
-    var undoCommandJson = {};
-    undoCommandJson.type = apogeeapp.app.savemembercode.COMMAND_TYPE;
-    
+apogeeapp.app.savemembercode.createUndoCommand = function(workspaceUI,commandData) {
     var workspace = workspaceUI.getWorkspace();
-    
+    var undoCommandJson = apogeeapp.app.membersave.getMemberStateUndoCommand(workspace,commandData.memberFullName); 
     return undoCommandJson;
 }
 
-apogeeapp.app.savemembercode.executeCommand = function(workspaceUI,commandJson,asynchOnComplete) {
+apogeeapp.app.savemembercode.executeCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
     
     var actionData = apogeeapp.app.membersave.getSetCodeAction(workspace,
-        commandJson.memberFullName,
-        commandJson.argList,
-        commandJson.functionBody
-        commandJson.supplementalCode
-        commandJson.clearCodeDataValue);
+        commandData.memberFullName,
+        commandData.argList,
+        commandData.functionBody,
+        commandData.supplementalCode,
+        commandData.clearCodeDataValue);
     
     var actionResult = apogee.action.doAction(workspace,actionData);
     

@@ -4,14 +4,14 @@ apogeeapp.app.deletecomponent = {};
 // Command Object
 //=====================================
 
-apogeeapp.app.deletecomponent.createUndoCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.deletecomponent.createUndoCommand = function(workspaceUI,commandData) {
     
     //problems
     // - is this member a component main member?
     // - is there a parent, or just an owner
     
     var workspace = workspaceUI.getWorkspace();
-    var member = workspace.getMemberByFullName(commandJson.memberFullName);
+    var member = workspace.getMemberByFullName(commandData.memberFullName);
     var component = workspaceUI.getComponent(member);
     var parent = member.getParent();
     
@@ -28,13 +28,13 @@ apogeeapp.app.deletecomponent.createUndoCommand = function(workspaceUI,commandJs
  *  the workspace and the member full name. (We delete by name and workspace to handle
  *  undo/redo cases where the instance of the member changes.)
  */
-apogeeapp.app.deletecomponent.executeCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.deletecomponent.executeCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
 
     var actionJson = {};
     actionJson.action = "deleteMember";
-    actionJson.memberName = commandJson.memberFullName;
+    actionJson.memberName = commandData.memberFullName;
     
     var actionResult = apogee.action.doAction(workspace,actionJson);
     

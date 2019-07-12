@@ -14,14 +14,14 @@ apogeeapp.app.openworkspace = {};
 //=====================================
 
 //NO UNDO FOR OPEN WORKSPACE
-//apogeeapp.app.openworkspace.createUndoCommand = function(workspaceUI,commandJson) {
+//apogeeapp.app.openworkspace.createUndoCommand = function(workspaceUI,commandData) {
 
-apogeeapp.app.openworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandJson,asynchOnComplete) {
+apogeeapp.app.openworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData,asynchOnComplete) {
         //app,workspaceText,fileMetadata) {
     var workspaceUIAdded;
     var synchCommandResult = {};
     
-    var app = apogee.Apogee.getInstance();
+    var app = apogeeapp.app.Apogee.getInstance();
     
     try {
 
@@ -30,13 +30,13 @@ apogeeapp.app.openworkspace.executeCommand = function(unpopulatedWorkspaceUI,com
         var workspaceUI = new apogeeapp.app.WorkspaceUI();
         workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
     
-        var referencesJson = commandJson.workspaceJson.references;
+        var referencesJson = commandData.workspaceJson.references;
         var loadReferencesPromise = workspaceUI.getLoadReferencesPromise(referencesJson);
     	
 		//if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {
-            workspaceUI.load(commandJson.workspaceJson);
-            workspaceUI.setFileMetadata(commandJson.fileMetadata);
+            workspaceUI.load(commandData.workspaceJson);
+            workspaceUI.setFileMetadata(commandData.fileMetadata);
             
             if(asynchOnComplete) {
                 let asynchCommandResult = {};

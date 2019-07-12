@@ -76,6 +76,8 @@ apogeeapp.app.importworkspaceseq.openWorkspace = function(app,componentGenerator
         loadReferencesPromise.catch(linkLoadError).then(workspaceImportDialogFunction).catch(workspaceImportError2);
     }
     catch(error) {
+        if(error.stack) console.error(error.stack);
+        
         apogeeapp.app.CommandManager.errorAlert("Error importing workspace: " + error.message);
         return false;
     }

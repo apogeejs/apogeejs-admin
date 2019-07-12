@@ -13,33 +13,17 @@ apogeeapp.app.savememberdata = {};
 // Action
 //=====================================
 
-apogeeapp.app.savememberdata.createUndoCommand = function(workspaceUI,commandJson) {
-    var undoCommandJson = {};
-    undoCommandJson.type = apogeeapp.app.savememberdata.COMMAND_TYPE;
-    
+apogeeapp.app.savememberdata.createUndoCommand = function(workspaceUI,commandData) {
     var workspace = workspaceUI.getWorkspace();
-
-    
+    var undoCommandJson = apogeeapp.app.membersave.getMemberStateUndoCommand(workspace,commandData.memberFullName); 
     return undoCommandJson;
 }
 
-apogeeapp.app.savememberdata.executeCommand = function(workspaceUI,commandJson,asynchOnComplete) {
+apogeeapp.app.savememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
     
     var workspace = workspaceUI.getWorkspace();
     
-    var actionData = apogeeapp.app.membersave.getSaveDataAction(workspace,commandJson.memberFullName,commandJson.data);
-    
-    //handle the asynch case
-    if((commandJson.data instanceof Promise)&&(asynchOnComplete)) {
-        //add a promise callback if this is a promise, to handle any alert
-        actionData.promiseCallback = asynchActionResult => {
-            var asynchCommandResult = {};
-            asynchCommandResult.cmdDone = asynchActionResult.actionDone;
-            if(asynchActionResult.alertMsg) asynchCommandResult.alertMsg = asynchActionResult.alertMsg;
-            
-            asynchOnComplete(asynchCommandResult);
-        }
-    }
+    var actionData = apogeeapp.app.membersave.getSaveDataAction(workspace,commandData.memberFullName,commandData.data,asynchOnComplete);
     
     var actionResult = apogee.action.doAction(workspace,actionData);
     

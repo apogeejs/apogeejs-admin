@@ -13,7 +13,7 @@ apogeeapp.app.updateworkspace = {};
 // Action
 //=====================================
 
-apogeeapp.app.updateworkspace.createUndoCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.updateworkspace.createUndoCommand = function(workspaceUI,commandData) {
     var undoCommandJson = {};
     undoCommandJson.type = apogeeapp.app.updateworkspace.COMMAND_TYPE;
     
@@ -25,7 +25,7 @@ apogeeapp.app.updateworkspace.createUndoCommand = function(workspaceUI,commandJs
     return undoCommandJson;
 }
 
-apogeeapp.app.updateworkspace.executeCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.updateworkspace.executeCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
 
@@ -34,7 +34,7 @@ apogeeapp.app.updateworkspace.executeCommand = function(workspaceUI,commandJson)
     actionData = {};
     actionData.action = apogee.updateworkspace.ACTION_NAME;
     actionData.workspace = workspace;
-    actionData.properties = commandJson.updatedCoreProperties;
+    actionData.properties = commandData.updatedCoreProperties;
 
     actionResult = apogee.action.doAction(workspace,actionData);
 

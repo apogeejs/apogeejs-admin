@@ -14,9 +14,9 @@ apogeeapp.app.updatecomponent = {};
 // Command Object
 //=====================================
 
-apogeeapp.app.updatecomponent.createUndoCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.updatecomponent.createUndoCommand = function(workspaceUI,commandData) {
     var workspace = workspaceUI.getWorkspace();
-    var member = workspace.lookupMemberByFullName(commandJson.memberFullName);
+    var member = workspace.getMemberByFullName(commandData.memberFullName);
     var component = workspaceUI.getComponent(member);
     
     var originalMemberProperties = member.readProperties();
@@ -25,23 +25,23 @@ apogeeapp.app.updatecomponent.createUndoCommand = function(workspaceUI,commandJs
     var undoMemberProperties;
     var undoComponentProperties;
     
-    if(commandJson.updatedMemberProperties) {
+    if(commandData.updatedMemberProperties) {
         undoMemberProperties = {};
-        for(var propKey in commandJson.updatedMemberProperties) {
+        for(var propKey in commandData.updatedMemberProperties) {
             undoMemberProperties = originalMemberProperties[propKey];
         }
     }
     
-    if(commandJson.updatedMemberProperties) {
+    if(commandData.updatedComponentProperties) {
         undoComponentProperties = {};
-        for(var propKey in commandJson.updatedComponentProperties) {
+        for(var propKey in commandData.updatedComponentProperties) {
             undoComponentProperties = originalComponentProperties[propKey];
         }
     }
     
     var undoCommandJson = {};
     undoCommandJson.type = apogeeapp.app.updatecomponent.COMMAND_TYPE;
-    undoCommandJson.memberFullName = commandJson.memberFullName;
+    undoCommandJson.memberFullName = commandData.memberFullName;
     if(undoMemberProperties) undoCommandJson.updatedMemberProperties = undoMemberProperties;
     if(undoComponentProperties) undoCommandJson.updatedComponentProperties = undoComponentProperties;
     
@@ -51,27 +51,37 @@ apogeeapp.app.updatecomponent.createUndoCommand = function(workspaceUI,commandJs
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-apogeeapp.app.updatecomponent.executeCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.updatecomponent.executeCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
     //get the member
-    var member = workspace.getMemberByFullName(commandJson.memberFullName);   
+    var member = workspace.getMemberByFullName(commandData.memberFullName);   
     var component = workspaceUI.getComponent(member);
-
+    
+    var error = false;
+    var errorMsg;
+    
     //create an action to update an member additional properties
     var memberGenerator = member.generator;
-    var actionData = memberGenerator.getPropertyUpdateAction(member,commandJson.updatedMemberProperties);  
-    var actionResult = apogee.action.doAction(workspace,actionData);
+    if(memberGenerator.getPropertyUpdateAction) {
+        var actionData = memberGenerator.getPropertyUpdateAction(member,commandData.updatedMemberProperties);  
+        var actionResult = apogee.action.doAction(workspace,actionData);
+        
+        if(!actionResult.actionDone) {
+            error = true;
+            errorMsg = actionResult.alertMsg;
+        }
+    }
     
     //update an component additional properties
     //NEED ERROR HANDLING HERE!!!
-    if(actionResult.actionDone) {
-        component.loadPropertyValues(commandJson.updatedComponentProperties);
+    if(!error) {
+        component.loadPropertyValues(commandData.updatedComponentProperties);
     }
     
     var commandResult = {};
-    commandResult.cmdDone = actionResult.actionDone;
-    if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
+    commandResult.cmdDone = !error;
+    if(errorMsg) commandResult.alertMsg = errorMsg;
     
     return commandResult;
 }

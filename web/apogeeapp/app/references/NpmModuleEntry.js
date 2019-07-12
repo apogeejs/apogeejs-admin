@@ -25,6 +25,8 @@ apogeeapp.app.NpmModuleEntry = class extends apogeeapp.app.ReferenceEntry {
             }
             catch(error) {
                 if(error.stack) console.error(error.stack);
+                
+                if(error.stack) console.error(error.stack);
                 var errorMsg = error.message ? error.message : "Failed to load module " + this.url;
                 this.setError(errorMsg);
                 reject(errorMsg);

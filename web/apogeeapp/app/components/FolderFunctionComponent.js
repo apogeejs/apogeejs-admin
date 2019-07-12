@@ -69,7 +69,7 @@ apogeeapp.app.FolderFunctionComponent.propertyDialogLines = [
         "resultKey":"returnValueString"
     }
 ];
-apogeeapp.app.FunctionComponent.transferMemberProperties = function(inputValues,propertyJson) {
+apogeeapp.app.FolderFunctionComponent.transferMemberProperties = function(inputValues,propertyJson) {
     if(inputValues.argListString !== undefined) {
         var argList = apogee.FunctionTable.parseStringArray(inputValues.argListString);
         propertyJson.argList = argList;

@@ -44,14 +44,14 @@ apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,opt
             //other validation of inputs?
             
             //create the command
-            var commandJson = {};
-            commandJson.type = apogeeapp.app.addcomponent.COMMAND_TYPE;
-            commandJson.parentFullName = userInputProperties.parentName;
-            commandJson.memberJson = apogeeapp.app.Component.createMemberJson(componentGenerator,userInputProperties,optionalBaseMemberValues);
-            commandJson.componentJson = apogeeapp.app.Component.createComponentJson(componentGenerator,userInputProperties,optionalBaseComponentValues);
+            var commandData = {};
+            commandData.type = apogeeapp.app.addcomponent.COMMAND_TYPE;
+            commandData.parentFullName = userInputProperties.parentName;
+            commandData.memberJson = apogeeapp.app.Component.createMemberJson(componentGenerator,userInputProperties,optionalBaseMemberValues);
+            commandData.componentJson = apogeeapp.app.Component.createComponentJson(componentGenerator,userInputProperties,optionalBaseComponentValues);
             
             //execute command
-            workspaceUI.getApp().executeCommand(commandJson);
+            workspaceUI.getApp().executeCommand(commandData);
 
             //return true to close the dialog
             return true;

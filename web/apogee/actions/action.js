@@ -269,6 +269,13 @@ apogee.action.fireEvents = function(workspace,completedResults,recalculateList) 
 
 /** This is a helper function to dispatch an event. */
 apogee.action.mergeEventIntoEventMap = function(eventMap,member,eventName) {
+    
+    //############################################
+    //OOPS - my current logic does nto allow for non-member events. 
+    //for now I will dump them. i need to add them back.
+    if(!member) return;
+    //############################################
+    
     var memberId = member.getId();
      
     var existingInfo = eventMap[memberId];

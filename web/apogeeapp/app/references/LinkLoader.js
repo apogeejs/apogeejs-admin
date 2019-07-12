@@ -90,6 +90,8 @@ apogeeapp.app.LinkLoader = class {
             }
         }
         catch(error) {
+            if(error.stack) console.error(error.stack);
+            
             //error loading link  
             if(onError) {
                 onError(error);

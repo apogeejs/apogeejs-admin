@@ -9,8 +9,12 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks = function(me
         getData: () => member.getData(),
         getEditOk: () => (!member.hasCode()),
         saveData: (data) => {
-            var command = apogeeapp.app.membersave.createSaveDataCommand(member,data,null,true);
-            apogeeapp.app.Apogee.getInstance().executeCommand(command);
+            var commandData = {};
+            commandData.type = apogeeapp.app.savememberdata.COMMAND_TYPE;
+            commandData.memberFullName = member.getFullName();
+            commandData.data = data;
+            
+            apogeeapp.app.Apogee.getInstance().executeCommand(commandData);
             return true;
         }
     }
@@ -43,6 +47,8 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks = function(me
                     data = JSON.parse(text);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     //parsing error
                     alert("There was an error parsing the JSON input: " +  error.message);
                     return false;
@@ -51,9 +57,13 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks = function(me
             else {
                 data = "";
             }
-
-            var command = apogeeapp.app.membersave.createSaveDataCommand(member,data,null,true);
-            apogeeapp.app.Apogee.getInstance().executeCommand(command);
+            
+            var commandData = {};
+            commandData.type = apogeeapp.app.savememberdata.COMMAND_TYPE;
+            commandData.memberFullName = member.getFullName();
+            commandData.data = data;
+            
+            apogeeapp.app.Apogee.getInstance().executeCommand(commandData);
             return true;
         }
     }
@@ -67,11 +77,14 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks = functio
         getData: () => member.getFunctionBody(),
         getEditOk: () => true,
         saveData: (text) => {
-            var argList = member.getArgList();
-            var functionBody = text;
-            var supplementalCode = member.getSupplementalCode();
-            var command = apogeeapp.app.membersave.createSetCodeCommand(member,argList,functionBody,supplementalCode,optionalClearCodeDataValue,null,true);
-            apogeeapp.app.Apogee.getInstance().executeCommand(command);
+            var commandData = {};
+            commandData.type = apogeeapp.app.savemembercode.COMMAND_TYPE;
+            commandData.memberFullName = member.getFullName();
+            commandData.argList = member.getArgList();
+            commandData.functionBody = text;
+            commandData.supplementalCode = member.getSupplementalCode();
+            
+            apogeeapp.app.Apogee.getInstance().executeCommand(commandData);
             return true;
         }
     }
@@ -83,11 +96,14 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks = functio
         getData: () => member.getSupplementalCode(),
         getEditOk: () => true,
         saveData: (text) => {
-            var argList = member.getArgList();
-            var functionBody = member.getFunctionBody();
-            var supplementalCode = text;
-            var command = apogeeapp.app.membersave.createSetCodeCommand(member,argList,functionBody,supplementalCode,optionalClearCodeDataValue,null,true);
-            apogeeapp.app.Apogee.getInstance().executeCommand(command);
+            var commandData = {};
+            commandData.type = apogeeapp.app.savemembercode.COMMAND_TYPE;
+            commandData.memberFullName = member.getFullName();
+            commandData.argList = member.getArgList();
+            commandData.functionBody = member.getFunctionBody();
+            commandData.supplementalCode = text;
+            
+            apogeeapp.app.Apogee.getInstance().executeCommand(commandData);
             return true;
         }
     }
@@ -98,9 +114,13 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks = function
     return {
         getData: () => member.getDescription(),
         getEditOk: () => true,
-        saveData: (text) => {
-            var command = apogeeapp.app.membersave.createSaveDescriptionCommand(member,text,null,true);
-            apogeeapp.app.Apogee.getInstance().executeCommand(command);
+        saveData: (text) => {  
+            var commandData = {};
+            commandData.type = apogeeapp.app.savememberdescription.COMMAND_TYPE;
+            commandData.memberFullName = member.getFullName();
+            commandData.description = text;
+            
+            apogeeapp.app.Apogee.getInstance().executeCommand(commandData);
             return true;
         }
     }

@@ -1,8 +1,8 @@
-/** Save Member Data Command
+/** Save Member Description Command
  *
  * Command JSON format:
  * {
- *   "type":"saveMembeData",
+ *   "type":"saveMembeDescription",
  *   "memberFullName":(main member full name),
  *   "desc":(description),
  * }
@@ -13,13 +13,13 @@ apogeeapp.app.savememberdescription = {};
 // Action
 //=====================================
 
-apogeeapp.app.savememberdescription.createUndoCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.savememberdescription.createUndoCommand = function(workspaceUI,commandData) {
     var workspace = workspaceUI.getWorkspace();
-    var member = workspace.lookupMemberByFullName(commandJson.memberFullName);
+    var member = workspace.getMemberByFullName(commandData.memberFullName);
     if(member) {
         var undoCommandJson = {};
         undoCommandJson.type = apogeeapp.app.savememberdescription.COMMAND_TYPE;
-        undoCommandJson.memberFullName = commandJson.memberFullName;
+        undoCommandJson.memberFullName = commandData.memberFullName;
         undoCommandJson.description = member.getDescription();
         return undoCommandJson;
     }
@@ -28,14 +28,14 @@ apogeeapp.app.savememberdescription.createUndoCommand = function(workspaceUI,com
     }
 }
 
-apogeeapp.app.savememberdescription.executeCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.savememberdescription.executeCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
 
     var actionData = {};
     actionData.action = apogee.updatemember.UPDATE_DESCRIPTION_ACTION_NAME;
-    actionData.memberName = commandJson.memberFullName;
-    actionData.description = commandJson.text ? commandJson.text : "";
+    actionData.memberName = commandData.memberFullName;
+    actionData.description = commandData.description ? commandData.description : "";
     
     var actionResult = apogee.action.doAction(workspace,actionData);
     

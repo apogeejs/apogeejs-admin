@@ -14,8 +14,8 @@
  * }
  * 
  * Command Object - Should be registered with "registerFunction". It should contain the following things:
- * - function executeCommand(workspaceUI,commandJson) = This exectues the command and return a commandResult object.
- * - function createUnfoCommand(workspceUI,commandJson) - This creates an undo command json from the given command json.
+ * - function executeCommand(workspaceUI,commandData) = This exectues the command and return a commandResult object.
+ * - function createUnfoCommand(workspceUI,commandData) - This creates an undo command json from the given command json.
  * - string COMMAND_TYPE - This is the command type.
  *  
  * Command Result:
@@ -37,24 +37,26 @@
  *
  */
 apogeeapp.app.CommandManager = class {
-    constructor(workspaceUI, eventManager) {
-        this.workspaceUI = workspaceUI;
-        this.eventManager = eventManager;
+    constructor(app) {
+        this.app = app;
     }
     
     /** This method executes the given command and, if applicable, adds it to the queue. */
     executeCommand(command) {
+        var workspaceUI = this.app.getWorkspaceUI();
         let commandResult;
         
         var commandObject = apogeeapp.app.CommandManager.getCommandObject(command.type);
         if(commandObject) {
             try {
-                commandResult = commandObject.executeCommand(this.workspaceUI,command);
+                commandResult = commandObject.executeCommand(workspaceUI,command);
             }
             catch(error) {
+                if(error.stack) console.error(error.stack);
+                
                 commandResult = {};
                 commandResult.cmdDone = false;
-                commandResult.message = "Unknown error executing command: " + error.message;
+                commandResult.alertMsg = "Unknown error executing command: " + error.message;
                 commandResult.isFatal = true;
                 
             }
@@ -62,7 +64,7 @@ apogeeapp.app.CommandManager = class {
         else {
             commandResult = {};
             commandResult.cmdDone = false;
-            commandResult.message = "Command type not found: " + command.type;
+            commandResult.alertMsg = "Command type not found: " + command.type;
         }
         
         //history??
@@ -70,6 +72,8 @@ apogeeapp.app.CommandManager = class {
         //fire events!!
         
         //display? Including for fatal errors?
+        
+        if(commandResult.alertMsg) apogeeapp.app.CommandManager.errorAlert(commandResult.alertMsg,commandResult.isFatal);
         
         return commandResult;
     }
@@ -86,7 +90,7 @@ apogeeapp.app.CommandManager = class {
     }
     
     /** This registers a command. The command object should hold two functions,
-     * executeCommand(workspaceUI,commandJson) and, if applicable, createUndoCommand(workspaceUI,commandJson)
+     * executeCommand(workspaceUI,commandData) and, if applicable, createUndoCommand(workspaceUI,commandData)
      * and it should have the constant COMMAND_TYPE.
      */
     static registerCommand(commandObject) {
@@ -94,7 +98,7 @@ apogeeapp.app.CommandManager = class {
         //repeat warning
         let existingCommandObject = apogeeapp.app.CommandManager.commandMap[commandObject.COMMAND_TYPE];
         if(existingCommandObject) {
-            alert("The given command already exists in the command manager. It will be replaced with the new command");
+            alert("The given command already exists in the command manager: " + commandObject.COMMAND_TYPE + ". It will be replaced with the new command");
         }
         
         apogeeapp.app.CommandManager.commandMap[commandObject.COMMAND_TYPE] = commandObject;

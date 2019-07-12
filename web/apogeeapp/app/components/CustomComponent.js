@@ -210,6 +210,8 @@ apogeeapp.app.CustomComponent.prototype.createResource = function() {
         return resource;
     }
     catch(error) {
+        if(error.stack) console.error(error.stack);
+        
         alert("Error creating custom control: " + error.message);
     }
 }

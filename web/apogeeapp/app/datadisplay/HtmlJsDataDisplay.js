@@ -63,6 +63,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                 resource.constructorAddition.call(resource,admin);
             }
             catch(error) {
+                if(error.stack) console.error(error.stack);
+                
                 alert("Error in " + this.member.getFullName() + " init function: " + error.message);
             }
         }
@@ -86,6 +88,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     }
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     alert("Error in " + this.member.getFullName() + " onLoad function: " + error.message);
                 }
             };
@@ -104,6 +108,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     resource.onUnload.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     alert("Error in " + this.member.getFullName()+ " onUnload function: " + error.message);
                 }
             }
@@ -115,6 +121,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     resource.onResize.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     console.log("Error in " + this.member.getFullName() + " onResize function: " + error.message);
                 }
             };
@@ -137,6 +145,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                 }
             }
             catch(error) {
+                if(error.stack) console.error(error.stack);
+                
                 alert("Error in " + this.member.getFullName() + " setData function: " + error.message);
             }
         }
@@ -147,6 +157,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     return this.resource.getData.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     alert("Error in " + this.member.getFullName() + " getData function: " + error.message);
                 }
             }
@@ -164,6 +176,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     return resource.isCloseOk.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     alert("Error in " + this.member.getFullName() + " isCloseOk function: " + error.message);
                 }
             }
@@ -175,6 +189,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     resource.destroy.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     alert("Error in " + this.member.getFullName() + " destroy function: " + error.message);
                 }
             }
@@ -189,6 +205,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                 resource.init.call(resource,this.outputElement,admin);
             }
             catch(error) {
+                if(error.stack) console.error(error.stack);
+                
                 alert("Error in " + this.member.getFullName() + " init function: " + error.message);
             }
         }

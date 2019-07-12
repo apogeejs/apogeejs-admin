@@ -72,10 +72,12 @@ apogeeapp.app.updatecomponentseq.updateComponent = function(component) {
         if((newValues.name)||(newValues.parentName)) {
             
             //validate the name
-            var nameResult = apogee.codeCompiler.validateTableName(newValues.name);
-            if(!nameResult.valid) {
-                alert(nameResult.errorMessage);
-                return false;
+            if(newValues.name) {
+                var nameResult = apogee.codeCompiler.validateTableName(newValues.name);
+                if(!nameResult.valid) {
+                    alert(nameResult.errorMessage);
+                    return false;
+                }
             }
             
             moveCommand = {};

@@ -14,15 +14,15 @@ apogeeapp.app.addlink = {};
 // Command Object
 //=====================================
 
-apogeeapp.app.addlink.createUndoCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.addlink.createUndoCommand = function(workspaceUI,commandData) {
     var undoCommandJson = {};
     undoCommandJson.type = apogeeapp.app.deletelink.COMMAND_TYPE;
-    undoCommandJson.entryType = commandJson.entryType;
-    undoCommandJson.url = commandJson.url;
+    undoCommandJson.entryType = commandData.entryType;
+    undoCommandJson.url = commandData.url;
     return undoCommandJson;
 }
 
-apogeeapp.app.addlink.executeCommand = function(workspaceUI,commandJson,asynchOnComplete) {
+apogeeapp.app.addlink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
     
     var synchCommandResult = {};
 
@@ -30,7 +30,7 @@ apogeeapp.app.addlink.executeCommand = function(workspaceUI,commandJson,asynchOn
         var referenceManager = workspaceUI.getReferenceManager();
 
         //add entry function
-        var promise = referenceManager.addEntry(commandJson);
+        var promise = referenceManager.addEntry(commandData);
 
         promise.then( () => {
                 if(asynchOnComplete) {
@@ -52,7 +52,7 @@ apogeeapp.app.addlink.executeCommand = function(workspaceUI,commandJson,asynchOn
         synchCommandResult.cmdDone = true;
     }
     catch(error) {
-        synchCommandResult.alertMsg("Error adding link: " + error.message);
+        synchCommandResult.alertMsg = "Error adding link: " + error.message;
         synchCommandResult.cmdDone = false;
     }
     

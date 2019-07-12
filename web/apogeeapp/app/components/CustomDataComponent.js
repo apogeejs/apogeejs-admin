@@ -228,6 +228,8 @@ apogeeapp.app.CustomDataComponent.prototype.createResource = function() {
                 resource = resourceFunction();
             }
             catch(err) {
+                if(err.stack) console.error(err.stack);
+                
                 console.log("bad ui generator function");
             }
         }
@@ -240,6 +242,8 @@ apogeeapp.app.CustomDataComponent.prototype.createResource = function() {
         return resource;
     }
     catch(error) {
+        if(error.stack) console.error(error.stack);
+        
         alert("Error creating custom control: " + error.message);
     }
 }

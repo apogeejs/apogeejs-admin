@@ -36,16 +36,18 @@ apogeeapp.app.openworkspaceseq.onOpen = function(err,app,workspaceData,fileMetad
             workspaceJson = JSON.parse(workspaceData);
         }
         catch(error) {
+            if(error.stack) console.error(error.stack);
+            
             alert("Error parsing workspace content: " + error.message);
             return;
         }
         
         //open workspace
-        var commandJson = {};
-        commandJson.type = apogeeapp.app.openworkspace.COMMAND_TYPE;
-        commandJson.workspaceJson = workspaceJson;
-        commandJson.fileMetadata = fileMetadata;
+        var commandData = {};
+        commandData.type = apogeeapp.app.openworkspace.COMMAND_TYPE;
+        commandData.workspaceJson = workspaceJson;
+        commandData.fileMetadata = fileMetadata;
 
-        app.executeCommand(commandJson);
+        app.executeCommand(commandData);
     }
 }

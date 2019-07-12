@@ -12,26 +12,26 @@
 apogeeapp.app.updatelink = {};
 
 
-apogeeapp.app.updatelink.createUndoCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.updatelink.createUndoCommand = function(workspaceUI,commandData) {
     var undoCommandJson = {};
     undoCommandJson.type = apogeeapp.app.updatelink.COMMAND_TYPE;
     
-    undoCommandJson.entryType = commandJson.entryType;
-    undoCommandJson.oldUrl = commandJson.newUrl;
+    undoCommandJson.entryType = commandData.entryType;
+    undoCommandJson.oldUrl = commandData.newUrl;
     
-    if(commandJson.newUrl != commandJson.oldUrl) undoCommandJson.newUrl = commandJson.oldUrl;
+    if(commandData.newUrl != commandData.oldUrl) undoCommandJson.newUrl = commandData.oldUrl;
     
-    if(commandJson.newNickname) {
+    if(commandData.newNickname) {
         //look up the pre-command entry (we change back gto this)
         var referenceManager = workspaceUI.getReferenceManager();
-        var referenceEntry = referenceManager.lookupEntry(commandJson.entryType,commandJson.oldUrl);
-        if(commandJson.newNickname != referenceEntry.getNickname()) undoCommandJson.newNickname = referenceEntry.getNickname();
+        var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.oldUrl);
+        if(commandData.newNickname != referenceEntry.getNickname()) undoCommandJson.newNickname = referenceEntry.getNickname();
     }
     
     return undoCommandJson;
 }
 
-apogeeapp.app.updatelink.executeCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.updatelink.executeCommand = function(workspaceUI,commandData) {
     
     var commandResult = {};
 
@@ -39,11 +39,11 @@ apogeeapp.app.updatelink.executeCommand = function(workspaceUI,commandJson) {
         var referenceManager = workspaceUI.getReferenceManager();
         
         //lookup entry for this reference
-        var referenceEntry = referenceManager.lookupEntry(commandJson.entryType,commandJson.oldUrl);
+        var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.oldUrl);
         
         if(referenceEntry) {
             //update entry
-            referenceEntry.updateData(commandJson.newUrl,commandJson.newNickname);
+            referenceEntry.updateData(commandData.newUrl,commandData.newNickname);
             
             //TODO - think about how to add result one link updaye completion
             
@@ -51,11 +51,13 @@ apogeeapp.app.updatelink.executeCommand = function(workspaceUI,commandJson) {
         }
         else {
             //entry not found
-            commandResult.alertMsg("Link entry to update not found!");
+            commandResult.alertMsg = "Link entry to update not found!";
             commandResult.cmdDone = false;
         }
     }
     catch(error) {
+        if(error.stack) console.error(error.stack);
+        
         //unkown error
         commandResult.alertMsg("Error adding link: " + error.message);
         commandResult.cmdDone = false;

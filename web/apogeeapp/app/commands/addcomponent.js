@@ -1,16 +1,24 @@
-
-
+/** Add Component Command
+ *
+ * Command JSON format:
+ * {
+ *   "type":"addComponent",
+ *   "parentFullName":(parent full name),
+ *   "memberJson":(member property json),
+ *   "componentJson":(component property json)
+ * }
+ */ 
 apogeeapp.app.addcomponent = {};
 
 //=====================================
 // Command Object
 //=====================================
 
-apogeeapp.app.addcomponent.createUndoCommand = function(workspaceUI,commandJson) {
+apogeeapp.app.addcomponent.createUndoCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
-    var memberName = commandJson.memberJson.name;
-    var parent = workspace.getMemberByFullName(commandJson.parentFullName);
+    var memberName = commandData.memberJson.name;
+    var parent = workspace.getMemberByFullName(commandData.parentFullName);
     var memberFullName = parent.getChildFullName(memberName);
     
     var undoCommandJson = {};
@@ -20,23 +28,21 @@ apogeeapp.app.addcomponent.createUndoCommand = function(workspaceUI,commandJson)
     return undoCommandJson;
 }
 
-apogeeapp.app.addcomponent.executeCommand = function(workspaceUI,commandJson) { 
+apogeeapp.app.addcomponent.executeCommand = function(workspaceUI,commandData) { 
     
     var workspace = workspaceUI.getWorkspace();
 
     //create the member
     var createAction = {};
     createAction.action = "createMember";
-    createAction.ownerName = commandJson.parentFullName;
-    createAction.createData = commandJson.memberJson;
+    createAction.ownerName = commandData.parentFullName;
+    createAction.createData = commandData.memberJson;
     var actionResult = apogee.action.doAction(workspace,createAction);
-    
-    var cmdDone;
     
     //create the components for the member
     //I need error handling for the create component action
     if(actionResult.actionDone) {
-        apogeeapp.app.addcomponent.createComponentFromMember(workspaceUI,actionResult,commandJson.componentProperties);
+        apogeeapp.app.addcomponent.createComponentFromMember(workspaceUI,actionResult,commandData.componentJson);
     }
 
     var commandResult = {};
@@ -81,6 +87,8 @@ apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,crea
         }
     }
     catch(error) {
+        if(error.stack) console.error(error.stack);
+        
         //exception creating component
         errorMessage = "Failed to create UI component: " + error.message;
         component = null;

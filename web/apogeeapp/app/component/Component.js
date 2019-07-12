@@ -510,10 +510,10 @@ apogeeapp.app.Component.prototype.deleteComponent = function() {
         return;
     }
 
-    var commandJson = {};
-    commandJson.type = "deleteComponent";
-    commandJson.memberFullName = this.getMember().getFullName();
-    this.workspaceUI.getApp().executeCommand(commandJson);
+    var commandData = {};
+    commandData.type = "deleteComponent";
+    commandData.memberFullName = this.getMember().getFullName();
+    this.workspaceUI.getApp().executeCommand(commandData);
 }
 
 //======================================

@@ -170,6 +170,8 @@ function proseMirrorSetup() {
               targetData = JSON.parse(targetText);
             }
             catch(error) {
+                if(error.stack) console.error(error.stack);
+                
               alert("Error parsing JSON input!");
               return;
             }
