@@ -1,49 +1,55 @@
+/** Update Workspace Command
+ *
+ * Command JSON format:
+ * {
+ *   "type":"updateWorkspace",
+ *   "updatedCoreProperties":(member property json), //name only
+ *   "updatedAppProperties":(component property json) //currently not used
+ * }
+ */ 
 apogeeapp.app.updateworkspace = {};
 
 //=====================================
 // Action
 //=====================================
 
-apogeeapp.app.updateworkspace.createUpdatePropertyValuesCommand = function(workspaceUI,oldValues,newValues) {
-    var command = {};
-    command.cmd = () => apogeeapp.app.updateworkspace.doUpdatePropertyValues(workspaceUI,oldValues,newValues);
-    command.undoCmd = () => apogeeapp.app.updateworkspace.doUpdatePropertyValues(workspaceUI,newValues,oldValues);
-    command.desc = "Update workspace properties"
-    command.setsDirty = true;
-    return command;
+apogeeapp.app.updateworkspace.createUndoCommand = function(workspaceUI,commandJson) {
+    var undoCommandJson = {};
+    undoCommandJson.type = apogeeapp.app.updateworkspace.COMMAND_TYPE;
+    
+    //right now we assume this is just a name update
+    var workspace = workspaceUI.getWorkspace();
+    undoCommandJson.updatedCoreProperties = {};
+    undoCommandJson.updatedCoreProperties.name = workspace.getName();
+    
+    return undoCommandJson;
 }
 
-
-/** This method is used for updating property values from the property dialog. */
-apogeeapp.app.updateworkspace.doUpdatePropertyValues = function(workspaceUI,oldValues,newValues) {
+apogeeapp.app.updateworkspace.executeCommand = function(workspaceUI,commandJson) {
     
     var workspace = workspaceUI.getWorkspace();
 
-    var actionResult;
+    var actionResult;    
+    var actionData;
+    actionData = {};
+    actionData.action = apogee.updateworkspace.ACTION_NAME;
+    actionData.workspace = workspace;
+    actionData.properties = commandJson.updatedCoreProperties;
+
+    actionResult = apogee.action.doAction(workspace,actionData);
+
+    //update any workspace ui properties here - none for now
     
-    //check if rename is needed
-    if(oldValues.name !== newValues.name) {
-        var actionData;
-        actionData = {};
-        actionData.action = apogee.updateworkspace.ACTION_NAME;
-        actionData.workspace = workspace;
-        actionData.name = newValues.name;
-        
-        actionResult = apogee.action.doAction(workspace,actionData);
-    }
+    var commandResult = {};
+    commandResult.cmdDone = actionResult.actionDone;
+    if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
     
-    //update any workspace ui properties here
-        
-    if(actionResult) {
-        if(actionResult.alertMsg) apogeeapp.app.CommandMessenger.errorAlert(actionResult.alertMsg);
-        return actionResult.actionDone;
-    }
-    else {
-        return true;
-    }
+    return commandResult;
 }
 
+apogeeapp.app.updateworkspace.COMMAND_TYPE = "updateWorkspace";
 
+apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.updateworkspace);
 
 
 

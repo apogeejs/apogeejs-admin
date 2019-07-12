@@ -116,6 +116,10 @@ apogeeapp.app.WorkspaceUI = class {
     getTabFrame() {
         return this.tabFrame;
     }
+    
+    getReferenceManager() {
+        return this.referenceManager;
+    }
 
 
     /** This method gets the workspace object. */

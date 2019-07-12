@@ -6,7 +6,7 @@ apogee.updateworkspace = {};
  * {
  *  "action": apogee.updateworkspace.ACTION_NAME,
  *  "workspace": (workspace to update),
- *  "name": (new name)
+ *  "properties": (properties to set) //currently only "name"
  * }
  */
 apogee.updateworkspace.ACTION_NAME = "updateWorkspace";
@@ -23,8 +23,11 @@ apogee.updateworkspace.WORKSPACE_UPDATED_EVENT = "workspaceUpdated";
 /** Update code action function. */
 apogee.updateworkspace.updateWorkspace = function(workspace,actionData,actionResult) { 
     
-    workspace.setName(actionData.name);
-        
+    var properties = actionData.properties;
+    if(properties) {
+        if(properties.name) workspace.setName(properties.name);
+    }
+    
     actionResult.actionDone = true;
 }
 

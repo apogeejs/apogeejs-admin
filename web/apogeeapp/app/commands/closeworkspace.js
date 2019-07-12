@@ -6,19 +6,11 @@ apogeeapp.app.closeworkspace = {};
 // Action
 //=====================================
 
-/** This function creates a command to close the workspace. */
-apogeeapp.app.closeworkspace.createCloseWorkspaceCommand = function(app) {
-    var command = {};
-    command.cmd = () => apogeeapp.app.closeworkspace.doCloseWorkspace(app);
-    //no undo
-    command.desc = "Close workspace";
-    
-    return command;
-}
+//NO UNDO FOR CLOSE WORKSPACE
+//apogeeapp.app.closeworkspace.createUndoCommand = function(workspaceUI,commandJson) {
 
-apogeeapp.app.closeworkspace.doCloseWorkspace = function(app) {
-    var activeWorkspaceUI = app.getWorkspaceUI();
-    var workspace = activeWorkspaceUI.getWorkspace();
+apogeeapp.app.closeworkspace.executeCommand = function(workspaceUI,commandJson)
+    var workspace = workspaceUI.getWorkspace();
     
     var workspaceUIRemoved = false;
     
@@ -37,6 +29,10 @@ apogeeapp.app.closeworkspace.doCloseWorkspace = function(app) {
     
     return workspaceUIRemoved;
 }
+
+apogeeapp.app.closeworkspace.COMMAND_TYPE = "closeWorkspace";
+
+apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.closeworkspace);
 
 
 

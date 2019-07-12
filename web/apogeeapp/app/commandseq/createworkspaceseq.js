@@ -13,7 +13,8 @@ apogeeapp.app.createworkspaceseq.createWorkspace = function(app) {
         return;
     }      
     
-    var command = apogeeapp.app.createworkspace.createCreateWorkspaceCommand(app);
+    var commandJson = {};
+    commandJson.type = apogeeapp.app.createworkspace.COMMAND_TYPE;
     
     app.executeCommand(command);
 }

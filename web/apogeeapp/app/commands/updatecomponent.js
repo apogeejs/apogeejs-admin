@@ -1,5 +1,13 @@
-
-
+/** Update Component Command
+ *
+ * Command JSON format:
+ * {
+ *   "type":"updateComponent",
+ *   "memberFullName":(main member full name),
+ *   "updatedMemberProperties":(member property json),
+ *   "updatedComponentProperties":(component property json)
+ * }
+ */ 
 apogeeapp.app.updatecomponent = {};
 
 //=====================================

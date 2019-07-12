@@ -60,8 +60,12 @@ apogeeapp.app.updateworkspaceseq.updateWorkspaceProperties = function(workspaceU
 
         //update
         if(valuesChanged) {
-            var command = apogeeapp.app.updateworkspace.createUpdatePropertyValuesCommand(workspaceUI,initialValues,newValues);
-            workspaceUI.getApp().executeCommand(command);
+            var commandJson = {};
+            commandJson.type = apogeeapp.app.updateworkspace.COMMAND_TYPE;
+            commandJson.updatedCoreProperties = {};
+            commandJson.updatedCoreProperties.name = workspace.getName();
+
+            workspaceUI.getApp().executeCommand(commandJson);
         }
 
         //return true to close the dialog

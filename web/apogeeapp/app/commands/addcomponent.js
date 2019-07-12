@@ -9,8 +9,8 @@ apogeeapp.app.addcomponent = {};
 apogeeapp.app.addcomponent.createUndoCommand = function(workspaceUI,commandJson) {
     
     var workspace = workspaceUI.getWorkspace();
-    var memberName = commandJson.mebmerJson.name;
-    var parent = workspace.getMemberByFullName(parentFullName);
+    var memberName = commandJson.memberJson.name;
+    var parent = workspace.getMemberByFullName(commandJson.parentFullName);
     var memberFullName = parent.getChildFullName(memberName);
     
     var undoCommandJson = {};

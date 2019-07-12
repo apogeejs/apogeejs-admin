@@ -46,15 +46,15 @@ apogeeapp.app.updatelinkseq.addLink = function(referenceManager,entryTypeInfo) {
             return false;
         }
 
-        //not sure what to do with promise
-        var entryJson = {};
-        entryJson.url = newValues.url;
-        entryJson.nickname = newValues.nickname;
-        entryJson.entryType = entryTypeInfo.REFERENCE_TYPE;
+        //create command json
+        var commandJson = {};
+        commandJson.type = apogeeapp.app.addlink.COMMAND_TYPE;
+        commandJson.entryType = entryTypeInfo.REFERENCE_TYPE;
+        commandJson.url = newValues.url;
+        commandJson.nickname = newValues.nickname;
 
         //run command
-        var command = apogeeapp.app.updatelink.createAddEntryCommand(referenceManager,entryJson);
-        apogeeapp.app.Apogee.getInstance().executeCommand(command);
+        apogeeapp.app.Apogee.getInstance().executeCommand(commandJson);
 
         //return true to close the dialog
         return true;
@@ -101,9 +101,24 @@ apogeeapp.app.updatelinkseq.updateLink = function(referenceEntry) {
         }
 
         //run command
-        var command = apogeeapp.app.updatelink.createUpdateEntryCommand(referenceEntry,newValues.url,newValues.nickname);
-        apogeeapp.app.Apogee.getInstance().executeCommand(command);
+        var commandJson = {};
+        var dataChanged = false;
+        commandJson.type = apogeeapp.app.updatelink.COMMAND_TYPE;
+        commandJson.entryType = entryTypeInfo.REFERENCE_TYPE;
+        commandJson.oldUrl = initialValues.url;
+        if(initialValues.url != newValues.url) {
+            commandJson.newUrl = newValues.url;
+            dataChanged = true;
+        }
+        if(initialValues.url != newValues.url) {
+            commandJson.nickname = newValues.nickname;
+            dataChanged = true;
+        }
 
+        if(dataChanged) {
+            apogeeapp.app.Apogee.getInstance().executeCommand(commandJson);
+        }
+            
         //return true to close the dialog
         return true;
     }
@@ -120,10 +135,14 @@ apogeeapp.app.updatelinkseq.removeLink = function(referenceEntry) {
 
     //create on submit callback
     if(doDelete) {
+        
+        var commandJson = {};
+        commandJson.type = apogeeapp.app.deletelink.COMMAND_TYPE;
+        commandJson.entryType = referenceEntry.getTypeInfo().REFERENCE_TYPE;
+        commandJson.url = referenceEntry.getUrl();
 
         //run command
-        var command = apogeeapp.app.updatelink.createRemoveEntryCommand(referenceEntry);
-        apogeeapp.app.Apogee.getInstance().executeCommand(command);
+        apogeeapp.app.Apogee.getInstance().executeCommand(commandJson);
     }
 }
 
