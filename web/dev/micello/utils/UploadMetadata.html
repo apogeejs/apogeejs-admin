@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Community Overrides Display</title>
+        <title>Metadata Uploads</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
@@ -27,7 +27,7 @@
 			}
             .dataCell1 {
 				width: 800px;
-                height: 400px;
+                height: 600px;
 				outline: solid 2px #aaaaaa;
 				margin: 20px;
                 margin-right: 30px;
@@ -36,7 +36,7 @@
 			}
             .dataCell2 {
 				width: 800px;
-                height: 600px;
+                height: 300px;
 				outline: solid 2px #aaaaaa;
 				margin: 20px;
                 margin-right: 30px;
@@ -78,19 +78,19 @@
               
             function onWorkspaceLoad() {
                 //load the UI controls
-                addDisplay("Model.settings.OVERRIDES_DOWNLOAD_TEMPLATE","templateCell");
+                addDisplay("Model.settings.MFS_UPLOAD_HOST","uploadHostCell");
                 addDisplay("Model.login.loginUrl","loginUrlCell");
                 
                 addDisplay("Model.login.loginControl","loginCell");
                 addDisplay("Model.login.loginResult","loginResultCell");
                  
-                addDisplay("Model.download.cidInput","cidInputCell");
+                addDisplay("Model.upload.selectFileForm","uploadFileSelectCell");
                 
-                addDisplay("Model.download.overridesFile","overridesFileCell");
+                addDisplay("Model.upload.uploadFile","uploadFileCell");
                 
-                addDisplay("Model.download.fileSelection","fileInputCell");
+                addDisplay("Model.upload.uploadForm","uploadFormCell");
 
-                addDisplay("Model.download.file","fileDisplayCell");
+                addDisplay("Model.upload.uploadResponse","uploadResultCell");
             }
             
             function addDisplay(memberName,parentElementId,optionalViewType) {
@@ -118,22 +118,22 @@
         </script>
     </head>
     <body onload="init()">
-        <h1>Community Overrides Display</h1>
+        <h1>Metadata Uploads</h1>
         
-        Overrides Template:
-        <div class="dataCell0" id="templateCell"></div>
+        MFS Upload Host:
+        <div class="dataCell0" id="uploadHostCell"></div>
         Login URL:
         <div class="dataCell0" id="loginUrlCell"></div>
         
         <div class="formCell" id="loginCell"></div>
         <div class="formCell" id="loginResultCell"></div>
         
-        <div class="formCell" id="cidInputCell"></div>
+        <div class="formCell" id="uploadFileSelectCell"></div>
   
-        <div class="dataCell1" id="overridesFileCell"></div>
+        <div class="dataCell1" id="uploadFileCell"></div>
         
-        <div class="formCell" id="fileInputCell"></div>
+        <div class="formCell" id="uploadFormCell"></div>
         
-        <div class="dataCell2" id="fileDisplayCell"></div>
+        <div class="dataCell2" id="uploadResultCell"></div>
     </body>
 </html>
