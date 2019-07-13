@@ -31,7 +31,7 @@ apogeeapp.app.updatelink.createUndoCommand = function(workspaceUI,commandData) {
     return undoCommandJson;
 }
 
-apogeeapp.app.updatelink.executeCommand = function(workspaceUI,commandData) {
+apogeeapp.app.updatelink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
     
     var commandResult = {};
 
@@ -68,6 +68,8 @@ apogeeapp.app.updatelink.executeCommand = function(workspaceUI,commandData) {
 
 
 apogeeapp.app.updatelink.COMMAND_TYPE = "updateLink";
+
+apogeeapp.app.updatelink.isAsynch = true;
 
 apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.updatelink);
 

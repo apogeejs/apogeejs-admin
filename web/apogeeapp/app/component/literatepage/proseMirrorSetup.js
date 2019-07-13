@@ -118,6 +118,8 @@ function proseMirrorSetup() {
             dispatch(state.tr.replaceSelectionWith(testBlockSchema.nodes.apogeeComponent.create({"state":name})))
       }
     }))
+    
+    
 
 
     //==============================
@@ -461,7 +463,25 @@ function proseMirrorSetup() {
         });
        return editorData.apply(transaction);
     }
-
+    
+    proseMirror.getInsertIsOk = function(literatePageComponent) {
+        var state = literatePageComponent.getEditorData();
+        
+        return insertPoint(state.doc, state.selection.from, testBlockSchema.nodes.apogeeComponent) != null
+    }
+    
+    proseMirror.insertComponentOnPage = function(literatePageComponent,childName) {
+        var state = literatePageComponent.getEditorData();
+                
+        let {empty, $from, $to} = state.selection, content = Fragment.empty
+        if (!empty && $from.sameParent($to) && $from.parent.inlineContent)
+            content = $from.parent.content.cut($from.parentOffset, $to.parentOffset)
+        transaction = state.tr.replaceSelectionWith(testBlockSchema.nodes.apogeeComponent.create({"state":childName}));
+        
+        var commandData = literatePageComponent.createInsertCommand(transaction);
+        return commandData;
+    }
+   
     return proseMirror;
 }
 

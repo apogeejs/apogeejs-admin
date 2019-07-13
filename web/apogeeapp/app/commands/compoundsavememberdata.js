@@ -72,6 +72,8 @@ apogeeapp.app.compoundsavememberdata.executeCommand = function(workspaceUI,comma
 
 apogeeapp.app.compoundsavememberdata.COMMAND_TYPE = "compoundSaveMemberData";
 
+apogeeapp.app.addlink.compoundsavememberdata = true;
+
 apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.compoundsavememberdata);
 
 

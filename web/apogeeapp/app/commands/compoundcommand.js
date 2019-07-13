@@ -32,11 +32,11 @@ apogeeapp.app.compoundcommand.executeCommand = function(workspaceUI,commandData)
     commandResult.childResults = [];
     
     //add the child undo commands in the reverse order
-    for(var i = 0; i >= commandData.childCommands.length; i++) {
+    for(var i = 0; i < commandData.childCommands.length; i++) {
         let childCommandJson = commandData.childCommands[i];
-        let childCommandObject = CommandManager.getCommandObject(childCommandJson.type);
+        let childCommandObject = apogeeapp.app.CommandManager.getCommandObject(childCommandJson.type);
         let childCommandResult = childCommandObject.executeCommand(workspaceUI,childCommandJson);
-        commandResult.childResults(childCommandResult);
+        commandResult.childResults.push(childCommandResult);
     }
     
     return commandResult;

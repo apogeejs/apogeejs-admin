@@ -62,6 +62,8 @@ apogeeapp.app.addlink.executeCommand = function(workspaceUI,commandData,asynchOn
 
 apogeeapp.app.addlink.COMMAND_TYPE = "addLink";
 
+apogeeapp.app.addlink.isAsynch = true;
+
 apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.addlink);
 
 

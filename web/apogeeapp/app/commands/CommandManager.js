@@ -10,6 +10,8 @@
  *     
  *     ?: setsDirty?
  *     
+ *     ?: noUndo?
+ *     
  *     (everything else depends on the specific command)
  * }
  * 
@@ -24,7 +26,7 @@
  *      cmdDone: If this is true the command was done. This implies the undo command
  *      should undo the results. If this value is false, no action was taken.
  *
- *      message - This is a message for the user after the command was executed. This
+ *      alertMsg - This is a message for the user after the command was executed. This
  *      is typically an error mesasge. There may still be a message if cmdDone is true, 
  *      since that does not necessarily imply the command was exectued completely
  *      as intended.

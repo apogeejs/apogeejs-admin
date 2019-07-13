@@ -14,51 +14,28 @@ apogeeapp.app.FolderComponent.prototype.getEditorData = function() {
     return this.editorData;
 }
 
-apogeeapp.app.FolderComponent.prototype.applyTransaction = function(transaction) {
+apogeeapp.app.FolderComponent.prototype.setEditorData = function(editorData) {
+    this.editorData = editorData;
     
-    //================================
-    //start test code
-    
+    //this should be in an event for the change
+    var tabDisplay = this.getTabDisplay();
+    if(tabDisplay) {
+        tabDisplay.updateDocumentData(this.editorData);
+    }
+}
 
+//================================================================
+//start test code
+//temporary implementation
+    
+apogeeapp.app.FolderComponent.prototype.applyTransaction = function(transaction) {
     
     console.log("New Transaction:");
     console.log("Doc changed: " + transaction.docChanged);
 
     if(transaction.docChanged) {
-        var stepsJson = [];
-        var inverseStepsJson = [];
-
-        for(var i = 0; i < transaction.steps.length; i++) {
-            var step = transaction.steps[i];
-            stepsJson.push(step.toJSON());
-            var stepDoc = transaction.docs[i];
-            var inverseStep = step.invert(stepDoc);
-            inverseStepsJson.push(inverseStep.toJSON()); 
-        }
-        
-        var doChange = stepsJson => {
-            var newEditorData = proseMirror.getNewEditorData(this.editorData, stepsJson);
-
-            if(newEditorData) {
-                this.editorData = newEditorData;
-                //this should be in an event for the change
-                var tabDisplay = this.getTabDisplay();
-                if(tabDisplay) {
-                    tabDisplay.updateDocumentData(this.editorData);
-                }
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        
-        var command = {};
-        command.cmd = () => doChange(stepsJson);
-        command.undoCmd = () => doChange(inverseStepsJson);
-        command.desc = "Document update: " + this.getMember().getFullName();
-        
-        this.getWorkspaceUI().getApp().executeCommand(command);
+        var commandData = this.createInsertCommand(transaction);
+        this.getWorkspaceUI().getApp().executeCommand(commandData);
     }
     else {
         //this is a editor state change that doesn't change the data
@@ -69,16 +46,33 @@ apogeeapp.app.FolderComponent.prototype.applyTransaction = function(transaction)
             this.tabDisplay.updateDocumentData(this.editorData);
         }
     }
-        
-        
-    
-    //end test code
-    //================================
-
-    
-    
 }
 
+apogeeapp.app.FolderComponent.prototype.createInsertCommand = function(transaction) {
+    var stepsJson = [];
+    var inverseStepsJson = [];
+
+    for(var i = 0; i < transaction.steps.length; i++) {
+        var step = transaction.steps[i];
+        stepsJson.push(step.toJSON());
+        var stepDoc = transaction.docs[i];
+        var inverseStep = step.invert(stepDoc);
+        inverseStepsJson.push(inverseStep.toJSON()); 
+    }
+
+    var commandData = {};
+    commandData.type = apogeeapp.app.literatepagetransaction.COMMAND_TYPE;
+    commandData.memberFullName = this.member.getFullName();
+    commandData.steps = stepsJson;
+    commandData.undoSteps = inverseStepsJson;
+    
+    return commandData;
+}
+
+    
+//end test code
+//=========================================================================
+    
 apogeeapp.app.FolderComponent.prototype.instantiateTabDisplay = function() {
     var folder = this.getMember();
     return new apogeeapp.app.LiteratePageComponentDisplay(this,folder,folder); 

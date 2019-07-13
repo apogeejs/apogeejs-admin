@@ -36,6 +36,8 @@ apogeeapp.app.savememberdata.executeCommand = function(workspaceUI,commandData,a
 
 apogeeapp.app.savememberdata.COMMAND_TYPE = "saveMemberData";
 
+apogeeapp.app.savememberdata.isAsynch = true;
+
 apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.savememberdata);
 
 

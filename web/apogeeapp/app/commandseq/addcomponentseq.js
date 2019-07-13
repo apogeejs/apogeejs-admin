@@ -10,7 +10,8 @@ apogeeapp.app.addcomponentseq = {};
  * properties, with the values optionalInitialProperties preset. The created componenent will also use the 
  * property values in optionalBaseComponentValues, overridden by the user input properties where applicable. The member
  * created will be made using the optionalBaseMemberValues, agagin overidden by any user input values.  */   
-apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
+//piggybackCommand is a temporary test!!!
+apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator) {
 
         //get the active workspace
         var workspaceUI = app.getWorkspaceUI();
@@ -50,6 +51,23 @@ apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,opt
             commandData.memberJson = apogeeapp.app.Component.createMemberJson(componentGenerator,userInputProperties,optionalBaseMemberValues);
             commandData.componentJson = apogeeapp.app.Component.createComponentJson(componentGenerator,userInputProperties,optionalBaseComponentValues);
             
+            //#################################################
+            //temporary TESTING
+            if(piggybackCommandGenerator) {
+                
+                var piggybackCommand = piggybackCommandGenerator(userInputProperties.name);
+                
+                var parentCommandData = {};
+                parentCommandData.type = "compoundCommand";
+                parentCommandData.childCommands = [];
+                parentCommandData.childCommands.push(commandData);
+                parentCommandData.childCommands.push(piggybackCommand);
+                
+                commandData = parentCommandData;
+            }
+            
+            //#################################################
+            
             //execute command
             workspaceUI.getApp().executeCommand(commandData);
 
@@ -63,12 +81,13 @@ apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,opt
 
 /** This gets a callback to add an "additional" component, menaing one that is not
  * in the main component menu. */
-apogeeapp.app.addcomponentseq.addAdditionalComponent = function(app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
+//piggybackCommand is a temporary test!!!
+apogeeapp.app.addcomponentseq.addAdditionalComponent = function(app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator) {
         
     var onSelect = function(componentType) {
         var componentGenerator = app.getComponentGenerator(componentType);
         if(componentGenerator) {
-            apogeeapp.app.addcomponentseq.addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
+            apogeeapp.app.addcomponentseq.addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator);
         }
         else {
             alert("Unknown component type: " + componentType);

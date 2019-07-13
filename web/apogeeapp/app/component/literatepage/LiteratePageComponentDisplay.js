@@ -179,10 +179,10 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
 
         this.bannerElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_banner",this.headerElement);
 //        this.editorToolbarElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_editorToolbar",this.headerElement);
-//        this.componentToolbarElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentToolbar",this.headerElement);
+        this.componentToolbarElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentToolbar",this.headerElement);
 
 //        this.initEditorToolbar();
-//        this.initComponentToolbar();
+        this.initComponentToolbar();
 
         //-------------------
         //page body
@@ -212,60 +212,73 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
     }
 
     initComponentToolbar() {
-//        
-//        //########################################
-//        // rewrite this for prosemirror
-//        //########################################
-//        //
-//        //we will add a button for each standard component, and a button for the additional components
-//
-//        //THIS IS BAD - IT IS ONLY TO GET THIS WORKING AS A TRIAL
-//        //MAKE A WAY TO GET COMPONENT GENERATORS FOR BUTTONS RATHER THAN READING A PRIVATE VARIABLE FROM APP
-//        var workspaceUI = this.component.getWorkspaceUI();
-//        var app = workspaceUI.getApp();
-//
-//        for(var i = 0; i < app.standardComponents.length; i++) {
-//            let key = app.standardComponents[i];
-//            let generator = app.componentGenerators[key];
-//
-//            var buttonElement = document.createElement("button");
-//            buttonElement.innerHTML = generator.displayName;
-//            buttonElement.onclick = () => {
-//                var selection = this.quill.getSelection();
-//
-//                var initialValues = {};
-//                initialValues.parentName = this.member.getFullName();
-//
-//                var onSuccess = (member,component) => {
-//                    this.insertChildIntoDisplay(member.getName(),selection);
-//                }
-//
-//                apogeeapp.app.addcomponentseq.addComponent(app,generator,initialValues,null,onSuccess);
-//            }
-//            this.componentToolbarElement.appendChild(buttonElement);
-//        }
-//
-//        //add the additional component item
-//        var buttonElement = document.createElement("button");
-//        buttonElement.innerHTML = "Additional Components";
-//        buttonElement.onclick = () => {
-//            var selection = this.quill.getSelection();
-//
-//            var initialValues = {};
-//            initialValues.parentName = this.member.getFullName();
-//
-//            var onSuccess = (member,component) => {
-//                this.insertChildIntoDisplay(member.getName(),selection);
-//            }
-//
-//            var doAddComponent = apogeeapp.app.addcomponent.getAddAdditionalComponentCallback(app,initialValues,null,onSuccess);
-//            doAddComponent();
-//
-//            //if successfull, add to the ui
-//            //need a better success check!
-//        }
-//        this.componentToolbarElement.appendChild(buttonElement);
+        
+        //########################################
+        // rewrite this for prosemirror
+        //########################################
+        //
+        //we will add a button for each standard component, and a button for the additional components
+
+        //THIS IS BAD - IT IS ONLY TO GET THIS WORKING AS A TRIAL
+        //MAKE A WAY TO GET COMPONENT GENERATORS FOR BUTTONS RATHER THAN READING A PRIVATE VARIABLE FROM APP
+        var workspaceUI = this.component.getWorkspaceUI();
+        var app = workspaceUI.getApp();
+
+        for(var i = 0; i < app.standardComponents.length; i++) {
+            let key = app.standardComponents[i];
+            let generator = app.componentGenerators[key];
+
+            var buttonElement = document.createElement("button");
+            buttonElement.innerHTML = generator.displayName;
+            buttonElement.onclick = () => {
+                
+                if(!proseMirror.getInsertIsOk(this.component)) {
+                    alert("INVALID ENTRY POINT");
+                    return;
+                }
+                
+                var piggybackCommandGenerator = childName => proseMirror.insertComponentOnPage(this.component,childName);
+
+                var initialValues = {};
+                initialValues.parentName = this.member.getFullName();
+
+                //I tacked on a piggyback for testing!!!
+                apogeeapp.app.addcomponentseq.addComponent(app,generator,initialValues,null,null,piggybackCommandGenerator);
+            }
+            this.componentToolbarElement.appendChild(buttonElement);
+        }
+
+        //add the additional component item
+        var buttonElement = document.createElement("button");
+        buttonElement.innerHTML = "Additional Components";
+        buttonElement.onclick = () => {
+            alert("button clicked: " + generator.uniqueName);
+
+            var initialValues = {};
+            initialValues.parentName = this.member.getFullName();
+
+            //I tacked on a piggyback for testing!!!
+            apogeeapp.app.addcomponent.addAdditionalComponent(app,initialValues,null,null,piggybackCommandGenerator);
+        }
+        this.componentToolbarElement.appendChild(buttonElement);
     }
+    
+    
+//    //this tests if the "menu item" should be enabled
+//    selection(state)
+//        return insertPoint(state.doc, state.selection.from, testBlockSchema.nodes.apogeeComponent) != null
+//    }
+//        
+//    //this inserts the apogee component for the given name
+//    run(state, dispatch) {
+//
+//        var name = prompt("Component name?");
+//
+//        let {empty, $from, $to} = state.selection, content = Fragment.empty
+//        if (!empty && $from.sameParent($to) && $from.parent.inlineContent)
+//            content = $from.parent.content.cut($from.parentOffset, $to.parentOffset)
+//        dispatch(state.tr.replaceSelectionWith(testBlockSchema.nodes.apogeeComponent.create({"state":name})))
+//      }
 
     initEditor() {
         

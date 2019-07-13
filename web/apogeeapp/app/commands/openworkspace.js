@@ -82,6 +82,8 @@ apogeeapp.app.openworkspace.executeCommand = function(unpopulatedWorkspaceUI,com
 
 apogeeapp.app.openworkspace.COMMAND_TYPE = "openWorkspace";
 
+apogeeapp.app.openworkspace.isAsynch = true;
+
 apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.openworkspace);
 
 
