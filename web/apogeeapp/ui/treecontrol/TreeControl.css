@@ -19,7 +19,9 @@
     font-family: monospace;
     
     position:relative;
-    left:-5px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    /*left:-5px;*/
 }
 .visiui-tc-icon-container {
     /* fixed */
@@ -54,21 +56,5 @@
     
     margin: 0;
     padding: 0px;
-    border-left:1px solid rgb(190,190,190);
 }
-.visiui-tc-child:last-child {
-    border-left:none;
-}
-.visiui-tc-child:before {
-    position:relative;
-    top:-0.3em;
-    height:1em;
-    width:0px;
-    color:white;
-    content:"";
-    display:inline-block;
-    left:0px;
-}
-.visiui-tc-child:last-child:before {
-    border-left:1px solid rgb(190,190,190);   
-}
+

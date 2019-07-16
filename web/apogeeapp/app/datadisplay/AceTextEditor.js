@@ -11,7 +11,7 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
 
         //#################################################
         //use this for literate page - also add line options below
-        this.editorDiv = document.createElement("div");
+        this.editorDiv = apogeeapp.ui.createElement("div");
         //##################################################
         
 //        //###################################################
@@ -40,7 +40,8 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
             maxLines: 20
         })
         //############################################################
-        editor.renderer.setShowGutter(true);
+        editor.renderer.setShowGutter(false);
+        editor.setHighlightActiveLine(false);
         editor.setTheme("ace/theme/eclipse"); //good
         editor.getSession().setMode(this.aceMode); 
         

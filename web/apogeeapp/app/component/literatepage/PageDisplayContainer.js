@@ -116,8 +116,8 @@ apogeeapp.app.PageDisplayContainer.prototype.getDisplayElement = function() {
 //====================================
 
 /** This method returns the main dom element for the window frame. */
-apogeeapp.app.PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH = "/expand.png";
-apogeeapp.app.PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH = "/contract.png";
+apogeeapp.app.PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH = "/opened_gray.png";
+apogeeapp.app.PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH = "/closed_gray.png";
 
 /** @private */
 apogeeapp.app.PageDisplayContainer.prototype.initUI = function() {

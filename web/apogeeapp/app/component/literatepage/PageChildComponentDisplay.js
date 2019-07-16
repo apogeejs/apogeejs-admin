@@ -141,8 +141,8 @@ apogeeapp.app.PageChildComponentDisplay.prototype.setIsExpanded = function(isExp
 //===============================
 
 /** This method returns the main dom element for the window frame. */
-apogeeapp.app.PageChildComponentDisplay.EXPAND_BUTTON_PATH = "/expand.png";
-apogeeapp.app.PageChildComponentDisplay.CONTRACT_BUTTON_PATH = "/contract.png";
+apogeeapp.app.PageChildComponentDisplay.EXPAND_BUTTON_PATH = "/closed_gray.png";
+apogeeapp.app.PageChildComponentDisplay.CONTRACT_BUTTON_PATH = "/opened_gray.png";
 
 /** This is the standard window for the component.  
  * @private */
