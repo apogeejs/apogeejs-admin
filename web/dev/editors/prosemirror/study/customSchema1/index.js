@@ -284,7 +284,7 @@ let menu = menuPlugin([
     {command: toggleMark(schema.marks.strong), dom: icon("B", "strong")},
     {command: toggleMark(schema.marks.em), dom: icon("i", "em")},
     colorItem("blue"),colorItem("red"),colorItem("green"),
-    highlightItem("yellow"),highlightItem("cyan"),highlightItem("lighblue"),
+    highlightItem("yellow"),highlightItem("cyan"),highlightItem("lightblue"),
     {command: setBlockType(schema.nodes.paragraph), dom: icon("p", "paragraph")},
     heading(1), heading(2), heading(3),
     {command: wrapIn(schema.nodes.blockquote), dom: icon(">", "blockquote")}
