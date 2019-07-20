@@ -199,21 +199,58 @@ const marks = {
   //test
   //------------------------
   // an attempt at text color, with style
+  //I SHOULD FORMALLY DEFINE THE CUSTOM TAGS!
+ 
+  
   color: {
     attrs: {
       color: {default: "black"}
     },
-    parseDOM: [{tag: "span", style: "color"}],
-    toDOM(node) { return ["span", {"style":"color:"+node.attrs["color"]+";"}, 0] }
+    parseDOM: [{tag: "clr-tag", style: "color", getAttrs(dom) {
+        return {color: dom.style.color};
+    }}],
+    toDOM(node) { return ["clr-tag", {"style":"color:"+node.attrs["color"]+";"}, 0] }
+  },
+  
+  fontsize: {
+    attrs: {
+      fontsize: {default: ""}
+    },
+    parseDOM: [{tag: "fntsz-tag", style: "font-size", getAttrs(dom) {
+        return {fontsize: dom.style["font-size"]};
+    }}],
+    toDOM(node) { return ["fntsz-tag", {"style":"font-size:"+node.attrs["fontsize"]+";"}, 0] }
   },
   
   highlight: {
     attrs: {
       highlightcolor: {default: "white"}
     },
-    parseDOM: [{tag: "span", style: "background-color"}],
-    toDOM(node) { return ["span", {"style":"background-color:"+node.attrs["highlightcolor"]+";"}, 0] }
+    parseDOM: [{tag: "bgd-tag", style: "background-color", getAttrs(dom) {
+        return {"highlightcolor": dom.style["background-color"]};
+    }}],
+    toDOM(node) { return ["bgd-tag", {"style":"background-color:"+node.attrs["highlightcolor"]+";"}, 0] }
   },
+  
+//  span: {
+//    attrs: {
+//        color: {default: null},
+//        highlightcolor: {default: null}
+//    },
+//    parseDOM: [{tag: "span", getAttrs(dom) {
+//        let attrs = {};
+//        //only keep non empty styles
+//        if(dom.style.color) attrs.color = dom.style.color;
+//        if(dom.style["background-color"]) attrs.highlightcolor = dom.style["background-color"];
+//        return attrs;
+//    }}],
+//    toDOM(node) { 
+//        let styleString = "";
+//        //only keep non empty styles
+//        if(node.attrs.color) styleString += "color:" + node.attrs.color + ";";
+//        if(node.attrs.highlightcolor) styleString += "background-color:" + node.attrs.highlightcolor + ";";
+//        return ["span", {style:styleString}, 0] }
+//  },
 
   
 //  colorblue: {
@@ -249,6 +286,46 @@ const schema = new Schema({nodes, marks})
 
 const {toggleMark, setBlockType, wrapIn} = require("prosemirror-commands")
 
+function markApplies(doc, ranges, type) {
+  for (let i = 0; i < ranges.length; i++) {
+    let {$from, $to} = ranges[i]
+    let can = $from.depth == 0 ? doc.type.allowsMarkType(type) : false
+    doc.nodesBetween($from.pos, $to.pos, node => {
+      if (can) return false
+      can = node.inlineContent && node.type.allowsMarkType(type)
+    })
+    if (can) return true
+  }
+  return false
+}
+
+function wrapInMark(markType, attrs) {
+    return function(state, dispatch) {
+        let {empty, $cursor, ranges} = state.selection
+        if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) return false
+        if (dispatch) {
+            if ($cursor) {
+                dispatch(state.tr.addStoredMark(markType.create(attrs)))
+            } 
+            else {
+//                let has = false, tr = state.tr
+//                for (let i = 0; !has && i < ranges.length; i++) {
+//                  let {$from, $to} = ranges[i]
+//                  has = state.doc.rangeHasMark($from.pos, $to.pos, markType)
+//                }
+                
+                let tr = state.tr
+                for (let i = 0; i < ranges.length; i++) {
+                    let {$from, $to} = ranges[i]
+                    tr.addMark($from.pos, $to.pos, markType.create(attrs))
+                }
+                dispatch(tr.scrollIntoView())
+            }
+        }
+        return true
+    }
+}
+
 // Helper function to create menu icons
 function icon(text, name) {
     let span = document.createElement("span")
@@ -268,15 +345,22 @@ function heading(level) {
 
 function colorItem(color) {
     return {
-        command: toggleMark(schema.marks.color, {color}),
+        command: wrapInMark(schema.marks.color, {color}),
         dom: icon("Text: " + color, "color")
     }
 }
 
 function highlightItem(highlightcolor) {
     return {
-        command: toggleMark(schema.marks.highlight, {highlightcolor}),
+        command: wrapInMark(schema.marks.highlight, {highlightcolor}),
         dom: icon("Highlight: " + highlightcolor, "highlight")
+    }
+}
+
+function fontSizeItem(fontsize) {
+    return {
+        command: wrapInMark(schema.marks.fontsize, {fontsize}),
+        dom: icon("Font size: " + fontsize, "fontsize")
     }
 }
 
@@ -285,6 +369,7 @@ let menu = menuPlugin([
     {command: toggleMark(schema.marks.em), dom: icon("i", "em")},
     colorItem("blue"),colorItem("red"),colorItem("green"),
     highlightItem("yellow"),highlightItem("cyan"),highlightItem("lightblue"),
+    fontSizeItem("6px"),fontSizeItem("12px"),fontSizeItem("inherit"),fontSizeItem("24px"),
     {command: setBlockType(schema.nodes.paragraph), dom: icon("p", "paragraph")},
     heading(1), heading(2), heading(3),
     {command: wrapIn(schema.nodes.blockquote), dom: icon(">", "blockquote")}
