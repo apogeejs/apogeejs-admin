@@ -5,30 +5,36 @@
 //============================================
 
 class MenuView {
-    constructor(items, editorView) {
-        this.items = items
+    constructor(elements, editorView) {
+        this.elements = elements
         this.editorView = editorView
 
         this.dom = document.createElement("div")
         this.dom.className = "menubar"
-        items.forEach(({dom}) => this.dom.appendChild(dom))
-        this.update()
-
-        this.dom.addEventListener("mousedown", e => {
-            e.preventDefault()
-            editorView.focus()
-            items.forEach(({command, dom}) => {
-                if(dom.contains(e.target))
-                    command(editorView.state, editorView.dispatch, editorView)
+        elements.forEach(element => { 
+                //I am registering the editor view since it is needed for the command
+                //here I attach the command to the item rather than as they do it below
+                element.registerEditorView(editorView);
+                this.dom.appendChild(element)
             })
-        })
+//        this.update()
+
+//        this.dom.addEventListener("mousedown", e => {
+//            e.preventDefault()
+//            editorView.focus()
+//            elements.forEach(({command, dom}) => {
+//                if(dom.contains(e.target))
+//                    command(editorView.state, editorView.dispatch, editorView)
+//            })
+//        })
     }
 
     update() {
-        this.items.forEach(({command, dom}) => {
-            let active = command(this.editorView.state, null, this.editorView)
-            dom.style.display = active ? "" : "none"
-        })
+//reinsert this!!!
+//        this.elements.forEach(({command, dom}) => {
+//            let active = command(this.editorView.state, null, this.editorView)
+//            dom.style.display = active ? "" : "none"
+//        })
     }
 
     destroy() { 
@@ -222,6 +228,16 @@ const marks = {
     toDOM(node) { return ["fntsz-tag", {"style":"font-size:"+node.attrs["fontsize"]+";"}, 0] }
   },
   
+  font: {
+    attrs: {
+      fontfamily: {default: "Sans-serif"}
+    },
+    parseDOM: [{tag: "fntfam-tag", style: "font-family", getAttrs(dom) {
+        return {fontsize: dom.style["font-family"]};
+    }}],
+    toDOM(node) { return ["fntfam-tag", {"style":"font-family:"+node.attrs.fontfamily+";"}, 0] }
+  },
+  
   highlight: {
     attrs: {
       highlightcolor: {default: "white"}
@@ -231,32 +247,6 @@ const marks = {
     }}],
     toDOM(node) { return ["bgd-tag", {"style":"background-color:"+node.attrs["highlightcolor"]+";"}, 0] }
   },
-  
-//  span: {
-//    attrs: {
-//        color: {default: null},
-//        highlightcolor: {default: null}
-//    },
-//    parseDOM: [{tag: "span", getAttrs(dom) {
-//        let attrs = {};
-//        //only keep non empty styles
-//        if(dom.style.color) attrs.color = dom.style.color;
-//        if(dom.style["background-color"]) attrs.highlightcolor = dom.style["background-color"];
-//        return attrs;
-//    }}],
-//    toDOM(node) { 
-//        let styleString = "";
-//        //only keep non empty styles
-//        if(node.attrs.color) styleString += "color:" + node.attrs.color + ";";
-//        if(node.attrs.highlightcolor) styleString += "background-color:" + node.attrs.highlightcolor + ";";
-//        return ["span", {style:styleString}, 0] }
-//  },
-
-  
-//  colorblue: {
-//    parseDOM: [{tag: "span", {style: "color=blue"}],
-//    toDOM() { return emDOM }
-//  },
   
   //------------------------
   //end test
@@ -327,12 +317,50 @@ function wrapInMark(markType, attrs) {
 }
 
 // Helper function to create menu icons
-function icon(text, name) {
+function iconElement(text, name, command) {
     let span = document.createElement("span")
     span.className = "menuicon " + name
     span.title = name
     span.textContent = text
+    
+    //I need to plug in the editorView. They did it differently in their example that I changed. See above.
+    span.registerEditorView = (editorView) => {
+        span.onclick = () => command(editorView.state, editorView.dispatch, editorView);
+    } 
+    
     return span
+}
+
+function colorOption(colorValue, command) {
+    let option = document.createElement("option")
+    option.text = " ";
+    option._command = command
+    option.style.backgroundColor = colorValue;
+    
+    return option
+}
+
+function textOption(text,command) {
+    let option = document.createElement("option")
+    option.text = text;
+    option._command = command
+    return option
+}
+
+//THIS IS NOT GOOD. I THINK MAYBE I SHOULD JUST USE A MENU RATHER THAN A DROPDOWN
+function dropdownElement(optionsList, name) {
+    let dropdown = document.createElement("select");
+    dropdown.className = "menuDropdown";
+    optionsList.forEach(option => dropdown.add(option));
+    
+    dropdown.registerEditorView = editorView => {
+        dropdown.onchange = e => {
+            var activeOption = optionsList[dropdown.selectedIndex];
+            activeOption._command(editorView.state, editorView.dispatch, editorView);
+        }
+    } 
+    
+    return dropdown;
 }
 
 // Create an icon for a heading at the given level
@@ -343,36 +371,68 @@ function heading(level) {
     }
 }
 
-function colorItem(color) {
-    return {
-        command: wrapInMark(schema.marks.color, {color}),
-        dom: icon("Text: " + color, "color")
-    }
+function textColorOption(color) {
+    return colorOption(color,wrapInMark(schema.marks.color, {color}))
 }
 
-function highlightItem(highlightcolor) {
-    return {
-        command: wrapInMark(schema.marks.highlight, {highlightcolor}),
-        dom: icon("Highlight: " + highlightcolor, "highlight")
-    }
+function highlightOption(highlightcolor) {
+     return colorOption(highlightcolor,wrapInMark(schema.marks.highlight, {highlightcolor}))
 }
 
-function fontSizeItem(fontsize) {
-    return {
-        command: wrapInMark(schema.marks.fontsize, {fontsize}),
-        dom: icon("Font size: " + fontsize, "fontsize")
-    }
+function fontSizeOption(fontsize) {
+    return textOption(fontsize,wrapInMark(schema.marks.fontsize, {fontsize}))
+}
+
+function fontOption(fontfamily) {
+    return textOption(fontfamily,wrapInMark(schema.marks.font, {fontfamily}))
+}
+
+function textColorDropdown() {
+    var options = [];
+    options.push(textColorOption("blue"));
+    options.push(textColorOption("red"));
+    options.push(textColorOption("green"));
+    return dropdownElement(options, "Text Color");
+}
+
+function highlightDropdown() {
+    var options = [];
+    options.push(highlightOption("yellow"));
+    options.push(highlightOption("cyan"));
+    options.push(highlightOption("gray"));
+    return dropdownElement(options, "Highlight Color");
+}
+
+function fontDropdown() {
+    var options = [];
+    options.push(fontOption("Sans-serif"));
+    options.push(fontOption("Serif"));
+    options.push(fontOption("Monospace"));
+    return dropdownElement(options, "Font");
+}
+
+function fontSizeDropdown() {
+    var options = [];
+    options.push(fontSizeOption(".75em"));
+    options.push(fontSizeOption("1em"));
+    options.push(fontSizeOption("1.5em"));
+    return dropdownElement(options, "Font Size");
 }
 
 let menu = menuPlugin([
-    {command: toggleMark(schema.marks.strong), dom: icon("B", "strong")},
-    {command: toggleMark(schema.marks.em), dom: icon("i", "em")},
-    colorItem("blue"),colorItem("red"),colorItem("green"),
-    highlightItem("yellow"),highlightItem("cyan"),highlightItem("lightblue"),
-    fontSizeItem("6px"),fontSizeItem("12px"),fontSizeItem("inherit"),fontSizeItem("24px"),
-    {command: setBlockType(schema.nodes.paragraph), dom: icon("p", "paragraph")},
-    heading(1), heading(2), heading(3),
-    {command: wrapIn(schema.nodes.blockquote), dom: icon(">", "blockquote")}
+    iconElement("B","strong",toggleMark(schema.marks.strong)),
+    iconElement("i", "em",toggleMark(schema.marks.em)),
+    fontDropdown(),
+    fontSizeDropdown(),
+    textColorDropdown(),
+    highlightDropdown()
+//    colorItem("blue"),colorItem("red"),colorItem("green"),
+//    highlightItem("yellow"),highlightItem("cyan"),highlightItem("lightblue"),
+//    fontSizeItem(".75em"),fontSizeItem("1em"),fontSizeItem("2em"),
+//    fontItem("Sans-serif"),fontItem("Serif"),fontItem("Monospace"),
+//    {command: setBlockType(schema.nodes.paragraph), dom: icon("p", "paragraph")},
+//    heading(1), heading(2), heading(3),
+//    {command: wrapIn(schema.nodes.blockquote), dom: icon(">", "blockquote")}
 ])
 
 //===================================
