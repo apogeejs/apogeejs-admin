@@ -36,7 +36,7 @@ class MenuView {
 //            dom.style.display = active ? "" : "none"
 //        })
     }
-
+    
     destroy() { 
         this.dom.remove() 
     }
@@ -50,6 +50,54 @@ function menuPlugin(items) {
             let menuView = new MenuView(items, editorView)
             editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom)
             return menuView
+        }
+    })
+}
+
+//===================================
+// State check plugin
+//===================================
+
+//This is a test to measure the state of the editor. I want to use this to 
+//configure my menu bar (as to what is active)
+class StateCheck {
+    constructor(editorView) {
+        this.editorView = editorView
+    }
+
+    update() {
+        this.showActiveState();
+    }
+    
+    //THis is a ttest function to measure the state
+    showActiveState() {
+
+        var selection = this.editorView.state.selection;
+        var ranges = selection.ranges;
+        var doc = this.editorView.state.doc;
+        //var schema = editorView.schema;
+
+        var nodeTypes = [];
+        var markTypes = [];
+
+        for (let i = 0; i < ranges.length; i++) {
+            let {$from, $to} = ranges[i]
+            doc.nodesBetween($from.pos, $to.pos, node => {
+                nodeTypes.push(node.type.name);
+                var nodeMarks = node.marks.map(mark => mark.type.name);
+                markTypes.push(nodeMarks);
+        })
+      }
+      console.log("Nodes: " + JSON.stringify(nodeTypes));
+      console.log("Marks: " + JSON.stringify(markTypes));
+    }
+}
+
+function stateCheckPlugin() {
+    return new Plugin({
+        view(editorView) {
+            let stateCheck = new StateCheck(editorView)
+            return stateCheck
         }
     })
 }
@@ -289,6 +337,8 @@ function markApplies(doc, ranges, type) {
   return false
 }
 
+
+
 function wrapInMark(markType, attrs) {
     return function(state, dispatch) {
         let {empty, $cursor, ranges} = state.selection
@@ -435,6 +485,7 @@ let menu = menuPlugin([
 //    {command: wrapIn(schema.nodes.blockquote), dom: icon(">", "blockquote")}
 ])
 
+let stateCheck = stateCheckPlugin();
 //===================================
 // Menu Items
 //===================================
@@ -453,9 +504,12 @@ let state = EditorState.create({
     history(),
     keymap({"Mod-z": undo, "Mod-y": redo}),
     keymap(baseKeymap),
-    menu
+    menu,
+    stateCheck
   ]
 })
 let view = new EditorView(element, {state});
+
+
 
 
