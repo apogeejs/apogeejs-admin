@@ -58,6 +58,24 @@ function menuPlugin(items) {
 // State check plugin
 //===================================
 
+const MARK_INFO = {
+    strong: true,
+    em: true,
+    font: "fontfamily",
+    fontsize: "fontsize",
+    color: "color",
+    highlight: "highlightcolor"
+}
+
+const EMPTY_MARK_DATA = {
+    strong: [],
+    em: [],
+    font: [],
+    fontsize: [],
+    color: [],
+    highlight: []
+}
+
 //This is a test to measure the state of the editor. I want to use this to 
 //configure my menu bar (as to what is active)
 class StateCheck {
@@ -75,21 +93,71 @@ class StateCheck {
         var selection = this.editorView.state.selection;
         var ranges = selection.ranges;
         var doc = this.editorView.state.doc;
-        //var schema = editorView.schema;
 
+        var block;
+        //simple deep copy
+        var data = JSON.parse(JSON.stringify(EMPTY_MARK_DATA));
+        
         var nodeTypes = [];
         var markTypes = [];
+        
+        //the model below assumes a single level of block
+        //with text nodes insides with the above specified marks available.
 
-        for (let i = 0; i < ranges.length; i++) {
-            let {$from, $to} = ranges[i]
+        for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
+            let {$from, $to} = ranges[rangeIndex]
             doc.nodesBetween($from.pos, $to.pos, node => {
+                
+                if(node.type.name == "text") {
+                    //populate marks for this text node
+                    let nodeMarkList = [];
+                    node.marks.forEach(mark => {
+                        var markType = mark.type.name;
+                        var markInfo = MARK_INFO[markType];
+                        
+                        if(markInfo === true) {
+                            //no-attribute mark
+                            data[markType].push(true);
+                        }
+                        else {
+                            //attribute mark
+                            var attribute = mark.attrs[markInfo];
+                            data[markType].push(attribute);
+                        }
+                    });
+                    
+                    //add a "false" value for any mark not added.
+                    for(var markType in data) {
+                        if(data[markType].length == rangeIndex) {
+                            data[markType].push(false);
+                        }
+                    }
+                }
+                else {
+                    //store the main block type
+                    //validate this better
+//                    if(state.block) {
+//                        throw new Error("There are multiple blocks!");
+//                    }
+                    
+                    block = node.type.name;
+                }
+                
+                //get the base node and mark info
                 nodeTypes.push(node.type.name);
-                var nodeMarks = node.marks.map(mark => mark.type.name);
+                
+                let nodeMarks = [];
+                node.marks.forEach(mark => {
+                    nodeMarks.push(mark.type.name);
+                });
                 markTypes.push(nodeMarks);
-        })
+            })
       }
-      console.log("Nodes: " + JSON.stringify(nodeTypes));
-      console.log("Marks: " + JSON.stringify(markTypes));
+        
+        console.log("Nodes: " + JSON.stringify(nodeTypes));
+        console.log("Marks: " + JSON.stringify(markTypes));
+        console.log("Block: " + block);
+        console.log("Mark data: " + JSON.stringify(data));
     }
 }
 
