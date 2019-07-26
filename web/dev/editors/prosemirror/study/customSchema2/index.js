@@ -22,10 +22,6 @@ const EMPTY_MARK_DATA = {
     highlight: false
 }
 
-function addToListOnce(list,value) {
-    if(list.indexOf(value) < 0) list.push(value);
-}
-
 class ToolbarView {
     constructor(items, editorView) {
         this.items = items
@@ -54,79 +50,97 @@ class ToolbarView {
     
     _getSelectionInfo() {
 
-        var selection = this.editorView.state.selection;
-        var ranges = selection.ranges;
+        var {empty,$cursor,ranges} = this.editorView.state.selection;
         var doc = this.editorView.state.doc;
 
         //get a list of blocks and a list for each mark type
         var blocks = [];
-        var marks = Object.assign({},EMPTY_MARK_DATA);
-        for(let key in marks) {
-            marks[key] = [];
+        var markState = this._getEmptyMarkMap();
+        for(let key in markState) {
+            markState[key] = [];
+        }
+        
+        if(empty) {
+            if($cursor) {
+                //read the block node for the cursor
+//                let ancestor;
+//                for(let i = 0; (ancestor = $cursor.node(i)); i++) {
+//                    blocks.push(ancestor.type.name);
+//                }
+                //I AM ASSUMING SCHEMA GIVES  LAYER OF BLOCKS UNDER DOC! (I SHOULD MAKE THIS MORE GENERAL) 
+                let blockNode = $cursor.node(1);
+                if(blockNode) {
+                    blocks.push(blockNode.type.name);
+                }
+                
+                //populate marks for the cursor
+                this._updateMarkStateFromMarkList(markState,$cursor.marks());
+            }
+            else {
+                //no cursor for empty selection
+                //keep blocks and marks are empty
+            }
+        }
+        else {
+            //there is a selection
+
+            //the model below assumes a single level of block
+            //with text nodes insides with the above specified marks available.
+            for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
+                let {$from, $to} = ranges[rangeIndex]
+                doc.nodesBetween($from.pos, $to.pos, node => {
+
+                    if(node.type.name == "text") {
+                        //populate marks for this text node
+                        this._updateMarkStateFromMarkList(markState,node.marks);
+                    }
+                    else {
+                        //store the main block type
+                        //validate this better
+                        this._addToListOnce(blocks,node.type.name);
+                    }
+                })
+            }
         }
 
-        //for debugging
-        var nodeTypes = [];
-        var markTypes = [];
-        
-        //the model below assumes a single level of block
-        //with text nodes insides with the above specified marks available.
-
-        for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
-            let {$from, $to} = ranges[rangeIndex]
-            doc.nodesBetween($from.pos, $to.pos, node => {
-                
-                if(node.type.name == "text") {
-                    let nodeMarks = Object.assign({},EMPTY_MARK_DATA);
-                    //populate marks for this text node
-                    let nodeMarkList = [];
-                    
-                    node.marks.forEach(mark => {
-                        let markType = mark.type.name;
-                        let markInfo = MARK_INFO[markType];
-                        
-                        if(markInfo === true) {
-                            //no-attribute mark
-                            nodeMarks[markType] = true;
-                        }
-                        else {
-                            //attribute mark
-                            var attribute = mark.attrs[markInfo];
-                            nodeMarks[markType] = attribute;
-                        }
-                    });
-                    
-                    //add these to the overall list for each mark
-                    for(var markName in marks) {
-                        addToListOnce(marks[markName],nodeMarks[markName]);
-                    }
-                }
-                else {
-                    //store the main block type
-                    //validate this better
-                    addToListOnce(blocks,node.type.name);
-                }
-                
-                //get the base node and mark info
-                nodeTypes.push(node.type.name);
-                
-                let nodeMarks = [];
-                node.marks.forEach(mark => {
-                    nodeMarks.push(mark.type.name);
-                });
-                markTypes.push(nodeMarks);
-            })
-      }
-        
-        console.log("Nodes: " + JSON.stringify(nodeTypes));
-        console.log("Marks: " + JSON.stringify(markTypes));
-        console.log("Blocks: " + JSON.stringify(blocks));
-        console.log("Marks: " + JSON.stringify(marks));
-        
         //get the selection state for the blocks and marks 
         return {
             blocks: blocks,
-            marks: marks
+            marks: markState
+        }
+    }
+    
+    _getEmptyMarkMap() {
+        return Object.assign({},EMPTY_MARK_DATA);
+    }
+    
+    /** This adds a value to a list if it is not there. */
+    _addToListOnce(list,value) {
+        if(list.indexOf(value) < 0) list.push(value);
+    }
+    
+    /** This updates the passed in mark state, adding any mark values from the
+     * mark list (including the value false for missing marks) */
+    _updateMarkStateFromMarkList(markState,markList) {
+        let markListMarks = this._getEmptyMarkMap();
+
+        markList.forEach(mark => {
+            let markType = mark.type.name;
+            let markInfo = MARK_INFO[markType];
+
+            if(markInfo === true) {
+                //no-attribute mark
+                markListMarks[markType] = true;
+            }
+            else {
+                //attribute mark
+                var attribute = mark.attrs[markInfo];
+                markListMarks[markType] = attribute;
+            }
+        });
+        
+        for(var markName in markState) {
+            this._addToListOnce(markState[markName],markListMarks[markName]);
         }
     }
 }
@@ -139,6 +153,80 @@ function toolbarPlugin(items) {
             let toolbarView = new ToolbarView(items, editorView)
             editorView.dom.parentNode.insertBefore(toolbarView.dom, editorView.dom)
             return toolbarView;
+        }
+    })
+}
+
+//============================
+// debug plugin
+//============================
+
+//This is a test to measure the state of the editor. I want to use this to 
+//configure my menu bar (as to what is active)
+class StateCheck {
+    constructor(editorView) {
+        this.editorView = editorView
+    }
+
+    update() {
+        this._showSelectionInfo();
+    }
+    
+    
+    _showSelectionInfo() {
+
+        var {empty,$cursor,ranges} = this.editorView.state.selection;
+        var doc = this.editorView.state.doc;
+        
+        var nodeTypes = [];
+        var markTypes = [];
+        
+        console.log("================");
+                
+        console.log("Empty: " + empty);
+
+        //cursor
+        if($cursor) {
+            if($cursor.parent) {
+                console.log("Cursor Parent: " + $cursor.parent.type.name);
+            }
+            
+            let ancestor;
+            for(let i = 0; (ancestor = $cursor.node(i)); i++) {
+                console.log("Cursor ancestor " + i + ": " + ancestor.type.name);
+            }
+            let cursorMarks = $cursor.marks().map(mark => mark.type.name);
+            console.log("Cursor Marks: " + cursorMarks)
+        }
+
+        //selection
+        for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
+            let {$from, $to} = ranges[rangeIndex]
+            doc.nodesBetween($from.pos, $to.pos, node => {
+
+                //get the base node and mark info
+                nodeTypes.push(node.type.name);
+
+                let nodeMarks = [];
+                node.marks.forEach(mark => {
+                    nodeMarks.push(mark.type.name);
+                });
+                markTypes.push(nodeMarks);
+            })
+        }
+        
+        console.log("Nodes: " + JSON.stringify(nodeTypes));
+        console.log("Marks: " + JSON.stringify(markTypes));
+        
+        console.log("================");
+    }
+}
+
+function stateCheckPlugin() {
+    return new Plugin({
+        view(editorView) {
+            let stateCheck = new StateCheck(editorView)
+            return stateCheck
         }
     })
 }
@@ -373,7 +461,8 @@ class MarkToggleElement {
         this.element.textContent = labelText;
 
         this.element.onclick = () => {
-            if(this.state) {
+            this.editorView.focus();
+            if(this.elementState) {
                 clearMark(this.markType,this.editorView.state,this.editorView.dispatch);
             }
             else {
@@ -470,6 +559,7 @@ class MarkDropdownElement {
         });
 
         this.element.onchange = () => {
+            this.editorView.focus();
             if(this.element.value === false) {
                 //remove mark
                 clearMark(this.markType,this.editorView.state,this.editorView.dispatch);
@@ -544,7 +634,6 @@ class MarkDropdownElement {
     /** This sets the toggle state and the display class. */
     _setElementValue(value) {
         if(this.element.value !== value) {
-            console.log("Value: " + value);
             this.element.value = value;
         }
     }
@@ -559,6 +648,8 @@ let toolbar = toolbarPlugin([
     new MarkDropdownElement(schema.marks.textcolor,"color",[false,"blue","red","green","yellow","#202020","#505050","#808080"]),
     new MarkDropdownElement(schema.marks.highlight,"color",[false,"yellow","cyan","pink","green","orange","red","#a0a0a0"])
 ])
+
+let stateCheck = stateCheckPlugin();
 
 //===================================
 // Menu Items
@@ -578,7 +669,8 @@ let state = EditorState.create({
     history(),
     keymap({"Mod-z": undo, "Mod-y": redo}),
     keymap(baseKeymap),
-    toolbar
+    toolbar,
+    stateCheck
   ]
 })
 let view = new EditorView(element, {state});
