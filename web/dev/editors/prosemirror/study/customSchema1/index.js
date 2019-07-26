@@ -68,12 +68,12 @@ const MARK_INFO = {
 }
 
 const EMPTY_MARK_DATA = {
-    strong: [],
-    em: [],
-    font: [],
-    fontsize: [],
-    color: [],
-    highlight: []
+    strong: false,
+    em: false,
+    font: false,
+    fontsize: false,
+    color: false,
+    highlight: false
 }
 
 //This is a test to measure the state of the editor. I want to use this to 
@@ -96,7 +96,10 @@ class StateCheck {
 
         var block;
         //simple deep copy
-        var data = JSON.parse(JSON.stringify(EMPTY_MARK_DATA));
+        var data = Object.assign({},EMPTY_MARK_DATA);
+        for(var key in data) {
+            data[key] = [];
+        }
         
         var nodeTypes = [];
         var markTypes = [];
@@ -390,7 +393,7 @@ const schema = new Schema({nodes, marks})
 // Our menu plugn lets us toggle marks, set block type and wrap in (which I won't use for starters)
 //===================================
 
-const {toggleMark, setBlockType, wrapIn} = require("prosemirror-commands")
+const {setBlockType, wrapIn} = require("prosemirror-commands")
 
 function markApplies(doc, ranges, type) {
   for (let i = 0; i < ranges.length; i++) {
@@ -405,10 +408,7 @@ function markApplies(doc, ranges, type) {
   return false
 }
 
-
-
-function wrapInMark(markType, attrs) {
-    return function(state, dispatch) {
+function setMark(markType, attrs, state, dispatch) {
         let {empty, $cursor, ranges} = state.selection
         if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) return false
         if (dispatch) {
@@ -416,16 +416,30 @@ function wrapInMark(markType, attrs) {
                 dispatch(state.tr.addStoredMark(markType.create(attrs)))
             } 
             else {
-//                let has = false, tr = state.tr
-//                for (let i = 0; !has && i < ranges.length; i++) {
-//                  let {$from, $to} = ranges[i]
-//                  has = state.doc.rangeHasMark($from.pos, $to.pos, markType)
-//                }
-                
                 let tr = state.tr
                 for (let i = 0; i < ranges.length; i++) {
                     let {$from, $to} = ranges[i]
                     tr.addMark($from.pos, $to.pos, markType.create(attrs))
+                }
+                dispatch(tr.scrollIntoView())
+            }
+        }
+        return true
+    }
+}
+
+function clearMark(markType, state, dispatch) {
+        let {empty, $cursor, ranges} = state.selection
+        if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) return false
+        if (dispatch) {
+            if ($cursor) {
+                dispatch(state.tr.removeStoredMark(markType))
+            } 
+            else {
+                let tr = state.tr
+                for (let i = 0; i < ranges.length; i++) {
+                    let {$from, $to} = ranges[i]
+                    tr.removeMark($from.pos, $to.pos, markType)
                 }
                 dispatch(tr.scrollIntoView())
             }
