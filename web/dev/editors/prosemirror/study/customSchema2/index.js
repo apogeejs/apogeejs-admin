@@ -62,15 +62,16 @@ class ToolbarView {
         
         if(empty) {
             if($cursor) {
-                //read the block node for the cursor
-//                let ancestor;
-//                for(let i = 0; (ancestor = $cursor.node(i)); i++) {
-//                    blocks.push(ancestor.type.name);
-//                }
-                //I AM ASSUMING SCHEMA GIVES  LAYER OF BLOCKS UNDER DOC! (I SHOULD MAKE THIS MORE GENERAL) 
-                let blockNode = $cursor.node(1);
-                if(blockNode) {
-                    blocks.push(blockNode.type.name);
+                //get the closest ancestor block node
+                let parentBlock;
+                let ancestor;
+                for(let i = 0; (ancestor = $cursor.node(i)); i++) {
+                    if(ancestor.type.isBlock) {
+                        parentBlock = ancestor;
+                    }
+                }
+                if(parentBlock) {
+                    blocks.push(parentBlock.type.name);
                 }
                 
                 //populate marks for the cursor
@@ -86,18 +87,34 @@ class ToolbarView {
 
             //the model below assumes a single level of block
             //with text nodes insides with the above specified marks available.
+            //---------------------------------------------------------------------
+            //DOH! - The logic I put in for reading the parent block node is not good,
+            //but it should work in the special schema that only allows one block node deep
+            //----------------------------------------------------------------------
             for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
                 let {$from, $to} = ranges[rangeIndex]
+                let previousBlockName = null;
                 doc.nodesBetween($from.pos, $to.pos, node => {
 
                     if(node.type.name == "text") {
                         //populate marks for this text node
                         this._updateMarkStateFromMarkList(markState,node.marks);
-                    }
-                    else {
+                        
                         //store the main block type
                         //validate this better
-                        this._addToListOnce(blocks,node.type.name);
+                        if(previousBlockName) {
+                            this._addToListOnce(blocks,previousBlockName);
+                        }
+                        else {
+                            //figure out a better way to handle this.
+                            throw new Error("No block node found for this text node!");
+                        }
+                    }
+                    else {
+                        //store latest block  - will be a block for the given text node.
+                        if(node.type.isBlock) {
+                            previousBlockName = node.type.name;
+                        }
                     }
                 })
             }
@@ -257,18 +274,28 @@ const nodes = {
   // :: NodeSpec A heading textblock, with a `level` attribute that
   // should hold the number 1 to 6. Parsed and serialized as `<h1>` to
   // `<h6>` elements.
-  heading: {
-    attrs: {level: {default: 1}},
+  heading1: {
     content: "inline*",
     group: "block",
     defining: true,
-    parseDOM: [{tag: "h1", attrs: {level: 1}},
-               {tag: "h2", attrs: {level: 2}},
-               {tag: "h3", attrs: {level: 3}},
-               {tag: "h4", attrs: {level: 4}},
-               {tag: "h5", attrs: {level: 5}},
-               {tag: "h6", attrs: {level: 6}}],
-    toDOM(node) { return ["h" + node.attrs.level, 0] }
+    parseDOM: [{tag: "h1"}],
+    toDOM(node) { return ["h1", 0] }
+  },
+  
+  heading2: {
+    content: "inline*",
+    group: "block",
+    defining: true,
+    parseDOM: [{tag: "h2"}],
+    toDOM(node) { return ["h2", 0] }
+  },
+  
+  heading3: {
+    content: "inline*",
+    group: "block",
+    defining: true,
+    parseDOM: [{tag: "h3"}],
+    toDOM(node) { return ["h3", 0] }
   },
 
   // :: NodeSpec The text node.
@@ -543,6 +570,73 @@ class MarkToggleElement {
 }
 
 
+//This is a toggle button for marks with either no attribute or fixed attributes
+class BlockToggleElement {
+    constructor(blockType,labelText) {
+        this.blockType = blockType;
+        this.labelText = labelText;
+        
+        this.element = document.createElement("span");      
+        this.element.title = labelText;
+        this.element.textContent = labelText;
+        
+        var clearBlockCommand = setBlockType(schema.nodes.paragraph);
+        var setBlockCommand = setBlockType(blockType);
+
+        this.element.onclick = () => {
+            this.editorView.focus();
+            if(this.elementState) {
+                clearBlockCommand(this.editorView.state,this.editorView.dispatch);
+            }
+            else {
+                setBlockCommand(this.editorView.state,this.editorView.dispatch);
+            }
+        }
+        
+        this._setElementState(false);
+    }
+    
+    registerEditorView(editorView) {
+        this.editorView = editorView;
+    }
+    
+    getElement() {
+        return this.element;
+    }
+    
+    /** This gets the selection info and sets whether the toggle should be on or off. */
+    update(selectionInfo) {
+        let blocks = selectionInfo.blocks;
+        
+        if((blocks.length === 1)&&(blocks[0] == this.blockType.name)) {
+            //only set state active if this is the only type in the list (not mixed)
+            this._setElementState(true);
+        }
+        else {
+            this._setElementState(false);
+        }
+    }
+        
+        //=========================
+        // internal
+        //=========================
+        
+    /** This sets the toggle state and the display class. */
+    _setElementState(state) {
+        if(this.elementState != state) {
+            this.elementState = state;
+            if(state) {
+                this.element.className = "toggleButton toggleOffClass";
+            }
+            else {
+                this.element.className = "toggleButton toggleOnClass";
+            }
+        }
+    }
+    
+}
+
+
 //This is a menu element for a mark with multiple attribute values
 //use "false" as the input values to shoe no mark
 class MarkDropdownElement {
@@ -641,6 +735,10 @@ class MarkDropdownElement {
 
 
 let toolbar = toolbarPlugin([
+    new BlockToggleElement(schema.nodes.paragraph,"Paragraph"),
+    new BlockToggleElement(schema.nodes.heading1,"H1"),
+    new BlockToggleElement(schema.nodes.heading2,"H2"),
+    new BlockToggleElement(schema.nodes.heading3,"H2"),
     new MarkToggleElement(schema.marks.bold,null,"Bold"),
     new MarkToggleElement(schema.marks.italic,null,"Italic"),
     new MarkDropdownElement(schema.marks.fontfamily,"fontfamily",[false,"Sans-serif","Serif","Monospace"]),

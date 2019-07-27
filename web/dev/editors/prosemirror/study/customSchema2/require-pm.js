@@ -1,4 +1,6 @@
-// Kludge to make requiring prosemirror core libraries possible. The
+
+// 
+// // Kludge to make requiring prosemirror core libraries possible. The
 // PM global is defined by http://prosemirror.net/examples/prosemirror.js,
 // which bundles all the core libraries.
 function require(name) {
