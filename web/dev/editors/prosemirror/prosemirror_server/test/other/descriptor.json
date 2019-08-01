@@ -1,0 +1,35 @@
+{
+	"workspaces": {
+		"triggerTestWorkspace": {
+			"source": "test/other/triggerTestWorkspace.json",
+			"endpoints": {
+				"triggerTest": {
+					"inputs": {
+						"trigger": "Model.inputTrigger"
+					},
+					"triggerValue": "anything you want. If there is nothing set, 'true' will be used.",
+					"outputs": {
+						"body": "Model.currentUTC"
+					}
+				}
+			}
+		},
+		"otherTestWorkspace": {
+			"source": "test/other/otherTestWorkspace.json",
+			"endpoints": {
+				"staticReturn": {
+					"inputs": {
+					},
+					"outputs": {
+						"body": "Model.staticReturn"
+					}
+				},
+				"noReturn": {
+					"inputs": {
+						"body": "Model.inputWithNoReturn" 
+					}
+				}
+			}
+		}
+	}
+}

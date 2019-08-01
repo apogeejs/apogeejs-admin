@@ -1,0 +1,64 @@
+
+
+
+
+
+<!doctype html>
+<html>
+    <head>
+        <meta charset=utf8>
+        <base href="/file/">
+        <link rel=stylesheet href="editor.css">
+        <script src="/file/import-require.js"></script>
+        <script src="/file/orderedmap.js"></script>
+        <script src="/file/rope-sequence.js"></script>
+        <script src="/file/w3c-keyname.js"></script>
+        <script src="/file/prosemirror-model.js"></script>
+        <script src="/file/prosemirror-transform.js"></script>
+        <script src="/file/prosemirror-state.js"></script>
+        <script src="/file/prosemirror-commands.js"></script>
+        <script src="/file/prosemirror-view.js"></script>
+        <script src="/file/prosemirror-history.js"></script>
+        <script src="/file/prosemirror-keymap.js"></script>
+        <script src="/file/prosemirror-history.js"></script>
+
+
+        <script src="/file/index.js" defer></script>
+        <style>
+            .editorClass {
+                height: 500px;
+                outline: 1px solid gray;
+            }
+            .toolbar {
+                border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+                line-height: 0.1;
+            }
+            .toggleButton {
+                display: inline-block;
+                border-right: 1px solid rgba(0, 0, 0, 0.2);
+                color: #888;
+                line-height: 1;
+                padding: 0 7px;
+                margin: 1px;
+                cursor: pointer;
+                text-align: center;
+                min-width: 1.4em;
+            }
+            .toggleOffClass {
+                
+            }
+            .toggleOffClass {
+                background-color: lightblue;
+            }
+        </style>
+        
+        <!--
+        This code uses the base schema and has a simple menu we can use to add commands.
+        -->
+    </head>
+    <body>
+        <div id="editor" class="editorClass"></div>
+    </body>
+</html>
+
+

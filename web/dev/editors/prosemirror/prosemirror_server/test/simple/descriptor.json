@@ -1,0 +1,18 @@
+{
+	"workspaces": {
+		"simple": {
+			"source": "test/simple/simpleWorkspace.json",
+			"endpoints": {
+				"processNumber": {
+					"inputs": {
+						"body": "Model.inputBody",
+						"queryParams": "Model.inputParams"
+					},
+					"outputs": {
+						"body": "Model.outputNumber"
+					}
+				}
+			}
+		}
+	}
+}
