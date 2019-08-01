@@ -60,7 +60,7 @@ apogeeapp.app.CommandHistory = class {
     
     /** If there is an undo command, this method will return the description if there
      * is one or an empty string. If there is no undo command, this method will return
-     * the value apogee.app.CommandHistory.NO_COMMAND. */
+     * the value apogeeapp.CommandHistory.NO_COMMAND. */
     getNextUndoDesc() {
         let command = this._getNextUndoCommand(false);
         if(command) {
@@ -78,8 +78,8 @@ apogeeapp.app.CommandHistory = class {
     
     /** If there is an redo command, this method will return the description if there
      * is one or an empty string. If there is no undo command, this method will return
-     * the value apogee.app.CommandHistory.NO_COMMAND. To test equality with
-     * apogee.app.CommandHistory.NO_COMMAND, use == or ===. Do not test equality
+     * the value apogeeapp.CommandHistory.NO_COMMAND. To test equality with
+     * apogeeapp.CommandHistory.NO_COMMAND, use == or ===. Do not test equality
      * with json equals!*/
     getNextRedoDesc() {
         let command = this._getNextRedoCommand(false);
