@@ -1,4 +1,5 @@
 import util from "/apogeeutil/util.js";
+import action from "/apogee/actions/action.js";
 
 apogeeapp.app.movecomponent = {};
 
