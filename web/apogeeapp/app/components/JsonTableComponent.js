@@ -165,7 +165,7 @@ apogeeapp.app.JsonTableComponent.ICON_RES_PATH = "/componentIcons/dataTable.png"
  * create the member for this object. The field "name" can be omitted. This will 
  * be added when the member is created. */
 apogeeapp.app.JsonTableComponent.DEFAULT_MEMBER_JSON = {
-    "type": apogee.JsonTable.generator.type
+    "type": "apogee.JsonTable"
 };
 /** This is configuration for the properties dialog box, the results of which
  * our code will read in. */

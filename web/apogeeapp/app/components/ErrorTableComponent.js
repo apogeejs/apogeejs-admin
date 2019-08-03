@@ -75,6 +75,6 @@ apogeeapp.app.ErrorTableComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.ErrorTableComponent.DEFAULT_HEIGHT = 100;
 apogeeapp.app.ErrorTableComponent.ICON_RES_PATH = "/componentIcons/genericDataTable.png";
 apogeeapp.app.ErrorTableComponent.DEFAULT_MEMBER_JSON = {
-    "type": apogee.ErrorTable.generator.type
+    "type": "apogee.ErrorTable"
 };
 

@@ -73,7 +73,7 @@ apogeeapp.app.FunctionComponent.DEFAULT_WIDTH = 400;
 apogeeapp.app.FunctionComponent.DEFAULT_HEIGHT = 400;
 apogeeapp.app.FunctionComponent.ICON_RES_PATH = "/componentIcons/functionTable.png";
 apogeeapp.app.FunctionComponent.DEFAULT_MEMBER_JSON = {
-    "type": apogee.FunctionTable.generator.type
+    "type": "apogee.FunctionTable"
 };
 apogeeapp.app.FunctionComponent.propertyDialogLines = [
     {

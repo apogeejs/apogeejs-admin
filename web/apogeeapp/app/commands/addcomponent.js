@@ -71,7 +71,7 @@ apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,crea
         if(member) {
             
             var componentGenerator = apogeeapp.app.Apogee.getInstance().getComponentGenerator(componentJson.type);
-            if((!componentGenerator)||(member.constructor == apogee.ErrorTable)) {
+            if((!componentGenerator)||(member.generator.type == "apogee.ErrorTable")) {
                 //throw base.createError("Component type not found: " + componentType);
 
                 //table not found - create an empty table

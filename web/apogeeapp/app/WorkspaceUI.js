@@ -1,4 +1,7 @@
 import base from "/apogeeutil/base.js";
+import Workspace from "/apogee/data/Workspace.js";
+import "/apogee/commandConfig.js";
+import "/apogee/tableConfig.js";
 
 /** This class manages the user interface for a workspace object. */
 apogeeapp.app.WorkspaceUI = class {
@@ -55,14 +58,14 @@ apogeeapp.app.WorkspaceUI = class {
         var actionResult;
 
         //create workspace
-        this.workspace = new apogee.Workspace();
+        this.workspace = new Workspace();
         if(workspaceJson) {
             workspaceDataJson = workspaceJson.workspace;
             workspaceComponentsJson = workspaceJson.components;
         }
         else {
             //set up an empty workspace
-            workspaceDataJson = apogee.Workspace.EMPTY_WORKSPACE_JSON;
+            workspaceDataJson = Workspace.EMPTY_WORKSPACE_JSON;
             workspaceComponentsJson = apogeeapp.app.FolderComponent.EMPTY_FOLDER_COMPONENT_JSON;
         }
         

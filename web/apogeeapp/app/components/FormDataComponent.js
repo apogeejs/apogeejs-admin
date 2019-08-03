@@ -166,7 +166,7 @@ apogeeapp.app.FormDataComponent.DEFAULT_WIDTH = 300;
 apogeeapp.app.FormDataComponent.DEFAULT_HEIGHT = 300;
 apogeeapp.app.FormDataComponent.ICON_RES_PATH = "/componentIcons/formControl.png";
 apogeeapp.app.FormDataComponent.DEFAULT_MEMBER_JSON = {
-        "type": apogee.Folder.generator.type,
+        "type": "apogee.Folder",
         "childrenNotWriteable": true,
         "children": {
             "layout": {

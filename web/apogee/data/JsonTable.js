@@ -1,10 +1,11 @@
 import base from "/apogeeutil/base.js";
 import util from "/apogeeutil/util.js";
+import Workspace from "/apogee/data/Workspace.js";
 
 /** This class encapsulatees a data table for a JSON object */
-apogee.JsonTable = function(name,owner,initialData) {
+function JsonTable(name,owner,initialData) {
     //base init
-    apogee.Member.init.call(this,name,apogee.JsonTable.generator);
+    apogee.Member.init.call(this,name,JsonTable.generator);
     apogee.Dependent.init.call(this);
     apogee.ContextHolder.init.call(this);
 	apogee.Codeable.init.call(this,[],true);
@@ -34,10 +35,10 @@ apogee.JsonTable = function(name,owner,initialData) {
 }
 
 //add components to this class
-base.mixin(apogee.JsonTable,apogee.Member);
-base.mixin(apogee.JsonTable,apogee.Dependent);
-base.mixin(apogee.JsonTable,apogee.ContextHolder);
-base.mixin(apogee.JsonTable,apogee.Codeable);
+base.mixin(JsonTable,apogee.Member);
+base.mixin(JsonTable,apogee.Dependent);
+base.mixin(JsonTable,apogee.ContextHolder);
+base.mixin(JsonTable,apogee.Codeable);
 
 //------------------------------
 // Codeable Methods
@@ -46,11 +47,11 @@ base.mixin(apogee.JsonTable,apogee.Codeable);
 /** This method returns the argument list. We override it because
  * for JsonTable it gets cleared when data is set. However, whenever code
  * is used we want the argument list to be this value. */
-apogee.JsonTable.prototype.getArgList = function() {
+JsonTable.prototype.getArgList = function() {
     return [];
 }
 	
-apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
+JsonTable.prototype.processMemberFunction = function(memberGenerator) {
     
     //first initialize
     var initialized = this.memberFunctionInitialize();
@@ -87,7 +88,7 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
 /** This method extends set data from member. It also
  * freezes the object so it is immutable. (in the future we may
  * consider copying instead, or allowing a choice)*/
-apogee.JsonTable.prototype.setData = function(data) {
+JsonTable.prototype.setData = function(data) {
     
 	//make this object immutable
 	base.deepFreeze(data);
@@ -98,20 +99,20 @@ apogee.JsonTable.prototype.setData = function(data) {
 
 /** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-apogee.JsonTable.fromJson = function(owner,json) {
-    return new apogee.JsonTable(json.name,owner,json.updateData);
+JsonTable.fromJson = function(owner,json) {
+    return new JsonTable(json.name,owner,json.updateData);
 }
 
 //============================
 // Static methods
 //============================
 
-apogee.JsonTable.generator = {};
-apogee.JsonTable.generator.displayName = "Table";
-apogee.JsonTable.generator.type = "apogee.JsonTable";
-apogee.JsonTable.generator.createMember = apogee.JsonTable.fromJson;
-apogee.JsonTable.generator.setDataOk = true;
-apogee.JsonTable.generator.setCodeOk = true;
+JsonTable.generator = {};
+JsonTable.generator.displayName = "Table";
+JsonTable.generator.type = "apogee.JsonTable";
+JsonTable.generator.createMember = JsonTable.fromJson;
+JsonTable.generator.setDataOk = true;
+JsonTable.generator.setCodeOk = true;
 
 //register this member
-apogee.Workspace.addMemberGenerator(apogee.JsonTable.generator);
+Workspace.addMemberGenerator(JsonTable.generator);

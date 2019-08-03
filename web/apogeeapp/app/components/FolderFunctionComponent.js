@@ -57,7 +57,7 @@ apogeeapp.app.FolderFunctionComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.FolderFunctionComponent.DEFAULT_HEIGHT = 500;
 apogeeapp.app.FolderFunctionComponent.ICON_RES_PATH = "/componentIcons/folderFunction.png";
 apogeeapp.app.FolderFunctionComponent.DEFAULT_MEMBER_JSON = {
-    "type": apogee.FolderFunction.generator.type
+    "type": "apogee.FolderFunction"
 };
 apogeeapp.app.FolderFunctionComponent.propertyDialogLines = [
     {
@@ -85,7 +85,7 @@ apogeeapp.app.FolderFunctionComponent.transferMemberProperties = function(inputV
 apogeeapp.app.FolderFunctionComponent.appendWorkspaceChildren = function(optionsJson,childrenJson) {
     var internalFolderJson = {};
     internalFolderJson.name = optionsJson.name;
-    internalFolderJson.type = apogee.Folder.generator.type;
+    internalFolderJson.type = "apogee.Folder";
     apogeeapp.app.FolderComponent.generator.appendWorkspaceChildren(internalFolderJson,childrenJson);
     optionsJson.internalFolder = internalFolderJson;
 }

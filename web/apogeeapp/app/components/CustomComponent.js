@@ -333,7 +333,7 @@ apogeeapp.app.CustomComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.CustomComponent.DEFAULT_HEIGHT = 500;
 apogeeapp.app.CustomComponent.ICON_RES_PATH = "/componentIcons/chartControl.png";
 apogeeapp.app.CustomComponent.DEFAULT_MEMBER_JSON = {
-    "type": apogee.JsonTable.generator.type
+    "type": "apogee.JsonTable"
 };
 apogeeapp.app.CustomComponent.propertyDialogLines = [
     {

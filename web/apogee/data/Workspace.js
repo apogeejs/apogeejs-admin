@@ -2,14 +2,6 @@ import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManager.js";
 import {doAction} from "/apogee/actions/action.js";
 
-/** These are self installing commands. The have no exports. */
-import "/apogee/actions/createmember.js";
-import "/apogee/actions/updatemember.js";
-import "/apogee/actions/deletemember.js";
-import "/apogee/actions/updatefolderfunction.js";
-import "/apogee/actions/updateworkspace.js";
-
-
 /** This is the workspace. Typically owner should be null. It
  * is used for creating virtual workspaces. 
  * - optionalJson - For new workspaces this can be empty. If we are deserializing an existing
@@ -18,7 +10,7 @@ import "/apogee/actions/updateworkspace.js";
  * used for the virtual workspace created for folder functions, so the folder function can 
  * access variables from the larger workspace.
  * */
-apogee.Workspace = function(optionalContextOwner) {
+export default function Workspace(optionalContextOwner) {
     //base init
     EventManager.init.call(this);
     apogee.ContextHolder.init.call(this);
@@ -29,25 +21,25 @@ apogee.Workspace = function(optionalContextOwner) {
     this.actionInProgress = false;
     this.messengerActionList = []
     this.consecutiveActionCount = 0;
-    this.activeConsecutiveActionLimit = apogee.Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT;
-    this.name = apogee.Workspace.DEFAULT_WORKSPACE_NAME;
+    this.activeConsecutiveActionLimit = Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT;
+    this.name = Workspace.DEFAULT_WORKSPACE_NAME;
     
     this.owner = optionalContextOwner ? optionalContextOwner : null;
 }
 
 //add components to this class
-base.mixin(apogee.Workspace,EventManager);
-base.mixin(apogee.Workspace,apogee.ContextHolder);
-base.mixin(apogee.Workspace,apogee.Owner);
-base.mixin(apogee.Workspace,apogee.RootHolder);
+base.mixin(Workspace,EventManager);
+base.mixin(Workspace,apogee.ContextHolder);
+base.mixin(Workspace,apogee.Owner);
+base.mixin(Workspace,apogee.RootHolder);
 
 
-apogee.Workspace.DEFAULT_WORKSPACE_NAME = "Workspace";
-apogee.Workspace.ROOT_FOLDER_NAME = "Model";
+Workspace.DEFAULT_WORKSPACE_NAME = "Workspace";
+Workspace.ROOT_FOLDER_NAME = "Model";
 
-apogee.Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT = 500;
+Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT = 500;
 
-apogee.Workspace.EMPTY_WORKSPACE_JSON = {
+Workspace.EMPTY_WORKSPACE_JSON = {
     "fileType": "apogee workspace",
     "version": 0.2,
     "name": "Custom Component Demo",
@@ -58,40 +50,40 @@ apogee.Workspace.EMPTY_WORKSPACE_JSON = {
 }
 
 /** This method returns the root object - implemented from RootHolder.  */
-apogee.Workspace.prototype.setName = function(name) {
+Workspace.prototype.setName = function(name) {
     this.name = name;
 }
 
 /** This method returns the root object - implemented from RootHolder.  */
-apogee.Workspace.prototype.getName = function() {
+Workspace.prototype.getName = function() {
     return this.name;
 }
 
 /** This method returns the root object - implemented from RootHolder.  */
-apogee.Workspace.prototype.getRoot = function() {
+Workspace.prototype.getRoot = function() {
     return this.rootFolder;
 }
 
 /** This method sets the root object - implemented from RootHolder.  */
-apogee.Workspace.prototype.setRoot = function(member) {
+Workspace.prototype.setRoot = function(member) {
     this.rootFolder = member;
 }
 
 /** This allows for a workspace to have a parent. For a normal workspace this should be null. 
  * This is used for finding variables in scope. */
-apogee.Workspace.prototype.getOwner = function() {
+Workspace.prototype.getOwner = function() {
     return this.owner;
 }
 
 /** This method updates the dependencies of any children in the workspace. */
-apogee.Workspace.prototype.updateDependeciesForModelChange = function(recalculateList) {
+Workspace.prototype.updateDependeciesForModelChange = function(recalculateList) {
     if(this.rootFolder) {
         this.rootFolder.updateDependeciesForModelChange(recalculateList);
     }
 }
 
 /** This method removes any data from this workspace on closing. */
-apogee.Workspace.prototype.onClose = function() {
+Workspace.prototype.onClose = function() {
     this.rootFolder.onClose();
 }
 
@@ -100,19 +92,19 @@ apogee.Workspace.prototype.onClose = function() {
 //------------------------------
 
 /** This function triggers the action for the queued action to be run when the current thread exits. */
-apogee.Workspace.prototype.isActionInProgress = function() {
+Workspace.prototype.isActionInProgress = function() {
     return this.actionInProgress;
 }
 
-apogee.Workspace.prototype.setActionInProgress = function(inProgress) {
+Workspace.prototype.setActionInProgress = function(inProgress) {
     this.actionInProgress = inProgress;
 }
 
-apogee.Workspace.prototype.saveMessengerAction = function(actionInfo) {
+Workspace.prototype.saveMessengerAction = function(actionInfo) {
     this.messengerActionList.push(actionInfo);
 }
 
-apogee.Workspace.prototype.getSavedMessengerAction = function() {
+Workspace.prototype.getSavedMessengerAction = function() {
     if(this.messengerActionList.length > 0) {
         var actionData = {};
         actionData.action = apogee.compoundaction.ACTION_NAME;
@@ -130,7 +122,7 @@ apogee.Workspace.prototype.getSavedMessengerAction = function() {
  * action count so next time it will take longer. Any call to clearConsecutiveQueuedActionCount
  * will return it to the default initial value.
  */
-apogee.Workspace.prototype.checkConsecutiveQueuedActionLimitExceeded = function() {
+Workspace.prototype.checkConsecutiveQueuedActionLimitExceeded = function() {
     this.consecutiveActionCount++;
     
     //check the limit
@@ -144,7 +136,7 @@ apogee.Workspace.prototype.checkConsecutiveQueuedActionLimitExceeded = function(
 }
 
 /** This should be called wo abort any queued actions. */
-apogee.Workspace.prototype.setCalculationCanceled = function() {
+Workspace.prototype.setCalculationCanceled = function() {
     //reset queued action variables
     this.clearCommandQueue();
     
@@ -152,13 +144,13 @@ apogee.Workspace.prototype.setCalculationCanceled = function() {
 }
 
 /** This should be called when there is not a queued action. */
-apogee.Workspace.prototype.clearConsecutiveQueuedTracking = function() {
+Workspace.prototype.clearConsecutiveQueuedTracking = function() {
     this.consecutiveActionCount = 0;
-    this.activeConsecutiveActionLimit = apogee.Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT;
+    this.activeConsecutiveActionLimit = Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT;
 }
 
 /** This method resets the command queue */
-apogee.Workspace.prototype.clearCommandQueue = function() {
+Workspace.prototype.clearCommandQueue = function() {
     //reset queued action variables
     this.messengerActionList = [];
     this.clearConsecutiveQueuedTracking();
@@ -170,18 +162,18 @@ apogee.Workspace.prototype.clearCommandQueue = function() {
 //------------------------------
 
 /** this method is implemented for the Owner component/mixin. */
-apogee.Workspace.prototype.getWorkspace = function() {
+Workspace.prototype.getWorkspace = function() {
    return this;
 }
 
 /** this method gets the hame the children inherit for the full name. */
-apogee.Workspace.prototype.getPossesionNameBase = function() {
+Workspace.prototype.getPossesionNameBase = function() {
     //the name starts over at a new workspace
     return "";
 }
 
 /** This method looks up a member by its full name. */
-apogee.Workspace.prototype.getMemberByPathArray = function(path,startElement) {
+Workspace.prototype.getMemberByPathArray = function(path,startElement) {
     if(startElement === undefined) startElement = 0;
     if(path[startElement] === this.rootFolder.getName()) {
         if(startElement === path.length-1) {
@@ -202,7 +194,7 @@ apogee.Workspace.prototype.getMemberByPathArray = function(path,startElement) {
 //------------------------------
 
 /** This method retrieve creates the loaded context manager. */
-apogee.Workspace.prototype.createContextManager = function() {
+Workspace.prototype.createContextManager = function() {
     //set the context manager
     var contextManager = new apogee.ContextManager(this);
     
@@ -226,36 +218,36 @@ apogee.Workspace.prototype.createContextManager = function() {
 //============================
 
 /** This is the supported file type. */
-apogee.Workspace.SAVE_FILE_TYPE = "apogee workspace";
+Workspace.SAVE_FILE_TYPE = "apogee workspace";
 
 /** This is the supported file version. */
-apogee.Workspace.SAVE_FILE_VERSION = 0.2;
+Workspace.SAVE_FILE_VERSION = 0.2;
 
 /** This method creates a headless workspace json from a folder json. It
  * is used in the folder function. */
-apogee.Workspace.createWorkpaceJsonFromFolderJson = function(name,folderJson) {
+Workspace.createWorkpaceJsonFromFolderJson = function(name,folderJson) {
 	//create a workspace json from the root folder json
 	var workspaceJson = {};
-    workspaceJson.fileType = apogee.Workspace.SAVE_FILE_TYPE;
-    workspaceJson.version = apogee.Workspace.SAVE_FILE_VERSION;
+    workspaceJson.fileType = Workspace.SAVE_FILE_TYPE;
+    workspaceJson.version = Workspace.SAVE_FILE_VERSION;
     workspaceJson.name = name;
     workspaceJson.data = folderJson;
 	return workspaceJson;
 }
 
 /** This saves the workspace */
-apogee.Workspace.prototype.toJson = function() {
+Workspace.prototype.toJson = function() {
     var rootFolderJson = this.rootFolder.toJson();
-    return apogee.Workspace.createWorkpaceJsonFromFolderJson(this.name,rootFolderJson);
+    return Workspace.createWorkpaceJsonFromFolderJson(this.name,rootFolderJson);
 }
 
 /** This is loads data from the given json into this workspace. */
-apogee.Workspace.prototype.loadFromJson = function(json) {
+Workspace.prototype.loadFromJson = function(json) {
     var fileType = json.fileType;
-	if(fileType !== apogee.Workspace.SAVE_FILE_TYPE) {
+	if(fileType !== Workspace.SAVE_FILE_TYPE) {
 		throw base.createError("Bad file format.",false);
 	}
-    if(json.version !== apogee.Workspace.SAVE_FILE_VERSION) {
+    if(json.version !== Workspace.SAVE_FILE_VERSION) {
         throw base.createError("Incorrect file version. CHECK APOGEEJS.COM FOR VERSION CONVERTER.",false);
     }
 
@@ -276,15 +268,15 @@ apogee.Workspace.prototype.loadFromJson = function(json) {
 // Member generator functions
 //================================
 
-apogee.Workspace.memberGenerators = {};
+Workspace.memberGenerators = {};
 
 /** This methods retrieves the member generator for the given type. */
-apogee.Workspace.getMemberGenerator = function(type) {
-    return apogee.Workspace.memberGenerators[type];
+Workspace.getMemberGenerator = function(type) {
+    return Workspace.memberGenerators[type];
 }
 
 /** This method registers the member generator for a given named type. */
-apogee.Workspace.addMemberGenerator = function(generator) {
-    apogee.Workspace.memberGenerators[generator.type] = generator;
+Workspace.addMemberGenerator = function(generator) {
+    Workspace.memberGenerators[generator.type] = generator;
 }
 

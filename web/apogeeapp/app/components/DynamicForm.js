@@ -99,7 +99,7 @@ apogeeapp.app.DynamicForm.DEFAULT_WIDTH = 400;
 apogeeapp.app.DynamicForm.DEFAULT_HEIGHT = 400;
 apogeeapp.app.DynamicForm.ICON_RES_PATH = "/componentIcons/formControl.png";
 apogeeapp.app.DynamicForm.DEFAULT_MEMBER_JSON = {
-    "type": apogee.FunctionTable.generator.type,
+    "type": "apogee.FunctionTable",
     "updateData": {
         "argList": ["admin"]
     }

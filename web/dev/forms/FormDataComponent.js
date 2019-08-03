@@ -100,7 +100,7 @@ apogeeapp.app.FormDataComponent = class extends apogeeapp.app.EditComponent {
     static getCreateMemberPayload(userInputValues) {
         var json = {};
         json.name = userInputValues.name;
-        json.type = apogee.JsonTable.generator.type;
+        json.type = "apogee.JsonTable";
         return json;
     }
 }

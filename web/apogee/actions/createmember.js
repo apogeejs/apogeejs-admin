@@ -1,4 +1,5 @@
 import {addActionInfo} from "/apogee/actions/action.js";
+import Workspace from "/apogee/data/Workspace.js";
 
 /** This is self installing command module. It has no exports
  * but it must be imported to install the command. 
@@ -53,7 +54,7 @@ function createMemberImpl(owner,actionData,actionResult) {
     //create member
     var generator;
     if(memberJson) {
-        generator = apogee.Workspace.getMemberGenerator(memberJson.type);
+        generator = Workspace.getMemberGenerator(memberJson.type);
     }
 
     if(generator) {
@@ -75,7 +76,8 @@ function createMemberImpl(owner,actionData,actionResult) {
     }
     else {
         //type not found! - create a dummy object and add an error to it
-        member = apogee.ErrorTable.generator.createMember(owner,memberJson);
+        var errorTableGenerator = Workspace.getMemberGenerator("appogee.ErrorTable");
+        member = errorTableGenerator.createMember(owner,memberJson);
         var error = new apogee.ActionError("Member type not found: " + memberJson.type,apogee.ActionError.ERROR_TYPE_APP,null);
         member.addError(error);
         
