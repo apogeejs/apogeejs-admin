@@ -1,6 +1,10 @@
+import base from "/apogeeutil/base.js";
+import util from "/apogeeutil/util.js";
+import EventManager from "/apogeeutil/EventManager.js";
+
 /** This is the base functionality for a component. */
 apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
     
     this.workspaceUI = workspaceUI;
     this.member = member;
@@ -29,7 +33,7 @@ apogeeapp.app.Component = function(workspaceUI,member,componentGenerator) {
 }
 
 //add components to this class
-apogee.base.mixin(apogeeapp.app.Component,apogee.EventManager);
+base.mixin(apogeeapp.app.Component,EventManager);
 
 //These parameters are used to order the components in the tree entry.
 apogeeapp.app.Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER = 5;
@@ -342,12 +346,12 @@ apogeeapp.app.Component.prototype.memberUpdated = function(eventInfo) {
         this.fieldUpdated("member");
         
         //check for name changes
-        if(apogee.util.isFieldUpdated(updatedMemberFields,"name")) {
+        if(util.isFieldUpdated(updatedMemberFields,"name")) {
             this.fieldUpdated("name");
         }
         
         //check for parent change
-        if(apogee.util.isFieldUpdated(updatedMemberFields,"owner")) {
+        if(util.isFieldUpdated(updatedMemberFields,"owner")) {
             this.fieldUpdated("owner");
             
             //old parent change logic!!!
@@ -528,7 +532,7 @@ apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,
     var component = new componentGenerator(workspaceUI,member);
 
     //call member updated to process and notify of component creation
-    var eventInfo = apogee.util.getAllFieldsInfo(member);
+    var eventInfo = util.getAllFieldsInfo(member);
     component.memberUpdated(eventInfo);
     
     //apply any serialized values
@@ -547,7 +551,7 @@ apogeeapp.app.Component.createComponentFromMember = function(componentGenerator,
  * It uses default values and then overwrites in with optionalBaseValues (these are intended to be base values outside of user input values)
  * and then optionalOverrideValues (these are intended to be user input values) */
 apogeeapp.app.Component.createMemberJson = function(componentGenerator,optionalInputProperties,optionalBaseValues) {
-    var json = apogee.util.jsonCopy(componentGenerator.DEFAULT_MEMBER_JSON);
+    var json = util.jsonCopy(componentGenerator.DEFAULT_MEMBER_JSON);
     if(optionalBaseValues) {
         for(var key in optionalBaseValues) {
             json[key]= optionalBaseValues[key];
@@ -569,7 +573,7 @@ apogeeapp.app.Component.createMemberJson = function(componentGenerator,optionalI
 /** This function merges values from two objects containing component property values. */
 apogeeapp.app.Component.createComponentJson = function(componentGenerator,optionalInputProperties,optionalBaseValues) {
     //copy the base properties
-    var newPropertyValues = optionalBaseValues ? apogee.util.jsonCopy(optionalBaseValues) : {};
+    var newPropertyValues = optionalBaseValues ? util.jsonCopy(optionalBaseValues) : {};
     
     //set the type
     newPropertyValues.type = componentGenerator.uniqueName;

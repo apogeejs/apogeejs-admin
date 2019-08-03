@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 apogeeapp.app.updatelinkseq = {};
 
 apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_URL_LINE = {
@@ -79,9 +81,9 @@ apogeeapp.app.updatelinkseq.updateLink = function(referenceEntry) {
     titleLine.type = "title";
     titleLine.title = entryTypeInfo.UPDATE_ENTRY_TEXT;
 
-    var urlLine = apogee.util.jsonCopy(apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_URL_LINE);
+    var urlLine = util.jsonCopy(apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_URL_LINE);
     urlLine.initial = initialValues.url;
-    var nicknameLine = apogee.util.jsonCopy(apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_NICKNAME_LINE);
+    var nicknameLine = util.jsonCopy(apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_NICKNAME_LINE);
     nicknameLine.initial = initialValues.nickname;
 
     var dialogLayout = {};

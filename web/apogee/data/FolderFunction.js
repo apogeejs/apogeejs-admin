@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import action from "/apogee/actions/action.js";
+
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
 apogee.FolderFunction = function(name,owner,initialData,createEmptyInternalFolder) {
@@ -26,11 +29,11 @@ apogee.FolderFunction = function(name,owner,initialData,createEmptyInternalFolde
 }
 
 //add components to this class
-apogee.base.mixin(apogee.FolderFunction,apogee.Member);
-apogee.base.mixin(apogee.FolderFunction,apogee.Dependent);
-apogee.base.mixin(apogee.FolderFunction,apogee.ContextHolder);
-apogee.base.mixin(apogee.FolderFunction,apogee.Owner);
-apogee.base.mixin(apogee.FolderFunction,apogee.RootHolder);
+base.mixin(apogee.FolderFunction,apogee.Member);
+base.mixin(apogee.FolderFunction,apogee.Dependent);
+base.mixin(apogee.FolderFunction,apogee.ContextHolder);
+base.mixin(apogee.FolderFunction,apogee.Owner);
+base.mixin(apogee.FolderFunction,apogee.RootHolder);
 
 apogee.FolderFunction.INTERNAL_FOLDER_NAME = "root";
 
@@ -129,7 +132,7 @@ apogee.FolderFunction.getPropertyUpdateAction = function(folderFunction,newValue
         
         var argList;
         if(newValues.argListString) {
-            argList = apogee.FunctionTable.parseStringArray(newValues.argListString);
+            argList = util.parseStringArray(newValues.argListString);
         }
         else {
             argList = this.argList;
@@ -309,7 +312,7 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         actionData.actions = updateActionList;
 
         //apply the update
-        var actionResult = apogee.action.doAction(virtualWorkspace,actionData);        
+        var actionResult = action.doAction(virtualWorkspace,actionData);        
         if(actionResult.alertMsg) {
             apogeeapp.app.CommandManager.errorAlert(actionResult.alertMsg);
         }

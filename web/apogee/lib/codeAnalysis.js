@@ -1,3 +1,5 @@
+import base from "/apogeeutil/base.js";
+
 /** This function parses the code and returns a table that gives the variable use
  * in the passed function. The var info table has the following content
  * - it is a map with an entry for each variable accessed. (This refers just to
@@ -580,7 +582,7 @@ apogee.codeAnalysis.markLocalVariables = function(processInfo) {
  * }
  * @private */
 apogee.codeAnalysis.createParsingError = function(errorMsg,location) {
-    var error = apogee.base.createError(errorMsg,false);
+    var error = base.createError(errorMsg,false);
     if(location) {
         error.lineNumber = location.start.line;
         error.column = location.start.column;

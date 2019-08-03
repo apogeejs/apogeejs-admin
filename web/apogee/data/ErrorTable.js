@@ -1,3 +1,5 @@
+import base from "/apogeeutil/base.js";
+
 /** This class encapsulatees a table with no specific functionality. It
  * is intended to be used as a placeholder when a table generator is not found. */
 apogee.ErrorTable = function(name,owner,completeJson) {
@@ -20,8 +22,8 @@ apogee.ErrorTable = function(name,owner,completeJson) {
 }
 
 //add components to this class
-apogee.base.mixin(apogee.ErrorTable,apogee.Member);
-//apogee.base.mixin(apogee.ErrorTable,apogee.Dependent);
+base.mixin(apogee.ErrorTable,apogee.Member);
+//base.mixin(apogee.ErrorTable,apogee.Dependent);
 
 //------------------------------
 // Member Methods
@@ -33,7 +35,7 @@ apogee.base.mixin(apogee.ErrorTable,apogee.Member);
 apogee.ErrorTable.prototype.setData = function(data) {
     
 	//make this object immutable
-	apogee.base.deepFreeze(data);
+	base.deepFreeze(data);
 
 	//store the new object
     return apogee.Member.setData.call(this,data);

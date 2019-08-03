@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** This component represents a folderFunction, which is a function that is programmed using
  *apogee tables rather than writing code. */
 apogeeapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction) {
@@ -71,7 +73,7 @@ apogeeapp.app.FolderFunctionComponent.propertyDialogLines = [
 ];
 apogeeapp.app.FolderFunctionComponent.transferMemberProperties = function(inputValues,propertyJson) {
     if(inputValues.argListString !== undefined) {
-        var argList = apogee.FunctionTable.parseStringArray(inputValues.argListString);
+        var argList = util.parseStringArray(inputValues.argListString);
         propertyJson.argList = argList;
     }
     if(inputValues.returnValueString !== undefined) {

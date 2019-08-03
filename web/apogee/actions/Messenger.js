@@ -1,6 +1,8 @@
+import action from "/apogee/actions/action.js";
+
 /** This is a messenger class for sending action messages. 
  * If the send fails, and exception will be thrown. */
-apogee.action.Messenger = class {
+export default class Messenger {
     
     constructor(fromMember) {
         this.workspace = fromMember.getWorkspace();
@@ -39,7 +41,7 @@ apogee.action.Messenger = class {
         }
         
         //return is handled above asynchronously
-        apogee.action.doAction(this.workspace,actionData);
+        action.doAction(this.workspace,actionData);
     }
 
     /** This is similar to dataUpdate except is allows multiple values to be set.
@@ -82,7 +84,7 @@ apogee.action.Messenger = class {
         }
         
         //return is handled above asynchronously
-        apogee.action.doAction(this.workspace,actionData);
+        action.doAction(this.workspace,actionData);
     }
     
     //=====================

@@ -1,3 +1,5 @@
+import action from "/apogee/actions/action.js";
+
 /** This namespace contains the update member actions */
 apogee.updateworkspace = {};
 
@@ -43,4 +45,4 @@ apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_INFO = {
 };
 
 //The following code registers the actions
-apogee.action.addActionInfo(apogee.updateworkspace.ACTION_NAME,apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_INFO);
+action.addActionInfo(apogee.updateworkspace.ACTION_NAME,apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_INFO);

@@ -1,3 +1,5 @@
+import base from "/apogeeutil/base.js";
+
 /** This class manages the user interface for a workspace object. */
 apogeeapp.app.WorkspaceUI = class {
 
@@ -201,7 +203,7 @@ apogeeapp.app.WorkspaceUI = class {
 
         //make sure this is for us
         if(member.getWorkspace() !== this.workspace) {
-            throw apogee.base.createError("Component registered in wrong workspace: " + member.getFullName());
+            throw base.createError("Component registered in wrong workspace: " + member.getFullName());
         }
 
         //store the ui object
@@ -209,7 +211,7 @@ apogeeapp.app.WorkspaceUI = class {
 
         if(this.componentMap[memberId]) {
             //already exists! (we need to catch this earlier if we want it to not be fatal. But we should catch it here too.)
-            throw apogee.base.createError("There is already a member with the given ID.",true);
+            throw base.createError("There is already a member with the given ID.",true);
         }
 
         var componentInfo = {};
@@ -222,7 +224,7 @@ apogeeapp.app.WorkspaceUI = class {
     }
     
     testPrint(eventInfo) {
-        console.log("Event: " + eventInfo.event + "; Name: " + eventInfo.member.getFullName());
+        //console.log("Event: " + eventInfo.event + "; Name: " + eventInfo.member.getFullName());
         if(eventInfo.updated) {
             console.log(JSON.stringify(eventInfo.updated));
         }

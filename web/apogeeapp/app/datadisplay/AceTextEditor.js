@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** Editor that uses the Ace text editor.
  * 
  * @param {type} displayContainer - the display container
@@ -75,7 +77,7 @@ apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
     
     setData(text) {
         //check data is valid
-        if(apogee.util.getObjectType(text) != "String") {
+        if(util.getObjectType(text) != "String") {
             var errorMsg = "ERROR: Data value is not text";
             //this.setError(errorMsg);
             text = errorMsg;

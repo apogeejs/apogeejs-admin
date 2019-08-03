@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** Update Component Command
  *
  * Command JSON format:
@@ -65,7 +67,7 @@ apogeeapp.app.updatecomponent.executeCommand = function(workspaceUI,commandData)
     var memberGenerator = member.generator;
     if(memberGenerator.getPropertyUpdateAction) {
         var actionData = memberGenerator.getPropertyUpdateAction(member,commandData.updatedMemberProperties);  
-        var actionResult = apogee.action.doAction(workspace,actionData);
+        var actionResult = action.doAction(workspace,actionData);
         
         if(!actionResult.actionDone) {
             error = true;

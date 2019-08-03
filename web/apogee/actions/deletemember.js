@@ -1,3 +1,5 @@
+import action from "/apogee/actions/action.js";
+
 /** This namespace contains the delete member action */
 apogee.deletemember = {};
 
@@ -93,4 +95,4 @@ apogee.deletemember.ACTION_INFO = {
 
 
 //This line of code registers the action 
-apogee.action.addActionInfo(apogee.deletemember.ACTION_NAME,apogee.deletemember.ACTION_INFO);
+action.addActionInfo(apogee.deletemember.ACTION_NAME,apogee.deletemember.ACTION_INFO);

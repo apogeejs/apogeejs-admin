@@ -1,3 +1,5 @@
+import base from "/apogeeutil/base.js";
+
 /** This is a folder. */
 apogee.Folder = function(name,owner) {
     //base init
@@ -19,11 +21,11 @@ apogee.Folder = function(name,owner) {
 }
 
 //add components to this class
-apogee.base.mixin(apogee.Folder,apogee.Member);
-apogee.base.mixin(apogee.Folder,apogee.Dependent);                      
-apogee.base.mixin(apogee.Folder,apogee.ContextHolder);
-apogee.base.mixin(apogee.Folder,apogee.Owner);
-apogee.base.mixin(apogee.Folder,apogee.Parent);
+base.mixin(apogee.Folder,apogee.Member);
+base.mixin(apogee.Folder,apogee.Dependent);                      
+base.mixin(apogee.Folder,apogee.ContextHolder);
+base.mixin(apogee.Folder,apogee.Owner);
+base.mixin(apogee.Folder,apogee.Parent);
 
 //------------------------------
 // Parent Methods
@@ -48,7 +50,7 @@ apogee.Folder.prototype.addChild = function(child) {
     var name = child.getName();
     if(this.childMap[name]) {
         //already exists! not fatal since it is not added to the model yet,
-        throw apogee.base.createError("There is already an object with the given name.",false);
+        throw base.createError("There is already an object with the given name.",false);
     }
     //add object
     this.childMap[name] = child;

@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 apogeeapp.app.updateworkspaceseq = {};
 
 apogeeapp.app.updateworkspaceseq.DIALOG_LAYOUT_TITLE_LINE = {
@@ -30,7 +32,7 @@ apogeeapp.app.updateworkspaceseq.updateWorkspaceProperties = function(workspaceU
     initialValues.name = workspace.getName();
 
     //create the dialog layout
-    var nameLine = apogee.util.jsonCopy(apogeeapp.app.updateworkspaceseq.DIALOG_LAYOUT_NAME_LINE);
+    var nameLine = util.jsonCopy(apogeeapp.app.updateworkspaceseq.DIALOG_LAYOUT_NAME_LINE);
     nameLine.initial = initialValues.name;
 
     var dialogLayout = {};

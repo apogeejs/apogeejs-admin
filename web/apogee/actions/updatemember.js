@@ -1,3 +1,6 @@
+import util from "/apogeeutil/util.js";
+import action from "/apogee/actions/action.js";
+
 /** This namespace contains the update member actions */
 apogee.updatemember = {};
 
@@ -126,7 +129,7 @@ apogee.updatemember.updateData = function(workspace,actionData,actionResult) {
         //data is an error
         apogee.updatemember.applyErrorData(member,data);
     }
-    else if(data === apogee.util.INVALID_VALUE) {
+    else if(data === util.INVALID_VALUE) {
         //data is an invalid value
         apogee.updatemember.applyInvalidData(member,data);
     }
@@ -198,7 +201,7 @@ apogee.updatemember.applyPromiseData = function(member,promise,onAsynchComplete,
             if(onAsynchComplete) {
                 actionData.onComplete = onAsynchComplete;
             }
-            apogee.action.doAction(workspace,actionData);
+            action.doAction(workspace,actionData);
         }
         var asynchErrorCallback = function(errorMsg) {
             let actionData = {};
@@ -209,7 +212,7 @@ apogee.updatemember.applyPromiseData = function(member,promise,onAsynchComplete,
             if(onAsynchComplete) {
                 actionData.onComplete = onAsynchComplete;
             }
-            apogee.action.doAction(workspace,actionData);
+            action.doAction(workspace,actionData);
         }
 
         //call appropriate action when the promise completes
@@ -219,7 +222,7 @@ apogee.updatemember.applyPromiseData = function(member,promise,onAsynchComplete,
 
 apogee.updatemember.applyErrorData = function(member,error) {
     //set the error flag
-    var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_MODEL);
+    var actionError = apogee.actionError.processException(error,apogee.ActionError.ERROR_TYPE_MODEL);
     member.addError(actionError);
 }
 
@@ -260,6 +263,6 @@ apogee.updatemember.UPDATE_DESCRIPTION_ACTION_INFO = {
 
 
 //The following code registers the actions
-apogee.action.addActionInfo(apogee.updatemember.UPDATE_DATA_ACTION_NAME,apogee.updatemember.UPDATE_DATA_ACTION_INFO);
-apogee.action.addActionInfo(apogee.updatemember.UPDATE_CODE_ACTION_NAME,apogee.updatemember.UPDATE_CODE_ACTION_INFO);
-apogee.action.addActionInfo(apogee.updatemember.UPDATE_DESCRIPTION_ACTION_NAME,apogee.updatemember.UPDATE_DESCRIPTION_ACTION_INFO);
+action.addActionInfo(apogee.updatemember.UPDATE_DATA_ACTION_NAME,apogee.updatemember.UPDATE_DATA_ACTION_INFO);
+action.addActionInfo(apogee.updatemember.UPDATE_CODE_ACTION_NAME,apogee.updatemember.UPDATE_CODE_ACTION_INFO);
+action.addActionInfo(apogee.updatemember.UPDATE_DESCRIPTION_ACTION_NAME,apogee.updatemember.UPDATE_DESCRIPTION_ACTION_INFO);

@@ -2,5 +2,5 @@
  * Main namespace for apoge core logic 
  * @namespace
  */
-apogee = {};
+var apogee = {};
 

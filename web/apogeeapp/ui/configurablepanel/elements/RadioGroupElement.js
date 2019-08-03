@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** This is an text field element configurable element.
  * 
  * @class 
@@ -31,7 +33,7 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
             
             var label;
             var value;
-            if(apogee.util.getObjectType(buttonInfo) == "Array") {
+            if(util.getObjectType(buttonInfo) == "Array") {
                 label = buttonInfo[0]
                 value = buttonInfo[1];     
             }

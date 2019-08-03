@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** This file contains some methods for creating commands to do updates for component members.
  * There are 
  */
@@ -34,7 +36,7 @@ apogeeapp.app.membersave.getMemberStateUndoCommand = function(workspace, memberF
         }
         else if(member.getResultInvalid()) {
             //result is invalid - set value to invalid in undo
-            command.data = apogee.util.INVALID_VALUE
+            command.data = util.INVALID_VALUE
         }
         else {
             //this is a standard data value or a promise

@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import EventManager from "/apogeeutil/EventManager.js";
+
 /** This is a tab frame.
  * 
  * @class 
@@ -5,7 +8,7 @@
 apogeeapp.ui.TabFrame = function() {
     
     //base init
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
 	
     //variables
     this.tabTable = {};
@@ -17,7 +20,7 @@ apogeeapp.ui.TabFrame = function() {
 }
 
 //add components to this class
-apogee.base.mixin(apogeeapp.ui.TabFrame,apogee.EventManager);
+base.mixin(apogeeapp.ui.TabFrame,EventManager);
 
 apogeeapp.ui.TabFrame.CONTAINER_FRAME_MARGIN_PX = 5;
 

@@ -1,7 +1,9 @@
 /** This namespace includes network request functions.
  * @namespace
  */
-apogee.net = {};
+let net = {};
+
+export {net as default};
 
 /** 
  * This method does a standard callback request. It includes the following options:
@@ -13,7 +15,7 @@ apogee.net = {};
  * @param {function} onError - This is the callback that will be called it the request fails. It should take a String error message argument. 
  * @param {Object} options - These are options for the request.
  */
-apogee.net.callbackRequest = function(url,onSuccess,onError,options) {
+net.callbackRequest = function(url,onSuccess,onError,options) {
     
     var xmlhttp=new XMLHttpRequest();
 
@@ -59,12 +61,12 @@ apogee.net.callbackRequest = function(url,onSuccess,onError,options) {
  * returns the text body of the URL if it resolves successfully.
  *  
  * @param {String} url - This is the url to be requested
- * @param {Object} options - These are options for the request. See {@link apogee.net.callbackRequest} for the options definition.
+ * @param {Object} options - These are options for the request. See {@link net.callbackRequest} for the options definition.
  * @return {Promise} This method returns a promise object with the URL body as text.
  */
-apogee.net.textRequest = function(url,options) {
+net.textRequest = function(url,options) {
     return new Promise(function(onSuccess,onError) {
-        apogee.net.callbackRequest(url,onSuccess,onError,options);
+        net.callbackRequest(url,onSuccess,onError,options);
     });
 }
 
@@ -73,9 +75,9 @@ apogee.net.textRequest = function(url,options) {
  * returns the JSON body of the URL if it resolves successfully.
  *  
  * @param {String} url - This is the url to be requested
- * @param {Object} options - These are options for the request. See {@link apogee.net.callbackRequest} for the options definition.
+ * @param {Object} options - These are options for the request. See {@link net.callbackRequest} for the options definition.
  * @return {Promise} This method returns a promise object with the URL body as text.
  */
-apogee.net.jsonRequest = function(url,options) {
-    return apogee.net.textRequest(url,options).then(JSON.parse);
+net.jsonRequest = function(url,options) {
+    return net.textRequest(url,options).then(JSON.parse);
 }

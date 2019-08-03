@@ -1,4 +1,4 @@
-
+import util from "/apogeeutil/util.js";
 
 apogeeapp.app.addcomponentseq = {};
 
@@ -24,7 +24,7 @@ apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,opt
         var displayName = componentGenerator.displayName
         
         //get any additional property content for dialog beyond basic properties
-        var additionalLines = apogee.util.jsonCopy(componentGenerator.propertyDialogLines); 
+        var additionalLines = util.jsonCopy(componentGenerator.propertyDialogLines); 
         
         //get the folder list
         var folderList = workspaceUI.getFolders();

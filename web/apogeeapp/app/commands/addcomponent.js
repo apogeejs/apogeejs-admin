@@ -1,3 +1,8 @@
+import base from "/apogeeutil/base.js";
+import util from "/apogeeutil/util.js";
+import action from "/apogee/actions/action.js";
+
+
 /** Add Component Command
  *
  * Command JSON format:
@@ -37,7 +42,7 @@ apogeeapp.app.addcomponent.executeCommand = function(workspaceUI,commandData) {
     createAction.action = "createMember";
     createAction.ownerName = commandData.parentFullName;
     createAction.createData = commandData.memberJson;
-    var actionResult = apogee.action.doAction(workspace,createAction);
+    var actionResult = action.doAction(workspace,createAction);
     
     //create the components for the member
     //I need error handling for the create component action
@@ -67,7 +72,7 @@ apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,crea
             
             var componentGenerator = apogeeapp.app.Apogee.getInstance().getComponentGenerator(componentJson.type);
             if((!componentGenerator)||(member.constructor == apogee.ErrorTable)) {
-                //throw apogee.base.createError("Component type not found: " + componentType);
+                //throw base.createError("Component type not found: " + componentType);
 
                 //table not found - create an empty table
                 componentGenerator = apogeeapp.app.ErrorTableComponent;
@@ -77,7 +82,7 @@ apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,crea
             var component = new componentGenerator(workspaceUI,member);
 
             //call member updated to process and notify of component creation
-            var eventInfo = apogee.util.getAllFieldsInfo(member);
+            var eventInfo = util.getAllFieldsInfo(member);
             component.memberUpdated(eventInfo);
 
             //apply any serialized values
@@ -103,7 +108,7 @@ apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,crea
         json.memberName = member.getFullName();
         //if this fails, we will just ignore it for now
         var workspace = workspaceUI.getWorkspace();
-        var actionResult = apogee.action.doAction(workspace,json);
+        var actionResult = action.doAction(workspace,json);
         //end undo create member
         //##########################################################################
 

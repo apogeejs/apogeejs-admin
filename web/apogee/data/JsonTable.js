@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import util from "/apogeeutil/util.js";
+
 /** This class encapsulatees a data table for a JSON object */
 apogee.JsonTable = function(name,owner,initialData) {
     //base init
@@ -33,10 +36,10 @@ apogee.JsonTable = function(name,owner,initialData) {
 }
 
 //add components to this class
-apogee.base.mixin(apogee.JsonTable,apogee.Member);
-apogee.base.mixin(apogee.JsonTable,apogee.Dependent);
-apogee.base.mixin(apogee.JsonTable,apogee.ContextHolder);
-apogee.base.mixin(apogee.JsonTable,apogee.Codeable);
+base.mixin(apogee.JsonTable,apogee.Member);
+base.mixin(apogee.JsonTable,apogee.Dependent);
+base.mixin(apogee.JsonTable,apogee.ContextHolder);
+base.mixin(apogee.JsonTable,apogee.Codeable);
 
 //------------------------------
 // Codeable Methods
@@ -65,7 +68,7 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
         data = undefined;
     }
     
-    if(data === apogee.util.INVALID_VALUE) {
+    if(data === util.INVALID_VALUE) {
         //value is invalid if return is this predefined value
         this.setResultInvalid(true);
     }
@@ -89,7 +92,7 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
 apogee.JsonTable.prototype.setData = function(data) {
     
 	//make this object immutable
-	apogee.base.deepFreeze(data);
+	base.deepFreeze(data);
 
 	//store the new object
     return apogee.Member.setData.call(this,data);

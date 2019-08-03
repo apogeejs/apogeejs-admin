@@ -2,22 +2,25 @@
  * This namespace includes some utility functions available to the user.
  * @namespace
  */
-apogee.util = {};
+let util = {};
+
+export {util as default};
+
 
 /** 
  * This value can be assigned to a data table to signify that data is not valid.
  * Any other member depending on this value will withhold the calcalation and also
  * return this invalid value.
  */
-apogee.util.INVALID_VALUE = {"apogeeValue":"INVALID VALUE"};
+util.INVALID_VALUE = {"apogeeValue":"INVALID VALUE"};
 
 /** 
  * This function should be called from the body of a function table
  * to indicate the function will not return a valid value. (The actual invalid value
  * can not be returned since this typically will not have the desired effect.)
  */
-apogee.util.invalidFunctionReturn = function() {
-    throw apogee.base.MEMBER_FUNCTION_INVALID_THROWABLE;
+util.invalidFunctionReturn = function() {
+    throw base.MEMBER_FUNCTION_INVALID_THROWABLE;
 }
 
 /** 
@@ -26,7 +29,7 @@ apogee.util.invalidFunctionReturn = function() {
  * @param {String} string - This is the string for which a hash number is desired.
  * @return {integer} This is the hash value for the string.
  */
-apogee.util.stringHash = function(string) {
+util.stringHash = function(string) {
     var HASH_SIZE = 0xffffffff;
     var hash = 0;
     var ch;
@@ -43,7 +46,7 @@ apogee.util.stringHash = function(string) {
  * @param {JSON} object - This is the json valued object for which a hash number is desired.
  * @return {integer} This is the hash value for the JSON.
  */
-apogee.util.objectHash = function(object) {
+util.objectHash = function(object) {
     //this is not real efficient. It should be implemented differently
     var string = JSON.stringify(object);
     return stringHash(string);
@@ -52,7 +55,7 @@ apogee.util.objectHash = function(object) {
 /**
  * @private
  */
-apogee.util.constructors = {
+util.constructors = {
     "String": ("").constructor,
     "Number": (3).constructor,
     "Boolean": (true).constructor,
@@ -67,13 +70,13 @@ apogee.util.constructors = {
  * @param {Object} object - This is the object for which the type is desired.
  * @returns {String} This is the type for the object. 
  */
-apogee.util.getObjectType = function(object) {
+util.getObjectType = function(object) {
     if(object === null) return "null";
     if(object === undefined) return "undefined";
     
     var constructor = object.constructor;
-    for(var key in apogee.util.constructors) {
-        if(constructor == apogee.util.constructors[key]) {
+    for(var key in util.constructors) {
+        if(constructor == util.constructors[key]) {
             return key;
         }	
     }
@@ -87,7 +90,7 @@ apogee.util.getObjectType = function(object) {
  * @param {JSON} data - This is a JSON valued object
  * @returns {JSON} A JSON object which is a deep copy of the input.
  */
-apogee.util.jsonCopy = function(data) {
+util.jsonCopy = function(data) {
     if(data === null) return null;
     if(data === undefined) return undefined;
     return JSON.parse(JSON.stringify(data));
@@ -99,7 +102,7 @@ apogee.util.jsonCopy = function(data) {
  *  @param {Array} stringArgs - These are the values which should be placed into the format string.
  *  @returns {String} The format string with the proper inserted values is returned.  
  */
-apogee.util.formatString = function(format,stringArgs) {
+util.formatString = function(format,stringArgs) {
     var formatParams = arguments;
     return format.replace(/{(\d+)}/g, function(match,p1) {
         var index = Number(p1) + 1;
@@ -113,7 +116,7 @@ apogee.util.formatString = function(format,stringArgs) {
  *  @param {String} url - This is the url from which we read the query string
  *  @returns {String} The value associated with the query string key passed in. 
  */
-apogee.util.readQueryField = function(field,url) {
+util.readQueryField = function(field,url) {
     var href = url ? url : window.location.href;
     var reg = new RegExp( '[?&]' + field + '=([^&#]*)', 'i' );
     var string = reg.exec(href);
@@ -129,9 +132,9 @@ apogee.util.readQueryField = function(field,url) {
  *  @param {JSON} json1 - This is a JSON valued object 
  *  @returns {Boolean}  - Returns whether or not the objects are equal
  */
-apogee.util.jsonEquals = function(json1,json2) {
-    var string1 = JSON.stringify(apogee.util.getNormalizedCopy(json1));
-    var string2 = JSON.stringify(apogee.util.getNormalizedCopy(json2));
+util.jsonEquals = function(json1,json2) {
+    var string1 = JSON.stringify(util.getNormalizedCopy(json1));
+    var string2 = JSON.stringify(util.getNormalizedCopy(json2));
     return (string1 == string2);
 }
 
@@ -143,18 +146,18 @@ apogee.util.jsonEquals = function(json1,json2) {
  *  @param {JSON} json1 - This is a JSON valued object 
  *  @returns {Boolean}  - Returns whether or not the objects are equal
  */  
-apogee.util.getNormalizedCopy = function(json) {
+util.getNormalizedCopy = function(json) {
     var copiedJson;
 
-    var objectType = apogee.util.getObjectType(json);
+    var objectType = util.getObjectType(json);
     
     switch(objectType) {
         case "Object":
-            copiedJson = apogee.util.getNormalizedObjectCopy(json);
+            copiedJson = util.getNormalizedObjectCopy(json);
             break;
             
         case "Array": 
-            copiedJson = apogee.util.getNormalizedArrayCopy(json);
+            copiedJson = util.getNormalizedArrayCopy(json);
             break;
             
         default:
@@ -167,7 +170,7 @@ apogee.util.getNormalizedCopy = function(json) {
 /** this orders the keys apphabetically, since order is not important in a json object 
  * @private
  */
-apogee.util.getNormalizedObjectCopy = function(json) {
+util.getNormalizedObjectCopy = function(json) {
     var copiedJson = {};
     
     var keys = [];
@@ -180,13 +183,13 @@ apogee.util.getNormalizedObjectCopy = function(json) {
     
     for(var i = 0; i < keys.length; i++) {
         key = keys[i];
-        copiedJson[key] = apogee.util.getNormalizedCopy(json[key]);
+        copiedJson[key] = util.getNormalizedCopy(json[key]);
     }
     return copiedJson;
 }
 
 /** This method counts the properties in a object. */
-apogee.util.jsonObjectLength = function(jsonObject) {
+util.jsonObjectLength = function(jsonObject) {
     var count = 0;
 
     for(var key in jsonObject) {
@@ -199,11 +202,11 @@ apogee.util.jsonObjectLength = function(jsonObject) {
 /** This makes a copy of with any contained objects normalized. 
  * @private 
  */
-apogee.util.getNormalizedArrayCopy = function(json) {
+util.getNormalizedArrayCopy = function(json) {
     var copiedJson = [];
     for(var i = 0; i < json.length; i++) {
         var element = json[i];
-        copiedJson.push(apogee.util.getNormalizedCopy(element));
+        copiedJson.push(util.getNormalizedCopy(element));
     }
     return copiedJson;
 }
@@ -213,7 +216,7 @@ apogee.util.getNormalizedArrayCopy = function(json) {
 //=============================
 
 /** This constant is used to field update info, to specify all fields are updated. */
-apogee.util.ALL_FIELDS = "all";
+util.ALL_FIELDS = "all";
 
 /** This method takes a field update Info object (a set or map of names to a truthy value)
  * and either a single field name or an arrya of field names. In the case of a single
@@ -221,8 +224,8 @@ apogee.util.ALL_FIELDS = "all";
  * of an array of field names, it checks if any of those fields have been updated.
  * The field update info object may have the value "all" set to true. In this case
  * any test against it will return true. */
-apogee.util.isFieldUpdated = function(updateInfo,fieldOrFields) {
-    if(updateInfo[apogee.util.ALL_FIELDS]) return true;
+util.isFieldUpdated = function(updateInfo,fieldOrFields) {
+    if(updateInfo[util.ALL_FIELDS]) return true;
     if(Array.isArray(fieldOrFields)) {
         return fieldOrFields.any(fieldName => updateInfo[fieldName]);
     }
@@ -236,11 +239,25 @@ apogee.util.isFieldUpdated = function(updateInfo,fieldOrFields) {
 /** This method returns a field update object for the given member that returns 
  * true for all fields checked. The event name can optionally be passed in.
  * Otherwise the event name will be set to "all".*/
-apogee.util.getAllFieldsInfo = function(member,optionalEventName) {
+util.getAllFieldsInfo = function(member,optionalEventName) {
     let updateInfo = {};
     updateInfo.member = member;
     updateInfo.updated = {};
-    updateInfo.updated[apogee.util.ALL_FIELDS] = true;
+    updateInfo.updated[util.ALL_FIELDS] = true;
     updateInfo.event = optionalEventName ? optionalEventName : "all";
     return updateInfo;
+}
+
+//=================
+// Some other generic utils
+//=================
+
+/** This methdo parses an arg list string to make an arg list array. It is
+ * also used outisde this class. */
+util.parseStringArray = function(argListString) {
+    var argList = argListString.split(",");
+    for(var i = 0; i < argList.length; i++) {
+        argList[i] = argList[i].trim();
+    }
+    return argList;
 }

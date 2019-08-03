@@ -1,3 +1,5 @@
+import EventManager from "/apogeeutil/EventManager.js";
+
 /** This component represents a json table object. 
  * The member argument is the main member for this component. The folder argument is 
  * the parent folde associated with this component, which may be different from the
@@ -7,7 +9,7 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
     constructor(component,member,folder) {
 
         //mixin init
-        apogee.EventManager.init.call(this);
+        EventManager.init.call(this);
 
         if(!apogeeapp.app.LiteratePageComponentDisplay.quillInitialized()) {
             apogeeapp.app.LiteratePageComponentDisplay.initializeQuill();
@@ -545,7 +547,7 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
 }
 
 //add components to this class
-apogee.base.mixin(apogeeapp.app.LiteratePageComponentDisplay,apogee.EventManager);
+apogee.base.mixin(apogeeapp.app.LiteratePageComponentDisplay,EventManager);
 
 /** This is the data to load an empty page. */
 apogeeapp.app.LiteratePageComponentDisplay.EMPTY_PAGE_BODY = [];

@@ -1,4 +1,5 @@
-  
+import util from "/apogeeutil/util.js";
+ 
 apogee.codeCompiler = {};
 
 /** @private */
@@ -91,7 +92,7 @@ apogee.codeCompiler.createCombinedFunctionBody = function(argList,
     var argListString = argList.join(",");
     
     //create the code body
-    var combinedFunctionBody = apogee.util.formatString(
+    var combinedFunctionBody = util.formatString(
         apogee.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT,
 		codeLabel,
         argListString,
@@ -132,7 +133,7 @@ apogee.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunction
     }
     
     //create the generator for the object function
-    var generatorBody = apogee.util.formatString(
+    var generatorBody = util.formatString(
         apogee.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT,
 		contextDeclarationText,
         initializerBody,

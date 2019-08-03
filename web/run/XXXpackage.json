@@ -1,0 +1,14 @@
+{
+  "name": "hax-server",
+  "version": "0.2.0",
+  "description": "Hax server",
+  "main": "server.js",
+  "dependencies": {
+    "esprima": "~2.7.2"
+  },
+  "author": "Dave Sutter",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/sutter-dave/haxserver.git"
+  }
+}

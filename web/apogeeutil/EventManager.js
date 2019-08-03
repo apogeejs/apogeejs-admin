@@ -1,10 +1,12 @@
 /* 
  * This is a mixin to give event functionality.
  */
-apogee.EventManager = {};
+var EventManager = {};
+
+export { EventManager as default };
     
 /** This serves as the constructor. */
-apogee.EventManager.init = function() {
+EventManager.init = function() {
      /** This field holds the event listeners
     * @private */
     this.listenerTable = {};
@@ -15,7 +17,7 @@ apogee.EventManager.init = function() {
 }
 
 /** This method adds a listener for the given event. */
-apogee.EventManager.addListener = function(eventName, callback) {
+EventManager.addListener = function(eventName, callback) {
     var callbackList = this.listenerTable[eventName];
     if(!callbackList) {
         callbackList = [];
@@ -33,7 +35,7 @@ apogee.EventManager.addListener = function(eventName, callback) {
 }
 
 /** This method removes a listener for the event. */
-apogee.EventManager.removeListener = function(eventName, callback) {
+EventManager.removeListener = function(eventName, callback) {
     var callbackList = this.listenerTable[eventName];
     if(callbackList) {
         var index = callbackList.indexOf(callback);
@@ -44,7 +46,7 @@ apogee.EventManager.removeListener = function(eventName, callback) {
 }
 
 /** THis method dispatches an event. */
-apogee.EventManager.dispatchEvent = function(eventName, eventData) {
+EventManager.dispatchEvent = function(eventName, eventData) {
     var callbackList = this.listenerTable[eventName];
     if(callbackList) {
         for(var i = 0; i < callbackList.length; i++) {
@@ -56,18 +58,18 @@ apogee.EventManager.dispatchEvent = function(eventName, eventData) {
 
 
 /** This method adds a handler. */
-apogee.EventManager.addHandler = function(handlerName, callback) {
+EventManager.addHandler = function(handlerName, callback) {
     this.handlerTable[handlerName] = callback;
 }
 
 /** This method clears a handler. */
-apogee.EventManager.removeHandler = function(handlerName) {
+EventManager.removeHandler = function(handlerName) {
     delete this.handlerTable[handlerName];
 }
 
 /** This method calls a handler by name and returns the result. If no 
  * handler is found undefined is returned. */
-apogee.EventManager.callHandler = function(handlerName, handlerData) {
+EventManager.callHandler = function(handlerName, handlerData) {
     var callback = this.handlerTable[handlerName];
     if(callback) {
         return callback(handlerData)

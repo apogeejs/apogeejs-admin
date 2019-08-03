@@ -1,3 +1,5 @@
+import action from "/apogee/actions/action.js";
+
 /** This namespace contains the compound action */
 apogee.compoundaction = {};
 
@@ -18,7 +20,7 @@ apogee.compoundaction.compoundActionFunction = function(workspace,actionData,act
     for(var i = 0; i < actionList.length; i++) {
         let childActionData = actionList[i];
         let childActionResult = {};
-        apogee.action.callActionFunction(workspace,childActionData,childActionResult);
+        action.callActionFunction(workspace,childActionData,childActionResult);
         actionResult.childActionResults.push(childActionResult);   
     }
     actionResult.actionDone = true;
@@ -36,4 +38,4 @@ apogee.compoundaction.ACTION_INFO = {
 
 
 //This line of code registers the action 
-apogee.action.addActionInfo(apogee.compoundaction.ACTION_NAME,apogee.compoundaction.ACTION_INFO);
+action.addActionInfo(apogee.compoundaction.ACTION_NAME,apogee.compoundaction.ACTION_INFO);

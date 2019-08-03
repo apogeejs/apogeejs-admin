@@ -1,4 +1,5 @@
-function proseMirrorSetup() {
+//ugh - this is ugly fix it
+function proseMirrorSetup(proseMirror) {
     
     // Kludge to make requiring prosemirror core libraries possible. The
     // PM global is defined by http://prosemirror.net/examples/prosemirror.js,
@@ -412,8 +413,6 @@ function proseMirrorSetup() {
     //set up the export functions
     //===============================
     
-    var proseMirror = {};
-    
     proseMirror.createEditorState = function(docJson) {
         var doc;
         if(docJson) {
@@ -476,7 +475,7 @@ function proseMirrorSetup() {
         let {empty, $from, $to} = state.selection, content = Fragment.empty
         if (!empty && $from.sameParent($to) && $from.parent.inlineContent)
             content = $from.parent.content.cut($from.parentOffset, $to.parentOffset)
-        transaction = state.tr.replaceSelectionWith(testBlockSchema.nodes.apogeeComponent.create({"state":childName}));
+        let transaction = state.tr.replaceSelectionWith(testBlockSchema.nodes.apogeeComponent.create({"state":childName}));
         
         var commandData = literatePageComponent.createInsertCommand(transaction);
         return commandData;
@@ -486,9 +485,11 @@ function proseMirrorSetup() {
 }
 
 //for now I will ad an explicit delay to load this. I do need to do it a different way.
-var proseMirror;
+var proseMirror = {};
         
-setTimeout(() => {proseMirror = proseMirrorSetup()},2000);
+setTimeout(() => {proseMirrorSetup(proseMirror)},2000);
+
+export {proseMirror as default}
 
 
 

@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** This is a grid editor using hands on table*/
 apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.DataDisplay {
     
@@ -64,7 +66,7 @@ apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.DataDisplay {
     
     getData() {
         //update "input" data before calling update
-        if(this.gridControl) this.inputData = apogee.util.jsonCopy(this.gridControl.getData());
+        if(this.gridControl) this.inputData = util.jsonCopy(this.gridControl.getData());
         return this.inputData;
     }
     
@@ -173,7 +175,7 @@ apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.DataDisplay {
         //clear the cached data flag, if it is present
         this.dataCached = false;
 
-        var editData = apogee.util.jsonCopy(this.inputData);
+        var editData = util.jsonCopy(this.inputData);
         if(!editData) {
             editData = [[]];
         }

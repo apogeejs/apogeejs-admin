@@ -1,3 +1,6 @@
+import util from "/apogeeutil/util.js";
+import Messenger from "/apogee/actions/Messenger.js";
+
 /** This attempt has a single form edit page which returns an object. */
 // To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 
 //than making the user do that.
@@ -166,7 +169,7 @@ apogeeapp.app.CustomDataComponent.prototype.getFormCallbacks = function() {
     callbacks.getEditOk = () => true;
     
     //save data - just form value here
-    var messenger = new apogee.action.Messenger(this.inputTable);
+    var messenger = new Messenger(this.inputTable);
     callbacks.saveData = (formValue) => {
         messenger.dataUpdate("data",formValue);
         return true;
@@ -216,7 +219,7 @@ apogeeapp.app.CustomDataComponent.prototype.createResource = function() {
             try {
 
                 //create the resource generator wrapped with its closure
-                var generatorFunctionBody = apogee.util.formatString(
+                var generatorFunctionBody = util.formatString(
                     apogeeapp.app.CustomDataComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
                     uiGeneratorBody
                 );
@@ -255,7 +258,7 @@ apogeeapp.app.CustomDataComponent.prototype.createResource = function() {
 apogeeapp.app.CustomDataComponent.prototype.doCodeFieldUpdate = function(uiCodeField,fieldValue) { 
 
     var initialCodeFields = this.getUiCodeFields();
-    var targetCodeFields = apogee.util.jsonCopy(initialCodeFields);
+    var targetCodeFields = util.jsonCopy(initialCodeFields);
     targetCodeFields[uiCodeField] = fieldValue;
 
     var command = {};

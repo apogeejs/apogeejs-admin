@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
@@ -186,7 +188,7 @@ apogeeapp.app.CustomComponent.prototype.createResource = function() {
             try {
 
                 //create the resource generator wrapped with its closure
-                var generatorFunctionBody = apogee.util.formatString(
+                var generatorFunctionBody = util.formatString(
                     apogeeapp.app.CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
                     uiGeneratorBody
                 );
@@ -224,7 +226,7 @@ apogeeapp.app.CustomComponent.prototype.createResource = function() {
 apogeeapp.app.CustomComponent.prototype.doCodeFieldUpdate = function(uiCodeField,fieldValue) { 
 
     var initialCodeFields = this.getUiCodeFields();
-    var targetCodeFields = apogee.util.jsonCopy(initialCodeFields);
+    var targetCodeFields = util.jsonCopy(initialCodeFields);
     targetCodeFields[uiCodeField] = fieldValue;
 
     var command = {};

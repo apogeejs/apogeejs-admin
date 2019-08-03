@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import EventManager from "/apogeeutil/EventManager.js";
+
 apogeeapp.app.dialog = {};
 
 //======================================
@@ -13,7 +16,7 @@ apogeeapp.app.dialog = {};
  * 
  * @private */
 apogeeapp.app.Apogee = function(containerId,appConfigManager) {
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
     
     //make sure we define this once
     if(apogeeapp.app.Apogee.instance != null) {
@@ -63,7 +66,7 @@ apogeeapp.app.Apogee = function(containerId,appConfigManager) {
 }
 	
 //add components to this class
-apogee.base.mixin(apogeeapp.app.Apogee,apogee.EventManager);
+base.mixin(apogeeapp.app.Apogee,EventManager);
 
 apogeeapp.app.Apogee.DEFAULT_WORKSPACE_NAME = "workspace";
 
@@ -198,7 +201,7 @@ apogeeapp.app.Apogee.prototype.setWorkspaceUI = function(workspaceUI) {
     
     //we can only have one workspace of a given name!
     if(this.workspaceUI) {
-        throw apogee.base.createError("There is already an open workspace",false);
+        throw base.createError("There is already an open workspace",false);
     }
     
     workspaceUI.setApp(this,this.tabFrame,this.treePane);

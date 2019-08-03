@@ -1,3 +1,5 @@
+import Messenger from "/apogee/actions/Messenger.js";
+
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form
  * can be accessed from the variables (componentName).data. There are also subtables
@@ -120,7 +122,7 @@ apogeeapp.app.FormDataComponent.prototype.getFormEditorCallbacks = function() {
     callbacks.getEditOk = () => true;
     
     //save data - just form value here
-    var messenger = new apogee.action.Messenger(this.layoutFunctionTable);
+    var messenger = new Messenger(this.layoutFunctionTable);
     callbacks.saveData = (formValue) => {
         
         //validate input

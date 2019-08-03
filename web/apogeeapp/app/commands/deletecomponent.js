@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 apogeeapp.app.deletecomponent = {};
 
 //=====================================
@@ -36,7 +38,7 @@ apogeeapp.app.deletecomponent.executeCommand = function(workspaceUI,commandData)
     actionJson.action = "deleteMember";
     actionJson.memberName = commandData.memberFullName;
     
-    var actionResult = apogee.action.doAction(workspace,actionJson);
+    var actionResult = action.doAction(workspace,actionJson);
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;

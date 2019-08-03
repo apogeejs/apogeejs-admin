@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** This component represents a table object. */
 apogeeapp.app.FunctionComponent = function(workspaceUI, functionObject) {
     //extend edit component
@@ -85,6 +87,6 @@ apogeeapp.app.FunctionComponent.transferMemberProperties = function(inputValues,
         if(!propertyJson.updateData) {
             propertyJson.updateData = {};
         }
-        propertyJson.updateData.argList = apogee.FunctionTable.parseStringArray(inputValues.argListString);
+        propertyJson.updateData.argList = util.parseStringArray(inputValues.argListString);
     }
 }

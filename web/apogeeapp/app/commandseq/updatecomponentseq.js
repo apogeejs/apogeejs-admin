@@ -1,4 +1,4 @@
-
+import util from "/apogeeutil/util.js";
 
 apogeeapp.app.updatecomponentseq = {};
 
@@ -12,7 +12,7 @@ apogeeapp.app.updatecomponentseq.updateComponent = function(component) {
     var componentGenerator = component.componentGenerator;
 
     var displayName = componentGenerator.displayName
-    var additionalLines = apogee.util.jsonCopy(componentGenerator.propertyDialogLines); 
+    var additionalLines = util.jsonCopy(componentGenerator.propertyDialogLines); 
 
     var workspaceUI = component.getWorkspaceUI(); 
     var initialValues = component.getPropertyValues(); 
@@ -49,13 +49,13 @@ apogeeapp.app.updatecomponentseq.updateComponent = function(component) {
         if(componentGenerator.transferMemberProperties) {
             componentGenerator.transferMemberProperties(newValues,memberUpdateJson);
         }
-        var numMemberProps = apogee.util.jsonObjectLength(memberUpdateJson);
+        var numMemberProps = util.jsonObjectLength(memberUpdateJson);
         
         var componentUpdateJson = {};
         if(componentGenerator.transferComponentProperties) {
             componentGenerator.transferComponentProperties(newValues,componentUpdateJson);
         }
-        var numComponentProps = apogee.util.jsonObjectLength(componentUpdateJson);
+        var numComponentProps = util.jsonObjectLength(componentUpdateJson);
         
         if((numMemberProps > 0)||(numComponentProps > 0)) {
             updateCommand = {};

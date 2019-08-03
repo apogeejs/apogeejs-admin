@@ -1,3 +1,5 @@
+import action from "/apogee/actions/action.js";
+
 /** This namespace contains the move member action */
 apogee.movemember = {};
 
@@ -87,4 +89,4 @@ apogee.movemember.ACTION_INFO = {
 
 
 //This line of code registers the action 
-apogee.action.addActionInfo(apogee.movemember.ACTION_NAME,apogee.movemember.ACTION_INFO);
+action.addActionInfo(apogee.movemember.ACTION_NAME,apogee.movemember.ACTION_INFO);

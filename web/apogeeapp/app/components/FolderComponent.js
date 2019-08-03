@@ -1,3 +1,5 @@
+import proseMirror from "/apogeeapp/app/component/literatepage/proseMirrorSetup.js";
+
 /** This component represents a table object. */
 apogeeapp.app.FolderComponent = function(workspaceUI,folder) {
     //extend parent component
@@ -30,8 +32,8 @@ apogeeapp.app.FolderComponent.prototype.setEditorData = function(editorData) {
     
 apogeeapp.app.FolderComponent.prototype.applyTransaction = function(transaction) {
     
-    console.log("New Transaction:");
-    console.log("Doc changed: " + transaction.docChanged);
+    //console.log("New Transaction:");
+    //console.log("Doc changed: " + transaction.docChanged);
 
     if(transaction.docChanged) {
         var commandData = this.createInsertCommand(transaction);

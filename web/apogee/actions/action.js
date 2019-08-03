@@ -6,15 +6,15 @@
  * 
  * Generic Action:
  * - The action is represented by a data object "actionData". 
- * - The method apogee.action.doAction is called to exectue the action.
- * - Available actions are registered through the method apogee.action.addActionInfo.
+ * - The method action.doAction is called to exectue the action.
+ * - Available actions are registered through the method action.addActionInfo.
  *   this allows the doAction method to dispatch the actionData to the proper
  *   action specific code.
  * - Included in doing that action is any updates to dependent tables and the 
  * firing of any events for the changes.
  *   
  * Registering a specific action:
- * To register a specific action, apogee.action.addActionInfo must be called with 
+ * To register a specific action, action.addActionInfo must be called with 
  * a actionInfo object. An action info object is of the following format.
  * actionInfo object: {
  *   "action": (string - this is the name of the action)
@@ -64,15 +64,17 @@
  * 
  * 
  */ 
-apogee.action = {};
+let action = {};
+
+export {action as default}
 
 /** This structure holds the processing information for all the actions. It is set by each action. 
  * @private */
-apogee.action.actionInfo = {
+action.actionInfo = {
 }
 
 /** This method is used to execute an action for the data model. */
-apogee.action.doAction = function(workspace,actionData) {
+action.doAction = function(workspace,actionData) {
     
     var actionResult = {};
     
@@ -92,23 +94,23 @@ apogee.action.doAction = function(workspace,actionData) {
     try {   
         
         //do the action
-        apogee.action.callActionFunction(workspace,actionData,actionResult); 
+        action.callActionFunction(workspace,actionData,actionResult); 
         
         //finish processing the action
         var recalculateList = [];
         
         var completedResults = [];
-        apogee.action.addToCompletedResultList(completedResults,actionResult)
+        action.addToCompletedResultList(completedResults,actionResult)
         
         //handle cases with a valid object 
-        apogee.action.updateDependencies(workspace,completedResults,recalculateList);
+        action.updateDependencies(workspace,completedResults,recalculateList);
         
-        apogee.action.updateRecalculateList(completedResults,recalculateList);
+        action.updateRecalculateList(completedResults,recalculateList);
         
         apogee.calculation.callRecalculateList(recalculateList);
     
         //fire events
-        apogee.action.fireEvents(workspace,completedResults,recalculateList);
+        action.fireEvents(workspace,completedResults,recalculateList);
 	}
 	catch(error) {
         if(error.stack) console.error(error.stack);
@@ -150,7 +152,7 @@ apogee.action.doAction = function(workspace,actionData) {
 
         if(runQueuedAction) {
             //FOR NOW WE WILL RUN SYNCHRONOUSLY!!!
-            apogee.action.doAction(workspace,savedMessengerAction);
+            action.doAction(workspace,savedMessengerAction);
         }
     }
     else {
@@ -162,15 +164,15 @@ apogee.action.doAction = function(workspace,actionData) {
 }
 
 /** This function is used to register an action. */
-apogee.action.addActionInfo = function(actionName,actionInfo) {
-    apogee.action.actionInfo[actionName] = actionInfo;
+action.addActionInfo = function(actionName,actionInfo) {
+    action.actionInfo[actionName] = actionInfo;
 }
 
 /** This function looks up the proper function for an action and executes it. */
-apogee.action.callActionFunction = function(workspace,actionData,actionResult) {
+action.callActionFunction = function(workspace,actionData,actionResult) {
 
     //do the action
-    var actionInfo = apogee.action.actionInfo[actionData.action];
+    var actionInfo = action.actionInfo[actionData.action];
     if(actionInfo) {
         actionResult.actionInfo = actionInfo;
         actionInfo.actionFunction(workspace,actionData,actionResult);
@@ -187,9 +189,9 @@ apogee.action.callActionFunction = function(workspace,actionData,actionResult) {
 
 /** This method makes sure the member dependencies in the workspace are properly updated. 
  * @private */
-apogee.action.updateDependencies = function(workspace,completedResults,recalculateList) {
+action.updateDependencies = function(workspace,completedResults,recalculateList) {
     //check if we need to update the entire model
-    var updateAllDep = apogee.action.checkUpdateAllDep(completedResults);
+    var updateAllDep = action.checkUpdateAllDep(completedResults);
     if(updateAllDep) {
         //update entire model - see conditions bewlo
         workspace.updateDependeciesForModelChange(recalculateList);
@@ -199,7 +201,7 @@ apogee.action.updateDependencies = function(workspace,completedResults,recalcula
         for(var i = 0; i < completedResults.length; i++) {
             var actionResult = completedResults[i];
             if((actionResult.actionDone)&&(actionResult.member)) {
-                if(apogee.action.doInitializeDependencies(actionResult)) {
+                if(action.doInitializeDependencies(actionResult)) {
                     actionResult.member.initializeDependencies();
                 }
             }
@@ -209,14 +211,14 @@ apogee.action.updateDependencies = function(workspace,completedResults,recalcula
     
 /** This function updates the recalculation list for the given processed actions. 
  * @private */
-apogee.action.updateRecalculateList = function(completedResults,recalculateList) {
+action.updateRecalculateList = function(completedResults,recalculateList) {
     for(var i = 0; i < completedResults.length; i++) {
         var actionResult = completedResults[i];
         if((actionResult.actionDone)&&(actionResult.member)) {
-            if(apogee.action.doAddToRecalc(actionResult)) {
+            if(action.doAddToRecalc(actionResult)) {
                 apogee.calculation.addToRecalculateList(recalculateList,actionResult.member);            
             }
-            else if((apogee.action.doAddDependOnToRecalc(actionResult))) {
+            else if((action.doAddDependOnToRecalc(actionResult))) {
                 apogee.calculation.addDependsOnToRecalculateList(recalculateList,actionResult.member);                         
             }
         }
@@ -226,7 +228,7 @@ apogee.action.updateRecalculateList = function(completedResults,recalculateList)
 /** This function fires the proper events for the action. It combines events to 
  * fire a single event for each member.
  * @private */
-apogee.action.fireEvents = function(workspace,completedResults,recalculateList) {
+action.fireEvents = function(workspace,completedResults,recalculateList) {
 
     var eventMap = {};
     var member;
@@ -268,7 +270,7 @@ apogee.action.fireEvents = function(workspace,completedResults,recalculateList) 
 }
 
 /** This is a helper function to dispatch an event. */
-apogee.action.mergeEventIntoEventMap = function(eventMap,member,eventName) {
+action.mergeEventIntoEventMap = function(eventMap,member,eventName) {
     
     //############################################
     //OOPS - my current logic does nto allow for non-member events. 
@@ -309,7 +311,7 @@ apogee.action.mergeEventIntoEventMap = function(eventMap,member,eventName) {
  * tracking may be in error if a new member is created, a member is deleted or
  * a member is moved. In these actions we flag that the entire model should be
  * updated.*/
-apogee.action.checkUpdateAllDep = function(completedResults) {
+action.checkUpdateAllDep = function(completedResults) {
     for(var i = 0; i < completedResults.length; i++) {
         var actionResult = completedResults[i];
         
@@ -325,7 +327,7 @@ apogee.action.checkUpdateAllDep = function(completedResults) {
 }
 
 /** This method if a single action entry requires updating dependencies for the associated member. */
-apogee.action.doInitializeDependencies = function(actionResult) {
+action.doInitializeDependencies = function(actionResult) {
     if(!actionResult.member) return false;
     
     //only applicable to codeables
@@ -338,7 +340,7 @@ apogee.action.doInitializeDependencies = function(actionResult) {
 }
 
 /** This method checks if the associated member and its dependencies need to be added to the recalc list. */
-apogee.action.doAddToRecalc = function(actionResult) {
+action.doAddToRecalc = function(actionResult) {
     if(!actionResult.member) return false;
     if(!actionResult.member.isDependent) return false;
     
@@ -351,7 +353,7 @@ apogee.action.doAddToRecalc = function(actionResult) {
 }
 
 /** This method checks if the dependencies of the associated needs to be added to the recalc list, but not the member itself. */
-apogee.action.doAddDependOnToRecalc = function(actionResult) {
+action.doAddDependOnToRecalc = function(actionResult) {
     if(actionResult.actionInfo) {
         return actionResult.actionInfo.addDependenceiesToRecalc;
     }
@@ -361,11 +363,11 @@ apogee.action.doAddDependOnToRecalc = function(actionResult) {
 }
 
 /** This method unpacks the actionResult and its child reponse into an array of actionResult. */
-apogee.action.addToCompletedResultList = function(completedResults,actionResult) {
+action.addToCompletedResultList = function(completedResults,actionResult) {
     completedResults.push(actionResult);
     if(actionResult.childActionResults) {
         for(var key in actionResult.childActionResults) {
-            apogee.action.addToCompletedResultList(completedResults,actionResult.childActionResults[key]);
+            action.addToCompletedResultList(completedResults,actionResult.childActionResults[key]);
         }      
     }
 }

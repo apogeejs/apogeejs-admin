@@ -1,11 +1,13 @@
 /** This namespace contains some basic functions for the application. */
-apogee.base = {};
+let base = {};
 
-apogee.base.MEMBER_FUNCTION_INVALID_THROWABLE = {"apogeeException":"invalid"};
-apogee.base.MEMBER_FUNCTION_PENDING_THROWABLE = {"apogeeException":"pending"};
+export {base as default};
+
+base.MEMBER_FUNCTION_INVALID_THROWABLE = {"apogeeException":"invalid"};
+base.MEMBER_FUNCTION_PENDING_THROWABLE = {"apogeeException":"pending"};
 
 /** This method creates an integer has value for a string. */
-apogee.base.mixin = function(destObject,mixinObject) {
+base.mixin = function(destObject,mixinObject) {
     for(var key in mixinObject) {
         destObject.prototype[key] = mixinObject[key];
     }
@@ -17,7 +19,7 @@ apogee.base.mixin = function(destObject,mixinObject) {
  * Warning - this does not check for cycles (which are not in JSON 
  * objects but can be in javascript objects)
  * Implementation from Mozilla */
-apogee.base.deepFreeze = function(obj) {
+base.deepFreeze = function(obj) {
     if((obj === null)||(obj === undefined)) return;
     
     //retrieve the property names defined on obj
@@ -28,7 +30,7 @@ apogee.base.deepFreeze = function(obj) {
         var prop = obj[name];
 
         //freeze prop if it is an object
-        if(typeof prop == 'object' && prop !== null) apogee.base.deepFreeze(prop);
+        if(typeof prop == 'object' && prop !== null) base.deepFreeze(prop);
     });
 
     //freeze self (no-op if already frozen)
@@ -38,7 +40,7 @@ apogee.base.deepFreeze = function(obj) {
 /** This method creates an error object, which has a "message" in the format
  *of a system error. The isFatal flag can be set to specify if this is a fatal or nonfatal
  *error. It may also be omitted. A base error may also be set. */
-apogee.base.createError = function(msg,optionalIsFatal,optionalBaseError) {
+base.createError = function(msg,optionalIsFatal,optionalBaseError) {
     var error = new Error(msg);
 	if(optionalIsFatal !== undefined) {
 		error.isFatal = optionalIsFatal;
@@ -49,15 +51,3 @@ apogee.base.createError = function(msg,optionalIsFatal,optionalBaseError) {
     return error;
 }
 
-/** This creates a new array with elements from the first that are not in the second. 
- * I wasn't really sure where to put this. So it ended up here. */
-apogee.base.getListInFirstButNotSecond = function(firstList,secondList) {
-    var newList = [];
-    for(var i = 0; i < firstList.length; i++) {
-        var entry = firstList[i];
-        if(secondList.indexOf(entry) < 0) {
-            newList.push(entry);
-        }
-    }
-    return newList;
-}

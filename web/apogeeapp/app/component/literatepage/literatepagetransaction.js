@@ -1,3 +1,5 @@
+import proseMirror from "/apogeeapp/app/component/literatepage/proseMirrorSetup.js";
+
 /** Update Component Command
  *
  * Command JSON format:

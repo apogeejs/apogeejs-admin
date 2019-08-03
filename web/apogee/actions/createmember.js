@@ -1,3 +1,5 @@
+import action from "/apogee/actions/action.js";
+
 /** This namespace contains the create member action */
 apogee.createmember = {};
 
@@ -99,4 +101,4 @@ apogee.createmember.ACTION_INFO = {
 }
 
 //This line of code registers the action 
-apogee.action.addActionInfo(apogee.createmember.ACTION_NAME,apogee.createmember.ACTION_INFO);
+action.addActionInfo(apogee.createmember.ACTION_NAME,apogee.createmember.ACTION_INFO);

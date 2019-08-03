@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** Save Member Data Command
  *
  * Command JSON format:
@@ -25,7 +27,7 @@ apogeeapp.app.savememberdata.executeCommand = function(workspaceUI,commandData,a
     
     var actionData = apogeeapp.app.membersave.getSaveDataAction(workspace,commandData.memberFullName,commandData.data,asynchOnComplete);
     
-    var actionResult = apogee.action.doAction(workspace,actionData);
+    var actionResult = action.doAction(workspace,actionData);
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;

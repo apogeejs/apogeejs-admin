@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import EventManager from "/apogeeutil/EventManager.js";
+
 /** This is a plain div that holds content similar to a window frame
  * but it does not have a outer frame and does not go in a window parent.
  * 
@@ -11,7 +14,7 @@ apogeeapp.ui.PlainFrame = function(options) {
     }
     
     //base init
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
 	
     //variables
     this.options = options;
@@ -29,7 +32,7 @@ apogeeapp.ui.PlainFrame = function(options) {
 }
 
 //add components to this class
-apogee.base.mixin(apogeeapp.ui.PlainFrame,apogee.EventManager);
+base.mixin(apogeeapp.ui.PlainFrame,EventManager);
 
 //====================================
 // Public Methods

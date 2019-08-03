@@ -8,7 +8,9 @@
         <script src="../../apogeeapp.js"></script>
         <script src="CommandManager.js"></script>
         <script src="CommandManagerTests.js"></script>
-        <script>         
+        <script>       
+        
+            import util from "/apogeeutil/util.js";
             
             function runTests() {
                 var commandManagerTests = new CommandManagerTests();
@@ -50,7 +52,7 @@
 
             /** This is one of the compares that should be in the test suit. */
             function testJsonEquals(desc,value1,value2) {
-                if(!apogee.util.jsonEquals(value1,value2)) {
+                if(!util.jsonEquals(value1,value2)) {
                     throw new Error("Failure in test: " + desc + " " + JSON.stringify(value1) + " != " + JSON.stringify(value2));
                 }
             }

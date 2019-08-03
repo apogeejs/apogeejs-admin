@@ -1,8 +1,10 @@
+import base from "/apogeeutil/base.js";
+import EventManager from "/apogeeutil/EventManager.js";
 
 apogeeapp.ui.Tab = function(id) {
     
     //base init
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
     
     this.tabFrame = null;
     this.id = id;
@@ -35,7 +37,7 @@ apogeeapp.ui.Tab = function(id) {
 }
 
 //add components to this class
-apogee.base.mixin(apogeeapp.ui.Tab,apogee.EventManager);
+base.mixin(apogeeapp.ui.Tab,EventManager);
 
 //---------------------------
 // WINDOW CONTAINER
@@ -46,14 +48,14 @@ apogeeapp.ui.Tab.prototype.setTabFrame = function(tabFrame) {
     this.tabFrame = tabFrame;
     var instance = this;
     //attach to listeners to forward show and hide events
-    this.tabShownListener = function(tab) {
+    this.tabShownListener = (tab) => {
         if(tab == instance) {
             this.isShowing = true;
             instance.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,instance);
         }
     };
     this.tabFrame.addListener(apogeeapp.ui.SHOWN_EVENT, this.tabShownListener);
-    this.tabHiddenListener = function(tab) {
+    this.tabHiddenListener = (tab) => {
         if(tab == instance) {
             this.isShowing = false;
             instance.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,instance);

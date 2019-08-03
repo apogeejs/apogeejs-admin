@@ -1,3 +1,6 @@
+import util from "/apogeeutil/util.js";
+import net from "/apogeeutil/net.js";
+
 /** 
  * This is the format of the AppConfigManager. This class does not need
  * to be extended. It has not internal functionality.
@@ -11,10 +14,10 @@ apogeeapp.app.CutNPasteAppConfigManager = class {
      * app configuration.
      */
     getConfigPromise(app) {
-        var configUrl = apogee.util.readQueryField("config",document.URL);
+        var configUrl = util.readQueryField("config",document.URL);
         var configFilePromise;
         if(configUrl) {
-            configFilePromise = apogee.net.jsonRequest(configUrl);
+            configFilePromise = net.jsonRequest(configUrl);
             //chain the file download promise to the init settings promise
             return configFilePromise.then(appSettings => app.getConfigurationPromise(appSettings));
         }
@@ -35,9 +38,9 @@ apogeeapp.app.CutNPasteAppConfigManager = class {
      * that should be loaded
      */
     getInitialWorkspaceFilePromise(app) {
-        var workspaceUrl = apogee.util.readQueryField("url",document.URL);
+        var workspaceUrl = util.readQueryField("url",document.URL);
         if(workspaceUrl) {
-            return apogee.net.textRequest(workspaceUrl);
+            return net.textRequest(workspaceUrl);
         } else {
             return null;
         }

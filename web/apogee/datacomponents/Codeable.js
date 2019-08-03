@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import Messenger from "/apogee/actions/Messenger.js";
+
 /** This mixin encapsulates an object in that can be coded. It contains a function
  * and supplemental code. Object that are codeable should also be a member and
  * dependent.
@@ -116,7 +119,7 @@ apogee.Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
         
         try {
             //get the inputs to the generator
-            var messenger = new apogee.action.Messenger(this);
+            var messenger = new Messenger(this);
             
             //get the generated fucntion
             var generatedFunctions = compiledInfo.generatorFunction(messenger);
@@ -244,13 +247,13 @@ apogee.Codeable.calculate = function() {
         this.processMemberFunction(this.memberGenerator);
     }
     catch(error) {
-        if(error == apogee.base.MEMBER_FUNCTION_INVALID_THROWABLE) {
+        if(error == base.MEMBER_FUNCTION_INVALID_THROWABLE) {
             //This is not an error. I don't like to throw an error
             //for an expected condition, but I didn't know how else
             //to do this. See notes where this is thrown.
             this.setResultInvalid(true);
         }
-        else if(error == apogee.base.MEMBER_FUNCTION_PENDING_THROWABLE) {
+        else if(error == base.MEMBER_FUNCTION_PENDING_THROWABLE) {
             //This is not an error. I don't like to throw an error
             //for an expected condition, but I didn't know how else
             //to do this. See notes where this is thrown.

@@ -1,3 +1,5 @@
+import action from "/apogee/actions/action.js";
+
 /** This namespace contains the update folder function action */
 apogee.updatefolderfunction = {};
 
@@ -44,5 +46,5 @@ apogee.updatefolderfunction.ACTION_INFO = {
 
 
 //This line of code registers the action 
-apogee.action.addActionInfo(apogee.updatefolderfunction.ACTION_NAME,apogee.updatefolderfunction.ACTION_INFO);
+action.addActionInfo(apogee.updatefolderfunction.ACTION_NAME,apogee.updatefolderfunction.ACTION_INFO);
 

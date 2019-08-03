@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** This is an editor that displays a customized form for data input. */
 apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.DataDisplay {
     
@@ -55,7 +57,7 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.DataDisplay {
         
         //set change to enable save bar is form value differs from initial data
         var onChange = (currentFormValue,form) => {
-            if(apogee.util.jsonEquals(currentFormValue,savedFormValue)) {
+            if(util.jsonEquals(currentFormValue,savedFormValue)) {
                 this.endEditMode()
             }
             else {

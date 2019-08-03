@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import EventManager from "/apogeeutil/EventManager.js";
+
 /** This is a window frame component. IT is used the table window and the dialog.
  *
  * It can be minimized an maximized and dragged and resized with the mouse.  
@@ -19,7 +22,7 @@ apogeeapp.ui.WindowFrame = function(options) {
     }
     
     //base init
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
 	
     //variables
     this.windowParent = null;
@@ -79,7 +82,7 @@ apogeeapp.ui.WindowFrame = function(options) {
 }
 
 //add components to this class
-apogee.base.mixin(apogeeapp.ui.WindowFrame,apogee.EventManager);
+base.mixin(apogeeapp.ui.WindowFrame,EventManager);
 
 apogeeapp.ui.WindowFrame.RESIZE_LOCATION_SIZE = 10;
 

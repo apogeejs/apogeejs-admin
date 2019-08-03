@@ -1,3 +1,7 @@
+import base from "/apogeeutil/base.js";
+import EventManager from "/apogeeutil/EventManager.js";
+import action from "/apogee/actions/action.js";
+
 /** This is the workspace. Typically owner should be null. It
  * is used for creating virtual workspaces. 
  * - optionalJson - For new workspaces this can be empty. If we are deserializing an existing
@@ -8,7 +12,7 @@
  * */
 apogee.Workspace = function(optionalContextOwner) {
     //base init
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
     apogee.ContextHolder.init.call(this);
     apogee.Owner.init.call(this);
     apogee.RootHolder.init.call(this);
@@ -24,10 +28,10 @@ apogee.Workspace = function(optionalContextOwner) {
 }
 
 //add components to this class
-apogee.base.mixin(apogee.Workspace,apogee.EventManager);
-apogee.base.mixin(apogee.Workspace,apogee.ContextHolder);
-apogee.base.mixin(apogee.Workspace,apogee.Owner);
-apogee.base.mixin(apogee.Workspace,apogee.RootHolder);
+base.mixin(apogee.Workspace,EventManager);
+base.mixin(apogee.Workspace,apogee.ContextHolder);
+base.mixin(apogee.Workspace,apogee.Owner);
+base.mixin(apogee.Workspace,apogee.RootHolder);
 
 
 apogee.Workspace.DEFAULT_WORKSPACE_NAME = "Workspace";
@@ -241,10 +245,10 @@ apogee.Workspace.prototype.toJson = function() {
 apogee.Workspace.prototype.loadFromJson = function(json) {
     var fileType = json.fileType;
 	if(fileType !== apogee.Workspace.SAVE_FILE_TYPE) {
-		throw apogee.base.createError("Bad file format.",false);
+		throw base.createError("Bad file format.",false);
 	}
     if(json.version !== apogee.Workspace.SAVE_FILE_VERSION) {
-        throw apogee.base.createError("Incorrect file version. CHECK APOGEEJS.COM FOR VERSION CONVERTER.",false);
+        throw base.createError("Incorrect file version. CHECK APOGEEJS.COM FOR VERSION CONVERTER.",false);
     }
 
     if(json.name !== undefined) {
@@ -255,7 +259,7 @@ apogee.Workspace.prototype.loadFromJson = function(json) {
     actionData.action = "createMember";
     actionData.workspaceIsOwner = true;
     actionData.createData = json.data;
-    var actionResult = apogee.action.doAction(this,actionData);
+    var actionResult = action.doAction(this,actionData);
     
     return actionResult;
 }

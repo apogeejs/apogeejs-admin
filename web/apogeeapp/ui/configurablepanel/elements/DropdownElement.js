@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** This is an text field element configurable element.
  * 
  * @class 
@@ -23,7 +25,7 @@ apogeeapp.ui.DropdownElement = class extends apogeeapp.ui.ConfigurableElement {
         var addEntry = entryInfo => {
             var label;
             var value;
-            if(apogee.util.getObjectType(entryInfo) == "Array") {
+            if(util.getObjectType(entryInfo) == "Array") {
                 label = entryInfo[0]
                 value = entryInfo[1];
             }

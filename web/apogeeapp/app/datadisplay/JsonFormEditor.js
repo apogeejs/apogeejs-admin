@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** Editor that uses json edit area. I am NOT using it for the time being because
  * I need to improve it a little before it is used.
  * 
@@ -43,7 +45,7 @@ apogeeapp.app.JsonFormEditor.prototype.showData = function(data,editOk) {
 	//I should verify I handle this consistently through app.
 	if(data === undefined) data = null;
     
-    this.workingData = apogee.util.jsonCopy(data);
+    this.workingData = util.jsonCopy(data);
     this.editOk = editOk;
     
 	apogeeapp.ui.removeAllChildren(this.editorDiv);

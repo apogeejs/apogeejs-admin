@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** Update Workspace Command
  *
  * Command JSON format:
@@ -36,7 +38,7 @@ apogeeapp.app.updateworkspace.executeCommand = function(workspaceUI,commandData)
     actionData.workspace = workspace;
     actionData.properties = commandData.updatedCoreProperties;
 
-    actionResult = apogee.action.doAction(workspace,actionData);
+    actionResult = action.doAction(workspace,actionData);
 
     //update any workspace ui properties here - none for now
     

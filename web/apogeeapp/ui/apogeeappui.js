@@ -1,3 +1,5 @@
+import base from "/apogeeutil/base.js";
+
 /** This is the main apogeeapp ui file */
 apogeeapp.ui = {};
 
@@ -132,7 +134,7 @@ apogeeapp.ui.initWindows = function(appElementId) {
     //create the ui elements from the app element
     var appContainer = document.getElementById(appElementId);
     if(!appContainer) {
-        throw apogee.base.createError("Container ID not found: " + appElementId);
+        throw base.createError("Container ID not found: " + appElementId);
     }
     
     var elements = {};

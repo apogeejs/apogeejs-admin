@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import util from "/apogeeutil/util.js";
+
 /** This is a function. */
 apogee.FunctionTable = function(name,owner,initialData) {
     //base init
@@ -19,10 +22,10 @@ apogee.FunctionTable = function(name,owner,initialData) {
 }
 
 //add components to this class
-apogee.base.mixin(apogee.FunctionTable,apogee.Member);
-apogee.base.mixin(apogee.FunctionTable,apogee.Dependent);
-apogee.base.mixin(apogee.FunctionTable,apogee.ContextHolder);
-apogee.base.mixin(apogee.FunctionTable,apogee.Codeable);
+base.mixin(apogee.FunctionTable,apogee.Member);
+base.mixin(apogee.FunctionTable,apogee.Dependent);
+base.mixin(apogee.FunctionTable,apogee.ContextHolder);
+base.mixin(apogee.FunctionTable,apogee.Codeable);
 
 //------------------------------
 // Codeable Methods
@@ -56,10 +59,10 @@ apogee.FunctionTable.prototype.getLazyInitializedMemberFunction = function(membe
 
             }
             else if(instance.getResultPending()) {
-                issue = apogee.base.MEMBER_FUNCTION_PENDING_THROWABLE;
+                issue = base.MEMBER_FUNCTION_PENDING_THROWABLE;
             }
             else if(instance.getResultInvalid()) {
-                issue = apogee.base.MEMBER_FUNCTION_INVALID_THROWABLE;
+                issue = base.MEMBER_FUNCTION_INVALID_THROWABLE;
             }
             else {
                 issue = new Error("Unknown problem in initializing: " + instance.getFullName());
@@ -103,7 +106,7 @@ apogee.FunctionTable.readProperties = function(member,values) {
 /** This method executes a property update. */
 apogee.FunctionTable.getPropertyUpdateAction = function(member,newValues) {
     if(newValues.argListString !== undefined) {
-        var newArgList = apogee.FunctionTable.parseStringArray(newValues.argListString);
+        var newArgList = util.parseStringArray(newValues.argListString);
   
         var actionData = {};
         actionData.action = apogee.updatemember.UPDATE_CODE_ACTION_NAME;
@@ -116,16 +119,6 @@ apogee.FunctionTable.getPropertyUpdateAction = function(member,newValues) {
     else {
         return null;
     }
-}
-
-/** This methdo parses an arg list string to make an arg list array. It is
- * also used outisde this class. */
-apogee.FunctionTable.parseStringArray = function(argListString) {
-    var argList = argListString.split(",");
-    for(var i = 0; i < argList.length; i++) {
-        argList[i] = argList[i].trim();
-    }
-    return argList;
 }
 
 //============================
