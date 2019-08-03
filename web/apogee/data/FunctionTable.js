@@ -1,14 +1,18 @@
 import base from "/apogeeutil/base.js";
 import util from "/apogeeutil/util.js";
 import Workspace from "/apogee/data/Workspace.js";
+import Member from "/apogee/datacomponents/ContextHolder.js";
+import Dependent from "/apogee/datacomponents/Dependent.js";
+import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
+import Codeable from "/apogee/datacomponents/Codeable.js";
 
 /** This is a function. */
 function FunctionTable(name,owner,initialData) {
     //base init
-    apogee.Member.init.call(this,name,FunctionTable.generator);
-    apogee.Dependent.init.call(this);
-    apogee.ContextHolder.init.call(this);
-	apogee.Codeable.init.call(this,argList,false);
+    Member.init.call(this,name,FunctionTable.generator);
+    Dependent.init.call(this);
+    ContextHolder.init.call(this);
+	Codeable.init.call(this,argList,false);
     
     this.initOwner(owner);
     
@@ -23,10 +27,10 @@ function FunctionTable(name,owner,initialData) {
 }
 
 //add components to this class
-base.mixin(FunctionTable,apogee.Member);
-base.mixin(FunctionTable,apogee.Dependent);
-base.mixin(FunctionTable,apogee.ContextHolder);
-base.mixin(FunctionTable,apogee.Codeable);
+base.mixin(FunctionTable,Member);
+base.mixin(FunctionTable,Dependent);
+base.mixin(FunctionTable,ContextHolder);
+base.mixin(FunctionTable,Codeable);
 
 //------------------------------
 // Codeable Methods

@@ -1,14 +1,19 @@
 import base from "/apogeeutil/base.js";
 import Workspace from "/apogee/data/Workspace.js";
+import Member from "/apogee/datacomponents/Member.js";
+import Dependent from "/apogee/datacomponents/Dependent.js";
+import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
+import Owner from "/apogee/datacomponents/Owner.js";
+import Parent from "/apogee/datacomponents/Parent.js";
 
 /** This is a folder. */
 function Folder(name,owner) {
     //base init
-    apogee.Member.init.call(this,name,Folder.generator);
-    apogee.Dependent.init.call(this);
-    apogee.ContextHolder.init.call(this);
-    apogee.Owner.init.call(this);
-    apogee.Parent.init.call(this);
+    Member.init.call(this,name,Folder.generator);
+    Dependent.init.call(this);
+    ContextHolder.init.call(this);
+    Owner.init.call(this);
+    Parent.init.call(this);
     
     this.initOwner(owner);
 
@@ -22,11 +27,11 @@ function Folder(name,owner) {
 }
 
 //add components to this class
-base.mixin(Folder,apogee.Member);
-base.mixin(Folder,apogee.Dependent);                      
-base.mixin(Folder,apogee.ContextHolder);
-base.mixin(Folder,apogee.Owner);
-base.mixin(Folder,apogee.Parent);
+base.mixin(Folder,Member);
+base.mixin(Folder,Dependent);                      
+base.mixin(Folder,ContextHolder);
+base.mixin(Folder,Owner);
+base.mixin(Folder,Parent);
 
 //------------------------------
 // Parent Methods

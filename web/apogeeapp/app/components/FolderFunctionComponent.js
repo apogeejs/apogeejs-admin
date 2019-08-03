@@ -34,7 +34,7 @@ apogeeapp.app.FolderFunctionComponent.prototype.writeToJson = function(json) {
 
 apogeeapp.app.FolderFunctionComponent.prototype.readChildrenFromJson = function(workspaceUI,childActionResults,json) {
     //verify the internal folder was loaded
-    var internalFolderActionResult = childActionResults[apogee.FolderFunction.INTERNAL_FOLDER_NAME];
+    //var internalFolderActionResult = childActionResults[FolderFunction.INTERNAL_FOLDER_NAME];
     
     //verify success???
     //verify the action result exists!!!

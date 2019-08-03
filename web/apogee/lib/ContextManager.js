@@ -7,27 +7,27 @@
  * A "data" entry is a map of variables. Thse are not apogee members. With a "data" entry 
  * you can look up the variable values only. This is used to give access to other
  * variables besides the apogee members. */
-apogee.ContextManager = function(contextHolder) {
+export default function ContextManager(contextHolder) {
     this.contextHolder = contextHolder;
     this.contextList = [];
 }
 
-apogee.ContextManager.prototype.addToContextList = function(entry) {
+ContextManager.prototype.addToContextList = function(entry) {
     this.contextList.push(entry);
 }
 
-apogee.ContextManager.prototype.removeFromContextList = function(entry) {
+ContextManager.prototype.removeFromContextList = function(entry) {
     var index = this.contextList.indexOf(entry);
     if(index >= 0) {
         this.contextList.splice(index,1);
     }
 }
 
-apogee.ContextManager.prototype.clearContextList = function() {
+ContextManager.prototype.clearContextList = function() {
     this.contextList = [];
 }
 
-apogee.ContextManager.prototype.getValue = function(varName) {
+ContextManager.prototype.getValue = function(varName) {
     var data = this.lookupValue(varName);
     
     //if the name is not in this context, check with the parent context
@@ -44,7 +44,7 @@ apogee.ContextManager.prototype.getValue = function(varName) {
     return data;
 }
 
-apogee.ContextManager.prototype.getMember = function(path) {
+ContextManager.prototype.getMember = function(path) {
     var impactor = this.lookupMember(path);
     
     //if the object is not in this context, check with the parent context
@@ -66,7 +66,7 @@ apogee.ContextManager.prototype.getMember = function(path) {
 //==================================
 
 /** Check each entry of the context list to see if the data is present. */
-apogee.ContextManager.prototype.lookupValue = function(varName) {
+ContextManager.prototype.lookupValue = function(varName) {
     var data;
     for(var i = 0; i < this.contextList.length; i++) {
         var entry = this.contextList[i];        
@@ -88,7 +88,7 @@ apogee.ContextManager.prototype.lookupValue = function(varName) {
     return undefined;
 }
 
-apogee.ContextManager.prototype.lookupMember = function(path) {
+ContextManager.prototype.lookupMember = function(path) {
     var impactor;
     for(var i = 0; i < this.contextList.length; i++) {
         var entry = this.contextList[i];        

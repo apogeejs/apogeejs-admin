@@ -1,3 +1,5 @@
+import ActionError from "/apogee/lib/ActionError.js";
+
 /** This mixin encapsulates an member whose value depends on on another
  * member. The dependent allows for a recalculation based on an update of the 
  * objects it depends on.
@@ -8,10 +10,11 @@
  * - A Dependent must be a Member.
  * 
  */
-apogee.Dependent = {};
+let Dependent = {};
+export {Dependent as default};
 
 /** This initializes the component */
-apogee.Dependent.init = function() {
+Dependent.init = function() {
     
     //this is the list of dependencies
     this.dependsOnList = [];
@@ -20,37 +23,37 @@ apogee.Dependent.init = function() {
 
 /** This property tells if this object is a dependent.
  * This property should not be implemented on non-dependents. */
-apogee.Dependent.isDependent = true;
+Dependent.isDependent = true;
 
 /** This returns a list of the members that this member depends on. */
-apogee.Dependent.getDependsOn = function() {
+Dependent.getDependsOn = function() {
     return this.dependsOnList;
 }
 
 /** This returns the calc pending flag.  */
-apogee.Dependent.getCalcPending = function() {
+Dependent.getCalcPending = function() {
     return this.calcPending;
 }
 
 /** This sets the calc pending flag to false. It should be called when the 
  * calcultion is no longer needed.  */
-apogee.Dependent.clearCalcPending = function() {
+Dependent.clearCalcPending = function() {
     this.calcPending = false;
 }
 
 //Must be implemented in extending object
 ///** This method udpates the dependencies if needed because
 // *a variable was added or removed from the workspace.  */
-//apogee.Dependent.updateDependeciesForModelChange = function(object);
+//Dependent.updateDependeciesForModelChange = function(object);
 
 ///** This is a check to see if the object should be checked for dependencies 
 // * for recalculation. It is safe for this method to always return false and
 // allow the calculation to happen. 
 // * @private */
-//apogee.Dependent.needsCalculating = function();
+//Dependent.needsCalculating = function();
 
 /** This does any init needed for calculation.  */
-apogee.Dependent.prepareForCalculate = function() {
+Dependent.prepareForCalculate = function() {
     this.clearErrors();
     this.setResultPending(false);
     this.setResultInvalid(false);
@@ -58,11 +61,11 @@ apogee.Dependent.prepareForCalculate = function() {
 }
 
 ///** This updates the member based on a change in a dependency.  */
-//apogee.Dependent.calculate = function();
+//Dependent.calculate = function();
 
 /** This method makes sure any impactors are set. It sets a dependency 
  * error if one or more of the dependencies has a error. */
-apogee.Dependent.initializeImpactors = function() {
+Dependent.initializeImpactors = function() {
     var errorDependencies = [];
     var resultPending = false;
     var resultInvalid = false;
@@ -96,7 +99,7 @@ apogee.Dependent.initializeImpactors = function() {
 }
 
 /** This method does any needed cleanup when the dependent is depeted.. */
-apogee.Dependent.onDeleteDependent = function() {
+Dependent.onDeleteDependent = function() {
     //remove this dependent from the impactor
     for(var i = 0; i < this.dependsOnList.length; i++) {
         var remoteMember = this.dependsOnList[i];
@@ -109,7 +112,7 @@ apogee.Dependent.onDeleteDependent = function() {
 //===================================
 
 /** This sets the dependencies based on the code for the member. */
-apogee.Dependent.updateDependencies = function(newDependsOn) {
+Dependent.updateDependencies = function(newDependsOn) {
     
     var dependenciesUpdated = false;
     
@@ -162,14 +165,14 @@ apogee.Dependent.updateDependencies = function(newDependsOn) {
 
 /** This method creates an dependency error, given a list of impactors that have an error. 
  * @private */
-apogee.Dependent.createDependencyError = function(errorDependencies) {
+Dependent.createDependencyError = function(errorDependencies) {
         //dependency error found
         var message = "Error in dependency: ";
         for(var i = 0; i < errorDependencies.length; i++) {
             if(i > 0) message += ", ";
             message += errorDependencies[i].getFullName();
         }
-        var actionError = new apogee.ActionError(message,"Calculation - Dependency",this);
+        var actionError = new ActionError(message,"Calculation - Dependency",this);
         this.addError(actionError);   
 
 }

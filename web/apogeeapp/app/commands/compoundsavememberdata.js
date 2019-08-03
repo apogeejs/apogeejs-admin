@@ -61,7 +61,7 @@ apogeeapp.app.compoundsavememberdata.executeCommand = function(workspaceUI,comma
     }
     
     var actionData = {};
-    actionData.action = apogee.compoundaction.ACTION_NAME;
+    actionData.action = "compoundAction";
     actionData.actions = actionList;
     
     var actionResult = doAction(workspace,actionData);

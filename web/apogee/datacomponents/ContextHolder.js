@@ -4,18 +4,19 @@
  * 
  * COMPONENT DEPENDENCIES:
  */
-apogee.ContextHolder = {};
+let ContextHolder = {};
+export {ContextHolder as default};
 
 /** This initializes the component */
-apogee.ContextHolder.init = function() {
+ContextHolder.init = function() {
     //will be set on demand
     this.contextManager = null;
 }
 
-apogee.ContextHolder.isContextHolder = true;
+ContextHolder.isContextHolder = true;
 
 /** This method retrieves the context manager. */
-apogee.ContextHolder.getContextManager = function() {
+ContextHolder.getContextManager = function() {
     if(!this.contextManager) {
         //set the context manager
         this.contextManager = this.createContextManager();
@@ -26,7 +27,7 @@ apogee.ContextHolder.getContextManager = function() {
 
 //this method must be implemneted in extending classes
 ///** This method retrieve creates the loaded context manager. */
-//apogee.ContextHolder.createContextManager = function();
+//ContextHolder.createContextManager = function();
 
 
 

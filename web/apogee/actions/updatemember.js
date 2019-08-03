@@ -1,5 +1,6 @@
 import util from "/apogeeutil/util.js";
 import {addActionInfo} from "/apogee/actions/action.js";
+import ActionError from "/apogee/lib/ActionError.js";
 
 /** This is self installing command module. It has no exports
  * but it must be imported to install the command. 
@@ -122,7 +123,7 @@ function updateData(workspace,actionData,actionResult) {
     }
     else if(data instanceof Error) {
         //data is an error
-        var actionError = apogee.actionError.processException(error,apogee.ActionError.ERROR_TYPE_MODEL);
+        var actionError = ActionError.processException(error,ActionError.ERROR_TYPE_MODEL);
         member.addError(actionError);
     }
     else if(data === util.INVALID_VALUE) {

@@ -6,19 +6,20 @@
  * COMPONENT DEPENDENCIES:
  * - A RootHolder must be an Owner.
  */
-apogee.RootHolder = {};
+let RootHolder = {};
+export {RootHolder as default};
 
 /** This initializes the component */
-apogee.RootHolder.init = function() {
+RootHolder.init = function() {
 }
 
-apogee.RootHolder.isRootHolder = true;
+RootHolder.isRootHolder = true;
 
 // Must be implemented in extending object
 ///** This method sets the root object.  */
-//apogee.RootHolder.setRoot = function(member);
+//RootHolder.setRoot = function(member);
 
 // Must be implemented in extending object
 ///** This method returns the root object.  */
-//apogee.RootHolder.getRoot = function();
+//RootHolder.getRoot = function();
 

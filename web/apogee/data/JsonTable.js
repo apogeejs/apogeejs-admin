@@ -1,14 +1,18 @@
 import base from "/apogeeutil/base.js";
 import util from "/apogeeutil/util.js";
 import Workspace from "/apogee/data/Workspace.js";
+import Member from "/apogee/datacomponents/Member.js";
+import Dependent from "/apogee/datacomponents/Dependent.js";
+import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
+import Codeable from "/apogee/datacomponents/Codeable.js";
 
 /** This class encapsulatees a data table for a JSON object */
 function JsonTable(name,owner,initialData) {
     //base init
-    apogee.Member.init.call(this,name,JsonTable.generator);
-    apogee.Dependent.init.call(this);
-    apogee.ContextHolder.init.call(this);
-	apogee.Codeable.init.call(this,[],true);
+    Member.init.call(this,name,JsonTable.generator);
+    Dependent.init.call(this);
+    ContextHolder.init.call(this);
+	Codeable.init.call(this,[],true);
     
     this.initOwner(owner);
     
@@ -35,10 +39,10 @@ function JsonTable(name,owner,initialData) {
 }
 
 //add components to this class
-base.mixin(JsonTable,apogee.Member);
-base.mixin(JsonTable,apogee.Dependent);
-base.mixin(JsonTable,apogee.ContextHolder);
-base.mixin(JsonTable,apogee.Codeable);
+base.mixin(JsonTable,Member);
+base.mixin(JsonTable,Dependent);
+base.mixin(JsonTable,ContextHolder);
+base.mixin(JsonTable,Codeable);
 
 //------------------------------
 // Codeable Methods
@@ -94,7 +98,7 @@ JsonTable.prototype.setData = function(data) {
 	base.deepFreeze(data);
 
 	//store the new object
-    return apogee.Member.setData.call(this,data);
+    return Member.setData.call(this,data);
 }
 
 /** This method creates a member from a json. It should be implemented as a static

@@ -10,43 +10,44 @@
  * COMPONENT DEPENDENCIES:
  * An Owner must be a Context Holder
  */
-apogee.Owner = {};
+let Owner = {};
+export {Owner as default};
 
 /** This initializes the component */
-apogee.Owner.init = function() {
+Owner.init = function() {
 }
 
-apogee.Owner.isOwner = true;
+Owner.isOwner = true;
 
 //must be implemented in extending object
 ///** This method retrieves the workspace for the child of this owner. */
-//apogee.Owner.getWorkspace = function();
+//Owner.getWorkspace = function();
 
 //must be implemented in extending object
 ///** This method retrieves the full name whichis relevent for a root folder owned
 // * by this object. */
-//apogee.Owner.getPossesionNameBase = function();
+//Owner.getPossesionNameBase = function();
 
 /** This method returns the full name in dot notation for this object. */
-apogee.Owner.getChildFullName = function(childName) {
+Owner.getChildFullName = function(childName) {
     return this.getPossesionNameBase() + childName;
 }
 
 //must be implented by extending object
 ///** This method retrieves the context manager for this owner. */
-//apogee.Owner.getContextManager = function();
+//Owner.getContextManager = function();
 
 /** This method looks up a member by its full name. */
-apogee.Owner.getMemberByFullName = function(fullName) {
+Owner.getMemberByFullName = function(fullName) {
     var path = fullName.split(".");
     return this.getMemberByPathArray(path);
 }
 
 ///** This method looks up a member by an array path. The start element is
 // * the index of the array at which to start. */
-//apogee.Owner.getMemberByPathArray = function(path,startElement);
+//Owner.getMemberByPathArray = function(path,startElement);
 
 ///** This method is called when the workspace is closed.
 // It should do any needed cleanup for the object. */
-//apogee.Owner.onClose = function();
+//Owner.onClose = function();
 

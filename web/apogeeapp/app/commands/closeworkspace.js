@@ -16,7 +16,7 @@ apogeeapp.app.closeworkspace.executeCommand = function(workspaceUI,commandData) 
     
     try {
         
-        workspaceUIRemoved = apogeeapp.app.getInstance().clearWorkspaceUI();
+        workspaceUIRemoved = apogeeapp.app.Apogee.getInstance().clearWorkspaceUI();
         
         workspaceUI.close();
         workspace.onClose();

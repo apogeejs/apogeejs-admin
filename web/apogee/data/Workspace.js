@@ -1,6 +1,10 @@
 import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManager.js";
 import {doAction} from "/apogee/actions/action.js";
+import ContextManager from "/apogee/lib/ContextManager.js";
+import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
+import Owner from "/apogee/datacomponents/Owner.js";
+import RootHolder from "/apogee/datacomponents/RootHolder.js";
 
 /** This is the workspace. Typically owner should be null. It
  * is used for creating virtual workspaces. 
@@ -13,9 +17,9 @@ import {doAction} from "/apogee/actions/action.js";
 export default function Workspace(optionalContextOwner) {
     //base init
     EventManager.init.call(this);
-    apogee.ContextHolder.init.call(this);
-    apogee.Owner.init.call(this);
-    apogee.RootHolder.init.call(this);
+    ContextHolder.init.call(this);
+    Owner.init.call(this);
+    RootHolder.init.call(this);
     
     // This is a queue to hold actions while one is in process.
     this.actionInProgress = false;
@@ -29,9 +33,9 @@ export default function Workspace(optionalContextOwner) {
 
 //add components to this class
 base.mixin(Workspace,EventManager);
-base.mixin(Workspace,apogee.ContextHolder);
-base.mixin(Workspace,apogee.Owner);
-base.mixin(Workspace,apogee.RootHolder);
+base.mixin(Workspace,ContextHolder);
+base.mixin(Workspace,Owner);
+base.mixin(Workspace,RootHolder);
 
 
 Workspace.DEFAULT_WORKSPACE_NAME = "Workspace";
@@ -107,7 +111,7 @@ Workspace.prototype.saveMessengerAction = function(actionInfo) {
 Workspace.prototype.getSavedMessengerAction = function() {
     if(this.messengerActionList.length > 0) {
         var actionData = {};
-        actionData.action = apogee.compoundaction.ACTION_NAME;
+        actionData.action = "compoundAction";
         actionData.actions = this.messengerActionList;
         this.messengerActionList = []
         return actionData;
@@ -196,7 +200,7 @@ Workspace.prototype.getMemberByPathArray = function(path,startElement) {
 /** This method retrieve creates the loaded context manager. */
 Workspace.prototype.createContextManager = function() {
     //set the context manager
-    var contextManager = new apogee.ContextManager(this);
+    var contextManager = new ContextManager(this);
     
     //if no owner is defined for the workspace - the standard scenario, we will
     //add all global variables as a data entry for the context, so these variables

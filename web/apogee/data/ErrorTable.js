@@ -1,16 +1,17 @@
 import base from "/apogeeutil/base.js";
 import Workspace from "/apogee/data/Workspace.js";
+import Member from "/apogee/datacomponents/Member.js";
 
 /** This class encapsulatees a table with no specific functionality. It
  * is intended to be used as a placeholder when a table generator is not found. */
 function ErrorTable(name,owner,completeJson) {
     //base init
-    apogee.Member.init.call(this,name,ErrorTable.generator);
+    Member.init.call(this,name,ErrorTable.generator);
     //i didn't really want this to be a dependent, bot for now I think they all have to be - check into this.
     //there are at least two places
     //- add to recalc list function in action (which I temporarily fixed)
     //- initialize impactors in dependent, assumes all impactors are dependents (this is also needed 
-    apogee.Dependent.init.call(this);
+    Dependent.init.call(this);
     
     this.initOwner(owner);
     
@@ -23,8 +24,8 @@ function ErrorTable(name,owner,completeJson) {
 }
 
 //add components to this class
-base.mixin(ErrorTable,apogee.Member);
-//base.mixin(ErrorTable,apogee.Dependent);
+base.mixin(ErrorTable,Member);
+//base.mixin(ErrorTable,Dependent);
 
 //------------------------------
 // Member Methods
@@ -39,7 +40,7 @@ ErrorTable.prototype.setData = function(data) {
 	base.deepFreeze(data);
 
 	//store the new object
-    return apogee.Member.setData.call(this,data);
+    return Member.setData.call(this,data);
 }
 
 /** This overrides the commplete json to just pass back the entire json sent in. */

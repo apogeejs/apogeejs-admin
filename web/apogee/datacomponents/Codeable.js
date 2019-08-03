@@ -3,6 +3,9 @@ import Messenger from "/apogee/actions/Messenger.js";
 import {addToRecalculateList} from "/apogee/lib/workspaceCalculation.js";
 import {processCode} from "/apogee/lib/codeCompiler.js"; 
 import {getDependencyInfo} from "/apogee/lib/codeDependencies.js";
+import ActionError from "/apogee/lib/ActionError.js";
+import ContextManager from "/apogee/lib/ContextManager.js";
+import Dependent from "/apogee/datacomponents/Dependent.js"
 
 /** This mixin encapsulates an object in that can be coded. It contains a function
  * and supplemental code. Object that are codeable should also be a member and
@@ -21,10 +24,11 @@ import {getDependencyInfo} from "/apogee/lib/codeDependencies.js";
  * - private
  * - description
  */
-apogee.Codeable = {};
+let Codeable = {};
+export {Codeable as default};
 
 /** This initializes the component. argList is the arguments for the object function. */
-apogee.Codeable.init = function(argList) {
+Codeable.init = function(argList) {
     
     //arguments of the member function
     if(argList) {
@@ -62,40 +66,40 @@ apogee.Codeable.init = function(argList) {
 
 /** This property tells if this object is a codeable.
  * This property should not be implemented on non-codeables. */
-apogee.Codeable.isCodeable = true
+Codeable.isCodeable = true
 
-apogee.Codeable.getSetCodeOk = function() {
+Codeable.getSetCodeOk = function() {
     return this.generator.setCodeOk;
 }
 
 /** This method returns the argument list.  */
-apogee.Codeable.getArgList = function() {
+Codeable.getArgList = function() {
     return this.argList;
 }
 
 /** This method returns the fucntion body for this member.  */
-apogee.Codeable.getFunctionBody = function() {
+Codeable.getFunctionBody = function() {
     return this.functionBody;
 }
 
 /** This method returns the supplemental code for this member.  */
-apogee.Codeable.getSupplementalCode = function() {
+Codeable.getSupplementalCode = function() {
     return this.supplementalCode;
 }
 
 /** This method returns the supplemental code for this member.  */
-apogee.Codeable.getDescription = function() {
+Codeable.getDescription = function() {
     return this.description;
 }
 
 /** This method returns the supplemental code for this member.  */
-apogee.Codeable.setDescription = function(description) {
+Codeable.setDescription = function(description) {
     this.fieldUpdated("description");
     this.description = description;
 }
 
 /** This method returns the formula for this member.  */
-apogee.Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
+Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
 
     //set the base data
     if(this.argList.toString() != codeInfo.argList.toString()) {
@@ -130,7 +134,7 @@ apogee.Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
             this.memberFunctionInitializer = generatedFunctions.initializer;                       
         }
         catch(ex) {
-            this.codeErrors.push(apogee.ActionError.processException(ex,"Codeable - Set Code",false));
+            this.codeErrors.push(ActionError.processException(ex,"Codeable - Set Code",false));
         }
     }
     else {
@@ -147,7 +151,7 @@ apogee.Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
 }
 
 /** This is a helper method that compiles the code as needed for setCodeInfo.*/
-apogee.Codeable.applyCode = function(argList,functionBody,supplementalCode) {
+Codeable.applyCode = function(argList,functionBody,supplementalCode) {
     
     var codeInfo ={};
     codeInfo.argList = argList;
@@ -166,7 +170,7 @@ apogee.Codeable.applyCode = function(argList,functionBody,supplementalCode) {
 }
 
 /** This method returns the formula for this member.  */
-apogee.Codeable.initializeDependencies = function() {
+Codeable.initializeDependencies = function() {
     
     if((this.hasCode())&&(this.varInfo)&&(this.codeErrors.length === 0)) {
         try {
@@ -177,7 +181,7 @@ apogee.Codeable.initializeDependencies = function() {
             this.updateDependencies(newDependencyList);
         }
         catch(ex) {
-            this.codeErrors.push(apogee.ActionError.processException(ex,"Codeable - Set Dependencies",false));
+            this.codeErrors.push(ActionError.processException(ex,"Codeable - Set Dependencies",false));
         }
     }
     else {
@@ -188,7 +192,7 @@ apogee.Codeable.initializeDependencies = function() {
 
 /** This method udpates the dependencies if needed because
  *the passed variable was added.  */
-apogee.Codeable.updateDependeciesForModelChange = function(recalculateList) {
+Codeable.updateDependeciesForModelChange = function(recalculateList) {
     if((this.hasCode())&&(this.varInfo)) {
                   
         //calculate new dependencies
@@ -205,7 +209,7 @@ apogee.Codeable.updateDependeciesForModelChange = function(recalculateList) {
 }
     
 /** This method returns the formula for this member.  */
-apogee.Codeable.clearCode = function() {
+Codeable.clearCode = function() {
     this.codeSet = false;
     if(this.functionBody != "") {
         this.fieldUpdated("functionBody");
@@ -230,27 +234,27 @@ apogee.Codeable.clearCode = function() {
 }
 
 /** This method returns the formula for this member.  */
-apogee.Codeable.hasCode = function() {
+Codeable.hasCode = function() {
     return this.codeSet;
 }
 
 /** If this is true the member is ready to be executed. 
  * @private */
-apogee.Codeable.needsCalculating = function() {
+Codeable.needsCalculating = function() {
 	return this.codeSet;
 }
 
 /** This does any init needed for calculation.  */
-apogee.Codeable.prepareForCalculate = function() {
+Codeable.prepareForCalculate = function() {
     //call the base function
-    apogee.Dependent.prepareForCalculate.call(this);
+    Dependent.prepareForCalculate.call(this);
     
     this.functionInitialized = false;
     this.initReturnValue = false;
 }
 
 /** This method sets the data object for the member.  */
-apogee.Codeable.calculate = function() {
+Codeable.calculate = function() {
     if(this.codeErrors.length > 0) {
         this.addErrors(this.codeErrors);
         this.clearCalcPending();
@@ -259,7 +263,7 @@ apogee.Codeable.calculate = function() {
     
     if((!this.memberGenerator)||(!this.memberFunctionInitializer)) {
         var msg = "Function not found for member: " + this.getName();
-        var actionError = new apogee.ActionError(msg,"Codeable - Calculate",this);
+        var actionError = new ActionError(msg,"Codeable - Calculate",this);
         this.addError(actionError);
         this.clearCalcPending();
         return;
@@ -291,7 +295,7 @@ apogee.Codeable.calculate = function() {
             }
 
             var errorMsg = (error.message) ? error.message : "Unknown error";
-            var actionError = new apogee.ActionError(errorMsg,"Codeable - Calculate",this);
+            var actionError = new ActionError(errorMsg,"Codeable - Calculate",this);
             actionError.setParentException(error);
             this.addError(actionError);
         }
@@ -301,14 +305,14 @@ apogee.Codeable.calculate = function() {
 }
 
 /** This makes sure user code of object function is ready to execute.  */
-apogee.Codeable.memberFunctionInitialize = function() {
+Codeable.memberFunctionInitialize = function() {
     
     if(this.functionInitialized) return this.initReturnValue;
     
     //make sure this in only called once
     if(this.dependencyInitInProgress) {
         var errorMsg = "Circular reference error";
-        var actionError = new apogee.ActionError(errorMsg,"Codeable - Calculate",this);
+        var actionError = new ActionError(errorMsg,"Codeable - Calculate",this);
         this.addError(actionError);
         //clear calc in progress flag
         this.dependencyInitInProgress = false;
@@ -340,7 +344,7 @@ apogee.Codeable.memberFunctionInitialize = function() {
             console.error(error.stack);
         }
         var errorMsg = (error.message) ? error.message : "Unknown error";
-        var actionError = new apogee.ActionError(errorMsg,"Codeable - Calculate",this);
+        var actionError = new ActionError(errorMsg,"Codeable - Calculate",this);
         actionError.setParentException(error);
         this.addError(actionError);
         this.initReturnValue = false;
@@ -357,7 +361,7 @@ apogee.Codeable.memberFunctionInitialize = function() {
 
 /** This gets an update structure to upsate a newly instantiated member
 /* to match the current object. */
-apogee.Codeable.getUpdateData = function() {
+Codeable.getUpdateData = function() {
     var updateData = {};
     if(this.hasCode()) {
         updateData.argList = this.getArgList();
@@ -376,8 +380,8 @@ apogee.Codeable.getUpdateData = function() {
 //------------------------------
 
 /** This method retrieve creates the loaded context manager. */
-apogee.Codeable.createContextManager = function() {
-    return new apogee.ContextManager(this);
+Codeable.createContextManager = function() {
+    return new ContextManager(this);
 }
 
 //===================================
@@ -387,5 +391,5 @@ apogee.Codeable.createContextManager = function() {
 //implementations must implement this function
 //This method takes the object function generated from code and processes it
 //to set the data for the object. (protected)
-//apogee.Codeable.processMemberFunction 
+//Codeable.processMemberFunction 
 

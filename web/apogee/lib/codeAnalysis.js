@@ -1,4 +1,5 @@
 import base from "/apogeeutil/base.js";
+import ActionError from "/apogee/lib/ActionError.js";
 
 /** This function parses the code and returns a table that gives the variable use
  * in the passed function. The var info table has the following content
@@ -240,7 +241,7 @@ export function analyzeCode(functionText) {
             returnValue.errors = [];
             for(var i = 0; i < ast.errors.length; i++) {
                 var astError = ast.errors[i];
-                var actionError = new apogee.ActionError(astError.description,"Analyze - Code");
+                var actionError = new ActionError(astError.description,"Analyze - Code");
                 actionError.setParentException(astError);
                 returnValue.errors.push(actionError);
             }
@@ -255,7 +256,7 @@ export function analyzeCode(functionText) {
         return returnValue;
     }
     catch(exception) {
-        var actionError = apogee.ActionError.processException(exception,"Analyze - Code",false);
+        var actionError = ActionError.processException(exception,"Analyze - Code",false);
         returnValue.success = false;
         returnValue.errors = [];
         returnValue.errors.push(actionError);

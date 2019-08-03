@@ -1,16 +1,23 @@
 import base from "/apogeeutil/base.js";
 import {doAction} from "/apogee/actions/action.js";
 import Workspace from "/apogee/data/Workspace.js";
+import ActionError from "/apogee/lib/ActionError.js";
+import ContextManager from "/apogee/lib/ContextManager.js";
+import Member from "/apogee/datacomponents/Member.js";
+import Dependent from "/apogee/datacomponents/Dependent.js";
+import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
+import Owner from "/apogee/datacomponents/Owner.js";
+import RootHolder from "/apogee/datacomponents/RootHolder.js";
 
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
 function FolderFunction(name,owner,initialData,createEmptyInternalFolder) {
     //base init
-    apogee.Member.init.call(this,name,FolderFunction.generator);
-    apogee.Dependent.init.call(this);
-    apogee.ContextHolder.init.call(this);
-    apogee.Owner.init.call(this);
-    apogee.RootHolder.init.call(this);
+    Member.init.call(this,name,FolderFunction.generator);
+    Dependent.init.call(this);
+    ContextHolder.init.call(this);
+    Owner.init.call(this);
+    RootHolder.init.call(this);
     
     this.initOwner(owner);
     
@@ -24,17 +31,18 @@ function FolderFunction(name,owner,initialData,createEmptyInternalFolder) {
     
     //recreate the root folder if info is specified
     if(createEmptyInternalFolder) {
-        var internalFolder = new apogee.Folder(FolderFunction.INTERNAL_FOLDER_NAME,this);
+        throw new Error("I need to make this folder correctly!!!");
+        var internalFolder = new Folder(FolderFunction.INTERNAL_FOLDER_NAME,this);
         this.setRoot(internalFolder);
     }
 }
 
 //add components to this class
-base.mixin(FolderFunction,apogee.Member);
-base.mixin(FolderFunction,apogee.Dependent);
-base.mixin(FolderFunction,apogee.ContextHolder);
-base.mixin(FolderFunction,apogee.Owner);
-base.mixin(FolderFunction,apogee.RootHolder);
+base.mixin(FolderFunction,Member);
+base.mixin(FolderFunction,Dependent);
+base.mixin(FolderFunction,ContextHolder);
+base.mixin(FolderFunction,Owner);
+base.mixin(FolderFunction,RootHolder);
 
 FolderFunction.INTERNAL_FOLDER_NAME = "root";
 
@@ -200,7 +208,7 @@ FolderFunction.prototype.updateDependeciesForModelChange = function(recalculateL
 
 /** This method retrieve creates the loaded context manager. */
 FolderFunction.prototype.createContextManager = function() {
-    return new apogee.ContextManager(this);
+    return new ContextManager(this);
 }
 
 //------------------------------
@@ -351,7 +359,7 @@ FolderFunction.prototype.createVirtualWorkspace = function(folderFunctionErrors)
         return virtualWorkspace;
 	}
 	catch(error) {
-        var actionError = apogee.ActionError.processException(error,"FolderFunction - Code",false);
+        var actionError = ActionError.processException(error,"FolderFunction - Code",false);
 		folderFunctionErrors.push(actionError);
 		return null;
 	}
@@ -370,7 +378,7 @@ FolderFunction.prototype.loadInputElements = function(rootFolder,folderFunctionE
 //		else {
 //            //missing input element
 //            var msg = "Input element not found in folderFunction: " + argName;
-//            var actionError = new apogee.ActionError(msg,"FolderFunction - Code",this);
+//            var actionError = new ActionError(msg,"FolderFunction - Code",this);
 //            folderFunctionErrors.push(actionError);
 //        }       
     }
@@ -384,7 +392,7 @@ FolderFunction.prototype.loadOutputElement = function(rootFolder,folderFunctionE
 //    if(!returnValueMember) {
 //        //missing input element
 //        var msg = "Return element not found in folderFunction: " + this.returnValueString;
-//        var actionError = new apogee.ActionError(msg,"FolderFunction - Code",this);
+//        var actionError = new ActionError(msg,"FolderFunction - Code",this);
 //        folderFunctionErrors.push(actionError);
 //    }
     return returnValueMember;
