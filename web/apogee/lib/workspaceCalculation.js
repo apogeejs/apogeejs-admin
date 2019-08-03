@@ -1,12 +1,10 @@
-/** This namespace contains functions to process an update to an member
+/** This module contains functions to process an update to an member
  * which inherits from the FunctionBase component. */
-apogee.calculation = {};
 
 
 /** This moethod should be called on an member (impactor or dependent) that changes.
- * This will allow for any Dependents to be recaculated.
- * @private */
-apogee.calculation.addToRecalculateList = function(recalculateList,member) {
+ * This will allow for any Dependents to be recaculated. */
+export function addToRecalculateList(recalculateList,member) {
     //if it is in the list, return
     if(recalculateList.indexOf(member) >= 0) return;
      
@@ -16,23 +14,22 @@ apogee.calculation.addToRecalculateList = function(recalculateList,member) {
         member.prepareForCalculate();
     }
         
-    apogee.calculation.addDependsOnToRecalculateList(recalculateList,member);
+    addDependsOnToRecalculateList(recalculateList,member);
 }
 
-apogee.calculation.addDependsOnToRecalculateList = function(recalculateList,member) {
+export function addDependsOnToRecalculateList(recalculateList,member) {
     //add any member that depends on this one    
     var impactsList = member.getImpactsList();
     for(var i = 0; i < impactsList.length; i++) {
-        apogee.calculation.addToRecalculateList(recalculateList,impactsList[i]);
+        addToRecalculateList(recalculateList,impactsList[i]);
     }
 }
 
 
 
 /** This calls execute for each member in the recalculate list. The return value
- * is false if there are any errors.
- * @private */
-apogee.calculation.callRecalculateList = function(recalculateList) {
+ * is false if there are any errors. */
+export function callRecalculateList(recalculateList) {
     var dependent;
     var i;
     var success = true;

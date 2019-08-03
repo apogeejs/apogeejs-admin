@@ -1,3 +1,5 @@
+import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} from "/apogee/lib/workspaceCalculation.js";
+
 /**
  * Action Module
  * An action is an operation on the data model. The code in this module handles
@@ -104,7 +106,7 @@ export function doAction(workspace,actionData) {
         
         updateRecalculateList(completedResults,recalculateList);
         
-        apogee.calculation.callRecalculateList(recalculateList);
+        callRecalculateList(recalculateList);
     
         //fire events
         fireEvents(workspace,completedResults,recalculateList);
@@ -218,10 +220,10 @@ function updateRecalculateList(completedResults,recalculateList) {
         var actionResult = completedResults[i];
         if((actionResult.actionDone)&&(actionResult.member)) {
             if(doAddToRecalc(actionResult)) {
-                apogee.calculation.addToRecalculateList(recalculateList,actionResult.member);            
+                addToRecalculateList(recalculateList,actionResult.member);            
             }
             else if((doAddDependOnToRecalc(actionResult))) {
-                apogee.calculation.addDependsOnToRecalculateList(recalculateList,actionResult.member);                         
+                addDependsOnToRecalculateList(recalculateList,actionResult.member);                         
             }
         }
     }

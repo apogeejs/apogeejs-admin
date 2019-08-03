@@ -1,4 +1,5 @@
 import util from "/apogeeutil/util.js";
+import {validateTableName} from "/apogee/lib/codeCompiler.js"; 
 
 apogeeapp.app.addcomponentseq = {};
 
@@ -36,7 +37,7 @@ apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,opt
         var onSubmitFunction = function(userInputProperties) {
             
             //validate the name
-            var nameResult = apogee.codeCompiler.validateTableName(userInputProperties.name);
+            var nameResult = validateTableName(userInputProperties.name);
             if(!nameResult.valid) {
                 alert(nameResult.errorMessage);
                 return false;

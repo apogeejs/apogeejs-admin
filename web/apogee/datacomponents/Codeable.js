@@ -1,5 +1,8 @@
 import base from "/apogeeutil/base.js";
 import Messenger from "/apogee/actions/Messenger.js";
+import {addToRecalculateList} from "/apogee/lib/workspaceCalculation.js";
+import {processCode} from "/apogee/lib/codeCompiler.js"; 
+import {getDependencyInfo} from "/apogee/lib/codeDependencies.js";
 
 /** This mixin encapsulates an object in that can be coded. It contains a function
  * and supplemental code. Object that are codeable should also be a member and
@@ -155,7 +158,7 @@ apogee.Codeable.applyCode = function(argList,functionBody,supplementalCode) {
     var codeLabel = this.getFullName();
     
     //process the code text into javascript code
-    var compiledInfo = apogee.codeCompiler.processCode(codeInfo,
+    var compiledInfo = processCode(codeInfo,
         codeLabel);
 
     //save the code
@@ -167,7 +170,7 @@ apogee.Codeable.initializeDependencies = function() {
     
     if((this.hasCode())&&(this.varInfo)&&(this.codeErrors.length === 0)) {
         try {
-            var newDependencyList = apogee.codeDependencies.getDependencyInfo(this.varInfo,
+            var newDependencyList = getDependencyInfo(this.varInfo,
                    this.getContextManager());
 
             //update dependencies
@@ -189,14 +192,14 @@ apogee.Codeable.updateDependeciesForModelChange = function(recalculateList) {
     if((this.hasCode())&&(this.varInfo)) {
                   
         //calculate new dependencies
-        var newDependencyList = apogee.codeDependencies.getDependencyInfo(this.varInfo,
+        var newDependencyList = getDependencyInfo(this.varInfo,
                this.getContextManager());
           
         //update the dependency list
         var dependenciesChanged = this.updateDependencies(newDependencyList);
         if(dependenciesChanged) {
             //add to update list
-            apogee.calculation.addToRecalculateList(recalculateList,this);
+            addToRecalculateList(recalculateList,this);
         }  
     }
 }

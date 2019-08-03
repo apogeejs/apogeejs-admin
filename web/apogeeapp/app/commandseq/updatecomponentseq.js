@@ -1,4 +1,5 @@
 import util from "/apogeeutil/util.js";
+import {validateTableName} from "/apogee/lib/codeCompiler.js"; 
 
 apogeeapp.app.updatecomponentseq = {};
 
@@ -73,7 +74,7 @@ apogeeapp.app.updatecomponentseq.updateComponent = function(component) {
             
             //validate the name
             if(newValues.name) {
-                var nameResult = apogee.codeCompiler.validateTableName(newValues.name);
+                var nameResult = validateTableName(newValues.name);
                 if(!nameResult.valid) {
                     alert(nameResult.errorMessage);
                     return false;

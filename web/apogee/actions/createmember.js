@@ -68,7 +68,7 @@ function createMemberImpl(owner,actionData,actionResult) {
                 childActionData.createData = memberJson.children[childName];
                 var childActionResult = {};
                 childActionResult.actionInfo = ACTION_INFO;
-                _createMemberImpl(member,childActionData,childActionResult);
+                createMemberImpl(member,childActionData,childActionResult);
                 actionResult.childActionResults[childName] = childActionResult;
             }
         }

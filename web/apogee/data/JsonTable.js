@@ -19,8 +19,7 @@ apogee.JsonTable = function(name,owner,initialData) {
     }  
 
     if(initialData.functionBody !== undefined) {
-        this.applyCode(this,
-            initialData.argList,
+        this.applyCode(initialData.argList,
             initialData.functionBody,
             initialData.supplementalCode);
     }
