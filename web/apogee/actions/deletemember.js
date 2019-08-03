@@ -1,29 +1,26 @@
-import action from "/apogee/actions/action.js";
+import {addActionInfo} from "/apogee/actions/action.js";
 
-/** This namespace contains the delete member action */
-apogee.deletemember = {};
-
-/** Delete member action name 
+/** This is self installing command module. It has no exports
+ * but it must be imported to install the command. 
+ *
  * Action Data format:
  * {
- *  "action": apogee.deletemember.ACTION_NAME,
+ *  "action": "deleteMember",
  *  "member": (member to delete),
  *  
  *  "eventInfo": (OUTPUT - event info for the associated delete event)
  * }
- */
-apogee.deletemember.ACTION_NAME = "deleteMember";
-
-/** MEMBER DELETED EVENT
+ *
+ * MEMBER DELETED EVENT: "memberDeleted"
  * Event object Format:
  * {
  *  "member": (member),
  *  }
  */
-apogee.deletemember.MEMBER_DELETED_EVENT = "memberDeleted";
+
 
 /** Delete member action function */
-apogee.deletemember.deleteMember = function(workspace,actionData,actionResult) {
+function deleteMember(workspace,actionData,actionResult) {
     
     var memberFullName = actionData.memberName;
     var member = workspace.getMemberByFullName(memberFullName);
@@ -34,13 +31,13 @@ apogee.deletemember.deleteMember = function(workspace,actionData,actionResult) {
     }
     actionResult.member = member;
     
-    apogee.deletemember.doDelete(member,actionResult);
+    doDelete(member,actionResult);
     
 }
 
 
 /** @private */
-apogee.deletemember.doDelete = function(member,actionResult) {
+function doDelete(member,actionResult) {
     
     //delete children
     if(member.isParent) {
@@ -51,12 +48,12 @@ apogee.deletemember.doDelete = function(member,actionResult) {
             var child = childMap[childName];
             let childActionResult = {};
             childActionResult.member = child;
-            childActionResult.actionInfo = apogee.deletemember.ACTION_INFO
+            childActionResult.actionInfo = ACTION_INFO
             
             actionResult.childActionResults[childName] = childActionResult;
             
             //add results for children to this member
-            apogee.deletemember.doDelete(child,childActionResult);
+            doDelete(child,childActionResult);
         }
     }
     else if(member.isRootHolder) {
@@ -65,12 +62,12 @@ apogee.deletemember.doDelete = function(member,actionResult) {
         var root = member.getRoot();
         let childActionResult = {};
         childActionResult.member = root;
-        childActionResult.actionInfo = apogee.deletemember.ACTION_INFO
+        childActionResult.actionInfo = ACTION_INFO
 
         actionResult.childActionResults["root"] = childActionResult;
         
         //add results for children to this member
-        apogee.deletemember.doDelete(child,childActionResult);
+        doDelete(child,childActionResult);
     }
     
     //delete member
@@ -84,15 +81,15 @@ apogee.deletemember.doDelete = function(member,actionResult) {
 
 
 /** Action info */
-apogee.deletemember.ACTION_INFO = {
-    "action": apogee.deletemember.ACTION_NAME,
-    "actionFunction": apogee.deletemember.deleteMember,
+let ACTION_INFO = {
+    "action": "deleteMember",
+    "actionFunction": deleteMember,
     "checkUpdateAll": true,
     "updateDependencies": false,
     "addToRecalc": false,
-    "event": apogee.deletemember.MEMBER_DELETED_EVENT
+    "event": "memberDeleted"
 }
 
 
 //This line of code registers the action 
-action.addActionInfo(apogee.deletemember.ACTION_NAME,apogee.deletemember.ACTION_INFO);
+addActionInfo(ACTION_INFO);

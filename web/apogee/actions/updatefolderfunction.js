@@ -1,12 +1,11 @@
-import action from "/apogee/actions/action.js";
+import {addActionInfo} from "/apogee/actions/action.js";
 
-/** This namespace contains the update folder function action */
-apogee.updatefolderfunction = {};
-
-/** Update folder function action name 
+/** This is self installing command module. It has no exports
+ * but it must be imported to install the command. 
+ *
  * Action Data format:
  * {
- *  "action": apogee.updatefolderfunction.ACTION_NAME,
+ *  "action": "updateFolderFunction",
  *  "member": (member to move),
  *  "argList": (argument list, as an array of strings)
  *  "returnValueString": (name of the return value table)
@@ -14,10 +13,9 @@ apogee.updatefolderfunction = {};
  *  "eventInfo": (OUTPUT - event info for the associated delete event)
  * }
  */
-apogee.updatefolderfunction.ACTION_NAME = "updateFolderFunction";
 
 /** Update folder function action function */
-apogee.updatefolderfunction.updateProperties = function(workspace,actionData,actionResult) { 
+function updateProperties(workspace,actionData,actionResult) { 
     
     var memberFullName = actionData.memberName;
     var folderFunction = workspace.getMemberByFullName(memberFullName);
@@ -35,16 +33,16 @@ apogee.updatefolderfunction.updateProperties = function(workspace,actionData,act
 }
 
 /** Action info */
-apogee.updatefolderfunction.ACTION_INFO = {
-    "action": apogee.updatefolderfunction.ACTION_NAME,
-    "actionFunction": apogee.updatefolderfunction.updateProperties,
+let ACTION_INFO = {
+    "action": "updateFolderFunction",
+    "actionFunction": updateProperties,
     "checkUpdateAll": false,
     "updateDependencies": false,
     "addToRecalc": true,
-    "event": apogee.updatemember.MEMBER_UPDATED_EVENT
+    "event": "memberUpdated"
 };
 
 
 //This line of code registers the action 
-action.addActionInfo(apogee.updatefolderfunction.ACTION_NAME,apogee.updatefolderfunction.ACTION_INFO);
+addActionInfo(ACTION_INFO);
 

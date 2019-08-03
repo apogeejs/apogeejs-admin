@@ -1,4 +1,4 @@
-import action from "/apogee/actions/action.js";
+import {doAction} from "/apogee/actions/action.js";
 
 /** This is a messenger class for sending action messages. 
  * If the send fails, and exception will be thrown. */
@@ -26,7 +26,7 @@ export default class Messenger {
         
         //set the data for the table, along with triggering updates on dependent tables.
         var actionData = {};
-        actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
+        actionData.action = "updateData";
         actionData.memberName = member.getFullName();
         actionData.data = data;
         if(data instanceof Promise) {
@@ -41,7 +41,7 @@ export default class Messenger {
         }
         
         //return is handled above asynchronously
-        action.doAction(this.workspace,actionData);
+        doAction(this.workspace,actionData);
     }
 
     /** This is similar to dataUpdate except is allows multiple values to be set.
@@ -62,7 +62,7 @@ export default class Messenger {
             }
             let data = updateEntry[1];
             
-            subActionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
+            subActionData.action = "updateData";
             subActionData.memberName = member.getFullName();
             subActionData.data = data;
             if(data instanceof Promise) {
@@ -84,7 +84,7 @@ export default class Messenger {
         }
         
         //return is handled above asynchronously
-        action.doAction(this.workspace,actionData);
+        doAction(this.workspace,actionData);
     }
     
     //=====================

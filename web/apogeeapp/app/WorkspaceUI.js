@@ -83,10 +83,10 @@ apogeeapp.app.WorkspaceUI = class {
         }
 
         //add listeners
-        //this.workspace.addListener(apogee.createmember.MEMBER_CREATED_EVENT, eventInfo => this.memberCreated(eventInfo));
-        this.workspace.addListener(apogee.updatemember.MEMBER_UPDATED_EVENT, eventInfo => this.memberUpdated(eventInfo));
-        this.workspace.addListener(apogee.deletemember.MEMBER_DELETED_EVENT, eventInfo => this.memberDeleted(eventInfo));
-        this.workspace.addListener(apogee.updateworkspace.WORKSPACE_UPDATED_EVENT, () => this.workspaceUpdated());
+        //this.workspace.addListener("memberCreated", eventInfo => this.memberCreated(eventInfo));
+        this.workspace.addListener("memberUpdated", eventInfo => this.memberUpdated(eventInfo));
+        this.workspace.addListener("memberDeleted", eventInfo => this.memberDeleted(eventInfo));
+        this.workspace.addListener("workspaceUpdated", () => this.workspaceUpdated());
 
         //process the workspace state - open tabs
         if(workspaceJson) {

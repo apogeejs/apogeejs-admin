@@ -1,21 +1,19 @@
-import action from "/apogee/actions/action.js";
+import {addActionInfo} from "/apogee/actions/action.js";
 
-/** This namespace contains the move member action */
-apogee.movemember = {};
-
-/** Move member action name 
+/** This is self installing command module. It has no exports
+ * but it must be imported to install the command. 
+ *
  * Action Data format:
  * {
- *  "action": apogee.movemember.ACTION_NAME,
+ *  "action": "moveMember",
  *  "member": (member to move),
  *  
  *  "eventInfo": (OUTPUT - event info for the associated delete event)
  * }
  */
-apogee.movemember.ACTION_NAME = "moveMember";
 
 /** Move member action function */
-apogee.movemember.moveMember = function(workspace,actionData,actionResult) {
+function moveMember(workspace,actionData,actionResult) {
         
     var memberFullName = actionData.memberName;
     var member = workspace.getMemberByFullName(memberFullName);
@@ -38,10 +36,10 @@ apogee.movemember.moveMember = function(workspace,actionData,actionResult) {
     actionResult.actionDone = true;
     
     //add the child action results
-    apogee.movemember.addChildResults(member,actionResult);
+    addChildResults(member,actionResult);
 }
 
-apogee.movemember.addChildResults = function(member,actionResult) {
+function addChildResults(member,actionResult) {
     
     if(member.isParent) {
         actionResult.childActionResults = {};
@@ -52,12 +50,12 @@ apogee.movemember.addChildResults = function(member,actionResult) {
             let childActionResult = {};
             childActionResult.actionDone = true;
             childActionResult.member = child;
-            childActionResult.actionInfo = apogee.movemember.ACTION_INFO
+            childActionResult.actionInfo = ACTION_INFO;
             
             actionResult.childActionResults[childName] = childActionResult;
             
             //add results for children to this member
-            apogee.movemember.addChildResults(child,childActionResult);
+            addChildResults(child,childActionResult);
         }
     }
     else if(member.isRootHolder) {
@@ -67,7 +65,7 @@ apogee.movemember.addChildResults = function(member,actionResult) {
         let childActionResult = {};
         childActionResult.actionDone = true;
         childActionResult.member = root;
-        childActionResult.actionInfo = apogee.movemember.ACTION_INFO
+        childActionResult.actionInfo = ACTION_INFO;
 
         actionResult.childActionResults["root"] = childActionResult;
         
@@ -78,15 +76,15 @@ apogee.movemember.addChildResults = function(member,actionResult) {
 
 
 /** Action info */
-apogee.movemember.ACTION_INFO = {
-    "action": apogee.movemember.ACTION_NAME,
-    "actionFunction": apogee.movemember.moveMember,
+let ACTION_INFO = {
+    "action": "moveMember",
+    "actionFunction": moveMember,
     "checkUpdateAll": true,
     "updateDependencies": true,
     "addToRecalc": true,
-    "event": apogee.updatemember.MEMBER_UPDATED_EVENT
+    "event": "memberUpdated"
 };
 
 
 //This line of code registers the action 
-action.addActionInfo(apogee.movemember.ACTION_NAME,apogee.movemember.ACTION_INFO);
+addActionInfo(ACTION_INFO);

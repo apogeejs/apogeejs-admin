@@ -1,5 +1,5 @@
 import util from "/apogeeutil/util.js";
-import action from "/apogee/actions/action.js";
+import {doAction} from "/apogee/actions/action.js";
 
 /** Save Member Data Command
  *
@@ -28,7 +28,7 @@ apogeeapp.app.savememberdata.executeCommand = function(workspaceUI,commandData,a
     
     var actionData = apogeeapp.app.membersave.getSaveDataAction(workspace,commandData.memberFullName,commandData.data,asynchOnComplete);
     
-    var actionResult = action.doAction(workspace,actionData);
+    var actionResult = doAction(workspace,actionData);
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;

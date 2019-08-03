@@ -19,7 +19,7 @@ apogee.JsonTable = function(name,owner,initialData) {
     }  
 
     if(initialData.functionBody !== undefined) {
-        apogee.updatemember.applyCode(this,
+        this.applyCode(this,
             initialData.argList,
             initialData.functionBody,
             initialData.supplementalCode);
@@ -27,8 +27,7 @@ apogee.JsonTable = function(name,owner,initialData) {
     else {
         if(initialData.data === undefined) initialData.data = "";
         
-        apogee.updatemember.applyData(this,
-            initialData.data);
+        this.setData(initialData.data);
     }
     if(initialData.description !== undefined) {
         this.setDescription(initialData.description);
@@ -74,7 +73,7 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
     }
     else if(data instanceof Promise) {
         //if the return value is a Promise, the data is asynch asynchronous!
-        apogee.updatemember.applyPromiseData(this,data);
+        this.applyPromiseData(this,data);
     }
     else {
         //result is normal synchronous data

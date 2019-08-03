@@ -15,7 +15,7 @@ apogee.FunctionTable = function(name,owner,initialData) {
     var argList = initialData.argList ? initialData.argList : [];
     var functionBody = initialData.functionBody ? initialData.functionBody : "";
     var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
-    apogee.updatemember.applyCode(this,argList,functionBody,supplementalCode);
+    this.applyCode(this,argList,functionBody,supplementalCode);
     if(initialData.description !== undefined) {
         this.setDescription(initialData.description);
     }
@@ -109,7 +109,7 @@ apogee.FunctionTable.getPropertyUpdateAction = function(member,newValues) {
         var newArgList = util.parseStringArray(newValues.argListString);
   
         var actionData = {};
-        actionData.action = apogee.updatemember.UPDATE_CODE_ACTION_NAME;
+        actionData.action = "updateCode";
         actionData.memberName = member.getFullName();
         actionData.argList = newArgList;
         actionData.functionBody = member.getFunctionBody();

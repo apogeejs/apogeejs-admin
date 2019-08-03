@@ -1,12 +1,11 @@
-import action from "/apogee/actions/action.js";
+import {addActionInfo} from "/apogee/actions/action.js";
 
-/** This namespace contains the create member action */
-apogee.createmember = {};
-
-/** Create member action name 
+/** This is self installing command module. It has no exports
+ * but it must be imported to install the command. 
+ *
  * Action Data format:
  * {
- *  "action": apogee.createmember.ACTION_NAME,
+ *  "action": "createMember",
  *  "owner": (parent/owner for new member),
  *  "name": (name of the new member),
  *  "createData": 
@@ -15,20 +14,18 @@ apogee.createmember = {};
  *      - additional table specific data
  *  
  * }
- */
-apogee.createmember.ACTION_NAME = "createMember";
-
-/** member CREATED EVENT
+ *
+ * MEMBER CREATED EVENT: "memberCreated"
  * Event member format:
  * {
  *  "member": (member)
  * }
  */
-apogee.createmember.MEMBER_CREATED_EVENT = "memberCreated";
+
 
 /** This method instantiates a member, without setting the update data. 
  *@private */
-apogee.createmember.createMember = function(workspace,actionData,processedActions,actionResult) {
+function createMember(workspace,actionData,processedActions,actionResult) {
     
     var owner;
     if(actionData.workspaceIsOwner) {
@@ -44,11 +41,11 @@ apogee.createmember.createMember = function(workspace,actionData,processedAction
         }
     }
  
-    apogee.createmember._createMemberImpl(owner,actionData,processedActions,actionResult);
+    createMemberImpl(owner,actionData,processedActions,actionResult);
 }
  
     
-apogee.createmember._createMemberImpl = function(owner,actionData,actionResult) {
+function createMemberImpl(owner,actionData,actionResult) {
     
     var memberJson = actionData.createData;
     var member;
@@ -70,8 +67,8 @@ apogee.createmember._createMemberImpl = function(owner,actionData,actionResult) 
                 childActionData.action = "createMember";
                 childActionData.createData = memberJson.children[childName];
                 var childActionResult = {};
-                childActionResult.actionInfo = apogee.createmember.ACTION_INFO;
-                apogee.createmember._createMemberImpl(member,childActionData,childActionResult);
+                childActionResult.actionInfo = ACTION_INFO;
+                _createMemberImpl(member,childActionData,childActionResult);
                 actionResult.childActionResults[childName] = childActionResult;
             }
         }
@@ -91,14 +88,14 @@ apogee.createmember._createMemberImpl = function(owner,actionData,actionResult) 
 }
 
 /** Action info */
-apogee.createmember.ACTION_INFO = {
-    "action": apogee.createmember.ACTION_NAME,
-    "actionFunction": apogee.createmember.createMember,
+let ACTION_INFO = {
+    "action": "createMember",
+    "actionFunction": createMember,
     "checkUpdateAll": true,
     "updateDependencies": true,
     "addToRecalc": true,
-    "event": apogee.createmember.MEMBER_CREATED_EVENT
+    "event": "memberCreated"
 }
 
 //This line of code registers the action 
-action.addActionInfo(apogee.createmember.ACTION_NAME,apogee.createmember.ACTION_INFO);
+addActionInfo(ACTION_INFO);

@@ -1,20 +1,20 @@
 /**
- * Action Namespace
- * An action is an operation on the data model. The code in this namespace handles
+ * Action Module
+ * An action is an operation on the data model. The code in this module handles
  * the generic parts of the action process, and the action specific code is placed
  * elsewhere.
  * 
  * Generic Action:
  * - The action is represented by a data object "actionData". 
- * - The method action.doAction is called to exectue the action.
- * - Available actions are registered through the method action.addActionInfo.
+ * - The method doAction is called to exectue the action.
+ * - Available actions are registered through the method addActionInfo.
  *   this allows the doAction method to dispatch the actionData to the proper
  *   action specific code.
  * - Included in doing that action is any updates to dependent tables and the 
  * firing of any events for the changes.
  *   
  * Registering a specific action:
- * To register a specific action, action.addActionInfo must be called with 
+ * To register a specific action, addActionInfo must be called with 
  * a actionInfo object. An action info object is of the following format.
  * actionInfo object: {
  *   "action": (string - this is the name of the action)
@@ -64,17 +64,14 @@
  * 
  * 
  */ 
-let action = {};
-
-export {action as default}
 
 /** This structure holds the processing information for all the actions. It is set by each action. 
  * @private */
-action.actionInfo = {
+let actionInfoMap = {
 }
 
 /** This method is used to execute an action for the data model. */
-action.doAction = function(workspace,actionData) {
+export function doAction(workspace,actionData) {
     
     var actionResult = {};
     
@@ -94,23 +91,23 @@ action.doAction = function(workspace,actionData) {
     try {   
         
         //do the action
-        action.callActionFunction(workspace,actionData,actionResult); 
+        callActionFunction(workspace,actionData,actionResult); 
         
         //finish processing the action
         var recalculateList = [];
         
         var completedResults = [];
-        action.addToCompletedResultList(completedResults,actionResult)
+        addToCompletedResultList(completedResults,actionResult)
         
         //handle cases with a valid object 
-        action.updateDependencies(workspace,completedResults,recalculateList);
+        updateDependencies(workspace,completedResults,recalculateList);
         
-        action.updateRecalculateList(completedResults,recalculateList);
+        updateRecalculateList(completedResults,recalculateList);
         
         apogee.calculation.callRecalculateList(recalculateList);
     
         //fire events
-        action.fireEvents(workspace,completedResults,recalculateList);
+        fireEvents(workspace,completedResults,recalculateList);
 	}
 	catch(error) {
         if(error.stack) console.error(error.stack);
@@ -152,7 +149,7 @@ action.doAction = function(workspace,actionData) {
 
         if(runQueuedAction) {
             //FOR NOW WE WILL RUN SYNCHRONOUSLY!!!
-            action.doAction(workspace,savedMessengerAction);
+            doAction(workspace,savedMessengerAction);
         }
     }
     else {
@@ -164,15 +161,20 @@ action.doAction = function(workspace,actionData) {
 }
 
 /** This function is used to register an action. */
-action.addActionInfo = function(actionName,actionInfo) {
-    action.actionInfo[actionName] = actionInfo;
+export function addActionInfo(actionInfo) {
+    if(!actionInfo.action) {
+        //we hav to ignore this action
+        alert("Action name missing from action info: " + JSON.stringify(actionInfo));
+        return;
+    }
+    actionInfoMap[actionInfo.action] = actionInfo;
 }
 
 /** This function looks up the proper function for an action and executes it. */
-action.callActionFunction = function(workspace,actionData,actionResult) {
+function callActionFunction(workspace,actionData,actionResult) {
 
     //do the action
-    var actionInfo = action.actionInfo[actionData.action];
+    var actionInfo = actionInfoMap[actionData.action];
     if(actionInfo) {
         actionResult.actionInfo = actionInfo;
         actionInfo.actionFunction(workspace,actionData,actionResult);
@@ -189,9 +191,9 @@ action.callActionFunction = function(workspace,actionData,actionResult) {
 
 /** This method makes sure the member dependencies in the workspace are properly updated. 
  * @private */
-action.updateDependencies = function(workspace,completedResults,recalculateList) {
+function updateDependencies(workspace,completedResults,recalculateList) {
     //check if we need to update the entire model
-    var updateAllDep = action.checkUpdateAllDep(completedResults);
+    var updateAllDep = checkUpdateAllDep(completedResults);
     if(updateAllDep) {
         //update entire model - see conditions bewlo
         workspace.updateDependeciesForModelChange(recalculateList);
@@ -201,7 +203,7 @@ action.updateDependencies = function(workspace,completedResults,recalculateList)
         for(var i = 0; i < completedResults.length; i++) {
             var actionResult = completedResults[i];
             if((actionResult.actionDone)&&(actionResult.member)) {
-                if(action.doInitializeDependencies(actionResult)) {
+                if(doInitializeDependencies(actionResult)) {
                     actionResult.member.initializeDependencies();
                 }
             }
@@ -211,24 +213,24 @@ action.updateDependencies = function(workspace,completedResults,recalculateList)
     
 /** This function updates the recalculation list for the given processed actions. 
  * @private */
-action.updateRecalculateList = function(completedResults,recalculateList) {
+function updateRecalculateList(completedResults,recalculateList) {
     for(var i = 0; i < completedResults.length; i++) {
         var actionResult = completedResults[i];
         if((actionResult.actionDone)&&(actionResult.member)) {
-            if(action.doAddToRecalc(actionResult)) {
+            if(doAddToRecalc(actionResult)) {
                 apogee.calculation.addToRecalculateList(recalculateList,actionResult.member);            
             }
-            else if((action.doAddDependOnToRecalc(actionResult))) {
+            else if((doAddDependOnToRecalc(actionResult))) {
                 apogee.calculation.addDependsOnToRecalculateList(recalculateList,actionResult.member);                         
             }
         }
     }
 }
     
-/** This function fires the proper events for the action. It combines events to 
+/** This function fires the proper events for the  It combines events to 
  * fire a single event for each member.
  * @private */
-action.fireEvents = function(workspace,completedResults,recalculateList) {
+function fireEvents(workspace,completedResults,recalculateList) {
 
     var eventMap = {};
     var member;
@@ -245,14 +247,14 @@ action.fireEvents = function(workspace,completedResults,recalculateList) {
             
             let member = actionResult.member;
             
-            this.mergeEventIntoEventMap(eventMap,member,eventName);
+            mergeEventIntoEventMap(eventMap,member,eventName);
         }
     }
     
     //add an update event for any object not accounted from
     for(i = 0; i < recalculateList.length; i++) {
         var member = recalculateList[i];
-        this.mergeEventIntoEventMap(eventMap,member,apogee.updatemember.MEMBER_UPDATED_EVENT);
+        mergeEventIntoEventMap(eventMap,member,"memberUpdated");
     } 
     
     //fire events from the event map
@@ -270,7 +272,7 @@ action.fireEvents = function(workspace,completedResults,recalculateList) {
 }
 
 /** This is a helper function to dispatch an event. */
-action.mergeEventIntoEventMap = function(eventMap,member,eventName) {
+function mergeEventIntoEventMap(eventMap,member,eventName) {
     
     //############################################
     //OOPS - my current logic does nto allow for non-member events. 
@@ -285,14 +287,14 @@ action.mergeEventIntoEventMap = function(eventMap,member,eventName) {
      
     if(existingInfo) {
         if((existingInfo.event == eventName)) {
-            //repeat event - including case of both being apogee.updatemember.MEMBER_UPDATED_EVENT
+            //repeat event - including case of both being "memberUpdated"
             newInfo = existingInfo;
         }
-        else if((existingInfo.event == apogee.deletemember.MEMBER_DELETED_EVENT)||(eventName == apogee.deletemember.MEMBER_DELETED_EVENT)) {
-            newInfo =  { member: member, event: apogee.deletemember.MEMBER_DELETED_EVENT };
+        else if((existingInfo.event == "memberDeleted")||(eventName == "memberDeleted")) {
+            newInfo =  { member: member, event: "memberDeleted" };
         }
-        else if((existingInfo.event == apogee.createmember.MEMBER_CREATED_EVENT)||(eventName == apogee.createmember.MEMBER_CREATED_EVENT)) {
-            newInfo =  { member: member, updated: member.getUpdated(), event: apogee.createmember.MEMBER_CREATED_EVENT };
+        else if((existingInfo.event == "memberCreated")||(eventName == "memberCreated")) {
+            newInfo =  { member: member, updated: member.getUpdated(), event: "memberCreated" };
         }
         else {
             //we this shouldn't happen - it means we hace an unknown event type
@@ -311,7 +313,7 @@ action.mergeEventIntoEventMap = function(eventMap,member,eventName) {
  * tracking may be in error if a new member is created, a member is deleted or
  * a member is moved. In these actions we flag that the entire model should be
  * updated.*/
-action.checkUpdateAllDep = function(completedResults) {
+function checkUpdateAllDep(completedResults) {
     for(var i = 0; i < completedResults.length; i++) {
         var actionResult = completedResults[i];
         
@@ -327,7 +329,7 @@ action.checkUpdateAllDep = function(completedResults) {
 }
 
 /** This method if a single action entry requires updating dependencies for the associated member. */
-action.doInitializeDependencies = function(actionResult) {
+function doInitializeDependencies(actionResult) {
     if(!actionResult.member) return false;
     
     //only applicable to codeables
@@ -340,7 +342,7 @@ action.doInitializeDependencies = function(actionResult) {
 }
 
 /** This method checks if the associated member and its dependencies need to be added to the recalc list. */
-action.doAddToRecalc = function(actionResult) {
+function doAddToRecalc(actionResult) {
     if(!actionResult.member) return false;
     if(!actionResult.member.isDependent) return false;
     
@@ -353,7 +355,7 @@ action.doAddToRecalc = function(actionResult) {
 }
 
 /** This method checks if the dependencies of the associated needs to be added to the recalc list, but not the member itself. */
-action.doAddDependOnToRecalc = function(actionResult) {
+function doAddDependOnToRecalc(actionResult) {
     if(actionResult.actionInfo) {
         return actionResult.actionInfo.addDependenceiesToRecalc;
     }
@@ -363,13 +365,55 @@ action.doAddDependOnToRecalc = function(actionResult) {
 }
 
 /** This method unpacks the actionResult and its child reponse into an array of actionResult. */
-action.addToCompletedResultList = function(completedResults,actionResult) {
+function addToCompletedResultList(completedResults,actionResult) {
     completedResults.push(actionResult);
     if(actionResult.childActionResults) {
         for(var key in actionResult.childActionResults) {
-            action.addToCompletedResultList(completedResults,actionResult.childActionResults[key]);
+            addToCompletedResultList(completedResults,actionResult.childActionResults[key]);
         }      
     }
 }
+
+//============================================
+// Compound Action
+//============================================
+
+/** The compound action is automatically imported when the action module is imported.
+ *
+ * Action Data format:
+ * {
+ *  "action": "compoundAction",
+ *  "actions": (list of actions in this compound action),
+ * }
+ */
+
+
+/** This method is the action function for a compound action. */
+function compoundActionFunction(workspace,actionData,actionResult) {
+
+    var actionList = actionData.actions;
+    actionResult.childActionResults = [];
+    for(var i = 0; i < actionList.length; i++) {
+        let childActionData = actionList[i];
+        let childActionResult = {};
+        action.callActionFunction(workspace,childActionData,childActionResult);
+        actionResult.childActionResults.push(childActionResult);   
+    }
+    actionResult.actionDone = true;
+}
+
+/** Action info */
+let COMPOUND_ACTION_INFO = {
+    "action": "compoundAction",
+    "actionFunction": compoundActionFunction,
+    "checkUpdateAll": false,
+    "updateDependencies": false,
+    "addToRecalc": false,
+    "event": null
+}
+
+
+//This line of code registers the action 
+addActionInfo(COMPOUND_ACTION_INFO);
 
 

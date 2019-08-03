@@ -1,5 +1,5 @@
 import util from "/apogeeutil/util.js";
-import action from "/apogee/actions/action.js";
+import {doAction} from "/apogee/actions/action.js";
 
 /** Save Member Description Command
  *
@@ -36,11 +36,11 @@ apogeeapp.app.savememberdescription.executeCommand = function(workspaceUI,comman
     var workspace = workspaceUI.getWorkspace();
 
     var actionData = {};
-    actionData.action = apogee.updatemember.UPDATE_DESCRIPTION_ACTION_NAME;
+    actionData.action = "updateDescription";
     actionData.memberName = commandData.memberFullName;
     actionData.description = commandData.description ? commandData.description : "";
     
-    var actionResult = action.doAction(workspace,actionData);
+    var actionResult = doAction(workspace,actionData);
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;

@@ -143,6 +143,25 @@ apogee.Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
     this.codeSet = true;
 }
 
+/** This is a helper method that compiles the code as needed for setCodeInfo.*/
+apogee.Codeable.applyCode = function(argList,functionBody,supplementalCode) {
+    
+    var codeInfo ={};
+    codeInfo.argList = argList;
+    codeInfo.functionBody = functionBody;
+    codeInfo.supplementalCode = supplementalCode;
+    
+    //load some needed context variables
+    var codeLabel = this.getFullName();
+    
+    //process the code text into javascript code
+    var compiledInfo = apogee.codeCompiler.processCode(codeInfo,
+        codeLabel);
+
+    //save the code
+    this.setCodeInfo(codeInfo,compiledInfo);
+}
+
 /** This method returns the formula for this member.  */
 apogee.Codeable.initializeDependencies = function() {
     

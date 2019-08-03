@@ -279,6 +279,44 @@ apogee.Member.setData = function(data) {
     }
 }
 
+
+/** This method implements setting asynchronous data on the member using a promise. */
+apogee.Member.applyPromiseData = function(promise,onAsynchComplete,optionalPromiseRefresh) {
+    //set the result as pending
+    this.setResultPending(true,promise);
+
+    //kick off the asynch update, if this is not only a refresh of the promise
+    if(!optionalPromiseRefresh) {
+        var workspace = this.getWorkspace();
+        var asynchCallback = function(memberValue) {
+            //set the data for the table, along with triggering updates on dependent tables.
+            let actionData = {};
+            actionData.action = "updateData";
+            actionData.memberName = this.getFullName();
+            actionData.sourcePromise = promise;
+            actionData.data = memberValue;
+            if(onAsynchComplete) {
+                actionData.onComplete = onAsynchComplete;
+            }
+            action.doAction(workspace,actionData);
+        }
+        var asynchErrorCallback = function(errorMsg) {
+            let actionData = {};
+            actionData.action = "updateData";
+            actionData.memberName = this.getFullName();
+            actionData.sourcePromise = promise;
+            actionData.data = new Error(errorMsg);
+            if(onAsynchComplete) {
+                actionData.onComplete = onAsynchComplete;
+            }
+            action.doAction(workspace,actionData);
+        }
+
+        //call appropriate action when the promise completes
+        promise.then(asynchCallback).catch(asynchErrorCallback);
+    }
+}
+
 //========================================
 // "Protected" Methods
 //========================================

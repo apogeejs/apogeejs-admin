@@ -1,6 +1,6 @@
 import base from "/apogeeutil/base.js";
 import util from "/apogeeutil/util.js";
-import action from "/apogee/actions/action.js";
+import {doAction} from "/apogee/actions/action.js";
 
 
 /** Add Component Command
@@ -42,7 +42,7 @@ apogeeapp.app.addcomponent.executeCommand = function(workspaceUI,commandData) {
     createAction.action = "createMember";
     createAction.ownerName = commandData.parentFullName;
     createAction.createData = commandData.memberJson;
-    var actionResult = action.doAction(workspace,createAction);
+    var actionResult = doAction(workspace,createAction);
     
     //create the components for the member
     //I need error handling for the create component action
@@ -108,7 +108,7 @@ apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,crea
         json.memberName = member.getFullName();
         //if this fails, we will just ignore it for now
         var workspace = workspaceUI.getWorkspace();
-        var actionResult = action.doAction(workspace,json);
+        var actionResult = doAction(workspace,json);
         //end undo create member
         //##########################################################################
 

@@ -1,5 +1,5 @@
 import util from "/apogeeutil/util.js";
-import action from "/apogee/actions/action.js";
+import {doAction} from "/apogee/actions/action.js";
 
 /** Update Component Command
  *
@@ -68,7 +68,7 @@ apogeeapp.app.updatecomponent.executeCommand = function(workspaceUI,commandData)
     var memberGenerator = member.generator;
     if(memberGenerator.getPropertyUpdateAction) {
         var actionData = memberGenerator.getPropertyUpdateAction(member,commandData.updatedMemberProperties);  
-        var actionResult = action.doAction(workspace,actionData);
+        var actionResult = doAction(workspace,actionData);
         
         if(!actionResult.actionDone) {
             error = true;

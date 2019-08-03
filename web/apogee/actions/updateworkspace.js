@@ -1,29 +1,24 @@
-import action from "/apogee/actions/action.js";
+import {addActionInfo} from "/apogee/actions/action.js";
 
-/** This namespace contains the update member actions */
-apogee.updateworkspace = {};
-
-/** Update workspace action name 
+/** This is self installing command module. It has no exports
+ * but it must be imported to install the command. 
+ *
  * Action Data format:
  * {
- *  "action": apogee.updateworkspace.ACTION_NAME,
+ *  "action": "updateWorkspace",
  *  "workspace": (workspace to update),
  *  "properties": (properties to set) //currently only "name"
  * }
- */
-apogee.updateworkspace.ACTION_NAME = "updateWorkspace";
-
-
-/** member UPDATED EVENT
+ *
+ * member UPDATED EVENT: "workspaceUpdated"
  * Event member format:
  * {
  *  "member": (member)
  * }
  */
-apogee.updateworkspace.WORKSPACE_UPDATED_EVENT = "workspaceUpdated";
 
 /** Update code action function. */
-apogee.updateworkspace.updateWorkspace = function(workspace,actionData,actionResult) { 
+function updateWorkspace(workspace,actionData,actionResult) { 
     
     var properties = actionData.properties;
     if(properties) {
@@ -34,15 +29,15 @@ apogee.updateworkspace.updateWorkspace = function(workspace,actionData,actionRes
 }
 
 /** Update data action info */
-apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_INFO = {
-    "action": apogee.updateworkspace.ACTION_NAME,
-    "actionFunction": apogee.updateworkspace.updateWorkspace,
+let ACTION_INFO = {
+    "action": "updateWorkspace",
+    "actionFunction": updateWorkspace,
     "checkUpdateAll": false,
     "updateDependencies": false,
     "addToRecalc": false,
     "addDependenceiesToRecalc": false,
-    "event": apogee.updateworkspace.WORKSPACE_UPDATED_EVENT
+    "event": "workspaceUpdated"
 };
 
 //The following code registers the actions
-action.addActionInfo(apogee.updateworkspace.ACTION_NAME,apogee.updateworkspace.UPDATE_WORKSPACE_ACTION_INFO);
+addActionInfo(ACTION_INFO);

@@ -1,5 +1,5 @@
 import util from "/apogeeutil/util.js";
-import action from "/apogee/actions/action.js";
+import {doAction} from "/apogee/actions/action.js";
 
 apogeeapp.app.movecomponent = {};
 
@@ -38,7 +38,7 @@ apogeeapp.app.movecomponent.executeCommand = function(workspaceUI,commandData) {
     actionData.memberName = commandData.memberFullName;
     actionData.targetName = commandData.newMemberName;
     actionData.targetOwnerName = commandData.newParentFullName;
-    var actionResult = action.doAction(workspace,actionData);
+    var actionResult = doAction(workspace,actionData);
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;

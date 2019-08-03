@@ -18,7 +18,7 @@ apogee.ErrorTable = function(name,owner,completeJson) {
     this.fieldUpdated("completeJson");
 
     var dummyData = "";
-    apogee.updatemember.applyData(this,dummyData);
+    this.setData(dummyData);
 }
 
 //add components to this class

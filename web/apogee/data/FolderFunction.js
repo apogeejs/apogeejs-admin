@@ -1,5 +1,5 @@
 import base from "/apogeeutil/base.js";
-import action from "/apogee/actions/action.js";
+import {doAction} from "/apogee/actions/action.js";
 
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
@@ -301,7 +301,7 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         var updateActionList = [];
         for(var i = 0; i < inputElementArray.length; i++) {
             var entry = {};
-            entry.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
+            entry.action = "updateMember";
             entry.memberName = inputElementArray[i].getFullName();
             entry.data = arguments[i];
             updateActionList.push(entry);
@@ -312,7 +312,7 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         actionData.actions = updateActionList;
 
         //apply the update
-        var actionResult = action.doAction(virtualWorkspace,actionData);        
+        var actionResult = doAction(virtualWorkspace,actionData);        
         if(actionResult.alertMsg) {
             apogeeapp.app.CommandManager.errorAlert(actionResult.alertMsg);
         }

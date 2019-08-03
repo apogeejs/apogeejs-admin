@@ -1,6 +1,14 @@
 import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManager.js";
-import action from "/apogee/actions/action.js";
+import {doAction} from "/apogee/actions/action.js";
+
+/** These are self installing commands. The have no exports. */
+import "/apogee/actions/createmember.js";
+import "/apogee/actions/updatemember.js";
+import "/apogee/actions/deletemember.js";
+import "/apogee/actions/updatefolderfunction.js";
+import "/apogee/actions/updateworkspace.js";
+
 
 /** This is the workspace. Typically owner should be null. It
  * is used for creating virtual workspaces. 
@@ -259,7 +267,7 @@ apogee.Workspace.prototype.loadFromJson = function(json) {
     actionData.action = "createMember";
     actionData.workspaceIsOwner = true;
     actionData.createData = json.data;
-    var actionResult = action.doAction(this,actionData);
+    var actionResult = doAction(this,actionData);
     
     return actionResult;
 }

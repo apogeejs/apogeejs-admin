@@ -56,7 +56,7 @@ apogeeapp.app.membersave.getMemberStateUndoCommand = function(workspace, memberF
 apogeeapp.app.membersave.getSaveDataAction = function(workspace,memberFullName,data,asynchOnComplete) {
 
     var actionData = {};
-    actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
+    actionData.action = "updateData";
     actionData.memberName = memberFullName;
     actionData.data = data;
         
@@ -82,13 +82,13 @@ apogeeapp.app.membersave.getSetCodeAction = function(workspace,memberFullName,ar
 
     if((optionalClearCodeDataValue != undefined)&&(functionBody == "")&&(supplementalCode == "")) {
         //special case - clear code
-        actionData.action = apogee.updatemember.UPDATE_DATA_ACTION_NAME;
+        actionData.action = "updateData";
         actionData.memberName = memberFullName;
         actionData.data = optionalClearCodeDataValue;
     }
     else {
         //standard case - edit code
-        actionData.action = apogee.updatemember.UPDATE_CODE_ACTION_NAME;
+        actionData.action = "updateCode";
         actionData.memberName = memberFullName;
         actionData.argList = argList;
         actionData.functionBody = functionBody;
