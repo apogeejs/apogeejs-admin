@@ -1,15 +1,15 @@
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 
-
-apogeeapp.app.closeworkspace = {};
+let closeworkspace = {};
 
 //=====================================
 // Action
 //=====================================
 
 //NO UNDO FOR CLOSE WORKSPACE
-//apogeeapp.app.closeworkspace.createUndoCommand = function(workspaceUI,commandData) {
+//closeworkspace.createUndoCommand = function(workspaceUI,commandData) {
 
-apogeeapp.app.closeworkspace.executeCommand = function(workspaceUI,commandData) {
+closeworkspace.executeCommand = function(workspaceUI,commandData) {
     var workspace = workspaceUI.getWorkspace();
     
     var workspaceUIRemoved = false;
@@ -26,15 +26,15 @@ apogeeapp.app.closeworkspace.executeCommand = function(workspaceUI,commandData) 
         
         var isFatal = !workspaceUIRemoved;
         var errorMsg = "Error closeing workspace: " + error.message;
-        apogeeapp.app.CommandManager.errorAlert(errorMsg,isFatal);
+        CommandManager.errorAlert(errorMsg,isFatal);
     }
     
     return workspaceUIRemoved;
 }
 
-apogeeapp.app.closeworkspace.COMMAND_TYPE = "closeWorkspace";
+closeworkspace.COMMAND_TYPE = "closeWorkspace";
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.closeworkspace);
+CommandManager.registerCommand(closeworkspace);
 
 
 

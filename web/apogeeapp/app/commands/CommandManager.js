@@ -38,7 +38,7 @@
  *      (all other data depends on the specific command)
  *
  */
-apogeeapp.app.CommandManager = class {
+export default class CommandManager {
     constructor(app) {
         this.app = app;
     }
@@ -48,7 +48,7 @@ apogeeapp.app.CommandManager = class {
         var workspaceUI = this.app.getWorkspaceUI();
         let commandResult;
         
-        var commandObject = apogeeapp.app.CommandManager.getCommandObject(command.type);
+        var commandObject = CommandManager.getCommandObject(command.type);
         if(commandObject) {
             try {
                 commandResult = commandObject.executeCommand(workspaceUI,command);
@@ -75,7 +75,7 @@ apogeeapp.app.CommandManager = class {
         
         //display? Including for fatal errors?
         
-        if(commandResult.alertMsg) apogeeapp.app.CommandManager.errorAlert(commandResult.alertMsg,commandResult.isFatal);
+        if(commandResult.alertMsg) CommandManager.errorAlert(commandResult.alertMsg,commandResult.isFatal);
         
         return commandResult;
     }
@@ -98,22 +98,22 @@ apogeeapp.app.CommandManager = class {
     static registerCommand(commandObject) {
         
         //repeat warning
-        let existingCommandObject = apogeeapp.app.CommandManager.commandMap[commandObject.COMMAND_TYPE];
+        let existingCommandObject = CommandManager.commandMap[commandObject.COMMAND_TYPE];
         if(existingCommandObject) {
             alert("The given command already exists in the command manager: " + commandObject.COMMAND_TYPE + ". It will be replaced with the new command");
         }
         
-        apogeeapp.app.CommandManager.commandMap[commandObject.COMMAND_TYPE] = commandObject;
+        CommandManager.commandMap[commandObject.COMMAND_TYPE] = commandObject;
     }
     
     static getCommandObject(commandType) {
-        return apogeeapp.app.CommandManager.commandMap[commandType];
+        return CommandManager.commandMap[commandType];
     }
     
 }
 
 /** This is a map of commands accessibly to the command manager. */
-apogeeapp.app.CommandManager.commandMap = {};
+CommandManager.commandMap = {};
 
 
 

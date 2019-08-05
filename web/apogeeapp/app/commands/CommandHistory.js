@@ -12,7 +12,7 @@
  * 
  * The command manager fires an event each time the command history is updated.
  */
-apogeeapp.app.CommandHistory = class {
+export default class CommandHistory {
     constructor(commandManger, eventManager, optionalUndoCommandCount) {
         this.commandManager = commandManager;
         this.eventManager = eventManager;
@@ -257,9 +257,9 @@ apogeeapp.app.CommandHistory = class {
 
 /** This is a token to represent there is no command available, either for 
  * undo or redo. */
-apogeeapp.app.CommandHistory.NO_COMMAND = {};
+CommandHistory.NO_COMMAND = {};
 
 /** This is the default number of stored undo/redo commands */
-apogeeapp.app.CommandHistory.DEFAULT_UNDO_COMMAND_COUNT = 50;
+CommandHistory.DEFAULT_UNDO_COMMAND_COUNT = 50;
 
 

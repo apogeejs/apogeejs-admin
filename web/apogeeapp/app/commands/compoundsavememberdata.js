@@ -1,5 +1,6 @@
-import util from "/apogeeutil/util.js";
 import {doAction} from "/apogee/actions/action.js";
+
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 
 /** Save Member Data Command
  *
@@ -10,19 +11,19 @@ import {doAction} from "/apogee/actions/action.js";
  *   "updateInfo":(member data values)
  * }
  */ 
-apogeeapp.app.compoundsavememberdata = {};
+let compoundsavememberdata = {};
 
 //=====================================
 // Action
 //=====================================
 
-apogeeapp.app.compoundsavememberdata.createUndoCommand = function(workspaceUI,commandData) {
+compoundsavememberdata.createUndoCommand = function(workspaceUI,commandData) {
     var undoCommandJson = {};
-    undoCommandJson.type = apogeeapp.app.compoundsavememberdata.COMMAND_TYPE;
+    undoCommandJson.type = compoundsavememberdata.COMMAND_TYPE;
     
     var workspace = workspaceUI.getWorkspace();
     
-    alert("IX THIS! needs to be implmeneted correctly");
+    alert("FIX THIS! needs to be implmeneted correctly");
     return null;
     
     //make the action list
@@ -44,7 +45,7 @@ apogeeapp.app.compoundsavememberdata.createUndoCommand = function(workspaceUI,co
     return undoCommandJson;
 }
 
-apogeeapp.app.compoundsavememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
+compoundsavememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
     
     var workspace = workspaceUI.getWorkspace();
     
@@ -73,11 +74,11 @@ apogeeapp.app.compoundsavememberdata.executeCommand = function(workspaceUI,comma
     return commandResult;
 }
 
-apogeeapp.app.compoundsavememberdata.COMMAND_TYPE = "compoundSaveMemberData";
+compoundsavememberdata.COMMAND_TYPE = "compoundSaveMemberData";
 
-apogeeapp.app.addlink.compoundsavememberdata = true;
+compoundsavememberdata.isAsynch = true;
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.compoundsavememberdata);
+CommandManager.registerCommand(compoundsavememberdata);
 
 
 

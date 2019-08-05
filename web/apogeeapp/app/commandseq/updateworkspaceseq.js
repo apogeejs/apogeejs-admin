@@ -63,7 +63,7 @@ apogeeapp.app.updateworkspaceseq.updateWorkspaceProperties = function(workspaceU
         //update
         if(valuesChanged) {
             var commandData = {};
-            commandData.type = apogeeapp.app.updateworkspace.COMMAND_TYPE;
+            commandData.type = "updateWorkspace";
             commandData.updatedCoreProperties = {};
             commandData.updatedCoreProperties.name = newValues.name;
 

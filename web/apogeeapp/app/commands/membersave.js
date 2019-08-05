@@ -17,14 +17,14 @@ apogeeapp.app.membersave.getMemberStateUndoCommand = function(workspace, memberF
     
     if((member.isCodeable)&&(member.hasCode())) {
         //check if the current state has code set - if so, set the code for the undo function
-        command.type = apogeeapp.app.savemembercode.COMMAND_TYPE
+        command.type = "saveMemberCode";
         command.argList = member.getArgList();
         command.functionBody = member.getFunctionBody();
         command.supplemental = member.getSupplementalCode();
         
     }
     else {
-        command.type = apogeeapp.app.savememberdata.COMMAND_TYPE
+        command.type = "saveMemberData";
         
         //here the object has data set. Check if an "alternate" data values was set - error, pending or invalid
         if(member.hasError()) {

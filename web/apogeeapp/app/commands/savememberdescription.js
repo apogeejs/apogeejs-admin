@@ -1,5 +1,6 @@
-import util from "/apogeeutil/util.js";
 import {doAction} from "/apogee/actions/action.js";
+
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 
 /** Save Member Description Command
  *
@@ -10,18 +11,18 @@ import {doAction} from "/apogee/actions/action.js";
  *   "desc":(description),
  * }
  */ 
-apogeeapp.app.savememberdescription = {};
+let savememberdescription = {};
 
 //=====================================
 // Action
 //=====================================
 
-apogeeapp.app.savememberdescription.createUndoCommand = function(workspaceUI,commandData) {
+savememberdescription.createUndoCommand = function(workspaceUI,commandData) {
     var workspace = workspaceUI.getWorkspace();
     var member = workspace.getMemberByFullName(commandData.memberFullName);
     if(member) {
         var undoCommandJson = {};
-        undoCommandJson.type = apogeeapp.app.savememberdescription.COMMAND_TYPE;
+        undoCommandJson.type = savememberdescription.COMMAND_TYPE;
         undoCommandJson.memberFullName = commandData.memberFullName;
         undoCommandJson.description = member.getDescription();
         return undoCommandJson;
@@ -31,7 +32,7 @@ apogeeapp.app.savememberdescription.createUndoCommand = function(workspaceUI,com
     }
 }
 
-apogeeapp.app.savememberdescription.executeCommand = function(workspaceUI,commandData) {
+savememberdescription.executeCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
 
@@ -49,9 +50,9 @@ apogeeapp.app.savememberdescription.executeCommand = function(workspaceUI,comman
     return commandResult;
 }
 
-apogeeapp.app.savememberdescription.COMMAND_TYPE = "saveMemberDescription";
+savememberdescription.COMMAND_TYPE = "saveMemberDescription";
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.savememberdescription);
+CommandManager.registerCommand(savememberdescription);
 
 
 

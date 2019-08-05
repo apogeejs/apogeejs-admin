@@ -8,6 +8,7 @@ import Dependent from "/apogee/datacomponents/Dependent.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import Owner from "/apogee/datacomponents/Owner.js";
 import RootHolder from "/apogee/datacomponents/RootHolder.js";
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
@@ -323,7 +324,7 @@ FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErro
         //apply the update
         var actionResult = doAction(virtualWorkspace,actionData);        
         if(actionResult.alertMsg) {
-            apogeeapp.app.CommandManager.errorAlert(actionResult.alertMsg);
+            CommandManager.errorAlert(actionResult.alertMsg);
         }
         if(actionResult.actionDone) {
             //retrieve the result

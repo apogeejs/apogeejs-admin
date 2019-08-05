@@ -50,7 +50,7 @@ apogeeapp.app.updatelinkseq.addLink = function(referenceManager,entryTypeInfo) {
 
         //create command json
         var commandData = {};
-        commandData.type = apogeeapp.app.addlink.COMMAND_TYPE;
+        commandData.type = "addLink";
         commandData.entryType = entryTypeInfo.REFERENCE_TYPE;
         commandData.url = newValues.url;
         commandData.nickname = newValues.nickname;
@@ -105,7 +105,7 @@ apogeeapp.app.updatelinkseq.updateLink = function(referenceEntry) {
         //run command
         var commandData = {};
         var dataChanged = false;
-        commandData.type = apogeeapp.app.updatelink.COMMAND_TYPE;
+        commandData.type = "updateLink";
         commandData.entryType = entryTypeInfo.REFERENCE_TYPE;
         commandData.oldUrl = initialValues.url;
         if(initialValues.url != newValues.url) {
@@ -139,7 +139,7 @@ apogeeapp.app.updatelinkseq.removeLink = function(referenceEntry) {
     if(doDelete) {
         
         var commandData = {};
-        commandData.type = apogeeapp.app.deletelink.COMMAND_TYPE;
+        commandData.type = "deleteLink";
         commandData.entryType = referenceEntry.getTypeInfo().REFERENCE_TYPE;
         commandData.url = referenceEntry.getUrl();
 

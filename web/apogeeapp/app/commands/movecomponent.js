@@ -1,7 +1,8 @@
-import util from "/apogeeutil/util.js";
 import {doAction} from "/apogee/actions/action.js";
 
-apogeeapp.app.movecomponent = {};
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+
+let movecomponent = {};
 
 //=====================================
 // Action
@@ -10,7 +11,7 @@ apogeeapp.app.movecomponent = {};
 
 /** This creates the command. Both the initial and full names should be passed in 
  * even is they are the same. */
-apogeeapp.app.movecomponent.createUndoCommand = function(workspaceUI,commandData) {
+movecomponent.createUndoCommand = function(workspaceUI,commandData) {
     var workspace = workspaceUI.getWorkspace();
     var member = workspace.getMemberByFullName(commandData.memberFullName);
     var parent = member.getParent();
@@ -21,7 +22,7 @@ apogeeapp.app.movecomponent.createUndoCommand = function(workspaceUI,commandData
     var newMemberFullName = newParent.getChildFullName(commandData.newMemberName);
     
     var undoCommandJson = {};
-    undoCommandJson.type = apogeeapp.app.movecomponent.COMMAND_TYPE;
+    undoCommandJson.type = movecomponent.COMMAND_TYPE;
     undoCommandJson.memberFullName = newMemberFullName;
     undoCommandJson.newMemberName = oldMemberName;
     undoCommandJson.newParentFullName = oldParentFullName;
@@ -29,7 +30,7 @@ apogeeapp.app.movecomponent.createUndoCommand = function(workspaceUI,commandData
     return undoCommandJson;
 }
 
-apogeeapp.app.movecomponent.executeCommand = function(workspaceUI,commandData) {
+movecomponent.executeCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
 
@@ -48,8 +49,8 @@ apogeeapp.app.movecomponent.executeCommand = function(workspaceUI,commandData) {
     
 }
 
-apogeeapp.app.movecomponent.COMMAND_TYPE = "moveComponent";
+movecomponent.COMMAND_TYPE = "moveComponent";
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.movecomponent);
+CommandManager.registerCommand(movecomponent);
 
 

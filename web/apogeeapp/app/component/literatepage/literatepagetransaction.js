@@ -1,5 +1,7 @@
 import proseMirror from "/apogeeapp/app/component/literatepage/proseMirrorSetup.js";
 
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+
 /** Update Component Command
  *
  * Command JSON format:
@@ -63,6 +65,6 @@ apogeeapp.app.literatepagetransaction.executeCommand = function(workspaceUI,comm
 
 apogeeapp.app.literatepagetransaction.COMMAND_TYPE = "literatePageTransaction";
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.literatepagetransaction);
+CommandManager.registerCommand(apogeeapp.app.literatepagetransaction);
 
 

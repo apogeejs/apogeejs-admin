@@ -1,5 +1,6 @@
-import util from "/apogeeutil/util.js";
 import {doAction} from "/apogee/actions/action.js";
+
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 
 /** Update Workspace Command
  *
@@ -10,15 +11,15 @@ import {doAction} from "/apogee/actions/action.js";
  *   "updatedAppProperties":(component property json) //currently not used
  * }
  */ 
-apogeeapp.app.updateworkspace = {};
+let updateworkspace = {};
 
 //=====================================
 // Action
 //=====================================
 
-apogeeapp.app.updateworkspace.createUndoCommand = function(workspaceUI,commandData) {
+updateworkspace.createUndoCommand = function(workspaceUI,commandData) {
     var undoCommandJson = {};
-    undoCommandJson.type = apogeeapp.app.updateworkspace.COMMAND_TYPE;
+    undoCommandJson.type = updateworkspace.COMMAND_TYPE;
     
     //right now we assume this is just a name update
     var workspace = workspaceUI.getWorkspace();
@@ -28,7 +29,7 @@ apogeeapp.app.updateworkspace.createUndoCommand = function(workspaceUI,commandDa
     return undoCommandJson;
 }
 
-apogeeapp.app.updateworkspace.executeCommand = function(workspaceUI,commandData) {
+updateworkspace.executeCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
 
@@ -50,9 +51,9 @@ apogeeapp.app.updateworkspace.executeCommand = function(workspaceUI,commandData)
     return commandResult;
 }
 
-apogeeapp.app.updateworkspace.COMMAND_TYPE = "updateWorkspace";
+updateworkspace.COMMAND_TYPE = "updateWorkspace";
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.updateworkspace);
+CommandManager.registerCommand(updateworkspace);
 
 
 

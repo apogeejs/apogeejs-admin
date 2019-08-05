@@ -23,7 +23,7 @@ apogeeapp.app.closeworkspaceseq.closeWorkspace = function(app) {
     }
     
     var commandData = {};
-    commandData.type = apogeeapp.app.closeworkspace.COMMAND_TYPE;
+    commandData.type = "closeWorkspace";
 
     app.executeCommand(commandData);
 }

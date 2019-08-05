@@ -60,7 +60,7 @@ apogeeapp.app.updatecomponentseq.updateComponent = function(component) {
         
         if((numMemberProps > 0)||(numComponentProps > 0)) {
             updateCommand = {};
-            updateCommand.type = apogeeapp.app.updatecomponent.COMMAND_TYPE;
+            updateCommand.type = "updateComponent";
             updateCommand.memberFullName = memberFullName;
             if(numMemberProps > 0) updateCommand.updatedMemberProperties = memberUpdateJson;
             if(numComponentProps > 0) updateCommand.updatedComponentProperties = componentUpdateJson;
@@ -82,7 +82,7 @@ apogeeapp.app.updatecomponentseq.updateComponent = function(component) {
             }
             
             moveCommand = {};
-            moveCommand.type = apogeeapp.app.movecomponent.COMMAND_TYPE;
+            moveCommand.type = "moveComponent";
             moveCommand.memberFullName = memberFullName;
             moveCommand.newMemberName = submittedValues.name;
             moveCommand.newParentFullName = submittedValues.parentName;

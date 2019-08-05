@@ -10,7 +10,7 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks = function(me
         getEditOk: () => (!member.hasCode()),
         saveData: (data) => {
             var commandData = {};
-            commandData.type = apogeeapp.app.savememberdata.COMMAND_TYPE;
+            commandData.type = "saveMemberData";
             commandData.memberFullName = member.getFullName();
             commandData.data = data;
             
@@ -59,7 +59,7 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks = function(me
             }
             
             var commandData = {};
-            commandData.type = apogeeapp.app.savememberdata.COMMAND_TYPE;
+            commandData.type = "saveMemberData";
             commandData.memberFullName = member.getFullName();
             commandData.data = data;
             
@@ -78,7 +78,7 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks = functio
         getEditOk: () => true,
         saveData: (text) => {
             var commandData = {};
-            commandData.type = apogeeapp.app.savemembercode.COMMAND_TYPE;
+            commandData.type = "saveMemberCode";
             commandData.memberFullName = member.getFullName();
             commandData.argList = member.getArgList();
             commandData.functionBody = text;
@@ -97,7 +97,7 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks = functio
         getEditOk: () => true,
         saveData: (text) => {
             var commandData = {};
-            commandData.type = apogeeapp.app.savemembercode.COMMAND_TYPE;
+            commandData.type = "saveMemberCode";
             commandData.memberFullName = member.getFullName();
             commandData.argList = member.getArgList();
             commandData.functionBody = member.getFunctionBody();
@@ -116,7 +116,7 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks = function
         getEditOk: () => true,
         saveData: (text) => {  
             var commandData = {};
-            commandData.type = apogeeapp.app.savememberdescription.COMMAND_TYPE;
+            commandData.type = "saveMemberDescription";
             commandData.memberFullName = member.getFullName();
             commandData.description = text;
             

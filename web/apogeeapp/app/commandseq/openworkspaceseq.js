@@ -44,7 +44,7 @@ apogeeapp.app.openworkspaceseq.onOpen = function(err,app,workspaceData,fileMetad
         
         //open workspace
         var commandData = {};
-        commandData.type = apogeeapp.app.openworkspace.COMMAND_TYPE;
+        commandData.type = "openWorkspace";
         commandData.workspaceJson = workspaceJson;
         commandData.fileMetadata = fileMetadata;
 

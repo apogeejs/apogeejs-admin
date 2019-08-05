@@ -1,3 +1,5 @@
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+
 /** Add Link Command
  *
  * Command JSON format:
@@ -8,21 +10,21 @@
  *   "nickname":(nickname - optional)
  * }
  */ 
-apogeeapp.app.addlink = {};
+let addlink = {};
 
 //=====================================
 // Command Object
 //=====================================
 
-apogeeapp.app.addlink.createUndoCommand = function(workspaceUI,commandData) {
+addlink.createUndoCommand = function(workspaceUI,commandData) {
     var undoCommandJson = {};
-    undoCommandJson.type = apogeeapp.app.deletelink.COMMAND_TYPE;
+    undoCommandJson.type = "deleteLink";
     undoCommandJson.entryType = commandData.entryType;
     undoCommandJson.url = commandData.url;
     return undoCommandJson;
 }
 
-apogeeapp.app.addlink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
+addlink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
     
     var synchCommandResult = {};
 
@@ -60,11 +62,11 @@ apogeeapp.app.addlink.executeCommand = function(workspaceUI,commandData,asynchOn
 }
 
 
-apogeeapp.app.addlink.COMMAND_TYPE = "addLink";
+addlink.COMMAND_TYPE = "addLink";
 
-apogeeapp.app.addlink.isAsynch = true;
+addlink.isAsynch = true;
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.addlink);
+CommandManager.registerCommand(addlink);
 
 
 

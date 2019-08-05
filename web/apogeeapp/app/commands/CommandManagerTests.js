@@ -1,3 +1,5 @@
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+
 CommandManagerTests = class {
     
     getTests() {
@@ -6,7 +8,7 @@ CommandManagerTests = class {
                 throw Error("Just making sure fail works!");
             },
             basicTest: () => {
-                var commandManager = new apogeeapp.app.CommandManager();
+                var commandManager = new CommandManager();
                 var executedTestList = [];
                 var cmd1 = this.createCommand(1,executedTestList);
                 var cmd2 = this.createCommand(2,executedTestList);
@@ -22,7 +24,7 @@ CommandManagerTests = class {
                 
             },
             overwriteRedoTest: () => {
-                var commandManager = new apogeeapp.app.CommandManager();
+                var commandManager = new CommandManager();
                 var executedTestList = [];
                 var cmd1 = this.createCommand(1,executedTestList);
                 var cmd2 = this.createCommand(2,executedTestList);
@@ -46,7 +48,7 @@ CommandManagerTests = class {
             wrapTest: () => {
                 //here we test wrapping of the command history. We also test setting the length.
                 //this also tests the undo/redo labels
-                var commandManager = new apogeeapp.app.CommandManager(3);
+                var commandManager = new CommandManager(3);
                 var executedTestList = [];
                 var cmd1 = this.createCommand(1,executedTestList);
                 var cmd2 = this.createCommand(2,executedTestList);
@@ -70,7 +72,7 @@ CommandManagerTests = class {
                 nextUndo = commandManager.getNextUndoDesc();
                 testSimpleEquals("Wrap test undo label",nextUndo,5);
                 nextRedo = commandManager.getNextRedoDesc();
-                testSimpleEquals("Wrap test redo label",nextRedo,apogeeapp.app.CommandManager.NO_COMMAND);
+                testSimpleEquals("Wrap test redo label",nextRedo,CommandManager.NO_COMMAND);
                 
                 commandManager.undo();
                 nextUndo = commandManager.getNextUndoDesc();
@@ -86,7 +88,7 @@ CommandManagerTests = class {
     
                 commandManager.undo();
                 nextUndo = commandManager.getNextUndoDesc();
-                testSimpleEquals("Wrap test undo label",nextUndo,apogeeapp.app.CommandManager.NO_COMMAND);
+                testSimpleEquals("Wrap test undo label",nextUndo,CommandManager.NO_COMMAND);
                 nextRedo = commandManager.getNextRedoDesc();
                 testSimpleEquals("Wrap test redo label",nextRedo,3);
                 
@@ -94,7 +96,7 @@ CommandManagerTests = class {
                 alert("Test notes: there should be a alert warning for no undo given next.");
                 commandManager.undo();
                 nextUndo = commandManager.getNextUndoDesc();
-                testSimpleEquals("Wrap test undo label",nextUndo,apogeeapp.app.CommandManager.NO_COMMAND);
+                testSimpleEquals("Wrap test undo label",nextUndo,CommandManager.NO_COMMAND);
                 nextRedo = commandManager.getNextRedoDesc();
                 testSimpleEquals("Wrap test redo label",nextRedo,3);
                 alert("Test notes: the alert warning for no undo should have already been given.");

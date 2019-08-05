@@ -1,3 +1,5 @@
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+
 /** Open Workspace Command
  *
  * Command JSON format:
@@ -7,16 +9,16 @@
  *   "fileMetadata":(file metadata)
  * }
  */ 
-apogeeapp.app.openworkspace = {};
+let openworkspace = {};
 
 //=====================================
 // Action
 //=====================================
 
 //NO UNDO FOR OPEN WORKSPACE
-//apogeeapp.app.openworkspace.createUndoCommand = function(workspaceUI,commandData) {
+//openworkspace.createUndoCommand = function(workspaceUI,commandData) {
 
-apogeeapp.app.openworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData,asynchOnComplete) {
+openworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData,asynchOnComplete) {
         //app,workspaceText,fileMetadata) {
     var workspaceUIAdded;
     var synchCommandResult = {};
@@ -47,7 +49,7 @@ apogeeapp.app.openworkspace.executeCommand = function(unpopulatedWorkspaceUI,com
         
         var linkLoadError = function(errorMsg) {
             //this is just a warning - we will continue, though things may not work.
-            apogeeapp.app.CommandManager.errorAlert("Error loading links: " + errorMsg);
+            CommandManager.errorAlert("Error loading links: " + errorMsg);
         }
         
         var workspaceLoadError = function(errorMsg) {
@@ -80,11 +82,11 @@ apogeeapp.app.openworkspace.executeCommand = function(unpopulatedWorkspaceUI,com
     return synchCommandResult;
 }
 
-apogeeapp.app.openworkspace.COMMAND_TYPE = "openWorkspace";
+openworkspace.COMMAND_TYPE = "openWorkspace";
 
-apogeeapp.app.openworkspace.isAsynch = true;
+openworkspace.isAsynch = true;
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.openworkspace);
+CommandManager.registerCommand(openworkspace);
 
 
 

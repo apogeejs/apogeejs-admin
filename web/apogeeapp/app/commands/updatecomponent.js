@@ -1,5 +1,6 @@
-import util from "/apogeeutil/util.js";
 import {doAction} from "/apogee/actions/action.js";
+
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 
 /** Update Component Command
  *
@@ -11,13 +12,13 @@ import {doAction} from "/apogee/actions/action.js";
  *   "updatedComponentProperties":(component property json)
  * }
  */ 
-apogeeapp.app.updatecomponent = {};
+let updatecomponent = {};
 
 //=====================================
 // Command Object
 //=====================================
 
-apogeeapp.app.updatecomponent.createUndoCommand = function(workspaceUI,commandData) {
+updatecomponent.createUndoCommand = function(workspaceUI,commandData) {
     var workspace = workspaceUI.getWorkspace();
     var member = workspace.getMemberByFullName(commandData.memberFullName);
     var component = workspaceUI.getComponent(member);
@@ -43,7 +44,7 @@ apogeeapp.app.updatecomponent.createUndoCommand = function(workspaceUI,commandDa
     }
     
     var undoCommandJson = {};
-    undoCommandJson.type = apogeeapp.app.updatecomponent.COMMAND_TYPE;
+    undoCommandJson.type = updatecomponent.COMMAND_TYPE;
     undoCommandJson.memberFullName = commandData.memberFullName;
     if(undoMemberProperties) undoCommandJson.updatedMemberProperties = undoMemberProperties;
     if(undoComponentProperties) undoCommandJson.updatedComponentProperties = undoComponentProperties;
@@ -54,7 +55,7 @@ apogeeapp.app.updatecomponent.createUndoCommand = function(workspaceUI,commandDa
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-apogeeapp.app.updatecomponent.executeCommand = function(workspaceUI,commandData) {
+updatecomponent.executeCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
     //get the member
@@ -89,8 +90,8 @@ apogeeapp.app.updatecomponent.executeCommand = function(workspaceUI,commandData)
     return commandResult;
 }
 
-apogeeapp.app.updatecomponent.COMMAND_TYPE = "updateComponent";
+updatecomponent.COMMAND_TYPE = "updateComponent";
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.updatecomponent);
+CommandManager.registerCommand(updatecomponent);
 
 

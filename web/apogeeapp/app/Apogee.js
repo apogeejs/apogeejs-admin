@@ -1,6 +1,8 @@
 import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManager.js";
 
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+
 apogeeapp.app.dialog = {};
 
 //======================================
@@ -49,7 +51,7 @@ apogeeapp.app.Apogee = function(containerId,appConfigManager) {
     this.referenceManager = new apogeeapp.app.ReferenceManager();
     
     //command manager
-    this.commandManager = new apogeeapp.app.CommandManager(this);
+    this.commandManager = new CommandManager(this);
     
     //load the standard component generators
     //(for now this is not configurable. This is called first so loaded modules
@@ -526,7 +528,7 @@ apogeeapp.app.Apogee.prototype.getEditMenuItems = function() {
     var undoLabel;
     var undoCallback;
     var nextUndoDesc = this.commandManager.getNextUndoDesc();
-    if(nextUndoDesc === apogeeapp.app.CommandManager.NO_COMMAND) {
+    if(nextUndoDesc === CommandManager.NO_COMMAND) {
         undoLabel = "-no undo-"
         undoCallback = null;
     }
@@ -548,7 +550,7 @@ apogeeapp.app.Apogee.prototype.getEditMenuItems = function() {
     var redoLabel;
     var redoCallback;
     var nextRedoDesc = this.commandManager.getNextRedoDesc();
-    if(nextRedoDesc === apogeeapp.app.CommandManager.NO_COMMAND) {
+    if(nextRedoDesc === CommandManager.NO_COMMAND) {
         redoLabel = "-no redo-"
         redoCallback = null;
     }

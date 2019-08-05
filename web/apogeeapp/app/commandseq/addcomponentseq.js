@@ -47,7 +47,7 @@ apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,opt
             
             //create the command
             var commandData = {};
-            commandData.type = apogeeapp.app.addcomponent.COMMAND_TYPE;
+            commandData.type = "addComponent";
             commandData.parentFullName = userInputProperties.parentName;
             commandData.memberJson = apogeeapp.app.Component.createMemberJson(componentGenerator,userInputProperties,optionalBaseMemberValues);
             commandData.componentJson = apogeeapp.app.Component.createComponentJson(componentGenerator,userInputProperties,optionalBaseComponentValues);

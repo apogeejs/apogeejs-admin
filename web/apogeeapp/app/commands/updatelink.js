@@ -1,3 +1,5 @@
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+
 /** Update Link Command
  *
  * Command JSON format:
@@ -9,12 +11,12 @@
  *   "newNickname":(new nickname - optional)
  * }
  */ 
-apogeeapp.app.updatelink = {};
+let updatelink = {};
 
 
-apogeeapp.app.updatelink.createUndoCommand = function(workspaceUI,commandData) {
+updatelink.createUndoCommand = function(workspaceUI,commandData) {
     var undoCommandJson = {};
-    undoCommandJson.type = apogeeapp.app.updatelink.COMMAND_TYPE;
+    undoCommandJson.type = updatelink.COMMAND_TYPE;
     
     undoCommandJson.entryType = commandData.entryType;
     undoCommandJson.oldUrl = commandData.newUrl;
@@ -31,7 +33,7 @@ apogeeapp.app.updatelink.createUndoCommand = function(workspaceUI,commandData) {
     return undoCommandJson;
 }
 
-apogeeapp.app.updatelink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
+updatelink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
     
     var commandResult = {};
 
@@ -67,11 +69,11 @@ apogeeapp.app.updatelink.executeCommand = function(workspaceUI,commandData,async
 }
 
 
-apogeeapp.app.updatelink.COMMAND_TYPE = "updateLink";
+updatelink.COMMAND_TYPE = "updateLink";
 
-apogeeapp.app.updatelink.isAsynch = true;
+updatelink.isAsynch = true;
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.updatelink);
+CommandManager.registerCommand(updatelink);
 
 
 

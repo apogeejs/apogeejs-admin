@@ -14,7 +14,7 @@ apogeeapp.app.createworkspaceseq.createWorkspace = function(app) {
     }      
     
     var commandData = {};
-    commandData.type = apogeeapp.app.createworkspace.COMMAND_TYPE;
+    commandData.type = "createWorkspace";
     
     app.executeCommand(commandData);
 }

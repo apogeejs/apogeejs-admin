@@ -1,3 +1,5 @@
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+
 /** Delete Link Command
  *
  * Command JSON format:
@@ -7,20 +9,20 @@
  *   "url":(url)
  * }
  */ 
-apogeeapp.app.deletelink = {};
+let deletelink = {};
 
 //=====================================
 // Command Object
 //=====================================
 
-apogeeapp.app.deletelink.createUndoCommand = function(workspaceUI,commandData) {
+deletelink.createUndoCommand = function(workspaceUI,commandData) {
     
     var referenceManager = workspaceUI.getReferenceManager();
     var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.url);
     var nickname = referenceEntry.getNickname();
     
     var undoCommandJson = {};
-    undoCommandJson.type = apogeeapp.app.addlink.COMMAND_TYPE;
+    undoCommandJson.type = "addLink";
     undoCommandJson.entryType = commandData.entryType;
     undoCommandJson.url = commandData.url;
     if(nickname) undoCommandJson.nickname = nickname;
@@ -28,7 +30,7 @@ apogeeapp.app.deletelink.createUndoCommand = function(workspaceUI,commandData) {
     return undoCommandJson;
 }
 
-apogeeapp.app.deletelink.executeCommand = function(workspaceUI,commandData) {
+deletelink.executeCommand = function(workspaceUI,commandData) {
     
     var commandResult = {};
 
@@ -60,9 +62,9 @@ apogeeapp.app.deletelink.executeCommand = function(workspaceUI,commandData) {
     return commandResult;
 }
 
-apogeeapp.app.deletelink.COMMAND_TYPE = "deleteLink";
+deletelink.COMMAND_TYPE = "deleteLink";
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.deletelink);
+CommandManager.registerCommand(deletelink);
 
 
 

@@ -1,14 +1,14 @@
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 
-
-apogeeapp.app.compoundcommand = {};
+let compoundcommand = {};
 
 //=====================================
 // Command Object
 //=====================================
 
-apogeeapp.app.compoundcommand.createUndoCommand = function(workspaceUI,commandData) {
+compoundcommand.createUndoCommand = function(workspaceUI,commandData) {
     let undoCommandJson = {};
-    undoCommandJson.type = apogeeapp.app.compoundcommand.COMMAND_TYPE;
+    undoCommandJson.type = compoundcommand.COMMAND_TYPE;
     undoCommandJson.childCommands = [];
     
     //add the child undo commands in the reverse order
@@ -26,7 +26,7 @@ apogeeapp.app.compoundcommand.createUndoCommand = function(workspaceUI,commandDa
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-apogeeapp.app.compoundcommand.executeCommand = function(workspaceUI,commandData) {
+compoundcommand.executeCommand = function(workspaceUI,commandData) {
     
     let commandResult = {};
     commandResult.childResults = [];
@@ -34,7 +34,7 @@ apogeeapp.app.compoundcommand.executeCommand = function(workspaceUI,commandData)
     //add the child undo commands in the reverse order
     for(var i = 0; i < commandData.childCommands.length; i++) {
         let childCommandJson = commandData.childCommands[i];
-        let childCommandObject = apogeeapp.app.CommandManager.getCommandObject(childCommandJson.type);
+        let childCommandObject = CommandManager.getCommandObject(childCommandJson.type);
         let childCommandResult = childCommandObject.executeCommand(workspaceUI,childCommandJson);
         commandResult.childResults.push(childCommandResult);
     }
@@ -42,8 +42,8 @@ apogeeapp.app.compoundcommand.executeCommand = function(workspaceUI,commandData)
     return commandResult;
 }
 
-apogeeapp.app.compoundcommand.COMMAND_TYPE = "compoundCommand";
+compoundcommand.COMMAND_TYPE = "compoundCommand";
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.compoundcommand);
+CommandManager.registerCommand(compoundcommand);
 
 

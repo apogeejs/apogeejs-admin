@@ -262,7 +262,7 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
             initialValues.parentName = this.member.getFullName();
 
             //I tacked on a piggyback for testing!!!
-            apogeeapp.app.addcomponent.addAdditionalComponent(app,initialValues,null,null,piggybackCommandGenerator);
+            apogeeapp.app.addcomponentseq.addAdditionalComponent(app,initialValues,null,null,piggybackCommandGenerator);
         }
         this.componentToolbarElement.appendChild(buttonElement);
     }

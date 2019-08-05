@@ -1,3 +1,5 @@
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+
 /** Create Workspace Command
  *
  * Command JSON format:
@@ -5,17 +7,17 @@
  *   "type":"createWorkspace",
  * }
  */ 
-apogeeapp.app.createworkspace = {};
+let createworkspace = {};
 
 //=====================================
 // Command Object
 //=====================================
 
 //NO UNDO FOR CREATE WORKSPACE
-//apogeeapp.app.createworkspace.createUndoCommand = function(workspaceUI,commandData) {
+//createworkspace.createUndoCommand = function(workspaceUI,commandData) {
 
 /** Workspace UI parameter is not applicable. */
-apogeeapp.app.createworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData) {
+createworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData) {
 
     var commandResult = {};
     var workspaceUIAdded;
@@ -46,7 +48,7 @@ apogeeapp.app.createworkspace.executeCommand = function(unpopulatedWorkspaceUI,c
     return commandResult;
 }
 
-apogeeapp.app.createworkspace.COMMAND_TYPE = "createWorkspace";
+createworkspace.COMMAND_TYPE = "createWorkspace";
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.createworkspace);
+CommandManager.registerCommand(createworkspace);
 

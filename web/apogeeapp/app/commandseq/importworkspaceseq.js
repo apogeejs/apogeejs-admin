@@ -17,7 +17,7 @@ apogeeapp.app.importworkspaceseq = {};
 
     var onOpen = function(err,app,workspaceData,fileMetadata) {
         if(err) {
-            apogeeapp.app.CommandManager.errorAlert("Error adding link: " + err);
+            alert("Error adding link: " + err);
             return false;
         }
         else {
@@ -68,7 +68,7 @@ apogeeapp.app.importworkspaceseq.openWorkspace = function(app,componentGenerator
         }
         
         var workspaceImportError2 = function(errorMsg) {
-            apogeeapp.app.CommandManager.errorAlert(errorMsg);
+            alert(errorMsg);
         }
         
         //load links then import the workspace. On a link load error, continue with importing the workspace
@@ -79,7 +79,7 @@ apogeeapp.app.importworkspaceseq.openWorkspace = function(app,componentGenerator
     catch(error) {
         if(error.stack) console.error(error.stack);
         
-        apogeeapp.app.CommandManager.errorAlert("Error importing workspace: " + error.message);
+        alert("Error importing workspace: " + error.message);
         return false;
     }
     
@@ -93,7 +93,7 @@ apogeeapp.app.importworkspaceseq.openWorkspace = function(app,componentGenerator
 apogeeapp.app.importworkspaceseq.openWorkspaceFromUrl = function(app,url) {
     var actionCompletedCallback = function(success,errorMsg) {
         if(!success) {
-            apogeeapp.app.CommandManager.errorAlert(errroMsg);
+            alert(errroMsg);
         }
     };
     

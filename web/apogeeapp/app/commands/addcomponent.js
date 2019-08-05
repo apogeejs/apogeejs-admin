@@ -1,6 +1,8 @@
-import base from "/apogeeutil/base.js";
+//import base from "/apogeeutil/base.js";
 import util from "/apogeeutil/util.js";
 import {doAction} from "/apogee/actions/action.js";
+
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 
 
 /** Add Component Command
@@ -13,13 +15,14 @@ import {doAction} from "/apogee/actions/action.js";
  *   "componentJson":(component property json)
  * }
  */ 
-apogeeapp.app.addcomponent = {};
+
+let addcomponent = {};
 
 //=====================================
 // Command Object
 //=====================================
 
-apogeeapp.app.addcomponent.createUndoCommand = function(workspaceUI,commandData) {
+addcomponent.createUndoCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
     var memberName = commandData.memberJson.name;
@@ -27,13 +30,13 @@ apogeeapp.app.addcomponent.createUndoCommand = function(workspaceUI,commandData)
     var memberFullName = parent.getChildFullName(memberName);
     
     var undoCommandJson = {};
-    undoCommandJson.type = apogeeapp.app.deletecomponent.COMMAND_TYPE;
+    undoCommandJson.type = "deleteComponent";
     undoCommandJson.memberFullName = memberFullName;
     
     return undoCommandJson;
 }
 
-apogeeapp.app.addcomponent.executeCommand = function(workspaceUI,commandData) { 
+addcomponent.executeCommand = function(workspaceUI,commandData) { 
     
     var workspace = workspaceUI.getWorkspace();
 
@@ -47,7 +50,7 @@ apogeeapp.app.addcomponent.executeCommand = function(workspaceUI,commandData) {
     //create the components for the member
     //I need error handling for the create component action
     if(actionResult.actionDone) {
-        apogeeapp.app.addcomponent.createComponentFromMember(workspaceUI,actionResult,commandData.componentJson);
+        addcomponent.createComponentFromMember(workspaceUI,actionResult,commandData.componentJson);
     }
 
     var commandResult = {};
@@ -61,7 +64,7 @@ apogeeapp.app.addcomponent.executeCommand = function(workspaceUI,commandData) {
 // Internal Methods
 //==========================
 
-apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,createMemberResult,componentJson) {
+addcomponent.createComponentFromMember = function(workspaceUI,createMemberResult,componentJson) {
     
     //response - get new member
     var member = createMemberResult.member;
@@ -125,6 +128,6 @@ apogeeapp.app.addcomponent.createComponentFromMember = function(workspaceUI,crea
     
 }
 
-apogeeapp.app.addcomponent.COMMAND_TYPE = "addComponent";
+addcomponent.COMMAND_TYPE = "addComponent";
 
-apogeeapp.app.CommandManager.registerCommand(apogeeapp.app.addcomponent);
+CommandManager.registerCommand(addcomponent);
