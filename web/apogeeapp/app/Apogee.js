@@ -3,7 +3,6 @@ import EventManager from "/apogeeutil/EventManager.js";
 
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 import "/apogeeapp/app/commandConfig.js";
-import "/apogeeapp/app/componentConfig.js";
 import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
 import {closeWorkspace} from "/apogeeapp/app/commandseq/closeworkspaceseq.js";
 import {createWorkspace} from "/apogeeapp/app/commandseq/createworkspaceseq.js";
@@ -15,6 +14,12 @@ import {saveWorkspace} from "/apogeeapp/app/commandseq/saveworkspaceseq.js";
 import JsonTableComponent from "/apogeeapp/app/components/JsonTableComponent.js";
 import FunctionComponent from "/apogeeapp/app/components/FunctionComponent.js";
 import FolderComponent from "/apogeeapp/app/components/FolderComponent.js";
+import CanvasFolderComponent from "/apogeeapp/app/components/CanvasFolderComponent.js";
+import FolderFunctionComponent from "/apogeeapp/app/components/FolderFunctionComponent.js";
+import DynamicForm from "/apogeeapp/app/components/DynamicForm.js";
+import FormDataComponent from "/apogeeapp/app/components/FormDataComponent.js";
+import CustomComponent from "/apogeeapp/app/components/CustomComponent.js";
+import CustomDataComponent from "/apogeeapp/app/components/CustomDataComponent.js";
 
 
 apogeeapp.app.dialog = {};
@@ -311,15 +316,20 @@ apogeeapp.app.Apogee.prototype.loadComponentGenerators = function() {
     //standard components
     this.registerStandardComponent(JsonTableComponent);
 	this.registerStandardComponent(FolderComponent);
-    //this.registerStandardComponent(apogeeapp.app.CanvasFolderComponent);
+    this.registerStandardComponent(CanvasFolderComponent);
 	this.registerStandardComponent(FunctionComponent);
-    //this.registerStandardComponent(apogeeapp.app.FolderFunctionComponent);
-    //this.registerStandardComponent(apogeeapp.app.DynamicForm);
-    //this.registerStandardComponent(apogeeapp.app.FormDataComponent);
+    this.registerStandardComponent(FolderFunctionComponent);
+    this.registerStandardComponent(DynamicForm);
+    this.registerStandardComponent(FormDataComponent);
+
+//TEMP---
+this.registerStandardComponent(CustomComponent);
+this.registerStandardComponent(CustomDataComponent);
+//------------
 	
     //additional components
-    //this.registerComponent(apogeeapp.app.CustomComponent);
-    //this.registerComponent(apogeeapp.app.CustomDataComponent);
+//    this.registerComponent(CustomComponent);
+//    this.registerComponent(CustomDataComponent);
 }
 
 /** This method registers a component. 

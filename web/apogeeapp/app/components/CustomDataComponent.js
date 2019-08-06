@@ -2,6 +2,7 @@ import util from "/apogeeutil/util.js";
 import Messenger from "/apogee/actions/Messenger.js";
 
 import Component from "/apogeeapp/app/component/Component.js";
+import EditComponent from "/apogeeapp/app/component/EditComponent.js";
 
 /** This attempt has a single form edit page which returns an object. */
 // To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 
@@ -11,11 +12,11 @@ import Component from "/apogeeapp/app/component/Component.js";
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-export default class CustomDataComponent extends apogeeapp.app.EditComponent {
+export default class CustomDataComponent extends EditComponent {
 
     constructor(workspaceUI,folder) {
         //extend edit component
-        super(workspaceUI,folder,apogeeapp.app.CustomDataComponent);
+        super(workspaceUI,folder,CustomDataComponent);
         
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         folder.setChildrenWriteable(false);
@@ -254,18 +255,18 @@ export default class CustomDataComponent extends apogeeapp.app.EditComponent {
         }
 
         //record the updates
-        if(uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_CSS] != this.uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_CSS]) {
-            this.fieldUpdated(apogeeapp.app.CustomComponent.CODE_FIELD_CSS);
+        if(uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS] != this.uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS]) {
+            this.fieldUpdated(apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS);
             
             //update css now
-            let cssInfo = uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_CSS];
+            let cssInfo = uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS];
             apogeeapp.ui.setMemberCssData(this.getMember().getId(),cssInfo);
         }
-        if(uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_HTML] != this.uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_HTML]) {
-            this.fieldUpdated(apogeeapp.app.CustomComponent.CODE_FIELD_HTML);
+        if(uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_HTML] != this.uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_HTML]) {
+            this.fieldUpdated(apogeeapp.app.CustomDataComponent.CODE_FIELD_HTML);
         }
-        if(uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_UI_CODE] != this.uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_UI_CODE]) {
-            this.fieldUpdated(apogeeapp.app.CustomComponent.CODE_FIELD_UI_CODE);
+        if(uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_UI_CODE] != this.uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_UI_CODE]) {
+            this.fieldUpdated(apogeeapp.app.CustomDataComponent.CODE_FIELD_UI_CODE);
         }
         
         this.uiCodeFields = uiCodeFields;
@@ -312,9 +313,16 @@ export default class CustomDataComponent extends apogeeapp.app.EditComponent {
     //======================================
 
     static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(apogeeapp.app.CustomDataComponent,userInputValues,optionalBaseJson);
+        var json = Component.createMemberJson(CustomDataComponent,userInputValues,optionalBaseJson);
         return json;
     }
+
+    static transferComponentProperties(inputValues,propertyJson) {
+        if(inputValues.destroyOnInactive !== undefined) {
+            propertyJson.destroyOnInactive = inputValues.destroyOnInactive;
+        }
+    }
+    
 }
 
 /** This is the format string to create the code body for updateing the member
@@ -369,11 +377,6 @@ CustomDataComponent.propertyDialogLines = [
         "resultKey":"destroyOnInactive"
     }
 ];
-CustomDataComponent.transferComponentProperties = function(inputValues,propertyJson) {
-    if(inputValues.destroyOnInactive !== undefined) {
-        propertyJson.destroyOnInactive = inputValues.destroyOnInactive;
-    }
-}
 
 
 CustomDataComponent.CODE_FIELD_HTML = "html";

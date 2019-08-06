@@ -1,7 +1,7 @@
 import base from "/apogeeutil/base.js";
 import util from "/apogeeutil/util.js";
 import Workspace from "/apogee/data/Workspace.js";
-import Member from "/apogee/datacomponents/ContextHolder.js";
+import Member from "/apogee/datacomponents/Member.js";
 import Dependent from "/apogee/datacomponents/Dependent.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import Codeable from "/apogee/datacomponents/Codeable.js";
@@ -20,7 +20,7 @@ function FunctionTable(name,owner,initialData) {
     var argList = initialData.argList ? initialData.argList : [];
     var functionBody = initialData.functionBody ? initialData.functionBody : "";
     var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
-    this.applyCode(this,argList,functionBody,supplementalCode);
+    this.applyCode(argList,functionBody,supplementalCode);
     if(initialData.description !== undefined) {
         this.setDescription(initialData.description);
     }
