@@ -1,3 +1,5 @@
+import Component from "/apogeeapp/app/component/Component.js";
+
 /** This component represents a table object. */
 apogeeapp.app.CanvasFolderComponent = function(workspaceUI,folder) {
     //extend parent component
@@ -41,7 +43,7 @@ apogeeapp.app.CanvasFolderComponent.EMPTY_FOLDER_COMPONENT_JSON  = {
 };
 
 apogeeapp.app.CanvasFolderComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
-    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.CanvasFolderComponent,userInputValues,optionalBaseJson);
+    var json = Component.createMemberJson(apogeeapp.app.CanvasFolderComponent,userInputValues,optionalBaseJson);
     return json;
 }
 
@@ -54,7 +56,7 @@ apogeeapp.app.CanvasFolderComponent.uniqueName = "apogeeapp.app.CanvasFolderComp
 apogeeapp.app.CanvasFolderComponent.DEFAULT_WIDTH = 500;
 apogeeapp.app.CanvasFolderComponent.DEFAULT_HEIGHT = 500;
 apogeeapp.app.CanvasFolderComponent.ICON_RES_PATH = "/componentIcons/folder.png";
-apogeeapp.app.CanvasFolderComponent.TREE_ENTRY_SORT_ORDER = apogeeapp.app.Component.FOLDER_COMPONENT_TYPE_SORT_ORDER;
+apogeeapp.app.CanvasFolderComponent.TREE_ENTRY_SORT_ORDER = Component.FOLDER_COMPONENT_TYPE_SORT_ORDER;
 apogeeapp.app.CanvasFolderComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.Folder"
 };

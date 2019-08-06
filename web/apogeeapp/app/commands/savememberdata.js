@@ -1,6 +1,8 @@
 import {doAction} from "/apogee/actions/action.js";
 
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import {getSaveDataAction, getMemberStateUndoCommand} from  "/apogeeapp/app/commands/membersave.js";
+
 
 /** Save Member Data Command
  *
@@ -19,7 +21,7 @@ let savememberdata = {};
 
 savememberdata.createUndoCommand = function(workspaceUI,commandData) {
     var workspace = workspaceUI.getWorkspace();
-    var undoCommandJson = apogeeapp.app.membersave.getMemberStateUndoCommand(workspace,commandData.memberFullName); 
+    var undoCommandJson = getMemberStateUndoCommand(workspace,commandData.memberFullName); 
     return undoCommandJson;
 }
 
@@ -27,7 +29,7 @@ savememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplet
     
     var workspace = workspaceUI.getWorkspace();
     
-    var actionData = apogeeapp.app.membersave.getSaveDataAction(workspace,commandData.memberFullName,commandData.data,asynchOnComplete);
+    var actionData = getSaveDataAction(workspace,commandData.memberFullName,commandData.data,asynchOnComplete);
     
     var actionResult = doAction(workspace,actionData);
     

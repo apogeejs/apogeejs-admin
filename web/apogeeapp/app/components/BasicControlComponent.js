@@ -1,7 +1,9 @@
+import Component from "/apogeeapp/app/component/Component.js";
+
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods
  * and create a generator. */
-apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
+export default class BasicControlComponent extends apogeeapp.app.EditComponent{
     
     constructor(workspaceUI,control,componentGenerator) {
         super(workspaceUI,control,componentGenerator);
@@ -38,7 +40,7 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
     /**  This method retrieves the table edit settings for this component instance
      * @protected */
     getTableEditSettings() {
-        return apogeeapp.app.BasicControlComponent.TABLE_EDIT_SETTINGS;
+        return BasicControlComponent.TABLE_EDIT_SETTINGS;
     }
 
     /** This method should be implemented to retrieve a data display of the give type. 
@@ -50,20 +52,20 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
         //create the new view element;
         switch(viewType) {
 
-            case apogeeapp.app.BasicControlComponent.VIEW_OUTPUT:
+            case BasicControlComponent.VIEW_OUTPUT:
                 displayContainer.setDisplayDestroyFlags(this.displayDestroyFlags);
                 this.outputDisplayContainer = displayContainer;
                 return this.getOutputDisplay(displayContainer);
 
-            case apogeeapp.app.BasicControlComponent.VIEW_CODE:
+            case BasicControlComponent.VIEW_CODE:
                 callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member);
                 return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
-            case apogeeapp.app.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
+            case BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
                 callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member);
                 return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
-            case apogeeapp.app.BasicControlComponent.VIEW_DESCRIPTION:
+            case BasicControlComponent.VIEW_DESCRIPTION:
                 callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
                 //return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
                 return new apogeeapp.app.TextAreaEditor(displayContainer,callbacks);
@@ -76,7 +78,7 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
     }
 
     static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.JsonTable,userInputValues,optionalBaseJson);
+        var json = Component.createMemberJson(apogeeapp.app.JsonTable,userInputValues,optionalBaseJson);
         return json;
     }
 
@@ -84,7 +86,7 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
     static attachStandardStaticProperties(componentGenerator,displayName,uniqueName) {
         componentGenerator.displayName = displayName;
         componentGenerator.uniqueName = uniqueName;
-        componentGenerator.createMemberJson = apogeeapp.app.BasicControlComponent.createMemberJson;
+        componentGenerator.createMemberJson = BasicControlComponent.createMemberJson;
         componentGenerator.DEFAULT_WIDTH = 500;
         componentGenerator.DEFAULT_HEIGHT = 500;
         componentGenerator.ICON_RES_PATH = "/componentIcons/chartControl.png";
@@ -95,21 +97,21 @@ apogeeapp.app.BasicControlComponent = class extends apogeeapp.app.EditComponent{
 // Static properties
 //======================================
 
-apogeeapp.app.BasicControlComponent.VIEW_OUTPUT = "Output";
-apogeeapp.app.BasicControlComponent.VIEW_CODE = "Code";
-apogeeapp.app.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
-apogeeapp.app.BasicControlComponent.VIEW_DESCRIPTION = "Notes";
+BasicControlComponent.VIEW_OUTPUT = "Output";
+BasicControlComponent.VIEW_CODE = "Code";
+BasicControlComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+BasicControlComponent.VIEW_DESCRIPTION = "Notes";
 
-apogeeapp.app.BasicControlComponent.VIEW_MODES = [
-	apogeeapp.app.BasicControlComponent.VIEW_OUTPUT,
-	apogeeapp.app.BasicControlComponent.VIEW_CODE,
-    apogeeapp.app.BasicControlComponent.VIEW_SUPPLEMENTAL_CODE,
-    apogeeapp.app.BasicControlComponent.VIEW_DESCRIPTION
+BasicControlComponent.VIEW_MODES = [
+	BasicControlComponent.VIEW_OUTPUT,
+	BasicControlComponent.VIEW_CODE,
+    BasicControlComponent.VIEW_SUPPLEMENTAL_CODE,
+    BasicControlComponent.VIEW_DESCRIPTION
 ];
 
-apogeeapp.app.BasicControlComponent.TABLE_EDIT_SETTINGS = {
-    "viewModes": apogeeapp.app.BasicControlComponent.VIEW_MODES,
-    "defaultView": apogeeapp.app.BasicControlComponent.VIEW_OUTPUT
+BasicControlComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": BasicControlComponent.VIEW_MODES,
+    "defaultView": BasicControlComponent.VIEW_OUTPUT
 }
 
 

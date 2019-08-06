@@ -1,3 +1,4 @@
+import {addLink} from "/apogeeapp/app/commandseq/updatelinkseq.js";
 
 /** This class manages links and other reference entries, loading the references and
  * creating the UI tree elements for display of the references.
@@ -215,7 +216,7 @@ apogeeapp.app.ReferenceManager.prototype.getListMenuItems = function(typeInfo) {
     //add the standard entries
     var itemInfo = {};
     itemInfo.title = typeInfo.ADD_ENTRY_TEXT;
-    itemInfo.callback = apogeeapp.app.updatelinkseq.addLink(this,typeInfo);
+    itemInfo.callback = addLink(this,typeInfo);
     menuItemList.push(itemInfo);
     
     return menuItemList;

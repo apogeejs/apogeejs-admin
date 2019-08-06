@@ -1,3 +1,4 @@
+import {updateLink, removeLink} from "/apogeeapp/app/commandseq/updatelinkseq.js";
 
 /** This class manages references for the web page.*/
 apogeeapp.app.ReferenceEntry = class {
@@ -164,13 +165,13 @@ apogeeapp.app.ReferenceEntry = class {
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = "Update Reference";
-        itemInfo.callback = () => apogeeapp.app.updatelinkseq.updateLink(this);
+        itemInfo.callback = () => updateLink(this);
         menuItemList.push(itemInfo);
 
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = "Remove Reference";
-        itemInfo.callback = () => apogeeapp.app.updatelinkseq.removeLink(this);
+        itemInfo.callback = () => removeLink(this);
         menuItemList.push(itemInfo);
 
         return menuItemList;

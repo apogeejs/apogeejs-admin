@@ -1,6 +1,8 @@
 import {doAction} from "/apogee/actions/action.js";
 
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import {getSetCodeAction, getMemberStateUndoCommand} from  "/apogeeapp/app/commands/membersave.js";
+
 
 /** Save Member Data Command
  *
@@ -22,7 +24,7 @@ let savemembercode = {};
 
 savemembercode.createUndoCommand = function(workspaceUI,commandData) {
     var workspace = workspaceUI.getWorkspace();
-    var undoCommandJson = apogeeapp.app.membersave.getMemberStateUndoCommand(workspace,commandData.memberFullName); 
+    var undoCommandJson = getMemberStateUndoCommand(workspace,commandData.memberFullName); 
     return undoCommandJson;
 }
 
@@ -30,7 +32,7 @@ savemembercode.executeCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
     
-    var actionData = apogeeapp.app.membersave.getSetCodeAction(workspace,
+    var actionData = getSetCodeAction(workspace,
         commandData.memberFullName,
         commandData.argList,
         commandData.functionBody,

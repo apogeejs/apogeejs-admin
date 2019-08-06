@@ -1,6 +1,8 @@
 import {doAction} from "/apogee/actions/action.js";
 
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import {getSaveDataAction, getMemberStateUndoCommand} from  "/apogeeapp/app/commands/membersave.js";
+
 
 /** Save Member Data Command
  *
@@ -32,7 +34,7 @@ compoundsavememberdata.createUndoCommand = function(workspaceUI,commandData) {
         let updateEntry = commandData.updateInfo[i];
         let memberFullName = commandData.updateEntry[0];
 
-        let childUndoCommandJson = apogeeapp.app.membersave.getMemberStateUndoCommand(workspace,commandData.memberFullName); 
+        let childUndoCommandJson = getMemberStateUndoCommand(workspace,commandData.memberFullName); 
 
         //OOPS. THIS ISN"T RIGHT
 
@@ -56,7 +58,7 @@ compoundsavememberdata.executeCommand = function(workspaceUI,commandData,asynchO
         let memberFullName = commandData.updateEntry[0];
         let data = commandData.updateEntry[1];
 
-        let childActionData = apogeeapp.app.membersave.getSaveDataAction(workspace,memberFullName,data,asynchOnComplete);
+        let childActionData = getSaveDataAction(workspace,memberFullName,data,asynchOnComplete);
 
         actionList.push(childActionData);
     }

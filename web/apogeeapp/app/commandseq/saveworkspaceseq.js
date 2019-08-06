@@ -1,12 +1,10 @@
 
 
-apogeeapp.app.saveworkspaceseq = {};
-
 //=====================================
 // UI Entry Point
 //=====================================
 
-apogeeapp.app.saveworkspaceseq.saveWorkspace = function(app,fileAccessObject,doDirectSave) {
+export function saveWorkspace(app,fileAccessObject,doDirectSave) {
 
     var activeWorkspaceUI = app.getWorkspaceUI();
     var workspaceText;

@@ -1,4 +1,5 @@
 import EventManager from "/apogeeutil/EventManager.js";
+import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
 
 /** This component represents a json table object. 
  * The member argument is the main member for this component. The folder argument is 
@@ -347,7 +348,7 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
                     this.insertChildIntoDisplay(member.getName(),selection);
                 }
 
-                apogeeapp.app.addcomponentseq.addComponent(app,generator,initialValues,null,onSuccess);
+                addComponent(app,generator,initialValues,null,onSuccess);
             }
             this.componentToolbarElement.appendChild(buttonElement);
         }
@@ -365,7 +366,7 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
                 this.insertChildIntoDisplay(member.getName(),selection);
             }
 
-            var doAddComponent = apogeeapp.app.addcomponentseq.getAddAdditionalComponentCallback(app,initialValues,null,onSuccess);
+            var doAddComponent = addAdditionalComponent(app,initialValues,null,onSuccess);
             doAddComponent();
 
             //if successfull, add to the ui

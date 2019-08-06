@@ -1,20 +1,18 @@
 import util from "/apogeeutil/util.js";
 
-apogeeapp.app.updatelinkseq = {};
-
-apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_URL_LINE = {
+const DIALOG_LAYOUT_URL_LINE = {
     "type": "inputElement",
     "heading": "URL: ",
     "resultKey": "url",
     "initial": ""
 };
-apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_NICKNAME_LINE = {
+const DIALOG_LAYOUT_NICKNAME_LINE = {
     "type": "inputElement",
     "heading": "Nickname (optional): ",
     "resultKey": "nickname",
     "initial": ""
 };
-apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_SUBMIT_LINE = {
+const DIALOG_LAYOUT_SUBMIT_LINE = {
     "type": "submit",
     "submit": "Update",
     "cancel": "Cancel"
@@ -25,7 +23,7 @@ apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_SUBMIT_LINE = {
 //=====================================
 
 /** This method gets a callback to update the properties of a workspace. */
-apogeeapp.app.updatelinkseq.addLink = function(referenceManager,entryTypeInfo) {
+export function addLink(referenceManager,entryTypeInfo) {
         
     //create the dialog layout 
     var titleLine = {};
@@ -67,7 +65,7 @@ apogeeapp.app.updatelinkseq.addLink = function(referenceManager,entryTypeInfo) {
 }
 
 /** This method gets a callback to update the properties of a workspace. */
-apogeeapp.app.updatelinkseq.updateLink = function(referenceEntry) {
+export function updateLink(referenceEntry) {
         
     var initialValues = {};
     initialValues.url = referenceEntry.getUrl();
@@ -131,7 +129,7 @@ apogeeapp.app.updatelinkseq.updateLink = function(referenceEntry) {
 
 
 /** This method gets a callback to update the properties of a workspace. */
-apogeeapp.app.updatelinkseq.removeLink = function(referenceEntry) {
+export function removeLink(referenceEntry) {
 
     var doDelete= confirm("Are you sure you want to delete this link?");
 

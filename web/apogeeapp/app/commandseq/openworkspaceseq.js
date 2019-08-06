@@ -1,11 +1,9 @@
 
-apogeeapp.app.openworkspaceseq = {};
-
 //=====================================
 // UI Entry Point
 //=====================================
 
-apogeeapp.app.openworkspaceseq.openWorkspace = function(app,fileAccessObject) {
+export function openWorkspace(app,fileAccessObject) {
     
     //make sure there is not an open workspace
     if(app.getWorkspaceUI()) {
@@ -13,11 +11,11 @@ apogeeapp.app.openworkspaceseq.openWorkspace = function(app,fileAccessObject) {
         return;
     }    
 
-    fileAccessObject.openFile(app,apogeeapp.app.openworkspaceseq.onOpen);
+    fileAccessObject.openFile(app,onOpen);
 }
 
 /** This method should be called when workspace data is opened, to create the workspace. */
-apogeeapp.app.openworkspaceseq.onOpen = function(err,app,workspaceData,fileMetadata) {
+function onOpen(err,app,workspaceData,fileMetadata) {
 
     if(err) {
         var errorMessage = "There was an error opening the file";

@@ -1,14 +1,12 @@
 import util from "/apogeeutil/util.js";
 import {validateTableName} from "/apogee/lib/codeCompiler.js"; 
 
-apogeeapp.app.updatecomponentseq = {};
-
 //=====================================
 // UI Entry Point
 //=====================================
 
 /** This method gets a callback to update the properties of a component. */
-apogeeapp.app.updatecomponentseq.updateComponent = function(component) {
+export function updateComponent(component) {
     
     var componentGenerator = component.componentGenerator;
 
@@ -22,7 +20,7 @@ apogeeapp.app.updatecomponentseq.updateComponent = function(component) {
     var folderList = workspaceUI.getFolders();
 
     //create the dialog layout - do on the fly because folder list changes
-    var dialogLayout = apogeeapp.app.updatecomponentseq.getPropertiesDialogLayout(displayName,folderList,additionalLines,false,initialValues);
+    var dialogLayout = getPropertiesDialogLayout(displayName,folderList,additionalLines,false,initialValues);
 
     //create on submit callback
     var onSubmitFunction = function(submittedValues) {
@@ -129,7 +127,7 @@ apogeeapp.app.updatecomponentseq.updateComponent = function(component) {
 
 //this is for a create or update dialog
 //omit folder names (null) and folder initial value to omit the parent selection
-apogeeapp.app.updatecomponentseq.getPropertiesDialogLayout = function(displayName,folderNames,additionalLines,doCreate,initialValues) { 
+export function getPropertiesDialogLayout(displayName,folderNames,additionalLines,doCreate,initialValues) { 
     
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};

@@ -1,3 +1,5 @@
+import Component from "/apogeeapp/app/component/Component.js";
+
 /** This component represents a table object. */
 apogeeapp.app.DynamicForm = function(workspaceUI, functionObject) {
     //extend edit component
@@ -85,7 +87,7 @@ apogeeapp.app.DynamicForm.prototype.getFormCallbacks = function() {
 //======================================
 
 apogeeapp.app.DynamicForm.createMemberJson = function(userInputValues,optionalBaseJson) {
-    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.DynamicForm,userInputValues,optionalBaseJson);
+    var json = Component.createMemberJson(apogeeapp.app.DynamicForm,userInputValues,optionalBaseJson);
     return json;
 }
 

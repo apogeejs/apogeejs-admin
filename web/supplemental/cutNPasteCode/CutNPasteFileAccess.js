@@ -63,7 +63,7 @@ apogeeapp.app.CutNPasteFileAccess = class extends apogeeapp.app.BaseFileAccess {
      * This method saves a file to the give location. 
      */
     saveFile(fileMetadata,data,onSaveSuccess) {
-        apogeeapp.app.saveworkspaceseq.showSaveDialog(fileMetadata,data,onSaveSuccess);
+        this.showSaveDialog(fileMetadata,data,onSaveSuccess);
     }
 
 

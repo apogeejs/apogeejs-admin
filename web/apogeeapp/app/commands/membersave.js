@@ -4,13 +4,11 @@ import util from "/apogeeutil/util.js";
  * There are 
  */
 
-apogeeapp.app.membersave = {};
-
 
 
 /** This method can be called to create a undo function to return a member to the current state
  * following a code or data update. */
-apogeeapp.app.membersave.getMemberStateUndoCommand = function(workspace, memberFullName) {
+export function getMemberStateUndoCommand(workspace, memberFullName) {
     
     var member = workspace.getMemberByFullName(memberFullName);
     var command = {};
@@ -53,7 +51,7 @@ apogeeapp.app.membersave.getMemberStateUndoCommand = function(workspace, memberF
 
 
 /** @private */
-apogeeapp.app.membersave.getSaveDataAction = function(workspace,memberFullName,data,asynchOnComplete) {
+export function getSaveDataAction(workspace,memberFullName,data,asynchOnComplete) {
 
     var actionData = {};
     actionData.action = "updateData";
@@ -75,8 +73,7 @@ apogeeapp.app.membersave.getSaveDataAction = function(workspace,memberFullName,d
     return actionData;
 }
 
-/** @private */
-apogeeapp.app.membersave.getSetCodeAction = function(workspace,memberFullName,argList,functionBody,supplementalCode,optionalClearCodeDataValue) {
+export function getSetCodeAction(workspace,memberFullName,argList,functionBody,supplementalCode,optionalClearCodeDataValue) {
      
     var actionData = {};
 

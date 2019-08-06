@@ -2,6 +2,8 @@ import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManager.js";
 import proseMirror from "/apogeeapp/app/component/literatepage/proseMirrorSetup.js";
 
+import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
+
 /** This component represents a json table object. 
  * The member argument is the main member for this component. The folder argument is 
  * the parent folde associated with this component, which may be different from the
@@ -247,7 +249,7 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
                 initialValues.parentName = this.member.getFullName();
 
                 //I tacked on a piggyback for testing!!!
-                apogeeapp.app.addcomponentseq.addComponent(app,generator,initialValues,null,null,piggybackCommandGenerator);
+                addComponent(app,generator,initialValues,null,null,piggybackCommandGenerator);
             }
             this.componentToolbarElement.appendChild(buttonElement);
         }
@@ -256,13 +258,12 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
         var buttonElement = document.createElement("button");
         buttonElement.innerHTML = "Additional Components";
         buttonElement.onclick = () => {
-            alert("button clicked: " + generator.uniqueName);
 
             var initialValues = {};
             initialValues.parentName = this.member.getFullName();
 
             //I tacked on a piggyback for testing!!!
-            apogeeapp.app.addcomponentseq.addAdditionalComponent(app,initialValues,null,null,piggybackCommandGenerator);
+            addAdditionalComponent(app,initialValues,null,null,piggybackCommandGenerator);
         }
         this.componentToolbarElement.appendChild(buttonElement);
     }

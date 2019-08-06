@@ -1,18 +1,16 @@
 import util from "/apogeeutil/util.js";
 
-apogeeapp.app.updateworkspaceseq = {};
-
-apogeeapp.app.updateworkspaceseq.DIALOG_LAYOUT_TITLE_LINE = {
+const DIALOG_LAYOUT_TITLE_LINE = {
     "type": "title",
     "title": "Update Workspace"
 };
-apogeeapp.app.updateworkspaceseq.DIALOG_LAYOUT_NAME_LINE = {
+const DIALOG_LAYOUT_NAME_LINE = {
     "type": "inputElement",
     "heading": "Name: ",
     "resultKey": "name",
     "initial": ""
 };
-apogeeapp.app.updateworkspaceseq.DIALOG_LAYOUT_SUBMIT_LINE = {
+const DIALOG_LAYOUT_SUBMIT_LINE = {
     "type": "submit",
     "submit": "Update",
     "cancel": "Cancel"
@@ -23,7 +21,7 @@ apogeeapp.app.updateworkspaceseq.DIALOG_LAYOUT_SUBMIT_LINE = {
 //=====================================
 
 /** This method gets a callback to update the properties of a workspace. */
-apogeeapp.app.updateworkspaceseq.updateWorkspaceProperties = function(workspaceUI) {
+export function updateWorkspaceProperties(workspaceUI) {
         
     var workspace = workspaceUI.getWorkspace();
 
@@ -32,15 +30,15 @@ apogeeapp.app.updateworkspaceseq.updateWorkspaceProperties = function(workspaceU
     initialValues.name = workspace.getName();
 
     //create the dialog layout
-    var nameLine = util.jsonCopy(apogeeapp.app.updateworkspaceseq.DIALOG_LAYOUT_NAME_LINE);
+    var nameLine = util.jsonCopy(DIALOG_LAYOUT_NAME_LINE);
     nameLine.initial = initialValues.name;
 
     var dialogLayout = {};
     dialogLayout.lines = [];
-    dialogLayout.lines.push(apogeeapp.app.updateworkspaceseq.DIALOG_LAYOUT_TITLE_LINE);
+    dialogLayout.lines.push(DIALOG_LAYOUT_TITLE_LINE);
     dialogLayout.lines.push(nameLine);
     //(add any workspace ui lines here)
-    dialogLayout.lines.push(apogeeapp.app.updateworkspaceseq.DIALOG_LAYOUT_SUBMIT_LINE);
+    dialogLayout.lines.push(DIALOG_LAYOUT_SUBMIT_LINE);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {

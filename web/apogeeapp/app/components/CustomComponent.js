@@ -1,5 +1,7 @@
 import util from "/apogeeutil/util.js";
 
+import Component from "/apogeeapp/app/component/Component.js";
+
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
@@ -319,7 +321,7 @@ apogeeapp.app.CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 //======================================
 
 apogeeapp.app.CustomComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
-    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.CustomComponent,userInputValues,optionalBaseJson);
+    var json = Component.createMemberJson(apogeeapp.app.CustomComponent,userInputValues,optionalBaseJson);
     return json;
 }
 

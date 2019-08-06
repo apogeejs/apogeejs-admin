@@ -1,12 +1,10 @@
 
 
-apogeeapp.app.closeworkspaceseq = {};
-
 //=====================================
 // UI Entry Point
 //=====================================
 
-apogeeapp.app.closeworkspaceseq.closeWorkspace = function(app) {
+export function closeWorkspace(app) {
     
     var activeWorkspaceUI = app.getWorkspaceUI();
     if(activeWorkspaceUI === null) {

@@ -2,6 +2,20 @@ import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManager.js";
 
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import "/apogeeapp/app/commandConfig.js";
+import "/apogeeapp/app/componentConfig.js";
+import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
+import {closeWorkspace} from "/apogeeapp/app/commandseq/closeworkspaceseq.js";
+import {createWorkspace} from "/apogeeapp/app/commandseq/createworkspaceseq.js";
+import {importWorkspace} from "/apogeeapp/app/commandseq/importworkspaceseq.js";
+import {exportWorkspace} from "/apogeeapp/app/commandseq/exportworkspaceseq.js";
+import {openWorkspace} from "/apogeeapp/app/commandseq/openworkspaceseq.js";
+import {saveWorkspace} from "/apogeeapp/app/commandseq/saveworkspaceseq.js";
+
+import JsonTableComponent from "/apogeeapp/app/components/JsonTableComponent.js";
+import FunctionComponent from "/apogeeapp/app/components/FunctionComponent.js";
+import FolderComponent from "/apogeeapp/app/components/FolderComponent.js";
+
 
 apogeeapp.app.dialog = {};
 
@@ -295,17 +309,17 @@ apogeeapp.app.Apogee.prototype.initApp = function() {
  * @private */
 apogeeapp.app.Apogee.prototype.loadComponentGenerators = function() {
     //standard components
-    this.registerStandardComponent(apogeeapp.app.JsonTableComponent);
-	this.registerStandardComponent(apogeeapp.app.FolderComponent);
-    this.registerStandardComponent(apogeeapp.app.CanvasFolderComponent);
-	this.registerStandardComponent(apogeeapp.app.FunctionComponent);
-    this.registerStandardComponent(apogeeapp.app.FolderFunctionComponent);
-    this.registerStandardComponent(apogeeapp.app.DynamicForm);
-    this.registerStandardComponent(apogeeapp.app.FormDataComponent);
+    this.registerStandardComponent(JsonTableComponent);
+	this.registerStandardComponent(FolderComponent);
+    //this.registerStandardComponent(apogeeapp.app.CanvasFolderComponent);
+	this.registerStandardComponent(FunctionComponent);
+    //this.registerStandardComponent(apogeeapp.app.FolderFunctionComponent);
+    //this.registerStandardComponent(apogeeapp.app.DynamicForm);
+    //this.registerStandardComponent(apogeeapp.app.FormDataComponent);
 	
     //additional components
-    this.registerComponent(apogeeapp.app.CustomComponent);
-    this.registerComponent(apogeeapp.app.CustomDataComponent);
+    //this.registerComponent(apogeeapp.app.CustomComponent);
+    //this.registerComponent(apogeeapp.app.CustomDataComponent);
 }
 
 /** This method registers a component. 
@@ -452,13 +466,13 @@ apogeeapp.app.Apogee.prototype.createMenuBar = function() {
     menuBarLeft.appendChild(menu.getElement());
     menus[name] = menu;
     
-    var importCallback = () => apogeeapp.app.importworkspaceseq.importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderComponent);
+    var importCallback = () => importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderComponent);
     menu.addCallbackMenuItem("Import as Folder",importCallback);
     
-    var import2Callback = () => apogeeapp.app.importworkspaceseq.importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderFunctionComponent);
+    var import2Callback = () => importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderFunctionComponent);
     menu.addCallbackMenuItem("Import as Folder Function",import2Callback);
     
-    var exportCallback = () => apogeeapp.app.exportworkspaceseq.exportWorkspace(this,this.fileAccessObject);
+    var exportCallback = () => exportWorkspace(this,this.fileAccessObject);
     menu.addCallbackMenuItem("Export as Workspace",exportCallback);
     
     //allow the implementation to add more menus or menu items
@@ -484,12 +498,12 @@ apogeeapp.app.Apogee.prototype.getWorkspaceMenuItems = function() {
     
     menuItem = {};
     menuItem.title = "New";
-    menuItem.callback = () => apogeeapp.app.createworkspaceseq.createWorkspace(this);
+    menuItem.callback = () => createWorkspace(this);
     menuItems.push(menuItem);
     
     menuItem = {};
     menuItem.title = "Open";
-    menuItem.callback = () => apogeeapp.app.openworkspaceseq.openWorkspace(this,this.fileAccessObject);
+    menuItem.callback = () => openWorkspace(this,this.fileAccessObject);
     menuItems.push(menuItem);
 
     var workspaceUI = this.getWorkspaceUI();
@@ -499,19 +513,19 @@ apogeeapp.app.Apogee.prototype.getWorkspaceMenuItems = function() {
         if(this.fileAccessObject.directSaveOk(fileMetadata)) {
             menuItem = {};
             menuItem.title = "Save";
-            menuItem.callback = () => apogeeapp.app.saveworkspaceseq.saveWorkspace(this,this.fileAccessObject,true);
+            menuItem.callback = () => saveWorkspace(this,this.fileAccessObject,true);
             menuItems.push(menuItem);
         }
 
         menuItem = {};
         menuItem.title = "Save as";
-        menuItem.callback = () => apogeeapp.app.saveworkspaceseq.saveWorkspace(this,this.fileAccessObject,false);
+        menuItem.callback = () => saveWorkspace(this,this.fileAccessObject,false);
         menuItems.push(menuItem);
     }  
 
     menuItem = {};
     menuItem.title = "Close";
-    menuItem.callback = () => apogeeapp.app.closeworkspaceseq.closeWorkspace(this);
+    menuItem.callback = () => closeWorkspace(this);
     menuItems.push(menuItem);
     
     return menuItems;
@@ -584,14 +598,14 @@ apogeeapp.app.Apogee.prototype.getAddChildMenuItems = function(optionalInitialPr
         
         let menuItem = {};
         menuItem.title = "Add " + generator.displayName;
-        menuItem.callback = () => apogeeapp.app.addcomponentseq.addComponent(this,generator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
+        menuItem.callback = () => addComponent(this,generator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
         menuItemList.push(menuItem);
     }
 
     //add the additional component item
     let menuItem = {};
     menuItem.title = "Other Components...";
-    menuItem.callback = () => apogeeapp.app.addcomponentseq.addAdditionalComponent(this,optionalInitialProperties,optionalBaseMemberValues,optionalBaseMemberValues);
+    menuItem.callback = () => addAdditionalComponent(this,optionalInitialProperties,optionalBaseMemberValues,optionalBaseMemberValues);
     menuItemList.push(menuItem);
 
     return menuItemList;

@@ -1,5 +1,7 @@
 import Messenger from "/apogee/actions/Messenger.js";
 
+import Component from "/apogeeapp/app/component/Component.js";
+
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form
  * can be accessed from the variables (componentName).data. There are also subtables
@@ -152,7 +154,7 @@ apogeeapp.app.FormDataComponent.prototype.getFormEditorCallbacks = function() {
 //======================================
 
 apogeeapp.app.FormDataComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
-    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.FormDataComponent,userInputValues,optionalBaseJson);
+    var json = Component.createMemberJson(apogeeapp.app.FormDataComponent,userInputValues,optionalBaseJson);
     return json;
 }
 

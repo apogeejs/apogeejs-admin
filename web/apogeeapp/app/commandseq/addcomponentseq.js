@@ -1,7 +1,8 @@
 import util from "/apogeeutil/util.js";
 import {validateTableName} from "/apogee/lib/codeCompiler.js"; 
 
-apogeeapp.app.addcomponentseq = {};
+import {getPropertiesDialogLayout} from "/apogeeapp/app/commandseq/updatecomponentseq.js";
+import Component from "/apogeeapp/app/component/Component.js";
 
 //=====================================
 // UI Entry Point
@@ -12,7 +13,7 @@ apogeeapp.app.addcomponentseq = {};
  * property values in optionalBaseComponentValues, overridden by the user input properties where applicable. The member
  * created will be made using the optionalBaseMemberValues, agagin overidden by any user input values.  */   
 //piggybackCommand is a temporary test!!!
-apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator) {
+export function addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator) {
 
         //get the active workspace
         var workspaceUI = app.getWorkspaceUI();
@@ -31,7 +32,7 @@ apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,opt
         var folderList = workspaceUI.getFolders();
         
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = apogeeapp.app.updatecomponentseq.getPropertiesDialogLayout(displayName,folderList,additionalLines,true,optionalInitialProperties);
+        var dialogLayout = getPropertiesDialogLayout(displayName,folderList,additionalLines,true,optionalInitialProperties);
         
         //create on submit callback
         var onSubmitFunction = function(userInputProperties) {
@@ -49,8 +50,8 @@ apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,opt
             var commandData = {};
             commandData.type = "addComponent";
             commandData.parentFullName = userInputProperties.parentName;
-            commandData.memberJson = apogeeapp.app.Component.createMemberJson(componentGenerator,userInputProperties,optionalBaseMemberValues);
-            commandData.componentJson = apogeeapp.app.Component.createComponentJson(componentGenerator,userInputProperties,optionalBaseComponentValues);
+            commandData.memberJson = Component.createMemberJson(componentGenerator,userInputProperties,optionalBaseMemberValues);
+            commandData.componentJson = Component.createComponentJson(componentGenerator,userInputProperties,optionalBaseComponentValues);
             
             //#################################################
             //temporary TESTING
@@ -83,12 +84,12 @@ apogeeapp.app.addcomponentseq.addComponent = function(app,componentGenerator,opt
 /** This gets a callback to add an "additional" component, menaing one that is not
  * in the main component menu. */
 //piggybackCommand is a temporary test!!!
-apogeeapp.app.addcomponentseq.addAdditionalComponent = function(app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator) {
+export function addAdditionalComponent(app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator) {
         
     var onSelect = function(componentType) {
         var componentGenerator = app.getComponentGenerator(componentType);
         if(componentGenerator) {
-            apogeeapp.app.addcomponentseq.addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator);
+            addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator);
         }
         else {
             alert("Unknown component type: " + componentType);

@@ -1,80 +1,87 @@
+import Component from "/apogeeapp/app/component/Component.js";
+import EditComponent from "/apogeeapp/app/component/EditComponent.js";
+
 /** This component represents a json table object. */
-apogeeapp.app.ErrorTableComponent = function(workspaceUI,table) {
-    //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.ErrorTableComponent);
+export default class ErrorTableComponent extends EditComponent {
 
-    //default view
-    this.dataView = apogeeapp.app.ErrorTableComponent.EMPTY_VIEW;
-};
+    constructor(workspaceUI,table) {
+        //extend edit component
+        super(workspaceUI,table,apogeeapp.app.ErrorTableComponent);
 
-apogeeapp.app.ErrorTableComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
-apogeeapp.app.ErrorTableComponent.prototype.constructor = apogeeapp.app.ErrorTableComponent;
+        //default view
+        this.dataView = ErrorTableComponent.EMPTY_VIEW;
+    };
 
-apogeeapp.app.ErrorTableComponent.prototype.getDataView = function() {
-    return this.dataView;
+
+    getDataView() {
+        return this.dataView;
+    }
+
+    setDataView(dataView) {
+        //no action - data view is fixed
+    }
+
+    //==============================
+    // Protected and Private Instance Methods
+    //==============================
+
+
+
+    /**  This method retrieves the table edit settings for this component instance
+     * @protected */
+    getTableEditSettings() {
+        return ErrorTableComponent.TABLE_EDIT_SETTINGS;
+    }
+
+    /** This method should be implemented to retrieve a view mode of the give type. 
+     * @protected. */
+    getDataDisplay(displayContainer,viewType) {
+        return new apogeeapp.app.ErrorDisplay(displayContainer,false);
+    }
+
+    /** This overrides the save method to return the original input. */
+    toJson() {
+        return this.completeJson;
+    }
+
+    /** This overrides the open deserialize method to save the entire json. */
+    loadPropertyValues(json) {
+        this.completeJson = json;
+    }
+
+    //======================================
+    // Static methods
+    //======================================
+
+    static createMemberJson(userInputValues,optionalBaseJson) {
+        var json = Component.createMemberJson(apogeeapp.app.ErrorTableComponent,userInputValues,optionalBaseJson);
+        return json;
+    }
+
 }
 
-apogeeapp.app.ErrorTableComponent.prototype.setDataView = function(dataView) {
-    //no action - data view is fixed
-}
+ErrorTableComponent.EMPTY_VIEW = "EMPTY_VIEW";
 
-//==============================
-// Protected and Private Instance Methods
-//==============================
-
-apogeeapp.app.ErrorTableComponent.EMPTY_VIEW = "EMPTY_VIEW";
-
-apogeeapp.app.ErrorTableComponent.VIEW_MODES = [
-    apogeeapp.app.ErrorTableComponent.EMPTY_VIEW
+ErrorTableComponent.VIEW_MODES = [
+    ErrorTableComponent.EMPTY_VIEW
 ];
 
-apogeeapp.app.ErrorTableComponent.TABLE_EDIT_SETTINGS = {
-    "viewModes": apogeeapp.app.ErrorTableComponent.VIEW_MODES,
-    "defaultView": apogeeapp.app.ErrorTableComponent.EMPTY_VIEW,
+ErrorTableComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": ErrorTableComponent.VIEW_MODES,
+    "defaultView": ErrorTableComponent.EMPTY_VIEW,
     "emptyDataValue": ""
-}
-
-/**  This method retrieves the table edit settings for this component instance
- * @protected */
-apogeeapp.app.ErrorTableComponent.prototype.getTableEditSettings = function() {
-    return apogeeapp.app.ErrorTableComponent.TABLE_EDIT_SETTINGS;
-}
-
-/** This method should be implemented to retrieve a view mode of the give type. 
- * @protected. */
-apogeeapp.app.ErrorTableComponent.prototype.getDataDisplay = function(displayContainer,viewType) {
-    return new apogeeapp.app.ErrorDisplay(displayContainer,false);
-}
-
-/** This overrides the save method to return the original input. */
-apogeeapp.app.ErrorTableComponent.prototype.toJson = function() {
-    return this.completeJson;
-}
-
-/** This overrides the open deserialize method to save the entire json. */
-apogeeapp.app.ErrorTableComponent.prototype.loadPropertyValues = function(json) {
-    this.completeJson = json;
-}
-
-//======================================
-// Static methods
-//======================================
-
-apogeeapp.app.ErrorTableComponent.createMemberJson = function(userInputValues,optionalBaseJson) {
-    var json = apogeeapp.app.Component.createMemberJson(apogeeapp.app.ErrorTableComponent,userInputValues,optionalBaseJson);
-    return json;
 }
 
 //======================================
 // This is the component generator, to register the component
 //======================================
 
-apogeeapp.app.ErrorTableComponent.displayName = "Error Table";
-apogeeapp.app.ErrorTableComponent.uniqueName = "apogeeapp.app.ErrorTableComponent";
-apogeeapp.app.ErrorTableComponent.DEFAULT_WIDTH = 300;
-apogeeapp.app.ErrorTableComponent.DEFAULT_HEIGHT = 100;
-apogeeapp.app.ErrorTableComponent.ICON_RES_PATH = "/componentIcons/genericDataTable.png";
-apogeeapp.app.ErrorTableComponent.DEFAULT_MEMBER_JSON = {
+ErrorTableComponent.displayName = "Error Table";
+ErrorTableComponent.uniqueName = "apogeeapp.app.ErrorTableComponent";
+ErrorTableComponent.DEFAULT_WIDTH = 300;
+ErrorTableComponent.DEFAULT_HEIGHT = 100;
+ErrorTableComponent.ICON_RES_PATH = "/componentIcons/genericDataTable.png";
+ErrorTableComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.ErrorTable"
 };
 
