@@ -38,11 +38,6 @@ export default class CanvasFolderComponent extends ParentComponent {
     // Static methods
     //======================================
 
-    static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(CanvasFolderComponent,userInputValues,optionalBaseJson);
-        return json;
-    }
-
     //if we want to allow importing a workspace as this object, we must add this method to the generator
     static appendWorkspaceChildren(optionsJson,childrenJson) {
         optionsJson.children = childrenJson;

@@ -75,10 +75,6 @@ export default class DynamicForm extends EditComponent {
     // Static methods
     //======================================
 
-    static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(DynamicForm,userInputValues,optionalBaseJson);
-        return json;
-    }
 
 }
 

@@ -65,7 +65,7 @@ export default class FolderFunctionComponent extends ParentComponent {
         var internalFolderJson = {};
         internalFolderJson.name = optionsJson.name;
         internalFolderJson.type = "apogee.Folder";
-        apogeeapp.app.FolderComponent.generator.appendWorkspaceChildren(internalFolderJson,childrenJson);
+        internalFolderJson.children = childrenJson;
         optionsJson.internalFolder = internalFolderJson;
     }
 

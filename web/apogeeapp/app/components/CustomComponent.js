@@ -281,11 +281,6 @@ export default class CustomComponent extends EditComponent {
     // Static methods
     //======================================
 
-    static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(CustomComponent,userInputValues,optionalBaseJson);
-        return json;
-    }
-
     static transferComponentProperties(inputValues,propertyJson) {
         if(inputValues.destroyOnInactive !== undefined) {
             propertyJson.destroyOnInactive = inputValues.destroyOnInactive;

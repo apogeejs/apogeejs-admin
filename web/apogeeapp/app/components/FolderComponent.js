@@ -122,13 +122,6 @@ export default class FolderComponent extends ParentComponent {
     // Static methods
     //======================================
 
-
-
-    static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(apogeeapp.app.FolderComponent,userInputValues,optionalBaseJson);
-        return json;
-    }
-
     //if we want to allow importing a workspace as this object, we must add this method to the generator
     static appendWorkspaceChildren(optionsJson,childrenJson) {
         optionsJson.children = childrenJson;

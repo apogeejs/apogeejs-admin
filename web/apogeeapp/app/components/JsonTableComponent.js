@@ -122,14 +122,6 @@ export default class JsonTableComponent extends EditComponent {
     // Static methods
     //======================================
 
-    /** This method takes input Property values and create a member json to create the member object.
-     * Optionally a base member json can be passed in.
-     */
-    static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(apogeeapp.app.JsonTableComponent,userInputValues,optionalBaseJson);
-        return json;
-    }
-
     /** This optional static function reads property input from the property 
      * dialog and copies it into a member property json. It is not needed for
      * this componnet. */

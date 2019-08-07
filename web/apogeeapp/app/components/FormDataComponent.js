@@ -134,11 +134,6 @@ export default class FormDataComponent extends EditComponent {
     // Static methods
     //======================================
 
-    static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(FormDataComponent,userInputValues,optionalBaseJson);
-        return json;
-    }
-
 }
 
 

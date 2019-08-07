@@ -260,18 +260,18 @@ export default class CustomDataComponent extends EditComponent {
         }
 
         //record the updates
-        if(uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS] != this.uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS]) {
-            this.fieldUpdated(apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS);
+        if(uiCodeFields[CustomDataComponent.CODE_FIELD_CSS] != this.uiCodeFields[CustomDataComponent.CODE_FIELD_CSS]) {
+            this.fieldUpdated(CustomDataComponent.CODE_FIELD_CSS);
             
             //update css now
-            let cssInfo = uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_CSS];
+            let cssInfo = uiCodeFields[CustomDataComponent.CODE_FIELD_CSS];
             apogeeapp.ui.setMemberCssData(this.getMember().getId(),cssInfo);
         }
-        if(uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_HTML] != this.uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_HTML]) {
-            this.fieldUpdated(apogeeapp.app.CustomDataComponent.CODE_FIELD_HTML);
+        if(uiCodeFields[CustomDataComponent.CODE_FIELD_HTML] != this.uiCodeFields[CustomDataComponent.CODE_FIELD_HTML]) {
+            this.fieldUpdated(CustomDataComponent.CODE_FIELD_HTML);
         }
-        if(uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_UI_CODE] != this.uiCodeFields[apogeeapp.app.CustomDataComponent.CODE_FIELD_UI_CODE]) {
-            this.fieldUpdated(apogeeapp.app.CustomDataComponent.CODE_FIELD_UI_CODE);
+        if(uiCodeFields[CustomDataComponent.CODE_FIELD_UI_CODE] != this.uiCodeFields[CustomDataComponent.CODE_FIELD_UI_CODE]) {
+            this.fieldUpdated(CustomDataComponent.CODE_FIELD_UI_CODE);
         }
         
         this.uiCodeFields = uiCodeFields;
@@ -316,11 +316,6 @@ export default class CustomDataComponent extends EditComponent {
     //======================================
     // Static methods
     //======================================
-
-    static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(CustomDataComponent,userInputValues,optionalBaseJson);
-        return json;
-    }
 
     static transferComponentProperties(inputValues,propertyJson) {
         if(inputValues.destroyOnInactive !== undefined) {

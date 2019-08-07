@@ -54,11 +54,6 @@ export default class ErrorTableComponent extends EditComponent {
     // Static methods
     //======================================
 
-    static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(ErrorTableComponent,userInputValues,optionalBaseJson);
-        return json;
-    }
-
 }
 
 ErrorTableComponent.EMPTY_VIEW = "EMPTY_VIEW";

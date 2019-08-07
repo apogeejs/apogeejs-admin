@@ -81,16 +81,10 @@ export default class BasicControlComponent extends EditComponent{
         }
     }
 
-    static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(apogeeapp.app.JsonTable,userInputValues,optionalBaseJson);
-        return json;
-    }
-
     /** This method creates a basic generator for the extending object. */
     static attachStandardStaticProperties(componentGenerator,displayName,uniqueName) {
         componentGenerator.displayName = displayName;
         componentGenerator.uniqueName = uniqueName;
-        componentGenerator.createMemberJson = BasicControlComponent.createMemberJson;
         componentGenerator.DEFAULT_WIDTH = 500;
         componentGenerator.DEFAULT_HEIGHT = 500;
         componentGenerator.ICON_RES_PATH = "/componentIcons/chartControl.png";
