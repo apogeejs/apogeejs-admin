@@ -198,6 +198,7 @@
         
         <script type="module">
             import Apogee from "/apogeeapp/app/Apogee.js";
+            import CutNPasteAppConfigManager from "/supplemental/cutNPasteCode/CutNPasteAppConfigManager.js";
 
 			window.init = function() {
 
@@ -205,7 +206,7 @@
                 apogeeapp.ui.initResourcePath("/resources");
                 
                 //use cutnpaste file access
-                var appConfigManager = new apogeeapp.app.CutNPasteAppConfigManager();
+                var appConfigManager = new CutNPasteAppConfigManager();
                 
                 //create the application
                 Apogee.createApp("appContainer",appConfigManager);

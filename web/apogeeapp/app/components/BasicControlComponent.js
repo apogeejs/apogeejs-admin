@@ -1,4 +1,5 @@
 import Component from "/apogeeapp/app/component/Component.js";
+import EditComponent from "/apogeeapp/app/component/EditComponent.js";
 import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
 import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
@@ -6,7 +7,7 @@ import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHel
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods
  * and create a generator. */
-export default class BasicControlComponent extends apogeeapp.app.EditComponent{
+export default class BasicControlComponent extends EditComponent{
     
     constructor(workspaceUI,control,componentGenerator) {
         super(workspaceUI,control,componentGenerator);

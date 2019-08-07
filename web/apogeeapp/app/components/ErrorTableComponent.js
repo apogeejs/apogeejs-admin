@@ -7,7 +7,7 @@ export default class ErrorTableComponent extends EditComponent {
 
     constructor(workspaceUI,table) {
         //extend edit component
-        super(workspaceUI,table,apogeeapp.app.ErrorTableComponent);
+        super(workspaceUI,table,ErrorTableComponent);
 
         //default view
         this.dataView = ErrorTableComponent.EMPTY_VIEW;
@@ -55,7 +55,7 @@ export default class ErrorTableComponent extends EditComponent {
     //======================================
 
     static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(apogeeapp.app.ErrorTableComponent,userInputValues,optionalBaseJson);
+        var json = Component.createMemberJson(ErrorTableComponent,userInputValues,optionalBaseJson);
         return json;
     }
 

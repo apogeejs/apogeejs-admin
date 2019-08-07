@@ -1,4 +1,5 @@
 import ReferenceEntry from "/apogeeapp/app/references/ReferenceEntry.js";
+import {getLinkLoader} from "/apogeeapp/app/references/LinkLoader.js";
 
 /* 
  * To change this license header, choose License Headers in Project Properties.
@@ -29,8 +30,8 @@ export default class JsScriptEntry extends ReferenceEntry {
                 reject(errorMsg);
             }
 
-            this.linkCallerId = apogeeapp.app.getLinkLoader().createLinkCallerId();
-            apogeeapp.app.getLinkLoader().addLinkElement("script",this.url,this.linkCallerId,onLoad,onError);
+            this.linkCallerId = getLinkLoader().createLinkCallerId();
+            getLinkLoader().addLinkElement("script",this.url,this.linkCallerId,onLoad,onError);
         }
 
         //call link added to references
@@ -42,7 +43,7 @@ export default class JsScriptEntry extends ReferenceEntry {
     
     /** This method removes the link. */
     remove() {
-        apogeeapp.app.getLinkLoader().removeLinkElement("script",this.url,this.linkCallerId);
+        getLinkLoader().removeLinkElement("script",this.url,this.linkCallerId);
         
         this.referenceManager.entryRemoved(this);
     }

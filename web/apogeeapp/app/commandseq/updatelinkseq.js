@@ -36,9 +36,9 @@ export function addLink(referenceManager,entryTypeInfo) {
     var dialogLayout = {};
     dialogLayout.lines = [];
     dialogLayout.lines.push(titleLine);
-    dialogLayout.lines.push(apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_URL_LINE);
-    dialogLayout.lines.push(apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_NICKNAME_LINE);
-    dialogLayout.lines.push(apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_SUBMIT_LINE);
+    dialogLayout.lines.push(DIALOG_LAYOUT_URL_LINE);
+    dialogLayout.lines.push(DIALOG_LAYOUT_NICKNAME_LINE);
+    dialogLayout.lines.push(DIALOG_LAYOUT_SUBMIT_LINE);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {
@@ -82,9 +82,9 @@ export function updateLink(referenceEntry) {
     titleLine.type = "title";
     titleLine.title = entryTypeInfo.UPDATE_ENTRY_TEXT;
 
-    var urlLine = util.jsonCopy(apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_URL_LINE);
+    var urlLine = util.jsonCopy(DIALOG_LAYOUT_URL_LINE);
     urlLine.initial = initialValues.url;
-    var nicknameLine = util.jsonCopy(apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_NICKNAME_LINE);
+    var nicknameLine = util.jsonCopy(DIALOG_LAYOUT_NICKNAME_LINE);
     nicknameLine.initial = initialValues.nickname;
 
     var dialogLayout = {};
@@ -92,7 +92,7 @@ export function updateLink(referenceEntry) {
     dialogLayout.lines.push(titleLine);
     dialogLayout.lines.push(urlLine);
     dialogLayout.lines.push(nicknameLine);
-    dialogLayout.lines.push(apogeeapp.app.updatelinkseq.DIALOG_LAYOUT_SUBMIT_LINE);
+    dialogLayout.lines.push(DIALOG_LAYOUT_SUBMIT_LINE);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {

@@ -6,7 +6,7 @@ import CutNPasteFileAccess from "./CutNPasteFileAccess.js";
  * This is the format of the AppConfigManager. This class does not need
  * to be extended. It has not internal functionality.
  */
-apogeeapp.app.CutNPasteAppConfigManager = class {
+export default class CutNPasteAppConfigManager {
     
     constructor() {
     }

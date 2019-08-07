@@ -301,7 +301,7 @@ export default class Apogee extends EventManager {
             var workspaceFileMetadata = this.appConfigManager.getInitialWorkspaceFileMetadata(this);
             
             var openWorkspace = workspaceText => {
-                apogeeapp.app.openworkspaceseq.openWorkspace(this,workspaceText,workspaceFileMetadata);
+                openworkspaceseq.openWorkspace(this,workspaceText,workspaceFileMetadata);
             };
             
             workspaceFilePromise.then(openWorkspace).catch(errorMsg => alert("Error downloading initial workspace."));
@@ -475,10 +475,10 @@ export default class Apogee extends EventManager {
         menuBarLeft.appendChild(menu.getElement());
         menus[name] = menu;
         
-        var importCallback = () => importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderComponent);
+        var importCallback = () => importWorkspace(this,this.fileAccessObject,FolderComponent);
         menu.addCallbackMenuItem("Import as Folder",importCallback);
         
-        var import2Callback = () => importWorkspace(this,this.fileAccessObject,apogeeapp.app.FolderFunctionComponent);
+        var import2Callback = () => importWorkspace(this,this.fileAccessObject,FolderFunctionComponent);
         menu.addCallbackMenuItem("Import as Folder Function",import2Callback);
         
         var exportCallback = () => exportWorkspace(this,this.fileAccessObject);

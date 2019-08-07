@@ -254,7 +254,7 @@ export default class WorkspaceUI {
                     //throw base.createError("Component type not found: " + componentType);
 
                     //table not found - create an empty table
-                    componentGenerator = apogeeapp.app.ErrorTableComponent;
+                    componentGenerator = Apogee.getInstance().getComponentGenerator("apogeeapp.app.ErrorTableComponent");
                 }
 
                 //create empty component

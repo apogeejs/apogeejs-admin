@@ -282,7 +282,7 @@ export default class CustomComponent extends EditComponent {
     //======================================
 
     static createMemberJson(userInputValues,optionalBaseJson) {
-        var json = Component.createMemberJson(apogeeapp.app.CustomComponent,userInputValues,optionalBaseJson);
+        var json = Component.createMemberJson(CustomComponent,userInputValues,optionalBaseJson);
         return json;
     }
 
