@@ -3,8 +3,8 @@ import {validateTableName} from "/apogee/lib/codeCompiler.js";
 
 import {getPropertiesDialogLayout} from "/apogeeapp/app/commandseq/updatecomponentseq.js";
 import Component from "/apogeeapp/app/component/Component.js";
-import {showConfigurableDialog} from "/apogeeapp/app/commandseq/ConfigurableDialog.js";
-import {showSelectComponentDialog} from "/apogeeapp/app/commandseq/SelectComponentDialog.js";
+import {showConfigurableDialog} from "/apogeeapp/app/dialogs/ConfigurableDialog.js";
+import {showSelectComponentDialog} from "/apogeeapp/app/dialogs/SelectControlDialog.js";
 
 //=====================================
 // UI Entry Point

@@ -1,12 +1,14 @@
+import ReferenceEntry from "/apogeeapp/app/references/ReferenceEntry.js";
+
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-apogeeapp.app.JsScriptEntry = class extends apogeeapp.app.ReferenceEntry {
+export default class JsScriptEntry extends ReferenceEntry {
     
     constructor(referenceManager,referenceData) {
-        super(referenceManager,referenceData,apogeeapp.app.JsScriptEntry.REFERENCE_TYPE_INFO);
+        super(referenceManager,referenceData,JsScriptEntry.REFERENCE_TYPE_INFO);
 
     }
 
@@ -50,14 +52,14 @@ apogeeapp.app.JsScriptEntry = class extends apogeeapp.app.ReferenceEntry {
     }
 }
 
-apogeeapp.app.JsScriptEntry.REFERENCE_TYPE_INFO = {
+JsScriptEntry.REFERENCE_TYPE_INFO = {
     "REFERENCE_TYPE": "js link",
     "LIST_NAME": "JS Scripts",
     "ADD_ENTRY_TEXT":"Add JS Script Link",
     "UPDATE_ENTRY_TEXT":"Update JS Script Link",
     "LIST_ICON_PATH":"/componentIcons/folder.png",
     "ENTRY_ICON_PATH":"/componentIcons/javascriptLink.png",
-    "createEntryFunction": (referenceManager, linkData) => new apogeeapp.app.JsScriptEntry(referenceManager,linkData)
+    "createEntryFunction": (referenceManager, linkData) => new JsScriptEntry(referenceManager,linkData)
 }
 
 

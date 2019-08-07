@@ -1,12 +1,14 @@
+import ReferenceEntry from "/apogeeapp/app/references/ReferenceEntry.js";
+
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-apogeeapp.app.AmdModuleEntry = class extends apogeeapp.app.ReferenceEntry {
+export default class AmdModuleEntry extends ReferenceEntry {
     
     constructor(referenceManager,referenceData) {
-        super(referenceManager,referenceData,apogeeapp.app.AmdModuleEntry.REFERENCE_TYPE_INFO);
+        super(referenceManager,referenceData,AmdModuleEntry.REFERENCE_TYPE_INFO);
 
     }
 
@@ -57,14 +59,14 @@ apogeeapp.app.AmdModuleEntry = class extends apogeeapp.app.ReferenceEntry {
     
 }
 
-apogeeapp.app.AmdModuleEntry.REFERENCE_TYPE_INFO = {
+AmdModuleEntry.REFERENCE_TYPE_INFO = {
     "REFERENCE_TYPE": "amd module",
     "LIST_NAME": "Web Modules",
     "ADD_ENTRY_TEXT":"Add Web Module",
     "UPDATE_ENTRY_TEXT":"Update Web Module",
     "LIST_ICON_PATH":"/componentIcons/folder.png",
     "ENTRY_ICON_PATH":"/componentIcons/webModule.png",
-    "createEntryFunction": (referenceManager, referenceData) => new apogeeapp.app.AmdModuleEntry(referenceManager,referenceData)
+    "createEntryFunction": (referenceManager, referenceData) => new AmdModuleEntry(referenceManager,referenceData)
 }
 
 

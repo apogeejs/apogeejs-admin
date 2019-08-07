@@ -7,6 +7,7 @@ import "/apogee/tableConfig.js";
 import Apogee from "/apogeeapp/app/Apogee.js";
 import {updateWorkspaceProperties} from "/apogeeapp/app/commandseq/updateworkspaceseq.js";
 import FolderComponent from "/apogeeapp/app/components/FolderComponent.js";
+import ReferenceManager from "/apogeeapp/app/references/ReferenceManager.js";
 
 /** This class manages the user interface for a workspace object. */
 export default class WorkspaceUI {
@@ -22,7 +23,7 @@ export default class WorkspaceUI {
         this.tree = null;
         this.treeEntry = null;
         this.componentMap = {};
-        this.referenceManager = new apogeeapp.app.ReferenceManager();
+        this.referenceManager = new ReferenceManager();
     }
 
     //====================================

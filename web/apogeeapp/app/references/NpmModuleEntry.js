@@ -1,12 +1,14 @@
+import ReferenceEntry from "/apogeeapp/app/references/ReferenceEntry.js";
+
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-apogeeapp.app.NpmModuleEntry = class extends apogeeapp.app.ReferenceEntry {
+export default class NpmModuleEntry extends ReferenceEntry {
     
     constructor(referenceManager,referenceData) {
-        super(referenceManager,referenceData,apogeeapp.app.NpmModuleEntry.REFERENCE_TYPE_INFO);
+        super(referenceManager,referenceData,NpmModuleEntry.REFERENCE_TYPE_INFO);
 
     }
 
@@ -53,14 +55,14 @@ apogeeapp.app.NpmModuleEntry = class extends apogeeapp.app.ReferenceEntry {
     
 }
 
-apogeeapp.app.NpmModuleEntry.REFERENCE_TYPE_INFO = {
+NpmModuleEntry.REFERENCE_TYPE_INFO = {
     "REFERENCE_TYPE": "npm module",
     "LIST_NAME": "NPM Modules",
     "ADD_ENTRY_TEXT":"Add NPM Module",
     "UPDATE_ENTRY_TEXT":"Update NPM Module",
     "LIST_ICON_PATH":"/componentIcons/folder.png",
     "ENTRY_ICON_PATH":"/componentIcons/module.png",
-    "createEntryFunction": (referenceManager, referenceData) => new apogeeapp.app.NpmModuleEntry(referenceManager,referenceData)
+    "createEntryFunction": (referenceManager, referenceData) => new NpmModuleEntry(referenceManager,referenceData)
 }
 
 

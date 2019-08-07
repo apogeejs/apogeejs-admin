@@ -2,10 +2,10 @@ import {updateLink, removeLink} from "/apogeeapp/app/commandseq/updatelinkseq.js
 import {bannerConstants} from "/apogeeapp/app/component/banner.js"; 
 
 /** This class manages references for the web page.*/
-apogeeapp.app.ReferenceEntry = class {
+export default class ReferenceEntry {
     
     constructor(referenceManager,referenceData,referenceTypeInfo) {
-        this.id = apogeeapp.app.ReferenceManager._createId();
+        this.id = ReferenceManager._createId();
         this.referenceManager = referenceManager;
 
         this.url = referenceData.url;
@@ -128,7 +128,7 @@ apogeeapp.app.ReferenceEntry = class {
     }
 
     getElementId() {
-        return apogeeapp.app.ReferenceEntry.ELEMENT_ID_BASE + this.id;
+        return ReferenceEntry.ELEMENT_ID_BASE + this.id;
     }
 
     setClearState() {
@@ -146,7 +146,7 @@ apogeeapp.app.ReferenceEntry = class {
     setState(state,msg) {
         this.state = state;
         if(this.treeEntry) {
-            apogeeapp.app.ReferenceManager.applyBannerState(this.treeEntry,this.state);
+            ReferenceManager.applyBannerState(this.treeEntry,this.state);
         }
         this.referenceManager.entryStatusChange(this);
     }
@@ -155,7 +155,7 @@ apogeeapp.app.ReferenceEntry = class {
         var iconUrl = this.getIconUrl();
         var menuItemsCallback = () => this.getMenuItems();
         var treeEntry = new apogeeapp.ui.treecontrol.TreeEntry(this.nickname, iconUrl, null, menuItemsCallback, false);
-        apogeeapp.app.ReferenceManager.applyBannerState(treeEntry,this.state);
+        ReferenceManager.applyBannerState(treeEntry,this.state);
         return treeEntry;
     }
 
@@ -184,5 +184,5 @@ apogeeapp.app.ReferenceEntry = class {
 //====================================
 
 
-apogeeapp.app.ReferenceEntry.ELEMENT_ID_BASE = "__apogee_link_element_";
+ReferenceEntry.ELEMENT_ID_BASE = "__apogee_link_element_";
 

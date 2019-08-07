@@ -1,9 +1,12 @@
+import BaseFileAccess from "/apogeeapp/app/BaseFileAccess.js";
+import {showTextIoDialog} from "./TextIoDialog.js";
+
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-apogeeapp.app.CutNPasteFileAccess = class extends apogeeapp.app.BaseFileAccess {
+export default class CutNPasteFileAccess extends BaseFileAccess {
     
     //========================================
     // Public
@@ -42,7 +45,7 @@ apogeeapp.app.CutNPasteFileAccess = class extends apogeeapp.app.BaseFileAccess {
         options.title = "Open Workspace";
         options.instructions = "Paste saved workspace data in the space below.";
         options.submitLabel = "Open";
-        apogeeapp.app.dialog.showTextIoDialog(options,onFileOpen);
+        showTextIoDialog(options,onFileOpen);
     }
 
     /** This  method shows a save dialog and saves the file. */
@@ -53,7 +56,7 @@ apogeeapp.app.CutNPasteFileAccess = class extends apogeeapp.app.BaseFileAccess {
         options.instructions = "Copy the data below and save it in a file to open later.";
         options.initialText = data;
         options.submitLabel = "Save";
-        apogeeapp.app.dialog.showTextIoDialog(options,onSubmit);
+        showTextIoDialog(options,onSubmit);
 
         //I should maybe only do this if you do not press cancel?
         if(onSaveSuccess) onSaveSuccess();

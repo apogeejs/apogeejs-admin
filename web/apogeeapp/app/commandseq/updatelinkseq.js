@@ -1,6 +1,6 @@
 import util from "/apogeeutil/util.js";
 
-import {showConfigurableDialog} from "/apogeeapp/app/commandseq/ConfigurableDialog.js";
+import {showConfigurableDialog} from "/apogeeapp/app/dialogs/ConfigurableDialog.js";
 import Apogee from "/apogeeapp/app/Apogee.js";
 
 const DIALOG_LAYOUT_URL_LINE = {

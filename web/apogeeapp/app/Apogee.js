@@ -2,6 +2,7 @@ import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import ReferenceManager from "/apogeeapp/app/references/ReferenceManager.js";
 import "/apogeeapp/app/commandConfig.js";
 import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
 import {closeWorkspace} from "/apogeeapp/app/commandseq/closeworkspaceseq.js";
@@ -10,6 +11,7 @@ import {importWorkspace} from "/apogeeapp/app/commandseq/importworkspaceseq.js";
 import {exportWorkspace} from "/apogeeapp/app/commandseq/exportworkspaceseq.js";
 import {openWorkspace} from "/apogeeapp/app/commandseq/openworkspaceseq.js";
 import {saveWorkspace} from "/apogeeapp/app/commandseq/saveworkspaceseq.js";
+
 
 import JsonTableComponent from "/apogeeapp/app/components/JsonTableComponent.js";
 import FunctionComponent from "/apogeeapp/app/components/FunctionComponent.js";
@@ -72,7 +74,7 @@ export default class Apogee extends EventManager {
         this.appSettings = {};
         
         //reference manager
-        this.referenceManager = new apogeeapp.app.ReferenceManager();
+        this.referenceManager = new ReferenceManager();
         
         //command manager
         this.commandManager = new CommandManager(this);

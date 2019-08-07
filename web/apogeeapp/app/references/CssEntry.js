@@ -1,12 +1,14 @@
+import ReferenceEntry from "/apogeeapp/app/references/ReferenceEntry.js";
+
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-apogeeapp.app.CssEntry = class extends apogeeapp.app.ReferenceEntry {
+export default class CssEntry extends ReferenceEntry {
     
     constructor(referenceManager,referenceData) {
-        super(referenceManager,referenceData,apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO);
+        super(referenceManager,referenceData,CssEntry.REFERENCE_TYPE_INFO);
     }
     
     /** This method loads the link onto the page. It returns a promise that
@@ -45,12 +47,12 @@ apogeeapp.app.CssEntry = class extends apogeeapp.app.ReferenceEntry {
     }
 }
 
-apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO = {
+CssEntry.REFERENCE_TYPE_INFO = {
     "REFERENCE_TYPE": "css link",
     "LIST_NAME": "CSS Links",
     "ADD_ENTRY_TEXT":"Add CSS Link",
     "UPDATE_ENTRY_TEXT":"Update CSS Link",
     "LIST_ICON_PATH":"/componentIcons/folder.png",
     "ENTRY_ICON_PATH": "/componentIcons/cssLink.png",
-    "createEntryFunction": (referenceManager, linkData) => new apogeeapp.app.CssEntry(referenceManager,linkData)
+    "createEntryFunction": (referenceManager, linkData) => new CssEntry(referenceManager,linkData)
 }

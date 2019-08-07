@@ -1,5 +1,6 @@
 import util from "/apogeeutil/util.js";
 import net from "/apogeeutil/net.js";
+import CutNPasteFileAccess from "./CutNPasteFileAccess.js";
 
 /** 
  * This is the format of the AppConfigManager. This class does not need
@@ -31,7 +32,7 @@ apogeeapp.app.CutNPasteAppConfigManager = class {
      * if an alternate is not loaded in configuration.
      */
     getDefaultFileAccessObject(app) {
-        return new apogeeapp.app.CutNPasteFileAccess();
+        return new CutNPasteFileAccess();
     }
     
     /** This method should return a promise for the initial workspace
