@@ -1,7 +1,6 @@
 /** This namespace provides methods to create a standard save bar and other toolbars. */
-apogeeapp.app.toolbar = {};
 
-apogeeapp.app.toolbar.getSaveBar = function(onSave,onCancel) {
+export function getSaveBar(onSave,onCancel) {
     var saveDiv = apogeeapp.ui.createElement("div",null,
         {
             //"display":"block",

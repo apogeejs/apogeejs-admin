@@ -1,3 +1,5 @@
+import {getSaveBar} from "/apogeeapp/app/component/toolbar.js";
+
 /** This is a standin for the display conatiner for the literate page
  * 
  * @class 
@@ -267,7 +269,7 @@ apogeeapp.app.PageDisplayContainer.prototype.onCancel = function() {
 apogeeapp.app.PageDisplayContainer.prototype.startEditMode = function(onSave,onCancel) {
     if(!this.inEditMode) {
         this.inEditMode = true;
-        var saveBar = apogeeapp.app.toolbar.getSaveBar(onSave,onCancel);
+        var saveBar = getSaveBar(onSave,onCancel);
         this.setHeaderContent(saveBar);
     }
 }

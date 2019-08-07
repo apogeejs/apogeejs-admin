@@ -1,3 +1,5 @@
+import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
+
 /** This component represents a json table object.
  * The member argument is the main member for this component. The folder argument is 
  * the parent folde associated with this component, which may be different from the
@@ -25,16 +27,16 @@ apogeeapp.app.CanvasFolderComponentDisplay.prototype.closeTab = function() {
 }
 
 apogeeapp.app.CanvasFolderComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
-    if(bannerState == apogeeapp.app.banner.BANNER_TYPE_NONE) {
+    if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
        this.tab.setHeaderContent(null);
     }
     else {
-        var banner = apogeeapp.app.banner.getBanner(bannerMessage,bannerState);
+        var banner = getBanner(bannerMessage,bannerState);
         this.tab.setHeaderContent(banner);
     }
     
     if(this.tab) {
-        var iconOverlay = apogeeapp.app.banner.getIconOverlay(bannerState);
+        var iconOverlay = getIconOverlay(bannerState);
         if(iconOverlay) {
             this.tab.setIconOverlay(iconOverlay);
         }

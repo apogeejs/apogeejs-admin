@@ -1,5 +1,9 @@
 import Component from "/apogeeapp/app/component/Component.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
+import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
+import ConfigurableFormDisplay from "/apogeeapp/app/datadisplay/ConfigurableFormDisplay.js";
+import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
+import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 
 /** This component represents a table object. */
 export default class DynamicForm extends EditComponent {
@@ -32,20 +36,20 @@ export default class DynamicForm extends EditComponent {
             
             case DynamicForm.VIEW_FORM:
                 callbacks = this.getFormCallbacks();
-                return new apogeeapp.app.ConfigurableFormDisplay(displayContainer,callbacks);
+                return new ConfigurableFormDisplay(displayContainer,callbacks);
                 
             case DynamicForm.VIEW_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case DynamicForm.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case DynamicForm.VIEW_DESCRIPTION:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
-                //return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new apogeeapp.app.TextAreaEditor(displayContainer,callbacks);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                return new TextAreaEditor(displayContainer,callbacks);
                 
             default:
     //temporary error handling...

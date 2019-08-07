@@ -2,7 +2,7 @@
  * defines the form content for the dialog. The on submit
  * function is called when submit is pressed. The on submit function should
  * return true or false, indicating whether of not to close the dialog. */
-apogeeapp.app.dialog.showConfigurableDialog = function(layout,onSubmitFunction) {
+export function showConfigurableDialog(layout,onSubmitFunction) {
 
     var dialog = apogeeapp.ui.createDialog({"movable":true});
     var lineObjects = [];
@@ -46,7 +46,7 @@ apogeeapp.app.dialog.showConfigurableDialog = function(layout,onSubmitFunction) 
         var lineDef = layout.lines[i];
         
         //create line
-        var lineObject = apogeeapp.app.dialog.showConfigurableDialog.createLine(lineDef,formActions);
+        var lineObject = createLine(lineDef,formActions);
         lineObjects.push(lineObject);
         if(lineObject.element) { //no element for "invisible" entry, which is used to pass values along
             content.appendChild(lineObject.element);
@@ -64,8 +64,8 @@ apogeeapp.app.dialog.showConfigurableDialog = function(layout,onSubmitFunction) 
     
     
     
-apogeeapp.app.dialog.showConfigurableDialog.createLine = function(lineDef,formActions) {
-    var lineFunction = apogeeapp.app.dialog.showConfigurableDialog.lineFunctions[lineDef.type];
+function createLine(lineDef,formActions) {
+    var lineFunction = lineFunctions[lineDef.type];
     if(lineFunction) {
         return lineFunction(lineDef,formActions);
     }
@@ -76,7 +76,7 @@ apogeeapp.app.dialog.showConfigurableDialog.createLine = function(lineDef,formAc
     }
 }
 
-apogeeapp.app.dialog.showConfigurableDialog.lineFunctions = {
+let lineFunctions = {
     //linedef.type = "title"
     //linedef.title = title
     "title": function(lineDef,formActions) {

@@ -1,5 +1,9 @@
 import Component from "/apogeeapp/app/component/Component.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
+import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
+import HandsonGridEditor from "/apogeeapp/app/datadisplay/HandsonGridEditor.js";
+import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
+import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 
 /** This component represents a json table object. */
 export default class JsonTableComponent extends EditComponent {
@@ -53,35 +57,35 @@ export default class JsonTableComponent extends EditComponent {
             case JsonTableComponent.VIEW_DATA:
                 switch(this.dataView) {
                     case JsonTableComponent.COLORIZED_DATA_VEW:
-                        callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.member);
-                        return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/json");
+                        callbacks = dataDisplayHelper.getMemberDataTextCallbacks(this.member);
+                        return new AceTextEditor(displayContainer,callbacks,"ace/mode/json");
                         
                     case JsonTableComponent.TEXT_DATA_VEW:
-                        callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks(this.member);
-                        return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                        callbacks = dataDisplayHelper.getMemberDataJsonCallbacks(this.member);
+                        return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
                         
                     case JsonTableComponent.GRID_DATA_VEW:
-                        callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks(this.member);
-                        return new apogeeapp.app.HandsonGridEditor(displayContainer,callbacks);
+                        callbacks = dataDisplayHelper.getMemberDataJsonCallbacks(this.member);
+                        return new HandsonGridEditor(displayContainer,callbacks);
                         
                     case JsonTableComponent.PLAIN_DATA_VEW:
                     default:
-                        callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.member);
-                        return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                        callbacks = dataDisplayHelper.getMemberDataTextCallbacks(this.member);
+                        return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
                 }
                 
             case JsonTableComponent.VIEW_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case JsonTableComponent.VIEW_DESCRIPTION:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
-                //return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new apogeeapp.app.TextAreaEditor(displayContainer,callbacks);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                return new TextAreaEditor(displayContainer,callbacks);
                 
             default:
     //temporary error handling...

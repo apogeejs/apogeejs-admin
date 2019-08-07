@@ -1,52 +1,53 @@
 /** This namespacve provides methods to create a status banner and icon overlay. */
-apogeeapp.app.banner = {};
 
 //constants for the window banner bar
-apogeeapp.app.banner.BANNER_TYPE_ERROR = "error";
-apogeeapp.app.banner.BANNER_BGCOLOR_ERROR = "red";
-apogeeapp.app.banner.BANNER_FGCOLOR_ERROR = "white";
-apogeeapp.app.banner.ERROR_ICON_IMAGE = "/error.png";
+export let bannerConstants = {};
 
-apogeeapp.app.banner.BANNER_TYPE_PENDING = "pending";
-apogeeapp.app.banner.BANNER_BGCOLOR_PENDING = "yellow";
-apogeeapp.app.banner.BANNER_FGCOLOR_PENDING = "black";
-apogeeapp.app.banner.PENDING_ICON_IMAGE = "/pending.png";
+bannerConstants.BANNER_TYPE_ERROR = "error";
+bannerConstants.BANNER_BGCOLOR_ERROR = "red";
+bannerConstants.BANNER_FGCOLOR_ERROR = "white";
+bannerConstants.ERROR_ICON_IMAGE = "/error.png";
 
-apogeeapp.app.banner.BANNER_TYPE_INVALID = "invalid";
-apogeeapp.app.banner.BANNER_BGCOLOR_INVALID = "gray";
-apogeeapp.app.banner.BANNER_FGCOLOR_INVALID = "white";
-apogeeapp.app.banner.INVALID_ICON_IMAGE = "/invalid.png";
+bannerConstants.BANNER_TYPE_PENDING = "pending";
+bannerConstants.BANNER_BGCOLOR_PENDING = "yellow";
+bannerConstants.BANNER_FGCOLOR_PENDING = "black";
+bannerConstants.PENDING_ICON_IMAGE = "/pending.png";
 
-apogeeapp.app.banner.BANNER_BGCOLOR_UNKNOWN = "yellow";
-apogeeapp.app.banner.BANNER_FGCOLOR_UNKNOWN = "black";
+bannerConstants.BANNER_TYPE_INVALID = "invalid";
+bannerConstants.BANNER_BGCOLOR_INVALID = "gray";
+bannerConstants.BANNER_FGCOLOR_INVALID = "white";
+bannerConstants.INVALID_ICON_IMAGE = "/invalid.png";
 
-apogeeapp.app.banner.BANNER_TYPE_NONE = "none";
+bannerConstants.BANNER_BGCOLOR_UNKNOWN = "yellow";
+bannerConstants.BANNER_FGCOLOR_UNKNOWN = "black";
 
-apogeeapp.app.banner.PENDING_MESSAGE = "Calculation pending...";
-apogeeapp.app.banner.INVALID_MESSAGE = "Result not valid!";
+bannerConstants.BANNER_TYPE_NONE = "none";
+
+bannerConstants.PENDING_MESSAGE = "Calculation pending...";
+bannerConstants.INVALID_MESSAGE = "Result not valid!";
 
 /** This method returns a banner for the given state and message. This should 
- * not be called for banner state apogeeapp.app.banner.BANNER_TYPE_NONE */
-apogeeapp.app.banner.getBanner = function(text,bannerState) {
+ * not be called for banner state bannerConstants.BANNER_TYPE_NONE */
+export function getBanner(text,bannerState) {
     
     //get banner colors and icon overlay resource
     var bgColor;
     var fgColor;
-    if(bannerState == apogeeapp.app.banner.BANNER_TYPE_INVALID) {
-        bgColor = apogeeapp.app.banner.BANNER_BGCOLOR_INVALID;
-        fgColor = apogeeapp.app.banner.BANNER_FGCOLOR_INVALID;
+    if(bannerState == bannerConstants.BANNER_TYPE_INVALID) {
+        bgColor = bannerConstants.BANNER_BGCOLOR_INVALID;
+        fgColor = bannerConstants.BANNER_FGCOLOR_INVALID;
     }
-    else if(bannerState == apogeeapp.app.banner.BANNER_TYPE_ERROR) {
-        bgColor = apogeeapp.app.banner.BANNER_BGCOLOR_ERROR;
-        fgColor = apogeeapp.app.banner.BANNER_FGCOLOR_ERROR;
+    else if(bannerState == bannerConstants.BANNER_TYPE_ERROR) {
+        bgColor = bannerConstants.BANNER_BGCOLOR_ERROR;
+        fgColor = bannerConstants.BANNER_FGCOLOR_ERROR;
     }
-    else if(bannerState == apogeeapp.app.banner.BANNER_TYPE_PENDING) {
-        bgColor = apogeeapp.app.banner.BANNER_BGCOLOR_PENDING;
-        fgColor = apogeeapp.app.banner.BANNER_FGCOLOR_PENDING;
+    else if(bannerState == bannerConstants.BANNER_TYPE_PENDING) {
+        bgColor = bannerConstants.BANNER_BGCOLOR_PENDING;
+        fgColor = bannerConstants.BANNER_FGCOLOR_PENDING;
     }
     else {
-        bgColor = apogeeapp.app.banner.BANNER_BGCOLOR_UNKNOWN;
-        fgColor = apogeeapp.app.banner.BANNER_FGCOLOR_UNKNOWN;
+        bgColor = bannerConstants.BANNER_BGCOLOR_UNKNOWN;
+        fgColor = bannerConstants.BANNER_FGCOLOR_UNKNOWN;
     }
    
     //banner showing
@@ -64,17 +65,17 @@ apogeeapp.app.banner.getBanner = function(text,bannerState) {
 }
 
 /** This method creates an icon overlay for a given banner state. This should 
- * not be called for banner state apogeeapp.app.banner.BANNER_TYPE_NONE */
-apogeeapp.app.banner.getIconOverlay = function(bannerState) {
+ * not be called for banner state bannerConstants.BANNER_TYPE_NONE */
+export function getIconOverlay(bannerState) {
     var resource;
-    if(bannerState == apogeeapp.app.banner.BANNER_TYPE_INVALID) {
-        resource = apogeeapp.app.banner.INVALID_ICON_IMAGE;
+    if(bannerState == bannerConstants.BANNER_TYPE_INVALID) {
+        resource = bannerConstants.INVALID_ICON_IMAGE;
     }
-    else if(bannerState == apogeeapp.app.banner.BANNER_TYPE_ERROR) {
-        resource = apogeeapp.app.banner.ERROR_ICON_IMAGE;
+    else if(bannerState == bannerConstants.BANNER_TYPE_ERROR) {
+        resource = bannerConstants.ERROR_ICON_IMAGE;
     }
-    else if(bannerState == apogeeapp.app.banner.BANNER_TYPE_PENDING) {
-        resource = apogeeapp.app.banner.PENDING_ICON_IMAGE;
+    else if(bannerState == bannerConstants.BANNER_TYPE_PENDING) {
+        resource = bannerConstants.PENDING_ICON_IMAGE;
     }
     else {
         //unknown

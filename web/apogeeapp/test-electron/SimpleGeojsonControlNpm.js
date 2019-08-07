@@ -1,3 +1,6 @@
+import Apogee from "/apogeeapp/app/Apogee.js";
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /** 
  * SimpleGeojsonControl
  * This module creates a GeoJSON control in apogee. It loads the leaflet library and then 
@@ -48,7 +51,7 @@ moduleReturn.initApogeeModule = function(apogee,apogeeapp) {
     //-----------------
     //auto registration
     //-----------------
-    var app = apogeeapp.app.Apogee.getInstance();
+    var app = Apogee.getInstance();
     if(app) {
         app.registerComponent(apogeeapp.app.SimpleGeojsonControl);
     }
@@ -60,7 +63,7 @@ moduleReturn.initApogeeModule = function(apogee,apogeeapp) {
     var DEFAULT_ZOOM = 1;
 
     /** Extend ths JsDataDisplay */
-    apogeeapp.app.SimpleGeojsonDisplay = class extends apogeeapp.app.DataDisplay {
+    apogeeapp.app.SimpleGeojsonDisplay = class extends DataDisplay {
 
         //==============================
         // Public

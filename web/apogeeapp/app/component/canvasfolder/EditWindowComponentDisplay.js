@@ -1,3 +1,6 @@
+import {getSaveBar} from "/apogeeapp/app/component/toolbar.js";
+import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component/banner.js";  
+
 /** This component represents a json table object. */
 apogeeapp.app.EditWindowComponentDisplay = function(component, options) {
     this.component = component;
@@ -89,17 +92,17 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.deleteDisplay = function() {
 
 apogeeapp.app.EditWindowComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     //update the banner
-    if(bannerState == apogeeapp.app.banner.BANNER_TYPE_NONE) {
+    if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
         this.bannerDiv = null;
     }
     else {
-        this.bannerDiv = apogeeapp.app.banner.getBanner(bannerMessage,bannerState);
+        this.bannerDiv = getBanner(bannerMessage,bannerState);
     }
     this.updateHeaders();
     
     //update the icon overlay
     if(this.windowFrame) {
-        var iconOverlay = apogeeapp.app.banner.getIconOverlay(bannerState);
+        var iconOverlay = getIconOverlay(bannerState);
         if(iconOverlay) {
             this.windowFrame.setIconOverlay(iconOverlay);
         }
@@ -369,7 +372,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.endEditUI = function() {
 
 /** This method returns the base member for this component. */
 apogeeapp.app.EditWindowComponentDisplay.prototype.showSaveBar = function(onSave,onCancel) {
-    this.saveBarDiv = apogeeapp.app.toolbar.getSaveBar(onSave,onCancel);
+    this.saveBarDiv = getSaveBar(onSave,onCancel);
     this.updateHeaders();
 }
 

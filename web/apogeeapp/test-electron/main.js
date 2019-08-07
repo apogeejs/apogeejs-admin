@@ -24,7 +24,7 @@ function createWindow () {
     win.on('close',(e) => {
         const {dialog} = require('electron');
  
-        var isDirtyPromise = win.webContents.executeJavaScript("apogeeapp.app.Apogee.getInstance().getWorkspaceIsDirty()");
+        var isDirtyPromise = win.webContents.executeJavaScript("Apogee.getInstance().getWorkspaceIsDirty()");
         isDirtyPromise.then( (isDirty) => {
             var doClose;
             if(isDirty) {

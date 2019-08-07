@@ -1,5 +1,7 @@
 import util from "/apogeeutil/util.js";
 
+import {showConfigurableDialog} from "/apogeeapp/app/commandseq/ConfigurableDialog.js";
+
 const DIALOG_LAYOUT_TITLE_LINE = {
     "type": "title",
     "title": "Update Workspace"
@@ -73,7 +75,7 @@ export function updateWorkspaceProperties(workspaceUI) {
     }
 
     //show dialog
-    apogeeapp.app.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
+    showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 

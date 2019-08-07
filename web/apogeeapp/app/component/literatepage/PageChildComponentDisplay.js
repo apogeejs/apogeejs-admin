@@ -1,3 +1,5 @@
+import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
+
 /** This component represents a json table object. */
 apogeeapp.app.PageChildComponentDisplay = function(component, parentComponentDisplay, options) {
     this.component = component;
@@ -52,11 +54,11 @@ apogeeapp.app.PageChildComponentDisplay.prototype.getMember = function() {
 apogeeapp.app.PageChildComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     //update the banner
     var bannerDiv;
-    if(bannerState == apogeeapp.app.banner.BANNER_TYPE_NONE) {
+    if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
         bannerDiv = null;
     }
     else {
-        bannerDiv = apogeeapp.app.banner.getBanner(bannerMessage,bannerState);
+        bannerDiv = getBanner(bannerMessage,bannerState);
     }
     apogeeapp.ui.removeAllChildren(this.bannerContainer);
     if(bannerDiv) {
@@ -64,7 +66,7 @@ apogeeapp.app.PageChildComponentDisplay.prototype.setBannerState = function(bann
     }
     
     //update the icon overlay
-    var iconOverlay = apogeeapp.app.banner.getIconOverlay(bannerState);
+    var iconOverlay = getIconOverlay(bannerState);
     if(iconOverlay) {
         this.setIconOverlay(iconOverlay);
     }

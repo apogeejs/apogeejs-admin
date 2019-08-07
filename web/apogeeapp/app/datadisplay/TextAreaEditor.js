@@ -1,8 +1,10 @@
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /** Editor that uses the basic text editor */
-apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.DataDisplay {
+export default class TextAreaEditor extends DataDisplay {
     
     constructor(displayContainer,callbacks) {
-        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
+        super(displayContainer,callbacks,DataDisplay.SCROLLING);
 
         var textArea = apogeeapp.ui.createElement("TEXTAREA",null,{
 //            "position":"absolute",

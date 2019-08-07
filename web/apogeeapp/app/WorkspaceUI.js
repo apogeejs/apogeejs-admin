@@ -4,11 +4,12 @@ import Workspace from "/apogee/data/Workspace.js";
 import "/apogee/commandConfig.js";
 import "/apogee/tableConfig.js";
 
+import Apogee from "/apogeeapp/app/Apogee.js";
 import {updateWorkspaceProperties} from "/apogeeapp/app/commandseq/updateworkspaceseq.js";
 import FolderComponent from "/apogeeapp/app/components/FolderComponent.js";
 
 /** This class manages the user interface for a workspace object. */
-apogeeapp.app.WorkspaceUI = class {
+export default class WorkspaceUI {
 
     constructor() {
 
@@ -247,7 +248,7 @@ apogeeapp.app.WorkspaceUI = class {
         try {
             if(member) {
                 
-                var componentGenerator = apogeeapp.app.Apogee.getInstance().getComponentGenerator(componentJson.type);
+                var componentGenerator = Apogee.getInstance().getComponentGenerator(componentJson.type);
                 if((!componentGenerator)||(member.generator.type == "apogee.ErrorTable")) {
                     //throw base.createError("Component type not found: " + componentType);
 
@@ -478,7 +479,7 @@ apogeeapp.app.WorkspaceUI = class {
 
     /** This method returns the icon url for the component. */
     getIconUrl() {
-        return apogeeapp.ui.getResourcePath(apogeeapp.app.WorkspaceUI.ICON_RES_PATH);
+        return apogeeapp.ui.getResourcePath(WorkspaceUI.ICON_RES_PATH);
     }
 
     getMenuItems() {
@@ -546,4 +547,4 @@ apogeeapp.app.WorkspaceUI = class {
 
 }
 
-apogeeapp.app.WorkspaceUI.ICON_RES_PATH = "/componentIcons/workspace.png";   
+WorkspaceUI.ICON_RES_PATH = "/componentIcons/workspace.png";   

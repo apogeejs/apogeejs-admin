@@ -1,7 +1,12 @@
 import util from "/apogeeutil/util.js";
 
+import Apogee from "/apogeeapp/app/Apogee.js";
 import Component from "/apogeeapp/app/component/Component.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
+import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
+import HtmlJsDataDisplay from "/apogeeapp/app/datadisplay/HtmlJsDataDisplay.js";
+import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
+import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
@@ -82,34 +87,34 @@ export default class CustomComponent extends EditComponent {
                 var callbacks = this.getOutputCallbacks();
                 var html = this.getUiCodeField(CustomComponent.CODE_FIELD_HTML);
                 var resource = this.createResource();
-                var dataDisplay = new apogeeapp.app.HtmlJsDataDisplay(displayContainer,callbacks,this.member,html,resource);
+                var dataDisplay = new HtmlJsDataDisplay(displayContainer,callbacks,this.member,html,resource);
                 return dataDisplay;
                 
             case CustomComponent.VIEW_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case CustomComponent.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
             
             case CustomComponent.VIEW_HTML:
                 callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_HTML);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/html");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/html");
         
             case CustomComponent.VIEW_CSS:
                 callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_CSS);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/css");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/css");
                 
             case CustomComponent.VIEW_UI_CODE:
                 callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_UI_CODE);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
 
             case CustomComponent.VIEW_DESCRIPTION:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
-                //return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new apogeeapp.app.TextAreaEditor(displayContainer,callbacks);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                return new TextAreaEditor(displayContainer,callbacks);
                 
             default:
     //temporary error handling...
@@ -211,7 +216,7 @@ export default class CustomComponent extends EditComponent {
         command.desc = "Update code field " + uiCodeField + " - " + this.getMember().getFullName();
         command.setDirty = true;
 
-        apogeeapp.app.Apogee.getInstance().executeCommand(command);
+        Apogee.getInstance().executeCommand(command);
         return true;  
     }
 

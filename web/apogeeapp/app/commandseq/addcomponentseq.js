@@ -3,6 +3,8 @@ import {validateTableName} from "/apogee/lib/codeCompiler.js";
 
 import {getPropertiesDialogLayout} from "/apogeeapp/app/commandseq/updatecomponentseq.js";
 import Component from "/apogeeapp/app/component/Component.js";
+import {showConfigurableDialog} from "/apogeeapp/app/commandseq/ConfigurableDialog.js";
+import {showSelectComponentDialog} from "/apogeeapp/app/commandseq/SelectComponentDialog.js";
 
 //=====================================
 // UI Entry Point
@@ -78,7 +80,7 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
         }
         
         //show dialog
-        apogeeapp.app.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
+        showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 /** This gets a callback to add an "additional" component, menaing one that is not
@@ -106,5 +108,5 @@ export function addAdditionalComponent(app,optionalInitialProperties,optionalBas
         }
     })
     //open select component dialog
-    apogeeapp.app.dialog.showSelectComponentDialog(componentNames,app.additionalComponents,onSelect);
+    showSelectComponentDialog(componentNames,app.additionalComponents,onSelect);
 }

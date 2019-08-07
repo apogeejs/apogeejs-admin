@@ -1,3 +1,7 @@
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+import ConfigurableFormEditor from "/apogeeapp/app/datadisplay/ConfigurableFormEditor.js";
+import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
+
 (function() {
     
 //=================================
@@ -71,7 +75,7 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
                 getEditOk: () => true,
                 saveData: (formData) => this._onSubmit(formData)
             }
-            return new apogeeapp.app.ConfigurableFormEditor(viewMode,callbacks,apogeeapp.app.GoogleChartComponent.FORM_LAYOUT);
+            return new ConfigurableFormEditor(viewMode,callbacks,apogeeapp.app.GoogleChartComponent.FORM_LAYOUT);
         }
         else {
             return super.getDataDisplay(viewMode,viewType);
@@ -137,7 +141,7 @@ return {
         var member = this.getMember();
         var argList = member.getArgList();
         var supplementalCode = member.getSupplementalCode();
-        return apogeeapp.app.dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode); 
+        return dataDisplayHelper.setCode(member,argList,functionBody,supplementalCode); 
     }       
             
 
@@ -242,7 +246,7 @@ else {
 //-----------------------
 
 /** Extend ths JsDataDisplay */
-apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.DataDisplay {
+apogeeapp.app.GoogleChartDisplay = class extends DataDisplay {
     
     //=====================================
     // Public Methods
@@ -254,7 +258,7 @@ apogeeapp.app.GoogleChartDisplay = class extends apogeeapp.app.DataDisplay {
             getData: () => this.member.getData()
         }
         
-        super(viewMode,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
+        super(viewMode,callbacks,DataDisplay.SCROLLING);
     
         this.member = member;
         //create a content element of variable size in the top left of the parent

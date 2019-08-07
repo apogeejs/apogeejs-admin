@@ -1,4 +1,6 @@
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import Apogee from "/apogeeapp/app/Apogee.js";
+import WorkspaceUI from "/apogeeapp/app/WorkspaceUI.js";
 
 /** Create Workspace Command
  *
@@ -25,8 +27,8 @@ createworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData) {
     try {
         
         //make the workspace ui
-        var workspaceUI = new apogeeapp.app.WorkspaceUI();
-        workspaceUIAdded = apogeeapp.app.Apogee.getInstance().setWorkspaceUI(workspaceUI);
+        var workspaceUI = new WorkspaceUI();
+        workspaceUIAdded = Apogee.getInstance().setWorkspaceUI(workspaceUI);
         
         //load
         workspaceUI.load();

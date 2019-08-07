@@ -1,6 +1,8 @@
 import util from "/apogeeutil/util.js";
 import {validateTableName} from "/apogee/lib/codeCompiler.js"; 
 
+import {showConfigurableDialog} from "/apogeeapp/app/commandseq/ConfigurableDialog.js";
+
 //=====================================
 // UI Entry Point
 //=====================================
@@ -118,7 +120,7 @@ export function updateComponent(component) {
     }
 
     //show dialog
-    apogeeapp.app.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
+    showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 //========================

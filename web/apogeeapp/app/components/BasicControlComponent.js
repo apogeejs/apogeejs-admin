@@ -1,4 +1,7 @@
 import Component from "/apogeeapp/app/component/Component.js";
+import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
+import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
+import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods
@@ -58,17 +61,17 @@ export default class BasicControlComponent extends apogeeapp.app.EditComponent{
                 return this.getOutputDisplay(displayContainer);
 
             case BasicControlComponent.VIEW_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
             case BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
             case BasicControlComponent.VIEW_DESCRIPTION:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
-                //return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new apogeeapp.app.TextAreaEditor(displayContainer,callbacks);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                return new TextAreaEditor(displayContainer,callbacks);
 
             default:
     //temporary error handling...

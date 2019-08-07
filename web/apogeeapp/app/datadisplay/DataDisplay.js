@@ -4,8 +4,8 @@
  * @param {type} callbacks - the callbacks for the editor {getData,getEditOk,saveData}
  * @param {type} containerClass - the is the css class for the display container OPTIONAL
  */
-apogeeapp.app.DataDisplay = class {
-    constructor(displayContainer,callbacks,containerClass = apogeeapp.app.DataDisplay.NON_SCROLLING) {
+export default class DataDisplay {
+    constructor(displayContainer,callbacks,containerClass = DataDisplay.NON_SCROLLING) {
         
         this.outsideDiv = apogeeapp.ui.createElementWithClass("div",containerClass);
 	
@@ -131,7 +131,7 @@ apogeeapp.app.DataDisplay = class {
     }
 }
 
-apogeeapp.app.DataDisplay.NON_SCROLLING = "apogee_datadisplay_container_fixed";
-apogeeapp.app.DataDisplay.SCROLLING = "apogee_datadisplay_container_scrolling";
+DataDisplay.NON_SCROLLING = "apogee_datadisplay_container_fixed";
+DataDisplay.SCROLLING = "apogee_datadisplay_container_scrolling";
 
-apogeeapp.app.DataDisplay.FIT_CONTENT = "apogee_datadisplay_container_fit_content";
+DataDisplay.FIT_CONTENT = "apogee_datadisplay_container_fit_content";

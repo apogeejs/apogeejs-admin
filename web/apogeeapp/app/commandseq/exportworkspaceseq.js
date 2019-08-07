@@ -1,4 +1,4 @@
-
+import {showConfigurableDialog} from "/apogeeapp/app/commandseq/ConfigurableDialog.js";
 
 //=====================================
 // UI Entry Point
@@ -41,7 +41,7 @@ export function exportWorkspace(app,fileAccessObject) {
     }
 
     //show dialog
-    apogeeapp.app.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
+    showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
     
 

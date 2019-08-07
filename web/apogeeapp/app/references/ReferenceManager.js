@@ -1,4 +1,5 @@
 import {addLink} from "/apogeeapp/app/commandseq/updatelinkseq.js";
+import {bannerConstants,getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
 
 /** This class manages links and other reference entries, loading the references and
  * creating the UI tree elements for display of the references.
@@ -9,7 +10,7 @@ import {addLink} from "/apogeeapp/app/commandseq/updatelinkseq.js";
 apogeeapp.app.ReferenceManager = function() {
     
     this.referencesTreeEntry = null;
-    this.state = apogeeapp.app.banner.BANNER_TYPE_NORMAL;
+    this.state = bannerConstants.BANNER_TYPE_NORMAL;
     
     //references
     this.referenceLists = {};
@@ -164,7 +165,7 @@ apogeeapp.app.ReferenceManager.prototype.getListStruct = function(typeInfo) {
     listStruct.typeInfo = typeInfo;
     listStruct.listEntries = [];
     listStruct.treeEntry = null;
-    listStruct.state = apogeeapp.app.banner.BANNER_TYPE_NORMAL;
+    listStruct.state = bannerConstants.BANNER_TYPE_NORMAL;
     return listStruct;
 }
 
@@ -235,19 +236,19 @@ apogeeapp.app.ReferenceManager.prototype.processReferenceState = function() {
         
         var listState = this.getListState(listStruct);
         
-        if(listState == apogeeapp.app.banner.BANNER_TYPE_ERROR) hasError = true;
-        else if(listState == apogeeapp.app.banner.BANNER_TYPE_PENDING) hasPending = true;
+        if(listState == bannerConstants.BANNER_TYPE_ERROR) hasError = true;
+        else if(listState == bannerConstants.BANNER_TYPE_PENDING) hasPending = true;
     }
         
     var newState;
     if(hasError) {
-        newState = apogeeapp.app.banner.BANNER_TYPE_ERROR;
+        newState = bannerConstants.BANNER_TYPE_ERROR;
     }
     else if(hasPending) {
-        newState = apogeeapp.app.banner.BANNER_TYPE_PENDING;
+        newState = bannerConstants.BANNER_TYPE_PENDING;
     }
     else {
-        newState = apogeeapp.app.banner.BANNER_TYPE_NORMAL;
+        newState = bannerConstants.BANNER_TYPE_NORMAL;
     }
     
     if(this.state != newState) {
@@ -264,10 +265,10 @@ apogeeapp.app.ReferenceManager.prototype.getListState = function(listStruct) {
     
     var checkStatus = refEntry => {
         var state = refEntry.getState();
-        if(state == apogeeapp.app.banner.BANNER_TYPE_ERROR) {
+        if(state == bannerConstants.BANNER_TYPE_ERROR) {
             hasError = true;
         }
-        else if(state == apogeeapp.app.banner.BANNER_TYPE_PENDING) {
+        else if(state == bannerConstants.BANNER_TYPE_PENDING) {
             hasPending = true;
         }
     }
@@ -276,13 +277,13 @@ apogeeapp.app.ReferenceManager.prototype.getListState = function(listStruct) {
         
     var listState;
     if(hasError) {
-        listState = apogeeapp.app.banner.BANNER_TYPE_ERROR;
+        listState = bannerConstants.BANNER_TYPE_ERROR;
     }
     else if(hasPending) {
-        listState = apogeeapp.app.banner.BANNER_TYPE_PENDING;
+        listState = bannerConstants.BANNER_TYPE_PENDING;
     }
     else {
-        listState = apogeeapp.app.banner.BANNER_TYPE_NORMAL;
+        listState = bannerConstants.BANNER_TYPE_NORMAL;
     }
     
     if(listState != listStruct.state) {
@@ -311,7 +312,7 @@ apogeeapp.app.ReferenceManager._createId = function() {
 
 /** @private */
 apogeeapp.app.ReferenceManager.applyBannerState = function(treeEntry,state) {
-    var iconOverlay = apogeeapp.app.banner.getIconOverlay(state);
+    var iconOverlay = getIconOverlay(state);
     if(iconOverlay) {
         treeEntry.setIconOverlay(iconOverlay);
     }

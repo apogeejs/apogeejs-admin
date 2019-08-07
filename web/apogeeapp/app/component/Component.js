@@ -2,6 +2,8 @@ import util from "/apogeeutil/util.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
 import {updateComponent} from "/apogeeapp/app/commandseq/updatecomponentseq.js";
+import TreeComponentDisplay from "/apogeeapp/app/component/TreeComponentDisplay.js";
+import {bannerConstants} from "/apogeeapp/app/component/banner.js"; 
 
 /** This is the base functionality for a component. */
 export default class Component extends EventManager {
@@ -21,7 +23,7 @@ export default class Component extends EventManager {
         this.cleanupActions = [];
         
         //notifications
-        this.bannerState = apogeeapp.app.banner.BANNER_TYPE_NONE;
+        this.bannerState = bannerConstants.BANNER_TYPE_NONE;
         this.bannerMessage = "";
         
         this.updated = {};
@@ -100,7 +102,7 @@ export default class Component extends EventManager {
 
     /** @protected */
     instantiateTreeEntry() {
-        var treeDisplay = new apogeeapp.app.TreeComponentDisplay(this);
+        var treeDisplay = new TreeComponentDisplay(this);
         
         //default sort order within parent
         var treeEntrySortOrder = (this.componentGenerator.TREE_ENTRY_SORT_ORDER !== undefined) ? this.componentGenerator.TREE_ENTRY_SORT_ORDER : Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER;
@@ -385,20 +387,20 @@ export default class Component extends EventManager {
                     errorMsg += actionErrors[i].msg + "\n";
                 }
 
-                newBannerState = apogeeapp.app.banner.BANNER_TYPE_ERROR;
+                newBannerState = bannerConstants.BANNER_TYPE_ERROR;
                 newBannerMessage = errorMsg;
             }
             else if(updatedMember.getResultPending()) {
-                newBannerState = apogeeapp.app.banner.BANNER_TYPE_PENDING;
-                newBannerMessage = apogeeapp.app.banner.PENDING_MESSAGE;
+                newBannerState = bannerConstants.BANNER_TYPE_PENDING;
+                newBannerMessage = bannerConstants.PENDING_MESSAGE;
 
             }
             else if(updatedMember.getResultInvalid()) {
-                newBannerState = apogeeapp.app.banner.BANNER_TYPE_INVALID;
-                newBannerMessage = apogeeapp.app.banner.INVALID_MESSAGE;
+                newBannerState = bannerConstants.BANNER_TYPE_INVALID;
+                newBannerMessage = bannerConstants.INVALID_MESSAGE;
             }
             else {   
-                newBannerState = apogeeapp.app.banner.BANNER_TYPE_NONE;
+                newBannerState = bannerConstants.BANNER_TYPE_NONE;
                 newBannerMessage = null;
             }
             

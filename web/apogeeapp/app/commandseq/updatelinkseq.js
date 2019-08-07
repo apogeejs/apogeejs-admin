@@ -1,5 +1,8 @@
 import util from "/apogeeutil/util.js";
 
+import {showConfigurableDialog} from "/apogeeapp/app/commandseq/ConfigurableDialog.js";
+import Apogee from "/apogeeapp/app/Apogee.js";
+
 const DIALOG_LAYOUT_URL_LINE = {
     "type": "inputElement",
     "heading": "URL: ",
@@ -54,14 +57,14 @@ export function addLink(referenceManager,entryTypeInfo) {
         commandData.nickname = newValues.nickname;
 
         //run command
-        apogeeapp.app.Apogee.getInstance().executeCommand(commandData);
+        Apogee.getInstance().executeCommand(commandData);
 
         //return true to close the dialog
         return true;
     }
 
     //show dialog
-    apogeeapp.app.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
+    showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 /** This method gets a callback to update the properties of a workspace. */
@@ -116,7 +119,7 @@ export function updateLink(referenceEntry) {
         }
 
         if(dataChanged) {
-            apogeeapp.app.Apogee.getInstance().executeCommand(commandData);
+            Apogee.getInstance().executeCommand(commandData);
         }
             
         //return true to close the dialog
@@ -124,7 +127,7 @@ export function updateLink(referenceEntry) {
     }
 
     //show dialog
-    apogeeapp.app.dialog.showConfigurableDialog(dialogLayout,onSubmitFunction);
+    showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 
@@ -142,7 +145,7 @@ export function removeLink(referenceEntry) {
         commandData.url = referenceEntry.getUrl();
 
         //run command
-        apogeeapp.app.Apogee.getInstance().executeCommand(commandData);
+        Apogee.getInstance().executeCommand(commandData);
     }
 }
 

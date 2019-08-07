@@ -1,15 +1,17 @@
 import util from "/apogeeutil/util.js";
 
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /** Editor that uses the Ace text editor.
  * 
  * @param {type} displayContainer - the display container
  * @param {type} callbacks - {getData,getEditOk,setData}; format for data is text
  * @param {type} aceMode - the display format, such as "ace/mode/json"
  */
-apogeeapp.app.AceTextEditor = class extends apogeeapp.app.DataDisplay {
+export default class AceTextEditor extends DataDisplay {
     
     constructor(displayContainer,callbacks,aceMode) {
-        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
+        super(displayContainer,callbacks,DataDisplay.NON_SCROLLING);
 
         //#################################################
         //use this for literate page - also add line options below

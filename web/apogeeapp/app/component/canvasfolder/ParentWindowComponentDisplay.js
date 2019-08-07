@@ -1,3 +1,5 @@
+import {getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
+
 /** This component represents a json table object. */
 apogeeapp.app.ParentWindowComponentDisplay = function(component, options) {
     this.component = component;
@@ -51,7 +53,7 @@ apogeeapp.app.ParentWindowComponentDisplay.prototype.deleteDisplay = function() 
 
 apogeeapp.app.ParentWindowComponentDisplay.prototype.setBannerState = function(bannerState,bannerMessage) {
     if(this.windowFrame) {
-        var iconOverlay = apogeeapp.app.banner.getIconOverlay(bannerState);
+        var iconOverlay = getIconOverlay(bannerState);
         if(iconOverlay) {
             this.windowFrame.setIconOverlay(iconOverlay);
         }

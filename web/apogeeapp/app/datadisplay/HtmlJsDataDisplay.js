@@ -1,3 +1,5 @@
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from
  * HTML and javascript code. Is should be passed a 
@@ -21,10 +23,10 @@
  */
 
 /** This is the display/editor for the custom control output. */
-apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
+export default class HtmlJsDataDisplay extends DataDisplay {
     constructor(displayContainer,callbacks,member,html,resource) {
         
-        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
+        super(displayContainer,callbacks,DataDisplay.NON_SCROLLING);
         
         this.resource = resource;
         this.member = member;

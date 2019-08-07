@@ -2,6 +2,10 @@ import Messenger from "/apogee/actions/Messenger.js";
 
 import Component from "/apogeeapp/app/component/Component.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
+import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
+import ConfigurableFormEditor from "/apogeeapp/app/datadisplay/ConfigurableFormEditor.js";
+import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
+import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form
@@ -50,33 +54,33 @@ export default class FormDataComponent extends EditComponent {
             case FormDataComponent.VIEW_FORM:
                 displayContainer.setDisplayDestroyFlags(this.displayDestroyFlags);
                 callbacks = this.getFormEditorCallbacks();
-                var formEditorDisplay = new apogeeapp.app.ConfigurableFormEditor(displayContainer,callbacks);
+                var formEditorDisplay = new ConfigurableFormEditor(displayContainer,callbacks);
                 return formEditorDisplay;
                 
             case FormDataComponent.VIEW_LAYOUT_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.layoutFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.layoutFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.layoutFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.layoutFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
             
             case FormDataComponent.VIEW_FORM_VALUE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.dataTable);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/json");
+                callbacks = dataDisplayHelper.getMemberDataTextCallbacks(this.dataTable);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/json");
                 
             case FormDataComponent.VIEW_INPUT_INVALID_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.isInputValidFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.isInputValidFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.isInputValidFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.isInputValidFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case FormDataComponent.VIEW_DESCRIPTION:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.dataTable);
-                //return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new apogeeapp.app.TextAreaEditor(displayContainer,callbacks);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.dataTable);
+                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                return new TextAreaEditor(displayContainer,callbacks);
                 
             default:
     //temporary error handling...

@@ -1,3 +1,8 @@
+import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
+import ConfigurableFormEditor from "/apogeeapp/app/datadisplay/ConfigurableFormEditor.js";
+import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
+import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
+
 (function() {
 
 /** This component represents a json table object. */
@@ -35,26 +40,26 @@ apogeeapp.app.FormCodeComponent = class extends apogeeapp.app.EditComponent {
         switch(viewType) {
             
             case apogeeapp.app.FormCodeComponent.VIEW_DATA:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.member);
-                return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/json");
+                callbacks = dataDisplayHelper.getMemberDataTextCallbacks(this.member);
+                return new AceTextEditor(viewMode,callbacks,"ace/mode/json");
                     
             case apogeeapp.app.FormCodeComponent.VIEW_INPUT:
                 this.activeFormViewMode = viewMode;
                 callbacks = this.getInputCallbacks();
-                return new apogeeapp.app.ConfigurableFormEditor(viewMode,callbacks,this.layout);
+                return new ConfigurableFormEditor(viewMode,callbacks,this.layout);
 
             case apogeeapp.app.FormCodeComponent.VIEW_LAYOUT:
                 callbacks = this.getLayoutCallbacks();
-                return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/json");
+                return new AceTextEditor(viewMode,callbacks,"ace/mode/json");
                 
              case apogeeapp.app.FormCodeComponent.VIEW_ENCODING:
                 callbacks = this.getEncodingCallbacks();
-                return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/jsvascript");
+                return new AceTextEditor(viewMode,callbacks,"ace/mode/jsvascript");
 
             case apogeeapp.app.FormCodeComponent.VIEW_DESCRIPTION:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
-                //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
-                return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                //return new AceTextEditor(viewMode,callbacks,"ace/mode/text");
+                return new TextAreaEditor(viewMode,callbacks);
 
             default:
     //temporary error handling...
@@ -130,7 +135,7 @@ apogeeapp.app.FormCodeComponent = class extends apogeeapp.app.EditComponent {
             console.error(error.stack);
             code = apogeeapp.app.FormCodeComponent.DEFAULT_MEMBER_CODE;
         }
-        return apogeeapp.app.dataDisplayCallbackHelper.setCode(this.member,[],code,"",undefined); 
+        return dataDisplayHelper.setCode(this.member,[],code,"",undefined); 
     }
 
     //=====================================

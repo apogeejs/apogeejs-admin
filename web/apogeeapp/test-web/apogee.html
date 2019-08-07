@@ -168,7 +168,6 @@
         <script type="module" src="/apogeeapp/app/datadisplay/TextAreaEditor.js"></script>
 		<script type="module" src="/apogeeapp/app/datadisplay/AceTextEditor.js"></script>		
         <script type="module" src="/apogeeapp/app/datadisplay/HtmlJsDataDisplay.js"></script>
-		<script type="module" src="/apogeeapp/app/datadisplay/JsonFormEditor.js"></script>
 		<script type="module" src="/apogeeapp/app/datadisplay/HandsonGridEditor.js"></script>
         <script type="module" src="/apogeeapp/app/datadisplay/ConfigurableFormEditor.js"></script>
         <script type="module" src="/apogeeapp/app/datadisplay/ConfigurableFormDisplay.js"></script>
@@ -198,9 +197,10 @@
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/6.2.0/handsontable.full.min.css">
         <!--<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">-->
         
-		<script>
+        <script type="module">
+            import Apogee from "/apogeeapp/app/Apogee.js";
 
-			function init() {
+			window.init = function() {
 
                 //initialize resource path
                 apogeeapp.ui.initResourcePath("/resources");
@@ -209,11 +209,11 @@
                 var appConfigManager = new apogeeapp.app.CutNPasteAppConfigManager();
                 
                 //create the application
-                apogeeapp.app.Apogee.createApp("appContainer",appConfigManager);
+                Apogee.createApp("appContainer",appConfigManager);
             }
             
             function beforeUnloadHandler() {
-                var app = apogeeapp.app.Apogee.getInstance();
+                var app = Apogee.getInstance();
                 if((app)&&(app.getWorkspaceIsDirty())) {
                     return "There is unsaved data. Are you sure you want to exit?";
                 }

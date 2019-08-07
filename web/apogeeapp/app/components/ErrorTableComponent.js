@@ -1,5 +1,6 @@
 import Component from "/apogeeapp/app/component/Component.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
+import ErrorDisplay from "/apogeeapp/app/datadisplay/ErrorDisplay.js";
 
 /** This component represents a json table object. */
 export default class ErrorTableComponent extends EditComponent {
@@ -36,7 +37,7 @@ export default class ErrorTableComponent extends EditComponent {
     /** This method should be implemented to retrieve a view mode of the give type. 
      * @protected. */
     getDataDisplay(displayContainer,viewType) {
-        return new apogeeapp.app.ErrorDisplay(displayContainer,false);
+        return new ErrorDisplay(displayContainer,false);
     }
 
     /** This overrides the save method to return the original input. */

@@ -153,10 +153,14 @@
 		<link rel="stylesheet" type="text/css" href="../ui/configurablepanel/ConfigurablePanel.css">
           
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
-		<script>
+		<script type="module">
             'use strict'
 
+            import Apogee from "/apogeeapp/app/Apogee.js";
+
 			function init() {
+                
+
                 console.log("In!")
                 
                 //set resounce path
@@ -166,7 +170,7 @@
                 var appConfigManager = new apogeeapp.app.ElectronAppConfigManager();
                 
                 //create the application
-                apogeeapp.app.Apogee.createApp("appContainer",appConfigManager);
+                Apogee.createApp("appContainer",appConfigManager);
             }
             
 		</script>

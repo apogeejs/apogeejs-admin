@@ -1,3 +1,5 @@
+import Apogee from "/apogeeapp/app/Apogee.js";
+
 /** This class is used to provide user-code user interface access to 
  * modifying the model. 
  * Updates are done with commands. There is a method here which executes a command
@@ -46,7 +48,7 @@ apogeeapp.app.UiCommandMessenger = class {
     
     /** This method executes a command. */
     executeCommand(command) {
-        apogeeapp.app.Apogee.getInstance().executeCommand(command);
+        Apogee.getInstance().executeCommand(command);
     }
     
     //=============================

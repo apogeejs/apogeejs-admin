@@ -1,10 +1,12 @@
 import util from "/apogeeutil/util.js";
 
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /** This is a grid editor using hands on table*/
-apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.DataDisplay {
+export default class HandsonGridEditor extends DataDisplay {
     
     constructor(displayContainer,callbacks) {
-        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
+        super(displayContainer,callbacks,DataDisplay.NON_SCROLLING);
 
         //TBR initial sizing. now I just set it to a dummy number	
         this.gridDiv = apogeeapp.ui.createElement("div",null,{

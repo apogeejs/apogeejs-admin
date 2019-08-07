@@ -1,7 +1,9 @@
 import util from "/apogeeutil/util.js";
 
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /** This is an editor that displays a customized form for data input. */
-apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.DataDisplay {
+export default class ConfigurableFormEditor extends DataDisplay {
     
     /** This allows for a static or dynamic layout setting
      * @param {type} displayContainer - the displayContainer
@@ -17,7 +19,7 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.DataDisplay {
      * allack should not be populated. 
      */
     constructor(displayContainer,callbacks,optionalFixedLayoutInfo) {
-        super(displayContainer,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
+        super(displayContainer,callbacks,DataDisplay.SCROLLING);
         
         //layout can be fixed or dynamic
         this.dynamicLayoutCallback = callbacks.getLayoutInfo;

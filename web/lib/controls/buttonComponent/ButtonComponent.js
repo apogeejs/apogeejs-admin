@@ -1,3 +1,5 @@
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 (function() {
 
 /** This is a simple custom resource component example. */
@@ -38,7 +40,7 @@ else {
  * onHide(outputElement,outputMode);
  * destroy(outputElement,outputMode);
  */
-apogeeapp.app.ButtonDisplay = class extends apogeeapp.app.DataDisplay {
+apogeeapp.app.ButtonDisplay = class extends DataDisplay {
     
     constructor(viewMode,member) {
         

@@ -1,4 +1,6 @@
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import Apogee from "/apogeeapp/app/Apogee.js";
+import WorkspaceUI from "/apogeeapp/app/WorkspaceUI.js";
 
 /** Open Workspace Command
  *
@@ -23,13 +25,13 @@ openworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData,async
     var workspaceUIAdded;
     var synchCommandResult = {};
     
-    var app = apogeeapp.app.Apogee.getInstance();
+    var app = Apogee.getInstance();
     
     try {
 
 //I should verify the file type and format!  
         
-        var workspaceUI = new apogeeapp.app.WorkspaceUI();
+        var workspaceUI = new WorkspaceUI();
         workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
     
         var referencesJson = commandData.workspaceJson.references;

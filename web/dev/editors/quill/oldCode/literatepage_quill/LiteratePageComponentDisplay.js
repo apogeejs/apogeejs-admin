@@ -1,5 +1,6 @@
 import EventManager from "/apogeeutil/EventManager.js";
 import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
+import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
 
 /** This component represents a json table object. 
  * The member argument is the main member for this component. The folder argument is 
@@ -49,16 +50,16 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
 
     setBannerState(bannerState,bannerMessage) {
         apogeeapp.ui.removeAllChildren(this.bannerElement);
-        if(bannerState == apogeeapp.app.banner.BANNER_TYPE_NONE) {
+        if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
            //no action
         }
         else {
-            var banner = apogeeapp.app.banner.getBanner(bannerMessage,bannerState);
+            var banner = getBanner(bannerMessage,bannerState);
             this.bannerElement.appendChild(banner);
         }
 
         if(this.tab) {
-            var iconOverlay = apogeeapp.app.banner.getIconOverlay(bannerState);
+            var iconOverlay = getIconOverlay(bannerState);
             if(iconOverlay) {
                 this.tab.setIconOverlay(iconOverlay);
             }

@@ -1,8 +1,13 @@
-import util from "/apogeeutil/util.js";
+ import util from "/apogeeutil/util.js";
 import Messenger from "/apogee/actions/Messenger.js";
 
+import Apogee from "/apogeeapp/app/Apogee.js";
 import Component from "/apogeeapp/app/component/Component.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
+import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
+import HtmlJsDataDisplay from "/apogeeapp/app/datadisplay/HtmlJsDataDisplay.js";
+import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
+import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 
 /** This attempt has a single form edit page which returns an object. */
 // To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 
@@ -95,37 +100,37 @@ export default class CustomDataComponent extends EditComponent {
                 var callbacks = this.getFormCallbacks();
                 var html = this.getUiCodeField(CustomDataComponent.CODE_FIELD_HTML);
                 var resource = this.createResource();
-                var dataDisplay = new apogeeapp.app.HtmlJsDataDisplay(displayContainer,callbacks,this.inputTable,html,resource);
+                var dataDisplay = new HtmlJsDataDisplay(displayContainer,callbacks,this.inputTable,html,resource);
                 return dataDisplay;
                 
             case CustomDataComponent.VIEW_VALUE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.dataTable);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/json");
+                callbacks = dataDisplayHelper.getMemberDataTextCallbacks(this.dataTable);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/json");
                 
             case CustomDataComponent.VIEW_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.inputTable);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.inputTable);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case CustomDataComponent.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.inputTable);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.inputTable);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
             
             case CustomDataComponent.VIEW_HTML:
                 callbacks = this.getUiCallbacks(CustomDataComponent.CODE_FIELD_HTML);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/html");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/html");
         
             case CustomDataComponent.VIEW_CSS:
                 callbacks = this.getUiCallbacks(CustomDataComponent.CODE_FIELD_CSS);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/css");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/css");
                 
             case CustomDataComponent.VIEW_UI_CODE:
                 callbacks = this.getUiCallbacks(CustomDataComponent.CODE_FIELD_UI_CODE);
-                return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
             case CustomDataComponent.VIEW_DESCRIPTION:
-                callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.inputTable);
-                //return new apogeeapp.app.AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new apogeeapp.app.TextAreaEditor(displayContainer,callbacks);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.inputTable);
+                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                return new TextAreaEditor(displayContainer,callbacks);
                 
             default:
     //temporary error handling...
@@ -242,7 +247,7 @@ export default class CustomDataComponent extends EditComponent {
         command.desc = "Update code field " + uiCodeField + " - " + this.getMember().getFullName();
         command.setDirty = true;
 
-        apogeeapp.app.Apogee.getInstance().executeCommand(command);
+        Apogee.getInstance().executeCommand(command);
         return true;  
     }
 
