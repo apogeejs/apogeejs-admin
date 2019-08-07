@@ -23,9 +23,6 @@ import FormDataComponent from "/apogeeapp/app/components/FormDataComponent.js";
 import CustomComponent from "/apogeeapp/app/components/CustomComponent.js";
 import CustomDataComponent from "/apogeeapp/app/components/CustomDataComponent.js";
 
-
-apogeeapp.app.dialog = {};
-
 /** @private */
 let apogeeInstance = null;
 
