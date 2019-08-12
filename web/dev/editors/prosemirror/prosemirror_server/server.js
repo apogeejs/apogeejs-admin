@@ -3,7 +3,7 @@ var router = require('./router');
 var filehandler = require("./filehandler");
 
 const FILE_ROOT = "file/";
-const PORT = 8888;
+const PORT = 8887;
 
 //NOTE - delay is just so the debugger can start before I do any work
 function init() {

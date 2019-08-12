@@ -1,0 +1,21 @@
+.literatePage_toolbar {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    line-height: 0.1;
+}
+.literatePage_toggleButton {
+    display: inline-block;
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    color: #888;
+    line-height: 1;
+    padding: 0 7px;
+    margin: 1px;
+    cursor: pointer;
+    text-align: center;
+    min-width: 1.4em;
+}
+.literatePage_toggleOffClass {
+    
+}
+.literatePage_toggleOnClass {
+    background-color: lightblue;
+}
