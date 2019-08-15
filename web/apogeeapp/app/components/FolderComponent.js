@@ -1,4 +1,6 @@
 import proseMirror from "/apogeeapp/app/component/literatepage/proseMirrorSetup.js";
+import LiteratePageComponentDisplay from "/apogeeapp/app/component/literatepage/LiteratePageComponentDisplay.js";
+import "/apogeeapp/app/component/literatepage/literatepagetransaction.js";
 
 import Component from "/apogeeapp/app/component/Component.js";
 import ParentComponent from "/apogeeapp/app/component/ParentComponent.js";
@@ -66,7 +68,7 @@ export default class FolderComponent extends ParentComponent {
         }
 
         var commandData = {};
-        commandData.type = apogeeapp.app.literatepagetransaction.COMMAND_TYPE;
+        commandData.type = "literatePageTransaction";
         commandData.memberFullName = this.member.getFullName();
         commandData.steps = stepsJson;
         commandData.undoSteps = inverseStepsJson;
@@ -80,7 +82,7 @@ export default class FolderComponent extends ParentComponent {
         
     instantiateTabDisplay() {
         var folder = this.getMember();
-        return new apogeeapp.app.LiteratePageComponentDisplay(this,folder,folder); 
+        return new LiteratePageComponentDisplay(this,folder,folder); 
     }
 
     //==============================

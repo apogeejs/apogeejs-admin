@@ -24,40 +24,6 @@ export default class ApogeeComponentView {
   
     }
   
-    ///////////////////////////////////////////////////////////////////
-    //start my new functions
-  
-    save() {
-      //            let targetText = this.textArea.value;
-      //            let targetData;
-      //            try {
-      //              targetData = JSON.parse(targetText);
-      //            }
-      //            catch(error) {
-      //              alert("Error parsing JSON input!");
-      //              return;
-      //            }
-      //            let start = this.getPos();
-      //            let end = this.getPos() + this.node.nodeSize;
-      //            let newNode = schema.nodes.testBlock.create({"state":targetData})
-      //
-      //            let tr = this.view.state.tr.replaceWith(start, end, newNode);
-      //            this.view.dispatch(tr);
-    }
-  
-  
-    cancel() {
-      //          //replace value in text area
-      //          this.textArea.value = this.node.textContent;
-      //          var textData = this.getTextData();
-      //          this.contentDiv.innerHTML = textData;
-    }
-  
-  
-  
-    //end my new functions
-    ////////////////////////////////////////////////////////////////////
-  
     selectNode() {
       this.dom.classList.add("ProseMirror-selectednode")
       //if (!this.innerView) this.open()

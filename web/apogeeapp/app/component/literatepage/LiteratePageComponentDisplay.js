@@ -1,20 +1,19 @@
 import base from "/apogeeutil/base.js";
-import EventManager from "/apogeeutil/EventManager.js";
+import EventManager from "/apogeeutil/EventManagerClass.js";
 import proseMirror from "/apogeeapp/app/component/literatepage/proseMirrorSetup.js";
 
 import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
 import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
+import PageChildComponentDisplay from "/apogeeapp/app/component/literatepage/PageChildComponentDisplay.js"
 
 /** This component represents a json table object. 
  * The member argument is the main member for this component. The folder argument is 
  * the parent folde associated with this component, which may be different from the
  * main member, which is the case for the folder function. */
-apogeeapp.app.LiteratePageComponentDisplay = class {
+export default class LiteratePageComponentDisplay extends EventManager {
     
     constructor(component,member,folder) {
-
-        //mixin init
-        EventManager.init.call(this);
+        super();
 
         this.component = component;
         this.member = member;
@@ -25,7 +24,7 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
         this.loadTabEntry();
 
         //add a cleanup action to the base component - component must already be initialized
-    //    this.addCleanupAction(apogeeapp.app.EditDisplayContent.destroy);
+    //    this.addCleanupAction(LiteratePageComponentDisplay.destroy);
     };
 
 
@@ -96,7 +95,7 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
 
         //create a new component display for this child
         if(childComponent.isEditComponent) {
-            childComponentDisplay = new apogeeapp.app.PageChildComponentDisplay(childComponent,this,childDisplayState);
+            childComponentDisplay = new PageChildComponentDisplay(childComponent,this,childDisplayState);
         }
         else if(childComponent.isParentComponent) {
             //don't display the child parents!
@@ -340,8 +339,5 @@ apogeeapp.app.LiteratePageComponentDisplay = class {
     
 }
 
-//add components to this class
-base.mixin(apogeeapp.app.LiteratePageComponentDisplay,EventManager);
-
 /** This is the data to load an empty page. */
-apogeeapp.app.LiteratePageComponentDisplay.EMPTY_PAGE_BODY = [];
+LiteratePageComponentDisplay.EMPTY_PAGE_BODY = [];

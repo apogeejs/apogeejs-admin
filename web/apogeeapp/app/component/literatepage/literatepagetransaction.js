@@ -11,18 +11,18 @@ import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
  *   "steps":(steps json)
  * }
  */ 
-apogeeapp.app.literatepagetransaction = {};
+let literatepagetransaction = {};
 
 //=====================================
 // Command Object
 //=====================================
 
-apogeeapp.app.literatepagetransaction.createUndoCommand = function(workspaceUI,commandData) {
+literatepagetransaction.createUndoCommand = function(workspaceUI,commandData) {
     
     if(commandData.undoSteps) {
         //temporary implementation
         var undoCommandData = {};
-        undoCommandData.type = apogeeapp.app.literatepagetransaction.COMMAND_TYPE;
+        undoCommandData.type = literatepagetransaction.COMMAND_TYPE;
         undoCommandData.steps = commandData.undoSteps;
         return undoCommandData;
     }
@@ -34,7 +34,7 @@ apogeeapp.app.literatepagetransaction.createUndoCommand = function(workspaceUI,c
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-apogeeapp.app.literatepagetransaction.executeCommand = function(workspaceUI,commandData) {
+literatepagetransaction.executeCommand = function(workspaceUI,commandData) {
     
     var error = false;;
     var errorMsg;
@@ -63,8 +63,8 @@ apogeeapp.app.literatepagetransaction.executeCommand = function(workspaceUI,comm
     return commandResult;
 }
 
-apogeeapp.app.literatepagetransaction.COMMAND_TYPE = "literatePageTransaction";
+literatepagetransaction.COMMAND_TYPE = "literatePageTransaction";
 
-CommandManager.registerCommand(apogeeapp.app.literatepagetransaction);
+CommandManager.registerCommand(literatepagetransaction);
 
 
