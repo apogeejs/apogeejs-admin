@@ -6,7 +6,7 @@ import {getSaveBar} from "/apogeeapp/app/component/toolbar.js";
  */
 export default class PageDisplayContainer {
 
-    constructor(component, viewType, options) {
+    constructor(component, viewType, isMainView, options) {
         
         //set the options
         if(!options) {
@@ -14,6 +14,7 @@ export default class PageDisplayContainer {
         }
         
         //variables
+        this.isMainView = isMainView;
         this.options = options;
         
         this.mainElement = null;
@@ -24,7 +25,7 @@ export default class PageDisplayContainer {
         
         this.isComponentShowing = false;
         this.isComponentActive = false;
-        this.isViewActive = false;
+        this.isViewActive = isMainView;
         this.isContentLoaded = false;
         
         this.destroyViewOnInactive = true;
@@ -73,11 +74,15 @@ export default class PageDisplayContainer {
         //show/hide ui elements
         if(isViewActive) {
             this.mainElement.style.display = ""; 
-            this.componentViewLabelContainer.style.display = "none";
+            this.expandImage.style.display = "none";
+            this.contractImage.style.display = "";
+//            this.componentViewLabelContainer.style.display = "none";
         }
         else {
-            this.mainElement.style.display = "none"; 
-            this.componentViewLabelContainer.style.display = "";
+            this.mainElement.style.display = "none";
+            this.expandImage.style.display = "";
+            this.contractImage.style.display = "none";
+//            this.componentViewLabelContainer.style.display = "";
         }
         
         //this lets the data display know if its visibility changes
@@ -129,25 +134,36 @@ export default class PageDisplayContainer {
         this.viewTitleBarElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewTitleBarClass",this.mainElement);
 
         this.viewTitleActiveElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewTitleActiveClass",this.viewTitleBarElement);
-        this.viewTitleElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewTitleClass",this.viewTitleBarElement);
-        
-        this.viewTitleElement.innerHTML = this.viewType;
+
+        let mainTitleLabelText = this.getMainViewLabelText();
+        if(mainTitleLabelText) {
+            this.viewTitleElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_componentViewTitleClass",this.viewTitleBarElement);
+            this.viewTitleElement.innerHTML = mainTitleLabelText;
+        }
         
         //make the label for the view in the componennt title bar
         this.componentViewLabelContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_componentViewLabelClass",null);
 
+        let headerTitleLabelClass = this.getHeaderViewLabelClass();
+        let headerTitleLabelText = this.getHeaderViewLabelText();
+
         this.componentViewActiveElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_componentViewActiveClass",this.componentViewLabelContainer);
-        this.componentViewTitleElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_componentViewTitleClass",this.componentViewLabelContainer);
+        this.componentViewTitleElement = apogeeapp.ui.createElementWithClass("div",headerTitleLabelClass,this.componentViewLabelContainer);
         
-        this.componentViewTitleElement.innerHTML = this.viewType;
-        
+        this.componentViewTitleElement.innerHTML = headerTitleLabelText;
 
         this.expandImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.componentViewActiveElement);
         this.expandImage.src = apogeeapp.ui.getResourcePath(PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
         this.expandImage.onclick = () => this.setIsViewActive(true);
-        this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewTitleActiveElement);
+//these lines if contract on title bar        
+        this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.componentViewActiveElement);
         this.contractImage.src = apogeeapp.ui.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
         this.contractImage.onclick = () => this.setIsViewActive(false);
+
+//these lines if contract on data display
+//        this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewTitleActiveElement);
+//        this.contractImage.src = apogeeapp.ui.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
+//        this.contractImage.onclick = () => this.setIsViewActive(false);
         
         //add the header elment (for the save bar)
         this.headerContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
@@ -159,6 +175,37 @@ export default class PageDisplayContainer {
         
         //set the visibility state for the element
         this.setIsViewActive(this.isViewActive);
+    }
+
+    getHeaderViewLabelClass() {
+        if(this.isMainView) {
+            return "visiui_pageChild_titleBarTitleClass";
+        }
+        else {
+            return "visiui_displayContainer_componentViewTitleClass";
+        }
+    }
+
+    /** This method returns the text for the view label.  */
+    getHeaderViewLabelText() {
+
+        if(this.isMainView) {
+            return this.component.getMember().getDisplayName();
+        }
+        else {
+            return this.viewType;
+        }
+    }
+
+    /** This method returns the text for the view label.  */
+    getMainViewLabelText() {
+
+        if(this.isMainView) {
+            return null;
+        }
+        else {
+            return this.viewType;
+        }
     }
 
     /** This method shold be called when the content loaded or frame visible state 

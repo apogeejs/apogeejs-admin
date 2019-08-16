@@ -1,3 +1,5 @@
+import {doAction} from "/apogee/actions/action.js";
+
 /** This component encapsulates the member functionality for objects in the workspace.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
@@ -289,7 +291,7 @@ Member.applyPromiseData = function(promise,onAsynchComplete,optionalPromiseRefre
     //kick off the asynch update, if this is not only a refresh of the promise
     if(!optionalPromiseRefresh) {
         var workspace = this.getWorkspace();
-        var asynchCallback = function(memberValue) {
+        var asynchCallback = memberValue => {
             //set the data for the table, along with triggering updates on dependent tables.
             let actionData = {};
             actionData.action = "updateData";
@@ -299,9 +301,9 @@ Member.applyPromiseData = function(promise,onAsynchComplete,optionalPromiseRefre
             if(onAsynchComplete) {
                 actionData.onComplete = onAsynchComplete;
             }
-            action.doAction(workspace,actionData);
+            doAction(workspace,actionData);
         }
-        var asynchErrorCallback = function(errorMsg) {
+        var asynchErrorCallback = errorMsg => {
             let actionData = {};
             actionData.action = "updateData";
             actionData.memberName = this.getFullName();
@@ -310,7 +312,7 @@ Member.applyPromiseData = function(promise,onAsynchComplete,optionalPromiseRefre
             if(onAsynchComplete) {
                 actionData.onComplete = onAsynchComplete;
             }
-            action.doAction(workspace,actionData);
+            doAction(workspace,actionData);
         }
 
         //call appropriate action when the promise completes

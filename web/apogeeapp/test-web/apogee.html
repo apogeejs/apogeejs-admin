@@ -101,6 +101,13 @@
         <script type="module">
             import Apogee from "/apogeeapp/app/Apogee.js";
             import CutNPasteAppConfigManager from "/supplemental/cutNPasteCode/CutNPasteAppConfigManager.js";
+            import util from "/apogeeutil/util.js";
+            import net from "/apogeeutil/net.js";
+
+            //expose these apogee libraries
+            window.apogee = {};
+            apogee.util = util;
+            apogee.net = net;
 
 			window.init = function() {
 

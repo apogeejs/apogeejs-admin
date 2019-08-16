@@ -107,8 +107,9 @@ function updateData(workspace,actionData,actionResult) {
     
     //some cleanup for new data
     member.clearErrors();
-    if(member.isCodeable) {
+    if((member.isCodeable)&&(actionData.sourcePromise === undefined)) {
         //clear the code - so the data is used
+        //UNLESS this is a delayed set date from a promise, in what case we want to keep the code.
         member.clearCode();
     }
     
@@ -123,7 +124,7 @@ function updateData(workspace,actionData,actionResult) {
     }
     else if(data instanceof Error) {
         //data is an error
-        var actionError = ActionError.processException(error,ActionError.ERROR_TYPE_MODEL);
+        var actionError = ActionError.processException(data,ActionError.ERROR_TYPE_MODEL);
         member.addError(actionError);
     }
     else if(data === util.INVALID_VALUE) {

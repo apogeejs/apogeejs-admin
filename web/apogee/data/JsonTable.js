@@ -77,7 +77,7 @@ JsonTable.prototype.processMemberFunction = function(memberGenerator) {
     }
     else if(data instanceof Promise) {
         //if the return value is a Promise, the data is asynch asynchronous!
-        this.applyPromiseData(this,data);
+        this.applyPromiseData(data);
     }
     else {
         //result is normal synchronous data

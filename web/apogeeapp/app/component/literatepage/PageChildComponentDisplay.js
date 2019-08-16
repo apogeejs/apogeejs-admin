@@ -14,16 +14,18 @@ export default class PageChildComponentDisplay {
         this.options = options;
         
         //these are the header elements
-        this.titleBarElement = null;
+//REMOVE TITLE BAR ELEMENT AND EXPAND/CONTRACT IMAGES
+//        this.titleBarElement = null;
         this.iconOverlayElement
         this.mainElement = null;
         this.bannerContainer = null;
-        this.expandImage;
-        this.contractImage;
+//        this.expandImage;
+//        this.contractImage;
         
         this.displayContainerMap = null;
         
         this.isPageShowing = false;
+//IS EXPANDED ALWAYS TRUE NOW
         this.isExpanded = true;
         
     
@@ -80,7 +82,9 @@ export default class PageChildComponentDisplay {
 
     updateData() {
         //update the title
-        this.titleBarTitleElement.innerHTML = this.member.getDisplayName();
+//REMOVE TITLE----
+//        this.titleBarTitleElement.innerHTML = this.member.getDisplayName();
+//----------------
 
         //update the content in instantiated view mode elements
         for(var viewType in this.displayContainerMap) {
@@ -119,6 +123,7 @@ export default class PageChildComponentDisplay {
     // state management
     //-------------------
 
+//THIS IS NOT USED RIGHT NOW-------------------
     setIsExpanded(isExpanded) {
         this.isExpanded = isExpanded;
         //update ui components
@@ -140,6 +145,7 @@ export default class PageChildComponentDisplay {
         //update state for children, as needed
         this.updateChildDisplayStates();
     }
+//----------------------------------------------
 
     //===============================
     // Private Functions
@@ -170,7 +176,9 @@ export default class PageChildComponentDisplay {
         for(var i = 0; i < viewTypes.length; i++) {
             var viewType = viewTypes[i];
             
-            var displayContainer = new PageDisplayContainer(this.component, viewType);
+            var isMainView = (i == 0);
+
+            var displayContainer = new PageDisplayContainer(this.component, viewType, isMainView);
             
             //add the view title element to the title bar
             this.titleBarViewsElement.appendChild(displayContainer.getViewLabelElement());
@@ -181,8 +189,9 @@ export default class PageChildComponentDisplay {
             //store the display container object
             this.displayContainerMap[viewType] = displayContainer;
         }
-        
-        this.setIsExpanded(this.isExpanded);
+//get rid of expand contract---------        
+//        this.setIsExpanded(this.isExpanded);
+//----------------------
     }
 
     /** This makes the title bar, and installs it inline */
@@ -192,23 +201,24 @@ export default class PageChildComponentDisplay {
 
         this.titleBarActiveElement = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_titleBarActiveClass",this.titleBarContainer);
         this.titleBarMenuElement = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_titleBarMenuClass",this.titleBarContainer);
-        this.titleBarTitleElement = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_titleBarTitleClass",this.titleBarContainer);
+//NOT SHOWING TITLE HERE!!!
+//        this.titleBarTitleElement = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_titleBarTitleClass",this.titleBarContainer);
         this.titleBarViewsElement = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
         
         //-----------------
         // title
         //-----------------
-        this.titleBarTitleElement.innerHTML = this.member.getDisplayName();
+//        this.titleBarTitleElement.innerHTML = this.member.getDisplayName();
         
         //-----------------
         // show/hide (active)
         //-----------------
-        this.expandImage = apogeeapp.ui.createElementWithClass("img","visiui_pageChild_expandContractClass",this.titleBarActiveElement);
-        this.expandImage.src = apogeeapp.ui.getResourcePath(PageChildComponentDisplay.EXPAND_BUTTON_PATH);
-        this.expandImage.onclick = () => this.setIsExpanded(true);
-        this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_pageChild_expandContractClass",this.titleBarActiveElement);
-        this.contractImage.src = apogeeapp.ui.getResourcePath(PageChildComponentDisplay.CONTRACT_BUTTON_PATH);
-        this.contractImage.onclick = () => this.setIsExpanded(false);
+//        this.expandImage = apogeeapp.ui.createElementWithClass("img","visiui_pageChild_expandContractClass",this.titleBarActiveElement);
+//        this.expandImage.src = apogeeapp.ui.getResourcePath(PageChildComponentDisplay.EXPAND_BUTTON_PATH);
+//        this.expandImage.onclick = () => this.setIsExpanded(true);
+//        this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_pageChild_expandContractClass",this.titleBarActiveElement);
+//        this.contractImage.src = apogeeapp.ui.getResourcePath(PageChildComponentDisplay.CONTRACT_BUTTON_PATH);
+//        this.contractImage.onclick = () => this.setIsExpanded(false);
         
         //------------------
         // menu
