@@ -72,12 +72,8 @@ const { Fragment } = require("prosemirror-model")
 
 import ApogeeComponentView from "/apogeeapp/app/editor/ApogeeComponentView.js";
 
-var ProseMirrorNode;
-function NodeLoad() {
-  const { Node } = require("prosemirror-model");
-  ProseMirrorNode = Node;
-}
-NodeLoad();
+//I wanted a different name than just "Node"
+const ProseMirrorNode = require("prosemirror-model").Node
 
 function saveState() {
   var stateJson = window.view.state.toJSON();
