@@ -3,7 +3,7 @@
 // Apogee Schema
 //===================================
 
-const { Schema } = require("prosemirror-model")
+import { Schema }  from "/prosemirror/lib/prosemirror-model/src/index.js";
 
 // :: Object
 // [Specs](#model.NodeSpec) for the nodes defined in this schema.

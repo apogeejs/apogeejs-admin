@@ -1,4 +1,4 @@
-const { setBlockType } = require("prosemirror-commands")
+import { setBlockType }  from "/prosemirror/lib/prosemirror-commands/src/commands.js";
 
 //This is a toggle button for blocks with either no attribute or fixed attributes
 

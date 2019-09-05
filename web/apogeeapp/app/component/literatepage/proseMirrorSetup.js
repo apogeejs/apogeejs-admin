@@ -10,7 +10,7 @@ const schema = createSchema();
 //create the toolbar
 //===========================
 
-const {Plugin} = require("prosemirror-state")
+import {Plugin}  from "/prosemirror/lib/prosemirror-state/src/index.js";
 
 import ApogeeToolbar from "/apogeeapp/app/editor/toolbar/ApogeeToolbar.js";
 import BlockToggleItem from "/apogeeapp/app/editor/toolbar/BlockToggleItem.js";
@@ -59,21 +59,15 @@ let stateCheckPlugin = new Plugin({
 // Create the editor
 //==============================
 
-const { EditorState } = require("prosemirror-state")
-const { DOMParser } = require("prosemirror-model")
-const { EditorView } = require("prosemirror-view")
-const { Step } = require("prosemirror-transform")
-const { undo, redo, history } = require("prosemirror-history")
-const { keymap } = require("prosemirror-keymap")
-const { baseKeymap } = require("prosemirror-commands")
-
-const { insertPoint } = require("prosemirror-transform")
-const { Fragment } = require("prosemirror-model")
+import { EditorState }  from "/prosemirror/lib/prosemirror-state/src/index.js";
+import { DOMParser, Fragment, Node as ProseMirrorNode }  from "/prosemirror/lib/prosemirror-model/src/index.js";
+import { EditorView }  from "/prosemirror/lib/prosemirror-view/src/index.js";
+import { Step, insertPoint }  from "/prosemirror/lib/prosemirror-transform/src/index.js";
+import { undo, redo, history }  from "/prosemirror/lib/prosemirror-history/src/history.js";
+import { keymap }  from "/prosemirror/lib/prosemirror-keymap/src/keymap.js";
+import { baseKeymap }  from "/prosemirror/lib/prosemirror-commands/src/commands.js";
 
 import ApogeeComponentView from "/apogeeapp/app/editor/ApogeeComponentView.js";
-
-//I wanted a different name than just "Node"
-const ProseMirrorNode = require("prosemirror-model").Node
 
 function saveState() {
   var stateJson = window.view.state.toJSON();

@@ -4,8 +4,6 @@
 // understand adding to/making the schema
 //============================================
 
-const { Plugin } = require("prosemirror-state")
-
 const MARK_INFO = {
   bold: true,
   italic: true,
