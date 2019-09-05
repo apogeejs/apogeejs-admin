@@ -5,7 +5,7 @@
 .atb_toggleButton {
     display: inline-block;
     border-right: 1px solid rgba(0, 0, 0, 0.2);
-    color: #888;
+    color: #444;
     line-height: 1;
     padding: 0 7px;
     margin: 1px;
@@ -18,6 +18,39 @@
 }
 .atb_toggleOnClass {
     background-color: lightblue;
+}
+.atb_radioButton {
+    display: inline-block;
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    color: #444;
+    line-height: 1;
+    padding: 0 7px;
+    margin: 1px;
+    cursor: pointer;
+    text-align: center;
+    min-width: 1.4em;
+}
+.atb_radioOffClass {
+    
+}
+.atb_radioOnClass {
+    background-color: lightblue;
+}
+.atb_actionButton {
+    display: inline-block;
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    line-height: 1;
+    padding: 0 7px;
+    margin: 1px;
+    cursor: pointer;
+    text-align: center;
+    min-width: 1.4em;
+}
+.atb_actionOffClass {
+    color: #aaa;
+}
+.atb_actionOnClass {
+    color: #444;
 }
 .atb_normal_style {
     font-size: 1em;
@@ -35,6 +68,22 @@
     font-weight: bold;
 }
 .atb_h4_style {
+    font-size: 1em;
+    font-weight: bold;
+}
+.atb_ul_style {
+    font-size: 1em;
+    font-weight: bold;
+}
+.atb_ol_style {
+    font-size: 1em;
+    font-weight: bold;
+}
+.atb_lindent_style {
+    font-size: 1em;
+    font-weight: bold;
+}
+.atb_lunindent_style {
     font-size: 1em;
     font-weight: bold;
 }

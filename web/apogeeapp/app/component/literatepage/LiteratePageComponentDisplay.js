@@ -267,23 +267,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
         }
         this.componentToolbarElement.appendChild(buttonElement);
     }
-    
-    
-//    //this tests if the "menu item" should be enabled
-//    selection(state)
-//        return insertPoint(state.doc, state.selection.from, testBlockSchema.nodes.apogeeComponent) != null
-//    }
-//        
-//    //this inserts the apogee component for the given name
-//    run(state, dispatch) {
-//
-//        var name = prompt("Component name?");
-//
-//        let {empty, $from, $to} = state.selection, content = Fragment.empty
-//        if (!empty && $from.sameParent($to) && $from.parent.inlineContent)
-//            content = $from.parent.content.cut($from.parentOffset, $to.parentOffset)
-//        dispatch(state.tr.replaceSelectionWith(testBlockSchema.nodes.apogeeComponent.create({"state":name})))
-//      }
+
 
     initEditor() {
         

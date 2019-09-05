@@ -13,16 +13,33 @@ const schema = createSchema();
 import {Plugin}  from "/prosemirror/lib/prosemirror-state/src/index.js";
 
 import ApogeeToolbar from "/apogeeapp/app/editor/toolbar/ApogeeToolbar.js";
-import BlockToggleItem from "/apogeeapp/app/editor/toolbar/BlockToggleItem.js";
+import BlockRadioItem from "/apogeeapp/app/editor/toolbar/BlockRadioItem.js";
 import MarkToggleItem from "/apogeeapp/app/editor/toolbar/MarkToggleItem.js";
 import MarkDropdownItem from "/apogeeapp/app/editor/toolbar/MarkDropdownItem.js";
+import ActionButton from "/apogeeapp/app/editor/toolbar/ActionButton.js";
+
+let paragraphCommand = (doc, ranges, dispatch)=> setTextBlock(doc, ranges, schema.nodes.paragraph, dispatch);
+let h1Command = (doc, ranges, dispatch)=> setTextBlock(doc, ranges, schema.nodes.heading1, dispatch);
+let h2Command = (doc, ranges, dispatch)=> setTextBlock(doc, ranges, schema.nodes.heading2, dispatch);
+let h3Command = (doc, ranges, dispatch)=> setTextBlock(doc, ranges, schema.nodes.heading3, dispatch);
+let h4Command = (doc, ranges, dispatch)=> setTextBlock(doc, ranges, schema.nodes.heading4, dispatch);
+let bulletCommand = (doc, ranges, dispatch)=> setListBlock(doc, ranges, schema.nodes.bulletList, dispatch);
+let numberedCommand = (doc, ranges, dispatch)=> setListBlock(doc, ranges, schema.nodes.numberedList, dispatch);
+let indentCommand = (doc, ranges, dispatch) => listIndent(doc, ranges, dispatch);
+let indentActiveFunction = null;
+let unindentCommand = (doc, ranges, dispatch) => listUnindent(doc, ranges, dispatch);
+let unindentActiveFunction = null;
 
 let toolbarItems = [
-  new BlockToggleItem(schema.nodes.paragraph, "Normal", "atb_normal_style", "Normal Paragraph Text", schema.nodes.paragraph),
-  new BlockToggleItem(schema.nodes.heading1, "H1", "atb_h1_style", "Heading 1", schema.nodes.paragraph),
-  new BlockToggleItem(schema.nodes.heading2, "H2", "atb_h2_style", "Heading 2", schema.nodes.paragraph),
-  new BlockToggleItem(schema.nodes.heading3, "H3", "atb_h3_style", "Heading 3", schema.nodes.paragraph),
-  new BlockToggleItem(schema.nodes.heading4, "H4", "atb_h4_style", "Heading 4", schema.nodes.paragraph),
+  new BlockRadioItem(schema.nodes.paragraph, paragraphCommand, "Normal", "atb_normal_style", "Normal Paragraph Text"),
+  new BlockRadioItem(schema.nodes.heading1, h1Command, "H1", "atb_h1_style", "Heading 1"),
+  new BlockRadioItem(schema.nodes.heading2, h2Command, "H2", "atb_h2_style", "Heading 2"),
+  new BlockRadioItem(schema.nodes.heading3, h3Command, "H3", "atb_h3_style", "Heading 3"),
+  new BlockRadioItem(schema.nodes.heading4, h4Command, "H4", "atb_h4_style", "Heading 4"),
+  new BlockRadioItem(schema.nodes.bulletList, bulletCommand, "Bullet", "atb_ul_style", "Bullet List"),
+  new BlockRadioItem(schema.nodes.numberedList, numberedCommand, "Numbered", "atb_ol_style", "Numbered List"),
+  new ActionButton(indentCommand, indentActiveFunction, "L+", "atb_lindent_style", "Indent List"),
+  new ActionButton(unindentCommand, unindentActiveFunction, "L-", "atb_lunindent_style", "Unindent List"),
   new MarkToggleItem(schema.marks.bold, null, "B", "atb_bold_style", "Bold"),
   new MarkToggleItem(schema.marks.italic, null, "I", "atb_italic_style", "Italic"),
   new MarkDropdownItem(schema.marks.fontfamily, "fontfamily", [["Sans-serif",false], ["Serif","Serif"], ["Monospace","Monospace"]]),

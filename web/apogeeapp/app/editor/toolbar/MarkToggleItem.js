@@ -14,7 +14,7 @@ export default class MarkToggleItem {
 
         this.element.onclick = () => {
             this.editorView.focus();
-            if (this.elementState) {
+            if (this.elementIsSelected) {
                 clearMark(this.markType, this.editorView.state, this.editorView.dispatch);
             }
             else {
@@ -22,7 +22,7 @@ export default class MarkToggleItem {
             }
         }
 
-        this._setElementState(false);
+        this._setElementIsSelected(false);
     }
 
     registerEditorView(editorView) {
@@ -41,17 +41,17 @@ export default class MarkToggleItem {
             case 0:
                 //no marks
                 //we should make ti so this doesn't happen!!!
-                this._setElementState(false);
+                this._setElementIsSelected(false);
                 break;
 
             case 1:
                 if (markValues[0] === false) {
                     //mark is off
-                    this._setElementState(false);
+                    this._setElementIsSelected(false);
                 }
                 else {
                     //mark is on
-                    this._setElementState(true);
+                    this._setElementIsSelected(true);
                 }
                 break;
 
@@ -67,10 +67,10 @@ export default class MarkToggleItem {
 
                 //set state
                 if ((hasMultivalue) || (hasFalse)) {
-                    this._setElementState(false);
+                    this._setElementIsSelected(false);
                 }
                 else {
-                    this._setElementState(true);
+                    this._setElementIsSelected(true);
                 }
         }
     }
@@ -80,10 +80,10 @@ export default class MarkToggleItem {
     //=========================
 
     /** This sets the toggle state and the display class. */
-    _setElementState(state) {
-        if (this.elementState != state) {
-            this.elementState = state;
-            if (state) {
+    _setElementIsSelected(isSelected) {
+        if (this.elementIsSelected != isSelected) {
+            this.elementIsSelected = isSelected;
+            if (isSelected) {
                 this.element.className = "atb_toggleButton atb_toggleOnClass " + this.styleClass;
             }
             else {

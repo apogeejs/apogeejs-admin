@@ -2,19 +2,24 @@
 // Utility Functions for toolbr mark and node commands
 //===============================
 
-export function markApplies(doc, ranges, type) {
-    for (let i = 0; i < ranges.length; i++) {
-        let { $from, $to } = ranges[i]
-        let can = $from.depth == 0 ? doc.type.allowsMarkType(type) : false
-        doc.nodesBetween($from.pos, $to.pos, node => {
-            if (can) return false
-            can = node.inlineContent && node.type.allowsMarkType(type)
-        })
-        if (can) return true
-    }
-    return false
+export function setTextBlock(doc, ranges, type, dispatch) {
+    //remove any list tags (ol, ul)
+    //convert all blocks to this block type (if not already this type)
 }
 
+export function setListBlock(doc, ranges, type, dispatch) {
+    //convert all blocks to list items (if not already this type)
+    //wrap the range of selections in a list of this type
+    //set any child lists to this type (if they are not already)
+}
+
+export function listIndent(doc, ranges, dispatch) {
+    alert("List indent not implmented!");
+}
+
+export function listUnindent(doc, ranges, dispatch) {
+    alert("List unindent not implmented!");
+}
 
 export function setMark(markType, attrs, state, dispatch) {
     let { empty, $cursor, ranges } = state.selection
@@ -55,4 +60,15 @@ export function clearMark(markType, state, dispatch) {
     return true
 }
 
-
+function markApplies(doc, ranges, type) {
+    for (let i = 0; i < ranges.length; i++) {
+        let { $from, $to } = ranges[i]
+        let can = $from.depth == 0 ? doc.type.allowsMarkType(type) : false
+        doc.nodesBetween($from.pos, $to.pos, node => {
+            if (can) return false
+            can = node.inlineContent && node.type.allowsMarkType(type)
+        })
+        if (can) return true
+    }
+    return false
+}

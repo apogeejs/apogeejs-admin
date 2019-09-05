@@ -10,7 +10,7 @@ import { Schema }  from "/prosemirror/lib/prosemirror-model/src/index.js";
 const nodes = {
   // :: NodeSpec The top level document node.
   doc: {
-    content: "block+"
+    content: "(block | list | apogeeComponent)"
   },
 
   // :: NodeSpec A plain paragraph textblock. Represented in the DOM
@@ -57,6 +57,28 @@ const nodes = {
     toDOM(node) { return ["h4", 0] }
   },
 
+  bulletList: {
+    content: "(listItem | list)+",
+    group: "list",
+    defining: true,
+    parseDOM: [{ tag: "ul" }],
+    toDOM(node) { return ["ul", 0] }
+  },
+
+  numberedList: {
+    content: "(listItem | list)+",
+    group: "list",
+    defining: true,
+    parseDOM: [{ tag: "ol" }],
+    toDOM(node) { return ["ol", 0] }
+  },
+
+  listItem: {
+    content: "inline*",
+    parseDOM: [{ tag: "li" }],
+    toDOM() { return ["li", 0] }
+  },
+
   // :: NodeSpec The text node.
   text: {
     group: "inline"
@@ -87,7 +109,6 @@ const nodes = {
   },
 
   apogeeComponent: {
-    group: "block",
     marks: "",
     atom: true,
     defining: true,
