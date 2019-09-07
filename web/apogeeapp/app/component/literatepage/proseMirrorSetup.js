@@ -116,6 +116,13 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
     }
   }
 
+//######################################################
+//PROBLEM - I am mapping in each step using the transformation
+//I should be mapping using the step (or always map from the initial from,to)
+//also I need to verify the steps don't do something funny to my location - like put it somewhere else
+//for example, adding text can move the position (and I can specify which way to move it, right or left of the next text)
+//######################################################
+
   //update the selection if we changed the doc
   if(startCutDone) {
     let newFrom = transform.mapping.map($from.pos);
@@ -135,7 +142,7 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
     //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
     for(let i = modPath.length-1; i > 0; i--) {
       let entry = modPath[i];
-      if(((entry.nodeType == "bulletList")||(entry.nodeType == "bulletList"))&&(entry.index > 0)) {
+      if(((entry.nodeType == "bulletList")||(entry.nodeType == "numberedList"))&&(entry.index > 0)) {
         //split here!
         //cut at start of text block
         let textBlockDepth = $to.depth; //I should probably validate the last element is a text block
@@ -177,21 +184,118 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   // lift out of any lists!
   //-------------------------------
 
-  //grab the worker node
-  //cycle through its direct children
-  //if a list is found, create a step to lift its content
-  //(we should do this is in a way that we can add tabs for child lists)
-  //update the positions
-  //if a list was found, do it again
+  {
+    //grab the worker node
+    let workerNode = $from.path[3]; //verify this!
+    let workerPosition = $from.path[5];
+
+    //cycle through its direct children
+    let listInfo;
+    let findChildList = (node, offset, index) => {
+      //exit is we already found a list
+      if(listInfo.contentSize !== undefined) return;
+
+      if((node.type == schema.nodes.bulletList)||(node.type == schema.nodes.numberedList)) {
+        //list found
+        //look for a list inside thisone
+        node.forEach(findChildList);
+        if(listInfo.contentSize !== undefined) {
+          //update the list info 
+          listInfo.offset += offset + 1;
+          listInfo.listGenerations += 1;
+        }
+        else {
+          //set list info for this list
+          listInfo.listGenerations = 1;
+          listInfo.offset = offset;
+          listInfo.contentSize = node.content.size;
+        }
+      }
+    }
+
+    //this will lift the list
+    let processListResult = () => {
+      if(listInfo.contentSize === undefined) return;
+
+      let listContentsFrom = workerPosition + listInfo.offset + 1 + 2; //why +2?
+      let listContentsTo = listContentsFrom + listInfo.contentSize - 3; //why -3? 
+      let listDepth = listInfo.listGenerations + 1;
+      let listChildrenDepth = listDepth+1;
+      let $listContentsFrom = transform.doc.resolve(listContentsFrom);
+      let $listContentsTo = transform.doc.resolve(listContentsTo);
+      let range = new NodeRange($listContentsFrom,$listContentsTo,listChildrenDepth-1); //why -1?
+      
+      //lift the children out of the list
+      transform = transform.lift(range, listDepth-1);  //why -1?
+
+      //udpate the working range variables
+      let newFrom = transform.mapping.map($from.pos);
+      let newTo = transform.mapping.map($to.pos);
+      $from = transform.doc.resolve(newFrom);
+      $to = transform.doc.resolve(newTo);
+      workerPosition = $from.path[5];
+      workerNode = $from.path[3];
+
+      //clear the list info for the next iterateion
+      listInfo = {};
+      doSearch = true;
+    }
+
+    //we will list one list per iteration, and keep doing this until there are no more lists
+    let doSearch = true;
+    for(listInfo = {}; doSearch; processListResult()) {
+      doSearch = false;
+      workerNode.forEach(findChildList);
+    } 
+  }
 
   //-------------------------------
   // convert the text blocks to the specified type
   // (there should only be text blocks)
   //-------------------------------
 
+  {
+    //grab the worker node
+    let workerNode = $from.path[3]; //verify this!
+    let workerPosition = $from.path[5];
+
+    let workerContentStart = workerPosition+1;
+    let workerContentEnd = workerContentStart + workerNode.content.size;
+
+    transform = transform.setBlockType(workerContentStart, workerContentEnd, nodeType);
+
+    //udpate the working range variables
+    let newFrom = transform.mapping.map($from.pos);
+    let newTo = transform.mapping.map($to.pos);
+    $from = transform.doc.resolve(newFrom);
+    $to = transform.doc.resolve(newTo);
+  }
+
   //------------------------------
   // lift out of the worker
   //------------------------------
+
+  {
+    //grab the worker node
+    let workerNode = $from.path[3]; //verify this!
+    let workerPosition = $from.path[5];
+    let workerDepth = 1;
+
+    let workerContentStart = workerPosition+1;
+    let workerContentEnd = workerContentStart + workerNode.content.size;
+    let $workerContentStart = transform.doc.resolve(workerContentStart);
+    let $workerContentEnd = transform.doc.resolve(workerContentEnd);
+    let range = new NodeRange($workerContentStart,$workerContentEnd,workerDepth); //why worker depth?
+      
+    //lift the children out of the list
+    transform = transform.lift(range, workerDepth-1);  //why -1?
+
+    //udpate the working range variables
+    let newFrom = transform.mapping.map($from.pos);
+    let newTo = transform.mapping.map($to.pos);
+    $from = transform.doc.resolve(newFrom);
+    $to = transform.doc.resolve(newTo);
+  }
 
   //------------------------------
   // execute the transform
@@ -200,12 +304,6 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   if((dispatch)&&(transform.docChanged)) {
     dispatch(transform);
   }
-
-
-
-
-  
-
   
 }
 
