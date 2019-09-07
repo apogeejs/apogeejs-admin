@@ -18,36 +18,244 @@ import MarkToggleItem from "/apogeeapp/app/editor/toolbar/MarkToggleItem.js";
 import MarkDropdownItem from "/apogeeapp/app/editor/toolbar/MarkDropdownItem.js";
 import ActionButton from "/apogeeapp/app/editor/toolbar/ActionButton.js";
 
-let paragraphCommand = (doc, ranges, dispatch)=> setTextBlock(doc, ranges, schema.nodes.paragraph, dispatch);
-let h1Command = (doc, ranges, dispatch)=> setTextBlock(doc, ranges, schema.nodes.heading1, dispatch);
-let h2Command = (doc, ranges, dispatch)=> setTextBlock(doc, ranges, schema.nodes.heading2, dispatch);
-let h3Command = (doc, ranges, dispatch)=> setTextBlock(doc, ranges, schema.nodes.heading3, dispatch);
-let h4Command = (doc, ranges, dispatch)=> setTextBlock(doc, ranges, schema.nodes.heading4, dispatch);
-let bulletCommand = (doc, ranges, dispatch)=> setListBlock(doc, ranges, schema.nodes.bulletList, dispatch);
-let numberedCommand = (doc, ranges, dispatch)=> setListBlock(doc, ranges, schema.nodes.numberedList, dispatch);
-let indentCommand = (doc, ranges, dispatch) => listIndent(doc, ranges, dispatch);
+import {setTextBlock,setListBlock,listIndent,listUnindent} from "/apogeeapp/app/editor/toolbar/menuUtils.js";
+
+let paragraphCommand = (state, dispatch)=> setTextBlock(state, schema.nodes.paragraph, dispatch);
+let h1Command = (state, dispatch)=> setTextBlock(state, schema.nodes.heading1, dispatch);
+let h2Command = (state, dispatch)=> setTextBlock(state, schema.nodes.heading2, dispatch);
+let h3Command = (state, dispatch)=> setTextBlock(state, schema.nodes.heading3, dispatch);
+let h4Command = (state, dispatch)=> setTextBlock(state, schema.nodes.heading4, dispatch);
+let bulletCommand = (state, dispatch)=> setListBlock(state, schema.nodes.bulletList, dispatch);
+let numberedCommand = (state, dispatch)=> setListBlock(state, schema.nodes.numberedList, dispatch);
+let indentCommand = (state, dispatch) => listIndent(state, dispatch);
 let indentActiveFunction = null;
-let unindentCommand = (doc, ranges, dispatch) => listUnindent(doc, ranges, dispatch);
+let unindentCommand = (state, dispatch) => listUnindent(state, dispatch);
 let unindentActiveFunction = null;
 
+//=====================================================================================================
+//start experimental commands
+import { setBlockType, lift, wrapIn, joinUp, joinDown  }  from "/prosemirror/lib/prosemirror-commands/src/commands.js";
+import { NodeRange } from "/prosemirror/lib/prosemirror-model/src/index.js";
+
+let wrapInWorkerCommand = wrapIn(schema.nodes.workerParent);
+let liftFromWorkerCommand = (state,dispatch) => liftFromWorker(state,dispatch);
+let liftLeastCommand = (state,dispatch) => lift(state,dispatch);
+let wrapInBulletCommand = wrapIn(schema.nodes.bulletList);
+let setAsListItemCommand = setBlockType(schema.nodes.listItem);
+let setAsParagraphCommand = setBlockType(schema.nodes.paragraph);
+let setAsH1Command = setBlockType(schema.nodes.heading1);
+let setAsH2Command = setBlockType(schema.nodes.heading2);
+let splitNonTextTop = (state,dispatch) => splitParent(true, state, dispatch);
+let splitNonTextBottom = (state,dispatch) => splitParent(false, state, dispatch);
+let joinUpCommand = (state,dispatch) => joinUp(state, dispatch);
+let joinDownCommand = (state,dispatch) => joinDown(state, dispatch);
+
+
+//rewrite of list to always lift around the range at tdepth 1 - which should be the workerParent
+function liftFromWorker(state, dispatch) {
+  let {$from, $to} = state.selection;
+  let depth = 1;
+  let target = 0;
+  let range = new NodeRange($from,$to,depth);
+  if (dispatch) dispatch(state.tr.lift(range, target).scrollIntoView())
+  return true
+}
+
+//This will split any parent nodes not inlcuding the document, assuming the selection is in a text block
+function splitParent(fromTop, state, dispatch) {
+  let $pos = fromTop ? state.selection.$from : state.selection.$to;
+  //here the parent variable represents the text block. We will split the ancestors above that (not including the doc)
+  let parent = $pos.parent;
+  if(parent.isTextblock) {
+    let parentDepth = $pos.depth;
+    let grandparentDepth = parentDepth-1;
+    let grandparentPos = fromTop ? $pos.start(parentDepth) - 1 : $pos.end(parentDepth) + 1;
+    if(grandparentDepth > 0) {
+      if(dispatch)  dispatch(state.tr.split(grandparentPos,grandparentDepth).scrollIntoView());
+      return true;
+    }
+  }
+  //fi we get here we did not split anything
+  return false;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+import { findWrapping } from "/prosemirror/lib/prosemirror-transform/src/index.js";
+
+let convertToParagraphCommand = (state,dispatch) => convertToNonListBlockType(schema.nodes.paragraph, state, dispatch);
+
+function convertToNonListBlockType(nodeType,state,dispatch) {
+  //this will be our transform
+  let transform = state.tr;
+
+  //this is our range to convert
+  let {$from, $to} = state.selection;
+
+  //-----------------------------------
+  //split any parens at start if needed
+  //-----------------------------------
+  let startCutDone = false;
+  {
+    let modPath = pathToModPath($from.path);
+    console.log("From Path: " + JSON.stringify(modPath));
+
+    //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
+    for(let i = modPath.length-1; i > 0; i--) {
+      let entry = modPath[i];
+      if(((entry.nodeType == "bulletList")||(entry.nodeType == "bulletList"))&&(entry.index > 0)) {
+        //split here!
+        //cut at start of text block
+        let textBlockDepth = $from.depth; //I should probably validate the last element is a text block
+        let cutDepth = i;
+        let cutPosition = $from.start(textBlockDepth) - 1;
+        transform = transform.split(cutPosition,cutDepth);
+        startCutDone = true; //I should make sure this succeeds, I think
+        break;
+      }
+    }
+  }
+
+  //update the selection if we changed the doc
+  if(startCutDone) {
+    let newFrom = transform.mapping.map($from.pos);
+    let newTo = transform.mapping.map($to.pos);
+    $from = transform.doc.resolve(newFrom);
+    $to = transform.doc.resolve(newTo);
+  }
+
+  //---------------------------
+  //split at the end if needed
+  //---------------------------
+  let endCutDone = false;
+  {
+    let modPath = pathToModPath($to.path);
+    console.log("To Path: " + JSON.stringify(modPath));
+
+    //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
+    for(let i = modPath.length-1; i > 0; i--) {
+      let entry = modPath[i];
+      if(((entry.nodeType == "bulletList")||(entry.nodeType == "bulletList"))&&(entry.index > 0)) {
+        //split here!
+        //cut at start of text block
+        let textBlockDepth = $to.depth; //I should probably validate the last element is a text block
+        let cutDepth = i;
+        let cutPosition = $to.end(textBlockDepth) + 1;
+        transform = transform.split(cutPosition,cutDepth);
+        endCutDone = true;
+        break;
+      }
+    }
+  }
+
+  //update the selection if we changed the doc
+  if(endCutDone) {
+    let newFrom = transform.mapping.map($from.pos);
+    let newTo = transform.mapping.map($to.pos);
+    $from = transform.doc.resolve(newFrom);
+    $to = transform.doc.resolve(newTo);
+  }
+
+  //------------------------------
+  // Add the worker parent
+  //------------------------------
+
+  {
+    //depth is set to 0
+    let depth = 0;
+    let range = new NodeRange($from,$to,depth), wrapping = range && findWrapping(range, schema.nodes.workerParent);
+    if (!wrapping) throw new Error("Wrapping not found!"); //need to work out error handling
+    transform = transform.wrap(range, wrapping)
+
+    let newFrom = transform.mapping.map($from.pos);
+    let newTo = transform.mapping.map($to.pos);
+    $from = transform.doc.resolve(newFrom);
+    $to = transform.doc.resolve(newTo);
+  }
+
+  //-------------------------------
+  // lift out of any lists!
+  //-------------------------------
+
+  //grab the worker node
+  //cycle through its direct children
+  //if a list is found, create a step to lift its content
+  //(we should do this is in a way that we can add tabs for child lists)
+  //update the positions
+  //if a list was found, do it again
+
+  //-------------------------------
+  // convert the text blocks to the specified type
+  // (there should only be text blocks)
+  //-------------------------------
+
+  //------------------------------
+  // lift out of the worker
+  //------------------------------
+
+  //------------------------------
+  // execute the transform
+  //------------------------------
+
+  if((dispatch)&&(transform.docChanged)) {
+    dispatch(transform);
+  }
+
+
+
+
+  
+
+  
+}
+
+function pathToModPath(path) {
+  let modPath = [];
+  for(let i = 0; i < path.length-2; i+= 3) {
+    let entry = {};
+    entry.nodeType = path[i].type.name;
+    entry.index = path[i+1];
+    entry.startPos = path[i+2];
+    modPath.push(entry);
+  }
+  return modPath;
+}
+
+
+//end experimental commands
+//=================================================================
+
 let toolbarItems = [
-  new BlockRadioItem(schema.nodes.paragraph, paragraphCommand, "Normal", "atb_normal_style", "Normal Paragraph Text"),
-  new BlockRadioItem(schema.nodes.heading1, h1Command, "H1", "atb_h1_style", "Heading 1"),
-  new BlockRadioItem(schema.nodes.heading2, h2Command, "H2", "atb_h2_style", "Heading 2"),
-  new BlockRadioItem(schema.nodes.heading3, h3Command, "H3", "atb_h3_style", "Heading 3"),
-  new BlockRadioItem(schema.nodes.heading4, h4Command, "H4", "atb_h4_style", "Heading 4"),
-  new BlockRadioItem(schema.nodes.bulletList, bulletCommand, "Bullet", "atb_ul_style", "Bullet List"),
-  new BlockRadioItem(schema.nodes.numberedList, numberedCommand, "Numbered", "atb_ol_style", "Numbered List"),
-  new ActionButton(indentCommand, indentActiveFunction, "L+", "atb_lindent_style", "Indent List"),
-  new ActionButton(unindentCommand, unindentActiveFunction, "L-", "atb_lunindent_style", "Unindent List"),
-  new MarkToggleItem(schema.marks.bold, null, "B", "atb_bold_style", "Bold"),
-  new MarkToggleItem(schema.marks.italic, null, "I", "atb_italic_style", "Italic"),
-  new MarkDropdownItem(schema.marks.fontfamily, "fontfamily", [["Sans-serif",false], ["Serif","Serif"], ["Monospace","Monospace"]]),
-  new MarkDropdownItem(schema.marks.fontsize, "fontsize", [["75%",".75em"], ["100%",false], ["150%","1.5em"], ["200%","2em"]]),
-  new MarkDropdownItem(schema.marks.textcolor, "color", [["Black",false],["Blue","blue"],["Red","red"],["Green","green"],["Yellow","yellow"],["Dark Gray","#202020"],
-    ["Gray","#505050"],["light gray","#808080"]]),
-  new MarkDropdownItem(schema.marks.highlight, "color", [["None",false], ["Yellow","yellow"], ["Cyan","cyan"], ["Pink","pink"], ["Green","green"],
-    ['Orange',"orange"], ["Red","red"], ["Gray","#a0a0a0"]])
+  new ActionButton(convertToParagraphCommand,null,"Convert to Paragraph","atb_bold_style","temp"),
+  //new BlockRadioItem(schema.nodes.paragraph, paragraphCommand, "Normal", "atb_normal_style", "Normal Paragraph Text"),
+  //new BlockRadioItem(schema.nodes.heading1, h1Command, "H1", "atb_h1_style", "Heading 1"),
+  //new BlockRadioItem(schema.nodes.heading2, h2Command, "H2", "atb_h2_style", "Heading 2"),
+  //new BlockRadioItem(schema.nodes.heading3, h3Command, "H3", "atb_h3_style", "Heading 3"),
+  //new BlockRadioItem(schema.nodes.heading4, h4Command, "H4", "atb_h4_style", "Heading 4"),
+  //new BlockRadioItem(schema.nodes.bulletList, bulletCommand, "Bullet", "atb_ul_style", "Bullet List"),
+  //new BlockRadioItem(schema.nodes.numberedList, numberedCommand, "Numbered", "atb_ol_style", "Numbered List"),
+  //new ActionButton(indentCommand, indentActiveFunction, "L+", "atb_lindent_style", "Indent List"),
+  //new ActionButton(unindentCommand, unindentActiveFunction, "L-", "atb_lunindent_style", "Unindent List"),
+  //new MarkToggleItem(schema.marks.bold, null, "B", "atb_bold_style", "Bold"),
+  //new MarkToggleItem(schema.marks.italic, null, "I", "atb_italic_style", "Italic"),
+  //new MarkDropdownItem(schema.marks.fontfamily, "fontfamily", [["Sans-serif",false], ["Serif","Serif"], ["Monospace","Monospace"]]),
+  //new MarkDropdownItem(schema.marks.fontsize, "fontsize", [["75%",".75em"], ["100%",false], ["150%","1.5em"], ["200%","2em"]]),
+  //new MarkDropdownItem(schema.marks.textcolor, "color", [["Black",false],["Blue","blue"],["Red","red"],["Green","green"],["Yellow","yellow"],["Dark Gray","#202020"],
+  //  ["Gray","#505050"],["light gray","#808080"]]),
+  //new MarkDropdownItem(schema.marks.highlight, "color", [["None",false], ["Yellow","yellow"], ["Cyan","cyan"], ["Pink","pink"], ["Green","green"],
+  //  ['Orange',"orange"], ["Red","red"], ["Gray","#a0a0a0"]]),
+  new ActionButton(wrapInWorkerCommand,null,"Wrap In Worker","atb_italic_style","temp"),
+  new ActionButton(liftFromWorkerCommand,null,"Lift from Worker","atb_italic_style","temp"),
+  new ActionButton(liftLeastCommand,null,"Lift least","atb_italic_style","temp"),
+  new ActionButton(splitNonTextTop,null,"split top","atb_italic_style","temp"),
+  new ActionButton(splitNonTextBottom,null,"split bottom","atb_italic_style","temp"),
+  new ActionButton(joinUpCommand,null,"join up","atb_italic_style","temp"),
+  new ActionButton(joinDownCommand,null,"join down","atb_italic_style","temp"),
+  new ActionButton(wrapInBulletCommand,null,"Wrap In Bullet","atb_italic_style","temp"),
+  new ActionButton(setAsListItemCommand,null,"set as List Item","atb_italic_style","temp"),
+  new ActionButton(setAsParagraphCommand,null,"set as Para","atb_italic_style","temp"),
+  new ActionButton(setAsH1Command,null,"set as H1","atb_italic_style","temp"),
+  new ActionButton(setAsH2Command,null,"set as H2","atb_italic_style","temp"),
 ];
 
 let toolbarPlugin = new Plugin({
@@ -57,6 +265,7 @@ let toolbarPlugin = new Plugin({
     return toolbarView;
   }
 })
+
 
 //===========================
 //state debug plugin

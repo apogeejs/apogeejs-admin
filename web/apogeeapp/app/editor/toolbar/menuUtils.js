@@ -2,22 +2,35 @@
 // Utility Functions for toolbr mark and node commands
 //===============================
 
-export function setTextBlock(doc, ranges, type, dispatch) {
+export function setTextBlock(state, type, dispatch) {
+    let {$from, $to} = state.selection;
+
+    let range = $from.blockRange($to);
+
+    console.log("out");
     //remove any list tags (ol, ul)
     //convert all blocks to this block type (if not already this type)
+
+    //setBlockType(nodeType, attrs)
+    //wrapIn(nodeType, attrs)
+    //lift(state, dispatch)
+
+    //wrap in a workerParent block
+    //go through text blocks
+    //if it is a list item, i
 }
 
-export function setListBlock(doc, ranges, type, dispatch) {
+export function setListBlock(state, type, dispatch) {
     //convert all blocks to list items (if not already this type)
     //wrap the range of selections in a list of this type
     //set any child lists to this type (if they are not already)
 }
 
-export function listIndent(doc, ranges, dispatch) {
+export function listIndent(state, dispatch) {
     alert("List indent not implmented!");
 }
 
-export function listUnindent(doc, ranges, dispatch) {
+export function listUnindent(state, dispatch) {
     alert("List unindent not implmented!");
 }
 

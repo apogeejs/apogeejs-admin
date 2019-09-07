@@ -12,7 +12,7 @@ export default class ActionButton {
 
         this.element.onclick = () => {
             this.editorView.focus();
-            if (!this.isActive) {
+            if (this.elementIsActive) {
                 this.commandFunction(this.editorView.state, this.editorView.dispatch);
             }
         }

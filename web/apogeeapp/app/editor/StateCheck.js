@@ -42,7 +42,11 @@ export default class StateCheck {
   
       //selection
       for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
-        let { $from, $to } = ranges[rangeIndex]
+        let { $from, $to } = ranges[rangeIndex];
+
+        console.log("Selection range " + rangeIndex + " start path: " + this._getNodePathString($from.path));
+        console.log("Selection range " + rangeIndex + " end path: " + this._getNodePathString($to.path));
+
         doc.nodesBetween($from.pos, $to.pos, node => {
   
           //get the base node and mark info
@@ -60,5 +64,18 @@ export default class StateCheck {
       console.log("Marks: " + JSON.stringify(markTypes));
   
       console.log("================");
+    }
+
+    _getNodePathString(path) {
+      let simplifiedPath = path.map( element => {
+        if(typeof element == "object") {
+          return element.type.name;
+        }
+        else {
+          return element;
+        }
+      })
+
+      return JSON.stringify(simplifiedPath);
     }
   }

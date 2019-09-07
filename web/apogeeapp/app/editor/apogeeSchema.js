@@ -10,7 +10,7 @@ import { Schema }  from "/prosemirror/lib/prosemirror-model/src/index.js";
 const nodes = {
   // :: NodeSpec The top level document node.
   doc: {
-    content: "(block | list | apogeeComponent)"
+    content: "(block | list | workerParent | apogeeComponent)+"
   },
 
   // :: NodeSpec A plain paragraph textblock. Represented in the DOM
@@ -77,6 +77,14 @@ const nodes = {
     content: "inline*",
     parseDOM: [{ tag: "li" }],
     toDOM() { return ["li", 0] }
+  },
+
+  //this is used only to legally transition between states.
+  //there is probably a better way of doing this...
+  workerParent: {
+    content: "(block | listItem | list | apogeeComponent )+",
+    parseDOM: [{ tag: "w-p" }],
+    toDOM(node) { return ["w-p", 0] }
   },
 
   // :: NodeSpec The text node.
