@@ -81,9 +81,23 @@ function splitParent(fromTop, state, dispatch) {
 
 ///////////////////////////////////////////////////////////////////////
 
+//PROBLEMS
+// FROM LIST
+// - don't add tab at the start of lines from child lists
+// TO LIST
+// - don't merge at start and end
+// - don't convert included lists to be the specified type
+// - don't handle tabs at the start of non-list items, beign converted to child lists
+
 import { findWrapping } from "/prosemirror/lib/prosemirror-transform/src/index.js";
 
 let convertToParagraphCommand = (state,dispatch) => convertToNonListBlockType(schema.nodes.paragraph, state, dispatch);
+let convertToH1Command = (state,dispatch) => convertToNonListBlockType(schema.nodes.heading1, state, dispatch);
+let convertToH2Command = (state,dispatch) => convertToNonListBlockType(schema.nodes.heading2, state, dispatch);
+let convertToH3Command = (state,dispatch) => convertToNonListBlockType(schema.nodes.heading3, state, dispatch);
+let convertToH4Command = (state,dispatch) => convertToNonListBlockType(schema.nodes.heading4, state, dispatch);
+let convertToBulletCommand = (state,dispatch) => convertToListBlockType(schema.nodes.bulletList, state, dispatch);
+let convertToNumberedCommand = (state,dispatch) => convertToListBlockType(schema.nodes.numberedList, state, dispatch);
 
 function convertToNonListBlockType(nodeType,state,dispatch) {
   //this will be our transform
@@ -92,62 +106,22 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   //this is our range to convert
   let {$from, $to} = state.selection;
 
-  //-----------------------------------
-  //split any parens at start if needed
-  //-----------------------------------
-  let startCutDone = false;
-  {
-    let modPath = pathToModPath($from.path);
-    console.log("From Path: " + JSON.stringify(modPath));
-
-    //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
-    for(let i = modPath.length-1; i > 0; i--) {
-      let entry = modPath[i];
-      if(((entry.nodeType == "bulletList")||(entry.nodeType == "bulletList"))&&(entry.index > 0)) {
-        //split here!
-        //cut at start of text block
-        let textBlockDepth = $from.depth; //I should probably validate the last element is a text block
-        let cutDepth = i;
-        let cutPosition = $from.start(textBlockDepth) - 1;
-        transform = transform.split(cutPosition,cutDepth);
-        startCutDone = true; //I should make sure this succeeds, I think
-        break;
-      }
-    }
-  }
-
-//######################################################
-//PROBLEM - I am mapping in each step using the transformation
-//I should be mapping using the step (or always map from the initial from,to)
-//also I need to verify the steps don't do something funny to my location - like put it somewhere else
-//for example, adding text can move the position (and I can specify which way to move it, right or left of the next text)
-//######################################################
-
-  //update the selection if we changed the doc
-  if(startCutDone) {
-    let newFrom = transform.mapping.map($from.pos);
-    let newTo = transform.mapping.map($to.pos);
-    $from = transform.doc.resolve(newFrom);
-    $to = transform.doc.resolve(newTo);
-  }
-
   //---------------------------
-  //split at the end if needed
+  //split at the end if needed (we'll do end first so we can do start with updating the $from variable)
   //---------------------------
   let endCutDone = false;
   {
     let modPath = pathToModPath($to.path);
-    console.log("To Path: " + JSON.stringify(modPath));
 
     //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
     for(let i = modPath.length-1; i > 0; i--) {
       let entry = modPath[i];
-      if(((entry.nodeType == "bulletList")||(entry.nodeType == "numberedList"))&&(entry.index > 0)) {
+      if(((entry.node.type == schema.nodes.bulletList)||(entry.node.type == schema.nodes.numberedList))&&(entry.index < entry.node.childCount-1)) {
         //split here!
-        //cut at start of text block
-        let textBlockDepth = $to.depth; //I should probably validate the last element is a text block
+        //cut at the end of the child block
+        let childBlockDepth = i+1;
         let cutDepth = i;
-        let cutPosition = $to.end(textBlockDepth) + 1;
+        let cutPosition = $to.end(childBlockDepth) + 1;
         transform = transform.split(cutPosition,cutDepth);
         endCutDone = true;
         break;
@@ -155,8 +129,31 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
     }
   }
 
-  //update the selection if we changed the doc
-  if(endCutDone) {
+  //-----------------------------------
+  //split any parens at start if needed (from should not have been updated above)
+  //-----------------------------------
+  let startCutDone = false;
+  {
+    let modPath = pathToModPath($from.path);
+
+    //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
+    for(let i = modPath.length-1; i > 0; i--) {
+      let entry = modPath[i];
+      if(((entry.node.type == schema.nodes.bulletList)||(entry.node.type == schema.nodes.numberedList))&&(entry.index > 0)) {
+        //split here!
+        //cut at start of the child block
+        let childBlockDepth = i+1; 
+        let cutDepth = i;
+        let cutPosition = $from.start(childBlockDepth) - 1;
+        transform = transform.split(cutPosition,cutDepth); //cut position off by 1 when at the start of a child list, but need to cut is parent
+        startCutDone = true; //I should make sure this succeeds, I think
+        break;
+      }
+    }
+  }
+
+  //update if we did any transform
+  if((startCutDone)||(endCutDone)) {
     let newFrom = transform.mapping.map($from.pos);
     let newTo = transform.mapping.map($to.pos);
     $from = transform.doc.resolve(newFrom);
@@ -173,11 +170,6 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
     let range = new NodeRange($from,$to,depth), wrapping = range && findWrapping(range, schema.nodes.workerParent);
     if (!wrapping) throw new Error("Wrapping not found!"); //need to work out error handling
     transform = transform.wrap(range, wrapping)
-
-    let newFrom = transform.mapping.map($from.pos);
-    let newTo = transform.mapping.map($to.pos);
-    $from = transform.doc.resolve(newFrom);
-    $to = transform.doc.resolve(newTo);
   }
 
   //-------------------------------
@@ -185,10 +177,6 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   //-------------------------------
 
   {
-    //grab the worker node
-    let workerNode = $from.path[3]; //verify this!
-    let workerPosition = $from.path[5];
-
     //cycle through its direct children
     let listInfo;
     let findChildList = (node, offset, index) => {
@@ -214,11 +202,11 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
     }
 
     //this will lift the list
-    let processListResult = () => {
+    let processListResult = (workerPosition) => {
       if(listInfo.contentSize === undefined) return;
 
-      let listContentsFrom = workerPosition + listInfo.offset + 1 + 2; //why +2?
-      let listContentsTo = listContentsFrom + listInfo.contentSize - 3; //why -3? 
+      let listContentsFrom = workerPosition + listInfo.offset + 1;
+      let listContentsTo = listContentsFrom + listInfo.contentSize; 
       let listDepth = listInfo.listGenerations + 1;
       let listChildrenDepth = listDepth+1;
       let $listContentsFrom = transform.doc.resolve(listContentsFrom);
@@ -228,23 +216,23 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
       //lift the children out of the list
       transform = transform.lift(range, listDepth-1);  //why -1?
 
-      //udpate the working range variables
-      let newFrom = transform.mapping.map($from.pos);
-      let newTo = transform.mapping.map($to.pos);
-      $from = transform.doc.resolve(newFrom);
-      $to = transform.doc.resolve(newTo);
-      workerPosition = $from.path[5];
-      workerNode = $from.path[3];
-
-      //clear the list info for the next iterateion
-      listInfo = {};
+      //enable another search
       doSearch = true;
     }
 
     //we will list one list per iteration, and keep doing this until there are no more lists
     let doSearch = true;
-    for(listInfo = {}; doSearch; processListResult()) {
+    let workerPosition;
+    for( ; doSearch; processListResult(workerPosition)) {
       doSearch = false;
+      listInfo = {};
+      //grab the worker node
+      let workerNodeInfos = getWorkerNodeInfo(transform.doc);
+      if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
+
+      let workerNodeInfo = workerNodeInfos[0];
+      let workerNode = workerNodeInfo.node;
+      workerPosition = workerNodeInfo.childPosition;
       workerNode.forEach(findChildList);
     } 
   }
@@ -255,20 +243,15 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   //-------------------------------
 
   {
-    //grab the worker node
-    let workerNode = $from.path[3]; //verify this!
-    let workerPosition = $from.path[5];
+    //grab the worker node info
+    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
+    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
 
-    let workerContentStart = workerPosition+1;
-    let workerContentEnd = workerContentStart + workerNode.content.size;
+    let workerNodeInfo = workerNodeInfos[0];
+    let workerContentStart = workerNodeInfo.childPosition;
+    let workerContentEnd = workerContentStart + workerNodeInfo.childLength;
 
     transform = transform.setBlockType(workerContentStart, workerContentEnd, nodeType);
-
-    //udpate the working range variables
-    let newFrom = transform.mapping.map($from.pos);
-    let newTo = transform.mapping.map($to.pos);
-    $from = transform.doc.resolve(newFrom);
-    $to = transform.doc.resolve(newTo);
   }
 
   //------------------------------
@@ -276,25 +259,21 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   //------------------------------
 
   {
-    //grab the worker node
-    let workerNode = $from.path[3]; //verify this!
-    let workerPosition = $from.path[5];
+    //grab the worker node info
+    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
+    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
+
+    let workerNodeInfo = workerNodeInfos[0];
+    let workerContentStart = workerNodeInfo.childPosition;
+    let workerContentEnd = workerContentStart + workerNodeInfo.childLength;
     let workerDepth = 1;
 
-    let workerContentStart = workerPosition+1;
-    let workerContentEnd = workerContentStart + workerNode.content.size;
     let $workerContentStart = transform.doc.resolve(workerContentStart);
     let $workerContentEnd = transform.doc.resolve(workerContentEnd);
     let range = new NodeRange($workerContentStart,$workerContentEnd,workerDepth); //why worker depth?
       
     //lift the children out of the list
     transform = transform.lift(range, workerDepth-1);  //why -1?
-
-    //udpate the working range variables
-    let newFrom = transform.mapping.map($from.pos);
-    let newTo = transform.mapping.map($to.pos);
-    $from = transform.doc.resolve(newFrom);
-    $to = transform.doc.resolve(newTo);
   }
 
   //------------------------------
@@ -307,11 +286,201 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   
 }
 
+function convertToListBlockType(nodeType,state,dispatch) {
+  //this will be our transform
+  let transform = state.tr;
+
+  //this is our range to convert
+  let {$from, $to} = state.selection;
+
+  //---------------------------
+  //split at the end if needed (we'll do end first so we can do start with updating the $from variable)
+  //---------------------------
+  {
+    let modPath = pathToModPath($to.path);
+
+    //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
+    for(let i = modPath.length-1; i > 0; i--) {
+      let entry = modPath[i];
+      if(((entry.node.type == schema.nodes.bulletList)||(entry.node.type == schema.nodes.numberedList))&&(entry.index < entry.node.childCount-1)) {
+        //split here!
+        //cut at the end of the child block
+        let childBlockDepth = i+1;
+        let cutDepth = i;
+        let cutPosition = $to.end(childBlockDepth) + 1;
+        transform = transform.split(cutPosition,cutDepth);
+        break;
+      }
+    }
+  }
+
+  //-----------------------------------
+  //split any parens at start if needed (from should not have been updated above)
+  //-----------------------------------
+  {
+    let modPath = pathToModPath($from.path);
+
+    //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
+    for(let i = modPath.length-1; i > 0; i--) {
+      let entry = modPath[i];
+      if(((entry.node.type == schema.nodes.bulletList)||(entry.node.type == schema.nodes.numberedList))&&(entry.index > 0)) {
+        //split here!
+        //cut at start of the child block
+        let childBlockDepth = i+1; 
+        let cutDepth = i;
+        let cutPosition = $from.start(childBlockDepth) - 1;
+        transform = transform.split(cutPosition,cutDepth); //cut position off by 1 when at the start of a child list, but need to cut is parent
+        break;
+      }
+    }
+  }
+
+  //update if we did any transform
+  if(transform.docChanged) {
+    let newFrom = transform.mapping.map($from.pos);
+    let newTo = transform.mapping.map($to.pos);
+    $from = transform.doc.resolve(newFrom);
+    $to = transform.doc.resolve(newTo);
+  }
+
+  //------------------------------
+  // Add the worker parent
+  //------------------------------
+
+  {
+    //depth is set to 0
+    let depth = 0;
+    let range = new NodeRange($from,$to,depth), wrapping = range && findWrapping(range, schema.nodes.workerParent);
+    if (!wrapping) throw new Error("Wrapping not found!"); //need to work out error handling
+    transform = transform.wrap(range, wrapping)
+  }
+
+  //-------------------------------
+  // lift out of any lists at the ROOT level (children will remain children - but we must reset their type!)
+  //-------------------------------
+
+  //FIX - set the proper child list type
+
+  {
+    //cycle through its direct children
+    let listInfos = [];
+    let findChildList = (node, offset, index) => {
+      if((node.type == schema.nodes.bulletList)||(node.type == schema.nodes.numberedList)) {
+        //list found at top level (here we are not doing children)
+        let listInfo = {};
+        listInfo.node = node;
+        listInfo.offset = offset;
+        listInfo.contentSize = node.content.size;
+        listInfos.push(listInfo);
+      }
+    }
+
+    //get the top level lists
+    //grab the worker node
+    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
+    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
+
+    let workerNodeInfo = workerNodeInfos[0];
+    let workerNode = workerNodeInfo.node;
+    let workerPosition = workerNodeInfo.childPosition;
+    workerNode.forEach(findChildList);
+
+    //go through top level ists in reverse order and lift out of them (so we don't have to worry about position changes here)
+    for(let i = listInfos.length - 1; i >= 0; i--) {
+      let listInfo = listInfos[i];
+      let contentStartPosition = workerPosition + listInfo.offset + 1;
+      let contentEndPosition = contentStartPosition + listInfo.contentSize;
+      let depth = 2; //this is just inside the worker
+
+      let $contentStartPosition = transform.doc.resolve(contentStartPosition);
+      let $contentEndPosition = transform.doc.resolve(contentEndPosition);
+      let range = new NodeRange($contentStartPosition,$contentEndPosition,depth);
+      
+      //lift the children out of the list
+      transform = transform.lift(range, depth-1);
+    }
+
+  }
+
+
+  //this should replace the nodes at positions startM-endM with a noew of type "type" 
+  //tranform.step(new ReplaceAroundStep(startM, endM, startM + 1, endM - 1, new Slice(Fragment.from(type.create(attrs, null, node.marks)), 0, 0), 1, true))
+
+  //-------------------------------
+  // convert the text blocks to list items
+  //-------------------------------
+
+  {
+    //grab the worker node info
+    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
+    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
+
+    let workerNodeInfo = workerNodeInfos[0];
+    let workerContentStart = workerNodeInfo.childPosition;
+    let workerContentEnd = workerContentStart + workerNodeInfo.childLength;
+
+    transform = transform.setBlockType(workerContentStart, workerContentEnd, schema.nodes.listItem);
+  }
+
+  //------------------------------
+  // warp all the items in a list
+  //------------------------------
+  {
+    //grab the worker node info
+    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
+    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
+
+    let workerNodeInfo = workerNodeInfos[0];
+    let workerContentStart = workerNodeInfo.childPosition;
+    let workerContentEnd = workerContentStart + workerNodeInfo.childLength;
+    let $workerContentStart = transform.doc.resolve(workerContentStart);
+    let $workerContentEnd = transform.doc.resolve(workerContentEnd);
+
+    //depth is set to 1
+    let depth = 1;
+    let range = new NodeRange($workerContentStart,$workerContentEnd,depth), wrapping = range && findWrapping(range,nodeType);
+    if (!wrapping) throw new Error("Wrapping not found!"); //need to work out error handling
+    transform = transform.wrap(range, wrapping)
+  }
+
+  //------------------------------
+  // lift out of the worker
+  //------------------------------
+
+  {
+    //grab the worker node info
+    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
+    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
+
+    let workerNodeInfo = workerNodeInfos[0];
+    let workerContentStart = workerNodeInfo.childPosition;
+    let workerContentEnd = workerContentStart + workerNodeInfo.childLength;
+    let workerDepth = 1;
+
+    let $workerContentStart = transform.doc.resolve(workerContentStart);
+    let $workerContentEnd = transform.doc.resolve(workerContentEnd);
+    let range = new NodeRange($workerContentStart,$workerContentEnd,workerDepth); //why worker depth?
+      
+    //lift the children out of the list
+    transform = transform.lift(range, workerDepth-1);  //why -1?
+  }
+
+  //------------------------------
+  // execute the transform
+  //------------------------------
+
+  if((dispatch)&&(transform.docChanged)) {
+    dispatch(transform);
+  }
+  
+}
+
+/** This load the path data into an alternat struct */
 function pathToModPath(path) {
   let modPath = [];
   for(let i = 0; i < path.length-2; i+= 3) {
     let entry = {};
-    entry.nodeType = path[i].type.name;
+    entry.node = path[i];
     entry.index = path[i+1];
     entry.startPos = path[i+2];
     modPath.push(entry);
@@ -319,12 +488,33 @@ function pathToModPath(path) {
   return modPath;
 }
 
+/** This finds the worker nodes in the doc */
+function getWorkerNodeInfo(doc) {
+  let workerNodeInfos = [];
+  doc.forEach( (node, offset) => {
+    if(node.type == schema.nodes.workerParent) {
+      let workerNodeInfo = {};
+      workerNodeInfo.node = node;
+      workerNodeInfo.childPosition = offset+1;
+      workerNodeInfo.childLength = node.content.size;
+      workerNodeInfos.push(workerNodeInfo);
+    }
+  });
+  return workerNodeInfos;
+}
+
 
 //end experimental commands
 //=================================================================
 
 let toolbarItems = [
-  new ActionButton(convertToParagraphCommand,null,"Convert to Paragraph","atb_bold_style","temp"),
+  new ActionButton(convertToParagraphCommand,null,"Normal","atb_bold_style","temp"),
+  new ActionButton(convertToH1Command,null,"H1","atb_bold_style","temp"),
+  new ActionButton(convertToH2Command,null,"H2","atb_bold_style","temp"),
+  new ActionButton(convertToH3Command,null,"H3","atb_bold_style","temp"),
+  new ActionButton(convertToH4Command,null,"H4","atb_bold_style","temp"),
+  new ActionButton(convertToBulletCommand,null,"Bullet","atb_bold_style","temp"),
+  new ActionButton(convertToNumberedCommand,null,"Numbered","atb_bold_style","temp"),
   //new BlockRadioItem(schema.nodes.paragraph, paragraphCommand, "Normal", "atb_normal_style", "Normal Paragraph Text"),
   //new BlockRadioItem(schema.nodes.heading1, h1Command, "H1", "atb_h1_style", "Heading 1"),
   //new BlockRadioItem(schema.nodes.heading2, h2Command, "H2", "atb_h2_style", "Heading 2"),
@@ -342,18 +532,19 @@ let toolbarItems = [
   //  ["Gray","#505050"],["light gray","#808080"]]),
   //new MarkDropdownItem(schema.marks.highlight, "color", [["None",false], ["Yellow","yellow"], ["Cyan","cyan"], ["Pink","pink"], ["Green","green"],
   //  ['Orange',"orange"], ["Red","red"], ["Gray","#a0a0a0"]]),
-  new ActionButton(wrapInWorkerCommand,null,"Wrap In Worker","atb_italic_style","temp"),
-  new ActionButton(liftFromWorkerCommand,null,"Lift from Worker","atb_italic_style","temp"),
-  new ActionButton(liftLeastCommand,null,"Lift least","atb_italic_style","temp"),
-  new ActionButton(splitNonTextTop,null,"split top","atb_italic_style","temp"),
-  new ActionButton(splitNonTextBottom,null,"split bottom","atb_italic_style","temp"),
-  new ActionButton(joinUpCommand,null,"join up","atb_italic_style","temp"),
-  new ActionButton(joinDownCommand,null,"join down","atb_italic_style","temp"),
-  new ActionButton(wrapInBulletCommand,null,"Wrap In Bullet","atb_italic_style","temp"),
-  new ActionButton(setAsListItemCommand,null,"set as List Item","atb_italic_style","temp"),
-  new ActionButton(setAsParagraphCommand,null,"set as Para","atb_italic_style","temp"),
-  new ActionButton(setAsH1Command,null,"set as H1","atb_italic_style","temp"),
-  new ActionButton(setAsH2Command,null,"set as H2","atb_italic_style","temp"),
+
+  //new ActionButton(wrapInWorkerCommand,null,"Wrap In Worker","atb_italic_style","temp"),
+  //new ActionButton(liftFromWorkerCommand,null,"Lift from Worker","atb_italic_style","temp"),
+  //new ActionButton(liftLeastCommand,null,"Lift least","atb_italic_style","temp"),
+  //new ActionButton(splitNonTextTop,null,"split top","atb_italic_style","temp"),
+  //new ActionButton(splitNonTextBottom,null,"split bottom","atb_italic_style","temp"),
+  //new ActionButton(joinUpCommand,null,"join up","atb_italic_style","temp"),
+  //new ActionButton(joinDownCommand,null,"join down","atb_italic_style","temp"),
+  //new ActionButton(wrapInBulletCommand,null,"Wrap In Bullet","atb_italic_style","temp"),
+  //new ActionButton(setAsListItemCommand,null,"set as List Item","atb_italic_style","temp"),
+  //new ActionButton(setAsParagraphCommand,null,"set as Para","atb_italic_style","temp"),
+  //new ActionButton(setAsH1Command,null,"set as H1","atb_italic_style","temp"),
+  //new ActionButton(setAsH2Command,null,"set as H2","atb_italic_style","temp"),
 ];
 
 let toolbarPlugin = new Plugin({
