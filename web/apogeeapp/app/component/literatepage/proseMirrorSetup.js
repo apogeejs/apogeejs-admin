@@ -107,53 +107,14 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   let {$from, $to} = state.selection;
 
   //---------------------------
-  //split at the end if needed (we'll do end first so we can do start with updating the $from variable)
+  //Split any lists so there is not a list that spans outside the current selection
+  //Do after first so this doesn't change the value of $from yet.
   //---------------------------
-  let endCutDone = false;
-  {
-    let modPath = pathToModPath($to.path);
-
-    //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
-    for(let i = modPath.length-1; i > 0; i--) {
-      let entry = modPath[i];
-      if(((entry.node.type == schema.nodes.bulletList)||(entry.node.type == schema.nodes.numberedList))&&(entry.index < entry.node.childCount-1)) {
-        //split here!
-        //cut at the end of the child block
-        let childBlockDepth = i+1;
-        let cutDepth = i;
-        let cutPosition = $to.end(childBlockDepth) + 1;
-        transform = transform.split(cutPosition,cutDepth);
-        endCutDone = true;
-        break;
-      }
-    }
-  }
-
-  //-----------------------------------
-  //split any parens at start if needed (from should not have been updated above)
-  //-----------------------------------
-  let startCutDone = false;
-  {
-    let modPath = pathToModPath($from.path);
-
-    //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
-    for(let i = modPath.length-1; i > 0; i--) {
-      let entry = modPath[i];
-      if(((entry.node.type == schema.nodes.bulletList)||(entry.node.type == schema.nodes.numberedList))&&(entry.index > 0)) {
-        //split here!
-        //cut at start of the child block
-        let childBlockDepth = i+1; 
-        let cutDepth = i;
-        let cutPosition = $from.start(childBlockDepth) - 1;
-        transform = transform.split(cutPosition,cutDepth); //cut position off by 1 when at the start of a child list, but need to cut is parent
-        startCutDone = true; //I should make sure this succeeds, I think
-        break;
-      }
-    }
-  }
+  transform = splitSpannedListAfterPos($to,transform);
+  transform = splitSpannedListBeforePos($from,transform);
 
   //update if we did any transform
-  if((startCutDone)||(endCutDone)) {
+  if(transform.docChanged) {
     let newFrom = transform.mapping.map($from.pos);
     let newTo = transform.mapping.map($to.pos);
     $from = transform.doc.resolve(newFrom);
@@ -165,76 +126,32 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   //------------------------------
 
   {
-    //depth is set to 0
-    let depth = 0;
-    let range = new NodeRange($from,$to,depth), wrapping = range && findWrapping(range, schema.nodes.workerParent);
-    if (!wrapping) throw new Error("Wrapping not found!"); //need to work out error handling
-    transform = transform.wrap(range, wrapping)
+    let parentDepth = 0;
+    let nodeType = schema.nodes.workerParent;
+    transform = wrapSelectionInNode($from,$to,parentDepth,nodeType,transform)
   }
 
   //-------------------------------
   // lift out of any lists!
   //-------------------------------
 
-  {
-    //cycle through its direct children
-    let listInfo;
-    let findChildList = (node, offset, index) => {
-      //exit is we already found a list
-      if(listInfo.contentSize !== undefined) return;
-
-      if((node.type == schema.nodes.bulletList)||(node.type == schema.nodes.numberedList)) {
-        //list found
-        //look for a list inside thisone
-        node.forEach(findChildList);
-        if(listInfo.contentSize !== undefined) {
-          //update the list info 
-          listInfo.offset += offset + 1;
-          listInfo.listGenerations += 1;
-        }
-        else {
-          //set list info for this list
-          listInfo.listGenerations = 1;
-          listInfo.offset = offset;
-          listInfo.contentSize = node.content.size;
-        }
-      }
-    }
-
-    //this will lift the list
-    let processListResult = (workerPosition) => {
-      if(listInfo.contentSize === undefined) return;
-
-      let listContentsFrom = workerPosition + listInfo.offset + 1;
-      let listContentsTo = listContentsFrom + listInfo.contentSize; 
-      let listDepth = listInfo.listGenerations + 1;
-      let listChildrenDepth = listDepth+1;
-      let $listContentsFrom = transform.doc.resolve(listContentsFrom);
-      let $listContentsTo = transform.doc.resolve(listContentsTo);
-      let range = new NodeRange($listContentsFrom,$listContentsTo,listChildrenDepth-1); //why -1?
-      
-      //lift the children out of the list
-      transform = transform.lift(range, listDepth-1);  //why -1?
-
-      //enable another search
-      doSearch = true;
-    }
-
     //we will list one list per iteration, and keep doing this until there are no more lists
-    let doSearch = true;
-    let workerPosition;
-    for( ; doSearch; processListResult(workerPosition)) {
-      doSearch = false;
-      listInfo = {};
+    let listInfo;
+    do {
+      let startGeneration = 0;
+      
       //grab the worker node
-      let workerNodeInfos = getWorkerNodeInfo(transform.doc);
-      if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
+      let { workerNode, workerContentStart } = getWorkerInfo(transform.doc);
+      listInfo =  findContainedList(workerNode,workerContentStart,startGeneration);
 
-      let workerNodeInfo = workerNodeInfos[0];
-      let workerNode = workerNodeInfo.node;
-      workerPosition = workerNodeInfo.childPosition;
-      workerNode.forEach(findChildList);
-    } 
+      if(listInfo) {
+        //remove list if one is found
+        let $listContentsFrom = transform.doc.resolve(listInfo.contentsStart);
+        let $listContentsTo = transform.doc.resolve(listInfo.contentsEnd);
+        let listDepth = listInfo.listGenerations + 1;
+        transform = liftContent($listContentsFrom,$listContentsTo,listDepth,transform);
+      }
+    } while(listInfo) 
   }
 
   //-------------------------------
@@ -243,13 +160,8 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   //-------------------------------
 
   {
-    //grab the worker node info
-    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
-    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
-
-    let workerNodeInfo = workerNodeInfos[0];
-    let workerContentStart = workerNodeInfo.childPosition;
-    let workerContentEnd = workerContentStart + workerNodeInfo.childLength;
+    //get the content range for the worker node
+    let {workerContentStart, workerContentEnd} = getWorkerInfo(transform.doc);
 
     transform = transform.setBlockType(workerContentStart, workerContentEnd, nodeType);
   }
@@ -259,21 +171,13 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   //------------------------------
 
   {
-    //grab the worker node info
-    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
-    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
-
-    let workerNodeInfo = workerNodeInfos[0];
-    let workerContentStart = workerNodeInfo.childPosition;
-    let workerContentEnd = workerContentStart + workerNodeInfo.childLength;
-    let workerDepth = 1;
-
+    //get the content range for the worker node
+    let {workerContentStart, workerContentEnd} = getWorkerInfo(transform.doc);
     let $workerContentStart = transform.doc.resolve(workerContentStart);
     let $workerContentEnd = transform.doc.resolve(workerContentEnd);
-    let range = new NodeRange($workerContentStart,$workerContentEnd,workerDepth); //why worker depth?
-      
-    //lift the children out of the list
-    transform = transform.lift(range, workerDepth-1);  //why -1?
+
+    let workerDepth = 1;
+    transform = liftContent($workerContentStart,$workerContentEnd,workerDepth,transform);
   }
 
   //------------------------------
@@ -293,47 +197,12 @@ function convertToListBlockType(nodeType,state,dispatch) {
   //this is our range to convert
   let {$from, $to} = state.selection;
 
+    //---------------------------
+  //Split any lists so there is not a list that spans outside the current selection
+  //Do after first so this doesn't change the value of $from yet.
   //---------------------------
-  //split at the end if needed (we'll do end first so we can do start with updating the $from variable)
-  //---------------------------
-  {
-    let modPath = pathToModPath($to.path);
-
-    //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
-    for(let i = modPath.length-1; i > 0; i--) {
-      let entry = modPath[i];
-      if(((entry.node.type == schema.nodes.bulletList)||(entry.node.type == schema.nodes.numberedList))&&(entry.index < entry.node.childCount-1)) {
-        //split here!
-        //cut at the end of the child block
-        let childBlockDepth = i+1;
-        let cutDepth = i;
-        let cutPosition = $to.end(childBlockDepth) + 1;
-        transform = transform.split(cutPosition,cutDepth);
-        break;
-      }
-    }
-  }
-
-  //-----------------------------------
-  //split any parens at start if needed (from should not have been updated above)
-  //-----------------------------------
-  {
-    let modPath = pathToModPath($from.path);
-
-    //traverse backwards to look for the last non-0 index list (last element is doc, we can ignore it)
-    for(let i = modPath.length-1; i > 0; i--) {
-      let entry = modPath[i];
-      if(((entry.node.type == schema.nodes.bulletList)||(entry.node.type == schema.nodes.numberedList))&&(entry.index > 0)) {
-        //split here!
-        //cut at start of the child block
-        let childBlockDepth = i+1; 
-        let cutDepth = i;
-        let cutPosition = $from.start(childBlockDepth) - 1;
-        transform = transform.split(cutPosition,cutDepth); //cut position off by 1 when at the start of a child list, but need to cut is parent
-        break;
-      }
-    }
-  }
+  transform = splitSpannedListAfterPos($to,transform);
+  transform = splitSpannedListBeforePos($from,transform);
 
   //update if we did any transform
   if(transform.docChanged) {
@@ -348,121 +217,118 @@ function convertToListBlockType(nodeType,state,dispatch) {
   //------------------------------
 
   {
-    //depth is set to 0
-    let depth = 0;
-    let range = new NodeRange($from,$to,depth), wrapping = range && findWrapping(range, schema.nodes.workerParent);
-    if (!wrapping) throw new Error("Wrapping not found!"); //need to work out error handling
-    transform = transform.wrap(range, wrapping)
+    let parentDepth = 0;
+    let nodeType = schema.nodes.workerParent;
+    transform = wrapSelectionInNode($from,$to,parentDepth,nodeType,transform)
   }
 
   //-------------------------------
-  // lift out of any lists at the ROOT level (children will remain children - but we must reset their type!)
+  // lift out of any lists at the ROOT level (children will remain as child lists - but we must reset their type, below.)
   //-------------------------------
 
-  //FIX - set the proper child list type
+  {
+    //get the top level lists
+    //grab the worker node
+    let { workerNode, workerContentStart } = getWorkerInfo(transform.doc);
+
+    let doRecursive = false;
+    let startGeneration = 0;
+    let listInfos = getContainedLists(workerNode,workerContentStart,startGeneration,doRecursive);
+
+    //go through top level lists in reverse order and lift out of them (so we don't have to worry about position changes here)
+    for(let i = listInfos.length - 1; i >= 0; i--) {
+      let listInfo = listInfos[i];
+
+      //remove list if one is found
+      let $listContentsFrom = transform.doc.resolve(listInfo.contentsStart);
+      let $listContentsTo = transform.doc.resolve(listInfo.contentsEnd);
+      let listDepth = listInfo.listGenerations + 1;
+      transform = liftContent($listContentsFrom,$listContentsTo,listDepth,transform);
+    }
+
+  }
+
+  //-------------------------------
+  // make any remaining child lists the proper list type
+  //-------------------------------
 
   {
-    //cycle through its direct children
-    let listInfos = [];
-    let findChildList = (node, offset, index) => {
-      if((node.type == schema.nodes.bulletList)||(node.type == schema.nodes.numberedList)) {
-        //list found at top level (here we are not doing children)
-        let listInfo = {};
-        listInfo.node = node;
-        listInfo.offset = offset;
-        listInfo.contentSize = node.content.size;
-        listInfos.push(listInfo);
+    //get the top level lists
+    //grab the worker node
+    let { workerNode, workerContentStart } = getWorkerInfo(transform.doc);
+
+    let doRecursive = true;
+    let startGeneration = 0;
+    let listInfos = getContainedLists(workerNode,workerContentStart,startGeneration,doRecursive);
+
+    //go through top level lists in reverse order and lift out of them (so we don't have to worry about position changes here)
+    for(let i = 0; i < listInfos.length; i++) {
+      let listInfo = listInfos[i];
+
+      //change the child list type if it does not match the current type
+      if(listInfo.node.nodeType != nodeType) {
+        let listNode = listInfo.node;
+        let listOutsideFrom = listInfo.contentsStart-1;
+        let listOutsideTo = listInfo.contentsEnd+1;
+        transform = setNodeType(listNode,listOutsideFrom,listOutsideTo,listDepth,nodeType,transform);
       }
     }
 
-    //get the top level lists
-    //grab the worker node
-    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
-    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
-
-    let workerNodeInfo = workerNodeInfos[0];
-    let workerNode = workerNodeInfo.node;
-    let workerPosition = workerNodeInfo.childPosition;
-    workerNode.forEach(findChildList);
-
-    //go through top level ists in reverse order and lift out of them (so we don't have to worry about position changes here)
-    for(let i = listInfos.length - 1; i >= 0; i--) {
-      let listInfo = listInfos[i];
-      let contentStartPosition = workerPosition + listInfo.offset + 1;
-      let contentEndPosition = contentStartPosition + listInfo.contentSize;
-      let depth = 2; //this is just inside the worker
-
-      let $contentStartPosition = transform.doc.resolve(contentStartPosition);
-      let $contentEndPosition = transform.doc.resolve(contentEndPosition);
-      let range = new NodeRange($contentStartPosition,$contentEndPosition,depth);
-      
-      //lift the children out of the list
-      transform = transform.lift(range, depth-1);
-    }
-
   }
-
-
-  //this should replace the nodes at positions startM-endM with a noew of type "type" 
-  //tranform.step(new ReplaceAroundStep(startM, endM, startM + 1, endM - 1, new Slice(Fragment.from(type.create(attrs, null, node.marks)), 0, 0), 1, true))
 
   //-------------------------------
   // convert the text blocks to list items
   //-------------------------------
 
   {
-    //grab the worker node info
-    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
-    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
-
-    let workerNodeInfo = workerNodeInfos[0];
-    let workerContentStart = workerNodeInfo.childPosition;
-    let workerContentEnd = workerContentStart + workerNodeInfo.childLength;
+    //get the content range for the worker node
+    let {workerContentStart, workerContentEnd} = getWorkerInfo(transform.doc);
 
     transform = transform.setBlockType(workerContentStart, workerContentEnd, schema.nodes.listItem);
   }
 
   //------------------------------
-  // warp all the items in a list
+  // wrap all the items in a list
   //------------------------------
   {
-    //grab the worker node info
-    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
-    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
-
-    let workerNodeInfo = workerNodeInfos[0];
-    let workerContentStart = workerNodeInfo.childPosition;
-    let workerContentEnd = workerContentStart + workerNodeInfo.childLength;
+    //get the worker node range
+    let {workerContentStart, workerContentEnd} = getWorkerInfo(transform.doc);
     let $workerContentStart = transform.doc.resolve(workerContentStart);
     let $workerContentEnd = transform.doc.resolve(workerContentEnd);
 
-    //depth is set to 1
-    let depth = 1;
-    let range = new NodeRange($workerContentStart,$workerContentEnd,depth), wrapping = range && findWrapping(range,nodeType);
-    if (!wrapping) throw new Error("Wrapping not found!"); //need to work out error handling
-    transform = transform.wrap(range, wrapping)
+    let parentDepth = 1;
+    transform = wrapSelectionInNode($workerContentStart,$workerContentEnd,parentDepth,nodeType,transform)
   }
 
   //------------------------------
   // lift out of the worker
   //------------------------------
 
+//  let workerIndex;
+
   {
-    //grab the worker node info
-    let workerNodeInfos = getWorkerNodeInfo(transform.doc);
-    if(workerNodeInfos.length > 1) throw new Error("Wrong number of worker nodes: " + workerNodeInfos.length);
-
-    let workerNodeInfo = workerNodeInfos[0];
-    let workerContentStart = workerNodeInfo.childPosition;
-    let workerContentEnd = workerContentStart + workerNodeInfo.childLength;
-    let workerDepth = 1;
-
+    //get the content range for the worker node
+    let {workerContentStart, workerContentEnd} = getWorkerInfo(transform.doc);
     let $workerContentStart = transform.doc.resolve(workerContentStart);
     let $workerContentEnd = transform.doc.resolve(workerContentEnd);
-    let range = new NodeRange($workerContentStart,$workerContentEnd,workerDepth); //why worker depth?
-      
-    //lift the children out of the list
-    transform = transform.lift(range, workerDepth-1);  //why -1?
+
+    //get the index of the worker before we remove it
+    // {
+    //   let parentDepth = 0;
+    //   workerIndex = getNodeIndex($workerContentStart,parentDepth);
+    // }
+
+    let workerDepth = 1;
+    transform = liftContent($workerContentStart,$workerContentEnd,workerDepth,transform);
+  }
+
+  //------------------------------
+  // Check if there is a list of the same type before and after the updated selection. If so, join them.
+  //------------------------------
+
+  {
+    //if the node before or after our new list is a list of the same type, it should be joined.
+    //note we will also want to join common generation child lists...
   }
 
   //------------------------------
@@ -475,7 +341,50 @@ function convertToListBlockType(nodeType,state,dispatch) {
   
 }
 
+/** This function cuts the document so there is not a list spanned before the text block at the given position. */
+function splitSpannedListAfterPos($pos,transform) {
+  let modPath = pathToModPath($pos.path);
+
+  //traverse backwards to look for the deepest entry that cuts a list (last element is doc, we can ignore it)
+  for(let i = modPath.length-1; i > 0; i--) {
+    let entry = modPath[i];
+    if(((entry.node.type == schema.nodes.bulletList)||(entry.node.type == schema.nodes.numberedList))&&(entry.index < entry.node.childCount-1)) {
+      //split here!
+      //cut at the end of the child block
+      let childBlockDepth = i+1;
+      let cutDepth = i;
+      let cutPosition = $pos.end(childBlockDepth) + 1;
+      transform = transform.split(cutPosition,cutDepth);
+      break;
+    }
+  }
+
+  return transform;
+}
+
+/** This function cuts the document so there is not a list spanned after the text block at the given position. */
+function splitSpannedListBeforePos($pos,transform) {
+  let modPath = pathToModPath($pos.path);
+
+  //traverse backwards to look for the deepest entry that cuts list (last element is doc, we can ignore it)
+  for(let i = modPath.length-1; i > 0; i--) {
+    let entry = modPath[i];
+    if(((entry.node.type == schema.nodes.bulletList)||(entry.node.type == schema.nodes.numberedList))&&(entry.index > 0)) {
+      //split here!
+      //cut at start of the child block
+      let childBlockDepth = i+1; 
+      let cutDepth = i;
+      let cutPosition = $pos.start(childBlockDepth) - 1;
+      transform = transform.split(cutPosition,cutDepth); //cut position off by 1 when at the start of a child list, but need to cut is parent
+      break;
+    }
+  }
+
+  return transform;
+}
+
 /** This load the path data into an alternat struct */
+//helper
 function pathToModPath(path) {
   let modPath = [];
   for(let i = 0; i < path.length-2; i+= 3) {
@@ -488,21 +397,138 @@ function pathToModPath(path) {
   return modPath;
 }
 
-/** This finds the worker nodes in the doc */
-function getWorkerNodeInfo(doc) {
-  let workerNodeInfos = [];
-  doc.forEach( (node, offset) => {
-    if(node.type == schema.nodes.workerParent) {
-      let workerNodeInfo = {};
-      workerNodeInfo.node = node;
-      workerNodeInfo.childPosition = offset+1;
-      workerNodeInfo.childLength = node.content.size;
-      workerNodeInfos.push(workerNodeInfo);
-    }
-  });
-  return workerNodeInfos;
+//depth is set to 0
+function wrapSelectionInNode($from,$to,parentDepth,nodeType,transform) {
+  let range = new NodeRange($from,$to,parentDepth);
+  let wrapping = range && findWrapping(range, nodeType);
+  if (!wrapping) throw new Error("Wrapping not found!"); //need to work out error handling
+  //return the updated transform
+  return transform.wrap(range, wrapping);
 }
 
+/** This finds the worker nodes in the doc. This will throw an error if there
+ * is not a single worker node. */
+function getWorkerInfo(doc) {
+  let workerNodeInfo;
+  doc.forEach( (node, offset) => {
+    if(node.type == schema.nodes.workerParent) {
+      if(workerNodeInfo !== undefined) throw new Error("Multiple worker nodes found!");
+
+      workerNodeInfo = {};
+      workerNodeInfo.workerNode = node;
+      workerNodeInfo.workerContentStart = offset+1;
+      workerNodeInfo.workerContentEnd = workerNodeInfo.contentStartPosition + node.content.size;
+    }
+  });
+  if(workerNodeInfo === undefined) throw new Error("No worker nodes found!");
+  return workerNodeInfo;
+}
+
+/** This function returns list info for a list contained in the given list. If the recursive 
+ * flag is false it only returns list info for direct children. Otherwise it also returns further descendant lists, first.
+ */
+function findContainedList(parentNode,parentInsidePosition,parentListGeneration) {
+  let listInfo;
+  let position = parentInsidePosition;
+  for(let i = 0; (i < parentNode.childCount)&&(!listInfo); i++) {
+    let childNode = parentNode.child(i);
+    listInfo = getListInfo(childNode,position,parentListGeneration);
+
+    //update position for the next node
+    position += childNode.size + 2;
+  }
+  return listInfo;
+}
+
+/** This function returns list info if this is a list node. If the recusrive flag is set,
+ * it will return list info for a child list if there are any. */
+//helper
+function getListInfo(node,outsidePosition,parentListGeneration) { 
+  let listInfo;
+
+  if((node.type == schema.nodes.bulletList)||(node.type == schema.nodes.numberedList)) {
+    //list found
+    let currentListGeneration = parentListGeneration + 1;
+    let currentListInsidePosition = outsidePosition + 1;
+
+    //check for a child list
+    listInfo = findContainedList(node,currentListInsidePosition,currentListGeneration);
+
+    if(listInfo === undefined) {
+      //set the list info for this list if no child found
+      listInfo.node = node;
+      listInfo.contentsStart = currentListInsidePosition
+      listInfo.contentsEnd = listInfo.contentsStart + node.content.size;
+      listInfo.listGeneration = currentListGeneration;
+    }
+  }
+
+  return listInfo;
+}
+
+function getContainedLists(parentNode,parentInsidePosition,parentListGeneration,doRecursive) {
+  let listInfos = [];
+  let position = parentInsidePosition;
+  for(let i = 0; i < parentNode.childCount; i++) {
+    let childNode = parentNode.child(i);
+    let childListInfo = getAllListInfo(childNode,position,parentListGeneration,doRecursive);
+    listInfos = listInfos.concat(childListInfo);
+
+    //update position for the next node
+    position += childNode.size + 2;
+  }
+
+  return listInfos;
+}
+
+/** This function returns list info if this is a list node. If the recusrive flag is set,
+ * it will return list info for a child list if there are any. */
+//helper
+function getAllListInfo(node,outsidePosition,parentListGeneration,doRecursive) { 
+  let listInfos = [];
+
+  if((node.type == schema.nodes.bulletList)||(node.type == schema.nodes.numberedList)) {
+    //list found
+    let currentListGeneration = parentListGeneration + 1;
+    let currentListInsidePosition = outsidePosition + 1;
+
+    //add the child lists
+    let childListInfos = findContainedList(node,currentListInsidePosition,currentListGeneration,doRecursive);
+    listInfos = listInfos.concat(childListInfos);
+
+    //add the current list info
+    let listInfo = {};
+    listInfo.node = node;
+    listInfo.contentsStart = currentListInsidePosition
+    listInfo.contentsEnd = listInfo.contentsStart + node.content.size;
+    listInfo.listGeneration = currentListGeneration;
+  
+    listInfos.push(listInfo);
+  }
+
+  return listInfo;
+}
+
+/** This function lifts the content at the given positions. It returns
+ * the updated transform */
+function liftContent($contentStart,$contentEnd,parentDepth,transform) {
+  let range = new NodeRange($contentStart,$contentEnd,parentDepth);
+  return transform.lift(range, parentDepth-1);
+}
+
+/** This changes the node type. It assumes the node type is valid. */
+function setNodeType(node,outsideFromPos,outsideToPos,nodeType,transform) {
+  transform.step(new ReplaceAroundStep(outsideFromPos, outsideToPos, outsideFromPos + 1, outsideToPos - 1,
+                                      new Slice(Fragment.from(nodeType.create(null, null, node.marks)), 0, 0), 1, true));
+  return transform;
+}
+
+/** This reads the path associated with the input position to find the index of the node at the requested depth. */
+// function getNodeIndex($pos,parentDepth) {
+//   let nodeIndexArrayIndex = parentDepth*3 + 1;
+//   if($pos.path.length <= nodeIndexArrayIndex) throw new Exception("Error reading the node index - position depth to small!");
+//   return $pos.path[nodeIndexArrayIndex];
+// }
 
 //end experimental commands
 //=================================================================
