@@ -89,7 +89,10 @@ function splitParent(fromTop, state, dispatch) {
 // - don't convert included lists to be the specified type
 // - don't handle tabs at the start of non-list items, beign converted to child lists
 
-import { findWrapping } from "/prosemirror/lib/prosemirror-transform/src/index.js";
+import { findWrapping, ReplaceAroundStep } from "/prosemirror/lib/prosemirror-transform/src/index.js";
+import { Slice} from "/prosemirror/lib/prosemirror-model/src/index.js"
+
+//import {joinPoint, canJoin, findWrapping, liftTarget, canSplit, ReplaceAroundStep} from "../../prosemirror-transform/src/index.js"
 
 let convertToParagraphCommand = (state,dispatch) => convertToNonListBlockType(schema.nodes.paragraph, state, dispatch);
 let convertToH1Command = (state,dispatch) => convertToNonListBlockType(schema.nodes.heading1, state, dispatch);
@@ -148,11 +151,10 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
         //remove list if one is found
         let $listContentsFrom = transform.doc.resolve(listInfo.contentsStart);
         let $listContentsTo = transform.doc.resolve(listInfo.contentsEnd);
-        let listDepth = listInfo.listGenerations + 1;
+        let listDepth = listInfo.listGeneration + 1;
         transform = liftContent($listContentsFrom,$listContentsTo,listDepth,transform);
       }
     } while(listInfo) 
-  }
 
   //-------------------------------
   // convert the text blocks to the specified type
@@ -187,8 +189,9 @@ function convertToNonListBlockType(nodeType,state,dispatch) {
   if((dispatch)&&(transform.docChanged)) {
     dispatch(transform);
   }
-  
+
 }
+
 
 function convertToListBlockType(nodeType,state,dispatch) {
   //this will be our transform
@@ -242,7 +245,7 @@ function convertToListBlockType(nodeType,state,dispatch) {
       //remove list if one is found
       let $listContentsFrom = transform.doc.resolve(listInfo.contentsStart);
       let $listContentsTo = transform.doc.resolve(listInfo.contentsEnd);
-      let listDepth = listInfo.listGenerations + 1;
+      let listDepth = listInfo.listGeneration + 1;
       transform = liftContent($listContentsFrom,$listContentsTo,listDepth,transform);
     }
 
@@ -270,7 +273,7 @@ function convertToListBlockType(nodeType,state,dispatch) {
         let listNode = listInfo.node;
         let listOutsideFrom = listInfo.contentsStart-1;
         let listOutsideTo = listInfo.contentsEnd+1;
-        transform = setNodeType(listNode,listOutsideFrom,listOutsideTo,listDepth,nodeType,transform);
+        transform = setNodeType(listNode,listOutsideFrom,listOutsideTo,nodeType,transform);
       }
     }
 
@@ -417,7 +420,7 @@ function getWorkerInfo(doc) {
       workerNodeInfo = {};
       workerNodeInfo.workerNode = node;
       workerNodeInfo.workerContentStart = offset+1;
-      workerNodeInfo.workerContentEnd = workerNodeInfo.contentStartPosition + node.content.size;
+      workerNodeInfo.workerContentEnd = workerNodeInfo.workerContentStart + node.content.size;
     }
   });
   if(workerNodeInfo === undefined) throw new Error("No worker nodes found!");
@@ -435,7 +438,7 @@ function findContainedList(parentNode,parentInsidePosition,parentListGeneration)
     listInfo = getListInfo(childNode,position,parentListGeneration);
 
     //update position for the next node
-    position += childNode.size + 2;
+    position += childNode.content.size + 2;
   }
   return listInfo;
 }
@@ -456,6 +459,7 @@ function getListInfo(node,outsidePosition,parentListGeneration) {
 
     if(listInfo === undefined) {
       //set the list info for this list if no child found
+      listInfo = {};
       listInfo.node = node;
       listInfo.contentsStart = currentListInsidePosition
       listInfo.contentsEnd = listInfo.contentsStart + node.content.size;
@@ -471,11 +475,11 @@ function getContainedLists(parentNode,parentInsidePosition,parentListGeneration,
   let position = parentInsidePosition;
   for(let i = 0; i < parentNode.childCount; i++) {
     let childNode = parentNode.child(i);
-    let childListInfo = getAllListInfo(childNode,position,parentListGeneration,doRecursive);
-    listInfos = listInfos.concat(childListInfo);
+    let childListInfos = getAllListInfos(childNode,position,parentListGeneration,doRecursive);
+    listInfos = listInfos.concat(childListInfos);
 
     //update position for the next node
-    position += childNode.size + 2;
+    position += childNode.content.size + 2;
   }
 
   return listInfos;
@@ -484,7 +488,7 @@ function getContainedLists(parentNode,parentInsidePosition,parentListGeneration,
 /** This function returns list info if this is a list node. If the recusrive flag is set,
  * it will return list info for a child list if there are any. */
 //helper
-function getAllListInfo(node,outsidePosition,parentListGeneration,doRecursive) { 
+function getAllListInfos(node,outsidePosition,parentListGeneration,doRecursive) { 
   let listInfos = [];
 
   if((node.type == schema.nodes.bulletList)||(node.type == schema.nodes.numberedList)) {
@@ -493,8 +497,10 @@ function getAllListInfo(node,outsidePosition,parentListGeneration,doRecursive) {
     let currentListInsidePosition = outsidePosition + 1;
 
     //add the child lists
-    let childListInfos = findContainedList(node,currentListInsidePosition,currentListGeneration,doRecursive);
-    listInfos = listInfos.concat(childListInfos);
+    if(doRecursive) {
+      let childListInfos = getContainedLists(node,currentListInsidePosition,currentListGeneration,doRecursive);
+      listInfos = listInfos.concat(childListInfos);
+    }
 
     //add the current list info
     let listInfo = {};
@@ -506,7 +512,7 @@ function getAllListInfo(node,outsidePosition,parentListGeneration,doRecursive) {
     listInfos.push(listInfo);
   }
 
-  return listInfo;
+  return listInfos;
 }
 
 /** This function lifts the content at the given positions. It returns
