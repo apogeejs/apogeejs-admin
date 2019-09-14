@@ -157,7 +157,49 @@ proseMirror.createEditorView = function (containerElement, folderComponent, fold
 
 }
 
+//test///////////////////////////////////
+function getDeletedApogeeNodes(editorData, stepsJson) {
+  //prepare to get apogee nodes
+  let apogeeNodes = [];
+  let getApogeeNodes = node => {
+    if(node.type.name == "apogeeComponent") {
+      apogeeNodes.push(node);
+    }
+    //do not go inside any top level nodes
+    return false;
+  }
+
+  //get all the replcaed apogee nodes
+  stepsJson.forEach( stepJson => {
+    if(stepJson.stepType == "replace") {
+      editorData.doc.nodesBetween(stepJson.from,stepJson.to,getApogeeNodes);
+    }
+    else if(stepJson.stepType == "replaceAround") {
+      editorData.doc.nodesBetween(stepJson.from,stepJson.gapFrom,getApogeeNodes);
+      editorData.doc.nodesBetween(stepJson.gapTo,stepJson.to,getApogeeNodes);
+    }
+  });
+
+  return apogeeNodes;
+
+}
+/////////////////////////////////////////
+
 proseMirror.getNewEditorData = function (editorData, stepsJson) {
+  //see if we need to delete any apogee nodes
+  var deletedApogeeNodes = getDeletedApogeeNodes(editorData,stepsJson);
+
+  if(deletedApogeeNodes.length > 0) {
+    let doDelete = confirm("The selection includes Apogee nodes. Are you sure you want to delete them?");
+    //Tdo not do delete.
+    //if(!doDelete) return null;
+    if(!doDelete) alert("sorry - they will be deleted anyway, until the code is fixed.")
+  }
+
+  //delete the apogee nodes
+  //(add this)
+
+  //apply the editor transaction
   var transaction = editorData.tr;
   stepsJson.forEach(stepJson => {
     try {
