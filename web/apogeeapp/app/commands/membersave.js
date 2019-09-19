@@ -18,8 +18,7 @@ export function getMemberStateUndoCommand(workspace, memberFullName) {
         command.type = "saveMemberCode";
         command.argList = member.getArgList();
         command.functionBody = member.getFunctionBody();
-        command.supplemental = member.getSupplementalCode();
-        
+        command.supplemental = member.getSupplementalCode();      
     }
     else {
         command.type = "saveMemberData";
@@ -43,6 +42,8 @@ export function getMemberStateUndoCommand(workspace, memberFullName) {
             command.data = member.getData();
         }
     }
+
+    command.memberFullName = memberFullName;
     
     return command;
 }

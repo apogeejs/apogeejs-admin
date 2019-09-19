@@ -83,10 +83,11 @@ import { EditorState }  from "/prosemirror/lib/prosemirror-state/src/index.js";
 import { DOMParser, Fragment, Node as ProseMirrorNode }  from "/prosemirror/lib/prosemirror-model/src/index.js";
 import { EditorView }  from "/prosemirror/lib/prosemirror-view/src/index.js";
 import { Step, insertPoint }  from "/prosemirror/lib/prosemirror-transform/src/index.js";
-import { undo, redo, history }  from "/prosemirror/lib/prosemirror-history/src/history.js";
+//import { undo, redo, history }  from "/prosemirror/lib/prosemirror-history/src/history.js";
 import { keymap }  from "/prosemirror/lib/prosemirror-keymap/src/keymap.js";
 
 import ApogeeComponentView from "/apogeeapp/app/editor/ApogeeComponentView.js";
+import { undo, redo }  from "/apogeeapp/app/editor/apogeeHistory.js";
 
 function saveState() {
   var stateJson = window.view.state.toJSON();
@@ -110,7 +111,7 @@ function createEditorState(doc) {
   var state = EditorState.create({
     doc: doc,
     plugins: [
-      history(),
+      //history(), //this is the prose mirror history plugin
       keymap({ "Mod-z": undo, "Mod-y": redo }),
       keymap(baseKeymap),
       toolbarPlugin,

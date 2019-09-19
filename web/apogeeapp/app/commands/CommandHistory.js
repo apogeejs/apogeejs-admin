@@ -13,10 +13,10 @@
  * The command manager fires an event each time the command history is updated.
  */
 export default class CommandHistory {
-    constructor(commandManger, eventManager, optionalUndoCommandCount) {
+    constructor(commandManager, eventManager, optionalUndoCommandCount) {
         this.commandManager = commandManager;
         this.eventManager = eventManager;
-        this.undoCommandCount = (optionalUndoCommandCount !== undefined) ? optionalUndoCommandCount : apogeeapp.app.CommandHistory.DEFAULT_UNDO_COMMAND_COUNT;
+        this.undoCommandCount = (optionalUndoCommandCount !== undefined) ? optionalUndoCommandCount : CommandHistory.DEFAULT_UNDO_COMMAND_COUNT;
         this.clearHistory();
     }
     
@@ -100,7 +100,7 @@ export default class CommandHistory {
     undo() {
         let command = this._getNextUndoCommand(true);
         if((command)&&(command.undoCmd)) {
-            let commandResult = this.commandManager.executeCommand(command.undoCmd);
+            let commandResult = this.commandManager.executeCommand(command.undoCmd,true);
             if(!commandResult.cmdDone) {
                 this._commandUndoneFailed();
             }
@@ -114,8 +114,8 @@ export default class CommandHistory {
     /** This method redones the next command to be redone. */
     redo() {
         let command = this._getNextRedoCommand(true);
-        if((command)&&(command.cmd)) {
-            let commandResult = this.commandManager.executeCommand(command.redoCmd);
+        if((command)&&(command.redoCmd)) {
+            let commandResult = this.commandManager.executeCommand(command.redoCmd,true);
             if(!commandResult.cmdDone) {
                 this.commandRedoneFailed();
             }

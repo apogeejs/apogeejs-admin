@@ -24,6 +24,7 @@ literatepagetransaction.createUndoCommand = function(workspaceUI,commandData) {
         var undoCommandData = {};
         undoCommandData.type = literatepagetransaction.COMMAND_TYPE;
         undoCommandData.steps = commandData.undoSteps;
+        undoCommandData.memberFullName = commandData.memberFullName;
         return undoCommandData;
     }
     else {

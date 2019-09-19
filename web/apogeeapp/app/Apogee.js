@@ -74,7 +74,7 @@ export default class Apogee extends EventManager {
         this.referenceManager = new ReferenceManager();
         
         //command manager
-        this.commandManager = new CommandManager(this);
+        this.commandManager = new CommandManager(this,this);
         
         //load the standard component generators
         //(for now this is not configurable. This is called first so loaded modules
@@ -205,7 +205,7 @@ export default class Apogee extends EventManager {
 
     /** This method is intended for the UI for the undo/redo functionality */
     getCommandManager() {
-        return commandManager;
+        return this.commandManager;
     }
 
     //==================================

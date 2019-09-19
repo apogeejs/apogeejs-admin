@@ -1,3 +1,5 @@
+import CommandHistory from "./CommandHistory.js";
+
 /* 
  * This class manages executing commands and storign and operating the command history for undo/redo.
  * It provides standarde error handling for the commands in addition to managing undo/redo or commands.
@@ -39,16 +41,31 @@
  *
  */
 export default class CommandManager {
-    constructor(app) {
+    constructor(app,eventManager) {
         this.app = app;
+        this.eventManager = eventManager;
+
+        this.commandHistory = new CommandHistory(this,eventManager);
     }
     
-    /** This method executes the given command and, if applicable, adds it to the queue. */
-    executeCommand(command) {
+    /** This method executes the given command and, if applicable, adds it to the queue. 
+     * Supress history is a temp addition for testing.
+    */
+    executeCommand(command,suppressFromHistory) {
         var workspaceUI = this.app.getWorkspaceUI();
         let commandResult;
         
         var commandObject = CommandManager.getCommandObject(command.type);
+
+        //FOR NOW? - MAKE UNDO COMMAND BEFORE EXECUTING COMMAND, IF WE NEED IT (because it is sometimes made by reading the current state)
+        let undoCommand;
+        let description;
+        if((!suppressFromHistory)&&(commandObject.createUndoCommand)) {   
+            undoCommand = commandObject.createUndoCommand(workspaceUI,command);  
+            description = commandObject.COMMAND_TYPE; //need a better description
+            this.commandHistory.addToHistory(undoCommand,command,description);
+        }
+
         if(commandObject) {
             try {
                 commandResult = commandObject.executeCommand(workspaceUI,command);
@@ -70,6 +87,10 @@ export default class CommandManager {
         }
         
         //history??
+        //this is temporary code
+        if((commandResult.cmdDone)&&(undoCommand)) {   
+            this.commandHistory.addToHistory(undoCommand,command,description);
+        }
         
         //fire events!!
         
@@ -78,6 +99,11 @@ export default class CommandManager {
         if(commandResult.alertMsg) CommandManager.errorAlert(commandResult.alertMsg,commandResult.isFatal);
         
         return commandResult;
+    }
+
+    /** This returns the command history. */
+    getCommandHistory() {
+        return this.commandHistory;
     }
     
     /** This message does a standard error alert for the user. If the error is
