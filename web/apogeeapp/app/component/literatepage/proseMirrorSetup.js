@@ -158,47 +158,7 @@ proseMirror.createEditorView = function (containerElement, folderComponent, fold
 
 }
 
-//test///////////////////////////////////
-function getDeletedApogeeNodes(editorData, stepsJson) {
-  //prepare to get apogee nodes
-  let apogeeNodes = [];
-  let getApogeeNodes = node => {
-    if(node.type.name == "apogeeComponent") {
-      apogeeNodes.push(node);
-    }
-    //do not go inside any top level nodes
-    return false;
-  }
-
-  //get all the replcaed apogee nodes
-  stepsJson.forEach( stepJson => {
-    if(stepJson.stepType == "replace") {
-      editorData.doc.nodesBetween(stepJson.from,stepJson.to,getApogeeNodes);
-    }
-    else if(stepJson.stepType == "replaceAround") {
-      editorData.doc.nodesBetween(stepJson.from,stepJson.gapFrom,getApogeeNodes);
-      editorData.doc.nodesBetween(stepJson.gapTo,stepJson.to,getApogeeNodes);
-    }
-  });
-
-  return apogeeNodes;
-
-}
-/////////////////////////////////////////
-
 proseMirror.getNewEditorData = function (editorData, stepsJson) {
-  //see if we need to delete any apogee nodes
-  var deletedApogeeNodes = getDeletedApogeeNodes(editorData,stepsJson);
-
-  if(deletedApogeeNodes.length > 0) {
-    let doDelete = confirm("The selection includes Apogee nodes. Are you sure you want to delete them?");
-    //Tdo not do delete.
-    //if(!doDelete) return null;
-    if(!doDelete) alert("sorry - they will be deleted anyway, until the code is fixed.")
-  }
-
-  //delete the apogee nodes
-  //(add this)
 
   //apply the editor transaction
   var transaction = editorData.tr;
@@ -215,24 +175,27 @@ proseMirror.getNewEditorData = function (editorData, stepsJson) {
   return editorData.apply(transaction);
 }
 
-proseMirror.getInsertIsOk = function (literatePageComponent) {
-  var state = literatePageComponent.getEditorData();
+proseMirror.getComponentRange = function(editorData,componentShortName) {
+  let doc = editorData.doc;
+  let schema = editorData.schema;
+  let result = {};
+  doc.forEach( (node,offset) => {
+    if(node.type == schema.nodes.apogeeComponent) {
+      if(node.attrs.state == componentShortName) {
+  
+        if(result.found) {
+          //this shouldn't happen
+          throw new Error("Multiple nodes found with the given name");
+        }
 
-  return insertPoint(state.doc, state.selection.from, schema.nodes.apogeeComponent) != null
+        result.found = true;
+        result.from = offset;
+        result.to = result.from + node.content.size + 2;
+      }
+    }
+  });
+  return result;
 }
-
-proseMirror.insertComponentOnPage = function (literatePageComponent, childName) {
-  var state = literatePageComponent.getEditorData();
-
-  let { empty, $from, $to } = state.selection, content = Fragment.empty
-  if (!empty && $from.sameParent($to) && $from.parent.inlineContent)
-    content = $from.parent.content.cut($from.parentOffset, $to.parentOffset)
-  let transaction = state.tr.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "state": childName }));
-
-  var commandData = literatePageComponent.createInsertCommand(transaction);
-  return commandData;
-}
-
 
 export { proseMirror as default }
 

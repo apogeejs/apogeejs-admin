@@ -2,6 +2,7 @@ import util from "/apogeeutil/util.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
 import {updateComponent} from "/apogeeapp/app/commandseq/updatecomponentseq.js";
+import {deleteComponent} from "/apogeeapp/app/commandseq/deletecomponentseq.js";
 import TreeComponentDisplay from "/apogeeapp/app/component/TreeComponentDisplay.js";
 import {bannerConstants} from "/apogeeapp/app/component/banner.js"; 
 
@@ -192,7 +193,7 @@ export default class Component extends EventManager {
 
         var itemInfo = {};
         itemInfo.title = "Delete";
-        itemInfo.callback = () => this.deleteComponent(itemInfo.title);
+        itemInfo.callback = () => deleteComponent(this);
         menuItemList.push(itemInfo);
         
         return menuItemList;
@@ -501,20 +502,6 @@ export default class Component extends EventManager {
         }
         
         return openCallback;
-    }
-
-    /** This method creates a callback for deleting the component. 
-     *  @private */
-    deleteComponent() {
-        var doDelete = confirm("Are you sure you want to delete this object?");
-        if(!doDelete) {
-            return;
-        }
-
-        var commandData = {};
-        commandData.type = "deleteComponent";
-        commandData.memberFullName = this.getMember().getFullName();
-        this.workspaceUI.getApp().executeCommand(commandData);
     }
 
     //======================================

@@ -31,17 +31,27 @@ export default class FolderComponent extends ParentComponent {
         }
     }
 
-    //================================================================
-    //start test code
-    //temporary implementation
-        
+    /** This method is called to respond to transactions created in the editor. */
     applyTransaction(transaction) {
         
         //console.log("New Transaction:");
         //console.log("Doc changed: " + transaction.docChanged);
 
         if(transaction.docChanged) {
-            var commandData = this.createInsertCommand(transaction);
+            //see if we need to delete any apogee nodes
+            var deletedApogeeNodes = this.getDeletedApogeeNodes(this.editorData,transaction);
+
+            if(deletedApogeeNodes.length > 0) {
+                let doDelete = confirm("The selection includes Apogee nodes. Are you sure you want to delete them?");
+                //do not do delete.
+                //if(!doDelete) return null;
+                if(!doDelete) alert("sorry - they will be deleted anyway, until the code is fixed.")
+            }
+
+            //delete the apogee nodes
+            //(add this)
+
+            var commandData = this.createEditorCommand(transaction);
             this.getWorkspaceUI().getApp().executeCommand(commandData);
         }
         else {
@@ -55,7 +65,33 @@ export default class FolderComponent extends ParentComponent {
         }
     }
 
-    createInsertCommand(transaction) {
+    getDeletedApogeeNodes(editorData, transaction) {
+        //prepare to get apogee nodes
+        let apogeeNodes = [];
+        let getApogeeNodes = node => {
+        if(node.type.name == "apogeeComponent") {
+            apogeeNodes.push(node);
+        }
+        //do not go inside any top level nodes
+        return false;
+        }
+    
+        //get all the replcaed apogee nodes
+        transaction.steps.forEach( step => {
+        if(step.jsonID == "replace") {
+            editorData.doc.nodesBetween(step.from,step.to,getApogeeNodes);
+        }
+        else if(step.jsonID == "replaceAround") {
+            editorData.doc.nodesBetween(step.from,step.gapFrom,getApogeeNodes);
+            editorData.doc.nodesBetween(step.gapTo,step.to,getApogeeNodes);
+        }
+        });
+    
+        return apogeeNodes;
+    
+    }
+
+    createEditorCommand(transaction) {
         var stepsJson = [];
         var inverseStepsJson = [];
 
@@ -74,6 +110,41 @@ export default class FolderComponent extends ParentComponent {
         commandData.undoSteps = inverseStepsJson;
         
         return commandData;
+    }
+
+    getInsertIsOk() {
+        var state = this.getEditorData();
+      
+        return (insertPoint(state.doc, state.selection.from, schema.nodes.apogeeComponent) != null);
+    }
+      
+    insertComponentOnPage(childName) {
+        var state = this.getEditorData();
+      
+        let { empty, $from, $to } = state.selection, content = Fragment.empty
+        if (!empty && $from.sameParent($to) && $from.parent.inlineContent)
+          content = $from.parent.content.cut($from.parentOffset, $to.parentOffset)
+        let transaction = state.tr.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "state": childName }));
+      
+        var commandData = this.createEditorCommand(transaction);
+        return commandData;
+    }
+
+    removeComponentFromPage(childShortName) {
+        var state = this.getEditorData();
+      
+        //let { empty, $from, $to } = proseMirror.getComponentRange(childName), content = Fragment.empty
+        let {found,from,to} = proseMirror.getComponentRange(state,childShortName);
+        //end test
+
+        if(found) {
+            let transaction = state.tr.delete(from, to);
+            var commandData = this.createEditorCommand(transaction);
+            return commandData;
+        }
+        else {
+            return null;
+        }
     }
 
         

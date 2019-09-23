@@ -238,12 +238,12 @@ export default class LiteratePageComponentDisplay extends EventManager {
             buttonElement.innerHTML = generator.displayName;
             buttonElement.onclick = () => {
                 
-                if(!proseMirror.getInsertIsOk(this.component)) {
+                if(!this.component.getInsertIsOk()) {
                     alert("INVALID ENTRY POINT");
                     return;
                 }
                 
-                var piggybackCommandGenerator = childName => proseMirror.insertComponentOnPage(this.component,childName);
+                var piggybackCommandGenerator = childName => this.component.insertComponentOnPage(childName);
 
                 var initialValues = {};
                 initialValues.parentName = this.member.getFullName();
