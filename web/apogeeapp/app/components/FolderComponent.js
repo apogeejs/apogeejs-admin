@@ -6,6 +6,7 @@ import Component from "/apogeeapp/app/component/Component.js";
 import ParentComponent from "/apogeeapp/app/component/ParentComponent.js";
 
 import { insertPoint }  from "/prosemirror/lib/prosemirror-transform/src/index.js";
+import { Selection } from "/prosemirror/lib/prosemirror-state/src/index.js";
 
 /** This component represents a table object. */
 export default class FolderComponent extends ParentComponent {
@@ -155,26 +156,43 @@ export default class FolderComponent extends ParentComponent {
         return (insertPoint(state.doc, state.selection.from, schema.nodes.apogeeComponent) != null);
     }
       
-    getInsertApogeeNodeOnPageCommand(childName,insertAtEnd) {
-        var state = this.getEditorData();
-        var schema = state.schema;
-      
+    getInsertApogeeNodeOnPageCommands(childName,insertAtEnd) {
+        let state = this.getEditorData();
+        let schema = state.schema;
         let transaction = state.tr;
+        let commands = {};
+        
+        if(!insertAtEnd) {
+            let { empty } = state.selection;
+            if(!empty) {
 
-        if(insertAtEnd) {
+                transaction = transaction.deleteSelection(); 
+
+                //see if we need to delete any apogee nodes
+                var deletedApogeeComponents = this.getDeletedApogeeComponentShortNames(this.editorData,transaction);
+
+                if(deletedApogeeComponents.length > 0) {
+                    //create delete commands
+                    commands.deletedComponentCommands = this.getDeletedComponentCommandsFromShortNames(deletedApogeeComponents); 
+                }
+            }
+        }
+        else {
+            //insert at end
+            //move selection to end
             let docLength = state.doc.content.size;
-            let $pos = state.doc.resolvePosition(docLength);
+            let $pos = state.doc.resolve(docLength);
             let selection = new Selection($pos,$pos);
             transaction = transaction.setSelection(selection);
         }
 
-        // let { empty, $from, $to } = state.selection, content = Fragment.empty
-        // if (!empty && $from.sameParent($to) && $from.parent.inlineContent)
-        //   content = $from.parent.content.cut($from.parentOffset, $to.parentOffset)
+        //finish the document transaction
         transaction = transaction.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "state": childName }));
       
-        var commandData = this.createEditorCommand(transaction);
-        return commandData;
+        commands.editorCommand = this.createEditorCommand(transaction);
+
+        return commands;
+        
     }
 
     getRemoveApogeeNodeFromPageCommand(childShortName) {

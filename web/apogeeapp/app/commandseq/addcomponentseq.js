@@ -63,13 +63,15 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
             commandData.type = "compoundCommand";
             commandData.childCommands = [];
             //any needed delete commands
-            if(additionalCommands.deleteSelectionCommand) {
-                commandData.childCommands.push(additionalCommands.deleteSelectionCommand);
+            if(additionalCommands.deletedComponentCommands) {
+                for(var i = 0; i < additionalCommands.deletedComponentCommands.length; i++) {
+                    commandData.childCommands.push(additionalCommands.deletedComponentCommands[i]);
+                }
             }
             //the create component command
             commandData.childCommands.push(createCommandData);
             //the insert node commands
-            commandData.childCommands.push(additionalCommands.insertNodeCommand);
+            commandData.childCommands.push(additionalCommands.editorCommand);
 
             
             //execute command
@@ -113,19 +115,11 @@ export function addAdditionalComponent(app,optionalInitialProperties,optionalBas
 
 function getAdditionalCommands(parentComponent,childName) {
 
-    let commands = {};
-
     //check selection
     let useParentSelection = getUseParentSelection(parentComponent);
-
-    if(useParentSelection) {
-        commands.deleteSelectionCommand = parentComponent.getDeleteSelectionCommand();
-    }
     
     let insertAtEnd = !useParentSelection;
-    commands.insertNodeCommand = parentComponent.getInsertApogeeNodeOnPageCommand(childName,insertAtEnd);
-
-    return commands;
+    return parentComponent.getInsertApogeeNodeOnPageCommands(childName,insertAtEnd);
 }
 
 function getComponentFromName(workspaceUI, componentName) {
@@ -136,10 +130,14 @@ function getComponentFromName(workspaceUI, componentName) {
 }
 
 function getUseParentSelection(parentComponent) {
-    let tabDisplay = parentComponent.getTabDisplay();
-    let tab = tabDisplay.getTab();
-
     //use the parent selection only if the tab is the active tab
     //otherwise the component should be placed at the end
+
+    let tabDisplay = parentComponent.getTabDisplay();
+    if(!tabDisplay) return false;
+
+    let tab = tabDisplay.getTab();
+    if(!tab) return false;
+    
     return tabDisplay.getIsShowing();
 }
