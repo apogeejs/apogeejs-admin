@@ -38,20 +38,47 @@ export default class FolderComponent extends ParentComponent {
         //console.log("Doc changed: " + transaction.docChanged);
 
         if(transaction.docChanged) {
-            //see if we need to delete any apogee nodes
-            var deletedApogeeNodes = this.getDeletedApogeeNodes(this.editorData,transaction);
 
-            if(deletedApogeeNodes.length > 0) {
-                let doDelete = confirm("The selection includes Apogee nodes. Are you sure you want to delete them?");
+            //command
+            let commandData;
+
+            //see if we need to delete any apogee nodes
+            var deletedApogeeComponents = this.getDeletedApogeeComponents(this.editorData,transaction);
+
+            if(deletedApogeeComponents.length > 0) {
+                let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedApogeeComponents);
                 //do not do delete.
-                //if(!doDelete) return null;
-                if(!doDelete) alert("sorry - they will be deleted anyway, until the code is fixed.")
+                if(!doDelete) return;
+
+                //do the delete
+
+                //we will use a combined command
+                commandData = {};
+                commandData.type = "compoundCommand";
+                commandData.childCommands = [];
+                
+                //create the delete component commands
+                deletedApogeeComponents.forEach(shortName => {
+                    let fullName = this.member.getChildFullName(shortName);
+                    let componentDeleteCommand = {};
+                    componentDeleteCommand.type = "deleteComponent";
+                    componentDeleteCommand.memberFullName = fullName;
+                    commandData.childCommands.push(componentDeleteCommand);
+                });
             }
 
-            //delete the apogee nodes
-            //(add this)
+            //create the editor command to delete the component node
+            var editorCommand = this.createEditorCommand(transaction);
 
-            var commandData = this.createEditorCommand(transaction);
+            //combine commands or use the editor command directly
+            if(commandData) {
+                commandData.childCommands.push(editorCommand);
+            }
+            else {
+                commandData = editorCommand;
+            }
+
+            //execute the command
             this.getWorkspaceUI().getApp().executeCommand(commandData);
         }
         else {
@@ -65,29 +92,30 @@ export default class FolderComponent extends ParentComponent {
         }
     }
 
-    getDeletedApogeeNodes(editorData, transaction) {
+    getDeletedApogeeComponents(editorData, transaction) {
         //prepare to get apogee nodes
-        let apogeeNodes = [];
-        let getApogeeNodes = node => {
+        let apogeeComponents = [];
+        let getApogeeComponents = node => {
         if(node.type.name == "apogeeComponent") {
-            apogeeNodes.push(node);
+            var componentShortName = node.attrs.state; //we should change this node attribute name
+            apogeeComponents.push(componentShortName);
         }
         //do not go inside any top level nodes
         return false;
         }
     
-        //get all the replcaed apogee nodes
+        //get all the replcaed apogee components
         transaction.steps.forEach( step => {
         if(step.jsonID == "replace") {
-            editorData.doc.nodesBetween(step.from,step.to,getApogeeNodes);
+            editorData.doc.nodesBetween(step.from,step.to,getApogeeComponents);
         }
         else if(step.jsonID == "replaceAround") {
-            editorData.doc.nodesBetween(step.from,step.gapFrom,getApogeeNodes);
-            editorData.doc.nodesBetween(step.gapTo,step.to,getApogeeNodes);
+            editorData.doc.nodesBetween(step.from,step.gapFrom,getApogeeComponents);
+            editorData.doc.nodesBetween(step.gapTo,step.to,getApogeeComponents);
         }
         });
     
-        return apogeeNodes;
+        return apogeeComponents;
     
     }
 
