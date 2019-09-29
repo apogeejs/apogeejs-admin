@@ -48,29 +48,29 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
 
             //other validation of inputs?
             
-            //create the command
-            var commandData = {};
-            commandData.type = "addComponent";
-            commandData.parentFullName = userInputProperties.parentName;
-            commandData.memberJson = Component.createMemberJson(componentGenerator,userInputProperties,optionalBaseMemberValues);
-            commandData.componentJson = Component.createComponentJson(componentGenerator,userInputProperties,optionalBaseComponentValues);
-            
-            //#################################################
-            //temporary TESTING
-            if(piggybackCommandGenerator) {
-                
-                var piggybackCommand = piggybackCommandGenerator(userInputProperties.name);
-                
-                var parentCommandData = {};
-                parentCommandData.type = "compoundCommand";
-                parentCommandData.childCommands = [];
-                parentCommandData.childCommands.push(commandData);
-                parentCommandData.childCommands.push(piggybackCommand);
-                
-                commandData = parentCommandData;
+            //create the model command
+            let createCommandData = {};
+            createCommandData.type = "addComponent";
+            createCommandData.parentFullName = userInputProperties.parentName;
+            createCommandData.memberJson = Component.createMemberJson(componentGenerator,userInputProperties,optionalBaseMemberValues);
+            createCommandData.componentJson = Component.createComponentJson(componentGenerator,userInputProperties,optionalBaseComponentValues);
+
+            //editor related commands
+            let parentComponent = getComponentFromName(workspaceUI,userInputProperties.parentName);
+            let additionalCommands = getAdditionalCommands(parentComponent,userInputProperties.name);
+
+            let commandData = {};
+            commandData.type = "compoundCommand";
+            commandData.childCommands = [];
+            //any needed delete commands
+            if(additionalCommands.deleteSelectionCommand) {
+                commandData.childCommands.push(additionalCommands.deleteSelectionCommand);
             }
-            
-            //#################################################
+            //the create component command
+            commandData.childCommands.push(createCommandData);
+            //the insert node commands
+            commandData.childCommands.push(additionalCommands.insertNodeCommand);
+
             
             //execute command
             workspaceUI.getApp().executeCommand(commandData);
@@ -109,4 +109,37 @@ export function addAdditionalComponent(app,optionalInitialProperties,optionalBas
     })
     //open select component dialog
     showSelectComponentDialog(componentNames,app.additionalComponents,onSelect);
+}
+
+function getAdditionalCommands(parentComponent,childName) {
+
+    let commands = {};
+
+    //check selection
+    let useParentSelection = getUseParentSelection(parentComponent);
+
+    if(useParentSelection) {
+        commands.deleteSelectionCommand = parentComponent.getDeleteSelectionCommand();
+    }
+    
+    let insertAtEnd = !useParentSelection;
+    commands.insertNodeCommand = parentComponent.getInsertApogeeNodeOnPageCommand(childName,insertAtEnd);
+
+    return commands;
+}
+
+function getComponentFromName(workspaceUI, componentName) {
+    var workspace = workspaceUI.getWorkspace();
+    var member = workspace.getMemberByFullName(componentName);
+    var component = workspaceUI.getComponent(member);
+    return component;
+}
+
+function getUseParentSelection(parentComponent) {
+    let tabDisplay = parentComponent.getTabDisplay();
+    let tab = tabDisplay.getTab();
+
+    //use the parent selection only if the tab is the active tab
+    //otherwise the component should be placed at the end
+    return tabDisplay.getIsShowing();
 }

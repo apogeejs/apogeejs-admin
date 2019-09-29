@@ -5,6 +5,8 @@ import "/apogeeapp/app/component/literatepage/literatepagetransaction.js";
 import Component from "/apogeeapp/app/component/Component.js";
 import ParentComponent from "/apogeeapp/app/component/ParentComponent.js";
 
+import { insertPoint }  from "/prosemirror/lib/prosemirror-transform/src/index.js";
+
 /** This component represents a table object. */
 export default class FolderComponent extends ParentComponent {
 
@@ -41,9 +43,10 @@ export default class FolderComponent extends ParentComponent {
 
             //command
             let commandData;
+            let deletedComponentCommands;
 
             //see if we need to delete any apogee nodes
-            var deletedApogeeComponents = this.getDeletedApogeeComponents(this.editorData,transaction);
+            var deletedApogeeComponents = this.getDeletedApogeeComponentShortNames(this.editorData,transaction);
 
             if(deletedApogeeComponents.length > 0) {
                 let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedApogeeComponents);
@@ -51,27 +54,21 @@ export default class FolderComponent extends ParentComponent {
                 if(!doDelete) return;
 
                 //do the delete
-
-                //we will use a combined command
-                commandData = {};
-                commandData.type = "compoundCommand";
-                commandData.childCommands = [];
-                
-                //create the delete component commands
-                deletedApogeeComponents.forEach(shortName => {
-                    let fullName = this.member.getChildFullName(shortName);
-                    let componentDeleteCommand = {};
-                    componentDeleteCommand.type = "deleteComponent";
-                    componentDeleteCommand.memberFullName = fullName;
-                    commandData.childCommands.push(componentDeleteCommand);
-                });
+                deletedComponentCommands = this.getDeletedComponentCommandsFromShortNames(deletedApogeeComponents);
             }
 
             //create the editor command to delete the component node
             var editorCommand = this.createEditorCommand(transaction);
 
             //combine commands or use the editor command directly
-            if(commandData) {
+            if(deletedComponentCommands) {
+                commandData = {};
+                commandData.type = "compoundCommand";
+                commandData.childCommands = [];
+
+                //add the delete commands
+                pushSecondArrayIntoFirst(commandData.childCommands,deletedComponentCommands);
+                //add the editor command
                 commandData.childCommands.push(editorCommand);
             }
             else {
@@ -92,7 +89,7 @@ export default class FolderComponent extends ParentComponent {
         }
     }
 
-    getDeletedApogeeComponents(editorData, transaction) {
+    getDeletedApogeeComponentShortNames(editorData, transaction) {
         //prepare to get apogee nodes
         let apogeeComponents = [];
         let getApogeeComponents = node => {
@@ -119,6 +116,17 @@ export default class FolderComponent extends ParentComponent {
     
     }
 
+    getDeletedComponentCommandsFromShortNames(deletedApogeeComponents) {
+        //map the names to delete commands
+        return deletedApogeeComponents.map(shortName => {
+            let fullName = this.member.getChildFullName(shortName);
+            let componentDeleteCommand = {};
+            componentDeleteCommand.type = "deleteComponent";
+            componentDeleteCommand.memberFullName = fullName;
+            return componentDeleteCommand;
+        });
+    }
+
     createEditorCommand(transaction) {
         var stepsJson = [];
         var inverseStepsJson = [];
@@ -142,23 +150,34 @@ export default class FolderComponent extends ParentComponent {
 
     getInsertIsOk() {
         var state = this.getEditorData();
+        var schema = state.schema;
       
         return (insertPoint(state.doc, state.selection.from, schema.nodes.apogeeComponent) != null);
     }
       
-    insertComponentOnPage(childName) {
+    getInsertApogeeNodeOnPageCommand(childName,insertAtEnd) {
         var state = this.getEditorData();
+        var schema = state.schema;
       
-        let { empty, $from, $to } = state.selection, content = Fragment.empty
-        if (!empty && $from.sameParent($to) && $from.parent.inlineContent)
-          content = $from.parent.content.cut($from.parentOffset, $to.parentOffset)
-        let transaction = state.tr.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "state": childName }));
+        let transaction = state.tr;
+
+        if(insertAtEnd) {
+            let docLength = state.doc.content.size;
+            let $pos = state.doc.resolvePosition(docLength);
+            let selection = new Selection($pos,$pos);
+            transaction = transaction.setSelection(selection);
+        }
+
+        // let { empty, $from, $to } = state.selection, content = Fragment.empty
+        // if (!empty && $from.sameParent($to) && $from.parent.inlineContent)
+        //   content = $from.parent.content.cut($from.parentOffset, $to.parentOffset)
+        transaction = transaction.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "state": childName }));
       
         var commandData = this.createEditorCommand(transaction);
         return commandData;
     }
 
-    removeComponentFromPage(childShortName) {
+    getRemoveApogeeNodeFromPageCommand(childShortName) {
         var state = this.getEditorData();
       
         //let { empty, $from, $to } = proseMirror.getComponentRange(childName), content = Fragment.empty
@@ -174,6 +193,46 @@ export default class FolderComponent extends ParentComponent {
             return null;
         }
     }
+
+    getDeleteSelectionCommand() {
+        let commandData;
+
+        let state = this.getEditorData();
+        let { empty } = state.selection;
+        if(!empty) {
+            let deleteSelectionTransaction = state.tr.deleteSelection(); 
+
+            //see if we need to delete any apogee nodes
+            var deletedApogeeComponents = this.getDeletedApogeeComponentShortNames(this.editorData,deleteSelectionTransaction);
+
+            if(deletedApogeeComponents.length > 0) {
+                //we will use a compound command
+                commandData = {};
+                commandData.type = "compoundCommand";
+                commandData.childCommands = [];
+
+                //create delete commands
+                let deletedComponentCommands = this.getDeletedComponentCommandsFromShortNames(deletedApogeeComponents);
+                pushSecondArrayInfoFirst(commandData.childCommands,deletedComponentCommands);
+                
+            }
+
+            //create the editor command to delete the component node
+            let editorCommand = this.createEditorCommand(deleteSelectionTransaction);
+
+
+            if(commandData) {
+                commandData.childCommands.push(editorCommand);
+            }
+            else {
+                commandData = editorCommand;
+            }
+        }
+
+        return commandData;
+    }
+
+    
 
         
     //end test code
@@ -250,3 +309,12 @@ FolderComponent.DEFAULT_MEMBER_JSON = {
 };
 
 
+//================================
+// Some internal functions
+//================================
+
+function pushSecondArrayIntoFirst(first,second) {
+    for(var i = 0; i < second.length; i++) {
+        first.push(second[i]);
+    }
+}

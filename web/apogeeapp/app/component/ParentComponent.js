@@ -4,9 +4,6 @@ import Component from "/apogeeapp/app/component/Component.js";
  * It extends the component class. */
 export default class ParentComponent extends Component {
 
-    /** This is used to flag this as an edit component. */
-    isParentComponent = true;
-
     constructor(workspaceUI,member,componentGenerator) {
         //base constructor
         super(workspaceUI,member,componentGenerator);
@@ -102,4 +99,5 @@ export default class ParentComponent extends Component {
     }
 }
 
-
+/** This is used to flag this as an edit component. */
+ParentComponent.isParentComponent = true;

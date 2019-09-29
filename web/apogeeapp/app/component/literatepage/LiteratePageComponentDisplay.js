@@ -94,10 +94,10 @@ export default class LiteratePageComponentDisplay extends EventManager {
         var childDisplayState = childComponent.getChildDisplayState();
 
         //create a new component display for this child
-        if(childComponent.isEditComponent) {
+        if(childComponent.componentGenerator.isEditComponent) {
             childComponentDisplay = new PageChildComponentDisplay(childComponent,this,childDisplayState);
         }
-        else if(childComponent.isParentComponent) {
+        else if(childComponent.componentGenerator.isParentComponent) {
             //don't display the child parents!
         }
         else {
@@ -242,14 +242,12 @@ export default class LiteratePageComponentDisplay extends EventManager {
                     alert("INVALID ENTRY POINT");
                     return;
                 }
-                
-                var piggybackCommandGenerator = childName => this.component.insertComponentOnPage(childName);
 
                 var initialValues = {};
                 initialValues.parentName = this.member.getFullName();
 
                 //I tacked on a piggyback for testing!!!
-                addComponent(app,generator,initialValues,null,null,piggybackCommandGenerator);
+                addComponent(app,generator,initialValues,null,null);
             }
             this.componentToolbarElement.appendChild(buttonElement);
         }

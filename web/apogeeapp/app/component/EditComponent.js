@@ -2,10 +2,7 @@ import Component from "/apogeeapp/app/component/Component.js";
 
 /** This is the base class for a editable component (an object with code or data),
  * It extends the component class. */
-export default class EditComponent extends Component {
-
-    /** This is used to flag this as an edit component. */
-    isEditComponent = true;
+export default class EditComponent extends Component {  
     
     constructor(workspaceUI,member,componentGenerator) {    
         //base constructor
@@ -30,5 +27,9 @@ export default class EditComponent extends Component {
     }
 
 }
+
+/** This is used to flag this as an edit component. */
+EditComponent.isEditComponent = true;
+    
 
 

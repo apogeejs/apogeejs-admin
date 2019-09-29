@@ -22,7 +22,7 @@ export function deleteComponent(component) {
     //this is cumbersome - fix it up
     var parentMember = member.getParent();
     let parentComponent = workspaceUI.getComponent(parentMember);
-    let editorCommand = parentComponent.removeComponentFromPage(member.getName());
+    let editorCommand = parentComponent.getRemoveApogeeNodeFromPageCommand(member.getName());
     /////////////////////////////////
 
     //model command
