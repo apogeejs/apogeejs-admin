@@ -15,7 +15,7 @@ import {showSelectComponentDialog} from "/apogeeapp/app/dialogs/SelectControlDia
  * property values in optionalBaseComponentValues, overridden by the user input properties where applicable. The member
  * created will be made using the optionalBaseMemberValues, agagin overidden by any user input values.  */   
 //piggybackCommand is a temporary test!!!
-export function addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator) {
+export function addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
 
         //get the active workspace
         var workspaceUI = app.getWorkspaceUI();
@@ -64,6 +64,13 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
             commandData.childCommands = [];
             //any needed delete commands
             if(additionalCommands.deletedComponentCommands) {
+
+                let deletedComponentNames = additionalCommands.deletedComponentCommands.map(command => command.memberFullName);
+
+                let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedComponentNames);
+                //do not do delete.
+                if(!doDelete) return;
+
                 for(var i = 0; i < additionalCommands.deletedComponentCommands.length; i++) {
                     commandData.childCommands.push(additionalCommands.deletedComponentCommands[i]);
                 }
@@ -88,12 +95,12 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
 /** This gets a callback to add an "additional" component, menaing one that is not
  * in the main component menu. */
 //piggybackCommand is a temporary test!!!
-export function addAdditionalComponent(app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator) {
+export function addAdditionalComponent(app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
         
     var onSelect = function(componentType) {
         var componentGenerator = app.getComponentGenerator(componentType);
         if(componentGenerator) {
-            addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues,piggybackCommandGenerator);
+            addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
         }
         else {
             alert("Unknown component type: " + componentType);

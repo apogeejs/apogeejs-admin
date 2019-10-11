@@ -34,3 +34,28 @@ __functionTableWrapper = function(initMember) {
 }
 
 
+/** TEMPORARY FUNCTION TO DEBUG EDITOR */
+function getNodeInfo(doc) {
+    let docNodeInfo = {pos:0, size:0, childNodes:[]};
+    return doc.content.content.reduce(createNodeInfo,docNodeInfo);
+}
+
+function createNodeInfo(parentNodeInfo,node) {
+    let nodeInfo = {};
+
+    nodeInfo.pos = parentNodeInfo.size;
+    nodeInfo.size = node.content.size + 2;
+    nodeInfo.type = node.type.name;
+
+    parentNodeInfo.size += nodeInfo.size;
+    parentNodeInfo.childNodes.push(nodeInfo);
+
+    if(node.isBlock) {
+//        nodeInfo.childNodes = [];
+ //       node.content.content.reduce(createNodeInfo,nodeInfo);
+    }
+
+    return parentNodeInfo;
+}
+
+

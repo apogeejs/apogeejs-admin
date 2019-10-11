@@ -18,13 +18,16 @@ export default class PageDisplayContainer {
         this.options = options;
         
         this.mainElement = null;
-        this.viewTitleBarElement = null;
-        this.componentViewLabelContainer = null;
+        this.viewLabelHeaderElement = null;
+        this.viewLabelElement = null;
         this.headerContainer = null;
         this.viewContainer = null;
+
+        this.viewSelectorContainer = null;
+        this.viewActiveElement = null;
+        this.viewSelectorElement = null;
         
         this.isComponentShowing = false;
-        this.isComponentActive = false;
         this.isViewActive = isMainView;
         this.isContentLoaded = false;
         
@@ -58,17 +61,6 @@ export default class PageDisplayContainer {
     }
 
     /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
-    setIsComponentActive(isComponentActive) {
-        this.isComponentActive = isComponentActive;
-        this.updateDataDisplayLoadedState();
-    }
-
-    /** This returns the isComponentShowing status of the display. */
-    getIsComponentActive() {
-        return this.isComponentActive;
-    }
-
-    /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
     setIsViewActive(isViewActive) {
         this.isViewActive = isViewActive;
         //show/hide ui elements
@@ -76,13 +68,11 @@ export default class PageDisplayContainer {
             this.mainElement.style.display = ""; 
             this.expandImage.style.display = "none";
             this.contractImage.style.display = "";
-//            this.componentViewLabelContainer.style.display = "none";
         }
         else {
             this.mainElement.style.display = "none";
             this.expandImage.style.display = "";
             this.contractImage.style.display = "none";
-//            this.componentViewLabelContainer.style.display = "";
         }
         
         //this lets the data display know if its visibility changes
@@ -111,8 +101,8 @@ export default class PageDisplayContainer {
     //---------------------------
 
     /** This method returns the view label element to be used in the component title bar. */
-    getViewLabelElement() {
-        return this.componentViewLabelContainer;
+    getViewSelectorContainer() {
+        return this.viewSelectorContainer;
     }
 
     /** This method returns the main dom element for the window frame. */
@@ -130,40 +120,33 @@ export default class PageDisplayContainer {
         //make the container
         this.mainElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_mainClass",null);
         
-        //make the view title bar element
-        this.viewTitleBarElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewTitleBarClass",this.mainElement);
+        //make the label for the view
+        this.viewLabelHeaderElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewLabelHeaderClass",this.mainElement);
 
-        this.viewTitleActiveElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewTitleActiveClass",this.viewTitleBarElement);
-
-        let mainTitleLabelText = this.getMainViewLabelText();
-        if(mainTitleLabelText) {
-            this.viewTitleElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_componentViewTitleClass",this.viewTitleBarElement);
-            this.viewTitleElement.innerHTML = mainTitleLabelText;
+        let viewLabelText = this.getViewLabelText();
+        if(viewLabelText) {
+            this.viewLabelElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
+            this.viewLabelElement.innerHTML = viewLabelText;
         }
         
-        //make the label for the view in the componennt title bar
-        this.componentViewLabelContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_componentViewLabelClass",null);
+        //make the selector for the view, in the component title bar
+        this.viewSelectorContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
 
-        let headerTitleLabelClass = this.getHeaderViewLabelClass();
-        let headerTitleLabelText = this.getHeaderViewLabelText();
+        let viewSelectorLabelClass = this.getViewSelectorLabelClass();
+        let viewSelectorLabelText = this.getViewSelectorLabelText();
 
-        this.componentViewActiveElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_componentViewActiveClass",this.componentViewLabelContainer);
-        this.componentViewTitleElement = apogeeapp.ui.createElementWithClass("div",headerTitleLabelClass,this.componentViewLabelContainer);
+        this.viewActiveElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewActiveElementClass",this.viewSelectorContainer);
+        this.viewSelectorElement = apogeeapp.ui.createElementWithClass("div",viewSelectorLabelClass,this.viewSelectorContainer);
         
-        this.componentViewTitleElement.innerHTML = headerTitleLabelText;
+        this.viewSelectorElement.innerHTML = viewSelectorLabelText;
 
-        this.expandImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.componentViewActiveElement);
+        this.expandImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
         this.expandImage.src = apogeeapp.ui.getResourcePath(PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
-        this.expandImage.onclick = () => this.setIsViewActive(true);
-//these lines if contract on title bar        
-        this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.componentViewActiveElement);
+    
+        this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
         this.contractImage.src = apogeeapp.ui.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
-        this.contractImage.onclick = () => this.setIsViewActive(false);
 
-//these lines if contract on data display
-//        this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewTitleActiveElement);
-//        this.contractImage.src = apogeeapp.ui.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
-//        this.contractImage.onclick = () => this.setIsViewActive(false);
+        this.viewSelectorElement.onclick = () => this.setIsViewActive(!this.isViewActive);
         
         //add the header elment (for the save bar)
         this.headerContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
@@ -177,17 +160,17 @@ export default class PageDisplayContainer {
         this.setIsViewActive(this.isViewActive);
     }
 
-    getHeaderViewLabelClass() {
+    getViewSelectorLabelClass() {
         if(this.isMainView) {
-            return "visiui_pageChild_titleBarTitleClass";
+            return "visiui_displayContainer_mainViewSelectorClass";
         }
         else {
-            return "visiui_displayContainer_componentViewTitleClass";
+            return "visiui_displayContainer_nonMainViewSelectorClass";
         }
     }
 
     /** This method returns the text for the view label.  */
-    getHeaderViewLabelText() {
+    getViewSelectorLabelText() {
 
         if(this.isMainView) {
             return this.component.getMember().getDisplayName();
@@ -198,7 +181,7 @@ export default class PageDisplayContainer {
     }
 
     /** This method returns the text for the view label.  */
-    getMainViewLabelText() {
+    getViewLabelText() {
 
         if(this.isMainView) {
             return null;
@@ -213,7 +196,7 @@ export default class PageDisplayContainer {
      * private */
     updateDataDisplayLoadedState() {
         
-        if((this.isComponentShowing)&&(this.isComponentActive)&&(this.isViewActive)) {
+        if((this.isComponentShowing)&&(this.isViewActive)) {
             if(!this.dataDisplayLoaded) {
                 if(!this.dataDisplay) {
                     //the display should be created only when it is made visible
@@ -234,7 +217,7 @@ export default class PageDisplayContainer {
                 }
                 
                 //we will destroy the display is the destroyViewOnInactive flag is set, and we are inactive
-                if((this.destroyViewOnInactive)&&((!this.isComponentActive)||(!this.isViewActive))) {
+                if((this.destroyViewOnInactive)&&(!this.isViewActive)) {
                     //remove content
                     this.safeRemoveContent();
                     //destroy the display

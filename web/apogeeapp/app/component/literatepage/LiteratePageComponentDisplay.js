@@ -237,16 +237,10 @@ export default class LiteratePageComponentDisplay extends EventManager {
             var buttonElement = document.createElement("button");
             buttonElement.innerHTML = generator.displayName;
             buttonElement.onclick = () => {
-                
-                if(!this.component.getInsertIsOk()) {
-                    alert("INVALID ENTRY POINT");
-                    return;
-                }
 
                 var initialValues = {};
                 initialValues.parentName = this.member.getFullName();
 
-                //I tacked on a piggyback for testing!!!
                 addComponent(app,generator,initialValues,null,null);
             }
             this.componentToolbarElement.appendChild(buttonElement);
@@ -261,7 +255,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
             initialValues.parentName = this.member.getFullName();
 
             //I tacked on a piggyback for testing!!!
-            addAdditionalComponent(app,initialValues,null,null,piggybackCommandGenerator);
+            addAdditionalComponent(app,initialValues,null,null);
         }
         this.componentToolbarElement.appendChild(buttonElement);
     }

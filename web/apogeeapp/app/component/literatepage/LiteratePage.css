@@ -39,22 +39,10 @@
 .visiui_pageChild_titleBarClass {
     position: relative;
 }
-.visiui_pageChild_titleBarActiveClass {
-    display: inline;
-    padding-right: 1px;
-}
 .visiui_pageChild_titleBarMenuClass {
     position: relative;
     display: inline;
     padding-left: 1px;
-}
-.visiui_pageChild_titleBarTitleClass {
-    display: inline;
-    padding-left: 2px;
-    padding-right:10px;
-    font-weight:bold;
-    font-size: larger;
-    color:darkblue;
 }
 .visiui_pageChild_titleBarViewsClass {
     display: inline;
@@ -69,27 +57,34 @@
 .visiui_displayContainer_mainClass {
     position: relative;
 }
-.visiui_displayContainer_viewTitleBarClass {
+.visiui_displayContainer_viewLabelHeaderClass {
     position: relative;
 }
-.visiui_displayContainer_viewTitleActiveClass {
-    display: inline;
-}
-.visiui_displayContainer_viewTitleClass {
+.visiui_displayContainer_viewLabelClass {
     display: inline;
     padding-left: 1px;
     font-size: smaller;
     color:rgd(64,64,64);
 }
-.visiui_displayContainer_componentViewLabelClass {
+
+
+.visiui_displayContainer_viewSelectorContainerClass {
     display: inline;
     padding-left: 8px;
 }
-.visiui_displayContainer_componentViewActiveClass {
+.visiui_displayContainer_viewActiveElementClass {
     display: inline;
     padding-left: 1px;
 }
-.visiui_displayContainer_componentViewTitleClass {
+.visiui_displayContainer_mainViewSelectorClass {
+    display: inline;
+    padding-left: 2px;
+    padding-right:10px;
+    font-weight:bold;
+    font-size: larger;
+    color:darkblue;
+}
+.visiui_displayContainer_nonMainViewSelectorClass {
     display: inline;
     padding-left: 1px;
     font-size: smaller;

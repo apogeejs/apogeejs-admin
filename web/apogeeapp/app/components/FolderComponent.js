@@ -34,6 +34,10 @@ export default class FolderComponent extends ParentComponent {
         }
     }
 
+    //----------------------------------------
+    // Editor Command Processing
+    //----------------------------------------
+    
     /** This method is called to respond to transactions created in the editor. */
     applyTransaction(transaction) {
         
@@ -90,6 +94,8 @@ export default class FolderComponent extends ParentComponent {
         }
     }
 
+    /** This function returns the names of any apogee components nodes which are deleted in the
+     * given transaction. */
     getDeletedApogeeComponentShortNames(editorData, transaction) {
         //prepare to get apogee nodes
         let apogeeComponents = [];
@@ -103,20 +109,22 @@ export default class FolderComponent extends ParentComponent {
         }
     
         //get all the replcaed apogee components
-        transaction.steps.forEach( step => {
-        if(step.jsonID == "replace") {
-            editorData.doc.nodesBetween(step.from,step.to,getApogeeComponents);
-        }
-        else if(step.jsonID == "replaceAround") {
-            editorData.doc.nodesBetween(step.from,step.gapFrom,getApogeeComponents);
-            editorData.doc.nodesBetween(step.gapTo,step.to,getApogeeComponents);
-        }
+        transaction.steps.forEach( (step,index) => {
+            let doc = transaction.docs[index];
+            if(step.jsonID == "replace") {
+                doc.nodesBetween(step.from,step.to,getApogeeComponents);
+            }
+            else if(step.jsonID == "replaceAround") {
+                doc.nodesBetween(step.from,step.gapFrom,getApogeeComponents);
+                doc.nodesBetween(step.gapTo,step.to,getApogeeComponents);
+            }
         });
     
         return apogeeComponents;
     
     }
 
+    /** This function creates component delete commands from a list of short component names. */
     getDeletedComponentCommandsFromShortNames(deletedApogeeComponents) {
         //map the names to delete commands
         return deletedApogeeComponents.map(shortName => {
@@ -128,6 +136,12 @@ export default class FolderComponent extends ParentComponent {
         });
     }
 
+    //------------------------------------------
+    // Editor command processing from commands created outside the editor
+    //------------------------------------------
+
+    /** This function turns a transaction into an application command. This is used
+     * for the command path for commands generated outside the editor. */
     createEditorCommand(transaction) {
         var stepsJson = [];
         var inverseStepsJson = [];
@@ -147,13 +161,6 @@ export default class FolderComponent extends ParentComponent {
         commandData.undoSteps = inverseStepsJson;
         
         return commandData;
-    }
-
-    getInsertIsOk() {
-        var state = this.getEditorData();
-        var schema = state.schema;
-      
-        return (insertPoint(state.doc, state.selection.from, schema.nodes.apogeeComponent) != null);
     }
       
     getInsertApogeeNodeOnPageCommands(childName,insertAtEnd) {
@@ -211,46 +218,6 @@ export default class FolderComponent extends ParentComponent {
             return null;
         }
     }
-
-    getDeleteSelectionCommand() {
-        let commandData;
-
-        let state = this.getEditorData();
-        let { empty } = state.selection;
-        if(!empty) {
-            let deleteSelectionTransaction = state.tr.deleteSelection(); 
-
-            //see if we need to delete any apogee nodes
-            var deletedApogeeComponents = this.getDeletedApogeeComponentShortNames(this.editorData,deleteSelectionTransaction);
-
-            if(deletedApogeeComponents.length > 0) {
-                //we will use a compound command
-                commandData = {};
-                commandData.type = "compoundCommand";
-                commandData.childCommands = [];
-
-                //create delete commands
-                let deletedComponentCommands = this.getDeletedComponentCommandsFromShortNames(deletedApogeeComponents);
-                pushSecondArrayInfoFirst(commandData.childCommands,deletedComponentCommands);
-                
-            }
-
-            //create the editor command to delete the component node
-            let editorCommand = this.createEditorCommand(deleteSelectionTransaction);
-
-
-            if(commandData) {
-                commandData.childCommands.push(editorCommand);
-            }
-            else {
-                commandData = editorCommand;
-            }
-        }
-
-        return commandData;
-    }
-
-    
 
         
     //end test code
