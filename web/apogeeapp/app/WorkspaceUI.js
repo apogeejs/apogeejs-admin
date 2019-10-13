@@ -132,7 +132,6 @@ export default class WorkspaceUI {
         return this.referenceManager;
     }
 
-
     /** This method gets the workspace object. */
     close() {
         //delete all the components - to make sure the are cleaned up

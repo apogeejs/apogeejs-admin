@@ -35,12 +35,12 @@ export default class ApogeeComponentView {
     }
   
     setViewDataFromNode() {
-      var jsonData = this.getJsonData();
-      var name = jsonData;
+      let name = this.node.attrs["name"];
   
       //lookup component
       var member = this.folderMember.lookupChild(name);
-  
+      
+      //WE SHOULD MAKE SURE THE MEMBER BELONGS TO THIS PARENT!!!??
       if (member) {
         var workspaceUI = this.folderComponent.getWorkspaceUI();
         var component = workspaceUI.getComponent(member);
@@ -60,10 +60,13 @@ export default class ApogeeComponentView {
   
     }
   
+    //===========================================================
+    //figrue out what I want here
     getJsonData() {
-      //get the attribute!!!!
-      var stateJson = this.node.attrs["state"];
-      if (stateJson === undefined) stateJson = "";
+      //get the attribute!!!! - this is just a string
+      var name = this.node.attrs["name"];
+      if (name) stateJson = {name};
+      else stateJson = {};
       return stateJson;
     }
   
@@ -75,7 +78,9 @@ export default class ApogeeComponentView {
       else textData = JSON.stringify(data);
       return textData;
     }
-  
+    //end simplified
+    //============================================================
+
     update(node) {
       if (!node.sameMarkup(this.node)) return false
       this.node = node;

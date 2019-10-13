@@ -1,5 +1,3 @@
-import proseMirror from "/apogeeapp/app/component/literatepage/proseMirrorSetup.js";
-
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 
 /** Update Component Command
@@ -46,8 +44,9 @@ literatepagetransaction.executeCommand = function(workspaceUI,commandData) {
     var component = workspaceUI.getComponent(member);
     
     var editorData = component.getEditorData();
+    var editorManager = component.getEditorManager();
             
-    var newEditorData = proseMirror.getNewEditorData(editorData,commandData.steps);
+    var newEditorData = editorManager.getNewEditorData(editorData,commandData.steps);
 
     if(newEditorData) {
         component.setEditorData(newEditorData);

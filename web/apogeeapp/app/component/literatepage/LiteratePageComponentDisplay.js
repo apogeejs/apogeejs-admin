@@ -1,6 +1,5 @@
 import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
-import proseMirror from "/apogeeapp/app/component/literatepage/proseMirrorSetup.js";
 
 import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
 import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
@@ -20,6 +19,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
         this.folder = folder;
 
         this.isShowing = false;
+
+        this.editorManager = this.component.getEditorManager();
 
         this.loadTabEntry();
 
@@ -122,7 +123,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
     /** This is to restore any state in the tab object. */
     setStateJson(json) {
         return null
-//        var editorState = proseMirror.createEditorState(json.doc);
+//        var editorState = this.editorManager.createEditorState(json.doc);
 //        this.editorView.updateState(editorState);
     }
 
@@ -218,12 +219,6 @@ export default class LiteratePageComponentDisplay extends EventManager {
     }
 
     initComponentToolbar() {
-        
-        //########################################
-        // rewrite this for prosemirror
-        //########################################
-        //
-        //we will add a button for each standard component, and a button for the additional components
 
         //THIS IS BAD - IT IS ONLY TO GET THIS WORKING AS A TRIAL
         //MAKE A WAY TO GET COMPONENT GENERATORS FOR BUTTONS RATHER THAN READING A PRIVATE VARIABLE FROM APP
@@ -262,18 +257,14 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
 
     initEditor() {
-        
-        //########################################
-        // rewrite this for prosemirror
-        //########################################
 
         var container = document.createElement("div");
         this.contentElement.appendChild(container);
         
         //start with an empty component display
-        var emptyEditorState = proseMirror.createEditorState();
+        var emptyEditorState = this.editorManager.createEditorState();
         
-        this.editorView = proseMirror.createEditorView(container,this.component, this.member, emptyEditorState);
+        this.editorView = this.editorManager.createEditorView(container,this.component, this.member, emptyEditorState);
         
     }
 

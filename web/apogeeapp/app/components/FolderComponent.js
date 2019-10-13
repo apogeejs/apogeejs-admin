@@ -1,11 +1,10 @@
-import proseMirror from "/apogeeapp/app/component/literatepage/proseMirrorSetup.js";
 import LiteratePageComponentDisplay from "/apogeeapp/app/component/literatepage/LiteratePageComponentDisplay.js";
 import "/apogeeapp/app/component/literatepage/literatepagetransaction.js";
+import { createProseMirrorManager } from "/apogeeapp/app/component/literatepage/proseMirrorSetup.js";
 
 import Component from "/apogeeapp/app/component/Component.js";
 import ParentComponent from "/apogeeapp/app/component/ParentComponent.js";
 
-import { insertPoint }  from "/prosemirror/lib/prosemirror-transform/src/index.js";
 import { Selection } from "/prosemirror/lib/prosemirror-state/src/index.js";
 
 /** This component represents a table object. */
@@ -16,7 +15,8 @@ export default class FolderComponent extends ParentComponent {
         super(workspaceUI,folder,FolderComponent);
         
         //create an empty edit state to start
-        this.editorData = proseMirror.createEditorState();
+        this.editorManager = createProseMirrorManager(this);
+        this.editorData = this.editorManager.createEditorState();
     };
 
 
@@ -32,6 +32,10 @@ export default class FolderComponent extends ParentComponent {
         if(tabDisplay) {
             tabDisplay.updateDocumentData(this.editorData);
         }
+    }
+
+    getEditorManager() {
+        return this.editorManager;
     }
 
     //----------------------------------------
@@ -101,7 +105,7 @@ export default class FolderComponent extends ParentComponent {
         let apogeeComponents = [];
         let getApogeeComponents = node => {
         if(node.type.name == "apogeeComponent") {
-            var componentShortName = node.attrs.state; //we should change this node attribute name
+            var componentShortName = node.attrs.name; //we should change this node attribute name
             apogeeComponents.push(componentShortName);
         }
         //do not go inside any top level nodes
@@ -163,7 +167,7 @@ export default class FolderComponent extends ParentComponent {
         return commandData;
     }
       
-    getInsertApogeeNodeOnPageCommands(childName,insertAtEnd) {
+    getInsertApogeeNodeOnPageCommands(shortName,insertAtEnd) {
         let state = this.getEditorData();
         let schema = state.schema;
         let transaction = state.tr;
@@ -194,7 +198,7 @@ export default class FolderComponent extends ParentComponent {
         }
 
         //finish the document transaction
-        transaction = transaction.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "state": childName }));
+        transaction = transaction.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "name": shortName }));
       
         commands.editorCommand = this.createEditorCommand(transaction);
 
@@ -205,8 +209,7 @@ export default class FolderComponent extends ParentComponent {
     getRemoveApogeeNodeFromPageCommand(childShortName) {
         var state = this.getEditorData();
       
-        //let { empty, $from, $to } = proseMirror.getComponentRange(childName), content = Fragment.empty
-        let {found,from,to} = proseMirror.getComponentRange(state,childShortName);
+        let {found,from,to} = this.editorManager.getComponentRange(state,childShortName);
         //end test
 
         if(found) {
@@ -250,7 +253,7 @@ export default class FolderComponent extends ParentComponent {
     readFromJson(json) {
         //read the editor state
         if((json.data)&&(json.data.doc)) {
-            this.editorData = proseMirror.createEditorState(json.data.doc);
+            this.editorData = this.editorManager.createEditorState(json.data.doc);
             this.fieldUpdated("document");
         }
     }
