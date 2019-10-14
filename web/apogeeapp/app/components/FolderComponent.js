@@ -6,6 +6,10 @@ import Component from "/apogeeapp/app/component/Component.js";
 import ParentComponent from "/apogeeapp/app/component/ParentComponent.js";
 
 import { Selection } from "/prosemirror/lib/prosemirror-state/src/index.js";
+import { Step } from "/prosemirror/lib/prosemirror-transform/src/index.js";
+
+//this constant is used (or hopefully not) in correctCreateInfoforRepeatedNames
+const MAX_SUFFIX_INDEX = 99999;
 
 /** This component represents a table object. */
 export default class FolderComponent extends ParentComponent {
@@ -51,41 +55,53 @@ export default class FolderComponent extends ParentComponent {
         if(transaction.docChanged) {
 
             //command
-            let commandData;
-            let deletedComponentCommands;
+            let commands = [];
 
             //see if we need to delete any apogee nodes
-            var deletedApogeeComponents = this.getDeletedApogeeComponentShortNames(this.editorData,transaction);
+            var deletedApogeeComponentNames = this.getDeletedApogeeComponentShortNames(transaction);
 
-            if(deletedApogeeComponents.length > 0) {
-                let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedApogeeComponents);
+            if(deletedApogeeComponentNames.length > 0) {
+                let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedApogeeComponentNames);
                 //do not do delete.
                 if(!doDelete) return;
 
                 //do the delete
-                deletedComponentCommands = this.getDeletedComponentCommandsFromShortNames(deletedApogeeComponents);
+                let deletedComponentCommands = this.getDeletedComponentCommandsFromShortNames(deletedApogeeComponentNames);
+
+                //add these to the list of commands
+                commands.push(...deletedComponentCommands);
+            }
+
+            if(this.transactionHasComponentCreate(transaction)) {
+
+                let {modifiedTransaction,componentCreateCommands} = this.getModifiedCommandsForCreate(transaction,deletedApogeeComponentNames);
+
+                //use the new transaction
+                transaction = modifiedTransaction;
+
+                //add these to the list of commands
+                commands.push(...componentCreateCommands);
             }
 
             //create the editor command to delete the component node
-            var editorCommand = this.createEditorCommand(transaction);
+            let editorCommand = this.createEditorCommand(transaction);
+            commands.push(editorCommand);
 
+            let commandData;
             //combine commands or use the editor command directly
-            if(deletedComponentCommands) {
+            if(commands.length > 1) {
                 commandData = {};
                 commandData.type = "compoundCommand";
-                commandData.childCommands = [];
-
-                //add the delete commands
-                pushSecondArrayIntoFirst(commandData.childCommands,deletedComponentCommands);
-                //add the editor command
-                commandData.childCommands.push(editorCommand);
+                commandData.childCommands = commands;
             }
-            else {
-                commandData = editorCommand;
+            else if(commands.length === 1) {
+                commandData = commands[0];
             }
 
             //execute the command
-            this.getWorkspaceUI().getApp().executeCommand(commandData);
+            if(commandData) {
+                this.getWorkspaceUI().getApp().executeCommand(commandData);
+            }
         }
         else {
             //this is a editor state change that doesn't change the data
@@ -98,9 +114,13 @@ export default class FolderComponent extends ParentComponent {
         }
     }
 
+    //---------------------------------------------
+    // Delete Component detection and processing
+    //---------------------------------------------
+
     /** This function returns the names of any apogee components nodes which are deleted in the
      * given transaction. */
-    getDeletedApogeeComponentShortNames(editorData, transaction) {
+    getDeletedApogeeComponentShortNames(transaction) {
         //prepare to get apogee nodes
         let apogeeComponents = [];
         let getApogeeComponents = node => {
@@ -133,12 +153,280 @@ export default class FolderComponent extends ParentComponent {
         //map the names to delete commands
         return deletedApogeeComponents.map(shortName => {
             let fullName = this.member.getChildFullName(shortName);
-            let componentDeleteCommand = {};
-            componentDeleteCommand.type = "deleteComponent";
-            componentDeleteCommand.memberFullName = fullName;
-            return componentDeleteCommand;
+            let commandData = {};
+            commandData.type = "deleteComponent";
+            commandData.memberFullName = fullName;
+            return commandData;
         });
     }
+
+    //---------------------------------------------
+    // Add Component detection and processing
+    //---------------------------------------------
+
+    /** This function detects if a transaction has an create component node commands. */
+    transactionHasComponentCreate(transaction) {
+        let hasCreate = false;
+
+        //get all the replcaed apogee components
+        transaction.steps.forEach( step => {
+            if(this.stepHasCreateComponentNode(step)) {
+                hasCreate = true;
+            }
+        });
+    
+        return hasCreate;
+    }
+
+    /** This method will create a modified editor transaction and create any needed apogee create component
+     * commands if needed fro the transaction. */
+    getModifiedCommandsForCreate(transaction,deletedApogeeComponentNames) {
+        //init name change struct
+        let nameCheckStruct = this.getNameCheckStruct(deletedApogeeComponentNames)
+
+        //make a new transaction with modified component create info
+        let modifiedTransaction = this.editorData.tr;
+
+        //we will capture the component create commands that are needed
+        let componentCreateCommands = [];
+
+        //process these steps to get the modified steps and the create component commands
+        transaction.steps.forEach( step =>  {
+            //get the modified step (it may be the old step) and any needed create component commands
+            let {modifiedStep,stepCreateCommands} = this.processStepForCreateTransaction(step,nameCheckStruct);
+            modifiedTransaction.step(modifiedStep);
+            if(stepCreateCommands) {
+                componentCreateCommands.push(...stepCreateCommands);
+            }
+        });
+        
+        return {modifiedTransaction,componentCreateCommands};
+    }
+
+    /** This generates an initial list of existing names in the folder. */
+    getNameCheckStruct(deletedApogeeComponentNames) {
+        //retrieve the existing names
+        let nameCheckStruct = {};
+        for(let name in this.member.getChildMap()) {
+            nameCheckStruct[name] = true;
+        }
+
+        //remove the deleted names
+        deletedApogeeComponentNames.forEach( name => delete nameCheckStruct[name]);
+
+        return nameCheckStruct;
+    }
+
+    /** This method checks the name of a created component and returns the proper name to 
+     * use to create the component. It will be modified if the name already exists. The function
+     * also returns the modified names struct use to record the curren tname list, which it modifies in place. */
+    createComponentReplacementNameProcessing(name,nameCheckStruct) {
+        if(nameCheckStruct[name]) {
+            //repeat name! - modify it with a suffix
+            for(let suffixIndex = 1; true; suffixIndex++) {
+                let testName = name + "_" + suffixIndex;
+                if(!nameCheckStruct[testName]) {
+                    let newName = testName;
+                    //mark this name as used
+                    nameCheckStruct[newName] = true;
+                    return {name:newName, nameCheckStruct: nameCheckStruct};
+                }
+                
+                //I assume this will never happen, but just in case we will provide an end to this loop
+                if(suffixIndex > MAX_SUFFIX_INDEX) {
+                    throw new Error("Too many repeat names in create new component!");
+                }
+            }
+        }
+        else {
+            //old name was good, mark it as used
+            nameCheckStruct[name] = true;
+            return {name,nameCheckStruct}
+        }
+    }
+
+    /** This method returns the proper transaction step - possibly modified - and the create component commands. */
+    processStepForCreateTransaction(step,nameCheckStruct) {
+        if(!this.stepHasCreateComponentNode(step)) {
+            //no modified step or create component commands needed
+            return { modifiedStep: step, stepCreateCommands: [] };
+        }
+        else {
+            //we need to modify the step and make create component command(s)
+            let stepJson = step.toJSON();
+            let newContentJson = [];
+            let stepCreateCommands = [];
+            if((stepJson.stepType == "replace")||(stepJson.stepType == "replaceAround")) {
+                stepJson.slice.content.forEach( nodeJson => {
+
+                    if(nodeJson.type == "apogeeComponent") {
+                        let newNodeJson = apogee.util.jsonCopy(nodeJson);
+
+                        //remove the state
+                        let state = newNodeJson.attrs.state;
+                        delete newNodeJson.attrs.state;
+
+                        //get the name and do any needed name processing
+                        let name = newNodeJson.attrs.name;
+
+                        let newNameInfo = this.createComponentReplacementNameProcessing(name,nameCheckStruct);
+                        nameCheckStruct = newNameInfo.nameCheckStruct;
+                        if(newNameInfo.name != name) {
+                            name = newNameInfo.name;
+                            newNodeJson.attrs.name = name;
+
+                            //we need to change the name in the state too
+                           if(state) {
+                                state.memberJson.name = name;                                
+                            }
+                        }
+
+                        //create the new component for this node and add to commands for this ste-
+                        if(state) {
+                            let createCommand = this.getCreateChildComponentCommmand(state);
+                            stepCreateCommands.push(createCommand);
+
+                            //I SHOULD DO SOMETHING IF THE STATE IS MISSING - MAYBE DON'T CREATE THE NODE?
+                        }
+
+                        //store the modified json
+                        newContentJson.push(newNodeJson);
+                    }
+                    else {
+                        //not a component, store the original node
+                        newContentJson.push(nodeJson);
+                    }
+                })
+            }
+
+
+            //add the new content into the step
+            stepJson.slice.content = newContentJson;
+
+            //convert back to a step
+            let newStep = Step.fromJSON(this.editorData.schema, stepJson);
+
+            //return the new step
+            return { modifiedStep: newStep, stepCreateCommands: stepCreateCommands };
+        }
+    }
+
+    /** This method makes a create coomponent command.  */
+    getCreateChildComponentCommmand(state) {
+        let commandData = {};
+        commandData.type = "addComponent";
+        commandData.parentFullName = this.member.getFullName();
+        commandData.memberJson = state.memberJson;
+        commandData.componentJson = state.componentJson;
+        return commandData;
+    }
+
+    /** This method returns true if the given step has any create component node command. */
+    stepHasCreateComponentNode(step) {
+        if((step.jsonID == "replace")||(step.jsonID == "replaceAround")) {
+            return step.slice.content.content.some( node => (node.type.name == "apogeeComponent") );
+        }
+    }
+
+
+
+    // /** This method checks a incoming transaction frmo the editor to see if there are any apogee components created. */
+    // getCreatedApogeeComponentData(transaction) {
+    //     //prepare to get apogee nodes
+    //     let apogeeComponentInfo = [];
+    //     let getApogeeComponents = node => {
+    //         if(node.type.name == "apogeeComponent") {
+    //             let createInfo = {};
+    //             createInfo.shortName = node.attrs.name;
+    //             createInfo.state = node.attrs.state;
+    //             apogeeComponentInfo.push(createInfo);
+    //         }
+    //         //do not go inside any top level nodes MAYBE CHANGE THIS!!!
+    //         return false;
+    //     }
+    
+    //     //get all the replcaed apogee components
+    //     transaction.steps.forEach( (step,index) => {
+    //         if(step.jsonID == "replace") {
+    //             step.slice.content.content.forEach(getApogeeComponents);
+    //         }
+    //         else if(step.jsonID == "replaceAround") {
+    //             step.slice.content.content.forEach(getApogeeComponents);
+    //         }
+    //     });
+    
+    //     return apogeeComponentInfo;
+    // }
+
+    // /** If the requested components have names that are already in use, we will use a modified name. 
+    //  * This method applies any needed modified name. */
+    // correctCreateInfoforRepeatedNames(deletedApogeeComponentNames,createApogeeComponentInfo) {
+    //     //retrieve the existing names
+    //     let names = {};
+    //     for(let name in this.member.getChildMap()) {
+    //         names[name] = true;
+    //     }
+
+    //     //remove the deleted names
+    //     deletedApogeeComponentNames.forEach( name => delete names[name]);
+
+    //     //check the added names
+    //     createApogeeComponentInfo.forEach(createInfo => {
+    //         if((createInfo.shortName)&&(names[createInfo.shortName])) {
+    //             //repeat name! - modify it with a suffix
+    //             for(let suffixIndex = 1; true; suffixIndex++) {
+    //                 let newName = createInfo.shortName + "_" + suffixIndex;
+    //                 if(!names[newName]) {
+    //                     //use this name
+    //                     this.doNameChangeInCreateInfo(createInfo,newName);
+                        
+    //                     //exit check
+    //                     break;
+    //                 }
+                    
+    //                 //I assume this will never happen, but just in case we will provide an end to this loop
+    //                 if(suffixIndex > MAX_SUFFIX_INDEX) {
+    //                     throw new Error("Too many repeat names in create new component!");
+    //                 }
+    //             }
+    //         }
+    //         else {
+    //             names[createInfo.shortName] = true;
+    //         }
+    //     })
+
+    //     //return the input object - we modified it in place
+    //     return createApogeeComponentInfo;
+    // }
+
+    // /** This method updates a name in place if a create component has a repeat name. */
+    // doNameChangeInCreateInfo(createInfo,newName) {
+    //     createInfo.shortName = newName;
+    //     if(createInfo.state) {
+    //         createInfo.state.memberJson.name = newName;
+    //     }
+    // }
+
+    // /** THis method eInes the command to create the new components. For a component with missing data, 
+    //  * an error message string is returned instead of a command. */
+    // getCreatedApogeeCommands(createApogeeComponentInfo) {
+    //     //map the names to delete commands
+    //     return createApogeeComponentInfo.map(createInfo => {
+    //         let state = createInfo.state;
+    //         if(state) {
+    //             let commandData = {};
+    //             commandData.type = "addComponent";
+    //             commandData.parentFullName = this.member.getFullName();
+    //             commandData.memberJson = state.memberJson;
+    //             commandData.componentJson = state.componentJson;
+    //             return commandData;
+    //         }
+    //         else {
+    //             //error message instead of command
+    //             return "Invalid create data: " + createInfo.shortName;
+    //         }
+    //     });
+    // }
 
     //------------------------------------------
     // Editor command processing from commands created outside the editor
@@ -180,7 +468,7 @@ export default class FolderComponent extends ParentComponent {
                 transaction = transaction.deleteSelection(); 
 
                 //see if we need to delete any apogee nodes
-                var deletedApogeeComponents = this.getDeletedApogeeComponentShortNames(this.editorData,transaction);
+                var deletedApogeeComponents = this.getDeletedApogeeComponentShortNames(transaction);
 
                 if(deletedApogeeComponents.length > 0) {
                     //create delete commands

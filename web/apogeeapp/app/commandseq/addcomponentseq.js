@@ -122,13 +122,11 @@ export function addAdditionalComponent(app,optionalInitialProperties,optionalBas
 
 function getAdditionalCommands(parentComponent,childName) {
 
-    let fullName = parentComponent.getMember().getChildFullName(childName);
-
     //check selection
     let useParentSelection = getUseParentSelection(parentComponent);
     
     let insertAtEnd = !useParentSelection;
-    return parentComponent.getInsertApogeeNodeOnPageCommands(fullName,insertAtEnd);
+    return parentComponent.getInsertApogeeNodeOnPageCommands(childName,insertAtEnd);
 }
 
 function getComponentFromName(workspaceUI, componentName) {

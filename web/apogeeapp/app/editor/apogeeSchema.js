@@ -129,25 +129,40 @@ export function createFolderSchema(folderComponent) {
       defining: true,
       isolating: true,
 
-      attrs: { "name": { default: "" } },
+      attrs: { 
+        "name": { default: "" },
+        "state": { default: "" } //this is only used for transient loading, then erased
+      },
       toDOM: node => {
         let name = node.attrs.name;
 
         let member = folderMember.lookupChild(name);
         let component = workspaceUI.getComponent(member);
 
-        let memberData = member ? JSON.stringify(member.toJson()) : undefined;
-        let componentData = component ? JSON.stringify(component.toJson()) : undefined;
+        let state = {};
+        state.memberJson = member ? member.toJson() : undefined;
+        state.componentJson = component ? component.toJson() : undefined;
 
-        return ["div", { "data-name":name, "data-member": memberData, "data-component": componentData }]
+        return ["div", { "data-name":name, "data-state": JSON.stringify(state) }]
       },
       parseDOM: [{
         tag: "div[data-name]",
         getAttrs: (dom) => {
           let name = dom.getAttribute("data-name");
-          let memberData = dom.getAttribute("data-member");
-          let componentData = dom.getAttribute("data-component");
-          return { name: name };
+          let stateString = dom.getAttribute("data-state");
+          let state;
+          if(stateString) {
+            try {
+              state =  JSON.parse(stateString);
+            }
+            catch(error) {
+              //FIGURE OUT HOW TO HANDLE THIS ERROR!!!
+              console.log("Error parsing entered component: ") + name;
+              if(error.stack) console.error(error.stack);
+              state = undefined;
+            }
+          }
+          return { name, state };
         }
       }]
     }
