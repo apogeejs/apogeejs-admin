@@ -4,7 +4,6 @@
 
 import { createFolderSchema } from "/apogeeapp/app/editor/apogeeSchema.js";
 
-import {Plugin}  from "/prosemirror/lib/prosemirror-state/src/index.js";
 
 import ApogeeToolbar from "/apogeeapp/app/editor/toolbar/ApogeeToolbar.js";
 //import BlockRadioItem from "/apogeeapp/app/editor/toolbar/BlockRadioItem.js";
@@ -17,11 +16,11 @@ import StateCheck from "/apogeeapp/app/editor/StateCheck.js";
 
 import { baseKeymap } from "/apogeeapp/app/editor/apogeeCommands.js";
 
-import { EditorState }  from "/prosemirror/lib/prosemirror-state/src/index.js";
-import { DOMParser, Fragment, Node as ProseMirrorNode }  from "/prosemirror/lib/prosemirror-model/src/index.js";
+import {Plugin}  from "/prosemirror/lib/prosemirror-state/src/index.js";
+import { EditorState, Selection,  }  from "/prosemirror/lib/prosemirror-state/src/index.js";
+import { DOMParser, Node as ProseMirrorNode, Mark }  from "/prosemirror/lib/prosemirror-model/src/index.js";
 import { EditorView }  from "/prosemirror/lib/prosemirror-view/src/index.js";
-import { Step, insertPoint }  from "/prosemirror/lib/prosemirror-transform/src/index.js";
-//import { undo, redo, history }  from "/prosemirror/lib/prosemirror-history/src/history.js";
+import { Step }  from "/prosemirror/lib/prosemirror-transform/src/index.js";
 import { keymap }  from "/prosemirror/lib/prosemirror-keymap/src/keymap.js";
 
 import ApogeeComponentView from "/apogeeapp/app/editor/ApogeeComponentView.js";
@@ -160,10 +159,20 @@ export function createProseMirrorManager (folderComponent) {
 
   }
 
-  proseMirror.getNewEditorData = function (editorData, stepsJson) {
+  proseMirror.getNewEditorData = function (editorData, stepsJson, selectionJson, marksJson) {
+
+    let schema = editorData.schema;
 
     //apply the editor transaction
     var transaction = editorData.tr;
+
+    //set the state
+    let selection = Selection.fromJSON(transaction.doc,selectionJson);
+    let marks = marksJson.map(markJson => Marks.fromJson(schema,markJson));
+    transaction.setSelection(selection);
+    transaction.setStoredMarks(marks);
+
+    //apply the steps
     stepsJson.forEach(stepJson => {
       try {
         var step = Step.fromJSON(schema, stepJson);

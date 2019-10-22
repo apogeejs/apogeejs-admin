@@ -328,106 +328,6 @@ export default class FolderComponent extends ParentComponent {
         }
     }
 
-
-
-    // /** This method checks a incoming transaction frmo the editor to see if there are any apogee components created. */
-    // getCreatedApogeeComponentData(transaction) {
-    //     //prepare to get apogee nodes
-    //     let apogeeComponentInfo = [];
-    //     let getApogeeComponents = node => {
-    //         if(node.type.name == "apogeeComponent") {
-    //             let createInfo = {};
-    //             createInfo.shortName = node.attrs.name;
-    //             createInfo.state = node.attrs.state;
-    //             apogeeComponentInfo.push(createInfo);
-    //         }
-    //         //do not go inside any top level nodes MAYBE CHANGE THIS!!!
-    //         return false;
-    //     }
-    
-    //     //get all the replcaed apogee components
-    //     transaction.steps.forEach( (step,index) => {
-    //         if(step.jsonID == "replace") {
-    //             step.slice.content.content.forEach(getApogeeComponents);
-    //         }
-    //         else if(step.jsonID == "replaceAround") {
-    //             step.slice.content.content.forEach(getApogeeComponents);
-    //         }
-    //     });
-    
-    //     return apogeeComponentInfo;
-    // }
-
-    // /** If the requested components have names that are already in use, we will use a modified name. 
-    //  * This method applies any needed modified name. */
-    // correctCreateInfoforRepeatedNames(deletedApogeeComponentNames,createApogeeComponentInfo) {
-    //     //retrieve the existing names
-    //     let names = {};
-    //     for(let name in this.member.getChildMap()) {
-    //         names[name] = true;
-    //     }
-
-    //     //remove the deleted names
-    //     deletedApogeeComponentNames.forEach( name => delete names[name]);
-
-    //     //check the added names
-    //     createApogeeComponentInfo.forEach(createInfo => {
-    //         if((createInfo.shortName)&&(names[createInfo.shortName])) {
-    //             //repeat name! - modify it with a suffix
-    //             for(let suffixIndex = 1; true; suffixIndex++) {
-    //                 let newName = createInfo.shortName + "_" + suffixIndex;
-    //                 if(!names[newName]) {
-    //                     //use this name
-    //                     this.doNameChangeInCreateInfo(createInfo,newName);
-                        
-    //                     //exit check
-    //                     break;
-    //                 }
-                    
-    //                 //I assume this will never happen, but just in case we will provide an end to this loop
-    //                 if(suffixIndex > MAX_SUFFIX_INDEX) {
-    //                     throw new Error("Too many repeat names in create new component!");
-    //                 }
-    //             }
-    //         }
-    //         else {
-    //             names[createInfo.shortName] = true;
-    //         }
-    //     })
-
-    //     //return the input object - we modified it in place
-    //     return createApogeeComponentInfo;
-    // }
-
-    // /** This method updates a name in place if a create component has a repeat name. */
-    // doNameChangeInCreateInfo(createInfo,newName) {
-    //     createInfo.shortName = newName;
-    //     if(createInfo.state) {
-    //         createInfo.state.memberJson.name = newName;
-    //     }
-    // }
-
-    // /** THis method eInes the command to create the new components. For a component with missing data, 
-    //  * an error message string is returned instead of a command. */
-    // getCreatedApogeeCommands(createApogeeComponentInfo) {
-    //     //map the names to delete commands
-    //     return createApogeeComponentInfo.map(createInfo => {
-    //         let state = createInfo.state;
-    //         if(state) {
-    //             let commandData = {};
-    //             commandData.type = "addComponent";
-    //             commandData.parentFullName = this.member.getFullName();
-    //             commandData.memberJson = state.memberJson;
-    //             commandData.componentJson = state.componentJson;
-    //             return commandData;
-    //         }
-    //         else {
-    //             //error message instead of command
-    //             return "Invalid create data: " + createInfo.shortName;
-    //         }
-    //     });
-    // }
-
     //------------------------------------------
     // Editor command processing from commands created outside the editor
     //------------------------------------------
@@ -438,6 +338,9 @@ export default class FolderComponent extends ParentComponent {
         var stepsJson = [];
         var inverseStepsJson = [];
 
+        let selectionJson = this.editorData.selection.toJSON();
+        let marksJson = this.editorData.marks ? this.editorData.marks.map(mark => mark.toJSON()) : [];
+
         for(var i = 0; i < transaction.steps.length; i++) {
             var step = transaction.steps[i];
             stepsJson.push(step.toJSON());
@@ -446,11 +349,18 @@ export default class FolderComponent extends ParentComponent {
             inverseStepsJson.push(inverseStep.toJSON()); 
         }
 
+        let undoSelectionJson = transaction.selection.toJSON();
+        let undoMarksJson = transaction.marks ? transaction.marks.map(mark => mark.toJSON()) : [];
+
         var commandData = {};
         commandData.type = "literatePageTransaction";
         commandData.memberFullName = this.member.getFullName();
         commandData.steps = stepsJson;
+        commandData.selection = selectionJson;
+        commandData.marks = marksJson;
         commandData.undoSteps = inverseStepsJson;
+        commandData.undoSelection = undoSelectionJson;
+        commandData.undoMarks = undoMarksJson;
         
         return commandData;
     }

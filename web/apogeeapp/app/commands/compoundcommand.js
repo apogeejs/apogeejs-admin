@@ -19,7 +19,6 @@ compoundcommand.createUndoCommand = function(workspaceUI,commandData) {
         undoCommandJson.childCommands.push(childUndoCommandJson);
     }
     
-    undoCommandJson.cmdDone = true;
     return undoCommandJson;
 }
 
@@ -38,6 +37,9 @@ compoundcommand.executeCommand = function(workspaceUI,commandData) {
         let childCommandResult = childCommandObject.executeCommand(workspaceUI,childCommandJson);
         commandResult.childResults.push(childCommandResult);
     }
+
+    //i need to handle error cases!
+    commandResult.cmdDone = true;
     
     return commandResult;
 }

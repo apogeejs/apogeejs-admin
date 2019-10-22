@@ -63,7 +63,6 @@ export default class CommandManager {
         if((!suppressFromHistory)&&(commandObject.createUndoCommand)) {   
             undoCommand = commandObject.createUndoCommand(workspaceUI,command);  
             description = commandObject.COMMAND_TYPE; //need a better description
-            this.commandHistory.addToHistory(undoCommand,command,description);
         }
 
         if(commandObject) {

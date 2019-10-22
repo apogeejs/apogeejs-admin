@@ -22,6 +22,8 @@ literatepagetransaction.createUndoCommand = function(workspaceUI,commandData) {
         var undoCommandData = {};
         undoCommandData.type = literatepagetransaction.COMMAND_TYPE;
         undoCommandData.steps = commandData.undoSteps;
+        undoCommandData.selection = commandData.undoSelection;
+        undoCommandData.marks = commandData.undoMarks;
         undoCommandData.memberFullName = commandData.memberFullName;
         return undoCommandData;
     }
@@ -46,7 +48,7 @@ literatepagetransaction.executeCommand = function(workspaceUI,commandData) {
     var editorData = component.getEditorData();
     var editorManager = component.getEditorManager();
             
-    var newEditorData = editorManager.getNewEditorData(editorData,commandData.steps);
+    var newEditorData = editorManager.getNewEditorData(editorData,commandData.steps,commandData.selection,commandData.marks);
 
     if(newEditorData) {
         component.setEditorData(newEditorData);
