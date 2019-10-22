@@ -146,7 +146,7 @@ export default class PageDisplayContainer {
         this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
         this.contractImage.src = apogeeapp.ui.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
 
-        this.viewSelectorElement.onclick = () => this.setIsViewActive(!this.isViewActive);
+        this.viewSelectorContainer.onclick = () => this.setIsViewActive(!this.isViewActive);
         
         //add the header elment (for the save bar)
         this.headerContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
@@ -278,8 +278,14 @@ export default class PageDisplayContainer {
     /** This method is called when the member is updated, to make sure the 
     * data display is up to date. */
     memberUpdated() {
+        //update the data display
         if((this.dataDisplay)&&(!this.inEditMode)) {
             this.dataDisplay.showData();
+        }
+        //update the labels, if needed
+        if(this.isMainView) {
+            let viewSelectorLabelText = this.getViewSelectorLabelText();
+            this.viewSelectorElement.innerHTML = viewSelectorLabelText;
         }
     }
         

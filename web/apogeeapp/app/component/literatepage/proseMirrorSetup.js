@@ -192,7 +192,7 @@ export function createProseMirrorManager (folderComponent) {
 
           result.found = true;
           result.from = offset;
-          result.to = result.from + node.content.size + 2;
+          result.to = result.from + node.nodeSize;
         }
       }
     });

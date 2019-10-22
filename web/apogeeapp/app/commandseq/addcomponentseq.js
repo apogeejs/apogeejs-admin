@@ -126,6 +126,7 @@ function getAdditionalCommands(parentComponent,childName) {
     let useParentSelection = getUseParentSelection(parentComponent);
     
     let insertAtEnd = !useParentSelection;
+
     return parentComponent.getInsertApogeeNodeOnPageCommands(childName,insertAtEnd);
 }
 

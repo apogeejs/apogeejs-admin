@@ -455,6 +455,11 @@ export default class FolderComponent extends ParentComponent {
         return commandData;
     }
       
+    /** This method adds an apogee component node of the given name to the folder.
+     * It will be placed in the current selection, unless the "insertAtEnd" argument is true. 
+     * If no transaction argument is included, a new transaction will be created. If the
+     * transaction object is included, the remove action will be added to it. 
+     */
     getInsertApogeeNodeOnPageCommands(shortName,insertAtEnd) {
         let state = this.getEditorData();
         let schema = state.schema;
@@ -494,6 +499,10 @@ export default class FolderComponent extends ParentComponent {
         
     }
 
+    /** This method removes the node of the given name frmo the folder. If no
+     * transaction argument is included, a new transaction will be created. If the
+     * transaction object is included, the remove action will be added to it. 
+     */
     getRemoveApogeeNodeFromPageCommand(childShortName) {
         var state = this.getEditorData();
       
@@ -503,6 +512,25 @@ export default class FolderComponent extends ParentComponent {
         if(found) {
             let transaction = state.tr.delete(from, to);
             var commandData = this.createEditorCommand(transaction);
+            return commandData;
+        }
+        else {
+            return null;
+        }
+    }
+
+    /** This method updates the name attribute of the given node. If no 
+     * transaction argument is included, a new transaction will be created. If the
+     * transaction object is included, the remove action will be added to it. 
+     */
+    getRenameApogeeNodeCommand(oldShortName,newShortName) {
+        var state = this.getEditorData();
+      
+        let {found,from,to} = this.editorManager.getComponentRange(state,oldShortName);
+
+        if(found) {
+            let  transaction = state.tr.replaceWith(from, to,state.schema.nodes.apogeeComponent.create({ "name": newShortName }));
+            let commandData = this.createEditorCommand(transaction);
             return commandData;
         }
         else {

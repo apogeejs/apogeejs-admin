@@ -429,7 +429,7 @@ function findContainedList(parentNode, parentInsidePosition, parentListGeneratio
         listInfo = getListInfo(childNode, position, parentListGeneration);
 
         //update position for the next node
-        position += childNode.content.size + 2;
+        position += childNode.nodeSize;
     }
     return listInfo;
 }
@@ -470,7 +470,7 @@ function getContainedLists(parentNode, parentInsidePosition, parentListGeneratio
         listInfos = listInfos.concat(childListInfos);
 
         //update position for the next node
-        position += childNode.content.size + 2;
+        position += childNode.nodeSize;
     }
 
     return listInfos;

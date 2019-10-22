@@ -16,6 +16,7 @@ export function updateComponent(component) {
     var additionalLines = util.jsonCopy(componentGenerator.propertyDialogLines); 
 
     var workspaceUI = component.getWorkspaceUI(); 
+    var workspace = component.getWorkspace();
     var initialValues = component.getPropertyValues(); 
 
     //add folder list, only if we can set the parent (if there is a parent)
@@ -38,8 +39,7 @@ export function updateComponent(component) {
         var member = component.getMember();
         var memberFullName = member.getFullName();
         
-        var updateCommand;
-        var moveCommand;
+        var commands = [];
         
         //--------------
         // Update Properties
@@ -59,11 +59,12 @@ export function updateComponent(component) {
         var numComponentProps = util.jsonObjectLength(componentUpdateJson);
         
         if((numMemberProps > 0)||(numComponentProps > 0)) {
-            updateCommand = {};
+            let updateCommand = {};
             updateCommand.type = "updateComponent";
             updateCommand.memberFullName = memberFullName;
             if(numMemberProps > 0) updateCommand.updatedMemberProperties = memberUpdateJson;
             if(numComponentProps > 0) updateCommand.updatedComponentProperties = componentUpdateJson;
+            command.push(updateCommand)
         }
         
         //--------------
@@ -81,11 +82,39 @@ export function updateComponent(component) {
                 }
             }
             
-            moveCommand = {};
+            let moveCommand = {};
             moveCommand.type = "moveComponent";
             moveCommand.memberFullName = memberFullName;
             moveCommand.newMemberName = submittedValues.name;
             moveCommand.newParentFullName = submittedValues.parentName;
+            commands.push(moveCommand);
+
+            //create the editor move command
+            let oldName = member.getName();
+            let oldParent = member.getParent();
+            let oldParentComponent = workspaceUI.getComponent(oldParent);
+
+            if(newValues.parentName) {
+                let newParent = workspace.getMemberByFullName(newValues.parentName);
+                let newParentComponent = workspaceUI.getComponent(newParent);
+
+                //delete old parent apogee node 
+                let oldParentEditorCommand = oldParentComponent.getRemoveApogeeNodeFromPageCommand(oldName);
+                commands.push(oldParentEditorCommand);
+
+                //insert node add at end of new page
+                let newParentCommands = newParentComponent.getInsertApogeeNodeOnPageCommands(newValues.name,true);
+                //check if we need to add any delete component commands - we should not if we place at end
+                if(newParentCommands.deletedComponentCommands) commands.push(...newParentCommands.deletedComponentCommands);
+                //added the editor command to insert the component
+                if(newParentCommands.editorCommand) commands.push(newParentCommands.editorCommand);
+            }
+            if(newValues.name) {
+                //update apogee node name
+                let editorCommand = oldParentComponent.getRenameApogeeNodeCommand(oldName,newValues.name);
+                commands.push(editorCommand);
+            }
+
         }
         
         //---------------
@@ -94,24 +123,18 @@ export function updateComponent(component) {
 
         var command;
         
-        if((updateCommand)&&(moveCommand)) {
+        if(commands.length > 1) {
             //make a compound command
             command = {};
-            command.type = "compound";
-            command.childCommands = {};
-            command.childCommands.push(updateCommand);
-            command.childCommands.push(moveCommand);
+            command.type = "compoundCommand";
+            command.childCommands = commands;
         }
-        else if(updateCommand) {
-            command = updateCommand;
-        }
-        else if(moveCommand) {
-            command = moveCommand;
+        else if(commands.length === 1) {
+            command = commands[0];
         }
         
         //execute command
-        if(command) {
-            var workspaceUI = component.getWorkspaceUI();     
+        if(command) {   
             workspaceUI.getApp().executeCommand(command);
         }
 
