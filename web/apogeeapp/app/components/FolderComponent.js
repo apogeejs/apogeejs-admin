@@ -521,14 +521,3 @@ FolderComponent.TREE_ENTRY_SORT_ORDER = Component.FOLDER_COMPONENT_TYPE_SORT_ORD
 FolderComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.Folder"
 };
-
-
-//================================
-// Some internal functions
-//================================
-
-function pushSecondArrayIntoFirst(first,second) {
-    for(var i = 0; i < second.length; i++) {
-        first.push(second[i]);
-    }
-}
