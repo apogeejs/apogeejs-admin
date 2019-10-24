@@ -31,6 +31,9 @@ import {convertToNonListBlockType, convertToListBlockType } from "/apogeeapp/app
 
 export function createProseMirrorManager (folderComponent) {
 
+  //this is the function return object - the editor manager
+  let proseMirror = {};
+
   const schema = createFolderSchema(folderComponent);
 
   //===========================
@@ -66,10 +69,14 @@ export function createProseMirrorManager (folderComponent) {
 
   ];
 
+  //create the toolbar instance
+  let toolbarView = new ApogeeToolbar(toolbarItems);
+  proseMirror.editorToolbarElement = toolbarView.dom;
+
+  //create the toolbar plugin - we will reuse the toolbar element here
   let toolbarPlugin = new Plugin({
     view(editorView) {
-      let toolbarView = new ApogeeToolbar(toolbarItems, editorView);
-      editorView.dom.parentNode.insertBefore(toolbarView.dom, editorView.dom);
+      toolbarView.setEditorView(editorView);
       return toolbarView;
     }
   })
@@ -125,8 +132,6 @@ export function createProseMirrorManager (folderComponent) {
   //===============================
   //set up the export functions
   //===============================
-
-  var proseMirror = {};
 
   proseMirror.createEditorState = function (docJson) {
     var doc;

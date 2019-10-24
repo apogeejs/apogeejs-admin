@@ -5,15 +5,19 @@
     
 }
 .visiui_litPage_editorToolbar {
-    
+    border: 1px solid #ccc;
+    padding: 4px;
+    background-color: rgb(247,247,249);
+    font-family: 'Helvitica Neue', 'Helvitica', 'Ariel', sans-serif;
 }
 .visiui_litPage_componentToolbar {
     border-right: 1px solid #ccc;
     border-left: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    box-sizing: border-box;
+    /*box-sizing: border-box;*/
     font-family: 'Helvitica Neue', 'Helvitica', 'Ariel', sans-serif;
     padding: 8px;
+    background-color: rgb(247,247,249);
 }
 .visiui_litPage_body {
     position: relative;
@@ -23,12 +27,40 @@
     top: 0px;
     left: 0px;
 }
+.visiui_litPage_componentButton {
+    position:relative;
+    display: inline-block;
+    margin:2px;
+    border: 1px solid #ccc;
+    white-space:nowrap;
+    text-align: center;
+}
+.visiui_litPage_componentButton:hover {
+    background-color: rgb(235,235,240);;
+}
+.visiui_litPage_componentButton:active {
+    background-color: rgb(220,220,228);;
+}
+.visiui_litPage_componentButtonIcon {
+    display:inline-block;
+    margin-top:0px;
+    margin-bottom:0px;
+    margin-right:0px;
+    margin-left:2px;
+}
+.visiui_litPage_componentButtonText {
+    display:inline-block;
+    margin-top:5px;
+    margin-bottom:2px;
+    margin-right:2px;
+    margin-left:2px;
+}
 
 .visiui_pageChild_mainClass {
     position: relative;
     background-color: rgb(235,235,240);
     padding:3px;
-    border: .5px solid rgb(200,200,200);
+    border: .5px solid rgb(230,230,235);
 }
 .visiui_pageChild_bannerContainerClass {
     position: relative;
@@ -96,5 +128,5 @@
 .visiui_displayContainer_viewContainerClass {
     position: relative;
     margin: 3px;
-    outline: .5px solid rgb(200,200,200);
+    /*outline: .5px solid rgb(200,200,200);*/
 }

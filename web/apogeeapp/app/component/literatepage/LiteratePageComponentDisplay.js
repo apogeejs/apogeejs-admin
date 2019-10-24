@@ -45,13 +45,13 @@ export default class LiteratePageComponentDisplay extends EventManager {
     }
 
     setBannerState(bannerState,bannerMessage) {
-        apogeeapp.ui.removeAllChildren(this.bannerElement);
+        apogeeapp.ui.removeAllChildren(this.bannerContainer);
         if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
            //no action
         }
         else {
             var banner = getBanner(bannerMessage,bannerState);
-            this.bannerElement.appendChild(banner);
+            this.bannerContainer.appendChild(banner);
         }
 
         if(this.tab) {
@@ -184,9 +184,9 @@ export default class LiteratePageComponentDisplay extends EventManager {
         this.headerElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_header",null);
         this.tab.setHeaderContent(this.headerElement);
 
-        this.bannerElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_banner",this.headerElement);
-//        this.editorToolbarElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_editorToolbar",this.headerElement);
-        this.componentToolbarElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentToolbar",this.headerElement);
+        this.editorToolbarContainer = apogeeapp.ui.createElementWithClass("div","visiui_litPage_editorToolbar",this.headerElement);
+        this.componentToolbarContainer = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentToolbar",this.headerElement);
+        this.bannerContainer = apogeeapp.ui.createElementWithClass("div","visiui_litPage_banner",this.headerElement);
 
 //        this.initEditorToolbar();
         this.initComponentToolbar();
@@ -229,8 +229,16 @@ export default class LiteratePageComponentDisplay extends EventManager {
             let key = app.standardComponents[i];
             let generator = app.componentGenerators[key];
 
-            var buttonElement = document.createElement("button");
-            buttonElement.innerHTML = generator.displayName;
+            var buttonElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
+            //make the idon
+            var imageElement = document.createElement("img")
+            imageElement.src = apogeeapp.ui.getResourcePath(generator.ICON_RES_PATH);
+            var iconElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButtonIcon",buttonElement);
+            iconElement.appendChild(imageElement);
+            //label
+            var textElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
+            textElement.innerHTML = generator.displayName;
+            //add handler
             buttonElement.onclick = () => {
 
                 var initialValues = {};
@@ -238,12 +246,12 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
                 addComponent(app,generator,initialValues,null,null);
             }
-            this.componentToolbarElement.appendChild(buttonElement);
         }
 
         //add the additional component item
-        var buttonElement = document.createElement("button");
-        buttonElement.innerHTML = "Additional Components";
+        var buttonElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
+        var textElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
+        textElement.innerHTML = "Additional Components...";
         buttonElement.onclick = () => {
 
             var initialValues = {};
@@ -252,7 +260,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
             //I tacked on a piggyback for testing!!!
             addAdditionalComponent(app,initialValues,null,null);
         }
-        this.componentToolbarElement.appendChild(buttonElement);
+        this.componentToolbarContainer.appendChild(buttonElement);
     }
 
 
@@ -265,6 +273,9 @@ export default class LiteratePageComponentDisplay extends EventManager {
         var emptyEditorState = this.editorManager.createEditorState();
         
         this.editorView = this.editorManager.createEditorView(container,this.component, this.member, emptyEditorState);
+
+        //add the editor toolbar
+        this.editorToolbarContainer.appendChild(this.editorManager.editorToolbarElement);
         
     }
 

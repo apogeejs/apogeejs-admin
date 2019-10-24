@@ -25,13 +25,21 @@ const EMPTY_MARK_DATA = {
 export default class ApogeeToolbar {
   constructor(items, editorView) {
     this.items = items
-    this.editorView = editorView
-
+    
     this.dom = document.createElement("div")
     this.dom.className = "atb_toolbar"
-    items.forEach(item => {
-      item.registerEditorView(editorView);
+
+    this.items.forEach(item => {
       this.dom.appendChild(item.getElement());
+    })
+    
+  }
+
+  setEditorView(editorView) {
+    this.editorView = editorView;
+
+    this.items.forEach(item => {
+      item.registerEditorView(editorView);
     })
     this.update();
   }
@@ -45,7 +53,7 @@ export default class ApogeeToolbar {
   }
 
   destroy() {
-    this.dom.remove()
+    //this.dom.remove()
   }
 
   _getSelectionInfo() {
