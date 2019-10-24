@@ -309,10 +309,20 @@ export default class PageDisplayContainer {
     }
 
     endEditMode() {
+        //exit edit mode
         if(this.inEditMode) {
             this.inEditMode = false;
             this.setHeaderContent(null);
         }
+        //select the associated node in the document.
+        let parentComponent = this.component.getParentComponent();
+        if(parentComponent) {
+            let name = this.component.getMember().getName();
+            parentComponent.selectApogeeNode(name);
+        }
+        //give the editor focus
+        parentComponent.giveEditorFocusIfShowing();
+
     }
 
     isInEditMode() {

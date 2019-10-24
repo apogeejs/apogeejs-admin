@@ -2,7 +2,7 @@
  * defines the form content for the dialog. The on submit
  * function is called when submit is pressed. The on submit function should
  * return true or false, indicating whether of not to close the dialog. */
-export function showConfigurableDialog(layout,onSubmitFunction) {
+export function showConfigurableDialog(layout,onSubmitFunction,optionalOnCancelFunction) {
 
     var dialog = apogeeapp.ui.createDialog({"movable":true});
     var lineObjects = [];
@@ -21,6 +21,7 @@ export function showConfigurableDialog(layout,onSubmitFunction) {
     }
     //cancel
     formActions.onCancel = function() {
+        if(optionalOnCancelFunction) optionalOnCancelFunction();
         formActions.onClose();
     }
     //submit

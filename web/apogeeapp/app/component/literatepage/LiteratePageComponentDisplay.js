@@ -33,6 +33,10 @@ export default class LiteratePageComponentDisplay extends EventManager {
         return this.tab;
     }
 
+    getEditorView() {
+        return this.editorView;
+    }
+
     closeTab() {
         if(this.tab) {
             this.tab.close();
@@ -241,6 +245,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
             //add handler
             buttonElement.onclick = () => {
 
+                this.editorView.dom.focus();
+
                 var initialValues = {};
                 initialValues.parentName = this.member.getFullName();
 
@@ -253,6 +259,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
         var textElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
         textElement.innerHTML = "Additional Components...";
         buttonElement.onclick = () => {
+
+            this.editorView.dom.focus();
 
             var initialValues = {};
             initialValues.parentName = this.member.getFullName();

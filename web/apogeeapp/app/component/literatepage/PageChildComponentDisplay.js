@@ -119,6 +119,13 @@ export default class PageChildComponentDisplay {
 
         //make the container
         this.mainElement = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_mainClass",null);
+
+        //add the click handler, to select this node if it is clicked
+        this.mainElement.onclick = () => {
+            let name = this.member.getName();
+            let parentComponent = this.component.getParentComponent();
+            parentComponent.selectApogeeNode(name);
+        }
         
         //add title bar
         this.addTitleBar();

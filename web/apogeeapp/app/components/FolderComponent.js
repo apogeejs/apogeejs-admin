@@ -5,7 +5,7 @@ import { createProseMirrorManager } from "/apogeeapp/app/component/literatepage/
 import Component from "/apogeeapp/app/component/Component.js";
 import ParentComponent from "/apogeeapp/app/component/ParentComponent.js";
 
-import { Selection } from "/prosemirror/lib/prosemirror-state/src/index.js";
+import { Selection, NodeSelection } from "/prosemirror/lib/prosemirror-state/src/index.js";
 import { Step } from "/prosemirror/lib/prosemirror-transform/src/index.js";
 
 //this constant is used (or hopefully not) in correctCreateInfoforRepeatedNames
@@ -363,6 +363,33 @@ export default class FolderComponent extends ParentComponent {
         commandData.undoMarks = undoMarksJson;
         
         return commandData;
+    }
+
+    /** This method removes the node of the given name frmo the folder. If no
+     * transaction argument is included, a new transaction will be created. If the
+     * transaction object is included, the remove action will be added to it. 
+     */
+    selectApogeeNode(childShortName) {
+        var state = this.getEditorData();
+      
+        let {found,from,to} = this.editorManager.getComponentRange(state,childShortName);
+        //end test
+
+        if(found) {
+            let $from = state.doc.resolve(from);
+            let selection = new NodeSelection($from);
+            let transaction = state.tr.setSelection(selection);
+            this.applyTransaction(transaction);
+        }
+    }
+
+    /** This method give focus to the editor for this componennt, if the component is showing. */
+    giveEditorFocusIfShowing() {
+        let display = this.getTabDisplay();
+        let editorView = display.getEditorView(); 
+        if((display)&&(display.getIsShowing())&&(editorView.dom)) {
+            editorView.dom.focus();
+        }
     }
       
     /** This method adds an apogee component node of the given name to the folder.

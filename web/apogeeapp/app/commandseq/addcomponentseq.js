@@ -79,18 +79,24 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
             commandData.childCommands.push(createCommandData);
             //the insert node commands
             commandData.childCommands.push(additionalCommands.editorCommand);
-
             
             //execute command
             workspaceUI.getApp().executeCommand(commandData);
 
+            //give focus back to editor
+            parentComponent.giveEditorFocusIfShowing();
+
             //return true to close the dialog
             return true;
         }
+
+        //give foxus back to editor
+        let onCancelFunction = () => parentComponent.giveEditorFocusIfShowing();
         
         //show dialog
-        showConfigurableDialog(dialogLayout,onSubmitFunction);
+        showConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
 }
+
 
 /** This gets a callback to add an "additional" component, menaing one that is not
  * in the main component menu. */

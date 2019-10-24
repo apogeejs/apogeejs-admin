@@ -57,6 +57,24 @@ export default class Component extends EventManager {
         return this.member;
     }
 
+    getName() {
+        return this.member.getName();
+    }
+
+    getFullName() {
+        return this.member.getFullName();
+    }
+
+    getParentComponent() {
+        let parent = this.member.getParent();
+        if(parent) {
+            return this.workspaceUI.getComponent(parent);
+        }
+        else {
+            return null;
+        }
+    }
+
     /** This method returns the icon url for the component. */
     getIconUrl() {
         if(this.componentGenerator.ICON_URL) {

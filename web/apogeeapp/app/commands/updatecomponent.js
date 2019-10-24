@@ -23,8 +23,9 @@ updatecomponent.createUndoCommand = function(workspaceUI,commandData) {
     var member = workspace.getMemberByFullName(commandData.memberFullName);
     var component = workspaceUI.getComponent(member);
     
-    var originalMemberProperties = member.readProperties();
-    var originalComponentProperties = component.readExtendedProperties();
+    var originalMemberProperties = (member.generator.readProperties) ? member.generator.readProperties(member,values) : {};
+    var originalComponentProperties = {};
+    component.readExtendedProperties(originalComponentProperties);
     
     var undoMemberProperties;
     var undoComponentProperties;

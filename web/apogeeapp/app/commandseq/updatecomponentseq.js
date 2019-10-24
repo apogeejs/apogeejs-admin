@@ -64,7 +64,7 @@ export function updateComponent(component) {
             updateCommand.memberFullName = memberFullName;
             if(numMemberProps > 0) updateCommand.updatedMemberProperties = memberUpdateJson;
             if(numComponentProps > 0) updateCommand.updatedComponentProperties = componentUpdateJson;
-            command.push(updateCommand)
+            commands.push(updateCommand)
         }
         
         //--------------
@@ -138,12 +138,29 @@ export function updateComponent(component) {
             workspaceUI.getApp().executeCommand(command);
         }
 
+        //select the component and give focus to the parent editor
+        returnToEditor(component,submittedValues.name);
+
         //return true to close the dialog
         return true;
     }
 
+    //return focus to editor on cancel
+    let onCancelFunction = () => returnToEditor(component);
+
     //show dialog
-    showConfigurableDialog(dialogLayout,onSubmitFunction);
+    showConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
+}
+
+function returnToEditor(component,optionalNameToSelect) {
+    let parentComponent = component.getParentComponent();
+    if(parentComponent) {
+        parentComponent.giveEditorFocusIfShowing();
+//NOTE - this name select did nothing. ProseMirror supressed selection change for some reason. Look into this.
+        // if(optionalNameToSelect) {
+        //     parentComponent.selectApogeeNode(optionalNameToSelect);
+        // }
+    }
 }
 
 //========================
