@@ -56,6 +56,8 @@ CanvasFolderComponent.EMPTY_FOLDER_COMPONENT_JSON  = {
 
 CanvasFolderComponent.displayName = "CanvasFolder";
 CanvasFolderComponent.uniqueName = "apogeeapp.app.CanvasFolderComponent";
+CanvasFolderComponent.hasTabEntry = true;
+CanvasFolderComponent.hasChildEntry = false;
 CanvasFolderComponent.DEFAULT_WIDTH = 500;
 CanvasFolderComponent.DEFAULT_HEIGHT = 500;
 CanvasFolderComponent.ICON_RES_PATH = "/componentIcons/folder.png";

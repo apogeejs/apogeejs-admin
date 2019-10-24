@@ -77,6 +77,8 @@ FunctionComponent.TABLE_EDIT_SETTINGS = {
 
 FunctionComponent.displayName = "Function";
 FunctionComponent.uniqueName = "apogeeapp.app.FunctionComponent";
+FunctionComponent.hasTabEntry = false;
+FunctionComponent.hasChildEntry = true;
 FunctionComponent.DEFAULT_WIDTH = 400;
 FunctionComponent.DEFAULT_HEIGHT = 400;
 FunctionComponent.ICON_RES_PATH = "/componentIcons/functionTable.png";

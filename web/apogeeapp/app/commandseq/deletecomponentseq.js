@@ -17,26 +17,38 @@ export function deleteComponent(component) {
     }
 
     var member = component.getMember();
+    var commands = [];
 
     ////////////////////////////////////
     //this is cumbersome - fix it up
-    var parentMember = member.getParent();
-    let parentComponent = workspaceUI.getComponent(parentMember);
+    if(component.usesChildDisplay()) {
+        var parentMember = member.getParent();
+        let parentComponent = workspaceUI.getComponent(parentMember);
 
-    let editorCommand = parentComponent.getRemoveApogeeNodeFromPageCommand(member.getName());
+        let editorCommand = parentComponent.getRemoveApogeeNodeFromPageCommand(member.getName());
+        commands.push(editorCommand);
+    }
     /////////////////////////////////
 
     //model command
     var modelCommand = {};
     modelCommand.type = "deleteComponent";
     modelCommand.memberFullName = member.getFullName();
+    commands.push(modelCommand);
     
     //combined command
-    var commandData = {};
-    commandData.type = "compoundCommand";
-    commandData.childCommands = [];
-    if(editorCommand) commandData.childCommands.push(editorCommand);
-    commandData.childCommands.push(modelCommand);
+    let commandData;
+    if(commands.length > 1) {
+        commandData = {};
+        commandData.type = "compoundCommand";
+        commandData.childCommands = commands;
+    }
+    else if(commands.length === 1) {
+        commandData = commands[0];
+    }
+    else {
+        return;
+    }
 
     workspaceUI.getApp().executeCommand(commandData);
 }

@@ -2,6 +2,7 @@ import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import CommandHistory from "/apogeeapp/app/commands/CommandHistory.js";
 import ReferenceManager from "/apogeeapp/app/references/ReferenceManager.js";
 import "/apogeeapp/app/commandConfig.js";
 import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
@@ -313,20 +314,14 @@ export default class Apogee extends EventManager {
         //standard components
         this.registerStandardComponent(JsonTableComponent);
         this.registerStandardComponent(FolderComponent);
-        this.registerStandardComponent(CanvasFolderComponent);
         this.registerStandardComponent(FunctionComponent);
         this.registerStandardComponent(FolderFunctionComponent);
         this.registerStandardComponent(DynamicForm);
         this.registerStandardComponent(FormDataComponent);
-
-    //TEMP---
-    this.registerStandardComponent(CustomComponent);
-    this.registerStandardComponent(CustomDataComponent);
-    //------------
         
         //additional components
-    //    this.registerComponent(CustomComponent);
-    //    this.registerComponent(CustomDataComponent);
+        this.registerComponent(CustomComponent);
+        this.registerComponent(CustomDataComponent);
     }
 
     /** This method registers a component. 
@@ -457,29 +452,30 @@ export default class Apogee extends EventManager {
         var getEditMenuCallback = () => this.getEditMenuItems();
         this.editMenu.setAsOnTheFlyMenu(getEditMenuCallback);
         
-        //Components Menu
-        name = "Components";
-        menu = apogeeapp.ui.Menu.createMenu(name);
-        menuBarLeft.appendChild(menu.getElement());
-        menus[name] = menu;
+        //FOR NOW REMOVE GLOBAL COMPONENT AND IMPORT MENUS
+        // //Components Menu
+        // name = "Components";
+        // menu = apogeeapp.ui.Menu.createMenu(name);
+        // menuBarLeft.appendChild(menu.getElement());
+        // menus[name] = menu;
         
-        //add create child elements
-        menu.setMenuItems(this.getAddChildMenuItems());
+        // //add create child elements
+        // menu.setMenuItems(this.getAddChildMenuItems());
         
-        //libraries menu
-        name = "Import/Export";
-        menu = apogeeapp.ui.Menu.createMenu(name);
-        menuBarLeft.appendChild(menu.getElement());
-        menus[name] = menu;
+        // //libraries menu
+        // name = "Import/Export";
+        // menu = apogeeapp.ui.Menu.createMenu(name);
+        // menuBarLeft.appendChild(menu.getElement());
+        // menus[name] = menu;
         
-        var importCallback = () => importWorkspace(this,this.fileAccessObject,FolderComponent);
-        menu.addCallbackMenuItem("Import as Folder",importCallback);
+        // var importCallback = () => importWorkspace(this,this.fileAccessObject,FolderComponent);
+        // menu.addCallbackMenuItem("Import as Folder",importCallback);
         
-        var import2Callback = () => importWorkspace(this,this.fileAccessObject,FolderFunctionComponent);
-        menu.addCallbackMenuItem("Import as Folder Function",import2Callback);
+        // var import2Callback = () => importWorkspace(this,this.fileAccessObject,FolderFunctionComponent);
+        // menu.addCallbackMenuItem("Import as Folder Function",import2Callback);
         
-        var exportCallback = () => exportWorkspace(this,this.fileAccessObject);
-        menu.addCallbackMenuItem("Export as Workspace",exportCallback);
+        // var exportCallback = () => exportWorkspace(this,this.fileAccessObject);
+        // menu.addCallbackMenuItem("Export as Workspace",exportCallback);
         
         //allow the implementation to add more menus or menu items
         if(this.addToMenuBar) {
@@ -543,12 +539,14 @@ export default class Apogee extends EventManager {
         
         var menuItems = [];
         var menuItem;
+
+        let commandHistory = this.commandManager.getCommandHistory();
         
         //populate the undo menu item
         var undoLabel;
         var undoCallback;
-        var nextUndoDesc = this.commandManager.getNextUndoDesc();
-        if(nextUndoDesc === CommandManager.NO_COMMAND) {
+        var nextUndoDesc = commandHistory.getNextUndoDesc();
+        if(nextUndoDesc === CommandHistory.NO_COMMAND) {
             undoLabel = "-no undo-"
             undoCallback = null;
         }
@@ -559,7 +557,7 @@ export default class Apogee extends EventManager {
             else {
                 undoLabel = "Undo: " + nextUndoDesc;
             }
-            undoCallback = () => this.commandManager.undo();
+            undoCallback = () => commandHistory.undo();
         }
         menuItem = {};
         menuItem.title = undoLabel;
@@ -569,8 +567,8 @@ export default class Apogee extends EventManager {
         //populate the redo menu item
         var redoLabel;
         var redoCallback;
-        var nextRedoDesc = this.commandManager.getNextRedoDesc();
-        if(nextRedoDesc === CommandManager.NO_COMMAND) {
+        var nextRedoDesc = commandHistory.getNextRedoDesc();
+        if(nextRedoDesc === CommandHistory.NO_COMMAND) {
             redoLabel = "-no redo-"
             redoCallback = null;
         }
@@ -581,7 +579,7 @@ export default class Apogee extends EventManager {
             else {
                 redoLabel = "Redo: " + nextRedoDesc;
             }
-            redoCallback = () => this.commandManager.redo();
+            redoCallback = () => commandHistory.redo();
         }
         menuItem = {};
         menuItem.title = redoLabel;
@@ -615,6 +613,15 @@ export default class Apogee extends EventManager {
         menuItemList.push(menuItem);
 
         return menuItemList;
+    }
+
+    
+    /** This method returns a callback  to add a child folder. */
+    getAddChildFolderCallback(parentFullName) {        
+        var initialValues = {};
+        initialValues.parentName = parentFullName;
+
+        return () => addComponent(this,FolderComponent,initialValues);
     }
 
 }

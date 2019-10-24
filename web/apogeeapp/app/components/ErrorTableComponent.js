@@ -74,6 +74,8 @@ ErrorTableComponent.TABLE_EDIT_SETTINGS = {
 
 ErrorTableComponent.displayName = "Error Table";
 ErrorTableComponent.uniqueName = "apogeeapp.app.ErrorTableComponent";
+ErrorTableComponent.hasTabEntry = false;
+ErrorTableComponent.hasChildEntry = true;
 ErrorTableComponent.DEFAULT_WIDTH = 300;
 ErrorTableComponent.DEFAULT_HEIGHT = 100;
 ErrorTableComponent.ICON_RES_PATH = "/componentIcons/genericDataTable.png";

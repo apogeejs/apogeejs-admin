@@ -67,11 +67,23 @@ export default class TreeComponentDisplay {
         
         //menu item callback
         var menuItemCallback = () => {
+            //open menu item
             var menuItemList = [];
             var openMenuItem = this.component.getOpenMenuItem();
             if(openMenuItem) {
                 menuItemList.push(openMenuItem);
             }
+
+            //add child folder menu item
+            if(this.component.usesTabDisplay()) {
+                var childMenuItem = {};
+                childMenuItem.title = "Add Child Folder";
+                var app = this.component.getWorkspaceUI().getApp();
+                var parentFullName = this.component.getMember().getFullName();
+                childMenuItem.callback = app.getAddChildFolderCallback(parentFullName)
+                menuItemList.push(childMenuItem);
+            }
+
             return this.component.getMenuItems(menuItemList);
         }
         

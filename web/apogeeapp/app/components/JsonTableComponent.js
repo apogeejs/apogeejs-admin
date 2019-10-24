@@ -172,6 +172,10 @@ JsonTableComponent.DEFAULT_DATA_VIEW = JsonTableComponent.COLORIZED_DATA_VEW;
 JsonTableComponent.displayName = "Data Table";
 /** This is the univeral uniaue name for the component, used to deserialize the component. */
 JsonTableComponent.uniqueName = "apogeeapp.app.JsonTableComponent";
+/** If true, this indicates the component has a tab entry */
+JsonTableComponent.hasTabEntry = false;
+/** If true, this indicates the component has an entry appearing on the parent tab */
+JsonTableComponent.hasChildEntry = true;
 JsonTableComponent.DEFAULT_WIDTH = 300;
 JsonTableComponent.DEFAULT_HEIGHT = 300;
 /** This is the icon url for the component. */

@@ -47,6 +47,8 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
             }
 
             //other validation of inputs?
+
+            let commands = [];
             
             //create the model command
             let createCommandData = {};
@@ -56,35 +58,57 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
             createCommandData.componentJson = Component.createComponentJson(componentGenerator,userInputProperties,optionalBaseComponentValues);
 
             //editor related commands
-            let parentComponent = getComponentFromName(workspaceUI,userInputProperties.parentName);
-            let additionalCommands = getAdditionalCommands(parentComponent,userInputProperties.name);
+            let additionalCommands;
+            let parentComponent
+            if(componentGenerator.hasChildEntry) {
+                parentComponent = getComponentFromName(workspaceUI,userInputProperties.parentName);
+                additionalCommands = getAdditionalCommands(parentComponent,userInputProperties.name);
 
-            let commandData = {};
-            commandData.type = "compoundCommand";
-            commandData.childCommands = [];
-            //any needed delete commands
-            if(additionalCommands.deletedComponentCommands) {
+                //store delete commands, if applicable
+                if(additionalCommands.deletedComponentCommands) {
 
-                let deletedComponentNames = additionalCommands.deletedComponentCommands.map(command => command.memberFullName);
-
-                let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedComponentNames);
-                //do not do delete.
-                if(!doDelete) return;
-
-                for(var i = 0; i < additionalCommands.deletedComponentCommands.length; i++) {
-                    commandData.childCommands.push(additionalCommands.deletedComponentCommands[i]);
+                    let deletedComponentNames = additionalCommands.deletedComponentCommands.map(command => command.memberFullName);
+    
+                    let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedComponentNames);
+                    //do not do delete.
+                    if(!doDelete) return;
+    
+                    for(var i = 0; i < additionalCommands.deletedComponentCommands.length; i++) {
+                        commands.push(additionalCommands.deletedComponentCommands[i]);
+                    }
                 }
             }
-            //the create component command
-            commandData.childCommands.push(createCommandData);
-            //the insert node commands
-            commandData.childCommands.push(additionalCommands.editorCommand);
+
+            //store create command
+            commands.push(createCommandData);
+
+            //store editor command
+            if((additionalCommands)&&(additionalCommands.editorCommand)) {
+                commands.push(additionalCommands.editorCommand);
+            }
+
+            
+            let commandData;
+            if(commands.length > 1) {
+                commandData = {};
+                commandData.type = "compoundCommand";
+                commandData.childCommands = commands;
+            }
+            else if(commands.length === 1) {
+                commandData = commands[0];
+            }
+            else {
+                //this shouldn't happen
+                return;
+            }
             
             //execute command
             workspaceUI.getApp().executeCommand(commandData);
 
             //give focus back to editor
-            parentComponent.giveEditorFocusIfShowing();
+            if(componentGenerator.hasChildEntry) {
+                parentComponent.giveEditorFocusIfShowing();
+            }
 
             //return true to close the dialog
             return true;

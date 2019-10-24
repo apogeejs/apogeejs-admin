@@ -89,30 +89,32 @@ export function updateComponent(component) {
             moveCommand.newParentFullName = submittedValues.parentName;
             commands.push(moveCommand);
 
-            //create the editor move command
-            let oldName = member.getName();
-            let oldParent = member.getParent();
-            let oldParentComponent = workspaceUI.getComponent(oldParent);
+            //create the editor move command if needed
+            if(component.usesChildDisplay()) {
+                let oldName = member.getName();
+                let oldParent = member.getParent();
+                let oldParentComponent = workspaceUI.getComponent(oldParent);
 
-            if(newValues.parentName) {
-                let newParent = workspace.getMemberByFullName(newValues.parentName);
-                let newParentComponent = workspaceUI.getComponent(newParent);
+                if(newValues.parentName) {
+                    let newParent = workspace.getMemberByFullName(newValues.parentName);
+                    let newParentComponent = workspaceUI.getComponent(newParent);
 
-                //delete old parent apogee node 
-                let oldParentEditorCommand = oldParentComponent.getRemoveApogeeNodeFromPageCommand(oldName);
-                commands.push(oldParentEditorCommand);
+                    //delete old parent apogee node 
+                    let oldParentEditorCommand = oldParentComponent.getRemoveApogeeNodeFromPageCommand(oldName);
+                    commands.push(oldParentEditorCommand);
 
-                //insert node add at end of new page
-                let newParentCommands = newParentComponent.getInsertApogeeNodeOnPageCommands(newValues.name,true);
-                //check if we need to add any delete component commands - we should not if we place at end
-                if(newParentCommands.deletedComponentCommands) commands.push(...newParentCommands.deletedComponentCommands);
-                //added the editor command to insert the component
-                if(newParentCommands.editorCommand) commands.push(newParentCommands.editorCommand);
-            }
-            if(newValues.name) {
-                //update apogee node name
-                let editorCommand = oldParentComponent.getRenameApogeeNodeCommand(oldName,newValues.name);
-                commands.push(editorCommand);
+                    //insert node add at end of new page
+                    let newParentCommands = newParentComponent.getInsertApogeeNodeOnPageCommands(newValues.name,true);
+                    //check if we need to add any delete component commands - we should not if we place at end
+                    if(newParentCommands.deletedComponentCommands) commands.push(...newParentCommands.deletedComponentCommands);
+                    //added the editor command to insert the component
+                    if(newParentCommands.editorCommand) commands.push(newParentCommands.editorCommand);
+                }
+                if(newValues.name) {
+                    //update apogee node name
+                    let editorCommand = oldParentComponent.getRenameApogeeNodeCommand(oldName,newValues.name);
+                    commands.push(editorCommand);
+                }
             }
 
         }
@@ -138,8 +140,11 @@ export function updateComponent(component) {
             workspaceUI.getApp().executeCommand(command);
         }
 
-        //select the component and give focus to the parent editor
-        returnToEditor(component,submittedValues.name);
+        if(component.usesChildDisplay()) {
+            //select the component and give focus to the parent editor if this is a child
+            //NOTE - the if is not quite right. We shoudl only return to editor if the command origniated there.
+            returnToEditor(component,submittedValues.name);
+        }
 
         //return true to close the dialog
         return true;

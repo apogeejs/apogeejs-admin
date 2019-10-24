@@ -232,25 +232,27 @@ export default class LiteratePageComponentDisplay extends EventManager {
         for(var i = 0; i < app.standardComponents.length; i++) {
             let key = app.standardComponents[i];
             let generator = app.componentGenerators[key];
+            if(generator.hasChildEntry) {
 
-            var buttonElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
-            //make the idon
-            var imageElement = document.createElement("img")
-            imageElement.src = apogeeapp.ui.getResourcePath(generator.ICON_RES_PATH);
-            var iconElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButtonIcon",buttonElement);
-            iconElement.appendChild(imageElement);
-            //label
-            var textElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
-            textElement.innerHTML = generator.displayName;
-            //add handler
-            buttonElement.onclick = () => {
+                var buttonElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
+                //make the idon
+                var imageElement = document.createElement("img")
+                imageElement.src = apogeeapp.ui.getResourcePath(generator.ICON_RES_PATH);
+                var iconElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButtonIcon",buttonElement);
+                iconElement.appendChild(imageElement);
+                //label
+                var textElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
+                textElement.innerHTML = generator.displayName;
+                //add handler
+                buttonElement.onclick = () => {
 
-                this.editorView.dom.focus();
+                    this.editorView.dom.focus();
 
-                var initialValues = {};
-                initialValues.parentName = this.member.getFullName();
+                    var initialValues = {};
+                    initialValues.parentName = this.member.getFullName();
 
-                addComponent(app,generator,initialValues,null,null);
+                    addComponent(app,generator,initialValues,null,null);
+                }
             }
         }
 

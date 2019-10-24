@@ -72,7 +72,7 @@ export default class CommandHistory {
             }
         }
         else {
-            return apogeeapp.app.CommandHistory.NO_COMMAND;
+            return CommandHistory.NO_COMMAND;
         }
     }
     
@@ -92,7 +92,7 @@ export default class CommandHistory {
             }
         }
         else {
-            return apogeeapp.app.CommandHistory.NO_COMMAND;
+            return CommandHistory.NO_COMMAND;
         }
     }
     

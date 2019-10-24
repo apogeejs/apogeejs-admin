@@ -541,6 +541,8 @@ FolderComponent.EMPTY_FOLDER_COMPONENT_JSON  = {
 
 FolderComponent.displayName = "Folder";
 FolderComponent.uniqueName = "apogeeapp.app.FolderComponent";
+FolderComponent.hasTabEntry = true;
+FolderComponent.hasChildEntry = false;
 FolderComponent.DEFAULT_WIDTH = 500;
 FolderComponent.DEFAULT_HEIGHT = 500;
 FolderComponent.ICON_RES_PATH = "/componentIcons/folder.png";

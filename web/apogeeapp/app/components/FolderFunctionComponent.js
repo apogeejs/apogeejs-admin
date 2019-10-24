@@ -78,6 +78,8 @@ export default class FolderFunctionComponent extends ParentComponent {
 
 FolderFunctionComponent.displayName = "Folder Function";
 FolderFunctionComponent.uniqueName = "apogeeapp.app.FolderFunctionComponent";
+FolderFunctionComponent.hasTabEntry = true;
+FolderFunctionComponent.hasChildEntry = true;
 FolderFunctionComponent.DEFAULT_WIDTH = 500;
 FolderFunctionComponent.DEFAULT_HEIGHT = 500;
 FolderFunctionComponent.ICON_RES_PATH = "/componentIcons/folderFunction.png";

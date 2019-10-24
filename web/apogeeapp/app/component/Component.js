@@ -134,6 +134,11 @@ export default class Component extends EventManager {
     // component display methods - this is the element in the parent tab (main display)
     //-------------------
 
+    /** This indicates if the component has a tab display. */
+    usesChildDisplay() {
+        return this.componentGenerator.hasChildEntry;
+    }
+
     getChildDisplayState() {
         return this.childDisplayState;
     }
@@ -162,9 +167,10 @@ export default class Component extends EventManager {
     // tab display methods - this is the tab element, only used for parent members
     //-------------------
 
-    //Implement in extending class:
-    ///** This indicates if the component has a tab display. */
-    //usesTabDisplay();
+    /** This indicates if the component has a tab display. */
+    usesTabDisplay() {
+        return this.componentGenerator.hasTabEntry;
+    }
 
     //Implement in extending class:
     ///** This creates the tab display for the component. */

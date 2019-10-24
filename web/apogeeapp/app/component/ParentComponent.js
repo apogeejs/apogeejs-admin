@@ -19,7 +19,8 @@ export default class ParentComponent extends Component {
         for(var childKey in childMap) {
             var childMember = childMap[childKey];
             var childComponent = this.getWorkspaceUI().getComponent(childMember);
-            if(childComponent) {
+            if((childComponent)&&(childComponent.usesTabDisplay())) {
+                //only add tree entries for components with tab displays
                 var childTreeEntry = childComponent.getTreeEntry(true);
                 treeEntry.addChild(childTreeEntry);
             }
@@ -36,25 +37,25 @@ export default class ParentComponent extends Component {
         return true;
     }
 
-    getMenuItems(optionalMenuItemList) {
-        var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
+    // getMenuItems(optionalMenuItemList) {
+    //     var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
         
-        //initialize the "add components" menu
-        var itemInfo = {};
+    //     //initialize the "add components" menu
+    //     var itemInfo = {};
         
-        var app = this.getWorkspaceUI().getApp();
-        var initialValues = {};
-        initialValues.parentName = this.member.getFullName();
+    //     var app = this.getWorkspaceUI().getApp();
+    //     var initialValues = {};
+    //     initialValues.parentName = this.member.getFullName();
         
-        itemInfo.title = "Add Component...";
-        itemInfo.childMenuItems = app.getAddChildMenuItems(initialValues);
-        menuItemList.push(itemInfo);
+    //     itemInfo.title = "Add Component...";
+    //     itemInfo.childMenuItems = app.getAddChildMenuItems(initialValues);
+    //     menuItemList.push(itemInfo);
 
-        //call base class
-        var menuItemList = super.getMenuItems(menuItemList);
+    //     //call base class
+    //     var menuItemList = super.getMenuItems(menuItemList);
                 
-        return menuItemList;
-    }
+    //     return menuItemList;
+    // }
 
     /** This brings the child component to the front and takes any other actions
      * to show the child in the open parent. */
