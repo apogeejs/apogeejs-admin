@@ -64,29 +64,29 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
                 parentComponent = getComponentFromName(workspaceUI,userInputProperties.parentName);
                 additionalCommands = getAdditionalCommands(parentComponent,userInputProperties.name);
 
-                //store delete commands, if applicable
-                if(additionalCommands.deletedComponentCommands) {
+                //added the editor setup command
+                if(additionalCommands.editorSetupCommand) commands.push(additionalCommands.editorSetupCommand);
 
+                //add any delete commands
+                if(additionalCommands.deletedComponentCommands){
+                    //make sure the user wants to proceed
                     let deletedComponentNames = additionalCommands.deletedComponentCommands.map(command => command.memberFullName);
-    
                     let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedComponentNames);
-                    //do not do delete.
+                    
+                    //return if user rejects
                     if(!doDelete) return;
-    
-                    for(var i = 0; i < additionalCommands.deletedComponentCommands.length; i++) {
-                        commands.push(additionalCommands.deletedComponentCommands[i]);
-                    }
-                }
+
+                    commands.push(...additionalCommands.deletedComponentCommands);
+                } 
             }
 
             //store create command
             commands.push(createCommandData);
 
-            //store editor command
-            if((additionalCommands)&&(additionalCommands.editorCommand)) {
-                commands.push(additionalCommands.editorCommand);
+            //add the editor insert command
+            if((additionalCommands)&&(additionalCommands.editorAddCommand)) {
+                commands.push(additionalCommands.editorAddCommand);
             }
-
             
             let commandData;
             if(commands.length > 1) {

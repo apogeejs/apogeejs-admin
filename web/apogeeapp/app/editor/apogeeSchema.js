@@ -131,6 +131,7 @@ export function createFolderSchema(folderComponent) {
 
       attrs: { 
         "name": { default: "" },
+        "id": {default: 0}, //to be used later?
         "state": { default: "" } //this is only used for transient loading, then erased
       },
       toDOM: node => {

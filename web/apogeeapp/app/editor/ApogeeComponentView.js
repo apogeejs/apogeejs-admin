@@ -36,26 +36,32 @@ export default class ApogeeComponentView {
   
     setViewDataFromNode() {
       let name = this.node.attrs["name"];
+      let memberId = this.node.attrs["memberId"];
   
-      //lookup component
-      var member = this.folderMember.lookupChild(name);
-      
-      //WE SHOULD MAKE SURE THE MEMBER BELONGS TO THIS PARENT!!!??
-      if (member) {
-        var workspaceUI = this.folderComponent.getWorkspaceUI();
-        var component = workspaceUI.getComponent(member);
-        var componentDisplay = component.getComponentDisplay();
-        if (!componentDisplay) {
-          //CLUDGE ALERT - fix this when I reorganize the code
-          var tabDisplay = this.folderComponent.getTabDisplay();
-          tabDisplay.addChildComponent(component);
-          componentDisplay = component.getComponentDisplay();
+      //temporary solution to a problem: we will hold an ID during a name
+      //change so we don't lose track of an object.
+      //we will not display data in this time.
+      if(!memberId) {
+        //lookup component
+        var member = this.folderMember.lookupChild(name);
+        
+        //WE SHOULD MAKE SURE THE MEMBER BELONGS TO THIS PARENT!!!??
+        if (member) {
+          var workspaceUI = this.folderComponent.getWorkspaceUI();
+          var component = workspaceUI.getComponent(member);
+          var componentDisplay = component.getComponentDisplay();
+          if (!componentDisplay) {
+            //CLUDGE ALERT - fix this when I reorganize the code
+            var tabDisplay = this.folderComponent.getTabDisplay();
+            tabDisplay.addChildComponent(component);
+            componentDisplay = component.getComponentDisplay();
+          }
+          var displayElement = componentDisplay.getElement();
+          this.contentDiv.appendChild(displayElement);
         }
-        var displayElement = componentDisplay.getElement();
-        this.contentDiv.appendChild(displayElement);
-      }
-      else {
-        this.contentDiv.innerHTML = "Component not found: " + name;
+        else {
+          this.contentDiv.innerHTML = "Component not found: " + name;
+        }
       }
   
     }

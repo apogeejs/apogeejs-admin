@@ -81,16 +81,16 @@ export function updateComponent(component) {
                     return false;
                 }
             }
-            
-            let moveCommand = {};
-            moveCommand.type = "moveComponent";
-            moveCommand.memberFullName = memberFullName;
-            moveCommand.newMemberName = submittedValues.name;
-            moveCommand.newParentFullName = submittedValues.parentName;
-            commands.push(moveCommand);
 
-            //create the editor move command if needed
+
+            let renameEditorCommands;
+
+            //do the first stage of editor commands
             if(component.usesChildDisplay()) {
+                //----------------------------
+                //move case
+                //delete old node
+                //----------------------------
                 let oldName = member.getName();
                 let oldParent = member.getParent();
                 let oldParentComponent = workspaceUI.getComponent(oldParent);
@@ -102,18 +102,62 @@ export function updateComponent(component) {
                     //delete old parent apogee node 
                     let oldParentEditorCommand = oldParentComponent.getRemoveApogeeNodeFromPageCommand(oldName);
                     commands.push(oldParentEditorCommand);
+                }
+                if(newValues.name) {
+                    //---------------------------
+                    //rename case
+                    //get the rename editr comamnds, then apply the one to clear the component node name
+                    //----------------------------
+                    renameEditorCommands = oldParentComponent.getRenameApogeeNodeCommands(member.getId(),oldName,newValues.name);
+                    commands.push(renameEditorCommands.setupCommand);
+                }
+            }
+            
+            //update the component name
+            let moveCommand = {};
+            moveCommand.type = "moveComponent";
+            moveCommand.memberFullName = memberFullName;
+            moveCommand.newMemberName = submittedValues.name;
+            moveCommand.newParentFullName = submittedValues.parentName;
+            commands.push(moveCommand);
+
+            //do the second stage of editor commands
+            if(component.usesChildDisplay()) {
+
+                //-----------------------------------
+                // move case
+                // add the compone nodes to the new page after the component has been moved there
+                //----------------------------------------------
+                if(newValues.parentName) {
+                    let newParent = workspace.getMemberByFullName(newValues.parentName);
+                    let newParentComponent = workspaceUI.getComponent(newParent);
 
                     //insert node add at end of new page
                     let newParentCommands = newParentComponent.getInsertApogeeNodeOnPageCommands(newValues.name,true);
-                    //check if we need to add any delete component commands - we should not if we place at end
-                    if(newParentCommands.deletedComponentCommands) commands.push(...newParentCommands.deletedComponentCommands);
-                    //added the editor command to insert the component
-                    if(newParentCommands.editorCommand) commands.push(newParentCommands.editorCommand);
+                    //added the editor setup command
+                    if(newParentCommands.editorSetupCommand) commands.push(newParentCommands.editorSetupCommand);
+                    //check if we need to add any delete component commands  - we shouldn't have any since we are not overwriting data here
+                    if(newParentCommands.deletedComponentCommands) {
+                        //make sure the user wants to proceed
+                        let deletedComponentNames = additionalCommands.deletedComponentCommands.map(command => command.memberFullName);
+                        let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedComponentNames);
+                        
+                        //return if user rejects
+                        if(!doDelete) return;
+                        
+                        commands.push(...newParentCommands.deletedComponentCommands);
+                 }
+                 //add the editor insert command
+                 if(newParentCommands.editorAddCommand) commands.push(newParentCommands.editorAddCommand);
                 }
-                if(newValues.name) {
+
+                //----------------------------
+                //rename case
+                //set the new node name, after the compnoent rename is done
+                //-------------------------------------------
+                if(renameEditorCommands) {
                     //update apogee node name
-                    let editorCommand = oldParentComponent.getRenameApogeeNodeCommand(oldName,newValues.name);
-                    commands.push(editorCommand);
+                    commands.push(renameEditorCommands.setNameCommand);
                 }
             }
 

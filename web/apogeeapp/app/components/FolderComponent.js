@@ -5,7 +5,7 @@ import { createProseMirrorManager } from "/apogeeapp/app/component/literatepage/
 import Component from "/apogeeapp/app/component/Component.js";
 import ParentComponent from "/apogeeapp/app/component/ParentComponent.js";
 
-import { Selection, NodeSelection } from "/prosemirror/lib/prosemirror-state/src/index.js";
+import { TextSelection, NodeSelection, EditorState } from "/prosemirror/lib/prosemirror-state/src/index.js";
 import { Step } from "/prosemirror/lib/prosemirror-transform/src/index.js";
 
 //this constant is used (or hopefully not) in correctCreateInfoforRepeatedNames
@@ -400,17 +400,17 @@ export default class FolderComponent extends ParentComponent {
     getInsertApogeeNodeOnPageCommands(shortName,insertAtEnd) {
         let state = this.getEditorData();
         let schema = state.schema;
-        let transaction = state.tr;
+        let setupTransaction;
         let commands = {};
         
         if(!insertAtEnd) {
             let { empty } = state.selection;
             if(!empty) {
 
-                transaction = transaction.deleteSelection(); 
+                setupTransaction = state.tr.deleteSelection(); 
 
                 //see if we need to delete any apogee nodes
-                var deletedApogeeComponents = this.getDeletedApogeeComponentShortNames(transaction);
+                var deletedApogeeComponents = this.getDeletedApogeeComponentShortNames(setupTransaction);
 
                 if(deletedApogeeComponents.length > 0) {
                     //create delete commands
@@ -423,14 +423,32 @@ export default class FolderComponent extends ParentComponent {
             //move selection to end
             let docLength = state.doc.content.size;
             let $pos = state.doc.resolve(docLength);
-            let selection = new Selection($pos,$pos);
-            transaction = transaction.setSelection(selection);
+            let selection = new TextSelection($pos,$pos);
+            setupTransaction = state.tr.setSelection(selection);
+        }
+
+        if(setupTransaction) {
+            commands.editorSetupCommand = this.createEditorCommand(setupTransaction);
+        }
+
+        //create a second transaction
+        let addTransaction;
+        if(setupTransaction) {
+            let config = {};
+            config.doc = setupTransaction.doc;
+            config.selection = setupTransaction.selection;
+            config.storedMarks = setupTransaction.storedMarks;
+            let intermediateState = EditorState.create(config);
+            addTransaction = intermediateState.tr;
+        }
+        else {
+            addTransaction = state.tr;
         }
 
         //finish the document transaction
-        transaction = transaction.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "name": shortName }));
+        addTransaction = addTransaction.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "name": shortName }));
       
-        commands.editorCommand = this.createEditorCommand(transaction);
+        commands.editorAddCommand = this.createEditorCommand(addTransaction);
 
         return commands;
         
@@ -460,15 +478,27 @@ export default class FolderComponent extends ParentComponent {
      * transaction argument is included, a new transaction will be created. If the
      * transaction object is included, the remove action will be added to it. 
      */
-    getRenameApogeeNodeCommand(oldShortName,newShortName) {
+    getRenameApogeeNodeCommands(memberId,oldShortName,newShortName) {
         var state = this.getEditorData();
-      
         let {found,from,to} = this.editorManager.getComponentRange(state,oldShortName);
 
+        let commands = {};
+
         if(found) {
-            let  transaction = state.tr.replaceWith(from, to,state.schema.nodes.apogeeComponent.create({ "name": newShortName }));
-            let commandData = this.createEditorCommand(transaction);
-            return commandData;
+            //clear the component state (my recording member id)
+            let setupTransaction = state.tr.replaceWith(from, to,state.schema.nodes.apogeeComponent.create({"memberId": memberId }));
+            commands.setupCommand = this.createEditorCommand(setupTransaction);
+
+            //later set the new name
+            let config = {};
+            config.doc = setupTransaction.doc;
+            config.selection = setupTransaction.selection;
+            config.storedMarks = setupTransaction.storedMarks;
+            let intermediateState = EditorState.create(config);
+            let setNameTransaction = intermediateState.tr.replaceWith(from, to,state.schema.nodes.apogeeComponent.create({"name": newShortName}));
+            commands.setNameCommand = this.createEditorCommand(setNameTransaction);
+
+            return commands;
         }
         else {
             return null;
