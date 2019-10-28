@@ -1,8 +1,12 @@
+import util from "/apogeeutil/util.js";
+
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /** This is a grid editor using hands on table*/
-apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.DataDisplay {
+export default class HandsonGridEditor extends DataDisplay {
     
-    constructor(viewMode,callbacks) {
-        super(viewMode,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
+    constructor(displayContainer,callbacks) {
+        super(displayContainer,callbacks,DataDisplay.NON_SCROLLING);
 
         //TBR initial sizing. now I just set it to a dummy number	
         this.gridDiv = apogeeapp.ui.createElement("div",null,{
@@ -64,7 +68,7 @@ apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.DataDisplay {
     
     getData() {
         //update "input" data before calling update
-        if(this.gridControl) this.inputData = apogee.util.jsonCopy(this.gridControl.getData());
+        if(this.gridControl) this.inputData = util.jsonCopy(this.gridControl.getData());
         return this.inputData;
     }
     
@@ -173,7 +177,7 @@ apogeeapp.app.HandsonGridEditor = class extends apogeeapp.app.DataDisplay {
         //clear the cached data flag, if it is present
         this.dataCached = false;
 
-        var editData = apogee.util.jsonCopy(this.inputData);
+        var editData = util.jsonCopy(this.inputData);
         if(!editData) {
             editData = [[]];
         }

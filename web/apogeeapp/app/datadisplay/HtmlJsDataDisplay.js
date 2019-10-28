@@ -1,3 +1,5 @@
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from
  * HTML and javascript code. Is should be passed a 
@@ -21,10 +23,10 @@
  */
 
 /** This is the display/editor for the custom control output. */
-apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
-    constructor(viewMode,callbacks,member,html,resource) {
+export default class HtmlJsDataDisplay extends DataDisplay {
+    constructor(displayContainer,callbacks,member,html,resource) {
         
-        super(viewMode,callbacks,apogeeapp.app.DataDisplay.NON_SCROLLING);
+        super(displayContainer,callbacks,DataDisplay.NON_SCROLLING);
         
         this.resource = resource;
         this.member = member;
@@ -48,7 +50,7 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
         
         //this gives the ui code access to some data display functions
         var admin = {
-            getMessenger: () => new apogee.action.Messenger(this.member),
+            getMessenger: () => new apogeeapp.app.UiCommandMessenger(this.member),
             startEditMode: () => this.startEditMode(),
             endEditMode: () => this.endEditMode()
         }
@@ -63,6 +65,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                 resource.constructorAddition.call(resource,admin);
             }
             catch(error) {
+                if(error.stack) console.error(error.stack);
+                
                 alert("Error in " + this.member.getFullName() + " init function: " + error.message);
             }
         }
@@ -86,6 +90,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     }
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     alert("Error in " + this.member.getFullName() + " onLoad function: " + error.message);
                 }
             };
@@ -104,6 +110,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     resource.onUnload.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     alert("Error in " + this.member.getFullName()+ " onUnload function: " + error.message);
                 }
             }
@@ -115,6 +123,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     resource.onResize.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     console.log("Error in " + this.member.getFullName() + " onResize function: " + error.message);
                 }
             };
@@ -137,6 +147,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                 }
             }
             catch(error) {
+                if(error.stack) console.error(error.stack);
+                
                 alert("Error in " + this.member.getFullName() + " setData function: " + error.message);
             }
         }
@@ -147,6 +159,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     return this.resource.getData.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     alert("Error in " + this.member.getFullName() + " getData function: " + error.message);
                 }
             }
@@ -164,6 +178,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     return resource.isCloseOk.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     alert("Error in " + this.member.getFullName() + " isCloseOk function: " + error.message);
                 }
             }
@@ -175,6 +191,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                     resource.destroy.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     alert("Error in " + this.member.getFullName() + " destroy function: " + error.message);
                 }
             }
@@ -189,6 +207,8 @@ apogeeapp.app.HtmlJsDataDisplay = class extends apogeeapp.app.DataDisplay {
                 resource.init.call(resource,this.outputElement,admin);
             }
             catch(error) {
+                if(error.stack) console.error(error.stack);
+                
                 alert("Error in " + this.member.getFullName() + " init function: " + error.message);
             }
         }

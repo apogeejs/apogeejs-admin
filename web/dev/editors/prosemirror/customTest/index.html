@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+    <meta charset=utf8>
+    <head>
+        <link rel=stylesheet href="https://prosemirror.net/css/editor.css">
+        <script src="https://prosemirror.net/examples/prosemirror.js"></script>
+        <script src="require-pm.js"></script>
+
+        <script src="index.js" defer></script>
+
+        <style>
+          .ProseMirror {
+            counter-reset: prosemirror-footnote;
+          }
+          footnote {
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+          }
+          footnote::after {
+            content: counter(prosemirror-footnote);
+            vertical-align: super;
+            font-size: 75%;
+            counter-increment: prosemirror-footnote;
+          }
+          .ProseMirror-hideselection .footnote-tooltip *::selection { background-color: transparent; }
+          .ProseMirror-hideselection .footnote-tooltip *::-moz-selection { background-color: transparent; }
+          .footnote-tooltip {
+            cursor: auto;
+            position: absolute;
+            left: -30px;
+            top: calc(100% + 10px);
+            background: silver;
+            padding: 3px;
+            border-radius: 2px;
+            width: 500px;
+          }
+          .footnote-tooltip::before {
+            border: 5px solid silver;
+            border-top-width: 0px;
+            border-left-color: transparent;
+            border-right-color: transparent;
+            position: absolute;
+            top: -5px;
+            left: 27px;
+            content: " ";
+            height: 0;
+            width: 0;
+          }
+        </style>
+    </head>
+    <body>
+        <button onclick="saveState()">SAVE TEST</button>
+        
+        <div id=editor style="margin-bottom: 23px"></div>
+
+        <div style="display: none" id="content">
+          <h3>Hello ProseMirror</h3>
+
+          <p>This is editable text. You can focus it and start typing.</p>
+
+          <p>To apply styling, you can select a piece of text and manipulate
+          its styling from the menu. The basic schema
+          supports <em>emphasis</em>, <strong>strong
+          text</strong>, <a href="http://marijnhaverbeke.nl/blog">links</a>, <code>code
+          font</code>, and <img src="https://prosemirror.net/img/smiley.png"> images.</p>
+
+          <p>Block-level structure can be manipulated with key bindings (try
+          ctrl-shift-2 to create a level 2 heading, or enter in an empty
+          textblock to exit the parent block), or through the menu.</p>
+
+          <p>Try using the “list” item in the menu to wrap this paragraph in
+          a numbered list.</p>
+        </div>
+    </body>
+</html>
+

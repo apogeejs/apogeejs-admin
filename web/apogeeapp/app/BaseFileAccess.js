@@ -2,7 +2,7 @@
  * This is a base class for workspace opening and saveing, or whatever actions
  * are appropriate. It should be extended to provide functionality.
  */
-apogeeapp.app.BaseFileAccess = class {
+export default class BaseFileAccess {
     /**
      * Constructor
      */

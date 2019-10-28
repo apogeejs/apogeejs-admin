@@ -1,12 +1,15 @@
+import ReferenceEntry from "/apogeeapp/app/references/ReferenceEntry.js";
+import {getLinkLoader} from "/apogeeapp/app/references/LinkLoader.js";
+
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-apogeeapp.app.JsScriptEntry = class extends apogeeapp.app.ReferenceEntry {
+export default class JsScriptEntry extends ReferenceEntry {
     
     constructor(referenceManager,referenceData) {
-        super(referenceManager,referenceData,apogeeapp.app.JsScriptEntry.REFERENCE_TYPE_INFO);
+        super(referenceManager,referenceData,JsScriptEntry.REFERENCE_TYPE_INFO);
 
     }
 
@@ -27,8 +30,8 @@ apogeeapp.app.JsScriptEntry = class extends apogeeapp.app.ReferenceEntry {
                 reject(errorMsg);
             }
 
-            this.linkCallerId = apogeeapp.app.getLinkLoader().createLinkCallerId();
-            apogeeapp.app.getLinkLoader().addLinkElement("script",this.url,this.linkCallerId,onLoad,onError);
+            this.linkCallerId = getLinkLoader().createLinkCallerId();
+            getLinkLoader().addLinkElement("script",this.url,this.linkCallerId,onLoad,onError);
         }
 
         //call link added to references
@@ -40,7 +43,7 @@ apogeeapp.app.JsScriptEntry = class extends apogeeapp.app.ReferenceEntry {
     
     /** This method removes the link. */
     remove() {
-        apogeeapp.app.getLinkLoader().removeLinkElement("script",this.url,this.linkCallerId);
+        getLinkLoader().removeLinkElement("script",this.url,this.linkCallerId);
         
         this.referenceManager.entryRemoved(this);
     }
@@ -50,14 +53,14 @@ apogeeapp.app.JsScriptEntry = class extends apogeeapp.app.ReferenceEntry {
     }
 }
 
-apogeeapp.app.JsScriptEntry.REFERENCE_TYPE_INFO = {
+JsScriptEntry.REFERENCE_TYPE_INFO = {
     "REFERENCE_TYPE": "js link",
     "LIST_NAME": "JS Scripts",
     "ADD_ENTRY_TEXT":"Add JS Script Link",
     "UPDATE_ENTRY_TEXT":"Update JS Script Link",
     "LIST_ICON_PATH":"/componentIcons/folder.png",
     "ENTRY_ICON_PATH":"/componentIcons/javascriptLink.png",
-    "createEntryFunction": (referenceManager, linkData) => new apogeeapp.app.JsScriptEntry(referenceManager,linkData)
+    "createEntryFunction": (referenceManager, linkData) => new JsScriptEntry(referenceManager,linkData)
 }
 
 

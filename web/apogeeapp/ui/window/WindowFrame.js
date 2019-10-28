@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import EventManager from "/apogeeutil/EventManager.js";
+
 /** This is a window frame component. IT is used the table window and the dialog.
  *
  * It can be minimized an maximized and dragged and resized with the mouse.  
@@ -19,7 +22,7 @@ apogeeapp.ui.WindowFrame = function(options) {
     }
     
     //base init
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
 	
     //variables
     this.windowParent = null;
@@ -41,7 +44,6 @@ apogeeapp.ui.WindowFrame = function(options) {
     this.headerCell = null;
     this.bodyCell = null;
     
-    this.headerContent = null;
     this.content = null;
     
     this.windowDragActive = false;
@@ -80,7 +82,7 @@ apogeeapp.ui.WindowFrame = function(options) {
 }
 
 //add components to this class
-apogee.base.mixin(apogeeapp.ui.WindowFrame,apogee.EventManager);
+base.mixin(apogeeapp.ui.WindowFrame,EventManager);
 
 apogeeapp.ui.WindowFrame.RESIZE_LOCATION_SIZE = 10;
 
@@ -151,11 +153,13 @@ apogeeapp.ui.WindowFrame.prototype.clearIconOverlay = function() {
     }
 }
 
-/** This sets the content for the window. */
+/** This sets the content for the window. If null (or otherwise false) is passed
+ * the content will be set to empty.*/
 apogeeapp.ui.WindowFrame.prototype.setHeaderContent = function(contentElement) {
     apogeeapp.ui.removeAllChildren(this.headerCell);
-    this.headerCell.appendChild(contentElement);
-    this.headerContent = contentElement;
+    if(contentElement) {
+        this.headerCell.appendChild(contentElement);
+    }
 }
 
 /** This sets the content for the window. The content type

@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import EventManager from "/apogeeutil/EventManager.js";
+
 /** This is a plain div that holds content similar to a window frame
  * but it does not have a outer frame and does not go in a window parent.
  * 
@@ -11,7 +14,7 @@ apogeeapp.ui.PlainFrame = function(options) {
     }
     
     //base init
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
 	
     //variables
     this.options = options;
@@ -22,7 +25,6 @@ apogeeapp.ui.PlainFrame = function(options) {
     
     this.isShowing = false;
     
-    this.headerContent = null;
     this.content = null;
 	
     //initialize
@@ -30,17 +32,19 @@ apogeeapp.ui.PlainFrame = function(options) {
 }
 
 //add components to this class
-apogee.base.mixin(apogeeapp.ui.PlainFrame,apogee.EventManager);
+base.mixin(apogeeapp.ui.PlainFrame,EventManager);
 
 //====================================
 // Public Methods
 //====================================
 
-/** This sets the content for the window. */
+/** This sets the content for the window. If null (or otherwise false) is passed
+ * the content will be set to empty.*/
 apogeeapp.ui.PlainFrame.prototype.setHeaderContent = function(contentElement) {
     apogeeapp.ui.removeAllChildren(this.headerCell);
-    this.headerCell.appendChild(contentElement);
-    this.headerContent = contentElement;
+    if(contentElement) {
+        this.headerCell.appendChild(contentElement);
+    }
 }
 
 /** This sets the content for the window. The content type
@@ -167,9 +171,6 @@ apogeeapp.ui.PlainFrame.prototype.initUI = function() {
   
     this.headerCell= this.displayAndHeader.getHeaderContainer();  
     this.bodyCell = this.displayAndHeader.getBody();
-    
-    this.windowHeaderManager = new apogeeapp.app.WindowHeaderManager();
-    this.headerCell.appendChild(this.windowHeaderManager.getHeaderElement());  
     
 }
 

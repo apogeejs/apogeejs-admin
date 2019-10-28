@@ -1,3 +1,12 @@
+import base from "/apogeeutil/base.js";
+import Messenger from "/apogee/actions/Messenger.js";
+import {addToRecalculateList} from "/apogee/lib/workspaceCalculation.js";
+import {processCode} from "/apogee/lib/codeCompiler.js"; 
+import {getDependencyInfo} from "/apogee/lib/codeDependencies.js";
+import ActionError from "/apogee/lib/ActionError.js";
+import ContextManager from "/apogee/lib/ContextManager.js";
+import Dependent from "/apogee/datacomponents/Dependent.js"
+
 /** This mixin encapsulates an object in that can be coded. It contains a function
  * and supplemental code. Object that are codeable should also be a member and
  * dependent.
@@ -8,14 +17,26 @@
  * - A Codeable must be a Member.
  * - A Codeable must be Dependent. 
  * - A Codeable must be ContextHolder
+ * 
+ * FIELD NAMES (from update event):
+ * - argList
+ * - functionBody
+ * - private
+ * - description
  */
-apogee.Codeable = {};
+let Codeable = {};
+export {Codeable as default};
 
 /** This initializes the component. argList is the arguments for the object function. */
-apogee.Codeable.init = function(argList) {
+Codeable.init = function(argList) {
     
     //arguments of the member function
-    this.argList = argList;
+    if(argList) {
+        this.argList = argList;
+    }
+    else {
+        this.argList = [];
+    }
     
     //initialze the code as empty
     this.codeSet = false;
@@ -32,71 +53,88 @@ apogee.Codeable.init = function(argList) {
     this.setResultPending(false);
     this.setResultInvalid(false);
     
+    //set field updated in init
+    this.fieldUpdated("argList");
+    this.fieldUpdated("functionBody");
+    this.fieldUpdated("private");
+    
     //fields used in calculation
-    this.calcInProgress = false;
+    this.dependencyInitInProgress = false;
     this.functionInitialized = false;
     this.initReturnValue = false;
 }
 
 /** This property tells if this object is a codeable.
  * This property should not be implemented on non-codeables. */
-apogee.Codeable.isCodeable = true
+Codeable.isCodeable = true
 
-apogee.Codeable.getSetCodeOk = function() {
+Codeable.getSetCodeOk = function() {
     return this.generator.setCodeOk;
 }
 
 /** This method returns the argument list.  */
-apogee.Codeable.getArgList = function() {
+Codeable.getArgList = function() {
     return this.argList;
 }
 
 /** This method returns the fucntion body for this member.  */
-apogee.Codeable.getFunctionBody = function() {
+Codeable.getFunctionBody = function() {
     return this.functionBody;
 }
 
 /** This method returns the supplemental code for this member.  */
-apogee.Codeable.getSupplementalCode = function() {
+Codeable.getSupplementalCode = function() {
     return this.supplementalCode;
 }
 
 /** This method returns the supplemental code for this member.  */
-apogee.Codeable.getDescription = function() {
+Codeable.getDescription = function() {
     return this.description;
 }
 
 /** This method returns the supplemental code for this member.  */
-apogee.Codeable.setDescription = function(description) {
+Codeable.setDescription = function(description) {
+    this.fieldUpdated("description");
     this.description = description;
 }
 
 /** This method returns the formula for this member.  */
-apogee.Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
+Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
 
     //set the base data
-    this.argList = codeInfo.argList;
-    this.functionBody = codeInfo.functionBody;
-    this.supplementalCode = codeInfo.supplementalCode;
+    if(this.argList.toString() != codeInfo.argList.toString()) {
+        this.fieldUpdated("argList");
+        this.argList = codeInfo.argList;
+    }
+    
+    if(this.functionBody != codeInfo.functionBody) {
+        this.fieldUpdated("functionBody");
+        this.functionBody = codeInfo.functionBody;
+    }
+    
+    if(this.supplementalCode != codeInfo.supplementalCode) {
+        this.fieldUpdated("private");
+        this.supplementalCode = codeInfo.supplementalCode;
+    }
 
     //save the variables accessed
     this.varInfo = compiledInfo.varInfo;
 
     if((!compiledInfo.errors)||(compiledInfo.errors.length === 0)) {
         //set the code  by exectuing generator
+        this.codeErrors = [];
+        
         try {
             //get the inputs to the generator
-            var messenger = new apogee.action.Messenger(this);
+            var messenger = new Messenger(this);
             
             //get the generated fucntion
             var generatedFunctions = compiledInfo.generatorFunction(messenger);
             this.memberGenerator = generatedFunctions.memberGenerator;
-            this.memberFunctionInitializer = generatedFunctions.initializer;            
-            
-            this.codeErrors = [];
+            this.memberFunctionInitializer = generatedFunctions.initializer;                       
         }
         catch(ex) {
-            this.codeErrors.push(apogee.ActionError.processException(ex,"Codeable - Set Code",false));
+            this.codeErrors.push(ActionError.processException(ex,"Codeable - Set Code",false));
         }
     }
     else {
@@ -112,19 +150,38 @@ apogee.Codeable.setCodeInfo = function(codeInfo,compiledInfo) {
     this.codeSet = true;
 }
 
+/** This is a helper method that compiles the code as needed for setCodeInfo.*/
+Codeable.applyCode = function(argList,functionBody,supplementalCode) {
+    
+    var codeInfo ={};
+    codeInfo.argList = argList;
+    codeInfo.functionBody = functionBody;
+    codeInfo.supplementalCode = supplementalCode;
+    
+    //load some needed context variables
+    var codeLabel = this.getFullName();
+    
+    //process the code text into javascript code
+    var compiledInfo = processCode(codeInfo,
+        codeLabel);
+
+    //save the code
+    this.setCodeInfo(codeInfo,compiledInfo);
+}
+
 /** This method returns the formula for this member.  */
-apogee.Codeable.initializeDependencies = function() {
+Codeable.initializeDependencies = function() {
     
     if((this.hasCode())&&(this.varInfo)&&(this.codeErrors.length === 0)) {
         try {
-            var newDependencyList = apogee.codeDependencies.getDependencyInfo(this.varInfo,
+            var newDependencyList = getDependencyInfo(this.varInfo,
                    this.getContextManager());
 
             //update dependencies
             this.updateDependencies(newDependencyList);
         }
         catch(ex) {
-            this.codeErrors.push(apogee.ActionError.processException(ex,"Codeable - Set Dependencies",false));
+            this.codeErrors.push(ActionError.processException(ex,"Codeable - Set Dependencies",false));
         }
     }
     else {
@@ -135,27 +192,33 @@ apogee.Codeable.initializeDependencies = function() {
 
 /** This method udpates the dependencies if needed because
  *the passed variable was added.  */
-apogee.Codeable.updateDependeciesForModelChange = function(recalculateList) {
+Codeable.updateDependeciesForModelChange = function(recalculateList) {
     if((this.hasCode())&&(this.varInfo)) {
                   
         //calculate new dependencies
-        var newDependencyList = apogee.codeDependencies.getDependencyInfo(this.varInfo,
+        var newDependencyList = getDependencyInfo(this.varInfo,
                this.getContextManager());
           
         //update the dependency list
         var dependenciesChanged = this.updateDependencies(newDependencyList);
         if(dependenciesChanged) {
             //add to update list
-            apogee.calculation.addToRecalculateList(recalculateList,this);
+            addToRecalculateList(recalculateList,this);
         }  
     }
 }
     
 /** This method returns the formula for this member.  */
-apogee.Codeable.clearCode = function() {
+Codeable.clearCode = function() {
     this.codeSet = false;
-    this.functionBody = "";
-    this.supplementalCode = "";
+    if(this.functionBody != "") {
+        this.fieldUpdated("functionBody");
+        this.functionBody = "";
+    }
+    if(this.supplementalCode != "") {
+        this.fieldUpdated("private");
+        this.supplementalCode = "";
+    }
     this.varInfo = null;
     this.dependencyInfo = null;
     this.memberFunctionInitializer = null;
@@ -171,27 +234,27 @@ apogee.Codeable.clearCode = function() {
 }
 
 /** This method returns the formula for this member.  */
-apogee.Codeable.hasCode = function() {
+Codeable.hasCode = function() {
     return this.codeSet;
 }
 
 /** If this is true the member is ready to be executed. 
  * @private */
-apogee.Codeable.needsCalculating = function() {
+Codeable.needsCalculating = function() {
 	return this.codeSet;
 }
 
 /** This does any init needed for calculation.  */
-apogee.Codeable.prepareForCalculate = function() {
+Codeable.prepareForCalculate = function() {
     //call the base function
-    apogee.Dependent.prepareForCalculate.call(this);
+    Dependent.prepareForCalculate.call(this);
     
     this.functionInitialized = false;
     this.initReturnValue = false;
 }
 
 /** This method sets the data object for the member.  */
-apogee.Codeable.calculate = function() {
+Codeable.calculate = function() {
     if(this.codeErrors.length > 0) {
         this.addErrors(this.codeErrors);
         this.clearCalcPending();
@@ -200,7 +263,7 @@ apogee.Codeable.calculate = function() {
     
     if((!this.memberGenerator)||(!this.memberFunctionInitializer)) {
         var msg = "Function not found for member: " + this.getName();
-        var actionError = new apogee.ActionError(msg,"Codeable - Calculate",this);
+        var actionError = new ActionError(msg,"Codeable - Calculate",this);
         this.addError(actionError);
         this.clearCalcPending();
         return;
@@ -210,13 +273,13 @@ apogee.Codeable.calculate = function() {
         this.processMemberFunction(this.memberGenerator);
     }
     catch(error) {
-        if(error == apogee.base.MEMBER_FUNCTION_INVALID_THROWABLE) {
+        if(error == base.MEMBER_FUNCTION_INVALID_THROWABLE) {
             //This is not an error. I don't like to throw an error
             //for an expected condition, but I didn't know how else
             //to do this. See notes where this is thrown.
             this.setResultInvalid(true);
         }
-        else if(error == apogee.base.MEMBER_FUNCTION_PENDING_THROWABLE) {
+        else if(error == base.MEMBER_FUNCTION_PENDING_THROWABLE) {
             //This is not an error. I don't like to throw an error
             //for an expected condition, but I didn't know how else
             //to do this. See notes where this is thrown.
@@ -232,7 +295,7 @@ apogee.Codeable.calculate = function() {
             }
 
             var errorMsg = (error.message) ? error.message : "Unknown error";
-            var actionError = new apogee.ActionError(errorMsg,"Codeable - Calculate",this);
+            var actionError = new ActionError(errorMsg,"Codeable - Calculate",this);
             actionError.setParentException(error);
             this.addError(actionError);
         }
@@ -242,29 +305,29 @@ apogee.Codeable.calculate = function() {
 }
 
 /** This makes sure user code of object function is ready to execute.  */
-apogee.Codeable.memberFunctionInitialize = function() {
+Codeable.memberFunctionInitialize = function() {
     
     if(this.functionInitialized) return this.initReturnValue;
     
     //make sure this in only called once
-    if(this.calcInProgress) {
+    if(this.dependencyInitInProgress) {
         var errorMsg = "Circular reference error";
-        var actionError = new apogee.ActionError(errorMsg,"Codeable - Calculate",this);
+        var actionError = new ActionError(errorMsg,"Codeable - Calculate",this);
         this.addError(actionError);
         //clear calc in progress flag
-        this.calcInProgress = false;
+        this.dependencyInitInProgress = false;
         this.functionInitialized = true;
         this.initReturnValue = false;
         return this.initReturnValue;
     }
-    this.calcInProgress = true;
+    this.dependencyInitInProgress = true;
     
     try {
         
         //make sure the data is set in each impactor
         this.initializeImpactors();
         if((this.hasError())||(this.getResultPending())||(this.getResultInvalid())) {
-            this.calcInProgress = false;
+            this.dependencyInitInProgress = false;
             this.functionInitialized = true;
             this.initReturnValue = false;
             return this.initReturnValue;
@@ -281,13 +344,13 @@ apogee.Codeable.memberFunctionInitialize = function() {
             console.error(error.stack);
         }
         var errorMsg = (error.message) ? error.message : "Unknown error";
-        var actionError = new apogee.ActionError(errorMsg,"Codeable - Calculate",this);
+        var actionError = new ActionError(errorMsg,"Codeable - Calculate",this);
         actionError.setParentException(error);
         this.addError(actionError);
         this.initReturnValue = false;
     }
     
-    this.calcInProgress = false;
+    this.dependencyInitInProgress = false;
     this.functionInitialized = true;
     return this.initReturnValue;
 }
@@ -298,7 +361,7 @@ apogee.Codeable.memberFunctionInitialize = function() {
 
 /** This gets an update structure to upsate a newly instantiated member
 /* to match the current object. */
-apogee.Codeable.getUpdateData = function() {
+Codeable.getUpdateData = function() {
     var updateData = {};
     if(this.hasCode()) {
         updateData.argList = this.getArgList();
@@ -317,8 +380,8 @@ apogee.Codeable.getUpdateData = function() {
 //------------------------------
 
 /** This method retrieve creates the loaded context manager. */
-apogee.Codeable.createContextManager = function() {
-    return new apogee.ContextManager(this);
+Codeable.createContextManager = function() {
+    return new ContextManager(this);
 }
 
 //===================================
@@ -328,5 +391,5 @@ apogee.Codeable.createContextManager = function() {
 //implementations must implement this function
 //This method takes the object function generated from code and processes it
 //to set the data for the object. (protected)
-//apogee.Codeable.processMemberFunction 
+//Codeable.processMemberFunction 
 

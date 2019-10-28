@@ -1,291 +1,320 @@
+import util from "/apogeeutil/util.js";
+
+import Apogee from "/apogeeapp/app/Apogee.js";
+import Component from "/apogeeapp/app/component/Component.js";
+import EditComponent from "/apogeeapp/app/component/EditComponent.js";
+import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
+import HtmlJsDataDisplay from "/apogeeapp/app/datadisplay/HtmlJsDataDisplay.js";
+import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
+import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
+
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-apogeeapp.app.CustomComponent = function(workspaceUI,control) {
-    //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,control,apogeeapp.app.CustomComponent);
-    
-    this.uiCodeFields = {};
-    this.currentCss = "";
-    
-    //keep alive or destroy on inactive
-    this.destroyOnInactive = false;
-    
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.CustomComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.CustomComponent.writeToJson);
-};
+export default class CustomComponent extends EditComponent {
 
-apogeeapp.app.CustomComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
-apogeeapp.app.CustomComponent.prototype.constructor = apogeeapp.app.CustomComponent;
+    constructor(workspaceUI,control) {
+        //extend edit component
+        super(workspaceUI,control,CustomComponent);
+        
+        this.uiCodeFields = {};
+        this.currentCss = "";
+        
+        //keep alive or destroy on inactive
+        this.destroyOnInactive = false;
+        
+        this.fieldUpdated("destroyOnInactive");
+    };
 
-//==============================
-//Resource Accessors
-//==============================
 
-apogeeapp.app.CustomComponent.prototype.getUiCodeFields = function() {
-    return this.uiCodeFields;
-}
+    //==============================
+    //Resource Accessors
+    //==============================
 
-apogeeapp.app.CustomComponent.prototype.getUiCodeField = function(codeField) {
-    var text = this.uiCodeFields[codeField];
-    if((text === null)||(text === undefined)) text = "";
-    return text;
-}
-
-apogeeapp.app.CustomComponent.prototype.getDestroyOnInactive = function() {
-    return this.destroyOnInactive;
-}
-
-apogeeapp.app.CustomComponent.prototype.getDisplayDestroyFlags = function() {
-    return this.destroyOnInactive ? apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_INACTIVE :
-            apogeeapp.app.ViewMode.DISPLAY_DESTROY_FLAG_NEVER;
-}
-
-apogeeapp.app.CustomComponent.prototype.setDestroyOnInactive = function(destroyOnInactive) {
-    this.destroyOnInactive = destroyOnInactive;
-    
-    if(this.activeOutputMode) {
-        this.activeOutputMode.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
+    getUiCodeFields() {
+        return this.uiCodeFields;
     }
+
+    getUiCodeField(codeField) {
+        var text = this.uiCodeFields[codeField];
+        if((text === null)||(text === undefined)) text = "";
+        return text;
+    }
+
+    getDestroyOnInactive() {
+        return this.destroyOnInactive;
+    }
+
+    getDisplayDestroyFlags() {
+        return this.destroyOnInactive ? apogeeapp.app.DisplayContainer.DISPLAY_DESTROY_FLAG_INACTIVE :
+                apogeeapp.app.DisplayContainer.DISPLAY_DESTROY_FLAG_NEVER;
+    }
+
+    setDestroyOnInactive(destroyOnInactive) {
+        if(destroyOnInactive != this.destroyOnInactive) {
+            this.fieldUpdated("destroyOnInactive");
+            this.destroyOnInactive = destroyOnInactive;
+
+            if(this.activeOutputMode) {
+                this.activeOutputMode.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
+            }
+        }
+    }
+
+    //==============================
+    // Protected and Private Instance Methods
+    //==============================
+
+    /**  This method retrieves the table edit settings for this component instance
+     * @protected */
+    getTableEditSettings() {
+        return CustomComponent.TABLE_EDIT_SETTINGS;
+    }
+
+    /** This method should be implemented to retrieve a data display of the give type. 
+     * @protected. */
+    getDataDisplay(displayContainer,viewType) {
+        
+        var callbacks;
+        
+        //create the new view element;
+        switch(viewType) {
+            
+            case CustomComponent.VIEW_OUTPUT:
+                displayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
+                this.activeOutputMode = displayContainer;
+                var callbacks = this.getOutputCallbacks();
+                var html = this.getUiCodeField(CustomComponent.CODE_FIELD_HTML);
+                var resource = this.createResource();
+                var dataDisplay = new HtmlJsDataDisplay(displayContainer,callbacks,this.member,html,resource);
+                return dataDisplay;
+                
+            case CustomComponent.VIEW_CODE:
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                
+            case CustomComponent.VIEW_SUPPLEMENTAL_CODE:
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+            
+            case CustomComponent.VIEW_HTML:
+                callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_HTML);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/html");
+        
+            case CustomComponent.VIEW_CSS:
+                callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_CSS);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/css");
+                
+            case CustomComponent.VIEW_UI_CODE:
+                callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_UI_CODE);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+
+
+            case CustomComponent.VIEW_DESCRIPTION:
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                return new TextAreaEditor(displayContainer,callbacks);
+                
+            default:
+    //temporary error handling...
+                alert("unrecognized view element!");
+                return null;
+        }
+    }
+
+    getOutputCallbacks(codeField) {
+        return {
+            getData: () => this.getMember().getData()
+        };
+    }
+
+    getUiCallbacks(codeField) {
+        return {
+            getData: () => {
+                var uiCodeFields = this.getUiCodeFields();
+                var data = uiCodeFields[codeField];
+                if((data === undefined)||(data === null)) data = "";
+                return data;
+            },
+            
+            getEditOk: () => true,
+            
+            saveData: (text) => this.doCodeFieldUpdate(codeField,text)
+        }
+    }
+
+    /** This method deseriliazes data for the custom resource component. */
+    updateFromJson(json) {  
+        this.loadResourceFromJson(json);
+    }
+
+    /** This method deseriliazes data for the custom resource component. This will
+     * work is no json is passed in. */
+    loadResourceFromJson(json) {   
+        if((json)&&(json.resource)) {
+            this.update(json.resource);
+        }  
+    }
+
+
+    createResource() {
+        try {
+            var uiCodeFields = this.getUiCodeFields();
+
+            var uiGeneratorBody = uiCodeFields[CustomComponent.CODE_FIELD_UI_CODE];
+            
+            var resource;
+            if((uiGeneratorBody)&&(uiGeneratorBody.length > 0)) {
+                try {
+
+                    //create the resource generator wrapped with its closure
+                    var generatorFunctionBody = util.formatString(
+                        CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
+                        uiGeneratorBody
+                    );
+
+                    //create the function generator, with the aliased variables in the closure
+                    var generatorFunction = new Function(generatorFunctionBody);
+                    var resourceFunction = generatorFunction();
+                    
+                    resource = resourceFunction();
+                }
+                catch(err) {
+                    console.log("bad ui generator function");
+                }
+            }
+                
+            //create a dummy
+            if(!resource) {
+                resource = {};
+            }
+
+            return resource;
+        }
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+            
+            alert("Error creating custom control: " + error.message);
+        }
+    }
+
+
+    //=============================
+    // Action
+    //=============================
+
+    doCodeFieldUpdate(uiCodeField,fieldValue) { 
+
+        var initialCodeFields = this.getUiCodeFields();
+        var targetCodeFields = util.jsonCopy(initialCodeFields);
+        targetCodeFields[uiCodeField] = fieldValue;
+
+        var command = {};
+        command.cmd = () => this.update(targetCodeFields);
+        command.undoCmd = () => this.update(initialCodeFields);
+        command.desc = "Update code field " + uiCodeField + " - " + this.getMember().getFullName();
+        command.setDirty = true;
+
+        Apogee.getInstance().executeCommand(command);
+        return true;  
+    }
+
+    update(uiCodeFields) { 
+        
+        //make sure we get rid of the old display
+        if(this.activeOutputMode) {
+            this.activeOutputMode.forceClearDisplay();
+        }
+        
+        //record the updates
+        if(uiCodeFields[CustomComponent.CODE_FIELD_CSS] != this.uiCodeFields[CustomComponent.CODE_FIELD_CSS]) {
+            this.fieldUpdated(CustomComponent.CODE_FIELD_CSS);
+            
+            //update css now
+            let cssInfo = uiCodeFields[CustomComponent.CODE_FIELD_CSS];
+            apogeeapp.ui.setMemberCssData(this.getMember().getId(),cssInfo);
+        }
+        if(uiCodeFields[CustomComponent.CODE_FIELD_HTML] != this.uiCodeFields[CustomComponent.CODE_FIELD_HTML]) {
+            this.fieldUpdated(CustomComponent.CODE_FIELD_HTML);
+        }
+        if(uiCodeFields[CustomComponent.CODE_FIELD_UI_CODE] != this.uiCodeFields[CustomComponent.CODE_FIELD_UI_CODE]) {
+            this.fieldUpdated(CustomComponent.CODE_FIELD_UI_CODE);
+        }
+        
+        this.uiCodeFields = uiCodeFields;
+    }
+
+    //==============================
+    // serialization
+    //==============================
+
+    readFromJson(json) {
+        if(!json) return;
+        
+        //set destroy flag
+        if(json.destroyOnInactive !== undefined) {
+            var destroyOnInactive = json.destroyOnInactive;
+            this.setDestroyOnInactive(destroyOnInactive);
+        }
+        
+        //load the resource
+        this.loadResourceFromJson(json);
+    }
+
+    /** This serializes the table component. */
+    writeToJson(json) {
+        //store the resource info
+        json.resource = this.uiCodeFields;
+        json.destroyOnInactive = this.destroyOnInactive;
+    }
+
+    //======================================
+    // properties
+    //======================================
+
+    readExtendedProperties(values) {
+        values.destroyOnInactive = this.getDestroyOnInactive();
+    }
+
+    //======================================
+    // Static methods
+    //======================================
+
+    static transferComponentProperties(inputValues,propertyJson) {
+        if(inputValues.destroyOnInactive !== undefined) {
+            propertyJson.destroyOnInactive = inputValues.destroyOnInactive;
+        }
+    }
+
 }
 
-//==============================
-// Protected and Private Instance Methods
-//==============================
 
-apogeeapp.app.CustomComponent.CODE_FIELD_HTML = "html";
-apogeeapp.app.CustomComponent.CODE_FIELD_CSS = "css";
-apogeeapp.app.CustomComponent.CODE_FIELD_UI_CODE = "uiCode";
-apogeeapp.app.CustomComponent.VIEW_OUTPUT = "Display";
-apogeeapp.app.CustomComponent.VIEW_CODE = "Input Code";
-apogeeapp.app.CustomComponent.VIEW_SUPPLEMENTAL_CODE = "Input Private";
-apogeeapp.app.CustomComponent.VIEW_HTML = "HTML";
-apogeeapp.app.CustomComponent.VIEW_CSS = "CSS";
-apogeeapp.app.CustomComponent.VIEW_UI_CODE = "uiGenerator()";
-apogeeapp.app.CustomComponent.VIEW_DESCRIPTION = "Notes";
+CustomComponent.CODE_FIELD_HTML = "html";
+CustomComponent.CODE_FIELD_CSS = "css";
+CustomComponent.CODE_FIELD_UI_CODE = "uiCode";
 
-apogeeapp.app.CustomComponent.VIEW_MODES = [
-    apogeeapp.app.CustomComponent.VIEW_OUTPUT,
-    apogeeapp.app.CustomComponent.VIEW_CODE,
-    apogeeapp.app.CustomComponent.VIEW_SUPPLEMENTAL_CODE,
-    apogeeapp.app.CustomComponent.VIEW_HTML,
-    apogeeapp.app.CustomComponent.VIEW_CSS,
-    apogeeapp.app.CustomComponent.VIEW_UI_CODE,
-    apogeeapp.app.CustomComponent.VIEW_DESCRIPTION
+CustomComponent.VIEW_OUTPUT = "Display";
+CustomComponent.VIEW_CODE = "Input Code";
+CustomComponent.VIEW_SUPPLEMENTAL_CODE = "Input Private";
+CustomComponent.VIEW_HTML = "HTML";
+CustomComponent.VIEW_CSS = "CSS";
+CustomComponent.VIEW_UI_CODE = "uiGenerator()";
+CustomComponent.VIEW_DESCRIPTION = "Notes";
+
+CustomComponent.VIEW_MODES = [
+    CustomComponent.VIEW_OUTPUT,
+    CustomComponent.VIEW_CODE,
+    CustomComponent.VIEW_SUPPLEMENTAL_CODE,
+    CustomComponent.VIEW_HTML,
+    CustomComponent.VIEW_CSS,
+    CustomComponent.VIEW_UI_CODE,
+    CustomComponent.VIEW_DESCRIPTION
 ];
 
-apogeeapp.app.CustomComponent.TABLE_EDIT_SETTINGS = {
-    "viewModes": apogeeapp.app.CustomComponent.VIEW_MODES,
-    "defaultView": apogeeapp.app.CustomComponent.VIEW_OUTPUT
-}
-
-/**  This method retrieves the table edit settings for this component instance
- * @protected */
-apogeeapp.app.CustomComponent.prototype.getTableEditSettings = function() {
-    return apogeeapp.app.CustomComponent.TABLE_EDIT_SETTINGS;
-}
-
-/** This method should be implemented to retrieve a data display of the give type. 
- * @protected. */
-apogeeapp.app.CustomComponent.prototype.getDataDisplay = function(viewMode,viewType) {
-	
-    var callbacks;
-	
-	//create the new view element;
-	switch(viewType) {
-		
-		case apogeeapp.app.CustomComponent.VIEW_OUTPUT:
-            viewMode.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
-            this.activeOutputMode = viewMode;
-            var callbacks = this.getOutputCallbacks();
-            var html = this.getUiCodeField(apogeeapp.app.CustomComponent.CODE_FIELD_HTML);
-            var resource = this.createResource();
-            var dataDisplay = new apogeeapp.app.HtmlJsDataDisplay(viewMode,callbacks,this.member,html,resource);
-            return dataDisplay;
-			
-		case apogeeapp.app.CustomComponent.VIEW_CODE:
-            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member);
-			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-			
-		case apogeeapp.app.CustomComponent.VIEW_SUPPLEMENTAL_CODE:
-			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-        
-        case apogeeapp.app.CustomComponent.VIEW_HTML:
-            callbacks = this.getUiCallbacks(apogeeapp.app.CustomComponent.CODE_FIELD_HTML);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/html");
-    
-        case apogeeapp.app.CustomComponent.VIEW_CSS:
-            callbacks = this.getUiCallbacks(apogeeapp.app.CustomComponent.CODE_FIELD_CSS);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/css");
-            
-        case apogeeapp.app.CustomComponent.VIEW_UI_CODE:
-            callbacks = this.getUiCallbacks(apogeeapp.app.CustomComponent.CODE_FIELD_UI_CODE);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-
-
-        case apogeeapp.app.CustomComponent.VIEW_DESCRIPTION:
-			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
-            //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
-            return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
-			
-		default:
-//temporary error handling...
-			alert("unrecognized view element!");
-			return null;
-	}
-}
-
-apogeeapp.app.CustomComponent.prototype.getOutputCallbacks = function(codeField) {
-    return {
-        getData: () => this.getMember().getData()
-    };
-}
-
-apogeeapp.app.CustomComponent.prototype.getUiCallbacks = function(codeField) {
-    return {
-        getData: () => {
-            var uiCodeFields = this.getUiCodeFields();
-            var data = uiCodeFields[codeField];
-            if((data === undefined)||(data === null)) data = "";
-            return data;
-        },
-        
-        getEditOk: () => true,
-        
-        saveData: (text) => {
-            var uiCodeFields = this.getUiCodeFields();
-            uiCodeFields[codeField] = text;
-            var actionResponse = this.update(uiCodeFields);
-            if(!actionResponse.getSuccess()) {
-                //show an error message
-                apogeeapp.app.errorHandling.handleActionError(actionResponse);
-            }
-            return true;  
-        }
-    }
-}
-
-/** This method deseriliazes data for the custom resource component. */
-apogeeapp.app.CustomComponent.prototype.updateFromJson = function(json) {  
-    this.loadResourceFromJson(json);
-}
-
-/** This method deseriliazes data for the custom resource component. This will
- * work is no json is passed in. */
-apogeeapp.app.CustomComponent.prototype.loadResourceFromJson = function(json) {   
-	var uiCodeFields;
-    if((!json)||(!json.resource)) {
-		uiCodeFields = {};
-	} 
-	else {
-		uiCodeFields = json.resource;
-	}  
-    this.update(uiCodeFields);
-}
-
-
-apogeeapp.app.CustomComponent.prototype.createResource = function() {
-    try {
-        var uiCodeFields = this.getUiCodeFields();
-
-        var uiGeneratorBody = uiCodeFields[apogeeapp.app.CustomComponent.CODE_FIELD_UI_CODE];
-        
-        var resource;
-        if((uiGeneratorBody)&&(uiGeneratorBody.length > 0)) {
-            try {
-
-                //create the resource generator wrapped with its closure
-                var generatorFunctionBody = apogee.util.formatString(
-                    apogeeapp.app.CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
-                    uiGeneratorBody
-                );
-
-                //create the function generator, with the aliased variables in the closure
-                var generatorFunction = new Function(generatorFunctionBody);
-                var resourceFunction = generatorFunction();
-                
-                resource = resourceFunction();
-            }
-            catch(err) {
-                console.log("bad ui generator function");
-            }
-        }
-            
-        //create a dummy
-        if(!resource) {
-            resource = {};
-        }
-
-        return resource;
-    }
-    catch(error) {
-        alert("Error creating custom control: " + error.message);
-    }
-}
-
-
-//=============================
-// Action
-//=============================
-
-apogeeapp.app.CustomComponent.prototype.update = function(uiCodeFields) { 
-    
-    //make sure we get rid of the old display
-    if(this.activeOutputMode) {
-        this.activeOutputMode.forceClearDisplay();
-    }
-    
-    this.uiCodeFields = uiCodeFields;
-    
-    var newCss = this.getUiCodeField(apogeeapp.app.CustomComponent.CODE_FIELD_CSS);
-    
-    //update the css right away
-    
-    if(newCss !== this.currentCss) {
-        if(!((newCss == "")&&(this.currentCss == ""))) {
-            apogeeapp.ui.setMemberCssData(this.getMember().getId(),newCss);
-            this.currentCss = newCss;
-        }
-    }
-    
-	var actionResponse = new apogee.ActionResponse();
-    return actionResponse; 
-}
-
-//======================================
-// Callbacks
-// These are defined as static but are called in the objects context
-//======================================
-
-apogeeapp.app.CustomComponent.readFromJson = function(json) {
-    if(!json) return;
-    
-    //set destroy flag
-    if(json.destroyOnInactive !== undefined) {
-        var destroyOnInactive = json.destroyOnInactive;
-        this.setDestroyOnInactive(destroyOnInactive);
-    }
-    
-    //load the resource
-    this.loadResourceFromJson(json);
-}
-
-/** This serializes the table component. */
-apogeeapp.app.CustomComponent.writeToJson = function(json) {
-    //store the resource info
-    json.resource = this.uiCodeFields;
-    json.destroyOnInactive = this.destroyOnInactive;
-}
-
-apogeeapp.app.CustomComponent.addPropFunction = function(component,values) {
-    values.destroyOnHide = component.getDestroyOnInactive();
-}
-
-apogeeapp.app.CustomComponent.updateProperties = function(component,oldValues,newValues) {
-    component.setDestroyOnInactive(newValues.destroyOnHide);
+CustomComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": CustomComponent.VIEW_MODES,
+    "defaultView": CustomComponent.VIEW_OUTPUT
 }
 
 /** This is the format string to create the code body for updateing the member
@@ -294,46 +323,41 @@ apogeeapp.app.CustomComponent.updateProperties = function(component,oldValues,ne
  * 1: uiPrivate
  * @private
  */
-apogeeapp.app.CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
-"//member functions",
-"var resourceFunction = function(component) {",
-"{0}",
-"}",
-"//end member functions",
-"return resourceFunction;",
-""
-   ].join("\n");
+CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
+    "//member functions",
+    "var resourceFunction = function(component) {",
+    "{0}",
+    "}",
+    "//end member functions",
+    "return resourceFunction;",
+    ""
+       ].join("\n");
+    
+    
 
-
-
-//======================================
-// Static methods
-//======================================
-
-apogeeapp.app.CustomComponent.getCreateMemberPayload = function(userInputValues) {
-    var json = {};
-    json.name = userInputValues.name;
-    json.type = apogee.JsonTable.generator.type;
-    return json;
-}
 
 //======================================
 // This is the control generator, to register the control
 //======================================
 
-apogeeapp.app.CustomComponent.displayName = "Custom Component";
-apogeeapp.app.CustomComponent.uniqueName = "apogeeapp.app.CustomComponent";
-apogeeapp.app.CustomComponent.DEFAULT_WIDTH = 500;
-apogeeapp.app.CustomComponent.DEFAULT_HEIGHT = 500;
-apogeeapp.app.CustomComponent.ICON_RES_PATH = "/componentIcons/chartControl.png";
-
-apogeeapp.app.CustomComponent.propertyDialogLines = [
+CustomComponent.displayName = "Custom Component";
+CustomComponent.uniqueName = "apogeeapp.app.CustomComponent";
+CustomComponent.hasTabEntry = false;
+CustomComponent.hasChildEntry = true;
+CustomComponent.DEFAULT_WIDTH = 500;
+CustomComponent.DEFAULT_HEIGHT = 500;
+CustomComponent.ICON_RES_PATH = "/componentIcons/chartControl.png";
+CustomComponent.DEFAULT_MEMBER_JSON = {
+    "type": "apogee.JsonTable"
+};
+CustomComponent.propertyDialogLines = [
     {
         "type":"checkbox",
         "heading":"Destroy on Hide: ",
-        "resultKey":"destroyOnHide"
+        "resultKey":"destroyOnInactive"
     }
 ];
+
 
 
 

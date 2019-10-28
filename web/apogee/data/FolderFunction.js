@@ -1,12 +1,24 @@
+import base from "/apogeeutil/base.js";
+import {doAction} from "/apogee/actions/action.js";
+import Workspace from "/apogee/data/Workspace.js";
+import ActionError from "/apogee/lib/ActionError.js";
+import ContextManager from "/apogee/lib/ContextManager.js";
+import Member from "/apogee/datacomponents/Member.js";
+import Dependent from "/apogee/datacomponents/Dependent.js";
+import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
+import Owner from "/apogee/datacomponents/Owner.js";
+import RootHolder from "/apogee/datacomponents/RootHolder.js";
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
-apogee.FolderFunction = function(name,owner,initialData,createEmptyInternalFolder) {
+function FolderFunction(name,owner,initialData,createEmptyInternalFolder) {
     //base init
-    apogee.Member.init.call(this,name,apogee.FolderFunction.generator);
-    apogee.Dependent.init.call(this);
-    apogee.ContextHolder.init.call(this);
-    apogee.Owner.init.call(this);
-    apogee.RootHolder.init.call(this);
+    Member.init.call(this,name,FolderFunction.generator);
+    Dependent.init.call(this);
+    ContextHolder.init.call(this);
+    Owner.init.call(this);
+    RootHolder.init.call(this);
     
     this.initOwner(owner);
     
@@ -15,35 +27,38 @@ apogee.FolderFunction = function(name,owner,initialData,createEmptyInternalFolde
     this.returnValueString = initialData.returnValue !== undefined ? initialData.returnValue : [];
     //set to an empty function
     this.setData(function(){});
+    this.fieldUpdated("argList");
+    this.fieldUpdated("returnValue");
     
     //recreate the root folder if info is specified
     if(createEmptyInternalFolder) {
-        var internalFolder = new apogee.Folder(apogee.FolderFunction.INTERNAL_FOLDER_NAME,this);
+        throw new Error("I need to make this folder correctly!!!");
+        var internalFolder = new Folder(FolderFunction.INTERNAL_FOLDER_NAME,this);
         this.setRoot(internalFolder);
     }
 }
 
 //add components to this class
-apogee.base.mixin(apogee.FolderFunction,apogee.Member);
-apogee.base.mixin(apogee.FolderFunction,apogee.Dependent);
-apogee.base.mixin(apogee.FolderFunction,apogee.ContextHolder);
-apogee.base.mixin(apogee.FolderFunction,apogee.Owner);
-apogee.base.mixin(apogee.FolderFunction,apogee.RootHolder);
+base.mixin(FolderFunction,Member);
+base.mixin(FolderFunction,Dependent);
+base.mixin(FolderFunction,ContextHolder);
+base.mixin(FolderFunction,Owner);
+base.mixin(FolderFunction,RootHolder);
 
-apogee.FolderFunction.INTERNAL_FOLDER_NAME = "root";
+FolderFunction.INTERNAL_FOLDER_NAME = "root";
 
 /** This gets the internal forlder for the folderFunction. */
-apogee.FolderFunction.prototype.getInternalFolder = function() {
+FolderFunction.prototype.getInternalFolder = function() {
     return this.internalFolder;
 }
 
 /** Implemnetation of get root for folder function. */
-apogee.FolderFunction.prototype.getRoot = function() {
+FolderFunction.prototype.getRoot = function() {
     return this.getInternalFolder();
 }
 
 /** This method sets the root object - implemented from RootHolder.  */
-apogee.FolderFunction.prototype.setRoot = function(child) {
+FolderFunction.prototype.setRoot = function(child) {
     this.internalFolder = child;
     var newDependsOn = [];
     if(child) newDependsOn.push(child);
@@ -51,12 +66,12 @@ apogee.FolderFunction.prototype.setRoot = function(child) {
 }
 
 /** This gets the name of the return object for the folderFunction function. */
-apogee.FolderFunction.prototype.getReturnValueString = function() {
+FolderFunction.prototype.getReturnValueString = function() {
     return this.returnValueString;
 }
 
 /** This gets the arg list of the folderFunction function. */
-apogee.FolderFunction.prototype.getArgList = function() {
+FolderFunction.prototype.getArgList = function() {
     return this.argList;
 }
 
@@ -65,7 +80,7 @@ apogee.FolderFunction.prototype.getArgList = function() {
 //------------------------------
 
 /** This overrides the get displaymethod of member to return the function declaration. */
-apogee.FolderFunction.prototype.getDisplayName = function(useFullPath) {
+FolderFunction.prototype.getDisplayName = function(useFullPath) {
     var name = useFullPath ? this.getFullName() : this.getName();
     var argList = this.getArgList();
     var argListString = argList.join(",");
@@ -79,25 +94,19 @@ apogee.FolderFunction.prototype.getDisplayName = function(useFullPath) {
 }
 
 /** This method removes any data from this workspace on closing. */
-apogee.FolderFunction.prototype.close = function() {
+FolderFunction.prototype.close = function() {
     this.internalFolder.onClose();
 }
 
 /** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-apogee.FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
+FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
     var initialData = {};
     initialData.argList = json.argList;
     initialData.returnValue = json.returnValue;
     
     var createEmptyInternalFolder;
-    if(json.internalFolder) {
-        //enforce name of internal folder
-        //this is needed for importing a workspace as a folder function
-        //this will fail quietly if we change the format, but it will still run
-        json.internalFolder.name = apogee.FolderFunction.INTERNAL_FOLDER_NAME;
-        
-        childrenJsonOutputList.push(json.internalFolder);
+    if((json.children)&&(json.children.length >= 1)) {
         createEmptyInternalFolder = false;
     }
     else {
@@ -105,20 +114,21 @@ apogee.FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
     }
 
     
-    return new apogee.FolderFunction(json.name,owner,initialData,createEmptyInternalFolder);
+    return new FolderFunction(json.name,owner,initialData,createEmptyInternalFolder);
 }
 
 /** This method adds any additional data to the json saved for this member. 
  * @protected */
-apogee.FolderFunction.prototype.addToJson = function(json) {
+FolderFunction.prototype.addToJson = function(json) {
     json.argList = this.argList;
     json.returnValue = this.returnValueString;
-    json.internalFolder = this.internalFolder.toJson();
+    json.children = {};
+    json.children[FolderFunction.INTERNAL_FOLDER_NAME] = this.internalFolder.toJson();
 }
 
 /** This method extends the base method to get the property values
  * for the property editting. */
-apogee.FolderFunction.addPropValues = function(member,values) {
+FolderFunction.readProperties = function(member,values) {
     var argList = member.getArgList();
     var argListString = argList.toString();
     values.argListString = argListString;
@@ -127,19 +137,24 @@ apogee.FolderFunction.addPropValues = function(member,values) {
 }
 
 /** This method executes a property update. */
-apogee.FolderFunction.getPropertyUpdateAction = function(folderFunction,oldValues,newValues) {
-    if((oldValues.argListString !== newValues.argListString)||(oldValues.returnValueString !== newValues.returnValueString)) {
-        var newArgList = apogee.FunctionTable.parseStringArray(newValues.argListString);
-  
-//I commented this out - I need to check to make sure that was correct        
-//        folderFunction.setArgList(newArgList);
-//        folderFunction.setReturnValueString(newValues.returnValueString);
+FolderFunction.getPropertyUpdateAction = function(folderFunction,newValues) {
+    if((newValues.argListString !== undefined)||(newValues.returnValueString!== undefined)) {
         
+        var argList;
+        if(newValues.argListString) {
+            argList = util.parseStringArray(newValues.argListString);
+        }
+        else {
+            argList = this.argList;
+        }
+        
+        var returnValueString = newValues.returnValueString ? newValues.returnValueString : this.returnValueString;
+ 
         var actionData = {};
         actionData.action = "updateFolderFunction";
-        actionData.member = folderFunction;
-        actionData.argList = newArgList;
-        actionData.returnValueString = newValues.returnValueString;
+        actionData.memberName = folderFunction.getFullName();
+        actionData.argList = argList;
+        actionData.returnValueString = returnValueString;
         return actionData;
     }    
     else {
@@ -153,13 +168,13 @@ apogee.FolderFunction.getPropertyUpdateAction = function(folderFunction,oldValue
     
 
 /** If this is true the member must be executed. */
-apogee.FolderFunction.prototype.needsCalculating = function() {
+FolderFunction.prototype.needsCalculating = function() {
 	return true;
 }
 
 /** This updates the member data based on the function. It returns
  * true for success and false if there is an error.  */
-apogee.FolderFunction.prototype.calculate = function() {  
+FolderFunction.prototype.calculate = function() {  
     //make sure the data is set in each impactor
     this.initializeImpactors();
     
@@ -182,7 +197,7 @@ apogee.FolderFunction.prototype.calculate = function() {
 
 /** This method updates the dependencies of any children
  * based on an object being added. */
-apogee.FolderFunction.prototype.updateDependeciesForModelChange = function(recalculateList) {
+FolderFunction.prototype.updateDependeciesForModelChange = function(recalculateList) {
     if(this.internalFolder) {
         this.internalFolder.updateDependeciesForModelChange(recalculateList);
     }
@@ -193,8 +208,8 @@ apogee.FolderFunction.prototype.updateDependeciesForModelChange = function(recal
 //------------------------------
 
 /** This method retrieve creates the loaded context manager. */
-apogee.FolderFunction.prototype.createContextManager = function() {
-    return new apogee.ContextManager(this);
+FolderFunction.prototype.createContextManager = function() {
+    return new ContextManager(this);
 }
 
 //------------------------------
@@ -202,12 +217,12 @@ apogee.FolderFunction.prototype.createContextManager = function() {
 //------------------------------
 
 /** this method gets the table map. */
-apogee.FolderFunction.prototype.getChildMap = function() {
+FolderFunction.prototype.getChildMap = function() {
     return this.internalFolder.childMap;
 }
 
 /** This method looks up a child from this folder.  */
-apogee.FolderFunction.prototype.lookupChild = function(name) {
+FolderFunction.prototype.lookupChild = function(name) {
     //check look for object in this folder
     return this.internalFolder.childMap[name];
 }
@@ -217,12 +232,12 @@ apogee.FolderFunction.prototype.lookupChild = function(name) {
 //------------------------------
 
 /** this method gets the hame the children inherit for the full name. */
-apogee.FolderFunction.prototype.getPossesionNameBase = function() {
+FolderFunction.prototype.getPossesionNameBase = function() {
     return this.getFullName() + ".";
 }
 
 /** This method looks up a member by its full name. */
-apogee.FolderFunction.prototype.getMemberByPathArray = function(path,startElement) {
+FolderFunction.prototype.getMemberByPathArray = function(path,startElement) {
     if(startElement === undefined) startElement = 0;
     if(path[startElement] === this.internalFolder.getName()) {
         if(startElement === path.length-1) {
@@ -244,19 +259,25 @@ apogee.FolderFunction.prototype.getMemberByPathArray = function(path,startElemen
 //==============================
 
 /** This is called from the update action. It should not be called externally. */
-apogee.FolderFunction.prototype.setReturnValueString = function(returnValueString) {
+FolderFunction.prototype.setReturnValueString = function(returnValueString) {
+    if(this.returnValueString != returnValueString) {
+        this.fieldUpdated("returnValue");
+    }
     this.returnValueString = returnValueString;
 }
 
 /** This is called from the update action. It should not be called externally. */
-apogee.FolderFunction.prototype.setArgList = function(argList) {
+FolderFunction.prototype.setArgList = function(argList) {
+    if(this.argList != argList) {
+        this.fieldUpdated("argList");
+    }
     this.argList = argList;
 }
 
 /** This method creates the folderFunction function. It is called from the update action 
  * and should not be called externally. 
  * @private */
-apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErrors) {
+FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErrors) {
 
     //create a copy of the workspace to do the function calculation - we don't update the UI display version
     var virtualWorkspace;
@@ -290,8 +311,8 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         var updateActionList = [];
         for(var i = 0; i < inputElementArray.length; i++) {
             var entry = {};
-            entry.action = "updateData";
-            entry.member = inputElementArray[i];
+            entry.action = "updateMember";
+            entry.memberName = inputElementArray[i].getFullName();
             entry.data = arguments[i];
             updateActionList.push(entry);
         }
@@ -299,11 +320,13 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
         var actionData = {};
         actionData.action = "compoundAction";
         actionData.actions = updateActionList;
-        actionData.workspace = virtualWorkspace;
 
         //apply the update
-        var actionResponse = apogee.action.doAction(actionData,false);        
-        if(actionResponse.getSuccess()) {
+        var actionResult = doAction(virtualWorkspace,actionData);        
+        if(actionResult.alertMsg) {
+            CommandManager.errorAlert(actionResult.alertMsg);
+        }
+        if(actionResult.actionDone) {
             //retrieve the result
             if(returnValueTable) {
                 
@@ -318,10 +341,6 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
                 return undefined;
             }
         }
-        else {
-            //error exectuing folderFunction function - thro wan exception
-            throw apogee.base.createError(actionResponse.getErrorMsg());
-        }
     }
     
     return folderFunctionFunction;    
@@ -329,12 +348,19 @@ apogee.FolderFunction.prototype.getFolderFunctionFunction = function(folderFunct
 
 /** This method creates a copy of the workspace to be used for the function evvaluation. 
  * @private */
-apogee.FolderFunction.prototype.createVirtualWorkspace = function(folderFunctionErrors) {
+FolderFunction.prototype.createVirtualWorkspace = function(folderFunctionErrors) {
     try {
-		return apogee.Workspace.createVirtualWorkpaceFromFolder(this.getName(),this.internalFolder,this.getOwner());
+        var folderJson = this.internalFolder.toJson();
+		var workspaceJson = Workspace.createWorkpaceJsonFromFolderJson(this.getName(),folderJson);
+        var virtualWorkspace = new Workspace(this.getOwner());
+        var actionResult = virtualWorkspace.loadFromJson(workspaceJson);
+        
+        //do something with action result!!!
+        
+        return virtualWorkspace;
 	}
 	catch(error) {
-        var actionError = apogee.ActionError.processException(exception,"FolderFunction - Code",false);
+        var actionError = ActionError.processException(error,"FolderFunction - Code",false);
 		folderFunctionErrors.push(actionError);
 		return null;
 	}
@@ -342,7 +368,7 @@ apogee.FolderFunction.prototype.createVirtualWorkspace = function(folderFunction
 
 /** This method loads the input argument members from the virtual workspace. 
  * @private */
-apogee.FolderFunction.prototype.loadInputElements = function(rootFolder,folderFunctionErrors) {
+FolderFunction.prototype.loadInputElements = function(rootFolder,folderFunctionErrors) {
     var argMembers = [];
     for(var i = 0; i < this.argList.length; i++) {
         var argName = this.argList[i];
@@ -353,7 +379,7 @@ apogee.FolderFunction.prototype.loadInputElements = function(rootFolder,folderFu
 //		else {
 //            //missing input element
 //            var msg = "Input element not found in folderFunction: " + argName;
-//            var actionError = new apogee.ActionError(msg,"FolderFunction - Code",this);
+//            var actionError = new ActionError(msg,"FolderFunction - Code",this);
 //            folderFunctionErrors.push(actionError);
 //        }       
     }
@@ -362,12 +388,12 @@ apogee.FolderFunction.prototype.loadInputElements = function(rootFolder,folderFu
 
 /** This method loads the output member from the virtual workspace. 
  * @private  */
-apogee.FolderFunction.prototype.loadOutputElement = function(rootFolder,folderFunctionErrors) {
+FolderFunction.prototype.loadOutputElement = function(rootFolder,folderFunctionErrors) {
     var returnValueMember = rootFolder.lookupChild(this.returnValueString);
 //    if(!returnValueMember) {
 //        //missing input element
 //        var msg = "Return element not found in folderFunction: " + this.returnValueString;
-//        var actionError = new apogee.ActionError(msg,"FolderFunction - Code",this);
+//        var actionError = new ActionError(msg,"FolderFunction - Code",this);
 //        folderFunctionErrors.push(actionError);
 //    }
     return returnValueMember;
@@ -378,16 +404,16 @@ apogee.FolderFunction.prototype.loadOutputElement = function(rootFolder,folderFu
 // Static methods
 //============================
 
-apogee.FolderFunction.generator = {};
-apogee.FolderFunction.generator.displayName = "Folder Function";
-apogee.FolderFunction.generator.type = "apogee.FolderFunction";
-apogee.FolderFunction.generator.createMember = apogee.FolderFunction.fromJson;
-apogee.FolderFunction.generator.addPropFunction = apogee.FolderFunction.addPropValues;
-apogee.FolderFunction.generator.getPropertyUpdateAction = apogee.FolderFunction.getPropertyUpdateAction;
-apogee.FolderFunction.generator.setDataOk = false;
-apogee.FolderFunction.generator.setCodeOk = false;
+FolderFunction.generator = {};
+FolderFunction.generator.displayName = "Folder Function";
+FolderFunction.generator.type = "apogee.FolderFunction";
+FolderFunction.generator.createMember = FolderFunction.fromJson;
+FolderFunction.generator.readProperties = FolderFunction.readProperties;
+FolderFunction.generator.getPropertyUpdateAction = FolderFunction.getPropertyUpdateAction;
+FolderFunction.generator.setDataOk = false;
+FolderFunction.generator.setCodeOk = false;
 
 //register this member
-apogee.Workspace.addMemberGenerator(apogee.FolderFunction.generator);
+Workspace.addMemberGenerator(FolderFunction.generator);
 
 

@@ -1,23 +1,25 @@
+import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} from "/apogee/lib/workspaceCalculation.js";
+
 /**
- * Action Namespace
- * An action is an operation on the data model. The code in this namespace handles
+ * Action Module
+ * An action is an operation on the data model. The code in this module handles
  * the generic parts of the action process, and the action specific code is placed
  * elsewhere.
  * 
  * Generic Action:
  * - The action is represented by a data object "actionData". 
- * - The method apogee.action.doAction is called to exectue the action.
- * - Available actions are registered through the method apogee.action.addActionInfo.
+ * - The method doAction is called to exectue the action.
+ * - Available actions are registered through the method addActionInfo.
  *   this allows the doAction method to dispatch the actionData to the proper
  *   action specific code.
- * - After the action specific code is completed, generic code runs to ensure eny
- *   remote tables that need to be updated do get updated, and that the proper
- *   events are fired.
+ * - Included in doing that action is any updates to dependent tables and the 
+ * firing of any events for the changes.
  *   
  * Registering a specific action:
- * To register a specific action, apogee.action.addActionInfo must be called with 
+ * To register a specific action, addActionInfo must be called with 
  * a actionInfo object. An action info object is of the following format.
  * actionInfo object: {
+ *   "action": (string - this is the name of the action)
  *   "actionFunction": (funtion to exectue object - arguments = actionData,processedActions),
  *   "checkUpdateAll": (boolean - indicates if change in the underlying data model),
  *   "updateDependencies": [Indicates the changed object requires its dependecies be updated),
@@ -33,8 +35,27 @@
  *   "action": (The name of the action to execute),
  *   "member": (The data object that is acted upon , if applicable),
  *   (other, multiple): (Specific data for the action),
- *   "error": (output only - An action error giving an error in action specific code execution)
- *   "actionInfo": (This is the action info for the action. It is added within doAction and should not be added the user.)
+ *   "onComplete": (OPTIONAL - If this is set it will be called after the action is completed.)
+ *   "onAsynchComplete": (OPTIONAL - FOr an asynchronous update, this can be set. It will be
+ *   called when the asynch action completes.)
+ * }
+ * 
+ * ActionResult:
+ * The return value of the doAction function is an ActionResult struct, with the following data: {
+ *   "actionDone": (If this is returned true the action was done. This does not mean it was error free but
+ *      it typically does mean the action can be reversed such as with an undo. An example of
+ *      where there was an error is if the user is setting code that has a syntax error or that does 
+ *      not properly (exectue.)
+ *   "actionPending": This flag is returned if the action is a queued action and will be run after the
+ *      current action completes.)
+ *   "member":
+ *   "actionInfo" - (This is the action info associated with the action, mainly used for bookeeping.)
+ *   "alertMsg"" (This is a message that should be given to the user. It usually will be sent if there is an error
+ *      where actionDone is false, though it may be set on actionDone = true too.)
+ *   "isFatal": "If this value is set to true then the application is in an indeterminate state and the user
+ *      should not continue."
+ *   "childActionResults" - (This is a list of action results if there are additional child actions done with this
+ *      action. Examples where this is used are on creating, moving or deleting a folder that has chilren.)
  * }
  * 
  * Action Function:
@@ -45,96 +66,80 @@
  * 
  * 
  */ 
-apogee.action = {};
 
 /** This structure holds the processing information for all the actions. It is set by each action. 
  * @private */
-apogee.action.actionInfo = {
+let actionInfoMap = {
 }
 
-/** This method is used to execute an action for the data model.
- * -The source tells the type of action. This affects how the action is treated. For 
- * example, actions from the UI set the workspace dirty flag to true and are used in the
- * undo list. (NOTE - UNDO LIST DOES NOT EXIST YET)
- * -The optionalContext is a context manager to convert a member name to a
- * member, if supported by the action.
- * -The optionalActionResponse allows you to pass an existing actionResponse rather
- * than creating a new one inside this function as a return value. */
-apogee.action.doAction = function(actionData,addToUndo,optionalContext,optionalActionResponse) {
+/** This method is used to execute an action for the data model. */
+export function doAction(workspace,actionData) {
     
-    //read the workspace
-    var workspace;
-    if(actionData.member) {
-        workspace = actionData.member.getWorkspace();
-    }
-    else if(actionData.workspace) {
-        workspace = actionData.workspace;
-    }
-    else {
-        throw new Error("Workspace info missing from action. ");
-    }
+    var actionResult = {};
     
     //only allow one action at a time
     if(workspace.isActionInProgress()) {
-        var queuedAction = {};
-        queuedAction.actionData = actionData;
-        queuedAction.optionalContext = optionalContext;
-        queuedAction.optionalActionResponse = optionalActionResponse;
-        queuedAction.addToUndo = addToUndo;
-        workspace.queueAction(queuedAction);
+        //this is a messenger action - we will save it and execute it after this computation cycle is complete
+        workspace.saveMessengerAction(actionData);
         
-        //return an empty (successful) action response
-        //we sould have a flag saying the action is pending
-        return new apogee.ActionResponse();;
+        //mark command as pending
+        actionResult.actionPending = true;
+        return actionResult;
     }
     
     //flag action in progress
     workspace.setActionInProgress(true);
     
-    var actionResponse = optionalActionResponse ? optionalActionResponse : new apogee.ActionResponse();
-    
     try {   
         
-        var processedActions = [];
-        
         //do the action
-        apogee.action.callActionFunction(actionData,optionalContext,processedActions); 
+        callActionFunction(workspace,actionData,actionResult); 
         
         //finish processing the action
         var recalculateList = [];
         
+        var completedResults = [];
+        addToCompletedResultList(completedResults,actionResult)
+        
         //handle cases with a valid object 
-        apogee.action.updateDependencies(workspace,processedActions,recalculateList);
+        updateDependencies(workspace,completedResults,recalculateList);
         
-        apogee.action.updateRecalculateList(processedActions,recalculateList);
+        updateRecalculateList(completedResults,recalculateList);
         
-        apogee.calculation.callRecalculateList(recalculateList,actionResponse);
+        callRecalculateList(recalculateList);
     
         //fire events
-        apogee.action.fireEvents(workspace,processedActions,recalculateList);
-        
-        //save the action for the undo queue if needed
-        //WE HAVE NOT UNDO QUEUE NOT. But do set the workspace dirty flag, which 
-        //we use to warn the user if there is unsaved data.
-        //NOTE - I might not want to do that is the action fails - check into this
-        if(addToUndo) {
-            workspace.setIsDirty();
-        }
+        fireEvents(workspace,completedResults,recalculateList);
 	}
 	catch(error) {
-        //unknown application error
-        var actionError = apogee.ActionError.processException(error,apogee.ActionError.ERROR_TYPE_APP,true);
-        actionResponse.addError(actionError);
+        if(error.stack) console.error(error.stack);
+        
+        //unknown application error - this is fatal
+        actionResult.actionDone = false;
+        actionResult.isFatal = true
+        actionResult.alertMsg = "Unknown error updating model: " + error.message;
+        
+        workspace.clearCommandQueue();
+        workspace.setActionInProgress(false);
+        return actionResult;
+        
     }
     
     //flag action in progress
     workspace.setActionInProgress(false);
+    actionResult.actionDone = true;
+    
+    //if the action has an onComplete callback, call it here.
+    if(actionData.onComplete) {
+        actionData.onComplete(actionResult);
+    }
     
     //trigger any pending actions
-    var queuedActionData = workspace.getQueuedAction();
-    if(queuedActionData) {
+    //these will be done asynchronously
+    var savedMessengerAction = workspace.getSavedMessengerAction();
+    if(savedMessengerAction) {
         var runQueuedAction = true;
-        
+
         if(workspace.checkConsecutiveQueuedActionLimitExceeded()) {
             //ask user if about continueing
             var doContinue = confirm("The calculation is taking a long time. Continue?");
@@ -143,188 +148,66 @@ apogee.action.doAction = function(actionData,addToUndo,optionalContext,optionalA
                 runQueuedAction = false;
             }
         }
-        
+
         if(runQueuedAction) {
-            apogee.action.asynchRunQueuedAction(queuedActionData);
+            //FOR NOW WE WILL RUN SYNCHRONOUSLY!!!
+            doAction(workspace,savedMessengerAction);
         }
     }
     else {
         workspace.clearConsecutiveQueuedTracking();
     }
     
-    //return response
-	return actionResponse;
+    //return actionResult
+	return actionResult;
 }
 
 /** This function is used to register an action. */
-apogee.action.addActionInfo = function(actionName,actionInfo) {
-    apogee.action.actionInfo[actionName] = actionInfo;
+export function addActionInfo(actionInfo) {
+    if(!actionInfo.action) {
+        //we hav to ignore this action
+        alert("Action name missing from action info: " + JSON.stringify(actionInfo));
+        return;
+    }
+    actionInfoMap[actionInfo.action] = actionInfo;
 }
 
 /** This function looks up the proper function for an action and executes it. */
-apogee.action.callActionFunction = function(actionData,context,processedActions) {
+function callActionFunction(workspace,actionData,actionResult) {
 
     //do the action
-    var actionInfo = apogee.action.actionInfo[actionData.action];
+    var actionInfo = actionInfoMap[actionData.action];
     if(actionInfo) {
-        actionData.actionInfo = actionInfo;
-        actionInfo.actionFunction(actionData,context,processedActions);
+        actionResult.actionInfo = actionInfo;
+        actionInfo.actionFunction(workspace,actionData,actionResult);
     }
     else {
-        actionData.error = new apogee.ActionError("Unknown action: " + actionData.action,apogee.ActionError.ERROR_TYPE_APP,null);
+        actionResult.actionDone = false;
+        actionResult.alertMsg = "Unknown action: " + actionData.action;
     }  
 }
-
-/** This method returns a random numberic token that is used in asynch updates.
- * It serves two purposes, first to ensure only the _latest_ asyhc update is 
- * done. Secondly it prevents someone arbitrarily using this method 
- * without initially setting the pending flag.
- */
-apogee.action.getAsynchToken = function() {
-    return Math.random();
-}
-
-/** This token value should be used if a table is pending because it is waiting for
- * an update in another table. */
-apogee.action.DEPENDENT_PENDING_TOKEN = -1;
-
-//--------------------------------
-// Action Convenience Methods
-//--------------------------------
-
-/** This is a convenience method to set a member to a given value. */
-apogee.action.dataUpdate = function(updateMemberName,fromMember,data,addToUndo) {
-    var workspace = fromMember.getWorkspace();
-    var contextManager = fromMember.getContextManager();
-    
-    //set the data for the table, along with triggering updates on dependent tables.
-    var actionData = {};
-    actionData.action = "updateData";
-    actionData.memberName = updateMemberName;
-    actionData.workspace = workspace;
-    actionData.data = data;
-    return apogee.action.doAction(actionData,addToUndo,contextManager);
-}
-
-/** This is a convenience method to set a member to a given value. */
-apogee.action.compoundDataUpdate = function(updateInfo,fromMember,addToUndo) {
-    var workspace = fromMember.getWorkspace();
-    var contextManager = fromMember.getContextManager();
-
-    //create the single compound action
-    var actionData = {};
-    actionData.action = apogee.compoundaction.ACTION_NAME;
-    actionData.actions = apogee.action.updateInfoToActionList(updateInfo,workspace);
-    actionData.workspace = workspace;
-
-    return apogee.action.doAction(actionData,addToUndo,contextManager);
-}
-
-
-/** This is a convenience method to set a member tohave an error message. */
-apogee.action.errorUpdate = function(updateMemberName,fromMember,errorMessage,addToUndo) {
-    var workspace = fromMember.getWorkspace();
-    var contextManager = fromMember.getContextManager();
-        
-    var actionData = {};
-    actionData.action = "updateError";
-    actionData.memberName = updateMemberName;
-    actionData.workspace = workspace;
-    actionData.errorMsg = errorMessage;
-    return apogee.action.doAction(actionData,addToUndo,contextManager);
-}
-
-/** This is a convenience method to set a member to a given value when the dataPromise resolves. */
-apogee.action.asynchDataUpdate = function(updateMemberName,fromMember,dataPromise,addToUndo) {
-    
-    var workspace = fromMember.getWorkspace();
-    var contextManager = fromMember.getContextManager();
-    
-    var token = apogee.action.getAsynchToken();
-        
-    var actionData = {};
-    actionData.action = "updateDataPending";
-    actionData.memberName = updateMemberName;
-    actionData.workspace = workspace;
-    actionData.token = token;
-    var actionResponse =  apogee.action.doAction(actionData,addToUndo,contextManager);
-    
-    var asynchCallback = function(memberValue) {
-        //set the data for the table, along with triggering updates on dependent tables.
-        var actionData = {};
-        actionData.action = "updateData";
-        actionData.memberName = updateMemberName;
-        actionData.workspace = workspace;
-        actionData.token = token;
-        actionData.data = memberValue;
-        var actionResponse =  apogee.action.doAction(actionData,addToUndo,contextManager);
-    }
-    var asynchErrorCallback = function(errorMsg) {
-        var actionData = {};
-        actionData.action = "updateError";
-        actionData.memberName = updateMemberName;
-        actionData.workspace = workspace;
-        actionData.token = token;
-        actionData.errorMsg = errorMsg;
-        var actionResponse =  apogee.action.doAction(actionData,addToUndo,contextManager);
-    }
-
-    //call appropriate action when the promise resolves.
-    dataPromise.then(asynchCallback).catch(asynchErrorCallback);
-}
-
-/** This is a convenience method to set a member to a given value. 
- * @private */
-apogee.action.updateInfoToActionList = function(updateInfo,workspace) {
-
-    //make the action list
-    var actionList = [];
-    for(var i = 0; i < updateInfo.length; i++) {
-        var updateEntry = updateInfo[i];
-        var subActionData = {};
-        subActionData.action = "updateData";
-        subActionData.memberName = updateEntry[0];
-        subActionData.workspace = workspace;
-        subActionData.data = updateEntry[1];
-        actionList.push(subActionData);
-    }
-    
-    return actionList;
-}
-
-
 
 //=======================================
 // Internal Methods
 //=======================================
 
-/** This function triggers the action for the queued action to be run when the current thread exits. */
-apogee.action.asynchRunQueuedAction = function(queuedActionData) {
-    var callback = function() {
-        apogee.action.doAction(queuedActionData.actionData,
-            queuedActionData.addToUndo,
-            queuedActionData.optionalContext,
-            queuedActionData.optionalActionResponse);
-    }
-    
-    setTimeout(callback,0);
-}
-
 /** This method makes sure the member dependencies in the workspace are properly updated. 
  * @private */
-apogee.action.updateDependencies = function(workspace,processedActions,recalculateList) {
+function updateDependencies(workspace,completedResults,recalculateList) {
     //check if we need to update the entire model
-    var updateAllDep = apogee.action.checkUpdateAllDep(processedActions);
+    var updateAllDep = checkUpdateAllDep(completedResults);
     if(updateAllDep) {
         //update entire model - see conditions bewlo
         workspace.updateDependeciesForModelChange(recalculateList);
     }
     else {
         //upate dependencies on table with updated code
-        for(var i = 0; i < processedActions.length; i++) {
-            var actionData = processedActions[i];
-            if(apogee.action.doInitializeDependencies(actionData)) {
-                actionData.member.initializeDependencies();
+        for(var i = 0; i < completedResults.length; i++) {
+            var actionResult = completedResults[i];
+            if((actionResult.actionDone)&&(actionResult.member)) {
+                if(doInitializeDependencies(actionResult)) {
+                    actionResult.member.initializeDependencies();
+                }
             }
         }
     }
@@ -332,66 +215,114 @@ apogee.action.updateDependencies = function(workspace,processedActions,recalcula
     
 /** This function updates the recalculation list for the given processed actions. 
  * @private */
-apogee.action.updateRecalculateList = function(processedActions,recalculateList) {
-    for(var i = 0; i < processedActions.length; i++) {
-        var actionData = processedActions[i];
-        if(apogee.action.doAddToRecalc(actionData)) {
-            apogee.calculation.addToRecalculateList(recalculateList,actionData.member);            
-        }
-        else if((apogee.action.doAddDependOnToRecalc(actionData))) {
-            apogee.calculation.addDependsOnToRecalculateList(recalculateList,actionData.member);                         
-        }
-    }
-}
-    
-/** This function fires the proper events for the action. 
- * @private */
-apogee.action.fireEvents = function(workspace,processedActions,recalculateList) {
-    
-    //TEMPORARY EVENT PROCESSING - NEEDS TO BE IMPROVED
-    var eventSet = {};
-    var member;
-    
-    for(var i = 0; i < processedActions.length; i++) {
-        var actionData = processedActions[i];
-        
-        if(actionData.actionInfo) {
-            var eventName = actionData.actionInfo.event;
-            if(!eventName) continue;
-            
-            var member = actionData.member;
-      
-            apogee.action.fireEvent(workspace,eventName,member);
-
-            //temporary processing!
-            if(member) {
-                eventSet[actionData.member.getId()] = true;
+function updateRecalculateList(completedResults,recalculateList) {
+    for(var i = 0; i < completedResults.length; i++) {
+        var actionResult = completedResults[i];
+        if((actionResult.actionDone)&&(actionResult.member)) {
+            if(doAddToRecalc(actionResult)) {
+                addToRecalculateList(recalculateList,actionResult.member);            
+            }
+            else if((doAddDependOnToRecalc(actionResult))) {
+                addDependsOnToRecalculateList(recalculateList,actionResult.member);                         
             }
         }
     }
+}
     
-    //Doh! WE NEED TO DO THIS DIFFERENTLY FOR LOTS OF REASONS
+/** This function fires the proper events for the  It combines events to 
+ * fire a single event for each member.
+ * @private */
+function fireEvents(workspace,completedResults,recalculateList) {
+
+    var eventMap = {};
+    var member;
+    
+    //go through explicitly called events from results
+    for(var i = 0; i < completedResults.length; i++) {
+        var actionResult = completedResults[i];
+        var actionInfo = actionResult.actionInfo;
+        
+        if(actionInfo) {
+            
+            let eventName = actionInfo.event;
+            if(!eventName) continue;
+            
+            let member = actionResult.member;
+            
+            mergeEventIntoEventMap(eventMap,member,eventName);
+        }
+    }
+    
+    //add an update event for any object not accounted from
     for(i = 0; i < recalculateList.length; i++) {
         var member = recalculateList[i];
-        if(!eventSet[member.getId()]) {
-            apogee.action.fireEvent(workspace,apogee.updatemember.MEMBER_UPDATED_EVENT,member);
-        }
+        mergeEventIntoEventMap(eventMap,member,"memberUpdated");
     } 
+    
+    //fire events from the event map
+    for(var idString in eventMap) {
+        let eventInfo = eventMap[idString];
+        workspace.dispatchEvent(eventInfo.event,eventInfo);
+        //clear the update map for this member (the member should be set
+        if(eventInfo.member) {
+            eventInfo.member.clearUpdated();
+        }
+        else {
+            console.log("Error: Member not set for event: " + eventInfo.event);
+        }
+    }
 }
 
 /** This is a helper function to dispatch an event. */
-apogee.action.fireEvent = function(workspace,name,data) {
-    workspace.dispatchEvent(name,data);
+function mergeEventIntoEventMap(eventMap,member,eventName) {
+    
+    //############################################
+    //OOPS - my current logic does nto allow for non-member events. 
+    //for now I will dump them. i need to add them back.
+    if(!member) return;
+    //############################################
+    
+    var memberId = member.getId();
+     
+    var existingInfo = eventMap[memberId];
+    var newInfo;
+     
+    if(existingInfo) {
+        if((existingInfo.event == eventName)) {
+            //repeat event - including case of both being "memberUpdated"
+            newInfo = existingInfo;
+        }
+        else if((existingInfo.event == "memberDeleted")||(eventName == "memberDeleted")) {
+            newInfo =  { member: member, event: "memberDeleted" };
+        }
+        else if((existingInfo.event == "memberCreated")||(eventName == "memberCreated")) {
+            newInfo =  { member: member, updated: member.getUpdated(), event: "memberCreated" };
+        }
+        else {
+            //we this shouldn't happen - it means we hace an unknown event type
+            throw new Error("Unknown event type: " + existingInfo.event + ", " + eventName);
+        }
+    }
+    else {
+        //create event object - note we don't need the "updated" field on a delete event, but that is ok
+        newInfo =  { member: member, updated: member.getUpdated(), event: eventName };
+    }
+     
+    eventMap[memberId] = newInfo; 
 }
 
-/** This method determines if updating all dependencies is necessary. */
-apogee.action.checkUpdateAllDep = function(processedActions) {
-    for(var i = 0; i < processedActions.length; i++) {
-        var actionData = processedActions[i];
-        var member = actionData.member;
-        //check update only needed for data holders (no impact for non-data holder
-        if(member) {
-            if((actionData.actionInfo)&&(actionData.actionInfo.checkUpdateAll)){
+/** This method determines if updating all dependencies is necessary. Our dependency 
+ * tracking may be in error if a new member is created, a member is deleted or
+ * a member is moved. In these actions we flag that the entire model should be
+ * updated.*/
+function checkUpdateAllDep(completedResults) {
+    for(var i = 0; i < completedResults.length; i++) {
+        var actionResult = completedResults[i];
+        
+        //we need to update the entire model if any actino is flagged as such
+        if(actionResult.member) {
+            var actionInfo = actionResult.actionInfo;
+            if((actionInfo)&&(actionInfo.checkUpdateAll)){
                 return true;
             }
         }
@@ -400,12 +331,12 @@ apogee.action.checkUpdateAllDep = function(processedActions) {
 }
 
 /** This method if a single action entry requires updating dependencies for the associated member. */
-apogee.action.doInitializeDependencies = function(actionData) {
-    if(!actionData.member) return false;
+function doInitializeDependencies(actionResult) {
+    if(!actionResult.member) return false;
     
     //only applicable to codeables
-    if((actionData.actionInfo)&&(actionData.member.isCodeable)) {
-        return actionData.actionInfo.updateDependencies;
+    if((actionResult.actionInfo)&&(actionResult.member.isCodeable)) {
+        return actionResult.actionInfo.updateDependencies;
     }
     else {
         return false;
@@ -413,12 +344,12 @@ apogee.action.doInitializeDependencies = function(actionData) {
 }
 
 /** This method checks if the associated member and its dependencies need to be added to the recalc list. */
-apogee.action.doAddToRecalc = function(actionData) {
-    if(!actionData.member) return false;
-    if(!actionData.member.isDependent) return false;
+function doAddToRecalc(actionResult) {
+    if(!actionResult.member) return false;
+    if(!actionResult.member.isDependent) return false;
     
-    if(actionData.actionInfo) {
-        return actionData.actionInfo.addToRecalc;
+    if(actionResult.actionInfo) {
+        return actionResult.actionInfo.addToRecalc;
     }
     else {
         return false;
@@ -426,13 +357,65 @@ apogee.action.doAddToRecalc = function(actionData) {
 }
 
 /** This method checks if the dependencies of the associated needs to be added to the recalc list, but not the member itself. */
-apogee.action.doAddDependOnToRecalc = function(actionData) {
-    if(actionData.actionInfo) {
-        return actionData.actionInfo.addDependenceiesToRecalc;
+function doAddDependOnToRecalc(actionResult) {
+    if(actionResult.actionInfo) {
+        return actionResult.actionInfo.addDependenceiesToRecalc;
     }
     else {
         return false;
     }
 }
+
+/** This method unpacks the actionResult and its child reponse into an array of actionResult. */
+function addToCompletedResultList(completedResults,actionResult) {
+    completedResults.push(actionResult);
+    if(actionResult.childActionResults) {
+        for(var key in actionResult.childActionResults) {
+            addToCompletedResultList(completedResults,actionResult.childActionResults[key]);
+        }      
+    }
+}
+
+//============================================
+// Compound Action
+//============================================
+
+/** The compound action is automatically imported when the action module is imported.
+ *
+ * Action Data format:
+ * {
+ *  "action": "compoundAction",
+ *  "actions": (list of actions in this compound action),
+ * }
+ */
+
+
+/** This method is the action function for a compound action. */
+function compoundActionFunction(workspace,actionData,actionResult) {
+
+    var actionList = actionData.actions;
+    actionResult.childActionResults = [];
+    for(var i = 0; i < actionList.length; i++) {
+        let childActionData = actionList[i];
+        let childActionResult = {};
+        action.callActionFunction(workspace,childActionData,childActionResult);
+        actionResult.childActionResults.push(childActionResult);   
+    }
+    actionResult.actionDone = true;
+}
+
+/** Action info */
+let COMPOUND_ACTION_INFO = {
+    "action": "compoundAction",
+    "actionFunction": compoundActionFunction,
+    "checkUpdateAll": false,
+    "updateDependencies": false,
+    "addToRecalc": false,
+    "event": null
+}
+
+
+//This line of code registers the action 
+addActionInfo(COMPOUND_ACTION_INFO);
 
 

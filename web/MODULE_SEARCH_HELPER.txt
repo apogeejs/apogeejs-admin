@@ -1,0 +1,6 @@
+The line below does a search in the given path for a given pattern. (I think I can set multiple folders rather than just one.)
+It creates an output file which i can use to see where I need to insert modules.
+
+
+
+Get-ChildItem -Path "./apogeeapp" -Recurse | Select-String -Pattern "apogee.action" | Out-File -FilePath ./list_apogee.action_apogeeapp.txt

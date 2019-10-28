@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import EventManager from "/apogeeutil/EventManager.js";
+
 /** This is a tab frame.
  * 
  * @class 
@@ -5,7 +8,7 @@
 apogeeapp.ui.TabFrame = function() {
     
     //base init
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
 	
     //variables
     this.tabTable = {};
@@ -17,7 +20,7 @@ apogeeapp.ui.TabFrame = function() {
 }
 
 //add components to this class
-apogee.base.mixin(apogeeapp.ui.TabFrame,apogee.EventManager);
+base.mixin(apogeeapp.ui.TabFrame,EventManager);
 
 apogeeapp.ui.TabFrame.CONTAINER_FRAME_MARGIN_PX = 5;
 
@@ -117,6 +120,16 @@ apogeeapp.ui.TabFrame.prototype.setActiveTab = function(id) {
 		this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,tab);
         
 	}
+}
+
+/** This gets the active tab, by tab id. */
+apogeeapp.ui.TabFrame.prototype.getOpenTabs = function() {
+    var openTabs = [];
+    for(var idString in this.tabTable) {
+        var id = parseInt(idString);
+        openTabs.push(id);
+    }
+    return openTabs;
 }
 
 /** This updates the tabs. */

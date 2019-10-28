@@ -1,0 +1,176 @@
+{
+  "fileType": "apogee app js workspace",
+  "version": "0.40",
+  "references": [],
+  "workspace": {
+    "fileType": "apogee workspace",
+    "version": 0.2,
+    "name": "Custom Component Demo",
+    "data": {
+      "name": "Model",
+      "type": "apogee.Folder",
+      "children": {
+        "cdc": {
+          "name": "cdc",
+          "type": "apogee.Folder",
+          "children": {
+            "input": {
+              "name": "input",
+              "type": "apogee.JsonTable",
+              "updateData": {
+                "argList": [],
+                "functionBody": "return dummyInput;",
+                "supplementalCode": "",
+                "description": ""
+              }
+            },
+            "data": {
+              "name": "data",
+              "type": "apogee.JsonTable",
+              "updateData": {
+                "data": "other new data",
+                "description": ""
+              }
+            }
+          },
+          "childrenNotWriteable": true
+        },
+        "cc": {
+          "name": "cc",
+          "type": "apogee.JsonTable",
+          "updateData": {
+            "argList": [],
+            "functionBody": "return ccOutput;",
+            "supplementalCode": "",
+            "description": ""
+          }
+        },
+        "ccOutput": {
+          "name": "ccOutput",
+          "type": "apogee.JsonTable",
+          "updateData": {
+            "data": "new data",
+            "description": ""
+          }
+        },
+        "cdcOutput": {
+          "name": "cdcOutput",
+          "type": "apogee.JsonTable",
+          "updateData": {
+            "argList": [],
+            "functionBody": "return cdc.data;",
+            "supplementalCode": "",
+            "description": ""
+          }
+        },
+        "dummyInput": {
+          "name": "dummyInput",
+          "type": "apogee.JsonTable",
+          "updateData": {
+            "data": "This is dummy input",
+            "description": ""
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "type": "apogeeapp.app.FolderComponent",
+    "tabOpen": true,
+    "treeState": null,
+    "children": {
+      "cdc": {
+        "type": "apogeeapp.app.CustomDataComponent",
+        "windowState": {
+          "sizeInfo": {
+            "width": 329,
+            "height": 239
+          },
+          "posInfo": {
+            "x": 12,
+            "y": 5
+          },
+          "state": 0,
+          "viewType": "Form"
+        },
+        "resource": {
+          "html": "Dummy: <input id=\"cdc-xxx\"></input>\n<br>\n<p>You can also get input, which \nhas a slight difference for custom\ndata components than custom components.</p>\n<span id=\"cdc-yyy\"></span>\n",
+          "uiCode": "var Generator = class {\n    onLoad(outputElement,admin) {\n        this.textField = document.getElementById(\"cdc-xxx\");\n        this.textField.oninput = () => admin.startEditMode();\n        \n        this.span = document.getElementById(\"cdc-yyy\");\n    }\n    \n    setData(data,outputElement,admin) {\n        this.textField.value = data.data;\n        this.span.innerHTML = data.input;\n    }\n    \n    getData(outputElement,admin) {\n        return this.textField.value;\n    }\n}\n\nreturn new Generator();"
+        },
+        "destroyOnInactive": false
+      },
+      "cc": {
+        "type": "apogeeapp.app.CustomComponent",
+        "windowState": {
+          "sizeInfo": {
+            "width": 363,
+            "height": 236
+          },
+          "posInfo": {
+            "x": 404,
+            "y": 11
+          },
+          "state": 0,
+          "viewType": "Display"
+        },
+        "resource": {
+          "html": "Dummy: <input id=\"cc-xxx\"></input>\n\n<button id=\"cc-yyy\">Submit</button>",
+          "uiCode": "var Generator = class {\n    \n    constructor() {\n        __customControlDebugHook();\n    }\n    \n    onLoad(outputElement,admin) {\n        this.textField = document.getElementById(\"cc-xxx\");\n        \n        this.button = document.getElementById(\"cc-yyy\");\n        this.button.onclick = () => this._submit(admin);\n    }\n    \n    setData(data,outputElement,admin) {\n        this.textField.value = data;\n    }\n    \n    \n    //====================\n    // Private\n    //====================\n    \n    _submit(admin) {\n        var command  = admin.getMessenger().getDataUpdateCommand(\"ccOutput\",this.textField.value);\n        admin.getMessenger().executeCommand(command);\n        \n    }\n}\n\nreturn new Generator();"
+        },
+        "destroyOnInactive": false
+      },
+      "ccOutput": {
+        "type": "apogeeapp.app.JsonTableComponent",
+        "windowState": {
+          "sizeInfo": {
+            "width": 300,
+            "height": 52
+          },
+          "posInfo": {
+            "x": 75,
+            "y": 432
+          },
+          "state": 0,
+          "viewType": "Data"
+        },
+        "dataView": "Colorized"
+      },
+      "cdcOutput": {
+        "type": "apogeeapp.app.JsonTableComponent",
+        "windowState": {
+          "sizeInfo": {
+            "width": 316,
+            "height": 112
+          },
+          "posInfo": {
+            "x": 78,
+            "y": 535
+          },
+          "state": 0,
+          "viewType": "Data"
+        },
+        "dataView": "Colorized"
+      },
+      "dummyInput": {
+        "type": "apogeeapp.app.JsonTableComponent",
+        "windowState": {
+          "sizeInfo": {
+            "width": 300,
+            "height": 45
+          },
+          "posInfo": {
+            "x": 76,
+            "y": 331
+          },
+          "state": 0,
+          "viewType": "Data"
+        },
+        "dataView": "Colorized"
+      }
+    }
+  },
+  "openTabs": [
+    "Model"
+  ],
+  "activeTabMember": "Model"
+}

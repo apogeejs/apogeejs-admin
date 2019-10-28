@@ -1,10 +1,9 @@
 
-apogee.codeDependencies = {};
 
 /** This method takes the varInfo table from the code analysis and returns
- * a lsit of member objects which this member depends on.
+ * a lit of member objects which this member depends on.
  */
-apogee.codeDependencies.getDependencyInfo = function(varInfo,contextManager) {
+export function getDependencyInfo(varInfo,contextManager) {
     var dependencyList = [];
 	var objectMap = {};
 	
@@ -20,7 +19,7 @@ apogee.codeDependencies.getDependencyInfo = function(varInfo,contextManager) {
                 var namePath = nameUse.path;
 
                 //lookup this object
-                var impactor = contextManager.getImpactor(namePath);
+                var impactor = contextManager.getMember(namePath);
                 if(impactor) {
 
                     //add as dependent (note this may not be a data object - check later!)

@@ -2,7 +2,7 @@
 //---------------------------------
 // Link Element Management - This manages DOM elements for links
 //---------------------------------
-apogeeapp.app.LinkLoader = class {
+class LinkLoader {
     /** 
      * This is a singleton and the constructor should not be called.
      * @private
@@ -24,7 +24,7 @@ apogeeapp.app.LinkLoader = class {
      * This method adds a link element to a page, supporting 'css' and 'script'. 
      * The caller identifer should be a unique identifier among people
      * requesting links of this given type. It cna be requested from
-     * apogeeapp.app.ReferenceManager._createId
+     * ReferenceManager._createId
      * @protected
      */
     addLinkElement(type,url,linkCallerId,onLoad,onError) {
@@ -90,6 +90,8 @@ apogeeapp.app.LinkLoader = class {
             }
         }
         catch(error) {
+            if(error.stack) console.error(error.stack);
+            
             //error loading link  
             if(onError) {
                 onError(error);
@@ -128,15 +130,14 @@ apogeeapp.app.LinkLoader = class {
 //======================================
 
 /** @private */
-apogeeapp.app.LinkLoader.instance = null;
+let instance = null;
 
 /** This retrieves the link loader instance. */
-apogeeapp.app.getLinkLoader = function() {
-    if(!apogeeapp.app.LinkLoader.instance) {
-        apogeeapp.app.LinkLoader.instance = new apogeeapp.app.LinkLoader();
+export function getLinkLoader() {
+    if(!instance) {
+        instance = new LinkLoader();
     }
-    return apogeeapp.app.LinkLoader.instance;
+    return instance;
 }
-
 
 

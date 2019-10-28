@@ -1,7 +1,7 @@
 /** This method shows a dialog that inputs or outputs a text area.
  * The onSubmitFunction should return true if the dialog should close and false if it should stay open. 
  * This dialog uses a text area that allows for better cut/paste speed with very large input/output. */
-apogeeapp.app.dialog.showTextIoDialog = function(options,onSubmitFunction) {
+export function showTextIoDialog(options,onSubmitFunction) {
     
     var dialog = apogeeapp.ui.createDialog({"minimizable":true,"maximizable":true,"movable":true});
             

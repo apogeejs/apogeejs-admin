@@ -3,10 +3,10 @@ if(!apogeeapp.ui.treecontrol) apogeeapp.ui.treecontrol = {};
 
 apogeeapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback,menuItemCallback,isRoot) {
     
-    this.contractUrl = apogeeapp.ui.getResourcePath("/contractPlus2.png");
-    this.expandUrl = apogeeapp.ui.getResourcePath("/expandPlus2.png");
-    this.noControlUrl = apogeeapp.ui.getResourcePath("/nothingPlus2.png");
-    this.emptyControlUrl = apogeeapp.ui.getResourcePath("/emptyPlus2.png");
+    this.contractUrl = apogeeapp.ui.getResourcePath("/opened_bluish.png");
+    this.expandUrl = apogeeapp.ui.getResourcePath("/closed_bluish.png");
+    this.noControlUrl = apogeeapp.ui.getResourcePath("/circle_bluish.png");
+    this.emptyControlUrl = apogeeapp.ui.getResourcePath("/circle_bluish.png");
     
     this.isRoot = isRoot;
     

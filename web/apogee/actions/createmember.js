@@ -1,10 +1,13 @@
-/** This namespace contains the create member action */
-apogee.createmember = {};
+import {addActionInfo} from "/apogee/actions/action.js";
+import Workspace from "/apogee/data/Workspace.js";
+import ActionError from "/apogee/lib/ActionError.js";
 
-/** Create member action name 
+/** This is self installing command module. It has no exports
+ * but it must be imported to install the command. 
+ *
  * Action Data format:
  * {
- *  "action": apogee.createmember.ACTION_NAME,
+ *  "action": "createMember",
  *  "owner": (parent/owner for new member),
  *  "name": (name of the new member),
  *  "createData": 
@@ -12,69 +15,90 @@ apogee.createmember = {};
  *      - unique table type name
  *      - additional table specific data
  *  
- *  "member": (OUTPUT - the created member),
- *  "error": (OUTPUT - an error created in the action function)
  * }
- */
-apogee.createmember.ACTION_NAME = "createMember";
-
-/** member CREATED EVENT
+ *
+ * MEMBER CREATED EVENT: "memberCreated"
  * Event member format:
  * {
  *  "member": (member)
  * }
  */
-apogee.createmember.MEMBER_CREATED_EVENT = "memberCreated";
+
 
 /** This method instantiates a member, without setting the update data. 
  *@private */
-apogee.createmember.createMember = function(actionData,optionalContext,processedActions) {
+function createMember(workspace,actionData,processedActions,actionResult) {
     
+    var owner;
+    if(actionData.workspaceIsOwner) {
+        owner = workspace;
+    }
+    else {
+        var ownerFullName = actionData.ownerName;
+        var owner = workspace.getMemberByFullName(ownerFullName);
+        if(!owner) {
+            actionResult.actionDone = false;
+            actionResult.alertMsg = "Parent not found for created member";
+            return;
+        }
+    }
+ 
+    createMemberImpl(owner,actionData,processedActions,actionResult);
+}
+ 
+    
+function createMemberImpl(owner,actionData,actionResult) {
+    
+    var memberJson = actionData.createData;
+    var member;
+     
     //create member
-    var generator = apogee.Workspace.getMemberGenerator(actionData.createData.type);
+    var generator;
+    if(memberJson) {
+        generator = Workspace.getMemberGenerator(memberJson.type);
+    }
 
     if(generator) {
-        var childJsonOutputList = [];
-        var member = generator.createMember(actionData.owner,actionData.createData,childJsonOutputList);
-
-        //store the created object
-        actionData.member = member;
-
-        //we are potentially adding multiple creates here, including children
-        processedActions.push(actionData);
+        member = generator.createMember(owner,memberJson);   
 
         //instantiate children if there are any
-        for(var i = 0; i < childJsonOutputList.length; i++) {
-            var childActionData = {};
-            childActionData.action = "createMember";
-            childActionData.actionInfo = apogee.createmember.ACTION_INFO;
-            childActionData.owner = member;
-            childActionData.createData = childJsonOutputList[i];
-            apogee.createmember.createMember(childActionData,optionalContext,processedActions);
+        if(memberJson.children) {
+            actionResult.childActionResults = {};
+            for(var childName in memberJson.children) {
+                var childActionData = {};
+                childActionData.action = "createMember";
+                childActionData.createData = memberJson.children[childName];
+                var childActionResult = {};
+                childActionResult.actionInfo = ACTION_INFO;
+                createMemberImpl(member,childActionData,childActionResult);
+                actionResult.childActionResults[childName] = childActionResult;
+            }
         }
     }
     else {
-        //type not found! - create a dummy object
-        member = apogee.ErrorTable.generator.createMember(actionData.owner,actionData.createData);
-        var error = new apogee.ActionError("Member type not found: " + actionData.createData.type,apogee.ActionError.ERROR_TYPE_APP,null);
+        //type not found! - create a dummy object and add an error to it
+        var errorTableGenerator = Workspace.getMemberGenerator("appogee.ErrorTable");
+        member = errorTableGenerator.createMember(owner,memberJson);
+        var error = new ActionError("Member type not found: " + memberJson.type,ActionError.ERROR_TYPE_APP,null);
         member.addError(error);
         
-        actionData.member = member;
-        actionData.error = error;
-        processedActions.push(actionData);
+        //store an error message, but this still counts as command done.
+        actionResult.alertMsg = "Error creating member: member type not found: " + memberJson.type;
     }
-    
-    return member;
+
+    actionResult.member = member;
+    actionResult.actionDone = true;
 }
 
 /** Action info */
-apogee.createmember.ACTION_INFO = {
-    "actionFunction": apogee.createmember.createMember,
+let ACTION_INFO = {
+    "action": "createMember",
+    "actionFunction": createMember,
     "checkUpdateAll": true,
     "updateDependencies": true,
     "addToRecalc": true,
-    "event": apogee.createmember.MEMBER_CREATED_EVENT
+    "event": "memberCreated"
 }
 
 //This line of code registers the action 
-apogee.action.addActionInfo(apogee.createmember.ACTION_NAME,apogee.createmember.ACTION_INFO);
+addActionInfo(ACTION_INFO);

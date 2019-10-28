@@ -1,13 +1,15 @@
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /* This is a form display. It is meant for taking a submit action. If you want a form
  * tied to a data value, the ConfigurableFormEditor can be used.
  * 
- * @param {type} viewMode - the apogee view mode
+ * @param {type} displayContainer - the display container
  * @param {type} getLayout - this callback retrieves the form layout
  */
-apogeeapp.app.ConfigurableFormDisplay = class extends apogeeapp.app.DataDisplay {
+export default class ConfigurableFormDisplay extends DataDisplay {
     
-    constructor(viewMode,callbacks,getLayoutInfo) {
-        super(viewMode,callbacks,apogeeapp.app.DataDisplay.SCROLLING);  
+    constructor(displayContainer,callbacks,getLayoutInfo) {
+        super(displayContainer,callbacks,DataDisplay.SCROLLING);  
         
         this.panel = this.panel = new apogeeapp.ui.ConfigurablePanel();
     }

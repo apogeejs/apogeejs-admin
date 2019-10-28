@@ -1,8 +1,12 @@
+import util from "/apogeeutil/util.js";
+
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /** This is an editor that displays a customized form for data input. */
-apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.DataDisplay {
+export default class ConfigurableFormEditor extends DataDisplay {
     
     /** This allows for a static or dynamic layout setting
-     * @param {type} viewMode - the apogee view mode
+     * @param {type} displayContainer - the displayContainer
      * @param {type} callbacks - {
      *  - getData - returns the desired form value,
      *  - getEditOk - gets if form is editable,
@@ -14,8 +18,8 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.DataDisplay {
      * It should be populated if a fixed layout is OK. In this case, the getLayoutInfo
      * allack should not be populated. 
      */
-    constructor(viewMode,callbacks,optionalFixedLayoutInfo) {
-        super(viewMode,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
+    constructor(displayContainer,callbacks,optionalFixedLayoutInfo) {
+        super(displayContainer,callbacks,DataDisplay.SCROLLING);
         
         //layout can be fixed or dynamic
         this.dynamicLayoutCallback = callbacks.getLayoutInfo;
@@ -55,7 +59,7 @@ apogeeapp.app.ConfigurableFormEditor = class extends apogeeapp.app.DataDisplay {
         
         //set change to enable save bar is form value differs from initial data
         var onChange = (currentFormValue,form) => {
-            if(apogee.util.jsonEquals(currentFormValue,savedFormValue)) {
+            if(util.jsonEquals(currentFormValue,savedFormValue)) {
                 this.endEditMode()
             }
             else {

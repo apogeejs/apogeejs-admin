@@ -1,3 +1,6 @@
+import base from "/apogeeutil/base.js";
+import ActionError from "/apogee/lib/ActionError.js";
+
 /** This function parses the code and returns a table that gives the variable use
  * in the passed function. The var info table has the following content
  * - it is a map with an entry for each variable accessed. (This refers just to
@@ -13,8 +16,6 @@
  * -- isLocal: true if all uses of a varaible entry are local variables
  **/ 
 
-apogee.codeAnalysis = {};
-
 /** Syntax for AST, names from Esprima.
  * Each entry is a list of nodes inside a node of a given type. the list
  * contains entries with the given fields:
@@ -23,7 +24,7 @@ apogee.codeAnalysis = {};
  *     list:[true if the field is a list of nodes]
  *     declaration:[boolean indicating if the field corrsponds to a field declaration]
  * @private */
-apogee.codeAnalysis.syntax = {
+const syntax = {
     AssignmentExpression: [{name:'left'},{name:'right'}],
     ArrayExpression: [{name:'elements',list:true}],
     ArrowFunctionExpression: [{name:'params',list:true,declaration:true},{name:'body'},{name:'defaults',list:true}],
@@ -125,7 +126,7 @@ apogee.codeAnalysis.syntax = {
 };
 
 /** These are javascript keywords */
-apogee.codeAnalysis.KEYWORDS = {
+export const KEYWORDS = {
 	"abstract": true,
 	"arguments": true,
 	"boolean": true,
@@ -193,7 +194,7 @@ apogee.codeAnalysis.KEYWORDS = {
 
 /** These are variable names we will not call out in setting the context.
  * NOTE - it is OK if we do not exclude a global variable. It will still work. */
-apogee.codeAnalysis.EXCLUSION_NAMES = {
+export const EXCLUSION_NAMES = {
     "undefined": true,
     "Infinity": true,
     "NaN": true,
@@ -228,7 +229,7 @@ apogee.codeAnalysis.EXCLUSION_NAMES = {
 /** This method parses the code and returns a list of variabls accessed. It throws
  * an exception if there is an error parsing.
  **/
-apogee.codeAnalysis.analyzeCode = function(functionText) {
+export function analyzeCode(functionText) {
     
     try {
         var returnValue = {};
@@ -240,14 +241,14 @@ apogee.codeAnalysis.analyzeCode = function(functionText) {
             returnValue.errors = [];
             for(var i = 0; i < ast.errors.length; i++) {
                 var astError = ast.errors[i];
-                var actionError = new apogee.ActionError(astError.description,"Analyze - Code");
+                var actionError = new ActionError(astError.description,"Analyze - Code");
                 actionError.setParentException(astError);
                 returnValue.errors.push(actionError);
             }
         }
         
         //get the variable list
-        var varInfo = apogee.codeAnalysis.getVariableInfo(ast);
+        var varInfo = getVariableInfo(ast);
 
         //return the variable info
         returnValue.success = true;
@@ -255,7 +256,7 @@ apogee.codeAnalysis.analyzeCode = function(functionText) {
         return returnValue;
     }
     catch(exception) {
-        var actionError = apogee.ActionError.processException(exception,"Analyze - Code",false);
+        var actionError = ActionError.processException(exception,"Analyze - Code",false);
         returnValue.success = false;
         returnValue.errors = [];
         returnValue.errors.push(actionError);
@@ -277,7 +278,7 @@ apogee.codeAnalysis.analyzeCode = function(functionText) {
  * -- is declaration - this node should contain an identifier that is a declaration
  * of a local variable
  * @private */
-apogee.codeAnalysis.getVariableInfo = function(ast) {
+function getVariableInfo(ast) {
     
     //create the var to hold the parse data
     var processInfo = {};
@@ -285,16 +286,16 @@ apogee.codeAnalysis.getVariableInfo = function(ast) {
     processInfo.scopeTable = {};
     
     //create the base scope
-    var scope = apogee.codeAnalysis.startScope(processInfo);
+    var scope = startScope(processInfo);
 
     //traverse the tree, recursively
-    apogee.codeAnalysis.processTreeNode(processInfo,ast,false);
+    processTreeNode(processInfo,ast,false);
     
     //finish the base scope
-    apogee.codeAnalysis.endScope(processInfo,scope);
+    endScope(processInfo,scope);
     
     //finish analyzing the accessed variables
-    apogee.codeAnalysis.markLocalVariables(processInfo);
+    markLocalVariables(processInfo);
     
     //return the variable names accessed
     return processInfo.nameTable;
@@ -303,7 +304,7 @@ apogee.codeAnalysis.getVariableInfo = function(ast) {
 /** This method starts a new loca variable scope, it should be called
  * when a function starts. 
  * @private */
-apogee.codeAnalysis.startScope = function(processInfo) {
+function startScope(processInfo) {
     //initailize id gerneator
     if(processInfo.scopeIdGenerator === undefined) {
         processInfo.scopeIdGenerator = 0;
@@ -323,7 +324,7 @@ apogee.codeAnalysis.startScope = function(processInfo) {
 /** This method ends a local variable scope, reverting to the parent scope.
  * It should be called when a function exits. 
  * @private */
-apogee.codeAnalysis.endScope = function(processInfo) {
+function endScope(processInfo) {
     var currentScope = processInfo.currentScope;
     if(!currentScope) return;
     
@@ -333,44 +334,44 @@ apogee.codeAnalysis.endScope = function(processInfo) {
 
 /** This method analyzes the AST (abstract syntax tree). 
  * @private */
-apogee.codeAnalysis.processTreeNode = function(processInfo,node,isDeclaration) {
+function processTreeNode(processInfo,node,isDeclaration) {
     
     //process the node type
     if((node.type == "Identifier")||(node.type == "MemberExpression")) {
         //process a variable
-        apogee.codeAnalysis.processVariable(processInfo,node,isDeclaration);
+        processVariable(processInfo,node,isDeclaration);
     } 
     else if((node.type == "FunctionDeclaration")||(node.type == "FunctionExpression")) {
         //process the functoin
-        apogee.codeAnalysis.processFunction(processInfo,node);
+        processFunction(processInfo,node);
         
     }
     else if((node.type === "NewExpression")&&(node.callee.type === "Function")) {
         //we currently do not support the function constructor
         //to add it we need to add the local variables and parse the text body
-        throw apogee.codeAnalysis.createParsingError("Function constructor not currently supported!",node.loc); 
+        throw createParsingError("Function constructor not currently supported!",node.loc); 
     }
     else {
         //process some other node
-        apogee.codeAnalysis.processGenericNode(processInfo,node);
+        processGenericNode(processInfo,node);
     }
 }
    
 /** This method process nodes that are not variabls identifiers. This traverses 
  * down the syntax tree.
  * @private */
-apogee.codeAnalysis.processGenericNode = function(processInfo,node) {
+function processGenericNode(processInfo,node) {
     //load the syntax node info list for this node
-    var nodeInfoList = apogee.codeAnalysis.syntax[node.type];
+    var nodeInfoList = syntax[node.type];
     
     //process this list
     if(nodeInfoList === undefined) {
         //node not found
-        throw apogee.codeAnalysis.createParsingError("Syntax Tree Node not found: " + node.type,node.loc);
+        throw createParsingError("Syntax Tree Node not found: " + node.type,node.loc);
     }
     else if(nodeInfoList === null) {
         //node not supported
-        throw apogee.codeAnalysis.createParsingError("Syntax node not supported: " + node.type,node.loc);
+        throw createParsingError("Syntax node not supported: " + node.type,node.loc);
     }
     else {
         //this is a good node - process it
@@ -389,12 +390,12 @@ apogee.codeAnalysis.processGenericNode = function(processInfo,node) {
                 if(nodeInfo.list) {
                     //this is a list of child nodes
                     for(var j = 0; j < childField.length; j++) {
-                        apogee.codeAnalysis.processTreeNode(processInfo,childField[j],nodeInfo.declaration);
+                        processTreeNode(processInfo,childField[j],nodeInfo.declaration);
                     }
                 }
                 else {
                     //this is a single node
-                    apogee.codeAnalysis.processTreeNode(processInfo,childField,nodeInfo.declaration);
+                    processTreeNode(processInfo,childField,nodeInfo.declaration);
                 }
             }
         }
@@ -404,7 +405,7 @@ apogee.codeAnalysis.processGenericNode = function(processInfo,node) {
 /** This method processes nodes that are function. For functions a new scope is created 
  * for the body of the function.
  * @private */
-apogee.codeAnalysis.processFunction = function(processInfo,node) {
+function processFunction(processInfo,node) {
     var nodeType = node.type;
     var idNode = node.id;
     var params = node.params;
@@ -418,42 +419,42 @@ apogee.codeAnalysis.processFunction = function(processInfo,node) {
     
     if((nodeType === "FunctionDeclaration")&&(idNode)) {
         //parse id node (variable name) in the parent scope
-        apogee.codeAnalysis.processTreeNode(processInfo,idNode,true);
+        processTreeNode(processInfo,idNode,true);
     }
     
     //create a new scope for this function
-    var scope = apogee.codeAnalysis.startScope(processInfo);
+    var scope = startScope(processInfo);
     
     if((nodeType === "FunctionExpression")&&(idNode)) {
         //parse id node (variable name) in the parent scope
-        apogee.codeAnalysis.processTreeNode(processInfo,idNode,true);
+        processTreeNode(processInfo,idNode,true);
     }
     
     //process the variable list
     for(var i = 0; i < params.length; i++) {
-        apogee.codeAnalysis.processTreeNode(processInfo,params[i],true);
+        processTreeNode(processInfo,params[i],true);
     }
     
     //process the function body
-    apogee.codeAnalysis.processTreeNode(processInfo,body,false);
+    processTreeNode(processInfo,body,false);
     
     //end the scope for this function
-    apogee.codeAnalysis.endScope(processInfo,scope);
+    endScope(processInfo,scope);
 }
 
 /** This method processes nodes that are variables (identifiers and member expressions), adding
  * them to the list of variables which are used in tehe formula.
  * @private */
-apogee.codeAnalysis.processVariable = function(processInfo,node,isDeclaration) {
+function processVariable(processInfo,node,isDeclaration) {
     
     //get the variable path and the base name
-    var namePath = this.getVariableDotPath(processInfo,node);
+    var namePath = getVariableDotPath(processInfo,node);
     if(!namePath) return;
     
     var baseName = namePath[0];
     
     //check if it is an excluded name - such as a variable name used by javascript
-    if(apogee.codeAnalysis.EXCLUSION_NAMES[baseName]) {
+    if(EXCLUSION_NAMES[baseName]) {
         return;
     }
     
@@ -494,7 +495,7 @@ apogee.codeAnalysis.processVariable = function(processInfo,node,isDeclaration) {
  * dependecne on a parent (and all children) when all that is required is a 
  * single child. 
  * @private */
-apogee.codeAnalysis.getVariableDotPath = function(processInfo,node) {
+function getVariableDotPath(processInfo,node) {
     if(node.type == "Identifier") {
         //read the identifier name
         return [node.name];
@@ -502,7 +503,7 @@ apogee.codeAnalysis.getVariableDotPath = function(processInfo,node) {
     else if(node.type == "MemberExpression") {
         if((node.object.type == "MemberExpression")||(node.object.type == "Identifier")) {
             //MEMBER EXPRESSION OR IDENTIFIER - variable name and/or path
-            var variable = this.getVariableDotPath(processInfo,node.object);
+            var variable = getVariableDotPath(processInfo,node.object);
 
             if(node.computed) {
                 //COMPUTED CASE
@@ -510,7 +511,7 @@ apogee.codeAnalysis.getVariableDotPath = function(processInfo,node) {
                 //the parent. This should work but it is too strong. For example
                 //we may be including dependence on a while folder when really we depend
                 //on a single child in the folder.
-                this.processTreeNode(processInfo,node.property,false);
+                processTreeNode(processInfo,node.property,false);
             }
             else {
                 //append the member expression property to it
@@ -525,20 +526,20 @@ apogee.codeAnalysis.getVariableDotPath = function(processInfo,node) {
             //on the parent which should work but is too strong. For example
             //we may be including dependence on a while folder when really we depend
             //on a single child in the folder.
-            this.processTreeNode(processInfo,node.object,false);
+            processTreeNode(processInfo,node.object,false);
             
             return null;
         }
     }
     else {
         //this shouldn't happen. If it does we didn't code the syntax tree right
-        throw this.createParsingError("Unknown application error: expected a variable identifier node.",node.loc);
+        throw createParsingError("Unknown application error: expected a variable identifier node.",node.loc);
     }
 }
 
 /** This method annotates the variable usages that are local variables. 
  * @private */
-apogee.codeAnalysis.markLocalVariables = function(processInfo) {
+function markLocalVariables(processInfo) {
     for(var key in processInfo.nameTable) {
         var nameEntry = processInfo.nameTable[key];
         var name = nameEntry.name;
@@ -579,8 +580,8 @@ apogee.codeAnalysis.markLocalVariables = function(processInfo) {
  *     column;[integer column on line number]
  * }
  * @private */
-apogee.codeAnalysis.createParsingError = function(errorMsg,location) {
-    var error = apogee.base.createError(errorMsg,false);
+function createParsingError(errorMsg,location) {
+    var error = base.createError(errorMsg,false);
     if(location) {
         error.lineNumber = location.start.line;
         error.column = location.start.column;

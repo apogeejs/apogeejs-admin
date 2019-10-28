@@ -47,7 +47,7 @@
 		</style>
         
         <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/noconflict/ace.js"></script>
-        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
+        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.3/esprima.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
         
         <script type="text/javascript" src="http://www.apogeejs.com/v0.8.8/apogee-web-lib.min.js"></script>
@@ -78,18 +78,19 @@
               
             function onWorkspaceLoad() {
                 //load the UI controls
-                addDisplay("Model.overridesTemplate","templateCell");
+                addDisplay("Model.settings.OVERRIDES_DOWNLOAD_TEMPLATE","templateCell");
+                addDisplay("Model.login.loginUrl","loginUrlCell");
                 
                 addDisplay("Model.login.loginControl","loginCell");
                 addDisplay("Model.login.loginResult","loginResultCell");
                  
-                addDisplay("Model.cidInput","cidInputCell");
+                addDisplay("Model.download.cidInput","cidInputCell");
                 
-                addDisplay("Model.overridesFile","overridesFileCell");
+                addDisplay("Model.download.overridesFile","overridesFileCell");
                 
-                addDisplay("Model.fileSelection","fileInputCell");
+                addDisplay("Model.download.fileSelection","fileInputCell");
 
-                addDisplay("Model.file","fileDisplayCell");
+                addDisplay("Model.download.file","fileDisplayCell");
             }
             
             function addDisplay(memberName,parentElementId,optionalViewType) {
@@ -119,7 +120,10 @@
     <body onload="init()">
         <h1>Community Overrides Display</h1>
         
+        Overrides Template:
         <div class="dataCell0" id="templateCell"></div>
+        Login URL:
+        <div class="dataCell0" id="loginUrlCell"></div>
         
         <div class="formCell" id="loginCell"></div>
         <div class="formCell" id="loginResultCell"></div>

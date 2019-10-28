@@ -1,12 +1,15 @@
+import ReferenceEntry from "/apogeeapp/app/references/ReferenceEntry.js";
+import {getLinkLoader} from "/apogeeapp/app/references/LinkLoader.js";
+
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-apogeeapp.app.CssEntry = class extends apogeeapp.app.ReferenceEntry {
+export default class CssEntry extends ReferenceEntry {
     
     constructor(referenceManager,referenceData) {
-        super(referenceManager,referenceData,apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO);
+        super(referenceManager,referenceData,CssEntry.REFERENCE_TYPE_INFO);
     }
     
     /** This method loads the link onto the page. It returns a promise that
@@ -26,8 +29,8 @@ apogeeapp.app.CssEntry = class extends apogeeapp.app.ReferenceEntry {
                 reject(errorMsg);
             }
 
-            this.linkCallerId = apogeeapp.app.getLinkLoader().createLinkCallerId();
-            apogeeapp.app.getLinkLoader().addLinkElement("css",this.url,this.linkCallerId,onLoad,onError);
+            this.linkCallerId = getLinkLoader().createLinkCallerId();
+            getLinkLoader().addLinkElement("css",this.url,this.linkCallerId,onLoad,onError);
         }
 
         //call link added to references
@@ -39,18 +42,18 @@ apogeeapp.app.CssEntry = class extends apogeeapp.app.ReferenceEntry {
     
     /** This method removes the link. */
     remove() {
-        apogeeapp.app.getLinkLoader().removeLinkElement("css",this.url,this.linkCallerId);
+        getLinkLoader().removeLinkElement("css",this.url,this.linkCallerId);
         
         this.referenceManager.entryRemoved(this);
     }
 }
 
-apogeeapp.app.CssEntry.REFERENCE_TYPE_INFO = {
+CssEntry.REFERENCE_TYPE_INFO = {
     "REFERENCE_TYPE": "css link",
     "LIST_NAME": "CSS Links",
     "ADD_ENTRY_TEXT":"Add CSS Link",
     "UPDATE_ENTRY_TEXT":"Update CSS Link",
     "LIST_ICON_PATH":"/componentIcons/folder.png",
     "ENTRY_ICON_PATH": "/componentIcons/cssLink.png",
-    "createEntryFunction": (referenceManager, linkData) => new apogeeapp.app.CssEntry(referenceManager,linkData)
+    "createEntryFunction": (referenceManager, linkData) => new CssEntry(referenceManager,linkData)
 }

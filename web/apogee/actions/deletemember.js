@@ -1,84 +1,95 @@
-/** This namespace contains the delete member action */
-apogee.deletemember = {};
+import {addActionInfo} from "/apogee/actions/action.js";
 
-/** Delete member action name 
+/** This is self installing command module. It has no exports
+ * but it must be imported to install the command. 
+ *
  * Action Data format:
  * {
- *  "action": apogee.deletemember.ACTION_NAME,
+ *  "action": "deleteMember",
  *  "member": (member to delete),
  *  
  *  "eventInfo": (OUTPUT - event info for the associated delete event)
  * }
- */
-apogee.deletemember.ACTION_NAME = "deleteMember";
-
-/** MEMBER DELETED EVENT
+ *
+ * MEMBER DELETED EVENT: "memberDeleted"
  * Event object Format:
  * {
  *  "member": (member),
  *  }
  */
-apogee.deletemember.MEMBER_DELETED_EVENT = "memberDeleted";
+
 
 /** Delete member action function */
-apogee.deletemember.deleteMember = function(actionData,optionalContext,processedActions) {
-
-    var deleteList = [];
-
-    apogee.deletemember.getDeleteList(actionData.member,deleteList);
-    for(var i = 0; i < deleteList.length; i++) {
-        //call delete handlers
-        var member = deleteList[i];
-        member.onDeleteMember();
-        if(member.isDependent) {
-            member.onDeleteDependent();
-        }   
-        
-        //we are adding multiple delete events here
-        var actionDataEntry;
-        if(member == actionData.member) {
-            actionDataEntry = actionData;
-        }
-        else {
-            actionDataEntry = {};
-            actionDataEntry.action = "deleteMember";
-            actionDataEntry.member = member;
-            actionDataEntry.actionInfo = actionData.actionInfo;
-        }
-        
-        processedActions.push(actionDataEntry);
+function deleteMember(workspace,actionData,actionResult) {
+    
+    var memberFullName = actionData.memberName;
+    var member = workspace.getMemberByFullName(memberFullName);
+    if(!member) {
+        actionResult.actionDone = false;
+        actionResult.errorMsg = "Member not found for delete member";
+        return;
     }
+    actionResult.member = member;
+    
+    doDelete(member,actionResult);
+    
 }
 
+
 /** @private */
-apogee.deletemember.getDeleteList =  function(member,deleteList) {
-    //delete children first if there are any
+function doDelete(member,actionResult) {
+    
+    //delete children
     if(member.isParent) {
+        actionResult.childActionResults = {};
+        
         var childMap = member.getChildMap();
-        for(var key in childMap) {
-            var child = childMap[key];
-            apogee.deletemember.getDeleteList(child,deleteList);
+        for(var childName in childMap) {
+            var child = childMap[childName];
+            let childActionResult = {};
+            childActionResult.member = child;
+            childActionResult.actionInfo = ACTION_INFO
+            
+            actionResult.childActionResults[childName] = childActionResult;
+            
+            //add results for children to this member
+            doDelete(child,childActionResult);
         }
     }
     else if(member.isRootHolder) {
+        actionResult.childActionResults = {};
+        
         var root = member.getRoot();
-        apogee.deletemember.getDeleteList(root,deleteList);
+        let childActionResult = {};
+        childActionResult.member = root;
+        childActionResult.actionInfo = ACTION_INFO
+
+        actionResult.childActionResults["root"] = childActionResult;
+        
+        //add results for children to this member
+        doDelete(child,childActionResult);
     }
-    //delete the member
-    deleteList.push(member);
+    
+    //delete member
+    member.onDeleteMember();
+    if(member.isDependent) {
+        member.onDeleteDependent();
+    }
+    
+    actionResult.actionDone = true;
 }
 
 
-
 /** Action info */
-apogee.deletemember.ACTION_INFO = {
-    "actionFunction": apogee.deletemember.deleteMember,
+let ACTION_INFO = {
+    "action": "deleteMember",
+    "actionFunction": deleteMember,
     "checkUpdateAll": true,
     "updateDependencies": false,
     "addToRecalc": false,
-    "event": apogee.deletemember.MEMBER_DELETED_EVENT
+    "event": "memberDeleted"
 }
 
 
 //This line of code registers the action 
-apogee.action.addActionInfo(apogee.deletemember.ACTION_NAME,apogee.deletemember.ACTION_INFO);
+addActionInfo(ACTION_INFO);

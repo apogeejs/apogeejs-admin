@@ -1,9 +1,12 @@
+import base from "/apogeeutil/base.js";
+import EventManager from "/apogeeutil/EventManager.js";
+
 /** This object is a container for window frames. The argument of the constructor should
  * be an element that will hold the window frames.  */
 apogeeapp.ui.WindowParent = function(containerElement) {
     
     //base init
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
     
     this.containerElement = containerElement;
     
@@ -18,7 +21,7 @@ apogeeapp.ui.WindowParent = function(containerElement) {
 }
 
 //add components to this class
-apogee.base.mixin(apogeeapp.ui.WindowParent,apogee.EventManager);
+base.mixin(apogeeapp.ui.WindowParent,EventManager);
 
 apogeeapp.ui.WindowParent.BASE_ZINDEX = 0;
 

@@ -1,3 +1,5 @@
+import util from "/apogeeutil/util.js";
+
 /** This is an text field element configurable element.
  * 
  * @class 
@@ -29,7 +31,7 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
             
             var label;
             var value;
-            if(apogee.util.getObjectType(checkboxInfo) == "Array") {
+            if(util.getObjectType(checkboxInfo) == "Array") {
                 label = checkboxInfo[0]
                 value = checkboxInfo[1];     
             }

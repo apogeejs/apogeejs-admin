@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <title>Command Manager Tests</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="../../../apogee/apogee.js"></script>
+        <script src="../../../apogee/usrlib/util.js"></script>
+        <script src="../../apogeeapp.js"></script>
+        <script src="CommandManager.js"></script>
+        <script src="CommandManagerTests.js"></script>
+        <script>       
+        
+            import util from "/apogeeutil/util.js";
+            
+            function runTests() {
+                var commandManagerTests = new CommandManagerTests();
+                var tests = commandManagerTests.getTests();
+                var results = [];
+                runTestCollection(tests,results);
+                
+                var output = document.getElementById("output");
+                output.innerHTML = JSON.stringify(results,null,4);
+            }
+            
+            //======================================
+            // THESE ARE THINGS THAT SHOULD BE IN THE TEST FRAMEWORK (pri
+            //======================================
+            
+            /** This runs a set of tests, where tests is a map of test functions which throw an error if they fail. */
+            function runTestCollection(tests,results) {
+
+                for(var testName in tests) {
+                    try {
+                        tests[testName]();
+
+                        results.push([testName,"pass"])
+                    }
+                    catch(error) {
+                        console.error(testName + "Failed!");
+                        console.error(error.stack);
+                        results.push([testName,"fail",error.message]);
+                    }
+                }
+            }
+
+            /** This is one of the compares that should be in the test suit. */
+            function testSimpleEquals(desc,value1,value2) {
+                if(value1 !== value2) {
+                    throw new Error("Failure in test: " + desc + " " + value1 + " != " + value2);
+                }
+            }
+
+            /** This is one of the compares that should be in the test suit. */
+            function testJsonEquals(desc,value1,value2) {
+                if(!util.jsonEquals(value1,value2)) {
+                    throw new Error("Failure in test: " + desc + " " + JSON.stringify(value1) + " != " + JSON.stringify(value2));
+                }
+            }
+        </script>
+    </head>
+    <body onload="runTests()">
+        Results:<pre id="output"></pre>
+    </body>
+</html>

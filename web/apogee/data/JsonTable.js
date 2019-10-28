@@ -1,10 +1,18 @@
+import base from "/apogeeutil/base.js";
+import util from "/apogeeutil/util.js";
+import Workspace from "/apogee/data/Workspace.js";
+import Member from "/apogee/datacomponents/Member.js";
+import Dependent from "/apogee/datacomponents/Dependent.js";
+import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
+import Codeable from "/apogee/datacomponents/Codeable.js";
+
 /** This class encapsulatees a data table for a JSON object */
-apogee.JsonTable = function(name,owner,initialData) {
+function JsonTable(name,owner,initialData) {
     //base init
-    apogee.Member.init.call(this,name,apogee.JsonTable.generator);
-    apogee.Dependent.init.call(this);
-    apogee.ContextHolder.init.call(this);
-	apogee.Codeable.init.call(this,[],true);
+    Member.init.call(this,name,JsonTable.generator);
+    Dependent.init.call(this);
+    ContextHolder.init.call(this);
+	Codeable.init.call(this,[],true);
     
     this.initOwner(owner);
     
@@ -16,16 +24,14 @@ apogee.JsonTable = function(name,owner,initialData) {
     }  
 
     if(initialData.functionBody !== undefined) {
-        apogee.updatemember.applyCode(this,
-            initialData.argList,
+        this.applyCode(initialData.argList,
             initialData.functionBody,
             initialData.supplementalCode);
     }
     else {
         if(initialData.data === undefined) initialData.data = "";
         
-        apogee.updatemember.applyData(this,
-            initialData.data);
+        this.setData(initialData.data);
     }
     if(initialData.description !== undefined) {
         this.setDescription(initialData.description);
@@ -33,10 +39,10 @@ apogee.JsonTable = function(name,owner,initialData) {
 }
 
 //add components to this class
-apogee.base.mixin(apogee.JsonTable,apogee.Member);
-apogee.base.mixin(apogee.JsonTable,apogee.Dependent);
-apogee.base.mixin(apogee.JsonTable,apogee.ContextHolder);
-apogee.base.mixin(apogee.JsonTable,apogee.Codeable);
+base.mixin(JsonTable,Member);
+base.mixin(JsonTable,Dependent);
+base.mixin(JsonTable,ContextHolder);
+base.mixin(JsonTable,Codeable);
 
 //------------------------------
 // Codeable Methods
@@ -45,11 +51,11 @@ apogee.base.mixin(apogee.JsonTable,apogee.Codeable);
 /** This method returns the argument list. We override it because
  * for JsonTable it gets cleared when data is set. However, whenever code
  * is used we want the argument list to be this value. */
-apogee.JsonTable.prototype.getArgList = function() {
+JsonTable.prototype.getArgList = function() {
     return [];
 }
 	
-apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
+JsonTable.prototype.processMemberFunction = function(memberGenerator) {
     
     //first initialize
     var initialized = this.memberFunctionInitialize();
@@ -65,43 +71,17 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
         data = undefined;
     }
     
-    if(data === apogee.util.INVALID_VALUE) {
+    if(data === util.INVALID_VALUE) {
         //value is invalid if return is this predefined value
         this.setResultInvalid(true);
     }
-    else if(apogee.base.isPromise(data)) {
+    else if(data instanceof Promise) {
         //if the return value is a Promise, the data is asynch asynchronous!
-
-        //set pending manually here rather than doing below in a separate action
-        var token = apogee.action.getAsynchToken();
-        this.setResultPending(true,token);
-        
-        var instance = this;
-       
-        var asynchCallback = function(memberValue) {
-            //set the data for the table, along with triggering updates on dependent tables.
-            var actionData = {};
-            actionData.action = "asynchFormulaData";
-            actionData.member = instance;
-            actionData.token = token;
-            actionData.data = memberValue;
-            var actionResponse =  apogee.action.doAction(actionData,false);
-        }
-        var asynchErrorCallback = function(errorMsg) {
-            var actionData = {};
-            actionData.action = "updateError";
-            actionData.member = instance;
-            actionData.token = token;
-            actionData.errorMsg = errorMsg;
-            var actionResponse =  apogee.action.doAction(actionData,false);
-        }
-
-        //call appropriate action when the promise resolves.
-        data.then(asynchCallback).catch(asynchErrorCallback);
+        this.applyPromiseData(data);
     }
     else {
-        //result is synchronous
-        this.setData(data);
+        //result is normal synchronous data
+        this.setData(data); 
     }
 }
 
@@ -112,31 +92,31 @@ apogee.JsonTable.prototype.processMemberFunction = function(memberGenerator) {
 /** This method extends set data from member. It also
  * freezes the object so it is immutable. (in the future we may
  * consider copying instead, or allowing a choice)*/
-apogee.JsonTable.prototype.setData = function(data) {
+JsonTable.prototype.setData = function(data) {
     
 	//make this object immutable
-	apogee.base.deepFreeze(data);
+	base.deepFreeze(data);
 
 	//store the new object
-    return apogee.Member.setData.call(this,data);
+    return Member.setData.call(this,data);
 }
 
 /** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-apogee.JsonTable.fromJson = function(owner,json) {
-    return new apogee.JsonTable(json.name,owner,json.updateData);
+JsonTable.fromJson = function(owner,json) {
+    return new JsonTable(json.name,owner,json.updateData);
 }
 
 //============================
 // Static methods
 //============================
 
-apogee.JsonTable.generator = {};
-apogee.JsonTable.generator.displayName = "Table";
-apogee.JsonTable.generator.type = "apogee.JsonTable";
-apogee.JsonTable.generator.createMember = apogee.JsonTable.fromJson;
-apogee.JsonTable.generator.setDataOk = true;
-apogee.JsonTable.generator.setCodeOk = true;
+JsonTable.generator = {};
+JsonTable.generator.displayName = "Table";
+JsonTable.generator.type = "apogee.JsonTable";
+JsonTable.generator.createMember = JsonTable.fromJson;
+JsonTable.generator.setDataOk = true;
+JsonTable.generator.setCodeOk = true;
 
 //register this member
-apogee.Workspace.addMemberGenerator(apogee.JsonTable.generator);
+Workspace.addMemberGenerator(JsonTable.generator);

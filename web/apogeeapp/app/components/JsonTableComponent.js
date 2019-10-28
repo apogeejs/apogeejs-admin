@@ -1,165 +1,194 @@
+import Component from "/apogeeapp/app/component/Component.js";
+import EditComponent from "/apogeeapp/app/component/EditComponent.js";
+import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
+import HandsonGridEditor from "/apogeeapp/app/datadisplay/HandsonGridEditor.js";
+import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
+import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
+
 /** This component represents a json table object. */
-apogeeapp.app.JsonTableComponent = function(workspaceUI,table) {
-    //extend edit component
-    apogeeapp.app.EditComponent.call(this,workspaceUI,table,apogeeapp.app.JsonTableComponent);
-
-    //default view
-    this.dataView = apogeeapp.app.JsonTableComponent.DEFAULT_DATA_VIEW;
+export default class JsonTableComponent extends EditComponent {
     
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.JsonTableComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.JsonTableComponent.writeToJson);
-};
+        
+    constructor(workspaceUI,table) {
+        //extend edit component
+        super(workspaceUI,table,JsonTableComponent);
 
-apogeeapp.app.JsonTableComponent.prototype = Object.create(apogeeapp.app.EditComponent.prototype);
-apogeeapp.app.JsonTableComponent.prototype.constructor = apogeeapp.app.JsonTableComponent;
+        //default view
+        this.dataView = JsonTableComponent.DEFAULT_DATA_VIEW;
+    };
 
-apogeeapp.app.JsonTableComponent.prototype.getDataView = function() {
-    if(!this.dataView) this.dataView = apogeeapp.app.JsonTableComponent.DEFAULT_DATA_VIEW;
-    return this.dataView;
-}
+    getDataView() {
+        if(!this.dataView) this.dataView = JsonTableComponent.DEFAULT_DATA_VIEW;
+        return this.dataView;
+    }
 
-apogeeapp.app.JsonTableComponent.prototype.setDataView = function(dataView) {
-    this.dataView = dataView;
-    //update the window display if needed
-    var windowDisplay = this.getWindowDisplay();
-    if(windowDisplay) {
-        windowDisplay.updateViewModeElement(apogeeapp.app.JsonTableComponent.VIEW_DATA);
+    setDataView(dataView) {
+        if(this.dataView != dataView) {
+            this.fieldUpdated("dataView");
+            
+            this.dataView = dataView;
+            //update the window display if needed
+            var componentDisplay = this.getComponentDisplay();
+            if(componentDisplay) {
+                alert("I need to fix set data view in json table!");
+                //componentDisplay.updateViewModeElement(JsonTableComponent.VIEW_DATA);
+            }
+        }
+    }
+
+    //==============================
+    // Protected and Private Instance Methods
+    //==============================
+
+    /**  This method retrieves the table edit settings for this component instance
+     * @protected */
+    getTableEditSettings() {
+        return JsonTableComponent.TABLE_EDIT_SETTINGS;
+    }
+
+    /** This method should be implemented to retrieve a data display of the give type. 
+     * @protected. */
+    getDataDisplay(displayContainer,viewType) {
+        
+        var callbacks;
+        
+        //create the new view element;
+        switch(viewType) {
+            case JsonTableComponent.VIEW_DATA:
+                switch(this.dataView) {
+                    case JsonTableComponent.COLORIZED_DATA_VEW:
+                        callbacks = dataDisplayHelper.getMemberDataTextCallbacks(this.member);
+                        return new AceTextEditor(displayContainer,callbacks,"ace/mode/json");
+                        
+                    case JsonTableComponent.TEXT_DATA_VEW:
+                        callbacks = dataDisplayHelper.getMemberDataJsonCallbacks(this.member);
+                        return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                        
+                    case JsonTableComponent.GRID_DATA_VEW:
+                        callbacks = dataDisplayHelper.getMemberDataJsonCallbacks(this.member);
+                        return new HandsonGridEditor(displayContainer,callbacks);
+                        
+                    case JsonTableComponent.PLAIN_DATA_VEW:
+                    default:
+                        callbacks = dataDisplayHelper.getMemberDataTextCallbacks(this.member);
+                        return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                }
+                
+            case JsonTableComponent.VIEW_CODE:
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                
+            case JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                
+            case JsonTableComponent.VIEW_DESCRIPTION:
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                return new TextAreaEditor(displayContainer,callbacks);
+                
+            default:
+    //temporary error handling...
+                alert("unrecognized view element!");
+                return null;
+        }
+    }
+
+    //==============================
+    // serialization
+    //==============================
+
+    writeToJson(json) {
+        json.dataView = this.dataView;
+    }
+
+    readFromJson(json) {
+        if(json.dataView !== undefined) {
+            this.setDataView(json.dataView);
+        }
+    }
+
+    //======================================
+    // properties
+    //======================================
+
+    /** This returns the current values for the member and component properties in the  
+     * proeprties dialog. */
+    readExtendedProperties(values) {
+        values.dataView = this.getDataView();
+    }
+
+    //======================================
+    // Static methods
+    //======================================
+
+    /** This optional static function reads property input from the property 
+     * dialog and copies it into a member property json. It is not needed for
+     * this componnet. */
+    //transferMemberProperties(inputValues,propertyJson) {
+    //}
+
+    /** This optional static function reads property input from the property 
+     * dialog and copies it into a component property json. */
+    static transferComponentProperties(inputValues,propertyJson) {
+        if(inputValues.dataView !== undefined) {
+            propertyJson.dataView = inputValues.dataView;
+        }
     }
 }
 
-//==============================
-// Protected and Private Instance Methods
-//==============================
 
-apogeeapp.app.JsonTableComponent.VIEW_DATA = "Data";
-apogeeapp.app.JsonTableComponent.VIEW_CODE = "Formula";
-apogeeapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
-apogeeapp.app.JsonTableComponent.VIEW_DESCRIPTION = "Notes";
+JsonTableComponent.VIEW_DATA = "Data";
+JsonTableComponent.VIEW_CODE = "Formula";
+JsonTableComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
+JsonTableComponent.VIEW_DESCRIPTION = "Notes";
 
-apogeeapp.app.JsonTableComponent.VIEW_MODES = [
-    apogeeapp.app.JsonTableComponent.VIEW_DATA,
-    apogeeapp.app.JsonTableComponent.VIEW_CODE,
-    apogeeapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE,
-    apogeeapp.app.JsonTableComponent.VIEW_DESCRIPTION
+JsonTableComponent.VIEW_MODES = [
+    JsonTableComponent.VIEW_DATA,
+    JsonTableComponent.VIEW_CODE,
+    JsonTableComponent.VIEW_SUPPLEMENTAL_CODE,
+    JsonTableComponent.VIEW_DESCRIPTION
 ];
 
-apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS = {
-    "viewModes": apogeeapp.app.JsonTableComponent.VIEW_MODES,
-    "defaultView": apogeeapp.app.JsonTableComponent.VIEW_DATA,
-    "clearFunctionMenuText": "Clear Formula",
+JsonTableComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": JsonTableComponent.VIEW_MODES,
+    "defaultView": JsonTableComponent.VIEW_DATA,
     "emptyDataValue": ""
 }
 
-apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW = "Plain";
-apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW = "Colorized";
-apogeeapp.app.JsonTableComponent.TEXT_DATA_VEW = "Text Data";
-apogeeapp.app.JsonTableComponent.GRID_DATA_VEW = "Grid";
-apogeeapp.app.JsonTableComponent.FORM_DATA_VIEW = "Form";
+JsonTableComponent.PLAIN_DATA_VEW = "Plain";
+JsonTableComponent.COLORIZED_DATA_VEW = "Colorized";
+JsonTableComponent.TEXT_DATA_VEW = "Text Data";
+JsonTableComponent.GRID_DATA_VEW = "Grid";
 
-apogeeapp.app.JsonTableComponent.DEFAULT_DATA_VIEW = apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW;;
-
-
-/**  This method retrieves the table edit settings for this component instance
- * @protected */
-apogeeapp.app.JsonTableComponent.prototype.getTableEditSettings = function() {
-    return apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS;
-}
-
-/** This method should be implemented to retrieve a data display of the give type. 
- * @protected. */
-apogeeapp.app.JsonTableComponent.prototype.getDataDisplay = function(viewMode,viewType) {
-	
-    var callbacks;
-    
-	//create the new view element;
-	switch(viewType) {
-        case apogeeapp.app.JsonTableComponent.VIEW_DATA:
-            switch(this.dataView) {
-                case apogeeapp.app.JsonTableComponent.COLORIZED_DATA_VEW:
-                    callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.member);
-                    return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/json");
-                    
-                case apogeeapp.app.JsonTableComponent.TEXT_DATA_VEW:
-                    callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks(this.member);
-                    return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
-                    
-                case apogeeapp.app.JsonTableComponent.GRID_DATA_VEW:
-                    callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks(this.member);
-                    return new apogeeapp.app.HandsonGridEditor(viewMode,callbacks);
-
-                case apogeeapp.app.JsonTableComponent.FORM_DATA_VIEW:
-                    alert("FORM EDITOR NOT IMPLEMENTED YET!");
-                    callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks(this.member);
-                    //return new apogeeapp.app.FormDataMode(editComponentDisplay);
-                    //drop through to below
-                    
-                case apogeeapp.app.JsonTableComponent.PLAIN_DATA_VEW:
-                default:
-                    callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks(this.member);
-                    return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
-            }
-			
-		case apogeeapp.app.JsonTableComponent.VIEW_CODE:
-            callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks(this.member,apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-			return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-			
-		case apogeeapp.app.JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
-			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks(this.member,apogeeapp.app.JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-            return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/javascript");
-            
-        case apogeeapp.app.JsonTableComponent.VIEW_DESCRIPTION:
-			callbacks = apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks(this.member);
-            //return new apogeeapp.app.AceTextEditor(viewMode,callbacks,"ace/mode/text");
-            return new apogeeapp.app.TextAreaEditor(viewMode,callbacks);
-			
-		default:
-//temporary error handling...
-			alert("unrecognized view element!");
-			return null;
-	}
-}
-
-
-//======================================
-// Static methods
-//======================================
-
-apogeeapp.app.JsonTableComponent.getCreateMemberPayload = function(userInputValues) {
-    var json = {};
-    json.name = userInputValues.name;
-    json.type = apogee.JsonTable.generator.type;
-    return json;
-}
-
-apogeeapp.app.JsonTableComponent.writeToJson = function(json) {
-    json.dataView = this.dataView;
-}
-
-apogeeapp.app.JsonTableComponent.readFromJson = function(json) {
-    if(json.dataView !== undefined) {
-        this.dataView = json.dataView;
-    }
-}
-
-apogeeapp.app.JsonTableComponent.addPropFunction = function(component,values) {
-    values.dataView = component.getDataView();
-}
-
-apogeeapp.app.JsonTableComponent.updateProperties = function(component,oldValues,newValues) {
-    component.setDataView(newValues.dataView);
-}
+JsonTableComponent.DEFAULT_DATA_VIEW = JsonTableComponent.COLORIZED_DATA_VEW;
 
 //======================================
 // This is the component generator, to register the component
 //======================================
 
-apogeeapp.app.JsonTableComponent.displayName = "Data Table";
-apogeeapp.app.JsonTableComponent.uniqueName = "apogeeapp.app.JsonTableComponent";
-apogeeapp.app.JsonTableComponent.DEFAULT_WIDTH = 300;
-apogeeapp.app.JsonTableComponent.DEFAULT_HEIGHT = 300;
-apogeeapp.app.JsonTableComponent.ICON_RES_PATH = "/componentIcons/dataTable.png";
-apogeeapp.app.JsonTableComponent.propertyDialogLines = [
+
+/** This is the display name for the type of component */
+JsonTableComponent.displayName = "Data Table";
+/** This is the univeral uniaue name for the component, used to deserialize the component. */
+JsonTableComponent.uniqueName = "apogeeapp.app.JsonTableComponent";
+/** If true, this indicates the component has a tab entry */
+JsonTableComponent.hasTabEntry = false;
+/** If true, this indicates the component has an entry appearing on the parent tab */
+JsonTableComponent.hasChildEntry = true;
+JsonTableComponent.DEFAULT_WIDTH = 300;
+JsonTableComponent.DEFAULT_HEIGHT = 300;
+/** This is the icon url for the component. */
+JsonTableComponent.ICON_RES_PATH = "/componentIcons/dataTable.png";
+/** This field gives the default value for the JSON taht should be deserialized to
+ * create the member for this object. The field "name" can be omitted. This will 
+ * be added when the member is created. */
+JsonTableComponent.DEFAULT_MEMBER_JSON = {
+    "type": "apogee.JsonTable"
+};
+/** This is configuration for the properties dialog box, the results of which
+ * our code will read in. */
+JsonTableComponent.propertyDialogLines = [
     {
         "type":"dropdown",
         "heading":"Data View: ",
@@ -173,4 +202,5 @@ apogeeapp.app.JsonTableComponent.propertyDialogLines = [
         "resultKey":"dataView"
     }
 ];
+
 

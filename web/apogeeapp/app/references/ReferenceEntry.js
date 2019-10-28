@@ -1,15 +1,17 @@
+import {updateLink, removeLink} from "/apogeeapp/app/commandseq/updatelinkseq.js";
+import {bannerConstants} from "/apogeeapp/app/component/banner.js"; 
 
 /** This class manages references for the web page.*/
-apogeeapp.app.ReferenceEntry = class {
+export default class ReferenceEntry {
     
     constructor(referenceManager,referenceData,referenceTypeInfo) {
-        this.id = apogeeapp.app.ReferenceManager._createId();
+        this.id = ReferenceManager._createId();
         this.referenceManager = referenceManager;
 
         this.url = referenceData.url;
         this.referenceTypeInfo = referenceTypeInfo;
 
-        this.state = apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE;
+        this.state = bannerConstants.BANNER_TYPE_NONE;
 
         var nickname = referenceData.nickname;
         if((!nickname)||(nickname.length === 0)) nickname = this.createEntryNameFromUrl(this.url);
@@ -21,6 +23,10 @@ apogeeapp.app.ReferenceEntry = class {
     //---------------------------
     // references entry interface
     //---------------------------
+    
+    getReferenceManager() {
+        return this.referenceManager;
+    }
 
     getId() {
         return this.id;
@@ -122,25 +128,25 @@ apogeeapp.app.ReferenceEntry = class {
     }
 
     getElementId() {
-        return apogeeapp.app.ReferenceEntry.ELEMENT_ID_BASE + this.id;
+        return ReferenceEntry.ELEMENT_ID_BASE + this.id;
     }
 
     setClearState() {
-        this.setState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_NONE);
+        this.setState(bannerConstants.BANNER_TYPE_NONE);
     }
 
     setError(errorMsg) {
-        this.setState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_ERROR,errorMsg);
+        this.setState(bannerConstants.BANNER_TYPE_ERROR,errorMsg);
     }
 
     setPendingState() {
-        this.setState(apogeeapp.app.WindowHeaderManager.BANNER_TYPE_PENDING,"loading");
+        this.setState(bannerConstants.BANNER_TYPE_PENDING,"loading");
     }
 
     setState(state,msg) {
         this.state = state;
         if(this.treeEntry) {
-            apogeeapp.app.ReferenceManager.applyBannerState(this.treeEntry,this.state);
+            ReferenceManager.applyBannerState(this.treeEntry,this.state);
         }
         this.referenceManager.entryStatusChange(this);
     }
@@ -149,7 +155,7 @@ apogeeapp.app.ReferenceEntry = class {
         var iconUrl = this.getIconUrl();
         var menuItemsCallback = () => this.getMenuItems();
         var treeEntry = new apogeeapp.ui.treecontrol.TreeEntry(this.nickname, iconUrl, null, menuItemsCallback, false);
-        apogeeapp.app.ReferenceManager.applyBannerState(treeEntry,this.state);
+        ReferenceManager.applyBannerState(treeEntry,this.state);
         return treeEntry;
     }
 
@@ -160,13 +166,13 @@ apogeeapp.app.ReferenceEntry = class {
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = "Update Reference";
-        itemInfo.callback = apogeeapp.app.updatelink.getUpdateLinkCallback(this);
+        itemInfo.callback = () => updateLink(this);
         menuItemList.push(itemInfo);
 
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = "Remove Reference";
-        itemInfo.callback = apogeeapp.app.updatelink.getRemoveLinkCallback(this);
+        itemInfo.callback = () => removeLink(this);
         menuItemList.push(itemInfo);
 
         return menuItemList;
@@ -178,5 +184,5 @@ apogeeapp.app.ReferenceEntry = class {
 //====================================
 
 
-apogeeapp.app.ReferenceEntry.ELEMENT_ID_BASE = "__apogee_link_element_";
+ReferenceEntry.ELEMENT_ID_BASE = "__apogee_link_element_";
 

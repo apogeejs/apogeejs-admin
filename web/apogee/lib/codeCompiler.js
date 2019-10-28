@@ -1,8 +1,8 @@
-  
-apogee.codeCompiler = {};
+import util from "/apogeeutil/util.js";
+import {KEYWORDS, EXCLUSION_NAMES, analyzeCode} from "/apogee/lib/codeAnalysis.js"; 
 
 /** @private */
-apogee.codeCompiler.APOGEE_FORBIDDEN_NAMES = {
+const APOGEE_FORBIDDEN_NAMES = {
     "apogeeMessenger": true,
     "__initializer": true,
     "__memberFunction": true,
@@ -11,29 +11,29 @@ apogee.codeCompiler.APOGEE_FORBIDDEN_NAMES = {
 }
 
 /** @private */
-apogee.codeCompiler.NAME_PATTERN = /[a-zA-Z_$][0-9a-zA-Z_$]*/;
+const NAME_PATTERN = /[a-zA-Z_$][0-9a-zA-Z_$]*/;
 
 /** This function validates a table name. It returns 
  * [valid,errorMsg]. */
-apogee.codeCompiler.validateTableName = function(name) {
+export function validateTableName(name) {
     var nameResult = {};
 
     //check if it is a keyword
-    if(apogee.codeAnalysis.KEYWORDS[name]) {
+    if(KEYWORDS[name]) {
         nameResult.errorMessage = "Illegal name: " + name + " - Javascript reserved keyword";
         nameResult.valid = false;
     }  
-    else if(apogee.codeAnalysis.EXCLUSION_NAMES[name]) {
+    else if(EXCLUSION_NAMES[name]) {
         nameResult.errorMessage = "Illegal name: " + name + " - Javascript variable or value name";
         nameResult.valid = false;
     }
-    else if(apogee.codeCompiler.APOGEE_FORBIDDEN_NAMES[name]) {
+    else if(APOGEE_FORBIDDEN_NAMES[name]) {
         nameResult.errorMessage = "Illegal name: " + name + " - Apogee reserved keyword";
         nameResult.valid = false;
     }
     else {
         //check the pattern
-        var nameResult = apogee.codeCompiler.NAME_PATTERN.exec(name);
+        var nameResult = NAME_PATTERN.exec(name);
         if((!nameResult)||(nameResult[0] !== name)) {
             nameResult.errorMessage = "Illegal name format: " + name;
             nameResult.valid = false;
@@ -47,10 +47,10 @@ apogee.codeCompiler.validateTableName = function(name) {
 
 /** This method analyzes the code and creates the object function and dependencies. 
  * The results are loaded into the passed object processedCodeData. */
-apogee.codeCompiler.processCode = function(codeInfo,codeLabel) {
+export function processCode(codeInfo,codeLabel) {
     
     //analyze the code
-    var combinedFunctionBody = apogee.codeCompiler.createCombinedFunctionBody(
+    var combinedFunctionBody = createCombinedFunctionBody(
         codeInfo.argList, 
         codeInfo.functionBody, 
         codeInfo.supplementalCode, 
@@ -59,8 +59,8 @@ apogee.codeCompiler.processCode = function(codeInfo,codeLabel) {
     //get the accessed variables
     //
     //parse the code and get variable dependencies
-    var effectiveCombinedFunctionBody = apogee.codeCompiler.MEMBER_LOCALS_TEXT + combinedFunctionBody;
-    var analyzeOutput = apogee.codeAnalysis.analyzeCode(effectiveCombinedFunctionBody);
+    var effectiveCombinedFunctionBody = MEMBER_LOCALS_TEXT + combinedFunctionBody;
+    var analyzeOutput = analyzeCode(effectiveCombinedFunctionBody);
     
     var compiledInfo = {};
     
@@ -72,8 +72,9 @@ apogee.codeCompiler.processCode = function(codeInfo,codeLabel) {
         return compiledInfo;
     }
 
-    //create the object function and context setter from the code text
-    var generatorFunction = apogee.codeCompiler.createGeneratorFunction(compiledInfo.varInfo, combinedFunctionBody);
+    //this generator creates two functions - a function that creates the member function
+    //and function that initializes external variables for that member fuction.
+    var generatorFunction = createGeneratorFunction(compiledInfo.varInfo, combinedFunctionBody);
     compiledInfo.generatorFunction = generatorFunction;
     
     return compiledInfo;   
@@ -82,7 +83,7 @@ apogee.codeCompiler.processCode = function(codeInfo,codeLabel) {
 
 /** This method creates the user code object function body. 
  * @private */
-apogee.codeCompiler.createCombinedFunctionBody = function(argList,
+function createCombinedFunctionBody(argList,
         functionBody, 
         supplementalCode,
         codeLabel) {
@@ -90,8 +91,8 @@ apogee.codeCompiler.createCombinedFunctionBody = function(argList,
     var argListString = argList.join(",");
     
     //create the code body
-    var combinedFunctionBody = apogee.util.formatString(
-        apogee.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT,
+    var combinedFunctionBody = util.formatString(
+        MEMBER_FUNCTION_FORMAT_TEXT,
 		codeLabel,
         argListString,
         functionBody,
@@ -101,9 +102,17 @@ apogee.codeCompiler.createCombinedFunctionBody = function(argList,
     return combinedFunctionBody;
 }
 
-/** This method creates the wrapped user code object function, including the context variables. 
+/** This method creates (1) a closure function that returns another generator function
+ * which makes the member function and (2) a function that initializes any external 
+ * variables needed in the member function.
+ * This closure wraps the variables that are external to this member, meaning other
+ * members in the model.
+ * This initializer function allows the code to be compiled once and then used with different
+ * values for other data in the model.
+ * The generator that makes the member function is a closure to wrap the member private
+ * code and any other needed data with the member function.
  * @private */
-apogee.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunctionBody) {
+function createGeneratorFunction(varInfo, combinedFunctionBody) {
     
     var contextDeclarationText = "";
     var initializerBody = "";
@@ -119,12 +128,12 @@ apogee.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunction
         contextDeclarationText += "var " + baseName + ";\n";
         
         //add to the context setter
-        initializerBody += baseName + ' = contextManager.getBaseData("' + baseName + '");\n';
+        initializerBody += baseName + ' = contextManager.getValue("' + baseName + '");\n';
     }
     
     //create the generator for the object function
-    var generatorBody = apogee.util.formatString(
-        apogee.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT,
+    var generatorBody = util.formatString(
+        GENERATOR_FUNCTION_FORMAT_TEXT,
 		contextDeclarationText,
         initializerBody,
         combinedFunctionBody
@@ -144,7 +153,7 @@ apogee.codeCompiler.createGeneratorFunction = function(varInfo, combinedFunction
  * 
  * @private
  */
-apogee.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT = [
+const MEMBER_FUNCTION_FORMAT_TEXT = [
 "//{0}",
 "",
 "//supplemental code--------------",
@@ -165,7 +174,7 @@ apogee.codeCompiler.MEMBER_FUNCTION_FORMAT_TEXT = [
 /** This line is added when getting the dependencies to account for some local 
  * variables in the member function.
  * @private */
-apogee.codeCompiler.MEMBER_LOCALS_TEXT = "var apogeeMessenger, __memberFunction, __memberFunctionDebugHook;";
+const MEMBER_LOCALS_TEXT = "var apogeeMessenger, __memberFunction, __memberFunctionDebugHook;";
    
 /** This is the format string to create the code body for the object function
  * Input indices:
@@ -174,7 +183,7 @@ apogee.codeCompiler.MEMBER_LOCALS_TEXT = "var apogeeMessenger, __memberFunction,
  * 2: object function body
  * @private
  */
-apogee.codeCompiler.GENERATOR_FUNCTION_FORMAT_TEXT = [
+const GENERATOR_FUNCTION_FORMAT_TEXT = [
 "'use strict'",
 "//declare context variables",
 "{0}",

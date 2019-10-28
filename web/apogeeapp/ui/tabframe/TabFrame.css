@@ -39,9 +39,9 @@
     
     /* configurable */
     margin:0px;
-    border: 1px solid gray;
+    /*border: 1px solid gray;*/
     border-top-width: 0px;
-    background-color: rgb(185,185,220);
+    background-color: rgb(220,220,240);
 }
 .visiui-tf-tab-base {
     /*fixed*/
@@ -49,16 +49,18 @@
     cursor: default;
     
     /*configurable*/
-    border: 1px solid black;
     padding:0px;
     margin:0px;
 }
 .visiui-tf-tab-inactive {
     font-weight:normal;
+    border: 1px solid rgb(215,215,220);
+    background-color: rgb(234,234,246);
 }
 .visiui-tf-tab-active {
-    background-color: rgb(220,220,240);
-    border-bottom: 1px solid rgb(220,220,240);
+    background-color: white;
+    border: 1px solid white;
+    /*border-bottom: 1px solid white;*/
     font-weight:bold;
 }
 

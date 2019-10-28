@@ -1,8 +1,10 @@
+import base from "/apogeeutil/base.js";
+import EventManager from "/apogeeutil/EventManager.js";
 
 apogeeapp.ui.Tab = function(id) {
     
     //base init
-    apogee.EventManager.init.call(this);
+    EventManager.init.call(this);
     
     this.tabFrame = null;
     this.id = id;
@@ -35,7 +37,7 @@ apogeeapp.ui.Tab = function(id) {
 }
 
 //add components to this class
-apogee.base.mixin(apogeeapp.ui.Tab,apogee.EventManager);
+base.mixin(apogeeapp.ui.Tab,EventManager);
 
 //---------------------------
 // WINDOW CONTAINER
@@ -46,14 +48,16 @@ apogeeapp.ui.Tab.prototype.setTabFrame = function(tabFrame) {
     this.tabFrame = tabFrame;
     var instance = this;
     //attach to listeners to forward show and hide events
-    this.tabShownListener = function(tab) {
+    this.tabShownListener = (tab) => {
         if(tab == instance) {
+            this.isShowing = true;
             instance.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,instance);
         }
     };
     this.tabFrame.addListener(apogeeapp.ui.SHOWN_EVENT, this.tabShownListener);
-    this.tabHiddenListener = function(tab) {
+    this.tabHiddenListener = (tab) => {
         if(tab == instance) {
+            this.isShowing = false;
             instance.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,instance);
         }
     };
@@ -77,17 +81,24 @@ apogeeapp.ui.Tab.prototype.getId = function() {
     return this.id;
 }
 
+/** This returns true if the tab is showing in the display. */
+apogeeapp.ui.Tab.prototype.getIsShowing = function() {
+    return this.isShowing;
+}
+
 /** This method must be implemented in inheriting objects. */
 apogeeapp.ui.Tab.prototype.setTitle = function(title) {
     this.titleElement.innerHTML = title;
     this.title = title;
 }
 
-/** This sets the content for the window. */
+/** This sets the content for the window. If null (or otherwise false) is passed
+ * the content will be set to empty.*/
 apogeeapp.ui.Tab.prototype.setHeaderContent = function(contentElement) {
     apogeeapp.ui.removeAllChildren(this.headerContainer);
-    this.headerContainer.appendChild(contentElement);
-    this.headerContent = contentElement;
+    if(contentElement) {
+        this.headerContainer.appendChild(contentElement);
+    }
 }
 
 /** This sets the content for the window. The content type

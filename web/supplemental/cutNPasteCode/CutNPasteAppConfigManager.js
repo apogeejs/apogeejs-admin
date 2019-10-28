@@ -1,8 +1,12 @@
+import util from "/apogeeutil/util.js";
+import net from "/apogeeutil/net.js";
+import CutNPasteFileAccess from "./CutNPasteFileAccess.js";
+
 /** 
  * This is the format of the AppConfigManager. This class does not need
  * to be extended. It has not internal functionality.
  */
-apogeeapp.app.CutNPasteAppConfigManager = class {
+export default class CutNPasteAppConfigManager {
     
     constructor() {
     }
@@ -11,10 +15,10 @@ apogeeapp.app.CutNPasteAppConfigManager = class {
      * app configuration.
      */
     getConfigPromise(app) {
-        var configUrl = apogee.util.readQueryField("config",document.URL);
+        var configUrl = util.readQueryField("config",document.URL);
         var configFilePromise;
         if(configUrl) {
-            configFilePromise = apogee.net.jsonRequest(configUrl);
+            configFilePromise = net.jsonRequest(configUrl);
             //chain the file download promise to the init settings promise
             return configFilePromise.then(appSettings => app.getConfigurationPromise(appSettings));
         }
@@ -28,16 +32,16 @@ apogeeapp.app.CutNPasteAppConfigManager = class {
      * if an alternate is not loaded in configuration.
      */
     getDefaultFileAccessObject(app) {
-        return new apogeeapp.app.CutNPasteFileAccess();
+        return new CutNPasteFileAccess();
     }
     
     /** This method should return a promise for the initial workspace
      * that should be loaded
      */
     getInitialWorkspaceFilePromise(app) {
-        var workspaceUrl = apogee.util.readQueryField("url",document.URL);
+        var workspaceUrl = util.readQueryField("url",document.URL);
         if(workspaceUrl) {
-            return apogee.net.textRequest(workspaceUrl);
+            return net.textRequest(workspaceUrl);
         } else {
             return null;
         }

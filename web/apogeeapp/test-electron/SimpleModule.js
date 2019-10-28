@@ -15,6 +15,8 @@ var _linkCallerId;
  */
 moduleReturn.initApogeeModule = function(apogee,apogeeapp) {
 
+    alert("FIX! - need to load link getLinkLoader");
+
     //load a css file
     _linkCallerId = apogeeapp.app.getLinkLoader().createLinkCallerId();
     apogeeapp.app.getLinkLoader().addLinkElement("css",_cssUrl,_linkCallerId);

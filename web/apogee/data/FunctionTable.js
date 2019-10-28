@@ -1,10 +1,18 @@
+import base from "/apogeeutil/base.js";
+import util from "/apogeeutil/util.js";
+import Workspace from "/apogee/data/Workspace.js";
+import Member from "/apogee/datacomponents/Member.js";
+import Dependent from "/apogee/datacomponents/Dependent.js";
+import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
+import Codeable from "/apogee/datacomponents/Codeable.js";
+
 /** This is a function. */
-apogee.FunctionTable = function(name,owner,initialData) {
+function FunctionTable(name,owner,initialData) {
     //base init
-    apogee.Member.init.call(this,name,apogee.FunctionTable.generator);
-    apogee.Dependent.init.call(this);
-    apogee.ContextHolder.init.call(this);
-	apogee.Codeable.init.call(this,argList,false);
+    Member.init.call(this,name,FunctionTable.generator);
+    Dependent.init.call(this);
+    ContextHolder.init.call(this);
+	Codeable.init.call(this,argList,false);
     
     this.initOwner(owner);
     
@@ -12,28 +20,28 @@ apogee.FunctionTable = function(name,owner,initialData) {
     var argList = initialData.argList ? initialData.argList : [];
     var functionBody = initialData.functionBody ? initialData.functionBody : "";
     var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
-    apogee.updatemember.applyCode(this,argList,functionBody,supplementalCode);
+    this.applyCode(argList,functionBody,supplementalCode);
     if(initialData.description !== undefined) {
         this.setDescription(initialData.description);
     }
 }
 
 //add components to this class
-apogee.base.mixin(apogee.FunctionTable,apogee.Member);
-apogee.base.mixin(apogee.FunctionTable,apogee.Dependent);
-apogee.base.mixin(apogee.FunctionTable,apogee.ContextHolder);
-apogee.base.mixin(apogee.FunctionTable,apogee.Codeable);
+base.mixin(FunctionTable,Member);
+base.mixin(FunctionTable,Dependent);
+base.mixin(FunctionTable,ContextHolder);
+base.mixin(FunctionTable,Codeable);
 
 //------------------------------
 // Codeable Methods
 //------------------------------
 
-apogee.FunctionTable.prototype.processMemberFunction = function(memberGenerator) {
+FunctionTable.prototype.processMemberFunction = function(memberGenerator) {
     var memberFunction = this.getLazyInitializedMemberFunction(memberGenerator);
 	this.setData(memberFunction);
 }
 
-apogee.FunctionTable.prototype.getLazyInitializedMemberFunction = function(memberGenerator) {
+FunctionTable.prototype.getLazyInitializedMemberFunction = function(memberGenerator) {
     var instance = this;
 
     //create init member function for lazy initialization
@@ -56,10 +64,10 @@ apogee.FunctionTable.prototype.getLazyInitializedMemberFunction = function(membe
 
             }
             else if(instance.getResultPending()) {
-                issue = apogee.base.MEMBER_FUNCTION_PENDING_THROWABLE;
+                issue = base.MEMBER_FUNCTION_PENDING_THROWABLE;
             }
             else if(instance.getResultInvalid()) {
-                issue = apogee.base.MEMBER_FUNCTION_INVALID_THROWABLE;
+                issue = base.MEMBER_FUNCTION_INVALID_THROWABLE;
             }
             else {
                 issue = new Error("Unknown problem in initializing: " + instance.getFullName());
@@ -78,7 +86,7 @@ apogee.FunctionTable.prototype.getLazyInitializedMemberFunction = function(membe
 //------------------------------
 
 /** This overrides the get title method of member to return the function declaration. */
-apogee.FunctionTable.prototype.getDisplayName = function(useFullPath) {
+FunctionTable.prototype.getDisplayName = function(useFullPath) {
     var name = useFullPath ? this.getFullName() : this.getName();
     var argList = this.getArgList();
     var argListString = argList.join(",");
@@ -87,13 +95,13 @@ apogee.FunctionTable.prototype.getDisplayName = function(useFullPath) {
 
 /** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-apogee.FunctionTable.fromJson = function(owner,json) {
-    return new apogee.FunctionTable(json.name,owner,json.updateData);
+FunctionTable.fromJson = function(owner,json) {
+    return new FunctionTable(json.name,owner,json.updateData);
 }
 
 /** This method extends the base method to get the property values
  * for the property editting. */
-apogee.FunctionTable.addPropValues = function(member,values) {
+FunctionTable.readProperties = function(member,values) {
     var argList = member.getArgList();
     var argListString = argList.toString();
     values.argListString = argListString;
@@ -101,13 +109,13 @@ apogee.FunctionTable.addPropValues = function(member,values) {
 }
 
 /** This method executes a property update. */
-apogee.FunctionTable.getPropertyUpdateAction = function(member,oldValues,newValues) {
-    if(oldValues.argListString !== newValues.argListString) {
-        var newArgList = apogee.FunctionTable.parseStringArray(newValues.argListString);
+FunctionTable.getPropertyUpdateAction = function(member,newValues) {
+    if(newValues.argListString !== undefined) {
+        var newArgList = util.parseStringArray(newValues.argListString);
   
         var actionData = {};
         actionData.action = "updateCode";
-        actionData.member = member;
+        actionData.memberName = member.getFullName();
         actionData.argList = newArgList;
         actionData.functionBody = member.getFunctionBody();
         actionData.supplementalCode = member.getSupplementalCode();
@@ -118,30 +126,20 @@ apogee.FunctionTable.getPropertyUpdateAction = function(member,oldValues,newValu
     }
 }
 
-/** This methdo parses an arg list string to make an arg list array. It is
- * also used outisde this class. */
-apogee.FunctionTable.parseStringArray = function(argListString) {
-    var argList = argListString.split(",");
-    for(var i = 0; i < argList.length; i++) {
-        argList[i] = argList[i].trim();
-    }
-    return argList;
-}
-
 //============================
 // Static methods
 //============================
 
-apogee.FunctionTable.generator = {};
-apogee.FunctionTable.generator.displayName = "Function";
-apogee.FunctionTable.generator.type = "apogee.FunctionTable";
-apogee.FunctionTable.generator.createMember = apogee.FunctionTable.fromJson;
-apogee.FunctionTable.generator.addPropFunction = apogee.FunctionTable.addPropValues;
-apogee.FunctionTable.generator.getPropertyUpdateAction = apogee.FunctionTable.getPropertyUpdateAction;
-apogee.FunctionTable.generator.setDataOk = false;
-apogee.FunctionTable.generator.setCodeOk = true;
+FunctionTable.generator = {};
+FunctionTable.generator.displayName = "Function";
+FunctionTable.generator.type = "apogee.FunctionTable";
+FunctionTable.generator.createMember = FunctionTable.fromJson;
+FunctionTable.generator.readProperties = FunctionTable.readProperties;
+FunctionTable.generator.getPropertyUpdateAction = FunctionTable.getPropertyUpdateAction;
+FunctionTable.generator.setDataOk = false;
+FunctionTable.generator.setCodeOk = true;
 
 //register this member
-apogee.Workspace.addMemberGenerator(apogee.FunctionTable.generator);
+Workspace.addMemberGenerator(FunctionTable.generator);
 
 

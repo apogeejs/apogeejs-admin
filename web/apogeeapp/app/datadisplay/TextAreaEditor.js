@@ -1,15 +1,21 @@
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /** Editor that uses the basic text editor */
-apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.DataDisplay {
+export default class TextAreaEditor extends DataDisplay {
     
-    constructor(viewMode,callbacks) {
-        super(viewMode,callbacks,apogeeapp.app.DataDisplay.SCROLLING);
+    constructor(displayContainer,callbacks) {
+        super(displayContainer,callbacks,DataDisplay.SCROLLING);
 
         var textArea = apogeeapp.ui.createElement("TEXTAREA",null,{
-            "position":"absolute",
-            "top":"0px",
-            "left":"0px",
-            "width":"100%",
-            "height":"100%",
+//            "position":"absolute",
+//            "top":"0px",
+//            "left":"0px",
+//            "width":"100%",
+//            "height":"100%",
+//            "overflow":"auto"
+            "position":"relative",
+            "width":"400px",
+            "height":"300px",
             "overflow":"auto"
         });
         this.textArea = textArea;
@@ -56,7 +62,7 @@ apogeeapp.app.TextAreaEditor = class extends  apogeeapp.app.DataDisplay {
     }
     
     checkStartEditMode() {
-        if(!this.viewMode.isInEditMode()) {
+        if(!this.displayContainer.isInEditMode()) {
             if(this.getData() != this.uneditedValue) {
                 this.onTriggerEditMode();
             }

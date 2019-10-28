@@ -1,19 +1,29 @@
+import Apogee from "/apogeeapp/app/Apogee.js";
 
-apogeeapp.app.dataDisplayCallbackHelper = {};
+let dataDisplayHelper = {};
+export {dataDisplayHelper as default}
 
-apogeeapp.app.dataDisplayCallbackHelper.formatString = "\t";
+const FORMAT_STRING = "\t";
 
 /** This function creates editor callbacks or member data where the editor takes JSON format. */
-apogeeapp.app.dataDisplayCallbackHelper.getMemberDataJsonCallbacks = function(member) {
+dataDisplayHelper.getMemberDataJsonCallbacks = function(member) {
     return {
         getData: () => member.getData(),
         getEditOk: () => (!member.hasCode()),
-        saveData: (data) => apogeeapp.app.dataDisplayCallbackHelper.saveData(member,data)
+        saveData: (data) => {
+            var commandData = {};
+            commandData.type = "saveMemberData";
+            commandData.memberFullName = member.getFullName();
+            commandData.data = data;
+            
+            Apogee.getInstance().executeCommand(commandData);
+            return true;
+        }
     }
 }
 
 /** This function creates editor callbacks or member data where the editor takes text format. */
-apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks = function(member) {
+dataDisplayHelper.getMemberDataTextCallbacks = function(member) {
     return {
         getData: () => {
             var json = member.getData();	
@@ -26,7 +36,7 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks = function(me
                 textData = "undefined";
             }
             else {
-                textData = JSON.stringify(json,null,apogeeapp.app.dataDisplayCallbackHelper.formatString);
+                textData = JSON.stringify(json,null,FORMAT_STRING);
             }
 
             return textData;
@@ -39,6 +49,8 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks = function(me
                     data = JSON.parse(text);
                 }
                 catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    
                     //parsing error
                     alert("There was an error parsing the JSON input: " +  error.message);
                     return false;
@@ -47,8 +59,14 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks = function(me
             else {
                 data = "";
             }
-
-            return apogeeapp.app.dataDisplayCallbackHelper.saveData(member,data);
+            
+            var commandData = {};
+            commandData.type = "saveMemberData";
+            commandData.memberFullName = member.getFullName();
+            commandData.data = data;
+            
+            Apogee.getInstance().executeCommand(commandData);
+            return true;
         }
     }
 }
@@ -56,94 +74,56 @@ apogeeapp.app.dataDisplayCallbackHelper.getMemberDataTextCallbacks = function(me
 /** This function creates editor callbacks or the member function body. 
  * The argument optionalClearCodeValue can optionally be set. If so, the member data will be 
  * set with this value if the function body and supplemental code are empty. */
-apogeeapp.app.dataDisplayCallbackHelper.getMemberFunctionBodyCallbacks = function(member,optionalClearCodeValue) {
+dataDisplayHelper.getMemberFunctionBodyCallbacks = function(member,optionalClearCodeDataValue) {
     return {
         getData: () => member.getFunctionBody(),
         getEditOk: () => true,
         saveData: (text) => {
-            var argList = member.getArgList();
-            var functionBody = text;
-            var supplementalCode = member.getSupplementalCode();
-            return apogeeapp.app.dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode,optionalClearCodeValue);
+            var commandData = {};
+            commandData.type = "saveMemberCode";
+            commandData.memberFullName = member.getFullName();
+            commandData.argList = member.getArgList();
+            commandData.functionBody = text;
+            commandData.supplementalCode = member.getSupplementalCode();
+            
+            Apogee.getInstance().executeCommand(commandData);
+            return true;
         }
     }
 }
 
 /** This function creates editor callbacks or the member supplemental code. */
-apogeeapp.app.dataDisplayCallbackHelper.getMemberSupplementalCallbacks = function(member,optionalClearCodeValue) {
+dataDisplayHelper.getMemberSupplementalCallbacks = function(member,optionalClearCodeDataValue) {
     return {
         getData: () => member.getSupplementalCode(),
         getEditOk: () => true,
         saveData: (text) => {
-            var argList = member.getArgList();
-            var functionBody = member.getFunctionBody();
-            var supplementalCode = text;
-            return apogeeapp.app.dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode,optionalClearCodeValue);
+            var commandData = {};
+            commandData.type = "saveMemberCode";
+            commandData.memberFullName = member.getFullName();
+            commandData.argList = member.getArgList();
+            commandData.functionBody = member.getFunctionBody();
+            commandData.supplementalCode = text;
+            
+            Apogee.getInstance().executeCommand(commandData);
+            return true;
         }
     }
 }
 
 /** This function creates editor callbacks or the member description. */
-apogeeapp.app.dataDisplayCallbackHelper.getMemberDescriptionCallbacks = function(member) {
+dataDisplayHelper.getMemberDescriptionCallbacks = function(member) {
     return {
         getData: () => member.getDescription(),
         getEditOk: () => true,
-        saveData: (text) => {	
-            if((text === null)||(text === undefined)) {
-                text = "";
-            }
-
-            var actionData = {};
-            actionData.action = "updateDescription";
-            actionData.member = member;
-            actionData.description = text;
-            var actionResponse =  apogee.action.doAction(actionData,true);
-
+        saveData: (text) => {  
+            var commandData = {};
+            commandData.type = "saveMemberDescription";
+            commandData.memberFullName = member.getFullName();
+            commandData.description = text;
+            
+            Apogee.getInstance().executeCommand(commandData);
             return true;
         }
-    
     }
 }
-
-//=============================
-// Shared methods
-//=============================
-
-/** @private */
-apogeeapp.app.dataDisplayCallbackHelper.saveData = function(member,data) {
-    var actionData = {};
-    actionData.action = "updateData";
-    actionData.member = member;
-    actionData.data = data;
-    var actionResponse =  apogee.action.doAction(actionData,true);
-
-    return true;    
-}
-
-/** This method is a common method to set the code and supplemental code. It also
- * will clear the code if both code fields are empty and a defined clearCodeValue is set. 
- * @private */
- apogeeapp.app.dataDisplayCallbackHelper.setCode = function(member,argList,functionBody,supplementalCode,clearCodeValue) {
-    var actionData = {};
-
-    if((clearCodeValue !== undefined)&&(functionBody == "")&&(supplementalCode == "")) {
-        //special case - clear code
-        actionData.action = "updateData";
-        actionData.member = member;
-        actionData.data = clearCodeValue;
-    }
-    else {
-        //standard case - edit code
-        actionData.action = "updateCode";
-        actionData.member = member;
-        actionData.argList = argList;
-        actionData.functionBody = functionBody;
-        actionData.supplementalCode = supplementalCode;  
-    }
-
-    var actionResponse =  apogee.action.doAction(actionData,true);
-
-    return true;  
-}
-
-

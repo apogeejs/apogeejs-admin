@@ -1,82 +1,93 @@
+import util from "/apogeeutil/util.js";
+
+import ParentComponent from "/apogeeapp/app/component/ParentComponent.js";
+
 /** This component represents a folderFunction, which is a function that is programmed using
  *apogee tables rather than writing code. */
-apogeeapp.app.FolderFunctionComponent = function(workspaceUI,folderFunction) {
-    //extend parent component
-    apogeeapp.app.ParentComponent.call(this,workspaceUI,folderFunction,apogeeapp.app.FolderFunctionComponent);
-    
-    //register this object as a parent container
-    var internalFolder = folderFunction.getInternalFolder();
-    workspaceUI.registerMember(internalFolder,this,folderFunction);
-    
-    //add a cleanup and save actions
-    this.addOpenAction(apogeeapp.app.FolderFunctionComponent.readFromJson);
-    this.addSaveAction(apogeeapp.app.FolderFunctionComponent.writeToJson);
-};
+export default class FolderFunctionComponent extends ParentComponent {
+        
+    constructor(workspaceUI,folderFunction) {
+        //extend parent component
+        super(workspaceUI,folderFunction,FolderFunctionComponent);
+        
+        //register this object as a parent container
+        var internalFolder = folderFunction.getInternalFolder();
+        workspaceUI.registerMember(internalFolder,this,folderFunction);
+    }
 
-apogeeapp.app.FolderFunctionComponent.prototype = Object.create(apogeeapp.app.ParentComponent.prototype);
-apogeeapp.app.FolderFunctionComponent.prototype.constructor = apogeeapp.app.FolderFunctionComponent;
+    instantiateTabDisplay() {
+        var member = this.getMember();
+        var folder = member.getInternalFolder();
+        return new apogeeapp.app.CanvasFolderComponentDisplay(this,member,folder);   
+    }
 
-apogeeapp.app.FolderFunctionComponent.prototype.instantiateTabDisplay = function() {
-    var member = this.getMember();
-    var folder = member.getInternalFolder();
-    this.tabDisplay = new apogeeapp.app.TabComponentDisplay(this,member,folder);   
-    return this.tabDisplay;
-}
+    //==============================
+    // serialization
+    //==============================
 
-//======================================
-// Callbacks
-// These are defined as static but are called in the objects context
-//======================================
-
-/** This serializes the folderFunction component. */
-apogeeapp.app.FolderFunctionComponent.writeToJson = function(json) {
-    var folderFunction = this.getMember();
-    var internalFolder = folderFunction.getInternalFolder();
-    var workspaceUI = this.getWorkspaceUI();
-    json.children = workspaceUI.getFolderComponentContentJson(internalFolder);
-}
-
-apogeeapp.app.FolderFunctionComponent.readFromJson = function(json) {
-    if(json.children) {
-        var workspaceUI = this.getWorkspaceUI();
+    /** This serializes the folderFunction component. */
+    writeToJson(json) {
         var folderFunction = this.getMember();
         var internalFolder = folderFunction.getInternalFolder();
-        workspaceUI.loadFolderComponentContentFromJson(internalFolder,json.children);
+        var workspaceUI = this.getWorkspaceUI();
+        json.children = workspaceUI.getFolderComponentContentJson(internalFolder);
     }
+
+    readChildrenFromJson(workspaceUI,childActionResults,json) {
+        //verify the internal folder was loaded
+        //var internalFolderActionResult = childActionResults[FolderFunction.INTERNAL_FOLDER_NAME];
+        
+        //verify success???
+        //verify the action result exists!!!
+        
+        var internalFolderChildActionResults = internalFolderActionResult.childActionResults;
+        
+        if(json.children) {
+            workspaceUI.loadFolderComponentContentFromJson(internalFolderChildActionResults,json.children);
+        }
+        return true;  
+    }
+
+
+
+    static transferMemberProperties(inputValues,propertyJson) {
+        if(inputValues.argListString !== undefined) {
+            var argList = util.parseStringArray(inputValues.argListString);
+            propertyJson.argList = argList;
+        }
+        if(inputValues.returnValueString !== undefined) {
+            propertyJson.returnValue = inputValues.returnValueString;
+        }
+    }
+
+    //if we want to allow importing a workspace as this object, we must add this method to the generator
+    static appendWorkspaceChildren(optionsJson,childrenJson) {
+        var internalFolderJson = {};
+        internalFolderJson.name = optionsJson.name;
+        internalFolderJson.type = "apogee.Folder";
+        internalFolderJson.children = childrenJson;
+        optionsJson.internalFolder = internalFolderJson;
+    }
+
 }
 
-//======================================
-// Static methods
-//======================================
-
-apogeeapp.app.FolderFunctionComponent.getCreateMemberPayload = function(userInputValues) {
-    var json = {};
-    json.name = userInputValues.name;
-    if(userInputValues.argListString) {
-        var argList = apogee.FunctionTable.parseStringArray(userInputValues.argListString);
-        json.argList = argList;
-    }
-    if(userInputValues.returnValueString) {
-        json.returnValue = userInputValues.returnValueString;
-    }
-    if(userInputValues.internalFolder) {
-        json.internalFolder = userInputValues.internalFolder;
-    }
-    json.type = apogee.FolderFunction.generator.type;
-    return json;
-}
 
 //======================================
 // This is the component generator, to register the component
 //======================================
 
-apogeeapp.app.FolderFunctionComponent.displayName = "Folder Function";
-apogeeapp.app.FolderFunctionComponent.uniqueName = "apogeeapp.app.FolderFunctionComponent";
-apogeeapp.app.FolderFunctionComponent.DEFAULT_WIDTH = 500;
-apogeeapp.app.FolderFunctionComponent.DEFAULT_HEIGHT = 500;
-apogeeapp.app.FolderFunctionComponent.ICON_RES_PATH = "/componentIcons/folderFunction.png";
+FolderFunctionComponent.displayName = "Folder Function";
+FolderFunctionComponent.uniqueName = "apogeeapp.app.FolderFunctionComponent";
+FolderFunctionComponent.hasTabEntry = true;
+FolderFunctionComponent.hasChildEntry = true;
+FolderFunctionComponent.DEFAULT_WIDTH = 500;
+FolderFunctionComponent.DEFAULT_HEIGHT = 500;
+FolderFunctionComponent.ICON_RES_PATH = "/componentIcons/folderFunction.png";
+FolderFunctionComponent.DEFAULT_MEMBER_JSON = {
+    "type": "apogee.FolderFunction"
+};
 
-apogeeapp.app.FolderFunctionComponent.propertyDialogLines = [
+FolderFunctionComponent.propertyDialogLines = [
     {
         "type":"inputElement",
         "heading":"Arg List: ",
@@ -86,18 +97,5 @@ apogeeapp.app.FolderFunctionComponent.propertyDialogLines = [
         "type":"inputElement",
         "heading":"Return Val: ",
         "resultKey":"returnValueString"
-    },
-    {
-        "type":"invisible",
-        "resultKey":"internalFolder"
     }
 ];
-
-//if we want to allow importing a workspace as this object, we must add this method to the generator
-apogeeapp.app.FolderFunctionComponent.appendWorkspaceChildren = function(optionsJson,childrenJson) {
-    var internalFolderJson = {};
-    internalFolderJson.name = optionsJson.name;
-    internalFolderJson.type = apogee.Folder.generator.type;
-    apogeeapp.app.FolderComponent.generator.appendWorkspaceChildren(internalFolderJson,childrenJson);
-    optionsJson.internalFolder = internalFolderJson;
-}

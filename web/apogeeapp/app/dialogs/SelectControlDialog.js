@@ -1,5 +1,5 @@
 /** This method shows a dialog to select from additional components. */
-apogeeapp.app.dialog.showSelectComponentDialog = function(displayNameList,componentList,onSelectFunction) {
+export function showSelectComponentDialog(displayNameList,componentList,onSelectFunction) {
     
     if(displayNameList.length != componentList.length) throw new Error("Mismatch in additional component display name and class name lists!");
 

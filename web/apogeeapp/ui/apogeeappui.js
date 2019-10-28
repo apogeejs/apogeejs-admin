@@ -1,3 +1,5 @@
+import base from "/apogeeutil/base.js";
+
 /** This is the main apogeeapp ui file */
 apogeeapp.ui = {};
 
@@ -50,7 +52,7 @@ apogeeapp.ui.applyStyle = function(element,style) {
 apogeeapp.ui.MINIMIZE_CMD_IMAGE = "/minimize.png";
 apogeeapp.ui.RESTORE_CMD_IMAGE = "/restore.png";
 apogeeapp.ui.MAXIMIZE_CMD_IMAGE = "/maximize.png";
-apogeeapp.ui.CLOSE_CMD_IMAGE = "/close.png";
+apogeeapp.ui.CLOSE_CMD_IMAGE = "/close_gray.png";
 apogeeapp.ui.MENU_IMAGE = "/hamburger.png";
 
 //=========================================
@@ -132,7 +134,7 @@ apogeeapp.ui.initWindows = function(appElementId) {
     //create the ui elements from the app element
     var appContainer = document.getElementById(appElementId);
     if(!appContainer) {
-        throw apogee.base.createError("Container ID not found: " + appElementId);
+        throw base.createError("Container ID not found: " + appElementId);
     }
     
     var elements = {};

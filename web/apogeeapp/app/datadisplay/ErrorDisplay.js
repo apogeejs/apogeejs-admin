@@ -1,3 +1,5 @@
+import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+
 /** JsDataDisplay
  * This is the data display for a custom control where the control is generated
  * from javascript code. Is should be passed a 
@@ -11,12 +13,12 @@
  */
 
 /** This is the display/editor for the custom control output. */
-apogeeapp.app.ErrorDisplay = class extends apogeeapp.app.DataDisplay {
-    constructor(viewMode) {
+export default class ErrorDisplay extends DataDisplay {
+    constructor(displayContainer) {
         var callbacks = {
             getData: () => null
         }
-        super(viewMode,callbacks);
+        super(displayContainer,callbacks);
         
         var msg = "ERROR - Component not loaded!";
         var msgDiv = apogeeapp.ui.createElement("div");

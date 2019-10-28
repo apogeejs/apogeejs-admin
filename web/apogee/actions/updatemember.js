@@ -1,277 +1,195 @@
-/** This namespace contains the update member actions */
-apogee.updatemember = {};
+import util from "/apogeeutil/util.js";
+import {addActionInfo} from "/apogee/actions/action.js";
+import ActionError from "/apogee/lib/ActionError.js";
 
-/** Update data action name 
+/** This is self installing command module. It has no exports
+ * but it must be imported to install the command. 
+ *
  * Action Data format:
  * {
- *  "action": apogee.updatemember.UPDATE_DATA_ACTION_NAME,
+ *  "action": "updateData",
  *  "member": (member to update),
  *  "data": (new value for the table)
+ *  "sourcePromise": (OPTIONAL - If this is the completion of an asynchronous action, the
+ *      source promise shoudl be included to make sure it has not been overwritten with a
+ *      more recent operation.)
+ *  "promiseRefresh": (OPTIONAL - If this action reinstates a previously set promise,
+ *      this flag will prevent setting additional then/catch statements on the promise)
  * }
- */
-apogee.updatemember.UPDATE_DATA_ACTION_NAME = "updateData";
-
-/** Update code action name 
+ * 
  * Action Data format:
  * {
- *  "action": apogee.updatemember.UPDATE_CODE_ACTION_NAME,
+ *  "action": "updateCode",
  *  "member": (member to update),
  *  "argList": (arg list for the table)
  *  "functionBody": (function body for the table)
  *  "supplementalCode": (supplemental code for the table)
  * }
  */
-apogee.updatemember.UPDATE_CODE_ACTION_NAME = "updateCode";
 
-/** Update data pending action name 
- * Action Data format:
- * {
- *  "action": apogee.updatemember.UPDATE_DATA_PENDING_ACTION_NAME,
- *  "member": (member to update),
- * }
- */
-apogee.updatemember.UPDATE_DATA_PENDING_ACTION_NAME = "updateDataPending"
-
-/** Update asynch data action name - used for updating data after an asynchronous formula
- * Action Data format:
- * {
- *  "action": apogee.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME,
- *  "member": (member to update),
- *  "data": (new value for the table)
- * }
- */
-apogee.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME = "asynchFormulaData";
-
-/** Update asynch error action name - used for publishing an error after an asynchronous formula
- * Action Data format:
- * {
- *  "action": apogee.updatemember.UPDATE_DATA_ACTION_NAME,
- *  "member": (member to update),
- *  "errorMsg": (new value for the table)
- * }
- */
-apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME = "updateError";
 
 /** Update description action name - used for publishing an error after an asynchronous formula
  * Action Data format:
  * {
- *  "action": apogee.updatemember.UPDATE_DESCRIPTION_ACTION_NAME,
+ *  "action": "updateDescription",
  *  "member": (member to update),
  *  "description": (description)
  * }
  */
-apogee.updatemember.UPDATE_DESCRIPTION_ACTION_NAME = "updateDescription";
 
-/** member UPDATED EVENT
+
+/** member UPDATED EVENT: "memberUpdated"
  * Event member format:
  * {
  *  "member": (member)
  * }
  */
-apogee.updatemember.MEMBER_UPDATED_EVENT = "memberUpdated";
+
 
 /** Update code action function. */
-apogee.updatemember.updateCode = function(actionData,optionalContext,processedActions) { 
+function updateCode(workspace,actionData,actionResult) {
     
-    var member = actionData.member;
+    var memberFullName = actionData.memberName;
+    var member = workspace.getMemberByFullName(memberFullName);
+    if(!member) {
+        actionResult.actionDone = false;
+        actionResult.errorMsg = "Member not found for update member code";
+        return;
+    }
+    actionResult.member = member;
+
     if((!member.isCodeable)||(!member.getSetCodeOk())) {
-        throw new Error("can not set code on member: " + member.getFullName());
+        actionResult.actionDone = false;
+        actionResult.errorMsg = "can not set code on member: " + member.getFullName();
+        return;
     }
           
-    apogee.updatemember.applyCode(actionData.member,
-        actionData.argList,
+    member.applyCode(actionData.argList,
         actionData.functionBody,
         actionData.supplementalCode);
         
-    processedActions.push(actionData);
+    
+    actionResult.actionDone = true;
 }
 
-/** Update data action function */
-apogee.updatemember.updateData = function(actionData,optionalContext,processedActions) {
+/** Update data action function. */
+function updateData(workspace,actionData,actionResult) {
     
-    if(!actionData.member) {
-        apogee.updatemember.loadMemberName(actionData,optionalContext);
+    var memberFullName = actionData.memberName;
+    var member = workspace.getMemberByFullName(memberFullName);
+    if(!member) {
+        actionResult.actionDone = false;
+        actionResult.errorMsg = "Member not found for update member data";
+        return;
     }
+    actionResult.member = member;
     
-    if(!actionData.member.getSetDataOk()) {
-        throw new Error("can not set data on member: " + member.getFullName());
+    if(!member.getSetDataOk()) {
+        actionResult.actionDone = false;
+        actionResult.errorMsg = "Can not set data on member: " + memberFullName;
+        return;
     }
         
-    var member = actionData.member;
-
-    apogee.updatemember.applyData(member,actionData.data);
-
-    //clear the code - so the data is used
-    if(member.isCodeable) {
+    var data = actionData.data;
+    
+    //if this is the resolution (or rejection) of a previously set promise
+    if(actionData.sourcePromise) {
+        if(member.pendingPromiseMatches(actionData.sourcePromise)) {
+            //this is the reoslution of pending data
+            member.setResultPending(false);
+        }
+        else {
+            //no action - this is from an asynch action that has been overwritten
+            actionResult.actionDone = false;
+            return;
+        }
+    }
+    
+    //some cleanup for new data
+    member.clearErrors();
+    if((member.isCodeable)&&(actionData.sourcePromise === undefined)) {
+        //clear the code - so the data is used
+        //UNLESS this is a delayed set date from a promise, in what case we want to keep the code.
         member.clearCode();
     }
     
-    processedActions.push(actionData);
-}
-
-/** Update asynch data action function */
-apogee.updatemember.updateDataPending = function(actionData,optionalContext,processedActions) {
-    
-    if(!actionData.member) {
-        apogee.updatemember.loadMemberName(actionData,optionalContext);
-    }
-	
-    var member = actionData.member;
-    var token = actionData.token;
-    
-    member.setResultPending(true,token);
-    
-    processedActions.push(actionData);
-}
-
-/** Asynch function update data action function (resulting from code) */
-apogee.updatemember.asynchFunctionUpdateData = function(actionData,optionalContext,processedActions) {
-    
-    if(!actionData.member.getSetCodeOk()) {
-        throw new Error("can not set code on member: " + member.getFullName());
-    }
+    //handle four types of data inputs
+    if(data instanceof Promise) {
+        //data is a promise - will be updated asynchromously
         
-    var member = actionData.member;
-    var token = actionData.token;
-
-    if(member.pendingTokenMatches(token)) {
-        //apply the data but DO NOT clear the code (this is an asymch update to a coded member)
-        apogee.updatemember.applyData(member,actionData.data);
-        member.setResultPending(false);
-
-        processedActions.push(actionData);
+        //check if this is only a refresh
+        var optionalPromiseRefresh = actionData.promiseRefresh ? true : false;
+        
+        member.applyPromiseData(data,actionData.onAsynchComplete,optionalPromiseRefresh);
     }
-}
-
-/** Update asynch error action function. */
-apogee.updatemember.asynchFunctionUpdateError = function(actionData,optionalContext,processedActions) {
-    
-    if(!actionData.member) {
-        apogee.updatemember.loadMemberName(actionData,optionalContext);
-    }
-
-    var member = actionData.member;
-    var token = actionData.token;
-    
-    if(member.pendingTokenMatches(token)) {
-        //set the error flag
-        var actionError = new apogee.ActionError(actionData.errorMsg,"Codeable - Calculate",member);
+    else if(data instanceof Error) {
+        //data is an error
+        var actionError = ActionError.processException(data,ActionError.ERROR_TYPE_MODEL);
         member.addError(actionError);
-        member.setResultPending(false);
-
-        processedActions.push(actionData);
     }
-        
+    else if(data === util.INVALID_VALUE) {
+        //data is an invalid value
+        member.setResultInvalid(true);
+    }
+    else {
+        //normal data update (poosibly from an asynchronouse update)
+        member.setData(data);
+    }
+    
+    actionResult.actionDone = true;
 }
 
 /** Update description */
-apogee.updatemember.updateDescription = function(actionData,optionalContext,processedActions) {
-        
-    var member = actionData.member;
+function updateDescription(workspace,actionData,actionResult) {
+    
+    var memberFullName = actionData.memberName;
+    var member = workspace.getMemberByFullName(memberFullName);
+    if(!member) {
+        actionResult.actionDone = false;
+        actionResult.errorMsg = "Member not found for update member description";
+        return;
+    }
+    actionResult.member = member;
 
     member.setDescription(actionData.description);
     
-    processedActions.push(actionData);
+    actionResult.actionDone = true;
 }
-
-
-/** This method updates the code and object function in a member based on the
- * passed code.*/
-apogee.updatemember.applyCode = function(codeable,argList,functionBody,supplementalCode) {
-    
-    var codeInfo ={};
-    codeInfo.argList = argList;
-    codeInfo.functionBody = functionBody;
-    codeInfo.supplementalCode = supplementalCode;
-    
-    //load some needed context variables
-    var codeLabel = codeable.getFullName();
-    
-    //process the code text into javascript code
-    var compiledInfo = apogee.codeCompiler.processCode(codeInfo,
-        codeLabel);
-
-    //save the code
-    codeable.setCodeInfo(codeInfo,compiledInfo);
-}
-
-/** This method sets the data for a member. */
-apogee.updatemember.applyData = function(member,data) {
-    member.clearErrors();
-    member.setData(data);
-}
-
-/** Update code action function. */
-apogee.updatemember.loadMemberName = function(actionData,context) { 
-    
-    if(actionData.memberName) {
-        var path = actionData.memberName.split(".");
-        actionData.member = context.getImpactor(path);
-    }
-    if(!actionData.member) {
-        throw new Error("Member not found for action: " + actionData.action);
-    }
-}
-
-
+        
 /** Update data action info */
-apogee.updatemember.UPDATE_DATA_ACTION_INFO = {
-    "actionFunction": apogee.updatemember.updateData,
+let UPDATE_DATA_ACTION_INFO = {
+    "action": "updateData",
+    "actionFunction": updateData,
     "checkUpdateAll": false,
     "updateDependencies": true,
     "addToRecalc": false,
     "addDependenceiesToRecalc": true,
-    "event": apogee.updatemember.MEMBER_UPDATED_EVENT
+    "event": "memberUpdated"
 };
+
 /** Update code action info */
-apogee.updatemember.UPDATE_CODE_ACTION_INFO = {
-    "actionFunction": apogee.updatemember.updateCode,
+let UPDATE_CODE_ACTION_INFO = {
+    "action": "updateCode",
+    "actionFunction": updateCode,
     "checkUpdateAll": false,
     "updateDependencies": true,
     "addToRecalc": true,
-    "event": apogee.updatemember.MEMBER_UPDATED_EVENT
+    "event": "memberUpdated"
 };
-apogee.updatemember.UPDATE_DATA_PENDING_ACTION_INFO = {
-    "actionFunction": apogee.updatemember.updateDataPending,
-    "checkUpdateAll": false,
-    "updateDependencies": true,
-    "addToRecalc": false,
-    "addDependenceiesToRecalc": true,
-    "event": apogee.updatemember.MEMBER_UPDATED_EVENT
-};
-/** Update asynch data action info */
-apogee.updatemember.UPDATE_ASYNCH_DATA_ACTION_INFO = {
-    "actionFunction": apogee.updatemember.asynchFunctionUpdateData,
-    "checkUpdateAll": false,
-    "updateDependencies": false,
-    "addToRecalc": false,
-    "addDependenceiesToRecalc": true,
-    "event": apogee.updatemember.MEMBER_UPDATED_EVENT
-};
-/** Update asynch error action info */
-apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_INFO = {
-    "actionFunction": apogee.updatemember.asynchFunctionUpdateError,
-    "checkUpdateAll": false,
-    "updateDependencies": false,
-    "addToRecalc": false,
-    "addDependenceiesToRecalc": true,
-    "event": apogee.updatemember.MEMBER_UPDATED_EVENT
-};
+
 /** Update data action info */
-apogee.updatemember.UPDATE_DESCRIPTION_ACTION_INFO = {
-    "actionFunction": apogee.updatemember.updateDescription,
+let UPDATE_DESCRIPTION_ACTION_INFO = {
+    "action": "updateDescription",
+    "actionFunction": updateDescription,
     "checkUpdateAll": false,
     "updateDependencies": false,
     "addToRecalc": false,
     "addDependenceiesToRecalc": false,
-    "event": apogee.updatemember.MEMBER_UPDATED_EVENT
+    "event": "memberUpdated"
 };
 
 
 //The following code registers the actions
-apogee.action.addActionInfo(apogee.updatemember.UPDATE_DATA_ACTION_NAME,apogee.updatemember.UPDATE_DATA_ACTION_INFO);
-apogee.action.addActionInfo(apogee.updatemember.UPDATE_CODE_ACTION_NAME,apogee.updatemember.UPDATE_CODE_ACTION_INFO);
-apogee.action.addActionInfo(apogee.updatemember.UPDATE_DATA_PENDING_ACTION_NAME,apogee.updatemember.UPDATE_DATA_PENDING_ACTION_INFO);
-apogee.action.addActionInfo(apogee.updatemember.UPDATE_ASYNCH_DATA_ACTION_NAME,apogee.updatemember.UPDATE_ASYNCH_DATA_ACTION_INFO);
-apogee.action.addActionInfo(apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_NAME,apogee.updatemember.UPDATE_ASYNCH_ERROR_ACTION_INFO);
-apogee.action.addActionInfo(apogee.updatemember.UPDATE_DESCRIPTION_ACTION_NAME,apogee.updatemember.UPDATE_DESCRIPTION_ACTION_INFO);
+addActionInfo(UPDATE_DATA_ACTION_INFO);
+addActionInfo(UPDATE_CODE_ACTION_INFO);
+addActionInfo(UPDATE_DESCRIPTION_ACTION_INFO);

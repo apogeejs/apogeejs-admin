@@ -1,0 +1,16 @@
+import "/apogeeapp/app/commands/addcomponent.js";
+import "/apogeeapp/app/commands/addlink.js";
+import "/apogeeapp/app/commands/closeworkspace.js";
+import "/apogeeapp/app/commands/compoundcommand.js";
+import "/apogeeapp/app/commands/compoundsavememberdata.js";
+import "/apogeeapp/app/commands/createworkspace.js";
+import "/apogeeapp/app/commands/deletecomponent.js";
+import "/apogeeapp/app/commands/deletelink.js";
+import "/apogeeapp/app/commands/movecomponent.js";
+import "/apogeeapp/app/commands/openworkspace.js";
+import "/apogeeapp/app/commands/savemembercode.js";
+import "/apogeeapp/app/commands/savememberdata.js";
+import "/apogeeapp/app/commands/savememberdescription.js";
+import "/apogeeapp/app/commands/updatecomponent.js";
+import "/apogeeapp/app/commands/updatelink.js";
+import "/apogeeapp/app/commands/updateworkspace.js";

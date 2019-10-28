@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js"></script>
-        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.2/esprima.js"></script>
+        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.3/esprima.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>
         
         <script type="text/javascript" src="electronTestLibHeader.js"></script>
@@ -32,7 +32,6 @@
         <script type="text/javascript" src="../../apogee/data/Workspace.js"></script>
         <script type="text/javascript" src="../../apogee/data/JsonTable.js"></script>
         <script type="text/javascript" src="../../apogee/data/FunctionTable.js"></script>
-        <script type="text/javascript" src="../../apogee/data/JavascriptTable.js"></script>
         <script type="text/javascript" src="../../apogee/data/Folder.js"></script>
         <script type="text/javascript" src="../../apogee/data/FolderFunction.js"></script>
         <script type="text/javascript" src="../../apogee/data/ErrorTable.js"></script>
@@ -90,7 +89,8 @@
         <script type="text/javascript" src="../../apogeeapp/app/references/CssEntry.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/references/AmdModuleEntry.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/references/NpmModuleEntry.js"></script>
-        <script type="text/javascript" src="../../apogeeapp/app/component/WindowHeaderManager.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/component/banner.js"></script>
+        <script type="text/javascript" src="../../apogeeapp/app/component/toolbar.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/component/Component.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/component/ParentComponent.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/component/EditComponent.js"></script>
@@ -102,13 +102,11 @@
         <script type="text/javascript" src="../../apogeeapp/app/components/JsonTableComponent.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/components/GridTableComponent.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/components/TextComponent.js"></script>
-        <script type="text/javascript" src="../../apogeeapp/app/components/JavascriptComponent.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/components/FunctionComponent.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/components/FolderFunctionComponent.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/components/BasicControlComponent.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/components/DynamicForm.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/components/FormDataComponent.js"></script>
-		<script type="text/javascript" src="../../apogeeapp/app/components/CustomControlComponent.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/components/CustomComponent.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/components/CustomDataComponent.js"></script>
         <script type="text/javascript" src="../../apogeeapp/app/components/ErrorTableComponent.js"></script>
@@ -155,10 +153,14 @@
 		<link rel="stylesheet" type="text/css" href="../ui/configurablepanel/ConfigurablePanel.css">
           
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">
-		<script>
+		<script type="module">
             'use strict'
 
+            import Apogee from "/apogeeapp/app/Apogee.js";
+
 			function init() {
+                
+
                 console.log("In!")
                 
                 //set resounce path
@@ -168,7 +170,7 @@
                 var appConfigManager = new apogeeapp.app.ElectronAppConfigManager();
                 
                 //create the application
-                apogeeapp.app.Apogee.createApp("appContainer",appConfigManager);
+                Apogee.createApp("appContainer",appConfigManager);
             }
             
 		</script>

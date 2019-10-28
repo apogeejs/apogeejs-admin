@@ -40,6 +40,8 @@
 .visiui-sp-right {
     height:100%;
     overflow: hidden;
+    margin: 0px;
+    padding: 0px;
 }
 .visiui-sp-inner {
     position: relative;
