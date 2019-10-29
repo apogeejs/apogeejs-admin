@@ -59,6 +59,12 @@ export default class WorkspaceUI {
       * a new empty workspace the workspaceJson should be omitted. */
     load(workspaceJson) { 
 
+        if((workspaceJson)&&(workspaceJson.version != WorkspaceUI.FILE_VERSION)) {
+            let msg = "Version mismatch. Expected version " + WorkspaceUI.FILE_VERSION + ", Found version " + workspaceJson.version;
+            alert(msg);
+            throw new Error(msg);
+        }
+
         var workspaceDataJson;
         var workspaceComponentsJson;
         var actionResult;
@@ -388,7 +394,7 @@ export default class WorkspaceUI {
         var json = {};
         json.fileType = "apogee app js workspace";
 
-        json.version = "0.40";
+        json.version = WorkspaceUI.FILE_VERSION;
 
         json.references = this.referenceManager.saveEntries();
 
@@ -548,3 +554,5 @@ export default class WorkspaceUI {
 }
 
 WorkspaceUI.ICON_RES_PATH = "/componentIcons/workspace.png";   
+
+WorkspaceUI.FILE_VERSION = "0.50";

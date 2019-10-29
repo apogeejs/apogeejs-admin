@@ -46,7 +46,7 @@ Workspace.CONSECUTIVE_ACTION_INITIAL_LIMIT = 500;
 Workspace.EMPTY_WORKSPACE_JSON = {
     "fileType": "apogee workspace",
     "version": 0.2,
-    "name": "Custom Component Demo",
+    "name": "Workspace",
     "data": {
         "name": "Model",
         "type": "apogee.Folder"
