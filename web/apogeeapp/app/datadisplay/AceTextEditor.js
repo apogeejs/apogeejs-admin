@@ -10,13 +10,21 @@ import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
  */
 export default class AceTextEditor extends DataDisplay {
     
-    constructor(displayContainer,callbacks,aceMode) {
+    constructor(displayContainer,callbacks,aceMode,options) {
         super(displayContainer,callbacks,DataDisplay.NON_SCROLLING);
 
         //#################################################
         //use this for literate page - also add line options below
         this.editorDiv = apogeeapp.ui.createElement("div");
         //##################################################
+
+        if(options) {
+            this.editorOptions = options;
+        }
+        else this.editorOptions = {
+            minLines: 2,
+            maxLines: 20
+        };
         
 //        //###################################################
 //        //use this for canvas folder
@@ -39,10 +47,7 @@ export default class AceTextEditor extends DataDisplay {
         var editor = ace.edit(this.editorDiv);
         //##########################################################
         //use this for literate page
-        editor.setOptions({
-            minLines: 2,
-            maxLines: 20
-        })
+        editor.setOptions(this.editorOptions);
         //############################################################
         editor.renderer.setShowGutter(false);
         editor.setHighlightActiveLine(false);

@@ -51,6 +51,12 @@ export default class JsonTableComponent extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
+
+        //temporary?
+        let codeEditorOptions = {
+            minLines: 2,
+            maxLines: 1000
+        }
         
         //create the new view element;
         switch(viewType) {
@@ -76,11 +82,11 @@ export default class JsonTableComponent extends EditComponent {
                 
             case JsonTableComponent.VIEW_CODE:
                 callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
                 
             case JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
                 
             case JsonTableComponent.VIEW_DESCRIPTION:
                 callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);

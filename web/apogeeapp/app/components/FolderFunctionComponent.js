@@ -52,8 +52,7 @@ export default class FolderFunctionComponent extends ParentComponent {
 
     static transferMemberProperties(inputValues,propertyJson) {
         if(inputValues.argListString !== undefined) {
-            var argList = util.parseStringArray(inputValues.argListString);
-            propertyJson.argList = argList;
+            propertyJson.argListString = inputValues.argListString;
         }
         if(inputValues.returnValueString !== undefined) {
             propertyJson.returnValue = inputValues.returnValueString;

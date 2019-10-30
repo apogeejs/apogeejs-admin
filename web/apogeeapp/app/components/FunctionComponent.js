@@ -28,17 +28,23 @@ export default class FunctionComponent extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
+
+        //temporary?
+        let codeEditorOptions = {
+            minLines: 2,
+            maxLines: 1000
+        }
         
         //create the new view element;
         switch(viewType) {
                 
             case FunctionComponent.VIEW_CODE:
                 callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
                 
             case FunctionComponent.VIEW_SUPPLEMENTAL_CODE:
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
                 
             case FunctionComponent.VIEW_DESCRIPTION:
                 callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
@@ -94,9 +100,6 @@ FunctionComponent.propertyDialogLines = [
 ];
 FunctionComponent.transferMemberProperties = function(inputValues,propertyJson) {
     if(inputValues.argListString != undefined) { 
-        if(!propertyJson.updateData) {
-            propertyJson.updateData = {};
-        }
-        propertyJson.updateData.argList = util.parseStringArray(inputValues.argListString);
+        propertyJson.argListString = inputValues.argListString;
     }
 }
