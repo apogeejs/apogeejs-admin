@@ -110,13 +110,11 @@ FunctionTable.readProperties = function(member,values) {
 
 /** This method executes a property update. */
 FunctionTable.getPropertyUpdateAction = function(member,newValues) {
-    if(newValues.argListString !== undefined) {
-        var newArgList = util.parseStringArray(newValues.argListString);
-  
+    if((newValues.updateData)&&(newValues.updateData.argList !== undefined)) {
         var actionData = {};
         actionData.action = "updateCode";
         actionData.memberName = member.getFullName();
-        actionData.argList = newArgList;
+        actionData.argList = newValues.updateData.argList;
         actionData.functionBody = member.getFunctionBody();
         actionData.supplementalCode = member.getSupplementalCode();
         return actionData;

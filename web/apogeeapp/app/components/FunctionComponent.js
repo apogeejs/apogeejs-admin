@@ -100,6 +100,7 @@ FunctionComponent.propertyDialogLines = [
 ];
 FunctionComponent.transferMemberProperties = function(inputValues,propertyJson) {
     if(inputValues.argListString != undefined) { 
-        propertyJson.argListString = inputValues.argListString;
+        if(!propertyJson.updateData) propertyJson.updateData = {};
+        propertyJson.updateData.argList = util.parseStringArray(inputValues.argListString);
     }
 }

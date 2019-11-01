@@ -72,11 +72,13 @@ updatecomponent.executeCommand = function(workspaceUI,commandData) {
     var memberGenerator = member.generator;
     if(memberGenerator.getPropertyUpdateAction) {
         var actionData = memberGenerator.getPropertyUpdateAction(member,commandData.updatedMemberProperties);  
-        var actionResult = doAction(workspace,actionData);
-        
-        if(!actionResult.actionDone) {
-            error = true;
-            errorMsg = actionResult.alertMsg;
+        if(actionData) {
+            var actionResult = doAction(workspace,actionData);
+            
+            if(!actionResult.actionDone) {
+                error = true;
+                errorMsg = actionResult.alertMsg;
+            }
         }
     }
     
