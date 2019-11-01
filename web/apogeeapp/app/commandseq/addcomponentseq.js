@@ -35,6 +35,9 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
         
         //create the dialog layout - do on the fly because folder list changes
         var dialogLayout = getPropertiesDialogLayout(displayName,folderList,additionalLines,true,optionalInitialProperties);
+
+        //we will populate the parent if we need to insert thenew component as a child in the parent document. 
+        
         
         //create on submit callback
         var onSubmitFunction = function(userInputProperties) {
@@ -59,7 +62,7 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
 
             //editor related commands
             let additionalCommands;
-            let parentComponent
+            let parentComponent;
             if(componentGenerator.hasChildEntry) {
                 parentComponent = getComponentFromName(workspaceUI,userInputProperties.parentName);
                 additionalCommands = getAdditionalCommands(parentComponent,userInputProperties.name);
@@ -115,7 +118,7 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
         }
 
         //give foxus back to editor
-        let onCancelFunction = () => parentComponent.giveEditorFocusIfShowing();
+        let onCancelFunction = () => null; /*parentComponent.giveEditorFocusIfShowing() - oops no parent component*/;
         
         //show dialog
         showConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
