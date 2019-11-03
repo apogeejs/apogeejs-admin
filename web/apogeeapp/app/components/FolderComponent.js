@@ -388,7 +388,7 @@ export default class FolderComponent extends ParentComponent {
         let display = this.getTabDisplay();
         let editorView = display.getEditorView(); 
         if((display)&&(display.getIsShowing())&&(editorView.dom)) {
-            editorView.dom.focus();
+            editorView.focus();
         }
     }
       
