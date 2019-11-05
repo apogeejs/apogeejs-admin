@@ -73,6 +73,7 @@ const syntax = {
     ReturnStatement: [{name:'argument'}],
     SequenceExpression: [{name:'expressions',list:true}],
     ObjectExpression: [{name:'properties',list:true}], //this is handled specially  
+    SpreadElement: [{name:'argument'}],
     SwitchCase: [{name:'test'},{name:'consequent',list:true}],
     SwitchStatement: [{name:'discriminant'},{name:'cases',list:true}],
     TemplateElement: [],
@@ -119,7 +120,6 @@ const syntax = {
     MethodDefinition: null,
     ObjectPattern: null,
     RestElement: null,
-    SpreadElement: null,
     Super: null,
     TaggedTemplateExpression: null
     
