@@ -27,6 +27,7 @@ import ActionError from "/apogee/lib/ActionError.js";
 const syntax = {
     AssignmentExpression: [{name:'left'},{name:'right'}],
     ArrayExpression: [{name:'elements',list:true}],
+    ArrayPattern: [{name:'elements',list:true}],
     ArrowFunctionExpression: [{name:'params',list:true,declaration:true},{name:'body'},{name:'defaults',list:true}],
     BlockStatement: [{name:'body',list:true}],
     BinaryExpression: [
@@ -71,8 +72,10 @@ const syntax = {
     Program: [{name:'body',list:true}],
     Property: [{name:'key'},{name:'value'}], //this is handled specially
     ReturnStatement: [{name:'argument'}],
+    RestElement: [{name:'argument'}],
     SequenceExpression: [{name:'expressions',list:true}],
-    ObjectExpression: [{name:'properties',list:true}], //this is handled specially  
+    ObjectExpression: [{name:'properties',list:true}], //this is handled specially 
+    ObjectPattern: [{name:'properties',list:true}], 
     SpreadElement: [{name:'argument'}],
     SwitchCase: [{name:'test'},{name:'consequent',list:true}],
     SwitchStatement: [{name:'discriminant'},{name:'cases',list:true}],
@@ -102,7 +105,7 @@ const syntax = {
     ],
 
     //no support
-    ArrayPattern: null,
+    //ArrayPattern: null,
     AssignmentPattern: null,
     ClassBody: null,
     ClassDeclaration: null,
@@ -118,8 +121,8 @@ const syntax = {
     ImportSpecifier: null,
     MetaProperty: null,
     MethodDefinition: null,
-    ObjectPattern: null,
-    RestElement: null,
+    //ObjectPattern: null,
+    //RestElement: null,
     Super: null,
     TaggedTemplateExpression: null
     
