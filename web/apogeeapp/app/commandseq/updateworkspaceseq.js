@@ -10,7 +10,8 @@ const DIALOG_LAYOUT_NAME_LINE = {
     "type": "inputElement",
     "heading": "Name: ",
     "resultKey": "name",
-    "initial": ""
+    "initial": "",
+    "focus": true
 };
 const DIALOG_LAYOUT_SUBMIT_LINE = {
     "type": "submit",

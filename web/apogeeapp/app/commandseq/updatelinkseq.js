@@ -7,7 +7,8 @@ const DIALOG_LAYOUT_URL_LINE = {
     "type": "inputElement",
     "heading": "URL: ",
     "resultKey": "url",
-    "initial": ""
+    "initial": "",
+    "focus": true
 };
 const DIALOG_LAYOUT_NICKNAME_LINE = {
     "type": "inputElement",

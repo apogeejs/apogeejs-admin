@@ -248,6 +248,7 @@ export function getPropertiesDialogLayout(displayName,folderNames,additionalLine
     nameLine.type = "inputElement";
     nameLine.heading = "Name: ";
     nameLine.resultKey = "name";
+    nameLine.focus = true;
     lines.push(nameLine);
     
     //add additioanl lines, if applicable

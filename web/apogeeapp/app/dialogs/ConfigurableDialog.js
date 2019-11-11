@@ -42,6 +42,9 @@ export function showConfigurableDialog(layout,onSubmitFunction,optionalOnCancelF
         }
     }
     
+    //this will be used if we want to set the initial focus
+    var initialFocusElement;
+
     var content = apogeeapp.ui.createElement("div",{"className":"dialogBody"});
     for(var i = 0; i < layout.lines.length; i++) {
         var lineDef = layout.lines[i];
@@ -52,11 +55,17 @@ export function showConfigurableDialog(layout,onSubmitFunction,optionalOnCancelF
         if(lineObject.element) { //no element for "invisible" entry, which is used to pass values along
             content.appendChild(lineObject.element);
         }
+        if((lineDef.focus)&&(lineObject.focusElement)) {
+            initialFocusElement = lineObject.focusElement;
+        }
     }
     
     //show dialog
     dialog.setContent(content,apogeeapp.ui.SIZE_WINDOW_TO_CONTENT);
     apogeeapp.ui.showDialog(dialog);
+    if(initialFocusElement) {
+        initialFocusElement.focus();
+    }
     
     //size the dialog to the content
     dialog.fitToContent();
@@ -105,6 +114,7 @@ let lineFunctions = {
             line.appendChild(document.createTextNode(lineDef.heading));
         }
         var select = apogeeapp.ui.createElement("select");
+        lineObject.focusElement = select;
         for(var i = 0; i < lineDef.entries.length; i++) {
             var entry = lineDef.entries[i];
             select.add(apogeeapp.ui.createElement("option",{"text":entry}));
@@ -138,6 +148,7 @@ let lineFunctions = {
             line.appendChild(document.createTextNode(lineDef.heading));
         }
         var inputElement = apogeeapp.ui.createElement("input",{"type":"text"});
+        lineObject.focusElement = inputElement;
         if(lineDef.initial) {
             inputElement.value = lineDef.initial;
         }
@@ -173,6 +184,7 @@ let lineFunctions = {
         }
         var checkbox = apogeeapp.ui.createElement("input");
         checkbox.type = "checkbox";
+        lineObject.focusElement = checkbox;
         if(lineDef.name) {
             checkbox.name = lineDef.name;
         }

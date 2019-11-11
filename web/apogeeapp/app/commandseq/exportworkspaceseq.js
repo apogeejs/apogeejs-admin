@@ -79,6 +79,7 @@ function getExportDialogLayout(folderNames) {
         parentLine.heading = "Folder: ";
         parentLine.entries = folderNames;
         parentLine.resultKey = "parentName"; 
+        parentLine.focus = true;
         lines.push(parentLine);
     }
     
