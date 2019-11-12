@@ -164,7 +164,7 @@ export function createProseMirrorManager (folderComponent) {
 
   }
 
-  proseMirror.getNewEditorData = function (editorData, stepsJson, selectionJson, marksJson) {
+  proseMirror.getNewEditorData = function (editorData, commandData) {
 
     let schema = editorData.schema;
 
@@ -172,22 +172,28 @@ export function createProseMirrorManager (folderComponent) {
     var transaction = editorData.tr;
 
     //set the state
-    let selection = Selection.fromJSON(transaction.doc,selectionJson);
-    let marks = marksJson.map(markJson => Marks.fromJson(schema,markJson));
-    transaction.setSelection(selection);
-    transaction.setStoredMarks(marks);
+    let startSelection = Selection.fromJSON(transaction.doc,commandData.startSelection);
+    let startMarks = commandData.startMarks.map(markJson => Marks.fromJson(schema,markJson));
+    transaction.setSelection(startSelection);
+    transaction.setStoredMarks(startMarks);
 
     //apply the steps
-    stepsJson.forEach(stepJson => {
+    commandData.steps.forEach(stepJson => {
       try {
         var step = Step.fromJSON(schema, stepJson);
-        transaction.step(step);
+        transaction = transaction.step(step);
       }
       catch (error) {
         console.log("Step failed: " + JSON.stringify(stepJson));
         return null;
       }
     });
+
+    let endSelection = Selection.fromJSON(transaction.doc,commandData.endSelection);
+    let endMarks = commandData.endMarks.map(markJson => Marks.fromJson(schema,markJson));
+    transaction.setSelection(endSelection);
+    transaction.setStoredMarks(endMarks);
+
     return editorData.apply(transaction);
   }
 

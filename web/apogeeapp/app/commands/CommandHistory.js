@@ -34,6 +34,9 @@ export default class CommandHistory {
         command.desc = description;
         
         this._saveCommand(command);
+
+        //set workspace dirty whenever a command is added to history (description as argument thrown in gratuitiously, or now)
+        this.eventManager.dispatchEvent("workspaceDirty",command.desc);
     }
     
     /** This method clears the undo/redo history. */

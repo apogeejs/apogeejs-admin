@@ -108,19 +108,24 @@
                 Apogee.createApp("appContainer",appConfigManager);
             }
             
-            function beforeUnloadHandler() {
+            function beforeUnloadHandler(e) {
                 var app = Apogee.getInstance();
                 if((app)&&(app.getWorkspaceIsDirty())) {
-                    return "There is unsaved data. Are you sure you want to exit?";
+                    console.log("Closing with unsaved data - It should query the user!");
+                    e.preventDefault();
+                    return "There is unsaved data. Exit?";
                 }
                 else {
                     return undefined;
                 }
             }
+
+            window.addEventListener("beforeunload", beforeUnloadHandler);
             
 		</script>
 	</head>
-	<body onload="init()" onbeforeunload="return beforeUnloadHandler()">
+    <!--<body onload="init()" onbeforeunload="return beforeUnloadHandler()">-->
+    <body onload="init()">
         <div id="appContainer"></div>
 	</body>
 </html>

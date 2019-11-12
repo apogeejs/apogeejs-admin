@@ -10,8 +10,6 @@ import { findWrapping, ReplaceAroundStep } from "/prosemirror/lib/prosemirror-tr
 import { Slice, NodeRange } from "/prosemirror/lib/prosemirror-model/src/index.js"
 import { Selection } from "/prosemirror/lib/prosemirror-state/src/index.js"
 
-//import {joinPoint, canJoin, findWrapping, liftTarget, canSplit, ReplaceAroundStep} from "../../prosemirror-transform/src/index.js"
-
 //--------------------------------------------------------
 // Commands
 //--------------------------------------------------------

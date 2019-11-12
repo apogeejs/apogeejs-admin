@@ -60,6 +60,9 @@ export default class FolderComponent extends ParentComponent {
             //see if we need to delete any apogee nodes
             var deletedApogeeComponentNames = this.getDeletedApogeeComponentShortNames(transaction);
 
+            //WE SHOULD ADD EDITOR COMMAND PART 1 HERE - A DELETE!
+
+            //add delete command after the editor nodes have been removed
             if(deletedApogeeComponentNames.length > 0) {
                 let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedApogeeComponentNames);
                 //do not do delete.
@@ -338,8 +341,8 @@ export default class FolderComponent extends ParentComponent {
         var stepsJson = [];
         var inverseStepsJson = [];
 
-        let selectionJson = this.editorData.selection.toJSON();
-        let marksJson = this.editorData.marks ? this.editorData.marks.map(mark => mark.toJSON()) : [];
+        let startSelectionJson = this.editorData.selection.toJSON();
+        let startMarksJson = this.editorData.marks ? this.editorData.marks.map(mark => mark.toJSON()) : [];
 
         for(var i = 0; i < transaction.steps.length; i++) {
             var step = transaction.steps[i];
@@ -349,18 +352,18 @@ export default class FolderComponent extends ParentComponent {
             inverseStepsJson.push(inverseStep.toJSON()); 
         }
 
-        let undoSelectionJson = transaction.selection.toJSON();
-        let undoMarksJson = transaction.marks ? transaction.marks.map(mark => mark.toJSON()) : [];
+        let endSelectionJson = transaction.selection.toJSON();
+        let endMarksJson = transaction.marks ? transaction.marks.map(mark => mark.toJSON()) : [];
 
         var commandData = {};
         commandData.type = "literatePageTransaction";
         commandData.memberFullName = this.member.getFullName();
         commandData.steps = stepsJson;
-        commandData.selection = selectionJson;
-        commandData.marks = marksJson;
+        commandData.startSelection = startSelectionJson;
+        commandData.startMarks = startMarksJson;
         commandData.undoSteps = inverseStepsJson;
-        commandData.undoSelection = undoSelectionJson;
-        commandData.undoMarks = undoMarksJson;
+        commandData.endSelection = endSelectionJson;
+        commandData.endMarks = endMarksJson;
         
         return commandData;
     }

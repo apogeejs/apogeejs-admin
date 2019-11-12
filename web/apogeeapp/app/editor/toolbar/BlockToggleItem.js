@@ -13,7 +13,8 @@ export default class BlockToggleItem {
         this.element.title = tooltip;
         this.element.textContent = labelText;
 
-        var clearBlockCommand = setBlockType(clearBlockBlockType);
+//        var clearBlockCommand = setBlockType(clearBlockBlockType);
+var clearBlockCommand = () => true;
         var setBlockCommand = setBlockType(blockType);
 
         this.element.onclick = () => {
