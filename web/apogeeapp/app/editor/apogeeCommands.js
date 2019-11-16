@@ -85,55 +85,29 @@ export function liftEmptyBlock(state, dispatch) {
     if (target == null) return false
     if (dispatch) dispatch(state.tr.lift(range, target).scrollIntoView())
     return true
-  }
+}
 
-  export function convertToNonListBlockType(nodeType, state, dispatch) {
+/** This function converts a selection to a new non-list block type. */
+export function convertToNonListBlockType(nodeType, state, dispatch) {
+
+    //some input checking
+    if(nodeType.spec.group == "list") return false;
+
     //this will be our transform
-    let transform = state.tr;
-
-    //this is our range to convert
-    let { $from, $to } = state.selection;
-
+    let transform = state.tr;    
     let schema = state.schema;
+    let selection = state.selection;
 
-    //---------------------------
-    //Split any lists so there is not a list that spans outside the current selection
-    //Do after first so this doesn't change the value of $from yet.
-    //---------------------------
-    transform = splitSpannedListAfterPos($to, transform);
-    transform = splitSpannedListBeforePos($from, transform);
-
-    //update if we did any transform
-    if (transform.docChanged) {
-        let newFrom = transform.mapping.map($from.pos);
-        let newTo = transform.mapping.map($to.pos);
-        $from = transform.doc.resolve(newFrom);
-        $to = transform.doc.resolve(newTo);
-    }
+    //------------------------------
+    //if there are start and end lists, split them from the selection to update
+    //------------------------------
+    transform = splitStartAndEndLists(transform,selection);
 
     //---------------------------
     // -traverse the top level nodes (the ones in the doc) and process each
     //----------------------------
 
-    //get start and end index in top level
-    let firstIndex = $from.index(0);
-    let lastIndex = $to.index(0);
-
-    let refStep = transform.steps.length;
-
-    transform.doc.forEach( (node,offset,index) => {
-        if((index >= firstIndex)&&(index <= lastIndex)) {
-            
-            if(node.type.spec.group == "list") convertListToNonList(nodeType,null,node,offset,transform,refStep,schema);
-            else if(node.isTextblock) convertBlockType(nodeType,null,node,offset,transform,refStep);
-            else if(node.nodeType === schema.nodes.apogeeComponent) {
-                //noop
-            }
-            else {
-                throw new Error("Unexpected editor node type: " + node.nodeType.name);
-            }
-        }
-    });
+    transform = convertSelectedBlocksToNonList(transform,nodeType,selection,schema);
     
     //------------------------------
     // execute the transform
@@ -143,46 +117,143 @@ export function liftEmptyBlock(state, dispatch) {
         dispatch(transform);
     }
 
+    return true;
+
 }
 
-export function convertToListBlockType(nodeType, state, dispatch) {
-    //this will be our transform
-    let transform = state.tr;
+/** This traverses the list of nodes in the selection and converts them to the 
+ * specified non-list type. Before this is called, any lists at the start and end
+ * of the selection that go oustide the selection should be split, on list item boundaries.
+ */
+function convertSelectedBlocksToNonList(transform,nodeType,selection,schema) {
+
+    //set the baseline for the document and the reference step for position mapping 
+    let refDoc = transform.doc;
+    let refStep = transform.steps.length;
 
     //this is our range to convert
-    let { $from, $to } = state.selection;
+    let { $from, $to } = selection;
 
-    let schema = state.schema;
-
-    //---------------------------
-    //Split any lists so there is not a list that spans outside the current selection
-    //Do after first so this doesn't change the value of $from yet.
-    //---------------------------
-    transform = splitSpannedListAfterPos($to, transform);
-    transform = splitSpannedListBeforePos($from, transform);
-
-    //update if we did any transform
+    //update if we have done any transform
     if (transform.docChanged) {
         let newFrom = transform.mapping.map($from.pos);
         let newTo = transform.mapping.map($to.pos);
-        $from = transform.doc.resolve(newFrom);
-        $to = transform.doc.resolve(newTo);
+        $from = refDoc.resolve(newFrom);
+        $to = refDoc.resolve(newTo);
     }
-
-    //---------------------------
-    // - wrap continuous non-apogee blocks in a worker parent. These will be the end lists
-    //----------------------------
 
     //get start and end index in top level
     let firstIndex = $from.index(0);
     let lastIndex = $to.index(0);
 
+    //traverse nodes, converting them to node type
+    refDoc.forEach( (node,offset,index) => {
+        if((index >= firstIndex)&&(index <= lastIndex)) {
+            
+            if(node.type.spec.group == "list") {
+                //convert list entry to non list
+                convertListToNonList(nodeType,null,node,offset,transform,refStep,schema);
+            }
+            else if(node.isTextblock) {
+                //convert block type
+                if(node.type != nodeType) {
+                    convertBlockType(nodeType,null,node,offset,transform,refStep);
+                }
+            }
+            else if(node.nodeType === schema.nodes.apogeeComponent) {
+                //no action on apogee nodes
+            }
+            else {
+                //this shouldn't happen
+                throw new Error("Unexpected editor node type: " + node.nodeType.name);
+            }
+        }
+    });
+
+    return transform;
+}
+
+/** This function converts a selection to a new list block type. */
+export function convertToListBlockType(nodeType, state, dispatch) {
+
+    //some input checking
+    if(nodeType.spec.group != "list") return false;
+
+    //this will be our transform
+    let transform = state.tr;
+    let schema = state.schema;
+    
+    //------------------------------
+    //if there are start and end lists, split them from the selection to update
+    //------------------------------
+    transform = splitStartAndEndLists(transform,state.selection);
+
+    //-------------------------------
+    // Wrap continueous ranges of non-apogee component nodes in a worker parent, which will be our end list(s). 
+    //-------------------------------
+
+    transform = wrapSelectionInWorkerParent(transform,state.selection,schema);
+
+    //---------------------------
+    // process each future list node
+    //----------------------------
+
+    transform = processWorkerContentsToListContents(transform,nodeType,schema);
+
+    //------------------------------
+    // Convert worker parents to target list
+    //------------------------------
+    let refDoc = transform.doc;
     let refStep = transform.steps.length;
+    let attrs = null;
+
+    refDoc.forEach( (childNode,offset,index) => {
+        if(childNode.type == schema.nodes.workerParent) {
+            let childPosition = offset
+            convertBlockType(nodeType,attrs,childNode,childPosition,transform,refStep);
+        }
+    });
+
+    //------------------------------
+    // execute the transform
+    //------------------------------
+
+    if ((dispatch) && (transform.docChanged)) {
+        dispatch(transform);
+    }
+
+    return true;
+
+}
+
+
+/** This function wraps the given selection in one or more worker parent nodes, with any apogee
+ * component nodes excluded.
+ */
+function wrapSelectionInWorkerParent(transform,selection,schema) {
+
+    let refDoc = transform.doc;
+    let refStep = transform.steps.length;
+
+    //this is our range to convert
+    let { $from, $to } = selection;
+
+    //update if we have done any transform
+    if (transform.docChanged) {
+        let newFrom = transform.mapping.map($from.pos);
+        let newTo = transform.mapping.map($to.pos);
+        $from = refDoc.resolve(newFrom);
+        $to = refDoc.resolve(newTo);
+    }
+
+    //get start and end index in top level
+    let firstIndex = $from.index(0);
+    let lastIndex = $to.index(0);
 
     let startPosition;
     let endPosition;
     let inFutureList = false;
-    transform.doc.forEach( (node,offset,index) => {
+    refDoc.forEach( (node,offset,index) => {
         if((index >= firstIndex)&&(index <= lastIndex)) {
 
             if(node.type === schema.nodes.apogeeComponent) {
@@ -198,7 +269,7 @@ export function convertToListBlockType(nodeType, state, dispatch) {
                     startPosition = offset;
                 }
             }
- 
+    
         }
     });
 
@@ -208,12 +279,27 @@ export function convertToListBlockType(nodeType, state, dispatch) {
         wrapInWorker(startPosition,endPosition,transform,schema,refStep);
     }
 
-    //---------------------------
-    // -traverse the top level nodes (the ones in the doc) and process each worker parent into the given list
-    //----------------------------
-    refStep = transform.steps.length;
+    return transform;
+}
 
-    transform.doc.forEach( (node,offset,index) => {
+/** This method wraps the given range, relative the old tranform state as given by refStep, in a worker parent node. */
+function wrapInWorker(startBasePosition,endBasePosition,transform,schema,refStep) {
+    let mapping = transform.mapping.slice(refStep);
+    let startPosition = mapping.map(startBasePosition, 1);
+    let endPosition = mapping.map(endBasePosition, 1);
+    let $workerFrom = transform.doc.resolve(startPosition);
+    let $workerTo = transform.doc.resolve(endPosition);
+    let futureListParentDepth = 0;
+    wrapSelectionInNode($workerFrom, $workerTo, futureListParentDepth, schema.nodes.workerParent, transform);
+}
+
+/** This method updates the top level nodes to match the desired list type. */
+function processWorkerContentsToListContents(transform,nodeType,schema) {
+    
+    let refDoc = transform.doc;
+    let refStep = transform.steps.length;
+
+    refDoc.forEach( (node,offset,index) => {
         if(node.type == schema.nodes.workerParent) {
             let workerPosition = offset;
 
@@ -225,73 +311,25 @@ export function convertToListBlockType(nodeType, state, dispatch) {
                     unwrapChildren(childNode,childPosition,transform,refStep);
                 }
                 else if(childNode.isTextblock) {
-                    convertBlockType(schema.nodes.listItem,null,childNode,childPosition,transform,refStep);
+                    //convert all text block entries into list items
+                    if(childNode.type != schema.nodes.listItem) {
+                        convertBlockType(schema.nodes.listItem,null,childNode,childPosition,transform,refStep);
+                    }
                 }
                 else if(childNode.type === schema.nodes.apogeeComponent) {
-                    //OOPS - this should not be in list!!!
+                    //OOPS - this should not be in list!!! but ignore it
                 }
                 else {
+                    //this shouldn't happen
                     throw new Error("Unexpected editor node type: " + childNode.type.name);
                 }
             });
         }
     });
 
-    //------------------------------
-    // Convert worker parents to target list
-    //------------------------------
-    let modifiedDoc = transform.doc;
-    let modifiedRefStep = transform.steps.length;
-    let attrs = null;
-
-    modifiedDoc.forEach( (childNode,offset,index) => {
-        if(childNode.type == schema.nodes.workerParent) {
-            let childPosition = offset
-            convertBlockType(nodeType,attrs,childNode,childPosition,transform,modifiedRefStep);
-        }
-    });
-
-    //------------------------------
-    // execute the transform
-    //------------------------------
-
-    if ((dispatch) && (transform.docChanged)) {
-        dispatch(transform);
-    }
-
+    return transform;
 }
 
-function wrapInWorker(startBasePosition,endBasePosition,transform,schema,refStep) {
-    let mapping = transform.mapping.slice(refStep);
-    let startPosition = mapping.map(startBasePosition, 1);
-    let endPosition = mapping.map(endBasePosition, 1);
-    let $workerFrom = transform.doc.resolve(startPosition);
-    let $workerTo = transform.doc.resolve(endPosition);
-    let futureListParentDepth = 0;
-    wrapSelectionInNode($workerFrom, $workerTo, futureListParentDepth, schema.nodes.workerParent, transform);
-}
-
-/** This method converts the given block into the targetnode type. */
-function convertBlockType(targetNodeType,attrs,node,nodeRefStart,transform,refStep) {
-    //get the mapping to remap the node position
-    let mapping = transform.mapping.slice(refStep);
-    let start = mapping.map(nodeRefStart, 1);
-    let end = mapping.map(nodeRefStart + node.nodeSize, 1);
-    return transform.step(new ReplaceAroundStep(start, end, start + 1, end - 1,
-            new Slice(Fragment.from(targetNodeType.create(attrs, null, node.marks)), 0, 0), 1, true))
-  }
-
-function unwrapChildren(node,nodeRefStart,transform,refStep) {
-    //get the mapping to remap the node position
-    let mapping = transform.mapping.slice(refStep);
-    let start = mapping.map(nodeRefStart, 1);
-    let end = mapping.map(nodeRefStart + node.nodeSize, 1);
-
-    //return transform.step(new ReplaceStep(start, end, new Slice(node.content, 0, 0), false))
-
-    return transform.step(new ReplaceAroundStep(start, end, start + 1, end - 1,
-        new Slice(Fragment.empty, 0, 0), 0, false))
-}
 
 /** This converts the list to a parent worker, and then traverses the child nodes -
  * It updates child list items to the proper target node type. It lifts content out of any child list
@@ -342,249 +380,41 @@ function recursiveListUnwrap(node,nodeRefStart,transform,refStep,listDepth,minLi
     }
 }
 
-export function OLDconvertToNonListBlockType(nodeType, state, dispatch) {
-    //this will be our transform
-    let transform = state.tr;
 
+//==========================
+// Common utilities
+//==========================
+
+/** Split any lists so there is not a list that spans outside the current selection */
+function splitStartAndEndLists(transform,selection) {
     //this is our range to convert
-    let { $from, $to } = state.selection;
-
-    let schema = state.schema;
-
-    //---------------------------
-    //Split any lists so there is not a list that spans outside the current selection
-    //Do after first so this doesn't change the value of $from yet.
-    //---------------------------
+    let { $from, $to } = selection;
     transform = splitSpannedListAfterPos($to, transform);
     transform = splitSpannedListBeforePos($from, transform);
-
-    //update if we did any transform
-    if (transform.docChanged) {
-        let newFrom = transform.mapping.map($from.pos);
-        let newTo = transform.mapping.map($to.pos);
-        $from = transform.doc.resolve(newFrom);
-        $to = transform.doc.resolve(newTo);
-    }
-
-    //------------------------------
-    // Add the worker parent
-    //------------------------------
-
-    {
-        let parentDepth = 0;
-        let nodeType = schema.nodes.workerParent;
-        transform = wrapSelectionInNode($from, $to, parentDepth, nodeType, transform)
-    }
-
-    //-------------------------------
-    // lift out of any lists!
-    //-------------------------------
-
-    //we will list one list per iteration, and keep doing this until there are no more lists
-    let listInfo;
-    do {
-        let startGeneration = 0;
-
-        //grab the worker node
-        let { workerNode, workerContentStart } = getWorkerInfo(transform.doc,schema);
-        listInfo = findContainedList(workerNode, workerContentStart, startGeneration);
-
-        if (listInfo) {
-            //remove list if one is found
-            let $listContentsFrom = transform.doc.resolve(listInfo.contentsStart);
-            let $listContentsTo = transform.doc.resolve(listInfo.contentsEnd);
-            let listDepth = listInfo.listGeneration + 1;
-            transform = liftContent($listContentsFrom, $listContentsTo, listDepth, transform);
-        }
-    } while (listInfo)
-
-    //-------------------------------
-    // convert the text blocks to the specified type
-    // (there should only be text blocks)
-    //-------------------------------
-
-    {
-        //get the content range for the worker node
-        let { workerContentStart, workerContentEnd } = getWorkerInfo(transform.doc,schema);
-
-        transform = transform.setBlockType(workerContentStart, workerContentEnd, nodeType);
-    }
-
-    //------------------------------
-    // lift out of the worker
-    //------------------------------
-
-    {
-        //get the content range for the worker node
-        let { workerContentStart, workerContentEnd } = getWorkerInfo(transform.doc,schema);
-        let $workerContentStart = transform.doc.resolve(workerContentStart);
-        let $workerContentEnd = transform.doc.resolve(workerContentEnd);
-
-        let workerDepth = 1;
-        transform = liftContent($workerContentStart, $workerContentEnd, workerDepth, transform);
-    }
-
-    //------------------------------
-    // execute the transform
-    //------------------------------
-
-    if ((dispatch) && (transform.docChanged)) {
-        dispatch(transform);
-    }
+    return transform;
 }
 
+/** This method converts the given block into the targetnode type. */
+function convertBlockType(targetNodeType,attrs,node,nodeRefStart,transform,refStep) {
+    //get the mapping to remap the node position
+    let mapping = transform.mapping.slice(refStep);
+    let start = mapping.map(nodeRefStart, 1);
+    let end = mapping.map(nodeRefStart + node.nodeSize, 1);
+    return transform.step(new ReplaceAroundStep(start, end, start + 1, end - 1,
+            new Slice(Fragment.from(targetNodeType.create(attrs, null, node.marks)), 0, 0), 1, true))
+  }
 
-export function OLDconvertToListBlockType(nodeType, state, dispatch) {
-    //this will be our transform
-    let transform = state.tr;
+/** This lifts children of the given node out of that node. */
+function unwrapChildren(node,nodeRefStart,transform,refStep) {
+    //get the mapping to remap the node position
+    let mapping = transform.mapping.slice(refStep);
+    let start = mapping.map(nodeRefStart, 1);
+    let end = mapping.map(nodeRefStart + node.nodeSize, 1);
 
-    //this is our range to convert
-    let { $from, $to } = state.selection;
+    //return transform.step(new ReplaceStep(start, end, new Slice(node.content, 0, 0), false))
 
-    let schema = state.schema;
-
-    //---------------------------
-    //Split any lists so there is not a list that spans outside the current selection
-    //Do after first so this doesn't change the value of $from yet.
-    //---------------------------
-    transform = splitSpannedListAfterPos($to, transform);
-    transform = splitSpannedListBeforePos($from, transform);
-
-    //update if we did any transform
-    if (transform.docChanged) {
-        let newFrom = transform.mapping.map($from.pos);
-        let newTo = transform.mapping.map($to.pos);
-        $from = transform.doc.resolve(newFrom);
-        $to = transform.doc.resolve(newTo);
-    }
-
-    //------------------------------
-    // Add the worker parent
-    //------------------------------
-
-    {
-        let parentDepth = 0;
-        let nodeType = schema.nodes.workerParent;
-        transform = wrapSelectionInNode($from, $to, parentDepth, nodeType, transform)
-    }
-
-    //-------------------------------
-    // lift out of any lists at the ROOT level (children will remain as child lists - but we must reset their type, below.)
-    //-------------------------------
-
-    {
-        //get the top level lists
-        //grab the worker node
-        let { workerNode, workerContentStart } = getWorkerInfo(transform.doc,schema);
-
-        let doRecursive = false;
-        let startGeneration = 0;
-        let listInfos = getContainedLists(workerNode, workerContentStart, startGeneration, doRecursive);
-
-        //go through top level lists in reverse order and lift out of them (so we don't have to worry about position changes here)
-        for (let i = listInfos.length - 1; i >= 0; i--) {
-            let listInfo = listInfos[i];
-
-            //remove list if one is found
-            let $listContentsFrom = transform.doc.resolve(listInfo.contentsStart);
-            let $listContentsTo = transform.doc.resolve(listInfo.contentsEnd);
-            let listDepth = listInfo.listGeneration + 1;
-            transform = liftContent($listContentsFrom, $listContentsTo, listDepth, transform);
-        }
-
-    }
-
-    //-------------------------------
-    // make any remaining child lists the proper list type
-    //-------------------------------
-
-    {
-        //get the top level lists
-        //grab the worker node
-        let { workerNode, workerContentStart } = getWorkerInfo(transform.doc,schema);
-
-        let doRecursive = true;
-        let startGeneration = 0;
-        let listInfos = getContainedLists(workerNode, workerContentStart, startGeneration, doRecursive);
-
-        //go through top level lists in reverse order and lift out of them (so we don't have to worry about position changes here)
-        for (let i = 0; i < listInfos.length; i++) {
-            let listInfo = listInfos[i];
-
-            //change the child list type if it does not match the current type
-            if (listInfo.node.nodeType != nodeType) {
-                let listNode = listInfo.node;
-                let listOutsideFrom = listInfo.contentsStart - 1;
-                let listOutsideTo = listInfo.contentsEnd + 1;
-                transform = setNodeType(listNode, listOutsideFrom, listOutsideTo, nodeType, transform);
-            }
-        }
-
-    }
-
-    //-------------------------------
-    // convert the text blocks to list items
-    //-------------------------------
-
-    {
-        //get the content range for the worker node
-        let { workerContentStart, workerContentEnd } = getWorkerInfo(transform.doc,schema);
-
-        transform = transform.setBlockType(workerContentStart, workerContentEnd, schema.nodes.listItem);
-    }
-
-    //------------------------------
-    // wrap all the items in a list
-    //------------------------------
-    {
-        //get the worker node range
-        let { workerContentStart, workerContentEnd } = getWorkerInfo(transform.doc,schema);
-        let $workerContentStart = transform.doc.resolve(workerContentStart);
-        let $workerContentEnd = transform.doc.resolve(workerContentEnd);
-
-        let parentDepth = 1;
-        transform = wrapSelectionInNode($workerContentStart, $workerContentEnd, parentDepth, nodeType, transform)
-    }
-
-    //------------------------------
-    // lift out of the worker
-    //------------------------------
-
-    //  let workerIndex;
-
-    {
-        //get the content range for the worker node
-        let { workerContentStart, workerContentEnd } = getWorkerInfo(transform.doc,schema);
-        let $workerContentStart = transform.doc.resolve(workerContentStart);
-        let $workerContentEnd = transform.doc.resolve(workerContentEnd);
-
-        //get the index of the worker before we remove it
-        // {
-        //   let parentDepth = 0;
-        //   workerIndex = getNodeIndex($workerContentStart,parentDepth);
-        // }
-
-        let workerDepth = 1;
-        transform = liftContent($workerContentStart, $workerContentEnd, workerDepth, transform);
-    }
-
-    //------------------------------
-    // Check if there is a list of the same type before and after the updated selection. If so, join them.
-    //------------------------------
-
-    {
-        //if the node before or after our new list is a list of the same type, it should be joined.
-        //note we will also want to join common generation child lists...
-    }
-
-    //------------------------------
-    // execute the transform
-    //------------------------------
-
-    if ((dispatch) && (transform.docChanged)) {
-        dispatch(transform);
-    }
-
+    return transform.step(new ReplaceAroundStep(start, end, start + 1, end - 1,
+        new Slice(Fragment.empty, 0, 0), 0, false))
 }
 
 /** This function cuts the document so there is not a list spanned before the text block at the given position. */
@@ -652,134 +482,7 @@ function wrapSelectionInNode($from, $to, parentDepth, nodeType, transform) {
     return transform.wrap(range, wrapping);
 }
 
-/** This finds the worker nodes in the doc. This will throw an error if there
- * is not a single worker node. */
-function getWorkerInfo(doc,schema) {
-    let workerNodeInfo;
-    doc.forEach((node, offset) => {
-        if (node.type == schema.nodes.workerParent) {
-            if (workerNodeInfo !== undefined) throw new Error("Multiple worker nodes found!");
-
-            workerNodeInfo = {};
-            workerNodeInfo.workerNode = node;
-            workerNodeInfo.workerContentStart = offset + 1;
-            workerNodeInfo.workerContentEnd = workerNodeInfo.workerContentStart + node.content.size;
-        }
-    });
-    if (workerNodeInfo === undefined) throw new Error("No worker nodes found!");
-    return workerNodeInfo;
-}
-
-/** This function returns list info for a list contained in the given list. If the recursive 
- * flag is false it only returns list info for direct children. Otherwise it also returns further descendant lists, first.
- */
-function findContainedList(parentNode, parentInsidePosition, parentListGeneration) {
-    let listInfo;
-    let position = parentInsidePosition;
-    for (let i = 0; (i < parentNode.childCount) && (!listInfo); i++) {
-        let childNode = parentNode.child(i);
-        listInfo = getListInfo(childNode, position, parentListGeneration);
-
-        //update position for the next node
-        position += childNode.nodeSize;
-    }
-    return listInfo;
-}
-
-/** This function returns list info if this is a list node. If the recusrive flag is set,
- * it will return list info for a child list if there are any. */
-//helper
-function getListInfo(node, outsidePosition, parentListGeneration) {
-    let listInfo;
-
-    if (node.type.spec.group == "list") {
-        //list found
-        let currentListGeneration = parentListGeneration + 1;
-        let currentListInsidePosition = outsidePosition + 1;
-
-        //check for a child list
-        listInfo = findContainedList(node, currentListInsidePosition, currentListGeneration);
-
-        if (listInfo === undefined) {
-            //set the list info for this list if no child found
-            listInfo = {};
-            listInfo.node = node;
-            listInfo.contentsStart = currentListInsidePosition
-            listInfo.contentsEnd = listInfo.contentsStart + node.content.size;
-            listInfo.listGeneration = currentListGeneration;
-        }
-    }
-
-    return listInfo;
-}
-
-function getContainedLists(parentNode, parentInsidePosition, parentListGeneration, doRecursive) {
-    let listInfos = [];
-    let position = parentInsidePosition;
-    for (let i = 0; i < parentNode.childCount; i++) {
-        let childNode = parentNode.child(i);
-        let childListInfos = getAllListInfos(childNode, position, parentListGeneration, doRecursive);
-        listInfos = listInfos.concat(childListInfos);
-
-        //update position for the next node
-        position += childNode.nodeSize;
-    }
-
-    return listInfos;
-}
-
-/** This function returns list info if this is a list node. If the recusrive flag is set,
- * it will return list info for a child list if there are any. */
-//helper
-function getAllListInfos(node, outsidePosition, parentListGeneration, doRecursive) {
-    let listInfos = [];
-
-    if (node.type.spec.group == "list") {
-        //list found
-        let currentListGeneration = parentListGeneration + 1;
-        let currentListInsidePosition = outsidePosition + 1;
-
-        //add the child lists
-        if (doRecursive) {
-            let childListInfos = getContainedLists(node, currentListInsidePosition, currentListGeneration, doRecursive);
-            listInfos = listInfos.concat(childListInfos);
-        }
-
-        //add the current list info
-        let listInfo = {};
-        listInfo.node = node;
-        listInfo.contentsStart = currentListInsidePosition
-        listInfo.contentsEnd = listInfo.contentsStart + node.content.size;
-        listInfo.listGeneration = currentListGeneration;
-
-        listInfos.push(listInfo);
-    }
-
-    return listInfos;
-}
-
-/** This function lifts the content at the given positions. It returns
- * the updated transform */
-function liftContent($contentStart, $contentEnd, parentDepth, transform) {
-    let range = new NodeRange($contentStart, $contentEnd, parentDepth);
-    return transform.lift(range, parentDepth - 1);
-}
-
-/** This changes the node type. It assumes the node type is valid. */
-function setNodeType(node, outsideFromPos, outsideToPos, nodeType, transform) {
-    transform.step(new ReplaceAroundStep(outsideFromPos, outsideToPos, outsideFromPos + 1, outsideToPos - 1,
-        new Slice(Fragment.from(nodeType.create(null, null, node.marks)), 0, 0), 1, true));
-    return transform;
-}
-
-/** This reads the path associated with the input position to find the index of the node at the requested depth. */
-  // function getNodeIndex($pos,parentDepth) {
-  //   let nodeIndexArrayIndex = parentDepth*3 + 1;
-  //   if($pos.path.length <= nodeIndexArrayIndex) throw new Exception("Error reading the node index - position depth to small!");
-  //   return $pos.path[nodeIndexArrayIndex];
-  // }
-
-  //========================================
+//========================================
  // Keymap
  //========================================
 
@@ -827,4 +530,385 @@ const mac = typeof navigator != "undefined" ? /Mac/.test(navigator.platform)
 // [`pcBasekeymap`](#commands.pcBaseKeymap) or
 // [`macBaseKeymap`](#commands.macBaseKeymap).
 export let baseKeymap = mac ? macBaseKeymap : pcBaseKeymap
+
+
+
+
+//###########################################################################################################
+//OLD 
+// export function OLDconvertToNonListBlockType(nodeType, state, dispatch) {
+//     //this will be our transform
+//     let transform = state.tr;
+
+//     //this is our range to convert
+//     let { $from, $to } = state.selection;
+
+//     let schema = state.schema;
+
+//     //---------------------------
+//     //Split any lists so there is not a list that spans outside the current selection
+//     //Do after first so this doesn't change the value of $from yet.
+//     //---------------------------
+//     transform = splitSpannedListAfterPos($to, transform);
+//     transform = splitSpannedListBeforePos($from, transform);
+
+//     //update if we did any transform
+//     if (transform.docChanged) {
+//         let newFrom = transform.mapping.map($from.pos);
+//         let newTo = transform.mapping.map($to.pos);
+//         $from = transform.doc.resolve(newFrom);
+//         $to = transform.doc.resolve(newTo);
+//     }
+
+//     //------------------------------
+//     // Add the worker parent
+//     //------------------------------
+
+//     {
+//         let parentDepth = 0;
+//         let nodeType = schema.nodes.workerParent;
+//         transform = wrapSelectionInNode($from, $to, parentDepth, nodeType, transform)
+//     }
+
+//     //-------------------------------
+//     // lift out of any lists!
+//     //-------------------------------
+
+//     //we will list one list per iteration, and keep doing this until there are no more lists
+//     let listInfo;
+//     do {
+//         let startGeneration = 0;
+
+//         //grab the worker node
+//         let { workerNode, workerContentStart } = getWorkerInfo(transform.doc,schema);
+//         listInfo = findContainedList(workerNode, workerContentStart, startGeneration);
+
+//         if (listInfo) {
+//             //remove list if one is found
+//             let $listContentsFrom = transform.doc.resolve(listInfo.contentsStart);
+//             let $listContentsTo = transform.doc.resolve(listInfo.contentsEnd);
+//             let listDepth = listInfo.listGeneration + 1;
+//             transform = liftContent($listContentsFrom, $listContentsTo, listDepth, transform);
+//         }
+//     } while (listInfo)
+
+//     //-------------------------------
+//     // convert the text blocks to the specified type
+//     // (there should only be text blocks)
+//     //-------------------------------
+
+//     {
+//         //get the content range for the worker node
+//         let { workerContentStart, workerContentEnd } = getWorkerInfo(transform.doc,schema);
+
+//         transform = transform.setBlockType(workerContentStart, workerContentEnd, nodeType);
+//     }
+
+//     //------------------------------
+//     // lift out of the worker
+//     //------------------------------
+
+//     {
+//         //get the content range for the worker node
+//         let { workerContentStart, workerContentEnd } = getWorkerInfo(transform.doc,schema);
+//         let $workerContentStart = transform.doc.resolve(workerContentStart);
+//         let $workerContentEnd = transform.doc.resolve(workerContentEnd);
+
+//         let workerDepth = 1;
+//         transform = liftContent($workerContentStart, $workerContentEnd, workerDepth, transform);
+//     }
+
+//     //------------------------------
+//     // execute the transform
+//     //------------------------------
+
+//     if ((dispatch) && (transform.docChanged)) {
+//         dispatch(transform);
+//     }
+// }
+
+
+// export function OLDconvertToListBlockType(nodeType, state, dispatch) {
+//     //this will be our transform
+//     let transform = state.tr;
+
+//     //this is our range to convert
+//     let { $from, $to } = state.selection;
+
+//     let schema = state.schema;
+
+//     //---------------------------
+//     //Split any lists so there is not a list that spans outside the current selection
+//     //Do after first so this doesn't change the value of $from yet.
+//     //---------------------------
+//     transform = splitSpannedListAfterPos($to, transform);
+//     transform = splitSpannedListBeforePos($from, transform);
+
+//     //update if we did any transform
+//     if (transform.docChanged) {
+//         let newFrom = transform.mapping.map($from.pos);
+//         let newTo = transform.mapping.map($to.pos);
+//         $from = transform.doc.resolve(newFrom);
+//         $to = transform.doc.resolve(newTo);
+//     }
+
+//     //------------------------------
+//     // Add the worker parent
+//     //------------------------------
+
+//     {
+//         let parentDepth = 0;
+//         let nodeType = schema.nodes.workerParent;
+//         transform = wrapSelectionInNode($from, $to, parentDepth, nodeType, transform)
+//     }
+
+//     //-------------------------------
+//     // lift out of any lists at the ROOT level (children will remain as child lists - but we must reset their type, below.)
+//     //-------------------------------
+
+//     {
+//         //get the top level lists
+//         //grab the worker node
+//         let { workerNode, workerContentStart } = getWorkerInfo(transform.doc,schema);
+
+//         let doRecursive = false;
+//         let startGeneration = 0;
+//         let listInfos = getContainedLists(workerNode, workerContentStart, startGeneration, doRecursive);
+
+//         //go through top level lists in reverse order and lift out of them (so we don't have to worry about position changes here)
+//         for (let i = listInfos.length - 1; i >= 0; i--) {
+//             let listInfo = listInfos[i];
+
+//             //remove list if one is found
+//             let $listContentsFrom = transform.doc.resolve(listInfo.contentsStart);
+//             let $listContentsTo = transform.doc.resolve(listInfo.contentsEnd);
+//             let listDepth = listInfo.listGeneration + 1;
+//             transform = liftContent($listContentsFrom, $listContentsTo, listDepth, transform);
+//         }
+
+//     }
+
+//     //-------------------------------
+//     // make any remaining child lists the proper list type
+//     //-------------------------------
+
+//     {
+//         //get the top level lists
+//         //grab the worker node
+//         let { workerNode, workerContentStart } = getWorkerInfo(transform.doc,schema);
+
+//         let doRecursive = true;
+//         let startGeneration = 0;
+//         let listInfos = getContainedLists(workerNode, workerContentStart, startGeneration, doRecursive);
+
+//         //go through top level lists in reverse order and lift out of them (so we don't have to worry about position changes here)
+//         for (let i = 0; i < listInfos.length; i++) {
+//             let listInfo = listInfos[i];
+
+//             //change the child list type if it does not match the current type
+//             if (listInfo.node.nodeType != nodeType) {
+//                 let listNode = listInfo.node;
+//                 let listOutsideFrom = listInfo.contentsStart - 1;
+//                 let listOutsideTo = listInfo.contentsEnd + 1;
+//                 transform = setNodeType(listNode, listOutsideFrom, listOutsideTo, nodeType, transform);
+//             }
+//         }
+
+//     }
+
+//     //-------------------------------
+//     // convert the text blocks to list items
+//     //-------------------------------
+
+//     {
+//         //get the content range for the worker node
+//         let { workerContentStart, workerContentEnd } = getWorkerInfo(transform.doc,schema);
+
+//         transform = transform.setBlockType(workerContentStart, workerContentEnd, schema.nodes.listItem);
+//     }
+
+//     //------------------------------
+//     // wrap all the items in a list
+//     //------------------------------
+//     {
+//         //get the worker node range
+//         let { workerContentStart, workerContentEnd } = getWorkerInfo(transform.doc,schema);
+//         let $workerContentStart = transform.doc.resolve(workerContentStart);
+//         let $workerContentEnd = transform.doc.resolve(workerContentEnd);
+
+//         let parentDepth = 1;
+//         transform = wrapSelectionInNode($workerContentStart, $workerContentEnd, parentDepth, nodeType, transform)
+//     }
+
+//     //------------------------------
+//     // lift out of the worker
+//     //------------------------------
+
+//     //  let workerIndex;
+
+//     {
+//         //get the content range for the worker node
+//         let { workerContentStart, workerContentEnd } = getWorkerInfo(transform.doc,schema);
+//         let $workerContentStart = transform.doc.resolve(workerContentStart);
+//         let $workerContentEnd = transform.doc.resolve(workerContentEnd);
+
+//         //get the index of the worker before we remove it
+//         // {
+//         //   let parentDepth = 0;
+//         //   workerIndex = getNodeIndex($workerContentStart,parentDepth);
+//         // }
+
+//         let workerDepth = 1;
+//         transform = liftContent($workerContentStart, $workerContentEnd, workerDepth, transform);
+//     }
+
+//     //------------------------------
+//     // Check if there is a list of the same type before and after the updated selection. If so, join them.
+//     //------------------------------
+
+//     {
+//         //if the node before or after our new list is a list of the same type, it should be joined.
+//         //note we will also want to join common generation child lists...
+//     }
+
+//     //------------------------------
+//     // execute the transform
+//     //------------------------------
+
+//     if ((dispatch) && (transform.docChanged)) {
+//         dispatch(transform);
+//     }
+
+// }
+
+
+// /** This finds the worker nodes in the doc. This will throw an error if there
+//  * is not a single worker node. */
+// function getWorkerInfo(doc,schema) {
+//     let workerNodeInfo;
+//     doc.forEach((node, offset) => {
+//         if (node.type == schema.nodes.workerParent) {
+//             if (workerNodeInfo !== undefined) throw new Error("Multiple worker nodes found!");
+
+//             workerNodeInfo = {};
+//             workerNodeInfo.workerNode = node;
+//             workerNodeInfo.workerContentStart = offset + 1;
+//             workerNodeInfo.workerContentEnd = workerNodeInfo.workerContentStart + node.content.size;
+//         }
+//     });
+//     if (workerNodeInfo === undefined) throw new Error("No worker nodes found!");
+//     return workerNodeInfo;
+// }
+
+// /** This function returns list info for a list contained in the given list. If the recursive 
+//  * flag is false it only returns list info for direct children. Otherwise it also returns further descendant lists, first.
+//  */
+// function findContainedList(parentNode, parentInsidePosition, parentListGeneration) {
+//     let listInfo;
+//     let position = parentInsidePosition;
+//     for (let i = 0; (i < parentNode.childCount) && (!listInfo); i++) {
+//         let childNode = parentNode.child(i);
+//         listInfo = getListInfo(childNode, position, parentListGeneration);
+
+//         //update position for the next node
+//         position += childNode.nodeSize;
+//     }
+//     return listInfo;
+// }
+
+// /** This function returns list info if this is a list node. If the recusrive flag is set,
+//  * it will return list info for a child list if there are any. */
+// //helper
+// function getListInfo(node, outsidePosition, parentListGeneration) {
+//     let listInfo;
+
+//     if (node.type.spec.group == "list") {
+//         //list found
+//         let currentListGeneration = parentListGeneration + 1;
+//         let currentListInsidePosition = outsidePosition + 1;
+
+//         //check for a child list
+//         listInfo = findContainedList(node, currentListInsidePosition, currentListGeneration);
+
+//         if (listInfo === undefined) {
+//             //set the list info for this list if no child found
+//             listInfo = {};
+//             listInfo.node = node;
+//             listInfo.contentsStart = currentListInsidePosition
+//             listInfo.contentsEnd = listInfo.contentsStart + node.content.size;
+//             listInfo.listGeneration = currentListGeneration;
+//         }
+//     }
+
+//     return listInfo;
+// }
+
+// function getContainedLists(parentNode, parentInsidePosition, parentListGeneration, doRecursive) {
+//     let listInfos = [];
+//     let position = parentInsidePosition;
+//     for (let i = 0; i < parentNode.childCount; i++) {
+//         let childNode = parentNode.child(i);
+//         let childListInfos = getAllListInfos(childNode, position, parentListGeneration, doRecursive);
+//         listInfos = listInfos.concat(childListInfos);
+
+//         //update position for the next node
+//         position += childNode.nodeSize;
+//     }
+
+//     return listInfos;
+// }
+
+// /** This function returns list info if this is a list node. If the recusrive flag is set,
+//  * it will return list info for a child list if there are any. */
+// //helper
+// function getAllListInfos(node, outsidePosition, parentListGeneration, doRecursive) {
+//     let listInfos = [];
+
+//     if (node.type.spec.group == "list") {
+//         //list found
+//         let currentListGeneration = parentListGeneration + 1;
+//         let currentListInsidePosition = outsidePosition + 1;
+
+//         //add the child lists
+//         if (doRecursive) {
+//             let childListInfos = getContainedLists(node, currentListInsidePosition, currentListGeneration, doRecursive);
+//             listInfos = listInfos.concat(childListInfos);
+//         }
+
+//         //add the current list info
+//         let listInfo = {};
+//         listInfo.node = node;
+//         listInfo.contentsStart = currentListInsidePosition
+//         listInfo.contentsEnd = listInfo.contentsStart + node.content.size;
+//         listInfo.listGeneration = currentListGeneration;
+
+//         listInfos.push(listInfo);
+//     }
+
+//     return listInfos;
+// }
+
+// /** This function lifts the content at the given positions. It returns
+//  * the updated transform */
+// function liftContent($contentStart, $contentEnd, parentDepth, transform) {
+//     let range = new NodeRange($contentStart, $contentEnd, parentDepth);
+//     return transform.lift(range, parentDepth - 1);
+// }
+
+// /** This changes the node type. It assumes the node type is valid. */
+// function setNodeType(node, outsideFromPos, outsideToPos, nodeType, transform) {
+//     transform.step(new ReplaceAroundStep(outsideFromPos, outsideToPos, outsideFromPos + 1, outsideToPos - 1,
+//         new Slice(Fragment.from(nodeType.create(null, null, node.marks)), 0, 0), 1, true));
+//     return transform;
+// }
+
+/** This reads the path associated with the input position to find the index of the node at the requested depth. */
+  // function getNodeIndex($pos,parentDepth) {
+  //   let nodeIndexArrayIndex = parentDepth*3 + 1;
+  //   if($pos.path.length <= nodeIndexArrayIndex) throw new Exception("Error reading the node index - position depth to small!");
+  //   return $pos.path[nodeIndexArrayIndex];
+  // }
+
+//end old
+//#############################################################################################
 
