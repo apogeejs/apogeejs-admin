@@ -29,9 +29,6 @@ export function createFolderSchema(folderComponent) {
       toDOM() { return ["p", 0] }
     },
 
-    // :: NodeSpec A heading textblock, with a `level` attribute that
-    // should hold the number 1 to 6. Parsed and serialized as `<h1>` to
-    // `<h6>` elements.
     heading1: {
       content: "inline*",
       group: "block",

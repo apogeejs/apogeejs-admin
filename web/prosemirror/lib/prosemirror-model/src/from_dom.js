@@ -400,7 +400,13 @@ class ParseContext {
   // none is found, the element's content nodes are added directly.
   addElement(dom) {
     let name = dom.nodeName.toLowerCase()
-    if (listTags.hasOwnProperty(name)) normalizeList(dom)
+
+    //==============================
+    // TEMP - getting rid of this cludge (as he describes it)!!!
+    //I need a different cludge
+    //if (listTags.hasOwnProperty(name)) normalizeList(dom)
+    //==============================
+
     let rule = (this.options.ruleFromNode && this.options.ruleFromNode(dom)) || this.parser.matchTag(dom, this)
     if (rule ? rule.ignore : ignoreTags.hasOwnProperty(name)) {
       this.findInside(dom)

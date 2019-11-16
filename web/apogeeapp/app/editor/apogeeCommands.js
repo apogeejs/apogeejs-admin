@@ -6,8 +6,8 @@
 // - don't convert included lists to be the specified type
 // - don't handle tabs at the start of non-list items, beign converted to child lists
 
-import { findWrapping, ReplaceAroundStep } from "/prosemirror/lib/prosemirror-transform/src/index.js";
-import { Slice, NodeRange } from "/prosemirror/lib/prosemirror-model/src/index.js"
+import { findWrapping, ReplaceStep, ReplaceAroundStep } from "/prosemirror/lib/prosemirror-transform/src/index.js";
+import { Slice, NodeRange, Fragment } from "/prosemirror/lib/prosemirror-model/src/index.js"
 import { Selection } from "/prosemirror/lib/prosemirror-state/src/index.js"
 
 //--------------------------------------------------------
@@ -87,8 +87,262 @@ export function liftEmptyBlock(state, dispatch) {
     return true
   }
 
+  export function convertToNonListBlockType(nodeType, state, dispatch) {
+    //this will be our transform
+    let transform = state.tr;
 
-export function convertToNonListBlockType(nodeType, state, dispatch) {
+    //this is our range to convert
+    let { $from, $to } = state.selection;
+
+    let schema = state.schema;
+
+    //---------------------------
+    //Split any lists so there is not a list that spans outside the current selection
+    //Do after first so this doesn't change the value of $from yet.
+    //---------------------------
+    transform = splitSpannedListAfterPos($to, transform);
+    transform = splitSpannedListBeforePos($from, transform);
+
+    //update if we did any transform
+    if (transform.docChanged) {
+        let newFrom = transform.mapping.map($from.pos);
+        let newTo = transform.mapping.map($to.pos);
+        $from = transform.doc.resolve(newFrom);
+        $to = transform.doc.resolve(newTo);
+    }
+
+    //---------------------------
+    // -traverse the top level nodes (the ones in the doc) and process each
+    //----------------------------
+
+    //get start and end index in top level
+    let firstIndex = $from.index(0);
+    let lastIndex = $to.index(0);
+
+    let refStep = transform.steps.length;
+
+    transform.doc.forEach( (node,offset,index) => {
+        if((index >= firstIndex)&&(index <= lastIndex)) {
+            
+            if(node.type.spec.group == "list") convertListToNonList(nodeType,null,node,offset,transform,refStep,schema);
+            else if(node.isTextblock) convertBlockType(nodeType,null,node,offset,transform,refStep);
+            else if(node.nodeType === schema.nodes.apogeeComponent) {
+                //noop
+            }
+            else {
+                throw new Error("Unexpected editor node type: " + node.nodeType.name);
+            }
+        }
+    });
+    
+    //------------------------------
+    // execute the transform
+    //------------------------------
+
+    if ((dispatch) && (transform.docChanged)) {
+        dispatch(transform);
+    }
+
+}
+
+export function convertToListBlockType(nodeType, state, dispatch) {
+    //this will be our transform
+    let transform = state.tr;
+
+    //this is our range to convert
+    let { $from, $to } = state.selection;
+
+    let schema = state.schema;
+
+    //---------------------------
+    //Split any lists so there is not a list that spans outside the current selection
+    //Do after first so this doesn't change the value of $from yet.
+    //---------------------------
+    transform = splitSpannedListAfterPos($to, transform);
+    transform = splitSpannedListBeforePos($from, transform);
+
+    //update if we did any transform
+    if (transform.docChanged) {
+        let newFrom = transform.mapping.map($from.pos);
+        let newTo = transform.mapping.map($to.pos);
+        $from = transform.doc.resolve(newFrom);
+        $to = transform.doc.resolve(newTo);
+    }
+
+    //---------------------------
+    // - wrap continuous non-apogee blocks in a worker parent. These will be the end lists
+    //----------------------------
+
+    //get start and end index in top level
+    let firstIndex = $from.index(0);
+    let lastIndex = $to.index(0);
+
+    let refStep = transform.steps.length;
+
+    let startPosition;
+    let endPosition;
+    let inFutureList = false;
+    transform.doc.forEach( (node,offset,index) => {
+        if((index >= firstIndex)&&(index <= lastIndex)) {
+
+            if(node.type === schema.nodes.apogeeComponent) {
+                if(inFutureList) {
+                    inFutureList = false;
+                    endPosition = offset;
+                    wrapInWorker(startPosition,endPosition,transform,schema,refStep);
+                }
+            }
+            else {
+                if(!inFutureList) {
+                    inFutureList = true;
+                    startPosition = offset;
+                }
+            }
+ 
+        }
+    });
+
+    //create the final list/worker segment
+    if(inFutureList) {
+        endPosition = $to.pos;
+        wrapInWorker(startPosition,endPosition,transform,schema,refStep);
+    }
+
+    //---------------------------
+    // -traverse the top level nodes (the ones in the doc) and process each worker parent into the given list
+    //----------------------------
+    refStep = transform.steps.length;
+
+    transform.doc.forEach( (node,offset,index) => {
+        if(node.type == schema.nodes.workerParent) {
+            let workerPosition = offset;
+
+            node.forEach( (childNode,childOffset,index) => {
+                let childPosition = workerPosition + 1 + childOffset;
+            
+                if(childNode.type.spec.group == "list") {
+                    //lift children from al top level lists (the worker parent will be the list)
+                    unwrapChildren(childNode,childPosition,transform,refStep);
+                }
+                else if(childNode.isTextblock) {
+                    convertBlockType(schema.nodes.listItem,null,childNode,childPosition,transform,refStep);
+                }
+                else if(childNode.type === schema.nodes.apogeeComponent) {
+                    //OOPS - this should not be in list!!!
+                }
+                else {
+                    throw new Error("Unexpected editor node type: " + childNode.type.name);
+                }
+            });
+        }
+    });
+
+    //------------------------------
+    // Convert worker parents to target list
+    //------------------------------
+    let modifiedDoc = transform.doc;
+    let modifiedRefStep = transform.steps.length;
+    let attrs = null;
+
+    modifiedDoc.forEach( (childNode,offset,index) => {
+        if(childNode.type == schema.nodes.workerParent) {
+            let childPosition = offset
+            convertBlockType(nodeType,attrs,childNode,childPosition,transform,modifiedRefStep);
+        }
+    });
+
+    //------------------------------
+    // execute the transform
+    //------------------------------
+
+    if ((dispatch) && (transform.docChanged)) {
+        dispatch(transform);
+    }
+
+}
+
+function wrapInWorker(startBasePosition,endBasePosition,transform,schema,refStep) {
+    let mapping = transform.mapping.slice(refStep);
+    let startPosition = mapping.map(startBasePosition, 1);
+    let endPosition = mapping.map(endBasePosition, 1);
+    let $workerFrom = transform.doc.resolve(startPosition);
+    let $workerTo = transform.doc.resolve(endPosition);
+    let futureListParentDepth = 0;
+    wrapSelectionInNode($workerFrom, $workerTo, futureListParentDepth, schema.nodes.workerParent, transform);
+}
+
+/** This method converts the given block into the targetnode type. */
+function convertBlockType(targetNodeType,attrs,node,nodeRefStart,transform,refStep) {
+    //get the mapping to remap the node position
+    let mapping = transform.mapping.slice(refStep);
+    let start = mapping.map(nodeRefStart, 1);
+    let end = mapping.map(nodeRefStart + node.nodeSize, 1);
+    return transform.step(new ReplaceAroundStep(start, end, start + 1, end - 1,
+            new Slice(Fragment.from(targetNodeType.create(attrs, null, node.marks)), 0, 0), 1, true))
+  }
+
+function unwrapChildren(node,nodeRefStart,transform,refStep) {
+    //get the mapping to remap the node position
+    let mapping = transform.mapping.slice(refStep);
+    let start = mapping.map(nodeRefStart, 1);
+    let end = mapping.map(nodeRefStart + node.nodeSize, 1);
+
+    //return transform.step(new ReplaceStep(start, end, new Slice(node.content, 0, 0), false))
+
+    return transform.step(new ReplaceAroundStep(start, end, start + 1, end - 1,
+        new Slice(Fragment.empty, 0, 0), 0, false))
+}
+
+/** This converts the list to a parent worker, and then traverses the child nodes -
+ * It updates child list items to the proper target node type. It lifts content out of any child list
+ */
+function convertListToNonList(targetNodeType,attrs,node,nodeRefStart,transform,refStep,schema) {
+    //convert outer type to worker parent
+    //traverse child
+    //- list item - change to target type
+    //- list - (1) recursively lift content (2) convet to target node type
+
+    //convert top level list to worker parent
+    convertBlockType(schema.nodes.workerParent,attrs,node,nodeRefStart,transform,refStep);
+
+    //flatten the lists inside
+    recursiveListUnwrap(node,nodeRefStart,transform,refStep,0,1);
+
+    //convert worker children to target link and remove worker 
+    //get the updated doc
+    let modifiedDoc = transform.doc;
+    let modifiedRefStep = transform.steps.length;
+
+    modifiedDoc.forEach( (childNode,offset,index) => {
+        if(childNode.type == schema.nodes.workerParent) {
+            let childPosition = offset
+
+            childNode.forEach( (grandchildNode,childOffset,childIndex) => {
+                let grandchildPosition = childPosition + 1 + childOffset;
+                convertBlockType(targetNodeType,attrs,grandchildNode,grandchildPosition,transform,modifiedRefStep);
+            });
+
+            unwrapChildren(childNode,childPosition,transform,modifiedRefStep);
+        }
+    });
+
+}
+
+function recursiveListUnwrap(node,nodeRefStart,transform,refStep,listDepth,minListDepthToFlatten) {
+    //unwrap the children
+    let childListDepth = listDepth + 1;
+    node.forEach( (childNode,offset,index) => {
+        let refPosition = nodeRefStart + 1 + offset;
+        if(childNode.type.spec.group == "list") recursiveListUnwrap(childNode,refPosition,transform,refStep,childListDepth,minListDepthToFlatten);
+    });
+
+    //unwrap this list
+    if(minListDepthToFlatten <= listDepth) {
+      unwrapChildren(node,nodeRefStart,transform,refStep);
+    }
+}
+
+export function OLDconvertToNonListBlockType(nodeType, state, dispatch) {
     //this will be our transform
     let transform = state.tr;
 
@@ -180,7 +434,7 @@ export function convertToNonListBlockType(nodeType, state, dispatch) {
 }
 
 
-export function convertToListBlockType(nodeType, state, dispatch) {
+export function OLDconvertToListBlockType(nodeType, state, dispatch) {
     //this will be our transform
     let transform = state.tr;
 
