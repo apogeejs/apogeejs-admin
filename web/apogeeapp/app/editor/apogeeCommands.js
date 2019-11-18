@@ -87,6 +87,10 @@ export function liftEmptyBlock(state, dispatch) {
     return true
 }
 
+//--
+//to non-list block type commands
+//--
+
 /** This function converts a selection to a new non-list block type. */
 export function convertToNonListBlockType(nodeType, state, dispatch) {
 
@@ -173,6 +177,83 @@ function convertSelectedBlocksToNonList(transform,nodeType,selection,schema) {
     return transform;
 }
 
+
+/** This converts the list to a parent worker, and then traverses the child nodes -
+ * It updates child list items to the proper target node type. It lifts content out of any child list
+ */
+function convertListToNonList(targetNodeType,attrs,node,nodeRefStart,transform,refStep,schema) {
+    //convert outer type to worker parent
+    //traverse child
+    //- list item - change to target type
+    //- list - (1) recursively lift content (2) convet to target node type
+
+    //convert top level list to worker parent
+    convertBlockType(schema.nodes.workerParent,attrs,node,nodeRefStart,transform,refStep);
+
+    //flatten the lists inside
+    recursiveListUnwrap(node,nodeRefStart,transform,refStep,0,1);
+
+    //convert worker children to target link and remove worker 
+    //get the updated doc
+    let modifiedDoc = transform.doc;
+    let modifiedRefStep = transform.steps.length;
+
+    modifiedDoc.forEach( (childNode,offset,index) => {
+        if(childNode.type == schema.nodes.workerParent) {
+            let childPosition = offset
+
+            childNode.forEach( (grandchildNode,childOffset,childIndex) => {
+                let grandchildPosition = childPosition + 1 + childOffset;
+                convertBlockType(targetNodeType,attrs,grandchildNode,grandchildPosition,transform,modifiedRefStep);
+            });
+
+            unwrapChildren(childNode,childPosition,transform,modifiedRefStep);
+        }
+    });
+
+}
+
+/** This function unwraps a list, so that the list can be flattened. This method also inserts a leading tab character 
+ * for each level the list is indented. */
+function recursiveListUnwrap(node,nodeRefStart,transform,refStep,listDepth,minListDepthToFlatten) {
+    //unwrap the children
+    let childListDepth = listDepth + 1;
+    node.forEach( (childNode,offset,index) => {
+        let refPosition = nodeRefStart + 1 + offset;
+        if(childNode.type.spec.group == "list") recursiveListUnwrap(childNode,refPosition,transform,refStep,childListDepth,minListDepthToFlatten);
+    });
+
+    //unwrap this list, including adding a tab for any indents
+    if(minListDepthToFlatten <= listDepth) {
+        //add a tab character at the start of each list entry
+        insertLeadingTabOnListItems(node,nodeRefStart,transform,refStep);
+
+        //lift the children
+        unwrapChildren(node,nodeRefStart,transform,refStep);
+    }
+}
+
+/** This lifts children of the given node out of that node. */
+function insertLeadingTabOnListItems(node,nodeStart,transform,refStep) {
+
+    //traverse the child nodes
+    node.forEach( (childNode,offset,index) => {
+        //get the updated mapping and text location
+        let mapping = transform.mapping.slice(refStep);
+        let childNodeBasePosition = nodeStart + 1 + offset;
+        let childNodePosition = mapping.map(childNodeBasePosition);
+        let textStart = childNodePosition + 1;
+        //insert tab
+        transform.insertText("\t",textStart,textStart);
+    });
+
+    return transform;
+}
+
+//--
+//to non-list block type commands
+//--
+
 /** This function converts a selection to a new list block type. */
 export function convertToListBlockType(nodeType, state, dispatch) {
 
@@ -201,7 +282,7 @@ export function convertToListBlockType(nodeType, state, dispatch) {
     transform = processWorkerContentsToListContents(transform,nodeType,schema);
 
     //------------------------------
-    // Convert worker parents to target list
+    // Convert worker parents to target list and add indent for leading tabs
     //------------------------------
     let refDoc = transform.doc;
     let refStep = transform.steps.length;
@@ -210,7 +291,13 @@ export function convertToListBlockType(nodeType, state, dispatch) {
     refDoc.forEach( (childNode,offset,index) => {
         if(childNode.type == schema.nodes.workerParent) {
             let childPosition = offset
+            
+            //convert worker to target list type
             convertBlockType(nodeType,attrs,childNode,childPosition,transform,refStep);
+
+            //add indent for top level list items with leading tabs
+            addIndentForTab(childNode,childPosition,transform,refStep,schema);
+
         }
     });
 
@@ -330,56 +417,51 @@ function processWorkerContentsToListContents(transform,nodeType,schema) {
     return transform;
 }
 
+//add indent for top level list items with leading tabs
+function addIndentForTab(listNode,baseListPosition,transform,refStep,schema) {
+    //traverse child nodes
+    //for top level list items, record the number of leading tabs
+    //store a "indent summary": indent count for each node, along with position of start
+    //insert list nodes based on changes in indent 
+    let mapping = transform.mapping.slice(refStep);
+    let listPosition = mapping.map(baseListPosition);
 
-/** This converts the list to a parent worker, and then traverses the child nodes -
- * It updates child list items to the proper target node type. It lifts content out of any child list
- */
-function convertListToNonList(targetNodeType,attrs,node,nodeRefStart,transform,refStep,schema) {
-    //convert outer type to worker parent
-    //traverse child
-    //- list item - change to target type
-    //- list - (1) recursively lift content (2) convet to target node type
+    //create indent info
+    let indentInfo = [];
+    listNode.forEach( (childNode,childOffset,index) => {
+        let indentEntry = {};
+        indentEntry.nodeStart = listPosition + 1 + childOffset;
+        indentInfo[index] = indentEntry;
 
-    //convert top level list to worker parent
-    convertBlockType(schema.nodes.workerParent,attrs,node,nodeRefStart,transform,refStep);
-
-    //flatten the lists inside
-    recursiveListUnwrap(node,nodeRefStart,transform,refStep,0,1);
-
-    //convert worker children to target link and remove worker 
-    //get the updated doc
-    let modifiedDoc = transform.doc;
-    let modifiedRefStep = transform.steps.length;
-
-    modifiedDoc.forEach( (childNode,offset,index) => {
-        if(childNode.type == schema.nodes.workerParent) {
-            let childPosition = offset
-
-            childNode.forEach( (grandchildNode,childOffset,childIndex) => {
-                let grandchildPosition = childPosition + 1 + childOffset;
-                convertBlockType(targetNodeType,attrs,grandchildNode,grandchildPosition,transform,modifiedRefStep);
-            });
-
-            unwrapChildren(childNode,childPosition,transform,modifiedRefStep);
+        if(childNode.type == schema.nodes.listItem) {
+            indentEntry.indent = countLeadingTabs(childNode);
+        }
+        else {
+            indentEntry.indent = 0;
         }
     });
 
+    console.log(JSON.stringify(indentInfo));
 }
 
-function recursiveListUnwrap(node,nodeRefStart,transform,refStep,listDepth,minListDepthToFlatten) {
-    //unwrap the children
-    let childListDepth = listDepth + 1;
-    node.forEach( (childNode,offset,index) => {
-        let refPosition = nodeRefStart + 1 + offset;
-        if(childNode.type.spec.group == "list") recursiveListUnwrap(childNode,refPosition,transform,refStep,childListDepth,minListDepthToFlatten);
-    });
+/** This function counts the nubmer of tabs in a text block node. */
+function countLeadingTabs(textblockNode) {
+    if(!textblockNode.isTextblock) throw new Error("Text block expected");
 
-    //unwrap this list
-    if(minListDepthToFlatten <= listDepth) {
-      unwrapChildren(node,nodeRefStart,transform,refStep);
+    let tabCount = 0;
+    for(let nodeIndex = 0; nodeIndex < textblockNode.content.content.length; nodeIndex++) {
+        let textNode = textblockNode.content.content[nodeIndex];
+        for(let charIndex = 0; charIndex < textNode.text.length; charIndex++) {
+            let textChar = textNode.text.charAt(charIndex);
+            if(textChar == "\t") tabCount++;
+            else return tabCount;
+        }
     }
-}
+    //we will get here if the list item has only tabs
+    return tabCount;
 
+}
+ 
 
 //==========================
 // Common utilities
