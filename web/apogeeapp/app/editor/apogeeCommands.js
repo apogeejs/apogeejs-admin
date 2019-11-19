@@ -190,8 +190,8 @@ function convertListToNonList(targetNodeType,attrs,node,nodeRefStart,transform,r
     //convert top level list to worker parent
     convertBlockType(schema.nodes.workerParent,attrs,node,nodeRefStart,transform,refStep);
 
-    //insert leading tabs on indented line
-    insertLeadingStringOnIndentedLines(node,"\t",nodeRefStart,transform,refStep,schema);
+    //insert leading tabs on indented line (no leading tab on lowest level of list = "")
+    insertLeadingStringOnIndentedLines(node,"",nodeRefStart,transform,refStep,schema);
     
     //flatten the lists inside
     recursiveListUnwrap(node,nodeRefStart,transform,refStep,0,1,schema);
@@ -207,7 +207,7 @@ function insertLeadingStringOnIndentedLines(node,linePrefix,nodeRefStart,transfo
     
     node.forEach( (childNode,offset,index) => {
         let childNodeRefStart = nodeRefStart + 1 + offset;
-        if(childNode.type == schema.nodes.listItem) {     
+        if((childNode.type == schema.nodes.listItem)&&(linePrefix.length > 0)) {     
             //get the updated mapping and text location
             let mapping = transform.mapping.slice(refStep);
             let childNodeStart = mapping.map(childNodeRefStart);
@@ -223,8 +223,7 @@ function insertLeadingStringOnIndentedLines(node,linePrefix,nodeRefStart,transfo
     return transform;
 }
 
-/** This function unwraps a list, so that the list can be flattened. This method also inserts a leading tab character 
- * for each level the list is indented. */
+/** This function unwraps a list, so that the list can be flattened. */
 function recursiveListUnwrap(node,nodeRefStart,transform,refStep,listDepth,minListDepthToFlatten,schema) {
     //unwrap the children
     let childListDepth = listDepth + 1;
@@ -447,10 +446,17 @@ function addIndentForTab(nodeType,attrs,listNode,baseListPosition,transform,refS
     //create a list with the tab indent level for each non-list block
     //---------------------
     let indentInfo = [];
+
+    //add a dummy entry at start with 0 indent
+    let initialIndentEntry = {};
+    initialIndentEntry.nodeStart = listPosition + 1;
+    initialIndentEntry.indent = 0;
+    indentInfo.push(initialIndentEntry);
+
     listNode.forEach( (childNode,childOffset,index) => {
         let indentEntry = {};
         indentEntry.nodeStart = listPosition + 1 + childOffset;
-        indentInfo[index] = indentEntry;
+        indentInfo.push(indentEntry);
 
         if(childNode.type == schema.nodes.listItem) {
             indentEntry.indent = countLeadingTabs(childNode);
@@ -462,7 +468,7 @@ function addIndentForTab(nodeType,attrs,listNode,baseListPosition,transform,refS
 
     //add a dummy entry at end with 0 indent
     let finalIndentEntry = {};
-    finalIndentEntry.nodeStart = listPosition + 1 + listNode.content.length;
+    finalIndentEntry.nodeStart = listPosition + 1 + listNode.content.size;
     finalIndentEntry.indent = 0;
     indentInfo.push(finalIndentEntry);
 
@@ -497,7 +503,21 @@ function addIndentForTab(nodeType,attrs,listNode,baseListPosition,transform,refS
     });
 
     //----------------------
-    // insert the list nodes
+    // delete leading tabs
+    //----------------------
+    indentInfo.forEach( indentEntry => {
+        if(indentEntry.indent > 0) {
+            let tabRefStart = indentEntry.nodeStart + 1; //start pos is the start of the list item
+            let tabRefEnd = tabRefStart + indentEntry.indent;
+            let mapping = transform.mapping.slice(refStep);
+            let tabStart = mapping.map(tabRefStart, 1);
+            let tabEnd = mapping.map(tabRefEnd, 1);
+            transform.delete(tabStart,tabEnd);
+        }
+    });
+
+    //----------------------
+    // insert the list nodes for indenting
     //----------------------
     console.log(JSON.stringify(listRanges));
 
@@ -530,6 +550,158 @@ function countLeadingTabs(textblockNode) {
     return tabCount;
 
 }
+
+export function indentSelection(state, dispatch) {
+    //this will be our transform
+    let transform = state.tr;
+    let schema = state.schema;
+
+    //set the baseline for the document and the reference step for position mapping 
+    let refDoc = transform.doc;
+    let refStep = transform.steps.length;
+
+    //this is our range to convert
+    let { $from, $to } = state.selection;
+
+    //get top level node
+    let startTopNode = $from.node(1);
+    let endTopNode = $to.node(1);
+    let mainStartPos = $from.start(1);
+
+    //require we are in a single list item
+    if((startTopNode.type.spec.group != "list")||(startTopNode != endTopNode)) return false;
+    let listNode = startTopNode;
+
+    //--------------------
+    //traverse descendants
+    //--------------------
+
+    //indent info
+    let nextIndex = 0;
+    let currentIndent = 0;
+    let indentInfo = [];
+
+    //list range info
+    let activeParentNode = [];
+    activeParentNode.push(listNode);
+    let activeListRangeInfo = [];
+    let listRangeInfo = [];
+    let initialRangeEntry = {node: listNode, startIndex: 0, startPos: mainStartPos};
+    activeListRangeInfo.push(initialRangeEntry);
+    listRangeInfo.push(initialRangeEntry);
+
+    //construction function
+    let constructIndentInfo = (node,offset,parent) => {
+        let pos = mainStartPos + 1 + offset;
+
+        //get the proper parent entry
+        let listRangeEntry;
+        while(true) {
+            listRangeEntry = activeListRangeInfo[activeListRangeInfo.length-1];
+            if(listRangeEntry.node != parent) {
+                listRangeEntry.endPos = pos;
+                listRangeEntry.endIndex = nextIndex - 1;
+                if(activeListRangeInfo.length > 0) {
+                    activeListRangeInfo.pop();
+                    currentIndent--;
+                }
+                else throw new Error("Unknown error indenting!");
+            }
+            else {
+                break;
+            }
+        } 
+
+        //record the indent, by line
+        if(node.type == schema.nodes.listItem) {
+            let indentEntry = {};
+            indentEntry.indent = currentIndent;
+            indentEntry.startPos = pos;
+            indentEntry.index = nextIndex++;
+            
+            //see if we are in the selection
+            if((pos + node.nodeSize >= $from.pos)&&(pos <= $to.pos)) {
+                indentEntry.delta = 1;
+            }
+
+            indentInfo.push(indentEntry);
+            return false;
+        }
+        else if(node.type.spec.group == "list") {
+            listRangeEntry = {node: node, startIndex: nextIndex, startPos: pos};
+            listRangeInfo.push(listRangeEntry);
+            activeListRangeInfo.push(listRangeEntry);
+            currentIndent++;
+            return true;
+        }
+    }
+
+    listNode.descendants(constructIndentInfo);
+
+    //finishe the list
+    let mainInsideEndPos = mainStartPos + listNode.nodeSize - 1;
+    let endIndex = nextIndex - 1;
+    while(activeListRangeInfo.length > 0) {
+        let listRangeEntry = activeListRangeInfo.pop();
+        listRangeEntry.endPos = mainInsideEndPos;
+        listRangeEntry.endIndex = endIndex;
+    }
+
+    //--------------------------
+    //testing
+    //--------------------------
+
+    let listRanges = [];
+    let activeListRanges = [];
+    let previousIndentEntry;
+    indentInfo.forEach( currentIndentEntry => {
+        if(previousIndentEntry) {
+            if(currentIndentEntry.indent > previousIndentEntry.indent) {
+                //add a list, or multiple (indent)
+                for(let indent = previousIndentEntry.indent + 1; indent <= currentIndentEntry.indent; indent++) {
+                    let listRangeEntry = {}
+                    listRangeEntry.startPos = currentIndentEntry.startPos;
+                    listRangeEntry.startIndex = currentIndentEntry.index;
+                    listRangeEntry.indent = indent;
+                    listRanges.push(listRangeEntry);
+                    activeListRanges.push(listRangeEntry);
+                }
+            }
+            else if(currentIndentEntry.indent < previousIndentEntry.indent) {
+                //remove a list,or multiple (unindent)
+                for(let indent = previousIndentEntry.indent - 1; indent >= currentIndentEntry.indent; indent--) {
+                    if(activeListRanges.length === 0) throw new Error("Unknown error constructing indented lists");
+                    let closeRangeEntry = activeListRanges.pop();
+                    closeRangeEntry.endPos = currentIndentEntry.startPos;
+                    closeRangeEntry.endIndex = currentIndentEntry.index - 1;
+                }
+            }
+        }
+        previousIndentEntry = currentIndentEntry;
+    });
+
+    //finish up
+    while(activeListRanges.length > 0) {
+        let rangeEntry = activeListRanges.pop();
+        rangeEntry.endPos = mainInsideEndPos;
+        rangeEntry.endIndex = endIndex;
+    }
+
+    console.log("Indent info: " + JSON.stringify(indentInfo))
+    let modListRangeInfo = listRangeInfo.map( entry => {
+        return {startIndex:entry.startIndex, startPos:entry.startPos, endIndex:entry.endIndex, endPos:entry.endPos};
+    });
+    console.log("List Range info: " + JSON.stringify(modListRangeInfo))
+    console.log("Measured List Range: " + JSON.stringify(listRanges))
+
+    //The two ranges differ because the start is on the list versus the item?
+    //That doesn't matter for now. We will compare based on start and end index values.
+
+}
+
+export function unindentSelection(state, dispatch) {
+
+}
  
 
 //==========================
@@ -553,7 +725,7 @@ function convertBlockType(targetNodeType,attrs,node,nodeRefStart,transform,refSt
     let end = mapping.map(nodeRefStart + node.nodeSize, 1);
     return transform.step(new ReplaceAroundStep(start, end, start + 1, end - 1,
             new Slice(Fragment.from(targetNodeType.create(attrs, null, node.marks)), 0, 0), 1, true))
-  }
+}
 
 /** This lifts children of the given node out of that node. */
 function unwrapChildren(node,nodeRefStart,transform,refStep) {

@@ -27,7 +27,7 @@ import ApogeeComponentView from "/apogeeapp/app/editor/ApogeeComponentView.js";
 import { undo, redo }  from "/apogeeapp/app/editor/apogeeHistory.js";
 
 
-import {convertToNonListBlockType, convertToListBlockType } from "/apogeeapp/app/editor/apogeeCommands.js";
+import {convertToNonListBlockType, convertToListBlockType, indentSelection, unindentSelection } from "/apogeeapp/app/editor/apogeeCommands.js";
 
 export function createProseMirrorManager (folderComponent) {
 
@@ -46,6 +46,8 @@ export function createProseMirrorManager (folderComponent) {
   let convertToH4Command = (state,dispatch) => convertToNonListBlockType(schema.nodes.heading4, state, dispatch);
   let convertToBulletCommand = (state,dispatch) => convertToListBlockType(schema.nodes.bulletList, state, dispatch);
   let convertToNumberedCommand = (state,dispatch) => convertToListBlockType(schema.nodes.numberedList, state, dispatch);
+  let indentCommand = (state,dispatch) => indentSelection(state, dispatch);
+  let unindentCommand = (state,dispatch) => unindentSelection(state, dispatch);
 
 
   let toolbarItems = [
@@ -56,8 +58,8 @@ export function createProseMirrorManager (folderComponent) {
     new ActionButton(convertToH4Command,null,"H4","atb_h4_style","temp"),
     new ActionButton(convertToBulletCommand,null,"Bullet","atb_ul_style","temp"),
     new ActionButton(convertToNumberedCommand,null,"Numbered","atb_ol_style","temp"),
-    //new ActionButton(indentCommand, indentActiveFunction, "L+", "atb_lindent_style", "Indent List"),
-    //new ActionButton(unindentCommand, unindentActiveFunction, "L-", "atb_lunindent_style", "Unindent List"),
+    new ActionButton(indentCommand, /*indentActiveFunction*/null, "L+", "atb_lindent_style", "Indent List"),
+    new ActionButton(unindentCommand, /*unindentActiveFunction*/null, "L-", "atb_lunindent_style", "Unindent List"),
     new MarkToggleItem(schema.marks.bold, null, "B", "atb_bold_style", "Bold"),
     new MarkToggleItem(schema.marks.italic, null, "I", "atb_italic_style", "Italic"),
     new MarkDropdownItem(schema.marks.fontfamily, "fontfamily", [["Sans-serif",false], ["Serif","Serif"], ["Monospace","Monospace"]]),
