@@ -190,64 +190,80 @@ function convertListToNonList(targetNodeType,attrs,node,nodeRefStart,transform,r
     //convert top level list to worker parent
     convertBlockType(schema.nodes.workerParent,attrs,node,nodeRefStart,transform,refStep);
 
+    //insert leading tabs on indented line
+    insertLeadingStringOnIndentedLines(node,"\t",nodeRefStart,transform,refStep,schema);
+    
     //flatten the lists inside
-    recursiveListUnwrap(node,nodeRefStart,transform,refStep,0,1);
+    recursiveListUnwrap(node,nodeRefStart,transform,refStep,0,1,schema);
 
     //convert worker children to target link and remove worker 
-    //get the updated doc
-    let modifiedDoc = transform.doc;
-    let modifiedRefStep = transform.steps.length;
+    convertBlocksToProperTypes(targetNodeType,attrs,transform,schema);
 
-    modifiedDoc.forEach( (childNode,offset,index) => {
+}
+
+/** This lifts children of the given node out of that node. */
+function insertLeadingStringOnIndentedLines(node,linePrefix,nodeRefStart,transform,refStep,schema) {
+    //traverse the child nodes
+    
+    node.forEach( (childNode,offset,index) => {
+        let childNodeRefStart = nodeRefStart + 1 + offset;
+        if(childNode.type == schema.nodes.listItem) {     
+            //get the updated mapping and text location
+            let mapping = transform.mapping.slice(refStep);
+            let childNodeStart = mapping.map(childNodeRefStart);
+            let textStart = childNodeStart + 1;
+            transform.insertText(linePrefix,textStart,textStart);
+        }
+        else if(childNode.type.spec.group == "list") {
+            //recursive call to insert tabs
+            insertLeadingStringOnIndentedLines(childNode,linePrefix + "\t",childNodeRefStart,transform,refStep,schema);
+        }
+    });
+
+    return transform;
+}
+
+/** This function unwraps a list, so that the list can be flattened. This method also inserts a leading tab character 
+ * for each level the list is indented. */
+function recursiveListUnwrap(node,nodeRefStart,transform,refStep,listDepth,minListDepthToFlatten,schema) {
+    //unwrap the children
+    let childListDepth = listDepth + 1;
+    node.forEach( (childNode,offset,index) => {
+        let refPosition = nodeRefStart + 1 + offset;
+        if(childNode.type.spec.group == "list") {
+            recursiveListUnwrap(childNode,refPosition,transform,refStep,childListDepth,minListDepthToFlatten,schema);
+        }
+    });
+
+    //unwrap this list, including adding a tab for any indents
+    if(minListDepthToFlatten <= listDepth) {
+        unwrapChildren(node,nodeRefStart,transform,refStep);
+    }
+}
+
+/** This function is used in converting to a non-list block type. That start point should be 
+ * a worker parent node with text blocks inside - either list items or non-list text blocks.
+ * The doc should _only_ contain worker parents in this format. All will be converted. 
+ * This converts the inside blocks to the target node format and unwraps the contents from the 
+ * worker parent node. */
+function convertBlocksToProperTypes(targetNodeType,attrs,transform,schema) {
+    //convert worker children to target link and remove worker 
+    //get the updated doc
+    let doc = transform.doc;
+    let refStep = transform.steps.length;
+
+    doc.forEach( (childNode,offset,index) => {
         if(childNode.type == schema.nodes.workerParent) {
             let childPosition = offset
 
             childNode.forEach( (grandchildNode,childOffset,childIndex) => {
                 let grandchildPosition = childPosition + 1 + childOffset;
-                convertBlockType(targetNodeType,attrs,grandchildNode,grandchildPosition,transform,modifiedRefStep);
+                convertBlockType(targetNodeType,attrs,grandchildNode,grandchildPosition,transform,refStep);
             });
 
-            unwrapChildren(childNode,childPosition,transform,modifiedRefStep);
+            unwrapChildren(childNode,childPosition,transform,refStep);
         }
     });
-
-}
-
-/** This function unwraps a list, so that the list can be flattened. This method also inserts a leading tab character 
- * for each level the list is indented. */
-function recursiveListUnwrap(node,nodeRefStart,transform,refStep,listDepth,minListDepthToFlatten) {
-    //unwrap the children
-    let childListDepth = listDepth + 1;
-    node.forEach( (childNode,offset,index) => {
-        let refPosition = nodeRefStart + 1 + offset;
-        if(childNode.type.spec.group == "list") recursiveListUnwrap(childNode,refPosition,transform,refStep,childListDepth,minListDepthToFlatten);
-    });
-
-    //unwrap this list, including adding a tab for any indents
-    if(minListDepthToFlatten <= listDepth) {
-        //add a tab character at the start of each list entry
-        insertLeadingTabOnListItems(node,nodeRefStart,transform,refStep);
-
-        //lift the children
-        unwrapChildren(node,nodeRefStart,transform,refStep);
-    }
-}
-
-/** This lifts children of the given node out of that node. */
-function insertLeadingTabOnListItems(node,nodeStart,transform,refStep) {
-
-    //traverse the child nodes
-    node.forEach( (childNode,offset,index) => {
-        //get the updated mapping and text location
-        let mapping = transform.mapping.slice(refStep);
-        let childNodeBasePosition = nodeStart + 1 + offset;
-        let childNodePosition = mapping.map(childNodeBasePosition);
-        let textStart = childNodePosition + 1;
-        //insert tab
-        transform.insertText("\t",textStart,textStart);
-    });
-
-    return transform;
 }
 
 //--
@@ -296,7 +312,7 @@ export function convertToListBlockType(nodeType, state, dispatch) {
             convertBlockType(nodeType,attrs,childNode,childPosition,transform,refStep);
 
             //add indent for top level list items with leading tabs
-            addIndentForTab(childNode,childPosition,transform,refStep,schema);
+            addIndentForTab(nodeType,attrs,childNode,childPosition,transform,refStep,schema);
 
         }
     });
@@ -373,7 +389,7 @@ function wrapSelectionInWorkerParent(transform,selection,schema) {
 function wrapInWorker(startBasePosition,endBasePosition,transform,schema,refStep) {
     let mapping = transform.mapping.slice(refStep);
     let startPosition = mapping.map(startBasePosition, 1);
-    let endPosition = mapping.map(endBasePosition, 1);
+    let endPosition = mapping.map(endBasePosition, -1);
     let $workerFrom = transform.doc.resolve(startPosition);
     let $workerTo = transform.doc.resolve(endPosition);
     let futureListParentDepth = 0;
@@ -418,7 +434,8 @@ function processWorkerContentsToListContents(transform,nodeType,schema) {
 }
 
 //add indent for top level list items with leading tabs
-function addIndentForTab(listNode,baseListPosition,transform,refStep,schema) {
+function addIndentForTab(nodeType,attrs,listNode,baseListPosition,transform,refStep,schema) {
+
     //traverse child nodes
     //for top level list items, record the number of leading tabs
     //store a "indent summary": indent count for each node, along with position of start
@@ -426,7 +443,9 @@ function addIndentForTab(listNode,baseListPosition,transform,refStep,schema) {
     let mapping = transform.mapping.slice(refStep);
     let listPosition = mapping.map(baseListPosition);
 
-    //create indent info
+    //--------------------
+    //create a list with the tab indent level for each non-list block
+    //---------------------
     let indentInfo = [];
     listNode.forEach( (childNode,childOffset,index) => {
         let indentEntry = {};
@@ -441,7 +460,57 @@ function addIndentForTab(listNode,baseListPosition,transform,refStep,schema) {
         }
     });
 
-    console.log(JSON.stringify(indentInfo));
+    //add a dummy entry at end with 0 indent
+    let finalIndentEntry = {};
+    finalIndentEntry.nodeStart = listPosition + 1 + listNode.content.length;
+    finalIndentEntry.indent = 0;
+    indentInfo.push(finalIndentEntry);
+
+    //----------------------
+    //create a list of ranges where we should have list nodes
+    //----------------------
+    let listRanges = [];
+    let activeListRanges = [];
+    let previousIndentEntry;
+    indentInfo.forEach( currentIndentEntry => {
+        if(previousIndentEntry) {
+            if(currentIndentEntry.indent > previousIndentEntry.indent) {
+                //add a list, or multiple (indent)
+                for(let indent = previousIndentEntry.indent + 1; indent <= currentIndentEntry.indent; indent++) {
+                    let listRangeEntry = {}
+                    listRangeEntry.startPos = currentIndentEntry.nodeStart;
+                    listRangeEntry.indent = indent;
+                    listRanges.push(listRangeEntry);
+                    activeListRanges.push(listRangeEntry);
+                }
+            }
+            else if(currentIndentEntry.indent < previousIndentEntry.indent) {
+                //remove a list,or multiple (unindent)
+                for(let indent = previousIndentEntry.indent - 1; indent >= currentIndentEntry.indent; indent--) {
+                    if(activeListRanges.length === 0) throw new Error("Unknown error constructing indented lists");
+                    let closeRangeEntry = activeListRanges.pop();
+                    closeRangeEntry.endPos = currentIndentEntry.nodeStart;
+                }
+            }
+        }
+        previousIndentEntry = currentIndentEntry;
+    });
+
+    //----------------------
+    // insert the list nodes
+    //----------------------
+    console.log(JSON.stringify(listRanges));
+
+    listRanges.forEach( listRangeEntry => {
+        let mapping = transform.mapping.slice(refStep);
+        let startPosition = mapping.map(listRangeEntry.startPos, 1);
+        let endPosition = mapping.map(listRangeEntry.endPos, -1);
+        let $listFrom = transform.doc.resolve(startPosition);
+        let $listTo = transform.doc.resolve(endPosition);
+        let listParentDepth = listRangeEntry.indent;
+        wrapSelectionInNode($listFrom, $listTo, listParentDepth,nodeType, transform);
+    });
+    
 }
 
 /** This function counts the nubmer of tabs in a text block node. */
