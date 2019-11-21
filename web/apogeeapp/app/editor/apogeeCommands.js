@@ -105,7 +105,7 @@ export function convertToNonListBlockType(nodeType, state, dispatch) {
     //------------------------------
     //if there are start and end lists, split them from the selection to update
     //------------------------------
-    transform = splitStartAndEndLists(transform,selection);
+    transform = splitStartAndEndLists(transform,selection,schema);
 
     //---------------------------
     // -traverse the top level nodes (the ones in the doc) and process each
@@ -282,7 +282,7 @@ export function convertToListBlockType(nodeType, state, dispatch) {
     //------------------------------
     //if there are start and end lists, split them from the selection to update
     //------------------------------
-    transform = splitStartAndEndLists(transform,state.selection);
+    transform = splitStartAndEndLists(transform,state.selection,schema);
 
     //-------------------------------
     // Wrap continueous ranges of non-apogee component nodes in a worker parent, which will be our end list(s). 
@@ -362,7 +362,9 @@ function wrapSelectionInWorkerParent(transform,selection,schema) {
                 if(inFutureList) {
                     inFutureList = false;
                     endPosition = offset;
-                    wrapInWorker(startPosition,endPosition,transform,schema,refStep);
+                    //wrap in a worker parent
+                    insertDepth = 0;
+                    wrapSelectionInNode(startPosition,endPosition,insertDepth,schema.nodes.workerParent,transform,refStep);
                 }
             }
             else {
@@ -377,23 +379,22 @@ function wrapSelectionInWorkerParent(transform,selection,schema) {
 
     //create the final list/worker segment
     if(inFutureList) {
-        endPosition = $to.pos;
-        wrapInWorker(startPosition,endPosition,transform,schema,refStep);
+        wrapSelectionInNode(startPosition,endPosition,insertDepth,schema.nodes.workerParent,transform,refStep);
     }
 
     return transform;
 }
 
-/** This method wraps the given range, relative the old tranform state as given by refStep, in a worker parent node. */
-function wrapInWorker(startBasePosition,endBasePosition,transform,schema,refStep) {
-    let mapping = transform.mapping.slice(refStep);
-    let startPosition = mapping.map(startBasePosition, 1);
-    let endPosition = mapping.map(endBasePosition, -1);
-    let $workerFrom = transform.doc.resolve(startPosition);
-    let $workerTo = transform.doc.resolve(endPosition);
-    let futureListParentDepth = 0;
-    wrapSelectionInNode($workerFrom, $workerTo, futureListParentDepth, schema.nodes.workerParent, transform);
-}
+// /** This method wraps the given range, relative the old tranform state as given by refStep, in a worker parent node. */
+// function wrapInWorker(startBasePosition,endBasePosition,transform,schema,refStep) {
+//     let mapping = transform.mapping.slice(refStep);
+//     let startPosition = mapping.map(startBasePosition, 1);
+//     let endPosition = mapping.map(endBasePosition, -1);
+//     let $workerFrom = transform.doc.resolve(startPosition);
+//     let $workerTo = transform.doc.resolve(endPosition);
+//     let futureListParentDepth = 0;
+//     wrapSelectionInNode($workerFrom, $workerTo, futureListParentDepth, schema.nodes.workerParent, transform, refStep);
+// }
 
 /** This method updates the top level nodes to match the desired list type. */
 function processWorkerContentsToListContents(transform,nodeType,schema) {
@@ -522,13 +523,8 @@ function addIndentForTab(nodeType,attrs,listNode,baseListPosition,transform,refS
     console.log(JSON.stringify(listRanges));
 
     listRanges.forEach( listRangeEntry => {
-        let mapping = transform.mapping.slice(refStep);
-        let startPosition = mapping.map(listRangeEntry.startPos, 1);
-        let endPosition = mapping.map(listRangeEntry.endPos, -1);
-        let $listFrom = transform.doc.resolve(startPosition);
-        let $listTo = transform.doc.resolve(endPosition);
         let listParentDepth = listRangeEntry.indent;
-        wrapSelectionInNode($listFrom, $listTo, listParentDepth,nodeType, transform);
+        wrapSelectionInNode(listRangeEntry.startPos, listRangeEntry.endPos, listParentDepth,nodeType, transform, refStep);
     });
     
 }
@@ -552,6 +548,14 @@ function countLeadingTabs(textblockNode) {
 }
 
 export function indentSelection(state, dispatch) {
+    return doIndentChange(1, state, dispatch);
+}
+
+export function unindentSelection(state, dispatch) {
+    return doIndentChange(-1, state, dispatch);
+}
+
+function doIndentChange(indentDelta, state, dispatch) {
     //this will be our transform
     let transform = state.tr;
     let schema = state.schema;
@@ -566,7 +570,8 @@ export function indentSelection(state, dispatch) {
     //get top level node
     let startTopNode = $from.node(1);
     let endTopNode = $to.node(1);
-    let mainStartPos = $from.start(1);
+    let mainInsidePos = $from.start(1);
+    let mainOutsidePos = mainInsidePos - 1;
 
     //require we are in a single list item
     if((startTopNode.type.spec.group != "list")||(startTopNode != endTopNode)) return false;
@@ -586,20 +591,20 @@ export function indentSelection(state, dispatch) {
     activeParentNode.push(listNode);
     let activeListRangeInfo = [];
     let listRangeInfo = [];
-    let initialRangeEntry = {node: listNode, startIndex: 0, startPos: mainStartPos};
+//EDIT - start pos had a -1. Should not have
+    let initialRangeEntry = {node: listNode, startIndex: 0, startPos: mainOutsidePos, endPos: mainOutsidePos + listNode.nodeSize};
     activeListRangeInfo.push(initialRangeEntry);
     listRangeInfo.push(initialRangeEntry);
 
     //construction function
     let constructIndentInfo = (node,offset,parent) => {
-        let pos = mainStartPos + 1 + offset;
+        let outsideNodeStart = mainInsidePos + offset;
 
         //get the proper parent entry
         let listRangeEntry;
         while(true) {
             listRangeEntry = activeListRangeInfo[activeListRangeInfo.length-1];
             if(listRangeEntry.node != parent) {
-                listRangeEntry.endPos = pos;
                 listRangeEntry.endIndex = nextIndex - 1;
                 if(activeListRangeInfo.length > 0) {
                     activeListRangeInfo.pop();
@@ -616,19 +621,25 @@ export function indentSelection(state, dispatch) {
         if(node.type == schema.nodes.listItem) {
             let indentEntry = {};
             indentEntry.indent = currentIndent;
-            indentEntry.startPos = pos;
+            indentEntry.startPos = outsideNodeStart;
+            indentEntry.endPos = outsideNodeStart + node.nodeSize;
             indentEntry.index = nextIndex++;
             
-            //see if we are in the selection
-            if((pos + node.nodeSize >= $from.pos)&&(pos <= $to.pos)) {
-                indentEntry.delta = 1;
+            //see if we are in the selection - we start befroe the end of the node inside
+            //and end after the start of the node inside
+            if(($from.pos <= outsideNodeStart + 1 + node.nodeSize)&&($to.pos >= outsideNodeStart + 1)) {
+                let maybeNewIndent = indentEntry.indent + indentDelta;
+                //don't unindent from indent = 0
+                if(maybeNewIndent >= 0) {
+                    indentEntry.indent = maybeNewIndent;
+                }
             }
 
             indentInfo.push(indentEntry);
             return false;
         }
         else if(node.type.spec.group == "list") {
-            listRangeEntry = {node: node, startIndex: nextIndex, startPos: pos};
+            listRangeEntry = {node: node, startIndex: nextIndex, startPos: outsideNodeStart, endPos: outsideNodeStart + node.nodeSize};
             listRangeInfo.push(listRangeEntry);
             activeListRangeInfo.push(listRangeEntry);
             currentIndent++;
@@ -639,12 +650,9 @@ export function indentSelection(state, dispatch) {
     listNode.descendants(constructIndentInfo);
 
     //finishe the list
-    let mainInsideEndPos = mainStartPos + listNode.nodeSize - 1;
-    let endIndex = nextIndex - 1;
     while(activeListRangeInfo.length > 0) {
         let listRangeEntry = activeListRangeInfo.pop();
-        listRangeEntry.endPos = mainInsideEndPos;
-        listRangeEntry.endIndex = endIndex;
+        listRangeEntry.endIndex = nextIndex - 1;
     }
 
     //--------------------------
@@ -672,8 +680,8 @@ export function indentSelection(state, dispatch) {
                 for(let indent = previousIndentEntry.indent - 1; indent >= currentIndentEntry.indent; indent--) {
                     if(activeListRanges.length === 0) throw new Error("Unknown error constructing indented lists");
                     let closeRangeEntry = activeListRanges.pop();
-                    closeRangeEntry.endPos = currentIndentEntry.startPos;
-                    closeRangeEntry.endIndex = currentIndentEntry.index - 1;
+                    closeRangeEntry.endPos = previousIndentEntry.endPos;
+                    closeRangeEntry.endIndex = previousIndentEntry.index;
                 }
             }
         }
@@ -683,8 +691,8 @@ export function indentSelection(state, dispatch) {
     //finish up
     while(activeListRanges.length > 0) {
         let rangeEntry = activeListRanges.pop();
-        rangeEntry.endPos = mainInsideEndPos;
-        rangeEntry.endIndex = endIndex;
+        rangeEntry.endPos = previousIndentEntry.endPos;
+        rangeEntry.endIndex = previousIndentEntry.index;
     }
 
     console.log("Indent info: " + JSON.stringify(indentInfo))
@@ -694,14 +702,55 @@ export function indentSelection(state, dispatch) {
     console.log("List Range info: " + JSON.stringify(modListRangeInfo))
     console.log("Measured List Range: " + JSON.stringify(listRanges))
 
-    //The two ranges differ because the start is on the list versus the item?
-    //That doesn't matter for now. We will compare based on start and end index values.
+    let listMap = {};
+    let addToMap = (listRangeEntry,status) => {
+        //ignore the outside list entry
+
+        if(listRangeEntry.startIndex === 0) return;
+
+        let key = listRangeEntry.startIndex + "-" + listRangeEntry.endIndex;
+        let entry = listMap[key];
+        if(!entry) {
+            entry = {};
+            listMap[key] = entry;
+        }
+        entry[status] = listRangeEntry;
+    }
+    //usemod so we can print the entry for debug
+    listRangeInfo.forEach( listRangeEntry => addToMap(listRangeEntry,"present") );
+    listRanges.forEach( listRangeEntry => addToMap(listRangeEntry,"needed") );
+
+    for(let key in listMap) {
+        let entry = listMap[key];
+
+        if((entry.present)&&(!entry.needed)) {
+            //remove the wrapping list element
+            let listRangeEntry = entry.present;
+            unwrapChildren(listRangeEntry.node,listRangeEntry.startPos,transform,refStep)
+        }
+        else if((!entry.present)&&(entry.needed)) {
+            //add a wrapping list element
+            let listRangeEntry = entry.needed;
+            wrapSelectionInNode(listRangeEntry.startPos, listRangeEntry.endPos, listRangeEntry.indent, listNode.type, transform, refStep)
+        }
+    }
+    
+    //------------------------------
+    // execute the transform
+    //------------------------------
+
+    if ((dispatch) && (transform.docChanged)) {
+        dispatch(transform);
+    }
+
+    return true;
+    
+    
+
 
 }
 
-export function unindentSelection(state, dispatch) {
 
-}
  
 
 //==========================
@@ -709,11 +758,11 @@ export function unindentSelection(state, dispatch) {
 //==========================
 
 /** Split any lists so there is not a list that spans outside the current selection */
-function splitStartAndEndLists(transform,selection) {
+function splitStartAndEndLists(transform,selection,schema) {
     //this is our range to convert
     let { $from, $to } = selection;
-    transform = splitSpannedListAfterPos($to, transform);
-    transform = splitSpannedListBeforePos($from, transform);
+    transform = splitSpannedListAfterPos($to, transform, schema);
+    transform = splitSpannedListBeforePos($from, transform, schema);
     return transform;
 }
 
@@ -741,7 +790,8 @@ function unwrapChildren(node,nodeRefStart,transform,refStep) {
 }
 
 /** This function cuts the document so there is not a list spanned before the text block at the given position. */
-function splitSpannedListAfterPos($pos, transform) {
+function splitSpannedListAfterPos($pos, transform, schema) {
+
     let modPath = pathToModPath($pos.path);
 
     //traverse backwards to look for the deepest entry that cuts a list (last element is doc, we can ignore it)
@@ -762,7 +812,7 @@ function splitSpannedListAfterPos($pos, transform) {
 }
 
 /** This function cuts the document so there is not a list spanned after the text block at the given position. */
-function splitSpannedListBeforePos($pos, transform) {
+function splitSpannedListBeforePos($pos, transform, schema) {
     let modPath = pathToModPath($pos.path);
 
     //traverse backwards to look for the deepest entry that cuts list (last element is doc, we can ignore it)
@@ -797,13 +847,29 @@ function pathToModPath(path) {
 }
 
 //depth is set to 0
-function wrapSelectionInNode($from, $to, parentDepth, nodeType, transform) {
+function wrapSelectionInNode(baseFrom, baseTo, parentDepth, nodeType, transform, refStep) {
+    let mapping = transform.mapping.slice(refStep);
+    let from = mapping.map(baseFrom, 1);
+    let to = mapping.map(baseTo, -1);
+    let $from = transform.doc.resolve(from);
+    let $to = transform.doc.resolve(to);
     let range = new NodeRange($from, $to, parentDepth);
     let wrapping = range && findWrapping(range, nodeType);
     if (!wrapping) throw new Error("Wrapping not found!"); //need to work out error handling
     //return the updated transform
     return transform.wrap(range, wrapping);
 }
+
+
+
+// //depth is set to 0
+// function wrapSelectionInNode($from, $to, parentDepth, nodeType, transform) {
+//     let range = new NodeRange($from, $to, parentDepth);
+//     let wrapping = range && findWrapping(range, nodeType);
+//     if (!wrapping) throw new Error("Wrapping not found!"); //need to work out error handling
+//     //return the updated transform
+//     return transform.wrap(range, wrapping);
+// }
 
 //========================================
  // Keymap
