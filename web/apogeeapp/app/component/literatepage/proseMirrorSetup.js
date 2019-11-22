@@ -6,7 +6,6 @@ import { createFolderSchema } from "/apogeeapp/app/editor/apogeeSchema.js";
 
 
 import ApogeeToolbar from "/apogeeapp/app/editor/toolbar/ApogeeToolbar.js";
-//import BlockRadioItem from "/apogeeapp/app/editor/toolbar/BlockRadioItem.js";
 import MarkToggleItem from "/apogeeapp/app/editor/toolbar/MarkToggleItem.js";
 import MarkDropdownItem from "/apogeeapp/app/editor/toolbar/MarkDropdownItem.js";
 import ActionButton from "/apogeeapp/app/editor/toolbar/ActionButton.js";

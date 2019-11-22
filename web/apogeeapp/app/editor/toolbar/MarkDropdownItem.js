@@ -1,5 +1,13 @@
-import {setMark,clearMark} from "./menuUtils.js";
+import {setMark,clearMark} from "/apogeeapp/app/editor/apogeeCommands.js";
 
+/** This is a toolbar element for marks which have a single attribute key and multple attribute values. Arguments:
+ * - markType - this is the schema mark type object.
+ * - attrName - this is the name or the single attribute for the marks. 
+ * - attrValueList - This is a list of values for the attribute. Each value should have a two element array, the first 
+ * being the display label and the second beint the internal value represented.
+ * - defaultValue - This is the value for the list which corresponds to no mark present. For example in the font
+ * case, this should be the font that is showing when no mark is present.
+ */
 //This is a menu element for a mark with multiple attribute values, for a single attribute name
 //the default value should be the selection option for no mark present.
 export default class MarkDropdownItem {

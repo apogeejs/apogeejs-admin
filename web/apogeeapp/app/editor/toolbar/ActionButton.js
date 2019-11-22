@@ -1,4 +1,16 @@
-//This is a radio-type item that will highlight when the associated state is active.
+/** This is a toolbar item button. Arguments:
+ * - commandFunction - this is the action taken when the button is pressed when enabled.
+ * - isHighlightedFunction - This function is called with selectionInfo on selection change to determine if the 
+ * button should be in the highlighted state. This does not change the action. If the function is not provided
+ * the button is never highlighted.
+ * - isEnabled - This function is called with the selectionInfo on selection change to determine if the
+ * button shoudl be enabled. The button only acts when enabled. If this function is not provided, the button is
+ * always enabled.
+ * - labelText - This is the text that appears on the label. 
+ * - textStyleClass - This is the CSS class name for the text. Note that the background and text color are controlled
+ * by the button to show enabled,disabled and highlighted.
+ * - toolTip - This is the tooltip text for the button.
+ */
 export default class ActionButton {
     constructor(commandFunction, isHighlightedFunction, isEnabledFunction, labelText, textStyleClass, tooltip) {
         this.commandFunction = commandFunction;

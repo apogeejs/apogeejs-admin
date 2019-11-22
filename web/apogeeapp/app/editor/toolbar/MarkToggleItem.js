@@ -1,6 +1,14 @@
-import {setMark,clearMark} from "./menuUtils.js";
+import {setMark,clearMark} from "/apogeeapp/app/editor/apogeeCommands.js";
 
-//This is a toggle button for marks with either no attribute or fixed attributes
+/** This is a toolbar button for marks. It is inteded for marks with either no attrbiutes or with 
+ * fixed attributes. Arguments:
+ * - markType - this is the schema mark type object.
+ * - attr - these are the attributes for the marks. It should be fixed of empty.
+ * - labelText - This is the text that appears on the label. 
+ * - textStyleClass - This is the CSS class name for the text. Note that the background and text color are controlled
+ * by the button to show enabled,disabled and highlighted.
+ * - toolTip - This is the tooltip text for the button.
+ */
 export default class MarkToggleItem {
     constructor(markType, attr, labelText, styleClass, tooltip) {
         this.markType = markType;
