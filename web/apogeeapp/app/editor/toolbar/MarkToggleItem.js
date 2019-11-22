@@ -8,6 +8,8 @@ export default class MarkToggleItem {
         this.labelText = labelText;
         this.styleClass = styleClass;
 
+        this.selectionGenerator = createSelectionGenerator(markType);
+
         this.element = document.createElement("span");
         this.element.title = tooltip;
         this.element.textContent = labelText;
@@ -33,47 +35,17 @@ export default class MarkToggleItem {
         return this.element;
     }
 
-    /** This gets the selection info and sets whether the toggle should be on or off. */
+    getMarkSelectionGenerator() {
+        return this.selectionGenerator;
+    }
+
+    /** This gets the selection info and sets whether the toggle should be on or off. 
+     * Mark is considered "on" if it is present on all text nodes in the selection.
+    */
     update(selectionInfo) {
-
-        // let markValues = selectionInfo.marks[this.markType.name];
-
-        // switch (markValues.length) {
-        //     case 0:
-        //         //no marks
-        //         //we should make ti so this doesn't happen!!!
-        //         this._setElementIsSelected(false);
-        //         break;
-
-        //     case 1:
-        //         if (markValues[0] === false) {
-        //             //mark is off
-        //             this._setElementIsSelected(false);
-        //         }
-        //         else {
-        //             //mark is on
-        //             this._setElementIsSelected(true);
-        //         }
-        //         break;
-
-        //     default:
-        //         let hasFalse = false;
-        //         let hasMultivalue = false;
-        //         let singleValue = undefined;
-        //         markValues.forEach(value => {
-        //             if (value == false) hasFalse = true;
-        //             else if (singleValue !== undefined) singleValue = value;
-        //             else hasMultivalue = true;
-        //         });
-
-        //         //set state
-        //         if ((hasMultivalue) || (hasFalse)) {
-        //             this._setElementIsSelected(false);
-        //         }
-        //         else {
-        //             this._setElementIsSelected(true);
-        //         }
-        // }
+        let markInfo = selectionInfo.marks[this.markType.name];
+        let isSelected = (markInfo)&&(markInfo.present === true)&&(markInfo.missing === false);
+        this._setElementIsSelected(isSelected);
     }
 
     //=========================
@@ -93,4 +65,27 @@ export default class MarkToggleItem {
         }
     }
 
+}
+
+function createSelectionGenerator(markType) {
+    let selectionGenerator = {};
+    selectionGenerator.name = markType.name;
+    selectionGenerator.getEmptyInfo = () => { return { last: -1, missing: false}; }
+    selectionGenerator.updateInfo = (mark,markInfoEntry,textNodeNumber) => {
+        //record if there are any text nodes with this mark missing
+        if(textNodeNumber - markInfoEntry.last > 1) {
+            markInfoEntry.missing = true;
+        }
+        markInfoEntry.last = textNodeNumber;
+
+        //record that this mark is present
+        markInfoEntry.present = true;
+    }
+    selectionGenerator.onComplete = (markInfoEntry,nodeCount) => {
+        if(nodeCount - markInfoEntry.last > 1) {
+            markInfoEntry.missing = true;
+        }
+    }
+
+    return selectionGenerator;
 }

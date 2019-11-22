@@ -1,11 +1,14 @@
 import {setMark,clearMark} from "./menuUtils.js";
 
-//This is a menu element for a mark with multiple attribute values
-//use "false" as the input values to shoe no mark
+//This is a menu element for a mark with multiple attribute values, for a single attribute name
+//the default value should be the selection option for no mark present.
 export default class MarkDropdownItem {
-    constructor(markType, attrName, attrValueList) {
+    constructor(markType, attrName, attrValueList, defaultValue) {
         this.markType = markType;
         this.attrValueList = attrValueList;
+        this.defaultValue = defaultValue;
+
+        this.selectionGenerator = createSelectionGenerator(markType, attrName);
 
         this.element = document.createElement("select");
         attrValueList.forEach(attrValueEntry => {
@@ -15,10 +18,12 @@ export default class MarkDropdownItem {
             this.element.add(option);
         });
 
+        this.element.value = this.defaultValue;
+
         this.element.onchange = () => {
             this.editorView.focus();
             //allow string or boolean value (I think it turns to string even if boolean is set)
-            if ((this.element.value === false)||(this.element.value == "false")) {
+            if(this.element.value == defaultValue) {
                 //remove mark
                 clearMark(this.markType, this.editorView.state, this.editorView.dispatch);
             }
@@ -39,51 +44,28 @@ export default class MarkDropdownItem {
         return this.element;
     }
 
+    getMarkSelectionGenerator() {
+        return this.selectionGenerator;
+    }
+
     /** This gets the selection info and sets whether the toggle should be on or off. */
     update(selectionInfo) {
-        let markValues = selectionInfo.marks[this.markType.name];
+        let markInfo = selectionInfo.marks[this.markType.name];
+
+        if((markInfo.values.length === 1)&&(!markInfo.missing)) {
+            //mark present on all text nodes - display this as the current value
+            this._setElementValue(markInfo.values[0]);
+        }
+        else if(markInfo.values.length === 0) {
+            //mark not present. This is the default.
+            this._setElementValue(this.defaultValue);
+        }
+        else {
+            //multiple values present - display no current value
+            this._setElementValue(null);
+        }
+
         return;
-
-        // switch (markValues.length) {
-        //     case 0:
-        //         //add better validation/recovery
-        //         //we should make it so this doesn't happen
-        //         this._setElementValue(false);
-        //         break;
-
-        //     case 1:
-        //         if (markValues[0] === false) {
-        //             //mark is off
-        //             this._setElementValue(false);
-        //         }
-        //         else {
-        //             //mark is on
-        //             this._setElementValue(markValues[0]);
-        //         }
-        //         break;
-
-        //     default:
-        //         let hasFalse = false;
-        //         let hasMultivalue = false;
-        //         let singleValue = undefined;
-        //         markValues.forEach(value => {
-        //             if (value == false) hasFalse = true;
-        //             else if (singleValue !== undefined) singleValue = value;
-        //             else hasMultivalue = true;
-        //         });
-
-        //         //set state
-        //         if (hasMultivalue) {
-        //             this._setElementValue(null);
-        //         }
-        //         else if (hasFalse) {
-        //             this._setElementValue(false);
-        //         }
-        //         else {
-        //             this._setElementValue(singleValue);
-        //         }
-        //         break;
-        // }
     }
 
     
@@ -99,4 +81,28 @@ export default class MarkDropdownItem {
         }
     }
 
+}
+
+function createSelectionGenerator(markType,attrName) {
+    let selectionGenerator = {};
+    selectionGenerator.name = markType.name;
+    selectionGenerator.getEmptyInfo = () => { return { last: -1, missing: false, values: [] }; }
+    selectionGenerator.updateInfo = (mark,markInfoEntry,textNodeNumber) => {
+        //record if there are any text nodes with this mark missing
+        if(textNodeNumber - markInfoEntry.last > 1) {
+            markInfoEntry.missing = true;
+        }
+        markInfoEntry.last = textNodeNumber;
+
+        //recorc that this mark is present
+        let attrValue = mark.attrs[attrName];
+        if(markInfoEntry.values.indexOf(attrValue) < 0) markInfoEntry.values.push(attrValue);
+    }
+    selectionGenerator.onComplete = (markInfoEntry,nodeCount) => {
+        if(nodeCount - markInfoEntry.last > 1) {
+            markInfoEntry.missing = true;
+        }
+    }
+
+    return selectionGenerator;
 }

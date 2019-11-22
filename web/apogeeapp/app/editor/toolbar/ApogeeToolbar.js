@@ -23,15 +23,15 @@ const EMPTY_MARK_DATA = {
 }
 
 export default class ApogeeToolbar {
-  constructor(items, editorView) {
+  constructor(items) {
     this.items = items
     
     this.dom = document.createElement("div")
     this.dom.className = "atb_toolbar"
 
-    this.items.forEach(item => {
-      this.dom.appendChild(item.getElement());
-    })
+    this.markSelectionGenerators = {};
+
+    this.items.forEach(item => this._addToolbarItem(item))
     
   }
 
@@ -56,13 +56,36 @@ export default class ApogeeToolbar {
     //this.dom.remove()
   }
 
+  _addToolbarItem(toolbarItem) {
+
+    //this allows mark items to create custom information for themselves in a simple and efficient way
+    //blocks are handled in standard way
+    if(toolbarItem.getMarkSelectionGenerator) {
+      this._registerMarkSelectionGenerator(toolbarItem.getMarkSelectionGenerator());
+    }
+
+    this.dom.appendChild(toolbarItem.getElement());
+  }
+
+  /** This function allows each mark to create information on selection to decide the item
+   * status, such as if the press should turn the mark on or off */
+  _registerMarkSelectionGenerator(selectionGenerator) {
+    if(selectionGenerator.name) {
+      this.markSelectionGenerators[selectionGenerator.name] = selectionGenerator;
+    }
+  }
+
+  /** This function creates information on each selection event to update the status of the buttons */
   _getSelectionInfo() {
 
     let { $from, $to } = this.editorView.state.selection;
     let doc = this.editorView.state.doc;
     let schema = this.editorView.state.schema;
 
+    //----------------------------
     //get block info
+    //create a list of blocks present, along with the total number of blocks
+    //-----------------------------
     let blockInfo = {};
     let startBlockIndex = $from.index(0);
     let endBlockIndex = $to.index(0);
@@ -78,113 +101,46 @@ export default class ApogeeToolbar {
       }
     }
 
+    //-------------------
     //get mark info
+    //toolbar buttons register a function to create their own mark info entry
+    //-------------------
+    //initialize mark info
     let markInfo = {};
-    for(let markName in schema.marks) {
-      markInfo[markName] = {mark: schema.marks[markName], present: false, missing:false};
+    for(let markName in this.markSelectionGenerators) {
+      let initEntryFunction = this.markSelectionGenerators[markName].getEmptyInfo;
+      markInfo[markName] = initEntryFunction ? initEntryFunction() : {};
     }
 
+    //process marks for text nodes.
+    let textNodeNumber = 0;
     let setMarkInfo = node => {
       if(node.isText) {
-        for(let markName in markInfo) {
-          let markEntry = markInfo[markName];
-          //this conditional is wrong - it is an array of mark info objects, not marks
-          if(node.marks.indexOf(markEntry.mark) >= 0) {
-            markEntry.present = true;
+        node.marks.forEach( mark => {
+          let markInfoUpdater = this.markSelectionGenerators[mark.type.name].updateInfo;
+          if(markInfoUpdater) {
+            let markInfoEntry = markInfo[mark.type.name];
+            markInfoUpdater(mark,markInfoEntry,textNodeNumber);
           }
-          else {
-            markEntry.missing = true;
-          }
-        }
-        return false;
-      }
-      else {
-        return true;
+        });
+        textNodeNumber++;
       }
     }
 
     doc.nodesBetween($from.pos,$to.pos,setMarkInfo);
+
+    //call final update, if needed
+    for(let markName in this.markSelectionGenerators) {
+      let onCompleteFunction = this.markSelectionGenerators[markName].onComplete;
+      let markInfoEntry = markInfo[markName];
+      if(onCompleteFunction) onCompleteFunction(markInfoEntry,textNodeNumber);
+    }
     
     //return selection info
     let selectionInfo = {};
     selectionInfo.blocks = blockInfo;
     selectionInfo.marks = markInfo;
     return selectionInfo;
-
-    ////////////////////////////////////////
-
-    // //get a list of blocks and a list for each mark type
-    // var blocks = [];
-    // var markState = this._getEmptyMarkMap();
-    // for (let key in markState) {
-    //   markState[key] = [];
-    // }
-
-    // if (empty) {
-    //   if ($cursor) {
-    //     //get the closest ancestor block node
-    //     let parentBlock;
-    //     let ancestor;
-    //     for (let i = 0; (ancestor = $cursor.node(i)); i++) {
-    //       if (ancestor.type.isBlock) {
-    //         parentBlock = ancestor;
-    //       }
-    //     }
-    //     if (parentBlock) {
-    //       blocks.push(parentBlock.type.name);
-    //     }
-
-    //     //populate marks for the cursor
-    //     this._updateMarkStateFromMarkList(markState, $cursor.marks());
-    //   }
-    //   else {
-    //     //no cursor for empty selection
-    //     //keep blocks and marks are empty
-    //   }
-    // }
-    // else {
-    //   //there is a selection
-
-    //   //the model below assumes a single level of block
-    //   //with text nodes insides with the above specified marks available.
-    //   //---------------------------------------------------------------------
-    //   //DOH! - The logic I put in for reading the parent block node is not good,
-    //   //but it should work in the special schema that only allows one block node deep
-    //   //----------------------------------------------------------------------
-    //   for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
-    //     let { $from, $to } = ranges[rangeIndex]
-    //     let previousBlockName = null;
-    //     doc.nodesBetween($from.pos, $to.pos, node => {
-
-    //       if (node.type.name == "text") {
-    //         //populate marks for this text node
-    //         this._updateMarkStateFromMarkList(markState, node.marks);
-
-    //         //store the main block type
-    //         //validate this better
-    //         if (previousBlockName) {
-    //           this._addToListOnce(blocks, previousBlockName);
-    //         }
-    //         else {
-    //           //figure out a better way to handle this.
-    //           throw new Error("No block node found for this text node!");
-    //         }
-    //       }
-    //       else {
-    //         //store latest block  - will be a block for the given text node.
-    //         if (node.type.isBlock) {
-    //           previousBlockName = node.type.name;
-    //         }
-    //       }
-    //     })
-    //   }
-    // }
-
-    // //get the selection state for the blocks and marks 
-    // return {
-    //   blocks: blocks,
-    //   marks: markState
-    // }
   }
 
   _getEmptyMarkMap() {
