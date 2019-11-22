@@ -16,7 +16,7 @@
     
 }
 .atb_toggleOnClass {
-    background-color: lightblue;
+    background-color: rgb(220,220,240);;
 }
 .atb_radioButton {
     display: inline-block;
@@ -33,7 +33,7 @@
     
 }
 .atb_radioOnClass {
-    background-color: lightblue;
+    background-color: rgb(220,220,240);;
 }
 .atb_actionButton {
     display: inline-block;
@@ -45,12 +45,18 @@
     text-align: center;
     min-width: 1.4em;
 }
-.atb_actionOffClass {
-    color: #aaa;
+.atb_actionHighlightedClass {
+    background-color: rgb(220,220,240);
 }
-.atb_actionOnClass {
-    color: #444;
+.atb_actionEnabledClass {
+    color: #444;   
 }
+.atb_actionDisabledClass {
+    color: #999;
+}
+
+
+
 .atb_normal_style {
     font-size: 1em;
 }

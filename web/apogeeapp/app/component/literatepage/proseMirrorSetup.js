@@ -49,17 +49,31 @@ export function createProseMirrorManager (folderComponent) {
   let indentCommand = (state,dispatch) => indentSelection(state, dispatch);
   let unindentCommand = (state,dispatch) => unindentSelection(state, dispatch);
 
+  //this function determines if the block button is highlighted
+  let getBlockIsHighlightedFunction = (nodeType) => {
+    return (selectionInfo) => {
+      let blockTypes = selectionInfo.blocks.blockTypes;
+      return ((blockTypes.length === 1)&&(blockTypes[0] == nodeType));
+    }
+  }
+
+  //this determines if the list indent buttons are active
+  let listIndentIsActive = (selectionInfo) => {
+    let blockCount = selectionInfo.blocks.blockCount;
+    let blockTypes = selectionInfo.blocks.blockTypes;
+    return ((blockCount === 1)&&(blockTypes[0].spec.group == "list"));
+  }
 
   let toolbarItems = [
-    new ActionButton(convertToParagraphCommand,null,"Normal","atb_normal_style","temp"),
-    new ActionButton(convertToH1Command,null,"H1","atb_h1_style","temp"),
-    new ActionButton(convertToH2Command,null,"H2","atb_h2_style","temp"),
-    new ActionButton(convertToH3Command,null,"H3","atb_h3_style","temp"),
-    new ActionButton(convertToH4Command,null,"H4","atb_h4_style","temp"),
-    new ActionButton(convertToBulletCommand,null,"Bullet","atb_ul_style","temp"),
-    new ActionButton(convertToNumberedCommand,null,"Numbered","atb_ol_style","temp"),
-    new ActionButton(indentCommand, /*indentActiveFunction*/null, "L+", "atb_lindent_style", "Indent List"),
-    new ActionButton(unindentCommand, /*unindentActiveFunction*/null, "L-", "atb_lunindent_style", "Unindent List"),
+    new ActionButton(convertToParagraphCommand,getBlockIsHighlightedFunction(schema.nodes.paragraph),null,"Normal","atb_normal_style","Paragraph"),
+    new ActionButton(convertToH1Command,getBlockIsHighlightedFunction(schema.nodes.heading1),null,"H1","atb_h1_style","Heading 1"),
+    new ActionButton(convertToH2Command,getBlockIsHighlightedFunction(schema.nodes.heading2),null,"H2","atb_h2_style","Heading 2"),
+    new ActionButton(convertToH3Command,getBlockIsHighlightedFunction(schema.nodes.heading3),null,"H3","atb_h3_style","Heading 3"),
+    new ActionButton(convertToH4Command,getBlockIsHighlightedFunction(schema.nodes.heading4),null,"H4","atb_h4_style","Heading 4"),
+    new ActionButton(convertToBulletCommand,getBlockIsHighlightedFunction(schema.nodes.bulletList),null,"Bullet","atb_ul_style","Bullet List"),
+    new ActionButton(convertToNumberedCommand,getBlockIsHighlightedFunction(schema.nodes.numberedList),null,"Numbered","atb_ol_style","Nubmered List"),
+    new ActionButton(indentCommand, null, listIndentIsActive, "L+", "atb_lindent_style", "Indent List"),
+    new ActionButton(unindentCommand, null, listIndentIsActive, "L-", "atb_lunindent_style", "Unindent List"),
     new MarkToggleItem(schema.marks.bold, null, "B", "atb_bold_style", "Bold"),
     new MarkToggleItem(schema.marks.italic, null, "I", "atb_italic_style", "Italic"),
     new MarkDropdownItem(schema.marks.fontfamily, "fontfamily", [["Sans-serif",false], ["Serif","Serif"], ["Monospace","Monospace"]]),

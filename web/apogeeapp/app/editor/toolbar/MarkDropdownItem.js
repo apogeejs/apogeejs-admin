@@ -42,47 +42,48 @@ export default class MarkDropdownItem {
     /** This gets the selection info and sets whether the toggle should be on or off. */
     update(selectionInfo) {
         let markValues = selectionInfo.marks[this.markType.name];
+        return;
 
-        switch (markValues.length) {
-            case 0:
-                //add better validation/recovery
-                //we should make it so this doesn't happen
-                this._setElementValue(false);
-                break;
+        // switch (markValues.length) {
+        //     case 0:
+        //         //add better validation/recovery
+        //         //we should make it so this doesn't happen
+        //         this._setElementValue(false);
+        //         break;
 
-            case 1:
-                if (markValues[0] === false) {
-                    //mark is off
-                    this._setElementValue(false);
-                }
-                else {
-                    //mark is on
-                    this._setElementValue(markValues[0]);
-                }
-                break;
+        //     case 1:
+        //         if (markValues[0] === false) {
+        //             //mark is off
+        //             this._setElementValue(false);
+        //         }
+        //         else {
+        //             //mark is on
+        //             this._setElementValue(markValues[0]);
+        //         }
+        //         break;
 
-            default:
-                let hasFalse = false;
-                let hasMultivalue = false;
-                let singleValue = undefined;
-                markValues.forEach(value => {
-                    if (value == false) hasFalse = true;
-                    else if (singleValue !== undefined) singleValue = value;
-                    else hasMultivalue = true;
-                });
+        //     default:
+        //         let hasFalse = false;
+        //         let hasMultivalue = false;
+        //         let singleValue = undefined;
+        //         markValues.forEach(value => {
+        //             if (value == false) hasFalse = true;
+        //             else if (singleValue !== undefined) singleValue = value;
+        //             else hasMultivalue = true;
+        //         });
 
-                //set state
-                if (hasMultivalue) {
-                    this._setElementValue(null);
-                }
-                else if (hasFalse) {
-                    this._setElementValue(false);
-                }
-                else {
-                    this._setElementValue(singleValue);
-                }
-                break;
-        }
+        //         //set state
+        //         if (hasMultivalue) {
+        //             this._setElementValue(null);
+        //         }
+        //         else if (hasFalse) {
+        //             this._setElementValue(false);
+        //         }
+        //         else {
+        //             this._setElementValue(singleValue);
+        //         }
+        //         break;
+        // }
     }
 
     

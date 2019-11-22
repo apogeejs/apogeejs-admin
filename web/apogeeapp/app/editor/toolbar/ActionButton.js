@@ -1,8 +1,7 @@
 //This is a radio-type item that will highlight when the associated state is active.
 export default class ActionButton {
-    constructor(commandFunction, isActiveFunction, labelText, textStyleClass, tooltip) {
+    constructor(commandFunction, isHighlightedFunction, isEnabledFunction, labelText, textStyleClass, tooltip) {
         this.commandFunction = commandFunction;
-        this.isActiveFunction = isActiveFunction;
         this.labelText = labelText;
         this.textStyleClass = textStyleClass;
 
@@ -12,12 +11,16 @@ export default class ActionButton {
 
         this.element.onclick = () => {
             this.editorView.focus();
-            if (this.elementIsActive) {
+            if(this.isEnabled) {
                 this.commandFunction(this.editorView.state, this.editorView.dispatch);
             }
         }
 
-        this._setElementIsActive(true);
+        this.isHighlightedFunction = isHighlightedFunction;
+        this.isEnabledFunction = isEnabledFunction;
+
+        this.isEnabled;
+        this._setState(true,false);
     }
 
     registerEditorView(editorView) {
@@ -32,9 +35,10 @@ export default class ActionButton {
     update(selectionInfo) {
 
         //call function to decide if button is enabled if function defined. Otherwise just keep it on. 
-        var elementIsActive = this.isActiveFunction ? this.isActiveFunction(selectionInfo) : true;
+        var isHighlighted = this.isHighlightedFunction ? this.isHighlightedFunction(selectionInfo) : false;
+        var isEnabled = this.isEnabledFunction ? this.isEnabledFunction(selectionInfo) : true;
 
-        this._setElementIsActive(elementIsActive);
+        this._setState(isEnabled,isHighlighted);
     }
 
     //=========================
@@ -42,16 +46,27 @@ export default class ActionButton {
     //=========================
 
     /** This sets the toggle state and the display class. */
-    _setElementIsActive(isActive) {
-        if(this.elementIsActive != isActive) {
-            this.elementIsActive = isActive;
-            if (isActive) {
-                this.element.className = "atb_actionButton atb_actionOnClass " + this.textStyleClass;
+    _setState(isEnabled,isHighlighted) {
+        let className = "atb_actionButton " + this.textStyleClass;
+
+        if (isEnabled) {
+            if (isHighlighted) {
+                className += " atb_actionHighlightedClass";
             }
             else {
-                this.element.className = "atb_actionButton atb_actionOffClass " + this.textStyleClass;
+                className += " atb_actionEnabledClass";
             }
         }
+        else {
+            className += " atb_actionDisabledClass";
+        }
+
+        if(className != this.element.classname) {
+            this.element.className = className;
+        }
+
+        this.isEnabled = isEnabled;
+        
     }
 
 }

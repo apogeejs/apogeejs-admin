@@ -35,44 +35,45 @@ export default class MarkToggleItem {
 
     /** This gets the selection info and sets whether the toggle should be on or off. */
     update(selectionInfo) {
-        let markValues = selectionInfo.marks[this.markType.name];
 
-        switch (markValues.length) {
-            case 0:
-                //no marks
-                //we should make ti so this doesn't happen!!!
-                this._setElementIsSelected(false);
-                break;
+        // let markValues = selectionInfo.marks[this.markType.name];
 
-            case 1:
-                if (markValues[0] === false) {
-                    //mark is off
-                    this._setElementIsSelected(false);
-                }
-                else {
-                    //mark is on
-                    this._setElementIsSelected(true);
-                }
-                break;
+        // switch (markValues.length) {
+        //     case 0:
+        //         //no marks
+        //         //we should make ti so this doesn't happen!!!
+        //         this._setElementIsSelected(false);
+        //         break;
 
-            default:
-                let hasFalse = false;
-                let hasMultivalue = false;
-                let singleValue = undefined;
-                markValues.forEach(value => {
-                    if (value == false) hasFalse = true;
-                    else if (singleValue !== undefined) singleValue = value;
-                    else hasMultivalue = true;
-                });
+        //     case 1:
+        //         if (markValues[0] === false) {
+        //             //mark is off
+        //             this._setElementIsSelected(false);
+        //         }
+        //         else {
+        //             //mark is on
+        //             this._setElementIsSelected(true);
+        //         }
+        //         break;
 
-                //set state
-                if ((hasMultivalue) || (hasFalse)) {
-                    this._setElementIsSelected(false);
-                }
-                else {
-                    this._setElementIsSelected(true);
-                }
-        }
+        //     default:
+        //         let hasFalse = false;
+        //         let hasMultivalue = false;
+        //         let singleValue = undefined;
+        //         markValues.forEach(value => {
+        //             if (value == false) hasFalse = true;
+        //             else if (singleValue !== undefined) singleValue = value;
+        //             else hasMultivalue = true;
+        //         });
+
+        //         //set state
+        //         if ((hasMultivalue) || (hasFalse)) {
+        //             this._setElementIsSelected(false);
+        //         }
+        //         else {
+        //             this._setElementIsSelected(true);
+        //         }
+        // }
     }
 
     //=========================
