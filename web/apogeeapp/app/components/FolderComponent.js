@@ -349,8 +349,12 @@ export default class FolderComponent extends ParentComponent {
             stepsJson.push(step.toJSON());
             var stepDoc = transaction.docs[i];
             var inverseStep = step.invert(stepDoc);
+            //this is in the wrong order - we will reverse it below
             inverseStepsJson.push(inverseStep.toJSON()); 
         }
+
+        //fix the order of inverse commands
+        inverseStepsJson.reverse();
 
         let endSelectionJson = transaction.selection.toJSON();
         let endMarksJson = transaction.marks ? transaction.marks.map(mark => mark.toJSON()) : [];

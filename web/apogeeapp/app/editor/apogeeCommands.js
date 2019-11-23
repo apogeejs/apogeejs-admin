@@ -498,7 +498,7 @@ function addIndentForTab(nodeType,attrs,listNode,baseListPosition,transform,refS
     });
 
     //add a dummy entry at end with 0 indent
-    let listEndPosition = 1 + listNode.content.size;
+    let listEndPosition = baseListPosition + 1 + listNode.content.size;
 
     //----------------------
     // delete leading tabs
