@@ -12,7 +12,7 @@ import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
-function FolderFunction(name,owner,initialData,createEmptyInternalFolder) {
+function FolderFunction(name,owner,initialData) {
     //base init
     Member.init.call(this,name,FolderFunction.generator);
     Dependent.init.call(this);
@@ -23,19 +23,12 @@ function FolderFunction(name,owner,initialData,createEmptyInternalFolder) {
     this.initOwner(owner);
     
     //set initial data
-    this.argList = initialData.argList !== undefined ? initialData.argList : "";
+    this.argList = initialData.argList !== undefined ? initialData.argList : [];
     this.returnValueString = initialData.returnValue !== undefined ? initialData.returnValue : [];
     //set to an empty function
     this.setData(function(){});
     this.fieldUpdated("argList");
     this.fieldUpdated("returnValue");
-    
-    //recreate the root folder if info is specified
-    if(createEmptyInternalFolder) {
-        throw new Error("I need to make this folder correctly!!!");
-        var internalFolder = new Folder(FolderFunction.INTERNAL_FOLDER_NAME,this);
-        this.setRoot(internalFolder);
-    }
 }
 
 //add components to this class
@@ -100,28 +93,16 @@ FolderFunction.prototype.close = function() {
 
 /** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
-FolderFunction.fromJson = function(owner,json,childrenJsonOutputList) {
-    var initialData = {};
-    initialData.argList = json.argList;
-    initialData.returnValue = json.returnValue;
-    
-    var createEmptyInternalFolder;
-    if((json.children)&&(json.children.length >= 1)) {
-        createEmptyInternalFolder = false;
-    }
-    else {
-        createEmptyInternalFolder = true;
-    }
-
-    
-    return new FolderFunction(json.name,owner,initialData,createEmptyInternalFolder);
+FolderFunction.fromJson = function(owner,json) {
+    return new FolderFunction(json.name,owner,json.updateData);
 }
 
 /** This method adds any additional data to the json saved for this member. 
  * @protected */
 FolderFunction.prototype.addToJson = function(json) {
-    json.argList = this.argList;
-    json.returnValue = this.returnValueString;
+    json.updateData = {};
+    json.updateData.argList = this.argList;
+    json.updateData.returnValue = this.returnValueString;
     json.children = {};
     json.children[FolderFunction.INTERNAL_FOLDER_NAME] = this.internalFolder.toJson();
 }
@@ -138,16 +119,9 @@ FolderFunction.readProperties = function(member,values) {
 
 /** This method executes a property update. */
 FolderFunction.getPropertyUpdateAction = function(folderFunction,newValues) {
-    if((newValues.argListString !== undefined)||(newValues.returnValueString!== undefined)) {
-        
-        var argList;
-        if(newValues.argListString) {
-            argList = util.parseStringArray(newValues.argListString);
-        }
-        else {
-            argList = this.argList;
-        }
-        
+    if((newValues.updateData)&&((newValues.argList !== undefined)||(newValues.returnValueString!== undefined))) {
+
+        var argList = newValues.argList ? newValues.argList : this.argList;
         var returnValueString = newValues.returnValueString ? newValues.returnValueString : this.returnValueString;
  
         var actionData = {};
@@ -311,7 +285,7 @@ FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErro
         var updateActionList = [];
         for(var i = 0; i < inputElementArray.length; i++) {
             var entry = {};
-            entry.action = "updateMember";
+            entry.action = "updateData";
             entry.memberName = inputElementArray[i].getFullName();
             entry.data = arguments[i];
             updateActionList.push(entry);

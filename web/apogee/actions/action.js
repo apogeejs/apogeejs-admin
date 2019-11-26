@@ -398,7 +398,7 @@ function compoundActionFunction(workspace,actionData,actionResult) {
     for(var i = 0; i < actionList.length; i++) {
         let childActionData = actionList[i];
         let childActionResult = {};
-        action.callActionFunction(workspace,childActionData,childActionResult);
+        callActionFunction(workspace,childActionData,childActionResult);
         actionResult.childActionResults.push(childActionResult);   
     }
     actionResult.actionDone = true;

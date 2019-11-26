@@ -99,14 +99,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
         var childDisplayState = childComponent.getChildDisplayState();
 
         //create a new component display for this child
-        if(childComponent.componentGenerator.isEditComponent) {
+        if(childComponent.componentGenerator.hasChildEntry) {
             childComponentDisplay = new PageChildComponentDisplay(childComponent,this,childDisplayState);
-        }
-        else if(childComponent.componentGenerator.isParentComponent) {
-            //don't display the child parents!
-        }
-        else {
-            throw new Error("Unrecognized child component type! " + childComponent.constructor)
         }
 
         //------------------

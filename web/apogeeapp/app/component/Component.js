@@ -45,9 +45,6 @@ export default class Component extends EventManager {
         this.cleanupActions.push(cleanupFunction);
     }
 
-
-
-
     //==============================
     // Public Instance Methods
     //==============================

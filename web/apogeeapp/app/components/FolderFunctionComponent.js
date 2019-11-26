@@ -1,6 +1,7 @@
 import util from "/apogeeutil/util.js";
 
 import ParentComponent from "/apogeeapp/app/component/ParentComponent.js";
+import LiteratePageComponentDisplay from "/apogeeapp/app/component/literatepage/LiteratePageComponentDisplay.js";
 
 /** This component represents a folderFunction, which is a function that is programmed using
  *apogee tables rather than writing code. */
@@ -16,9 +17,19 @@ export default class FolderFunctionComponent extends ParentComponent {
     }
 
     instantiateTabDisplay() {
-        var member = this.getMember();
-        var folder = member.getInternalFolder();
-        return new apogeeapp.app.CanvasFolderComponentDisplay(this,member,folder);   
+        let member = this.getMember();
+        let folder = member.getInternalFolder();
+        return new LiteratePageComponentDisplay(this,member,folder); 
+    }
+
+    //==============================
+    // Child Display
+    //==============================
+
+    /**  This method retrieves the table edit settings for this component instance
+     * @protected */
+    getTableEditSettings() {
+        return FolderFunctionComponent.TABLE_EDIT_SETTINGS;
     }
 
     //==============================
@@ -34,28 +45,22 @@ export default class FolderFunctionComponent extends ParentComponent {
     }
 
     readChildrenFromJson(workspaceUI,childActionResults,json) {
-        //verify the internal folder was loaded
-        //var internalFolderActionResult = childActionResults[FolderFunction.INTERNAL_FOLDER_NAME];
-        
-        //verify success???
-        //verify the action result exists!!!
-        
-        var internalFolderChildActionResults = internalFolderActionResult.childActionResults;
-        
+    
+        //verify internal folder?
+
         if(json.children) {
-            workspaceUI.loadFolderComponentContentFromJson(internalFolderChildActionResults,json.children);
+            workspaceUI.loadFolderComponentContentFromJson(childActionResults,json.children);
         }
         return true;  
     }
 
-
-
     static transferMemberProperties(inputValues,propertyJson) {
+        if(!propertyJson.updateData) propertyJson.updateData = {};
         if(inputValues.argListString !== undefined) {
-            propertyJson.argListString = inputValues.argListString;
+            propertyJson.updateData.argList = util.parseStringArray(inputValues.argListString);
         }
         if(inputValues.returnValueString !== undefined) {
-            propertyJson.returnValue = inputValues.returnValueString;
+            propertyJson.updateData.returnValue = inputValues.returnValueString;
         }
     }
 
@@ -68,6 +73,17 @@ export default class FolderFunctionComponent extends ParentComponent {
         optionsJson.internalFolder = internalFolderJson;
     }
 
+}
+
+//=======================
+// Child View SEttings
+//=======================
+
+FolderFunctionComponent.VIEW_MODES = [
+];
+
+FolderFunctionComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": FolderFunctionComponent.VIEW_MODES,
 }
 
 
@@ -83,7 +99,13 @@ FolderFunctionComponent.DEFAULT_WIDTH = 500;
 FolderFunctionComponent.DEFAULT_HEIGHT = 500;
 FolderFunctionComponent.ICON_RES_PATH = "/componentIcons/folderFunction.png";
 FolderFunctionComponent.DEFAULT_MEMBER_JSON = {
-    "type": "apogee.FolderFunction"
+    "type": "apogee.FolderFunction",
+    "children": {
+        "layout": {
+            "name": "root",
+            "type": "apogee.Folder",
+        }
+    }
 };
 
 FolderFunctionComponent.propertyDialogLines = [
