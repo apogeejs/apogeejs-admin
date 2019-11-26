@@ -174,6 +174,17 @@ export default class WorkspaceUI {
     // Component Management
     //====================================
 
+    /** This method returns a component by full name. */
+    getComponentByFullName(fullName) {
+        let member = this.workspace.getMemberByFullName(fullName);
+        if(member) {
+            return this.getComponent(member);
+        }
+        else {
+            return undefined;
+        }
+    }
+
     /** This method gets the component associated with a member object. */
     getComponent(member) {
         var componentInfo = this.componentMap[member.getId()];

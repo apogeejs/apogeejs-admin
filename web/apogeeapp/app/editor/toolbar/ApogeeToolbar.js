@@ -87,8 +87,8 @@ export default class ApogeeToolbar {
     let blockMap = {};
     blockInfo.blockTypes = [];
     for(let index = startBlockIndex; index <= endBlockIndex; index++) {
-      let childNode = doc.child(index);
-      if(!blockMap[childNode.type.name]) {
+      let childNode = doc.maybeChild(index);
+      if((childNode)&&(!blockMap[childNode.type.name])) {
         blockMap[childNode.type.name] = true;
         blockInfo.blockTypes.push(childNode.type);
       }

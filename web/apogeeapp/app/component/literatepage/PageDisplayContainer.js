@@ -1,4 +1,5 @@
 import {getSaveBar} from "/apogeeapp/app/component/toolbar.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
 
 /** This is a standin for the display conatiner for the literate page
  * 
@@ -242,13 +243,17 @@ export default class PageDisplayContainer {
     setDisplayDestroyFlags(displayDestroyFlags) {
         
         //note - I should probably update app to only use this one flag.
-        this.destroyViewOnInactive = (displayDestroyFlags & PageDisplayContainer.DISPLAY_DESTROY_FLAG_INACTIVE != 0);
+        this.destroyViewOnInactive = (displayDestroyFlags & DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_INACTIVE != 0);
     }   
 
     /** This method cleasr the data display. It should only be called when the data display is not showing. 
      * maybe allow this when the display is showing - unload and reload it*/
     forceClearDisplay() {
-        alert("Implement forceClearDisplay!");
+        //this destrpys the data display, not the container - bad name
+        this.destroy();
+
+        //reload display
+        this.updateDataDisplayLoadedState();
     }
 
     /** This method destroys the data display. */
@@ -256,6 +261,7 @@ export default class PageDisplayContainer {
         if((this.dataDisplay)&&(this.dataDisplay.destroy)) {
             this.dataDisplay.destroy();
             this.dataDisplay = null;
+            this.dataDisplayLoaded = false;
         }
     }
 

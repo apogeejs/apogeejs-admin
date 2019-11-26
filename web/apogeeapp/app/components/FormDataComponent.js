@@ -27,9 +27,6 @@ export default class FormDataComponent extends EditComponent {
         this.dataTable = folder.lookupChildFromPathArray(["data"]);
         this.layoutFunctionTable = folder.lookupChildFromPathArray(["layout"]);
         this.isInputValidFunctionTable = folder.lookupChildFromPathArray(["isInputValid"]);
-        
-        //keep the form display alive
-        this.displayDestroyFlags = apogeeapp.app.DisplayContainer.DISPLAY_DESTROY_FLAG_NEVER;
     };
 
     //==============================
@@ -52,7 +49,6 @@ export default class FormDataComponent extends EditComponent {
         switch(viewType) {
                 
             case FormDataComponent.VIEW_FORM:
-                displayContainer.setDisplayDestroyFlags(this.displayDestroyFlags);
                 callbacks = this.getFormEditorCallbacks();
                 var formEditorDisplay = new ConfigurableFormEditor(displayContainer,callbacks);
                 return formEditorDisplay;

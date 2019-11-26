@@ -34,13 +34,16 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         this.isLoaded = false;
         this.cachedData = undefined;
     
+        // this.outputElement = apogeeapp.ui.createElement("div",null,{
+        //     "position":"absolute",
+        //     "top":"0px",
+        //     "left":"0px",
+        //     "bottom":"0px",
+        //     "right":"0px",
+        //     "overflow":"auto"
+        // });
         this.outputElement = apogeeapp.ui.createElement("div",null,{
-            "position":"absolute",
-            "top":"0px",
-            "left":"0px",
-            "bottom":"0px",
-            "right":"0px",
-            "overflow":"auto"
+            "position":"relative"
         });
 
         //content

@@ -3,6 +3,7 @@ import EditComponent from "/apogeeapp/app/component/EditComponent.js";
 import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
 import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
 
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods
@@ -13,7 +14,7 @@ export default class BasicControlComponent extends EditComponent{
         super(workspaceUI,control,componentGenerator);
     
         //default to keep alive
-        this.displayDestroyFlags = apogeeapp.app.DisplayContainer.DISPLAY_DESTROY_FLAG_NEVER;
+        this.displayDestroyFlags = DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_NEVER;
     };
 
     //==============================

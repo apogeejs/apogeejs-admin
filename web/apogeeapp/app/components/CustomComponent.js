@@ -7,6 +7,8 @@ import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeapp/app/datadisplay/HtmlJsDataDisplay.js";
 import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
+import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
@@ -47,8 +49,8 @@ export default class CustomComponent extends EditComponent {
     }
 
     getDisplayDestroyFlags() {
-        return this.destroyOnInactive ? apogeeapp.app.DisplayContainer.DISPLAY_DESTROY_FLAG_INACTIVE :
-                apogeeapp.app.DisplayContainer.DISPLAY_DESTROY_FLAG_NEVER;
+        return this.destroyOnInactive ? DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_INACTIVE :
+        DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_NEVER;
     }
 
     setDestroyOnInactive(destroyOnInactive) {
@@ -205,28 +207,22 @@ export default class CustomComponent extends EditComponent {
     //=============================
 
     doCodeFieldUpdate(uiCodeField,fieldValue) { 
-
         var initialCodeFields = this.getUiCodeFields();
         var targetCodeFields = util.jsonCopy(initialCodeFields);
         targetCodeFields[uiCodeField] = fieldValue;
 
         var command = {};
-        command.cmd = () => this.update(targetCodeFields);
-        command.undoCmd = () => this.update(initialCodeFields);
-        command.desc = "Update code field " + uiCodeField + " - " + this.getMember().getFullName();
-        command.setDirty = true;
+        command.type = customComponentUpdateData.COMMAND_TYPE;
+        command.memberFullName = this.getFullName();
+        command.initialFields = initialCodeFields;
+        command.targetFields = targetCodeFields;
 
         Apogee.getInstance().executeCommand(command);
         return true;  
     }
 
     update(uiCodeFields) { 
-        
-        //make sure we get rid of the old display
-        if(this.activeOutputMode) {
-            this.activeOutputMode.forceClearDisplay();
-        }
-        
+
         //record the updates
         if(uiCodeFields[CustomComponent.CODE_FIELD_CSS] != this.uiCodeFields[CustomComponent.CODE_FIELD_CSS]) {
             this.fieldUpdated(CustomComponent.CODE_FIELD_CSS);
@@ -243,6 +239,11 @@ export default class CustomComponent extends EditComponent {
         }
         
         this.uiCodeFields = uiCodeFields;
+
+        //make sure we get rid of the old display
+        if(this.activeOutputMode) {
+            this.activeOutputMode.forceClearDisplay();
+        }
     }
 
     //==============================
@@ -357,6 +358,58 @@ CustomComponent.propertyDialogLines = [
         "resultKey":"destroyOnInactive"
     }
 ];
+
+//=====================================
+// Update Data Command
+//=====================================
+
+/*
+ *
+ * Command JSON format:
+ * {
+ *   "type":"customComponentUpdateCommand",
+ *   "memberFullName":(main member full name),
+ *   "initialFields":(original fields value)
+ *   "targetFields": (desired fields value)
+ * }
+ */ 
+let customComponentUpdateData = {};
+
+customComponentUpdateData.createUndoCommand = function(workspaceUI,commandData) {
+    let undoCommandData = {};
+    undoCommandData.memberFullName = commandData.memberFullName;
+    undoCommandData.targetFields = commandData.initialFields;
+    undoCommandData.initialFields = commandData.targetFields;
+    return undoCommandData;
+}
+
+customComponentUpdateData.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
+    let component = workspaceUI.getComponentByFullName(commandData.memberFullName);
+    var commandResult = {};
+    if(component) {
+        try {
+            component.update(commandData.targetFields);
+        }
+        catch(error) {
+            let msg = error.message ? error.message : error;
+            commandResult.alertMsg = "Exception on custom component update: " + msg;
+        }
+    }
+    else {
+        commandResult.alertMsg = "Component not found: " + command.memberFullName;
+    }
+
+    if(!commandResult.alertMsg) commandResult.actionDone = true;
+    
+    return commandResult;
+}
+
+customComponentUpdateData.COMMAND_TYPE = "customComponentUpdateCommand";
+
+CommandManager.registerCommand(customComponentUpdateData);
+
+
+
 
 
 
