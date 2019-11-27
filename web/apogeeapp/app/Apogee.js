@@ -404,7 +404,7 @@ export default class Apogee extends EventManager {
         var component = this.workspaceUI.getComponentById(id);
         if(component) {
             this.activeTabIconDisplay.src = component.getIconUrl();
-            this.activeTabTitleDisplay.innerHTML = component.getMember().getDisplayName(true);
+            this.activeTabTitleDisplay.innerHTML = component.getDisplayName(true);
             this.activeTabIconDisplay.style.display = "";
             this.activeTabTitleDisplay.style.display = "";
         }

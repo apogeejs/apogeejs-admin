@@ -72,20 +72,6 @@ FolderFunction.prototype.getArgList = function() {
 // Member Methods
 //------------------------------
 
-/** This overrides the get displaymethod of member to return the function declaration. */
-FolderFunction.prototype.getDisplayName = function(useFullPath) {
-    var name = useFullPath ? this.getFullName() : this.getName();
-    var argList = this.getArgList();
-    var argListString = argList.join(",");
-    
-    var displayName = name + "(" + argListString + ")";
-    if((this.returnValueString != null)&&(this.returnValueString.length > 0)) {
-        displayName += " = " + this.returnValueString;
-    }
-    
-    return displayName;
-}
-
 /** This method removes any data from this workspace on closing. */
 FolderFunction.prototype.close = function() {
     this.internalFolder.onClose();

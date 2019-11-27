@@ -106,7 +106,7 @@ apogeeapp.app.ChildComponentDisplay.prototype.setBannerState = function(bannerSt
 apogeeapp.app.ChildComponentDisplay.prototype.updateData = function() {
     if(this.windowFrame) {
         //update the title
-        this.windowFrame.setTitle(this.member.getDisplayName());
+        this.windowFrame.setTitle(this.component.getDisplayName());
 
         //update the content in instantiated view mode elements
         for(var elementTag in this.viewModeElements) {
@@ -199,7 +199,7 @@ apogeeapp.app.ChildComponentDisplay.prototype.loadWindowFrameEntry = function() 
     this.windowFrame.setHeaderContent(this.windowHeaderManager.getHeaderElement());
     
     //set title
-    this.windowFrame.setTitle(this.member.getDisplayName());
+    this.windowFrame.setTitle(this.component.getDisplayName());
     
     // set menu
     var menu = this.windowFrame.createMenu(this.component.getIconUrl());

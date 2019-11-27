@@ -106,6 +106,12 @@ export default class PageDisplayContainer {
         return this.viewSelectorContainer;
     }
 
+    /** This method returns the view title element, which is embedded in the selecton container. This is
+     * intended for when the view title should be overritten. */
+    getViewTitleElement() {
+        return this.viewSelectorElement;
+    }
+
     /** This method returns the main dom element for the window frame. */
     getDisplayElement() {
         return this.mainElement;
@@ -124,22 +130,16 @@ export default class PageDisplayContainer {
         //make the label for the view
         this.viewLabelHeaderElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewLabelHeaderClass",this.mainElement);
 
-        let viewLabelText = this.getViewLabelText();
-        if(viewLabelText) {
-            this.viewLabelElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
-            this.viewLabelElement.innerHTML = viewLabelText;
-        }
+        this.viewLabelElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
+        this.viewLabelElement.innerHTML = this.viewType;
         
         //make the selector for the view, in the component title bar
         this.viewSelectorContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
 
-        let viewSelectorLabelClass = this.getViewSelectorLabelClass();
-        let viewSelectorLabelText = this.getViewSelectorLabelText();
-
         this.viewActiveElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewActiveElementClass",this.viewSelectorContainer);
-        this.viewSelectorElement = apogeeapp.ui.createElementWithClass("div",viewSelectorLabelClass,this.viewSelectorContainer);
+        this.viewSelectorElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_nonMainViewSelectorClass",this.viewSelectorContainer);
         
-        this.viewSelectorElement.innerHTML = viewSelectorLabelText;
+        this.viewSelectorElement.innerHTML = this.viewType;
 
         this.expandImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
         this.expandImage.src = apogeeapp.ui.getResourcePath(PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
@@ -159,37 +159,6 @@ export default class PageDisplayContainer {
         
         //set the visibility state for the element
         this.setIsViewActive(this.isViewActive);
-    }
-
-    getViewSelectorLabelClass() {
-        if(this.isMainView) {
-            return "visiui_displayContainer_mainViewSelectorClass";
-        }
-        else {
-            return "visiui_displayContainer_nonMainViewSelectorClass";
-        }
-    }
-
-    /** This method returns the text for the view label.  */
-    getViewSelectorLabelText() {
-
-        if(this.isMainView) {
-            return this.component.getMember().getDisplayName();
-        }
-        else {
-            return this.viewType;
-        }
-    }
-
-    /** This method returns the text for the view label.  */
-    getViewLabelText() {
-
-        if(this.isMainView) {
-            return null;
-        }
-        else {
-            return this.viewType;
-        }
     }
 
     /** This method shold be called when the content loaded or frame visible state 
@@ -287,11 +256,6 @@ export default class PageDisplayContainer {
         //update the data display
         if((this.dataDisplay)&&(!this.inEditMode)) {
             this.dataDisplay.showData();
-        }
-        //update the labels, if needed
-        if(this.isMainView) {
-            let viewSelectorLabelText = this.getViewSelectorLabelText();
-            this.viewSelectorElement.innerHTML = viewSelectorLabelText;
         }
     }
         

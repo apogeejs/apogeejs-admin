@@ -103,18 +103,6 @@ Member.getFullName = function() {
     }
 }
 
-/** This method returns a display name for the member object. By default it returns
-/* the object name but can by overriden by the member implementation. By setting 
- * the input argument "useFullPath" to true, the path is included with the name. */
-Member.getDisplayName = function(useFullPath) {
-    if(useFullPath) {
-        return this.getFullName();
-    }
-    else {
-        return this.name;
-    }
-}
-
 /** This returns the owner for this member. */
 Member.getOwner = function() {
     return this.owner;

@@ -16,6 +16,21 @@ export default class FolderFunctionComponent extends ParentComponent {
         workspaceUI.registerMember(internalFolder,this,folderFunction);
     }
 
+    /** This overrides the get display method of componnet to return the function declaration. */
+    getDisplayName(useFullPath) {
+        var name = useFullPath ? this.getFullName() : this.getName();
+        var argList = this.member.getArgList();
+        var argListString = argList.join(",");
+        var returnValueString = this.member.getReturnValueString();
+        
+        var displayName = name + "(" + argListString + ")";
+        if((returnValueString != null)&&(returnValueString.length > 0)) {
+            displayName += " = " + returnValueString;
+        }
+        
+        return displayName;
+    }
+
     instantiateTabDisplay() {
         let member = this.getMember();
         let folder = member.getInternalFolder();

@@ -62,6 +62,16 @@ export default class Component extends EventManager {
         return this.member.getFullName();
     }
 
+    /** This method returns a display name for the member object. */
+    getDisplayName(useFullPath) {
+        if(useFullPath) {
+            return this.getFullName();
+        }
+        else {
+            return this.getName();
+        }
+    }
+
     getParentComponent() {
         let parent = this.member.getParent();
         if(parent) {

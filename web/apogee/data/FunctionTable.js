@@ -85,14 +85,6 @@ FunctionTable.prototype.getLazyInitializedMemberFunction = function(memberGenera
 // Member Methods
 //------------------------------
 
-/** This overrides the get title method of member to return the function declaration. */
-FunctionTable.prototype.getDisplayName = function(useFullPath) {
-    var name = useFullPath ? this.getFullName() : this.getName();
-    var argList = this.getArgList();
-    var argListString = argList.join(",");
-    return name + "(" + argListString + ")";
-}
-
 /** This method creates a member from a json. It should be implemented as a static
  * method in a non-abstract class. */ 
 FunctionTable.fromJson = function(owner,json) {

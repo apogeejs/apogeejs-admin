@@ -78,7 +78,7 @@ apogeeapp.app.PageChildComponentDisplay.prototype.setBannerState = function(bann
 
 apogeeapp.app.PageChildComponentDisplay.prototype.updateData = function() {
     //update the title
-    this.titleBarTitleElement.innerHTML = this.member.getDisplayName();
+    this.titleBarTitleElement.innerHTML = this.component.getDisplayName();
 
     //update the content in instantiated view mode elements
     for(var viewType in this.displayContainerMap) {
@@ -210,7 +210,7 @@ apogeeapp.app.PageChildComponentDisplay.prototype.addTitleBar = function() {
     //-----------------
     // title
     //-----------------
-    this.titleBarTitleElement.innerHTML = this.member.getDisplayName();
+    this.titleBarTitleElement.innerHTML = this.component.getDisplayName();
     
     //-----------------
     // show/hide (active)

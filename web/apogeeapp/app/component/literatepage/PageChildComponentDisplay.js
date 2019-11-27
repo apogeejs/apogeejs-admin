@@ -17,6 +17,9 @@ export default class PageChildComponentDisplay {
         this.iconOverlayElement
         this.mainElement = null;
         this.bannerContainer = null;
+
+        this.viewTitleElement = null;
+        this.recordedTitle = null;
         
         this.displayContainerMap = null;
         
@@ -34,8 +37,6 @@ export default class PageChildComponentDisplay {
         //add a cleanup action to the base component - component must already be initialized
     //    this.addCleanupAction(PageChildComponentDisplay.destroy);
     };
-
-
 
     getElement() {
         return this.mainElement;
@@ -74,6 +75,12 @@ export default class PageChildComponentDisplay {
     }
 
     updateData() {
+        //check for a title update
+        let newTitle = this.component.getDisplayName();
+        if(newTitle != this.recordedTitle) {
+            this.setTitle();
+        }
+
         //update the content in instantiated view mode elements
         for(var viewType in this.displayContainerMap) {
             var displayContainer = this.displayContainerMap[viewType];
@@ -141,22 +148,36 @@ export default class PageChildComponentDisplay {
         var viewTypes = settings.viewModes;
         
         this.displayContainerMap = {};  
-        for(var i = 0; i < viewTypes.length; i++) {
-            var viewType = viewTypes[i];
-            
-            var isMainView = (i == 0);
+        if(viewTypes.length > 0) {
+            for(var i = 0; i < viewTypes.length; i++) {
+                var viewType = viewTypes[i];
+                
+                var isMainView = (i == 0);
 
-            var displayContainer = new PageDisplayContainer(this.component, viewType, isMainView);
-            
-            //add the view title element to the title bar
-            this.titleBarViewsElement.appendChild(displayContainer.getViewSelectorContainer());
-            
-            //add the view display
-            this.viewContainer.appendChild(displayContainer.getDisplayElement());
-            
-            //store the display container object
-            this.displayContainerMap[viewType] = displayContainer;
+                var displayContainer = new PageDisplayContainer(this.component, viewType, isMainView);
+                
+                //add the view title element to the title bar
+                this.titleBarViewsElement.appendChild(displayContainer.getViewSelectorContainer());
+
+                //we will overwrite the label (and style) on the main view to be the component title, rather than the view name.
+                if(isMainView) {
+                    this.viewTitleElement = displayContainer.getViewTitleElement();
+                    this.viewTitleElement.className = "visiui_displayContainer_mainViewSelectorClass";
+                }
+                
+                //add the view display
+                this.viewContainer.appendChild(displayContainer.getDisplayElement());
+                
+                //store the display container object
+                this.displayContainerMap[viewType] = displayContainer;
+            }
         }
+        else {
+            //no views, add an explicit title element
+            this.viewTitleElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_mainViewSelectorClass",this.titleBarViewsElement);
+        }
+
+        this.setTitle();
     }
 
     /** This makes the title bar, and installs it inline */
@@ -221,6 +242,11 @@ export default class PageChildComponentDisplay {
         if(this.iconOverlayElement) {
             apogeeapp.ui.removeAllChildren(this.iconOverlayElement);
         }
+    }
+
+    setTitle() {
+        this.recordedTitle = this.component.getDisplayName();
+        this.viewTitleElement.innerHTML = this.recordedTitle;
     }
 
 }

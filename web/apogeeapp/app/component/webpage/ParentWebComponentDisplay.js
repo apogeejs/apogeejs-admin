@@ -64,7 +64,7 @@ apogeeapp.app.ParentWebComponentDisplay.prototype.setBannerState = function(bann
 apogeeapp.app.ParentWebComponentDisplay.prototype.updateData = function() {
     if(this.windowFrame) {
         //update the title
-        this.windowFrame.setTitle(this.member.getDisplayName());
+        this.windowFrame.setTitle(this.component.getDisplayName());
     }
 }
 
@@ -103,7 +103,7 @@ apogeeapp.app.ParentWebComponentDisplay.prototype.loadWindowFrameEntry = functio
     this.windowFrame.setContent(dummyDiv,apogeeapp.ui.RESIZABLE);
     
     //set title
-    this.windowFrame.setTitle(this.member.getDisplayName());
+    this.windowFrame.setTitle(this.component.getDisplayName());
     
     // set menu
     var menu = this.windowFrame.createMenu(this.component.getIconUrl());

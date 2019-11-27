@@ -115,7 +115,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.setBannerState = function(ban
 apogeeapp.app.EditWindowComponentDisplay.prototype.updateData = function() {
     if(this.windowFrame) {
         //update the title
-        this.windowFrame.setTitle(this.member.getDisplayName());
+        this.windowFrame.setTitle(this.component.getDisplayName());
 
         //update the content in instantiated view mode elements
         for(var elementTag in this.viewModeElements) {
@@ -204,7 +204,7 @@ apogeeapp.app.EditWindowComponentDisplay.prototype.loadWindowFrameEntry = functi
     }
     
     //set title
-    this.windowFrame.setTitle(this.member.getDisplayName());
+    this.windowFrame.setTitle(this.component.getDisplayName());
     
     // set menu
     var menu = this.windowFrame.createMenu(this.component.getIconUrl());

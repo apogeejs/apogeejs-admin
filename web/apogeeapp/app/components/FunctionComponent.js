@@ -13,6 +13,14 @@ export default class FunctionComponent extends EditComponent {
         super(workspaceUI,functionObject,FunctionComponent);
     };
 
+    /** This overrides the get title method of member to return the function declaration. */
+    getDisplayName(useFullPath) {
+        var name = useFullPath ? this.getFullName() : this.getName();
+        var argList = this.getArgList();
+        var argListString = argList.join(",");
+        return name + "(" + argListString + ")";
+    }
+
     //==============================
     // Protected and Private Instance Methods
     //==============================
