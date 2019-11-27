@@ -38,18 +38,35 @@ export default class FolderFunctionComponent extends ParentComponent {
 
     /** This serializes the folderFunction component. */
     writeToJson(json) {
+
+        //save the editor state
+        if(this.editorData) {
+            json.data = this.editorData.toJSON();
+        }
+
         var folderFunction = this.getMember();
         var internalFolder = folderFunction.getInternalFolder();
         var workspaceUI = this.getWorkspaceUI();
         json.children = workspaceUI.getFolderComponentContentJson(internalFolder);
     }
 
+    readFromJson(json) {
+        //read the editor state
+        if((json.data)&&(json.data.doc)) {
+            this.editorData = this.editorManager.createEditorState(json.data.doc);
+            this.fieldUpdated("document");
+        }
+    }
+
     readChildrenFromJson(workspaceUI,childActionResults,json) {
     
-        //verify internal folder?
+        //get the child action results for the internal folder, rather than the folder function member.
+        //NOTE - we should handle multi-member components so we detect errors in an of the components.
+        //at the time this is written, this is the only acknowledgement of the result for the internal folder.
+        let externalChildActionResults = childActionResults.root.childActionResults;
 
         if(json.children) {
-            workspaceUI.loadFolderComponentContentFromJson(childActionResults,json.children);
+            workspaceUI.loadFolderComponentContentFromJson(externalChildActionResults,json.children);
         }
         return true;  
     }
