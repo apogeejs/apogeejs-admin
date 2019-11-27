@@ -32,8 +32,7 @@ export default class ParentComponent extends Component {
         for(var childKey in childMap) {
             var childMember = childMap[childKey];
             var childComponent = this.getWorkspaceUI().getComponent(childMember);
-            if((childComponent)&&(childComponent.usesTabDisplay())) {
-                //only add tree entries for components with tab displays
+            if(childComponent) {
                 var childTreeEntry = childComponent.getTreeEntry(true);
                 treeEntry.addChild(childTreeEntry);
             }
