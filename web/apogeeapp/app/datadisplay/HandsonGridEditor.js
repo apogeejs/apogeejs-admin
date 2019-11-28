@@ -8,16 +8,35 @@ export default class HandsonGridEditor extends DataDisplay {
     constructor(displayContainer,callbacks) {
         super(displayContainer,callbacks,DataDisplay.NON_SCROLLING);
 
-        //TBR initial sizing. now I just set it to a dummy number	
+        this.gridParentDiv = apogeeapp.ui.createElement("div",null,{
+            "position":"relative",
+            "width": "100%",
+            "height":"300px",
+            "overflow":"hidden",
+            "zIndex":0
+        });
+
+        // //TBR initial sizing. now I just set it to a dummy number	
+        // this.gridDiv = apogeeapp.ui.createElement("div",null,{
+        //     "position":"absolute",
+        //     "top":"0px",
+        //     "left":"0px",
+        //     "width":"50px",
+        //     "height":"50px",
+        //     "overflow":"hidden",
+        //     "zIndex":0
+        // });
+
         this.gridDiv = apogeeapp.ui.createElement("div",null,{
             "position":"absolute",
             "top":"0px",
             "left":"0px",
-            "width":"50px",
-            "height":"50px",
+            "right":"0px",
+            "bottom":"0px",
             "overflow":"hidden",
             "zIndex":0
         });
+        this.gridParentDiv.appendChild(this.gridDiv);
 
         this.inputData = null;
         this.activeEditOk = undefined;
@@ -59,7 +78,8 @@ export default class HandsonGridEditor extends DataDisplay {
 //=============================
 
     getContent() {
-        return this.gridDiv;
+        //return this.gridDiv;
+        return this.gridParentDiv;
     }
     
     getContentType() {

@@ -30,8 +30,7 @@ export default class JsonTableComponent extends EditComponent {
             //update the window display if needed
             var componentDisplay = this.getComponentDisplay();
             if(componentDisplay) {
-                alert("I need to fix set data view in json table!");
-                //componentDisplay.updateViewModeElement(JsonTableComponent.VIEW_DATA);
+                componentDisplay.reloadDisplay(JsonTableComponent.VIEW_DATA);
             }
         }
     }

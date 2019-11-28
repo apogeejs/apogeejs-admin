@@ -102,6 +102,16 @@ export default class PageChildComponentDisplay {
         
     }
 
+    /** This will reload the given data display. */
+    reloadDisplay(viewType) {
+        if(this.displayContainerMap) {
+            let displayContainer = this.displayContainerMap[viewType];
+            if(displayContainer) {
+                displayContainer.forceClearDisplay();
+            }
+        }
+    }
+
     /** This should be called by the component when it discards this display. */
     deleteDisplay() {
         //dispose any view elements
