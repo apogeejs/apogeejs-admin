@@ -1,6 +1,7 @@
 import util from "/apogeeutil/util.js";
 
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
 
 /** This is a grid editor using hands on table*/
 export default class HandsonGridEditor extends DataDisplay {
@@ -215,7 +216,7 @@ export default class HandsonGridEditor extends DataDisplay {
             this.gridDiv.style.backgroundColor = "";
         }
         else {
-            this.gridDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
+            this.gridDiv.style.backgroundColor = DATA_DISPLAY_CONSTANTS.NO_EDIT_BACKGROUND_COLOR;
         }
     }
     

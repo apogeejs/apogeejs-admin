@@ -16,7 +16,7 @@ export default class FunctionComponent extends EditComponent {
     /** This overrides the get title method of member to return the function declaration. */
     getDisplayName(useFullPath) {
         var name = useFullPath ? this.getFullName() : this.getName();
-        var argList = this.getArgList();
+        var argList = this.member.getArgList();
         var argListString = argList.join(",");
         return name + "(" + argListString + ")";
     }

@@ -37,9 +37,6 @@ apogeeapp.app.PageChildComponentDisplay = function(component, parentComponentDis
 //    this.addCleanupAction(apogeeapp.app.PageChildComponentDisplay.destroy);
 };
 
-/** This value is used as the background color when an editor is read only. */
-apogeeapp.app.PageChildComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
-
 apogeeapp.app.PageChildComponentDisplay.prototype.getElement = function() {
     return this.mainElement;
 }

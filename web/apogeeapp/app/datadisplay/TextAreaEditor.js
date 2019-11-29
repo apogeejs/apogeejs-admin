@@ -1,4 +1,5 @@
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
 
 /** Editor that uses the basic text editor */
 export default class TextAreaEditor extends DataDisplay {
@@ -48,7 +49,7 @@ export default class TextAreaEditor extends DataDisplay {
             this.textArea.readOnly = false;
         }
         else {
-            this.textArea.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
+            this.textArea.style.backgroundColor = DATA_DISPLAY_CONSTANTS.NO_EDIT_BACKGROUND_COLOR;
             this.textArea.readOnly = true;
         }
     }

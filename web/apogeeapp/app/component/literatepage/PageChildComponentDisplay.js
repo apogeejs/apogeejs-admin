@@ -261,9 +261,6 @@ export default class PageChildComponentDisplay {
 
 }
 
-/** This value is used as the background color when an editor is read only. */
-PageChildComponentDisplay.NO_EDIT_BACKGROUND_COLOR = "#f4f4f4";
-
 /** This method returns the main dom element for the window frame. */
 PageChildComponentDisplay.EXPAND_BUTTON_PATH = "/closed_gray.png";
 PageChildComponentDisplay.CONTRACT_BUTTON_PATH = "/opened_gray.png";

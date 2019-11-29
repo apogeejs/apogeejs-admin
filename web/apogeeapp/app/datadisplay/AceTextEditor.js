@@ -1,6 +1,7 @@
 import util from "/apogeeutil/util.js";
 
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
 
 /** Editor that uses the Ace text editor.
  * 
@@ -103,7 +104,7 @@ export default class AceTextEditor extends DataDisplay {
                 this.editor.setReadOnly(false);
             }
             else {
-                this.editorDiv.style.backgroundColor = apogeeapp.app.EditWindowComponentDisplay.NO_EDIT_BACKGROUND_COLOR;
+                this.editorDiv.style.backgroundColor = DATA_DISPLAY_CONSTANTS.NO_EDIT_BACKGROUND_COLOR;
                 this.editor.setReadOnly(true);
             }
         }
