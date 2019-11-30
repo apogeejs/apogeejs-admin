@@ -1,6 +1,6 @@
 import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component/banner.js";
 
-import WebDisplayContainer from "/apogeeapp/app/component/literatepage/PageDisplayContainer.js";
+import WebDisplayContainer from "/apogeeapp/app/component/webpage/WebDisplayContainer.js";
 
 /** This is the component display for a web page.
  * NOTES:
@@ -11,7 +11,6 @@ export default class WebComponentDisplay {
     constructor(component, activeView) {
         this.component = component;
         this.member = component.getMember();
-        this.webParentDisplay = webParentDisplay;
 
         this.activeView = activeView;
         this.displayContainer = null;
@@ -19,8 +18,6 @@ export default class WebComponentDisplay {
         //these are the header elements
         this.mainElement = null;
         this.bannerContainer = null;
-        
-        this.isPageShowing = false;
     
         //this is the window in which the component is displayed
         this.loadComponentDisplay();
@@ -28,6 +25,18 @@ export default class WebComponentDisplay {
         //add a cleanup action to the base component - component must already be initialized
     //    this.addCleanupAction(PageChildComponentDisplay.destroy);
     };
+
+    setIsShowing(isShowing) {
+        this.displayContainer.setIsShowing(isShowing);
+    }
+
+    getIsShowing() {
+        this.displayContainer.getIsShowing();
+    }
+
+    onResize() {
+        this.displayContainer.onResize();
+    }
 
     getElement() {
         return this.mainElement;
@@ -108,11 +117,14 @@ export default class WebComponentDisplay {
         this.viewContainer = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_viewContainerClass",this.mainElement);
         
         //create the view element
-        this.displayContainer = new WebDisplayContainer(this.component, activeView);
+        this.displayContainer = new WebDisplayContainer(this.component, this.activeView);
         
         //add the view display
-        this.viewContainer.appendChild(displayContainer.getDisplayElement());
+        this.viewContainer.appendChild(this.displayContainer.getDisplayElement());
     }
 
 }
+
+
+
 

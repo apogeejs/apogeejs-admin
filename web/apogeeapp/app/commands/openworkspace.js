@@ -20,7 +20,7 @@ let openworkspace = {};
 //NO UNDO FOR OPEN WORKSPACE
 //openworkspace.createUndoCommand = function(workspaceUI,commandData) {
 
-openworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData,asynchOnComplete) {
+openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComplete) {
         //app,workspaceText,fileMetadata) {
     var workspaceUIAdded;
     var synchCommandResult = {};
@@ -41,10 +41,13 @@ openworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData,async
 		var doWorkspaceLoad = function() {
             workspaceUI.load(commandData.workspaceJson);
             workspaceUI.setFileMetadata(commandData.fileMetadata);
+
+            //fire event
+            let asynchCommandResult = {};
+            asynchCommandResult.cmdDone = true;
+            app.dispatchEvent("workspaceComponentLoaded",asynchCommandResult);
             
             if(asynchOnComplete) {
-                let asynchCommandResult = {};
-                asynchCommandResult.cmdDone = true;
                 asynchOnComplete(asynchCommandResult);
             }
         }
@@ -54,13 +57,17 @@ openworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData,async
             CommandManager.errorAlert("Error loading links: " + errorMsg);
         }
         
-        var workspaceLoadError = function(errorMsg) {
+        var workspaceLoadError = function(error) {
             app.clearWorkspaceUI();
+
+            //fire event
+            let errorMsg = error.message ? error.message : error.toString(); 
+            let asynchCommandResult = {};
+            asynchCommandResult.alertMsg = "Error loading workspace: " + errorMsg;
+            asynchCommandResult.cmdDone = false;
+            app.dispatchEvent("workspaceComponentLoadFailed",asynchCommandResult);
             
             if(asynchOnComplete) {
-                let asynchCommandResult = {};
-                asynchCommandResult.alertMsg("Error loading workspace: " + errorMsg);
-                asynchCommandResult.cmdDone = false;
                 asynchOnComplete(asynchCommandResult);
             }
         }

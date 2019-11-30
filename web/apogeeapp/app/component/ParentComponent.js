@@ -413,9 +413,11 @@ export default class ParentComponent extends Component {
     /** This method give focus to the editor for this componennt, if the component is showing. */
     giveEditorFocusIfShowing() {
         let display = this.getTabDisplay();
-        let editorView = display.getEditorView(); 
-        if((display)&&(display.getIsShowing())&&(editorView.dom)) {
-            editorView.focus();
+        if((display)&&(display.getIsShowing())) {
+            let editorView = display.getEditorView(); 
+            if(editorView.dom) {
+                editorView.focus();
+            }
         }
     }
       

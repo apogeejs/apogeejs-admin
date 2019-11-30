@@ -10,7 +10,7 @@ import {closeWorkspace} from "/apogeeapp/app/commandseq/closeworkspaceseq.js";
 import {createWorkspace} from "/apogeeapp/app/commandseq/createworkspaceseq.js";
 import {importWorkspace} from "/apogeeapp/app/commandseq/importworkspaceseq.js";
 import {exportWorkspace} from "/apogeeapp/app/commandseq/exportworkspaceseq.js";
-import {openWorkspace} from "/apogeeapp/app/commandseq/openworkspaceseq.js";
+import {openWorkspace,openWorkspaceFromTextData} from "/apogeeapp/app/commandseq/openworkspaceseq.js";
 import {saveWorkspace} from "/apogeeapp/app/commandseq/saveworkspaceseq.js";
 
 
@@ -255,7 +255,7 @@ export default class Apogee extends EventManager {
      * 
      * @private
      */ 
-    getConfigurationPromise(configJson) {    
+    getConfigurationPromise(configJson) {   
         if(!configJson) return;
         
         //set the settings JSON
@@ -289,7 +289,7 @@ export default class Apogee extends EventManager {
         }
         
         //create the UI - if a container ID is passed in
-        if(this.containerId !== undefined) {
+        if(this.containerId) {
             this.createUI(this.containerId);
         }
         
@@ -298,11 +298,11 @@ export default class Apogee extends EventManager {
         if(workspaceFilePromise) {
             var workspaceFileMetadata = this.appConfigManager.getInitialWorkspaceFileMetadata(this);
             
-            var openWorkspace = workspaceText => {
-                openworkspaceseq.openWorkspace(this,workspaceText,workspaceFileMetadata);
+            var openInitialWorkspace = workspaceText => {
+                openWorkspaceFromTextData(this,workspaceText,workspaceFileMetadata);
             };
             
-            workspaceFilePromise.then(openWorkspace).catch(errorMsg => alert("Error downloading initial workspace."));
+            workspaceFilePromise.then(openInitialWorkspace).catch(errorMsg => alert("Error downloading initial workspace."));
         }
         
     }

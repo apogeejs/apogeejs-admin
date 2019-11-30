@@ -42,6 +42,13 @@ export default class WebDisplayContainer {
         return this.isShowing;
     }
 
+    /** This method should be called if the data display is resized. */
+    onResize() {
+        if(this.dataDisplay) {
+            this.dataDisplay.onResize();
+        }
+    }
+
     /** This method closes the window. If the argument forceClose is not
      * set to true the "request_close" handler is called to check if
      * it is ok to close the window. */
@@ -62,17 +69,6 @@ export default class WebDisplayContainer {
     //---------------------------
     // GUI ELEMENT
     //---------------------------
-
-    /** This method returns the view label element to be used in the component title bar. */
-    getViewSelectorContainer() {
-        return this.viewSelectorContainer;
-    }
-
-    /** This method returns the view title element, which is embedded in the selecton container. This is
-     * intended for when the view title should be overritten. */
-    getViewTitleElement() {
-        return this.viewSelectorElement;
-    }
 
     /** This method returns the main dom element for the window frame. */
     getDisplayElement() {
@@ -283,10 +279,5 @@ export default class WebDisplayContainer {
     }
 
 }
-
-/** This method returns the main dom element for the window frame. */
-PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH = "/closed_gray.png";
-PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH = "/opened_gray.png";
-
 
 
