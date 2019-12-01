@@ -1,8 +1,10 @@
+import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
+
 /** This is a heading element configurable element.
  * 
  * @class 
  */
-apogeeapp.ui.HeadingElement = class extends apogeeapp.ui.ConfigurableElement {
+export default class HeadingElement extends ConfigurableElement {
 
     constructor(form,elementInitData) {
         super(form,elementInitData);
@@ -14,7 +16,7 @@ apogeeapp.ui.HeadingElement = class extends apogeeapp.ui.ConfigurableElement {
             headingLevel = elementInitData.level;
         }
         else {
-            headingLevel = apogeeapp.ui.HeadingElement.DEFAULT_HEADING_LEVEL;
+            headingLevel = HeadingElement.DEFAULT_HEADING_LEVEL;
         }
         var headingType = "h" + headingLevel;
         
@@ -30,10 +32,11 @@ apogeeapp.ui.HeadingElement = class extends apogeeapp.ui.ConfigurableElement {
 }
 
 
-apogeeapp.ui.HeadingElement.DEFAULT_HEADING_LEVEL = 2;
+HeadingElement.DEFAULT_HEADING_LEVEL = 2;
 
-apogeeapp.ui.HeadingElement.TYPE_NAME = "heading";
+HeadingElement.TYPE_NAME = "heading";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.HeadingElement);
+
+
 
 

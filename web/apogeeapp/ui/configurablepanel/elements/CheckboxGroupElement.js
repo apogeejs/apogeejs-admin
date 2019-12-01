@@ -1,10 +1,11 @@
 import util from "/apogeeutil/util.js";
+import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
 
 /** This is an text field element configurable element.
  * 
  * @class 
  */
-apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableElement {
+export default class CheckboxGroupElement extends ConfigurableElement {
     constructor(form,elementInitData) {
         super(form,elementInitData);
         
@@ -52,7 +53,7 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
         this._postInstantiateInit(elementInitData);
         
         //add suport for selection children
-        this.setChildState = apogeeapp.ui.ConfigurableElement.setChildStateArrayValue;
+        this.setChildState = ConfigurableElement.setChildStateArrayValue;
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -86,6 +87,6 @@ apogeeapp.ui.CheckboxGroupElement = class extends apogeeapp.ui.ConfigurableEleme
     }
 }
 
-apogeeapp.ui.CheckboxGroupElement.TYPE_NAME = "checkboxGroup";
+CheckboxGroupElement.TYPE_NAME = "checkboxGroup";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.CheckboxGroupElement);
+

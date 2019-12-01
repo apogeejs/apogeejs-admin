@@ -1,13 +1,15 @@
+import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
+
 /** This is an text field element configurable element.
  * 
  * @class 
  */
-apogeeapp.ui.SpacerElement = class extends apogeeapp.ui.ConfigurableElement {
+export default class SpacerElement extends ConfigurableElement {
     constructor(form,elementInitData) {
         //we will hide this element by setting display none. Someone can go ahead 
         //and show it, in which case they will get an empty element with margins.
         //maybe we should have a way to not create the element in the first place.
-        super(form,elementInitData,apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_NO_MARGIN);
+        super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_NO_MARGIN);
         
         var containerElement = this.getElement();
         
@@ -17,7 +19,7 @@ apogeeapp.ui.SpacerElement = class extends apogeeapp.ui.ConfigurableElement {
             spacerHeight = elementInitData.height;
         }
         else {
-            spacerHeight = apogeeapp.ui.SpacerElement.DEFAULT_HEIGHT;
+            spacerHeight = SpacerElement.DEFAULT_HEIGHT;
         }
         //this.spacerElement.style.display = "table";
         this.spacerElement.style.height = spacerHeight + "px";
@@ -30,8 +32,6 @@ apogeeapp.ui.SpacerElement = class extends apogeeapp.ui.ConfigurableElement {
 
 //adding this includes the extra space of two margins rather than one,
 //so just one pixel has a large effect
-apogeeapp.ui.SpacerElement.DEFAULT_HEIGHT = 15;
+SpacerElement.DEFAULT_HEIGHT = 15;
 
-apogeeapp.ui.SpacerElement.TYPE_NAME = "spacer";
-
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.SpacerElement);
+SpacerElement.TYPE_NAME = "spacer";

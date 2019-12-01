@@ -17,12 +17,13 @@ import {saveWorkspace} from "/apogeeapp/app/commandseq/saveworkspaceseq.js";
 import JsonTableComponent from "/apogeeapp/app/components/JsonTableComponent.js";
 import FunctionComponent from "/apogeeapp/app/components/FunctionComponent.js";
 import FolderComponent from "/apogeeapp/app/components/FolderComponent.js";
-import CanvasFolderComponent from "/apogeeapp/app/components/CanvasFolderComponent.js";
 import FolderFunctionComponent from "/apogeeapp/app/components/FolderFunctionComponent.js";
 import DynamicForm from "/apogeeapp/app/components/DynamicForm.js";
 import FormDataComponent from "/apogeeapp/app/components/FormDataComponent.js";
 import CustomComponent from "/apogeeapp/app/components/CustomComponent.js";
 import CustomDataComponent from "/apogeeapp/app/components/CustomDataComponent.js";
+
+import "/apogeeapp/ui/configurablepanel/ConfigurablePanelInit.js";
 
 /** @private */
 let apogeeInstance = null;

@@ -1,8 +1,10 @@
+import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
+
 /** This is a heading element configurable element.
  * 
  * @class 
  */
-apogeeapp.ui.HTMLDisplayElement = class extends apogeeapp.ui.ConfigurableElement {
+export default class HTMLDisplayElement extends ConfigurableElement {
 
     constructor(form,elementInitData) {
         super(form,elementInitData);
@@ -19,8 +21,8 @@ apogeeapp.ui.HTMLDisplayElement = class extends apogeeapp.ui.ConfigurableElement
     }
 }
 
-apogeeapp.ui.HTMLDisplayElement.TYPE_NAME = "htmlDisplay";
+HTMLDisplayElement.TYPE_NAME = "htmlDisplay";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.HTMLDisplayElement);
+
 
 

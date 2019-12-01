@@ -1,10 +1,12 @@
+import ConfigurablePanelConstants from "/apogeeapp/ui/configurablepanel/ConfigurablePanelConstants.js";
+
 /** This is a panel with forma elements that can be configured using a javascript object.
  * 
  * @class 
  */
-apogeeapp.ui.ConfigurablePanel = class {
+export default class ConfigurablePanel {
     
-    constructor(optionalContainerClassName = apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED) {
+    constructor(optionalContainerClassName = ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED) {
         this.elementObjects = [];
         this.panelElement = this.createPanelElement(optionalContainerClassName); 
     }
@@ -19,7 +21,7 @@ apogeeapp.ui.ConfigurablePanel = class {
         
         //check for an invalid input
         if((!formInitData)||(!formInitData.layout)||(formInitData.layout.constructor != Array)) {
-            formInitData = apogeeapp.ui.ConfigurablePanel.INVALID_INIT_DATA;
+            formInitData = ConfigurablePanel.INVALID_INIT_DATA;
         }
         
         //clear data
@@ -49,8 +51,12 @@ apogeeapp.ui.ConfigurablePanel = class {
         catch(error) {
             var errorMsg = "Error in panel: " + error.message;
             
-            var errorLayoutInfo = apogeeapp.ui.ConfigurablePanel.getErrorMessageLayoutInfo(errorMsg);
-            this.configureForm(errorLayoutInfo);
+            //display an error layout
+            //but only try this once. If the error layout throws an error jsut continue
+            if(!formInitData.isErrorLayout) {
+                var errorLayoutInfo = ConfigurablePanel.getErrorMessageLayoutInfo(errorMsg);
+                this.configureForm(errorLayoutInfo);
+            }
         }
     }
     
@@ -63,7 +69,7 @@ apogeeapp.ui.ConfigurablePanel = class {
     getValue() {
         var formValue = {};
         var addValue = elementObject => {
-            if(elementObject.getState() != apogeeapp.ui.ConfigurableElement.STATE_INACTIVE) {
+            if(elementObject.getState() != ConfigurablePanelConstants.STATE_INACTIVE) {
                 var elementValue = elementObject.getValue();
                 if(elementValue !== undefined) {
                     var key = elementObject.getKey();
@@ -98,11 +104,11 @@ apogeeapp.ui.ConfigurablePanel = class {
      * will then separate out any handlers from the layout. */
     addSubmit(onSubmit,
             onCancel,
-            optionalSubmitLabel = apogeeapp.ui.SubmitElement.DEFAULT_SUBMIT_LABEL,
-            optionalCancelLabel = apogeeapp.ui.SubmitElement.DEFAULT_CANCEL_LABEL) {
+            optionalSubmitLabel = ConfigurablePanelConstants.DEFAULT_SUBMIT_LABEL,
+            optionalCancelLabel = ConfigurablePanelConstants.DEFAULT_CANCEL_LABEL) {
                 
         var data = {};
-        data.type = apogeeapp.ui.SubmitElement.TYPE_NAME;
+        data.type = "submit";
         if(onSubmit) {
             data.onSubmit = onSubmit;
             data.submitLabel = optionalSubmitLabel;
@@ -125,15 +131,15 @@ apogeeapp.ui.ConfigurablePanel = class {
     }
     
     setDisabled(isDisabled) {
-        var state = isDisabled ? apogeeapp.ui.ConfigurableElement.STATE_DISABLED :
-                apogeeapp.ui.ConfigurableElement.STATE_NORMAL;
+        var state = isDisabled ? ConfigurablePanelConstants.STATE_DISABLED :
+                ConfigurablePanelConstants.STATE_NORMAL;
         this.elementObjects.forEach( elementObject => elementObject.setState(state) );
     }
     
     /** This method is used to register configurable elements with the panel */
     static addConfigurableElement(constructorFunction) {
         var type = constructorFunction.TYPE_NAME;
-        apogeeapp.ui.ConfigurablePanel.elementMap[type] = constructorFunction;
+        ConfigurablePanel.elementMap[type] = constructorFunction;
     }
     
     /** This method can be used to generate an error message layout. */
@@ -143,7 +149,7 @@ apogeeapp.ui.ConfigurablePanel = class {
         entry.type = "htmlDisplay";
         entry.html = "<em style='color:red'>" + errorMsg + "</em>";
         layout.push(entry);
-        return {"layout":layout};
+        return {"layout":layout, "isErrorLayout": true};
     }
     
     //=================================
@@ -164,21 +170,13 @@ apogeeapp.ui.ConfigurablePanel = class {
             throw new Error("Type not found for configurable form entry!");
         }
         
-        var elementObject;
-        if(type == "custom") {
-            //special case - let the user construct an explict object from the base element
-            elementObject = new apogeeapp.ui.ConfigurableElement(this,elementInitData);
-            elementInitData.builderFunction(elementObject);
+        var constructor = ConfigurablePanel.getTypeConstructor(type);
+        if(!constructor) {
+            throw new Error("Type not found for configurable element: " + type);
         }
-        else {
-            //standard case - lookup constructor and instantiate
-            var constructor = apogeeapp.ui.ConfigurablePanel.getTypeConstructor(type);
-            if(!constructor) {
-                throw new Error("Type not found for configurable element: " + type);
-            }
 
-            elementObject = new constructor(this,elementInitData);
-        }
+        var elementObject = new constructor(this,elementInitData);
+
         
         this.elementObjects.push(elementObject);
         var domElement = elementObject.getElement();
@@ -188,18 +186,18 @@ apogeeapp.ui.ConfigurablePanel = class {
     }
     
     static getTypeConstructor(type) {
-        return apogeeapp.ui.ConfigurablePanel.elementMap[type];
+        return ConfigurablePanel.elementMap[type];
     }
 }
 
 //static fields
-apogeeapp.ui.ConfigurablePanel.elementMap = {};
+ConfigurablePanel.elementMap = {};
 
-apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT = "apogee_configurablePanelBody_fillParent";
-apogeeapp.ui.ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED = "apogee_configurablePanelBody_selfSized";
+ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT = "apogee_configurablePanelBody_fillParent";
+ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED = "apogee_configurablePanelBody_selfSized";
 
 //This is displayed if there is an invalid layout passed in
-apogeeapp.ui.ConfigurablePanel.INVALID_INIT_DATA = {
+ConfigurablePanel.INVALID_INIT_DATA = {
     layout: [
         {
             type: "heading",

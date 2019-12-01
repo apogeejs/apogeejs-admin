@@ -1,8 +1,10 @@
+import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
+
 /** This is an text field element configurable element.
  * 
  * @class 
  */
-apogeeapp.ui.TextareaElement = class extends apogeeapp.ui.ConfigurableElement {
+export default class TextareaElement extends ConfigurableElement {
     constructor(form,elementInitData) {
         super(form,elementInitData);
         
@@ -74,6 +76,4 @@ apogeeapp.ui.TextareaElement = class extends apogeeapp.ui.ConfigurableElement {
     }
 }
 
-apogeeapp.ui.TextareaElement.TYPE_NAME = "textarea";
-
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.TextareaElement);
+TextareaElement.TYPE_NAME = "textarea";

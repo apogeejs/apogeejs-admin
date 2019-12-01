@@ -1,4 +1,5 @@
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+import ConfigurablePanel from "/apogeeapp/ui/configurablepanel/ConfigurablePanel.js";
 
 /* This is a form display. It is meant for taking a submit action. If you want a form
  * tied to a data value, the ConfigurableFormEditor can be used.
@@ -11,7 +12,7 @@ export default class ConfigurableFormDisplay extends DataDisplay {
     constructor(displayContainer,callbacks,getLayoutInfo) {
         super(displayContainer,callbacks,DataDisplay.SCROLLING);  
         
-        this.panel = this.panel = new apogeeapp.ui.ConfigurablePanel();
+        this.panel = this.panel = new ConfigurablePanel();
     }
     
     /** This method will return undefined until showData is called. */

@@ -1,6 +1,7 @@
 import util from "/apogeeutil/util.js";
 
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+import ConfigurablePanel from "/apogeeapp/ui/configurablepanel/ConfigurablePanel.js";
 
 /** This is an editor that displays a customized form for data input. */
 export default class ConfigurableFormEditor extends DataDisplay {
@@ -24,7 +25,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
         //layout can be fixed or dynamic
         this.dynamicLayoutCallback = callbacks.getLayoutInfo;
         
-        this.panel = new apogeeapp.ui.ConfigurablePanel();
+        this.panel = new ConfigurablePanel();
         
         if(optionalFixedLayoutInfo) {
             this.panel.configureForm(optionalFixedLayoutInfo);

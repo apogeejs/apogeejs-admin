@@ -1,10 +1,11 @@
 import util from "/apogeeutil/util.js";
+import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
 
 /** This is an text field element configurable element.
  * 
  * @class 
  */
-apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement {
+export default class RadioGroupElement extends ConfigurableElement {
     constructor(form,elementInitData) {
         super(form,elementInitData);
         
@@ -52,7 +53,7 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
         this._postInstantiateInit(elementInitData);
         
         //add suport for selection children
-        this.setChildState = apogeeapp.ui.ConfigurableElement.setChildStateSingleValue;
+        this.setChildState = ConfigurableElement.setChildStateSingleValue;
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -95,6 +96,5 @@ apogeeapp.ui.RadioGroupElement = class extends apogeeapp.ui.ConfigurableElement 
     }
 }
 
-apogeeapp.ui.RadioGroupElement.TYPE_NAME = "radioButtonGroup";
+RadioGroupElement.TYPE_NAME = "radioButtonGroup";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.RadioGroupElement);

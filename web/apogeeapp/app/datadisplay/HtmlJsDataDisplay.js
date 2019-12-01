@@ -1,4 +1,5 @@
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+import UiCommandMessenger from "/apogeeapp/app/commands/UiCommandMessenger.js";
 
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from
@@ -53,7 +54,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         
         //this gives the ui code access to some data display functions
         var admin = {
-            getMessenger: () => new apogeeapp.app.UiCommandMessenger(this.member),
+            getMessenger: () => new UiCommandMessenger(this.member),
             startEditMode: () => this.startEditMode(),
             endEditMode: () => this.endEditMode()
         }

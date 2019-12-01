@@ -1,9 +1,11 @@
+import ConfigurablePanelConstants from "/apogeeapp/ui/configurablepanel/ConfigurablePanelConstants.js";
+
 /** This is an element that composes the content of a configurable panel.
  * 
  * @class 
  */
-apogeeapp.ui.ConfigurableElement = class {
-    constructor(form,elementInitData,optionalContainerClassName = apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_STANDARD) {
+export default class ConfigurableElement {
+    constructor(form,elementInitData,optionalContainerClassName = ConfigurableElement.CONTAINER_CLASS_STANDARD) {
         this.form = form;
         this.key = elementInitData.key;
         this.domElement = apogeeapp.ui.createElement("div",{"className":optionalContainerClassName});
@@ -29,21 +31,21 @@ apogeeapp.ui.ConfigurableElement = class {
         this.state = state;
          
         switch(state) {
-            case apogeeapp.ui.ConfigurableElement.STATE_NORMAL:
+            case ConfigurablePanelConstants.STATE_NORMAL:
                 this._setVisible(true);
                 this._setDisabled(false);
                 break;
                 
-            case apogeeapp.ui.ConfigurableElement.STATE_DISABLED:
+            case ConfigurablePanelConstants.STATE_DISABLED:
                 this._setVisible(true);
                 this._setDisabled(true);
                 break;
                 
-            case apogeeapp.ui.ConfigurableElement.STATE_HIDDEN:
+            case ConfigurablePanelConstants.STATE_HIDDEN:
                 this._setVisible(false);
                 break;
                 
-            case apogeeapp.ui.ConfigurableElement.STATE_INACTIVE:
+            case ConfigurablePanelConstants.STATE_INACTIVE:
                 this._setVisible(false);
                 break;
         }
@@ -99,10 +101,10 @@ apogeeapp.ui.ConfigurableElement = class {
     /** This is a function that can be used to set values when the parent element has a single value. */
     static setChildStateSingleValue(childData,value) {
         if(childData.value == value) {
-            childData.element.setState(apogeeapp.ui.ConfigurableElement.STATE_NORMAL);
+            childData.element.setState(ConfigurablePanelConstants.STATE_NORMAL);
         }
         else {
-            var state = childData.keepActiveOnHide ? apogeeapp.ui.ConfigurableElement.STATE_HIDDEN : apogeeapp.ui.ConfigurableElement.STATE_INACTIVE;
+            var state = childData.keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE;
             childData.element.setState(state);
         }
     }
@@ -110,10 +112,10 @@ apogeeapp.ui.ConfigurableElement = class {
     /** This is a function that can be used to set values when the parent element has an array value. */
     static setChildStateArrayValue(childData,value) {
         if(value.indexOf(childData.value) >= 0) {
-            childData.element.setState(apogeeapp.ui.ConfigurableElement.STATE_NORMAL);
+            childData.element.setState(ConfigurablePanelConstants.STATE_NORMAL);
         }
         else {
-            var state = childData.keepActiveOnHide ? apogeeapp.ui.ConfigurableElement.STATE_HIDDEN : apogeeapp.ui.ConfigurableElement.STATE_INACTIVE;
+            var state = childData.keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE;
             childData.element.setState(state);
         }
     }
@@ -132,7 +134,7 @@ apogeeapp.ui.ConfigurableElement = class {
             this.setValue(elementInitData.value);
         }
         
-        var state = (elementInitData.state != undefined) ? elementInitData.state : apogeeapp.ui.ConfigurableElement.STATE_NORMAL;
+        var state = (elementInitData.state != undefined) ? elementInitData.state : ConfigurablePanelConstants.STATE_NORMAL;
         this.setState(state);
         
         //standard events
@@ -170,13 +172,8 @@ apogeeapp.ui.ConfigurableElement = class {
     }
 }
 
-apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_STANDARD = "apogee_configurablePanelLine_standard";
-apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_NO_MARGIN = "apogee_configurablePanelPanelLine_noMargin";
-apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_INVISIBLE = "apogee_configurablePanelPanelLine_hidden";
-
-apogeeapp.ui.ConfigurableElement.STATE_NORMAL = "normal";
-apogeeapp.ui.ConfigurableElement.STATE_DISABLED = "disabled";
-apogeeapp.ui.ConfigurableElement.STATE_HIDDEN = "hidden";
-apogeeapp.ui.ConfigurableElement.STATE_INACTIVE = "inactive";
+ConfigurableElement.CONTAINER_CLASS_STANDARD = "apogee_configurablePanelLine_standard";
+ConfigurableElement.CONTAINER_CLASS_NO_MARGIN = "apogee_configurablePanelPanelLine_noMargin";
+ConfigurableElement.CONTAINER_CLASS_INVISIBLE = "apogee_configurablePanelPanelLine_hidden";
 
 

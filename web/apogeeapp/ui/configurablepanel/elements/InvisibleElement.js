@@ -1,13 +1,15 @@
+import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
+
 /** This is an text field element configurable element.
  * 
  * @class 
  */
-apogeeapp.ui.InvisibleElement = class extends apogeeapp.ui.ConfigurableElement {
+export default class InvisibleElement extends ConfigurableElement {
     constructor(form,elementInitData) {
         //we will hide this element by setting display none. Someone can go ahead 
         //and show it, in which case they will get an empty element with margins.
         //maybe we should have a way to not create the element in the first place.
-        super(form,elementInitData,apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_INVISIBLE);
+        super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_INVISIBLE);
         
         this._postInstantiateInit(elementInitData);
     }
@@ -25,6 +27,6 @@ apogeeapp.ui.InvisibleElement = class extends apogeeapp.ui.ConfigurableElement {
     }
 }
 
-apogeeapp.ui.InvisibleElement.TYPE_NAME = "invisible";
+InvisibleElement.TYPE_NAME = "invisible";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.InvisibleElement);
+

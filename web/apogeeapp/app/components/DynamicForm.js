@@ -4,6 +4,7 @@ import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
 import ConfigurableFormDisplay from "/apogeeapp/app/datadisplay/ConfigurableFormDisplay.js";
 import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
+import UiCommandMessenger from "/apogeeapp/app/commands/UiCommandMessenger.js";
 
 /** This component represents a table object. */
 export default class DynamicForm extends EditComponent {
@@ -63,7 +64,7 @@ export default class DynamicForm extends EditComponent {
                 getData: () => {              
                     let layoutFunction = this.member.getData();
                     let admin = {
-                        getMessenger: () => new apogeeapp.app.UiCommandMessenger(this.member)
+                        getMessenger: () => new UiCommandMessenger(this.member)
                     }
                     return layoutFunction(admin);
                 }

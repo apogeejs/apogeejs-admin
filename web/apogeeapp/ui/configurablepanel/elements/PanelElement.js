@@ -1,17 +1,20 @@
+import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
+import ConfigurablePanel from "/apogeeapp/ui/configurablepanel/ConfigurablePanel.js";
+
 /** This is an text field element configurable element.
  * 
  * @class 
  */
-apogeeapp.ui.PanelElement = class extends apogeeapp.ui.ConfigurableElement {
+export default class PanelElement extends ConfigurableElement {
     constructor(form,elementInitData) {
-        super(form,elementInitData,apogeeapp.ui.ConfigurableElement.CONTAINER_CLASS_NO_MARGIN);
+        super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_NO_MARGIN);
         
         var containerElement = this.getElement();
         //update the container class
         containerElement.className = "apogee_configurablePanelPanelLine";
         
         var formInitData = elementInitData.formData;
-        this.panel = new apogeeapp.ui.ConfigurablePanel();
+        this.panel = new ConfigurablePanel();
         this.panel.configureForm(formInitData);
         var panelElement = this.panel.getElement();
         panelElement.className = "apogee_configurablePanelPanelLine";
@@ -50,6 +53,7 @@ apogeeapp.ui.PanelElement = class extends apogeeapp.ui.ConfigurableElement {
     }
 }
 
-apogeeapp.ui.PanelElement.TYPE_NAME = "panel";
+PanelElement.TYPE_NAME = "panel";
 
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.PanelElement);
+
+

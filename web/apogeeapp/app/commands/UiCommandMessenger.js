@@ -6,7 +6,7 @@ import Apogee from "/apogeeapp/app/Apogee.js";
  * and methods to create commands for setting a value to a table or for setting
  * values on multiple tables. Custom commands can also be created. See the 
  * documentation. */
-apogeeapp.app.UiCommandMessenger = class {
+export default class UiCommandMessenger {
     
     constructor(fromMember) {
         this.workspace = fromMember.getWorkspace();
@@ -26,24 +26,26 @@ apogeeapp.app.UiCommandMessenger = class {
             throw new Error("Error calling messenger - member not fond: " + updateMemberName);
         }
         
-        return apogeeapp.app.membersave.createSaveDataCommand(member,data,optionalCommandDescription,optionalSetsWorkspaceDirty);
+        return getSaveDataAction(member.getWorkspace(),member.getFullName(),data);
+        
     }
     
     /** This is similar to getDataUpdateCommand but it allows setting multiple values.
      * UpdateInfo is an array with each element being a array of two values with the first
      * being the member name and the second being the value to set. */
     getCompoundDataUpdateCommand(updateInfo,optionalCommandDescription,optionalSetsWorkspaceDirty) {
-        
+
         //populte the update into with the proper member objects
-        var modUpdateInfo = updateInfo.map( entry => {
-            let member = this._getMemberObject(entry[0]);
-            if(!member) {
-                throw new Error("Error calling messenger - member not fond: " + updateMemberName);
-            }
-            return [member,entry[1]];
+        let childActions = updateInfo.map( entry => {
+            childActions.push(this.getDataupdateCommand(entry[0],entry[1]));
         });
         
-        return apogeeapp.app.membersave.createCompoundSaveDataCommand(this.workspace,modUpdateInfo,optionalCommandDescription,optionalSetsWorkspaceDirty);
+        let compoundAction = {};
+        compoundAction.action = "compoundAction";
+        compoundAction.actions = childActions;
+
+        return compoundAction;
+        
     }
     
     /** This method executes a command. */

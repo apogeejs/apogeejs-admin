@@ -1,8 +1,11 @@
+import ConfigurablePanelConstants from "/apogeeapp/ui/configurablepanel/ConfigurablePanelConstants.js";
+import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
+
 /** This is an submit element configurable element.
  * 
  * @class 
  */
-apogeeapp.ui.SubmitElement = class extends apogeeapp.ui.ConfigurableElement {
+export default class SubmitElement extends ConfigurableElement {
     
     constructor(form,elementInitData) {
         super(form,elementInitData);
@@ -25,7 +28,7 @@ apogeeapp.ui.SubmitElement = class extends apogeeapp.ui.ConfigurableElement {
                 submitLabel = elementInitData.submitLabel;
             }
             else {
-                submitLabel = apogeeapp.ui.SubmitElement.DEFAULT_SUBMIT_LABEL;
+                submitLabel = ConfigurablePanelConstants.DEFAULT_SUBMIT_LABEL;
             }
             
             this.submitButton = apogeeapp.ui.createElement("button",{"className":"apogee_configurablePanelButton","innerHTML":submitLabel,"onclick":onSubmit});
@@ -47,7 +50,7 @@ apogeeapp.ui.SubmitElement = class extends apogeeapp.ui.ConfigurableElement {
                 cancelLabel = elementInitData.cancelLabel;
             }
             else {
-                cancelLabel = apogeeapp.ui.SubmitElement.DEFAULT_CANCEL_LABEL;
+                cancelLabel = ConfigurablePanelConstants.DEFAULT_CANCEL_LABEL;
             }
             
             this.cancelButton = apogeeapp.ui.createElement("button",{"className":"apogee_configurablePanelButton","innerHTML":cancelLabel,"onclick":onCancel});
@@ -86,10 +89,5 @@ apogeeapp.ui.SubmitElement = class extends apogeeapp.ui.ConfigurableElement {
         if(this.cancelButton) this.cancelButton.disabled = this.overallDisabled || this.cancelDisabled;
     }
 }
- 
-apogeeapp.ui.SubmitElement.DEFAULT_SUBMIT_LABEL = "OK";
-apogeeapp.ui.SubmitElement.DEFAULT_CANCEL_LABEL = "Cancel";
 
-apogeeapp.ui.SubmitElement.TYPE_NAME = "submit";
-
-apogeeapp.ui.ConfigurablePanel.addConfigurableElement(apogeeapp.ui.SubmitElement);
+SubmitElement.TYPE_NAME = "submit";
