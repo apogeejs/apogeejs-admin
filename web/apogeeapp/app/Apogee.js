@@ -13,8 +13,11 @@ import {exportWorkspace} from "/apogeeapp/app/commandseq/exportworkspaceseq.js";
 import {openWorkspace,openWorkspaceFromTextData} from "/apogeeapp/app/commandseq/openworkspaceseq.js";
 import {saveWorkspace} from "/apogeeapp/app/commandseq/saveworkspaceseq.js";
 
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import TabFrame from "/apogeeapp/ui/tabframe/TabFrame.js";
 import Menu from "/apogeeapp/ui/menu/Menu.js";
+import SplitPane from "/apogeeapp/ui/splitpane/SplitPane.js";
+import DisplayAndHeader from "/apogeeapp/ui/displayandheader/DisplayAndHeader.js";
 
 import JsonTableComponent from "/apogeeapp/app/components/JsonTableComponent.js";
 import FunctionComponent from "/apogeeapp/app/components/FunctionComponent.js";
@@ -351,12 +354,12 @@ export default class Apogee extends EventManager {
      * @private */
     createUI(containerId) {
         
-        var windowElements = apogeeapp.ui.initWindows(containerId);
+        var windowElements = apogeeui.initWindows(containerId);
         var topContainer = windowElements.baseElement;
         
-        var mainContainer = new apogeeapp.ui.DisplayAndHeader(apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
+        var mainContainer = new DisplayAndHeader(DisplayAndHeader.FIXED_PANE,
                 null,
-                apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
+                DisplayAndHeader.FIXED_PANE,
                 null
             );
         topContainer.appendChild(mainContainer.getOuterElement());
@@ -370,9 +373,9 @@ export default class Apogee extends EventManager {
         //----------------------
         //create the split pane
         //----------------------
-        var splitPane = new apogeeapp.ui.SplitPane(
-                apogeeapp.ui.SplitPane.SCROLLING_PANE,
-                apogeeapp.ui.SplitPane.FIXED_PANE
+        var splitPane = new SplitPane(
+                SplitPane.SCROLLING_PANE,
+                SplitPane.FIXED_PANE
             );
         mainContainer.getBody().appendChild(splitPane.getOuterElement());
 
@@ -388,8 +391,8 @@ export default class Apogee extends EventManager {
         splitPane.getRightPaneContainer().appendChild(this.tabFrame.getElement());
         
         //add listener for displaying the active tab
-        this.tabFrame.addListener(apogeeapp.ui.SHOWN_EVENT,tab => this.onTabShown(tab));
-        this.tabFrame.addListener(apogeeapp.ui.HIDDEN_EVENT,tab => this.onTabHidden(tab));
+        this.tabFrame.addListener(apogeeui.SHOWN_EVENT,tab => this.onTabShown(tab));
+        this.tabFrame.addListener(apogeeui.HIDDEN_EVENT,tab => this.onTabHidden(tab));
 
     }
 
@@ -431,9 +434,9 @@ export default class Apogee extends EventManager {
         var menus = {};
         
         //creat menu  bar with left elements (menus) and right elements (active tab display)
-        var menuBar = apogeeapp.ui.createElementWithClass("div","menu_bar");
-        var menuBarLeft = apogeeapp.ui.createElementWithClass("div","menu_bar_left",menuBar);
-        var menuBarRight = apogeeapp.ui.createElementWithClass("div","menu_bar_right",menuBar);
+        var menuBar = apogeeui.createElementWithClass("div","menu_bar");
+        var menuBarLeft = apogeeui.createElementWithClass("div","menu_bar_left",menuBar);
+        var menuBarRight = apogeeui.createElementWithClass("div","menu_bar_right",menuBar);
 
         //Workspace menu
         name = "Workspace";
@@ -486,9 +489,9 @@ export default class Apogee extends EventManager {
         }
         
         //add the active tab display
-        this.activeTabIconDisplay = apogeeapp.ui.createElementWithClass("img","tab-icon-display",menuBarRight);
+        this.activeTabIconDisplay = apogeeui.createElementWithClass("img","tab-icon-display",menuBarRight);
         this.activeTabIconDisplay.style.display = "none";
-        this.activeTabTitleDisplay = apogeeapp.ui.createElementWithClass("div","tab-title-display",menuBarRight);
+        this.activeTabTitleDisplay = apogeeui.createElementWithClass("div","tab-title-display",menuBarRight);
         this.activeTabTitleDisplay.style.display = "none";
         return menuBar;
         

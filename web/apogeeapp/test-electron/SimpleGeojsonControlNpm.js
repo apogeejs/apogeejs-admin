@@ -1,5 +1,6 @@
 import Apogee from "/apogeeapp/app/Apogee.js";
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** 
  * SimpleGeojsonControl
@@ -77,7 +78,7 @@ moduleReturn.initApogeeModule = function(apogee,apogeeapp) {
             super(displayContainer,callbacks)
 
             //create map element - this css class will fill the parent (the window frame) with no scrolling 
-            this.mapElement = apogeeapp.ui.createElement("div");
+            this.mapElement = apogeeui.createElement("div");
             this.mapElement.className = "visiui_win_container_fixed";
 
             this.member = member;
@@ -93,10 +94,10 @@ moduleReturn.initApogeeModule = function(apogee,apogeeapp) {
         }
 
         //this method tells the window the type of content:
-        //apogeeapp.ui.RESIZABLE - if the window can freely resize it
-        //apogeeapp.ui.FIXED_SIZE - if the content is fixed size
+        //apogeeui.RESIZABLE - if the window can freely resize it
+        //apogeeui.FIXED_SIZE - if the content is fixed size
         getContentType() {
-            return apogeeapp.ui.RESIZABLE;
+            return apogeeui.RESIZABLE;
         }
 
         setData(data) {

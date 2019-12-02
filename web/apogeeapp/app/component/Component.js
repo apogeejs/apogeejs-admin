@@ -1,9 +1,11 @@
 import util from "/apogeeutil/util.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import {updateComponent} from "/apogeeapp/app/commandseq/updatecomponentseq.js";
 import {deleteComponent} from "/apogeeapp/app/commandseq/deletecomponentseq.js";
 import TreeComponentDisplay from "/apogeeapp/app/component/TreeComponentDisplay.js";
+import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";
 import {bannerConstants} from "/apogeeapp/app/component/banner.js"; 
 
 /** This is the base functionality for a component. */
@@ -90,7 +92,7 @@ export default class Component extends EventManager {
         else {
             var resPath = this.componentGenerator.ICON_RES_PATH;
             if(!resPath) resPath = Component.DEFAULT_ICON_RES_PATH;
-            return apogeeapp.ui.getResourcePath(resPath);
+            return apogeeui.getResourcePath(resPath);
         }
     }
 
@@ -275,7 +277,7 @@ export default class Component extends EventManager {
         
         if(this.treeDisplay) {
             var treeState = this.treeDisplay.getState();
-            if(treeState != apogeeapp.ui.treecontrol.NO_CONTROL) {
+            if(treeState != TreeEntry.NO_CONTROL) {
                 json.treeState = treeState;
             }
         }

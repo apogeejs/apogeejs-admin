@@ -5,6 +5,7 @@ import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/ad
 import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
 import PageChildComponentDisplay from "/apogeeapp/app/component/literatepage/PageChildComponentDisplay.js"
 
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import Tab from "/apogeeapp/ui/tabframe/Tab.js";
 
 /** This component represents a json table object. 
@@ -51,7 +52,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
     }
 
     setBannerState(bannerState,bannerMessage) {
-        apogeeapp.ui.removeAllChildren(this.bannerContainer);
+        apogeeui.removeAllChildren(this.bannerContainer);
         if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
            //no action
         }
@@ -139,7 +140,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //set the content
         //-----------------------
         this.createDisplayContent();
-        this.tab.setContent(this.contentElement,apogeeapp.ui.FIXED_SIZE);
+        this.tab.setContent(this.contentElement,apogeeui.FIXED_SIZE);
 
         if(this.tab.getIsShowing()) {
             this.tabShown()
@@ -147,9 +148,9 @@ export default class LiteratePageComponentDisplay extends EventManager {
         else {
             this.tabHidden()
         }
-        this.tab.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.tabShown());
-        this.tab.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.tabHidden());
-        this.tab.addListener(apogeeapp.ui.CLOSE_EVENT,() => this.tabClosed());
+        this.tab.addListener(apogeeui.SHOWN_EVENT,() => this.tabShown());
+        this.tab.addListener(apogeeui.HIDDEN_EVENT,() => this.tabHidden());
+        this.tab.addListener(apogeeui.CLOSE_EVENT,() => this.tabClosed());
 
         //------------------
         // set menu
@@ -172,7 +173,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
             this.component.closeTabDisplay();
             this.destroy();
         }
-        this.tab.addListener(apogeeapp.ui.CLOSE_EVENT,onClose);
+        this.tab.addListener(apogeeui.CLOSE_EVENT,onClose);
     }
 
      /** @private */
@@ -181,12 +182,12 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //-----------
         //page header
         //------------
-        this.headerElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_header",null);
+        this.headerElement = apogeeui.createElementWithClass("div","visiui_litPage_header",null);
         this.tab.setHeaderContent(this.headerElement);
 
-        this.editorToolbarContainer = apogeeapp.ui.createElementWithClass("div","visiui_litPage_editorToolbar",this.headerElement);
-        this.componentToolbarContainer = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentToolbar",this.headerElement);
-        this.bannerContainer = apogeeapp.ui.createElementWithClass("div","visiui_litPage_banner",this.headerElement);
+        this.editorToolbarContainer = apogeeui.createElementWithClass("div","visiui_litPage_editorToolbar",this.headerElement);
+        this.componentToolbarContainer = apogeeui.createElementWithClass("div","visiui_litPage_componentToolbar",this.headerElement);
+        this.bannerContainer = apogeeui.createElementWithClass("div","visiui_litPage_banner",this.headerElement);
 
 //        this.initEditorToolbar();
         this.initComponentToolbar();
@@ -194,8 +195,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //-------------------
         //page body
         //-------------------
-        this.contentElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_body",null);
-        this.tab.setContent(this.contentElement,apogeeapp.ui.FIXED_SIZE);
+        this.contentElement = apogeeui.createElementWithClass("div","visiui_litPage_body",null);
+        this.tab.setContent(this.contentElement,apogeeui.FIXED_SIZE);
 
         //we ony use this context menu and child map for parents
         //modify if we use this elsewhere
@@ -230,14 +231,14 @@ export default class LiteratePageComponentDisplay extends EventManager {
             let generator = app.componentGenerators[key];
             if(generator.hasChildEntry) {
 
-                var buttonElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
+                var buttonElement = apogeeui.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
                 //make the idon
                 var imageElement = document.createElement("img")
-                imageElement.src = apogeeapp.ui.getResourcePath(generator.ICON_RES_PATH);
-                var iconElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButtonIcon",buttonElement);
+                imageElement.src = apogeeui.getResourcePath(generator.ICON_RES_PATH);
+                var iconElement = apogeeui.createElementWithClass("div","visiui_litPage_componentButtonIcon",buttonElement);
                 iconElement.appendChild(imageElement);
                 //label
-                var textElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
+                var textElement = apogeeui.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
                 textElement.innerHTML = generator.displayName;
                 //add handler
                 buttonElement.onclick = () => {
@@ -253,8 +254,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
         }
 
         //add the additional component item
-        var buttonElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
-        var textElement = apogeeapp.ui.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
+        var buttonElement = apogeeui.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
+        var textElement = apogeeui.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
         textElement.innerHTML = "Additional Components...";
         buttonElement.onclick = () => {
 
@@ -306,19 +307,19 @@ export default class LiteratePageComponentDisplay extends EventManager {
     /** @protected */
     tabShown() {
         this.isShowing = true;
-        this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,this);
+        this.dispatchEvent(apogeeui.SHOWN_EVENT,this);
     }
 
     /** @protected */
     tabHidden() {
         this.isShowing = false;
-        this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,this);
+        this.dispatchEvent(apogeeui.HIDDEN_EVENT,this);
     }
 
     tabClosed() {
         //delete the page
         this.component.closeTabDisplay();
-        this.dispatchEvent(apogeeapp.ui.CLOSE_EVENT,this);
+        this.dispatchEvent(apogeeui.CLOSE_EVENT,this);
     }
     
 }

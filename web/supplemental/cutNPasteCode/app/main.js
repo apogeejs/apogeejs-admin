@@ -26,7 +26,7 @@ requirejs(['apogee-web-app'],function(apogeeapp) {
 	}
 	
 	//initialize resource path
-	apogeeapp.ui.initResourcePath("resources");
+	apogeeui.initResourcePath("resources");
 	
 	//create the application
 	apogeeapp.app.Apogee.createApp("appContainer");

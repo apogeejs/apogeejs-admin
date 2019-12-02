@@ -2,6 +2,7 @@ import util from "/apogeeutil/util.js";
 
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** Editor that uses the Ace text editor.
  * 
@@ -16,7 +17,7 @@ export default class AceTextEditor extends DataDisplay {
 
         //#################################################
         //use this for literate page - also add line options below
-        this.editorDiv = apogeeapp.ui.createElement("div");
+        this.editorDiv = apogeeui.createElement("div");
         //##################################################
 
         if(options) {
@@ -29,7 +30,7 @@ export default class AceTextEditor extends DataDisplay {
         
 //        //###################################################
 //        //use this for canvas folder
-//        this.editorDiv = apogeeapp.ui.createElement("div",null,{
+//        this.editorDiv = apogeeui.createElement("div",null,{
 //            "position":"absolute",
 //            "top":"0px",
 //            "left":"0px",
@@ -73,7 +74,7 @@ export default class AceTextEditor extends DataDisplay {
     }
     
     getContentType() {
-        return apogeeapp.ui.RESIZABLE;
+        return apogeeui.RESIZABLE;
     }
 
     getData() {

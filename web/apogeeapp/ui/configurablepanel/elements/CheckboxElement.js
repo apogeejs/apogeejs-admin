@@ -1,4 +1,5 @@
 import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This is an text field element configurable element.
  * 
@@ -22,7 +23,7 @@ export default class CheckboxElement extends ConfigurableElement {
         }
         
         //checkbox field
-        this.checkbox = apogeeapp.ui.createElement("input",{"type":"checkbox"});
+        this.checkbox = apogeeui.createElement("input",{"type":"checkbox"});
         containerElement.appendChild(this.checkbox);  
         
         this._postInstantiateInit(elementInitData);

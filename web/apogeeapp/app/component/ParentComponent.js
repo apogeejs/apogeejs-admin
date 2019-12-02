@@ -1,3 +1,4 @@
+import util from "/apogeeutil/util.js";
 import Component from "/apogeeapp/app/component/Component.js";
 
 import "/apogeeapp/app/component/literatepage/literatepagetransaction.js";
@@ -283,7 +284,7 @@ export default class ParentComponent extends Component {
                 stepJson.slice.content.forEach( nodeJson => {
 
                     if(nodeJson.type == "apogeeComponent") {
-                        let newNodeJson = apogee.util.jsonCopy(nodeJson);
+                        let newNodeJson = util.jsonCopy(nodeJson);
 
                         //remove the state
                         let state = newNodeJson.attrs.state;

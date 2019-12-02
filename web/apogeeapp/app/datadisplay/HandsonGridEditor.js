@@ -2,6 +2,7 @@ import util from "/apogeeutil/util.js";
 
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This is a grid editor using hands on table*/
 export default class HandsonGridEditor extends DataDisplay {
@@ -9,7 +10,7 @@ export default class HandsonGridEditor extends DataDisplay {
     constructor(displayContainer,callbacks) {
         super(displayContainer,callbacks,DataDisplay.NON_SCROLLING);
 
-        this.gridParentDiv = apogeeapp.ui.createElement("div",null,{
+        this.gridParentDiv = apogeeui.createElement("div",null,{
             "position":"relative",
             "width": "100%",
             "height":"300px",
@@ -18,7 +19,7 @@ export default class HandsonGridEditor extends DataDisplay {
         });
 
         // //TBR initial sizing. now I just set it to a dummy number	
-        // this.gridDiv = apogeeapp.ui.createElement("div",null,{
+        // this.gridDiv = apogeeui.createElement("div",null,{
         //     "position":"absolute",
         //     "top":"0px",
         //     "left":"0px",
@@ -28,7 +29,7 @@ export default class HandsonGridEditor extends DataDisplay {
         //     "zIndex":0
         // });
 
-        this.gridDiv = apogeeapp.ui.createElement("div",null,{
+        this.gridDiv = apogeeui.createElement("div",null,{
             "position":"absolute",
             "top":"0px",
             "left":"0px",
@@ -84,7 +85,7 @@ export default class HandsonGridEditor extends DataDisplay {
     }
     
     getContentType() {
-        return apogeeapp.ui.RESIZABLE;
+        return apogeeui.RESIZABLE;
     }
     
     getData() {

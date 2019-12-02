@@ -1,5 +1,6 @@
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** Editor that uses the basic text editor */
 export default class TextAreaEditor extends DataDisplay {
@@ -7,7 +8,7 @@ export default class TextAreaEditor extends DataDisplay {
     constructor(displayContainer,callbacks) {
         super(displayContainer,callbacks,DataDisplay.SCROLLING);
 
-        var textArea = apogeeapp.ui.createElement("TEXTAREA",null,{
+        var textArea = apogeeui.createElement("TEXTAREA",null,{
 //            "position":"absolute",
 //            "top":"0px",
 //            "left":"0px",
@@ -32,7 +33,7 @@ export default class TextAreaEditor extends DataDisplay {
     }
     
     getContentType() {
-        return apogeeapp.ui.RESIZABLE;
+        return apogeeui.RESIZABLE;
     }
 
     getData() {

@@ -1,4 +1,5 @@
 import {getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
+import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";
 
 /** This component represents a json table object. */
 export default class TreeComponentDisplay {
@@ -93,7 +94,7 @@ export default class TreeComponentDisplay {
         var labelText = this.member.getName();
         var iconUrl = this.component.getIconUrl();
         var isRoot = ((this.member.isParent)&&(this.member.isRoot()));
-        return new apogeeapp.ui.treecontrol.TreeEntry(labelText, iconUrl, openCallback, menuItemCallback,isRoot);
+        return new TreeEntry(labelText, iconUrl, openCallback, menuItemCallback,isRoot);
     }
 
     /** This is used to sort the child tree entries. 

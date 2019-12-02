@@ -1,5 +1,6 @@
 import util from "/apogeeutil/util.js";
 import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This is an text field element configurable element.
  * 
@@ -28,7 +29,7 @@ export default class RadioGroupElement extends ConfigurableElement {
         this.buttonList = [];
         var groupName = elementInitData.groupName;
         var addButton = buttonInfo => {
-            var radio = apogeeapp.ui.createElement("input");
+            var radio = apogeeui.createElement("input");
             radio.type = "radio";
             radio.name = groupName;
             

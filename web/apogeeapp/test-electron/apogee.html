@@ -156,6 +156,7 @@
             'use strict'
 
             import Apogee from "/apogeeapp/app/Apogee.js";
+            import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 			function init() {
                 
@@ -163,7 +164,7 @@
                 console.log("In!")
                 
                 //set resounce path
-                apogeeapp.ui.initResourcePath("../../resources");
+                apogeeui.initResourcePath("../../resources");
                 
                 //use electron file access
                 var appConfigManager = new apogeeapp.app.ElectronAppConfigManager();

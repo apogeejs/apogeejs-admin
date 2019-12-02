@@ -1,4 +1,5 @@
 import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This is a heading element configurable element.
  * 
@@ -20,7 +21,7 @@ export default class HeadingElement extends ConfigurableElement {
         }
         var headingType = "h" + headingLevel;
         
-        this.headingElement = apogeeapp.ui.createElement(headingType,{"className":"apogee_configurablePanelHeading","innerHTML":elementInitData.text});
+        this.headingElement = apogeeui.createElement(headingType,{"className":"apogee_configurablePanelHeading","innerHTML":elementInitData.text});
         containerElement.appendChild(this.headingElement);
     }
 

@@ -2,6 +2,7 @@ import util from "/apogeeutil/util.js";
 
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
 import ConfigurablePanel from "/apogeeapp/ui/configurablepanel/ConfigurablePanel.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This is an editor that displays a customized form for data input. */
 export default class ConfigurableFormEditor extends DataDisplay {
@@ -38,7 +39,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
     }
     
     getContentType() {
-        return apogeeapp.ui.FIXED_SIZE;
+        return apogeeui.FIXED_SIZE;
     }
     
     /** This returns the form value (not the layout too) */

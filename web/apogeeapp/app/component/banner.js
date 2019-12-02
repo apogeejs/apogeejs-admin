@@ -1,3 +1,5 @@
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
+
 /** This namespacve provides methods to create a status banner and icon overlay. */
 
 //constants for the window banner bar
@@ -51,7 +53,7 @@ export function getBanner(text,bannerState) {
     }
    
     //banner showing
-    var bannerDiv = apogeeapp.ui.createElement("div",null,
+    var bannerDiv = apogeeui.createElement("div",null,
         {
             //"display":"block",
             //"position":"relative",
@@ -84,7 +86,7 @@ export function getIconOverlay(bannerState) {
     
     var iconOverlayElement = document.createElement("img");
     if(resource) {
-        var url = apogeeapp.ui.getResourcePath(resource);
+        var url = apogeeui.getResourcePath(resource);
         iconOverlayElement.src = url;
     }
     return iconOverlayElement;

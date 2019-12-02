@@ -4,6 +4,8 @@ import AmdModuleEntry from "/apogeeapp/app/references/AmdModuleEntry.js";
 import NpmModuleEntry from "/apogeeapp/app/references/NpmModuleEntry.js";
 import JsScriptEntry from "/apogeeapp/app/references/JsScriptEntry.js";
 import CssEntry from "/apogeeapp/app/references/CssEntry.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
+import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";
 
 /** This class manages links and other reference entries, loading the references and
  * creating the UI tree elements for display of the references.
@@ -176,8 +178,8 @@ export default class ReferenceManager {
 
     /** @private */
     instantiateTreeEntry() {
-        var iconUrl = apogeeapp.ui.getResourcePath(ReferenceManager.REFERENCES_ICON_PATH);
-        var treeEntry = new apogeeapp.ui.treecontrol.TreeEntry("References", iconUrl, null, null, false);
+        var iconUrl = apogeeui.getResourcePath(ReferenceManager.REFERENCES_ICON_PATH);
+        var treeEntry = new TreeEntry("References", iconUrl, null, null, false);
         
         //add child lists
         for(var childKey in this.referenceLists) {
@@ -194,9 +196,9 @@ export default class ReferenceManager {
 
     addListTreeEntry(referenceTreeEntry,childStruct) {
         var typeInfo = childStruct.typeInfo;
-        var iconUrl = apogeeapp.ui.getResourcePath(typeInfo.LIST_ICON_PATH);
+        var iconUrl = apogeeui.getResourcePath(typeInfo.LIST_ICON_PATH);
         var menuItemCallback = () => this.getListMenuItems(typeInfo);
-        var listTreeEntry = new apogeeapp.ui.treecontrol.TreeEntry(typeInfo.LIST_NAME, iconUrl, null, menuItemCallback, false);
+        var listTreeEntry = new TreeEntry(typeInfo.LIST_NAME, iconUrl, null, menuItemCallback, false);
         
         //add existing child entries
         for(var childKey in childStruct.listEntries) {

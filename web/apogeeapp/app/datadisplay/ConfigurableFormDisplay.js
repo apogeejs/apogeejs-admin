@@ -1,5 +1,6 @@
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
 import ConfigurablePanel from "/apogeeapp/ui/configurablepanel/ConfigurablePanel.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /* This is a form display. It is meant for taking a submit action. If you want a form
  * tied to a data value, the ConfigurableFormEditor can be used.
@@ -21,7 +22,7 @@ export default class ConfigurableFormDisplay extends DataDisplay {
     }
     
     getContentType() {
-        return apogeeapp.ui.FIXED_SIZE;
+        return apogeeui.FIXED_SIZE;
     }
     
     

@@ -1,5 +1,5 @@
-import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component/banner.js";
-
+import {bannerConstants,getBanner} from "/apogeeapp/app/component/banner.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import WebDisplayContainer from "/apogeeapp/app/component/webpage/WebDisplayContainer.js";
 
 /** This is the component display for a web page.
@@ -59,7 +59,7 @@ export default class WebComponentDisplay {
         else {
             bannerDiv = getBanner(bannerMessage,bannerState);
         }
-        apogeeapp.ui.removeAllChildren(this.bannerContainer);
+        apogeeui.removeAllChildren(this.bannerContainer);
         if(bannerDiv) {
             this.bannerContainer.appendChild(bannerDiv);
         }
@@ -108,13 +108,13 @@ export default class WebComponentDisplay {
     loadComponentDisplay() {
 
         //make the container
-        this.mainElement = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_mainClass",null);
+        this.mainElement = apogeeui.createElementWithClass("div","visiui_pageChild_mainClass",null);
         
         //add banner container
-        this.bannerContainer = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_bannerContainerClass",this.mainElement);
+        this.bannerContainer = apogeeui.createElementWithClass("div","visiui_pageChild_bannerContainerClass",this.mainElement);
         
         //add the view container
-        this.viewContainer = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_viewContainerClass",this.mainElement);
+        this.viewContainer = apogeeui.createElementWithClass("div","visiui_pageChild_viewContainerClass",this.mainElement);
         
         //create the view element
         this.displayContainer = new WebDisplayContainer(this.component, this.activeView);

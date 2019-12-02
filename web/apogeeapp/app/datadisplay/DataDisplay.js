@@ -1,3 +1,5 @@
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
+
 /** Editor that uses the Ace text editor.
  * 
  * @param {type} displayContainer - this is the ui container that will show the display
@@ -7,7 +9,7 @@
 export default class DataDisplay {
     constructor(displayContainer,callbacks,containerClass = DataDisplay.NON_SCROLLING) {
         
-        this.outsideDiv = apogeeapp.ui.createElementWithClass("div",containerClass);
+        this.outsideDiv = apogeeui.createElementWithClass("div",containerClass);
 	
         this.displayContainer = displayContainer;
         this.callbacks = callbacks;
@@ -76,8 +78,8 @@ export default class DataDisplay {
     //getContent() {}
     
     //This method returns the content type for the content. The choices of values are REQUIRED
-    //apogeeapp.ui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
-    //apogeeapp.ui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.*/
+    //apogeeui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
+    //apogeeui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.*/
     //getContentType() {}
 
     //=============================

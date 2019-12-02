@@ -2,6 +2,7 @@ import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component
 
 import PageDisplayContainer from "/apogeeapp/app/component/literatepage/PageDisplayContainer.js";
 
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import Menu from "/apogeeapp/ui/menu/Menu.js";
 
 /** This component represents a json table object. */
@@ -32,8 +33,8 @@ export default class PageChildComponentDisplay {
         
         //connect to parent
         this.setIsPageShowing(this.parentComponentDisplay.getIsShowing());
-        this.parentComponentDisplay.addListener(apogeeapp.ui.SHOWN_EVENT,() => this.setIsPageShowing(true));
-        this.parentComponentDisplay.addListener(apogeeapp.ui.HIDDEN_EVENT,() => this.setIsPageShowing(false));
+        this.parentComponentDisplay.addListener(apogeeui.SHOWN_EVENT,() => this.setIsPageShowing(true));
+        this.parentComponentDisplay.addListener(apogeeui.HIDDEN_EVENT,() => this.setIsPageShowing(false));
         
 
         //add a cleanup action to the base component - component must already be initialized
@@ -61,7 +62,7 @@ export default class PageChildComponentDisplay {
         else {
             bannerDiv = getBanner(bannerMessage,bannerState);
         }
-        apogeeapp.ui.removeAllChildren(this.bannerContainer);
+        apogeeui.removeAllChildren(this.bannerContainer);
         if(bannerDiv) {
             this.bannerContainer.appendChild(bannerDiv);
         }
@@ -137,7 +138,7 @@ export default class PageChildComponentDisplay {
     loadComponentDisplay() {
 
         //make the container
-        this.mainElement = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_mainClass",null);
+        this.mainElement = apogeeui.createElementWithClass("div","visiui_pageChild_mainClass",null);
 
         //add the click handler, to select this node if it is clicked
         this.mainElement.onclick = () => {
@@ -150,10 +151,10 @@ export default class PageChildComponentDisplay {
         this.addTitleBar();
         
         //add banner container
-        this.bannerContainer = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_bannerContainerClass",this.mainElement);
+        this.bannerContainer = apogeeui.createElementWithClass("div","visiui_pageChild_bannerContainerClass",this.mainElement);
         
         //add the view container
-        this.viewContainer = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_viewContainerClass",this.mainElement);
+        this.viewContainer = apogeeui.createElementWithClass("div","visiui_pageChild_viewContainerClass",this.mainElement);
         
         //add the view elements
         var settings = this.component.getTableEditSettings();
@@ -186,7 +187,7 @@ export default class PageChildComponentDisplay {
         }
         else {
             //no views, add an explicit title element
-            this.viewTitleElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_mainViewSelectorClass",this.titleBarViewsElement);
+            this.viewTitleElement = apogeeui.createElementWithClass("div","visiui_displayContainer_mainViewSelectorClass",this.titleBarViewsElement);
         }
 
         this.setTitle();
@@ -195,16 +196,16 @@ export default class PageChildComponentDisplay {
     /** This makes the title bar, and installs it inline */
     addTitleBar() {
         
-        this.titleBarContainer = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_titleBarClass",this.mainElement);
-        this.titleBarMenuElement = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_titleBarMenuClass",this.titleBarContainer);
-        this.titleBarViewsElement = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
+        this.titleBarContainer = apogeeui.createElementWithClass("div","visiui_pageChild_titleBarClass",this.mainElement);
+        this.titleBarMenuElement = apogeeui.createElementWithClass("div","visiui_pageChild_titleBarMenuClass",this.titleBarContainer);
+        this.titleBarViewsElement = apogeeui.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
         
         //------------------
         // menu
         //------------------
         
         var iconUrl = this.component.getIconUrl();
-        if(!iconUrl) iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.ui.MENU_IMAGE);
+        if(!iconUrl) iconUrl = apogeeui.getResourcePath(apogeeui.MENU_IMAGE);
         
         this.menu = Menu.createMenuFromImage(iconUrl);
         var menuItemCallback = () => {
@@ -215,7 +216,7 @@ export default class PageChildComponentDisplay {
         this.titleBarMenuElement.appendChild(this.menu.getElement());
         
         //create the icon (menu) overlay
-        this.iconOverlayElement = apogeeapp.ui.createElementWithClass("div","visiui_pageChild_icon_overlay_style",this.titleBarMenuElement);
+        this.iconOverlayElement = apogeeui.createElementWithClass("div","visiui_pageChild_icon_overlay_style",this.titleBarMenuElement);
 
     }
 
@@ -252,7 +253,7 @@ export default class PageChildComponentDisplay {
 
     clearIconOverlay() {
         if(this.iconOverlayElement) {
-            apogeeapp.ui.removeAllChildren(this.iconOverlayElement);
+            apogeeui.removeAllChildren(this.iconOverlayElement);
         }
     }
 

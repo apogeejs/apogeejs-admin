@@ -75,15 +75,21 @@ export default class FolderFunctionComponent extends ParentComponent {
 
     readChildrenFromJson(workspaceUI,childActionResults,json) {
     
-        //get the child action results for the internal folder, rather than the folder function member.
-        //NOTE - we should handle multi-member components so we detect errors in an of the components.
-        //at the time this is written, this is the only acknowledgement of the result for the internal folder.
-        let externalChildActionResults = childActionResults.root.childActionResults;
+        if(childActionResults.root) {
+            //get the child action results for the internal folder, rather than the folder function member.
+            //NOTE - we should handle multi-member components so we detect errors in an of the components.
+            //at the time this is written, this is the only acknowledgement of the result for the internal folder.
+            let externalChildActionResults = childActionResults.root.childActionResults;
 
-        if(json.children) {
-            workspaceUI.loadFolderComponentContentFromJson(externalChildActionResults,json.children);
+            if(json.children) {
+                workspaceUI.loadFolderComponentContentFromJson(externalChildActionResults,json.children);
+            }
+            return true;
         }
-        return true;  
+        else {
+            //error - internal folder not requested or created
+            return false;
+        }  
     }
 
     static transferMemberProperties(inputValues,propertyJson) {
@@ -133,7 +139,7 @@ FolderFunctionComponent.ICON_RES_PATH = "/componentIcons/folderFunction.png";
 FolderFunctionComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.FolderFunction",
     "children": {
-        "layout": {
+        "root": {
             "name": "root",
             "type": "apogee.Folder",
         }

@@ -1,5 +1,6 @@
 import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This is a tab frame.
  * 
@@ -14,9 +15,9 @@ export default class TabFrame extends EventManager {
         this.tabTable = {};
         this.activeTab = null;
         
-        this.tabFrameControl = apogeeapp.ui.createElementWithClass("div","visiui-tf-frame");
-        this.tabBar = apogeeapp.ui.createElementWithClass("div","visiui-tf-tab-bar",this.tabFrameControl);
-        this.tabFrame = apogeeapp.ui.createElementWithClass("div","visiui-tf-tab-container",this.tabFrameControl);   	
+        this.tabFrameControl = apogeeui.createElementWithClass("div","visiui-tf-frame");
+        this.tabBar = apogeeui.createElementWithClass("div","visiui-tf-tab-bar",this.tabFrameControl);
+        this.tabFrame = apogeeui.createElementWithClass("div","visiui-tf-tab-container",this.tabFrameControl);   	
     }
 
     /** This method returns the dom element for the control. */
@@ -79,7 +80,7 @@ export default class TabFrame extends EventManager {
             delete this.tabTable[id];
             
             if(this.activeTab == id) {
-                this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,tab);
+                this.dispatchEvent(apogeeui.HIDDEN_EVENT,tab);
                 this.activeTab = null;
                 //choose a random tab
                 for(var newId in this.tabTable) {
@@ -109,9 +110,9 @@ export default class TabFrame extends EventManager {
             this.tabFrame.appendChild(tab.getMainElement());
             this.updateTabDisplay();
             if(oldTab) {
-                this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,oldTab);
+                this.dispatchEvent(apogeeui.HIDDEN_EVENT,oldTab);
             }
-            this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,tab);
+            this.dispatchEvent(apogeeui.SHOWN_EVENT,tab);
             
         }
     }

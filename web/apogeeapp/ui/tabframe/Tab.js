@@ -1,6 +1,8 @@
 import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 import Menu from "/apogeeapp/ui/menu/Menu.js";
+import DisplayAndHeader from "/apogeeapp/ui/displayandheader/DisplayAndHeader.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 export default class Tab extends EventManager {
 
@@ -9,23 +11,23 @@ export default class Tab extends EventManager {
         
         this.tabFrame = null;
         this.id = id;
-        this.tabLabelElement = apogeeapp.ui.createElementWithClass("div","visiui-tf-tab-base visiui-tf-tab-inactive");
+        this.tabLabelElement = apogeeui.createElementWithClass("div","visiui-tf-tab-base visiui-tf-tab-inactive");
         
-        this.menuContainer = apogeeapp.ui.createElementWithClass("div","visiui-tf_tab-menuDiv",this.tabLabelElement);
-        this.titleElement = apogeeapp.ui.createElementWithClass("div","visiui_tf_tab_title",this.tabLabelElement);
+        this.menuContainer = apogeeui.createElementWithClass("div","visiui-tf_tab-menuDiv",this.tabLabelElement);
+        this.titleElement = apogeeui.createElementWithClass("div","visiui_tf_tab_title",this.tabLabelElement);
         
-        this.closeButton = apogeeapp.ui.createElementWithClass("img","visiui_tf_tab_cmd_button",this.tabLabelElement);
-        this.closeButton.src = apogeeapp.ui.getResourcePath(apogeeapp.ui.CLOSE_CMD_IMAGE);
+        this.closeButton = apogeeui.createElementWithClass("img","visiui_tf_tab_cmd_button",this.tabLabelElement);
+        this.closeButton.src = apogeeui.getResourcePath(apogeeui.CLOSE_CMD_IMAGE);
         
         this.closeButton.onclick = () => {
             this.close();
         };
         
         //create the tab element
-        this.displayFrame = apogeeapp.ui.createElementWithClass("div","visiui-tf-tab-window");
-        this.tabInsideContainer = new apogeeapp.ui.DisplayAndHeader(apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
+        this.displayFrame = apogeeui.createElementWithClass("div","visiui-tf-tab-window");
+        this.tabInsideContainer = new DisplayAndHeader(DisplayAndHeader.FIXED_PANE,
                 null,
-                apogeeapp.ui.DisplayAndHeader.FIXED_PANE,
+                DisplayAndHeader.FIXED_PANE,
                 null
             );
         this.displayFrame.appendChild(this.tabInsideContainer.getOuterElement());
@@ -48,17 +50,17 @@ export default class Tab extends EventManager {
         this.tabShownListener = (tab) => {
             if(tab == instance) {
                 this.isShowing = true;
-                instance.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,instance);
+                instance.dispatchEvent(apogeeui.SHOWN_EVENT,instance);
             }
         };
-        this.tabFrame.addListener(apogeeapp.ui.SHOWN_EVENT, this.tabShownListener);
+        this.tabFrame.addListener(apogeeui.SHOWN_EVENT, this.tabShownListener);
         this.tabHiddenListener = (tab) => {
             if(tab == instance) {
                 this.isShowing = false;
-                instance.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,instance);
+                instance.dispatchEvent(apogeeui.HIDDEN_EVENT,instance);
             }
         };
-        this.tabFrame.addListener(apogeeapp.ui.HIDDEN_EVENT, this.tabHiddenListener);
+        this.tabFrame.addListener(apogeeui.HIDDEN_EVENT, this.tabHiddenListener);
     }
 
     /** This sets the tab as the active tab. It returns true if it can do this. In the case
@@ -92,7 +94,7 @@ export default class Tab extends EventManager {
     /** This sets the content for the window. If null (or otherwise false) is passed
      * the content will be set to empty.*/
     setHeaderContent(contentElement) {
-        apogeeapp.ui.removeAllChildren(this.headerContainer);
+        apogeeui.removeAllChildren(this.headerContainer);
         if(contentElement) {
             this.headerContainer.appendChild(contentElement);
         }
@@ -100,25 +102,25 @@ export default class Tab extends EventManager {
 
     /** This sets the content for the window. The content type
      *  can be:
-     *  apogeeapp.ui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
-     *  apogeeapp.ui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.*/
+     *  apogeeui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
+     *  apogeeui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.*/
     setContent(contentElement,elementType) {
         if(!this.contentContainer) {
-            this.contentContainer = apogeeapp.ui.createElement("div");
-            apogeeapp.ui.removeAllChildren(this.bodyContainer);
+            this.contentContainer = apogeeui.createElement("div");
+            apogeeui.removeAllChildren(this.bodyContainer);
             this.bodyContainer.appendChild(this.contentContainer);
         }
-        if(elementType == apogeeapp.ui.RESIZABLE) {
+        if(elementType == apogeeui.RESIZABLE) {
             this.contentContainer.className = "visiui_tf_tab_contents_fixed";
         }
-        else if(elementType == apogeeapp.ui.FIXED_SIZE) {
+        else if(elementType == apogeeui.FIXED_SIZE) {
             this.contentContainer.className = "visiui_tf_tab_contents_scrolling";
         }
         else {
             throw new Error("Unknown content type: " + elementType);
         }
         
-        apogeeapp.ui.removeAllChildren(this.contentContainer);
+        apogeeui.removeAllChildren(this.contentContainer);
         this.contentContainer.appendChild(contentElement);
         
         this.content = contentElement;
@@ -131,11 +133,11 @@ export default class Tab extends EventManager {
 
     /** This method shows the window. */
     createMenu(iconUrl) {
-        if(!iconUrl) iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.ui.MENU_IMAGE);
+        if(!iconUrl) iconUrl = apogeeui.getResourcePath(apogeeui.MENU_IMAGE);
         this.menu = Menu.createMenuFromImage(iconUrl);
         this.menuContainer.appendChild(this.menu.domElement);
         //add the icon overlay element
-        this.iconOverlayElement = apogeeapp.ui.createElementWithClass("div","visiui_tf_icon_overlay",this.menuContainer);
+        this.iconOverlayElement = apogeeui.createElementWithClass("div","visiui_tf_icon_overlay",this.menuContainer);
         return this.menu;
     }
 
@@ -157,7 +159,7 @@ export default class Tab extends EventManager {
 
     clearIconOverlay() {
         if(this.iconOverlayElement) {
-            apogeeapp.ui.removeAllChildren(this.iconOverlayElement);
+            apogeeui.removeAllChildren(this.iconOverlayElement);
         }
     }
 
@@ -167,19 +169,19 @@ export default class Tab extends EventManager {
         
         if(!forceClose) {
             //make a close request
-            var requestResponse = this.callHandler(apogeeapp.ui.REQUEST_CLOSE,this);
-            if(requestResponse == apogeeapp.ui.DENY_CLOSE) {
+            var requestResponse = this.callHandler(apogeeui.REQUEST_CLOSE,this);
+            if(requestResponse == apogeeui.DENY_CLOSE) {
                 //do not close the window
                 return;
             }
         }
         
         this.tabFrame.closeTab(this.id);
-        this.tabFrame.removeListener(apogeeapp.ui.SHOWN_EVENT, this.tabShownListener);
-        this.tabFrame.removeListener(apogeeapp.ui.HIDDEN_EVENT, this.tabHiddenListener);
+        this.tabFrame.removeListener(apogeeui.SHOWN_EVENT, this.tabShownListener);
+        this.tabFrame.removeListener(apogeeui.HIDDEN_EVENT, this.tabHiddenListener);
         this.tabFrame = null;
         
-        this.dispatchEvent(apogeeapp.ui.CLOSE_EVENT,this);
+        this.dispatchEvent(apogeeui.CLOSE_EVENT,this);
         
         
     }

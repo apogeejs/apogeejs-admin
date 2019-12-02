@@ -58,7 +58,7 @@ apogeeapp.app.ButtonDisplay = class extends DataDisplay {
         this.button.innerHTML = "Click me!";
         this.button.onclick = () => this.buttonClicked();      
     
-        this.outputElement = apogeeapp.ui.createElement("div");
+        this.outputElement = apogeeui.createElement("div");
         this.outputElement.appendChild(document.createTextNode("This is a stupid component because you can't set the action."));
         this.outputElement.appendChild(document.createElement("br"));
         this.outputElement.appendChild(this.button);
@@ -73,10 +73,10 @@ apogeeapp.app.ButtonDisplay = class extends DataDisplay {
     }
     
     //this method tells the window the type of content:
-    //apogeeapp.ui.RESIZABLE - if the window can freely resize it
-    //apogeeapp.ui.FIXED_SIZE - if the content is fixed size
+    //apogeeui.RESIZABLE - if the window can freely resize it
+    //apogeeui.FIXED_SIZE - if the content is fixed size
     getContentType() {
-        return apogeeapp.ui.FIXED_SIZE;
+        return apogeeui.FIXED_SIZE;
     }
     
     /** This is called when the control object updates. */

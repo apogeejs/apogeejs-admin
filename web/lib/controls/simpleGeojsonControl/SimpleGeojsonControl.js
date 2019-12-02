@@ -74,7 +74,7 @@ define(['http://localhost:8383/lib/controls/simpleGeojsonControl/leaflet_1.0.1_A
                 super(viewMode,callbacks)
 
                 //create map element - this css class will fill the parent (the window frame) with no scrolling 
-                this.mapElement = apogeeapp.ui.createElement("div");
+                this.mapElement = apogeeui.createElement("div");
                 this.mapElement.className = "visiui_win_container_fixed";
 
                 this.member = member;
@@ -90,10 +90,10 @@ define(['http://localhost:8383/lib/controls/simpleGeojsonControl/leaflet_1.0.1_A
             }
 
             //this method tells the window the type of content:
-            //apogeeapp.ui.RESIZABLE - if the window can freely resize it
-            //apogeeapp.ui.FIXED_SIZE - if the content is fixed size
+            //apogeeui.RESIZABLE - if the window can freely resize it
+            //apogeeui.FIXED_SIZE - if the content is fixed size
             getContentType() {
-                return apogeeapp.ui.RESIZABLE;
+                return apogeeui.RESIZABLE;
             }
 
             setData(data) {

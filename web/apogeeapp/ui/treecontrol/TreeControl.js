@@ -1,22 +1,25 @@
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
-if(!apogeeapp.ui.treecontrol) apogeeapp.ui.treecontrol = {};
+export default class TreeControl {
 
-apogeeapp.ui.treecontrol.TreeControl = function() {
-    this.list = apogeeapp.ui.createElementWithClass("ul","visiui-tc-child-list",this.element); 
-}
+    constructor() {
+        this.list = apogeeui.createElementWithClass("ul","visiui-tc-child-list",this.element); 
+    }
 
-/** The outer DOM element */
-apogeeapp.ui.treecontrol.TreeControl.prototype.getElement = function() {
-    return this.list;
-}
+    /** The outer DOM element */
+    getElement() {
+        return this.list;
+    }
 
-apogeeapp.ui.treecontrol.TreeControl.prototype.setRootEntry = function(treeEntry) {
-    this.clearRootEntry();
-    this.list.appendChild(treeEntry.getElement());
-}
+    setRootEntry(treeEntry) {
+        this.clearRootEntry();
+        this.list.appendChild(treeEntry.getElement());
+    }
 
-apogeeapp.ui.treecontrol.TreeControl.prototype.clearRootEntry = function() {
-    apogeeapp.ui.removeAllChildren(this.list);
+    clearRootEntry() {
+        apogeeui.removeAllChildren(this.list);
+    }
+
 }
 
 

@@ -263,7 +263,7 @@ apogeeapp.app.GoogleChartDisplay = class extends DataDisplay {
         this.member = member;
         //create a content element of variable size in the top left of the parent
         //the chart library will set the size to match the rendered chart
-        this.element = apogeeapp.ui.createElement("div");
+        this.element = apogeeui.createElement("div");
         this.element.style =  {
             position:"relative",
             overflow:"auto"
@@ -284,10 +284,10 @@ apogeeapp.app.GoogleChartDisplay = class extends DataDisplay {
     }
     
     //this method tells the window the type of content:
-    //apogeeapp.ui.RESIZABLE - if the window can freely resize it
-    //apogeeapp.ui.FIXED_SIZE - if the content is fixed size
+    //apogeeui.RESIZABLE - if the window can freely resize it
+    //apogeeui.FIXED_SIZE - if the content is fixed size
     getContentType() {
-        return apogeeapp.ui.FIXED_SIZE;
+        return apogeeui.FIXED_SIZE;
     }
 
     setData(data) {

@@ -100,7 +100,7 @@ and open the template in the editor.
                 entry.key = "cb1";
                 entry.onChange = (value,form) => {
                     var childPanel = form.getEntry("childPanel");
-                    var state = value ? apogeeapp.ui.ConfigurableElement.STATE_NORMAL : apogeeapp.ui.ConfigurableElement.STATE_INACTIVE;
+                    var state = value ? apogeeui.ConfigurableElement.STATE_NORMAL : apogeeui.ConfigurableElement.STATE_INACTIVE;
                     childPanel.setState(state);
                     
 //                    var newPanelValue = {
@@ -217,7 +217,7 @@ and open the template in the editor.
                 entry.onCancel = onCancel;
                 //layout.push(entry);
                 
-                var panel = new apogeeapp.ui.ConfigurablePanel();
+                var panel = new apogeeui.ConfigurablePanel();
                 panel.configureForm(layout);
                 
                 //alternate method to add submit buttons

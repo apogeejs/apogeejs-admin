@@ -9,6 +9,7 @@ import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
@@ -229,7 +230,7 @@ export default class CustomComponent extends EditComponent {
             
             //update css now
             let cssInfo = uiCodeFields[CustomComponent.CODE_FIELD_CSS];
-            apogeeapp.ui.setMemberCssData(this.getMember().getId(),cssInfo);
+            apogeeui.setMemberCssData(this.getMember().getId(),cssInfo);
         }
         if(uiCodeFields[CustomComponent.CODE_FIELD_HTML] != this.uiCodeFields[CustomComponent.CODE_FIELD_HTML]) {
             this.fieldUpdated(CustomComponent.CODE_FIELD_HTML);

@@ -1,4 +1,5 @@
 import ConfigurablePanelConstants from "/apogeeapp/ui/configurablepanel/ConfigurablePanelConstants.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This is a panel with forma elements that can be configured using a javascript object.
  * 
@@ -25,7 +26,7 @@ export default class ConfigurablePanel {
         }
         
         //clear data
-        apogeeapp.ui.removeAllChildren(this.panelElement);
+        apogeeui.removeAllChildren(this.panelElement);
         this.elementObjects = [];
         
         try {

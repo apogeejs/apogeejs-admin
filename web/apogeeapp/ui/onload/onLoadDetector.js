@@ -1,3 +1,5 @@
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
+
 /** This file provides a load listener. The element must be a positioned element
  * (position must be set to something besides static. It can only be done once per element(!)
  * 
@@ -5,7 +7,7 @@
  * iframe document body. It calls load (and resize) on initial loading of the iframe.
  */
 
-apogeeapp.ui.setLoadListener = function(element, loadCallback, resizeCallback){
+setLoadListener = function(element, loadCallback, resizeCallback){
 
     var styleJson = {
         "position":"absolute",
@@ -18,7 +20,7 @@ apogeeapp.ui.setLoadListener = function(element, loadCallback, resizeCallback){
     };
 
     //create and attach element
-    var dummyFrameElement = apogeeapp.ui.createElement("iframe",null,styleJson);
+    var dummyFrameElement = apogeeui.createElement("iframe",null,styleJson);
     dummyFrameElement.onload = function() {
         var dummyFrameBody = dummyFrameElement.contentDocument.body; 
         
@@ -35,7 +37,7 @@ apogeeapp.ui.setLoadListener = function(element, loadCallback, resizeCallback){
     element.appendChild(dummyFrameElement);
 }
 
-apogeeapp.ui.removeResizeListener = function(element, resizeCallback){
+removeResizeListener = function(element, resizeCallback){
     alert("implement this!");
 }
 

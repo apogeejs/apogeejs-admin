@@ -1,5 +1,8 @@
 import {updateLink, removeLink} from "/apogeeapp/app/commandseq/updatelinkseq.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import {bannerConstants} from "/apogeeapp/app/component/banner.js"; 
+import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";
+
 
 /** This class manages references for the web page.*/
 export default class ReferenceEntry {
@@ -75,7 +78,7 @@ export default class ReferenceEntry {
     
     /** This method returns the icon url for the component. */
     getIconUrl() {
-        return apogeeapp.ui.getResourcePath(this.referenceTypeInfo.ENTRY_ICON_PATH);
+        return apogeeui.getResourcePath(this.referenceTypeInfo.ENTRY_ICON_PATH);
     }
 
     /** This method loads the link onto the page. It returns a promise that
@@ -154,7 +157,7 @@ export default class ReferenceEntry {
     instantiateTreeEntry() {
         var iconUrl = this.getIconUrl();
         var menuItemsCallback = () => this.getMenuItems();
-        var treeEntry = new apogeeapp.ui.treecontrol.TreeEntry(this.nickname, iconUrl, null, menuItemsCallback, false);
+        var treeEntry = new TreeEntry(this.nickname, iconUrl, null, menuItemsCallback, false);
         ReferenceManager.applyBannerState(treeEntry,this.state);
         return treeEntry;
     }

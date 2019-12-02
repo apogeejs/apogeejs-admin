@@ -1,5 +1,6 @@
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
 import UiCommandMessenger from "/apogeeapp/app/commands/UiCommandMessenger.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from
@@ -35,7 +36,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         this.isLoaded = false;
         this.cachedData = undefined;
     
-        // this.outputElement = apogeeapp.ui.createElement("div",null,{
+        // this.outputElement = apogeeui.createElement("div",null,{
         //     "position":"absolute",
         //     "top":"0px",
         //     "left":"0px",
@@ -43,7 +44,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         //     "right":"0px",
         //     "overflow":"auto"
         // });
-        this.outputElement = apogeeapp.ui.createElement("div",null,{
+        this.outputElement = apogeeui.createElement("div",null,{
             "position":"relative"
         });
 
@@ -223,7 +224,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
     }
     
     getContentType() {
-        return apogeeapp.ui.RESIZABLE;
+        return apogeeui.RESIZABLE;
     }
    
 }

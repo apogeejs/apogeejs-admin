@@ -1,5 +1,6 @@
 import {getSaveBar} from "/apogeeapp/app/component/toolbar.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This is a standin for the display conatiner for the literate page
  * 
@@ -87,14 +88,14 @@ export default class PageDisplayContainer {
 
         if(!forceClose) {
             //make a close request
-            var requestResponse = this.callHandler(apogeeapp.ui.REQUEST_CLOSE,this);
-            if(requestResponse == apogeeapp.ui.DENY_CLOSE) {
+            var requestResponse = this.callHandler(apogeeui.REQUEST_CLOSE,this);
+            if(requestResponse == apogeeui.DENY_CLOSE) {
                 //do not close the window
                 return;
             }
         }
 
-        this.dispatchEvent(apogeeapp.ui.CLOSE_EVENT,this);
+        this.dispatchEvent(apogeeui.CLOSE_EVENT,this);
     }
 
     //---------------------------
@@ -125,35 +126,35 @@ export default class PageDisplayContainer {
     initUI() {
         
         //make the container
-        this.mainElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_mainClass",null);
+        this.mainElement = apogeeui.createElementWithClass("div","visiui_displayContainer_mainClass",null);
         
         //make the label for the view
-        this.viewLabelHeaderElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewLabelHeaderClass",this.mainElement);
+        this.viewLabelHeaderElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewLabelHeaderClass",this.mainElement);
 
-        this.viewLabelElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
+        this.viewLabelElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
         this.viewLabelElement.innerHTML = this.viewType;
         
         //make the selector for the view, in the component title bar
-        this.viewSelectorContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
+        this.viewSelectorContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
 
-        this.viewActiveElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewActiveElementClass",this.viewSelectorContainer);
-        this.viewSelectorElement = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_nonMainViewSelectorClass",this.viewSelectorContainer);
+        this.viewActiveElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewActiveElementClass",this.viewSelectorContainer);
+        this.viewSelectorElement = apogeeui.createElementWithClass("div","visiui_displayContainer_nonMainViewSelectorClass",this.viewSelectorContainer);
         
         this.viewSelectorElement.innerHTML = this.viewType;
 
-        this.expandImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
-        this.expandImage.src = apogeeapp.ui.getResourcePath(PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
+        this.expandImage = apogeeui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
+        this.expandImage.src = apogeeui.getResourcePath(PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
     
-        this.contractImage = apogeeapp.ui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
-        this.contractImage.src = apogeeapp.ui.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
+        this.contractImage = apogeeui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
+        this.contractImage.src = apogeeui.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
 
         this.viewSelectorContainer.onclick = () => this.setIsViewActive(!this.isViewActive);
         
         //add the header elment (for the save bar)
-        this.headerContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
+        this.headerContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
         
         //add the view container
-        this.viewContainer = apogeeapp.ui.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
+        this.viewContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
         
         //TODO - resize element!!!
         
@@ -307,7 +308,7 @@ export default class PageDisplayContainer {
     /** This sets the content for the window. If null (or otherwise false) is passed
      * the content will be set to empty.*/
     setHeaderContent(contentElement) {
-        apogeeapp.ui.removeAllChildren(this.headerContainer);
+        apogeeui.removeAllChildren(this.headerContainer);
         if(contentElement) {
             this.headerContainer.appendChild(contentElement);
         }
@@ -315,23 +316,23 @@ export default class PageDisplayContainer {
 
     /** This sets the content for the window. The content type
      *  can be:
-     *  apogeeapp.ui.RESIZABLE - for this content, the content is resized to fit the plane frame. The place frame should be initialized with a size.
-     *  apogeeapp.ui.FIXED_SIZE - for this content, the plain frame is sized to fit the content. ITs size should not be externally set.
-     *  apogeeapp.ui.SIZE_WINDOW_TO_CONTENT - this is not a content type but a input option for content FIXED_SIZE that shrinks the window to fit the content. It is typically only used for dialog boxes so isn't really relevent here.
+     *  apogeeui.RESIZABLE - for this content, the content is resized to fit the plane frame. The place frame should be initialized with a size.
+     *  apogeeui.FIXED_SIZE - for this content, the plain frame is sized to fit the content. ITs size should not be externally set.
+     *  apogeeui.SIZE_WINDOW_TO_CONTENT - this is not a content type but a input option for content FIXED_SIZE that shrinks the window to fit the content. It is typically only used for dialog boxes so isn't really relevent here.
      */
     setContent(contentElement,elementType) {
         
-        apogeeapp.ui.removeAllChildren(this.viewContainer);
+        apogeeui.removeAllChildren(this.viewContainer);
         
     //    //set the body type
     //    var bodyClassName;
-    //    if(elementType == apogeeapp.ui.RESIZABLE) {
+    //    if(elementType == apogeeui.RESIZABLE) {
     //       bodyClassName = "visiui-dnh-fixed";
     //    }
-    //    else if(elementType == apogeeapp.ui.FIXED_SIZE) {
+    //    else if(elementType == apogeeui.FIXED_SIZE) {
     //        bodyClassName = "visiui-dnh-shrink-to-fit";
     //    }
-    //    else if(elementType == apogeeapp.ui.SIZE_WINDOW_TO_CONTENT) {
+    //    else if(elementType == apogeeui.SIZE_WINDOW_TO_CONTENT) {
     //        bodyClassName = "visiui-dnh-shrink-to-fit";
     //    }
     //    else {

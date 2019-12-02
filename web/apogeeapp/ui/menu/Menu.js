@@ -1,8 +1,10 @@
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
+
 /** Thiis is a namespace with functions to control menu operation
  *
  * NOTE - the name Menu should probably be menu because this
  * is just a namespace and not a class, however when I converted this from a namespace
- * qualified by apogeeapp.ui, I didn't want to collide with local variables which are
+ * qualified by apogeeui, I didn't want to collide with local variables which are
  * often named "menu".
  *
  * @class 
@@ -21,7 +23,7 @@ Menu.createMenu = function(text) {
         Menu.initialize();
     }
 
-    var element = apogeeapp.ui.createElementWithClass("div", "visiui-menu-heading visiui-menu-text");
+    var element = apogeeui.createElementWithClass("div", "visiui-menu-heading visiui-menu-text");
     element.innerHTML = text;
     return new MenuHeader(element);
 }
@@ -36,7 +38,7 @@ Menu.createMenuFromImage = function(imageUrl) {
 
     var imageElement = document.createElement("img");
     imageElement.src = imageUrl;
-    var element = apogeeapp.ui.createElementWithClass("div", "visiui-menu-heading visiui-menu-image");
+    var element = apogeeui.createElementWithClass("div", "visiui-menu-heading visiui-menu-image");
     element.appendChild(imageElement);
     return new MenuHeader(element);
 }
@@ -259,7 +261,7 @@ class MenuBody {
         
     /** this adds a menu item that dispatchs the given event when clicked. */
     addMenuItem(itemInfo) {
-        itemInfo.element = apogeeapp.ui.createElementWithClass("div","visiui-menu-item");
+        itemInfo.element = apogeeui.createElementWithClass("div","visiui-menu-item");
         itemInfo.element.innerHTML = itemInfo.title;
         
         if(itemInfo.childMenuItems) {
@@ -333,7 +335,7 @@ class MenuBody {
 
     /** This method creates the menu body that is shown below the header. */
     createMenuElement() {
-        this.menuDiv = apogeeapp.ui.createElementWithClass("div","visiui-menu-body");
+        this.menuDiv = apogeeui.createElementWithClass("div","visiui-menu-body");
     }
 
     constructItemsForShow () {
@@ -346,7 +348,7 @@ class MenuBody {
     /** This is called after the menu body is hidden. */
     destroyItemsForHides() {
         if(this.menuDiv) {
-            apogeeapp.ui.removeAllChildren(this.menuDiv);
+            apogeeui.removeAllChildren(this.menuDiv);
         }
         this.menuItems = {};
     }

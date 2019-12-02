@@ -1,5 +1,6 @@
 import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This object is a container for window frames. The argument of the constructor should
  * be an element that will hold the window frames.  */
@@ -28,14 +29,14 @@ export default class WindowParent extends EventManager {
      * "shown" event is to be supported.  */
     elementIsShown() {
         this.showing = true;
-        this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,this);
+        this.dispatchEvent(apogeeui.SHOWN_EVENT,this);
     }
 
     /** This should be called when the window parent element is shown, if the
      * "shown" event is to be supported.  */
     elementIsHidden() {
         this.showing = false;
-        this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,this);
+        this.dispatchEvent(apogeeui.HIDDEN_EVENT,this);
     }
 
     /** This method returns true if this window parent is showing. */

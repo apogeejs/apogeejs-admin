@@ -1,12 +1,15 @@
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
+import dialogMgr from "/apogeeapp/ui/window/dialogMgr.js";
+
 /** This method shows a dialog that inputs or outputs a text area.
  * The onSubmitFunction should return true if the dialog should close and false if it should stay open. 
  * This dialog uses a text area that allows for better cut/paste speed with very large input/output. */
 export function showTextIoDialog(options,onSubmitFunction) {
     
-    var dialog = apogeeapp.ui.createDialog({"minimizable":true,"maximizable":true,"movable":true});
+    var dialog = dialogMgr.createDialog({"minimizable":true,"maximizable":true,"movable":true});
             
     //add a scroll container
-    var contentContainer = apogeeapp.ui.createElement("div",null,
+    var contentContainer = apogeeui.createElement("div",null,
         {
 			"display":"block",
             "position":"relative",
@@ -14,9 +17,9 @@ export function showTextIoDialog(options,onSubmitFunction) {
             "height":"100%",
             "overflow": "auto"
         });
-	dialog.setContent(contentContainer,apogeeapp.ui.SIZE_WINDOW_TO_CONTENT);
+	dialog.setContent(contentContainer,apogeeui.SIZE_WINDOW_TO_CONTENT);
     
-	var content = apogeeapp.ui.createElement("div",null,
+	var content = apogeeui.createElement("div",null,
 			{
 				"display":"table",
 				"overflow":"hidden"
@@ -27,23 +30,23 @@ export function showTextIoDialog(options,onSubmitFunction) {
     
     //title
     if(options.title) {
-        line = apogeeapp.ui.createElement("div",{"className":"dialogLine"});
-        line.appendChild(apogeeapp.ui.createElement("div",{"className":"dialogTitle"}));
+        line = apogeeui.createElement("div",{"className":"dialogLine"});
+        line.appendChild(apogeeui.createElement("div",{"className":"dialogTitle"}));
         line.innerHTML = options.title;
         content.appendChild(line);
     }
     
     //instructions
     if(options.instructions) {
-        line = apogeeapp.ui.createElement("div",{"className":"dialogLine"});
-        line.appendChild(apogeeapp.ui.createElement("div",/*{"className":"xxx"}*/));
+        line = apogeeui.createElement("div",{"className":"dialogLine"});
+        line.appendChild(apogeeui.createElement("div",/*{"className":"xxx"}*/));
         line.innerHTML = options.instructions;
         content.appendChild(line);
     }
     
     //text area
-    line = apogeeapp.ui.createElement("div",{"className":"dialogLine"});
-    var editorDiv = apogeeapp.ui.createElement("div",null,
+    line = apogeeui.createElement("div",{"className":"dialogLine"});
+    var editorDiv = apogeeui.createElement("div",null,
         {
             "position":"relative",
             "width":"500px",
@@ -53,7 +56,7 @@ export function showTextIoDialog(options,onSubmitFunction) {
     line.appendChild(editorDiv);
     content.appendChild(line);
         
-//    var jsLinksEditorDiv = apogeeapp.ui.createElement("div",null,{
+//    var jsLinksEditorDiv = apogeeui.createElement("div",null,{
 //        "position":"absolute",
 //        "top":"0px",
 //        "bottom":"0px",
@@ -74,7 +77,7 @@ textEditor.$blockScrolling = Infinity;
     
     //save and cancel buttons
     //buttons and handler
-    line = apogeeapp.ui.createElement("div",{"className":"dialogLine"});
+    line = apogeeui.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
         closeDialog();
     }
@@ -86,7 +89,7 @@ textEditor.$blockScrolling = Infinity;
     }
     
     var closeDialog = function() {
-        apogeeapp.ui.closeDialog(dialog);
+        dialogMgr.closeDialog(dialog);
         
         //clean up the editor
         if(textEditor) { 
@@ -96,14 +99,14 @@ textEditor.$blockScrolling = Infinity;
     }
     
     var submitLabel = options.submitLabel ? options.submitLabel : "Submit";
-    line.appendChild(apogeeapp.ui.createElement("button",{"className":"dialogButton","innerHTML":submitLabel,"onclick":onSave}));
-    line.appendChild(apogeeapp.ui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
+    line.appendChild(apogeeui.createElement("button",{"className":"dialogButton","innerHTML":submitLabel,"onclick":onSave}));
+    line.appendChild(apogeeui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
-    dialog.setContent(content,apogeeapp.ui.SIZE_WINDOW_TO_CONTENT);
+    dialog.setContent(content,apogeeui.SIZE_WINDOW_TO_CONTENT);
     
     //show dialog
-    apogeeapp.ui.showDialog(dialog);
+    dialogMgr.showDialog(dialog);
     
     //size the dialog to the content
     dialog.fitToContent();

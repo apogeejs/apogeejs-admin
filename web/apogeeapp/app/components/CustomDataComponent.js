@@ -10,6 +10,7 @@ import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This attempt has a single form edit page which returns an object. */
 // To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 
@@ -260,7 +261,7 @@ export default class CustomDataComponent extends EditComponent {
             
             //update css now
             let cssInfo = uiCodeFields[CustomDataComponent.CODE_FIELD_CSS];
-            apogeeapp.ui.setMemberCssData(this.getMember().getId(),cssInfo);
+            apogeeui.setMemberCssData(this.getMember().getId(),cssInfo);
         }
         if(uiCodeFields[CustomDataComponent.CODE_FIELD_HTML] != this.uiCodeFields[CustomDataComponent.CODE_FIELD_HTML]) {
             this.fieldUpdated(CustomDataComponent.CODE_FIELD_HTML);

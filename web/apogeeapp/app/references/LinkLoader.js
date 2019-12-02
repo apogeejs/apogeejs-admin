@@ -1,3 +1,4 @@
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 //---------------------------------
 // Link Element Management - This manages DOM elements for links
@@ -68,7 +69,7 @@ class LinkLoader {
                     elementEntry.callerInfoList.forEach(callerInfo => {if(callerInfo.onError) callerInfo.onError(error)});
                 }
 
-                var element = apogeeapp.ui.createElement(elementType,linkProps);
+                var element = apogeeui.createElement(elementType,linkProps);
                 elementEntry.element = element;
                 elementList[url] = elementEntry;
 

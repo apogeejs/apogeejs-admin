@@ -4,6 +4,10 @@ import Workspace from "/apogee/data/Workspace.js";
 import "/apogee/commandConfig.js";
 import "/apogee/tableConfig.js";
 
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
+import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";
+import TreeControl from "/apogeeapp/ui/treecontrol/TreeControl.js";
+
 import Apogee from "/apogeeapp/app/Apogee.js";
 import {updateWorkspaceProperties} from "/apogeeapp/app/commandseq/updateworkspaceseq.js";
 import FolderComponent from "/apogeeapp/app/components/FolderComponent.js";
@@ -37,8 +41,8 @@ export default class WorkspaceUI {
 
         //omit tree if tree pane is missing 
         if(treePane) {
-            this.tree = new apogeeapp.ui.treecontrol.TreeControl();
-            apogeeapp.ui.removeAllChildren(treePane);
+            this.tree = new TreeControl();
+            apogeeui.removeAllChildren(treePane);
             treePane.appendChild(this.tree.getElement());
         }
 
@@ -91,7 +95,7 @@ export default class WorkspaceUI {
         //set up the tree (if tree in use)
         if(this.tree) {
             this.treeEntry = this.createTreeEntry();
-            this.treeEntry.setState(apogeeapp.ui.treecontrol.EXPANDED);
+            this.treeEntry.setState(TreeEntry.EXPANDED);
             this.tree.setRootEntry(this.treeEntry);
             this.treeEntry.addChild(rootFolderComponent.getTreeEntry(true));
             this.treeEntry.addChild(this.referenceManager.getTreeEntry(true));
@@ -491,12 +495,12 @@ export default class WorkspaceUI {
         var iconUrl = this.getIconUrl();
         var menuItemCallback = () => this.getMenuItems();
         var isRoot = true;
-        return new apogeeapp.ui.treecontrol.TreeEntry(labelText, iconUrl, null, menuItemCallback,isRoot);
+        return new TreeEntry(labelText, iconUrl, null, menuItemCallback,isRoot);
     }
 
     /** This method returns the icon url for the component. */
     getIconUrl() {
-        return apogeeapp.ui.getResourcePath(WorkspaceUI.ICON_RES_PATH);
+        return apogeeui.getResourcePath(WorkspaceUI.ICON_RES_PATH);
     }
 
     getMenuItems() {

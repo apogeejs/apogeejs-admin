@@ -70,7 +70,7 @@ function addChildResults(member,actionResult) {
         actionResult.childActionResults["root"] = childActionResult;
         
         //add results for children to this member
-        addChildResults(child,childActionResult);
+        addChildResults(root,childActionResult);
     }
 }
 

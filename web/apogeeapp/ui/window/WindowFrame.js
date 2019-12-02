@@ -1,6 +1,7 @@
 import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 import Menu from "/apogeeapp/ui/menu/Menu.js";
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This is a window frame component. IT is used the table window and the dialog.
  *
@@ -31,7 +32,7 @@ export default class WindowFrame extends EventManager {
         this.parentElement = null;
         this.options = options;
 
-        this.windowState = (options.initialState !== undefined) ? options.initialState : apogeeapp.ui.WINDOW_STATE_NORMAL; //minimize, normal, maximize
+        this.windowState = (options.initialState !== undefined) ? options.initialState : apogeeui.WINDOW_STATE_NORMAL; //minimize, normal, maximize
         
         //set default size values
         this.posInfo = {};
@@ -104,11 +105,11 @@ export default class WindowFrame extends EventManager {
 
     /** This method shows the window. */
     createMenu(iconUrl) {
-        if(!iconUrl) iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.ui.MENU_IMAGE);
+        if(!iconUrl) iconUrl = apogeeui.getResourcePath(apogeeui.MENU_IMAGE);
         this.menu = Menu.createMenuFromImage(iconUrl);
         this.titleBarMenuElement.appendChild(this.menu.getElement());
         //create the icon (menu) overlay
-        this.iconOverlayElement = apogeeapp.ui.createElementWithClass("div","visiui_win_icon_overlay_style",this.titleBarMenuElement);
+        this.iconOverlayElement = apogeeui.createElementWithClass("div","visiui_win_icon_overlay_style",this.titleBarMenuElement);
         
         return this.menu;
     }
@@ -131,14 +132,14 @@ export default class WindowFrame extends EventManager {
 
     clearIconOverlay() {
         if(this.iconOverlayElement) {
-            apogeeapp.ui.removeAllChildren(this.iconOverlayElement);
+            apogeeui.removeAllChildren(this.iconOverlayElement);
         }
     }
 
     /** This sets the content for the window. If null (or otherwise false) is passed
      * the content will be set to empty.*/
     setHeaderContent(contentElement) {
-        apogeeapp.ui.removeAllChildren(this.headerCell);
+        apogeeui.removeAllChildren(this.headerCell);
         if(contentElement) {
             this.headerCell.appendChild(contentElement);
         }
@@ -146,30 +147,30 @@ export default class WindowFrame extends EventManager {
 
     /** This sets the content for the window. The content type
      *  can be:
-     *  apogeeapp.ui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
-     *  apogeeapp.ui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.
-     *  apogeeapp.ui.SIZE_WINDOW_TO_CONTENT - this is not a content type but a input option for content FIXED_SIZE that shrinks the window to fit the content. */
+     *  apogeeui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
+     *  apogeeui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.
+     *  apogeeui.SIZE_WINDOW_TO_CONTENT - this is not a content type but a input option for content FIXED_SIZE that shrinks the window to fit the content. */
     setContent(contentElement,elementType) {
         
         if(!this.contentContainer) {
-            this.contentContainer = apogeeapp.ui.createElement("div");
-            apogeeapp.ui.removeAllChildren(this.bodyCell);
+            this.contentContainer = apogeeui.createElement("div");
+            apogeeui.removeAllChildren(this.bodyCell);
             this.bodyCell.appendChild(this.contentContainer);
         }
-        if(elementType == apogeeapp.ui.RESIZABLE) {
+        if(elementType == apogeeui.RESIZABLE) {
             this.contentContainer.className = "visiui_win_container_fixed";
         }
-        else if(elementType == apogeeapp.ui.FIXED_SIZE) {
+        else if(elementType == apogeeui.FIXED_SIZE) {
             this.contentContainer.className = "visiui_win_container_scrolling";
         }
-        else if(elementType == apogeeapp.ui.SIZE_WINDOW_TO_CONTENT) {
+        else if(elementType == apogeeui.SIZE_WINDOW_TO_CONTENT) {
             this.contentContainer.className = "visiui_win_container_fit_content";
         }
         else {
             throw new Error("Unknown content type: " + elementType);
         }
         
-        apogeeapp.ui.removeAllChildren(this.contentContainer);
+        apogeeui.removeAllChildren(this.contentContainer);
         this.contentContainer.appendChild(contentElement);
         
         this.content = contentElement;
@@ -225,19 +226,19 @@ export default class WindowFrame extends EventManager {
         
         if(!forceClose) {
             //make a close request
-            var requestResponse = this.callHandler(apogeeapp.ui.REQUEST_CLOSE,this);
-            if(requestResponse == apogeeapp.ui.DENY_CLOSE) {
+            var requestResponse = this.callHandler(apogeeui.REQUEST_CLOSE,this);
+            if(requestResponse == apogeeui.DENY_CLOSE) {
                 //do not close the window
                 return;
             }
         }
 
-        this.windowParent.removeListener(apogeeapp.ui.SHOWN_EVENT, this.windowShownListener);
-        this.windowParent.removeListener(apogeeapp.ui.HIDDEN_EVENT, this.windowHiddenListener);
+        this.windowParent.removeListener(apogeeui.SHOWN_EVENT, this.windowShownListener);
+        this.windowParent.removeListener(apogeeui.HIDDEN_EVENT, this.windowHiddenListener);
         this.windowParent.removeWindow(this);
         this.windowParent = null;
 
-        this.dispatchEvent(apogeeapp.ui.CLOSE_EVENT,this);
+        this.dispatchEvent(apogeeui.CLOSE_EVENT,this);
     }
 
     /** This method sets the position of the window frame in the parent. */
@@ -331,15 +332,15 @@ export default class WindowFrame extends EventManager {
     /** This method sets the location and size info for the window. */
     setWindowState(windowState) {
         switch(windowState) {
-            case apogeeapp.ui.WINDOW_STATE_NORMAL:
+            case apogeeui.WINDOW_STATE_NORMAL:
                 this.restoreContent();
                 break;
                 
-            case apogeeapp.ui.WINDOW_STATE_MINIMIZED:
+            case apogeeui.WINDOW_STATE_MINIMIZED:
                 this.minimizeContent();
                 break;
                 
-            case apogeeapp.ui.WINDOW_STATE_MAXIMIZED:
+            case apogeeui.WINDOW_STATE_MAXIMIZED:
                 this.maximizeContent();
                 break;
                 
@@ -361,17 +362,17 @@ export default class WindowFrame extends EventManager {
         
         //attach to listeners to forward show and hide events
         this.windowShownListener = (windowParent) => {
-            this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,this);
+            this.dispatchEvent(apogeeui.SHOWN_EVENT,this);
         };
-        this.windowParent.addListener(apogeeapp.ui.SHOWN_EVENT, this.windowShownListener);
+        this.windowParent.addListener(apogeeui.SHOWN_EVENT, this.windowShownListener);
         this.windowHiddenListener = (windowParent) => {
-            this.dispatchEvent(apogeeapp.ui.HIDDEN_EVENT,this);
+            this.dispatchEvent(apogeeui.HIDDEN_EVENT,this);
         };
-        this.windowParent.addListener(apogeeapp.ui.HIDDEN_EVENT, this.windowHiddenListener);
+        this.windowParent.addListener(apogeeui.HIDDEN_EVENT, this.windowHiddenListener);
         
         //do the show event if the parent is currently wshowing
         if(this.windowParent.getIsShowing()) {
-            this.dispatchEvent(apogeeapp.ui.SHOWN_EVENT,this);
+            this.dispatchEvent(apogeeui.SHOWN_EVENT,this);
         }
         
         //we will redo this since the size of elements used in calculation may have been wrong
@@ -387,7 +388,7 @@ export default class WindowFrame extends EventManager {
     /** Mouse down handler for moving the window. */
     moveMouseDown(e) {
         //do not do move in maximized state
-        if(this.windowState === apogeeapp.ui.WINDOW_STATE_MAXIMIZED) return;
+        if(this.windowState === apogeeui.WINDOW_STATE_MAXIMIZED) return;
         
         if(this.parentElement) {
             this.windowDragActive = true;
@@ -428,7 +429,7 @@ export default class WindowFrame extends EventManager {
     /** Mouse down handler for resizing the window. */
     resizeMouseDownImpl(e,resizeFlags) {
         //do not do resize in maximized state
-        if(this.windowState === apogeeapp.ui.WINDOW_STATE_MAXIMIZED) return;
+        if(this.windowState === apogeeui.WINDOW_STATE_MAXIMIZED) return;
 
         if(resizeFlags) {
             if(resizeFlags & WindowFrame.RESIZE_EAST) {
@@ -545,16 +546,16 @@ export default class WindowFrame extends EventManager {
         this.headerCell.style.display = "none";
         this.bodyCell.style.display = "none";
         
-        var wasMinimized = (this.windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED);
+        var wasMinimized = (this.windowState === apogeeui.WINDOW_STATE_MINIMIZED);
     
         //set the window state
-        this.windowState = apogeeapp.ui.WINDOW_STATE_MINIMIZED;
+        this.windowState = apogeeui.WINDOW_STATE_MINIMIZED;
         this.updateCoordinates();
         this.setMinMaxButtons();
         
         //dispatch resize event
         if(!wasMinimized) { 
-            this.dispatchEvent(apogeeapp.ui.WINDOW_STATE_CHANGED,this);
+            this.dispatchEvent(apogeeui.WINDOW_STATE_CHANGED,this);
         }
     }
 
@@ -565,16 +566,16 @@ export default class WindowFrame extends EventManager {
         this.headerCell.style.display = "";
         this.bodyCell.style.display = "";
         
-        var wasMinimized = (this.windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED);
-        var wasMaximized = (this.windowState === apogeeapp.ui.WINDOW_STATE_MAXIMIZED);
+        var wasMinimized = (this.windowState === apogeeui.WINDOW_STATE_MINIMIZED);
+        var wasMaximized = (this.windowState === apogeeui.WINDOW_STATE_MAXIMIZED);
         
         //set the window state
-        this.windowState = apogeeapp.ui.WINDOW_STATE_NORMAL;
+        this.windowState = apogeeui.WINDOW_STATE_NORMAL;
         this.updateCoordinates();
         this.setMinMaxButtons();
         
         if((wasMinimized)||(wasMaximized)) {
-            this.dispatchEvent(apogeeapp.ui.WINDOW_STATE_CHANGED,this);
+            this.dispatchEvent(apogeeui.WINDOW_STATE_CHANGED,this);
         }
     }
 
@@ -585,15 +586,15 @@ export default class WindowFrame extends EventManager {
         this.headerCell.style.display = "";
         this.bodyCell.style.display = "";
         
-        var wasMaximized = (this.windowState === apogeeapp.ui.WINDOW_STATE_MAXIMIZED);
+        var wasMaximized = (this.windowState === apogeeui.WINDOW_STATE_MAXIMIZED);
         
         //set the window state
-        this.windowState = apogeeapp.ui.WINDOW_STATE_MAXIMIZED;
+        this.windowState = apogeeui.WINDOW_STATE_MAXIMIZED;
         this.updateCoordinates();
         this.setMinMaxButtons();
         
         if(!wasMaximized) {
-            this.dispatchEvent(apogeeapp.ui.WINDOW_STATE_CHANGED,this);
+            this.dispatchEvent(apogeeui.WINDOW_STATE_CHANGED,this);
         }
     }
 
@@ -603,7 +604,7 @@ export default class WindowFrame extends EventManager {
         var initialBodyHeight = this.bodyCell.style.height;
         var initialBodyWidth = this.bodyCell.style.width;
         
-        if(this.windowState === apogeeapp.ui.WINDOW_STATE_MAXIMIZED) {
+        if(this.windowState === apogeeui.WINDOW_STATE_MAXIMIZED) {
             //apply the maximized coordinates size
             this.frame.style.left = "0px";
             this.frame.style.top = "0px";
@@ -613,7 +614,7 @@ export default class WindowFrame extends EventManager {
             this.bodyCell.style.height = "100%";
             this.bodyCell.style.width = "100%";
         }
-        else if(this.windowState === apogeeapp.ui.WINDOW_STATE_NORMAL) {
+        else if(this.windowState === apogeeui.WINDOW_STATE_NORMAL) {
             //apply the normal size to the window
             this.frame.style.left = this.posInfo.x + "px";
             this.frame.style.top = this.posInfo.y + "px";
@@ -633,7 +634,7 @@ export default class WindowFrame extends EventManager {
                 this.bodyCell.style.width = "";
             }
         }
-        else if(this.windowState === apogeeapp.ui.WINDOW_STATE_MINIMIZED) {
+        else if(this.windowState === apogeeui.WINDOW_STATE_MINIMIZED) {
             //apply the minimized size to the window
             this.frame.style.left = this.posInfo.x + "px";
             this.frame.style.top = this.posInfo.y + "px";
@@ -645,7 +646,7 @@ export default class WindowFrame extends EventManager {
         }
         
         if((initialBodyHeight != this.bodyCell.style.height)||(initialBodyWidth != this.bodyCell.style.width)) {
-            this.dispatchEvent(apogeeapp.ui.RESIZED_EVENT,this);
+            this.dispatchEvent(apogeeui.RESIZED_EVENT,this);
         }
     }
 
@@ -763,21 +764,21 @@ export default class WindowFrame extends EventManager {
     /** @private */
     createTitleBar() {
         
-        this.titleBarElement = apogeeapp.ui.createElementWithClass("div","visiui_win_titleBarClass",this.titleBarCell);
+        this.titleBarElement = apogeeui.createElementWithClass("div","visiui_win_titleBarClass",this.titleBarCell);
 
         //add elements
-        this.titleBarLeftElements = apogeeapp.ui.createElementWithClass("div","visiui_win_left_style",this.titleBarElement);
-        this.titleBarMenuElement = apogeeapp.ui.createElementWithClass("div","visiui_win_menu_style",this.titleBarLeftElements);
-        this.titleBarTitleElement = apogeeapp.ui.createElementWithClass("div","visiui_win_title",this.titleBarLeftElements);
+        this.titleBarLeftElements = apogeeui.createElementWithClass("div","visiui_win_left_style",this.titleBarElement);
+        this.titleBarMenuElement = apogeeui.createElementWithClass("div","visiui_win_menu_style",this.titleBarLeftElements);
+        this.titleBarTitleElement = apogeeui.createElementWithClass("div","visiui_win_title",this.titleBarLeftElements);
         
-        this.titleBarRightElements = apogeeapp.ui.createElementWithClass("div","visiui_win_right_style",this.titleBarElement);
-        this.titleBarToolElement = apogeeapp.ui.createElementWithClass("div","visiui_win_tool_style",this.titleBarRightElements);
+        this.titleBarRightElements = apogeeui.createElementWithClass("div","visiui_win_right_style",this.titleBarElement);
+        this.titleBarToolElement = apogeeui.createElementWithClass("div","visiui_win_tool_style",this.titleBarRightElements);
         
         //add window commands ( we will hide the bottons that are not needed)
         //minimize button
         if(this.options.minimizable) {
-            this.minimizeButton = apogeeapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
-            this.minimizeButton.src = apogeeapp.ui.getResourcePath(apogeeapp.ui.MINIMIZE_CMD_IMAGE);
+            this.minimizeButton = apogeeui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
+            this.minimizeButton.src = apogeeui.getResourcePath(apogeeui.MINIMIZE_CMD_IMAGE);
             this.minimizeButton.onclick = () => {
                 this.minimizeContent();
             }
@@ -785,8 +786,8 @@ export default class WindowFrame extends EventManager {
         
         //restore button - only if we cn minimize or maximize
         if(this.options.minimizable || this.options.maximizable) {	
-            this.restoreButton = apogeeapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
-            this.restoreButton.src = apogeeapp.ui.getResourcePath(apogeeapp.ui.RESTORE_CMD_IMAGE);
+            this.restoreButton = apogeeui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
+            this.restoreButton.src = apogeeui.getResourcePath(apogeeui.RESTORE_CMD_IMAGE);
             this.restoreButton.onclick = () => {
                 this.restoreContent();
             }
@@ -795,21 +796,21 @@ export default class WindowFrame extends EventManager {
         //maximize button and logic
     //DISABLE MAXIMIZE - just don't show button for now
     //    if(this.options.maximizable) {
-    //        this.maximizeButton = apogeeapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
-    //        this.maximizeButton.src = apogeeapp.ui.getResourcePath(apogeeapp.ui.MAXIMIZE_CMD_IMAGE);
+    //        this.maximizeButton = apogeeui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
+    //        this.maximizeButton.src = apogeeui.getResourcePath(apogeeui.MAXIMIZE_CMD_IMAGE);
     //        this.maximizeButton.onclick = () => {
     //            this.maximizeContent();
     //        }
     //    }
         
         //layout the window buttons
-        this.windowState = apogeeapp.ui.WINDOW_STATE_NORMAL;
+        this.windowState = apogeeui.WINDOW_STATE_NORMAL;
         this.setMinMaxButtons();
         
         //close button
         if(this.options.closable) {
-            this.closeButton = apogeeapp.ui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
-            this.closeButton.src = apogeeapp.ui.getResourcePath(apogeeapp.ui.CLOSE_CMD_IMAGE);
+            this.closeButton = apogeeui.createElementWithClass("img","visiui_win_cmd_button",this.titleBarRightElements);
+            this.closeButton.src = apogeeui.getResourcePath(apogeeui.CLOSE_CMD_IMAGE);
             this.closeButton.onclick = () => {
                 this.close();
             }
@@ -844,7 +845,7 @@ export default class WindowFrame extends EventManager {
      * @private */
     setMinMaxButtons() {
         if(this.minimizeButton) {
-            if(this.windowState == apogeeapp.ui.WINDOW_STATE_MINIMIZED) {
+            if(this.windowState == apogeeui.WINDOW_STATE_MINIMIZED) {
                 this.minimizeButton.style.display = "none";
             }
             else {
@@ -852,7 +853,7 @@ export default class WindowFrame extends EventManager {
             }
         }
         if(this.restoreButton) {
-            if(this.windowState == apogeeapp.ui.WINDOW_STATE_NORMAL) {
+            if(this.windowState == apogeeui.WINDOW_STATE_NORMAL) {
                 this.restoreButton.style.display = "none";
             }
             else {
@@ -860,7 +861,7 @@ export default class WindowFrame extends EventManager {
             }
         }
         if(this.maximizeButton) {
-            if(this.windowState == apogeeapp.ui.WINDOW_STATE_MAXIMIZED) {
+            if(this.windowState == apogeeui.WINDOW_STATE_MAXIMIZED) {
                 this.maximizeButton.style.display = "none";
             }
             else {
