@@ -1,5 +1,8 @@
 import base from "/apogeeutil/base.js";
 
+import WindowFrame from "/apogeeapp/ui/window/WindowFrame.js";
+import WindowParent from "/apogeeapp/ui/window/WindowParent.js";
+
 /** This is the main apogeeapp ui file */
 apogeeapp.ui = {};
 
@@ -156,13 +159,13 @@ apogeeapp.ui.initWindows = function(appElementId) {
  *normal options for a window frame. (Note - if there are other events with whihc to act with
  *the app they may need to be shileded too.) */
 apogeeapp.ui.createDialog = function(options) {
-    var dialog = new apogeeapp.ui.WindowFrame(options);
+    var dialog = new WindowFrame(options);
     return dialog;
 }
 
 apogeeapp.ui.showDialog = function(dialog) {
     var shieldElement = apogeeapp.ui.createElement("div",null,apogeeapp.ui.DIALOG_SHIELD_STYLE);
-    var dialogParent = new apogeeapp.ui.WindowParent(shieldElement);
+    var dialogParent = new WindowParent(shieldElement);
     apogeeapp.ui.dialogLayer.appendChild(shieldElement);
 
     dialogParent.addWindow(dialog);

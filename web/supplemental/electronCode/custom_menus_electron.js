@@ -1,4 +1,6 @@
     
+import Menu from "/apogeeapp/ui/menu/Menu.js";
+
 /** This method adds to the standard apogee menus.  */
 apogeeapp.app.Apogee.prototype.addToMenuBar = function(menuBar,menus) {
     	
@@ -12,7 +14,7 @@ apogeeapp.app.Apogee.prototype.addToMenuBar = function(menuBar,menus) {
     
     // add a debugger menu
     var name = "Debugging";
-    menu = apogeeapp.ui.Menu.createMenu(name);
+    menu = Menu.createMenu(name);
     menuBar.appendChild(menu.getElement());
     menus[name] = menu;
     

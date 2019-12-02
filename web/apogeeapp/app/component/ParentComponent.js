@@ -539,7 +539,7 @@ export default class ParentComponent extends Component {
     //############################################################################################################
 
     //----------------------
-    // WindowParent Methods
+    // Parent Methods
     //----------------------
         
     usesTabDisplay() {    

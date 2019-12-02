@@ -82,7 +82,7 @@ apogeeWebApp.onResize = function(memberName) {
     componentDisplay.onResize();
 }
 
-/** This method returns a PlainFrame object which contains the component display object. 
+/** This method returns a WebComponentDisplay object which contains the component display object. 
 * If the optionalViewType is not set, the default view (which is typically the desired one) will be used.*/
 function _createComponentDisplay(memberName,optionalViewType) {
    var workspace = app.getWorkspace();

@@ -1,4 +1,6 @@
 
+import Menu from "/apogeeapp/ui/menu/Menu.js";
+
 if(!apogeeapp.ui.treecontrol) apogeeapp.ui.treecontrol = {};
 
 apogeeapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback,menuItemCallback,isRoot) {
@@ -27,7 +29,7 @@ apogeeapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback
         this.iconContainerElement = apogeeapp.ui.createElementWithClass("div", "visiui-tc-icon-container",this.element);
         if(menuItemCallback) {
             //icon as menu
-            this.menu = apogeeapp.ui.Menu.createMenuFromImage(iconSrc);
+            this.menu = Menu.createMenuFromImage(iconSrc);
             this.menu.setAsOnTheFlyMenu(menuItemCallback);
             this.iconContainerElement.appendChild(this.menu.getElement());
         }
@@ -60,10 +62,10 @@ apogeeapp.ui.treecontrol.TreeEntry = function(labelText,iconSrc,dblClickCallback
     
     //context menu and double click
     var contextMenuCallback = function(event) {
-        var contextMenu = new apogeeapp.ui.MenuBody();
+        var contextMenu = Menu.createContextMenu();
         var menuItems = menuItemCallback();
         contextMenu.setMenuItems(menuItems);
-        apogeeapp.ui.Menu.showContextMenu(contextMenu,event);
+        Menu.showContextMenu(contextMenu,event);
     }
     this.label.oncontextmenu = contextMenuCallback;
     

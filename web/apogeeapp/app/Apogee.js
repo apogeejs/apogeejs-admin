@@ -13,6 +13,8 @@ import {exportWorkspace} from "/apogeeapp/app/commandseq/exportworkspaceseq.js";
 import {openWorkspace,openWorkspaceFromTextData} from "/apogeeapp/app/commandseq/openworkspaceseq.js";
 import {saveWorkspace} from "/apogeeapp/app/commandseq/saveworkspaceseq.js";
 
+import TabFrame from "/apogeeapp/ui/tabframe/TabFrame.js";
+import Menu from "/apogeeapp/ui/menu/Menu.js";
 
 import JsonTableComponent from "/apogeeapp/app/components/JsonTableComponent.js";
 import FunctionComponent from "/apogeeapp/app/components/FunctionComponent.js";
@@ -382,7 +384,7 @@ export default class Apogee extends EventManager {
         //----------------------
         //create the tab frame
         //----------------------
-        this.tabFrame = new apogeeapp.ui.TabFrame();
+        this.tabFrame = new TabFrame();
         splitPane.getRightPaneContainer().appendChild(this.tabFrame.getElement());
         
         //add listener for displaying the active tab
@@ -435,7 +437,7 @@ export default class Apogee extends EventManager {
 
         //Workspace menu
         name = "Workspace";
-        this.workspaceMenu = apogeeapp.ui.Menu.createMenu(name);
+        this.workspaceMenu = Menu.createMenu(name);
         menuBarLeft.appendChild(this.workspaceMenu.getElement());
         menus[name] = this.workspaceMenu;
         
@@ -445,7 +447,7 @@ export default class Apogee extends EventManager {
         
         //Edit menu
         name = "Edit";
-        this.editMenu = apogeeapp.ui.Menu.createMenu(name);
+        this.editMenu = Menu.createMenu(name);
         menuBarLeft.appendChild(this.editMenu.getElement());
         menus[name] = this.editMenu;
         
@@ -456,7 +458,7 @@ export default class Apogee extends EventManager {
         //FOR NOW REMOVE GLOBAL COMPONENT AND IMPORT MENUS
         // //Components Menu
         // name = "Components";
-        // menu = apogeeapp.ui.Menu.createMenu(name);
+        // menu = Menu.createMenu(name);
         // menuBarLeft.appendChild(menu.getElement());
         // menus[name] = menu;
         
@@ -465,7 +467,7 @@ export default class Apogee extends EventManager {
         
         // //libraries menu
         // name = "Import/Export";
-        // menu = apogeeapp.ui.Menu.createMenu(name);
+        // menu = Menu.createMenu(name);
         // menuBarLeft.appendChild(menu.getElement());
         // menus[name] = menu;
         

@@ -2,6 +2,8 @@ import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component
 
 import PageDisplayContainer from "/apogeeapp/app/component/literatepage/PageDisplayContainer.js";
 
+import Menu from "/apogeeapp/ui/menu/Menu.js";
+
 /** This component represents a json table object. */
 export default class PageChildComponentDisplay {
 
@@ -204,7 +206,7 @@ export default class PageChildComponentDisplay {
         var iconUrl = this.component.getIconUrl();
         if(!iconUrl) iconUrl = apogeeapp.ui.getResourcePath(apogeeapp.ui.MENU_IMAGE);
         
-        this.menu = apogeeapp.ui.Menu.createMenuFromImage(iconUrl);
+        this.menu = Menu.createMenuFromImage(iconUrl);
         var menuItemCallback = () => {
             return this.component.getMenuItems();
         }

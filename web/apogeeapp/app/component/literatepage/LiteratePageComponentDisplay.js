@@ -5,6 +5,8 @@ import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/ad
 import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
 import PageChildComponentDisplay from "/apogeeapp/app/component/literatepage/PageChildComponentDisplay.js"
 
+import Tab from "/apogeeapp/ui/tabframe/Tab.js";
+
 /** This component represents a json table object. 
  * The member argument is the main member for this component. The folder argument is 
  * the parent folde associated with this component, which may be different from the
@@ -131,7 +133,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
     /** @private */
     loadTabEntry() {
-        this.tab = new apogeeapp.ui.Tab(this.member.getId());    
+        this.tab = new Tab(this.member.getId());    
 
         //-----------------------
         //set the content
