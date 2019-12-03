@@ -223,7 +223,7 @@ export default class ReferenceManager {
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = typeInfo.ADD_ENTRY_TEXT;
-        itemInfo.callback = addLink(this,typeInfo);
+        itemInfo.callback = () => addLink(this,typeInfo);
         menuItemList.push(itemInfo);
         
         return menuItemList;

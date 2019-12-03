@@ -2,7 +2,7 @@ import {updateLink, removeLink} from "/apogeeapp/app/commandseq/updatelinkseq.js
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import {bannerConstants} from "/apogeeapp/app/component/banner.js"; 
 import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";
-
+import ReferenceManager from "/apogeeapp/app/references/ReferenceManager.js";
 
 /** This class manages references for the web page.*/
 export default class ReferenceEntry {

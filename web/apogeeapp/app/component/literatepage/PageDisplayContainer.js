@@ -228,8 +228,10 @@ export default class PageDisplayContainer {
 
     /** This method destroys the data display. */
     destroy() {
-        if((this.dataDisplay)&&(this.dataDisplay.destroy)) {
-            this.dataDisplay.destroy();
+        if(this.dataDisplay) {
+            if(this.dataDisplay.destroy) {
+                this.dataDisplay.destroy();
+            }
             this.dataDisplay = null;
             this.dataDisplayLoaded = false;
         }

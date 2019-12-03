@@ -104,8 +104,9 @@ const syntax = {
         //moz spidermonkey specific
     ],
 
+    
+
     //no support
-    //ArrayPattern: null,
     AssignmentPattern: null,
     ClassBody: null,
     ClassDeclaration: null,
@@ -121,10 +122,16 @@ const syntax = {
     ImportSpecifier: null,
     MetaProperty: null,
     MethodDefinition: null,
-    //ObjectPattern: null,
-    //RestElement: null,
     Super: null,
     TaggedTemplateExpression: null
+
+    //if we allowed module import, it would look like this I think
+    //but we can not do this in a function, only a module
+    //as of the time of this writing, esprima did not support parsing dynamic es6 imports
+    // ImportDeclaration: [{name:'specifiers',list:true},{name:'source'}],
+    // ImportDefaultSpecifier: [{name:'local'}],
+    // ImportNamespaceSpecifier: [{name:'local'}],
+    // ImportSpecifier: [{name:'local'},{name:'imported'}],
     
 };
 
