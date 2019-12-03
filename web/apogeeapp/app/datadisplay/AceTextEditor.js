@@ -3,6 +3,7 @@ import util from "/apogeeutil/util.js";
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
+import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 
 /** Editor that uses the Ace text editor.
  * 
@@ -138,7 +139,7 @@ export default class AceTextEditor extends DataDisplay {
     }
     
     checkStartEditMode() {
-        if(!this.displayContainer.isInEditMode()) {
+        if((!this.displayContainer.isInEditMode())&&(this.editor)) {
             var activeData = this.editor.getSession().getValue();
             if(activeData != this.storedData) {
                 this.onTriggerEditMode();

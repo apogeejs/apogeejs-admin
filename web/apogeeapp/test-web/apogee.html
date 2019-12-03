@@ -4,16 +4,11 @@
 		<title></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <!--<script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/noconflict/ace.js"></script>-->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
-        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.3/esprima.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/6.2.0/handsontable.full.min.js"></script>
-        <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>-->
-        
-        <link rel=stylesheet href="/prosemirror/lib/compiledCss/editor.css">
         
         <script type="text/javascript" src="/supplemental/webLibHeader.js"></script>
         <script src="/supplemental/debugHook.js"></script>
+
+        <link rel=stylesheet href="/prosemirror/lib/compiledCss/editor.css">
         
         <link rel="stylesheet" type="text/css" href="/apogeeapp/app/apogeeapp.css">
         <link rel="stylesheet" type="text/css" href="/apogeeapp/app/component/literatepage/LiteratePage.css">
@@ -28,8 +23,7 @@
         <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/configurablepanel/ConfigurablePanel.css">     
         
           
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/6.2.0/handsontable.full.min.css">
-        <!--<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">-->
+        <link rel="stylesheet" type="text/css" href="/ext/handsontable/handsontable_6.2.0/handsontable.full.min.css">
         
         <script type="module">
             import Apogee from "/apogeeapp/app/Apogee.js";
@@ -37,6 +31,7 @@
             import util from "/apogeeutil/util.js";
             import net from "/apogeeutil/net.js";
             import apogeeui from "/apogeeapp/ui/apogeeui.js";
+            import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 
             //expose these apogee libraries
             window.apogee = {};
@@ -47,6 +42,9 @@
 
                 //initialize resource path
                 apogeeui.initResourcePath("/resources");
+
+                //any needs mode or theme files for the ace editor should go in the folder set below
+			    ace.config.set('basePath','/ext/ace/ace_1.4.3/ace_includes');
                 
                 //use cutnpaste file access
                 var appConfigManager = new CutNPasteAppConfigManager();

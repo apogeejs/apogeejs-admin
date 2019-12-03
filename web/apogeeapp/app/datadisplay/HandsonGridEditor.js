@@ -3,6 +3,7 @@ import util from "/apogeeutil/util.js";
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
+import Handsontable from "/ext/handsontable/handsontable_6.2.0/handsontable.full.min_to_es6.js";
 
 /** This is a grid editor using hands on table*/
 export default class HandsonGridEditor extends DataDisplay {

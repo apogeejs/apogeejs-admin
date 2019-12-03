@@ -1,5 +1,6 @@
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import dialogMgr from "/apogeeapp/ui/window/dialogMgr.js";
+import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 
 /** This method shows a dialog that inputs or outputs a text area.
  * The onSubmitFunction should return true if the dialog should close and false if it should stay open. 
