@@ -3,13 +3,13 @@
 
 /** The function is called when a member function is called. It
  * is intended for debug purposes, to add a breakpoint. */
-__memberFunctionDebugHook = function(member) {
+__memberFunctionDebugHook = function(memberFullName) {
 }
 
 /** This function is called from the constructor code for a custom control.
  * It is intended to allow adding a breakpoint before entering user code.
  * To use this, the constuctor must be set. */
-__customControlDebugHook = function(member) {
+__customControlDebugHook = function(args) {
 }
 
 /** This is a wrapper used in function table creation to help make 
@@ -31,31 +31,6 @@ __functionTableWrapper = function(initMember) {
     }
     
     return wrapperMemberFunction;
-}
-
-
-/** TEMPORARY FUNCTION TO DEBUG EDITOR */
-function getNodeInfo(doc) {
-    let docNodeInfo = {pos:0, size:0, childNodes:[]};
-    return doc.content.content.reduce(createNodeInfo,docNodeInfo);
-}
-
-function createNodeInfo(parentNodeInfo,node) {
-    let nodeInfo = {};
-
-    nodeInfo.pos = parentNodeInfo.size;
-    nodeInfo.size = node.content.size + 2;
-    nodeInfo.type = node.type.name;
-
-    parentNodeInfo.size += nodeInfo.size;
-    parentNodeInfo.childNodes.push(nodeInfo);
-
-    if(node.isBlock) {
-//        nodeInfo.childNodes = [];
- //       node.content.content.reduce(createNodeInfo,nodeInfo);
-    }
-
-    return parentNodeInfo;
 }
 
 

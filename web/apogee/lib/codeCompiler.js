@@ -163,7 +163,7 @@ const MEMBER_FUNCTION_FORMAT_TEXT = [
 "//member function----------------",
 "function __memberFunction({1}) {",
 "//overhead code",
-"__memberFunctionDebugHook();",
+"__memberFunctionDebugHook('{0}');",
 "",
 "//user code",
 "{2}",
