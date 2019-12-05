@@ -2,6 +2,30 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import pkg from './package.json';
 
+//test for absolute references-----------------------
+let basedir = '/Dave/dev/github/hax_code/master/ApogeeJS/web/dev/rollup_test/rollup-starter-lib-master/src';
+const path = require('path');
+function resolveId(importee, importer) {
+console.log(__dirname);
+//this is to handle the initial file for the cjs case
+if(!importer) return null;
+
+  if (isAbsolute(importee)) {
+	const root = path.parse(importee).root;
+    return ensureExt(path.resolve(basedir, path.relative(root, importee)));
+  } else {
+    const importer_dir = path.dirname(importer);
+    return ensureExt(importer ? path.resolve(importer_dir, importee) : path.resolve(importee));
+  }
+   function isAbsolute(path) {
+	return /^[\\\/]/.test(path);
+  }
+  function ensureExt(fn) {
+    return /\.js$/.test(fn) ? fn : fn + '.js';
+  }
+}
+//-------------------------------------------------------
+
 export default [
 	// browser-friendly UMD build
 	{
@@ -13,7 +37,8 @@ export default [
 		},
 		plugins: [
 			resolve(), // so Rollup can find `ms`
-			commonjs() // so Rollup can convert `ms` to an ES module
+			commonjs(), // so Rollup can convert `ms` to an ES module
+			{resolveId}
 		]
 	},
 
@@ -25,7 +50,8 @@ export default [
 		],
 		plugins: [
 			resolve(), // so Rollup can find `ms`
-			commonjs() // so Rollup can convert `ms` to an ES module
+			commonjs(), // so Rollup can convert `ms` to an ES module
+			{resolveId}
 		]
 	},
 
@@ -35,6 +61,9 @@ export default [
 		external: ['ms'],
 		output: [
 			{ file: pkg.main, format: 'cjs' }
+		],
+		plugins: [
+			{resolveId}
 		]
 	}
 ];

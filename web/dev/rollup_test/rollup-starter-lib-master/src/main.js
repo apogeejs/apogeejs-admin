@@ -1,6 +1,7 @@
 import ms from 'ms';
 import lunchtime from './lunchtime.js';
-import millisecondsUntil from './millisecondsUntil.js';
+// import millisecondsUntil from '/Dave/dev/github/hax_code/master/ApogeeJS/web/dev/rollup_test/rollup-starter-lib-master/src/millisecondsUntil.js';
+import millisecondsUntil from '/millisecondsUntil.js';
 
 export default function howLongUntilLunch(hours, minutes) {
 	// lunch is at 12.30

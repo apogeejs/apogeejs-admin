@@ -1,13 +1,12 @@
 {
-  "name"    : "apogee-app",
-  "version" : "0.3.0",
-  "main"    : "main.js",
+  "name": "apogee-app",
+  "version": "0.3.0",
+  "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "~3.0.0",
-	"leaflet": "~1.0.1"
+    "electron": "~3.0.0"
   },
   "author": "Dave Sutter"
 }

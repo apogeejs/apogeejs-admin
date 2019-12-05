@@ -283,7 +283,7 @@ export default class WindowFrame extends EventManager {
     }
 
     /** This method sets the location and size info for the window at the same time. */
-    setCoordinateInfo= function(posInfo,sizeInfo) {
+    setCoordinateInfo(posInfo,sizeInfo) {
         this.posInfo = posInfo;
         this.sizeInfo = sizeInfo;
         this.updateCoordinates();

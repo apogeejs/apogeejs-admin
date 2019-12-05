@@ -1,8 +1,10 @@
+import ElectronFileAccess from "/supplemental/electroncode/ElectronFileAccess.js";
+
 /** 
  * This is the format of the AppConfigManager. This class does not need
  * to be extended. It has not internal functionality.
  */
-apogeeapp.app.ElectronAppConfigManager = class {
+export default class ElectronAppConfigManager {
     
     constructor() {
     }
@@ -15,13 +17,13 @@ apogeeapp.app.ElectronAppConfigManager = class {
         var fileLoadPromise;
         
         //load file if it exists
-        if(fs.existsSync(apogeeapp.app.ElectronAppConfigManager.CONFIG_FILE_PATH)) {
+        if(fs.existsSync(ElectronAppConfigManager.CONFIG_FILE_PATH)) {
             var promiseFunction = (resolve,reject) => {
                 var onFileOpen = function(err,data) {
                     if(err) reject(err);
                     else resolve(JSON.parse(data));                    
                 }              
-                fs.readFile(apogeeapp.app.ElectronAppConfigManager.CONFIG_FILE_PATH,onFileOpen);
+                fs.readFile(ElectronAppConfigManager.CONFIG_FILE_PATH,onFileOpen);
             }
 
             var configFilePromise = new Promise(promiseFunction);
@@ -39,7 +41,7 @@ apogeeapp.app.ElectronAppConfigManager = class {
      * if an alternate is not loaded in configuration.
      */
     getDefaultFileAccessObject(app) {
-        return new apogeeapp.app.ElectronFileAccess();
+        return new ElectronFileAccess();
     }
     
     /** This method should return a promise for the initial workspace
@@ -61,4 +63,4 @@ apogeeapp.app.ElectronAppConfigManager = class {
     }
 }
 
-apogeeapp.app.ElectronAppConfigManager.CONFIG_FILE_PATH = "./config.json";
+ElectronAppConfigManager.CONFIG_FILE_PATH = "./config.json";

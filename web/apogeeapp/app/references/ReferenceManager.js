@@ -150,7 +150,7 @@ export default class ReferenceManager {
     /** This method opens a list of js and css links. It returns a promise that
      * resolves when all links are loaded. 
      * @protected */
-    entryRemoved= function(referenceEntry) {
+    entryRemoved(referenceEntry) {
         var entryType = referenceEntry.getEntryType();
         
         var listStruct = this.referenceLists[entryType];
