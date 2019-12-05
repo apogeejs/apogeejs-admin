@@ -9,28 +9,28 @@
             __globals__ = global;
             __APOGEE_ENVIRONMENT__ = "NODE";
         </script>
-        <script type="text/javascript" src="./debugHook.js"></script>
+        <script type="text/javascript" src="../../supplemental/debugHook.js"></script>
         <script type="text/javascript">
-            let {appInit,getWorkspaceIsDirty} = require("./app.cjs.js");
+            let {appInit,getWorkspaceIsDirty} = require("./bundle/dist/app.cjs.js");
 
             let init = () => setTimeout(appInit,1000);
 
             let isWorkspaceDirty = () => getWorkspaceIsDirty();
         </script>
 
-        <link rel="stylesheet" type="text/css" href="./css/editor.css">
-        <link rel="stylesheet" type="text/css" href="./css/apogeeapp.css">
-        <link rel="stylesheet" type="text/css" href="./css/LiteratePage.css">
-        <link rel="stylesheet" type="text/css" href="./css/ApogeeToolbar.css">
-        <link rel="stylesheet" type="text/css" href="./css/WindowFrame.css">
-        <link rel="stylesheet" type="text/css" href="./css/dialog.css">
-        <link rel="stylesheet" type="text/css" href="./css/DisplayAndHeader.css">
-        <link rel="stylesheet" type="text/css" href="./css/Menu.css">
-        <link rel="stylesheet" type="text/css" href="./css/SplitPane.css">
-        <link rel="stylesheet" type="text/css" href="./css/TabFrame.css">
-        <link rel="stylesheet" type="text/css" href="./css/TreeControl.css">
-        <link rel="stylesheet" type="text/css" href="./css/ConfigurablePanel.css">     
-        <link rel="stylesheet" type="text/css" href="./css/handsontable.full.min.css">
+        <link rel="stylesheet" type="text/css" href="../../prosemirror/lib/compiledCss/editor.css">
+        <link rel="stylesheet" type="text/css" href="../app/apogeeapp.css">
+        <link rel="stylesheet" type="text/css" href="../app/component/literatepage/LiteratePage.css">
+        <link rel="stylesheet" type="text/css" href="../app/editor/toolbar/ApogeeToolbar.css">
+        <link rel="stylesheet" type="text/css" href="../ui/window/WindowFrame.css">
+        <link rel="stylesheet" type="text/css" href="../ui/window/dialog.css">
+        <link rel="stylesheet" type="text/css" href="../ui/displayandheader/DisplayAndHeader.css">
+        <link rel="stylesheet" type="text/css" href="../ui/menu/Menu.css">
+        <link rel="stylesheet" type="text/css" href="../ui/splitpane/SplitPane.css">
+        <link rel="stylesheet" type="text/css" href="../ui/tabframe/TabFrame.css">
+        <link rel="stylesheet" type="text/css" href="../ui/treecontrol/TreeControl.css">
+        <link rel="stylesheet" type="text/css" href="../ui/configurablepanel/ConfigurablePanel.css">     
+        <link rel="stylesheet" type="text/css" href="../../ext/handsontable/handsontable_6.2.0/handsontable.full.min.css">
 
 
 	</head>

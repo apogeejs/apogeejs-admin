@@ -105,10 +105,11 @@ FolderFunction.readProperties = function(member,values) {
 
 /** This method executes a property update. */
 FolderFunction.getPropertyUpdateAction = function(folderFunction,newValues) {
-    if((newValues.updateData)&&((newValues.argList !== undefined)||(newValues.returnValueString!== undefined))) {
+    let updateData = newValues.updateData;
+    if((updateData)&&((updateData.argList !== undefined)||(updateData.returnValue !== undefined))) {
 
-        var argList = newValues.argList ? newValues.argList : this.argList;
-        var returnValueString = newValues.returnValueString ? newValues.returnValueString : this.returnValueString;
+        var argList = updateData.argList ? updateData.argList : folderFunction.argList;
+        var returnValueString = updateData.returnValue ? updateData.returnValue : folderFunction.returnValueString;
  
         var actionData = {};
         actionData.action = "updateFolderFunction";
