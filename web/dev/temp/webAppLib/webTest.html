@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <script type="text/javascript">
+            var __globals__ = window;
+            var __APOGEE_ENVIRONMENT__ = "WEB";
+        </script>
+        <script type="text/javascript" src="/debug/debugHook.js"></script>
+        
+        <link rel="stylesheet" type="text/css" href="/prosemirror/lib/compiledCss/editor.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/app/apogeeapp.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/app/component/literatepage/LiteratePage.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/app/editor/toolbar/ApogeeToolbar.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/window/WindowFrame.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/window/dialog.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/displayandheader/DisplayAndHeader.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/menu/Menu.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/splitpane/SplitPane.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/tabframe/TabFrame.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/treecontrol/TreeControl.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/configurablepanel/ConfigurablePanel.css">     
+        <link rel="stylesheet" type="text/css" href="/ext/handsontable/handsontable_6.2.0/handsontable.full.min.css">    
+        
+        <script type="module">
+            import apogeeWebApp from "/dist/apogeeAppLib.es6.js";
+
+            import util from "/apogeeutil/util.js";
+            import net from "/apogeeutil/net.js";
+            import apogeeui from "/apogeeapp/ui/apogeeui.js";
+            import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
+
+            //==============================================
+            //this should not be done here
+            //expose these apogee libraries
+            window.apogee = {};
+            apogee.util = util;
+            apogee.net = net;
+            //=================================================
+        
+            let workspaceUrl = "http://localhost:8888/dev/temp/webAppLib/testWorkspace.json";
+
+			window.init = function() {
+
+                //====================================================
+                //these should not be done here
+                //initialize resource path
+                apogeeui.initResourcePath("/resources");
+
+                //any needs mode or theme files for the ace editor should go in the folder set below
+                ace.config.set('basePath','/ext/ace/ace_1.4.3/ace_includes');
+                //======================================================
+
+                //start app
+                apogeeWebApp.initWebApp(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadFailed);
+            }
+
+            function onWorkspaceLoad(openResult) {
+                apogeeWebApp.addDisplay("Model.a","aDisplayElement",true);
+                apogeeWebApp.addDisplay("Model.b","bDisplayElement",true);
+            }
+
+            function onWorkspaceLoadFailed(failResult) {
+                alert("Workspace open complete: " + JSON.stringify(failResult));
+            }
+            
+		</script>
+	</head>
+    <body onload="init()">
+        This is element "a":
+        <div id="aDisplayElement"></div>
+
+        This is element "b":
+        <div id="bDisplayElement"></div>
+	</body>
+</html>

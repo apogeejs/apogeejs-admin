@@ -1,5 +1,5 @@
 import Apogee from "/apogeeapp/app/Apogee.js";
-import WebAppConfigManager from "/supplemental/webAppCode/WebAppConfigManager.js";
+import WebAppConfigManager from "/apogeeapp/impl/webAppCode/WebAppConfigManager.js";
 import WebComponentDisplay from "/apogeeapp/app/component/webpage/WebComponentDisplay.js";
 
 let apogeeWebApp = {};

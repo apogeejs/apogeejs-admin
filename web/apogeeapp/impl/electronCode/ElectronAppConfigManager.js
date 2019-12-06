@@ -1,4 +1,4 @@
-import ElectronFileAccess from "/supplemental/electroncode/ElectronFileAccess.js";
+import ElectronFileAccess from "/apogeeapp/impl/electroncode/ElectronFileAccess.js";
 
 /** 
  * This is the format of the AppConfigManager. This class does not need
