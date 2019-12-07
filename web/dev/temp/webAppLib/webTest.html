@@ -26,41 +26,18 @@
         <link rel="stylesheet" type="text/css" href="/ext/handsontable/handsontable_6.2.0/handsontable.full.min.css">    
         
         <script type="module">
-            import apogeeWebApp from "/dist/apogeeAppLib.es6.js";
-
-            import util from "/apogeeutil/util.js";
-            import net from "/apogeeutil/net.js";
-            import apogeeui from "/apogeeapp/ui/apogeeui.js";
-            import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
-
-            //==============================================
-            //this should not be done here
-            //expose these apogee libraries
-            window.apogee = {};
-            apogee.util = util;
-            apogee.net = net;
-            //=================================================
+            import apogeeAppLib from "/dist/apogeeAppLib.es6.js";
         
             let workspaceUrl = "http://localhost:8888/dev/temp/webAppLib/testWorkspace.json";
 
 			window.init = function() {
-
-                //====================================================
-                //these should not be done here
-                //initialize resource path
-                apogeeui.initResourcePath("/resources");
-
-                //any needs mode or theme files for the ace editor should go in the folder set below
-                ace.config.set('basePath','/ext/ace/ace_1.4.3/ace_includes');
-                //======================================================
-
                 //start app
-                apogeeWebApp.initWebApp(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadFailed);
+                apogeeAppLib.initWebApp(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadFailed);
             }
 
             function onWorkspaceLoad(openResult) {
-                apogeeWebApp.addDisplay("Model.a","aDisplayElement",true);
-                apogeeWebApp.addDisplay("Model.b","bDisplayElement",true);
+                apogeeAppLib.addDisplay("Model.a","aDisplayElement",true);
+                apogeeAppLib.addDisplay("Model.b","bDisplayElement",true);
             }
 
             function onWorkspaceLoadFailed(failResult) {

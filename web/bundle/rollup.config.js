@@ -47,7 +47,7 @@ export default [
 
 	// ES module build for Web App Lib
 	{
-		input: '../apogeeapp/impl/webAppCode/apogeeWebApp.js',
+		input: '../apogeeapp/impl/webAppCode/apogeeAppLib.js',
 		output: [
 			{ file: "../dist/apogeeAppLib.es6.js", format: 'es' },
 			{ name: "apogeeAppLib", file: "../dist/apogeeAppLib.umd.js", format: 'umd' },

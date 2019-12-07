@@ -1,0 +1,13 @@
+{
+  "name": "apogee-release",
+  "version": "0.0.0",
+  "description": "Gulp release tool for Apogee",
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-inject-string": "^1.1.2",
+    "gulp-rollup": "^2.16.2"
+  },
+  "author": "Intransix"
+}

@@ -13,12 +13,12 @@ apogee.net = net;
 export function appInit() {
 
     //========================================
-    //we need to do these paths differently
+    //resource paths
     //initialize resource path
-    apogeeui.initResourcePath("../../../resources");
+    apogeeui.initResourcePath("./resources");
 
     //any needs mode or theme files for the ace editor should go in the folder set below
-    ace.config.set('basePath','../../../ext/ace/ace_1.4.3/ace_includes');
+    ace.config.set('basePath','./ace_includes');
     //=========================================
     
     //use electron file access
