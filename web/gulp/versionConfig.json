@@ -1,4 +1,4 @@
 {
     "VERSION_RELEASE_HOST": "https://apogeejs.com",
-    "VERSION_RELEASE_PATH": "/lib/v1.0.0" 
+    "VERSION_ASSETS_PATH": "/lib/v1.0.0/assets" 
 }

@@ -1,5 +1,5 @@
 import Apogee from "/apogeeapp/app/Apogee.js";
-import CutNPasteAppConfigManager from "/supplemental/cutNPasteCode/CutNPasteAppConfigManager.js";
+import CutNPasteAppConfigManager from "/apogeeapp/impl/cutNPasteCode/CutNPasteAppConfigManager.js";
 import util from "/apogeeutil/util.js";
 import net from "/apogeeutil/net.js";
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
