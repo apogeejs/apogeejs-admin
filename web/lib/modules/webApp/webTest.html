@@ -4,102 +4,29 @@
 		<title></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <!--<script type="text/javascript" src="https://cdn.jsdelivr.net/ace/1.2.3/noconflict/ace.js"></script>-->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
-        <script src="https://cdn.rawgit.com/jquery/esprima/2.7.3/esprima.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/6.2.0/handsontable.full.min.js"></script>
-        <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.js"></script>-->
         
-        <!-- <link rel=stylesheet href="/prosemirror/lib/compiledCss/editor.css"> -->
-        
-        <script>
-            var apogeeapp = {};
-            apogeeapp.app = {};
+        <script type="text/javascript">
+            var __globals__ = window;
+            var __APOGEE_ENVIRONMENT__ = "WEB";
         </script>
-            
+        <script type="text/javascript" src="/debug/debugHook.js"></script>
         
-        <script type="text/javascript" src="/supplemental/webLibHeader.js"></script>
-
-<!-- ##################################### START: UI not modularaized -->
-
-		<script type="module" src="/apogeeapp/ui/apogeeappui.js"></script>
-        <script type="module" src="/apogeeapp/ui/window/WindowParent.js"></script>
-		<script type="module" src="/apogeeapp/ui/window/WindowFrame.js"></script> 
-        <script type="module" src="/apogeeapp/ui/plainframe/PlainFrame.js"></script>  
-		<script type="module" src="/apogeeapp/ui/tabframe/TabFrame.js"></script>
-        <script type="module" src="/apogeeapp/ui/tabframe/Tab.js"></script>
-		<script type="module" src="/apogeeapp/ui/menu/Menu.js"></script>
-        <script type="module" src="/apogeeapp/ui/menu/MenuHeader.js"></script>
-        <script type="module" src="/apogeeapp/ui/menu/MenuBody.js"></script>
-		<script type="module" src="/apogeeapp/ui/jsonedit/jsonedit.js"></script>
-        <script type="module" src="/apogeeapp/ui/jsonedit/keyentry.js"></script>
-        <script type="module" src="/apogeeapp/ui/jsonedit/valueentry.js"></script>
-        <script type="module" src="/apogeeapp/ui/jsonedit/editfield.js"></script>
-        <script type="module" src="/apogeeapp/ui/jsonedit/jsoneditarea.js"></script>
-        <script type="module" src="/apogeeapp/ui/onload/onLoadDetector.js"></script>
-        <script type="module" src="/apogeeapp/ui/displayandheader/DisplayAndHeader.js"></script>
-        <script type="module" src="/apogeeapp/ui/splitpane/SplitPane.js"></script>
-        <script type="module" src="/apogeeapp/ui/treecontrol/TreeControl.js"></script>
-        <script type="module" src="/apogeeapp/ui/treecontrol/TreeEntry.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/ConfigurablePanel.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/ConfigurableElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/HeadingElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/TextFieldElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/TextareaElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/DropdownElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/CheckboxElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/CheckboxGroupElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/RadioGroupElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/InvisibleElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/PanelElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/SubmitElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/SpacerElement.js"></script>
-        <script type="module" src="/apogeeapp/ui/configurablepanel/elements/HTMLDisplayElement.js"></script>
-
-<!-- ##################################### END: UI not modularaized -->
-
-        <script src="/supplemental/debugHook.js"></script>
-        
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/app/apogeeapp.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/app/component/literatepage/LiteratePage.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/app/editor/toolbar/ApogeeToolbar.css">
-		<link rel="stylesheet" type="text/css" href="/apogeeapp/ui/jsonedit/jsonedit.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/window/WindowFrame.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/window/dialog.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/displayandheader/DisplayAndHeader.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/menu/Menu.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/splitpane/SplitPane.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/tabframe/TabFrame.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/treecontrol/TreeControl.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/configurablepanel/ConfigurablePanel.css">     
-        
-          
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/6.2.0/handsontable.full.min.css">
-        <!--<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.33.0/handsontable.full.min.css">-->
+        <link rel="stylesheet" type="text/css" href="/lib/v1.0.0/assets/cssBundle.css">
+   
         
         <script type="module">
-            import apogeeWebApp from "/supplemental/webAppCode/apogeeWebApp.js";
-
-            import util from "/apogeeutil/util.js";
-            import net from "/apogeeutil/net.js";
-
-            //expose these apogee libraries
-            window.apogee = {};
-            apogee.util = util;
-            apogee.net = net;
-
-            apogeeui.initResourcePath("/resources");
+            import apogeeAppLib from "/lib/v1.0.0/assets/apogeeAppLib.es6.js";
         
-            let workspaceUrl = "http://localhost:8888/lib/modules/webApp/testWorkspace.json";
+            let workspaceUrl = "testWorkspace.json";
 
 			window.init = function() {
                 //start app
-                apogeeWebApp.initWebApp(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadFailed);
+                apogeeAppLib.initWebApp(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadFailed);
             }
 
             function onWorkspaceLoad(openResult) {
-                apogeeWebApp.addDisplay("Model.a","aDisplayElement",true);
-                apogeeWebApp.addDisplay("Model.b","bDisplayElement",true);
+                apogeeAppLib.addDisplay("Model.a","aDisplayElement",true);
+                apogeeAppLib.addDisplay("Model.b","bDisplayElement",true);
             }
 
             function onWorkspaceLoadFailed(failResult) {

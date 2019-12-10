@@ -100,6 +100,7 @@ function packageWebAppTask(destFolder,webAppBundleFileName) {
 //==============================
 // Package Web Lib
 //==============================
+
 function prepareAppLibTask(tempFolder) {
     let releasePath = versionConfig.VERSION_RELEASE_HOST + versionConfig.VERSION_ASSETS_PATH;
 
@@ -144,6 +145,22 @@ function packageElectronTask(destFolder,electronBundleFileName) {
 }
 
 //==============================
+// Package Core Lib
+//==============================
+function packageCoreLibTask(destFolder,coreLibBundleFileName) {
+    return rollup.rollup({
+        input: '../apogeeapp/impl/coreLib/apogeeCoreLib.js',
+		plugins: [
+			{resolveId}
+		]
+    }).then(bundle => {
+        return bundle.write(
+            { file: destFolder + "/" + coreLibBundleFileName, format: 'cjs' }
+        );
+    });
+}
+
+//==============================
 // Clean Output
 //==============================
 function cleanFolderTask(folder) {
@@ -159,6 +176,7 @@ const DIST_FOLDER = "dist";
 const ASSETS_FOLDER = DIST_FOLDER + "/assets";
 const WEBAPP_FOLDER = DIST_FOLDER + "/webapp";
 const ELECTRON_FOLDER = DIST_FOLDER + "/electronapp";
+const CORE_LIB_FOLDER = DIST_FOLDER + "/corelib"
 const TEMP_FOLDER = "temp";
 
 const RESOURCES_FOLDER_NAME = "resources";
@@ -167,6 +185,7 @@ const ACE_INCLUDES_FOLDER_NAME = "ace_includes";
 const WEB_APP_JS_FILENAME = "apogeeWebBundle.js";
 const WEB_LIB_JS_BASE_FILENAME = "apogeeAppLib";
 const ELECTRON_APP_JS_FILENAME = "apogeeElectronBundle.js";
+const CORE_LIB_FILE_NAME = "apogeeCoreLib.js"
 const CSS_BUNDLE_FILENAME = "cssBundle.css";
 
 const ASSETS_ADDED_FILES = [
@@ -233,6 +252,10 @@ let releaseElectron = parallel(
     () => copyAceIncludesTask(ELECTRON_FOLDER,ACE_INCLUDES_FOLDER_NAME)
 );
 
+let releaseCoreLib = parallel(
+    () => packageCoreLibTask(CORE_LIB_FOLDER,CORE_LIB_FILE_NAME)
+)
+
 //============================
 // Exports
 //============================
@@ -251,7 +274,8 @@ exports.release = series(
     parallel(
         releaseWebApp,
         releaseWebLib,
-        releaseElectron
+        releaseElectron,
+        releaseCoreLib
     )
 );
 

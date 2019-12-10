@@ -8,7 +8,7 @@ import ActionError from "/apogee/lib/ActionError.js";
  * Action Data format:
  * {
  *  "action": "updateData",
- *  "member": (member to update),
+ *  "memberName": (member to update),
  *  "data": (new value for the table)
  *  "sourcePromise": (OPTIONAL - If this is the completion of an asynchronous action, the
  *      source promise shoudl be included to make sure it has not been overwritten with a
@@ -20,7 +20,7 @@ import ActionError from "/apogee/lib/ActionError.js";
  * Action Data format:
  * {
  *  "action": "updateCode",
- *  "member": (member to update),
+ *  "memberName": (member to update),
  *  "argList": (arg list for the table)
  *  "functionBody": (function body for the table)
  *  "supplementalCode": (supplemental code for the table)

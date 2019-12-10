@@ -1,0 +1,1 @@
+global.__globals__ = global;

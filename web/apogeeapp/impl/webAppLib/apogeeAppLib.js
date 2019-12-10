@@ -6,7 +6,7 @@ import util from "/apogeeutil/util.js";
 import net from "/apogeeutil/net.js";
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
-import "/debug/debugHook.es6.js";
+import "/debug/debugHook.js";
 
 let apogeeAppLib = {};
 let app;
