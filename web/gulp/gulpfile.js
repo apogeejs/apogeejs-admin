@@ -188,6 +188,10 @@ const ELECTRON_APP_JS_FILENAME = "apogeeElectronBundle.js";
 const CORE_LIB_FILE_NAME = "apogeeCoreLib.js"
 const CSS_BUNDLE_FILENAME = "cssBundle.css";
 
+const BASE_FILES = [
+    "versionConfig.json"
+]
+
 const ASSETS_ADDED_FILES = [
     "../debug/debugHook.js"
 ]
@@ -223,6 +227,7 @@ const ELECTRON_CSS_FILES = [
 //this must be done first because the CSS is bundled here and then must
 //be copied to the electron folder.
 let copySharedAssets = parallel(
+    () => copyFilesTask(BASE_FILES,DIST_FOLDER),
     () => packageCssTask(ASSETS_FOLDER,CSS_FILES,CSS_BUNDLE_FILENAME),
     () => copyResourcesTask(ASSETS_FOLDER,RESOURCES_FOLDER_NAME),
     () => copyAceIncludesTask(ASSETS_FOLDER,ACE_INCLUDES_FOLDER_NAME),

@@ -12,11 +12,11 @@ apogee.net = net;
 
 window.init = function() {
 
-    //initialize resource path
-    apogeeui.initResourcePath("/resources");
+    //initialize resource path (relative to base path in web page)
+    apogeeui.initResourcePath("resources");
 
-    //any needs mode or theme files for the ace editor should go in the folder set below
-    ace.config.set('basePath','/ext/ace/ace_1.4.3/ace_includes');
+    //any needs mode or theme files for the ace editor should go in the folder set below (relative to base path in web page)
+    ace.config.set('basePath','ace_includes');
     
     //use cutnpaste file access
     var appConfigManager = new CutNPasteAppConfigManager();
