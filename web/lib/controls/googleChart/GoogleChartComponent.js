@@ -1,7 +1,3 @@
-import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
-import ConfigurableFormEditor from "/apogeeapp/app/datadisplay/ConfigurableFormEditor.js";
-import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
-
 (function() {
     
 //=================================
@@ -30,12 +26,12 @@ function onLibLoad() {
 //===================================
 
 /** This is a simple google chart component. */
-apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlComponent {
+GoogleChartComponent = class extends BasicControlComponent {
     
     constructor(workspaceUI,control) {
-        super(workspaceUI,control,apogeeapp.app.GoogleChartComponent);
+        super(workspaceUI,control,GoogleChartComponent);
 
-        this.chartType = apogeeapp.app.GoogleChartComponent.DEFAULT_CHART;
+        this.chartType = GoogleChartComponent.DEFAULT_CHART;
 
         //if not yet done, load the google chart library
         if(!googleLoadCalled) {
@@ -44,13 +40,17 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
             google.charts.setOnLoadCallback(onLibLoad);
         }
         
-        this._setStoredData(apogeeapp.app.GoogleChartComponent.DEFAULT_STORED_DATA);
+        this._setStoredData(GoogleChartComponent.DEFAULT_STORED_DATA);
+        
+        //add a cleanup and save actions
+        this.addOpenAction(GoogleChartComponent.readFromJson);
+        this.addSaveAction(GoogleChartComponent.writeToJson);
     }
         
     /** Implement the method to get the data display. JsDataDisplay is an 
     * easily configurable data display. */
     getOutputDisplay(viewMode) {
-        this.chartDisplay = new apogeeapp.app.GoogleChartDisplay(viewMode,this.getMember());
+        this.chartDisplay = new GoogleChartDisplay(viewMode,this.getMember());
         //set the config data
         this.chartDisplay.setChartType(this.chartType);
         this.chartDisplay.setHasHeaderRow(this.hasHeaderRow);
@@ -62,37 +62,23 @@ apogeeapp.app.GoogleChartComponent = class extends apogeeapp.app.BasicControlCom
     //==================================
     
     getTableEditSettings() {
-        return apogeeapp.app.GoogleChartComponent.TABLE_EDIT_SETTINGS;
+        return GoogleChartComponent.TABLE_EDIT_SETTINGS;
     }
     
     /** This method should be implemented to retrieve a data display of the give type. 
      * @protected. */
     getDataDisplay(viewMode,viewType) {
         
-        if(viewType == apogeeapp.app.GoogleChartComponent.VIEW_INPUT_FORM) {
+        if(viewType == GoogleChartComponent.VIEW_INPUT_FORM) {
             var callbacks = {
                 getData: () => this.storedData,
                 getEditOk: () => true,
                 saveData: (formData) => this._onSubmit(formData)
             }
-            return new ConfigurableFormEditor(viewMode,callbacks,apogeeapp.app.GoogleChartComponent.FORM_LAYOUT);
+            return new ConfigurableFormEditor(viewMode,callbacks,GoogleChartComponent.FORM_LAYOUT);
         }
         else {
             return super.getDataDisplay(viewMode,viewType);
-        }
-    }
-    
-    //=====================================
-    // serialization
-    //=====================================
-    
-    writeToJson(json) {
-        json.formData = this.storedData;
-    }
-
-    readFromJson(json) {
-        if(json.formData !== undefined) {
-            this._setStoredData(json.formData);
         }
     }
     
@@ -141,37 +127,51 @@ return {
         var member = this.getMember();
         var argList = member.getArgList();
         var supplementalCode = member.getSupplementalCode();
-        return dataDisplayHelper.setCode(member,argList,functionBody,supplementalCode); 
+        return dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode); 
     }       
+    
+    //=====================================
+    // Static Methods
+    //=====================================
+    
+    static writeToJson(json) {
+        json.formData = this.storedData;
+    }
+
+    static readFromJson(json) {
+        if(json.formData !== undefined) {
+            this._setStoredData(json.formData);
+        }
+    }
             
 
 };
 
 //attach the standard static values to the static object (this can also be done manually)
-apogeeapp.app.BasicControlComponent.attachStandardStaticProperties(apogeeapp.app.GoogleChartComponent,
+BasicControlComponent.attachStandardStaticProperties(GoogleChartComponent,
         "GoogleChartComponent",
         "apogeeapp.app.GoogleChartComponent");
 
-apogeeapp.app.GoogleChartComponent.VIEW_INPUT_FORM = "Input";
+GoogleChartComponent.VIEW_INPUT_FORM = "Input";
 
-apogeeapp.app.GoogleChartComponent.VIEW_MODES = [
-	apogeeapp.app.BasicControlComponent.VIEW_OUTPUT,
-	apogeeapp.app.GoogleChartComponent.VIEW_INPUT_FORM,
-    apogeeapp.app.BasicControlComponent.VIEW_DESCRIPTION
+GoogleChartComponent.VIEW_MODES = [
+	BasicControlComponent.VIEW_OUTPUT,
+	GoogleChartComponent.VIEW_INPUT_FORM,
+    BasicControlComponent.VIEW_DESCRIPTION
 ];
 
-apogeeapp.app.GoogleChartComponent.TABLE_EDIT_SETTINGS = {
-    "viewModes": apogeeapp.app.GoogleChartComponent.VIEW_MODES,
-    "defaultView": apogeeapp.app.BasicControlComponent.VIEW_OUTPUT
+GoogleChartComponent.TABLE_EDIT_SETTINGS = {
+    "viewModes": GoogleChartComponent.VIEW_MODES,
+    "defaultView": BasicControlComponent.VIEW_OUTPUT
 }
 
-apogeeapp.app.GoogleChartComponent.DEFAULT_STORED_DATA = {
+GoogleChartComponent.DEFAULT_STORED_DATA = {
     chartType: "line",
     hasHeaderRow: false
 };
 
 //format for entries below [ display name , enumeration name, Google constructor name] 
-apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO = [
+GoogleChartComponent.CHART_TYPE_INFO = [
     ["Area","area","AreaChart"],
     ["Bar","bar","BarChart"],
     ["Bubble","bubble","BubbleChart"],
@@ -186,9 +186,9 @@ apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO = [
     ["Stepped Area","steppedArea","SteppedAreaChart"]
 ];
 
-apogeeapp.app.GoogleChartComponent.CHART_SELECT_FORM_INFO = apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO.map(entry => entry.slice(0,2));
+GoogleChartComponent.CHART_SELECT_FORM_INFO = GoogleChartComponent.CHART_TYPE_INFO.map(entry => entry.slice(0,2));
 
-apogeeapp.app.GoogleChartComponent.FORM_LAYOUT = {
+GoogleChartComponent.FORM_LAYOUT = {
     layout: [
         {
             type: "spacer"
@@ -196,7 +196,7 @@ apogeeapp.app.GoogleChartComponent.FORM_LAYOUT = {
         {   
             type: "dropdown",
             label: "Chart Type: ",
-            entries: apogeeapp.app.GoogleChartComponent.CHART_SELECT_FORM_INFO,
+            entries: GoogleChartComponent.CHART_SELECT_FORM_INFO,
             value: "<SET CURRENT>", //set current value
             key: "chartType",
         },
@@ -233,9 +233,9 @@ apogeeapp.app.GoogleChartComponent.FORM_LAYOUT = {
 //-----------------
 //auto registration
 //-----------------
-var app = apogeeapp.app.Apogee.getInstance();
+var app = Apogee.getInstance();
 if(app) {
-    app.registerComponent(apogeeapp.app.GoogleChartComponent);
+    app.registerComponent(GoogleChartComponent);
 }
 else {
     console.log("Component could not be registered because no Apogee app instance was available at component load time: apogeeapp.app.GoogleChartComponent");
@@ -246,7 +246,7 @@ else {
 //-----------------------
 
 /** Extend ths JsDataDisplay */
-apogeeapp.app.GoogleChartDisplay = class extends DataDisplay {
+GoogleChartDisplay = class extends DataDisplay {
     
     //=====================================
     // Public Methods
@@ -351,7 +351,7 @@ apogeeapp.app.GoogleChartDisplay = class extends DataDisplay {
     }
 
     _instantiateChart() {
-        var chartInfoEntry = apogeeapp.app.GoogleChartComponent.CHART_TYPE_INFO.find(entry => (entry[1] == this.chartType) );
+        var chartInfoEntry = GoogleChartComponent.CHART_TYPE_INFO.find(entry => (entry[1] == this.chartType) );
         if(!chartInfoEntry) {
             alert("Chart type not found: " + this.chartType);
         }
