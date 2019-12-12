@@ -22,4 +22,37 @@ export {default as TextAreaEditor} from "/apogeeapp/app/datadisplay/TextAreaEdit
 
 export {showConfigurableDialog} from "/apogeeapp/app/dialogs/ConfigurableDialog.js";
 
+import apogeeui from "/apogeeapp/ui/apogeeui.js";
+import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
+
+/** This function initializes the resources path and the ace includes path. Both these folders should be
+ * available in the sam directory. The argment includesBasePath gives the path prefix for these folders.
+ */
+export function initIncludePath(includeBasePath) {
+    const RESOURCE_FOLDER_NAME = "resources";
+    const ACE_INCLUDES_FOLDER_NAME = "ace_includes";
+
+    let resourcesPath;
+    let aceIncludesPath;
+
+    if(includeBasePath == "") {
+        resourcesPath = RESOURCE_FOLDER_NAME;
+        aceIncludesPath = ACE_INCLUDES_FOLDER_NAME;
+    }
+    else if(includesBasepath.endWith("/")) {
+        resourcesPath = includeBasePath + RESOURCE_FOLDER_NAME;
+        aceIncludesPath = includeBasePath + ACE_INCLUDES_FOLDER_NAME;
+    }
+    else {
+        resourcesPath = includeBasePath + "/" + RESOURCE_FOLDER_NAME;
+        aceIncludesPath = includeBasePath + "/" + ACE_INCLUDES_FOLDER_NAME;
+    }
+
+    //initialize resource path (relative to base path in web page)
+    apogeeui.initResourcePath(resourcesPath);
+
+    //any needs mode or theme files for the ace editor should go in the folder set below (relative to base path in web page)
+    ace.config.set('basePath',aceIncludesPath);
+}
+
 

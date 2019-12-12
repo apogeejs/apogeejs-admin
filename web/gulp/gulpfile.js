@@ -64,6 +64,7 @@ function copyAceIncludesTask(parentFolder,aceIncludesFolderName) {
 }
 
 function copyFilesTask(fileList,destFolder) {
+    console.log(fileList);
     return src(fileList)
         .pipe(dest(destFolder));
 }
@@ -84,6 +85,7 @@ function packageCssTask(destFolder,cssFiles,cssBundleFileName) {
 function packageWebAppTask(destFolder,webAppBundleFileName) {
     return rollup.rollup({
         input: '../apogeeapp/impl/cutNPasteCode/app/app.js',
+        external: ["/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js"],
         plugins: [
             {resolveId}
         ]
@@ -91,7 +93,11 @@ function packageWebAppTask(destFolder,webAppBundleFileName) {
         return bundle.write(
             { 
                 file: destFolder + "/" + webAppBundleFileName,
-                format: 'es'
+                format: 'es',
+                paths: {
+                    "/apogee/apogeeCoreLib.js": "apogeeCoreLib.js",
+                    "/apogeeapp/apogeeAppLib.js": "apogeeAppLib.js"
+                },
             }
         );
     });
@@ -149,13 +155,35 @@ function packageElectronTask(destFolder,electronBundleFileName) {
 //==============================
 function packageCoreLibTask(destFolder,coreLibBundleFileName) {
     return rollup.rollup({
-        input: '../apogeeapp/impl/coreLib/apogeeCoreLib.js',
+        input: '../apogee/apogeeCoreLib.js',
 		plugins: [
 			{resolveId}
 		]
     }).then(bundle => {
         return bundle.write(
-            { file: destFolder + "/" + coreLibBundleFileName, format: 'cjs' }
+            { file: destFolder + "/" + coreLibBundleFileName, format: 'es' }
+        );
+    });
+}
+
+//==============================
+// Package App Lib
+//==============================
+function packageAppLibTask(destFolder,appLibBundleFileName) {
+    return rollup.rollup({
+        input: '../apogeeapp/apogeeAppLib.js',
+        external: ["/apogee/apogeeCoreLib.js"],
+		plugins: [
+			{resolveId}
+		]
+    }).then(bundle => {
+        return bundle.write(
+            { 
+                file: destFolder + "/" + appLibBundleFileName,
+                format: 'es',
+                paths: {
+                    "/apogee/apogeeCoreLib.js": "apogeeCoreLib.js"
+                }, }
         );
     });
 }
@@ -164,7 +192,7 @@ function packageCoreLibTask(destFolder,coreLibBundleFileName) {
 // Clean Output
 //==============================
 function cleanFolderTask(folder) {
-    return src(folder, {read: false})
+    return src(folder, {read: false, allowEmpty: true})
         .pipe(clean());
 }
 
@@ -176,7 +204,6 @@ const DIST_FOLDER = "dist";
 const ASSETS_FOLDER = DIST_FOLDER + "/assets";
 const WEBAPP_FOLDER = DIST_FOLDER + "/webapp";
 const ELECTRON_FOLDER = DIST_FOLDER + "/electronapp";
-const CORE_LIB_FOLDER = DIST_FOLDER + "/corelib"
 const TEMP_FOLDER = "temp";
 
 const RESOURCES_FOLDER_NAME = "resources";
@@ -185,7 +212,8 @@ const ACE_INCLUDES_FOLDER_NAME = "ace_includes";
 const WEB_APP_JS_FILENAME = "apogeeWebBundle.js";
 const WEB_LIB_JS_BASE_FILENAME = "apogeeAppLib";
 const ELECTRON_APP_JS_FILENAME = "apogeeElectronBundle.js";
-const CORE_LIB_FILE_NAME = "apogeeCoreLib.js"
+const CORE_LIB_FILE_NAME = "apogeeCoreLib.js";
+const APP_LIB_FILE_NAME = "apogeeAppLib.js";
 const CSS_BUNDLE_FILENAME = "cssBundle.css";
 
 const BASE_FILES = [
@@ -193,11 +221,9 @@ const BASE_FILES = [
 ]
 
 const ASSETS_ADDED_FILES = [
-    "../debug/debugHook.js"
 ]
 
 const ELECTRON_ADDED_FILES = [
-    "../debug/debugHook.js",
     "../apogeeapp/impl/electronCode/app/apogee.html",
     "../apogeeapp/impl/electronCode/app/main.js",
     "../apogeeapp/impl/electronCode/app/package.json"
@@ -231,7 +257,7 @@ let copySharedAssets = parallel(
     () => packageCssTask(ASSETS_FOLDER,CSS_FILES,CSS_BUNDLE_FILENAME),
     () => copyResourcesTask(ASSETS_FOLDER,RESOURCES_FOLDER_NAME),
     () => copyAceIncludesTask(ASSETS_FOLDER,ACE_INCLUDES_FOLDER_NAME),
-    () => copyFilesTask(ASSETS_ADDED_FILES,ASSETS_FOLDER),
+//    () => copyFilesTask(ASSETS_ADDED_FILES,ASSETS_FOLDER),
 );
 
 //This releases the web app
@@ -241,24 +267,28 @@ let releaseWebApp = parallel(
 );
 
 //this releases the web lib
-let releaseWebLib = series(
-    () => prepareAppLibTask(TEMP_FOLDER),
-    () => packageAppLibTask(TEMP_FOLDER,ASSETS_FOLDER,WEB_LIB_JS_BASE_FILENAME),
-    () => cleanFolderTask(TEMP_FOLDER)
-);
+// let releaseWebLib = series(
+//     () => prepareAppLibTask(TEMP_FOLDER),
+//     () => packageAppLibTask(TEMP_FOLDER,ASSETS_FOLDER,WEB_LIB_JS_BASE_FILENAME),
+//     () => cleanFolderTask(TEMP_FOLDER)
+// );
 
 //this releases the eletron app. It depends on the creation of the css
 //bundle.
-let releaseElectron = parallel( 
-    () => packageElectronTask(ELECTRON_FOLDER,ELECTRON_APP_JS_FILENAME),
-    () => copyFilesTask(ELECTRON_ADDED_FILES,ELECTRON_FOLDER),
-    () => copyFilesTask(ELECTRON_CSS_FILES,ELECTRON_FOLDER),
-    () => copyResourcesTask(ELECTRON_FOLDER,RESOURCES_FOLDER_NAME),
-    () => copyAceIncludesTask(ELECTRON_FOLDER,ACE_INCLUDES_FOLDER_NAME)
-);
+// let releaseElectron = parallel( 
+//     () => packageElectronTask(ELECTRON_FOLDER,ELECTRON_APP_JS_FILENAME),
+//     () => copyFilesTask(ELECTRON_ADDED_FILES,ELECTRON_FOLDER),
+//     () => copyFilesTask(ELECTRON_CSS_FILES,ELECTRON_FOLDER),
+//     () => copyResourcesTask(ELECTRON_FOLDER,RESOURCES_FOLDER_NAME),
+//     () => copyAceIncludesTask(ELECTRON_FOLDER,ACE_INCLUDES_FOLDER_NAME)
+// );
 
 let releaseCoreLib = parallel(
-    () => packageCoreLibTask(CORE_LIB_FOLDER,CORE_LIB_FILE_NAME)
+    () => packageCoreLibTask(ASSETS_FOLDER,CORE_LIB_FILE_NAME)
+)
+
+let releaseAppLib = parallel(
+    () => packageAppLibTask(ASSETS_FOLDER,APP_LIB_FILE_NAME)
 )
 
 //============================
@@ -278,9 +308,10 @@ exports.release = series(
     copySharedAssets,
     parallel(
         releaseWebApp,
-        releaseWebLib,
-        releaseElectron,
-        releaseCoreLib
+//        releaseWebLib,
+//        releaseElectron,
+        releaseCoreLib,
+        releaseAppLib
     )
 );
 
