@@ -1,4 +1,5 @@
-import Apogee from "/apogeeapp/app/Apogee.js";
+import "/apogee/nodeGlobals.js";
+import { Apogee } from "/apogeeapp/apogeeAppLib.js";
 import ElectronAppConfigManager from "/apogeeapp/impl/electronCode/ElectronAppConfigManager.js";
 import util from "/apogeeutil/util.js";
 import net from "/apogeeutil/net.js";

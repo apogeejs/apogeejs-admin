@@ -1,4 +1,4 @@
-import {doAction} from "/apogee/actions/action.js";
+import {doAction} from "/apogee/apogeeCoreLib.js";
 
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 import {getSaveDataAction, getMemberStateUndoCommand} from "/apogeeapp/app/commands/membersave.js";

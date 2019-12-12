@@ -1,5 +1,5 @@
 import util from "/apogeeutil/util.js";
-import {validateTableName} from "/apogee/lib/codeCompiler.js"; 
+import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
 
 import {getPropertiesDialogLayout} from "/apogeeapp/app/commandseq/updatecomponentseq.js";
 import Component from "/apogeeapp/app/component/Component.js";

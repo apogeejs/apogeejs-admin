@@ -1,8 +1,6 @@
 import base from "/apogeeutil/base.js";
 import util from "/apogeeutil/util.js";
-import Workspace from "/apogee/data/Workspace.js";
-import "/apogee/commandConfig.js";
-import "/apogee/tableConfig.js";
+import { Workspace } from "/apogee/apogeeCoreLib.js";
 
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";

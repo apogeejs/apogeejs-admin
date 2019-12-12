@@ -1,4 +1,5 @@
-import "/apogeeapp/impl/coreLib/defineGlobals.js";
+//This module exports the public interface to the Apogee Core Library
+//(It also loads the needed empty imports)
 export {default as Workspace} from "/apogee/data/Workspace.js";
 export { doAction } from "/apogee/actions/action.js";
 export { validateTableName } from "/apogee/lib/codeCompiler.js";

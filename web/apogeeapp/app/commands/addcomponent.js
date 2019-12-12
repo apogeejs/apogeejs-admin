@@ -1,5 +1,5 @@
 //import base from "/apogeeutil/base.js";
-import {doAction} from "/apogee/actions/action.js";
+import {doAction} from "/apogee/apogeeCoreLib.js";
 
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
 

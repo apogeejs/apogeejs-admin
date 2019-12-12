@@ -1,4 +1,4 @@
-import Messenger from "/apogee/actions/Messenger.js";
+import { Messenger } from "/apogee/apogeeCoreLib.js";
 
 import Component from "/apogeeapp/app/component/Component.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";

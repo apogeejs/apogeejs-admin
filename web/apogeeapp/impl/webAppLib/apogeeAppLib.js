@@ -1,4 +1,5 @@
-import Apogee from "/apogeeapp/app/Apogee.js";
+import "/apogee/webGlobals.js";
+import { Apogee } from "/apogeeapp/apogeeAppLib.js";
 import WebAppConfigManager from "/apogeeapp/impl/webAppLib/WebAppConfigManager.js";
 import WebComponentDisplay from "/apogeeapp/app/component/webpage/WebComponentDisplay.js";
 
@@ -6,15 +7,14 @@ import util from "/apogeeutil/util.js";
 import net from "/apogeeutil/net.js";
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
-import "/debug/debugHook.js";
 
-let apogeeAppLib = {};
+let apogeeWebAppLib = {};
 let app;
 
-export {apogeeAppLib as default};
+export {apogeeWebAppLib as default};
 
 /** This method initializes the workspace. */
-apogeeAppLib.initWebApp = function(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadFailed) { 
+apogeeWebAppLib.initWebApp = function(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadFailed) { 
 
     //==========================
     //some global initialization
@@ -55,7 +55,7 @@ apogeeAppLib.initWebApp = function(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadF
  * @param {type} optionalViewType - For this component, the name of the data view can optionally be specified. Otherwise the default is used.
  * @returns {undefined} There is no return value
  */ 
-apogeeAppLib.addDisplay = function(memberName,parentElementId,isShowing,optionalViewType) {
+apogeeWebAppLib.addDisplay = function(memberName,parentElementId,isShowing,optionalViewType) {
                 
     var parentElement = document.getElementById(parentElementId);
     if(!parentElement) {
@@ -84,7 +84,7 @@ apogeeAppLib.addDisplay = function(memberName,parentElementId,isShowing,optional
 /** If the DOM element is loaded or unloaded, this method should be called to update
  * the state. This state is available to all component displays and is used by some of them.
  */
-apogeeAppLib.setIsShowing = function(memberName,isShowing) {
+apogeeWebAppLib.setIsShowing = function(memberName,isShowing) {
     var componentDisplay = _getComponentDisplay(memberName);
     if(!componentDisplay) {
         console.error("Workspace member not found not found:" + memberName);
@@ -97,7 +97,7 @@ apogeeAppLib.setIsShowing = function(memberName,isShowing) {
 /** If the DOM element is resized this method should be called. This information is available
  * to all component display and is sued by some of them.
  */
-apogeeAppLib.onResize = function(memberName) {
+apogeeWebAppLib.onResize = function(memberName) {
     var componentDisplay = _getComponentDisplay(memberName);
     if(!componentDisplay) {
         console.error("Workspace member not found not found:" + memberName);
