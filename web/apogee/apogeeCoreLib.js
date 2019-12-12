@@ -6,4 +6,4 @@ export { validateTableName } from "/apogee/lib/codeCompiler.js";
 export {default as Messenger} from "/apogee/actions/Messenger.js";
 import "/apogee/commandConfig.js";
 import "/apogee/tableConfig.js";
-import "/debug/debugHook.js";
+import "/apogee/debugHook.js";
