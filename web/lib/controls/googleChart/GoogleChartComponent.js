@@ -1,4 +1,4 @@
-(function() {
+//no
     
 //=================================
 // Statics to load google code (can only call load once)
@@ -26,7 +26,7 @@ function onLibLoad() {
 //===================================
 
 /** This is a simple google chart component. */
-GoogleChartComponent = class extends BasicControlComponent {
+GoogleChartComponent = class extends apogeeapp.BasicControlComponent {
     
     constructor(workspaceUI,control) {
         super(workspaceUI,control,GoogleChartComponent);
@@ -75,7 +75,7 @@ GoogleChartComponent = class extends BasicControlComponent {
                 getEditOk: () => true,
                 saveData: (formData) => this._onSubmit(formData)
             }
-            return new ConfigurableFormEditor(viewMode,callbacks,GoogleChartComponent.FORM_LAYOUT);
+            return new apogeeapp.ConfigurableFormEditor(viewMode,callbacks,GoogleChartComponent.FORM_LAYOUT);
         }
         else {
             return super.getDataDisplay(viewMode,viewType);
@@ -127,7 +127,7 @@ return {
         var member = this.getMember();
         var argList = member.getArgList();
         var supplementalCode = member.getSupplementalCode();
-        return dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode); 
+        return apogeeapp.dataDisplayCallbackHelper.setCode(member,argList,functionBody,supplementalCode); 
     }       
     
     //=====================================
@@ -148,21 +148,21 @@ return {
 };
 
 //attach the standard static values to the static object (this can also be done manually)
-BasicControlComponent.attachStandardStaticProperties(GoogleChartComponent,
+apogeeapp.BasicControlComponent.attachStandardStaticProperties(GoogleChartComponent,
         "GoogleChartComponent",
         "apogeeapp.app.GoogleChartComponent");
 
 GoogleChartComponent.VIEW_INPUT_FORM = "Input";
 
 GoogleChartComponent.VIEW_MODES = [
-	BasicControlComponent.VIEW_OUTPUT,
+	apogeeapp.BasicControlComponent.VIEW_OUTPUT,
 	GoogleChartComponent.VIEW_INPUT_FORM,
-    BasicControlComponent.VIEW_DESCRIPTION
+    apogeeapp.BasicControlComponent.VIEW_DESCRIPTION
 ];
 
 GoogleChartComponent.TABLE_EDIT_SETTINGS = {
     "viewModes": GoogleChartComponent.VIEW_MODES,
-    "defaultView": BasicControlComponent.VIEW_OUTPUT
+    "defaultView": apogeeapp.BasicControlComponent.VIEW_OUTPUT
 }
 
 GoogleChartComponent.DEFAULT_STORED_DATA = {
@@ -233,7 +233,7 @@ GoogleChartComponent.FORM_LAYOUT = {
 //-----------------
 //auto registration
 //-----------------
-var app = Apogee.getInstance();
+var app = apogeeapp.Apogee.getInstance();
 if(app) {
     app.registerComponent(GoogleChartComponent);
 }
@@ -246,7 +246,7 @@ else {
 //-----------------------
 
 /** Extend ths JsDataDisplay */
-GoogleChartDisplay = class extends DataDisplay {
+GoogleChartDisplay = class extends apogeeapp.DataDisplay {
     
     //=====================================
     // Public Methods
@@ -258,12 +258,12 @@ GoogleChartDisplay = class extends DataDisplay {
             getData: () => this.member.getData()
         }
         
-        super(viewMode,callbacks,DataDisplay.SCROLLING);
+        super(viewMode,callbacks,apogeeapp.DataDisplay.SCROLLING);
     
         this.member = member;
         //create a content element of variable size in the top left of the parent
         //the chart library will set the size to match the rendered chart
-        this.element = apogeeui.createElement("div");
+        this.element = apogeeapp.apogeeui.createElement("div");
         this.element.style =  {
             position:"relative",
             overflow:"auto"
@@ -287,7 +287,7 @@ GoogleChartDisplay = class extends DataDisplay {
     //apogeeui.RESIZABLE - if the window can freely resize it
     //apogeeui.FIXED_SIZE - if the content is fixed size
     getContentType() {
-        return apogeeui.FIXED_SIZE;
+        return apogeeapp.apogeeui.FIXED_SIZE;
     }
 
     setData(data) {
@@ -378,5 +378,3 @@ GoogleChartDisplay = class extends DataDisplay {
     }
 }
 
-//end definition
-})();

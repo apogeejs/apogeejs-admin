@@ -7,5 +7,4 @@ let apogee = {};
 apogee.util = util;
 apogee.net = net;
 
-export {apogee as default};
-export { util, net };
+export { apogee, util, net };

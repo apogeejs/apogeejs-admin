@@ -1,7 +1,6 @@
-import "/apogee/nodeGlobals.js";
 import { Apogee, initIncludePath } from "/apogeeapp/apogeeAppLib.js";
 import ElectronAppConfigManager from "./ElectronAppConfigManager.js";
-import apogee from "/apogeeutil/apogeeUtilLib.js";
+import { apogee } from "/apogeeutil/apogeeUtilLib.js";
 
 //expose these apogee libraries
 __globals__.apogee = apogee;

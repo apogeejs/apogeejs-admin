@@ -3,7 +3,8 @@ const concat = require('gulp-concat');
 const clean = require('gulp-clean');
 const versionConfig = require('./versionConfig.json');
 const rollup = require('rollup');
-const inject = require('gulp-inject-string');
+const replace = require('gulp-replace');
+var rename = require('gulp-rename');
 const createResolveIdPlugin = require("./absoluteRefPlugin.js");
 
 //for absolute references
@@ -17,27 +18,51 @@ const DIST_FOLDER = "dist";
 const RELEASE_FOLDER = DIST_FOLDER + "/v" + versionConfig.VERSION_NUMBER;
 const ASSETS_FOLDER = RELEASE_FOLDER + "/assets";
 
+
+const WEBAPP_FOLDER = RELEASE_FOLDER + "/webapp";
+const ELECTRON_FOLDER = RELEASE_FOLDER + "/electronapp";
+const TEMP_FOLDER = "temp";
+
+//======================================
+// Release Info
+//======================================
+
+//base files - version info
+const BASE_FILES = [
+    "versionConfig.json"
+]
+
+let copyReleaseInfoTask = () => copyFilesTask(BASE_FILES,RELEASE_FOLDER);
+
 //==============================
 // Package Util Lib
 //==============================
 
 const UTIL_LIB_BASE_FILE_NAME = "apogeeUtilLib";
+const UTIL_LIB_ES_FILE_NAME = UTIL_LIB_BASE_FILE_NAME + ".es.js"
+const UTIL_LIB_CJS_FILE_NAME = UTIL_LIB_BASE_FILE_NAME + ".cjs.js"
 
-let releaseUtilLib = () => packageUtilLibTask(ASSETS_FOLDER,UTIL_LIB_BASE_FILE_NAME);
-
-function packageUtilLibTask(destFolder,utilLibBaseFileName) {
+function packageUtilLibTask() {
     return rollup.rollup({
         input: '../apogeeutil/apogeeUtilLib.js',
 		plugins: [
 			{resolveId}
 		]
     }).then(bundle => {
-        return bundle.write(
-            { 
-                file: destFolder + "/" + utilLibBaseFileName + ".es.js",
-                format: 'es'
-            }
-        );
+        return Promise.all([
+            bundle.write(
+                { 
+                    file: ASSETS_FOLDER + "/" + UTIL_LIB_ES_FILE_NAME,
+                    format: 'es'
+                }
+            ),
+            bundle.write(
+                { 
+                    file: ELECTRON_FOLDER + "/" + UTIL_LIB_CJS_FILE_NAME,
+                    format: 'cjs'
+                }
+            )
+        ])
     });
 }
 
@@ -46,22 +71,37 @@ function packageUtilLibTask(destFolder,utilLibBaseFileName) {
 //==============================
 
 const CORE_LIB_BASE_FILE_NAME = "apogeeCoreLib";
+const CORE_LIB_ES_FILE_NAME = CORE_LIB_BASE_FILE_NAME + ".es.js"
+const CORE_LIB_CJS_FILE_NAME = CORE_LIB_BASE_FILE_NAME + ".cjs.js"
 
-let releaseCoreLib = () => packageCoreLibTask(ASSETS_FOLDER,CORE_LIB_BASE_FILE_NAME);
-
-function packageCoreLibTask(destFolder,coreLibBaseFileName) {
+function packageCoreLibTask() {
     return rollup.rollup({
         input: '../apogee/apogeeCoreLib.js',
+        external: ["/apogeeutil/apogeeUtilLib.js"],
 		plugins: [
 			{resolveId}
-		]
+        ]
     }).then(bundle => {
-        return bundle.write(
-            { 
-                file: destFolder + "/" + coreLibBaseFileName + ".es.js",
-                format: 'es' 
-            }
-        );
+        return Promise.all([
+            bundle.write(
+                { 
+                    file: ASSETS_FOLDER + "/" + CORE_LIB_ES_FILE_NAME,
+                    format: 'es',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js"
+                    }
+                }
+            ),
+            bundle.write(
+                { 
+                    file: ELECTRON_FOLDER + "/" + CORE_LIB_CJS_FILE_NAME,
+                    format: 'cjs',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js"
+                    }
+                }
+            )
+        ])
     });
 }
 
@@ -70,25 +110,39 @@ function packageCoreLibTask(destFolder,coreLibBaseFileName) {
 //==============================
 
 const APP_LIB_BASE_FILE_NAME = "apogeeAppLib";
+const APP_LIB_ES_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".es.js"
+const APP_LIB_CJS_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".cjs.js"
 
-let releaseAppLib = () => packageAppLibTask(ASSETS_FOLDER,APP_LIB_BASE_FILE_NAME);
-
-function packageAppLibTask(destFolder,appLibBaseFileName) {
+function packageAppLibTask() {
     return rollup.rollup({
         input: '../apogeeapp/apogeeAppLib.js',
-        external: ["/apogee/apogeeCoreLib.js"],
+        external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js"],
 		plugins: [
 			{resolveId}
-		]
+        ]
     }).then(bundle => {
-        return bundle.write(
-            { 
-                file: destFolder + "/" + appLibBaseFileName + ".es.js",
-                format: 'es',
-                paths: {
-                    "/apogee/apogeeCoreLib.js": "apogeeCoreLib.js"
-                }, }
-        );
+        return Promise.all([
+            bundle.write(
+                { 
+                    file: ASSETS_FOLDER + "/" + APP_LIB_ES_FILE_NAME,
+                    format: 'es',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js",
+                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.es.js"
+                    }
+                }
+            ),
+            bundle.write(
+                { 
+                    file: ELECTRON_FOLDER + "/" + APP_LIB_CJS_FILE_NAME,
+                    format: 'cjs',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
+                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.cjs.js"
+                    }
+                }
+            )
+        ])
     });
 }
 
@@ -114,24 +168,14 @@ const CSS_FILES = [
 
 const CSS_BUNDLE_FILENAME = "cssBundle.css";
 
-let packageCss = () => packageCssTask(ASSETS_FOLDER,CSS_FILES,CSS_BUNDLE_FILENAME);
-
-function packageCssTask(destFolder,cssFiles,cssBundleFileName) {
-    return src(cssFiles)
-        .pipe(concat(cssBundleFileName))
-        .pipe(dest(destFolder));
+function packageCssTask() {
+    return src(CSS_FILES)
+        .pipe(concat(CSS_BUNDLE_FILENAME))
+        .pipe(dest(ASSETS_FOLDER))
+        .pipe(dest(ELECTRON_FOLDER))
 }
 
-//======================================
-// Some resource Copying
-//======================================
 
-//base files - version info
-const BASE_FILES = [
-    "versionConfig.json"
-]
-
-let copyBaseFiles = () => copyFilesTask(BASE_FILES,RELEASE_FOLDER);
 
 //----------------
 // resources (images, mainly)
@@ -139,11 +183,10 @@ let copyBaseFiles = () => copyFilesTask(BASE_FILES,RELEASE_FOLDER);
 
 const RESOURCES_FOLDER_NAME = "resources";
 
-let copyResources = () => copyResourcesTask(ASSETS_FOLDER,RESOURCES_FOLDER_NAME);
-
-function copyResourcesTask(parentFolder,resourcesFolderName) {
+function copyResourcesTask() {
     return src('../resources/**/*')
-        .pipe(dest(parentFolder + '/' + resourcesFolderName));
+        .pipe(dest(ASSETS_FOLDER + '/' + RESOURCES_FOLDER_NAME))
+        .pipe(dest(ELECTRON_FOLDER + '/' + RESOURCES_FOLDER_NAME))
 }
 
 //----------------
@@ -151,57 +194,56 @@ function copyResourcesTask(parentFolder,resourcesFolderName) {
 //----------------
 const ACE_INCLUDES_FOLDER_NAME = "ace_includes";
 
-let copyAceIncludes = () => copyAceIncludesTask(ASSETS_FOLDER,ACE_INCLUDES_FOLDER_NAME);
-
-function copyAceIncludesTask(parentFolder,aceIncludesFolderName) {
+function copyAceIncludesTask() {
     return src('../ext/ace/ace_1.4.3/ace_includes/**/*')
-        .pipe(dest(parentFolder + '/' + aceIncludesFolderName));
+        .pipe(dest(ASSETS_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
+        .pipe(dest(ELECTRON_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
 }
 
 //----------------
-//other assets (nonr for now)
+// globals definition files
 //----------------
-const ASSETS_ADDED_FILES = [
-]
 
-let copyOtherAssets = () => copyFilesTask(ASSETS_ADDED_FILES,ASSETS_FOLDER);
+let copyGlobalsFiles = parallel(
+    () => copyFilesTask(["../apogee/webGlobals;js"],ASSETS_FOLDER),
+    () => copyFilesTask(["../apogee/nodeGlobals;js"],ELECTRON_FOLDER),
+)
 
 //==============================
 // Web App
 //==============================
 
-const WEBAPP_FOLDER = RELEASE_FOLDER + "/webapp";
-const WEB_APP_JS_FILENAME = "apogeeWebApp.js";
+let releaseWebAppTask = parallel(
+    copyWebAppPageTask,
+    packageWebAppTask
+)
 
-//This releases the web app
-let releaseWebApp = parallel(
-    () => packageWebAppTask(ASSETS_FOLDER,WEB_APP_JS_FILENAME),
-    () => copyWebPageTask(WEBAPP_FOLDER),
-);
+function copyWebAppPageTask() {
+    let baseHref = versionConfig.VERSION_ASSETS_PATH + "/";
 
-function copyWebPageTask(destFolder) {
-    let assetsPath = versionConfig.VERSION_ASSETS_PATH;
-
-    return src('../apogeeapp/impl/cutNPasteCode/app/apogee.html')
-        .pipe(inject.after('<base href="',assetsPath + "/"))
-        .pipe(dest(destFolder));
+    return src('../applications/cutnpastewebapp/apogee.html')
+        .pipe(replace("BASE_HREF",baseHref))
+        .pipe(dest(WEBAPP_FOLDER));
 }
 
-function packageWebAppTask(destFolder,webAppBundleFileName) {
+const WEB_APP_JS_FILENAME = "apogeeWebApp.js";
+
+function packageWebAppTask() {
     return rollup.rollup({
-        input: '../apogeeapp/impl/cutNPasteCode/app/app.js',
-        external: ["/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js"],
+        input: '../applications/cutnpastewebapp/app.js',
+        external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js"],
         plugins: [
             {resolveId}
         ]
     }).then(bundle => {
         return bundle.write(
             { 
-                file: destFolder + "/" + webAppBundleFileName,
+                file: ASSETS_FOLDER + "/" + WEB_APP_JS_FILENAME,
                 format: 'es',
                 paths: {
-                    "/apogee/apogeeCoreLib.js": "apogeeCoreLib.js",
-                    "/apogeeapp/apogeeAppLib.js": "apogeeAppLib.js"
+                    "/apogeeutil/apogeeUtilLib.js": "./" + UTIL_LIB_ES_FILE_NAME,
+                    "/apogee/apogeeCoreLib.js": "./" + CORE_LIB_ES_FILE_NAME,
+                    "/apogeeapp/apogeeAppLib.js": "./" + APP_LIB_ES_FILE_NAME
                 },
             }
         );
@@ -209,42 +251,50 @@ function packageWebAppTask(destFolder,webAppBundleFileName) {
 }
 
 //==============================
-// Package Web Lib
+// Package Client Web Lib
 //==============================
 
-const TEMP_FOLDER = "temp";
+const CLIENT_LIB_JS_BASE_FILENAME = "apogeeWebClientLib";
+const CLIENT_LIB_INTERMEDIATE_FILENAME = CLIENT_LIB_JS_BASE_FILENAME + ".js";
+const CLIENT_LIB_ES_FILENAME = CLIENT_LIB_JS_BASE_FILENAME + ".es.js";
 
-const CLIENT_LIB_JS_BASE_FILENAME = "apogeeClientLib";
+let CLIENT_LIB_ASSETS_BASE_URL = versionConfig.VERSION_RELEASE_HOST + versionConfig.VERSION_ASSETS_PATH;
 
 //this releases the web lib
-let releaseWebClientLib = series(
+let releaseWebClientLibTask = series(
     () => cleanFolderTask(TEMP_FOLDER),
-    () => prepareClientLibTask(TEMP_FOLDER),
-    () => packageClientLibTask(TEMP_FOLDER,ASSETS_FOLDER,CLIENT_LIB_JS_BASE_FILENAME),
+    prepareClientLibTask,
+    packageClientLibTask,
     () => cleanFolderTask(TEMP_FOLDER)
 );
 
-function prepareClientLibTask(tempFolder) {
-    let releasePath = versionConfig.VERSION_RELEASE_HOST + versionConfig.VERSION_ASSETS_PATH;
+function prepareClientLibTask() {
 
     return src('../applications/webclientlib/webClientLib.js')
-        .pipe(inject.after('const HOST_OUTPUT_ROOT = "',releasePath))
-        .pipe(dest(tempFolder));
+        .pipe(replace('INCLUDE_BASE_PATH_VALUE',CLIENT_LIB_ASSETS_BASE_URL))
+        .pipe(rename(CLIENT_LIB_INTERMEDIATE_FILENAME))
+        .pipe(dest(TEMP_FOLDER));
 }
 
-function packageClientLibTask(tempFolder,destFolder,webLibBaseFileName) {
+function packageClientLibTask() {
     return rollup.rollup({
-        input: tempFolder + '/' + webLibBaseFileName + '.js',
+        input: TEMP_FOLDER + '/' + CLIENT_LIB_INTERMEDIATE_FILENAME,
+        external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js"],
         plugins: [
             {resolveId}
         ]
     }).then(bundle => {
         return Promise.all[
             bundle.write(
-                 { file: destFolder + "/" + webLibBaseFileName + ".es.js", format: 'es' }
-            ),
-            bundle.write(
-                { name: webLibBaseFileName, file: destFolder + "/" + webLibBaseFileName + ".umd.js", format: 'umd' }
+                 { 
+                    file: ASSETS_FOLDER + "/" + CLIENT_LIB_ES_FILENAME, 
+                    format: 'es',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": CLIENT_LIB_ASSETS_BASE_URL + "/" + UTIL_LIB_ES_FILE_NAME,
+                        "/apogee/apogeeCoreLib.js": CLIENT_LIB_ASSETS_BASE_URL + "/" + CORE_LIB_ES_FILE_NAME,
+                        "/apogeeapp/apogeeAppLib.js": CLIENT_LIB_ASSETS_BASE_URL + "/" + APP_LIB_ES_FILE_NAME
+                    }
+                }
             )
         ]
     });
@@ -254,43 +304,47 @@ function packageClientLibTask(tempFolder,destFolder,webLibBaseFileName) {
 // Package Electron
 //==============================
 
-
-const ELECTRON_FOLDER = RELEASE_FOLDER + "/electronapp";
-
 const ELECTRON_APP_JS_FILENAME = "apogeeElectronApp.js";
 
 const ELECTRON_ADDED_FILES = [
-    "../apogeeapp/impl/electronCode/app/apogee.html",
-    "../apogeeapp/impl/electronCode/app/main.js",
-    "../apogeeapp/impl/electronCode/app/package.json"
-]
-
-const ELECTRON_CSS_FILES = [
-    ASSETS_FOLDER + '/' + CSS_BUNDLE_FILENAME
+    "../applications/electronapp/apogee.html",
+    "../applications/electronapp/main.js"
 ]
 
 //this releases the eletron app. It depends on the creation of the css
 //bundle.
-let releaseElectron = parallel( 
-    () => packageElectronTask(ELECTRON_FOLDER,ELECTRON_APP_JS_FILENAME),
-    () => copyFilesTask(ELECTRON_ADDED_FILES,ELECTRON_FOLDER),
-    () => copyFilesTask(ELECTRON_CSS_FILES,ELECTRON_FOLDER),
-    () => copyResourcesTask(ELECTRON_FOLDER,RESOURCES_FOLDER_NAME),
-    () => copyAceIncludesTask(ELECTRON_FOLDER,ACE_INCLUDES_FOLDER_NAME)
+let releaseElectronTask = parallel( 
+    packageElectronSourceTask,
+    prepareElectronPackageJsonTask,
+    () => copyFilesTask(ELECTRON_ADDED_FILES,ELECTRON_FOLDER)
 );
 
-function packageElectronTask(destFolder,electronBundleFileName) {
+function packageElectronSourceTask() {
     return rollup.rollup({
-        input: '../apogeeapp/impl/electronCode/app/app.js',
-		external: ['fs'],
+        input: '../applications/electronapp/app.js',
+		external: ['fs',"/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js"],
 		plugins: [
 			{resolveId}
 		]
     }).then(bundle => {
         return bundle.write(
-            { file: destFolder + "/" + electronBundleFileName, format: 'cjs' }
+            {
+                file: ELECTRON_FOLDER + "/" + ELECTRON_APP_JS_FILENAME,
+                format: 'cjs',
+                paths: {
+                    "/apogeeutil/apogeeUtilLib.js": "./" + UTIL_LIB_CJS_FILE_NAME,
+                    "/apogee/apogeeCoreLib.js": "./" + CORE_LIB_CJS_FILE_NAME,
+                    "/apogeeapp/apogeeAppLib.js": "./" + APP_LIB_CJS_FILE_NAME
+                }
+            }
         );
     });
+}
+
+function prepareElectronPackageJsonTask() {
+    return src('../applications/electronapp/package.json')
+        .pipe(replace('VERSION', versionConfig.VERSION_NUMBER))
+        .pipe(dest(ELECTRON_FOLDER));
 }
 
 //==============================
@@ -321,17 +375,33 @@ function cleanTask()  {
 //This cleans the release folder
 exports.clean = cleanTask; 
 
+/*
+copyReleaseInfoTask
+packageUtilLibTask
+packageCoreLibTask
+packageAppLibTask
+packageCssTask
+copyResourcesTask
+copyAceIncludesTask
+releaseWebAppTask
+releaseWebClientLibTask
+releaseElectronTask
+*/
+
 //This task executes the complete release
 exports.release = series(
     cleanTask,
-    copySharedAssets,
     parallel(
-        releaseUtilLib,
-        releaseCoreLib,
-        releaseAppLib,
-        releaseWebApp,
-//        releaseWebClientLib,
-//        releaseElectron,
-
+        copyReleaseInfoTask,
+        packageUtilLibTask,
+        packageCoreLibTask,
+        packageAppLibTask,
+        packageCssTask,
+        copyResourcesTask,
+        copyAceIncludesTask,
+        copyGlobalsFiles,
+        releaseWebAppTask,
+        releaseWebClientLibTask,
+        releaseElectronTask
     )
 );

@@ -8,7 +8,7 @@ export {default as Component} from "/apogeeapp/app/component/Component.js";
 export {default as EditComponent} from "/apogeeapp/app/component/EditComponent.js";
 
 //needed just for web lib
-export {WebComponentDisplay} from "/apogeeapp/app/component/webpage/WebComponentDisplay.js";
+export {default as WebComponentDisplay} from "/apogeeapp/app/component/webpage/WebComponentDisplay.js";
 
 export {default as BasicControlComponent} from "/apogeeapp/app/components/BasicControlComponent.js";
 
@@ -28,7 +28,7 @@ export {showConfigurableDialog} from "/apogeeapp/app/dialogs/ConfigurableDialog.
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 export { apogeeui };
 
-export {default as DialogMgr} from "/apogeeapp/ui/window/DialogMgr.js";
+export {default as dialogMgr} from "/apogeeapp/ui/window/dialogMgr.js";
 
 import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 export { ace };

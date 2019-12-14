@@ -1,7 +1,7 @@
 {
-  "name"    : "apogeejs",
-  "version" : "0.8.9",
-  "main"    : "main.js",
+  "name": "apogeejs",
+  "version": "VERSION",
+  "main": "main.js",
   "scripts": {
     "start": "electron ."
   },

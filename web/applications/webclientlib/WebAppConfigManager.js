@@ -1,4 +1,4 @@
-import net from "/apogeeutil/apogeeUtilLib.js";
+import {net} from "/apogeeutil/apogeeUtilLib.js";
 
 /** 
  * This is the format of the AppConfigManager. This class does not need
