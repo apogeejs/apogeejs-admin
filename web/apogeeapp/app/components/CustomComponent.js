@@ -1,7 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
-import Apogee from "/apogeeapp/app/Apogee.js";
-import Component from "/apogeeapp/app/component/Component.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
 import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeapp/app/datadisplay/HtmlJsDataDisplay.js";
@@ -80,6 +78,7 @@ export default class CustomComponent extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
+        var app = this.getWorkspaceUI().getApp();
         
         //create the new view element;
         switch(viewType) {
@@ -90,15 +89,15 @@ export default class CustomComponent extends EditComponent {
                 var callbacks = this.getOutputCallbacks();
                 var html = this.getUiCodeField(CustomComponent.CODE_FIELD_HTML);
                 var resource = this.createResource();
-                var dataDisplay = new HtmlJsDataDisplay(displayContainer,callbacks,this.member,html,resource);
+                var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,callbacks,this.member,html,resource);
                 return dataDisplay;
                 
             case CustomComponent.VIEW_CODE:
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case CustomComponent.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
             
             case CustomComponent.VIEW_HTML:
@@ -115,7 +114,7 @@ export default class CustomComponent extends EditComponent {
 
 
             case CustomComponent.VIEW_DESCRIPTION:
-                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(app,this.member);
                 //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
                 return new TextAreaEditor(displayContainer,callbacks);
                 
@@ -218,7 +217,7 @@ export default class CustomComponent extends EditComponent {
         command.initialFields = initialCodeFields;
         command.targetFields = targetCodeFields;
 
-        Apogee.getInstance().executeCommand(command);
+        this.getWorkspaceUI().getApp().executeCommand(command);
         return true;  
     }
 

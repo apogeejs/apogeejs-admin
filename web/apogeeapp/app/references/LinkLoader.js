@@ -25,7 +25,7 @@ class LinkLoader {
      * This method adds a link element to a page, supporting 'css' and 'script'. 
      * The caller identifer should be a unique identifier among people
      * requesting links of this given type. It cna be requested from
-     * ReferenceManager._createId
+     * ReferenceEntry._createId
      * @protected
      */
     addLinkElement(type,url,linkCallerId,onLoad,onError) {

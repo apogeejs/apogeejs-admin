@@ -2,13 +2,12 @@ import {updateLink, removeLink} from "/apogeeapp/app/commandseq/updatelinkseq.js
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import {bannerConstants} from "/apogeeapp/app/component/banner.js"; 
 import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";
-import ReferenceManager from "/apogeeapp/app/references/ReferenceManager.js";
 
 /** This class manages references for the web page.*/
 export default class ReferenceEntry {
     
     constructor(referenceManager,referenceData,referenceTypeInfo) {
-        this.id = ReferenceManager._createId();
+        this.id = ReferenceEntry._createId();
         this.referenceManager = referenceManager;
 
         this.url = referenceData.url;
@@ -121,6 +120,14 @@ export default class ReferenceEntry {
     }
 
 
+    /** This method generates a member ID for the member. It is only valid
+     * for the duration the application is opened. It is not persisted.
+     * @private
+     */
+    static _createId() {
+        return nextId++;
+    }
+
 
     //===================================
     // private methods
@@ -149,7 +156,7 @@ export default class ReferenceEntry {
     setState(state,msg) {
         this.state = state;
         if(this.treeEntry) {
-            ReferenceManager.applyBannerState(this.treeEntry,this.state);
+            this.treeEntry.setBannerState(this.state);
         }
         this.referenceManager.entryStatusChange(this);
     }
@@ -158,7 +165,7 @@ export default class ReferenceEntry {
         var iconUrl = this.getIconUrl();
         var menuItemsCallback = () => this.getMenuItems();
         var treeEntry = new TreeEntry(this.nickname, iconUrl, null, menuItemsCallback, false);
-        ReferenceManager.applyBannerState(treeEntry,this.state);
+        treeEntry.setBannerState(this.state);
         return treeEntry;
     }
 
@@ -180,6 +187,7 @@ export default class ReferenceEntry {
 
         return menuItemList;
     }
+
 }
 
 //====================================
@@ -188,4 +196,8 @@ export default class ReferenceEntry {
 
 
 ReferenceEntry.ELEMENT_ID_BASE = "__apogee_link_element_";
+
+/** THis is used to give an id to the link entries 
+ * @private */
+let nextId = 1;
 

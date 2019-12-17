@@ -31,6 +31,7 @@ export default class DynamicForm extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
+        var app = this.getWorkspaceUI().getApp();
         
         //create the new view element;
         switch(viewType) {
@@ -40,15 +41,15 @@ export default class DynamicForm extends EditComponent {
                 return new ConfigurableFormDisplay(displayContainer,callbacks);
                 
             case DynamicForm.VIEW_CODE:
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case DynamicForm.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
             case DynamicForm.VIEW_DESCRIPTION:
-                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(app,this.member);
                 //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
                 return new TextAreaEditor(displayContainer,callbacks);
                 
@@ -60,11 +61,12 @@ export default class DynamicForm extends EditComponent {
     }
 
     getFormCallbacks() {
+        var app = this.getWorkspaceUI().getApp();
         var callbacks = {
                 getData: () => {              
                     let layoutFunction = this.member.getData();
                     let admin = {
-                        getMessenger: () => new UiCommandMessenger(this.member)
+                        getMessenger: () => new UiCommandMessenger(app,this.member)
                     }
                     return layoutFunction(admin);
                 }

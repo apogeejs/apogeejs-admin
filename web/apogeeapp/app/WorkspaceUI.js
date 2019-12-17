@@ -6,7 +6,6 @@ import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";
 import TreeControl from "/apogeeapp/ui/treecontrol/TreeControl.js";
 
-import Apogee from "/apogeeapp/app/Apogee.js";
 import {updateWorkspaceProperties} from "/apogeeapp/app/commandseq/updateworkspaceseq.js";
 import FolderComponent from "/apogeeapp/app/components/FolderComponent.js";
 import ReferenceManager from "/apogeeapp/app/references/ReferenceManager.js";
@@ -25,7 +24,7 @@ export default class WorkspaceUI {
         this.tree = null;
         this.treeEntry = null;
         this.componentMap = {};
-        this.referenceManager = new ReferenceManager();
+        this.referenceManager = null;
     }
 
     //====================================
@@ -36,6 +35,7 @@ export default class WorkspaceUI {
     setApp(app,tabFrame,treePane) {
         this.app = app;
         this.tabFrame = tabFrame;
+        this.referenceManager = new ReferenceManager(app);
 
         //omit tree if tree pane is missing 
         if(treePane) {
@@ -267,12 +267,12 @@ export default class WorkspaceUI {
         try {
             if(member) {
                 
-                var componentGenerator = Apogee.getInstance().getComponentGenerator(componentJson.type);
+                var componentGenerator = this.app.getComponentGenerator(componentJson.type);
                 if((!componentGenerator)||(member.generator.type == "apogee.ErrorTable")) {
                     //throw base.createError("Component type not found: " + componentType);
 
                     //table not found - create an empty table
-                    componentGenerator = Apogee.getInstance().getComponentGenerator("apogeeapp.app.ErrorTableComponent");
+                    componentGenerator = this.app.getComponentGenerator("apogeeapp.app.ErrorTableComponent");
                 }
 
                 //create empty component

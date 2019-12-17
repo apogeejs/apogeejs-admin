@@ -78,7 +78,7 @@ export default class Apogee extends EventManager {
         this.appSettings = {};
         
         //reference manager
-        this.referenceManager = new ReferenceManager();
+        this.referenceManager = new ReferenceManager(this);
         
         //command manager
         this.commandManager = new CommandManager(this,this);

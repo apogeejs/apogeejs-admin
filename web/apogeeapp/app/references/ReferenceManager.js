@@ -1,5 +1,5 @@
 import {addLink} from "/apogeeapp/app/commandseq/updatelinkseq.js";
-import {bannerConstants,getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
+import {bannerConstants} from "/apogeeapp/app/component/banner.js"; 
 import EsModuleEntry from "/apogeeapp/app/references/EsModuleEntry.js";
 import NpmModuleEntry from "/apogeeapp/app/references/NpmModuleEntry.js";
 import JsScriptEntry from "/apogeeapp/app/references/JsScriptEntry.js";
@@ -15,17 +15,21 @@ import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";
  */
 export default class ReferenceManager {
 
-    constructor() {
-        
+    constructor(app) {
+        this.app = app;
         this.referencesTreeEntry = null;
         this.state = bannerConstants.BANNER_TYPE_NORMAL;
         
         //references
         this.referenceLists = {};
-//        if(__APOGEE_ENVIRONMENT__ == "WEB") this.referenceLists[EsModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(EsModuleEntry.REFERENCE_TYPE_INFO);
-//        if(__APOGEE_ENVIRONMENT__ == "NODE") this.referenceLists[NpmModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(NpmModuleEntry.REFERENCE_TYPE_INFO);
+        if(__APOGEE_ENVIRONMENT__ == "WEB") this.referenceLists[EsModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(EsModuleEntry.REFERENCE_TYPE_INFO);
+        if(__APOGEE_ENVIRONMENT__ == "NODE") this.referenceLists[NpmModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(NpmModuleEntry.REFERENCE_TYPE_INFO);
         this.referenceLists[JsScriptEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(JsScriptEntry.REFERENCE_TYPE_INFO);
         this.referenceLists[CssEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(CssEntry.REFERENCE_TYPE_INFO);
+    }
+
+    getApp() {
+        return this.app;
     }
 
     /** This returns the tree entry to display the reference entry for this reference manager. */
@@ -189,7 +193,7 @@ export default class ReferenceManager {
         }
         
         //set the state on the banner entry
-        ReferenceManager.applyBannerState(treeEntry,this.state);
+        treeEntry.setBannerState(this.state);
         
         return treeEntry;
     }
@@ -208,7 +212,7 @@ export default class ReferenceManager {
         }
         
         //set the state on the banner entry
-        ReferenceManager.applyBannerState(listTreeEntry,childStruct.state);
+        listTreeEntry.setBannerState(childStruct.state);
         
         childStruct.treeEntry = listTreeEntry;
         referenceTreeEntry.addChild(listTreeEntry);
@@ -259,7 +263,7 @@ export default class ReferenceManager {
         
         if(this.state != newState) {
             this.state = newState;
-            if(this.referencesTreeEntry) ReferenceManager.applyBannerState(this.referencesTreeEntry,newState);
+            if(this.referencesTreeEntry) this.referencesTreeEntry.setBannerState(newState);
         }
     }
 
@@ -294,41 +298,11 @@ export default class ReferenceManager {
         
         if(listState != listStruct.state) {
             listStruct.state = listState;
-            if(listStruct.treeEntry) ReferenceManager.applyBannerState(listStruct.treeEntry,listState);
+            if(listStruct.treeEntry) listStruct.treeEntry.setBannerState(listState); 
         }
         
         return listState;
     }
-
-    //=================================
-    // Static
-    //=================================
-
-    /** This method generates a member ID for the member. It is only valid
-     * for the duration the application is opened. It is not persisted.
-     * @private
-     */
-    static _createId() {
-        return nextId++;
-    }
-
-    /** @private */
-    static applyBannerState(treeEntry,state) {
-        var iconOverlay = getIconOverlay(state);
-        if(iconOverlay) {
-            treeEntry.setIconOverlay(iconOverlay);
-        }
-        else {
-            treeEntry.clearIconOverlay();
-        }
-    }
-
 }
-
-
-
-/** THis is used to give an id to the link entries 
- * @private */
-let nextId = 1;
 
 ReferenceManager.REFERENCES_ICON_PATH = "/componentIcons/references.png";

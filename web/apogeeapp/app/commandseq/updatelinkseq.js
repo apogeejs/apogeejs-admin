@@ -1,7 +1,6 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import {showConfigurableDialog} from "/apogeeapp/app/dialogs/ConfigurableDialog.js";
-import Apogee from "/apogeeapp/app/Apogee.js";
 
 const DIALOG_LAYOUT_URL_LINE = {
     "type": "inputElement",
@@ -58,7 +57,7 @@ export function addLink(referenceManager,entryTypeInfo) {
         commandData.nickname = newValues.nickname;
 
         //run command
-        Apogee.getInstance().executeCommand(commandData);
+        referenceManager.getApp().executeCommand(commandData);
 
         //return true to close the dialog
         return true;
@@ -120,7 +119,7 @@ export function updateLink(referenceEntry) {
         }
 
         if(dataChanged) {
-            Apogee.getInstance().executeCommand(commandData);
+            referenceEntry.getReferenceManager().getApp().executeCommand(commandData);
         }
             
         //return true to close the dialog
@@ -146,7 +145,7 @@ export function removeLink(referenceEntry) {
         commandData.url = referenceEntry.getUrl();
 
         //run command
-        Apogee.getInstance().executeCommand(commandData);
+        referenceEntry.getReferenceManager().getApp().executeCommand(commandData);
     }
 }
 

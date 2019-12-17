@@ -23,12 +23,14 @@ createworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData) {
 
     var commandResult = {};
     var workspaceUIAdded;
+
+    var app = Apogee.getInstance();
     
     try {
         
         //make the workspace ui
         var workspaceUI = new WorkspaceUI();
-        workspaceUIAdded = Apogee.getInstance().setWorkspaceUI(workspaceUI);
+        workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
         
         //load
         workspaceUI.load();
@@ -43,7 +45,7 @@ createworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData) {
         }
         
         //unkown error
-        commandResult.alertMsg = "Error adding link: " + error.message;
+        commandResult.alertMsg = "Error creating workspace: " + error.message;
         commandResult.cmdDone = false;
     }
     

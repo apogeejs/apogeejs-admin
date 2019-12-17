@@ -16,7 +16,7 @@ import {addComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
 
     var onOpen = function(err,app,workspaceData,fileMetadata) {
         if(err) {
-            alert("Error adding link: " + err);
+            alert("Error importing workspace: " + err);
             return false;
         }
         else {

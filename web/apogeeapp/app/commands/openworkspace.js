@@ -84,7 +84,7 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
         }
         
         //unkown error
-        synchCommandResult.alertMsg("Error adding link: " + error.message);
+        synchCommandResult.alertMsg("Error creating workspace: " + error.message);
         synchCommandResult.cmdDone = false;
     }
     

@@ -50,6 +50,7 @@ export default class JsonTableComponent extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
+        var app = this.getWorkspaceUI().getApp();
 
         //temporary?
         let codeEditorOptions = {
@@ -62,33 +63,33 @@ export default class JsonTableComponent extends EditComponent {
             case JsonTableComponent.VIEW_DATA:
                 switch(this.dataView) {
                     case JsonTableComponent.COLORIZED_DATA_VEW:
-                        callbacks = dataDisplayHelper.getMemberDataTextCallbacks(this.member);
+                        callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,this.member);
                         return new AceTextEditor(displayContainer,callbacks,"ace/mode/json");
                         
                     case JsonTableComponent.TEXT_DATA_VEW:
-                        callbacks = dataDisplayHelper.getMemberDataJsonCallbacks(this.member);
+                        callbacks = dataDisplayHelper.getMemberDataJsonCallbacks(app,this.member);
                         return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
                         
                     case JsonTableComponent.GRID_DATA_VEW:
-                        callbacks = dataDisplayHelper.getMemberDataJsonCallbacks(this.member);
+                        callbacks = dataDisplayHelper.getMemberDataJsonCallbacks(app,this.member);
                         return new HandsonGridEditor(displayContainer,callbacks);
                         
                     case JsonTableComponent.PLAIN_DATA_VEW:
                     default:
-                        callbacks = dataDisplayHelper.getMemberDataTextCallbacks(this.member);
+                        callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,this.member);
                         return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
                 }
                 
             case JsonTableComponent.VIEW_CODE:
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
                 
             case JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
                 
             case JsonTableComponent.VIEW_DESCRIPTION:
-                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(app,this.member);
                 //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
                 return new TextAreaEditor(displayContainer,callbacks);
                 

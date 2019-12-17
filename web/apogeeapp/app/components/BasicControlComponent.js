@@ -53,6 +53,7 @@ export default class BasicControlComponent extends EditComponent{
     getDataDisplay(displayContainer,viewType) {
 
         var callbacks;
+        var app = this.getWorkspaceUI().getApp();
 
         //create the new view element;
         switch(viewType) {
@@ -63,15 +64,15 @@ export default class BasicControlComponent extends EditComponent{
                 return this.getOutputDisplay(displayContainer);
 
             case BasicControlComponent.VIEW_CODE:
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
             case BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
             case BasicControlComponent.VIEW_DESCRIPTION:
-                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(app,this.member);
                 //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
                 return new TextAreaEditor(displayContainer,callbacks);
 

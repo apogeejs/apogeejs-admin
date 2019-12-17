@@ -36,6 +36,7 @@ export default class FunctionComponent extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
+        var app = this.getWorkspaceUI().getApp();
 
         //temporary?
         let codeEditorOptions = {
@@ -47,15 +48,15 @@ export default class FunctionComponent extends EditComponent {
         switch(viewType) {
                 
             case FunctionComponent.VIEW_CODE:
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
                 
             case FunctionComponent.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
                 
             case FunctionComponent.VIEW_DESCRIPTION:
-                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(this.member);
+                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(app,this.member);
                 //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
                 return new TextAreaEditor(displayContainer,callbacks);
                 

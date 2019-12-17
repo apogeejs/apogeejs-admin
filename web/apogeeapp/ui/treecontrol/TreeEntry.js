@@ -1,5 +1,6 @@
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import Menu from "/apogeeapp/ui/menu/Menu.js";
+import {getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
 
 export default class TreeEntry {
 
@@ -192,6 +193,16 @@ export default class TreeEntry {
 
     clearIconOverlay() {
         apogeeui.removeAllChildren(this.iconOverlayElement);
+    }
+
+    setBannerState(bannerState) {
+        var iconOverlay = getIconOverlay(bannerState);
+        if(iconOverlay) {
+            this.setIconOverlay(iconOverlay);
+        }
+        else {
+            this.clearIconOverlay();
+        }
     }
 
     //=====================================

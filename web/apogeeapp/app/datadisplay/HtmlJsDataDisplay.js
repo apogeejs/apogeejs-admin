@@ -26,10 +26,11 @@ import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
 /** This is the display/editor for the custom control output. */
 export default class HtmlJsDataDisplay extends DataDisplay {
-    constructor(displayContainer,callbacks,member,html,resource) {
+    constructor(app,displayContainer,callbacks,member,html,resource) {
         
         super(displayContainer,callbacks,DataDisplay.NON_SCROLLING);
         
+        this.app = app;
         this.resource = resource;
         this.member = member;
         
@@ -55,7 +56,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         
         //this gives the ui code access to some data display functions
         var admin = {
-            getMessenger: () => new UiCommandMessenger(this.member),
+            getMessenger: () => new UiCommandMessenger(this.app,this.member),
             startEditMode: () => this.startEditMode(),
             endEditMode: () => this.endEditMode()
         }

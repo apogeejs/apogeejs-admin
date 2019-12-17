@@ -1,12 +1,10 @@
-import Apogee from "/apogeeapp/app/Apogee.js";
-
 let dataDisplayHelper = {};
 export {dataDisplayHelper as default}
 
 const FORMAT_STRING = "\t";
 
 /** This function creates editor callbacks or member data where the editor takes JSON format. */
-dataDisplayHelper.getMemberDataJsonCallbacks = function(member) {
+dataDisplayHelper.getMemberDataJsonCallbacks = function(app,member) {
     return {
         getData: () => member.getData(),
         getEditOk: () => (!member.hasCode()),
@@ -16,14 +14,14 @@ dataDisplayHelper.getMemberDataJsonCallbacks = function(member) {
             commandData.memberFullName = member.getFullName();
             commandData.data = data;
             
-            Apogee.getInstance().executeCommand(commandData);
+            app.executeCommand(commandData);
             return true;
         }
     }
 }
 
 /** This function creates editor callbacks or member data where the editor takes text format. */
-dataDisplayHelper.getMemberDataTextCallbacks = function(member) {
+dataDisplayHelper.getMemberDataTextCallbacks = function(app,member) {
     return {
         getData: () => {
             var json = member.getData();	
@@ -65,7 +63,7 @@ dataDisplayHelper.getMemberDataTextCallbacks = function(member) {
             commandData.memberFullName = member.getFullName();
             commandData.data = data;
             
-            Apogee.getInstance().executeCommand(commandData);
+            app.executeCommand(commandData);
             return true;
         }
     }
@@ -74,7 +72,7 @@ dataDisplayHelper.getMemberDataTextCallbacks = function(member) {
 /** This function creates editor callbacks or the member function body. 
  * The argument optionalClearCodeValue can optionally be set. If so, the member data will be 
  * set with this value if the function body and supplemental code are empty. */
-dataDisplayHelper.getMemberFunctionBodyCallbacks = function(member,optionalClearCodeDataValue) {
+dataDisplayHelper.getMemberFunctionBodyCallbacks = function(app,member,optionalClearCodeDataValue) {
     return {
         getData: () => member.getFunctionBody(),
         getEditOk: () => true,
@@ -86,14 +84,14 @@ dataDisplayHelper.getMemberFunctionBodyCallbacks = function(member,optionalClear
             commandData.functionBody = text;
             commandData.supplementalCode = member.getSupplementalCode();
             
-            Apogee.getInstance().executeCommand(commandData);
+            app.executeCommand(commandData);
             return true;
         }
     }
 }
 
 /** This function creates editor callbacks or the member supplemental code. */
-dataDisplayHelper.getMemberSupplementalCallbacks = function(member,optionalClearCodeDataValue) {
+dataDisplayHelper.getMemberSupplementalCallbacks = function(app,member,optionalClearCodeDataValue) {
     return {
         getData: () => member.getSupplementalCode(),
         getEditOk: () => true,
@@ -105,14 +103,14 @@ dataDisplayHelper.getMemberSupplementalCallbacks = function(member,optionalClear
             commandData.functionBody = member.getFunctionBody();
             commandData.supplementalCode = text;
             
-            Apogee.getInstance().executeCommand(commandData);
+            app.executeCommand(commandData);
             return true;
         }
     }
 }
 
 /** This function creates editor callbacks or the member description. */
-dataDisplayHelper.getMemberDescriptionCallbacks = function(member) {
+dataDisplayHelper.getMemberDescriptionCallbacks = function(app,member) {
     return {
         getData: () => member.getDescription(),
         getEditOk: () => true,
@@ -122,7 +120,7 @@ dataDisplayHelper.getMemberDescriptionCallbacks = function(member) {
             commandData.memberFullName = member.getFullName();
             commandData.description = text;
             
-            Apogee.getInstance().executeCommand(commandData);
+            app.executeCommand(commandData);
             return true;
         }
     }

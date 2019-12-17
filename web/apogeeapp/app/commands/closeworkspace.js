@@ -1,5 +1,4 @@
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
-import Apogee from "/apogeeapp/app/Apogee.js";
 
 let closeworkspace = {};
 
@@ -16,8 +15,7 @@ closeworkspace.executeCommand = function(workspaceUI,commandData) {
     var workspaceUIRemoved = false;
     
     try {
-        
-        workspaceUIRemoved = Apogee.getInstance().clearWorkspaceUI();
+        workspaceUIRemoved = workspaceUI.getApp().clearWorkspaceUI();
         
         workspaceUI.close();
         workspace.onClose();

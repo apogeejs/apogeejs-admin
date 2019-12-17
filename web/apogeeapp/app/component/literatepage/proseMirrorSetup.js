@@ -23,12 +23,13 @@ import { Step }  from "/prosemirror/lib/prosemirror-transform/src/index.js";
 import { keymap }  from "/prosemirror/lib/prosemirror-keymap/src/keymap.js";
 
 import ApogeeComponentView from "/apogeeapp/app/editor/ApogeeComponentView.js";
-import { undo, redo }  from "/apogeeapp/app/editor/apogeeHistory.js";
-
 
 import {convertToNonListBlockType, convertToListBlockType, indentSelection, unindentSelection } from "/apogeeapp/app/editor/apogeeCommands.js";
 
 export function createProseMirrorManager (folderComponent) {
+
+  let workspaceUI = folderComponent.getWorkspaceUI();
+  let app = workspaceUI.getApp();
 
   //this is the function return object - the editor manager
   let proseMirror = {};
@@ -128,6 +129,18 @@ export function createProseMirrorManager (folderComponent) {
   function showSelection() {
     var selection = window.view.state.selection;
     console.log(JSON.stringify(selection));
+  }
+
+  function undo() {
+    let commandManager = app.getCommandManager();
+    let commandHistory = commandManager.getCommandHistory();
+    commandHistory.undo();
+  }
+
+  function redo() {
+    let commandManager = app.getCommandManager();
+    let commandHistory = commandManager.getCommandHistory();
+    commandHistory.redo();
   }
 
   function createEditorState(doc) {
