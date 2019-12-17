@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
@@ -377,12 +377,12 @@ export default class Component extends EventManager {
             this.fieldUpdated("member");
             
             //check for name changes
-            if(util.isFieldUpdated(updatedMemberFields,"name")) {
+            if(apogeeutil.isFieldUpdated(updatedMemberFields,"name")) {
                 this.fieldUpdated("name");
             }
             
             //check for parent change
-            if(util.isFieldUpdated(updatedMemberFields,"owner")) {
+            if(apogeeutil.isFieldUpdated(updatedMemberFields,"owner")) {
                 this.fieldUpdated("owner");
                 
                 //old parent change logic!!!
@@ -545,7 +545,7 @@ export default class Component extends EventManager {
      * It uses default values and then overwrites in with optionalBaseValues (these are intended to be base values outside of user input values)
      * and then optionalOverrideValues (these are intended to be user input values) */
     static createMemberJson(componentGenerator,optionalInputProperties,optionalBaseValues) {
-        var json = util.jsonCopy(componentGenerator.DEFAULT_MEMBER_JSON);
+        var json = apogeeutil.jsonCopy(componentGenerator.DEFAULT_MEMBER_JSON);
         if(optionalBaseValues) {
             for(var key in optionalBaseValues) {
                 json[key]= optionalBaseValues[key];
@@ -567,7 +567,7 @@ export default class Component extends EventManager {
     /** This function merges values from two objects containing component property values. */
     static createComponentJson(componentGenerator,optionalInputProperties,optionalBaseValues) {
         //copy the base properties
-        var newPropertyValues = optionalBaseValues ? util.jsonCopy(optionalBaseValues) : {};
+        var newPropertyValues = optionalBaseValues ? apogeeutil.jsonCopy(optionalBaseValues) : {};
         
         //set the type
         newPropertyValues.type = componentGenerator.uniqueName;

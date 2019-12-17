@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
@@ -33,7 +33,7 @@ export default class CheckboxGroupElement extends ConfigurableElement {
             
             var label;
             var value;
-            if(util.getObjectType(checkboxInfo) == "Array") {
+            if(apogeeutil.getObjectType(checkboxInfo) == "Array") {
                 label = checkboxInfo[0]
                 value = checkboxInfo[1];     
             }

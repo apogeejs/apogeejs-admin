@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
 import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
@@ -107,6 +107,6 @@ FunctionComponent.propertyDialogLines = [
 FunctionComponent.transferMemberProperties = function(inputValues,propertyJson) {
     if(inputValues.argListString != undefined) { 
         if(!propertyJson.updateData) propertyJson.updateData = {};
-        propertyJson.updateData.argList = util.parseStringArray(inputValues.argListString);
+        propertyJson.updateData.argList = apogeeutil.parseStringArray(inputValues.argListString);
     }
 }

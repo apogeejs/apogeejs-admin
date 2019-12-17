@@ -65,7 +65,7 @@
 													"type": "apogee.JsonTable",
 													"updateData": {
 														"argList": [],
-														"functionBody": "return apogee.net.jsonRequest(url);",
+														"functionBody": "return .jsonRequest(url);",
 														"supplementalCode": "",
 														"description": "This is a simple web request returning a JSON object."
 													}
@@ -222,7 +222,7 @@
 					"type": "apogee.JsonTable",
 					"updateData": {
 						"argList": [],
-						"functionBody": "var newWorkspace = apogee.util.jsonCopy(workspace31);\n\nnewWorkspace.fileType = \"apogee app js workspace\";\nnewWorkspace.version = .40;\nnewWorkspace.references = newWorkspace.library;\ndelete newWorkspace.library;\n\nvar rootFolderName = newWorkspace.workspace.data.name;\nif(rootFolderName != \"Model\") {\n    newWorkspace.workspace.data.name = \"Model\";\n    newWorkspace.workspace.name = rootFolderName;\n}\nif(newWorkspace.workspace.name === undefined) {\n    newWorkspace.workspace.name = \"Workspace\";\n}\n\nreturn newWorkspace;\n",
+						"functionBody": "var newWorkspace = apogeeutil.jsonCopy(workspace31);\n\nnewWorkspace.fileType = \"apogee app js workspace\";\nnewWorkspace.version = .40;\nnewWorkspace.references = newWorkspace.library;\ndelete newWorkspace.library;\n\nvar rootFolderName = newWorkspace.workspace.data.name;\nif(rootFolderName != \"Model\") {\n    newWorkspace.workspace.data.name = \"Model\";\n    newWorkspace.workspace.name = rootFolderName;\n}\nif(newWorkspace.workspace.name === undefined) {\n    newWorkspace.workspace.name = \"Workspace\";\n}\n\nreturn newWorkspace;\n",
 						"supplementalCode": "",
 						"description": ""
 					}
@@ -232,7 +232,7 @@
 					"type": "apogee.JsonTable",
 					"updateData": {
 						"argList": [],
-						"functionBody": "if(oldWorkspace.version == 0.31) {\n    return oldWorkspace;\n}\nelse {\n    var newWorkspace = apogee.util.jsonCopy(oldWorkspace);\n    \n    newWorkspace.fileType = \"apogee js web workspace\";\n    newWorkspace.version = .31;\n    \n    var oldComponents = newWorkspace.components;\n    newComponents = {};\n    newComponents.type = \"apogeeapp.app.FolderComponent\"\n    newComponents.children = oldComponents;\n    newWorkspace.components = newComponents;\n    \n    var jsEntries = newWorkspace.jsLinks.map( url => {return {\"url\":url,\"entryType\":\"js link\"}});\n    var cssEntries = newWorkspace.cssLinks.map( url => {return {\"url\":url,\"entryType\":\"css link\"}});\n    newWorkspace.library = jsEntries.concat(cssEntries);\n    delete newWorkspace.jsLinks;\n    delete newWorkspace.cssLinks;\n    \n    return newWorkspace;\n}\n",
+						"functionBody": "if(oldWorkspace.version == 0.31) {\n    return oldWorkspace;\n}\nelse {\n    var newWorkspace = apogeeutil.jsonCopy(oldWorkspace);\n    \n    newWorkspace.fileType = \"apogee js web workspace\";\n    newWorkspace.version = .31;\n    \n    var oldComponents = newWorkspace.components;\n    newComponents = {};\n    newComponents.type = \"apogeeapp.app.FolderComponent\"\n    newComponents.children = oldComponents;\n    newWorkspace.components = newComponents;\n    \n    var jsEntries = newWorkspace.jsLinks.map( url => {return {\"url\":url,\"entryType\":\"js link\"}});\n    var cssEntries = newWorkspace.cssLinks.map( url => {return {\"url\":url,\"entryType\":\"css link\"}});\n    newWorkspace.library = jsEntries.concat(cssEntries);\n    delete newWorkspace.jsLinks;\n    delete newWorkspace.cssLinks;\n    \n    return newWorkspace;\n}\n",
 						"supplementalCode": "",
 						"description": ""
 					}

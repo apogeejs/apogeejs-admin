@@ -1,14 +1,11 @@
 import Apogee from "/apogeeapp/app/Apogee.js";
 import ElectronAppConfigManager from "/supplemental/electronCode/ElectronAppConfigManager.js";
-import util from "/apogeeutil/util.js";
-import net from "/apogeeutil/net.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 
 //expose these apogee libraries
-__globals__.apogee = {};
-apogee.util = util;
-apogee.net = net;
+__globals__.apogeeutil = apogeeutil;
 
 export function appInit() {
 

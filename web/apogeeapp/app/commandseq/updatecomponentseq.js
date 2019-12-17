@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
 
 import {showConfigurableDialog} from "/apogeeapp/app/dialogs/ConfigurableDialog.js";
@@ -13,7 +13,7 @@ export function updateComponent(component) {
     var componentGenerator = component.componentGenerator;
 
     var displayName = componentGenerator.displayName
-    var additionalLines = util.jsonCopy(componentGenerator.propertyDialogLines); 
+    var additionalLines = apogeeutil.jsonCopy(componentGenerator.propertyDialogLines); 
 
     var workspaceUI = component.getWorkspaceUI(); 
     var workspace = component.getWorkspace();
@@ -50,13 +50,13 @@ export function updateComponent(component) {
         if(componentGenerator.transferMemberProperties) {
             componentGenerator.transferMemberProperties(newValues,memberUpdateJson);
         }
-        var numMemberProps = util.jsonObjectLength(memberUpdateJson);
+        var numMemberProps = apogeeutil.jsonObjectLength(memberUpdateJson);
         
         var componentUpdateJson = {};
         if(componentGenerator.transferComponentProperties) {
             componentGenerator.transferComponentProperties(newValues,componentUpdateJson);
         }
-        var numComponentProps = util.jsonObjectLength(componentUpdateJson);
+        var numComponentProps = apogeeutil.jsonObjectLength(componentUpdateJson);
         
         if((numMemberProps > 0)||(numComponentProps > 0)) {
             let updateCommand = {};

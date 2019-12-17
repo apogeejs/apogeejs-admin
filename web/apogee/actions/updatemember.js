@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {addActionInfo} from "/apogee/actions/action.js";
 import ActionError from "/apogee/lib/ActionError.js";
 
@@ -127,7 +127,7 @@ function updateData(workspace,actionData,actionResult) {
         var actionError = ActionError.processException(data,ActionError.ERROR_TYPE_MODEL);
         member.addError(actionError);
     }
-    else if(data === util.INVALID_VALUE) {
+    else if(data === apogeeutil.INVALID_VALUE) {
         //data is an invalid value
         member.setResultInvalid(true);
     }

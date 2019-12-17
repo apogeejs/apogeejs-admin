@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 /** This file contains some methods for creating commands to do updates for component members.
  * There are 
@@ -33,7 +33,7 @@ export function getMemberStateUndoCommand(workspace, memberFullName) {
         }
         else if(member.getResultInvalid()) {
             //result is invalid - set value to invalid in undo
-            command.data = util.INVALID_VALUE
+            command.data = apogeeutil.INVALID_VALUE
         }
         else {
             //this is a standard data value or a promise

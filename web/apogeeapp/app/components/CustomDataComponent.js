@@ -1,4 +1,4 @@
- import util from "/apogeeutil/util.js";
+ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import { Messenger } from "/apogee/apogeeCoreLib.js";
 
 import Apogee from "/apogeeapp/app/Apogee.js";
@@ -202,7 +202,7 @@ export default class CustomDataComponent extends EditComponent {
                 try {
 
                     //create the resource generator wrapped with its closure
-                    var generatorFunctionBody = util.formatString(
+                    var generatorFunctionBody = apogeeutil.formatString(
                         CustomDataComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
                         uiGeneratorBody
                     );
@@ -240,7 +240,7 @@ export default class CustomDataComponent extends EditComponent {
 
     doCodeFieldUpdate(uiCodeField,fieldValue) { 
         var initialCodeFields = this.getUiCodeFields();
-        var targetCodeFields = util.jsonCopy(initialCodeFields);
+        var targetCodeFields = apogeeutil.jsonCopy(initialCodeFields);
         targetCodeFields[uiCodeField] = fieldValue;
 
         var command = {};

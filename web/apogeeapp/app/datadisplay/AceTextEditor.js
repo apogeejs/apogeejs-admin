@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
@@ -87,7 +87,7 @@ export default class AceTextEditor extends DataDisplay {
     
     setData(text) {
         //check data is valid
-        if(util.getObjectType(text) != "String") {
+        if(apogeeutil.getObjectType(text) != "String") {
             var errorMsg = "ERROR: Data value is not text";
             //this.setError(errorMsg);
             text = errorMsg;

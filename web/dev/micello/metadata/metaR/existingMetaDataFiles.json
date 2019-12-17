@@ -9385,7 +9385,7 @@
 					"type": "apogee.JsonTable",
 					"updateData": {
 						"argList": [],
-						"functionBody": "var url = \"http://mfs-us-1.micello.com/ms/v1/mfile/meta/strings/v5/Standard?key=nS71TmmSmgvwcXlfrGrin38AMLP48B\";\nreturn apogee.net.jsonRequest(url);",
+						"functionBody": "var url = \"http://mfs-us-1.micello.com/ms/v1/mfile/meta/strings/v5/Standard?key=nS71TmmSmgvwcXlfrGrin38AMLP48B\";\nreturn .jsonRequest(url);",
 						"supplementalCode": "",
 						"description": ""
 					}

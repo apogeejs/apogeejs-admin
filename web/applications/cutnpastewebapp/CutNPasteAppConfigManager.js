@@ -1,4 +1,4 @@
-import { util, net } from "/apogeeutil/apogeeUtilLib.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import CutNPasteFileAccess from "./CutNPasteFileAccess.js";
 
 /** 
@@ -14,10 +14,10 @@ export default class CutNPasteAppConfigManager {
      * app configuration.
      */
     getConfigPromise(app) {
-        var configUrl = util.readQueryField("config",document.URL);
+        var configUrl = apogeeutil.readQueryField("config",document.URL);
         var configFilePromise;
         if(configUrl) {
-            configFilePromise = net.jsonRequest(configUrl);
+            configFilePromise = apogeeutil.jsonRequest(configUrl);
             //chain the file download promise to the init settings promise
             return configFilePromise.then(appSettings => app.getConfigurationPromise(appSettings));
         }
@@ -38,9 +38,9 @@ export default class CutNPasteAppConfigManager {
      * that should be loaded
      */
     getInitialWorkspaceFilePromise(app) {
-        var workspaceUrl = util.readQueryField("url",document.URL);
+        var workspaceUrl = apogeeutil.readQueryField("url",document.URL);
         if(workspaceUrl) {
-            return net.textRequest(workspaceUrl);
+            return apogeeutil.textRequest(workspaceUrl);
         } else {
             return null;
         }

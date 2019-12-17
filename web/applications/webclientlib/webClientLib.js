@@ -1,6 +1,6 @@
 import { Apogee, initIncludePath, WebComponentDisplay } from "/apogeeapp/apogeeAppLib.js";
 import WebAppConfigManager from "/applications/webclientlib/WebAppConfigManager.js";
-import { apogee } from "/apogeeutil/apogeeUtilLib.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 let apogeeWebClientLib = {};
 let app;
@@ -14,7 +14,7 @@ apogeeWebClientLib.initWebApp = function(workspaceUrl,onWorkspaceLoad,onWorkspac
     //some global initialization
     //==========================
 
-    window.apogee = apogee;
+    window.apogeeutil = apogeeutil;
 
     const INCLUDE_BASE_PATH = "INCLUDE_BASE_PATH_VALUE";
     initIncludePath(INCLUDE_BASE_PATH);

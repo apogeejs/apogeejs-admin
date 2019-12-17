@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
 import ConfigurablePanel from "/apogeeapp/ui/configurablepanel/ConfigurablePanel.js";
@@ -61,7 +61,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
         
         //set change to enable save bar is form value differs from initial data
         var onChange = (currentFormValue,form) => {
-            if(util.jsonEquals(currentFormValue,savedFormValue)) {
+            if(apogeeutil.jsonEquals(currentFormValue,savedFormValue)) {
                 this.endEditMode()
             }
             else {

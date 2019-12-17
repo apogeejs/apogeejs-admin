@@ -18,7 +18,7 @@ export default class UiCommandMessenger {
      * variable name updateMemberName, with the value data. UpdateMemberName should
      * be the name as it would be specified in a formula from the given member. Data may
      * get a JSON or a Promise (for asynch data), Error (to set an error state) 
-     * or util.INVALID_VALUE.*/
+     * or apogeeutil.INVALID_VALUE.*/
     getDataUpdateCommand(updateMemberName,data,optionalCommandDescription,optionalSetsWorkspaceDirty) {
 
         var member = this._getMemberObject(updateMemberName);

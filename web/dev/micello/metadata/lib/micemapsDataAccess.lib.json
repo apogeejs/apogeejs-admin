@@ -55,7 +55,7 @@
 						],
 						"functionBody": "var header = {};\nheader[\"Content-Type\"] = \"text/plain;charset=UTF-8\";\nheader.sessionKey = sessionKey;\nheader[\"proto-version\"] = \"4.0\";\nheader[\"db-version\"] = dataSetInfo.version;\n\nrequestInfo = {};\nrequestInfo.header = header;\nif(bodyJson) {\n    requestInfo.method = \"POST\";\n    requestInfo.body = JSON.stringify(bodyJson);\n}\n\nreturn requestInfo;\n",
 						"supplementalCode": "",
-						"description": "This creates the requestOptions, suitable for apogee.net.jsonRequest, to go with an type of request to the workingset (micemetarequest) server."
+						"description": "This creates the requestOptions, suitable for .jsonRequest, to go with an type of request to the workingset (micemetarequest) server."
 					}
 				},
 				"host": {
@@ -769,7 +769,7 @@
 							"targetRecord"
 						],
 						"functionBody": "if(initialRecord.Id != targetRecord.Id) {\n    throw new Error(\"Record ID mismatch in create update instruction for target record: \" + getRecordErrString(targetRecord));\n}\n\nif(initialRecord.Type != targetRecord.Type) {\n    throw new Error(\"Inital and target record types do not match. Target record: \" + getRecordErrString(targetRecord));\n}\n\nvar recordsDifferent = false;\n\nvar recordInfo = getRecordInfo(initialRecord.Type);\n\nvar instruction = {};\ninstruction.Type = \"Update\";\ninstruction.Record = recordInfo.name;\ninstruction.Id = initialRecord.Id;\n\ninstruction.initialReadPerm = initialRecord.read_perm;\ninstruction.initialEditPerm = initialRecord.edit_perm;\n\nif(initialRecord.readPerm != targetRecord.readPerm) {\n    instruction.targetReadPerm = targetRecord.read_perm;\n    recordsDifferent = true;\n}\n\nif(initialRecord.editPerm != targetRecord.editPerm) {\n    instruction.targetEditPerm = targetRecord.edit_perm;\n    recordsDifferent = true;\n}\n\nvar initialData = {};\ninstruction.Initial = initialData;\nvar targetData = {};\ninstruction.Target = targetData;\n\nfor(var i = 0; i < recordInfo.fields.length; i++) {\n    var field = recordInfo.fields[i];\n    \n    var initialValue;\n    var targetValue;\n    \n    var initialValue = initialRecord.Fields[field.name];\n    var targetValue = targetRecord.Fields[field.name];\n    \n    //validate target values\n    if(targetValue === undefined) {\n        //use default\n        targetValue = field.defaultValue;\n    }\n    \n    if(targetValue === undefined) {\n        throw new Error(\"Unknown problem: undefined field value: \" + getFieldErrString(targetRecord,field));\n    }\n    \n    if(targetValue === null) {\n        if(!field.nullOk) {\n            throw new Error(\"Illegal null value: \" + getFieldErrString(targetRecord,field));\n        }\n    }\n    \n    if(!fieldsMatch(initialValue,targetValue,field)) {\n        initialData[field.name] = initialValue;\n        targetData[field.name] = targetValue;\n        recordsDifferent = true;\n    }\n}\n\nif(recordsDifferent) {\n    return instruction;\n}\nelse {\n    return null;\n}\n",
-						"supplementalCode": "function fieldsMatch(initialValue,targetValue,fieldInfo) {\n    if(fieldInfo.fieldClass === \"java.lang.String\") {\n        //compare strings with \"==\"\n        return (initialValue == targetValue);\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"java.lang\")) {\n        //compare other basic values with \"===\"\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"com.micello\")) {\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONObject\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONArray\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else {\n        throw new Error(\"unrecognized field type: \" + fieldInfo.fieldClass);\n    }\n}\n\nfunction compareJsonData(a,b) {\n    var an = apogee.util.getNormalizedObjectCopy(a);\n    var bn = apogee.util.getNormalizedObjectCopy(b);\n    var aString = JSON.stringify(an);\n    var bString = JSON.stringify(bn);\n    return aString == bString;\n}\n    ",
+						"supplementalCode": "function fieldsMatch(initialValue,targetValue,fieldInfo) {\n    if(fieldInfo.fieldClass === \"java.lang.String\") {\n        //compare strings with \"==\"\n        return (initialValue == targetValue);\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"java.lang\")) {\n        //compare other basic values with \"===\"\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass.startsWith(\"com.micello\")) {\n        return initialValue === targetValue;\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONObject\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else if(fieldInfo.fieldClass == \"org.json.JSONArray\") {\n        return compareJsonData(initialValue,targetValue);\n    }\n    else {\n        throw new Error(\"unrecognized field type: \" + fieldInfo.fieldClass);\n    }\n}\n\nfunction compareJsonData(a,b) {\n    var an = apogeeutil.getNormalizedObjectCopy(a);\n    var bn = apogeeutil.getNormalizedObjectCopy(b);\n    var aString = JSON.stringify(an);\n    var bString = JSON.stringify(bn);\n    return aString == bString;\n}\n    ",
 						"description": "This function creates an update instruction given an initial and target record. If the records are the same then NULL is returned. (No update is needed.)"
 					}
 				},
@@ -842,7 +842,7 @@
 							"combinedEntries"
 						],
 						"functionBody": "var output = [];\nfor(var key in combinedEntries) {\n    var entry = combinedEntries[key];\n    var instruction = getInstructionForCombinedEntry(entry);\n    if(instruction) {\n        output.push(instruction);\n    }\n}\n\nreturn output;",
-						"supplementalCode": "function getInstructionForCombinedEntry(combinedEntry) {\n    var newEntry = combinedEntry.newEntry;\n    var oldEntry = combinedEntry.oldEntry;\n    \n    if(newEntry) {\n        if(!oldEntry) {\n            console.log(\"Create: \" + newEntry.Id);\n            return createCreateInstruction(newEntry);\n        }\n        else {\n            //this will return null for matching records\n            console.log(\"Update(maybe): \" + newEntry.Id);\n            return createUpdateInstruction(oldEntry,newEntry);\n        }\n    }\n    else if(oldEntry) {\n        console.log(\"Delete: \" + oldEntry.Id);\n        return createDeleteInstruction(oldEntry);\n    }\n    \n    return null;\n}\n\nfunction entriesDifferent(entry1,entry2) {\n    var string1 = JSON.stringify(apogee.util.getNormalizedCopy(entry1));\n    var string2 = JSON.stringify(apogee.util.getNormalizedCopy(entry2));\n    return (string1 == string2);\n}",
+						"supplementalCode": "function getInstructionForCombinedEntry(combinedEntry) {\n    var newEntry = combinedEntry.newEntry;\n    var oldEntry = combinedEntry.oldEntry;\n    \n    if(newEntry) {\n        if(!oldEntry) {\n            console.log(\"Create: \" + newEntry.Id);\n            return createCreateInstruction(newEntry);\n        }\n        else {\n            //this will return null for matching records\n            console.log(\"Update(maybe): \" + newEntry.Id);\n            return createUpdateInstruction(oldEntry,newEntry);\n        }\n    }\n    else if(oldEntry) {\n        console.log(\"Delete: \" + oldEntry.Id);\n        return createDeleteInstruction(oldEntry);\n    }\n    \n    return null;\n}\n\nfunction entriesDifferent(entry1,entry2) {\n    var string1 = JSON.stringify(apogeeutil.getNormalizedCopy(entry1));\n    var string2 = JSON.stringify(apogeeutil.getNormalizedCopy(entry2));\n    return (string1 == string2);\n}",
 						"description": "This function takes a combined entry map of the format:\n\n{\n  \"some-identifier\":{\n    \"oldEntry\":{original record entry, if applicable},\n    \"newEntry\":{new record entry, if applicable}\n  },\n  ...\n}\n\nIt returns an instruction list.\n\n"
 					}
 				},
@@ -855,7 +855,7 @@
 							"commitMessage",
 							"sessionKey"
 						],
-						"functionBody": "var commitBody = createCommitBody(instructionList,commitMessage);\nvar requestOptions = createRequestOptions(commitBody,sessionKey);\nvalue = apogee.net.jsonRequest(commitUrl,requestOptions);\nreturn value;",
+						"functionBody": "var commitBody = createCommitBody(instructionList,commitMessage);\nvar requestOptions = createRequestOptions(commitBody,sessionKey);\nvalue = .jsonRequest(commitUrl,requestOptions);\nreturn value;",
 						"supplementalCode": "",
 						"description": ""
 					}
@@ -868,7 +868,7 @@
 							"requestBody",
 							"sessionKey"
 						],
-						"functionBody": "var requestOptions = createRequestOptions(requestBody,sessionKey);\nvalue = apogee.net.jsonRequest(requestUrl,requestOptions);\nreturn value;",
+						"functionBody": "var requestOptions = createRequestOptions(requestBody,sessionKey);\nvalue = .jsonRequest(requestUrl,requestOptions);\nreturn value;",
 						"supplementalCode": "",
 						"description": ""
 					}
@@ -881,7 +881,7 @@
 							"cid",
 							"sessionKey"
 						],
-						"functionBody": "var requestBody = {};\nrequestBody.search = \"community_map\";\nrequestBody.id = cid;\n\nvar requestOptions = createRequestOptions(requestBody,sessionKey);\n\nvar requestUrl = host + \"/cannedsearch\";\nreturn apogee.net.jsonRequest(requestUrl,requestOptions);",
+						"functionBody": "var requestBody = {};\nrequestBody.search = \"community_map\";\nrequestBody.id = cid;\n\nvar requestOptions = createRequestOptions(requestBody,sessionKey);\n\nvar requestUrl = host + \"/cannedsearch\";\nreturn .jsonRequest(requestUrl,requestOptions);",
 						"supplementalCode": "",
 						"description": ""
 					}

@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {addComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
 
 //=====================================
@@ -139,7 +139,7 @@ function getMemberJsonFromWorkspaceJson(workspaceJson,componentGenerator) {
     if(componentGenerator.uniqueName == "apogeeapp.app.FolderFunctionComponent") {
         //I should probably do this conversion in the folder function code, so it is easier to maintain
         var memberFolderFunctionJson = componentGenerator.DEFAULT_MEMBER_JSON;
-        var internalFolderJson = util.jsonCopy(memberFolderJson);
+        var internalFolderJson = apogeeutil.jsonCopy(memberFolderJson);
         internalFolderJson.name = "root";
         memberFolderFunctionJson.internalFolder = internalFolderJson;
         return memberFolderFunctionJson;

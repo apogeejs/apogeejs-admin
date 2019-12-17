@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
 
 import {getPropertiesDialogLayout} from "/apogeeapp/app/commandseq/updatecomponentseq.js";
@@ -28,7 +28,7 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
         var displayName = componentGenerator.displayName
         
         //get any additional property content for dialog beyond basic properties
-        var additionalLines = util.jsonCopy(componentGenerator.propertyDialogLines); 
+        var additionalLines = apogeeutil.jsonCopy(componentGenerator.propertyDialogLines); 
         
         //get the folder list
         var folderList = workspaceUI.getFolders();

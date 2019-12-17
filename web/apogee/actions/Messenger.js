@@ -14,7 +14,7 @@ export default class Messenger {
      * updateMemberName - This is a member name as it would be accessed from the local code
      * data - This is the data to set on the given member. Aside from a JSON value, additional 
      * options are a Promise, to do an asynchronous update, a Error, to send an error to 
-     * that table, or util.INVALID_VALUE to send the invalid value.
+     * that table, or apogeeutil.INVALID_VALUE to send the invalid value.
      * These updates are applied after the current calculation is completed. See documentation
      * for more information on the messenger. */
     dataUpdate(updateMemberName,data) {

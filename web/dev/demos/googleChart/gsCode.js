@@ -29,7 +29,7 @@ function renderChart() {
     //---------------------
     // LOAD POPULATION DATA
     //---------------------
-    var populationDataPromise = apogee.net.jsonRequest(url);
+    var populationDataPromise = .jsonRequest(url);
     populationDataPromise.then(processData).catch(onRequestError);
 }
 

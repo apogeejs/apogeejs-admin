@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import Apogee from "/apogeeapp/app/Apogee.js";
 import Component from "/apogeeapp/app/component/Component.js";
@@ -172,7 +172,7 @@ export default class CustomComponent extends EditComponent {
                 try {
 
                     //create the resource generator wrapped with its closure
-                    var generatorFunctionBody = util.formatString(
+                    var generatorFunctionBody = apogeeutil.formatString(
                         CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
                         uiGeneratorBody
                     );
@@ -209,7 +209,7 @@ export default class CustomComponent extends EditComponent {
 
     doCodeFieldUpdate(uiCodeField,fieldValue) { 
         var initialCodeFields = this.getUiCodeFields();
-        var targetCodeFields = util.jsonCopy(initialCodeFields);
+        var targetCodeFields = apogeeutil.jsonCopy(initialCodeFields);
         targetCodeFields[uiCodeField] = fieldValue;
 
         var command = {};

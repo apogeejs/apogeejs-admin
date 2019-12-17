@@ -53,7 +53,7 @@
 					"type": "apogee.JsonTable",
 					"updateData": {
 						"argList": [],
-						"functionBody": "var request = url + \"?\" + query;\n\nreturn apogee.net.jsonRequest(request);",
+						"functionBody": "var request = url + \"?\" + query;\n\nreturn .jsonRequest(request);",
 						"supplementalCode": "",
 						"description": ""
 					}
@@ -79,7 +79,7 @@
 					"type": "apogee.JsonTable",
 					"updateData": {
 						"argList": [],
-						"functionBody": "var output = [];\n\nfor(var key in tags) {\n    var entry = tags[key];\n    var newEntry = apogee.util.jsonCopy(entry);\n    newEntry.score = getScore(newEntry);\n    newEntry.key = key;\n    output.push(newEntry);\n}\n\n\nvar compare = function(a,b) {\n    return b.score - a.score;\n}\n\noutput.sort(compare);\n\nreturn output;",
+						"functionBody": "var output = [];\n\nfor(var key in tags) {\n    var entry = tags[key];\n    var newEntry = apogeeutil.jsonCopy(entry);\n    newEntry.score = getScore(newEntry);\n    newEntry.key = key;\n    output.push(newEntry);\n}\n\n\nvar compare = function(a,b) {\n    return b.score - a.score;\n}\n\noutput.sort(compare);\n\nreturn output;",
 						"supplementalCode": "function getScore(entry) {\n    var total = 0;\n    for(var key in entry) {\n        total += entry[key];\n    }\n    return total;\n}",
 						"description": ""
 					}

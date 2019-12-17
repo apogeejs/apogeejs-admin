@@ -1,10 +1,10 @@
 import { Apogee, initIncludePath } from "/apogeeapp/apogeeAppLib.js";
 import CutNPasteAppConfigManager from "/applications/cutnpastewebapp/CutNPasteAppConfigManager.js";
-import {apogee} from "/apogeeutil/apogeeUtilLib.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 
 //expose these apogee libraries
-window.apogee = apogee;
+window.apogeeutil = apogeeutil;
 
 window.init = function() {
 

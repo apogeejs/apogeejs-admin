@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import {showConfigurableDialog} from "/apogeeapp/app/dialogs/ConfigurableDialog.js";
 import Apogee from "/apogeeapp/app/Apogee.js";
@@ -83,9 +83,9 @@ export function updateLink(referenceEntry) {
     titleLine.type = "title";
     titleLine.title = entryTypeInfo.UPDATE_ENTRY_TEXT;
 
-    var urlLine = util.jsonCopy(DIALOG_LAYOUT_URL_LINE);
+    var urlLine = apogeeutil.jsonCopy(DIALOG_LAYOUT_URL_LINE);
     urlLine.initial = initialValues.url;
-    var nicknameLine = util.jsonCopy(DIALOG_LAYOUT_NICKNAME_LINE);
+    var nicknameLine = apogeeutil.jsonCopy(DIALOG_LAYOUT_NICKNAME_LINE);
     nicknameLine.initial = initialValues.nickname;
 
     var dialogLayout = {};

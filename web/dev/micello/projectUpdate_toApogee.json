@@ -44,7 +44,7 @@
 					"type": "apogee.JsonTable",
 					"updateData": {
 						"argList": [],
-						"functionBody": "var projectJson = apogee.util.jsonCopy(stringsReplaced);\n\nvar componentsJson = projectJson.components;\ncheckForControls(componentsJson);\n\nreturn projectJson;",
+						"functionBody": "var projectJson = apogeeutil.jsonCopy(stringsReplaced);\n\nvar componentsJson = projectJson.components;\ncheckForControls(componentsJson);\n\nreturn projectJson;",
 						"supplementalCode": "function checkForControls(folderComponents) {\n    for(var tableName in folderComponents) {\n        var tableJson = folderComponents[tableName];\n        \n        if(tableJson.type == \"apogeeapp.app.CustomControlComponent\") {\n            var resource =  tableJson.resource;\n            var customizeScript = resource.customizeScript;\n            if(customizeScript !== undefined) {\n                delete resource.customizeScript;\n                resource.setData = customizeScript;\n            }\n            var supplementalCode = tableJson.resource.supplementalCode;\n            if(supplementalCode !== undefined) {\n                delete resource.supplementalCode;\n                resource.constructorAddition = supplementalCode;\n            }\n            alert(\"Custom control needs fixing: \" + tableName);\n        }\n        \n        if(tableJson.children) {\n            checkForControls(tableJson.children);\n        }\n    }\n}",
 						"description": ""
 					}

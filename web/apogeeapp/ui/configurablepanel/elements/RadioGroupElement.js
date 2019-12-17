@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
@@ -35,7 +35,7 @@ export default class RadioGroupElement extends ConfigurableElement {
             
             var label;
             var value;
-            if(util.getObjectType(buttonInfo) == "Array") {
+            if(apogeeutil.getObjectType(buttonInfo) == "Array") {
                 label = buttonInfo[0]
                 value = buttonInfo[1];     
             }

@@ -1,4 +1,4 @@
-import {net} from "/apogeeutil/apogeeUtilLib.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 /** 
  * This is the format of the AppConfigManager. This class does not need
@@ -28,7 +28,7 @@ export default class WebAppConfigManager {
      * that should be loaded
      */
     getInitialWorkspaceFilePromise(app) {
-        return net.textRequest(this.workspaceUrl);
+        return apogeeutil.textRequest(this.workspaceUrl);
     }
     
     /** This method should return the file metadata for the intial workspace.

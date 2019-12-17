@@ -2,7 +2,7 @@ import ReferenceEntry from "/apogeeapp/app/references/ReferenceEntry.js";
 
 import * as apogee from "/apogee/apogeeCoreLib.js";
 import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
-import * as apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 /* 
  * To change this license header, choose License Headers in Project Properties.

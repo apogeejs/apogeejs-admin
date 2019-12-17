@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
@@ -91,7 +91,7 @@ export default class HandsonGridEditor extends DataDisplay {
     
     getData() {
         //update "input" data before calling update
-        if(this.gridControl) this.inputData = util.jsonCopy(this.gridControl.getData());
+        if(this.gridControl) this.inputData = apogeeutil.jsonCopy(this.gridControl.getData());
         return this.inputData;
     }
     
@@ -200,7 +200,7 @@ export default class HandsonGridEditor extends DataDisplay {
         //clear the cached data flag, if it is present
         this.dataCached = false;
 
-        var editData = util.jsonCopy(this.inputData);
+        var editData = apogeeutil.jsonCopy(this.inputData);
         if(!editData) {
             editData = [[]];
         }

@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import {showConfigurableDialog} from "/apogeeapp/app/dialogs/ConfigurableDialog.js";
 
@@ -33,7 +33,7 @@ export function updateWorkspaceProperties(workspaceUI) {
     initialValues.name = workspace.getName();
 
     //create the dialog layout
-    var nameLine = util.jsonCopy(DIALOG_LAYOUT_NAME_LINE);
+    var nameLine = apogeeutil.jsonCopy(DIALOG_LAYOUT_NAME_LINE);
     nameLine.initial = initialValues.name;
 
     var dialogLayout = {};

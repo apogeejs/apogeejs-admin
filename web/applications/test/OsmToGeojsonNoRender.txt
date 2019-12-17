@@ -53,8 +53,8 @@
 					"type": "apogee.JsonTable",
 					"updateData": {
 						"argList": [],
-						"functionBody": "var options = {};\noptions.method = \"POST\";\noptions.body = getBody(swneBoundingBox);\n\nreturn apogee.net.jsonRequest(url,options);",
-						"supplementalCode": "function getBody(boundingBoxArray) {\n    var bboxString = boundingBoxArray.join(\",\");\n    var body = apogee.util.formatString(\"[out:json];(node({0});(way({0});>;););out;\",bboxString);\n    return body;\n}",
+						"functionBody": "var options = {};\noptions.method = \"POST\";\noptions.body = getBody(swneBoundingBox);\n\nreturn .jsonRequest(url,options);",
+						"supplementalCode": "function getBody(boundingBoxArray) {\n    var bboxString = boundingBoxArray.join(\",\");\n    var body = apogeeutil.formatString(\"[out:json];(node({0});(way({0});>;););out;\",bboxString);\n    return body;\n}",
 						"description": ""
 					}
 				},

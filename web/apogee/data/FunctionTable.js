@@ -1,5 +1,5 @@
 import base from "/apogeeutil/base.js";
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Workspace from "/apogee/data/Workspace.js";
 import Member from "/apogee/datacomponents/Member.js";
 import Dependent from "/apogee/datacomponents/Dependent.js";

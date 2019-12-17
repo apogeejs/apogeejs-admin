@@ -1,5 +1,5 @@
 import base from "/apogeeutil/base.js";
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import { Workspace, doAction } from "/apogee/apogeeCoreLib.js";
 
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
@@ -279,7 +279,7 @@ export default class WorkspaceUI {
                 var component = new componentGenerator(this,member);
 
                 //call member updated to process and notify of component creation
-                var eventInfo = util.getAllFieldsInfo(member);
+                var eventInfo = apogeeutil.getAllFieldsInfo(member);
                 component.memberUpdated(eventInfo);
 
                 //apply any serialized values

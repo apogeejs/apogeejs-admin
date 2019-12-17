@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import ParentComponent from "/apogeeapp/app/component/ParentComponent.js";
 import LiteratePageComponentDisplay from "/apogeeapp/app/component/literatepage/LiteratePageComponentDisplay.js";
@@ -95,7 +95,7 @@ export default class FolderFunctionComponent extends ParentComponent {
     static transferMemberProperties(inputValues,propertyJson) {
         if(!propertyJson.updateData) propertyJson.updateData = {};
         if(inputValues.argListString !== undefined) {
-            propertyJson.updateData.argList = util.parseStringArray(inputValues.argListString);
+            propertyJson.updateData.argList = apogeeutil.parseStringArray(inputValues.argListString);
         }
         if(inputValues.returnValueString !== undefined) {
             propertyJson.updateData.returnValue = inputValues.returnValueString;

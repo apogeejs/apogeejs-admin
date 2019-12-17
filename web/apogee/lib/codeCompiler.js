@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {KEYWORDS, EXCLUSION_NAMES, analyzeCode} from "/apogee/lib/codeAnalysis.js"; 
 
 /** @private */
@@ -91,7 +91,7 @@ function createCombinedFunctionBody(argList,
     var argListString = argList.join(",");
     
     //create the code body
-    var combinedFunctionBody = util.formatString(
+    var combinedFunctionBody = apogeeutil.formatString(
         MEMBER_FUNCTION_FORMAT_TEXT,
 		codeLabel,
         argListString,
@@ -132,7 +132,7 @@ function createGeneratorFunction(varInfo, combinedFunctionBody) {
     }
     
     //create the generator for the object function
-    var generatorBody = util.formatString(
+    var generatorBody = apogeeutil.formatString(
         GENERATOR_FUNCTION_FORMAT_TEXT,
 		contextDeclarationText,
         initializerBody,

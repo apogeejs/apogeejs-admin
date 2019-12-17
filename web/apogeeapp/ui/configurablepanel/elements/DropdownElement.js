@@ -1,4 +1,4 @@
-import util from "/apogeeutil/util.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ConfigurableElement from "/apogeeapp/ui/configurablepanel/ConfigurableElement.js";
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 
@@ -27,7 +27,7 @@ export default class DropdownElement extends ConfigurableElement {
         var addEntry = entryInfo => {
             var label;
             var value;
-            if(util.getObjectType(entryInfo) == "Array") {
+            if(apogeeutil.getObjectType(entryInfo) == "Array") {
                 label = entryInfo[0]
                 value = entryInfo[1];
             }
