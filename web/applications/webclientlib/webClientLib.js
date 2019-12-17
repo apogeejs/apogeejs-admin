@@ -1,3 +1,4 @@
+import "/apogee/webGlobals.js";
 import { Apogee, initIncludePath, WebComponentDisplay } from "/apogeeapp/apogeeAppLib.js";
 import WebAppConfigManager from "/applications/webclientlib/WebAppConfigManager.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";

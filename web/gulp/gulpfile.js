@@ -21,6 +21,7 @@ const ASSETS_FOLDER = RELEASE_FOLDER + "/assets";
 
 const WEBAPP_FOLDER = RELEASE_FOLDER + "/webapp";
 const ELECTRON_FOLDER = RELEASE_FOLDER + "/electronapp";
+const NODE_FOLDER = RELEASE_FOLDER + "/nodelib";
 const TEMP_FOLDER = "temp";
 
 //======================================
@@ -33,118 +34,6 @@ const BASE_FILES = [
 ]
 
 let copyReleaseInfoTask = () => copyFilesTask(BASE_FILES,RELEASE_FOLDER);
-
-//==============================
-// Package Util Lib
-//==============================
-
-const UTIL_LIB_BASE_FILE_NAME = "apogeeUtilLib";
-const UTIL_LIB_ES_FILE_NAME = UTIL_LIB_BASE_FILE_NAME + ".es.js"
-const UTIL_LIB_CJS_FILE_NAME = UTIL_LIB_BASE_FILE_NAME + ".cjs.js"
-
-function packageUtilLibTask() {
-    return rollup.rollup({
-        input: '../apogeeutil/apogeeUtilLib.js',
-		plugins: [
-			{resolveId}
-		]
-    }).then(bundle => {
-        return Promise.all([
-            bundle.write(
-                { 
-                    file: ASSETS_FOLDER + "/" + UTIL_LIB_ES_FILE_NAME,
-                    format: 'es'
-                }
-            ),
-            bundle.write(
-                { 
-                    file: ELECTRON_FOLDER + "/" + UTIL_LIB_CJS_FILE_NAME,
-                    format: 'cjs'
-                }
-            )
-        ])
-    });
-}
-
-//==============================
-// Package Core Lib
-//==============================
-
-const CORE_LIB_BASE_FILE_NAME = "apogeeCoreLib";
-const CORE_LIB_ES_FILE_NAME = CORE_LIB_BASE_FILE_NAME + ".es.js"
-const CORE_LIB_CJS_FILE_NAME = CORE_LIB_BASE_FILE_NAME + ".cjs.js"
-
-function packageCoreLibTask() {
-    return rollup.rollup({
-        input: '../apogee/apogeeCoreLib.js',
-        external: ["/apogeeutil/apogeeUtilLib.js"],
-		plugins: [
-			{resolveId}
-        ]
-    }).then(bundle => {
-        return Promise.all([
-            bundle.write(
-                { 
-                    file: ASSETS_FOLDER + "/" + CORE_LIB_ES_FILE_NAME,
-                    format: 'es',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js"
-                    }
-                }
-            ),
-            bundle.write(
-                { 
-                    file: ELECTRON_FOLDER + "/" + CORE_LIB_CJS_FILE_NAME,
-                    format: 'cjs',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js"
-                    }
-                }
-            )
-        ])
-    });
-}
-
-//==============================
-// Package App Lib
-//==============================
-
-const APP_LIB_BASE_FILE_NAME = "apogeeAppLib";
-const APP_LIB_ES_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".es.js"
-const APP_LIB_CJS_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".cjs.js"
-
-function packageAppLibTask() {
-    return rollup.rollup({
-        input: '../apogeeapp/apogeeAppLib.js',
-        external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js"],
-		plugins: [
-			{resolveId}
-        ]
-    }).then(bundle => {
-        return Promise.all([
-            bundle.write(
-                { 
-                    file: ASSETS_FOLDER + "/" + APP_LIB_ES_FILE_NAME,
-                    format: 'es',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js",
-                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.es.js"
-                    }
-                }
-            ),
-            bundle.write(
-                { 
-                    file: ELECTRON_FOLDER + "/" + APP_LIB_CJS_FILE_NAME,
-                    format: 'cjs',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
-                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.cjs.js"
-                    }
-                }
-            )
-        ])
-    });
-}
 
 //=================================
 // Package CSS
@@ -205,8 +94,7 @@ function copyAceIncludesTask() {
 //----------------
 
 let copyGlobalsFiles = parallel(
-    () => copyFilesTask(["../apogee/webGlobals;js"],ASSETS_FOLDER),
-    () => copyFilesTask(["../apogee/nodeGlobals;js"],ELECTRON_FOLDER),
+    () => copyFilesTask(["../apogee/nodeGlobals.js"],NODE_FOLDER),
 )
 
 //==============================
@@ -231,7 +119,6 @@ const WEB_APP_JS_FILENAME = "apogeeWebApp.js";
 function packageWebAppTask() {
     return rollup.rollup({
         input: '../applications/cutnpastewebapp/app.js',
-        external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js"],
         plugins: [
             {resolveId}
         ]
@@ -239,12 +126,7 @@ function packageWebAppTask() {
         return bundle.write(
             { 
                 file: ASSETS_FOLDER + "/" + WEB_APP_JS_FILENAME,
-                format: 'es',
-                paths: {
-                    "/apogeeutil/apogeeUtilLib.js": "./" + UTIL_LIB_ES_FILE_NAME,
-                    "/apogee/apogeeCoreLib.js": "./" + CORE_LIB_ES_FILE_NAME,
-                    "/apogeeapp/apogeeAppLib.js": "./" + APP_LIB_ES_FILE_NAME
-                },
+                format: 'es'
             }
         );
     });
@@ -279,7 +161,6 @@ function prepareClientLibTask() {
 function packageClientLibTask() {
     return rollup.rollup({
         input: TEMP_FOLDER + '/' + CLIENT_LIB_INTERMEDIATE_FILENAME,
-        external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js"],
         plugins: [
             {resolveId}
         ]
@@ -288,12 +169,7 @@ function packageClientLibTask() {
             bundle.write(
                  { 
                     file: ASSETS_FOLDER + "/" + CLIENT_LIB_ES_FILENAME, 
-                    format: 'es',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": CLIENT_LIB_ASSETS_BASE_URL + "/" + UTIL_LIB_ES_FILE_NAME,
-                        "/apogee/apogeeCoreLib.js": CLIENT_LIB_ASSETS_BASE_URL + "/" + CORE_LIB_ES_FILE_NAME,
-                        "/apogeeapp/apogeeAppLib.js": CLIENT_LIB_ASSETS_BASE_URL + "/" + APP_LIB_ES_FILE_NAME
-                    }
+                    format: 'es'
                 }
             )
         ]
@@ -347,6 +223,110 @@ function prepareElectronPackageJsonTask() {
         .pipe(dest(ELECTRON_FOLDER));
 }
 
+
+//==============================
+// Package Util Lib
+//==============================
+
+const UTIL_LIB_BASE_FILE_NAME = "apogeeUtilLib";
+const UTIL_LIB_ES_FILE_NAME = UTIL_LIB_BASE_FILE_NAME + ".es.js"
+const UTIL_LIB_CJS_FILE_NAME = UTIL_LIB_BASE_FILE_NAME + ".cjs.js"
+
+function packageUtilLibTask() {
+    return rollup.rollup({
+        input: '../apogeeutil/apogeeUtilLib.js',
+		plugins: [
+			{resolveId}
+		]
+    }).then(bundle => {
+        return Promise.all([
+            bundle.write(
+                { 
+                    file: ELECTRON_FOLDER + "/" + UTIL_LIB_CJS_FILE_NAME,
+                    format: 'cjs'
+                }
+            ),
+            bundle.write(
+                { 
+                    file: NODE_FOLDER + "/" + UTIL_LIB_CJS_FILE_NAME,
+                    format: 'cjs'
+                }
+            )
+        ])
+    });
+}
+
+//==============================
+// Package Core Lib
+//==============================
+
+const CORE_LIB_BASE_FILE_NAME = "apogeeCoreLib";
+const CORE_LIB_ES_FILE_NAME = CORE_LIB_BASE_FILE_NAME + ".es.js"
+const CORE_LIB_CJS_FILE_NAME = CORE_LIB_BASE_FILE_NAME + ".cjs.js"
+
+function packageCoreLibTask() {
+    return rollup.rollup({
+        input: '../apogee/apogeeCoreLib.js',
+        external: ["/apogeeutil/apogeeUtilLib.js"],
+		plugins: [
+			{resolveId}
+        ]
+    }).then(bundle => {
+        return Promise.all([
+            bundle.write(
+                { 
+                    file: ELECTRON_FOLDER + "/" + CORE_LIB_CJS_FILE_NAME,
+                    format: 'cjs',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js"
+                    }
+                }
+            ),
+            bundle.write(
+                { 
+                    file: NODE_FOLDER + "/" + CORE_LIB_CJS_FILE_NAME,
+                    format: 'cjs',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js"
+                    }
+                }
+            ),
+        ])
+    });
+}
+
+//==============================
+// Package App Lib
+//==============================
+
+const APP_LIB_BASE_FILE_NAME = "apogeeAppLib";
+const APP_LIB_ES_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".es.js"
+const APP_LIB_CJS_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".cjs.js"
+
+function packageAppLibTask() {
+    return rollup.rollup({
+        input: '../apogeeapp/apogeeAppLib.js',
+        external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js"],
+		plugins: [
+			{resolveId}
+        ]
+    }).then(bundle => {
+        return Promise.all([
+            bundle.write(
+                { 
+                    file: ELECTRON_FOLDER + "/" + APP_LIB_CJS_FILE_NAME,
+                    format: 'cjs',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
+                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.cjs.js"
+                    }
+                }
+            )
+        ])
+    });
+}
+
+
 //==============================
 // Utility Tasks
 //==============================
@@ -393,15 +373,15 @@ exports.release = series(
     cleanTask,
     parallel(
         copyReleaseInfoTask,
-        packageUtilLibTask,
-        packageCoreLibTask,
-        packageAppLibTask,
         packageCssTask,
         copyResourcesTask,
         copyAceIncludesTask,
         copyGlobalsFiles,
         releaseWebAppTask,
         releaseWebClientLibTask,
-        releaseElectronTask
+        releaseElectronTask,
+        packageUtilLibTask,
+        packageCoreLibTask,
+        packageAppLibTask
     )
 );

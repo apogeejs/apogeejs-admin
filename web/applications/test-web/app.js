@@ -1,3 +1,4 @@
+import "/apogee/webGlobals.js";
 import { Apogee, initIncludePath } from "/apogeeapp/apogeeAppLib.js";
 import CutNPasteAppConfigManager from "/applications/cutnpastewebapp/CutNPasteAppConfigManager.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";

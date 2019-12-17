@@ -1,3 +1,4 @@
+import "/apogee/nodeGlobals.js";
 import { Apogee, initIncludePath } from "/apogeeapp/apogeeAppLib.js";
 import ElectronAppConfigManager from "./ElectronAppConfigManager.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
