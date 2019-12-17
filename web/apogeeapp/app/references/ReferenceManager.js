@@ -1,6 +1,6 @@
 import {addLink} from "/apogeeapp/app/commandseq/updatelinkseq.js";
 import {bannerConstants,getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
-import AmdModuleEntry from "/apogeeapp/app/references/AmdModuleEntry.js";
+import EsModuleEntry from "/apogeeapp/app/references/EsModuleEntry.js";
 import NpmModuleEntry from "/apogeeapp/app/references/NpmModuleEntry.js";
 import JsScriptEntry from "/apogeeapp/app/references/JsScriptEntry.js";
 import CssEntry from "/apogeeapp/app/references/CssEntry.js";
@@ -22,7 +22,7 @@ export default class ReferenceManager {
         
         //references
         this.referenceLists = {};
-        if(__APOGEE_ENVIRONMENT__ == "WEB") this.referenceLists[AmdModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(AmdModuleEntry.REFERENCE_TYPE_INFO);
+        if(__APOGEE_ENVIRONMENT__ == "WEB") this.referenceLists[EsModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(EsModuleEntry.REFERENCE_TYPE_INFO);
         if(__APOGEE_ENVIRONMENT__ == "NODE") this.referenceLists[NpmModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(NpmModuleEntry.REFERENCE_TYPE_INFO);
         this.referenceLists[JsScriptEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(JsScriptEntry.REFERENCE_TYPE_INFO);
         this.referenceLists[CssEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(CssEntry.REFERENCE_TYPE_INFO);

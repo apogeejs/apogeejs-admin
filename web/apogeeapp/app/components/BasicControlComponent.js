@@ -86,9 +86,14 @@ export default class BasicControlComponent extends EditComponent{
     static attachStandardStaticProperties(componentGenerator,displayName,uniqueName) {
         componentGenerator.displayName = displayName;
         componentGenerator.uniqueName = uniqueName;
+        componentGenerator.hasTabEntry = false;
+        componentGenerator.hasChildEntry = true;
         componentGenerator.DEFAULT_WIDTH = 500;
         componentGenerator.DEFAULT_HEIGHT = 500;
         componentGenerator.ICON_RES_PATH = "/componentIcons/chartControl.png";
+        componentGenerator.DEFAULT_MEMBER_JSON = {
+            "type": "apogee.JsonTable"
+        };
     }
 }
 

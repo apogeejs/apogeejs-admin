@@ -150,6 +150,12 @@ export default class Apogee extends EventManager {
         }
     }
 
+    /** This method registers a new component. It will be exposed when the user
+     * requests to create a new component */
+    unregisterComponent(componentGenerator) {
+        //implement this
+    }
+
     /** This method returns a component generator of a given name. */
     getComponentGenerator(name) {
         return this.componentGenerators[name];
