@@ -106,8 +106,6 @@ DynamicForm.displayName = "Dynamic Form";
 DynamicForm.uniqueName = "apogeeapp.app.DynamicForm";
 DynamicForm.hasTabEntry = false;
 DynamicForm.hasChildEntry = true;
-DynamicForm.DEFAULT_WIDTH = 400;
-DynamicForm.DEFAULT_HEIGHT = 400;
 DynamicForm.ICON_RES_PATH = "/componentIcons/formControl.png";
 DynamicForm.DEFAULT_MEMBER_JSON = {
     "type": "apogee.FunctionTable",

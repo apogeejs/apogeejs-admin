@@ -346,8 +346,6 @@ CustomComponent.displayName = "Custom Component";
 CustomComponent.uniqueName = "apogeeapp.app.CustomComponent";
 CustomComponent.hasTabEntry = false;
 CustomComponent.hasChildEntry = true;
-CustomComponent.DEFAULT_WIDTH = 500;
-CustomComponent.DEFAULT_HEIGHT = 500;
 CustomComponent.ICON_RES_PATH = "/componentIcons/chartControl.png";
 CustomComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.JsonTable"

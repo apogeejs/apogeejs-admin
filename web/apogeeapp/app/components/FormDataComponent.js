@@ -164,8 +164,6 @@ FormDataComponent.displayName = "Form Data Table";
 FormDataComponent.uniqueName = "apogeeapp.app.FormDataComponent";
 FormDataComponent.hasTabEntry = false;
 FormDataComponent.hasChildEntry = true;
-FormDataComponent.DEFAULT_WIDTH = 300;
-FormDataComponent.DEFAULT_HEIGHT = 300;
 FormDataComponent.ICON_RES_PATH = "/componentIcons/formControl.png";
 FormDataComponent.DEFAULT_MEMBER_JSON = {
         "type": "apogee.Folder",

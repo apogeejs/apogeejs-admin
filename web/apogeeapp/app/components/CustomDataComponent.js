@@ -350,8 +350,6 @@ CustomDataComponent.displayName = "Custom Data Component";
 CustomDataComponent.uniqueName = "apogeeapp.app.CustomDataComponent";
 CustomDataComponent.hasTabEntry = false;
 CustomDataComponent.hasChildEntry = true;
-CustomDataComponent.DEFAULT_WIDTH = 500;
-CustomDataComponent.DEFAULT_HEIGHT = 500;
 CustomDataComponent.ICON_RES_PATH = "/componentIcons/formControl.png";
 CustomDataComponent.DEFAULT_MEMBER_JSON = {
         "type": "apogee.Folder",

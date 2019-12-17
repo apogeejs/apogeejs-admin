@@ -1,5 +1,9 @@
 import ReferenceEntry from "/apogeeapp/app/references/ReferenceEntry.js";
 
+import * as apogee from "/apogee/apogeeCoreLib.js";
+import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
+import * as apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -22,7 +26,7 @@ export default class AmdModuleEntry extends ReferenceEntry {
                 //store the module return, if there is one
                 //this is only used for cleanup
                 this.module = module;
-                if((module)&&(module.initApogeeModule)) module.initApogeeModule(apogee,apogeeapp);
+                if((module)&&(module.initApogeeModule)) module.initApogeeModule(apogee,apogeeapp,apogeeutil);
                 
                 console.log("Module loaded: " + this.url);
                 this.setClearState();
@@ -50,7 +54,7 @@ export default class AmdModuleEntry extends ReferenceEntry {
     /** This method removes the link. */
     remove() {
         //allow for an optional module remove step
-        if((this.module)&&(this.module.removeApogeeModule)) this.module.removeApogeeModule(apogee,apogeeapp);
+        if((this.module)&&(this.module.removeApogeeModule)) this.module.removeApogeeModule(apogee,apogeeapp,apogeeutil);
         
         require.undef(this.url);
 

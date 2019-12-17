@@ -181,8 +181,6 @@ JsonTableComponent.uniqueName = "apogeeapp.app.JsonTableComponent";
 JsonTableComponent.hasTabEntry = false;
 /** If true, this indicates the component has an entry appearing on the parent tab */
 JsonTableComponent.hasChildEntry = true;
-JsonTableComponent.DEFAULT_WIDTH = 300;
-JsonTableComponent.DEFAULT_HEIGHT = 300;
 /** This is the icon url for the component. */
 JsonTableComponent.ICON_RES_PATH = "/componentIcons/dataTable.png";
 /** This field gives the default value for the JSON taht should be deserialized to
