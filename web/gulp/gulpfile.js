@@ -94,6 +94,7 @@ function copyAceIncludesTask() {
 //----------------
 
 let copyGlobalsFiles = parallel(
+    () => copyFilesTask(["../apogee/nodeGlobals.js"],ELECTRON_FOLDER),
     () => copyFilesTask(["../apogee/nodeGlobals.js"],NODE_FOLDER),
 )
 
@@ -198,7 +199,7 @@ let releaseElectronTask = parallel(
 function packageElectronSourceTask() {
     return rollup.rollup({
         input: '../applications/electronapp/app.js',
-		external: ['fs',"/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js"],
+		external: ['fs',"/apogee/nodeGLobals.js","/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js"],
 		plugins: [
 			{resolveId}
 		]
@@ -208,6 +209,7 @@ function packageElectronSourceTask() {
                 file: ELECTRON_FOLDER + "/" + ELECTRON_APP_JS_FILENAME,
                 format: 'cjs',
                 paths: {
+                    "/apogee/nodeGlobals.js": "./nodeGlobals.js",
                     "/apogeeutil/apogeeUtilLib.js": "./" + UTIL_LIB_CJS_FILE_NAME,
                     "/apogee/apogeeCoreLib.js": "./" + CORE_LIB_CJS_FILE_NAME,
                     "/apogeeapp/apogeeAppLib.js": "./" + APP_LIB_CJS_FILE_NAME
