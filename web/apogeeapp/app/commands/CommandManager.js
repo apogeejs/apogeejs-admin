@@ -18,7 +18,7 @@ import CommandHistory from "./CommandHistory.js";
  * }
  * 
  * Command Object - Should be registered with "registerFunction". It should contain the following things:
- * - function executeCommand(workspaceUI,commandData) = This exectues the command and return a commandResult object.
+ * - function executeCommand(workspaceUI,commandData,optionalAsynchOnComplete) = This exectues the command and return a commandResult object.
  * - function createUnfoCommand(workspceUI,commandData) - This creates an undo command json from the given command json.
  * - string COMMAND_TYPE - This is the command type.
  *  
@@ -49,9 +49,10 @@ export default class CommandManager {
     }
     
     /** This method executes the given command and, if applicable, adds it to the queue. 
-     * Supress history is a temp addition for testing.
+     * Supress history does not add this command to the history. It is used by the history for
+     * undo commands/redo commands.
     */
-    executeCommand(command,suppressFromHistory) {
+    executeCommand(command,asynchOnComplete,suppressFromHistory) {
         var workspaceUI = this.app.getWorkspaceUI();
         let commandResult;
         
@@ -67,7 +68,7 @@ export default class CommandManager {
 
         if(commandObject) {
             try {
-                commandResult = commandObject.executeCommand(workspaceUI,command);
+                commandResult = commandObject.executeCommand(workspaceUI,command,asynchOnComplete);
             }
             catch(error) {
                 if(error.stack) console.error(error.stack);
@@ -117,7 +118,7 @@ export default class CommandManager {
     }
     
     /** This registers a command. The command object should hold two functions,
-     * executeCommand(workspaceUI,commandData) and, if applicable, createUndoCommand(workspaceUI,commandData)
+     * executeCommand(workspaceUI,commandData,optionalAsynchOnComplete) and, if applicable, createUndoCommand(workspaceUI,commandData)
      * and it should have the constant COMMAND_TYPE.
      */
     static registerCommand(commandObject) {

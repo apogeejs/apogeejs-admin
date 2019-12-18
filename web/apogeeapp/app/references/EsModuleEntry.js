@@ -40,7 +40,7 @@ export default class EsModuleEntry extends ReferenceEntry {
         }
             
         this.setPendingState();
-//        var moduleLoadPromise = import(this.url).then(onLoad).catch(onError);
+        var moduleLoadPromise = import(this.url).then(onLoad).catch(onError);
 
         //call link added to references
         this.referenceManager.entryInserted(this);

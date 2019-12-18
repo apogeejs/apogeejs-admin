@@ -33,7 +33,7 @@ updatelink.createUndoCommand = function(workspaceUI,commandData) {
     return undoCommandJson;
 }
 
-updatelink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
+updatelink.executeCommand = function(workspaceUI,commandData) {
     
     var commandResult = {};
 

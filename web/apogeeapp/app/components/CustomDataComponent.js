@@ -432,7 +432,7 @@ customDataComponentUpdateData.createUndoCommand = function(workspaceUI,commandDa
    return undoCommandData;
 }
 
-customDataComponentUpdateData.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
+customDataComponentUpdateData.executeCommand = function(workspaceUI,commandData,) {
    let component = workspaceUI.getComponentByFullName(commandData.memberFullName);
    var commandResult = {};
    if(component) {
