@@ -39,7 +39,7 @@ literatepagetransaction.createUndoCommand = function(workspaceUI,commandData) {
  * be extended to edit the values of those properties too. */
 literatepagetransaction.executeCommand = function(workspaceUI,commandData) {
     
-    var error = false;;
+    var error = false;
     var errorMsg;
     
     var workspace = workspaceUI.getWorkspace();

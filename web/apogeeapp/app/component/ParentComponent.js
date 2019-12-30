@@ -78,11 +78,20 @@ export default class ParentComponent extends Component {
             //this will hold the resulting command
             let apogeeCommand;
 
-            if(transactionUpdatesModel(transaction)) {
+            let initialSelection = this.editorData.selection;
+            let initialMarks = this.editorData.marks;
+
+            if(this.transactionUpdatesModel(transaction)) {
+
+                let commandList = [];
+                let allDeletedNames = [];
 
                 //record if the transaction sets the selection or markSet
-                let selection = transaction.selectionSet ? transaction.selection : null;
-                let markSet = transaction.storedMarksSet ? transaction.storedMarks : null;
+                let finalSelection = transaction.selectionSet ? transaction.selection : null;
+                let finalStoredMarks = transaction.storedMarksSet ? transaction.storedMarks : null;
+
+                let workingInitialSelection = initialSelection;
+                let workingInitialMarks = initialMarks;
 
                 //process each step, mapping to new steps
                 let activeNameMap = this.createActiveNameMap();
@@ -100,29 +109,32 @@ export default class ParentComponent extends Component {
                     let deletedComponentShortNames = this.getStepDeletedComponentShortNames(oldStep,oldStepDoc);
                     if(deletedComponentShortNames.length > 0) {
                         //update active name map
-                        activeNameMap = this.updateActiveNameMapForDelete(activeNameMap,deletedComponentShortNames);
+                        this.updateActiveNameMapForDelete(activeNameMap,deletedComponentShortNames);
 
                         //get delete commands
                         deleteComponentCommands = this.createDeleteComponentCommands(deletedComponentShortNames);
+
+                        //save the deleted names so we can warn the user about the delete
+                        allDeletedNames = allDeletedNames.concat(deletedComponentShortNames);
                     }
 
                     //--------------------------------------
                     //process the step for any added components including potentially modifying the slice
                     //--------------------------------------
                     let createComponentCommands;
-                    let { newSliceContentJson, createdComponentInfos } = this.processForStepComponentCreateCommands(oldStepJson,activeNameMap);
+                    let { newSliceContentJson, createdComponentInfos } = this.processForStepComponentCreateCommands(oldStep,oldStepJson,activeNameMap);
                     if(createdComponentInfos.length > 0) {
-                        //update active name map
-                        activeNameMap = this.updateActiveNameMapForCreate(activeNameMap,createdComponentInfos);
-
                         //get the create commands
                         createComponentCommands = this.createCreateComponentCommands(createdComponentInfos);
+
+                        //perhaps confusingly, the activeNameMap is updated in place in the above function so we don't have to 
+                        //do it here.
                     }
 
                     //--------------------------------------
                     // Update the new transaction and commands
                     //--------------------------------------
-                    if((deleteComponentComands)||(createComponentCommands)) {
+                    if((deleteComponentCommands)||(createComponentCommands)) {
                         //we want to modify the step and insert the delete and/or create component commands
 
                         //----------------------------------
@@ -137,7 +149,7 @@ export default class ParentComponent extends Component {
                         //close out the old transaction if needed, starting a new one
                         if(transactionModified) {
                             //save the transaction as a command (so we can add the model commands now)
-                            let editorCommand = this.createEditorCommand(modifiedTransaction);
+                            let editorCommand = this.createEditorCommand(modifiedTransaction,workingInitialSelection,workingInitialMarks);
                             commandList.push(editorCommand);
 
                             //create a new transaction
@@ -148,6 +160,8 @@ export default class ParentComponent extends Component {
                             let intermediateState = EditorState.create(config);
 
                             modifiedTransaction = intermediateState.tr;
+                            workingInitialSelection = config.selection;
+                            workingInitialMarks = config.storedMarks;
                             transactionModified = false;
                         }
 
@@ -173,23 +187,44 @@ export default class ParentComponent extends Component {
 
                 })
 
+                //if the selection or stored marks was explicitly set in the transaction, add these back to the final new transaction
+                if(finalSelection) {
+                    let fixedSelection = this.convertSelectionToNewDoc(finalSelection,modifiedTransaction.doc);
+                    modifiedTransaction.setSelection(fixedSelection);
+                    transactionModified = true;
+                }
+                if(finalStoredMarks) {
+                    modifiedTransaction.setStoredMarks(finalStoredMarks);
+                    transactionModified = true;
+                }
+
                 //close out the final transaction, if needed
                 if(transactionModified) {
                     //save the transaction as a command (so we can add the model commands now)
-                    let editorCommand = this.createEditorCommand(modifiedTransaction);
+                    let editorCommand = this.createEditorCommand(modifiedTransaction,workingInitialSelection,workingInitialMarks);
                     commandList.push(editorCommand);
                 }
 
+                //-------------------
+                // Get verificaion if we are deleting anything
+                //-------------------
+                if(allDeletedNames.length > 0) {
+                    let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + allDeletedNames);
+                    if(!doDelete) return;
+                }
+
+                //-------------------------
                 //create the apogee command for the input transaction
+                //-------------------------
                 apogeeCommand = {};
                 apogeeCommand.type = "compoundCommand";
-                apogeeCommand.childCommands = commands;
+                apogeeCommand.childCommands = commandList;
             }
             else {
                 //--------------------------
                 //There is no change to the model. Convert the transaction directly to an editor command
                 //--------------------------
-                apogeeCommand = this.createEditorCommand(transaction);
+                apogeeCommand = this.createEditorCommand(transaction,initialSelection,initialMarks);
             }
 
             //-------------------
@@ -267,13 +302,6 @@ export default class ParentComponent extends Component {
         })
     }
 
-    /** This function updates the active name map for the list of created components. If updates the map in place, but also returns it. */
-    updateActiveNameMapForCreate(activeNameMap,createdComponentInfos) {
-        createdComponentInfos.forEach( componentInfo => {
-            activeNameMap[componentInfo.name] = true;
-        })
-    }
-
     /** This function gets the shorts names for the components deleted in this step. */
     getStepDeletedComponentShortNames(step,stepDoc) {
         let deletedComponentShortNames = [];
@@ -297,14 +325,18 @@ export default class ParentComponent extends Component {
         return deletedComponentShortNames;
     }
     
-    /**  */
-    processForStepComponentCreateCommands(oldStepJson,activeNameMap) {
+    /** This method process the step, modifying it as needed:
+     * -it pulls out the "state" that we include in the pasted data, but we don't track this value in the working node
+     * - it checks if the name is available. If not, it modifying the name.
+     * The passed in variable "activeNameMap" is modified in place as new names are added
+     */
+    processForStepComponentCreateCommands(oldStep,oldStepJson,activeNameMap) {
         let newSliceContentJson;
         let createdComponentInfos = [];
 
-        if(!this.stepHasCreateComponentNode(step)) {
+        if(!this.stepHasCreateComponentNode(oldStep)) {
             //no modified step or create component commands needed
-            newSliceContentJson = oldStepJson.slice.content;
+            if(oldStepJson.slice) newSliceContentJson = oldStepJson.slice.content;
             createdComponentInfos = [];
         }
         else {
@@ -355,8 +387,8 @@ export default class ParentComponent extends Component {
     }
 
     /** This method checks the name of a created component and returns the proper name to 
-     * use to create the component. It will be modified if the name already exists. This function does not modify
-     * the active name struct, so it you try to create the same name twice it will succeed here and fail later. */
+     * use to create the component. It will be modified if the name already exists. This function modifies the active name map 
+     * in place. */
     createComponentReplacementNameProcessing(name,activeNameMap) {
         if(activeNameMap[name]) {
             //repeat name! - modify it with a suffix
@@ -377,7 +409,7 @@ export default class ParentComponent extends Component {
         }
         else {
             //old name was good, mark it as used
-            nameCheckStruct[name] = true;
+            activeNameMap[name] = true;
             return name
         }
     }
@@ -389,12 +421,92 @@ export default class ParentComponent extends Component {
         }
     }
 
+    /** This method takes a selection pointing at one document and makes a new one pointing at the given
+     * document. The positions in the documents must match.
+     */
+    convertSelectionToNewDoc(selection,newDoc) {
+        let $newAnchor = newDoc.resolve(selection.$anchor.pos);
+        let $newHead = newDoc.resolve(selection.$head.pos);
+        if(selection instanceof TextSelection) {
+            return new TextSelection($newAnchor,$newHead);
+        }
+        else if(selection instanceof NodeSelection) {
+            return new TextSelection($newAnchor);
+        }
+        else {
+            throw new Exception("Unknown selection type: " + selection.constructor.name);
+        }
+        
+    }
+
+    /** This method takes an input step that includes a delete and/or create and makes the associated remove step. 
+     * The insert step is made in createInsertStep. This method returns null if there is no remove step.
+     * The new step will keep the same bounds for the replace but it will remove the slice that is inserted.
+     */
     createRemoveStep(oldStepJson) {
-        throw new Error("Implement create remove step");
+        let newStepJson;
+        if(oldStepJson.stepType == "replace") {
+            if(oldStepJson.from != oldStepJson.to) {
+                newStepJson = {};
+                newStepJson.stepType = "replace";
+                newStepJson.from = oldStepJson.from;
+                newStepJson.to = oldStepJson.to;
+            }
+            else {
+                newStepJson = null;
+            }
+        }
+        else if(oldStepJson.stepType == "replaceAround") {
+            if((oldStepJson.from != oldStepJson.gapFrom)&&(oldStepJson.gapTo != oldStepJson.to)) {
+                newStepJson = {};
+                newStepJson.stepType = "replaceAround";
+                newStepJson.from = oldStepJson.from;
+                newStepJson.gapFrom = oldStepJson.gapFrom;
+                newStepJson.gapTo = oldStepJson.gapTo;
+                newStepJson.to = oldStepJson.to;
+            }
+            else {
+                newStepJson = null;
+            }
+        }
+        else {
+            throw new Error("Unknown editor step type: " + oldStepJson.stepType);
+        }
+
+        return newStepJson ? Step.fromJSON(this.editorData.schema, newStepJson) : null;
     }
     
+    /** This method takes an input step that includes a delete and/or create and makes the associated insert step. 
+     * The remove step is made in createRemoveStep. This method returns null if there is no insert step.
+     * The new step will keep the same slice for the insert but it will remove no content.
+     */
     createInsertStep(oldStepJson,newSliceContentJson) {
-        throw new Error("Implement create Insert step");
+        if(newSliceContentJson) {
+            //make a copy to keep the old slice info - but we will insert the potentiall modified content
+            let newStepJson = apogeeutil.jsonCopy(oldStepJson);
+            newStepJson.slice.content = newSliceContentJson
+            //update the locations
+            if(oldStepJson.stepType == "replace") {
+                newStepJson.from = oldStepJson.from;
+                newStepJson.to = oldStepJson.from;
+            }
+            else if(oldStepJson.stepType == "replaceAround") {
+                newStepJson.from = oldStepJson.from;
+                newStepJson.gapFrom = newStepJson.from;
+                let gapSize = oldStepJson.gapTo - oldStepJson.gapFrom;
+                newStepJson.gapTo = newStepJson.gapFrom + gapSize;
+                newStepJson.to = newStepJson.gapTo;
+            }
+            else {
+                throw new Error("Unknown editor step type: " + oldStepJson.stepType);
+            }
+
+            return  Step.fromJSON(this.editorData.schema, newStepJson);
+        }
+        else {
+            //no insert done
+            return null;
+        }
     }
 
     /** This method maps the list of component names to a list of delete commands. */
@@ -428,12 +540,9 @@ export default class ParentComponent extends Component {
 
     /** This function turns a transaction into an application command. This is used
      * for the command path for commands generated outside the editor. */
-    createEditorCommand(transaction) {
+    createEditorCommand(transaction,optionalInitialSelection,optionalInitialMarks) {
         var stepsJson = [];
         var inverseStepsJson = [];
-
-        let startSelectionJson = this.editorData.selection.toJSON();
-        let startMarksJson = this.editorData.marks ? this.editorData.marks.map(mark => mark.toJSON()) : [];
 
         for(var i = 0; i < transaction.steps.length; i++) {
             var step = transaction.steps[i];
@@ -447,18 +556,17 @@ export default class ParentComponent extends Component {
         //fix the order of inverse commands
         inverseStepsJson.reverse();
 
-        let endSelectionJson = transaction.selection.toJSON();
-        let endMarksJson = transaction.marks ? transaction.marks.map(mark => mark.toJSON()) : [];
-
         var commandData = {};
         commandData.type = "literatePageTransaction";
         commandData.memberFullName = this.member.getFullName();
         commandData.steps = stepsJson;
-        commandData.startSelection = startSelectionJson;
-        commandData.startMarks = startMarksJson;
         commandData.undoSteps = inverseStepsJson;
-        commandData.endSelection = endSelectionJson;
-        commandData.endMarks = endMarksJson;
+
+        if(optionalInitialSelection) commandData.startSelection = optionalInitialSelection.toJSON();
+        if(optionalInitialMarks) commandData.startMarks = optionalInitialMarks.map(mark => mark.toJSON());;
+
+        if(transaction.selection) commandData.endSelection = transaction.selection.toJSON();
+        if(transaction.marks) commandData.endMarks = transaction.marks.map(mark => mark.toJSON());
         
         return commandData;
     }
@@ -528,27 +636,35 @@ export default class ParentComponent extends Component {
         }
 
         if(setupTransaction) {
-            commands.editorSetupCommand = this.createEditorCommand(setupTransaction);
+            let initial1Selection = state.selection;
+            let initial1Marks = state.marks;
+            commands.editorSetupCommand = this.createEditorCommand(setupTransaction,initial1Selection,initial1Marks);
         }
 
         //create a second transaction
         let addTransaction;
+        let initial2Selection;
+        let initial2Marks;
         if(setupTransaction) {
             let config = {};
             config.doc = setupTransaction.doc;
             config.selection = setupTransaction.selection;
             config.storedMarks = setupTransaction.storedMarks;
             let intermediateState = EditorState.create(config);
+
             addTransaction = intermediateState.tr;
+            initial2Selection = config.selection;
+            initial2Marks = config.storedMarks;
         }
         else {
             addTransaction = state.tr;
+            initial2Selection = state.selection;
+            initial2Marks = state.marks;
         }
 
         //finish the document transaction
         addTransaction = addTransaction.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "name": shortName }));
-      
-        commands.editorAddCommand = this.createEditorCommand(addTransaction);
+        commands.editorAddCommand = this.createEditorCommand(addTransaction,initial2Selection,initial2Marks);
 
         return commands;
         
@@ -584,7 +700,7 @@ export default class ParentComponent extends Component {
 
         if(found) {
             let transaction = state.tr.delete(from, to);
-            var commandData = this.createEditorCommand(transaction);
+            var commandData = this.createEditorCommand(transaction,state.selection,state.marks);
             return commandData;
         }
         else {
@@ -603,9 +719,9 @@ export default class ParentComponent extends Component {
         let commands = {};
 
         if(found) {
-            //clear the component state (my recording member id)
+            //clear the component state (by recording member id)
             let setupTransaction = state.tr.replaceWith(from, to,state.schema.nodes.apogeeComponent.create({"memberId": memberId }));
-            commands.setupCommand = this.createEditorCommand(setupTransaction);
+            commands.setupCommand = this.createEditorCommand(setupTransaction,state.selection,state.marks);
 
             //later set the new name
             let config = {};
@@ -614,7 +730,7 @@ export default class ParentComponent extends Component {
             config.storedMarks = setupTransaction.storedMarks;
             let intermediateState = EditorState.create(config);
             let setNameTransaction = intermediateState.tr.replaceWith(from, to,state.schema.nodes.apogeeComponent.create({"name": newShortName}));
-            commands.setNameCommand = this.createEditorCommand(setNameTransaction);
+            commands.setNameCommand = this.createEditorCommand(setNameTransaction,config.selection,config.storedMarks);
 
             return commands;
         }
