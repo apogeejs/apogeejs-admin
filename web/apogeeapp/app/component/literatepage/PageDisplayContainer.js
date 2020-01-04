@@ -42,6 +42,10 @@ export default class PageDisplayContainer {
         this.component = component;
         this.viewType = viewType;
         this.dataDisplay = null;
+
+        this.showLessButton = null;
+        this.showMoreButton = null;
+        this.showMaxButton = null;
         
         //initialize
         this.initUI();
@@ -155,8 +159,6 @@ export default class PageDisplayContainer {
         
         //add the view container
         this.viewContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
-        
-        //TODO - resize element!!!
         
         //set the visibility state for the element
         this.setIsViewActive(this.isViewActive);

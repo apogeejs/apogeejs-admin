@@ -36,23 +36,17 @@ export default class FunctionComponent extends EditComponent {
         
         var callbacks;
         var app = this.getWorkspaceUI().getApp();
-
-        //temporary?
-        let codeEditorOptions = {
-            minLines: 2,
-            maxLines: 1000
-        }
         
         //create the new view element;
         switch(viewType) {
                 
             case FunctionComponent.VIEW_CODE:
                 callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case FunctionComponent.VIEW_SUPPLEMENTAL_CODE:
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
     //temporary error handling...

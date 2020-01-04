@@ -9,7 +9,7 @@ import Handsontable from "/ext/handsontable/handsontable_6.2.0/handsontable.full
 export default class HandsonGridEditor extends DataDisplay {
     
     constructor(displayContainer,callbacks) {
-        super(displayContainer,callbacks,DataDisplay.NON_SCROLLING);
+        super(displayContainer,callbacks);
 
         this.gridParentDiv = apogeeui.createElement("div",null,{
             "position":"relative",

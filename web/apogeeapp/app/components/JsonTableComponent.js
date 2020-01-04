@@ -49,42 +49,37 @@ export default class JsonTableComponent extends EditComponent {
         
         var callbacks;
         var app = this.getWorkspaceUI().getApp();
-
-        //temporary?
-        let codeEditorOptions = {
-            minLines: 2,
-            maxLines: 1000
-        }
         
         //create the new view element;
         switch(viewType) {
             case JsonTableComponent.VIEW_DATA:
                 switch(this.dataView) {
                     case JsonTableComponent.COLORIZED_DATA_VEW:
+                    default:
                         callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,this.member);
-                        return new AceTextEditor(displayContainer,callbacks,"ace/mode/json");
+                        return new AceTextEditor(displayContainer,callbacks,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                         
                     case JsonTableComponent.TEXT_DATA_VEW:
                         callbacks = dataDisplayHelper.getMemberDataJsonCallbacks(app,this.member);
-                        return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                        return new AceTextEditor(displayContainer,callbacks,"ace/mode/text",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                         
                     case JsonTableComponent.GRID_DATA_VEW:
                         callbacks = dataDisplayHelper.getMemberDataJsonCallbacks(app,this.member);
                         return new HandsonGridEditor(displayContainer,callbacks);
                         
-                    case JsonTableComponent.PLAIN_DATA_VEW:
-                    default:
-                        callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,this.member);
-                        return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
+                    // case JsonTableComponent.PLAIN_DATA_VEW:
+                    // default:
+                    //     callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,this.member);
+                    //     return new AceTextEditor(displayContainer,callbacks,"ace/mode/text",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 }
                 
             case JsonTableComponent.VIEW_CODE:
                 callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case JsonTableComponent.VIEW_SUPPLEMENTAL_CODE:
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
     //temporary error handling...
@@ -153,10 +148,10 @@ JsonTableComponent.TABLE_EDIT_SETTINGS = {
     "emptyDataValue": ""
 }
 
-JsonTableComponent.PLAIN_DATA_VEW = "Plain";
 JsonTableComponent.COLORIZED_DATA_VEW = "Colorized";
 JsonTableComponent.TEXT_DATA_VEW = "Text Data";
 JsonTableComponent.GRID_DATA_VEW = "Grid";
+JsonTableComponent.PLAIN_DATA_VEW = "Plain"; 
 
 JsonTableComponent.DEFAULT_DATA_VIEW = JsonTableComponent.COLORIZED_DATA_VEW;
 
@@ -189,10 +184,9 @@ JsonTableComponent.propertyDialogLines = [
         "heading":"Data View: ",
         "entries":[
             "Colorized",
-            "Plain",
+//            "Plain",
             "Text Data",
-            "Grid",
-            "Form"
+            "Grid"
         ],
         "resultKey":"dataView"
     }

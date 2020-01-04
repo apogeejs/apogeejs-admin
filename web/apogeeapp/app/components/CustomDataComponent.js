@@ -106,27 +106,27 @@ export default class CustomDataComponent extends EditComponent {
                 
             case CustomDataComponent.VIEW_VALUE:
                 callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,this.dataTable);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/json");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                 
             case CustomDataComponent.VIEW_CODE:
                 callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.inputTable);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case CustomDataComponent.VIEW_SUPPLEMENTAL_CODE:
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.inputTable);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
             case CustomDataComponent.VIEW_HTML:
                 callbacks = this.getUiCallbacks(CustomDataComponent.CODE_FIELD_HTML);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/html");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/html",AceTextEditor.OPTION_SET_DISPLAY_MAX);
         
             case CustomDataComponent.VIEW_CSS:
                 callbacks = this.getUiCallbacks(CustomDataComponent.CODE_FIELD_CSS);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/css");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/css",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case CustomDataComponent.VIEW_UI_CODE:
                 callbacks = this.getUiCallbacks(CustomDataComponent.CODE_FIELD_UI_CODE);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
     //temporary error handling...

@@ -65,11 +65,11 @@ export default class BasicControlComponent extends EditComponent{
 
             case BasicControlComponent.VIEW_CODE:
                 callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
             case BasicControlComponent.VIEW_SUPPLEMENTAL_CODE:
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
             default:
     //temporary error handling...

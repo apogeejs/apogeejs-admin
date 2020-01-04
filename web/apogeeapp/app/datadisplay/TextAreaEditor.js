@@ -6,7 +6,7 @@ import apogeeui from "/apogeeapp/ui/apogeeui.js";
 export default class TextAreaEditor extends DataDisplay {
     
     constructor(displayContainer,callbacks) {
-        super(displayContainer,callbacks,DataDisplay.SCROLLING);
+        super(displayContainer,callbacks);
 
         var textArea = apogeeui.createElement("TEXTAREA",null,{
 //            "position":"absolute",

@@ -21,7 +21,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
      * allack should not be populated. 
      */
     constructor(displayContainer,callbacks,optionalFixedLayoutInfo) {
-        super(displayContainer,callbacks,DataDisplay.SCROLLING);
+        super(displayContainer,callbacks);
         
         //layout can be fixed or dynamic
         this.dynamicLayoutCallback = callbacks.getLayoutInfo;

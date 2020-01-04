@@ -265,7 +265,7 @@ export function initApogeeModule(apogee,apogeeapp,apogeeutil) {
                 getData: () => this.member.getData()
             }
             
-            super(viewMode,callbacks,apogeeapp.DataDisplay.SCROLLING);
+            super(viewMode,callbacks);
         
             this.member = member;
             //create a content element of variable size in the top left of the parent

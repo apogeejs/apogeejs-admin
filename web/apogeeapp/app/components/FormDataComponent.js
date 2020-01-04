@@ -54,23 +54,23 @@ export default class FormDataComponent extends EditComponent {
                 
             case FormDataComponent.VIEW_LAYOUT_CODE:
                 callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.layoutFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE:
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.layoutFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
             case FormDataComponent.VIEW_FORM_VALUE:
                 callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,this.dataTable);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/json");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                 
             case FormDataComponent.VIEW_INPUT_INVALID_CODE:
                 callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.isInputValidFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE:
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.isInputValidFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
     //temporary error handling...

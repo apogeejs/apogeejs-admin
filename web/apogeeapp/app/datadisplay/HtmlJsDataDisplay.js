@@ -28,7 +28,7 @@ import apogeeui from "/apogeeapp/ui/apogeeui.js";
 export default class HtmlJsDataDisplay extends DataDisplay {
     constructor(app,displayContainer,callbacks,member,html,resource) {
         
-        super(displayContainer,callbacks,DataDisplay.NON_SCROLLING);
+        super(displayContainer,callbacks);
         
         this.app = app;
         this.resource = resource;

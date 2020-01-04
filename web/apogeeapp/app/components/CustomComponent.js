@@ -93,23 +93,23 @@ export default class CustomComponent extends EditComponent {
                 
             case CustomComponent.VIEW_CODE:
                 callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case CustomComponent.VIEW_SUPPLEMENTAL_CODE:
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
             case CustomComponent.VIEW_HTML:
                 callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_HTML);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/html");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/html",AceTextEditor.OPTION_SET_DISPLAY_MAX);
         
             case CustomComponent.VIEW_CSS:
                 callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_CSS);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/css");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/css",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case CustomComponent.VIEW_UI_CODE:
                 callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_UI_CODE);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
     //temporary error handling...

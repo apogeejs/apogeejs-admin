@@ -41,11 +41,11 @@ export default class DynamicForm extends EditComponent {
                 
             case DynamicForm.VIEW_CODE:
                 callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case DynamicForm.VIEW_SUPPLEMENTAL_CODE:
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
+                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
     //temporary error handling...
