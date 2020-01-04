@@ -10,7 +10,6 @@ import "/apogeeapp/app/commands/movecomponent.js";
 import "/apogeeapp/app/commands/openworkspace.js";
 import "/apogeeapp/app/commands/savemembercode.js";
 import "/apogeeapp/app/commands/savememberdata.js";
-import "/apogeeapp/app/commands/savememberdescription.js";
 import "/apogeeapp/app/commands/updatecomponent.js";
 import "/apogeeapp/app/commands/updatelink.js";
 import "/apogeeapp/app/commands/updateworkspace.js";

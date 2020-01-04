@@ -28,16 +28,6 @@ import ActionError from "/apogee/lib/ActionError.js";
  */
 
 
-/** Update description action name - used for publishing an error after an asynchronous formula
- * Action Data format:
- * {
- *  "action": "updateDescription",
- *  "member": (member to update),
- *  "description": (description)
- * }
- */
-
-
 /** member UPDATED EVENT: "memberUpdated"
  * Event member format:
  * {
@@ -138,23 +128,6 @@ function updateData(workspace,actionData,actionResult) {
     
     actionResult.actionDone = true;
 }
-
-/** Update description */
-function updateDescription(workspace,actionData,actionResult) {
-    
-    var memberFullName = actionData.memberName;
-    var member = workspace.getMemberByFullName(memberFullName);
-    if(!member) {
-        actionResult.actionDone = false;
-        actionResult.errorMsg = "Member not found for update member description";
-        return;
-    }
-    actionResult.member = member;
-
-    member.setDescription(actionData.description);
-    
-    actionResult.actionDone = true;
-}
         
 /** Update data action info */
 let UPDATE_DATA_ACTION_INFO = {
@@ -177,19 +150,7 @@ let UPDATE_CODE_ACTION_INFO = {
     "event": "memberUpdated"
 };
 
-/** Update data action info */
-let UPDATE_DESCRIPTION_ACTION_INFO = {
-    "action": "updateDescription",
-    "actionFunction": updateDescription,
-    "checkUpdateAll": false,
-    "updateDependencies": false,
-    "addToRecalc": false,
-    "addDependenceiesToRecalc": false,
-    "event": "memberUpdated"
-};
-
 
 //The following code registers the actions
 addActionInfo(UPDATE_DATA_ACTION_INFO);
 addActionInfo(UPDATE_CODE_ACTION_INFO);
-addActionInfo(UPDATE_DESCRIPTION_ACTION_INFO);

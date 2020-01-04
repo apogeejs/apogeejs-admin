@@ -1,8 +1,6 @@
-import Component from "/apogeeapp/app/component/Component.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
 import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
 import HandsonGridEditor from "/apogeeapp/app/datadisplay/HandsonGridEditor.js";
-import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 
 /** This component represents a json table object. */
@@ -88,11 +86,6 @@ export default class JsonTableComponent extends EditComponent {
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member,JsonTableComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
                 
-            case JsonTableComponent.VIEW_DESCRIPTION:
-                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(app,this.member);
-                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new TextAreaEditor(displayContainer,callbacks);
-                
             default:
     //temporary error handling...
                 alert("unrecognized view element!");
@@ -147,13 +140,11 @@ export default class JsonTableComponent extends EditComponent {
 JsonTableComponent.VIEW_DATA = "Data";
 JsonTableComponent.VIEW_CODE = "Formula";
 JsonTableComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
-JsonTableComponent.VIEW_DESCRIPTION = "Notes";
 
 JsonTableComponent.VIEW_MODES = [
     JsonTableComponent.VIEW_DATA,
     JsonTableComponent.VIEW_CODE,
-    JsonTableComponent.VIEW_SUPPLEMENTAL_CODE,
-    JsonTableComponent.VIEW_DESCRIPTION
+    JsonTableComponent.VIEW_SUPPLEMENTAL_CODE
 ];
 
 JsonTableComponent.TABLE_EDIT_SETTINGS = {

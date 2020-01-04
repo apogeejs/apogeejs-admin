@@ -22,7 +22,6 @@ import Dependent from "/apogee/datacomponents/Dependent.js"
  * - argList
  * - functionBody
  * - private
- * - description
  */
 let Codeable = {};
 export {Codeable as default};
@@ -42,7 +41,6 @@ Codeable.init = function(argList) {
     this.codeSet = false;
     this.functionBody = "";
     this.supplementalCode = "";
-    this.description = "";
     this.varInfo = null;
     this.dependencyInfo = null;
     this.memberFunctionInitializer = null;
@@ -85,17 +83,6 @@ Codeable.getFunctionBody = function() {
 /** This method returns the supplemental code for this member.  */
 Codeable.getSupplementalCode = function() {
     return this.supplementalCode;
-}
-
-/** This method returns the supplemental code for this member.  */
-Codeable.getDescription = function() {
-    return this.description;
-}
-
-/** This method returns the supplemental code for this member.  */
-Codeable.setDescription = function(description) {
-    this.fieldUpdated("description");
-    this.description = description;
 }
 
 /** This method returns the formula for this member.  */
@@ -371,7 +358,6 @@ Codeable.getUpdateData = function() {
     else {
         updateData.data = this.getData();
     }
-    updateData.description = this.getDescription();
     return updateData;
 }
 

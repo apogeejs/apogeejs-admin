@@ -108,20 +108,3 @@ dataDisplayHelper.getMemberSupplementalCallbacks = function(app,member,optionalC
         }
     }
 }
-
-/** This function creates editor callbacks or the member description. */
-dataDisplayHelper.getMemberDescriptionCallbacks = function(app,member) {
-    return {
-        getData: () => member.getDescription(),
-        getEditOk: () => true,
-        saveData: (text) => {  
-            var commandData = {};
-            commandData.type = "saveMemberDescription";
-            commandData.memberFullName = member.getFullName();
-            commandData.description = text;
-            
-            app.executeCommand(commandData);
-            return true;
-        }
-    }
-}

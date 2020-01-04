@@ -1,10 +1,8 @@
 import { Messenger } from "/apogee/apogeeCoreLib.js";
 
-import Component from "/apogeeapp/app/component/Component.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
 import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeeapp/app/datadisplay/ConfigurableFormEditor.js";
-import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 
 /** This ccomponent represents a data value, with input being from a configurable form.
@@ -74,11 +72,6 @@ export default class FormDataComponent extends EditComponent {
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.isInputValidFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
-            case FormDataComponent.VIEW_DESCRIPTION:
-                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(app,this.dataTable);
-                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new TextAreaEditor(displayContainer,callbacks);
-                
             default:
     //temporary error handling...
                 alert("unrecognized view element!");
@@ -140,7 +133,6 @@ FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE = "Layout Private";
 FormDataComponent.VIEW_FORM_VALUE = "Form Value";
 FormDataComponent.VIEW_INPUT_INVALID_CODE = "isInputValid(formValue)";
 FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE = "isInputValid Private";
-FormDataComponent.VIEW_DESCRIPTION = "Notes";
 
 FormDataComponent.VIEW_MODES = [
     FormDataComponent.VIEW_FORM,
@@ -148,8 +140,7 @@ FormDataComponent.VIEW_MODES = [
     FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE,
     FormDataComponent.VIEW_INPUT_INVALID_CODE,
     FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE,
-    FormDataComponent.VIEW_FORM_VALUE,
-    FormDataComponent.VIEW_DESCRIPTION
+    FormDataComponent.VIEW_FORM_VALUE
 ];
 
 FormDataComponent.TABLE_EDIT_SETTINGS = {

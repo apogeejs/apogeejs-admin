@@ -3,7 +3,6 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
 import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeapp/app/datadisplay/HtmlJsDataDisplay.js";
-import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
@@ -111,12 +110,6 @@ export default class CustomComponent extends EditComponent {
             case CustomComponent.VIEW_UI_CODE:
                 callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_UI_CODE);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
-
-
-            case CustomComponent.VIEW_DESCRIPTION:
-                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(app,this.member);
-                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new TextAreaEditor(displayContainer,callbacks);
                 
             default:
     //temporary error handling...
@@ -301,7 +294,6 @@ CustomComponent.VIEW_SUPPLEMENTAL_CODE = "Input Private";
 CustomComponent.VIEW_HTML = "HTML";
 CustomComponent.VIEW_CSS = "CSS";
 CustomComponent.VIEW_UI_CODE = "uiGenerator()";
-CustomComponent.VIEW_DESCRIPTION = "Notes";
 
 CustomComponent.VIEW_MODES = [
     CustomComponent.VIEW_OUTPUT,
@@ -309,8 +301,7 @@ CustomComponent.VIEW_MODES = [
     CustomComponent.VIEW_SUPPLEMENTAL_CODE,
     CustomComponent.VIEW_HTML,
     CustomComponent.VIEW_CSS,
-    CustomComponent.VIEW_UI_CODE,
-    CustomComponent.VIEW_DESCRIPTION
+    CustomComponent.VIEW_UI_CODE
 ];
 
 CustomComponent.TABLE_EDIT_SETTINGS = {

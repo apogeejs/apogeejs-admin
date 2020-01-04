@@ -71,11 +71,6 @@ export default class BasicControlComponent extends EditComponent{
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
 
-            case BasicControlComponent.VIEW_DESCRIPTION:
-                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(app,this.member);
-                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new TextAreaEditor(displayContainer,callbacks);
-
             default:
     //temporary error handling...
                 alert("unrecognized view element!");
@@ -103,13 +98,11 @@ export default class BasicControlComponent extends EditComponent{
 BasicControlComponent.VIEW_OUTPUT = "Output";
 BasicControlComponent.VIEW_CODE = "Code";
 BasicControlComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
-BasicControlComponent.VIEW_DESCRIPTION = "Notes";
 
 BasicControlComponent.VIEW_MODES = [
 	BasicControlComponent.VIEW_OUTPUT,
 	BasicControlComponent.VIEW_CODE,
-    BasicControlComponent.VIEW_SUPPLEMENTAL_CODE,
-    BasicControlComponent.VIEW_DESCRIPTION
+    BasicControlComponent.VIEW_SUPPLEMENTAL_CODE
 ];
 
 BasicControlComponent.TABLE_EDIT_SETTINGS = {

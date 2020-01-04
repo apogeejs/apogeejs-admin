@@ -33,9 +33,6 @@ function JsonTable(name,owner,initialData) {
         
         this.setData(initialData.data);
     }
-    if(initialData.description !== undefined) {
-        this.setDescription(initialData.description);
-    }
 }
 
 //add components to this class

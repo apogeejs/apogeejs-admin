@@ -2,7 +2,6 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
 import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
-import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 
 /** This component represents a table object. */
@@ -55,11 +54,6 @@ export default class FunctionComponent extends EditComponent {
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",codeEditorOptions);
                 
-            case FunctionComponent.VIEW_DESCRIPTION:
-                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(app,this.member);
-                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new TextAreaEditor(displayContainer,callbacks);
-                
             default:
     //temporary error handling...
                 alert("unrecognized view element!");
@@ -72,12 +66,10 @@ export default class FunctionComponent extends EditComponent {
 
 FunctionComponent.VIEW_CODE = "Code";
 FunctionComponent.VIEW_SUPPLEMENTAL_CODE = "Private";
-FunctionComponent.VIEW_DESCRIPTION = "Notes";
 
 FunctionComponent.VIEW_MODES = [
     FunctionComponent.VIEW_CODE,
-    FunctionComponent.VIEW_SUPPLEMENTAL_CODE,
-    FunctionComponent.VIEW_DESCRIPTION
+    FunctionComponent.VIEW_SUPPLEMENTAL_CODE
 ];
 
 FunctionComponent.TABLE_EDIT_SETTINGS = {

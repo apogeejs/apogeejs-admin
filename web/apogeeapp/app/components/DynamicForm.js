@@ -2,7 +2,6 @@ import Component from "/apogeeapp/app/component/Component.js";
 import EditComponent from "/apogeeapp/app/component/EditComponent.js";
 import AceTextEditor from "/apogeeapp/app/datadisplay/AceTextEditor.js";
 import ConfigurableFormDisplay from "/apogeeapp/app/datadisplay/ConfigurableFormDisplay.js";
-import TextAreaEditor from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 import dataDisplayHelper from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 import UiCommandMessenger from "/apogeeapp/app/commands/UiCommandMessenger.js";
 
@@ -48,11 +47,6 @@ export default class DynamicForm extends EditComponent {
                 callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript");
                 
-            case DynamicForm.VIEW_DESCRIPTION:
-                callbacks = dataDisplayHelper.getMemberDescriptionCallbacks(app,this.member);
-                //return new AceTextEditor(displayContainer,callbacks,"ace/mode/text");
-                return new TextAreaEditor(displayContainer,callbacks);
-                
             default:
     //temporary error handling...
                 alert("unrecognized view element!");
@@ -84,13 +78,11 @@ export default class DynamicForm extends EditComponent {
 DynamicForm.VIEW_FORM = "Form";
 DynamicForm.VIEW_CODE = "Code";
 DynamicForm.VIEW_SUPPLEMENTAL_CODE = "Private";
-DynamicForm.VIEW_DESCRIPTION = "Notes";
 
 DynamicForm.VIEW_MODES = [
     DynamicForm.VIEW_FORM,
     DynamicForm.VIEW_CODE,
-    DynamicForm.VIEW_SUPPLEMENTAL_CODE,
-    DynamicForm.VIEW_DESCRIPTION
+    DynamicForm.VIEW_SUPPLEMENTAL_CODE
 ];
 
 DynamicForm.TABLE_EDIT_SETTINGS = {

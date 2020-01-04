@@ -164,8 +164,7 @@ export function initApogeeModule(apogee,apogeeapp,apogeeutil) {
 
     GoogleChartComponent.VIEW_MODES = [
         apogeeapp.BasicControlComponent.VIEW_OUTPUT,
-        GoogleChartComponent.VIEW_INPUT_FORM,
-        apogeeapp.BasicControlComponent.VIEW_DESCRIPTION
+        GoogleChartComponent.VIEW_INPUT_FORM
     ];
 
     GoogleChartComponent.TABLE_EDIT_SETTINGS = {
