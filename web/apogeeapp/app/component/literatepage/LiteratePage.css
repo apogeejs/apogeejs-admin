@@ -95,8 +95,9 @@
 .visiui_displayContainer_viewLabelClass {
     display: inline;
     padding-left: 1px;
+    padding-right: 20px;
     font-size: smaller;
-    color:rgd(64,64,64);
+    color:rgb(0,0,0);
 }
 
 
@@ -108,7 +109,7 @@
     display: inline;
     padding-left: 1px;
 }
-.visiui_displayContainer_mainViewSelectorClass {
+.visiui_pageChild_titleBarNameClass {
     display: inline;
     padding-left: 2px;
     padding-right:10px;
@@ -116,14 +117,26 @@
     font-size: larger;
     color:darkblue;
 }
-.visiui_displayContainer_nonMainViewSelectorClass {
+.visiui_displayContainer_viewSelectorClass {
     display: inline;
     padding-left: 1px;
     font-size: smaller;
-    color:rgd(64,64,64);
+    color:rgb(0,0,0);
+    cursor: pointer;
 }
 .visiui_displayContainer_headerContainerClass {
     position: relative;
+}
+.visiui_displayContainer_viewToolbarClass {
+    position: relative;
+    display: inline;
+}
+.visiui_displayContainer_viewDisplaySizeButtonClass {
+    display: inline;
+    padding-right: 5px;
+    font-size: smaller;
+    color:rgb(128,128,128);
+    cursor: pointer;
 }
 .visiui_displayContainer_viewContainerClass {
     position: relative;

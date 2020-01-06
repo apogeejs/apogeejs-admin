@@ -1,4 +1,4 @@
-import apogeeui from "/apogeeapp/ui/apogeeui.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeapp/app/datadisplay/dataDisplayConstants.js"
 
 /** Editor that uses the Ace text editor.
  * 
@@ -86,36 +86,36 @@ export default class DataDisplay {
     //----------------------------
 
     /** This method returns one of the following values to indicate support for resizing.
-     * - DataDisplay.RESIZE_NO_SUPPORT - The UI should not resize the display
-     * - DataDisplay.RESIZE_NO_INTERNAL_SUPPORT - The view shows a fixed size display. The UI is free to show a portion of it.
-     * - DataDisplay.RESIZE_INTERNAL_SUPPORT - The view supports the API to resize itself internally.
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_NO_SUPPORT - The UI should not resize the display
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_NO_INTERNAL_SUPPORT - The view shows a fixed size display. The UI is free to show a portion of it.
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT - The view supports the API to resize itself internally.
      */
     getResizeSupport() {
-        return DataDisplay.RESIZE_NO_SUPPORT;
+        return DATA_DISPLAY_CONSTANTS.RESIZE_NO_SUPPORT;
     }
 
     /** This method gets the resize mode. Options:
-     * - DataDisplay.RESIZE_MODE_SOME;
-     * - DataDisplay.RESIZE_MODE_MAX;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
      */
     //getResizeMode();
 
     /** This method sets the resize mode. Options:
-     * - DataDisplay.RESIZE_MODE_SOME;
-     * - DataDisplay.RESIZE_MODE_MAX;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
      */
     //setResizeMode(resizeMode);
 
-    /** This method adjusts the size when the resize mode is DataDisplay.RESIZE_MODE_SOME. Options:
-     * - DataDisplay.RESIZE_MORE;
-     * - DataDisplay.RESIZE_LESS;
+    /** This method adjusts the size when the resize mode is DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME. Options:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MORE;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_LESS;
     */
     //adjustSize(adjustment);
 
-    /** This method returns the possible resize options, for use in the mode DataDisplay.RESIZE_MODE_SOME. Flags:
-     * - DataDisplay.RESIZE_LESS = 1;
-     * - DataDisplay.RESIZE_MORE = 2;
-     * - DataDisplay.RESIZE_NONE = 0;
+    /** This method returns the possible resize options, for use in the mode DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME. Flags:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_LESS = 1;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MORE = 2;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_NONE = 0;
      * These flags should be or'ed togethder to give the allowed options.
     */
     //getSizeAdjustFlags();
@@ -170,14 +170,3 @@ export default class DataDisplay {
         }
     }
 }
-
-DataDisplay.RESIZE_NO_SUPPORT = "resize_none";
-DataDisplay.RESIZE_NO_INTERNAL_SUPPORT = "resize_external";
-DataDisplay.RESIZE_INTERNAL_SUPPORT = "resize_internal";
-
-DataDisplay.RESIZE_MODE_SOME = "resize_mode_some";
-DataDisplay.RESIZE_MODE_MAX = "resize_mode_max";
-
-DataDisplay.RESIZE_LESS = 1;
-DataDisplay.RESIZE_MORE = 2;
-DataDisplay.RESIZE_NONE = 0;

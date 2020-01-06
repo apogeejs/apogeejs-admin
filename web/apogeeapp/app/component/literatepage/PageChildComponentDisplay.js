@@ -21,7 +21,7 @@ export default class PageChildComponentDisplay {
         this.mainElement = null;
         this.bannerContainer = null;
 
-        this.viewTitleElement = null;
+        this.titleBarNameElement = null;
         this.recordedTitle = null;
         
         this.displayContainerMap = null;
@@ -171,12 +171,6 @@ export default class PageChildComponentDisplay {
                 
                 //add the view title element to the title bar
                 this.titleBarViewsElement.appendChild(displayContainer.getViewSelectorContainer());
-
-                //we will overwrite the label (and style) on the main view to be the component title, rather than the view name.
-                if(isMainView) {
-                    this.viewTitleElement = displayContainer.getViewTitleElement();
-                    this.viewTitleElement.className = "visiui_displayContainer_mainViewSelectorClass";
-                }
                 
                 //add the view display
                 this.viewContainer.appendChild(displayContainer.getDisplayElement());
@@ -184,10 +178,6 @@ export default class PageChildComponentDisplay {
                 //store the display container object
                 this.displayContainerMap[viewType] = displayContainer;
             }
-        }
-        else {
-            //no views, add an explicit title element
-            this.viewTitleElement = apogeeui.createElementWithClass("div","visiui_displayContainer_mainViewSelectorClass",this.titleBarViewsElement);
         }
 
         this.setTitle();
@@ -198,6 +188,7 @@ export default class PageChildComponentDisplay {
         
         this.titleBarContainer = apogeeui.createElementWithClass("div","visiui_pageChild_titleBarClass",this.mainElement);
         this.titleBarMenuElement = apogeeui.createElementWithClass("div","visiui_pageChild_titleBarMenuClass",this.titleBarContainer);
+        this.titleBarNameElement = apogeeui.createElementWithClass("div","visiui_pageChild_titleBarNameClass",this.titleBarContainer);
         this.titleBarViewsElement = apogeeui.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
         
         //------------------
@@ -259,7 +250,7 @@ export default class PageChildComponentDisplay {
 
     setTitle() {
         this.recordedTitle = this.component.getDisplayName();
-        this.viewTitleElement.innerHTML = this.recordedTitle;
+        this.titleBarNameElement.innerHTML = this.recordedTitle;
     }
 
 }

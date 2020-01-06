@@ -27,7 +27,7 @@ export default class PageDisplayContainer {
 
         this.viewSelectorContainer = null;
         this.viewActiveElement = null;
-        this.viewSelectorElement = null;
+        this.viewNameElement = null;
         
         this.isComponentShowing = false;
         this.isViewActive = isMainView;
@@ -111,12 +111,6 @@ export default class PageDisplayContainer {
         return this.viewSelectorContainer;
     }
 
-    /** This method returns the view title element, which is embedded in the selecton container. This is
-     * intended for when the view title should be overritten. */
-    getViewTitleElement() {
-        return this.viewSelectorElement;
-    }
-
     /** This method returns the main dom element for the window frame. */
     getDisplayElement() {
         return this.mainElement;
@@ -137,14 +131,19 @@ export default class PageDisplayContainer {
 
         this.viewLabelElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
         this.viewLabelElement.innerHTML = this.viewType;
+
+        this.viewToolbarElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.viewLabelHeaderElement);
+
+        //add the view toolbar controls
+        this.populateViewToolbar();
         
         //make the selector for the view, in the component title bar
         this.viewSelectorContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
 
         this.viewActiveElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewActiveElementClass",this.viewSelectorContainer);
-        this.viewSelectorElement = apogeeui.createElementWithClass("div","visiui_displayContainer_nonMainViewSelectorClass",this.viewSelectorContainer);
+        this.viewNameElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewSelectorClass",this.viewSelectorContainer);
         
-        this.viewSelectorElement.innerHTML = this.viewType;
+        this.viewNameElement.innerHTML = this.viewType;
 
         this.expandImage = apogeeui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
         this.expandImage.src = apogeeui.getResourcePath(PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
@@ -164,6 +163,88 @@ export default class PageDisplayContainer {
         this.setIsViewActive(this.isViewActive);
     }
 
+    /** This method configures the toolbar for the view display. */
+    populateViewToolbar() {
+        this.showLessButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+        this.showLessButton.innerHTML = "less";
+        this.showLessButton.onclick = () => this.showLess();
+        this.showMoreButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+        this.showMoreButton.innerHTML = "more";
+        this.showMoreButton.onclick = () => this.showMore();
+        this.showMaxButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+        this.showMaxButton.innerHTML = "max";
+        this.showMaxButton.onclick = () => this.showMax();
+    }
+
+    showLess() {
+        if((this.dataDisplay)&&(this.dataDisplay.getResizeSupport() == DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT)) {
+            if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX) {
+                //if we are in display max mode, change to display some mode
+                this.dataDisplay.setResizeMode(DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME);
+            }
+            else if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
+                //if we are in "some" mode, adjust size smaller if allowed
+                if((this.dataDisplay.getSizeAdjustFlags() | DATA_DISPLAY_CONSTANTS.RESIZE_LESS) !== 0) {                  
+                    this.dataDisplay.adjustSize(DATA_DISPLAY_CONSTANTS.RESIZE_LESS);
+                }
+            }
+            else {
+                //unknown mode
+                return;
+            }
+            this.updateViewSizeButtons();
+        }
+    }
+
+    showMore() {
+        if((this.dataDisplay)&&(this.dataDisplay.getResizeSupport() == DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT)) {
+            if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
+                //if we are in "some" mode, adjust size smaller if allowed
+                if((this.dataDisplay.getSizeAdjustFlags() | DATA_DISPLAY_CONSTANTS.RESIZE_MORE) !== 0) {
+                    this.dataDisplay.adjustSize(DATA_DISPLAY_CONSTANTS.RESIZE_MORE);
+                }
+            }
+            else {
+                //no action is not in some mode
+                return;
+            }
+            this.updateViewSizeButtons();
+        }
+    }
+
+    showMax() {
+        if((this.dataDisplay)&&(this.dataDisplay.getResizeSupport() == DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT)) {
+            if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
+                //if we are in display max mode, change to display some mode
+                this.dataDisplay.setResizeMode(DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX);
+            }
+            else {
+                //no action is not in some mode
+                return;
+            }
+            this.updateViewSizeButtons();
+        }
+    }
+
+    updateViewSizeButtons() {
+        let showLessVisible = false, showMoreVisible = false, showMaxVisible = false;
+        if((this.dataDisplay)&&(this.dataDisplay.getResizeSupport() == DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT)) {
+            if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
+                showLessVisible = true;
+                showMoreVisible = true;
+                showMaxVisible = true;
+            }
+            else if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX){
+                showLessVisible = true;
+            }
+        }
+
+        this.showLessButton.style.display = (showLessVisible) ? "" : "none";
+        this.showMoreButton.style.display = (showMoreVisible) ? "" : "none";
+        this.showMaxButton.style.display = (showMaxVisible) ? "" : "none";
+        
+    }
+
     /** This method shold be called when the content loaded or frame visible state 
      * changes to manage the data display.
      * private */
@@ -180,6 +261,8 @@ export default class PageDisplayContainer {
             
                 if(this.dataDisplay.onLoad) this.dataDisplay.onLoad();
                 this.dataDisplayLoaded = true;
+
+                this.updateViewSizeButtons();
             }
         }
         else {
@@ -261,6 +344,7 @@ export default class PageDisplayContainer {
         //update the data display
         if((this.dataDisplay)&&(!this.inEditMode)) {
             this.dataDisplay.showData();
+            this.updateViewSizeButtons();
         }
     }
         
@@ -327,22 +411,6 @@ export default class PageDisplayContainer {
     setContent(contentElement,elementType) {
         
         apogeeui.removeAllChildren(this.viewContainer);
-        
-    //    //set the body type
-    //    var bodyClassName;
-    //    if(elementType == apogeeui.RESIZABLE) {
-    //       bodyClassName = "visiui-dnh-fixed";
-    //    }
-    //    else if(elementType == apogeeui.FIXED_SIZE) {
-    //        bodyClassName = "visiui-dnh-shrink-to-fit";
-    //    }
-    //    else if(elementType == apogeeui.SIZE_WINDOW_TO_CONTENT) {
-    //        bodyClassName = "visiui-dnh-shrink-to-fit";
-    //    }
-    //    else {
-    //        throw new Error("Unknown content type: " + elementType);
-    //    }
-    //    this.displayAndHeader.setBodyType(bodyClassName);
         
         //set the content
         this.viewContainer.appendChild(contentElement);

@@ -28,11 +28,11 @@ export default class AceTextEditor extends DataDisplay {
         this.editorOptions = {};
         this.showSomeMaxLines = DEFAULT_MAX_LINES;
         if(options.displayMax) {
-            this.resizeMode = DataDisplay.RESIZE_MODE_MAX;
+            this.resizeMode = DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
             this.editorOptions.maxLines = MAX_MAX_LINES;
         }
         else {
-            this.resizeMode = DataDisplay.RESIZE_MODE_SOME;
+            this.resizeMode = DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
             this.editorOptions.maxLines = this.showSomeMaxLines;
         }
 
@@ -145,33 +145,33 @@ export default class AceTextEditor extends DataDisplay {
     //----------------------------
 
     /** This method returns one of the following values to indicate support for resizing.
-     * - DataDisplay.RESIZE_NO_SUPPORT - The UI should not resize the display
-     * - DataDisplay.RESIZE_NO_INTERNAL_SUPPORT - The view shows a fixed size display. The UI is free to show a portion of it.
-     * - DataDisplay.RESIZE_INTERNAL_SUPPORT - The view supports the API to resize itself internally.
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_NO_SUPPORT - The UI should not resize the display
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_NO_INTERNAL_SUPPORT - The view shows a fixed size display. The UI is free to show a portion of it.
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT - The view supports the API to resize itself internally.
      */
     getResizeSupport() {
-        return DataDisplay.RESIZE_INTERNAL_SUPPORT;
+        return DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT;
     }
 
     /** This method gets the resize mode. Options:
-     * - DataDisplay.RESIZE_MODE_SOME;
-     * - DataDisplay.RESIZE_MODE_MAX;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
      */
     getResizeMode() {
         return this.resizeMode;
     }
 
     /** This method sets the resize mode. Options:
-     * - DataDisplay.RESIZE_MODE_SOME;
-     * - DataDisplay.RESIZE_MODE_MAX;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
      */
     setResizeMode(resizeMode) {
-        if(resizeMode == DataDisplay.RESIZE_MODE_SOME) {
-            this.resizeMode = DataDisplay.RESIZE_MODE_SOME;
+        if(resizeMode == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
+            this.resizeMode = DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
             this.editorOptions.maxLines = this.showSomeMaxLines;
         }
-        else if(resizeMode == DataDisplay.RESIZE_MODE_SOME) {
-            this.resizeMode = DataDisplay.RESIZE_MODE_MAX;
+        else if(resizeMode == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX) {
+            this.resizeMode = DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
             this.editorOptions.maxLines = MAX_MAX_LINES;
         }
         else {
@@ -184,15 +184,15 @@ export default class AceTextEditor extends DataDisplay {
         }
     }
 
-    /** This method adjusts the size when the resize mode is DataDisplay.RESIZE_MODE_SOME. Options:
-     * - DataDisplay.RESIZE_MORE;
-     * - DataDisplay.RESIZE_LESS;
+    /** This method adjusts the size when the resize mode is DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME. Options:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MORE;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_LESS;
     */
     adjustSize(adjustment) {
-        if(this.resizeMode == DataDisplay.RESIZE_MODE_SOME) {
+        if(this.resizeMode == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
             if(this.editor) {
                 let newMaxLines;
-                if(adjustment == DataDisplay.RESIZE_LESS) {
+                if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_LESS) {
                     //decrease size by 1 line - except if our size is 
                     //larger than the current doc, then shrink it to 
                     //one line smaller than current doc.
@@ -205,7 +205,7 @@ export default class AceTextEditor extends DataDisplay {
                         newMaxLines = DEFAULT_MIN_LINES;
                     }
                 }
-                else if(adjustment == DataDisplay.RESIZE_MORE) {
+                else if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_MORE) {
                     //just grow size by 1 line
                     newMaxLines = this.showSomeMaxLines + 1;
                     if(newMaxLines >  MAX_MAX_LINES) {
@@ -225,10 +225,10 @@ export default class AceTextEditor extends DataDisplay {
         }
     }
 
-    /** This method returns the possible resize options, for use in the mode DataDisplay.RESIZE_MODE_SOME. Flags:
-     * - DataDisplay.RESIZE_LESS = 1;
-     * - DataDisplay.RESIZE_MORE = 2;
-     * - DataDisplay.RESIZE_NONE = 0;
+    /** This method returns the possible resize options, for use in the mode DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME. Flags:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_LESS = 1;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MORE = 2;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_NONE = 0;
      * These flags should be or'ed togethder to give the allowed options.
     */
     getSizeAdjustFlags() {
@@ -238,10 +238,10 @@ export default class AceTextEditor extends DataDisplay {
         //We will set the flags based on our absolute limits.
         let flags = 0;
         if(this.showSomeMaxLines < MAX_MAX_LINES) {
-            flags = flags | DataDisplay.RESIZE_MORE;
+            flags = flags | DATA_DISPLAY_CONSTANTS.RESIZE_MORE;
         }
         if(this.showSomeMaxLines > DEFAULT_MIN_LINES) {
-            flags = flags | DataDisplay.RESIZE_LESS;
+            flags = flags | DATA_DISPLAY_CONSTANTS.RESIZE_LESS;
         }
         return flags;
     }
