@@ -1,14 +1,16 @@
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
+import EventManager from "/apogeeutil/EventManagerClass.js";
 
 /** This is a split pane, with a right and left pane. The types of pane are 
  * given by the constants defined below:
  * SplitPane.SCROLLING_PANE
  * SplitPane.FIXED_PANE
  */ 
-export default class SplitPane {
+export default class SplitPane extends EventManager {
 
     constructor(leftPaneType,rightPaneType) {
-        
+        super();
+
         //-----------------
         // Create the DOM elements
         //-----------------
@@ -50,16 +52,17 @@ export default class SplitPane {
         }
 
         //mouse move handler
-        var mouseMove = function(e) {
+        var mouseMove = (e) => {
             if(resizeActive) {
                 var delta = e.clientX - resizeBasePixels;
                 leftCell.style.width = (resizeBasePosition + delta) + "px";
+                this.dispatchEvent("move",this);
             }
         }
 
         //mouse up handler
         var mouseUp = function(e) {
-        endResize();
+            endResize();
         }
 
         //mouse leave handler

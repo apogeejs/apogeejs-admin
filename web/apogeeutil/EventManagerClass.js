@@ -45,6 +45,12 @@ export default class EventManager {
         }
     }
 
+    /** This method can be called to see if an event has listeners. */
+    hasListeners(eventName) {
+        let listenerList = this.listenerTable[eventName];
+        return ((listenerList)&&(listenerList.length > 0));
+    }
+
     /** THis method dispatches an event. */
     dispatchEvent(eventName, eventData) {
         var callbackList = this.listenerTable[eventName];

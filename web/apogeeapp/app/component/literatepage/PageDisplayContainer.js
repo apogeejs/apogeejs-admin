@@ -51,6 +51,10 @@ export default class PageDisplayContainer {
         this.initUI();
     }
 
+    getComponent() {
+        return this.component;
+    }
+
     //-------------------
     // state management
     //-------------------

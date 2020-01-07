@@ -18,6 +18,11 @@ export default class AceTextEditor extends DataDisplay {
 
         this.editorDiv = apogeeui.createElement("div");
 
+        //========================
+        //this.editorDiv.style.fontSize = "12px";
+        //this.editorDiv.style.lineHeight = "1.2";
+        //=========================
+
         this.aceMode = aceMode;
 
         this.storedData = null;

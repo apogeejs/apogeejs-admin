@@ -11,35 +11,13 @@ export default class HandsonGridEditor extends DataDisplay {
     constructor(displayContainer,callbacks) {
         super(displayContainer,callbacks);
 
-        this.gridParentDiv = apogeeui.createElement("div",null,{
-            "position":"relative",
+        this.gridDiv = apogeeui.createElement("div",null,{
+            //"position":"relative",
             "width": "100%",
             "height":"300px",
             "overflow":"hidden",
-            "zIndex":0
+            //"zIndex":0
         });
-
-        // //TBR initial sizing. now I just set it to a dummy number	
-        // this.gridDiv = apogeeui.createElement("div",null,{
-        //     "position":"absolute",
-        //     "top":"0px",
-        //     "left":"0px",
-        //     "width":"50px",
-        //     "height":"50px",
-        //     "overflow":"hidden",
-        //     "zIndex":0
-        // });
-
-        this.gridDiv = apogeeui.createElement("div",null,{
-            "position":"absolute",
-            "top":"0px",
-            "left":"0px",
-            "right":"0px",
-            "bottom":"0px",
-            "overflow":"hidden",
-            "zIndex":0
-        });
-        this.gridParentDiv.appendChild(this.gridDiv);
 
         this.inputData = null;
         this.activeEditOk = undefined;
@@ -74,6 +52,11 @@ export default class HandsonGridEditor extends DataDisplay {
             }
         }
 
+        //we will use a listener to see when the page is resized
+        let app = this.displayContainer.getComponent().getWorkspaceUI().getApp();
+        this.frameWidthListener = () => this.onFrameWidthResize();
+        app.addListener("frameWidthResize",this.frameWidthListener);
+
     }
 
 //=============================
@@ -81,8 +64,7 @@ export default class HandsonGridEditor extends DataDisplay {
 //=============================
 
     getContent() {
-        //return this.gridDiv;
-        return this.gridParentDiv;
+        return this.gridDiv;
     }
     
     getContentType() {
@@ -126,26 +108,34 @@ export default class HandsonGridEditor extends DataDisplay {
     }
 
     onResize() {
-        this.setSize();
+        //dont use this for now
     }
 
     setSize() {  
-        if(this.gridDiv) {
-            var gridDivParent = this.gridDiv.parentElement;
-            if(gridDivParent) {
-                this.gridDiv.style.width = gridDivParent.clientWidth + "px";
-                this.gridDiv.style.height = gridDivParent.clientHeight + "px";
-                if(this.gridControl) {
-                    this.gridControl.render();
-                }
+        if((this.gridDiv)&(this.gridDiv.parent)) {
+            this.gridDiv.style.width = this.gridDiv.parent.scrollWidth + "px";
+            this.gridDiv.style.height = this.gridDiv.parent.scrollWidth + "px";
+            if(this.gridControl) {
+                this.gridControl.render();
             }
         }
     }
 
+    onFrameWidthResize() {
+        this.setSize();
+    }
+
     destroy() {
+        //tear down the grid control
         if(this.gridControl) {
             this.gridControl.destroy();
             this.gridControl = null;
+        }
+        //remove the frame width listener
+        if(this.frameWidthListener) {
+            let app = this.displayContainer.getComponent().getWorkspaceUI().getApp();
+            app.removeListener("frameWidthResize",this.frameWidthListener);
+            this.frameWidthListener = null;
         }
     }
 
@@ -174,7 +164,10 @@ export default class HandsonGridEditor extends DataDisplay {
                 afterCreateCol:this.delayGridEdited,
                 afterCreateRow:this.delayGridEdited,
                 afterRemoveCol:this.delayGridEdited,
-                afterRemoveRow:this.delayGridEdited
+                afterRemoveRow:this.delayGridEdited,
+                width:"100%",
+                colWidths: 250,
+                rowHeights: 23
             }
             this.gridEditable = true;
         }

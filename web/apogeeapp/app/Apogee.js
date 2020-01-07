@@ -379,26 +379,33 @@ export default class Apogee extends EventManager {
         //----------------------
         //create the split pane
         //----------------------
-        var splitPane = new SplitPane(
+        this.splitPane = new SplitPane(
                 SplitPane.SCROLLING_PANE,
                 SplitPane.FIXED_PANE
             );
-        mainContainer.getBody().appendChild(splitPane.getOuterElement());
+        mainContainer.getBody().appendChild(this.splitPane.getOuterElement());
 
         //---------------------
         //load the tree pane
         //---------------------
-        this.treePane = splitPane.getLeftPaneContainer();
+        this.treePane = this.splitPane.getLeftPaneContainer();
         
         //----------------------
         //create the tab frame
         //----------------------
         this.tabFrame = new TabFrame();
-        splitPane.getRightPaneContainer().appendChild(this.tabFrame.getElement());
+        this.splitPane.getRightPaneContainer().appendChild(this.tabFrame.getElement());
         
         //add listener for displaying the active tab
         this.tabFrame.addListener(apogeeui.SHOWN_EVENT,tab => this.onTabShown(tab));
         this.tabFrame.addListener(apogeeui.HIDDEN_EVENT,tab => this.onTabHidden(tab));
+
+        //-----------------------
+        // Create the width resize listener (for now I am putting it in app - refering to both panes)
+        //-----------------------
+
+        this.splitPane.addListener("move",() => this.onSplitPaneResize());
+        window.addEventListener("resize",() => this.onWindowResize());
 
     }
 
@@ -420,6 +427,33 @@ export default class Apogee extends EventManager {
             this.activeTabIconDisplay.style.display = "";
             this.activeTabTitleDisplay.style.display = "";
         }
+    }
+
+    //---------------------------------
+    // Width resize events - for tab frame and tree frame
+    //---------------------------------
+
+    onSplitPaneResize() {
+        this.triggerResizeWait();
+    }
+
+    onWindowResize() {
+        this.triggerResizeWait();
+    }
+
+    triggerResizeWait() {
+        //only do the slow resizde timer if we have listeners
+        if(!this.hasListeners("frameWidthResize")) return;
+
+        //create a new timer if we don't already have one
+        if(!this.resizeWaitTimer) {
+            this.resizeWaitTimer =  setTimeout(() => this.resizeTimerExpired(),RESIZE_TIMER_PERIOD_MS);
+        }
+    }
+
+    resizeTimerExpired() {
+        this.resizeWaitTimer = null;
+        this.dispatchEvent("frameWidthResize",null);
     }
 
     //=================================
@@ -640,3 +674,5 @@ export default class Apogee extends EventManager {
 
 
 Apogee.DEFAULT_WORKSPACE_NAME = "workspace";
+
+const RESIZE_TIMER_PERIOD_MS = 300;
