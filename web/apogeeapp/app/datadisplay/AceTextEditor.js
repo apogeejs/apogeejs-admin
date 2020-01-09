@@ -118,10 +118,6 @@ export default class AceTextEditor extends DataDisplay {
         this.editor.resize();
     }
 
-    onResize() {
-        if(this.editor) this.editor.resize();
-    }
-
     destroy() {
         if(this.editor) {
             this.editor.destroy();

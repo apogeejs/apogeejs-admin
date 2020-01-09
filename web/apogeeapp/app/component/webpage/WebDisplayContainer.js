@@ -43,13 +43,6 @@ export default class WebDisplayContainer {
         return this.isShowing;
     }
 
-    /** This method should be called if the data display is resized. */
-    onResize() {
-        if(this.dataDisplay) {
-            this.dataDisplay.onResize();
-        }
-    }
-
     /** This method closes the window. If the argument forceClose is not
      * set to true the "request_close" handler is called to check if
      * it is ok to close the window. */

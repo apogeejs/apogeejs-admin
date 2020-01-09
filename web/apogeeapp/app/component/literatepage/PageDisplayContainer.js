@@ -76,19 +76,7 @@ export default class PageDisplayContainer {
     /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
     setIsViewActive(isViewActive) {
         this.isViewActive = isViewActive;
-        //show/hide ui elements
-        if(isViewActive) {
-            this.mainElement.style.display = ""; 
-            this.expandImage.style.display = "none";
-            this.contractImage.style.display = "";
-        }
-        else {
-            this.mainElement.style.display = "none";
-            this.expandImage.style.display = "";
-            this.contractImage.style.display = "none";
-        }
-        
-        //this lets the data display know if its visibility changes
+        this.updateViewSelectorState();
         this.updateDataDisplayLoadedState();
     }
 
@@ -148,6 +136,8 @@ export default class PageDisplayContainer {
         this.contractImage.src = apogeeui.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
 
         this.viewSelectorContainer.onclick = () => this.setIsViewActive(!this.isViewActive);
+        
+        this.updateViewSelectorState();
     }
 
     /** This completes the UI. It should only be called when the data display has been created. */
@@ -175,9 +165,6 @@ export default class PageDisplayContainer {
         this.viewContainer = apogeeui.createElementWithClass("div",viewContainerClass,this.mainElement);
 
         this.uiCompleted = true;
-        
-        //set the visibility state for the element
-        this.setIsViewActive(this.isViewActive);
     }
 
     /** This undoes the data display specific parts of the container ui */
@@ -185,6 +172,20 @@ export default class PageDisplayContainer {
         apogeeui.removeAllChildren(this.mainElement);
         this.heightUiActive = false;
         this.uiCompleted = false;
+    }
+
+    updateViewSelectorState() {
+        //show/hide ui elements
+        if(this.isViewActive) {
+            this.mainElement.style.display = ""; 
+            this.expandImage.style.display = "none";
+            this.contractImage.style.display = "";
+        }
+        else {
+            this.mainElement.style.display = "none";
+            this.expandImage.style.display = "";
+            this.contractImage.style.display = "none";
+        }
     }
 
     /** This method configures the toolbar for the view display. */

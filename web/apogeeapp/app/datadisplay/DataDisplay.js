@@ -69,9 +69,6 @@ export default class DataDisplay {
     //this method is called on unloading the display. OPTIONAL
     //onUnLoad() {}
 
-    //this methodis called on loading the display. OPTIONAL
-    //onResize() { }
-
     //this method is called when the display will be destroyed. OPTIONAL
     //destroy() {}
     

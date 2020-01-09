@@ -675,4 +675,4 @@ export default class Apogee extends EventManager {
 
 Apogee.DEFAULT_WORKSPACE_NAME = "workspace";
 
-const RESIZE_TIMER_PERIOD_MS = 300;
+const RESIZE_TIMER_PERIOD_MS = 500;

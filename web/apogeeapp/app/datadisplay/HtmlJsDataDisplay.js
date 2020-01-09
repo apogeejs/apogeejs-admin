@@ -14,9 +14,6 @@ import apogeeui from "/apogeeapp/ui/apogeeui.js";
  * destroy(outputElement,admin)
  * onLoad(outputElement,admin)
  * onUnload(outputElement,admin)
- * onResize(outputElement,admin)
- * 
- * constructorAddition(admin) DEPRECATED!
  * 
  * The admin object includes the following functions on it:
  * getMessenger()
@@ -36,15 +33,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         
         this.isLoaded = false;
         this.cachedData = undefined;
-    
-        // this.outputElement = apogeeui.createElement("div",null,{
-        //     "position":"absolute",
-        //     "top":"0px",
-        //     "left":"0px",
-        //     "bottom":"0px",
-        //     "right":"0px",
-        //     "overflow":"auto"
-        // });
+
         this.outputElement = apogeeui.createElement("div",null,{
             "position":"relative"
         });
@@ -60,28 +49,6 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             startEditMode: () => this.startEditMode(),
             endEditMode: () => this.endEditMode()
         }
-
-        //-------------------
-        //constructor code
-        //-------------------
-        //I have this for legacy reasons
-        if(resource.constructorAddition) {
-            try {
-                //custom code
-                resource.constructorAddition.call(resource,admin);
-            }
-            catch(error) {
-                if(error.stack) console.error(error.stack);
-                
-                alert("Error in " + this.member.getFullName() + " init function: " + error.message);
-            }
-        }
-
-        //------------------------
-        //add resize/load listener if needed
-        //------------------------
-
-        
 
         if(this.resource.onLoad) {
             this.onLoad = () => {
@@ -122,20 +89,6 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 }
             }
         }
-
-        if(this.resource.onResize) {
-            this.onResize = () => {
-                try {
-                    resource.onResize.call(resource,this.outputElement,admin);
-                }
-                catch(error) {
-                    if(error.stack) console.error(error.stack);
-                    
-                    console.log("Error in " + this.member.getFullName() + " onResize function: " + error.message);
-                }
-            };
-        }
-
 
         this.setData = (data) => {
             try {

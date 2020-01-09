@@ -34,10 +34,6 @@ export default class WebComponentDisplay {
         this.displayContainer.getIsShowing();
     }
 
-    onResize() {
-        this.displayContainer.onResize();
-    }
-
     getElement() {
         return this.mainElement;
     }

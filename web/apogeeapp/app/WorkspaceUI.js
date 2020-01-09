@@ -326,7 +326,7 @@ export default class WorkspaceUI {
     /** This method responds to a member updated. */
     memberCreated(eventInfo) {
         
-        this.testPrint(eventInfo);
+//        this.testPrint(eventInfo);
         
         //store the ui object
         var member = eventInfo.member;
@@ -342,7 +342,7 @@ export default class WorkspaceUI {
     /** This method responds to a member updated. */
     memberUpdated(eventInfo) {
         
-        this.testPrint(eventInfo);
+//        this.testPrint(eventInfo);
         
         //store the ui object
         var member = eventInfo.member;
@@ -359,7 +359,7 @@ export default class WorkspaceUI {
     /** This method responds to a "new" menu event. */
     memberDeleted(eventInfo) {
         
-        this.testPrint(eventInfo);
+//        this.testPrint(eventInfo);
 
         //store the ui object
         var member = eventInfo.member;

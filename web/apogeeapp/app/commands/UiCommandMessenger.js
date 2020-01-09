@@ -18,43 +18,45 @@ export default class UiCommandMessenger {
      * be the name as it would be specified in a formula from the given member. Data may
      * get a JSON or a Promise (for asynch data), Error (to set an error state) 
      * or apogeeutil.INVALID_VALUE.*/
-    getDataUpdateCommand(updateMemberName,data,optionalCommandDescription,optionalSetsWorkspaceDirty) {
-
-        var member = this._getMemberObject(updateMemberName);
-        if(!member) {
-            throw new Error("Error calling messenger - member not fond: " + updateMemberName);
-        }
-        
-        return getSaveDataAction(member.getWorkspace(),member.getFullName(),data);
-        
+    dataUpdate(updateMemberName,data,optionalCommandDescription,optionalSetsWorkspaceDirty) {
+        let command = this._createDataUpdateCommand(updateMemberName,data,optionalCommandDescription,optionalSetsWorkspaceDirty);
+        return this.app.executeCommand(command);
     }
     
     /** This is similar to getDataUpdateCommand but it allows setting multiple values.
      * UpdateInfo is an array with each element being a array of two values with the first
      * being the member name and the second being the value to set. */
-    getCompoundDataUpdateCommand(updateInfo,optionalCommandDescription,optionalSetsWorkspaceDirty) {
+    compoundDataUpdate(updateInfo,optionalCommandDescription,optionalSetsWorkspaceDirty) {
 
         //populte the update into with the proper member objects
-        let childActions = updateInfo.map( entry => {
-            childActions.push(this.getDataupdateCommand(entry[0],entry[1]));
-        });
-        
-        let compoundAction = {};
-        compoundAction.action = "compoundAction";
-        compoundAction.actions = childActions;
+        let childCommands = updateInfo.map( entry => this._createDataUpdateCommand(entry[0],entry[1]) );
 
-        return compoundAction;
+        command.type = "compoundCommand";
+        command.childCommands = childCommands;
+
+        return this.app.executeCommand(command);
         
-    }
-    
-    /** This method executes a command. */
-    executeCommand(command) {
-        this.app.executeCommand(command);
     }
     
     //=============================
     // Private Functions
     //=============================
+
+    _createDataUpdateCommand(updateMemberName,data,optionalCommandDescription,optionalSetsWorkspaceDirty) {
+
+        //resolve the member
+        var member = this._getMemberObject(updateMemberName);
+        if(!member) {
+            throw new Error("Error calling messenger - member not fond: " + updateMemberName);
+        }
+
+        let command = {};
+        command.type = "saveMemberData";
+        command.memberFullName = member.getFullName();
+        command.data = data;
+
+        return command
+    }
     
     /** This method returns the member instance for a given local member name,
      * as defined from the source object context. */
