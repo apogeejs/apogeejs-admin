@@ -104,7 +104,7 @@ export default class WebDisplayContainer {
                 if(!this.dataDisplay) {
                     //the display should be created only when it is made visible
                     this.dataDisplay =  this.component.getDataDisplay(this,this.viewType);
-                    this.setContent(this.dataDisplay.getContent(),this.dataDisplay.getContentType());
+                    this.setContent(this.dataDisplay.getContent());
                     this.dataDisplay.showData();
                 }
             
@@ -236,31 +236,10 @@ export default class WebDisplayContainer {
         }
     }
 
-    /** This sets the content for the window. The content type
-     *  can be:
-     *  apogeeui.RESIZABLE - for this content, the content is resized to fit the plane frame. The place frame should be initialized with a size.
-     *  apogeeui.FIXED_SIZE - for this content, the plain frame is sized to fit the content. ITs size should not be externally set.
-     *  apogeeui.SIZE_WINDOW_TO_CONTENT - this is not a content type but a input option for content FIXED_SIZE that shrinks the window to fit the content. It is typically only used for dialog boxes so isn't really relevent here.
-     */
-    setContent(contentElement,elementType) {
+    /** This sets the content for the window.  */
+    setContent(contentElement) {
         
         apogeeui.removeAllChildren(this.viewContainer);
-        
-    //    //set the body type
-    //    var bodyClassName;
-    //    if(elementType == apogeeui.RESIZABLE) {
-    //       bodyClassName = "visiui-dnh-fixed";
-    //    }
-    //    else if(elementType == apogeeui.FIXED_SIZE) {
-    //        bodyClassName = "visiui-dnh-shrink-to-fit";
-    //    }
-    //    else if(elementType == apogeeui.SIZE_WINDOW_TO_CONTENT) {
-    //        bodyClassName = "visiui-dnh-shrink-to-fit";
-    //    }
-    //    else {
-    //        throw new Error("Unknown content type: " + elementType);
-    //    }
-    //    this.displayAndHeader.setBodyType(bodyClassName);
         
         //set the content
         this.viewContainer.appendChild(contentElement);

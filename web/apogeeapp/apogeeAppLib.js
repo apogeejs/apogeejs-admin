@@ -21,7 +21,6 @@ export {default as DATA_DISPLAY_CONSTANTS} from "/apogeeapp/app/datadisplay/data
 export {default as ErrorDisplay} from "/apogeeapp/app/datadisplay/ErrorDisplay.js";
 export {default as HandsOnGridEditor} from "/apogeeapp/app/datadisplay/HandsOnGridEditor.js";
 export {default as HtmlJsDataDisplay} from "/apogeeapp/app/datadisplay/HtmlJsDataDisplay.js";
-export {default as TextAreaEditor} from "/apogeeapp/app/datadisplay/TextAreaEditor.js";
 
 export {showConfigurableDialog} from "/apogeeapp/app/dialogs/ConfigurableDialog.js";
 

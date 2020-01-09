@@ -33,10 +33,6 @@ export default class ErrorDisplay extends DataDisplay {
     getContent() {
         return this.displayElement;
     }
-    
-    getContentType() {
-        return apogeeui.FIXED_SIZE;
-    }
 
     setData(data) {
         //no action

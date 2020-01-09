@@ -33,16 +33,19 @@ export default class AceTextEditor extends DataDisplay {
         this.editorOptions = {};
         this.showSomeMaxLines = DEFAULT_MAX_LINES;
         if(options.displayMax) {
-            this.resizeMode = DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
             this.editorOptions.maxLines = MAX_MAX_LINES;
         }
         else {
-            this.resizeMode = DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
             this.editorOptions.maxLines = this.showSomeMaxLines;
         }
 
         this.editorOptions.minLines = DEFAULT_MIN_LINES;
 
+        //set variables for internal display view sizing
+        this.setSupressContainerHorizontalScroll(true);
+        this.setUseContainerHeightUi(true)
     }
     
     createEditor() {
@@ -149,34 +152,25 @@ export default class AceTextEditor extends DataDisplay {
     // following API to interact with the display
     //----------------------------
 
-    /** This method returns one of the following values to indicate support for resizing.
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_NO_SUPPORT - The UI should not resize the display
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_NO_INTERNAL_SUPPORT - The view shows a fixed size display. The UI is free to show a portion of it.
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT - The view supports the API to resize itself internally.
-     */
-    getResizeSupport() {
-        return DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT;
-    }
-
     /** This method gets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
      */
-    getResizeMode() {
-        return this.resizeMode;
+    getResizeHeightMode() {
+        return this.resizeHeightMode;
     }
 
     /** This method sets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
      */
-    setResizeMode(resizeMode) {
-        if(resizeMode == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
-            this.resizeMode = DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
+    setResizeHeightMode(resizeHeightMode) {
+        if(resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
             this.editorOptions.maxLines = this.showSomeMaxLines;
         }
-        else if(resizeMode == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX) {
-            this.resizeMode = DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
+        else if(resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX) {
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
             this.editorOptions.maxLines = MAX_MAX_LINES;
         }
         else {
@@ -189,15 +183,15 @@ export default class AceTextEditor extends DataDisplay {
         }
     }
 
-    /** This method adjusts the size when the resize mode is DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MORE;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_LESS;
+    /** This method adjusts the size when the resize mode is DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Options:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS;
     */
-    adjustSize(adjustment) {
-        if(this.resizeMode == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
+    adjustHeight(adjustment) {
+        if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
             if(this.editor) {
                 let newMaxLines;
-                if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_LESS) {
+                if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS) {
                     //decrease size by 1 line - except if our size is 
                     //larger than the current doc, then shrink it to 
                     //one line smaller than current doc.
@@ -210,7 +204,7 @@ export default class AceTextEditor extends DataDisplay {
                         newMaxLines = DEFAULT_MIN_LINES;
                     }
                 }
-                else if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_MORE) {
+                else if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE) {
                     //just grow size by 1 line
                     newMaxLines = this.showSomeMaxLines + 1;
                     if(newMaxLines >  MAX_MAX_LINES) {
@@ -230,23 +224,23 @@ export default class AceTextEditor extends DataDisplay {
         }
     }
 
-    /** This method returns the possible resize options, for use in the mode DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME. Flags:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_LESS = 1;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MORE = 2;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_NONE = 0;
+    /** This method returns the possible resize options, for use in the mode DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Flags:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS = 1;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE = 2;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_NONE = 0;
      * These flags should be or'ed togethder to give the allowed options.
     */
-    getSizeAdjustFlags() {
+    getHeightAdjustFlags() {
         //We won't dynamically figufre out if we can add or remove lines based on current content. If
         //we add this we will have to track if it changes. 
         //So they user may push these buttons and nothing will happen.
         //We will set the flags based on our absolute limits.
         let flags = 0;
         if(this.showSomeMaxLines < MAX_MAX_LINES) {
-            flags = flags | DATA_DISPLAY_CONSTANTS.RESIZE_MORE;
+            flags = flags | DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE;
         }
         if(this.showSomeMaxLines > DEFAULT_MIN_LINES) {
-            flags = flags | DATA_DISPLAY_CONSTANTS.RESIZE_LESS;
+            flags = flags | DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS;
         }
         return flags;
     }

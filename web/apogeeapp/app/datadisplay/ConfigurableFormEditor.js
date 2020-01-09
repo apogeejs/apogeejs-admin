@@ -38,10 +38,6 @@ export default class ConfigurableFormEditor extends DataDisplay {
         return this.panel.getElement();
     }
     
-    getContentType() {
-        return apogeeui.FIXED_SIZE;
-    }
-    
     /** This returns the form value (not the layout too) */
     getData() {
         //output data is the form

@@ -100,25 +100,14 @@ export default class Tab extends EventManager {
         }
     }
 
-    /** This sets the content for the window. The content type
-     *  can be:
-     *  apogeeui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
-     *  apogeeui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.*/
-    setContent(contentElement,elementType) {
+    /** This sets the content for the window. */
+    setContent(contentElement) {
         if(!this.contentContainer) {
             this.contentContainer = apogeeui.createElement("div");
             apogeeui.removeAllChildren(this.bodyContainer);
             this.bodyContainer.appendChild(this.contentContainer);
         }
-        if(elementType == apogeeui.RESIZABLE) {
-            this.contentContainer.className = "visiui_tf_tab_contents_fixed";
-        }
-        else if(elementType == apogeeui.FIXED_SIZE) {
-            this.contentContainer.className = "visiui_tf_tab_contents_scrolling";
-        }
-        else {
-            throw new Error("Unknown content type: " + elementType);
-        }
+        this.contentContainer.className = "visiui_tf_tab_container";
         
         apogeeui.removeAllChildren(this.contentContainer);
         this.contentContainer.appendChild(contentElement);

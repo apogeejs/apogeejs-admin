@@ -21,10 +21,6 @@ export default class ConfigurableFormDisplay extends DataDisplay {
         return this.panel.getElement();
     }
     
-    getContentType() {
-        return apogeeui.FIXED_SIZE;
-    }
-    
     
     //this sets the data into the editor display. REQUIRED
     setData(layoutData) {

@@ -140,7 +140,6 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //set the content
         //-----------------------
         this.createDisplayContent();
-        this.tab.setContent(this.contentElement,apogeeui.FIXED_SIZE);
 
         if(this.tab.getIsShowing()) {
             this.tabShown()
@@ -196,7 +195,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //page body
         //-------------------
         this.contentElement = apogeeui.createElementWithClass("div","visiui_litPage_body",null);
-        this.tab.setContent(this.contentElement,apogeeui.FIXED_SIZE);
+        this.tab.setContent(this.contentElement);
 
         //we ony use this context menu and child map for parents
         //modify if we use this elsewhere

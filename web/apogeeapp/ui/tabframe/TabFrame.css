@@ -70,7 +70,7 @@
 	height:100%;
     position:relative;
     background-color:white;
-    overflow:auto;
+    /*overflow:auto;*/
 }
 
 .visiui-tf_tab-menuDiv {
@@ -108,24 +108,11 @@
     margin-right:5px;
 }
 
-.visiui_tf_tab_contents_fixed {
+.visiui_tf_tab_container {
     position:absolute;
     top:0px;
     left:0px;
     bottom:0px;
     right:0px;
     overflow:hidden;
-}
-
-.visiui_tf_tab_contents_scrolling {
-	position:absolute;
-    top:0px;
-    left:0px;
-    bottom:0px;
-    right:0px;
-    overflow:auto;
-}
-
-.visiui_tf_tab_contents_fit_content {
-	position:relative;
 }

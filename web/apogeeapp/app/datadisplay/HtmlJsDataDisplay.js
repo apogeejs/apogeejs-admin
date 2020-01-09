@@ -223,11 +223,6 @@ export default class HtmlJsDataDisplay extends DataDisplay {
     getContent() {
         return this.outputElement;
     }
-    
-    getContentType() {
-        return apogeeui.RESIZABLE;
-    }
-   
 }
 
 

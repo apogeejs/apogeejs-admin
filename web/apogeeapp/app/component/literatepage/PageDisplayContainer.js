@@ -28,6 +28,8 @@ export default class PageDisplayContainer {
         this.viewSelectorContainer = null;
         this.viewActiveElement = null;
         this.viewNameElement = null;
+
+        this.uiCompleted = false;
         
         this.isComponentShowing = false;
         this.isViewActive = isMainView;
@@ -43,6 +45,7 @@ export default class PageDisplayContainer {
         this.viewType = viewType;
         this.dataDisplay = null;
 
+        this.heightUiActive = false;
         this.showLessButton = null;
         this.showMoreButton = null;
         this.showMaxButton = null;
@@ -129,18 +132,7 @@ export default class PageDisplayContainer {
         
         //make the container
         this.mainElement = apogeeui.createElementWithClass("div","visiui_displayContainer_mainClass",null);
-        
-        //make the label for the view
-        this.viewLabelHeaderElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewLabelHeaderClass",this.mainElement);
 
-        this.viewLabelElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
-        this.viewLabelElement.innerHTML = this.viewType;
-
-        this.viewToolbarElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.viewLabelHeaderElement);
-
-        //add the view toolbar controls
-        this.populateViewToolbar();
-        
         //make the selector for the view, in the component title bar
         this.viewSelectorContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
 
@@ -156,40 +148,72 @@ export default class PageDisplayContainer {
         this.contractImage.src = apogeeui.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
 
         this.viewSelectorContainer.onclick = () => this.setIsViewActive(!this.isViewActive);
+    }
+
+    /** This completes the UI. It should only be called when the data display has been created. */
+    completeUI() {
+
+        if(!this.dataDisplay) return;
+        
+        //make the label for the view
+        this.viewLabelHeaderElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewLabelHeaderClass",this.mainElement);
+
+        this.viewLabelElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
+        this.viewLabelElement.innerHTML = this.viewType;
+
+        this.viewToolbarElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.viewLabelHeaderElement);
+
+        //add the view toolbar controls
+        this.populateViewToolbar();
         
         //add the header elment (for the save bar)
         this.headerContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
         
         //add the view container
-        this.viewContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
+        let viewContainerClass = this.dataDisplay.getSupressContainerHorizontalScroll() ? 
+            "visiui_displayContainer_viewContainerClass_noHScroll" : "visiui_displayContainer_viewContainerClass";
+        this.viewContainer = apogeeui.createElementWithClass("div",viewContainerClass,this.mainElement);
+
+        this.uiCompleted = true;
         
         //set the visibility state for the element
         this.setIsViewActive(this.isViewActive);
     }
 
+    /** This undoes the data display specific parts of the container ui */
+    uncompleteUI() {
+        apogeeui.removeAllChildren(this.mainElement);
+        this.heightUiActive = false;
+        this.uiCompleted = false;
+    }
+
     /** This method configures the toolbar for the view display. */
     populateViewToolbar() {
-        this.showLessButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
-        this.showLessButton.innerHTML = "less";
-        this.showLessButton.onclick = () => this.showLess();
-        this.showMoreButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
-        this.showMoreButton.innerHTML = "more";
-        this.showMoreButton.onclick = () => this.showMore();
-        this.showMaxButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
-        this.showMaxButton.innerHTML = "max";
-        this.showMaxButton.onclick = () => this.showMax();
+        if(this.dataDisplay.getUseContainerHeightUi()) {
+            this.showLessButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showLessButton.innerHTML = "less";
+            this.showLessButton.onclick = () => this.showLess();
+            this.showMoreButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showMoreButton.innerHTML = "more";
+            this.showMoreButton.onclick = () => this.showMore();
+            this.showMaxButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showMaxButton.innerHTML = "max";
+            this.showMaxButton.onclick = () => this.showMax();
+            this.heightUiActive = true;
+            this.updateViewSizeButtons()
+        }
     }
 
     showLess() {
-        if((this.dataDisplay)&&(this.dataDisplay.getResizeSupport() == DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT)) {
-            if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX) {
+        if((this.dataDisplay)&&(this.heightUiActive)) {
+            if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX) {
                 //if we are in display max mode, change to display some mode
-                this.dataDisplay.setResizeMode(DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME);
+                this.dataDisplay.setResizeHeightMode(DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME);
             }
-            else if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
+            else if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
                 //if we are in "some" mode, adjust size smaller if allowed
-                if((this.dataDisplay.getSizeAdjustFlags() | DATA_DISPLAY_CONSTANTS.RESIZE_LESS) !== 0) {                  
-                    this.dataDisplay.adjustSize(DATA_DISPLAY_CONSTANTS.RESIZE_LESS);
+                if((this.dataDisplay.getHeightAdjustFlags() | DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS) !== 0) {                  
+                    this.dataDisplay.adjustHeight(DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS);
                 }
             }
             else {
@@ -201,11 +225,11 @@ export default class PageDisplayContainer {
     }
 
     showMore() {
-        if((this.dataDisplay)&&(this.dataDisplay.getResizeSupport() == DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT)) {
-            if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
+        if((this.dataDisplay)&&(this.heightUiActive)) {
+            if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
                 //if we are in "some" mode, adjust size smaller if allowed
-                if((this.dataDisplay.getSizeAdjustFlags() | DATA_DISPLAY_CONSTANTS.RESIZE_MORE) !== 0) {
-                    this.dataDisplay.adjustSize(DATA_DISPLAY_CONSTANTS.RESIZE_MORE);
+                if((this.dataDisplay.getHeightAdjustFlags() | DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE) !== 0) {
+                    this.dataDisplay.adjustHeight(DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE);
                 }
             }
             else {
@@ -217,10 +241,10 @@ export default class PageDisplayContainer {
     }
 
     showMax() {
-        if((this.dataDisplay)&&(this.dataDisplay.getResizeSupport() == DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT)) {
-            if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
+        if((this.dataDisplay)&&(this.heightUiActive)) {
+            if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
                 //if we are in display max mode, change to display some mode
-                this.dataDisplay.setResizeMode(DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX);
+                this.dataDisplay.setResizeHeightMode(DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX);
             }
             else {
                 //no action is not in some mode
@@ -231,21 +255,23 @@ export default class PageDisplayContainer {
     }
 
     updateViewSizeButtons() {
-        let showLessVisible = false, showMoreVisible = false, showMaxVisible = false;
-        if((this.dataDisplay)&&(this.dataDisplay.getResizeSupport() == DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT)) {
-            if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME) {
-                showLessVisible = true;
-                showMoreVisible = true;
-                showMaxVisible = true;
+        if(this.heightUiActive) {
+            let showLessVisible = false, showMoreVisible = false, showMaxVisible = false;
+            if(this.dataDisplay) {
+                if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
+                    showLessVisible = true;
+                    showMoreVisible = true;
+                    showMaxVisible = true;
+                }
+                else if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX){
+                    showLessVisible = true;
+                }
             }
-            else if(this.dataDisplay.getResizeMode() == DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX){
-                showLessVisible = true;
-            }
-        }
 
-        this.showLessButton.style.display = (showLessVisible) ? "" : "none";
-        this.showMoreButton.style.display = (showMoreVisible) ? "" : "none";
-        this.showMaxButton.style.display = (showMaxVisible) ? "" : "none";
+            this.showLessButton.style.display = (showLessVisible) ? "" : "none";
+            this.showMoreButton.style.display = (showMoreVisible) ? "" : "none";
+            this.showMaxButton.style.display = (showMaxVisible) ? "" : "none";
+        }
         
     }
 
@@ -259,14 +285,13 @@ export default class PageDisplayContainer {
                 if(!this.dataDisplay) {
                     //the display should be created only when it is made visible
                     this.dataDisplay =  this.component.getDataDisplay(this,this.viewType);
-                    this.setContent(this.dataDisplay.getContent(),this.dataDisplay.getContentType());
+                    if(!this.uiCompleted) this.completeUI();
+                    this.setContent(this.dataDisplay.getContent());
                     this.dataDisplay.showData();
                 }
             
                 if(this.dataDisplay.onLoad) this.dataDisplay.onLoad();
                 this.dataDisplayLoaded = true;
-
-                this.updateViewSizeButtons();
             }
         }
         else {
@@ -310,6 +335,9 @@ export default class PageDisplayContainer {
     forceClearDisplay() {
         //this destrpys the data display, not the container - bad name
         this.destroy();
+
+        //this gets rid of the data display specific parts of the ui
+        this.uncompleteUI();
 
         //reload display
         this.updateDataDisplayLoadedState();
@@ -412,7 +440,7 @@ export default class PageDisplayContainer {
      *  apogeeui.FIXED_SIZE - for this content, the plain frame is sized to fit the content. ITs size should not be externally set.
      *  apogeeui.SIZE_WINDOW_TO_CONTENT - this is not a content type but a input option for content FIXED_SIZE that shrinks the window to fit the content. It is typically only used for dialog boxes so isn't really relevent here.
      */
-    setContent(contentElement,elementType) {
+    setContent(contentElement) {
         
         apogeeui.removeAllChildren(this.viewContainer);
         

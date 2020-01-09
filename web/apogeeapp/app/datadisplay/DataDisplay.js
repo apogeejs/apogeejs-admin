@@ -11,6 +11,10 @@ export default class DataDisplay {
         this.displayContainer = displayContainer;
         this.callbacks = callbacks;
         this.editOk = false;
+
+        //defaults for container sizing logic
+        this.supressContainerHorizontalScroll = false;
+        this.useContainerHeightUi = false;
     }
 
     setCallbacks(callbacks) {
@@ -59,25 +63,20 @@ export default class DataDisplay {
     //this sets the data into the editor display. REQUIRED if edit mode or save is used
     //setData(data) {}
     
-    //this methodis called on loading the display. OPTIONAL
+    //this method is called on loading the display. OPTIONAL
     //onLoad() {}
     
-    //this methodis called on loading the display. OPTIONAL
+    //this method is called on unloading the display. OPTIONAL
     //onUnLoad() {}
 
     //this methodis called on loading the display. OPTIONAL
     //onResize() { }
 
-    //this methodis called on loading the display. OPTIONAL
+    //this method is called when the display will be destroyed. OPTIONAL
     //destroy() {}
     
     //This method returns the content element for the data display REQUIRED
     //getContent() {}
-    
-    //This method returns the content type for the content. The choices of values are REQUIRED
-    //apogeeui.RESIZABLE - content can be resized to fit window - scrolling, if necessary is managed within the content element.
-    //apogeeui.FIXED_SIZE - the content is fixed size. The window will decide how to display the complete object.*/
-    //getContentType() {}
 
     //----------------------------
     // This is the View resize API
@@ -85,40 +84,52 @@ export default class DataDisplay {
     // following API to interact with the display
     //----------------------------
 
-    /** This method returns one of the following values to indicate support for resizing.
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_NO_SUPPORT - The UI should not resize the display
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_NO_INTERNAL_SUPPORT - The view shows a fixed size display. The UI is free to show a portion of it.
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_INTERNAL_SUPPORT - The view supports the API to resize itself internally.
-     */
-    getResizeSupport() {
-        return DATA_DISPLAY_CONSTANTS.RESIZE_NO_SUPPORT;
+    /** This function is called to see if the container should provide horizontal scroll bars for the display view content. */
+    getSupressContainerHorizontalScroll() {
+        return this.supressContainerHorizontalScroll;
+    }
+
+    /** This sets the variable that determines if the container will provide a horizontal scroll bars for the display view
+     * content. The default value is false. */
+    setSupressContainerHorizontalScroll(supressContainerHorizontalScroll) {
+        this.supressContainerHorizontalScroll = supressContainerHorizontalScroll;
+    }
+
+    /** This function is called to see if the container should provide a view height UI, if the container supports it. */
+    getUseContainerHeightUi() {
+        return this.useContainerHeightUi;
+    }
+
+    /** This sets the variable that determines if the container will provide a height adjustment UI. The default value is false. */
+    setUseContainerHeightUi(useContainerHeightUi) {
+        this.useContainerHeightUi = useContainerHeightUi;
     }
 
     /** This method gets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
      */
-    //getResizeMode();
+    //getResizeHeightMode();
 
     /** This method sets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
      */
-    //setResizeMode(resizeMode);
+    //setResizeHeightMode(resizeMode);
 
-    /** This method adjusts the size when the resize mode is DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MORE;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_LESS;
+    /** This method adjusts the size when the resize mode is DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Options:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS;
     */
-    //adjustSize(adjustment);
+    //adjustHeight(adjustment);
 
-    /** This method returns the possible resize options, for use in the mode DATA_DISPLAY_CONSTANTS.RESIZE_MODE_SOME. Flags:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_LESS = 1;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_MORE = 2;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_NONE = 0;
+    /** This method returns the possible resize options, for use in the mode DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Flags:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS = 1;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE = 2;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_NONE = 0;
      * These flags should be or'ed togethder to give the allowed options.
     */
-    //getSizeAdjustFlags();
+    //getHeightAdjustFlags();
 
     //=============================
     // protected, package and private Methods

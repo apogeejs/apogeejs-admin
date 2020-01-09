@@ -11,12 +11,13 @@ export default class HandsonGridEditor extends DataDisplay {
     constructor(displayContainer,callbacks) {
         super(displayContainer,callbacks);
 
+        this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+        this.savedPixelHeight = DEFAULT_PIXEL_HEIGHT;
+
         this.gridDiv = apogeeui.createElement("div",null,{
-            //"position":"relative",
             "width": "100%",
-            "height":"300px",
+            "height":this.savedPixelHeight + "px",
             "overflow":"hidden",
-            //"zIndex":0
         });
 
         this.inputData = null;
@@ -52,6 +53,10 @@ export default class HandsonGridEditor extends DataDisplay {
             }
         }
 
+        //set variables for internal display view sizing
+        this.setSupressContainerHorizontalScroll(true);
+        this.setUseContainerHeightUi(true)
+
         //we will use a listener to see when the page is resized
         let app = this.displayContainer.getComponent().getWorkspaceUI().getApp();
         this.frameWidthListener = () => this.onFrameWidthResize();
@@ -65,10 +70,6 @@ export default class HandsonGridEditor extends DataDisplay {
 
     getContent() {
         return this.gridDiv;
-    }
-    
-    getContentType() {
-        return apogeeui.RESIZABLE;
     }
     
     getData() {
@@ -107,22 +108,8 @@ export default class HandsonGridEditor extends DataDisplay {
         this.loaded = false;
     }
 
-    onResize() {
-        //dont use this for now
-    }
-
-    setSize() {  
-        if((this.gridDiv)&(this.gridDiv.parent)) {
-            this.gridDiv.style.width = this.gridDiv.parent.scrollWidth + "px";
-            this.gridDiv.style.height = this.gridDiv.parent.scrollWidth + "px";
-            if(this.gridControl) {
-                this.gridControl.render();
-            }
-        }
-    }
-
     onFrameWidthResize() {
-        this.setSize();
+        this.updateWidth();
     }
 
     destroy() {
@@ -137,6 +124,95 @@ export default class HandsonGridEditor extends DataDisplay {
             app.removeListener("frameWidthResize",this.frameWidthListener);
             this.frameWidthListener = null;
         }
+    }
+
+    /** This updates the width to the current container width. */
+    updateWidth() {
+        if(this.gridControl) {
+            this.gridControl.render();
+        }
+    }
+
+    /** This updates the height to the specified pixel height. */
+    updateHeight(pixelHeight) {
+        if(this.gridControl) {
+            this.gridControl.updateSettings({height: pixelHeight});
+        }
+    }
+
+    //----------------------------
+    // This is the View resize API
+    // The display has controls for the user to resize the display. These use the 
+    // following API to interact with the display
+    //----------------------------
+
+    /** This method gets the resize mode. Options:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
+     */
+    getResizeHeightMode() {
+        return this.resizeHeightMode;
+    }
+
+    /** This method sets the resize mode. Options:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
+     */
+    setResizeHeightMode(resizeHeightMode) {
+        let newPixelHeight;
+        if(resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+            newPixelHeight = this.savedPixelHeight;
+        }
+        else if(resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX) {
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
+            newPixelHeight = MAX_PIXEL_HEIGHT;
+        }
+        else {
+            //ignore unknown value
+            return;
+        }
+
+        this.updateHeight(newPixelHeight);
+    }
+
+    /** This method adjusts the size when the resize mode is DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Options:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS;
+    */
+    adjustHeight(adjustment) {
+        if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
+            let newPixelHeight;
+            if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS) {
+                //decrease up to the min size
+                newPixelHeight = this.savedPixelHeight - DELTA_PIXEL_HEIGHT;
+                if(newPixelHeight < MIN_PIXEL_HEIGHT) newPixelHeight = MIN_PIXEL_HEIGHT;
+
+            }
+            else if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE) {
+                //decrease up to the min size
+                newPixelHeight = this.savedPixelHeight + DELTA_PIXEL_HEIGHT;
+                if(newPixelHeight > MAX_PIXEL_HEIGHT) newPixelHeight = MAX_PIXEL_HEIGHT;
+            }
+            else {
+                //ignore an unknown command
+                return;
+            }
+            
+            this.savedPixelHeight = newPixelHeight;
+            this.updateHeight(newPixelHeight);
+        }
+    }
+
+    /** This method returns the possible resize options, for use in the mode DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Flags:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS = 1;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE = 2;
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_NONE = 0;
+     * These flags should be or'ed togethder to give the allowed options.
+    */
+    getHeightAdjustFlags() {
+        let flags = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS | DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE;
+        return flags;
     }
 
 //==============================
@@ -183,7 +259,7 @@ export default class HandsonGridEditor extends DataDisplay {
 
         this.gridControl = new Handsontable(this.gridDiv,gridOptions); 
 
-        this.setSize();
+        this.updateWidth();
     }
     
     
@@ -226,4 +302,10 @@ export default class HandsonGridEditor extends DataDisplay {
     }
 
 }
+
+//configuration constants
+let MAX_PIXEL_HEIGHT = 1000;
+let DEFAULT_PIXEL_HEIGHT = 300;
+let MIN_PIXEL_HEIGHT = 30;
+let DELTA_PIXEL_HEIGHT = 20;
 

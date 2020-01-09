@@ -199,6 +199,12 @@ apogeeui.setMemberCssData = function(objectId,cssText) {
 apogeeui.RESIZABLE = 0x01;
 apogeeui.FIXED_SIZE = 0x02;
 
+apogeeui.SCROLL_NONE = 0x00;
+apogeeui.SCROLL_VERTICAL = 0x01;
+apogeeui.SCROLL_HORIZONTAL = 0x02;
+apogeeui.SCROLL_BOTH = 0x03;
+
+
 //this is not an actual content type, but an option for displaying FIXED_SIZE content
 apogeeui.SIZE_WINDOW_TO_CONTENT = 0x03;
 
