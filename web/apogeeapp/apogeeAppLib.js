@@ -19,7 +19,7 @@ export {default as DataDisplay} from "/apogeeapp/app/datadisplay/DataDisplay.js"
 export {default as dataDisplayHelper} from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
 export {default as DATA_DISPLAY_CONSTANTS} from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
 export {default as ErrorDisplay} from "/apogeeapp/app/datadisplay/ErrorDisplay.js";
-export {default as HandsOnGridEditor} from "/apogeeapp/app/datadisplay/HandsOnGridEditor.js";
+export {default as HandsonGridEditor} from "/apogeeapp/app/datadisplay/HandsonGridEditor.js";
 export {default as HtmlJsDataDisplay} from "/apogeeapp/app/datadisplay/HtmlJsDataDisplay.js";
 
 export {showConfigurableDialog} from "/apogeeapp/app/dialogs/ConfigurableDialog.js";

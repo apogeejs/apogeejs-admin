@@ -75,6 +75,22 @@ export default class DataDisplay {
     //This method returns the content element for the data display REQUIRED
     //getContent() {}
 
+    //---------------------------
+    // UI State Management
+    //---------------------------
+    
+    /** This method adds any data display state info to the view state json. 
+     * By default there is none. Note that this modifies the json state of the view,
+     * rather than providing a data object that will by added to it.. */
+    addUiStateData(json) {
+
+    }
+
+    /** This method reads an data display state info from the view state json. */
+    readUiStateData(json) {
+
+    }
+
     //----------------------------
     // This is the View resize API
     // The display has controls for the user to resize the display. These use the 

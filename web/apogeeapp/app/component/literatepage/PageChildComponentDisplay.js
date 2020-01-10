@@ -8,13 +8,10 @@ import Menu from "/apogeeapp/ui/menu/Menu.js";
 /** This component represents a json table object. */
 export default class PageChildComponentDisplay {
 
-    constructor(component, parentComponentDisplay, options) {
+    constructor(component, parentComponentDisplay) {
         this.component = component;
         this.member = component.getMember();
         this.parentComponentDisplay = parentComponentDisplay;
-        
-        if(!options) options = {};
-        this.options = options;
         
         //these are the header elements
         this.iconOverlayElement
@@ -35,7 +32,10 @@ export default class PageChildComponentDisplay {
         this.setIsPageShowing(this.parentComponentDisplay.getIsShowing());
         this.parentComponentDisplay.addListener(apogeeui.SHOWN_EVENT,() => this.setIsPageShowing(true));
         this.parentComponentDisplay.addListener(apogeeui.HIDDEN_EVENT,() => this.setIsPageShowing(false));
-        
+
+        //set the initial state
+        let childDisplayState = component.getChildDisplayState();
+        this.setStateJson(childDisplayState);
 
         //add a cleanup action to the base component - component must already be initialized
     //    this.addCleanupAction(PageChildComponentDisplay.destroy);
@@ -93,8 +93,19 @@ export default class PageChildComponentDisplay {
 
     /** This gets the current window state, to reconstruct the view. */
     getStateJson() {
-        var json = {};
-        var dataPresent = false;
+        let json = {};
+        let dataPresent = false;
+        
+        //view state
+        json.views = {};
+        for(var viewType in this.displayContainerMap) {
+            let displayContainer = this.displayContainerMap[viewType];
+            let viewStateJson = displayContainer.getStateJson();
+            if(viewStateJson) {
+                json.views[viewType] = viewStateJson;
+                dataPresent = true;
+            }
+        }
         
         if(dataPresent) return json;
         else return undefined;
@@ -102,7 +113,21 @@ export default class PageChildComponentDisplay {
 
     /** This gets the current window state, to reconstruct the view. */
     setStateJson(json) {
-        
+        if(json) {
+
+            //set view state
+            if(json.views) {
+                for(let viewType in json.views) {
+                    let viewStateJson = json.views[viewType];
+                    if(viewStateJson) {
+                        let displayContainer = this.displayContainerMap[viewType];
+                        if(displayContainer) {
+                            displayContainer.setStateJson(viewStateJson);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /** This will reload the given data display. */

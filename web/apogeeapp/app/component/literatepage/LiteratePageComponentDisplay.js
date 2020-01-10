@@ -99,11 +99,10 @@ export default class LiteratePageComponentDisplay extends EventManager {
         // Get component display
         //-----------------
         var childComponentDisplay;
-        var childDisplayState = childComponent.getChildDisplayState();
 
         //create a new component display for this child
         if(childComponent.componentGenerator.hasChildEntry) {
-            childComponentDisplay = new PageChildComponentDisplay(childComponent,this,childDisplayState);
+            childComponentDisplay = new PageChildComponentDisplay(childComponent,this);
         }
 
         //------------------
@@ -118,14 +117,10 @@ export default class LiteratePageComponentDisplay extends EventManager {
     /** This is to record any state in the tab object. */
     getStateJson() {
         return null;
-//        return this.editorView.state.toJSON();
     }
 
     /** This is to restore any state in the tab object. */
     setStateJson(json) {
-        return null
-//        var editorState = this.editorManager.createEditorState(json.doc);
-//        this.editorView.updateState(editorState);
     }
 
     //===============================

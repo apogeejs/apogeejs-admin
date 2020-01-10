@@ -318,10 +318,6 @@ export default class Component extends EventManager {
             }
             
             this.childDisplayState = json.windowState;
-            
-    //        if(this.childComponentDisplay) {
-    //            this.childComponentDisplay.setStateJson(this.childDisplayState);
-    //        }
         }
         
         //allow the component implemnetation ro read from the json

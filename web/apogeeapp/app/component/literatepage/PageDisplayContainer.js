@@ -8,16 +8,10 @@ import apogeeui from "/apogeeapp/ui/apogeeui.js";
  */
 export default class PageDisplayContainer {
 
-    constructor(component, viewType, isMainView, options) {
-        
-        //set the options
-        if(!options) {
-            options = {};
-        }
+    constructor(component, viewType, isMainView) {
         
         //variables
         this.isMainView = isMainView;
-        this.options = options;
         
         this.mainElement = null;
         this.viewLabelHeaderElement = null;
@@ -49,6 +43,8 @@ export default class PageDisplayContainer {
         this.showLessButton = null;
         this.showMoreButton = null;
         this.showMaxButton = null;
+
+        this.savedUiState = {};
         
         //initialize
         this.initUI();
@@ -95,6 +91,33 @@ export default class PageDisplayContainer {
         }
 
         this.dispatchEvent(apogeeui.CLOSE_EVENT,this);
+    }
+
+    getStateJson() {
+        //update the saved state json
+        this.savedUiState.isViewActive = this.isViewActive;
+        if(this.dataDisplay) {
+            this.dataDisplay.addUiStateData(this.savedUiState);
+        }
+        return this.savedUiState;
+    }
+
+    setStateJson(json) {
+        if(json) {
+            this.savedUiState = json;
+        }
+        else {
+            this.savedUiState = {};
+        }
+
+        //update any relevent fields
+        if(this.savedUiState.isViewActive !== undefined) {
+            this.setIsViewActive(this.savedUiState.isViewActive);
+        }
+
+        if(this.dataDisplay) {
+            this.dataDisplay.readUiStateJson(this.savedUiState);
+        }
     }
 
     //---------------------------
@@ -286,6 +309,7 @@ export default class PageDisplayContainer {
                 if(!this.dataDisplay) {
                     //the display should be created only when it is made visible
                     this.dataDisplay =  this.component.getDataDisplay(this,this.viewType);
+                    this.dataDisplay.readUiStateData(this.savedUiState);
                     if(!this.uiCompleted) this.completeUI();
                     this.setContent(this.dataDisplay.getContent());
                     this.dataDisplay.showData();
@@ -304,6 +328,9 @@ export default class PageDisplayContainer {
                 
                 //we will destroy the display is the destroyViewOnInactive flag is set, and we are inactive
                 if((this.destroyViewOnInactive)&&(!this.isViewActive)) {
+                    //update the saved UI state
+                    this.dataDisplay.addUiStateData(this.savedUiState);
+
                     //remove content
                     this.safeRemoveContent();
                     //destroy the display
@@ -334,6 +361,10 @@ export default class PageDisplayContainer {
     /** This method cleasr the data display. It should only be called when the data display is not showing. 
      * maybe allow this when the display is showing - unload and reload it*/
     forceClearDisplay() {
+
+        //update the stored UI state json
+        this.savedUiState = this.getStateJson();
+
         //this destrpys the data display, not the container - bad name
         this.destroy();
 

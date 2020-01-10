@@ -19,8 +19,10 @@ export default class AceTextEditor extends DataDisplay {
         this.editorDiv = apogeeui.createElement("div");
 
         //========================
-        //this.editorDiv.style.fontSize = "12px";
-        //this.editorDiv.style.lineHeight = "1.2";
+        //this is for consistency of lines to pixels
+        this.editorDiv.style.fontSize = "12px";
+        this.editorDiv.style.lineHeight = "1.2";
+        this.pixelsPerLine = 14;
         //=========================
 
         this.aceMode = aceMode;
@@ -138,6 +140,43 @@ export default class AceTextEditor extends DataDisplay {
             var activeData = this.editor.getSession().getValue();
             if(activeData != this.storedData) {
                 this.onTriggerEditMode();
+            }
+        }
+    }
+
+    //---------------------------
+    // UI State Management
+    //---------------------------
+    
+    /** This method adds any data display state info to the view state json. 
+     * By default there is none. Note that this modifies the json state of the view,
+     * rather than providing a data object that will by added to it.. */
+    addUiStateData(json) {
+        if(this.editorOptions.maxLines) {
+            json.height = this.editorOptions.maxLines * this.pixelsPerLine;
+        }
+    }
+
+    /** This method reads an data display state info from the view state json. */
+    readUiStateData(json) {
+        if(json.height) {
+            let maxLines = Math.round(json.height / this.pixelsPerLine);
+            if(maxLines >= MAX_MAX_LINES) {
+                this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
+                maxLines = MAX_MAX_LINES;
+            }
+            else {
+                this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+                if(maxLines < DEFAULT_MIN_LINES) {
+                    maxLines = DEFAULT_MIN_LINES;
+                }
+                this.showSomeMaxLines = maxLines;
+            }
+
+            this.editorOptions.maxLines = maxLines;
+
+            if(this.editor) {
+                this.editor.setOptions(this.editorOptions);
             }
         }
     }

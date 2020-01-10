@@ -60,6 +60,32 @@ export default class WebDisplayContainer {
         this.dispatchEvent(apogeeui.CLOSE_EVENT,this);
     }
 
+    /** I don't expect this will be used. People currently won't be saving from the web app.
+     * But if it is, it will pass along the data display state.  */
+    getStateJson() {
+        //we only read the data display data
+        if(this.dataDisplay) {
+            this.dataDisplay.addUiStateData(this.savedUiState);
+        }
+        return this.savedUiState;
+    }
+
+    /** This container only reads the data display state. And saved state for the display container is ignored. */
+    setStateJson(json) {
+        if(json) {
+            this.savedUiState = json;
+        }
+        else {
+            this.savedUiState = {};
+        }
+
+        //we only read the data display state
+        //there is no state used in the container itself.
+        if(this.dataDisplay) {
+            this.dataDisplay.readUiStateJson(this.savedUiState);
+        }
+    }
+
     //---------------------------
     // GUI ELEMENT
     //---------------------------

@@ -138,6 +138,42 @@ export default class HandsonGridEditor extends DataDisplay {
         if(this.gridControl) {
             this.gridControl.updateSettings({height: pixelHeight});
         }
+        else {
+            this.gridDiv.style.height = this.savedPixelHeight + "px";
+        }
+    }
+
+    //---------------------------
+    // UI State Management
+    //---------------------------
+    
+    /** This method adds any data display state info to the view state json. 
+     * By default there is none. Note that this modifies the json state of the view,
+     * rather than providing a data object that will by added to it.. */
+    addUiStateData(json) {
+        if(this.savedPixelHeight) {
+            json.height = this.savedPixelHeight;
+        }
+    }
+
+    /** This method reads an data display state info from the view state json. */
+    readUiStateData(json) {
+        if(json.height) {
+            let newPixelHeight = json.height;
+            if(newPixelHeight >= MAX_PIXEL_HEIGHT) {
+                this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
+                newPixelHeight = MAX_PIXEL_HEIGHT;
+            }
+            else {
+                this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+                if(newPixelHeight < MIN_PIXEL_HEIGHT) {
+                    newPixelHeight = MIN_PIXEL_HEIGHT;
+                }
+            }
+
+            this.savedPixelHeight = newPixelHeight;
+            this.updateHeight(newPixelHeight);
+        }
     }
 
     //----------------------------
@@ -242,8 +278,8 @@ export default class HandsonGridEditor extends DataDisplay {
                 afterRemoveCol:this.delayGridEdited,
                 afterRemoveRow:this.delayGridEdited,
                 width:"100%",
-                colWidths: 250,
-                rowHeights: 23
+                height: this.savedPixelHeight + "px"
+
             }
             this.gridEditable = true;
         }
@@ -253,6 +289,8 @@ export default class HandsonGridEditor extends DataDisplay {
                 readOnly: true,
                 rowHeaders: true,
                 colHeaders: true,
+                width:"100%",
+                height: this.savedPixelHeight + "px"
             }
             this.gridEditable = false;
         }

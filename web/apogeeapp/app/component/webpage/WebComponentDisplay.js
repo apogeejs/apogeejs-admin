@@ -14,6 +14,7 @@ export default class WebComponentDisplay {
 
         this.activeView = activeView;
         this.displayContainer = null;
+        this.savedActiveViewUiState = null;
         
         //these are the header elements
         this.mainElement = null;
@@ -75,6 +76,38 @@ export default class WebComponentDisplay {
         
     }
 
+    ////////////////////////////////////////////////////////////
+
+    /** This saves the state only for the single active view. */
+    getStateJson() {
+        //if the display container is active, update the saved state
+        if(this.displayContainer) {
+            this.savedActiveViewUiState = displayContainer.getStateJson();
+        }
+
+        if(this.savedActiveViewUiState) {
+            let json = {};
+            json.views = {};
+            json.views[this.activeView] = this.savedActiveViewUiState
+            return json;
+        }
+        else {
+            return null;
+        }
+    }
+
+    /** This reads the state only for the single active view. */
+    setStateJson(json) {
+        if((json)&&(json.views)) {
+            this.savedActiveViewUiState = json.views[this.activeView];
+            if((this.savedActiveViewUiState)&&(this.displayContainer)) {
+                this.displayContainer.setStateJson(this.savedActiveViewUiState);
+            }
+        }
+    }
+
+   ////////////////////////////////////////////////////
+
     /** This will reload the given data display. */
     reloadDisplay(viewType) {
         if(viewType == this.activeView) {
@@ -88,6 +121,9 @@ export default class WebComponentDisplay {
     deleteDisplay() {
         //dispose any view elements
         if(this.displayContainer) {
+            //refresh the saved UI state
+            this.savedActiveViewUiState = displayContainer.getStateJson();
+
             this.displayContainer.destroy();
             this.displayContainer = null;
         }
@@ -114,6 +150,11 @@ export default class WebComponentDisplay {
         
         //create the view element
         this.displayContainer = new WebDisplayContainer(this.component, this.activeView);
+
+        //set the saved state, if there is one
+        if(this.savedActiveViewUiState) {
+            this.displayContainer.setStateJson(this.savedActiveViewUiState);
+        }
         
         //add the view display
         this.viewContainer.appendChild(this.displayContainer.getDisplayElement());
