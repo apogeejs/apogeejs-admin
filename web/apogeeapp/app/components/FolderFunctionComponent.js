@@ -37,6 +37,16 @@ export default class FolderFunctionComponent extends ParentComponent {
         return new LiteratePageComponentDisplay(this,member,folder); 
     }
 
+    //cludge================================================
+    //I need a real solution for this
+    //this is a temp solution to return the parent member for children added to this componnet
+    //it is used for now when we paste into the document to create a new component.
+    getParentForChildren() {
+        let member = this.getMember();
+        return member.getInternalFolder();
+    }
+    //=======================================================
+
     //==============================
     // Child Display
     //==============================

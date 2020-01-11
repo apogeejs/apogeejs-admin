@@ -512,7 +512,10 @@ export default class ParentComponent extends Component {
     /** This method maps the list of component names to a list of delete commands. */
     createDeleteComponentCommands(deletedComponentShortNames) {
         return deletedComponentShortNames.map(shortName => {
-            let fullName = this.member.getChildFullName(shortName);
+
+            let parentMember = this.getParentForChildren();
+            let fullName = parentMember.getChildFullName(shortName);
+            
             let commandData = {};
             commandData.type = "deleteComponent";
             commandData.memberFullName = fullName;
@@ -525,9 +528,11 @@ export default class ParentComponent extends Component {
         return createdComponentInfos.map( createInfo => {
             let state = createInfo.state;
 
+            let parentMember = this.getParentForChildren();
+
             let commandData = {};
             commandData.type = "addComponent";
-            commandData.parentFullName = this.member.getFullName();
+            commandData.parentFullName = parentMember.getFullName();
             commandData.memberJson = state.memberJson;
             commandData.componentJson = state.componentJson;
             return commandData;
