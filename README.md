@@ -1,3 +1,3 @@
 #Apogee
 
-Apogee is a spreadsheet-inspired programming environmant. For more information go to http://www.apogeejs.com.
+Apogee is a javascriptd programming environmant for interactive programming. For more information go to http://www.apogeejs.com.
