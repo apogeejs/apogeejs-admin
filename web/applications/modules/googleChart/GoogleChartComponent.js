@@ -337,7 +337,7 @@ export function initApogeeModule(apogee,apogeeapp,apogeeutil) {
         //=====================================
 
         _displayData() {
-            if(!this.data) return;
+            if((!this.data)||(!this.data.rows)) return;
 
             if(!this.chart) {
                 this.chart = this._instantiateChart();
