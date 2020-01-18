@@ -126,6 +126,10 @@ export function createFolderSchema(folderComponent) {
       defining: true,
       isolating: true,
 
+      //TEMP TEST////
+      hasInteractiveSelection: true,
+      ///////////////
+
       attrs: { 
         "name": { default: "" },
         "id": {default: 0}, //to be used later?

@@ -11,7 +11,8 @@ import MarkDropdownItem from "/apogeeapp/app/editor/toolbar/MarkDropdownItem.js"
 import ActionButton from "/apogeeapp/app/editor/toolbar/ActionButton.js";
 
 
-//import StateCheck from "/apogeeapp/app/editor/StateCheck.js";
+import StateCheck from "/apogeeapp/app/editor/StateCheck.js";
+import {getInteractiveNodePlugin} from "/apogeeapp/app/editor/InteractiveNodeKeyHandler.js";
 
 import { baseKeymap } from "/apogeeapp/app/editor/apogeeCommands.js";
 
@@ -21,6 +22,7 @@ import { DOMParser, Node as ProseMirrorNode, Mark }  from "/prosemirror/lib/pros
 import { EditorView }  from "/prosemirror/lib/prosemirror-view/src/index.js";
 import { Step }  from "/prosemirror/lib/prosemirror-transform/src/index.js";
 import { keymap }  from "/prosemirror/lib/prosemirror-keymap/src/keymap.js";
+import {gapCursor} from "/prosemirror/lib/prosemirror-gapcursor/src/index.js";
 
 import ApogeeComponentView from "/apogeeapp/app/editor/ApogeeComponentView.js";
 
@@ -102,12 +104,12 @@ export function createProseMirrorManager (folderComponent) {
   //state debug plugin
   //===========================
 
-  // let stateCheckPlugin = new Plugin({
-  //   view(editorView) {
-  //     let stateCheck = new StateCheck(editorView);
-  //     return stateCheck;
-  //   }
-  // })
+  let stateCheckPlugin = new Plugin({
+    view(editorView) {
+      let stateCheck = new StateCheck(editorView);
+      return stateCheck;
+    }
+  })
 
   //==============================
   // Create the editor
@@ -147,11 +149,12 @@ export function createProseMirrorManager (folderComponent) {
     var state = EditorState.create({
       doc: doc,
       plugins: [
-        //history(), //this is the prose mirror history plugin
+        getInteractiveNodePlugin(),
         keymap({ "Mod-z": undo, "Mod-y": redo }),
         keymap(baseKeymap),
-        toolbarPlugin
-        //stateCheckPlugin
+        gapCursor(),
+        toolbarPlugin,
+        stateCheckPlugin
       ]
     });
     return state;
