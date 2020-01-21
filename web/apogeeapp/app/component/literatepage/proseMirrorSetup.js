@@ -232,6 +232,8 @@ export function createProseMirrorManager (folderComponent) {
       transaction.setStoredMarks(endMarks);
     }
 
+    transaction.scrollIntoView();
+
     return editorData.apply(transaction);
   }
 
