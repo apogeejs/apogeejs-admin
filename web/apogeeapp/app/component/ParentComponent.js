@@ -200,6 +200,9 @@ export default class ParentComponent extends Component {
 
                 //close out the final transaction, if needed
                 if(transactionModified) {
+                    //make sure we scroll into view
+                    modifiedTransaction.scrollIntoView();
+
                     //save the transaction as a command (so we can add the model commands now)
                     let editorCommand = this.createEditorCommand(modifiedTransaction,workingInitialSelection,workingInitialMarks);
                     commandList.push(editorCommand);
@@ -589,7 +592,7 @@ export default class ParentComponent extends Component {
         if(found) {
             let $from = state.doc.resolve(from);
             let selection = new NodeSelection($from);
-            let transaction = state.tr.setSelection(selection);
+            let transaction = state.tr.setSelection(selection).scrollIntoView();
             this.applyTransaction(transaction);
         }
     }
@@ -669,6 +672,7 @@ export default class ParentComponent extends Component {
 
         //finish the document transaction
         addTransaction = addTransaction.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "name": shortName }));
+        addTransaction.scrollIntoView();
         commands.editorAddCommand = this.createEditorCommand(addTransaction,initial2Selection,initial2Marks);
 
         return commands;
@@ -685,7 +689,7 @@ export default class ParentComponent extends Component {
         //get all the replcaed apogee components
         transaction.steps.forEach( (step,index) => {
             let stepDoc = transaction.docs[index];
-            let stepShortName = this.getStepDeletedComponentShortNames(step,stepDoc);
+            let stepShortNames = this.getStepDeletedComponentShortNames(step,stepDoc);
             transactionShortNames.push(...stepShortNames);
         });
     
@@ -704,7 +708,7 @@ export default class ParentComponent extends Component {
         //end test
 
         if(found) {
-            let transaction = state.tr.delete(from, to);
+            let transaction = state.tr.delete(from, to).scrollIntoView();
             var commandData = this.createEditorCommand(transaction,state.selection,state.marks);
             return commandData;
         }
@@ -743,7 +747,6 @@ export default class ParentComponent extends Component {
             return null;
         }
     }
-
         
     //end page code
     //############################################################################################################
@@ -760,10 +763,7 @@ export default class ParentComponent extends Component {
      * to show the child in the open parent. */
     showChildComponent(childComponent) {
         if(childComponent.getMember().getParent() != this.getMember()) return;
-        
-        if(this.tabDisplay) {
-            this.tabDisplay.showChildComponent(childComponent);
-        }
+        this.selectApogeeNode(childComponent.getName());
     }
 
 

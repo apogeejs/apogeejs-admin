@@ -5,6 +5,8 @@ import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/ad
 import {bannerConstants,getBanner,getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
 import PageChildComponentDisplay from "/apogeeapp/app/component/literatepage/PageChildComponentDisplay.js"
 
+import {selectionBetween} from "/prosemirror/lib/prosemirror-view/src/selection.js";
+
 import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import Tab from "/apogeeapp/ui/tabframe/Tab.js";
 
@@ -80,18 +82,6 @@ export default class LiteratePageComponentDisplay extends EventManager {
         this.editorView.updateState(editorData);
     }
 
-    /** This method is used to bring the child component to the front. */
-    showChildComponent(childComponent) {
-        //########################################
-        //NOTE - this will change if we get rid of child entries in the tree
-        //########################################
-        
-        var childComponentDisplay = childComponent.getComponentDisplay();
-        if(childComponentDisplay) {
-            alert("Not implemented!");
-        }
-    }
-
     /** This creates and adds a display for the child component to the parent container. */
     addChildComponent(childComponent) {
 
@@ -113,6 +103,38 @@ export default class LiteratePageComponentDisplay extends EventManager {
             childComponent.setComponentDisplay(childComponentDisplay);
         }
     }
+
+    // /** This will scroll so the current selection is in view. */
+    // issueScrollToViewCommand() {
+    //     let state = this.component.getEditorData();
+    //     let transaction = state.tr.scrollIntoView();
+    //     this.component.applyTransaction(transaction); 
+    // }
+
+    /** This will move the selection to the end of the document. */
+    selectStartOfDocument() {
+        let state = this.component.getEditorData();
+        let $startPos = state.doc.resolve(0);
+        let selection = selectionBetween(this.editorView, $startPos, $startPos);
+        let transaction = state.tr.setSelection(selection).scrollIntoView();
+        this.component.applyTransaction(transaction);
+
+        this.component.giveEditorFocusIfShowing();
+    }
+
+    /** This will move the selection to the end of the document. */
+    selectEndOfDocument() {
+        let state = this.component.getEditorData();
+        let endPos = state.doc.content.size;
+        let $endPos = state.doc.resolve(endPos);
+        let selection = selectionBetween(this.editorView, $endPos, $endPos);
+        let transaction = state.tr.setSelection(selection).scrollIntoView();
+        this.component.applyTransaction(transaction);
+
+        this.component.giveEditorFocusIfShowing();
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** This is to record any state in the tab object. */
     getStateJson() {
@@ -183,7 +205,6 @@ export default class LiteratePageComponentDisplay extends EventManager {
         this.componentToolbarContainer = apogeeui.createElementWithClass("div","visiui_litPage_componentToolbar",this.headerElement);
         this.bannerContainer = apogeeui.createElementWithClass("div","visiui_litPage_banner",this.headerElement);
 
-//        this.initEditorToolbar();
         this.initComponentToolbar();
 
         //-------------------
@@ -211,6 +232,9 @@ export default class LiteratePageComponentDisplay extends EventManager {
         
         var editorData = this.component.getEditorData();
         this.editorView.updateState(editorData);
+
+        //set the selection to the end of the view
+        this.selectEndOfDocument();
     }
 
     initComponentToolbar() {
@@ -266,18 +290,24 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
 
     initEditor() {
-
-        var container = document.createElement("div");
-        this.contentElement.appendChild(container);
         
         //start with an empty component display
         var emptyEditorState = this.editorManager.createEditorState();
         
-        this.editorView = this.editorManager.createEditorView(container,this.component, this.member, emptyEditorState);
+        this.editorView = this.editorManager.createEditorView(this.contentElement,this.component, this.member, emptyEditorState);
+
+        this.contentElement.addEventListener("click",event => this.onClickContentElement(event));
 
         //add the editor toolbar
         this.editorToolbarContainer.appendChild(this.editorManager.editorToolbarElement);
         
+    }
+
+    /** This is used to select the end of the document if the page is clicked below the document end. */
+    onClickContentElement(event) {
+        if(event.target == this.contentElement) {
+            this.selectEndOfDocument();    
+        }    
     }
 
     /** This should be called by the parent component when it is discarding the 

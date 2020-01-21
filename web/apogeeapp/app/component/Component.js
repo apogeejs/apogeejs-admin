@@ -493,7 +493,6 @@ export default class Component extends EventManager {
     /** This method creates a callback for deleting the component. 
      *  @private */
     createOpenCallback() {
-        var instance = this;
         var openCallback;
         var workspaceUI = this.workspaceUI;
         
@@ -510,21 +509,34 @@ export default class Component extends EventManager {
         }
         
         if(this.usesTabDisplay()) {
-            openCallback = function() {
-                makeTabActive(instance);
+            openCallback = () => {
+                makeTabActive(this);
+
+                //allow time for UI to be created and then select start fo doc
+                //this will also give the doc focus
+                setTimeout(() => {
+                    let tabDisplay = this.getTabDisplay();
+                    if(tabDisplay.selectStartOfDocument) {
+                        tabDisplay.selectStartOfDocument();
+                    }
+                },0);
             }
         }
         else {
             //remove the tree from the parent
-            openCallback = function() {
-                var parent = instance.member.getParent();
+            openCallback = () => {
+                var parent = this.member.getParent();
                 if(parent) {
                     var parentComponent = workspaceUI.getComponent(parent);
                     if((parentComponent)&&(parentComponent.usesTabDisplay())) {
 
                         //open the parent and bring this child to the front
                         makeTabActive(parentComponent);
-                        parentComponent.showChildComponent(instance);
+
+                        //allow time for UI to be created and then show child
+                        setTimeout(() => {
+                            parentComponent.showChildComponent(this);
+                        },0);
                     }
                 }
             }

@@ -61,9 +61,8 @@ export function createProseMirrorManager (folderComponent) {
 
   //this determines if the list indent buttons are active
   let listIndentIsActive = (selectionInfo) => {
-    let blockCount = selectionInfo.blocks.blockCount;
     let blockTypes = selectionInfo.blocks.blockTypes;
-    return ((blockCount === 1)&&(blockTypes[0].spec.group == "list"));
+    return ((blockTypes.length === 1)&&(blockTypes[0].spec.group == "list"));
   }
 
   let toolbarItems = [

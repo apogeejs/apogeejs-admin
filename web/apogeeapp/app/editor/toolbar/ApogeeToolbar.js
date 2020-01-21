@@ -77,12 +77,11 @@ export default class ApogeeToolbar {
 
     //----------------------------
     //get block info
-    //create a list of blocks present, along with the total number of blocks
+    //create a list of blocks present
     //-----------------------------
     let blockInfo = {};
     let startBlockIndex = $from.index(0);
     let endBlockIndex = $to.index(0);
-    blockInfo.blockCount = endBlockIndex - startBlockIndex + 1;
 
     let blockMap = {};
     blockInfo.blockTypes = [];
