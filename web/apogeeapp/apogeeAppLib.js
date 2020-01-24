@@ -1,33 +1,33 @@
 //This is a single module that exports the public items from the apogee app namespace
-export {default as Apogee} from "/apogeeapp/app/Apogee.js";
-export {default as BaseFileAccess} from "/apogeeapp/app/BaseFileAccess.js";
+export {default as Apogee} from "/apogeeapp/Apogee.js";
+export {default as BaseFileAccess} from "/apogeeapp/BaseFileAccess.js";
 
-export {default as UiCommandMessenger} from "/apogeeapp/app/commands/UiCommandMessenger.js";
+export {default as UiCommandMessenger} from "/apogeeapp/commands/UiCommandMessenger.js";
 
-export {default as Component} from "/apogeeapp/app/component/Component.js";
-export {default as EditComponent} from "/apogeeapp/app/component/EditComponent.js";
+export {default as Component} from "/apogeeapp/component/Component.js";
+export {default as EditComponent} from "/apogeeapp/component/EditComponent.js";
 
 //needed just for web lib
-export {default as WebComponentDisplay} from "/apogeeapp/app/component/webpage/WebComponentDisplay.js";
+export {default as WebComponentDisplay} from "/apogeeview/componentdisplay/webpage/WebComponentDisplay.js";
 
-export {default as BasicControlComponent} from "/apogeeapp/app/components/BasicControlComponent.js";
+export {default as BasicControlComponent} from "/apogeeapp/components/BasicControlComponent.js";
 
-export {default as AceTextEditor} from "/apogeeapp/app/datadisplay/AceTextEditor.js";
-export {default as ConfigurableFormDisplay} from "/apogeeapp/app/datadisplay/ConfigurableFormDisplay.js";
-export {default as ConfigurableFormEditor} from "/apogeeapp/app/datadisplay/ConfigurableFormEditor.js";
-export {default as DataDisplay} from "/apogeeapp/app/datadisplay/DataDisplay.js";
-export {default as dataDisplayHelper} from "/apogeeapp/app/datadisplay/dataDisplayCallbackHelper.js";
-export {default as DATA_DISPLAY_CONSTANTS} from "/apogeeapp/app/datadisplay/dataDisplayConstants.js";
-export {default as ErrorDisplay} from "/apogeeapp/app/datadisplay/ErrorDisplay.js";
-export {default as HandsonGridEditor} from "/apogeeapp/app/datadisplay/HandsonGridEditor.js";
-export {default as HtmlJsDataDisplay} from "/apogeeapp/app/datadisplay/HtmlJsDataDisplay.js";
+export {default as AceTextEditor} from "/apogeeview/datadisplay/AceTextEditor.js";
+export {default as ConfigurableFormDisplay} from "/apogeeview/datadisplay/ConfigurableFormDisplay.js";
+export {default as ConfigurableFormEditor} from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
+export {default as DataDisplay} from "/apogeeview/datadisplay/DataDisplay.js";
+export {default as dataDisplayHelper} from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
+export {default as DATA_DISPLAY_CONSTANTS} from "/apogeeview/datadisplay/dataDisplayConstants.js";
+export {default as ErrorDisplay} from "/apogeeview/datadisplay/ErrorDisplay.js";
+export {default as HandsonGridEditor} from "/apogeeview/datadisplay/HandsonGridEditor.js";
+export {default as HtmlJsDataDisplay} from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 
-export {showConfigurableDialog} from "/apogeeapp/app/dialogs/ConfigurableDialog.js";
+export {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 
-import apogeeui from "/apogeeapp/ui/apogeeui.js";
+import apogeeui from "/apogeeui/apogeeui.js";
 export { apogeeui };
 
-export {default as dialogMgr} from "/apogeeapp/ui/window/dialogMgr.js";
+export {default as dialogMgr} from "/apogeeui/window/dialogMgr.js";
 
 import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 export { ace };

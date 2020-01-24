@@ -1,4 +1,4 @@
-import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 
 /** 
  * SimpleGeojsonControl

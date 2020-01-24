@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="/apogee/apogee.js"></script>
+        <script type="text/javascript" src="/apogee/usrlib/apogeeutil.js"></script>
+        <script type="text/javascript" src="/apogeeapp/apogeeapp.js"></script>
+		<script type="text/javascript" src="/apogeeui/apogeeappui.js"></script>
+        <script src="ConfigurablePanel.js"></script>
+        <script src="ConfigurableElement.js"></script>
+        <script src="elements/HeadingElement.js"></script>
+        <script src="elements/TextFieldElement.js"></script>
+        <script src="elements/TextareaElement.js"></script>
+        <script src="elements/DropdownElement.js"></script>
+        <script src="elements/CheckboxElement.js"></script>
+        <script src="elements/CheckboxGroupElement.js"></script>
+        <script src="elements/RadioGroupElement.js"></script>
+        <script src="elements/InvisibleElement.js"></script>
+        <script src="elements/PanelElement.js"></script>
+        <script src="elements/SubmitElement.js"></script>
+        <link rel="stylesheet" type="text/css" href="ConfigurablePanel.css">
+        <style>
+            html,body {
+                position: relative;
+            }
+            .container {
+                position: relative;
+                height: 500px;
+                width: 400px;
+            }
+        </style>
+        <script>
+            function init() {
+                var layout = [];
+                var entry;
+        
+                //title
+                entry = {};
+                entry.type = "heading";
+                entry.level = 2;
+                entry.text = "Test Form";
+                layout.push(entry);
+                
+                //text entry
+                entry = {};
+                entry.type = "textField";
+                entry.label = "Test text entry: ";
+                entry.value = "xxx";
+                entry.key = "text1";
+                entry.onChangeCompleted = (value,form) => alert("Value updated: " + value);
+                entry.onChange = (value,form) => alert("Key typed into field: " + value);
+                layout.push(entry);
+                
+                //text entry
+                entry = {};
+                entry.type = "textarea";
+                entry.label = "Test text area: ";
+                entry.value = "asdfasdfasldfa;lskdjfas";
+                entry.cols = 30;
+                entry.rows = 5;
+                entry.key = "text2";
+                entry.onChangeCompleted = (value,form) => alert("Value updated: " + value);
+                entry.onChange = (value,form) => alert("Key typed into field: " + value);
+                layout.push(entry);
+                
+                //radio group 1
+                entry = {};
+                entry.type = "radioButtonGroup";
+                entry.label = "Radio 1: ";
+                entry.groupName = "rg1";
+                entry.entries = ["slop","freeze","dew"];
+                entry.value = "freeze";
+                entry.key = "rg1";
+                entry.onChange = (value,form) => alert("Value updated: " + value);
+                layout.push(entry);
+                
+                //ckeckbox group 1
+                entry = {};
+                entry.type = "checkboxGroup";
+                entry.label = "Check 1: ";
+                entry.entries = ["slop","freeze","dew"];
+                entry.value = ["freeze","slop"];
+                entry.key = "cbg1";
+                entry.horizontal = true;
+                entry.onChange = (value,form) => alert("Value updated: " + value);
+                layout.push(entry);
+                
+                //checkbox 1
+                entry = {};
+                entry.type = "checkbox";
+                entry.label = "Show child panel ";
+                entry.value = true;
+                entry.key = "cb1";
+                entry.onChange = (value,form) => {
+                    var childPanel = form.getEntry("childPanel");
+                    var state = value ? apogeeui.ConfigurableElement.STATE_NORMAL : apogeeui.ConfigurableElement.STATE_INACTIVE;
+                    childPanel.setState(state);
+                    
+//                    var newPanelValue = {
+//                        "d2":"dew",
+//                        "rg2":"dew",
+//                        "cbg2":["dew"],
+//                        "text3":"xyz",
+//                        "text4":"xyz"
+//                        
+//                    };
+//                    childPanel.setValue(newPanelValue);
+                };
+                layout.push(entry);
+                
+                //select group 1
+                entry = {};
+                entry.type = "dropdown";
+                entry.label = "Dropdown 1: ";
+                entry.entries = ["slop","freeze","dew"];
+                entry.value = "freeze";
+                entry.key = "d1";
+                entry.onChange = (value,form) => alert("Value updated: " + value);
+                layout.push(entry);
+                
+                //child panel
+                var childFormData = [];
+                
+                //title
+                entry = {};
+                entry.type = "heading";
+                entry.level = 3;
+                entry.text = "Child Form";
+                childFormData.push(entry);
+                
+                //select group 2
+                entry = {};
+                entry.type = "dropdown";
+                entry.label = "Dropdown 2: ";
+                entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]];
+                entry.value = "freeze";
+                entry.key = "d2";
+                entry.onChange = (value,form) => alert("Value updated: " + value);
+                childFormData.push(entry);
+                
+                //radio group 1
+                entry = {};
+                entry.type = "radioButtonGroup";
+                entry.label = "Radio 2: ";
+                entry.groupName = "rg2";
+                entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]]
+                entry.value = "freeze";
+                entry.horizontal = true;
+                entry.key = "rg2";
+                entry.onChange = (value,form) => alert("Value updated: " + value);
+                childFormData.push(entry);
+                
+                //checkbox group 2
+                entry = {};
+                entry.type = "checkboxGroup";
+                entry.label = "Check 2: ";
+                entry.entries = [["Slop","slop"],["Freeze","freeze"],["Dew","dew"]];
+                entry.value = ["freeze","slop"];
+                entry.key = "cbg2";
+                entry.onChange = (value,form) => alert("Value updated: " + value);
+                childFormData.push(entry);
+                
+                //text entry
+                entry = {};
+                entry.type = "textField";
+                entry.label = "Test text entry: ";
+                entry.value = "xxx";
+                entry.key = "text3";
+                entry.onChangeCompleted = (value,form) => alert("Value updated: " + value);
+                childFormData.push(entry);
+                
+                //text entry
+                entry = {};
+                entry.type = "textarea";
+                entry.label = "Test text area: ";
+                entry.value = "asdfasdfasldfa;lskdjfas";
+                entry.cols = 30;
+                entry.rows = 5;
+                entry.key = "text4";
+                entry.onChangeCompleted = (value,form) => alert("Value updated: " + value);
+                childFormData.push(entry);        
+                                
+                //end title
+                entry = {};
+                entry.type = "heading";
+                entry.level = 3;
+                entry.text = "End of Child Form";
+                childFormData.push(entry);
+                
+                entry = {};
+                entry.type = "panel";
+                entry.formData = childFormData;
+                entry.key = "childPanel";
+                layout.push(entry);
+                
+                //invisible 1
+                entry = {};
+                entry.type = "invisible";
+                entry.value = [3,4,3];
+                entry.key = "i1";
+                layout.push(entry);
+                
+                //submit
+                var onSubmit = formData => alert("result " + JSON.stringify(formData));
+                var onCancel = () => alert("Canceled!");
+                //standard method to add submit buttons
+                entry = {};
+                entry.type = "submit";
+                entry.onSubmit = onSubmit;
+                entry.onCancel = onCancel;
+                //layout.push(entry);
+                
+                var panel = new apogeeui.ConfigurablePanel();
+                panel.configureForm(layout);
+                
+                //alternate method to add submit buttons
+                panel.addSubmit(onSubmit,onCancel);
+                
+                var mainDiv = document.getElementById("mainDiv");
+                mainDiv.appendChild(panel.getElement());
+                
+            }
+        </script>
+    </head>
+    <body onload = "init()">
+        <div id="mainDiv" class="container"></div>
+    </body>
+</html>

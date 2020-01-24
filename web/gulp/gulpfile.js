@@ -40,17 +40,17 @@ let copyReleaseInfoTask = () => copyFilesTask(BASE_FILES,RELEASE_FOLDER);
 //=================================
 
 const CSS_FILES = [
-    "../apogeeapp/app/apogeeapp.css",
-    "../apogeeapp/app/component/literatepage/LiteratePage.css",
-    "../apogeeapp/app/editor/toolbar/ApogeeToolbar.css",
-    "../apogeeapp/ui/window/WindowFrame.css",
-    "../apogeeapp/ui/window/dialog.css",
-    "../apogeeapp/ui/displayandheader/DisplayAndHeader.css",
-    "../apogeeapp/ui/menu/Menu.css",
-    "../apogeeapp/ui/splitpane/SplitPane.css",
-    "../apogeeapp/ui/tabframe/TabFrame.css",
-    "../apogeeapp/ui/treecontrol/TreeControl.css",
-    "../apogeeapp/ui/configurablepanel/ConfigurablePanel.css", 
+    "../apogeeview/apogeeapp.css",
+    "../apogeeview/componentdisplay/literatepage/LiteratePage.css",
+    "../apogeeview/editor/toolbar/ApogeeToolbar.css",
+    "../apogeeui/window/WindowFrame.css",
+    "../apogeeui/window/dialog.css",
+    "../apogeeui/displayandheader/DisplayAndHeader.css",
+    "../apogeeui/menu/Menu.css",
+    "../apogeeui/splitpane/SplitPane.css",
+    "../apogeeui/tabframe/TabFrame.css",
+    "../apogeeui/treecontrol/TreeControl.css",
+    "../apogeeui/configurablepanel/ConfigurablePanel.css", 
     "../prosemirror/lib/compiledCss/editor.css",    
     "../ext/handsontable/handsontable_6.2.0/handsontable.full.min.css"
 ]

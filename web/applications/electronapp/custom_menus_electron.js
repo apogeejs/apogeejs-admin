@@ -1,5 +1,5 @@
     
-import Menu from "/apogeeapp/ui/menu/Menu.js";
+import Menu from "/apogeeui/menu/Menu.js";
 
 /** This method adds to the standard apogee menus.  */
 apogeeapp.app.Apogee.prototype.addToMenuBar = function(menuBar,menus) {

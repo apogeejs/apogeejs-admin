@@ -8,7 +8,7 @@ import Dependent from "/apogee/datacomponents/Dependent.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import Owner from "/apogee/datacomponents/Owner.js";
 import RootHolder from "/apogee/datacomponents/RootHolder.js";
-import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import CommandManager from "/apogeeapp/commands/CommandManager.js";
 
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */

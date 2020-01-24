@@ -1,7 +1,7 @@
-import Apogee from "/apogeeapp/app/Apogee.js";
+import Apogee from "/apogeeapp/Apogee.js";
 import ElectronAppConfigManager from "/supplemental/electronCode/ElectronAppConfigManager.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import apogeeui from "/apogeeapp/ui/apogeeui.js";
+import apogeeui from "/apogeeui/apogeeui.js";
 import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 
 //expose these apogee libraries
