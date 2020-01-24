@@ -29,6 +29,10 @@ export default function Workspace(optionalContextOwner) {
     this.name = Workspace.DEFAULT_WORKSPACE_NAME;
     
     this.owner = optionalContextOwner ? optionalContextOwner : null;
+
+    this.updated = {};
+
+    this.fieldUpdated("name");
 }
 
 //add components to this class
@@ -56,6 +60,7 @@ Workspace.EMPTY_WORKSPACE_JSON = {
 /** This method returns the root object - implemented from RootHolder.  */
 Workspace.prototype.setName = function(name) {
     this.name = name;
+    this.fieldUpdated("name");
 }
 
 /** This method returns the root object - implemented from RootHolder.  */
@@ -267,6 +272,24 @@ Workspace.prototype.loadFromJson = function(json) {
     
     return actionResult;
 }
+
+//-------------------------
+// Update Event Methods
+// - NOTE - these are repeated from Member. We should make common base class or add ins for this, along with some other things, like name
+//-------------------------
+
+Workspace.prototype.getUpdated = function() {
+    return this.updated;
+}
+
+Workspace.prototype.clearUpdated = function() {
+    this.updated = {};
+}
+
+Workspace.prototype.fieldUpdated = function(field) {
+    this.updated[field] = true;
+}
+
 
 //================================
 // Member generator functions

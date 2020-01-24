@@ -1,23 +1,9 @@
 import base from "/apogeeutil/base.js";
-import EventManager from "/apogeeutil/EventManagerClass.js";
 
+import EventManager from "/apogeeutil/EventManagerClass.js";
 import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
-import CommandHistory from "/apogeeapp/app/commands/CommandHistory.js";
 import ReferenceManager from "/apogeeapp/app/references/ReferenceManager.js";
 import "/apogeeapp/app/commandConfig.js";
-import {addComponent, addAdditionalComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
-import {closeWorkspace} from "/apogeeapp/app/commandseq/closeworkspaceseq.js";
-import {createWorkspace} from "/apogeeapp/app/commandseq/createworkspaceseq.js";
-import {importWorkspace} from "/apogeeapp/app/commandseq/importworkspaceseq.js";
-import {exportWorkspace} from "/apogeeapp/app/commandseq/exportworkspaceseq.js";
-import {openWorkspace,openWorkspaceFromTextData} from "/apogeeapp/app/commandseq/openworkspaceseq.js";
-import {saveWorkspace} from "/apogeeapp/app/commandseq/saveworkspaceseq.js";
-
-import apogeeui from "/apogeeapp/ui/apogeeui.js";
-import TabFrame from "/apogeeapp/ui/tabframe/TabFrame.js";
-import Menu from "/apogeeapp/ui/menu/Menu.js";
-import SplitPane from "/apogeeapp/ui/splitpane/SplitPane.js";
-import DisplayAndHeader from "/apogeeapp/ui/displayandheader/DisplayAndHeader.js";
 
 import JsonTableComponent from "/apogeeapp/app/components/JsonTableComponent.js";
 import FunctionComponent from "/apogeeapp/app/components/FunctionComponent.js";
@@ -28,7 +14,7 @@ import FormDataComponent from "/apogeeapp/app/components/FormDataComponent.js";
 import CustomComponent from "/apogeeapp/app/components/CustomComponent.js";
 import CustomDataComponent from "/apogeeapp/app/components/CustomDataComponent.js";
 
-import "/apogeeapp/ui/configurablepanel/ConfigurablePanelInit.js";
+import ApogeeView from "/apogeeapp/app/ApogeeView.js";
 
 /** @private */
 let apogeeInstance = null;
@@ -65,7 +51,7 @@ export default class Apogee extends EventManager {
         //construct the base app structures
         //---------------------------------
         
-        //workspaces
+        //workspace
         this.workspaceUI = null;
         
         //component generators
@@ -134,6 +120,11 @@ export default class Apogee extends EventManager {
         return this.referenceManager;
     }
 
+    /** This returns the app level view element. */
+    getAppView() {
+        return this.appView;
+    }
+
     /** This method registers a new component. It will be exposed when the user
      * requests to create a new component */
     registerComponent(componentGenerator) {
@@ -159,6 +150,22 @@ export default class Apogee extends EventManager {
     /** This method returns a component generator of a given name. */
     getComponentGenerator(name) {
         return this.componentGenerators[name];
+    }
+
+    getStandardComponentNames() {
+        return this.standardComponents;
+    }
+
+    getAdditionalComponentNames() {
+        return this.additionalComponents;
+    }
+
+    getComponentGenerators() {
+        return this.componentGenerators;
+    }
+
+    getFolderGenerator() {
+        return FolderComponent;
     }
 
 
@@ -235,7 +242,7 @@ export default class Apogee extends EventManager {
             throw base.createError("There is already an open workspace",false);
         }
         
-        workspaceUI.setApp(this,this.tabFrame,this.treePane);
+        workspaceUI.setApp(this,this.appView);
         this.workspaceUI = workspaceUI;
         
         return true;
@@ -302,7 +309,7 @@ export default class Apogee extends EventManager {
         
         //create the UI - if a container ID is passed in
         if(this.containerId) {
-            this.createUI(this.containerId);
+            this.appView = new ApogeeView(this,this.containerId);
         }
         
         //open the initial workspace
@@ -311,10 +318,18 @@ export default class Apogee extends EventManager {
             var workspaceFileMetadata = this.appConfigManager.getInitialWorkspaceFileMetadata(this);
             
             var openInitialWorkspace = workspaceText => {
-                openWorkspaceFromTextData(this,workspaceText,workspaceFileMetadata);
+                let workspaceJson = JSON.parse(workspaceText);
+
+                //open workspace
+                var commandData = {};
+                commandData.type = "openWorkspace";
+                commandData.workspaceJson = workspaceJson;
+                commandData.fileMetadata = workspaceFileMetadata;
+
+                this.executeCommand(commandData);
             };
             
-            workspaceFilePromise.then(openInitialWorkspace).catch(errorMsg => alert("Error downloading initial workspace."));
+            workspaceFilePromise.then(openInitialWorkspace).catch(errorMsg => alert("Error downloading initial workspace: " + errorMsg));
         }
         
     }
@@ -352,327 +367,7 @@ export default class Apogee extends EventManager {
         }
     }
 
-    //=================================
-    // User Interface Creation Methods
-    //=================================
-
-    /** This method creates the app ui. 
-     * @private */
-    createUI(containerId) {
-        
-        var windowElements = apogeeui.initWindows(containerId);
-        var topContainer = windowElements.baseElement;
-        
-        var mainContainer = new DisplayAndHeader(DisplayAndHeader.FIXED_PANE,
-                null,
-                DisplayAndHeader.FIXED_PANE,
-                null
-            );
-        topContainer.appendChild(mainContainer.getOuterElement());
-        
-        //-------------------
-        //create menus
-        //-------------------
-        var menuBar = this.createMenuBar();
-        mainContainer.getHeader().appendChild(menuBar);
-        
-        //----------------------
-        //create the split pane
-        //----------------------
-        this.splitPane = new SplitPane(
-                SplitPane.SCROLLING_PANE,
-                SplitPane.FIXED_PANE
-            );
-        mainContainer.getBody().appendChild(this.splitPane.getOuterElement());
-
-        //---------------------
-        //load the tree pane
-        //---------------------
-        this.treePane = this.splitPane.getLeftPaneContainer();
-        
-        //----------------------
-        //create the tab frame
-        //----------------------
-        this.tabFrame = new TabFrame();
-        this.splitPane.getRightPaneContainer().appendChild(this.tabFrame.getElement());
-        
-        //add listener for displaying the active tab
-        this.tabFrame.addListener(apogeeui.SHOWN_EVENT,tab => this.onTabShown(tab));
-        this.tabFrame.addListener(apogeeui.HIDDEN_EVENT,tab => this.onTabHidden(tab));
-
-        //-----------------------
-        // Create the width resize listener (for now I am putting it in app - refering to both panes)
-        //-----------------------
-
-        this.splitPane.addListener("move",() => this.onSplitPaneResize());
-        window.addEventListener("resize",() => this.onWindowResize());
-
-    }
-
-    /** This method creates the app ui. 
-     * @private */
-    onTabHidden(tab) {
-        this.activeTabIconDisplay.style.display = "none";
-        this.activeTabTitleDisplay.style.display = "none";
-    }
-
-    onTabShown(tab) {
-        if(!this.workspaceUI) return;
-        
-        var id = tab.getId();
-        var component = this.workspaceUI.getComponentById(id);
-        if(component) {
-            this.activeTabIconDisplay.src = component.getIconUrl();
-            this.activeTabTitleDisplay.innerHTML = component.getDisplayName(true);
-            this.activeTabIconDisplay.style.display = "";
-            this.activeTabTitleDisplay.style.display = "";
-        }
-    }
-
-    //---------------------------------
-    // Width resize events - for tab frame and tree frame
-    //---------------------------------
-
-    onSplitPaneResize() {
-        this.triggerResizeWait();
-    }
-
-    onWindowResize() {
-        this.triggerResizeWait();
-    }
-
-    triggerResizeWait() {
-        //only do the slow resizde timer if we have listeners
-        if(!this.hasListeners("frameWidthResize")) return;
-
-        //create a new timer if we don't already have one
-        if(!this.resizeWaitTimer) {
-            this.resizeWaitTimer =  setTimeout(() => this.resizeTimerExpired(),RESIZE_TIMER_PERIOD_MS);
-        }
-    }
-
-    resizeTimerExpired() {
-        this.resizeWaitTimer = null;
-        this.dispatchEvent("frameWidthResize",null);
-    }
-
-    //=================================
-    // Menu Functions
-    //=================================
-
-    /** This method creates the creates the menu bar, with the attached functionality. 
-     * @private */
-    createMenuBar() {
-        
-        //-------------------
-        //create menus
-        //-----------------------
-        
-        //create the menus
-        var menu;
-        var name;
-        var menus = {};
-        
-        //creat menu  bar with left elements (menus) and right elements (active tab display)
-        var menuBar = apogeeui.createElementWithClass("div","menu_bar");
-        var menuBarLeft = apogeeui.createElementWithClass("div","menu_bar_left",menuBar);
-        var menuBarRight = apogeeui.createElementWithClass("div","menu_bar_right",menuBar);
-
-        //Workspace menu
-        name = "Workspace";
-        this.workspaceMenu = Menu.createMenu(name);
-        menuBarLeft.appendChild(this.workspaceMenu.getElement());
-        menus[name] = this.workspaceMenu;
-        
-        //populate the workspace menu on the fly - depends on workspace state
-        var getWorkspaceMenuCallback = () => this.getWorkspaceMenuItems();
-        this.workspaceMenu.setAsOnTheFlyMenu(getWorkspaceMenuCallback);
-        
-        //Edit menu
-        name = "Edit";
-        this.editMenu = Menu.createMenu(name);
-        menuBarLeft.appendChild(this.editMenu.getElement());
-        menus[name] = this.editMenu;
-        
-        //populate the workspace menu on the fly - depends on workspace state
-        var getEditMenuCallback = () => this.getEditMenuItems();
-        this.editMenu.setAsOnTheFlyMenu(getEditMenuCallback);
-        
-        //FOR NOW REMOVE GLOBAL COMPONENT AND IMPORT MENUS
-        // //Components Menu
-        // name = "Components";
-        // menu = Menu.createMenu(name);
-        // menuBarLeft.appendChild(menu.getElement());
-        // menus[name] = menu;
-        
-        // //add create child elements
-        // menu.setMenuItems(this.getAddChildMenuItems());
-        
-        // //libraries menu
-        // name = "Import/Export";
-        // menu = Menu.createMenu(name);
-        // menuBarLeft.appendChild(menu.getElement());
-        // menus[name] = menu;
-        
-        // var importCallback = () => importWorkspace(this,this.fileAccessObject,FolderComponent);
-        // menu.addCallbackMenuItem("Import as Folder",importCallback);
-        
-        // var import2Callback = () => importWorkspace(this,this.fileAccessObject,FolderFunctionComponent);
-        // menu.addCallbackMenuItem("Import as Folder Function",import2Callback);
-        
-        // var exportCallback = () => exportWorkspace(this,this.fileAccessObject);
-        // menu.addCallbackMenuItem("Export as Workspace",exportCallback);
-        
-        //allow the implementation to add more menus or menu items
-        if(this.addToMenuBar) {
-            this.addToMenuBar(menuBar,menus);
-        }
-        
-        //add the active tab display
-        this.activeTabIconDisplay = apogeeui.createElementWithClass("img","tab-icon-display",menuBarRight);
-        this.activeTabIconDisplay.style.display = "none";
-        this.activeTabTitleDisplay = apogeeui.createElementWithClass("div","tab-title-display",menuBarRight);
-        this.activeTabTitleDisplay.style.display = "none";
-        return menuBar;
-        
-    }
-
-    /** This method gets the workspace menu items. This is created on the fly because the
-     * items will change depending on the state of the workspace. */
-    getWorkspaceMenuItems() {
-        
-        var menuItems = [];
-        var menuItem;
-        
-        menuItem = {};
-        menuItem.title = "New";
-        menuItem.callback = () => createWorkspace(this);
-        menuItems.push(menuItem);
-        
-        menuItem = {};
-        menuItem.title = "Open";
-        menuItem.callback = () => openWorkspace(this,this.fileAccessObject);
-        menuItems.push(menuItem);
-
-        var workspaceUI = this.getWorkspaceUI();
-        if(workspaceUI) {
-            var fileMetadata = workspaceUI.getFileMetadata();
-
-            if(this.fileAccessObject.directSaveOk(fileMetadata)) {
-                menuItem = {};
-                menuItem.title = "Save";
-                menuItem.callback = () => saveWorkspace(this,this.fileAccessObject,true);
-                menuItems.push(menuItem);
-            }
-
-            menuItem = {};
-            menuItem.title = "Save as";
-            menuItem.callback = () => saveWorkspace(this,this.fileAccessObject,false);
-            menuItems.push(menuItem);
-        }  
-
-        menuItem = {};
-        menuItem.title = "Close";
-        menuItem.callback = () => closeWorkspace(this);
-        menuItems.push(menuItem);
-        
-        return menuItems;
-    }
-
-    /** This method gets the workspace menu items. This is created on the fly because the
-     * items will change depending on the state of the workspace. */
-    getEditMenuItems() {
-        
-        var menuItems = [];
-        var menuItem;
-
-        let commandHistory = this.commandManager.getCommandHistory();
-        
-        //populate the undo menu item
-        var undoLabel;
-        var undoCallback;
-        var nextUndoDesc = commandHistory.getNextUndoDesc();
-        if(nextUndoDesc === CommandHistory.NO_COMMAND) {
-            undoLabel = "-no undo-"
-            undoCallback = null;
-        }
-        else {
-            if(nextUndoDesc == "") {
-                undoLabel = "Undo"
-            }
-            else {
-                undoLabel = "Undo: " + nextUndoDesc;
-            }
-            undoCallback = () => commandHistory.undo();
-        }
-        menuItem = {};
-        menuItem.title = undoLabel;
-        menuItem.callback = undoCallback;
-        menuItems.push(menuItem);
-        
-        //populate the redo menu item
-        var redoLabel;
-        var redoCallback;
-        var nextRedoDesc = commandHistory.getNextRedoDesc();
-        if(nextRedoDesc === CommandHistory.NO_COMMAND) {
-            redoLabel = "-no redo-"
-            redoCallback = null;
-        }
-        else {
-            if(nextRedoDesc == "") {
-                redoLabel = "Redo"
-            }
-            else {
-                redoLabel = "Redo: " + nextRedoDesc;
-            }
-            redoCallback = () => commandHistory.redo();
-        }
-        menuItem = {};
-        menuItem.title = redoLabel;
-        menuItem.callback = redoCallback;
-        menuItems.push(menuItem);
-        
-        return menuItems;
-    }
-
-    ///** This method should be implemented if custom menus or menu items are desired. */
-    //addToMenuBar(menuBar,menus);
-
-    getAddChildMenuItems(optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
-        
-        var menuItemList = [];
-        
-        for(var i = 0; i < this.standardComponents.length; i++) {
-            let key = this.standardComponents[i];
-            let generator = this.componentGenerators[key];
-            
-            let menuItem = {};
-            menuItem.title = "Add " + generator.displayName;
-            menuItem.callback = () => addComponent(this,generator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
-            menuItemList.push(menuItem);
-        }
-
-        //add the additional component item
-        let menuItem = {};
-        menuItem.title = "Other Components...";
-        menuItem.callback = () => addAdditionalComponent(this,optionalInitialProperties,optionalBaseMemberValues,optionalBaseMemberValues);
-        menuItemList.push(menuItem);
-
-        return menuItemList;
-    }
-
-    
-    /** This method returns a callback  to add a child folder. */
-    getAddChildFolderCallback(parentFullName) {        
-        var initialValues = {};
-        initialValues.parentName = parentFullName;
-
-        return () => addComponent(this,FolderComponent,initialValues);
-    }
-
 }
 
 
 Apogee.DEFAULT_WORKSPACE_NAME = "workspace";
-
-const RESIZE_TIMER_PERIOD_MS = 500;

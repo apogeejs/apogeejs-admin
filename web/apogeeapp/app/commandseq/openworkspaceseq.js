@@ -16,22 +16,6 @@ export function openWorkspace(app,fileAccessObject) {
 }
 
 //=====================================
-// non-UI Entry Point
-//=====================================
-
-/** This opens a workspace directly from file data, not using the UI file selector. */
-export function openWorkspaceFromTextData(app,workspaceTextData,workspaceMetadata) {
-
-    //make sure there is not an open workspace
-    if(app.getWorkspaceUI()) {
-        alert("There is an open workspace. You must close the workspace first.");
-        return;
-    }    
-
-    onOpen(null,app,workspaceTextData,workspaceMetadata);
-}
-
-//=====================================
 // Internal functions
 //=====================================
 

@@ -2,9 +2,7 @@ import apogeeui from "/apogeeapp/ui/apogeeui.js";
 import dialogMgr from "/apogeeapp/ui/window/dialogMgr.js";
 
 /** This method shows a dialog to select from additional components. */
-export function showSelectComponentDialog(displayNameList,componentList,onSelectFunction) {
-    
-    if(displayNameList.length != componentList.length) throw new Error("Mismatch in additional component display name and class name lists!");
+export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
 
     var dialog = dialogMgr.createDialog({"movable":true});
     
@@ -40,11 +38,9 @@ export function showSelectComponentDialog(displayNameList,componentList,onSelect
     line.appendChild(document.createTextNode("Component:"));
     var select = apogeeui.createElement("select");
     line.appendChild(select);
-    for(var i = 0; i < componentList.length; i++) {
-		var displayName = displayNameList[i];
-        var className = componentList[i];
-		select.add(apogeeui.createElement("option",{"text":displayName,"value":className}));
-    }
+    componentInfoList.forEach( componentInfo => {
+		select.add(apogeeui.createElement("option",{"text":componentInfo.displayName,"value":componentInfo.uniqueName}));
+    });
     content.appendChild(line);
     
     //buttons
@@ -54,8 +50,8 @@ export function showSelectComponentDialog(displayNameList,componentList,onSelect
     }
     
     var onCreate = function() {
-		var componentType = select.value;
-        onSelectFunction(componentType);
+		var componentGenerator = select.value;
+        onSelectFunction(componentGenerator);
         dialogMgr.closeDialog(dialog);
     }
     line.appendChild(apogeeui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));

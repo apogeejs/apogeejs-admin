@@ -1,29 +1,23 @@
 import base from "/apogeeutil/base.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import { Workspace, doAction } from "/apogee/apogeeCoreLib.js";
+import WorkspaceUIView from "/apogeeapp/app/WorkspaceUiView.js";
 
-import apogeeui from "/apogeeapp/ui/apogeeui.js";
-import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";
-import TreeControl from "/apogeeapp/ui/treecontrol/TreeControl.js";
-
-import {updateWorkspaceProperties} from "/apogeeapp/app/commandseq/updateworkspaceseq.js";
-import FolderComponent from "/apogeeapp/app/components/FolderComponent.js";
 import ReferenceManager from "/apogeeapp/app/references/ReferenceManager.js";
 
 /** This class manages the user interface for a workspace object. */
 export default class WorkspaceUI {
 
     constructor() {
-
-        this.workspace = null;
-        this.fileMetadata = null;
-
-        //properties
         this.app = null;
-        this.tabFrame = null;
-        this.tree = null;
-        this.treeEntry = null;
+        this.workspace = null;
+        
+        this.appView = null;
+        this.workspaceUIView = null;
+      
         this.componentMap = {};
+
+        this.fileMetadata = null;
         this.referenceManager = null;
     }
 
@@ -32,19 +26,15 @@ export default class WorkspaceUI {
     //====================================
 
     /** This sets the application. It must be done before the workspace is set. */
-    setApp(app,tabFrame,treePane) {
+    setApp(app) {
         this.app = app;
-        this.tabFrame = tabFrame;
-        this.referenceManager = new ReferenceManager(app);
-
-        //omit tree if tree pane is missing 
-        if(treePane) {
-            this.tree = new TreeControl();
-            apogeeui.removeAllChildren(treePane);
-            treePane.appendChild(this.tree.getElement());
+        this.appView = app.getAppView();
+        //add the workspace view only if there is an app view
+        if(this.appView) {
+            this.workspaceUIView = new WorkspaceUIView(this,this.appView)
         }
 
-        this.treeEntry = null;
+        this.referenceManager = new ReferenceManager(app);
         
         //listen to the workspace dirty event from the app
         this.app.addListener("workspaceDirty",() => this.setIsDirty());
@@ -53,6 +43,10 @@ export default class WorkspaceUI {
     /** This gets the application instance. */
     getApp() {
         return this.app;
+    }
+
+    getView() {
+        return this.workspaceUIView;
     }
 
      /** This method sets the workspace. The argument workspaceJson should be included
@@ -80,60 +74,44 @@ export default class WorkspaceUI {
         else {
             //set up an empty workspace
             workspaceDataJson = Workspace.EMPTY_WORKSPACE_JSON;
-            workspaceComponentsJson = FolderComponent.EMPTY_FOLDER_COMPONENT_JSON;
+            workspaceComponentsJson = WorkspaceUI.EMPTY_WORKSPACE_COMPONENT_JSON;
         }
         
         actionResult = this.workspace.loadFromJson(workspaceDataJson);
 
+        ////////////////////////////////////////////////////////////////////////
+        //We are manually clearing the updated fields because there is no create workspce
+        //event (in whcih we would clear any udpated field flags)
+        //we should probably change that...
+        this.workspace.clearUpdated();
+        ////////////////////////////////////////////////////////////////////////
+
         //set up the root folder conmponent, with children if applicable
         var rootFolder = this.workspace.getRoot();
         var success = this.createComponentFromMember(actionResult,workspaceComponentsJson);
-        var rootFolderComponent = this.getComponent(rootFolder);
-
-        //set up the tree (if tree in use)
-        if(this.tree) {
-            this.treeEntry = this.createTreeEntry();
-            this.treeEntry.setState(TreeEntry.EXPANDED);
-            this.tree.setRootEntry(this.treeEntry);
-            this.treeEntry.addChild(rootFolderComponent.getTreeEntry(true));
-            this.treeEntry.addChild(this.referenceManager.getTreeEntry(true));
-        }
 
         //add listeners
         //this.workspace.addListener("memberCreated", eventInfo => this.memberCreated(eventInfo));
         this.workspace.addListener("memberUpdated", eventInfo => this.memberUpdated(eventInfo));
         this.workspace.addListener("memberDeleted", eventInfo => this.memberDeleted(eventInfo));
-        this.workspace.addListener("workspaceUpdated", () => this.workspaceUpdated());
+        this.workspace.addListener("workspaceUpdated", eventInfo => this.workspaceUpdated(eventInfo));
 
-        //process the workspace state - open tabs
-        if(workspaceJson) {
-            if(this.tabFrame) {
-                if(workspaceJson.openTabs) {
-                    workspaceJson.openTabs.map(memberName => {
-                        var openTabMember = this.workspace.getMemberByFullName(memberName);
-                        if(openTabMember) {
-                            var openTabComponent = this.getComponent(openTabMember);
-                            openTabComponent.createTabDisplay();
-                        }
-                    });
-                    if(workspaceJson.activeTabMember) {
-                        var activeTabMember = this.workspace.getMemberByFullName(workspaceJson.activeTabMember);
-                        if(activeTabMember) {
-                           this.tabFrame.setActiveTab(activeTabMember.getId());
-                        }
-                    }
-                }
+        //set up the view, if we have one
+        if(this.workspaceUIView) {
+            //load the view
+            let rootFolderComponent = this.getComponent(rootFolder);
+            this.workspaceUIView.loadView(rootFolderComponent,this.referenceManager);
+
+            //cset an ui view state
+            if(workspaceJson) {
+                this.workspaceUIView.setViewJsonState(workspaceJson);
             }
-        }
+        }    
     }
 
     /** This method gets the workspace object. */
     getWorkspace() {
         return this.workspace;
-    }
-
-    getTabFrame() {
-        return this.tabFrame;
     }
     
     getReferenceManager() {
@@ -150,9 +128,9 @@ export default class WorkspaceUI {
             }
         }
 
-        //remove tree entry (if tree active)
-        if(this.tree) {
-            this.tree.clearRootEntry();
+        //cleanup the view
+        if(this.workspaceUIView) {
+            this.workspaceUIView.close();
         }
 
         //remove links
@@ -251,7 +229,6 @@ export default class WorkspaceUI {
     }
     
     testPrint(eventInfo) {
-        //console.log("Event: " + eventInfo.event + "; Name: " + eventInfo.member.getFullName());
         if(eventInfo.updated) {
             console.log(JSON.stringify(eventInfo.updated));
         }
@@ -329,7 +306,7 @@ export default class WorkspaceUI {
 //        this.testPrint(eventInfo);
         
         //store the ui object
-        var member = eventInfo.member;
+        var member = eventInfo.target;
         var key = member.getId();
 
 //        var componentInfo = this.componentMap[key];
@@ -345,7 +322,7 @@ export default class WorkspaceUI {
 //        this.testPrint(eventInfo);
         
         //store the ui object
-        var member = eventInfo.member;
+        var member = eventInfo.target;
         if(member) {
             var key = member.getId();
 
@@ -362,7 +339,7 @@ export default class WorkspaceUI {
 //        this.testPrint(eventInfo);
 
         //store the ui object
-        var member = eventInfo.member;
+        var member = eventInfo.target;
         var memberId = member.getId();
 
         var componentInfo = this.componentMap[memberId];
@@ -374,13 +351,11 @@ export default class WorkspaceUI {
         }
     }
 
-    /** This method extends the member udpated function from the base.
+    /** This method handles updates to the workspace.
      * @protected */    
-    workspaceUpdated() {
-
-        //update name
-        if(this.treeEntry) {
-            this.treeEntry.setLabel(this.workspace.getName());
+    workspaceUpdated(eventInfo) {
+        if(this.workspaceUIView) {
+            this.workspaceUIView.workspaceUpdated(eventInfo);
         }
     }
 
@@ -424,15 +399,8 @@ export default class WorkspaceUI {
         var rootFolderComponent = this.getComponent(rootFolder);
         json.components = rootFolderComponent.toJson();
 
-        if(this.tabFrame) {
-            var openTabs = this.tabFrame.getOpenTabs();
-            if(openTabs.length > 0) {
-                json.openTabs = openTabs.map(tabId => this.getMemberNameFromId(tabId));
-            }
-            var activeTabId = this.tabFrame.getActiveTab();
-            if(activeTabId) {
-                json.activeTabMember = this.getMemberNameFromId(activeTabId);
-            }
+        if(this.workspaceUIView) {
+            this.workspaceUIView.appendViewJsonState(json);
         }
 
         return json;
@@ -483,42 +451,6 @@ export default class WorkspaceUI {
         }
     }
 
-    //====================================
-    // properties and display
-    //====================================
-
-    createTreeEntry() {
-        //menu item callback
-        var labelText = this.workspace.getName(); //add the name
-        var iconUrl = this.getIconUrl();
-        var menuItemCallback = () => this.getMenuItems();
-        var isRoot = true;
-        return new TreeEntry(labelText, iconUrl, null, menuItemCallback,isRoot);
-    }
-
-    /** This method returns the icon url for the component. */
-    getIconUrl() {
-        return apogeeui.getResourcePath(WorkspaceUI.ICON_RES_PATH);
-    }
-
-    getMenuItems() {
-        //menu items
-        var menuItemList = [];
-
-        //add the standard entries
-        var itemInfo = {};
-        itemInfo.title = "Edit Properties";
-        itemInfo.callback = () => updateWorkspaceProperties(this);
-        menuItemList.push(itemInfo);
-
-        //DEV ENTRY
-        itemInfo = {};
-        itemInfo.title = "Print Dependencies";
-        itemInfo.callback = () => this.showDependencies();
-        menuItemList.push(itemInfo);
-
-        return menuItemList;
-    }
 
     //========================================
     // Links
@@ -566,6 +498,9 @@ export default class WorkspaceUI {
 
 }
 
-WorkspaceUI.ICON_RES_PATH = "/componentIcons/workspace.png";   
+//this is the json for an empty workspace
+WorkspaceUI.EMPTY_WORKSPACE_COMPONENT_JSON = {
+    "type":"apogeeapp.app.FolderComponent"
+};
 
 WorkspaceUI.FILE_VERSION = "0.50";

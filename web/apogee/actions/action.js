@@ -249,14 +249,14 @@ function fireEvents(workspace,completedResults,recalculateList) {
             
             let member = actionResult.member;
             
-            mergeEventIntoEventMap(eventMap,member,eventName);
+            mergeEventIntoEventMap(eventMap,workspace,member,eventName);
         }
     }
     
     //add an update event for any object not accounted from
     for(i = 0; i < recalculateList.length; i++) {
         var member = recalculateList[i];
-        mergeEventIntoEventMap(eventMap,member,"memberUpdated");
+        mergeEventIntoEventMap(eventMap,workspace,member,"memberUpdated");
     } 
     
     //fire events from the event map
@@ -264,39 +264,42 @@ function fireEvents(workspace,completedResults,recalculateList) {
         let eventInfo = eventMap[idString];
         workspace.dispatchEvent(eventInfo.event,eventInfo);
         //clear the update map for this member (the member should be set
-        if(eventInfo.member) {
-            eventInfo.member.clearUpdated();
+        if(eventInfo.target) {
+            eventInfo.target.clearUpdated();
         }
         else {
-            console.log("Error: Member not set for event: " + eventInfo.event);
+            console.log("Error: Target not set for event: " + eventInfo.event);
         }
     }
 }
 
 /** This is a helper function to dispatch an event. */
-function mergeEventIntoEventMap(eventMap,member,eventName) {
-    
-    //############################################
-    //OOPS - my current logic does nto allow for non-member events. 
-    //for now I will dump them. i need to add them back.
-    if(!member) return;
-    //############################################
-    
-    var memberId = member.getId();
+function mergeEventIntoEventMap(eventMap,workspace,member,eventName) {
+
+    let targetId;
+    let eventTarget;
+    if(member) {
+        targetId = member.getId();
+        eventTarget = member;
+    }
+    else {
+        targetId = WORKSPACE_TARGET_ID;
+        eventTarget = workspace;
+    }
      
-    var existingInfo = eventMap[memberId];
+    var existingInfo = eventMap[targetId];
     var newInfo;
      
     if(existingInfo) {
         if((existingInfo.event == eventName)) {
-            //repeat event - including case of both being "memberUpdated"
+            //repeat event - including case of both being "memberUpdated" or "workspaceUpdated"
             newInfo = existingInfo;
         }
         else if((existingInfo.event == "memberDeleted")||(eventName == "memberDeleted")) {
-            newInfo =  { member: member, event: "memberDeleted" };
+            newInfo =  { target: eventTarget, event: "memberDeleted" };
         }
         else if((existingInfo.event == "memberCreated")||(eventName == "memberCreated")) {
-            newInfo =  { member: member, updated: member.getUpdated(), event: "memberCreated" };
+            newInfo =  { target: eventTarget, updated: eventTarget.getUpdated(), event: "memberCreated" };
         }
         else {
             //we this shouldn't happen - it means we hace an unknown event type
@@ -305,10 +308,10 @@ function mergeEventIntoEventMap(eventMap,member,eventName) {
     }
     else {
         //create event object - note we don't need the "updated" field on a delete event, but that is ok
-        newInfo =  { member: member, updated: member.getUpdated(), event: eventName };
+        newInfo =  { target: eventTarget, updated: eventTarget.getUpdated(), event: eventName };
     }
      
-    eventMap[memberId] = newInfo; 
+    eventMap[targetId] = newInfo; 
 }
 
 /** This method determines if updating all dependencies is necessary. Our dependency 
@@ -413,6 +416,9 @@ let COMPOUND_ACTION_INFO = {
     "addToRecalc": false,
     "event": null
 }
+
+/** This is an id value used internally to signify an event acted on the workspace, as oposed to a specific member id. */
+let WORKSPACE_TARGET_ID = "workspace";
 
 
 //This line of code registers the action 

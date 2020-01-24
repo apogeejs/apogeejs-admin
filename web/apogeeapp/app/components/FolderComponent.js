@@ -72,11 +72,6 @@ export default class FolderComponent extends ParentComponent {
 
 }
 
-//this is a method to help construct an emtpy folder component
-FolderComponent.EMPTY_FOLDER_COMPONENT_JSON  = {
-    "type":"apogeeapp.app.FolderComponent"
-};
-
 //======================================
 // This is the component generator, to register the component
 //======================================

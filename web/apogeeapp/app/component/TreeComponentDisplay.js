@@ -1,6 +1,8 @@
 import {getIconOverlay} from "/apogeeapp/app/component/banner.js"; 
 import TreeEntry from "/apogeeapp/ui/treecontrol/TreeEntry.js";
 
+import {addComponent} from "/apogeeapp/app/commandseq/addcomponentseq.js";
+
 /** This component represents a json table object. */
 export default class TreeComponentDisplay {
 
@@ -77,11 +79,14 @@ export default class TreeComponentDisplay {
 
             //add child folder menu item
             if(this.component.usesTabDisplay()) {
-                var childMenuItem = {};
-                childMenuItem.title = "Add Child Folder";
                 var app = this.component.getWorkspaceUI().getApp();
                 var parentFullName = this.component.getMember().getFullName();
-                childMenuItem.callback = app.getAddChildFolderCallback(parentFullName)
+                var folderComponentGenerator = app.getFolderGenerator();
+                var initialValues = {parentName: parentFullName};
+
+                var childMenuItem = {};
+                childMenuItem.title = "Add Child Folder";
+                childMenuItem.callback = () => addComponent(app,folderComponentGenerator,initialValues);
                 menuItemList.push(childMenuItem);
             }
 

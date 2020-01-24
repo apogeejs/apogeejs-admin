@@ -63,7 +63,7 @@ export default class CommandHistory {
     
     /** If there is an undo command, this method will return the description if there
      * is one or an empty string. If there is no undo command, this method will return
-     * the value CommandHistory.NO_COMMAND. */
+     * the value null. */
     getNextUndoDesc() {
         let command = this._getNextUndoCommand(false);
         if(command) {
@@ -75,15 +75,13 @@ export default class CommandHistory {
             }
         }
         else {
-            return CommandHistory.NO_COMMAND;
+            return null;
         }
     }
     
     /** If there is an redo command, this method will return the description if there
      * is one or an empty string. If there is no undo command, this method will return
-     * the value CommandHistory.NO_COMMAND. To test equality with
-     * CommandHistory.NO_COMMAND, use == or ===. Do not test equality
-     * with json equals!*/
+     * the value null.*/
     getNextRedoDesc() {
         let command = this._getNextRedoCommand(false);
         if(command) {
@@ -95,7 +93,7 @@ export default class CommandHistory {
             }
         }
         else {
-            return CommandHistory.NO_COMMAND;
+            return null;
         }
     }
     
@@ -257,10 +255,6 @@ export default class CommandHistory {
         }
     }
 }
-
-/** This is a token to represent there is no command available, either for 
- * undo or redo. */
-CommandHistory.NO_COMMAND = {};
 
 /** This is the default number of stored undo/redo commands */
 CommandHistory.DEFAULT_UNDO_COMMAND_COUNT = 50;

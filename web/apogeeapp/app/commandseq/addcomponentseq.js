@@ -130,8 +130,8 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
 //piggybackCommand is a temporary test!!!
 export function addAdditionalComponent(app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
         
-    var onSelect = function(componentType) {
-        var componentGenerator = app.getComponentGenerator(componentType);
+    var onSelect = function(componentUniqueName) {
+        let componentGenerator = app.getComponentGenerator(componentUniqueName);
         if(componentGenerator) {
             addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
         }
@@ -140,17 +140,13 @@ export function addAdditionalComponent(app,optionalInitialProperties,optionalBas
         }
     }
     //get the display names
-    var componentNames = app.additionalComponents.map(componentClassName => {
-        var generator = app.getComponentGenerator(componentClassName);
-        if(generator) {
-            return generator.displayName;
-        }
-        else {
-            return componentClassName + " (ERROR - not found!)";
-        }
-    })
+    let additionalComponents = app.getAdditionalComponentNames();
+    let componentInfoList = additionalComponents.map( componentName => {
+        let componentGenerator = app.getComponentGenerator(componentUniqueName); 
+        return {displayName: componentGenerator.displayName, uniqueName: componentName};
+    });
     //open select component dialog
-    showSelectComponentDialog(componentNames,app.additionalComponents,onSelect);
+    showSelectComponentDialog(componentInfoList,onSelect);
 }
 
 function getAdditionalCommands(parentComponent,childName) {

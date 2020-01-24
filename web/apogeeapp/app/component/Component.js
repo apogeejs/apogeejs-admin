@@ -187,12 +187,15 @@ export default class Component extends EventManager {
 
     createTabDisplay() {
         if((this.usesTabDisplay())&&(!this.tabDisplay)) {
-            this.tabDisplay = this.instantiateTabDisplay();
-            this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
-            //add the tab display to the tab frame
-            var tab = this.tabDisplay.getTab();
-            var tabFrame = this.workspaceUI.getTabFrame();
-            tabFrame.addTab(tab,true);
+            let workspaceUIView = this.workspaceUI.getView();
+            if(workspaceUIView) { 
+                this.tabDisplay = this.instantiateTabDisplay();
+                this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
+                //add the tab display to the tab frame
+                var tab = this.tabDisplay.getTab();
+                var tabFrame = workspaceUIView.getTabFrame();
+                tabFrame.addTab(tab,true);
+            }
         }
     }
 
@@ -218,16 +221,20 @@ export default class Component extends EventManager {
         //menu items
         var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
 
-        //add the standard entries
-        var itemInfo = {};
-        itemInfo.title = "Edit Properties";
-        itemInfo.callback = () => updateComponent(this);
-        menuItemList.push(itemInfo);
+        if(this.member.getParent()) {
+            //these items are only possible for members with a parent.
+            
+            //add the standard entries
+            var itemInfo = {};
+            itemInfo.title = "Edit Properties";
+            itemInfo.callback = () => updateComponent(this);
+            menuItemList.push(itemInfo);
 
-        var itemInfo = {};
-        itemInfo.title = "Delete";
-        itemInfo.callback = () => deleteComponent(this);
-        menuItemList.push(itemInfo);
+            var itemInfo = {};
+            itemInfo.title = "Delete";
+            itemInfo.callback = () => deleteComponent(this);
+            menuItemList.push(itemInfo);
+        }
         
         return menuItemList;
     }
@@ -367,7 +374,7 @@ export default class Component extends EventManager {
     memberUpdated(eventInfo) {
         
         let updatedMemberFields = eventInfo.updated;
-        let updatedMember = eventInfo.member;
+        let updatedMember = eventInfo.target;
         
         if(updatedMember = this.member) {
             this.fieldUpdated("member");
