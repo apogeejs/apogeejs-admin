@@ -63,7 +63,7 @@ function createMemberImpl(owner,actionData,actionResult) {
 
         //instantiate children if there are any
         if(memberJson.children) {
-            actionResult.childActionResults = {};
+            actionResult.childActionResults = [];
             for(var childName in memberJson.children) {
                 var childActionData = {};
                 childActionData.action = "createMember";
@@ -71,7 +71,7 @@ function createMemberImpl(owner,actionData,actionResult) {
                 var childActionResult = {};
                 childActionResult.actionInfo = ACTION_INFO;
                 createMemberImpl(member,childActionData,childActionResult);
-                actionResult.childActionResults[childName] = childActionResult;
+                actionResult.childActionResults.push(childActionResult);
             }
         }
     }

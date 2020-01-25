@@ -441,14 +441,19 @@ export default class WorkspaceUI {
         return json;
     }
     
-    loadFolderComponentContentFromJson(actionResults,childrenJson) {
-        for(var childName in childrenJson) {
-            var childComponentJson = childrenJson[childName];
-            var childActionResult = actionResults[childName];
+    loadFolderComponentContentFromJson(childActionResults,childrenJson) {
+        if(!childActionResults) return;
 
-            var childSuccess = this.createComponentFromMember(childActionResult,childComponentJson);
-            if(!childSuccess) return false;
-        }
+        childActionResults.forEach( childActionResult => {
+        
+            let childMember = childActionResult.member;
+            if(childMember) {
+                var childComponentJson = childrenJson[childMember.getName()];
+
+                var childSuccess = this.createComponentFromMember(childActionResult,childComponentJson);
+                if(!childSuccess) return false;
+            }
+        });
     }
 
 

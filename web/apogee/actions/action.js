@@ -373,9 +373,9 @@ function doAddDependOnToRecalc(actionResult) {
 function addToCompletedResultList(completedResults,actionResult) {
     completedResults.push(actionResult);
     if(actionResult.childActionResults) {
-        for(var key in actionResult.childActionResults) {
-            addToCompletedResultList(completedResults,actionResult.childActionResults[key]);
-        }      
+        actionResult.childActionResults.forEach( childActionResult => {
+            addToCompletedResultList(completedResults,childActionResult);
+        });
     }
 }
 

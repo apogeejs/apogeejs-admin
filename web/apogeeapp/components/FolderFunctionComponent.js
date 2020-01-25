@@ -85,19 +85,25 @@ export default class FolderFunctionComponent extends ParentComponent {
 
     readChildrenFromJson(workspaceUI,childActionResults,json) {
     
-        if(childActionResults.root) {
-            //get the child action results for the internal folder, rather than the folder function member.
+        if((childActionResults)&&(childActionResults.length > 0)) {
+            let internalFolderChildActionResult = childActionResults[0]; //this is presumably the internalFolder
+
+            //I should do some more error checking
+
+            //these are the internal folder children
+            let bodyChildActionResults = internalFolderChildActionResult.childActionResults;
+
             //NOTE - we should handle multi-member components so we detect errors in an of the components.
             //at the time this is written, this is the only acknowledgement of the result for the internal folder.
-            let externalChildActionResults = childActionResults.root.childActionResults;
 
             if(json.children) {
-                workspaceUI.loadFolderComponentContentFromJson(externalChildActionResults,json.children);
+                workspaceUI.loadFolderComponentContentFromJson(bodyChildActionResults,json.children);
             }
             return true;
         }
         else {
             //error - internal folder not requested or created
+            alert("internal folder not found!")
             return false;
         }  
     }

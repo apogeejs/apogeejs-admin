@@ -41,7 +41,7 @@ function doDelete(member,actionResult) {
     
     //delete children
     if(member.isParent) {
-        actionResult.childActionResults = {};
+        actionResult.childActionResults = [];
         
         var childMap = member.getChildMap();
         for(var childName in childMap) {
@@ -50,21 +50,21 @@ function doDelete(member,actionResult) {
             childActionResult.member = child;
             childActionResult.actionInfo = ACTION_INFO
             
-            actionResult.childActionResults[childName] = childActionResult;
+            actionResult.childActionResults.push(childActionResult);
             
             //add results for children to this member
             doDelete(child,childActionResult);
         }
     }
     else if(member.isRootHolder) {
-        actionResult.childActionResults = {};
+        actionResult.childActionResults = [];
         
         var root = member.getRoot();
         let childActionResult = {};
         childActionResult.member = root;
         childActionResult.actionInfo = ACTION_INFO
 
-        actionResult.childActionResults["root"] = childActionResult;
+        actionResult.childActionResults.push(childActionResult);
         
         //add results for children to this member
         doDelete(child,childActionResult);

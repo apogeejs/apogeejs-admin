@@ -42,7 +42,7 @@ function moveMember(workspace,actionData,actionResult) {
 function addChildResults(member,actionResult) {
     
     if(member.isParent) {
-        actionResult.childActionResults = {};
+        actionResult.childActionResults = [];
         
         var childMap = member.getChildMap();
         for(var childName in childMap) {
@@ -52,14 +52,14 @@ function addChildResults(member,actionResult) {
             childActionResult.member = child;
             childActionResult.actionInfo = ACTION_INFO;
             
-            actionResult.childActionResults[childName] = childActionResult;
+            actionResult.childActionResults.push(childActionResult);
             
             //add results for children to this member
             addChildResults(child,childActionResult);
         }
     }
     else if(member.isRootHolder) {
-        actionResult.childActionResults = {};
+        actionResult.childActionResults = [];
         
         var root = member.getRoot();
         let childActionResult = {};
@@ -67,7 +67,7 @@ function addChildResults(member,actionResult) {
         childActionResult.member = root;
         childActionResult.actionInfo = ACTION_INFO;
 
-        actionResult.childActionResults["root"] = childActionResult;
+        actionResult.childActionResults.push(childActionResult);
         
         //add results for children to this member
         addChildResults(root,childActionResult);
