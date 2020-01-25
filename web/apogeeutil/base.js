@@ -6,7 +6,10 @@ export {base as default};
 base.MEMBER_FUNCTION_INVALID_THROWABLE = {"apogeeException":"invalid"};
 base.MEMBER_FUNCTION_PENDING_THROWABLE = {"apogeeException":"pending"};
 
-/** This method creates an integer has value for a string. */
+/** This function reads any proeprty of the mixinObject and adds it
+ * fo the prototypr of the destObject. This is intended to apend functions and
+ * other properties to a cless directly without going through inheritance. 
+ * Note this will overwrite and similarly named object in the dest class.*/
 base.mixin = function(destObject,mixinObject) {
     for(var key in mixinObject) {
         destObject.prototype[key] = mixinObject[key];
