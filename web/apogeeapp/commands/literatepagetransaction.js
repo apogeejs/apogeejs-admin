@@ -20,7 +20,7 @@ literatepagetransaction.createUndoCommand = function(workspaceUI,commandData) {
     if(commandData.undoSteps) {
         //temporary implementation
         var undoCommandData = {};
-        undoCommandData.type = literatepagetransaction.COMMAND_TYPE;
+        undoCommandData.type = literatepagetransaction.commandInfo.type;
         undoCommandData.steps = commandData.undoSteps;
         undoCommandData.startSelection = commandData.endSelection;
         undoCommandData.startMarks = commandData.endMarks;
@@ -67,7 +67,11 @@ literatepagetransaction.executeCommand = function(workspaceUI,commandData) {
     return commandResult;
 }
 
-literatepagetransaction.COMMAND_TYPE = "literatePageTransaction";
+literatepagetransaction.commandInfo = {
+    "type": "literatePageTransaction",
+    "targetType": "component",
+    "event": "updated"
+}
 
 CommandManager.registerCommand(literatepagetransaction);
 

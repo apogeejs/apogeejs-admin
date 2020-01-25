@@ -39,6 +39,8 @@ addcomponent.executeCommand = function(workspaceUI,commandData) {
     
     var workspace = workspaceUI.getWorkspace();
 
+    var commandResult;
+
     //create the member
     var createAction = {};
     createAction.action = "createMember";
@@ -49,16 +51,22 @@ addcomponent.executeCommand = function(workspaceUI,commandData) {
     //create the components for the member
     //I need error handling for the create component action
     if(actionResult.actionDone) {
-        workspaceUI.createComponentFromMember(actionResult,commandData.componentJson);
+        commandResult = workspaceUI.createComponentFromMember(actionResult,commandData.componentJson);
+    }
+    else {
+        commandResult = {};
     }
 
-    var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
     
     return commandResult;
 }
 
-addcomponent.COMMAND_TYPE = "addComponent";
+addcomponent.commandInfo = {
+    "type": "addComponent",
+    "targetType": "component",
+    "event": "created"
+}
 
 CommandManager.registerCommand(addcomponent);

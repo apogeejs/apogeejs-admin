@@ -8,7 +8,7 @@ let compoundcommand = {};
 
 compoundcommand.createUndoCommand = function(workspaceUI,commandData) {
     let undoCommandJson = {};
-    undoCommandJson.type = compoundcommand.COMMAND_TYPE;
+    undoCommandJson.type = compoundcommand.commandInfo.type;
     undoCommandJson.childCommands = [];
     
     //add the child undo commands in the reverse order
@@ -44,7 +44,9 @@ compoundcommand.executeCommand = function(workspaceUI,commandData) {
     return commandResult;
 }
 
-compoundcommand.COMMAND_TYPE = "compoundCommand";
+compoundcommand.commandInfo = {
+    "type": "compoundCommand",
+}
 
 CommandManager.registerCommand(compoundcommand);
 

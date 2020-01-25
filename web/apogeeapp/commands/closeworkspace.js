@@ -31,7 +31,11 @@ closeworkspace.executeCommand = function(workspaceUI,commandData) {
     return workspaceUIRemoved;
 }
 
-closeworkspace.COMMAND_TYPE = "closeWorkspace";
+closeworkspace.commandInfo = {
+    "type": "closeWorkspace",
+    "targetType": "workspace",
+    "event": "deleted"
+}
 
 CommandManager.registerCommand(closeworkspace);
 

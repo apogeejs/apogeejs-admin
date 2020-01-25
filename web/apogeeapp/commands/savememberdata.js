@@ -40,7 +40,11 @@ savememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplet
     return commandResult;
 }
 
-savememberdata.COMMAND_TYPE = "saveMemberData";
+savememberdata.commandInfo = {
+    "type": "saveMemberData",
+    "targetType": "component",
+    "event": "updated"
+}
 
 savememberdata.isAsynch = true;
 

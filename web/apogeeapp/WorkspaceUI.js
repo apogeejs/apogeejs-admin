@@ -88,7 +88,7 @@ export default class WorkspaceUI {
 
         //set up the root folder conmponent, with children if applicable
         var rootFolder = this.workspace.getRoot();
-        var success = this.createComponentFromMember(actionResult,workspaceComponentsJson);
+        var commandResult = this.createComponentFromMember(actionResult,workspaceComponentsJson);
 
         //add listeners
         //this.workspace.addListener("memberCreated", eventInfo => this.memberCreated(eventInfo));
@@ -241,6 +241,7 @@ export default class WorkspaceUI {
         var member = createMemberResult.member;
         var component;
         var errorMessage;
+        var commandResult = {};
         try {
             if(member) {
                 
@@ -287,15 +288,20 @@ export default class WorkspaceUI {
             //##########################################################################
 
             //this should have already been set
-            return false;
+            return null;
+        }
+        else {
+            commandResult.target = component;
         }
         
         //load the children, if there are any (BETTER ERROR CHECKING!)
-        if((component.readChildrenFromJson)&&(createMemberResult.childActionResults)) {      
-            component.readChildrenFromJson(this,createMemberResult.childActionResults,componentJson);
+        if((component.readChildrenFromJson)&&(createMemberResult.childActionResults)) { 
+            let childCommandResults = [];     
+            component.readChildrenFromJson(this,createMemberResult.childActionResults,componentJson,childCommandResults);
+            commandResult.childCommandResults = childCommandResults;
         }
             
-        return true;
+        return commandResult;
         
     }
 
@@ -441,7 +447,7 @@ export default class WorkspaceUI {
         return json;
     }
     
-    loadFolderComponentContentFromJson(childActionResults,childrenJson) {
+    loadFolderComponentContentFromJson(childActionResults,childrenJson,childCommandResults) {
         if(!childActionResults) return;
 
         childActionResults.forEach( childActionResult => {
@@ -450,8 +456,8 @@ export default class WorkspaceUI {
             if(childMember) {
                 var childComponentJson = childrenJson[childMember.getName()];
 
-                var childSuccess = this.createComponentFromMember(childActionResult,childComponentJson);
-                if(!childSuccess) return false;
+                var childCommandResult = this.createComponentFromMember(childActionResult,childComponentJson);
+                childCommandResults.push(childCommandResult);
             }
         });
     }

@@ -48,7 +48,11 @@ savemembercode.executeCommand = function(workspaceUI,commandData) {
     return commandResult;
 }
 
-savemembercode.COMMAND_TYPE = "saveMemberCode";
+savemembercode.commandInfo = {
+    "type": "saveMemberCode",
+    "targetType": "component",
+    "event": "updated"
+}
 
 CommandManager.registerCommand(savemembercode);
 

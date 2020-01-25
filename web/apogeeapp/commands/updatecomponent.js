@@ -47,7 +47,7 @@ updatecomponent.createUndoCommand = function(workspaceUI,commandData) {
     }
     
     var undoCommandJson = {};
-    undoCommandJson.type = updatecomponent.COMMAND_TYPE;
+    undoCommandJson.type = updatecomponent.commandInfo.type;
     undoCommandJson.memberFullName = commandData.memberFullName;
     if(undoMemberProperties) undoCommandJson.updatedMemberProperties = undoMemberProperties;
     if(undoComponentProperties) undoCommandJson.updatedComponentProperties = undoComponentProperties;
@@ -95,7 +95,11 @@ updatecomponent.executeCommand = function(workspaceUI,commandData) {
     return commandResult;
 }
 
-updatecomponent.COMMAND_TYPE = "updateComponent";
+updatecomponent.commandInfo = {
+    "type": "updateComponent",
+    "targetType": "component",
+    "event": "updated"
+}
 
 CommandManager.registerCommand(updatecomponent);
 

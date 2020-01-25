@@ -52,7 +52,11 @@ createworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData) {
     return commandResult;
 }
 
-createworkspace.COMMAND_TYPE = "createWorkspace";
+createworkspace.commandInfo = {
+    "type": "createWorkspace",
+    "targetType": "workspace",
+    "event": "created"
+}
 
 CommandManager.registerCommand(createworkspace);
 

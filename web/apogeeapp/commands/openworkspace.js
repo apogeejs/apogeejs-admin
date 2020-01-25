@@ -91,7 +91,11 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
     return synchCommandResult;
 }
 
-openworkspace.COMMAND_TYPE = "openWorkspace";
+openworkspace.commandInfo = {
+    "type": "openWorkspace",
+    "targetType": "workspace",
+    "event": "created"
+}
 
 openworkspace.isAsynch = true;
 

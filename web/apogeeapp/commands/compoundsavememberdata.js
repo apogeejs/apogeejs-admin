@@ -21,7 +21,7 @@ let compoundsavememberdata = {};
 
 compoundsavememberdata.createUndoCommand = function(workspaceUI,commandData) {
     var undoCommandJson = {};
-    undoCommandJson.type = compoundsavememberdata.COMMAND_TYPE;
+    undoCommandJson.type = compoundsavememberdata.commandInfo.type;
     
     var workspace = workspaceUI.getWorkspace();
     
@@ -76,7 +76,11 @@ compoundsavememberdata.executeCommand = function(workspaceUI,commandData,asynchO
     return commandResult;
 }
 
-compoundsavememberdata.COMMAND_TYPE = "compoundSaveMemberData";
+compoundsavememberdata.commandInfo = {
+    "type": "compoundSaveMemberData",
+    "targetType": "component",
+    "event": "created"
+}
 
 compoundsavememberdata.isAsynch = true;
 

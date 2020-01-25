@@ -22,7 +22,7 @@ movecomponent.createUndoCommand = function(workspaceUI,commandData) {
     var newMemberFullName = newParent.getChildFullName(commandData.newMemberName);
     
     var undoCommandJson = {};
-    undoCommandJson.type = movecomponent.COMMAND_TYPE;
+    undoCommandJson.type = movecomponent.commandInfo.type;
     undoCommandJson.memberFullName = newMemberFullName;
     undoCommandJson.newMemberName = oldMemberName;
     undoCommandJson.newParentFullName = oldParentFullName;
@@ -49,7 +49,11 @@ movecomponent.executeCommand = function(workspaceUI,commandData) {
     
 }
 
-movecomponent.COMMAND_TYPE = "moveComponent";
+movecomponent.commandInfo = {
+    "type": "moveComponent",
+    "targetType": "component",
+    "event": "updated"
+}
 
 CommandManager.registerCommand(movecomponent);
 

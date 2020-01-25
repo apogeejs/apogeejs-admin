@@ -49,6 +49,10 @@ deletecomponent.executeCommand = function(workspaceUI,commandData) {
     return commandResult;
 }
 
-deletecomponent.COMMAND_TYPE = "deleteComponent";
+deletecomponent.commandInfo = {
+    "type": "deleteComponent",
+    "targetType": "component",
+    "event": "deleted"
+}
 
 CommandManager.registerCommand(deletecomponent);

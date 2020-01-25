@@ -393,7 +393,11 @@ customComponentUpdateData.executeCommand = function(workspaceUI,commandData) {
     return commandResult;
 }
 
-customComponentUpdateData.COMMAND_TYPE = "customComponentUpdateCommand";
+customComponentUpdateData.commandInfo = {
+    "type": "customComponentUpdateCommand",
+    "targetType": "component",
+    "event": "updated"
+}
 
 CommandManager.registerCommand(customComponentUpdateData);
 

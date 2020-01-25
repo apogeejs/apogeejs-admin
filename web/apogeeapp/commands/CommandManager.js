@@ -20,7 +20,10 @@ import CommandHistory from "./CommandHistory.js";
  * Command Object - Should be registered with "registerFunction". It should contain the following things:
  * - function executeCommand(workspaceUI,commandData,optionalAsynchOnComplete) = This exectues the command and return a commandResult object.
  * - function createUnfoCommand(workspceUI,commandData) - This creates an undo command json from the given command json.
- * - string COMMAND_TYPE - This is the command type.
+ * - object commandInfo - This is metadata for the command:
+ *      - type - A string giving the name of the command type
+ *      - targetType - This identifies the type of the command target (what the command acts on) This may be missing if there is no event.
+ *      - event - This is the name of the event the command will fire. (It should be "created", "updated", "deleted" or missing if there is no event) 
  *  
  * Command Result:
  * After executing a command, a commandResult is returned:
@@ -63,7 +66,7 @@ export default class CommandManager {
         let description;
         if((!suppressFromHistory)&&(commandObject.createUndoCommand)) {   
             undoCommand = commandObject.createUndoCommand(workspaceUI,command);  
-            description = commandObject.COMMAND_TYPE; //need a better description
+            description = commandObject.commandInfo.type; //need a better description
         }
 
         if(commandObject) {
@@ -119,17 +122,17 @@ export default class CommandManager {
     
     /** This registers a command. The command object should hold two functions,
      * executeCommand(workspaceUI,commandData,optionalAsynchOnComplete) and, if applicable, createUndoCommand(workspaceUI,commandData)
-     * and it should have the constant COMMAND_TYPE.
+     * and it should have the metadata commandInfo.
      */
     static registerCommand(commandObject) {
         
         //repeat warning
-        let existingCommandObject = CommandManager.commandMap[commandObject.COMMAND_TYPE];
+        let existingCommandObject = CommandManager.commandMap[commandObject.commandInfo.type];
         if(existingCommandObject) {
-            alert("The given command already exists in the command manager: " + commandObject.COMMAND_TYPE + ". It will be replaced with the new command");
+            alert("The given command already exists in the command manager: " + commandObject.commandInfo.type + ". It will be replaced with the new command");
         }
         
-        CommandManager.commandMap[commandObject.COMMAND_TYPE] = commandObject;
+        CommandManager.commandMap[commandObject.commandInfo.type] = commandObject;
     }
     
     static getCommandObject(commandType) {

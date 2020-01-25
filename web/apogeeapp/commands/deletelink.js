@@ -62,7 +62,11 @@ deletelink.executeCommand = function(workspaceUI,commandData) {
     return commandResult;
 }
 
-deletelink.COMMAND_TYPE = "deleteLink";
+deletelink.commandInfo = {
+    "type": "deleteLink",
+    "targetType": "link",
+    "event": "deleted"
+}
 
 CommandManager.registerCommand(deletelink);
 

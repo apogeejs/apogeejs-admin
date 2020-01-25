@@ -16,7 +16,7 @@ let updatelink = {};
 
 updatelink.createUndoCommand = function(workspaceUI,commandData) {
     var undoCommandJson = {};
-    undoCommandJson.type = updatelink.COMMAND_TYPE;
+    undoCommandJson.type = updatelink.commandInfo.type;
     
     undoCommandJson.entryType = commandData.entryType;
     undoCommandJson.oldUrl = commandData.newUrl;
@@ -69,7 +69,11 @@ updatelink.executeCommand = function(workspaceUI,commandData) {
 }
 
 
-updatelink.COMMAND_TYPE = "updateLink";
+updatelink.commandInfo = {
+    "type": "updateLink",
+    "targetType": "component",
+    "event": "updated"
+}
 
 updatelink.isAsynch = true;
 

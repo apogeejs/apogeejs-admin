@@ -19,7 +19,7 @@ let updateworkspace = {};
 
 updateworkspace.createUndoCommand = function(workspaceUI,commandData) {
     var undoCommandJson = {};
-    undoCommandJson.type = updateworkspace.COMMAND_TYPE;
+    undoCommandJson.type = updateworkspace.commandInfo.type;
     
     //right now we assume this is just a name update
     var workspace = workspaceUI.getWorkspace();
@@ -51,7 +51,11 @@ updateworkspace.executeCommand = function(workspaceUI,commandData) {
     return commandResult;
 }
 
-updateworkspace.COMMAND_TYPE = "updateWorkspace";
+updateworkspace.commandInfo = {
+    "type": "updateWorkspace",
+    "targetType": "workspace",
+    "event": "updated"
+}
 
 CommandManager.registerCommand(updateworkspace);
 
