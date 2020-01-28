@@ -55,21 +55,30 @@ export default class CommandManager {
      * Supress history does not add this command to the history. It is used by the history for
      * undo commands/redo commands.
     */
-    executeCommand(command,asynchOnComplete,suppressFromHistory) {
+    executeCommand(command,suppressFromHistory) {
         var workspaceUI = this.app.getWorkspaceUI();
         let commandResult;
         
         var commandObject = CommandManager.getCommandObject(command.type);
-
-        //FOR NOW? - MAKE UNDO COMMAND BEFORE EXECUTING COMMAND, IF WE NEED IT (because it is sometimes made by reading the current state)
+        let asynchOnComplete;
         let undoCommand;
         let description;
-        if((!suppressFromHistory)&&(commandObject.createUndoCommand)) {   
-            undoCommand = commandObject.createUndoCommand(workspaceUI,command);  
-            description = commandObject.commandInfo.type; //need a better description
-        }
 
         if(commandObject) {
+
+            //for asynch transactions, pass a callback for handling any asynch result
+            if(commandObject.commandInfo.isAsynch) {
+                asynchOnComplete = commandResult => this._publishEvents(commandResult);
+            }
+
+            //create undo command before doing command (since it may depend on current state)
+            if((!suppressFromHistory)&&(commandObject.createUndoCommand)) {   
+                undoCommand = commandObject.createUndoCommand(workspaceUI,command);  
+            }
+
+            //read the desrition (this needs to be improved)
+            description = commandObject.commandInfo.type;
+
             try {
                 commandResult = commandObject.executeCommand(workspaceUI,command,asynchOnComplete);
             }
@@ -80,7 +89,6 @@ export default class CommandManager {
                 commandResult.cmdDone = false;
                 commandResult.alertMsg = "Unknown error executing command: " + error.message;
                 commandResult.isFatal = true;
-                
             }
         }
         else {
@@ -89,18 +97,19 @@ export default class CommandManager {
             commandResult.alertMsg = "Command type not found: " + command.type;
         }
         
-        //history??
-        //this is temporary code
+        //add to history if the command was done and there is an undo command
         if((commandResult.cmdDone)&&(undoCommand)) {   
             this.commandHistory.addToHistory(undoCommand,command,description);
         }
         
         //fire events!!
+        this._publishEvents(commandResult);
         
-        //display? Including for fatal errors?
-        
+/////////////////////////////////////////////////////
+//REMOVE THIS WHEN I HAVE BETTER HANDLING IN THE UI???
         if(commandResult.alertMsg) CommandManager.errorAlert(commandResult.alertMsg,commandResult.isFatal);
-        
+//////////////////////////////////////////////////////
+
         return commandResult;
     }
 
@@ -108,6 +117,140 @@ export default class CommandManager {
     getCommandHistory() {
         return this.commandHistory;
     }
+
+    //=========================================
+    // Private Methods
+    //=========================================
+
+    /** This fires all the necessary events for the given command result */
+    _publishEvents(commandResult) {
+        //combine the command result of successful events so here is one per target
+        //also fire all the unsuccesful events
+        let successEventMap = {};
+        let failedEvents = [];
+        this._flattenCommandResults(commandResult,successEventMap,failedEvents);
+
+        //fire success events (we merged these for one per target)
+        for(let key in successEventMap) {
+            this._fireEvent(successEventMap[key]);
+        }
+
+        //fire failed events
+        failedEvents.forEach(targetData => this._fireEvent(targetData));
+    }
+
+    _fireEvent(targetData) {
+        //FOR NOW JUST TO THE APP
+        //IF WE KEEP THIS TO APP IT SHOULD PROBABLY BE ONE COMBINED EVENT
+        this.app.dispatchEvent(targetData.eventType,targetData);
+    }
+
+    /** This flattens the command result structure, which contains a single parent and potentially mulitple
+     * generations of child events.
+     */
+    _flattenCommandResults(commandResult,successEventMap,failedEvents) {
+        if(commandResult.cmdDone) {
+
+            let targetId = commandResult.target ? commandResult.target.getEventId() : null;
+
+            if(targetId) {
+                //marge target info so there is no more than one event per target (for successful events)
+                let targetData = successEventMap[targetId];
+                if(targetData) {
+                    targetData = this._mergeTargetData(targetData,commandResult);
+                }
+                else {
+                    targetPayData = this._createNewTargetData(commandResult);
+                }
+                successEventMap[targetId] = targetData;
+            }
+
+            //process any children
+            if(commandResult.childCommandResults) {
+                commandResult.childCommandResults,forEach(childCommandResult => this._flattenCommandResults(childCommandResult,successEventMap,failedEvents));
+            }
+        }
+        else {
+            //if we didn't process this, add it to other events
+            failedEvents.push(this._createNewTargetData(commandResult));
+        }
+    }
+
+    /** This creates new event target data from a command result */
+    _createNewTargetData(commandResult) {
+        //copy everything but the childCommandResults
+        let targetData = {};
+        for(let key in commandResult) {
+            if(key == "childCommandResults") continue;
+            targetData[key] = commandResult[key];
+        }
+        return targetData;
+    }
+
+    /** Thie updated the target data for the new command result. */
+    _mergeTargetData(targetData,commandResult) {
+
+        let action = this._getActionType(targetData.action,commandResult.action);
+
+        //we have a potential new action
+        targetData.action = action;
+        //we might have to combine error messages
+        targetData.errorMsg = this._getMergeErrorMsg(targetData.alertMsg,commandResult.alertMsg);
+        //or the is pending flags
+        targetData.isPending = targetData.isPending || commandResult.isPending;
+
+        //parent would only be present on the first command
+        //child commands and are not in the event target data
+         
+        return targetData;
+    }
+
+    _getMergeErrorMsg(firstMsg,secondMsg) {
+        if(firstMsg && secondMsg) {
+            //we should get a better concatenation...
+            return firstMsg + "; " + secondMsg;
+        }
+        else if(firstMsg) {
+            return firstMsg;
+        }
+        else if(secondMsg) {
+            return secondMsg;
+        }
+        else {
+            return undefined;
+        } 
+    }
+
+    /** This creates a combined event by merging two successive events within the same command. */
+    _getActionType(firstAction,secondAction) {
+        if(firstAction == "created") {
+            if(secondAction == "updated") {
+                //created + updated = created
+                return "created";
+            }
+            else if(secondAction == "deleted"){
+                //created + deleted = canceling event
+                //we can support this, but for now we will make it an error
+                return "error";
+            }
+        }
+        else if(fistAction == "updated") {
+            if(secondAction == "updated") {
+                return "updated";
+            }
+            else if(secondAction == "deleted") {
+                //updated + deleted = deleted
+                return "deleted";
+            }
+        }
+
+        //any other scenario is an error
+        return "error";
+    }
+
+    //=========================================
+    // Static Methods
+    //=========================================
     
     /** This message does a standard error alert for the user. If the error is
      * fatal, meaning the application is not in a stable state, the flag isFatal

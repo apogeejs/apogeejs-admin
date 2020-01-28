@@ -44,6 +44,12 @@ savemembercode.executeCommand = function(workspaceUI,commandData) {
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
+
+    if(actionResult.actionDone) {
+        commandResult.target = workspaceUI.getComponent(actionResult.member);
+        commandResult.targetType = "component";
+        commandResult.action = "updated";
+    }
     
     return commandResult;
 }

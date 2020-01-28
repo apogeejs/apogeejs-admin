@@ -37,16 +37,15 @@ addcomponent.createUndoCommand = function(workspaceUI,commandData) {
 
 addcomponent.executeCommand = function(workspaceUI,commandData) { 
     
-    var workspace = workspaceUI.getWorkspace();
-
-    var commandResult;
+    let workspace = workspaceUI.getWorkspace();
+    let commandResult;
 
     //create the member
-    var createAction = {};
+    let createAction = {};
     createAction.action = "createMember";
     createAction.ownerName = commandData.parentFullName;
     createAction.createData = commandData.memberJson;
-    var actionResult = doAction(workspace,createAction);
+    let actionResult = doAction(workspace,createAction);
     
     //create the components for the member
     //I need error handling for the create component action

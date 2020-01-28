@@ -25,6 +25,8 @@ export default class WorkspaceUIView {
         treePane.appendChild(this.tree.getElement());
 
         this.treeEntry = null;
+
+        this.init();
     }
 
     getTabFrame() {
@@ -35,13 +37,16 @@ export default class WorkspaceUIView {
     // Workspace Management
     //====================================
 
-     
-    loadView(rootFolderComponent,referenceManager) {
-        this.treeEntry = this.createTreeEntry();
-        this.treeEntry.setState(TreeEntry.EXPANDED);
-        this.tree.setRootEntry(this.treeEntry);
-        this.treeEntry.addChild(rootFolderComponent.getTreeEntry(true));
+    loadReferenceManager(referenceManager) {
         this.treeEntry.addChild(referenceManager.getTreeEntry(true));
+    }
+
+     
+    loadRootFolder(rootFolderComponent) {
+        //our workspace is loaded. make sure out name is correct
+        this.treeEntry.setLabel(this.workspaceUI.getWorkspace().getName());
+        //add the root folder component
+        this.treeEntry.addChild(rootFolderComponent.getTreeEntry(true));
     }
 
     setViewJsonState(workspaceJson) { 
@@ -100,9 +105,16 @@ export default class WorkspaceUIView {
     // properties and display
     //====================================
 
+    init() {
+        this.treeEntry = this.createTreeEntry();
+        this.treeEntry.setState(TreeEntry.EXPANDED);
+        this.tree.setRootEntry(this.treeEntry);
+    }
+
     createTreeEntry() {
-        //menu item callback
-        var labelText = this.workspaceUI.getWorkspace().getName(); //add the name
+        //generally we expct the workspace not to exist yet. We will update this when it opens.
+        let workspace = this.workspaceUI.getWorkspace();
+        var labelText = workspace ? workspace.getName() : WORKSPACE_OPENING_NAME; //add the name
         var iconUrl = this.getIconUrl();
         var menuItemCallback = () => this.getMenuItems();
         var isRoot = true;
@@ -135,5 +147,7 @@ export default class WorkspaceUIView {
 
 
 }
+
+let WORKSPACE_OPENING_NAME = "opening...";
 
 WorkspaceUIView.ICON_RES_PATH = "/componentIcons/workspace.png";   

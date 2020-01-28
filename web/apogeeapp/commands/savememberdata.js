@@ -36,6 +36,12 @@ savememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplet
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
+
+    if(actionResult.actionDone) {
+        commandResult.target = workspaceUI.getComponent(actionResult.member);
+        commandResult.targetType = "component";
+        commandResult.action = "updated";
+    }
     
     return commandResult;
 }
@@ -43,10 +49,9 @@ savememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplet
 savememberdata.commandInfo = {
     "type": "saveMemberData",
     "targetType": "component",
-    "event": "updated"
+    "event": "updated",
+    "isAsynch": true
 }
-
-savememberdata.isAsynch = true;
 
 CommandManager.registerCommand(savememberdata);
 

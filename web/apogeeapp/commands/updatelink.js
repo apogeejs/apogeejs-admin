@@ -72,10 +72,9 @@ updatelink.executeCommand = function(workspaceUI,commandData) {
 updatelink.commandInfo = {
     "type": "updateLink",
     "targetType": "component",
-    "event": "updated"
+    "event": "updated",
+    "isAsynch": true
 }
-
-updatelink.isAsynch = true;
 
 CommandManager.registerCommand(updatelink);
 

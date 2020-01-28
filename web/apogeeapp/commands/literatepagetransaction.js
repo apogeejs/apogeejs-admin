@@ -63,6 +63,12 @@ literatepagetransaction.executeCommand = function(workspaceUI,commandData) {
     var commandResult = {};
     commandResult.cmdDone = !error;
     if(errorMsg) commandResult.alertMsg = errorMsg;
+
+    if(actionResult.actionDone) {
+        commandResult.target = workspaceUI.getComponent(member);
+        commandResult.targetType = "component";
+        commandResult.action = "updated";
+    }
     
     return commandResult;
 }

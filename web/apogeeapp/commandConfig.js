@@ -2,7 +2,6 @@ import "/apogeeapp/commands/addcomponent.js";
 import "/apogeeapp/commands/addlink.js";
 import "/apogeeapp/commands/closeworkspace.js";
 import "/apogeeapp/commands/compoundcommand.js";
-import "/apogeeapp/commands/compoundsavememberdata.js";
 import "/apogeeapp/commands/createworkspace.js";
 import "/apogeeapp/commands/deletecomponent.js";
 import "/apogeeapp/commands/deletelink.js";

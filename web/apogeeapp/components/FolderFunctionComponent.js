@@ -83,8 +83,8 @@ export default class FolderFunctionComponent extends ParentComponent {
         }
     }
 
-    readChildrenFromJson(workspaceUI,childActionResults,json,childCommandResults) {
-    
+    readChildrenFromJson(workspaceUI,childActionResults,json) {
+        let childCommandResults;
         if((childActionResults)&&(childActionResults.length > 0)) {
             let internalFolderChildActionResult = childActionResults[0]; //this is presumably the internalFolder
 
@@ -97,15 +97,15 @@ export default class FolderFunctionComponent extends ParentComponent {
             //at the time this is written, this is the only acknowledgement of the result for the internal folder.
 
             if(json.children) {
-                workspaceUI.loadFolderComponentContentFromJson(bodyChildActionResults,json.children,childCommandResults);
+                childCommandResults = workspaceUI.loadFolderComponentContentFromJson(bodyChildActionResults,json.children);
             }
-            return true;
         }
         else {
             //error - internal folder not requested or created
             alert("internal folder not found!")
             return false;
         }  
+        return childCommandResults;
     }
 
     static transferMemberProperties(inputValues,propertyJson) {

@@ -38,6 +38,8 @@ export default class WorkspaceUI {
         
         //listen to the workspace dirty event from the app
         this.app.addListener("workspaceDirty",() => this.setIsDirty());
+
+        this.workspaceUIView.loadReferenceManager(this.referenceManager);
     }
 
     /** This gets the application instance. */
@@ -100,7 +102,7 @@ export default class WorkspaceUI {
         if(this.workspaceUIView) {
             //load the view
             let rootFolderComponent = this.getComponent(rootFolder);
-            this.workspaceUIView.loadView(rootFolderComponent,this.referenceManager);
+            this.workspaceUIView.loadRootFolder(rootFolderComponent);
 
             //cset an ui view state
             if(workspaceJson) {
@@ -240,21 +242,14 @@ export default class WorkspaceUI {
         //response - get new member
         var member = createMemberResult.member;
         var component;
-        var errorMessage;
         var commandResult = {};
-        try {
-            if(member) {
-                
-                var componentGenerator = this.app.getComponentGenerator(componentJson.type);
-                if((!componentGenerator)||(member.generator.type == "apogee.ErrorTable")) {
-                    //throw base.createError("Component type not found: " + componentType);
 
-                    //table not found - create an empty table
-                    componentGenerator = this.app.getComponentGenerator("apogeeapp.app.ErrorTableComponent");
-                }
-
+        if(member) {
+            
+            var componentGenerator = this.app.getComponentGenerator(componentJson.type);
+            if((componentGenerator)&&(member.generator.type != "apogee.ErrorTable")) {
                 //create empty component
-                var component = new componentGenerator(this,member);
+                component = new componentGenerator(this,member);
 
                 //call member updated to process and notify of component creation
                 var eventInfo = apogeeutil.getAllFieldsInfo(member);
@@ -265,13 +260,17 @@ export default class WorkspaceUI {
                     component.loadPropertyValues(componentJson);
                 }
             }
-        }
-        catch(error) {
-            if(error.stack) console.error(error.stack);
-            
-            //exception creating component
-            errorMessage = "Failed to create UI component: " + error.message;
-            component = null;
+
+            //if we failed to create the component, or if we failed to make the member properly (and we used the error member)
+            if(!component) {
+                //table not found - create an empty table
+                componentGenerator = this.app.getComponentGenerator("apogeeapp.app.ErrorTableComponent");
+                component = new componentGenerator(this,member);
+                if(componentJson) {
+                    component.loadProperties(componentJson);
+                }
+            }
+
         }
 
         //I WANT BETTER ERROR HANDLING HERE (AND ABOVE)
@@ -292,6 +291,8 @@ export default class WorkspaceUI {
         }
         else {
             commandResult.target = component;
+            commandResult.targetType = "component"
+            commandResult.type = "created";
         }
         
         //load the children, if there are any (BETTER ERROR CHECKING!)
@@ -447,8 +448,9 @@ export default class WorkspaceUI {
         return json;
     }
     
-    loadFolderComponentContentFromJson(childActionResults,childrenJson,childCommandResults) {
+    loadFolderComponentContentFromJson(childActionResults,childrenJson) {
         if(!childActionResults) return;
+        let childCommandResults = [];
 
         childActionResults.forEach( childActionResult => {
         
@@ -460,6 +462,8 @@ export default class WorkspaceUI {
                 childCommandResults.push(childCommandResult);
             }
         });
+
+        return childCommandResults;
     }
 
 

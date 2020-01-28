@@ -36,16 +36,28 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
     
         var referencesJson = commandData.workspaceJson.references;
         var loadReferencesPromise = workspaceUI.getLoadReferencesPromise(referencesJson);
+        var doReferenceLoad = loadReferencesPromise.then( () => {
+            //publish result
+            let asynchCommandResult = {};
+            asynchCommandResult.cmdDone = true;
+            asynchCommandResult.target = workspaceUI;
+            asynchCommandResult.action = "updated";
+            
+            if(asynchOnComplete) {
+                asynchOnComplete(asynchCommandResult);
+            }
+        })
     	
 		//if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {
             workspaceUI.load(commandData.workspaceJson);
             workspaceUI.setFileMetadata(commandData.fileMetadata);
 
-            //fire event
+            //publish result
             let asynchCommandResult = {};
             asynchCommandResult.cmdDone = true;
-            app.dispatchEvent("workspaceComponentLoaded",asynchCommandResult);
+            asynchCommandResult.target = workspaceUI;
+            asynchCommandResult.action = "updated";
             
             if(asynchOnComplete) {
                 asynchOnComplete(asynchCommandResult);
@@ -55,17 +67,31 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
         var linkLoadError = function(errorMsg) {
             //this is just a warning - we will continue, though things may not work.
             CommandManager.errorAlert("Error loading links: " + errorMsg);
+
+            //publish event
+            let errorMsg = error.message ? error.message : error.toString(); 
+            let asynchCommandResult = {};
+            asynchCommandResult.alertMsg = "Error loading workspace links: " + errorMsg;
+            asynchCommandResult.cmdDone = false;
+            asynchCommandResult.target = workspaceUI;
+            asynchCommandResult.action = "updated";
+            
+            
+            if(asynchOnComplete) {
+                asynchOnComplete(asynchCommandResult);
+            }
         }
         
         var workspaceLoadError = function(error) {
             app.clearWorkspaceUI();
 
-            //fire event
+            //publish event
             let errorMsg = error.message ? error.message : error.toString(); 
             let asynchCommandResult = {};
             asynchCommandResult.alertMsg = "Error loading workspace: " + errorMsg;
             asynchCommandResult.cmdDone = false;
-            app.dispatchEvent("workspaceComponentLoadFailed",asynchCommandResult);
+            asynchCommandResult.target = workspaceUI;
+            asynchCommandResult.action = "updated";
             
             if(asynchOnComplete) {
                 asynchOnComplete(asynchCommandResult);
@@ -74,9 +100,12 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
         
         //load references and then workspace
         //on a reference error, we continue loading the workspace
-        loadReferencesPromise.catch(linkLoadError).then(doWorkspaceLoad).catch(workspaceLoadError);
+        doReferenceLoad.catch(linkLoadError).then(doWorkspaceLoad).catch(workspaceLoadError);
 
         synchCommandResult.cmdDone = true;
+        synchCommandResult.target = this.workspaceUI;
+        synchCommandResult.action = "created";
+        synchCommandResult.pending = true;
     }
     catch(error) {
         if(workspaceUIAdded) {
@@ -86,6 +115,8 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
         //unkown error
         synchCommandResult.alertMsg = "Error creating workspace: " + error.message;
         synchCommandResult.cmdDone = false;
+        synchCommandResult.targetIdentifier = "workspace";
+        synchCommandResult.action = "created";
     }
     
     return synchCommandResult;
@@ -94,10 +125,22 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
 openworkspace.commandInfo = {
     "type": "openWorkspace",
     "targetType": "workspace",
-    "event": "created"
+    "event": "created",
+    "isAsynch": true
 }
 
-openworkspace.isAsynch = true;
+//additional asynch command info
+let REFERENCES_LOADED_COMMAND_INFO = {
+    "type": "openWorkspace_referencesLoaded",
+    "targetType": "workspace",
+    "event": "updated",
+}
+
+let WORKSPACE_LOADED_COMMAND_INFO = {
+    "type": "openWorkspace_workspaceLoaded",
+    "targetType": "workspace",
+    "event": "updated",
+}
 
 CommandManager.registerCommand(openworkspace);
 

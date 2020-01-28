@@ -64,10 +64,9 @@ addlink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
 addlink.commandInfo = {
     "type": "addLink",
     "targetType": "link",
-    "event": "created"
+    "event": "created",
+    "isAsynch": true
 }
-
-addlink.isAsynch = true;
 
 CommandManager.registerCommand(addlink);
 

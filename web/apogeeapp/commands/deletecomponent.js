@@ -45,7 +45,30 @@ deletecomponent.executeCommand = function(workspaceUI,commandData) {
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
+
+    if(actionResult.actionDone) {
+        _fillInCommandResults(workspaceUI,actionResult,commandResult);
+    }
     
+    return commandResult;
+}
+
+/** This method fills in command results from the action results, recursively. If a command result
+ * object is passed in it is populated, If one is not passed in, a new one is created.
+ * The command result is returned.
+ */
+function _fillInCommandResults(workspaceUI,actionResult,commandResult) {
+    if(!commandResult) commandResult = {};
+
+    commandResult.target = workspaceUI.getComponent(actionResult.member);
+    commandResult.targetType = "component";
+    commandResult.targetId = actionResult.member.getId();
+    commandResult.action = "deleted";
+    
+    if(actionResult.childActionResults) {
+        commandResult.childCommandResults = actionResults.childActionResults.map( actionResult => _cillInCommandResults(workspaceUI,actionResult))
+    }
+
     return commandResult;
 }
 

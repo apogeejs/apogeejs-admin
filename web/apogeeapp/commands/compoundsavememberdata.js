@@ -79,10 +79,9 @@ compoundsavememberdata.executeCommand = function(workspaceUI,commandData,asynchO
 compoundsavememberdata.commandInfo = {
     "type": "compoundSaveMemberData",
     "targetType": "component",
-    "event": "created"
+    "event": "created",
+    "isAsynch": true
 }
-
-compoundsavememberdata.isAsynch = true;
 
 CommandManager.registerCommand(compoundsavememberdata);
 

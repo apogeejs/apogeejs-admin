@@ -54,11 +54,12 @@ export default class FolderComponent extends ParentComponent {
     }
 
     /** This method is used to load the child components from a json */
-    readChildrenFromJson(workspaceUI,childActionResults,json,childCommandResults) {
+    readChildrenFromJson(workspaceUI,childActionResults,json) {
+        let childCommandResults;
         if(json.children) {
-            workspaceUI.loadFolderComponentContentFromJson(childActionResults,json.children,childCommandResults);
+            childCommandResults = workspaceUI.loadFolderComponentContentFromJson(childActionResults,json.children);
         }
-        return true;  
+        return childCommandResults;  
     }
 
     //======================================
