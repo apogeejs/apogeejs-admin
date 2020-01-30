@@ -61,8 +61,6 @@ function _fillInCommandResults(workspaceUI,actionResult,commandResult) {
     if(!commandResult) commandResult = {};
 
     commandResult.target = workspaceUI.getComponent(actionResult.member);
-    commandResult.targetType = "component";
-    commandResult.targetId = actionResult.member.getId();
     commandResult.action = "deleted";
     
     if(actionResult.childActionResults) {

@@ -17,10 +17,13 @@ let deletelink = {};
 
 deletelink.createUndoCommand = function(workspaceUI,commandData) {
     
+    var nickname;
+
     var referenceManager = workspaceUI.getReferenceManager();
     var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.url);
-    var nickname = referenceEntry.getNickname();
     
+    if(referenceEntry) nickname = referenceEntry.getNickname();
+
     var undoCommandJson = {};
     undoCommandJson.type = "addLink";
     undoCommandJson.entryType = commandData.entryType;
@@ -44,19 +47,23 @@ deletelink.executeCommand = function(workspaceUI,commandData) {
             referenceEntry.remove();
             
             commandResult.cmdDone = true;
+            commandResult.target = referenceEntry;
+            commandResult.type = "deleted";
         }
         else {
             //entry not found
             commandResult.alertMsg = "Link entry to update not found!";
             commandResult.cmdDone = false;
+            commandResult.type = "deleted";
         }
     }
     catch(error) {
         if(error.stack) console.error(error.stack);
         
         //unkown error
-        commandResult.alertMsg("Error adding link: " + error.message);
+        commandResult.alertMsg("Error deleting link: " + error.message);
         commandResult.cmdDone = false;
+        commandResult.type = "deleted";
     }
     
     return commandResult;

@@ -30,14 +30,15 @@ addlink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
 
     try {
         var referenceManager = workspaceUI.getReferenceManager();
-
-        //add entry function
-        var promise = referenceManager.addEntry(commandData);
+        var referenceEntry = referenceManager.createEntry(commandData.entryType);
+        var promise = referenceEntry.loadEntry(commandData);
 
         promise.then( () => {
                 if(asynchOnComplete) {
                     let asynchCommandResult = {};
                     asynchCommandResult.cmdDone = true;
+                    asynchCommandResult.target = referenceEntry;
+                    asynchCommandResult.type = "updated";
                     asynchOnComplete(asynchCommandResult);
                 }
             })
@@ -45,17 +46,24 @@ addlink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
                 if(asynchOnComplete) {
                     let asynchCommandResult = {};
                     asynchCommandResult.alertMsg("Error adding link: " + errorMsg);
-                    asynchCommandResult.cmdDone = false;
+                    asynchCommandResult.cmdDone = true;
+                    asynchCommandResult.target = referenceEntry;
+                    asynchCommandResult.type = "updated";
                     asynchOnComplete(asynchCommandResult);
                 }
             });
         
-        //we don't know if we had success - think about how to do this rather than just saying true now
+        //link created, will load asynchronously
         synchCommandResult.cmdDone = true;
+        synchCommandResult.target = referenceEntry;
+        synchCommandResult.parent = referenceManager;
+        synchCommandResult.type = "created";
     }
     catch(error) {
         synchCommandResult.alertMsg = "Error adding link: " + error.message;
         synchCommandResult.cmdDone = false;
+        synchCommandResult.parent = referenceManager;
+        synchCommandResult.type = "created";
     }
     
     return synchCommandResult;

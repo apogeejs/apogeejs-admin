@@ -1,25 +1,28 @@
-import {updateLink, removeLink} from "/apogeeview/commandseq/updatelinkseq.js";
-import apogeeui from "/apogeeui/apogeeui.js";
 import {bannerConstants} from "/apogeeview/componentdisplay/banner.js"; 
-import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
+import EventManager from "/apogeeutil/EventManagerClass.js";
 
 /** This class manages references for the web page.*/
-export default class ReferenceEntry {
+export default class ReferenceEntry extends EventManager {
     
-    constructor(referenceManager,referenceData,referenceTypeInfo) {
+    constructor(referenceManager,referenceData,referenceType) {
+        super();
+
         this.id = ReferenceEntry._createId();
         this.referenceManager = referenceManager;
+        this.clearUpdated();
 
         this.url = referenceData.url;
-        this.referenceTypeInfo = referenceTypeInfo;
+        this.referenceType = referenceType;
 
         this.state = bannerConstants.BANNER_TYPE_NONE;
 
         var nickname = referenceData.nickname;
         if((!nickname)||(nickname.length === 0)) nickname = this.createEntryNameFromUrl(this.url);
-        this.nickname = nickname;
-
-        this.treeEntry = null;
+        this.nickname = nickname;  
+        
+        this.fieldUpdated("url");
+        this.fieldUpdated("nickname");
+        this.fieldUpdated("state");     
     }
 
     //---------------------------
@@ -35,24 +38,11 @@ export default class ReferenceEntry {
     }
     
     getEntryType() {
-        return this.referenceTypeInfo.REFERENCE_TYPE;
-    }
-    
-    getTypeInfo() {
-        return this.referenceTypeInfo;
+        return this.referenceType;
     }
 
     getState() {
         return this.state;
-    }
-
-    /** This method loads the link onto the page. It returns a promise that
-     * resolves when the link is loaded. */
-    getTreeEntry(createIfMissing) {
-        if((createIfMissing)&&(!this.treeEntry)) {
-            this.treeEntry = this.instantiateTreeEntry();
-        }
-        return this.treeEntry;
     }
 
     getUrl() {
@@ -74,11 +64,6 @@ export default class ReferenceEntry {
     
     
     ///////////////////////////////////////////////////////////////////////////
-    
-    /** This method returns the icon url for the component. */
-    getIconUrl() {
-        return apogeeui.getResourcePath(this.referenceTypeInfo.ENTRY_ICON_PATH);
-    }
 
     /** This method loads the link onto the page. It returns a promise that
      * resolves when the link is loaded. */
@@ -86,7 +71,7 @@ export default class ReferenceEntry {
         var entryJson = {};
         entryJson.url = this.url;
         if(this.nickname != this.url) entryJson.nickname = this.nickname;
-        entryJson.entryType = this.referenceTypeInfo.REFERENCE_TYPE;
+        entryJson.entryType = this.referenceType;
         return entryJson;
     }
 
@@ -103,6 +88,7 @@ export default class ReferenceEntry {
             if(this.nickname != nickname) {
                 this.nickname = nickname;
                 this.treeEntry.setLabel(this.nickname);
+                this.fieldUpdated("nickname");
             }
         }
 
@@ -111,6 +97,7 @@ export default class ReferenceEntry {
             this.url = url;
             this.remove();
             var promise = this.loadEntry();
+            this.fieldUpdated("url");
         }
 
         //if we didn't update, create a dummy promise
@@ -119,13 +106,25 @@ export default class ReferenceEntry {
         return promise;
     }
 
+    //------------------------------------------
+    // Event Tracking Methods
+    //------------------------------------------
 
-    /** This method generates a member ID for the member. It is only valid
-     * for the duration the application is opened. It is not persisted.
-     * @private
-     */
-    static _createId() {
-        return nextId++;
+    getUpdated() {
+        return this.updated;
+    }
+
+    clearUpdated() {
+        this.updated = {};
+    }
+
+    fieldUpdated(field) {
+        this.updated[field] = true;
+    }
+
+    getEventId() {
+        //use the main member for the event ID
+        return "link-" + this.id;
     }
 
 
@@ -154,38 +153,23 @@ export default class ReferenceEntry {
     }
 
     setState(state,msg) {
-        this.state = state;
-        if(this.treeEntry) {
-            this.treeEntry.setBannerState(this.state);
+        if(this.state != state) {
+            //for now we are not tracking msg. If we do, we should check for that change too
+            this.state = state;
+            if(this.treeEntry) {
+                this.treeEntry.setBannerState(this.state);
+            }
+            this.referenceManager.entryStatusChange(this);
+            this.fieldUpdated("state");
         }
-        this.referenceManager.entryStatusChange(this);
     }
 
-    instantiateTreeEntry() {
-        var iconUrl = this.getIconUrl();
-        var menuItemsCallback = () => this.getMenuItems();
-        var treeEntry = new TreeEntry(this.nickname, iconUrl, null, menuItemsCallback, false);
-        treeEntry.setBannerState(this.state);
-        return treeEntry;
-    }
-
-    getMenuItems() {
-        //menu items
-        var menuItemList = [];
-
-        //add the standard entries
-        var itemInfo = {};
-        itemInfo.title = "Update Reference";
-        itemInfo.callback = () => updateLink(this);
-        menuItemList.push(itemInfo);
-
-        //add the standard entries
-        var itemInfo = {};
-        itemInfo.title = "Remove Reference";
-        itemInfo.callback = () => removeLink(this);
-        menuItemList.push(itemInfo);
-
-        return menuItemList;
+    /** This method generates a member ID for the member. It is only valid
+     * for the duration the application is opened. It is not persisted.
+     * @private
+     */
+    static _createId() {
+        return nextId++;
     }
 
 }

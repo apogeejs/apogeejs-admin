@@ -94,7 +94,6 @@ updatecomponent.executeCommand = function(workspaceUI,commandData) {
 
     if(actionResult.actionDone) {
         commandResult.target = workspaceUI.getComponent(member);
-        commandResult.targetType = "component";
         commandResult.action = "updated";
     }
     

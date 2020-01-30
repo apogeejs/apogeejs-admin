@@ -160,7 +160,7 @@ export default class CommandManager {
                     targetData = this._mergeTargetData(targetData,commandResult);
                 }
                 else {
-                    targetPayData = this._createNewTargetData(commandResult);
+                    targetData = this._createNewTargetData(commandResult);
                 }
                 successEventMap[targetId] = targetData;
             }

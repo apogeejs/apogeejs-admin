@@ -48,12 +48,5 @@ export default class CssEntry extends ReferenceEntry {
     }
 }
 
-CssEntry.REFERENCE_TYPE_INFO = {
-    "REFERENCE_TYPE": "css link",
-    "LIST_NAME": "CSS Links",
-    "ADD_ENTRY_TEXT":"Add CSS Link",
-    "UPDATE_ENTRY_TEXT":"Update CSS Link",
-    "LIST_ICON_PATH":"/componentIcons/folder.png",
-    "ENTRY_ICON_PATH": "/componentIcons/cssLink.png",
-    "createEntryFunction": (referenceManager, linkData) => new CssEntry(referenceManager,linkData)
-}
+CssEntry.REFERENCE_TYPE = "css link";
+

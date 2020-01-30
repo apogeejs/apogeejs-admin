@@ -152,6 +152,27 @@ export default class WorkspaceUI {
         this.isDirty = false;
     }
 
+    //------------------------------------------
+    // Event Tracking Methods
+    //------------------------------------------
+
+    getUpdated() {
+        return this.updated;
+    }
+
+    clearUpdated() {
+        this.updated = {};
+    }
+
+    fieldUpdated(field) {
+        this.updated[field] = true;
+    }
+
+    getEventId() {
+        //for now we have a single fixed id for the workspace
+        return "workspace";
+    }
+
     //====================================
     // Component Management
     //====================================

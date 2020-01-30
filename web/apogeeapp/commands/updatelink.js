@@ -27,7 +27,9 @@ updatelink.createUndoCommand = function(workspaceUI,commandData) {
         //look up the pre-command entry (we change back gto this)
         var referenceManager = workspaceUI.getReferenceManager();
         var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.oldUrl);
-        if(commandData.newNickname != referenceEntry.getNickname()) undoCommandJson.newNickname = referenceEntry.getNickname();
+        if((referenceEntry)&&(commandData.newNickname != referenceEntry.getNickname())) {
+            undoCommandJson.newNickname = referenceEntry.getNickname();
+        }
     }
     
     return undoCommandJson;
@@ -35,39 +37,49 @@ updatelink.createUndoCommand = function(workspaceUI,commandData) {
 
 updatelink.executeCommand = function(workspaceUI,commandData) {
     
-    var commandResult = {};
+    var synchcommandResult = {};
+    var referenceManager = workspaceUI.getReferenceManager();
+    
+    //lookup entry for this reference
+    var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.oldUrl);
+    
+    if(referenceEntry) {
+        //update entry
+        let updatePromise = referenceEntry.updateData(commandData.newUrl,commandData.newNickname);
 
-    try {
-        var referenceManager = workspaceUI.getReferenceManager();
+        updatePromise.then( () => {
+            if(asynchOnComplete) {
+                let asynchCommandResult = {};
+                asynchCommandResult.cmdDone = true;
+                asynchCommandResult.target = referenceEntry;
+                asynchCommandResult.type = "updated";
+                asynchOnComplete(asynchCommandResult);
+            }
+        })
+        .catch( errorMsg => {
+            if(asynchOnComplete) {
+                let asynchCommandResult = {};
+                asynchCommandResult.alertMsg("Error updating link: " + errorMsg);
+                asynchCommandResult.cmdDone = true;
+                asynchCommandResult.target = referenceEntry;
+                asynchCommandResult.type = "updated";
+                asynchOnComplete(asynchCommandResult);
+            }
+        });
         
-        //lookup entry for this reference
-        var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.oldUrl);
-        
-        if(referenceEntry) {
-            //update entry
-            referenceEntry.updateData(commandData.newUrl,commandData.newNickname);
-            
-            //TODO - think about how to add result one link updaye completion
-            
-            commandResult.cmdDone = true;
-        }
-        else {
-            //entry not found
-            commandResult.alertMsg = "Link entry to update not found!";
-            commandResult.cmdDone = false;
-        }
+        synchcommandResult.cmdDone = true;
+        synchcommandResult.target = referenceEntry;
+        synchcommandResult.type = "updated";
     }
-    catch(error) {
-        if(error.stack) console.error(error.stack);
-        
-        //unkown error
-        commandResult.alertMsg("Error adding link: " + error.message);
-        commandResult.cmdDone = false;
+    else {
+        //entry not found
+        synchcommandResult.alertMsg = "Link entry to update not found!";
+        synchcommandResult.cmdDone = false;
+        synchcommandResult.type = "updated";
     }
     
-    return commandResult;
+    return synchcommandResult;
 }
-
 
 updatelink.commandInfo = {
     "type": "updateLink",

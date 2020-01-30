@@ -68,8 +68,7 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
             //this is just a warning - we will continue, though things may not work.
             CommandManager.errorAlert("Error loading links: " + errorMsg);
 
-            //publish event
-            let errorMsg = error.message ? error.message : error.toString(); 
+            //publish event 
             let asynchCommandResult = {};
             asynchCommandResult.alertMsg = "Error loading workspace links: " + errorMsg;
             asynchCommandResult.cmdDone = false;

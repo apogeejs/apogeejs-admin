@@ -59,14 +59,5 @@ export default class EsModuleEntry extends ReferenceEntry {
     
 }
 
-EsModuleEntry.REFERENCE_TYPE_INFO = {
-    "REFERENCE_TYPE": "es module",
-    "LIST_NAME": "Web Modules",
-    "ADD_ENTRY_TEXT":"Add ES Web Module",
-    "UPDATE_ENTRY_TEXT":"Update Web Module",
-    "LIST_ICON_PATH":"/componentIcons/folder.png",
-    "ENTRY_ICON_PATH":"/componentIcons/webModule.png",
-    "createEntryFunction": (referenceManager, referenceData) => new EsModuleEntry(referenceManager,referenceData)
-}
-
+EsModuleEntry.REFERENCE_TYPE = "es module";
 

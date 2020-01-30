@@ -53,14 +53,6 @@ export default class JsScriptEntry extends ReferenceEntry {
     }
 }
 
-JsScriptEntry.REFERENCE_TYPE_INFO = {
-    "REFERENCE_TYPE": "js link",
-    "LIST_NAME": "JS Scripts",
-    "ADD_ENTRY_TEXT":"Add JS Script Link",
-    "UPDATE_ENTRY_TEXT":"Update JS Script Link",
-    "LIST_ICON_PATH":"/componentIcons/folder.png",
-    "ENTRY_ICON_PATH":"/componentIcons/javascriptLink.png",
-    "createEntryFunction": (referenceManager, linkData) => new JsScriptEntry(referenceManager,linkData)
-}
+JsScriptEntry.REFERENCE_TYPE = "js link";
 
 

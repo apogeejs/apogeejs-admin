@@ -64,9 +64,8 @@ literatepagetransaction.executeCommand = function(workspaceUI,commandData) {
     commandResult.cmdDone = !error;
     if(errorMsg) commandResult.alertMsg = errorMsg;
 
-    if(actionResult.actionDone) {
+    if(commandResult.actionDone) {
         commandResult.target = workspaceUI.getComponent(member);
-        commandResult.targetType = "component";
         commandResult.action = "updated";
     }
     

@@ -39,7 +39,6 @@ savememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplet
 
     if(actionResult.actionDone) {
         commandResult.target = workspaceUI.getComponent(actionResult.member);
-        commandResult.targetType = "component";
         commandResult.action = "updated";
     }
     

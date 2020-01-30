@@ -1,11 +1,9 @@
-import {addLink} from "/apogeeview/commandseq/updatelinkseq.js";
 import {bannerConstants} from "/apogeeview/componentdisplay/banner.js"; 
 import EsModuleEntry from "/apogeeapp/references/EsModuleEntry.js";
 import NpmModuleEntry from "/apogeeapp/references/NpmModuleEntry.js";
 import JsScriptEntry from "/apogeeapp/references/JsScriptEntry.js";
 import CssEntry from "/apogeeapp/references/CssEntry.js";
-import apogeeui from "/apogeeui/apogeeui.js";
-import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
+import EventManager from "/apogeeutil/EventManagerClass.js";
 
 /** This class manages links and other reference entries, loading the references and
  * creating the UI tree elements for display of the references.
@@ -13,31 +11,41 @@ import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
  * Any links needed for the page are managed externally by the Link Loader, which
  * allows multiple users to request the same link.
  */
-export default class ReferenceManager {
+export default class ReferenceManager extends EventManager {
 
     constructor(app) {
+        super();
         this.app = app;
-        this.referencesTreeEntry = null;
         this.state = bannerConstants.BANNER_TYPE_NORMAL;
         
         //references
         this.referenceLists = {};
-        if(__APOGEE_ENVIRONMENT__ == "WEB") this.referenceLists[EsModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(EsModuleEntry.REFERENCE_TYPE_INFO);
-        if(__APOGEE_ENVIRONMENT__ == "NODE") this.referenceLists[NpmModuleEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(NpmModuleEntry.REFERENCE_TYPE_INFO);
-        this.referenceLists[JsScriptEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(JsScriptEntry.REFERENCE_TYPE_INFO);
-        this.referenceLists[CssEntry.REFERENCE_TYPE_INFO.REFERENCE_TYPE] = this.getListStruct(CssEntry.REFERENCE_TYPE_INFO);
+        if(__APOGEE_ENVIRONMENT__ == "WEB") this.referenceLists[EsModuleEntry.REFERENCE_TYPE] = this.getListStruct(EsModuleEntry);
+        if(__APOGEE_ENVIRONMENT__ == "NODE") this.referenceLists[NpmModuleEntry.REFERENCE_TYPE] = this.getListStruct(NpmModuleEntry);
+        this.referenceLists[JsScriptEntry.REFERENCE_TYPE] = this.getListStruct(JsScriptEntry);
+        this.referenceLists[CssEntry.REFERENCE_TYPE] = this.getListStruct(CssEntry);
+    }
+
+    /** This method returns the state of the reference manager. */
+    getState() {
+        return this.state;
+    }   
+    
+    /** This method returns the state of the given reference list. If the list is not
+     * found, bannerConstants.BANNER_TYPE_ERROR is returned. */
+    getReferenceListState(entryType) {
+        referenceList = this.referenceLists[entryType];
+        if(referenceList) {
+            return referenceList.state;
+        }
+        else {
+            //unknown list - return error state
+            return bannerConstants.BANNER_TYPE_ERROR;
+        }
     }
 
     getApp() {
         return this.app;
-    }
-
-    /** This returns the tree entry to display the reference entry for this reference manager. */
-    getTreeEntry(createIfMissing) {
-        if((createIfMissing)&&(!this.referencesTreeEntry)) {
-            this.referencesTreeEntry = this.instantiateTreeEntry();
-        }
-        return this.referencesTreeEntry;
     }
 
     /** This method opens the reference entries, from the structure returned from
@@ -84,20 +92,18 @@ export default class ReferenceManager {
         return entryListJson;
     }
 
-    /** This method adds a reference entry, from the structure returned from
-     * the save call. It returns a promise that
-     * resolves when the entry are loaded. 
-     */
-    addEntry(entryJson) {
+    /** This method creates a reference entry. This does nto however load it, to 
+     * do that ReferenceEntry.loadEntry() method must be called.  */
+    createEntry(entryTypeString) {
         
         //check if these object exist - if so, don't add them
     
-        var listStruct = this.referenceLists[entryJson.entryType];
+        var listStruct = this.referenceLists[entryTypeString];
         
-        if(!listStruct) throw new Error("Entry type nopt found: " + entryJson.entryType);
+        if(!listStruct) throw new Error("Entry type nopt found: " + entryTypeString);
         
-        var referenceEntry = listStruct.typeInfo.createEntryFunction(this,entryJson);
-        return referenceEntry.loadEntry();
+        var referenceEntry = listStruct.createEntryFunction(this,entryJson);
+        return referenceEntry;
     }
 
     /** This method should be called when the parent is closed. It removes all links. 
@@ -134,12 +140,9 @@ export default class ReferenceManager {
         }
         
         listStruct.listEntries.push(referenceEntry);
-        
-        //add tree entry if applicable
-        if(listStruct.treeEntry) {
-            var treeEntry = referenceEntry.getTreeEntry(true);
-            listStruct.treeEntry.addChild(treeEntry);
-        }
+
+        //FIRE ENTRY ADDED?
+        //onEntryAdded(referencentry)
     }
 
 
@@ -170,67 +173,13 @@ export default class ReferenceManager {
     // Private
     //=================================
 
-    getListStruct(typeInfo) {
+    getListStruct(referenceEntryClass) {
         var listStruct = {};
-        listStruct.typeInfo = typeInfo;
+        listStruct.createEntryFunction = (referenceManager, linkData) => new referenceEntryClass(referenceManager,linkData);
         listStruct.listEntries = [];
         listStruct.treeEntry = null;
         listStruct.state = bannerConstants.BANNER_TYPE_NORMAL;
         return listStruct;
-    }
-
-
-    /** @private */
-    instantiateTreeEntry() {
-        var iconUrl = apogeeui.getResourcePath(ReferenceManager.REFERENCES_ICON_PATH);
-        var treeEntry = new TreeEntry("References", iconUrl, null, null, false);
-        
-        //add child lists
-        for(var childKey in this.referenceLists) {
-            var childStruct = this.referenceLists[childKey];
-            
-            this.addListTreeEntry(treeEntry,childStruct);
-        }
-        
-        //set the state on the banner entry
-        treeEntry.setBannerState(this.state);
-        
-        return treeEntry;
-    }
-
-    addListTreeEntry(referenceTreeEntry,childStruct) {
-        var typeInfo = childStruct.typeInfo;
-        var iconUrl = apogeeui.getResourcePath(typeInfo.LIST_ICON_PATH);
-        var menuItemCallback = () => this.getListMenuItems(typeInfo);
-        var listTreeEntry = new TreeEntry(typeInfo.LIST_NAME, iconUrl, null, menuItemCallback, false);
-        
-        //add existing child entries
-        for(var childKey in childStruct.listEntries) {
-            var childEntry = childStruct.listEntries[childKey];
-            var treeEntry = childEntry.getTreeEntry(true);
-            listTreeEntry.addChild(treeEntry);
-        }
-        
-        //set the state on the banner entry
-        listTreeEntry.setBannerState(childStruct.state);
-        
-        childStruct.treeEntry = listTreeEntry;
-        referenceTreeEntry.addChild(listTreeEntry);
-    }
-
-
-    /** @private */
-    getListMenuItems(typeInfo) {
-        //menu items
-        var menuItemList = [];
-
-        //add the standard entries
-        var itemInfo = {};
-        itemInfo.title = typeInfo.ADD_ENTRY_TEXT;
-        itemInfo.callback = () => addLink(this,typeInfo);
-        menuItemList.push(itemInfo);
-        
-        return menuItemList;
     }
 
     /** This method opens a list of js and css links. It returns a promise that
@@ -304,5 +253,3 @@ export default class ReferenceManager {
         return listState;
     }
 }
-
-ReferenceManager.REFERENCES_ICON_PATH = "/componentIcons/references.png";

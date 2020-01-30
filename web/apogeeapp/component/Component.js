@@ -253,6 +253,10 @@ export default class Component extends EventManager {
         }
     }
 
+    //------------------------------------------
+    // Event Tracking Methods
+    //------------------------------------------
+
     getUpdated() {
         return this.updated;
     }
@@ -263,6 +267,11 @@ export default class Component extends EventManager {
 
     fieldUpdated(field) {
         this.updated[field] = true;
+    }
+
+    getEventId() {
+        //use the main member for the event ID
+        return "component:" + this.member.getId();
     }
 
 

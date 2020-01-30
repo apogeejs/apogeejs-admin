@@ -75,7 +75,7 @@ export function updateLink(referenceEntry) {
     initialValues.nickname = referenceEntry.getNickname();
     if(initialValues.nickname == initialValues.url) initialValues.nickname = "";
 
-    var entryTypeInfo = referenceEntry.getTypeInfo();
+    var entryTypeInfo = referenceEntry.getTypeInfo();//FIX THIS!! the tyep info for the UI is moved.
 
     //create the dialog layout
     var titleLine = {};

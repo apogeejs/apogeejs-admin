@@ -5,6 +5,7 @@ import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
 import TreeControl from "/apogeeui/treecontrol/TreeControl.js";
 
 import {updateWorkspaceProperties} from "/apogeeview/commandseq/updateworkspaceseq.js";
+import ReferenceView from "./reference/ReferenceView";
 
 /** This class manages the user interface for a workspace object. */
 export default class WorkspaceUIView {
@@ -38,7 +39,9 @@ export default class WorkspaceUIView {
     //====================================
 
     loadReferenceManager(referenceManager) {
-        this.treeEntry.addChild(referenceManager.getTreeEntry(true));
+        this.referenceView = new ReferenceView(referenceManager);
+        let refTreeEntry = this.referenceView.getTreeEntry();
+        this.treeEntry.addChild(refTreeEntry);
     }
 
      

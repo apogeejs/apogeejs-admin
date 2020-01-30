@@ -63,14 +63,6 @@ export default class AmdModuleEntry extends ReferenceEntry {
     
 }
 
-AmdModuleEntry.REFERENCE_TYPE_INFO = {
-    "REFERENCE_TYPE": "amd module",
-    "LIST_NAME": "Web Modules",
-    "ADD_ENTRY_TEXT":"Add Web Module",
-    "UPDATE_ENTRY_TEXT":"Update Web Module",
-    "LIST_ICON_PATH":"/componentIcons/folder.png",
-    "ENTRY_ICON_PATH":"/componentIcons/webModule.png",
-    "createEntryFunction": (referenceManager, referenceData) => new AmdModuleEntry(referenceManager,referenceData)
-}
+AmdModuleEntry.REFERENCE_TYPE = "amd module";
 
 

@@ -59,14 +59,5 @@ export default class NpmModuleEntry extends ReferenceEntry {
     
 }
 
-NpmModuleEntry.REFERENCE_TYPE_INFO = {
-    "REFERENCE_TYPE": "npm module",
-    "LIST_NAME": "NPM Modules",
-    "ADD_ENTRY_TEXT":"Add NPM Module",
-    "UPDATE_ENTRY_TEXT":"Update NPM Module",
-    "LIST_ICON_PATH":"/componentIcons/folder.png",
-    "ENTRY_ICON_PATH":"/componentIcons/module.png",
-    "createEntryFunction": (referenceManager, referenceData) => new NpmModuleEntry(referenceManager,referenceData)
-}
-
+NpmModuleEntry.REFERENCE_TYPE = "npm module";
 

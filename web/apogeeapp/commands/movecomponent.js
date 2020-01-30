@@ -46,8 +46,7 @@ movecomponent.executeCommand = function(workspaceUI,commandData) {
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
 
     if(actionResult.actionDone) {
-        commandResult.target = workspaceUI.getComponent(member);
-        commandResult.targetType = "component";
+        commandResult.target = workspaceUI.getComponent(actionResult.member);
         commandResult.action = "updated";
     }
     
