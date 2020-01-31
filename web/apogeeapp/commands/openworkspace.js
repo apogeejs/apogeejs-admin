@@ -22,7 +22,6 @@ let openworkspace = {};
 
 openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComplete) {
         //app,workspaceText,fileMetadata) {
-    var workspaceUIAdded;
     var synchCommandResult = {};
     
     var app = Apogee.getInstance();
@@ -30,59 +29,41 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
     try {
 
 //I should verify the file type and format!  
-        
+
+        //create the workspace UI (this does not create several child objects in it)
         var workspaceUI = new WorkspaceUI();
-        workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
-    
+        synchCommandResult.target = this.workspaceUI;
+        synchCommandResult.action = "created";
+
+        workspaceUI.setFileMetadata(commandData.fileMetadata);
+
+        //initialize the workspace - this returns command results for creating the reference management objects
+        workspaceUI.init(this,this.appView);
+
+        //open the reference entries - this has a synch and asynch part.
         var referencesJson = commandData.workspaceJson.references;
-        var loadReferencesPromise = workspaceUI.getLoadReferencesPromise(referencesJson);
-        var doReferenceLoad = loadReferencesPromise.then( () => {
-            //publish result
-            let asynchCommandResult = {};
-            asynchCommandResult.cmdDone = true;
-            asynchCommandResult.target = workspaceUI;
-            asynchCommandResult.action = "updated";
-            
+        let referenceManager = workspaceUI.getReferenceManager();
+        var {entriesCommandResultList, openEntriesPromise} = referenceManager.openReferenceEntries(workspaceUI,referencesJson);
+        //save the entries create results to the synchronous command result
+        synchCommandResult.childCommandResults = entriesCommandResultList;
+
+        //set up asynchronouse part of loading.
+        var doReferenceLoad = openEntriesPromise.then( asynchCommandResult => {
             if(asynchOnComplete) {
                 asynchOnComplete(asynchCommandResult);
             }
         })
     	
-		//if we have to load links wait for them to load
+        //if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {
-            workspaceUI.load(commandData.workspaceJson);
-            workspaceUI.setFileMetadata(commandData.fileMetadata);
-
-            //publish result
-            let asynchCommandResult = {};
-            asynchCommandResult.cmdDone = true;
-            asynchCommandResult.target = workspaceUI;
-            asynchCommandResult.action = "updated";
-            
+            let asynchCommandResult = workspaceUI.load(commandData.workspaceJson);
             if(asynchOnComplete) {
                 asynchOnComplete(asynchCommandResult);
             }
         }
         
-        var linkLoadError = function(errorMsg) {
-            //this is just a warning - we will continue, though things may not work.
-            CommandManager.errorAlert("Error loading links: " + errorMsg);
-
-            //publish event 
-            let asynchCommandResult = {};
-            asynchCommandResult.alertMsg = "Error loading workspace links: " + errorMsg;
-            asynchCommandResult.cmdDone = false;
-            asynchCommandResult.target = workspaceUI;
-            asynchCommandResult.action = "updated";
-            
-            
-            if(asynchOnComplete) {
-                asynchOnComplete(asynchCommandResult);
-            }
-        }
-        
-        var workspaceLoadError = function(error) {
-            app.clearWorkspaceUI();
+        //This will handle a unknown error om the asynchloading
+        var onLoadError = function(error) {
 
             //publish event
             let errorMsg = error.message ? error.message : error.toString(); 
@@ -98,19 +79,12 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
         }
         
         //load references and then workspace
-        //on a reference error, we continue loading the workspace
-        doReferenceLoad.catch(linkLoadError).then(doWorkspaceLoad).catch(workspaceLoadError);
+        doReferenceLoad.then(doWorkspaceLoad).catch(onLoadError);
+        synchCommandResult.pending = true;
 
         synchCommandResult.cmdDone = true;
-        synchCommandResult.target = this.workspaceUI;
-        synchCommandResult.action = "created";
-        synchCommandResult.pending = true;
     }
     catch(error) {
-        if(workspaceUIAdded) {
-            app.clearWorkspaceUI();
-        }
-        
         //unkown error
         synchCommandResult.alertMsg = "Error creating workspace: " + error.message;
         synchCommandResult.cmdDone = false;

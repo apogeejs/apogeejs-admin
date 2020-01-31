@@ -4,10 +4,10 @@ import {updateLink, removeLink} from "/apogeeview/commandseq/updatelinkseq.js";
 
 export default class ReferenceEntryView {
 
-    constructor(referenceEntry,typeUiInfo) {
+    constructor(referenceEntry,displayInfo) {
         this.referenceEntry = referenceEntry;
-        this.typeUiInfo = typeUiInfo;
-        this.treeEntry = this.instantiateTreeEntry();
+        this.displayInfo = displayInfo;
+        this.treeEntry = this._createTreeEntry();
 
         referenceEntry.addListener("updated",referenceEntry => this.onUpdated(referenceEntry));
     }
@@ -36,38 +36,35 @@ export default class ReferenceEntryView {
     // Private Methods
     //===========================================
 
-    instantiateTreeEntry() {
-        var iconUrl = this.getIconUrl();
+    _createTreeEntry() {
+        var iconUrl = apogeeui.getResourcePath(this.displayInfo.ENTRY_ICON_PATH);
         var nickname = this.referenceEntry.getNickname();
-        var menuItemsCallback = () => this.getMenuItems();
+        var menuItemsCallback = () => this._getMenuItems();
 
         var treeEntry = new TreeEntry(nickname, iconUrl, null, menuItemsCallback, false);
         treeEntry.setBannerState(this.referenceEntry.getState());
         return treeEntry;
     }
 
-    getMenuItems() {
+    _getMenuItems() {
         //menu items
         var menuItemList = [];
 
         //add the standard entries
         var itemInfo = {};
-        itemInfo.title = "Update Reference";
+        itemInfo.title = this.displayInfo.UPDATE_ENTRY_TEXT;
         itemInfo.callback = () => updateLink(this);
         menuItemList.push(itemInfo);
 
         //add the standard entries
         var itemInfo = {};
-        itemInfo.title = "Remove Reference";
+        itemInfo.title = this.displayInfo.REMOVE_ENTRY_TEXT;
         itemInfo.callback = () => removeLink(this);
         menuItemList.push(itemInfo);
 
         return menuItemList;
     }
 
-    /** This method returns the icon url for the component. */
-    getIconUrl() {
-        return apogeeui.getResourcePath(this.typeUiInfo.ENTRY_ICON_PATH);
-    }
+
 
 }

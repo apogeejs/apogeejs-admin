@@ -35,7 +35,7 @@ deletelink.createUndoCommand = function(workspaceUI,commandData) {
 
 deletelink.executeCommand = function(workspaceUI,commandData) {
     
-    var commandResult = {};
+    var commandResult;
 
     try {
         var referenceManager = workspaceUI.getReferenceManager();
@@ -44,14 +44,11 @@ deletelink.executeCommand = function(workspaceUI,commandData) {
         var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.url);
         if(referenceEntry) {
             //update entry
-            referenceEntry.remove();
-            
-            commandResult.cmdDone = true;
-            commandResult.target = referenceEntry;
-            commandResult.type = "deleted";
+            commandResult = referenceEntry.remove();
         }
         else {
             //entry not found
+            commandResult = {}
             commandResult.alertMsg = "Link entry to update not found!";
             commandResult.cmdDone = false;
             commandResult.type = "deleted";
@@ -61,6 +58,7 @@ deletelink.executeCommand = function(workspaceUI,commandData) {
         if(error.stack) console.error(error.stack);
         
         //unkown error
+        commandResult = {}
         commandResult.alertMsg("Error deleting link: " + error.message);
         commandResult.cmdDone = false;
         commandResult.type = "deleted";

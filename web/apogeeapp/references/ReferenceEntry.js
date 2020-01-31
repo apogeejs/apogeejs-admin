@@ -4,17 +4,18 @@ import EventManager from "/apogeeutil/EventManagerClass.js";
 /** This class manages references for the web page.*/
 export default class ReferenceEntry extends EventManager {
     
-    constructor(referenceManager,referenceData,referenceType) {
+    constructor(referenceList,referenceData,referenceType) {
         super();
 
         this.id = ReferenceEntry._createId();
-        this.referenceManager = referenceManager;
+        this.referenceList = referenceList;
         this.clearUpdated();
 
         this.url = referenceData.url;
         this.referenceType = referenceType;
 
-        this.state = bannerConstants.BANNER_TYPE_NONE;
+        //we create in a pending state because the link is not loaded.
+        this.state = bannerConstants.BANNER_TYPE_PENDING;
 
         var nickname = referenceData.nickname;
         if((!nickname)||(nickname.length === 0)) nickname = this.createEntryNameFromUrl(this.url);
@@ -31,6 +32,10 @@ export default class ReferenceEntry extends EventManager {
     
     getReferenceManager() {
         return this.referenceManager;
+    }
+
+    getReferenceList() {
+        return this.referenceList;
     }
 
     getId() {
@@ -56,10 +61,11 @@ export default class ReferenceEntry extends EventManager {
     ///////////////////////////////////////////////////////////////////////////
 
     /** This method loads the link onto the page. It returns a promise that
-     * resolves when the reference is loaded. */
+     * resolves when the reference is loaded.
+     * The promise returns a commandResult for the loaded reference. */
     //loadEntry()
     
-    /** This method removes the reference. */
+    /** This method removes the reference. It returns a command result for the removed link. */
     //remove()
     
     
@@ -100,8 +106,12 @@ export default class ReferenceEntry extends EventManager {
             this.fieldUpdated("url");
         }
 
-        //if we didn't update, create a dummy promise
-        if(!promise) promise = Promise.resolve("No url update");
+        //if we didn't do a URL update, make a promise that says update was successful
+        if(!promise) promise = Promise.resolve({
+            cmdDone: true,
+            target: this,
+            action: "updated"
+        });
 
         return promise;
     }
@@ -156,10 +166,6 @@ export default class ReferenceEntry extends EventManager {
         if(this.state != state) {
             //for now we are not tracking msg. If we do, we should check for that change too
             this.state = state;
-            if(this.treeEntry) {
-                this.treeEntry.setBannerState(this.state);
-            }
-            this.referenceManager.entryStatusChange(this);
             this.fieldUpdated("state");
         }
     }

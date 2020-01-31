@@ -11,8 +11,8 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
  */
 export default class NpmModuleEntry extends ReferenceEntry {
     
-    constructor(referenceManager,referenceData) {
-        super(referenceManager,referenceData,NpmModuleEntry.REFERENCE_TYPE_INFO);
+    constructor(referenceList,referenceData) {
+        super(referenceList,referenceData,NpmModuleEntry.REFERENCE_TYPE_INFO);
 
     }
 
@@ -22,25 +22,34 @@ export default class NpmModuleEntry extends ReferenceEntry {
 
         var promiseFunction = (resolve,reject) => {
 
+            let commandResult = {};
+            commandResult.target = this;
+            commandResult.action = "updated";
+
             //synchronous loading
             try {
                 this.module = require(this.url);
                 if((this.module)&&(this.module.initApogeeModule)) this.module.initApogeeModule(apogee,apogeeapp,apogeeutil);
+                
+                commandResult.cmdDone = true;
                 this.setClearState();
-                resolve(this.url);
+                resolve(commandResult);
             }
             catch(error) {
                 if(error.stack) console.error(error.stack);
                 
                 if(error.stack) console.error(error.stack);
-                var errorMsg = error.message ? error.message : "Failed to load module " + this.url;
+                //accept the error and keep going - it will be flagged in UI
+                commandResult.cmdDone = true;
+                commandResult.alertMsg = errorMsg;
+
                 this.setError(errorMsg);
-                reject(errorMsg);
+                resolve(commandResult);
             }
         }
 
         //call link added to references
-        this.referenceManager.entryInserted(this);
+        this.referenceList.addEntry(this);
 
         //return promise to track loading finish
         return new Promise(promiseFunction);
@@ -54,7 +63,13 @@ export default class NpmModuleEntry extends ReferenceEntry {
         //we aren't really removing it...
         //require.undef(this.url);
 
-        this.referenceManager.entryRemoved(this);
+        this.referenceList.removeEntry(this);
+
+        return {
+            cmdDone: true,
+            target: this,
+            type: "deleted"
+        }
     }
     
 }

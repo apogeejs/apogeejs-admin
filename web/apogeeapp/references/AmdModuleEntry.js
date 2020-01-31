@@ -11,8 +11,8 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
  */
 export default class AmdModuleEntry extends ReferenceEntry {
     
-    constructor(referenceManager,referenceData) {
-        super(referenceManager,referenceData,AmdModuleEntry.REFERENCE_TYPE_INFO);
+    constructor(referenceList,referenceData) {
+        super(referenceList,referenceData,AmdModuleEntry.REFERENCE_TYPE_INFO);
 
     }
 
@@ -21,31 +21,36 @@ export default class AmdModuleEntry extends ReferenceEntry {
     loadEntry() {
 
         var promiseFunction = (resolve,reject) => {
+
+            this.setPendingState();
             
-            var onLoad = (module) => {
-                //store the module return, if there is one
-                //this is only used for cleanup
-                this.module = module;
-                if((module)&&(module.initApogeeModule)) module.initApogeeModule(apogee,apogeeapp,apogeeutil);
-                
-                console.log("Module loaded: " + this.url);
+            let commandResult = {};
+            commandResult.target = this;
+            commandResult.action = "updated";
+
+            //add event handlers
+            var onLoad = () => {
+                commandResult.cmdDone = true;
+
                 this.setClearState();
-                resolve(this.url);
+                resolve(commandResult);
             }
             var onError = (error) => {
-                //I should read the error passed in for a better message!!!
-                if(error.stack) console.error(error.stack);
-                var errorMsg = error.message ? error.message : "Failed to load module " + this.url;
+                var errorMsg = "Failed to load link '" + this.url + "':" + error;
+                //accept the error and keep going - it will be flagged in UI
+                commandResult.cmdDone = true;
+                commandResult.alertMsg = errorMsg;
+
                 this.setError(errorMsg);
-                reject(errorMsg);
+                resolve(commandResult);
             }
-            
+
             this.setPendingState();
             require([this.url],onLoad,onError);
         }
 
         //call link added to references
-        this.referenceManager.entryInserted(this);
+        this.referenceList.addEntry(this);
 
         //return promise to track loading finish
         return new Promise(promiseFunction);
@@ -58,7 +63,13 @@ export default class AmdModuleEntry extends ReferenceEntry {
         
         require.undef(this.url);
 
-        this.referenceManager.entryRemoved(this);
+        this.referenceList.removeEntry(this);
+
+        return {
+            cmdDone: true,
+            target: this,
+            type: "deleted"
+        }
     }
     
 }

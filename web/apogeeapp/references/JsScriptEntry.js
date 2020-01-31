@@ -8,8 +8,8 @@ import {getLinkLoader} from "/apogeeapp/references/LinkLoader.js";
  */
 export default class JsScriptEntry extends ReferenceEntry {
     
-    constructor(referenceManager,referenceData) {
-        super(referenceManager,referenceData,JsScriptEntry.REFERENCE_TYPE_INFO);
+    constructor(referenceList,referenceData) {
+        super(referenceList,referenceData,JsScriptEntry.REFERENCE_TYPE_INFO);
 
     }
 
@@ -19,15 +19,25 @@ export default class JsScriptEntry extends ReferenceEntry {
 
         var promiseFunction = (resolve,reject) => {
 
+            let commandResult = {};
+            commandResult.target = this;
+            commandResult.action = "updated";
+
             //add event handlers
             var onLoad = () => {
+                commandResult.cmdDone = true;
+
                 this.setClearState();
-                resolve(this.url);
+                resolve(commandResult);
             }
             var onError = (error) => {
-                var errorMsg = "Failed to load link '" + this.url + "'";
+                var errorMsg = "Failed to load link '" + this.url + "':" + error;
+                //accept the error and keep going - it will be flagged in UI
+                commandResult.cmdDone = true;
+                commandResult.alertMsg = errorMsg;
+
                 this.setError(errorMsg);
-                reject(errorMsg);
+                resolve(commandResult);
             }
 
             this.linkCallerId = getLinkLoader().createLinkCallerId();
@@ -35,7 +45,7 @@ export default class JsScriptEntry extends ReferenceEntry {
         }
 
         //call link added to references
-        this.referenceManager.entryInserted(this);
+        this.referenceList.addEntry(this);
 
         //return promise to track loading finish
         return new Promise(promiseFunction);
@@ -45,7 +55,13 @@ export default class JsScriptEntry extends ReferenceEntry {
     remove() {
         getLinkLoader().removeLinkElement("script",this.url,this.linkCallerId);
         
-        this.referenceManager.entryRemoved(this);
+        this.referenceList.removeEntry(this);
+
+        return {
+            cmdDone: true,
+            target: this,
+            type: "deleted"
+        }
     }
     
     _getLinkCallerHandle() {

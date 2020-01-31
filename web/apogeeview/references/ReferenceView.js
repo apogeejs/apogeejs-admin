@@ -1,16 +1,18 @@
-import {addLink} from "/apogeeview/commandseq/updatelinkseq.js";
-import ReferenceEntryView from "/apogeeview/reference/ReferenceEntryView";
+import ReferenceListView from "/apogeeview/references/ReferenceListView";
+import ReferenceEntryView from "/apogeeview/references/ReferenceEntryView";
 
 export default class ReferenceView {
 
     constructor(referenceManager) {
         this.referenceManager = referenceManager;
-        this.referenceLists = _getReferenceListsInstance();
-        this.instantiateTreeEntries();
+
+        this.referenceListViews = {};
+        let referenceLists = referencemanager.getReferenceLists();
+        for(let entryType in referenceLists) {
+            this.referenceListViews = this.createReferenceListView(entryType,referenceLists[entryType]);
+        }
 
         referenceManager.addListener("created",target => this.onCreatedObject(target));
-        referenceManager.addListener("updated",referenceManager => this.onUpdated(referenceManager));
-        referenceManager.addListener("deleted",referenceManager => this.onDeleted(referenceManager));
     }
 
     onCreateObject(target) {
@@ -79,122 +81,141 @@ export default class ReferenceView {
     updateState() {
         //update the main tree entry state
         this.referenceTreeEntry.setBannerState(this.referenceManager.getState());
-
-        //update the child tree entry states
-        this.referenceLists.forEach(childStruct => {
-            childStruct.state = this.referenceManager.getListState(childStruct.typeUiInfo.REFERENCE_TYPE)
-        });
     }
 
     /** @private */
     instantiateTreeEntries() {
         var iconUrl = apogeeui.getResourcePath(REFERENCES_ICON_PATH);
         this.referenceTreeEntry = new TreeEntry("References", iconUrl, null, null, false);
+        this.referenceTreeEntry.setBannerState(this.referenceManager.getState());
         
         //add child lists
-        for(var childKey in this.referenceLists) {
-            var childViewStruct = this.referenceLists[childKey];
-            this.addListTreeEntry(childViewStruct.treeEntry);
+        for(var childKey in this.referenceViewLists) {
+            var referenceViewList = this.referenceViewLists[childKey];
+            this.addListTreeEntry(referenceViewList.getTreeEntry());
         }
-        
-        //set the state on the banner entry for all trees
-        this.updateState();
     }
 
-    addListTreeEntry(childViewStruct) {
-        var typeUiInfo = childViewStruct.typeUiInfo;
-        var iconUrl = apogeeui.getResourcePath(typeUiInfo.LIST_ICON_PATH);
-        var menuItemCallback = () => this.getListMenuItems(typeUiInfo);
-        var listTreeEntry = new TreeEntry(typeUiInfo.LIST_NAME, iconUrl, null, menuItemCallback, false);
-
-        childViewStruct.treeEntry = listTreeEntry;
-        this.referenceTreeEntry.addChild(listTreeEntry);
-    }
 
     //==================================
     // Private Methods
     //==================================
 
-
-    /** @private */
-    getListMenuItems(typeUiInfo) {
-        //menu items
-        var menuItemList = [];
-
-        //add the standard entries
-        var itemInfo = {};
-        itemInfo.title = typeUiInfo.ADD_ENTRY_TEXT;
-        itemInfo.callback = () => addLink(this,typeUiInfo);
-        menuItemList.push(itemInfo);
-        
-        return menuItemList;
+    createReferenceListView(entryType,referenceList) {
+        let listDisplayInfo = LIST_DISPLAY_INFO[entryType];
+        if(!entryTypeInfo) {
+            listDisplayInfo = apogeeutil.jsonCopy(DEFAULT_LIST_DISPLAY_INFO);
+            //set the proper entry type, and use that for the list name too
+            listDisplayInfo.REFERENCE_TYPE = entryType;
+            listDisplayInfo.LIST_NAME = entryType;
+        }
+        return new ReferenceListView(referenceList,listDisplayInfo);
     }
 
-}
 
-/** This function creates a child lists structure instance, which 
- * will hold the type info and the lists for entry info for that type. */
-function _getReferenceListsInstance() {
-    let childLists = {};
-    TYPE_UI_INFO_ARRAY.forEach( typeUiInfo => {
-        let childStruct = {};
-        childStruct.typeUiInfo = typeUiInfo;
-        childStruct.refEntries = [];
-        childStruct.state = null;
-        childStruct.treeEntry = null;
-        chidlLists[typeUiInfo.REFERENCE_TYPE] = childStruct;
-    });
-    return childLists;
+    
+    // /** This method determines the overall reference state from the state of each list. 
+    //  * @private */
+    // processReferenceState() {
+    //     //just check all entries for find state
+    //     var hasError = false;
+    //     var hasPending = false;
+        
+    //     for(var listType in this.referenceLists) {
+    //         var referenceList = this.referenceLists[listType];
+            
+    //         var listState = referenceList.getState();
+            
+    //         if(listState == bannerConstants.BANNER_TYPE_ERROR) hasError = true;
+    //         else if(listState == bannerConstants.BANNER_TYPE_PENDING) hasPending = true;
+    //     }
+            
+    //     var newState;
+    //     if(hasError) {
+    //         newState = bannerConstants.BANNER_TYPE_ERROR;
+    //     }
+    //     else if(hasPending) {
+    //         newState = bannerConstants.BANNER_TYPE_PENDING;
+    //     }
+    //     else {
+    //         newState = bannerConstants.BANNER_TYPE_NONE;
+    //     }
+        
+    //     if(this.state != newState) {
+    //         this.state = newState;
+    //         this.fieldsUpdated("state");
+    //     }
+    // }
+
 }
 
 let REFERENCES_ICON_PATH = "/componentIcons/references.png";
 
-//this is temporary
-let TYPE_UI_INFO_ARRAY = [
+/** This is the UI definition data for the added reference lists.
+ * This should be placed somewhere else to make it easier for people to 
+ * add additional reference types.
+ */
+let LIST_DISPLAY_INFO = {
 
-    {
+    "amd module": {
         "REFERENCE_TYPE": "amd module",
         "LIST_NAME": "Web Modules",
         "ADD_ENTRY_TEXT":"Add Web Module",
         "UPDATE_ENTRY_TEXT":"Update Web Module",
+        "REMOVE_ENTRY_TEXT":"Remove Web Module",
         "LIST_ICON_PATH":"/componentIcons/folder.png",
         "ENTRY_ICON_PATH":"/componentIcons/webModule.png"
     },
 
-    {
+    "css link": {
         "REFERENCE_TYPE": "css link",
         "LIST_NAME": "CSS Links",
         "ADD_ENTRY_TEXT":"Add CSS Link",
         "UPDATE_ENTRY_TEXT":"Update CSS Link",
+        "REMOVE_ENTRY_TEXT":"Remove CSS Link",
         "LIST_ICON_PATH":"/componentIcons/folder.png",
         "ENTRY_ICON_PATH": "/componentIcons/cssLink.png"
     },
 
-    {
+    "npm module": {
         "REFERENCE_TYPE": "npm module",
         "LIST_NAME": "NPM Modules",
         "ADD_ENTRY_TEXT":"Add NPM Module",
         "UPDATE_ENTRY_TEXT":"Update NPM Module",
+        "REMOVE_ENTRY_TEXT":"Remove NPM Module",
         "LIST_ICON_PATH":"/componentIcons/folder.png",
         "ENTRY_ICON_PATH":"/componentIcons/module.png"
     },
 
-    {
+    "es module": {
         "REFERENCE_TYPE": "es module",
         "LIST_NAME": "Web Modules",
         "ADD_ENTRY_TEXT":"Add ES Web Module",
         "UPDATE_ENTRY_TEXT":"Update Web Module",
+        "REMOVE_ENTRY_TEXT":"Remove Web Module",
         "LIST_ICON_PATH":"/componentIcons/folder.png",
         "ENTRY_ICON_PATH":"/componentIcons/webModule.png"
     },
 
-    {
+    "js link": {
         "REFERENCE_TYPE": "js link",
         "LIST_NAME": "JS Scripts",
         "ADD_ENTRY_TEXT":"Add JS Script Link",
         "UPDATE_ENTRY_TEXT":"Update JS Script Link",
+        "REMOVE_ENTRY_TEXT":"Remove JS Script Link",
         "LIST_ICON_PATH":"/componentIcons/folder.png",
         "ENTRY_ICON_PATH":"/componentIcons/javascriptLink.png"
     }
-]
+}
+
+//if this is used, replace the reference type and list name
+let DEFAULT_LIST_DISPLAY_INFO = {
+    "REFERENCE_TYPE": "PUT THE ENTRY TYPE HERE!",
+    "LIST_NAME": "PUT THE ENTRY TYPE HERE!",
+    "ADD_ENTRY_TEXT":"Add Link",
+    "UPDATE_ENTRY_TEXT":"Update Link",
+    "REMOVE_ENTRY_TEXT":"Remove Link",
+    "LIST_ICON_PATH":"/componentIcons/folder.png",
+    "ENTRY_ICON_PATH":"/componentIcons/javascriptLink.png"
+}
 

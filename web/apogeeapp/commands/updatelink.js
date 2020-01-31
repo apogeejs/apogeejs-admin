@@ -47,20 +47,16 @@ updatelink.executeCommand = function(workspaceUI,commandData) {
         //update entry
         let updatePromise = referenceEntry.updateData(commandData.newUrl,commandData.newNickname);
 
-        updatePromise.then( () => {
+        updatePromise.then( asynchCommandResult => {
             if(asynchOnComplete) {
-                let asynchCommandResult = {};
-                asynchCommandResult.cmdDone = true;
-                asynchCommandResult.target = referenceEntry;
-                asynchCommandResult.type = "updated";
                 asynchOnComplete(asynchCommandResult);
             }
         })
         .catch( errorMsg => {
             if(asynchOnComplete) {
                 let asynchCommandResult = {};
-                asynchCommandResult.alertMsg("Error updating link: " + errorMsg);
-                asynchCommandResult.cmdDone = true;
+                asynchCommandResult.alertMsg("Unkonwn error updating link: " + errorMsg);
+                asynchCommandResult.cmdDone = false;
                 asynchCommandResult.target = referenceEntry;
                 asynchCommandResult.type = "updated";
                 asynchOnComplete(asynchCommandResult);

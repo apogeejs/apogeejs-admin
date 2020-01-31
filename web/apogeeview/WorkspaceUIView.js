@@ -28,6 +28,8 @@ export default class WorkspaceUIView {
         this.treeEntry = null;
 
         this.init();
+
+//        this.workspaceUIView.loadReferenceManager(this.referenceManager);
     }
 
     getTabFrame() {

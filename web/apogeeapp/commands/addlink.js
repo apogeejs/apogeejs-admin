@@ -30,37 +30,30 @@ addlink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
 
     try {
         var referenceManager = workspaceUI.getReferenceManager();
-        var referenceEntry = referenceManager.createEntry(commandData.entryType);
+        synchCommandResult = referenceManager.createEntry(workspaceUI,commandData.entryType);
+        var referenceEntry = synchCommandResult.target;
         var promise = referenceEntry.loadEntry(commandData);
 
-        promise.then( () => {
+        promise.then( asynchCommandResult => {
                 if(asynchOnComplete) {
-                    let asynchCommandResult = {};
-                    asynchCommandResult.cmdDone = true;
-                    asynchCommandResult.target = referenceEntry;
-                    asynchCommandResult.type = "updated";
                     asynchOnComplete(asynchCommandResult);
                 }
             })
             .catch( errorMsg => {
                 if(asynchOnComplete) {
+                    //unknown exception - this hopefully won't happen
                     let asynchCommandResult = {};
-                    asynchCommandResult.alertMsg("Error adding link: " + errorMsg);
-                    asynchCommandResult.cmdDone = true;
+                    asynchCommandResult.alertMsg("Unknown exception in link processing: " + errorMsg);
+                    asynchCommandResult.cmdDone = false;
                     asynchCommandResult.target = referenceEntry;
                     asynchCommandResult.type = "updated";
                     asynchOnComplete(asynchCommandResult);
                 }
             });
-        
-        //link created, will load asynchronously
-        synchCommandResult.cmdDone = true;
-        synchCommandResult.target = referenceEntry;
-        synchCommandResult.parent = referenceManager;
-        synchCommandResult.type = "created";
     }
     catch(error) {
-        synchCommandResult.alertMsg = "Error adding link: " + error.message;
+        //unknown exception
+        synchCommandResult.alertMsg = "Unknown exception in creating link: " + error.message;
         synchCommandResult.cmdDone = false;
         synchCommandResult.parent = referenceManager;
         synchCommandResult.type = "created";

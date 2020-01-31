@@ -1,8 +1,4 @@
 import {bannerConstants} from "/apogeeview/componentdisplay/banner.js"; 
-import EsModuleEntry from "/apogeeapp/references/EsModuleEntry.js";
-import NpmModuleEntry from "/apogeeapp/references/NpmModuleEntry.js";
-import JsScriptEntry from "/apogeeapp/references/JsScriptEntry.js";
-import CssEntry from "/apogeeapp/references/CssEntry.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
 /** This class manages links and other reference entries, loading the references and
@@ -13,64 +9,57 @@ import EventManager from "/apogeeutil/EventManagerClass.js";
  */
 export default class ReferenceManager extends EventManager {
 
-    constructor(app) {
+    constructor() {
         super();
-        this.app = app;
-        this.state = bannerConstants.BANNER_TYPE_NORMAL;
         
         //references
         this.referenceLists = {};
-        if(__APOGEE_ENVIRONMENT__ == "WEB") this.referenceLists[EsModuleEntry.REFERENCE_TYPE] = this.getListStruct(EsModuleEntry);
-        if(__APOGEE_ENVIRONMENT__ == "NODE") this.referenceLists[NpmModuleEntry.REFERENCE_TYPE] = this.getListStruct(NpmModuleEntry);
-        this.referenceLists[JsScriptEntry.REFERENCE_TYPE] = this.getListStruct(JsScriptEntry);
-        this.referenceLists[CssEntry.REFERENCE_TYPE] = this.getListStruct(CssEntry);
     }
-
-    /** This method returns the state of the reference manager. */
-    getState() {
-        return this.state;
-    }   
     
-    /** This method returns the state of the given reference list. If the list is not
-     * found, bannerConstants.BANNER_TYPE_ERROR is returned. */
-    getReferenceListState(entryType) {
-        referenceList = this.referenceLists[entryType];
-        if(referenceList) {
-            return referenceList.state;
-        }
-        else {
-            //unknown list - return error state
-            return bannerConstants.BANNER_TYPE_ERROR;
-        }
+    /** This method sets the reference types for the reference manager. 
+     * This method returns a list of command results, for the creation of the reference lists.  */
+    initReferenceLists(referenceClassArray) {
+        commandResulList = {};
+        referenceClassArray.forEach( referenceClass => {
+            this.referenceLists[referenceClass.REFERENCE_TYPE] = new ReferenceList(referenceClass);
+        });
     }
-
-    getApp() {
-        return this.app;
+    
+    getReferenceLists() {
+        return this.referenceLists;
     }
 
     /** This method opens the reference entries, from the structure returned from
      * the save call. It returns a promise that
      * resolves when all entries are loaded. 
      */
-    getOpenEntriesPromise(referencesJson) {
+    openReferenceEntries(workspaceUI,referencesJson) {
 
+        var entriesCommandResultList = [];
         var entryPromises = [];
         
         var loadEntry = entryJson => {
-            var listStruct = this.referenceLists[entryJson.entryType];
+            var referenceList = this.referenceLists[referencesJson.entryType];
             
-            if(!listStruct) throw new Error("Entry type nopt found: " + entryJson.entryType);
+            if(!referenceList) throw new Error("Entry type nopt found: " + referenceJson.entryType);
             
             //load this url if it doesn't exist
-            if(!listStruct.listEntries.some( listEntry => (listEntry.url == entryJson.url) )) {
-                var referenceEntry = listStruct.typeInfo.createEntryFunction(this,entryJson);
+            if(!referenceList.hasUrlEntry(entryJson.url)) {
+                //create the entry (this does not actually load it)
+                let commandResult = referenceList.createEntry(workspaceUI,entryJson);
+                entriesCommandResultList.push(commandResult);
+
+                //load the entry - this will be asynchronous
+                let referenceEntry = commandResult.target;
                 var promise = referenceEntry.loadEntry();
                 entryPromises.push(promise);
             }
         }
-        referencesJson.forEach(loadEntry);
+        referenceJson.forEach(loadEntry);
         
-        return Promise.all(entryPromises);
+        let openEntriesPromise = Promise.all(entryPromises);
+
+        return {entriesCommandResultList,openEntriesPromise};
     }
 
     /** This method opens the reference entries, from the structure returned from
@@ -78,178 +67,44 @@ export default class ReferenceManager extends EventManager {
      * resolves when all entries are loaded. 
      */
     saveEntries() {
-        var entryListJson = [];
-        var saveEntry = listEntry => {
-            var entryJson = listEntry.saveEntry();
-            entryListJson.push(entryJson);
+        var entriesJson = [];
+        for(var referenceList in this.referenceLists) {
+            let entryListJson = referenceList.getEntriesJson();
+            entriesJson.push(...entryListJson);
         }
-        
-        for(var listType in this.referenceLists) {
-            var listStruct =  this.referenceLists[listType];
-            listStruct.listEntries.forEach(saveEntry);
-        }
-    
-        return entryListJson;
+        return entriesJson;
     }
 
     /** This method creates a reference entry. This does nto however load it, to 
      * do that ReferenceEntry.loadEntry() method must be called.  */
-    createEntry(entryTypeString) {
-        
-        //check if these object exist - if so, don't add them
-    
-        var listStruct = this.referenceLists[entryTypeString];
-        
-        if(!listStruct) throw new Error("Entry type nopt found: " + entryTypeString);
-        
-        var referenceEntry = listStruct.createEntryFunction(this,entryJson);
-        return referenceEntry;
+    createEntry(workspaceUI,entryTypeString) {
+        var referenceList = this.referenceLists[entryTypeString];
+        if(!referenceList) throw new Error("Entry type nopt found: " + entryTypeString);
+
+        return referenceList.createEntry(workspaceUI,entryJson);
     }
 
     /** This method should be called when the parent is closed. It removes all links. 
      */
     close() {
         for(var listType in this.referenceLists) {
-            var listStruct = this.referenceLists[listType];
-            listStruct.listEntries.forEach( referenceEntry => referenceEntry.remove() );
+            var referenceList = this.referenceLists[listType];
+            referenceList.close();
         }
     }
 
     lookupEntry(entryType,url) {
-        var listStruct = this.referenceLists[entryType];
-        if(listStruct) {
-            return listStruct.listEntries.find(referenceEntry => referenceEntry.getUrl() == url);
+        var referenceList = this.referenceLists[entryType];
+        if(referenceList) {
+            return referenceList.lookupEntry(url);
         }
         else {
             return null;
         }
     }
-    //================================
-    // Protected
-    //================================
-
-    /** This method opens a list of js and css links. It returns a promise that
-     * resolves when all links are loaded. 
-     * @protected */
-    entryInserted(referenceEntry) {
-        var entryType = referenceEntry.getEntryType();
-        
-        var listStruct = this.referenceLists[entryType];
-        if(!listStruct) {
-            throw new Error("Unrecognized link type: " + entryType);
-        }
-        
-        listStruct.listEntries.push(referenceEntry);
-
-        //FIRE ENTRY ADDED?
-        //onEntryAdded(referencentry)
-    }
-
-
-    /** This method opens a list of js and css links. It returns a promise that
-     * resolves when all links are loaded. 
-     * @protected */
-    entryStatusChange(referenceEntry) {
-        //just check all entries for find state
-        this.processReferenceState();
-    }
-
-    /** This method opens a list of js and css links. It returns a promise that
-     * resolves when all links are loaded. 
-     * @protected */
-    entryRemoved(referenceEntry) {
-        var entryType = referenceEntry.getEntryType();
-        
-        var listStruct = this.referenceLists[entryType];
-        if(!listStruct) {
-            throw new Error("Unrecognized link type: " + entryType);
-        }
-        
-        listStruct.listEntries = listStruct.listEntries.filter( existingEntry => (existingEntry != referenceEntry) );
-        listStruct.treeEntry.removeChild(referenceEntry.getTreeEntry());
-    }
 
     //=================================
     // Private
     //=================================
-
-    getListStruct(referenceEntryClass) {
-        var listStruct = {};
-        listStruct.createEntryFunction = (referenceManager, linkData) => new referenceEntryClass(referenceManager,linkData);
-        listStruct.listEntries = [];
-        listStruct.treeEntry = null;
-        listStruct.state = bannerConstants.BANNER_TYPE_NORMAL;
-        return listStruct;
-    }
-
-    /** This method opens a list of js and css links. It returns a promise that
-     * resolves when all links are loaded. 
-     * @private */
-    processReferenceState() {
-        //just check all entries for find state
-        var hasError = false;
-        var hasPending = false;
-        
-        for(var listType in this.referenceLists) {
-            var listStruct = this.referenceLists[listType];
-            
-            var listState = this.getListState(listStruct);
-            
-            if(listState == bannerConstants.BANNER_TYPE_ERROR) hasError = true;
-            else if(listState == bannerConstants.BANNER_TYPE_PENDING) hasPending = true;
-        }
-            
-        var newState;
-        if(hasError) {
-            newState = bannerConstants.BANNER_TYPE_ERROR;
-        }
-        else if(hasPending) {
-            newState = bannerConstants.BANNER_TYPE_PENDING;
-        }
-        else {
-            newState = bannerConstants.BANNER_TYPE_NORMAL;
-        }
-        
-        if(this.state != newState) {
-            this.state = newState;
-            if(this.referencesTreeEntry) this.referencesTreeEntry.setBannerState(newState);
-        }
-    }
-
-    /** This gets and applies the list state for a reference list. 
-     * @private */
-    getListState(listStruct) {
-        var hasError = false;
-        var hasPending = false;
-        
-        var checkStatus = refEntry => {
-            var state = refEntry.getState();
-            if(state == bannerConstants.BANNER_TYPE_ERROR) {
-                hasError = true;
-            }
-            else if(state == bannerConstants.BANNER_TYPE_PENDING) {
-                hasPending = true;
-            }
-        }
-            
-        listStruct.listEntries.forEach(checkStatus);
-            
-        var listState;
-        if(hasError) {
-            listState = bannerConstants.BANNER_TYPE_ERROR;
-        }
-        else if(hasPending) {
-            listState = bannerConstants.BANNER_TYPE_PENDING;
-        }
-        else {
-            listState = bannerConstants.BANNER_TYPE_NORMAL;
-        }
-        
-        if(listState != listStruct.state) {
-            listStruct.state = listState;
-            if(listStruct.treeEntry) listStruct.treeEntry.setBannerState(listState); 
-        }
-        
-        return listState;
-    }
+   
 }

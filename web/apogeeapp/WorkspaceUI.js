@@ -25,21 +25,26 @@ export default class WorkspaceUI {
     // Workspace Management
     //====================================
 
-    /** This sets the application. It must be done before the workspace is set. */
-    setApp(app) {
+    /** This sets the application. It must be done before the workspace is set on the workspace UI. */
+    init(app) {
         this.app = app;
-        this.appView = app.getAppView();
-        //add the workspace view only if there is an app view
-        if(this.appView) {
-            this.workspaceUIView = new WorkspaceUIView(this,this.appView)
-        }
+        app.setWorkspaceUI(workspaceUI);
 
+        this.appView = app.getAppView();
+
+        //create the reference manager
         this.referenceManager = new ReferenceManager(app);
+
+        //initial - creating reference lists
+        this.referenceManager.initReferenceLists(app.getReferenceClassArray());
         
         //listen to the workspace dirty event from the app
         this.app.addListener("workspaceDirty",() => this.setIsDirty());
 
-        this.workspaceUIView.loadReferenceManager(this.referenceManager);
+        //add the workspace view only if there is an app view
+        if(this.appView) {
+            this.workspaceUIView = new WorkspaceUIView(this,this.appView)
+        }
     }
 
     /** This gets the application instance. */
@@ -56,6 +61,12 @@ export default class WorkspaceUI {
       * contains the data for the component associated with each workspace member. For 
       * a new empty workspace the workspaceJson should be omitted. */
     load(workspaceJson) { 
+
+                    // //publish result
+                    // let asynchCommandResult = {};
+                    // asynchCommandResult.cmdDone = true;
+                    // asynchCommandResult.target = workspaceUI;
+                    // asynchCommandResult.action = "updated";
 
         if((workspaceJson)&&(workspaceJson.version != WorkspaceUI.FILE_VERSION)) {
             let msg = "Version mismatch. Expected version " + WorkspaceUI.FILE_VERSION + ", Found version " + workspaceJson.version;
@@ -485,15 +496,6 @@ export default class WorkspaceUI {
         });
 
         return childCommandResults;
-    }
-
-
-    //========================================
-    // Links
-    //========================================
-
-    getLoadReferencesPromise(referencesJson) {
-        return this.referenceManager.getOpenEntriesPromise(referencesJson);
     }
 
     //==================================

@@ -14,6 +14,11 @@ import FormDataComponent from "/apogeeapp/components/FormDataComponent.js";
 import CustomComponent from "/apogeeapp/components/CustomComponent.js";
 import CustomDataComponent from "/apogeeapp/components/CustomDataComponent.js";
 
+import EsModuleEntry from "/apogeeapp/references/EsModuleEntry.js";
+import NpmModuleEntry from "/apogeeapp/references/NpmModuleEntry.js";
+import JsScriptEntry from "/apogeeapp/references/JsScriptEntry.js";
+import CssEntry from "/apogeeapp/references/CssEntry.js";
+
 import ApogeeView from "/apogeeview/ApogeeView.js";
 
 /** @private */
@@ -241,10 +246,7 @@ export default class Apogee extends EventManager {
         if(this.workspaceUI) {
             throw base.createError("There is already an open workspace",false);
         }
-        
-        workspaceUI.setApp(this,this.appView);
         this.workspaceUI = workspaceUI;
-        
         return true;
     }
 
@@ -365,6 +367,16 @@ export default class Apogee extends EventManager {
         if(this.standardComponents.indexOf(name) < 0) {
             this.standardComponents.push(name);
         }
+    }
+
+    /** This method returns the reference entry type classes which will be used in the app. */
+    getReferenceClassArray() {
+        let referenceClassArray = [];
+        if(__APOGEE_ENVIRONMENT__ == "WEB") referenceClassArray.push(EsModuleEntry);
+        if(__APOGEE_ENVIRONMENT__ == "NODE") referenceClassArray.push(NpmModuleEntry);
+        referenceClassArray.push(JsScriptEntry);
+        referenceClassArray.push(CssEntry);
+        return referenceClassArray;
     }
 
 }

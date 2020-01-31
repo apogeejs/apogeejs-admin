@@ -8,25 +8,36 @@ import {getLinkLoader} from "/apogeeapp/references/LinkLoader.js";
  */
 export default class CssEntry extends ReferenceEntry {
     
-    constructor(referenceManager,referenceData) {
-        super(referenceManager,referenceData,CssEntry.REFERENCE_TYPE_INFO);
+    constructor(referenceList,referenceData) {
+        super(referenceList,referenceData,CssEntry.REFERENCE_TYPE_INFO);
     }
     
     /** This method loads the link onto the page. It returns a promise that
-     * resolves when the link is loaded. */
+     * resolves when the link is loaded. 
+     * This is a command method. The promise returns a command result. */
     loadEntry() {
 
         var promiseFunction = (resolve,reject) => {
 
+            let commandResult = {};
+            commandResult.target = this;
+            commandResult.action = "updated";
+
             //add event handlers
             var onLoad = () => {
+                commandResult.cmdDone = true;
+
                 this.setClearState();
-                resolve(this.url);
+                resolve(commandResult);
             }
             var onError = (error) => {
-                var errorMsg = "Failed to load link '" + this.url + "'";
+                var errorMsg = "Failed to load link '" + this.url + "':" + error;
+                //accept the error and keep going - it will be flagged in UI
+                commandResult.cmdDone = true;
+                commandResult.alertMsg = errorMsg;
+
                 this.setError(errorMsg);
-                reject(errorMsg);
+                resolve(commandResult);
             }
 
             this.linkCallerId = getLinkLoader().createLinkCallerId();
@@ -34,7 +45,7 @@ export default class CssEntry extends ReferenceEntry {
         }
 
         //call link added to references
-        this.referenceManager.entryInserted(this);
+        this.referenceList.addEntry(this);
 
         //return promise to track loading finish
         return new Promise(promiseFunction);
@@ -44,7 +55,13 @@ export default class CssEntry extends ReferenceEntry {
     remove() {
         getLinkLoader().removeLinkElement("css",this.url,this.linkCallerId);
         
-        this.referenceManager.entryRemoved(this);
+        this.referenceList.remvoeEntry(this);
+
+        return {
+            cmdDone: true,
+            target: this,
+            type: "deleted"
+        }
     }
 }
 
