@@ -29,7 +29,7 @@ export default class ApogeeView {
 
         //subscribe to events
         this.app.addListener("created",target => this.targetCreated(target));
-        this.app.addListener("deleted",target => this.targetCreated(target));
+        this.app.addListener("deleted",target => this.targetDeleted(target));
     }
 
     getTreePane() {
@@ -160,9 +160,11 @@ export default class ApogeeView {
     onTabShown(tab) {
         let workspaceUI = this.app.getWorkspaceUI();
         if(!workspaceUI) return;
+
+        let modelManager = workspaceUI.getModelManager();
         
         var id = tab.getId();
-        var component = workspaceUI.getComponentById(id);
+        var component = modelManager.getComponentById(id);
         if(component) {
             this.activeTabIconDisplay.src = component.getIconUrl();
             this.activeTabTitleDisplay.innerHTML = component.getDisplayName(true);

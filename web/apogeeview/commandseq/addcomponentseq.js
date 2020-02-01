@@ -23,6 +23,15 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
             alert("There is no open workspace.");
             return;
         }     
+
+        var modelManager = workspaceUI.getModelManager();
+        if(!modelManager) {
+            alert("The workspace has not been loaded yet.");
+            return;
+        }    
+
+        //this is not a true test - the workspace and model can be presenet ith out the model loaded.
+
         
         //get the tyep display name
         var displayName = componentGenerator.displayName
@@ -31,7 +40,7 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
         var additionalLines = apogeeutil.jsonCopy(componentGenerator.propertyDialogLines); 
         
         //get the folder list
-        var folderList = workspaceUI.getFolders();
+        var folderList = modelManager.getFolders();
         
         //create the dialog layout - do on the fly because folder list changes
         var dialogLayout = getPropertiesDialogLayout(displayName,folderList,additionalLines,true,optionalInitialProperties);
@@ -64,7 +73,7 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
             let additionalCommands;
             let parentComponent;
             if(componentGenerator.hasChildEntry) {
-                parentComponent = getComponentFromName(workspaceUI,userInputProperties.parentName);
+                parentComponent = getComponentFromName(modelManager,userInputProperties.parentName);
                 additionalCommands = getAdditionalCommands(parentComponent,userInputProperties.name);
 
                 //added the editor setup command
@@ -106,7 +115,7 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
             }
             
             //execute command
-            workspaceUI.getApp().executeCommand(commandData);
+            modelManager.getApp().executeCommand(commandData);
 
             //give focus back to editor
             if(componentGenerator.hasChildEntry) {
@@ -159,10 +168,10 @@ function getAdditionalCommands(parentComponent,childName) {
     return parentComponent.getInsertApogeeNodeOnPageCommands(childName,insertAtEnd);
 }
 
-function getComponentFromName(workspaceUI, componentName) {
-    var workspace = workspaceUI.getWorkspace();
+function getComponentFromName(modelManager, componentName) {
+    var workspace = modelManager.getWorkspace();
     var member = workspace.getMemberByFullName(componentName);
-    var component = workspaceUI.getComponent(member);
+    var component = modelManager.getComponent(member);
     return component;
 }
 

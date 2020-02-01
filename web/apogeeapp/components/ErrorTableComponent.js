@@ -5,9 +5,9 @@ import ErrorDisplay from "/apogeeview/datadisplay/ErrorDisplay.js";
 /** This component represents a json table object. */
 export default class ErrorTableComponent extends EditComponent {
 
-    constructor(workspaceUI,table) {
+    constructor(modelManager,table) {
         //extend edit component
-        super(workspaceUI,table,ErrorTableComponent);
+        super(modelManager,table,ErrorTableComponent);
 
         //default view
         this.dataView = ErrorTableComponent.EMPTY_VIEW;

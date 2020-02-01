@@ -11,6 +11,8 @@ export function deleteComponent(component) {
         return;
     }     
 
+    var modelManager = workspaceUI.getModelManager();
+
     var doDelete = confirm("Are you sure you want to delete this object?");
     if(!doDelete) {
         return;
@@ -23,7 +25,7 @@ export function deleteComponent(component) {
     //this is cumbersome - fix it up
     if(component.usesChildDisplay()) {
         var parentMember = member.getParent();
-        let parentComponent = workspaceUI.getComponent(parentMember);
+        let parentComponent = modelManager.getComponent(parentMember);
 
         let editorCommand = parentComponent.getRemoveApogeeNodeFromPageCommand(member.getName());
         commands.push(editorCommand);

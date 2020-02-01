@@ -14,9 +14,9 @@ const MAX_SUFFIX_INDEX = 99999;
  * It extends the component class. */
 export default class ParentComponent extends Component {
 
-    constructor(workspaceUI,member,componentGenerator) {
+    constructor(modelManager,member,componentGenerator) {
         //base constructor
-        super(workspaceUI,member,componentGenerator);
+        super(modelManager,member,componentGenerator);
 
         //create an empty edit state to start
         this.editorManager = createProseMirrorManager(this);
@@ -32,7 +32,7 @@ export default class ParentComponent extends Component {
         var childMap = member.getChildMap();
         for(var childKey in childMap) {
             var childMember = childMap[childKey];
-            var childComponent = this.getWorkspaceUI().getComponent(childMember);
+            var childComponent = this.getModelManager().getComponent(childMember);
             if(childComponent) {
                 var childTreeEntry = childComponent.getTreeEntry(true);
                 treeEntry.addChild(childTreeEntry);
@@ -234,7 +234,7 @@ export default class ParentComponent extends Component {
             //execute the command
             //-------------------
             if(apogeeCommand) {
-                this.getWorkspaceUI().getApp().executeCommand(apogeeCommand);
+                this.getModelManager().getApp().executeCommand(apogeeCommand);
             }
         }
         else {

@@ -58,7 +58,7 @@ export default class HandsonGridEditor extends DataDisplay {
         this.setUseContainerHeightUi(true)
 
         //we will use a listener to see when the page is resized
-        let app = this.displayContainer.getComponent().getWorkspaceUI().getApp();
+        let app = this.displayContainer.getComponent().getModelManager().getApp();
         this.frameWidthListener = () => this.onFrameWidthResize();
         app.addListener("frameWidthResize",this.frameWidthListener);
 
@@ -120,7 +120,7 @@ export default class HandsonGridEditor extends DataDisplay {
         }
         //remove the frame width listener
         if(this.frameWidthListener) {
-            let app = this.displayContainer.getComponent().getWorkspaceUI().getApp();
+            let app = this.displayContainer.getComponent().getModelManager().getApp();
             app.removeListener("frameWidthResize",this.frameWidthListener);
             this.frameWidthListener = null;
         }

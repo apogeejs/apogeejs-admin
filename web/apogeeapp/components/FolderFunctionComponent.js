@@ -7,13 +7,13 @@ import LiteratePageComponentDisplay from "/apogeeview/componentdisplay/literatep
  *apogee tables rather than writing code. */
 export default class FolderFunctionComponent extends ParentComponent {
         
-    constructor(workspaceUI,folderFunction) {
+    constructor(modelManager,folderFunction) {
         //extend parent component
-        super(workspaceUI,folderFunction,FolderFunctionComponent);
+        super(modelManager,folderFunction,FolderFunctionComponent);
         
         //register this object as a parent container
         var internalFolder = folderFunction.getInternalFolder();
-        workspaceUI.registerMember(internalFolder,this,folderFunction);
+        modelManager.registerMember(internalFolder,this,folderFunction);
     }
 
     /** This overrides the get display method of componnet to return the function declaration. */
@@ -71,8 +71,8 @@ export default class FolderFunctionComponent extends ParentComponent {
 
         var folderFunction = this.getMember();
         var internalFolder = folderFunction.getInternalFolder();
-        var workspaceUI = this.getWorkspaceUI();
-        json.children = workspaceUI.getFolderComponentContentJson(internalFolder);
+        var modelManager = this.getModelManager();
+        json.children = modelManager.getFolderComponentContentJson(internalFolder);
     }
 
     readFromJson(json) {
@@ -83,7 +83,7 @@ export default class FolderFunctionComponent extends ParentComponent {
         }
     }
 
-    readChildrenFromJson(workspaceUI,childActionResults,json) {
+    readChildrenFromJson(modelManager,childActionResults,json) {
         let childCommandResults;
         if((childActionResults)&&(childActionResults.length > 0)) {
             let internalFolderChildActionResult = childActionResults[0]; //this is presumably the internalFolder
@@ -97,7 +97,7 @@ export default class FolderFunctionComponent extends ParentComponent {
             //at the time this is written, this is the only acknowledgement of the result for the internal folder.
 
             if(json.children) {
-                childCommandResults = workspaceUI.loadFolderComponentContentFromJson(bodyChildActionResults,json.children);
+                childCommandResults = modelManager.loadFolderComponentContentFromJson(bodyChildActionResults,json.children);
             }
         }
         else {

@@ -47,8 +47,8 @@ export default class ApogeeComponentView {
         
         //WE SHOULD MAKE SURE THE MEMBER BELONGS TO THIS PARENT!!!??
         if (member) {
-          var workspaceUI = this.folderComponent.getWorkspaceUI();
-          var component = workspaceUI.getComponent(member);
+          var modelManager = this.folderComponent.getModelManager();
+          var component = modelManager.getComponent(member);
           var componentDisplay = component.getComponentDisplay();
           if (!componentDisplay) {
             //CLUDGE ALERT - fix this when I reorganize the code

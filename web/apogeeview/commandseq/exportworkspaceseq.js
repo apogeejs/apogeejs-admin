@@ -14,8 +14,10 @@ export function exportWorkspace(app,fileAccessObject) {
         return;
     }   
 
+    var modelManager = workspaceUI.getModelManager();
+
     //get the folder list
-    var folderNames = workspaceUI.getFolders();
+    var folderNames = modelManager.getFolders();
 
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = getExportDialogLayout(folderNames);
@@ -23,7 +25,7 @@ export function exportWorkspace(app,fileAccessObject) {
     //create on submit callback
     var onSubmitFunction = function(result) {         
         var folderFullName = result.parentName;
-        var workspace = workspaceUI.getWorkspace();
+        var workspace = modelManager.getWorkspace();
         var folder = workspace.lookupMemberByName(folderFullName);
 
         var workspaceText = getWorkspaceText(app,folder);

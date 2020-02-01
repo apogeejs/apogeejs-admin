@@ -172,7 +172,7 @@ export default class CommandManager {
 
             //process any children
             if(commandResult.childCommandResults) {
-                commandResult.childCommandResults,forEach(childCommandResult => this._flattenCommandResults(childCommandResult,successEventMap,failedEvents));
+                commandResult.childCommandResults.forEach(childCommandResult => this._flattenCommandResults(childCommandResult,successEventMap,failedEvents));
             }
         }
         else {

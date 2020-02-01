@@ -22,7 +22,8 @@ updateworkspace.createUndoCommand = function(workspaceUI,commandData) {
     undoCommandJson.type = updateworkspace.commandInfo.type;
     
     //right now we assume this is just a name update
-    var workspace = workspaceUI.getWorkspace();
+    let modelManager = workspaceUI.getModelManager();
+    let workspace = modelManager.getWorkspace();
     undoCommandJson.updatedCoreProperties = {};
     undoCommandJson.updatedCoreProperties.name = workspace.getName();
     
@@ -31,7 +32,8 @@ updateworkspace.createUndoCommand = function(workspaceUI,commandData) {
 
 updateworkspace.executeCommand = function(workspaceUI,commandData) {
     
-    var workspace = workspaceUI.getWorkspace();
+    let modelManager = workspaceUI.getModelManager();
+    let workspace = modelManager.getWorkspace();
 
     var actionResult;    
     var actionData;

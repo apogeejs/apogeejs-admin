@@ -8,9 +8,9 @@ import UiCommandMessenger from "/apogeeapp/commands/UiCommandMessenger.js";
 /** This component represents a table object. */
 export default class DynamicForm extends EditComponent {
         
-    constructor(workspaceUI, functionObject) {
+    constructor(modelManager, functionObject) {
         //extend edit component
-        super(workspaceUI,functionObject,DynamicForm);
+        super(modelManager,functionObject,DynamicForm);
     };
 
     //==============================
@@ -30,7 +30,7 @@ export default class DynamicForm extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
-        var app = this.getWorkspaceUI().getApp();
+        var app = this.getModelManager().getApp();
         
         //create the new view element;
         switch(viewType) {
@@ -55,7 +55,7 @@ export default class DynamicForm extends EditComponent {
     }
 
     getFormCallbacks() {
-        var app = this.getWorkspaceUI().getApp();
+        var app = this.getModelManager().getApp();
         var callbacks = {
                 getData: () => {              
                     let layoutFunction = this.member.getData();

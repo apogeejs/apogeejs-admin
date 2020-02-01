@@ -4,9 +4,9 @@ import Component from "/apogeeapp/component/Component.js";
  * It extends the component class. */
 export default class EditComponent extends Component {  
     
-    constructor(workspaceUI,member,componentGenerator) {    
+    constructor(modelManager,member,componentGenerator) {    
         //base constructor
-        super(workspaceUI,member,componentGenerator);
+        super(modelManager,member,componentGenerator);
     }
 
     //===============================

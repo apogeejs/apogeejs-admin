@@ -7,9 +7,9 @@ import LiteratePageComponentDisplay from "/apogeeview/componentdisplay/literatep
 /** This component represents a table object. */
 export default class FolderComponent extends ParentComponent {
 
-    constructor(workspaceUI,folder) {
+    constructor(modelManager,folder) {
         //extend parent component
-        super(workspaceUI,folder,FolderComponent);
+        super(modelManager,folder,FolderComponent);
     };
 
     instantiateTabDisplay() {
@@ -39,8 +39,8 @@ export default class FolderComponent extends ParentComponent {
         
         //save the children
         var folder = this.getMember();
-        var workspaceUI = this.getWorkspaceUI();
-        json.children = workspaceUI.getFolderComponentContentJson(folder);
+        var modelManager = this.getModelManager();
+        json.children = modelManager.getFolderComponentContentJson(folder);
 
         return json;
     }
@@ -54,10 +54,10 @@ export default class FolderComponent extends ParentComponent {
     }
 
     /** This method is used to load the child components from a json */
-    readChildrenFromJson(workspaceUI,childActionResults,json) {
+    readChildrenFromJson(modelManager,childActionResults,json) {
         let childCommandResults;
         if(json.children) {
-            childCommandResults = workspaceUI.loadFolderComponentContentFromJson(childActionResults,json.children);
+            childCommandResults = modelManager.loadFolderComponentContentFromJson(childActionResults,json.children);
         }
         return childCommandResults;  
     }

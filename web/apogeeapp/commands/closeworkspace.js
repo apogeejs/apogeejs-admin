@@ -10,7 +10,8 @@ let closeworkspace = {};
 //closeworkspace.createUndoCommand = function(workspaceUI,commandData) {
 
 closeworkspace.executeCommand = function(workspaceUI,commandData) {
-    var workspace = workspaceUI.getWorkspace();
+    let modelManager = workspaceUI.getModelManager();
+    var workspace = modelManager.getWorkspace();
     
     var workspaceUIRemoved = false;
     

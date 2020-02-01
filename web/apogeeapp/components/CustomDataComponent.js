@@ -19,9 +19,9 @@ import apogeeui from "/apogeeui/apogeeui.js";
  * confugred with initialization data from the model. */
 export default class CustomDataComponent extends EditComponent {
 
-    constructor(workspaceUI,folder) {
+    constructor(modelManager,folder) {
         //extend edit component
-        super(workspaceUI,folder,CustomDataComponent);
+        super(modelManager,folder,CustomDataComponent);
         
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         folder.setChildrenWriteable(false);
@@ -90,7 +90,7 @@ export default class CustomDataComponent extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
-        var app = this.getWorkspaceUI().getApp();
+        var app = this.getModelManager().getApp();
         
         //create the new view element;
         switch(viewType) {
@@ -242,7 +242,7 @@ export default class CustomDataComponent extends EditComponent {
         command.initialFields = initialCodeFields;
         command.targetFields = targetCodeFields;
 
-        this.getWorkspaceUI().getApp().executeCommand(command);
+        this.getModelManager().getApp().executeCommand(command);
         return true; 
     }
 
@@ -425,7 +425,8 @@ customDataComponentUpdateData.createUndoCommand = function(workspaceUI,commandDa
 }
 
 customDataComponentUpdateData.executeCommand = function(workspaceUI,commandData,) {
-   let component = workspaceUI.getComponentByFullName(commandData.memberFullName);
+   let modelManager = workspaceUI.getModelManager();
+   let component = modelManager.getComponentByFullName(commandData.memberFullName);
    var commandResult = {};
    if(component) {
        try {

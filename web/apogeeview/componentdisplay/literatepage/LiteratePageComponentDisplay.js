@@ -220,11 +220,11 @@ export default class LiteratePageComponentDisplay extends EventManager {
         this.initEditor();
 
         //show all children
-        var workspaceUI = this.component.getWorkspaceUI();
+        var modelManager = this.component.getModelManager();
         var children = this.folder.getChildMap();
         for(var childName in children) {
             var child = children[childName];
-            var childComponent = workspaceUI.getComponent(child);
+            var childComponent = modelManager.getComponent(child);
             if(childComponent) {
                 this.addChildComponent(childComponent);
             }
@@ -241,8 +241,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
         //THIS IS BAD - IT IS ONLY TO GET THIS WORKING AS A TRIAL
         //MAKE A WAY TO GET COMPONENT GENERATORS FOR BUTTONS RATHER THAN READING A PRIVATE VARIABLE FROM APP
-        var workspaceUI = this.component.getWorkspaceUI();
-        var app = workspaceUI.getApp();
+        var modelManager = this.component.getModelManager();
+        var app = modelManager.getApp();
 
         for(var i = 0; i < app.standardComponents.length; i++) {
             let key = app.standardComponents[i];
@@ -315,11 +315,11 @@ export default class LiteratePageComponentDisplay extends EventManager {
      * @protected */
     destroy() {
         var children = this.folder.getChildMap();
-        var workspaceUI = this.component.getWorkspaceUI();
+        var modelManager = this.component.getModelManager();
 
         for(var childName in children) {
             var child = children[childName];
-            var childComponent = workspaceUI.getComponent(child);
+            var childComponent = modelManager.getComponent(child);
             if(childComponent) {
                 childComponent.closeComponentDisplay();
             }

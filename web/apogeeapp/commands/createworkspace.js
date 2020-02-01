@@ -34,7 +34,7 @@ createworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData) {
         
         //load
         let childCommandResult = workspaceUI.load(commandData.workspaceJson);
-        commandResult.chidlCommandResults = [childCommandResult];
+        commandResult.childCommandResults = [childCommandResult];
         
         commandResult.cmdDone = true;
     }

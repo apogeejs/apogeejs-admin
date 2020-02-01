@@ -23,7 +23,8 @@ let addcomponent = {};
 
 addcomponent.createUndoCommand = function(workspaceUI,commandData) {
     
-    var workspace = workspaceUI.getWorkspace();
+    var modelManager = workspaceUI.getModelManager();
+    var workspace = modelManager.getWorkspace();
     var memberName = commandData.memberJson.name;
     var parent = workspace.getMemberByFullName(commandData.parentFullName);
     var memberFullName = parent.getChildFullName(memberName);
@@ -37,7 +38,8 @@ addcomponent.createUndoCommand = function(workspaceUI,commandData) {
 
 addcomponent.executeCommand = function(workspaceUI,commandData) { 
     
-    let workspace = workspaceUI.getWorkspace();
+    let modelManager = workspaceUI.getModelManager();
+    let workspace = modelManager.getWorkspace();
     let commandResult;
 
     //create the member
@@ -50,7 +52,7 @@ addcomponent.executeCommand = function(workspaceUI,commandData) {
     //create the components for the member
     //I need error handling for the create component action
     if(actionResult.actionDone) {
-        commandResult = workspaceUI.createComponentFromMember(actionResult,commandData.componentJson);
+        commandResult = modelManager.createComponentFromMember(actionResult,commandData.componentJson);
     }
     else {
         commandResult = {};

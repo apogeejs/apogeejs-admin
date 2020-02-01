@@ -9,7 +9,7 @@ import { Schema } from "/prosemirror/lib/prosemirror-model/src/index.js";
 // This the schema for the apogee page editor
 export function createFolderSchema(folderComponent) {
 
-  let workspaceUI = folderComponent.getWorkspaceUI();
+  let modelManager = folderComponent.getModelManager();
   let folderMember = folderComponent.getMember(); 
 
   // :: Object
@@ -139,7 +139,7 @@ export function createFolderSchema(folderComponent) {
         let name = node.attrs.name;
 
         let member = folderMember.lookupChild(name);
-        let component = workspaceUI.getComponent(member);
+        let component = modelManager.getComponent(member);
 
         let state = {};
         state.memberJson = member ? member.toJson() : undefined;

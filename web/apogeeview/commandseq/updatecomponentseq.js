@@ -15,12 +15,12 @@ export function updateComponent(component) {
     var displayName = componentGenerator.displayName
     var additionalLines = apogeeutil.jsonCopy(componentGenerator.propertyDialogLines); 
 
-    var workspaceUI = component.getWorkspaceUI(); 
+    var modelManager = component.getModelManager(); 
     var workspace = component.getWorkspace();
     var initialValues = component.getPropertyValues(); 
 
     //add folder list, only if we can set the parent (if there is a parent)
-    var folderList = workspaceUI.getFolders();
+    var folderList = modelManager.getFolders();
 
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = getPropertiesDialogLayout(displayName,folderList,additionalLines,false,initialValues);
@@ -93,11 +93,11 @@ export function updateComponent(component) {
                 //----------------------------
                 let oldName = member.getName();
                 let oldParent = member.getParent();
-                let oldParentComponent = workspaceUI.getComponent(oldParent);
+                let oldParentComponent = modelManager.getComponent(oldParent);
 
                 if(newValues.parentName) {
                     let newParent = workspace.getMemberByFullName(newValues.parentName);
-                    let newParentComponent = workspaceUI.getComponent(newParent);
+                    let newParentComponent = modelManager.getComponent(newParent);
 
                     //delete old parent apogee node 
                     let oldParentEditorCommand = oldParentComponent.getRemoveApogeeNodeFromPageCommand(oldName);
@@ -130,7 +130,7 @@ export function updateComponent(component) {
                 //----------------------------------------------
                 if(newValues.parentName) {
                     let newParent = workspace.getMemberByFullName(newValues.parentName);
-                    let newParentComponent = workspaceUI.getComponent(newParent);
+                    let newParentComponent = modelManager.getComponent(newParent);
 
                     //insert node add at end of new page
                     let newParentCommands = newParentComponent.getInsertApogeeNodeOnPageCommands(newValues.name,true);
@@ -181,7 +181,7 @@ export function updateComponent(component) {
         
         //execute command
         if(command) {   
-            workspaceUI.getApp().executeCommand(command);
+            modelManager.getApp().executeCommand(command);
         }
 
         if(component.usesChildDisplay()) {

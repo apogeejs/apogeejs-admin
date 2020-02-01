@@ -2,7 +2,8 @@ import apogeeui from "/apogeeui/apogeeui.js";
 import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
 
 import {updateWorkspaceProperties} from "/apogeeview/commandseq/updateworkspaceseq.js";
-import ReferenceView from "/apogeeView/references/ReferenceView.js";
+import ReferenceView from "/apogeeview/references/ReferenceView.js";
+import ModelView from "/apogeeview/ModelView.js";
 
 /** This class manages the user interface for a workspace object. */
 export default class WorkspaceUIView {
@@ -16,15 +17,7 @@ export default class WorkspaceUIView {
 
         this.treeEntry = null;
 
-        //I want a better checking and handling of the root folder being loaded, just once
-        this.rootFolderLoaded = true;
-
         this.init();
-
-        //subscribe to events
-        this.workspaceUI.addListener("created",target => this.targetCreated(target));
-        this.workspaceUI.addListener("updated",target => this.targetUpdated(target));
-        this.workspaceUI.addListener("deleted",target => this.targetDeleted(target));
     }
 
     getTreeEntry() {
@@ -35,71 +28,17 @@ export default class WorkspaceUIView {
         return this.appView.getTabFrame();
     }
 
-    //================================
-    // Target Event handlers
-    //================================
-
-    targetCreated(eventData) {
-        let target = eventData.target;
-        if(target.getTargetType() == "component") {
-            this.onComponentCreated(target);
-        }
+    getApp() {
+        return this.app;
     }
 
-    targetUpdated(eventData) {
-        let target = eventData.target;
-        if(target.getTargetType() == "workspace") {
-            this.onWorkspaceUpdated(target);
-        }
-    }
-
-    targetDeleted(eventData) {
-        let target = eventData.target;
-        if(target.getTargetType() == "workspace") {
-            this.onWorkspaceClosed(target);
-        }
-    }
-
-    /** This is called on component created events. We only 
-     * want to respond to the root folder event here.
-     */
-    onComponentCreated(component) {
-        //discard an old view if there is one
-        let parentMember = component.getParent();
-        if(!parentMember) {
-
-            //make sure we don't already have one??!!
-            if(this.rootFolderLoaded) throw new Error("Root folder already loaded!")
-
-            this.loadRootFolder(rootFolderComponent);
-        }
-    }
-
-    onWorkspaceUpdated(workspaceUI) {
-
-        //TBD - should I change the local workspace UI object? I will want to if it is replaced at each update
-        //then I might need to do more... (root folder update, etc)
-
-        if((workspaceUI.fieldUpdated("name"))&&(this.treeEntry)) {
-            this.treeEntry.setLabel(workspaceUI.getWorkspace().getName());
-        }
-    }
-
-    onWorkspaceClosed(workspaceUI) {
-        //we need to make sure the tab frame is cleared of anything the workspace put in it (soemthing else may be using it too)
+    setName(name) {
+        this.treeEntry.setLabel(name);
     }
 
     //====================================
     // Workspace Management
     //====================================
-     
-    loadRootFolder(rootFolderComponent) {
-        //our workspace is loaded. make sure out name is correct
-        this.treeEntry.setLabel(this.workspaceUI.getWorkspace().getName());
-        //add the root folder component
-        this.treeEntry.addChild(rootFolderComponent.getTreeEntry(true));
-        this.rootFolderLoaded = true;
-    }
 
     setViewJsonState(workspaceJson) { 
         let tabFrame = this.appView.getTabFrame();
@@ -149,6 +88,11 @@ export default class WorkspaceUIView {
         this.treeEntry = this.createTreeEntry();
         this.treeEntry.setState(TreeEntry.EXPANDED);
 
+        //model manager
+        this.modelView = new ModelView(this,this.workspaceUI.getModelManager());
+        let modelTreeEntry = this.modelView.getTreeEntry();
+        this.treeEntry.addChild(modelTreeEntry);
+
         //reference mamageger
         this.referenceView = new ReferenceView(this.app,this.workspaceUI.getReferenceManager());
         let refTreeEntry = this.referenceView.getTreeEntry();
@@ -157,7 +101,8 @@ export default class WorkspaceUIView {
 
     createTreeEntry() {
         //generally we expct the workspace not to exist yet. We will update this when it opens.
-        let workspace = this.workspaceUI.getWorkspace();
+        let modelManager = this.workspaceUI.getModelManager();
+        let workspace = modelManager.getWorkspace();
         var labelText = workspace ? workspace.getName() : WORKSPACE_OPENING_NAME; //add the name
         var iconUrl = this.getIconUrl();
         var menuItemCallback = () => this.getMenuItems();

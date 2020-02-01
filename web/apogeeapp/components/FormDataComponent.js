@@ -14,9 +14,9 @@ import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper
  * data value, you can use the dynmaic form. */
 export default class FormDataComponent extends EditComponent {
 
-    constructor(workspaceUI,folder) {
+    constructor(modelManager,folder) {
         //extend edit component
-        super(workspaceUI,folder,FormDataComponent);
+        super(modelManager,folder,FormDataComponent);
         
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         folder.setChildrenWriteable(false);
@@ -42,7 +42,7 @@ export default class FormDataComponent extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
-        var app = this.getWorkspaceUI().getApp();
+        var app = this.getModelManager().getApp();
         
         //create the new view element;
         switch(viewType) {

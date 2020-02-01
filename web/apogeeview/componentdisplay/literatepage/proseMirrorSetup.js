@@ -30,8 +30,8 @@ import {convertToNonListBlockType, convertToListBlockType, indentSelection, unin
 
 export function createProseMirrorManager (folderComponent) {
 
-  let workspaceUI = folderComponent.getWorkspaceUI();
-  let app = workspaceUI.getApp();
+  let modelManager = folderComponent.getModelManager();
+  let app = modelManager.getApp();
 
   //this is the function return object - the editor manager
   let proseMirror = {};

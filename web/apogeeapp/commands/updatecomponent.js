@@ -19,9 +19,10 @@ let updatecomponent = {};
 //=====================================
 
 updatecomponent.createUndoCommand = function(workspaceUI,commandData) {
-    var workspace = workspaceUI.getWorkspace();
+    let modelManager = workspaceUI.getModelManager();
+    let workspace = modelManager.getWorkspace();
     var member = workspace.getMemberByFullName(commandData.memberFullName);
-    var component = workspaceUI.getComponent(member);
+    var component = memberManager.getComponent(member);
     
 
     var originalMemberProperties = {};
@@ -60,10 +61,11 @@ updatecomponent.createUndoCommand = function(workspaceUI,commandData) {
  * be extended to edit the values of those properties too. */
 updatecomponent.executeCommand = function(workspaceUI,commandData) {
     
-    var workspace = workspaceUI.getWorkspace();
+    let modelManager = workspaceUI.getModelManager();
+    let workspace = modelManager.getWorkspace();
     //get the member
     var member = workspace.getMemberByFullName(commandData.memberFullName);   
-    var component = workspaceUI.getComponent(member);
+    var component = modelManager.getComponent(member);
     
     var error = false;
     var errorMsg;
@@ -93,7 +95,7 @@ updatecomponent.executeCommand = function(workspaceUI,commandData) {
     if(errorMsg) commandResult.alertMsg = errorMsg;
 
     if(actionResult.actionDone) {
-        commandResult.target = workspaceUI.getComponent(member);
+        commandResult.target = modelManager.getComponent(member);
         commandResult.action = "updated";
     }
     

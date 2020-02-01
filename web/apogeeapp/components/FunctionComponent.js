@@ -7,9 +7,9 @@ import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper
 /** This component represents a table object. */
 export default class FunctionComponent extends EditComponent {
 
-    constructor(workspaceUI, functionObject) {
+    constructor(modelManager, functionObject) {
         //extend edit component
-        super(workspaceUI,functionObject,FunctionComponent);
+        super(modelManager,functionObject,FunctionComponent);
     };
 
     /** This overrides the get title method of member to return the function declaration. */
@@ -35,7 +35,7 @@ export default class FunctionComponent extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
-        var app = this.getWorkspaceUI().getApp();
+        var app = this.getModelManager().getApp();
         
         //create the new view element;
         switch(viewType) {

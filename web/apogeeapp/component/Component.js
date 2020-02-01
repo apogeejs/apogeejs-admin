@@ -11,16 +11,16 @@ import {bannerConstants} from "/apogeeview/componentdisplay/banner.js";
 /** This is the base functionality for a component. */
 export default class Component extends EventManager {
 
-    constructor(workspaceUI,member,componentGenerator) {
+    constructor(modelManager,member,componentGenerator) {
 
         super();
         
-        this.workspaceUI = workspaceUI;
+        this.modelManager = modelManager;
         this.member = member;
         this.uiActiveParent = null;
         this.componentGenerator = componentGenerator;
     
-        this.workspaceUI.registerMember(this.member,this);
+        this.modelManager.registerMember(this.member,this);
         
         //inheriting objects can pass functions here to be called on cleanup, save, etc
         this.cleanupActions = [];
@@ -77,7 +77,7 @@ export default class Component extends EventManager {
     getParentComponent() {
         let parent = this.member.getParent();
         if(parent) {
-            return this.workspaceUI.getComponent(parent);
+            return this.modelManager.getComponent(parent);
         }
         else {
             return null;
@@ -102,9 +102,9 @@ export default class Component extends EventManager {
         return this.member.getWorkspace();
     }
 
-    /** This method returns the workspaceUI for this component. */
-    getWorkspaceUI() {
-        return this.workspaceUI;
+    /** This method returns the model manager for this component. */
+    getModelManager() {
+        return this.modelManager;
     }
 
     //-------------------
@@ -188,13 +188,13 @@ export default class Component extends EventManager {
 //--- VIEW ITEM ---//
     createTabDisplay() {
         if((this.usesTabDisplay())&&(!this.tabDisplay)) {
-            let workspaceUIView = this.workspaceUI.getView();
-            if(workspaceUIView) { 
+            let modelView = this.modelManager.getModelView();
+            if(modelView) { 
                 this.tabDisplay = this.instantiateTabDisplay();
                 this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
                 //add the tab display to the tab frame
                 var tab = this.tabDisplay.getTab();
-                var tabFrame = workspaceUIView.getTabFrame();
+                var tabFrame = modelView.getTabFrame();
                 tabFrame.addTab(tab,true);
             }
         }
@@ -370,7 +370,7 @@ export default class Component extends EventManager {
         
         //remove from parent
         if(this.uiActiveParent) {
-            var parentComponent = this.workspaceUI.getComponent(this.uiActiveParent);
+            var parentComponent = this.modelManager.getComponent(this.uiActiveParent);
             if(parentComponent) {
                 //remove the tree from the parent
                 parentComponent.removeChildComponent(this);
@@ -413,7 +413,7 @@ export default class Component extends EventManager {
 
                 //remove from old parent component
                 if(oldParent) {
-                    var oldParentComponent = this.workspaceUI.getComponent(oldParent);
+                    var oldParentComponent = this.modelManager.getComponent(oldParent);
                     oldParentComponent.removeChildComponent(this);
                     //delete all the window display
                     if(this.childComponentDisplay) {
@@ -424,7 +424,7 @@ export default class Component extends EventManager {
 
                 //add to the new parent component
                 if(newParent) {
-                    var newParentComponent = this.workspaceUI.getComponent(newParent);
+                    var newParentComponent = this.modelManager.getComponent(newParent);
                     newParentComponent.addChildComponent(this);
 
                     //TODO - delete the current component display and add a new one
@@ -518,7 +518,6 @@ export default class Component extends EventManager {
      *  @private */
     createOpenCallback() {
         var openCallback;
-        var workspaceUI = this.workspaceUI;
         
         var makeTabActive = function(tabComponent) {
             var tabDisplay = tabComponent.getTabDisplay();
@@ -549,19 +548,17 @@ export default class Component extends EventManager {
         else {
             //remove the tree from the parent
             openCallback = () => {
-                var parent = this.member.getParent();
-                if(parent) {
-                    var parentComponent = workspaceUI.getComponent(parent);
-                    if((parentComponent)&&(parentComponent.usesTabDisplay())) {
+                var parentComponent = this.getParentComponent();
+                if((parentComponent)&&(parentComponent.usesTabDisplay())) {
 
-                        //open the parent and bring this child to the front
-                        makeTabActive(parentComponent);
+                    //open the parent and bring this child to the front
+                    makeTabActive(parentComponent);
 
-                        //allow time for UI to be created and then show child
-                        setTimeout(() => {
-                            parentComponent.showChildComponent(this);
-                        },0);
-                    }
+                    //allow time for UI to be created and then show child
+                    setTimeout(() => {
+                        parentComponent.showChildComponent(this);
+                    },0);
+
                 }
             }
         }

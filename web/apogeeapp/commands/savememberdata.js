@@ -20,14 +20,16 @@ let savememberdata = {};
 //=====================================
 
 savememberdata.createUndoCommand = function(workspaceUI,commandData) {
-    var workspace = workspaceUI.getWorkspace();
+    let modelManager = workspaceUI.getModelManager();
+    let workspace = modelManager.getWorkspace();
     var undoCommandJson = getMemberStateUndoCommand(workspace,commandData.memberFullName); 
     return undoCommandJson;
 }
 
 savememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
     
-    var workspace = workspaceUI.getWorkspace();
+    let modelManager = workspaceUI.getModelManager();
+    let workspace = modelManager.getWorkspace();
     
     var actionData = getSaveDataAction(workspace,commandData.memberFullName,commandData.data,asynchOnComplete);
     
@@ -38,7 +40,7 @@ savememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplet
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
 
     if(actionResult.actionDone) {
-        commandResult.target = workspaceUI.getComponent(actionResult.member);
+        commandResult.target = modelManager.getComponent(actionResult.member);
         commandResult.action = "updated";
     }
     

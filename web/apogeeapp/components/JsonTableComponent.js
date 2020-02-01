@@ -7,9 +7,9 @@ import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper
 export default class JsonTableComponent extends EditComponent {
     
         
-    constructor(workspaceUI,table) {
+    constructor(modelManager,table) {
         //extend edit component
-        super(workspaceUI,table,JsonTableComponent);
+        super(modelManager,table,JsonTableComponent);
 
         //default view
         this.dataView = JsonTableComponent.DEFAULT_DATA_VIEW;
@@ -48,7 +48,7 @@ export default class JsonTableComponent extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
-        var app = this.getWorkspaceUI().getApp();
+        var app = this.getModelManager().getApp();
         
         //create the new view element;
         switch(viewType) {

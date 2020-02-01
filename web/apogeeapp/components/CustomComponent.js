@@ -14,10 +14,9 @@ import apogeeui from "/apogeeui/apogeeui.js";
  * confugred with initialization data from the model. */
 export default class CustomComponent extends EditComponent {
 
-    constructor(workspaceUI,control) {
+    constructor(modelManager,control) {
         //extend edit component
-        super(workspaceUI,control,CustomComponent);
-        
+        modelManager        
         this.uiCodeFields = {};
         this.currentCss = "";
         
@@ -77,7 +76,7 @@ export default class CustomComponent extends EditComponent {
     getDataDisplay(displayContainer,viewType) {
         
         var callbacks;
-        var app = this.getWorkspaceUI().getApp();
+        var app = this.getModelManager().getApp();
         
         //create the new view element;
         switch(viewType) {
@@ -210,7 +209,7 @@ export default class CustomComponent extends EditComponent {
         command.initialFields = initialCodeFields;
         command.targetFields = targetCodeFields;
 
-        this.getWorkspaceUI().getApp().executeCommand(command);
+        this.getModelManager().getApp().executeCommand(command);
         return true;  
     }
 
@@ -373,7 +372,8 @@ customComponentUpdateData.createUndoCommand = function(workspaceUI,commandData) 
 }
 
 customComponentUpdateData.executeCommand = function(workspaceUI,commandData) {
-    let component = workspaceUI.getComponentByFullName(commandData.memberFullName);
+    let modelManager = workspaceUI.getModelManager();
+    let component = modelManager.getComponentByFullName(commandData.memberFullName);
     var commandResult = {};
     if(component) {
         try {

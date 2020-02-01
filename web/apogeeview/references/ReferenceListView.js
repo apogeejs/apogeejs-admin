@@ -2,7 +2,7 @@ import {addLink} from "/apogeeview/commandseq/updatelinkseq.js";
 import apogeeui from "/apogeeui/apogeeui.js";
 import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
 
-import ReferenceEntryView from "/apogeeView/references/ReferenceEntryView.js";
+import ReferenceEntryView from "/apogeeview/references/ReferenceEntryView.js";
 
 export default class ReferenceListView {
 

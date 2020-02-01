@@ -42,10 +42,11 @@ literatepagetransaction.executeCommand = function(workspaceUI,commandData) {
     var error = false;
     var errorMsg;
     
-    var workspace = workspaceUI.getWorkspace();
+    let modelManager = workspaceUI.getModelManager();
+    var workspace = modelManager.getWorkspace();
     //get the member
     var member = workspace.getMemberByFullName(commandData.memberFullName);   
-    var component = workspaceUI.getComponent(member);
+    var component = modelManager.getComponent(member);
     
     var editorData = component.getEditorData();
     var editorManager = component.getEditorManager();
@@ -65,7 +66,7 @@ literatepagetransaction.executeCommand = function(workspaceUI,commandData) {
     if(errorMsg) commandResult.alertMsg = errorMsg;
 
     if(commandResult.actionDone) {
-        commandResult.target = workspaceUI.getComponent(member);
+        commandResult.target = modelManager.getComponent(member);
         commandResult.action = "updated";
     }
     

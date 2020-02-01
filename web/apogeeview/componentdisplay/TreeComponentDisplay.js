@@ -79,7 +79,7 @@ export default class TreeComponentDisplay {
 
             //add child folder menu item
             if(this.component.usesTabDisplay()) {
-                var app = this.component.getWorkspaceUI().getApp();
+                var app = this.component.getModelManager().getApp();
                 var parentFullName = this.component.getMember().getFullName();
                 var folderComponentGenerator = app.getFolderGenerator();
                 var initialValues = {parentName: parentFullName};

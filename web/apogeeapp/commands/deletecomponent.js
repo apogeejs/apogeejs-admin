@@ -14,9 +14,10 @@ deletecomponent.createUndoCommand = function(workspaceUI,commandData) {
     // - is this member a component main member?
     // - is there a parent, or just an owner
     
-    var workspace = workspaceUI.getWorkspace();
+    let modelManager = workspaceUI.getModelManager();
+    var workspace = modelManager.getWorkspace();
     var member = workspace.getMemberByFullName(commandData.memberFullName);
-    var component = workspaceUI.getComponent(member);
+    var component = modelManager.getComponent(member);
     var parent = member.getParent();
     
     var commandUndoJson = {};
@@ -34,7 +35,8 @@ deletecomponent.createUndoCommand = function(workspaceUI,commandData) {
  */
 deletecomponent.executeCommand = function(workspaceUI,commandData) {
     
-    var workspace = workspaceUI.getWorkspace();
+    let modelManager = workspaceUI.getModelManager();
+    var workspace = modelManager.getWorkspace();
 
     var actionJson = {};
     actionJson.action = "deleteMember";
@@ -47,7 +49,7 @@ deletecomponent.executeCommand = function(workspaceUI,commandData) {
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
 
     if(actionResult.actionDone) {
-        _fillInCommandResults(workspaceUI,actionResult,commandResult);
+        _fillInCommandResults(modelManager,actionResult,commandResult);
     }
     
     return commandResult;
@@ -57,10 +59,10 @@ deletecomponent.executeCommand = function(workspaceUI,commandData) {
  * object is passed in it is populated, If one is not passed in, a new one is created.
  * The command result is returned.
  */
-function _fillInCommandResults(workspaceUI,actionResult,commandResult) {
+function _fillInCommandResults(modelManager,actionResult,commandResult) {
     if(!commandResult) commandResult = {};
 
-    commandResult.target = workspaceUI.getComponent(actionResult.member);
+    commandResult.target = modelManager.getComponent(actionResult.member);
     commandResult.action = "deleted";
     
     if(actionResult.childActionResults) {

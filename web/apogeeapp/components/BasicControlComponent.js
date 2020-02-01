@@ -8,8 +8,8 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
  * and create a generator. */
 export default class BasicControlComponent extends EditComponent{
     
-    constructor(workspaceUI,control,componentGenerator) {
-        super(workspaceUI,control,componentGenerator);
+    constructor(modelManager,control,componentGenerator) {
+        super(modelManager,control,componentGenerator);
     
         //default to keep alive
         this.displayDestroyFlags = DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_NEVER;
@@ -51,7 +51,7 @@ export default class BasicControlComponent extends EditComponent{
     getDataDisplay(displayContainer,viewType) {
 
         var callbacks;
-        var app = this.getWorkspaceUI().getApp();
+        var app = this.getModelManager().getApp();
 
         //create the new view element;
         switch(viewType) {
