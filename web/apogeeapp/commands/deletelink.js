@@ -51,7 +51,7 @@ deletelink.executeCommand = function(workspaceUI,commandData) {
             commandResult = {}
             commandResult.alertMsg = "Link entry to update not found!";
             commandResult.cmdDone = false;
-            commandResult.type = "deleted";
+            commandResult.action = "deleted";
         }
     }
     catch(error) {
@@ -59,9 +59,9 @@ deletelink.executeCommand = function(workspaceUI,commandData) {
         
         //unkown error
         commandResult = {}
-        commandResult.alertMsg("Error deleting link: " + error.message);
+        commandResult.alertMsg = "Error deleting link: " + error.message;
         commandResult.cmdDone = false;
-        commandResult.type = "deleted";
+        commandResult.action = "deleted";
     }
     
     return commandResult;

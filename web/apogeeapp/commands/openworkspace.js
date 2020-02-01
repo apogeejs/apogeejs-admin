@@ -24,26 +24,21 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
         //app,workspaceText,fileMetadata) {
     var synchCommandResult = {};
     
-    var app = Apogee.getInstance();
-    
     try {
 
 //I should verify the file type and format!  
 
         //create the workspace UI (this does not create several child objects in it)
-        var workspaceUI = new WorkspaceUI();
+        var workspaceUI = new WorkspaceUI(Apogee.getInstance());
         synchCommandResult.target = this.workspaceUI;
         synchCommandResult.action = "created";
 
         workspaceUI.setFileMetadata(commandData.fileMetadata);
 
-        //initialize the workspace - this returns command results for creating the reference management objects
-        workspaceUI.init(this,this.appView);
-
         //open the reference entries - this has a synch and asynch part.
         var referencesJson = commandData.workspaceJson.references;
         let referenceManager = workspaceUI.getReferenceManager();
-        var {entriesCommandResultList, openEntriesPromise} = referenceManager.openReferenceEntries(workspaceUI,referencesJson);
+        var {entriesCommandResultList, openEntriesPromise} = referenceManager.openReferenceEntries(referencesJson);
         //save the entries create results to the synchronous command result
         synchCommandResult.childCommandResults = entriesCommandResultList;
 
@@ -85,6 +80,8 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
         synchCommandResult.cmdDone = true;
     }
     catch(error) {
+        if(error.stack) console.error(error.stack);
+
         //unkown error
         synchCommandResult.alertMsg = "Error creating workspace: " + error.message;
         synchCommandResult.cmdDone = false;

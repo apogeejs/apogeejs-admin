@@ -19,8 +19,6 @@ import NpmModuleEntry from "/apogeeapp/references/NpmModuleEntry.js";
 import JsScriptEntry from "/apogeeapp/references/JsScriptEntry.js";
 import CssEntry from "/apogeeapp/references/CssEntry.js";
 
-import ApogeeView from "/apogeeview/ApogeeView.js";
-
 /** @private */
 let apogeeInstance = null;
 
@@ -32,13 +30,12 @@ let apogeeInstance = null;
  * This constuctor should not be called externally, the static creation method 
  * should be used. This is a singlet.
  * 
- * @param containerId - The DOM element ID for the app container
  * @param appConfigManager - An instance of an AppConfigManager on configure the application.
  * 
  * @private */
 export default class Apogee extends EventManager {
 
-    constructor(containerId,appConfigManager) {
+    constructor(appConfigManager) {
         super();
         
         //make sure we define this once
@@ -50,7 +47,6 @@ export default class Apogee extends EventManager {
         }
         
         this.appConfigManager = appConfigManager;
-        this.containerId = containerId;
         
         //---------------------------------
         //construct the base app structures
@@ -92,20 +88,6 @@ export default class Apogee extends EventManager {
     // static singleton methods
     //======================================
 
-
-    /** This creates and returns an app instance. The app is a singleton. This call
-     * should only be made once. The containerId is the DOM element ID in which the
-     * app UI is created. If this is left as undefined the UI will not be created. This
-     * is used when creating an alternate UI such as with the web app. 
-     *
-     * @param containerId - The DOM element ID for the app container
-     * @param appConfigManager - An instance of an AppConfigManager on configure the application.
-     *   
-     */
-    static createApp(containerId,appConfigManager) {
-        return new Apogee(containerId,appConfigManager);
-    }
-
     /** This retrieves an existing instance. It does not create an instance. */
     static getInstance() {
         return apogeeInstance;
@@ -123,11 +105,6 @@ export default class Apogee extends EventManager {
     /** This mehod return the application ReferenceManager. */
     getAppReferenceManager() {
         return this.referenceManager;
-    }
-
-    /** This returns the app level view element. */
-    getAppView() {
-        return this.appView;
     }
 
     /** This method registers a new component. It will be exposed when the user
@@ -307,11 +284,6 @@ export default class Apogee extends EventManager {
         //file accessor - load the default if it wasn't loaded in cofiguration
         if(!this.fileAccessObject) {
             this.fileAccessObject = this.appConfigManager.getDefaultFileAccessObject(this);
-        }
-        
-        //create the UI - if a container ID is passed in
-        if(this.containerId) {
-            this.appView = new ApogeeView(this,this.containerId);
         }
         
         //open the initial workspace

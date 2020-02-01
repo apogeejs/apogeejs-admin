@@ -55,23 +55,23 @@ updatelink.executeCommand = function(workspaceUI,commandData) {
         .catch( errorMsg => {
             if(asynchOnComplete) {
                 let asynchCommandResult = {};
-                asynchCommandResult.alertMsg("Unkonwn error updating link: " + errorMsg);
+                asynchCommandResult.alertMsg = "Unkonwn error updating link: " + errorMsg;
                 asynchCommandResult.cmdDone = false;
                 asynchCommandResult.target = referenceEntry;
-                asynchCommandResult.type = "updated";
+                asynchCommandResult.action = "updated";
                 asynchOnComplete(asynchCommandResult);
             }
         });
         
         synchcommandResult.cmdDone = true;
         synchcommandResult.target = referenceEntry;
-        synchcommandResult.type = "updated";
+        synchcommandResult.action = "updated";
     }
     else {
         //entry not found
         synchcommandResult.alertMsg = "Link entry to update not found!";
         synchcommandResult.cmdDone = false;
-        synchcommandResult.type = "updated";
+        synchcommandResult.action = "updated";
     }
     
     return synchcommandResult;

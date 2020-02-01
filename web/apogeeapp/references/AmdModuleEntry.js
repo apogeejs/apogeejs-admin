@@ -49,9 +49,6 @@ export default class AmdModuleEntry extends ReferenceEntry {
             require([this.url],onLoad,onError);
         }
 
-        //call link added to references
-        this.referenceList.addEntry(this);
-
         //return promise to track loading finish
         return new Promise(promiseFunction);
     }
@@ -68,7 +65,7 @@ export default class AmdModuleEntry extends ReferenceEntry {
         return {
             cmdDone: true,
             target: this,
-            type: "deleted"
+            action: "deleted"
         }
     }
     

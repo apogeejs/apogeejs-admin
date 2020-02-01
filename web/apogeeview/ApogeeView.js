@@ -10,17 +10,26 @@ import apogeeui from "/apogeeui/apogeeui.js";
 import TabFrame from "/apogeeui/tabframe/TabFrame.js";
 import Menu from "/apogeeui/menu/Menu.js";
 import SplitPane from "/apogeeui/splitpane/SplitPane.js";
+import TreeControl from "/apogeeui/treecontrol/TreeControl.js";
 import DisplayAndHeader from "/apogeeui/displayandheader/DisplayAndHeader.js";
 
+import WorkspaceUIView from "/apogeeview/WorkspaceUIView.js";
+
 import "/apogeeui/configurablepanel/ConfigurablePanelInit.js";
+import Apogee from "/apogeeapp/Apogee.js";
 
 export default class ApogeeView {
 
-    constructor(app, containerId) {
-        this.app = app;
+    constructor(containerId,appConfigManager) {
         this.treePane = null;
         this.tabFrame = null;
-        this.createUI(containerId);
+        this.containerId = containerId;
+        this.app = this.instantiateApp(appConfigManager);
+        this.loadUI(containerId);
+
+        //subscribe to events
+        this.app.addListener("created",target => this.targetCreated(target));
+        this.app.addListener("deleted",target => this.targetCreated(target));
     }
 
     getTreePane() {
@@ -30,14 +39,62 @@ export default class ApogeeView {
     getTabFrame() {
         return this.tabFrame;
     }
+
+    //================================
+    // TargetEvent handlers
+    //================================
     
+    targetCreated(eventData) {
+        let target = eventData.target;
+        if(target.getTargetType() == "workspace") {
+            this.onWorkspaceCreated(target);
+        }
+    }
+
+    targetDeleted(eventData) {
+        let target = eventData.target;
+        if(target.getTargetType() == "workspace") {
+            this.onWorkspaceClosed(target);
+        }
+    }
+
+    onWorkspaceCreated(workspaceUI) {
+
+        if(this.workspaceUIView != null) {
+            //discard an old view if there is one
+            this.onWorkspaceClosed();
+        }
+
+        //create the new workspace view
+        this.workspaceView = new WorkspaceUIView(workspaceUI,this);
+
+        //load the tree entry
+        let treeEntry = this.workspaceView.getTreeEntry();
+        this.tree.setRootEntry(treeEntry);
+    }
+
+    onWorkspaceClosed() {
+        //close any old workspace view
+        if(this.workspaceUIView) {
+            this.workspaceUIView.close();
+            this.workspaceUIView = null;
+        }
+
+        //clear the tree
+        this.tree.clearRootEntry();
+    }
+
     //=================================
     // User Interface Creation Methods
     //=================================
 
+    instantiateApp(appConfigManager) {
+        return new Apogee(appConfigManager);
+    }
+
     /** This method creates the app ui. 
      * @private */
-    createUI(containerId) {
+    loadUI(containerId) {
         
         var windowElements = apogeeui.initWindows(containerId);
         var topContainer = windowElements.baseElement;
@@ -68,6 +125,11 @@ export default class ApogeeView {
         //load the tree pane
         //---------------------
         this.treePane = this.splitPane.getLeftPaneContainer();
+
+        //tree view
+        this.tree = new TreeControl();
+        apogeeui.removeAllChildren(this.treePane);
+        this.treePane.appendChild(this.tree.getElement());
         
         //----------------------
         //create the tab frame

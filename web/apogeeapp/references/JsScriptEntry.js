@@ -44,9 +44,6 @@ export default class JsScriptEntry extends ReferenceEntry {
             getLinkLoader().addLinkElement("script",this.url,this.linkCallerId,onLoad,onError);
         }
 
-        //call link added to references
-        this.referenceList.addEntry(this);
-
         //return promise to track loading finish
         return new Promise(promiseFunction);
     }
@@ -60,7 +57,7 @@ export default class JsScriptEntry extends ReferenceEntry {
         return {
             cmdDone: true,
             target: this,
-            type: "deleted"
+            action: "deleted"
         }
     }
     

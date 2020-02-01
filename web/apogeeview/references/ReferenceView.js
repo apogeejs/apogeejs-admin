@@ -1,81 +1,37 @@
-import ReferenceListView from "/apogeeview/references/ReferenceListView";
-import ReferenceEntryView from "/apogeeview/references/ReferenceEntryView";
+import apogeeui from "/apogeeui/apogeeui.js";
+import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
+import ReferenceListView from "/apogeeview/references/ReferenceListView.js";
 
 export default class ReferenceView {
 
-    constructor(referenceManager) {
+    constructor(app, referenceManager) {
+        this.app = app;
         this.referenceManager = referenceManager;
 
+        //create the tree entry
+        this.treeEntry = this._createTreeEntry();
+
+        //initailize the child list views
         this.referenceListViews = {};
-        let referenceLists = referencemanager.getReferenceLists();
+        let referenceLists = referenceManager.getReferenceLists();
         for(let entryType in referenceLists) {
-            this.referenceListViews = this.createReferenceListView(entryType,referenceLists[entryType]);
-        }
-
-        referenceManager.addListener("created",target => this.onCreatedObject(target));
-    }
-
-    onCreateObject(target) {
-        if(target instanceof ReferenceManager) {
-            this.onUpdated();
-        }
-        else if(target instanceof ReferenceEntry) {
-            this.onEntryAdded(target);
-
-            target.addListener("deleted",referenceEntry => this.onEntryDeleted(referenceEntry));
+            let referenceList = referenceLists[entryType];
+            let listDisplayInfo = _getListDisplayInfo(entryType);
+            let referenceListView = new ReferenceListView(this.app,referenceList,listDisplayInfo); 
+            this.referenceListViews[entryType] = referenceListView;
+            let childTreeEntry = referenceListView.getTreeEntry();
+            this.treeEntry.addChild(childTreeEntry);
         }
     }
 
     /** This returns the tree entry to display the reference entry for this reference manager. */
     getTreeEntry() {
-        return this.referenceTreeEntry;
+        return this.treeEntry;
     }
 
     onUpdated() {
         //for now just do a stright state update
         this.updateState();
-    }
-
-    onEntryAdded(referenceEntry) {
-        let referenceListEntry = this.referenceLists[referenceEntry.getEntryType()];
-        if(referenceListEntry) {
-            //add a view for this list entry
-            let referenceEntryView = new ReferenceEntryView(referenceEntry);
-            referenceListEntry.refEntries.push(referenceEntryView);
-            
-            //add the tree entry for this reference entry to its parent list tree entry
-            let listTreeEntry = referenceListEntry.treeEntry;
-            listTreeEntry.addChild(referenceEntryView.getTreeEntry());
-        }
-    }
-
-    onEntryDeleted(referenceEntry) {
-        //find the reference entry view
-        let childStruct = this.referenceLists[referenceEntry.getEntryType()];
-        if(childStruct) {
-            let newReferenceList = [];
-            let removedRefEntry;
-            //lookup and remove the reference view for this entry
-            childStruct.refEntries.forEach(referenceView => { 
-                let listRefEntry = referenceView.getReferenceEntry();
-                if(listRefEntry == referenceEntry) {
-                    removedRefEntry = listRefEntry;
-                }
-                else {
-                    newReferenceList.push(listRefEntry);
-                }
-            });
-
-            //remove the tree entry for this ref
-            if(removedRefEntry) {
-                let refTreeEntry = removedRefEntry.getTreeEntry();
-                let listTreeEntry = childStruct.treeEntry;
-                listTreeEntry.removeChild(refTreeEntry)
-            }
-        }
-
-        //should I tell the list tree entry it is being deleted?
-        //should I disconnect the event listening for this to be deleted?
     }
 
     updateState() {
@@ -84,18 +40,12 @@ export default class ReferenceView {
     }
 
     /** @private */
-    instantiateTreeEntries() {
+    _createTreeEntry() {
         var iconUrl = apogeeui.getResourcePath(REFERENCES_ICON_PATH);
-        this.referenceTreeEntry = new TreeEntry("References", iconUrl, null, null, false);
-        this.referenceTreeEntry.setBannerState(this.referenceManager.getState());
-        
-        //add child lists
-        for(var childKey in this.referenceViewLists) {
-            var referenceViewList = this.referenceViewLists[childKey];
-            this.addListTreeEntry(referenceViewList.getTreeEntry());
-        }
+        let treeEntry = new TreeEntry("References", iconUrl, null, null, false);
+        //treeEntry.setBannerState(this.referenceManager.getState());
+        return treeEntry;
     }
-
 
     //==================================
     // Private Methods
@@ -143,13 +93,27 @@ export default class ReferenceView {
         
     //     if(this.state != newState) {
     //         this.state = newState;
-    //         this.fieldsUpdated("state");
+    //         this.fieldUpdated("state");
     //     }
     // }
 
 }
 
+
+
 let REFERENCES_ICON_PATH = "/componentIcons/references.png";
+
+/** This function gets the display info for a given list. */
+function _getListDisplayInfo(entryType) {
+    let listDisplayInfo = LIST_DISPLAY_INFO[entryType];
+    if(!listDisplayInfo) {
+        listDisplayInfo = apogeeutil.jsonCopy(DEFAULT_LIST_DISPLAY_INFO);
+        //set the proper entry type, and use that for the list name too
+        listDisplayInfo.REFERENCE_TYPE = entryType;
+        listDisplayInfo.LIST_NAME = entryType;
+    }
+    return listDisplayInfo;
+}
 
 /** This is the UI definition data for the added reference lists.
  * This should be placed somewhere else to make it easier for people to 

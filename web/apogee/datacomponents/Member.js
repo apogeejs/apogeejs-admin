@@ -365,6 +365,20 @@ Member.fieldUpdated = function(field) {
     this.updated[field] = true;
 }
 
+Member.isFieldUpdated = function(field) {
+    return this.updated[field] ? true : false;
+}
+
+Member.getEventId = function() {
+    //use the main member for the event ID
+    return "member:" + this.member.getId();
+}
+
+Member.getTargetType = function() {
+    return "member";
+}
+
+
 
 //===================================
 // Private Functions

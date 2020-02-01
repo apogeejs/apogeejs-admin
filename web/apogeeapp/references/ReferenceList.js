@@ -25,14 +25,14 @@ export default class ReferenceList extends EventManager {
      * is an asynchronous process. 
      * This method returns a command result for creating the reference entry. The reference is 
      * contained in the "target" field of the command result. */
-    createEntry(workspaceUI,linkData) {
-        let referenceEntry = new referenceEntryClass(this,linkData);
+    createEntry(linkData) {
+        let referenceEntry = new this.referenceEntryClass(this,linkData);
         this.referenceEntries.push(referenceEntry);
         return {
             cmdDone: true,
             target: referenceEntry,
-            parent: workspaceUI,
-            type: "created"
+            parent: this,
+            action: "created"
         }
     }
     
@@ -54,27 +54,5 @@ export default class ReferenceList extends EventManager {
 
     getEntriesJson() {
         return this.referenceEntries.map(refEntry => refEntry.saveEntry());
-    }
-
-
-    //------------------------------------------
-    // Event Tracking Methods
-    //------------------------------------------
-
-    getUpdated() {
-        return this.updated;
-    }
-
-    clearUpdated() {
-        this.updated = {};
-    }
-
-    fieldUpdated(field) {
-        this.updated[field] = true;
-    }
-
-    getEventId() {
-        //use the main member for the event ID
-        return "link-" + this.id;
     }
 }

@@ -4,12 +4,14 @@ import {updateLink, removeLink} from "/apogeeview/commandseq/updatelinkseq.js";
 
 export default class ReferenceEntryView {
 
-    constructor(referenceEntry,displayInfo) {
+    constructor(app, referenceEntry,displayInfo) {
+        this.app = app;
         this.referenceEntry = referenceEntry;
         this.displayInfo = displayInfo;
         this.treeEntry = this._createTreeEntry();
 
-        referenceEntry.addListener("updated",referenceEntry => this.onUpdated(referenceEntry));
+        referenceEntry.addListener("updated",eventInfo => this._onUpdated(eventInfo));
+        referenceEntry.addListener("deleted",eventInfo => this._onDeleted(eventInfo));
     }
 
 
@@ -19,22 +21,34 @@ export default class ReferenceEntryView {
         return this.treeEntry;
     }
 
-    onUpdated(referenceEntry) {
-        this.referenceEntry = referenceEntry;
-        let fieldsUpdated = referenceEntry.fieldsUpdated;
-
-        if(fieldsUpdated.nickname) {
-            this.treeEntry.setLabel(this.referenceEntry.getNickname());
-        }
-
-        if(fieldsUpdated.state) {
-            this.treeEntry.setBannerState(this.referenceEntry.getState());
-        }
-    }
-
     //===========================================
     // Private Methods
     //===========================================
+
+    _onUpdated(eventInfo) {
+        let target = eventInfo.target;
+        if(target.getTargetType() == "link") {
+            //make sure this is the right entry 
+            if(target.getId() != this.referenceEntry.getId()) return;
+
+            this.referenceEntry = target;
+            if(this.referenceEntry.isFieldUpdated("nickname")) {
+                this.treeEntry.setLabel(this.referenceEntry.getNickname());
+            }
+    
+            if(this.referenceEntry.isFieldUpdated("state")) {
+                this.treeEntry.setBannerState(this.referenceEntry.getState());
+            }
+        }
+    }
+
+    _onDeleted(eventInfo) {
+        let target = eventInfo.target;
+        if(target.getTargetType() == "link") {
+            let referenceEntryView = this.childViews[target.getId()];
+            this.treeEntry.removeChild(referenceEntryView.getTreeEntry());
+        }
+    }
 
     _createTreeEntry() {
         var iconUrl = apogeeui.getResourcePath(this.displayInfo.ENTRY_ICON_PATH);
@@ -53,13 +67,13 @@ export default class ReferenceEntryView {
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = this.displayInfo.UPDATE_ENTRY_TEXT;
-        itemInfo.callback = () => updateLink(this);
+        itemInfo.callback = () => updateLink(this.app,this);
         menuItemList.push(itemInfo);
 
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = this.displayInfo.REMOVE_ENTRY_TEXT;
-        itemInfo.callback = () => removeLink(this);
+        itemInfo.callback = () => removeLink(this.app,this);
         menuItemList.push(itemInfo);
 
         return menuItemList;

@@ -30,7 +30,7 @@ addlink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
 
     try {
         var referenceManager = workspaceUI.getReferenceManager();
-        synchCommandResult = referenceManager.createEntry(workspaceUI,commandData.entryType);
+        synchCommandResult = referenceManager.createEntry(commandData);
         var referenceEntry = synchCommandResult.target;
         var promise = referenceEntry.loadEntry(commandData);
 
@@ -43,10 +43,10 @@ addlink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
                 if(asynchOnComplete) {
                     //unknown exception - this hopefully won't happen
                     let asynchCommandResult = {};
-                    asynchCommandResult.alertMsg("Unknown exception in link processing: " + errorMsg);
+                    asynchCommandResult.alertMsg = "Unknown exception in link processing: " + errorMsg;
                     asynchCommandResult.cmdDone = false;
                     asynchCommandResult.target = referenceEntry;
-                    asynchCommandResult.type = "updated";
+                    asynchCommandResult.action = "updated";
                     asynchOnComplete(asynchCommandResult);
                 }
             });
@@ -56,7 +56,7 @@ addlink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
         synchCommandResult.alertMsg = "Unknown exception in creating link: " + error.message;
         synchCommandResult.cmdDone = false;
         synchCommandResult.parent = referenceManager;
-        synchCommandResult.type = "created";
+        synchCommandResult.action = "created";
     }
     
     return synchCommandResult;

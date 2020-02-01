@@ -1,24 +1,28 @@
 import base from "/apogeeutil/base.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import { Workspace, doAction } from "/apogee/apogeeCoreLib.js";
-import WorkspaceUIView from "/apogeeview/WorkspaceUIView.js";
+import EventManager from "/apogeeutil/EventManagerClass.js";
 
 import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";
 
-/** This class manages the user interface for a workspace object. */
-export default class WorkspaceUI {
 
-    constructor() {
-        this.app = null;
+/** This class manages the user interface for a workspace object. */
+export default class WorkspaceUI extends EventManager {
+
+    constructor(app) {
+        super();
+
+        this.app = app;
         this.workspace = null;
-        
-        this.appView = null;
-        this.workspaceUIView = null;
       
         this.componentMap = {};
 
         this.fileMetadata = null;
         this.referenceManager = null;
+
+        this.init();
+
+        app.setWorkspaceUI(this);
     }
 
     //====================================
@@ -26,25 +30,15 @@ export default class WorkspaceUI {
     //====================================
 
     /** This sets the application. It must be done before the workspace is set on the workspace UI. */
-    init(app) {
-        this.app = app;
-        app.setWorkspaceUI(workspaceUI);
-
-        this.appView = app.getAppView();
-
+    init() {
         //create the reference manager
-        this.referenceManager = new ReferenceManager(app);
+        this.referenceManager = new ReferenceManager(this.app);
 
         //initial - creating reference lists
-        this.referenceManager.initReferenceLists(app.getReferenceClassArray());
+        this.referenceManager.initReferenceLists(this.app.getReferenceClassArray());
         
         //listen to the workspace dirty event from the app
         this.app.addListener("workspaceDirty",() => this.setIsDirty());
-
-        //add the workspace view only if there is an app view
-        if(this.appView) {
-            this.workspaceUIView = new WorkspaceUIView(this,this.appView)
-        }
     }
 
     /** This gets the application instance. */
@@ -53,15 +47,17 @@ export default class WorkspaceUI {
     }
 
     getView() {
-        return this.workspaceUIView;
+        alert("We need to provide the view!");
+        return null;
     }
 
      /** This method sets the workspace. The argument workspaceJson should be included
       * if the workspace is not empty, such as when opening a existing workspace. It
       * contains the data for the component associated with each workspace member. For 
-      * a new empty workspace the workspaceJson should be omitted. */
-    load(workspaceJson) { 
-
+      * a new empty workspace the workspaceJson should be omitted. 
+      * The argument fileMetadata is the file identifier if the workspace is opened from a file.
+      * This will be used for the "save" function to save to an existing file. */
+    load(workspaceJson,fileMetadata) {
                     // //publish result
                     // let asynchCommandResult = {};
                     // asynchCommandResult.cmdDone = true;
@@ -73,6 +69,8 @@ export default class WorkspaceUI {
             alert(msg);
             throw new Error(msg);
         }
+
+        this.fileMetadata = fileMetadata;
 
         var workspaceDataJson;
         var workspaceComponentsJson;
@@ -107,19 +105,6 @@ export default class WorkspaceUI {
         //this.workspace.addListener("memberCreated", eventInfo => this.memberCreated(eventInfo));
         this.workspace.addListener("memberUpdated", eventInfo => this.memberUpdated(eventInfo));
         this.workspace.addListener("memberDeleted", eventInfo => this.memberDeleted(eventInfo));
-        this.workspace.addListener("workspaceUpdated", eventInfo => this.workspaceUpdated(eventInfo));
-
-        //set up the view, if we have one
-        if(this.workspaceUIView) {
-            //load the view
-            let rootFolderComponent = this.getComponent(rootFolder);
-            this.workspaceUIView.loadRootFolder(rootFolderComponent);
-
-            //cset an ui view state
-            if(workspaceJson) {
-                this.workspaceUIView.setViewJsonState(workspaceJson);
-            }
-        }    
     }
 
     /** This method gets the workspace object. */
@@ -139,11 +124,6 @@ export default class WorkspaceUI {
             if((componentInfo)&&(componentInfo.component)&&(!componentInfo.componentMember)) {
                 componentInfo.component.onDelete();
             }
-        }
-
-        //cleanup the view
-        if(this.workspaceUIView) {
-            this.workspaceUIView.close();
         }
 
         //remove links
@@ -171,6 +151,10 @@ export default class WorkspaceUI {
         return this.updated;
     }
 
+    isFieldUpdated(field) {
+        return this.updated[field] ? true : false;
+    }
+
     clearUpdated() {
         this.updated = {};
     }
@@ -181,6 +165,10 @@ export default class WorkspaceUI {
 
     getEventId() {
         //for now we have a single fixed id for the workspace
+        return "workspace";
+    }
+
+    getTargetType() {
         return "workspace";
     }
 
@@ -284,7 +272,10 @@ export default class WorkspaceUI {
                 component = new componentGenerator(this,member);
 
                 //call member updated to process and notify of component creation
-                var eventInfo = apogeeutil.getAllFieldsInfo(member);
+//#############################
+// I should fix this so I don't create event info here...
+//###############################
+                let eventInfo = { target: member, updated: member.getUpdated(), event: "memberCreated" };
                 component.memberUpdated(eventInfo);
 
                 //apply any serialized values
@@ -390,25 +381,9 @@ export default class WorkspaceUI {
         }
     }
 
-    /** This method handles updates to the workspace.
-     * @protected */    
-    workspaceUpdated(eventInfo) {
-        if(this.workspaceUIView) {
-            this.workspaceUIView.workspaceUpdated(eventInfo);
-        }
-    }
-
     //====================================
     // open and save methods
     //====================================
-
-    /** This should be set to store file source info, for saving the file. 
-     * The format is arbitrary except it should hold one field "saveOK, which 
-     * will be used to enable the menu option to save the file to the same source from
-     * which it was opened.*/
-    setFileMetadata(fileMetadata) {
-        this.fileMetadata = fileMetadata;
-    }
 
     /** This retrieves the file metadata used to save the file. */
     getFileMetadata() {
@@ -437,10 +412,6 @@ export default class WorkspaceUI {
 
         var rootFolderComponent = this.getComponent(rootFolder);
         json.components = rootFolderComponent.toJson();
-
-        if(this.workspaceUIView) {
-            this.workspaceUIView.appendViewJsonState(json);
-        }
 
         return json;
     }

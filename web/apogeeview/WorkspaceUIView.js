@@ -1,11 +1,8 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-
 import apogeeui from "/apogeeui/apogeeui.js";
 import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
-import TreeControl from "/apogeeui/treecontrol/TreeControl.js";
 
 import {updateWorkspaceProperties} from "/apogeeview/commandseq/updateworkspaceseq.js";
-import ReferenceView from "./reference/ReferenceView";
+import ReferenceView from "/apogeeView/references/ReferenceView.js";
 
 /** This class manages the user interface for a workspace object. */
 export default class WorkspaceUIView {
@@ -14,44 +11,94 @@ export default class WorkspaceUIView {
 
         //yes these
         this.workspaceUI = workspaceUI;
+        this.app = workspaceUI.getApp();
         this.appView = appView;
-
-        //tab frame
-        this.tabFrame = this.appView.getTabFrame();
-
-        //tree view
-        this.tree = new TreeControl();
-        let treePane = this.appView.getTreePane();
-        apogeeui.removeAllChildren(treePane);
-        treePane.appendChild(this.tree.getElement());
 
         this.treeEntry = null;
 
+        //I want a better checking and handling of the root folder being loaded, just once
+        this.rootFolderLoaded = true;
+
         this.init();
 
-//        this.workspaceUIView.loadReferenceManager(this.referenceManager);
+        //subscribe to events
+        this.workspaceUI.addListener("created",target => this.targetCreated(target));
+        this.workspaceUI.addListener("updated",target => this.targetUpdated(target));
+        this.workspaceUI.addListener("deleted",target => this.targetDeleted(target));
+    }
+
+    getTreeEntry() {
+        return this.treeEntry;
     }
 
     getTabFrame() {
-        return this.tabFrame;
+        return this.appView.getTabFrame();
+    }
+
+    //================================
+    // Target Event handlers
+    //================================
+
+    targetCreated(eventData) {
+        let target = eventData.target;
+        if(target.getTargetType() == "component") {
+            this.onComponentCreated(target);
+        }
+    }
+
+    targetUpdated(eventData) {
+        let target = eventData.target;
+        if(target.getTargetType() == "workspace") {
+            this.onWorkspaceUpdated(target);
+        }
+    }
+
+    targetDeleted(eventData) {
+        let target = eventData.target;
+        if(target.getTargetType() == "workspace") {
+            this.onWorkspaceClosed(target);
+        }
+    }
+
+    /** This is called on component created events. We only 
+     * want to respond to the root folder event here.
+     */
+    onComponentCreated(component) {
+        //discard an old view if there is one
+        let parentMember = component.getParent();
+        if(!parentMember) {
+
+            //make sure we don't already have one??!!
+            if(this.rootFolderLoaded) throw new Error("Root folder already loaded!")
+
+            this.loadRootFolder(rootFolderComponent);
+        }
+    }
+
+    onWorkspaceUpdated(workspaceUI) {
+
+        //TBD - should I change the local workspace UI object? I will want to if it is replaced at each update
+        //then I might need to do more... (root folder update, etc)
+
+        if((workspaceUI.fieldUpdated("name"))&&(this.treeEntry)) {
+            this.treeEntry.setLabel(workspaceUI.getWorkspace().getName());
+        }
+    }
+
+    onWorkspaceClosed(workspaceUI) {
+        //we need to make sure the tab frame is cleared of anything the workspace put in it (soemthing else may be using it too)
     }
 
     //====================================
     // Workspace Management
     //====================================
-
-    loadReferenceManager(referenceManager) {
-        this.referenceView = new ReferenceView(referenceManager);
-        let refTreeEntry = this.referenceView.getTreeEntry();
-        this.treeEntry.addChild(refTreeEntry);
-    }
-
      
     loadRootFolder(rootFolderComponent) {
         //our workspace is loaded. make sure out name is correct
         this.treeEntry.setLabel(this.workspaceUI.getWorkspace().getName());
         //add the root folder component
         this.treeEntry.addChild(rootFolderComponent.getTreeEntry(true));
+        this.rootFolderLoaded = true;
     }
 
     setViewJsonState(workspaceJson) { 
@@ -94,18 +141,6 @@ export default class WorkspaceUIView {
         }
     }
 
-    /** This method handles updates to the workspace.
-     * @protected */    
-    workspaceUpdated(eventInfo) {
-
-        if((apogeeutil.isFieldUpdated(eventInfo.updated,"name"))) {
-            //update name
-            if(this.treeEntry) {
-                this.treeEntry.setLabel(this.workspaceUI.getWorkspace().getName());
-            }
-        }
-    }
-
     //====================================
     // properties and display
     //====================================
@@ -113,7 +148,11 @@ export default class WorkspaceUIView {
     init() {
         this.treeEntry = this.createTreeEntry();
         this.treeEntry.setState(TreeEntry.EXPANDED);
-        this.tree.setRootEntry(this.treeEntry);
+
+        //reference mamageger
+        this.referenceView = new ReferenceView(this.app,this.workspaceUI.getReferenceManager());
+        let refTreeEntry = this.referenceView.getTreeEntry();
+        this.treeEntry.addChild(refTreeEntry);
     }
 
     createTreeEntry() {

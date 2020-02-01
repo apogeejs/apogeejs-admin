@@ -22,31 +22,30 @@ let createworkspace = {};
 createworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData) {
 
     var commandResult = {};
-    var workspaceUIAdded;
-
-    var app = Apogee.getInstance();
     
     try {
         
         //make the workspace ui
-        var workspaceUI = new WorkspaceUI();
-        workspaceUIAdded = app.setWorkspaceUI(workspaceUI);
+        let app = Apogee.getInstance();
+        var workspaceUI = new WorkspaceUI(app);
+        commandResult.target = workspaceUI;
+        commandResult.parent = app;
+        commandResult.action = "created";
         
         //load
-        workspaceUI.load();
+        let childCommandResult = workspaceUI.load(commandData.workspaceJson);
+        commandResult.chidlCommandResults = [childCommandResult];
         
         commandResult.cmdDone = true;
     }
     catch(error) {
         if(error.stack) console.error(error.stack);
         
-        if(workspaceUIAdded) {
-            app.clearWorkspaceUI();
-        }
-        
         //unkown error
         commandResult.alertMsg = "Error creating workspace: " + error.message;
         commandResult.cmdDone = false;
+        commandResult.targetIdentifier = "workspace";
+        commandResult.action = "created";
     }
     
     return commandResult;

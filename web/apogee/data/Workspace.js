@@ -290,6 +290,19 @@ Workspace.prototype.fieldUpdated = function(field) {
     this.updated[field] = true;
 }
 
+Workspace.isFieldUpdated = function(field) {
+    return this.updated[field] ? true : false;
+}
+
+Workspace.getEventId = function() {
+    //use the main member for the event ID
+    return "member:" + this.member.getId();
+}
+
+Workspace.getTargetType = function() {
+    return "member";
+}
+
 
 //================================
 // Member generator functions

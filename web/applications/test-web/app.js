@@ -1,11 +1,14 @@
 import "/apogee/webGlobals.js";
-import { Apogee, initIncludePath } from "/apogeeapp/apogeeAppLib.js";
+import ApogeeView from "/apogeeview/ApogeeView.js";
+import { initIncludePath } from "/apogeeapp/apogeeAppLib.js";
 import CutNPasteAppConfigManager from "/applications/cutnpastewebapp/CutNPasteAppConfigManager.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 
 //expose these apogee libraries
 window.apogeeutil = apogeeutil;
+
+let appView;
 
 window.init = function() {
 
@@ -17,14 +20,14 @@ window.init = function() {
     initIncludePath(includeBasePathStruct);
     
     //use cutnpaste file access
-    var appConfigManager = new CutNPasteAppConfigManager();
+    let appConfigManager = new CutNPasteAppConfigManager();
     
     //create the application
-    Apogee.createApp("appContainer",appConfigManager);
+    appView = new ApogeeView("appContainer",appConfigManager);
 }
 
 function beforeUnloadHandler(e) {
-    var app = Apogee.getInstance();
+    var app = appView.getApp();
     if((app)&&(app.getWorkspaceIsDirty())) {
         console.log("Closing with unsaved data - It should query the user!");
         e.preventDefault();

@@ -48,9 +48,6 @@ export default class NpmModuleEntry extends ReferenceEntry {
             }
         }
 
-        //call link added to references
-        this.referenceList.addEntry(this);
-
         //return promise to track loading finish
         return new Promise(promiseFunction);
     }
@@ -68,7 +65,7 @@ export default class NpmModuleEntry extends ReferenceEntry {
         return {
             cmdDone: true,
             target: this,
-            type: "deleted"
+            action: "deleted"
         }
     }
     

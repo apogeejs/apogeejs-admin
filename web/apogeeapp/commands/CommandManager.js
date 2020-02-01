@@ -136,13 +136,18 @@ export default class CommandManager {
         }
 
         //fire failed events
-        failedEvents.forEach(targetData => this._fireEvent(targetData));
+        failedEvents.forEach(eventData => this._fireEvent(eventData));
     }
 
-    _fireEvent(targetData) {
-        //FOR NOW JUST TO THE APP
-        //IF WE KEEP THIS TO APP IT SHOULD PROBABLY BE ONE COMBINED EVENT
-        this.app.dispatchEvent(targetData.eventType,targetData);
+    _fireEvent(eventData) {
+        if((eventData.action == "created")||(eventData.action == "deleted")) {
+            //dispatch created and deleted events to the parent
+            if(eventData.parent) eventData.parent.dispatchEvent(eventData.action,eventData);
+        }
+        if((eventData.action == "updated")||(eventData.action == "deleted")) {
+            //dispatch updated and deleted events to the target
+            if(eventData.target) eventData.target.dispatchEvent(eventData.action,eventData);
+        } 
     }
 
     /** This flattens the command result structure, which contains a single parent and potentially mulitple
@@ -155,14 +160,14 @@ export default class CommandManager {
 
             if(targetId) {
                 //marge target info so there is no more than one event per target (for successful events)
-                let targetData = successEventMap[targetId];
-                if(targetData) {
-                    targetData = this._mergeTargetData(targetData,commandResult);
+                let eventData = successEventMap[targetId];
+                if(eventData) {
+                    eventData = this._mergeEventData(targetData,commandResult);
                 }
                 else {
-                    targetData = this._createNewTargetData(commandResult);
+                    eventData = this._createNewEventData(commandResult);
                 }
-                successEventMap[targetId] = targetData;
+                successEventMap[targetId] = eventData;
             }
 
             //process any children
@@ -172,37 +177,37 @@ export default class CommandManager {
         }
         else {
             //if we didn't process this, add it to other events
-            failedEvents.push(this._createNewTargetData(commandResult));
+            failedEvents.push(this._createNewEventData(commandResult));
         }
     }
 
     /** This creates new event target data from a command result */
-    _createNewTargetData(commandResult) {
+    _createNewEventData(commandResult) {
         //copy everything but the childCommandResults
-        let targetData = {};
+        let eventData = {};
         for(let key in commandResult) {
             if(key == "childCommandResults") continue;
-            targetData[key] = commandResult[key];
+            eventData[key] = commandResult[key];
         }
-        return targetData;
+        return eventData;
     }
 
     /** Thie updated the target data for the new command result. */
-    _mergeTargetData(targetData,commandResult) {
+    _mergeEventData(eventData,commandResult) {
 
-        let action = this._getActionType(targetData.action,commandResult.action);
+        let action = this._getActionType(eventData.action,commandResult.action);
 
         //we have a potential new action
-        targetData.action = action;
+        eventData.action = action;
         //we might have to combine error messages
-        targetData.errorMsg = this._getMergeErrorMsg(targetData.alertMsg,commandResult.alertMsg);
+        eventData.errorMsg = this._getMergeErrorMsg(targetData.alertMsg,commandResult.alertMsg);
         //or the is pending flags
-        targetData.isPending = targetData.isPending || commandResult.isPending;
+        eventData.isPending = eventData.isPending || commandResult.isPending;
 
         //parent would only be present on the first command
         //child commands and are not in the event target data
          
-        return targetData;
+        return eventData;
     }
 
     _getMergeErrorMsg(firstMsg,secondMsg) {

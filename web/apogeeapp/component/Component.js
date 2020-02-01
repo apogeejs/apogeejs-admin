@@ -269,9 +269,17 @@ export default class Component extends EventManager {
         this.updated[field] = true;
     }
 
+    isFieldUpdated(field) {
+        return this.updated[field] ? true : false;
+    }
+
     getEventId() {
         //use the main member for the event ID
         return "component:" + this.member.getId();
+    }
+
+    getTargetType() {
+        return "component";
     }
 
 
@@ -382,20 +390,19 @@ export default class Component extends EventManager {
     /** This method extends the member udpated function from the base.
      * @protected */    
     memberUpdated(eventInfo) {
-        
-        let updatedMemberFields = eventInfo.updated;
+
         let updatedMember = eventInfo.target;
         
-        if(updatedMember = this.member) {
+        if(updatedMember.getId() == this.member.getId()) {
             this.fieldUpdated("member");
             
             //check for name changes
-            if(apogeeutil.isFieldUpdated(updatedMemberFields,"name")) {
+            if(this.member.isFieldUpdated("name")) {
                 this.fieldUpdated("name");
             }
             
             //check for parent change
-            if(apogeeutil.isFieldUpdated(updatedMemberFields,"owner")) {
+            if(this.member.isFieldUpdated("owner")) {
                 this.fieldUpdated("owner");
                 
                 //old parent change logic!!!

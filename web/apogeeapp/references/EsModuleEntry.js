@@ -50,9 +50,6 @@ export default class EsModuleEntry extends ReferenceEntry {
         this.setPendingState();
         var moduleLoadPromise = import(this.url).then(onLoad).catch(onError);
 
-        //call link added to references
-        this.referenceList.addEntry(this);
-
         //return promise to track loading finish
         return moduleLoadPromise;
     }
@@ -67,7 +64,7 @@ export default class EsModuleEntry extends ReferenceEntry {
         return {
             cmdDone: true,
             target: this,
-            type: "deleted"
+            action: "deleted"
         }
     }
     

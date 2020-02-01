@@ -26,7 +26,7 @@ const DIALOG_LAYOUT_SUBMIT_LINE = {
 //=====================================
 
 /** This method gets a callback to update the properties of a workspace. */
-export function addLink(referenceManager,entryTypeInfo) {
+export function addLink(app,entryTypeInfo) {
         
     //create the dialog layout 
     var titleLine = {};
@@ -57,7 +57,7 @@ export function addLink(referenceManager,entryTypeInfo) {
         commandData.nickname = newValues.nickname;
 
         //run command
-        referenceManager.getApp().executeCommand(commandData);
+        app.executeCommand(commandData);
 
         //return true to close the dialog
         return true;
@@ -68,7 +68,7 @@ export function addLink(referenceManager,entryTypeInfo) {
 }
 
 /** This method gets a callback to update the properties of a workspace. */
-export function updateLink(referenceEntry) {
+export function updateLink(app,referenceEntry) {
         
     var initialValues = {};
     initialValues.url = referenceEntry.getUrl();
@@ -119,7 +119,7 @@ export function updateLink(referenceEntry) {
         }
 
         if(dataChanged) {
-            referenceEntry.getReferenceManager().getApp().executeCommand(commandData);
+            app.executeCommand(commandData);
         }
             
         //return true to close the dialog
@@ -132,7 +132,7 @@ export function updateLink(referenceEntry) {
 
 
 /** This method gets a callback to update the properties of a workspace. */
-export function removeLink(referenceEntry) {
+export function removeLink(app,referenceEntry) {
 
     var doDelete= confirm("Are you sure you want to delete this link?");
 
@@ -145,7 +145,7 @@ export function removeLink(referenceEntry) {
         commandData.url = referenceEntry.getUrl();
 
         //run command
-        referenceEntry.getReferenceManager().getApp().executeCommand(commandData);
+        app.executeCommand(commandData);
     }
 }
 
