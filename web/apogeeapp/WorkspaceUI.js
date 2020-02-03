@@ -150,6 +150,11 @@ export default class WorkspaceUI extends EventManager {
         return this.fileMetadata;
     }
 
+    /** This method should be used to update the file metadata for the workspace, such as after the file is saved. */
+    setFileMetadata(fileMetadata) {
+        this.fileMetadata = fileMetadata;
+    }
+
     /** This saves the workspace. It the optionalSavedRootFolder is passed in,
      * it will save a workspace with that as the root folder. */
     toJson(optionalSavedRootFolder) {

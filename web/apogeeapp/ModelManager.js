@@ -207,6 +207,7 @@ export default class ModelManager extends EventManager {
         
         //response - get new member
         var member = createMemberResult.member;
+        var memberFieldsUpdated = createMemberResult.updated;
         var component;
         var commandResult = {};
 
@@ -218,11 +219,8 @@ export default class ModelManager extends EventManager {
                 component = new componentGenerator(this,member);
 
                 //call member updated to process and notify of component creation
-//#############################
-// I should fix this so I don't create event info here... see notes
-member.updated = {name:true,owner:true};
-//###############################
-                let eventInfo = { target: member, updated: member.getUpdated(), event: "memberCreated" };
+                //I SHOULD CONSTRUCT THIS IN A STANDARD WAY RATHER THAN MAKING IT HERE.
+                let eventInfo = { target: member, updated: memberFieldsUpdated, event: "memberCreated" };
                 component.memberUpdated(eventInfo);
 
                 //apply any serialized values

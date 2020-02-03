@@ -187,7 +187,7 @@ export default class ApogeeView {
 
     triggerResizeWait() {
         //only do the slow resizde timer if we have listeners
-        if(!this.hasListeners("frameWidthResize")) return;
+        if(!this.app.hasListeners("frameWidthResize")) return;
 
         //create a new timer if we don't already have one
         if(!this.resizeWaitTimer) {

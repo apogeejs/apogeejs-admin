@@ -34,6 +34,7 @@ function moveMember(workspace,actionData,actionResult) {
         
     member.move(actionData.targetName,targetOwner);
     actionResult.actionDone = true;
+    actionResult.updated = apogeeutil.jsonCopy(member.getUpdated());
     
     //add the child action results
     addChildResults(member,actionResult);
@@ -50,6 +51,7 @@ function addChildResults(member,actionResult) {
             let childActionResult = {};
             childActionResult.actionDone = true;
             childActionResult.member = child;
+            childActionResult.updated = apogeeutil.jsonCopy(child.getUpdated());
             childActionResult.actionInfo = ACTION_INFO;
             
             actionResult.childActionResults.push(childActionResult);

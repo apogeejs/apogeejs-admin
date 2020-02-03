@@ -87,6 +87,7 @@ function createMemberImpl(owner,actionData,actionResult) {
     }
 
     actionResult.member = member;
+    actionResult.updated = apogeeutil.jsonCopy(member.getUpdated());
     actionResult.actionDone = true;
 }
 

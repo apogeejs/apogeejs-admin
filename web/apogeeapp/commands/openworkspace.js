@@ -29,8 +29,10 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
 //I should verify the file type and format!  
 
         //create the workspace UI (this does not create several child objects in it)
-        var workspaceUI = new WorkspaceUI(Apogee.getInstance());
-        synchCommandResult.target = this.workspaceUI;
+        var app = Apogee.getInstance();
+        var workspaceUI = new WorkspaceUI(app);
+        synchCommandResult.target = workspaceUI;
+        synchCommandResult.parent = app;
         synchCommandResult.action = "created";
 
         workspaceUI.setFileMetadata(commandData.fileMetadata);

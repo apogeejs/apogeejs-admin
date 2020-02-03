@@ -189,6 +189,7 @@ export default class CommandManager {
             if(key == "childCommandResults") continue;
             eventData[key] = commandResult[key];
         }
+        if(commandResult.target) eventData.fieldsUpdated = commandResult.target.getUpdated();
         return eventData;
     }
 

@@ -44,7 +44,7 @@ export default class ReferenceManager {
         var loadEntry = entryJson => {
             var referenceList = this.referenceLists[referencesJson.entryType];
             
-            if(!referenceList) throw new Error("Entry type nopt found: " + referenceJson.entryType);
+            if(!referenceList) throw new Error("Entry type nopt found: " + referencesJson.entryType);
             
             //load this url if it doesn't exist
             if(!referenceList.hasUrlEntry(entryJson.url)) {
@@ -58,7 +58,7 @@ export default class ReferenceManager {
                 entryPromises.push(promise);
             }
         }
-        referenceJson.forEach(loadEntry);
+        referencesJson.forEach(loadEntry);
         
         let openEntriesPromise = Promise.all(entryPromises);
 
@@ -71,7 +71,8 @@ export default class ReferenceManager {
      */
     saveEntries() {
         var entriesJson = [];
-        for(var referenceList in this.referenceLists) {
+        for(var referenceListType in this.referenceLists) {
+            let referenceList = this.referenceLists[referenceListType];
             let entryListJson = referenceList.getEntriesJson();
             entriesJson.push(...entryListJson);
         }

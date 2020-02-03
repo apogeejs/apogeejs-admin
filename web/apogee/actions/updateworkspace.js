@@ -26,6 +26,7 @@ function updateWorkspace(workspace,actionData,actionResult) {
     }
     
     actionResult.actionDone = true;
+    actionResult.updated = apogeeutil.jsonCopy(workspace.getUpdated());
 }
 
 /** Update data action info */

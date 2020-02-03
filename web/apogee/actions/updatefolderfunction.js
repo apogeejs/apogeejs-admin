@@ -30,6 +30,7 @@ function updateProperties(workspace,actionData,actionResult) {
     folderFunction.setReturnValueString(actionData.returnValueString);
     
     actionResult.actionDone = true;
+    actionResult.updated = apogeeutil.jsonCopy(member.getUpdated());
 }
 
 /** Action info */

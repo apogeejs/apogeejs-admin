@@ -392,17 +392,18 @@ export default class Component extends EventManager {
     memberUpdated(eventInfo) {
 
         let updatedMember = eventInfo.target;
+        let fieldsUpdated = eventInfo.updated;
         
         if(updatedMember.getId() == this.member.getId()) {
             this.fieldUpdated("member");
             
             //check for name changes
-            if(this.member.isFieldUpdated("name")) {
+            if(apogeeutil.isFieldUpdated(fieldsUpdated,"name")) {
                 this.fieldUpdated("name");
             }
             
             //check for parent change
-            if(this.member.isFieldUpdated("owner")) {
+            if(apogeeutil.isFieldUpdated(fieldsUpdated,"owner")) {
                 this.fieldUpdated("owner");
                 
                 //old parent change logic!!!

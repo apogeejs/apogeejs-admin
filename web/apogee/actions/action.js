@@ -48,9 +48,10 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  *      not properly (exectue.)
  *   "actionPending": This flag is returned if the action is a queued action and will be run after the
  *      current action completes.)
- *   "member":
- *   "actionInfo" - (This is the action info associated with the action, mainly used for bookeeping.)
- *   "alertMsg"" (This is a message that should be given to the user. It usually will be sent if there is an error
+ *   "member": The object modified in the action
+ *   "updated": The structure of fields of the member updated in the action (for create and update but not delete)
+ *   "actionInfo": (This is the action info associated with the action, mainly used for bookeeping.)
+ *   "alertMsg": (This is a message that should be given to the user. It usually will be sent if there is an error
  *      where actionDone is false, though it may be set on actionDone = true too.)
  *   "isFatal": "If this value is set to true then the application is in an indeterminate state and the user
  *      should not continue."

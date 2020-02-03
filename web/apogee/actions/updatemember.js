@@ -60,6 +60,7 @@ function updateCode(workspace,actionData,actionResult) {
         
     
     actionResult.actionDone = true;
+    actionResult.updated = apogeeutil.jsonCopy(member.getUpdated());
 }
 
 /** Update data action function. */
@@ -127,6 +128,7 @@ function updateData(workspace,actionData,actionResult) {
     }
     
     actionResult.actionDone = true;
+    actionResult.updated = apogeeutil.jsonCopy(member.getUpdated());
 }
         
 /** Update data action info */

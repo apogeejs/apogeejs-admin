@@ -215,38 +215,42 @@ apogeeutil.getNormalizedArrayCopy = function(json) {
 // Field Update Info Methods
 //=============================
 
-/** This constant is used to field update info, to specify all fields are updated. */
-apogeeutil.ALL_FIELDS = "all";
+// /** This constant is used to field update info, to specify all fields are updated. */
+// apogeeutil.ALL_FIELDS = "all";
 
-/** This method takes a field update Info object (a set or map of names to a truthy value)
- * and either a single field name or an arrya of field names. In the case of a single
- * field name passed, it returns true if that field has been updated. In the case
- * of an array of field names, it checks if any of those fields have been updated.
- * The field update info object may have the value "all" set to true. In this case
- * any test against it will return true. */
-apogeeutil.isFieldUpdated = function(updateInfo,fieldOrFields) {
-    if(updateInfo[apogeeutil.ALL_FIELDS]) return true;
-    if(Array.isArray(fieldOrFields)) {
-        return fieldOrFields.any(fieldName => updateInfo[fieldName]);
-    }
-    else {
-        if(updateInfo[fieldOrFields]) return true;
-        else return false;
-    }
+// /** This method takes a field update Info object (a set or map of names to a truthy value)
+//  * and either a single field name or an arrya of field names. In the case of a single
+//  * field name passed, it returns true if that field has been updated. In the case
+//  * of an array of field names, it checks if any of those fields have been updated.
+//  * The field update info object may have the value "all" set to true. In this case
+//  * any test against it will return true. */
+// apogeeutil.isFieldUpdated = function(updateInfo,fieldOrFields) {
+//     if(updateInfo[apogeeutil.ALL_FIELDS]) return true;
+//     if(Array.isArray(fieldOrFields)) {
+//         return fieldOrFields.any(fieldName => updateInfo[fieldName]);
+//     }
+//     else {
+//         if(updateInfo[fieldOrFields]) return true;
+//         else return false;
+//     }
     
+// }
+//This is a version 
+apogeeutil.isFieldUpdated = function(updateInfo,fieldName) {
+    return updateInfo[fieldName] ? true : false;
 }
 
-/** This method returns a field update object for the given member that returns 
- * true for all fields checked. The event name can optionally be passed in.
- * Otherwise the event name will be set to "all".*/
-apogeeutil.getAllFieldsInfo = function(member,optionalEventName) {
-    let updateInfo = {};
-    updateInfo.member = member;
-    updateInfo.updated = {};
-    updateInfo.updated[apogeeutil.ALL_FIELDS] = true;
-    updateInfo.event = optionalEventName ? optionalEventName : "all";
-    return updateInfo;
-}
+// /** This method returns a field update object for the given member that returns 
+//  * true for all fields checked. The event name can optionally be passed in.
+//  * Otherwise the event name will be set to "all".*/
+// apogeeutil.getAllFieldsInfo = function(member,optionalEventName) {
+//     let updateInfo = {};
+//     updateInfo.member = member;
+//     updateInfo.updated = {};
+//     updateInfo.updated[apogeeutil.ALL_FIELDS] = true;
+//     updateInfo.event = optionalEventName ? optionalEventName : "all";
+//     return updateInfo;
+// }
 
 //=================
 // Some other generic utils
