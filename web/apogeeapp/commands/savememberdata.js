@@ -19,16 +19,16 @@ let savememberdata = {};
 // Action
 //=====================================
 
-savememberdata.createUndoCommand = function(workspaceUI,commandData) {
-    let modelManager = workspaceUI.getModelManager();
+savememberdata.createUndoCommand = function(workspaceManager,commandData) {
+    let modelManager = workspaceManager.getModelManager();
     let workspace = modelManager.getWorkspace();
     var undoCommandJson = getMemberStateUndoCommand(workspace,commandData.memberFullName); 
     return undoCommandJson;
 }
 
-savememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
+savememberdata.executeCommand = function(workspaceManager,commandData,asynchOnComplete) {
     
-    let modelManager = workspaceUI.getModelManager();
+    let modelManager = workspaceManager.getModelManager();
     let workspace = modelManager.getWorkspace();
     
     var actionData = getSaveDataAction(workspace,commandData.memberFullName,commandData.data,asynchOnComplete);

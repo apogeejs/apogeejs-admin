@@ -21,9 +21,9 @@ let addcomponent = {};
 // Command Object
 //=====================================
 
-addcomponent.createUndoCommand = function(workspaceUI,commandData) {
+addcomponent.createUndoCommand = function(workspaceManager,commandData) {
     
-    var modelManager = workspaceUI.getModelManager();
+    var modelManager = workspaceManager.getModelManager();
     var workspace = modelManager.getWorkspace();
     var memberName = commandData.memberJson.name;
     var parent = workspace.getMemberByFullName(commandData.parentFullName);
@@ -36,9 +36,9 @@ addcomponent.createUndoCommand = function(workspaceUI,commandData) {
     return undoCommandJson;
 }
 
-addcomponent.executeCommand = function(workspaceUI,commandData) { 
+addcomponent.executeCommand = function(workspaceManager,commandData) { 
     
-    let modelManager = workspaceUI.getModelManager();
+    let modelManager = workspaceManager.getModelManager();
     let workspace = modelManager.getWorkspace();
     let commandResult;
 

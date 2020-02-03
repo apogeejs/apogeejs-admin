@@ -7,29 +7,29 @@ let closeworkspace = {};
 //=====================================
 
 //NO UNDO FOR CLOSE WORKSPACE
-//closeworkspace.createUndoCommand = function(workspaceUI,commandData) {
+//closeworkspace.createUndoCommand = function(workspaceManager,commandData) {
 
-closeworkspace.executeCommand = function(workspaceUI,commandData) {
-    let modelManager = workspaceUI.getModelManager();
+closeworkspace.executeCommand = function(workspaceManager,commandData) {
+    let modelManager = workspaceManager.getModelManager();
     var workspace = modelManager.getWorkspace();
     
-    var workspaceUIRemoved = false;
+    var workspaceManagerRemoved = false;
     
     try {
-        workspaceUIRemoved = workspaceUI.getApp().clearWorkspaceUI();
+        workspaceManagerRemoved = workspaceManager.getApp().clearWorkspaceManager();
         
-        workspaceUI.close();
+        workspaceManager.close();
         workspace.onClose();
     }
     catch(error) {
         if(error.stack) console.error(error.stack);
         
-        var isFatal = !workspaceUIRemoved;
+        var isFatal = !workspaceManagerRemoved;
         var errorMsg = "Error closeing workspace: " + error.message;
         CommandManager.errorAlert(errorMsg,isFatal);
     }
     
-    return workspaceUIRemoved;
+    return workspaceManagerRemoved;
 }
 
 closeworkspace.commandInfo = {

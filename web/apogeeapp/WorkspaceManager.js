@@ -8,7 +8,7 @@ import ModelManager from "/apogeeapp/ModelManager.js";
 
 
 /** This class manages the user interface for a workspace object. */
-export default class WorkspaceUI extends EventManager {
+export default class WorkspaceManager extends EventManager {
 
     constructor(app) {
         super();
@@ -21,7 +21,7 @@ export default class WorkspaceUI extends EventManager {
 
         this.init();
 
-        app.setWorkspaceUI(this);
+        app.setWorkspaceManager(this);
     }
 
     //====================================
@@ -51,11 +51,11 @@ export default class WorkspaceUI extends EventManager {
                     // //publish result
                     // let asynchCommandResult = {};
                     // asynchCommandResult.cmdDone = true;
-                    // asynchCommandResult.target = workspaceUI;
+                    // asynchCommandResult.target = workspaceManager;
                     // asynchCommandResult.action = "updated";
 
-        if((workspaceJson)&&(workspaceJson.version != WorkspaceUI.FILE_VERSION)) {
-            let msg = "Version mismatch. Expected version " + WorkspaceUI.FILE_VERSION + ", Found version " + workspaceJson.version;
+        if((workspaceJson)&&(workspaceJson.version != WorkspaceManager.FILE_VERSION)) {
+            let msg = "Version mismatch. Expected version " + WorkspaceManager.FILE_VERSION + ", Found version " + workspaceJson.version;
             alert(msg);
             throw new Error(msg);
         }
@@ -161,7 +161,7 @@ export default class WorkspaceUI extends EventManager {
         var json = {};
         json.fileType = "apogee app js workspace";
 
-        json.version = WorkspaceUI.FILE_VERSION;
+        json.version = WorkspaceManager.FILE_VERSION;
 
         json.references = this.referenceManager.saveEntries();
 
@@ -174,4 +174,4 @@ export default class WorkspaceUI extends EventManager {
 
 }
 
-WorkspaceUI.FILE_VERSION = "0.50";
+WorkspaceManager.FILE_VERSION = "0.50";

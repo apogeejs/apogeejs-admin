@@ -8,13 +8,13 @@ import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js"
 /** This gets a callback to add a component. */
 export function exportWorkspace(app,fileAccessObject) {
     //get the active workspace
-    var workspaceUI = app.getWorkspaceUI();
-    if(!workspaceUI) {
+    var workspaceManager = app.getWorkspaceManager();
+    if(!workspaceManager) {
         alert("There is no open workspace.");
         return;
     }   
 
-    var modelManager = workspaceUI.getModelManager();
+    var modelManager = workspaceManager.getModelManager();
 
     //get the folder list
     var folderNames = modelManager.getFolders();
@@ -48,9 +48,9 @@ export function exportWorkspace(app,fileAccessObject) {
     
 
 function getWorkspaceText(app,folder) {
-    var activeWorkspaceUI = app.getWorkspaceUI();
-    if(activeWorkspaceUI) {
-        var workspaceJson = activeWorkspaceUI.toJson(folder);
+    var activeWorkspaceManager = app.getWorkspaceManager();
+    if(activeWorkspaceManager) {
+        var workspaceJson = activeWorkspaceManager.toJson(folder);
         return JSON.stringify(workspaceJson);
     }
     else {

@@ -14,7 +14,7 @@ import CommandManager from "/apogeeapp/commands/CommandManager.js";
 let updatelink = {};
 
 
-updatelink.createUndoCommand = function(workspaceUI,commandData) {
+updatelink.createUndoCommand = function(workspaceManager,commandData) {
     var undoCommandJson = {};
     undoCommandJson.type = updatelink.commandInfo.type;
     
@@ -25,7 +25,7 @@ updatelink.createUndoCommand = function(workspaceUI,commandData) {
     
     if(commandData.newNickname) {
         //look up the pre-command entry (we change back gto this)
-        var referenceManager = workspaceUI.getReferenceManager();
+        var referenceManager = workspaceManager.getReferenceManager();
         var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.oldUrl);
         if((referenceEntry)&&(commandData.newNickname != referenceEntry.getNickname())) {
             undoCommandJson.newNickname = referenceEntry.getNickname();
@@ -35,10 +35,10 @@ updatelink.createUndoCommand = function(workspaceUI,commandData) {
     return undoCommandJson;
 }
 
-updatelink.executeCommand = function(workspaceUI,commandData) {
+updatelink.executeCommand = function(workspaceManager,commandData) {
     
     var synchcommandResult = {};
-    var referenceManager = workspaceUI.getReferenceManager();
+    var referenceManager = workspaceManager.getReferenceManager();
     
     //lookup entry for this reference
     var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.oldUrl);

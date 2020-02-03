@@ -6,7 +6,7 @@ let compoundcommand = {};
 // Command Object
 //=====================================
 
-compoundcommand.createUndoCommand = function(workspaceUI,commandData) {
+compoundcommand.createUndoCommand = function(workspaceManager,commandData) {
     let undoCommandJson = {};
     undoCommandJson.type = compoundcommand.commandInfo.type;
     undoCommandJson.childCommands = [];
@@ -15,7 +15,7 @@ compoundcommand.createUndoCommand = function(workspaceUI,commandData) {
     for(var i = commandData.childCommands.length-1; i >= 0; i--) {
         let childCommandJson = commandData.childCommands[i];
         let childCommandObject = CommandManager.getCommandObject(childCommandJson.type);
-        let childUndoCommandJson = childCommandObject.createUndoCommand(workspaceUI,childCommandJson);
+        let childUndoCommandJson = childCommandObject.createUndoCommand(workspaceManager,childCommandJson);
         undoCommandJson.childCommands.push(childUndoCommandJson);
     }
     
@@ -25,7 +25,7 @@ compoundcommand.createUndoCommand = function(workspaceUI,commandData) {
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-compoundcommand.executeCommand = function(workspaceUI,commandData) {
+compoundcommand.executeCommand = function(workspaceManager,commandData) {
     
     let commandResult = {};
     commandResult.childResults = [];
@@ -34,7 +34,7 @@ compoundcommand.executeCommand = function(workspaceUI,commandData) {
     for(var i = 0; i < commandData.childCommands.length; i++) {
         let childCommandJson = commandData.childCommands[i];
         let childCommandObject = CommandManager.getCommandObject(childCommandJson.type);
-        let childCommandResult = childCommandObject.executeCommand(workspaceUI,childCommandJson);
+        let childCommandResult = childCommandObject.executeCommand(workspaceManager,childCommandJson);
         commandResult.childResults.push(childCommandResult);
     }
 

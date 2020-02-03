@@ -5,11 +5,11 @@ import EventManager from "/apogeeutil/EventManagerClass.js";
 /** This class manages the user interface for a workspace object. */
 export default class ModelManager extends EventManager {
 
-    constructor(workspaceUI) {
+    constructor(workspaceManager) {
         super();
 
-        this.workspaceUI = workspaceUI;
-        this.app = workspaceUI.getApp();
+        this.workspaceManager = workspaceManager;
+        this.app = workspaceManager.getApp();
         this.workspace = null;
       
         this.componentMap = {};
@@ -34,8 +34,8 @@ export default class ModelManager extends EventManager {
         return this.app;
     }
 
-    getWorkspaceUI() {
-        return this.workspaceUI;
+    getWorkspaceManager() {
+        return this.workspaceManager;
     }
 
      /** This method sets the workspace. The argument workspaceJson should be included

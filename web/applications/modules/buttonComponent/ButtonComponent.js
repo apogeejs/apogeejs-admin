@@ -4,8 +4,8 @@ import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 
 /** This is a simple custom resource component example. */
 apogeeapp.app.ButtonComponent = class extends apogeeapp.app.BasicControlComponent {
-    constructor(workspaceUI,control) {
-        super(workspaceUI,control,apogeeapp.app.ButtonComponent);
+    constructor(workspaceManager,control) {
+        super(workspaceManager,control,apogeeapp.app.ButtonComponent);
     }
 
     /** Implement the method to get the output data display. This should typically 

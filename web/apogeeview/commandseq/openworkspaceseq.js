@@ -7,7 +7,7 @@
 export function openWorkspace(app,fileAccessObject) {
     
     //make sure there is not an open workspace
-    if(app.getWorkspaceUI()) {
+    if(app.getWorkspaceManager()) {
         alert("There is an open workspace. You must close the workspace first.");
         return;
     }    
@@ -29,7 +29,7 @@ function onOpen(err,app,workspaceData,fileMetadata) {
         return;
     }
     else {
-        if(app.getWorkspaceUI()) {
+        if(app.getWorkspaceManager()) {
             alert("There is already an open workspace");
             return;
         }

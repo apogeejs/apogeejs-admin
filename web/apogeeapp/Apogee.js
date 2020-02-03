@@ -53,7 +53,7 @@ export default class Apogee extends EventManager {
         //---------------------------------
         
         //workspace
-        this.workspaceUI = null;
+        this.workspaceManager = null;
         
         //component generators
         this.componentGenerators = {};
@@ -161,15 +161,15 @@ export default class Apogee extends EventManager {
         return this.fileAccessObject;
     }
 
-    /** This method returns the active WorkspaceUI object. */
-    getWorkspaceUI() {
-        return this.workspaceUI;
+    /** This method returns the active WorkspaceManager object. */
+    getWorkspaceManager() {
+        return this.workspaceManager;
     }
 
     /** This method returns the active Workspace object. */
     getWorkspace() {
-        if(this.workspaceUI) {
-            return this.workspaceUI.getWorkspace();
+        if(this.workspaceManager) {
+            return this.workspaceManager.getWorkspace();
         }
         else {
             return null;
@@ -178,8 +178,8 @@ export default class Apogee extends EventManager {
 
     /** This method returns true if the workspcae contains unsaved data. */
     getWorkspaceIsDirty() {
-        if(this.workspaceUI) {
-            return this.workspaceUI.getIsDirty();
+        if(this.workspaceManager) {
+            return this.workspaceManager.getIsDirty();
         }
         else {
             return false;
@@ -188,8 +188,8 @@ export default class Apogee extends EventManager {
 
     /** This method clears the workspace dirty flag. */
     clearWorkspaceIsDirty() {
-        if(this.workspaceUI) {
-            return this.workspaceUI.clearIsDirty();
+        if(this.workspaceManager) {
+            return this.workspaceManager.clearIsDirty();
         }
         else {
             return false;
@@ -217,20 +217,20 @@ export default class Apogee extends EventManager {
     /** This method makes an empty workspace ui object. This throws an exception if
      * the workspace can not be opened.
      */
-    setWorkspaceUI(workspaceUI) {
+    setWorkspaceManager(workspaceManager) {
         
         //we can only have one workspace of a given name!
-        if(this.workspaceUI) {
+        if(this.workspaceManager) {
             throw base.createError("There is already an open workspace",false);
         }
-        this.workspaceUI = workspaceUI;
+        this.workspaceManager = workspaceManager;
         return true;
     }
 
     /** This method closes the active workspace. */
-    clearWorkspaceUI() {
+    clearWorkspaceManager() {
         //remove the workspace from the app
-        this.workspaceUI = null;
+        this.workspaceManager = null;
         
         return true;
     }

@@ -16,7 +16,7 @@ let addlink = {};
 // Command Object
 //=====================================
 
-addlink.createUndoCommand = function(workspaceUI,commandData) {
+addlink.createUndoCommand = function(workspaceManager,commandData) {
     var undoCommandJson = {};
     undoCommandJson.type = "deleteLink";
     undoCommandJson.entryType = commandData.entryType;
@@ -24,12 +24,12 @@ addlink.createUndoCommand = function(workspaceUI,commandData) {
     return undoCommandJson;
 }
 
-addlink.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
+addlink.executeCommand = function(workspaceManager,commandData,asynchOnComplete) {
     
     var synchCommandResult = {};
 
     try {
-        var referenceManager = workspaceUI.getReferenceManager();
+        var referenceManager = workspaceManager.getReferenceManager();
         synchCommandResult = referenceManager.createEntry(commandData);
         var referenceEntry = synchCommandResult.target;
         var promise = referenceEntry.loadEntry(commandData);

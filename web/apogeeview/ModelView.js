@@ -4,11 +4,11 @@ import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
 /** This class manages the user interface for a workspace object. */
 export default class ModelView {
 
-    constructor(workspaceUIView,modelManager) {
+    constructor(workspaceView,modelManager) {
 
         //yes these
         this.modelManager = modelManager;
-        this.workspaceUIView = workspaceUIView;
+        this.workspaceView = workspaceView;
 
         this.treeEntry = null;
 
@@ -32,7 +32,7 @@ export default class ModelView {
     }
 
     getTabFrame() {
-        return this.workspaceUIView.getTabFrame();
+        return this.workspaceView.getTabFrame();
     }
 
     //================================
@@ -75,17 +75,17 @@ export default class ModelView {
         }
     }
 
-    onModelUpdated(workspaceUI) {
+    onModelUpdated(workspaceManager) {
 
         //TBD - should I change the local workspace UI object? I will want to if it is replaced at each update
         //then I might need to do more... (root folder update, etc)
 
         if((modelManager.fieldUpdated("name"))&&(this.treeEntry)) {
-            this.workspaceUIView.setName(model.getWorkspace().getName());
+            this.workspaceView.setName(model.getWorkspace().getName());
         }
     }
 
-    onModelClosed(workspaceUI) {
+    onModelClosed(workspace) {
         //we need to make sure the tab frame is cleared of anything the workspace put in it (soemthing else may be using it too)
     }
 
@@ -101,12 +101,12 @@ export default class ModelView {
 
     setViewJsonState(workspaceJson) { 
         let tabFrame = this.appView.getTabFrame();
-        let workspace = this.workspaceUI.getWorkspace();
+        let workspace = this.workspaceManager.getWorkspace();
         if(workspaceJson.openTabs) {
             workspaceJson.openTabs.map(memberName => {
                 var openTabMember = workspace.getMemberByFullName(memberName);
                 if(openTabMember) {
-                    var openTabComponent = this.workspaceUI.getComponent(openTabMember);
+                    var openTabComponent = this.workspaceManager.getComponent(openTabMember);
                     openTabComponent.createTabDisplay();
                 }
             });
@@ -123,11 +123,11 @@ export default class ModelView {
         let tabFrame = this.appView.getTabFrame();
         var openTabs = tabFrame.getOpenTabs();
         if(openTabs.length > 0) {
-            json.openTabs = openTabs.map(tabId => this.workspaceUI.getMemberNameFromId(tabId));
+            json.openTabs = openTabs.map(tabId => this.workspaceManager.getMemberNameFromId(tabId));
         }
         var activeTabId = tabFrame.getActiveTab();
         if(activeTabId) {
-            json.activeTabMember = this.workspaceUI.getMemberNameFromId(activeTabId);
+            json.activeTabMember = this.workspaceManager.getMemberNameFromId(activeTabId);
         }
     }
 

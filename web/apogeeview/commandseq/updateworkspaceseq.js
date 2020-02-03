@@ -24,9 +24,9 @@ const DIALOG_LAYOUT_SUBMIT_LINE = {
 //=====================================
 
 /** This method gets a callback to update the properties of a workspace. */
-export function updateWorkspaceProperties(workspaceUI) {
+export function updateWorkspaceProperties(workspaceManager) {
         
-    var workspace = workspaceUI.getWorkspace();
+    var workspace = workspaceManager.getWorkspace();
 
     //load initial values
     var initialValues = {};
@@ -68,7 +68,7 @@ export function updateWorkspaceProperties(workspaceUI) {
             commandData.updatedCoreProperties = {};
             commandData.updatedCoreProperties.name = newValues.name;
 
-            workspaceUI.getApp().executeCommand(commandData);
+            workspaceManager.getApp().executeCommand(commandData);
         }
 
         //return true to close the dialog

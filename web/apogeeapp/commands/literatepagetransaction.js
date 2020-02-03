@@ -15,7 +15,7 @@ let literatepagetransaction = {};
 // Command Object
 //=====================================
 
-literatepagetransaction.createUndoCommand = function(workspaceUI,commandData) {
+literatepagetransaction.createUndoCommand = function(workspaceManager,commandData) {
     
     if(commandData.undoSteps) {
         //temporary implementation
@@ -37,12 +37,12 @@ literatepagetransaction.createUndoCommand = function(workspaceUI,commandData) {
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-literatepagetransaction.executeCommand = function(workspaceUI,commandData) {
+literatepagetransaction.executeCommand = function(workspaceManager,commandData) {
     
     var error = false;
     var errorMsg;
     
-    let modelManager = workspaceUI.getModelManager();
+    let modelManager = workspaceManager.getModelManager();
     var workspace = modelManager.getWorkspace();
     //get the member
     var member = workspace.getMemberByFullName(commandData.memberFullName);   

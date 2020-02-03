@@ -33,8 +33,8 @@ export function initApogeeModule(apogee,apogeeapp,apogeeutil) {
     /** This is a simple google chart component. */
     GoogleChartComponent = class extends apogeeapp.BasicControlComponent {
         
-        constructor(workspaceUI,control) {
-            super(workspaceUI,control,GoogleChartComponent);
+        constructor(workspaceManager,control) {
+            super(workspaceManager,control,GoogleChartComponent);
 
             this.chartType = GoogleChartComponent.DEFAULT_CHART;
 

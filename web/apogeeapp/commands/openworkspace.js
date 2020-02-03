@@ -1,6 +1,6 @@
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 import Apogee from "/apogeeapp/Apogee.js";
-import WorkspaceUI from "/apogeeapp/WorkspaceUI.js";
+import WorkspaceManager from "/apogeeapp/WorkspaceManager.js";
 
 /** Open Workspace Command
  *
@@ -18,9 +18,9 @@ let openworkspace = {};
 //=====================================
 
 //NO UNDO FOR OPEN WORKSPACE
-//openworkspace.createUndoCommand = function(workspaceUI,commandData) {
+//openworkspace.createUndoCommand = function(workspaceManager,commandData) {
 
-openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComplete) {
+openworkspace.executeCommand = function(nullWorkspaceManager,commandData,asynchOnComplete) {
         //app,workspaceText,fileMetadata) {
     var synchCommandResult = {};
     
@@ -30,16 +30,16 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
 
         //create the workspace UI (this does not create several child objects in it)
         var app = Apogee.getInstance();
-        var workspaceUI = new WorkspaceUI(app);
-        synchCommandResult.target = workspaceUI;
+        var workspaceManager = new WorkspaceManager(app);
+        synchCommandResult.target = workspaceManager;
         synchCommandResult.parent = app;
         synchCommandResult.action = "created";
 
-        workspaceUI.setFileMetadata(commandData.fileMetadata);
+        workspaceManager.setFileMetadata(commandData.fileMetadata);
 
         //open the reference entries - this has a synch and asynch part.
         var referencesJson = commandData.workspaceJson.references;
-        let referenceManager = workspaceUI.getReferenceManager();
+        let referenceManager = workspaceManager.getReferenceManager();
         var {entriesCommandResultList, openEntriesPromise} = referenceManager.openReferenceEntries(referencesJson);
         //save the entries create results to the synchronous command result
         synchCommandResult.childCommandResults = entriesCommandResultList;
@@ -53,7 +53,7 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
     	
         //if we have to load links wait for them to load
 		var doWorkspaceLoad = function() {
-            let asynchCommandResult = workspaceUI.load(commandData.workspaceJson);
+            let asynchCommandResult = workspaceManager.load(commandData.workspaceJson);
             if(asynchOnComplete) {
                 asynchOnComplete(asynchCommandResult);
             }
@@ -67,7 +67,7 @@ openworkspace.executeCommand = function(nullWorkspaceUI,commandData,asynchOnComp
             let asynchCommandResult = {};
             asynchCommandResult.alertMsg = "Error loading workspace: " + errorMsg;
             asynchCommandResult.cmdDone = false;
-            asynchCommandResult.target = workspaceUI;
+            asynchCommandResult.target = workspaceManager;
             asynchCommandResult.action = "updated";
             
             if(asynchOnComplete) {

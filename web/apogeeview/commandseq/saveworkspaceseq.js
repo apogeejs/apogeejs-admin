@@ -6,13 +6,13 @@
 
 export function saveWorkspace(app,fileAccessObject,doDirectSave) {
 
-    var activeWorkspaceUI = app.getWorkspaceUI();
+    var activeWorkspaceManager = app.getWorkspaceManager();
     var workspaceText;
     var fileMetadata;
-    if(activeWorkspaceUI) {
-        var workspaceJson = activeWorkspaceUI.toJson();
+    if(activeWorkspaceManager) {
+        var workspaceJson = activeWorkspaceManager.toJson();
         workspaceText = JSON.stringify(workspaceJson);
-        fileMetadata = activeWorkspaceUI.getFileMetadata();
+        fileMetadata = activeWorkspaceManager.getFileMetadata();
     }
     else {
         alert("There is no workspace open.");
@@ -21,9 +21,9 @@ export function saveWorkspace(app,fileAccessObject,doDirectSave) {
 
     //clear workspace dirty flag on completion of save
     var onSaveSuccess = (updatedFileMetadata) => {
-        var workspaceUI = app.getWorkspaceUI();
-        workspaceUI.setFileMetadata(updatedFileMetadata);
-        workspaceUI.clearIsDirty();
+        var workspaceManager = app.getWorkspaceManager();
+        workspaceManager.setFileMetadata(updatedFileMetadata);
+        workspaceManager.clearIsDirty();
     }
 
     if((!doDirectSave)||(!fileMetadata)||(!fileMetadata.directSaveOk)) {

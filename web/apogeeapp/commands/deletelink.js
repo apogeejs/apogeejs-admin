@@ -15,11 +15,11 @@ let deletelink = {};
 // Command Object
 //=====================================
 
-deletelink.createUndoCommand = function(workspaceUI,commandData) {
+deletelink.createUndoCommand = function(workspaceManager,commandData) {
     
     var nickname;
 
-    var referenceManager = workspaceUI.getReferenceManager();
+    var referenceManager = workspaceManager.getReferenceManager();
     var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.url);
     
     if(referenceEntry) nickname = referenceEntry.getNickname();
@@ -33,12 +33,12 @@ deletelink.createUndoCommand = function(workspaceUI,commandData) {
     return undoCommandJson;
 }
 
-deletelink.executeCommand = function(workspaceUI,commandData) {
+deletelink.executeCommand = function(workspaceManager,commandData) {
     
     var commandResult;
 
     try {
-        var referenceManager = workspaceUI.getReferenceManager();
+        var referenceManager = workspaceManager.getReferenceManager();
         
         //lookup entry for this reference
         var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.url);

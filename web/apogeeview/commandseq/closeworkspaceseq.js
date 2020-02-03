@@ -6,14 +6,14 @@
 
 export function closeWorkspace(app) {
     
-    var activeWorkspaceUI = app.getWorkspaceUI();
-    if(activeWorkspaceUI === null) {
+    var activeWorkspaceManager = app.getWorkspaceManager();
+    if(activeWorkspaceManager === null) {
         alert("There is no workspace close.");
         return;
     }
 
     //
-    if(activeWorkspaceUI.getIsDirty()) {
+    if(activeWorkspaceManager.getIsDirty()) {
         var doClose = confirm("There is unsaved data. Are you sure you want to close the workspace?");
         if(!doClose) {
             return;

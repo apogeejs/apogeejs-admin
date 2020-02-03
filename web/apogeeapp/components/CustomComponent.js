@@ -363,7 +363,7 @@ CustomComponent.propertyDialogLines = [
  */ 
 let customComponentUpdateData = {};
 
-customComponentUpdateData.createUndoCommand = function(workspaceUI,commandData) {
+customComponentUpdateData.createUndoCommand = function(workspaceManager,commandData) {
     let undoCommandData = {};
     undoCommandData.memberFullName = commandData.memberFullName;
     undoCommandData.targetFields = commandData.initialFields;
@@ -371,8 +371,8 @@ customComponentUpdateData.createUndoCommand = function(workspaceUI,commandData) 
     return undoCommandData;
 }
 
-customComponentUpdateData.executeCommand = function(workspaceUI,commandData) {
-    let modelManager = workspaceUI.getModelManager();
+customComponentUpdateData.executeCommand = function(workspaceManager,commandData) {
+    let modelManager = workspaceManager.getModelManager();
     let component = modelManager.getComponentByFullName(commandData.memberFullName);
     var commandResult = {};
     if(component) {

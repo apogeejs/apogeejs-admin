@@ -13,7 +13,7 @@ import SplitPane from "/apogeeui/splitpane/SplitPane.js";
 import TreeControl from "/apogeeui/treecontrol/TreeControl.js";
 import DisplayAndHeader from "/apogeeui/displayandheader/DisplayAndHeader.js";
 
-import WorkspaceUIView from "/apogeeview/WorkspaceUIView.js";
+import WorkspaceView from "/apogeeview/WorkspaceView.js";
 
 import "/apogeeui/configurablepanel/ConfigurablePanelInit.js";
 import Apogee from "/apogeeapp/Apogee.js";
@@ -58,15 +58,15 @@ export default class ApogeeView {
         }
     }
 
-    onWorkspaceCreated(workspaceUI) {
+    onWorkspaceCreated(workspaceManager) {
 
-        if(this.workspaceUIView != null) {
+        if(this.workspaceView != null) {
             //discard an old view if there is one
             this.onWorkspaceClosed();
         }
 
         //create the new workspace view
-        this.workspaceView = new WorkspaceUIView(workspaceUI,this);
+        this.workspaceView = new WorkspaceView(workspaceManager,this);
 
         //load the tree entry
         let treeEntry = this.workspaceView.getTreeEntry();
@@ -75,9 +75,9 @@ export default class ApogeeView {
 
     onWorkspaceClosed() {
         //close any old workspace view
-        if(this.workspaceUIView) {
-            this.workspaceUIView.close();
-            this.workspaceUIView = null;
+        if(this.workspaceView) {
+            this.workspaceView.close();
+            this.workspaceView = null;
         }
 
         //clear the tree
@@ -158,10 +158,10 @@ export default class ApogeeView {
     }
 
     onTabShown(tab) {
-        let workspaceUI = this.app.getWorkspaceUI();
-        if(!workspaceUI) return;
+        let workspaceManager = this.app.getWorkspaceManager();
+        if(!workspaceManager) return;
 
-        let modelManager = workspaceUI.getModelManager();
+        let modelManager = workspaceManager.getModelManager();
         
         var id = tab.getId();
         var component = modelManager.getComponentById(id);
@@ -300,9 +300,9 @@ export default class ApogeeView {
         menuItem.callback = () => openWorkspace(this.app,fileAccessObject);
         menuItems.push(menuItem);
 
-        let workspaceUI = this.app.getWorkspaceUI();
-        if(workspaceUI) {
-            var fileMetadata = workspaceUI.getFileMetadata();
+        let workspaceManager = this.app.getWorkspaceManager();
+        if(workspaceManager) {
+            var fileMetadata = workspaceManager.getFileMetadata();
 
             if(fileAccessObject.directSaveOk(fileMetadata)) {
                 menuItem = {};

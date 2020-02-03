@@ -6,13 +6,13 @@ import ReferenceView from "/apogeeview/references/ReferenceView.js";
 import ModelView from "/apogeeview/ModelView.js";
 
 /** This class manages the user interface for a workspace object. */
-export default class WorkspaceUIView {
+export default class WorkspaceView {
 
-    constructor(workspaceUI,appView) {
+    constructor(workspaceManager,appView) {
 
         //yes these
-        this.workspaceUI = workspaceUI;
-        this.app = workspaceUI.getApp();
+        this.workspaceManager = workspaceManager;
+        this.app = workspaceManager.getApp();
         this.appView = appView;
 
         this.treeEntry = null;
@@ -42,12 +42,12 @@ export default class WorkspaceUIView {
 
     setViewJsonState(workspaceJson) { 
         let tabFrame = this.appView.getTabFrame();
-        let workspace = this.workspaceUI.getWorkspace();
+        let workspace = this.workspaceManager.getWorkspace();
         if(workspaceJson.openTabs) {
             workspaceJson.openTabs.map(memberName => {
                 var openTabMember = workspace.getMemberByFullName(memberName);
                 if(openTabMember) {
-                    var openTabComponent = this.workspaceUI.getComponent(openTabMember);
+                    var openTabComponent = this.workspaceManager.getComponent(openTabMember);
                     openTabComponent.createTabDisplay();
                 }
             });
@@ -64,11 +64,11 @@ export default class WorkspaceUIView {
         let tabFrame = this.appView.getTabFrame();
         var openTabs = tabFrame.getOpenTabs();
         if(openTabs.length > 0) {
-            json.openTabs = openTabs.map(tabId => this.workspaceUI.getMemberNameFromId(tabId));
+            json.openTabs = openTabs.map(tabId => this.workspaceManager.getMemberNameFromId(tabId));
         }
         var activeTabId = tabFrame.getActiveTab();
         if(activeTabId) {
-            json.activeTabMember = this.workspaceUI.getMemberNameFromId(activeTabId);
+            json.activeTabMember = this.workspaceManager.getMemberNameFromId(activeTabId);
         }
     }
 
@@ -89,19 +89,19 @@ export default class WorkspaceUIView {
         this.treeEntry.setState(TreeEntry.EXPANDED);
 
         //model manager
-        this.modelView = new ModelView(this,this.workspaceUI.getModelManager());
+        this.modelView = new ModelView(this,this.workspaceManager.getModelManager());
         let modelTreeEntry = this.modelView.getTreeEntry();
         this.treeEntry.addChild(modelTreeEntry);
 
         //reference mamageger
-        this.referenceView = new ReferenceView(this.app,this.workspaceUI.getReferenceManager());
+        this.referenceView = new ReferenceView(this.app,this.workspaceManager.getReferenceManager());
         let refTreeEntry = this.referenceView.getTreeEntry();
         this.treeEntry.addChild(refTreeEntry);
     }
 
     createTreeEntry() {
         //generally we expct the workspace not to exist yet. We will update this when it opens.
-        let modelManager = this.workspaceUI.getModelManager();
+        let modelManager = this.workspaceManager.getModelManager();
         let workspace = modelManager.getWorkspace();
         var labelText = workspace ? workspace.getName() : WORKSPACE_OPENING_NAME; //add the name
         var iconUrl = this.getIconUrl();
@@ -112,7 +112,7 @@ export default class WorkspaceUIView {
 
     /** This method returns the icon url for the component. */
     getIconUrl() {
-        return apogeeui.getResourcePath(WorkspaceUIView.ICON_RES_PATH);
+        return apogeeui.getResourcePath(WorkspaceView.ICON_RES_PATH);
     }
 
     getMenuItems() {
@@ -139,4 +139,4 @@ export default class WorkspaceUIView {
 
 let WORKSPACE_OPENING_NAME = "opening...";
 
-WorkspaceUIView.ICON_RES_PATH = "/componentIcons/workspace.png";   
+WorkspaceView.ICON_RES_PATH = "/componentIcons/workspace.png";   

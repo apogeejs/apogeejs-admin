@@ -5,13 +5,13 @@
 export function deleteComponent(component) {
 
     //get the active workspace
-    var workspaceUI = component.getWorkspaceUI();
-    if(!workspaceUI) {
+    var workspaceManager = component.getWorkspaceManager();
+    if(!workspaceManager) {
         alert("There is no open workspace.");
         return;
     }     
 
-    var modelManager = workspaceUI.getModelManager();
+    var modelManager = workspaceManager.getModelManager();
 
     var doDelete = confirm("Are you sure you want to delete this object?");
     if(!doDelete) {
@@ -52,5 +52,5 @@ export function deleteComponent(component) {
         return;
     }
 
-    workspaceUI.getApp().executeCommand(commandData);
+    workspaceManager.getApp().executeCommand(commandData);
 }

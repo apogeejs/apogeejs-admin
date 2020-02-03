@@ -18,13 +18,13 @@ import {showSelectComponentDialog} from "/apogeeview/dialogs/SelectControlDialog
 export function addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
 
         //get the active workspace
-        var workspaceUI = app.getWorkspaceUI();
-        if(!workspaceUI) {
+        var workspaceManager = app.getWorkspaceManager();
+        if(!workspaceManager) {
             alert("There is no open workspace.");
             return;
         }     
 
-        var modelManager = workspaceUI.getModelManager();
+        var modelManager = workspaceManager.getModelManager();
         if(!modelManager) {
             alert("The workspace has not been loaded yet.");
             return;

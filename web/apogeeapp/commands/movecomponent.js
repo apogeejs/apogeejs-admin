@@ -11,8 +11,8 @@ let movecomponent = {};
 
 /** This creates the command. Both the initial and full names should be passed in 
  * even is they are the same. */
-movecomponent.createUndoCommand = function(workspaceUI,commandData) {
-    let modelManager = workspaceUI.getModelManager();
+movecomponent.createUndoCommand = function(workspaceManager,commandData) {
+    let modelManager = workspaceManager.getModelManager();
     var workspace = modelManager.getWorkspace();
     var member = workspace.getMemberByFullName(commandData.memberFullName);
     var parent = member.getParent();
@@ -31,9 +31,9 @@ movecomponent.createUndoCommand = function(workspaceUI,commandData) {
     return undoCommandJson;
 }
 
-movecomponent.executeCommand = function(workspaceUI,commandData) {
+movecomponent.executeCommand = function(workspaceManager,commandData) {
     
-    let modelManager = workspaceUI.getModelManager();
+    let modelManager = workspaceManager.getModelManager();
     var workspace = modelManager.getWorkspace();
 
     var actionData = {};

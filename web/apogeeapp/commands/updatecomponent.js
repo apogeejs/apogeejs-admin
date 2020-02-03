@@ -18,8 +18,8 @@ let updatecomponent = {};
 // Command Object
 //=====================================
 
-updatecomponent.createUndoCommand = function(workspaceUI,commandData) {
-    let modelManager = workspaceUI.getModelManager();
+updatecomponent.createUndoCommand = function(workspaceManager,commandData) {
+    let modelManager = workspaceManager.getModelManager();
     let workspace = modelManager.getWorkspace();
     var member = workspace.getMemberByFullName(commandData.memberFullName);
     var component = memberManager.getComponent(member);
@@ -59,9 +59,9 @@ updatecomponent.createUndoCommand = function(workspaceUI,commandData) {
 /** This method is used for updating property values from the property dialog. 
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
-updatecomponent.executeCommand = function(workspaceUI,commandData) {
+updatecomponent.executeCommand = function(workspaceManager,commandData) {
     
-    let modelManager = workspaceUI.getModelManager();
+    let modelManager = workspaceManager.getModelManager();
     let workspace = modelManager.getWorkspace();
     //get the member
     var member = workspace.getMemberByFullName(commandData.memberFullName);   

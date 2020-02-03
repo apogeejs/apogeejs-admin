@@ -19,11 +19,11 @@ let compoundsavememberdata = {};
 // Action
 //=====================================
 
-compoundsavememberdata.createUndoCommand = function(workspaceUI,commandData) {
+compoundsavememberdata.createUndoCommand = function(workspaceManager,commandData) {
     var undoCommandJson = {};
     undoCommandJson.type = compoundsavememberdata.commandInfo.type;
     
-    let modelManager = workspaceUI.getModelManager();
+    let modelManager = workspaceManager.getModelManager();
     var workspace = modelManager.getWorkspace();
     
     alert("FIX THIS! needs to be implmeneted correctly");
@@ -48,9 +48,9 @@ compoundsavememberdata.createUndoCommand = function(workspaceUI,commandData) {
     return undoCommandJson;
 }
 
-compoundsavememberdata.executeCommand = function(workspaceUI,commandData,asynchOnComplete) {
+compoundsavememberdata.executeCommand = function(workspaceManager,commandData,asynchOnComplete) {
     
-    var modelManager = workspaceUI.getModelManager();
+    var modelManager = workspaceManager.getModelManager();
     var workspace = modelManager.getWorkspace();
     
     //make the action list

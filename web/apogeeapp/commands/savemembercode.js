@@ -22,16 +22,16 @@ let savemembercode = {};
 // Action
 //=====================================
 
-savemembercode.createUndoCommand = function(workspaceUI,commandData) {
-    let modelManager = workspaceUI.getModelManager();
+savemembercode.createUndoCommand = function(workspaceManager,commandData) {
+    let modelManager = workspaceManager.getModelManager();
     let workspace = modelManager.getWorkspace();
     var undoCommandJson = getMemberStateUndoCommand(workspace,commandData.memberFullName); 
     return undoCommandJson;
 }
 
-savemembercode.executeCommand = function(workspaceUI,commandData) {
+savemembercode.executeCommand = function(workspaceManager,commandData) {
     
-    let modelManager = workspaceUI.getModelManager();
+    let modelManager = workspaceManager.getModelManager();
     let workspace = modelManager.getWorkspace();
     
     var actionData = getSetCodeAction(workspace,

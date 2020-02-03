@@ -18,7 +18,7 @@ import CommandHistory from "./CommandHistory.js";
  * }
  * 
  * Command Object - Should be registered with "registerFunction". It should contain the following things:
- * - function executeCommand(workspaceUI,commandData,optionalAsynchOnComplete) = This exectues the command and return a commandResult object.
+ * - function executeCommand(workspaceManager,commandData,optionalAsynchOnComplete) = This exectues the command and return a commandResult object.
  * - function createUnfoCommand(workspceUI,commandData) - This creates an undo command json from the given command json.
  * - object commandInfo - This is metadata for the command:
  *      - type - A string giving the name of the command type
@@ -56,7 +56,7 @@ export default class CommandManager {
      * undo commands/redo commands.
     */
     executeCommand(command,suppressFromHistory) {
-        var workspaceUI = this.app.getWorkspaceUI();
+        var workspaceManager = this.app.getWorkspaceManager();
         let commandResult;
         
         var commandObject = CommandManager.getCommandObject(command.type);
@@ -73,14 +73,14 @@ export default class CommandManager {
 
             //create undo command before doing command (since it may depend on current state)
             if((!suppressFromHistory)&&(commandObject.createUndoCommand)) {   
-                undoCommand = commandObject.createUndoCommand(workspaceUI,command);  
+                undoCommand = commandObject.createUndoCommand(workspaceManager,command);  
             }
 
             //read the desrition (this needs to be improved)
             description = commandObject.commandInfo.type;
 
             try {
-                commandResult = commandObject.executeCommand(workspaceUI,command,asynchOnComplete);
+                commandResult = commandObject.executeCommand(workspaceManager,command,asynchOnComplete);
             }
             catch(error) {
                 if(error.stack) console.error(error.stack);
@@ -270,7 +270,7 @@ export default class CommandManager {
     }
     
     /** This registers a command. The command object should hold two functions,
-     * executeCommand(workspaceUI,commandData,optionalAsynchOnComplete) and, if applicable, createUndoCommand(workspaceUI,commandData)
+     * executeCommand(workspaceManager,commandData,optionalAsynchOnComplete) and, if applicable, createUndoCommand(workspaceManager,commandData)
      * and it should have the metadata commandInfo.
      */
     static registerCommand(commandObject) {

@@ -8,13 +8,13 @@ let deletecomponent = {};
 // Command Object
 //=====================================
 
-deletecomponent.createUndoCommand = function(workspaceUI,commandData) {
+deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
     
     //problems
     // - is this member a component main member?
     // - is there a parent, or just an owner
     
-    let modelManager = workspaceUI.getModelManager();
+    let modelManager = workspaceManager.getModelManager();
     var workspace = modelManager.getWorkspace();
     var member = workspace.getMemberByFullName(commandData.memberFullName);
     var component = modelManager.getComponent(member);
@@ -33,9 +33,9 @@ deletecomponent.createUndoCommand = function(workspaceUI,commandData) {
  *  the workspace and the member full name. (We delete by name and workspace to handle
  *  undo/redo cases where the instance of the member changes.)
  */
-deletecomponent.executeCommand = function(workspaceUI,commandData) {
+deletecomponent.executeCommand = function(workspaceManager,commandData) {
     
-    let modelManager = workspaceUI.getModelManager();
+    let modelManager = workspaceManager.getModelManager();
     var workspace = modelManager.getWorkspace();
 
     var actionJson = {};
@@ -66,7 +66,7 @@ function _fillInCommandResults(modelManager,actionResult,commandResult) {
     commandResult.action = "deleted";
     
     if(actionResult.childActionResults) {
-        commandResult.childCommandResults = actionResults.childActionResults.map( actionResult => _cillInCommandResults(workspaceUI,actionResult))
+        commandResult.childCommandResults = actionResults.childActionResults.map( actionResult => _fillInCommandResults(workspaceManager,actionResult))
     }
 
     return commandResult;

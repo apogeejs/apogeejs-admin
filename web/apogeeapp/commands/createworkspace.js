@@ -1,6 +1,6 @@
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 import Apogee from "/apogeeapp/Apogee.js";
-import WorkspaceUI from "/apogeeapp/WorkspaceUI.js";
+import WorkspaceManager from "/apogeeapp/WorkspaceManager.js";
 
 /** Create Workspace Command
  *
@@ -16,10 +16,10 @@ let createworkspace = {};
 //=====================================
 
 //NO UNDO FOR CREATE WORKSPACE
-//createworkspace.createUndoCommand = function(workspaceUI,commandData) {
+//createworkspace.createUndoCommand = function(workspaceManager,commandData) {
 
 /** Workspace UI parameter is not applicable. */
-createworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData) {
+createworkspace.executeCommand = function(unpopulatedWorkspaceManager,commandData) {
 
     var commandResult = {};
     
@@ -27,13 +27,13 @@ createworkspace.executeCommand = function(unpopulatedWorkspaceUI,commandData) {
         
         //make the workspace ui
         let app = Apogee.getInstance();
-        var workspaceUI = new WorkspaceUI(app);
-        commandResult.target = workspaceUI;
+        var workspaceManager = new WorkspaceManager(app);
+        commandResult.target = workspaceManager;
         commandResult.parent = app;
         commandResult.action = "created";
         
         //load
-        let childCommandResult = workspaceUI.load(commandData.workspaceJson);
+        let childCommandResult = workspaceManager.load(commandData.workspaceJson);
         commandResult.childCommandResults = [childCommandResult];
         
         commandResult.cmdDone = true;

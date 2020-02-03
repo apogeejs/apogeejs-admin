@@ -9,7 +9,7 @@ import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
  export function importWorkspace(app,fileAccessObject,componentGenerator) {
 
     //make sure there is not an open workspace
-    if(!app.getWorkspaceUI()) {
+    if(!app.getWorkspaceManager()) {
         alert("There must be an open workspace to import a workspace.");
         return false;
     }    
@@ -42,7 +42,7 @@ function openWorkspace(app,componentGenerator,workspaceText,fileMetadata) {
     
     try {
         //make sure there is not an open workspace
-        var workspaceUI = app.getWorkspaceUI();
+        var workspaceManager = app.getWorkspaceManager();
         
         //parse the workspace json
         var workspaceJson = JSON.parse(workspaceText);
@@ -50,7 +50,7 @@ function openWorkspace(app,componentGenerator,workspaceText,fileMetadata) {
 //I should verify the file type and format!  
 
         var referencesJson = workspaceJson.references;
-        var loadReferencesPromise = workspaceUI.getLoadReferencesPromise(referencesJson);
+        var loadReferencesPromise = workspaceManager.getLoadReferencesPromise(referencesJson);
     	
 		//if we have to load links wait for them to load
         //for initial properties take the workspace name as the object name

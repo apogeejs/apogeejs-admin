@@ -416,7 +416,7 @@ CustomDataComponent.TABLE_EDIT_SETTINGS = {
  */ 
 let customDataComponentUpdateData = {};
 
-customDataComponentUpdateData.createUndoCommand = function(workspaceUI,commandData) {
+customDataComponentUpdateData.createUndoCommand = function(workspaceManager,commandData) {
    let undoCommandData = {};
    undoCommandData.memberFullName = commandData.memberFullName;
    undoCommandData.targetFields = commandData.initialFields;
@@ -424,8 +424,8 @@ customDataComponentUpdateData.createUndoCommand = function(workspaceUI,commandDa
    return undoCommandData;
 }
 
-customDataComponentUpdateData.executeCommand = function(workspaceUI,commandData,) {
-   let modelManager = workspaceUI.getModelManager();
+customDataComponentUpdateData.executeCommand = function(workspaceManager,commandData,) {
+   let modelManager = workspaceManager.getModelManager();
    let component = modelManager.getComponentByFullName(commandData.memberFullName);
    var commandResult = {};
    if(component) {
