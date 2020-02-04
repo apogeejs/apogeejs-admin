@@ -1,5 +1,5 @@
 import base from "/apogeeutil/base.js";
-import Workspace from "/apogee/data/Workspace.js";
+import Model from "/apogee/data/Model.js";
 import Member from "/apogee/datacomponents/Member.js";
 
 /** This class encapsulatees a table with no specific functionality. It
@@ -60,7 +60,7 @@ ErrorTable.fromJson = function(owner,json) {
 //------------------------------
 
 /** This method udpates the dependencies if needed because
- *a variable was added or removed from the workspace.  */
+ *a variable was added or removed from the model.  */
 ErrorTable.prototype.updateDependeciesForModelChange = function(object) {
     //no action
 }
@@ -89,4 +89,4 @@ ErrorTable.generator.createMember = ErrorTable.fromJson;
 ErrorTable.generator.setDataOk = false;
 
 //register this member
-Workspace.addMemberGenerator(ErrorTable.generator);
+Model.addMemberGenerator(ErrorTable.generator);

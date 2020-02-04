@@ -15,8 +15,8 @@ deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
     // - is there a parent, or just an owner
     
     let modelManager = workspaceManager.getModelManager();
-    var workspace = modelManager.getWorkspace();
-    var member = workspace.getMemberByFullName(commandData.memberFullName);
+    var model = modelManager.getModel();
+    var member = model.getMemberByFullName(commandData.memberFullName);
     var component = modelManager.getComponent(member);
     var parent = member.getParent();
     
@@ -30,19 +30,19 @@ deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
 }
 
 /** This method deletes the component and the underlying member. It should be passed
- *  the workspace and the member full name. (We delete by name and workspace to handle
+ *  the model and the member full name. (We delete by name and model to handle
  *  undo/redo cases where the instance of the member changes.)
  */
 deletecomponent.executeCommand = function(workspaceManager,commandData) {
     
     let modelManager = workspaceManager.getModelManager();
-    var workspace = modelManager.getWorkspace();
+    var model = modelManager.getModel();
 
     var actionJson = {};
     actionJson.action = "deleteMember";
     actionJson.memberName = commandData.memberFullName;
     
-    var actionResult = doAction(workspace,actionJson);
+    var actionResult = doAction(model,actionJson);
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;

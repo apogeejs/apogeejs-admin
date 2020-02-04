@@ -1,6 +1,6 @@
 import base from "/apogeeutil/base.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import Workspace from "/apogee/data/Workspace.js";
+import Model from "/apogee/data/Model.js";
 import Member from "/apogee/datacomponents/Member.js";
 import Dependent from "/apogee/datacomponents/Dependent.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
@@ -116,4 +116,4 @@ JsonTable.generator.setDataOk = true;
 JsonTable.generator.setCodeOk = true;
 
 //register this member
-Workspace.addMemberGenerator(JsonTable.generator);
+Model.addMemberGenerator(JsonTable.generator);

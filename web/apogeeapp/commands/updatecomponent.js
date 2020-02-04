@@ -20,8 +20,8 @@ let updatecomponent = {};
 
 updatecomponent.createUndoCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
-    let workspace = modelManager.getWorkspace();
-    var member = workspace.getMemberByFullName(commandData.memberFullName);
+    let model = modelManager.getModel();
+    var member = model.getMemberByFullName(commandData.memberFullName);
     var component = memberManager.getComponent(member);
     
 
@@ -62,9 +62,9 @@ updatecomponent.createUndoCommand = function(workspaceManager,commandData) {
 updatecomponent.executeCommand = function(workspaceManager,commandData) {
     
     let modelManager = workspaceManager.getModelManager();
-    let workspace = modelManager.getWorkspace();
+    let model = modelManager.getModel();
     //get the member
-    var member = workspace.getMemberByFullName(commandData.memberFullName);   
+    var member = model.getMemberByFullName(commandData.memberFullName);   
     var component = modelManager.getComponent(member);
     
     var error = false;
@@ -75,7 +75,7 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     if(memberGenerator.getPropertyUpdateAction) {
         var actionData = memberGenerator.getPropertyUpdateAction(member,commandData.updatedMemberProperties);  
         if(actionData) {
-            var actionResult = doAction(workspace,actionData);
+            var actionResult = doAction(model,actionData);
             
             if(!actionResult.actionDone) {
                 error = true;

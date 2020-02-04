@@ -8,9 +8,9 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 /** This method can be called to create a undo function to return a member to the current state
  * following a code or data update. */
-export function getMemberStateUndoCommand(workspace, memberFullName) {
+export function getMemberStateUndoCommand(model, memberFullName) {
     
-    var member = workspace.getMemberByFullName(memberFullName);
+    var member = model.getMemberByFullName(memberFullName);
     var command = {};
     
     if((member.isCodeable)&&(member.hasCode())) {
@@ -52,7 +52,7 @@ export function getMemberStateUndoCommand(workspace, memberFullName) {
 
 
 /** @private */
-export function getSaveDataAction(workspace,memberFullName,data,asynchOnComplete) {
+export function getSaveDataAction(model,memberFullName,data,asynchOnComplete) {
 
     var actionData = {};
     actionData.action = "updateData";
@@ -74,7 +74,7 @@ export function getSaveDataAction(workspace,memberFullName,data,asynchOnComplete
     return actionData;
 }
 
-export function getSetCodeAction(workspace,memberFullName,argList,functionBody,supplementalCode,optionalClearCodeDataValue) {
+export function getSetCodeAction(model,memberFullName,argList,functionBody,supplementalCode,optionalClearCodeDataValue) {
      
     var actionData = {};
 

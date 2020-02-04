@@ -42,17 +42,18 @@ export default class WorkspaceView {
 
     setViewJsonState(workspaceJson) { 
         let tabFrame = this.appView.getTabFrame();
-        let workspace = this.workspaceManager.getWorkspace();
+        let modelManager = this.workspaceManager.getModelManager();
+        let model = modelManager.getModel();
         if(workspaceJson.openTabs) {
             workspaceJson.openTabs.map(memberName => {
-                var openTabMember = workspace.getMemberByFullName(memberName);
+                var openTabMember = model.getMemberByFullName(memberName);
                 if(openTabMember) {
-                    var openTabComponent = this.workspaceManager.getComponent(openTabMember);
+                    var openTabComponent = this.nodelManager.getComponent(openTabMember);
                     openTabComponent.createTabDisplay();
                 }
             });
             if(workspaceJson.activeTabMember) {
-                var activeTabMember = workspace.getMemberByFullName(workspaceJson.activeTabMember);
+                var activeTabMember = model.getMemberByFullName(workspaceJson.activeTabMember);
                 if(activeTabMember) {
                     tabFrame.setActiveTab(activeTabMember.getId());
                 }
@@ -64,11 +65,11 @@ export default class WorkspaceView {
         let tabFrame = this.appView.getTabFrame();
         var openTabs = tabFrame.getOpenTabs();
         if(openTabs.length > 0) {
-            json.openTabs = openTabs.map(tabId => this.workspaceManager.getMemberNameFromId(tabId));
+            json.openTabs = openTabs.map(tabId => this.modelManager.getMemberNameFromId(tabId));
         }
         var activeTabId = tabFrame.getActiveTab();
         if(activeTabId) {
-            json.activeTabMember = this.workspaceManager.getMemberNameFromId(activeTabId);
+            json.activeTabMember = this.modelManager.getMemberNameFromId(activeTabId);
         }
     }
 
@@ -102,8 +103,8 @@ export default class WorkspaceView {
     createTreeEntry() {
         //generally we expct the workspace not to exist yet. We will update this when it opens.
         let modelManager = this.workspaceManager.getModelManager();
-        let workspace = modelManager.getWorkspace();
-        var labelText = workspace ? workspace.getName() : WORKSPACE_OPENING_NAME; //add the name
+        let model = modelManager.getModel();
+        var labelText = model ? model.getName() : Workspace_OPENING_NAME; //add the name
         var iconUrl = this.getIconUrl();
         var menuItemCallback = () => this.getMenuItems();
         var isRoot = true;
@@ -137,6 +138,6 @@ export default class WorkspaceView {
 
 }
 
-let WORKSPACE_OPENING_NAME = "opening...";
+let Workspace_OPENING_NAME = "opening...";
 
 WorkspaceView.ICON_RES_PATH = "/componentIcons/workspace.png";   

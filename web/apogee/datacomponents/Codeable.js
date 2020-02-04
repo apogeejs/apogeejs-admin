@@ -1,6 +1,6 @@
 import base from "/apogeeutil/base.js";
 import Messenger from "/apogee/actions/Messenger.js";
-import {addToRecalculateList} from "/apogee/lib/workspaceCalculation.js";
+import {addToRecalculateList} from "/apogee/lib/modelCalculation.js";
 import {processCode} from "/apogee/lib/codeCompiler.js"; 
 import {getDependencyInfo} from "/apogee/lib/codeDependencies.js";
 import ActionError from "/apogee/lib/ActionError.js";

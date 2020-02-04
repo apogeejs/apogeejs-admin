@@ -8,7 +8,7 @@ export default class UiCommandMessenger {
     
     constructor(app,fromMember) {
         this.app = app;
-        this.workspace = fromMember.getWorkspace();
+        this.model = fromMember.getModel();
         this.contextManager = fromMember.getContextManager();
         this.fromMember = fromMember;
     }

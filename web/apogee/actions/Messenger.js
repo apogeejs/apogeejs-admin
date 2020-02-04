@@ -5,7 +5,7 @@ import {doAction} from "/apogee/actions/action.js";
 export default class Messenger {
     
     constructor(fromMember) {
-        this.workspace = fromMember.getWorkspace();
+        this.model = fromMember.getModel();
         this.contextManager = fromMember.getContextManager();
         this.fromMember = fromMember;
     }
@@ -41,7 +41,7 @@ export default class Messenger {
         }
         
         //return is handled above asynchronously
-        doAction(this.workspace,actionData);
+        doAction(this.model,actionData);
     }
 
     /** This is similar to dataUpdate except is allows multiple values to be set.
@@ -84,7 +84,7 @@ export default class Messenger {
         }
         
         //return is handled above asynchronously
-        doAction(this.workspace,actionData);
+        doAction(this.model,actionData);
     }
     
     //=====================

@@ -1,6 +1,6 @@
 import base from "/apogeeutil/base.js";
 import {doAction} from "/apogee/actions/action.js";
-import Workspace from "/apogee/data/Workspace.js";
+import Model from "/apogee/data/Model.js";
 import ActionError from "/apogee/lib/ActionError.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
 import Member from "/apogee/datacomponents/Member.js";
@@ -72,7 +72,7 @@ FolderFunction.prototype.getArgList = function() {
 // Member Methods
 //------------------------------
 
-/** This method removes any data from this workspace on closing. */
+/** This method removes any data from this model on closing. */
 FolderFunction.prototype.close = function() {
     this.internalFolder.onClose();
 }
@@ -240,8 +240,8 @@ FolderFunction.prototype.setArgList = function(argList) {
  * @private */
 FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErrors) {
 
-    //create a copy of the workspace to do the function calculation - we don't update the UI display version
-    var virtualWorkspace;
+    //create a copy of the model to do the function calculation - we don't update the UI display version
+    var virtualModel;
     var rootFolder;
     var inputElementArray;
     var returnValueTable; 
@@ -252,16 +252,16 @@ FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErro
     var folderFunctionFunction = function(args) {
         
         if(!initialized) {
-            //create a copy of the workspace to do the function calculation - we don't update the UI display version
-            virtualWorkspace = instance.createVirtualWorkspace(folderFunctionErrors);
+            //create a copy of the model to do the function calculation - we don't update the UI display version
+            virtualModel = instance.createVirtualModel(folderFunctionErrors);
 	
     //HANDLE THIS ERROR CASE DIFFERENTLY!!!
-            if(!virtualWorkspace) {
+            if(!virtualModel) {
                 return null;
             }
 
-            //lookup elements from virtual workspace
-            rootFolder = virtualWorkspace.getRoot();
+            //lookup elements from virtual model
+            rootFolder = virtualModel.getRoot();
             inputElementArray = instance.loadInputElements(rootFolder,folderFunctionErrors);
             returnValueTable = instance.loadOutputElement(rootFolder,folderFunctionErrors); 
             
@@ -283,7 +283,7 @@ FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErro
         actionData.actions = updateActionList;
 
         //apply the update
-        var actionResult = doAction(virtualWorkspace,actionData);        
+        var actionResult = doAction(virtualModel,actionData);        
         if(actionResult.alertMsg) {
             CommandManager.errorAlert(actionResult.alertMsg);
         }
@@ -307,18 +307,18 @@ FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErro
     return folderFunctionFunction;    
 }
 
-/** This method creates a copy of the workspace to be used for the function evvaluation. 
+/** This method creates a copy of the model to be used for the function evvaluation. 
  * @private */
-FolderFunction.prototype.createVirtualWorkspace = function(folderFunctionErrors) {
+FolderFunction.prototype.createVirtualModel = function(folderFunctionErrors) {
     try {
         var folderJson = this.internalFolder.toJson();
-		var workspaceJson = Workspace.createWorkpaceJsonFromFolderJson(this.getName(),folderJson);
-        var virtualWorkspace = new Workspace(this.getOwner());
-        var actionResult = virtualWorkspace.loadFromJson(workspaceJson);
+		var modelJson = Model.createWorkpaceJsonFromFolderJson(this.getName(),folderJson);
+        var virtualModel = new Model(this.getOwner());
+        var actionResult = virtualModel.loadFromJson(modelJson);
         
         //do something with action result!!!
         
-        return virtualWorkspace;
+        return virtualModel;
 	}
 	catch(error) {
         var actionError = ActionError.processException(error,"FolderFunction - Code",false);
@@ -327,7 +327,7 @@ FolderFunction.prototype.createVirtualWorkspace = function(folderFunctionErrors)
 	}
 }
 
-/** This method loads the input argument members from the virtual workspace. 
+/** This method loads the input argument members from the virtual model. 
  * @private */
 FolderFunction.prototype.loadInputElements = function(rootFolder,folderFunctionErrors) {
     var argMembers = [];
@@ -347,7 +347,7 @@ FolderFunction.prototype.loadInputElements = function(rootFolder,folderFunctionE
     return argMembers;
 }
 
-/** This method loads the output member from the virtual workspace. 
+/** This method loads the output member from the virtual model. 
  * @private  */
 FolderFunction.prototype.loadOutputElement = function(rootFolder,folderFunctionErrors) {
     var returnValueMember = rootFolder.lookupChild(this.returnValueString);
@@ -375,6 +375,6 @@ FolderFunction.generator.setDataOk = false;
 FolderFunction.generator.setCodeOk = false;
 
 //register this member
-Workspace.addMemberGenerator(FolderFunction.generator);
+Model.addMemberGenerator(FolderFunction.generator);
 
 

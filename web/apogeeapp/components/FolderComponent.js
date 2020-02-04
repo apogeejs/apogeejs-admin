@@ -67,7 +67,7 @@ export default class FolderComponent extends ParentComponent {
     //======================================
 
     //if we want to allow importing a workspace as this object, we must add this method to the generator
-    static appendWorkspaceChildren(optionsJson,childrenJson) {
+    static appendMemberChildren(optionsJson,childrenJson) {
         optionsJson.children = childrenJson;
     }
 

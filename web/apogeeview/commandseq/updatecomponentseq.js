@@ -16,7 +16,7 @@ export function updateComponent(component) {
     var additionalLines = apogeeutil.jsonCopy(componentGenerator.propertyDialogLines); 
 
     var modelManager = component.getModelManager(); 
-    var workspace = component.getWorkspace();
+    var model = component.getModel();
     var initialValues = component.getPropertyValues(); 
 
     //add folder list, only if we can set the parent (if there is a parent)
@@ -96,7 +96,7 @@ export function updateComponent(component) {
                 let oldParentComponent = modelManager.getComponent(oldParent);
 
                 if(newValues.parentName) {
-                    let newParent = workspace.getMemberByFullName(newValues.parentName);
+                    let newParent = model.getMemberByFullName(newValues.parentName);
                     let newParentComponent = modelManager.getComponent(newParent);
 
                     //delete old parent apogee node 
@@ -129,7 +129,7 @@ export function updateComponent(component) {
                 // add the compone nodes to the new page after the component has been moved there
                 //----------------------------------------------
                 if(newValues.parentName) {
-                    let newParent = workspace.getMemberByFullName(newValues.parentName);
+                    let newParent = model.getMemberByFullName(newValues.parentName);
                     let newParentComponent = modelManager.getComponent(newParent);
 
                     //insert node add at end of new page

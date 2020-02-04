@@ -1,4 +1,4 @@
-import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} from "/apogee/lib/workspaceCalculation.js";
+import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} from "/apogee/lib/modelCalculation.js";
 
 /**
  * Action Module
@@ -74,14 +74,14 @@ let actionInfoMap = {
 }
 
 /** This method is used to execute an action for the data model. */
-export function doAction(workspace,actionData) {
+export function doAction(model,actionData) {
     
     var actionResult = {};
     
     //only allow one action at a time
-    if(workspace.isActionInProgress()) {
+    if(model.isActionInProgress()) {
         //this is a messenger action - we will save it and execute it after this computation cycle is complete
-        workspace.saveMessengerAction(actionData);
+        model.saveMessengerAction(actionData);
         
         //mark command as pending
         actionResult.actionPending = true;
@@ -89,12 +89,12 @@ export function doAction(workspace,actionData) {
     }
     
     //flag action in progress
-    workspace.setActionInProgress(true);
+    model.setActionInProgress(true);
     
     try {   
         
         //do the action
-        callActionFunction(workspace,actionData,actionResult); 
+        callActionFunction(model,actionData,actionResult); 
         
         //finish processing the action
         var recalculateList = [];
@@ -103,14 +103,14 @@ export function doAction(workspace,actionData) {
         addToCompletedResultList(completedResults,actionResult)
         
         //handle cases with a valid object 
-        updateDependencies(workspace,completedResults,recalculateList);
+        updateDependencies(model,completedResults,recalculateList);
         
         updateRecalculateList(completedResults,recalculateList);
         
         callRecalculateList(recalculateList);
     
         //fire events
-        fireEvents(workspace,completedResults,recalculateList);
+        fireEvents(model,completedResults,recalculateList);
 	}
 	catch(error) {
         if(error.stack) console.error(error.stack);
@@ -120,14 +120,14 @@ export function doAction(workspace,actionData) {
         actionResult.isFatal = true
         actionResult.alertMsg = "Unknown error updating model: " + error.message;
         
-        workspace.clearCommandQueue();
-        workspace.setActionInProgress(false);
+        model.clearCommandQueue();
+        model.setActionInProgress(false);
         return actionResult;
         
     }
     
     //flag action in progress
-    workspace.setActionInProgress(false);
+    model.setActionInProgress(false);
     actionResult.actionDone = true;
     
     //if the action has an onComplete callback, call it here.
@@ -137,26 +137,26 @@ export function doAction(workspace,actionData) {
     
     //trigger any pending actions
     //these will be done asynchronously
-    var savedMessengerAction = workspace.getSavedMessengerAction();
+    var savedMessengerAction = model.getSavedMessengerAction();
     if(savedMessengerAction) {
         var runQueuedAction = true;
 
-        if(workspace.checkConsecutiveQueuedActionLimitExceeded()) {
+        if(model.checkConsecutiveQueuedActionLimitExceeded()) {
             //ask user if about continueing
             var doContinue = confirm("The calculation is taking a long time. Continue?");
             if(!doContinue) {
-                workspace.setCalculationCanceled();
+                model.setCalculationCanceled();
                 runQueuedAction = false;
             }
         }
 
         if(runQueuedAction) {
             //FOR NOW WE WILL RUN SYNCHRONOUSLY!!!
-            doAction(workspace,savedMessengerAction);
+            doAction(model,savedMessengerAction);
         }
     }
     else {
-        workspace.clearConsecutiveQueuedTracking();
+        model.clearConsecutiveQueuedTracking();
     }
     
     //return actionResult
@@ -174,13 +174,13 @@ export function addActionInfo(actionInfo) {
 }
 
 /** This function looks up the proper function for an action and executes it. */
-function callActionFunction(workspace,actionData,actionResult) {
+function callActionFunction(model,actionData,actionResult) {
 
     //do the action
     var actionInfo = actionInfoMap[actionData.action];
     if(actionInfo) {
         actionResult.actionInfo = actionInfo;
-        actionInfo.actionFunction(workspace,actionData,actionResult);
+        actionInfo.actionFunction(model,actionData,actionResult);
     }
     else {
         actionResult.actionDone = false;
@@ -192,14 +192,14 @@ function callActionFunction(workspace,actionData,actionResult) {
 // Internal Methods
 //=======================================
 
-/** This method makes sure the member dependencies in the workspace are properly updated. 
+/** This method makes sure the member dependencies in the model are properly updated. 
  * @private */
-function updateDependencies(workspace,completedResults,recalculateList) {
+function updateDependencies(model,completedResults,recalculateList) {
     //check if we need to update the entire model
     var updateAllDep = checkUpdateAllDep(completedResults);
     if(updateAllDep) {
         //update entire model - see conditions bewlo
-        workspace.updateDependeciesForModelChange(recalculateList);
+        model.updateDependeciesForModelChange(recalculateList);
     }
     else {
         //upate dependencies on table with updated code
@@ -233,7 +233,7 @@ function updateRecalculateList(completedResults,recalculateList) {
 /** This function fires the proper events for the  It combines events to 
  * fire a single event for each member.
  * @private */
-function fireEvents(workspace,completedResults,recalculateList) {
+function fireEvents(model,completedResults,recalculateList) {
 
     var eventMap = {};
     var member;
@@ -250,20 +250,20 @@ function fireEvents(workspace,completedResults,recalculateList) {
             
             let member = actionResult.member;
             
-            mergeEventIntoEventMap(eventMap,workspace,member,eventName);
+            mergeEventIntoEventMap(eventMap,model,member,eventName);
         }
     }
     
     //add an update event for any object not accounted from
     for(i = 0; i < recalculateList.length; i++) {
         var member = recalculateList[i];
-        mergeEventIntoEventMap(eventMap,workspace,member,"memberUpdated");
+        mergeEventIntoEventMap(eventMap,model,member,"memberUpdated");
     } 
     
     //fire events from the event map
     for(var idString in eventMap) {
         let eventInfo = eventMap[idString];
-        workspace.dispatchEvent(eventInfo.event,eventInfo);
+        model.dispatchEvent(eventInfo.event,eventInfo);
         //clear the update map for this member (the member should be set
         if(eventInfo.target) {
             eventInfo.target.clearUpdated();
@@ -275,7 +275,7 @@ function fireEvents(workspace,completedResults,recalculateList) {
 }
 
 /** This is a helper function to dispatch an event. */
-function mergeEventIntoEventMap(eventMap,workspace,member,eventName) {
+function mergeEventIntoEventMap(eventMap,model,member,eventName) {
 
     let targetId;
     let eventTarget;
@@ -284,8 +284,8 @@ function mergeEventIntoEventMap(eventMap,workspace,member,eventName) {
         eventTarget = member;
     }
     else {
-        targetId = WORKSPACE_TARGET_ID;
-        eventTarget = workspace;
+        targetId = MODEL_TARGET_ID;
+        eventTarget = model;
     }
      
     var existingInfo = eventMap[targetId];
@@ -293,7 +293,7 @@ function mergeEventIntoEventMap(eventMap,workspace,member,eventName) {
      
     if(existingInfo) {
         if((existingInfo.event == eventName)) {
-            //repeat event - including case of both being "memberUpdated" or "workspaceUpdated"
+            //repeat event - including case of both being "memberUpdated" or "modelUpdated"
             newInfo = existingInfo;
         }
         else if((existingInfo.event == "memberDeleted")||(eventName == "memberDeleted")) {
@@ -395,14 +395,14 @@ function addToCompletedResultList(completedResults,actionResult) {
 
 
 /** This method is the action function for a compound action. */
-function compoundActionFunction(workspace,actionData,actionResult) {
+function compoundActionFunction(model,actionData,actionResult) {
 
     var actionList = actionData.actions;
     actionResult.childActionResults = [];
     for(var i = 0; i < actionList.length; i++) {
         let childActionData = actionList[i];
         let childActionResult = {};
-        callActionFunction(workspace,childActionData,childActionResult);
+        callActionFunction(model,childActionData,childActionResult);
         actionResult.childActionResults.push(childActionResult);   
     }
     actionResult.actionDone = true;
@@ -418,8 +418,8 @@ let COMPOUND_ACTION_INFO = {
     "event": null
 }
 
-/** This is an id value used internally to signify an event acted on the workspace, as oposed to a specific member id. */
-let WORKSPACE_TARGET_ID = "workspace";
+/** This is an id value used internally to signify an event acted on the model, as oposed to a specific member id. */
+let MODEL_TARGET_ID = "model";
 
 
 //This line of code registers the action 

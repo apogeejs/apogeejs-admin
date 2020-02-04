@@ -1,6 +1,6 @@
 import {doAction} from "/apogee/actions/action.js";
 
-/** This component encapsulates the member functionality for objects in the workspace.
+/** This component encapsulates the member functionality for objects in the model.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  *  
@@ -17,7 +17,7 @@ export {Member as default};
     
 /** This serves as the constructor for the member object, when extending it. 
  * The owner should be the parent that holds this member or the object that holds
- * the hierarchy (maybe the workspace). If the owner is not a parent, this is typically
+ * the hierarchy (maybe the model). If the owner is not a parent, this is typically
  * a folder and it is called the root folder. */
 Member.init = function(name,generator) {
     this.id = Member._createId();
@@ -82,7 +82,7 @@ Member.move = function(newName,newOwner) {
 Member.isMember = true
 
 /** this method gets the ID. It is not persistent and is valid only for this 
- * instance the workspace is opened. */
+ * instance the model is opened. */
 Member.getId = function() {
     return this.id;
 }
@@ -119,10 +119,10 @@ Member.getParent = function() {
     }
 }
 
-/** this method gets the workspace. */
-Member.getWorkspace = function() {
+/** this method gets the model. */
+Member.getModel = function() {
    if(this.owner) {
-       return this.owner.getWorkspace();
+       return this.owner.getModel();
    }
    else {
        return null;
@@ -278,7 +278,7 @@ Member.applyPromiseData = function(promise,onAsynchComplete,optionalPromiseRefre
 
     //kick off the asynch update, if this is not only a refresh of the promise
     if(!optionalPromiseRefresh) {
-        var workspace = this.getWorkspace();
+        var model = this.getModel();
         var asynchCallback = memberValue => {
             //set the data for the table, along with triggering updates on dependent tables.
             let actionData = {};
@@ -289,7 +289,7 @@ Member.applyPromiseData = function(promise,onAsynchComplete,optionalPromiseRefre
             if(onAsynchComplete) {
                 actionData.onComplete = onAsynchComplete;
             }
-            doAction(workspace,actionData);
+            doAction(model,actionData);
         }
         var asynchErrorCallback = errorMsg => {
             let actionData = {};
@@ -300,7 +300,7 @@ Member.applyPromiseData = function(promise,onAsynchComplete,optionalPromiseRefre
             if(onAsynchComplete) {
                 actionData.onComplete = onAsynchComplete;
             }
-            doAction(workspace,actionData);
+            doAction(model,actionData);
         }
 
         //call appropriate action when the promise completes
@@ -328,7 +328,7 @@ Member.onDeleteMember = function() {
     this.owner = null;
 }
 
-///** This method is called when the workspace is closed and also when an object
+///** This method is called when the model is closed and also when an object
 // * is deleted. It should do any needed cleanup for the object.  
 // * @protected */
 //Member.onClose = function();
@@ -418,7 +418,7 @@ Member.removeFromImpactsList = function(member) {
 Member.nextId = 1;
 
 /** This method generates a member ID for the member. It is only valid
- * for the duration the workspace is opened. It is not persisted.
+ * for the duration the model is opened. It is not persisted.
  * @private
  */
 Member._createId = function() {

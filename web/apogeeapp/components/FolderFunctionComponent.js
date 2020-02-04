@@ -119,7 +119,7 @@ export default class FolderFunctionComponent extends ParentComponent {
     }
 
     //if we want to allow importing a workspace as this object, we must add this method to the generator
-    static appendWorkspaceChildren(optionsJson,childrenJson) {
+    static appendMemberChildren(optionsJson,childrenJson) {
         var internalFolderJson = {};
         internalFolderJson.name = optionsJson.name;
         internalFolderJson.type = "apogee.Folder";

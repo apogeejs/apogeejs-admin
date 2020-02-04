@@ -6,12 +6,12 @@ let closeworkspace = {};
 // Action
 //=====================================
 
-//NO UNDO FOR CLOSE WORKSPACE
+//NO UNDO FOR CLOSE Workspace
 //closeworkspace.createUndoCommand = function(workspaceManager,commandData) {
 
 closeworkspace.executeCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
-    var workspace = modelManager.getWorkspace();
+    var model = modelManager.getModel();
     
     var workspaceManagerRemoved = false;
     
@@ -19,7 +19,7 @@ closeworkspace.executeCommand = function(workspaceManager,commandData) {
         workspaceManagerRemoved = workspaceManager.getApp().clearWorkspaceManager();
         
         workspaceManager.close();
-        workspace.onClose();
+        model.onClose();
     }
     catch(error) {
         if(error.stack) console.error(error.stack);

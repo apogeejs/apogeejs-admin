@@ -25,8 +25,8 @@ export function exportWorkspace(app,fileAccessObject) {
     //create on submit callback
     var onSubmitFunction = function(result) {         
         var folderFullName = result.parentName;
-        var workspace = modelManager.getWorkspace();
-        var folder = workspace.lookupMemberByName(folderFullName);
+        var model = modelManager.getModel();
+        var folder = model.lookupMemberByName(folderFullName);
 
         var workspaceText = getWorkspaceText(app,folder);
         if(!workspaceText) {

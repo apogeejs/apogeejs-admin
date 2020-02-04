@@ -43,7 +43,7 @@ Dependent.clearCalcPending = function() {
 
 //Must be implemented in extending object
 ///** This method udpates the dependencies if needed because
-// *a variable was added or removed from the workspace.  */
+// *a variable was added or removed from the model.  */
 //Dependent.updateDependeciesForModelChange = function(object);
 
 ///** This is a check to see if the object should be checked for dependencies 

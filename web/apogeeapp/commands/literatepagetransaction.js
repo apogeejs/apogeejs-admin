@@ -43,9 +43,9 @@ literatepagetransaction.executeCommand = function(workspaceManager,commandData) 
     var errorMsg;
     
     let modelManager = workspaceManager.getModelManager();
-    var workspace = modelManager.getWorkspace();
+    var model = modelManager.getModel();
     //get the member
-    var member = workspace.getMemberByFullName(commandData.memberFullName);   
+    var member = model.getMemberByFullName(commandData.memberFullName);   
     var component = modelManager.getComponent(member);
     
     var editorData = component.getEditorData();

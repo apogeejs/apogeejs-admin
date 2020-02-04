@@ -20,10 +20,10 @@ import {addActionInfo} from "/apogee/actions/action.js";
 
 
 /** Delete member action function */
-function deleteMember(workspace,actionData,actionResult) {
+function deleteMember(model,actionData,actionResult) {
     
     var memberFullName = actionData.memberName;
-    var member = workspace.getMemberByFullName(memberFullName);
+    var member = model.getMemberByFullName(memberFullName);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for delete member";

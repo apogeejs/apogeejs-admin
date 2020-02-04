@@ -1,13 +1,13 @@
 import base from "/apogeeutil/base.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import { Workspace, doAction } from "/apogee/apogeeCoreLib.js";
+import { Model, doAction } from "/apogee/apogeeCoreLib.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
 import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";
 import ModelManager from "/apogeeapp/ModelManager.js";
 
 
-/** This class manages the user interface for a workspace object. */
+/** This class manages the workspace. */
 export default class WorkspaceManager extends EventManager {
 
     constructor(app) {
@@ -43,7 +43,7 @@ export default class WorkspaceManager extends EventManager {
 
      /** This method sets the workspace. The argument workspaceJson should be included
       * if the workspace is not empty, such as when opening a existing workspace. It
-      * contains the data for the component associated with each workspace member. For 
+      * contains the data for the component associated with each model member. For 
       * a new empty workspace the workspaceJson should be omitted. 
       * The argument fileMetadata is the file identifier if the workspace is opened from a file.
       * This will be used for the "save" function to save to an existing file. */
@@ -62,20 +62,20 @@ export default class WorkspaceManager extends EventManager {
 
         this.fileMetadata = fileMetadata;
 
-        var workspaceDataJson;
-        var workspaceComponentsJson;
+        var modelDataJson;
+        var modelComponentsJson;
 
         if(workspaceJson) {
-            workspaceDataJson = workspaceJson.workspace;
-            workspaceComponentsJson = workspaceJson.components;
+            modelDataJson = workspaceJson.model;
+            modelComponentsJson = workspaceJson.components;
         }
 
-        let commandResult = this.modelManager.load(workspaceDataJson,workspaceComponentsJson);
+        let commandResult = this.modelManager.load(modelDataJson,modelComponentsJson);
 
         return commandResult;
     }
 
-    /** This method gets the workspace object. */
+    /** This method closes the workspace object. */
     close() {
         //close model manager
         this.modelManager.close();
@@ -130,7 +130,7 @@ export default class WorkspaceManager extends EventManager {
     // open and save methods
     //====================================
 
-    /** This sets the application. It must be done before the workspace is set on the workspace UI. */
+    /** This sets the application. It must be done before the workspace manager is opened. */
     init() {
         //create the model manager
         this.modelManager = new ModelManager(this);
@@ -165,8 +165,8 @@ export default class WorkspaceManager extends EventManager {
 
         json.references = this.referenceManager.saveEntries();
 
-        let {workspaceJson, componentsJson} = this.modelManager.toJson(optionalSavedRootFolder);
-        json.workspace = workspaceJson;
+        let {modelJson, componentsJson} = this.modelManager.toJson(optionalSavedRootFolder);
+        json.model = modelJson;
         json.components = componentsJson;
 
         return json;

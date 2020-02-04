@@ -1,8 +1,8 @@
 import base from "/apogeeutil/base.js";
-import { Workspace, doAction } from "/apogee/apogeeCoreLib.js";
+import { Model, doAction } from "/apogee/apogeeCoreLib.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
-/** This class manages the user interface for a workspace object. */
+/** This class manages the user interface for a model object. */
 export default class ModelManager extends EventManager {
 
     constructor(workspaceManager) {
@@ -10,7 +10,7 @@ export default class ModelManager extends EventManager {
 
         this.workspaceManager = workspaceManager;
         this.app = workspaceManager.getApp();
-        this.workspace = null;
+        this.model = null;
       
         this.componentMap = {};
     }
@@ -26,7 +26,7 @@ export default class ModelManager extends EventManager {
     //########################################################
 
     //====================================
-    // Workspace Management
+    // Model Management
     //====================================
 
     /** This gets the application instance. */
@@ -38,47 +38,42 @@ export default class ModelManager extends EventManager {
         return this.workspaceManager;
     }
 
-     /** This method sets the workspace. The argument workspaceJson should be included
-      * if the workspace is not empty, such as when opening a existing workspace. It
-      * contains the data for the component associated with each workspace member. For 
-      * a new empty workspace the workspaceJson should be omitted. 
-      * The argument fileMetadata is the file identifier if the workspace is opened from a file.
-      * This will be used for the "save" function to save to an existing file. */
-    load(workspaceDataJson,workspaceComponentsJson) {
+     /** This method loads the model data and model components from the json. */
+    load(modelDataJson,modelComponentsJson) {
 
-        //load defaults if there is not saved workspace data
-        if(!workspaceDataJson) workspaceDataJson = Workspace.EMPTY_WORKSPACE_JSON;
-        if(!workspaceComponentsJson) workspaceComponentsJson = ModelManager.EMPTY_WORKSPACE_COMPONENT_JSON;
+        //load defaults if there is not saved model data
+        if(!modelDataJson) modelDataJson = Model.EMPTY_MODEL_JSON;
+        if(!modelComponentsJson) modelComponentsJson = ModelManager.EMPTY_MODEL_COMPONENT_JSON;
 
-        //create workspace
-        this.workspace = new Workspace();
-        let actionResult = this.workspace.loadFromJson(workspaceDataJson);
+        //create model
+        this.model = new Model();
+        let actionResult = this.model.loadFromJson(modelDataJson);
 
         ////////////////////////////////////////////////////////////////////////
         //We are manually clearing the updated fields because there is no create workspce
         //event (in whcih we would clear any udpated field flags)
         //we should probably change that...
-        this.workspace.clearUpdated();
+        this.model.clearUpdated();
         ////////////////////////////////////////////////////////////////////////
 
         //set up the root folder conmponent, with children if applicable
-        var rootFolder = this.workspace.getRoot();
-        var commandResult = this.createComponentFromMember(actionResult,workspaceComponentsJson);
+        var rootFolder = this.model.getRoot();
+        var commandResult = this.createComponentFromMember(actionResult,modelComponentsJson);
 
         //add listeners
-        //this.workspace.addListener("memberCreated", eventInfo => this.memberCreated(eventInfo));
-        this.workspace.addListener("memberUpdated", eventInfo => this.memberUpdated(eventInfo));
-        this.workspace.addListener("memberDeleted", eventInfo => this.memberDeleted(eventInfo));
+        //this.model.addListener("memberCreated", eventInfo => this.memberCreated(eventInfo));
+        this.model.addListener("memberUpdated", eventInfo => this.memberUpdated(eventInfo));
+        this.model.addListener("memberDeleted", eventInfo => this.memberDeleted(eventInfo));
 
         return commandResult;
     }
 
-    /** This method gets the workspace object. */
-    getWorkspace() {
-        return this.workspace;
+    /** This method gets the model object. */
+    getModel() {
+        return this.model;
     }
 
-    /** This method gets the workspace object. */
+    /** This method closes the model object. */
     close() {
         //delete all the components - to make sure the are cleaned up
         for(var key in this.componentMap) {
@@ -110,7 +105,7 @@ export default class ModelManager extends EventManager {
     }
 
     getEventId() {
-        //for now we have a single fixed id for the workspace
+        //for now we have a single fixed id for the model
         return "model";
     }
 
@@ -124,7 +119,7 @@ export default class ModelManager extends EventManager {
 
     /** This method returns a component by full name. */
     getComponentByFullName(fullName) {
-        let member = this.workspace.getMemberByFullName(fullName);
+        let member = this.model.getMemberByFullName(fullName);
         if(member) {
             return this.getComponent(member);
         }
@@ -175,8 +170,8 @@ export default class ModelManager extends EventManager {
     registerMember(member,component,mainComponentMember) {
 
         //make sure this is for us
-        if(member.getWorkspace() !== this.workspace) {
-            throw base.createError("Component registered in wrong workspace: " + member.getFullName());
+        if(member.getModel() !== this.model) {
+            throw base.createError("Component registered in wrong model: " + member.getFullName());
         }
 
         //store the ui object
@@ -249,8 +244,8 @@ export default class ModelManager extends EventManager {
             json.action = "deleteMember";
             json.memberName = member.getFullName();
             //if this fails, we will just ignore it for now
-            var workspace = this.getWorkspace();
-            var actionResult = doAction(workspace,json);
+            var model = this.getModel();
+            var actionResult = doAction(model,json);
             //end undo create member
             //##########################################################################
 
@@ -339,24 +334,24 @@ export default class ModelManager extends EventManager {
         return this.fileMetadata;
     }
 
-    /** This saves the workspace. It the optionalSavedRootFolder is passed in,
-     * it will save a workspace with that as the root folder. */
+    /** This saves the model. It the optionalSavedRootFolder is passed in,
+     * it will save a model with that as the root folder. */
     toJson(optionalSavedRootFolder) {
 
-        let workspaceJson = this.workspace.toJson(optionalSavedRootFolder);
+        let modelJson = this.model.toJson(optionalSavedRootFolder);
 
         var rootFolder;
         if(optionalSavedRootFolder) {
             rootFolder = optionalSavedRootFolder;
         }
         else {
-            rootFolder = this.workspace.getRoot();
+            rootFolder = this.model.getRoot();
         }
 
         var rootFolderComponent = this.getComponent(rootFolder);
         let componentsJson = rootFolderComponent.toJson();
 
-        return {workspaceJson, componentsJson};
+        return {modelJson, componentsJson};
     }
 
     /** This is used in saving the active tab 
@@ -384,7 +379,7 @@ export default class ModelManager extends EventManager {
         for(var key in tableMap) {
             var child = tableMap[key];
 
-            //get the object map for the workspace
+            //get the object map for the model
             var childComponent = this.getComponent(child);
 
             //get the component for this child
@@ -450,7 +445,7 @@ export default class ModelManager extends EventManager {
 
 }
 
-//this is the json for an empty workspace
-ModelManager.EMPTY_WORKSPACE_COMPONENT_JSON = {
+//this is the json for an empty model
+ModelManager.EMPTY_MODEL_COMPONENT_JSON = {
     "type":"apogeeapp.app.FolderComponent"
 };

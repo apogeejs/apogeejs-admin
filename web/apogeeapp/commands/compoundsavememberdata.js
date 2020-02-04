@@ -24,7 +24,7 @@ compoundsavememberdata.createUndoCommand = function(workspaceManager,commandData
     undoCommandJson.type = compoundsavememberdata.commandInfo.type;
     
     let modelManager = workspaceManager.getModelManager();
-    var workspace = modelManager.getWorkspace();
+    var model = modelManager.getModel();
     
     alert("FIX THIS! needs to be implmeneted correctly");
     return null;
@@ -35,7 +35,7 @@ compoundsavememberdata.createUndoCommand = function(workspaceManager,commandData
         let updateEntry = commandData.updateInfo[i];
         let memberFullName = commandData.updateEntry[0];
 
-        let childUndoCommandJson = getMemberStateUndoCommand(workspace,commandData.memberFullName); 
+        let childUndoCommandJson = getMemberStateUndoCommand(model,commandData.memberFullName); 
 
         //OOPS. THIS ISN"T RIGHT
 
@@ -51,7 +51,7 @@ compoundsavememberdata.createUndoCommand = function(workspaceManager,commandData
 compoundsavememberdata.executeCommand = function(workspaceManager,commandData,asynchOnComplete) {
     
     var modelManager = workspaceManager.getModelManager();
-    var workspace = modelManager.getWorkspace();
+    var model = modelManager.getModel();
     
     //make the action list
     var actionList = [];
@@ -60,7 +60,7 @@ compoundsavememberdata.executeCommand = function(workspaceManager,commandData,as
         let memberFullName = commandData.updateEntry[0];
         let data = commandData.updateEntry[1];
 
-        let childActionData = getSaveDataAction(workspace,memberFullName,data,asynchOnComplete);
+        let childActionData = getSaveDataAction(model,memberFullName,data,asynchOnComplete);
 
         actionList.push(childActionData);
     }
@@ -69,7 +69,7 @@ compoundsavememberdata.executeCommand = function(workspaceManager,commandData,as
     actionData.action = "compoundAction";
     actionData.actions = actionList;
     
-    var actionResult = doAction(workspace,actionData);
+    var actionResult = doAction(model,actionData);
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;

@@ -1,7 +1,7 @@
 import ContextManager from "/apogee/lib/ContextManager.js";
 
 /** This component encapsulates an owner object that is a member and contains children members, creating  a 
- * hierarchical structure in the workspace. Each child has a name and this name
+ * hierarchical structure in the model. Each child has a name and this name
  * forms the index of the child into its parent. (I guess that means it doesn't
  * have to be a string, in the case we made an ArrayFolder, which would index the
  * children by integer.)
@@ -90,7 +90,7 @@ Parent.setChildrenWriteable = function(writeable) {
 ///** This method updates the data object for this child. */
 //Parent.updateData = function(child);
 
-///** This method is called when the workspace is closed. 
+///** This method is called when the model is closed. 
 //* It should do any needed cleanup for the object. */
 //Parent.onClose = function();
 

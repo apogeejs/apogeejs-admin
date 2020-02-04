@@ -82,7 +82,7 @@ module.exports = function(grunt) {
                 "apogeeui/configurablepanel/elements/SpacerElement.js",
 				"apogeeui/configurablepanel/elements/HTMLDisplayElement.js",
                 "apogeeapp/Apogee.js",
-                "apogeeapp/WorkspaceManager.js",
+                "apogeeapp/WorkEspaceManager.js",
                 "apogeeapp/BaseFileAccess.js",
                 "apogeeapp/references/ReferenceManager.js",
                 "apogeeapp/references/LinkEntry.js",

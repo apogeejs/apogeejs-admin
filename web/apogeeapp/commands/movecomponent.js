@@ -13,13 +13,13 @@ let movecomponent = {};
  * even is they are the same. */
 movecomponent.createUndoCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
-    var workspace = modelManager.getWorkspace();
-    var member = workspace.getMemberByFullName(commandData.memberFullName);
+    var model = modelManager.getModel();
+    var member = model.getMemberByFullName(commandData.memberFullName);
     var parent = member.getParent();
     var oldMemberName = member.getName();
     var oldParentFullName = parent.getFullName();
     
-    var newParent = workspace.getMemberByFullName(commandData.newParentFullName);
+    var newParent = model.getMemberByFullName(commandData.newParentFullName);
     var newMemberFullName = newParent.getChildFullName(commandData.newMemberName);
     
     var undoCommandJson = {};
@@ -34,14 +34,14 @@ movecomponent.createUndoCommand = function(workspaceManager,commandData) {
 movecomponent.executeCommand = function(workspaceManager,commandData) {
     
     let modelManager = workspaceManager.getModelManager();
-    var workspace = modelManager.getWorkspace();
+    var model = modelManager.getModel();
 
     var actionData = {};
     actionData.action = "moveMember";
     actionData.memberName = commandData.memberFullName;
     actionData.targetName = commandData.newMemberName;
     actionData.targetOwnerName = commandData.newParentFullName;
-    var actionResult = doAction(workspace,actionData);
+    var actionResult = doAction(model,actionData);
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;

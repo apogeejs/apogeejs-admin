@@ -52,7 +52,7 @@ export default class Apogee extends EventManager {
         //construct the base app structures
         //---------------------------------
         
-        //workspace
+        //workspace manager
         this.workspaceManager = null;
         
         //component generators
@@ -166,10 +166,10 @@ export default class Apogee extends EventManager {
         return this.workspaceManager;
     }
 
-    /** This method returns the active Workspace object. */
-    getWorkspace() {
+    /** This method returns the active model object. */
+    getModel() {
         if(this.workspaceManager) {
-            return this.workspaceManager.getWorkspace();
+            return this.workspaceManager.getModelManager().getModel();
         }
         else {
             return null;
@@ -214,7 +214,7 @@ export default class Apogee extends EventManager {
     // Workspace Management
     //==================================
 
-    /** This method makes an empty workspace ui object. This throws an exception if
+    /** This method makes an empty workspace object. This throws an exception if
      * the workspace can not be opened.
      */
     setWorkspaceManager(workspaceManager) {
@@ -354,4 +354,4 @@ export default class Apogee extends EventManager {
 }
 
 
-Apogee.DEFAULT_WORKSPACE_NAME = "workspace";
+Apogee.DEFAULT_Workspace_NAME = "workspace";

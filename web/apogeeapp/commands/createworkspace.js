@@ -15,17 +15,17 @@ let createworkspace = {};
 // Command Object
 //=====================================
 
-//NO UNDO FOR CREATE WORKSPACE
+//NO UNDO FOR CREATE Workspace
 //createworkspace.createUndoCommand = function(workspaceManager,commandData) {
 
-/** Workspace UI parameter is not applicable. */
+/** Workspace parameter is not applicable. */
 createworkspace.executeCommand = function(unpopulatedWorkspaceManager,commandData) {
 
     var commandResult = {};
     
     try {
         
-        //make the workspace ui
+        //make the workspace manager
         let app = Apogee.getInstance();
         var workspaceManager = new WorkspaceManager(app);
         commandResult.target = workspaceManager;

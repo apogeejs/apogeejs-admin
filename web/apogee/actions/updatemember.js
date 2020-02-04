@@ -37,10 +37,10 @@ import ActionError from "/apogee/lib/ActionError.js";
 
 
 /** Update code action function. */
-function updateCode(workspace,actionData,actionResult) {
+function updateCode(model,actionData,actionResult) {
     
     var memberFullName = actionData.memberName;
-    var member = workspace.getMemberByFullName(memberFullName);
+    var member = model.getMemberByFullName(memberFullName);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member code";
@@ -64,10 +64,10 @@ function updateCode(workspace,actionData,actionResult) {
 }
 
 /** Update data action function. */
-function updateData(workspace,actionData,actionResult) {
+function updateData(model,actionData,actionResult) {
     
     var memberFullName = actionData.memberName;
-    var member = workspace.getMemberByFullName(memberFullName);
+    var member = model.getMemberByFullName(memberFullName);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member data";

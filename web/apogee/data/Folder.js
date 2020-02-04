@@ -1,5 +1,5 @@
 import base from "/apogeeutil/base.js";
-import Workspace from "/apogee/data/Workspace.js";
+import Model from "/apogee/data/Model.js";
 import Member from "/apogee/datacomponents/Member.js";
 import Dependent from "/apogee/datacomponents/Dependent.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
@@ -214,5 +214,5 @@ Folder.generator.setDataOk = false;
 Folder.generator.setCodeOk = false;
 
 //register this member
-Workspace.addMemberGenerator(Folder.generator);
+Model.addMemberGenerator(Folder.generator);
 

@@ -25,7 +25,7 @@ const DIALOG_LAYOUT_SUBMIT_LINE = {
 // UI Entry Point
 //=====================================
 
-/** This method gets a callback to update the properties of a workspace. */
+/** This method adds a link to the workspace. */
 export function addLink(app,entryTypeInfo) {
         
     //create the dialog layout 
@@ -67,7 +67,7 @@ export function addLink(app,entryTypeInfo) {
     showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
-/** This method gets a callback to update the properties of a workspace. */
+/** This method updates a link in the workspace. */
 export function updateLink(app,referenceEntry) {
         
     var initialValues = {};
@@ -131,7 +131,7 @@ export function updateLink(app,referenceEntry) {
 }
 
 
-/** This method gets a callback to update the properties of a workspace. */
+/** This method deletes a link in the workspace. */
 export function removeLink(app,referenceEntry) {
 
     var doDelete= confirm("Are you sure you want to delete this link?");

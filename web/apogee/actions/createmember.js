@@ -1,5 +1,5 @@
 import {addActionInfo} from "/apogee/actions/action.js";
-import Workspace from "/apogee/data/Workspace.js";
+import Model from "/apogee/data/Model.js";
 import ActionError from "/apogee/lib/ActionError.js";
 
 /** This is self installing command module. It has no exports
@@ -27,15 +27,15 @@ import ActionError from "/apogee/lib/ActionError.js";
 
 /** This method instantiates a member, without setting the update data. 
  *@private */
-function createMember(workspace,actionData,processedActions,actionResult) {
+function createMember(model,actionData,processedActions,actionResult) {
     
     var owner;
-    if(actionData.workspaceIsOwner) {
-        owner = workspace;
+    if(actionData.modelIsOwner) {
+        owner = model;
     }
     else {
         var ownerFullName = actionData.ownerName;
-        var owner = workspace.getMemberByFullName(ownerFullName);
+        var owner = model.getMemberByFullName(ownerFullName);
         if(!owner) {
             actionResult.actionDone = false;
             actionResult.alertMsg = "Parent not found for created member";
@@ -55,7 +55,7 @@ function createMemberImpl(owner,actionData,actionResult) {
     //create member
     var generator;
     if(memberJson) {
-        generator = Workspace.getMemberGenerator(memberJson.type);
+        generator = Model.getMemberGenerator(memberJson.type);
     }
 
     if(generator) {
@@ -77,7 +77,7 @@ function createMemberImpl(owner,actionData,actionResult) {
     }
     else {
         //type not found! - create a dummy object and add an error to it
-        var errorTableGenerator = Workspace.getMemberGenerator("appogee.ErrorTable");
+        var errorTableGenerator = Model.getMemberGenerator("appogee.ErrorTable");
         member = errorTableGenerator.createMember(owner,memberJson);
         var error = new ActionError("Member type not found: " + memberJson.type,ActionError.ERROR_TYPE_APP,null);
         member.addError(error);

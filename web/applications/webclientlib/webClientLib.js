@@ -99,14 +99,14 @@ apogeeWebClientLib.onResize = function(memberName) {
 * If the optionalViewType is not set, the default view (which is typically the desired one) will be used.*/
 function _createComponentDisplay(memberName,optionalViewType) {
    var workspace = app.getWorkspace();
-   var workspaceManager = app.getWorkspaceManager();
+   var workEspaceManager = app.getWorkEspaceManager();
 
    var member = workspace.getMemberByFullName(memberName); 
    if(!member) {
        console.error("Member not found: " + memberName);
        return;
    }
-   var component = workspaceManager.getComponent(member);
+   var component = workEspaceManager.getComponent(member);
    
    var activeView = optionalViewType ? optionalViewType : component.componentGenerator.TABLE_EDIT_SETTINGS.defaultView;
 
@@ -121,14 +121,14 @@ function _createComponentDisplay(memberName,optionalViewType) {
 * If the optionalViewType is not set, the default view (which is typically the desired one) will be used.*/
 function _getComponentDisplay(memberName) {
     var workspace = app.getWorkspace();
-    var workspaceManager = app.getWorkspaceManager();
+    var workEspaceManager = app.getWorkEspaceManager();
  
     var member = workspace.getMemberByFullName(memberName); 
     if(!member) {
         console.error("Member not found: " + memberName);
         return;
     }
-    var component = workspaceManager.getComponent(member);
+    var component = workEspaceManager.getComponent(member);
  
     return component.getComponentDisplay();
 

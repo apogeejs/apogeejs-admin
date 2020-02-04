@@ -169,8 +169,8 @@ function getAdditionalCommands(parentComponent,childName) {
 }
 
 function getComponentFromName(modelManager, componentName) {
-    var workspace = modelManager.getWorkspace();
-    var member = workspace.getMemberByFullName(componentName);
+    var model = modelManager.getModel();
+    var member = model.getMemberByFullName(componentName);
     var component = modelManager.getComponent(member);
     return component;
 }

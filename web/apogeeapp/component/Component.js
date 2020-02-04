@@ -97,9 +97,9 @@ export default class Component extends EventManager {
         }
     }
 
-    /** This method returns the workspace for this component. */
-    getWorkspace() {
-        return this.member.getWorkspace();
+    /** This method returns the model for this component. */
+    getModel() {
+        return this.member.getModel();
     }
 
     /** This method returns the model manager for this component. */

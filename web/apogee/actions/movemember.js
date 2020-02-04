@@ -13,10 +13,10 @@ import {addActionInfo} from "/apogee/actions/action.js";
  */
 
 /** Move member action function */
-function moveMember(workspace,actionData,actionResult) {
+function moveMember(model,actionData,actionResult) {
         
     var memberFullName = actionData.memberName;
-    var member = workspace.getMemberByFullName(memberFullName);
+    var member = model.getMemberByFullName(memberFullName);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for move member";
@@ -25,7 +25,7 @@ function moveMember(workspace,actionData,actionResult) {
     actionResult.member = member;
     
     var targetOwnerFullName = actionData.targetOwnerName;
-    var targetOwner = workspace.getMemberByFullName(targetOwnerFullName);
+    var targetOwner = model.getMemberByFullName(targetOwnerFullName);
     if(!targetOwner) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "New parent not found for move member";

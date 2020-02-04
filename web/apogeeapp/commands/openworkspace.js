@@ -17,18 +17,18 @@ let openworkspace = {};
 // Action
 //=====================================
 
-//NO UNDO FOR OPEN WORKSPACE
+//NO UNDO FOR OPEN Workspace
 //openworkspace.createUndoCommand = function(workspaceManager,commandData) {
 
 openworkspace.executeCommand = function(nullWorkspaceManager,commandData,asynchOnComplete) {
-        //app,workspaceText,fileMetadata) {
+
     var synchCommandResult = {};
     
     try {
 
 //I should verify the file type and format!  
 
-        //create the workspace UI (this does not create several child objects in it)
+        //create the workspace manager (this does not create several child objects in it)
         var app = Apogee.getInstance();
         var workspaceManager = new WorkspaceManager(app);
         synchCommandResult.target = workspaceManager;
@@ -75,7 +75,7 @@ openworkspace.executeCommand = function(nullWorkspaceManager,commandData,asynchO
             }
         }
         
-        //load references and then workspace
+        //load references and then model
         doReferenceLoad.then(doWorkspaceLoad).catch(onLoadError);
         synchCommandResult.pending = true;
 
@@ -108,8 +108,8 @@ let REFERENCES_LOADED_COMMAND_INFO = {
     "event": "updated",
 }
 
-let WORKSPACE_LOADED_COMMAND_INFO = {
-    "type": "openWorkspace_workspaceLoaded",
+let MODEL_LOADED_COMMAND_INFO = {
+    "type": "openWorkspace_modelLoaded",
     "targetType": "workspace",
     "event": "updated",
 }
