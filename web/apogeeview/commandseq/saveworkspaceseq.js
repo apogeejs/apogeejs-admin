@@ -10,6 +10,9 @@ export function saveWorkspace(app,fileAccessObject,doDirectSave) {
     var workspaceText;
     var fileMetadata;
     if(activeWorkspaceManager) {
+        //fire a prepare save event so the UI can save its current state.
+        activeWorkspaceManager.dispatchEvent("prepareSave",activeWorkspaceManager);
+
         var workspaceJson = activeWorkspaceManager.toJson();
         workspaceText = JSON.stringify(workspaceJson);
         fileMetadata = activeWorkspaceManager.getFileMetadata();

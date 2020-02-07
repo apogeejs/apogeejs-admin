@@ -1,7 +1,7 @@
  import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import { Messenger } from "/apogee/apogeeCoreLib.js";
 
-import EditComponent from "/apogeeapp/component/EditComponent.js";
+import Component from "/apogeeapp/component/Component.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
@@ -17,7 +17,7 @@ import apogeeui from "/apogeeui/apogeeui.js";
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-export default class CustomDataComponent extends EditComponent {
+export default class CustomDataComponent extends Component {
 
     constructor(modelManager,folder) {
         //extend edit component

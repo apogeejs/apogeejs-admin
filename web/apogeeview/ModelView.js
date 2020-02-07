@@ -1,6 +1,9 @@
 import apogeeui from "/apogeeui/apogeeui.js";
 import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
 
+import JsonTableComponentView from "/apogeeview/componentviews/JsonTableComponentView.js";
+import FolderComponentView from "/apogeeview/componentviews/FolderComponentView.js";
+
 /** This class manages the user interface for a workspace object. */
 export default class ModelView {
 
@@ -14,6 +17,8 @@ export default class ModelView {
 
         //I want a better checking and handling of the root folder being loaded, just once
         this.rootFolderLoaded = false;
+
+        this.componentViewMap = {};
 
         this.init();
 
@@ -33,6 +38,28 @@ export default class ModelView {
 
     getTabFrame() {
         return this.workspaceView.getTabFrame();
+    }
+
+    getComponentView(componentId) {
+        return this.componentViewMap[componentId];
+    }
+
+    getApp() {
+        return this.workspaceView.getApp();
+    }
+
+    //-----------------------------------
+    // Save methods
+    //-----------------------------------
+    
+    /** This method will be called to prepare for a workspace save. It lets
+     * the UI save its current state. */
+    prepareSave() {
+        for(let componentId in this.componentViewMap) {
+            let componentView = this.componentViewMap[componentId];
+            componentView.prepareSave();
+
+        }
     }
 
     //================================
@@ -58,20 +85,68 @@ export default class ModelView {
         if(target.getTargetType() == "model") {
             this.onModelClosed(target);
         }
+        else if(target.getTargetType() == "component") {
+            this.onComponentDeleted(target);
+        }
     }
 
     /** This is called on component created events. We only 
      * want to respond to the root folder event here.
      */
     onComponentCreated(component) {
-        //discard an old view if there is one
-        let parentMember = component.getMember().getParent();
-        if(!parentMember) {
 
-            //make sure we don't already have one??!!
-            if(this.rootFolderLoaded) throw new Error("Root folder already loaded!")
+        //create the component view
+        let componentViewClass = ModelView.getComponentViewClass(component.componentGenerator.uniqueName);
+        let componentView;
+        if(componentViewClass) {
+            componentView = new componentViewClass(this,component);
+        }
 
-            this.loadRootFolder(component);
+        if(!componentView) {
+            componentView = new ERROR_COMPONENT_VIEW_CLASS(this,component);
+        }
+
+        this.componentViewMap[component.getId()] = componentView;
+
+        //add to the proper parent
+        let parentComponent = component.getParentComponent();
+        if(parentComponent) {
+            let parentComponentView = this.getComponentView(parentComponent.getFullName());
+            if(parentComponentView) {
+                parentComponentView.addChild(componentView);
+            }
+        }
+        else {
+            //this is the root component
+            if(this.rootFolderLoaded) {
+                //figure out how to handle this!!!
+                alert("Root folder already loaded!");
+            }
+            this.treeEntry.addChild(componentView.getTreeEntry(true));
+            this.rootFolderLoaded = true;
+        }
+    }
+
+    onComponentDeleted(component) {
+        let componentView = this.componentViewMap[component.getId()];
+        delete this.componentViewMap[component.getId()];
+
+        //add to the proper parent
+        let parentComponent = component.getParent();
+        if(parentComponent) {
+            let parentComponentView = this.getComponentView(parentComponent.getFullName());
+            if(parentComponentView) {
+                parentComponentView.removeChild(componentView);
+            }
+        }
+        else {
+            //this is the root component
+            if(rootFolderLoaded) {
+                //figure out how to handle this!!!
+                alert("Root folder already loaded!");
+            }
+            this.treeEntry.removeChild(componentView.getTreeEntry(true));
+            this.rootFolderLoaded = false;
         }
     }
 
@@ -92,12 +167,6 @@ export default class ModelView {
     //====================================
     // Workspace Management
     //====================================
-     
-    loadRootFolder(rootFolderComponent) {
-        //add the root folder component
-        this.treeEntry.addChild(rootFolderComponent.getTreeEntry(true));
-        this.rootFolderLoaded = true;
-    }
 
     setViewJsonState(workspaceJson) { 
         let tabFrame = this.appView.getTabFrame();
@@ -146,6 +215,11 @@ export default class ModelView {
     init() {
         this.treeEntry = this.createTreeEntry();
         this.treeEntry.setState(TreeEntry.EXPANDED);
+
+        //TEMPORARY COMPONENT VIEW REGISTRATION#################################
+        ModelView.registerComponentView(JsonTableComponentView);
+        ModelView.registerComponentView(FolderComponentView);
+        //######################################################################
     }
 
     createTreeEntry() {
@@ -159,8 +233,21 @@ export default class ModelView {
         return apogeeui.getResourcePath(ICON_RES_PATH);
     }
 
+    //========================================
+    // Static Functions
+    //========================================
+
+    static registerComponentView(viewClass) {
+        componentClassMap[viewClass.componentName] = viewClass;
+    }
+
+    static getComponentViewClass(componentName) {
+        return componentClassMap[componentName];
+    }
 
 }
+
+let componentClassMap = {};
 
 let MODEL_FOLDER_LABEL = "Model";
 

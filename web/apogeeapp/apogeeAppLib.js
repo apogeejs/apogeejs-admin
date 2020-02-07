@@ -5,7 +5,6 @@ export {default as BaseFileAccess} from "/apogeeapp/BaseFileAccess.js";
 export {default as UiCommandMessenger} from "/apogeeapp/commands/UiCommandMessenger.js";
 
 export {default as Component} from "/apogeeapp/component/Component.js";
-export {default as EditComponent} from "/apogeeapp/component/EditComponent.js";
 
 //needed just for web lib
 export {default as WebComponentDisplay} from "/apogeeview/componentdisplay/webpage/WebComponentDisplay.js";

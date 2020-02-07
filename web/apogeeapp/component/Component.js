@@ -1,11 +1,6 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
-import apogeeui from "/apogeeui/apogeeui.js";
-import {updateComponent} from "/apogeeview/commandseq/updatecomponentseq.js";
-import {deleteComponent} from "/apogeeview/commandseq/deletecomponentseq.js";
-import TreeComponentDisplay from "/apogeeview/componentdisplay/TreeComponentDisplay.js";
-import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
 import {bannerConstants} from "/apogeeview/componentdisplay/banner.js"; 
 
 /** This is the base functionality for a component. */
@@ -31,13 +26,8 @@ export default class Component extends EventManager {
         
         this.updated = {};
         
-        //ui elements
-        this.childComponentDisplay = null; //this is the main display, inside the parent tab
+        //ui state elements
         this.childDisplayState = null;
-        
-        this.tabDisplay = null; //only valid on parents, which open into a tab
-        
-        this.treeDisplay = null; //this is shown in the tree view
         this.treeState = null;
     }
 
@@ -54,6 +44,10 @@ export default class Component extends EventManager {
     /** This method returns the base member for this component. */
     getMember() {
         return this.member;
+    }
+
+    getId() {
+        return this.member.getId();
     }
 
     getName() {
@@ -84,17 +78,12 @@ export default class Component extends EventManager {
         }
     }
 
-//--- VIEW ITEM ---//
-    /** This method returns the icon url for the component. */
-    getIconUrl() {
-        if(this.componentGenerator.ICON_URL) {
-            return this.componentGenerator.ICON_URL;
-        }
-        else {
-            var resPath = this.componentGenerator.ICON_RES_PATH;
-            if(!resPath) resPath = Component.DEFAULT_ICON_RES_PATH;
-            return apogeeui.getResourcePath(resPath);
-        }
+    getBannerState() {
+        return this.bannerState;
+    }
+
+    getBannerMessage() {
+        return this.bannerMessage;
     }
 
     /** This method returns the model for this component. */
@@ -107,151 +96,19 @@ export default class Component extends EventManager {
         return this.modelManager;
     }
 
-    //-------------------
-    // tree entry methods - this is the element in the tree view
-    //-------------------
-//--- VIEW ITEM ---//
-    getTreeEntry(createIfMissing) {
-        if((createIfMissing)&&(!this.treeDisplay)) {
-            this.treeDisplay = this.instantiateTreeEntry();
-            this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
+    //------------------------------------------
+    // UI State Methods - Interface for holding UI state
+    //------------------------------------------
 
-            if(this.treeState !== undefined) {
-                this.treeDisplay.setState(this.treeState);
-            }
-        }
-        
-        if(this.treeDisplay) {
-            return this.treeDisplay.getTreeEntry();
-        }
-        else {
-            return null;
-        }
-    }
-//--- VIEW ITEM ---//
-    /** @protected */
-    instantiateTreeEntry() {
-        var treeDisplay = new TreeComponentDisplay(this);
-        
-        //default sort order within parent
-        var treeEntrySortOrder = (this.componentGenerator.TREE_ENTRY_SORT_ORDER !== undefined) ? this.componentGenerator.TREE_ENTRY_SORT_ORDER : Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER;
-        treeDisplay.setComponentTypeSortOrder(treeEntrySortOrder);
-        
-        return treeDisplay;
+    getDisplayState(displayState) {
+        return this.displayState;
     }
 
-    //-------------------
-    // component display methods - this is the element in the parent tab (main display)
-    //-------------------
-//--- VIEW ITEM ---//
-    /** This indicates if the component has a tab display. */
-    usesChildDisplay() {
-        return this.componentGenerator.hasChildEntry;
-    }
-//--- VIEW ITEM ---//
-    getChildDisplayState() {
-        return this.childDisplayState;
-    }
-//--- VIEW ITEM ---//
-    setComponentDisplay(childComponentDisplay) {
-        this.childComponentDisplay = childComponentDisplay; 
-    }
-//--- VIEW ITEM ---//
-    getComponentDisplay() {
-        return this.childComponentDisplay;
-    }
-//--- VIEW ITEM ---//
-    closeComponentDisplay() {
-        if(this.childComponentDisplay) {
-            //first store the window state
-            this.childDisplayState = this.childComponentDisplay.getStateJson();
-            
-            //delete the window
-            this.childComponentDisplay.deleteDisplay();
-            
-            this.childComponentDisplay = null;
-        }
+    setDisplayState() {
+        this.displayState = displayState;
     }
 
-    //-------------------
-    // tab display methods - this is the tab element, only used for parent members
-    //-------------------
-//--- VIEW ITEM ---//
-    /** This indicates if the component has a tab display. */
-    usesTabDisplay() {
-        return this.componentGenerator.hasTabEntry;
-    }
-//--- VIEW ITEM ---//
-    //Implement in extending class:
-    ///** This creates the tab display for the component. */
-    //instantiateTabDisplay();
-//--- VIEW ITEM ---//
-    createTabDisplay() {
-        if((this.usesTabDisplay())&&(!this.tabDisplay)) {
-            let modelView = this.modelManager.getModelView();
-            if(modelView) { 
-                this.tabDisplay = this.instantiateTabDisplay();
-                this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
-                //add the tab display to the tab frame
-                var tab = this.tabDisplay.getTab();
-                var tabFrame = modelView.getTabFrame();
-                tabFrame.addTab(tab,true);
-            }
-        }
-    }
-//--- VIEW ITEM ---//
-    getTabDisplay(createIfMissing) {
-        return this.tabDisplay;
-    }
-//--- VIEW ITEM ---//
-    /** This closes the tab display for the component. */
-    closeTabDisplay() {
-        if(this.tabDisplay) {
-            var tabDisplay = this.tabDisplay;
-            this.tabDisplay = null;
-            tabDisplay.closeTab();
-            tabDisplay.destroy();    
-        }
-    }
 
-    //-------------------
-    // Menu methods
-    //-------------------
-//--- VIEW ITEM ---// ???
-    getMenuItems(optionalMenuItemList) {
-        //menu items
-        var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
-
-        if(this.member.getParent()) {
-            //these items are only possible for members with a parent.
-            
-            //add the standard entries
-            var itemInfo = {};
-            itemInfo.title = "Edit Properties";
-            itemInfo.callback = () => updateComponent(this);
-            menuItemList.push(itemInfo);
-
-            var itemInfo = {};
-            itemInfo.title = "Delete";
-            itemInfo.callback = () => deleteComponent(this);
-            menuItemList.push(itemInfo);
-        }
-        
-        return menuItemList;
-    }
-//--- VIEW ITEM ---//
-    getOpenMenuItem () {
-        var openCallback = this.createOpenCallback();
-        if(openCallback) {
-            var itemInfo = {};
-            itemInfo.title = "Open";
-            itemInfo.callback = openCallback;
-            return itemInfo;
-        }
-        else {
-            return null;
-        }
-    }
 
     //------------------------------------------
     // Event Tracking Methods
@@ -291,20 +148,11 @@ export default class Component extends EventManager {
     toJson() {
         var json = {};
         json.type = this.componentGenerator.uniqueName;
-        
-        if(this.childComponentDisplay != null) {
-            this.childDisplayState = this.childComponentDisplay.getStateJson();
-        }
-        
-        if(this.childDisplayState) {
-            json.windowState = this.childDisplayState;
-        }
-        
-        if(this.treeDisplay) {
-            var treeState = this.treeDisplay.getState();
-            if(treeState != TreeEntry.NO_CONTROL) {
-                json.treeState = treeState;
-            }
+
+        //TO DO 
+
+        if(this.displayState) {
+            json.displayState = this.displayState;
         }
         
         //allow the specific component implementation to write to the json
@@ -322,27 +170,8 @@ export default class Component extends EventManager {
         //take any immediate needed actions
         
         //set the tree state
-        if(json.treeState !== undefined) {
-            
-            if(this.treeState != json.treeState) {
-                this.fieldUpdated("treeState");
-            }
-            
-            this.treeState = json.treeState; 
-            
-            if(this.treeDisplay) {
-                this.treeDisplay.setState(this.treeState);
-            }
-        }
-        
-        //set window options
-        if(json.windowState !== undefined) {
-            
-            if(this.childDisplayState != json.windowState) {
-                this.fieldUpdated("childDisplayState");
-            }
-            
-            this.childDisplayState = json.windowState;
+        if(json.displayState !== undefined) {
+            this.displayState = json.displayState;
         }
         
         //allow the component implemnetation ro read from the json
@@ -377,10 +206,6 @@ export default class Component extends EventManager {
             }
         }
         
-        if(this.tabDisplay) {
-            this.closeTabDisplay();
-        }
-        
         //execute cleanup actions
         for(var i = 0; i < this.cleanupActions.length; i++) {
             this.cleanupActions[i].call(this);
@@ -406,30 +231,23 @@ export default class Component extends EventManager {
             if(apogeeutil.isFieldUpdated(fieldsUpdated,"owner")) {
                 this.fieldUpdated("owner");
                 
-                //old parent change logic!!!
-                var oldParent = this.uiActiveParent;
-                var newParent = this.member.getParent();
+                // //old parent change logic!!!
+                // var oldParent = this.uiActiveParent;
+                // var newParent = this.member.getParent();
 
-                this.uiActiveParent = newParent;
+                // this.uiActiveParent = newParent;
 
-                //remove from old parent component
-                if(oldParent) {
-                    var oldParentComponent = this.modelManager.getComponent(oldParent);
-                    oldParentComponent.removeChildComponent(this);
-                    //delete all the window display
-                    if(this.childComponentDisplay) {
-                        this.childComponentDisplay.deleteDisplay();
-                        this.childComponentDisplay = null;
-                    }
-                }
+                // //remove from old parent component
+                // if(oldParent) {
+                //     var oldParentComponent = this.modelManager.getComponent(oldParent);
+                //     oldParentComponent.removeChildComponent(this);
+                // }
 
-                //add to the new parent component
-                if(newParent) {
-                    var newParentComponent = this.modelManager.getComponent(newParent);
-                    newParentComponent.addChildComponent(this);
-
-                    //TODO - delete the current component display and add a new one
-                }
+                // //add to the new parent component
+                // if(newParent) {
+                //     var newParentComponent = this.modelManager.getComponent(newParent);
+                //     newParentComponent.addChildComponent(this);
+                // }
             }  
             
             //check for banner update
@@ -466,25 +284,11 @@ export default class Component extends EventManager {
             }
         }
         else {
+            //there was an update to an internal field
             this.fieldUpdated(updatedMember.getName());
             
             //for now we will assume the internal members do not have their name update!!!
             //maybe I should add a error check 
-        }
-        
-        
-        //update for new data
-        if(this.treeDisplay) {
-            this.treeDisplay.updateData();
-            this.treeDisplay.setBannerState(this.bannerState,this.bannerMessage);
-        }
-        if(this.childComponentDisplay != null) {
-            this.childComponentDisplay.updateData();
-            this.childComponentDisplay.setBannerState(this.bannerState,this.bannerMessage);
-        }
-        if(this.tabDisplay != null) {
-            this.tabDisplay.updateData();
-            this.tabDisplay.setBannerState(this.bannerState,this.bannerMessage);
         }
     }
 
@@ -509,62 +313,6 @@ export default class Component extends EventManager {
             this.readExtendedProperties(values);
         }
         return values;
-    }
-
-    //=============================
-    // Action UI Entry Points
-    //=============================
-//--- VIEW ITEM ---//
-    /** This method creates a callback for deleting the component. 
-     *  @private */
-    createOpenCallback() {
-        var openCallback;
-        
-        var makeTabActive = function(tabComponent) {
-            var tabDisplay = tabComponent.getTabDisplay();
-            if(tabDisplay) {
-                var tab = tabDisplay.getTab();
-                tab.makeActive();
-            }
-            else {
-                //create the tab display - this automaticaly puts it in the tab frame
-                tabComponent.createTabDisplay();
-            }
-        }
-        
-        if(this.usesTabDisplay()) {
-            openCallback = () => {
-                makeTabActive(this);
-
-                //allow time for UI to be created and then select start fo doc
-                //this will also give the doc focus
-                setTimeout(() => {
-                    let tabDisplay = this.getTabDisplay();
-                    if(tabDisplay.selectStartOfDocument) {
-                        tabDisplay.selectStartOfDocument();
-                    }
-                },0);
-            }
-        }
-        else {
-            //remove the tree from the parent
-            openCallback = () => {
-                var parentComponent = this.getParentComponent();
-                if((parentComponent)&&(parentComponent.usesTabDisplay())) {
-
-                    //open the parent and bring this child to the front
-                    makeTabActive(parentComponent);
-
-                    //allow time for UI to be created and then show child
-                    setTimeout(() => {
-                        parentComponent.showChildComponent(this);
-                    },0);
-
-                }
-            }
-        }
-        
-        return openCallback;
     }
 
     //======================================
@@ -612,14 +360,6 @@ export default class Component extends EventManager {
 
 
 }
-
-//These parameters are used to order the components in the tree entry.
-Component.DEFAULT_COMPONENT_TYPE_SORT_ORDER = 5;
-Component.FOLDER_COMPONENT_TYPE_SORT_ORDER = 0;
-
-Component.DEFAULT_ICON_RES_PATH = "/genericIcon.png";
-
-Component.MENU_ITEM_OPEN = 0x01;
 
 //======================================
 // All components should have a generator to create the component

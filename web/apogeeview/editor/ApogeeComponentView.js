@@ -4,13 +4,12 @@
 //================================================================================
 
 export default class ApogeeComponentView {
-    constructor(node, view, getPos, folderComponent, folderMember) {
+    constructor(node, view, getPos, folderComponentView) {
       // We'll need these later
       this.node = node
       this.view = view
       this.getPos = getPos
-      this.folderComponent = folderComponent;
-      this.folderMember = folderMember;
+      this.folderComponentView = folderComponentView;
   
       // The node's representation in the editor
       this.dom = document.createElement("div");
@@ -42,17 +41,20 @@ export default class ApogeeComponentView {
       //change so we don't lose track of an object.
       //we will not display data in this time.
       if(!memberId) {
+        let folderComponent = this.folderComponentView.getComponent();
+        let folderMember = folderComponent.getMember();
+
         //lookup component
-        var member = this.folderMember.lookupChild(name);
+        var member = folderMember.lookupChild(name);
         
         //WE SHOULD MAKE SURE THE MEMBER BELONGS TO THIS PARENT!!!??
         if (member) {
-          var modelManager = this.folderComponent.getModelManager();
+          var modelManager = folderComponent.getModelManager();
           var component = modelManager.getComponent(member);
           var componentDisplay = component.getComponentDisplay();
           if (!componentDisplay) {
             //CLUDGE ALERT - fix this when I reorganize the code
-            var tabDisplay = this.folderComponent.getTabDisplay();
+            var tabDisplay = this.folderComponentView.getTabDisplay();
             tabDisplay.addChildComponent(component);
             componentDisplay = component.getComponentDisplay();
           }

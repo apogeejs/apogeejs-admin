@@ -39,6 +39,16 @@ export default class ReferenceView {
         this.referenceTreeEntry.setBannerState(this.referenceManager.getState());
     }
 
+    //-----------------------------------
+    // Save methods
+    //-----------------------------------
+    
+    /** This method will be called to prepare for a workspace save. It lets
+     * the UI save its current state. */
+    prepareSave() {
+        //we need to implement this!!!
+    }
+
     /** @private */
     _createTreeEntry() {
         var iconUrl = apogeeui.getResourcePath(REFERENCES_ICON_PATH);

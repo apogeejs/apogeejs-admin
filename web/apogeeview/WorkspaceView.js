@@ -14,10 +14,13 @@ export default class WorkspaceView {
         this.workspaceManager = workspaceManager;
         this.app = workspaceManager.getApp();
         this.appView = appView;
+        this.modelView = null;
 
         this.treeEntry = null;
 
         this.init();
+
+        this.workspaceManager.addListener("prepareSave",() => this.prepareSave());
     }
 
     getTreeEntry() {
@@ -26,6 +29,10 @@ export default class WorkspaceView {
 
     getTabFrame() {
         return this.appView.getTabFrame();
+    }
+
+    getModelView() {
+        return this.modelView;
     }
 
     getApp() {
@@ -79,6 +86,17 @@ export default class WorkspaceView {
         if(this.tree) {
             this.tree.clearRootEntry();
         }
+    }
+
+    //-----------------------------------
+    // Save methods
+    //-----------------------------------
+
+    /** This method will be called to prepare for a workspace save. It lets
+     * the UI save its current state. */
+    prepareSave() {
+        this.modelView.prepareSave();
+        this.referenceView.prepareSave();
     }
 
     //====================================

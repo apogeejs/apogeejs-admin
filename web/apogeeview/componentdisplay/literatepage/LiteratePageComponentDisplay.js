@@ -7,25 +7,22 @@ import PageChildComponentDisplay from "/apogeeview/componentdisplay/literatepage
 
 import {selectionBetween} from "/prosemirror/lib/prosemirror-view/src/selection.js";
 
+import ModelView from "/apogeeview/ModelView.js";
+
 import apogeeui from "/apogeeui/apogeeui.js";
 import Tab from "/apogeeui/tabframe/Tab.js";
 
-/** This component represents a json table object. 
- * The member argument is the main member for this component. The folder argument is 
- * the parent folde associated with this component, which may be different from the
- * main member, which is the case for the folder function. */
+/** This component represents a json table object. */
 export default class LiteratePageComponentDisplay extends EventManager {
     
-    constructor(component,member,folder) {
+    constructor(componentView) {
         super();
 
-        this.component = component;
-        this.member = member;
-        this.folder = folder;
+        this.componentView = componentView;
 
         this.isShowing = false;
 
-        this.editorManager = this.component.getEditorManager();
+        this.editorManager = this.componentView.getEditorManager();
 
         this.loadTabEntry();
 
@@ -53,37 +50,32 @@ export default class LiteratePageComponentDisplay extends EventManager {
         return this.isShowing;
     }
 
-    setBannerState(bannerState,bannerMessage) {
-        apogeeui.removeAllChildren(this.bannerContainer);
-        if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
-           //no action
-        }
-        else {
-            var banner = getBanner(bannerMessage,bannerState);
-            this.bannerContainer.appendChild(banner);
+    componentUpdated(fieldsUpdated) {
+
+        if(apogeeutil.isFieldUpdated(fieldsUpdated,"name")) {
+            this.tab.setTitle(this.componentView.getName());
         }
 
-        if(this.tab) {
-            var iconOverlay = getIconOverlay(bannerState);
-            if(iconOverlay) {
-                this.tab.setIconOverlay(iconOverlay);
-            }
-            else {
-                this.tab.clearIconOverlay();
-            }
+        if(apogeeutil.isFieldUpdated(fieldsUpdated,"document")) {
+            let editorData = this.componentView.getEditorData();
+            this.editorView.updateState(editorData);
+        }
+
+        if(apogeeutil.isFieldUpdated(fieldsUpdated,"bannerState")) {
+            this._setBannerState();
         }
     }
 
-    updateData() {
-        this.tab.setTitle(this.member.getName());
-    }
-    
-    updateDocumentData(editorData) {
+    //#############################################################################
+    //Argh! See ntoes and fix this
+    nonComponentDocumentUpdate() {
+        let editorData = this.componentView.getEditorData();
         this.editorView.updateState(editorData);
     }
+    //##############################################################################
 
     /** This creates and adds a display for the child component to the parent container. */
-    addChildComponent(childComponent) {
+    addChild(childComponentView) {
 
         //-----------------
         // Get component display
@@ -92,7 +84,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
         //create a new component display for this child
         if(childComponent.componentGenerator.hasChildEntry) {
-            childComponentDisplay = new PageChildComponentDisplay(childComponent,this);
+            childComponentDisplay = new PageChildComponentDisplay(childComponentView,this);
         }
 
         //------------------
@@ -104,34 +96,27 @@ export default class LiteratePageComponentDisplay extends EventManager {
         }
     }
 
-    // /** This will scroll so the current selection is in view. */
-    // issueScrollToViewCommand() {
-    //     let state = this.component.getEditorData();
-    //     let transaction = state.tr.scrollIntoView();
-    //     this.component.applyTransaction(transaction); 
-    // }
-
     /** This will move the selection to the end of the document. */
     selectStartOfDocument() {
-        let state = this.component.getEditorData();
+        let state = this.componentView.getComponent().getEditorData();
         let $startPos = state.doc.resolve(0);
         let selection = selectionBetween(this.editorView, $startPos, $startPos);
         let transaction = state.tr.setSelection(selection).scrollIntoView();
-        this.component.applyTransaction(transaction);
+        this.componentView.applyTransaction(transaction);
 
-        this.component.giveEditorFocusIfShowing();
+        this.componentView.giveEditorFocusIfShowing();
     }
 
     /** This will move the selection to the end of the document. */
     selectEndOfDocument() {
-        let state = this.component.getEditorData();
+        let state = this.componentView.getEditorData();
         let endPos = state.doc.content.size;
         let $endPos = state.doc.resolve(endPos);
         let selection = selectionBetween(this.editorView, $endPos, $endPos);
         let transaction = state.tr.setSelection(selection).scrollIntoView();
-        this.component.applyTransaction(transaction);
+        this.componentView.applyTransaction(transaction);
 
-        this.component.giveEditorFocusIfShowing();
+        this.componentView.giveEditorFocusIfShowing();
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,7 +136,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
     /** @private */
     loadTabEntry() {
-        this.tab = new Tab(this.member.getId());    
+        this.tab = new Tab(this.componentView.getComponent().getId());    
 
         //-----------------------
         //set the content
@@ -171,25 +156,54 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //------------------
         // set menu
         //------------------
-        var menu = this.tab.createMenu(this.component.getIconUrl());
+        var menu = this.tab.createMenu(this.componentView.getIconUrl());
         var createMenuItemsCallback = () => {
-            return this.component.getMenuItems();
+            return this.componentView.getMenuItems();
         }
         menu.setAsOnTheFlyMenu(createMenuItemsCallback);
 
         //-----------------
         //set the tab title
         //-----------------
-        this.tab.setTitle(this.member.getName());
+        this.tab.setTitle(this.componentView.getName());
+
+        //-----------------
+        // apply the banner state
+        //-----------------
+        this._setBannerState();
 
         //-----------------------------
         //add the handlers for the tab
         //-----------------------------
         var onClose = () => {
-            this.component.closeTabDisplay();
+            this.componentView.closeTabDisplay();
             this.destroy();
         }
         this.tab.addListener(apogeeui.CLOSE_EVENT,onClose);
+    }
+
+    _setBannerState() {
+        let bannerState = this.componentView.getComponent().getBannerState();
+        let bannerMessage = this.componentView.getComponent().getBannerMessage();
+
+        apogeeui.removeAllChildren(this.bannerContainer);
+        if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
+           //no action
+        }
+        else {
+            var banner = getBanner(bannerMessage,bannerState);
+            this.bannerContainer.appendChild(banner);
+        }
+
+        if(this.tab) {
+            var iconOverlay = getIconOverlay(bannerState);
+            if(iconOverlay) {
+                this.tab.setIconOverlay(iconOverlay);
+            }
+            else {
+                this.tab.clearIconOverlay();
+            }
+        }
     }
 
      /** @private */
@@ -213,15 +227,18 @@ export default class LiteratePageComponentDisplay extends EventManager {
         this.contentElement = apogeeui.createElementWithClass("div","visiui_litPage_body",null);
         this.tab.setContent(this.contentElement);
 
+        let pageComponent = this.componentView.getComponent();
+        let folder = pageComponent.getParentForChildren();
+
         //we ony use this context menu and child map for parents
         //modify if we use this elsewhere
-        if(!this.folder.isParent) return;
+        if(!folder.isParent) return;
 
         this.initEditor();
 
         //show all children
-        var modelManager = this.component.getModelManager();
-        var children = this.folder.getChildMap();
+        var modelManager = pageComponent.getModelManager();
+        var children = folder.getChildMap();
         for(var childName in children) {
             var child = children[childName];
             var childComponent = modelManager.getComponent(child);
@@ -230,7 +247,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
             }
         }
         
-        var editorData = this.component.getEditorData();
+        var editorData = pageComponent.getEditorData();
         this.editorView.updateState(editorData);
 
         //set the selection to the end of the view
@@ -241,32 +258,35 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
         //THIS IS BAD - IT IS ONLY TO GET THIS WORKING AS A TRIAL
         //MAKE A WAY TO GET COMPONENT GENERATORS FOR BUTTONS RATHER THAN READING A PRIVATE VARIABLE FROM APP
-        var modelManager = this.component.getModelManager();
+        let pageComponent = this.componentView.getComponent();
+        var modelManager = pageComponent.getModelManager();
         var app = modelManager.getApp();
 
         for(var i = 0; i < app.standardComponents.length; i++) {
             let key = app.standardComponents[i];
-            let generator = app.componentGenerators[key];
-            if(generator.hasChildEntry) {
+
+            let componentGenerator = app.componentGenerators[key];
+            let viewClass = ModelView.getComponentViewClass(componentGenerator.uniqueName);
+            if(viewClass.hasChildEntry) {
 
                 var buttonElement = apogeeui.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
                 //make the idon
                 var imageElement = document.createElement("img")
-                imageElement.src = apogeeui.getResourcePath(generator.ICON_RES_PATH);
+                imageElement.src = apogeeui.getResourcePath(viewClass.ICON_RES_PATH);
                 var iconElement = apogeeui.createElementWithClass("div","visiui_litPage_componentButtonIcon",buttonElement);
                 iconElement.appendChild(imageElement);
                 //label
                 var textElement = apogeeui.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
-                textElement.innerHTML = generator.displayName;
+                textElement.innerHTML = componentGenerator.displayName;
                 //add handler
                 buttonElement.onclick = () => {
 
                     this.editorView.dom.focus();
 
                     var initialValues = {};
-                    initialValues.parentName = this.member.getFullName();
+                    initialValues.parentName = this.componentView.getFullName();
 
-                    addComponent(app,generator,initialValues,null,null);
+                    addComponent(app,componentGenerator,initialValues,null,null);
                 }
             }
         }
@@ -280,7 +300,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
             this.editorView.dom.focus();
 
             var initialValues = {};
-            initialValues.parentName = this.member.getFullName();
+            initialValues.parentName = this.componentView.getFullName();
 
             //I tacked on a piggyback for testing!!!
             addAdditionalComponent(app,initialValues,null,null);
@@ -294,7 +314,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //start with an empty component display
         var emptyEditorState = this.editorManager.createEditorState();
         
-        this.editorView = this.editorManager.createEditorView(this.contentElement,this.component, this.member, emptyEditorState);
+        this.editorView = this.editorManager.createEditorView(this.contentElement,this.componentView, emptyEditorState);
 
         this.contentElement.addEventListener("click",event => this.onClickContentElement(event));
 
@@ -314,8 +334,10 @@ export default class LiteratePageComponentDisplay extends EventManager {
      * page display.  
      * @protected */
     destroy() {
-        var children = this.folder.getChildMap();
-        var modelManager = this.component.getModelManager();
+        let pageComponent = this.getComponent();
+        let folder = pageComponent.getParentForChildren();
+        var children = folder.getChildMap();
+        var modelManager = pageComponent.getModelManager();
 
         for(var childName in children) {
             var child = children[childName];
@@ -342,7 +364,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
     tabClosed() {
         //delete the page
-        this.component.closeTabDisplay();
+        this.componentView.closeTabDisplay();
         this.dispatchEvent(apogeeui.CLOSE_EVENT,this);
     }
     

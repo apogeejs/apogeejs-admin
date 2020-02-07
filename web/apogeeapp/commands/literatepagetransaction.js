@@ -64,11 +64,8 @@ literatepagetransaction.executeCommand = function(workspaceManager,commandData) 
     var commandResult = {};
     commandResult.cmdDone = !error;
     if(errorMsg) commandResult.alertMsg = errorMsg;
-
-    if(commandResult.actionDone) {
-        commandResult.target = modelManager.getComponent(member);
-        commandResult.action = "updated";
-    }
+    commandResult.target = component;
+    commandResult.action = "updated";
     
     return commandResult;
 }

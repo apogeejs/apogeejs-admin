@@ -6,13 +6,13 @@ import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";
 import "/apogeeapp/commandConfig.js";
 
 import JsonTableComponent from "/apogeeapp/components/JsonTableComponent.js";
-import FunctionComponent from "/apogeeapp/components/FunctionComponent.js";
+//import FunctionComponent from "/apogeeapp/components/FunctionComponent.js";
 import FolderComponent from "/apogeeapp/components/FolderComponent.js";
-import FolderFunctionComponent from "/apogeeapp/components/FolderFunctionComponent.js";
-import DynamicForm from "/apogeeapp/components/DynamicForm.js";
-import FormDataComponent from "/apogeeapp/components/FormDataComponent.js";
-import CustomComponent from "/apogeeapp/components/CustomComponent.js";
-import CustomDataComponent from "/apogeeapp/components/CustomDataComponent.js";
+//import FolderFunctionComponent from "/apogeeapp/components/FolderFunctionComponent.js";
+//import DynamicForm from "/apogeeapp/components/DynamicForm.js";
+//import FormDataComponent from "/apogeeapp/components/FormDataComponent.js";
+//import CustomComponent from "/apogeeapp/components/CustomComponent.js";
+//import CustomDataComponent from "/apogeeapp/components/CustomDataComponent.js";
 
 import EsModuleEntry from "/apogeeapp/references/EsModuleEntry.js";
 import NpmModuleEntry from "/apogeeapp/references/NpmModuleEntry.js";
@@ -315,14 +315,14 @@ export default class Apogee extends EventManager {
         //standard components
         this.registerStandardComponent(JsonTableComponent);
         this.registerStandardComponent(FolderComponent);
-        this.registerStandardComponent(FunctionComponent);
-        this.registerStandardComponent(FolderFunctionComponent);
-        this.registerStandardComponent(DynamicForm);
-        this.registerStandardComponent(FormDataComponent);
+        //this.registerStandardComponent(FunctionComponent);
+        //this.registerStandardComponent(FolderFunctionComponent);
+        //this.registerStandardComponent(DynamicForm);
+        //this.registerStandardComponent(FormDataComponent);
         
         //additional components
-        this.registerComponent(CustomComponent);
-        this.registerComponent(CustomDataComponent);
+        //this.registerComponent(CustomComponent);
+        //this.registerComponent(CustomDataComponent);
     }
 
     /** This method registers a component. 

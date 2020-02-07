@@ -8,7 +8,7 @@ import apogeeui from "/apogeeui/apogeeui.js";
  */
 export default class PageDisplayContainer {
 
-    constructor(component, viewType, isMainView) {
+    constructor(componentView, viewType, isMainView) {
         
         //variables
         this.isMainView = isMainView;
@@ -35,7 +35,7 @@ export default class PageDisplayContainer {
         
         this.content = null;
         
-        this.component = component;
+        this.componentView = componentView;
         this.viewType = viewType;
         this.dataDisplay = null;
 
@@ -50,8 +50,10 @@ export default class PageDisplayContainer {
         this.initUI();
     }
 
-    getComponent() {
-        return this.component;
+    getComponent
+
+    getComponentView() {
+        return this.componentView;
     }
 
     //-------------------
@@ -308,7 +310,7 @@ export default class PageDisplayContainer {
             if(!this.dataDisplayLoaded) {
                 if(!this.dataDisplay) {
                     //the display should be created only when it is made visible
-                    this.dataDisplay =  this.component.getDataDisplay(this,this.viewType);
+                    this.dataDisplay =  this.componentView.getDataDisplay(this,this.viewType);
                     this.dataDisplay.readUiStateData(this.savedUiState);
                     if(!this.uiCompleted) this.completeUI();
                     this.setContent(this.dataDisplay.getContent());
@@ -438,13 +440,13 @@ export default class PageDisplayContainer {
             this.setHeaderContent(null);
         }
         //select the associated node in the document.
-        let parentComponent = this.component.getParentComponent();
-        if(parentComponent) {
-            let name = this.component.getMember().getName();
-            parentComponent.selectApogeeNode(name);
+        let parentComponentView = this.componentView.getParentComponentView();
+        if(parentComponentView) {
+            let name = this.componentView.getComponent().getName();
+            parentComponentView.selectApogeeNode(name);
         }
         //give the editor focus
-        parentComponent.giveEditorFocusIfShowing();
+        parentComponentView.giveEditorFocusIfShowing();
 
     }
 

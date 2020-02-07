@@ -1,11 +1,11 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
-import EditComponent from "/apogeeapp/component/EditComponent.js";
+import Component from "/apogeeapp/component/Component.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
 
 /** This component represents a table object. */
-export default class FunctionComponent extends EditComponent {
+export default class FunctionComponent extends Component {
 
     constructor(modelManager, functionObject) {
         //extend edit component

@@ -28,15 +28,15 @@ import ApogeeComponentView from "/apogeeview/editor/ApogeeComponentView.js";
 
 import {convertToNonListBlockType, convertToListBlockType, indentSelection, unindentSelection } from "/apogeeview/editor/apogeeCommands.js";
 
-export function createProseMirrorManager (folderComponent) {
+export function createProseMirrorManager (pageComponent) {
 
-  let modelManager = folderComponent.getModelManager();
+  let modelManager = pageComponent.getModelManager();
   let app = modelManager.getApp();
 
   //this is the function return object - the editor manager
   let proseMirror = {};
 
-  const schema = createFolderSchema(folderComponent);
+  const schema = createFolderSchema(pageComponent);
 
   //===========================
   //create the toolbar
@@ -114,23 +114,23 @@ export function createProseMirrorManager (folderComponent) {
   // Create the editor
   //==============================
 
-  function saveState() {
-    var stateJson = window.view.state.toJSON();
-    console.log(JSON.stringify(stateJson));
-  }
+  // function saveState() {
+  //   var stateJson = window.view.state.toJSON();
+  //   console.log(JSON.stringify(stateJson));
+  // }
 
-  function openState() {
-    var stateText = prompt("Enter the state json:");
-    var stateJson = JSON.parse(stateText);
-    var doc = ProseMirrorNode.fromJSON(schema, stateJson.doc);
-    var state = createEditorState(doc);
-    window.view.updateState(state);
-  }
+  // function openState() {
+  //   var stateText = prompt("Enter the state json:");
+  //   var stateJson = JSON.parse(stateText);
+  //   var doc = ProseMirrorNode.fromJSON(schema, stateJson.doc);
+  //   var state = createEditorState(doc);
+  //   window.view.updateState(state);
+  // }
 
-  function showSelection() {
-    var selection = window.view.state.selection;
-    console.log(JSON.stringify(selection));
-  }
+  // function showSelection() {
+  //   var selection = window.view.state.selection;
+  //   console.log(JSON.stringify(selection));
+  // }
 
   function undo() {
     let commandManager = app.getCommandManager();
@@ -177,12 +177,12 @@ export function createProseMirrorManager (folderComponent) {
     return state;
   }
 
-  proseMirror.createEditorView = function (containerElement, folderComponent, folderMember, editorData) {
+  proseMirror.createEditorView = function (containerElement, folderComponentView, editorData) {
 
     var nodeViews = {};
-    nodeViews.apogeeComponent = (node, view, getPos) => new ApogeeComponentView(node, view, getPos, folderComponent, folderMember);
+    nodeViews.apogeeComponent = (node, view, getPos) => new ApogeeComponentView(node, view, getPos, folderComponentView);
 
-    var dispatchTransaction = transaction => folderComponent.applyTransaction(transaction);
+    var dispatchTransaction = transaction => folderComponentView.applyTransaction(transaction);
 
     var editorView = new EditorView(containerElement, {
       state: editorData,

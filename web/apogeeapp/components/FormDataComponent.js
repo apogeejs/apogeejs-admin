@@ -1,6 +1,6 @@
 import { Messenger } from "/apogee/apogeeCoreLib.js";
 
-import EditComponent from "/apogeeapp/component/EditComponent.js";
+import Component from "/apogeeapp/component/Component.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
@@ -12,7 +12,7 @@ import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper
  * to validate form input.
  * If you want a form to take an action on submit rather than create and edit a 
  * data value, you can use the dynmaic form. */
-export default class FormDataComponent extends EditComponent {
+export default class FormDataComponent extends Component {
 
     constructor(modelManager,folder) {
         //extend edit component

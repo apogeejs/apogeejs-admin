@@ -1,8 +1,6 @@
 
 import Component from "/apogeeapp/component/Component.js";
 import ParentComponent from "/apogeeapp/component/ParentComponent.js";
-import LiteratePageComponentDisplay from "/apogeeview/componentdisplay/literatepage/LiteratePageComponentDisplay.js";
-
 
 /** This component represents a table object. */
 export default class FolderComponent extends ParentComponent {
@@ -11,11 +9,6 @@ export default class FolderComponent extends ParentComponent {
         //extend parent component
         super(modelManager,folder,FolderComponent);
     };
-
-    instantiateTabDisplay() {
-        var folder = this.getMember();
-        return new LiteratePageComponentDisplay(this,folder,folder); 
-    }
 
     //cludge================================================
     //I need a real solution for this
@@ -79,10 +72,8 @@ export default class FolderComponent extends ParentComponent {
 
 FolderComponent.displayName = "Folder";
 FolderComponent.uniqueName = "apogeeapp.app.FolderComponent";
-FolderComponent.hasTabEntry = true;
-FolderComponent.hasChildEntry = false;
-FolderComponent.ICON_RES_PATH = "/componentIcons/folder.png";
-FolderComponent.TREE_ENTRY_SORT_ORDER = Component.FOLDER_COMPONENT_TYPE_SORT_ORDER;
 FolderComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.Folder"
 };
+
+

@@ -8,9 +8,8 @@ import Menu from "/apogeeui/menu/Menu.js";
 /** This component represents a json table object. */
 export default class PageChildComponentDisplay {
 
-    constructor(component, parentComponentDisplay) {
-        this.component = component;
-        this.member = component.getMember();
+    constructor(componentView, parentComponentDisplay) {
+        this.componentView = componentView;
         this.parentComponentDisplay = parentComponentDisplay;
         
         //these are the header elements
@@ -19,7 +18,6 @@ export default class PageChildComponentDisplay {
         this.bannerContainer = null;
 
         this.titleBarNameElement = null;
-        this.recordedTitle = null;
         
         this.displayContainerMap = null;
         
@@ -45,43 +43,22 @@ export default class PageChildComponentDisplay {
         return this.mainElement;
     }
 
-    getComponent() {
-        return this.component;
+    getComponentView() {
+        return this.componentView;
     }
 
     getMember() {
         return this.member;
     }
 
-    setBannerState(bannerState,bannerMessage) {
-        //update the banner
-        var bannerDiv;
-        if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
-            bannerDiv = null;
-        }
-        else {
-            bannerDiv = getBanner(bannerMessage,bannerState);
-        }
-        apogeeui.removeAllChildren(this.bannerContainer);
-        if(bannerDiv) {
-            this.bannerContainer.appendChild(bannerDiv);
-        }
-        
-        //update the icon overlay
-        var iconOverlay = getIconOverlay(bannerState);
-        if(iconOverlay) {
-            this.setIconOverlay(iconOverlay);
-        }
-        else {
-            this.clearIconOverlay();
-        }
-    }
+    componentUpdated(fieldsUpdated) {
 
-    updateData() {
-        //check for a title update
-        let newTitle = this.component.getDisplayName();
-        if(newTitle != this.recordedTitle) {
-            this.setTitle();
+        if(apogeeutil.isFieldUpdated(fieldsUpdated,"displayName")) {
+            this._setTitle();
+        }
+
+        if(apogeeutil.isFieldUpdated(fieldsUpdated,"bannerState")) {
+            this._setBannerState();
         }
 
         //update the content in instantiated view mode elements
@@ -168,8 +145,8 @@ export default class PageChildComponentDisplay {
         //add the click handler, to select this node if it is clicked
         this.mainElement.onclick = () => {
             let name = this.member.getName();
-            let parentComponent = this.component.getParentComponent();
-            parentComponent.selectApogeeNode(name);
+            let parentComponentView = this.componentView.getParentComponentView();
+            parentComponentView.selectApogeeNode(name);
         }
         
         //add title bar
@@ -182,7 +159,7 @@ export default class PageChildComponentDisplay {
         this.viewContainer = apogeeui.createElementWithClass("div","visiui_pageChild_viewContainerClass",this.mainElement);
         
         //add the view elements
-        var settings = this.component.getTableEditSettings();
+        var settings = this.componentView.getTableEditSettings();
         var viewTypes = settings.viewModes;
         
         this.displayContainerMap = {};  
@@ -192,7 +169,7 @@ export default class PageChildComponentDisplay {
                 
                 var isMainView = (i == 0);
 
-                var displayContainer = new PageDisplayContainer(this.component, viewType, isMainView);
+                var displayContainer = new PageDisplayContainer(this.componentView, viewType, isMainView);
                 
                 //add the view title element to the title bar
                 this.titleBarViewsElement.appendChild(displayContainer.getViewSelectorContainer());
@@ -205,7 +182,7 @@ export default class PageChildComponentDisplay {
             }
         }
 
-        this.setTitle();
+        this._setTitle();
     }
 
     /** This makes the title bar, and installs it inline */
@@ -220,12 +197,12 @@ export default class PageChildComponentDisplay {
         // menu
         //------------------
         
-        var iconUrl = this.component.getIconUrl();
+        var iconUrl = this.componentView.getIconUrl();
         if(!iconUrl) iconUrl = apogeeui.getResourcePath(apogeeui.MENU_IMAGE);
         
         this.menu = Menu.createMenuFromImage(iconUrl);
         var menuItemCallback = () => {
-            return this.component.getMenuItems();
+            return this.componentView.getMenuItems();
         }
         this.menu.setAsOnTheFlyMenu(menuItemCallback);
     
@@ -273,9 +250,37 @@ export default class PageChildComponentDisplay {
         }
     }
 
-    setTitle() {
-        this.recordedTitle = this.component.getDisplayName();
-        this.titleBarNameElement.innerHTML = this.recordedTitle;
+    _setTitle() {
+        let title = this.componentView.getDisplayName();
+        this.titleBarNameElement.innerHTML = title;
+    }
+
+    _setBannerState() {
+
+        let bannerState = this.componentView.getBannerState();
+        let bannerMessage = this.componentView.getBannerMessage();
+
+        //update the banner
+        var bannerDiv;
+        if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
+            bannerDiv = null;
+        }
+        else {
+            bannerDiv = getBanner(bannerMessage,bannerState);
+        }
+        apogeeui.removeAllChildren(this.bannerContainer);
+        if(bannerDiv) {
+            this.bannerContainer.appendChild(bannerDiv);
+        }
+        
+        //update the icon overlay
+        var iconOverlay = getIconOverlay(bannerState);
+        if(iconOverlay) {
+            this.setIconOverlay(iconOverlay);
+        }
+        else {
+            this.clearIconOverlay();
+        }
     }
 
 }

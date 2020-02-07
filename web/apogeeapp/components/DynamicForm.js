@@ -1,12 +1,12 @@
 import Component from "/apogeeapp/component/Component.js";
-import EditComponent from "/apogeeapp/component/EditComponent.js";
+import Component from "/apogeeapp/component/Component.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormDisplay from "/apogeeview/datadisplay/ConfigurableFormDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
 import UiCommandMessenger from "/apogeeapp/commands/UiCommandMessenger.js";
 
 /** This component represents a table object. */
-export default class DynamicForm extends EditComponent {
+export default class DynamicForm extends Component {
         
     constructor(modelManager, functionObject) {
         //extend edit component

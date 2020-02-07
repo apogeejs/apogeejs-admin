@@ -23,6 +23,7 @@ export default class ApogeeView {
     constructor(containerId,appConfigManager) {
         this.treePane = null;
         this.tabFrame = null;
+        this.workspaceView = null;
         this.containerId = containerId;
         this.app = this.instantiateApp(appConfigManager);
         this.loadUI(containerId);
@@ -158,16 +159,15 @@ export default class ApogeeView {
     }
 
     onTabShown(tab) {
-        let workspaceManager = this.app.getWorkspaceManager();
-        if(!workspaceManager) return;
+        if(!this.workspaceView) return;
 
-        let modelManager = workspaceManager.getModelManager();
+        let modelView = this.workspaceView.getModelView();
         
         var id = tab.getId();
-        var component = modelManager.getComponentById(id);
-        if(component) {
-            this.activeTabIconDisplay.src = component.getIconUrl();
-            this.activeTabTitleDisplay.innerHTML = component.getDisplayName(true);
+        let tabComponentView = modelView.getComponentView(id)
+        if(tabComponentView) {
+            this.activeTabIconDisplay.src = tabComponentView.getIconUrl();
+            this.activeTabTitleDisplay.innerHTML = tabComponentView.getDisplayName(true);
             this.activeTabIconDisplay.style.display = "";
             this.activeTabTitleDisplay.style.display = "";
         }
