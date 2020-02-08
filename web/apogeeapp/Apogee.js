@@ -56,7 +56,7 @@ export default class Apogee extends EventManager {
         this.workspaceManager = null;
         
         //component generators
-        this.componentGenerators = {};
+        this.componentClasses = {};
         this.standardComponents = [];
         //these are a list of names of components that go in the "added component" list
         this.additionalComponents = [];
@@ -73,7 +73,7 @@ export default class Apogee extends EventManager {
         //load the standard component generators
         //(for now this is not configurable. This is called first so loaded modules
         //in config can self load after the defaults)
-        this.loadComponentGenerators();
+        this.loadComponentClasses();
         
         //----------------------------------
         //configure the application
@@ -109,15 +109,15 @@ export default class Apogee extends EventManager {
 
     /** This method registers a new component. It will be exposed when the user
      * requests to create a new component */
-    registerComponent(componentGenerator) {
-        var name = componentGenerator.uniqueName;
+    registerComponent(componentClass) {
+        var name = componentClass.uniqueName;
     //just replace - but existing ones will not change!
-    //    if(this.componentGenerators[name]) {
+    //    if(this.componentClasses[name]) {
     //        var replace = confirm("There is already a registered component with this name. Would you like to continue?");
     //        if(!replace) return;
     //    }
 
-        this.componentGenerators[name] = componentGenerator;
+        this.componentClasses[name] = componentClass;
         if(this.additionalComponents.indexOf(name) < 0) {
             this.additionalComponents.push(name);
         }
@@ -125,13 +125,13 @@ export default class Apogee extends EventManager {
 
     /** This method registers a new component. It will be exposed when the user
      * requests to create a new component */
-    unregisterComponent(componentGenerator) {
+    unregisterComponent(componentClass) {
         //implement this
     }
 
     /** This method returns a component generator of a given name. */
-    getComponentGenerator(name) {
-        return this.componentGenerators[name];
+    getComponentClass(name) {
+        return this.componentClasses[name];
     }
 
     getStandardComponentNames() {
@@ -142,11 +142,11 @@ export default class Apogee extends EventManager {
         return this.additionalComponents;
     }
 
-    getComponentGenerators() {
-        return this.componentGenerators;
+    getcomponentClasses() {
+        return this.componentClasses;
     }
 
-    getFolderGenerator() {
+    getFolderComponentClass() {
         return FolderComponent;
     }
 
@@ -311,7 +311,7 @@ export default class Apogee extends EventManager {
 
     /** This method adds the standard components to the app. 
      * @private */
-    loadComponentGenerators() {
+    loadComponentClasses() {
         //standard components
         this.registerStandardComponent(JsonTableComponent);
         this.registerStandardComponent(FolderComponent);
@@ -327,15 +327,15 @@ export default class Apogee extends EventManager {
 
     /** This method registers a component. 
      * @private */
-    registerStandardComponent(componentGenerator) {
-        var name = componentGenerator.uniqueName;
-        if(this.componentGenerators[name]) {
+    registerStandardComponent(componentClass) {
+        var name = componentClass.uniqueName;
+        if(this.componentClasses[name]) {
             var replace = confirm("There is already a registered component with this name. Would you like to continue?");
             if(!replace) return;
         }
 
     //we should maybe warn if another component bundle is being overwritten 
-        this.componentGenerators[name] = componentGenerator;
+        this.componentClasses[name] = componentClass;
         if(this.standardComponents.indexOf(name) < 0) {
             this.standardComponents.push(name);
         }

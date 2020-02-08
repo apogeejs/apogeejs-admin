@@ -20,13 +20,7 @@ export default class JsonTableComponent extends Component {
     setDataView(dataView) {
         if(this.dataView != dataView) {
             this.fieldUpdated("dataView");
-            
             this.dataView = dataView;
-            //update the window display if needed
-            var componentDisplay = this.getComponentDisplay();
-            if(componentDisplay) {
-                componentDisplay.reloadDisplay(JsonTableComponent.VIEW_DATA);
-            }
         }
     }
 

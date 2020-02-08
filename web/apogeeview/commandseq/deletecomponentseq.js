@@ -2,16 +2,7 @@
 
 
 
-export function deleteComponent(component) {
-
-    //get the active workspace
-    var workspaceManager = component.getWorkspaceManager();
-    if(!workspaceManager) {
-        alert("There is no open workspace.");
-        return;
-    }     
-
-    var modelManager = workspaceManager.getModelManager();
+export function deleteComponent(component,componentView) {
 
     var doDelete = confirm("Are you sure you want to delete this object?");
     if(!doDelete) {
@@ -21,16 +12,12 @@ export function deleteComponent(component) {
     var member = component.getMember();
     var commands = [];
 
-    ////////////////////////////////////
-    //this is cumbersome - fix it up
-    if(component.usesChildDisplay()) {
-        var parentMember = member.getParent();
-        let parentComponent = modelManager.getComponent(parentMember);
+    if(componentView.constructor.hasChildEntry) {
+        let parentComponentView = componentView.getParentComponentView();
 
-        let editorCommand = parentComponent.getRemoveApogeeNodeFromPageCommand(member.getName());
+        let editorCommand = parentComponentView.getRemoveApogeeNodeFromPageCommand(component.getName());
         commands.push(editorCommand);
     }
-    /////////////////////////////////
 
     //model command
     var modelCommand = {};
@@ -52,5 +39,5 @@ export function deleteComponent(component) {
         return;
     }
 
-    workspaceManager.getApp().executeCommand(commandData);
+    component.getModelManager().getApp().executeCommand(commandData);
 }

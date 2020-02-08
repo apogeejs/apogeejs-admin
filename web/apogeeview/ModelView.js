@@ -1,8 +1,7 @@
 import apogeeui from "/apogeeui/apogeeui.js";
 import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
 
-import JsonTableComponentView from "/apogeeview/componentviews/JsonTableComponentView.js";
-import FolderComponentView from "/apogeeview/componentviews/FolderComponentView.js";
+import ApogeeView from "/apogeeview/ApogeeView.js"
 
 /** This class manages the user interface for a workspace object. */
 export default class ModelView {
@@ -26,10 +25,6 @@ export default class ModelView {
         this.modelManager.addListener("created",target => this.targetCreated(target));
         this.modelManager.addListener("updated",target => this.targetUpdated(target));
         this.modelManager.addListener("deleted",target => this.targetDeleted(target));
-
-        //TEMPORARY########################################################################
-        this.modelManager.setModelView(this);
-        //##################################################################################
     }
 
     getTreeEntry() {
@@ -46,6 +41,14 @@ export default class ModelView {
 
     getApp() {
         return this.workspaceView.getApp();
+    }
+
+    getWorkspaceView() {
+        return this.workspaceView;
+    }
+
+    getAppView() {
+        return this.workspaceView.getAppView();
     }
 
     //-----------------------------------
@@ -96,7 +99,7 @@ export default class ModelView {
     onComponentCreated(component) {
 
         //create the component view
-        let componentViewClass = ModelView.getComponentViewClass(component.componentGenerator.uniqueName);
+        let componentViewClass = ApogeeView.getComponentViewClass(component.constructor.uniqueName);
         let componentView;
         if(componentViewClass) {
             componentView = new componentViewClass(this,component);
@@ -111,7 +114,7 @@ export default class ModelView {
         //add to the proper parent
         let parentComponent = component.getParentComponent();
         if(parentComponent) {
-            let parentComponentView = this.getComponentView(parentComponent.getFullName());
+            let parentComponentView = this.getComponentView(parentComponent.getId());
             if(parentComponentView) {
                 parentComponentView.addChild(componentView);
             }
@@ -122,7 +125,7 @@ export default class ModelView {
                 //figure out how to handle this!!!
                 alert("Root folder already loaded!");
             }
-            this.treeEntry.addChild(componentView.getTreeEntry(true));
+            this.treeEntry.addChild(componentView.getTreeEntry());
             this.rootFolderLoaded = true;
         }
     }
@@ -145,7 +148,7 @@ export default class ModelView {
                 //figure out how to handle this!!!
                 alert("Root folder already loaded!");
             }
-            this.treeEntry.removeChild(componentView.getTreeEntry(true));
+            this.treeEntry.removeChild(componentView.getTreeEntry());
             this.rootFolderLoaded = false;
         }
     }
@@ -215,11 +218,6 @@ export default class ModelView {
     init() {
         this.treeEntry = this.createTreeEntry();
         this.treeEntry.setState(TreeEntry.EXPANDED);
-
-        //TEMPORARY COMPONENT VIEW REGISTRATION#################################
-        ModelView.registerComponentView(JsonTableComponentView);
-        ModelView.registerComponentView(FolderComponentView);
-        //######################################################################
     }
 
     createTreeEntry() {
@@ -233,21 +231,7 @@ export default class ModelView {
         return apogeeui.getResourcePath(ICON_RES_PATH);
     }
 
-    //========================================
-    // Static Functions
-    //========================================
-
-    static registerComponentView(viewClass) {
-        componentClassMap[viewClass.componentName] = viewClass;
-    }
-
-    static getComponentViewClass(componentName) {
-        return componentClassMap[componentName];
-    }
-
 }
-
-let componentClassMap = {};
 
 let MODEL_FOLDER_LABEL = "Model";
 

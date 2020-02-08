@@ -8,9 +8,9 @@ import { createProseMirrorManager } from "/apogeeview/componentdisplay/literatep
  * It extends the component class. */
 export default class ParentComponent extends Component {
 
-    constructor(modelManager,member,componentGenerator) {
+    constructor(modelManager,member) {
         //base constructor
-        super(modelManager,member,componentGenerator);
+        super(modelManager,member);
 
         //create an empty edit state to start
         this.editorManager = createProseMirrorManager(this);

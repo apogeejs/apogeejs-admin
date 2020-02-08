@@ -32,7 +32,7 @@ export default class PageChildComponentDisplay {
         this.parentComponentDisplay.addListener(apogeeui.HIDDEN_EVENT,() => this.setIsPageShowing(false));
 
         //set the initial state
-        let childDisplayState = component.getChildDisplayState();
+        let childDisplayState = componentView.getChildDisplayState();
         this.setStateJson(childDisplayState);
 
         //add a cleanup action to the base component - component must already be initialized
@@ -53,7 +53,8 @@ export default class PageChildComponentDisplay {
 
     componentUpdated(fieldsUpdated) {
 
-        if(apogeeutil.isFieldUpdated(fieldsUpdated,"displayName")) {
+//WRONG - we need to respond to the proper changes, which depend on the class (title is name + possible argument, return value)
+        if(apogeeutil.isFieldUpdated(fieldsUpdated,"name")) {
             this._setTitle();
         }
 
@@ -144,7 +145,7 @@ export default class PageChildComponentDisplay {
 
         //add the click handler, to select this node if it is clicked
         this.mainElement.onclick = () => {
-            let name = this.member.getName();
+            let name = this.componentView.getName();
             let parentComponentView = this.componentView.getParentComponentView();
             parentComponentView.selectApogeeNode(name);
         }
@@ -257,8 +258,8 @@ export default class PageChildComponentDisplay {
 
     _setBannerState() {
 
-        let bannerState = this.componentView.getBannerState();
-        let bannerMessage = this.componentView.getBannerMessage();
+        let bannerState = this.componentView.getComponent().getBannerState();
+        let bannerMessage = this.componentView.getComponent().getBannerMessage();
 
         //update the banner
         var bannerDiv;

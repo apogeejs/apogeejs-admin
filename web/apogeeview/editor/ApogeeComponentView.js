@@ -49,14 +49,14 @@ export default class ApogeeComponentView {
         
         //WE SHOULD MAKE SURE THE MEMBER BELONGS TO THIS PARENT!!!??
         if (member) {
-          var modelManager = folderComponent.getModelManager();
-          var component = modelManager.getComponent(member);
-          var componentDisplay = component.getComponentDisplay();
+          var modelView = this.folderComponentView.getModelView();
+          var componentView = modelView.getComponentView(member.getId());
+          var componentDisplay = componentView.getComponentDisplay();
           if (!componentDisplay) {
             //CLUDGE ALERT - fix this when I reorganize the code
             var tabDisplay = this.folderComponentView.getTabDisplay();
-            tabDisplay.addChildComponent(component);
-            componentDisplay = component.getComponentDisplay();
+            tabDisplay.addChild(componentView);
+            componentDisplay = componentView.getComponentDisplay();
           }
           var displayElement = componentDisplay.getElement();
           this.contentDiv.appendChild(displayElement);

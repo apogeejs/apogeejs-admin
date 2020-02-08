@@ -28,14 +28,14 @@ compoundcommand.createUndoCommand = function(workspaceManager,commandData) {
 compoundcommand.executeCommand = function(workspaceManager,commandData) {
     
     let commandResult = {};
-    commandResult.childResults = [];
+    commandResult.childCommandResults = [];
     
     //add the child undo commands in the reverse order
     for(var i = 0; i < commandData.childCommands.length; i++) {
         let childCommandJson = commandData.childCommands[i];
         let childCommandObject = CommandManager.getCommandObject(childCommandJson.type);
         let childCommandResult = childCommandObject.executeCommand(workspaceManager,childCommandJson);
-        commandResult.childResults.push(childCommandResult);
+        commandResult.childCommandResults.push(childCommandResult);
     }
 
     //i need to handle error cases!

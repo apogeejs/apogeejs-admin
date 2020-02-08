@@ -8,12 +8,12 @@ import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js"
 //=====================================
 
 /** This method gets a callback to update the properties of a component. */
-export function updateComponent(component) {
+export function updateComponent(component,componentViewClass) {
     
-    var componentGenerator = component.componentGenerator;
+    var componentClass = component.constructor;
 
-    var displayName = componentGenerator.displayName
-    var additionalLines = apogeeutil.jsonCopy(componentGenerator.propertyDialogLines); 
+    var displayName = componentClass.displayName
+    var additionalLines = apogeeutil.jsonCopy(componentViewClass.propertyDialogLines); 
 
     var modelManager = component.getModelManager(); 
     var model = component.getModel();
@@ -44,17 +44,16 @@ export function updateComponent(component) {
         //--------------
         // Update Properties
         //--------------
-        var componentGenerator = component.componentGenerator;
         
         var memberUpdateJson = {};
-        if(componentGenerator.transferMemberProperties) {
-            componentGenerator.transferMemberProperties(newValues,memberUpdateJson);
+        if(componentClass.transferMemberProperties) {
+            componentClass.transferMemberProperties(newValues,memberUpdateJson);
         }
         var numMemberProps = apogeeutil.jsonObjectLength(memberUpdateJson);
         
         var componentUpdateJson = {};
-        if(componentGenerator.transferComponentProperties) {
-            componentGenerator.transferComponentProperties(newValues,componentUpdateJson);
+        if(componentClass.transferComponentProperties) {
+            componentClass.transferComponentProperties(newValues,componentUpdateJson);
         }
         var numComponentProps = apogeeutil.jsonObjectLength(componentUpdateJson);
         
@@ -86,7 +85,7 @@ export function updateComponent(component) {
             let renameEditorCommands;
 
             //do the first stage of editor commands
-            if(component.usesChildDisplay()) {
+            if(componentViewClass.hasChildDisplay) {
                 //----------------------------
                 //move case
                 //delete old node
@@ -122,7 +121,7 @@ export function updateComponent(component) {
             commands.push(moveCommand);
 
             //do the second stage of editor commands
-            if(component.usesChildDisplay()) {
+            if(componentViewClass.hasChildDisplay) {
 
                 //-----------------------------------
                 // move case
@@ -184,7 +183,7 @@ export function updateComponent(component) {
             modelManager.getApp().executeCommand(command);
         }
 
-        if(component.usesChildDisplay()) {
+        if(componentViewClass.hasChildDisplay) {
             //select the component and give focus to the parent editor if this is a child
             //NOTE - the if is not quite right. We shoudl only return to editor if the command origniated there.
             returnToEditor(component,submittedValues.name);

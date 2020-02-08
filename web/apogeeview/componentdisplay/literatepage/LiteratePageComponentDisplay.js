@@ -83,7 +83,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
         var childComponentDisplay;
 
         //create a new component display for this child
-        if(childComponent.componentGenerator.hasChildEntry) {
+        if(childComponentView.constructor.hasChildEntry) {
             childComponentDisplay = new PageChildComponentDisplay(childComponentView,this);
         }
 
@@ -92,7 +92,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //------------------
         if(childComponentDisplay) {
             //set the component display
-            childComponent.setComponentDisplay(childComponentDisplay);
+            childComponentView.setComponentDisplay(childComponentDisplay);
         }
     }
 
@@ -237,13 +237,13 @@ export default class LiteratePageComponentDisplay extends EventManager {
         this.initEditor();
 
         //show all children
-        var modelManager = pageComponent.getModelManager();
+        var modelView = this.componentView.getModelView();
         var children = folder.getChildMap();
         for(var childName in children) {
             var child = children[childName];
-            var childComponent = modelManager.getComponent(child);
-            if(childComponent) {
-                this.addChildComponent(childComponent);
+            var childComponentView = modelView.getComponentView(child.getId());
+            if(childComponentView) {
+                this.addChild(childComponentView);
             }
         }
         
@@ -261,23 +261,24 @@ export default class LiteratePageComponentDisplay extends EventManager {
         let pageComponent = this.componentView.getComponent();
         var modelManager = pageComponent.getModelManager();
         var app = modelManager.getApp();
+        var appView = this.componentView.getModelView().getWorkspaceView().getAppView();
 
         for(var i = 0; i < app.standardComponents.length; i++) {
             let key = app.standardComponents[i];
 
-            let componentGenerator = app.componentGenerators[key];
-            let viewClass = ModelView.getComponentViewClass(componentGenerator.uniqueName);
-            if(viewClass.hasChildEntry) {
+            let componentClass = app.componentClasses[key];
+            let componentViewClass = appView.constructor.getComponentViewClass(componentClass.uniqueName);
+            if(componentViewClass.hasChildEntry) {
 
                 var buttonElement = apogeeui.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
                 //make the idon
                 var imageElement = document.createElement("img")
-                imageElement.src = apogeeui.getResourcePath(viewClass.ICON_RES_PATH);
+                imageElement.src = apogeeui.getResourcePath(componentViewClass.ICON_RES_PATH);
                 var iconElement = apogeeui.createElementWithClass("div","visiui_litPage_componentButtonIcon",buttonElement);
                 iconElement.appendChild(imageElement);
                 //label
                 var textElement = apogeeui.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
-                textElement.innerHTML = componentGenerator.displayName;
+                textElement.innerHTML = componentClass.displayName;
                 //add handler
                 buttonElement.onclick = () => {
 
@@ -286,7 +287,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
                     var initialValues = {};
                     initialValues.parentName = this.componentView.getFullName();
 
-                    addComponent(app,componentGenerator,initialValues,null,null);
+                    addComponent(appView,app,componentClass,initialValues,null,null);
                 }
             }
         }
@@ -302,8 +303,11 @@ export default class LiteratePageComponentDisplay extends EventManager {
             var initialValues = {};
             initialValues.parentName = this.componentView.getFullName();
 
+            let appView = this.componentView.getModelView().getWorkspaceView().getAppView();
+            let componentViewClassFunction = componentName => appView.constructor.getComponentViewClass(componentName);
+
             //I tacked on a piggyback for testing!!!
-            addAdditionalComponent(app,initialValues,null,null);
+            addAdditionalComponent(app,componentViewClassFunction,initialValues,null,null);
         }
         this.componentToolbarContainer.appendChild(buttonElement);
     }
@@ -334,16 +338,17 @@ export default class LiteratePageComponentDisplay extends EventManager {
      * page display.  
      * @protected */
     destroy() {
-        let pageComponent = this.getComponent();
+        //we should probably have a less cumbesome way of doing this
+        let pageComponent = this.componentView.getComponent();
         let folder = pageComponent.getParentForChildren();
         var children = folder.getChildMap();
-        var modelManager = pageComponent.getModelManager();
+        var modelView = this.componentView.getModelView();
 
         for(var childName in children) {
             var child = children[childName];
-            var childComponent = modelManager.getComponent(child);
-            if(childComponent) {
-                childComponent.closeComponentDisplay();
+            var childComponentView = modelView.getComponentView(child.getId());
+            if(childComponentView) {
+                childComponentView.closeComponentDisplay();
             }
         }
 

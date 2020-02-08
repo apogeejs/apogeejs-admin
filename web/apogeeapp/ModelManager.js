@@ -15,16 +15,6 @@ export default class ModelManager extends EventManager {
         this.componentMap = {};
     }
 
-    //TEMPORARY###############################################
-    getModelView() {
-        return this.modelView;
-    }
-
-    setModelView(modelView) {
-        this.modelView = modelView;
-    }
-    //########################################################
-
     //====================================
     // Model Management
     //====================================
@@ -208,10 +198,10 @@ export default class ModelManager extends EventManager {
 
         if(member) {
             
-            var componentGenerator = this.app.getComponentGenerator(componentJson.type);
-            if((componentGenerator)&&(member.generator.type != "apogee.ErrorTable")) {
+            var componentClass = this.app.getComponentClass(componentJson.type);
+            if((componentClass)&&(member.generator.type != "apogee.ErrorTable")) {
                 //create empty component
-                component = new componentGenerator(this,member);
+                component = new componentClass(this,member);
 
                 //call member updated to process and notify of component creation
                 //I SHOULD CONSTRUCT THIS IN A STANDARD WAY RATHER THAN MAKING IT HERE.
@@ -227,8 +217,8 @@ export default class ModelManager extends EventManager {
             //if we failed to create the component, or if we failed to make the member properly (and we used the error member)
             if(!component) {
                 //table not found - create an empty table
-                componentGenerator = this.app.getComponentGenerator("apogeeapp.app.ErrorTableComponent");
-                component = new componentGenerator(this,member);
+                componentClass = this.app.getComponentClass("apogeeapp.app.ErrorTableComponent");
+                component = new componentClass(this,member);
                 if(componentJson) {
                     component.loadProperties(componentJson);
                 }
@@ -262,10 +252,8 @@ export default class ModelManager extends EventManager {
             commandResult.action = "created";
 
             //load the children, if there are any (BETTER ERROR CHECKING!)
-            if((component.readChildrenFromJson)&&(createMemberResult.childActionResults)) { 
-                let childCommandResults = [];     
-                component.readChildrenFromJson(this,createMemberResult.childActionResults,componentJson,childCommandResults);
-                commandResult.childCommandResults = childCommandResults;
+            if((component.readChildrenFromJson)&&(createMemberResult.childActionResults)) {    
+                commandResult.childCommandResults = component.readChildrenFromJson(this,createMemberResult.childActionResults,componentJson);
             }
         }
             

@@ -23,19 +23,19 @@ export default class ParentComponentView extends ComponentView {
         this.editorData = component.getEditorData();
     }
 
-    instantiateTreeEntry() {
-        var treeDisplay = super.instantiateTreeEntry();
+    createTreeDisplay() {
+        var treeDisplay = super.createTreeDisplay();
         
         //add any existing children to the tree entry
         var treeEntry = treeDisplay.getTreeEntry();
         var member = this.component.getMember();
-        var modelManager = this.component.getModelManager();
+        var modelView = this.getModelView();
         var childMap = member.getChildMap();
         for(var childKey in childMap) {
             var childMember = childMap[childKey];
-            var childComponent = modelManager.getComponent(childMember);
-            if(childComponent) {
-                var childTreeEntry = childComponent.getTreeEntry(true);
+            var childComponentView = modelView.getComponentView(childMember.getId());
+            if(childComponentView) {
+                var childTreeEntry = childComponentView.getTreeEntry();
                 treeEntry.addChild(childTreeEntry);
             }
         }
@@ -75,7 +75,7 @@ export default class ParentComponentView extends ComponentView {
         //add the child to the tree entry
         var treeEntry = this.getTreeEntry();
         if(treeEntry) {
-            var childTreeEntry = childComponentView.getTreeEntry(true);
+            var childTreeEntry = childComponentView.getTreeEntry();
             treeEntry.addChild(childTreeEntry);
         }
 

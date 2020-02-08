@@ -8,8 +8,8 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
  * and create a generator. */
 export default class BasicControlComponent extends Component{
     
-    constructor(modelManager,control,componentGenerator) {
-        super(modelManager,control,componentGenerator);
+    constructor(modelManager,control) {
+        super(modelManager,control);
     
         //default to keep alive
         this.displayDestroyFlags = DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_NEVER;
@@ -77,13 +77,13 @@ export default class BasicControlComponent extends Component{
     }
 
     /** This method creates a basic generator for the extending object. */
-    static attachStandardStaticProperties(componentGenerator,displayName,uniqueName) {
-        componentGenerator.displayName = displayName;
-        componentGenerator.uniqueName = uniqueName;
-        componentGenerator.hasTabEntry = false;
-        componentGenerator.hasChildEntry = true;
-        componentGenerator.ICON_RES_PATH = "/componentIcons/chartControl.png";
-        componentGenerator.DEFAULT_MEMBER_JSON = {
+    static attachStandardStaticProperties(componentClass,displayName,uniqueName) {
+        componentClass.displayName = displayName;
+        componentClass.uniqueName = uniqueName;
+        componentClass.hasTabEntry = false;
+        componentClass.hasChildEntry = true;
+        componentClass.ICON_RES_PATH = "/componentIcons/chartControl.png";
+        componentClass.DEFAULT_MEMBER_JSON = {
             "type": "apogee.JsonTable"
         };
     }

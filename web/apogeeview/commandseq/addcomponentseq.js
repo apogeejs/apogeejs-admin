@@ -15,7 +15,10 @@ import {showSelectComponentDialog} from "/apogeeview/dialogs/SelectControlDialog
  * property values in optionalBaseComponentValues, overridden by the user input properties where applicable. The member
  * created will be made using the optionalBaseMemberValues, agagin overidden by any user input values.  */   
 //piggybackCommand is a temporary test!!!
-export function addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
+export function addComponent(appView,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
+
+        let componentViewClass = appView.constructor.getComponentViewClass(componentClass.uniqueName);
+        let modelView = appView.getWorkspaceView().getModelView();
 
         //get the active workspace
         var workspaceManager = app.getWorkspaceManager();
@@ -34,10 +37,10 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
 
         
         //get the tyep display name
-        var displayName = componentGenerator.displayName
+        var displayName = componentClass.displayName
         
         //get any additional property content for dialog beyond basic properties
-        var additionalLines = apogeeutil.jsonCopy(componentGenerator.propertyDialogLines); 
+        var additionalLines = apogeeutil.jsonCopy(componentViewClass.propertyDialogLines); 
         
         //get the folder list
         var folderList = modelManager.getFolders();
@@ -66,15 +69,15 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
             let createCommandData = {};
             createCommandData.type = "addComponent";
             createCommandData.parentFullName = userInputProperties.parentName;
-            createCommandData.memberJson = Component.createMemberJson(componentGenerator,userInputProperties,optionalBaseMemberValues);
-            createCommandData.componentJson = Component.createComponentJson(componentGenerator,userInputProperties,optionalBaseComponentValues);
+            createCommandData.memberJson = Component.createMemberJson(componentClass,userInputProperties,optionalBaseMemberValues);
+            createCommandData.componentJson = Component.createComponentJson(componentClass,userInputProperties,optionalBaseComponentValues);
 
             //editor related commands
             let additionalCommands;
-            let parentComponent;
-            if(componentGenerator.hasChildEntry) {
-                parentComponent = getComponentFromName(modelManager,userInputProperties.parentName);
-                additionalCommands = getAdditionalCommands(parentComponent,userInputProperties.name);
+            let parentComponentView;
+            if(componentViewClass.hasChildEntry) {
+                parentComponentView = getComponentFromName(modelManager,modelView,userInputProperties.parentName);
+                additionalCommands = getAdditionalCommands(parentComponentView,userInputProperties.name);
 
                 //added the editor setup command
                 if(additionalCommands.editorSetupCommand) commands.push(additionalCommands.editorSetupCommand);
@@ -115,11 +118,11 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
             }
             
             //execute command
-            modelManager.getApp().executeCommand(commandData);
+            app.executeCommand(commandData);
 
             //give focus back to editor
-            if(componentGenerator.hasChildEntry) {
-                parentComponent.giveEditorFocusIfShowing();
+            if(componentViewClass.hasChildEntry) {
+                parentComponentView.giveEditorFocusIfShowing();
             }
 
             //return true to close the dialog
@@ -127,7 +130,7 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
         }
 
         //give foxus back to editor
-        let onCancelFunction = () => null; /*parentComponent.giveEditorFocusIfShowing() - oops no parent component*/;
+        let onCancelFunction = () => null; /*parentComponentView.giveEditorFocusIfShowing() - oops no parent component*/;
         
         //show dialog
         showConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
@@ -136,13 +139,12 @@ export function addComponent(app,componentGenerator,optionalInitialProperties,op
 
 /** This gets a callback to add an "additional" component, menaing one that is not
  * in the main component menu. */
-//piggybackCommand is a temporary test!!!
-export function addAdditionalComponent(app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
+export function addAdditionalComponent(appView,app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
         
     var onSelect = function(componentUniqueName) {
-        let componentGenerator = app.getComponentGenerator(componentUniqueName);
-        if(componentGenerator) {
-            addComponent(app,componentGenerator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
+        let componentClass = app.getComponentClass(componentUniqueName);
+        if(componentClass) {
+            addComponent(appView,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
         }
         else {
             alert("Unknown component type: " + componentType);
@@ -151,35 +153,35 @@ export function addAdditionalComponent(app,optionalInitialProperties,optionalBas
     //get the display names
     let additionalComponents = app.getAdditionalComponentNames();
     let componentInfoList = additionalComponents.map( componentName => {
-        let componentGenerator = app.getComponentGenerator(componentUniqueName); 
-        return {displayName: componentGenerator.displayName, uniqueName: componentName};
+        let componentClass = app.getComponentClass(componentUniqueName); 
+        return {displayName: componentClass.displayName, uniqueName: componentName};
     });
     //open select component dialog
     showSelectComponentDialog(componentInfoList,onSelect);
 }
 
-function getAdditionalCommands(parentComponent,childName) {
+function getAdditionalCommands(parentComponentView,childName) {
 
     //check selection
-    let useParentSelection = getUseParentSelection(parentComponent);
+    let useParentSelection = getUseParentSelection(parentComponentView);
     
     let insertAtEnd = !useParentSelection;
 
-    return parentComponent.getInsertApogeeNodeOnPageCommands(childName,insertAtEnd);
+    return parentComponentView.getInsertApogeeNodeOnPageCommands(childName,insertAtEnd);
 }
 
-function getComponentFromName(modelManager, componentName) {
+function getComponentFromName(modelManager, modelView, componentName) {
     var model = modelManager.getModel();
     var member = model.getMemberByFullName(componentName);
-    var component = modelManager.getComponent(member);
-    return component;
+    var componentView = modelView.getComponentView(member.getId());
+    return componentView;
 }
 
-function getUseParentSelection(parentComponent) {
+function getUseParentSelection(parentComponentView) {
     //use the parent selection only if the tab is the active tab
     //otherwise the component should be placed at the end
 
-    let tabDisplay = parentComponent.getTabDisplay();
+    let tabDisplay = parentComponentView.getTabDisplay();
     if(!tabDisplay) return false;
 
     let tab = tabDisplay.getTab();

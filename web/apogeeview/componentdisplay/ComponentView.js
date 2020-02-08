@@ -23,8 +23,10 @@ export default class ComponentView {
         
         this.tabDisplay = null; //only valid on parents, which open into a tab
         
-        this.treeDisplay = null; //this is shown in the tree view
+        this.treeDisplay = this.createTreeDisplay(); //this is shown in the tree view
         this.treeState = null;
+
+        this.loadStateFromComponent();
 
         this.component.addListener("updated",eventInfo => this.componentUpdated(eventInfo));
     }
@@ -48,7 +50,19 @@ export default class ComponentView {
 
     /** This method returns a display name for the member object. */
     getDisplayName(useFullPath) {
-        this.component.getDisplayName(useFullPath);
+        return this.component.getDisplayName(useFullPath);
+    }
+
+    getParentComponentView() {
+        let parentComponent = this.component.getParentComponent();
+        if(parentComponent) {
+            let parentMemberId = parentComponent.getId();
+            return this.modelView.getComponentView(parentMemberId);
+        }
+        else {
+            return null;
+        }
+
     }
 
 //--- VIEW ITEM ---//
@@ -109,7 +123,7 @@ export default class ComponentView {
         }
 
         if((activeTreeState !== undefined)&&(activeTreeState != TreeEntry.NO_CONTROL)) {
-            json.childDisplayState = activeChildDisplayState;
+            json.treeState = activeTreeState;
             statePresent = true;
         }
 
@@ -141,13 +155,13 @@ export default class ComponentView {
         }
         
         //set window options
-        if(json.windowState !== undefined) {
+        if(json.childDisplayState !== undefined) {
             if(this.childComponentDisplay) {
-                this.childComponentDisplay.setState(json.windowState);
+                this.childComponentDisplay.setState(json.childDisplayState);
                 this.childDisplayState = undefined;
             }
             else {
-                this.childDisplayState = json.windowState;
+                this.childDisplayState = json.childDisplayState;
             }
         }
         
@@ -170,25 +184,13 @@ export default class ComponentView {
     // tree entry methods - this is the element in the tree view
     //-------------------
 //--- VIEW ITEM ---//
-    getTreeEntry(createIfMissing) {
-        if((createIfMissing)&&(!this.treeDisplay)) {
-            this.treeDisplay = this.instantiateTreeEntry();
-
-            if(this.treeState !== undefined) {
-                this.treeDisplay.setState(this.treeState);
-            }
-        }
-        
-        if(this.treeDisplay) {
-            return this.treeDisplay.getTreeEntry();
-        }
-        else {
-            return null;
-        }
+    getTreeEntry() {
+        return this.treeDisplay.getTreeEntry();
     }
+
 //--- VIEW ITEM ---//
     /** @protected */
-    instantiateTreeEntry() {
+    createTreeDisplay() {
         var treeDisplay = new TreeComponentDisplay(this);
         
         //default sort order within parent
@@ -201,11 +203,7 @@ export default class ComponentView {
     //-------------------
     // component display methods - this is the element in the parent tab (main display)
     //-------------------
-//--- VIEW ITEM ---//
-    /** This indicates if the component has a tab display. */
-    usesChildDisplay() {
-        return this.constructor.hasChildEntry;
-    }
+
 //--- VIEW ITEM ---//
     getChildDisplayState() {
         return this.childDisplayState;
@@ -285,12 +283,12 @@ export default class ComponentView {
             //add the standard entries
             var itemInfo = {};
             itemInfo.title = "Edit Properties";
-            itemInfo.callback = () => updateComponent(this.component);
+            itemInfo.callback = () => updateComponent(this.component,this.constructor);
             menuItemList.push(itemInfo);
 
             var itemInfo = {};
             itemInfo.title = "Delete";
-            itemInfo.callback = () => deleteComponent(this.component);
+            itemInfo.callback = () => deleteComponent(this.component,this);
             menuItemList.push(itemInfo);
         }
         
@@ -462,51 +460,6 @@ export default class ComponentView {
         
         return openCallback;
     }
-
-    //======================================
-    // Static methods
-    //======================================
-
-    /** This function creates a json to create the member for a new component instance. 
-     * It uses default values and then overwrites in with optionalBaseValues (these are intended to be base values outside of user input values)
-     * and then optionalOverrideValues (these are intended to be user input values) */
-    static createMemberJson(componentGenerator,optionalInputProperties,optionalBaseValues) {
-        var json = apogeeutil.jsonCopy(componentGenerator.DEFAULT_MEMBER_JSON);
-        if(optionalBaseValues) {
-            for(var key in optionalBaseValues) {
-                json[key]= optionalBaseValues[key];
-            }
-        }
-        if(optionalInputProperties) {
-            //add the base component values
-            if(optionalInputProperties.name !== undefined) json.name = optionalInputProperties.name;
-            
-            //add the specific member properties for this component type
-            if(componentGenerator.transferMemberProperties) {
-                componentGenerator.transferMemberProperties(optionalInputProperties,json);
-            }
-        }
-        
-        return json;
-    }
-
-    /** This function merges values from two objects containing component property values. */
-    static createComponentJson(componentGenerator,optionalInputProperties,optionalBaseValues) {
-        //copy the base properties
-        var newPropertyValues = optionalBaseValues ? apogeeutil.jsonCopy(optionalBaseValues) : {};
-        
-        //set the type
-        newPropertyValues.type = componentGenerator.uniqueName;
-        
-        //add in the input property Value
-        if((optionalInputProperties)&&(componentGenerator.transferComponentProperties)) {
-            componentGenerator.transferComponentProperties(optionalInputProperties,newPropertyValues);
-        }
-        
-        return newPropertyValues;
-    }
-
-
 }
 
 //These parameters are used to order the components in the tree entry.

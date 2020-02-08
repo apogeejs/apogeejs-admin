@@ -50,8 +50,8 @@ export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
     }
     
     var onCreate = function() {
-		var componentGenerator = select.value;
-        onSelectFunction(componentGenerator);
+		var componentClass = select.value;
+        onSelectFunction(componentClass);
         dialogMgr.closeDialog(dialog);
     }
     line.appendChild(apogeeui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));

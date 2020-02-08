@@ -6,7 +6,7 @@ import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 //=====================================
 
 /** Call this withthe appropriate generator - folder or folder function, for the given import type. */
- export function importWorkspace(app,fileAccessObject,componentGenerator) {
+ export function importWorkspace(appView,app,fileAccessObject,componentClass) {
 
     //make sure there is not an open workspace
     if(!app.getWorkspaceManager()) {
@@ -21,7 +21,7 @@ import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
         }
         else {
             //open workspace
-            return openWorkspace(app,componentGenerator,workspaceData,fileMetadata);
+            return openWorkspace(appView,app,componentClass,workspaceData,fileMetadata);
         }
     }
 
@@ -37,8 +37,7 @@ import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 /** This method opens an workspace, from the text file. 
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
-function openWorkspace(app,componentGenerator,workspaceText,fileMetadata) {
-    var name;
+function openWorkspace(appView,app,componentClass,workspaceText,fileMetadata) {
     
     try {
         //make sure there is not an open workspace
@@ -57,10 +56,10 @@ function openWorkspace(app,componentGenerator,workspaceText,fileMetadata) {
         var initialProperties = {};
         initialProperties.name = workspaceJson.workspace.data.name;
 
-        var serializedMemberJson = getMemberJsonFromWorkspaceJson(workspaceJson,componentGenerator);
-        var serializedComponentsJson = getComponentJsonFromWorkspaceJson(workspaceJson,componentGenerator);
+        var serializedMemberJson = getMemberJsonFromWorkspaceJson(workspaceJson,componentClass);
+        var serializedComponentsJson = getComponentJsonFromWorkspaceJson(workspaceJson,componentClass);
         
-		var workspaceImportDialogFunction = () => addComponent(app,componentGenerator,initialProperties,serializedMemberJson,serializedComponentsJson);
+		var workspaceImportDialogFunction = () => addComponent(appView,app,initialProperties,serializedMemberJson,serializedComponentsJson);
         
         var linkLoadError = function(errorMsg) {
             alert("Error loading links: " + errorMsg);
@@ -133,43 +132,43 @@ function doRequest(url,onDownload,onFailure) {
 }
 
 /** This reads the proper member json from the imported workspace json. */
-function getMemberJsonFromWorkspaceJson(workspaceJson,componentGenerator) {
+function getMemberJsonFromWorkspaceJson(workspaceJson,componentClass) {
     var memberFolderJson = workspaceJson.workspace.data;
     
-    if(componentGenerator.uniqueName == "apogeeapp.app.FolderFunctionComponent") {
+    if(componentClass.uniqueName == "apogeeapp.app.FolderFunctionComponent") {
         //I should probably do this conversion in the folder function code, so it is easier to maintain
-        var memberFolderFunctionJson = componentGenerator.DEFAULT_MEMBER_JSON;
+        var memberFolderFunctionJson = componentClass.DEFAULT_MEMBER_JSON;
         var internalFolderJson = apogeeutil.jsonCopy(memberFolderJson);
         internalFolderJson.name = "root";
         memberFolderFunctionJson.internalFolder = internalFolderJson;
         return memberFolderFunctionJson;
     }
-    else if(componentGenerator.uniqueName == "apogeeapp.app.FolderComponent") {
+    else if(componentClass.uniqueName == "apogeeapp.app.FolderComponent") {
         return memberFolderJson;
     }
     else {
-        throw new Error("Unknown target type: " + componentGenerator.uniqueName);
+        throw new Error("Unknown target type: " + componentClass.uniqueName);
     }
 
 }
         
 /** This reads the proper component json from the imported workspace json. */
-function getComponentJsonFromWorkspaceJson(workspaceJson,componentGenerator) {
+function getComponentJsonFromWorkspaceJson(workspaceJson,componentClass) {
     var componentFolderJson = workspaceJson.components;
     
-    if(componentGenerator.uniqueName == "apogeeapp.app.FolderFunctionComponent") {
+    if(componentClass.uniqueName == "apogeeapp.app.FolderFunctionComponent") {
         //I should probably do this conversion in the folder function code, so it is easier to maintain
         var componentFolderFunctionJson = {
-            type: componentGenerator.uniqueName,
+            type: componentClass.uniqueName,
             children: componentFolderJson.children
         }
         return componentFolderFunctionJson;
     }
-    else if(componentGenerator.uniqueName == "apogeeapp.app.FolderComponent") {
+    else if(componentClass.uniqueName == "apogeeapp.app.FolderComponent") {
         return componentFolderJson;
     }
     else {
-        throw new Error("Unknown target type: " + componentGenerator.uniqueName);
+        throw new Error("Unknown target type: " + componentClass.uniqueName);
     }
 }
         

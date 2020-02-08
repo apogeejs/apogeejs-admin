@@ -6,14 +6,13 @@ import {bannerConstants} from "/apogeeview/componentdisplay/banner.js";
 /** This is the base functionality for a component. */
 export default class Component extends EventManager {
 
-    constructor(modelManager,member,componentGenerator) {
+    constructor(modelManager,member) {
 
         super();
         
         this.modelManager = modelManager;
         this.member = member;
         this.uiActiveParent = null;
-        this.componentGenerator = componentGenerator;
     
         this.modelManager.registerMember(this.member,this);
         
@@ -104,7 +103,7 @@ export default class Component extends EventManager {
         return this.displayState;
     }
 
-    setDisplayState() {
+    setDisplayState(displayState) {
         this.displayState = displayState;
     }
 
@@ -147,7 +146,7 @@ export default class Component extends EventManager {
     /** This deserializes the component. */
     toJson() {
         var json = {};
-        json.type = this.componentGenerator.uniqueName;
+        json.type = this.constructor.uniqueName;
 
         //TO DO 
 
@@ -322,8 +321,8 @@ export default class Component extends EventManager {
     /** This function creates a json to create the member for a new component instance. 
      * It uses default values and then overwrites in with optionalBaseValues (these are intended to be base values outside of user input values)
      * and then optionalOverrideValues (these are intended to be user input values) */
-    static createMemberJson(componentGenerator,optionalInputProperties,optionalBaseValues) {
-        var json = apogeeutil.jsonCopy(componentGenerator.DEFAULT_MEMBER_JSON);
+    static createMemberJson(componentClass,optionalInputProperties,optionalBaseValues) {
+        var json = apogeeutil.jsonCopy(componentClass.DEFAULT_MEMBER_JSON);
         if(optionalBaseValues) {
             for(var key in optionalBaseValues) {
                 json[key]= optionalBaseValues[key];
@@ -334,8 +333,8 @@ export default class Component extends EventManager {
             if(optionalInputProperties.name !== undefined) json.name = optionalInputProperties.name;
             
             //add the specific member properties for this component type
-            if(componentGenerator.transferMemberProperties) {
-                componentGenerator.transferMemberProperties(optionalInputProperties,json);
+            if(componentClass.transferMemberProperties) {
+                componentClass.transferMemberProperties(optionalInputProperties,json);
             }
         }
         
@@ -343,16 +342,16 @@ export default class Component extends EventManager {
     }
 
     /** This function merges values from two objects containing component property values. */
-    static createComponentJson(componentGenerator,optionalInputProperties,optionalBaseValues) {
+    static createComponentJson(componentClass,optionalInputProperties,optionalBaseValues) {
         //copy the base properties
         var newPropertyValues = optionalBaseValues ? apogeeutil.jsonCopy(optionalBaseValues) : {};
         
         //set the type
-        newPropertyValues.type = componentGenerator.uniqueName;
+        newPropertyValues.type = componentClass.uniqueName;
         
         //add in the input property Value
-        if((optionalInputProperties)&&(componentGenerator.transferComponentProperties)) {
-            componentGenerator.transferComponentProperties(optionalInputProperties,newPropertyValues);
+        if((optionalInputProperties)&&(componentClass.transferComponentProperties)) {
+            componentClass.transferComponentProperties(optionalInputProperties,newPropertyValues);
         }
         
         return newPropertyValues;

@@ -108,7 +108,7 @@ function _createComponentDisplay(memberName,optionalViewType) {
    }
    var component = workEspaceManager.getComponent(member);
    
-   var activeView = optionalViewType ? optionalViewType : component.componentGenerator.TABLE_EDIT_SETTINGS.defaultView;
+   var activeView = optionalViewType ? optionalViewType : component.constructor.TABLE_EDIT_SETTINGS.defaultView;
 
    var componentDisplay = new WebComponentDisplay(component, activeView);
 

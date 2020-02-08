@@ -15,6 +15,9 @@ import DisplayAndHeader from "/apogeeui/displayandheader/DisplayAndHeader.js";
 
 import WorkspaceView from "/apogeeview/WorkspaceView.js";
 
+import JsonTableComponentView from "/apogeeview/componentviews/JsonTableComponentView.js";
+import FolderComponentView from "/apogeeview/componentviews/FolderComponentView.js";
+
 import "/apogeeui/configurablepanel/ConfigurablePanelInit.js";
 import Apogee from "/apogeeapp/Apogee.js";
 
@@ -31,6 +34,11 @@ export default class ApogeeView {
         //subscribe to events
         this.app.addListener("created",target => this.targetCreated(target));
         this.app.addListener("deleted",target => this.targetDeleted(target));
+
+        //TEMPORARY COMPONENT VIEW REGISTRATION#################################
+        ApogeeView.registerComponentView(JsonTableComponentView);
+        ApogeeView.registerComponentView(FolderComponentView);
+        //######################################################################
     }
 
     getTreePane() {
@@ -39,6 +47,14 @@ export default class ApogeeView {
 
     getTabFrame() {
         return this.tabFrame;
+    }
+
+    getWorkspaceView() {
+        return this.workspaceView;
+    }
+
+    getApp() {
+        return this.app;
     }
 
     //================================
@@ -258,10 +274,10 @@ export default class ApogeeView {
         // menuBarLeft.appendChild(menu.getElement());
         // menus[name] = menu;
         
-        // var importCallback = () => importWorkspace(this,this.fileAccessObject,FolderComponent);
+        // var importCallback = () => importWorkspace(this,this.app,this.fileAccessObject,FolderComponent,FolderComponentView);
         // menu.addCallbackMenuItem("Import as Folder",importCallback);
         
-        // var import2Callback = () => importWorkspace(this,this.fileAccessObject,FolderFunctionComponent);
+        // var import2Callback = () => importWorkspace(this,this.app,this.fileAccessObject,FolderFunctionComponent,FolderFunctionComponentView);
         // menu.addCallbackMenuItem("Import as Folder Function",import2Callback);
         
         // var exportCallback = () => exportWorkspace(this,this.fileAccessObject);
@@ -388,29 +404,45 @@ export default class ApogeeView {
     getAddChildMenuItems(optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
 
         let standardComponents = this.app.getStandardComponentNames();
-        let componentGenerators = this.app.getComponentGenerators();
+        let componentClasses = this.app.getcomponentClasses();
         
         var menuItemList = [];
         
         for(var i = 0; i < standardComponents.length; i++) {
             let key = standardComponents[i];
-            let generator = componentGenerators[key];
+            let componentClass = componentClasses[key];
             
             let menuItem = {};
             menuItem.title = "Add " + generator.displayName;
-            menuItem.callback = () => addComponent(this.app,generator,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
+            menuItem.callback = () => addComponent(this,this.app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
             menuItemList.push(menuItem);
         }
 
         //add the additional component item
         let menuItem = {};
         menuItem.title = "Other Components...";
-        menuItem.callback = () => addAdditionalComponent(this.app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseMemberValues);
+        menuItem.callback = () => addAdditionalComponent(this,this.app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseMemberValues);
         menuItemList.push(menuItem);
 
         return menuItemList;
     }
 
+    
+    //========================================
+    // Static Functions
+    //========================================
+
+    static registerComponentView(viewClass) {
+        componentClassMap[viewClass.componentName] = viewClass;
+    }
+
+    static getComponentViewClass(componentName) {
+        return componentClassMap[componentName];
+    }
+
 }
+
+
+let componentClassMap = {};
 
 const RESIZE_TIMER_PERIOD_MS = 500;
