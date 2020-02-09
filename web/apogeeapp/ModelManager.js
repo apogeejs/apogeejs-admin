@@ -11,6 +11,11 @@ export default class ModelManager extends EventManager {
         this.workspaceManager = workspaceManager;
         this.app = workspaceManager.getApp();
         this.model = null;
+
+        this.clearUpdated();
+
+        this.viewStateCallback = null;
+        this.cachedViewState = null;
       
         this.componentMap = {};
     }
@@ -28,27 +33,56 @@ export default class ModelManager extends EventManager {
         return this.workspaceManager;
     }
 
+    setViewStateCallback(viewStateCallback) {
+        this.viewStateCallback = viewStateCallback;
+    }
+
+    getCachedViewState() {
+        return this.cachedViewState;
+    }
+
      /** This method loads the model data and model components from the json. */
-    load(modelDataJson,modelComponentsJson) {
+    load(json) {
+
+        let modelJson; 
+        let componentsJson;
+
+        if(json) {
+            modelJson = json.model;
+            componentsJson = json.components;
+
+            //set the view state
+            if(json.viewState !== undefined) {
+                this.cachedViewState = json.viewState;
+            }
+        }
 
         //load defaults if there is not saved model data
-        if(!modelDataJson) modelDataJson = Model.EMPTY_MODEL_JSON;
-        if(!modelComponentsJson) modelComponentsJson = ModelManager.EMPTY_MODEL_COMPONENT_JSON;
+        if(!modelJson) modelJson = Model.EMPTY_MODEL_JSON;
+        if(!componentsJson) componentsJson = ModelManager.EMPTY_MODEL_COMPONENT_JSON;
 
         //create model
         this.model = new Model();
-        let actionResult = this.model.loadFromJson(modelDataJson);
+        let actionResult = this.model.loadFromJson(modelJson);
 
         ////////////////////////////////////////////////////////////////////////
         //We are manually clearing the updated fields because there is no create workspce
         //event (in whcih we would clear any udpated field flags)
         //we should probably change that...
         this.model.clearUpdated();
+        this.fieldUpdated("name");
         ////////////////////////////////////////////////////////////////////////
+
+        let commandResult = {};
+        commandResult.action = "updated";
+        commandResult.cmdDone = true;
+        commandResult.target = this;
 
         //set up the root folder conmponent, with children if applicable
         var rootFolder = this.model.getRoot();
-        var commandResult = this.createComponentFromMember(actionResult,modelComponentsJson);
+        let rootFolderComponentJson = componentsJson[rootFolder.getName()];
+        var rootFolderCommandResult = this.createComponentFromMember(actionResult,rootFolderComponentJson);
+        commandResult.childCommandResults = [rootFolderCommandResult];
 
         //add listeners
         //this.model.addListener("memberCreated", eventInfo => this.memberCreated(eventInfo));
@@ -326,7 +360,13 @@ export default class ModelManager extends EventManager {
      * it will save a model with that as the root folder. */
     toJson(optionalSavedRootFolder) {
 
-        let modelJson = this.model.toJson(optionalSavedRootFolder);
+        let json = {};
+
+        //get the model json
+        json.model = this.model.toJson(optionalSavedRootFolder);
+
+        //get the components json
+        let componentsJson = {};
 
         var rootFolder;
         if(optionalSavedRootFolder) {
@@ -335,11 +375,18 @@ export default class ModelManager extends EventManager {
         else {
             rootFolder = this.model.getRoot();
         }
-
         var rootFolderComponent = this.getComponent(rootFolder);
-        let componentsJson = rootFolderComponent.toJson();
 
-        return {modelJson, componentsJson};
+        componentsJson[rootFolder.getName()] = rootFolderComponent.toJson();
+        json.components = componentsJson;
+
+        //model view state
+        if(this.viewStateCallback) {
+            this.cachedViewState = this.viewStateCallback();
+            if(this.cachedViewState) componentsJson.viewState = this.cachedViewState;
+        }
+
+        return json;
     }
 
     /** This is used in saving the active tab 
@@ -435,5 +482,7 @@ export default class ModelManager extends EventManager {
 
 //this is the json for an empty model
 ModelManager.EMPTY_MODEL_COMPONENT_JSON = {
-    "type":"apogeeapp.app.FolderComponent"
+    "Main": {
+        "type":"apogeeapp.app.FolderComponent"
+    }
 };

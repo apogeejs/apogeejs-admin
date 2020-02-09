@@ -14,6 +14,9 @@ export default class ReferenceManager {
 
         //references
         this.referenceLists = {};
+
+        this.viewStateCallback = null;
+        this.cachedViewState = null;
     }
     
     /** This method sets the reference types for the reference manager. 
@@ -32,51 +35,78 @@ export default class ReferenceManager {
         return this.app;
     }
 
-    /** This method opens the reference entries, from the structure returned from
-     * the save call. It returns a promise that
-     * resolves when all entries are loaded. 
-     */
-    openReferenceEntries(referencesJson) {
+    setViewStateCallback(viewStateCallback) {
+        this.viewStateCallback = viewStateCallback;
+    }
 
-        var entriesCommandResultList = [];
-        var entryPromises = [];
-        
-        var loadEntry = entryJson => {
-            var referenceList = this.referenceLists[referencesJson.entryType];
-            
-            if(!referenceList) throw new Error("Entry type nopt found: " + referencesJson.entryType);
-            
-            //load this url if it doesn't exist
-            if(!referenceList.hasUrlEntry(entryJson.url)) {
-                //create the entry (this does not actually load it)
-                let commandResult = referenceList.createEntry(entryJson);
-                entriesCommandResultList.push(commandResult);
-
-                //load the entry - this will be asynchronous
-                let referenceEntry = commandResult.target;
-                var promise = referenceEntry.loadEntry();
-                entryPromises.push(promise);
-            }
-        }
-        referencesJson.forEach(loadEntry);
-        
-        let openEntriesPromise = Promise.all(entryPromises);
-
-        return {entriesCommandResultList,openEntriesPromise};
+    getCachedViewState() {
+        return this.cachedViewState;
     }
 
     /** This method opens the reference entries, from the structure returned from
      * the save call. It returns a promise that
      * resolves when all entries are loaded. 
      */
-    saveEntries() {
-        var entriesJson = [];
+    load(json) {
+
+        let referenceCommandResults = [];
+        let referencesOpenPromise
+        
+        //load the reference entries
+        if(json.refLists) {
+            let referenceCommandResults = [];
+            let referenceLoadPromises = [];
+
+            for(let listType in json.refLists) {
+                let listJson = json.refLists[listType];
+
+                let referenceList = this.referenceLists[listType];
+                let {listCommandResult,listLoadPromises} = referenceList.load(listJson);
+
+                referenceCommandResults.push(...listCommandResult);
+                referenceLoadPromises.push(...listLoadPromises);
+            }
+
+            if(referenceLoadPromises.length > 0) {
+                referencesOpenPromise = Promise.all(referenceLoadPromises);
+            }
+        }
+        
+        //set the view state
+        if(json.viewState !== undefined) {
+            this.cachedViewState = json.viewState;
+        }
+
+        return {referenceCommandResults,referencesOpenPromise};
+    }
+
+    /** This method opens the reference entries, from the structure returned from
+     * the save call. It returns a promise that
+     * resolves when all entries are loaded. 
+     */
+    toJson() {
+        let json = {};
+        let refListsJson = {};
+        let hasRefLists = false;
         for(var referenceListType in this.referenceLists) {
             let referenceList = this.referenceLists[referenceListType];
-            let entryListJson = referenceList.getEntriesJson();
-            entriesJson.push(...entryListJson);
+            let refListJson = referenceList.toJson();
+            if(refListJson) {
+                refListsJson[referenceListType] = refListJson;
+                hasRefLists = true;
+            }
         }
-        return entriesJson;
+        if(hasRefLists) {
+            json.refLists = refListsJson;
+        }
+
+        //set the view state
+        if(this.viewStateCallback) {
+            this.cachedViewState = this.viewStateCallback();
+            if(this.cachedViewState) json.viewState = this.cachedViewState;
+        }
+
+        return json;
     }
 
     /** This method creates a reference entry. This does nto however load it, to 

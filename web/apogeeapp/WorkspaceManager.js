@@ -19,6 +19,9 @@ export default class WorkspaceManager extends EventManager {
         this.modelManager = null;
         this.referenceManager = null;
 
+        this.viewStateCallback = null;
+        this.cachedViewState = null;
+
         this.init();
 
         app.setWorkspaceManager(this);
@@ -41,38 +44,63 @@ export default class WorkspaceManager extends EventManager {
         return this.modelManager;
     }
 
+    setViewStateCallback(viewStateCallback) {
+        this.viewStateCallback = viewStateCallback;
+    }
+
+    getCachedViewState() {
+        return this.cachedViewState;
+    }
+
      /** This method sets the workspace. The argument workspaceJson should be included
       * if the workspace is not empty, such as when opening a existing workspace. It
       * contains the data for the component associated with each model member. For 
       * a new empty workspace the workspaceJson should be omitted. 
       * The argument fileMetadata is the file identifier if the workspace is opened from a file.
       * This will be used for the "save" function to save to an existing file. */
-    load(workspaceJson,fileMetadata) {
-                    // //publish result
-                    // let asynchCommandResult = {};
-                    // asynchCommandResult.cmdDone = true;
-                    // asynchCommandResult.target = workspaceManager;
-                    // asynchCommandResult.action = "updated";
+    load(json,fileMetadata) {
 
-        if((workspaceJson)&&(workspaceJson.version != WorkspaceManager.FILE_VERSION)) {
-            let msg = "Version mismatch. Expected version " + WorkspaceManager.FILE_VERSION + ", Found version " + workspaceJson.version;
-            alert(msg);
-            throw new Error(msg);
+        //check file format
+        if(json) {
+            if(json.version != WorkspaceManager.FILE_VERSION) {
+                let msg = "Version mismatch. Expected version " + WorkspaceManager.FILE_VERSION + ", Found version " + workspaceJson.version;
+                alert(msg);
+                throw new Error(msg);
+            }
+        }
+        else {
+            //create aan empty json to load
+            json = {};
         }
 
+        //store the file metadata
         this.fileMetadata = fileMetadata;
 
-        var modelDataJson;
-        var modelComponentsJson;
+        let synchCommandResult = {};
+        synchCommandResult.target = this;
+        synchCommandResult.parent = this.app;
+        synchCommandResult.action = "created";
 
-        if(workspaceJson) {
-            modelDataJson = workspaceJson.model;
-            modelComponentsJson = workspaceJson.components;
+        //set the view state
+        if(json.viewState !== undefined) {
+            this.cachedViewState = json.viewState;
         }
 
-        let commandResult = this.modelManager.load(modelDataJson,modelComponentsJson);
+        //open the reference entries - this has a synch and asynch part.
+        let loadLinksPromise;
+        if(json.references) {
+            let {referenceCommandResults,referencesOpenPromise} = this.referenceManager.load(json.references);
+            if((referenceCommandResults)&&(referenceCommandResults.length > 0)) {
+                //save the entries create results to the synchronous command result
+                synchCommandResult.childCommandResults = referenceCommandResults;
+            }
+            loadLinksPromise = referencesOpenPromise;
+        }
 
-        return commandResult;
+        //return a code load function, to be run after the references load
+		let codeLoadFunction = () => this.modelManager.load(json.code);
+
+        return {synchCommandResult,loadLinksPromise,codeLoadFunction}
     }
 
     /** This method closes the workspace object. */
@@ -95,35 +123,6 @@ export default class WorkspaceManager extends EventManager {
     
     clearIsDirty() {
         this.isDirty = false;
-    }
-
-    // //------------------------------------------
-    // // Event Tracking Methods
-    // //------------------------------------------
-
-    getUpdated() {
-        return this.updated;
-    }
-
-    isFieldUpdated(field) {
-        return this.updated[field] ? true : false;
-    }
-
-    clearUpdated() {
-        this.updated = {};
-    }
-
-    fieldUpdated(field) {
-        this.updated[field] = true;
-    }
-
-    getEventId() {
-        //for now we have a single fixed id for the workspace
-        return "workspace";
-    }
-
-    getTargetType() {
-        return "workspace";
     }
 
     //====================================
@@ -163,13 +162,45 @@ export default class WorkspaceManager extends EventManager {
 
         json.version = WorkspaceManager.FILE_VERSION;
 
-        json.references = this.referenceManager.saveEntries();
+        json.references = this.referenceManager.toJson();
 
-        let {modelJson, componentsJson} = this.modelManager.toJson(optionalSavedRootFolder);
-        json.model = modelJson;
-        json.components = componentsJson;
+        json.code = this.modelManager.toJson(optionalSavedRootFolder);
+
+        if(this.viewStateCallback) {
+            this.cachedViewState = this.viewStateCallback();
+            if(this.cachedViewState) json.viewState = this.cachedViewState;
+        }
 
         return json;
+    }
+
+    //------------------------------------------
+    // Event Tracking Methods
+    //------------------------------------------
+
+    getUpdated() {
+        return this.updated;
+    }
+
+    isFieldUpdated(field) {
+        return this.updated[field] ? true : false;
+    }
+
+    clearUpdated() {
+        this.updated = {};
+    }
+
+    fieldUpdated(field) {
+        this.updated[field] = true;
+    }
+
+    getEventId() {
+        //for now we have a single fixed id for the workspace
+        return "workspace";
+    }
+
+    getTargetType() {
+        return "workspace";
     }
 
 }

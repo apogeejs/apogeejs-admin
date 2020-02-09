@@ -20,6 +20,9 @@ export default class ReferenceEntry extends EventManager {
         var nickname = referenceData.nickname;
         if((!nickname)||(nickname.length === 0)) nickname = this.createEntryNameFromUrl(this.url);
         this.nickname = nickname;  
+
+        this.viewStateCallback = null;
+        this.cachedViewState = null;
         
         this.fieldUpdated("url");
         this.fieldUpdated("nickname");
@@ -58,6 +61,14 @@ export default class ReferenceEntry extends EventManager {
         return this.nickname;
     }
 
+    setViewStateCallback(viewStateCallback) {
+        this.viewStateCallback = viewStateCallback;
+    }
+
+    getCachedViewState() {
+        return this.cachedViewState;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
 
     /** This method loads the link onto the page. It returns a promise that
@@ -73,7 +84,7 @@ export default class ReferenceEntry extends EventManager {
 
     /** This method loads the link onto the page. It returns a promise that
      * resolves when the link is loaded. */
-    saveEntry() {
+    toJson() {
         var entryJson = {};
         entryJson.url = this.url;
         if(this.nickname != this.url) entryJson.nickname = this.nickname;

@@ -20,7 +20,7 @@ export default class WorkspaceView {
 
         this.init();
 
-        this.workspaceManager.addListener("prepareSave",() => this.prepareSave());
+        this.workspaceManager.setViewStateCallback(() => this.getViewState());
     }
 
     getTreeEntry() {
@@ -48,69 +48,23 @@ export default class WorkspaceView {
         this.treeEntry.setLabel(name);
     }
 
-    //====================================
-    // Workspace Management
-    //====================================
-
-    setViewJsonState(workspaceJson) { 
-        let tabFrame = this.appView.getTabFrame();
-        let modelManager = this.workspaceManager.getModelManager();
-        let model = modelManager.getModel();
-        if(workspaceJson.openTabs) {
-            workspaceJson.openTabs.map(memberName => {
-                var openTabMember = model.getMemberByFullName(memberName);
-                if(openTabMember) {
-                    var openTabComponent = this.nodelManager.getComponent(openTabMember);
-                    openTabComponent.createTabDisplay();
-                }
-            });
-            if(workspaceJson.activeTabMember) {
-                var activeTabMember = model.getMemberByFullName(workspaceJson.activeTabMember);
-                if(activeTabMember) {
-                    tabFrame.setActiveTab(activeTabMember.getId());
-                }
-            }
-        }
-    }
-
-    appendViewJsonState(json) {
-        let tabFrame = this.appView.getTabFrame();
-        var openTabs = tabFrame.getOpenTabs();
-        if(openTabs.length > 0) {
-            json.openTabs = openTabs.map(tabId => this.modelManager.getMemberNameFromId(tabId));
-        }
-        var activeTabId = tabFrame.getActiveTab();
-        if(activeTabId) {
-            json.activeTabMember = this.modelManager.getMemberNameFromId(activeTabId);
-        }
-    }
-
-    /** This method gets the workspace object. */
+    /** This method takes any actions on workspace close. */
     close() {
-        //remove tree entry (if tree active)
-        if(this.tree) {
-            this.tree.clearRootEntry();
-        }
-    }
-
-    //-----------------------------------
-    // Save methods
-    //-----------------------------------
-
-    /** This method will be called to prepare for a workspace save. It lets
-     * the UI save its current state. */
-    prepareSave() {
-        this.modelView.prepareSave();
-        this.referenceView.prepareSave();
+        
     }
 
     //====================================
     // properties and display
     //====================================
 
+    getViewState() {
+        if(this.treeEntry) {
+            return {treeState: this.treeEntry.getState()};
+        }
+    }
+
     init() {
         this.treeEntry = this.createTreeEntry();
-        this.treeEntry.setState(TreeEntry.EXPANDED);
 
         //model manager
         this.modelView = new ModelView(this,this.workspaceManager.getModelManager());
@@ -121,6 +75,15 @@ export default class WorkspaceView {
         this.referenceView = new ReferenceView(this.app,this.workspaceManager.getReferenceManager());
         let refTreeEntry = this.referenceView.getTreeEntry();
         this.treeEntry.addChild(refTreeEntry);
+
+        //set the view state
+        let viewState = this.workspaceManager.getCachedViewState();
+        if((viewState)&&(viewState.treeState !== undefined)) {
+            this.treeEntry.setState(viewState.treeState)
+        }
+        else {
+            this.treeEntry.setState(TreeEntry.EXPANDED);
+        }
     }
 
     createTreeEntry() {

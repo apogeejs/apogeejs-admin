@@ -15,10 +15,21 @@ export default class ReferenceList extends EventManager {
         this.referenceEntryType = referenceEntryClass.REFERENCE_TYPE;
         this.referenceEntryClass = referenceEntryClass;
         this.referenceEntries = [];
+
+        this.viewStateCallback = null;
+        this.cachedViewState = null;
     }
 
     getReferenceEntryType() {
         return referenceEntryType;
+    }
+
+    setViewStateCallback(viewStateCallback) {
+        this.viewStateCallback = viewStateCallback;
+    }
+
+    getCachedViewState() {
+        return this.cachedViewState;
     }
 
     /** This methpod creates a reference entry. The referece entry must still be loaded, which
@@ -54,5 +65,56 @@ export default class ReferenceList extends EventManager {
 
     getEntriesJson() {
         return this.referenceEntries.map(refEntry => refEntry.saveEntry());
+    }
+
+    load(json) {
+        let listCommandResults = [];
+        let listLoadPromises = [];
+        let loadEntry = entryJson => {
+            
+            //load this url if it doesn't exist
+            if(!this.hasUrlEntry(entryJson.url)) {
+                //create the entry (this does not actually load it)
+                let commandResult = referenceList.createEntry(entryJson);
+                listCommandResults.push(commandResult);
+
+                //load the entry - this will be asynchronous
+                let referenceEntry = commandResult.target;
+                var promise = referenceEntry.loadEntry();
+                listLoadPromises.push(promise);
+            }
+        }
+        json.entries.forEach(loadEntry);
+
+        //set the view state
+        if(json.viewState !== undefined) {
+            this.cachedViewState = json.viewState;
+        }
+
+        return {listCommandResult,listLoadPromises};
+    }
+
+    toJson() {
+        let json = {};
+        let hasEntries = false;
+        var entriesJson = {};
+        for(let entry in this.referenceEntries) {
+            entriesJson[referenceListType] = entry.toJson();
+            hasEntries = true;
+        }
+        json.entries = entriesJson;
+
+        //set the view state
+        if(this.viewStateCallback) {
+            this.cachedViewState = this.viewStateCallback();
+            if(this.cachedViewState) json.viewState = this.cachedViewState;
+        }
+
+        if(hasEntries) {
+            return json;
+        }
+        else {
+            return false;
+        }
     }
 }

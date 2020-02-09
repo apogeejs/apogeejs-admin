@@ -14,9 +14,6 @@ export default class ModelView {
 
         this.treeEntry = null;
 
-        //I want a better checking and handling of the root folder being loaded, just once
-        this.rootFolderLoaded = false;
-
         this.componentViewMap = {};
 
         this.init();
@@ -25,6 +22,8 @@ export default class ModelView {
         this.modelManager.addListener("created",target => this.targetCreated(target));
         this.modelManager.addListener("updated",target => this.targetUpdated(target));
         this.modelManager.addListener("deleted",target => this.targetDeleted(target));
+
+        this.modelManager.setViewStateCallback(() => this.getViewState());
     }
 
     getTreeEntry() {
@@ -51,20 +50,6 @@ export default class ModelView {
         return this.workspaceView.getAppView();
     }
 
-    //-----------------------------------
-    // Save methods
-    //-----------------------------------
-    
-    /** This method will be called to prepare for a workspace save. It lets
-     * the UI save its current state. */
-    prepareSave() {
-        for(let componentId in this.componentViewMap) {
-            let componentView = this.componentViewMap[componentId];
-            componentView.prepareSave();
-
-        }
-    }
-
     //================================
     // Target Event handlers
     //================================
@@ -79,7 +64,7 @@ export default class ModelView {
     targetUpdated(eventData) {
         let target = eventData.target;
         if(target.getTargetType() == "model") {
-            this.onModelUpdated(target);
+            this.onModelUpdated(eventData.fieldsUpdated);
         }
     }
 
@@ -111,23 +96,18 @@ export default class ModelView {
 
         this.componentViewMap[component.getId()] = componentView;
 
-        //add to the proper parent
-        let parentComponent = component.getParentComponent();
-        if(parentComponent) {
-            let parentComponentView = this.getComponentView(parentComponent.getId());
-            if(parentComponentView) {
-                parentComponentView.addChild(componentView);
-            }
+        //add this entry to the proper parent.
+        let parentComponentView = componentView.getParentComponentView();
+        if(parentComponentView) {
+            parentComponentView.addChild(componentView);
         }
         else {
-            //this is the root component
-            if(this.rootFolderLoaded) {
-                //figure out how to handle this!!!
-                alert("Root folder already loaded!");
-            }
+            //this is a root component
             this.treeEntry.addChild(componentView.getTreeEntry());
-            this.rootFolderLoaded = true;
         }
+
+        //do view state initialization
+        componentView.loadViewStateFromComponent();
     }
 
     onComponentDeleted(component) {
@@ -135,31 +115,20 @@ export default class ModelView {
         delete this.componentViewMap[component.getId()];
 
         //add to the proper parent
-        let parentComponent = component.getParent();
-        if(parentComponent) {
-            let parentComponentView = this.getComponentView(parentComponent.getFullName());
-            if(parentComponentView) {
-                parentComponentView.removeChild(componentView);
-            }
+        let parentComponentView = componentView.getParentComponentView();
+        if(parentComponentView) {
+            parentComponentView.removeChild(componentView);
         }
         else {
-            //this is the root component
-            if(rootFolderLoaded) {
-                //figure out how to handle this!!!
-                alert("Root folder already loaded!");
-            }
+            //this is a root component
             this.treeEntry.removeChild(componentView.getTreeEntry());
-            this.rootFolderLoaded = false;
         }
     }
 
-    onModelUpdated(workspaceManager) {
-
-        //TBD - should I change the local workspace UI object? I will want to if it is replaced at each update
-        //then I might need to do more... (root folder update, etc)
-
-        if((modelManager.fieldUpdated("name"))&&(this.treeEntry)) {
-            this.workspaceView.setName(model.getWorkspace().getName());
+    onModelUpdated(fieldsUpdated) {
+        if(apogeeutil.isFieldUpdated(fieldsUpdated,"name")) {
+            let model = this.modelManager.getModel();
+            this.workspaceView.setName(model.getName());
         }
     }
 
@@ -170,38 +139,6 @@ export default class ModelView {
     //====================================
     // Workspace Management
     //====================================
-
-    setViewJsonState(workspaceJson) { 
-        let tabFrame = this.appView.getTabFrame();
-        let workspace = this.workspaceManager.getWorkspace();
-        if(workspaceJson.openTabs) {
-            workspaceJson.openTabs.map(memberName => {
-                var openTabMember = workspace.getMemberByFullName(memberName);
-                if(openTabMember) {
-                    var openTabComponent = this.workspaceManager.getComponent(openTabMember);
-                    openTabComponent.createTabDisplay();
-                }
-            });
-            if(workspaceJson.activeTabMember) {
-                var activeTabMember = workspace.getMemberByFullName(workspaceJson.activeTabMember);
-                if(activeTabMember) {
-                    tabFrame.setActiveTab(activeTabMember.getId());
-                }
-            }
-        }
-    }
-
-    appendViewJsonState(json) {
-        let tabFrame = this.appView.getTabFrame();
-        var openTabs = tabFrame.getOpenTabs();
-        if(openTabs.length > 0) {
-            json.openTabs = openTabs.map(tabId => this.workspaceManager.getMemberNameFromId(tabId));
-        }
-        var activeTabId = tabFrame.getActiveTab();
-        if(activeTabId) {
-            json.activeTabMember = this.workspaceManager.getMemberNameFromId(activeTabId);
-        }
-    }
 
     /** This method gets the workspace object. */
     close() {
@@ -215,9 +152,20 @@ export default class ModelView {
     // properties and display
     //====================================
 
+    getViewState() {
+        if(this.treeEntry) {
+            return {treeState: this.treeEntry.getState()};
+        }
+    }
+
     init() {
         this.treeEntry = this.createTreeEntry();
         this.treeEntry.setState(TreeEntry.EXPANDED);
+
+        let viewState = this.modelManager.getCachedViewState();
+        if((viewState)&&(viewState.treeState !== undefined)) {
+            this.treeEntry.setState(viewState.treeState)
+        }
     }
 
     createTreeEntry() {
@@ -233,6 +181,6 @@ export default class ModelView {
 
 }
 
-let MODEL_FOLDER_LABEL = "Model";
+let MODEL_FOLDER_LABEL = "Code";
 
 let ICON_RES_PATH = "/componentIcons/folder.png";   

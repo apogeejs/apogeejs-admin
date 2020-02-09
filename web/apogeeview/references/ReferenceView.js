@@ -22,6 +22,8 @@ export default class ReferenceView {
             let childTreeEntry = referenceListView.getTreeEntry();
             this.treeEntry.addChild(childTreeEntry);
         }
+
+        this.referenceManager.setViewStateCallback(() => this.getViewState());
     }
 
     /** This returns the tree entry to display the reference entry for this reference manager. */
@@ -43,17 +45,22 @@ export default class ReferenceView {
     // Save methods
     //-----------------------------------
     
-    /** This method will be called to prepare for a workspace save. It lets
-     * the UI save its current state. */
-    prepareSave() {
-        //we need to implement this!!!
+    getViewState() {
+        if(this.treeEntry) {
+            return {treeState: this.treeEntry.getState()};
+        }
     }
 
     /** @private */
     _createTreeEntry() {
         var iconUrl = apogeeui.getResourcePath(REFERENCES_ICON_PATH);
         let treeEntry = new TreeEntry("References", iconUrl, null, null, false);
-        //treeEntry.setBannerState(this.referenceManager.getState());
+
+        let viewState = this.referenceManager.getCachedViewState();
+        if((viewState)&&(viewState.treeState !== undefined)) {
+            treeEntry.setState(viewState.treeState)
+        }
+
         return treeEntry;
     }
 

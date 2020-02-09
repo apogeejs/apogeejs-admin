@@ -1,12 +1,8 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-
-
 import apogeeui from "/apogeeui/apogeeui.js";
 import {updateComponent} from "/apogeeview/commandseq/updatecomponentseq.js";
 import {deleteComponent} from "/apogeeview/commandseq/deletecomponentseq.js";
 import TreeComponentDisplay from "/apogeeview/componentdisplay/TreeComponentDisplay.js";
-import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
-import {bannerConstants} from "/apogeeview/componentdisplay/banner.js"; 
+import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js"; 
 
 /** This is the base functionality for a component. */
 export default class ComponentView {
@@ -26,9 +22,9 @@ export default class ComponentView {
         this.treeDisplay = this.createTreeDisplay(); //this is shown in the tree view
         this.treeState = null;
 
-        this.loadStateFromComponent();
-
         this.component.addListener("updated",eventInfo => this.componentUpdated(eventInfo));
+
+        this.component.setViewStateCallback(() => this.getViewState());
     }
 
     //==============================
@@ -53,6 +49,9 @@ export default class ComponentView {
         return this.component.getDisplayName(useFullPath);
     }
 
+    /** This method gets the parent component view of the current component view. 
+     * This method does not depends only on the relation between the components, 
+     * rather than any relationship established between the component views. */
     getParentComponentView() {
         let parentComponent = this.component.getParentComponent();
         if(parentComponent) {
@@ -65,7 +64,6 @@ export default class ComponentView {
 
     }
 
-//--- VIEW ITEM ---//
     /** This method returns the icon url for the component. */
     getIconUrl() {
         if(this.constructor.ICON_URL) {
@@ -86,16 +84,10 @@ export default class ComponentView {
     //-----------------------------------
     // Save methods
     //-----------------------------------
-    
-    /** This method will be called to prepare for a workspace save. It lets
-     * the UI save its current state in the workspace. */
-    prepareSave() {
-        this.saveStateOnComponent();
-    }
 
     
     /** This method reads the current UI state and saves it to the component. */
-    saveStateOnComponent() {
+    getViewState() {
         let json = {};
         let statePresent = false;
 
@@ -132,15 +124,27 @@ export default class ComponentView {
             statePresent = this.writeToJson(json);
         }
 
-        //store this state with the component
+        if(this.tabDisplay) {
+            json.tabOpened = true;
+            var tab = this.tabDisplay.getTab();
+            if(tab.getIsShowing()) {
+                json.tabShowing = true;
+            }
+            statePresent = true;
+        }
+
+        //return the state
         if(statePresent) {
-            this.component.setDisplayState(json);
+            return json;
+        }
+        else {
+            return undefined;
         }
     }
 
     /** This method reads the UI state from the component. */
-    loadStateFromComponent() {
-        let json = this.component.getDisplayState();
+    loadViewStateFromComponent() {
+        let json = this.component.getCachedViewState();
         if(!json) return;
 
         //set the tree state
@@ -170,6 +174,11 @@ export default class ComponentView {
             this.readFromJson(json);
         }
 
+        //check the tab display state (where tabs are used)
+        if(json.tabOpened) {
+            let setShowing = json.tabShowing;
+            this.createTabDisplay(setShowing);
+        }
     }
 
     /** This method can be implemented if the component view has additional state to save.
@@ -179,16 +188,13 @@ export default class ComponentView {
     /** This method can be implemented if the component view has additional state saved. */
     //readFromJson(json) {}
 
-
     //-------------------
     // tree entry methods - this is the element in the tree view
     //-------------------
-//--- VIEW ITEM ---//
     getTreeEntry() {
         return this.treeDisplay.getTreeEntry();
     }
 
-//--- VIEW ITEM ---//
     /** @protected */
     createTreeDisplay() {
         var treeDisplay = new TreeComponentDisplay(this);
@@ -204,19 +210,18 @@ export default class ComponentView {
     // component display methods - this is the element in the parent tab (main display)
     //-------------------
 
-//--- VIEW ITEM ---//
     getChildDisplayState() {
         return this.childDisplayState;
     }
-//--- VIEW ITEM ---//
+
     setComponentDisplay(childComponentDisplay) {
         this.childComponentDisplay = childComponentDisplay; 
     }
-//--- VIEW ITEM ---//
+
     getComponentDisplay() {
         return this.childComponentDisplay;
     }
-//--- VIEW ITEM ---//
+
     closeComponentDisplay() {
         if(this.childComponentDisplay) {
             //first store the window state
@@ -232,17 +237,16 @@ export default class ComponentView {
     //-------------------
     // tab display methods - this is the tab element, only used for parent members
     //-------------------
-//--- VIEW ITEM ---//
+
     /** This indicates if the component has a tab display. */
     usesTabDisplay() {
         return this.constructor.hasTabEntry;
     }
-//--- VIEW ITEM ---//
     //Implement in extending class:
     ///** This creates the tab display for the component. */
     //instantiateTabDisplay();
-//--- VIEW ITEM ---//
-    createTabDisplay() {
+
+    createTabDisplay(makeActive) {
         if((this.usesTabDisplay())&&(!this.tabDisplay)) {
             if(this.modelView) { 
                 this.tabDisplay = this.instantiateTabDisplay();
@@ -250,15 +254,15 @@ export default class ComponentView {
                 //add the tab display to the tab frame
                 var tab = this.tabDisplay.getTab();
                 var tabFrame = this.modelView.getTabFrame();
-                tabFrame.addTab(tab,true);
+                tabFrame.addTab(tab,makeActive);
             }
         }
     }
-//--- VIEW ITEM ---//
+
     getTabDisplay(createIfMissing) {
         return this.tabDisplay;
     }
-//--- VIEW ITEM ---//
+
     /** This closes the tab display for the component. */
     closeTabDisplay() {
         if(this.tabDisplay) {
@@ -272,7 +276,7 @@ export default class ComponentView {
     //-------------------
     // Menu methods
     //-------------------
-//--- VIEW ITEM ---// ???
+
     getMenuItems(optionalMenuItemList) {
         //menu items
         var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
@@ -294,7 +298,7 @@ export default class ComponentView {
         
         return menuItemList;
     }
-//--- VIEW ITEM ---//
+
     getOpenMenuItem () {
         var openCallback = this.createOpenCallback();
         if(openCallback) {
@@ -408,7 +412,7 @@ export default class ComponentView {
     //=============================
     // Action UI Entry Points
     //=============================
-//--- VIEW ITEM ---//
+
     /** This method creates a callback for deleting the component. 
      *  @private */
     createOpenCallback() {
@@ -422,7 +426,7 @@ export default class ComponentView {
             }
             else {
                 //create the tab display - this automaticaly puts it in the tab frame
-                tabComponent.createTabDisplay();
+                tabComponent.createTabDisplay(true);
             }
         }
         

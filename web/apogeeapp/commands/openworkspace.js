@@ -21,77 +21,54 @@ let openworkspace = {};
 //openworkspace.createUndoCommand = function(workspaceManager,commandData) {
 
 openworkspace.executeCommand = function(nullWorkspaceManager,commandData,asynchOnComplete) {
-
-    var synchCommandResult = {};
     
     try {
-
-//I should verify the file type and format!  
 
         //create the workspace manager (this does not create several child objects in it)
         var app = Apogee.getInstance();
         var workspaceManager = new WorkspaceManager(app);
-        synchCommandResult.target = workspaceManager;
-        synchCommandResult.parent = app;
-        synchCommandResult.action = "created";
 
-        workspaceManager.setFileMetadata(commandData.fileMetadata);
+        let {synchCommandResult,loadLinksPromise,codeLoadFunction} = workspaceManager.load(commandData.workspaceJson,commandData.fileMetadata);
 
-        //open the reference entries - this has a synch and asynch part.
-        var referencesJson = commandData.workspaceJson.references;
-        let referenceManager = workspaceManager.getReferenceManager();
-        var {entriesCommandResultList, openEntriesPromise} = referenceManager.openReferenceEntries(referencesJson);
-        //save the entries create results to the synchronous command result
-        synchCommandResult.childCommandResults = entriesCommandResultList;
-
-        //set up asynchronouse part of loading.
-        var doReferenceLoad = openEntriesPromise.then( asynchCommandResult => {
-            if(asynchOnComplete) {
-                asynchOnComplete(asynchCommandResult);
-            }
-        })
-    	
-        //if we have to load links wait for them to load
-		var doWorkspaceLoad = function() {
-            let asynchCommandResult = workspaceManager.load(commandData.workspaceJson);
-            if(asynchOnComplete) {
-                asynchOnComplete(asynchCommandResult);
-            }
+        //create a function to report the results of the promises
+        let reportResults = asynchCommandResult => {
+            if(asynchOnComplete) asynchOnComplete(asynchCommandResult);
         }
-        
-        //This will handle a unknown error om the asynchloading
+
+        //This will handle a unknown error om the asynchloading 
         var onLoadError = function(error) {
-
-            //publish event
+            if(error.stack) console.error(error.stack);
             let errorMsg = error.message ? error.message : error.toString(); 
-            let asynchCommandResult = {};
-            asynchCommandResult.alertMsg = "Error loading workspace: " + errorMsg;
-            asynchCommandResult.cmdDone = false;
-            asynchCommandResult.target = workspaceManager;
-            asynchCommandResult.action = "updated";
-            
             if(asynchOnComplete) {
+                let asynchCommandResult = {};
+                asynchCommandResult.alertMsg = "Error loading workspace: " + errorMsg;
+                asynchCommandResult.cmdDone = false;
+                asynchCommandResult.target = workspaceManager;
+                asynchCommandResult.action = "updated";
                 asynchOnComplete(asynchCommandResult);
             }
         }
+
+        //construct the reference load promise, depending on whether we have any links to load.
+        let referenceLoadPromise = loadLinksPromise ? loadLinksPromise.then(reportResults) : Promise.resolve();
         
         //load references and then model
-        doReferenceLoad.then(doWorkspaceLoad).catch(onLoadError);
-        synchCommandResult.pending = true;
+        referenceLoadPromise.then(codeLoadFunction).then(reportResults).catch(onLoadError);
 
-        synchCommandResult.cmdDone = true;
+        return synchCommandResult;
+
     }
     catch(error) {
         if(error.stack) console.error(error.stack);
 
         //unkown error
+        let synchCommandResult = {};
         synchCommandResult.alertMsg = "Error creating workspace: " + error.message;
         synchCommandResult.cmdDone = false;
         synchCommandResult.targetIdentifier = "workspace";
         synchCommandResult.action = "created";
+        return synchCommandResult;
     }
-    
-    return synchCommandResult;
 }
 
 openworkspace.commandInfo = {

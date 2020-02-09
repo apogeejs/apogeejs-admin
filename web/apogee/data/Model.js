@@ -42,17 +42,17 @@ base.mixin(Model,Owner);
 base.mixin(Model,RootHolder);
 
 
-Model.DEFAULT_MODEL_NAME = "Model";
-Model.ROOT_FOLDER_NAME = "Model";
+Model.DEFAULT_MODEL_NAME = "Workspace";
+Model.ROOT_FOLDER_NAME = "Main";
 
 Model.CONSECUTIVE_ACTION_INITIAL_LIMIT = 500;
 
 Model.EMPTY_MODEL_JSON = {
     "fileType": "apogee model",
     "version": 0.2,
-    "name": "Model",
+    "name": Model.DEFAULT_MODEL_NAME,
     "data": {
-        "name": "Model",
+        "name": Model.ROOT_FOLDER_NAME,
         "type": "apogee.Folder"
     }
 }

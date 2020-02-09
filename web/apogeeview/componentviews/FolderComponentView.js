@@ -23,5 +23,5 @@ export default class FolderComponentView extends ParentComponentView {
 FolderComponentView.componentName = "apogeeapp.app.FolderComponent";
 FolderComponentView.hasTabEntry = true;
 FolderComponentView.hasChildEntry = false;
-FolderComponentView.ICON_RES_PATH = "/componentIcons/folder.png";
+FolderComponentView.ICON_RES_PATH = "/componentIcons/formControl.png";
 FolderComponentView.TREE_ENTRY_SORT_ORDER = ComponentView.FOLDER_COMPONENT_TYPE_SORT_ORDER;

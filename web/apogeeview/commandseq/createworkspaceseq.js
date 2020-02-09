@@ -11,7 +11,7 @@ export function createWorkspace(app) {
     }      
     
     var commandData = {};
-    commandData.type = "createWorkspace";
+    commandData.type = "openWorkspace";
     
     app.executeCommand(commandData);
 }

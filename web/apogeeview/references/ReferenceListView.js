@@ -17,6 +17,8 @@ export default class ReferenceListView {
 
         referenceList.addListener("created",eventInfo => this._onCreated(eventInfo));
         referenceList.addListener("deleted",eventInfo => this._onDeleted(eventInfo));
+
+        this.referenceList.setViewStateCallback(() => this._getViewState());
     }
 
     getDisplayInfo() {
@@ -48,11 +50,22 @@ export default class ReferenceListView {
         }
     }
 
+    _getViewState() {
+        if(this.treeEntry) {
+            return {treeState: this.treeEntry.getState()};
+        }
+    }
+
     _createTreeEntry() {
         var iconUrl = apogeeui.getResourcePath(this.displayInfo.LIST_ICON_PATH);
         var menuItemCallback = () => this._getListMenuItems();
         let treeEntry = new TreeEntry(this.displayInfo.LIST_NAME, iconUrl, null, menuItemCallback, false);
-        //treeEntry.setBannerState(this.referenceList.getState());
+
+        let viewState = this.referenceList.getCachedViewState();
+        if((viewState)&&(viewState.treeState !== undefined)) {
+            this.treeEntry.setState(viewState.treeState)
+        }
+
         return treeEntry;
     }
 

@@ -24,10 +24,9 @@ export default class Component extends EventManager {
         this.bannerMessage = "";
         
         this.updated = {};
-        
-        //ui state elements
-        this.childDisplayState = null;
-        this.treeState = null;
+
+        this.viewStateCallback = null;
+        this.cachedViewState = null;
     }
 
     /** If an extending object has any cleanup actions, a callback should be passed here.
@@ -95,19 +94,13 @@ export default class Component extends EventManager {
         return this.modelManager;
     }
 
-    //------------------------------------------
-    // UI State Methods - Interface for holding UI state
-    //------------------------------------------
-
-    getDisplayState(displayState) {
-        return this.displayState;
+    setViewStateCallback(viewStateCallback) {
+        this.viewStateCallback = viewStateCallback;
     }
 
-    setDisplayState(displayState) {
-        this.displayState = displayState;
+    getCachedViewState() {
+        return this.cachedViewState;
     }
-
-
 
     //------------------------------------------
     // Event Tracking Methods
@@ -158,6 +151,11 @@ export default class Component extends EventManager {
         if(this.writeToJson) {
             this.writeToJson(json);
         }
+
+        if(this.viewStateCallback) {
+            this.cachedViewState = this.viewStateCallback();
+            if(this.cachedViewState) json.viewState = this.cachedViewState;
+        }
         
         return json;
     }
@@ -169,8 +167,8 @@ export default class Component extends EventManager {
         //take any immediate needed actions
         
         //set the tree state
-        if(json.displayState !== undefined) {
-            this.displayState = json.displayState;
+        if(json.viewState !== undefined) {
+            this.cachedViewState = json.viewState;
         }
         
         //allow the component implemnetation ro read from the json
