@@ -177,12 +177,14 @@ export function createProseMirrorManager (pageComponent) {
     return state;
   }
 
-  proseMirror.createEditorView = function (containerElement, folderComponentView, editorData) {
+  proseMirror.createEditorView = function (containerElement, pageDisplay, editorData) {
 
     var nodeViews = {};
-    nodeViews.apogeeComponent = (node, view, getPos) => new ApogeeComponentView(node, view, getPos, folderComponentView);
+    nodeViews.apogeeComponent = (node, view, getPos) => new ApogeeComponentView(node, view, getPos, pageDisplay);
 
-    var dispatchTransaction = transaction => folderComponentView.applyTransaction(transaction);
+    let pageComponentView = pageDisplay.getComponentView();
+
+    var dispatchTransaction = transaction => pageComponentView.applyTransaction(transaction);
 
     var editorView = new EditorView(containerElement, {
       state: editorData,

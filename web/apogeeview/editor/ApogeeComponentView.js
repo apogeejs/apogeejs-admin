@@ -4,12 +4,12 @@
 //================================================================================
 
 export default class ApogeeComponentView {
-    constructor(node, view, getPos, folderComponentView) {
+    constructor(node, view, getPos, pageDisplay) {
       // We'll need these later
       this.node = node
       this.view = view
       this.getPos = getPos
-      this.folderComponentView = folderComponentView;
+      this.pageDisplay = pageDisplay;
   
       // The node's representation in the editor
       this.dom = document.createElement("div");
@@ -40,30 +40,13 @@ export default class ApogeeComponentView {
       //temporary solution to a problem: we will hold an ID during a name
       //change so we don't lose track of an object.
       //we will not display data in this time.
-      if(!memberId) {
-        let folderComponent = this.folderComponentView.getComponent();
-        let folderMember = folderComponent.getMember();
-
-        //lookup component
-        var member = folderMember.lookupChild(name);
-        
-        //WE SHOULD MAKE SURE THE MEMBER BELONGS TO THIS PARENT!!!??
-        if (member) {
-          var modelView = this.folderComponentView.getModelView();
-          var componentView = modelView.getComponentView(member.getId());
-          var componentDisplay = componentView.getComponentDisplay();
-          if (!componentDisplay) {
-            //CLUDGE ALERT - fix this when I reorganize the code
-            var tabDisplay = this.folderComponentView.getTabDisplay();
-            tabDisplay.addChild(componentView);
-            componentDisplay = componentView.getComponentDisplay();
-          }
-          var displayElement = componentDisplay.getElement();
-          this.contentDiv.appendChild(displayElement);
-        }
-        else {
-          this.contentDiv.innerHTML = "Component not found: " + name;
-        }
+      if(name) {
+        var childComponentDisplay = this.pageDisplay.getChildComponentDisplay(name);
+        var displayElement = childComponentDisplay.getElement();
+        this.contentDiv.appendChild(displayElement);
+      }
+      else {
+        this.contentDiv.innerHTML = "Component not found: " + name;
       }
   
     }

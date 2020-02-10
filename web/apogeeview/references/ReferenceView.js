@@ -31,14 +31,8 @@ export default class ReferenceView {
         return this.treeEntry;
     }
 
-    onUpdated() {
-        //for now just do a stright state update
-        this.updateState();
-    }
-
-    updateState() {
-        //update the main tree entry state
-        this.referenceTreeEntry.setBannerState(this.referenceManager.getState());
+    closeWorkspace() {
+        //no action in ui for references
     }
 
     //-----------------------------------
@@ -50,6 +44,10 @@ export default class ReferenceView {
             return {treeState: this.treeEntry.getState()};
         }
     }
+
+    //==================================
+    // Private Methods
+    //==================================
 
     /** @private */
     _createTreeEntry() {
@@ -63,10 +61,6 @@ export default class ReferenceView {
 
         return treeEntry;
     }
-
-    //==================================
-    // Private Methods
-    //==================================
 
     createReferenceListView(entryType,referenceList) {
         let listDisplayInfo = LIST_DISPLAY_INFO[entryType];

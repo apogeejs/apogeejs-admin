@@ -81,6 +81,10 @@ export default class ComponentView {
         return this.modelView;
     }
 
+    closeWorkspace() {
+        this.onDelete();
+    }
+
     //-----------------------------------
     // Save methods
     //-----------------------------------
@@ -148,10 +152,10 @@ export default class ComponentView {
         if(!json) return;
 
         //set the tree state
-        if(json.treeState !== undefined) {
+        if((json.treeState !== undefined)||(json.treeState !== null)) {
             if(this.treeDisplay) {
                 this.treeDisplay.setState(json.treeState);
-                this.treeState = undefined;
+                this.treeState = null;
             }
             else {
                 this.treeState = json.treeState;
@@ -159,10 +163,10 @@ export default class ComponentView {
         }
         
         //set window options
-        if(json.childDisplayState !== undefined) {
+        if((json.childDisplayState !== undefined)||(json.childDisplayState !== null)) {
             if(this.childComponentDisplay) {
-                this.childComponentDisplay.setState(json.childDisplayState);
-                this.childDisplayState = undefined;
+                this.childComponentDisplay.setStateJson(json.childDisplayState);
+                this.childDisplayState = null;
             }
             else {
                 this.childDisplayState = json.childDisplayState;
@@ -198,6 +202,10 @@ export default class ComponentView {
     /** @protected */
     createTreeDisplay() {
         var treeDisplay = new TreeComponentDisplay(this);
+
+        if(this.treeState !== null) {
+            treeDisplay.setState(this.treeState);
+        }
         
         //default sort order within parent
         var treeEntrySortOrder = (this.constructor.TREE_ENTRY_SORT_ORDER !== undefined) ? this.constructor.TREE_ENTRY_SORT_ORDER : ComponentView.DEFAULT_COMPONENT_TYPE_SORT_ORDER;
@@ -210,12 +218,12 @@ export default class ComponentView {
     // component display methods - this is the element in the parent tab (main display)
     //-------------------
 
-    getChildDisplayState() {
-        return this.childDisplayState;
-    }
-
     setComponentDisplay(childComponentDisplay) {
         this.childComponentDisplay = childComponentDisplay; 
+        if(this.childDisplayState) {
+            this.childComponentDisplay.setStateJson(this.childDisplayState);
+            this.childDisplayState = null;
+        }
     }
 
     getComponentDisplay() {
@@ -259,7 +267,7 @@ export default class ComponentView {
         }
     }
 
-    getTabDisplay(createIfMissing) {
+    getTabDisplay() {
         return this.tabDisplay;
     }
 
@@ -319,16 +327,6 @@ export default class ComponentView {
     /** This method cleans up after a delete. Any extending object that has delete
      * actions should pass a callback function to the method "addClenaupAction" */
     onDelete() {
-        
-        //remove from parent
-        if(this.uiActiveParent) {
-            var parentComponent = this.modelManager.getComponent(this.uiActiveParent);
-            if(parentComponent) {
-                //remove the tree from the parent
-                parentComponent.removeChildComponent(this);
-            }
-        }
-        
         if(this.tabDisplay) {
             this.closeTabDisplay();
         }

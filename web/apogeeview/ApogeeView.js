@@ -28,7 +28,7 @@ export default class ApogeeView {
         this.tabFrame = null;
         this.workspaceView = null;
         this.containerId = containerId;
-        this.app = this.instantiateApp(appConfigManager);
+        this.app = new Apogee(appConfigManager);
         this.loadUI(containerId);
 
         //subscribe to events
@@ -104,10 +104,6 @@ export default class ApogeeView {
     //=================================
     // User Interface Creation Methods
     //=================================
-
-    instantiateApp(appConfigManager) {
-        return new Apogee(appConfigManager);
-    }
 
     /** This method creates the app ui. 
      * @private */
@@ -432,10 +428,12 @@ export default class ApogeeView {
     // Static Functions
     //========================================
 
+    /** This method is used to register a new component view class for the user interface. */
     static registerComponentView(viewClass) {
         componentClassMap[viewClass.componentName] = viewClass;
     }
 
+    /** This method retrieves a component view class using the component unique name. */
     static getComponentViewClass(componentName) {
         return componentClassMap[componentName];
     }

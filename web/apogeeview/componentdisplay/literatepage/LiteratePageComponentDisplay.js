@@ -24,11 +24,15 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
         this.editorManager = this.componentView.getEditorManager();
 
-        this.loadTabEntry();
+        //this is used if we have to prepopolate and child component displays
+        this.standInChildComponentDisplays = {};
 
-        //add a cleanup action to the base component - component must already be initialized
-    //    this.addCleanupAction(LiteratePageComponentDisplay.destroy);
+        this.loadTabEntry();
     };
+
+    getComponentView() {
+        return this.componentView;
+    }
 
 
     getTab() {
@@ -74,22 +78,59 @@ export default class LiteratePageComponentDisplay extends EventManager {
     }
     //##############################################################################
 
+    getChildComponentDisplay(name) {
+        let folderComponent = this.componentView.getComponent();
+        let folderMember = folderComponent.getMember();
+
+        //lookup component
+        var member = folderMember.lookupChild(name);
+        if (member) {
+            var modelView = this.componentView.getModelView();
+            var childComponentView = modelView.getComponentView(member.getId());
+            let childComponentDisplay;
+            if (childComponentView) {
+                childComponentDisplay = childComponentView.getComponentDisplay();
+                //   //CLUDGE ALERT - fix this when I reorganize the code
+                //   var tabDisplay = this.folderComponentView.getTabDisplay();
+                //   tabDisplay.addChild(componentView);
+                //   componentDisplay = componentView.getComponentDisplay();
+            }
+            else {
+                //this component view has not been created yet. Make a standing
+                childComponentDisplay = new PageChildComponentDisplay(null, this);
+                this.standInChildComponentDisplays[name] = childComponentDisplay;
+            }
+
+            return childComponentDisplay
+        }
+        else {
+            return null;
+        }
+    }
+
     /** This creates and adds a display for the child component to the parent container. */
     addChild(childComponentView) {
 
         //-----------------
         // Get component display
         //-----------------
-        var childComponentDisplay;
+        let childComponentDisplay;
 
         //create a new component display for this child
         if(childComponentView.constructor.hasChildEntry) {
-            childComponentDisplay = new PageChildComponentDisplay(childComponentView,this);
+            //check if there is a component display already waiting
+            childComponentDisplay = this.standInChildComponentDisplays[childComponentView.getName()];
+            if(childComponentDisplay) {
+                //set up the standin component display
+                childComponentDisplay.setComponentView(childComponentView);
+                delete this.standInChildComponentDisplays[name];
+            }
+            else {
+                childComponentDisplay = new PageChildComponentDisplay(childComponentView,this);
+            }
         }
 
-        //------------------
-        // add to editor
-        //------------------
+        //set this on the child
         if(childComponentDisplay) {
             //set the component display
             childComponentView.setComponentDisplay(childComponentDisplay);
@@ -318,7 +359,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //start with an empty component display
         var emptyEditorState = this.editorManager.createEditorState();
         
-        this.editorView = this.editorManager.createEditorView(this.contentElement,this.componentView, emptyEditorState);
+        this.editorView = this.editorManager.createEditorView(this.contentElement,this,emptyEditorState);
 
         this.contentElement.addEventListener("click",event => this.onClickContentElement(event));
 

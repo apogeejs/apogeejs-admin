@@ -20,6 +20,7 @@ export default class WorkspaceView {
 
         this.init();
 
+        //Thisis used to retieve UI state to save when the app is being saved
         this.workspaceManager.setViewStateCallback(() => this.getViewState());
     }
 
@@ -50,13 +51,19 @@ export default class WorkspaceView {
 
     /** This method takes any actions on workspace close. */
     close() {
-        
+        if(this.modelView) {
+            this.modelView.closeWorkspace();
+        }
+        if(this.referenceView) {
+            this.referenceView.closeWorkspace();
+        }
     }
 
     //====================================
     // properties and display
     //====================================
 
+    /** Thie methor retrieves a serialized UI state, to be used during save. */
     getViewState() {
         if(this.treeEntry) {
             return {treeState: this.treeEntry.getState()};
@@ -91,15 +98,10 @@ export default class WorkspaceView {
         let modelManager = this.workspaceManager.getModelManager();
         let model = modelManager.getModel();
         var labelText = model ? model.getName() : Workspace_OPENING_NAME; //add the name
-        var iconUrl = this.getIconUrl();
+        var iconUrl = apogeeui.getResourcePath(WorkspaceView.ICON_RES_PATH);
         var menuItemCallback = () => this.getMenuItems();
         var isRoot = true;
         return new TreeEntry(labelText, iconUrl, null, menuItemCallback,isRoot);
-    }
-
-    /** This method returns the icon url for the component. */
-    getIconUrl() {
-        return apogeeui.getResourcePath(WorkspaceView.ICON_RES_PATH);
     }
 
     getMenuItems() {

@@ -82,7 +82,7 @@ export default class WebDisplayContainer {
         //we only read the data display state
         //there is no state used in the container itself.
         if(this.dataDisplay) {
-            this.dataDisplay.readUiStateJson(this.savedUiState);
+            this.dataDisplay.readUiStateData(this.savedUiState);
         }
     }
 

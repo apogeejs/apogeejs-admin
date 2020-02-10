@@ -118,7 +118,7 @@ export default class PageDisplayContainer {
         }
 
         if(this.dataDisplay) {
-            this.dataDisplay.readUiStateJson(this.savedUiState);
+            this.dataDisplay.readUiStateData(this.savedUiState);
         }
     }
 

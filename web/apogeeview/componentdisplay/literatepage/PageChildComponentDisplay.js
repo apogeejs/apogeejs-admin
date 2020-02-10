@@ -22,25 +22,27 @@ export default class PageChildComponentDisplay {
         this.displayContainerMap = null;
         
         this.isPageShowing = false;
+
+        //make the container
+        this.mainElement = apogeeui.createElementWithClass("div","visiui_pageChild_mainClass",null);
     
         //this is the window in which the component is displayed
-        this.loadComponentDisplay();
+        if(componentView) this.loadComponentDisplay();
         
         //connect to parent
         this.setIsPageShowing(this.parentComponentDisplay.getIsShowing());
         this.parentComponentDisplay.addListener(apogeeui.SHOWN_EVENT,() => this.setIsPageShowing(true));
         this.parentComponentDisplay.addListener(apogeeui.HIDDEN_EVENT,() => this.setIsPageShowing(false));
-
-        //set the initial state
-        let childDisplayState = componentView.getChildDisplayState();
-        this.setStateJson(childDisplayState);
-
-        //add a cleanup action to the base component - component must already be initialized
-    //    this.addCleanupAction(PageChildComponentDisplay.destroy);
-    };
+    }
 
     getElement() {
         return this.mainElement;
+    }
+
+    setComponentView(componentView) {
+        this.componentView = componentView;
+        this.loadComponentDisplay();
+        this.updateChildDisplayStates();
     }
 
     getComponentView() {
@@ -139,9 +141,7 @@ export default class PageChildComponentDisplay {
     /** This is the standard window for the component.  
      * @private */
     loadComponentDisplay() {
-
-        //make the container
-        this.mainElement = apogeeui.createElementWithClass("div","visiui_pageChild_mainClass",null);
+        if(!this.componentView) return;
 
         //add the click handler, to select this node if it is clicked
         this.mainElement.onclick = () => {
@@ -252,11 +252,14 @@ export default class PageChildComponentDisplay {
     }
 
     _setTitle() {
+        if(!this.componentView) return;
+
         let title = this.componentView.getDisplayName();
         this.titleBarNameElement.innerHTML = title;
     }
 
     _setBannerState() {
+        if(!this.componentView) return;
 
         let bannerState = this.componentView.getComponent().getBannerState();
         let bannerMessage = this.componentView.getComponent().getBannerMessage();

@@ -50,6 +50,13 @@ export default class ModelView {
         return this.workspaceView.getAppView();
     }
 
+    closeWorkspace() {
+        for(let viewId in this.componentViewMap) {
+            let componentView = this.componentViewMap[viewId];
+            componentView.closeWorkspace();
+        }
+    }
+
     //================================
     // Target Event handlers
     //================================
@@ -70,10 +77,7 @@ export default class ModelView {
 
     targetDeleted(eventData) {
         let target = eventData.target;
-        if(target.getTargetType() == "model") {
-            this.onModelClosed(target);
-        }
-        else if(target.getTargetType() == "component") {
+        if(target.getTargetType() == "component") {
             this.onComponentDeleted(target);
         }
     }
@@ -132,22 +136,6 @@ export default class ModelView {
         }
     }
 
-    onModelClosed(workspace) {
-        //we need to make sure the tab frame is cleared of anything the workspace put in it (soemthing else may be using it too)
-    }
-
-    //====================================
-    // Workspace Management
-    //====================================
-
-    /** This method gets the workspace object. */
-    close() {
-        //remove tree entry (if tree active)
-        if(this.tree) {
-            this.tree.clearRootEntry();
-        }
-    }
-
     //====================================
     // properties and display
     //====================================
@@ -169,14 +157,9 @@ export default class ModelView {
     }
 
     createTreeEntry() {
-        var iconUrl = this.getIconUrl();
+        var iconUrl = apogeeui.getResourcePath(ICON_RES_PATH);
         var isRoot = true;
         return new TreeEntry(MODEL_FOLDER_LABEL, iconUrl, null, null, isRoot);
-    }
-
-    /** This method returns the icon url for the component. */
-    getIconUrl() {
-        return apogeeui.getResourcePath(ICON_RES_PATH);
     }
 
 }
