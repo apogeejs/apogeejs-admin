@@ -10,8 +10,9 @@ export default class ComponentView {
     constructor(modelView,component) {
         
         this.modelView = modelView;
-        this.uiActiveParent = null;
         this.component = component;
+        //this is to record the latest parent view to which this was added
+        this.lastAssignedParentComponentView = null;
         
         //ui elements
         this.childComponentDisplay = null; //this is the main display, inside the parent tab
@@ -61,6 +62,11 @@ export default class ComponentView {
         else {
             return null;
         }
+
+    }
+
+    setLastAssignedParentComponentView(parentComponentView) {
+        this.lastAssignedParentComponentView = parentComponentView;
 
     }
 
@@ -295,7 +301,7 @@ export default class ComponentView {
             //add the standard entries
             var itemInfo = {};
             itemInfo.title = "Edit Properties";
-            itemInfo.callback = () => updateComponent(this.component,this.constructor);
+            itemInfo.callback = () => updateComponent(this.component,this);
             menuItemList.push(itemInfo);
 
             var itemInfo = {};
@@ -343,34 +349,28 @@ export default class ComponentView {
 
         let fieldsUpdated = eventInfo.fieldsUpdated;
 
-        // //check for parent change
-        // if(apogeeutil.isFieldUpdated(fieldsUpdated,"owner")) {
-                
-        //     //old parent change logic!!!
-        //     var oldParent = this.uiActiveParent;
-        //     var newParent = this.member.getParent();
+        //check for parent change
+        if(apogeeutil.isFieldUpdated(fieldsUpdated,"owner")) {
+            var oldParentComponentView = this.lastAssignedParentComponentView;
+            var newParentComponentView = this.getParentComponentView();
 
-        //     this.uiActiveParent = newParent;
+            if(oldParentComponentView != newParentComponentView) {
+                //remove from old parent component
+                if(oldParentComponentView) {
+                    oldParentComponentView.removeChild(this);
+                    //delete all the window display
+                    if(this.childComponentDisplay) {
+                        this.childComponentDisplay.deleteDisplay();
+                        this.childComponentDisplay = null;
+                    }
+                }
 
-        //     //remove from old parent component
-        //     if(oldParent) {
-        //         var oldParentComponent = this.modelManager.getComponent(oldParent);
-        //         oldParentComponent.removeChildComponent(this);
-        //         //delete all the window display
-        //         if(this.childComponentDisplay) {
-        //             this.childComponentDisplay.deleteDisplay();
-        //             this.childComponentDisplay = null;
-        //         }
-        //     }
-
-        //     //add to the new parent component
-        //     if(newParent) {
-        //         var newParentComponent = this.modelManager.getComponent(newParent);
-        //         newParentComponent.addChildComponent(this);
-
-        //         //TODO - delete the current component display and add a new one
-        //     }
-        // }  
+                //add to the new parent component
+                if(newParentComponentView) {
+                    newParentComponentView.addChild(this);
+                }
+            }
+        }  
         
         //update for new data
         if(this.treeDisplay) {

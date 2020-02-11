@@ -123,7 +123,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
             if(childComponentDisplay) {
                 //set up the standin component display
                 childComponentDisplay.setComponentView(childComponentView);
-                delete this.standInChildComponentDisplays[name];
+                delete this.standInChildComponentDisplays[childComponentView.getName()];
             }
             else {
                 childComponentDisplay = new PageChildComponentDisplay(childComponentView,this);

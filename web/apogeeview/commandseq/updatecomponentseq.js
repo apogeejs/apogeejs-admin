@@ -8,15 +8,15 @@ import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js"
 //=====================================
 
 /** This method gets a callback to update the properties of a component. */
-export function updateComponent(component,componentViewClass) {
+export function updateComponent(component,componentView) {
     
     var componentClass = component.constructor;
+    var componentViewClass = componentView.constructor;
 
     var displayName = componentClass.displayName
     var additionalLines = apogeeutil.jsonCopy(componentViewClass.propertyDialogLines); 
 
     var modelManager = component.getModelManager(); 
-    var model = component.getModel();
     var initialValues = component.getPropertyValues(); 
 
     //add folder list, only if we can set the parent (if there is a parent)
@@ -81,33 +81,34 @@ export function updateComponent(component,componentViewClass) {
                 }
             }
 
+            let oldName = member.getName();
+            let modelView;
 
             let renameEditorCommands;
 
             //do the first stage of editor commands
-            if(componentViewClass.hasChildDisplay) {
-                //----------------------------
-                //move case
-                //delete old node
-                //----------------------------
-                let oldName = member.getName();
+            if(componentViewClass.hasChildEntry) {
+                //load model view, will be used for old parent and new parent
+                modelView = componentView.getModelView();
+
+                //look up the old parent component
                 let oldParent = member.getParent();
-                let oldParentComponent = modelManager.getComponent(oldParent);
+                let oldParentComponentView = modelView.getComponentView(oldParent.getId());
 
                 if(newValues.parentName) {
-                    let newParent = model.getMemberByFullName(newValues.parentName);
-                    let newParentComponent = modelManager.getComponent(newParent);
-
-                    //delete old parent apogee node 
-                    let oldParentEditorCommand = oldParentComponent.getRemoveApogeeNodeFromPageCommand(oldName);
+                    //----------------------------
+                    //move case
+                    //delete old node
+                    //----------------------------
+                    let oldParentEditorCommand = oldParentComponentView.getRemoveApogeeNodeFromPageCommand(oldName);
                     commands.push(oldParentEditorCommand);
                 }
-                if(newValues.name) {
+                else if(newValues.name) {
                     //---------------------------
                     //rename case
                     //get the rename editr comamnds, then apply the one to clear the component node name
                     //----------------------------
-                    renameEditorCommands = oldParentComponent.getRenameApogeeNodeCommands(member.getId(),oldName,newValues.name);
+                    renameEditorCommands = oldParentComponentView.getRenameApogeeNodeCommands(member.getId(),oldName,newValues.name);
                     commands.push(renameEditorCommands.setupCommand);
                 }
             }
@@ -121,18 +122,22 @@ export function updateComponent(component,componentViewClass) {
             commands.push(moveCommand);
 
             //do the second stage of editor commands
-            if(componentViewClass.hasChildDisplay) {
+            if(componentViewClass.hasChildEntry) {
 
                 //-----------------------------------
                 // move case
                 // add the compone nodes to the new page after the component has been moved there
                 //----------------------------------------------
                 if(newValues.parentName) {
+                    //look up the new parent component
+                    let model = member.getModel();
                     let newParent = model.getMemberByFullName(newValues.parentName);
-                    let newParentComponent = modelManager.getComponent(newParent);
+                    let newParentComponentView = modelView.getComponentView(newParent.getId());
+
+                    let newName = newValues.name ? newValues.name : oldName;
 
                     //insert node add at end of new page
-                    let newParentCommands = newParentComponent.getInsertApogeeNodeOnPageCommands(newValues.name,true);
+                    let newParentCommands = newParentComponentView.getInsertApogeeNodeOnPageCommands(newName,true);
                     //added the editor setup command
                     if(newParentCommands.editorSetupCommand) commands.push(newParentCommands.editorSetupCommand);
                     //check if we need to add any delete component commands  - we shouldn't have any since we are not overwriting data here
@@ -145,9 +150,10 @@ export function updateComponent(component,componentViewClass) {
                         if(!doDelete) return;
                         
                         commands.push(...newParentCommands.deletedComponentCommands);
-                 }
-                 //add the editor insert command
-                 if(newParentCommands.editorAddCommand) commands.push(newParentCommands.editorAddCommand);
+                    }
+
+                    //add the editor insert command
+                    if(newParentCommands.editorAddCommand) commands.push(newParentCommands.editorAddCommand);
                 }
 
                 //----------------------------

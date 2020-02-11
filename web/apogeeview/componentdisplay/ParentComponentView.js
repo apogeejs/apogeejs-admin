@@ -42,7 +42,6 @@ export default class ParentComponentView extends ComponentView {
         
         return treeDisplay;
     }
-
     
     //----------------------
     // Parent Methods
@@ -56,7 +55,7 @@ export default class ParentComponentView extends ComponentView {
     }
 
     /** This function adds a fhile componeent to the displays for this parent component. */
-    removeChildComponent(childComponent) {
+    removeChild(childComponent) {
         //remove from tree entry
         var treeEntry = this.getTreeEntry();
         if(treeEntry) {
@@ -72,6 +71,8 @@ export default class ParentComponentView extends ComponentView {
 
     /** This function adds a fhile componeent to the displays for this parent component. */
     addChild(childComponentView) {
+        //we need to record the child was assigned here, to be used if the component view is moved
+        childComponentView.setLastAssignedParentComponentView(this);
         //add the child to the tree entry
         var treeEntry = this.getTreeEntry();
         if(treeEntry) {
@@ -117,35 +118,6 @@ export default class ParentComponentView extends ComponentView {
 
     getEditorManager() {
         return this.editorManager;
-    }
-
-    
-    //----------------------
-    // Parent Methods
-    //----------------------
-
-    /** This brings the child component to the front and takes any other actions
-     * to show the child in the open parent. */
-    showChildComponent(childComponent) {
-        if(childComponent.getParentComponent() != this.getComponent()) return;
-        this.selectApogeeNode(childComponent.getName());
-    }
-
-
-
-    /** This function adds a fhile componeent to the displays for this parent component. */
-    removeChildComponent(childComponent) {
-        //remove from tree entry
-        var treeEntry = this.getTreeEntry();
-        if(treeEntry) {
-            var childTreeEntry = childComponent.getTreeEntry();
-            if(childTreeEntry) {
-                treeEntry.removeChild(childTreeEntry);
-            }
-        }
-        
-        //remove child windows - just hide them. They will be deleted in the component
-        childComponent.closeComponentDisplay();
     }
 
     //----------------------------------------

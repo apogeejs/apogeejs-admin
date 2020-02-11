@@ -162,7 +162,7 @@ export default class CommandManager {
                 //marge target info so there is no more than one event per target (for successful events)
                 let eventData = successEventMap[targetId];
                 if(eventData) {
-                    eventData = this._mergeEventData(targetData,commandResult);
+                    eventData = this._mergeEventData(eventData,commandResult);
                 }
                 else {
                     eventData = this._createNewEventData(commandResult);
@@ -201,7 +201,7 @@ export default class CommandManager {
         //we have a potential new action
         eventData.action = action;
         //we might have to combine error messages
-        eventData.errorMsg = this._getMergeErrorMsg(targetData.alertMsg,commandResult.alertMsg);
+        eventData.errorMsg = this._getMergeErrorMsg(eventData.alertMsg,commandResult.alertMsg);
         //or the is pending flags
         eventData.isPending = eventData.isPending || commandResult.isPending;
 
@@ -240,7 +240,7 @@ export default class CommandManager {
                 return "error";
             }
         }
-        else if(fistAction == "updated") {
+        else if(firstAction == "updated") {
             if(secondAction == "updated") {
                 return "updated";
             }
