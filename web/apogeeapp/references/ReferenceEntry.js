@@ -17,9 +17,8 @@ export default class ReferenceEntry extends EventManager {
         //we create in a pending state because the link is not loaded.
         this.state = bannerConstants.BANNER_TYPE_PENDING;
 
-        var nickname = referenceData.nickname;
-        if((!nickname)||(nickname.length === 0)) nickname = this.createEntryNameFromUrl(this.url);
-        this.nickname = nickname;  
+        this.nickname = referenceData.nickname;
+        if(!this.nickname) this.nickname = NO_NICKNAME_EMPTY_STRING;  
 
         this.viewStateCallback = null;
         this.cachedViewState = null;
@@ -32,10 +31,6 @@ export default class ReferenceEntry extends EventManager {
     //---------------------------
     // references entry interface
     //---------------------------
-    
-    getReferenceManager() {
-        return this.referenceManager;
-    }
 
     getReferenceList() {
         return this.referenceList;
@@ -61,6 +56,10 @@ export default class ReferenceEntry extends EventManager {
         return this.nickname;
     }
 
+    getLabel() {
+        return this.nickname ? this.nickname : this.url;
+    }
+
     setViewStateCallback(viewStateCallback) {
         this.viewStateCallback = viewStateCallback;
     }
@@ -76,7 +75,7 @@ export default class ReferenceEntry extends EventManager {
      * The promise returns a commandResult for the loaded reference. */
     //loadEntry()
     
-    /** This method removes the reference. It returns a command result for the removed link. */
+    /** This method removes the reference. It returns true if the link remove is successful. */
     //remove()
     
     
@@ -87,7 +86,7 @@ export default class ReferenceEntry extends EventManager {
     toJson() {
         var entryJson = {};
         entryJson.url = this.url;
-        if(this.nickname != this.url) entryJson.nickname = this.nickname;
+        if(this.nickname != NO_NICKNAME_EMPTY_STRING) entryJson.nickname = this.nickname;
         entryJson.entryType = this.referenceType;
         return entryJson;
     }
@@ -100,19 +99,16 @@ export default class ReferenceEntry extends EventManager {
     updateData(url,nickname) {
 
         //update nickname
-        if(this.treeEntry) {
-            if((!nickname)||(nickname.length === 0)) nickname = this.createEntryNameFromUrl(url);
-            if(this.nickname != nickname) {
-                this.nickname = nickname;
-                this.treeEntry.setLabel(this.nickname);
-                this.fieldUpdated("nickname");
-            }
+        if(!nickname) nickname = NO_NICKNAME_EMPTY_STRING;
+        if(this.nickname != nickname) {
+            this.nickname = nickname;
+            this.fieldUpdated("nickname");
         }
 
         //update url
         if(this.url != url) {
-            this.url = url;
             this.remove();
+            this.url = url;
             var promise = this.loadEntry();
             this.fieldUpdated("url");
         }
@@ -161,10 +157,6 @@ export default class ReferenceEntry extends EventManager {
     // private methods
     //===================================
 
-    createEntryNameFromUrl(url) {
-        return url;
-    }
-
     getElementId() {
         return ReferenceEntry.ELEMENT_ID_BASE + this.id;
     }
@@ -205,6 +197,8 @@ export default class ReferenceEntry extends EventManager {
 
 
 ReferenceEntry.ELEMENT_ID_BASE = "__apogee_link_element_";
+
+let NO_NICKNAME_EMPTY_STRING = "";
 
 /** THis is used to give an id to the link entries 
  * @private */

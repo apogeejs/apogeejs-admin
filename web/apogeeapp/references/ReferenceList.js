@@ -52,7 +52,7 @@ export default class ReferenceList extends EventManager {
     }
 
     lookupEntry(url) {
-        this.referecneEntries.find(referenceEntry => referenceEntry.getUrl() == url);
+        return this.referenceEntries.find(referenceEntry => referenceEntry.getUrl() == url);
     }
 
     removeEntry(referenceEntry) {
@@ -75,7 +75,7 @@ export default class ReferenceList extends EventManager {
             //load this url if it doesn't exist
             if(!this.hasUrlEntry(entryJson.url)) {
                 //create the entry (this does not actually load it)
-                let commandResult = referenceList.createEntry(entryJson);
+                let commandResult =this.createEntry(entryJson);
                 listCommandResults.push(commandResult);
 
                 //load the entry - this will be asynchronous
@@ -91,18 +91,12 @@ export default class ReferenceList extends EventManager {
             this.cachedViewState = json.viewState;
         }
 
-        return {listCommandResult,listLoadPromises};
+        return {listCommandResults,listLoadPromises};
     }
 
     toJson() {
         let json = {};
-        let hasEntries = false;
-        var entriesJson = {};
-        for(let entry in this.referenceEntries) {
-            entriesJson[referenceListType] = entry.toJson();
-            hasEntries = true;
-        }
-        json.entries = entriesJson;
+        json.entries = this.referenceEntries.map( entry => entry.toJson());
 
         //set the view state
         if(this.viewStateCallback) {
@@ -110,7 +104,7 @@ export default class ReferenceList extends EventManager {
             if(this.cachedViewState) json.viewState = this.cachedViewState;
         }
 
-        if(hasEntries) {
+        if(json.entries.length > 0) {
             return json;
         }
         else {

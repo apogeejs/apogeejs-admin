@@ -77,6 +77,7 @@ export default class WorkspaceManager extends EventManager {
         this.fileMetadata = fileMetadata;
 
         let synchCommandResult = {};
+        synchCommandResult.cmdDone = true;
         synchCommandResult.target = this;
         synchCommandResult.parent = this.app;
         synchCommandResult.action = "created";

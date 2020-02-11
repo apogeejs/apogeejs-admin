@@ -28,7 +28,7 @@ deletelink.createUndoCommand = function(workspaceManager,commandData) {
     undoCommandJson.type = "addLink";
     undoCommandJson.entryType = commandData.entryType;
     undoCommandJson.url = commandData.url;
-    if(nickname) undoCommandJson.nickname = nickname;
+    undoCommandJson.nickname = nickname;
     
     return undoCommandJson;
 }
@@ -44,7 +44,20 @@ deletelink.executeCommand = function(workspaceManager,commandData) {
         var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.url);
         if(referenceEntry) {
             //update entry
-            commandResult = referenceEntry.remove();
+            let isRemoved = referenceEntry.remove();
+
+            if(isRemoved) {
+                referenceEntry.getReferenceList().removeEntry(referenceEntry);
+            }
+
+            commandResult = {}
+            commandResult.cmdDone = isRemoved;
+            commandResult.target = referenceEntry;
+            commandResult.parent = referenceEntry.getReferenceList();
+            commandResult.action = "deleted";
+            if(!isRemoved) {
+                commandResult.alertMsg = "Unknown Error removing link entry!";
+            }
         }
         else {
             //entry not found

@@ -57,16 +57,8 @@ export default class AmdModuleEntry extends ReferenceEntry {
     remove() {
         //allow for an optional module remove step
         if((this.module)&&(this.module.removeApogeeModule)) this.module.removeApogeeModule(apogee,apogeeapp,apogeeutil);
-        
         require.undef(this.url);
-
-        this.referenceList.removeEntry(this);
-
-        return {
-            cmdDone: true,
-            target: this,
-            action: "deleted"
-        }
+        return true;
     }
     
 }

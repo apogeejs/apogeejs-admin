@@ -60,13 +60,7 @@ export default class NpmModuleEntry extends ReferenceEntry {
         //we aren't really removing it...
         //require.undef(this.url);
 
-        this.referenceList.removeEntry(this);
-
-        return {
-            cmdDone: true,
-            target: this,
-            action: "deleted"
-        }
+        return true;
     }
     
 }

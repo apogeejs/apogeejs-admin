@@ -48,17 +48,10 @@ export default class CssEntry extends ReferenceEntry {
         return new Promise(promiseFunction);
     }
     
-    /** This method removes the link. */
+    /** This method removes the link. It returns true if the link is removed. */
     remove() {
         getLinkLoader().removeLinkElement("css",this.url,this.linkCallerId);
-        
-        this.referenceList.remvoeEntry(this);
-
-        return {
-            cmdDone: true,
-            target: this,
-            action: "deleted"
-        }
+        return true;
     }
 }
 

@@ -40,6 +40,10 @@ export default class WorkspaceView {
         return this.app;
     }
 
+    getWorkspaceManager() {
+        return this.workspaceManager;
+    }
+
     getAppView() {
         return this.appView;
     }
@@ -111,7 +115,7 @@ export default class WorkspaceView {
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = "Edit Properties";
-        itemInfo.callback = () => updateWorkspaceProperties(this);
+        itemInfo.callback = () => updateWorkspaceProperties(this.getWorkspaceManager());
         menuItemList.push(itemInfo);
 
         //DEV ENTRY

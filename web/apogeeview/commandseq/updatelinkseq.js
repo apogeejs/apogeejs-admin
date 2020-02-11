@@ -26,12 +26,12 @@ const DIALOG_LAYOUT_SUBMIT_LINE = {
 //=====================================
 
 /** This method adds a link to the workspace. */
-export function addLink(app,entryTypeInfo) {
+export function addLink(app,displayInfo) {
         
     //create the dialog layout 
     var titleLine = {};
     titleLine.type = "title";
-    titleLine.title = entryTypeInfo.ADD_ENTRY_TEXT
+    titleLine.title = displayInfo.ADD_ENTRY_TEXT
 
     var dialogLayout = {};
     dialogLayout.lines = [];
@@ -52,7 +52,7 @@ export function addLink(app,entryTypeInfo) {
         //create command json
         var commandData = {};
         commandData.type = "addLink";
-        commandData.entryType = entryTypeInfo.REFERENCE_TYPE;
+        commandData.entryType = displayInfo.REFERENCE_TYPE;
         commandData.url = newValues.url;
         commandData.nickname = newValues.nickname;
 
@@ -68,19 +68,17 @@ export function addLink(app,entryTypeInfo) {
 }
 
 /** This method updates a link in the workspace. */
-export function updateLink(app,referenceEntry) {
+export function updateLink(app,referenceEntry,displayInfo) {
         
     var initialValues = {};
     initialValues.url = referenceEntry.getUrl();
     initialValues.nickname = referenceEntry.getNickname();
     if(initialValues.nickname == initialValues.url) initialValues.nickname = "";
 
-    var entryTypeInfo = referenceEntry.getTypeInfo();//FIX THIS!! the tyep info for the UI is moved.
-
     //create the dialog layout
     var titleLine = {};
     titleLine.type = "title";
-    titleLine.title = entryTypeInfo.UPDATE_ENTRY_TEXT;
+    titleLine.title = displayInfo.UPDATE_ENTRY_TEXT;
 
     var urlLine = apogeeutil.jsonCopy(DIALOG_LAYOUT_URL_LINE);
     urlLine.initial = initialValues.url;
@@ -107,13 +105,13 @@ export function updateLink(app,referenceEntry) {
         var commandData = {};
         var dataChanged = false;
         commandData.type = "updateLink";
-        commandData.entryType = entryTypeInfo.REFERENCE_TYPE;
+        commandData.entryType = displayInfo.REFERENCE_TYPE;
         commandData.oldUrl = initialValues.url;
         if(initialValues.url != newValues.url) {
             commandData.newUrl = newValues.url;
             dataChanged = true;
         }
-        if(initialValues.url != newValues.url) {
+        if(initialValues.nickname != newValues.nickname) {
             commandData.newNickname = newValues.nickname;
             dataChanged = true;
         }
@@ -132,7 +130,7 @@ export function updateLink(app,referenceEntry) {
 
 
 /** This method deletes a link in the workspace. */
-export function removeLink(app,referenceEntry) {
+export function removeLink(app,referenceEntry,displayInfo) {
 
     var doDelete= confirm("Are you sure you want to delete this link?");
 
@@ -141,7 +139,7 @@ export function removeLink(app,referenceEntry) {
         
         var commandData = {};
         commandData.type = "deleteLink";
-        commandData.entryType = referenceEntry.getTypeInfo().REFERENCE_TYPE;
+        commandData.entryType = displayInfo.REFERENCE_TYPE;
         commandData.url = referenceEntry.getUrl();
 
         //run command

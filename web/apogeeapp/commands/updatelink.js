@@ -23,7 +23,7 @@ updatelink.createUndoCommand = function(workspaceManager,commandData) {
     
     if(commandData.newUrl != commandData.oldUrl) undoCommandJson.newUrl = commandData.oldUrl;
     
-    if(commandData.newNickname) {
+    if(commandData.newNickname !== undefined) {
         //look up the pre-command entry (we change back gto this)
         var referenceManager = workspaceManager.getReferenceManager();
         var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.oldUrl);
@@ -35,7 +35,7 @@ updatelink.createUndoCommand = function(workspaceManager,commandData) {
     return undoCommandJson;
 }
 
-updatelink.executeCommand = function(workspaceManager,commandData) {
+updatelink.executeCommand = function(workspaceManager,commandData,asynchOnComplete) {
     
     var synchcommandResult = {};
     var referenceManager = workspaceManager.getReferenceManager();
@@ -45,7 +45,9 @@ updatelink.executeCommand = function(workspaceManager,commandData) {
     
     if(referenceEntry) {
         //update entry
-        let updatePromise = referenceEntry.updateData(commandData.newUrl,commandData.newNickname);
+        let url = (commandData.newUrl !== undefined) ? commandData.newUrl : referenceEntry.getUrl();
+        let nickname = (commandData.newNickname !== undefined) ? commandData.newNickname : referenceEntry.getNickname();
+        let updatePromise = referenceEntry.updateData(url,nickname);
 
         updatePromise.then( asynchCommandResult => {
             if(asynchOnComplete) {
@@ -65,6 +67,7 @@ updatelink.executeCommand = function(workspaceManager,commandData) {
         
         synchcommandResult.cmdDone = true;
         synchcommandResult.target = referenceEntry;
+        synchcommandResult.parent = referenceEntry.getReferenceList();
         synchcommandResult.action = "updated";
     }
     else {

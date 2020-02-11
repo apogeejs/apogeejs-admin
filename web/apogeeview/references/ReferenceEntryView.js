@@ -11,7 +11,6 @@ export default class ReferenceEntryView {
         this.treeEntry = this._createTreeEntry();
 
         referenceEntry.addListener("updated",eventInfo => this._onUpdated(eventInfo));
-        referenceEntry.addListener("deleted",eventInfo => this._onDeleted(eventInfo));
     }
 
 
@@ -27,27 +26,19 @@ export default class ReferenceEntryView {
 
     _onUpdated(eventInfo) {
         let target = eventInfo.target;
-        let fieldsUpdated = eventInfo.updated;
+        let fieldsUpdated = eventInfo.fieldsUpdated;
         if(target.getTargetType() == "link") {
             //make sure this is the right entry 
             if(target.getId() != this.referenceEntry.getId()) return;
             
             this.referenceEntry = target;
             if(apogeeutil.isFieldUpdated(fieldsUpdated,"nickname")) {
-                this.treeEntry.setLabel(this.referenceEntry.getNickname());
+                this.treeEntry.setLabel(this.referenceEntry.getLabel());
             }
     
             if(apogeeutil.isFieldUpdated(fieldsUpdated,"state")) {
                 this.treeEntry.setBannerState(this.referenceEntry.getState());
             }
-        }
-    }
-
-    _onDeleted(eventInfo) {
-        let target = eventInfo.target;
-        if(target.getTargetType() == "link") {
-            let referenceEntryView = this.childViews[target.getId()];
-            this.treeEntry.removeChild(referenceEntryView.getTreeEntry());
         }
     }
 
@@ -68,13 +59,13 @@ export default class ReferenceEntryView {
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = this.displayInfo.UPDATE_ENTRY_TEXT;
-        itemInfo.callback = () => updateLink(this.app,this);
+        itemInfo.callback = () => updateLink(this.app,this.referenceEntry,this.displayInfo);
         menuItemList.push(itemInfo);
 
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = this.displayInfo.REMOVE_ENTRY_TEXT;
-        itemInfo.callback = () => removeLink(this.app,this);
+        itemInfo.callback = () => removeLink(this.app,this.referenceEntry,this.displayInfo);
         menuItemList.push(itemInfo);
 
         return menuItemList;

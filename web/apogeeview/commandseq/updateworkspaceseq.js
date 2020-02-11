@@ -26,11 +26,11 @@ const DIALOG_LAYOUT_SUBMIT_LINE = {
 /** This method gets a callback to update the properties of a workspace. */
 export function updateWorkspaceProperties(workspaceManager) {
         
-    var workspace = workspaceManager.getWorkspace();
+    var model = workspaceManager.getModelManager().getModel();
 
     //load initial values
     var initialValues = {};
-    initialValues.name = workspace.getName();
+    initialValues.name = model.getName();
 
     //create the dialog layout
     var nameLine = apogeeutil.jsonCopy(DIALOG_LAYOUT_NAME_LINE);

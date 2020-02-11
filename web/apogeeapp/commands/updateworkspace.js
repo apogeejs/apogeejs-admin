@@ -48,6 +48,8 @@ updateworkspace.executeCommand = function(workspaceManager,commandData) {
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;
+    commandResult.target = modelManager;
+    commandResult.action = "updated";
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
     
     return commandResult;

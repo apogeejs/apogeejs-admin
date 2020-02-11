@@ -13,7 +13,7 @@ export default class ReferenceListView {
 
         this.childViews = {};
 
-        this.treeEntry = this._createTreeEntry();
+        this._setTreeEntry();
 
         referenceList.addListener("created",eventInfo => this._onCreated(eventInfo));
         referenceList.addListener("deleted",eventInfo => this._onDeleted(eventInfo));
@@ -56,17 +56,15 @@ export default class ReferenceListView {
         }
     }
 
-    _createTreeEntry() {
+    _setTreeEntry() {
         var iconUrl = apogeeui.getResourcePath(this.displayInfo.LIST_ICON_PATH);
         var menuItemCallback = () => this._getListMenuItems();
-        let treeEntry = new TreeEntry(this.displayInfo.LIST_NAME, iconUrl, null, menuItemCallback, false);
+        this.treeEntry = new TreeEntry(this.displayInfo.LIST_NAME, iconUrl, null, menuItemCallback, false);
 
         let viewState = this.referenceList.getCachedViewState();
         if((viewState)&&(viewState.treeState !== undefined)) {
             this.treeEntry.setState(viewState.treeState)
         }
-
-        return treeEntry;
     }
 
     /** @private */

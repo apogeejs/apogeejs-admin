@@ -51,14 +51,7 @@ export default class JsScriptEntry extends ReferenceEntry {
     /** This method removes the link. */
     remove() {
         getLinkLoader().removeLinkElement("script",this.url,this.linkCallerId);
-        
-        this.referenceList.removeEntry(this);
-
-        return {
-            cmdDone: true,
-            target: this,
-            action: "deleted"
-        }
+        return true;
     }
     
     _getLinkCallerHandle() {

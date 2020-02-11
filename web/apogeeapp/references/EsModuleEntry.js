@@ -32,7 +32,7 @@ export default class EsModuleEntry extends ReferenceEntry {
             
             commandResult.cmdDone = true;
             this.setClearState();
-            resolve(commandResult);
+            return commandResult;
         }
 
         var onError = (error) => {
@@ -44,7 +44,7 @@ export default class EsModuleEntry extends ReferenceEntry {
             commandResult.alertMsg = errorMsg;
 
             this.setError(errorMsg);
-            resolve(commandResult);
+            return commandResult;
         }
             
         this.setPendingState();
@@ -58,14 +58,7 @@ export default class EsModuleEntry extends ReferenceEntry {
     remove() {
         //allow for an optional module remove step
         if((this.module)&&(this.module.removeApogeeModule)) this.module.removeApogeeModule(apogee,apogeeapp,apogeeutil);
-
-        this.referenceList.removeEntry(this);
-
-        return {
-            cmdDone: true,
-            target: this,
-            action: "deleted"
-        }
+        return true;
     }
     
 }

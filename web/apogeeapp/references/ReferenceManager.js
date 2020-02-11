@@ -54,21 +54,26 @@ export default class ReferenceManager {
         
         //load the reference entries
         if(json.refLists) {
-            let referenceCommandResults = [];
             let referenceLoadPromises = [];
 
             for(let listType in json.refLists) {
                 let listJson = json.refLists[listType];
 
                 let referenceList = this.referenceLists[listType];
-                let {listCommandResult,listLoadPromises} = referenceList.load(listJson);
+                let {listCommandResults,listLoadPromises} = referenceList.load(listJson);
 
-                referenceCommandResults.push(...listCommandResult);
+                referenceCommandResults.push(...listCommandResults);
                 referenceLoadPromises.push(...listLoadPromises);
             }
 
             if(referenceLoadPromises.length > 0) {
-                referencesOpenPromise = Promise.all(referenceLoadPromises);
+                referencesOpenPromise = Promise.all(referenceLoadPromises).then(commandResultList => {
+                    //package the list of results into a single result
+                    let commandResult = {};
+                    commandResult.cmdDone = true;
+                    commandResult.childCommandResults = commandResultList;
+                    return commandResult;
+                });
             }
         }
         
