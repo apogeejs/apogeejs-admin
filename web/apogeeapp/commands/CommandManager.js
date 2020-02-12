@@ -156,18 +156,18 @@ export default class CommandManager {
     _flattenCommandResults(commandResult,successEventMap,failedEvents) {
         if(commandResult.cmdDone) {
 
-            let targetId = commandResult.target ? commandResult.target.getEventId() : null;
+            let uniqueTargetId = this._getUniqueTargetId(commandResult);
 
-            if(targetId) {
+            if(uniqueTargetId) {
                 //marge target info so there is no more than one event per target (for successful events)
-                let eventData = successEventMap[targetId];
+                let eventData = successEventMap[uniqueTargetId];
                 if(eventData) {
                     eventData = this._mergeEventData(eventData,commandResult);
                 }
                 else {
                     eventData = this._createNewEventData(commandResult);
                 }
-                successEventMap[targetId] = eventData;
+                successEventMap[uniqueTargetId] = eventData;
             }
 
             //process any children
@@ -178,6 +178,29 @@ export default class CommandManager {
         else {
             //if we didn't process this, add it to other events
             failedEvents.push(this._createNewEventData(commandResult));
+        }
+    }
+
+    _getUniqueTargetId(commandResult) {
+        let targetId;
+        let targetType;
+
+        if(commandResult.target) {
+            //used on create and update
+            targetId = commandResult.target.getId();
+            targetType = commandResult.target.getTargetType();
+        }
+        else {
+            //used on delete
+            targetId = commandResult.targetId;
+            targetType = commandResult.targetType;
+        }
+
+        if((targetId != undefined)&&(targetType)) {
+            return targetType + targetId;
+        }
+        else {
+            return undefined;
         }
     }
 

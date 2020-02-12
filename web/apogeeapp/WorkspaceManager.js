@@ -195,13 +195,13 @@ export default class WorkspaceManager extends EventManager {
         this.updated[field] = true;
     }
 
-    getEventId() {
-        //for now we have a single fixed id for the workspace
-        return "workspace";
+    getId() {
+        //right now we allow for just one workspace manager
+        return 1;
     }
 
     getTargetType() {
-        return "workspace";
+        return "workspaceManager";
     }
 
 }

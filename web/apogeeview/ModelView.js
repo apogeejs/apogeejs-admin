@@ -70,15 +70,14 @@ export default class ModelView {
 
     targetUpdated(eventData) {
         let target = eventData.target;
-        if(target.getTargetType() == "model") {
+        if(target.getTargetType() == "modelManager") {
             this.onModelUpdated(eventData.fieldsUpdated);
         }
     }
 
     targetDeleted(eventData) {
-        let target = eventData.target;
-        if(target.getTargetType() == "component") {
-            this.onComponentDeleted(target);
+        if((eventData.targetId)&&(eventData.targetType == "component")) {
+            this.onComponentDeleted(eventData.targetId);
         }
     }
 
@@ -114,12 +113,12 @@ export default class ModelView {
         componentView.loadViewStateFromComponent();
     }
 
-    onComponentDeleted(component) {
-        let componentView = this.componentViewMap[component.getId()];
-        delete this.componentViewMap[component.getId()];
+    onComponentDeleted(memberId) {
+        let componentView = this.componentViewMap[memberId];
+        delete this.componentViewMap[memberId];
 
-        //add to the proper parent
-        let parentComponentView = componentView.getParentComponentView();
+        //remove from the parent parent
+        let parentComponentView = componentView.getLastAssignedParentComponentView();
         if(parentComponentView) {
             parentComponentView.removeChild(componentView);
         }

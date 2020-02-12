@@ -122,10 +122,7 @@ export default class Component extends EventManager {
         return this.updated[field] ? true : false;
     }
 
-    getEventId() {
-        //use the main member for the event ID
-        return "component:" + this.member.getId();
-    }
+    //getId() Implmented above
 
     getTargetType() {
         return "component";

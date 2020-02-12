@@ -52,7 +52,8 @@ export default class ComponentView {
 
     /** This method gets the parent component view of the current component view. 
      * This method does not depends only on the relation between the components, 
-     * rather than any relationship established between the component views. */
+     * rather than any relationship established between the component views. This should give the
+     * same result getLastAssignedParentComponentView except during a delete or move operation. */
     getParentComponentView() {
         let parentComponent = this.component.getParentComponent();
         if(parentComponent) {
@@ -65,8 +66,18 @@ export default class ComponentView {
 
     }
 
+    /** This sets the assigned parent component view. This should be done for
+     * bookkeeping so it can be removed suring a move or delete operation. */
     setLastAssignedParentComponentView(parentComponentView) {
         this.lastAssignedParentComponentView = parentComponentView;
+
+    }
+
+    /** This method gets the assigned parent component view, which may not
+     * be the view corresponding to the current parent component. This should differ 
+     * only during move or delete operations. */
+    getLastAssignedParentComponentView() {
+        return this.lastAssignedParentComponentView;
 
     }
 
@@ -335,11 +346,6 @@ export default class ComponentView {
     onDelete() {
         if(this.tabDisplay) {
             this.closeTabDisplay();
-        }
-        
-        //execute cleanup actions
-        for(var i = 0; i < this.cleanupActions.length; i++) {
-            this.cleanupActions[i].call(this);
         }
     }
 

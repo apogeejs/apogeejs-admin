@@ -63,15 +63,14 @@ export default class ApogeeView {
     
     targetCreated(eventData) {
         let target = eventData.target;
-        if(target.getTargetType() == "workspace") {
+        if(target.getTargetType() == "workspaceManager") {
             this.onWorkspaceCreated(target);
         }
     }
 
     targetDeleted(eventData) {
-        let target = eventData.target;
-        if(target.getTargetType() == "workspace") {
-            this.onWorkspaceClosed(target);
+        if(eventData.targetType == "workspaceManager") {
+            this.onWorkspaceClosed();
         }
     }
 

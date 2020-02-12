@@ -128,13 +128,13 @@ export default class ModelManager extends EventManager {
         this.updated[field] = true;
     }
 
-    getEventId() {
-        //for now we have a single fixed id for the model
-        return "model";
+    getId() {
+        //right now we allow for just one model manager
+        return 1;
     }
 
     getTargetType() {
-        return "model";
+        return "modelManager";
     }
 
     //====================================

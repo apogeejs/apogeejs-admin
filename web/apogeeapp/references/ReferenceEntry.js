@@ -143,10 +143,7 @@ export default class ReferenceEntry extends EventManager {
         return this.updated[field] ? true : false;
     }
 
-    getEventId() {
-        //use the main member for the event ID
-        return "link-" + this.id;
-    }
+    //getId() Implmented above
 
     getTargetType() {
         return "link";

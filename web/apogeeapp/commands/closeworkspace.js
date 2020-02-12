@@ -11,7 +11,13 @@ let closeworkspace = {};
 
 closeworkspace.executeCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
-    var model = modelManager.getModel();
+    let model = modelManager.getModel();
+
+    let commandResult = {};
+    commandResult.action = "deleted";
+    commandResult.targetId = workspaceManager.getId();
+    commandResult.targetType = workspaceManager.getTargetType();
+    commandResult.parent = workspaceManager.getApp();
     
     var workspaceManagerRemoved = false;
     
@@ -20,16 +26,18 @@ closeworkspace.executeCommand = function(workspaceManager,commandData) {
         
         workspaceManager.close();
         model.onClose();
+
+        commandResult.cmdDone = true;
     }
     catch(error) {
         if(error.stack) console.error(error.stack);
-        
-        var isFatal = !workspaceManagerRemoved;
         var errorMsg = "Error closeing workspace: " + error.message;
         CommandManager.errorAlert(errorMsg,isFatal);
+        
+        commandResult.cmdDone = false;
     }
     
-    return workspaceManagerRemoved;
+    return commandResult;
 }
 
 closeworkspace.commandInfo = {

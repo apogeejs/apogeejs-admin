@@ -62,7 +62,9 @@ deletecomponent.executeCommand = function(workspaceManager,commandData) {
 function _fillInCommandResults(modelManager,actionResult,commandResult) {
     if(!commandResult) commandResult = {};
 
-    commandResult.target = modelManager.getComponent(actionResult.member);
+    commandResult.targetId = actionResult.member.getId();
+    commandResult.targetType = "component";
+    commandResult.parent = modelManager;
     commandResult.action = "deleted";
     
     if(actionResult.childActionResults) {

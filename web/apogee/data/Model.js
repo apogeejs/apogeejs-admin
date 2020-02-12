@@ -294,13 +294,13 @@ Model.isFieldUpdated = function(field) {
     return this.updated[field] ? true : false;
 }
 
-Model.getEventId = function() {
-    //use the main member for the event ID
-    return "member:" + this.member.getId();
+Model.getId = function() {
+    //right now we only allow for one model manager
+    return 1;
 }
 
 Model.getTargetType = function() {
-    return "member";
+    return "model";
 }
 
 

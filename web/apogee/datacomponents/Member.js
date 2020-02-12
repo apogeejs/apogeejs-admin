@@ -369,10 +369,7 @@ Member.isFieldUpdated = function(field) {
     return this.updated[field] ? true : false;
 }
 
-Member.getEventId = function() {
-    //use the main member for the event ID
-    return "member:" + this.member.getId();
-}
+//getId() Implmented above
 
 Member.getTargetType = function() {
     return "member";

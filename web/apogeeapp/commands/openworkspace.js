@@ -65,7 +65,7 @@ openworkspace.executeCommand = function(nullWorkspaceManager,commandData,asynchO
         let synchCommandResult = {};
         synchCommandResult.alertMsg = "Error creating workspace: " + error.message;
         synchCommandResult.cmdDone = false;
-        synchCommandResult.targetIdentifier = "workspace";
+        synchCommandResult.targetType = "workspace";
         synchCommandResult.action = "created";
         return synchCommandResult;
     }
