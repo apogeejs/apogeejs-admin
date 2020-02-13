@@ -49,9 +49,9 @@ export default class ParentComponentView extends ComponentView {
 
     /** This brings the child component to the front and takes any other actions
      * to show the child in the open parent. */
-    showChildComponent(childComponent) {
-        if(childComponent.getParentComponent() != this.getComponent()) return;
-        this.selectApogeeNode(childComponent.getName());
+    showChild(childComponentView) {
+        if(childComponentView.getParentComponentView() != this) return;
+        this.selectApogeeNode(childComponentView.getName());
     }
 
     /** This function adds a fhile componeent to the displays for this parent component. */
@@ -73,7 +73,7 @@ export default class ParentComponentView extends ComponentView {
     addChild(childComponentView) {
         //we need to record the child was assigned here, to be used if the component view is moved
         childComponentView.setLastAssignedParentComponentView(this);
-        
+
         //add the child to the tree entry
         var treeEntry = this.getTreeEntry();
         if(treeEntry) {

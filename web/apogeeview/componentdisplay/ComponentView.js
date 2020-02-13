@@ -451,16 +451,13 @@ export default class ComponentView {
         else {
             //remove the tree from the parent
             openCallback = () => {
-                var parentComponent = this.getParentComponent();
-                if((parentComponent)&&(parentComponent.usesTabDisplay())) {
+                var parentComponentView = this.getParentComponentView();
+                if((parentComponentView)&&(parentComponentView.constructor.hasTabEntry)) {
 
                     //open the parent and bring this child to the front
-                    makeTabActive(parentComponent);
+                    makeTabActive(parentComponentView);
 
-                    //allow time for UI to be created and then show child
-                    setTimeout(() => {
-                        parentComponent.showChildComponent(this);
-                    },0);
+                    parentComponentView.showChild(this);
 
                 }
             }
