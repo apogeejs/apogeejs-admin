@@ -13,10 +13,6 @@
 let Owner = {};
 export {Owner as default};
 
-/** This initializes the component */
-Owner.init = function() {
-}
-
 Owner.isOwner = true;
 
 //must be implemented in extending object

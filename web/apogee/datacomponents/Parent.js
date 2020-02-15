@@ -15,11 +15,8 @@ import ContextManager from "/apogee/lib/ContextManager.js";
 let Parent = {};
 export {Parent as default};
 
-/** This is the name for the root. */
-Parent.ROOT_NAME = "root";
-
 /** This initializes the component */
-Parent.init = function() {
+Parent.parentMixinInit = function() {
     this.childrenWriteable = true;
 }
 
@@ -116,7 +113,7 @@ Parent.createContextManager = function() {
 
 /** This method returns the full name in dot notation for this object. */
 //Parent.getFullName = function() {
-//    return Member.getFullName.call(this);
+//    return super.getFullName();
 //}
 
 /** this method gets the hame the children inherit for the full name. */

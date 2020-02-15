@@ -8,7 +8,7 @@ let ContextHolder = {};
 export {ContextHolder as default};
 
 /** This initializes the component */
-ContextHolder.init = function() {
+ContextHolder.contextHolderMixinInit = function() {
     //will be set on demand
     this.contextManager = null;
 }

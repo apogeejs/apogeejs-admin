@@ -9,10 +9,6 @@
 let RootHolder = {};
 export {RootHolder as default};
 
-/** This initializes the component */
-RootHolder.init = function() {
-}
-
 RootHolder.isRootHolder = true;
 
 // Must be implemented in extending object
