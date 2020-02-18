@@ -83,31 +83,6 @@ export default class FolderFunctionComponent extends ParentComponent {
         }
     }
 
-    readChildrenFromJson(modelManager,childActionResults,json) {
-        let childCommandResults;
-        if((childActionResults)&&(childActionResults.length > 0)) {
-            let internalFolderChildActionResult = childActionResults[0]; //this is presumably the internalFolder
-
-            //I should do some more error checking
-
-            //these are the internal folder children
-            let bodyChildActionResults = internalFolderChildActionResult.childActionResults;
-
-            //NOTE - we should handle multi-member components so we detect errors in an of the components.
-            //at the time this is written, this is the only acknowledgement of the result for the internal folder.
-
-            if(json.children) {
-                childCommandResults = modelManager.loadFolderComponentContentFromJson(bodyChildActionResults,json.children);
-            }
-        }
-        else {
-            //error - internal folder not requested or created
-            alert("internal folder not found!")
-            return false;
-        }  
-        return childCommandResults;
-    }
-
     static transferMemberProperties(inputValues,propertyJson) {
         if(!propertyJson.updateData) propertyJson.updateData = {};
         if(inputValues.argListString !== undefined) {

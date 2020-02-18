@@ -36,7 +36,7 @@ function createMemberAction(model,actionData) {
     }
     else {
         let ownerFullName = actionData.ownerName;
-        let owner = model.getMemberByFullName(ownerFullName);
+        owner = model.getMemberByFullName(ownerFullName);
         if(!owner) {
             let actionResult = {};
             actionResult.actionDone = false;

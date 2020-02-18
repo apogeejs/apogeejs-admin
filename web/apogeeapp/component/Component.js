@@ -211,7 +211,7 @@ export default class Component extends EventManager {
     memberUpdated(eventInfo) {
 
         let updatedMember = eventInfo.target;
-        let fieldsUpdated = eventInfo.updated;
+        let fieldsUpdated = updatedMember.getUpdated();
         
         if(updatedMember.getId() == this.member.getId()) {
             this.fieldUpdated("member");

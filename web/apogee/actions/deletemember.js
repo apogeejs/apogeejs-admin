@@ -52,10 +52,6 @@ function doDelete(member) {
         var childMap = member.getChildMap();
         for(var childName in childMap) {
             var child = childMap[childName];
-            let childActionResult = {};
-            childActionResult.member = child;
-            childActionResult.actionInfo = ACTION_INFO
-            
             let childActionResult = doDelete(child);
             actionResult.childActionResults.push(childActionResult);
         }

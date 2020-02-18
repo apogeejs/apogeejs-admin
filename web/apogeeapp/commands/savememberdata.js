@@ -40,7 +40,8 @@ savememberdata.executeCommand = function(workspaceManager,commandData,asynchOnCo
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
 
     if(actionResult.actionDone) {
-        commandResult.target = modelManager.getComponent(actionResult.member);
+        let member = model.getMemberByFullName(commandData.memberFullName);
+        commandResult.target = modelManager.getComponent(member);
         commandResult.action = "updated";
     }
     

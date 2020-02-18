@@ -66,7 +66,7 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     //get the member
     var member = model.getMemberByFullName(commandData.memberFullName);   
     var component = modelManager.getComponent(member);
-    
+
     var error = false;
     var errorMsg;
     
@@ -75,7 +75,7 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     if(memberGenerator.getPropertyUpdateAction) {
         var actionData = memberGenerator.getPropertyUpdateAction(member,commandData.updatedMemberProperties);  
         if(actionData) {
-            var actionResult = doAction(model,actionData);
+            let actionResult = doAction(model,actionData);
             
             if(!actionResult.actionDone) {
                 error = true;
@@ -94,8 +94,8 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     commandResult.cmdDone = !error;
     if(errorMsg) commandResult.alertMsg = errorMsg;
 
-    if(actionResult.actionDone) {
-        commandResult.target = modelManager.getComponent(member);
+    if(commandResult.cmdDone) {
+        commandResult.target = component;
         commandResult.action = "updated";
     }
     

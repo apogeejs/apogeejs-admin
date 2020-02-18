@@ -46,15 +46,6 @@ export default class FolderComponent extends ParentComponent {
         }
     }
 
-    /** This method is used to load the child components from a json */
-    readChildrenFromJson(modelManager,childActionResults,json) {
-        let childCommandResults;
-        if(json.children) {
-            childCommandResults = modelManager.loadFolderComponentContentFromJson(childActionResults,json.children);
-        }
-        return childCommandResults;  
-    }
-
     //======================================
     // Static methods
     //======================================

@@ -73,7 +73,11 @@ export default class ModelManager extends EventManager {
         let loadAction = {};
         loadAction.action = "loadModel";
         loadAction.modelJson = modelJson;
-        let actionResult = doAction(model,loadAction);
+        let actionResult = doAction(this.model,loadAction);
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//we don't handle failure here!!!
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
         //create the return result
         let commandResult = {};
@@ -84,7 +88,7 @@ export default class ModelManager extends EventManager {
         //set up the root folder conmponent, with children if applicable
         var rootFolder = this.model.getRoot();
         let rootFolderComponentJson = componentsJson[rootFolder.getName()];
-        var rootFolderCommandResult = this.createComponentFromMember(actionResult,rootFolderComponentJson);
+        var rootFolderCommandResult = this.createComponentFromMember(rootFolder,rootFolderComponentJson);
         commandResult.childCommandResults = [rootFolderCommandResult];
 
         return commandResult;
@@ -218,13 +222,10 @@ export default class ModelManager extends EventManager {
             console.log(JSON.stringify(eventInfo.updated));
         }
     }
-
         
-    createComponentFromMember(createMemberResult,componentJson) {
+    createComponentFromMember(member,componentJson) {
         
         //response - get new member
-        var member = createMemberResult.member;
-        var memberFieldsUpdated = createMemberResult.updated;
         var component;
         var commandResult = {};
 
@@ -237,7 +238,7 @@ export default class ModelManager extends EventManager {
 
                 //call member updated to process and notify of component creation
                 //I SHOULD CONSTRUCT THIS IN A STANDARD WAY RATHER THAN MAKING IT HERE.
-                let eventInfo = { target: member, updated: memberFieldsUpdated, event: "memberCreated" };
+                let eventInfo = { target: member, event: "memberCreated" };
                 component.memberUpdated(eventInfo);
 
                 //apply any serialized values
@@ -284,8 +285,12 @@ export default class ModelManager extends EventManager {
             commandResult.action = "created";
 
             //load the children, if there are any (BETTER ERROR CHECKING!)
-            if((component.readChildrenFromJson)&&(createMemberResult.childActionResults)) {    
-                commandResult.childCommandResults = component.readChildrenFromJson(this,createMemberResult.childActionResults,componentJson);
+            if(componentJson.children) {
+                let folderMember = component.getParentFolderForChildren();
+                let childCommandResults = modelManager.loadFolderComponentContentFromJson(folderMember,componentJson.children);
+                if((childCommandResults)&&(childCommandResults.length > 0)) {
+                    commandResult.childCommandResults = childCommandResults;
+                } 
             }
         }
             
@@ -422,17 +427,12 @@ export default class ModelManager extends EventManager {
         return json;
     }
     
-    loadFolderComponentContentFromJson(childActionResults,childrenJson) {
-        if(!childActionResults) return;
-        let childCommandResults = [];
-
-        childActionResults.forEach( childActionResult => {
-        
-            let childMember = childActionResult.member;
+    loadFolderComponentContentFromJson(parentMember,childrenJson) {
+        childrenJson.forEach( childName => {
+            let childMember = parentMember.lookupChildFromPathArray([childName]);
             if(childMember) {
-                var childComponentJson = childrenJson[childMember.getName()];
-
-                var childCommandResult = this.createComponentFromMember(childActionResult,childComponentJson);
+                let childComponentJson = childrenJson[childName];
+                var childCommandResult = this.createComponentFromMember(childMember,childComponentJson);
                 childCommandResults.push(childCommandResult);
             }
         });

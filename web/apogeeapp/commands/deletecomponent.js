@@ -48,6 +48,9 @@ deletecomponent.executeCommand = function(workspaceManager,commandData) {
     commandResult.cmdDone = actionResult.actionDone;
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
 
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// NEED TO FILL IN RESULT DIFFERENTLY!!!
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     if(actionResult.actionDone) {
         _fillInCommandResults(modelManager,actionResult,commandResult);
     }

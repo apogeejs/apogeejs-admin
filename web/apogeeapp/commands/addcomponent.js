@@ -52,7 +52,11 @@ addcomponent.executeCommand = function(workspaceManager,commandData) {
     //create the components for the member
     //I need error handling for the create component action
     if(actionResult.actionDone) {
-        commandResult = modelManager.createComponentFromMember(actionResult,commandData.componentJson);
+        //this is a bit clumsy...
+        let parentMember = model.getMemberByFullName(commandData.parentFullName);
+        let name = commandData.memberJson.name
+        let componentMember = parentMember.lookupChildFromPathArray([name]);
+        commandResult = modelManager.createComponentFromMember(componentMember,commandData.componentJson);
     }
     else {
         commandResult = {};

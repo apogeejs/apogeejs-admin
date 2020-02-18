@@ -141,7 +141,6 @@ export function doAction(model,actionData) {
     
     //flag action in progress
     model.setActionInProgress(false);
-    actionResult.actionDone = true;
     
     //trigger any pending actions
     //these will be done asynchronously
@@ -251,6 +250,16 @@ function updateDependenciesFromAction(completedResults,recalculateList) {
     }
 }
 
+/** This function fires the proper events for the  It combines events to 
+ * fire a single event for each member.
+ * @private */
+function fireEvents(model,changeMap) {
+    for(var idString in changeMap) {
+        let eventInfo = changeMap[idString];
+        model.dispatchEvent(eventInfo.event,eventInfo);
+    }
+}
+
 /** This creates the change map, which will be used to fire events and for the return value. */
 function createChangeMap(model,completedResults,recalculateList) {
     var changeMap = {};
@@ -280,16 +289,7 @@ function createChangeMap(model,completedResults,recalculateList) {
 
     return changeMap;
 }
-    
-/** This function fires the proper events for the  It combines events to 
- * fire a single event for each member.
- * @private */
-function fireEvents(model,changeMap) {
-    for(var idString in changeMap) {
-        let eventInfo = changeMap[idString];
-        model.dispatchEvent(eventInfo.event,eventInfo);
-    }
-}
+
 
 function mergeReturnValueIntoChangeMap(model,changeMap,actionReturnValue) {
     if(actionReturnValue.actionDone) {

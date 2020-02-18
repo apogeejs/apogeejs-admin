@@ -40,7 +40,7 @@ import ActionError from "/apogee/lib/ActionError.js";
 function updateCode(model,actionData) {
 
     let actionResult = {};
-    actionResult.actionInfo = ACTION_INFO;
+    actionResult.actionInfo = UPDATE_CODE_ACTION_INFO;
     
     var memberFullName = actionData.memberName;
     var member = model.getMemberByFullName(memberFullName);
@@ -70,7 +70,7 @@ function updateCode(model,actionData) {
 function updateData(model,actionData) {
 
     let actionResult = {};
-    actionResult.actionInfo = ACTION_INFO;
+    actionResult.actionInfo = UPDATE_DATA_ACTION_INFO;
     
     var memberFullName = actionData.memberName;
     var member = model.getMemberByFullName(memberFullName);

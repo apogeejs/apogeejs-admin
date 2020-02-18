@@ -1,5 +1,5 @@
 import {addActionInfo} from "/apogee/actions/action.js";
-import {createMember} from "/apogee/action/createmember.js";
+import {createMember} from "/apogee/actions/createmember.js";
 
 /** This is self installing command module. It has no exports
  * but it must be imported to install the command. 
@@ -44,7 +44,7 @@ function loadModel(model,actionData) {
     }
 
     //load the model members (root folder and its children)
-    memberActionResult = createMember(model,modelJson.data);
+    let memberActionResult = createMember(model,modelJson.data);
     actionResult.childActionResults = [memberActionResult];
 
     actionResult.actionDone = true;
