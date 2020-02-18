@@ -203,7 +203,7 @@ export default class Model extends EventManager {
     }
 
     //============================
-    // Save Functions
+    // Save and Load Functions
     //============================
 
     /** This method creates a headless model json from a folder json. It
@@ -222,29 +222,6 @@ export default class Model extends EventManager {
     toJson() {
         var rootFolderJson = this.rootFolder.toJson();
         return Model.createWorkpaceJsonFromFolderJson(this.name,rootFolderJson);
-    }
-
-    /** This is loads data from the given json into this model. */
-    loadFromJson(json) {
-        var fileType = json.fileType;
-        if(fileType !== Model.SAVE_FILE_TYPE) {
-            throw base.createError("Bad file format.",false);
-        }
-        if(json.version !== Model.SAVE_FILE_VERSION) {
-            throw base.createError("Incorrect file version. CHECK APOGEEJS.COM FOR VERSION CONVERTER.",false);
-        }
-
-        if(json.name !== undefined) {
-            this.name = json.name;
-        }
-
-        var actionData = {};
-        actionData.action = "createMember";
-        actionData.modelIsOwner = true;
-        actionData.createData = json.data;
-        var actionResult = doAction(this,actionData);
-        
-        return actionResult;
     }
 
     //-------------------------
@@ -315,10 +292,4 @@ Model.EMPTY_MODEL_JSON = {
         "type": "apogee.Folder"
     }
 }
-
-/** This is the supported file type. */
-Model.SAVE_FILE_TYPE = "apogee model";
-
-/** This is the supported file version. */
-Model.SAVE_FILE_VERSION = 0.2;
 

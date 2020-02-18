@@ -37,7 +37,10 @@ import ActionError from "/apogee/lib/ActionError.js";
 
 
 /** Update code action function. */
-function updateCode(model,actionData,actionResult) {
+function updateCode(model,actionData) {
+
+    let actionResult = {};
+    actionResult.actionInfo = ACTION_INFO;
     
     var memberFullName = actionData.memberName;
     var member = model.getMemberByFullName(memberFullName);
@@ -58,13 +61,16 @@ function updateCode(model,actionData,actionResult) {
         actionData.functionBody,
         actionData.supplementalCode);
         
-    
     actionResult.actionDone = true;
-    actionResult.updated = apogeeutil.jsonCopy(member.getUpdated());
+
+    return actionResult;
 }
 
 /** Update data action function. */
-function updateData(model,actionData,actionResult) {
+function updateData(model,actionData) {
+
+    let actionResult = {};
+    actionResult.actionInfo = ACTION_INFO;
     
     var memberFullName = actionData.memberName;
     var member = model.getMemberByFullName(memberFullName);
@@ -111,7 +117,7 @@ function updateData(model,actionData,actionResult) {
         //check if this is only a refresh
         var optionalPromiseRefresh = actionData.promiseRefresh ? true : false;
         
-        member.applyPromiseData(data,actionData.onAsynchComplete,optionalPromiseRefresh);
+        member.applyPromiseData(data,optionalPromiseRefresh);
     }
     else if(data instanceof Error) {
         //data is an error
@@ -128,7 +134,8 @@ function updateData(model,actionData,actionResult) {
     }
     
     actionResult.actionDone = true;
-    actionResult.updated = apogeeutil.jsonCopy(member.getUpdated());
+
+    return actionResult;
 }
         
 /** Update data action info */

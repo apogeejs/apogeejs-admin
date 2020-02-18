@@ -15,7 +15,10 @@ import {addActionInfo} from "/apogee/actions/action.js";
  */
 
 /** Update folder function action function */
-function updateProperties(model,actionData,actionResult) { 
+function updateProperties(model,actionData) { 
+
+    let actionResult = {};
+    actionResult.actionInfo = ACTION_INFO;
     
     var memberFullName = actionData.memberName;
     var folderFunction = model.getMemberByFullName(memberFullName);
@@ -30,7 +33,8 @@ function updateProperties(model,actionData,actionResult) {
     folderFunction.setReturnValueString(actionData.returnValueString);
     
     actionResult.actionDone = true;
-    actionResult.updated = apogeeutil.jsonCopy(member.getUpdated());
+
+    return actionResult;
 }
 
 /** Action info */

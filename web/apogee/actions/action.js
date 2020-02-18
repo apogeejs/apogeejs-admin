@@ -20,7 +20,7 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  * a actionInfo object. An action info object is of the following format.
  * actionInfo object: {
  *   "action": (string - this is the name of the action)
- *   "actionFunction": (funtion to exectue object - arguments = actionData,processedActions),
+ *   "actionFunction": (funtion to exectue object - arguments = modeo,actionData,actionResult),
  *   "checkUpdateAll": (boolean - indicates if change in the underlying data model),
  *   "updateDependencies": [Indicates the changed object requires its dependecies be updated),
  *   "addToRecalc": (Indicates the changed object should be added to the recalc list, with its dependencies),
@@ -34,10 +34,7 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  * actionData format: {
  *   "action": (The name of the action to execute),
  *   "member": (The data object that is acted upon , if applicable),
- *   (other, multiple): (Specific data for the action),
- *   "onComplete": (OPTIONAL - If this is set it will be called after the action is completed.)
- *   "onAsynchComplete": (OPTIONAL - FOr an asynchronous update, this can be set. It will be
- *   called when the asynch action completes.)
+ *   (other, multiple): (Specific data for the action)
  * }
  * 
  * ActionResult:
@@ -48,20 +45,17 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  *      not properly (exectue.)
  *   "actionPending": This flag is returned if the action is a queued action and will be run after the
  *      current action completes.)
- *   "member": The object modified in the action
- *   "updated": The structure of fields of the member updated in the action (for create and update but not delete)
+ *   "member": The object modified in the action (if it is a member. Model update will not have this)
  *   "actionInfo": (This is the action info associated with the action, mainly used for bookeeping.)
  *   "alertMsg": (This is a message that should be given to the user. It usually will be sent if there is an error
  *      where actionDone is false, though it may be set on actionDone = true too.)
- *   "isFatal": "If this value is set to true then the application is in an indeterminate state and the user
- *      should not continue."
  *   "childActionResults" - (This is a list of action results if there are additional child actions done with this
  *      action. Examples where this is used are on creating, moving or deleting a folder that has chilren.)
  * }
  * 
  * Action Function:
  * The action function executes the action specific code. It is passed the actionData object
- * and an array "processedActions.". The actions must add any executed actions to the action
+ * along with the model. The actions must add any executed actions to the action
  * list. This is done in the action function as opposed to outside because the action
  * function may exectue multiple actions, such as deleting multiple objects.
  * 
@@ -76,7 +70,7 @@ let actionInfoMap = {
 /** This method is used to execute an action for the data model. */
 export function doAction(model,actionData) {
     
-    var actionResult = {};
+    let changeMap;
     
     //only allow one action at a time
     if(model.isActionInProgress()) {
@@ -84,56 +78,70 @@ export function doAction(model,actionData) {
         model.saveMessengerAction(actionData);
         
         //mark command as pending
-        actionResult.actionPending = true;
-        return actionResult;
+        let returnValue = {};
+        returnValue.actionPending = true;
+        return returnValue;
     }
     
     //flag action in progress
     model.setActionInProgress(true);
-    
+
+//##########################################
+//FIRE ACTION START EVENT HERE
+//##########################################    
+
     try {   
         
         //do the action
-        callActionFunction(model,actionData,actionResult); 
+        let actionResult = callActionFunction(model,actionData); 
+
+        if(!actionResult.actionDone) {
+            let returnValue = {};
+            returnValue.actionDone = false;
+            returnValue.alertMsg = actionResult.alertMsg;
+            return returnValue;
+        }
         
-        //finish processing the action
+        //flatten action result tree into a list
+        var completedResults = flattenActionResult(actionResult);
+        
+        //figure out other objects that need to be updated
+        var updateAllDep = checkUpdateAllDep(completedResults);
         var recalculateList = [];
+        if(updateAllDep) {
+            //update entire model - see conditions bewlo
+            model.updateDependeciesForModelChange(recalculateList);
+        }
+        else {
+            updateDependenciesFromAction(completedResults,recalculateList);
+        }
         
-        var completedResults = [];
-        addToCompletedResultList(completedResults,actionResult)
-        
-        //handle cases with a valid object 
-        updateDependencies(model,completedResults,recalculateList);
-        
-        updateRecalculateList(completedResults,recalculateList);
-        
+        //recalculate all needed objects
         callRecalculateList(recalculateList);
+
+        //create the change map
+        changeMap = createChangeMap(model,completedResults,recalculateList);
     
         //fire events
-        fireEvents(model,completedResults,recalculateList);
+        fireEvents(model,changeMap);
 	}
 	catch(error) {
         if(error.stack) console.error(error.stack);
         
         //unknown application error - this is fatal
-        actionResult.actionDone = false;
-        actionResult.isFatal = true
-        actionResult.alertMsg = "Unknown error updating model: " + error.message;
+        let returnValue = {};
+        returnValue.actionDone = false;
+        returnValue.alertMsg = "Unknown error updating model: " + error.message;
         
         model.clearCommandQueue();
         model.setActionInProgress(false);
-        return actionResult;
+        return returnValue;
         
     }
     
     //flag action in progress
     model.setActionInProgress(false);
     actionResult.actionDone = true;
-    
-    //if the action has an onComplete callback, call it here.
-    if(actionData.onComplete) {
-        actionData.onComplete(actionResult);
-    }
     
     //trigger any pending actions
     //these will be done asynchronously
@@ -152,15 +160,38 @@ export function doAction(model,actionData) {
 
         if(runQueuedAction) {
             //FOR NOW WE WILL RUN SYNCHRONOUSLY!!!
-            doAction(model,savedMessengerAction);
+            let childActionReturnValue = doAction(model,savedMessengerAction);
+
+            
+            if(childActionReturnValue.actionDone) {
+                //merge this child return value into our main
+                mergeReturnValueIntoChangeMap(model,changeMap,childActionReturnValue);
+            }
+            else {
+                //if there is an failure in the child action, return an error for the whole action.
+                let returnValue = {};
+                returnValue.actionDone = false;
+                returnValue.alertMsg = actionResult.alertMsg;
+                return returnValue;
+            }
+
+             
+
+            
         }
     }
     else {
         model.clearConsecutiveQueuedTracking();
     }
+
+//##########################################
+//FIRE ACTION COMPLETED EVENT HERE
+//##########################################   
     
-    //return actionResult
-	return actionResult;
+    let returnValue = {};
+    returnValue.actionDone = true;
+    returnValue.changeList = changeMapToChangeList(changeMap);
+    return returnValue;
 }
 
 /** This function is used to register an action. */
@@ -174,18 +205,22 @@ export function addActionInfo(actionInfo) {
 }
 
 /** This function looks up the proper function for an action and executes it. */
-function callActionFunction(model,actionData,actionResult) {
+function callActionFunction(model,actionData) {
+
+    let actionResult;
 
     //do the action
     var actionInfo = actionInfoMap[actionData.action];
     if(actionInfo) {
-        actionResult.actionInfo = actionInfo;
-        actionInfo.actionFunction(model,actionData,actionResult);
+        actionResult = actionInfo.actionFunction(model,actionData,actionResult);
     }
     else {
+        actionResult = {};
         actionResult.actionDone = false;
         actionResult.alertMsg = "Unknown action: " + actionData.action;
     }  
+
+    return actionResult;
 }
 
 //=======================================
@@ -194,32 +229,18 @@ function callActionFunction(model,actionData,actionResult) {
 
 /** This method makes sure the member dependencies in the model are properly updated. 
  * @private */
-function updateDependencies(model,completedResults,recalculateList) {
-    //check if we need to update the entire model
-    var updateAllDep = checkUpdateAllDep(completedResults);
-    if(updateAllDep) {
-        //update entire model - see conditions bewlo
-        model.updateDependeciesForModelChange(recalculateList);
-    }
-    else {
-        //upate dependencies on table with updated code
-        for(var i = 0; i < completedResults.length; i++) {
-            var actionResult = completedResults[i];
-            if((actionResult.actionDone)&&(actionResult.member)) {
-                if(doInitializeDependencies(actionResult)) {
-                    actionResult.member.initializeDependencies();
-                }
-            }
-        }
-    }
-}
-    
-/** This function updates the recalculation list for the given processed actions. 
- * @private */
-function updateRecalculateList(completedResults,recalculateList) {
+function updateDependenciesFromAction(completedResults,recalculateList) {
+    //upate dependencies on table with updated code
     for(var i = 0; i < completedResults.length; i++) {
         var actionResult = completedResults[i];
         if((actionResult.actionDone)&&(actionResult.member)) {
+            
+            //initialize dependencies for this member
+            if(doInitializeDependencies(actionResult)) {
+                actionResult.member.initializeDependencies();
+            }
+
+            //update the recalc list
             if(doAddToRecalc(actionResult)) {
                 addToRecalculateList(recalculateList,actionResult.member);            
             }
@@ -229,13 +250,10 @@ function updateRecalculateList(completedResults,recalculateList) {
         }
     }
 }
-    
-/** This function fires the proper events for the  It combines events to 
- * fire a single event for each member.
- * @private */
-function fireEvents(model,completedResults,recalculateList) {
 
-    var eventMap = {};
+/** This creates the change map, which will be used to fire events and for the return value. */
+function createChangeMap(model,completedResults,recalculateList) {
+    var changeMap = {};
     var member;
     
     //go through explicitly called events from results
@@ -250,33 +268,41 @@ function fireEvents(model,completedResults,recalculateList) {
             
             let member = actionResult.member;
             
-            mergeEventIntoEventMap(eventMap,model,member,eventName);
+            mergeIntoChangeMap(changeMap,model,member,eventName);
         }
     }
     
     //add an update event for any object not accounted from
     for(i = 0; i < recalculateList.length; i++) {
         var member = recalculateList[i];
-        mergeEventIntoEventMap(eventMap,model,member,"memberUpdated");
+        mergeIntoChangeMap(changeMap,model,member,"memberUpdated");
     } 
+
+    return changeMap;
+}
     
-    //fire events from the event map
-    for(var idString in eventMap) {
-        let eventInfo = eventMap[idString];
+/** This function fires the proper events for the  It combines events to 
+ * fire a single event for each member.
+ * @private */
+function fireEvents(model,changeMap) {
+    for(var idString in changeMap) {
+        let eventInfo = changeMap[idString];
         model.dispatchEvent(eventInfo.event,eventInfo);
-        //clear the update map for this member (the member should be set
-        if(eventInfo.target) {
-            eventInfo.target.clearUpdated();
-        }
-        else {
-            console.log("Error: Target not set for event: " + eventInfo.event);
-        }
+    }
+}
+
+function mergeReturnValueIntoChangeMap(model,changeMap,actionReturnValue) {
+    if(actionReturnValue.actionDone) {
+        actionReturnValue.changeList.forEach( changeItem => {
+            //target is either member or model
+            let member = (changeItem.target != model) ? changeItem.target : undefined;
+            mergeIntoChangeMap(changeMap,model,member,changeItem.event);
+        })
     }
 }
 
 /** This is a helper function to dispatch an event. */
-function mergeEventIntoEventMap(eventMap,model,member,eventName) {
-
+function mergeIntoChangeMap(changeMap,model,member,eventName) {
     let targetId;
     let eventTarget;
     if(member) {
@@ -288,7 +314,7 @@ function mergeEventIntoEventMap(eventMap,model,member,eventName) {
         eventTarget = model;
     }
      
-    var existingInfo = eventMap[targetId];
+    var existingInfo = changeMap[targetId];
     var newInfo;
      
     if(existingInfo) {
@@ -300,19 +326,28 @@ function mergeEventIntoEventMap(eventMap,model,member,eventName) {
             newInfo =  { target: eventTarget, event: "memberDeleted" };
         }
         else if((existingInfo.event == "memberCreated")||(eventName == "memberCreated")) {
-            newInfo =  { target: eventTarget, updated: eventTarget.getUpdated(), event: "memberCreated" };
+            newInfo =  { target: eventTarget, event: "memberCreated" };
         }
         else {
-            //we this shouldn't happen - it means we hace an unknown event type
+            //there is one more event - model updated, but it will be captured above
+            //we shouldn't get here - it means we hace an unknown event type
             throw new Error("Unknown event type: " + existingInfo.event + ", " + eventName);
         }
     }
     else {
         //create event object - note we don't need the "updated" field on a delete event, but that is ok
-        newInfo =  { target: eventTarget, updated: eventTarget.getUpdated(), event: eventName };
+        newInfo =  { target: eventTarget, event: eventName };
     }
      
-    eventMap[targetId] = newInfo; 
+    changeMap[targetId] = newInfo; 
+}
+
+function changeMapToChangeList(changeMap) {
+    let changeList = [];
+    for(let key in changeMap) {
+        changeList.push(changeMap[key]);
+    }
+    return changeList;
 }
 
 /** This method determines if updating all dependencies is necessary. Our dependency 
@@ -371,6 +406,12 @@ function doAddDependOnToRecalc(actionResult) {
 }
 
 /** This method unpacks the actionResult and its child reponse into an array of actionResult. */
+function flattenActionResult(actionResult) {
+    let completedResults = [];
+    addToCompletedResultList(completedResults,actionResult);
+    return completedResults;
+}
+
 function addToCompletedResultList(completedResults,actionResult) {
     completedResults.push(actionResult);
     if(actionResult.childActionResults) {
@@ -395,7 +436,10 @@ function addToCompletedResultList(completedResults,actionResult) {
 
 
 /** This method is the action function for a compound action. */
-function compoundActionFunction(model,actionData,actionResult) {
+function compoundActionFunction(model,actionData) {
+
+    let actionResult = {};
+    actionResult.actionInfo = COMPOUND_ACTION_INFO;
 
     var actionList = actionData.actions;
     actionResult.childActionResults = [];
@@ -406,6 +450,7 @@ function compoundActionFunction(model,actionData,actionResult) {
         actionResult.childActionResults.push(childActionResult);   
     }
     actionResult.actionDone = true;
+    return actionResult;
 }
 
 /** Action info */

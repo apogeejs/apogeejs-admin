@@ -13,7 +13,10 @@ import {addActionInfo} from "/apogee/actions/action.js";
  */
 
 /** Move member action function */
-function moveMember(model,actionData,actionResult) {
+function moveMember(model,actionData) {
+
+    let actionResult = {};
+    actionResult.actionInfo = ACTION_INFO;
         
     var memberFullName = actionData.memberName;
     var member = model.getMemberByFullName(memberFullName);
@@ -34,45 +37,58 @@ function moveMember(model,actionData,actionResult) {
         
     member.move(actionData.targetName,targetOwner);
     actionResult.actionDone = true;
-    actionResult.updated = apogeeutil.jsonCopy(member.getUpdated());
     
     //add the child action results
-    addChildResults(member,actionResult);
+    let childActionResults = addChildResults(member);
+    if(childActionResults) {
+        actionResult.childActionResults = childActionResults;
+    }
+    
+    return actionResult;
 }
 
-function addChildResults(member,actionResult) {
+function addChildResults(member) {
+    let childActionResults = [];
     
-    if(member.isParent) {
-        actionResult.childActionResults = [];
-        
+    if(member.isParent) {    
         var childMap = member.getChildMap();
         for(var childName in childMap) {
             var child = childMap[childName];
             let childActionResult = {};
             childActionResult.actionDone = true;
             childActionResult.member = child;
-            childActionResult.updated = apogeeutil.jsonCopy(child.getUpdated());
             childActionResult.actionInfo = ACTION_INFO;
             
-            actionResult.childActionResults.push(childActionResult);
+            childActionResults.push(childActionResult);
             
             //add results for children to this member
-            addChildResults(child,childActionResult);
+            grandchildActionResults = addChildResults(child);
+            if(grandchildActionResults) {
+                childActionResult.childActionResults = grandchildActionResults;
+            }
         }
     }
     else if(member.isRootHolder) {
-        actionResult.childActionResults = [];
-        
         var root = member.getRoot();
         let childActionResult = {};
         childActionResult.actionDone = true;
         childActionResult.member = root;
         childActionResult.actionInfo = ACTION_INFO;
 
-        actionResult.childActionResults.push(childActionResult);
+        childActionResults.push(childActionResult);
         
         //add results for children to this member
-        addChildResults(root,childActionResult);
+        grandchildActionResults = addChildResults(child);
+        if(grandchildActionResults) {
+            childActionResult.childActionResults = grandchildActionResults;
+        }
+    }
+
+    if(childActionResults.length > 0) {
+        return childActionResults;
+    }
+    else {
+        return null;
     }
 }
 

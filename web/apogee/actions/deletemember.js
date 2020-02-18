@@ -20,29 +20,35 @@ import {addActionInfo} from "/apogee/actions/action.js";
 
 
 /** Delete member action function */
-function deleteMember(model,actionData,actionResult) {
+function deleteMember(model,actionData) {
     
     var memberFullName = actionData.memberName;
     var member = model.getMemberByFullName(memberFullName);
     if(!member) {
+        let actionResult = {};
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for delete member";
-        return;
+        return actionResult;
     }
-    actionResult.member = member;
     
-    doDelete(member,actionResult);
+    let actionResult = doDelete(member);
+    return actionResult;
     
 }
 
 
 /** @private */
-function doDelete(member,actionResult) {
+function doDelete(member) {
+
+    let actionResult = {};
+    actionResult.member = member;
+    actionResult.actionIngo = ACTION_INFO;
     
-    //delete children
+    //delete children first
     if(member.isParent) {
         actionResult.childActionResults = [];
         
+        //standard children for parent
         var childMap = member.getChildMap();
         for(var childName in childMap) {
             var child = childMap[childName];
@@ -50,24 +56,18 @@ function doDelete(member,actionResult) {
             childActionResult.member = child;
             childActionResult.actionInfo = ACTION_INFO
             
+            let childActionResult = doDelete(child);
             actionResult.childActionResults.push(childActionResult);
-            
-            //add results for children to this member
-            doDelete(child,childActionResult);
         }
     }
     else if(member.isRootHolder) {
         actionResult.childActionResults = [];
         
+        //child is the root of this object
         var root = member.getRoot();
-        let childActionResult = {};
-        childActionResult.member = root;
-        childActionResult.actionInfo = ACTION_INFO
+        let childActionResult = doDelete(root);
 
         actionResult.childActionResults.push(childActionResult);
-        
-        //add results for children to this member
-        doDelete(child,childActionResult);
     }
     
     //delete member
@@ -77,6 +77,8 @@ function doDelete(member,actionResult) {
     }
     
     actionResult.actionDone = true;
+
+    return actionResult;
 }
 
 

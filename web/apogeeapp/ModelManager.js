@@ -63,16 +63,19 @@ export default class ModelManager extends EventManager {
 
         //create model
         this.model = new Model();
-        let actionResult = this.model.loadFromJson(modelJson);
+        
+        //add listeners
+        //this.model.addListener("memberCreated", eventInfo => this.memberCreated(eventInfo));
+        this.model.addListener("memberUpdated", eventInfo => this.memberUpdated(eventInfo));
+        this.model.addListener("memberDeleted", eventInfo => this.memberDeleted(eventInfo));
 
-        ////////////////////////////////////////////////////////////////////////
-        //We are manually clearing the updated fields because there is no create workspce
-        //event (in whcih we would clear any udpated field flags)
-        //we should probably change that...
-        this.model.clearUpdated();
-        this.fieldUpdated("name");
-        ////////////////////////////////////////////////////////////////////////
+        //load the model
+        let loadAction = {};
+        loadAction.action = "loadModel";
+        loadAction.modelJson = modelJson;
+        let actionResult = doAction(model,loadAction);
 
+        //create the return result
         let commandResult = {};
         commandResult.action = "updated";
         commandResult.cmdDone = true;
@@ -83,11 +86,6 @@ export default class ModelManager extends EventManager {
         let rootFolderComponentJson = componentsJson[rootFolder.getName()];
         var rootFolderCommandResult = this.createComponentFromMember(actionResult,rootFolderComponentJson);
         commandResult.childCommandResults = [rootFolderCommandResult];
-
-        //add listeners
-        //this.model.addListener("memberCreated", eventInfo => this.memberCreated(eventInfo));
-        this.model.addListener("memberUpdated", eventInfo => this.memberUpdated(eventInfo));
-        this.model.addListener("memberDeleted", eventInfo => this.memberDeleted(eventInfo));
 
         return commandResult;
     }

@@ -18,7 +18,10 @@ import {addActionInfo} from "/apogee/actions/action.js";
  */
 
 /** Update code action function. */
-function updateModel(model,actionData,actionResult) { 
+function updateModel(model,actionData) { 
+
+    let actionResult = {};
+    actionResult.actionInfo = ACTION_INFO;
     
     var properties = actionData.properties;
     if(properties) {
@@ -26,7 +29,8 @@ function updateModel(model,actionData,actionResult) {
     }
     
     actionResult.actionDone = true;
-    actionResult.updated = apogeeutil.jsonCopy(model.getUpdated());
+
+    return actionResult;
 }
 
 /** Update data action info */

@@ -266,7 +266,7 @@ export default class Member {
 
 
     /** This method implements setting asynchronous data on the member using a promise. */
-    applyPromiseData(promise,onAsynchComplete,optionalPromiseRefresh) {
+    applyPromiseData(promise,optionalPromiseRefresh) {
         //set the result as pending
         this.setResultPending(true,promise);
 
@@ -280,9 +280,6 @@ export default class Member {
                 actionData.memberName = this.getFullName();
                 actionData.sourcePromise = promise;
                 actionData.data = memberValue;
-                if(onAsynchComplete) {
-                    actionData.onComplete = onAsynchComplete;
-                }
                 doAction(model,actionData);
             }
             var asynchErrorCallback = errorMsg => {
@@ -291,9 +288,6 @@ export default class Member {
                 actionData.memberName = this.getFullName();
                 actionData.sourcePromise = promise;
                 actionData.data = new Error(errorMsg);
-                if(onAsynchComplete) {
-                    actionData.onComplete = onAsynchComplete;
-                }
                 doAction(model,actionData);
             }
 

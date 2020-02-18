@@ -33,13 +33,6 @@ export default class Messenger {
             //for now no callback on promise
         }
         
-        //action is done later after the current action completes
-        actionData.onComplete = actionResult => {
-            if(!actionResult.actionDone) {
-                throw new Error("Error setting remote data: " + actionResult.alertMsg);
-            }
-        }
-        
         //return is handled above asynchronously
         doAction(this.model,actionData);
     }
@@ -75,13 +68,6 @@ export default class Messenger {
         var actionData = {};
         actionData.action = "compoundAction";
         actionData.actions = actionList;
-        
-        //action is done later after the current action completes
-        actionData.onComplete = actionResult => {
-            if(!actionResult.actionDone) {
-                throw new Error("Error setting remote data: " + actionResult.alertMsg);
-            }
-        }
         
         //return is handled above asynchronously
         doAction(this.model,actionData);
