@@ -14,7 +14,7 @@ export default class FolderComponent extends ParentComponent {
     //I need a real solution for this
     //this is a temp solution to return the parent member for children added to this componnet
     //it is used for now when we paste into the document to create a new component.
-    getParentForChildren() {
+    getParentFolderForChildren() {
         return this.member;
     }
     //=======================================================

@@ -71,11 +71,8 @@ export function createMember(owner,memberJson) {
         if(memberJson.children) {
             actionResult.childActionResults = [];
             for(let childName in memberJson.children) {
-                let childActionData = {};
-                childActionData.action = "createMember";
-                childActionData.createData = memberJson.children[childName];
-
-                let childActionResult = createMember(member,childActionData);
+                let childJson = memberJson.children[childName];
+                let childActionResult = createMember(member,childJson);
                 actionResult.childActionResults.push(childActionResult);
             }
         }

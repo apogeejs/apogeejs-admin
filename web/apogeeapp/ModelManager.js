@@ -287,7 +287,7 @@ export default class ModelManager extends EventManager {
             //load the children, if there are any (BETTER ERROR CHECKING!)
             if(componentJson.children) {
                 let folderMember = component.getParentFolderForChildren();
-                let childCommandResults = modelManager.loadFolderComponentContentFromJson(folderMember,componentJson.children);
+                let childCommandResults = this.loadFolderComponentContentFromJson(folderMember,componentJson.children);
                 if((childCommandResults)&&(childCommandResults.length > 0)) {
                     commandResult.childCommandResults = childCommandResults;
                 } 
@@ -428,14 +428,15 @@ export default class ModelManager extends EventManager {
     }
     
     loadFolderComponentContentFromJson(parentMember,childrenJson) {
-        childrenJson.forEach( childName => {
+        let childCommandResults = [];
+        for(let childName in childrenJson) {
             let childMember = parentMember.lookupChildFromPathArray([childName]);
             if(childMember) {
                 let childComponentJson = childrenJson[childName];
                 var childCommandResult = this.createComponentFromMember(childMember,childComponentJson);
                 childCommandResults.push(childCommandResult);
             }
-        });
+        };
 
         return childCommandResults;
     }

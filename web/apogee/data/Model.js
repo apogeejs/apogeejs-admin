@@ -1,6 +1,5 @@
 import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
-import {doAction} from "/apogee/actions/action.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import Owner from "/apogee/datacomponents/Owner.js";
@@ -280,6 +279,12 @@ let memberGenerators = {};
 
 Model.DEFAULT_MODEL_NAME = "Workspace";
 Model.ROOT_FOLDER_NAME = "Main";
+
+/** This is the supported file type. */
+Model.SAVE_FILE_TYPE = "apogee model";
+
+/** This is the supported file version. */
+Model.SAVE_FILE_VERSION = 0.2;
 
 Model.CONSECUTIVE_ACTION_INITIAL_LIMIT = 500;
 

@@ -269,7 +269,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
         this.tab.setContent(this.contentElement);
 
         let pageComponent = this.componentView.getComponent();
-        let folder = pageComponent.getParentForChildren();
+        let folder = pageComponent.getParentFolderForChildren();
 
         //we ony use this context menu and child map for parents
         //modify if we use this elsewhere
@@ -381,7 +381,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
     destroy() {
         //we should probably have a less cumbesome way of doing this
         let pageComponent = this.componentView.getComponent();
-        let folder = pageComponent.getParentForChildren();
+        let folder = pageComponent.getParentFolderForChildren();
         var children = folder.getChildMap();
         var modelView = this.componentView.getModelView();
 

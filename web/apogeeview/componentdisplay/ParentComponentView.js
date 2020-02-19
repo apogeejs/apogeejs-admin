@@ -577,7 +577,7 @@ export default class ParentComponentView extends ComponentView {
     createDeleteComponentCommands(deletedComponentShortNames) {
         return deletedComponentShortNames.map(shortName => {
 
-            let parentMember = this.getComponent().getParentForChildren();
+            let parentMember = this.getComponent().getParentFolderForChildren();
             let fullName = parentMember.getChildFullName(shortName);
             
             let commandData = {};
@@ -592,7 +592,7 @@ export default class ParentComponentView extends ComponentView {
         return createdComponentInfos.map( createInfo => {
             let state = createInfo.state;
 
-            let parentMember = this.getComponent().getParentForChildren();
+            let parentMember = this.getComponent().getParentFolderForChildren();
 
             let commandData = {};
             commandData.type = "addComponent";

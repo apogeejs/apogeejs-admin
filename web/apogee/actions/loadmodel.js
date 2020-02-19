@@ -1,5 +1,7 @@
 import {addActionInfo} from "/apogee/actions/action.js";
 import {createMember} from "/apogee/actions/createmember.js";
+import base from "/apogeeutil/base.js";
+import Model from "/apogee/data/Model.js";
 
 /** This is self installing command module. It has no exports
  * but it must be imported to install the command. 
@@ -31,10 +33,10 @@ function loadModel(model,actionData) {
     
     //check the file format
     var fileType = modelJson.fileType;
-    if(fileType !== SAVE_FILE_TYPE) {
+    if(fileType !== Model.SAVE_FILE_TYPE) {
         throw base.createError("Bad file format.",false);
     }
-    if(modelJson.version !== SAVE_FILE_VERSION) {
+    if(modelJson.version !== Model.SAVE_FILE_VERSION) {
         throw base.createError("Incorrect file version. CHECK APOGEEJS.COM FOR VERSION CONVERTER.",false);
     }
 
@@ -51,12 +53,6 @@ function loadModel(model,actionData) {
     
     return actionResult;
 }
-
-/** This is the supported file type. */
-let SAVE_FILE_TYPE = "apogee model";
-
-/** This is the supported file version. */
-let SAVE_FILE_VERSION = 0.2;
 
 /** Action info */
 let ACTION_INFO = {
