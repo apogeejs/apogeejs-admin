@@ -12,7 +12,6 @@ export default class Component extends EventManager {
         
         this.modelManager = modelManager;
         this.member = member;
-        this.uiActiveParent = null;
     
         this.modelManager.registerMember(this.member,this);
         
@@ -133,7 +132,7 @@ export default class Component extends EventManager {
     // serialization
     //------------------
 
-    /** This deserializes the component. */
+    /** This serializes the component. */
     toJson() {
         var json = {};
         json.type = this.constructor.uniqueName;
@@ -157,7 +156,8 @@ export default class Component extends EventManager {
         return json;
     }
 
-    /** This serializes the component. */
+    /** This is used to load the component from a json and also to set properties, such as
+     * from the set properties form. */
     loadPropertyValues(json) {
         if(!json) json = {};
         
@@ -191,15 +191,6 @@ export default class Component extends EventManager {
      * actions should pass a callback function to the method "addClenaupAction" */
     onDelete() {
         
-        //remove from parent
-        if(this.uiActiveParent) {
-            var parentComponent = this.modelManager.getComponent(this.uiActiveParent);
-            if(parentComponent) {
-                //remove the tree from the parent
-                parentComponent.removeChildComponent(this);
-            }
-        }
-        
         //execute cleanup actions
         for(var i = 0; i < this.cleanupActions.length; i++) {
             this.cleanupActions[i].call(this);
@@ -224,24 +215,6 @@ export default class Component extends EventManager {
             //check for parent change
             if(apogeeutil.isFieldUpdated(fieldsUpdated,"owner")) {
                 this.fieldUpdated("owner");
-                
-                // //old parent change logic!!!
-                // var oldParent = this.uiActiveParent;
-                // var newParent = this.member.getParent();
-
-                // this.uiActiveParent = newParent;
-
-                // //remove from old parent component
-                // if(oldParent) {
-                //     var oldParentComponent = this.modelManager.getComponent(oldParent);
-                //     oldParentComponent.removeChildComponent(this);
-                // }
-
-                // //add to the new parent component
-                // if(newParent) {
-                //     var newParentComponent = this.modelManager.getComponent(newParent);
-                //     newParentComponent.addChildComponent(this);
-                // }
             }  
             
             //check for banner update

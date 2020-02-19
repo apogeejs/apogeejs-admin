@@ -68,6 +68,7 @@ export default class ModelManager extends EventManager {
         //this.model.addListener("memberCreated", eventInfo => this.memberCreated(eventInfo));
         this.model.addListener("memberUpdated", eventInfo => this.memberUpdated(eventInfo));
         this.model.addListener("memberDeleted", eventInfo => this.memberDeleted(eventInfo));
+        this.model.addListener("modelUpdated", eventInfo => this.modelUpdated(eventInfo));
 
         //load the model
         let loadAction = {};
@@ -296,6 +297,16 @@ export default class ModelManager extends EventManager {
             
         return commandResult;
         
+    }
+
+    modelUpdated(eventInfo) {
+        let model = eventInfo.target;
+        let fieldsUpdated = model.getUpdated();
+        
+        //check for name changes
+        if(apogeeutil.isFieldUpdated(fieldsUpdated,"name")) {
+            this.fieldUpdated("name");
+        }
     }
 
     
