@@ -18,8 +18,9 @@ export function addToRecalculateList(recalculateList,member) {
 }
 
 export function addDependsOnToRecalculateList(recalculateList,member) {
-    //add any member that depends on this one    
-    var impactsList = member.getImpactsList();
+    //add any member that depends on this one 
+    let model = member.getModel();   
+    var impactsList = model.getImpactsList(member);
     for(var i = 0; i < impactsList.length; i++) {
         addToRecalculateList(recalculateList,impactsList[i]);
     }

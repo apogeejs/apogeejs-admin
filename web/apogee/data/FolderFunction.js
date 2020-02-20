@@ -24,20 +24,20 @@ export default class FolderFunction extends DependentMember {
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
-        this.argList = initialData.argList !== undefined ? initialData.argList : [];
-        this.returnValueString = initialData.returnValue !== undefined ? initialData.returnValue : [];
-        this.internalFolder = null;
+        let argList = initialData.argList !== undefined ? initialData.argList : [];
+        this.setField("argList",argList);
+        let returnValueString = initialData.returnValue !== undefined ? initialData.returnValue : [];
+        this.setField("returnValue",returnValueString);
+        //"internalFolder"
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         //set to an empty function
         this.setData(function(){});
-        this.fieldUpdated("argList");
-        this.fieldUpdated("returnValue");
     }
 
     /** This gets the internal forlder for the folderFunction. */
     getInternalFolder() {
-        return this.internalFolder;
+        return this.getField("internalFolder");
     }
 
     /** Implemnetation of get root for folder function. */
@@ -47,7 +47,7 @@ export default class FolderFunction extends DependentMember {
 
     /** This method sets the root object - implemented from RootHolder.  */
     setRoot(child) {
-        this.internalFolder = child;
+        this.setField("internalFolder",child);
         var newDependsOn = [];
         if(child) newDependsOn.push(child);
         this.updateDependencies(newDependsOn);
@@ -55,12 +55,12 @@ export default class FolderFunction extends DependentMember {
 
     /** This gets the name of the return object for the folderFunction function. */
     getReturnValueString() {
-        return this.returnValueString;
+        return this.getField("returnValue");
     }
 
     /** This gets the arg list of the folderFunction function. */
     getArgList() {
-        return this.argList;
+        return this.getField("argList");
     }
 
     //------------------------------
@@ -69,7 +69,7 @@ export default class FolderFunction extends DependentMember {
 
     /** This method removes any data from this model on closing. */
     close() {
-        this.internalFolder.onClose();
+        this.getField("internalFolder").onClose();
     }
 
     /** This method creates a member from a json. It should be implemented as a static
@@ -82,10 +82,10 @@ export default class FolderFunction extends DependentMember {
      * @protected */
     addToJson(json) {
         json.updateData = {};
-        json.updateData.argList = this.argList;
-        json.updateData.returnValue = this.returnValueString;
+        json.updateData.argList = this.getField("argList");
+        json.updateData.returnValue = this.getField("returnValue");
         json.children = {};
-        json.children[FolderFunction.INTERNAL_FOLDER_NAME] = this.internalFolder.toJson();
+        json.children[FolderFunction.INTERNAL_FOLDER_NAME] = this.getField("internalFolder").toJson();
     }
 
     /** This method extends the base method to get the property values
@@ -154,8 +154,9 @@ export default class FolderFunction extends DependentMember {
     /** This method updates the dependencies of any children
      * based on an object being added. */
     updateDependeciesForModelChange(recalculateList) {
-        if(this.internalFolder) {
-            this.internalFolder.updateDependeciesForModelChange(recalculateList);
+        let internalFolder = this.getField("internalFolder");
+        if(internalFolder) {
+            internalFolder.updateDependeciesForModelChange(recalculateList);
         }
     }
 
@@ -174,13 +175,13 @@ export default class FolderFunction extends DependentMember {
 
     /** this method gets the table map. */
     getChildMap() {
-        return this.internalFolder.childMap;
+        return this.getField("internalFolder").getChildMap();
     }
 
     /** This method looks up a child from this folder.  */
     lookupChild(name) {
         //check look for object in this folder
-        return this.internalFolder.childMap[name];
+        return this.getField("internalFolder").getChildMap()[name];
     }
 
     //------------------------------
@@ -194,14 +195,15 @@ export default class FolderFunction extends DependentMember {
 
     /** This method looks up a member by its full name. */
     getMemberByPathArray(path,startElement) {
+        let internalFolder = this.getField("internalFolder");
         if(startElement === undefined) startElement = 0;
-        if(path[startElement] === this.internalFolder.getName()) {
+        if(path[startElement] === internalFolder.getName()) {
             if(startElement === path.length-1) {
-                return this.internalFolder;
+                return internalFolder;
             }
             else {
                 startElement++;
-                return this.internalFolder.lookupChildFromPathArray(path,startElement);
+                return internalFolder.lookupChildFromPathArray(path,startElement);
             }
         }
         else {
@@ -216,18 +218,18 @@ export default class FolderFunction extends DependentMember {
 
     /** This is called from the update action. It should not be called externally. */
     setReturnValueString(returnValueString) {
-        if(this.returnValueString != returnValueString) {
-            this.fieldUpdated("returnValue");
+        let existingRVS = this.getField("returnValue");
+        if(existingRVS != returnValueString) {
+            this.setField("returnValue",returnValueString);
         }
-        this.returnValueString = returnValueString;
     }
 
     /** This is called from the update action. It should not be called externally. */
     setArgList(argList) {
-        if(this.argList != argList) {
-            this.fieldUpdated("argList");
+        let existingArgList = this.getField("argList");
+        if(existingArgList != argList) {
+            this.setField("argList",argList);
         }
-        this.argList = argList;
     }
 
     /** This method creates the folderFunction function. It is called from the update action 
@@ -305,7 +307,8 @@ export default class FolderFunction extends DependentMember {
      * @private */
     createVirtualModel(folderFunctionErrors) {
         try {
-            var folderJson = this.internalFolder.toJson();
+            let internalFolder = this.getField("internalFolder");
+            var folderJson = internalFolder.toJson();
             var modelJson = Model.createWorkpaceJsonFromFolderJson(this.getName(),folderJson);
             var virtualModel = new Model(this.getOwner());
             var actionResult = virtualModel.loadFromJson(modelJson);
@@ -324,9 +327,10 @@ export default class FolderFunction extends DependentMember {
     /** This method loads the input argument members from the virtual model. 
      * @private */
     loadInputElements(rootFolder,folderFunctionErrors) {
-        var argMembers = [];
-        for(var i = 0; i < this.argList.length; i++) {
-            var argName = this.argList[i];
+        let argMembers = [];
+        let argList = this.getField("argList");
+        for(var i = 0; i < argList.length; i++) {
+            var argName = argList[i];
             var argMember = rootFolder.lookupChild(argName);
             if(argMember) {
                 argMembers.push(argMember);
@@ -344,10 +348,11 @@ export default class FolderFunction extends DependentMember {
     /** This method loads the output member from the virtual model. 
      * @private  */
     loadOutputElement(rootFolder,folderFunctionErrors) {
-        var returnValueMember = rootFolder.lookupChild(this.returnValueString);
+        let returnValueString = this.getField("returnValue");
+        var returnValueMember = rootFolder.lookupChild(returnValueString);
     //    if(!returnValueMember) {
     //        //missing input element
-    //        var msg = "Return element not found in folderFunction: " + this.returnValueString;
+    //        var msg = "Return element not found in folderFunction: " + returnValueString;
     //        var actionError = new ActionError(msg,"FolderFunction - Code",this);
     //        folderFunctionErrors.push(actionError);
     //    }

@@ -120,6 +120,7 @@ export default class DependentMember extends Member {
     updateDependencies(newDependsOn) {
         
         var dependenciesUpdated = false;
+        let model = this.getModel();
         
         if(!newDependsOn) {
             newDependsOn = [];
@@ -141,7 +142,7 @@ export default class DependentMember extends Member {
             this.dependsOnList.push(remoteMember);
 
             //update this member
-            var isNewAddition = remoteMember.addToImpactsList(this);
+            var isNewAddition = model.addToImpactsList(this,remoteMember);
             if(isNewAddition) {
                 dependenciesUpdated = true;
             }
@@ -159,7 +160,7 @@ export default class DependentMember extends Member {
             
             if(!stillDependsOn) {
                 //remove from imacts list
-                remoteMember.removeFromImpactsList(this);
+                model.removeFromImpactsList(this,remoteMember);
                 dependenciesUpdated = true;
             }
         }

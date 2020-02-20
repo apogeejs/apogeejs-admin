@@ -30,9 +30,9 @@ export default class CodeableMember extends DependentMember {
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
         //arguments of the member function
-        this.argList = [];
-        this.functionBody = "";
-        this.supplementalCode = "";
+        this.setField("argList",[]);
+        //"functionBody";
+        //"supplementalCode";
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -50,11 +50,6 @@ export default class CodeableMember extends DependentMember {
         this.clearCalcPending();
         this.setResultPending(false);
         this.setResultInvalid(false);
-        
-        //set field updated in init
-        this.fieldUpdated("argList");
-        this.fieldUpdated("functionBody");
-        this.fieldUpdated("private");
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //WORKING FIELDS
@@ -77,69 +72,17 @@ export default class CodeableMember extends DependentMember {
 
     /** This method returns the argument list.  */
     getArgList() {
-        return this.argList;
+        return this.getField("argList");
     }
 
     /** This method returns the fucntion body for this member.  */
     getFunctionBody() {
-        return this.functionBody;
+        return this.getField("functionBody");
     }
 
     /** This method returns the supplemental code for this member.  */
     getSupplementalCode() {
-        return this.supplementalCode;
-    }
-
-    /** This method returns the formula for this member.  */
-    setCodeInfo(codeInfo,compiledInfo) {
-
-        //set the base data
-        if(this.argList.toString() != codeInfo.argList.toString()) {
-            this.fieldUpdated("argList");
-            this.argList = codeInfo.argList;
-        }
-        
-        if(this.functionBody != codeInfo.functionBody) {
-            this.fieldUpdated("functionBody");
-            this.functionBody = codeInfo.functionBody;
-        }
-        
-        if(this.supplementalCode != codeInfo.supplementalCode) {
-            this.fieldUpdated("private");
-            this.supplementalCode = codeInfo.supplementalCode;
-        }
-
-        //save the variables accessed
-        this.varInfo = compiledInfo.varInfo;
-
-        if((!compiledInfo.errors)||(compiledInfo.errors.length === 0)) {
-            //set the code  by exectuing generator
-            this.codeErrors = [];
-            
-            try {
-                //get the inputs to the generator
-                var messenger = new Messenger(this);
-                
-                //get the generated fucntion
-                var generatedFunctions = compiledInfo.generatorFunction(messenger);
-                this.memberGenerator = generatedFunctions.memberGenerator;
-                this.memberFunctionInitializer = generatedFunctions.initializer;                       
-            }
-            catch(ex) {
-                this.codeErrors.push(ActionError.processException(ex,"Codeable - Set Code",false));
-            }
-        }
-        else {
-    //doh - i am throwing away errors - handle this differently!
-            this.codeErrors = compiledInfo.errors;
-        }
-        
-        if(this.codeErrors.length > 0) {
-            //code not valid
-            this.memberGenerator = null;
-            this.memberFunctionInitializer = null;
-        }
-        this.codeSet = true;
+        return this.getField("supplementalCode");
     }
 
     /** This is a helper method that compiles the code as needed for setCodeInfo.*/
@@ -162,12 +105,34 @@ export default class CodeableMember extends DependentMember {
     }
 
     /** This method returns the formula for this member.  */
+    clearCode() {
+        this.codeSet = false;
+        if(this.getField("functionBody") != "") {
+            this.setField("functionBody","");
+        }
+        if(this.getField("supplementalCode") != "") {
+            this.setField("supplementalCode","");
+        }
+        this.varInfo = null;
+        this.dependencyInfo = null;
+        this.memberFunctionInitializer = null;
+        this.memberGenerator = null;
+        this.codeErrors = [];
+        
+        this.clearCalcPending();
+        this.setResultPending(false);
+        this.setResultInvalid(false);
+        
+        var newDependsOn = [];
+        this.updateDependencies(newDependsOn);
+    }
+
+    /** This method returns the formula for this member.  */
     initializeDependencies() {
         
         if((this.hasCode())&&(this.varInfo)&&(this.codeErrors.length === 0)) {
             try {
-                var newDependencyList = getDependencyInfo(this.varInfo,
-                    this.getContextManager());
+                var newDependencyList = getDependencyInfo(this.varInfo,this.getContextManager());
 
                 //update dependencies
                 this.updateDependencies(newDependencyList);
@@ -198,31 +163,6 @@ export default class CodeableMember extends DependentMember {
                 addToRecalculateList(recalculateList,this);
             }  
         }
-    }
-        
-    /** This method returns the formula for this member.  */
-    clearCode() {
-        this.codeSet = false;
-        if(this.functionBody != "") {
-            this.fieldUpdated("functionBody");
-            this.functionBody = "";
-        }
-        if(this.supplementalCode != "") {
-            this.fieldUpdated("private");
-            this.supplementalCode = "";
-        }
-        this.varInfo = null;
-        this.dependencyInfo = null;
-        this.memberFunctionInitializer = null;
-        this.memberGenerator = null;
-        this.codeErrors = [];
-        
-        this.clearCalcPending();
-        this.setResultPending(false);
-        this.setResultInvalid(false);
-        
-        var newDependsOn = [];
-        this.updateDependencies(newDependsOn);
     }
 
     /** This method returns the formula for this member.  */
@@ -296,6 +236,93 @@ export default class CodeableMember extends DependentMember {
         this.clearCalcPending();
     }
 
+    //------------------------------
+    // Member Methods
+    //------------------------------
+
+    /** This gets an update structure to upsate a newly instantiated member
+    /* to match the current object. */
+    getUpdateData() {
+        var updateData = {};
+        if(this.hasCode()) {
+            updateData.argList = this.getArgList();
+            updateData.functionBody = this.getFunctionBody();
+            updateData.supplementalCode = this.getSupplementalCode();
+        }
+        else {
+            updateData.data = this.getData();
+        }
+        return updateData;
+    }
+
+    //------------------------------
+    //ContextHolder methods
+    //------------------------------
+
+    /** This method retrieve creates the loaded context manager. */
+    createContextManager() {
+        return new ContextManager(this);
+    }
+
+    //===================================
+    // Private Functions
+    //===================================
+
+    //implementations must implement this function
+    //This method takes the object function generated from code and processes it
+    //to set the data for the object. (protected)
+    //processMemberFunction 
+
+    
+    /** This method returns the formula for this member.  */
+    setCodeInfo(codeInfo,compiledInfo) {
+        //set the base data
+        if(this.getField("argList").toString() != codeInfo.argList.toString()) {
+            this.setField("argList",codeInfo.argList);
+        }
+        
+        if(this.getField("functionBody") != codeInfo.functionBody) {
+            this.setField("functionBody",codeInfo.functionBody);
+        }
+        
+        if(this.getField("supplementalCode") != codeInfo.supplementalCode) {
+            this.setField("supplementalCode",codeInfo.supplementalCode);
+        }
+
+        //save the variables accessed
+        this.varInfo = compiledInfo.varInfo;
+
+        if((!compiledInfo.errors)||(compiledInfo.errors.length === 0)) {
+            //set the code  by exectuing generator
+            this.codeErrors = [];
+            
+            try {
+                //get the inputs to the generator
+                var messenger = new Messenger(this);
+                
+                //get the generated fucntion
+                var generatedFunctions = compiledInfo.generatorFunction(messenger);
+                this.memberGenerator = generatedFunctions.memberGenerator;
+                this.memberFunctionInitializer = generatedFunctions.initializer;                       
+            }
+            catch(ex) {
+                this.codeErrors.push(ActionError.processException(ex,"Codeable - Set Code",false));
+            }
+        }
+        else {
+    //doh - i am throwing away errors - handle this differently!
+            this.codeErrors = compiledInfo.errors;
+        }
+        
+        if(this.codeErrors.length > 0) {
+            //code not valid
+            this.memberGenerator = null;
+            this.memberFunctionInitializer = null;
+        }
+        this.codeSet = true;
+    }
+
+    
     /** This makes sure user code of object function is ready to execute.  */
     memberFunctionInitialize() {
         
@@ -347,42 +374,6 @@ export default class CodeableMember extends DependentMember {
         return this.initReturnValue;
     }
 
-    //------------------------------
-    // Member Methods
-    //------------------------------
-
-    /** This gets an update structure to upsate a newly instantiated member
-    /* to match the current object. */
-    getUpdateData() {
-        var updateData = {};
-        if(this.hasCode()) {
-            updateData.argList = this.getArgList();
-            updateData.functionBody = this.getFunctionBody();
-            updateData.supplementalCode = this.getSupplementalCode();
-        }
-        else {
-            updateData.data = this.getData();
-        }
-        return updateData;
-    }
-
-    //------------------------------
-    //ContextHolder methods
-    //------------------------------
-
-    /** This method retrieve creates the loaded context manager. */
-    createContextManager() {
-        return new ContextManager(this);
-    }
-
-    //===================================
-    // Private Functions
-    //===================================
-
-    //implementations must implement this function
-    //This method takes the object function generated from code and processes it
-    //to set the data for the object. (protected)
-    //processMemberFunction 
 
 }
 

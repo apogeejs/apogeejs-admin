@@ -20,7 +20,7 @@ export default class Folder extends DependentMember {
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
         //this holds the base objects, mapped by name
-        this.childMap = {};
+        this.setField("childMap",{});
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -39,13 +39,14 @@ export default class Folder extends DependentMember {
 
     /** this method gets the table map. */
     getChildMap() {
-        return this.childMap;
+        return this.getField("childMap");
     }
 
     /** This method looks up a child from this folder.  */
     lookupChild(name) {
         //check look for object in this folder
-        return this.childMap[name];
+        let childMap = this.getField("childMap");
+        return childMap[name];
     }
 
     /** This method adds a table to the folder. It also sets the folder for the
@@ -53,13 +54,20 @@ export default class Folder extends DependentMember {
     addChild(child) {
         
         //check if it exists first
-        var name = child.getName();
-        if(this.childMap[name]) {
+        let name = child.getName();
+        let childMap = this.getField("childMap");
+        if(childMap[name]) {
             //already exists! not fatal since it is not added to the model yet,
             throw base.createError("There is already an object with the given name.",false);
         }
+
+        //make a copy of the child map to modify
+        let newChildMap = {};
+        Object.assign(newChildMap,childMap);
+
         //add object
-        this.childMap[name] = child;
+        newChildMap[name] = child;
+        this.setField("childMap",newChildMap);
         
         var data = child.getData();
         //object may first appear with no data
@@ -79,7 +87,13 @@ export default class Folder extends DependentMember {
         
         //remove from folder
         var name = child.getName();
-        delete(this.childMap[name]);
+        let childMap = this.getField("childMap");
+        //make a copy of the child map to modify
+        let newChildMap = {};
+        Object.assign(newChildMap,childMap);
+        
+        delete(newChildMap[name]);
+        this.setField("childMap",newChildMap);
         this.spliceDataMap(name);
         
         //set all children as dependents
@@ -89,9 +103,10 @@ export default class Folder extends DependentMember {
     /** This method updates the table data object in the folder data map. */
     updateData(child) {
         
-        var name = child.getName();
-        var data = child.getData();
-        if(this.childMap[name] === undefined) {
+        let name = child.getName();
+        let data = child.getData();
+        let childMap = this.getField("childMap");
+        if(childMap[name] === undefined) {
             alert("Error - this table " + name + " has not yet been added to the folder.");
             return;
         }
@@ -120,8 +135,9 @@ export default class Folder extends DependentMember {
     /** This method updates the dependencies of any children
      * based on an object being added. */
     updateDependeciesForModelChange(recalculateList) {
-        for(var key in this.childMap) {
-            var child = this.childMap[key];
+        let childMap = this.getField("childMap");
+        for(var key in childMap) {
+            var child = childMap[key];
             if(child.isDependent) {
                 child.updateDependeciesForModelChange(recalculateList);
             }
@@ -151,15 +167,17 @@ export default class Folder extends DependentMember {
             json.childrenNotWriteable = true;
         }
         
-        for(var key in this.childMap) {
-            var child = this.childMap[key];
+        let childMap = this.getField("childMap");
+        for(var key in childMap) {
+            var child = childMap[key];
             json.children[key] = child.toJson();
         }
     }
 
     onClose () {
-        for(var key in this.childMap) {
-            var child = this.childMap[key];
+        let childMap = this.getField("childMap");
+        for(var key in childMap) {
+            var child = childMap[key];
             if(child.onClose) child.onClose();
         }
     }
@@ -171,9 +189,10 @@ export default class Folder extends DependentMember {
     /** This method updates the table data object in the folder data map. 
      * @private */
     calculateDependents() {
-        var newDependsOn = [];
-        for(var name in this.childMap) {
-            var child = this.childMap[name];
+        let newDependsOn = [];
+        let childMap = this.getField("childMap");
+        for(var name in childMap) {
+            var child = childMap[name];
             newDependsOn.push(child);
         }
         this.updateDependencies(newDependsOn);

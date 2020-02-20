@@ -1,4 +1,6 @@
+import base from "/apogeeutil/base.js";
 import {doAction} from "/apogee/actions/action.js";
+import FieldObject from "/apogeeutil/FieldObject.js";
 
 /** This component encapsulates the member functionality for objects in the model.
  * 
@@ -19,52 +21,47 @@ export default class Member {
 
     constructor(name,generator) {
         this.id = _createId();
+
+        this.fieldObjectMixinInit();
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
-        this.name = name;
-        this.owner = null;
-        this.data = null;
+        this.setField("name",name);
+        //"owner"
+        //"data"
 
         this.resultPending = false;
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //DERIVED FIELDS (presumably based on implementation)
-        this.impactsList = [];
-
         this.generator = generator;
         this.errors = []; 
         this.resultInvalid = false;
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        
-        this.updated = {};
-        
-        //set updated in constructor
-        this.fieldUpdated("name");
-        this.fieldUpdated("data");
     }
 
     initOwner(owner) {
-        if(this.owner != owner) {
-            this.fieldUpdated("owner");
+        let currentOwner = this.getField("owner");
+        if(currentOwner != owner) {
+            this.setField("owner",owner);
         }
         
-        this.owner = owner;
         if(owner.isParent) {
-            this.owner.addChild(this);
+            owner.addChild(this);
         }
         else if(owner.isRootHolder) {
-            this.owner.setRoot(this);
+            owner.setRoot(this);
         }
     }
 
     move(newName,newOwner) {
+        let currentOwner = this.getField("owner");
 
         //remove from old owner
-        if(this.owner) {
-            if(this.owner.isParent) {
-                this.owner.removeChild(this);
+        if(currentOwner) {
+            if(currentOwner.isParent) {
+                currentOwner.removeChild(this);
             }
             else {
                 //don't allow moving a root for now!
@@ -73,10 +70,8 @@ export default class Member {
         }
         
         //check for change of name
-        if(newName != this.name) {
-            this.fieldUpdated("name");
-            
-            this.name = newName;
+        if(newName != this.getField("name")) {
+            this.setField("name",newName);
         }
         
         //place in the new owner or update the name in the old owner
@@ -90,32 +85,39 @@ export default class Member {
         return this.id;
     }
 
+    getTargetType() {
+        return "member";
+    }
+
     /** this method gets the name. */
     getName() {
-        return this.name;
+        return this.getField("name");
     }
 
     /** This method returns the full name in dot notation for this object. */
     getFullName() {
-        if(this.owner) {
-            return this.owner.getChildFullName(this.name);
+        let name = this.getField("name");
+        let owner = this.getField("owner");
+        if(owner) {
+            return owner.getChildFullName(name);
         }
         else {
             //this shouldn't happen
-            return this.name;
+            return name;
         }
     }
 
     /** This returns the owner for this member. */
     getOwner() {
-        return this.owner;
+        return this.getField("owner");
     }
 
     /** This returns the parent for this member. For the root folder
      * this value is null. */
     getParent() {
-        if((this.owner)&&(this.owner.isParent)) {
-            return this.owner;
+        let owner = this.getField("owner");
+        if((owner)&&(owner.isParent)) {
+            return owner;
         }
         else {
             return null;
@@ -124,8 +126,9 @@ export default class Member {
 
     /** this method gets the model. */
     getModel() {
-        if(this.owner) {
-            return this.owner.getModel();
+        let owner = this.getField("owner");
+        if(owner) {
+            return owner.getModel();
         }
         else {
             return null;
@@ -228,7 +231,7 @@ export default class Member {
     /** This method writes the child to a json. */
     toJson() {
         var json = {};
-        json.name = this.name;
+        json.name = this.getField("name");
         json.type = this.generator.type;
         if(this.addToJson) {
             this.addToJson(json);
@@ -252,20 +255,14 @@ export default class Member {
 
     /** this method gets the data map. */
     getData() {
-        return this.data;
-    }
-
-    /** This returns an array of members this member impacts. */
-    getImpactsList() {
-        return this.impactsList;
+        return this.getField("data");
     }
 
     /** This method sets the data for this object. This is the object used by the 
      * code which is identified by this name, for example the JSON object associated
      * with a JSON table. Besides hold the data object, this updates the parent data map. */
     setData(data) {
-        this.data = data;
-        this.fieldUpdated("data");
+        this.setField("data",data);
     
         var parent = this.getParent();
         if(parent) {
@@ -314,15 +311,16 @@ export default class Member {
      * if it does.  
      * @protected */
     onDeleteMember() {
-        if(!(this.owner)) return;
+        let owner = this.getField("owner");
+        if(!(owner)) return;
         
-        if(this.owner.isParent) {
-            this.owner.removeChild(this);
+        if(owner.isParent) {
+            owner.removeChild(this);
         }
-        else if(this.owner.isRootHolder) {
-            this.owner.setRoot(null);
+        else if(owner.isRootHolder) {
+            owner.setRoot(null);
         }
-        this.owner = null;
+        owner = null;
     }
 
     ///** This method is called when the model is closed and also when an object
@@ -346,67 +344,10 @@ export default class Member {
     //getUpdateData() {
     //}
 
-    //-------------------------
-    // Update Event Methods
-    //-------------------------
-
-    getUpdated() {
-        return this.updated;
-    }
-
-    clearUpdated() {
-        this.updated = {};
-    }
-
-    fieldUpdated(field) {
-        this.updated[field] = true;
-    }
-
-    isFieldUpdated(field) {
-        return this.updated[field] ? true : false;
-    }
-
-    //getId() Implmented above
-
-    getTargetType() {
-        return "member";
-    }
-
-
-
-    //===================================
-    // Private Functions
-    //===================================
-
-    /** This method adds a data member to the imapacts list for this node.
-     * The return value is true if the member was added and false if it was already there. 
-     * @private */
-    addToImpactsList(member) {
-        //exclude this member
-        if(member === this) return;
-        
-        //add to the list iff it is not already there
-        if(this.impactsList.indexOf(member) === -1) {
-            this.impactsList.push(member);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    /** This method removes a data member from the imapacts list for this node. 
-     * @private */
-    removeFromImpactsList(member) {
-        //it should appear only once
-        for(var i = 0; i < this.impactsList.length; i++) {
-            if(this.impactsList[i] == member) {
-                this.impactsList.splice(i,1);
-                return;
-            }
-        }
-    }
 }
+
+//add mixins to this class
+base.mixin(Member,FieldObject);
 
 /** This is used for Id generation.
  * @private */

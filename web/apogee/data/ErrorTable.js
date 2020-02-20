@@ -14,10 +14,8 @@ export default class ErrorTable extends Member {
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
         //store this to use during save later
-        this.completeJson = completeJson;
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        
-        this.fieldUpdated("completeJson");
+        this.setField("completeJson",completeJson);
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         var dummyData = "";
         this.setData(dummyData);
@@ -41,7 +39,7 @@ export default class ErrorTable extends Member {
 
     /** This overrides the commplete json to just pass back the entire json sent in. */
     toJson() {
-        return this.completeJson;
+        return this.getField("completeJson");
     }
 
     /** This method creates a member from a json. It should be implemented as a static

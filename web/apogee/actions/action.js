@@ -106,6 +106,7 @@ export function doAction(model,actionData) {
         var completedResults = flattenActionResult(actionResult);
         
         //figure out other objects that need to be updated
+        //also update dependencies (and the inverse - impacts)
         var updateAllDep = checkUpdateAllDep(completedResults);
         var recalculateList = [];
         if(updateAllDep) {
@@ -115,6 +116,9 @@ export function doAction(model,actionData) {
         else {
             updateDependenciesFromAction(completedResults,recalculateList);
         }
+
+        //commit the updated impacts map (inverse of dependency map) 
+        model.finalizeImpactsMap();
         
         //recalculate all needed objects
         callRecalculateList(recalculateList);

@@ -1,4 +1,5 @@
 import base from "/apogeeutil/base.js";
+import FieldObject from "/apogeeutil/FieldObject.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
@@ -20,7 +21,8 @@ export default class Model extends EventManager {
         super();
 
         //mixin initialization
-        this.contextHolderMixinInit(this);
+        this.contextHolderMixinInit();
+        this.fieldObjectMixinInit();
         
         // This is a queue to hold actions while one is in process.
         this.actionInProgress = false;
@@ -30,54 +32,58 @@ export default class Model extends EventManager {
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //fields
-        this.name = Model.DEFAULT_MODEL_NAME;
-        this.rootFolder = null;
-        this.owner = optionalContextOwner ? optionalContextOwner : null;
+        this.setField("name",Model.DEFAULT_MODEL_NAME);
+        //"rootFolder"
+        if(optionalContextOwner) {
+            this.setField("owner",optionalContextOwner);
+        }
+
+        this.setField("impactsMap",{});
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
-        //field update data
-        this.updated = {};
-
-        this.fieldUpdated("name");
+        this.workingImpactsMap = null;
     }
 
     /** This method returns the root object - implemented from RootHolder.  */
     setName(name) {
-        this.name = name;
-        this.fieldUpdated("name");
+        this.setField("name",name);
     }
 
     /** This method returns the root object - implemented from RootHolder.  */
     getName() {
-        return this.name;
+        return this.getField("name");
     }
 
     /** This method returns the root object - implemented from RootHolder.  */
     getRoot() {
-        return this.rootFolder;
+        return this.getField("rootFolder");
     }
 
     /** This method sets the root object - implemented from RootHolder.  */
     setRoot(member) {
-        this.rootFolder = member;
+        this.setField("rootFolder",member);
     }
 
     /** This allows for a model to have a parent. For a normal model this should be null. 
      * This is used for finding variables in scope. */
     getOwner() {
-        return this.owner;
+        return this.getField("owner");
     }
 
     /** This method updates the dependencies of any children in the model. */
     updateDependeciesForModelChange(recalculateList) {
-        if(this.rootFolder) {
-            this.rootFolder.updateDependeciesForModelChange(recalculateList);
+        let rootFolder = this.getField("rootFolder");
+        if(rootFolder) {
+            rootFolder.updateDependeciesForModelChange(recalculateList);
         }
     }
 
     /** This method removes any data from this model on closing. */
     onClose() {
-        this.rootFolder.onClose();
+        let rootFolder = this.getField("rootFolder");
+        if(rootFolder) {
+            rootFolder.onClose();
+        }
     }
 
     //------------------------------
@@ -167,14 +173,15 @@ export default class Model extends EventManager {
 
     /** This method looks up a member by its full name. */
     getMemberByPathArray(path,startElement) {
+        let rootFolder = this.getField("rootFolder");
         if(startElement === undefined) startElement = 0;
-        if(path[startElement] === this.rootFolder.getName()) {
+        if((rootFolder)&&(path[startElement] === rootFolder.getName())) {
             if(startElement === path.length-1) {
-                return this.rootFolder;
+                return rootFolder;
             }
             else {
                 startElement++;
-                return this.rootFolder.lookupChildFromPathArray(path,startElement);
+                return rootFolder.lookupChildFromPathArray(path,startElement);
             }
         }
         else {
@@ -194,7 +201,8 @@ export default class Model extends EventManager {
         //if no owner is defined for the model - the standard scenario, we will
         //add all global variables as a data entry for the context, so these variables
         //can be called from the model. 
-        if(!this.owner) {
+        let owner = this.getField("owner");
+        if(!owner) {
             var globalVarEntry = {};
             globalVarEntry.data = __globals__;
             contextManager.addToContextList(globalVarEntry);
@@ -204,6 +212,92 @@ export default class Model extends EventManager {
         //access to other variables in the model.
         
         return contextManager;
+    }
+
+    //============================
+    // Impact List Functions
+    //============================
+
+    /** This returns an array of members this member impacts. */
+    getImpactsList(member) {
+        let impactsMap = this.getField("impactsMap");
+        let impactsList = impactsMap[member.getId()];
+        if(!impactsList) impactsList = [];
+        return impactsList;
+    }
+
+    /** This shoudl be called after all dependencies have been updated to store the
+     * impacts map (We kept a mutable working copy during construction for efficiency)  */
+    finalizeImpactsMap() {
+        this.setField("impactsMap",this.workingImpactsMap);
+        this.workingImpactsMap = null;
+    }
+
+    
+    /** This method adds a data member to the imapacts list for this node.
+     * The return value is true if the member was added and false if it was already there. 
+     * @private */
+    addToImpactsList(depedentMember,member) {
+        //don't let a member impact itself
+        if(member === depedentMember) return;
+
+        let workingMemberImpactsList = this.getWorkingMemberImpactsList(member.getId());
+
+        //add to the list iff it is not already there
+        if(workingMemberImpactsList.indexOf(depedentMember,) === -1) {
+            workingMemberImpactsList.push(depedentMember,);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    /** This method removes a data member from the imapacts list for this node. 
+     * @private */
+    removeFromImpactsList(depedentMember,member) {
+
+        let workingMemberImpactsList = this.getWorkingMemberImpactsList(member.getId());
+
+        //it should appear only once
+        for(var i = 0; i < this.impactsList.length; i++) {
+            if(workingMemberImpactsList[i] == depedentMember) {
+                workingMemberImpactsList.splice(i,1);
+                return;
+            }
+        }
+    }
+    
+    /** This gets a edittable copy of a member impacts list.  */
+    getWorkingMemberImpactsList(memberId) {
+        //make sure our working impacts map is populated
+        //we will use this wile buildign the impacts map and then set the impacts map field
+        if(!this.workingImpactsMap) {
+            this.populateWorkingImpactsMap();
+        }
+
+        let memberImpactsList = this.workingImpactsMap[memberId];
+        if(!memberImpactsList) {
+            memberImpactsList = [];
+            this.workingImpactsMap[memberId] = memberImpactsList;
+        }
+
+        return memberImpactsList;
+    }
+
+    /** This method will load a mutable copy of the impacts map field to be used
+     * when we update the impacts map. We use a working variable since the reconstruction
+     * spans many calls to the add/remove function. In the copy, it makes a shallow copy of 
+     * each impacts list in the map. */
+    populateWorkingImpactsMap() {
+        let impactsMap = this.getField("impactsMap");
+        let newImpactsMap = {};
+        for(let idString in impactsMap) {
+            let impactsList = impactsMap[idString];
+            //shallow copy each array
+            newImpactsMap[idString] = [...impactsList];
+        }
+        this.workingImpactsMap = newImpactsMap;
     }
 
     //============================
@@ -224,30 +318,19 @@ export default class Model extends EventManager {
 
     /** This saves the model */
     toJson() {
-        var rootFolderJson = this.rootFolder.toJson();
-        return Model.createWorkpaceJsonFromFolderJson(this.name,rootFolderJson);
+        let name = this.getField("name");
+        let rootFolder = this.getField("rootFolder");
+        let rootFolderJson;
+        if(rootFolder) {
+            rootFolderJson = rootFolder.toJson();
+        }
+        return Model.createWorkpaceJsonFromFolderJson(name,rootFolderJson);
     }
 
     //-------------------------
     // Update Event Methods
     // - NOTE - these are repeated from Member. We should make common base class or add ins for this, along with some other things, like name
     //-------------------------
-
-    getUpdated() {
-        return this.updated;
-    }
-
-    clearUpdated() {
-        this.updated = {};
-    }
-
-    fieldUpdated(field) {
-        this.updated[field] = true;
-    }
-
-    isFieldUpdated(field) {
-        return this.updated[field] ? true : false;
-    }
 
     getId() {
         //right now we only allow for one model manager
@@ -275,10 +358,11 @@ export default class Model extends EventManager {
 
 }
 
-//add components to this class
+//add mixins to this class
 base.mixin(Model,ContextHolder);
 base.mixin(Model,Owner);
 base.mixin(Model,RootHolder);
+base.mixin(Model,FieldObject);
 
 let memberGenerators = {};
 

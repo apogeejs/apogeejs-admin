@@ -88,9 +88,11 @@ export default class ModelManager extends EventManager {
 
         //set up the root folder conmponent, with children if applicable
         var rootFolder = this.model.getRoot();
-        let rootFolderComponentJson = componentsJson[rootFolder.getName()];
-        var rootFolderCommandResult = this.createComponentFromMember(rootFolder,rootFolderComponentJson);
-        commandResult.childCommandResults = [rootFolderCommandResult];
+        if(rootFolder) {
+            let rootFolderComponentJson = componentsJson[rootFolder.getName()];
+            var rootFolderCommandResult = this.createComponentFromMember(rootFolder,rootFolderComponentJson);
+            commandResult.childCommandResults = [rootFolderCommandResult];
+        }
 
         return commandResult;
     }
