@@ -65,6 +65,11 @@ export function createMember(owner,memberJson) {
     }
 
     if(generator) {
+        //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        // create member
+        // - modify parent and all parents up to model
+        // - created object is automatically unlocked.
+        //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         member = generator.createMember(owner,memberJson);   
 
         //instantiate children if there are any

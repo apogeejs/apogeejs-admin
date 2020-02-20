@@ -11,8 +11,12 @@ export default class ErrorTable extends Member {
         
         this.initOwner(owner);
         
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //FIELDS
         //store this to use during save later
         this.completeJson = completeJson;
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        
         this.fieldUpdated("completeJson");
 
         var dummyData = "";

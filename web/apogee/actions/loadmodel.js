@@ -40,10 +40,21 @@ function loadModel(model,actionData) {
         throw base.createError("Incorrect file version. CHECK APOGEEJS.COM FOR VERSION CONVERTER.",false);
     }
 
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+    // modify model
+    // - modify the model
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
     //set the model name
     if(modelJson.name !== undefined) {
         model.setName(this.name);
     }
+
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+    // create member - (THE NEW MEMBER INSTANCES IS HANDLED THERE)
+    // - modify the member
+    // - modify parent and all parents up to model
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
     //load the model members (root folder and its children)
     let memberActionResult = createMember(model,modelJson.data);

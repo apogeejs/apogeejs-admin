@@ -55,7 +55,7 @@ addcomponent.executeCommand = function(workspaceManager,commandData) {
         //this is a bit clumsy...
         let parentMember = model.getMemberByFullName(commandData.parentFullName);
         let name = commandData.memberJson.name
-        let componentMember = parentMember.lookupChildFromPathArray([name]);
+        let componentMember = parentMember.lookupChild(name);
         commandResult = modelManager.createComponentFromMember(componentMember,commandData.componentJson);
     }
     else {

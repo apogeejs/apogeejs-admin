@@ -441,7 +441,7 @@ export default class ModelManager extends EventManager {
     loadFolderComponentContentFromJson(parentMember,childrenJson) {
         let childCommandResults = [];
         for(let childName in childrenJson) {
-            let childMember = parentMember.lookupChildFromPathArray([childName]);
+            let childMember = parentMember.lookupChild(childName);
             if(childMember) {
                 let childComponentJson = childrenJson[childName];
                 var childCommandResult = this.createComponentFromMember(childMember,childComponentJson);

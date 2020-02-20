@@ -27,18 +27,25 @@ export default class CodeableMember extends DependentMember {
     constructor(name,generator) {
         super(name,generator);
         
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //FIELDS
         //arguments of the member function
         this.argList = [];
-        
-        //initialze the code as empty
-        this.codeSet = false;
         this.functionBody = "";
         this.supplementalCode = "";
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //DERIVED FIELDS (presumably based on implementation)
+        //initialze the code as empty
+        this.codeSet = false;
+        
         this.varInfo = null;
         this.dependencyInfo = null;
         this.memberFunctionInitializer = null;
         this.memberGenerator = null;
         this.codeErrors = [];
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         
         this.clearCalcPending();
         this.setResultPending(false);
@@ -49,10 +56,13 @@ export default class CodeableMember extends DependentMember {
         this.fieldUpdated("functionBody");
         this.fieldUpdated("private");
         
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //WORKING FIELDS
         //fields used in calculation
         this.dependencyInitInProgress = false;
         this.functionInitialized = false;
         this.initReturnValue = false;
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     }
 
     /** This property tells if this object is a codeable.

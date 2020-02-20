@@ -30,6 +30,11 @@ function deleteMember(model,actionData) {
         actionResult.errorMsg = "Member not found for delete member";
         return actionResult;
     }
+
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+    // delete member (and all children)
+    // - modify parent and all parents up to model
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     
     let actionResult = doDelete(member);
     return actionResult;

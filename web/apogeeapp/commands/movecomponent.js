@@ -49,7 +49,7 @@ movecomponent.executeCommand = function(workspaceManager,commandData) {
     
     if(actionResult.actionDone) {
         let parentMember = model.getMemberByFullName(command.newParentFullName)
-        let member = parentMember.lookupChildFromPathArray([commandData.newMemberName]);
+        let member = parentMember.lookupChild(commandData.newMemberName);
         commandResult.target = modelManager.getComponent(member);
         commandResult.action = "updated";
     }

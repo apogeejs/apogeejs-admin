@@ -25,6 +25,12 @@ function updateModel(model,actionData) {
     
     var properties = actionData.properties;
     if(properties) {
+
+        //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        // modify model
+        // - modify the model
+        //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
         if(properties.name) model.setName(properties.name);
     }
     

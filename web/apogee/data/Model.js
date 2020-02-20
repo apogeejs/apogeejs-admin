@@ -27,10 +27,15 @@ export default class Model extends EventManager {
         this.messengerActionList = []
         this.consecutiveActionCount = 0;
         this.activeConsecutiveActionLimit = Model.CONSECUTIVE_ACTION_INITIAL_LIMIT;
-        this.name = Model.DEFAULT_MODEL_NAME;
-        
-        this.owner = optionalContextOwner ? optionalContextOwner : null;
 
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //fields
+        this.name = Model.DEFAULT_MODEL_NAME;
+        this.rootFolder = null;
+        this.owner = optionalContextOwner ? optionalContextOwner : null;
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+        //field update data
         this.updated = {};
 
         this.fieldUpdated("name");
@@ -151,7 +156,7 @@ export default class Model extends EventManager {
 
     /** this method is implemented for the Owner component/mixin. */
     getModel() {
-    return this;
+        return this;
     }
 
     /** this method gets the hame the children inherit for the full name. */

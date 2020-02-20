@@ -27,9 +27,9 @@ export default class CustomDataComponent extends Component {
         folder.setChildrenWriteable(false);
         
         //load these!
-        this.dataTable = folder.lookupChildFromPathArray(["data"]);
-        this.inputTable = folder.lookupChildFromPathArray(["input"]);
-        this.isInputValidFunctionTable = folder.lookupChildFromPathArray(["isInputValid"]);
+        this.dataTable = folder.lookupChild("data");
+        this.inputTable = folder.lookupChild("input");
+        this.isInputValidFunctionTable = folder.lookupChild("isInputValid");
         
         this.uiCodeFields = {};
         this.currentCss = "";

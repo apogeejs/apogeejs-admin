@@ -56,6 +56,12 @@ function updateCode(model,actionData) {
         actionResult.errorMsg = "can not set code on member: " + member.getFullName();
         return;
     }
+
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+    // apply code
+    // - modify the member
+    // - modify parent and all parents up to model
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
           
     member.applyCode(actionData.argList,
         actionData.functionBody,
@@ -88,6 +94,12 @@ function updateData(model,actionData) {
     }
         
     var data = actionData.data;
+
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+    // member set data
+    // - modify the member
+    // - modify parent and all parents up to model
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     
     //if this is the resolution (or rejection) of a previously set promise
     if(actionData.sourcePromise) {

@@ -16,9 +16,12 @@ export default class DependentMember extends Member {
     constructor(name,generator) {
         super(name,generator);
 
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //DERIVED FIELDS (presumably based on implementation)
         //this is the list of dependencies
         this.dependsOnList = [];
         this.calcPending = false;
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     }
 
     /** This property tells if this object is a dependent.

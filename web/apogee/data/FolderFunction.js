@@ -22,9 +22,13 @@ export default class FolderFunction extends DependentMember {
         
         this.initOwner(owner);
         
-        //set initial data
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //FIELDS
         this.argList = initialData.argList !== undefined ? initialData.argList : [];
         this.returnValueString = initialData.returnValue !== undefined ? initialData.returnValue : [];
+        this.internalFolder = null;
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
         //set to an empty function
         this.setData(function(){});
         this.fieldUpdated("argList");

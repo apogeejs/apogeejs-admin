@@ -17,9 +17,16 @@ export default class Folder extends DependentMember {
         
         this.initOwner(owner);
 
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //FIELDS
         //this holds the base objects, mapped by name
         this.childMap = {};
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //DERIVED FIELDS - this does double as data, which is a field
         this.dataMap = {};
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         
         //make sure the data map is frozen
         Object.freeze(this.dataMap);

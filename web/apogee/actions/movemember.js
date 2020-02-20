@@ -34,6 +34,16 @@ function moveMember(model,actionData) {
         actionResult.errorMsg = "New parent not found for move member";
         return;
     }
+
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+    // apply code
+    // - modify the member
+    // - modify the old parent and all parents up to model
+    // - modify the new parent and all parents up to model
+    // - TBD - children of the moved member get a new full name, even if they themselves do not change.
+    //         What we do here may depend on how we handle compound fields. (Note - we will recalculation 
+    //         the dependencies here, but they may not change.)
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         
     member.move(actionData.targetName,targetOwner);
     actionResult.actionDone = true;

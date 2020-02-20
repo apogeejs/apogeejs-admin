@@ -9,8 +9,12 @@ export {ContextHolder as default};
 
 /** This initializes the component */
 ContextHolder.contextHolderMixinInit = function() {
+
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    //What kind of field is this? Dependent?
     //will be set on demand
     this.contextManager = null;
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 }
 
 ContextHolder.isContextHolder = true;

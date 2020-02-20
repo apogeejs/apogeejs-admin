@@ -19,15 +19,24 @@ export default class Member {
 
     constructor(name,generator) {
         this.id = _createId();
+        
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //FIELDS
         this.name = name;
-        
+        this.owner = null;
         this.data = null;
-        this.impactsList = [];
+
+        this.resultPending = false;
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //DERIVED FIELDS (presumably based on implementation)
+        this.impactsList = [];
+
         this.generator = generator;
         this.errors = []; 
         this.resultInvalid = false;
-        this.resultPending = false;
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         
         this.updated = {};
         
@@ -115,12 +124,12 @@ export default class Member {
 
     /** this method gets the model. */
     getModel() {
-    if(this.owner) {
-        return this.owner.getModel();
-    }
-    else {
-        return null;
-    }
+        if(this.owner) {
+            return this.owner.getModel();
+        }
+        else {
+            return null;
+        }
     }
 
     /** this method gets the root folder/namespace for this object. */

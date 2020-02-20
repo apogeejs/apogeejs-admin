@@ -28,6 +28,12 @@ function updateProperties(model,actionData) {
         return;
     }
     actionResult.member = folderFunction;
+
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+    // update folder function
+    // - modify the member
+    // - modify parent and all parents up to model
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     
     folderFunction.setArgList(actionData.argList);
     folderFunction.setReturnValueString(actionData.returnValueString);

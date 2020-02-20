@@ -22,9 +22,9 @@ export default class FormDataComponent extends Component {
         folder.setChildrenWriteable(false);
         
         //load these!
-        this.dataTable = folder.lookupChildFromPathArray(["data"]);
-        this.layoutFunctionTable = folder.lookupChildFromPathArray(["layout"]);
-        this.isInputValidFunctionTable = folder.lookupChildFromPathArray(["isInputValid"]);
+        this.dataTable = folder.lookupChild("data");
+        this.layoutFunctionTable = folder.lookupChild("layout");
+        this.isInputValidFunctionTable = folder.lookupChild("isInputValid");
     };
 
     //==============================
