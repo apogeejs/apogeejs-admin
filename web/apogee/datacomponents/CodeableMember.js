@@ -24,8 +24,8 @@ import DependentMember from "/apogee/datacomponents/DependentMember.js"
 export default class CodeableMember extends DependentMember {
 
     /** This initializes the component. argList is the arguments for the object function. */
-    constructor(name,generator) {
-        super(name,generator);
+    constructor(name) {
+        super(name);
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -67,7 +67,7 @@ export default class CodeableMember extends DependentMember {
     } 
 
     getSetCodeOk() {
-        return this.generator.setCodeOk;
+        return this.constuctor.generator.setCodeOk;
     }
 
     /** This method returns the argument list.  */

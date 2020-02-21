@@ -235,7 +235,7 @@ export default class ModelManager extends EventManager {
         if(member) {
             
             var componentClass = this.app.getComponentClass(componentJson.type);
-            if((componentClass)&&(member.generator.type != "apogee.ErrorTable")) {
+            if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorTable")) {
                 //create empty component
                 component = new componentClass(this,member);
 
@@ -473,7 +473,7 @@ export default class ModelManager extends EventManager {
                 var member = componentInfo.member;
 
                 var memberStruct = {};
-                memberStruct.type = member.generator.type;
+                memberStruct.type = member.constructor.generator.type;
                 var parent = member.getParent();
                 memberStruct.parent = parent ? parent.getFullName() : null;
 

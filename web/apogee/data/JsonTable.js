@@ -8,7 +8,7 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 export default class JsonTable extends CodeableMember {
 
     constructor(name,owner,initialData) {
-        super(name,JsonTable.generator);
+        super(name);
 
         //mixin init where needed
         this.contextHolderMixinInit();

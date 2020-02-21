@@ -19,8 +19,8 @@ export default class Component extends EventManager {
         this.cleanupActions = [];
         
         //notifications
-        this.bannerState = bannerConstants.BANNER_TYPE_NONE;
-        this.bannerMessage = "";
+        this.bannerState = member.getState();
+        this.bannerMessage = member.getStateMessage();
         
         this.updated = {};
 
@@ -202,52 +202,24 @@ export default class Component extends EventManager {
     memberUpdated(eventInfo) {
 
         let updatedMember = eventInfo.target;
-        let fieldsUpdated = updatedMember.getUpdated();
         
         if(updatedMember.getId() == this.member.getId()) {
             this.fieldUpdated("member");
             
             //check for name changes
-            if(apogeeutil.isFieldUpdated(fieldsUpdated,"name")) {
+            if(updatedMember.isFieldUpdated("name")) {
                 this.fieldUpdated("name");
             }
             
             //check for parent change
-            if(apogeeutil.isFieldUpdated(fieldsUpdated,"owner")) {
+            if(updatedMember.isFieldUpdated("owner")) {
                 this.fieldUpdated("owner");
             }  
-            
-            //check for banner update
-            let newBannerState;
-            let newBannerMessage;
-            if(updatedMember.hasError()) {
-                var errorMsg = "";
-                var actionErrors = updatedMember.getErrors();
-                for(var i = 0; i < actionErrors.length; i++) {
-                    errorMsg += actionErrors[i].msg + "\n";
-                }
 
-                newBannerState = bannerConstants.BANNER_TYPE_ERROR;
-                newBannerMessage = errorMsg;
-            }
-            else if(updatedMember.getResultPending()) {
-                newBannerState = bannerConstants.BANNER_TYPE_PENDING;
-                newBannerMessage = bannerConstants.PENDING_MESSAGE;
-
-            }
-            else if(updatedMember.getResultInvalid()) {
-                newBannerState = bannerConstants.BANNER_TYPE_INVALID;
-                newBannerMessage = bannerConstants.INVALID_MESSAGE;
-            }
-            else {   
-                newBannerState = bannerConstants.BANNER_TYPE_NONE;
-                newBannerMessage = null;
-            }
-            
-            if((newBannerState != this.bannerState)||(newBannerMessage != this.bannerMessage)) {
+            if((updatedMember.isFieldUpdated("state"))||(updatedMember.isFieldUpdated("stateMessage"))) {
+                this.bannerState = updatedMember.getState();
+                this.bannerMessage = updatedMember.getStateMessage();
                 this.fieldUpdated("bannerState");
-                this.bannerState = newBannerState;
-                this.bannerMessage = newBannerMessage;
             }
         }
         else {
@@ -273,8 +245,8 @@ export default class Component extends EventManager {
             values.parentName = parent.getFullName();
         }
 
-        if(member.generator.readProperties) {
-            member.generator.readProperties(member,values);
+        if(member.constructor.generator.readProperties) {
+            member.constructor.generator.readProperties(member,values);
         }
         if(this.readExtendedProperties) {
             this.readExtendedProperties(values);

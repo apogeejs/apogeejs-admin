@@ -26,7 +26,7 @@ updatecomponent.createUndoCommand = function(workspaceManager,commandData) {
     
 
     var originalMemberProperties = {};
-    if(member.generator.readProperties) member.generator.readProperties(member,originalMemberProperties);
+    if(member.constructor.generator.readProperties) member.constructor.generator.readProperties(member,originalMemberProperties);
     var originalComponentProperties = {};
     if(component.readExtendedProperties) component.readExtendedProperties(originalComponentProperties);
     
@@ -71,7 +71,7 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     var errorMsg;
     
     //create an action to update an member additional properties
-    var memberGenerator = member.generator;
+    var memberGenerator = member.constructor.generator;
     if(memberGenerator.getPropertyUpdateAction) {
         var actionData = memberGenerator.getPropertyUpdateAction(member,commandData.updatedMemberProperties);  
         if(actionData) {

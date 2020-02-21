@@ -19,7 +19,7 @@ import FieldObject from "/apogeeutil/FieldObject.js";
  * a folder and it is called the root folder. */
 export default class Member {
 
-    constructor(name,generator) {
+    constructor(name) {
         this.id = _createId();
 
         this.fieldObjectMixinInit();
@@ -29,14 +29,14 @@ export default class Member {
         this.setField("name",name);
         //"owner"
         //"data"
-
-        this.resultPending = false;
+        this.setField("state",apogeeutil.STATE_NORMAL);
+        this.setField("stateMessage",null);
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //DERIVED FIELDS (presumably based on implementation)
-        this.generator = generator;
         this.errors = []; 
+        this.resultPending = false;
         this.resultInvalid = false;
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     }
@@ -151,14 +151,24 @@ export default class Member {
         return null; //this shouldn't happen
     }
 
+    getState() {
+        return this.getField("state");
+    }
+
+    getStateMessage() {
+        return this.getField("stateMessage");
+    }
+
     /** This method sets the pre calc error for this dependent. */
     addError(error) {
         this.errors.push(error);
+        this._calculateState();
     }
 
     /** This method sets the pre calc error for this dependent. */
     addErrors(errorList) {
         this.errors = this.errors.concat(errorList);
+        this._calculateState();
     }
 
     /** This method clears the error list. */
@@ -173,6 +183,7 @@ export default class Member {
             }
         }
         this.errors = newList;
+        this._calculateState();
     }
 
     /** This returns true if there is a pre calc error. */
@@ -204,6 +215,7 @@ export default class Member {
     setResultPending(isPending,promise) {
         this.resultPending = isPending;
         this.pendingPromise = promise;
+        this._calculateState();
     }
 
     /** This returns true if the member is invalid, typically
@@ -217,6 +229,7 @@ export default class Member {
      * table depending on this will also have an invalid value. */
     setResultInvalid(isInvalid) {
         this.resultInvalid = isInvalid;
+        this._calculateState();
     }
 
     /** This returns true if the pending token matches. */
@@ -225,14 +238,14 @@ export default class Member {
     }
 
     getSetDataOk() {
-        return this.generator.setDataOk;
+        return this.constructor.generator.setDataOk;
     }
 
     /** This method writes the child to a json. */
     toJson() {
         var json = {};
         json.name = this.getField("name");
-        json.type = this.generator.type;
+        json.type = this.constructor.generator.type;
         if(this.addToJson) {
             this.addToJson(json);
         }
@@ -343,6 +356,42 @@ export default class Member {
     //* @protected */
     //getUpdateData() {
     //}
+
+    /** This method sets the state based on errors, pending and invalid */
+    _calculateState() {
+        let newState;
+        let newMessage;
+        if(this.hasError()) {
+            var errorMsg = "";
+            var actionErrors = this.getErrors();
+            for(var i = 0; i < actionErrors.length; i++) {
+                errorMsg += actionErrors[i].msg + "\n";
+            }
+
+            newState = apogeeutil.STATE_ERROR;
+            newMessage = errorMsg;
+        }
+        else if(this.getResultPending()) {
+            newState = apogeeutil.STATE_PENDING;
+            newMessage = apogeeutil.PENDING_MESSAGE;
+
+        }
+        else if(this.getResultInvalid()) {
+            newState = apogeeutil.STATE_INVALID;
+            newMessage = apogeeutil.INVALID_MESSAGE;
+        }
+        else {   
+            newState = apogeeutil.apogeeutil_NONE;
+            newMessage = null;
+        }
+        
+        if(newState != this.getField("state")) {
+            this.setField("state",newState);
+        }
+        if(newMessage != this.getField("stateMessage")) {
+            this.setField("stateMessage",newMessage);
+        }
+    }
 
 }
 

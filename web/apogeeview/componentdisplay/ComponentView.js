@@ -404,8 +404,8 @@ export default class ComponentView {
             values.parentName = parent.getFullName();
         }
 
-        if(member.generator.readProperties) {
-            member.generator.readProperties(member,values);
+        if(member.constructor.generator.readProperties) {
+            member.constructor.generator.readProperties(member,values);
         }
         if(this.readExtendedProperties) {
             this.readExtendedProperties(values);

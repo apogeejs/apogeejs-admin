@@ -14,7 +14,7 @@ import CommandManager from "/apogeeapp/commands/CommandManager.js";
 export default class FolderFunction extends DependentMember {
 
     constructor(name,owner,initialData) {
-        super(name,FolderFunction.generator);
+        super(name);
 
         //mixin init where needed
         this.dependentMixinInit();

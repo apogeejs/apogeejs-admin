@@ -9,7 +9,7 @@ import Parent from "/apogee/datacomponents/Parent.js";
 export default class Folder extends DependentMember {
 
     constructor(name,owner) {
-        super(name,Folder.generator);
+        super(name);
 
         //mixin init where needed
         this.contextHolderMixinInit();
