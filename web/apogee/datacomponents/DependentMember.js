@@ -106,10 +106,11 @@ export default class DependentMember extends Member {
     /** This method does any needed cleanup when the dependent is depeted.. */
     onDeleteDependent() {
         //remove this dependent from the impactor
+        let model = this.getModel();
         for(var i = 0; i < this.dependsOnList.length; i++) {
             var remoteMember = this.dependsOnList[i];
             //remove from imacts list
-            remoteMember.removeFromImpactsList(this);
+            model.removeFromImpactsList(this,remoteMember);
         }
     }
     //===================================
@@ -164,7 +165,6 @@ export default class DependentMember extends Member {
                 dependenciesUpdated = true;
             }
         }
-    //    this.dependenciesSet = true;
         
         return dependenciesUpdated;
     }

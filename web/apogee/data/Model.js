@@ -26,7 +26,7 @@ export default class Model extends EventManager {
         
         // This is a queue to hold actions while one is in process.
         this.actionInProgress = false;
-        this.messengerActionList = []
+        this.messengerActionList = [];
         this.consecutiveActionCount = 0;
         this.activeConsecutiveActionLimit = Model.CONSECUTIVE_ACTION_INITIAL_LIMIT;
 
@@ -244,8 +244,8 @@ export default class Model extends EventManager {
         let workingMemberImpactsList = this.getWorkingMemberImpactsList(member.getId());
 
         //add to the list iff it is not already there
-        if(workingMemberImpactsList.indexOf(depedentMember,) === -1) {
-            workingMemberImpactsList.push(depedentMember,);
+        if(workingMemberImpactsList.indexOf(depedentMember) === -1) {
+            workingMemberImpactsList.push(depedentMember);
             return true;
         }
         else {

@@ -41,7 +41,6 @@ export default class CodeableMember extends DependentMember {
         this.codeSet = false;
         
         this.varInfo = null;
-        this.dependencyInfo = null;
         this.memberFunctionInitializer = null;
         this.memberGenerator = null;
         this.codeErrors = [];
@@ -114,7 +113,6 @@ export default class CodeableMember extends DependentMember {
             this.setField("supplementalCode","");
         }
         this.varInfo = null;
-        this.dependencyInfo = null;
         this.memberFunctionInitializer = null;
         this.memberGenerator = null;
         this.codeErrors = [];
