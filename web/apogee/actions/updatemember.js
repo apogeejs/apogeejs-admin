@@ -39,7 +39,7 @@ import {addActionInfo} from "/apogee/actions/action.js";
 function updateCode(model,actionData) {
 
     let actionResult = {};
-    actionResult.actionInfo = UPDATE_CODE_ACTION_INFO;
+    actionResult.event = ACTION_EVENT;
     
     var memberFullName = actionData.memberName;
     var member = model.getMemberByFullName(memberFullName);
@@ -67,6 +67,8 @@ function updateCode(model,actionData) {
         actionData.supplementalCode);
         
     actionResult.actionDone = true;
+    actionResult.updateMemberDependencies = true;
+    actionResult.recalculateMember = true;
 
     return actionResult;
 }
@@ -75,7 +77,7 @@ function updateCode(model,actionData) {
 function updateData(model,actionData) {
 
     let actionResult = {};
-    actionResult.actionInfo = UPDATE_DATA_ACTION_INFO;
+    actionResult.event = ACTION_EVENT;
     
     var memberFullName = actionData.memberName;
     var member = model.getMemberByFullName(memberFullName);
@@ -99,6 +101,10 @@ function updateData(model,actionData) {
     // - modify the member
     // - modify parent and all parents up to model
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+    //see if there were any dependents, to know if we need to update them
+    //on setting data there will be none.
+    let hadDependents = ((member.getDependsOn)&&(member.getDependsOn().length > 0));
     
     //if this is the resolution (or rejection) of a previously set promise
     if(actionData.sourcePromise) {
@@ -144,32 +150,13 @@ function updateData(model,actionData) {
     }
     
     actionResult.actionDone = true;
+    if(hadDependents) actionResult.updateMemberDependencies = true;
 
     return actionResult;
 }
-        
-/** Update data action info */
-let UPDATE_DATA_ACTION_INFO = {
-    "action": "updateData",
-    "actionFunction": updateData,
-    "checkUpdateAll": false,
-    "updateDependencies": true,
-    "addToRecalc": false,
-    "addDependenceiesToRecalc": true,
-    "event": "memberUpdated"
-};
 
-/** Update code action info */
-let UPDATE_CODE_ACTION_INFO = {
-    "action": "updateCode",
-    "actionFunction": updateCode,
-    "checkUpdateAll": false,
-    "updateDependencies": true,
-    "addToRecalc": true,
-    "event": "memberUpdated"
-};
-
+let ACTION_EVENT = "memberUpdated";
 
 //The following code registers the actions
-addActionInfo(UPDATE_DATA_ACTION_INFO);
-addActionInfo(UPDATE_CODE_ACTION_INFO);
+addActionInfo("updateCode",updateCode);
+addActionInfo("updateData",updateData);

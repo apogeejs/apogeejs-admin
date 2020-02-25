@@ -21,7 +21,7 @@ import {addActionInfo} from "/apogee/actions/action.js";
 function updateModel(model,actionData) { 
 
     let actionResult = {};
-    actionResult.actionInfo = ACTION_INFO;
+    actionResult.event = ACTION_EVENT;
     
     var properties = actionData.properties;
     if(properties) {
@@ -39,16 +39,7 @@ function updateModel(model,actionData) {
     return actionResult;
 }
 
-/** Update data action info */
-let ACTION_INFO = {
-    "action": "updateModel",
-    "actionFunction": updateModel,
-    "checkUpdateAll": false,
-    "updateDependencies": false,
-    "addToRecalc": false,
-    "addDependenceiesToRecalc": false,
-    "event": "modelUpdated"
-};
+let ACTION_EVENT = "modelUpdated";
 
 //The following code registers the actions
-addActionInfo(ACTION_INFO);
+addActionInfo("updateModel",updateModel);

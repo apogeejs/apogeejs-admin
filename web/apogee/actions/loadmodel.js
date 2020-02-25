@@ -27,7 +27,7 @@ import Model from "/apogee/data/Model.js";
 function loadModel(model,actionData) {
 
     let actionResult = {};
-    actionResult.actionInfo = ACTION_INFO;
+    actionResult.event = ACTION_EVENT;
 
     let modelJson = actionData.modelJson;
     
@@ -47,7 +47,7 @@ function loadModel(model,actionData) {
 
     //set the model name
     if(modelJson.name !== undefined) {
-        model.setName(this.name);
+        model.setName(modelJson.name);
     }
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -65,12 +65,7 @@ function loadModel(model,actionData) {
     return actionResult;
 }
 
-/** Action info */
-let ACTION_INFO = {
-    "action": "loadModel",
-    "actionFunction": loadModel,
-    "event": "modelUpdated"
-}
+let ACTION_EVENT = "modelUpdated";
 
 //This line of code registers the action 
-addActionInfo(ACTION_INFO);
+addActionInfo("loadModel",loadModel);

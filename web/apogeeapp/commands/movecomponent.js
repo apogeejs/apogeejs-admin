@@ -48,7 +48,7 @@ movecomponent.executeCommand = function(workspaceManager,commandData) {
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
     
     if(actionResult.actionDone) {
-        let parentMember = model.getMemberByFullName(command.newParentFullName)
+        let parentMember = model.getMemberByFullName(commandData.newParentFullName)
         let member = parentMember.lookupChild(commandData.newMemberName);
         commandResult.target = modelManager.getComponent(member);
         commandResult.action = "updated";

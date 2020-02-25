@@ -18,7 +18,7 @@ import {addActionInfo} from "/apogee/actions/action.js";
 function updateProperties(model,actionData) { 
 
     let actionResult = {};
-    actionResult.actionInfo = ACTION_INFO;
+    actionResult.event = ACTION_EVENT;
     
     var memberFullName = actionData.memberName;
     var folderFunction = model.getMemberByFullName(memberFullName);
@@ -39,21 +39,13 @@ function updateProperties(model,actionData) {
     folderFunction.setReturnValueString(actionData.returnValueString);
     
     actionResult.actionDone = true;
+    actionResult.recalculateMember = true;
 
     return actionResult;
 }
 
-/** Action info */
-let ACTION_INFO = {
-    "action": "updateFolderFunction",
-    "actionFunction": updateProperties,
-    "checkUpdateAll": false,
-    "updateDependencies": false,
-    "addToRecalc": true,
-    "event": "memberUpdated"
-};
-
+let ACTION_EVENT = "memberUpdated";
 
 //This line of code registers the action 
-addActionInfo(ACTION_INFO);
+addActionInfo("updateFolderFunction",updateProperties);
 

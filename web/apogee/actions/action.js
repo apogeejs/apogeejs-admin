@@ -205,13 +205,8 @@ export function doAction(model,actionData) {
 }
 
 /** This function is used to register an action. */
-export function addActionInfo(actionInfo) {
-    if(!actionInfo.action) {
-        //we hav to ignore this action
-        alert("Action name missing from action info: " + JSON.stringify(actionInfo));
-        return;
-    }
-    actionInfoMap[actionInfo.action] = actionInfo;
+export function addActionInfo(actionName,actionFunction) {
+    actionInfoMap[actionName] = actionFunction;
 }
 
 /** This function looks up the proper function for an action and executes it. */
@@ -220,9 +215,9 @@ function callActionFunction(model,actionData) {
     let actionResult;
 
     //do the action
-    var actionInfo = actionInfoMap[actionData.action];
-    if(actionInfo) {
-        actionResult = actionInfo.actionFunction(model,actionData,actionResult);
+    var actionFunction = actionInfoMap[actionData.action];
+    if(actionFunction) {
+        actionResult = actionFunction(model,actionData);
     }
     else {
         actionResult = {};
@@ -241,18 +236,11 @@ function callActionFunction(model,actionData) {
  * @private */
 function updateDependenciesFromAction(actionModifiedMembers) {
     //upate dependencies on table with updated code
-    for(var i = 0; i < actionModifiedMembers.length; i++) {
-        var actionResult = actionModifiedMembers[i];
-        if((actionResult.actionDone)&&(actionResult.member)) {
-            
-            //initialize dependencies for this member
-            if(doInitializeDependencies(actionResult)) {
-                actionResult.member.initializeDependencies();
-            }
-
-            
+    actionModifiedMembers.forEach(actionResult => {
+        if((actionResult.member)&&(actionResult.member.isCodeable)&&(actionResult.updateMemberDependencies)) {
+            actionResult.member.initializeDependencies();
         }
-    }
+    });
 }
 
 /** This method takes the members that are updated (either by code or value) and
@@ -264,16 +252,15 @@ function createRecalculateList(actionModifiedMembers,additionalUpdatedMembers) {
     //add members from each action and/or fields they impact, if applicable
     for(var i = 0; i < actionModifiedMembers.length; i++) {
         var actionResult = actionModifiedMembers[i];
-        if((actionResult.actionDone)&&(actionResult.member)) {
-
-            //update the recalc list
-            if(doAddToRecalc(actionResult)) {
-                addToRecalculateList(recalculateList,actionResult.member);            
-            }
-            else if((doAddDependOnToRecalc(actionResult))) {
-                addDependsOnToRecalculateList(recalculateList,actionResult.member);                         
-            }
+ 
+        //update the recalc list
+        if(actionResult.recalculateMember) {
+            addToRecalculateList(recalculateList,actionResult.member);            
         }
+        else if(actionResult.recalculateDependsOnMembers) {
+            addDependsOnToRecalculateList(recalculateList,actionResult.member);                         
+        }
+   
     }
 
     //add any other modified members to the racalculate list
@@ -300,16 +287,9 @@ function createChangeMap(model,completedResults,recalculateList) {
     //go through explicitly called events from results
     for(var i = 0; i < completedResults.length; i++) {
         var actionResult = completedResults[i];
-        var actionInfo = actionResult.actionInfo;
         
-        if(actionInfo) {
-            
-            let eventName = actionInfo.event;
-            if(!eventName) continue;
-            
-            let member = actionResult.member;
-            
-            mergeIntoChangeMap(changeMap,model,member,eventName);
+        if(actionResult.event) {
+            mergeIntoChangeMap(changeMap,model,actionResult.member,actionResult.event);
         }
     }
     
@@ -387,54 +367,8 @@ function changeMapToChangeList(changeMap) {
  * a member is moved. In these actions we flag that the entire model should be
  * updated.*/
 function checkUpdateAllDep(completedResults) {
-    for(var i = 0; i < completedResults.length; i++) {
-        var actionResult = completedResults[i];
-        
-        //we need to update the entire model if any actino is flagged as such
-        if(actionResult.member) {
-            var actionInfo = actionResult.actionInfo;
-            if((actionInfo)&&(actionInfo.checkUpdateAll)){
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-/** This method if a single action entry requires updating dependencies for the associated member. */
-function doInitializeDependencies(actionResult) {
-    if(!actionResult.member) return false;
-    
-    //only applicable to codeables
-    if((actionResult.actionInfo)&&(actionResult.member.isCodeable)) {
-        return actionResult.actionInfo.updateDependencies;
-    }
-    else {
-        return false;
-    }
-}
-
-/** This method checks if the associated member and its dependencies need to be added to the recalc list. */
-function doAddToRecalc(actionResult) {
-    if(!actionResult.member) return false;
-    if(!actionResult.member.isDependent) return false;
-    
-    if(actionResult.actionInfo) {
-        return actionResult.actionInfo.addToRecalc;
-    }
-    else {
-        return false;
-    }
-}
-
-/** This method checks if the dependencies of the associated needs to be added to the recalc list, but not the member itself. */
-function doAddDependOnToRecalc(actionResult) {
-    if(actionResult.actionInfo) {
-        return actionResult.actionInfo.addDependenceiesToRecalc;
-    }
-    else {
-        return false;
-    }
+    //return true if any results have the updateModelDependencies flag set
+    return completedResults.some(result => result.updateModelDependencies)
 }
 
 /** This method unpacks the actionResult and its child reponse into an array of actionResult. */
@@ -471,7 +405,6 @@ function addToCompletedResultList(completedResults,actionResult) {
 function compoundActionFunction(model,actionData) {
 
     let actionResult = {};
-    actionResult.actionInfo = COMPOUND_ACTION_INFO;
 
     var actionList = actionData.actions;
     actionResult.childActionResults = [];

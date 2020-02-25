@@ -300,7 +300,7 @@ export default class Model extends EventManager {
         let workingMemberImpactsList = this.getWorkingMemberImpactsList(memberId);
 
         //it should appear only once
-        for(var i = 0; i < this.impactsList.length; i++) {
+        for(var i = 0; i < workingMemberImpactsList.length; i++) {
             if(workingMemberImpactsList[i] == depedentMemberId) {
                 workingMemberImpactsList.splice(i,1);
                 return;

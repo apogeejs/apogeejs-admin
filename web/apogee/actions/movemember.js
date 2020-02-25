@@ -16,7 +16,7 @@ import {addActionInfo} from "/apogee/actions/action.js";
 function moveMember(model,actionData) {
 
     let actionResult = {};
-    actionResult.actionInfo = ACTION_INFO;
+    actionResult.event = ACTION_EVENT;
         
     var memberFullName = actionData.memberName;
     var member = model.getMemberByFullName(memberFullName);
@@ -47,6 +47,7 @@ function moveMember(model,actionData) {
         
     member.move(actionData.targetName,targetOwner);
     actionResult.actionDone = true;
+    actionResult.updateModelDependencies = true;
     
     //add the child action results
     let childActionResults = addChildResults(member);
@@ -67,7 +68,7 @@ function addChildResults(member) {
             let childActionResult = {};
             childActionResult.actionDone = true;
             childActionResult.member = child;
-            childActionResult.actionInfo = ACTION_INFO;
+            childActionResult.event = ACTION_EVENT;
             
             childActionResults.push(childActionResult);
             
@@ -83,7 +84,7 @@ function addChildResults(member) {
         let childActionResult = {};
         childActionResult.actionDone = true;
         childActionResult.member = root;
-        childActionResult.actionInfo = ACTION_INFO;
+        childActionResult.event = ACTION_EVENT;
 
         childActionResults.push(childActionResult);
         
@@ -102,17 +103,8 @@ function addChildResults(member) {
     }
 }
 
-
-/** Action info */
-let ACTION_INFO = {
-    "action": "moveMember",
-    "actionFunction": moveMember,
-    "checkUpdateAll": true,
-    "updateDependencies": true,
-    "addToRecalc": true,
-    "event": "memberUpdated"
-};
+let ACTION_EVENT = "memberUpdated";
 
 
 //This line of code registers the action 
-addActionInfo(ACTION_INFO);
+addActionInfo("moveMember",moveMember);

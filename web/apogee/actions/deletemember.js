@@ -47,7 +47,7 @@ function doDelete(member) {
 
     let actionResult = {};
     actionResult.member = member;
-    actionResult.actionIngo = ACTION_INFO;
+    actionResult.event = ACTION_EVENT;
     
     //delete children first
     if(member.isParent) {
@@ -78,21 +78,13 @@ function doDelete(member) {
     }
     
     actionResult.actionDone = true;
+    actionResult.updateModelDependencies = true;
 
     return actionResult;
 }
 
-
-/** Action info */
-let ACTION_INFO = {
-    "action": "deleteMember",
-    "actionFunction": deleteMember,
-    "checkUpdateAll": true,
-    "updateDependencies": false,
-    "addToRecalc": false,
-    "event": "memberDeleted"
-}
+let ACTION_EVENT = "memberDeleted";
 
 
 //This line of code registers the action 
-addActionInfo(ACTION_INFO);
+addActionInfo("deleteMember",deleteMember);

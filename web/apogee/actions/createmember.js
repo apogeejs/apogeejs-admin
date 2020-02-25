@@ -55,7 +55,7 @@ export function createMember(model,owner,memberJson) {
 
     let member;
     let actionResult = {};
-    actionResult.actionInfo = ACTION_INFO;
+    actionResult.event = ACTION_EVENT;
     
     //create member
     let generator;
@@ -93,20 +93,13 @@ export function createMember(model,owner,memberJson) {
 
     actionResult.member = member;
     actionResult.actionDone = true;
+    actionResult.updateModelDependencies = true;
+    actionResult.recalculateMember = true;
 
     return actionResult;
 }
 
-
-/** Action info */
-let ACTION_INFO = {
-    "action": "createMember",
-    "actionFunction": createMemberAction,
-    "checkUpdateAll": true,
-    "updateDependencies": true,
-    "addToRecalc": true,
-    "event": "memberCreated"
-}
+let ACTION_EVENT = "memberCreated";
 
 //This line of code registers the action 
-addActionInfo(ACTION_INFO);
+addActionInfo("createMember",createMemberAction);
