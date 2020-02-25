@@ -3,12 +3,13 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Model from "/apogee/data/Model.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
+import ActionError from "/apogee/lib/ActionError.js";
 
 /** This class encapsulatees a data table for a JSON object */
 export default class JsonTable extends CodeableMember {
 
-    constructor(name,owner,initialData) {
-        super(name);
+    constructor(model,name,owner,initialData) {
+        super(model,name);
 
         //mixin init where needed
         this.contextHolderMixinInit();
@@ -23,14 +24,30 @@ export default class JsonTable extends CodeableMember {
         }  
 
         if(initialData.functionBody !== undefined) {
+            //apply initial code
             this.applyCode(initialData.argList,
                 initialData.functionBody,
                 initialData.supplementalCode);
         }
         else {
-            if(initialData.data === undefined) initialData.data = "";
-            
-            this.setData(initialData.data);
+            //apply initial data
+            //the value should be either some valid data or the invalid value
+            if(initialData.invalidValueData) {
+                this.setResultInvalid(true);
+            }
+            else if(initialData.errorValueData) {
+                let actionError = new ActionError(initialData.errorValueData,ActionError.ERROR_TYPE_MODEL,this);
+                this.addError(actionError);
+            }
+            else {
+                let initialDataValue = initialData.data;
+                if(initialDataValue === undefined) initialDataValue = "";
+
+                this.setField("data",initialDataValue);
+            }
+
+            this.setField("functionBody","");
+            this.setField("supplementalCode","");
         }
     }
 
@@ -93,8 +110,8 @@ export default class JsonTable extends CodeableMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(owner,json) {
-        return new JsonTable(json.name,owner,json.updateData);
+    static fromJson(model,owner,json) {
+        return new JsonTable(model,json.name,owner,json.updateData);
     }
 }
 

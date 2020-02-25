@@ -46,13 +46,13 @@ function createMemberAction(model,actionData) {
     }
 
     let memberJson = actionData.createData;
-    let actionResult = createMember(owner,memberJson);
+    let actionResult = createMember(model,owner,memberJson);
     return actionResult;
 }
 
 /** This function creates a member and any children for that member, returning an action result for
  * the member. This is exported so create member can be used by other actions, such as load model. */
-export function createMember(owner,memberJson) {
+export function createMember(model,owner,memberJson) {
 
     let member;
     let actionResult = {};
@@ -70,14 +70,14 @@ export function createMember(owner,memberJson) {
         // - modify parent and all parents up to model
         // - created object is automatically unlocked.
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        member = generator.createMember(owner,memberJson);   
+        member = generator.createMember(model,owner,memberJson); 
 
         //instantiate children if there are any
         if(memberJson.children) {
             actionResult.childActionResults = [];
             for(let childName in memberJson.children) {
                 let childJson = memberJson.children[childName];
-                let childActionResult = createMember(member,childJson);
+                let childActionResult = createMember(model,member,childJson);
                 actionResult.childActionResults.push(childActionResult);
             }
         }

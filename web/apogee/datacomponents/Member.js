@@ -19,7 +19,7 @@ import FieldObject from "/apogeeutil/FieldObject.js";
  * a folder and it is called the root folder. */
 export default class Member {
 
-    constructor(name) {
+    constructor(model,name) {
         this.id = _createId();
 
         this.fieldObjectMixinInit();
@@ -27,6 +27,7 @@ export default class Member {
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
         this.setField("name",name);
+        this.setField("model",model);
         //"owner"
         //"data"
         this.setField("state",apogeeutil.STATE_NORMAL);
@@ -39,6 +40,8 @@ export default class Member {
         this.resultPending = false;
         this.resultInvalid = false;
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+        model.registerMember(this);
     }
 
     initOwner(owner) {
@@ -126,13 +129,7 @@ export default class Member {
 
     /** this method gets the model. */
     getModel() {
-        let owner = this.getField("owner");
-        if(owner) {
-            return owner.getModel();
-        }
-        else {
-            return null;
-        }
+        return this.getField("model");
     }
 
     /** this method gets the root folder/namespace for this object. */

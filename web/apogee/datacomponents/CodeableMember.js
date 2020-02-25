@@ -24,8 +24,8 @@ import DependentMember from "/apogee/datacomponents/DependentMember.js"
 export default class CodeableMember extends DependentMember {
 
     /** This initializes the component. argList is the arguments for the object function. */
-    constructor(name) {
-        super(name);
+    constructor(model,name) {
+        super(model,name);
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -66,7 +66,7 @@ export default class CodeableMember extends DependentMember {
     } 
 
     getSetCodeOk() {
-        return this.constuctor.generator.setCodeOk;
+        return this.constructor.generator.setCodeOk;
     }
 
     /** This method returns the argument list.  */
@@ -121,8 +121,7 @@ export default class CodeableMember extends DependentMember {
         this.setResultPending(false);
         this.setResultInvalid(false);
         
-        var newDependsOn = [];
-        this.updateDependencies(newDependsOn);
+        this.updateDependencies([]);
     }
 
     /** This method returns the formula for this member.  */
@@ -130,10 +129,10 @@ export default class CodeableMember extends DependentMember {
         
         if((this.hasCode())&&(this.varInfo)&&(this.codeErrors.length === 0)) {
             try {
-                var newDependencyList = getDependencyInfo(this.varInfo,this.getContextManager());
+                var newDependsOnMemberList = getDependencyInfo(this.varInfo,this.getContextManager());
 
                 //update dependencies
-                this.updateDependencies(newDependencyList);
+                this.updateDependencies(newDependsOnMemberList);
             }
             catch(ex) {
                 this.codeErrors.push(ActionError.processException(ex,"Codeable - Set Dependencies",false));
@@ -147,7 +146,7 @@ export default class CodeableMember extends DependentMember {
 
     /** This method udpates the dependencies if needed because
      *the passed variable was added.  */
-    updateDependeciesForModelChange(recalculateList) {
+    updateDependeciesForModelChange(additionalUpdatedMembers) {
         if((this.hasCode())&&(this.varInfo)) {
                     
             //calculate new dependencies
@@ -158,7 +157,7 @@ export default class CodeableMember extends DependentMember {
             var dependenciesChanged = this.updateDependencies(newDependencyList);
             if(dependenciesChanged) {
                 //add to update list
-                addToRecalculateList(recalculateList,this);
+                additionalUpdatedMembers.push(this);
             }  
         }
     }
@@ -248,7 +247,30 @@ export default class CodeableMember extends DependentMember {
             updateData.supplementalCode = this.getSupplementalCode();
         }
         else {
-            updateData.data = this.getData();
+            //handle the possible data value cases
+            if(this.getResultInvalid()) {
+                //invalid valude
+                updateData.invalidValueData = true;
+            }
+            else if(this.getResultPending()) {
+                //pending value - we can't do anything with this
+                alert("There is a pending result in a field being saved. This may not be saved properly.");
+                updateData.data = "<unknonw pending value>";
+            }
+            else if(this.hasError()) {
+                //error data - save error (well, the first one)
+                let errors = this.getErrors();
+                if(errors.length >= 1) {
+                    //right now we just take the first error message. If the data is set as an error, there should be
+                    //just one error. It is an ActionError instance.
+                    errorMsg = errors[0].msg;
+                }
+                updateData.errorValueData = errorMsg;
+            }
+            else {
+                //save the data value
+                updateData.data = this.getData();
+            }
         }
         return updateData;
     }

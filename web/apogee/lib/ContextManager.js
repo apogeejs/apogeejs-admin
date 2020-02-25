@@ -70,9 +70,9 @@ ContextManager.prototype.lookupValue = function(varName) {
     var data;
     for(var i = 0; i < this.contextList.length; i++) {
         var entry = this.contextList[i];        
-        if(entry.parent) {
+        if(entry.contextHolderAsParent) {
             //for parent entries, look up the child and read the data
-            var child = entry.parent.lookupChild(varName);
+            var child = this.contextHolder.lookupChild(varName);
             if(child) {
                 data = child.getData();
             }

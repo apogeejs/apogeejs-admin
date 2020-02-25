@@ -101,7 +101,7 @@ Parent.createContextManager = function() {
     var contextManager = new ContextManager(this);
     //add an entry for this folder. Make it local unless this si a root folder
     var myEntry = {};
-    myEntry.parent = this;
+    myEntry.contextHolderAsParent = true;
     contextManager.addToContextList(myEntry);
     
     return contextManager;

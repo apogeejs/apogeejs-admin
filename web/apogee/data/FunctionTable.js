@@ -7,8 +7,8 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 /** This is a function. */
 export default class FunctionTable extends CodeableMember {
 
-    constructor(name,owner,initialData) {
-        super(name);
+    constructor(model,name,owner,initialData) {
+        super(model,name);
 
         //mixin init where needed
         this.contextHolderMixinInit();    
@@ -76,8 +76,8 @@ export default class FunctionTable extends CodeableMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(owner,json) {
-        return new FunctionTable(json.name,owner,json.updateData);
+    static fromJson(model,owner,json) {
+        return new FunctionTable(model,json.name,owner,json.updateData);
     }
 
     /** This method extends the base method to get the property values

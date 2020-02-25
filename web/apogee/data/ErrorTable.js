@@ -6,8 +6,8 @@ import Member from "/apogee/datacomponents/Member.js";
  * is intended to be used as a placeholder when a table generator is not found. */
 export default class ErrorTable extends Member {
 
-    constructor(name,owner,completeJson) {
-        super(name);
+    constructor(model,name,owner,completeJson) {
+        super(model,name);
         
         this.initOwner(owner);
         
@@ -44,9 +44,9 @@ export default class ErrorTable extends Member {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(owner,json) {
+    static fromJson(model,owner,json) {
         //note - we send in the complete JSON so we can return is on saving
-        return new ErrorTable(json.name,owner,json);
+        return new ErrorTable(model,json.name,owner,json);
     }
 
     //------------------------------
@@ -55,7 +55,7 @@ export default class ErrorTable extends Member {
 
     /** This method udpates the dependencies if needed because
      *a variable was added or removed from the model.  */
-    updateDependeciesForModelChange(object) {
+    updateDependeciesForModelChange(additionalUpdatedMembers) {
         //no action
     }
 
@@ -65,12 +65,6 @@ export default class ErrorTable extends Member {
     * @private */
     needsCalculating() {
         return false;
-    }
-
-    /** This method udpates the dependencies if needed because
-     *the passed variable was added.  */
-    updateDependeciesForModelChange(recalculateList) {
-        //no action
     }
 
 }

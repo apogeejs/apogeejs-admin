@@ -102,29 +102,36 @@ export function doAction(model,actionData) {
             return returnValue;
         }
         
-        //flatten action result tree into a list
-        var completedResults = flattenActionResult(actionResult);
+        //flatten action result tree into a list of objects modified in the action
+        var actionModifiedMembers = flattenActionResult(actionResult);
+
+        //this list will be additional modified members - from dependency changes
+        //due to adding and deleting members (This happens when a new remote member is referenced
+        //a member formula because of creating or deleting. This is not a common event, but it does happen)
+        var additionalUpdatedMembers = [];
         
         //figure out other objects that need to be updated
         //also update dependencies (and the inverse - impacts)
-        var updateAllDep = checkUpdateAllDep(completedResults);
-        var recalculateList = [];
+        var updateAllDep = checkUpdateAllDep(actionModifiedMembers);
         if(updateAllDep) {
             //update entire model - see conditions bewlo
-            model.updateDependeciesForModelChange(recalculateList);
+            model.updateDependeciesForModelChange(additionalUpdatedMembers);
         }
         else {
-            updateDependenciesFromAction(completedResults,recalculateList);
+            updateDependenciesFromAction(actionModifiedMembers);
         }
 
         //commit the updated impacts map (inverse of dependency map) 
         model.finalizeImpactsMap();
+
+        //populate recalc list
+        let recalculateList = createRecalculateList(actionModifiedMembers,additionalUpdatedMembers);
         
         //recalculate all needed objects
         callRecalculateList(recalculateList);
 
         //create the change map
-        changeMap = createChangeMap(model,completedResults,recalculateList);
+        changeMap = createChangeMap(model,actionModifiedMembers,recalculateList);
     
         //fire events
         fireEvents(model,changeMap);
@@ -232,16 +239,32 @@ function callActionFunction(model,actionData) {
 
 /** This method makes sure the member dependencies in the model are properly updated. 
  * @private */
-function updateDependenciesFromAction(completedResults,recalculateList) {
+function updateDependenciesFromAction(actionModifiedMembers) {
     //upate dependencies on table with updated code
-    for(var i = 0; i < completedResults.length; i++) {
-        var actionResult = completedResults[i];
+    for(var i = 0; i < actionModifiedMembers.length; i++) {
+        var actionResult = actionModifiedMembers[i];
         if((actionResult.actionDone)&&(actionResult.member)) {
             
             //initialize dependencies for this member
             if(doInitializeDependencies(actionResult)) {
                 actionResult.member.initializeDependencies();
             }
+
+            
+        }
+    }
+}
+
+/** This method takes the members that are updated (either by code or value) and
+ * adds them to the list of members that need to be recalculated. To do this, we must
+ * first have all dependencies updated, sicne it relies on the impacts list. */
+function createRecalculateList(actionModifiedMembers,additionalUpdatedMembers) {
+    let recalculateList = [];
+
+    //add members from each action and/or fields they impact, if applicable
+    for(var i = 0; i < actionModifiedMembers.length; i++) {
+        var actionResult = actionModifiedMembers[i];
+        if((actionResult.actionDone)&&(actionResult.member)) {
 
             //update the recalc list
             if(doAddToRecalc(actionResult)) {
@@ -252,6 +275,11 @@ function updateDependenciesFromAction(completedResults,recalculateList) {
             }
         }
     }
+
+    //add any other modified members to the racalculate list
+    recalculateList.push(...additionalUpdatedMembers);
+
+    return recalculateList;
 }
 
 /** This function fires the proper events for the  It combines events to 

@@ -57,7 +57,7 @@ function loadModel(model,actionData) {
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
     //load the model members (root folder and its children)
-    let memberActionResult = createMember(model,modelJson.data);
+    let memberActionResult = createMember(model,model,modelJson.data);
     actionResult.childActionResults = [memberActionResult];
 
     actionResult.actionDone = true;

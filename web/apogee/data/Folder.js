@@ -8,8 +8,8 @@ import Parent from "/apogee/datacomponents/Parent.js";
 /** This is a folder. */
 export default class Folder extends DependentMember {
 
-    constructor(name,owner) {
-        super(name);
+    constructor(model,name,owner) {
+        super(model,name);
 
         //mixin init where needed
         this.contextHolderMixinInit();
@@ -23,14 +23,10 @@ export default class Folder extends DependentMember {
         this.setField("childMap",{});
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //DERIVED FIELDS - this does double as data, which is a field
-        this.dataMap = {};
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        
         //make sure the data map is frozen
-        Object.freeze(this.dataMap);
-        this.setData(this.dataMap);
+        let dataMap = {};
+        Object.freeze(dataMap);
+        this.setData(dataMap);
     }
 
     //------------------------------
@@ -134,12 +130,12 @@ export default class Folder extends DependentMember {
 
     /** This method updates the dependencies of any children
      * based on an object being added. */
-    updateDependeciesForModelChange(recalculateList) {
+    updateDependeciesForModelChange(additionalUpdatedMembers) {
         let childMap = this.getField("childMap");
         for(var key in childMap) {
             var child = childMap[key];
             if(child.isDependent) {
-                child.updateDependeciesForModelChange(recalculateList);
+                child.updateDependeciesForModelChange(additionalUpdatedMembers);
             }
         }
     }
@@ -150,8 +146,8 @@ export default class Folder extends DependentMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(owner,json) {
-        var folder = new Folder(json.name,owner);
+    static fromJson(model,owner,json) {
+        var folder = new Folder(model,json.name,owner);
         if(json.childrenNotWriteable) {
             folder.setChildrenWriteable(false);
         }
@@ -189,13 +185,13 @@ export default class Folder extends DependentMember {
     /** This method updates the table data object in the folder data map. 
      * @private */
     calculateDependents() {
-        let newDependsOn = [];
+        let dependsOnMemberList = [];
         let childMap = this.getField("childMap");
         for(var name in childMap) {
             var child = childMap[name];
-            newDependsOn.push(child);
+            dependsOnMemberList.push(child);
         }
-        this.updateDependencies(newDependsOn);
+        this.updateDependencies(dependsOnMemberList);
     }
 
     /** This method creates a new immutable data map, either adding a give name and data or
@@ -203,11 +199,12 @@ export default class Folder extends DependentMember {
      * @private */
     spliceDataMap(addOrRemoveName,addData) {
         var newDataMap = {};
+        let oldDataMap = this.getField("data");
         
         //copy old data
-        for(var key in this.dataMap) {
+        for(var key in oldDataMap) {
             if(key !== addOrRemoveName) {
-                newDataMap[key] = this.dataMap[key];
+                newDataMap[key] = oldDataMap[key];
             }
         }
         //add or update thiis child data

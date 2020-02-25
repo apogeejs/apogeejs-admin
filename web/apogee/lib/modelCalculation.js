@@ -22,7 +22,8 @@ export function addDependsOnToRecalculateList(recalculateList,member) {
     let model = member.getModel();   
     var impactsList = model.getImpactsList(member);
     for(var i = 0; i < impactsList.length; i++) {
-        addToRecalculateList(recalculateList,impactsList[i]);
+        let impactor = model.lookupMember(impactsList[i]);
+        addToRecalculateList(recalculateList,impactor);
     }
 }
 

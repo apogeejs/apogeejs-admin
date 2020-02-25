@@ -39,9 +39,11 @@ export default class Model extends EventManager {
         }
 
         this.setField("impactsMap",{});
+        this.setField("memberMap",{});
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         this.workingImpactsMap = null;
+        this.workingMemberMap = null;
     }
 
     /** This method returns the root object - implemented from RootHolder.  */
@@ -71,10 +73,10 @@ export default class Model extends EventManager {
     }
 
     /** This method updates the dependencies of any children in the model. */
-    updateDependeciesForModelChange(recalculateList) {
+    updateDependeciesForModelChange(additionalUpdatedMembers) {
         let rootFolder = this.getField("rootFolder");
         if(rootFolder) {
-            rootFolder.updateDependeciesForModelChange(recalculateList);
+            rootFolder.updateDependeciesForModelChange(additionalUpdatedMembers);
         }
     }
 
@@ -215,6 +217,42 @@ export default class Model extends EventManager {
     }
 
     //============================
+    // MemberMap Functions
+    //============================
+
+    lookupMember(memberId) {
+        let memberMap = this._getMemberMap()
+        return memberMap[memberId];
+    }
+
+    registerMember(member) {
+        if(!this.workingMemberMap) {
+            this._populateWorkingMemberMap();
+        }
+
+        this.workingMemberMap[member.getId()] = member;
+    }
+
+    finalizeMemberMap() {
+        if(this.workingMemberMap) {
+            this.setField("memberMap");
+            this.workingMemberMap = null;
+        }
+    }
+
+    _getMemberMap() {
+        return this.workingMemberMap ? this.workingMemberMap : this.getField("memberMap");
+    }
+
+    /** This method makes a mutable copy of the member map, and places it in the working member map. */
+    _populateWorkingMemberMap() {
+        let memberMap = this.getField("memberMap");
+        let newMemberMap = {};
+        Object.assign(newMemberMap,memberMap);
+        this.workingMemberMap = newMemberMap;
+    }
+
+    //============================
     // Impact List Functions
     //============================
 
@@ -229,23 +267,25 @@ export default class Model extends EventManager {
     /** This shoudl be called after all dependencies have been updated to store the
      * impacts map (We kept a mutable working copy during construction for efficiency)  */
     finalizeImpactsMap() {
-        this.setField("impactsMap",this.workingImpactsMap);
-        this.workingImpactsMap = null;
+        if(this.workingImpactsMap) {
+            this.setField("impactsMap",this.workingImpactsMap);
+            this.workingImpactsMap = null;
+        } 
     }
 
     
     /** This method adds a data member to the imapacts list for this node.
      * The return value is true if the member was added and false if it was already there. 
      * @private */
-    addToImpactsList(depedentMember,member) {
+    addToImpactsList(depedentMemberId,memberId) {
         //don't let a member impact itself
-        if(member === depedentMember) return;
+        if(memberId === depedentMemberId) return;
 
-        let workingMemberImpactsList = this.getWorkingMemberImpactsList(member.getId());
+        let workingMemberImpactsList = this.getWorkingMemberImpactsList(memberId);
 
         //add to the list iff it is not already there
-        if(workingMemberImpactsList.indexOf(depedentMember) === -1) {
-            workingMemberImpactsList.push(depedentMember);
+        if(workingMemberImpactsList.indexOf(depedentMemberId) === -1) {
+            workingMemberImpactsList.push(depedentMemberId);
             return true;
         }
         else {
@@ -255,13 +295,13 @@ export default class Model extends EventManager {
 
     /** This method removes a data member from the imapacts list for this node. 
      * @private */
-    removeFromImpactsList(depedentMember,member) {
+    removeFromImpactsList(depedentMemberId,memberId) {
 
-        let workingMemberImpactsList = this.getWorkingMemberImpactsList(member.getId());
+        let workingMemberImpactsList = this.getWorkingMemberImpactsList(memberId);
 
         //it should appear only once
         for(var i = 0; i < this.impactsList.length; i++) {
-            if(workingMemberImpactsList[i] == depedentMember) {
+            if(workingMemberImpactsList[i] == depedentMemberId) {
                 workingMemberImpactsList.splice(i,1);
                 return;
             }
@@ -273,7 +313,7 @@ export default class Model extends EventManager {
         //make sure our working impacts map is populated
         //we will use this wile buildign the impacts map and then set the impacts map field
         if(!this.workingImpactsMap) {
-            this.populateWorkingImpactsMap();
+            this._populateWorkingImpactsMap();
         }
 
         let memberImpactsList = this.workingImpactsMap[memberId];
@@ -289,7 +329,7 @@ export default class Model extends EventManager {
      * when we update the impacts map. We use a working variable since the reconstruction
      * spans many calls to the add/remove function. In the copy, it makes a shallow copy of 
      * each impacts list in the map. */
-    populateWorkingImpactsMap() {
+    _populateWorkingImpactsMap() {
         let impactsMap = this.getField("impactsMap");
         let newImpactsMap = {};
         for(let idString in impactsMap) {

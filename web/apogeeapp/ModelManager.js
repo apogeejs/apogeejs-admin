@@ -478,8 +478,12 @@ export default class ModelManager extends EventManager {
                 memberStruct.parent = parent ? parent.getFullName() : null;
 
                 if(member.isDependent) {
-                    if(member.getDependsOn().length > 0) {
-                        memberStruct.dep = member.getDependsOn().map(dependency => dependency.getFullName());
+                    let dependsOnList = member.getDependsOn();
+                    if(dependsOnList.length > 0) {
+                        memberStruct.dep = dependsOnList.map(dependencyId => {
+                            let dependency = this.model.lookupMember(dependencyId);
+                            dependency.getFullName()
+                        });
                     }
                 }
 

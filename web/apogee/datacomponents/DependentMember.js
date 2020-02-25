@@ -13,13 +13,17 @@ import Member from "/apogee/datacomponents/Member.js";
 export default class DependentMember extends Member {
 
     /** This initializes the component */
-    constructor(name) {
-        super(name);
+    constructor(model,name) {
+        super(model,name);
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //DERIVED FIELDS (presumably based on implementation)
+        //FIELDS
         //this is the list of dependencies
-        this.dependsOnList = [];
+        this.setField("dependsOnList",[]);
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //WORKING FIELDS
         this.calcPending = false;
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     }
@@ -32,7 +36,7 @@ export default class DependentMember extends Member {
 
     /** This returns a list of the members that this member depends on. */
     getDependsOn() {
-        return this.dependsOnList;
+        return this.getField("dependsOnList");
     }
 
     /** This returns the calc pending flag.  */
@@ -48,8 +52,9 @@ export default class DependentMember extends Member {
 
     //Must be implemented in extending object
     ///** This method udpates the dependencies if needed because
-    // *a variable was added or removed from the model.  */
-    //updateDependeciesForModelChange(object);
+    // *a variable was added or removed from the model. Any member that has its dependencies udpated
+    // * should be added to the additionalUpdatedObjects list. */
+    //updateDependeciesForModelChange(additionalUpdatedMembers);
 
     ///** This is a check to see if the object should be checked for dependencies 
     // * for recalculation. It is safe for this method to always return false and
@@ -76,8 +81,12 @@ export default class DependentMember extends Member {
         var resultInvalid = false;
         
         //make sure dependencies are up to date
-        for(var i = 0; i < this.dependsOnList.length; i++) {
-            var impactor = this.dependsOnList[i];
+        let dependsOnList = this.getField("dependsOnList");
+        for(var i = 0; i < dependsOnList.length; i++) {
+            var impactorId = dependsOnList[i];
+            let model = this.getModel();
+            let impactor = model.lookupMember(impactorId);
+
             if((impactor.isDependent)&&(impactor.getCalcPending())) {
                 impactor.calculate();
             }
@@ -107,10 +116,11 @@ export default class DependentMember extends Member {
     onDeleteDependent() {
         //remove this dependent from the impactor
         let model = this.getModel();
-        for(var i = 0; i < this.dependsOnList.length; i++) {
-            var remoteMember = this.dependsOnList[i];
+        let dependsOnList = this.getField("dependsOnList");
+        for(var i = 0; i < dependsOnList.length; i++) {
+            var remoteMemberId = dependsOnList[i];
             //remove from imacts list
-            model.removeFromImpactsList(this,remoteMember);
+            model.removeFromImpactsList(this.getId(),remoteMemberId);
         }
     }
     //===================================
@@ -118,53 +128,43 @@ export default class DependentMember extends Member {
     //===================================
 
     /** This sets the dependencies based on the code for the member. */
-    updateDependencies(newDependsOn) {
+    updateDependencies(dependsOnMemberList) {
         
         var dependenciesUpdated = false;
         let model = this.getModel();
         
-        if(!newDependsOn) {
-            newDependsOn = [];
+        if(!dependsOnMemberList) {
+            dependsOnMemberList = [];
         }
+        let newDependsOnList = [];
+        let oldDependsOnList = this.getField("dependsOnList");
         
-        //retireve the old list
-        var oldDependsOn = this.dependsOnList;
-        
-        //create the new dependency list
-        this.dependsOnList = [];
-        
-        //update the dependency links among the members
-        var newDependencySet = {};
-        var remoteMember;
+        //recod the new dependencies. Check for additions
         var i;
-        for(i = 0; i < newDependsOn.length; i++) {
-            remoteMember = newDependsOn[i];
-                
-            this.dependsOnList.push(remoteMember);
+        for(i = 0; i < dependsOnMemberList.length; i++) {
+            let remoteMember = dependsOnMemberList[i];  
+            let remoteMemberId = remoteMember.getId()
+            newDependsOnList.push(remoteMemberId);
 
-            //update this member
-            var isNewAddition = model.addToImpactsList(this,remoteMember);
-            if(isNewAddition) {
+            //check if this is a change
+            if(oldDependsOnList.indexOf(remoteMemberId) < 0) {
+                model.addToImpactsList(this.getId(),remoteMemberId);
                 dependenciesUpdated = true;
-            }
-
-            //create a set of new member to use below
-            newDependencySet[remoteMember.getId()] = true;
-            
+            }  
         }
         
-        //update for links that have gotten deleted
-        for(i = 0; i < oldDependsOn.length; i++) {
-            remoteMember = oldDependsOn[i];
-            
-            var stillDependsOn = newDependencySet[remoteMember.getId()];
-            
-            if(!stillDependsOn) {
+        //check for removals
+        for(i = 0; i < oldDependsOnList.length; i++) {
+            let remoteMemberId = oldDependsOnList[i];
+
+            if(newDependsOnList.indexOf(remoteMemberId) < 0) {
                 //remove from imacts list
-                model.removeFromImpactsList(this,remoteMember);
+                model.removeFromImpactsList(this.getId(),remoteMemberId);
                 dependenciesUpdated = true;
             }
         }
+
+        this.setField("dependsOnList",newDependsOnList);
         
         return dependenciesUpdated;
     }

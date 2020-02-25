@@ -13,8 +13,8 @@ import CommandManager from "/apogeeapp/commands/CommandManager.js";
  * that is expanded into data objects. */
 export default class FolderFunction extends DependentMember {
 
-    constructor(name,owner,initialData) {
-        super(name);
+    constructor(model,name,owner,initialData) {
+        super(model,name);
 
         //mixin init where needed
         this.dependentMixinInit();
@@ -48,9 +48,9 @@ export default class FolderFunction extends DependentMember {
     /** This method sets the root object - implemented from RootHolder.  */
     setRoot(child) {
         this.setField("internalFolder",child);
-        var newDependsOn = [];
-        if(child) newDependsOn.push(child);
-        this.updateDependencies(newDependsOn);
+        var dependsOnMemberList = [];
+        if(child) dependsOnMemberList.push(child);
+        this.updateDependencies(dependsOnMemberList);
     }
 
     /** This gets the name of the return object for the folderFunction function. */
@@ -75,7 +75,7 @@ export default class FolderFunction extends DependentMember {
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
     static fromJson(owner,json) {
-        return new FolderFunction(json.name,owner,json.updateData);
+        return new FolderFunction(model,json.name,owner,json.updateData);
     }
 
     /** This method adds any additional data to the json saved for this member. 
@@ -153,10 +153,10 @@ export default class FolderFunction extends DependentMember {
 
     /** This method updates the dependencies of any children
      * based on an object being added. */
-    updateDependeciesForModelChange(recalculateList) {
+    updateDependeciesForModelChange(additionalUpdatedMembers) {
         let internalFolder = this.getField("internalFolder");
         if(internalFolder) {
-            internalFolder.updateDependeciesForModelChange(recalculateList);
+            internalFolder.updateDependeciesForModelChange(additionalUpdatedMembers);
         }
     }
 

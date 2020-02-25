@@ -4,7 +4,7 @@
  * a lit of member objects which this member depends on.
  */
 export function getDependencyInfo(varInfo,contextManager) {
-    var dependencyList = [];
+    var newDependsOnMemberList = [];
 	var objectMap = {};
 	
 	//cycle through the variables used
@@ -25,7 +25,7 @@ export function getDependencyInfo(varInfo,contextManager) {
                     //add as dependent (note this may not be a data object - check later!)
                     var memberId = impactor.getId();
                     if(!objectMap[memberId]) {
-                        dependencyList.push(impactor);
+                        newDependsOnMemberList.push(impactor);
                         objectMap[memberId] = true;
                     }
                 }
@@ -33,5 +33,5 @@ export function getDependencyInfo(varInfo,contextManager) {
 		}
 	}
 	
-	return dependencyList;
+	return newDependsOnMemberList;
 }
