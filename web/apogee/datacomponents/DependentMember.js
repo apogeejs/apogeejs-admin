@@ -1,4 +1,3 @@
-import ActionError from "/apogee/lib/ActionError.js";
 import Member from "/apogee/datacomponents/Member.js";
 
 /** This mixin encapsulates an member whose value depends on on another
@@ -178,8 +177,6 @@ export default class DependentMember extends Member {
                 if(i > 0) message += ", ";
                 message += errorDependencies[i].getFullName();
             }
-            var actionError = new ActionError(message,"Calculation - Dependency",this);
-            this.addError(actionError);   
-
+            this.addError(message);   
     }
 }

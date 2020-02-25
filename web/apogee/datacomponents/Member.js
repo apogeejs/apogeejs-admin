@@ -156,7 +156,8 @@ export default class Member {
         return this.getField("stateMessage");
     }
 
-    /** This method sets the pre calc error for this dependent. */
+    /** This method adds an error for this member. It will be valid for the current round of calculation of
+     * this member. The error may be a javascript Error object of string (or any other object really). */
     addError(error) {
         this.errors.push(error);
         this._calculateState();
@@ -164,7 +165,7 @@ export default class Member {
 
     /** This method sets the pre calc error for this dependent. */
     addErrors(errorList) {
-        this.errors = this.errors.concat(errorList);
+        this.errors.push(...errorList)
         this._calculateState();
     }
 
@@ -360,9 +361,9 @@ export default class Member {
         let newMessage;
         if(this.hasError()) {
             var errorMsg = "";
-            var actionErrors = this.getErrors();
-            for(var i = 0; i < actionErrors.length; i++) {
-                errorMsg += actionErrors[i].msg + "\n";
+            var errors = this.getErrors();
+            for(var i = 0; i < errors.length; i++) {
+                errorMsg += errors[i].toString() + "\n";
             }
 
             newState = apogeeutil.STATE_ERROR;

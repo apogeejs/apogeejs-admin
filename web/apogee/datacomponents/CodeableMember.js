@@ -1,9 +1,7 @@
 import base from "/apogeeutil/base.js";
 import Messenger from "/apogee/actions/Messenger.js";
-import {addToRecalculateList} from "/apogee/lib/modelCalculation.js";
 import {processCode} from "/apogee/lib/codeCompiler.js"; 
 import {getDependencyInfo} from "/apogee/lib/codeDependencies.js";
-import ActionError from "/apogee/lib/ActionError.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
 import DependentMember from "/apogee/datacomponents/DependentMember.js"
 
@@ -135,7 +133,7 @@ export default class CodeableMember extends DependentMember {
                 this.updateDependencies(newDependsOnMemberList);
             }
             catch(ex) {
-                this.codeErrors.push(ActionError.processException(ex,"Codeable - Set Dependencies",false));
+                this.codeErrors.push(ex);
             }
         }
         else {
@@ -191,9 +189,7 @@ export default class CodeableMember extends DependentMember {
         }
         
         if((!this.memberGenerator)||(!this.memberFunctionInitializer)) {
-            var msg = "Function not found for member: " + this.getName();
-            var actionError = new ActionError(msg,"Codeable - Calculate",this);
-            this.addError(actionError);
+            this.addError("Function not found for member: " + this.getName());
             this.clearCalcPending();
             return;
         } 
@@ -223,10 +219,7 @@ export default class CodeableMember extends DependentMember {
                     console.error(error.stack);
                 }
 
-                var errorMsg = (error.message) ? error.message : "Unknown error";
-                var actionError = new ActionError(errorMsg,"Codeable - Calculate",this);
-                actionError.setParentException(error);
-                this.addError(actionError);
+                this.addError(error);
             }
         }
         
@@ -250,7 +243,7 @@ export default class CodeableMember extends DependentMember {
             //handle the possible data value cases
             if(this.getResultInvalid()) {
                 //invalid valude
-                updateData.invalidValueData = true;
+                updateData.invalidValue = true;
             }
             else if(this.getResultPending()) {
                 //pending value - we can't do anything with this
@@ -258,14 +251,8 @@ export default class CodeableMember extends DependentMember {
                 updateData.data = "<unknonw pending value>";
             }
             else if(this.hasError()) {
-                //error data - save error (well, the first one)
-                let errors = this.getErrors();
-                if(errors.length >= 1) {
-                    //right now we just take the first error message. If the data is set as an error, there should be
-                    //just one error. It is an ActionError instance.
-                    errorMsg = errors[0].msg;
-                }
-                updateData.errorValueData = errorMsg;
+                //save the errors as strings only
+                updateData.errorList = this.getErrors().map(error => error.toString());
             }
             else {
                 //save the data value
@@ -326,7 +313,7 @@ export default class CodeableMember extends DependentMember {
                 this.memberFunctionInitializer = generatedFunctions.initializer;                       
             }
             catch(ex) {
-                this.codeErrors.push(ActionError.processException(ex,"Codeable - Set Code",false));
+                this.codeErrors.push(ex);
             }
         }
         else {
@@ -350,9 +337,7 @@ export default class CodeableMember extends DependentMember {
         
         //make sure this in only called once
         if(this.dependencyInitInProgress) {
-            var errorMsg = "Circular reference error";
-            var actionError = new ActionError(errorMsg,"Codeable - Calculate",this);
-            this.addError(actionError);
+            this.addError("Circular reference error");
             //clear calc in progress flag
             this.dependencyInitInProgress = false;
             this.functionInitialized = true;
@@ -382,10 +367,8 @@ export default class CodeableMember extends DependentMember {
             if(error.stack) {
                 console.error(error.stack);
             }
-            var errorMsg = (error.message) ? error.message : "Unknown error";
-            var actionError = new ActionError(errorMsg,"Codeable - Calculate",this);
-            actionError.setParentException(error);
-            this.addError(actionError);
+
+            this.addError(error);
             this.initReturnValue = false;
         }
         

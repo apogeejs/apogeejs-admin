@@ -1,6 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {addActionInfo} from "/apogee/actions/action.js";
-import ActionError from "/apogee/lib/ActionError.js";
 
 /** This is self installing command module. It has no exports
  * but it must be imported to install the command. 
@@ -133,8 +132,7 @@ function updateData(model,actionData) {
     }
     else if(data instanceof Error) {
         //data is an error
-        var actionError = ActionError.processException(data,ActionError.ERROR_TYPE_MODEL);
-        member.addError(actionError);
+        member.addError(error);
     }
     else if(data === apogeeutil.INVALID_VALUE) {
         //data is an invalid value

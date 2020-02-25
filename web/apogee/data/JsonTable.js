@@ -3,7 +3,6 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Model from "/apogee/data/Model.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
-import ActionError from "/apogee/lib/ActionError.js";
 
 /** This class encapsulatees a data table for a JSON object */
 export default class JsonTable extends CodeableMember {
@@ -32,12 +31,11 @@ export default class JsonTable extends CodeableMember {
         else {
             //apply initial data
             //the value should be either some valid data or the invalid value
-            if(initialData.invalidValueData) {
+            if(initialData.invalidValue) {
                 this.setResultInvalid(true);
             }
-            else if(initialData.errorValueData) {
-                let actionError = new ActionError(initialData.errorValueData,ActionError.ERROR_TYPE_MODEL,this);
-                this.addError(actionError);
+            else if(initialData.errorList) {
+                this.addErrors(initialData.errorList);
             }
             else {
                 let initialDataValue = initialData.data;

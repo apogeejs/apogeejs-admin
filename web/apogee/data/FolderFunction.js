@@ -1,7 +1,6 @@
 import base from "/apogeeutil/base.js";
 import {doAction} from "/apogee/actions/action.js";
 import Model from "/apogee/data/Model.js";
-import ActionError from "/apogee/lib/ActionError.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
 import DependentMember from "/apogee/datacomponents/DependentMember.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
@@ -134,18 +133,14 @@ export default class FolderFunction extends DependentMember {
         //make sure the data is set in each impactor
         this.initializeImpactors();
         
-        var folderFunctionErrors = [];
-        
         //check for code errors, if so set a data error
-        var folderFunctionFunction = this.getFolderFunctionFunction(folderFunctionErrors);
-        
-        if(folderFunctionErrors.length == 0) {
+        try {
+            var folderFunctionFunction = this.getFolderFunctionFunction();
             this.setData(folderFunctionFunction);
         }
-        else {
-            //for now I can only set a single error. I will set the first.
-            //I should get way to set multiple
-            this.addErrors(folderFunctionErrors);
+        catch(error) {
+            //error in calculation
+            this.addError(error);
         }
         
         this.clearCalcPending();
@@ -235,7 +230,7 @@ export default class FolderFunction extends DependentMember {
     /** This method creates the folderFunction function. It is called from the update action 
      * and should not be called externally. 
      * @private */
-    getFolderFunctionFunction(folderFunctionErrors) {
+    getFolderFunctionFunction() {
 
         //create a copy of the model to do the function calculation - we don't update the UI display version
         var virtualModel;
@@ -249,7 +244,7 @@ export default class FolderFunction extends DependentMember {
             
             if(!initialized) {
                 //create a copy of the model to do the function calculation - we don't update the UI display version
-                virtualModel = this.createVirtualModel(folderFunctionErrors);
+                virtualModel = this.createVirtualModel();
         
         //HANDLE THIS ERROR CASE DIFFERENTLY!!!
                 if(!virtualModel) {
@@ -258,8 +253,8 @@ export default class FolderFunction extends DependentMember {
 
                 //lookup elements from virtual model
                 rootFolder = virtualModel.getRoot();
-                inputElementArray = this.loadInputElements(rootFolder,folderFunctionErrors);
-                returnValueTable = this.loadOutputElement(rootFolder,folderFunctionErrors); 
+                inputElementArray = this.loadInputElements(rootFolder);
+                returnValueTable = this.loadOutputElement(rootFolder); 
                 
                 initialized = true;
             }
@@ -306,27 +301,20 @@ export default class FolderFunction extends DependentMember {
     /** This method creates a copy of the model to be used for the function evvaluation. 
      * @private */
     createVirtualModel(folderFunctionErrors) {
-        try {
-            let internalFolder = this.getField("internalFolder");
-            var folderJson = internalFolder.toJson();
-            var modelJson = Model.createWorkpaceJsonFromFolderJson(this.getName(),folderJson);
-            var virtualModel = new Model(this.getOwner());
-            var actionResult = virtualModel.loadFromJson(modelJson);
-            
-            //do something with action result!!!
-            
-            return virtualModel;
-        }
-        catch(error) {
-            var actionError = ActionError.processException(error,"FolderFunction - Code",false);
-            folderFunctionErrors.push(actionError);
-            return null;
-        }
+        let internalFolder = this.getField("internalFolder");
+        var folderJson = internalFolder.toJson();
+        var modelJson = Model.createWorkpaceJsonFromFolderJson(this.getName(),folderJson);
+        var virtualModel = new Model(this.getOwner());
+        var actionResult = virtualModel.loadFromJson(modelJson);
+        
+        //do something with action result!!!
+        
+        return virtualModel;
     }
 
     /** This method loads the input argument members from the virtual model. 
      * @private */
-    loadInputElements(rootFolder,folderFunctionErrors) {
+    loadInputElements(rootFolder) {
         let argMembers = [];
         let argList = this.getField("argList");
         for(var i = 0; i < argList.length; i++) {
@@ -334,28 +322,16 @@ export default class FolderFunction extends DependentMember {
             var argMember = rootFolder.lookupChild(argName);
             if(argMember) {
                 argMembers.push(argMember);
-            }
-    //		else {
-    //            //missing input element
-    //            var msg = "Input element not found in folderFunction: " + argName;
-    //            var actionError = new ActionError(msg,"FolderFunction - Code",this);
-    //            folderFunctionErrors.push(actionError);
-    //        }       
+            }     
         }
         return argMembers;
     }
 
     /** This method loads the output member from the virtual model. 
      * @private  */
-    loadOutputElement(rootFolder,folderFunctionErrors) {
+    loadOutputElement(rootFolder) {
         let returnValueString = this.getField("returnValue");
         var returnValueMember = rootFolder.lookupChild(returnValueString);
-    //    if(!returnValueMember) {
-    //        //missing input element
-    //        var msg = "Return element not found in folderFunction: " + returnValueString;
-    //        var actionError = new ActionError(msg,"FolderFunction - Code",this);
-    //        folderFunctionErrors.push(actionError);
-    //    }
         return returnValueMember;
     }
 }

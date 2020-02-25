@@ -1,6 +1,5 @@
 import {addActionInfo} from "/apogee/actions/action.js";
 import Model from "/apogee/data/Model.js";
-import ActionError from "/apogee/lib/ActionError.js";
 
 /** This is self installing command module. This must be imported to install the command.
  * Note that this module also contains an export, unlike most command modules. 
@@ -86,8 +85,7 @@ export function createMember(model,owner,memberJson) {
         //type not found! - create a dummy object and add an error to it
         let errorTableGenerator = Model.getMemberGenerator("appogee.ErrorTable");
         member = errorTableGenerator.createMember(owner,memberJson);
-        let error = new ActionError("Member type not found: " + memberJson.type,ActionError.ERROR_TYPE_APP,null);
-        member.addError(error);
+        member.addError("Member type not found: " + memberJson.type);
         
         //store an error message, but this still counts as command done.
         actionResult.alertMsg = "Error creating member: member type not found: " + memberJson.type;
