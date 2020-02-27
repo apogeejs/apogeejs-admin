@@ -63,7 +63,7 @@ export default class ErrorTable extends Member {
      * for recalculation. It is safe for this method to always return false and
      allow the calculation to happen. 
     * @private */
-    needsCalculating() {
+   memberUsesRecalculation() {
         return false;
     }
 

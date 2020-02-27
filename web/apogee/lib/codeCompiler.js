@@ -47,14 +47,10 @@ export function validateTableName(name) {
 
 /** This method analyzes the code and creates the object function and dependencies. 
  * The results are loaded into the passed object processedCodeData. */
-export function processCode(codeInfo,codeLabel) {
+export function processCode(argList,functionBody,supplementalCode,codeLabel) {
     
     //analyze the code
-    var combinedFunctionBody = createCombinedFunctionBody(
-        codeInfo.argList, 
-        codeInfo.functionBody, 
-        codeInfo.supplementalCode, 
-        codeLabel);
+    var combinedFunctionBody = createCombinedFunctionBody(argList,functionBody,supplementalCode,codeLabel);
         
     //get the accessed variables
     //
@@ -69,13 +65,24 @@ export function processCode(codeInfo,codeLabel) {
     }
     else {
         compiledInfo.errors = analyzeOutput.errors;
+        compiledInfo.valid = false;
         return compiledInfo;
     }
 
-    //this generator creates two functions - a function that creates the member function
-    //and function that initializes external variables for that member fuction.
+    //create and execute the generator function to get the member function generator
+    //and the memberFunctionContextInitializer
     var generatorFunction = createGeneratorFunction(compiledInfo.varInfo, combinedFunctionBody);
-    compiledInfo.generatorFunction = generatorFunction;
+    try {
+        //get the generated fucntion
+        var generatedFunctions = generatorFunction();
+        compiledInfo.memberFunctionGenerator = generatedFunctions.memberGenerator;
+        compiledInfo.memberFunctionContextInitializer = generatedFunctions.initializer;  
+        compiledInfo.valid = true;                     
+    }
+    catch(ex) {
+        compiledInfo.errors = [ex];
+        compiledInfo.valid = false;
+    }
     
     return compiledInfo;   
 }
@@ -116,6 +123,10 @@ function createGeneratorFunction(varInfo, combinedFunctionBody) {
     
     var contextDeclarationText = "";
     var initializerBody = "";
+
+    //add the messenger as a local variable
+    contextDeclarationText += "var apogeeMessenger\n";
+    initializerBody += "apogeeMessenger = messenger\n";
     
     //set the context - here we only defined the variables that are actually used.
 	for(var baseName in varInfo) {        
@@ -139,7 +150,7 @@ function createGeneratorFunction(varInfo, combinedFunctionBody) {
         combinedFunctionBody
     );
         
-    var generatorFunction = new Function("apogeeMessenger",generatorBody);
+    var generatorFunction = new Function(generatorBody);
     return generatorFunction;    
 }
 
@@ -188,7 +199,7 @@ const GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//declare context variables",
 "{0}",
 "//context setter",
-"function __initializer(contextManager) {",
+"function __initializer(contextManager,messenger) {",
 "{1}};",
 "",
 "//user code",

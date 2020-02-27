@@ -59,7 +59,7 @@ export default class DependentMember extends Member {
     // * for recalculation. It is safe for this method to always return false and
     // allow the calculation to happen. 
     // * @private */
-    //needsCalculating();
+    //memberUsesRecalculation();
 
     /** This does any init needed for calculation.  */
     prepareForCalculate() {

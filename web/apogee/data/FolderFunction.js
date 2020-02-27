@@ -123,7 +123,7 @@ export default class FolderFunction extends DependentMember {
         
 
     /** If this is true the member must be executed. */
-    needsCalculating() {
+    memberUsesRecalculation() {
         return true;
     }
 

@@ -111,7 +111,7 @@ export default class Folder extends DependentMember {
 
     /** There is no calculation for the folder base on dependents. 
      * @private */
-    needsCalculating() {
+    memberUsesRecalculation() {
         return true;
     }
 

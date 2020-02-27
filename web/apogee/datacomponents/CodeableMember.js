@@ -31,17 +31,7 @@ export default class CodeableMember extends DependentMember {
         this.setField("argList",[]);
         //"functionBody";
         //"supplementalCode";
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //DERIVED FIELDS (presumably based on implementation)
-        //initialze the code as empty
-        this.codeSet = false;
-        
-        this.varInfo = null;
-        this.memberFunctionInitializer = null;
-        this.memberGenerator = null;
-        this.codeErrors = [];
+        //"compiledInfo"
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -80,37 +70,36 @@ export default class CodeableMember extends DependentMember {
 
     /** This is a helper method that compiles the code as needed for setCodeInfo.*/
     applyCode(argList,functionBody,supplementalCode) {
-        
-        var codeInfo ={};
-        codeInfo.argList = argList;
-        codeInfo.functionBody = functionBody;
-        codeInfo.supplementalCode = supplementalCode;
-        
-        //load some needed context variables
-        var codeLabel = this.getFullName();
-        
-        //process the code text into javascript code
-        var compiledInfo = processCode(codeInfo,
-            codeLabel);
 
         //save the code
-        this.setCodeInfo(codeInfo,compiledInfo);
+        if(this.getField("argList").toString() != argList.toString()) {
+            this.setField("argList",argList);
+        }
+        
+        if(this.getField("functionBody") != functionBody) {
+            this.setField("functionBody",functionBody);
+        }
+        
+        if(this.getField("supplementalCode") != supplementalCode) {
+            this.setField("supplementalCode",supplementalCode);
+        }
+        
+        //process the code text into javascript code
+        var codeLabel = this.getFullName();
+        var compiledInfo = processCode(argList,functionBody,supplementalCode,codeLabel);
+        this.setField("compiledInfo",compiledInfo);
     }
 
     /** This method clears the function body and supplemental code, and
      * updates any associated variables, including the dependencies.  */
     clearCode() {
-        this.codeSet = false;
         if(this.getField("functionBody") != "") {
             this.setField("functionBody","");
         }
         if(this.getField("supplementalCode") != "") {
             this.setField("supplementalCode","");
         }
-        this.varInfo = null;
-        this.memberFunctionInitializer = null;
-        this.memberGenerator = null;
-        this.codeErrors = [];
+        this.clearField("compiledInfo");
         
         this.clearCalcPending();
 
@@ -119,10 +108,12 @@ export default class CodeableMember extends DependentMember {
 
     /** This method returns the formula for this member.  */
     initializeDependencies() {
+
+        let compiledInfo = this.getField("compiledInfo");
         
-        if((this.hasCode())&&(this.varInfo)&&(this.codeErrors.length === 0)) {
+        if((this.hasCode())&&(compiledInfo.valid)) {
             try {
-                var newDependsOnMemberList = getDependencyInfo(this.varInfo,this.getContextManager());
+                var newDependsOnMemberList = getDependencyInfo(compiledInfo.varInfo,this.getContextManager());
 
                 //update dependencies
                 this.updateDependencies(newDependsOnMemberList);
@@ -140,11 +131,11 @@ export default class CodeableMember extends DependentMember {
     /** This method udpates the dependencies if needed because
      *the passed variable was added.  */
     updateDependeciesForModelChange(additionalUpdatedMembers) {
-        if((this.hasCode())&&(this.varInfo)) {
+        let compiledInfo = this.getField("compiledInfo");
+        if((compiledInfo)&&(compiledInfo.valid)) {
                     
             //calculate new dependencies
-            var newDependencyList = getDependencyInfo(this.varInfo,
-                this.getContextManager());
+            var newDependencyList = getDependencyInfo(compiledInfo.varInfo,this.getContextManager());
             
             //update the dependency list
             var dependenciesChanged = this.updateDependencies(newDependencyList);
@@ -157,13 +148,13 @@ export default class CodeableMember extends DependentMember {
 
     /** This method returns the formula for this member.  */
     hasCode() {
-        return this.codeSet;
+        return this.getField("compiledInfo") ? true : false;
     }
 
     /** If this is true the member is ready to be executed. 
      * @private */
-    needsCalculating() {
-        return this.codeSet;
+    memberUsesRecalculation() {
+        return this.hasCode();
     }
 
     /** This does any init needed for calculation.  */
@@ -177,20 +168,19 @@ export default class CodeableMember extends DependentMember {
 
     /** This method sets the data object for the member.  */
     calculate() {
-        if(this.codeErrors.length > 0) {
-            this.setErrors(this.codeErrors);
+        let compiledInfo = this.getField("compiledInfo");
+        let codeErrors = [];
+        if(!compiledInfo) {
+            codeErrors.push("Code not found for member: " + this.getName());
+        }
+        else if(!compiledInfo.valid) {
+            this.setErrors(compiledInfo.codeErrors);
             this.clearCalcPending();
             return;
         }
         
-        if((!this.memberGenerator)||(!this.memberFunctionInitializer)) {
-            this.setError("Function not found for member: " + this.getName());
-            this.clearCalcPending();
-            return;
-        } 
-        
         try {
-            this.processMemberFunction(this.memberGenerator);
+            this.processMemberFunction(compiledInfo.memberFunctionGenerator);
         }
         catch(error) {
             if(error == base.MEMBER_FUNCTION_INVALID_THROWABLE) {
@@ -276,56 +266,6 @@ export default class CodeableMember extends DependentMember {
     //This method takes the object function generated from code and processes it
     //to set the data for the object. (protected)
     //processMemberFunction 
-
-    
-    /** This method returns the formula for this member.  */
-    setCodeInfo(codeInfo,compiledInfo) {
-        //set the base data
-        if(this.getField("argList").toString() != codeInfo.argList.toString()) {
-            this.setField("argList",codeInfo.argList);
-        }
-        
-        if(this.getField("functionBody") != codeInfo.functionBody) {
-            this.setField("functionBody",codeInfo.functionBody);
-        }
-        
-        if(this.getField("supplementalCode") != codeInfo.supplementalCode) {
-            this.setField("supplementalCode",codeInfo.supplementalCode);
-        }
-
-        //save the variables accessed
-        this.varInfo = compiledInfo.varInfo;
-
-        if((!compiledInfo.errors)||(compiledInfo.errors.length === 0)) {
-            //set the code  by exectuing generator
-            this.codeErrors = [];
-            
-            try {
-                //get the inputs to the generator
-                var messenger = new Messenger(this);
-                
-                //get the generated fucntion
-                var generatedFunctions = compiledInfo.generatorFunction(messenger);
-                this.memberGenerator = generatedFunctions.memberGenerator;
-                this.memberFunctionInitializer = generatedFunctions.initializer;                       
-            }
-            catch(ex) {
-                this.codeErrors.push(ex);
-            }
-        }
-        else {
-    //doh - i am throwing away errors - handle this differently!
-            this.codeErrors = compiledInfo.errors;
-        }
-        
-        if(this.codeErrors.length > 0) {
-            //code not valid
-            this.memberGenerator = null;
-            this.memberFunctionInitializer = null;
-        }
-        this.codeSet = true;
-    }
-
     
     /** This makes sure user code of object function is ready to execute.  */
     memberFunctionInitialize() {
@@ -344,7 +284,6 @@ export default class CodeableMember extends DependentMember {
         this.dependencyInitInProgress = true;
         
         try {
-            
             //make sure the data is set in each impactor
             this.initializeImpactors();
             if(this.getState() != apogeeutil.STATE_NORMAL) {
@@ -355,7 +294,9 @@ export default class CodeableMember extends DependentMember {
             }
             
             //set the context
-            this.memberFunctionInitializer(this.getContextManager());
+            let compiledInfo = this.getField("compiledInfo");
+            let messenger = new Messenger(this);
+            compiledInfo.memberFunctionContextInitializer(this.getContextManager(),messenger);
             
             this.initReturnValue = true;
         }

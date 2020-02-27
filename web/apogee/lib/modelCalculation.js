@@ -9,7 +9,7 @@ export function addToRecalculateList(recalculateList,member) {
     if(recalculateList.indexOf(member) >= 0) return;
      
     //add this member to recalculate list if it needs to be executed
-    if((member.isDependent)&&(member.needsCalculating())) {
+    if((member.isDependent)&&(member.memberUsesRecalculation())) {
         recalculateList.push(member);
         member.prepareForCalculate();
     }
