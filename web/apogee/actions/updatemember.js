@@ -107,12 +107,10 @@ function updateData(model,actionData) {
     let hadDependents = ((member.getDependsOn)&&(member.getDependsOn().length > 0));
     
     //if this is the resolution (or rejection) of a previously set promise
+    //make sure the source promise matches the pending promise. Otherwise
+    //we just ignore it (it is out of date)
     if(actionData.sourcePromise) {
-        if(member.pendingPromiseMatches(actionData.sourcePromise)) {
-            //this is the reoslution of pending data
-            member.setResultPending(false);
-        }
-        else {
+        if(!member.pendingPromiseMatches(actionData.sourcePromise)) {
             //no action - this is from an asynch action that has been overwritten
             actionResult.actionDone = false;
             return;
@@ -120,37 +118,19 @@ function updateData(model,actionData) {
     }
     
     //some cleanup for new data
-    member.clearErrors();
     if((member.isCodeable)&&(actionData.sourcePromise === undefined)) {
         //clear the code - so the data is used
         //UNLESS this is a delayed set date from a promise, in what case we want to keep the code.
         member.clearCode();
     }
-    
-    //handle four types of data inputs
-    if(data instanceof Promise) {
-        //data is a promise - will be updated asynchromously
-        
-        //check if this is only a refresh
-        var optionalPromiseRefresh = actionData.promiseRefresh ? true : false;
-        
-        member.applyPromiseData(data,optionalPromiseRefresh);
-    }
-    else if(data instanceof Error) {
-        //data is an error
-        member.addError(error);
-    }
-    else if(data === apogeeutil.INVALID_VALUE) {
-        //data is an invalid value
-        member.setResultInvalid(true);
-    }
-    else {
-        //normal data update (poosibly from an asynchronouse update)
-        member.setData(data);
-    }
+
+    member.applyData(data);
     
     actionResult.actionDone = true;
-    if(hadDependents) actionResult.updateMemberDependencies = true;
+    if(hadDependents) {
+        actionResult.updateMemberDependencies = true;
+    }
+    actionResult.recalculateDependsOnMembers = true;
 
     return actionResult;
 }

@@ -140,7 +140,7 @@ export default class FolderFunction extends DependentMember {
         }
         catch(error) {
             //error in calculation
-            this.addError(error);
+            this.setError(error);
         }
         
         this.clearCalcPending();
@@ -282,7 +282,7 @@ export default class FolderFunction extends DependentMember {
                 //retrieve the result
                 if(returnValueTable) {
                     
-                    if(returnValueTable.getResultPending()) {
+                    if(returnValueTable.getState() == apogeeutil.STATE_PENDING) {
                         throw new Error("A folder function must not be asynchronous: " + this.getFullName());
                     }
                     

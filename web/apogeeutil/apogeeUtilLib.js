@@ -6,6 +6,9 @@ let apogeeutil = {};
 
 export {apogeeutil as default};
 
+/** None State - used by members. This indicates no state information is present. */
+apogeeutil.STATE_NORMAL = "none";
+
 /** Normal State - used by members */
 apogeeutil.STATE_NORMAL = "normal";
 
@@ -17,13 +20,6 @@ apogeeutil.STATE_ERROR = "error";
 
 /** Invalid State - used by members */
 apogeeutil.STATE_INVALID = "invalid";
-
-/** Message for pending state */
-apogeeutil.PENDING_MESSAGE = "Calculation pending...";
-
-/** Message for invalid state */
-apogeeutil.INVALID_MESSAGE = "Result not valid!";
-
 
 /** 
  * This value can be assigned to a data table to signify that data is not valid.

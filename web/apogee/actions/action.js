@@ -17,20 +17,12 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  *   
  * Registering a specific action:
  * To register a specific action, addActionInfo must be called with 
- * a actionInfo object. An action info object is of the following format.
- * actionInfo object: {
- *   "action": (string - this is the name of the action)
- *   "actionFunction": (funtion to exectue object - arguments = modeo,actionData,actionResult),
- *   "checkUpdateAll": (boolean - indicates if change in the underlying data model),
- *   "updateDependencies": [Indicates the changed object requires its dependecies be updated),
- *   "addToRecalc": (Indicates the changed object should be added to the recalc list, with its dependencies),
- *   "addDependenceiesToRecalc": (Indicates the changed object should have its dependencies be added to the recalc list, but not itself),
- *   "event": (The name of the event to fire for this object and action.)
- * }
+ * the name of the action and the function taht executes the action. The function
+ * should be of the form: 
+ * actionResult = function actionFunction(model,actionData)
  * 
  * Action Data Format:
- * The action data is used to pass data into the action specific code, and alse to 
- * pass data back from the action specific code. Format:
+ * The action data is used to pass data into the action specific code, Format:
  * actionData format: {
  *   "action": (The name of the action to execute),
  *   "member": (The data object that is acted upon , if applicable),
@@ -38,28 +30,35 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  * }
  * 
  * ActionResult:
- * The return value of the doAction function is an ActionResult struct, with the following data: {
- *   "actionDone": (If this is returned true the action was done. This does not mean it was error free but
- *      it typically does mean the action can be reversed such as with an undo. An example of
- *      where there was an error is if the user is setting code that has a syntax error or that does 
- *      not properly (exectue.)
- *   "actionPending": This flag is returned if the action is a queued action and will be run after the
- *      current action completes.)
- *   "member": The object modified in the action (if it is a member. Model update will not have this)
- *   "actionInfo": (This is the action info associated with the action, mainly used for bookeeping.)
+ * The return value of the doAction function is an ActionResult struct, with the data below. The function should return
+ * an action result for each member/model that changes. There should be a single top level action result and then there can be 
+ * child action results, in the childActionResults field.
+ * Format: {
+ *   "actionDone": (If this is returned true the action was done. This does not mean it was error free, rather
+ *                  if means the action completed and can be undone. For example, it may be setting code in a member
+ *                  and the code may be invalid. That is OK. It is displayed in the UI as an error and "actionDone" = true.
+ *                  ActionDone should be false there was an error such that the state of the program is compromised and the 
+ *                  action can not be undone. In this case, the program will keep the original state rather than adopting 
+ *                  the new state the results from the action.
+ *   "actionPending": (This flag is returned if the action is a queued action and will be run after the
+ *                  current action completes.)
+ *   "member": (The object modified in the action, if it is a member. The other option is a model update, in which 
+ *                  case this field is left undefined.)
+ *   "event": (This is the event that should be fired as a result of this action/actionResult. The options are:
+ *                  memberCreate, memberUpdated, memberDeleted or modelUpdated.)
  *   "alertMsg": (This is a message that should be given to the user. It usually will be sent if there is an error
- *      where actionDone is false, though it may be set on actionDone = true too.)
+ *                  where actionDone is false, though it may be set on actionDone = true too, to indicate there was 
+ *                  a problem cpomared to what was expectd.)
  *   "childActionResults" - (This is a list of action results if there are additional child actions done with this
- *      action. Examples where this is used are on creating, moving or deleting a folder that has chilren.)
+ *                  action. Examples where this is used are on creating, moving or deleting a folder that has chilren.)
+ *   "recalculateMember" - (This is an optional action flag. The is set of the member is a dependent and it must be recalculated.)
+ *   "recalculateDependsOnMember" - (This is an optional action flag. This is set if the member has its value changed, but the 
+ *                  member does not need to be recalculated. The members that depend on this do however need to be recalculated.)
+ *   "updateMemberDependencies" - (This is an optional action flag. The is set of the member is a dependent and it must have its dependencies
+ *                  recalculated, such as if the code changes.)
+ *   "updateModelDepedencies" - (This is an optional action flag. The is set of the member is a dependent and it is created, deleted or moved.
+ *                  In this case, all members in the model should be checked to see if they have any dependency changes.)
  * }
- * 
- * Action Function:
- * The action function executes the action specific code. It is passed the actionData object
- * along with the model. The actions must add any executed actions to the action
- * list. This is done in the action function as opposed to outside because the action
- * function may exectue multiple actions, such as deleting multiple objects.
- * 
- * 
  */ 
 
 /** This structure holds the processing information for all the actions. It is set by each action. 

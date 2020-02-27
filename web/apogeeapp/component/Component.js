@@ -17,12 +17,10 @@ export default class Component extends EventManager {
         
         //inheriting objects can pass functions here to be called on cleanup, save, etc
         this.cleanupActions = [];
-        
-        //notifications
-        this.bannerState = member.getState();
-        this.bannerMessage = member.getStateMessage();
-        
+
         this.updated = {};
+        
+        this._setState(member.getState());
 
         this.viewStateCallback = null;
         this.cachedViewState = null;
@@ -217,9 +215,7 @@ export default class Component extends EventManager {
             }  
 
             if((updatedMember.isFieldUpdated("state"))||(updatedMember.isFieldUpdated("stateMessage"))) {
-                this.bannerState = updatedMember.getState();
-                this.bannerMessage = updatedMember.getStateMessage();
-                this.fieldUpdated("bannerState");
+                this._setState(updatedMember.getState());
             }
         }
         else {
@@ -252,6 +248,47 @@ export default class Component extends EventManager {
             this.readExtendedProperties(values);
         }
         return values;
+    }
+
+    _setState(newState) {
+        //only process a state change
+        if((newState == this.bannerState)&&(this.bannerState != apogeeutil.STATE_ERROR)) {
+            return;
+        }
+
+        let newMsg;
+        switch(newState) {
+            case apogeeutil.STATE_NORMAL:
+                newMsg = "";
+                break;
+
+            case apogeeutil.STATE_PENDING:
+                newMsg = bannerConstants.PENDING_MESSAGE;
+                break;
+
+            case apogeeutil.STATE_INVALID:
+                newMsg = bannerConstants.INVALID_MESSAGE;
+                break;
+
+            case apogeeutil.STATE_ERROR:
+                let errorList = this.member.getErrors();
+                newMsg = this._getErrorMessage(errorList);
+                //we could check if the message changes, but I won't since there is more
+                //error info we should store in the future.
+                break;
+
+            default:
+                newMsg = "Unknown state: " + newBannerState;
+        }
+
+        //set the new states
+        this.bannerState = newState;
+        this.bannerMessage = newMsg;
+        this.fieldUpdated("bannerState");
+    }
+
+    _getErrorMessage(errorList) {
+        return errorList.join("\n");
     }
 
     //======================================

@@ -21,6 +21,11 @@ FieldObject.setField = function(name,value) {
     this.updated[name] = true;
 }
 
+/** This will clear the value of a field. */
+FieldObject.clearField = function(name) {
+    this.setField(name,undefined);
+}
+
 /** This ges a field value, by name. */
 FieldObject.getField = function(name) {
     return this.fieldMap[name];

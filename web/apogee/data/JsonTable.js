@@ -15,13 +15,14 @@ export default class JsonTable extends CodeableMember {
         
         this.initOwner(owner);
         
-        //set initial data
+        //set initial data if not already set
         if(!initialData) {
             //default initail value
             initialData = {};
             initialData.data = "";
         }  
 
+        //apply the initial data
         if(initialData.functionBody !== undefined) {
             //apply initial code
             this.applyCode(initialData.argList,
@@ -30,20 +31,17 @@ export default class JsonTable extends CodeableMember {
         }
         else {
             //apply initial data
-            //the value should be either some valid data or the invalid value
-            if(initialData.invalidValue) {
-                this.setResultInvalid(true);
-            }
-            else if(initialData.errorList) {
-                this.addErrors(initialData.errorList);
-            }
-            else {
-                let initialDataValue = initialData.data;
-                if(initialDataValue === undefined) initialDataValue = "";
+            let data;
+            let errorList;
 
-                this.setField("data",initialDataValue);
-            }
+            if(initialData.errorList) errorList = initialData.errorList;
+            else if(initialData.invalidError) data = apogeeutil.INVALID_VALUE;
+            else if(initialData.data !== undefined) data = initialData.data;
+            else data = "";
 
+            this.applyData(data,errorList);
+
+            //set the code fields to empty strings
             this.setField("functionBody","");
             this.setField("supplementalCode","");
         }
@@ -75,19 +73,8 @@ export default class JsonTable extends CodeableMember {
             //initialization issue = error or pending dependancy
             data = undefined;
         }
-        
-        if(data === apogeeutil.INVALID_VALUE) {
-            //value is invalid if return is this predefined value
-            this.setResultInvalid(true);
-        }
-        else if(data instanceof Promise) {
-            //if the return value is a Promise, the data is asynch asynchronous!
-            this.applyPromiseData(data);
-        }
-        else {
-            //result is normal synchronous data
-            this.setData(data); 
-        }
+
+        this.applyData(data);
     }
 
     //------------------------------

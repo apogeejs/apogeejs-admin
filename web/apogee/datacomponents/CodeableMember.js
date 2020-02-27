@@ -44,10 +44,6 @@ export default class CodeableMember extends DependentMember {
         this.codeErrors = [];
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         
-        this.clearCalcPending();
-        this.setResultPending(false);
-        this.setResultInvalid(false);
-        
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //WORKING FIELDS
         //fields used in calculation
@@ -101,7 +97,8 @@ export default class CodeableMember extends DependentMember {
         this.setCodeInfo(codeInfo,compiledInfo);
     }
 
-    /** This method returns the formula for this member.  */
+    /** This method clears the function body and supplemental code, and
+     * updates any associated variables, including the dependencies.  */
     clearCode() {
         this.codeSet = false;
         if(this.getField("functionBody") != "") {
@@ -116,9 +113,7 @@ export default class CodeableMember extends DependentMember {
         this.codeErrors = [];
         
         this.clearCalcPending();
-        this.setResultPending(false);
-        this.setResultInvalid(false);
-        
+
         this.updateDependencies([]);
     }
 
@@ -183,13 +178,13 @@ export default class CodeableMember extends DependentMember {
     /** This method sets the data object for the member.  */
     calculate() {
         if(this.codeErrors.length > 0) {
-            this.addErrors(this.codeErrors);
+            this.setErrors(this.codeErrors);
             this.clearCalcPending();
             return;
         }
         
         if((!this.memberGenerator)||(!this.memberFunctionInitializer)) {
-            this.addError("Function not found for member: " + this.getName());
+            this.setError("Function not found for member: " + this.getName());
             this.clearCalcPending();
             return;
         } 
@@ -202,13 +197,13 @@ export default class CodeableMember extends DependentMember {
                 //This is not an error. I don't like to throw an error
                 //for an expected condition, but I didn't know how else
                 //to do this. See notes where this is thrown.
-                this.setResultInvalid(true);
+                this.setResultInvalid();
             }
             else if(error == base.MEMBER_FUNCTION_PENDING_THROWABLE) {
                 //This is not an error. I don't like to throw an error
                 //for an expected condition, but I didn't know how else
                 //to do this. See notes where this is thrown.
-                this.setResultPending(true);
+                this.setResultPending();
             }
             //--------------------------------------
             else {
@@ -219,7 +214,7 @@ export default class CodeableMember extends DependentMember {
                     console.error(error.stack);
                 }
 
-                this.addError(error);
+                this.setError(error);
             }
         }
         
@@ -240,17 +235,19 @@ export default class CodeableMember extends DependentMember {
             updateData.supplementalCode = this.getSupplementalCode();
         }
         else {
+            let state = this.getState();
+
             //handle the possible data value cases
-            if(this.getResultInvalid()) {
+            if(state == apogeeutil.STATE_INVALID) {
                 //invalid valude
                 updateData.invalidValue = true;
             }
-            else if(this.getResultPending()) {
+            else if(state == apogeeutil.STATE_PENDING) {
                 //pending value - we can't do anything with this
                 alert("There is a pending result in a field being saved. This may not be saved properly.");
-                updateData.data = "<unknonw pending value>";
+                updateData.data = "<unknown pending value>";
             }
-            else if(this.hasError()) {
+            else if(state == apogeeutil.STATE_ERROR) {
                 //save the errors as strings only
                 updateData.errorList = this.getErrors().map(error => error.toString());
             }
@@ -337,7 +334,7 @@ export default class CodeableMember extends DependentMember {
         
         //make sure this in only called once
         if(this.dependencyInitInProgress) {
-            this.addError("Circular reference error");
+            this.setError("Circular reference error");
             //clear calc in progress flag
             this.dependencyInitInProgress = false;
             this.functionInitialized = true;
@@ -350,7 +347,7 @@ export default class CodeableMember extends DependentMember {
             
             //make sure the data is set in each impactor
             this.initializeImpactors();
-            if((this.hasError())||(this.getResultPending())||(this.getResultInvalid())) {
+            if(this.getState() != apogeeutil.STATE_NORMAL) {
                 this.dependencyInitInProgress = false;
                 this.functionInitialized = true;
                 this.initReturnValue = false;
@@ -368,7 +365,7 @@ export default class CodeableMember extends DependentMember {
                 console.error(error.stack);
             }
 
-            this.addError(error);
+            this.setError(error);
             this.initReturnValue = false;
         }
         

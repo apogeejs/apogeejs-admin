@@ -26,8 +26,8 @@ bannerConstants.BANNER_FGCOLOR_UNKNOWN = "black";
 
 bannerConstants.BANNER_TYPE_NONE = apogeeutil.STATE_NORMAL;
 
-bannerConstants.PENDING_MESSAGE = apogeeutil.PENDING_MESSAGE;
-bannerConstants.INVALID_MESSAGE = apogeeutil.INVALID_MESSAGE;
+bannerConstants.PENDING_MESSAGE = "Calculation pending...";;
+bannerConstants.INVALID_MESSAGE = "Result not valid!";
 
 /** This method returns a banner for the given state and message. This should 
  * not be called for banner state bannerConstants.BANNER_TYPE_NONE */

@@ -24,21 +24,24 @@ export function getMemberStateUndoCommand(model, memberFullName) {
         command.type = "saveMemberData";
         
         //here the object has data set. Check if an "alternate" data values was set - error, pending or invalid
-        if(member.hasError()) {
+        let state = member.getState();
+        if(state == apogeeutil.STATE_ERROR) {
             //member has an error
             let errors = member.getErrors();
             //Fix this to save all the 
             command.data = errors[0];
             
         }
-        else if(member.getResultInvalid()) {
+        else if(state == apogeeutil.STATE_INVALID) {
             //result is invalid - set value to invalid in undo
             command.data = apogeeutil.INVALID_VALUE
         }
+        else if(state == apogeeutil.STATE_PENDING) {
+            //we have a pending promise. use it for the command
+            commandData = member.getPendingPromise();
+        }
         else {
-            //this is a standard data value or a promise
-            //note if it is a promise and the promise has not yet resolved we will have mutliple then/catch functions
-            //attached to it. That is OK, only one will succeed because for others the promise is no longer pending.
+            //normal data case
             command.data = member.getData();
         }
     }

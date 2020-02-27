@@ -63,9 +63,6 @@ export default class DependentMember extends Member {
 
     /** This does any init needed for calculation.  */
     prepareForCalculate() {
-        this.clearErrors();
-        this.setResultPending(false);
-        this.setResultInvalid(false);
         this.calcPending = true;
     }
 
@@ -89,13 +86,15 @@ export default class DependentMember extends Member {
             if((impactor.isDependent)&&(impactor.getCalcPending())) {
                 impactor.calculate();
             }
-            if(impactor.hasError()) {
+
+            let impactorState = impactor.getState();
+            if(impactorState == apogeeutil.STATE_ERROR) {
                 errorDependencies.push(impactor);
             } 
-            else if(impactor.getResultPending()) {
+            else if(impactorState == apogeeutil.STATE_PENDING) {
                 resultPending = true;
             }
-            else if(impactor.getResultInvalid()) {
+            else if(impactorState == apogeeutil.STATE_INVALID) {
                 resultInvalid = true;
             }
         }
@@ -104,10 +103,10 @@ export default class DependentMember extends Member {
             this.createDependencyError(errorDependencies);
         }
         else if(resultPending) {
-            this.setResultPending(true,null);
+            this.setResultPending();
         }
         else if(resultInvalid) {
-            this.setResultInvalid(true);
+            this.setResultInvalid();
         }
     }
 
@@ -177,6 +176,6 @@ export default class DependentMember extends Member {
                 if(i > 0) message += ", ";
                 message += errorDependencies[i].getFullName();
             }
-            this.addError(message);   
+            this.setError(message);   
     }
 }

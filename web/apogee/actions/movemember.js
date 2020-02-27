@@ -69,6 +69,7 @@ function addChildResults(member) {
             childActionResult.actionDone = true;
             childActionResult.member = child;
             childActionResult.event = ACTION_EVENT;
+            actionResult.updateModelDependencies = true;
             
             childActionResults.push(childActionResult);
             
@@ -85,6 +86,7 @@ function addChildResults(member) {
         childActionResult.actionDone = true;
         childActionResult.member = root;
         childActionResult.event = ACTION_EVENT;
+        actionResult.updateModelDependencies = true;
 
         childActionResults.push(childActionResult);
         

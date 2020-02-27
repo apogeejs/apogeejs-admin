@@ -42,20 +42,20 @@ export default class FunctionTable extends CodeableMember {
             }
             else {
                 //error handling
-                var issue;
-                
+                let issue;
+                let state = this.getState();
+
                 //in the case of "result invalid" or "result pending" this is 
                 //NOT an error. But I don't know
                 //how else to stop the calculation other than throwing an error, so 
                 //we do that here. It should be handled by anyone calling a function.
-                if(this.hasError()) {
+                if(state == apogeeutil.STATE_ERROR) {
                     issue = new Error("Error in dependency: " + this.getFullName());
-
                 }
-                else if(this.getResultPending()) {
+                else if(state == apogeeutil.STATE_PENDING) {
                     issue = base.MEMBER_FUNCTION_PENDING_THROWABLE;
                 }
-                else if(this.getResultInvalid()) {
+                else if(state == apogeeutil.STATE_INVALID) {
                     issue = base.MEMBER_FUNCTION_INVALID_THROWABLE;
                 }
                 else {

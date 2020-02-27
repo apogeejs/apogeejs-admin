@@ -30,56 +30,11 @@ export default class Member {
         this.setField("model",model);
         //"owner"
         //"data"
-        this.setField("state",apogeeutil.STATE_NORMAL);
-        this.setField("stateMessage",null);
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //DERIVED FIELDS (presumably based on implementation)
-        this.errors = []; 
-        this.resultPending = false;
-        this.resultInvalid = false;
+        //"pendingPromise"
+        //"state"
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         model.registerMember(this);
-    }
-
-    initOwner(owner) {
-        let currentOwner = this.getField("owner");
-        if(currentOwner != owner) {
-            this.setField("owner",owner);
-        }
-        
-        if(owner.isParent) {
-            owner.addChild(this);
-        }
-        else if(owner.isRootHolder) {
-            owner.setRoot(this);
-        }
-    }
-
-    move(newName,newOwner) {
-        let currentOwner = this.getField("owner");
-
-        //remove from old owner
-        if(currentOwner) {
-            if(currentOwner.isParent) {
-                currentOwner.removeChild(this);
-            }
-            else {
-                //don't allow moving a root for now!
-                //or renaiming either!
-            }
-        }
-        
-        //check for change of name
-        if(newName != this.getField("name")) {
-            this.setField("name",newName);
-        }
-        
-        //place in the new owner or update the name in the old owner
-        //owner field updated here
-        this.initOwner(newOwner);
     }
 
     /** this method gets the ID. It is not persistent and is valid only for this 
@@ -148,96 +103,9 @@ export default class Member {
         return null; //this shouldn't happen
     }
 
-    getState() {
-        return this.getField("state");
-    }
-
-    getStateMessage() {
-        return this.getField("stateMessage");
-    }
-
-    /** This method adds an error for this member. It will be valid for the current round of calculation of
-     * this member. The error may be a javascript Error object of string (or any other object really). */
-    addError(error) {
-        this.errors.push(error);
-        this._calculateState();
-    }
-
-    /** This method sets the pre calc error for this dependent. */
-    addErrors(errorList) {
-        this.errors.push(...errorList)
-        this._calculateState();
-    }
-
-    /** This method clears the error list. */
-    clearErrors(type) {
-        var newList = [];
-        if(type != null) {    
-            for(var i = 0; i < this.errors.length; i++) {
-                var entry = this.errors[i];
-                if(entry.type != type) {
-                    newList.push(entry);
-                }
-            }
-        }
-        this.errors = newList;
-        this._calculateState();
-    }
-
-    /** This returns true if there is a pre calc error. */
-    hasError() {
-        return (this.errors.length > 0);
-    }
-
-    /** This returns the pre calc error. */
-    getErrors() {
-        return this.errors;
-    }
-
-    /** This returns true if the member is not up to date, typically
-     * do to waiting on an asynchronous operation. */
-    getResultPending() {
-        return this.resultPending;
-    }
-
-    /** This returns true if the member is not up to date, typically
-     * do to waiting on an asynchronous operation. */
-    getPendingPromise() {
-        return this.pendingPromise;
-    }
-
-    /** This sets the result pending flag. If is pending is set to true and
-     * this is the object whose value is pending (as opposed to a member that 
-     * is dependent on the pending member) the promise should be saved. This 
-     * is used to ensure only a matching asynchronous action is kept. */
-    setResultPending(isPending,promise) {
-        this.resultPending = isPending;
-        this.pendingPromise = promise;
-        this._calculateState();
-    }
-
-    /** This returns true if the member is invalid, typically
-     * meaning the calculation could not properly be performed becase the
-     * needed data is not available. */
-    getResultInvalid() {
-        return this.resultInvalid;
-    }
-
-    /** This sets the result invalid flag. If the result is invalid, any
-     * table depending on this will also have an invalid value. */
-    setResultInvalid(isInvalid) {
-        this.resultInvalid = isInvalid;
-        this._calculateState();
-    }
-
-    /** This returns true if the pending token matches. */
-    pendingPromiseMatches(promise) {
-        return (this.pendingPromise === promise);
-    }
-
-    getSetDataOk() {
-        return this.constructor.generator.setDataOk;
-    }
+    //================================================
+    // Serialization Methods
+    //================================================
 
     /** This method writes the child to a json. */
     toJson() {
@@ -260,32 +128,180 @@ export default class Member {
     //fromJson(owner,json,childrenJsonOutputList) {
     //}
 
-    //-----------------------------------
-    // Data methods
-    //-----------------------------------
+    //=======================================
+    // Data/State getting functions
+    //=======================================
+
+    /** This returns the state struct for the member. */
+    getState() {
+        let stateStruct = this.getField("state");
+        if(stateStruct) { 
+            return stateStruct.state;
+        }
+        else {
+            //If this happens, we will just make it state normal 
+            return apogeeutil.STATE_NORMAL;
+        }
+    }
 
     /** this method gets the data map. */
     getData() {
         return this.getField("data");
     }
 
+    /** This returns true if this member accepts setting the data. */
+    getSetDataOk() {
+        return this.constructor.generator.setDataOk;
+    }
+
+    /** This returns the pre calc error. */
+    getErrors() {
+        let stateStruct = this.getField("state");
+        let errorList;
+        if(stateStruct) {
+            //If this happens, we will just make it state normal
+            errorList = stateStruct.errorList;
+        }
+        if(!errorList) {
+            //just return an emptylist
+            errorList = [];
+        }
+        return errorList;
+    }
+
+    /** This returns true if the member is not up to date, typically
+     * do to waiting on an asynchronous operation. */
+    getPendingPromise() {
+        return this.getField("pendingPromise");
+    }
+
+    /** This returns true if the pending token matches. */
+    pendingPromiseMatches(promise) {
+        return (this.pendingPromise === promise);
+    }
+
+    //=======================================
+    // Update Data/State functions
+    //=======================================
+
     /** This method sets the data for this object. This is the object used by the 
      * code which is identified by this name, for example the JSON object associated
      * with a JSON table. Besides hold the data object, this updates the parent data map. */
     setData(data) {
         this.setField("data",data);
-    
-        var parent = this.getParent();
-        if(parent) {
-            parent.updateData(this);
+        this._setState(apogeeutil.STATE_NORMAL);
+
+        let dataIsSet = true;
+        let isPending = false;
+        this._finishStateChange(dataIsSet,isPending);
+    }
+
+    /** This method adds an error for this member. It will be valid for the current round of calculation of
+     * this member. The error may be a javascript Error object of string (or any other object really). */
+    setError(error) {
+        this._setState(apogeeutil.STATE_ERROR,[error]);
+        
+        let dataIsSet = false;
+        let isPending = false;
+        this._finishStateChange(dataIsSet,isPending);
+    }
+
+    /** This method sets the pre calc error for this dependent. */
+    setErrors(errorList) {
+        this._setState(apogeeutil.STATE_ERROR,errorList);
+        
+        let dataIsSet = false;
+        let isPending = false;
+        this._finishStateChange(dataIsSet,isPending);
+    }
+
+    /** This sets the result pending flag. If there is a promise setting this member to pending, it should
+     * be passed as an arg. In this case the field will be updated only if the reolving promise matches this
+     * set promise. Otherwise it is assumed the promise had been superceded. In the case this member is pending
+     * because it depends on a remote pending member, then no promise should be passed in to this function. */
+    setResultPending(promise) {
+        this._setState(apogeeutil.STATE_PENDING);
+        if(promise) {
+            this._setField("pendingPromise",promise);
+        }
+
+        let dataIsSet = false;
+        let isPending = true;
+        this._finishStateChange(dataIsSet,isPending);
+    }
+
+    /** This sets the result invalid flag. If the result is invalid, any
+     * table depending on this will also have an invalid value. */
+    setResultInvalid() {
+        this._setDataState(apogeeutil.STATE_INVALID);
+        
+        let dataIsSet = false;
+        let isPending = false;
+        this._finishStateChange(dataIsSet,isPending);
+    }
+
+    /** This method finalizes the data/state change. */
+    _finishStateChange(dataIsSet,isPending) {
+        let dataChanged = dataIsSet;
+
+        //clear data if the we did not set data
+        if(!dataIsSet) {
+            let data = this.getField("data");
+            if(data) {
+                this.clearField("data");
+                //modify data change value
+                dataChanged = true;
+            }
+        }
+
+        //clear pending if the new state is not pending
+        if(!isPending) {
+            let pendingPromise = this.getField("pendingPromise");
+            if(pendingPromise) {
+                this.clearField("pendingPromise");
+            }
+        }
+
+        //notify parent of change to this data member
+        if(dataChanged) {
+            let parent = this.getParent();
+            if(parent) {
+                parent.updateData(this);
+            }
         }
     }
 
+    /** This methos sets the data, where the data can be a generalized value
+     *  include data, apogeeutil.INVALID_VALUE, a Promis or an Error. Also, an explitict
+     * errorList can be passed in, includgin either Error or String objects. */
+    applyData(data,errorList) {
+
+        //handle four types of data inputs
+        if((errorList)&&(errorList.length > 0)) {
+            this.setErrors(errorList);
+        }
+        else if(data instanceof Promise) {
+            //data is a promise - will be updated asynchromously
+            this.applyPromiseData(data);
+        }
+        else if(data instanceof Error) {
+            //data is an error
+            this.setError(error);
+        }
+        else if(data === apogeeutil.INVALID_VALUE) {
+            //data is an invalid value
+            this.setResultInvalid();
+        }
+        else {
+            //normal data update (poosibly from an asynchronouse update)
+            this.setData(data);
+        }
+    }
 
     /** This method implements setting asynchronous data on the member using a promise. */
     applyPromiseData(promise,optionalPromiseRefresh) {
         //set the result as pending
-        this.setResultPending(true,promise);
+        this.setResultPending(promise);
 
         //kick off the asynch update, if this is not only a refresh of the promise
         if(!optionalPromiseRefresh) {
@@ -314,8 +330,54 @@ export default class Member {
     }
 
     //========================================
+    // Move Functions
+    //=========================================
+
+    /** This method should be used to rename and/or change 
+     * the owner of this member. */
+    move(newName,newOwner) {
+        let currentOwner = this.getField("owner");
+
+        //remove from old owner
+        if(currentOwner) {
+            if(currentOwner.isParent) {
+                currentOwner.removeChild(this);
+            }
+            else {
+                //don't allow moving a root for now!
+                //or renaiming either!
+            }
+        }
+        
+        //check for change of name
+        if(newName != this.getField("name")) {
+            this.setField("name",newName);
+        }
+        
+        //place in the new owner or update the name in the old owner
+        //owner field updated here
+        this.initOwner(newOwner);
+    }
+
+
+    //========================================
     // "Protected" Methods
     //========================================
+
+    /** This method must be called to set the owner. */
+    initOwner(owner) {
+        let currentOwner = this.getField("owner");
+        if(currentOwner != owner) {
+            this.setField("owner",owner);
+        }
+        
+        if(owner.isParent) {
+            owner.addChild(this);
+        }
+        else if(owner.isRootHolder) {
+            owner.setRoot(this);
+        }
+    }
 
     /** This method is called when the member is deleted. If necessary the implementation
      * can extend this function, but it should call this base version of the function
@@ -355,41 +417,37 @@ export default class Member {
     //getUpdateData() {
     //}
 
-    /** This method sets the state based on errors, pending and invalid */
-    _calculateState() {
-        let newState;
-        let newMessage;
-        if(this.hasError()) {
-            var errorMsg = "";
-            var errors = this.getErrors();
-            for(var i = 0; i < errors.length; i++) {
-                errorMsg += errors[i].toString() + "\n";
-            }
+    //----------------------------------
+    // State setting methods
+    //----------------------------------
 
-            newState = apogeeutil.STATE_ERROR;
-            newMessage = errorMsg;
-        }
-        else if(this.getResultPending()) {
-            newState = apogeeutil.STATE_PENDING;
-            newMessage = apogeeutil.PENDING_MESSAGE;
+    /** This updates the data state. */
+    _setState(state,errorList) {
+        let newStateStruct = {};
+        let oldStateStruct = this.getField("state");
 
+        //don't update state if it is the same value (unless it is error, then we will update it
+        //becuase I don't feel like comparing the error messages)
+        if((oldStateStruct)&&(oldStateStruct.state == state)&&(state != apogeeutil.STATE_ERROR)) {
+            return;
         }
-        else if(this.getResultInvalid()) {
-            newState = apogeeutil.STATE_INVALID;
-            newMessage = apogeeutil.INVALID_MESSAGE;
+
+        //do some safety checks on the error list
+        if(state == apogeeutil.STATE_ERROR) {
+            //make sure there is an error list
+            if(!errorList) errorList = [];
+
+            newStateStruct.state = apogeeutil.STATE_ERROR;
+            newStateStruct.errorList = errorList;
         }
-        else {   
-            newState = apogeeutil.apogeeutil_NONE;
-            newMessage = null;
+        else {
+            //here we ignore the error list if there was one (there shouldn't be)
+            newStateStruct.state = state;
         }
-        
-        if(newState != this.getField("state")) {
-            this.setField("state",newState);
-        }
-        if(newMessage != this.getField("stateMessage")) {
-            this.setField("stateMessage",newMessage);
-        }
+
+        this.setField("state",newStateStruct);
     }
+
 
 }
 

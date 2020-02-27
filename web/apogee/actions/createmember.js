@@ -71,6 +71,15 @@ export function createMember(model,owner,memberJson) {
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         member = generator.createMember(model,owner,memberJson); 
 
+        //set action flags for successfull new member
+        actionResult.updateModelDependencies = true;
+        if((member.hasCode)&&(member.hasCode())) {
+            actionResult.recalculateMember = true;
+        }
+        else {
+            actionResult.recalculateDependsOnMembers = true;
+        }
+
         //instantiate children if there are any
         if(memberJson.children) {
             actionResult.childActionResults = [];
@@ -85,7 +94,7 @@ export function createMember(model,owner,memberJson) {
         //type not found! - create a dummy object and add an error to it
         let errorTableGenerator = Model.getMemberGenerator("appogee.ErrorTable");
         member = errorTableGenerator.createMember(owner,memberJson);
-        member.addError("Member type not found: " + memberJson.type);
+        member.setError("Member type not found: " + memberJson.type);
         
         //store an error message, but this still counts as command done.
         actionResult.alertMsg = "Error creating member: member type not found: " + memberJson.type;
@@ -93,8 +102,6 @@ export function createMember(model,owner,memberJson) {
 
     actionResult.member = member;
     actionResult.actionDone = true;
-    actionResult.updateModelDependencies = true;
-    actionResult.recalculateMember = true;
 
     return actionResult;
 }
