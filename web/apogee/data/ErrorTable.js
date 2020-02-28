@@ -7,9 +7,7 @@ import Member from "/apogee/datacomponents/Member.js";
 export default class ErrorTable extends Member {
 
     constructor(model,name,owner,completeJson) {
-        super(model,name);
-        
-        this.initOwner(owner);
+        super(model,name,owner);
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS

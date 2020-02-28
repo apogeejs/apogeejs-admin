@@ -8,12 +8,10 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 export default class FunctionTable extends CodeableMember {
 
     constructor(model,name,owner,initialData) {
-        super(model,name);
+        super(model,name,owner);
 
         //mixin init where needed
         this.contextHolderMixinInit();    
-        
-        this.initOwner(owner);
         
         //set initial data
         var argList = initialData.argList ? initialData.argList : [];
@@ -26,17 +24,17 @@ export default class FunctionTable extends CodeableMember {
     // Codeable Methods
     //------------------------------
 
-    processMemberFunction(memberGenerator) {
-        var memberFunction = this.getLazyInitializedMemberFunction(memberGenerator);
+    processMemberFunction(memberFunctionInitializer,memberGenerator) {
+        var memberFunction = this.getLazyInitializedMemberFunction(memberFunctionInitializer,memberGenerator);
         this.setData(memberFunction);
     }
 
-    getLazyInitializedMemberFunction(memberGenerator) {
+    getLazyInitializedMemberFunction(memberFunctionInitializer,memberGenerator) {
 
         //create init member function for lazy initialization
         //we need to do this for recursive functions, or else we will get a circular reference
         var initMember = () => {
-            var impactorSuccess = this.memberFunctionInitialize();
+            var impactorSuccess = memberFunctionInitializer();
             if(impactorSuccess) {
                 return memberGenerator();
             }

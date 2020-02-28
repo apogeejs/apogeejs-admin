@@ -72,10 +72,11 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     
     //create an action to update an member additional properties
     var memberGenerator = member.constructor.generator;
+    let actionResult;
     if(memberGenerator.getPropertyUpdateAction) {
         var actionData = memberGenerator.getPropertyUpdateAction(member,commandData.updatedMemberProperties);  
         if(actionData) {
-            let actionResult = doAction(model,actionData);
+            actionResult = doAction(model,actionData);
             
             if(!actionResult.actionDone) {
                 error = true;
@@ -98,6 +99,11 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
         commandResult.target = component;
         commandResult.action = "updated";
     }
+
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    //temporary change
+    commandResult.actionResult = actionResult;
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     
     return commandResult;
 }

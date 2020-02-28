@@ -47,11 +47,10 @@ savemembercode.executeCommand = function(workspaceManager,commandData) {
     commandResult.cmdDone = actionResult.actionDone;
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
 
-    if(actionResult.actionDone) {
-        let member = model.getMemberByFullName(commandData.memberFullName);
-        commandResult.target = modelManager.getComponent(member);
-        commandResult.action = "updated";
-    }
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    //temporary change
+    commandResult.actionResult = actionResult;
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     
     return commandResult;
 }

@@ -12,8 +12,8 @@ import Member from "/apogee/datacomponents/Member.js";
 export default class DependentMember extends Member {
 
     /** This initializes the component */
-    constructor(model,name) {
-        super(model,name);
+    constructor(model,name,owner) {
+        super(model,name,owner);
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -64,6 +64,8 @@ export default class DependentMember extends Member {
     /** This does any init needed for calculation.  */
     prepareForCalculate() {
         this.calcPending = true;
+        //clear any errors, and other state info
+        this.clearState();
     }
 
     ///** This updates the member based on a change in a dependency.  */

@@ -8,12 +8,10 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 export default class JsonTable extends CodeableMember {
 
     constructor(model,name,owner,initialData) {
-        super(model,name);
+        super(model,name,owner);
 
         //mixin init where needed
         this.contextHolderMixinInit();
-        
-        this.initOwner(owner);
         
         //set initial data if not already set
         if(!initialData) {
@@ -58,23 +56,14 @@ export default class JsonTable extends CodeableMember {
         return [];
     }
         
-    processMemberFunction(memberGenerator) {
-        
-        //first initialize
-        var initialized = this.memberFunctionInitialize();
-        
-        var data;
+    processMemberFunction(memberFunctionInitializer,memberGenerator) {
+        let initialized = memberFunctionInitializer();
         if(initialized) {
             //the data is the output of the function
-            var memberFunction = memberGenerator();
-            data = memberFunction();
-        }
-        else {
-            //initialization issue = error or pending dependancy
-            data = undefined;
-        }
-
-        this.applyData(data);
+            let memberFunction = memberGenerator();
+            let data = memberFunction();
+            this.applyData(data);
+        } 
     }
 
     //------------------------------

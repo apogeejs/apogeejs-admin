@@ -94,6 +94,11 @@ export default class ModelManager extends EventManager {
             commandResult.childCommandResults = [rootFolderCommandResult];
         }
 
+        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        //temporary change
+        commandResult.actionResult = actionResult;
+        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
         return commandResult;
     }
 
@@ -279,6 +284,11 @@ export default class ModelManager extends EventManager {
             commandResult.cmdDone = false;
             commandResult.targetType = "component"
             commandResult.action = "created";
+
+            //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            //temporary change
+            commandResult.actionResult = actionResult;
+            //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         }
         else {
             commandResult.target = component;

@@ -9,13 +9,11 @@ import Parent from "/apogee/datacomponents/Parent.js";
 export default class Folder extends DependentMember {
 
     constructor(model,name,owner) {
-        super(model,name);
+        super(model,name,owner);
 
         //mixin init where needed
         this.contextHolderMixinInit();
         this.parentMixinInit();
-        
-        this.initOwner(owner);
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -65,12 +63,6 @@ export default class Folder extends DependentMember {
         newChildMap[name] = child;
         this.setField("childMap",newChildMap);
         
-        var data = child.getData();
-        //object may first appear with no data
-        if(data !== undefined) {
-            this.spliceDataMap(name,data);
-        }
-        
         //set all children as dependents
         this.calculateDependents();
     }
@@ -90,23 +82,9 @@ export default class Folder extends DependentMember {
         
         delete(newChildMap[name]);
         this.setField("childMap",newChildMap);
-        this.spliceDataMap(name);
         
         //set all children as dependents
         this.calculateDependents();
-    }
-
-    /** This method updates the table data object in the folder data map. */
-    updateData(child) {
-        
-        let name = child.getName();
-        let data = child.getData();
-        let childMap = this.getField("childMap");
-        if(childMap[name] === undefined) {
-            alert("Error - this table " + name + " has not yet been added to the folder.");
-            return;
-        }
-        this.spliceDataMap(name,data);
     }
 
     /** There is no calculation for the folder base on dependents. 
@@ -117,10 +95,19 @@ export default class Folder extends DependentMember {
 
     /** Calculate the data.  */
     calculate() {
-        //we don't need to calculate since the calculate is done on the fly
-        //we just need to make sure the impactors are set
+        //make sure impactors are calculated
         this.initializeImpactors();
+
+        //make an immutable map of the data for each child
+        let childMap = this.getField("childMap");
+        let dataMap = {};
+        for(let name in childMap) {
+            dataMap[name] = childMap[name].getData();
+        }
+        Object.freeze(dataMap);
+        this.setData(dataMap);
         
+        //clear calc pending flag
         this.clearCalcPending();
     }
 
@@ -192,30 +179,6 @@ export default class Folder extends DependentMember {
             dependsOnMemberList.push(child);
         }
         this.updateDependencies(dependsOnMemberList);
-    }
-
-    /** This method creates a new immutable data map, either adding a give name and data or
-     * removing a name. To remove a name from the map, leave "addData" as undefined. 
-     * @private */
-    spliceDataMap(addOrRemoveName,addData) {
-        var newDataMap = {};
-        let oldDataMap = this.getField("data");
-        
-        //copy old data
-        for(var key in oldDataMap) {
-            if(key !== addOrRemoveName) {
-                newDataMap[key] = oldDataMap[key];
-            }
-        }
-        //add or update thiis child data
-        if(addData !== undefined) {
-            newDataMap[addOrRemoveName] = addData;
-        }
-        
-        //make this immutable and set it as data for this folder
-        Object.freeze(newDataMap);
-        this.dataMap = newDataMap;
-        this.setData(this.dataMap);
     }
 }
 

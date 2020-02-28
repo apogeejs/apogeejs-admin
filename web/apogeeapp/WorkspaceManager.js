@@ -1,6 +1,3 @@
-import base from "/apogeeutil/base.js";
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import { Model, doAction } from "/apogee/apogeeCoreLib.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
 import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";

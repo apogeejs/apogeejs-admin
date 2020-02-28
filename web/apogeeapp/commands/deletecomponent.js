@@ -48,32 +48,11 @@ deletecomponent.executeCommand = function(workspaceManager,commandData) {
     commandResult.cmdDone = actionResult.actionDone;
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
 
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-// NEED TO FILL IN RESULT DIFFERENTLY!!!
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    if(actionResult.actionDone) {
-        _fillInCommandResults(modelManager,actionResult,commandResult);
-    }
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    //temporary change
+    commandResult.actionResult = actionResult;
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     
-    return commandResult;
-}
-
-/** This method fills in command results from the action results, recursively. If a command result
- * object is passed in it is populated, If one is not passed in, a new one is created.
- * The command result is returned.
- */
-function _fillInCommandResults(modelManager,actionResult,commandResult) {
-    if(!commandResult) commandResult = {};
-
-    commandResult.targetId = actionResult.member.getId();
-    commandResult.targetType = "component";
-    commandResult.parent = modelManager;
-    commandResult.action = "deleted";
-    
-    if(actionResult.childActionResults) {
-        commandResult.childCommandResults = actionResults.childActionResults.map( actionResult => _fillInCommandResults(workspaceManager,actionResult))
-    }
-
     return commandResult;
 }
 

@@ -19,7 +19,7 @@ import FieldObject from "/apogeeutil/FieldObject.js";
  * a folder and it is called the root folder. */
 export default class Member {
 
-    constructor(model,name) {
+    constructor(model,name,owner) {
         this.id = _createId();
 
         this.fieldObjectMixinInit();
@@ -28,13 +28,22 @@ export default class Member {
         //FIELDS
         this.setField("name",name);
         this.setField("model",model);
-        //"owner"
+        this.setField("owner",owner);
         //"data"
         //"pendingPromise"
         //"state"
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
+        //register member with model
         model.registerMember(this);
+
+        //init the owner for this child
+        if(owner.isParent) {
+            owner.addChild(this);
+        }
+        else if(owner.isRootHolder) {
+            owner.setRoot(this);
+        }
     }
 
     /** this method gets the ID. It is not persistent and is valid only for this 
@@ -184,6 +193,10 @@ export default class Member {
     // Update Data/State functions
     //=======================================
 
+    clearState() {
+        this.clearField("state");
+    }
+
     /** This method sets the data for this object. This is the object used by the 
      * code which is identified by this name, for example the JSON object associated
      * with a JSON table. Besides hold the data object, this updates the parent data map. */
@@ -242,15 +255,11 @@ export default class Member {
 
     /** This method finalizes the data/state change. */
     _finishStateChange(dataIsSet,isPending) {
-        let dataChanged = dataIsSet;
-
         //clear data if the we did not set data
         if(!dataIsSet) {
             let data = this.getField("data");
             if(data) {
                 this.clearField("data");
-                //modify data change value
-                dataChanged = true;
             }
         }
 
@@ -259,14 +268,6 @@ export default class Member {
             let pendingPromise = this.getField("pendingPromise");
             if(pendingPromise) {
                 this.clearField("pendingPromise");
-            }
-        }
-
-        //notify parent of change to this data member
-        if(dataChanged) {
-            let parent = this.getParent();
-            if(parent) {
-                parent.updateData(this);
             }
         }
     }
@@ -339,7 +340,7 @@ export default class Member {
         let currentOwner = this.getField("owner");
 
         //remove from old owner
-        if(currentOwner) {
+        if(currentOwner != newOwner) {
             if(currentOwner.isParent) {
                 currentOwner.removeChild(this);
             }
@@ -354,30 +355,24 @@ export default class Member {
             this.setField("name",newName);
         }
         
-        //place in the new owner or update the name in the old owner
-        //owner field updated here
-        this.initOwner(newOwner);
+        //remove from old owner
+        if(currentOwner != newOwner) {
+            this.setField("owner",newOwner);
+
+            if(newOwner.isParent) {
+                newOwner.addChild(this);
+            }
+            else {
+                //don't allow moving a root for now!
+                //or renaiming either!
+            }
+        }
     }
 
 
     //========================================
     // "Protected" Methods
     //========================================
-
-    /** This method must be called to set the owner. */
-    initOwner(owner) {
-        let currentOwner = this.getField("owner");
-        if(currentOwner != owner) {
-            this.setField("owner",owner);
-        }
-        
-        if(owner.isParent) {
-            owner.addChild(this);
-        }
-        else if(owner.isRootHolder) {
-            owner.setRoot(this);
-        }
-    }
 
     /** This method is called when the member is deleted. If necessary the implementation
      * can extend this function, but it should call this base version of the function

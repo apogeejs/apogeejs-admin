@@ -277,6 +277,46 @@ export default class CommandManager {
         return "error";
     }
 
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+    static createCommandResultFromActionResult(actionResult) {
+        let convertMemberEventName = eventName => {
+            switch(eventName) {
+                case "memberCreated":
+                    return "created";
+
+                case "memberUpdated":
+                    return "updated";
+
+                case "memberDeleted":
+                    return "deleted";
+
+                default:
+                    return "UNKONWN EVENT: " + eventName;
+            }
+        }
+
+        commandResult = {}
+        if(aciontResult.actionDone) {
+            commandResult.cmdDone = true;
+            commandResult.childCommandResults = [];
+            actionResult.changeList.forEach( changeResult => {
+                let childCommandResult = {};
+                if(changeResult.member) {
+                    childCommandResult.target = modelManager.getComponent(changeResult.member);
+                    childCommandResult.action = convertMemberEventName(changeResult.event);
+                    commandResult.childCommandResults.push(childCommandResult);
+                }
+            })
+        }
+        else {
+            commandResult.cmdDone = false;
+            commandResult.alertMsg = actionResult.alertMsg;
+        }
+    }
+
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
     //=========================================
     // Static Methods
     //=========================================

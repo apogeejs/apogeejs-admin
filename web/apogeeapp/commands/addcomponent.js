@@ -60,11 +60,14 @@ addcomponent.executeCommand = function(workspaceManager,commandData) {
     }
     else {
         commandResult = {};
+        commandResult.cmdDone = false;
+        if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
     }
-
-    commandResult.cmdDone = actionResult.actionDone;
-    if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
     
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    //temporary change
+    commandResult.actionResult = actionResult;
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     return commandResult;
 }
 

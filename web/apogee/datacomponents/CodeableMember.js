@@ -22,8 +22,8 @@ import DependentMember from "/apogee/datacomponents/DependentMember.js"
 export default class CodeableMember extends DependentMember {
 
     /** This initializes the component. argList is the arguments for the object function. */
-    constructor(model,name) {
-        super(model,name);
+    constructor(model,name,owner) {
+        super(model,name,owner);
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -38,8 +38,6 @@ export default class CodeableMember extends DependentMember {
         //WORKING FIELDS
         //fields used in calculation
         this.dependencyInitInProgress = false;
-        this.functionInitialized = false;
-        this.initReturnValue = false;
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     }
 
@@ -157,30 +155,25 @@ export default class CodeableMember extends DependentMember {
         return this.hasCode();
     }
 
-    /** This does any init needed for calculation.  */
-    prepareForCalculate() {
-        //call the base function
-        super.prepareForCalculate();
-        
-        this.functionInitialized = false;
-        this.initReturnValue = false;
-    }
-
     /** This method sets the data object for the member.  */
     calculate() {
         let compiledInfo = this.getField("compiledInfo");
-        let codeErrors = [];
         if(!compiledInfo) {
-            codeErrors.push("Code not found for member: " + this.getName());
+            this.setError("Code not found for member: " + this.getName());
+            this.clearCalcPending();
+            return;
         }
         else if(!compiledInfo.valid) {
             this.setErrors(compiledInfo.codeErrors);
             this.clearCalcPending();
             return;
         }
-        
+
+//temporary - re create the initializer
+let memberFunctionInitializer = this.createMemberFunctionInitializer();
+      
         try {
-            this.processMemberFunction(compiledInfo.memberFunctionGenerator);
+            this.processMemberFunction(memberFunctionInitializer,compiledInfo.memberFunctionGenerator);
         }
         catch(error) {
             if(error == base.MEMBER_FUNCTION_INVALID_THROWABLE) {
@@ -268,51 +261,60 @@ export default class CodeableMember extends DependentMember {
     //processMemberFunction 
     
     /** This makes sure user code of object function is ready to execute.  */
-    memberFunctionInitialize() {
-        
-        if(this.functionInitialized) return this.initReturnValue;
-        
-        //make sure this in only called once
-        if(this.dependencyInitInProgress) {
-            this.setError("Circular reference error");
-            //clear calc in progress flag
-            this.dependencyInitInProgress = false;
-            this.functionInitialized = true;
-            this.initReturnValue = false;
-            return this.initReturnValue;
-        }
-        this.dependencyInitInProgress = true;
-        
-        try {
-            //make sure the data is set in each impactor
-            this.initializeImpactors();
-            if(this.getState() != apogeeutil.STATE_NORMAL) {
-                this.dependencyInitInProgress = false;
-                this.functionInitialized = true;
-                this.initReturnValue = false;
-                return this.initReturnValue;
-            }
-            
-            //set the context
-            let compiledInfo = this.getField("compiledInfo");
-            let messenger = new Messenger(this);
-            compiledInfo.memberFunctionContextInitializer(this.getContextManager(),messenger);
-            
-            this.initReturnValue = true;
-        }
-        catch(error) {
-            //this is an error in the code
-            if(error.stack) {
-                console.error(error.stack);
-            }
+    createMemberFunctionInitializer() {
+        //we want to hold these as closure variables
+        let functionInitialized = false;
+        let functionInitializedSuccess = false;
 
-            this.setError(error);
-            this.initReturnValue = false;
+        let memberFunctionInitializer = () => {
+            
+            if(functionInitialized) return functionInitializedSuccess;
+            
+            //make sure this in only called once
+            if(this.dependencyInitInProgress) {
+                this.setError("Circular reference error");
+                //clear calc in progress flag
+                this.dependencyInitInProgress = false;
+                functionInitialized = true;
+                functionInitializedSuccess = false;
+                return functionInitializedSuccess;
+            }
+            this.dependencyInitInProgress = true;
+            
+            try {
+                //make sure the data is set in each impactor
+                this.initializeImpactors();
+                if(this.getState() != apogeeutil.STATE_NORMAL) {
+                    this.dependencyInitInProgress = false;
+                    functionInitialized = true;
+                    functionInitializedSuccess = false;
+                    return functionInitializedSuccess;
+                }
+                
+                //set the context
+                let compiledInfo = this.getField("compiledInfo");
+                let messenger = new Messenger(this);
+                compiledInfo.memberFunctionContextInitializer(this.getContextManager(),messenger);
+                
+                functionInitializedSuccess = true;
+            }
+            catch(error) {
+                //this is an error in the code
+                if(error.stack) {
+                    console.error(error.stack);
+                }
+
+                this.setError(error);
+                functionInitializedSuccess = false;
+            }
+            
+            this.dependencyInitInProgress = false;
+            functionInitialized = true;
+            return functionInitializedSuccess;
         }
-        
-        this.dependencyInitInProgress = false;
-        this.functionInitialized = true;
-        return this.initReturnValue;
+
+        return memberFunctionInitializer;
+
     }
 
 

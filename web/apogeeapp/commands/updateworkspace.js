@@ -51,6 +51,11 @@ updateworkspace.executeCommand = function(workspaceManager,commandData) {
     commandResult.target = modelManager;
     commandResult.action = "updated";
     if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
+
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    //temporary change
+    commandResult.actionResult = actionResult;
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     
     return commandResult;
 }
