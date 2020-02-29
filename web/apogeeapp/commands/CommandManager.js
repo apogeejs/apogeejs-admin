@@ -31,16 +31,15 @@ import CommandHistory from "./CommandHistory.js";
  *      cmdDone: If this is true the command was done. This implies the undo command
  *      should undo the results. If this value is false, no action was taken.
  *
- *      alertMsg - This is a message for the user after the command was executed. This
+ *      errorMsg - This is a message for the user after the command was executed. This
  *      is typically an error mesasge. There may still be a message if cmdDone is true, 
  *      since that does not necessarily imply the command was exectued completely
  *      as intended.
  *      
- *      isFatal - If this flag is set there was an error that may have left the 
- *      program in an inoperable or unpredictably state and the program should be
- *      aborted. 
+ *      
  *      
  *      (all other data depends on the specific command)
+ * }
  *
  */
 export default class CommandManager {
@@ -57,6 +56,7 @@ export default class CommandManager {
     */
     executeCommand(command,suppressFromHistory) {
         var workspaceManager = this.app.getWorkspaceManager();
+        var modelManager = workspaceManager.getModelManager();
         let commandResult;
         
         var commandObject = CommandManager.getCommandObject(command.type);
@@ -68,7 +68,11 @@ export default class CommandManager {
 
             //for asynch transactions, pass a callback for handling any asynch result
             if(commandObject.commandInfo.isAsynch) {
-                asynchOnComplete = commandResult => this._publishEvents(commandResult);
+                asynchOnComplete = commandResult => {
+                    //process command result ad publish events
+                    let changeResult = this._createChangeResult(commandResult,modelManager);
+                    this._publishEvents(changeResult);
+                }
             }
 
             //create undo command before doing command (since it may depend on current state)
@@ -87,30 +91,27 @@ export default class CommandManager {
                 
                 commandResult = {};
                 commandResult.cmdDone = false;
-                commandResult.alertMsg = "Unknown error executing command: " + error.message;
-                commandResult.isFatal = true;
+                commandResult.errorMsg = "Unknown error executing command: " + error.message;
             }
         }
         else {
             commandResult = {};
             commandResult.cmdDone = false;
-            commandResult.alertMsg = "Command type not found: " + command.type;
+            commandResult.errorMsg = "Command type not found: " + command.type;
         }
         
         //add to history if the command was done and there is an undo command
         if((commandResult.cmdDone)&&(undoCommand)) {   
             this.commandHistory.addToHistory(undoCommand,command,description);
         }
+
+        //create change list
+        let changeResult = this._createChangeResult(commandResult,modelManager);
         
         //fire events!!
-        this._publishEvents(commandResult);
-        
-/////////////////////////////////////////////////////
-//REMOVE THIS WHEN I HAVE BETTER HANDLING IN THE UI???
-        if(commandResult.alertMsg) CommandManager.errorAlert(commandResult.alertMsg,commandResult.isFatal);
-//////////////////////////////////////////////////////
+        this._publishEvents(changeResult);
 
-        return commandResult;
+        return changeResult;
     }
 
     /** This returns the command history. */
@@ -122,8 +123,184 @@ export default class CommandManager {
     // Private Methods
     //=========================================
 
+    /** This method creates a change result, used for firing events and as a return value from the command result, the
+     * return value from the command. */
+    _createChangeResult(commandResult,modelManager) {
+        //traverse the command result tree, make a change list, store all error msgs, check if there are any failures
+        //on failure, ignore changes
+        let changeMap = {};
+        let errorInfo = {};
+        this._processCommandResult(commandResult,changeMap,errorInfo);
+
+        //convert the actionChangeList to a commandChangeList
+        if(commandResult.actionResult) {
+            this._processActionChangeList(commandResult.actionResult,changeMap,errorInfo,modelManager);
+        }
+
+        changeResult = {};
+        if(errorInfo.error) {
+            changeResult.cmdDone = false;
+            changeResult.errorMsgs = errorInfo.errorMsgs;
+        }
+        else {
+            changeResult.cmdDone = true;
+            changeResult.changeList = [];
+            for(let key in changeMap) {
+                let changeMapEntry = changeMap[key];
+                changeEntry = this._changeMapEntryToChangeEntry(changeMapEntry);
+                if(changeEntry) changeResult.changeList.push(changeEntry);
+            }
+        }
+
+        return changeResult;
+    }
+
+    /** This method flattens the command result into the change map and the error info. */
+    _processCommandResults(commandResult,changeMap,errorInfo) {
+        if(!commandResult.cmdDone) {
+            errorInfo.error = true;
+            if(!errorInfo.errorMsgs) errorInfo.errorMsgs = [];
+            errorInfo.errorMgs.push(commandResult.errorMsg);
+        }
+        else if((commandResult.target)||(commandResult.targetId)) {
+            this._addToChangeMap(commandResult,changeMap);
+        }
+
+        if(commandResult.childCommandResults) {
+            commandResult.childCommandResults.forEach(childCommandResult => this._processCommandResults(childCommandResult,changemap,errorInfo));
+        }
+    }
+
+    /** This method takes then entries from the action change list and enters them inot the command change map.
+     * It does this by finding the associated Component/ModelManager change and adding an entry to the change map for it. */
+    _processActionChangeList(actionChangeResult,changeMap,errorInfo,modelManager) {
+        if(!actionChangeResult.actionDone) {
+            errorInfo.error = true;
+            if(actionChangeResult.errorMsgs) {
+                if(!errorInfo.errorMsgs) errorInfo.errorMsgs = [];
+                errorInfo.errorMsgs.push(...actionChangeResult.errorMsgs);
+            }
+        }
+        else if(actionChangeResult.changeList) {
+            actionChangeResult.changeList.forEach(actionChangeEntry => {
+                //create a command change entry for each action change entry and then add it to the change map
+                let cmdRsltEquivelent = {};
+                if(actionChangeEntry.event) {
+                    cmdRsltEquivelent.action = actionChangeEntry.event;
+                    if(actionChangeEntry.member) {
+                        //member action
+                        cmdRsltEquivelent.targetId = actionChangeEntry.member.getId();
+                        cmdRsltEquivelent.targetType = "component";
+                        if(eventName == "deleted") {
+                            //store theparent if this is a delete event
+                            cmdRsltEquivelent.parent = actionChangeEntry.owner;
+                        }
+                        else {
+                            //otherwise, store the target.
+                            cmdRsltEquivelent.target = modelManager.getComponentById(cmdRsltEquivelent.targetId);
+                        }
+                    }
+                    else {
+                        //model action
+                        cmdRsltEquivelent.target = modelManager;
+                        cmdRsltEquivelent.targetId = modelManager.getId();
+                        cmdRsltEquivelent.targetType = modelManager.getTargetType();
+                    }
+
+                    //all model events will do through the model manager.
+                    cmdRsltEquivelent.dispatcher = modelManager;
+
+                    this._addToChangeMap(cmdRsltEquivelent,changeMap);
+                }
+            });
+        }
+    }
+
+    /** This method merges a change entry into the change map. */
+    _addToChangeMap(changeEntry,changeMap) {
+        let targetId;
+        let targetType;
+        let target;
+        if(changeEntry.target) {
+            target = changeEntry.target;
+            targetId = target.getId();
+            targetType = target.getTargetType();
+        }
+        else if((changeEntry.targetId != undefined)&&(changeEntry.targetType)) {
+            target = undefined;
+            targetId = target.getId();
+            targetType = target.getTargetType();
+        }
+        else {
+            //not a valid entry
+            //I should acknowledge an error here
+            return;
+        }
+
+        //get the lookup key
+        let key = apogeeutil.createUniqueKey(targetType,targetId);
+        
+        //create the change map entry
+        let changeMapEntry = changeMap[key];
+        if(!changeEntry) {
+            changeMapEntry = {};
+            if(changeEntry.target) {
+                changeMapEntry.target = target;
+                changeMapEntry.targetType = targetType;
+                changeMapEntry.targetId = targetId;
+                changeMapEntry.dispatcher = changeEntry.dispatcher;
+            }
+            changeMap[key] = changeMapEntry;
+        }
+        //there may be a case where we do not have a target instance in the change map entry because
+        //we found a delete first. We could add the target if we later come across a create or update, but
+        //we won't need it since the event will be either delete or a null event.
+
+        //store the event type for this target
+        changeMapEntry[changeEntry.action] = true;
+    }
+
+    /** This converts the change map entry, which usd as a working variable to combine events so there
+     * is only one per target, into a change enry, which is used for firing events. */
+    _changeMapEntryToChangeEntry(changeMapEntry) {
+        let changeEntry = {};
+
+        if((changeMapEntry.created)&&(changeMapEntry.deleted)) {
+            //no event - the object was created and destroyed
+            changeEntry = null;
+        }
+        else if(changeMapEntry.created) {
+            //created event
+            changeEntry.event = "created";
+            changeEntry.target = changeMapEntry.target;
+            changeEntry.dispatcer = changeMapEntry.dispatcher;
+        }
+        else if(changeMapEntry.deleted) {
+            //deleted event
+            changeEntry.event = "deleted";
+            changeEntry.targetId = changeMapEntry.targetId;
+            changeEntry.targetType = changeMapEnry.targetType;
+            changeEntry.dispatcer = changeMapEntry.dispatcher;
+        }
+        else if(changeMapEntry.updated) {
+            changeEntry.event = "updated";
+            changeEntry.target = changeMapEntry.target;
+            changeEntry.dispatcer = changeMapEntry.dispatcher;
+        }
+        else {
+            //unknown case
+            changeEntry = null;
+        }
+        return changeEntry;
+    }
+
     /** This fires all the necessary events for the given command result */
     _publishEvents(commandResult) {
+
+        //@@@@@@@@@@@@@@@@@@@@@
+        throw new Error("Update this for change result");
+        //@@@@@@@@@@@@@@@@@@@@@
+
         //combine the command result of successful events so here is one per target
         //also fire all the unsuccesful events
         let successEventMap = {};
@@ -140,6 +317,11 @@ export default class CommandManager {
     }
 
     _fireEvent(eventData) {
+
+        //@@@@@@@@@@@@@@@@@@@@@
+        throw new Error("Update this for change result (and maybe update change above to include parent!");
+        //@@@@@@@@@@@@@@@@@@@@@
+
         if((eventData.action == "created")||(eventData.action == "deleted")) {
             //dispatch created and deleted events to the parent
             if(eventData.parent) eventData.parent.dispatchEvent(eventData.action,eventData);
@@ -150,173 +332,6 @@ export default class CommandManager {
         } 
     }
 
-    /** This flattens the command result structure, which contains a single parent and potentially mulitple
-     * generations of child events.
-     */
-    _flattenCommandResults(commandResult,successEventMap,failedEvents) {
-        if(commandResult.cmdDone) {
-
-            let uniqueTargetId = this._getUniqueTargetId(commandResult);
-
-            if(uniqueTargetId) {
-                //marge target info so there is no more than one event per target (for successful events)
-                let eventData = successEventMap[uniqueTargetId];
-                if(eventData) {
-                    eventData = this._mergeEventData(eventData,commandResult);
-                }
-                else {
-                    eventData = this._createNewEventData(commandResult);
-                }
-                successEventMap[uniqueTargetId] = eventData;
-            }
-
-            //process any children
-            if(commandResult.childCommandResults) {
-                commandResult.childCommandResults.forEach(childCommandResult => this._flattenCommandResults(childCommandResult,successEventMap,failedEvents));
-            }
-        }
-        else {
-            //if we didn't process this, add it to other events
-            failedEvents.push(this._createNewEventData(commandResult));
-        }
-    }
-
-    _getUniqueTargetId(commandResult) {
-        let targetId;
-        let targetType;
-
-        if(commandResult.target) {
-            //used on create and update
-            targetId = commandResult.target.getId();
-            targetType = commandResult.target.getTargetType();
-        }
-        else {
-            //used on delete
-            targetId = commandResult.targetId;
-            targetType = commandResult.targetType;
-        }
-
-        if((targetId != undefined)&&(targetType)) {
-            return targetType + targetId;
-        }
-        else {
-            return undefined;
-        }
-    }
-
-    /** This creates new event target data from a command result */
-    _createNewEventData(commandResult) {
-        //copy everything but the childCommandResults
-        let eventData = {};
-        for(let key in commandResult) {
-            if(key == "childCommandResults") continue;
-            eventData[key] = commandResult[key];
-        }
-        if(commandResult.target) eventData.fieldsUpdated = commandResult.target.getUpdated();
-        return eventData;
-    }
-
-    /** Thie updated the target data for the new command result. */
-    _mergeEventData(eventData,commandResult) {
-
-        let action = this._getActionType(eventData.action,commandResult.action);
-
-        //we have a potential new action
-        eventData.action = action;
-        //we might have to combine error messages
-        eventData.errorMsg = this._getMergeErrorMsg(eventData.alertMsg,commandResult.alertMsg);
-        //or the is pending flags
-        eventData.isPending = eventData.isPending || commandResult.isPending;
-
-        //parent would only be present on the first command
-        //child commands and are not in the event target data
-         
-        return eventData;
-    }
-
-    _getMergeErrorMsg(firstMsg,secondMsg) {
-        if(firstMsg && secondMsg) {
-            //we should get a better concatenation...
-            return firstMsg + "; " + secondMsg;
-        }
-        else if(firstMsg) {
-            return firstMsg;
-        }
-        else if(secondMsg) {
-            return secondMsg;
-        }
-        else {
-            return undefined;
-        } 
-    }
-
-    /** This creates a combined event by merging two successive events within the same command. */
-    _getActionType(firstAction,secondAction) {
-        if(firstAction == "created") {
-            if(secondAction == "updated") {
-                //created + updated = created
-                return "created";
-            }
-            else if(secondAction == "deleted"){
-                //created + deleted = canceling event
-                //we can support this, but for now we will make it an error
-                return "error";
-            }
-        }
-        else if(firstAction == "updated") {
-            if(secondAction == "updated") {
-                return "updated";
-            }
-            else if(secondAction == "deleted") {
-                //updated + deleted = deleted
-                return "deleted";
-            }
-        }
-
-        //any other scenario is an error
-        return "error";
-    }
-
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-    static createCommandResultFromActionResult(actionResult) {
-        let convertMemberEventName = eventName => {
-            switch(eventName) {
-                case "memberCreated":
-                    return "created";
-
-                case "memberUpdated":
-                    return "updated";
-
-                case "memberDeleted":
-                    return "deleted";
-
-                default:
-                    return "UNKONWN EVENT: " + eventName;
-            }
-        }
-
-        commandResult = {}
-        if(aciontResult.actionDone) {
-            commandResult.cmdDone = true;
-            commandResult.childCommandResults = [];
-            actionResult.changeList.forEach( changeResult => {
-                let childCommandResult = {};
-                if(changeResult.member) {
-                    childCommandResult.target = modelManager.getComponent(changeResult.member);
-                    childCommandResult.action = convertMemberEventName(changeResult.event);
-                    commandResult.childCommandResults.push(childCommandResult);
-                }
-            })
-        }
-        else {
-            commandResult.cmdDone = false;
-            commandResult.alertMsg = actionResult.alertMsg;
-        }
-    }
-
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
     //=========================================
     // Static Methods
     //=========================================
@@ -324,11 +339,7 @@ export default class CommandManager {
     /** This message does a standard error alert for the user. If the error is
      * fatal, meaning the application is not in a stable state, the flag isFatal
      * should be set to true. Otherwise it can be omitted or set to false.  */
-    static errorAlert(errorMsg,isFatal) {
-        if(isFatal) {
-            errorMsg = "Fatal Error: The application is in an indterminate state and should be closed!. " + errorMsg;
-        }
-        
+    static errorAlert(errorMsg) {
         alert(errorMsg);
     }
     

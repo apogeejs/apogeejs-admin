@@ -27,7 +27,7 @@ import {addActionInfo} from "/apogee/actions/action.js";
  */
 
 
-/** member UPDATED EVENT: "memberUpdated"
+/** member UPDATED EVENT: "updated"
  * Event member format:
  * {
  *  "member": (member)
@@ -135,7 +135,7 @@ function updateData(model,actionData) {
     return actionResult;
 }
 
-let ACTION_EVENT = "memberUpdated";
+let ACTION_EVENT = "updated";
 
 //The following code registers the actions
 addActionInfo("updateCode",updateCode);

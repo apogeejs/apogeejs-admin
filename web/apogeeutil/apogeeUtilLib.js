@@ -21,6 +21,11 @@ apogeeutil.STATE_ERROR = "error";
 /** Invalid State - used by members */
 apogeeutil.STATE_INVALID = "invalid";
 
+/** This method creates a unique key for a field object target.  */
+apogeeutil.createUniqueKey = function(targetType,targetId) {
+    return targetType + targetId;
+}
+
 /** 
  * This value can be assigned to a data table to signify that data is not valid.
  * Any other member depending on this value will withhold the calcalation and also

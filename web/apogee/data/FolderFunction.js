@@ -273,9 +273,6 @@ export default class FolderFunction extends DependentMember {
 
             //apply the update
             var actionResult = doAction(virtualModel,actionData);        
-            if(actionResult.alertMsg) {
-                CommandManager.errorAlert(actionResult.alertMsg);
-            }
             if(actionResult.actionDone) {
                 //retrieve the result
                 if(returnValueTable) {
@@ -290,6 +287,10 @@ export default class FolderFunction extends DependentMember {
                     //no return value found
                     return undefined;
                 }
+            }
+            else {
+                let errorMsg = actionResult.errorMsg ? actionResult.errorMsg : "Unknown error evaluating Folder Function " + this.getName();
+                throw new Error(errorMsg);
             }
         }
         

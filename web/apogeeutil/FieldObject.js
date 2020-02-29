@@ -53,7 +53,7 @@ FieldObject.isFieldUpdated = function(field) {
 
 /** This method should be implemented for any object using this mixin. 
  * This should give a unique identifier for all objects of the given target type, below. */
-//getId() Implmented above
+//getId()
 
 /** Thie method should be implemented for any object using this method. 
  * It identifies the type of object */

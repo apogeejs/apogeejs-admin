@@ -42,13 +42,13 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  *                  the new state the results from the action.
  *   "actionPending": (This flag is returned if the action is a queued action and will be run after the
  *                  current action completes.)
- *   "member": (The object modified in the action, if it is a member. The other option is a model update, in which 
- *                  case this field is left undefined.)
+ *   "member": (The object modified in the action, if it is a member. Another option is a model update, in which 
+ *                  case this field is left undefined, but a model event will be included. It is also possible that
+ *                  there is no member listed because the action result does not corrspond to an action on a member of 
+ *                  the model. This is true on the top level result of a compound action.)
  *   "event": (This is the event that should be fired as a result of this action/actionResult. The options are:
- *                  memberCreate, memberUpdated, memberDeleted or modelUpdated.)
- *   "alertMsg": (This is a message that should be given to the user. It usually will be sent if there is an error
- *                  where actionDone is false, though it may be set on actionDone = true too, to indicate there was 
- *                  a problem cpomared to what was expectd.)
+ *                  "created", "updated" and "deleted".)
+ *   "errorMsg": (This is the error message for is the actionDone is false)
  *   "childActionResults" - (This is a list of action results if there are additional child actions done with this
  *                  action. Examples where this is used are on creating, moving or deleting a folder that has chilren.)
  *   "recalculateMember" - (This is an optional action flag. The is set of the member is a dependent and it must be recalculated.)
@@ -77,9 +77,9 @@ export function doAction(model,actionData) {
         model.saveMessengerAction(actionData);
         
         //mark command as pending
-        let returnValue = {};
-        returnValue.actionPending = true;
-        return returnValue;
+        let changeResult = {};
+        changeResult.actionPending = true;
+        return changeResult;
     }
     
     //flag action in progress
@@ -93,16 +93,22 @@ export function doAction(model,actionData) {
         
         //do the action
         let actionResult = callActionFunction(model,actionData); 
-
-        if(!actionResult.actionDone) {
-            let returnValue = {};
-            returnValue.actionDone = false;
-            returnValue.alertMsg = actionResult.alertMsg;
-            return returnValue;
-        }
         
         //flatten action result tree into a list of objects modified in the action
-        var actionModifiedMembers = flattenActionResult(actionResult);
+        var {actionModifiedMembers, actionDone, errorMsgList} = flattenActionResult(actionResult);
+
+        //return in the failure case
+        if(!actionDone) {
+            let changeResult = {};
+            changeResult.actionDone = false;
+            changeResult.errorMsgs = errorMsgList;
+
+            //clear any queued commands
+            model.clearCommandQueue();
+            model.setActionInProgress(false);
+            
+            return changeResult;
+        }
 
         //this list will be additional modified members - from dependency changes
         //due to adding and deleting members (This happens when a new remote member is referenced
@@ -139,13 +145,13 @@ export function doAction(model,actionData) {
         if(error.stack) console.error(error.stack);
         
         //unknown application error - this is fatal
-        let returnValue = {};
-        returnValue.actionDone = false;
-        returnValue.alertMsg = "Unknown error updating model: " + error.message;
+        let changeResult = {};
+        changeResult.actionDone = false;
+        changeResult.errorMsgs = ["Unknown error updating model: " + error.message];
         
         model.clearCommandQueue();
         model.setActionInProgress(false);
-        return returnValue;
+        return changeResult;
         
     }
     
@@ -162,31 +168,33 @@ export function doAction(model,actionData) {
             //ask user if about continueing
             var doContinue = confirm("The calculation is taking a long time. Continue?");
             if(!doContinue) {
+                let changeResult = {};
+                changeResult.actionDone = false;
+                changeResult.errorMsgs = ["The calculation was canceled"];
+
                 model.setCalculationCanceled();
-                runQueuedAction = false;
+
+                return changeResult;         
             }
         }
 
         if(runQueuedAction) {
             //FOR NOW WE WILL RUN SYNCHRONOUSLY!!!
-            let childActionReturnValue = doAction(model,savedMessengerAction);
+            let childActionChangeResult = doAction(model,savedMessengerAction);
 
-            
-            if(childActionReturnValue.actionDone) {
-                //merge this child return value into our main
-                mergeReturnValueIntoChangeMap(model,changeMap,childActionReturnValue);
-            }
-            else {
+            //merge this child return value into our main
+            mergeReturnValueIntoChangeMap(model,changeMap,childActionChangeResult);
+
+            if(!childActionChangeResult.actionDone) {
                 //if there is an failure in the child action, return an error for the whole action.
-                let returnValue = {};
-                returnValue.actionDone = false;
-                returnValue.alertMsg = actionResult.alertMsg;
-                return returnValue;
-            }
+                let changeResult = {};
+                changeResult.actionDone = false;
+                changeResult.errorMsg = childActionChangeResult.errorMsg;
+                
+                model.clearCommandQueue();
 
-             
-
-            
+                return changeResult;
+            }  
         }
     }
     else {
@@ -197,10 +205,10 @@ export function doAction(model,actionData) {
 //FIRE ACTION COMPLETED EVENT HERE
 //##########################################   
     
-    let returnValue = {};
-    returnValue.actionDone = true;
-    returnValue.changeList = changeMapToChangeList(changeMap);
-    return returnValue;
+    let changeResult = {};
+    changeResult.actionDone = true;
+    changeResult.changeList = changeMapToChangeList(changeMap);
+    return changeResult;
 }
 
 /** This function is used to register an action. */
@@ -221,7 +229,7 @@ function callActionFunction(model,actionData) {
     else {
         actionResult = {};
         actionResult.actionDone = false;
-        actionResult.alertMsg = "Unknown action: " + actionData.action;
+        actionResult.errorMsg = "Unknown action: " + actionData.action;
     }  
 
     return actionResult;
@@ -295,7 +303,7 @@ function createChangeMap(model,completedResults,recalculateList) {
     //add an update event for any object not accounted from
     for(i = 0; i < recalculateList.length; i++) {
         var member = recalculateList[i];
-        mergeIntoChangeMap(changeMap,model,member,"memberUpdated");
+        mergeIntoChangeMap(changeMap,model,member,"updated");
     } 
 
     return changeMap;
@@ -314,51 +322,48 @@ function mergeReturnValueIntoChangeMap(model,changeMap,actionReturnValue) {
 
 /** This is a helper function to dispatch an event. */
 function mergeIntoChangeMap(changeMap,model,member,eventName) {
-    let targetId;
     let eventTarget;
     if(member) {
-        targetId = member.getId();
         eventTarget = member;
     }
     else {
-        targetId = MODEL_TARGET_ID;
         eventTarget = model;
     }
-     
-    var existingInfo = changeMap[targetId];
-    var newInfo;
-     
-    if(existingInfo) {
-        if((existingInfo.event == eventName)) {
-            //repeat event - including case of both being "memberUpdated" or "modelUpdated"
-            newInfo = existingInfo;
-        }
-        else if((existingInfo.event == "memberDeleted")||(eventName == "memberDeleted")) {
-            newInfo =  { target: eventTarget, event: "memberDeleted" };
-        }
-        else if((existingInfo.event == "memberCreated")||(eventName == "memberCreated")) {
-            newInfo =  { target: eventTarget, event: "memberCreated" };
-        }
-        else {
-            //there is one more event - model updated, but it will be captured above
-            //we shouldn't get here - it means we hace an unknown event type
-            throw new Error("Unknown event type: " + existingInfo.event + ", " + eventName);
-        }
+    
+    let lookupKey = eventTarget.getTargetType() + eventTarget.getId();
+    var existingInfo = changeMap[lookupKey];
+    if(!existingInfo) {
+        existingInfo = {};
+        existingInfo.target = eventTarget;
+        changeMap[lookupKey] = existingInfo;
     }
-    else {
-        //create event object - note we don't need the "updated" field on a delete event, but that is ok
-        newInfo =  { target: eventTarget, event: eventName };
-    }
-     
-    changeMap[targetId] = newInfo; 
+
+    //record the event type
+    existingInfo[eventName] = true;
 }
 
 function changeMapToChangeList(changeMap) {
     let changeList = [];
     for(let key in changeMap) {
-        changeList.push(changeMap[key]);
+        let changeListEntry = changeMapEntryToChangeListEntry(changeMap[key]);
+        if(changeListEntry) changeList.push(changeListEntry);
     }
     return changeList;
+}
+
+function changeMapEntryToChangeListEntry(changeMapEntry) {
+    changeListEntry = {};
+
+    changeListEntry.target = changeMapEntry.target;
+    
+    //merge the events into a single event
+    if((changeMapEntry.created)&&(changeMapEntry.deleted)) return null;
+    else if(changeMapEntry.created) changeListEntry.event = "created";
+    else if(changeMapEntry.deleted) changeListEntry.event = "deleted";
+    else if(changeMapEntry.updated) changeListEntry.event = "updated";
+    else return null;
+
+    return changeListEntry;
 }
 
 /** This method determines if updating all dependencies is necessary. Our dependency 
@@ -372,16 +377,24 @@ function checkUpdateAllDep(completedResults) {
 
 /** This method unpacks the actionResult and its child reponse into an array of actionResult. */
 function flattenActionResult(actionResult) {
-    let completedResults = [];
-    addToCompletedResultList(completedResults,actionResult);
-    return completedResults;
+    let actionResultInfo = {};
+    actionResultInfo.actionModifiedMembers = [];
+    actionResultInfo.actionDone = true;
+    actionResultInfo.errorMsgList = [];
+
+    addToCompletedResultList(actionResultInfo,actionResult);
+
+    return actionResultInfo;
 }
 
-function addToCompletedResultList(completedResults,actionResult) {
-    completedResults.push(actionResult);
+function addToCompletedResultList(actionResultInfo,actionResult) {
+    actionResultInfo.actionModifiedMembers.push(actionResult);
+    if(!actionResult.actionDone) actionResultInfo.actionDone = false;
+    if(actionResult.errorMsgList) actionResultInfo.errorMsgList.push(actionResult.errorMsg);
+
     if(actionResult.childActionResults) {
         actionResult.childActionResults.forEach( childActionResult => {
-            addToCompletedResultList(completedResults,childActionResult);
+            addToCompletedResultList(actionResultInfo,childActionResult);
         });
     }
 }

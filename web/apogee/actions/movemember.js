@@ -105,7 +105,7 @@ function addChildResults(member) {
     }
 }
 
-let ACTION_EVENT = "memberUpdated";
+let ACTION_EVENT = "updated";
 
 
 //This line of code registers the action 

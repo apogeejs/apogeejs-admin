@@ -44,7 +44,7 @@ function updateProperties(model,actionData) {
     return actionResult;
 }
 
-let ACTION_EVENT = "memberUpdated";
+let ACTION_EVENT = "updated";
 
 //This line of code registers the action 
 addActionInfo("updateFolderFunction",updateProperties);

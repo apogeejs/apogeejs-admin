@@ -381,7 +381,6 @@ export default class Model extends EventManager {
         return "model";
     }
 
-
     //================================
     // Member generator functions
     //================================

@@ -65,10 +65,9 @@ export default class ModelManager extends EventManager {
         this.model = new Model();
         
         //add listeners
-        //this.model.addListener("memberCreated", eventInfo => this.memberCreated(eventInfo));
-        this.model.addListener("memberUpdated", eventInfo => this.memberUpdated(eventInfo));
-        this.model.addListener("memberDeleted", eventInfo => this.memberDeleted(eventInfo));
-        this.model.addListener("modelUpdated", eventInfo => this.modelUpdated(eventInfo));
+        //this.model.addListener("created", eventInfo => this.objectCreated(eventInfo));
+        this.model.addListener("updated", eventInfo => this.objectUpdated(eventInfo));
+        this.model.addListener("deleted", eventInfo => this.objectDeleted(eventInfo));
 
         //load the model
         let loadAction = {};
@@ -244,11 +243,6 @@ export default class ModelManager extends EventManager {
                 //create empty component
                 component = new componentClass(this,member);
 
-                //call member updated to process and notify of component creation
-                //I SHOULD CONSTRUCT THIS IN A STANDARD WAY RATHER THAN MAKING IT HERE.
-                let eventInfo = { target: member, event: "memberCreated" };
-                component.memberUpdated(eventInfo);
-
                 //apply any serialized values
                 if(componentJson) {
                     component.loadPropertyValues(componentJson);
@@ -311,8 +305,49 @@ export default class ModelManager extends EventManager {
         
     }
 
-    modelUpdated(eventInfo) {
-        let model = eventInfo.target;
+    objectCreated(eventInfo) {
+        if(!eventInfo.target) return;
+        
+        if(eventInfo.target.getTargetType() == "member") {
+            this.memberCreated(eventInfo.target);
+        }
+    }
+
+    objectUpdated(eventInfo) {
+        if(!eventInfo.target) return;
+        
+        if(eventInfo.target.getTargetType() == "member") {
+            this.memberUpdated(eventInfo.target);
+        }
+        else if(eventInfo.target.getTargetType() == "model") {
+            this.modelUpdated(eventInfo.target);
+        }
+    }
+
+    objectDeleted(eventInfo) {
+        if(!eventInfo.target) return;
+        
+        if(eventInfo.target.getTargetType() == "member") {
+            this.memberDeleted(eventInfo.target);
+        }
+    }
+
+    /** This method responds to a member updated. */
+    memberCreated(member) {
+    }
+
+
+    /** This method responds to a member updated. */
+    memberUpdated(member) {
+        var key = member.getId();
+
+        var componentInfo = this.componentMap[key];
+        if((componentInfo)&&(componentInfo.component)) {
+            componentInfo.component.memberUpdated(eventInfo);
+        }
+    }
+
+    modelUpdated(model) {
         let fieldsUpdated = model.getUpdated();
         
         //check for name changes
@@ -321,47 +356,8 @@ export default class ModelManager extends EventManager {
         }
     }
 
-    
-    /** This method responds to a member updated. */
-    memberCreated(eventInfo) {
-        
-//        this.testPrint(eventInfo);
-        
-        //store the ui object
-        var member = eventInfo.target;
-        var key = member.getId();
-
-//        var componentInfo = this.componentMap[key];
-//        if((componentInfo)&&(componentInfo.component)) {
-//            componentInfo.component.memberCreated();
-//        }
-    }
-
-
-    /** This method responds to a member updated. */
-    memberUpdated(eventInfo) {
-        
-//        this.testPrint(eventInfo);
-        
-        //store the ui object
-        var member = eventInfo.target;
-        if(member) {
-            var key = member.getId();
-
-            var componentInfo = this.componentMap[key];
-            if((componentInfo)&&(componentInfo.component)) {
-                componentInfo.component.memberUpdated(eventInfo);
-            }
-        }
-    }
-
     /** This method responds to a "new" menu event. */
-    memberDeleted(eventInfo) {
-        
-//        this.testPrint(eventInfo);
-
-        //store the ui object
-        var member = eventInfo.target;
+    memberDeleted(member) {
         var memberId = member.getId();
 
         var componentInfo = this.componentMap[memberId];

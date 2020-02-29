@@ -17,7 +17,7 @@ import Model from "/apogee/data/Model.js";
  *  
  * }
  *
- * MEMBER CREATED EVENT: "memberCreated"
+ * MEMBER CREATED EVENT: "created"
  * Event member format:
  * {
  *  "member": (member)
@@ -39,7 +39,7 @@ function createMemberAction(model,actionData) {
         if(!owner) {
             let actionResult = {};
             actionResult.actionDone = false;
-            actionResult.alertMsg = "Parent not found for created member";
+            actionResult.errorMsg = "Parent not found for created member";
             return actionResult;
         }
     }
@@ -97,7 +97,7 @@ export function createMember(model,owner,memberJson) {
         member.setError("Member type not found: " + memberJson.type);
         
         //store an error message, but this still counts as command done.
-        actionResult.alertMsg = "Error creating member: member type not found: " + memberJson.type;
+        actionResult.errorMsg = "Error creating member: member type not found: " + memberJson.type;
     }
 
     actionResult.member = member;
@@ -106,7 +106,7 @@ export function createMember(model,owner,memberJson) {
     return actionResult;
 }
 
-let ACTION_EVENT = "memberCreated";
+let ACTION_EVENT = "created";
 
 //This line of code registers the action 
 addActionInfo("createMember",createMemberAction);

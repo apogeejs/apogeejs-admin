@@ -11,7 +11,7 @@ import {addActionInfo} from "/apogee/actions/action.js";
  *  "eventInfo": (OUTPUT - event info for the associated delete event)
  * }
  *
- * MEMBER DELETED EVENT: "memberDeleted"
+ * MEMBER DELETED EVENT: "deleted"
  * Event object Format:
  * {
  *  "member": (member),
@@ -83,7 +83,7 @@ function doDelete(member) {
     return actionResult;
 }
 
-let ACTION_EVENT = "memberDeleted";
+let ACTION_EVENT = "deleted";
 
 
 //This line of code registers the action 
