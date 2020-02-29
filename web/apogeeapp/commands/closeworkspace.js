@@ -17,9 +17,7 @@ closeworkspace.executeCommand = function(workspaceManager,commandData) {
     commandResult.action = "deleted";
     commandResult.targetId = workspaceManager.getId();
     commandResult.targetType = workspaceManager.getTargetType();
-    commandResult.parent = workspaceManager.getApp();
-    
-    var workspaceManagerRemoved = false;
+    commandResult.dispatcher = workspaceManager.getApp();
     
     try {
         workspaceManagerRemoved = workspaceManager.getApp().clearWorkspaceManager();
@@ -32,9 +30,8 @@ closeworkspace.executeCommand = function(workspaceManager,commandData) {
     catch(error) {
         if(error.stack) console.error(error.stack);
         var errorMsg = "Error closeing workspace: " + error.message;
-        CommandManager.errorAlert(errorMsg,isFatal);
-        
         commandResult.cmdDone = false;
+        commandResult.errorMsg = errorMsg;
     }
     
     return commandResult;

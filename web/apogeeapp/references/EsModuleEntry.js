@@ -21,8 +21,9 @@ export default class EsModuleEntry extends ReferenceEntry {
 
         
         let commandResult = {};
-        commandResult.target = this;
-        commandResult.action = "updated";
+            commandResult.target = this;
+            commandResult.dispatcher = this;
+            commandResult.action = "updated";
             
         var onLoad = (module) => {
             //store the module return, if there is one
@@ -41,7 +42,7 @@ export default class EsModuleEntry extends ReferenceEntry {
             var errorMsg = error.message ? error.message : "Failed to load module " + this.url;
             //accept the error and keep going - it will be flagged in UI
             commandResult.cmdDone = true;
-            commandResult.alertMsg = errorMsg;
+            commandResult.errorMsg = errorMsg;
 
             this.setError(errorMsg);
             return commandResult;

@@ -45,18 +45,14 @@ addlink.executeCommand = function(workspaceManager,commandData,asynchOnComplete)
                     let asynchCommandResult = {};
                     asynchCommandResult.alertMsg = "Unknown exception in link processing: " + errorMsg;
                     asynchCommandResult.cmdDone = false;
-                    asynchCommandResult.target = referenceEntry;
-                    asynchCommandResult.action = "updated";
                     asynchOnComplete(asynchCommandResult);
                 }
             });
     }
     catch(error) {
         //unknown exception
-        synchCommandResult.alertMsg = "Unknown exception in creating link: " + error.message;
+        synchCommandResult.errorMsg = "Unknown exception in creating link: " + error.message;
         synchCommandResult.cmdDone = false;
-        synchCommandResult.parent = referenceManager;
-        synchCommandResult.action = "created";
     }
     
     return synchCommandResult;

@@ -52,19 +52,21 @@ deletelink.executeCommand = function(workspaceManager,commandData) {
 
             commandResult = {}
             commandResult.cmdDone = isRemoved;
-            commandResult.target = referenceEntry;
-            commandResult.parent = referenceEntry.getReferenceList();
-            commandResult.action = "deleted";
-            if(!isRemoved) {
-                commandResult.alertMsg = "Unknown Error removing link entry!";
+            if(isRemoved) {
+                commandResult.target = referenceEntry.getId();
+                commandResult.targetType = referenceEntry.getTargetType();
+                commandResult.dispatcher = referenceEntry.getReferenceList();
+                commandResult.action = "deleted";
+            }
+            else {
+                commandResult.errorMsg = "Unknown Error removing link entry!";
             }
         }
         else {
             //entry not found
             commandResult = {}
-            commandResult.alertMsg = "Link entry to update not found!";
+            commandResult.errorMsg = "Link entry to update not found!";
             commandResult.cmdDone = false;
-            commandResult.action = "deleted";
         }
     }
     catch(error) {
@@ -72,9 +74,8 @@ deletelink.executeCommand = function(workspaceManager,commandData) {
         
         //unkown error
         commandResult = {}
-        commandResult.alertMsg = "Error deleting link: " + error.message;
+        commandResult.errorMsg = "Error deleting link: " + error.message;
         commandResult.cmdDone = false;
-        commandResult.action = "deleted";
     }
     
     return commandResult;

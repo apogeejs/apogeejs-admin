@@ -217,16 +217,16 @@ export default class CommandManager {
     }
 
     /** This method merges a change entry into the change map. */
-    _addToChangeMap(changeEntry,changeMap) {
+    _addToChangeMap(commandResultEntry,changeMap) {
         let targetId;
         let targetType;
         let target;
-        if(changeEntry.target) {
-            target = changeEntry.target;
+        if(commandResultEntry.target) {
+            target = commandResultEntry.target;
             targetId = target.getId();
             targetType = target.getTargetType();
         }
-        else if((changeEntry.targetId != undefined)&&(changeEntry.targetType)) {
+        else if((commandResultEntry.targetId != undefined)&&(commandResultEntry.targetType)) {
             target = undefined;
             targetId = target.getId();
             targetType = target.getTargetType();
@@ -242,13 +242,13 @@ export default class CommandManager {
         
         //create the change map entry
         let changeMapEntry = changeMap[key];
-        if(!changeEntry) {
+        if(!commandResultEntry) {
             changeMapEntry = {};
-            if(changeEntry.target) {
+            if(commandResultEntry.target) {
                 changeMapEntry.target = target;
                 changeMapEntry.targetType = targetType;
                 changeMapEntry.targetId = targetId;
-                changeMapEntry.dispatcher = changeEntry.dispatcher;
+                changeMapEntry.dispatcher = commandResultEntry.dispatcher;
             }
             changeMap[key] = changeMapEntry;
         }
@@ -257,7 +257,7 @@ export default class CommandManager {
         //we won't need it since the event will be either delete or a null event.
 
         //store the event type for this target
-        changeMapEntry[changeEntry.action] = true;
+        changeMapEntry[commandResultEntry.action] = true;
     }
 
     /** This converts the change map entry, which usd as a working variable to combine events so there
@@ -295,41 +295,29 @@ export default class CommandManager {
     }
 
     /** This fires all the necessary events for the given command result */
-    _publishEvents(commandResult) {
-
-        //@@@@@@@@@@@@@@@@@@@@@
-        throw new Error("Update this for change result");
-        //@@@@@@@@@@@@@@@@@@@@@
-
-        //combine the command result of successful events so here is one per target
-        //also fire all the unsuccesful events
-        let successEventMap = {};
-        let failedEvents = [];
-        this._flattenCommandResults(commandResult,successEventMap,failedEvents);
-
-        //fire success events (we merged these for one per target)
-        for(let key in successEventMap) {
-            this._fireEvent(successEventMap[key]);
+    _publishEvents(changeResult) {
+        if(changeResult.cmdDone) {
+            //success - fire all events
+            if(changeResult.changeList) {
+                changeResult.changeList.forEach( changeEntry => {
+                    //fire event
+                    if((changeEntry.action)&&(changeEntry.dispatcher)) {
+                        changeEntry.dispacher.dispatchEvent(changeEntry.action,changeEntry);
+                    } 
+                })
+            }
         }
-
-        //fire failed events
-        failedEvents.forEach(eventData => this._fireEvent(eventData));
-    }
-
-    _fireEvent(eventData) {
-
-        //@@@@@@@@@@@@@@@@@@@@@
-        throw new Error("Update this for change result (and maybe update change above to include parent!");
-        //@@@@@@@@@@@@@@@@@@@@@
-
-        if((eventData.action == "created")||(eventData.action == "deleted")) {
-            //dispatch created and deleted events to the parent
-            if(eventData.parent) eventData.parent.dispatchEvent(eventData.action,eventData);
+        else {
+            //failure - show error message
+            let errorMsg;
+            if(changeResult.errorMsgs) {
+                errorMsg = errorMsgs.join("\n");
+            }
+            else {
+                errorMsg = "There was an unknown error executing the command";
+            }
+            CommandManager.errorAlert(errorMsg);
         }
-        if((eventData.action == "updated")||(eventData.action == "deleted")) {
-            //dispatch updated and deleted events to the target
-            if(eventData.target) eventData.target.dispatchEvent(eventData.action,eventData);
-        } 
     }
 
     //=========================================

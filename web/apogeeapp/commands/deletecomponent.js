@@ -46,12 +46,8 @@ deletecomponent.executeCommand = function(workspaceManager,commandData) {
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;
-    if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
 
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    //temporary change
     commandResult.actionResult = actionResult;
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     
     return commandResult;
 }

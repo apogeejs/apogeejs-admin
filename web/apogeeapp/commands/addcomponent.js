@@ -61,13 +61,12 @@ addcomponent.executeCommand = function(workspaceManager,commandData) {
     else {
         commandResult = {};
         commandResult.cmdDone = false;
-        if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
+        commandResult.errorMsg = "Create member failed";
     }
     
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    //temporary change
+    //store the model level result
     commandResult.actionResult = actionResult;
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
     return commandResult;
 }
 

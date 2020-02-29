@@ -75,28 +75,29 @@ export default class ModelManager extends EventManager {
         loadAction.modelJson = modelJson;
         let actionResult = doAction(this.model,loadAction);
 
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-//we don't handle failure here!!!
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
         //create the return result
         let commandResult = {};
-        commandResult.action = "updated";
-        commandResult.cmdDone = true;
-        commandResult.target = this;
 
-        //set up the root folder conmponent, with children if applicable
-        var rootFolder = this.model.getRoot();
-        if(rootFolder) {
-            let rootFolderComponentJson = componentsJson[rootFolder.getName()];
-            var rootFolderCommandResult = this.createComponentFromMember(rootFolder,rootFolderComponentJson);
-            commandResult.childCommandResults = [rootFolderCommandResult];
+        if(actionResult.actionDone) {
+            commandResult.action = "updated";
+            commandResult.cmdDone = true;
+            commandResult.target = this;
+            commandResult.dispatcher = this;
+
+            //set up the root folder conmponent, with children if applicable
+            var rootFolder = this.model.getRoot();
+            if(rootFolder) {
+                let rootFolderComponentJson = componentsJson[rootFolder.getName()];
+                var rootFolderCommandResult = this.createComponentFromMember(rootFolder,rootFolderComponentJson);
+                commandResult.childCommandResults = [rootFolderCommandResult];
+            }
+
+            commandResult.actionResult = actionResult;
         }
-
-        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        //temporary change
-        commandResult.actionResult = actionResult;
-        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        else {
+            commandResult.cmdDone = false;
+            commandResult.errorMsg = "Error opening workspace model";
+        }
 
         return commandResult;
     }
@@ -261,34 +262,14 @@ export default class ModelManager extends EventManager {
 
         }
 
-        //I WANT BETTER ERROR HANDLING HERE (AND ABOVE)
         if(!component) {
-            //##########################################################################
-            //undo create the member
-            var json = {};
-            json.action = "deleteMember";
-            json.memberName = member.getFullName();
-            //if this fails, we will just ignore it for now
-            var model = this.getModel();
-            var actionResult = doAction(model,json);
-            //end undo create member
-            //##########################################################################
-
-            //this should have already been set
             commandResult.cmdDone = false;
-            commandResult.targetType = "component"
-            commandResult.action = "created";
-
-            //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-            //temporary change
-            commandResult.actionResult = actionResult;
-            //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            commandResult.errorMsg = "Component creation failed: " + member.getName();
         }
         else {
             commandResult.target = component;
-            commandResult.parent = this;
+            commandResult.dispatcher = this;
             commandResult.cmdDone = true;
-            commandResult.targetType = "component"
             commandResult.action = "created";
 
             //load the children, if there are any (BETTER ERROR CHECKING!)
@@ -302,7 +283,6 @@ export default class ModelManager extends EventManager {
         }
             
         return commandResult;
-        
     }
 
     objectCreated(eventInfo) {

@@ -43,8 +43,6 @@ openworkspace.executeCommand = function(nullWorkspaceManager,commandData,asynchO
                 let asynchCommandResult = {};
                 asynchCommandResult.alertMsg = "Error loading workspace: " + errorMsg;
                 asynchCommandResult.cmdDone = false;
-                asynchCommandResult.target = workspaceManager;
-                asynchCommandResult.action = "updated";
                 asynchOnComplete(asynchCommandResult);
             }
         }
@@ -63,10 +61,8 @@ openworkspace.executeCommand = function(nullWorkspaceManager,commandData,asynchO
 
         //unkown error
         let synchCommandResult = {};
-        synchCommandResult.alertMsg = "Error creating workspace: " + error.message;
+        synchCommandResult.errorMsg = "Error creating workspace: " + error.message;
         synchCommandResult.cmdDone = false;
-        synchCommandResult.targetType = "workspace";
-        synchCommandResult.action = "created";
         return synchCommandResult;
     }
 }

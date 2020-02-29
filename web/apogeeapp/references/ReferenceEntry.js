@@ -117,6 +117,7 @@ export default class ReferenceEntry extends EventManager {
         if(!promise) promise = Promise.resolve({
             cmdDone: true,
             target: this,
+            dispatcher: this,
             action: "updated"
         });
 

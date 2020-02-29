@@ -24,6 +24,7 @@ export default class NpmModuleEntry extends ReferenceEntry {
 
             let commandResult = {};
             commandResult.target = this;
+            commandResult.dispatcher = this;
             commandResult.action = "updated";
 
             //synchronous loading
@@ -41,7 +42,7 @@ export default class NpmModuleEntry extends ReferenceEntry {
                 if(error.stack) console.error(error.stack);
                 //accept the error and keep going - it will be flagged in UI
                 commandResult.cmdDone = true;
-                commandResult.alertMsg = errorMsg;
+                commandResult.errorMsg = errorMsg;
 
                 this.setError(errorMsg);
                 resolve(commandResult);

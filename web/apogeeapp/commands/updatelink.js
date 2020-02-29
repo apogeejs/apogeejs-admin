@@ -59,22 +59,19 @@ updatelink.executeCommand = function(workspaceManager,commandData,asynchOnComple
                 let asynchCommandResult = {};
                 asynchCommandResult.alertMsg = "Unkonwn error updating link: " + errorMsg;
                 asynchCommandResult.cmdDone = false;
-                asynchCommandResult.target = referenceEntry;
-                asynchCommandResult.action = "updated";
                 asynchOnComplete(asynchCommandResult);
             }
         });
         
         synchcommandResult.cmdDone = true;
         synchcommandResult.target = referenceEntry;
-        synchcommandResult.parent = referenceEntry.getReferenceList();
+        synchcommandResult.dispatcher = referenceEntry;
         synchcommandResult.action = "updated";
     }
     else {
         //entry not found
         synchcommandResult.alertMsg = "Link entry to update not found!";
         synchcommandResult.cmdDone = false;
-        synchcommandResult.action = "updated";
     }
     
     return synchcommandResult;

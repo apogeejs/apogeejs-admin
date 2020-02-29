@@ -30,6 +30,9 @@ savememberdata.executeCommand = function(workspaceManager,commandData,asynchOnCo
     
     let modelManager = workspaceManager.getModelManager();
     let model = modelManager.getModel();
+
+    //lookup member so we can get the component
+    member = model.getMemberByFullName(commandData.memberFullName);
     
     var actionData = getSaveDataAction(model,commandData.memberFullName,commandData.data,asynchOnComplete);
     
@@ -37,12 +40,16 @@ savememberdata.executeCommand = function(workspaceManager,commandData,asynchOnCo
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;
-    if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
+    if(commandResult.cmdDone) {
+        commandResult.target = modelManager.getComponent(modelManager.getComponent(member));
+        commandResult.dispatcher = modelManager;
+        commandResult.action = "updated";
+    }
+    else {
+        commandResult.errorMsg = "Error saving data: " + commandData.memberFullName;
+    }
 
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    //temporary change
     commandResult.actionResult = actionResult;
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     
     return commandResult;
 }

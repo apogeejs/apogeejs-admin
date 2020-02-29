@@ -42,7 +42,7 @@ export default class ReferenceList extends EventManager {
         return {
             cmdDone: true,
             target: referenceEntry,
-            parent: this,
+            dispatcher: this,
             action: "created"
         }
     }

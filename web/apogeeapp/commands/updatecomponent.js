@@ -68,7 +68,6 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     var component = modelManager.getComponent(member);
 
     var error = false;
-    var errorMsg;
     
     //create an action to update an member additional properties
     var memberGenerator = member.constructor.generator;
@@ -86,24 +85,23 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     }
  
     //update an component additional properties
-    //NEED ERROR HANDLING HERE!!!
+    //we should get better error handling here
     if(!error) {
         component.loadPropertyValues(commandData.updatedComponentProperties);
     }
     
     var commandResult = {};
-    commandResult.cmdDone = !error;
-    if(errorMsg) commandResult.alertMsg = errorMsg;
-
+    commandResult.cmdDone = actionResult.actionDone;
     if(commandResult.cmdDone) {
         commandResult.target = component;
+        commandResult.dispatcher = modelManager;
         commandResult.action = "updated";
     }
+    else {
+        commandResult.errorMsg = "Error updating component: " + commandData.memberFullName;
+    }
 
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    //temporary change
     commandResult.actionResult = actionResult;
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     
     return commandResult;
 }

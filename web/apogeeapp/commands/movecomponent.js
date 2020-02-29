@@ -34,23 +34,29 @@ movecomponent.createUndoCommand = function(workspaceManager,commandData) {
 movecomponent.executeCommand = function(workspaceManager,commandData) {
     
     let modelManager = workspaceManager.getModelManager();
-    var model = modelManager.getModel();
+    let model = modelManager.getModel();
+
+    //look up id so we can look up component
+    let member = model.getMemberByFullName(commandData.memberFullName);
+    let memberId = member.getId();
 
     var actionData = {};
     actionData.action = "moveMember";
     actionData.memberName = commandData.memberFullName;
     actionData.targetName = commandData.newMemberName;
     actionData.targetOwnerName = commandData.newParentFullName;
-    var actionResult = doAction(model,actionData);
+    let actionResult = doAction(model,actionData);
     
-    var commandResult = {};
+    let commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;
-    if(actionResult.alertMsg) commandResult.alertMsg = actionResult.alertMsg;
-
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    //temporary change
+    if(commandResult.cmdDone) {
+        commandResult.target = modelManager.getComponentById(memberId);
+        commandResult.dispatcher = modelManager;
+    }
+    else {
+        commandResult.errorMsg = "Error moving component: " + actionData.memberName;
+    }
     commandResult.actionResult = actionResult;
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     
     return commandResult;
     

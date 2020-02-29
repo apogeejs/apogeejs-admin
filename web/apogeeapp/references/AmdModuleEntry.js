@@ -26,6 +26,7 @@ export default class AmdModuleEntry extends ReferenceEntry {
             
             let commandResult = {};
             commandResult.target = this;
+            commandResult.dispatcher = this;
             commandResult.action = "updated";
 
             //add event handlers
@@ -39,7 +40,7 @@ export default class AmdModuleEntry extends ReferenceEntry {
                 var errorMsg = "Failed to load link '" + this.url + "':" + error;
                 //accept the error and keep going - it will be flagged in UI
                 commandResult.cmdDone = true;
-                commandResult.alertMsg = errorMsg;
+                commandResult.errorMsg = errorMsg;
 
                 this.setError(errorMsg);
                 resolve(commandResult);
