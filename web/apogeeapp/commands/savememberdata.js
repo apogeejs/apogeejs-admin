@@ -32,7 +32,7 @@ savememberdata.executeCommand = function(workspaceManager,commandData,asynchOnCo
     let model = modelManager.getModel();
 
     //lookup member so we can get the component
-    member = model.getMemberByFullName(commandData.memberFullName);
+    let member = model.getMemberByFullName(commandData.memberFullName);
     
     var actionData = getSaveDataAction(model,commandData.memberFullName,commandData.data,asynchOnComplete);
     

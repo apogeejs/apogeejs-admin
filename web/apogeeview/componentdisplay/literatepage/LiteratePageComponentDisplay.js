@@ -54,18 +54,18 @@ export default class LiteratePageComponentDisplay extends EventManager {
         return this.isShowing;
     }
 
-    componentUpdated(fieldsUpdated) {
+    componentUpdated(component) {
 
-        if(apogeeutil.isFieldUpdated(fieldsUpdated,"name")) {
+        if(component.isFieldUpdated("name")) {
             this.tab.setTitle(this.componentView.getName());
         }
 
-        if(apogeeutil.isFieldUpdated(fieldsUpdated,"document")) {
+        if(component.isFieldUpdated("document")) {
             let editorData = this.componentView.getEditorData();
             this.editorView.updateState(editorData);
         }
 
-        if(apogeeutil.isFieldUpdated(fieldsUpdated,"bannerState")) {
+        if(component.isFieldUpdated("bannerState")) {
             this._setBannerState();
         }
     }

@@ -46,13 +46,13 @@ export default class TreeComponentDisplay {
         alert("Delete tree component display not implemneted");
     }
 
-    componentUpdated(fieldsUpdated) {
+    componentUpdated(component) {
 
-        if(apogeeutil.isFieldUpdated(fieldsUpdated,"name")) {
+        if(component.isFieldUpdated("name")) {
             this._setLabel();
         }
 
-        if(apogeeutil.isFieldUpdated(fieldsUpdated,"bannerState")) {
+        if(component.isFieldUpdated("bannerState")) {
             this._setBannerState();
         }
     }

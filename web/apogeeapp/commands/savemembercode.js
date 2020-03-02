@@ -35,7 +35,7 @@ savemembercode.executeCommand = function(workspaceManager,commandData) {
     let model = modelManager.getModel();
 
     //lookup member so we can get the component
-    member = model.getMemberByFullName(commandData.memberFullName);
+    let member = model.getMemberByFullName(commandData.memberFullName);
     
     var actionData = getSetCodeAction(model,
         commandData.memberFullName,

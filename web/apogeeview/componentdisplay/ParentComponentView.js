@@ -92,13 +92,13 @@ export default class ParentComponentView extends ComponentView {
     //==============================
 
     /** This overides the super method to first intercept the new document and save the editor data */
-    componentUpdated(eventInfo) {
+    componentUpdated(component) {
 
-        if(apogeeutil.isFieldUpdated(eventInfo.fieldsUpdated,"document")) {
+        if(component.isFieldUpdated("document")) {
             this.editorData = this.component.getEditorData();
         }
 
-        super.componentUpdated(eventInfo);
+        super.componentUpdated(component);
     }
     //###########################################################################################################
     //start page code

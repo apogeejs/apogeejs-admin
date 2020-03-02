@@ -314,27 +314,20 @@ function mergeReturnValueIntoChangeMap(model,changeMap,actionReturnValue) {
     if(actionReturnValue.actionDone) {
         actionReturnValue.changeList.forEach( changeItem => {
             //target is either member or model
-            let member = (changeItem.target != model) ? changeItem.target : undefined;
-            mergeIntoChangeMap(changeMap,model,member,changeItem.event);
+            mergeIntoChangeMap(changeMap,model,changeItem.member,changeItem.event);
         })
     }
 }
 
 /** This is a helper function to dispatch an event. */
 function mergeIntoChangeMap(changeMap,model,member,eventName) {
-    let eventTarget;
-    if(member) {
-        eventTarget = member;
-    }
-    else {
-        eventTarget = model;
-    }
-    
-    let lookupKey = eventTarget.getTargetType() + eventTarget.getId();
+    //action target is either the member, if defined, or the model
+    let actionTarget = member ? member : model;
+    let lookupKey = actionTarget.getTargetType() + actionTarget.getId();
     var existingInfo = changeMap[lookupKey];
     if(!existingInfo) {
         existingInfo = {};
-        existingInfo.target = eventTarget;
+        if(member) existingInfo.member = member;
         changeMap[lookupKey] = existingInfo;
     }
 
@@ -352,9 +345,10 @@ function changeMapToChangeList(changeMap) {
 }
 
 function changeMapEntryToChangeListEntry(changeMapEntry) {
-    changeListEntry = {};
+    let changeListEntry = {};
 
-    changeListEntry.target = changeMapEntry.target;
+    //member present only if the member is the event target
+    changeListEntry.member = changeMapEntry.member;
     
     //merge the events into a single event
     if((changeMapEntry.created)&&(changeMapEntry.deleted)) return null;

@@ -53,14 +53,14 @@ export default class PageChildComponentDisplay {
         return this.member;
     }
 
-    componentUpdated(fieldsUpdated) {
+    componentUpdated(component) {
 
 //WRONG - we need to respond to the proper changes, which depend on the class (title is name + possible argument, return value)
-        if(apogeeutil.isFieldUpdated(fieldsUpdated,"name")) {
+        if(component.isFieldUpdated("name")) {
             this._setTitle();
         }
 
-        if(apogeeutil.isFieldUpdated(fieldsUpdated,"bannerState")) {
+        if(component.isFieldUpdated("bannerState")) {
             this._setBannerState();
         }
 

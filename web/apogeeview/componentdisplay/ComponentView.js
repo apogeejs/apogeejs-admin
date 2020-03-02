@@ -23,8 +23,6 @@ export default class ComponentView {
         this.treeDisplay = this.createTreeDisplay(); //this is shown in the tree view
         this.treeState = null;
 
-        this.component.addListener("updated",eventInfo => this.componentUpdated(eventInfo));
-
         this.component.setViewStateCallback(() => this.getViewState());
     }
 
@@ -351,12 +349,10 @@ export default class ComponentView {
 
     /** This method extends the member udpated function from the base.
      * @protected */    
-    componentUpdated(eventInfo) {
-
-        let fieldsUpdated = eventInfo.fieldsUpdated;
+    componentUpdated(component) {
 
         //check for parent change
-        if(apogeeutil.isFieldUpdated(fieldsUpdated,"owner")) {
+        if(component.isFieldUpdated("owner")) {
             var oldParentComponentView = this.lastAssignedParentComponentView;
             var newParentComponentView = this.getParentComponentView();
 
@@ -380,13 +376,13 @@ export default class ComponentView {
         
         //update for new data
         if(this.treeDisplay) {
-            this.treeDisplay.componentUpdated(fieldsUpdated);
+            this.treeDisplay.componentUpdated(component);
         }
         if(this.childComponentDisplay != null) {
-            this.childComponentDisplay.componentUpdated(fieldsUpdated);
+            this.childComponentDisplay.componentUpdated(component);
         }
         if(this.tabDisplay != null) {
-            this.tabDisplay.componentUpdated(fieldsUpdated);
+            this.tabDisplay.componentUpdated(component);
         }
     }
 

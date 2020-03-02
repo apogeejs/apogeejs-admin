@@ -56,7 +56,6 @@ export default class CommandManager {
     */
     executeCommand(command,suppressFromHistory) {
         var workspaceManager = this.app.getWorkspaceManager();
-        var modelManager = workspaceManager.getModelManager();
         let commandResult;
         
         var commandObject = CommandManager.getCommandObject(command.type);
@@ -70,7 +69,7 @@ export default class CommandManager {
             if(commandObject.commandInfo.isAsynch) {
                 asynchOnComplete = commandResult => {
                     //process command result ad publish events
-                    let changeResult = this._createChangeResult(commandResult,modelManager);
+                    let changeResult = this._createChangeResult(commandResult);
                     this._publishEvents(changeResult);
                 }
             }
@@ -106,7 +105,7 @@ export default class CommandManager {
         }
 
         //create change list
-        let changeResult = this._createChangeResult(commandResult,modelManager);
+        let changeResult = this._createChangeResult(commandResult);
         
         //fire events!!
         this._publishEvents(changeResult);
@@ -125,19 +124,19 @@ export default class CommandManager {
 
     /** This method creates a change result, used for firing events and as a return value from the command result, the
      * return value from the command. */
-    _createChangeResult(commandResult,modelManager) {
+    _createChangeResult(commandResult) {
         //traverse the command result tree, make a change list, store all error msgs, check if there are any failures
         //on failure, ignore changes
         let changeMap = {};
         let errorInfo = {};
-        this._processCommandResult(commandResult,changeMap,errorInfo);
+        this._processCommandResults(commandResult,changeMap,errorInfo);
 
         //convert the actionChangeList to a commandChangeList
         if(commandResult.actionResult) {
-            this._processActionChangeList(commandResult.actionResult,changeMap,errorInfo,modelManager);
+            this._processActionChangeList(commandResult.actionResult,changeMap,errorInfo);
         }
 
-        changeResult = {};
+        let changeResult = {};
         if(errorInfo.error) {
             changeResult.cmdDone = false;
             changeResult.errorMsgs = errorInfo.errorMsgs;
@@ -147,7 +146,7 @@ export default class CommandManager {
             changeResult.changeList = [];
             for(let key in changeMap) {
                 let changeMapEntry = changeMap[key];
-                changeEntry = this._changeMapEntryToChangeEntry(changeMapEntry);
+                let changeEntry = this._changeMapEntryToChangeEntry(changeMapEntry);
                 if(changeEntry) changeResult.changeList.push(changeEntry);
             }
         }
@@ -167,13 +166,13 @@ export default class CommandManager {
         }
 
         if(commandResult.childCommandResults) {
-            commandResult.childCommandResults.forEach(childCommandResult => this._processCommandResults(childCommandResult,changemap,errorInfo));
+            commandResult.childCommandResults.forEach(childCommandResult => this._processCommandResults(childCommandResult,changeMap,errorInfo));
         }
     }
 
     /** This method takes then entries from the action change list and enters them inot the command change map.
      * It does this by finding the associated Component/ModelManager change and adding an entry to the change map for it. */
-    _processActionChangeList(actionChangeResult,changeMap,errorInfo,modelManager) {
+    _processActionChangeList(actionChangeResult,changeMap,errorInfo) {
         if(!actionChangeResult.actionDone) {
             errorInfo.error = true;
             if(actionChangeResult.errorMsgs) {
@@ -186,17 +185,21 @@ export default class CommandManager {
                 //create a command change entry for each action change entry and then add it to the change map
                 let cmdRsltEquivelent = {};
                 if(actionChangeEntry.event) {
+
+                    let workspaceManager = this.app.getWorkspaceManager();
+                    if(!workspaceManager) {
+                        //we should have a workspace manager if we get here.
+                        throw new Error("Unknown error - workspace manager missing!");
+                    }
+                    let modelManager = workspaceManager.getModelManager();
+
                     cmdRsltEquivelent.action = actionChangeEntry.event;
                     if(actionChangeEntry.member) {
                         //member action
                         cmdRsltEquivelent.targetId = actionChangeEntry.member.getId();
                         cmdRsltEquivelent.targetType = "component";
-                        if(eventName == "deleted") {
-                            //store theparent if this is a delete event
-                            cmdRsltEquivelent.parent = actionChangeEntry.owner;
-                        }
-                        else {
-                            //otherwise, store the target.
+                        if(actionChangeEntry.event != "deleted") {
+                            //store the target for update and create
                             cmdRsltEquivelent.target = modelManager.getComponentById(cmdRsltEquivelent.targetId);
                         }
                     }
@@ -242,7 +245,7 @@ export default class CommandManager {
         
         //create the change map entry
         let changeMapEntry = changeMap[key];
-        if(!commandResultEntry) {
+        if(!changeMapEntry) {
             changeMapEntry = {};
             if(commandResultEntry.target) {
                 changeMapEntry.target = target;
@@ -271,21 +274,21 @@ export default class CommandManager {
         }
         else if(changeMapEntry.created) {
             //created event
-            changeEntry.event = "created";
+            changeEntry.action = "created";
             changeEntry.target = changeMapEntry.target;
-            changeEntry.dispatcer = changeMapEntry.dispatcher;
+            changeEntry.dispatcher = changeMapEntry.dispatcher;
         }
         else if(changeMapEntry.deleted) {
             //deleted event
-            changeEntry.event = "deleted";
+            changeEntry.action = "deleted";
             changeEntry.targetId = changeMapEntry.targetId;
             changeEntry.targetType = changeMapEnry.targetType;
-            changeEntry.dispatcer = changeMapEntry.dispatcher;
+            changeEntry.dispatcher = changeMapEntry.dispatcher;
         }
         else if(changeMapEntry.updated) {
-            changeEntry.event = "updated";
+            changeEntry.action = "updated";
             changeEntry.target = changeMapEntry.target;
-            changeEntry.dispatcer = changeMapEntry.dispatcher;
+            changeEntry.dispatcher = changeMapEntry.dispatcher;
         }
         else {
             //unknown case
@@ -302,7 +305,7 @@ export default class CommandManager {
                 changeResult.changeList.forEach( changeEntry => {
                     //fire event
                     if((changeEntry.action)&&(changeEntry.dispatcher)) {
-                        changeEntry.dispacher.dispatchEvent(changeEntry.action,changeEntry);
+                        changeEntry.dispatcher.dispatchEvent(changeEntry.action,changeEntry);
                     } 
                 })
             }

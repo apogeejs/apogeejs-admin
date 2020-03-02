@@ -68,7 +68,7 @@ export function getSaveDataAction(model,memberFullName,data,asynchOnComplete) {
         actionData.promiseCallback = asynchActionResult => {
             var asynchCommandResult = {};
             asynchCommandResult.cmdDone = asynchActionResult.actionDone;
-            if(asynchActionResult.alertMsg) asynchCommandResult.alertMsg = asynchActionResult.alertMsg;
+            asynchCommandResult.actionResult = asynchActionResult;
 
             asynchOnComplete(asynchCommandResult);
         }

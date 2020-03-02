@@ -71,7 +71,11 @@ export default class ModelView {
     targetUpdated(eventData) {
         let target = eventData.target;
         if(target.getTargetType() == "modelManager") {
-            this.onModelUpdated(eventData.fieldsUpdated);
+            this.onModelUpdated(target);
+        }
+        if(target.getTargetType() == "component") {
+            let componentView = this.getComponentView(target.getId());
+            componentView.componentUpdated(target);
         }
     }
 
@@ -128,8 +132,8 @@ export default class ModelView {
         }
     }
 
-    onModelUpdated(fieldsUpdated) {
-        if(apogeeutil.isFieldUpdated(fieldsUpdated,"name")) {
+    onModelUpdated(modelManager) {
+        if(modelManager.isFieldUpdated("name")) {
             let model = this.modelManager.getModel();
             this.workspaceView.setName(model.getName());
         }
