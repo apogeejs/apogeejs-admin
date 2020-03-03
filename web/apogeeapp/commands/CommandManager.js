@@ -131,11 +131,6 @@ export default class CommandManager {
         let errorInfo = {};
         this._processCommandResults(commandResult,changeMap,errorInfo);
 
-        //convert the actionChangeList to a commandChangeList
-        if(commandResult.actionResult) {
-            this._processActionChangeList(commandResult.actionResult,changeMap,errorInfo);
-        }
-
         let changeResult = {};
         if(errorInfo.error) {
             changeResult.cmdDone = false;
@@ -159,12 +154,18 @@ export default class CommandManager {
         if(!commandResult.cmdDone) {
             errorInfo.error = true;
             if(!errorInfo.errorMsgs) errorInfo.errorMsgs = [];
-            errorInfo.errorMgs.push(commandResult.errorMsg);
+            errorInfo.errorMsgs.push(commandResult.errorMsg);
         }
         else if((commandResult.target)||(commandResult.targetId)) {
             this._addToChangeMap(commandResult,changeMap);
         }
 
+        //convert the actionChangeList to a commandChangeList
+        if(commandResult.actionResult) {
+            this._processActionChangeList(commandResult.actionResult,changeMap,errorInfo);
+        }
+
+        //process child command results
         if(commandResult.childCommandResults) {
             commandResult.childCommandResults.forEach(childCommandResult => this._processCommandResults(childCommandResult,changeMap,errorInfo));
         }
@@ -231,8 +232,8 @@ export default class CommandManager {
         }
         else if((commandResultEntry.targetId != undefined)&&(commandResultEntry.targetType)) {
             target = undefined;
-            targetId = target.getId();
-            targetType = target.getTargetType();
+            targetId = commandResultEntry.targetId;
+            targetType = commandResultEntry.targetType;
         }
         else {
             //not a valid entry
@@ -249,10 +250,10 @@ export default class CommandManager {
             changeMapEntry = {};
             if(commandResultEntry.target) {
                 changeMapEntry.target = target;
-                changeMapEntry.targetType = targetType;
-                changeMapEntry.targetId = targetId;
-                changeMapEntry.dispatcher = commandResultEntry.dispatcher;
             }
+            changeMapEntry.targetType = targetType;
+            changeMapEntry.targetId = targetId;
+            changeMapEntry.dispatcher = commandResultEntry.dispatcher;
             changeMap[key] = changeMapEntry;
         }
         //there may be a case where we do not have a target instance in the change map entry because
@@ -282,7 +283,7 @@ export default class CommandManager {
             //deleted event
             changeEntry.action = "deleted";
             changeEntry.targetId = changeMapEntry.targetId;
-            changeEntry.targetType = changeMapEnry.targetType;
+            changeEntry.targetType = changeMapEntry.targetType;
             changeEntry.dispatcher = changeMapEntry.dispatcher;
         }
         else if(changeMapEntry.updated) {
@@ -314,7 +315,7 @@ export default class CommandManager {
             //failure - show error message
             let errorMsg;
             if(changeResult.errorMsgs) {
-                errorMsg = errorMsgs.join("\n");
+                errorMsg = changeResult.errorMsgs.join("\n");
             }
             else {
                 errorMsg = "There was an unknown error executing the command";

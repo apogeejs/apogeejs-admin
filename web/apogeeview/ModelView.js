@@ -119,6 +119,7 @@ export default class ModelView {
 
     onComponentDeleted(memberId) {
         let componentView = this.componentViewMap[memberId];
+        if(componentView) componentView.onDelete();
         delete this.componentViewMap[memberId];
 
         //remove from the parent parent

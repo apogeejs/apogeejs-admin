@@ -118,6 +118,14 @@ export default class Folder extends DependentMember {
     /** This method updates the dependencies of any children
      * based on an object being added. */
     updateDependeciesForModelChange(additionalUpdatedMembers) {
+
+        //update dependencies of this folder
+        let dependenciesChanged = this.calculateDependents();
+        if(dependenciesChanged) {
+            additionalUpdatedMembers.push(this);
+        }
+
+        //call update in children
         let childMap = this.getField("childMap");
         for(var key in childMap) {
             var child = childMap[key];
@@ -178,7 +186,7 @@ export default class Folder extends DependentMember {
             var child = childMap[name];
             dependsOnMemberList.push(child);
         }
-        this.updateDependencies(dependsOnMemberList);
+        return this.updateDependencies(dependsOnMemberList);
     }
 }
 

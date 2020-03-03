@@ -92,9 +92,9 @@ ContextManager.prototype.lookupMember = function(path) {
     var impactor;
     for(var i = 0; i < this.contextList.length; i++) {
         var entry = this.contextList[i];        
-        if(entry.parent) {
+        if(entry.contextHolderAsParent) {
             //for parent entries, look up the child and read the data
-            impactor = entry.parent.lookupChildFromPathArray(path);
+            impactor = this.contextHolder.lookupChildFromPathArray(path);
         }
         //no lookup in data entries
         

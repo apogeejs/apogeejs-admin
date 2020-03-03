@@ -197,9 +197,7 @@ export default class Component extends EventManager {
 
     /** This method extends the member udpated function from the base.
      * @protected */    
-    memberUpdated(eventInfo) {
-
-        let updatedMember = eventInfo.target;
+    memberUpdated(updatedMember) {
         
         if(updatedMember.getId() == this.member.getId()) {
             this.fieldUpdated("member");

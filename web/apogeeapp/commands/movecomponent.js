@@ -50,6 +50,7 @@ movecomponent.executeCommand = function(workspaceManager,commandData) {
     let commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;
     if(commandResult.cmdDone) {
+        commandResult.action = "updated";
         commandResult.target = modelManager.getComponentById(memberId);
         commandResult.dispatcher = modelManager;
     }

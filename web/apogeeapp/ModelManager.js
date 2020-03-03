@@ -286,29 +286,23 @@ export default class ModelManager extends EventManager {
     }
 
     objectCreated(eventInfo) {
-        if(!eventInfo.target) return;
-        
-        if(eventInfo.target.getTargetType() == "member") {
+        if(eventInfo.member) {
             this.memberCreated(eventInfo.target);
         }
     }
 
     objectUpdated(eventInfo) {
-        if(!eventInfo.target) return;
-        
-        if(eventInfo.target.getTargetType() == "member") {
-            this.memberUpdated(eventInfo.target);
+        if(eventInfo.member) {
+            this.memberUpdated(eventInfo.member);
         }
-        else if(eventInfo.target.getTargetType() == "model") {
-            this.modelUpdated(eventInfo.target);
+        else if(eventInfo.model) {
+            this.modelUpdated(eventInfo.model);
         }
     }
 
     objectDeleted(eventInfo) {
-        if(!eventInfo.target) return;
-        
-        if(eventInfo.target.getTargetType() == "member") {
-            this.memberDeleted(eventInfo.target);
+        if(eventInfo.member) {
+            this.memberDeleted(eventInfo.member);
         }
     }
 
@@ -323,15 +317,13 @@ export default class ModelManager extends EventManager {
 
         var componentInfo = this.componentMap[key];
         if((componentInfo)&&(componentInfo.component)) {
-            componentInfo.component.memberUpdated(eventInfo);
+            componentInfo.component.memberUpdated(member);
         }
     }
 
     modelUpdated(model) {
-        let fieldsUpdated = model.getUpdated();
-        
         //check for name changes
-        if(apogeeutil.isFieldUpdated(fieldsUpdated,"name")) {
+        if(model.isFieldUpdated("name")) {
             this.fieldUpdated("name");
         }
     }

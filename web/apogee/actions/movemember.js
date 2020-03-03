@@ -48,6 +48,7 @@ function moveMember(model,actionData) {
     member.move(actionData.targetName,targetOwner);
     actionResult.actionDone = true;
     actionResult.updateModelDependencies = true;
+    actionResult.recalculateDependsOnMembers = true;
     
     //add the child action results
     let childActionResults = addChildResults(member);
@@ -69,12 +70,12 @@ function addChildResults(member) {
             childActionResult.actionDone = true;
             childActionResult.member = child;
             childActionResult.event = ACTION_EVENT;
-            actionResult.updateModelDependencies = true;
+            childActionResult.updateModelDependencies = true;
             
             childActionResults.push(childActionResult);
             
             //add results for children to this member
-            grandchildActionResults = addChildResults(child);
+            let grandchildActionResults = addChildResults(child);
             if(grandchildActionResults) {
                 childActionResult.childActionResults = grandchildActionResults;
             }

@@ -339,15 +339,13 @@ export default class Member {
     move(newName,newOwner) {
         let currentOwner = this.getField("owner");
 
-        //remove from old owner
-        if(currentOwner != newOwner) {
-            if(currentOwner.isParent) {
-                currentOwner.removeChild(this);
-            }
-            else {
-                //don't allow moving a root for now!
-                //or renaiming either!
-            }
+        //remove from old named object from the new or old owner
+        if(currentOwner.isParent) {
+            currentOwner.removeChild(this);
+        }
+        else {
+            //don't allow moving a root for now!
+            //or renaiming either!
         }
         
         //check for change of name
@@ -355,17 +353,18 @@ export default class Member {
             this.setField("name",newName);
         }
         
-        //remove from old owner
+        //set the new owner, if it changed
         if(currentOwner != newOwner) {
             this.setField("owner",newOwner);
+        }
 
-            if(newOwner.isParent) {
-                newOwner.addChild(this);
-            }
-            else {
-                //don't allow moving a root for now!
-                //or renaiming either!
-            }
+        //set the newly named object in the new or old owner
+        if(newOwner.isParent) {
+            newOwner.addChild(this);
+        }
+        else {
+            //don't allow moving a root for now!
+            //or renaiming either!
         }
     }
 

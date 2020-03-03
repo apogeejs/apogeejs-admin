@@ -281,8 +281,9 @@ function createRecalculateList(actionModifiedMembers,additionalUpdatedMembers) {
  * @private */
 function fireEvents(model,changeMap) {
     for(var idString in changeMap) {
-        let eventInfo = changeMap[idString];
-        model.dispatchEvent(eventInfo.event,eventInfo);
+        let changeMapEntry = changeMap[idString];
+        let changeListEntry = changeMapEntryToChangeListEntry(changeMapEntry);
+        model.dispatchEvent(changeListEntry.event,changeListEntry);
     }
 }
 
@@ -328,6 +329,7 @@ function mergeIntoChangeMap(changeMap,model,member,eventName) {
     if(!existingInfo) {
         existingInfo = {};
         if(member) existingInfo.member = member;
+        else existingInfo.model = model;
         changeMap[lookupKey] = existingInfo;
     }
 
@@ -348,8 +350,12 @@ function changeMapEntryToChangeListEntry(changeMapEntry) {
     let changeListEntry = {};
 
     //member present only if the member is the event target
-    changeListEntry.member = changeMapEntry.member;
-    
+    if(changeMapEntry.member) {
+        changeListEntry.member = changeMapEntry.member;
+    }
+    else if(changeMapEntry.model) {
+        changeListEntry.model = changeMapEntry.model;
+    }
     //merge the events into a single event
     if((changeMapEntry.created)&&(changeMapEntry.deleted)) return null;
     else if(changeMapEntry.created) changeListEntry.event = "created";

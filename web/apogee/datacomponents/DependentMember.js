@@ -164,8 +164,11 @@ export default class DependentMember extends Member {
             }
         }
 
-        this.setField("dependsOnList",newDependsOnList);
-        
+        if(dependenciesUpdated) {
+            this.setField("dependsOnList",newDependsOnList);
+            this.calcPending = true;
+        }
+
         return dependenciesUpdated;
     }
 

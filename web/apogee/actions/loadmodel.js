@@ -65,7 +65,7 @@ function loadModel(model,actionData) {
     return actionResult;
 }
 
-let ACTION_EVENT = "modelUpdated";
+let ACTION_EVENT = "updated";
 
 //This line of code registers the action 
 addActionInfo("loadModel",loadModel);
