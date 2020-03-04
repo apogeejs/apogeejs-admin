@@ -257,9 +257,7 @@ function createRecalculateList(actionModifiedMembers,additionalUpdatedMembers) {
     let recalculateList = [];
 
     //add members from each action and/or fields they impact, if applicable
-    for(var i = 0; i < actionModifiedMembers.length; i++) {
-        var actionResult = actionModifiedMembers[i];
- 
+    actionModifiedMembers.forEach( actionResult => {
         //update the recalc list
         if(actionResult.recalculateMember) {
             addToRecalculateList(recalculateList,actionResult.member);            
@@ -267,11 +265,10 @@ function createRecalculateList(actionModifiedMembers,additionalUpdatedMembers) {
         else if(actionResult.recalculateDependsOnMembers) {
             addDependsOnToRecalculateList(recalculateList,actionResult.member);                         
         }
-   
-    }
+    });
 
     //add any other modified members to the racalculate list
-    recalculateList.push(...additionalUpdatedMembers);
+    additionalUpdatedMembers.forEach(member => addToRecalculateList(recalculateList,member));
 
     return recalculateList;
 }

@@ -284,7 +284,8 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer();
             try {
                 //make sure the data is set in each impactor
                 this.initializeImpactors();
-                if(this.getState() != apogeeutil.STATE_NORMAL) {
+                let state = this.getState();
+                if((state == apogeeutil.STATE_ERROR)||(state == apogeeutil.STATE_PENDING)||(state == apogeeutil.STATE_INVALID)) {
                     this.dependencyInitInProgress = false;
                     functionInitialized = true;
                     functionInitializedSuccess = false;

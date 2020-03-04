@@ -130,15 +130,18 @@ export default class FolderFunction extends DependentMember {
     calculate() {  
         //make sure the data is set in each impactor
         this.initializeImpactors();
-        
-        //check for code errors, if so set a data error
-        try {
-            var folderFunctionFunction = this.getFolderFunctionFunction();
-            this.setData(folderFunctionFunction);
-        }
-        catch(error) {
-            //error in calculation
-            this.setError(error);
+
+        let state = this.getState();
+        if((state != apogeeutil.STATE_ERROR)&&(state != apogeeutil.STATE_PENDING)&&(state != apogeeutil.STATE_INVALID)) {
+            //check for code errors, if so set a data error
+            try {
+                var folderFunctionFunction = this.getFolderFunctionFunction();
+                this.setData(folderFunctionFunction);
+            }
+            catch(error) {
+                //error in calculation
+                this.setError(error);
+            }
         }
         
         this.clearCalcPending();

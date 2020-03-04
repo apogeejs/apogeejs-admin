@@ -98,14 +98,18 @@ export default class Folder extends DependentMember {
         //make sure impactors are calculated
         this.initializeImpactors();
 
-        //make an immutable map of the data for each child
-        let childMap = this.getField("childMap");
-        let dataMap = {};
-        for(let name in childMap) {
-            dataMap[name] = childMap[name].getData();
+        //update data if we are not in one of the following states (from the impactors)
+        let state = this.getState();
+        if((state != apogeeutil.STATE_ERROR)&&(state != apogeeutil.STATE_PENDING)&&(state != apogeeutil.STATE_INVALID)) {
+            //make an immutable map of the data for each child
+            let childMap = this.getField("childMap");
+            let dataMap = {};
+            for(let name in childMap) {
+                dataMap[name] = childMap[name].getData();
+            }
+            Object.freeze(dataMap);
+            this.setData(dataMap);
         }
-        Object.freeze(dataMap);
-        this.setData(dataMap);
         
         //clear calc pending flag
         this.clearCalcPending();
