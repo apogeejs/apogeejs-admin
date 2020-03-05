@@ -184,6 +184,7 @@ export default class PageChildComponentDisplay {
         }
 
         this._setTitle();
+        this._setBannerState();
     }
 
     /** This makes the title bar, and installs it inline */
