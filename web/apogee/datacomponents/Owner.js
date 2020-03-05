@@ -36,12 +36,12 @@ Owner.getChildFullName = function(childName) {
 /** This method looks up a member by its full name. */
 Owner.getMemberByFullName = function(fullName) {
     var path = fullName.split(".");
-    return this.getMemberByPathArray(path);
+    return this.lookupChildFromPathArray(path);
 }
 
 ///** This method looks up a member by an array path. The start element is
 // * the index of the array at which to start. */
-//Owner.getMemberByPathArray = function(path,startElement);
+//Owner.lookupChildFromPathArray = function(path,startElement,optionalParentMemberList);
 
 ///** This method is called when the model is closed.
 // It should do any needed cleanup for the object. */

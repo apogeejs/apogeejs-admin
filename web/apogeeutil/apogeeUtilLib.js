@@ -21,6 +21,12 @@ apogeeutil.STATE_ERROR = "error";
 /** Invalid State - used by members */
 apogeeutil.STATE_INVALID = "invalid";
 
+/** Standard dependency */
+apogeeutil.NORMAL_DEPENDENCY = 1
+
+/** Pass through dependency */
+apogeeutil.PASS_THROUGH_DEPENDENCY = 2;
+
 /** This method creates a unique key for a field object target.  */
 apogeeutil.createUniqueKey = function(targetType,targetId) {
     return targetType + targetId;

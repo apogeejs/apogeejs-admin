@@ -18,7 +18,7 @@ export default class DependentMember extends Member {
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
         //this is the list of dependencies
-        this.setField("dependsOnList",[]);
+        this.setField("dependsOnMap",{});
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -35,7 +35,7 @@ export default class DependentMember extends Member {
 
     /** This returns a list of the members that this member depends on. */
     getDependsOn() {
-        return this.getField("dependsOnList");
+        return this.getField("dependsOnMap");
     }
 
     /** This returns the calc pending flag.  */
@@ -79,25 +79,28 @@ export default class DependentMember extends Member {
         var resultInvalid = false;
         
         //make sure dependencies are up to date
-        let dependsOnList = this.getField("dependsOnList");
-        for(var i = 0; i < dependsOnList.length; i++) {
-            var impactorId = dependsOnList[i];
-            let model = this.getModel();
-            let impactor = model.lookupMember(impactorId);
+        let dependsOnMap = this.getField("dependsOnMap");
+        let model = this.getModel();
+        for(var idString in dependsOnMap) {
+            let dependsOnType = dependsOnMap[idString];
+            let impactor = model.lookupMember(idString);
 
             if((impactor.isDependent)&&(impactor.getCalcPending())) {
                 impactor.calculate();
             }
 
-            let impactorState = impactor.getState();
-            if(impactorState == apogeeutil.STATE_ERROR) {
-                errorDependencies.push(impactor);
-            } 
-            else if(impactorState == apogeeutil.STATE_PENDING) {
-                resultPending = true;
-            }
-            else if(impactorState == apogeeutil.STATE_INVALID) {
-                resultInvalid = true;
+            //inherit the the state of the impactor only if it is a normal dependency, as oppose to a pass through dependency
+            if(dependsOnType == apogeeutil.NORMAL_DEPENDENCY) {
+                let impactorState = impactor.getState();
+                if(impactorState == apogeeutil.STATE_ERROR) {
+                    errorDependencies.push(impactor);
+                } 
+                else if(impactorState == apogeeutil.STATE_PENDING) {
+                    resultPending = true;
+                }
+                else if(impactorState == apogeeutil.STATE_INVALID) {
+                    resultInvalid = true;
+                }
             }
         }
 
@@ -116,11 +119,10 @@ export default class DependentMember extends Member {
     onDeleteDependent() {
         //remove this dependent from the impactor
         let model = this.getModel();
-        let dependsOnList = this.getField("dependsOnList");
-        for(var i = 0; i < dependsOnList.length; i++) {
-            var remoteMemberId = dependsOnList[i];
+        let dependsOnMap = this.getField("dependsOnMap");
+        for(var remoteMemberIdString in dependsOnMap) {
             //remove from imacts list
-            model.removeFromImpactsList(this.getId(),remoteMemberId);
+            model.removeFromImpactsList(this.getId(),remoteMemberIdString);
         }
     }
     //===================================
@@ -128,44 +130,26 @@ export default class DependentMember extends Member {
     //===================================
 
     /** This sets the dependencies based on the code for the member. */
-    updateDependencies(dependsOnMemberList) {
-        
-        var dependenciesUpdated = false;
+    updateDependencies(newDependsOnMap) {
+        let dependenciesUpdated = false;
         let model = this.getModel();
-        
-        if(!dependsOnMemberList) {
-            dependsOnMemberList = [];
-        }
-        let newDependsOnList = [];
-        let oldDependsOnList = this.getField("dependsOnList");
-        
-        //recod the new dependencies. Check for additions
-        var i;
-        for(i = 0; i < dependsOnMemberList.length; i++) {
-            let remoteMember = dependsOnMemberList[i];  
-            let remoteMemberId = remoteMember.getId()
-            newDependsOnList.push(remoteMemberId);
 
-            //check if this is a change
-            if(oldDependsOnList.indexOf(remoteMemberId) < 0) {
-                model.addToImpactsList(this.getId(),remoteMemberId);
+        let oldDependsOnMap = this.getField("dependsOnMap");
+        for(var idString in newDependsOnMap) {
+            if(newDependsOnMap[idString] != oldDependsOnMap[idString]) {
                 dependenciesUpdated = true;
-            }  
+                if(!oldDependsOnMap[idString]) model.addToImpactsList(this.getId(),idString);
+            }
         }
-        
-        //check for removals
-        for(i = 0; i < oldDependsOnList.length; i++) {
-            let remoteMemberId = oldDependsOnList[i];
-
-            if(newDependsOnList.indexOf(remoteMemberId) < 0) {
-                //remove from imacts list
-                model.removeFromImpactsList(this.getId(),remoteMemberId);
+        for(var idString in oldDependsOnMap) {
+            if(newDependsOnMap[idString] != oldDependsOnMap[idString]) {
                 dependenciesUpdated = true;
+                if(!oldDependsOnMap[idString]) model.removeFromImpactsList(this.getId(),idString);
             }
         }
 
         if(dependenciesUpdated) {
-            this.setField("dependsOnList",newDependsOnList);
+            this.setField("dependsOnMap",newDependsOnMap);
             this.calcPending = true;
         }
 

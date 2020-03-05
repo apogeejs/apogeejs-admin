@@ -1,11 +1,8 @@
-
-
 /** This method takes the varInfo table from the code analysis and returns
  * a lit of member objects which this member depends on.
  */
 export function getDependencyInfo(varInfo,contextManager) {
-    var newDependsOnMemberList = [];
-	var objectMap = {};
+	var dependsOnMap = {};
 	
 	//cycle through the variables used
 	for(var baseName in varInfo) {
@@ -18,20 +15,29 @@ export function getDependencyInfo(varInfo,contextManager) {
                 //look up the object
                 var namePath = nameUse.path;
 
-                //lookup this object
-                var impactor = contextManager.getMember(namePath);
-                if(impactor) {
+                //lookup this object, along with the passthrough dependencies
+                let passThroughDependencies = [];
+                var impactor = contextManager.getMember(namePath,passThroughDependencies);
 
-                    //add as dependent (note this may not be a data object - check later!)
+                //add the impactor to the dependency map
+                if(impactor) {
+                    //add as dependent
                     var memberId = impactor.getId();
-                    if(!objectMap[memberId]) {
-                        newDependsOnMemberList.push(impactor);
-                        objectMap[memberId] = true;
+                    if(dependsOnMap[memberId] != apogeeutil.NORMAL_DEPENDENCY) {
+                        dependsOnMap[memberId] = apogeeutil.NORMAL_DEPENDENCY;
                     }
                 }
+
+                //add the pass through members to the dependency map (give precedence to normal dependencies)
+                passThroughDependencies.forEach(passThroughMember => {
+                    var memberId = passThroughMember.getId();
+                    if(dependsOnMap[memberId] == undefined) {
+                        dependsOnMap[memberId] = apogeeutil.PASS_THROUGH_DEPENDENCY;
+                    }
+                });
             }
 		}
 	}
 	
-	return newDependsOnMemberList;
+	return dependsOnMap;
 }

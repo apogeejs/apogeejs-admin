@@ -111,10 +111,10 @@ export default class CodeableMember extends DependentMember {
         
         if((this.hasCode())&&(compiledInfo.valid)) {
             try {
-                var newDependsOnMemberList = getDependencyInfo(compiledInfo.varInfo,this.getContextManager());
+                var dependencyInfo = getDependencyInfo(compiledInfo.varInfo,this.getContextManager());
 
                 //update dependencies
-                this.updateDependencies(newDependsOnMemberList);
+                this.updateDependencies(dependencyInfo);
             }
             catch(ex) {
                 this.codeErrors.push(ex);
@@ -122,7 +122,7 @@ export default class CodeableMember extends DependentMember {
         }
         else {
             //will not be calculated - has no dependencies
-            this.updateDependencies([]);
+            this.updateDependencies({});
         }
     }
 
@@ -133,10 +133,10 @@ export default class CodeableMember extends DependentMember {
         if((compiledInfo)&&(compiledInfo.valid)) {
                     
             //calculate new dependencies
-            var newDependencyList = getDependencyInfo(compiledInfo.varInfo,this.getContextManager());
+            var dependsOnMap = getDependencyInfo(compiledInfo.varInfo,this.getContextManager());
             
             //update the dependency list
-            var dependenciesChanged = this.updateDependencies(newDependencyList);
+            var dependenciesChanged = this.updateDependencies(dependsOnMap);
             if(dependenciesChanged) {
                 //add to update list
                 additionalUpdatedMembers.push(this);

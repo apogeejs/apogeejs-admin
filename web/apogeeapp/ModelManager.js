@@ -456,12 +456,17 @@ export default class ModelManager extends EventManager {
                 memberStruct.parent = parent ? parent.getFullName() : null;
 
                 if(member.isDependent) {
-                    let dependsOnList = member.getDependsOn();
-                    if(dependsOnList.length > 0) {
-                        memberStruct.dep = dependsOnList.map(dependencyId => {
-                            let dependency = this.model.lookupMember(dependencyId);
-                            dependency.getFullName()
-                        });
+                    let depList = [];
+                    let dependsOnMap = member.getDependsOn();
+                    for(var idString in dependsOnMap) {
+                        dependencyType = dependsOnMap[idString];
+                        if(dependencyType == apogeeutil.NORMAL_DEPENDENCY) {
+                            let dependency = this.model.lookupMember(idString);
+                            depList.push(dependency.getFullName());
+                        }
+                    }
+                    if(depList.length > 0) {
+                        memberStruct.dep = depList;
                     }
                 }
 

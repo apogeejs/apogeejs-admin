@@ -1,6 +1,6 @@
 import base from "/apogeeutil/base.js";
 import FieldObject from "/apogeeutil/FieldObject.js";
-import EventManager from "/apogeeutil/EventManagerClass.js";
+import EventManager from "/apogeeutil/EventManager.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import Owner from "/apogee/datacomponents/Owner.js";
@@ -14,15 +14,15 @@ import RootHolder from "/apogee/datacomponents/RootHolder.js";
  * used for the virtual model created for folder functions, so the folder function can 
  * access variables from the larger model.
  * */
-export default class Model extends EventManager {
+export default class Model extends FieldObject {
 
     constructor(optionalContextOwner) {
         //base init
         super();
 
         //mixin initialization
+        this.eventManagerMixinInit();
         this.contextHolderMixinInit();
-        this.fieldObjectMixinInit();
         
         // This is a queue to hold actions while one is in process.
         this.actionInProgress = false;
@@ -173,8 +173,9 @@ export default class Model extends EventManager {
         return "";
     }
 
-    /** This method looks up a member by its full name. */
-    getMemberByPathArray(path,startElement) {
+    /** This method looks up a member by its full name.  If the optionalParentMemberList is passed
+     * in, it will be populated with any parent members on the path.*/
+    lookupChildFromPathArray(path,startElement,optionalParentMemberList) {
         let rootFolder = this.getField("rootFolder");
         if(startElement === undefined) startElement = 0;
         if((rootFolder)&&(path[startElement] === rootFolder.getName())) {
@@ -183,7 +184,12 @@ export default class Model extends EventManager {
             }
             else {
                 startElement++;
-                return rootFolder.lookupChildFromPathArray(path,startElement);
+                let insideMember = rootFolder.lookupChildFromPathArray(path,startElement,optionalParentMemberList);
+                //add the root folder as a parent is requested
+                if((insideMember)&&(optionalParentMemberList)) {
+                    optionalParentMemberList.push(rootFolder);
+                }
+                return insideMember;
             }
         }
         else {
@@ -276,6 +282,7 @@ export default class Model extends EventManager {
     
     /** This method adds a data member to the imapacts list for this node.
      * The return value is true if the member was added and false if it was already there. 
+     * NOTE: the member ID can be a string or integer. This dependentMemberId should be an int.
      * @private */
     addToImpactsList(depedentMemberId,memberId) {
         //don't let a member impact itself
@@ -398,10 +405,10 @@ export default class Model extends EventManager {
 }
 
 //add mixins to this class
+base.mixin(Model,EventManager);
 base.mixin(Model,ContextHolder);
 base.mixin(Model,Owner);
 base.mixin(Model,RootHolder);
-base.mixin(Model,FieldObject);
 
 let memberGenerators = {};
 

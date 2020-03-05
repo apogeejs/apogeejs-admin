@@ -104,7 +104,7 @@ function updateData(model,actionData) {
 
     //see if there were any dependents, to know if we need to update them
     //on setting data there will be none.
-    let hadDependents = ((member.getDependsOn)&&(member.getDependsOn().length > 0));
+    let hadDependents = ((member.getDependsOn)&&(apogeeutil.jsonObjectLength(member.getDependsOn()) > 0));
     
     //if this is the resolution (or rejection) of a previously set promise
     //make sure the source promise matches the pending promise. Otherwise

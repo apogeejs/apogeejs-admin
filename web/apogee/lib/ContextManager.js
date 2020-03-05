@@ -44,8 +44,8 @@ ContextManager.prototype.getValue = function(varName) {
     return data;
 }
 
-ContextManager.prototype.getMember = function(path) {
-    var impactor = this.lookupMember(path);
+ContextManager.prototype.getMember = function(path,optionalParentMembers) {
+    var impactor = this.lookupMember(path,optionalParentMembers);
     
     //if the object is not in this context, check with the parent context
     if(impactor === undefined) {
@@ -53,7 +53,7 @@ ContextManager.prototype.getMember = function(path) {
             var owner = this.contextHolder.getOwner();
             if(owner) {
                 var ownerContextManager = owner.getContextManager();
-                impactor = ownerContextManager.getMember(path);
+                impactor = ownerContextManager.getMember(path,optionalParentMembers);
             }
         }
     }
@@ -88,13 +88,13 @@ ContextManager.prototype.lookupValue = function(varName) {
     return undefined;
 }
 
-ContextManager.prototype.lookupMember = function(path) {
+ContextManager.prototype.lookupMember = function(path,optionalParentMembers) {
     var impactor;
     for(var i = 0; i < this.contextList.length; i++) {
         var entry = this.contextList[i];        
         if(entry.contextHolderAsParent) {
             //for parent entries, look up the child and read the data
-            impactor = this.contextHolder.lookupChildFromPathArray(path);
+            impactor = this.contextHolder.lookupChildFromPathArray(path,0,optionalParentMembers);
         }
         //no lookup in data entries
         

@@ -97,18 +97,27 @@ export default class Folder extends DependentMember {
     calculate() {
         //make sure impactors are calculated
         this.initializeImpactors();
+        
+        //folders work slightly different because of pass thorugh dependencies. We will set the folder data
+        //value regardless of the state, meaning if the state is error or pending or invalid, we still set
+        //the data, along with maintaining the current state.
 
-        //update data if we are not in one of the following states (from the impactors)
+        //make an immutable map of the data for each child
+        let childMap = this.getField("childMap");
+        let dataMap = {};
+        for(let name in childMap) {
+            dataMap[name] = childMap[name].getData();
+        }
+        Object.freeze(dataMap);
+
         let state = this.getState();
         if((state != apogeeutil.STATE_ERROR)&&(state != apogeeutil.STATE_PENDING)&&(state != apogeeutil.STATE_INVALID)) {
-            //make an immutable map of the data for each child
-            let childMap = this.getField("childMap");
-            let dataMap = {};
-            for(let name in childMap) {
-                dataMap[name] = childMap[name].getData();
-            }
-            Object.freeze(dataMap);
+            //set the data state if there is no child error or other exceptional case
             this.setData(dataMap);
+        }
+        else {
+            //if there is a child exceptional case, still set the data for the sake of pass through dependencies
+            this.forceUpdateDataWithoutStateChange(dataMap);
         }
         
         //clear calc pending flag
@@ -184,13 +193,13 @@ export default class Folder extends DependentMember {
     /** This method updates the table data object in the folder data map. 
      * @private */
     calculateDependents() {
-        let dependsOnMemberList = [];
+        let dependsOnMap = [];
         let childMap = this.getField("childMap");
         for(var name in childMap) {
             var child = childMap[name];
-            dependsOnMemberList.push(child);
+            dependsOnMap[child.getId()] = apogeeutil.NORMAL_DEPENDENCY;
         }
-        return this.updateDependencies(dependsOnMemberList);
+        return this.updateDependencies(dependsOnMap);
     }
 }
 

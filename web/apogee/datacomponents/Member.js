@@ -17,12 +17,12 @@ import FieldObject from "/apogeeutil/FieldObject.js";
  * The owner should be the parent that holds this member or the object that holds
  * the hierarchy (maybe the model). If the owner is not a parent, this is typically
  * a folder and it is called the root folder. */
-export default class Member {
+export default class Member extends FieldObject {
 
     constructor(model,name,owner) {
-        this.id = _createId();
+        super();
 
-        this.fieldObjectMixinInit();
+        this.id = _createId();
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -193,6 +193,7 @@ export default class Member {
     // Update Data/State functions
     //=======================================
 
+    /** This method clears the state field. */
     clearState() {
         this.clearField("state");
     }
@@ -202,74 +203,43 @@ export default class Member {
      * with a JSON table. Besides hold the data object, this updates the parent data map. */
     setData(data) {
         this.setField("data",data);
-        this._setState(apogeeutil.STATE_NORMAL);
-
-        let dataIsSet = true;
-        let isPending = false;
-        this._finishStateChange(dataIsSet,isPending);
+        this._setState(apogeeutil.STATE_NORMAL,data);
     }
 
     /** This method adds an error for this member. It will be valid for the current round of calculation of
-     * this member. The error may be a javascript Error object of string (or any other object really). */
+     * this member. The error may be a javascript Error object of string (or any other object really). 
+     * The optional data value should typically be undefined unless there is a specifc data value that should be
+     * set with the error state. */
     setError(error) {
-        this._setState(apogeeutil.STATE_ERROR,[error]);
-        
-        let dataIsSet = false;
-        let isPending = false;
-        this._finishStateChange(dataIsSet,isPending);
+        this._setState(apogeeutil.STATE_ERROR,undefined,[error]);
     }
 
-    /** This method sets the pre calc error for this dependent. */
+    /** This method sets the pre calc error for this dependent. 
+     * The optional data value should typically be undefined unless there is a specifc data value that should be
+     * set with the error state. */
     setErrors(errorList) {
-        this._setState(apogeeutil.STATE_ERROR,errorList);
-        
-        let dataIsSet = false;
-        let isPending = false;
-        this._finishStateChange(dataIsSet,isPending);
+        this._setState(apogeeutil.STATE_ERROR,undefined,errorList);
     }
 
     /** This sets the result pending flag. If there is a promise setting this member to pending, it should
      * be passed as an arg. In this case the field will be updated only if the reolving promise matches this
      * set promise. Otherwise it is assumed the promise had been superceded. In the case this member is pending
-     * because it depends on a remote pending member, then no promise should be passed in to this function. */
+     * because it depends on a remote pending member, then no promise should be passed in to this function. 
+     * The optional data value should typically be undefined unless there is a specifc data value that should be
+     * set with the pending state. */
     setResultPending(promise) {
         this._setState(apogeeutil.STATE_PENDING);
         if(promise) {
             this._setField("pendingPromise",promise);
         }
-
-        let dataIsSet = false;
-        let isPending = true;
-        this._finishStateChange(dataIsSet,isPending);
     }
 
     /** This sets the result invalid flag. If the result is invalid, any
-     * table depending on this will also have an invalid value. */
+     * table depending on this will also have an invalid value. 
+     * The optional data value should typically be undefined unless there is a specifc data value that should be
+     * set with the invalid state. */
     setResultInvalid() {
         this._setDataState(apogeeutil.STATE_INVALID);
-        
-        let dataIsSet = false;
-        let isPending = false;
-        this._finishStateChange(dataIsSet,isPending);
-    }
-
-    /** This method finalizes the data/state change. */
-    _finishStateChange(dataIsSet,isPending) {
-        //clear data if the we did not set data
-        if(!dataIsSet) {
-            let data = this.getField("data");
-            if(data) {
-                this.clearField("data");
-            }
-        }
-
-        //clear pending if the new state is not pending
-        if(!isPending) {
-            let pendingPromise = this.getField("pendingPromise");
-            if(pendingPromise) {
-                this.clearField("pendingPromise");
-            }
-        }
     }
 
     /** This methos sets the data, where the data can be a generalized value
@@ -328,6 +298,13 @@ export default class Member {
             //call appropriate action when the promise completes
             promise.then(asynchCallback).catch(asynchErrorCallback);
         }
+    }
+
+    /** This method can be called to set data without setting the state. It is intended to be
+     * used by the folder to set the data value when an error, pending or invalid state is present. This
+     * data value is used for pass-through dependenceis. */
+    forceUpdateDataWithoutStateChange(data) {
+        this.setField("data",data)
     }
 
     //========================================
@@ -415,8 +392,8 @@ export default class Member {
     // State setting methods
     //----------------------------------
 
-    /** This updates the data state. */
-    _setState(state,errorList) {
+    /** This updates the state. */
+    _setState(state,data,errorList) {
         let newStateStruct = {};
         let oldStateStruct = this.getField("state");
 
@@ -439,7 +416,22 @@ export default class Member {
             newStateStruct.state = state;
         }
 
+        //set the data if we passed it in, regardless of state
         this.setField("state",newStateStruct);
+        if(data !== undefined) {
+            this.setField("data",data)
+        }
+        else {
+            this.clearField("data");
+        }
+
+        //clear the pending promise, if we are not in pending state
+        //note that the pending promise must be set elsewhere
+        if(state != apogeeutil.STATE_PENDING) {
+            if(this.getField("pendingPromise")) {
+                this.clearField("pendingPromise");
+            }
+        }
     }
 
 

@@ -39,26 +39,38 @@ Parent.isRoot = function() {
 
 /** This method looks up a child using an arry of names corresponding to the
  * path from this folder to the object.  The argument startElement is an optional
- * index into the path array for fodler below the root folder. */
-Parent.lookupChildFromPathArray = function(path,startElement) {
+ * index into the path array for fodler below the root folder. 
+ * The optional parentMemberList argument can be passed in to load the parent members 
+ * for the given member looked up. */
+Parent.lookupChildFromPathArray = function(path,startElement,optionalParentMemberList) {
     if(startElement === undefined) startElement = 0;
     
-    var member = this.lookupChild(path[startElement]);
-    if(!member) return undefined;
+    var childMember = this.lookupChild(path[startElement]);
+    if(!childMember) return undefined;
     
     if(startElement < path.length-1) {
-        if(member.isParent) {
-            return member.lookupChildFromPathArray(path,startElement+1);
+        if(childMember.isParent) {
+            let grandChildMember = childMember.lookupChildFromPathArray(path,startElement+1,optionalParentMemberList);
+            //record the parent path, if requested
+            if((grandChildMember)&&(optionalParentMemberList)) {
+                optionalParentMemberList.push(childMember);
+            }
+            return grandChildMember;
         }
         else if(member.isOwner) {
-            return member.getMemberByPathArray(path,startElement+1);
+            let grandChildMember = childMember.lookupChildFromPathArray(path,startElement+1,optionalParentMemberList);
+            //record the parent path, if requested
+            if((grandChildMember)&&(optionalParentMemberList)) {
+                optionalParentMemberList.push(childMember);
+            }
+            return grandChildMember;
         }
         else {
-            return member;
+            return childMember;
         }
     }
     else {
-        return member;
+        return childMember;
     }
 }
 

@@ -6,7 +6,7 @@ var EventManager = {};
 export { EventManager as default };
     
 /** This serves as the constructor. */
-EventManager.init = function() {
+EventManager.eventManagerMixinInit = function() {
      /** This field holds the event listeners
     * @private */
     this.listenerTable = {};

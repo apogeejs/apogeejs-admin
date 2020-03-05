@@ -45,9 +45,9 @@ export default class FolderFunction extends DependentMember {
     /** This method sets the root object - implemented from RootHolder.  */
     setRoot(child) {
         this.setField("internalFolder",child);
-        var dependsOnMemberList = [];
-        if(child) dependsOnMemberList.push(child);
-        this.updateDependencies(dependsOnMemberList);
+        var dependsOnMap = {};
+        if(child) dependsOnMap[child.getId()] = apogeeutil.NORMAL_DEPENDENCY;
+        this.updateDependencies(dependsOnMap);
     }
 
     /** This gets the name of the return object for the folderFunction function. */
@@ -189,8 +189,9 @@ export default class FolderFunction extends DependentMember {
         return this.getFullName() + ".";
     }
 
-    /** This method looks up a member by its full name. */
-    getMemberByPathArray(path,startElement) {
+    /** This method looks up a member by its full name. If the optionalParentMemberList is passed
+     * in, it will be populated with any parent members on the path.*/
+    lookupChildFromPathArray(path,startElement,optionalParentMemberList) {
         let internalFolder = this.getField("internalFolder");
         if(startElement === undefined) startElement = 0;
         if(path[startElement] === internalFolder.getName()) {
@@ -199,7 +200,12 @@ export default class FolderFunction extends DependentMember {
             }
             else {
                 startElement++;
-                return internalFolder.lookupChildFromPathArray(path,startElement);
+                let insideMember = internalFolder.lookupChildFromPathArray(path,startElement,optionalParentMemberList);
+                //add the internal folder as a parent is requested
+                if((insideMember)&&(optionalParentMemberList)) {
+                    optionalParentMemberList.push(rootFolder);
+                }
+                return insideMember;
             }
         }
         else {
