@@ -1,29 +1,33 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import EventManager from "/apogeeutil/EventManagerClass.js";
-
-import {bannerConstants} from "/apogeeview/componentdisplay/banner.js"; 
+import base from "/apogeeutil/base.js";
+import FieldObject from "/apogeeutil/FieldObject.js";
+import EventManager from "/apogeeutil/EventManager.js";
 
 /** This is the base functionality for a component. */
-export default class Component extends EventManager {
+export default class Component extends FieldObject {
 
     constructor(modelManager,member) {
-
         super();
-        
-        this.modelManager = modelManager;
-        this.member = member;
-    
-        this.modelManager.registerMember(this.member,this);
-        
+
+        //mixin initialization
+        this.eventManagerMixinInit();
+
         //inheriting objects can pass functions here to be called on cleanup, save, etc
         this.cleanupActions = [];
-
-        this.updated = {};
         
-        this._setState(member.getState());
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //FIELDS
+        this.setField("modelManager",modelManager);
+        this.setField("member",member);
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    
+        modelManager.registerMember(member,this);
 
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //Working
         this.viewStateCallback = null;
         this.cachedViewState = null;
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     }
 
     /** If an extending object has any cleanup actions, a callback should be passed here.
@@ -38,19 +42,19 @@ export default class Component extends EventManager {
 
     /** This method returns the base member for this component. */
     getMember() {
-        return this.member;
+        return this.getField("member");
     }
 
     getId() {
-        return this.member.getId();
+        return this.getField("member").getId();
     }
 
     getName() {
-        return this.member.getName();
+        return this.getField("member").getName();
     }
 
     getFullName() {
-        return this.member.getFullName();
+        return this.getField("member").getFullName();
     }
 
     /** This method returns a display name for the member object. */
@@ -64,31 +68,18 @@ export default class Component extends EventManager {
     }
 
     getParentComponent() {
-        let parent = this.member.getParent();
+        let parent = this.getField("member").getParent();
         if(parent) {
-            return this.modelManager.getComponent(parent);
+            return this.getField("modelManager").getComponent(parent);
         }
         else {
             return null;
         }
     }
 
-    getBannerState() {
-        return this.bannerState;
-    }
-
-    getBannerMessage() {
-        return this.bannerMessage;
-    }
-
-    /** This method returns the model for this component. */
-    getModel() {
-        return this.member.getModel();
-    }
-
     /** This method returns the model manager for this component. */
     getModelManager() {
-        return this.modelManager;
+        return this.getField("modelManager");
     }
 
     setViewStateCallback(viewStateCallback) {
@@ -100,24 +91,8 @@ export default class Component extends EventManager {
     }
 
     //------------------------------------------
-    // Event Tracking Methods
+    // Field Object Methods
     //------------------------------------------
-
-    getUpdated() {
-        return this.updated;
-    }
-
-    clearUpdated() {
-        this.updated = {};
-    }
-
-    fieldUpdated(field) {
-        this.updated[field] = true;
-    }
-
-    isFieldUpdated(field) {
-        return this.updated[field] ? true : false;
-    }
 
     //getId() Implmented above
 
@@ -199,26 +174,14 @@ export default class Component extends EventManager {
      * @protected */    
     memberUpdated(updatedMember) {
         
-        if(updatedMember.getId() == this.member.getId()) {
-            this.fieldUpdated("member");
-            
-            //check for name changes
-            if(updatedMember.isFieldUpdated("name")) {
-                this.fieldUpdated("name");
-            }
-            
-            //check for parent change
-            if(updatedMember.isFieldUpdated("owner")) {
-                this.fieldUpdated("owner");
-            }  
-
-            if((updatedMember.isFieldUpdated("state"))||(updatedMember.isFieldUpdated("stateMessage"))) {
-                this._setState(updatedMember.getState());
-            }
+        let member = this.getField("member");
+        if(updatedMember.getId() == member.getId()) {
+            this.setField("member",updatedMember);
         }
         else {
             //there was an update to an internal field
-            this.fieldUpdated(updatedMember.getName());
+            let internalMemberName = "member." + updatedMember.getName();
+            this.setField(internalMemberName,updatedMember);
             
             //for now we will assume the internal members do not have their name update!!!
             //maybe I should add a error check 
@@ -230,7 +193,7 @@ export default class Component extends EventManager {
      * be extended to give the values of those properties too. */
     getPropertyValues() {
         
-        var member = this.member;
+        var member = this.getField("member");
         
         var values = {};
         values.name = member.getName();
@@ -246,47 +209,6 @@ export default class Component extends EventManager {
             this.readExtendedProperties(values);
         }
         return values;
-    }
-
-    _setState(newState) {
-        //only process a state change
-        if((newState == this.bannerState)&&(this.bannerState != apogeeutil.STATE_ERROR)) {
-            return;
-        }
-
-        let newMsg;
-        switch(newState) {
-            case apogeeutil.STATE_NORMAL:
-                newMsg = "";
-                break;
-
-            case apogeeutil.STATE_PENDING:
-                newMsg = bannerConstants.PENDING_MESSAGE;
-                break;
-
-            case apogeeutil.STATE_INVALID:
-                newMsg = bannerConstants.INVALID_MESSAGE;
-                break;
-
-            case apogeeutil.STATE_ERROR:
-                let errorList = this.member.getErrors();
-                newMsg = this._getErrorMessage(errorList);
-                //we could check if the message changes, but I won't since there is more
-                //error info we should store in the future.
-                break;
-
-            default:
-                newMsg = "Unknown state: " + newBannerState;
-        }
-
-        //set the new states
-        this.bannerState = newState;
-        this.bannerMessage = newMsg;
-        this.fieldUpdated("bannerState");
-    }
-
-    _getErrorMessage(errorList) {
-        return errorList.join("\n");
     }
 
     //======================================
@@ -331,9 +253,10 @@ export default class Component extends EventManager {
         
         return newPropertyValues;
     }
-
-
 }
+
+//add mixins to this class
+base.mixin(Component,EventManager);
 
 //======================================
 // All components should have a generator to create the component

@@ -13,15 +13,17 @@ export default class FolderFunctionComponent extends ParentComponent {
         
         //register this object as a parent container
         var internalFolder = folderFunction.getInternalFolder();
+        this.setField("member.root",internalFolder);
         modelManager.registerMember(internalFolder,this,folderFunction);
     }
 
     /** This overrides the get display method of componnet to return the function declaration. */
     getDisplayName(useFullPath) {
+        let member = this.getMember();
         var name = useFullPath ? this.getFullName() : this.getName();
-        var argList = this.member.getArgList();
+        var argList = member.getArgList();
         var argListString = argList.join(",");
-        var returnValueString = this.member.getReturnValueString();
+        var returnValueString = member.getReturnValueString();
         
         var displayName = name + "(" + argListString + ")";
         if((returnValueString != null)&&(returnValueString.length > 0)) {
@@ -42,8 +44,8 @@ export default class FolderFunctionComponent extends ParentComponent {
     //this is a temp solution to return the parent member for children added to this componnet
     //it is used for now when we paste into the document to create a new component.
     getParentFolderForChildren() {
-        let member = this.getMember();
-        return member.getInternalFolder();
+        //use the internal folder
+        return this.getField("member.root");
     }
     //=======================================================
 

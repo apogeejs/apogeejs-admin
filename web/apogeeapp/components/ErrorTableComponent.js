@@ -7,25 +7,11 @@ export default class ErrorTableComponent extends Component {
     constructor(modelManager,table) {
         //extend edit component
         super(modelManager,table,ErrorTableComponent);
-
-        //default view
-        this.dataView = ErrorTableComponent.EMPTY_VIEW;
     };
-
-
-    getDataView() {
-        return this.dataView;
-    }
-
-    setDataView(dataView) {
-        //no action - data view is fixed
-    }
 
     //==============================
     // Protected and Private Instance Methods
     //==============================
-
-
 
     /**  This method retrieves the table edit settings for this component instance
      * @protected */

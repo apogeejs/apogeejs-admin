@@ -178,6 +178,20 @@ export default class Member extends FieldObject {
         return errorList;
     }
 
+    getErrorMsg() {
+        let stateStruct = this.getField("state");
+        let errorMsg;
+        if(stateStruct) {
+            //If this happens, we will just make it state normal
+            errorMsg = stateStruct.errorMsg;
+        }
+        if(!errorMsg) {
+            //just return an emptylist
+            errorMsg = UNKNOWN_ERROR_MSG_PREFIX + this.getName();
+        }
+        return errorMsg;
+    }
+
     /** This returns true if the member is not up to date, typically
      * do to waiting on an asynchronous operation. */
     getPendingPromise() {
@@ -410,6 +424,12 @@ export default class Member extends FieldObject {
 
             newStateStruct.state = apogeeutil.STATE_ERROR;
             newStateStruct.errorList = errorList;
+            if(errorList.length > 0) {
+                newStateStruct.errorMsg = errorList.join("\n");
+            }
+            else {
+                newStateStruct.errorMsg = UNKNOWN_ERROR_MSG_PREFIX + this.getName();
+            }
         }
         else {
             //here we ignore the error list if there was one (there shouldn't be)
@@ -451,4 +471,6 @@ let nextId = 1;
 function _createId() {
     return nextId++;
 }
+
+let UNKNOWN_ERROR_MSG_PREFIX = "Unknown error in member ";
 

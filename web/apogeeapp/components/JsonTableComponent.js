@@ -9,18 +9,19 @@ export default class JsonTableComponent extends Component {
         super(modelManager,table,JsonTableComponent);
 
         //default view
-        this.dataView = JsonTableComponent.DEFAULT_DATA_VIEW;
+        this.setField("dataView",JsonTableComponent.DEFAULT_DATA_VIEW)
     };
 
     getDataView() {
-        if(!this.dataView) this.dataView = JsonTableComponent.DEFAULT_DATA_VIEW;
-        return this.dataView;
+        let dataView = this.getField("dataView");
+        if(!dataView) dataView = JsonTableComponent.DEFAULT_DATA_VIEW;
+        return dataView;
     }
 
     setDataView(dataView) {
-        if(this.dataView != dataView) {
-            this.fieldUpdated("dataView");
-            this.dataView = dataView;
+        let oldDataView = this.getField("dataView");
+        if(oldDataView != dataView) {
+            this.setField("dataView",dataView);
         }
     }
 
@@ -29,7 +30,7 @@ export default class JsonTableComponent extends Component {
     //==============================
 
     writeToJson(json) {
-        json.dataView = this.dataView;
+        json.dataView = this.getDataView();
     }
 
     readFromJson(json) {

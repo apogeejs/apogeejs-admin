@@ -55,12 +55,14 @@ export default class PageChildComponentDisplay {
 
     componentUpdated(component) {
 
+        let member = component.getMember();
+
 //WRONG - we need to respond to the proper changes, which depend on the class (title is name + possible argument, return value)
-        if(component.isFieldUpdated("name")) {
+        if(member.isFieldUpdated("name")) {
             this._setTitle();
         }
 
-        if(component.isFieldUpdated("bannerState")) {
+        if(member.isFieldUpdated("state")) {
             this._setBannerState();
         }
 
@@ -262,8 +264,8 @@ export default class PageChildComponentDisplay {
     _setBannerState() {
         if(!this.componentView) return;
 
-        let bannerState = this.componentView.getComponent().getBannerState();
-        let bannerMessage = this.componentView.getComponent().getBannerMessage();
+        let bannerState = this.componentView.getBannerState();
+        let bannerMessage = this.componentView.getBannerMessage();
 
         //update the banner
         var bannerDiv;

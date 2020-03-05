@@ -40,11 +40,11 @@ export default class DynamicForm extends Component {
                 return new ConfigurableFormDisplay(displayContainer,callbacks);
                 
             case DynamicForm.VIEW_CODE:
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member);
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.getMember());
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case DynamicForm.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.getMember());
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
@@ -56,11 +56,12 @@ export default class DynamicForm extends Component {
 
     getFormCallbacks() {
         var app = this.getModelManager().getApp();
+        var member = this.getMember();
         var callbacks = {
                 getData: () => {              
-                    let layoutFunction = this.member.getData();
+                    let layoutFunction = member.getData();
                     let admin = {
-                        getMessenger: () => new UiCommandMessenger(app,this.member)
+                        getMessenger: () => new UiCommandMessenger(app,member)
                     }
                     return layoutFunction(admin);
                 }

@@ -21,52 +21,49 @@ export default class CustomDataComponent extends Component {
 
     constructor(modelManager,folder) {
         //extend edit component
-        super(modelManager,folder,CustomDataComponent);
+        super(modelManager,folder);
         
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         folder.setChildrenWriteable(false);
-        
-        //load these!
-        this.dataTable = folder.lookupChild("data");
-        this.inputTable = folder.lookupChild("input");
-        this.isInputValidFunctionTable = folder.lookupChild("isInputValid");
-        
-        this.uiCodeFields = {};
-        this.currentCss = "";
-        
-        //keep alive or destroy on inactive
-        this.destroyOnInactive = false;
-        
-        this.fieldUpdated("destroyOnInactive");
+
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //FIELDS
+        //internal tables
+        let dataMember = folder.lookupChild("data");
+        this.setField("member.data",dataMember);
+        modelManager.registerTable(dataMember,this,folder);
+
+        let inputMember = folder.lookupChild("input");
+        this.setField("member.input",inputMember);
+        modelManager.registerTable(inputMember,this,folder);
+
+        let isInputValidFunctionMember = folder.lookupChild("isInputValid");
+        this.setField("member.isInputValid",isInputValidFunctionMember);
+        modelManager.registerTable(isInputValidFunctionMember,this,folder);
+
+        this.setField("destroyOnInactive",false); //default to keep alive
+        this.setField("html","");
+        this.setField("css","");
+        this.setField("uiCode","");
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     };
 
     //==============================
     //Resource Accessors
     //==============================
 
-    getUiCodeFields() {
-        return this.uiCodeFields;
-    }
-
-    getUiCodeField(codeField) {
-        var text = this.uiCodeFields[codeField];
-        if((text === null)||(text === undefined)) text = "";
-        return text;
-    }
-
     getDestroyOnInactive() {
-        return this.destroyOnInactive;
+        return this.getField("destroyOnInactive");
     }
 
     getDisplayDestroyFlags() {
-        return this.destroyOnInactive ? DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_INACTIVE :
+        return this.getDestroyOnInactive() ? DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_INACTIVE :
         DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_NEVER;
     }
 
     setDestroyOnInactive(destroyOnInactive) {
-        if(destroyOnInactive != this.destroyOnInactive) {
-            this.fieldUpdated("destroyOnInactive");
-            this.destroyOnInactive = destroyOnInactive;
+        if(destroyOnInactive != this.getField("destroyOnInactive")) {
+            this.setField("destroyOnInactive",destroyOnInactive);
 
             if(this.activeOutputDisplayContainer) {
                 this.activeOutputDisplayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
@@ -99,7 +96,7 @@ export default class CustomDataComponent extends Component {
                 displayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
                 this.activeOutputDisplayContainer = displayContainer;
                 var callbacks = this.getFormCallbacks();
-                var html = this.getUiCodeField(CustomDataComponent.CODE_FIELD_HTML);
+                var html = this.getField("html");
                 var resource = this.createResource();
                 var dataDisplay = new HtmlJsDataDisplay(displayContainer,callbacks,this.inputTable,html,resource);
                 return dataDisplay;
@@ -117,15 +114,15 @@ export default class CustomDataComponent extends Component {
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
             case CustomDataComponent.VIEW_HTML:
-                callbacks = this.getUiCallbacks(CustomDataComponent.CODE_FIELD_HTML);
+                callbacks = this.getUiCallbacks("html");
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/html",AceTextEditor.OPTION_SET_DISPLAY_MAX);
         
             case CustomDataComponent.VIEW_CSS:
-                callbacks = this.getUiCallbacks(CustomDataComponent.CODE_FIELD_CSS);
+                callbacks = this.getUiCallbacks("css");
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/css",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case CustomDataComponent.VIEW_UI_CODE:
-                callbacks = this.getUiCallbacks(CustomDataComponent.CODE_FIELD_UI_CODE);
+                callbacks = this.getUiCallbacks("uiCode");
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
@@ -154,14 +151,12 @@ export default class CustomDataComponent extends Component {
         return callbacks;
     }
 
-
-    getUiCallbacks(codeField) {
+    getUiCallbacks(codeFieldName) {
         return {
             getData: () => {
-                var uiCodeFields = this.getUiCodeFields();
-                var data = uiCodeFields[codeField];
-                if((data === undefined)||(data === null)) data = "";
-                return data;
+                var codeField = this.getField(codeFieldName);
+                if((codeField === undefined)||(codeField === null)) codeField = "";
+                return codeField;
             },
             
             getEditOk: () => true,
@@ -179,16 +174,15 @@ export default class CustomDataComponent extends Component {
      * work is no json is passed in. */
     loadResourceFromJson(json) {   
         if((json)&&(json.resource)) {
-            this.update(json.resource);
+            for(let fieldName in json.resource) {
+                this.update(json.resource[fieldName]);
+            }
         } 
     }
 
-
     createResource() {
         try {
-            var uiCodeFields = this.getUiCodeFields();
-
-            var uiGeneratorBody = uiCodeFields[CustomDataComponent.CODE_FIELD_UI_CODE];
+            var uiGeneratorBody = this.getField("uiCode");
             
             var resource;
             if((uiGeneratorBody)&&(uiGeneratorBody.length > 0)) {
@@ -231,46 +225,35 @@ export default class CustomDataComponent extends Component {
     // Action
     //=============================
 
-    doCodeFieldUpdate(uiCodeField,fieldValue) { 
-        var initialCodeFields = this.getUiCodeFields();
-        var targetCodeFields = apogeeutil.jsonCopy(initialCodeFields);
-        targetCodeFields[uiCodeField] = fieldValue;
-
+    doCodeFieldUpdate(fieldName,targetValue) { 
+        var initialValue = this.getFields(fieldName);
         var command = {};
         command.type = customDataComponentUpdateData.COMMAND_TYPE;
         command.memberFullName = this.getFullName();
-        command.initialFields = initialCodeFields;
-        command.targetFields = targetCodeFields;
+        command.fieldName = fieldName;
+        command.initialValue = initialValue;
+        command.targetValue = targetValue;
 
         this.getModelManager().getApp().executeCommand(command);
         return true; 
     }
 
-    update(uiCodeFields) { 
+    update(fieldName,fieldValue) { 
 
-        //record the updates
-        if(uiCodeFields[CustomDataComponent.CODE_FIELD_CSS] != this.uiCodeFields[CustomDataComponent.CODE_FIELD_CSS]) {
-            this.fieldUpdated(CustomDataComponent.CODE_FIELD_CSS);
-            
-            //update css now
-            let cssInfo = uiCodeFields[CustomDataComponent.CODE_FIELD_CSS];
-            apogeeui.setMemberCssData(this.getMember().getId(),cssInfo);
+        let oldFieldValue = this.getField(fieldName);
+        if(fieldValue != oldFieldValue) {
+            this.setField(fieldName,fieldValue);
+
+            //if this is the css field, set it immediately
+            if(fieldName == "css") {
+                apogeeui.setMemberCssData(this.getId(),fieldValue);
+            }
         }
-        if(uiCodeFields[CustomDataComponent.CODE_FIELD_HTML] != this.uiCodeFields[CustomDataComponent.CODE_FIELD_HTML]) {
-            this.fieldUpdated(CustomDataComponent.CODE_FIELD_HTML);
-        }
-        if(uiCodeFields[CustomDataComponent.CODE_FIELD_UI_CODE] != this.uiCodeFields[CustomDataComponent.CODE_FIELD_UI_CODE]) {
-            this.fieldUpdated(CustomDataComponent.CODE_FIELD_UI_CODE);
-        }
-        
-        this.uiCodeFields = uiCodeFields;
 
         //make sure we get rid of the old display
-        if(this.activeOutputDisplayContainer) {
-            this.activeOutputDisplayContainer.forceClearDisplay();
+        if(this.activeOutputMode) {
+            this.activeOutputMode.forceClearDisplay();
         }
-        
-        return true;
     }
 
     //==============================
@@ -293,8 +276,10 @@ export default class CustomDataComponent extends Component {
     /** This serializes the table component. */
     writeToJson(json) {
         //store the resource info
-        json.resource = this.uiCodeFields;
-        json.destroyOnInactive = this.destroyOnInactive;
+        json["html"] = this.getField("html");
+        json["css"] = this.getField("css");
+        json["uiCode"] = this.getField("uiCode");
+        json.destroyOnInactive = this.getField("destroyOnInactive");
     }
 
     //======================================
@@ -372,10 +357,6 @@ CustomDataComponent.propertyDialogLines = [
     }
 ];
 
-
-CustomDataComponent.CODE_FIELD_HTML = "html";
-CustomDataComponent.CODE_FIELD_CSS = "css";
-CustomDataComponent.CODE_FIELD_UI_CODE = "uiCode";
 CustomDataComponent.VIEW_FORM = "Form";
 CustomDataComponent.VIEW_VALUE = "Data Value";
 CustomDataComponent.VIEW_CODE = "Input Code";
@@ -410,50 +391,49 @@ CustomDataComponent.TABLE_EDIT_SETTINGS = {
  * {
  *   "type":"customComponentUpdateCommand",
  *   "memberFullName":(main member full name),
- *   "initialFields":(original fields value)
- *   "targetFields": (desired fields value)
+ *   "fieldName": (the name of the field being updated),
+ *   "initialValue":(original fields value)
+ *   "targetValue": (desired fields value)
  * }
  */ 
+
 let customDataComponentUpdateData = {};
 
 customDataComponentUpdateData.createUndoCommand = function(workspaceManager,commandData) {
-   let undoCommandData = {};
-   undoCommandData.memberFullName = commandData.memberFullName;
-   undoCommandData.targetFields = commandData.initialFields;
-   undoCommandData.initialFields = commandData.targetFields;
-   return undoCommandData;
+    let undoCommandData = {};
+    undoCommandData.memberFullName = commandData.memberFullName;
+    undoCommandData.fieldName = commandData.fieldName;
+    undoCommandData.initialValue = commandData.targetValue;
+    undoCommandData.targetValue = commandData.initialValue;
+    return undoCommandData;
 }
 
-customDataComponentUpdateData.executeCommand = function(workspaceManager,commandData,) {
-   let modelManager = workspaceManager.getModelManager();
-   let component = modelManager.getComponentByFullName(commandData.memberFullName);
-   var commandResult = {};
-   if(component) {
-       try {
-           component.update(commandData.targetFields);
-       }
-       catch(error) {
-           let msg = error.message ? error.message : error;
-           commandResult.alertMsg = "Exception on custom component update: " + msg;
-       }
-   }
-   else {
-       commandResult.alertMsg = "Component not found: " + command.memberFullName;
-   }
+customDataComponentUpdateData.executeCommand = function(workspaceManager,commandData) {
+    let modelManager = workspaceManager.getModelManager();
+    let component = modelManager.getComponentByFullName(commandData.memberFullName);
+    var commandResult = {};
+    if(component) {
+        try {
+            component.update(commandData.fieldName,commmandData.targetValue);
+        }
+        catch(error) {
+            let msg = error.message ? error.message : error;
+            commandResult.alertMsg = "Exception on custom component update: " + msg;
+        }
+    }
+    else {
+        commandResult.alertMsg = "Component not found: " + command.memberFullName;
+    }
 
-   if(!commandResult.alertMsg) commandResult.actionDone = true;
-   
-   return commandResult;
+    if(!commandResult.alertMsg) commandResult.actionDone = true;
+    
+    return commandResult;
 }
 
 customDataComponentUpdateData.commandInfo = {
-    "type": "customDataComponentUpdateCommand",
+    "type": "customComponentUpdateCommand",
     "targetType": "component",
     "event": "updated"
 }
 
 CommandManager.registerCommand(customDataComponentUpdateData);
-
-
-
-

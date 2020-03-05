@@ -48,6 +48,32 @@ export default class ComponentView {
         return this.component.getDisplayName(useFullPath);
     }
 
+    getBannerState() {
+        let member = this.component.getMember();
+        return member.getState();
+    }
+
+    getBannerMessage() {
+        let member = this.component.getMember();
+        let state =  member.getState();
+        switch(state) {
+            case apogeeutil.STATE_NORMAL:
+                return "";
+
+            case apogeeutil.STATE_PENDING:
+                return bannerConstants.PENDING_MESSAGE;
+
+            case apogeeutil.STATE_INVALID:
+                return bannerConstants.INVALID_MESSAGE;
+
+            case apogeeutil.STATE_ERROR:
+                return member.getErrorMsg();
+
+            default:
+                return "Unknown state: " + state; 
+        }
+    }
+
     /** This method gets the parent component view of the current component view. 
      * This method does not depends only on the relation between the components, 
      * rather than any relationship established between the component views. This should give the
@@ -352,27 +378,30 @@ export default class ComponentView {
     componentUpdated(component) {
 
         //check for parent change
-        if(component.isFieldUpdated("owner")) {
-            var oldParentComponentView = this.lastAssignedParentComponentView;
-            var newParentComponentView = this.getParentComponentView();
+        if(component.isFieldUpdated("member")) {
+            let member = component.getMember();
+            if(member.isFieldUpdated("owner")) {
+                var oldParentComponentView = this.lastAssignedParentComponentView;
+                var newParentComponentView = this.getParentComponentView();
 
-            if(oldParentComponentView != newParentComponentView) {
-                //remove from old parent component
-                if(oldParentComponentView) {
-                    oldParentComponentView.removeChild(this);
-                    //delete all the window display
-                    if(this.childComponentDisplay) {
-                        this.childComponentDisplay.deleteDisplay();
-                        this.childComponentDisplay = null;
+                if(oldParentComponentView != newParentComponentView) {
+                    //remove from old parent component
+                    if(oldParentComponentView) {
+                        oldParentComponentView.removeChild(this);
+                        //delete all the window display
+                        if(this.childComponentDisplay) {
+                            this.childComponentDisplay.deleteDisplay();
+                            this.childComponentDisplay = null;
+                        }
+                    }
+
+                    //add to the new parent component
+                    if(newParentComponentView) {
+                        newParentComponentView.addChild(this);
                     }
                 }
-
-                //add to the new parent component
-                if(newParentComponentView) {
-                    newParentComponentView.addChild(this);
-                }
-            }
-        }  
+            }  
+        }
         
         //update for new data
         if(this.treeDisplay) {

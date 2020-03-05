@@ -15,6 +15,7 @@ export default class FunctionComponent extends Component {
     /** This overrides the get title method of member to return the function declaration. */
     getDisplayName(useFullPath) {
         var name = useFullPath ? this.getFullName() : this.getName();
+        let member = this.getMember();
         var argList = this.member.getArgList();
         var argListString = argList.join(",");
         return name + "(" + argListString + ")";
@@ -36,16 +37,17 @@ export default class FunctionComponent extends Component {
         
         var callbacks;
         var app = this.getModelManager().getApp();
+        let member = this.getMember();
         
         //create the new view element;
         switch(viewType) {
                 
             case FunctionComponent.VIEW_CODE:
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member);
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case FunctionComponent.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,member);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:

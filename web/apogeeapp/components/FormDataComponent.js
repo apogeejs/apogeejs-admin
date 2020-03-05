@@ -21,10 +21,21 @@ export default class FormDataComponent extends Component {
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         folder.setChildrenWriteable(false);
         
-        //load these!
-        this.dataTable = folder.lookupChild("data");
-        this.layoutFunctionTable = folder.lookupChild("layout");
-        this.isInputValidFunctionTable = folder.lookupChild("isInputValid");
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //FIELDS
+        //internal tables
+        let dataMember = folder.lookupChild("data");
+        this.setField("member.data",dataMember);
+        modelManager.registerTable(dataMember,this,folder);
+
+        let layoutFunctionMember = folder.lookupChild("layout");
+        this.setField("member.layout",layoutFunctionMember);
+        modelManager.registerTable(layoutMember,this,folder);
+
+        let isInputValidFunctionMember = folder.lookupChild("isInputValid");
+        this.setField("member.isInputValid",isInputValidFunctionMember);
+        modelManager.registerTable(isInputValidFunctionMember,this,folder);
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     };
 
     //==============================
@@ -53,23 +64,28 @@ export default class FormDataComponent extends Component {
                 return formEditorDisplay;
                 
             case FormDataComponent.VIEW_LAYOUT_CODE:
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.layoutFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                let layoutFunctionMember = this.getField("member.layout");
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,layoutFunctionMember,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE:
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.layoutFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                let layoutFunctionMember = this.getField("member.layout");
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,layoutFunctionMember,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
             case FormDataComponent.VIEW_FORM_VALUE:
-                callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,this.dataTable);
+                let dataTable = this.getField("member.data");
+                callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,dataTable);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                 
             case FormDataComponent.VIEW_INPUT_INVALID_CODE:
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.isInputValidFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                let isInputValidFunctionMember = this.getField("member.isInputValid");
+                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,isInputValidFunctionMember,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE:
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.isInputValidFunctionTable,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
+                let isInputValidFunctionMember = this.getField("member.isInputValid");
+                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,isInputValidFunctionMember,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
@@ -80,26 +96,31 @@ export default class FormDataComponent extends Component {
     }
 
     getFormEditorCallbacks() {
+        let layoutFunctionMember = this.getField("member.layout");
         var callbacks = {};
         
         //return desired form value
-        callbacks.getData = () => this.dataTable.getData();
+        callbacks.getData = () => {
+            let dataTable = this.getField("member.data");
+            dataTable.getData();
+        }
         
         //return form layout
         callbacks.getLayoutInfo = () => {              
-                let layoutFunction = this.layoutFunctionTable.getData();
-                return layoutFunction();
-            }
+            let layoutFunction = layoutFunctionMember.getData();
+            return layoutFunction();
+        }
         
         //edit ok - always true
         callbacks.getEditOk = () => true;
         
         //save data - just form value here
-        var messenger = new Messenger(this.layoutFunctionTable);
+        var messenger = new Messenger(layoutFunctionMember);
         callbacks.saveData = (formValue) => {
             
             //validate input
-            var isInputValid = this.isInputValidFunctionTable.getData();
+            let isInputValidFunctionMember = this.getField("member.isInputValid");
+            var isInputValid = isInputValidFunctionMember.getData();
             var validateResult = isInputValid(formValue);
             if(validateResult !== true) {
                 if(typeof validateResult == 'string') {

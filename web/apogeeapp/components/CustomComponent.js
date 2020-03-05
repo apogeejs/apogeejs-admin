@@ -14,46 +14,34 @@ import apogeeui from "/apogeeui/apogeeui.js";
  * confugred with initialization data from the model. */
 export default class CustomComponent extends Component {
 
-    constructor(modelManager,control) {
-        //extend edit component
-        modelManager        
-        this.uiCodeFields = {};
-        this.currentCss = "";
+    constructor(modelManager,member) {
+        super(modelManager,member);
         
-        //keep alive or destroy on inactive
-        this.destroyOnInactive = false;
-        
-        this.fieldUpdated("destroyOnInactive");
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //FIELDS
+        this.setField("destroyOnInactive",false); //default to keep alive
+        this.setField("html","");
+        this.setField("css","");
+        this.setField("uiCode","");
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     };
-
 
     //==============================
     //Resource Accessors
     //==============================
 
-    getUiCodeFields() {
-        return this.uiCodeFields;
-    }
-
-    getUiCodeField(codeField) {
-        var text = this.uiCodeFields[codeField];
-        if((text === null)||(text === undefined)) text = "";
-        return text;
-    }
-
     getDestroyOnInactive() {
-        return this.destroyOnInactive;
+        return this.getField("destroyOnInactive");
     }
 
     getDisplayDestroyFlags() {
-        return this.destroyOnInactive ? DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_INACTIVE :
+        return this.getField("destroyOnInactive") ? DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_INACTIVE :
         DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_NEVER;
     }
 
     setDestroyOnInactive(destroyOnInactive) {
         if(destroyOnInactive != this.destroyOnInactive) {
-            this.fieldUpdated("destroyOnInactive");
-            this.destroyOnInactive = destroyOnInactive;
+            this.setField("destroyOnInactive",destroyOnInactive);
 
             if(this.activeOutputMode) {
                 this.activeOutputMode.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
@@ -85,7 +73,7 @@ export default class CustomComponent extends Component {
                 displayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
                 this.activeOutputMode = displayContainer;
                 var callbacks = this.getOutputCallbacks();
-                var html = this.getUiCodeField(CustomComponent.CODE_FIELD_HTML);
+                var html = this.getField("html");
                 var resource = this.createResource();
                 var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,callbacks,this.member,html,resource);
                 return dataDisplay;
@@ -99,15 +87,15 @@ export default class CustomComponent extends Component {
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
             case CustomComponent.VIEW_HTML:
-                callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_HTML);
+                callbacks = this.getUiCallbacks("html");
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/html",AceTextEditor.OPTION_SET_DISPLAY_MAX);
         
             case CustomComponent.VIEW_CSS:
-                callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_CSS);
+                callbacks = this.getUiCallbacks("css");
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/css",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case CustomComponent.VIEW_UI_CODE:
-                callbacks = this.getUiCallbacks(CustomComponent.CODE_FIELD_UI_CODE);
+                callbacks = this.getUiCallbacks("uiCode");
                 return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
@@ -117,19 +105,18 @@ export default class CustomComponent extends Component {
         }
     }
 
-    getOutputCallbacks(codeField) {
+    getOutputCallbacks() {
         return {
             getData: () => this.getMember().getData()
         };
     }
 
-    getUiCallbacks(codeField) {
+    getUiCallbacks(codeFieldName) {
         return {
             getData: () => {
-                var uiCodeFields = this.getUiCodeFields();
-                var data = uiCodeFields[codeField];
-                if((data === undefined)||(data === null)) data = "";
-                return data;
+                var codeField = this.getField(codeFieldName);
+                if((codeField === undefined)||(codeField === null)) codeField = "";
+                return codeField;
             },
             
             getEditOk: () => true,
@@ -147,16 +134,16 @@ export default class CustomComponent extends Component {
      * work is no json is passed in. */
     loadResourceFromJson(json) {   
         if((json)&&(json.resource)) {
-            this.update(json.resource);
+            for(fieldName in json.resource) {
+                this.update(fieldName,json.resource[fieldName]);
+            }
         }  
     }
 
 
     createResource() {
         try {
-            var uiCodeFields = this.getUiCodeFields();
-
-            var uiGeneratorBody = uiCodeFields[CustomComponent.CODE_FIELD_UI_CODE];
+            var uiGeneratorBody = this.getField("uiCode");
             
             var resource;
             if((uiGeneratorBody)&&(uiGeneratorBody.length > 0)) {
@@ -198,39 +185,31 @@ export default class CustomComponent extends Component {
     // Action
     //=============================
 
-    doCodeFieldUpdate(uiCodeField,fieldValue) { 
-        var initialCodeFields = this.getUiCodeFields();
-        var targetCodeFields = apogeeutil.jsonCopy(initialCodeFields);
-        targetCodeFields[uiCodeField] = fieldValue;
+    doCodeFieldUpdate(codeFieldName,targetValue) { 
+        let initialValue = this.getField(codeFieldName);
 
         var command = {};
         command.type = customComponentUpdateData.COMMAND_TYPE;
         command.memberFullName = this.getFullName();
-        command.initialFields = initialCodeFields;
-        command.targetFields = targetCodeFields;
+        command.fieldName = codeFieldName;
+        command.initialValue = initialValue;
+        command.targetValue = targetValue;
 
         this.getModelManager().getApp().executeCommand(command);
         return true;  
     }
 
-    update(uiCodeFields) { 
+    update(fieldName,fieldValue) { 
 
-        //record the updates
-        if(uiCodeFields[CustomComponent.CODE_FIELD_CSS] != this.uiCodeFields[CustomComponent.CODE_FIELD_CSS]) {
-            this.fieldUpdated(CustomComponent.CODE_FIELD_CSS);
-            
-            //update css now
-            let cssInfo = uiCodeFields[CustomComponent.CODE_FIELD_CSS];
-            apogeeui.setMemberCssData(this.getMember().getId(),cssInfo);
+        let oldFieldValue = this.getField(fieldName);
+        if(fieldValue != oldFieldValue) {
+            this.setField(fieldName,fieldValue);
+
+            //if this is the css field, set it immediately
+            if(fieldName == "css") {
+                apogeeui.setMemberCssData(this.getId(),fieldValue);
+            }
         }
-        if(uiCodeFields[CustomComponent.CODE_FIELD_HTML] != this.uiCodeFields[CustomComponent.CODE_FIELD_HTML]) {
-            this.fieldUpdated(CustomComponent.CODE_FIELD_HTML);
-        }
-        if(uiCodeFields[CustomComponent.CODE_FIELD_UI_CODE] != this.uiCodeFields[CustomComponent.CODE_FIELD_UI_CODE]) {
-            this.fieldUpdated(CustomComponent.CODE_FIELD_UI_CODE);
-        }
-        
-        this.uiCodeFields = uiCodeFields;
 
         //make sure we get rid of the old display
         if(this.activeOutputMode) {
@@ -258,8 +237,10 @@ export default class CustomComponent extends Component {
     /** This serializes the table component. */
     writeToJson(json) {
         //store the resource info
-        json.resource = this.uiCodeFields;
-        json.destroyOnInactive = this.destroyOnInactive;
+        json["html"] = this.getField("html");
+        json["css"] = this.getField("css");
+        json["uiCode"] = this.getField("uiCode");
+        json.destroyOnInactive = this.getField("destroyOnInactive");
     }
 
     //======================================
@@ -279,13 +260,7 @@ export default class CustomComponent extends Component {
             propertyJson.destroyOnInactive = inputValues.destroyOnInactive;
         }
     }
-
 }
-
-
-CustomComponent.CODE_FIELD_HTML = "html";
-CustomComponent.CODE_FIELD_CSS = "css";
-CustomComponent.CODE_FIELD_UI_CODE = "uiCode";
 
 CustomComponent.VIEW_OUTPUT = "Display";
 CustomComponent.VIEW_CODE = "Input Code";
@@ -357,8 +332,9 @@ CustomComponent.propertyDialogLines = [
  * {
  *   "type":"customComponentUpdateCommand",
  *   "memberFullName":(main member full name),
- *   "initialFields":(original fields value)
- *   "targetFields": (desired fields value)
+ *   "fieldName": (the name of the field being updated),
+ *   "initialValue":(original fields value)
+ *   "targetValue": (desired fields value)
  * }
  */ 
 let customComponentUpdateData = {};
@@ -366,8 +342,9 @@ let customComponentUpdateData = {};
 customComponentUpdateData.createUndoCommand = function(workspaceManager,commandData) {
     let undoCommandData = {};
     undoCommandData.memberFullName = commandData.memberFullName;
-    undoCommandData.targetFields = commandData.initialFields;
-    undoCommandData.initialFields = commandData.targetFields;
+    undoCommandData.fieldName = commandData.fieldName;
+    undoCommandData.initialValue = commandData.targetValue;
+    undoCommandData.targetValue = commandData.initialValue;
     return undoCommandData;
 }
 
@@ -377,7 +354,7 @@ customComponentUpdateData.executeCommand = function(workspaceManager,commandData
     var commandResult = {};
     if(component) {
         try {
-            component.update(commandData.targetFields);
+            component.update(commandData.fieldName,commmandData.targetValue);
         }
         catch(error) {
             let msg = error.message ? error.message : error;

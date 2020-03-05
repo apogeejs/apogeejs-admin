@@ -1,23 +1,32 @@
 import base from "/apogeeutil/base.js";
 import { Model, doAction } from "/apogee/apogeeCoreLib.js";
-import EventManager from "/apogeeutil/EventManagerClass.js";
+import FieldObject from "/apogeeutil/FieldObject.js";
+import EventManager from "/apogeeutil/EventManager.js";
 
 /** This class manages the user interface for a model object. */
-export default class ModelManager extends EventManager {
+export default class ModelManager  extends FieldObject {
 
     constructor(workspaceManager) {
         super();
 
-        this.workspaceManager = workspaceManager;
+        //mixin initialization
+        this.eventManagerMixinInit();
+
         this.app = workspaceManager.getApp();
-        this.model = null;
 
-        this.clearUpdated();
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //FIELDS
+        this.setField("workspaceManager",workspaceManager); 
+        this.setField("model",null);
+        this.setField("componentMap",{});
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //Working
         this.viewStateCallback = null;
         this.cachedViewState = null;
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       
-        this.componentMap = {};
     }
 
     //====================================
@@ -30,7 +39,7 @@ export default class ModelManager extends EventManager {
     }
 
     getWorkspaceManager() {
-        return this.workspaceManager;
+        return this.getField("workspaceManager");
     }
 
     setViewStateCallback(viewStateCallback) {
@@ -62,18 +71,19 @@ export default class ModelManager extends EventManager {
         if(!componentsJson) componentsJson = ModelManager.EMPTY_MODEL_COMPONENT_JSON;
 
         //create model
-        this.model = new Model();
+        let model = new Model();
+        this.setField("model",model);
         
         //add listeners
-        //this.model.addListener("created", eventInfo => this.objectCreated(eventInfo));
-        this.model.addListener("updated", eventInfo => this.objectUpdated(eventInfo));
-        this.model.addListener("deleted", eventInfo => this.objectDeleted(eventInfo));
+        //model.addListener("created", eventInfo => this.objectCreated(eventInfo));
+        model.addListener("updated", eventInfo => this.objectUpdated(eventInfo));
+        model.addListener("deleted", eventInfo => this.objectDeleted(eventInfo));
 
         //load the model
         let loadAction = {};
         loadAction.action = "loadModel";
         loadAction.modelJson = modelJson;
-        let actionResult = doAction(this.model,loadAction);
+        let actionResult = doAction(model,loadAction);
 
         //create the return result
         let commandResult = {};
@@ -85,7 +95,7 @@ export default class ModelManager extends EventManager {
             commandResult.dispatcher = this;
 
             //set up the root folder conmponent, with children if applicable
-            var rootFolder = this.model.getRoot();
+            var rootFolder = model.getRoot();
             if(rootFolder) {
                 let rootFolderComponentJson = componentsJson[rootFolder.getName()];
                 var rootFolderCommandResult = this.createComponentFromMember(rootFolder,rootFolderComponentJson);
@@ -104,14 +114,15 @@ export default class ModelManager extends EventManager {
 
     /** This method gets the model object. */
     getModel() {
-        return this.model;
+        return this.getField("model");
     }
 
     /** This method closes the model object. */
     close() {
         //delete all the components - to make sure the are cleaned up
-        for(var key in this.componentMap) {
-            var componentInfo = this.componentMap[key];
+        let componentMap = this.getField("componentMap");
+        for(var key in componentMap) {
+            var componentInfo = componentMap[key];
             if((componentInfo)&&(componentInfo.component)&&(!componentInfo.componentMember)) {
                 componentInfo.component.onDelete();
             }
@@ -119,24 +130,8 @@ export default class ModelManager extends EventManager {
     }
 
     //------------------------------------------
-    // Event Tracking Methods
+    // Field Object Methods
     //------------------------------------------
-
-    getUpdated() {
-        return this.updated;
-    }
-
-    isFieldUpdated(field) {
-        return this.updated[field] ? true : false;
-    }
-
-    clearUpdated() {
-        this.updated = {};
-    }
-
-    fieldUpdated(field) {
-        this.updated[field] = true;
-    }
 
     getId() {
         //right now we allow for just one model manager
@@ -153,7 +148,8 @@ export default class ModelManager extends EventManager {
 
     /** This method returns a component by full name. */
     getComponentByFullName(fullName) {
-        let member = this.model.getMemberByFullName(fullName);
+        let model = this.getField("model");
+        let member = model.getMemberByFullName(fullName);
         if(member) {
             return this.getComponent(member);
         }
@@ -164,7 +160,8 @@ export default class ModelManager extends EventManager {
 
     /** This method gets the component associated with a member object. */
     getComponent(member) {
-        var componentInfo = this.componentMap[member.getId()];
+        let componentMap = this.getField("componentMap");
+        var componentInfo = componentMap[member.getId()];
         if(componentInfo) {
             return componentInfo.component;
         }
@@ -175,7 +172,8 @@ export default class ModelManager extends EventManager {
 
     /** This method gets the component associated with a member object. */
     getComponentById(memberId) {
-        var componentInfo = this.componentMap[memberId];
+        let componentMap = this.getField("componentMap");
+        var componentInfo = componentMap[memberId];
         if(componentInfo) {
             return componentInfo.component;
         }
@@ -186,9 +184,10 @@ export default class ModelManager extends EventManager {
 
     /** This returns the list of folder names. */
     getFolders() {
+        let componentMap = this.getField("componentMap");
         var folders = []
-        for(var key in this.componentMap) {
-            var componentInfo = this.componentMap[key];
+        for(var key in componentMap) {
+            var componentInfo = componentMap[key];
             var member = componentInfo.member;
             if((member.isParent)&&(member.getChildrenWriteable())) { 
                 folders.push(member.getFullName());
@@ -204,24 +203,33 @@ export default class ModelManager extends EventManager {
     registerMember(member,component,mainComponentMember) {
 
         //make sure this is for us
-        if(member.getModel() !== this.model) {
+        if(member.getModel() !== this.getField("model")) {
             throw base.createError("Component registered in wrong model: " + member.getFullName());
         }
+
+        let oldComponentMap = this.getField("componentMap");
 
         //store the ui object
         var memberId = member.getId();
 
-        if(this.componentMap[memberId]) {
+        if(oldComponentMap[memberId]) {
             //already exists! (we need to catch this earlier if we want it to not be fatal. But we should catch it here too.)
             throw base.createError("There is already a member with the given ID.",true);
         }
 
+        //copy the old map
+        let newComponentMap = {};
+        Object.assign(newComponentMap,oldComponentMap);
+
+        //add the new info
         var componentInfo = {};
         componentInfo.member = member;
         componentInfo.component = component;
         if(mainComponentMember) componentInfo.componentMember = mainComponentMember;
 
-        this.componentMap[memberId] = componentInfo;
+        newComponentMap[memberId] = componentInfo;
+
+        this.setField("componentMap",newComponentMap);
 
     }
     
@@ -313,31 +321,35 @@ export default class ModelManager extends EventManager {
 
     /** This method responds to a member updated. */
     memberUpdated(member) {
-        var key = member.getId();
-
-        var componentInfo = this.componentMap[key];
+        var componentInfo = this.getField("componentMap")[member.getId()];
         if((componentInfo)&&(componentInfo.component)) {
             componentInfo.component.memberUpdated(member);
         }
     }
 
     modelUpdated(model) {
-        //check for name changes
-        if(model.isFieldUpdated("name")) {
-            this.fieldUpdated("name");
-        }
+        //all changes kept in model
     }
 
     /** This method responds to a "new" menu event. */
     memberDeleted(member) {
-        var memberId = member.getId();
+        let oldComponentMap = this.getField("componentMap");
+        var componentInfo = oldComponentMap[member.getId()];
 
-        var componentInfo = this.componentMap[memberId];
-        delete this.componentMap[memberId];
+        if(componentInfo) {
+            //copy the old map
+            let newComponentMap = {};
+            Object.assign(newComponentMap,oldComponentMap);
+            //remove the given component
+            delete newComponentMap[memberId];
+            //save the updated map
+            this.setField("componentMap",newComponentMap);
 
-        if((componentInfo)&&(componentInfo.component)) {
-            //do any needed cleanup
-            componentInfo.component.onDelete();
+            //take any additionl delete actions
+            if((componentInfo)&&(componentInfo.component)) {
+                //do any needed cleanup
+                componentInfo.component.onDelete();
+            }
         }
     }
 
@@ -354,10 +366,11 @@ export default class ModelManager extends EventManager {
      * it will save a model with that as the root folder. */
     toJson(optionalSavedRootFolder) {
 
+        let model = this.getField("model");
         let json = {};
 
         //get the model json
-        json.model = this.model.toJson(optionalSavedRootFolder);
+        json.model = model.toJson(optionalSavedRootFolder);
 
         //get the components json
         let componentsJson = {};
@@ -367,7 +380,7 @@ export default class ModelManager extends EventManager {
             rootFolder = optionalSavedRootFolder;
         }
         else {
-            rootFolder = this.model.getRoot();
+            rootFolder = model.getRoot();
         }
         var rootFolderComponent = this.getComponent(rootFolder);
 
@@ -441,10 +454,13 @@ export default class ModelManager extends EventManager {
     }
 
     createDependencies() {
+        let model = this.getField("model");
         var memberInfo = {};
 
-        for(var key in this.componentMap) {
-            var componentInfo = this.componentMap[key];
+        let componentMap = this.getField("componentMap");
+
+        for(var key in componentMap) {
+            var componentInfo = componentMap[key];
             if((componentInfo)&&(componentInfo.member)) {
 
 
@@ -461,7 +477,7 @@ export default class ModelManager extends EventManager {
                     for(var idString in dependsOnMap) {
                         dependencyType = dependsOnMap[idString];
                         if(dependencyType == apogeeutil.NORMAL_DEPENDENCY) {
-                            let dependency = this.model.lookupMember(idString);
+                            let dependency = model.lookupMember(idString);
                             depList.push(dependency.getFullName());
                         }
                     }
@@ -478,6 +494,9 @@ export default class ModelManager extends EventManager {
     }
 
 }
+
+//add mixins to this class
+base.mixin(ModelManager,EventManager);
 
 //this is the json for an empty model
 ModelManager.EMPTY_MODEL_COMPONENT_JSON = {

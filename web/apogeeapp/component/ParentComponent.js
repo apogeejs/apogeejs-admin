@@ -23,7 +23,8 @@ export default class ParentComponent extends Component {
 
     setEditorData(editorData) {
         this.editorData = editorData;
-        this.fieldUpdated("document");
+        //for now set dummy data to show a change
+        this.setField("document",Date.now());
     }
 
     getEditorManager() {

@@ -48,11 +48,13 @@ export default class TreeComponentDisplay {
 
     componentUpdated(component) {
 
-        if(component.isFieldUpdated("name")) {
+        let member = component.getMember();
+
+        if(member.isFieldUpdated("name")) {
             this._setLabel();
         }
 
-        if(component.isFieldUpdated("bannerState")) {
+        if(member.isFieldUpdated("state")) {
             this._setBannerState();
         }
     }
@@ -107,7 +109,7 @@ export default class TreeComponentDisplay {
     }
 
     _setBannerState() {
-        let bannerState = this.componentView.getComponent().getBannerState();
+        let bannerState = this.componentView.getBannerState();
         //let bannerMessage = this.componentView.getBannerMessage();
 
         var iconOverlay = getIconOverlay(bannerState);

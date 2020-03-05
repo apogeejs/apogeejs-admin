@@ -11,8 +11,12 @@ export default class BasicControlComponent extends Component{
     constructor(modelManager,control) {
         super(modelManager,control);
     
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //FIELDS
         //default to keep alive
-        this.displayDestroyFlags = DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_NEVER;
+        let displayDestroyFlags = DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_NEVER;
+        this.setField("displayDestroyFlags",displayDestroyFlags);
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     };
 
     //==============================
@@ -31,7 +35,7 @@ export default class BasicControlComponent extends Component{
      * the display is hidden.
      */
     setDisplayDestroyFlags(displayDestroyFlags) {
-        this.displayDestroyFlags = displayDestroyFlags;
+        this.setField("displayDestroyFlags",displayDestroyFlags);
 
         if(this.outputDisplayContainer) {
             this.outputDisplayContainer.setDisplayDestroyFlags(displayDestroyFlags);
@@ -57,7 +61,7 @@ export default class BasicControlComponent extends Component{
         switch(viewType) {
 
             case BasicControlComponent.VIEW_OUTPUT:
-                displayContainer.setDisplayDestroyFlags(this.displayDestroyFlags);
+                displayContainer.setDisplayDestroyFlags(this.getField("displayDestroyFlags"));
                 this.outputDisplayContainer = displayContainer;
                 return this.getOutputDisplay(displayContainer);
 

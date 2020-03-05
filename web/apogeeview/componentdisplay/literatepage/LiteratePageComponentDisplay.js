@@ -56,7 +56,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
     componentUpdated(component) {
 
-        if(component.isFieldUpdated("name")) {
+        let member = component.getMember();
+        if(member.isFieldUpdated("name")) {
             this.tab.setTitle(this.componentView.getName());
         }
 
@@ -65,7 +66,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
             this.editorView.updateState(editorData);
         }
 
-        if(component.isFieldUpdated("bannerState")) {
+        if(member.isFieldUpdated("state")) {
             this._setBannerState();
         }
     }
@@ -224,8 +225,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
     }
 
     _setBannerState() {
-        let bannerState = this.componentView.getComponent().getBannerState();
-        let bannerMessage = this.componentView.getComponent().getBannerMessage();
+        let bannerState = this.componentView.getBannerState();
+        let bannerMessage = this.componentView.getBannerMessage();
 
         apogeeui.removeAllChildren(this.bannerContainer);
         if(bannerState == bannerConstants.BANNER_TYPE_NONE) {

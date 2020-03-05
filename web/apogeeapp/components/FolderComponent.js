@@ -15,7 +15,7 @@ export default class FolderComponent extends ParentComponent {
     //this is a temp solution to return the parent member for children added to this componnet
     //it is used for now when we paste into the document to create a new component.
     getParentFolderForChildren() {
-        return this.member;
+        return this.getMember();
     }
     //=======================================================
 
@@ -42,7 +42,7 @@ export default class FolderComponent extends ParentComponent {
         //read the editor state
         if((json.data)&&(json.data.doc)) {
             this.editorData = this.editorManager.createEditorState(json.data.doc);
-            this.fieldUpdated("document");
+            this.setField("document",Date.now());
         }
     }
 
