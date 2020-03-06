@@ -36,7 +36,7 @@ export function createProseMirrorManager (pageComponent) {
   //this is the function return object - the editor manager
   let proseMirror = {};
 
-  const schema = createFolderSchema(pageComponent);
+  const schema = pageComponent.getSchema();
 
   //===========================
   //create the toolbar
