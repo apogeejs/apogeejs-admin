@@ -33,12 +33,6 @@ export default class FolderFunctionComponent extends ParentComponent {
         return displayName;
     }
 
-    instantiateTabDisplay() {
-        let member = this.getMember();
-        let folder = member.getInternalFolder();
-        return new LiteratePageComponentDisplay(this,member,folder); 
-    }
-
     //cludge================================================
     //I need a real solution for this
     //this is a temp solution to return the parent member for children added to this componnet
@@ -57,32 +51,6 @@ export default class FolderFunctionComponent extends ParentComponent {
      * @protected */
     getTableEditSettings() {
         return FolderFunctionComponent.TABLE_EDIT_SETTINGS;
-    }
-
-    //==============================
-    // serialization
-    //==============================
-
-    /** This serializes the folderFunction component. */
-    writeToJson(json) {
-
-        //save the editor state
-        if(this.editorData) {
-            json.data = this.editorData.toJSON();
-        }
-
-        var folderFunction = this.getMember();
-        var internalFolder = folderFunction.getInternalFolder();
-        var modelManager = this.getModelManager();
-        json.children = modelManager.getFolderComponentContentJson(internalFolder);
-    }
-
-    readFromJson(json) {
-        //read the editor state
-        if((json.data)&&(json.data.doc)) {
-            this.editorData = this.editorManager.createEditorState(json.data.doc);
-            this.fieldUpdated("document");
-        }
     }
 
     static transferMemberProperties(inputValues,propertyJson) {

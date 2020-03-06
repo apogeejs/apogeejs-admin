@@ -1,5 +1,4 @@
 
-import Component from "/apogeeapp/component/Component.js";
 import ParentComponent from "/apogeeapp/component/ParentComponent.js";
 
 /** This component represents a table object. */
@@ -18,33 +17,6 @@ export default class FolderComponent extends ParentComponent {
         return this.getMember();
     }
     //=======================================================
-
-    //==============================
-    // serialization
-    //==============================
-
-    /** This serializes the table component. */
-    writeToJson(json) {
-        //save the editor state
-        if(this.editorData) {
-            json.data = this.editorData.toJSON();
-        }
-        
-        //save the children
-        var folder = this.getMember();
-        var modelManager = this.getModelManager();
-        json.children = modelManager.getFolderComponentContentJson(folder);
-
-        return json;
-    }
-
-    readFromJson(json) {
-        //read the editor state
-        if((json.data)&&(json.data.doc)) {
-            this.editorData = this.editorManager.createEditorState(json.data.doc);
-            this.setField("document",Date.now());
-        }
-    }
 
     //======================================
     // Static methods

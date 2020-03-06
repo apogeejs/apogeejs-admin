@@ -144,9 +144,15 @@ export function createProseMirrorManager (pageComponent) {
     commandHistory.redo();
   }
 
-  function createEditorState(doc) {
+  //===============================
+  //set up the export functions
+  //===============================
+
+  proseMirror.createEditorState = function(document,optionalSelection,optionalStoredMarks) {
     var state = EditorState.create({
-      doc: doc,
+      doc: document,
+      selection: optionalSelection,
+      storedMarks: optionalStoredMarks,
       plugins: [
         getInteractiveNodePlugin(),
         keymap({ "Mod-z": undo, "Mod-y": redo }),
@@ -156,24 +162,6 @@ export function createProseMirrorManager (pageComponent) {
         stateCheckPlugin
       ]
     });
-    return state;
-  }
-
-  //===============================
-  //set up the export functions
-  //===============================
-
-  proseMirror.createEditorState = function (docJson) {
-    var doc;
-    if (docJson) {
-      doc = ProseMirrorNode.fromJSON(schema, docJson);
-    }
-    else {
-      doc = DOMParser.fromSchema(schema).parse("");
-    }
-
-    var state = createEditorState(doc);
-
     return state;
   }
 

@@ -140,7 +140,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
     /** This will move the selection to the end of the document. */
     selectStartOfDocument() {
-        let state = this.componentView.getComponent().getEditorData();
+        let state = this.componentView.getEditorData();
         let $startPos = state.doc.resolve(0);
         let selection = selectionBetween(this.editorView, $startPos, $startPos);
         let transaction = state.tr.setSelection(selection).scrollIntoView();
@@ -276,7 +276,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //modify if we use this elsewhere
         if(!folder.isParent) return;
 
-        this.initEditor();
+        
 
         //show all children
         var modelView = this.componentView.getModelView();
@@ -289,8 +289,9 @@ export default class LiteratePageComponentDisplay extends EventManager {
             }
         }
         
-        var editorData = pageComponent.getEditorData();
-        this.editorView.updateState(editorData);
+        // var editorData = this.componentView.getEditorData();
+        // this.editorView.updateState(editorData);
+        this.initEditor();
 
         //set the selection to the end of the view
         this.selectEndOfDocument();
@@ -358,9 +359,9 @@ export default class LiteratePageComponentDisplay extends EventManager {
     initEditor() {
         
         //start with an empty component display
-        var emptyEditorState = this.editorManager.createEditorState();
+        var initialEditorState = this.componentView.getEditorData();
         
-        this.editorView = this.editorManager.createEditorView(this.contentElement,this,emptyEditorState);
+        this.editorView = this.editorManager.createEditorView(this.contentElement,this,initialEditorState);
 
         this.contentElement.addEventListener("click",event => this.onClickContentElement(event));
 

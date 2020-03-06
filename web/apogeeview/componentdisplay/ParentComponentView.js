@@ -4,8 +4,9 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import "/apogeeapp/commands/literatepagetransaction.js";
 import { createProseMirrorManager } from "/apogeeview/componentdisplay/literatepage/proseMirrorSetup.js";
 
-import { TextSelection, NodeSelection, EditorState } from "/prosemirror/lib/prosemirror-state/src/index.js";
+import { TextSelection, NodeSelection, EditorState, Selection } from "/prosemirror/lib/prosemirror-state/src/index.js";
 import { Step } from "/prosemirror/lib/prosemirror-transform/src/index.js";
+import { Mark }  from "/prosemirror/lib/prosemirror-model/src/index.js";
 
 //this constant is used (or hopefully not) in correctCreateInfoforRepeatedNames
 const MAX_SUFFIX_INDEX = 99999;
@@ -19,8 +20,11 @@ export default class ParentComponentView extends ComponentView {
         super(modelView,component);
 
         //create an empty edit state to start
-        this.editorManager = component.getEditorManager();
-        this.editorData = component.getEditorData();
+        //create an empty edit state to start
+        this.editorManager = createProseMirrorManager(component);
+
+        this.editorData = null;
+        this._loadEditorData();
     }
 
     createTreeDisplay() {
@@ -95,11 +99,36 @@ export default class ParentComponentView extends ComponentView {
     componentUpdated(component) {
 
         if(component.isFieldUpdated("document")) {
-            this.editorData = this.component.getEditorData();
+            this._loadEditorData();
         }
 
         super.componentUpdated(component);
     }
+
+    _loadEditorData() {
+        let document = this.component.getDocument();
+
+        let editorStateInfo = this.component.getEditorStateInfo(true);
+        let selection;
+        let storedMarks;
+        if(editorStateInfo) {
+            //load the saved selection
+            let selectionJson = editorStateInfo.selection;
+            if(selectionJson) {
+                selection = Selection.fromJSON(document,selectionJson);
+            }
+
+            //load the saved marks
+            let storedMarksJson = editorStateInfo.storedMarks;
+            if(storedMarksJson) {
+                let schema = this.component.getSchema();
+                storedMarks = storedMarksJson.map(markJson => Mark.fromJson(schema,markJson));
+            }
+        }
+
+        this.editorData = this.editorManager.createEditorState(document,selection,storedMarks);
+    }
+
     //###########################################################################################################
     //start page code
     
@@ -107,15 +136,15 @@ export default class ParentComponentView extends ComponentView {
         return this.editorData;
     }
 
-    setEditorData(editorData) {
-        this.editorData = editorData;
+    // setEditorData(editorData) {
+    //     this.editorData = editorData;
         
-        //this should be in an event for the change
-        var tabDisplay = this.getTabDisplay();
-        if(tabDisplay) {
-            tabDisplay.updateDocumentData(this.editorData);
-        }
-    }
+    //     //this should be in an event for the change
+    //     var tabDisplay = this.getTabDisplay();
+    //     if(tabDisplay) {
+    //         tabDisplay.updateDocumentData(this.editorData);
+    //     }
+    // }
 
     getEditorManager() {
         return this.editorManager;
