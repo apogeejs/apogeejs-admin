@@ -134,8 +134,8 @@ export default class ModelView {
     }
 
     onModelUpdated(modelManager) {
-        if(modelManager.isFieldUpdated("name")) {
-            let model = this.modelManager.getModel();
+        let model = modelManager.getModel();
+        if(model.isFieldUpdated("name")) {
             this.workspaceView.setName(model.getName());
         }
     }

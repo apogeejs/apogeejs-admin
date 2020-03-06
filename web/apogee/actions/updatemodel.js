@@ -5,7 +5,7 @@ import {addActionInfo} from "/apogee/actions/action.js";
  *
  * Action Data format:
  * {
- *  "action": "updateModel",
+ *  "action": "updated",
  *  "model": (model to update),
  *  "properties": (properties to set) //currently only "name"
  * }
@@ -39,7 +39,7 @@ function updateModel(model,actionData) {
     return actionResult;
 }
 
-let ACTION_EVENT = "modelUpdated";
+let ACTION_EVENT = "updated";
 
 //The following code registers the actions
 addActionInfo("updateModel",updateModel);
