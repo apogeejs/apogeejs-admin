@@ -35,53 +35,6 @@ literatepagetransaction.createUndoCommand = function(workspaceManager,commandDat
     }
 }
 
-/** This method is used for updating property values from the property dialog. 
- * If there are additional property lines, in the generator, this method should
- * be extended to edit the values of those properties too. */
-// literatepagetransaction.executeCommand = function(workspaceManager,commandData) {
-    
-//     var error = false;
-//     var errorMsg;
-    
-//     let modelManager = workspaceManager.getModelManager();
-//     var model = modelManager.getModel();
-//     //get the member
-//     var member = model.getMemberByFullName(commandData.memberFullName);   
-//     var component = modelManager.getComponent(member);
-    
-//     var editorData = component.getEditorData();
-//     var editorManager = component.getEditorManager();
-            
-//     var newEditorData = editorManager.getNewEditorData(editorData,commandData);
-
-//     if(newEditorData) {
-//         let document = newEditorData.document;
-//         let editorStateInfo = {};
-//         editorStateInfo.selection = newEditorData.selection;
-//         editorStateInfo.storedMarks = newEditorData.storedMarks;
-
-//         //set the document. Also set some editor state that accompanies the document.
-//         //this editor state inof should only be stored temporarily, and not be maintained in the component.
-//         component.setDocument(document,editorStateInfo);
-//     }
-//     else {
-//         error = true;
-//         errorMsg = "Unknown error";
-//     }
-    
-//     var commandResult = {};
-//     commandResult.cmdDone = !error;
-//     if(error) {
-//         if(errorMsg) commandResult.errorMsg = errorMsg;
-//     }
-//     else {
-//         commandResult.target = component;
-//         commandResult.action = "updated";
-//         commandResult.dispatcher = modelManager;
-//     }
-
-//     return commandResult;
-// }
 
 literatepagetransaction.executeCommand = function(workspaceManager,commandData) {
     

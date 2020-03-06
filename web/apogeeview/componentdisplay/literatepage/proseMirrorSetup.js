@@ -2,9 +2,6 @@
 //create the schema
 //===========================
 
-import { createFolderSchema } from "/apogeeview/editor/apogeeSchema.js";
-
-
 import ApogeeToolbar from "/apogeeview/editor/toolbar/ApogeeToolbar.js";
 import MarkToggleItem from "/apogeeview/editor/toolbar/MarkToggleItem.js";
 import MarkDropdownItem from "/apogeeview/editor/toolbar/MarkDropdownItem.js";
@@ -184,70 +181,7 @@ export function createProseMirrorManager (pageComponent) {
 
   }
 
-  proseMirror.getNewEditorData = function (editorData, commandData) {
 
-    let schema = editorData.schema;
-
-    //apply the editor transaction
-    var transaction = editorData.tr;
-
-    //set the state
-    if(commandData.startSelection) {
-      let startSelection = Selection.fromJSON(transaction.doc,commandData.startSelection);
-      transaction.setSelection(startSelection);
-    }
-    if(commandData.startMarks) {
-      let startMarks = commandData.startMarks.map(markJson => Marks.fromJson(schema,markJson));
-      transaction.setStoredMarks(startMarks);
-    }
-
-    //apply the steps
-    commandData.steps.forEach(stepJson => {
-      try {
-        var step = Step.fromJSON(schema, stepJson);
-        transaction = transaction.step(step);
-      }
-      catch (error) {
-        console.log("Step failed: " + JSON.stringify(stepJson));
-        return null;
-      }
-    });
-
-    if(commandData.endSelection) {
-      let endSelection = Selection.fromJSON(transaction.doc,commandData.endSelection);
-      transaction.setSelection(endSelection);
-    }
-    if(commandData.endMarks) {
-      let endMarks = commandData.endMarks.map(markJson => Marks.fromJson(schema,markJson));
-      transaction.setStoredMarks(endMarks);
-    }
-
-    transaction.scrollIntoView();
-
-    return editorData.apply(transaction);
-  }
-
-  proseMirror.getComponentRange = function(editorData,componentShortName) {
-    let doc = editorData.doc;
-    let schema = editorData.schema;
-    let result = {};
-    doc.forEach( (node,offset) => {
-      if(node.type == schema.nodes.apogeeComponent) {
-        if(node.attrs.name == componentShortName) {
-    
-          if(result.found) {
-            //this shouldn't happen
-            throw new Error("Multiple nodes found with the given name");
-          }
-
-          result.found = true;
-          result.from = offset;
-          result.to = result.from + node.nodeSize;
-        }
-      }
-    });
-    return result;
-  }
 
   return proseMirror;
 

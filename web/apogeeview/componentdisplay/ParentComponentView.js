@@ -676,7 +676,7 @@ export default class ParentComponentView extends ComponentView {
     selectApogeeNode(childShortName) {
         var state = this.getEditorData();
       
-        let {found,from,to} = this.editorManager.getComponentRange(state,childShortName);
+        let {found,from,to} = this.getComponentRange(state,childShortName);
         //end test
 
         if(found) {
@@ -685,6 +685,29 @@ export default class ParentComponentView extends ComponentView {
             let transaction = state.tr.setSelection(selection).scrollIntoView();
             this.applyTransaction(transaction);
         }
+    }
+
+    
+    getComponentRange = function(editorData,componentShortName) {
+        let doc = editorData.doc;
+        let schema = editorData.schema;
+        let result = {};
+        doc.forEach((node, offset) => {
+            if (node.type == schema.nodes.apogeeComponent) {
+                if (node.attrs.name == componentShortName) {
+
+                    if (result.found) {
+                        //this shouldn't happen
+                        throw new Error("Multiple nodes found with the given name");
+                    }
+
+                    result.found = true;
+                    result.from = offset;
+                    result.to = result.from + node.nodeSize;
+                }
+            }
+        });
+        return result;
     }
 
     /** This method give focus to the editor for this componennt, if the component is showing. */
@@ -794,7 +817,7 @@ export default class ParentComponentView extends ComponentView {
     getRemoveApogeeNodeFromPageCommand(childShortName) {
         var state = this.getEditorData();
       
-        let {found,from,to} = this.editorManager.getComponentRange(state,childShortName);
+        let {found,from,to} = this.getComponentRange(state,childShortName);
         //end test
 
         if(found) {
@@ -813,7 +836,7 @@ export default class ParentComponentView extends ComponentView {
      */
     getRenameApogeeNodeCommands(memberId,oldShortName,newShortName) {
         var state = this.getEditorData();
-        let {found,from,to} = this.editorManager.getComponentRange(state,oldShortName);
+        let {found,from,to} = this.getComponentRange(state,oldShortName);
 
         let commands = {};
 
