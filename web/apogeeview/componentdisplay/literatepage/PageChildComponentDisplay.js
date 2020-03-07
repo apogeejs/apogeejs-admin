@@ -58,7 +58,7 @@ export default class PageChildComponentDisplay {
         let member = component.getMember();
 
 //WRONG - we need to respond to the proper changes, which depend on the class (title is name + possible argument, return value)
-        if(member.isFieldUpdated("name")) {
+        if(component.isDisplayNameUpdated()) {
             this._setTitle();
         }
 

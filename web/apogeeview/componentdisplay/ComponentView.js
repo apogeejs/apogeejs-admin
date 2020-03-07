@@ -48,6 +48,12 @@ export default class ComponentView {
         return this.component.getDisplayName(useFullPath);
     }
 
+    /** This method returns true if the display name field is updated. It is only applicable if 
+     * the full path is NOT used. */
+    isDisplayNameUpdated() {
+        return this.component.isDisplayNameUpdated();
+    }
+
     getBannerState() {
         let member = this.component.getMember();
         return member.getState();
@@ -122,6 +128,7 @@ export default class ComponentView {
         return this.modelView;
     }
 
+    /** This method is called when the workspace is closing */
     closeWorkspace() {
         this.onDelete();
     }

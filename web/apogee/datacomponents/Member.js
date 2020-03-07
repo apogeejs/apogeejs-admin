@@ -74,6 +74,19 @@ export default class Member extends FieldObject {
         }
     }
 
+    /** This returns true if the full name changes. */
+    isFullNameUpdated() {
+        if(this.areAnyFieldsUpdated(["name","owner"])) {
+            return true;
+        }
+        else {
+            let parent = this.getParent();
+            if(parent) {
+                return parent.isFullNameChanged(); 
+            } 
+        }
+    }
+
     /** This returns the owner for this member. */
     getOwner() {
         return this.getField("owner");

@@ -40,19 +40,28 @@ export default class Component extends FieldObject {
     // Public Instance Methods
     //==============================
 
-    /** This method returns the base member for this component. */
+    /** This method returns the base member for this component. To see if this
+     * field has been updated, check the "member" field of the component.  */
     getMember() {
         return this.getField("member");
     }
 
+    /** This method returns the ID for the field. It is fixed for the duration of the application.
+     * it is not persistent between running the application different time. */
     getId() {
         return this.getField("member").getId();
     }
 
+    /** This method returns the name of the component. To see if the value has
+     * been updated, check the "name" field of the member. To check if the member has
+     * been udpated, you can check the "member" field of the component.
+     */
     getName() {
         return this.getField("member").getName();
     }
 
+    /** This method returns the name of the member including the full path.
+     * To check if the full name has changed, use the isFullNameChanged method of the member. */
     getFullName() {
         return this.getField("member").getFullName();
     }
@@ -67,6 +76,15 @@ export default class Component extends FieldObject {
         }
     }
 
+    /** This method returns true if the display name field is updated. This method exists because
+     * display name is potentially a compound field and this is a systematic way to see if it has changed.
+     * Components modifying the getDisplayName method should also update this method.
+     * Note this method only applies when useFullPath = false. If you are using useFullPath = true, also
+     * check if the fullName has changed. */
+    isDisplayNameUpdated() {
+        return this.getMember().isFieldUpdated("name");
+    }
+
     getParentComponent() {
         let parent = this.getField("member").getParent();
         if(parent) {
@@ -77,7 +95,8 @@ export default class Component extends FieldObject {
         }
     }
 
-    /** This method returns the model manager for this component. */
+    /** This method returns the model manager for this component. To see if the model manager has
+     * been updated, check the "modelManager" field. */
     getModelManager() {
         return this.getField("modelManager");
     }

@@ -10,7 +10,7 @@ import apogeeui from "/apogeeui/apogeeui.js";
  */
 export default class ConfigurableFormDisplay extends DataDisplay {
     
-    constructor(displayContainer,callbacks,getLayoutInfo) {
+    constructor(displayContainer,callbacks) {
         super(displayContainer,callbacks);  
         
         this.panel = this.panel = new ConfigurablePanel();

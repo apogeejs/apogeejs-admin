@@ -25,15 +25,10 @@ import ApogeeComponentView from "/apogeeview/editor/ApogeeComponentView.js";
 
 import {convertToNonListBlockType, convertToListBlockType, indentSelection, unindentSelection } from "/apogeeview/editor/apogeeCommands.js";
 
-export function createProseMirrorManager (pageComponent) {
-
-  let modelManager = pageComponent.getModelManager();
-  let app = modelManager.getApp();
+export function createProseMirrorManager(app,schema) {
 
   //this is the function return object - the editor manager
   let proseMirror = {};
-
-  const schema = pageComponent.getSchema();
 
   //===========================
   //create the toolbar

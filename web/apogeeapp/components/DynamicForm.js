@@ -10,7 +10,7 @@ export default class DynamicForm extends Component {
         
     constructor(modelManager, functionObject) {
         //extend edit component
-        super(modelManager,functionObject,DynamicForm);
+        super(modelManager,functionObject);
     };
 
     //==============================

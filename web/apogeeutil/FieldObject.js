@@ -53,6 +53,11 @@ export default class FieldObject {
         return this.updated[field] ? true : false;
     }
 
+    /** This returns true if any fields in the give list have been updated. */
+    areAnyFieldsUpdated(fieldList) {
+        return fieldList.some( field => this.updated[field]);
+    }
+
     /** This method should be implemented for any object using this mixin. 
      * This should give a unique identifier for all objects of the given target type, below. */
     //getId()

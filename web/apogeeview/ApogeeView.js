@@ -32,8 +32,8 @@ export default class ApogeeView {
         this.loadUI(containerId);
 
         //subscribe to events
-        this.app.addListener("created",target => this.targetCreated(target));
-        this.app.addListener("deleted",target => this.targetDeleted(target));
+        this.app.addListener("created",eventData => this.targetCreated(eventData));
+        this.app.addListener("deleted",eventData => this.targetDeleted(eventData));
 
         //TEMPORARY COMPONENT VIEW REGISTRATION#################################
         ApogeeView.registerComponentView(JsonTableComponentView);
@@ -87,6 +87,11 @@ export default class ApogeeView {
         //load the tree entry
         let treeEntry = this.workspaceView.getTreeEntry();
         this.tree.setRootEntry(treeEntry);
+
+        //add a listener for a change to components - we are displaying the component name of the open tab
+        let modelManager = workspaceManager.getModelManager();
+        modelManager.addListener("updated",eventData => this.modelObjectUpdated(eventData));
+
     }
 
     onWorkspaceClosed() {
@@ -162,8 +167,12 @@ export default class ApogeeView {
 
     }
 
-    /** This method creates the app ui. 
-     * @private */
+    //------------------------------
+    // Active Tab display name handling logic
+    // This is not good. I need to clean a few things up.
+    // - the id is the component id. If we geet tabs for other things we will need a more general id
+    // - by the same token, we should have a way of getting the display name from the tab itself, as part of the tab interface.
+    //------------------------------
     onTabHidden(tab) {
         this.activeTabIconDisplay.style.display = "none";
         this.activeTabTitleDisplay.style.display = "none";
@@ -181,6 +190,27 @@ export default class ApogeeView {
             this.activeTabTitleDisplay.innerHTML = tabComponentView.getDisplayName(true);
             this.activeTabIconDisplay.style.display = "";
             this.activeTabTitleDisplay.style.display = "";
+        }
+    }
+
+    /** This is called whenever a component in the model, or the model, changes. If the display name
+     * of that component changes, we update the tab display name. This is also not very general. I should
+     * clean it up to allow other things besides components to have tabs. I should probably make a tab event that
+     * its title changes, or just that it was udpated. */
+    modelObjectUpdated(eventData) {
+        let target = eventData.target;
+
+        if(target) {
+            //there is a bit hidden in here. Mainly active tab = id of active tab = id of the component it represents
+            //I should clean that up.
+            //if the 
+            if((target.getTargetType() == "component")&&(target.getId() == this.tabFrame.getActiveTab())) {
+                //this is pretty messy too... 
+                if((target.isDisplayNameUpdated)&&(target.getMember().isFullNameUpdated())) {
+                    let tab = this.tabFrame.getTab(target.getId());
+                    this.onTabShown(tab);
+                }
+            }
         }
     }
 

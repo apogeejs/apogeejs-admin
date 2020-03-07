@@ -19,9 +19,8 @@ export default class ParentComponentView extends ComponentView {
         //base constructor
         super(modelView,component);
 
-        //create an empty edit state to start
-        //create an empty edit state to start
-        this.editorManager = createProseMirrorManager(component);
+        //ccreate the editor manager
+        this.editorManager = createProseMirrorManager(modelView.getApp(),component.getSchema());
 
         this.editorData = null;
         this._loadEditorData();

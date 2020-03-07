@@ -21,6 +21,15 @@ export default class FunctionComponent extends Component {
         return name + "(" + argListString + ")";
     }
 
+    /** This method returns true if the display name field is updated. This method exists because
+     * display name is potentially a compound field and this is a systematic way to see if it has changed.
+     * Components modifying the getDisplayName method should also update this method.
+     * Note this method only applies when useFullPath = false. We currently don't implement a method to see
+     * if the full name was updated. */
+    isDisplayNameUpdated() {
+        return this.getMember().areAnyFieldsUpdated(["name","argList"]);
+    }
+
     //==============================
     // Protected and Private Instance Methods
     //==============================

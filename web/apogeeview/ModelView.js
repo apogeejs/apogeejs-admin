@@ -19,9 +19,9 @@ export default class ModelView {
         this.init();
 
         //subscribe to events
-        this.modelManager.addListener("created",target => this.targetCreated(target));
-        this.modelManager.addListener("updated",target => this.targetUpdated(target));
-        this.modelManager.addListener("deleted",target => this.targetDeleted(target));
+        this.modelManager.addListener("created",eventData => this.targetCreated(eventData));
+        this.modelManager.addListener("updated",eventData => this.targetUpdated(eventData));
+        this.modelManager.addListener("deleted",eventData => this.targetDeleted(eventData));
 
         this.modelManager.setViewStateCallback(() => this.getViewState());
     }

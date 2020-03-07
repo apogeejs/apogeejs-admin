@@ -33,6 +33,15 @@ export default class FolderFunctionComponent extends ParentComponent {
         return displayName;
     }
 
+    /** This method returns true if the display name field is updated. This method exists because
+     * display name is potentially a compound field and this is a systematic way to see if it has changed.
+     * Components modifying the getDisplayName method should also update this method.
+     * Note this method only applies when useFullPath = false. We currently don't implement a method to see
+     * if the full name was updated. */
+    isDisplayNameUpdated() {
+        return this.getMember().areAnyFieldsUpdated(["name","argList","returnValue"]);
+    }
+
     //cludge================================================
     //I need a real solution for this
     //this is a temp solution to return the parent member for children added to this componnet
