@@ -106,7 +106,7 @@ module.exports = function(grunt) {
 				"apogeeapp/components/CustomControlComponent.js",
                 "apogeeapp/components/CustomComponent.js",
                 "apogeeapp/components/CustomDataComponent.js",
-                "apogeeapp/components/ErrorTableComponent.js",
+                "apogeeapp/components/ErrorComponent.js",
                 "apogeeapp/actions/errorhandling.js",
                 "apogeeapp/actions/createworkspace.js",
                 "apogeeapp/actions/updateworkspace.js",

@@ -8,13 +8,13 @@ import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 /** Editor that uses the Ace text editor.
  * 
  * @param {type} displayContainer - the display container
- * @param {type} callbacks - {getData,getEditOk,setData}; format for data is text
+ * @param {type} dataSource - {updateComponent,getData,getEditOk,setData}; format for data is text
  * @param {type} aceMode - the display format, such as "ace/mode/json"
  */
 export default class AceTextEditor extends DataDisplay {
     
-    constructor(displayContainer,callbacks,aceMode,options) {
-        super(displayContainer,callbacks);
+    constructor(displayContainer,dataSource,aceMode,options) {
+        super(displayContainer,dataSource);
 
         this.editorDiv = apogeeui.createElement("div");
 

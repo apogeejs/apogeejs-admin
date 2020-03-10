@@ -62,8 +62,8 @@ export default class WebComponentDisplay {
         }
     }
 
-    updateData() {
-        this.displayContainer.memberUpdated();
+    componentUpdated(component) {
+        this.displayContainer.componentUpdated(component);
     }
 
     /** This gets the current window state, to reconstruct the view. */

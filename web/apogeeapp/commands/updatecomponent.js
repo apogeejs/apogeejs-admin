@@ -22,7 +22,7 @@ updatecomponent.createUndoCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
     let model = modelManager.getModel();
     var member = model.getMemberByFullName(commandData.memberFullName);
-    var component = memberManager.getComponent(member);
+    var component = modelManager.getComponent(member);
     
 
     var originalMemberProperties = {};

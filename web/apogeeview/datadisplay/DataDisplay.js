@@ -3,13 +3,13 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
 /** Editor that uses the Ace text editor.
  * 
  * @param {type} displayContainer - this is the ui container that will show the display
- * @param {type} callbacks - the callbacks for the editor {getData,getEditOk,saveData}
+ * @param {type} dataSource - the dataSource for the editor {dpUpdate,getData,getEditOk,saveData}
  * @param {type} containerClass - the is the css class for the display container OPTIONAL
  */
 export default class DataDisplay {
-    constructor(displayContainer,callbacks) {
+    constructor(displayContainer,dataSource) {
         this.displayContainer = displayContainer;
-        this.callbacks = callbacks;
+        this.dataSource = dataSource;
         this.editOk = false;
 
         //defaults for container sizing logic
@@ -17,8 +17,15 @@ export default class DataDisplay {
         this.useContainerHeightUi = false;
     }
 
-    setCallbacks(callbacks) {
-        this.callbacks = callbacks;
+    /** This method updates the internal component instance and also returns
+     * true if the data display needs to be refreshed. */
+    doUpdate(updatedComponent) {
+        if(this.dataSource) {
+            return this.dataSource.doUpdate(updatedComponent);
+        }
+        else {
+            return false;
+        }
     }
     
     save() {
@@ -30,8 +37,8 @@ export default class DataDisplay {
         //if we fail, we restart edit mode below
         this.endEditMode();
 
-        if((this.callbacks)&&(this.callbacks.saveData)) {
-            saveComplete = this.callbacks.saveData(data);
+        if((this.dataSource)&&(this.dataSource.saveData)) {
+            saveComplete = this.dataSource.saveData(data);
         }
         else {
             alert("Error: Data not saved: save callback not set!");
@@ -151,12 +158,12 @@ export default class DataDisplay {
     showData() {
         var data;
         var editOk;
-        if(this.callbacks) {
-            if(this.callbacks.getData) {
-                data = this.callbacks.getData();
+        if(this.dataSource) {
+            if(this.dataSource.getData) {
+                data = this.dataSource.getData();
             }
-            if(this.callbacks.getEditOk) {
-                editOk = this.callbacks.getEditOk();
+            if(this.dataSource.getEditOk) {
+                editOk = this.dataSource.getEditOk();
             }
         }
         if(data === undefined) {

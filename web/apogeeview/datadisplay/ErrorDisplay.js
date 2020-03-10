@@ -16,10 +16,11 @@ import apogeeui from "/apogeeui/apogeeui.js";
 /** This is the display/editor for the custom control output. */
 export default class ErrorDisplay extends DataDisplay {
     constructor(displayContainer) {
-        var callbacks = {
+        var dataSource = {
+            doUpdate: () => false,
             getData: () => null
         }
-        super(displayContainer,callbacks);
+        super(displayContainer,dataSource);
         
         var msg = "ERROR - Component not loaded!";
         var msgDiv = apogeeui.createElement("div");

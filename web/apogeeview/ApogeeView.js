@@ -17,6 +17,9 @@ import WorkspaceView from "/apogeeview/WorkspaceView.js";
 
 import JsonTableComponentView from "/apogeeview/componentviews/JsonTableComponentView.js";
 import FolderComponentView from "/apogeeview/componentviews/FolderComponentView.js";
+import FunctionComponentView from "/apogeeview/componentviews/FunctionComponentView.js";
+import FolderFunctionComponentView from "/apogeeview/componentviews/FolderFunctionComponentView.js";
+import ErrorComponentView from "/apogeeview/componentviews/ErrorComponentView.js";
 
 import "/apogeeui/configurablepanel/ConfigurablePanelInit.js";
 import Apogee from "/apogeeapp/Apogee.js";
@@ -38,6 +41,9 @@ export default class ApogeeView {
         //TEMPORARY COMPONENT VIEW REGISTRATION#################################
         ApogeeView.registerComponentView(JsonTableComponentView);
         ApogeeView.registerComponentView(FolderComponentView);
+        ApogeeView.registerComponentView(FunctionComponentView);
+        ApogeeView.registerComponentView(FolderFunctionComponentView);
+        ApogeeView.registerComponentView(ErrorComponentView);
         //######################################################################
     }
 

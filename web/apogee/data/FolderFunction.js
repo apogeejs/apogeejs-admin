@@ -6,7 +6,6 @@ import DependentMember from "/apogee/datacomponents/DependentMember.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import Owner from "/apogee/datacomponents/Owner.js";
 import RootHolder from "/apogee/datacomponents/RootHolder.js";
-import CommandManager from "/apogeeapp/commands/CommandManager.js";
 
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
@@ -16,7 +15,6 @@ export default class FolderFunction extends DependentMember {
         super(model,name,owner);
 
         //mixin init where needed
-        this.dependentMixinInit();
         this.contextHolderMixinInit();
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -71,7 +69,7 @@ export default class FolderFunction extends DependentMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(owner,json) {
+    static fromJson(model,owner,json) {
         return new FolderFunction(model,json.name,owner,json.updateData);
     }
 
@@ -247,7 +245,7 @@ export default class FolderFunction extends DependentMember {
         
         var initialized = false;
         
-        var folderFunctionFunction = args => {
+        var folderFunctionFunction = (...argumentArray) => {
             
             if(!initialized) {
                 //create a copy of the model to do the function calculation - we don't update the UI display version
@@ -272,7 +270,7 @@ export default class FolderFunction extends DependentMember {
                 var entry = {};
                 entry.action = "updateData";
                 entry.memberName = inputElementArray[i].getFullName();
-                entry.data = arguments[i];
+                entry.data = argumentArray[i];
                 updateActionList.push(entry);
             }
             
@@ -311,9 +309,14 @@ export default class FolderFunction extends DependentMember {
     createVirtualModel(folderFunctionErrors) {
         let internalFolder = this.getField("internalFolder");
         var folderJson = internalFolder.toJson();
-        var modelJson = Model.createWorkpaceJsonFromFolderJson(this.getName(),folderJson);
+        var modelJson = Model.createModelJsonFromFolderJson(this.getName(),folderJson);
         var virtualModel = new Model(this.getOwner());
-        var actionResult = virtualModel.loadFromJson(modelJson);
+
+        //load the model
+        let loadAction = {};
+        loadAction.action = "loadModel";
+        loadAction.modelJson = modelJson;
+        let actionResult = doAction(virtualModel,loadAction);
         
         //do something with action result!!!
         

@@ -3,15 +3,31 @@ export {dataDisplayHelper as default}
 
 const FORMAT_STRING = "\t";
 
-/** This function creates editor callbacks or member data where the editor takes JSON format. */
-dataDisplayHelper.getMemberDataJsonCallbacks = function(app,member) {
+/** This function creates the data display data source  for the data of the given member. The
+ * member field should be the field name used to access the data source from the associated component. */
+dataDisplayHelper.getMemberDataJsonDataSource = function(app,component,memberFieldName) {
+    let dataMember = component.getField(memberFieldName);
     return {
-        getData: () => member.getData(),
-        getEditOk: () => (!member.hasCode()),
-        saveData: (data) => {
+        doUpdate: function(updatedComponent) {
+            //set the component instance for this data source
+            component = updatedComponent;
+            dataMember = component.getField(memberFieldName);
+            //return value is whether or not the data display needs to be udpated
+            return dataMember.isFieldUpdated("data");
+        },
+
+        getData: function() {
+            return dataMember.getData();
+        },
+
+        getEditOk: function () {
+            return !dataMember.hasCode();
+        },
+
+        saveData: function(data) {
             var commandData = {};
             commandData.type = "saveMemberData";
-            commandData.memberFullName = member.getFullName();
+            commandData.memberFullName = dataMember.getFullName();
             commandData.data = data;
             
             app.executeCommand(commandData);
@@ -21,10 +37,14 @@ dataDisplayHelper.getMemberDataJsonCallbacks = function(app,member) {
 }
 
 /** This function creates editor callbacks or member data where the editor takes text format. */
-dataDisplayHelper.getMemberDataTextCallbacks = function(app,member) {
+dataDisplayHelper.getMemberDataTextDataSource = function(app,component,memberFieldName) {
+    let baseSource = dataDisplayHelper.getMemberDataJsonDataSource(app,component,memberFieldName);
+
     return {
-        getData: () => {
-            var json = member.getData();	
+        doUpdate: baseSource.doUpdate,
+
+        getData: function() {
+            let json = baseSource.getData();
 
             var textData;
             if(json === null) {
@@ -39,8 +59,10 @@ dataDisplayHelper.getMemberDataTextCallbacks = function(app,member) {
 
             return textData;
         },
-        getEditOk: () => (!member.hasCode()),
-        saveData: (text) => {
+
+        getEditOk: baseSource.getEditOk,
+
+        saveData: function(text) {
             var data;
             if(text.length > 0) {
                 try {
@@ -57,32 +79,42 @@ dataDisplayHelper.getMemberDataTextCallbacks = function(app,member) {
             else {
                 data = "";
             }
-            
-            var commandData = {};
-            commandData.type = "saveMemberData";
-            commandData.memberFullName = member.getFullName();
-            commandData.data = data;
-            
-            app.executeCommand(commandData);
-            return true;
+
+            return baseSource.saveData(data);
         }
     }
 }
 
+
 /** This function creates editor callbacks or the member function body. 
  * The argument optionalClearCodeValue can optionally be set. If so, the member data will be 
  * set with this value if the function body and supplemental code are empty. */
-dataDisplayHelper.getMemberFunctionBodyCallbacks = function(app,member,optionalClearCodeDataValue) {
+dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,component,memberFieldName) {
+    let functionMember = component.getField(memberFieldName);
     return {
-        getData: () => member.getFunctionBody(),
-        getEditOk: () => true,
-        saveData: (text) => {
+        doUpdate: function(updatedComponent) {
+            //set the component instance for this data source
+            component = updatedComponent;
+            functionMember = component.getField(memberFieldName);
+            //return value is whether or not the data display needs to be udpated
+            return functionMember.isFieldUpdated("functionBody");
+        },
+
+        getData: function() {
+            return functionMember.getFunctionBody();
+        },
+
+        getEditOk: function() {
+            return true;
+        },
+
+        saveData: function(text) {
             var commandData = {};
             commandData.type = "saveMemberCode";
-            commandData.memberFullName = member.getFullName();
-            commandData.argList = member.getArgList();
+            commandData.memberFullName = functionMember.getFullName();
+            commandData.argList = functionMember.getArgList();
             commandData.functionBody = text;
-            commandData.supplementalCode = member.getSupplementalCode();
+            commandData.supplementalCode = functionMember.getSupplementalCode();
             
             app.executeCommand(commandData);
             return true;
@@ -91,16 +123,31 @@ dataDisplayHelper.getMemberFunctionBodyCallbacks = function(app,member,optionalC
 }
 
 /** This function creates editor callbacks or the member supplemental code. */
-dataDisplayHelper.getMemberSupplementalCallbacks = function(app,member,optionalClearCodeDataValue) {
+dataDisplayHelper.getMemberSupplementalDataSource = function(app,component,memberFieldName) {
+    let functionMember = component.getField(memberFieldName);
     return {
-        getData: () => member.getSupplementalCode(),
-        getEditOk: () => true,
-        saveData: (text) => {
+        doUpdate: function(updatedComponent) {
+            //set the component instance for this data source
+            component = updatedComponent;
+            functionMember = component.getField(memberFieldName);
+            //return value is whether or not the data display needs to be udpated
+            return functionMember.isFieldUpdated("supplementalCode");
+        },
+
+        getData: function() {
+            functionMember.getSupplementalCode();
+        },
+
+        getEditOk: function() {
+            return true;
+        },
+
+        saveData: function(text) {
             var commandData = {};
             commandData.type = "saveMemberCode";
-            commandData.memberFullName = member.getFullName();
-            commandData.argList = member.getArgList();
-            commandData.functionBody = member.getFunctionBody();
+            commandData.memberFullName = functionMember.getFullName();
+            commandData.argList = functionMember.getArgList();
+            commandData.functionBody = functionMember.getFunctionBody();
             commandData.supplementalCode = text;
             
             app.executeCommand(commandData);

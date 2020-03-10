@@ -194,10 +194,14 @@ export default class WebDisplayContainer {
         
     /** This method is called when the member is updated, to make sure the 
     * data display is up to date. */
-    memberUpdated() {
+   componentUpdated(component) {
         //update the data display
         if((this.dataDisplay)&&(!this.inEditMode)) {
-            this.dataDisplay.showData();
+            let updateNeeded = this.dataDisplay.doUpdate(component);
+            if(updateNeeded) {
+                this.dataDisplay.showData();
+                this.updateViewSizeButtons();
+            }
         }
     }
         

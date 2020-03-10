@@ -1,7 +1,6 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import ParentComponent from "/apogeeapp/component/ParentComponent.js";
-import LiteratePageComponentDisplay from "/apogeeview/componentdisplay/literatepage/LiteratePageComponentDisplay.js";
 
 /** This component represents a folderFunction, which is a function that is programmed using
  *apogee tables rather than writing code. */
@@ -52,15 +51,6 @@ export default class FolderFunctionComponent extends ParentComponent {
     }
     //=======================================================
 
-    //==============================
-    // Child Display
-    //==============================
-
-    /**  This method retrieves the table edit settings for this component instance
-     * @protected */
-    getTableEditSettings() {
-        return FolderFunctionComponent.TABLE_EDIT_SETTINGS;
-    }
 
     static transferMemberProperties(inputValues,propertyJson) {
         if(!propertyJson.updateData) propertyJson.updateData = {};
@@ -83,27 +73,12 @@ export default class FolderFunctionComponent extends ParentComponent {
 
 }
 
-//=======================
-// Child View SEttings
-//=======================
-
-FolderFunctionComponent.VIEW_MODES = [
-];
-
-FolderFunctionComponent.TABLE_EDIT_SETTINGS = {
-    "viewModes": FolderFunctionComponent.VIEW_MODES,
-}
-
-
 //======================================
 // This is the component generator, to register the component
 //======================================
 
 FolderFunctionComponent.displayName = "Folder Function";
 FolderFunctionComponent.uniqueName = "apogeeapp.app.FolderFunctionComponent";
-FolderFunctionComponent.hasTabEntry = true;
-FolderFunctionComponent.hasChildEntry = true;
-FolderFunctionComponent.ICON_RES_PATH = "/componentIcons/folderFunction.png";
 FolderFunctionComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.FolderFunction",
     "children": {
@@ -114,15 +89,3 @@ FolderFunctionComponent.DEFAULT_MEMBER_JSON = {
     }
 };
 
-FolderFunctionComponent.propertyDialogLines = [
-    {
-        "type":"inputElement",
-        "heading":"Arg List: ",
-        "resultKey":"argListString"
-    },
-    {
-        "type":"inputElement",
-        "heading":"Return Val: ",
-        "resultKey":"returnValueString"
-    }
-];

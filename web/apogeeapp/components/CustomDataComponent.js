@@ -86,44 +86,47 @@ export default class CustomDataComponent extends Component {
      * @protected. */
     getDataDisplay(displayContainer,viewType) {
         
-        var callbacks;
+        var dataDisplaySource;
         var app = this.getModelManager().getApp();
         
         //create the new view element;
         switch(viewType) {
             
             case CustomDataComponent.VIEW_FORM:
+//##########################################################
+//UPDATE THIS - the data source should include the input table, html and resource arguments!!!
+//##########################################################
                 displayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
                 this.activeOutputDisplayContainer = displayContainer;
-                var callbacks = this.getFormCallbacks();
+                var dataDisplaySource = this.getOutputDataDisplaySource();
                 var html = this.getField("html");
                 var resource = this.createResource();
-                var dataDisplay = new HtmlJsDataDisplay(displayContainer,callbacks,this.inputTable,html,resource);
+                var dataDisplay = new HtmlJsDataDisplay(displayContainer,dataDisplaySource,this.inputTable,html,resource);
                 return dataDisplay;
                 
             case CustomDataComponent.VIEW_VALUE:
-                callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,this.dataTable);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
+                dataDisplaySource = dataDisplayHelper.getMemberDataTextCallbacks(app,this.dataTable);
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                 
             case CustomDataComponent.VIEW_CODE:
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.inputTable);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.inputTable);
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case CustomDataComponent.VIEW_SUPPLEMENTAL_CODE:
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.inputTable);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.inputTable);
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
             case CustomDataComponent.VIEW_HTML:
-                callbacks = this.getUiCallbacks("html");
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/html",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+                dataDisplaySource = this.getUiDataDisplaySource("html");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/html",AceTextEditor.OPTION_SET_DISPLAY_MAX);
         
             case CustomDataComponent.VIEW_CSS:
-                callbacks = this.getUiCallbacks("css");
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/css",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+                dataDisplaySource = this.getUiDataDisplaySource("css");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/css",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case CustomDataComponent.VIEW_UI_CODE:
-                callbacks = this.getUiCallbacks("uiCode");
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+                dataDisplaySource = this.getUiDataDisplaySource("uiCode");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
     //temporary error handling...
@@ -151,17 +154,60 @@ export default class CustomDataComponent extends Component {
         return callbacks;
     }
 
-    getUiCallbacks(codeFieldName) {
+    getOutputDataDisplaySource() {
+        //this is the instance of the component that is active for the data source - it will be updated
+        //as the component changes.
+        let component = this;
+        var messenger = new Messenger(component.inputTable);
+
         return {
-            getData: () => {
-                var codeField = this.getField(codeFieldName);
+            doUpdate: function(updatedComponent) {
+                //set the component instance for this data source
+                component = updatedComponent;
+                //return value is whether or not the data display needs to be udpated
+//FIX THIS - update depends on more maybe
+                return component.isFieldUpdated("member");
+            },
+
+            getData: function() {
+                component.getMember().getData()
+            },
+
+            saveData: function(formValue) {
+                messenger.dataUpdate("data",formValue);
+                return true;
+            }
+
+
+        };
+    }
+
+    /** This method returns the data dispklay data source for the code field data displays. */
+    getUiDataDisplaySource(codeFieldName) {
+        //this is the instance of the component that is active for the data source - it will be updated
+        //as the component changes.
+        let component = this;
+        return {
+            doUpdate: function(updatedComponent) {
+                //set the component instance for this data source
+                component = updatedComponent;
+                //return value is whether or not the data display needs to be udpated
+                return component.isFieldUpdated(codeFieldName);
+            },
+
+            getData: function() {
+                let codeField = compoent.getField(codeFieldName);
                 if((codeField === undefined)||(codeField === null)) codeField = "";
                 return codeField;
             },
+
+            getEditOk: function() {
+                return true;
+            },
             
-            getEditOk: () => true,
-            
-            saveData: (text) => this.doCodeFieldUpdate(codeField,text)
+            saveData: function(text) {
+                component.doCodeFieldUpdate(codeField,text);
+            }
         }
     }
 

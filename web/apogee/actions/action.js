@@ -419,29 +419,14 @@ function compoundActionFunction(model,actionData) {
     actionResult.childActionResults = [];
     for(var i = 0; i < actionList.length; i++) {
         let childActionData = actionList[i];
-        let childActionResult = {};
-        callActionFunction(model,childActionData,childActionResult);
+        let childActionResult = callActionFunction(model,childActionData);
         actionResult.childActionResults.push(childActionResult);   
     }
     actionResult.actionDone = true;
     return actionResult;
 }
 
-/** Action info */
-let COMPOUND_ACTION_INFO = {
-    "action": "compoundAction",
-    "actionFunction": compoundActionFunction,
-    "checkUpdateAll": false,
-    "updateDependencies": false,
-    "addToRecalc": false,
-    "event": null
-}
-
-/** This is an id value used internally to signify an event acted on the model, as oposed to a specific member id. */
-let MODEL_TARGET_ID = "model";
-
-
 //This line of code registers the action 
-addActionInfo(COMPOUND_ACTION_INFO);
+addActionInfo("compoundAction",compoundActionFunction);
 
 

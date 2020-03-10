@@ -8,8 +8,8 @@ import Handsontable from "/ext/handsontable/handsontable_6.2.0/handsontable.full
 /** This is a grid editor using hands on table*/
 export default class HandsonGridEditor extends DataDisplay {
     
-    constructor(displayContainer,callbacks) {
-        super(displayContainer,callbacks);
+    constructor(displayContainer,dataSource) {
+        super(displayContainer,dataSource);
 
         this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
         this.savedPixelHeight = DEFAULT_PIXEL_HEIGHT;

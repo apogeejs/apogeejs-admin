@@ -173,7 +173,8 @@ function getAdditionalCommands(parentComponentView,childName) {
 function getComponentFromName(modelManager, modelView, componentName) {
     var model = modelManager.getModel();
     var member = model.getMemberByFullName(componentName);
-    var componentView = modelView.getComponentView(member.getId());
+    var component = modelManager.getComponent(member);
+    var componentView = modelView.getComponentView(component.getId());
     return componentView;
 }
 

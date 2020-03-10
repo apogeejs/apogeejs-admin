@@ -57,7 +57,7 @@ Parent.lookupChildFromPathArray = function(path,startElement,optionalParentMembe
             }
             return grandChildMember;
         }
-        else if(member.isOwner) {
+        else if(childMember.isOwner) {
             let grandChildMember = childMember.lookupChildFromPathArray(path,startElement+1,optionalParentMemberList);
             //record the parent path, if requested
             if((grandChildMember)&&(optionalParentMemberList)) {

@@ -9,7 +9,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
     
     /** This allows for a static or dynamic layout setting
      * @param {type} displayContainer - the displayContainer
-     * @param {type} callbacks - {
+     * @param {type} dataSource - {
      *  - getData - returns the desired form value,
      *  - getEditOk - gets if form is editable,
      *  - setData - called when data is saved, with the form value
@@ -20,11 +20,11 @@ export default class ConfigurableFormEditor extends DataDisplay {
      * It should be populated if a fixed layout is OK. In this case, the getLayoutInfo
      * allack should not be populated. 
      */
-    constructor(displayContainer,callbacks,optionalFixedLayoutInfo) {
-        super(displayContainer,callbacks);
+    constructor(displayContainer,dataSource,optionalFixedLayoutInfo) {
+        super(displayContainer,dataSource);
         
         //layout can be fixed or dynamic
-        this.dynamicLayoutCallback = callbacks.getLayoutInfo;
+        this.dynamicLayoutCallback = dataSource.getLayoutInfo;
         
         this.panel = new ConfigurablePanel();
         

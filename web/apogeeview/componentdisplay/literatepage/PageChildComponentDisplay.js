@@ -57,7 +57,6 @@ export default class PageChildComponentDisplay {
 
         let member = component.getMember();
 
-//WRONG - we need to respond to the proper changes, which depend on the class (title is name + possible argument, return value)
         if(component.isDisplayNameUpdated()) {
             this._setTitle();
         }
@@ -69,7 +68,7 @@ export default class PageChildComponentDisplay {
         //update the content in instantiated view mode elements
         for(var viewType in this.displayContainerMap) {
             var displayContainer = this.displayContainerMap[viewType];
-            displayContainer.memberUpdated();
+            displayContainer.componentUpdated(component);
         }
     }
 

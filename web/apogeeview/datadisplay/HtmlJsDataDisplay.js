@@ -23,9 +23,9 @@ import apogeeui from "/apogeeui/apogeeui.js";
 
 /** This is the display/editor for the custom control output. */
 export default class HtmlJsDataDisplay extends DataDisplay {
-    constructor(app,displayContainer,callbacks,member,html,resource) {
+    constructor(app,displayContainer,dataSource,member,html,resource) {
         
-        super(displayContainer,callbacks);
+        super(displayContainer,dataSource);
         
         this.app = app;
         this.resource = resource;

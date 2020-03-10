@@ -261,7 +261,7 @@ export default class ModelManager  extends FieldObject {
             //if we failed to create the component, or if we failed to make the member properly (and we used the error member)
             if(!component) {
                 //table not found - create an empty table
-                componentClass = this.app.getComponentClass("apogeeapp.app.ErrorTableComponent");
+                componentClass = this.app.getComponentClass("apogeeapp.app.ErrorComponent");
                 component = new componentClass(this,member);
                 if(componentJson) {
                     component.loadProperties(componentJson);

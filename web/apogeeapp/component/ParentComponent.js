@@ -73,9 +73,10 @@ export default class ParentComponent extends Component {
     /** This serializes the table component. */
     writeToJson(json) {
         //save the editor state
-        if(this.document) {
+        let document = this.getField("document");
+        if(document) {
             json.data = {};
-            json.data.doc = this.document.toJSON();
+            json.data.doc = document.toJSON();
         }
         
         //save the children

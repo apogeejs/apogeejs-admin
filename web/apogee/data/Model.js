@@ -356,7 +356,7 @@ export default class Model extends FieldObject {
 
     /** This method creates a headless model json from a folder json. It
      * is used in the folder function. */
-    static createWorkpaceJsonFromFolderJson(name,folderJson) {
+    static createModelJsonFromFolderJson(name,folderJson) {
         //create a model json from the root folder json
         var modelJson = {};
         modelJson.fileType = Model.SAVE_FILE_TYPE;
@@ -374,7 +374,7 @@ export default class Model extends FieldObject {
         if(rootFolder) {
             rootFolderJson = rootFolder.toJson();
         }
-        return Model.createWorkpaceJsonFromFolderJson(name,rootFolderJson);
+        return Model.createModelJsonFromFolderJson(name,rootFolderJson);
     }
 
     //-------------------------
