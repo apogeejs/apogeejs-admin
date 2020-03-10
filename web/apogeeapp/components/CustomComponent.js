@@ -1,9 +1,6 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import Component from "/apogeeapp/component/Component.js";
-import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 import apogeeui from "/apogeeui/apogeeui.js";
@@ -45,112 +42,6 @@ export default class CustomComponent extends Component {
 
             if(this.activeOutputMode) {
                 this.activeOutputMode.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
-            }
-        }
-    }
-
-    //==============================
-    // Protected and Private Instance Methods
-    //==============================
-
-    /**  This method retrieves the table edit settings for this component instance
-     * @protected */
-    getTableEditSettings() {
-        return CustomComponent.TABLE_EDIT_SETTINGS;
-    }
-
-    /** This method should be implemented to retrieve a data display of the give type. 
-     * @protected. */
-    getDataDisplay(displayContainer,viewType) {
-        
-        var dataDisplaySource;
-        var app = this.getModelManager().getApp();
-        
-        //create the new view element;
-        switch(viewType) {
-            
-            case CustomComponent.VIEW_OUTPUT:
-//##########################################################
-//UPDATE THIS - the data source should include the member, html and resource arguments!!!
-//##########################################################
-                displayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
-                this.activeOutputMode = displayContainer;
-                var dataDisplaySource = this.getOutputDataDisplaySource();
-                var html = this.getField("html");
-                var resource = this.createResource();
-                var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,dataDisplaySource,this.member,html,resource);
-                return dataDisplay;
-                
-            case CustomComponent.VIEW_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.member);
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            case CustomComponent.VIEW_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.member);
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-            
-            case CustomComponent.VIEW_HTML:
-                dataDisplaySource = this.getUiDataDisplaySource("html");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/html",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-        
-            case CustomComponent.VIEW_CSS:
-                dataDisplaySource = this.getUiDataDisplaySource("css");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/css",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            case CustomComponent.VIEW_UI_CODE:
-                dataDisplaySource = this.getUiDataDisplaySource("uiCode");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            default:
-    //temporary error handling...
-                alert("unrecognized view element!");
-                return null;
-        }
-    }
-
-    getOutputDataDisplaySource() {
-        //this is the instance of the component that is active for the data source - it will be updated
-        //as the component changes.
-        let component = this;
-        return {
-            doUpdate: function(updatedComponent) {
-                //set the component instance for this data source
-                component = updatedComponent;
-                //return value is whether or not the data display needs to be udpated
-//FIX THIS - update depends on more maybe
-                return component.isFieldUpdated("member");
-            },
-            getData: function() {
-                component.getMember().getData();
-            }
-        };
-    }
-
-    /** This method returns the data dispklay data source for the code field data displays. */
-    getUiDataDisplaySource(codeFieldName) {
-        //this is the instance of the component that is active for the data source - it will be updated
-        //as the component changes.
-        let component = this;
-        return {
-            doUpdate: function(updatedComponent) {
-                //set the component instance for this data source
-                component = updatedComponent;
-                //return value is whether or not the data display needs to be udpated
-                return component.isFieldUpdated(codeFieldName);
-            },
-
-            getData: function() {
-                let codeField = compoent.getField(codeFieldName);
-                if((codeField === undefined)||(codeField === null)) codeField = "";
-                return codeField;
-            },
-
-            getEditOk: function() {
-                return true;
-            },
-            
-            saveData: function(text) {
-                component.doCodeFieldUpdate(codeField,text);
             }
         }
     }
@@ -292,27 +183,6 @@ export default class CustomComponent extends Component {
     }
 }
 
-CustomComponent.VIEW_OUTPUT = "Display";
-CustomComponent.VIEW_CODE = "Input Code";
-CustomComponent.VIEW_SUPPLEMENTAL_CODE = "Input Private";
-CustomComponent.VIEW_HTML = "HTML";
-CustomComponent.VIEW_CSS = "CSS";
-CustomComponent.VIEW_UI_CODE = "uiGenerator()";
-
-CustomComponent.VIEW_MODES = [
-    CustomComponent.VIEW_OUTPUT,
-    CustomComponent.VIEW_CODE,
-    CustomComponent.VIEW_SUPPLEMENTAL_CODE,
-    CustomComponent.VIEW_HTML,
-    CustomComponent.VIEW_CSS,
-    CustomComponent.VIEW_UI_CODE
-];
-
-CustomComponent.TABLE_EDIT_SETTINGS = {
-    "viewModes": CustomComponent.VIEW_MODES,
-    "defaultView": CustomComponent.VIEW_OUTPUT
-}
-
 /** This is the format string to create the code body for updateing the member
  * Input indices:
  * 0: resouce methods code
@@ -329,7 +199,6 @@ CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
     ""
        ].join("\n");
     
-    
 
 
 //======================================
@@ -338,19 +207,9 @@ CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 
 CustomComponent.displayName = "Custom Component";
 CustomComponent.uniqueName = "apogeeapp.app.CustomComponent";
-CustomComponent.hasTabEntry = false;
-CustomComponent.hasChildEntry = true;
-CustomComponent.ICON_RES_PATH = "/componentIcons/chartControl.png";
 CustomComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.JsonTable"
 };
-CustomComponent.propertyDialogLines = [
-    {
-        "type":"checkbox",
-        "heading":"Destroy on Hide: ",
-        "resultKey":"destroyOnInactive"
-    }
-];
 
 //=====================================
 // Update Data Command

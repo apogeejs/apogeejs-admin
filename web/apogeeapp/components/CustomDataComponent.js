@@ -71,146 +71,6 @@ export default class CustomDataComponent extends Component {
         }
     }
 
-    //==============================
-    // Protected and Private Instance Methods
-    //==============================
-
-
-    /**  This method retrieves the table edit settings for this component instance
-     * @protected */
-    getTableEditSettings() {
-        return CustomDataComponent.TABLE_EDIT_SETTINGS;
-    }
-
-    /** This method should be implemented to retrieve a data display of the give type. 
-     * @protected. */
-    getDataDisplay(displayContainer,viewType) {
-        
-        var dataDisplaySource;
-        var app = this.getModelManager().getApp();
-        
-        //create the new view element;
-        switch(viewType) {
-            
-            case CustomDataComponent.VIEW_FORM:
-//##########################################################
-//UPDATE THIS - the data source should include the input table, html and resource arguments!!!
-//##########################################################
-                displayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
-                this.activeOutputDisplayContainer = displayContainer;
-                var dataDisplaySource = this.getOutputDataDisplaySource();
-                var html = this.getField("html");
-                var resource = this.createResource();
-                var dataDisplay = new HtmlJsDataDisplay(displayContainer,dataDisplaySource,this.inputTable,html,resource);
-                return dataDisplay;
-                
-            case CustomDataComponent.VIEW_VALUE:
-                dataDisplaySource = dataDisplayHelper.getMemberDataTextCallbacks(app,this.dataTable);
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
-                
-            case CustomDataComponent.VIEW_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,this.inputTable);
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            case CustomDataComponent.VIEW_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalCallbacks(app,this.inputTable);
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-            
-            case CustomDataComponent.VIEW_HTML:
-                dataDisplaySource = this.getUiDataDisplaySource("html");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/html",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-        
-            case CustomDataComponent.VIEW_CSS:
-                dataDisplaySource = this.getUiDataDisplaySource("css");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/css",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            case CustomDataComponent.VIEW_UI_CODE:
-                dataDisplaySource = this.getUiDataDisplaySource("uiCode");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            default:
-    //temporary error handling...
-                alert("unrecognized view element!");
-                return null;
-        }
-    }
-
-    getFormCallbacks() {
-        var callbacks = {};
-        
-        //return desired form value
-        callbacks.getData = () => this.getMember().getData();
-        
-        //edit ok - always true
-        callbacks.getEditOk = () => true;
-        
-        //save data - just form value here
-        var messenger = new Messenger(this.inputTable);
-        callbacks.saveData = (formValue) => {
-            messenger.dataUpdate("data",formValue);
-            return true;
-        }
-        
-        return callbacks;
-    }
-
-    getOutputDataDisplaySource() {
-        //this is the instance of the component that is active for the data source - it will be updated
-        //as the component changes.
-        let component = this;
-        var messenger = new Messenger(component.inputTable);
-
-        return {
-            doUpdate: function(updatedComponent) {
-                //set the component instance for this data source
-                component = updatedComponent;
-                //return value is whether or not the data display needs to be udpated
-//FIX THIS - update depends on more maybe
-                return component.isFieldUpdated("member");
-            },
-
-            getData: function() {
-                component.getMember().getData()
-            },
-
-            saveData: function(formValue) {
-                messenger.dataUpdate("data",formValue);
-                return true;
-            }
-
-
-        };
-    }
-
-    /** This method returns the data dispklay data source for the code field data displays. */
-    getUiDataDisplaySource(codeFieldName) {
-        //this is the instance of the component that is active for the data source - it will be updated
-        //as the component changes.
-        let component = this;
-        return {
-            doUpdate: function(updatedComponent) {
-                //set the component instance for this data source
-                component = updatedComponent;
-                //return value is whether or not the data display needs to be udpated
-                return component.isFieldUpdated(codeFieldName);
-            },
-
-            getData: function() {
-                let codeField = compoent.getField(codeFieldName);
-                if((codeField === undefined)||(codeField === null)) codeField = "";
-                return codeField;
-            },
-
-            getEditOk: function() {
-                return true;
-            },
-            
-            saveData: function(text) {
-                component.doCodeFieldUpdate(codeField,text);
-            }
-        }
-    }
-
     /** This method deseriliazes data for the custom resource component. */
     updateFromJson(json) {  
         this.loadResourceFromJson(json);
@@ -372,9 +232,6 @@ CustomDataComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 
 CustomDataComponent.displayName = "Custom Data Component";
 CustomDataComponent.uniqueName = "apogeeapp.app.CustomDataComponent";
-CustomDataComponent.hasTabEntry = false;
-CustomDataComponent.hasChildEntry = true;
-CustomDataComponent.ICON_RES_PATH = "/componentIcons/formControl.png";
 CustomDataComponent.DEFAULT_MEMBER_JSON = {
         "type": "apogee.Folder",
         "childrenNotWriteable": true,
@@ -395,36 +252,7 @@ CustomDataComponent.DEFAULT_MEMBER_JSON = {
             }
         }
     };
-CustomDataComponent.propertyDialogLines = [
-    {
-        "type":"checkbox",
-        "heading":"Destroy on Hide: ",
-        "resultKey":"destroyOnInactive"
-    }
-];
 
-CustomDataComponent.VIEW_FORM = "Form";
-CustomDataComponent.VIEW_VALUE = "Data Value";
-CustomDataComponent.VIEW_CODE = "Input Code";
-CustomDataComponent.VIEW_SUPPLEMENTAL_CODE = "Input Private";
-CustomDataComponent.VIEW_HTML = "HTML";
-CustomDataComponent.VIEW_CSS = "CSS";
-CustomDataComponent.VIEW_UI_CODE = "uiGenerator(mode)";
-
-CustomDataComponent.VIEW_MODES = [
-    CustomDataComponent.VIEW_FORM,
-    CustomDataComponent.VIEW_VALUE,
-    CustomDataComponent.VIEW_CODE,
-    CustomDataComponent.VIEW_SUPPLEMENTAL_CODE,
-    CustomDataComponent.VIEW_HTML,
-    CustomDataComponent.VIEW_CSS,
-    CustomDataComponent.VIEW_UI_CODE
-];
-
-CustomDataComponent.TABLE_EDIT_SETTINGS = {
-    "viewModes": CustomDataComponent.VIEW_MODES,
-    "defaultView": CustomDataComponent.VIEW_FORM
-}
 
 
 //=====================================
