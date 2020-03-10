@@ -41,20 +41,54 @@ export default class Component extends FieldObject {
     //==============================
 
     /** This method returns the base member for this component. To see if this
-     * field has been updated, check the "member" field of the component.  */
+     * field has been updated, check the "member" field of the component.  
+     * To access other child members for compound components, use the access those fields using
+     * the getField method. The field name is the "member." + the variable name of the field. */
     getMember() {
         return this.getField("member");
     }
 
+    /** This method returns true if the data from a given named member field has changed. */
+    isMemberDataUpdated(memberFieldName) {
+        return this.isMemberFieldUpdated(memberFieldName,"data");
+    }
+    
+    /** This method returns true if the code, including either the function body or
+     * the supplemental code, from a given named member field has changed. */
+    isMemberCodeUpdated(memberFieldName) {
+        return this.areAnyMemberFieldsUpdated(memberFieldName,["functionBody","supplementalCode"]);
+    }
+
+    /** This method returns true if the given member field has been updated. */
+    isMemberFieldUpdated(memberFieldName,memberFieldFieldName) {
+        if(this.isFieldUpdated(memberFieldName)) {
+            let member = this.getField(memberFieldName);
+            return member.isFieldUpdated(memberFieldFieldName);
+        }
+        else {
+            return false;
+        }
+    }
+
+    /** This method returns true if the given member field has been updated. */
+    areAnyMemberFieldsUpdated(memberFieldName,memberFieldFieldNameList) {
+        if(this.isFieldUpdated(memberFieldName)) {
+            let member = this.getField(memberFieldName);
+            return member.areAnyFieldUpdated(memberFieldFieldNameList);
+        }
+        else {
+            return false;
+        }
+    }
+    
     /** This method returns the ID for the field. It is fixed for the duration of the application.
      * it is not persistent between running the application different time. */
     getId() {
         return this.getField("member").getId();
     }
 
-    /** This method returns the name of the component. To see if the value has
-     * been updated, check the "name" field of the member. To check if the member has
-     * been udpated, you can check the "member" field of the component.
+    /** This method returns the name of the component. To see if the value has been updated, check 
+     * the component field name "member" and the member field name "name".
      */
     getName() {
         return this.getField("member").getName();
@@ -82,7 +116,7 @@ export default class Component extends FieldObject {
      * Note this method only applies when useFullPath = false. If you are using useFullPath = true, also
      * check if the fullName has changed. */
     isDisplayNameUpdated() {
-        return this.getMember().isFieldUpdated("name");
+        return this.isMemberFieldUpdated("member","name");
     }
 
     getParentComponent() {

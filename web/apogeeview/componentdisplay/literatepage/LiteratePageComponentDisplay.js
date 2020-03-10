@@ -56,8 +56,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
     componentUpdated(component) {
 
-        let member = component.getMember();
-        if(member.isFieldUpdated("name")) {
+        if(component.isMemberFieldUpdated("member","name")) {
             this.tab.setTitle(this.componentView.getName());
         }
 
@@ -66,7 +65,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
             this.editorView.updateState(editorData);
         }
 
-        if(member.isFieldUpdated("state")) {
+        if(component.isMemberFieldUpdated("member","state")) {
             this._setBannerState();
         }
     }

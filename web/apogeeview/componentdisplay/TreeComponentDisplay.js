@@ -48,13 +48,11 @@ export default class TreeComponentDisplay {
 
     componentUpdated(component) {
 
-        let member = component.getMember();
-
-        if(member.isFieldUpdated("name")) {
+        if(component.isMemberFieldUpdated("member","name")) {
             this._setLabel();
         }
 
-        if(member.isFieldUpdated("state")) {
+        if(component.isMemberFieldUpdated("member","state")) {
             this._setBannerState();
         }
     }

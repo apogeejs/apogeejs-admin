@@ -55,13 +55,11 @@ export default class PageChildComponentDisplay {
 
     componentUpdated(component) {
 
-        let member = component.getMember();
-
         if(component.isDisplayNameUpdated()) {
             this._setTitle();
         }
 
-        if(member.isFieldUpdated("state")) {
+        if(component.isMemberFieldUpdated("member","state")) {
             this._setBannerState();
         }
 

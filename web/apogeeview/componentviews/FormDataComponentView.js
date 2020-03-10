@@ -1,6 +1,6 @@
 import { Messenger } from "/apogee/apogeeCoreLib.js";
 
-import Component from "/apogeeapp/component/Component.js";
+import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
@@ -12,11 +12,11 @@ import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper
  * to validate form input.
  * If you want a form to take an action on submit rather than create and edit a 
  * data value, you can use the dynmaic form. */
-export default class FormDataComponent extends Component {
+export default class FormDataComponentView extends ComponentView {
 
-    constructor(modelManager,folder) {
+    constructor(modelView,folderComponent) {
         //extend edit component
-        super(modelManager,folder,FormDataComponent);
+        super(modelView,folderComponent);
         
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         folder.setChildrenWriteable(false);
@@ -45,48 +45,44 @@ export default class FormDataComponent extends Component {
     /**  This method retrieves the table edit settings for this component instance
      * @protected */
     getTableEditSettings() {
-        return FormDataComponent.TABLE_EDIT_SETTINGS;
+        return FormDataComponentView.TABLE_EDIT_SETTINGS;
     }
 
     /** This method should be implemented to retrieve a data display of the give type. 
      * @protected. */
     getDataDisplay(displayContainer,viewType) {
         
-        var callbacks;
-        var app = this.getModelManager().getApp();
+        var dataDisplaySource;
+        var app = this.getModelView().getApp();
+        let component = this.getComponent();
         
         //create the new view element;
         switch(viewType) {
                 
-            case FormDataComponent.VIEW_FORM:
-                callbacks = this.getFormEditorCallbacks();
-                var formEditorDisplay = new ConfigurableFormEditor(displayContainer,callbacks);
+            case FormDataComponentView.VIEW_FORM:
+                dataDisplaySource = this.getFormEditorCallbacks();
+                var formEditorDisplay = new ConfigurableFormEditor(displayContainer,dataDisplaySource);
                 return formEditorDisplay;
                 
-            case FormDataComponent.VIEW_LAYOUT_CODE:
-                let layoutFunctionMember = this.getField("member.layout");
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,layoutFunctionMember,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+            case FormDataComponentView.VIEW_LAYOUT_CODE:
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,component,"member.layout");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
-            case FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE:
-                let layoutFunctionMember = this.getField("member.layout");
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,layoutFunctionMember,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+            case FormDataComponentView.VIEW_LAYOUT_SUPPLEMENTAL_CODE:
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,component,"member.layout");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
-            case FormDataComponent.VIEW_FORM_VALUE:
-                let dataTable = this.getField("member.data");
-                callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,dataTable);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
+            case FormDataComponentView.VIEW_FORM_VALUE:
+                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,component,"member.data");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                 
-            case FormDataComponent.VIEW_INPUT_INVALID_CODE:
-                let isInputValidFunctionMember = this.getField("member.isInputValid");
-                callbacks = dataDisplayHelper.getMemberFunctionBodyCallbacks(app,isInputValidFunctionMember,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+            case FormDataComponentView.VIEW_INPUT_INVALID_CODE:
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,component,"member.isInputValid");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
-            case FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE:
-                let isInputValidFunctionMember = this.getField("member.isInputValid");
-                callbacks = dataDisplayHelper.getMemberSupplementalCallbacks(app,isInputValidFunctionMember,FormDataComponent.TABLE_EDIT_SETTINGS.emptyDataValue);
-                return new AceTextEditor(displayContainer,callbacks,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+            case FormDataComponentView.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE:
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,component,"member.isInputValid");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
     //temporary error handling...
@@ -96,30 +92,47 @@ export default class FormDataComponent extends Component {
     }
 
     getFormEditorCallbacks() {
-        let layoutFunctionMember = this.getField("member.layout");
-        var callbacks = {};
+        let component = this.getComponent();
+        let dataTable = this.getField("member.data");
+        let layoutFunctionMember = component.getField("member.layout");
+        let isInputValidFunctionMember = this.getField("member.isInputValid");
+        let messenger = new Messenger(layoutFunctionMember);
+        let app = this.getModelView().getApp();
+        
+        var dataDisplaySource = {};
+
+        dataDisplaySource.doUpdate = function(updatedComponent) {
+            //set the component instance for this data source
+            component = updatedComponent;
+            dataTable = this.getField("member.data");
+            layoutFunctionMember = component.getField("member.layout");
+            isInputValidFunctionMember = this.getField("member.isInputValid");
+            messenger = new Messenger(layoutFunctionMember);
+            //update depends on multiplefields
+            return ( (component.isMemberDataUpdated("member.data")) ||
+                (component.isMemberCodeUpdated("member.layout")) ||
+                (component.isMemberCodeUpdated("member.isInputValid")) );
+        },
         
         //return desired form value
-        callbacks.getData = () => {
-            let dataTable = this.getField("member.data");
+        callbacks.getData = function() {
             dataTable.getData();
         }
         
         //return form layout
-        callbacks.getLayoutInfo = () => {              
-            let layoutFunction = layoutFunctionMember.getData();
+        dataDisplaySource.getLayoutInfo = function() {              
             return layoutFunction();
         }
         
         //edit ok - always true
-        callbacks.getEditOk = () => true;
+        dataDisplaySource.getEditOk = function() {
+            return true;
+        }
         
         //save data - just form value here
-        var messenger = new Messenger(layoutFunctionMember);
-        callbacks.saveData = (formValue) => {
-            
+        
+        dataDisplaySource.saveData = (formValue) => {
             //validate input
-            let isInputValidFunctionMember = this.getField("member.isInputValid");
             var isInputValid = isInputValidFunctionMember.getData();
             var validateResult = isInputValid(formValue);
             if(validateResult !== true) {
@@ -133,12 +146,13 @@ export default class FormDataComponent extends Component {
                 }
             }
 
-            //save the data
+            //save the data - send via messenger to the variable named "data" in code, which is the field 
+            //named "member.data", NOT the field named "data"
             messenger.dataUpdate("data",formValue);
             return true;
         }
         
-        return callbacks;
+        return dataDisplaySource;
     }
 
     //======================================
@@ -148,62 +162,33 @@ export default class FormDataComponent extends Component {
 }
 
 
-FormDataComponent.VIEW_FORM = "Form";
-FormDataComponent.VIEW_LAYOUT_CODE = "Layout Code";
-FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE = "Layout Private";
-FormDataComponent.VIEW_FORM_VALUE = "Form Value";
-FormDataComponent.VIEW_INPUT_INVALID_CODE = "isInputValid(formValue)";
-FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE = "isInputValid Private";
+FormDataComponentView.VIEW_FORM = "Form";
+FormDataComponentView.VIEW_LAYOUT_CODE = "Layout Code";
+FormDataComponentView.VIEW_LAYOUT_SUPPLEMENTAL_CODE = "Layout Private";
+FormDataComponentView.VIEW_FORM_VALUE = "Form Value";
+FormDataComponentView.VIEW_INPUT_INVALID_CODE = "isInputValid(formValue)";
+FormDataComponentView.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE = "isInputValid Private";
 
-FormDataComponent.VIEW_MODES = [
-    FormDataComponent.VIEW_FORM,
-    FormDataComponent.VIEW_LAYOUT_CODE,
-    FormDataComponent.VIEW_LAYOUT_SUPPLEMENTAL_CODE,
-    FormDataComponent.VIEW_INPUT_INVALID_CODE,
-    FormDataComponent.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE,
-    FormDataComponent.VIEW_FORM_VALUE
+FormDataComponentView.VIEW_MODES = [
+    FormDataComponentView.VIEW_FORM,
+    FormDataComponentView.VIEW_LAYOUT_CODE,
+    FormDataComponentView.VIEW_LAYOUT_SUPPLEMENTAL_CODE,
+    FormDataComponentView.VIEW_INPUT_INVALID_CODE,
+    FormDataComponentView.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE,
+    FormDataComponentView.VIEW_FORM_VALUE
 ];
 
-FormDataComponent.TABLE_EDIT_SETTINGS = {
-    "viewModes": FormDataComponent.VIEW_MODES,
-    "defaultView": FormDataComponent.VIEW_FORM,
+FormDataComponentView.TABLE_EDIT_SETTINGS = {
+    "viewModes": FormDataComponentView.VIEW_MODES,
+    "defaultView": FormDataComponentView.VIEW_FORM,
 }
 
 //======================================
 // This is the component generator, to register the component
 //======================================
 
-FormDataComponent.displayName = "Form Data Table";
-FormDataComponent.uniqueName = "apogeeapp.app.FormDataComponent";
-FormDataComponent.hasTabEntry = false;
-FormDataComponent.hasChildEntry = true;
-FormDataComponent.ICON_RES_PATH = "/componentIcons/formControl.png";
-FormDataComponent.DEFAULT_MEMBER_JSON = {
-        "type": "apogee.Folder",
-        "childrenNotWriteable": true,
-        "children": {
-            "layout": {
-                "name": "layout",
-                "type": "apogee.FunctionTable",
-                "updateData": {
-                    "argList":[],
-                }
-            },
-            "data": {
-                "name": "data",
-                "type": "apogee.JsonTable",
-                "updateData": {
-                    "data": "",
-                }
-            },
-            "isInputValid": {
-                "name": "isInputValid",
-                "type": "apogee.FunctionTable",
-                "updateData": {
-                    "argList":["formValue"],
-                    "functionBody": "//If data valid, return true. If data is invalid, return an error message.\nreturn true;"
-                }
-            }
-        }
-    };
 
+FormDataComponentView.componentName = "apogeeapp.app.FormDataComponent";
+FormDataComponentView.hasTabEntry = false;
+FormDataComponentView.hasChildEntry = true;
+FormDataComponentView.ICON_RES_PATH = "/componentIcons/formControl.png";
