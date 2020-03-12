@@ -13,7 +13,9 @@ dataDisplayHelper.getMemberDataJsonDataSource = function(app,component,memberFie
             component = updatedComponent;
             dataMember = component.getField(memberFieldName);
             //return value is whether or not the data display needs to be udpated
-            return component.isMemberDataUpdated("data");
+            let reloadData = component.isMemberDataUpdated("data");
+            let reloadDataDisplay = false;
+            return {reloadData,reloadDataDisplay};
         },
 
         getData: function() {
@@ -97,7 +99,9 @@ dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,component,membe
             component = updatedComponent;
             functionMember = component.getField(memberFieldName);
             //return value is whether or not the data display needs to be udpated
-            return component.isMemberFieldUpdated(memeberFieldName,"functionBody");
+            let reloadData = component.isMemberFieldUpdated(memberFieldName,"functionBody");
+            let reloadDataDisplay = false;
+            return {reloadData,reloadDataDisplay};
         },
 
         getData: function() {
@@ -131,7 +135,9 @@ dataDisplayHelper.getMemberSupplementalDataSource = function(app,component,membe
             component = updatedComponent;
             functionMember = component.getField(memberFieldName);
             //return value is whether or not the data display needs to be udpated
-            return component.isMemberFieldUpdated(memeberFieldName,"supplementalCode");
+            let reloadData = component.isMemberFieldUpdated(memberFieldName,"supplementalCode");
+            let reloadDataDisplay = false;
+            return {reloadData,reloadDataDisplay};
         },
 
         getData: function() {

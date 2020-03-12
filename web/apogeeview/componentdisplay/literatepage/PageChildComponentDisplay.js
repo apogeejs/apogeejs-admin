@@ -114,7 +114,7 @@ export default class PageChildComponentDisplay {
         if(this.displayContainerMap) {
             let displayContainer = this.displayContainerMap[viewType];
             if(displayContainer) {
-                displayContainer.forceClearDisplay();
+                displayContainer.reloadDisplay();
             }
         }
     }

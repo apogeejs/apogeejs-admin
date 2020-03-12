@@ -3,7 +3,7 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 import apogeeui from "/apogeeui/apogeeui.js";
@@ -41,11 +41,8 @@ export default class CustomComponentView extends ComponentView {
             
             case CustomComponentView.VIEW_OUTPUT:
                 displayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
-                this.activeOutputMode = displayContainer;
                 var dataDisplaySource = this.getOutputDataDisplaySource();
-                var html = this.getField("html");
-                var resource = this.createResource();
-                var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,dataDisplaySource,this.member,html,resource);
+                var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,dataDisplaySource);
                 return dataDisplay;
                 
             case CustomComponentView.VIEW_CODE:
@@ -79,17 +76,41 @@ export default class CustomComponentView extends ComponentView {
         //this is the instance of the component that is active for the data source - it will be updated
         //as the component changes.
         let component = this;
+        let member = component.getMember();
         return {
+
+            //This method reloads the component and checks if there is a DATA update. UI update is checked later.
             doUpdate: function(updatedComponent) {
                 //set the component instance for this data source
                 component = updatedComponent;
+                member = component.getMember();
                 //return value is whether or not the data display needs to be udpated
-                return component.isMemberDataUpdated("member");
+                let reloadData = component.isMemberDataUpdated("member");
+                let reloadDataDisplay = component.areAnyFieldsUpdated(["html","uiCode"]);
+                return {reloadData,reloadDataDisplay};
             },
+
             getData: function() {
-                component.getMember().getData();
+                return member.getData();
+            },
+
+            //below - custom methods for HtmlJsDataDisplay
+
+            //returns the HTML for the data display
+            getHtml: function() {
+                return component.getField("html");
+            },
+
+            //returns the resource for the data display
+            getResource: function() {
+                return component.getResource();
+            },
+
+            //gets the mebmer used as a refernce for the UI manager passed to the resource functions 
+            getContextMember: function() {
+                return member();
             }
-        };
+        }
     }
 
     /** This method returns the data dispklay data source for the code field data displays. */
@@ -102,7 +123,9 @@ export default class CustomComponentView extends ComponentView {
                 //set the component instance for this data source
                 component = updatedComponent;
                 //return value is whether or not the data display needs to be udpated
-                return component.isFieldUpdated(codeFieldName);
+                let reloadData = component.isFieldUpdated(codeFieldName);
+                let reloadDataDisplay = false;
+                return {reloadData,reloadDataDisplay};
             },
 
             getData: function() {

@@ -120,7 +120,7 @@ module.exports = function(grunt) {
                 "apogeeapp/actions/updatelink.js",
                 "apogeeview/datadisplay/ViewMode.js",
                 "apogeeview/datadisplay/DataDisplay.js",
-                "apogeeview/datadisplay/dataDisplayCallbackHelper.js",
+                "apogeeview/datadisplay/dataDisplayHelper.js",
                 "apogeeview/datadisplay/TextAreaEditor.js",
                 "apogeeview/datadisplay/AceTextEditor.js",		
                 "apogeeview/datadisplay/HtmlJsDataDisplay.js",

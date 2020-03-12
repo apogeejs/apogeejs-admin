@@ -10,26 +10,22 @@ export default class ConfigurableFormEditor extends DataDisplay {
     /** This allows for a static or dynamic layout setting
      * @param {type} displayContainer - the displayContainer
      * @param {type} dataSource - {
+     *  - doUpdate - this should return reloadDataDisplay = true if the form should be reconfigured. 
+     *          otherwise it should return reloadData if the form data should be reloaded.
      *  - getData - returns the desired form value,
-     *  - getEditOk - gets if form is editable,
-     *  - setData - called when data is saved, with the form value
-     *  - getLayoutInfo - OPTIONAL - if this is set, the layout will be dynamically loaded whenever the
-     *  form is updated. Alternatively, the fixed layout info can be passed in as a constructor argument.
+     *  - getEditOk - gets if form is editable (optional)
+     *  - setData - called when data is saved, with the form value (optional)
+     *  - getLayout - This returns the layour for the configurable form.
      *  }
-     * @param {type} optionalFixedLayoutInfo - the layout for the configurable panel. 
-     * It should be populated if a fixed layout is OK. In this case, the getLayoutInfo
-     * allack should not be populated. 
      */
-    constructor(displayContainer,dataSource,optionalFixedLayoutInfo) {
+    constructor(displayContainer,dataSource) {
         super(displayContainer,dataSource);
         
-        //layout can be fixed or dynamic
-        this.dynamicLayoutCallback = dataSource.getLayoutInfo;
-        
+        //construct the display
         this.panel = new ConfigurablePanel();
-        
+        let layout = dataSource.getLayout();
         if(optionalFixedLayoutInfo) {
-            this.panel.configureForm(optionalFixedLayoutInfo);
+            this.panel.configureForm(layout);
         }
     }
 
@@ -47,12 +43,6 @@ export default class ConfigurableFormEditor extends DataDisplay {
     /** This is passed the data form the data callback, which should be the extended data  - including layout + value */
     setData(savedFormValue) {
         //input data is the layout and the value
-
-        //set layout if dynmaically loaded
-        if(this.dynamicLayoutCallback) {
-            var layoutInfo = this.dynamicLayoutCallback();
-            this.panel.configureForm(layoutInfo);
-        }
         this.panel.setValue(savedFormValue);
         
         //set change to enable save bar is form value differs from initial data

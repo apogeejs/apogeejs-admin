@@ -13,14 +13,13 @@ export default class ConfigurableFormDisplay extends DataDisplay {
     constructor(displayContainer,dataSource) {
         super(displayContainer,dataSource);  
         
-        this.panel = this.panel = new ConfigurablePanel();
+        this.panel = new ConfigurablePanel();
     }
     
     /** This method will return undefined until showData is called. */
     getContent() {
         return this.panel.getElement();
     }
-    
     
     //this sets the data into the editor display. REQUIRED
     setData(layoutData) {

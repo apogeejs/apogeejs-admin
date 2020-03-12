@@ -132,10 +132,6 @@ export default class CustomComponent extends Component {
             }
         }
 
-        //make sure we get rid of the old display
-        if(this.activeOutputMode) {
-            this.activeOutputMode.forceClearDisplay();
-        }
     }
 
     //==============================

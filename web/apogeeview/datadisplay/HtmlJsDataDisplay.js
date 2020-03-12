@@ -23,13 +23,11 @@ import apogeeui from "/apogeeui/apogeeui.js";
 
 /** This is the display/editor for the custom control output. */
 export default class HtmlJsDataDisplay extends DataDisplay {
-    constructor(app,displayContainer,dataSource,member,html,resource) {
+    constructor(app,displayContainer,dataSource) {
         
         super(displayContainer,dataSource);
         
         this.app = app;
-        this.resource = resource;
-        this.member = member;
         
         this.isLoaded = false;
         this.cachedData = undefined;
@@ -38,6 +36,41 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             "position":"relative"
         });
 
+        this._constructDisplay();
+    }
+
+    getContent() {
+        return this.outputElement;
+    }
+
+    /** This method updates the internal component instance and also returns
+     * true if the data display needs to be refreshed. */
+    doUpdate(updatedComponent) {
+        if(this.dataSource) {
+            //updata the data source and get the flag on whether or not to reload the data in the view
+            let doDataReload = this.dataSource.doUpdate(updatedComponent);
+
+            //check if we need to reload the view
+            if(this.dataSource.doUiReload()) {
+                
+            }
+            else {
+                return doDataReload;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+
+    /** This method implements the methods needed for the display interface from the data source */
+    _constructDisplay() {
+
+        let dataSource = this.getDataSource();
+        let html = dataSource.getHtml();
+        let resource = dataSource.getResource();
+        let member = dataSource.getContextMember();
+
         //content
         if(html) {
             this.outputElement.innerHTML = html;
@@ -45,12 +78,12 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         
         //this gives the ui code access to some data display functions
         var admin = {
-            getMessenger: () => new UiCommandMessenger(this.app,this.member),
+            getMessenger: () => new UiCommandMessenger(this.app,member),
             startEditMode: () => this.startEditMode(),
             endEditMode: () => this.endEditMode()
         }
 
-        if(this.resource.onLoad) {
+        if(resource.onLoad) {
             this.onLoad = () => {
                 try {
                     resource.onLoad.call(resource,this.outputElement,admin);
@@ -65,7 +98,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 catch(error) {
                     if(error.stack) console.error(error.stack);
                     
-                    alert("Error in " + this.member.getFullName() + " onLoad function: " + error.message);
+                    alert("Error in " + member.getFullName() + " onLoad function: " + error.message);
                 }
             };
         }
@@ -73,7 +106,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             this.isLoaded = true;
         }
 
-        if(this.resource.onUnload) {   
+        if(resource.onUnload) {   
             this.onUnload = () => {
                 try {
                     
@@ -85,14 +118,14 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 catch(error) {
                     if(error.stack) console.error(error.stack);
                     
-                    alert("Error in " + this.member.getFullName()+ " onUnload function: " + error.message);
+                    alert("Error in " + member.getFullName()+ " onUnload function: " + error.message);
                 }
             }
         }
 
         this.setData = (data) => {
             try {
-                if(this.resource.setData) {
+                if(resource.setData) {
                     if(!this.isLoaded) {
                         this.cachedData = data;
                         return;
@@ -108,19 +141,19 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             catch(error) {
                 if(error.stack) console.error(error.stack);
                 
-                alert("Error in " + this.member.getFullName() + " setData function: " + error.message);
+                alert("Error in " + member.getFullName() + " setData function: " + error.message);
             }
         }
         
-        if(this.resource.getData) {
+        if(resource.getData) {
             this.getData = () => {
                 try {
-                    return this.resource.getData.call(resource,this.outputElement,admin);
+                    return resource.getData.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
                     if(error.stack) console.error(error.stack);
                     
-                    alert("Error in " + this.member.getFullName() + " getData function: " + error.message);
+                    alert("Error in " + member.getFullName() + " getData function: " + error.message);
                 }
             }
         }
@@ -131,7 +164,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         }
 
 
-        if(this.resource.isCloseOk) {     
+        if(resource.isCloseOk) {     
             this.isCloseOk = () => {
                 try {
                     return resource.isCloseOk.call(resource,this.outputElement,admin);
@@ -139,12 +172,12 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 catch(error) {
                     if(error.stack) console.error(error.stack);
                     
-                    alert("Error in " + this.member.getFullName() + " isCloseOk function: " + error.message);
+                    alert("Error in " + member.getFullName() + " isCloseOk function: " + error.message);
                 }
             }
         }
 
-        if(this.resource.destroy) {
+        if(resource.destroy) {
             this.destroy = () => {
                 try {
                     resource.destroy.call(resource,this.outputElement,admin);
@@ -152,7 +185,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 catch(error) {
                     if(error.stack) console.error(error.stack);
                     
-                    alert("Error in " + this.member.getFullName() + " destroy function: " + error.message);
+                    alert("Error in " + member.getFullName() + " destroy function: " + error.message);
                 }
             }
         }
@@ -168,13 +201,9 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             catch(error) {
                 if(error.stack) console.error(error.stack);
                 
-                alert("Error in " + this.member.getFullName() + " init function: " + error.message);
+                alert("Error in " + member.getFullName() + " init function: " + error.message);
             }
         }
-    }
-    
-    getContent() {
-        return this.outputElement;
     }
 }
 

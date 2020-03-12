@@ -15,7 +15,7 @@ export {default as AceTextEditor} from "/apogeeview/datadisplay/AceTextEditor.js
 export {default as ConfigurableFormDisplay} from "/apogeeview/datadisplay/ConfigurableFormDisplay.js";
 export {default as ConfigurableFormEditor} from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 export {default as DataDisplay} from "/apogeeview/datadisplay/DataDisplay.js";
-export {default as dataDisplayHelper} from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
+export {default as dataDisplayHelper} from "/apogeeview/datadisplay/dataDisplayHelper.js";
 export {default as DATA_DISPLAY_CONSTANTS} from "/apogeeview/datadisplay/dataDisplayConstants.js";
 export {default as ErrorDisplay} from "/apogeeview/datadisplay/ErrorDisplay.js";
 export {default as HandsonGridEditor} from "/apogeeview/datadisplay/HandsonGridEditor.js";

@@ -112,7 +112,7 @@ export default class WebComponentDisplay {
     reloadDisplay(viewType) {
         if(viewType == this.activeView) {
             if(this.displayContainer) {
-                displayContainer.forceClearDisplay();
+                displayContainer.reloadDisplay();
             }
         }
     }

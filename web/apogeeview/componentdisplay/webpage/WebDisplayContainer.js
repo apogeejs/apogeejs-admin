@@ -159,7 +159,7 @@ export default class WebDisplayContainer {
 
     /** This method cleasr the data display. It should only be called when the data display is not showing. 
      * maybe allow this when the display is showing - unload and reload it*/
-    forceClearDisplay() {
+    reloadDisplay() {
         //this destrpys the data display, not the container - bad name
         this.destroy();
 
@@ -195,15 +195,18 @@ export default class WebDisplayContainer {
     /** This method is called when the member is updated, to make sure the 
     * data display is up to date. */
    componentUpdated(component) {
-        //update the data display
-        if((this.dataDisplay)&&(!this.inEditMode)) {
-            let updateNeeded = this.dataDisplay.doUpdate(component);
-            if(updateNeeded) {
-                this.dataDisplay.showData();
-                this.updateViewSizeButtons();
-            }
+    //update the data display
+    if((this.dataDisplay)&&(!this.inEditMode)) {
+        let {reloadDataDisplay, reloadData} = this.dataDisplay.doUpdate(component);
+        if(reloadDataDisplay) {
+            this.reloadDisplay();
+        }
+        else if(reloadData) {
+            this.dataDisplay.showData();
+            this.updateViewSizeButtons();
         }
     }
+}
         
     //------------------------------
     // Accessed by the Editor, if applicable

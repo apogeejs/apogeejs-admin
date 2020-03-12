@@ -1,6 +1,6 @@
 import Component from "/apogeeapp/component/Component.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 
 /** This is the base class for a  basic control component. To create a

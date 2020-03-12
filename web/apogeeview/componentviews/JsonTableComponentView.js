@@ -1,7 +1,7 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HandsonGridEditor from "/apogeeview/datadisplay/HandsonGridEditor.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 
 export default class JsonTableComponentView extends ComponentView {
 
@@ -30,18 +30,19 @@ export default class JsonTableComponentView extends ComponentView {
         //create the new view element;
         switch(viewType) {
             case JsonTableComponentView.VIEW_DATA:
-                switch(this.dataView) {
+                let dataView = component.getField("dataView");
+                switch(dataView) {
                     case JsonTableComponentView.COLORIZED_DATA_VEW:
                     default:
-                        dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,component,"member");
+                        dataDisplaySource = this._wrapSourceForViewChange(dataDisplayHelper.getMemberDataTextDataSource(app,component,"member"));
                         return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                         
                     case JsonTableComponentView.TEXT_DATA_VEW:
-                        dataDisplaySource = dataDisplayHelper.getMemberDataJsonDataSource(app,component,"member");
+                        dataDisplaySource = this._wrapSourceForViewChange(dataDisplayHelper.getMemberDataJsonDataSource(app,component,"member"));
                         return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/text",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                         
                     case JsonTableComponentView.GRID_DATA_VEW:
-                        dataDisplaySource = dataDisplayHelper.getMemberDataJsonDataSource(app,component,"member");
+                        dataDisplaySource = this._wrapSourceForViewChange(dataDisplayHelper.getMemberDataJsonDataSource(app,component,"member"));
                         return new HandsonGridEditor(displayContainer,dataDisplaySource);
                         
                     // case JsonTableComponentView.PLAIN_DATA_VEW:
@@ -63,6 +64,18 @@ export default class JsonTableComponentView extends ComponentView {
                 alert("unrecognized view element!");
                 return null;
         }
+    }
+
+    /** This method updated the data display source to account for reloading the data display due to 
+     * a change in the data view. */
+    _wrapSourceForViewChange(dataDisplaySource) {
+        let originalDoUpdate = dataDisplaySource.doUpdate;
+        dataDisplaySource.doUpdate = function(updatedComponent) {
+            let returnValue = originalDoUpdate(updatedComponent);
+            returnValue.reloadDataDisplay = updatedComponent.isFieldUpdated("dataView");
+            return returnValue;
+        }
+        return dataDisplaySource;
     }
 
 

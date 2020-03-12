@@ -1,7 +1,7 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormDisplay from "/apogeeview/datadisplay/ConfigurableFormDisplay.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import UiCommandMessenger from "/apogeeapp/commands/UiCommandMessenger.js";
 
 /** This component represents a table object. */
@@ -35,7 +35,7 @@ export default class DynamicFormView extends ComponentView {
             
             case DynamicFormView.VIEW_FORM:
                 dataDisplaySource = this.getFormCallbacks();
-                return new ConfigurableFormDisplay(displayContainer,dataDisplaySource);
+                return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
                 
             case DynamicFormView.VIEW_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,component,"member");
@@ -63,16 +63,22 @@ export default class DynamicFormView extends ComponentView {
                 //set the component instance for this data source
                 component = updatedComponent;
                 functionMember = component.getField("member");
-                //update if either code field changed
-                return component.isMemberCodeUpdated("member");
+                //we have no data here, just the form layout
+                let reloadData = false;
+                let reloadDataDisplay = component.isMemberCodeUpdated("member");
+                return {reloadData,reloadDataDisplay};
             },
 
-            getData: () => {              
+            getLayout: () => {              
                 let layoutFunction = functionMember.getData();
                 let admin = {
                     getMessenger: () => new UiCommandMessenger(app,member)
                 }
                 return layoutFunction(admin);
+            },
+
+            getData: () => {              
+                return null;
             }
         }
 

@@ -4,7 +4,7 @@ import { Messenger } from "/apogee/apogeeCoreLib.js";
 import Component from "/apogeeapp/component/Component.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 import apogeeui from "/apogeeui/apogeeui.js";
@@ -154,11 +154,6 @@ export default class CustomDataComponent extends Component {
             if(fieldName == "css") {
                 apogeeui.setMemberCssData(this.getId(),fieldValue);
             }
-        }
-
-        //make sure we get rid of the old display
-        if(this.activeOutputMode) {
-            this.activeOutputMode.forceClearDisplay();
         }
     }
 

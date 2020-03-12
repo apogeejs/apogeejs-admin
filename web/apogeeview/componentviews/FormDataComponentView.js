@@ -3,7 +3,7 @@ import { Messenger } from "/apogee/apogeeCoreLib.js";
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayCallbackHelper.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form
@@ -97,7 +97,6 @@ export default class FormDataComponentView extends ComponentView {
         let layoutFunctionMember = component.getField("member.layout");
         let isInputValidFunctionMember = this.getField("member.isInputValid");
         let messenger = new Messenger(layoutFunctionMember);
-        let app = this.getModelView().getApp();
         
         var dataDisplaySource = {};
 
@@ -109,18 +108,19 @@ export default class FormDataComponentView extends ComponentView {
             isInputValidFunctionMember = this.getField("member.isInputValid");
             messenger = new Messenger(layoutFunctionMember);
             //update depends on multiplefields
-            return ( (component.isMemberDataUpdated("member.data")) ||
-                (component.isMemberCodeUpdated("member.layout")) ||
+            let reloadData = component.isMemberDataUpdated("member.data");
+            let reloadDataDisplay = ( (component.isMemberCodeUpdated("member.layout")) ||
                 (component.isMemberCodeUpdated("member.isInputValid")) );
+            return {reloadData,reloadDataDisplay};
         },
         
         //return desired form value
-        callbacks.getData = function() {
+        dataDisplaySource.getData = function() {
             dataTable.getData();
         }
         
         //return form layout
-        dataDisplaySource.getLayoutInfo = function() {              
+        dataDisplaySource.getLayout = function() {              
             return layoutFunction();
         }
         

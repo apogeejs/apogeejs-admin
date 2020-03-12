@@ -3,9 +3,18 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
 /** Editor that uses the Ace text editor.
  * 
  * @param {type} displayContainer - this is the ui container that will show the display
- * @param {type} dataSource - the dataSource for the editor {dpUpdate,getData,getEditOk,saveData}
- * @param {type} containerClass - the is the css class for the display container OPTIONAL
- */
+ * @param {type} dataSource - the dataSource for the editor. It is an object with the following functions:
+ *  - {reloadDataDisplay, reloadData} = doUpdate(updatedComponent) - Required - This function updates the component instance
+ *      held by the data source and it returns to boolean values, "reloadDataDisplay", which indicates is the data display should 
+ *      be reloaded (such as if it is replaced with a new data display or if the UI elements for it have been updated) and
+ *      "reloadData" which indicates the data value displayed in the data display should be reloaded.  
+ *  - data = getData() - Requried - This returns the data that should be displayed. The format of the data depends on the 
+ *      data display.
+ *  - editOk = getEditOk() - Optional - If present, this indicates if the data display edit mode should be used. If it is not present
+ *      it is assumed to be false.
+ *  - closeDialog = saveData(data) - Optional This is used if the data display edit mode is used. It should save the data.
+ *  - (other) - Data displays may define additional functions as needed for their implmentations.
+ */ 
 export default class DataDisplay {
     constructor(displayContainer,dataSource) {
         this.displayContainer = displayContainer;
@@ -199,5 +208,10 @@ export default class DataDisplay {
         if(this.editOk) {
             this.startEditMode();
         }
+    }
+
+    /** This method retrieves the data source for the data display */
+    getDataSource() {
+        return this.dataSource;
     }
 }

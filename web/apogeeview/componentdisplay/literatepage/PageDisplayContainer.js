@@ -362,7 +362,7 @@ export default class PageDisplayContainer {
 
     /** This method cleasr the data display. It should only be called when the data display is not showing. 
      * maybe allow this when the display is showing - unload and reload it*/
-    forceClearDisplay() {
+    reloadDisplay() {
 
         //update the stored UI state json
         this.savedUiState = this.getStateJson();
@@ -409,8 +409,11 @@ export default class PageDisplayContainer {
     componentUpdated(component) {
         //update the data display
         if((this.dataDisplay)&&(!this.inEditMode)) {
-            let updateNeeded = this.dataDisplay.doUpdate(component);
-            if(updateNeeded) {
+            let {reloadDataDisplay, reloadData} = this.dataDisplay.doUpdate(component);
+            if(reloadDataDisplay) {
+                this.reloadDisplay();
+            }
+            else if(reloadData) {
                 this.dataDisplay.showData();
                 this.updateViewSizeButtons();
             }
