@@ -74,7 +74,7 @@ export default class Component extends FieldObject {
     areAnyMemberFieldsUpdated(memberFieldName,memberFieldFieldNameList) {
         if(this.isFieldUpdated(memberFieldName)) {
             let member = this.getField(memberFieldName);
-            return member.areAnyFieldUpdated(memberFieldFieldNameList);
+            return member.areAnyFieldsUpdated(memberFieldFieldNameList);
         }
         else {
             return false;

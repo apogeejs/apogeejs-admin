@@ -31,15 +31,15 @@ export default class CustomDataComponent extends Component {
         //internal tables
         let dataMember = folder.lookupChild("data");
         this.setField("member.data",dataMember);
-        modelManager.registerTable(dataMember,this,folder);
+        modelManager.registerMember(dataMember,this,folder);
 
         let inputMember = folder.lookupChild("input");
         this.setField("member.input",inputMember);
-        modelManager.registerTable(inputMember,this,folder);
+        modelManager.registerMember(inputMember,this,folder);
 
         let isInputValidFunctionMember = folder.lookupChild("isInputValid");
         this.setField("member.isInputValid",isInputValidFunctionMember);
-        modelManager.registerTable(isInputValidFunctionMember,this,folder);
+        modelManager.registerMember(isInputValidFunctionMember,this,folder);
 
         this.setField("destroyOnInactive",false); //default to keep alive
         this.setField("html","");
@@ -300,7 +300,7 @@ customDataComponentUpdateData.executeCommand = function(workspaceManager,command
 }
 
 customDataComponentUpdateData.commandInfo = {
-    "type": "customComponentUpdateCommand",
+    "type": "customDataComponentUpdateCommand",
     "targetType": "component",
     "event": "updated"
 }

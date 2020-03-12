@@ -19,6 +19,10 @@ import JsonTableComponentView from "/apogeeview/componentviews/JsonTableComponen
 import FolderComponentView from "/apogeeview/componentviews/FolderComponentView.js";
 import FunctionComponentView from "/apogeeview/componentviews/FunctionComponentView.js";
 import FolderFunctionComponentView from "/apogeeview/componentviews/FolderFunctionComponentView.js";
+import DynamicFormView from "/apogeeview/componentviews/DynamicFormView.js";
+import FormDataComponentView from "/apogeeview/componentviews/FormDataComponentView.js";
+import CustomComponentView from "/apogeeview/componentviews/CustomComponentView.js";
+import CustomDataComponentView from "/apogeeview/componentviews/CustomDataComponentView.js";
 import ErrorComponentView from "/apogeeview/componentviews/ErrorComponentView.js";
 
 import "/apogeeui/configurablepanel/ConfigurablePanelInit.js";
@@ -44,6 +48,10 @@ export default class ApogeeView {
         ApogeeView.registerComponentView(FunctionComponentView);
         ApogeeView.registerComponentView(FolderFunctionComponentView);
         ApogeeView.registerComponentView(ErrorComponentView);
+        ApogeeView.registerComponentView(DynamicFormView);
+        ApogeeView.registerComponentView(FormDataComponentView);
+        ApogeeView.registerComponentView(CustomComponentView);
+        ApogeeView.registerComponentView(CustomDataComponentView);
         //######################################################################
     }
 

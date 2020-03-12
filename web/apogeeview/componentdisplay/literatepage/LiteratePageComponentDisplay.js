@@ -346,10 +346,9 @@ export default class LiteratePageComponentDisplay extends EventManager {
             initialValues.parentName = this.componentView.getFullName();
 
             let appView = this.componentView.getModelView().getWorkspaceView().getAppView();
-            let componentViewClassFunction = componentName => appView.constructor.getComponentViewClass(componentName);
 
             //I tacked on a piggyback for testing!!!
-            addAdditionalComponent(app,componentViewClassFunction,initialValues,null,null);
+            addAdditionalComponent(appView,app,initialValues,null,null);
         }
         this.componentToolbarContainer.appendChild(buttonElement);
     }

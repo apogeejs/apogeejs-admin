@@ -153,7 +153,7 @@ export function addAdditionalComponent(appView,app,optionalInitialProperties,opt
     //get the display names
     let additionalComponents = app.getAdditionalComponentNames();
     let componentInfoList = additionalComponents.map( componentName => {
-        let componentClass = app.getComponentClass(componentUniqueName); 
+        let componentClass = app.getComponentClass(componentName); 
         return {displayName: componentClass.displayName, uniqueName: componentName};
     });
     //open select component dialog

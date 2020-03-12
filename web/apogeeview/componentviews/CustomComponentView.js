@@ -40,7 +40,7 @@ export default class CustomComponentView extends ComponentView {
         switch(viewType) {
             
             case CustomComponentView.VIEW_OUTPUT:
-                displayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
+                displayContainer.setDisplayDestroyFlags(component.getDisplayDestroyFlags());
                 var dataDisplaySource = this.getOutputDataDisplaySource();
                 var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,dataDisplaySource);
                 return dataDisplay;
@@ -75,7 +75,7 @@ export default class CustomComponentView extends ComponentView {
     getOutputDataDisplaySource() {
         //this is the instance of the component that is active for the data source - it will be updated
         //as the component changes.
-        let component = this;
+        let component = this.getComponent();
         let member = component.getMember();
         return {
 
@@ -103,12 +103,12 @@ export default class CustomComponentView extends ComponentView {
 
             //returns the resource for the data display
             getResource: function() {
-                return component.getResource();
+                return component.createResource();
             },
 
             //gets the mebmer used as a refernce for the UI manager passed to the resource functions 
             getContextMember: function() {
-                return member();
+                return member;
             }
         }
     }
@@ -117,7 +117,7 @@ export default class CustomComponentView extends ComponentView {
     getUiDataDisplaySource(codeFieldName) {
         //this is the instance of the component that is active for the data source - it will be updated
         //as the component changes.
-        let component = this;
+        let component = this.getComponent();
         return {
             doUpdate: function(updatedComponent) {
                 //set the component instance for this data source
@@ -129,7 +129,7 @@ export default class CustomComponentView extends ComponentView {
             },
 
             getData: function() {
-                let codeField = compoent.getField(codeFieldName);
+                let codeField = component.getField(codeFieldName);
                 if((codeField === undefined)||(codeField === null)) codeField = "";
                 return codeField;
             },

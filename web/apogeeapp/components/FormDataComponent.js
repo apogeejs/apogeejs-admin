@@ -21,15 +21,15 @@ export default class FormDataComponent extends Component {
         //internal tables
         let dataMember = folder.lookupChild("data");
         this.setField("member.data",dataMember);
-        modelManager.registerTable(dataMember,this,folder);
+        modelManager.registerMember(dataMember,this,folder);
 
         let layoutFunctionMember = folder.lookupChild("layout");
         this.setField("member.layout",layoutFunctionMember);
-        modelManager.registerTable(layoutMember,this,folder);
+        modelManager.registerMember(layoutFunctionMember,this,folder);
 
         let isInputValidFunctionMember = folder.lookupChild("isInputValid");
         this.setField("member.isInputValid",isInputValidFunctionMember);
-        modelManager.registerTable(isInputValidFunctionMember,this,folder);
+        modelManager.registerMember(isInputValidFunctionMember,this,folder);
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     };
 

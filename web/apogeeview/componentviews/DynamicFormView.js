@@ -1,6 +1,6 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import ConfigurableFormDisplay from "/apogeeview/datadisplay/ConfigurableFormDisplay.js";
+import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import UiCommandMessenger from "/apogeeapp/commands/UiCommandMessenger.js";
 
@@ -97,14 +97,14 @@ DynamicFormView.VIEW_CODE = "Code";
 DynamicFormView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 DynamicFormView.VIEW_MODES = [
-    DynamicForm.VIEW_FORM,
-    DynamicForm.VIEW_CODE,
-    DynamicForm.VIEW_SUPPLEMENTAL_CODE
+    DynamicFormView.VIEW_FORM,
+    DynamicFormView.VIEW_CODE,
+    DynamicFormView.VIEW_SUPPLEMENTAL_CODE
 ];
 
 DynamicFormView.TABLE_EDIT_SETTINGS = {
-    "viewModes": DynamicForm.VIEW_MODES,
-    "defaultView": DynamicForm.VIEW_FORM
+    "viewModes": DynamicFormView.VIEW_MODES,
+    "defaultView": DynamicFormView.VIEW_FORM
 }
 
 //======================================

@@ -17,25 +17,6 @@ export default class FormDataComponentView extends ComponentView {
     constructor(modelView,folderComponent) {
         //extend edit component
         super(modelView,folderComponent);
-        
-        //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
-        folder.setChildrenWriteable(false);
-        
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        //internal tables
-        let dataMember = folder.lookupChild("data");
-        this.setField("member.data",dataMember);
-        modelManager.registerTable(dataMember,this,folder);
-
-        let layoutFunctionMember = folder.lookupChild("layout");
-        this.setField("member.layout",layoutFunctionMember);
-        modelManager.registerTable(layoutMember,this,folder);
-
-        let isInputValidFunctionMember = folder.lookupChild("isInputValid");
-        this.setField("member.isInputValid",isInputValidFunctionMember);
-        modelManager.registerTable(isInputValidFunctionMember,this,folder);
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     };
 
     //==============================
@@ -93,9 +74,9 @@ export default class FormDataComponentView extends ComponentView {
 
     getFormEditorCallbacks() {
         let component = this.getComponent();
-        let dataTable = this.getField("member.data");
+        let dataTable = component.getField("member.data");
         let layoutFunctionMember = component.getField("member.layout");
-        let isInputValidFunctionMember = this.getField("member.isInputValid");
+        let isInputValidFunctionMember = component.getField("member.isInputValid");
         let messenger = new Messenger(layoutFunctionMember);
         
         var dataDisplaySource = {};
@@ -103,9 +84,9 @@ export default class FormDataComponentView extends ComponentView {
         dataDisplaySource.doUpdate = function(updatedComponent) {
             //set the component instance for this data source
             component = updatedComponent;
-            dataTable = this.getField("member.data");
+            dataTable = component.getField("member.data");
             layoutFunctionMember = component.getField("member.layout");
-            isInputValidFunctionMember = this.getField("member.isInputValid");
+            isInputValidFunctionMember = component.getField("member.isInputValid");
             messenger = new Messenger(layoutFunctionMember);
             //update depends on multiplefields
             let reloadData = component.isMemberDataUpdated("member.data");
@@ -116,11 +97,12 @@ export default class FormDataComponentView extends ComponentView {
         
         //return desired form value
         dataDisplaySource.getData = function() {
-            dataTable.getData();
+            return dataTable.getData();
         }
         
         //return form layout
-        dataDisplaySource.getLayout = function() {              
+        dataDisplaySource.getLayout = function() { 
+            let layoutFunction = layoutFunctionMember.getData();    
             return layoutFunction();
         }
         

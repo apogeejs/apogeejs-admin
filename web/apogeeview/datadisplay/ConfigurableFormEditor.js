@@ -23,9 +23,8 @@ export default class ConfigurableFormEditor extends DataDisplay {
         
         //construct the display
         this.panel = new ConfigurablePanel();
-        let layout = dataSource.getLayout();
-        if(optionalFixedLayoutInfo) {
-            this.panel.configureForm(layout);
+        if(dataSource.getLayout) {
+            this.panel.configureForm(dataSource.getLayout());
         }
     }
 

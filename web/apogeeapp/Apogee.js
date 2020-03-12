@@ -9,10 +9,10 @@ import JsonTableComponent from "/apogeeapp/components/JsonTableComponent.js";
 import FunctionComponent from "/apogeeapp/components/FunctionComponent.js";
 import FolderComponent from "/apogeeapp/components/FolderComponent.js";
 import FolderFunctionComponent from "/apogeeapp/components/FolderFunctionComponent.js";
-//import DynamicForm from "/apogeeapp/components/DynamicForm.js";
-//import FormDataComponent from "/apogeeapp/components/FormDataComponent.js";
-//import CustomComponent from "/apogeeapp/components/CustomComponent.js";
-//import CustomDataComponent from "/apogeeapp/components/CustomDataComponent.js";
+import DynamicForm from "/apogeeapp/components/DynamicForm.js";
+import FormDataComponent from "/apogeeapp/components/FormDataComponent.js";
+import CustomComponent from "/apogeeapp/components/CustomComponent.js";
+import CustomDataComponent from "/apogeeapp/components/CustomDataComponent.js";
 import ErrorComponent from "/apogeeapp/components/ErrorComponent.js";
 
 import EsModuleEntry from "/apogeeapp/references/EsModuleEntry.js";
@@ -318,12 +318,12 @@ export default class Apogee extends EventManager {
         this.registerStandardComponent(FolderComponent);
         this.registerStandardComponent(FunctionComponent);
         this.registerStandardComponent(FolderFunctionComponent);
-        //this.registerStandardComponent(DynamicForm);
-        //this.registerStandardComponent(FormDataComponent);
+        this.registerStandardComponent(DynamicForm);
+        this.registerStandardComponent(FormDataComponent);
         
         //additional components
-        //this.registerComponent(CustomComponent);
-        //this.registerComponent(CustomDataComponent);
+        this.registerComponent(CustomComponent);
+        this.registerComponent(CustomDataComponent);
 
         //load the error class, but not as either a standard or additional component
         this.componentClasses[ErrorComponent.uniqueName] = ErrorComponent;

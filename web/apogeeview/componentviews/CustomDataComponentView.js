@@ -47,7 +47,7 @@ export default class CustomDataComponentView extends ComponentView {
         switch(viewType) {
             
             case CustomDataComponentView.VIEW_FORM:
-                displayContainer.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
+                displayContainer.setDisplayDestroyFlags(component.getDisplayDestroyFlags());
                 var dataDisplaySource = this.getOutputDataDisplaySource();
                 var dataDisplay = new HtmlJsDataDisplay(displayContainer,dataDisplaySource);
                 return dataDisplay;
@@ -86,7 +86,7 @@ export default class CustomDataComponentView extends ComponentView {
     getOutputDataDisplaySource() {
         //this is the instance of the component that is active for the data source - it will be updated
         //as the component changes.
-        let component = this;
+        let component = this.getComponent();
         let inputMember = component.getField("member.input");
         return {
 
@@ -127,7 +127,7 @@ export default class CustomDataComponentView extends ComponentView {
 
             //returns the resource for the data display
             getResource: function() {
-                return component.getResource();
+                return component.createResource();
             },
 
             //gets the mebmer used as a refernce for the UI manager passed to the resource functions 
@@ -141,7 +141,7 @@ export default class CustomDataComponentView extends ComponentView {
     getUiDataDisplaySource(codeFieldName) {
         //this is the instance of the component that is active for the data source - it will be updated
         //as the component changes.
-        let component = this;
+        let component = this.getComponent();
         return {
             doUpdate: function(updatedComponent) {
                 //set the component instance for this data source

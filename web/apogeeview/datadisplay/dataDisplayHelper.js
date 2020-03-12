@@ -141,7 +141,7 @@ dataDisplayHelper.getMemberSupplementalDataSource = function(app,component,membe
         },
 
         getData: function() {
-            functionMember.getSupplementalCode();
+            return functionMember.getSupplementalCode();
         },
 
         getEditOk: function() {
