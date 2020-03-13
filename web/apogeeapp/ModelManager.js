@@ -333,8 +333,9 @@ export default class ModelManager  extends FieldObject {
 
     /** This method responds to a "new" menu event. */
     memberDeleted(member) {
+        let memberId = member.getId();
         let oldComponentMap = this.getField("componentMap");
-        var componentInfo = oldComponentMap[member.getId()];
+        var componentInfo = oldComponentMap[memberId];
 
         if(componentInfo) {
             //copy the old map

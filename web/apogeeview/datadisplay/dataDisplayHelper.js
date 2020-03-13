@@ -13,7 +13,7 @@ dataDisplayHelper.getMemberDataJsonDataSource = function(app,component,memberFie
             component = updatedComponent;
             dataMember = component.getField(memberFieldName);
             //return value is whether or not the data display needs to be udpated
-            let reloadData = component.isMemberDataUpdated("data");
+            let reloadData = component.isMemberDataUpdated(memberFieldName);
             let reloadDataDisplay = false;
             return {reloadData,reloadDataDisplay};
         },

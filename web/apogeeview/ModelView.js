@@ -119,18 +119,21 @@ export default class ModelView {
 
     onComponentDeleted(memberId) {
         let componentView = this.componentViewMap[memberId];
-        if(componentView) componentView.onDelete();
-        delete this.componentViewMap[memberId];
+        if(componentView) {
+            componentView.onDelete();
+    
+            //remove from the parent parent
+            let parentComponentView = componentView.getLastAssignedParentComponentView();
+            if(parentComponentView) {
+                parentComponentView.removeChild(componentView);
+            }
+            else {
+                //this is a root component
+                this.treeEntry.removeChild(componentView.getTreeEntry());
+            }
+        }
 
-        //remove from the parent parent
-        let parentComponentView = componentView.getLastAssignedParentComponentView();
-        if(parentComponentView) {
-            parentComponentView.removeChild(componentView);
-        }
-        else {
-            //this is a root component
-            this.treeEntry.removeChild(componentView.getTreeEntry());
-        }
+        delete this.componentViewMap[memberId];
     }
 
     onModelUpdated(modelManager) {

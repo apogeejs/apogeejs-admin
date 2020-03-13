@@ -23,8 +23,8 @@ export default class ConfigurableFormEditor extends DataDisplay {
         
         //construct the display
         this.panel = new ConfigurablePanel();
-        if(dataSource.getLayout) {
-            this.panel.configureForm(dataSource.getLayout());
+        if(dataSource.getDisplayData) {
+            this.panel.configureForm(dataSource.getDisplayData());
         }
     }
 
@@ -45,15 +45,18 @@ export default class ConfigurableFormEditor extends DataDisplay {
         this.panel.setValue(savedFormValue);
         
         //set change to enable save bar is form value differs from initial data
-        var onChange = (currentFormValue,form) => {
-            if(apogeeutil.jsonEquals(currentFormValue,savedFormValue)) {
-                this.endEditMode()
+        let dataSource = this.getDataSource();
+        if((dataSource.getEditOk)&&(dataSource.getEditOk())) {
+            var onChange = (currentFormValue,form) => {
+                if(apogeeutil.jsonEquals(currentFormValue,savedFormValue)) {
+                    this.endEditMode()
+                }
+                else {
+                    this.startEditMode();
+                }
             }
-            else {
-                this.startEditMode();
-            }
-        }
-        this.panel.addOnChange(onChange);     
+            this.panel.addOnChange(onChange);
+        }     
     }
 }
 

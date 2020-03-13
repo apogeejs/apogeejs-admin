@@ -3,7 +3,6 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Component from "/apogeeapp/component/Component.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
-import apogeeui from "/apogeeui/apogeeui.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will

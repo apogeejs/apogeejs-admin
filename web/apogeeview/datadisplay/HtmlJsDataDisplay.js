@@ -51,6 +51,8 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         let resource = dataSource.getResource();
         let member = dataSource.getContextMember();
 
+        let displayData = dataSource.getDisplayData ? dataSource.getDisplayData() : undefined;
+
         //content
         if(html) {
             this.outputElement.innerHTML = html;
@@ -68,6 +70,12 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 try {
                     resource.onLoad.call(resource,this.outputElement,admin);
                     this.isLoaded = true;
+
+                    //set the display data if we have any
+                    if((displayData !== undefined)&&(resource.setDisplayData)) {
+                        resource.setDisplayData(displayData);
+                        displayData = undefined;
+                    }
                     
                     //handle the case the data loaded before the html (which we don't want)
                     if(this.cachedData != undefined) {

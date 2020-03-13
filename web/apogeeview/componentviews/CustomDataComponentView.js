@@ -1,10 +1,9 @@
- import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import { Messenger } from "/apogee/apogeeCoreLib.js";
-
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import UiCommandMessenger from "/apogeeapp/commands/UiCommandMessenger.js";
+import apogeeui from "/apogeeui/apogeeui.js";
 
 /** This attempt has a single form edit page which returns an object. */
 // To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 
@@ -21,9 +20,27 @@ export default class CustomDataComponentView extends ComponentView {
         super(modelView,component);
     };
 
+    /** This component overrides the componentupdated to process the css data, which is managed directly in the view. */
+    componentUpdated(component) {
+        super.componentUpdated(component);
+
+        //if this is the css field, set it immediately
+        if(component.isFieldUpdated("css")) {
+            apogeeui.setMemberCssData(component.getId(),component.getField("css"));
+        }
+    }
+
     //==============================
     // Protected and Private Instance Methods
     //==============================
+
+    /** This component extends the on delete method to get rid of any css data for this component. */
+    onDelete() {
+        //remove the css data for this component
+        apogeeui.setMemberCssData(this.component.getId(),"");
+        
+        super.onDelete();
+    }
 
 
     /**  This method retrieves the table edit settings for this component instance
@@ -85,6 +102,8 @@ export default class CustomDataComponentView extends ComponentView {
         //as the component changes.
         let component = this.getComponent();
         let inputMember = component.getField("member.input");
+        let dataMember = component.getField("member.data");
+        let app = this.modelView.getApp();  
         return {
 
             //This method reloads the component and checks if there is a DATA update. UI update is checked later.
@@ -92,14 +111,19 @@ export default class CustomDataComponentView extends ComponentView {
                 //set the component instance for this data source
                 component = updatedComponent;
                 inputMember = component.getField("member.input");
+                dataMember = component.getField("member.data");
                 //return value is whether or not the data display needs to be udpated
-                let reloadData = component.isMemberDataUpdated("member.input");
-                let reloadDataDisplay = component.areAnyFieldsUpdated(["html","uiCode"]);
+                let reloadData = component.isMemberDataUpdated("member.data");
+                let reloadDataDisplay = component.areAnyFieldsUpdated(["html","uiCode","member.input"]);
                 return {reloadData,reloadDataDisplay};
             },
 
-            getData: function() {
+            getDisplayData: function() {
                 return inputMember.getData();
+            },
+
+            getData: function() {
+                return dataMember.getData();
             },
 
             //edit ok - always true
@@ -110,8 +134,8 @@ export default class CustomDataComponentView extends ComponentView {
             saveData: function(formValue) {
                 //send value to the table whose variable name is "data"
                 //the context reference is the member called "input" 
-                let messenger = new Messenger(inputMember);
-                messenger.dataUpdate("data",formValue);
+                let commandMessenger = new UiCommandMessenger(app,inputMember);
+                commandMessenger.dataUpdate("data",formValue);
                 return true;
             },
 

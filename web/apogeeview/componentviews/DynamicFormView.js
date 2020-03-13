@@ -69,7 +69,7 @@ export default class DynamicFormView extends ComponentView {
                 return {reloadData,reloadDataDisplay};
             },
 
-            getLayout: () => {              
+            getDisplayData: () => {              
                 let layoutFunction = functionMember.getData();
                 let admin = {
                     getMessenger: () => new UiCommandMessenger(app,member)

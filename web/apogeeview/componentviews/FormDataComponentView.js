@@ -1,9 +1,8 @@
-import { Messenger } from "/apogee/apogeeCoreLib.js";
-
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import UiCommandMessenger from "/apogeeapp/commands/UiCommandMessenger.js";
 
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form
@@ -77,34 +76,32 @@ export default class FormDataComponentView extends ComponentView {
         let dataTable = component.getField("member.data");
         let layoutFunctionMember = component.getField("member.layout");
         let isInputValidFunctionMember = component.getField("member.isInputValid");
-        let messenger = new Messenger(layoutFunctionMember);
+        let app = this.modelView.getApp();  
         
         var dataDisplaySource = {};
-
         dataDisplaySource.doUpdate = function(updatedComponent) {
             //set the component instance for this data source
             component = updatedComponent;
             dataTable = component.getField("member.data");
             layoutFunctionMember = component.getField("member.layout");
             isInputValidFunctionMember = component.getField("member.isInputValid");
-            messenger = new Messenger(layoutFunctionMember);
             //update depends on multiplefields
             let reloadData = component.isMemberDataUpdated("member.data");
             let reloadDataDisplay = ( (component.isMemberCodeUpdated("member.layout")) ||
                 (component.isMemberCodeUpdated("member.isInputValid")) );
             return {reloadData,reloadDataDisplay};
         },
+
+        //return form layout
+        dataDisplaySource.getDisplayData = function() { 
+            let layoutFunction = layoutFunctionMember.getData();    
+            return layoutFunction();
+        }
         
         //return desired form value
         dataDisplaySource.getData = function() {
             return dataTable.getData();
-        }
-        
-        //return form layout
-        dataDisplaySource.getLayout = function() { 
-            let layoutFunction = layoutFunctionMember.getData();    
-            return layoutFunction();
-        }
+        } 
         
         //edit ok - always true
         dataDisplaySource.getEditOk = function() {
@@ -130,7 +127,8 @@ export default class FormDataComponentView extends ComponentView {
 
             //save the data - send via messenger to the variable named "data" in code, which is the field 
             //named "member.data", NOT the field named "data"
-            messenger.dataUpdate("data",formValue);
+            let commandMessenger = new UiCommandMessenger(app,layoutFunctionMember);
+            commandMessenger.dataUpdate("data",formValue);
             return true;
         }
         

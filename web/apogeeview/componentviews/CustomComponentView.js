@@ -4,6 +4,7 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import apogeeui from "/apogeeui/apogeeui.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
@@ -15,9 +16,27 @@ export default class CustomComponentView extends ComponentView {
         super(modelView,component);
     };
 
+    /** This component overrides the componentupdated to process the css data, which is managed directly in the view. */
+    componentUpdated(component) {
+        super.componentUpdated(component);
+
+        //if this is the css field, set it immediately
+        if(component.isFieldUpdated("css")) {
+            apogeeui.setMemberCssData(component.getId(),component.getField("css"));
+        }
+    }
+
     //==============================
     // Protected and Private Instance Methods
     //==============================
+
+    /** This component extends the on delete method to get rid of any css data for this component. */
+    onDelete() {
+        //remove the css data for this component
+        apogeeui.setMemberCssData(this.component.getId(),"");
+        
+        super.onDelete();
+    }
 
     /**  This method retrieves the table edit settings for this component instance
      * @protected */
@@ -87,8 +106,12 @@ export default class CustomComponentView extends ComponentView {
                 return {reloadData,reloadDataDisplay};
             },
 
-            getData: function() {
+            getDisplayData: function() {
                 return member.getData();
+            },
+
+            getData: function() {
+                return null;
             },
 
             //below - custom methods for HtmlJsDataDisplay
