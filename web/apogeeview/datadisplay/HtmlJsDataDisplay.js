@@ -43,26 +43,6 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         return this.outputElement;
     }
 
-    /** This method updates the internal component instance and also returns
-     * true if the data display needs to be refreshed. */
-    doUpdate(updatedComponent) {
-        if(this.dataSource) {
-            //updata the data source and get the flag on whether or not to reload the data in the view
-            let doDataReload = this.dataSource.doUpdate(updatedComponent);
-
-            //check if we need to reload the view
-            if(this.dataSource.doUiReload()) {
-                
-            }
-            else {
-                return doDataReload;
-            }
-        }
-        else {
-            return false;
-        }
-    }
-
     /** This method implements the methods needed for the display interface from the data source */
     _constructDisplay() {
 

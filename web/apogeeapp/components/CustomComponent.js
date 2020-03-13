@@ -47,18 +47,18 @@ export default class CustomComponent extends Component {
     }
 
     /** This method deseriliazes data for the custom resource component. */
-    updateFromJson(json) {  
-        this.loadResourceFromJson(json);
-    }
+    // updateFromJson(json) {  
+    //     this.loadResourceFromJson(json);
+    // }
 
     /** This method deseriliazes data for the custom resource component. This will
      * work is no json is passed in. */
-    loadResourceFromJson(json) {   
-        if((json)&&(json.resource)) {
-            for(fieldName in json.resource) {
+    loadResourceFromJson(json) { 
+        if((json)&&(json.resource)) {  
+            for(let fieldName in json.resource) {
                 this.update(fieldName,json.resource[fieldName]);
             }
-        }  
+        }
     }
 
 
@@ -110,7 +110,7 @@ export default class CustomComponent extends Component {
         let initialValue = this.getField(codeFieldName);
 
         var command = {};
-        command.type = customComponentUpdateData.COMMAND_TYPE;
+        command.type = customComponentUpdateData.commandInfo.type;
         command.memberFullName = this.getFullName();
         command.fieldName = codeFieldName;
         command.initialValue = initialValue;
@@ -154,9 +154,10 @@ export default class CustomComponent extends Component {
     /** This serializes the table component. */
     writeToJson(json) {
         //store the resource info
-        json["html"] = this.getField("html");
-        json["css"] = this.getField("css");
-        json["uiCode"] = this.getField("uiCode");
+        json.resource = {};
+        json.resource["html"] = this.getField("html");
+        json.resource["css"] = this.getField("css");
+        json.resource["uiCode"] = this.getField("uiCode");
         json.destroyOnInactive = this.getField("destroyOnInactive");
     }
 
@@ -239,18 +240,23 @@ customComponentUpdateData.executeCommand = function(workspaceManager,commandData
     var commandResult = {};
     if(component) {
         try {
-            component.update(commandData.fieldName,commmandData.targetValue);
+            component.update(commandData.fieldName,commandData.targetValue);
+
+            commandResult.cmdDone = true;
+            commandResult.target = component;
+            commandResult.dispatcher = modelManager;
+            commandResult.action = "updated";
         }
         catch(error) {
             let msg = error.message ? error.message : error;
+            commandResult.cmdDone = false;
             commandResult.alertMsg = "Exception on custom component update: " + msg;
         }
     }
     else {
+        commandResult.cmdDone = false;
         commandResult.alertMsg = "Component not found: " + command.memberFullName;
     }
-
-    if(!commandResult.alertMsg) commandResult.actionDone = true;
     
     return commandResult;
 }

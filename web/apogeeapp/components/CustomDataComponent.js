@@ -37,10 +37,6 @@ export default class CustomDataComponent extends Component {
         this.setField("member.input",inputMember);
         modelManager.registerMember(inputMember,this,folder);
 
-        let isInputValidFunctionMember = folder.lookupChild("isInputValid");
-        this.setField("member.isInputValid",isInputValidFunctionMember);
-        modelManager.registerMember(isInputValidFunctionMember,this,folder);
-
         this.setField("destroyOnInactive",false); //default to keep alive
         this.setField("html","");
         this.setField("css","");
@@ -71,19 +67,19 @@ export default class CustomDataComponent extends Component {
         }
     }
 
-    /** This method deseriliazes data for the custom resource component. */
-    updateFromJson(json) {  
-        this.loadResourceFromJson(json);
-    }
+    // /** This method deseriliazes data for the custom resource component. */
+    // updateFromJson(json) {  
+    //     this.loadResourceFromJson(json);
+    // }
 
     /** This method deseriliazes data for the custom resource component. This will
      * work is no json is passed in. */
-    loadResourceFromJson(json) {   
-        if((json)&&(json.resource)) {
+    loadResourceFromJson(json) { 
+        if((json)&&(json.resource)) {  
             for(let fieldName in json.resource) {
-                this.update(json.resource[fieldName]);
+                this.update(fieldName,json.resource[fieldName]);
             }
-        } 
+        }
     }
 
     createResource() {
@@ -132,9 +128,9 @@ export default class CustomDataComponent extends Component {
     //=============================
 
     doCodeFieldUpdate(fieldName,targetValue) { 
-        var initialValue = this.getFields(fieldName);
+        var initialValue = this.getField(fieldName);
         var command = {};
-        command.type = customDataComponentUpdateData.COMMAND_TYPE;
+        command.type = customDataComponentUpdateData.commandInfo.type;
         command.memberFullName = this.getFullName();
         command.fieldName = fieldName;
         command.initialValue = initialValue;
@@ -177,9 +173,10 @@ export default class CustomDataComponent extends Component {
     /** This serializes the table component. */
     writeToJson(json) {
         //store the resource info
-        json["html"] = this.getField("html");
-        json["css"] = this.getField("css");
-        json["uiCode"] = this.getField("uiCode");
+        json.resource = {};
+        json.resource["html"] = this.getField("html");
+        json.resource["css"] = this.getField("css");
+        json.resource["uiCode"] = this.getField("uiCode");
         json.destroyOnInactive = this.getField("destroyOnInactive");
     }
 
@@ -283,18 +280,23 @@ customDataComponentUpdateData.executeCommand = function(workspaceManager,command
     var commandResult = {};
     if(component) {
         try {
-            component.update(commandData.fieldName,commmandData.targetValue);
+            component.update(commandData.fieldName,commandData.targetValue);
+
+            commandResult.cmdDone = true;
+            commandResult.target = component;
+            commandResult.dispatcher = modelManager;
+            commandResult.action = "updated";
         }
         catch(error) {
             let msg = error.message ? error.message : error;
+            commandResult.cmdDone = false;
             commandResult.alertMsg = "Exception on custom component update: " + msg;
         }
     }
     else {
+        commandResult.cmdDone = false;
         commandResult.alertMsg = "Component not found: " + command.memberFullName;
     }
-
-    if(!commandResult.alertMsg) commandResult.actionDone = true;
     
     return commandResult;
 }

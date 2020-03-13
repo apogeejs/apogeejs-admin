@@ -4,9 +4,6 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
-import CommandManager from "/apogeeapp/commands/CommandManager.js";
-import apogeeui from "/apogeeui/apogeeui.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
@@ -139,7 +136,8 @@ export default class CustomComponentView extends ComponentView {
             },
             
             saveData: function(text) {
-                component.doCodeFieldUpdate(codeField,text);
+                component.doCodeFieldUpdate(codeFieldName,text);
+                return true;
             }
         }
     }

@@ -5,9 +5,6 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
-import CommandManager from "/apogeeapp/commands/CommandManager.js";
-import apogeeui from "/apogeeui/apogeeui.js";
 
 /** This attempt has a single form edit page which returns an object. */
 // To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 
@@ -49,19 +46,19 @@ export default class CustomDataComponentView extends ComponentView {
             case CustomDataComponentView.VIEW_FORM:
                 displayContainer.setDisplayDestroyFlags(component.getDisplayDestroyFlags());
                 var dataDisplaySource = this.getOutputDataDisplaySource();
-                var dataDisplay = new HtmlJsDataDisplay(displayContainer,dataDisplaySource);
+                var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,dataDisplaySource);
                 return dataDisplay;
                 
             case CustomDataComponentView.VIEW_VALUE:
-                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,component,"data");
+                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,component,"member.data");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                 
             case CustomDataComponentView.VIEW_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,component,"input");
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,component,"member.input");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case CustomDataComponentView.VIEW_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,component,"input");
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,component,"member.input");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
             case CustomDataComponentView.VIEW_HTML:
@@ -102,7 +99,7 @@ export default class CustomDataComponentView extends ComponentView {
             },
 
             getData: function() {
-                inputMember.getData();
+                return inputMember.getData();
             },
 
             //edit ok - always true
@@ -113,7 +110,7 @@ export default class CustomDataComponentView extends ComponentView {
             saveData: function(formValue) {
                 //send value to the table whose variable name is "data"
                 //the context reference is the member called "input" 
-                messenger = new Messenger(inputMember);
+                let messenger = new Messenger(inputMember);
                 messenger.dataUpdate("data",formValue);
                 return true;
             },
@@ -163,7 +160,8 @@ export default class CustomDataComponentView extends ComponentView {
             },
             
             saveData: function(text) {
-                component.doCodeFieldUpdate(codeField,text);
+                component.doCodeFieldUpdate(codeFieldName,text);
+                return true;
             }
         }
     }
