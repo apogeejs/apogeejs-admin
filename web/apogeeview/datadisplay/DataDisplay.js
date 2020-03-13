@@ -1,6 +1,7 @@
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js"
 
-/** Editor that uses the Ace text editor.
+/** This is the base class for data displays, which show individual edit/display fields for a component. For example, a standard JSON
+ * data component has three data displays, for the component value, the function body and the supplemental code.
  * 
  * @param {type} displayContainer - this is the ui container that will show the display
  * @param {type} dataSource - the dataSource for the editor. It is an object with the following functions:
@@ -8,12 +9,17 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
  *      held by the data source and it returns to boolean values, "reloadDataDisplay", which indicates is the data display should 
  *      be reloaded (such as if it is replaced with a new data display or if the UI elements for it have been updated) and
  *      "reloadData" which indicates the data value displayed in the data display should be reloaded.  
- *  - data = getData() - Requried - This returns the data that should be displayed. The format of the data depends on the 
+ *  - data = getData() - Requiried - This returns the data that should be displayed. The format of the data depends on the 
  *      data display.
  *  - editOk = getEditOk() - Optional - If present, this indicates if the data display edit mode should be used. If it is not present
  *      it is assumed to be false.
- *  - closeDialog = saveData(data) - Optional This is used if the data display edit mode is used. It should save the data.
- *  - (other) - Data displays may define additional functions as needed for their implmentations.
+ *  - closeDialog = saveData(data) - Optional This is used if the data display edit mode is used. It should save the data. The return value
+ *      should be true if the edit operation should be concluded. It shoudl return false if there is a save failure such that you want to 
+ *      stay in edit mode.
+ *  - data = getDisplayData() - Optional - This returns model data that should be passed to construct the display. It is used in places
+ *      like the configurable form controls or the custom controls.
+ *  - (other) - Optional - Data displays may define additional functions as needed for their implmentations. Examples where this is done in in the custom
+ *      components to pass non-model data (like the HTML or the UI generator code) into the data display.
  */ 
 export default class DataDisplay {
     constructor(displayContainer,dataSource) {
