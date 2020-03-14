@@ -124,11 +124,6 @@ export default class CustomComponent extends Component {
         let oldFieldValue = this.getField(fieldName);
         if(fieldValue != oldFieldValue) {
             this.setField(fieldName,fieldValue);
-
-            //if this is the css field, set it immediately
-            if(fieldName == "css") {
-                apogeeui.setMemberCssData(this.getId(),fieldValue);
-            }
         }
 
     }

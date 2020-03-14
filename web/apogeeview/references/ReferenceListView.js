@@ -43,9 +43,8 @@ export default class ReferenceListView {
     }
 
     _onDeleted(eventInfo) {
-        let target = eventInfo.target;
-        if(target.getTargetType() == "link") {
-            let referenceEntryView = this.childViews[target.getId()];
+        if(eventInfo.targetType == "link") {
+            let referenceEntryView = this.childViews[eventInfo.targetId];
             this.treeEntry.removeChild(referenceEntryView.getTreeEntry());
         }
     }

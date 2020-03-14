@@ -26,17 +26,16 @@ export default class ReferenceEntryView {
 
     _onUpdated(eventInfo) {
         let target = eventInfo.target;
-        let fieldsUpdated = eventInfo.fieldsUpdated;
         if(target.getTargetType() == "link") {
             //make sure this is the right entry 
             if(target.getId() != this.referenceEntry.getId()) return;
             
             this.referenceEntry = target;
-            if(apogeeutil.isFieldUpdated(fieldsUpdated,"nickname")) {
+            if(target.isFieldUpdated("nickname")) {
                 this.treeEntry.setLabel(this.referenceEntry.getLabel());
             }
     
-            if(apogeeutil.isFieldUpdated(fieldsUpdated,"state")) {
+            if(target.isFieldUpdated("state")) {
                 this.treeEntry.setBannerState(this.referenceEntry.getState());
             }
         }
