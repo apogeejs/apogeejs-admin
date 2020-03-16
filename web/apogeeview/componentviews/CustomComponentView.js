@@ -14,6 +14,15 @@ export default class CustomComponentView extends ComponentView {
 
     constructor(modelView,component) {
         super(modelView,component);
+
+        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        //add css to page! I think this should go in a separate on create event, but until I 
+        //make this, I iwll put this here.
+        let css = component.getField("css");
+        if((css)&&(css != "")) {
+            apogeeui.setMemberCssData(component.getId(),css);
+        }
+        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     };
 
     /** This component overrides the componentupdated to process the css data, which is managed directly in the view. */
