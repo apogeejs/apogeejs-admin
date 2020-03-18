@@ -54,7 +54,7 @@ deletelink.executeCommand = function(workspaceManager,commandData) {
             commandResult.cmdDone = isRemoved;
             if(isRemoved) {
                 commandResult.targetId = referenceEntry.getId();
-                commandResult.targetType = referenceEntry.getTargetType();
+                commandResult.targetType = referenceEntry.getType();
                 commandResult.dispatcher = referenceEntry.getReferenceList();
                 commandResult.action = "deleted";
             }

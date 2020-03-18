@@ -149,7 +149,7 @@ export default class Component extends FieldObject {
 
     //getId() Implmented above
 
-    getTargetType() {
+    getType() {
         return "component";
     }
 

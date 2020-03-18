@@ -197,7 +197,7 @@ export default class WorkspaceManager extends EventManager {
         return 1;
     }
 
-    getTargetType() {
+    getType() {
         return "workspaceManager";
     }
 

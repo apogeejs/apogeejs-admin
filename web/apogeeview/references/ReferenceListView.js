@@ -35,7 +35,7 @@ export default class ReferenceListView {
 
     _onCreated(eventInfo) {
         let target = eventInfo.target;
-        if(target.getTargetType() == "link") {
+        if(target.getType() == "link") {
             let referenceEntryView = new ReferenceEntryView(this.app,target,this.displayInfo);
             this.childViews[target.getId()] = referenceEntryView;
             this.treeEntry.addChild(referenceEntryView.getTreeEntry());

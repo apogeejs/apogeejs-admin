@@ -77,7 +77,7 @@ export default class ApogeeView {
     
     targetCreated(eventData) {
         let target = eventData.target;
-        if(target.getTargetType() == "workspaceManager") {
+        if(target.getType() == "workspaceManager") {
             this.onWorkspaceCreated(target);
         }
     }
@@ -218,7 +218,7 @@ export default class ApogeeView {
             //there is a bit hidden in here. Mainly active tab = id of active tab = id of the component it represents
             //I should clean that up.
             //if the 
-            if((target.getTargetType() == "component")&&(target.getId() == this.tabFrame.getActiveTab())) {
+            if((target.getType() == "component")&&(target.getId() == this.tabFrame.getActiveTab())) {
                 //this is pretty messy too... 
                 if((target.isDisplayNameUpdated)&&(target.getMember().isFullNameUpdated())) {
                     let tab = this.tabFrame.getTab(target.getId());

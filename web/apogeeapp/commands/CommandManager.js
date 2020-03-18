@@ -208,7 +208,7 @@ export default class CommandManager {
                         //model action
                         cmdRsltEquivelent.target = modelManager;
                         cmdRsltEquivelent.targetId = modelManager.getId();
-                        cmdRsltEquivelent.targetType = modelManager.getTargetType();
+                        cmdRsltEquivelent.targetType = modelManager.getType();
                     }
 
                     //all model events will do through the model manager.
@@ -228,7 +228,7 @@ export default class CommandManager {
         if(commandResultEntry.target) {
             target = commandResultEntry.target;
             targetId = target.getId();
-            targetType = target.getTargetType();
+            targetType = target.getType();
         }
         else if((commandResultEntry.targetId != undefined)&&(commandResultEntry.targetType)) {
             target = undefined;

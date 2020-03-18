@@ -138,7 +138,7 @@ export default class ModelManager  extends FieldObject {
         return 1;
     }
 
-    getTargetType() {
+    getType() {
         return "modelManager";
     }
 

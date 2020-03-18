@@ -16,7 +16,7 @@ closeworkspace.executeCommand = function(workspaceManager,commandData) {
     let commandResult = {};
     commandResult.action = "deleted";
     commandResult.targetId = workspaceManager.getId();
-    commandResult.targetType = workspaceManager.getTargetType();
+    commandResult.targetType = workspaceManager.getType();
     commandResult.dispatcher = workspaceManager.getApp();
     
     try {

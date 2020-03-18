@@ -67,17 +67,17 @@ export default class ModelView {
 
     targetCreated(eventData) {
         let target = eventData.target;
-        if(target.getTargetType() == "component") {
+        if(target.getType() == "component") {
             this.onComponentCreated(target);
         }
     }
 
     targetUpdated(eventData) {
         let target = eventData.target;
-        if(target.getTargetType() == "modelManager") {
+        if(target.getType() == "modelManager") {
             this.onModelUpdated(target);
         }
-        if(target.getTargetType() == "component") {
+        if(target.getType() == "component") {
             let componentView = this.getComponentView(target.getId());
             componentView.componentUpdated(target);
         }

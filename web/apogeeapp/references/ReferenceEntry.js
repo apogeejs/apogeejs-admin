@@ -146,7 +146,7 @@ export default class ReferenceEntry extends EventManager {
 
     //getId() Implmented above
 
-    getTargetType() {
+    getType() {
         return "link";
     }
 

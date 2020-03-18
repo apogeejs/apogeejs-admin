@@ -59,12 +59,13 @@ export default class FieldObject {
     }
 
     /** This method should be implemented for any object using this mixin. 
-     * This should give a unique identifier for all objects of the given target type, below. */
+     * This should give a unique identifier for all objects of the given object type, below.
+     * A unique id may optionally be generated using the statid FieldObject method createId. */
     //getId()
 
     /** Thie method should be implemented for any object using this method. 
      * It identifies the type of object */
-    //getTargetType() 
+    //getType() 
 
     /** This loads the current field object to have a copy of the data from the given field object.
      * The update field is however cleared. This method will throw an exception is you try to copy 
@@ -80,4 +81,26 @@ export default class FieldObject {
         this.updated = {};
     }
 
+    //================================
+    // Static Methods
+    //================================
+
+    /** This static function generates a ID that is unique over the span of this application execution (until the 
+     * integers wrap). This is suitable for creating the field object ID for an instance. Note that instance IDs
+     * have the lesser requirement that they only need to be unique for a given object type.
+     * At some point we shouldhandle wrapping, and the three cases it can cause - negative ids, 0 id, and most seriously,
+     * a reused id.
+     * 
+     * Currently planned future solution to wrapping: make this an operation issue. And event can be issued when we 
+     * have reached given id values. Then it is the responsibility of the operator to restart the sytems. This is probably safer
+     * than trying to com eup with some clever remapping solution. */
+    static createId() {
+        return nextId++;
+    }
+
 }
+
+
+/** This is used for Id generation.
+ * @private */
+let nextId = 1;

@@ -26,7 +26,7 @@ export default class ReferenceEntryView {
 
     _onUpdated(eventInfo) {
         let target = eventInfo.target;
-        if(target.getTargetType() == "link") {
+        if(target.getType() == "link") {
             //make sure this is the right entry 
             if(target.getId() != this.referenceEntry.getId()) return;
             

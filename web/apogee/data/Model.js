@@ -387,7 +387,7 @@ export default class Model extends FieldObject {
         return 1;
     }
 
-    getTargetType() {
+    getType() {
         return "model";
     }
 

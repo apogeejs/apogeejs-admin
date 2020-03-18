@@ -22,7 +22,8 @@ export default class Member extends FieldObject {
     constructor(name,owner) {
         super();
 
-        this.id = _createId();
+        //generate the id with the FieldObject static method
+        this.id = Member.createId();
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -40,7 +41,7 @@ export default class Member extends FieldObject {
         return this.id;
     }
 
-    getTargetType() {
+    getType() {
         return "member";
     }
 
@@ -424,18 +425,6 @@ export default class Member extends FieldObject {
 
 //add mixins to this class
 base.mixin(Member,FieldObject);
-
-/** This is used for Id generation.
- * @private */
-let nextId = 1;
-
-/** This method generates a member ID for the member. It is only valid
- * for the duration the model is opened. It is not persisted.
- * @private
- */
-function _createId() {
-    return nextId++;
-}
 
 let UNKNOWN_ERROR_MSG_PREFIX = "Unknown error in member ";
 
