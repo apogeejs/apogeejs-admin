@@ -35,7 +35,7 @@ function moveMember(model,actionData) {
 
     //if the owner changes, remove this child from the owner
     //remove from old named object from the new or old owner - if it stays, we still have the new name
-    let currentOwner = member.getField("owner");
+    let currentOwner = member.getOwner();
     if(currentOwner.isParent) {
         currentOwner.removeChild(model,member);
     }

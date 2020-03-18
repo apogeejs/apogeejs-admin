@@ -8,7 +8,7 @@ import Model from "/apogee/data/Model.js";
  * Action Data format:
  * {
  *  "action": "createMember",
- *  "owner": (parent/owner for new member),
+ *  "ownerId": (parent/owner for new member),
  *  "name": (name of the new member),
  *  "createData": 
  *      - name

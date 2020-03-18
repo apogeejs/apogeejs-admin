@@ -71,7 +71,7 @@ function doDelete(model, member) {
     }
     
     //delete member
-    let owner = member.getField("owner");
+    let owner = member.getOwner();
     if(owner) {
         if(owner.isParent) {
             owner.removeChild(model,member);
