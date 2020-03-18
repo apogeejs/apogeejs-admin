@@ -130,7 +130,7 @@ export function updateComponent(component,componentView) {
                 //----------------------------------------------
                 if(newValues.parentName) {
                     //look up the new parent component
-                    let model = member.getModel();
+                    let model = modelManager.getModel();
                     let newParent = model.getMemberByFullName(newValues.parentName);
                     let newParentComponentView = modelView.getComponentView(newParent.getId());
 

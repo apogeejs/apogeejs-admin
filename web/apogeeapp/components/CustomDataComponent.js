@@ -1,13 +1,9 @@
- import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import { Messenger } from "/apogee/apogeeCoreLib.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+
 
 import Component from "/apogeeapp/component/Component.js";
-import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
-import apogeeui from "/apogeeui/apogeeui.js";
 
 /** This attempt has a single form edit page which returns an object. */
 // To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 

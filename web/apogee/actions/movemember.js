@@ -35,17 +35,30 @@ function moveMember(model,actionData) {
         return;
     }
 
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-    // apply code
-    // - modify the member
-    // - modify the old parent and all parents up to model
-    // - modify the new parent and all parents up to model
-    // - TBD - children of the moved member get a new full name, even if they themselves do not change.
-    //         What we do here may depend on how we handle compound fields. (Note - we will recalculation 
-    //         the dependencies here, but they may not change.)
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+    //if the owner changes, remove this child from the owner
+    //remove from old named object from the new or old owner - if it stays, we still have the new name
+    let currentOwner = member.getField("owner");
+    if(currentOwner.isParent) {
+        currentOwner.removeChild(model,member);
+    }
+    else {
+        //don't allow moving a root for now!
+        //or renaiming either!
+    }
         
+    //appl the move to the member
     member.move(actionData.targetName,targetOwner);
+
+    //set the member in the new/old owner (rest in old owner to handle a name change)
+    if(targetOwner.isParent) {
+        targetOwner.addChild(model,member);
+    }
+    else {
+        //don't allow moving a root for now!
+        //or renaiming either!
+    }
+
+    //create the action result
     actionResult.actionDone = true;
     actionResult.updateModelDependencies = true;
     actionResult.recalculateDependsOnMembers = true;

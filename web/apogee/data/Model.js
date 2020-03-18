@@ -65,7 +65,7 @@ export default class Model extends FieldObject {
     }
 
     /** This method sets the root object - implemented from RootHolder.  */
-    setRoot(member) {
+    setRoot(model,member) {
         this.setField("rootFolder",member);
     }
 
@@ -79,7 +79,7 @@ export default class Model extends FieldObject {
     updateDependeciesForModelChange(additionalUpdatedMembers) {
         let rootFolder = this.getField("rootFolder");
         if(rootFolder) {
-            rootFolder.updateDependeciesForModelChange(additionalUpdatedMembers);
+            rootFolder.updateDependeciesForModelChange(this,additionalUpdatedMembers);
         }
     }
 

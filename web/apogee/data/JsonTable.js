@@ -7,42 +7,11 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 /** This class encapsulatees a data table for a JSON object */
 export default class JsonTable extends CodeableMember {
 
-    constructor(model,name,owner,initialData) {
-        super(model,name,owner);
+    constructor(name,owner) {
+        super(name,owner);
 
         //mixin init where needed
         this.contextHolderMixinInit();
-        
-        //set initial data if not already set
-        if(!initialData) {
-            //default initail value
-            initialData = {};
-            initialData.data = "";
-        }  
-
-        //apply the initial data
-        if(initialData.functionBody !== undefined) {
-            //apply initial code
-            this.applyCode(initialData.argList,
-                initialData.functionBody,
-                initialData.supplementalCode);
-        }
-        else {
-            //apply initial data
-            let data;
-            let errorList;
-
-            if(initialData.errorList) errorList = initialData.errorList;
-            else if(initialData.invalidError) data = apogeeutil.INVALID_VALUE;
-            else if(initialData.data !== undefined) data = initialData.data;
-            else data = "";
-
-            this.applyData(data,errorList);
-
-            //set the code fields to empty strings
-            this.setField("functionBody","");
-            this.setField("supplementalCode","");
-        }
     }
 
     //------------------------------
@@ -56,13 +25,18 @@ export default class JsonTable extends CodeableMember {
         return [];
     }
         
-    processMemberFunction(memberFunctionInitializer,memberGenerator) {
+    processMemberFunction(model,memberFunctionInitializer,memberGenerator) {
         let initialized = memberFunctionInitializer();
         if(initialized) {
             //the data is the output of the function
             let memberFunction = memberGenerator();
             let data = memberFunction();
             this.applyData(data);
+
+            //we must separately apply the asynch data set promise if there is one
+            if((data)&&(data instanceof Promise)) {
+                this.applyAsynchData(model,data);
+            }
         } 
     }
 
@@ -84,8 +58,44 @@ export default class JsonTable extends CodeableMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(model,owner,json) {
-        return new JsonTable(model,json.name,owner,json.updateData);
+    static fromJson(owner,json) {
+        let member = new JsonTable(json.name,owner);
+
+        //set initial data
+        let initialData = json.updateData;
+        if(!initialData) {
+            //default initail value
+            initialData = {};
+            initialData.data = "";
+        }  
+
+        //apply the initial data
+        if(initialData.functionBody !== undefined) {
+            //apply initial code
+            member.applyCode(initialData.argList,
+                initialData.functionBody,
+                initialData.supplementalCode);
+        }
+        else {
+            //apply initial data
+            let data;
+            let errorList;
+
+            if(initialData.errorList) errorList = initialData.errorList;
+            else if(initialData.invalidError) data = apogeeutil.INVALID_VALUE;
+            else if(initialData.data !== undefined) data = initialData.data;
+            else data = "";
+
+            //apply the initial data
+            //note for now this can not be a promise, so we do not need to also call applyAsynchData.
+            member.applyData(data,errorList);
+
+            //set the code fields to empty strings
+            member.setField("functionBody","");
+            member.setField("supplementalCode","");
+        }
+
+        return member;
     }
 }
 

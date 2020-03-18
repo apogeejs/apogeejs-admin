@@ -72,9 +72,20 @@ function doDelete(member) {
     }
     
     //delete member
+    let owner = member.getField("owner");
+    if(owner) {
+        if(owner.isParent) {
+            owner.removeChild(model,member);
+        }
+        else if(owner.isRootHolder) {
+            owner.setRoot(model,null);
+        }
+    }
+
+    //additional delete member actions
     member.onDeleteMember();
     if(member.isDependent) {
-        member.onDeleteDependent();
+        member.onDeleteDependent(model);
     }
     
     actionResult.actionDone = true;

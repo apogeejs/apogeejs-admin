@@ -55,7 +55,8 @@ export default class DynamicFormView extends ComponentView {
     getFormCallbacks() { 
         let component = this.getComponent();
         let functionMember = component.getField("member");
-        let app = this.getModelView().getApp();
+        let modelView = this.getModelView();
+        let app = modelView.getApp();
 
         var dataDisplaySource = {
 

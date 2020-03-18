@@ -89,11 +89,11 @@ Parent.setChildrenWriteable = function(writeable) {
 // Must be implemented in extending object
 ///** This method adds the child to this parent. 
 // * It will fail if the name already exists.  */
-//Parent.addChild = function(child);
+//Parent.addChild = function(model,child);
 
 // Must be implemented in extending object
 ///** This method removes this child from this parent.  */
-//Parent.removeChild = function(child);
+//Parent.removeChild = function(model,child);
 
 // Must be implemented in extending object
 ///** This method updates the data object for this child. */

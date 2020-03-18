@@ -202,11 +202,6 @@ export default class ModelManager  extends FieldObject {
      * undefined. */
     registerMember(member,component,mainComponentMember) {
 
-        //make sure this is for us
-        if(member.getModel() !== this.getField("model")) {
-            throw base.createError("Component registered in wrong model: " + member.getFullName());
-        }
-
         let oldComponentMap = this.getField("componentMap");
 
         //store the ui object

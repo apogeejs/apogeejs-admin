@@ -11,20 +11,11 @@ import RootHolder from "/apogee/datacomponents/RootHolder.js";
  * that is expanded into data objects. */
 export default class FolderFunction extends DependentMember {
 
-    constructor(model,name,owner,initialData) {
-        super(model,name,owner);
+    constructor(name,owner) {
+        super(name,owner);
 
         //mixin init where needed
         this.contextHolderMixinInit();
-        
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        let argList = initialData.argList !== undefined ? initialData.argList : [];
-        this.setField("argList",argList);
-        let returnValueString = initialData.returnValue !== undefined ? initialData.returnValue : [];
-        this.setField("returnValue",returnValueString);
-        //"internalFolder"
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         //set to an empty function
         this.setData(function(){});
@@ -41,11 +32,11 @@ export default class FolderFunction extends DependentMember {
     }
 
     /** This method sets the root object - implemented from RootHolder.  */
-    setRoot(child) {
+    setRoot(model,child) {
         this.setField("internalFolder",child);
         var dependsOnMap = {};
         if(child) dependsOnMap[child.getId()] = apogeeutil.NORMAL_DEPENDENCY;
-        this.updateDependencies(dependsOnMap);
+        this.updateDependencies(model,dependsOnMap);
     }
 
     /** This gets the name of the return object for the folderFunction function. */
@@ -69,8 +60,17 @@ export default class FolderFunction extends DependentMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(model,owner,json) {
-        return new FolderFunction(model,json.name,owner,json.updateData);
+    static fromJson(owner,json) {
+        let member = new FolderFunction(json.name,owner);
+
+        //set initial data
+        let initialData = json.updateData;
+        let argList = ((initialData)&&(initialData.argList !== undefined)) ? initialData.argList : [];
+        this.setField("argList",argList);
+        let returnValueString = ((initialData)&&(initialData.returnValue !== undefined)) ? initialData.returnValue : [];
+        this.setField("returnValue",returnValueString);
+        
+        return member;
     }
 
     /** This method adds any additional data to the json saved for this member. 
@@ -125,9 +125,9 @@ export default class FolderFunction extends DependentMember {
 
     /** This updates the member data based on the function. It returns
      * true for success and false if there is an error.  */
-    calculate() {  
+    calculate(model) {  
         //make sure the data is set in each impactor
-        this.initializeImpactors();
+        this.initializeImpactors(model);
 
         let state = this.getState();
         if((state != apogeeutil.STATE_ERROR)&&(state != apogeeutil.STATE_PENDING)&&(state != apogeeutil.STATE_INVALID)) {
@@ -147,10 +147,10 @@ export default class FolderFunction extends DependentMember {
 
     /** This method updates the dependencies of any children
      * based on an object being added. */
-    updateDependeciesForModelChange(additionalUpdatedMembers) {
+    updateDependeciesForModelChange(model,additionalUpdatedMembers) {
         let internalFolder = this.getField("internalFolder");
         if(internalFolder) {
-            internalFolder.updateDependeciesForModelChange(additionalUpdatedMembers);
+            internalFolder.updateDependeciesForModelChange(model,additionalUpdatedMembers);
         }
     }
 

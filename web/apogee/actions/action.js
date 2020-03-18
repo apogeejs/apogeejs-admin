@@ -42,6 +42,7 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  *                  the new state the results from the action.
  *   "actionPending": (This flag is returned if the action is a queued action and will be run after the
  *                  current action completes.)
+ *   "model": (The model on which the action is acting)
  *   "member": (The object modified in the action, if it is a member. Another option is a model update, in which 
  *                  case this field is left undefined, but a model event will be included. It is also possible that
  *                  there is no member listed because the action result does not corrspond to an action on a member of 
@@ -123,17 +124,17 @@ export function doAction(model,actionData) {
             model.updateDependeciesForModelChange(additionalUpdatedMembers);
         }
         else {
-            updateDependenciesFromAction(actionModifiedMembers);
+            updateDependenciesFromAction(model,actionModifiedMembers);
         }
 
         //commit the updated impacts map (inverse of dependency map) 
         model.finalizeImpactsMap();
 
         //populate recalc list
-        let recalculateList = createRecalculateList(actionModifiedMembers,additionalUpdatedMembers);
+        let recalculateList = createRecalculateList(model,actionModifiedMembers,additionalUpdatedMembers);
         
         //recalculate all needed objects
-        callRecalculateList(recalculateList);
+        callRecalculateList(model,recalculateList);
 
         //create the change map
         changeMap = createChangeMap(model,actionModifiedMembers,recalculateList);
@@ -241,11 +242,11 @@ function callActionFunction(model,actionData) {
 
 /** This method makes sure the member dependencies in the model are properly updated. 
  * @private */
-function updateDependenciesFromAction(actionModifiedMembers) {
+function updateDependenciesFromAction(model,actionModifiedMembers) {
     //upate dependencies on table with updated code
     actionModifiedMembers.forEach(actionResult => {
         if((actionResult.member)&&(actionResult.member.isCodeable)&&(actionResult.updateMemberDependencies)) {
-            actionResult.member.initializeDependencies();
+            actionResult.member.initializeDependencies(model);
         }
     });
 }
@@ -253,22 +254,22 @@ function updateDependenciesFromAction(actionModifiedMembers) {
 /** This method takes the members that are updated (either by code or value) and
  * adds them to the list of members that need to be recalculated. To do this, we must
  * first have all dependencies updated, sicne it relies on the impacts list. */
-function createRecalculateList(actionModifiedMembers,additionalUpdatedMembers) {
+function createRecalculateList(model,actionModifiedMembers,additionalUpdatedMembers) {
     let recalculateList = [];
 
     //add members from each action and/or fields they impact, if applicable
     actionModifiedMembers.forEach( actionResult => {
         //update the recalc list
         if(actionResult.recalculateMember) {
-            addToRecalculateList(recalculateList,actionResult.member);            
+            addToRecalculateList(model,recalculateList,actionResult.member);            
         }
         else if(actionResult.recalculateDependsOnMembers) {
-            addDependsOnToRecalculateList(recalculateList,actionResult.member);                         
+            addDependsOnToRecalculateList(model,recalculateList,actionResult.member);                         
         }
     });
 
     //add any other modified members to the racalculate list
-    additionalUpdatedMembers.forEach(member => addToRecalculateList(recalculateList,member));
+    additionalUpdatedMembers.forEach(member => addToRecalculateList(model,recalculateList,member));
 
     return recalculateList;
 }

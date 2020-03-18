@@ -121,10 +121,16 @@ function updateData(model,actionData) {
     if((member.isCodeable)&&(actionData.sourcePromise === undefined)) {
         //clear the code - so the data is used
         //UNLESS this is a delayed set date from a promise, in what case we want to keep the code.
-        member.clearCode();
+        member.clearCode(model);
     }
 
+    //apply the data
     member.applyData(data);
+
+    //if the data is a promise, we must also initiate the asynchronous setting of the data
+    if((data)&&(data instanceof Promise)) {
+        this.applyAsynchData(model,data);
+    }
     
     actionResult.actionDone = true;
     if(hadDependents) {

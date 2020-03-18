@@ -8,8 +8,8 @@ import Parent from "/apogee/datacomponents/Parent.js";
 /** This is a folder. */
 export default class Folder extends DependentMember {
 
-    constructor(model,name,owner) {
-        super(model,name,owner);
+    constructor(name,owner) {
+        super(name,owner);
 
         //mixin init where needed
         this.contextHolderMixinInit();
@@ -45,7 +45,7 @@ export default class Folder extends DependentMember {
 
     /** This method adds a table to the folder. It also sets the folder for the
      *table object to this folder. It will fail if the name already exists.  */
-    addChild(child) {
+    addChild(model,child) {
         
         //check if it exists first
         let name = child.getName();
@@ -64,11 +64,11 @@ export default class Folder extends DependentMember {
         this.setField("childMap",newChildMap);
         
         //set all children as dependents
-        this.calculateDependents();
+        this.calculateDependents(model);
     }
 
     /** This method removes a table from the folder. */
-    removeChild(child) {
+    removeChild(model,child) {
         //make sure this is a child of this object
         var parent = child.getParent();
         if((!parent)||(parent !== this)) return;
@@ -84,19 +84,18 @@ export default class Folder extends DependentMember {
         this.setField("childMap",newChildMap);
         
         //set all children as dependents
-        this.calculateDependents();
+        this.calculateDependents(model);
     }
 
-    /** There is no calculation for the folder base on dependents. 
-     * @private */
+    /** There is no calculation for the folder base on dependents. */
     memberUsesRecalculation() {
         return true;
     }
 
     /** Calculate the data.  */
-    calculate() {
+    calculate(model) {
         //make sure impactors are calculated
-        this.initializeImpactors();
+        this.initializeImpactors(model);
         
         //folders work slightly different because of pass thorugh dependencies. We will set the folder data
         //value regardless of the state, meaning if the state is error or pending or invalid, we still set
@@ -130,10 +129,10 @@ export default class Folder extends DependentMember {
 
     /** This method updates the dependencies of any children
      * based on an object being added. */
-    updateDependeciesForModelChange(additionalUpdatedMembers) {
+    updateDependeciesForModelChange(model,additionalUpdatedMembers) {
 
         //update dependencies of this folder
-        let dependenciesChanged = this.calculateDependents();
+        let dependenciesChanged = this.calculateDependents(model);
         if(dependenciesChanged) {
             additionalUpdatedMembers.push(this);
         }
@@ -143,7 +142,7 @@ export default class Folder extends DependentMember {
         for(var key in childMap) {
             var child = childMap[key];
             if(child.isDependent) {
-                child.updateDependeciesForModelChange(additionalUpdatedMembers);
+                child.updateDependeciesForModelChange(model,additionalUpdatedMembers);
             }
         }
     }
@@ -154,11 +153,13 @@ export default class Folder extends DependentMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(model,owner,json) {
-        var folder = new Folder(model,json.name,owner);
+    static fromJson(owner,json) {
+        var folder = new Folder(json.name,owner);
+
         if(json.childrenNotWriteable) {
             folder.setChildrenWriteable(false);
         }
+
         return folder;
     }
 
@@ -192,14 +193,14 @@ export default class Folder extends DependentMember {
 
     /** This method updates the table data object in the folder data map. 
      * @private */
-    calculateDependents() {
+    calculateDependents(model) {
         let dependsOnMap = [];
         let childMap = this.getField("childMap");
         for(var name in childMap) {
             var child = childMap[name];
             dependsOnMap[child.getId()] = apogeeutil.NORMAL_DEPENDENCY;
         }
-        return this.updateDependencies(dependsOnMap);
+        return this.updateDependencies(model,dependsOnMap);
     }
 }
 

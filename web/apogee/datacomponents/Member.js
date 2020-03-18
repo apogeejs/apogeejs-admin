@@ -19,7 +19,7 @@ import FieldObject from "/apogeeutil/FieldObject.js";
  * a folder and it is called the root folder. */
 export default class Member extends FieldObject {
 
-    constructor(model,name,owner) {
+    constructor(name,owner) {
         super();
 
         this.id = _createId();
@@ -27,23 +27,11 @@ export default class Member extends FieldObject {
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
         this.setField("name",name);
-        this.setField("model",model);
         this.setField("owner",owner);
         //"data"
         //"pendingPromise"
         //"state"
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-
-        //register member with model
-        model.registerMember(this);
-
-        //init the owner for this child
-        if(owner.isParent) {
-            owner.addChild(this);
-        }
-        else if(owner.isRootHolder) {
-            owner.setRoot(this);
-        }
     }
 
     /** this method gets the ID. It is not persistent and is valid only for this 
@@ -102,11 +90,6 @@ export default class Member extends FieldObject {
         else {
             return null;
         }
-    }
-
-    /** this method gets the model. */
-    getModel() {
-        return this.getField("model");
     }
 
     /** this method gets the root folder/namespace for this object. */
@@ -271,7 +254,10 @@ export default class Member extends FieldObject {
 
     /** This methos sets the data, where the data can be a generalized value
      *  include data, apogeeutil.INVALID_VALUE, a Promis or an Error. Also, an explitict
-     * errorList can be passed in, includgin either Error or String objects. */
+     * errorList can be passed in, includgin either Error or String objects. 
+     * This method does not however apply the asynchrnous data, it only flags the member as pending.
+     * the asynchronous data is set separately (also) using applyAsynchData, whcih requires access
+     * to the model object. */
     applyData(data,errorList) {
 
         //handle four types of data inputs
@@ -279,8 +265,8 @@ export default class Member extends FieldObject {
             this.setErrors(errorList);
         }
         else if(data instanceof Promise) {
-            //data is a promise - will be updated asynchromously
-            this.applyPromiseData(data);
+            //data is a promise - flag this a pending
+            this.setResultPending(data);
         }
         else if(data instanceof Error) {
             //data is an error
@@ -297,34 +283,29 @@ export default class Member extends FieldObject {
     }
 
     /** This method implements setting asynchronous data on the member using a promise. */
-    applyPromiseData(promise,optionalPromiseRefresh) {
-        //set the result as pending
-        this.setResultPending(promise);
+    applyAsynchData(model,promise) {
 
-        //kick off the asynch update, if this is not only a refresh of the promise
-        if(!optionalPromiseRefresh) {
-            var model = this.getModel();
-            var asynchCallback = memberValue => {
-                //set the data for the table, along with triggering updates on dependent tables.
-                let actionData = {};
-                actionData.action = "updateData";
-                actionData.memberName = this.getFullName();
-                actionData.sourcePromise = promise;
-                actionData.data = memberValue;
-                doAction(model,actionData);
-            }
-            var asynchErrorCallback = errorMsg => {
-                let actionData = {};
-                actionData.action = "updateData";
-                actionData.memberName = this.getFullName();
-                actionData.sourcePromise = promise;
-                actionData.data = new Error(errorMsg);
-                doAction(model,actionData);
-            }
-
-            //call appropriate action when the promise completes
-            promise.then(asynchCallback).catch(asynchErrorCallback);
+        //kick off the asynch update
+        var asynchCallback = memberValue => {
+            //set the data for the table, along with triggering updates on dependent tables.
+            let actionData = {};
+            actionData.action = "updateData";
+            actionData.memberName = this.getFullName();
+            actionData.sourcePromise = promise;
+            actionData.data = memberValue;
+            doAction(model,actionData);
         }
+        var asynchErrorCallback = errorMsg => {
+            let actionData = {};
+            actionData.action = "updateData";
+            actionData.memberName = this.getFullName();
+            actionData.sourcePromise = promise;
+            actionData.data = new Error(errorMsg);
+            doAction(model,actionData);
+        }
+
+        //call appropriate action when the promise completes
+        promise.then(asynchCallback).catch(asynchErrorCallback);
     }
 
     /** This method can be called to set data without setting the state. It is intended to be
@@ -341,37 +322,17 @@ export default class Member extends FieldObject {
     /** This method should be used to rename and/or change 
      * the owner of this member. */
     move(newName,newOwner) {
-        let currentOwner = this.getField("owner");
-
-        //remove from old named object from the new or old owner
-        if(currentOwner.isParent) {
-            currentOwner.removeChild(this);
-        }
-        else {
-            //don't allow moving a root for now!
-            //or renaiming either!
-        }
-        
-        //check for change of name
+        //update the name if needed
         if(newName != this.getField("name")) {
             this.setField("name",newName);
         }
         
-        //set the new owner, if it changed
+        //update the owner if needed
+        let currentOwner = this.getField("owner");
         if(currentOwner != newOwner) {
             this.setField("owner",newOwner);
         }
-
-        //set the newly named object in the new or old owner
-        if(newOwner.isParent) {
-            newOwner.addChild(this);
-        }
-        else {
-            //don't allow moving a root for now!
-            //or renaiming either!
-        }
     }
-
 
     //========================================
     // "Protected" Methods
@@ -382,16 +343,7 @@ export default class Member extends FieldObject {
      * if it does.  
      * @protected */
     onDeleteMember() {
-        let owner = this.getField("owner");
-        if(!(owner)) return;
-        
-        if(owner.isParent) {
-            owner.removeChild(this);
-        }
-        else if(owner.isRootHolder) {
-            owner.setRoot(null);
-        }
-        owner = null;
+        this.setField("owner",null);
     }
 
     ///** This method is called when the model is closed and also when an object

@@ -69,7 +69,18 @@ export function createMember(model,owner,memberJson) {
         // - modify parent and all parents up to model
         // - created object is automatically unlocked.
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        member = generator.createMember(model,owner,memberJson); 
+        member = generator.createMember(owner,memberJson); 
+
+        //pass this child to the owner
+        if(owner.isParent) {
+            owner.addChild(model,member);
+        }
+        else if(owner.isRootHolder) {
+            owner.setRoot(model,member);
+        }
+
+        //register member with model
+        model.registerMember(member);
 
         //set action flags for successfull new member
         actionResult.updateModelDependencies = true;

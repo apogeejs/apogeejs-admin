@@ -46,6 +46,10 @@ export default class ModelView {
         return this.workspaceView;
     }
 
+    getModelManager() {
+        return this.modelManager;
+    }
+
     getAppView() {
         return this.workspaceView.getAppView();
     }

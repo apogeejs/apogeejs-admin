@@ -22,8 +22,8 @@ import DependentMember from "/apogee/datacomponents/DependentMember.js"
 export default class CodeableMember extends DependentMember {
 
     /** This initializes the component. argList is the arguments for the object function. */
-    constructor(model,name,owner) {
-        super(model,name,owner);
+    constructor(name,owner) {
+        super(name,owner);
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -90,7 +90,7 @@ export default class CodeableMember extends DependentMember {
 
     /** This method clears the function body and supplemental code, and
      * updates any associated variables, including the dependencies.  */
-    clearCode() {
+    clearCode(model) {
         if(this.getField("functionBody") != "") {
             this.setField("functionBody","");
         }
@@ -101,11 +101,11 @@ export default class CodeableMember extends DependentMember {
         
         this.clearCalcPending();
 
-        this.updateDependencies([]);
+        this.updateDependencies(model,[]);
     }
 
     /** This method returns the formula for this member.  */
-    initializeDependencies() {
+    initializeDependencies(model) {
 
         let compiledInfo = this.getField("compiledInfo");
         
@@ -114,7 +114,7 @@ export default class CodeableMember extends DependentMember {
                 var dependencyInfo = getDependencyInfo(compiledInfo.varInfo,this.getContextManager());
 
                 //update dependencies
-                this.updateDependencies(dependencyInfo);
+                this.updateDependencies(model,dependencyInfo);
             }
             catch(ex) {
                 this.codeErrors.push(ex);
@@ -122,13 +122,13 @@ export default class CodeableMember extends DependentMember {
         }
         else {
             //will not be calculated - has no dependencies
-            this.updateDependencies({});
+            this.updateDependencies(model,{});
         }
     }
 
     /** This method udpates the dependencies if needed because
      *the passed variable was added.  */
-    updateDependeciesForModelChange(additionalUpdatedMembers) {
+    updateDependeciesForModelChange(model,additionalUpdatedMembers) {
         let compiledInfo = this.getField("compiledInfo");
         if((compiledInfo)&&(compiledInfo.valid)) {
                     
@@ -136,7 +136,7 @@ export default class CodeableMember extends DependentMember {
             var dependsOnMap = getDependencyInfo(compiledInfo.varInfo,this.getContextManager());
             
             //update the dependency list
-            var dependenciesChanged = this.updateDependencies(dependsOnMap);
+            var dependenciesChanged = this.updateDependencies(model,dependsOnMap);
             if(dependenciesChanged) {
                 //add to update list
                 additionalUpdatedMembers.push(this);
@@ -149,14 +149,13 @@ export default class CodeableMember extends DependentMember {
         return this.getField("compiledInfo") ? true : false;
     }
 
-    /** If this is true the member is ready to be executed. 
-     * @private */
+    /** If this is true the member is ready to be executed. */
     memberUsesRecalculation() {
         return this.hasCode();
     }
 
     /** This method sets the data object for the member.  */
-    calculate() {
+    calculate(model) {
         let compiledInfo = this.getField("compiledInfo");
         if(!compiledInfo) {
             this.setError("Code not found for member: " + this.getName());
@@ -170,10 +169,10 @@ export default class CodeableMember extends DependentMember {
         }
 
 //temporary - re create the initializer
-let memberFunctionInitializer = this.createMemberFunctionInitializer();
+let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
       
         try {
-            this.processMemberFunction(memberFunctionInitializer,compiledInfo.memberFunctionGenerator);
+            this.processMemberFunction(model,memberFunctionInitializer,compiledInfo.memberFunctionGenerator);
         }
         catch(error) {
             if(error == base.MEMBER_FUNCTION_INVALID_THROWABLE) {
@@ -261,7 +260,7 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer();
     //processMemberFunction 
     
     /** This makes sure user code of object function is ready to execute.  */
-    createMemberFunctionInitializer() {
+    createMemberFunctionInitializer(model) {
         //we want to hold these as closure variables
         let functionInitialized = false;
         let functionInitializedSuccess = false;
@@ -283,7 +282,7 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer();
             
             try {
                 //make sure the data is set in each impactor
-                this.initializeImpactors();
+                this.initializeImpactors(model);
                 let state = this.getState();
                 if((state == apogeeutil.STATE_ERROR)||(state == apogeeutil.STATE_PENDING)||(state == apogeeutil.STATE_INVALID)) {
                     this.dependencyInitInProgress = false;
@@ -294,7 +293,7 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer();
                 
                 //set the context
                 let compiledInfo = this.getField("compiledInfo");
-                let messenger = new Messenger(this);
+                let messenger = new Messenger(model,this);
                 compiledInfo.memberFunctionContextInitializer(this.getContextManager(),messenger);
                 
                 functionInitializedSuccess = true;

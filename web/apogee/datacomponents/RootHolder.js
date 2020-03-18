@@ -13,7 +13,7 @@ RootHolder.isRootHolder = true;
 
 // Must be implemented in extending object
 ///** This method sets the root object.  */
-//RootHolder.setRoot = function(member);
+//RootHolder.setRoot = function(model,member);
 
 // Must be implemented in extending object
 ///** This method returns the root object.  */

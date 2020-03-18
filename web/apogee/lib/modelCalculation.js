@@ -4,7 +4,7 @@
 
 /** This moethod should be called on an member (impactor or dependent) that changes.
  * This will allow for any Dependents to be recaculated. */
-export function addToRecalculateList(recalculateList,member) {
+export function addToRecalculateList(model,recalculateList,member) {
     //if it is in the list, return
     if(recalculateList.indexOf(member) >= 0) return;
      
@@ -14,16 +14,15 @@ export function addToRecalculateList(recalculateList,member) {
         member.prepareForCalculate();
     }
         
-    addDependsOnToRecalculateList(recalculateList,member);
+    addDependsOnToRecalculateList(model,recalculateList,member);
 }
 
-export function addDependsOnToRecalculateList(recalculateList,member) {
-    //add any member that depends on this one 
-    let model = member.getModel();   
+export function addDependsOnToRecalculateList(model,recalculateList,member) {
+    //add any member that depends on this one  
     var impactsList = model.getImpactsList(member);
     for(var i = 0; i < impactsList.length; i++) {
         let impactor = model.lookupMember(impactsList[i]);
-        addToRecalculateList(recalculateList,impactor);
+        addToRecalculateList(model,recalculateList,impactor);
     }
 }
 
@@ -31,14 +30,14 @@ export function addDependsOnToRecalculateList(recalculateList,member) {
 
 /** This calls execute for each member in the recalculate list. The return value
  * is false if there are any errors. */
-export function callRecalculateList(recalculateList) {
+export function callRecalculateList(model,recalculateList) {
     var dependent;
     var i;
     var success = true;
     for(i = 0; i < recalculateList.length; i++) {
         dependent = recalculateList[i];
         if(dependent.getCalcPending()) {
-            dependent.calculate();   
+            dependent.calculate(model);   
         }
     }
     

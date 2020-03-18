@@ -6,14 +6,8 @@ import Member from "/apogee/datacomponents/Member.js";
  * is intended to be used as a placeholder when a table generator is not found. */
 export default class ErrorTable extends Member {
 
-    constructor(model,name,owner,completeJson) {
-        super(model,name,owner);
-        
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        //store this to use during save later
-        this.setField("completeJson",completeJson);
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    constructor(name,owner) {
+        super(name,owner);
 
         var dummyData = "";
         this.setData(dummyData);
@@ -42,9 +36,14 @@ export default class ErrorTable extends Member {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(model,owner,json) {
+    static fromJson(owner,json) {
         //note - we send in the complete JSON so we can return is on saving
-        return new ErrorTable(model,json.name,owner,json);
+        let member = new ErrorTable(json.name,owner);
+
+        //set the initial data
+        member.setField("completeJson",json);
+
+        return member;
     }
 
     //------------------------------
@@ -53,7 +52,7 @@ export default class ErrorTable extends Member {
 
     /** This method udpates the dependencies if needed because
      *a variable was added or removed from the model.  */
-    updateDependeciesForModelChange(additionalUpdatedMembers) {
+    updateDependeciesForModelChange(model,additionalUpdatedMembers) {
         //no action
     }
 

@@ -12,8 +12,8 @@ import Member from "/apogee/datacomponents/Member.js";
 export default class DependentMember extends Member {
 
     /** This initializes the component */
-    constructor(model,name,owner) {
-        super(model,name,owner);
+    constructor(name,owner) {
+        super(name,owner);
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -53,7 +53,7 @@ export default class DependentMember extends Member {
     ///** This method udpates the dependencies if needed because
     // *a variable was added or removed from the model. Any member that has its dependencies udpated
     // * should be added to the additionalUpdatedObjects list. */
-    //updateDependeciesForModelChange(additionalUpdatedMembers);
+    //updateDependeciesForModelChange(model,additionalUpdatedMembers);
 
     ///** This is a check to see if the object should be checked for dependencies 
     // * for recalculation. It is safe for this method to always return false and
@@ -69,24 +69,23 @@ export default class DependentMember extends Member {
     }
 
     ///** This updates the member based on a change in a dependency.  */
-    //calculate();
+    //calculate(model);
 
     /** This method makes sure any impactors are set. It sets a dependency 
      * error if one or more of the dependencies has a error. */
-    initializeImpactors() {
+    initializeImpactors(model) {
         var errorDependencies = [];
         var resultPending = false;
         var resultInvalid = false;
         
         //make sure dependencies are up to date
         let dependsOnMap = this.getField("dependsOnMap");
-        let model = this.getModel();
         for(var idString in dependsOnMap) {
             let dependsOnType = dependsOnMap[idString];
             let impactor = model.lookupMember(idString);
 
             if((impactor.isDependent)&&(impactor.getCalcPending())) {
-                impactor.calculate();
+                impactor.calculate(model);
             }
 
             //inherit the the state of the impactor only if it is a normal dependency, as oppose to a pass through dependency
@@ -116,9 +115,8 @@ export default class DependentMember extends Member {
     }
 
     /** This method does any needed cleanup when the dependent is depeted.. */
-    onDeleteDependent() {
+    onDeleteDependent(model) {
         //remove this dependent from the impactor
-        let model = this.getModel();
         let dependsOnMap = this.getField("dependsOnMap");
         for(var remoteMemberIdString in dependsOnMap) {
             //remove from imacts list
@@ -130,9 +128,8 @@ export default class DependentMember extends Member {
     //===================================
 
     /** This sets the dependencies based on the code for the member. */
-    updateDependencies(newDependsOnMap) {
+    updateDependencies(model,newDependsOnMap) {
         let dependenciesUpdated = false;
-        let model = this.getModel();
 
         let oldDependsOnMap = this.getField("dependsOnMap");
         for(var idString in newDependsOnMap) {

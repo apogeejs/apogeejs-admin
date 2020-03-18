@@ -4,8 +4,8 @@ import {doAction} from "/apogee/actions/action.js";
  * If the send fails, and exception will be thrown. */
 export default class Messenger {
     
-    constructor(fromMember) {
-        this.model = fromMember.getModel();
+    constructor(model,fromMember) {
+        this.model = model;
         this.contextManager = fromMember.getContextManager();
         this.fromMember = fromMember;
     }

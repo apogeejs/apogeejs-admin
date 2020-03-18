@@ -7,24 +7,18 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 /** This is a function. */
 export default class FunctionTable extends CodeableMember {
 
-    constructor(model,name,owner,initialData) {
-        super(model,name,owner);
+    constructor(name,owner) {
+        super(name,owner);
 
         //mixin init where needed
         this.contextHolderMixinInit();    
-        
-        //set initial data
-        var argList = initialData.argList ? initialData.argList : [];
-        var functionBody = initialData.functionBody ? initialData.functionBody : "";
-        var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
-        this.applyCode(argList,functionBody,supplementalCode);
     }
 
     //------------------------------
     // Codeable Methods
     //------------------------------
 
-    processMemberFunction(memberFunctionInitializer,memberGenerator) {
+    processMemberFunction(model,memberFunctionInitializer,memberGenerator) {
         var memberFunction = this.getLazyInitializedMemberFunction(memberFunctionInitializer,memberGenerator);
         this.setData(memberFunction);
     }
@@ -74,8 +68,18 @@ export default class FunctionTable extends CodeableMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(model,owner,json) {
-        return new FunctionTable(model,json.name,owner,json.updateData);
+    static fromJson(owner,json) {
+        let member = new FunctionTable(json.name,owner,json.updateData);
+
+        //set initial data
+        let initialData = json.updateData;
+
+        var argList = initialData.argList ? initialData.argList : [];
+        var functionBody = initialData.functionBody ? initialData.functionBody : "";
+        var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
+        member.applyCode(argList,functionBody,supplementalCode);
+
+        return member;
     }
 
     /** This method extends the base method to get the property values
