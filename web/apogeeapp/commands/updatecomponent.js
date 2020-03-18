@@ -7,7 +7,7 @@ import CommandManager from "/apogeeapp/commands/CommandManager.js";
  * Command JSON format:
  * {
  *   "type":"updateComponent",
- *   "memberFullName":(main member full name),
+ *   "memberId":(main member ID),
  *   "updatedMemberProperties":(member property json),
  *   "updatedComponentProperties":(component property json)
  * }
@@ -21,7 +21,7 @@ let updatecomponent = {};
 updatecomponent.createUndoCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
     let model = modelManager.getModel();
-    var member = model.getMemberByFullName(commandData.memberFullName);
+    var member = model.lookupMember(commandData.memberId);
     var component = modelManager.getComponent(member);
 
     var originalMemberProperties = {};
@@ -48,7 +48,7 @@ updatecomponent.createUndoCommand = function(workspaceManager,commandData) {
     
     var undoCommandJson = {};
     undoCommandJson.type = updatecomponent.commandInfo.type;
-    undoCommandJson.memberFullName = commandData.memberFullName;
+    undoCommandJson.memberId = commandData.memberId;
     if(undoMemberProperties) undoCommandJson.updatedMemberProperties = undoMemberProperties;
     if(undoComponentProperties) undoCommandJson.updatedComponentProperties = undoComponentProperties;
     
@@ -63,7 +63,7 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
     let model = modelManager.getModel();
     //get the member
-    var member = model.getMemberByFullName(commandData.memberFullName);   
+    var member = model.lookupMember(commandData.memberId);   
     var component = modelManager.getComponent(member);
 
     var error = false;
@@ -97,7 +97,7 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
         commandResult.action = "updated";
     }
     else {
-        commandResult.errorMsg = "Error updating component: " + commandData.memberFullName;
+        commandResult.errorMsg = "Error updating component: " + component.getFullName();
     }
 
     if(actionResult) commandResult.actionResult = actionResult;

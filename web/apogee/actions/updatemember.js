@@ -7,7 +7,7 @@ import {addActionInfo} from "/apogee/actions/action.js";
  * Action Data format:
  * {
  *  "action": "updateData",
- *  "memberName": (member to update),
+ *  "memberId": (member to update),
  *  "data": (new value for the table)
  *  "sourcePromise": (OPTIONAL - If this is the completion of an asynchronous action, the
  *      source promise shoudl be included to make sure it has not been overwritten with a
@@ -19,7 +19,7 @@ import {addActionInfo} from "/apogee/actions/action.js";
  * Action Data format:
  * {
  *  "action": "updateCode",
- *  "memberName": (member to update),
+ *  "memberId": (member to update),
  *  "argList": (arg list for the table)
  *  "functionBody": (function body for the table)
  *  "supplementalCode": (supplemental code for the table)
@@ -41,8 +41,7 @@ function updateCode(model,actionData) {
     let actionResult = {};
     actionResult.event = ACTION_EVENT;
     
-    var memberFullName = actionData.memberName;
-    var member = model.getMemberByFullName(memberFullName);
+    var member = model.lookupMember(actionData.memberId);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member code";
@@ -79,8 +78,7 @@ function updateData(model,actionData) {
     let actionResult = {};
     actionResult.event = ACTION_EVENT;
     
-    var memberFullName = actionData.memberName;
-    var member = model.getMemberByFullName(memberFullName);
+    var member = model.lookupMember(actionData.memberId);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member data";
@@ -90,7 +88,7 @@ function updateData(model,actionData) {
     
     if(!member.getSetDataOk()) {
         actionResult.actionDone = false;
-        actionResult.errorMsg = "Can not set data on member: " + memberFullName;
+        actionResult.errorMsg = "Can not set data on member: " + member.getFullName();
         return;
     }
         

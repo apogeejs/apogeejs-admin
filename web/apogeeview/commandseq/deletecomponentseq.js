@@ -22,7 +22,7 @@ export function deleteComponent(component,componentView) {
     //model command
     var modelCommand = {};
     modelCommand.type = "deleteComponent";
-    modelCommand.memberFullName = member.getFullName();
+    modelCommand.memberId = member.getId();
     commands.push(modelCommand);
     
     //combined command

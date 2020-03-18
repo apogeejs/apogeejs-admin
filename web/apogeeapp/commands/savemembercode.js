@@ -9,7 +9,7 @@ import {getSetCodeAction, getMemberStateUndoCommand} from  "/apogeeapp/commands/
  * Command JSON format:
  * {
  *   "type":"saveMembeData",
- *   "memberFullName":(main member full name),
+ *   "memberId":(main member ID),
  *   "argList":(argument list json array),
  *   "functionBody":(function body)
  *   "supplementalCode":(supplementalCode code - optional)
@@ -25,7 +25,7 @@ let savemembercode = {};
 savemembercode.createUndoCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
     let model = modelManager.getModel();
-    var undoCommandJson = getMemberStateUndoCommand(model,commandData.memberFullName); 
+    var undoCommandJson = getMemberStateUndoCommand(model,commandData.memberId); 
     return undoCommandJson;
 }
 
@@ -33,28 +33,29 @@ savemembercode.executeCommand = function(workspaceManager,commandData) {
     
     let modelManager = workspaceManager.getModelManager();
     let model = modelManager.getModel();
-
-    //lookup member so we can get the component
-    let member = model.getMemberByFullName(commandData.memberFullName);
     
     var actionData = getSetCodeAction(model,
-        commandData.memberFullName,
+        commandData.memberId,
         commandData.argList,
         commandData.functionBody,
         commandData.supplementalCode,
         commandData.clearCodeDataValue);
     
     var actionResult = doAction(model,actionData);
-    
+
+    let component = modelManager.getComponentById(commandData.memberId);
+
     var commandResult = {};
-    commandResult.cmdDone = actionResult.actionDone;
-    if(commandResult.cmdDone) {
-        commandResult.target = modelManager.getComponent(modelManager.getComponent(member));
+    if((actionResult.actionDone)&&(component)) {
+        commandResult.cmdDone = true;
+        commandResult.target = component;
         commandResult.dispatcher = modelManager;
         commandResult.action = "updated";
     }
     else {
-        commandResult.errorMsg = "Error saving data: " + commandData.memberFullName;
+        commandResult.cmdDone = false;
+        let memberFullName = component ? component.getFullName() : "<unknown>" 
+        commandResult.errorMsg = "Error saving data: " + memberFullName;
     }
 
     commandResult.actionResult = actionResult;

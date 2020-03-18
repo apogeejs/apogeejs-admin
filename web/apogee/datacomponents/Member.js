@@ -291,7 +291,7 @@ export default class Member extends FieldObject {
             //set the data for the table, along with triggering updates on dependent tables.
             let actionData = {};
             actionData.action = "updateData";
-            actionData.memberName = this.getFullName();
+            actionData.memberId = this.getId();
             actionData.sourcePromise = promise;
             actionData.data = memberValue;
             doAction(model,actionData);
@@ -299,7 +299,7 @@ export default class Member extends FieldObject {
         var asynchErrorCallback = errorMsg => {
             let actionData = {};
             actionData.action = "updateData";
-            actionData.memberName = this.getFullName();
+            actionData.memberId = this.getId();
             actionData.sourcePromise = promise;
             actionData.data = new Error(errorMsg);
             doAction(model,actionData);

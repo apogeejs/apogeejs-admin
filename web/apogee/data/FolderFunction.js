@@ -103,7 +103,7 @@ export default class FolderFunction extends DependentMember {
     
             var actionData = {};
             actionData.action = "updateFolderFunction";
-            actionData.memberName = folderFunction.getFullName();
+            actionData.memberId = folderFunction.getId();
             actionData.argList = argList;
             actionData.returnValueString = returnValueString;
             return actionData;
@@ -269,7 +269,7 @@ export default class FolderFunction extends DependentMember {
             for(var i = 0; i < inputElementArray.length; i++) {
                 var entry = {};
                 entry.action = "updateData";
-                entry.memberName = inputElementArray[i].getFullName();
+                entry.memberId = inputElementArray[i].getId();
                 entry.data = argumentArray[i];
                 updateActionList.push(entry);
             }

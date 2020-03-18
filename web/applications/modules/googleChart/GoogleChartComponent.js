@@ -129,7 +129,7 @@ export function initApogeeModule(apogee,apogeeapp,apogeeutil) {
 
             var commandData = {};
             commandData.type = "saveMemberCode";
-            commandData.memberFullName = member.getFullName();
+            commandData.memberId = member.getId();
             commandData.argList = member.getArgList();
             commandData.functionBody = functionBody;
             commandData.supplementalCode = member.getSupplementalCode();

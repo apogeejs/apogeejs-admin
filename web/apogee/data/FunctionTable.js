@@ -96,7 +96,7 @@ export default class FunctionTable extends CodeableMember {
         if((newValues.updateData)&&(newValues.updateData.argList !== undefined)) {
             var actionData = {};
             actionData.action = "updateCode";
-            actionData.memberName = member.getFullName();
+            actionData.memberId = member.getId();
             actionData.argList = newValues.updateData.argList;
             actionData.functionBody = member.getFunctionBody();
             actionData.supplementalCode = member.getSupplementalCode();

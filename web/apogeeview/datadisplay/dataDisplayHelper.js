@@ -29,7 +29,7 @@ dataDisplayHelper.getMemberDataJsonDataSource = function(app,component,memberFie
         saveData: function(data) {
             var commandData = {};
             commandData.type = "saveMemberData";
-            commandData.memberFullName = dataMember.getFullName();
+            commandData.memberId = dataMember.getId();
             commandData.data = data;
             
             app.executeCommand(commandData);
@@ -115,7 +115,7 @@ dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,component,membe
         saveData: function(text) {
             var commandData = {};
             commandData.type = "saveMemberCode";
-            commandData.memberFullName = functionMember.getFullName();
+            commandData.memberId = functionMember.getId();
             commandData.argList = functionMember.getArgList();
             commandData.functionBody = text;
             commandData.supplementalCode = functionMember.getSupplementalCode();
@@ -151,7 +151,7 @@ dataDisplayHelper.getMemberSupplementalDataSource = function(app,component,membe
         saveData: function(text) {
             var commandData = {};
             commandData.type = "saveMemberCode";
-            commandData.memberFullName = functionMember.getFullName();
+            commandData.memberId = functionMember.getId();
             commandData.argList = functionMember.getArgList();
             commandData.functionBody = functionMember.getFunctionBody();
             commandData.supplementalCode = text;

@@ -8,6 +8,18 @@ let deletecomponent = {};
 // Command Object
 //=====================================
 
+/*** 
+ * This command supports two formats:
+ * 
+ * Format 1: member ID
+ * commandData.type = "deleteComponent"
+ * commandData.memberId = (memberId)
+ * 
+ * Format 2: parent ID, memberName
+ * commandData.type = "deleteComponent"
+ * commandData.parentId = (parentId)
+ * commandData.memberName = (memberName)
+ */
 deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
     
     //problems
@@ -16,13 +28,23 @@ deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
     
     let modelManager = workspaceManager.getModelManager();
     var model = modelManager.getModel();
-    var member = model.getMemberByFullName(commandData.memberFullName);
-    var component = modelManager.getComponent(member);
-    var parent = member.getParent();
+    let member;
+    let component;
+    let parent;
+
+    if(commandData.memberId) {
+        member = model.lookupMember(commandData.memberId);
+        parent = member.getParent();
+    }
+    else {
+        parent = model.lookupMember(commandData.parentId);
+        member = parent.lookupMember(commandData.memberName);
+    }
+    component = modelManager.getComponent(member);
     
     var commandUndoJson = {};
     commandUndoJson.type = "addComponent";
-    commandUndoJson.parentFullName = parent.getFullName();
+    commandUndoJson.parentId = parent.getId();
     commandUndoJson.memberJson = member.toJson();
     commandUndoJson.componentJson = component.toJson();
     
@@ -40,7 +62,15 @@ deletecomponent.executeCommand = function(workspaceManager,commandData) {
 
     var actionJson = {};
     actionJson.action = "deleteMember";
-    actionJson.memberName = commandData.memberFullName;
+
+    if(commandData.memberId) {
+        actionJson.memberId = commandData.memberId;
+    }
+    else {
+        let parent = model.lookupMember(commandData.parentId);
+        let member = parent.lookupMember(commandData.memberName);
+        actionJson.memberId = member.getId();
+    }
     
     var actionResult = doAction(model,actionJson);
     

@@ -6,7 +6,7 @@ import { Transform, Step } from "/prosemirror/lib/prosemirror-transform/src/inde
  * Command JSON format:
  * {
  *   "type":"literatePageTransaction",
- *   "memberFullName":(main member full name),
+ *   "memberId":(main member full name),
  *   "steps":(steps json)
  * }
  */ 
@@ -27,7 +27,7 @@ literatepagetransaction.createUndoCommand = function(workspaceManager,commandDat
         undoCommandData.startMarks = commandData.endMarks;
         undoCommandData.endSelection = commandData.startSelection;
         undoCommandData.endMarks = commandData.startMarks;
-        undoCommandData.memberFullName = commandData.memberFullName;
+        undoCommandData.memberId = commandData.memberId;
         return undoCommandData;
     }
     else {
@@ -44,7 +44,7 @@ literatepagetransaction.executeCommand = function(workspaceManager,commandData) 
     let modelManager = workspaceManager.getModelManager();
     var model = modelManager.getModel();
     //get the member
-    var member = model.getMemberByFullName(commandData.memberFullName);   
+    var member = model.lookupMember(commandData.memberId);   
     var component = modelManager.getComponent(member);
 
     var oldDocument = component.getDocument();

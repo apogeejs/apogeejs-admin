@@ -20,8 +20,7 @@ function updateProperties(model,actionData) {
     let actionResult = {};
     actionResult.event = ACTION_EVENT;
     
-    var memberFullName = actionData.memberName;
-    var folderFunction = model.getMemberByFullName(memberFullName);
+    var folderFunction = model.getMemberByFullName(actionData.memberId);
     if(!folderFunction) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member code";

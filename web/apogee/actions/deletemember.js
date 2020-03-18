@@ -22,8 +22,7 @@ import {addActionInfo} from "/apogee/actions/action.js";
 /** Delete member action function */
 function deleteMember(model,actionData) {
     
-    var memberFullName = actionData.memberName;
-    var member = model.getMemberByFullName(memberFullName);
+    var member = model.lookupMember(actionData.memberId);
     if(!member) {
         let actionResult = {};
         actionResult.actionDone = false;
@@ -36,14 +35,14 @@ function deleteMember(model,actionData) {
     // - modify parent and all parents up to model
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     
-    let actionResult = doDelete(member);
+    let actionResult = doDelete(model, member);
     return actionResult;
     
 }
 
 
 /** @private */
-function doDelete(member) {
+function doDelete(model, member) {
 
     let actionResult = {};
     actionResult.member = member;
@@ -57,7 +56,7 @@ function doDelete(member) {
         var childMap = member.getChildMap();
         for(var childName in childMap) {
             var child = childMap[childName];
-            let childActionResult = doDelete(child);
+            let childActionResult = doDelete(model, child);
             actionResult.childActionResults.push(childActionResult);
         }
     }
@@ -66,7 +65,7 @@ function doDelete(member) {
         
         //child is the root of this object
         var root = member.getRoot();
-        let childActionResult = doDelete(root);
+        let childActionResult = doDelete(model,root);
 
         actionResult.childActionResults.push(childActionResult);
     }

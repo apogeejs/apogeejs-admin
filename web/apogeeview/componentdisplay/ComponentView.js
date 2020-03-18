@@ -422,29 +422,6 @@ export default class ComponentView {
         }
     }
 
-    /** This method is used for setting initial values in the property dialog. 
-     * If there are additional property lines, in the generator, this method should
-     * be extended to give the values of those properties too. */
-    getPropertyValues() {
-        
-        var member = this.member;
-        
-        var values = {};
-        values.name = member.getName();
-        var parent = member.getParent();
-        if(parent) {
-            values.parentName = parent.getFullName();
-        }
-
-        if(member.constructor.generator.readProperties) {
-            member.constructor.generator.readProperties(member,values);
-        }
-        if(this.readExtendedProperties) {
-            this.readExtendedProperties(values);
-        }
-        return values;
-    }
-
     //=============================
     // Action UI Entry Points
     //=============================

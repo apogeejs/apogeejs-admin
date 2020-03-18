@@ -37,7 +37,6 @@ export function updateComponent(component,componentView) {
         }
         
         var member = component.getMember();
-        var memberFullName = member.getFullName();
         
         var commands = [];
         
@@ -60,7 +59,7 @@ export function updateComponent(component,componentView) {
         if((numMemberProps > 0)||(numComponentProps > 0)) {
             let updateCommand = {};
             updateCommand.type = "updateComponent";
-            updateCommand.memberFullName = memberFullName;
+            updateCommand.memberId = member.getId();
             if(numMemberProps > 0) updateCommand.updatedMemberProperties = memberUpdateJson;
             if(numComponentProps > 0) updateCommand.updatedComponentProperties = componentUpdateJson;
             commands.push(updateCommand)
@@ -112,13 +111,19 @@ export function updateComponent(component,componentView) {
                     commands.push(renameEditorCommands.setupCommand);
                 }
             }
+
+//============================================
+//simplify this by saving id in ui flow
+let parent = modelManager.getComponentByFullName(submittedValues.parentName);
+let parentId = parent.getId();
+//=========================================
             
             //update the component name
             let moveCommand = {};
             moveCommand.type = "moveComponent";
-            moveCommand.memberFullName = memberFullName;
+            moveCommand.memberId = member.getId();
             moveCommand.newMemberName = submittedValues.name;
-            moveCommand.newParentFullName = submittedValues.parentName;
+            moveCommand.newParentId = parentId;
             commands.push(moveCommand);
 
             //do the second stage of editor commands
@@ -143,7 +148,7 @@ export function updateComponent(component,componentView) {
                     //check if we need to add any delete component commands  - we shouldn't have any since we are not overwriting data here
                     if(newParentCommands.deletedComponentCommands) {
                         //make sure the user wants to proceed
-                        let deletedComponentNames = additionalCommands.deletedComponentCommands.map(command => command.memberFullName);
+                        let deletedComponentNames = newParentCommands.deletedComponentCommands.map(command => command.memberId);
                         let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedComponentNames);
                         
                         //return if user rejects

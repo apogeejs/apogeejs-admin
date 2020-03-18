@@ -110,7 +110,7 @@ export default class CustomComponent extends Component {
 
         var command = {};
         command.type = customComponentUpdateData.commandInfo.type;
-        command.memberFullName = this.getFullName();
+        command.memberId = this.getId();
         command.fieldName = codeFieldName;
         command.initialValue = initialValue;
         command.targetValue = targetValue;
@@ -211,7 +211,7 @@ CustomComponent.DEFAULT_MEMBER_JSON = {
  * Command JSON format:
  * {
  *   "type":"customComponentUpdateCommand",
- *   "memberFullName":(main member full name),
+ *   "memberId":(main member ID),
  *   "fieldName": (the name of the field being updated),
  *   "initialValue":(original fields value)
  *   "targetValue": (desired fields value)
@@ -221,7 +221,7 @@ let customComponentUpdateData = {};
 
 customComponentUpdateData.createUndoCommand = function(workspaceManager,commandData) {
     let undoCommandData = {};
-    undoCommandData.memberFullName = commandData.memberFullName;
+    undoCommandData.memberId = commandData.memberId;
     undoCommandData.fieldName = commandData.fieldName;
     undoCommandData.initialValue = commandData.targetValue;
     undoCommandData.targetValue = commandData.initialValue;
@@ -230,7 +230,7 @@ customComponentUpdateData.createUndoCommand = function(workspaceManager,commandD
 
 customComponentUpdateData.executeCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
-    let component = modelManager.getComponentByFullName(commandData.memberFullName);
+    let component = modelManager.getComponent(commandData.memberId);
     var commandResult = {};
     if(component) {
         try {
@@ -249,7 +249,7 @@ customComponentUpdateData.executeCommand = function(workspaceManager,commandData
     }
     else {
         commandResult.cmdDone = false;
-        commandResult.alertMsg = "Component not found: " + command.memberFullName;
+        commandResult.alertMsg = "Component not found: " + commandData.memberId;
     }
     
     return commandResult;

@@ -20,8 +20,7 @@ closeworkspace.executeCommand = function(workspaceManager,commandData) {
     commandResult.dispatcher = workspaceManager.getApp();
     
     try {
-        workspaceManagerRemoved = workspaceManager.getApp().clearWorkspaceManager();
-        
+        workspaceManager.getApp().clearWorkspaceManager();
         workspaceManager.close();
         model.onClose();
 

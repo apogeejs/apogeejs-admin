@@ -18,17 +18,15 @@ function moveMember(model,actionData) {
     let actionResult = {};
     actionResult.event = ACTION_EVENT;
         
-    var memberFullName = actionData.memberName;
-    var member = model.getMemberByFullName(memberFullName);
+    var member = model.lookupMember(actionData.memberId);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for move member";
         return;
     }
     actionResult.member = member;
-    
-    var targetOwnerFullName = actionData.targetOwnerName;
-    var targetOwner = model.getMemberByFullName(targetOwnerFullName);
+
+    var targetOwner = model.lookupMember(actionData.targetOwnerId);
     if(!targetOwner) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "New parent not found for move member";

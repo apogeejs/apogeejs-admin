@@ -127,7 +127,7 @@ export default class CustomDataComponent extends Component {
         var initialValue = this.getField(fieldName);
         var command = {};
         command.type = customDataComponentUpdateData.commandInfo.type;
-        command.memberFullName = this.getFullName();
+        command.memberId = this.getId();
         command.fieldName = fieldName;
         command.initialValue = initialValue;
         command.targetValue = targetValue;
@@ -247,7 +247,7 @@ CustomDataComponent.DEFAULT_MEMBER_JSON = {
  * Command JSON format:
  * {
  *   "type":"customComponentUpdateCommand",
- *   "memberFullName":(main member full name),
+ *   "memberId":(main member ID),
  *   "fieldName": (the name of the field being updated),
  *   "initialValue":(original fields value)
  *   "targetValue": (desired fields value)
@@ -258,7 +258,7 @@ let customDataComponentUpdateData = {};
 
 customDataComponentUpdateData.createUndoCommand = function(workspaceManager,commandData) {
     let undoCommandData = {};
-    undoCommandData.memberFullName = commandData.memberFullName;
+    undoCommandData.memberId = commandData.memberId;
     undoCommandData.fieldName = commandData.fieldName;
     undoCommandData.initialValue = commandData.targetValue;
     undoCommandData.targetValue = commandData.initialValue;
@@ -267,7 +267,7 @@ customDataComponentUpdateData.createUndoCommand = function(workspaceManager,comm
 
 customDataComponentUpdateData.executeCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
-    let component = modelManager.getComponentByFullName(commandData.memberFullName);
+    let component = modelManager.getComponentByFullName(commandData.memberId);
     var commandResult = {};
     if(component) {
         try {
@@ -286,7 +286,7 @@ customDataComponentUpdateData.executeCommand = function(workspaceManager,command
     }
     else {
         commandResult.cmdDone = false;
-        commandResult.alertMsg = "Component not found: " + command.memberFullName;
+        commandResult.alertMsg = "Component not found: " + commandData.memberId;
     }
     
     return commandResult;

@@ -606,11 +606,11 @@ export default class ParentComponentView extends ComponentView {
         return deletedComponentShortNames.map(shortName => {
 
             let parentMember = this.getComponent().getParentFolderForChildren();
-            let fullName = parentMember.getChildFullName(shortName);
+            let member = parentMember.lookupChild(shortName);
             
             let commandData = {};
             commandData.type = "deleteComponent";
-            commandData.memberFullName = fullName;
+            commandData.memberId = member.getId();
             return commandData;
         });
     }
@@ -624,7 +624,7 @@ export default class ParentComponentView extends ComponentView {
 
             let commandData = {};
             commandData.type = "addComponent";
-            commandData.parentFullName = parentMember.getFullName();
+            commandData.parentId = parentMember.getId();
             commandData.memberJson = state.memberJson;
             commandData.componentJson = state.componentJson;
             return commandData;
@@ -655,7 +655,7 @@ export default class ParentComponentView extends ComponentView {
 
         var commandData = {};
         commandData.type = "literatePageTransaction";
-        commandData.memberFullName = this.getComponent().getFullName();
+        commandData.memberId = this.getComponent().getId();
         commandData.steps = stepsJson;
         commandData.undoSteps = inverseStepsJson;
 
@@ -729,7 +729,7 @@ export default class ParentComponentView extends ComponentView {
         let state = this.getEditorData();
         let schema = state.schema;
         let setupTransaction;
-        let commands = {};
+        let commandInfo = {};
         
         if(!insertAtEnd) {
             let { empty } = state.selection;
@@ -738,11 +738,12 @@ export default class ParentComponentView extends ComponentView {
                 setupTransaction = state.tr.deleteSelection(); 
 
                 //see if we need to delete any apogee nodes
-                var deletedApogeeComponents = this.getDeletedApogeeComponentShortNames(setupTransaction);
+                var deletedComponentShortNames = this.getDeletedApogeeComponentShortNames(setupTransaction);
+                commandInfo.deletedComponentShortNames = deletedComponentShortNames
 
-                if(deletedApogeeComponents.length > 0) {
+                if(deletedComponentShortNames.length > 0) {
                     //create delete commands
-                    commands.deletedComponentCommands = this.createDeleteComponentCommands(deletedApogeeComponents); 
+                    commandInfo.deletedComponentCommands = this.createDeleteComponentCommands(deletedComponentShortNames); 
                 }
             }
         }
@@ -758,7 +759,7 @@ export default class ParentComponentView extends ComponentView {
         if(setupTransaction) {
             let initial1Selection = state.selection;
             let initial1Marks = state.marks;
-            commands.editorSetupCommand = this.createEditorCommand(setupTransaction,initial1Selection,initial1Marks);
+            commandInfo.editorSetupCommand = this.createEditorCommand(setupTransaction,initial1Selection,initial1Marks);
         }
 
         //create a second transaction
@@ -785,9 +786,9 @@ export default class ParentComponentView extends ComponentView {
         //finish the document transaction
         addTransaction = addTransaction.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "name": shortName }));
         addTransaction.scrollIntoView();
-        commands.editorAddCommand = this.createEditorCommand(addTransaction,initial2Selection,initial2Marks);
+        commandInfo.editorAddCommand = this.createEditorCommand(addTransaction,initial2Selection,initial2Marks);
 
-        return commands;
+        return commandInfo;
         
     }
 

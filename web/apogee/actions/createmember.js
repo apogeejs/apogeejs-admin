@@ -34,8 +34,7 @@ function createMemberAction(model,actionData) {
         owner = model;
     }
     else {
-        let ownerFullName = actionData.ownerName;
-        owner = model.getMemberByFullName(ownerFullName);
+        owner = model.lookupMember(actionData.ownerId);
         if(!owner) {
             let actionResult = {};
             actionResult.actionDone = false;

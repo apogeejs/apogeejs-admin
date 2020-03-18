@@ -8,9 +8,9 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 /** This method can be called to create a undo function to return a member to the current state
  * following a code or data update. */
-export function getMemberStateUndoCommand(model, memberFullName) {
+export function getMemberStateUndoCommand(model, memberId) {
     
-    var member = model.getMemberByFullName(memberFullName);
+    var member = model.lookupMember(memberId);
     var command = {};
     
     if((member.isCodeable)&&(member.hasCode())) {
@@ -46,7 +46,7 @@ export function getMemberStateUndoCommand(model, memberFullName) {
         }
     }
 
-    command.memberFullName = memberFullName;
+    command.memberId = memberId;
     
     return command;
 }
@@ -55,11 +55,11 @@ export function getMemberStateUndoCommand(model, memberFullName) {
 
 
 /** @private */
-export function getSaveDataAction(model,memberFullName,data,asynchOnComplete) {
+export function getSaveDataAction(model,memberId,data,asynchOnComplete) {
 
     var actionData = {};
     actionData.action = "updateData";
-    actionData.memberName = memberFullName;
+    actionData.memberId = memberId;
     actionData.data = data;
         
     //handle the asynch case
@@ -77,20 +77,20 @@ export function getSaveDataAction(model,memberFullName,data,asynchOnComplete) {
     return actionData;
 }
 
-export function getSetCodeAction(model,memberFullName,argList,functionBody,supplementalCode,optionalClearCodeDataValue) {
+export function getSetCodeAction(model,memberId,argList,functionBody,supplementalCode,optionalClearCodeDataValue) {
      
     var actionData = {};
 
     if((optionalClearCodeDataValue != undefined)&&(functionBody == "")&&(supplementalCode == "")) {
         //special case - clear code
         actionData.action = "updateData";
-        actionData.memberName = memberFullName;
+        actionData.memberId = memberId;
         actionData.data = optionalClearCodeDataValue;
     }
     else {
         //standard case - edit code
         actionData.action = "updateCode";
-        actionData.memberName = memberFullName;
+        actionData.memberId = memberId;
         actionData.argList = argList;
         actionData.functionBody = functionBody;
         actionData.supplementalCode = supplementalCode;  

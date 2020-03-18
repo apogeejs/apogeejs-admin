@@ -9,7 +9,7 @@ import CommandManager from "/apogeeapp/commands/CommandManager.js";
  * Command JSON format:
  * {
  *   "type":"addComponent",
- *   "parentFullName":(parent full name),
+ *   "parentId":(parent ID),
  *   "memberJson":(member property json),
  *   "componentJson":(component property json)
  * }
@@ -23,15 +23,10 @@ let addcomponent = {};
 
 addcomponent.createUndoCommand = function(workspaceManager,commandData) {
     
-    var modelManager = workspaceManager.getModelManager();
-    var model = modelManager.getModel();
-    var memberName = commandData.memberJson.name;
-    var parent = model.getMemberByFullName(commandData.parentFullName);
-    var memberFullName = parent.getChildFullName(memberName);
-    
     var undoCommandJson = {};
     undoCommandJson.type = "deleteComponent";
-    undoCommandJson.memberFullName = memberFullName;
+    undoCommandJson.parentId = commandData.parentId;
+    undoCommandJson.memberName = commandData.memberJson.name;
     
     return undoCommandJson;
 }
@@ -45,7 +40,7 @@ addcomponent.executeCommand = function(workspaceManager,commandData) {
     //create the member
     let createAction = {};
     createAction.action = "createMember";
-    createAction.ownerName = commandData.parentFullName;
+    createAction.ownerId = commandData.parentId;
     createAction.createData = commandData.memberJson;
     let actionResult = doAction(model,createAction);
     
@@ -53,7 +48,7 @@ addcomponent.executeCommand = function(workspaceManager,commandData) {
     //I need error handling for the create component action
     if(actionResult.actionDone) {
         //this is a bit clumsy...
-        let parentMember = model.getMemberByFullName(commandData.parentFullName);
+        let parentMember = model.lookupMember(commandData.parentId);
         let name = commandData.memberJson.name
         let componentMember = parentMember.lookupChild(name);
         commandResult = modelManager.createComponentFromMember(componentMember,commandData.componentJson);

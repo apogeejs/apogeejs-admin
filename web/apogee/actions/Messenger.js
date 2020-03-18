@@ -27,7 +27,7 @@ export default class Messenger {
         //set the data for the table, along with triggering updates on dependent tables.
         var actionData = {};
         actionData.action = "updateData";
-        actionData.memberName = member.getFullName();
+        actionData.memberId = member.getId();
         actionData.data = data;
         if(data instanceof Promise) {
             //for now no callback on promise
@@ -56,7 +56,7 @@ export default class Messenger {
             let data = updateEntry[1];
             
             subActionData.action = "updateData";
-            subActionData.memberName = member.getFullName();
+            subActionData.memberId = member.getId();
             subActionData.data = data;
             if(data instanceof Promise) {
                 //for now no callback on promise

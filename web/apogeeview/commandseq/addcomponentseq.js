@@ -63,35 +63,40 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
 
             //other validation of inputs?
 
+//we should do this cleaner - by storing parent id in the submit input
+            let modelManager = modelView.getModelManager();
+            let model = modelManager.getModel();
+            let parentMember = model.getMemberByFullName(userInputProperties.parentName);
+            let parentId = parentMember.getId();
+
             let commands = [];
             
             //create the model command
             let createCommandData = {};
             createCommandData.type = "addComponent";
-            createCommandData.parentFullName = userInputProperties.parentName;
+            createCommandData.parentId = parentId;
             createCommandData.memberJson = Component.createMemberJson(componentClass,userInputProperties,optionalBaseMemberValues);
             createCommandData.componentJson = Component.createComponentJson(componentClass,userInputProperties,optionalBaseComponentValues);
 
             //editor related commands
-            let additionalCommands;
+            let additionalCommandInfo;
             let parentComponentView;
             if(componentViewClass.hasChildEntry) {
                 parentComponentView = getComponentFromName(modelManager,modelView,userInputProperties.parentName);
-                additionalCommands = getAdditionalCommands(parentComponentView,userInputProperties.name);
+                additionalCommandInfo = getAdditionalCommands(parentComponentView,userInputProperties.name);
 
                 //added the editor setup command
-                if(additionalCommands.editorSetupCommand) commands.push(additionalCommands.editorSetupCommand);
+                if(additionalCommandInfo.editorSetupCommand) commands.push(additionalCommandInfo.editorSetupCommand);
 
                 //add any delete commands
-                if(additionalCommands.deletedComponentCommands){
+                if(additionalCommandInfo.deletedComponentCommands){
                     //make sure the user wants to proceed
-                    let deletedComponentNames = additionalCommands.deletedComponentCommands.map(command => command.memberFullName);
-                    let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedComponentNames);
+                    let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + additionalCommandInfo.deletedComponentShortNames);
                     
                     //return if user rejects
                     if(!doDelete) return;
 
-                    commands.push(...additionalCommands.deletedComponentCommands);
+                    commands.push(...additionalCommandInfo.deletedComponentCommands);
                 } 
             }
 
@@ -99,8 +104,8 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
             commands.push(createCommandData);
 
             //add the editor insert command
-            if((additionalCommands)&&(additionalCommands.editorAddCommand)) {
-                commands.push(additionalCommands.editorAddCommand);
+            if((additionalCommandInfo)&&(additionalCommandInfo.editorAddCommand)) {
+                commands.push(additionalCommandInfo.editorAddCommand);
             }
             
             let commandData;

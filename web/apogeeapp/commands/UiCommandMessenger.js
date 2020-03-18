@@ -51,7 +51,7 @@ export default class UiCommandMessenger {
 
         let command = {};
         command.type = "saveMemberData";
-        command.memberFullName = member.getFullName();
+        command.memberId = member.getId();
         command.data = data;
 
         return command
