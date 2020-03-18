@@ -285,8 +285,7 @@ export default class Model extends FieldObject {
     
     /** This method adds a data member to the imapacts list for this node.
      * The return value is true if the member was added and false if it was already there. 
-     * NOTE: the member ID can be a string or integer. This dependentMemberId should be an int.
-     * @private */
+     * NOTE: the member ID can be a string or integer. This dependentMemberId should be an int. */
     addToImpactsList(depedentMemberId,memberId) {
         //don't let a member impact itself
         if(memberId === depedentMemberId) return;
@@ -303,8 +302,7 @@ export default class Model extends FieldObject {
         }
     }
 
-    /** This method removes a data member from the imapacts list for this node. 
-     * @private */
+    /** This method removes a data member from the imapacts list for this node. */
     removeFromImpactsList(depedentMemberId,memberId) {
 
         let workingMemberImpactsList = this.getWorkingMemberImpactsList(memberId);
