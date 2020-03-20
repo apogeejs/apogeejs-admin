@@ -25,7 +25,7 @@ export default class FolderFunction extends DependentMember {
 
     /** This gets the internal forlder for the folderFunction. */
     getInternalFolder() {
-        return this.getField("childMap")["main"];
+        return this.getField("childMap")["body"];
     }
 
     /** This gets the name of the return object for the folderFunction function. */
@@ -62,9 +62,9 @@ export default class FolderFunction extends DependentMember {
         //set initial data
         let initialData = json.updateData;
         let argList = ((initialData)&&(initialData.argList !== undefined)) ? initialData.argList : [];
-        this.setField("argList",argList);
+        member.setField("argList",argList);
         let returnValueString = ((initialData)&&(initialData.returnValue !== undefined)) ? initialData.returnValue : [];
-        this.setField("returnValue",returnValueString);
+        member.setField("returnValue",returnValueString);
         
         return member;
     }
@@ -232,7 +232,7 @@ export default class FolderFunction extends DependentMember {
 
         //create a copy of the model to do the function calculation - we don't update the UI display version
         var virtualModel;
-        var rootFolder;
+        var internalFolder;
         var inputElementArray;
         var returnValueTable; 
         
@@ -250,7 +250,7 @@ export default class FolderFunction extends DependentMember {
                 }
 
                 //lookup elements from virtual model
-                internalFolder = virtualModel.getInternalFolder();
+                internalFolder = virtualModel.getMemberByFullName("body");
                 inputElementArray = this.loadInputElements(internalFolder);
                 returnValueTable = this.loadOutputElement(internalFolder); 
                 
@@ -300,7 +300,7 @@ export default class FolderFunction extends DependentMember {
     /** This method creates a copy of the model to be used for the function evvaluation. 
      * @private */
     createVirtualModel(model) {
-        let internalFolder = this.getField("internalFolder");
+        let internalFolder = this.getInternalFolder();
         var folderJson = internalFolder.toJson();
         var modelJson = Model.createModelJsonFromFolderJson(this.getName(),folderJson);
         var virtualModel = new Model(this.getParent(model));
@@ -344,7 +344,7 @@ export default class FolderFunction extends DependentMember {
 base.mixin(FolderFunction,ContextHolder);
 base.mixin(FolderFunction,Parent);
 
-FolderFunction.INTERNAL_FOLDER_NAME = "root";
+FolderFunction.INTERNAL_FOLDER_NAME = "body";
 
         
 //============================

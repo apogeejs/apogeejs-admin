@@ -80,7 +80,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
     getChildComponentDisplay(name) {
         let folderComponent = this.componentView.getComponent();
-        let folderMember = folderComponent.getMember();
+        let folderMember = folderComponent.getParentFolderForChildren();
 
         //lookup component
         var member = folderMember.lookupChild(name);
@@ -325,7 +325,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
                     this.editorView.dom.focus();
 
                     var initialValues = {};
-                    initialValues.parentId = pageComponent.getMemberId();
+                    var parentMember = pageComponent.getParentFolderForChildren();
+                    initialValues.parentId = parentMember.getId();
 
                     addComponent(appView,app,componentClass,initialValues,null,null);
                 }

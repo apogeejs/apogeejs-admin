@@ -4,9 +4,9 @@ import ParentComponent from "/apogeeapp/component/ParentComponent.js";
 /** This component represents a table object. */
 export default class FolderComponent extends ParentComponent {
 
-    constructor(modelManager,folder) {
+    constructor(member,modelManager) {
         //extend parent component
-        super(modelManager,folder,FolderComponent);
+        super(member,modelManager);
     };
 
     //cludge================================================

@@ -8,8 +8,8 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
  * and create a generator. */
 export default class BasicControlComponent extends Component{
     
-    constructor(control) {
-        super(control);
+    constructor(member,modelManager) {
+        super(member,modelManager);
     
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS

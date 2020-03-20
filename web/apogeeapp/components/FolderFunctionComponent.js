@@ -11,9 +11,9 @@ export default class FolderFunctionComponent extends ParentComponent {
         super(member,modelManager);
         
         //register this object as a parent container
-        var internalFolder = folderFunction.getInternalFolder();
-        this.setField("member.root",internalFolder);
-        modelManager.registerMember(internalFolder,this,folderFunction);
+        var internalFolder = member.getInternalFolder();
+        this.setField("member.body",internalFolder);
+        modelManager.registerMember(internalFolder,this,member);
     }
 
     /** This overrides the get display method of componnet to return the function declaration. */
@@ -47,7 +47,7 @@ export default class FolderFunctionComponent extends ParentComponent {
     //it is used for now when we paste into the document to create a new component.
     getParentFolderForChildren() {
         //use the internal folder
-        return this.getField("member.root");
+        return this.getField("member.body");
     }
     //=======================================================
 
@@ -70,7 +70,7 @@ export default class FolderFunctionComponent extends ParentComponent {
         internalFolderJson.children = childrenJson;
         
         optionsJson = {};
-        optionsJson.children["root"] = internalFolderJson;
+        optionsJson.children["body"] = internalFolderJson;
     }
 
     static appendMemberChildren(optionsJson,childrenJson) {
@@ -88,8 +88,8 @@ FolderFunctionComponent.uniqueName = "apogeeapp.app.FolderFunctionComponent";
 FolderFunctionComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.FolderFunction",
     "children": {
-        "root": {
-            "name": "root",
+        "body": {
+            "name": "body",
             "type": "apogee.Folder",
         }
     }

@@ -139,7 +139,7 @@ function getMemberJsonFromWorkspaceJson(workspaceJson,componentClass) {
         //I should probably do this conversion in the folder function code, so it is easier to maintain
         var memberFolderFunctionJson = componentClass.DEFAULT_MEMBER_JSON;
         var internalFolderJson = apogeeutil.jsonCopy(memberFolderJson);
-        internalFolderJson.name = "root";
+        internalFolderJson.name = "body";
         memberFolderFunctionJson.internalFolder = internalFolderJson;
         return memberFolderFunctionJson;
     }

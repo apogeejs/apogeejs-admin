@@ -88,7 +88,7 @@ export default class ParentComponent extends Component {
             var child = childMap[key];
             var childComponent = modelManager.getComponentByMember(child);
             var name = child.getName();
-            children[name] = childComponent.toJson();
+            children[name] = childComponent.toJson(modelManager);
             childrenPresent = true;
         }
         if(childrenPresent) {

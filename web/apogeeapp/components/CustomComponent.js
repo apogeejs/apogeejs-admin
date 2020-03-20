@@ -10,8 +10,8 @@ import CommandManager from "/apogeeapp/commands/CommandManager.js";
  * confugred with initialization data from the model. */
 export default class CustomComponent extends Component {
 
-    constructor(member) {
-        super(member);
+    constructor(member,modelManager) {
+        super(member,modelManager);
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
