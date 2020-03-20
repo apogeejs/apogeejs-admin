@@ -17,16 +17,15 @@ export function exportWorkspace(app,fileAccessObject) {
     var modelManager = workspaceManager.getModelManager();
 
     //get the folder list
-    var folderNames = modelManager.getFolders();
+    var folderList = modelManager.getFolders();
 
     //create the dialog layout - do on the fly because folder list changes
-    var dialogLayout = getExportDialogLayout(folderNames);
+    var dialogLayout = getExportDialogLayout(folderList);
 
     //create on submit callback
     var onSubmitFunction = function(result) {         
-        var folderFullName = result.parentName;
         var model = modelManager.getModel();
-        var folder = model.lookupMemberByName(folderFullName);
+        var folder = model.lookupMemberById(result.parentId);
 
         var workspaceText = getWorkspaceText(app,folder);
         if(!workspaceText) {
@@ -62,8 +61,9 @@ function getWorkspaceText(app,folder) {
 // private functions
 //---------------------------------
 
-/** @private */
-function getExportDialogLayout(folderNames) {
+/** FolderInfo is a format compatible with the comfigurable dialog - a list of names or a list of entries [id,name] 
+ * @private */
+function getExportDialogLayout(folderInfo) {
         
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};
@@ -79,8 +79,8 @@ function getExportDialogLayout(folderNames) {
         var parentLine = {};
         parentLine.type = "dropdown";
         parentLine.heading = "Folder: ";
-        parentLine.entries = folderNames;
-        parentLine.resultKey = "parentName"; 
+        parentLine.entries = folderInfo;
+        parentLine.resultKey = "parentId"; 
         parentLine.focus = true;
         lines.push(parentLine);
     }

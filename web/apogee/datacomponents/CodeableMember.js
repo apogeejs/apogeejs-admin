@@ -83,7 +83,7 @@ export default class CodeableMember extends DependentMember {
         }
         
         //process the code text into javascript code
-        var codeLabel = this.getFullName();
+        var codeLabel = this.getName();
         var compiledInfo = processCode(argList,functionBody,supplementalCode,codeLabel);
         this.setField("compiledInfo",compiledInfo);
     }
@@ -111,7 +111,7 @@ export default class CodeableMember extends DependentMember {
         
         if((this.hasCode())&&(compiledInfo.valid)) {
             try {
-                var dependencyInfo = getDependencyInfo(compiledInfo.varInfo,this.getContextManager());
+                var dependencyInfo = getDependencyInfo(compiledInfo.varInfo,model,this.getContextManager());
 
                 //update dependencies
                 this.updateDependencies(model,dependencyInfo);
@@ -133,7 +133,7 @@ export default class CodeableMember extends DependentMember {
         if((compiledInfo)&&(compiledInfo.valid)) {
                     
             //calculate new dependencies
-            var dependsOnMap = getDependencyInfo(compiledInfo.varInfo,this.getContextManager());
+            var dependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getContextManager());
             
             //update the dependency list
             var dependenciesChanged = this.updateDependencies(model,dependsOnMap);
@@ -294,7 +294,7 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
                 //set the context
                 let compiledInfo = this.getField("compiledInfo");
                 let messenger = new Messenger(model,this);
-                compiledInfo.memberFunctionContextInitializer(this.getContextManager(),messenger);
+                compiledInfo.memberFunctionContextInitializer(model,this.getContextManager(),messenger);
                 
                 functionInitializedSuccess = true;
             }

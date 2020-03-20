@@ -10,7 +10,7 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
  * following a code or data update. */
 export function getMemberStateUndoCommand(model, memberId) {
     
-    var member = model.lookupMember(memberId);
+    var member = model.lookupMemberById(memberId);
     var command = {};
     
     if((member.isCodeable)&&(member.hasCode())) {

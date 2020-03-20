@@ -65,16 +65,14 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
 
 //we should do this cleaner - by storing parent id in the submit input
             let modelManager = modelView.getModelManager();
-            let model = modelManager.getModel();
-            let parentMember = model.getMemberByFullName(userInputProperties.parentName);
-            let parentId = parentMember.getId();
+            let parentMemberId = userInputProperties.parentId;
 
             let commands = [];
             
             //create the model command
             let createCommandData = {};
             createCommandData.type = "addComponent";
-            createCommandData.parentId = parentId;
+            createCommandData.parentId = parentMemberId;
             createCommandData.memberJson = Component.createMemberJson(componentClass,userInputProperties,optionalBaseMemberValues);
             createCommandData.componentJson = Component.createComponentJson(componentClass,userInputProperties,optionalBaseComponentValues);
 
@@ -82,7 +80,8 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
             let additionalCommandInfo;
             let parentComponentView;
             if(componentViewClass.hasChildEntry) {
-                parentComponentView = getComponentFromName(modelManager,modelView,userInputProperties.parentName);
+                let parentComponent = modelManager.getComponentByMemberId(parentMemberId);
+                parentComponentView = modelView.getComponentViewByComponentId(parentComponent.getId());
                 additionalCommandInfo = getAdditionalCommands(parentComponentView,userInputProperties.name);
 
                 //added the editor setup command
@@ -173,14 +172,6 @@ function getAdditionalCommands(parentComponentView,childName) {
     let insertAtEnd = !useParentSelection;
 
     return parentComponentView.getInsertApogeeNodeOnPageCommands(childName,insertAtEnd);
-}
-
-function getComponentFromName(modelManager, modelView, componentName) {
-    var model = modelManager.getModel();
-    var member = model.getMemberByFullName(componentName);
-    var component = modelManager.getComponent(member);
-    var componentView = modelView.getComponentView(component.getId());
-    return componentView;
 }
 
 function getUseParentSelection(parentComponentView) {

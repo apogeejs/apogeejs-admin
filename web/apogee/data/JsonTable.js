@@ -58,8 +58,8 @@ export default class JsonTable extends CodeableMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(owner,json) {
-        let member = new JsonTable(json.name,owner);
+    static fromJson(ownerId,json) {
+        let member = new JsonTable(json.name,ownerId);
 
         //set initial data
         let initialData = json.updateData;

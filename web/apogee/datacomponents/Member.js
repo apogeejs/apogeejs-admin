@@ -19,30 +19,17 @@ import FieldObject from "/apogeeutil/FieldObject.js";
  * a folder and it is called the root folder. */
 export default class Member extends FieldObject {
 
-    constructor(name,owner) {
-        super();
-
-        //generate the id with the FieldObject static method
-        this.id = Member.createId();
+    constructor(name,ownerId) {
+        super("member");
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
         this.setField("name",name);
-        this.setField("owner",owner);
+        this.setField("ownerId",ownerId);
         //"data"
         //"pendingPromise"
         //"state"
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    }
-
-    /** this method gets the ID. It is not persistent and is valid only for this 
-     * instance the model is opened. */
-    getId() {
-        return this.id;
-    }
-
-    getType() {
-        return "member";
     }
 
     /** this method gets the name. */
@@ -51,62 +38,56 @@ export default class Member extends FieldObject {
     }
 
     /** This method returns the full name in dot notation for this object. */
-    getFullName() {
+    getFullName(model) {
         let name = this.getField("name");
-        let owner = this.getField("owner");
-        if(owner) {
-            return owner.getChildFullName(name);
+        let ownerId = this.getField("ownerId");
+        if(ownerId) {
+            let owner = model.lookupMemberById(ownerId);
+            if(owner) {
+                return owner.getChildFullName(model,name);
+            }
         }
-        else {
-            //this shouldn't happen
-            return name;
-        }
+        
+        //if we get here there is no owner
+        return name;
     }
 
     /** This returns true if the full name changes. */
-    isFullNameUpdated() {
-        if(this.areAnyFieldsUpdated(["name","owner"])) {
+    isFullNameUpdated(model) {
+        if(this.areAnyFieldsUpdated(["name","ownerId"])) {
             return true;
         }
         else {
-            let parent = this.getParent();
+            let parent = this.getParent(model);
             if(parent) {
-                return parent.isFullNameChanged(); 
+                return parent.isFullNameUpdated(model); 
             } 
         }
     }
 
+    getOwnerId() {
+        return this.getField("ownerId");
+    }
+
     /** This returns the owner for this member. */
-    getOwner() {
-        return this.getField("owner");
+    getOwner(model) {
+        let ownerId = this.getField("ownerId");
+        return model.lookupMemberById(ownerId);
     }
 
     /** This returns the parent for this member. For the root folder
      * this value is null. */
-    getParent() {
-        let owner = this.getField("owner");
-        if((owner)&&(owner.isParent)) {
-            return owner;
+    getParent(model) {
+        let ownerId = this.getField("ownerId");
+        if(ownerId) {
+            let owner = model.lookupMemberById(ownerId);
+            if((owner)&&(owner.isParent)) {
+                return owner;
+            }
         }
-        else {
-            return null;
-        }
-    }
 
-    /** this method gets the root folder/namespace for this object. */
-    getRoot() {
-        var ancestor = this;
-        while(ancestor) {
-            var owner = ancestor.getOwner();
-            if(!owner) {
-                return null;
-            }
-            else if(!owner.isParent) {
-                return ancestor;
-            }
-            ancestor = owner;
-        } 
-        return null; //this shouldn't happen
+        //if we get here, there is no parent
+        return null;
     }
 
     //================================================
@@ -329,9 +310,9 @@ export default class Member extends FieldObject {
         }
         
         //update the owner if needed
-        let currentOwner = this.getField("owner");
-        if(currentOwner != newOwner) {
-            this.setField("owner",newOwner);
+        let currentOwnerId = this.getField("ownerId");
+        if(currentOwnerId != newOwner.getId()) {
+            this.setField("ownerId",newOwner.getId());
         }
     }
 
@@ -344,7 +325,7 @@ export default class Member extends FieldObject {
      * if it does.  
      * @protected */
     onDeleteMember() {
-        this.setField("owner",null);
+        this.clearField("ownerId");
     }
 
     ///** This method is called when the model is closed and also when an object

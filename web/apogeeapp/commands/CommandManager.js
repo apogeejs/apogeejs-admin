@@ -201,7 +201,7 @@ export default class CommandManager {
                         cmdRsltEquivelent.targetType = "component";
                         if(actionChangeEntry.event != "deleted") {
                             //store the target for update and create
-                            cmdRsltEquivelent.target = modelManager.getComponentById(cmdRsltEquivelent.targetId);
+                            cmdRsltEquivelent.target = modelManager.getComponentByMemberId(cmdRsltEquivelent.targetId);
                         }
                     }
                     else {

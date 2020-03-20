@@ -75,13 +75,15 @@ export default class TreeComponentDisplay {
                 menuItemList.push(openMenuItem);
             }
 
+            var component = this.componentView.getComponent();
+            var modelView = this.componentView.getModelView();
+
             //add child folder menu item
             if(this.componentView.usesTabDisplay()) {
-                var app = this.componentView.getModelView().getApp();
-                var appView = this.componentView.getModelView().getAppView();
-                var parentFullName = this.componentView.getFullName();
+                var app = modelView.getApp();
+                var appView = modelView.getAppView();
                 var folderComponentClass = app.getFolderComponentClass();
-                var initialValues = {parentName: parentFullName};
+                var initialValues = {parentId: component.getMemberId()};
 
                 var childMenuItem = {};
                 childMenuItem.title = "Add Child Folder";
@@ -95,9 +97,11 @@ export default class TreeComponentDisplay {
         //double click callback
         var openCallback = this.componentView.createOpenCallback();
         
+        var component = this.componentView.getComponent();
+        var modelView = this.componentView.getModelView();
         var labelText = this.componentView.getName();
         var iconUrl = this.componentView.getIconUrl();
-        var isRoot = this.componentView.getComponent().getParentComponent() ? true : false;
+        var isRoot = component.getParentComponent(modelView.getModelManager()) ? true : false;
         return new TreeEntry(labelText, iconUrl, openCallback, menuItemCallback,isRoot);
     }
 

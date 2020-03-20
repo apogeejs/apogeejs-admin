@@ -34,7 +34,7 @@ export default class ModelView {
         return this.workspaceView.getTabFrame();
     }
 
-    getComponentView(componentId) {
+    getComponentViewByComponentId(componentId) {
         return this.componentViewMap[componentId];
     }
 
@@ -78,7 +78,7 @@ export default class ModelView {
             this.onModelUpdated(target);
         }
         if(target.getType() == "component") {
-            let componentView = this.getComponentView(target.getId());
+            let componentView = this.getComponentViewByComponentId(target.getId());
             componentView.componentUpdated(target);
         }
     }

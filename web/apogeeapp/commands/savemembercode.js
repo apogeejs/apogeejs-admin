@@ -43,7 +43,7 @@ savemembercode.executeCommand = function(workspaceManager,commandData) {
     
     var actionResult = doAction(model,actionData);
 
-    let component = modelManager.getComponentById(commandData.memberId);
+    let component = modelManager.getComponentByMemberId(commandData.memberId);
 
     var commandResult = {};
     if((actionResult.actionDone)&&(component)) {
@@ -54,7 +54,7 @@ savemembercode.executeCommand = function(workspaceManager,commandData) {
     }
     else {
         commandResult.cmdDone = false;
-        let memberFullName = component ? component.getFullName() : "<unknown>" 
+        let memberFullName = component ? component.getFullName(modelManager) : "<unknown>" 
         commandResult.errorMsg = "Error saving data: " + memberFullName;
     }
 

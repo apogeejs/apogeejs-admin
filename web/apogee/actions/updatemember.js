@@ -41,7 +41,7 @@ function updateCode(model,actionData) {
     let actionResult = {};
     actionResult.event = ACTION_EVENT;
     
-    var member = model.lookupMember(actionData.memberId);
+    var member = model.lookupMemberById(actionData.memberId);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member code";
@@ -51,7 +51,7 @@ function updateCode(model,actionData) {
 
     if((!member.isCodeable)||(!member.getSetCodeOk())) {
         actionResult.actionDone = false;
-        actionResult.errorMsg = "can not set code on member: " + member.getFullName();
+        actionResult.errorMsg = "can not set code on member: " + member.getFullName(model);
         return;
     }
 
@@ -78,7 +78,7 @@ function updateData(model,actionData) {
     let actionResult = {};
     actionResult.event = ACTION_EVENT;
     
-    var member = model.lookupMember(actionData.memberId);
+    var member = model.lookupMemberById(actionData.memberId);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member data";
@@ -88,7 +88,7 @@ function updateData(model,actionData) {
     
     if(!member.getSetDataOk()) {
         actionResult.actionDone = false;
-        actionResult.errorMsg = "Can not set data on member: " + member.getFullName();
+        actionResult.errorMsg = "Can not set data on member: " + member.getFullName(model);
         return;
     }
         

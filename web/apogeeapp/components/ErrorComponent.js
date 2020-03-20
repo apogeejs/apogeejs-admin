@@ -4,9 +4,9 @@ import ErrorDisplay from "/apogeeview/datadisplay/ErrorDisplay.js";
 /** This component represents a json table object. */
 export default class ErrorComponent extends Component {
 
-    constructor(modelManager,table) {
+    constructor(member,modelManager) {
         //extend edit component
-        super(modelManager,table);
+        super(member,modelManager);
     };
 
     //==============================
@@ -14,7 +14,7 @@ export default class ErrorComponent extends Component {
     //==============================
 
     /** This overrides the save method to return the original input. */
-    toJson() {
+    toJson(modelManager) {
         return this.completeJson;
     }
 

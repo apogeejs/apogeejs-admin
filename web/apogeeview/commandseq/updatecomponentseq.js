@@ -17,7 +17,7 @@ export function updateComponent(component,componentView) {
     var additionalLines = apogeeutil.jsonCopy(componentViewClass.propertyDialogLines); 
 
     var modelManager = component.getModelManager(); 
-    var initialValues = component.getPropertyValues(); 
+    var initialValues = component.getPropertyValues(modelManager.getModel()); 
 
     //add folder list, only if we can set the parent (if there is a parent)
     var folderList = modelManager.getFolders();
@@ -35,8 +35,6 @@ export function updateComponent(component,componentView) {
                 newValues[key] = submittedValues[key];
             }
         }
-        
-        var member = component.getMember();
         
         var commands = [];
         
@@ -59,7 +57,7 @@ export function updateComponent(component,componentView) {
         if((numMemberProps > 0)||(numComponentProps > 0)) {
             let updateCommand = {};
             updateCommand.type = "updateComponent";
-            updateCommand.memberId = member.getId();
+            updateCommand.memberId = component.getMemberId();
             if(numMemberProps > 0) updateCommand.updatedMemberProperties = memberUpdateJson;
             if(numComponentProps > 0) updateCommand.updatedComponentProperties = componentUpdateJson;
             commands.push(updateCommand)
@@ -69,7 +67,7 @@ export function updateComponent(component,componentView) {
         // Move
         //--------------
         
-        if((newValues.name)||(newValues.parentName)) {
+        if((newValues.name)||(newValues.parentId)) {
             
             //validate the name
             if(newValues.name) {
@@ -80,7 +78,7 @@ export function updateComponent(component,componentView) {
                 }
             }
 
-            let oldName = member.getName();
+            let oldName = component.getName();
             let modelView;
 
             let renameEditorCommands;
@@ -91,10 +89,10 @@ export function updateComponent(component,componentView) {
                 modelView = componentView.getModelView();
 
                 //look up the old parent component
-                let oldParent = member.getParent();
-                let oldParentComponentView = modelView.getComponentView(oldParent.getId());
+                let oldParentComponent = component.getParentComponent(modelManager);
+                let oldParentComponentView = modelView.getComponentViewByComponentId(oldParentComponent.getId());
 
-                if(newValues.parentName) {
+                if(newValues.parentId) {
                     //----------------------------
                     //move case
                     //delete old node
@@ -107,23 +105,17 @@ export function updateComponent(component,componentView) {
                     //rename case
                     //get the rename editr comamnds, then apply the one to clear the component node name
                     //----------------------------
-                    renameEditorCommands = oldParentComponentView.getRenameApogeeNodeCommands(member.getId(),oldName,newValues.name);
+                    renameEditorCommands = oldParentComponentView.getRenameApogeeNodeCommands(component.getMemberId(),oldName,newValues.name);
                     commands.push(renameEditorCommands.setupCommand);
                 }
             }
-
-//============================================
-//simplify this by saving id in ui flow
-let parent = modelManager.getComponentByFullName(submittedValues.parentName);
-let parentId = parent.getId();
-//=========================================
             
             //update the component name
             let moveCommand = {};
             moveCommand.type = "moveComponent";
-            moveCommand.memberId = member.getId();
+            moveCommand.memberId = component.getMemberId();
             moveCommand.newMemberName = submittedValues.name;
-            moveCommand.newParentId = parentId;
+            moveCommand.newParentId = newValues.parentId;
             commands.push(moveCommand);
 
             //do the second stage of editor commands
@@ -133,11 +125,9 @@ let parentId = parent.getId();
                 // move case
                 // add the compone nodes to the new page after the component has been moved there
                 //----------------------------------------------
-                if(newValues.parentName) {
-                    //look up the new parent component
-                    let model = modelManager.getModel();
-                    let newParent = model.getMemberByFullName(newValues.parentName);
-                    let newParentComponentView = modelView.getComponentView(newParent.getId());
+                if(newValues.parentId) {
+                    let newParentComponent = modelManager.getComponentByMemberId(newValues.parentId);
+                    let newParentComponentView = modelView.getComponentViewByComponentId(newParentComponent.getId());
 
                     let newName = newValues.name ? newValues.name : oldName;
 
@@ -197,7 +187,7 @@ let parentId = parent.getId();
         if(componentViewClass.hasChildDisplay) {
             //select the component and give focus to the parent editor if this is a child
             //NOTE - the if is not quite right. We shoudl only return to editor if the command origniated there.
-            returnToEditor(component,submittedValues.name);
+            returnToEditor(modelManager,component,submittedValues.name);
         }
 
         //return true to close the dialog
@@ -205,14 +195,14 @@ let parentId = parent.getId();
     }
 
     //return focus to editor on cancel
-    let onCancelFunction = () => returnToEditor(component);
+    let onCancelFunction = () => returnToEditor(modelManager,component);
 
     //show dialog
     showConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
 }
 
-function returnToEditor(component,optionalNameToSelect) {
-    let parentComponent = component.getParentComponent();
+function returnToEditor(modelManager,component,optionalNameToSelect) {
+    let parentComponent = component.getParentComponent(modelManager);
     if(parentComponent) {
         parentComponent.giveEditorFocusIfShowing();
 //NOTE - this name select did nothing. ProseMirror supressed selection change for some reason. Look into this.
@@ -250,7 +240,7 @@ export function getPropertiesDialogLayout(displayName,folderNames,additionalLine
         parentLine.type = "dropdown";
         parentLine.heading = "Folder: ";
         parentLine.entries = folderNames;
-        parentLine.resultKey = "parentName"; 
+        parentLine.resultKey = "parentId"; 
         lines.push(parentLine);
     }
 

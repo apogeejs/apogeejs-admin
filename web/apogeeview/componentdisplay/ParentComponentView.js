@@ -33,10 +33,12 @@ export default class ParentComponentView extends ComponentView {
         var treeEntry = treeDisplay.getTreeEntry();
         var member = this.component.getMember();
         var modelView = this.getModelView();
+        var modelManager = modelView.getModelManager();
         var childMap = member.getChildMap();
         for(var childKey in childMap) {
             var childMember = childMap[childKey];
-            var childComponentView = modelView.getComponentView(childMember.getId());
+            var childComponent = modelManager.getComponentByMemberId(childMember.getId());
+            var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
             if(childComponentView) {
                 var childTreeEntry = childComponentView.getTreeEntry();
                 treeEntry.addChild(childTreeEntry);
@@ -320,7 +322,7 @@ export default class ParentComponentView extends ComponentView {
             //execute the command
             //-------------------
             if(apogeeCommand) {
-                this.getComponent().getModelManager().getApp().executeCommand(apogeeCommand);
+                this.getModelView().getApp().executeCommand(apogeeCommand);
             }
         }
         else {
@@ -655,7 +657,7 @@ export default class ParentComponentView extends ComponentView {
 
         var commandData = {};
         commandData.type = "literatePageTransaction";
-        commandData.memberId = this.getComponent().getId();
+        commandData.memberId = this.getComponent().getMemberId();
         commandData.steps = stepsJson;
         commandData.undoSteps = inverseStepsJson;
 

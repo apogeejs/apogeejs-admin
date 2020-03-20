@@ -120,7 +120,16 @@ let lineFunctions = {
         lineObject.focusElement = select;
         for(var i = 0; i < lineDef.entries.length; i++) {
             var entry = lineDef.entries[i];
-            select.add(apogeeui.createElement("option",{"text":entry}));
+            let label, value;
+            if(apogeeutil.getObjectType(entry) == "Array") {
+                value = entry[0]
+                label = entry[1];
+            }
+            else {
+                value = entry;
+                label = entry;   
+            }
+            select.add(apogeeui.createElement("option",{"text":label, "value":value}));
         }
         if(lineDef.initial) {
             select.value = lineDef.initial;

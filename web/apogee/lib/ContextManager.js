@@ -27,16 +27,16 @@ ContextManager.prototype.clearContextList = function() {
     this.contextList = [];
 }
 
-ContextManager.prototype.getValue = function(varName) {
+ContextManager.prototype.getValue = function(model,varName) {
     var data = this.lookupValue(varName);
     
     //if the name is not in this context, check with the parent context
     if(data === undefined) {
         if((this.contextHolder)&&(this.contextHolder.getOwner)) {
-            var owner = this.contextHolder.getOwner();
+            var owner = this.contextHolder.getOwner(model);
             if(owner) {
                 var ownerContextManager = owner.getContextManager();
-                data = ownerContextManager.getValue(varName);
+                data = ownerContextManager.getValue(model,varName);
             }
         }
     }
@@ -44,16 +44,16 @@ ContextManager.prototype.getValue = function(varName) {
     return data;
 }
 
-ContextManager.prototype.getMember = function(path,optionalParentMembers) {
+ContextManager.prototype.getMember = function(model,path,optionalParentMembers) {
     var impactor = this.lookupMember(path,optionalParentMembers);
     
     //if the object is not in this context, check with the parent context
     if(impactor === undefined) {
         if((this.contextHolder)&&(this.contextHolder.getOwner)) {
-            var owner = this.contextHolder.getOwner();
+            var owner = this.contextHolder.getOwner(model);
             if(owner) {
                 var ownerContextManager = owner.getContextManager();
-                impactor = ownerContextManager.getMember(path,optionalParentMembers);
+                impactor = ownerContextManager.getMember(model,path,optionalParentMembers);
             }
         }
     }

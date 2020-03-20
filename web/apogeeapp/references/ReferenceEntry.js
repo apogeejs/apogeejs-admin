@@ -1,31 +1,32 @@
-import {bannerConstants} from "/apogeeview/componentdisplay/banner.js"; 
-import EventManager from "/apogeeutil/EventManagerClass.js";
+import base from "/apogeeutil/base.js";
+import FieldObject from "/apogeeutil/FieldObject.js";
+import EventManager from "/apogeeutil/EventManager.js";
+import {bannerConstants} from "/apogeeview/componentdisplay/banner.js";
 
 /** This class manages references for the web page.*/
-export default class ReferenceEntry extends EventManager {
+export default class ReferenceEntry extends FieldObject {
     
     constructor(referenceList,referenceData,referenceType) {
-        super();
+        super("referenceEntry");
 
-        this.id = ReferenceEntry._createId();
+        //mixin initialization
+        this.eventManagerMixinInit();
+
         this.referenceList = referenceList;
-        this.clearUpdated();
-
-        this.url = referenceData.url;
         this.referenceType = referenceType;
 
-        //we create in a pending state because the link is not loaded.
-        this.state = bannerConstants.BANNER_TYPE_PENDING;
+        this.setField("url",referenceData.url);
+        
 
-        this.nickname = referenceData.nickname;
-        if(!this.nickname) this.nickname = NO_NICKNAME_EMPTY_STRING;  
+        //we create in a pending state because the link is not loaded.
+        this.setField("state",bannerConstants.BANNER_TYPE_PENDING);
+
+        let nickname = referenceData.nickname;
+        if(!nickname) nickname = NO_NICKNAME_EMPTY_STRING; 
+        this.setField("nickname",nickname);
 
         this.viewStateCallback = null;
-        this.cachedViewState = null;
-        
-        this.fieldUpdated("url");
-        this.fieldUpdated("nickname");
-        this.fieldUpdated("state");     
+        this.cachedViewState = null;    
     }
 
     //---------------------------
@@ -35,29 +36,26 @@ export default class ReferenceEntry extends EventManager {
     getReferenceList() {
         return this.referenceList;
     }
-
-    getId() {
-        return this.id;
-    }
     
     getEntryType() {
         return this.referenceType;
     }
 
     getState() {
-        return this.state;
+        return this.getField("state");
     }
 
     getUrl() {
-        return this.url;
+        return this.getField("url");
     }
 
     getNickname() {
-        return this.nickname;
+        return this.getField("nickname");
     }
 
     getLabel() {
-        return this.nickname ? this.nickname : this.url;
+        let nickname = this.getNickname();
+        return nickname ? nickname : this.getUrl();
     }
 
     setViewStateCallback(viewStateCallback) {
@@ -85,8 +83,8 @@ export default class ReferenceEntry extends EventManager {
      * resolves when the link is loaded. */
     toJson() {
         var entryJson = {};
-        entryJson.url = this.url;
-        if(this.nickname != NO_NICKNAME_EMPTY_STRING) entryJson.nickname = this.nickname;
+        entryJson.url = this.getUrl();
+        if(this.nickname != NO_NICKNAME_EMPTY_STRING) entryJson.nickname = this.getNickname();
         entryJson.entryType = this.referenceType;
         return entryJson;
     }
@@ -101,16 +99,14 @@ export default class ReferenceEntry extends EventManager {
         //update nickname
         if(!nickname) nickname = NO_NICKNAME_EMPTY_STRING;
         if(this.nickname != nickname) {
-            this.nickname = nickname;
-            this.fieldUpdated("nickname");
+            this.setField("nickname",nickname);
         }
 
         //update url
         if(this.url != url) {
             this.remove();
-            this.url = url;
+            this.setField("url",url);
             var promise = this.loadEntry();
-            this.fieldUpdated("url");
         }
 
         //if we didn't do a URL update, make a promise that says update was successful
@@ -123,33 +119,6 @@ export default class ReferenceEntry extends EventManager {
 
         return promise;
     }
-
-    //------------------------------------------
-    // Event Tracking Methods
-    //------------------------------------------
-
-    getUpdated() {
-        return this.updated;
-    }
-
-    clearUpdated() {
-        this.updated = {};
-    }
-
-    fieldUpdated(field) {
-        this.updated[field] = true;
-    }
-
-    isFieldUpdated(field) {
-        return this.updated[field] ? true : false;
-    }
-
-    //getId() Implmented above
-
-    getType() {
-        return "link";
-    }
-
 
     //===================================
     // private methods
@@ -174,20 +143,14 @@ export default class ReferenceEntry extends EventManager {
     setState(state,msg) {
         if(this.state != state) {
             //for now we are not tracking msg. If we do, we should check for that change too
-            this.state = state;
-            this.fieldUpdated("state");
+            this.setField("state",state);
         }
     }
 
-    /** This method generates a member ID for the member. It is only valid
-     * for the duration the application is opened. It is not persisted.
-     * @private
-     */
-    static _createId() {
-        return nextId++;
-    }
-
 }
+
+//add mixins to this class
+base.mixin(ReferenceEntry,EventManager);
 
 //====================================
 // Static Fields

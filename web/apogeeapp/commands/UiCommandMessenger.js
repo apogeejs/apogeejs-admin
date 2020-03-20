@@ -10,6 +10,8 @@ export default class UiCommandMessenger {
         this.app = app;
         this.contextManager = fromMember.getContextManager();
         this.fromMember = fromMember;
+
+        this.model = this.app.getWorkspaceManager().getModelManager().getModel();
     }
     
     /** This method sents a command to update the given member, as specified by the
@@ -61,7 +63,7 @@ export default class UiCommandMessenger {
      * as defined from the source object context. */
     _getMemberObject(localMemberName) { 
         var path = localMemberName.split(".");
-        var member = this.contextManager.getMember(path);
+        var member = this.contextManager.getMember(this.model,path);
         return member;
     }
 

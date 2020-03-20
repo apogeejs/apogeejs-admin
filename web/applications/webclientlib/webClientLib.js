@@ -106,7 +106,7 @@ function _createComponentDisplay(memberName,optionalViewType) {
        console.error("Member not found: " + memberName);
        return;
    }
-   var component = workEspaceManager.getComponent(member);
+   var component = workEspaceManager.getComponentByMember(member);
    
    var activeView = optionalViewType ? optionalViewType : component.constructor.TABLE_EDIT_SETTINGS.defaultView;
 
@@ -128,7 +128,7 @@ function _getComponentDisplay(memberName) {
         console.error("Member not found: " + memberName);
         return;
     }
-    var component = workEspaceManager.getComponent(member);
+    var component = workEspaceManager.getComponentByMember(member);
  
     return component.getComponentDisplay();
 

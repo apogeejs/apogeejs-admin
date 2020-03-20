@@ -104,7 +104,7 @@ export default class ApogeeView {
 
         //add a listener for a change to components - we are displaying the component name of the open tab
         let modelManager = workspaceManager.getModelManager();
-        modelManager.addListener("updated",eventData => this.modelObjectUpdated(eventData));
+        modelManager.addListener("updated",eventData => this.modelManagerObjectUpdated(eventData));
 
     }
 
@@ -196,12 +196,13 @@ export default class ApogeeView {
         if(!this.workspaceView) return;
 
         let modelView = this.workspaceView.getModelView();
+        let modelManager = modelView.getModelManager();
         
-        var id = tab.getId();
-        let tabComponentView = modelView.getComponentView(id)
+        var componentId = tab.getId();
+        let tabComponentView = modelView.getComponentViewByComponentId(componentId)
         if(tabComponentView) {
             this.activeTabIconDisplay.src = tabComponentView.getIconUrl();
-            this.activeTabTitleDisplay.innerHTML = tabComponentView.getDisplayName(true);
+            this.activeTabTitleDisplay.innerHTML = tabComponentView.getDisplayName(true,modelManager);
             this.activeTabIconDisplay.style.display = "";
             this.activeTabTitleDisplay.style.display = "";
         }
@@ -211,14 +212,12 @@ export default class ApogeeView {
      * of that component changes, we update the tab display name. This is also not very general. I should
      * clean it up to allow other things besides components to have tabs. I should probably make a tab event that
      * its title changes, or just that it was udpated. */
-    modelObjectUpdated(eventData) {
+    modelManagerObjectUpdated(eventData) {
         let target = eventData.target;
 
         if(target) {
-            //there is a bit hidden in here. Mainly active tab = id of active tab = id of the component it represents
-            //I should clean that up.
-            //if the 
-            if((target.getType() == "component")&&(target.getId() == this.tabFrame.getActiveTab())) {
+            //tab id for components is the component id
+            if((target.getId() == this.tabFrame.getActiveTab())) {
                 //this is pretty messy too... 
                 if((target.isDisplayNameUpdated)&&(target.getMember().isFullNameUpdated())) {
                     let tab = this.tabFrame.getTab(target.getId());

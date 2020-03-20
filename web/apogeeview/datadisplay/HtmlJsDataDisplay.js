@@ -86,7 +86,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 catch(error) {
                     if(error.stack) console.error(error.stack);
                     
-                    alert("Error in " + member.getFullName() + " onLoad function: " + error.message);
+                    alert("Error in " + member.getName() + " onLoad function: " + error.message);
                 }
             };
         }
@@ -106,7 +106,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 catch(error) {
                     if(error.stack) console.error(error.stack);
                     
-                    alert("Error in " + member.getFullName()+ " onUnload function: " + error.message);
+                    alert("Error in " + member.getName()+ " onUnload function: " + error.message);
                 }
             }
         }
@@ -129,7 +129,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             catch(error) {
                 if(error.stack) console.error(error.stack);
                 
-                alert("Error in " + member.getFullName() + " setData function: " + error.message);
+                alert("Error in " + member.getName() + " setData function: " + error.message);
             }
         }
         
@@ -141,7 +141,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 catch(error) {
                     if(error.stack) console.error(error.stack);
                     
-                    alert("Error in " + member.getFullName() + " getData function: " + error.message);
+                    alert("Error in " + member.getName() + " getData function: " + error.message);
                 }
             }
         }
@@ -160,7 +160,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 catch(error) {
                     if(error.stack) console.error(error.stack);
                     
-                    alert("Error in " + member.getFullName() + " isCloseOk function: " + error.message);
+                    alert("Error in " + member.getName() + " isCloseOk function: " + error.message);
                 }
             }
         }
@@ -173,7 +173,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 catch(error) {
                     if(error.stack) console.error(error.stack);
                     
-                    alert("Error in " + member.getFullName() + " destroy function: " + error.message);
+                    alert("Error in " + member.getName() + " destroy function: " + error.message);
                 }
             }
         }
@@ -189,7 +189,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             catch(error) {
                 if(error.stack) console.error(error.stack);
                 
-                alert("Error in " + member.getFullName() + " init function: " + error.message);
+                alert("Error in " + member.getName() + " init function: " + error.message);
             }
         }
     }

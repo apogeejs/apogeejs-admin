@@ -18,7 +18,7 @@ function moveMember(model,actionData) {
     let actionResult = {};
     actionResult.event = ACTION_EVENT;
         
-    var member = model.lookupMember(actionData.memberId);
+    var member = model.lookupMemberById(actionData.memberId);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for move member";
@@ -26,7 +26,7 @@ function moveMember(model,actionData) {
     }
     actionResult.member = member;
 
-    var targetOwner = model.lookupMember(actionData.targetOwnerId);
+    var targetOwner = model.lookupMemberById(actionData.targetOwnerId);
     if(!targetOwner) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "New parent not found for move member";
@@ -35,7 +35,7 @@ function moveMember(model,actionData) {
 
     //if the owner changes, remove this child from the owner
     //remove from old named object from the new or old owner - if it stays, we still have the new name
-    let currentOwner = member.getOwner();
+    let currentOwner = member.getOwner(model);
     if(currentOwner.isParent) {
         currentOwner.removeChild(model,member);
     }
@@ -73,7 +73,7 @@ function moveMember(model,actionData) {
 function addChildResults(member) {
     let childActionResults = [];
     
-    if(member.isParent) {    
+    if((member.isParent)||(member.isRootHolder)) {  
         var childMap = member.getChildMap();
         for(var childName in childMap) {
             var child = childMap[childName];
@@ -90,22 +90,6 @@ function addChildResults(member) {
             if(grandchildActionResults) {
                 childActionResult.childActionResults = grandchildActionResults;
             }
-        }
-    }
-    else if(member.isRootHolder) {
-        var root = member.getRoot();
-        let childActionResult = {};
-        childActionResult.actionDone = true;
-        childActionResult.member = root;
-        childActionResult.event = ACTION_EVENT;
-        actionResult.updateModelDependencies = true;
-
-        childActionResults.push(childActionResult);
-        
-        //add results for children to this member
-        grandchildActionResults = addChildResults(child);
-        if(grandchildActionResults) {
-            childActionResult.childActionResults = grandchildActionResults;
         }
     }
 

@@ -33,20 +33,20 @@ deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
     let parent;
 
     if(commandData.memberId) {
-        member = model.lookupMember(commandData.memberId);
-        parent = member.getParent();
+        member = model.lookupMemberById(commandData.memberId);
+        parent = member.getParent(model);
     }
     else {
-        parent = model.lookupMember(commandData.parentId);
-        member = parent.lookupMember(commandData.memberName);
+        parent = model.lookupMemberById(commandData.parentId);
+        member = parent.lookupChild(commandData.memberName);
     }
-    component = modelManager.getComponent(member);
+    component = modelManager.getComponentByMember(member);
     
     var commandUndoJson = {};
     commandUndoJson.type = "addComponent";
     commandUndoJson.parentId = parent.getId();
     commandUndoJson.memberJson = member.toJson();
-    commandUndoJson.componentJson = component.toJson();
+    commandUndoJson.componentJson = component.toJson(modelManager);
     
     return commandUndoJson;
 }
@@ -67,8 +67,8 @@ deletecomponent.executeCommand = function(workspaceManager,commandData) {
         actionJson.memberId = commandData.memberId;
     }
     else {
-        let parent = model.lookupMember(commandData.parentId);
-        let member = parent.lookupMember(commandData.memberName);
+        let parent = model.lookupMemberById(commandData.parentId);
+        let member = parent.lookupChild(commandData.memberName);
         actionJson.memberId = member.getId();
     }
     

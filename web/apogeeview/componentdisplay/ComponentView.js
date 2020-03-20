@@ -39,13 +39,13 @@ export default class ComponentView {
         return this.component.getName();
     }
 
-    getFullName() {
-        return this.component.getFullName();
+    getFullName(model) {
+        return this.component.getFullName(model);
     }
 
     /** This method returns a display name for the member object. */
-    getDisplayName(useFullPath) {
-        return this.component.getDisplayName(useFullPath);
+    getDisplayName(useFullPath,modelForFullPathOnly) {
+        return this.component.getDisplayName(useFullPath,modelForFullPathOnly);
     }
 
     /** This method returns true if the display name field is updated. It is only applicable if 
@@ -85,10 +85,10 @@ export default class ComponentView {
      * rather than any relationship established between the component views. This should give the
      * same result getLastAssignedParentComponentView except during a delete or move operation. */
     getParentComponentView() {
-        let parentComponent = this.component.getParentComponent();
+
+        let parentComponent = this.component.getParentComponent(this.modelView.getModelManager());
         if(parentComponent) {
-            let parentMemberId = parentComponent.getId();
-            return this.modelView.getComponentView(parentMemberId);
+            return this.modelView.getComponentViewByComponentId(parentComponent.getId());
         }
         else {
             return null;
@@ -337,7 +337,7 @@ export default class ComponentView {
         //menu items
         var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
 
-        if(this.component.getParentComponent()) {
+        if(this.component.getParentComponent(this.modelView.getModelManager())) {
             //these items are only possible for members with a parent.
             
             //add the standard entries
@@ -387,7 +387,7 @@ export default class ComponentView {
         //check for parent change
         if(component.isFieldUpdated("member")) {
             let member = component.getMember();
-            if(member.isFieldUpdated("owner")) {
+            if(member.isFieldUpdated("ownerId")) {
                 var oldParentComponentView = this.lastAssignedParentComponentView;
                 var newParentComponentView = this.getParentComponentView();
 

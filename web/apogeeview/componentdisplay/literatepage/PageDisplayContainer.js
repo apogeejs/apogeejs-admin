@@ -50,8 +50,6 @@ export default class PageDisplayContainer {
         this.initUI();
     }
 
-    getComponent
-
     getComponentView() {
         return this.componentView;
     }

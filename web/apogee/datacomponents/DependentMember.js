@@ -82,7 +82,7 @@ export default class DependentMember extends Member {
         let dependsOnMap = this.getField("dependsOnMap");
         for(var idString in dependsOnMap) {
             let dependsOnType = dependsOnMap[idString];
-            let impactor = model.lookupMember(idString);
+            let impactor = model.lookupMemberById(idString);
 
             if((impactor.isDependent)&&(impactor.getCalcPending())) {
                 impactor.calculate(model);
@@ -104,7 +104,7 @@ export default class DependentMember extends Member {
         }
 
         if(errorDependencies.length > 0) {
-            this.createDependencyError(errorDependencies);
+            this.createDependencyError(model,errorDependencies);
         }
         else if(resultPending) {
             this.setResultPending();
@@ -155,12 +155,12 @@ export default class DependentMember extends Member {
 
     /** This method creates an dependency error, given a list of impactors that have an error. 
      * @private */
-    createDependencyError(errorDependencies) {
+    createDependencyError(model,errorDependencies) {
             //dependency error found
             var message = "Error in dependency: ";
             for(var i = 0; i < errorDependencies.length; i++) {
                 if(i > 0) message += ", ";
-                message += errorDependencies[i].getFullName();
+                message += errorDependencies[i].getFullName(model);
             }
             this.setError(message);   
     }

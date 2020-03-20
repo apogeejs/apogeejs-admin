@@ -171,7 +171,7 @@ apogeeui.SHOWN_EVENT = "shown";
 apogeeui.HIDDEN_EVENT = "hidden";
 
 /** This function adds CSS data for a given member id. */
-apogeeui.setMemberCssData = function(objectId,cssText) {
+apogeeui.setObjectCssData = function(objectId,cssText) {
     var cssElementId = "css_" + objectId;
     
     var cssElement = document.getElementById(cssElementId);

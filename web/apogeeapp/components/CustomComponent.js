@@ -10,8 +10,8 @@ import CommandManager from "/apogeeapp/commands/CommandManager.js";
  * confugred with initialization data from the model. */
 export default class CustomComponent extends Component {
 
-    constructor(modelManager,member) {
-        super(modelManager,member);
+    constructor(member) {
+        super(member);
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -110,7 +110,7 @@ export default class CustomComponent extends Component {
 
         var command = {};
         command.type = customComponentUpdateData.commandInfo.type;
-        command.memberId = this.getId();
+        command.memberId = this.getMemberId();
         command.fieldName = codeFieldName;
         command.initialValue = initialValue;
         command.targetValue = targetValue;
@@ -146,7 +146,7 @@ export default class CustomComponent extends Component {
     }
 
     /** This serializes the table component. */
-    writeToJson(json) {
+    writeToJson(json,modelManager) {
         //store the resource info
         json.resource = {};
         json.resource["html"] = this.getField("html");
@@ -230,7 +230,7 @@ customComponentUpdateData.createUndoCommand = function(workspaceManager,commandD
 
 customComponentUpdateData.executeCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
-    let component = modelManager.getComponent(commandData.memberId);
+    let component = modelManager.getComponentByMemberId(commandData.memberId);
     var commandResult = {};
     if(component) {
         try {

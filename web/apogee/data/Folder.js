@@ -70,8 +70,8 @@ export default class Folder extends DependentMember {
     /** This method removes a table from the folder. */
     removeChild(model,child) {
         //make sure this is a child of this object
-        var parent = child.getParent();
-        if((!parent)||(parent !== this)) return;
+        var owner = child.getOwner(model);
+        if((!owner)||(owner !== this)) return;
         
         //remove from folder
         var name = child.getName();
@@ -153,8 +153,8 @@ export default class Folder extends DependentMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(owner,json) {
-        var folder = new Folder(json.name,owner);
+    static fromJson(ownerId,json) {
+        var folder = new Folder(json.name,ownerId);
 
         if(json.childrenNotWriteable) {
             folder.setChildrenWriteable(false);

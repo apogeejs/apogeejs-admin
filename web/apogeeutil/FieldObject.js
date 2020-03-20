@@ -3,8 +3,13 @@
  * can be made. */
 export default class FieldObject {
 
-    /** This initializes the component */
-    constructor() {
+    /** constructor.
+     * The object type should be a text only string.
+     */
+    constructor(objectType) {
+        this.id = _createId(objectType);
+        this.objectType = objectType;
+
         this.fieldMap = {};
         this.updated = {};
         this.isLocked = false;
@@ -61,11 +66,31 @@ export default class FieldObject {
     /** This method should be implemented for any object using this mixin. 
      * This should give a unique identifier for all objects of the given object type, below.
      * A unique id may optionally be generated using the statid FieldObject method createId. */
-    //getId()
+    getId() {
+        return this.id;
+    }
 
     /** Thie method should be implemented for any object using this method. 
-     * It identifies the type of object */
-    //getType() 
+     * It identifies the type of object. */
+    getType() {
+        return this.objectType;
+    }
+
+    /** This static functions returns the type of an object given the ID. */
+    static getTypeFromId(id) {
+        let typeEnd = id.indexOf("|");
+        if(typeEnd < 0) {
+            throw new Error("Invalid ID");
+        }
+        else {
+            return id.substr(0,typeEnd);
+        }
+    }
+
+    /** This static function indicates if the given ID is an object of the given type. */
+    static idIsTypeOf(id,type) {
+        return id.startsWith(type + "|");
+    }
 
     /** This loads the current field object to have a copy of the data from the given field object.
      * The update field is however cleared. This method will throw an exception is you try to copy 
@@ -85,21 +110,21 @@ export default class FieldObject {
     // Static Methods
     //================================
 
-    /** This static function generates a ID that is unique over the span of this application execution (until the 
-     * integers wrap). This is suitable for creating the field object ID for an instance. Note that instance IDs
-     * have the lesser requirement that they only need to be unique for a given object type.
-     * At some point we shouldhandle wrapping, and the three cases it can cause - negative ids, 0 id, and most seriously,
-     * a reused id.
-     * 
-     * Currently planned future solution to wrapping: make this an operation issue. And event can be issued when we 
-     * have reached given id values. Then it is the responsibility of the operator to restart the sytems. This is probably safer
-     * than trying to com eup with some clever remapping solution. */
-    static createId() {
-        return nextId++;
-    }
+    
 
 }
 
+/** This function generates a ID that is unique over the span of this application execution (until the 
+ * integers wrap). This is suitable for creating the field object ID for an instance.
+ * At some point we shouldhandle wrapping, and the three cases it can cause - negative ids, 0 id, and most seriously,
+ * a reused id.
+ * 
+ * Currently planned future solution to wrapping: make this an operation issue. And event can be issued when we 
+ * have reached given id values. Then it is the responsibility of the operator to restart the sytems. This is probably safer
+ * than trying to com eup with some clever remapping solution. */
+function _createId(objectType) {
+    return objectType + "|" + nextId++;
+}
 
 /** This is used for Id generation.
  * @private */

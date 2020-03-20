@@ -22,13 +22,6 @@ Parent.parentMixinInit = function() {
 
 Parent.isParent = true;
 
-
-/** this is used to identify if this is the root folder. */
-Parent.isRoot = function() {
-    //undefined may be OK too. If there is populated object this is not root.
-    return (this.getParent() == null); 
-}
-
 ///** this method gets a map of child names to children. This may not be the structure
 // * of the data in the parent, but it is the prefered common representation. */
 //Parent.getChildMap = function();
@@ -124,12 +117,12 @@ Parent.createContextManager = function() {
 //------------------------------
 
 /** This method returns the full name in dot notation for this object. */
-//Parent.getFullName = function() {
-//    return super.getFullName();
+//Parent.getFullName = function(model) {
+//    return super.getFullName(model);
 //}
 
 /** this method gets the hame the children inherit for the full name. */
-Parent.getPossesionNameBase = function() {
-    return this.getFullName() + ".";
+Parent.getPossesionNameBase = function(model) {
+    return this.getFullName(model) + ".";
 }
 

@@ -25,8 +25,8 @@ Owner.isOwner = true;
 //Owner.getPossesionNameBase = function();
 
 /** This method returns the full name in dot notation for this object. */
-Owner.getChildFullName = function(childName) {
-    return this.getPossesionNameBase() + childName;
+Owner.getChildFullName = function(model,childName) {
+    return this.getPossesionNameBase(model) + childName;
 }
 
 //must be implented by extending object

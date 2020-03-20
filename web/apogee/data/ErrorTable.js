@@ -36,9 +36,9 @@ export default class ErrorTable extends Member {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(owner,json) {
+    static fromJson(ownerId,json) {
         //note - we send in the complete JSON so we can return is on saving
-        let member = new ErrorTable(json.name,owner);
+        let member = new ErrorTable(json.name,ownerId);
 
         //set the initial data
         member.setField("completeJson",json);
@@ -58,8 +58,7 @@ export default class ErrorTable extends Member {
 
     /** This is a check to see if the object should be checked for dependencies 
      * for recalculation. It is safe for this method to always return false and
-     allow the calculation to happen. 
-    * @private */
+     allow the calculation to happen.  */
    memberUsesRecalculation() {
         return false;
     }

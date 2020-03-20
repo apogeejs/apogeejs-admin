@@ -3,9 +3,9 @@ import Component from "/apogeeapp/component/Component.js";
 /** This component represents a table object. */
 export default class DynamicForm extends Component {
         
-    constructor(modelManager, functionObject) {
+    constructor(member,modelManager) {
         //extend edit component
-        super(modelManager,functionObject);
+        super(member,modelManager);
     };
 
 }

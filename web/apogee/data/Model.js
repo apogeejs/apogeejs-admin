@@ -18,7 +18,7 @@ export default class Model extends FieldObject {
 
     constructor(optionalContextOwner) {
         //base init
-        super();
+        super("model");
 
         //mixin initialization
         this.eventManagerMixinInit();
@@ -33,13 +33,19 @@ export default class Model extends FieldObject {
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //fields
         this.setField("name",Model.DEFAULT_MODEL_NAME);
-        //"rootFolder"
         if(optionalContextOwner) {
             this.setField("owner",optionalContextOwner);
         }
 
         this.setField("impactsMap",{});
-        this.setField("memberMap",{});
+
+        //create the member map, with the model included
+        let memberMap = {};
+        memberMap[this.getId()] = this;
+        this.setField("memberMap",memberMap);
+
+        //this holds the base objects, mapped by name
+        this.setField("childMap",{});
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -59,35 +65,84 @@ export default class Model extends FieldObject {
         return this.getField("name");
     }
 
-    /** This method returns the root object - implemented from RootHolder.  */
-    getRoot() {
-        return this.getField("rootFolder");
+    /** this method gets the table map. */
+    getChildMap() {
+        return this.getField("childMap");
     }
 
-    /** This method sets the root object - implemented from RootHolder.  */
-    setRoot(model,member) {
-        this.setField("rootFolder",member);
+    // Must be implemented in extending object
+    /** This method looks up a child from this folder.  */
+    lookupChild = function(name) {
+        //check look for object in this folder
+        let childMap = this.getField("childMap");
+        return childMap[name];
+    }
+
+    /** This method adds the child to this parent. 
+    * It will fail if the name already exists.  */
+    addChild = function(model,child) {
+        //check if it exists first
+        let name = child.getName();
+        let childMap = this.getField("childMap");
+        if(childMap[name]) {
+            //already exists! not fatal since it is not added to the model yet,
+            throw base.createError("There is already an object with the given name.",false);
+        }
+
+        //make a copy of the child map to modify
+        let newChildMap = {};
+        Object.assign(newChildMap,childMap);
+
+        //add object
+        newChildMap[name] = child;
+        this.setField("childMap",newChildMap);
+    }
+
+    /** This method removes this child from this parent.  */
+    removeChild = function(model,child) {
+        //make sure this is a child of this object
+        var owner = child.getOwner(model);
+        if((!owner)||(owner !== this)) return;
+        
+        //remove from folder
+        var name = child.getName();
+        let childMap = this.getField("childMap");
+        //make a copy of the child map to modify
+        let newChildMap = {};
+        Object.assign(newChildMap,childMap);
+        
+        delete(newChildMap[name]);
+        this.setField("childMap",newChildMap);
     }
 
     /** This allows for a model to have a parent. For a normal model this should be null. 
      * This is used for finding variables in scope. */
-    getOwner() {
+    getOwner(model) {
         return this.getField("owner");
     }
 
-    /** This method updates the dependencies of any children in the model. */
+    /** This method updates the dependencies of any children
+     * based on an object being added. */
     updateDependeciesForModelChange(additionalUpdatedMembers) {
-        let rootFolder = this.getField("rootFolder");
-        if(rootFolder) {
-            rootFolder.updateDependeciesForModelChange(this,additionalUpdatedMembers);
+        //call update in children
+        let childMap = this.getField("childMap");
+        for(var key in childMap) {
+            var child = childMap[key];
+            if(child.isDependent) {
+                child.updateDependeciesForModelChange(this,additionalUpdatedMembers);
+            }
         }
     }
 
     /** This method removes any data from this model on closing. */
     onClose() {
-        let rootFolder = this.getField("rootFolder");
-        if(rootFolder) {
-            rootFolder.onClose();
+        //call update in children
+        let childMap = this.getField("childMap");
+        for(var key in childMap) {
+            var child = childMap[key];
+            if(child.onClose) {
+                child.onClose();
+            }
         }
     }
 
@@ -171,32 +226,34 @@ export default class Model extends FieldObject {
     }
 
     /** this method gets the hame the children inherit for the full name. */
-    getPossesionNameBase() {
+    getPossesionNameBase(model) {
         //the name starts over at a new model
         return "";
     }
 
     /** This method looks up a member by its full name.  If the optionalParentMemberList is passed
      * in, it will be populated with any parent members on the path.*/
-    lookupChildFromPathArray(path,startElement,optionalParentMemberList) {
-        let rootFolder = this.getField("rootFolder");
+    lookupChildFromPathArray = function(path,startElement,optionalParentMemberList) {
         if(startElement === undefined) startElement = 0;
-        if((rootFolder)&&(path[startElement] === rootFolder.getName())) {
-            if(startElement === path.length-1) {
-                return rootFolder;
+        
+        var childMember = this.lookupChild(path[startElement]);
+        if(!childMember) return undefined;
+        
+        if(startElement < path.length-1) {
+            if((childMember.isParent)||(childMember.isOwner)) {
+                let grandChildMember = childMember.lookupChildFromPathArray(path,startElement+1,optionalParentMemberList);
+                //record the parent path, if requested
+                if((grandChildMember)&&(optionalParentMemberList)) {
+                    optionalParentMemberList.push(childMember);
+                }
+                return grandChildMember;
             }
             else {
-                startElement++;
-                let insideMember = rootFolder.lookupChildFromPathArray(path,startElement,optionalParentMemberList);
-                //add the root folder as a parent is requested
-                if((insideMember)&&(optionalParentMemberList)) {
-                    optionalParentMemberList.push(rootFolder);
-                }
-                return insideMember;
+                return childMember;
             }
         }
         else {
-            return null;
+            return childMember;
         }
     }
 
@@ -229,7 +286,7 @@ export default class Model extends FieldObject {
     // MemberMap Functions
     //============================
 
-    lookupMember(memberId) {
+    lookupMemberById(memberId) {
         let memberMap = this._getMemberMap()
         return memberMap[memberId];
     }
@@ -352,41 +409,38 @@ export default class Model extends FieldObject {
     // Save and Load Functions
     //============================
 
+    /** This saves the model */
+    toJson() {
+        let json = {};
+        json.fileType = Model.SAVE_FILE_TYPE;
+        json.version = Model.SAVE_FILE_VERSION;
+
+        json.name = this.getField("name");
+        json.children = {};
+        let childMap = this.getField("childMap");
+        for(var key in childMap) {
+            var child = childMap[key];
+            json.children[key] = child.toJson();
+        }
+
+        return json;
+    }
+
     /** This method creates a headless model json from a folder json. It
      * is used in the folder function. */
     static createModelJsonFromFolderJson(name,folderJson) {
-        //create a model json from the root folder json
-        var modelJson = {};
-        modelJson.fileType = Model.SAVE_FILE_TYPE;
-        modelJson.version = Model.SAVE_FILE_VERSION;
-        modelJson.name = name;
-        modelJson.data = folderJson;
-        return modelJson;
-    }
+        let json = {};
+        json.fileType = Model.SAVE_FILE_TYPE;
+        json.version = Model.SAVE_FILE_VERSION;
 
-    /** This saves the model */
-    toJson() {
-        let name = this.getField("name");
-        let rootFolder = this.getField("rootFolder");
-        let rootFolderJson;
-        if(rootFolder) {
-            rootFolderJson = rootFolder.toJson();
-        }
-        return Model.createModelJsonFromFolderJson(name,rootFolderJson);
-    }
+        //let the workspace inherit the folder name
+        json.name = name;
+        json.children = {};
 
-    //-------------------------
-    // Update Event Methods
-    // - NOTE - these are repeated from Member. We should make common base class or add ins for this, along with some other things, like name
-    //-------------------------
+        //attach a single child named main
+        json.children.Main = folderJson;
 
-    getId() {
-        //right now we only allow for one model manager
-        return 1;
-    }
-
-    getType() {
-        return "model";
+        return json
     }
 
     //================================
@@ -428,9 +482,11 @@ Model.EMPTY_MODEL_JSON = {
     "fileType": "apogee model",
     "version": 0.2,
     "name": Model.DEFAULT_MODEL_NAME,
-    "data": {
-        "name": Model.ROOT_FOLDER_NAME,
-        "type": "apogee.Folder"
+    "children": {
+        "Main": {
+            "name": "Main",
+            "type": "apogee.Folder"
+        }
     }
 }
 

@@ -15,9 +15,9 @@ import CommandManager from "/apogeeapp/commands/CommandManager.js";
  * confugred with initialization data from the model. */
 export default class CustomDataComponent extends Component {
 
-    constructor(modelManager,folder) {
+    constructor(member,modelManager) {
         //extend edit component
-        super(modelManager,folder);
+        super(member,modelManager);
         
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         folder.setChildrenWriteable(false);
@@ -127,7 +127,7 @@ export default class CustomDataComponent extends Component {
         var initialValue = this.getField(fieldName);
         var command = {};
         command.type = customDataComponentUpdateData.commandInfo.type;
-        command.memberId = this.getId();
+        command.memberId = this.getMemberId();
         command.fieldName = fieldName;
         command.initialValue = initialValue;
         command.targetValue = targetValue;
@@ -162,7 +162,7 @@ export default class CustomDataComponent extends Component {
     }
 
     /** This serializes the table component. */
-    writeToJson(json) {
+    writeToJson(json,modelManager) {
         //store the resource info
         json.resource = {};
         json.resource["html"] = this.getField("html");
@@ -267,7 +267,7 @@ customDataComponentUpdateData.createUndoCommand = function(workspaceManager,comm
 
 customDataComponentUpdateData.executeCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
-    let component = modelManager.getComponentByFullName(commandData.memberId);
+    let component = modelManager.getComponentByMemberId(commandData.memberId);
     var commandResult = {};
     if(component) {
         try {

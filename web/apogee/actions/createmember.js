@@ -34,7 +34,7 @@ function createMemberAction(model,actionData) {
         owner = model;
     }
     else {
-        owner = model.lookupMember(actionData.ownerId);
+        owner = model.lookupMemberById(actionData.ownerId);
         if(!owner) {
             let actionResult = {};
             actionResult.actionDone = false;
@@ -68,14 +68,11 @@ export function createMember(model,owner,memberJson) {
         // - modify parent and all parents up to model
         // - created object is automatically unlocked.
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        member = generator.createMember(owner,memberJson); 
+        member = generator.createMember(owner.getId(),memberJson); 
 
         //pass this child to the owner
-        if(owner.isParent) {
+        if((owner.isParent)||(owner.isRootHolder)) {
             owner.addChild(model,member);
-        }
-        else if(owner.isRootHolder) {
-            owner.setRoot(model,member);
         }
 
         //register member with model

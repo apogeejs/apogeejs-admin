@@ -6,9 +6,9 @@ import ParentComponent from "/apogeeapp/component/ParentComponent.js";
  *apogee tables rather than writing code. */
 export default class FolderFunctionComponent extends ParentComponent {
         
-    constructor(modelManager,folderFunction) {
+    constructor(member,modelManager) {
         //extend parent component
-        super(modelManager,folderFunction,FolderFunctionComponent);
+        super(member,modelManager);
         
         //register this object as a parent container
         var internalFolder = folderFunction.getInternalFolder();
@@ -17,9 +17,9 @@ export default class FolderFunctionComponent extends ParentComponent {
     }
 
     /** This overrides the get display method of componnet to return the function declaration. */
-    getDisplayName(useFullPath) {
+    getDisplayName(useFullPath,modelManagerForFullPathOnly) {
         let member = this.getMember();
-        var name = useFullPath ? this.getFullName() : this.getName();
+        var name = useFullPath ? this.getFullName(modelManagerForFullPathOnly) : this.getName();
         var argList = member.getArgList();
         var argListString = argList.join(",");
         var returnValueString = member.getReturnValueString();
@@ -68,7 +68,13 @@ export default class FolderFunctionComponent extends ParentComponent {
         internalFolderJson.name = optionsJson.name;
         internalFolderJson.type = "apogee.Folder";
         internalFolderJson.children = childrenJson;
-        optionsJson.internalFolder = internalFolderJson;
+        
+        optionsJson = {};
+        optionsJson.children["root"] = internalFolderJson;
+    }
+
+    static appendMemberChildren(optionsJson,childrenJson) {
+        optionsJson.children = childrenJson;
     }
 
 }

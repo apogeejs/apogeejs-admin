@@ -14,8 +14,8 @@ let movecomponent = {};
 movecomponent.createUndoCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
     var model = modelManager.getModel();
-    var member = model.lookupMember(commandData.memberId);
-    var parent = member.getParent();
+    var member = model.lookupMemberById(commandData.memberId);
+    var parent = member.getParent(model);
     var oldMemberName = member.getName();
     
     var undoCommandJson = {};
@@ -39,7 +39,7 @@ movecomponent.executeCommand = function(workspaceManager,commandData) {
     actionData.targetOwnerId = commandData.newParentId;
     let actionResult = doAction(model,actionData);
 
-    let component = modelManager.getComponentById(commandData.memberId);
+    let component = modelManager.getComponentByMemberId(commandData.memberId);
     
     let commandResult = {};
     if((actionResult.actionDone)&&(component)) {
@@ -50,7 +50,7 @@ movecomponent.executeCommand = function(workspaceManager,commandData) {
     }
     else {
         commandResult.cmdDone = false;
-        let name = component ? component.getFullName() : "unknown";
+        let name = component ? component.getFullName(modelManager) : "unknown";
         commandResult.errorMsg = "Error moving component: " + name;
     }
     commandResult.actionResult = actionResult;

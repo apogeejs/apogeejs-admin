@@ -4,9 +4,9 @@ import Component from "/apogeeapp/component/Component.js";
 export default class JsonTableComponent extends Component {
     
         
-    constructor(modelManager,table) {
+    constructor(member,modelManager) {
         //extend edit component
-        super(modelManager,table,JsonTableComponent);
+        super(member,modelManager);
 
         //default view
         this.setField("dataView",JsonTableComponent.DEFAULT_DATA_VIEW)
@@ -29,7 +29,7 @@ export default class JsonTableComponent extends Component {
     // serialization
     //==============================
 
-    writeToJson(json) {
+    writeToJson(json,modelManager) {
         json.dataView = this.getDataView();
     }
 

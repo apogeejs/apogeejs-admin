@@ -31,8 +31,8 @@ define(['http://localhost:8383/lib/controls/simpleGeojsonControl/leaflet_1.0.1_A
 
         /** This is a simple custom resource component example. */
         apogeeapp.app.SimpleGeojsonControl = class extends apogeeapp.app.BasicControlComponent {
-            constructor(workEspaceManager,control) {
-                super(workEspaceManager,control,apogeeapp.app.SimpleGeojsonControl);
+            constructor(member,modelManager) {
+                super(member,modelManager);
             }
 
             getOutputDisplay(viewMode) {

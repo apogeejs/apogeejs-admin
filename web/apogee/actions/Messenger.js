@@ -82,7 +82,7 @@ export default class Messenger {
      * as defined from the source object context. */
     _getMemberObject(localMemberName) { 
         var path = localMemberName.split(".");
-        var member = this.contextManager.getMember(path);
+        var member = this.contextManager.getMember(this.model,path);
         return member;
     }
 }

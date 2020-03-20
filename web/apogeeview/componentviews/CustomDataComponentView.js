@@ -24,7 +24,7 @@ export default class CustomDataComponentView extends ComponentView {
         //make this, I iwll put this here.
         let css = component.getField("css");
         if((css)&&(css != "")) {
-            apogeeui.setMemberCssData(component.getId(),css);
+            apogeeui.setObjectCssData(component.getId(),css);
         }
         //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     };
@@ -35,7 +35,7 @@ export default class CustomDataComponentView extends ComponentView {
 
         //if this is the css field, set it immediately
         if(component.isFieldUpdated("css")) {
-            apogeeui.setMemberCssData(component.getId(),component.getField("css"));
+            apogeeui.setObjectCssData(component.getId(),component.getField("css"));
         }
     }
 
@@ -46,7 +46,7 @@ export default class CustomDataComponentView extends ComponentView {
     /** This component extends the on delete method to get rid of any css data for this component. */
     onDelete() {
         //remove the css data for this component
-        apogeeui.setMemberCssData(this.component.getId(),"");
+        apogeeui.setObjectCssData(this.component.getId(),"");
         
         super.onDelete();
     }

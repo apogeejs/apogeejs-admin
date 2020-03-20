@@ -5,14 +5,14 @@ import Component from "/apogeeapp/component/Component.js";
 /** This component represents a table object. */
 export default class FunctionComponent extends Component {
 
-    constructor(modelManager, functionObject) {
+    constructor(member,modelManager) {
         //extend edit component
-        super(modelManager,functionObject);
+        super(member,modelManager);
     };
 
     /** This overrides the get title method of member to return the function declaration. */
-    getDisplayName(useFullPath) {
-        var name = useFullPath ? this.getFullName() : this.getName();
+    getDisplayName(useFullPath,modelManagerForFullPathOnly) {
+        var name = useFullPath ? this.getFullName(modelManagerForFullPathOnly) : this.getName();
         let member = this.getMember();
         var argList = member.getArgList();
         var argListString = argList.join(",");

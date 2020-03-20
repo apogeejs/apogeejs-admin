@@ -21,8 +21,8 @@ let updatecomponent = {};
 updatecomponent.createUndoCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
     let model = modelManager.getModel();
-    var member = model.lookupMember(commandData.memberId);
-    var component = modelManager.getComponent(member);
+    var member = model.lookupMemberById(commandData.memberId);
+    var component = modelManager.getComponentByMember(member);
 
     var originalMemberProperties = {};
     if(member.constructor.generator.readProperties) member.constructor.generator.readProperties(member,originalMemberProperties);
@@ -63,8 +63,8 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
     let model = modelManager.getModel();
     //get the member
-    var member = model.lookupMember(commandData.memberId);   
-    var component = modelManager.getComponent(member);
+    var member = model.lookupMemberById(commandData.memberId);   
+    var component = modelManager.getComponentByMember(member);
 
     var error = false;
     
@@ -97,7 +97,7 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
         commandResult.action = "updated";
     }
     else {
-        commandResult.errorMsg = "Error updating component: " + component.getFullName();
+        commandResult.errorMsg = "Error updating component: " + component.getFullName(modelManager);
     }
 
     if(actionResult) commandResult.actionResult = actionResult;

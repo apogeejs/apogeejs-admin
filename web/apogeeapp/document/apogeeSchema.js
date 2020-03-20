@@ -7,10 +7,7 @@ import { Schema } from "/prosemirror/lib/prosemirror-model/src/index.js";
 
 // :: Schema
 // This the schema for the apogee page editor
-export function createFolderSchema(folderComponent) {
-
-  let modelManager = folderComponent.getModelManager();
-  let folderMember = folderComponent.getMember(); 
+export function createFolderSchema(app,pageMemberId) {
 
   // :: Object
   // [Specs](#model.NodeSpec) for the nodes defined in this schema.
@@ -138,12 +135,16 @@ export function createFolderSchema(folderComponent) {
       toDOM: node => {
         let name = node.attrs.name;
 
-        let member = folderMember.lookupChild(name);
-        let component = modelManager.getComponent(member);
+        let modelManager = app.getWorkspaceManager().getModelManager();
+        let pageComponent = modelManager.getComponentByMemberId(pageMemberId);
+        let pageMember = pageComponent.getMember();
+
+        let nodeMember = pageMember.lookupChild(name);
+        let nodeComponent = modelManager.getComponentByMemberId(nodeMember.getId());
 
         let state = {};
-        state.memberJson = member ? member.toJson() : undefined;
-        state.componentJson = component ? component.toJson() : undefined;
+        state.memberJson = nodeMember ? nodeMember.toJson() : undefined;
+        state.componentJson = nodeComponent ? nodeComponent.toJson(modelManager) : undefined;
 
         return ["div", { "data-name":name, "data-state": JSON.stringify(state) }]
       },

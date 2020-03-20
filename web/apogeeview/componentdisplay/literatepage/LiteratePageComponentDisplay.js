@@ -86,7 +86,9 @@ export default class LiteratePageComponentDisplay extends EventManager {
         var member = folderMember.lookupChild(name);
         if (member) {
             var modelView = this.componentView.getModelView();
-            var childComponentView = modelView.getComponentView(member.getId());
+            var modelManager = modelView.getModelManager();
+            var childComponent = modelManager.getComponentByMemberId(member.getId());
+            var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
             let childComponentDisplay;
             if (childComponentView) {
                 childComponentDisplay = childComponentView.getComponentDisplay();
@@ -177,7 +179,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
     /** @private */
     loadTabEntry() {
-        this.tab = new Tab(this.componentView.getComponent().getId());    
+        let component = this.componentView.getComponent();
+        this.tab = new Tab(component.getId());    
 
         //-----------------------
         //set the content
@@ -279,10 +282,12 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
         //show all children
         var modelView = this.componentView.getModelView();
+        var modelManager = modelView.getModelManager();
         var children = folder.getChildMap();
         for(var childName in children) {
-            var child = children[childName];
-            var childComponentView = modelView.getComponentView(child.getId());
+            var childMember = children[childName];
+            var childComponent = modelManager.getComponentByMemberId(childMember.getId());
+            var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
             if(childComponentView) {
                 this.addChild(childComponentView);
             }
@@ -301,9 +306,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //THIS IS BAD - IT IS ONLY TO GET THIS WORKING AS A TRIAL
         //MAKE A WAY TO GET COMPONENT GENERATORS FOR BUTTONS RATHER THAN READING A PRIVATE VARIABLE FROM APP
         let pageComponent = this.componentView.getComponent();
-        var modelManager = pageComponent.getModelManager();
-        var app = modelManager.getApp();
         var appView = this.componentView.getModelView().getWorkspaceView().getAppView();
+        var app = appView.getApp();
 
         for(var i = 0; i < app.standardComponents.length; i++) {
             let key = app.standardComponents[i];
@@ -327,7 +331,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
                     this.editorView.dom.focus();
 
                     var initialValues = {};
-                    initialValues.parentName = this.componentView.getFullName();
+                    initialValues.parentId = pageComponent.getMemberId();
 
                     addComponent(appView,app,componentClass,initialValues,null,null);
                 }
@@ -343,7 +347,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
             this.editorView.dom.focus();
 
             var initialValues = {};
-            initialValues.parentName = this.componentView.getFullName();
+            initialValues.parentId = this.componentView.getComponent().getId();
 
             let appView = this.componentView.getModelView().getWorkspaceView().getAppView();
 
@@ -380,14 +384,15 @@ export default class LiteratePageComponentDisplay extends EventManager {
      * @protected */
     destroy() {
         //we should probably have a less cumbesome way of doing this
-        let pageComponent = this.componentView.getComponent();
         let folder = pageComponent.getParentFolderForChildren();
         var children = folder.getChildMap();
         var modelView = this.componentView.getModelView();
+        var modelManager = modelView.getModelManager();
 
         for(var childName in children) {
             var child = children[childName];
-            var childComponentView = modelView.getComponentView(child.getId());
+            var childComponent = modelManager.getComponentByMemberId(child.getId());
+            var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
             if(childComponentView) {
                 childComponentView.closeComponentDisplay();
             }

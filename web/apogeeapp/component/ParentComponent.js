@@ -9,14 +9,14 @@ import { DOMParser, Node as ProseMirrorNode }  from "/prosemirror/lib/prosemirro
  * It extends the component class. */
 export default class ParentComponent extends Component {
 
-    constructor(modelManager,member) {
+    constructor(member,modelManager) {
         //base constructor
-        super(modelManager,member);
+        super(member,modelManager);
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
         //the schema should only be created once
-        let schema = createFolderSchema(this);
+        let schema = createFolderSchema(modelManager.getApp(),member.getId());
         this.setField("schema",schema);
         //initialize with an empty document
         let document = this._createEmptyDocument(schema);
@@ -71,7 +71,7 @@ export default class ParentComponent extends Component {
     //==============================
 
     /** This serializes the table component. */
-    writeToJson(json) {
+    writeToJson(json,modelManager) {
         //save the editor state
         let document = this.getField("document");
         if(document) {
@@ -81,8 +81,19 @@ export default class ParentComponent extends Component {
         
         //save the children
         var folder = this.getParentFolderForChildren();
-        var modelManager = this.getModelManager();
-        json.children = modelManager.getFolderComponentContentJson(folder);
+        var childrenPresent = false;
+        var children = {};
+        var childMap = folder.getChildMap();
+        for(var key in childMap) {
+            var child = childMap[key];
+            var childComponent = modelManager.getComponentByMember(child);
+            var name = child.getName();
+            children[name] = childComponent.toJson();
+            childrenPresent = true;
+        }
+        if(childrenPresent) {
+            json.children = children;
+        }
 
         return json;
     }
@@ -101,6 +112,25 @@ export default class ParentComponent extends Component {
             document = this._createEmptyDocument(schema);
         }
         this.setField("document",document);
+    }
+
+    /** This method loads the children for this component */
+    loadChildrenFromJson(modelManager,componentJson) {
+        let childCommandResults = [];
+        if(componentJson.children) {
+            let parentMember = this.getParentFolderForChildren();
+            
+            for(let childName in componentJson.children) {
+                let childMember = parentMember.lookupChild(childName);
+                if(childMember) {
+                    let childComponentJson = componentJson.children[childName];
+                    var childCommandResult = modelManager.createComponentFromMember(childMember,childComponentJson);
+                    childCommandResults.push(childCommandResult);
+                }
+            };
+
+        }
+        return childCommandResults;
     }
 
     /** This method makes an empty document */

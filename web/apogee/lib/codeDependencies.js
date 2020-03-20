@@ -1,7 +1,7 @@
 /** This method takes the varInfo table from the code analysis and returns
  * a lit of member objects which this member depends on.
  */
-export function getDependencyInfo(varInfo,contextManager) {
+export function getDependencyInfo(varInfo,model,contextManager) {
 	var dependsOnMap = {};
 	
 	//cycle through the variables used
@@ -17,7 +17,7 @@ export function getDependencyInfo(varInfo,contextManager) {
 
                 //lookup this object, along with the passthrough dependencies
                 let passThroughDependencies = [];
-                var impactor = contextManager.getMember(namePath,passThroughDependencies);
+                var impactor = contextManager.getMember(model,namePath,passThroughDependencies);
 
                 //add the impactor to the dependency map
                 if(impactor) {

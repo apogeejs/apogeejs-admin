@@ -322,7 +322,7 @@ function mergeReturnValueIntoChangeMap(model,changeMap,actionReturnValue) {
 function mergeIntoChangeMap(changeMap,model,member,eventName) {
     //action target is either the member, if defined, or the model
     let actionTarget = member ? member : model;
-    let lookupKey = actionTarget.getType() + actionTarget.getId();
+    let lookupKey = actionTarget.getId()
     var existingInfo = changeMap[lookupKey];
     if(!existingInfo) {
         existingInfo = {};

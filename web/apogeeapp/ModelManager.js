@@ -7,7 +7,7 @@ import EventManager from "/apogeeutil/EventManager.js";
 export default class ModelManager  extends FieldObject {
 
     constructor(workspaceManager) {
-        super();
+        super("modelManager");
 
         //mixin initialization
         this.eventManagerMixinInit();
@@ -94,12 +94,17 @@ export default class ModelManager  extends FieldObject {
             commandResult.target = this;
             commandResult.dispatcher = this;
 
-            //set up the root folder conmponent, with children if applicable
-            var rootFolder = model.getRoot();
-            if(rootFolder) {
-                let rootFolderComponentJson = componentsJson[rootFolder.getName()];
-                var rootFolderCommandResult = this.createComponentFromMember(rootFolder,rootFolderComponentJson);
-                commandResult.childCommandResults = [rootFolderCommandResult];
+            //create the children
+            let childCommandResults = [];
+            let rootChildMap = model.getChildMap();
+            for(let childName in rootChildMap) {
+                let childMember = rootChildMap[childName];
+                let childJson = componentsJson[childName];
+                let childCommandResult = this.createComponentFromMember(childMember,childJson);
+                childCommandResults.push(childCommandResult);
+            }
+            if(childCommandResults.length > 0) {
+                commandResult.childCommandResults = childCommandResults;
             }
 
             commandResult.actionResult = actionResult;
@@ -129,37 +134,12 @@ export default class ModelManager  extends FieldObject {
         }
     }
 
-    //------------------------------------------
-    // Field Object Methods
-    //------------------------------------------
-
-    getId() {
-        //right now we allow for just one model manager
-        return 1;
-    }
-
-    getType() {
-        return "modelManager";
-    }
-
     //====================================
     // Component Management
     //====================================
 
-    /** This method returns a component by full name. */
-    getComponentByFullName(fullName) {
-        let model = this.getField("model");
-        let member = model.getMemberByFullName(fullName);
-        if(member) {
-            return this.getComponent(member);
-        }
-        else {
-            return undefined;
-        }
-    }
-
     /** This method gets the component associated with a member object. */
-    getComponent(member) {
+    getComponentByMember(member) {
         let componentMap = this.getField("componentMap");
         var componentInfo = componentMap[member.getId()];
         if(componentInfo) {
@@ -171,7 +151,7 @@ export default class ModelManager  extends FieldObject {
     }
 
     /** This method gets the component associated with a member object. */
-    getComponentById(memberId) {
+    getComponentByMemberId(memberId) {
         let componentMap = this.getField("componentMap");
         var componentInfo = componentMap[memberId];
         if(componentInfo) {
@@ -185,12 +165,16 @@ export default class ModelManager  extends FieldObject {
     /** This returns the list of folder names. */
     getFolders() {
         let componentMap = this.getField("componentMap");
+        let model = this.getModel();
         var folders = []
         for(var key in componentMap) {
+            var folderEntry = [];
             var componentInfo = componentMap[key];
             var member = componentInfo.member;
             if((member.isParent)&&(member.getChildrenWriteable())) { 
-                folders.push(member.getFullName());
+                folderEntry.push(member.getId());
+                folderEntry.push(member.getFullName(model));
+                folders.push(folderEntry);
             }
         }
         return folders;
@@ -245,7 +229,7 @@ export default class ModelManager  extends FieldObject {
             var componentClass = this.app.getComponentClass(componentJson.type);
             if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorTable")) {
                 //create empty component
-                component = new componentClass(this,member);
+                component = new componentClass(member,this);
 
                 //apply any serialized values
                 if(componentJson) {
@@ -257,7 +241,7 @@ export default class ModelManager  extends FieldObject {
             if(!component) {
                 //table not found - create an empty table
                 componentClass = this.app.getComponentClass("apogeeapp.app.ErrorComponent");
-                component = new componentClass(this,member);
+                component = new componentClass(member,this);
                 if(componentJson) {
                     component.loadProperties(componentJson);
                 }
@@ -275,13 +259,12 @@ export default class ModelManager  extends FieldObject {
             commandResult.cmdDone = true;
             commandResult.action = "created";
 
-            //load the children, if there are any (BETTER ERROR CHECKING!)
-            if(componentJson.children) {
-                let folderMember = component.getParentFolderForChildren();
-                let childCommandResults = this.loadFolderComponentContentFromJson(folderMember,componentJson.children);
-                if((childCommandResults)&&(childCommandResults.length > 0)) {
-                    commandResult.childCommandResults = childCommandResults;
-                } 
+            //load the children, after the component load is completed
+            if(component.loadChildrenFromJson) {
+                let childCommentResults = component.loadChildrenFromJson(this,componentJson);
+                if((childCommentResults)&&(childCommentResults.length > 0)) {
+                    commandResult.childCommandResults = childCommentResults;
+                }
             }
         }
             
@@ -371,16 +354,20 @@ export default class ModelManager  extends FieldObject {
         //get the components json
         let componentsJson = {};
 
-        var rootFolder;
+        let childMap;
         if(optionalSavedRootFolder) {
-            rootFolder = optionalSavedRootFolder;
+            childMap = [];
+            childMap[optionalSavedRootFolder.getName()] = optionalSavedRootFolder;
         }
         else {
-            rootFolder = model.getRoot();
+            childMap = model.getChildMap();
         }
-        var rootFolderComponent = this.getComponent(rootFolder);
 
-        componentsJson[rootFolder.getName()] = rootFolderComponent.toJson();
+        for(let childName in childMap) {
+            let childMember = childMap[childName];
+            let childComponent = this.getComponentByMember(childMember);
+            componentsJson[childName] = childComponent.toJson(this);
+        }
         json.components = componentsJson;
 
         //model view state
@@ -390,55 +377,6 @@ export default class ModelManager  extends FieldObject {
         }
 
         return json;
-    }
-
-    /** This is used in saving the active tab 
-     * @private */
-    getMemberNameFromId(activeTabId) {
-        var component = this.getComponentById(activeTabId);
-        if(component) {
-            var member = component.getMember();
-            if(member) {
-                return member.getFullName();
-            }
-        }
-        return undefined;
-    }
-
-    //================================
-    // Folder child methods
-    // The following methods are standard methods to serialize and deserialize the children in a folder. This
-    // can be used by different folder component representations.
-    //================================
-
-    getFolderComponentContentJson(folder) {
-        var json = {};
-        var tableMap = folder.getChildMap();
-        for(var key in tableMap) {
-            var child = tableMap[key];
-
-            //get the object map for the model
-            var childComponent = this.getComponent(child);
-
-            //get the component for this child
-            var name = child.getName();
-            json[name] = childComponent.toJson();
-        }
-        return json;
-    }
-    
-    loadFolderComponentContentFromJson(parentMember,childrenJson) {
-        let childCommandResults = [];
-        for(let childName in childrenJson) {
-            let childMember = parentMember.lookupChild(childName);
-            if(childMember) {
-                let childComponentJson = childrenJson[childName];
-                var childCommandResult = this.createComponentFromMember(childMember,childComponentJson);
-                childCommandResults.push(childCommandResult);
-            }
-        };
-
-        return childCommandResults;
     }
 
     //==================================
@@ -464,8 +402,8 @@ export default class ModelManager  extends FieldObject {
 
                 var memberStruct = {};
                 memberStruct.type = member.constructor.generator.type;
-                var parent = member.getParent();
-                memberStruct.parent = parent ? parent.getFullName() : null;
+                var parent = member.getParent(model);
+                memberStruct.parent = parent ? parent.getFullName(model) : null;
 
                 if(member.isDependent) {
                     let depList = [];
@@ -473,8 +411,8 @@ export default class ModelManager  extends FieldObject {
                     for(var idString in dependsOnMap) {
                         dependencyType = dependsOnMap[idString];
                         if(dependencyType == apogeeutil.NORMAL_DEPENDENCY) {
-                            let dependency = model.lookupMember(idString);
-                            depList.push(dependency.getFullName());
+                            let dependency = model.lookupMemberById(idString);
+                            depList.push(dependency.getFullName(model));
                         }
                     }
                     if(depList.length > 0) {
@@ -482,7 +420,7 @@ export default class ModelManager  extends FieldObject {
                     }
                 }
 
-                memberInfo[member.getFullName()] = memberStruct;
+                memberInfo[member.getFullName(model)] = memberStruct;
             }
         }
 

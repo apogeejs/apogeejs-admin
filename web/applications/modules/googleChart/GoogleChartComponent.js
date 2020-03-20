@@ -33,8 +33,8 @@ export function initApogeeModule(apogee,apogeeapp,apogeeutil) {
     /** This is a simple google chart component. */
     GoogleChartComponent = class extends apogeeapp.BasicControlComponent {
         
-        constructor(workEspaceManager,control) {
-            super(workEspaceManager,control,GoogleChartComponent);
+        constructor(member,modelManager) {
+            super(member,modelManager);
 
             this.chartType = GoogleChartComponent.DEFAULT_CHART;
 
@@ -142,7 +142,7 @@ export function initApogeeModule(apogee,apogeeapp,apogeeutil) {
         // Static Methods
         //=====================================
         
-        writeToJson(json) {
+        writeToJson(json,modelManager) {
             json.formData = this.storedData;
         }
 

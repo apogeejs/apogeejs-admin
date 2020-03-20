@@ -139,7 +139,7 @@ function createGeneratorFunction(varInfo, combinedFunctionBody) {
         contextDeclarationText += "var " + baseName + ";\n";
         
         //add to the context setter
-        initializerBody += baseName + ' = contextManager.getValue("' + baseName + '");\n';
+        initializerBody += baseName + ' = contextManager.getValue(model,"' + baseName + '");\n';
     }
     
     //create the generator for the object function
@@ -199,7 +199,7 @@ const GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//declare context variables",
 "{0}",
 "//context setter",
-"function __initializer(contextManager,messenger) {",
+"function __initializer(model,contextManager,messenger) {",
 "{1}};",
 "",
 "//user code",

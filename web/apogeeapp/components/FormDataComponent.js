@@ -9,9 +9,9 @@ import Component from "/apogeeapp/component/Component.js";
  * data value, you can use the dynmaic form. */
 export default class FormDataComponent extends Component {
 
-    constructor(modelManager,folder) {
+    constructor(member,modelManager) {
         //extend edit component
-        super(modelManager,folder);
+        super(member,modelManager);
         
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         folder.setChildrenWriteable(false);

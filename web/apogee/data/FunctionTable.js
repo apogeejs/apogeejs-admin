@@ -42,7 +42,7 @@ export default class FunctionTable extends CodeableMember {
                 //how else to stop the calculation other than throwing an error, so 
                 //we do that here. It should be handled by anyone calling a function.
                 if(state == apogeeutil.STATE_ERROR) {
-                    issue = new Error("Error in dependency: " + this.getFullName());
+                    issue = new Error("Error in dependency: " + this.getName());
                 }
                 else if(state == apogeeutil.STATE_PENDING) {
                     issue = base.MEMBER_FUNCTION_PENDING_THROWABLE;
@@ -51,7 +51,7 @@ export default class FunctionTable extends CodeableMember {
                     issue = base.MEMBER_FUNCTION_INVALID_THROWABLE;
                 }
                 else {
-                    issue = new Error("Unknown problem in initializing: " + this.getFullName());
+                    issue = new Error("Unknown problem in initializing: " + this.getName());
                 }
                 
                 throw issue;
@@ -68,8 +68,8 @@ export default class FunctionTable extends CodeableMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(owner,json) {
-        let member = new FunctionTable(json.name,owner,json.updateData);
+    static fromJson(ownerId,json) {
+        let member = new FunctionTable(json.name,ownerId);
 
         //set initial data
         let initialData = json.updateData;

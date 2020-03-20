@@ -6,8 +6,8 @@ import EventManager from "/apogeeutil/EventManager.js";
 /** This is the base functionality for a component. */
 export default class Component extends FieldObject {
 
-    constructor(modelManager,member) {
-        super();
+    constructor(member,modelManager) {
+        super("component");
 
         //mixin initialization
         this.eventManagerMixinInit();
@@ -17,7 +17,6 @@ export default class Component extends FieldObject {
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
-        this.setField("modelManager",modelManager);
         this.setField("member",member);
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     
@@ -83,7 +82,7 @@ export default class Component extends FieldObject {
     
     /** This method returns the ID for the field. It is fixed for the duration of the application.
      * it is not persistent between running the application different time. */
-    getId() {
+    getMemberId() {
         return this.getField("member").getId();
     }
 
@@ -96,14 +95,14 @@ export default class Component extends FieldObject {
 
     /** This method returns the name of the member including the full path.
      * To check if the full name has changed, use the isFullNameChanged method of the member. */
-    getFullName() {
-        return this.getField("member").getFullName();
+    getFullName(modelManager) {
+        return this.getField("member").getFullName(modelManager.getModel());
     }
 
     /** This method returns a display name for the member object. */
-    getDisplayName(useFullPath) {
+    getDisplayName(useFullPath,modelManagerForFullPathOnly) {
         if(useFullPath) {
-            return this.getFullName();
+            return this.getFullName(modelManagerForFullPathOnly);
         }
         else {
             return this.getName();
@@ -119,20 +118,15 @@ export default class Component extends FieldObject {
         return this.isMemberFieldUpdated("member","name");
     }
 
-    getParentComponent() {
-        let parent = this.getField("member").getParent();
+    getParentComponent(modelManager) {
+        let model = modelManager.getModel();
+        let parent = this.getField("member").getParent(model);
         if(parent) {
-            return this.getField("modelManager").getComponent(parent);
+            return modelManager.getComponentByMember(parent);
         }
         else {
             return null;
         }
-    }
-
-    /** This method returns the model manager for this component. To see if the model manager has
-     * been updated, check the "modelManager" field. */
-    getModelManager() {
-        return this.getField("modelManager");
     }
 
     setViewStateCallback(viewStateCallback) {
@@ -143,23 +137,12 @@ export default class Component extends FieldObject {
         return this.cachedViewState;
     }
 
-    //------------------------------------------
-    // Field Object Methods
-    //------------------------------------------
-
-    //getId() Implmented above
-
-    getType() {
-        return "component";
-    }
-
-
     //------------------
     // serialization
     //------------------
 
     /** This serializes the component. */
-    toJson() {
+    toJson(modelManager) {
         var json = {};
         json.type = this.constructor.uniqueName;
 
@@ -171,7 +154,7 @@ export default class Component extends FieldObject {
         
         //allow the specific component implementation to write to the json
         if(this.writeToJson) {
-            this.writeToJson(json);
+            this.writeToJson(json,modelManager);
         }
 
         if(this.viewStateCallback) {
@@ -211,7 +194,7 @@ export default class Component extends FieldObject {
     //This method should optionally be populated by an extending object.
     //** This method writes any necessary component implementation-specific data
     // * to the json. OPTIONAL */
-    //writeToJson(json);
+    //writeToJson(json,modelManager);
 
     /** This method cleans up after a delete. Any extending object that has delete
      * actions should pass a callback function to the method "addClenaupAction" */
@@ -250,10 +233,7 @@ export default class Component extends FieldObject {
         
         var values = {};
         values.name = member.getName();
-        var parent = member.getParent();
-        if(parent) {
-            values.parentName = parent.getFullName();
-        }
+        values.ownerId = member.getOwnerId();
 
         if(member.constructor.generator.readProperties) {
             member.constructor.generator.readProperties(member,values);

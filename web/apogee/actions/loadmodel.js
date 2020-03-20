@@ -57,8 +57,12 @@ function loadModel(model,actionData) {
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
     //load the model members (root folder and its children)
-    let memberActionResult = createMember(model,model,modelJson.data);
-    actionResult.childActionResults = [memberActionResult];
+    actionResult.childActionResults = [];
+    for(let childName in modelJson.children) {
+        let childJson = modelJson.children[childName];
+        let memberActionResult = createMember(model,model,childJson);
+        actionResult.childActionResults.push(memberActionResult);
+    }
 
     actionResult.actionDone = true;
     
