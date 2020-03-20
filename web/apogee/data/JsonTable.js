@@ -7,8 +7,8 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 /** This class encapsulatees a data table for a JSON object */
 export default class JsonTable extends CodeableMember {
 
-    constructor(name,owner) {
-        super(name,owner);
+    constructor(name,parent) {
+        super(name,parent);
 
         //mixin init where needed
         this.contextHolderMixinInit();
@@ -58,8 +58,8 @@ export default class JsonTable extends CodeableMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(ownerId,json) {
-        let member = new JsonTable(json.name,ownerId);
+    static fromJson(parentId,json) {
+        let member = new JsonTable(json.name,parentId);
 
         //set initial data
         let initialData = json.updateData;

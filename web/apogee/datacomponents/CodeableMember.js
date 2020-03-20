@@ -22,8 +22,8 @@ import DependentMember from "/apogee/datacomponents/DependentMember.js"
 export default class CodeableMember extends DependentMember {
 
     /** This initializes the component. argList is the arguments for the object function. */
-    constructor(name,owner) {
-        super(name,owner);
+    constructor(name,parent) {
+        super(name,parent);
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -110,15 +110,10 @@ export default class CodeableMember extends DependentMember {
         let compiledInfo = this.getField("compiledInfo");
         
         if((this.hasCode())&&(compiledInfo.valid)) {
-            try {
-                var dependencyInfo = getDependencyInfo(compiledInfo.varInfo,model,this.getContextManager());
-
-                //update dependencies
-                this.updateDependencies(model,dependencyInfo);
-            }
-            catch(ex) {
-                this.codeErrors.push(ex);
-            }
+            //set the dependencies
+            var dependencyInfo = getDependencyInfo(compiledInfo.varInfo,model,this.getContextManager());
+            this.updateDependencies(model,dependencyInfo);
+            
         }
         else {
             //will not be calculated - has no dependencies

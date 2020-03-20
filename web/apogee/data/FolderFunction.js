@@ -4,87 +4,28 @@ import Model from "/apogee/data/Model.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
 import DependentMember from "/apogee/datacomponents/DependentMember.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
-import Owner from "/apogee/datacomponents/Owner.js";
-import RootHolder from "/apogee/datacomponents/RootHolder.js";
+import Parent from "/apogee/datacomponents/Parent.js";
 
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
 export default class FolderFunction extends DependentMember {
 
-    constructor(name,owner) {
-        super(name,owner);
+    constructor(name,parent) {
+        super(name,parent);
 
         //mixin init where needed
         this.contextHolderMixinInit();
+        this.parentMixinInit();
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //set to an empty function
         this.setData(function(){});
-
-        //this holds the base objects, mapped by name
-        this.setField("childMap",{});
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     }
 
     /** This gets the internal forlder for the folderFunction. */
     getInternalFolder() {
         return this.getField("childMap")["main"];
-    }
-
-    /** this method gets the table map. */
-    getChildMap() {
-        return this.getField("childMap");
-    }
-    
-    // Must be implemented in extending object
-    /** This method looks up a child from this folder.  */
-    lookupChild = function(name) {
-        //check look for object in this folder
-        let childMap = this.getField("childMap");
-        return childMap[name];
-    }
-
-    /** This method adds the child to this parent. 
-    * It will fail if the name already exists.  */
-    addChild = function(model,child) {
-        //check if it exists first
-        let name = child.getName();
-        let childMap = this.getField("childMap");
-        if(childMap[name]) {
-            //already exists! not fatal since it is not added to the model yet,
-            throw base.createError("There is already an object with the given name.",false);
-        }
-
-        //make a copy of the child map to modify
-        let newChildMap = {};
-        Object.assign(newChildMap,childMap);
-
-        //add object
-        newChildMap[name] = child;
-        this.setField("childMap",newChildMap);
-
-        //set all children as dependents
-        this.calculateDependents(model);
-    }
-
-    /** This method removes this child from this parent.  */
-    removeChild = function(model,child) {
-        //make sure this is a child of this object
-        var owner = child.getOwner(model);
-        if((!owner)||(owner !== this)) return;
-        
-        //remove from folder
-        var name = child.getName();
-        let childMap = this.getField("childMap");
-        //make a copy of the child map to modify
-        let newChildMap = {};
-        Object.assign(newChildMap,childMap);
-        
-        delete(newChildMap[name]);
-        this.setField("childMap",newChildMap);
-
-        //set all children as dependents
-        this.calculateDependents(model);
     }
 
     /** This gets the name of the return object for the folderFunction function. */
@@ -102,14 +43,21 @@ export default class FolderFunction extends DependentMember {
     //------------------------------
 
     /** This method removes any data from this model on closing. */
-    close() {
-        this.getField("internalFolder").onClose();
+    onClose() {
+        //call onClose in children
+        let childMap = this.getField("childMap");
+        for(var key in childMap) {
+            var child = childMap[key];
+            if(child.onClose) {
+                child.onClose();
+            }
+        }
     }
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(ownerId,json) {
-        let member = new FolderFunction(json.name,ownerId);
+    static fromJson(parentId,json) {
+        let member = new FolderFunction(json.name,parentId);
 
         //set initial data
         let initialData = json.updateData;
@@ -230,50 +178,19 @@ export default class FolderFunction extends DependentMember {
     //Parent methods
     //------------------------------
 
-    /** this method gets the table map. */
-    getChildMap() {
-        return this.getField("internalFolder").getChildMap();
+    onAddChild(model,child) {
+        //set all children as dependents
+        this.calculateDependents(model);
     }
 
-    /** This method looks up a child from this folder.  */
-    lookupChild(name) {
-        //check look for object in this folder
-        return this.getField("internalFolder").getChildMap()[name];
+    onRemoveChild(model,child) {
+        //set all children as dependents
+        this.calculateDependents(model);
     }
-
-    //------------------------------
-    //Owner methods
-    //------------------------------
 
     /** this method gets the hame the children inherit for the full name. */
     getPossesionNameBase(model) {
         return this.getFullName(model) + ".";
-    }
-
-    /** This method looks up a member by its full name. If the optionalParentMemberList is passed
-     * in, it will be populated with any parent members on the path.*/
-    lookupChildFromPathArray = function(path,startElement,optionalParentMemberList) {
-        if(startElement === undefined) startElement = 0;
-        
-        var childMember = this.lookupChild(path[startElement]);
-        if(!childMember) return undefined;
-        
-        if(startElement < path.length-1) {
-            if((childMember.isParent)||(childMember.isOwner)) {
-                let grandChildMember = childMember.lookupChildFromPathArray(path,startElement+1,optionalParentMemberList);
-                //record the parent path, if requested
-                if((grandChildMember)&&(optionalParentMemberList)) {
-                    optionalParentMemberList.push(childMember);
-                }
-                return grandChildMember;
-            }
-            else {
-                return childMember;
-            }
-        }
-        else {
-            return childMember;
-        }
     }
 
     //============================
@@ -386,7 +303,7 @@ export default class FolderFunction extends DependentMember {
         let internalFolder = this.getField("internalFolder");
         var folderJson = internalFolder.toJson();
         var modelJson = Model.createModelJsonFromFolderJson(this.getName(),folderJson);
-        var virtualModel = new Model(this.getOwner(model));
+        var virtualModel = new Model(this.getParent(model));
 
         //load the model
         let loadAction = {};
@@ -425,8 +342,7 @@ export default class FolderFunction extends DependentMember {
 
 //add components to this class
 base.mixin(FolderFunction,ContextHolder);
-base.mixin(FolderFunction,Owner);
-base.mixin(FolderFunction,RootHolder);
+base.mixin(FolderFunction,Parent);
 
 FolderFunction.INTERNAL_FOLDER_NAME = "root";
 

@@ -36,7 +36,7 @@ movecomponent.executeCommand = function(workspaceManager,commandData) {
     actionData.action = "moveMember";
     actionData.memberId = commandData.memberId;
     actionData.targetName = commandData.newMemberName;
-    actionData.targetOwnerId = commandData.newParentId;
+    actionData.targetParentId = commandData.newParentId;
     let actionResult = doAction(model,actionData);
 
     let component = modelManager.getComponentByMemberId(commandData.memberId);

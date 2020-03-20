@@ -1,34 +1,135 @@
 import ContextManager from "/apogee/lib/ContextManager.js";
 
-/** This component encapsulates an owner object that is a member and contains children members, creating  a 
+/** This component encapsulates an parent object that is a member and contains children members, creating  a 
  * hierarchical structure in the model. Each child has a name and this name
  * forms the index of the child into its parent. (I guess that means it doesn't
  * have to be a string, in the case we made an ArrayFolder, which would index the
  * children by integer.)
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
- * 
- * COMPONENT DEPENDENCIES:
- * - A Parent must be a Member.
- * - A Parent must be an Owner.
  */
 let Parent = {};
 export {Parent as default};
 
 /** This initializes the component */
-Parent.parentMixinInit = function() {
-    this.childrenWriteable = true;
+Parent.parentMixinInit = function(childrenNotWriteable) {
+    this.childrenWriteable = !childrenNotWriteable;
+
+    //initialize the child mape
+    this.setField("childMap",{});
 }
 
 Parent.isParent = true;
 
-///** this method gets a map of child names to children. This may not be the structure
-// * of the data in the parent, but it is the prefered common representation. */
-//Parent.getChildMap = function();
+/** This method returns the map of the children. */
+Parent.getChildMap = function() {
+    return this.getField("childMap");
+}
 
-// Must be implemented in extending object
-///** This method looks up a child from this folder.  */
-//Parent.lookupChild = function(name);
+/** This method looks up a child from this parent.  */
+Parent.lookupChild = function(name) {
+    //check look for object in this folder
+    let childMap = this.getField("childMap");
+    return childMap[name];
+}
+
+/** This method allows the UI to decide if the user can add children to it. This
+ * value defaults to true. */
+Parent.getChildrenWriteable = function() {
+    return this.childrenWriteable;
+}
+
+/** This method sets the writeable property for adding child members. This value of
+ * the method is not enforced (since children must be added one way or another). */
+Parent.setChildrenWriteable = function(writeable) {
+    this.childrenWriteable = writeable; 
+}
+
+/** This method adds a table to the folder. It also sets the folder for the
+ *table object to this folder. It will fail if the name already exists.  */
+Parent.addChild = function(model,child) {
+    
+    //check if it exists first
+    let name = child.getName();
+    let childMap = this.getField("childMap");
+    if(childMap[name]) {
+        //already exists! not fatal since it is not added to the model yet,
+        throw base.createError("There is already an object with the given name.",false);
+    }
+
+    //make a copy of the child map to modify
+    let newChildMap = {};
+    Object.assign(newChildMap,childMap);
+
+    //add object
+    newChildMap[name] = child;
+    this.setField("childMap",newChildMap);
+    
+    //set all children as dependents
+    if(this.onAddChild) {
+        this.onAddChild(model,child);
+    }
+}
+
+//This method should optionally be implemented for any additional actions when a Child is added.
+//Parent.onAddChild(model,child);
+
+/** This method removes a table from the folder. */
+Parent.removeChild = function(model,child) {
+    //make sure this is a child of this object
+    var parent = child.getParent(model);
+    if((!parent)||(parent !== this)) return;
+    
+    //remove from folder
+    var name = child.getName();
+    let childMap = this.getField("childMap");
+    //make a copy of the child map to modify
+    let newChildMap = {};
+    Object.assign(newChildMap,childMap);
+    
+    delete(newChildMap[name]);
+    this.setField("childMap",newChildMap);
+    
+    //set all children as dependents
+    if(this.onRemoveChild) {
+        this.onRemoveChild(model,child);
+    }
+}
+
+//This method should optionally be implemented for any additional actions when a Child is removed.
+//Parent.onRemoveChild(model,child);
+
+///** This method is called when the model is closed. 
+//* It should do any needed cleanup for the object. */
+Parent.onClose = function() {
+    let childMap = this.getField("childMap");
+    for(var key in childMap) {
+        var child = childMap[key];
+        if(child.onClose) child.onClose();
+    }
+
+    if(this.onCloseAddition) {
+        this.onCloseAddition();
+    }
+}
+
+//This method should optionally be implemented if there are any additional actions when the parent is closed.
+//This method will be called after all children have been closed.
+//Parent.onCloseAddition();
+
+//This method should be implemented to give the base name the children inherit for the full name. */
+//Parent.getPossesionNameBase = function(model);
+
+/** This method returns the full name in dot notation for this object. */
+Parent.getChildFullName = function(model,childName) {
+    return this.getPossesionNameBase(model) + childName;
+}
+
+/** This method looks up a member by its full name. */
+Parent.getMemberByFullName = function(fullName) {
+    var path = fullName.split(".");
+    return this.lookupChildFromPathArray(path);
+}
 
 /** This method looks up a child using an arry of names corresponding to the
  * path from this folder to the object.  The argument startElement is an optional
@@ -50,14 +151,6 @@ Parent.lookupChildFromPathArray = function(path,startElement,optionalParentMembe
             }
             return grandChildMember;
         }
-        else if(childMember.isOwner) {
-            let grandChildMember = childMember.lookupChildFromPathArray(path,startElement+1,optionalParentMemberList);
-            //record the parent path, if requested
-            if((grandChildMember)&&(optionalParentMemberList)) {
-                optionalParentMemberList.push(childMember);
-            }
-            return grandChildMember;
-        }
         else {
             return childMember;
         }
@@ -65,64 +158,5 @@ Parent.lookupChildFromPathArray = function(path,startElement,optionalParentMembe
     else {
         return childMember;
     }
-}
-
-/** This method allows the UI to decide if the user can add children to it. This
- * value defaults to true. */
-Parent.getChildrenWriteable = function() {
-    return this.childrenWriteable;
-}
-
-/** This method sets the writeable property for adding child members. This value of
- * the method is not enforced (since children must be added one way or another). */
-Parent.setChildrenWriteable = function(writeable) {
-    this.childrenWriteable = writeable; 
-}
-
-// Must be implemented in extending object
-///** This method adds the child to this parent. 
-// * It will fail if the name already exists.  */
-//Parent.addChild = function(model,child);
-
-// Must be implemented in extending object
-///** This method removes this child from this parent.  */
-//Parent.removeChild = function(model,child);
-
-// Must be implemented in extending object
-///** This method updates the data object for this child. */
-//Parent.updateData = function(child);
-
-///** This method is called when the model is closed. 
-//* It should do any needed cleanup for the object. */
-//Parent.onClose = function();
-
-//------------------------------
-//ContextHolder methods
-//------------------------------
-
-/** This method retrieve creates the loaded context manager. */
-Parent.createContextManager = function() {
-    //set the context manager
-    var contextManager = new ContextManager(this);
-    //add an entry for this folder. Make it local unless this si a root folder
-    var myEntry = {};
-    myEntry.contextHolderAsParent = true;
-    contextManager.addToContextList(myEntry);
-    
-    return contextManager;
-}
-
-//------------------------------
-//Owner methods
-//------------------------------
-
-/** This method returns the full name in dot notation for this object. */
-//Parent.getFullName = function(model) {
-//    return super.getFullName(model);
-//}
-
-/** this method gets the hame the children inherit for the full name. */
-Parent.getPossesionNameBase = function(model) {
-    return this.getFullName(model) + ".";
 }
 

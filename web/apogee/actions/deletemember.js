@@ -62,11 +62,9 @@ function doDelete(model, member) {
     }
     
     //delete member
-    let owner = member.getOwner(model);
-    if(owner) {
-        if((owner.isParent)||(owner.isRootHolder)) {
-            owner.removeChild(model,member);
-        }
+    let parent = member.getParent(model);
+    if(parent) {
+        parent.removeChild(model,member);
     }
 
     //additional delete member actions

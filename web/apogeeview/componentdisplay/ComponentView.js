@@ -387,7 +387,7 @@ export default class ComponentView {
         //check for parent change
         if(component.isFieldUpdated("member")) {
             let member = component.getMember();
-            if(member.isFieldUpdated("ownerId")) {
+            if(member.isFieldUpdated("parentId")) {
                 var oldParentComponentView = this.lastAssignedParentComponentView;
                 var newParentComponentView = this.getParentComponentView();
 

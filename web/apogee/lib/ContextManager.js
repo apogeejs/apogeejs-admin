@@ -32,11 +32,11 @@ ContextManager.prototype.getValue = function(model,varName) {
     
     //if the name is not in this context, check with the parent context
     if(data === undefined) {
-        if((this.contextHolder)&&(this.contextHolder.getOwner)) {
-            var owner = this.contextHolder.getOwner(model);
-            if(owner) {
-                var ownerContextManager = owner.getContextManager();
-                data = ownerContextManager.getValue(model,varName);
+        if((this.contextHolder)&&(this.contextHolder.getParent)) {
+            var parent = this.contextHolder.getParent(model);
+            if(parent) {
+                var parentContextManager = parent.getContextManager();
+                data = parentContextManager.getValue(model,varName);
             }
         }
     }
@@ -49,11 +49,11 @@ ContextManager.prototype.getMember = function(model,path,optionalParentMembers) 
     
     //if the object is not in this context, check with the parent context
     if(impactor === undefined) {
-        if((this.contextHolder)&&(this.contextHolder.getOwner)) {
-            var owner = this.contextHolder.getOwner(model);
-            if(owner) {
-                var ownerContextManager = owner.getContextManager();
-                impactor = ownerContextManager.getMember(model,path,optionalParentMembers);
+        if((this.contextHolder)&&(this.contextHolder.getParent)) {
+            var parent = this.contextHolder.getParent(model);
+            if(parent) {
+                var parentContextManager = parent.getContextManager();
+                impactor = parentContextManager.getMember(model,path,optionalParentMembers);
             }
         }
     }

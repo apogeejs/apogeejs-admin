@@ -6,8 +6,8 @@ import Member from "/apogee/datacomponents/Member.js";
  * is intended to be used as a placeholder when a table generator is not found. */
 export default class ErrorTable extends Member {
 
-    constructor(name,owner) {
-        super(name,owner);
+    constructor(name,parent) {
+        super(name,parent);
 
         var dummyData = "";
         this.setData(dummyData);
@@ -36,9 +36,9 @@ export default class ErrorTable extends Member {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(ownerId,json) {
+    static fromJson(parentId,json) {
         //note - we send in the complete JSON so we can return is on saving
-        let member = new ErrorTable(json.name,ownerId);
+        let member = new ErrorTable(json.name,parentId);
 
         //set the initial data
         member.setField("completeJson",json);

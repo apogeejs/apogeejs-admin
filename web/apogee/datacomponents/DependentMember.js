@@ -12,8 +12,8 @@ import Member from "/apogee/datacomponents/Member.js";
 export default class DependentMember extends Member {
 
     /** This initializes the component */
-    constructor(name,owner) {
-        super(name,owner);
+    constructor(name,parent) {
+        super(name,parent);
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS

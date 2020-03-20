@@ -24,7 +24,6 @@ deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
     
     //problems
     // - is this member a component main member?
-    // - is there a parent, or just an owner
     
     let modelManager = workspaceManager.getModelManager();
     var model = modelManager.getModel();
@@ -38,7 +37,7 @@ deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
     }
     else {
         parent = model.lookupMemberById(commandData.parentId);
-        member = parent.lookupChild(commandData.memberName);
+        parent = parent.lookupChild(commandData.memberName);
     }
     component = modelManager.getComponentByMember(member);
     

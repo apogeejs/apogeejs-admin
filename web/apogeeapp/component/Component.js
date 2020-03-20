@@ -120,7 +120,7 @@ export default class Component extends FieldObject {
 
     getParentComponent(modelManager) {
         let model = modelManager.getModel();
-        let parent = this.getField("member").getParent(model);
+        let parent = this.getField("member").getParentMember(model);
         if(parent) {
             return modelManager.getComponentByMember(parent);
         }
@@ -233,7 +233,7 @@ export default class Component extends FieldObject {
         
         var values = {};
         values.name = member.getName();
-        values.ownerId = member.getOwnerId();
+        values.parentId = member.getParentId();
 
         if(member.constructor.generator.readProperties) {
             member.constructor.generator.readProperties(member,values);

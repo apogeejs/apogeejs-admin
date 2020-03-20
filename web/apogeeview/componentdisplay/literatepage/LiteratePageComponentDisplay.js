@@ -274,12 +274,6 @@ export default class LiteratePageComponentDisplay extends EventManager {
         let pageComponent = this.componentView.getComponent();
         let folder = pageComponent.getParentFolderForChildren();
 
-        //we ony use this context menu and child map for parents
-        //modify if we use this elsewhere
-        if(!folder.isParent) return;
-
-        
-
         //show all children
         var modelView = this.componentView.getModelView();
         var modelManager = modelView.getModelManager();
@@ -384,6 +378,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
      * @protected */
     destroy() {
         //we should probably have a less cumbesome way of doing this
+        let pageComponent = this.componentView.getComponent();
         let folder = pageComponent.getParentFolderForChildren();
         var children = folder.getChildMap();
         var modelView = this.componentView.getModelView();

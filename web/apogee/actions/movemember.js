@@ -26,18 +26,18 @@ function moveMember(model,actionData) {
     }
     actionResult.member = member;
 
-    var targetOwner = model.lookupMemberById(actionData.targetOwnerId);
-    if(!targetOwner) {
+    var targetParent = model.lookupMemberById(actionData.targetParentId);
+    if(!targetParent) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "New parent not found for move member";
         return;
     }
 
-    //if the owner changes, remove this child from the owner
-    //remove from old named object from the new or old owner - if it stays, we still have the new name
-    let currentOwner = member.getOwner(model);
-    if(currentOwner.isParent) {
-        currentOwner.removeChild(model,member);
+    //if the parent changes, remove this child from the parent
+    //remove from old named object from the new or old parent - if it stays, we still have the new name
+    let currentParent = member.getParent(model);
+    if(currentParent.isParent) {
+        currentParent.removeChild(model,member);
     }
     else {
         //don't allow moving a root for now!
@@ -45,11 +45,11 @@ function moveMember(model,actionData) {
     }
         
     //appl the move to the member
-    member.move(actionData.targetName,targetOwner);
+    member.move(actionData.targetName,targetParent);
 
-    //set the member in the new/old owner (rest in old owner to handle a name change)
-    if(targetOwner.isParent) {
-        targetOwner.addChild(model,member);
+    //set the member in the new/old parent (rest in old parent to handle a name change)
+    if(targetParent.isParent) {
+        targetParent.addChild(model,member);
     }
     else {
         //don't allow moving a root for now!

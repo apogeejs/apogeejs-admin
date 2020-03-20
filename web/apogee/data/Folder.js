@@ -2,14 +2,14 @@ import base from "/apogeeutil/base.js";
 import Model from "/apogee/data/Model.js";
 import DependentMember from "/apogee/datacomponents/DependentMember.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
-import Owner from "/apogee/datacomponents/Owner.js";
+import ContextManager from "/apogee/lib/ContextManager.js";
 import Parent from "/apogee/datacomponents/Parent.js";
 
 /** This is a folder. */
 export default class Folder extends DependentMember {
 
-    constructor(name,owner) {
-        super(name,owner);
+    constructor(name,parent) {
+        super(name,parent);
 
         //mixin init where needed
         this.contextHolderMixinInit();
@@ -17,8 +17,7 @@ export default class Folder extends DependentMember {
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
-        //this holds the base objects, mapped by name
-        this.setField("childMap",{});
+        //non defined locally
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         //make sure the data map is frozen
@@ -31,61 +30,24 @@ export default class Folder extends DependentMember {
     // Parent Methods
     //------------------------------
 
-    /** this method gets the table map. */
-    getChildMap() {
-        return this.getField("childMap");
-    }
-
-    /** This method looks up a child from this folder.  */
-    lookupChild(name) {
-        //check look for object in this folder
-        let childMap = this.getField("childMap");
-        return childMap[name];
-    }
-
-    /** This method adds a table to the folder. It also sets the folder for the
-     *table object to this folder. It will fail if the name already exists.  */
-    addChild(model,child) {
-        
-        //check if it exists first
-        let name = child.getName();
-        let childMap = this.getField("childMap");
-        if(childMap[name]) {
-            //already exists! not fatal since it is not added to the model yet,
-            throw base.createError("There is already an object with the given name.",false);
-        }
-
-        //make a copy of the child map to modify
-        let newChildMap = {};
-        Object.assign(newChildMap,childMap);
-
-        //add object
-        newChildMap[name] = child;
-        this.setField("childMap",newChildMap);
-        
+    onAddChild(model,child) {
         //set all children as dependents
         this.calculateDependents(model);
     }
 
-    /** This method removes a table from the folder. */
-    removeChild(model,child) {
-        //make sure this is a child of this object
-        var owner = child.getOwner(model);
-        if((!owner)||(owner !== this)) return;
-        
-        //remove from folder
-        var name = child.getName();
-        let childMap = this.getField("childMap");
-        //make a copy of the child map to modify
-        let newChildMap = {};
-        Object.assign(newChildMap,childMap);
-        
-        delete(newChildMap[name]);
-        this.setField("childMap",newChildMap);
-        
+    onRemoveChild(model,child) {
         //set all children as dependents
         this.calculateDependents(model);
     }
+
+    /** this method gets the hame the children inherit for the full name. */
+    getPossesionNameBase(model) {
+        return this.getFullName(model) + ".";
+    }
+
+    //------------------------------
+    // Dependent Methods
+    //------------------------------
 
     /** There is no calculation for the folder base on dependents. */
     memberUsesRecalculation() {
@@ -123,10 +85,6 @@ export default class Folder extends DependentMember {
         this.clearCalcPending();
     }
 
-    //------------------------------
-    // Dependent Methods
-    //------------------------------
-
     /** This method updates the dependencies of any children
      * based on an object being added. */
     updateDependeciesForModelChange(model,additionalUpdatedMembers) {
@@ -153,8 +111,8 @@ export default class Folder extends DependentMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(ownerId,json) {
-        var folder = new Folder(json.name,ownerId);
+    static fromJson(parentId,json) {
+        var folder = new Folder(json.name,parentId);
 
         if(json.childrenNotWriteable) {
             folder.setChildrenWriteable(false);
@@ -179,12 +137,20 @@ export default class Folder extends DependentMember {
         }
     }
 
-    onClose () {
-        let childMap = this.getField("childMap");
-        for(var key in childMap) {
-            var child = childMap[key];
-            if(child.onClose) child.onClose();
-        }
+    //------------------------------
+    // context holder Methods
+    //------------------------------
+
+    /** This method retrieve creates the loaded context manager. */
+    createContextManager() {
+        //set the context manager
+        var contextManager = new ContextManager(this);
+        //add an entry for this folder. Make it local unless this si a root folder
+        var myEntry = {};
+        myEntry.contextHolderAsParent = true;
+        contextManager.addToContextList(myEntry);
+        
+        return contextManager;
     }
 
     //============================
@@ -206,7 +172,6 @@ export default class Folder extends DependentMember {
 
 //add components to this class                     
 base.mixin(Folder,ContextHolder);
-base.mixin(Folder,Owner);
 base.mixin(Folder,Parent);
 
 //============================

@@ -402,8 +402,8 @@ export default class ModelManager  extends FieldObject {
 
                 var memberStruct = {};
                 memberStruct.type = member.constructor.generator.type;
-                var parent = member.getParent(model);
-                memberStruct.parent = parent ? parent.getFullName(model) : null;
+                var parentMember = member.getParentMember(model);
+                memberStruct.parent = parentMember ? parentMember.getFullName(model) : null;
 
                 if(member.isDependent) {
                     let depList = [];

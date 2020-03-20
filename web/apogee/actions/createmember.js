@@ -8,7 +8,7 @@ import Model from "/apogee/data/Model.js";
  * Action Data format:
  * {
  *  "action": "createMember",
- *  "ownerId": (parent/owner for new member),
+ *  "parentId": (parent for new member),
  *  "name": (name of the new member),
  *  "createData": 
  *      - name
@@ -29,13 +29,13 @@ import Model from "/apogee/data/Model.js";
  * @private */
 function createMemberAction(model,actionData) {
     
-    let owner;
-    if(actionData.modelIsOwner) {
-        owner = model;
+    let parent;
+    if(actionData.modelIsParent) {
+        parent = model;
     }
     else {
-        owner = model.lookupMemberById(actionData.ownerId);
-        if(!owner) {
+        parent = model.lookupMemberById(actionData.parentId);
+        if(!parent) {
             let actionResult = {};
             actionResult.actionDone = false;
             actionResult.errorMsg = "Parent not found for created member";
@@ -44,13 +44,13 @@ function createMemberAction(model,actionData) {
     }
 
     let memberJson = actionData.createData;
-    let actionResult = createMember(model,owner,memberJson);
+    let actionResult = createMember(model,parent,memberJson);
     return actionResult;
 }
 
 /** This function creates a member and any children for that member, returning an action result for
  * the member. This is exported so create member can be used by other actions, such as load model. */
-export function createMember(model,owner,memberJson) {
+export function createMember(model,parent,memberJson) {
 
     let member;
     let actionResult = {};
@@ -68,12 +68,10 @@ export function createMember(model,owner,memberJson) {
         // - modify parent and all parents up to model
         // - created object is automatically unlocked.
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        member = generator.createMember(owner.getId(),memberJson); 
+        member = generator.createMember(parent.getId(),memberJson); 
 
-        //pass this child to the owner
-        if((owner.isParent)||(owner.isRootHolder)) {
-            owner.addChild(model,member);
-        }
+        //pass this child to the parent
+        parent.addChild(model,member);
 
         //register member with model
         model.registerMember(member);
@@ -100,7 +98,7 @@ export function createMember(model,owner,memberJson) {
     else {
         //type not found! - create a dummy object and add an error to it
         let errorTableGenerator = Model.getMemberGenerator("appogee.ErrorTable");
-        member = errorTableGenerator.createMember(owner,memberJson);
+        member = errorTableGenerator.createMember(parent,memberJson);
         member.setError("Member type not found: " + memberJson.type);
         
         //store an error message, but this still counts as command done.

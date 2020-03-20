@@ -3,26 +3,26 @@ import FieldObject from "/apogeeutil/FieldObject.js";
 import EventManager from "/apogeeutil/EventManager.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
-import Owner from "/apogee/datacomponents/Owner.js";
-import RootHolder from "/apogee/datacomponents/RootHolder.js";
+import Parent from "/apogee/datacomponents/Parent.js";
 
-/** This is the model. Typically owner should be null. It
+/** This is the model. Typically parent should be null. It
  * is used for creating virtual models. 
  * - optionalJson - For new models this can be empty. If we are deserializing an existing
  * model, the json for it goes here.
- * - optionalContextOwner - This is used if the model should be placed in a context. This is 
+ * - optionalContextParent - This is used if the model should be placed in a context. This is 
  * used for the virtual model created for folder functions, so the folder function can 
  * access variables from the larger model.
  * */
 export default class Model extends FieldObject {
 
-    constructor(optionalContextOwner) {
+    constructor(optionalContextParent) {
         //base init
         super("model");
 
         //mixin initialization
         this.eventManagerMixinInit();
         this.contextHolderMixinInit();
+        this.parentMixinInit();
         
         // This is a queue to hold actions while one is in process.
         this.actionInProgress = false;
@@ -33,8 +33,8 @@ export default class Model extends FieldObject {
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //fields
         this.setField("name",Model.DEFAULT_MODEL_NAME);
-        if(optionalContextOwner) {
-            this.setField("owner",optionalContextOwner);
+        if(optionalContextParent) {
+            this.setField("parent",optionalContextParent);
         }
 
         this.setField("impactsMap",{});
@@ -43,9 +43,6 @@ export default class Model extends FieldObject {
         let memberMap = {};
         memberMap[this.getId()] = this;
         this.setField("memberMap",memberMap);
-
-        //this holds the base objects, mapped by name
-        this.setField("childMap",{});
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -65,60 +62,10 @@ export default class Model extends FieldObject {
         return this.getField("name");
     }
 
-    /** this method gets the table map. */
-    getChildMap() {
-        return this.getField("childMap");
-    }
-
-    // Must be implemented in extending object
-    /** This method looks up a child from this folder.  */
-    lookupChild = function(name) {
-        //check look for object in this folder
-        let childMap = this.getField("childMap");
-        return childMap[name];
-    }
-
-    /** This method adds the child to this parent. 
-    * It will fail if the name already exists.  */
-    addChild = function(model,child) {
-        //check if it exists first
-        let name = child.getName();
-        let childMap = this.getField("childMap");
-        if(childMap[name]) {
-            //already exists! not fatal since it is not added to the model yet,
-            throw base.createError("There is already an object with the given name.",false);
-        }
-
-        //make a copy of the child map to modify
-        let newChildMap = {};
-        Object.assign(newChildMap,childMap);
-
-        //add object
-        newChildMap[name] = child;
-        this.setField("childMap",newChildMap);
-    }
-
-    /** This method removes this child from this parent.  */
-    removeChild = function(model,child) {
-        //make sure this is a child of this object
-        var owner = child.getOwner(model);
-        if((!owner)||(owner !== this)) return;
-        
-        //remove from folder
-        var name = child.getName();
-        let childMap = this.getField("childMap");
-        //make a copy of the child map to modify
-        let newChildMap = {};
-        Object.assign(newChildMap,childMap);
-        
-        delete(newChildMap[name]);
-        this.setField("childMap",newChildMap);
-    }
-
     /** This allows for a model to have a parent. For a normal model this should be null. 
      * This is used for finding variables in scope. */
-    getOwner(model) {
-        return this.getField("owner");
+    getParent(model) {
+        return this.getField("parent");
     }
 
     /** This method updates the dependencies of any children
@@ -130,18 +77,6 @@ export default class Model extends FieldObject {
             var child = childMap[key];
             if(child.isDependent) {
                 child.updateDependeciesForModelChange(this,additionalUpdatedMembers);
-            }
-        }
-    }
-
-    /** This method removes any data from this model on closing. */
-    onClose() {
-        //call update in children
-        let childMap = this.getField("childMap");
-        for(var key in childMap) {
-            var child = childMap[key];
-            if(child.onClose) {
-                child.onClose();
             }
         }
     }
@@ -217,44 +152,13 @@ export default class Model extends FieldObject {
 
 
     //------------------------------
-    // Owner Methods
+    // Parent Methods
     //------------------------------
-
-    /** this method is implemented for the Owner component/mixin. */
-    getModel() {
-        return this;
-    }
 
     /** this method gets the hame the children inherit for the full name. */
     getPossesionNameBase(model) {
         //the name starts over at a new model
         return "";
-    }
-
-    /** This method looks up a member by its full name.  If the optionalParentMemberList is passed
-     * in, it will be populated with any parent members on the path.*/
-    lookupChildFromPathArray = function(path,startElement,optionalParentMemberList) {
-        if(startElement === undefined) startElement = 0;
-        
-        var childMember = this.lookupChild(path[startElement]);
-        if(!childMember) return undefined;
-        
-        if(startElement < path.length-1) {
-            if((childMember.isParent)||(childMember.isOwner)) {
-                let grandChildMember = childMember.lookupChildFromPathArray(path,startElement+1,optionalParentMemberList);
-                //record the parent path, if requested
-                if((grandChildMember)&&(optionalParentMemberList)) {
-                    optionalParentMemberList.push(childMember);
-                }
-                return grandChildMember;
-            }
-            else {
-                return childMember;
-            }
-        }
-        else {
-            return childMember;
-        }
     }
 
     //------------------------------
@@ -266,16 +170,16 @@ export default class Model extends FieldObject {
         //set the context manager
         var contextManager = new ContextManager(this);
         
-        //if no owner is defined for the model - the standard scenario, we will
+        //if no parent is defined for the model - the standard scenario, we will
         //add all global variables as a data entry for the context, so these variables
         //can be called from the model. 
-        let owner = this.getField("owner");
-        if(!owner) {
+        let parent = this.getField("parent");
+        if(!parent) {
             var globalVarEntry = {};
             globalVarEntry.data = __globals__;
             contextManager.addToContextList(globalVarEntry);
         }
-        //if there is an owner defined, the context manager for the owner will be used
+        //if there is an parent defined, the context manager for the owparentner will be used
         //to lokoup variables. This is done for a folder function, so that it has
         //access to other variables in the model.
         
@@ -462,8 +366,7 @@ export default class Model extends FieldObject {
 //add mixins to this class
 base.mixin(Model,EventManager);
 base.mixin(Model,ContextHolder);
-base.mixin(Model,Owner);
-base.mixin(Model,RootHolder);
+base.mixin(Model,Parent);
 
 let memberGenerators = {};
 

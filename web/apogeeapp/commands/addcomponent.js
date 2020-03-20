@@ -40,7 +40,7 @@ addcomponent.executeCommand = function(workspaceManager,commandData) {
     //create the member
     let createAction = {};
     createAction.action = "createMember";
-    createAction.ownerId = commandData.parentId;
+    createAction.parentId = commandData.parentId;
     createAction.createData = commandData.memberJson;
     let actionResult = doAction(model,createAction);
     
