@@ -64,10 +64,14 @@ export default class Folder extends DependentMember {
         //the data, along with maintaining the current state.
 
         //make an immutable map of the data for each child
-        let childMap = this.getField("childMap");
+        let childIdMap = this.getChildIdMap();
         let dataMap = {};
-        for(let name in childMap) {
-            dataMap[name] = childMap[name].getData();
+        for(let name in childIdMap) {
+            let childId = childIdMap[name];
+            let child = model.lookupMemberById(childId);
+            if(child) {
+                dataMap[name] = child;
+            }
         }
         Object.freeze(dataMap);
 
@@ -96,10 +100,11 @@ export default class Folder extends DependentMember {
         }
 
         //call update in children
-        let childMap = this.getField("childMap");
-        for(var key in childMap) {
-            var child = childMap[key];
-            if(child.isDependent) {
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            let childId = childIdMap[name];
+            var child = model.lookupMemberById(childId);
+            if((child)&&(child.isDependent)) {
                 child.updateDependeciesForModelChange(model,additionalUpdatedMembers);
             }
         }
@@ -123,17 +128,18 @@ export default class Folder extends DependentMember {
 
     /** This method adds any additional data to the json to save for this member. 
      * @protected */
-    addToJson(json) {
+    addToJson(model,json) {
         json.children = {};
         
         if(!this.getChildrenWriteable()) {
             json.childrenNotWriteable = true;
         }
         
-        let childMap = this.getField("childMap");
-        for(var key in childMap) {
-            var child = childMap[key];
-            json.children[key] = child.toJson();
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            let childId = childIdMap[name];
+            let child = model.lookupMemberById(childId);
+            json.children[name] = child.toJson(model);
         }
     }
 
@@ -161,10 +167,10 @@ export default class Folder extends DependentMember {
      * @private */
     calculateDependents(model) {
         let dependsOnMap = [];
-        let childMap = this.getField("childMap");
-        for(var name in childMap) {
-            var child = childMap[name];
-            dependsOnMap[child.getId()] = apogeeutil.NORMAL_DEPENDENCY;
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            var childId = childIdMap[name];
+            dependsOnMap[childId] = apogeeutil.NORMAL_DEPENDENCY;
         }
         return this.updateDependencies(model,dependsOnMap);
     }

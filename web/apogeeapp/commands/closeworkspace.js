@@ -22,7 +22,7 @@ closeworkspace.executeCommand = function(workspaceManager,commandData) {
     try {
         workspaceManager.getApp().clearWorkspaceManager();
         workspaceManager.close();
-        model.onClose();
+        model.onClose(model);
 
         commandResult.cmdDone = true;
     }

@@ -83,11 +83,11 @@ export default class ParentComponent extends Component {
         var folder = this.getParentFolderForChildren();
         var childrenPresent = false;
         var children = {};
-        var childMap = folder.getChildMap();
-        for(var key in childMap) {
-            var child = childMap[key];
-            var childComponent = modelManager.getComponentByMember(child);
-            var name = child.getName();
+        var childIdMap = folder.getChildIdMap();
+        for(var key in childIdMap) {
+            var childId = childIdMap[key];
+            var childComponent = modelManager.getComponentByMemberId(childId);
+            var name = childComponent.getName();
             children[name] = childComponent.toJson(modelManager);
             childrenPresent = true;
         }
@@ -121,7 +121,7 @@ export default class ParentComponent extends Component {
             let parentMember = this.getParentFolderForChildren();
             
             for(let childName in componentJson.children) {
-                let childMember = parentMember.lookupChild(childName);
+                let childMember = parentMember.lookupChild(modelManager.getModel(),childName);
                 if(childMember) {
                     let childComponentJson = componentJson.children[childName];
                     var childCommandResult = modelManager.createComponentFromMember(childMember,childComponentJson);

@@ -34,10 +34,10 @@ export default class ParentComponentView extends ComponentView {
         var member = this.component.getMember();
         var modelView = this.getModelView();
         var modelManager = modelView.getModelManager();
-        var childMap = member.getChildMap();
-        for(var childKey in childMap) {
-            var childMember = childMap[childKey];
-            var childComponent = modelManager.getComponentByMemberId(childMember.getId());
+        var childIdMap = member.getChildIdMap();
+        for(var childKey in childIdMap) {
+            var childMemberId = childIdMap[childKey];
+            var childComponent = modelManager.getComponentByMemberId(childMemberId);
             var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
             if(childComponentView) {
                 var childTreeEntry = childComponentView.getTreeEntry();
@@ -382,7 +382,7 @@ export default class ParentComponentView extends ComponentView {
         //retrieve the existing names
         let activeNameMap = {};
         let member = this.getComponent().getMember();
-        for(let name in member.getChildMap()) {
+        for(let name in member.getChildIdMap()) {
             activeNameMap[name] = true;
         }
 
@@ -608,11 +608,11 @@ export default class ParentComponentView extends ComponentView {
         return deletedComponentShortNames.map(shortName => {
 
             let parentMember = this.getComponent().getParentFolderForChildren();
-            let member = parentMember.lookupChild(shortName);
+            let memberId = parentMember.lookupChildId(shortName);
             
             let commandData = {};
             commandData.type = "deleteComponent";
-            commandData.memberId = member.getId();
+            commandData.memberId = memberId;
             return commandData;
         });
     }

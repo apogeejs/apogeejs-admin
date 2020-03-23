@@ -46,11 +46,11 @@
 				var rootFolder = workspace.getRoot();
 				
 				//set the input
-				var inputTable = rootFolder.lookupChild(inputObject.inputTable);
+				var inputTable = rootFolder.lookupChild(workspace,inputObject.inputTable);
 				apogee.updatemember.updateData(inputTable,inputObject.inputJson);
 				
 				//get the output
-				var outputTable = rootFolder.lookupChild(inputObject.outputTable);
+				var outputTable = rootFolder.lookupChild(workspace,inputObject.outputTable);
 				writeOutput(outputTable.getData());
             }
 			

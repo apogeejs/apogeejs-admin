@@ -96,12 +96,15 @@ export default class ModelManager  extends FieldObject {
 
             //create the children
             let childCommandResults = [];
-            let rootChildMap = model.getChildMap();
-            for(let childName in rootChildMap) {
-                let childMember = rootChildMap[childName];
-                let childJson = componentsJson[childName];
-                let childCommandResult = this.createComponentFromMember(childMember,childJson);
-                childCommandResults.push(childCommandResult);
+            let rootChildIdMap = model.getChildIdMap();
+            for(let childName in rootChildIdMap) {
+                let childMemberId = rootChildIdMap[childName];
+                let childMember = model.lookupMemberById(childMemberId);
+                if(childMember) {
+                    let childJson = componentsJson[childName];
+                    let childCommandResult = this.createComponentFromMember(childMember,childJson);
+                    childCommandResults.push(childCommandResult);
+                }
             }
             if(childCommandResults.length > 0) {
                 commandResult.childCommandResults = childCommandResults;
@@ -354,18 +357,18 @@ export default class ModelManager  extends FieldObject {
         //get the components json
         let componentsJson = {};
 
-        let childMap;
+        let childIdMap;
         if(optionalSavedRootFolder) {
-            childMap = [];
-            childMap[optionalSavedRootFolder.getName()] = optionalSavedRootFolder;
+            childIdMap = [];
+            childIdMap[optionalSavedRootFolder.getName()] = optionalSavedRootFolder;
         }
         else {
-            childMap = model.getChildMap();
+            childIdMap = model.getChildIdMap();
         }
 
-        for(let childName in childMap) {
-            let childMember = childMap[childName];
-            let childComponent = this.getComponentByMember(childMember);
+        for(let childName in childIdMap) {
+            let childMemberId = childIdMap[childName];
+            let childComponent = this.getComponentByMemberId(childMemberId);
             componentsJson[childName] = childComponent.toJson(this);
         }
         json.components = componentsJson;

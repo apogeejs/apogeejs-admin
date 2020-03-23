@@ -62,7 +62,7 @@ function moveMember(model,actionData) {
     actionResult.recalculateDependsOnMembers = true;
     
     //add the child action results
-    let childActionResults = addChildResults(member);
+    let childActionResults = addChildResults(model,member);
     if(childActionResults) {
         actionResult.childActionResults = childActionResults;
     }
@@ -70,25 +70,28 @@ function moveMember(model,actionData) {
     return actionResult;
 }
 
-function addChildResults(member) {
+function addChildResults(model,member) {
     let childActionResults = [];
     
     if((member.isParent)||(member.isRootHolder)) {  
-        var childMap = member.getChildMap();
-        for(var childName in childMap) {
-            var child = childMap[childName];
-            let childActionResult = {};
-            childActionResult.actionDone = true;
-            childActionResult.member = child;
-            childActionResult.event = ACTION_EVENT;
-            childActionResult.updateModelDependencies = true;
-            
-            childActionResults.push(childActionResult);
-            
-            //add results for children to this member
-            let grandchildActionResults = addChildResults(child);
-            if(grandchildActionResults) {
-                childActionResult.childActionResults = grandchildActionResults;
+        var childIdMap = member.getChildIdMap();
+        for(var childName in childIdMap) {
+            var childId = childIdMap[childName];
+            let child = model.lookupMemberById(childId);
+            if(child) {
+                let childActionResult = {};
+                childActionResult.actionDone = true;
+                childActionResult.member = child;
+                childActionResult.event = ACTION_EVENT;
+                childActionResult.updateModelDependencies = true;
+                
+                childActionResults.push(childActionResult);
+                
+                //add results for children to this member
+                let grandchildActionResults = addChildResults(model,child);
+                if(grandchildActionResults) {
+                    childActionResult.childActionResults = grandchildActionResults;
+                }
             }
         }
     }

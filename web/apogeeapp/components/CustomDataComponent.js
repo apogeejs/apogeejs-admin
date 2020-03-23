@@ -22,14 +22,15 @@ export default class CustomDataComponent extends Component {
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         member.setChildrenWriteable(false);
 
+        let model = modelManager.getModel();
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
         //internal tables
-        let dataMember = member.lookupChild("data");
+        let dataMember = member.lookupChild(model,"data");
         this.setField("member.data",dataMember);
         modelManager.registerMember(dataMember,this,folder);
 
-        let inputMember = member.lookupChild("input");
+        let inputMember = member.lookupChild(model,"input");
         this.setField("member.input",inputMember);
         modelManager.registerMember(inputMember,this,folder);
 

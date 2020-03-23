@@ -11,7 +11,7 @@ export default class FolderFunctionComponent extends ParentComponent {
         super(member,modelManager);
         
         //register this object as a parent container
-        var internalFolder = member.getInternalFolder();
+        var internalFolder = member.getInternalFolder(modelManager.getModel());
         this.setField("member.body",internalFolder);
         modelManager.registerMember(internalFolder,this,member);
     }

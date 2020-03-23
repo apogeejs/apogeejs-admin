@@ -16,21 +16,32 @@ Parent.parentMixinInit = function(childrenNotWriteable) {
     this.childrenWriteable = !childrenNotWriteable;
 
     //initialize the child mape
-    this.setField("childMap",{});
+    this.setField("childIdMap",{});
 }
 
 Parent.isParent = true;
 
 /** This method returns the map of the children. */
-Parent.getChildMap = function() {
-    return this.getField("childMap");
+Parent.getChildIdMap = function() {
+    return this.getField("childIdMap");
 }
 
 /** This method looks up a child from this parent.  */
-Parent.lookupChild = function(name) {
+Parent.lookupChildId = function(name) {
     //check look for object in this folder
-    let childMap = this.getField("childMap");
-    return childMap[name];
+    let childIdMap = this.getField("childIdMap");
+    return childIdMap[name];
+}
+
+/** This method looks up a child from this parent.  */
+Parent.lookupChild = function(model,name) {
+    let childId = this.lookupChildId(name);
+    if(childId) {
+        return model.lookupMemberById(childId);
+    }
+    else {
+        return null;
+    }
 }
 
 /** This method allows the UI to decide if the user can add children to it. This
@@ -51,19 +62,19 @@ Parent.addChild = function(model,child) {
     
     //check if it exists first
     let name = child.getName();
-    let childMap = this.getField("childMap");
-    if(childMap[name]) {
+    let childIdMap = this.getField("childIdMap");
+    if(childIdMap[name]) {
         //already exists! not fatal since it is not added to the model yet,
         throw base.createError("There is already an object with the given name.",false);
     }
 
     //make a copy of the child map to modify
-    let newChildMap = {};
-    Object.assign(newChildMap,childMap);
+    let newChildIdMap = {};
+    Object.assign(newChildIdMap,childIdMap);
 
     //add object
-    newChildMap[name] = child;
-    this.setField("childMap",newChildMap);
+    newChildIdMap[name] = child.getId();
+    this.setField("childIdMap",newChildIdMap);
     
     //set all children as dependents
     if(this.onAddChild) {
@@ -82,13 +93,13 @@ Parent.removeChild = function(model,child) {
     
     //remove from folder
     var name = child.getName();
-    let childMap = this.getField("childMap");
+    let childIdMap = this.getField("childIdMap");
     //make a copy of the child map to modify
-    let newChildMap = {};
-    Object.assign(newChildMap,childMap);
+    let newChildIdMap = {};
+    Object.assign(newChildIdMap,childIdMap);
     
-    delete(newChildMap[name]);
-    this.setField("childMap",newChildMap);
+    delete(newChildIdMap[name]);
+    this.setField("childIdMap",newChildIdMap);
     
     //set all children as dependents
     if(this.onRemoveChild) {
@@ -102,10 +113,11 @@ Parent.removeChild = function(model,child) {
 ///** This method is called when the model is closed. 
 //* It should do any needed cleanup for the object. */
 Parent.onClose = function() {
-    let childMap = this.getField("childMap");
-    for(var key in childMap) {
-        var child = childMap[key];
-        if(child.onClose) child.onClose();
+    let childIdMap = this.getField("childIdMap");
+    for(var key in childIdMap) {
+        var childId = childIdMap[key];
+        let child = model.lookupMemberById(childId);
+        if((child)(child.onClose)) child.onClose();
     }
 
     if(this.onCloseAddition) {
@@ -126,9 +138,9 @@ Parent.getChildFullName = function(model,childName) {
 }
 
 /** This method looks up a member by its full name. */
-Parent.getMemberByFullName = function(fullName) {
+Parent.getMemberByFullName = function(model,fullName) {
     var path = fullName.split(".");
-    return this.lookupChildFromPathArray(path);
+    return this.lookupChildFromPathArray(model,path);
 }
 
 /** This method looks up a child using an arry of names corresponding to the
@@ -136,10 +148,10 @@ Parent.getMemberByFullName = function(fullName) {
  * index into the path array for fodler below the root folder. 
  * The optional parentMemberList argument can be passed in to load the parent members 
  * for the given member looked up. */
-Parent.lookupChildFromPathArray = function(path,startElement,optionalParentMemberList) {
+Parent.lookupChildFromPathArray = function(model,path,startElement,optionalParentMemberList) {
     if(startElement === undefined) startElement = 0;
     
-    var childMember = this.lookupChild(path[startElement]);
+    var childMember = this.lookupChild(model,path[startElement]);
     if(!childMember) return undefined;
     
     if(startElement < path.length-1) {

@@ -28,7 +28,7 @@ ContextManager.prototype.clearContextList = function() {
 }
 
 ContextManager.prototype.getValue = function(model,varName) {
-    var data = this.lookupValue(varName);
+    var data = this.lookupValue(model,varName);
     
     //if the name is not in this context, check with the parent context
     if(data === undefined) {
@@ -44,8 +44,8 @@ ContextManager.prototype.getValue = function(model,varName) {
     return data;
 }
 
-ContextManager.prototype.getMember = function(model,path,optionalParentMembers) {
-    var impactor = this.lookupMember(path,optionalParentMembers);
+ContextManager.prototype.getMember = function(model,pathArray,optionalParentMembers) {
+    var impactor = this.lookupMember(model,pathArray,optionalParentMembers);
     
     //if the object is not in this context, check with the parent context
     if(impactor === undefined) {
@@ -53,7 +53,7 @@ ContextManager.prototype.getMember = function(model,path,optionalParentMembers) 
             var parent = this.contextHolder.getParent(model);
             if(parent) {
                 var parentContextManager = parent.getContextManager();
-                impactor = parentContextManager.getMember(model,path,optionalParentMembers);
+                impactor = parentContextManager.getMember(model,pathArray,optionalParentMembers);
             }
         }
     }
@@ -66,13 +66,13 @@ ContextManager.prototype.getMember = function(model,path,optionalParentMembers) 
 //==================================
 
 /** Check each entry of the context list to see if the data is present. */
-ContextManager.prototype.lookupValue = function(varName) {
+ContextManager.prototype.lookupValue = function(model,varName) {
     var data;
     for(var i = 0; i < this.contextList.length; i++) {
         var entry = this.contextList[i];        
         if(entry.contextHolderAsParent) {
             //for parent entries, look up the child and read the data
-            var child = this.contextHolder.lookupChild(varName);
+            var child = this.contextHolder.lookupChild(model,varName);
             if(child) {
                 data = child.getData();
             }
@@ -88,13 +88,13 @@ ContextManager.prototype.lookupValue = function(varName) {
     return undefined;
 }
 
-ContextManager.prototype.lookupMember = function(path,optionalParentMembers) {
+ContextManager.prototype.lookupMember = function(model,pathArray,optionalParentMembers) {
     var impactor;
     for(var i = 0; i < this.contextList.length; i++) {
         var entry = this.contextList[i];        
         if(entry.contextHolderAsParent) {
             //for parent entries, look up the child and read the data
-            impactor = this.contextHolder.lookupChildFromPathArray(path,0,optionalParentMembers);
+            impactor = this.contextHolder.lookupChildFromPathArray(model,pathArray,0,optionalParentMembers);
         }
         //no lookup in data entries
         

@@ -16,18 +16,19 @@ export default class FormDataComponent extends Component {
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         folder.setChildrenWriteable(false);
         
+        let model = modelManager.getModel();
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
         //internal tables
-        let dataMember = folder.lookupChild("data");
+        let dataMember = folder.lookupChild(model,"data");
         this.setField("member.data",dataMember);
         modelManager.registerMember(dataMember,this,folder);
 
-        let layoutFunctionMember = folder.lookupChild("layout");
+        let layoutFunctionMember = folder.lookupChild(model,"layout");
         this.setField("member.layout",layoutFunctionMember);
         modelManager.registerMember(layoutFunctionMember,this,folder);
 
-        let isInputValidFunctionMember = folder.lookupChild("isInputValid");
+        let isInputValidFunctionMember = folder.lookupChild(model,"isInputValid");
         this.setField("member.isInputValid",isInputValidFunctionMember);
         modelManager.registerMember(isInputValidFunctionMember,this,folder);
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&

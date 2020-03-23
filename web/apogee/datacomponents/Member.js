@@ -94,12 +94,12 @@ export default class Member extends FieldObject {
     //================================================
 
     /** This method writes the child to a json. */
-    toJson() {
+    toJson(model) {
         var json = {};
         json.name = this.getField("name");
         json.type = this.constructor.generator.type;
         if(this.addToJson) {
-            this.addToJson(json);
+            this.addToJson(model,json);
         }
         
         if(this.getUpdateData) {
@@ -336,7 +336,7 @@ export default class Member extends FieldObject {
     //be omitted
     ///** This method adds any additional data to the json saved for this member. 
     // * @protected */
-    //addToJson(json) {
+    //addToJson(model,json) {
     //}
 
     //Implement this method if there is update data for this json. otherwise it may

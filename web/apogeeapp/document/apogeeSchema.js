@@ -139,11 +139,11 @@ export function createFolderSchema(app,pageMemberId) {
         let pageComponent = modelManager.getComponentByMemberId(pageMemberId);
         let pageMember = pageComponent.getMember();
 
-        let nodeMember = pageMember.lookupChild(name);
-        let nodeComponent = modelManager.getComponentByMemberId(nodeMember.getId());
+        let nodeMemberId = pageMember.lookupChildId(name);
+        let nodeComponent = modelManager.getComponentByMemberId(nodeMemberId);
 
         let state = {};
-        state.memberJson = nodeMember ? nodeMember.toJson() : undefined;
+        state.memberJson = nodeMember ? nodeMember.toJson(modelManager.getModel()) : undefined;
         state.componentJson = nodeComponent ? nodeComponent.toJson(modelManager) : undefined;
 
         return ["div", { "data-name":name, "data-state": JSON.stringify(state) }]

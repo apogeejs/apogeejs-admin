@@ -101,7 +101,7 @@ function _createComponentDisplay(memberName,optionalViewType) {
    var workspace = app.getWorkspace();
    var workEspaceManager = app.getWorkEspaceManager();
 
-   var member = workspace.getMemberByFullName(memberName); 
+   var member = workspace.getMemberByFullName(workspace,memberName); 
    if(!member) {
        console.error("Member not found: " + memberName);
        return;
@@ -123,7 +123,7 @@ function _getComponentDisplay(memberName) {
     var workspace = app.getWorkspace();
     var workEspaceManager = app.getWorkEspaceManager();
  
-    var member = workspace.getMemberByFullName(memberName); 
+    var member = workspace.getMemberByFullName(workspace,memberName); 
     if(!member) {
         console.error("Member not found: " + memberName);
         return;

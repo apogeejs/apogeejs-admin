@@ -83,11 +83,11 @@ export default class LiteratePageComponentDisplay extends EventManager {
         let folderMember = folderComponent.getParentFolderForChildren();
 
         //lookup component
-        var member = folderMember.lookupChild(name);
-        if (member) {
+        var memberId = folderMember.lookupChildId(name);
+        if (memberId) {
             var modelView = this.componentView.getModelView();
             var modelManager = modelView.getModelManager();
-            var childComponent = modelManager.getComponentByMemberId(member.getId());
+            var childComponent = modelManager.getComponentByMemberId(memberId);
             var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
             let childComponentDisplay;
             if (childComponentView) {
@@ -277,10 +277,10 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //show all children
         var modelView = this.componentView.getModelView();
         var modelManager = modelView.getModelManager();
-        var children = folder.getChildMap();
-        for(var childName in children) {
-            var childMember = children[childName];
-            var childComponent = modelManager.getComponentByMemberId(childMember.getId());
+        var childrenIds = folder.getChildIdMap();
+        for(var childName in childrenIds) {
+            var childMemberId = childrenIds[childName];
+            var childComponent = modelManager.getComponentByMemberId(childMemberId);
             var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
             if(childComponentView) {
                 this.addChild(childComponentView);
@@ -381,13 +381,13 @@ export default class LiteratePageComponentDisplay extends EventManager {
         //we should probably have a less cumbesome way of doing this
         let pageComponent = this.componentView.getComponent();
         let folder = pageComponent.getParentFolderForChildren();
-        var children = folder.getChildMap();
+        var childIdMap = folder.getChildIdMap();
         var modelView = this.componentView.getModelView();
         var modelManager = modelView.getModelManager();
 
-        for(var childName in children) {
-            var child = children[childName];
-            var childComponent = modelManager.getComponentByMemberId(child.getId());
+        for(var childName in childIdMap) {
+            var childMemberId = childIdMapv[childName];
+            var childComponent = modelManager.getComponentByMemberId(childMemberId);
             var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
             if(childComponentView) {
                 childComponentView.closeComponentDisplay();

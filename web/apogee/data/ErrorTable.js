@@ -30,7 +30,7 @@ export default class ErrorTable extends Member {
     }
 
     /** This overrides the commplete json to just pass back the entire json sent in. */
-    toJson() {
+    toJson(model) {
         return this.getField("completeJson");
     }
 

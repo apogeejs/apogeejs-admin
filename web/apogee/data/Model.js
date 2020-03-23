@@ -72,10 +72,11 @@ export default class Model extends FieldObject {
      * based on an object being added. */
     updateDependeciesForModelChange(additionalUpdatedMembers) {
         //call update in children
-        let childMap = this.getField("childMap");
-        for(var key in childMap) {
-            var child = childMap[key];
-            if(child.isDependent) {
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            var childId = childIdMap[name];
+            let child = this.lookupMemberById(childId);
+            if((child)&&(child.isDependent)) {
                 child.updateDependeciesForModelChange(this,additionalUpdatedMembers);
             }
         }
@@ -321,10 +322,13 @@ export default class Model extends FieldObject {
 
         json.name = this.getField("name");
         json.children = {};
-        let childMap = this.getField("childMap");
-        for(var key in childMap) {
-            var child = childMap[key];
-            json.children[key] = child.toJson();
+        let childIdMap = this.getField("childIdMap");
+        for(var name in childIdMap) {
+            var childId = childIdMap[name];
+            let child = this.lookupMemberById(childId);
+            if(child) {
+                json.children[name] = child.toJson(this);
+            }
         }
 
         return json;

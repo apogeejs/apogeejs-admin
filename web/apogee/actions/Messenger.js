@@ -81,8 +81,8 @@ export default class Messenger {
     /** This method returns the member instance for a given local member name,
      * as defined from the source object context. */
     _getMemberObject(localMemberName) { 
-        var path = localMemberName.split(".");
-        var member = this.contextManager.getMember(this.model,path);
+        var pathArray = localMemberName.split(".");
+        var member = this.contextManager.getMember(this.model,pathArray);
         return member;
     }
 }

@@ -24,8 +24,8 @@ export default class FolderFunction extends DependentMember {
     }
 
     /** This gets the internal forlder for the folderFunction. */
-    getInternalFolder() {
-        return this.getField("childMap")["body"];
+    getInternalFolder(model) {
+        return this.lookupChild(model,"body");
     }
 
     /** This gets the name of the return object for the folderFunction function. */
@@ -41,18 +41,6 @@ export default class FolderFunction extends DependentMember {
     //------------------------------
     // Member Methods
     //------------------------------
-
-    /** This method removes any data from this model on closing. */
-    onClose() {
-        //call onClose in children
-        let childMap = this.getField("childMap");
-        for(var key in childMap) {
-            var child = childMap[key];
-            if(child.onClose) {
-                child.onClose();
-            }
-        }
-    }
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
@@ -71,15 +59,18 @@ export default class FolderFunction extends DependentMember {
 
     /** This method adds any additional data to the json saved for this member. 
      * @protected */
-    addToJson(json) {
+    addToJson(model,json) {
         json.updateData = {};
         json.updateData.argList = this.getField("argList");
         json.updateData.returnValue = this.getField("returnValue");
         json.children = {};
-        let childMap = this.getField("childMap");
-        for(var key in childMap) {
-            var child = childMap[key];
-            json.children[key] = child.toJson();
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            var childId = childIdMap[name];
+            let child = model.lookupMemberById(childId);
+            if(child) {
+                json.children[name] = child.toJson(model);
+            }
         }
     }
 
@@ -156,10 +147,11 @@ export default class FolderFunction extends DependentMember {
         }
 
         //call update in children
-        let childMap = this.getField("childMap");
-        for(var key in childMap) {
-            var child = childMap[key];
-            if(child.isDependent) {
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            var childId = childIdMap[name];
+            let child = model.lookupMemberById(childId);
+            if((child)&&(child.isDependent)) {
                 child.updateDependeciesForModelChange(model,additionalUpdatedMembers);
             }
         }
@@ -201,10 +193,10 @@ export default class FolderFunction extends DependentMember {
      * @private */
     calculateDependents(model) {
         let dependsOnMap = [];
-        let childMap = this.getField("childMap");
-        for(var name in childMap) {
-            var child = childMap[name];
-            dependsOnMap[child.getId()] = apogeeutil.NORMAL_DEPENDENCY;
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            var childId = childIdMap[name];
+            dependsOnMap[childId] = apogeeutil.NORMAL_DEPENDENCY;
         }
         return this.updateDependencies(model,dependsOnMap);
     }
@@ -232,7 +224,6 @@ export default class FolderFunction extends DependentMember {
 
         //create a copy of the model to do the function calculation - we don't update the UI display version
         var virtualModel;
-        var internalFolder;
         var inputElementArray;
         var returnValueTable; 
         
@@ -250,9 +241,9 @@ export default class FolderFunction extends DependentMember {
                 }
 
                 //lookup elements from virtual model
-                internalFolder = virtualModel.getMemberByFullName("body");
-                inputElementArray = this.loadInputElements(internalFolder);
-                returnValueTable = this.loadOutputElement(internalFolder); 
+                let virtualInternalFolder = virtualModel.getMemberByFullName(virtualModel,"body");
+                inputElementArray = this.loadInputElements(virtualModel,virtualInternalFolder);
+                returnValueTable = this.loadOutputElement(virtualModel,virtualInternalFolder); 
                 
                 initialized = true;
             }
@@ -300,8 +291,8 @@ export default class FolderFunction extends DependentMember {
     /** This method creates a copy of the model to be used for the function evvaluation. 
      * @private */
     createVirtualModel(model) {
-        let internalFolder = this.getInternalFolder();
-        var folderJson = internalFolder.toJson();
+        let internalFolder = this.getInternalFolder(model);
+        var folderJson = internalFolder.toJson(model);
         var modelJson = Model.createModelJsonFromFolderJson(this.getName(),folderJson);
         var virtualModel = new Model(this.getParent(model));
 
@@ -318,12 +309,12 @@ export default class FolderFunction extends DependentMember {
 
     /** This method loads the input argument members from the virtual model. 
      * @private */
-    loadInputElements(internalFolder) {
+    loadInputElements(virtualModel,virtualInternalFolder) {
         let argMembers = [];
         let argList = this.getField("argList");
         for(var i = 0; i < argList.length; i++) {
             var argName = argList[i];
-            var argMember = internalFolder.lookupChild(argName);
+            var argMember = virtualInternalFolder.lookupChild(virtualModel,argName);
             if(argMember) {
                 argMembers.push(argMember);
             }     
@@ -333,9 +324,9 @@ export default class FolderFunction extends DependentMember {
 
     /** This method loads the output member from the virtual model. 
      * @private  */
-    loadOutputElement(internalFolder) {
+    loadOutputElement(virtualModel,virtualInternalFolder) {
         let returnValueString = this.getField("returnValue");
-        var returnValueMember = internalFolder.lookupChild(returnValueString);
+        var returnValueMember = virtualInternalFolder.lookupChild(virtualModel,returnValueString);
         return returnValueMember;
     }
 }

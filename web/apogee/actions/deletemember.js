@@ -53,11 +53,14 @@ function doDelete(model, member) {
         actionResult.childActionResults = [];
         
         //standard children for parent
-        var childMap = member.getChildMap();
-        for(var childName in childMap) {
-            var child = childMap[childName];
-            let childActionResult = doDelete(model, child);
-            actionResult.childActionResults.push(childActionResult);
+        var childIdMap = member.getChildIdMap();
+        for(var childName in childIdMap) {
+            let childId = childIdMap[childName];
+            let child = model.lookupMemberById(childId);
+            if(child) {
+                let childActionResult = doDelete(model, child);
+                actionResult.childActionResults.push(childActionResult);
+            }
         }
     }
     
