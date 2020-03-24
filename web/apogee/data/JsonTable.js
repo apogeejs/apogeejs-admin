@@ -1,7 +1,6 @@
 import base from "/apogeeutil/base.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Model from "/apogee/data/Model.js";
-import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 
 /** This class encapsulatees a data table for a JSON object */
@@ -9,9 +8,6 @@ export default class JsonTable extends CodeableMember {
 
     constructor(name,parent) {
         super(name,parent);
-
-        //mixin init where needed
-        this.contextHolderMixinInit();
     }
 
     //------------------------------
@@ -98,10 +94,6 @@ export default class JsonTable extends CodeableMember {
         return member;
     }
 }
-
-
-//add components to this class
-base.mixin(JsonTable,ContextHolder);
 
 //============================
 // Static methods

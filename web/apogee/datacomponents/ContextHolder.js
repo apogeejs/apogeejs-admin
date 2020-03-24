@@ -8,7 +8,8 @@ let ContextHolder = {};
 export {ContextHolder as default};
 
 /** This initializes the component */
-ContextHolder.contextHolderMixinInit = function() {
+ContextHolder.contextHolderMixinInit = function(isScopeRoot) {
+    this.isScopeRoot = isScopeRoot;
 
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     //What kind of field is this? Dependent?
@@ -27,6 +28,10 @@ ContextHolder.getContextManager = function() {
     }
     
     return this.contextManager;
+}
+
+ContextHolder.getIsScopeRoot = function() {
+    return this.isScopeRoot;
 }
 
 //this method must be implemneted in extending classes

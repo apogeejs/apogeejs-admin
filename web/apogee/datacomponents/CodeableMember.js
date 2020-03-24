@@ -2,6 +2,7 @@ import base from "/apogeeutil/base.js";
 import Messenger from "/apogee/actions/Messenger.js";
 import {processCode} from "/apogee/lib/codeCompiler.js"; 
 import {getDependencyInfo} from "/apogee/lib/codeDependencies.js";
+import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
 import DependentMember from "/apogee/datacomponents/DependentMember.js"
 
@@ -24,6 +25,9 @@ export default class CodeableMember extends DependentMember {
     /** This initializes the component. argList is the arguments for the object function. */
     constructor(name,parent) {
         super(name,parent);
+
+        //mixin init where needed. This is not a scoep root. Parent scope is inherited in this object
+        this.contextHolderMixinInit(false); 
         
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //FIELDS
@@ -315,3 +319,5 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
 
 }
 
+//add components to this class
+base.mixin(CodeableMember,ContextHolder);

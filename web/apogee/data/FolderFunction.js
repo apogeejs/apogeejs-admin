@@ -14,7 +14,9 @@ export default class FolderFunction extends DependentMember {
         super(name,parent);
 
         //mixin init where needed
-        this.contextHolderMixinInit();
+        //this is a root for the context. Internal members can NOT see what is outside.
+        //Any external values must be passed in as arguments.
+        this.contextHolderMixinInit(true);
         this.parentMixinInit();
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -164,6 +166,9 @@ export default class FolderFunction extends DependentMember {
     /** This method retrieve creates the loaded context manager. */
     createContextManager() {
         return new ContextManager(this);
+
+        //we do not provide a parent entry for this context manager because the contents of the
+        //folder function are NOT accessible to outside members.
     }
 
     //------------------------------
@@ -294,7 +299,7 @@ export default class FolderFunction extends DependentMember {
         let internalFolder = this.getInternalFolder(model);
         var folderJson = internalFolder.toJson(model);
         var modelJson = Model.createModelJsonFromFolderJson(this.getName(),folderJson);
-        var virtualModel = new Model(this.getParent(model));
+        var virtualModel = new Model();
 
         //load the model
         let loadAction = {};

@@ -15,13 +15,14 @@ import Parent from "/apogee/datacomponents/Parent.js";
  * */
 export default class Model extends FieldObject {
 
-    constructor(optionalContextParent) {
+    constructor() {
         //base init
         super("model");
 
         //mixin initialization
         this.eventManagerMixinInit();
-        this.contextHolderMixinInit();
+        //this is a root for the context
+        this.contextHolderMixinInit(true);
         this.parentMixinInit();
         
         // This is a queue to hold actions while one is in process.
@@ -33,12 +34,7 @@ export default class Model extends FieldObject {
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         //fields
         this.setField("name",Model.DEFAULT_MODEL_NAME);
-        if(optionalContextParent) {
-            this.setField("parent",optionalContextParent);
-        }
-
         this.setField("impactsMap",{});
-
         //create the member map, with the model included
         let memberMap = {};
         memberMap[this.getId()] = this;
@@ -60,12 +56,6 @@ export default class Model extends FieldObject {
     /** This method returns the root object - implemented from RootHolder.  */
     getName() {
         return this.getField("name");
-    }
-
-    /** This allows for a model to have a parent. For a normal model this should be null. 
-     * This is used for finding variables in scope. */
-    getParent(model) {
-        return this.getField("parent");
     }
 
     /** This method updates the dependencies of any children
@@ -170,19 +160,13 @@ export default class Model extends FieldObject {
     createContextManager() {
         //set the context manager
         var contextManager = new ContextManager(this);
-        
-        //if no parent is defined for the model - the standard scenario, we will
-        //add all global variables as a data entry for the context, so these variables
-        //can be called from the model. 
-        let parent = this.getField("parent");
-        if(!parent) {
-            var globalVarEntry = {};
-            globalVarEntry.data = __globals__;
-            contextManager.addToContextList(globalVarEntry);
-        }
-        //if there is an parent defined, the context manager for the owparentner will be used
-        //to lokoup variables. This is done for a folder function, so that it has
-        //access to other variables in the model.
+
+        //add an entry for this folder. This is for multiple folders in the model base
+        //which as of the time of this comment we don't have but plan on adding
+        //(at which time this comment will probably be left in by accident...)
+        var myEntry = {};
+        myEntry.contextHolderAsParent = true;
+        contextManager.addToContextList(myEntry);
         
         return contextManager;
     }

@@ -12,7 +12,8 @@ export default class Folder extends DependentMember {
         super(name,parent);
 
         //mixin init where needed
-        this.contextHolderMixinInit();
+        //This is not a root. Scope is inherited from the parent.
+        this.contextHolderMixinInit(false);
         this.parentMixinInit();
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -70,7 +71,7 @@ export default class Folder extends DependentMember {
             let childId = childIdMap[name];
             let child = model.lookupMemberById(childId);
             if(child) {
-                dataMap[name] = child;
+                dataMap[name] = child.getData();
             }
         }
         Object.freeze(dataMap);
@@ -151,7 +152,8 @@ export default class Folder extends DependentMember {
     createContextManager() {
         //set the context manager
         var contextManager = new ContextManager(this);
-        //add an entry for this folder. Make it local unless this si a root folder
+        
+        //add an entry for this folder
         var myEntry = {};
         myEntry.contextHolderAsParent = true;
         contextManager.addToContextList(myEntry);

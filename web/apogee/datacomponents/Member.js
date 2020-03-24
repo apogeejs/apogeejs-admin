@@ -31,6 +31,11 @@ export default class Member extends FieldObject {
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     }
 
+    /** This property tells if this object is a member. */
+    get isMember() {
+        return true;
+    }
+
     /** this method gets the name. */
     getName() {
         return this.getField("name");

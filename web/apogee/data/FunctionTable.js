@@ -1,17 +1,13 @@
 import base from "/apogeeutil/base.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Model from "/apogee/data/Model.js";
-import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 
 /** This is a function. */
 export default class FunctionTable extends CodeableMember {
 
     constructor(name,parent) {
-        super(name,parent);
-
-        //mixin init where needed
-        this.contextHolderMixinInit();    
+        super(name,parent);   
     }
 
     //------------------------------
@@ -108,10 +104,6 @@ export default class FunctionTable extends CodeableMember {
     }
 
 }
-
-
-//add components to this class
-base.mixin(FunctionTable,ContextHolder);
 
 //============================
 // Static methods

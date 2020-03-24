@@ -11,9 +11,11 @@ import ContextManager from "/apogee/lib/ContextManager.js";
 let Parent = {};
 export {Parent as default};
 
-/** This initializes the component */
-Parent.parentMixinInit = function(childrenNotWriteable) {
-    this.childrenWriteable = !childrenNotWriteable;
+/** This initializes the component.
+ */
+Parent.parentMixinInit = function() {
+    //default value. Can be reconfigured
+    this.childrenWriteable = true
 
     //initialize the child mape
     this.setField("childIdMap",{});
@@ -156,7 +158,7 @@ Parent.lookupChildFromPathArray = function(model,path,startElement,optionalParen
     
     if(startElement < path.length-1) {
         if(childMember.isParent) {
-            let grandChildMember = childMember.lookupChildFromPathArray(path,startElement+1,optionalParentMemberList);
+            let grandChildMember = childMember.lookupChildFromPathArray(model,path,startElement+1,optionalParentMemberList);
             //record the parent path, if requested
             if((grandChildMember)&&(optionalParentMemberList)) {
                 optionalParentMemberList.push(childMember);
@@ -171,4 +173,3 @@ Parent.lookupChildFromPathArray = function(model,path,startElement,optionalParen
         return childMember;
     }
 }
-
